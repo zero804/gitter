@@ -4,6 +4,7 @@
 var Q                  = require('q');
 var lazy               = require('lazy.js');
 var troupeService      = require('./troupe-service');
+var troupeUriMapper    = require('./troupe-uri-mapper');
 var mongoUtils         = require('../utils/mongo-utils');
 var persistence        = require('./persistence-service');
 var assert             = require('assert');
@@ -213,15 +214,12 @@ function clearLastVisitedTroupeforUserId(userId, troupeId) {
          { upsert: true });
 }
 
-/**
- * Internal function
- */
-function saveUserTroupeLastAccessWithLimit(userId, troupeId) {
-  var lastAccessTime = new Date();
-
+function saveUserTroupeLastAccess(userId, troupeId, lastAccessTime) {
+  if (!lastAccessTime) lastAccessTime = new Date();
 
   var setOp = {};
   setOp['troupes.' + troupeId] = lastAccessTime;
+  setOp['last.' + troupeId] = lastAccessTime;
 
   return persistence.UserTroupeLastAccess.updateQ(
      { userId: userId },
@@ -233,21 +231,20 @@ function saveUserTroupeLastAccessWithLimit(userId, troupeId) {
  * Update the last visited troupe for the user, sending out appropriate events
  * Returns a promise of nothing
  */
-function saveLastVisitedTroupeforUserId(userId, troupeId) {
+function saveLastVisitedTroupeforUserId(userId, troupeId, options) {
   var lastAccessTime = new Date();
 
-  var setOp = {};
-  setOp['troupes.' + troupeId] = lastAccessTime;
-
   return Q.all([
-      saveUserTroupeLastAccessWithLimit(userId, troupeId),
+      saveUserTroupeLastAccess(userId, troupeId, lastAccessTime),
       // Update User
       persistence.User.updateQ({ _id: userId }, { $set: { lastTroupe: troupeId }})
     ])
     .then(function() {
       // XXX: lastAccessTime should be a date but for some bizarre reason it's not
       // serializing properly
-      appEvents.dataChange2('/user/' + userId + '/rooms', 'patch', { id: troupeId, lastAccessTime: moment(lastAccessTime).toISOString() });
+      if (!options || !options.skipFayeUpdate) {
+        appEvents.dataChange2('/user/' + userId + '/rooms', 'patch', { id: troupeId, lastAccessTime: moment(lastAccessTime).toISOString() });
+      }
     });
 }
 exports.saveLastVisitedTroupeforUserId = saveLastVisitedTroupeforUserId;
@@ -266,67 +263,34 @@ function getTroupeLastAccessTimesForUser(userId) {
 }
 exports.getTroupeLastAccessTimesForUser = getTroupeLastAccessTimesForUser;
 
+function findMostRecentRoomUrlForUser(userId) {
 
-/**
- * Find the last troupe that a user accessed that the user still has access to
- * that hasn't been deleted
- * @return promise of a troupe (or null)
- */
-function findLastAccessedTroupeForUser(user) {
-  return persistence.Troupe.findQ({ 'users.userId': user.id, 'status': 'ACTIVE' })
-    .then(function(activeTroupes) {
-      if (!activeTroupes || activeTroupes.length === 0) return null;
-
-      return getTroupeLastAccessTimesForUser(user.id)
-        .then(function(troupeAccessTimes) {
-          activeTroupes.forEach(function(troupe) {
-            troupe.lastAccessTime = troupeAccessTimes[troupe._id];
-          });
-
-          var troupes = _.sortBy(activeTroupes, function(t) {
-            return (t.lastAccessTime) ? t.lastAccessTime : 0;
-          }).reverse();
-
-          var troupe = _.find(troupes, function(troupe) {
-            return troupeService.userHasAccessToTroupe(user, troupe);
-          });
-
-          return troupe;
-        });
-
-    });
-
-}
-
-
-/**
- * Find the best troupe for a user to access
- * @return promise of a troupe or null
- */
-function findBestTroupeForUser(user) {
-  //
-  // This code is invoked when a user's lastAccessedTroupe is no longer valid (for the user)
-  // or the user doesn't have a last accessed troupe. It looks for all the troupes that the user
-  // DOES have access to (by querying the troupes.users collection in mongo)
-  // If the user has a troupe, it takes them to the last one they accessed. If the user doesn't have
-  // any valid troupes, it returns an error.
-  //
-  if (user.lastTroupe) {
-    // TODO: make this lean
-    return troupeService.findById(user.lastTroupe)
-      .then(function(troupe) {
-
-        if(!troupe || troupe.status == 'DELETED' || !troupeService.userHasAccessToTroupe(user, troupe)) {
-          return findLastAccessedTroupeForUser(user);
-        }
-
-        return troupe;
+  return getTroupeLastAccessTimesForUser(userId)
+    .then(function(troupeAccessTimes) {
+      var troupeIds = Object.keys(troupeAccessTimes);
+      troupeIds.sort(function(a, b) {
+        return troupeAccessTimes[b] - troupeAccessTimes[a]; // Reverse sort
       });
-  }
 
-  return findLastAccessedTroupeForUser(user);
+      return troupeUriMapper.getUrlOfFirstAccessibleRoom(troupeIds, userId)
+    });
 }
-exports.findBestTroupeForUser = findBestTroupeForUser;
+
+/* When a logged in user hits the root URL, find the best room to direct them to, or return null */
+function findInitialRoomUrlForUser(user) {
+  if (user.lastTroupe) {
+    return troupeUriMapper.getUrlOfFirstAccessibleRoom([user.lastTroupe], user._id)
+      .then(function(url) {
+        if (url) return url;
+
+        return findMostRecentRoomUrlForUser(user.id);
+      });
+  } else {
+    return findMostRecentRoomUrlForUser(user.id);
+
+  }
+}
+exports.findInitialRoomUrlForUser = findInitialRoomUrlForUser;
 
 /**
  * Returns a hash of the last access times for an array of userIds for a given room

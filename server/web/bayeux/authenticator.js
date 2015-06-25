@@ -104,9 +104,9 @@ module.exports = bayeuxExtension({
 
       message.ext.userId = userId;
 
-      // if(troupeId) {
-      //   recentRoomService.saveLastVisitedTroupeforUserId(userId, troupeId);
-      // }
+      if(troupeId && userId) {
+        recentRoomService.saveLastVisitedTroupeforUserId(userId, troupeId, { skipFayeUpdate: true });
+      }
 
       // If the troupeId was included, it means we've got a native
       // client and they'll be looking for a snapshot:
