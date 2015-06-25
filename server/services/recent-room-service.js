@@ -232,7 +232,7 @@ function saveUserTroupeLastAccess(userId, troupeId, lastAccessTime) {
  * Returns a promise of nothing
  */
 function saveLastVisitedTroupeforUserId(userId, troupeId, options) {
-  var lastAccessTime = new Date();
+  var lastAccessTime = options && options.lastAccessTime || new Date();
 
   return Q.all([
       saveUserTroupeLastAccess(userId, troupeId, lastAccessTime),
@@ -257,6 +257,7 @@ function getTroupeLastAccessTimesForUserExcludingHidden(userId) {
     });
 }
 exports.getTroupeLastAccessTimesForUserExcludingHidden = getTroupeLastAccessTimesForUserExcludingHidden;
+
 /**
  * Get the last access times for a user.
  * @param userId user we're getting the last access time for
