@@ -305,32 +305,39 @@ function findInitialRoomUrlForUser(user) {
 exports.findInitialRoomUrlForUser = findInitialRoomUrlForUser;
 
 /**
- * Returns a hash of the last access times for an array of userIds for a given room
+ * Returns a hash of the last access times for an array of userIds for a given room.
+ * If the user has never accessed the room, the value will represent the
+ * date the user was added to the room, or the date this feature was deployed
+ * as a default ~1 July 2015.
  */
 function findLastAccessTimesForUsersInRoom(roomId, userIds) {
   if (!userIds.length) return Q.resolve({});
 
   var troupesKey = 'troupes.' +  roomId;
   var lastKey = 'last.' +  roomId;
+  var addedKey = 'added.' +  roomId;
 
-  var orClause = [{},{}];
+  var orClause = [{}, {}, {}];
   orClause[0][troupesKey] = { $exists: true };
   orClause[1][lastKey] = { $exists: true };
+  orClause[2][addedKey] = { $exists: true };
 
   var query = { userId: { $in: userIds }, $or: [orClause] };
-  query[troupesKey] = { $exists: true };
 
   var select = { userId: 1, _id: 0 };
   select[troupesKey] = 1;
   select[lastKey] = 1;
+  select[addedKey] = 1;
 
   return persistence.UserTroupeLastAccess.findQ(query, select, { lean: true })
     .then(function(lastAccessTimes) {
+
       var lastAccessTimesHash = lastAccessTimes.reduce(function(memo, item) {
         // Use the last date by default, falling back to the troupes hash for
         // backwards compatibility
         memo[item.userId] = item.last && item.last[roomId] ||
-                            item.troupes && item.troupes[roomId];
+                            item.troupes && item.troupes[roomId] ||
+                            item.added && item.added[roomId];
         return memo;
       }, {});
 
