@@ -9,6 +9,7 @@ var fixtureLoader = require('../test-fixtures');
 var autoLurkerService = testRequire("./services/auto-lurker-service");
 var recentRoomService = testRequire("./services/recent-room-service");
 var roomService = testRequire("./services/room-service");
+var persistence = testRequire("./services/persistence-service");
 var userTroupeSettingsService = testRequire("./services/user-troupe-settings-service");
 
 describe('auto-lurker-service', function() {
@@ -105,6 +106,89 @@ describe('auto-lurker-service', function() {
           })
         .nodeify(done);
     });
+
+  });
+
+  describe('#autoLurkInactiveUsers', function() {
+    var fixture = {};
+
+    before(fixtureLoader(fixture, {
+      user1: { },
+      user2: { },
+      troupe1: { users: ['user1'] }
+    }));
+
+    after(function() {
+      fixture.cleanup();
+    });
+
+    it('#01 should return a lurk candidate',function(done) {
+      var tenDaysAgo = new Date(Date.now() - 86400000 * 10);
+      return recentRoomService.saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupe1.id, { lastAccessTime: tenDaysAgo })
+        .then(function() {
+          return autoLurkerService.autoLurkInactiveUsers(fixture.troupe1, { minTimeInDays: 1 });
+        })
+        .then(function() {
+          return [
+            userTroupeSettingsService.getUserSettings(fixture.user1.id, fixture.troupe1.id, 'notifications'),
+            persistence.Troupe.findOneQ({ _id: fixture.troupe1._id }, { users: { $elemMatch: { userId: fixture.user1._id } } })
+          ];
+        })
+        .spread(function(settings, t) {
+          assert.strictEqual(settings.push, 'mention');
+          assert(t.users[0].lurk);
+        })
+        .nodeify(done);
+    });
+
+    it('#02 should return a lurk candidate with notify settings',function(done) {
+      var tenDaysAgo = new Date(Date.now() - 86400000 * 10);
+      return userTroupeSettingsService.setUserSettings(fixture.user1.id, fixture.troupe1.id, 'notifications', { push: 'mention' })
+        .then(function() {
+          return recentRoomService.saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupe1.id, { lastAccessTime: tenDaysAgo });
+        })
+        .then(function() {
+          return autoLurkerService.autoLurkInactiveUsers(fixture.troupe1, { minTimeInDays: 1 });
+        })
+        .then(function() {
+          return [
+            userTroupeSettingsService.getUserSettings(fixture.user1.id, fixture.troupe1.id, 'notifications'),
+            persistence.Troupe.findOneQ({ _id: fixture.troupe1._id }, { users: { $elemMatch: { userId: fixture.user1._id } } })
+          ];
+        })
+        .spread(function(settings, t) {
+          assert.strictEqual(settings.push, 'mention');
+          assert(t.users[0].lurk);
+        })
+        .nodeify(done);
+    });
+
+    it('#03 should return a lurk candidate with notify settings',function(done) {
+      var tenDaysAgo = new Date(Date.now() - 86400000 * 10);
+      return userTroupeSettingsService.setUserSettings(fixture.user1.id, fixture.troupe1.id, 'notifications', { push: 'mute' })
+        .then(function() {
+          fixture.troupe1.users[0].lurk = true; // Workaround
+          return roomService.updateTroupeLurkForUserId(fixture.user1.id, fixture.troupe1.id, true); // lurk!
+        })
+        .then(function() {
+          return recentRoomService.saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupe1.id, { lastAccessTime: tenDaysAgo });
+        })
+        .then(function() {
+          return autoLurkerService.autoLurkInactiveUsers(fixture.troupe1, { minTimeInDays: 1 });
+        })
+        .then(function() {
+          return [
+            userTroupeSettingsService.getUserSettings(fixture.user1.id, fixture.troupe1.id, 'notifications'),
+            persistence.Troupe.findOneQ({ _id: fixture.troupe1._id }, { users: { $elemMatch: { userId: fixture.user1._id } } })
+          ];
+        })
+        .spread(function(settings, t) {
+          assert.strictEqual(settings.push, 'mute');
+          assert(t.users[0].lurk);
+        })
+        .nodeify(done);
+    });
+
 
   });
 
