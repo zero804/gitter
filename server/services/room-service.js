@@ -907,6 +907,20 @@ function notifyInvitedUser(fromUser, invitedUser, room/*, isNewUser*/) {
     .thenResolve(invitedUser);
 }
 
+function updateUserDateAdded(userId, roomId) {
+  var setOp = {};
+  setOp['added.' + roomId] = new Date();
+
+  return persistence.UserTroupeLastAccess.updateQ(
+     { userId: userId },
+     { $set: setOp },
+     { upsert: true });
+
+}
+
+/**
+ * Somebody adds another user to a room
+ */
 function addUserToRoom(room, instigatingUser, usernameToAdd) {
   return Q.all([
     roomPermissionsModel(instigatingUser, 'adduser', room),
@@ -931,9 +945,14 @@ function addUserToRoom(room, instigatingUser, usernameToAdd) {
       room.addUserById(invitedUser.id);
       return room.saveQ()
         .then(function () {
-          return notifyInvitedUser(instigatingUser, invitedUser, room, isNewUser);
+          return Q.all([
+            notifyInvitedUser(instigatingUser, invitedUser, room, isNewUser),
+            updateUserDateAdded(invitedUser.id, room.id)
+          ])
+          .thenResolve(invitedUser);
         });
     });
+
 }
 
 exports.addUserToRoom = addUserToRoom;

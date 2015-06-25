@@ -16,6 +16,7 @@ Q.longStackSupport = true;
 
 var troupeService = testRequire("./services/troupe-service");
 var persistence = testRequire("./services/persistence-service");
+var mongoUtils = testRequire("./utils/mongo-utils");
 
 function makeRoomAssertions(room, usersAllowedIn, usersNotAllowedIn) {
   return Q.resolve(true);
@@ -377,6 +378,10 @@ describe('room-service #slow', function() {
   });
 
   describe('addUserToRoom', function() {
+    var userId;
+    beforeEach(function() {
+      userId = mongoUtils.getNewObjectIdString();
+    });
 
     function createRoomServiceWithStubs(stubs) {
       return testRequire.withProxies("./services/room-service", {
@@ -407,7 +412,7 @@ describe('room-service #slow', function() {
     it('adds a user to the troupe', function(done) {
       var service = createRoomServiceWithStubs({
         addUser: true,
-        findByUsernameResult: { username: 'test-user', id: 'test-user-id' },
+        findByUsernameResult: { username: 'test-user', id: userId },
         createInvitedUserResult: null,
         canBeInvited: true,
         onInviteEmail: function() {}
@@ -417,7 +422,7 @@ describe('room-service #slow', function() {
         uri: 'user/room',
         containsUserId: function() { return false; },
         addUserById: function(id) {
-          assert.equal(id, 'test-user-id');
+          assert.equal(id, userId);
           done();
         },
         saveQ: function() {
@@ -430,7 +435,7 @@ describe('room-service #slow', function() {
     it('saves troupe changes', function(done) {
       var service = createRoomServiceWithStubs({
         addUser: true,
-        findByUsernameResult: { username: 'test-user', id: 'test-user-id' },
+        findByUsernameResult: { username: 'test-user', id: userId },
         createInvitedUserResult: null,
         canBeInvited: true,
         onInviteEmail: function() {}
@@ -448,10 +453,10 @@ describe('room-service #slow', function() {
       service.addUserToRoom(troupe, {}, 'test-user').fail(done);
     });
 
-    it('returns the added user', function(done) {
+    it('returns the added user and sets the date the user was added', function(done) {
       var service = createRoomServiceWithStubs({
         addUser: true,
-        findByUsernameResult: { username: 'test-user', id: 'test-user-id' },
+        findByUsernameResult: { username: 'test-user', id: userId },
         createInvitedUserResult: null,
         canBeInvited: true,
         onInviteEmail: function() {}
@@ -468,9 +473,18 @@ describe('room-service #slow', function() {
 
       service.addUserToRoom(troupe, {}, 'test-user')
         .then(function(user) {
-          assert.equal(user.id, 'test-user-id');
+          assert.equal(user.id, userId);
           assert.equal(user.username, 'test-user');
-        }).nodeify(done);
+
+          return persistence.UserTroupeLastAccess.findOneQ({ userId: user.id });
+        })
+        .then(function(lastAccess) {
+          assert(lastAccess);
+          assert(lastAccess.added);
+          assert(lastAccess.added[troupe.id]);
+          assert(Date.now() - lastAccess.added[troupe.id] <= 30000);
+        })
+        .nodeify(done);
     });
 
     it('attempts an email invite for new users', function(done) {
@@ -479,7 +493,7 @@ describe('room-service #slow', function() {
         findByUsernameResult: null,
         createInvitedUserResult: {
           username: 'test-user',
-          id: 'test-user-id',
+          id: userId,
           state: 'INVITED',
           emails: ['a@b.com']
         },
