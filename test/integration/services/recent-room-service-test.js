@@ -181,13 +181,15 @@ describe('recent-room-service', function() {
   });
 
 
-  describe('#findBestTroupeForUser', function() {
+  describe('#findInitialRoomUrlForUser', function() {
     var fixture = {};
 
     before(fixtureLoader(fixture, {
-      user1: { permissions: { createRoom: true } },
+      user1: { },
+      user2: { },
       userNoTroupes: { },
-      troupe1: { users: ['user1'] }
+      troupe1: { users: ['user1'] },
+      troupeOneToOne: { oneToOne: true, users: ['user1', 'user2'] },
     }));
 
     after(function() {
@@ -198,10 +200,11 @@ describe('recent-room-service', function() {
 
       return recentRoomService.saveLastVisitedTroupeforUserId(fixture.userNoTroupes.id, fixture.troupe1.id)
         .then(function() {
-          return recentRoomService.findBestTroupeForUser(fixture.userNoTroupes);
+          fixture.userNoTroupes.lastTroupe = fixture.troupe1.id;
+          return recentRoomService.findInitialRoomUrlForUser(fixture.userNoTroupes);
         })
-        .then(function(troupe) {
-          assert(troupe === null, 'Expected the troupe to be null');
+        .then(function(url) {
+          assert(url === null, 'Expected the url to be null');
         })
         .nodeify(done);
 
@@ -210,23 +213,33 @@ describe('recent-room-service', function() {
     it('#02 should return return the users last troupe when they have one',function(done) {
       return recentRoomService.saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupe1.id)
         .then(function() {
-          return recentRoomService.findBestTroupeForUser(fixture.user1);
+          return recentRoomService.findInitialRoomUrlForUser(fixture.user1);
         })
-        .then(function(troupe) {
-          assert(troupe !== null, 'Expected the troupe not to be null');
-          assert(troupe.uri == fixture.troupe1.uri, 'Expected the troupe uri to be testtroupe1');
+        .then(function(url) {
+          assert.strictEqual(url, '/' + fixture.troupe1.uri);
         })
         .nodeify(done);
     });
 
 
     it('#03 should return the users something when the user has troupes, but no last troupe',function(done) {
-      return recentRoomService.findBestTroupeForUser(fixture.user1)
-        .then(function(troupe) {
-          assert(troupe !== null, 'Expected the troupe not to be null');
+      return recentRoomService.findInitialRoomUrlForUser(fixture.user1)
+        .then(function(url) {
+          assert(url !== null, 'Expected the troupe not to be null');
         })
         .nodeify(done);
+    });
 
+    it('#04 should return one to one rooms',function(done) {
+      return recentRoomService.saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupeOneToOne.id)
+        .then(function() {
+          return recentRoomService.findInitialRoomUrlForUser(fixture.user1);
+        })
+        .then(function(url) {
+          assert.strictEqual(url, '/' + fixture.user2.username);
+
+        })
+        .nodeify(done);
     });
 
   });
