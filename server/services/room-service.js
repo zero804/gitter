@@ -40,6 +40,7 @@ var redisLockPromise   = require("../utils/redis-lock-promise");
 var unreadItemService  = require('./unread-item-service');
 var debug              = require('debug')('gitter:room-service');
 var badgerEnabled      = nconf.get('autoPullRequest:enabled');
+exports.testOnly = {};
 
 function localUriLookup(uri, opts) {
   debug("localUriLookup %s", uri);
@@ -907,9 +908,9 @@ function notifyInvitedUser(fromUser, invitedUser, room/*, isNewUser*/) {
     .thenResolve(invitedUser);
 }
 
-function updateUserDateAdded(userId, roomId) {
+function updateUserDateAdded(userId, roomId, date) {
   var setOp = {};
-  setOp['added.' + roomId] = new Date();
+  setOp['added.' + roomId] = date || new Date();
 
   return persistence.UserTroupeLastAccess.updateQ(
      { userId: userId },
@@ -917,6 +918,7 @@ function updateUserDateAdded(userId, roomId) {
      { upsert: true });
 
 }
+exports.testOnly.updateUserDateAdded = updateUserDateAdded;
 
 /**
  * Somebody adds another user to a room

@@ -19,8 +19,8 @@ describe('auto-lurker-service', function() {
 
     before(fixtureLoader(fixture, {
       user1: { },
-      user2: { },
-      troupe1: { users: ['user1'] }
+      troupe1: { users: ['user1'] },
+      troupe2: { users: ['user1'] },
     }));
 
     after(function() {
@@ -107,6 +107,39 @@ describe('auto-lurker-service', function() {
         .nodeify(done);
     });
 
+    it('#05 should identify users for lurk based on the date they were added to the room if they have not logged in',function(done) {
+      var tenDaysAgo = new Date(Date.now() - 86400000 * 10);
+      return roomService.testOnly.updateUserDateAdded(fixture.user1.id, fixture.troupe2.id, tenDaysAgo)
+        .then(function() {
+          return autoLurkerService.findLurkCandidates(fixture.troupe2, { minTimeInDays: 1 });
+        })
+        .then(function(candidates) {
+          assert.strictEqual(candidates.length, 1);
+          assert.equal(candidates[0].userId, fixture.user1.id);
+          assert.strictEqual(candidates[0].lastAccessTime.valueOf(), tenDaysAgo.valueOf());
+          })
+        .nodeify(done);
+    });
+
+    it('#06 should ignore date added if the user has accessed the room since then',function(done) {
+      var tenDaysAgo = new Date(Date.now() - 86400000 * 10);
+      var twoDaysAgo = new Date(Date.now() - 86400000 * 2);
+
+      return roomService.testOnly.updateUserDateAdded(fixture.user1.id, fixture.troupe2.id, tenDaysAgo)
+        .then(function() {
+          return recentRoomService.saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupe2.id, { lastAccessTime: twoDaysAgo });
+        })
+        .then(function() {
+          return autoLurkerService.findLurkCandidates(fixture.troupe2, { minTimeInDays: 1 });
+        })
+        .then(function(candidates) {
+          assert.strictEqual(candidates.length, 1);
+          assert.equal(candidates[0].userId, fixture.user1.id);
+          assert.strictEqual(candidates[0].lastAccessTime.valueOf(), twoDaysAgo.valueOf());
+          })
+        .nodeify(done);
+    });
+
   });
 
   describe('#autoLurkInactiveUsers', function() {
@@ -114,7 +147,6 @@ describe('auto-lurker-service', function() {
 
     before(fixtureLoader(fixture, {
       user1: { },
-      user2: { },
       troupe1: { users: ['user1'] }
     }));
 
