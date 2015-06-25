@@ -112,7 +112,7 @@ exports.bulkLurkUsers = bulkLurkUsers;
 function autoLurkInactiveUsers(troupe, options) {
   return findLurkCandidates(troupe, options)
     .then(function(candidates) {
-      if (!candidates.length) return;
+      if (!candidates.length) return [];
 
       var usersToLurk = candidates
         .filter(function(candidate) {
@@ -129,11 +129,11 @@ function autoLurkInactiveUsers(troupe, options) {
         .map(function(candidate) {
           return candidate.userId;
         });
-        
+
       return Q.all([
         usersToChangeSettings.length && userTroupeSettingsService.setUserSettingsForUsersInTroupe(troupe.id, usersToChangeSettings, 'notifications', { push: 'mention' }),
         usersToLurk.length && bulkLurkUsers(troupe.id, usersToLurk)
-      ]);
+      ]).thenResolve(candidates);
     });
 }
 exports.autoLurkInactiveUsers = autoLurkInactiveUsers;
