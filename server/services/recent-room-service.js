@@ -71,7 +71,7 @@ function removeRecentRoomForUser(userId, roomId) {
       unreadItemsService.markAllChatsRead(userId, roomId)
     ]);
 }
-exports.removeRecentRoomForUser = removeRecentRoomForUser
+exports.removeRecentRoomForUser = removeRecentRoomForUser;
 
 /**
  * Internal call
@@ -249,16 +249,27 @@ function saveLastVisitedTroupeforUserId(userId, troupeId, options) {
 }
 exports.saveLastVisitedTroupeforUserId = saveLastVisitedTroupeforUserId;
 
+function getTroupeLastAccessTimesForUserExcludingHidden(userId) {
+  return persistence.UserTroupeLastAccess.findOneQ({ userId: userId }, { _id: 0, troupes: 1 }, { lean: true })
+    .then(function(userTroupeLastAccess) {
+      if(!userTroupeLastAccess || !userTroupeLastAccess.troupes) return {};
+      return userTroupeLastAccess.troupes;
+    });
+}
+exports.getTroupeLastAccessTimesForUserExcludingHidden = getTroupeLastAccessTimesForUserExcludingHidden;
 /**
- * Get the last access times for a user
+ * Get the last access times for a user.
+ * @param userId user we're getting the last access time for
  * @return promise of a hash of { troupeId1: accessDate, troupeId2: accessDate ... }
  */
 function getTroupeLastAccessTimesForUser(userId) {
-  return persistence.UserTroupeLastAccess.findOneQ({ userId: userId })
+  return persistence.UserTroupeLastAccess.findOneQ({ userId: userId }, { _id: 0, last: 1, troupes: 1 }, { lean: true })
     .then(function(userTroupeLastAccess) {
-      if(!userTroupeLastAccess || !userTroupeLastAccess.troupes) return {};
+      if (!userTroupeLastAccess) return {};
 
-      return userTroupeLastAccess.troupes;
+      // Merge the results from `last` and `troupe`, giving priority to
+      // the values from last
+      return _.extend({}, userTroupeLastAccess.troupes, userTroupeLastAccess.last);
     });
 }
 exports.getTroupeLastAccessTimesForUser = getTroupeLastAccessTimesForUser;
@@ -272,7 +283,7 @@ function findMostRecentRoomUrlForUser(userId) {
         return troupeAccessTimes[b] - troupeAccessTimes[a]; // Reverse sort
       });
 
-      return troupeUriMapper.getUrlOfFirstAccessibleRoom(troupeIds, userId)
+      return troupeUriMapper.getUrlOfFirstAccessibleRoom(troupeIds, userId);
     });
 }
 
@@ -298,18 +309,27 @@ exports.findInitialRoomUrlForUser = findInitialRoomUrlForUser;
 function findLastAccessTimesForUsersInRoom(roomId, userIds) {
   if (!userIds.length) return Q.resolve({});
 
-  var key = 'troupes.' +  roomId;
+  var troupesKey = 'troupes.' +  roomId;
+  var lastKey = 'last.' +  roomId;
 
-  var query = { userId: { $in: userIds } };
-  query[key] = { $exists: true };
+  var orClause = [{},{}];
+  orClause[0][troupesKey] = { $exists: true };
+  orClause[1][lastKey] = { $exists: true };
+
+  var query = { userId: { $in: userIds }, $or: [orClause] };
+  query[troupesKey] = { $exists: true };
 
   var select = { userId: 1, _id: 0 };
-  select[key] = 1;
+  select[troupesKey] = 1;
+  select[lastKey] = 1;
 
   return persistence.UserTroupeLastAccess.findQ(query, select, { lean: true })
     .then(function(lastAccessTimes) {
       var lastAccessTimesHash = lastAccessTimes.reduce(function(memo, item) {
-        memo[item.userId] = item.troupes && item.troupes[roomId];
+        // Use the last date by default, falling back to the troupes hash for
+        // backwards compatibility
+        memo[item.userId] = item.last && item.last[roomId] ||
+                            item.troupes && item.troupes[roomId];
         return memo;
       }, {});
 

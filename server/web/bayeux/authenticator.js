@@ -5,6 +5,7 @@ var logger            = env.logger;
 
 var oauth             = require('../../services/oauth-service');
 var presenceService   = require('../../services/presence-service');
+var recentRoomService   = require('../../services/recent-room-service');
 var contextGenerator  = require('../context-generator');
 var StatusError       = require('statuserror');
 var bayeuxExtension   = require('./extension');
