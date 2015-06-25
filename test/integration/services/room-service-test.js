@@ -72,11 +72,6 @@ describe('room-service #slow', function() {
       githubType: 'REPO',
       users: ['userBan', 'userBanAdmin']
     },
-    troupeBulkLurk: {
-      security: 'PUBLIC',
-      githubType: 'REPO',
-      users: ['user1', 'user2', 'user3']
-    },
     userBan: { },
     userBanAdmin: {},
     troupeCanRemove: {
@@ -99,26 +94,6 @@ describe('room-service #slow', function() {
   });
 
   describe('classic functionality #slow', function() {
-    it('should allow users to be lurked in bulk', function (done) {
-
-      var roomService = testRequire('./services/room-service');
-      return roomService.bulkLurkUsers(fixture.troupeBulkLurk.id, [fixture.user1.id, fixture.user2.id])
-        .then(function() {
-          return persistence.Troupe.findByIdQ(fixture.troupeBulkLurk.id)
-            .then(function(troupe) {
-              var lurkForUsers = troupe.users.reduce(function(memo, troupeUser) {
-                memo[troupeUser.userId] = troupeUser.lurk;
-                return memo;
-              }, {});
-
-              assert(lurkForUsers[fixture.user1.id]);
-              assert(lurkForUsers[fixture.user2.id]);
-              assert(!lurkForUsers[fixture.user3.id]);
-            });
-        })
-        .nodeify(done);
-    });
-
     it('should fail to create a room for an org', function (done) {
       var permissionsModelMock = mockito.mockFunction();
 
