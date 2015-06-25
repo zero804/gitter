@@ -22,6 +22,12 @@ module.exports = exports = function(model, params) {
   var username;
   var deletedClass;
 
+  var root = params.data.root;
+
+  var tz = root.tz;
+  var tzOffset = root.tzOffset;
+  var showDatesWithoutTimezone = root.showDatesWithoutTimezone;
+
   //data.readByText = this.getReadByText(data.readBy);
   //
   var text = model.text;
@@ -39,7 +45,10 @@ module.exports = exports = function(model, params) {
     text: text,
     html: html,
     lang: lang,
-    locale: locale
+    locale: locale,
+    tz: tz,
+    tzOffset: tzOffset,
+    showDatesWithoutTimezone: showDatesWithoutTimezone
   });
 
   var result;

@@ -14,49 +14,6 @@
   color: @purple;
 }
 
-.commit-popover-title {
-  height: 20px;
-  position: relative;
-  a {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-  }
-}
-
-.commit-popover-body {
-  float: left;
-  width: 100%;
-
-  ul.file-list {
-    list-style: none;
-    margin-left: 0;
-  }
-  .modified {
-    font-size: small;
-    &:before {
-      color: @trpYellow;
-    }
-  }
-  .added {
-    font-size: small;
-    &:before {
-      color: @trpGreen;
-    }
-  }
-  .removed {
-    font-size: small;
-    &:before {
-      color: @trpRed;
-    }
-  }
-}
-
 .popover-footer a.open-in-github {
   float: right;
   line-height: 20px;
@@ -79,14 +36,7 @@ a.issue:hover {
   background-color: lighten(@trpRed, 35%);
 }
 
-.issue-popover-body {
-  float: left;
-  width: 100%;
-}
-
 .trpChatContainer {
-  /* Below commented out as it makes scrollbar vanish on Safari, which is not the best, really*/
-  /*-webkit-transform: translate3d(0, 0, 0); // scrollbar to respect z-index*/
   box-sizing: border-box;
   display: inline-block;
   width: 100%;

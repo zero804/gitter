@@ -2,9 +2,10 @@
 var Marionette = require('backbone.marionette');
 var moment = require('moment');
 var context = require('utils/context');
-var locale = require('utils/locale');
 var widgets = require('views/behaviors/widgets');
 var FastAttachMixin = require('views/fast-attach-mixin');
+var timeFormat = require('shared/time/time-format');
+
 require('views/behaviors/tooltip');
 
 var ONEDAY = 86400000;
@@ -22,7 +23,7 @@ module.exports = (function() {
       }
     },
     initialize: function(options) {
-      this.time = moment(options.time);
+      this.time = moment(options.time).locale(lang);
       this.compact = options.compact;
       this.position = options.position || "top";
       this.tooltipFormat = options.tooltipFormat || 'LLL';
@@ -35,7 +36,7 @@ module.exports = (function() {
     },
 
     getTooltip: function() {
-      return this.time.format(this.tooltipFormat, { lang: lang });
+      return this.time.locale(lang).format(this.tooltipFormat);
     },
 
     getTooltipPosition: function() {
@@ -68,18 +69,9 @@ module.exports = (function() {
     },
 
     render: function() {
-      var messageAge = Date.now() - this.time.valueOf();
+      this.el.textContent = timeFormat(this.time, { compact: this.compact });
 
-      var shortFormat;
-      if (messageAge >= ONEDAY) {
-        shortFormat = this.compact ? this.time.format("MMM DD", { lang: lang }) : this.time.format("MMM DD H:mm", { lang: lang });
-      } else {
-        shortFormat = this.time.format("H:mm", { lang: lang });
-      }
-
-      this.el.textContent = shortFormat;
-
-      var longFormat = this.time.format("LLL", { lang: lang });
+      var longFormat = this.time.format("LLL");
       this.el.setAttribute('title', longFormat);
 
       this.triggerMethod("render", this);
