@@ -21,7 +21,6 @@ var userService        = require('./user-service');
 var troupeService      = require('./troupe-service');
 var GitHubRepoService  = require('./github/github-repo-service');
 var GitHubOrgService   = require('./github/github-org-service');
-var unreadItemService  = require('./unread-item-service');
 var appEvents          = require("../app-events");
 var serializeEvent     = require('./persistence-service-events').serializeEvent;
 var validate           = require('../utils/validate');
@@ -37,8 +36,8 @@ var badger             = require('./badger-service');
 var userSettingsService = require('./user-settings-service');
 var roomSearchService  = require('./room-search-service');
 var assertMemberLimit  = require('./assert-member-limit');
-var qlimit             = require('qlimit');
 var redisLockPromise   = require("../utils/redis-lock-promise");
+var unreadItemService  = require('./unread-item-service');
 var debug              = require('debug')('gitter:room-service');
 var badgerEnabled      = nconf.get('autoPullRequest:enabled');
 
@@ -1241,41 +1240,6 @@ function updateTroupeLurkForUserId(userId, troupeId, lurk) {
 }
 exports.updateTroupeLurkForUserId = updateTroupeLurkForUserId;
 
-var bulkUnreadItemLimit = qlimit(5);
-
-function bulkLurkUsers(troupeId, userIds) {
-  var userHash = userIds.reduce(function(memo, userId) {
-    memo[userId] = true;
-    return memo;
-  }, {});
-
-  return persistence.Troupe.findByIdQ(troupeId)
-    .then(function(troupe) {
-      troupe.users.forEach(function(troupeUser) {
-        if (userHash[troupeUser.userId]) {
-          troupeUser.lurk = true;
-        }
-      });
-      troupe._skipTroupeMiddleware = true; // Don't send out an update
-      return troupe.saveQ();
-    })
-    .then(function() {
-      return Q.all(userIds.map(bulkUnreadItemLimit(function(userId) {
-        return unreadItemService.ensureAllItemsRead(userId, troupeId);
-      })));
-    });
-
-    // Odd, user not found
-    // if(!count) return;
-
-    // Don't send updates for now
-    //appEvents.userTroupeLurkModeChange({ userId: userId, troupeId: troupeId, lurk: lurk });
-    // TODO: in future get rid of this but this collection is used by the native clients
-    //appEvents.dataChange2('/user/' + userId + '/rooms', 'patch', { id: troupeId, lurk: lurk });
-
-    // Delete all the chats in Redis for this person too
-}
-exports.bulkLurkUsers = bulkLurkUsers;
 
 
 function searchRooms(userId, queryText, options) {
