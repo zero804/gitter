@@ -1228,6 +1228,12 @@ function updateTroupeLurkForUserId(userId, troupeId, lurk) {
     // Odd, user not found
     if(!count) return;
 
+    stats.event("lurk_room", {
+      userId: '' + userId,
+      troupeId: '' + troupeId,
+      lurking: lurk
+    });
+
     appEvents.userTroupeLurkModeChange({ userId: userId, troupeId: troupeId, lurk: lurk });
     // TODO: in future get rid of this but this collection is used by the native clients
     appEvents.dataChange2('/user/' + userId + '/rooms', 'patch', { id: troupeId, lurk: lurk });

@@ -1,5 +1,6 @@
 "use strict";
-
+var env                       = require('../utils/env');
+var stats                     = env.stats;
 var recentRoomService         = require('./recent-room-service');
 var userTroupeSettingsService = require('./user-troupe-settings-service');
 var persistence               = require('./persistence-service');
@@ -91,6 +92,16 @@ function bulkLurkUsers(troupeId, userIds) {
       return Q.all(userIds.map(bulkUnreadItemLimit(function(userId) {
         return unreadItemService.ensureAllItemsRead(userId, troupeId);
       })));
+    })
+    .then(function() {
+      userIds.forEach(function(userId) {
+        stats.event("lurk_room", {
+          userId: userId,
+          troupeId: troupeId,
+          lurking: true,
+          auto: true
+        });
+      });
     });
 
     // Odd, user not found
