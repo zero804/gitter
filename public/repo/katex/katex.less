@@ -1,3 +1,6 @@
+// The mu unit is defined as 1/18 em
+@mu: 1.0/18.0em;
+
 .katex-display {
     display: block;
     margin: 1em 0;
@@ -11,9 +14,12 @@
 .katex {
     font: normal 1.21em KaTeX_Main;
     line-height: 1.2;
+    pointer-events: none;
+    /*Commented out for mobile wrapping*/
+    /*    white-space: nowrap;*/
 
-    /* Commented out below to force wrapping for mobile and to prevent horizontal scrolling*/
-    /*white-space: nowrap;*/
+    // Protect elements inside .katex from inheriting text-indent.
+    text-indent: 0;
 
     .katex-html {
         // Making .katex inline-block allows line breaks before and after,
@@ -23,18 +29,18 @@
     }
 
     .katex-mathml {
-        display: none;
         // Accessibility hack to only show to screen readers
-        // Doesn't work, commenting the whole thing out
-        // TODO: REVISIT;
         // Found at: http://a11yproject.com/posts/how-to-hide-content/
-/*        position: absolute;
-        clip: rect(1px, 1px, 1px, 1px);
-        padding: 0;
-        border: 0;
-        height: 1px;
-        width: 1px;
-        overflow: hidden;*/
+        // This hack doesnt work for us, so commented out
+        // TODO: Revisit and figure it out in the future;
+        // position: absolute;
+        // clip: rect(1px, 1px, 1px, 1px);
+        // padding: 0;
+        // border: 0;
+        // height: 1px;
+        // width: 1px;
+        // overflow: hidden;
+        display: none;
     }
 
     .base {
@@ -359,6 +365,13 @@
                 margin-top: -1px;
             }
         }
+
+        > .root {
+            // These values are taken from the definition of `\r@@t`,
+            // `\mkern 5mu` and `\mkern -10mu`.
+            margin-left: 5*@mu;
+            margin-right: -10*@mu;
+        }
     }
 
     .sizing, .fontsize-ensurer {
@@ -452,4 +465,21 @@
             left: 0.326em;
         }
     }
+
+    .arraycolsep {
+        display: inline-block;
+    }
+
+    .col-align-c > .vlist {
+        text-align: center;
+    }
+
+    .col-align-l > .vlist {
+        text-align: left;
+    }
+
+    .col-align-r > .vlist {
+        text-align: right;
+    }
+
 }
