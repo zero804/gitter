@@ -70,7 +70,7 @@ function LastTroupeAccessTimesForUserStrategy(options) {
   var timesIndexed;
 
   this.preload = function(data, callback) {
-    return recentRoomService.getTroupeLastAccessTimesForUser(userId)
+    return recentRoomService.getTroupeLastAccessTimesForUserExcludingHidden(userId)
       .then(function(times) {
         timesIndexed = times;
       })
