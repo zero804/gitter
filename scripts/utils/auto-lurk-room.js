@@ -52,6 +52,7 @@ function handleRoom(troupe) {
       return [candidates, userService.findByIds(userIds)];
     })
     .spread(function(candidates, users)  {
+      console.log('>>>>>>>>>>> ROOM ', troupe.uri, '> ', candidates.length, 'candidates');
       var usersHash = collections.indexById(users);
 
       candidates.forEach(function(c) {
@@ -69,7 +70,7 @@ function handleRoom(troupe) {
 }
 
 function handleSingleRoom() {
-  troupeService.findByUri(opts.room)
+  return troupeService.findByUri(opts.room)
     .then(handleRoom);
 }
 
