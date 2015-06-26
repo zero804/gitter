@@ -12,8 +12,10 @@
   z-index: @l1;
   position: absolute;
   width: 100%;
+  // header can expand to fit long topics when hovered over
+  min-height: 75px;
 
-  padding: 10px 26px;
+  padding: 10px 26px 5px;
 
   background-color: rgba(255, 255, 255, 0.97);
   border-bottom: 1px solid rgba(0,0,0,0.05);
@@ -53,8 +55,10 @@
 
   .topic-input {
     width: 95%;
-    margin-bottom: 10px;
     resize: none;
+    height: 20px;
+    margin-bottom: 0px;
+    padding: 1px 2px;
   }
 
   h2 {
@@ -69,23 +73,35 @@
       text-decoration: none;
     }
   }
+}
 
-  p {
+.chat-header__topic {
+  color: #777;
+  // min height so that an empty topic can be double clicked to edit
+  min-height: 30px;
+  // max height to allow height animations
+  max-height: 30px;
+  line-height: 25px;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: max-height .5s ease-in-out;
+
+  &:hover {
+    // pleanty of room to auto expand into
+    max-height: 800px;
+    overflow: visible;
     white-space: normal;
     word-wrap: break-word;
-    color: #777;
-    margin: 0 0 0 1px;
-    user-select: text;
-    min-height: 27px;
-    line-height: 1.3;
+  }
+}
 
-    a {
-      color: #666;
-    }
+.chat-header__topic a {
+  color: #666;
 
-    a:hover {
-      color: @trpLightBlue;
-    }
+  &:hover {
+    color: @trpLightBlue;
   }
 }
 
