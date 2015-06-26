@@ -33,6 +33,7 @@
     "gitter-web-cache-wrapper": "file:modules/cache-wrapper",
     "gitter-web-env": "file:modules/env",
     "gitter-web-github": "file:modules/github",
+    "gitter-web-recommendations": "file:modules/recommendations",
     "gitter-web-shared": "file:shared",
     "handlebars": "~3.0.3",
     "heapdump": "^0.2.9",
