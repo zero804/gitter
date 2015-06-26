@@ -202,7 +202,7 @@
     "link": "linklocal link -r",
     "unlink": "linklocal unlink -r",
     "shrinkwrap": "npm run unlink && npm prune && npm install && npm shrinkwrap && npm run link",
-    "preinstall": "linklocal list --format '%S' --no-summary|while read line; do if [[ -d $line ]] && [[ ! -h $line ]]; then rm -r $line; fi; done",
+    "preinstall": "linklocal list --format '%S' --no-summary|while read line; do if [ -d \"$line\" ] && [ ! -h \"$line\" ]; then rm -r \"$line\"; fi; done",
     "shrinkwrap-conflict": "rm -f npm-shrinkwrap.json && npm run shrinkwrap"
   },
   "git": {
