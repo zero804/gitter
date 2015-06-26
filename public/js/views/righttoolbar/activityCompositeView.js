@@ -117,7 +117,8 @@ module.exports = (function() {
     template: activityEmptyTemplate,
     serializeData: function() {
       var isNativeDesktopApp = context().isNativeDesktopApp;
-      var integrationsUrl = (isNativeDesktopApp ? '/' + context.troupe().get('url') : '') + '#integrations';
+      var basePath = isNativeDesktopApp ? context.env('basePath') + context.troupe().get('url') : '';
+      var integrationsUrl = basePath + '#integrations';
 
       return {
         integrationsUrl: integrationsUrl,
