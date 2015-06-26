@@ -198,15 +198,14 @@ module.exports = (function() {
       if (this.editingTopic === true) return;
       this.editingTopic = true;
 
-      var topicInputText = this.$el.find('.js-chat-topic');
-      var unsafeText = topicInputText.text();
+      var unsafeText = this.ui.topic.text();
 
       this.oldTopic = unsafeText;
 
       // create inputview
-      topicInputText.html("<textarea class='topic-input'></textarea>");
+      this.ui.topic.html("<textarea class='topic-input'></textarea>");
 
-      var textarea = topicInputText.find('textarea').val(unsafeText);
+      var textarea = this.ui.topic.find('textarea').val(unsafeText);
 
       setTimeout(function() {
         textarea.select();
@@ -222,9 +221,12 @@ module.exports = (function() {
 
     redisplay: function() {
       var model = this.model;
-      //this.ui.name.text(model.get('name'));
-      this.ui.topic.text(model.get('topic'));
-      autolink(this.ui.topic[0]);
+
+      if (this.ui.topic.length) {
+        this.ui.topic.text(model.get('topic'));
+        autolink(this.ui.topic[0]);
+      }
+
       this.ui.favourite.toggleClass('favourite', !!model.get('favourite'));
     },
 
