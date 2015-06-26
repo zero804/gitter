@@ -185,17 +185,23 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri, options) {
 
   if(troupe) {
     /* The troupe exists. Ensure it's not past the max limit and the user can join */
-    return assertMemberLimit(troupe, user)
-      .then(function() {
-        return roomPermissionsModel(user, 'join', troupe)
-          .then(function(access) {
-            debug('Does user %s have access to existing room? %s', (user && user.username || '~anon~'), access);
 
-            return {
-              troupe: troupe,
-              access: access,
-              didCreate: false
-            };
+    return roomPermissionsModel(user, 'join', troupe)
+      .then(function(access) {
+        debug('Does user %s have access to existing room? %s', (user && user.username || '~anon~'), access);
+
+        var payload = {
+          troupe: troupe,
+          access: access,
+          didCreate: false
+        };
+
+        if (!access) return payload;
+
+        // If the user has access to the room, assert member count
+        return assertMemberLimit(troupe, user)
+          .then(function() {
+            return payload;
           });
       });
   }
