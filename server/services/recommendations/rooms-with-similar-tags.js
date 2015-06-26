@@ -57,7 +57,6 @@ function roomsWithSimilarTags(tags, topic) {
 }
 
 module.exports = function similarTags(user, roomUri) {
-  console.log('ROOM URI', roomUri);
   if (!roomUri) return [];
 
   return persistence.Troupe.findOneQ({ lcUri: roomUri.toLowerCase() }, { _id: 1, tags: 1, topic: 1 })
