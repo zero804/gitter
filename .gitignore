@@ -64,3 +64,8 @@ config/config.beta.user-overrides.json
 config/config.prod.user-overrides.json
 newrelic_agent.log
 scroll-debug.patch
+davisable.sh
+scripts/graphs/membership.csv
+scripts/graphs/one-to-ones.csv
+scripts/graphs/rooms.csv
+scripts/graphs/users.csv
