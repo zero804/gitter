@@ -26,9 +26,9 @@
       <i class='octicon octicon-lock chat-header__permission-icon'></i>
     {{/if}}
   </h2>
-  <p class="js-chat-topic line-clamp">
-    {{#unless oneToOne}}
-      {{troupeTopic}}
-    {{/unless}}
-  </p>
+
+  {{#unless oneToOne}}
+  <p class="js-chat-topic chat-header__topic">{{troupeTopic}}</p>
+  {{/unless}}
+
 </div>
