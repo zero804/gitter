@@ -12,6 +12,8 @@
   z-index: @l1;
   position: absolute;
   width: 100%;
+  // header can expand to fit long topics when hovered over
+  min-height: 75px;
 
   padding: 10px 26px 5px;
 
@@ -71,33 +73,36 @@
       text-decoration: none;
     }
   }
+}
 
-  p {
-    color: #777;
-    max-height: 30px;
-    line-height: 25px;
-    margin: 0px 0px 5px 0px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    transition: max-height .5s ease-in-out;
+.chat-header__topic {
+  color: #777;
+  // min height so that an empty topic can be double clicked to edit
+  min-height: 30px;
+  // max height to allow height animations
+  max-height: 30px;
+  line-height: 25px;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: max-height .5s ease-in-out;
 
-    a {
-      color: #666;
-    }
-
-    a:hover {
-      color: @trpLightBlue;
-    }
-  }
-
-  p:hover {
+  &:hover {
+    // pleanty of room to auto expand into
     max-height: 800px;
     overflow: visible;
     white-space: normal;
-    transition: max-height .5s ease-in-out;
+    word-wrap: break-word;
   }
+}
 
+.chat-header__topic a {
+  color: #666;
+
+  &:hover {
+    color: @trpLightBlue;
+  }
 }
 
 .chat-header__content h1 .octicon-lock:before {
