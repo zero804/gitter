@@ -11,6 +11,5 @@
   },
   "private": true,
   "dependencies": {
-    "cypher-promise": "^1.0.1"
   }
 }

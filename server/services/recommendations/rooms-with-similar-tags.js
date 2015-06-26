@@ -5,8 +5,10 @@ var esClient = require('../../utils/elasticsearch-client');
 var Q = require('q');
 
 function roomsWithSimilarTags(tags, topic) {
-  if (!tags && !topic) return Q.resolve([]);
-  var text = (tags ? tags.join(' ') : '') + ' ' + (topic ? topic : '');
+  var tagText = tags && tags.length ? tags.join(' ') : '';
+
+  if (!tagText && !topic) return Q.resolve([]);
+  var text = tagText + ' ' + (topic || '');
 
   var queryRequest = {
     size: 10,
