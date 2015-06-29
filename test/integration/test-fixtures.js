@@ -148,18 +148,17 @@ function createExpectedFixtures(expected, done) {
 
     debug('Creating %s', fixtureName);
 
-    var uri;
+    var uri, lcUri;
     var githubType = f.githubType || 'ORG';
-    if(f.oneToOne) {
-      uri = null;
-    } else {
+    if(!f.oneToOne) {
       uri = f.uri || generateUri(githubType);
+      lcUri = uri.toLowerCase();
     }
 
     return persistence.Troupe.createQ({
       name: f.name || '~~~TEST~~~ ' + fixtureName,
       uri: uri,
-      lcUri: uri.toLowerCase(),
+      lcUri: lcUri,
       githubId: f.githubId === true ? generateGithubId() : f.githubId || null,
       status: f.status || 'ACTIVE',
       oneToOne: f.oneToOne,
