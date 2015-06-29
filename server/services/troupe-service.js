@@ -196,34 +196,6 @@ function validateTroupeEmailAndReturnDistributionList(options, callback) {
   });
 }
 
-
-/**
- * Returns the URL a particular user would see if they wish to view a URL.
- * NB: this call has to query the db to get a user's username. Don't call it
- * inside a loop!
- *
- * @return promise of a URL string
- */
-function getUrlForTroupeForUserId(troupe, userId) {
-  if(!troupe.oneToOne) {
-    return Q.resolve("/" + troupe.uri);
-  }
-
-  var otherTroupeUser = troupe.users.filter(function(troupeUser) {
-    return troupeUser.userId != userId;
-  })[0];
-
-  if(!otherTroupeUser) throw "Unable to determine other user for troupe#" + troupe.id;
-
-  return userService.findUsernameForUserId(otherTroupeUser.userId)
-    .then(function(username) {
-      return username ? "/" + username
-                      : "/one-one/" + otherTroupeUser.userId;
-    });
-
-}
-
-
 function indexTroupesByUserIdTroupeId(troupes, userId) {
   var groupTroupeIds = troupes
                         .filter(function(t) { return !t.oneToOne; })
@@ -637,7 +609,6 @@ module.exports = {
   findAllUserIdsForUnconnectedImplicitContacts: findAllUserIdsForUnconnectedImplicitContacts,
   findAllImplicitContactUserIds: findAllImplicitContactUserIds,
   findAllConnectedUserIdsForUserId: findAllConnectedUserIdsForUserId,
-  getUrlForTroupeForUserId: getUrlForTroupeForUserId,
 
   findAllUserIdsForTroupes: findAllUserIdsForTroupes,
   findAllUserIdsForTroupe: findAllUserIdsForTroupe,
