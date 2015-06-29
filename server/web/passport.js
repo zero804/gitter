@@ -161,15 +161,13 @@ function install() {
                 if (user.isInvited()) {
 
                   // IMPORTANT: The alias can only happen ONCE. Do not remove.
-                  // IMPORTANT: 'bucket' is a reserved word on MixPanel, that's why we use _bucket
                   stats.alias(mixpanel.getMixpanelDistinctId(req.cookies), user.id, function() {
                     stats.event("new_user", {
                       userId: user.id,
                       method: 'github_oauth',
                       username: user.username,
                       source: 'invited',
-                      googleAnalyticsUniqueId: googleAnalyticsUniqueId,
-                      _bucket: ((parseInt(user.id.slice(-1), 16) % 2)) === 0 ? 'even' : 'odd'
+                      googleAnalyticsUniqueId: googleAnalyticsUniqueId
                     });
                   });
                 }
@@ -260,7 +258,6 @@ function install() {
                 }
 
                 // IMPORTANT: The alias can only happen ONCE. Do not remove.
-                // IMPORTANT: 'bucket' is a reserved word on MixPanel, that's why we use _bucket
                 stats.alias(mixpanel.getMixpanelDistinctId(req.cookies), user.id, function(err) {
                   if (err) logger.error('Error aliasing user:', { exception: err });
 
@@ -276,8 +273,7 @@ function install() {
                       method: 'github_oauth',
                       username: user.username,
                       source: req.session.source,
-                      googleAnalyticsUniqueId: googleAnalyticsUniqueId,
-                      _bucket: ((parseInt(user.id.slice(-1), 16) % 2)) === 0 ? 'even' : 'odd' //
+                      googleAnalyticsUniqueId: googleAnalyticsUniqueId
                     });
                   });
 
