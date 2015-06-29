@@ -70,11 +70,11 @@ function LastTroupeAccessTimesForUserStrategy(options) {
   var timesIndexed;
 
   this.preload = function(data, callback) {
-    recentRoomService.getTroupeLastAccessTimesForUser(userId, function(err, times) {
-      if(err) return callback(err);
-      timesIndexed = times;
-      callback();
-    });
+    return recentRoomService.getTroupeLastAccessTimesForUserExcludingHidden(userId)
+      .then(function(times) {
+        timesIndexed = times;
+      })
+      .nodeify(callback);
   };
 
   this.map = function(id) {
@@ -91,11 +91,11 @@ function FavouriteTroupesForUserStrategy(options) {
   var userId = options.userId || options.currentUserId;
 
   this.preload = function(data, callback) {
-    recentRoomService.findFavouriteTroupesForUser(userId, function(err, favs) {
-      if(err) return callback(err);
-      self.favs = favs;
-      callback();
-    });
+    recentRoomService.findFavouriteTroupesForUser(userId)
+      .then(function(favs) {
+        self.favs = favs;
+      })
+      .nodeify(callback);
   };
 
   this.map = function(id) {
