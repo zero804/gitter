@@ -1,5 +1,5 @@
 "use strict";
-var env                       = require('../utils/env');
+var env                       = require('gitter-web-env');
 var stats                     = env.stats;
 var recentRoomService         = require('./recent-room-service');
 var userTroupeSettingsService = require('./user-troupe-settings-service');
