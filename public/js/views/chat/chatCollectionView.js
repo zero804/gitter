@@ -129,34 +129,9 @@ module.exports = (function() {
       return options;
     },
 
-
-    // This nasty thing changes the CSS rule for the first chat item to prevent a high headerView from covering it
-    // We do this instead of jQuery because the first-child selector can
-    adjustTopPadding: function() {
-      var size = $('#header-wrapper').outerHeight() + 'px';
-      var ss = document.styleSheets[2];
-      try {
-        if (ss.insertRule) {
-          ss.insertRule('.trpChatContainer > div:first-child { padding-top: ' + size + ' }', ss.cssRules.length);
-        } else if (ss.addRule) {
-          ss.addRule('.trpChatContainer > div:first-child', 'padding-top:' + size);
-        }
-      } catch (err) {
-        // TODO: Handle the error? WC.
-      }
-    },
-
     initialize: function(options) {
-      // this.hasLoaded = false;
-      this.adjustTopPadding();
-      var self = this;
-      var resizer;
       this.firstRender = true;
       this.viewComparator = this.collection.comparator;
-      $(window).resize(function(){
-        clearTimeout(resizer);
-        resizer = setTimeout(self.adjustTopPadding, 100);
-      });
 
       this.listenTo(appEvents, 'chatCollectionView:scrollToBottom', function() {
         this.collection.fetchLatest({}, function () {
@@ -246,12 +221,6 @@ module.exports = (function() {
 
     isScrolledToBottom: function() {
       return this.rollers.isScrolledToBottom();
-    },
-
-    onAddChild: function() {
-      if(this.collection.length === 1) {
-        this.adjustTopPadding();
-      }
     },
 
     pageUp: function() {
