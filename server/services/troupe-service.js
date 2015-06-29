@@ -575,15 +575,26 @@ function findAllImplicitContactUserIds(userId, callback) {
 }
 
 function deleteTroupe(troupe, callback) {
-  if(troupe.status != 'ACTIVE') return callback("Troupe is not active");
-  if(!troupe.oneToOne && troupe.users.length !== 1) return callback("Can only delete troupes that have a single user");
-  troupe.status = 'DELETED';
-  troupe.dateDeleted = new Date();
-  troupe.removeUserById(troupe.users[0].userId);
-  if (troupe.oneToOne) {
-    troupe.removeUserById(troupe.users[1].userId);
-  }
-  return troupe.saveQ()
+  return Q.fcall(function() {
+      if (troupe.oneToOne) {
+        var userId0 = troupe.users[0] && troupe.users[0].userId;
+        var userId1 = troupe.users[1] && troupe.users[1].userId;
+        troupe.removeUserById(userId0);
+        troupe.removeUserById(userId1);
+
+        return troupe.removeQ();
+      } else {
+        if(troupe.users.length !== 1) throw new Error("Can only delete troupes that have a single user");
+
+        troupe.status = 'DELETED';
+        if (!troupe.dateDeleted) {
+          troupe.dateDeleted = new Date();
+        }
+        troupe.removeUserById(troupe.users[0].userId);
+
+        return troupe.removeQ();
+      }
+    })
     .then(function() {
       appEvents.troupeDeleted(troupe.id);
     })
