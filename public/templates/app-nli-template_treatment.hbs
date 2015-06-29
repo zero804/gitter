@@ -1,0 +1,49 @@
+<!doctype html>
+<html class="no-js loading" lang="en">
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=IE10" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
+	<meta charset="utf-8">
+	<title>{{troupeName}} - Gitter</title>
+  {{#each socialMetadata}}
+  <meta property="{{@key}}" content="{{this}}"/>
+  {{/each}}
+  <link rel="stylesheet" href='{{cdn cssFileName }}'>
+  <link id="favicon" rel="shortcut icon" href='{{cdn "images/favicon5.png" }}'>
+  {{#each subresources}}
+  <link rel="subresource" href="{{ this }}">
+  {{/each}}
+
+  {{#each dnsPrefetch}}
+  <link rel="dns-prefetch" href="{{ this }}">
+  {{/each}}
+</head>
+<body class="logged-out">
+
+  {{> staging_marker}}
+
+  {{#isMobile agent}}
+    <div class="trpPortraitAlert" id='portrait-alert'>
+      <div class="message">
+        <img class="ipad-icon" src='{{cdn "images/icon-rotate-ipad.png"}}'>
+        <p>Rotate iPad for better experience.</p>
+        <img class="logo" src='{{cdn "images/menu-toggle.png" }}'>
+      </div>
+    </div>
+  {{/isMobile}}
+
+  <div class="app-layout">
+    <nav class="nli-menu-treatment">
+    </nav>
+    <div id="iframe-region" class="iframe-region">
+      <iframe id="content-frame" src="{{chatAppLocation}}" style="display: block; width: 100%; height: 100%; border: 0;" frameBorder="0"></iframe>
+    </div>
+  </div>
+
+  {{{ generateTroupeContext troupeContext }}}
+
+  {{{ bootScript bootScriptName }}}
+  {{>live_reload}}
+
+</body>
+</html>

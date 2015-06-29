@@ -68,7 +68,8 @@ module.exports = (function() {
         pageName: routeName,
         authenticated: authenticated,
         isUserHome: isUserHome,
-        userAgent: userAgent
+        userAgent: userAgent,
+        variant: context().variant
       });
     }
 
