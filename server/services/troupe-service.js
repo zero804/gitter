@@ -592,7 +592,7 @@ function deleteTroupe(troupe, callback) {
         }
         troupe.removeUserById(troupe.users[0].userId);
 
-        return troupe.removeQ();
+        return troupe.saveQ();
       }
     })
     .then(function() {
