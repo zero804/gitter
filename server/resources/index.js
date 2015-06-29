@@ -26,6 +26,7 @@ module.exports = {
     installTroupeSubResource('bans', 'bans');
     installTroupeSubResource('channels', 'channels');
     installTroupeSubResource('collaborators', 'collaborators');
+    installTroupeSubResource('suggested-rooms', 'suggested-rooms');
 
     var chatResource = installTroupeSubResource('chatMessages', 'chat-messages');
     var chatReadBy = new Resource('readBy', require('./troupes/chat-read-by'), app);
@@ -52,10 +53,11 @@ module.exports = {
     var collapsedItems = new Resource('collapsedItems', require('./user/collapsed-items'), app);
     userTroupeResource.add(collapsedItems);
 
-    installUserSubResource('orgs',        'orgs');
-    installUserSubResource('repos',       'repos');
-    installUserSubResource('channels',    'channels');
-    installUserSubResource('settings',    'user-settings');
-    installUserSubResource('unreadItems', 'aggregated-unread-items');
+    installUserSubResource('orgs',            'orgs');
+    installUserSubResource('repos',           'repos');
+    installUserSubResource('channels',        'channels');
+    installUserSubResource('settings',        'user-settings');
+    installUserSubResource('suggested-rooms', 'suggested-rooms');
+    installUserSubResource('unreadItems',     'aggregated-unread-items');
   }
 };

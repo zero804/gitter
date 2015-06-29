@@ -5,7 +5,7 @@ var persistence     = require('./persistence-service');
 var Q               = require('q');
 var _               = require('underscore');
 var collections     = require('../utils/collections');
-
+var graphRecommendations = require('gitter-web-recommendations');
 var recommendations = require('./recommendations');
 
 var MAX_RECOMMENDATIONS = 20;
@@ -214,4 +214,14 @@ function getSuggestions(user, localeLanguage) {
     });
 }
 
-exports.getSuggestions = getSuggestions;
+function getSuggestionsForUser(user, locale) {
+  // TODO: deal with locale
+  return graphRecommendations.getUserRecommendations(user.id);
+}
+exports.getSuggestionsForUser = getSuggestionsForUser;
+
+/** Return rooms like the provided room */
+function getSuggestionsForRoom(room, user) {
+  return graphRecommendations.getRoomRecommendations(room.id, user && user.id);
+}
+exports.getSuggestionsForRoom = getSuggestionsForRoom;

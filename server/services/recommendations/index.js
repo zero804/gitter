@@ -44,7 +44,6 @@ module.exports = function (user, currentRoomUri) {
     }
 
     return Q.all(requiresLookup.map(function(recommendation) {
-      console.log('LOOKUP ', recommendation);
         return highlightedRoomCache(null, recommendation.uri)
           .catch(function() { });
       }))

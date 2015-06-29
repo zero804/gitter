@@ -7,7 +7,7 @@ var SyncMixin = require('./sync-mixin');
 
 var SuggestedTroupeCollection = Backbone.Collection.extend({
   model: gitterRealtimeClient.RoomModel,
-  url: apiClient.user.channelGenerator("/rooms?suggested=1"), // Querystring in the URL, Hmm...
+  url: apiClient.user.channelGenerator("/suggested-rooms"),
   sync: SyncMixin.sync
 });
 

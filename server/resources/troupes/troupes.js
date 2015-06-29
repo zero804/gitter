@@ -37,6 +37,10 @@ function searchRooms(req, res, next) {
 module.exports = {
   id: 'troupe',
   index: function(req, res, next) {
+    if (!req.user) {
+      return next(new StatusError(401));
+    }
+
     if(req.query.q) {
       return searchRooms(req, res, next);
     }
