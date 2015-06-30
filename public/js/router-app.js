@@ -356,7 +356,7 @@ onready(function () {
 
       var uri = window.location.pathname.split('/').slice(1).join('/');
       if(uri === context.user().get('username')) {
-        showWithOptions({ initialParent: uri, roomName: name });
+        return showWithOptions({ initialParent: uri, roomName: name });
       }
 
       var current = allRoomsCollection.findWhere({ url: '/' + uri });
