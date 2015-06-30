@@ -3,6 +3,7 @@
 
 @import "../../../less/base-zindex-levels";
 @import "../../../less/base-transition-mixins";
+@import "../../../less/typography.less";
 
 /* Imports for child views */
 @import "./room-list";
@@ -320,17 +321,20 @@ body.dragging .list-favourites li.placeholder {
 }
 
 .nli-menu-treatment__header {
-  font-family: DP, sans-serif;
-  font-weight: normal;
+  font-family: "source-sans-pro";
+  font-weight: 200;
   font-size: 47px;
   line-height: 43px;
   margin-bottom: 65px;
+  margin-left: 15px;
 }
 
 .nli-menu-treatment__features-header {
   font-size: 14px;
   text-transform: uppercase;
   letter-spacing: 2px;
+  font-weight: 300;
+  margin-left: 15px;
 }
 
 .nli-menu-treatment__price {
@@ -339,8 +343,8 @@ body.dragging .list-favourites li.placeholder {
   text-transform: uppercase;
   letter-spacing: 2px;
   margin-bottom: 30px;
+  margin-left: 15px;
 }
-
 
 .nli-menu-treatment__features {
   background-color: rgba(255,255,255, 0.1);
@@ -349,34 +353,15 @@ body.dragging .list-favourites li.placeholder {
   margin: 10px 0px;
   text-transform: uppercase;
   letter-spacing: 1px;
+  width: 100%;
 }
 
 .nli-menu-treatment__footer {
   position: absolute;
-  bottom: 10px;
+  bottom: 25px;
+  margin-left: 15px;
 }
 
-
-
-@font-face {
-  font-family: 'DP';
-
-  /* For older versions of IE */
-  src: url('../fonts/dp.eot');
-
-  /* Standard syntax */
-  src: url('../fonts/dp.eot?#iefix') format('embedded-opentype'),
-       url('../fonts/dp.woff') format('woff'),
-       url('../fonts/dp.ttf') format('truetype'),
-       url('../fonts/dp.svg#dp') format('svg');
-
-  /* Apply synthetic bolding/italics */
-  font-weight: normal;
-  font-style: normal;
-}
 
 
 // SPLIT TEST CSS END
-
-
-
