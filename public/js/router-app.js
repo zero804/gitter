@@ -333,48 +333,61 @@ onready(function () {
     },
 
     createcustomroom: function(name) {
+
       /* Figure out who's the daddy */
+      function getParentRoomUri(cb) {
+        var currentRoomUri = window.location.pathname.split('/').slice(1).join('/');
+        var userhomeUri = context.user().get('username');
 
-      function getParentUri(troupe) {
-        if(troupe.get('oneToOne') === true) {
-          return context.user().get('username');
+        if(currentRoomUri === userhomeUri) {
+          // currently in the userhome, not really a room but whatevs
+          return cb(null, userhomeUri);
         }
 
-        if(troupe.get('githubType') === 'REPO' || troupe.get('githubType') === 'ORG') {
-          return troupe.get('uri');
-        }
+        // current room metadata isnt in the app router context
+        getCurrentRoom(function(err, room) {
+          if (err || !room) return cb(null, null);
 
-        return troupe.get('uri').split('/').slice(0, -1).join('/');
+          if (room.get('oneToOne')) {
+            return cb(null, userhomeUri);
+          }
+
+          if (room.get('githubType') === 'REPO' || room.get('githubType') === 'ORG') {
+            return cb(null, room.get('uri'));
+          }
+
+          return cb(null, room.get('uri').split('/').slice(0, -1).join('/'));
+        });
       }
 
-      function showWithOptions(options) {
+      function getCurrentRoom(cb) {
+        var currentRoom = allRoomsCollection.findWhere({ url: window.location.pathname });
+
+        // room collection is in sync, so thats nice
+        if (currentRoom) return cb(null, currentRoom);
+
+        // room collection has not synced yet, lets wait
+        reallyOnce(allRoomsCollection, 'reset sync', function() {
+          currentRoom = allRoomsCollection.findWhere({ url: window.location.pathname });
+          return cb(null, currentRoom);
+        });
+      }
+
+      getParentRoomUri(function(err, parentUri) {
+        if (err) {
+          // ignore, carry on regardless
+        }
+
         require.ensure(['views/createRoom/createRoomView'], function(require) {
           var createRoomView = require('views/createRoom/createRoomView');
-          appLayout.dialogRegion.show(new createRoomView.Modal(options));
+          var modal = new createRoomView.Modal({
+            initialParent: parentUri,
+            roomName: name
+          });
+
+          appLayout.dialogRegion.show(modal);
         });
-      }
-
-      var uri = window.location.pathname.split('/').slice(1).join('/');
-      if(uri === context.user().get('username')) {
-        return showWithOptions({ initialParent: uri, roomName: name });
-      }
-
-      var current = allRoomsCollection.findWhere({ url: '/' + uri });
-      if(!current) {
-        reallyOnce(allRoomsCollection, 'reset sync', function () {
-          current = allRoomsCollection.findWhere({ url: '/' + uri });
-          if(current) {
-            uri = getParentUri(current);
-            showWithOptions({ initialParent: uri, roomName: name });
-          } else {
-            showWithOptions({ roomName: name });
-          }
-        });
-        return;
-      }
-
-      uri = getParentUri(current);
-      showWithOptions({ initialParent: uri, roomName: name });
+      });
     },
 
     createreporoom: function() {
