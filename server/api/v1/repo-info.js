@@ -2,7 +2,7 @@
 /* globals unescape:true */
 "use strict";
 
-var RepoService = require('../../services/github/github-repo-service');
+var RepoService = require('gitter-web-github').GitHubRepoService;
 
 module.exports =  function(req, res, next) {
   var repoName = unescape(req.query.repo); // TODO: why unescape?
@@ -14,4 +14,3 @@ module.exports =  function(req, res, next) {
     res.send(repo);
   }, next);
 };
-

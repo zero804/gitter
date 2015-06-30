@@ -3,7 +3,7 @@
 var testRequire = require('./test-require');
 /* Force a connection */
 testRequire('./services/persistence-service');
-var env = testRequire('./utils/env');
+var env = testRequire('gitter-web-env');
 
 var onMongoConnect = testRequire('./utils/on-mongo-connect');
 

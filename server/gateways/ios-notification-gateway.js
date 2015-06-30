@@ -3,7 +3,7 @@
 
 var apn = require('apn');
 var debug = require('debug')('gitter:ios-notification-gateway');
-var env = require('../utils/env');
+var env = require('gitter-web-env');
 var Q = require('q');
 var logger = env.logger;
 var config = env.config;

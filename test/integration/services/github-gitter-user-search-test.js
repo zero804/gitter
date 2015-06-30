@@ -142,7 +142,9 @@ describe('github-gitter-user-search', function() {
 function createSearchWithStubData(data) {
   return testRequire.withProxies('./services/github-gitter-user-search', {
     './user-search-service': createFakeGitterSearch(data.gitter),
-    './github/github-fast-search': createFakeGithubSearch(data.github),
+    'gitter-web-github': {
+      GitHubFastSearch: createFakeGithubSearch(data.github)
+    },
     './user-service': createFakeUserService(data.userService)
   });
 }

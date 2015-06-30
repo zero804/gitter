@@ -1,7 +1,7 @@
 /*jshint node:true, unused:true */
 "use strict";
 
-var env = require('./env');
+var env = require('gitter-web-env');
 
 /* Wrapper to gitter-env */
 exports.getClient = function() {

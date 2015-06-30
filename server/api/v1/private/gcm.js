@@ -1,7 +1,7 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var logger = require('../../../utils/env').logger;
+var logger = require('gitter-web-env').logger;
 var pushNotificationService = require('../../../services/push-notification-service');
 
 module.exports = function(req, res, next) {

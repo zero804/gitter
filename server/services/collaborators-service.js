@@ -1,10 +1,10 @@
 'use strict';
 
 
-var RepoService         = require('./github/github-repo-service');
-var OrgService          = require('./github/github-org-service');
-var ContributorService  = require('./github/github-contributor-service');
-var MeService           = require('./github/github-me-service');
+var RepoService         = require('gitter-web-github').GitHubRepoService;
+var OrgService          = require('gitter-web-github').GitHubOrgService;
+var ContributorService  = require('gitter-web-github').GitHubContributorService;
+var MeService           = require('gitter-web-github').GitHubMeService;
 var Q                   = require('q');
 
 function withoutCurrentUser(users, user) {

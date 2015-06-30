@@ -6,8 +6,7 @@ var Marionette = require('backbone.marionette');
 var appEvents = require('utils/appevents');
 var chatItemView = require('./chatItemView');
 var Rollers = require('utils/rollers');
-var unreadItemsClient = require('components/unread-items-client');
-var isolateBurst = require('shared/burst/isolate-burst-bb');
+var isolateBurst = require('gitter-web-shared/burst/isolate-burst-bb');
 
 require('views/behaviors/infinite-scroll');
 require('views/behaviors/smooth-scroll');

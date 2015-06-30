@@ -2,7 +2,7 @@
 "use strict";
 
 var winston           = require('../utils/winston');
-var appEvents         = require("../app-events");
+var appEvents         = require('gitter-web-appevents');
 var bayeux            = require('./bayeux');
 var ent               = require('ent');
 var presenceService   = require("../services/presence-service");

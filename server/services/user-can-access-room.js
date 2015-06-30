@@ -3,7 +3,7 @@
 
 var persistence = require('./persistence-service');
 
-var env    = require('../utils/env');
+var env    = require('gitter-web-env');
 var logger = env.logger;
 
 function userCanAccessRoom(userId, troupeId, callback) {

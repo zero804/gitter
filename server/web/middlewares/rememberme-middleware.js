@@ -1,7 +1,7 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var env             = require('../../utils/env');
+var env             = require('gitter-web-env');
 var logger          = env.logger;
 var nconf           = env.config;
 var stats           = env.stats;

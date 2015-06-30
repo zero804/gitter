@@ -4,7 +4,7 @@
 var StatusError  = require('statuserror');
 var troupeService = require('./troupe-service');
 var persistence = require('./persistence-service');
-var verbose = require('../utils/env').logger.verbose;
+var verbose = require('gitter-web-env').logger.verbose;
 var nconf = require('../utils/config');
 var Q = require('q');
 

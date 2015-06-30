@@ -3,7 +3,7 @@
 
 var Q = require('q');
 var winston = require('../../utils/winston');
-var GithubIssueStateService = require('../../services/github/github-issue-state-service');
+var GithubIssueStateService = require('gitter-web-github').GitHubIssueStateService;
 
 var EXPIRES_SECONDS = 180;
 var EXPIRES_MILLISECONDS = 180 * 1000;
@@ -37,4 +37,3 @@ module.exports =  function(req, res, next) {
   }).fail(next);
 
 };
-

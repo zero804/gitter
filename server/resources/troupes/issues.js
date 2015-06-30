@@ -1,8 +1,8 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var RepoService =  require('../../services/github/github-repo-service');
-var GitHubIssueService =  require('../../services/github/github-issue-service');
+var RepoService =  require('gitter-web-github').GitHubRepoService;
+var GitHubIssueService =  require('gitter-web-github').GitHubIssueService;
 var processChat = require('../../utils/markdown-processor');
 var StatusError = require('statuserror');
 

@@ -3,7 +3,7 @@
 
 var redis = require('./redis');
 var resque = require("node-resque");
-var env = require('./env');
+var env = require('gitter-web-env');
 var logger = env.logger;
 var stats = env.stats;
 var os = require('os');
