@@ -388,7 +388,7 @@ function renderOrg404Page(req, res, next) {
 
 function renderNotLoggedInChatPage(req, res, next) {
   return renderChat(req, res, {
-    template: 'chat-nli-template',
+    template: splitTest(req, 'chat-nli-template'),
     script: 'router-nli-chat',
     unread: false // Not logged in users see chats as read
   }, next);
