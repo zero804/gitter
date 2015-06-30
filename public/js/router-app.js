@@ -29,28 +29,27 @@ require('components/ping');
 // Preload widgets
 require('views/widgets/avatar');
 
+var loading = function (el) {
+  return {
+    show: function () {
+      el.removeClass('hide');
+    },
+    hide: function () {
+      el.addClass('hide');
+    },
+  };
+};
+
 onready(function () {
+  var loadingScreen = loading($('.loading-frame'));
   var chatIFrame = document.getElementById('content-frame');
   var titlebarUpdater = new TitlebarUpdater();
 
-  // the iframe ready state is almost impossible to be complete by the
-  // time weve loaded, as it means our iframe has loaded before our
-  // javascript could start.
-  // however, iframe loading before javascript can happen on dev. if this
-  // happens in prod, our performance is *too* good.
-  if (chatIFrame.contentDocument.readyState !== 'complete') {
-    var $loadingFrame = $('.loading-frame');
 
-    $loadingFrame.removeClass('hide');
+  loadingScreen.show();
 
-    chatIFrame.addEventListener('load', function() {
-      $loadingFrame.addClass('hide');
-    }, false);
-
-    appEvents.on('chatframe:loaded', function() {
-      $loadingFrame.addClass('hide');
-    });
-  }
+  chatIFrame.addEventListener('load', loadingScreen.hide, false);
+  appEvents.on('chatframe:loaded', loadingScreen.hide);
 
   // Send the hash to the child
   if (window.location.hash) {
