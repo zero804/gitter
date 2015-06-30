@@ -130,8 +130,6 @@ describe('troupe-service', function() {
         troupeService.findById(fixture.troupeForDeletion2.id, function(err, troupe) {
           if(err) return done(err);
 
-          var earlier = new Date(Date.now() - 10000);
-
           assert.equal('DELETED', troupe.status);
           assert.strictEqual(0, troupe.users.length);
 
