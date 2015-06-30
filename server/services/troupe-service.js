@@ -196,34 +196,6 @@ function validateTroupeEmailAndReturnDistributionList(options, callback) {
   });
 }
 
-
-/**
- * Returns the URL a particular user would see if they wish to view a URL.
- * NB: this call has to query the db to get a user's username. Don't call it
- * inside a loop!
- *
- * @return promise of a URL string
- */
-function getUrlForTroupeForUserId(troupe, userId) {
-  if(!troupe.oneToOne) {
-    return Q.resolve("/" + troupe.uri);
-  }
-
-  var otherTroupeUser = troupe.users.filter(function(troupeUser) {
-    return troupeUser.userId != userId;
-  })[0];
-
-  if(!otherTroupeUser) throw "Unable to determine other user for troupe#" + troupe.id;
-
-  return userService.findUsernameForUserId(otherTroupeUser.userId)
-    .then(function(username) {
-      return username ? "/" + username
-                      : "/one-one/" + otherTroupeUser.userId;
-    });
-
-}
-
-
 function indexTroupesByUserIdTroupeId(troupes, userId) {
   var groupTroupeIds = troupes
                         .filter(function(t) { return !t.oneToOne; })
@@ -603,15 +575,26 @@ function findAllImplicitContactUserIds(userId, callback) {
 }
 
 function deleteTroupe(troupe, callback) {
-  if(troupe.status != 'ACTIVE') return callback("Troupe is not active");
-  if(!troupe.oneToOne && troupe.users.length !== 1) return callback("Can only delete troupes that have a single user");
-  troupe.status = 'DELETED';
-  troupe.dateDeleted = new Date();
-  troupe.removeUserById(troupe.users[0].userId);
-  if (troupe.oneToOne) {
-    troupe.removeUserById(troupe.users[1].userId);
-  }
-  return troupe.saveQ()
+  return Q.fcall(function() {
+      if (troupe.oneToOne) {
+        var userId0 = troupe.users[0] && troupe.users[0].userId;
+        var userId1 = troupe.users[1] && troupe.users[1].userId;
+        troupe.removeUserById(userId0);
+        troupe.removeUserById(userId1);
+
+        return troupe.removeQ();
+      } else {
+        if(troupe.users.length !== 1) throw new Error("Can only delete troupes that have a single user");
+
+        troupe.status = 'DELETED';
+        if (!troupe.dateDeleted) {
+          troupe.dateDeleted = new Date();
+        }
+        troupe.removeUserById(troupe.users[0].userId);
+
+        return troupe.saveQ();
+      }
+    })
     .then(function() {
       appEvents.troupeDeleted(troupe.id);
     })
@@ -637,7 +620,6 @@ module.exports = {
   findAllUserIdsForUnconnectedImplicitContacts: findAllUserIdsForUnconnectedImplicitContacts,
   findAllImplicitContactUserIds: findAllImplicitContactUserIds,
   findAllConnectedUserIdsForUserId: findAllConnectedUserIdsForUserId,
-  getUrlForTroupeForUserId: getUrlForTroupeForUserId,
 
   findAllUserIdsForTroupes: findAllUserIdsForTroupes,
   findAllUserIdsForTroupe: findAllUserIdsForTroupe,

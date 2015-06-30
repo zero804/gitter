@@ -8,17 +8,21 @@ Please symlink pre-commit to .git/hooks/pre-commit to enable the pre-commit hook
 
 Prerequisites
 -------------
-Redis 2.8 (Sentinel 2 is shipped with Redis 2.8) & MongoDB 2.4 must be installed.
+* node.js 0.10+ `brew install node`
+* Redis 2.8+ `brew install redis`
+* MongoDB 2.4+ `brew install mongo`
 
 Getting Started
 ---------------
-1.  `npm install`
-2.  `gulp css`
-3.  `./mongodb.sh`
-4.  `./redis.sh`
-5.  `./scripts/mongo/init-dev-mongo.sh`
-6.  `./scripts/upgrade-data.sh`
-7.  `nodemon` (this will run node and restart when anything changes based on config in nodemon.json)
+1. `npm install`
+2. `npm install -g gulp`
+3. `gulp css` (compiles css)
+4. `./mongodb.sh` (starts mongo database)
+5. `./redis.sh` (starts redis cache)
+6. `./scripts/mongo/init-dev-mongo.sh`
+7. `./scripts/upgrade-data.sh`
+8. `npm install -g nodemon`
+9. `nodemon` (this will run node and restart when anything changes based on config in nodemon.json)
 
 Data Upgrades
 -------------

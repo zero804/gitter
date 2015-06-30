@@ -6,13 +6,12 @@ var troupeService = require('./troupe-service');
 var recentRoomService = require('./recent-room-service');
 var Q = require('q');
 var unreadItemService = require('./unread-item-service');
+var debug = require('debug')('gitter:user-removal-service');
 
-
-exports.removeByUsername = function(username) {
-  console.log('USERNAME IS ', username);
+exports.removeByUsername = function(username, options) {
   return userService.findByUsername(username)
     .then(function(user) {
-      console.log('FOUND USER ', username);
+      debug('Remove by username %s', username);
       if(!user) return;
 
       var userId = user.id;
@@ -34,12 +33,17 @@ exports.removeByUsername = function(username) {
           }));
         })
         .then(function() {
+          if (options && options.deleteUser) {
+            return user.removeQ();
+          }
+
           user.state = 'REMOVED';
           user.email = undefined;
           user.invitedEmail = undefined;
           user.clearTokens();
 
           return user.saveQ();
+
         });
 
     });
