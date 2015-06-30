@@ -5,7 +5,7 @@
  * description of configuration variables and their potential values.
  */
 
-var env = require('./server/utils/env');
+var env = require('gitter-web-env');
 var key = env.config.get('newrelic:key');
 
 exports.config = {

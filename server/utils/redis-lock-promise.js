@@ -1,6 +1,6 @@
 'use strict';
 
-var env       = require('./env');
+var env       = require('gitter-web-env');
 var redisLock = require("redis-lock")(env.redis.getClient());
 var Q         = require("q");
 

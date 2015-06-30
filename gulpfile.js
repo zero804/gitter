@@ -30,6 +30,26 @@ var del = require('del');
 /* Don't do clean in gulp, use make */
 var DEV_MODE = !!process.env.DEV_MODE;
 
+var testModules = {
+  'integration': ['./test/integration/**/*.js', './test/public-js/**/*.js'],
+  'cache-wrapper': ['./modules/cache-wrapper/test/*.js'],
+  'github': ['./modules/github/test/*.js']
+};
+
+/** Make a series of tasks based on the test modules */
+function makeTestTasks(taskName, generator) {
+  Object.keys(testModules).forEach(function(moduleName) {
+    var files = testModules[moduleName];
+
+    gulp.task(taskName + '-' + moduleName, function() {
+      return generator(moduleName, files);
+    });
+  });
+
+  gulp.task(taskName, Object.keys(testModules).map(function(moduleName) { return taskName + '-' + moduleName; }));
+}
+
+
 gulp.task('validate-client-source', function() {
   /* This is a very lax jshint, only looking for major problems */
   return gulp.src(['public/js/**/*.js', 'shared/**/*.js'])
@@ -52,7 +72,7 @@ gulp.task('validate-client-source', function() {
 
 gulp.task('validate-server-source', function() {
   /* This is a very lax jshint, only looking for major problems */
-  return gulp.src(['server/**/*.js', 'shared/**/*.js', '!server/web/faye-node.js'])
+  return gulp.src(['server/**/*.js', 'shared/**/*.js', 'modules/**/lib/**/*.js'])
     .pipe(jshint({
       node: true,
       // globalstrict: true, // ENABLE
@@ -69,15 +89,11 @@ gulp.task('validate-server-source', function() {
 
 gulp.task('validate', ['validate-client-source', 'validate-server-source']);
 
-
-/**
- * test
- */
-gulp.task('test-mocha', function() {
+makeTestTasks('test-mocha', function(name, files) {
   mkdirp.sync('output/test-reports/');
   mkdirp.sync('output/coverage-reports/');
 
-  return gulp.src(['./test/integration/**/*.js', './test/public-js/**/*.js'], { read: false })
+  return gulp.src(files, { read: false })
     .pipe(mocha({
       reporter: 'xunit-file',
       timeout: 10000,
@@ -85,10 +101,10 @@ gulp.task('test-mocha', function() {
         dir: 'output/coverage-reports/'
       },
       env: {
-        TAP_FILE: "output/test-reports/tests.tap",
-        XUNIT_FILE: 'output/test-reports/integration.xml',
+        TAP_FILE: 'output/test-reports/' + name + '.tap',
+        XUNIT_FILE: 'output/test-reports/' + name + '.xml',
         NODE_ENV: 'test',
-        Q_DEBUG: 1
+        Q_DEBUG: 1,
       }
     }));
 });
@@ -99,8 +115,8 @@ gulp.task('test-redis-lua', shell.task([
 
 gulp.task('test', ['test-mocha', 'test-redis-lua']);
 
-gulp.task('localtest', function() {
-  return gulp.src(['./test/integration/**/*.js', './test/public-js/**/*.js'], { read: false })
+makeTestTasks('localtest', function(name, files) {
+  return gulp.src(files, { read: false })
     .pipe(mocha({
       reporter: 'spec',
       timeout: 10000,
@@ -111,7 +127,6 @@ gulp.task('localtest', function() {
       }
     }));
 });
-
 
 /**
  * Matcha tests, submitted to datadog
@@ -148,14 +163,14 @@ gulp.task('localtest-coverage', ['clean:coverage'], function() {
     }));
 });
 
-gulp.task('fasttest', function() {
-  return gulp.src(['./test/integration/**/*.js', './test/public-js/**/*.js'], { read: false })
+makeTestTasks('fasttest', function(name, files) {
+  return gulp.src(files, { read: false })
     .pipe(mocha({
       reporter: 'spec',
       grep: '#slow',
       invert: true,
       env: {
-        TAP_FILE: "output/test-reports/tests.tap",
+        TAP_FILE: "output/test-reports/" + name + ".tap",
         SKIP_BADGER_TESTS: 1,
         DISABLE_CONSOLE_LOGGING: 1
       }
@@ -180,7 +195,8 @@ gulp.task('copy-app-files', function() {
       'scripts/**',
       'server/**',
       'shared/**',
-      'redis-lua/**'
+      'redis-lua/**',
+      'modules/**'
     ], { "base" : "." })
     .pipe(gulp.dest('output/app'));
 });

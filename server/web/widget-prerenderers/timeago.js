@@ -1,7 +1,7 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var timeFormat = require('../../../shared/time/time-format');
+var timeFormat = require('gitter-web-shared/time/time-format');
 
 module.exports = exports = function() {
   return function timeagoWidgetHandler(params) {

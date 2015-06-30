@@ -11,7 +11,7 @@ var troupeService = testRequire('./services/troupe-service');
 var recentRoomService = testRequire('./services/recent-room-service');
 var roomService = testRequire('./services/room-service');
 var userIsInRoom = testRequire('./services/user-in-room');
-var appEvents = testRequire('./app-events');
+var appEvents = testRequire('gitter-web-appevents');
 
 var mockito = require('jsmockito').JsMockito;
 

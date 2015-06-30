@@ -6,7 +6,7 @@ var persistence = require('./persistence-service');
 var assert = require('assert');
 var batcher = new RedisBatcher('readby', 0);
 var winston = require('../utils/winston');
-var appEvents = require("../app-events");
+var appEvents = require('gitter-web-appevents');
 var mongoUtils = require('../utils/mongo-utils');
 var Q = require('q');
 

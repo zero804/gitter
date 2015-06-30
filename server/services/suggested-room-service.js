@@ -2,8 +2,8 @@
 "use strict";
 
 var repoService     = require('./repo-service');
-var GithubRepo      = require("./github/github-repo-service");
-var persistence     = require("./persistence-service");
+var GithubRepo      = require('gitter-web-github').GitHubRepoService;
+var persistence     = require('./persistence-service');
 var Q               = require('q');
 var _               = require('underscore');
 var suggestedRoomCache = require('./suggested-room-service-cache');

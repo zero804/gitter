@@ -4,7 +4,7 @@ var moment = require('moment');
 var context = require('utils/context');
 var widgets = require('views/behaviors/widgets');
 var FastAttachMixin = require('views/fast-attach-mixin');
-var timeFormat = require('shared/time/time-format');
+var timeFormat = require('gitter-web-shared/time/time-format');
 
 require('views/behaviors/tooltip');
 
