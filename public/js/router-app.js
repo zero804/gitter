@@ -32,6 +32,7 @@ require('views/widgets/avatar');
 onready(function () {
   var chatIFrame = document.getElementById('content-frame');
   var titlebarUpdater = new TitlebarUpdater();
+  var $loadingFrame = $('.loading-frame');
 
   // the iframe ready state is almost impossible to be complete by the
   // time weve loaded, as it means our iframe has loaded before our
@@ -39,8 +40,6 @@ onready(function () {
   // however, iframe loading before javascript can happen on dev. if this
   // happens in prod, our performance is *too* good.
   if (chatIFrame.contentDocument.readyState !== 'complete') {
-    var $loadingFrame = $('.loading-frame');
-
     $loadingFrame.removeClass('hide');
 
     chatIFrame.addEventListener('load', function() {
@@ -157,7 +156,7 @@ onready(function () {
       return;
     }
 
-    loadingScreen.show();
+    $loadingFrame.removeClass('hide');
 
     pushState(frameUrl, title, url);
     updateContent(frameUrl);
