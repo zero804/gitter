@@ -411,7 +411,7 @@ onready(function () {
   if (context.popEvent('new_user_signup')) {
     require.ensure("scriptjs", function(require) {
       var $script = require("scriptjs");
-      $script("//platform.twitter.com/oct", function() {
+      $script("//platform.twitter.com/oct.js", function() {
         var twitterOct = window.twttr && window.twttr.conversion;
         twitterOct.trackPid('l4t99');
       });
