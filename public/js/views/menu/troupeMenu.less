@@ -257,24 +257,6 @@ body.dragging .list-favourites li.placeholder {
   color: white;
 }
 
-.nli-menu-treatment {
-  .nli-menu;
-
-  flex-direction: column;
-  align-items: flex-start;
-
-  background: url('../images/home/banner.jpg') no-repeat center center;
-  background-size: cover;
-  z-index: 9999;
-
-  .logo-holder {
-    position: relative;
-    width: 20px;
-    height: 20px;
-    top: -100px;
-  }
-}
-
 .nli-menu__intro {
   max-height: 100%;
 
@@ -316,3 +298,75 @@ body.dragging .list-favourites li.placeholder {
     color: white;
   }
 }
+
+// SPLIT TEST CSS START
+
+.nli-menu-treatment {
+  .nli-menu;
+
+  flex-direction: column;
+  align-items: flex-start;
+
+  background: url('../images/home/banner.jpg') no-repeat center center;
+  background-size: cover;
+  z-index: 9999;
+
+  .logo-holder {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    top: -100px;
+  }
+}
+
+.nli-menu-treatment__header {
+  font-family: DP, sans-serif;
+  font-weight: normal;
+  font-size: 47px;
+  line-height: 43px;
+  margin-bottom: 65px;
+}
+
+.nli-menu-treatment__features-header {
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+.nli-menu-treatment__features {
+  background-color: rgba(255,255,255, 0.1);
+  font-size: 10px;
+  padding: 20px 15px;
+  margin: 10px 0px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.nli-menu-treatment__footer {
+  position: absolute;
+  bottom: 10px;
+}
+
+
+
+@font-face {
+  font-family: 'DP';
+
+  /* For older versions of IE */
+  src: url('../fonts/dp.eot');
+
+  /* Standard syntax */
+  src: url('../fonts/dp.eot?#iefix') format('embedded-opentype'),
+       url('../fonts/dp.woff') format('woff'),
+       url('../fonts/dp.ttf') format('truetype'),
+       url('../fonts/dp.svg#dp') format('svg');
+
+  /* Apply synthetic bolding/italics */
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+// SPLIT TEST CSS END
+
+
+
