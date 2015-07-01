@@ -4,6 +4,7 @@
 @import "../../../less/base-zindex-levels";
 @import "../../../less/base-transition-mixins";
 @import "../../../less/typography.less";
+@import "../../../less/logo.less";
 
 /* Imports for child views */
 @import "./room-list";
@@ -335,7 +336,7 @@ body.dragging .list-favourites li.placeholder {
   position: relative;
   width: 76px;
   top: 7px;
-  left: 35px;
+  left: 12px;
 }
 
 
@@ -387,52 +388,6 @@ body.dragging .list-favourites li.placeholder {
     text-decoration: none;
   }
 }
-
-.logo-animation {
-  animation: dropdown 1s linear 1s 1 normal forwards;
-  transform: translate3d(0,0,0);
-}
-
-.logo-left-arm {
-  animation-name: tuck-arms;
-  position: absolute;
-  left: 0;
-  top: 0;
-  background-color: white;
-  width: 2px;
-  height: 15px;
-}
-
-.logo-body-left {
-  animation-name: tuck-legs;
-  position: absolute;
-  background-color: white;
-  left: 5px;
-  width: 2px;
-  top: 4px;
-  height: 20px;
-}
-
-.logo-body-right {
-  animation-name: tuck-legs;
-  position: absolute;
-  background-color: white;
-  left: 10px;
-  width: 2px;
-  top: 4px;
-  height: 20px;
-}
-
-.logo-right-arm {
-  animation-name: tuck-arms;
-  position: absolute;
-  left: 15px;
-  top: 4px;
-  background-color: white;
-  width: 2px;
-  height: 11px;
-}
-
 
 // 98px logo width
 
