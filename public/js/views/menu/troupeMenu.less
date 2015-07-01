@@ -307,26 +307,45 @@ body.dragging .list-favourites li.placeholder {
 
   flex-direction: column;
   align-items: flex-start;
+  justify-content: flex-start;
 
   background: url('../images/home/banner.jpg') no-repeat center center;
   background-size: cover;
   z-index: 9999;
 
+  // Not so BEM but it's inherited from the Homepage
   .logo-holder {
     position: relative;
     width: 20px;
     height: 20px;
-    top: -100px;
+    top: 0px;
+    left: 15px;
   }
 }
+
+.nli-menu-treatment__logo {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  position: absolute;
+  top: 25px;
+  left: 35px;
+}
+
+.nli-menu-treatment__logo-text {
+  position: relative;
+  width: 76px;
+  top: 7px;
+  left: 35px;
+}
+
 
 .nli-menu-treatment__header {
   font-family: "source-sans-pro";
   font-weight: 200;
   font-size: 47px;
   line-height: 43px;
-  margin-bottom: 65px;
-  margin-left: 15px;
+  margin: 200px 0px 65px 15px;
 }
 
 .nli-menu-treatment__features-header {
@@ -360,8 +379,62 @@ body.dragging .list-favourites li.placeholder {
   position: absolute;
   bottom: 25px;
   margin-left: 15px;
+  a {
+    color: #FFF;
+    border-bottom: 1px dotted #FFF;
+  }
+  a:hover {
+    text-decoration: none;
+  }
 }
 
+.logo-animation {
+  animation: dropdown 1s linear 1s 1 normal forwards;
+  transform: translate3d(0,0,0);
+}
+
+.logo-left-arm {
+  animation-name: tuck-arms;
+  position: absolute;
+  left: 0;
+  top: 0;
+  background-color: white;
+  width: 2px;
+  height: 15px;
+}
+
+.logo-body-left {
+  animation-name: tuck-legs;
+  position: absolute;
+  background-color: white;
+  left: 5px;
+  width: 2px;
+  top: 4px;
+  height: 20px;
+}
+
+.logo-body-right {
+  animation-name: tuck-legs;
+  position: absolute;
+  background-color: white;
+  left: 10px;
+  width: 2px;
+  top: 4px;
+  height: 20px;
+}
+
+.logo-right-arm {
+  animation-name: tuck-arms;
+  position: absolute;
+  left: 15px;
+  top: 4px;
+  background-color: white;
+  width: 2px;
+  height: 11px;
+}
+
+
+// 98px logo width
 
 
 // SPLIT TEST CSS END
