@@ -1,15 +1,9 @@
 "use strict";
+
 var apiClient = require('components/apiClient');
-var Backbone = require('backbone');
 var realtime = require('components/realtime');
 var gitterRealtimeClient = require('gitter-realtime-client');
 var SyncMixin = require('./sync-mixin');
-
-var SuggestedTroupeCollection = Backbone.Collection.extend({
-  model: gitterRealtimeClient.RoomModel,
-  url: apiClient.user.channelGenerator("/suggested-rooms"),
-  sync: SyncMixin.sync
-});
 
 var RoomModel = gitterRealtimeClient.RoomModel.extend({
   sync: SyncMixin.sync
@@ -25,7 +19,6 @@ var TroupeCollection = gitterRealtimeClient.RoomCollection.extend({
 });
 
 module.exports = {
-  SuggestedTroupeCollection: SuggestedTroupeCollection,
   TroupeCollection: TroupeCollection,
   TroupeModel:      RoomModel
 };

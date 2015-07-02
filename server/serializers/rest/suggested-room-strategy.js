@@ -27,6 +27,7 @@ function SuggestedRoomStrategy() {
     if (!room) return;
 
     return {
+      id: room.id,
       uri: room.uri,
       githubType: room.githubType,
       avatarUrl: getOwnerAvatarUrl(room),
