@@ -1,7 +1,8 @@
 'use strict';
 
+var env   = require('gitter-web-env');
 var cypher = require("cypher-promise");
-var neo4jClient = cypher('http://192.168.99.100:7474');
+var neo4jClient = cypher(env.config.get('neo4j:endpoint'));
 
 function queryRoomRecommedations(roomId, userId) {
   roomId = '' + roomId;
