@@ -40,22 +40,14 @@
   height: 100%;
 
   /* colors */
-  background-color: lighten(@trpDarkBlue, 5%);
+  background-color: #383435;
   color: white;
 
   /* effects */
-  transition: background-color 0.3s ease-in-out,
-              margin           0.2s ease-in-out;
+  transition: margin 0.2s ease-in-out;
 
   .nano-pane {
     left: 0;
-  }
-
-  a {
-    text-decoration: none;
-    color: inherit;
-    display: inline-block;
-    width: 100%;
   }
 }
 
@@ -71,8 +63,6 @@ body.hover .menu:hover {
   // slide menu to the right
   margin-left: 0;
   margin-right: -@menuWidth;
-
-  background-color: @trpDarkBlue;
 }
 
 @media @mid-min {
@@ -103,8 +93,6 @@ body.hover .menu:hover .menu__hotspot {
   // slide hotspot away when menu is hovered
   right: 0;
   width: 0;
-
-  transition-delay: 0s;
 }
 
 @media @mid-min {
@@ -112,8 +100,6 @@ body.hover .menu:hover .menu__hotspot {
     // slide hotspot away when menu is inline
     right: 0;
     width: 0;
-
-    transition-delay: 0s;
   }
 }
 
@@ -211,11 +197,22 @@ body.hover .menu:hover .menu__hotspot {
   color: white;
 }
 
-.menu-actions {
-  padding: 8px;
+.menu__create-room-button {
+  display: block;
+  margin: 1em;
+  padding: 1em;
+  background-color: @homepage-green;
+  border-radius: 0.5em;
 
-  a {
-    color: @trpDarkGrey;
+  text-align: center;
+  color: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.8em;
+
+  &:hover {
+    text-decoration: none;
+    background-color: darken(@homepage-green, 5%);
   }
 }
 
