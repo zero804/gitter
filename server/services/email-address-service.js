@@ -1,14 +1,15 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var env = require('../utils/env');
+var env = require('gitter-web-env');
 var config = env.config;
 var stats  = env.stats;
 
 var Q = require('q');
-var GitHubMeService = require('./github/github-me-service');
-var GitHubUserService = require('./github/github-user-service');
-var GitHubRepoService = require('./github/github-repo-service');
+var github = require('gitter-web-github');
+var GitHubMeService = github.GitHubMeService;
+var GitHubUserService = github.GitHubUserService;
+var GitHubRepoService = github.GitHubRepoService;
 
 var isValidEmail = require('email-validator').validate;
 

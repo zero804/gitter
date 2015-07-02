@@ -1,7 +1,7 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var env                = require('../utils/env');
+var env                = require('gitter-web-env');
 var logger             = env.logger;
 var nconf              = env.config;
 var stats              = env.stats;
@@ -13,16 +13,15 @@ var request            = require('request');
 var _                  = require('underscore');
 var xregexp            = require('xregexp').XRegExp;
 var persistence        = require('./persistence-service');
-var validateUri        = require('./github/github-uri-validator');
+var validateUri        = require('gitter-web-github').GitHubUriValidator;
 var uriLookupService   = require("./uri-lookup-service");
 var permissionsModel   = require('./permissions-model');
 var roomPermissionsModel = require('./room-permissions-model');
 var userService        = require('./user-service');
 var troupeService      = require('./troupe-service');
-var GitHubRepoService  = require('./github/github-repo-service');
-var GitHubOrgService   = require('./github/github-org-service');
-var unreadItemService  = require('./unread-item-service');
-var appEvents          = require("../app-events");
+var GitHubRepoService  = require('gitter-web-github').GitHubRepoService;
+var GitHubOrgService   = require('gitter-web-github').GitHubOrgService;
+var appEvents          = require('gitter-web-appevents');
 var serializeEvent     = require('./persistence-service-events').serializeEvent;
 var validate           = require('../utils/validate');
 var collections        = require('../utils/collections');
@@ -37,10 +36,11 @@ var badger             = require('./badger-service');
 var userSettingsService = require('./user-settings-service');
 var roomSearchService  = require('./room-search-service');
 var assertMemberLimit  = require('./assert-member-limit');
-var qlimit             = require('qlimit');
 var redisLockPromise   = require("../utils/redis-lock-promise");
+var unreadItemService  = require('./unread-item-service');
 var debug              = require('debug')('gitter:room-service');
 var badgerEnabled      = nconf.get('autoPullRequest:enabled');
+exports.testOnly = {};
 
 function localUriLookup(uri, opts) {
   debug("localUriLookup %s", uri);
@@ -577,8 +577,6 @@ function findOrCreateRoom(user, uri, options) {
       // need to check for the rooms
       return findOrCreateNonOneToOneRoom(user, uriLookup && uriLookup.troupe, uri, options)
         .then(function(findOrCreateResult) {
-          debug("findOrCreateNonOneToOneRoom returned %j", findOrCreateResult);
-
           var troupe = findOrCreateResult.troupe;
           var access = findOrCreateResult.access;
           var hookCreationFailedDueToMissingScope = findOrCreateResult.hookCreationFailedDueToMissingScope;
@@ -908,6 +906,21 @@ function notifyInvitedUser(fromUser, invitedUser, room/*, isNewUser*/) {
     .thenResolve(invitedUser);
 }
 
+function updateUserDateAdded(userId, roomId, date) {
+  var setOp = {};
+  setOp['added.' + roomId] = date || new Date();
+
+  return persistence.UserTroupeLastAccess.updateQ(
+     { userId: userId },
+     { $set: setOp },
+     { upsert: true });
+
+}
+exports.testOnly.updateUserDateAdded = updateUserDateAdded;
+
+/**
+ * Somebody adds another user to a room
+ */
 function addUserToRoom(room, instigatingUser, usernameToAdd) {
   return Q.all([
     roomPermissionsModel(instigatingUser, 'adduser', room),
@@ -932,9 +945,14 @@ function addUserToRoom(room, instigatingUser, usernameToAdd) {
       room.addUserById(invitedUser.id);
       return room.saveQ()
         .then(function () {
-          return notifyInvitedUser(instigatingUser, invitedUser, room, isNewUser);
+          return Q.all([
+            notifyInvitedUser(instigatingUser, invitedUser, room, isNewUser),
+            updateUserDateAdded(invitedUser.id, room.id)
+          ])
+          .thenResolve(invitedUser);
         });
     });
+
 }
 
 exports.addUserToRoom = addUserToRoom;
@@ -1235,6 +1253,12 @@ function updateTroupeLurkForUserId(userId, troupeId, lurk) {
     // Odd, user not found
     if(!count) return;
 
+    stats.event("lurk_room", {
+      userId: '' + userId,
+      troupeId: '' + troupeId,
+      lurking: lurk
+    });
+
     appEvents.userTroupeLurkModeChange({ userId: userId, troupeId: troupeId, lurk: lurk });
     // TODO: in future get rid of this but this collection is used by the native clients
     appEvents.dataChange2('/user/' + userId + '/rooms', 'patch', { id: troupeId, lurk: lurk });
@@ -1247,41 +1271,6 @@ function updateTroupeLurkForUserId(userId, troupeId, lurk) {
 }
 exports.updateTroupeLurkForUserId = updateTroupeLurkForUserId;
 
-var bulkUnreadItemLimit = qlimit(5);
-
-function bulkLurkUsers(troupeId, userIds) {
-  var userHash = userIds.reduce(function(memo, userId) {
-    memo[userId] = true;
-    return memo;
-  }, {});
-
-  return persistence.Troupe.findByIdQ(troupeId)
-    .then(function(troupe) {
-      troupe.users.forEach(function(troupeUser) {
-        if (userHash[troupeUser.userId]) {
-          troupeUser.lurk = true;
-        }
-      });
-      troupe._skipTroupeMiddleware = true; // Don't send out an update
-      return troupe.saveQ();
-    })
-    .then(function() {
-      return Q.all(userIds.map(bulkUnreadItemLimit(function(userId) {
-        return unreadItemService.ensureAllItemsRead(userId, troupeId);
-      })));
-    });
-
-    // Odd, user not found
-    // if(!count) return;
-
-    // Don't send updates for now
-    //appEvents.userTroupeLurkModeChange({ userId: userId, troupeId: troupeId, lurk: lurk });
-    // TODO: in future get rid of this but this collection is used by the native clients
-    //appEvents.dataChange2('/user/' + userId + '/rooms', 'patch', { id: troupeId, lurk: lurk });
-
-    // Delete all the chats in Redis for this person too
-}
-exports.bulkLurkUsers = bulkLurkUsers;
 
 
 function searchRooms(userId, queryText, options) {

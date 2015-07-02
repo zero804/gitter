@@ -2,7 +2,7 @@
 
 var LRU             = require("lru-cache");
 var Q               = require('q');
-var GithubRepo      = require("./github/github-repo-service");
+var GithubRepo      = require('gitter-web-github').GitHubRepoService;
 var MAX_TOKEN_AGE   = 10 * 60000; // 2 minutes
 var publicRoomCache = LRU({
   max: 20,

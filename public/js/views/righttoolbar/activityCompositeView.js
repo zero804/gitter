@@ -25,7 +25,7 @@ var trelloTemplate = require('./tmpl/trello.hbs');
 var prerenderedTemplate = require('./tmpl/activity-item-prerendered.hbs');
 var activityTemplate = require('./tmpl/activity-composite.hbs');
 var activityEmptyTemplate = require('./tmpl/activity-empty.hbs');
-var activityDecorators = require('shared/activity/activity-decorators');
+var activityDecorators = require('gitter-web-shared/activity/activity-decorators');
 var context = require('utils/context');
 
 require('views/widgets/timeago');

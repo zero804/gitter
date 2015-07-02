@@ -2,7 +2,7 @@
 "use strict";
 
 var troupeDao   = require('./daos/troupe-dao').lean;
-var appEvents   = require('../app-events');
+var appEvents   = require('gitter-web-appevents');
 var userService = require('./user-service');
 
 function repoPremiumStatusNotifier(userOrOrg, premiumStatus) {

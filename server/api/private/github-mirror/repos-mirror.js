@@ -1,6 +1,6 @@
 "use strict";
 
-var Mirror = require("../../../services/github/github-mirror-service")('repo');
+var Mirror = require('gitter-web-github').GitHubMirrorService('repo');
 var processChat = require('../../../utils/markdown-processor');
 var util = require('util');
 var highlight = require('highlight.js');

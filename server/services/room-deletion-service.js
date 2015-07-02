@@ -8,7 +8,7 @@ var removeService = require('./remove-service');
 var persistence = require('./persistence-service');
 var Q = require('q');
 
-var env    = require('../utils/env');
+var env    = require('gitter-web-env');
 var logger = env.logger;
 
 function removeUsersFromRoomOneAtATime(room, userIds) {

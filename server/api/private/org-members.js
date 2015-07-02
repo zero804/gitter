@@ -1,8 +1,8 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var GitHubMeService   = require('../../services/github/github-me-service');
-var GitHubOrgService   = require('../../services/github/github-org-service');
+var GitHubMeService   = require('gitter-web-github').GitHubMeService;
+var GitHubOrgService   = require('gitter-web-github').GitHubOrgService;
 var restSerializer     = require("../../serializers/rest-serializer");
 var userService        = require('../../services/user-service');
 var StatusError        = require('statuserror');

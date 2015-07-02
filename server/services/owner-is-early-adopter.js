@@ -3,7 +3,7 @@
 
 var persistence = require('./persistence-service');
 var mongoUtils  = require('../utils/mongo-utils');
-var env         = require('../utils/env');
+var env         = require('gitter-web-env');
 var config      = env.config;
 
 

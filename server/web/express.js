@@ -1,7 +1,7 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var env = require('../utils/env');
+var env = require('gitter-web-env');
 var config          = env.config;
 
 var express        = require('express');
@@ -100,6 +100,7 @@ module.exports = {
     app.use(passport.initialize());
     app.use(passport.session());
 
+
     app.use(require('./middlewares/authenticate-bearer'));
     app.use(rememberMe.rememberMeMiddleware);
     app.use(require('./middlewares/rate-limiter'));
@@ -110,10 +111,13 @@ module.exports = {
 
     app.use(require('./middlewares/tokenless-user'));
 
+    app.use(require('./middlewares/set-variant-cookie'));
+
     app.use(app.router);
 
     app.use(require('./middlewares/token-error-handler'));
     app.use(require('./middlewares/express-error-handler'));
+
   },
 
   installApi: function(app) {

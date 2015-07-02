@@ -77,8 +77,10 @@ function createEmailAddressService(stubData) {
   };
 
   return testRequire.withProxies('./services/email-address-service', {
-    '../utils/env': env,
-    './github/github-me-service': GitHubMeService,
-    './github/github-user-service': GitHubUserService
+    'gitter-web-env': env,
+    'gitter-web-github': {
+      GitHubMeService: GitHubMeService,
+      GitHubUserService: GitHubUserService
+    }
   });
 }

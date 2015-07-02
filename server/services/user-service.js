@@ -7,7 +7,7 @@ var assert                    = require('assert');
 var persistence               = require("./persistence-service");
 var uriLookupService          = require('./uri-lookup-service');
 var Q                         = require('q');
-var githubUserService         = require('./github/github-user-service');
+var githubUserService         = require('gitter-web-github').GitHubUserService;
 var mongooseUtils             = require('../utils/mongoose-utils');
 var extractGravatarVersion    = require('../utils/extract-gravatar-version');
 
