@@ -7,7 +7,7 @@ var csv = require('fast-csv');
 
 module.exports = function() {
   return persistence.Troupe
-    .find({ oneToOne: { $ne: true }, security: 'PUBLIC' })
+    .find({ oneToOne: { $ne: true } })
     .lean()
     .select('users.userId')
     .slaveOk()

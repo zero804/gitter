@@ -6,6 +6,7 @@ var context = require('utils/context');
 var appEvents = require('utils/appevents');
 var isMobile = require('utils/is-mobile');
 var troupeCollections = require('collections/instances/troupes');
+var SuggestedRoomCollection = require('collections/suggested-rooms');
 var RoomCollectionView = require('./room-collection-view');
 var SuggestedCollectionView = require('./suggested-collection-view');
 var log = require('utils/log');
@@ -205,26 +206,38 @@ module.exports = (function () {
 
       if (suggestedRoomsHidden || troupeCollections.troupes.length >= SUGGESTED_ROOMS_THRESHOLD) return;
 
-      this.listenTo(troupeCollections.suggested, 'add remove', this.initNanoScrollerThrottled);
-      troupeCollections.suggested.fetch();
+      var collection = this.suggestedRoomsCollection;
+      if (!collection) {
+        collection = this.suggestedRoomsCollection = new SuggestedRoomCollection();
+        if (context.getTroupeId()) {
+          collection.fetchForRoom();
+        }
+
+        this.listenTo(appEvents, 'context.troupeId', function() {
+          collection.fetchForRoom();
+        });
+
+        this.listenTo(collection, 'add remove', this.initNanoScrollerThrottled);
+      }
+
+      // troupeCollections.suggested.fetch();
 
       var suggestedWrapperView = new CollectionWrapperView({
-        collection: troupeCollections.suggested,
+        collection: collection,
         childView: SuggestedCollectionView,
         header: 'Suggested Rooms',
-        // a little bit messy sorry
         handleHide: function () {
           apiClient.user
             .put('/settings/suggestedRoomsHidden', { value: true })
             .then(function () {
-              troupeCollections.suggested.reset();
+              collection.reset();
             })
             .fail(function (err) {
               log.error(err);
             });
         }
       });
-      
+
       this.showChildView('suggested', suggestedWrapperView);
     },
 

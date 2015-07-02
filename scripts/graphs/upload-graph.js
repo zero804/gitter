@@ -9,7 +9,8 @@ var membershipStream = require('./membership-stream');
 var roomStream = require('./room-stream');
 var userStream = require('./user-stream');
 var cypher = require("cypher-promise");
-var neo4jClient = cypher('http://192.168.99.100:7474');
+var env   = require('gitter-web-env');
+var neo4jClient = cypher(env.config.get('neo4j:endpoint'));
 
 app.get('/users.csv', function(req, res){
   res.set('Content-Type', 'text/csv');
@@ -34,11 +35,12 @@ function executeBatch(urlBase) {
   var operations = [
     'CREATE INDEX ON :User(userId)',
     'CREATE INDEX ON :Room(roomId)',
+    'CREATE INDEX ON :Room(security)',
     /* Load users */
     'USING PERIODIC COMMIT LOAD CSV WITH HEADERS FROM "' + urlBase + '/users.csv" AS row MERGE (user:User {userId: row.userId }) SET user.username = row.username;',
 
     /* Load rooms */
-    'USING PERIODIC COMMIT LOAD CSV WITH HEADERS FROM "' + urlBase + '/rooms.csv" AS row MERGE (room:Room {roomId: row.roomId }) SET room.uri = row.uri',
+    'USING PERIODIC COMMIT LOAD CSV WITH HEADERS FROM "' + urlBase + '/rooms.csv" AS row MERGE (room:Room {roomId: row.roomId }) SET room.security = row.security',
 
     /* Setup MEMBER relationship */
     'USING PERIODIC COMMIT LOAD CSV WITH HEADERS FROM "' + urlBase + '/membership.csv" AS row ' +
@@ -78,11 +80,24 @@ server.listen(function() {
     .done();
 });
 
+function getIPV4Address(ifaceList) {
+  for (var j = 0; j < ifaceList.length; j++) {
+    var iface = ifaceList[j];
+
+    // skip over internal (i.e. 127.0.0.1) and non-ipv4 addresses
+    if (iface.family === 'IPv4' &&  !iface.internal) {
+      return iface.address;
+    }
+  }
+}
+
 function getExternalIp() {
   var ifaces = os.networkInterfaces();
 
   if (process.env.LISTEN_IF) {
-    return ifaces[process.env.LISTEN_IF].address;
+    var selectedAddress = getIPV4Address(ifaces[process.env.LISTEN_IF]);
+    if (selectedAddress) return selectedAddress;
+    throw new Error('Unable to find ipv4 address on ' + process.env.LISTEN_IF);
   }
 
   var ifaceNames = Object.keys(ifaces);
@@ -90,14 +105,9 @@ function getExternalIp() {
   for(var i = 0; i < ifaceNames.length; i++) {
     var ifaceName = ifaceNames[i];
     var ifaceList = ifaces[ifaceName];
-    for (var j = 0; j < ifaceList.length; j++) {
-      var iface = ifaceList[j];
+    var address = getIPV4Address(ifaceList);
 
-      // skip over internal (i.e. 127.0.0.1) and non-ipv4 addresses
-      if (iface.family === 'IPv4' &&  !iface.internal) {
-        return iface.address;
-      }
-    }
+    if (address) return address;
   }
 
 }
