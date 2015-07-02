@@ -4,6 +4,7 @@
 
 var userService = require('../../server/services/user-service');
 var troupeService = require('../../server/services/troupe-service');
+var troupeUriMapper = require('../../server/services/troupe-uri-mapper');
 var unreadService = require('../../server/services/unread-item-service');
 var restful = require("../../server/services/restful");
 
@@ -44,7 +45,7 @@ function getNamesForTroupeIds(troupeIds, userId) {
   return troupeService.findByIds(troupeIds)
     .then(function(troupes) {
       return troupes.map(function(troupe) {
-        return troupeService.getUrlForTroupeForUserId(troupe, userId);
+        return troupeUriMapper.getUrlForTroupeForUserId(troupe, userId);
       });
     }).all();
 }

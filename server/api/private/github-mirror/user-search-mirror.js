@@ -1,10 +1,11 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var Mirror      = require("../../../services/github/github-mirror-service")('user');
+var Mirror      = require('gitter-web-github').GitHubMirrorService('user');
 var userService = require('../../../services/user-service');
 var winston     = require('../../../utils/winston');
 var url         = require('url');
+
 module.exports = function(req, res, next) {
   if(!req.user) return next(401);
 

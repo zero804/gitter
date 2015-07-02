@@ -312,11 +312,11 @@ describe('unread-item-service', function() {
         var userId3 = mongoUtils.getNewObjectIdString();
 
         var troupeServiceMock = mockito.mock(testRequire('./services/troupe-service'));
-        var appEvents = mockito.spy(testRequire('./app-events'));
+        var appEvents = mockito.spy(testRequire('gitter-web-appevents'));
 
         var unreadItemService = testRequire.withProxies("./services/unread-item-service", {
           './troupe-service': troupeServiceMock,
-          '../app-events': appEvents
+          'gitter-web-appevents': appEvents
         });
         unreadItemService.testOnly.setSendBadgeUpdates(false);
 
@@ -440,7 +440,7 @@ describe('unread-item-service', function() {
 
         troupeService = mockito.mock(testRequire('./services/troupe-service'));
         userService = mockito.mock(testRequire('./services/user-service'));
-        appEvents = mockito.mock(testRequire('./app-events'));
+        appEvents = mockito.mock(testRequire('gitter-web-appevents'));
         roomPermissionsModel = mockito.mockFunction();
         presenceService = {
           categorizeUsersByOnlineStatus: function(userIds) {
@@ -460,7 +460,7 @@ describe('unread-item-service', function() {
           './troupe-service': troupeService,
           './user-service': userService,
           './presence-service': presenceService,
-          '../app-events': appEvents,
+          'gitter-web-appevents': appEvents,
           './room-permissions-model': roomPermissionsModel,
         });
         unreadItemService.testOnly.setSendBadgeUpdates(false);
@@ -659,7 +659,7 @@ describe('unread-item-service', function() {
 
         troupeService = mockito.mock(testRequire('./services/troupe-service'));
         userService = mockito.mock(testRequire('./services/user-service'));
-        appEvents = mockito.mock(testRequire('./app-events'));
+        appEvents = mockito.mock(testRequire('gitter-web-appevents'));
         roomPermissionsModel = mockito.mockFunction();
         presenceService = {
           categorizeUsersByOnlineStatus: function(userIds) {
@@ -679,7 +679,7 @@ describe('unread-item-service', function() {
           './troupe-service': troupeService,
           './user-service': userService,
           './presence-service': presenceService,
-          '../app-events': appEvents,
+          'gitter-web-appevents': appEvents,
           './room-permissions-model': roomPermissionsModel,
         });
         unreadItemService.testOnly.setSendBadgeUpdates(false);

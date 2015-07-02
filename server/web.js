@@ -6,7 +6,7 @@
 
 require('./utils/diagnostics');
 
-var env      = require('./utils/env');
+var env      = require('gitter-web-env');
 
 /* Configure winston before all else! */
 var winston  = require('./utils/winston');

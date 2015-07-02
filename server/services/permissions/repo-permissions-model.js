@@ -1,10 +1,10 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var GitHubRepoService    = require('../github/github-repo-service');
+var GitHubRepoService    = require('gitter-web-github').GitHubRepoService;
 var winston              = require('../../utils/winston');
 var Q                    = require('q');
-var appEvents            = require('../../app-events');
+var appEvents            = require('gitter-web-appevents');
 var userIsInRoom         = require('../user-in-room');
 
 
@@ -74,7 +74,7 @@ module.exports = function repoPermissionsModel(user, right, uri, security) {
         case 'view':
         case 'join':
           if(!repoInfo.private) return true;
-          return true;  
+          return true;
 
         case 'adduser':
           return true;
@@ -123,4 +123,3 @@ module.exports = function repoPermissionsModel(user, right, uri, security) {
     });
 
 };
-

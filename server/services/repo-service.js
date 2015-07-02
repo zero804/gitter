@@ -1,8 +1,8 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var GithubRepo      = require("./github/github-repo-service");
-var persistence     = require("./persistence-service");
+var GithubRepo      = require('gitter-web-github').GitHubRepoService;
+var persistence     = require('./persistence-service');
 var Q               = require('q');
 var winston         = require('../utils/winston');
 

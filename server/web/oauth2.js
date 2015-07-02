@@ -4,7 +4,7 @@
 /**
  * Module dependencies.
  */
-var env                    = require('../utils/env');
+var env                    = require('gitter-web-env');
 var logger                 = env.logger;
 var errorReporter          = env.errorReporter;
 var stats                  = env.stats;

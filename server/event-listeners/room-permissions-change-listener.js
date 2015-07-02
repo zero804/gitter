@@ -1,7 +1,7 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var appEvents   = require('../app-events');
+var appEvents   = require('gitter-web-appevents');
 var roomService = require('../services/room-service');
 
 exports.install = function() {

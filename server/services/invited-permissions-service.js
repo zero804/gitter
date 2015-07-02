@@ -1,7 +1,7 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var githubMembers = require('./github/github-members');
+var githubMembers = require('gitter-web-github').GitHubMembers;
 var Q = require('q');
 
 function canUserBeInvitedToJoinRoom(usernameToBeInvited, troupe, instigatingUser) {

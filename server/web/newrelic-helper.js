@@ -1,6 +1,6 @@
 'use strict';
 
-var env = require('../utils/env');
+var env = require('gitter-web-env');
 var template = require('./compile-web-template')('/js/views/tmpl/newrelic');
 
 module.exports = function () {

@@ -15,7 +15,7 @@ module.exports = (function() {
     serializeData: function() {
       var data = this.model.toJSON();
       data.uri = roomNameTrimmer(data.uri);
-      data.linkUrl = data.exists ? '/' + this.model.get('uri') : '#confirm/' + this.model.get('uri');
+      data.linkUrl = data.exists ? '/' + this.model.get('uri') + '?source=suggested' : '#confirm/' + this.model.get('uri');
       data.owner = this.model.get('uri').split('/')[0];
       return data;
     }

@@ -21,6 +21,7 @@ var unreadItemService  = require('../../services/unread-item-service');
 var mongoUtils         = require('../../utils/mongo-utils');
 var url                = require('url');
 var cdn                = require("../../web/cdn");
+var splitTest          = require('../../utils/split-test');
 
 var avatar   = require('../../utils/avatar');
 var _                 = require('underscore');
@@ -159,7 +160,7 @@ function renderMainFrame(req, res, next, frame) {
         template = 'app-template';
         bootScriptName = 'router-app';
       } else {
-        template = 'app-nli-template';
+        template = splitTest(troupeContext, 'app-nli-template');
         bootScriptName = 'router-nli-app';
       }
 
@@ -387,7 +388,7 @@ function renderOrg404Page(req, res, next) {
 
 function renderNotLoggedInChatPage(req, res, next) {
   return renderChat(req, res, {
-    template: 'chat-nli-template',
+    template: splitTest(req, 'chat-nli-template'),
     script: 'router-nli-chat',
     unread: false // Not logged in users see chats as read
   }, next);

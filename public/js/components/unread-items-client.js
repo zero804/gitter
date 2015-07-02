@@ -6,35 +6,13 @@ var apiClient = require('./apiClient');
 var log = require('utils/log');
 var Backbone = require('backbone');
 var appEvents = require('utils/appevents');
+var UnreadItemStore = require('./unread-items-client-store');
 
 module.exports = (function() {
 
 
   function limit(fn, context, timeout) {
     return _.throttle(fn.bind(context), timeout || 30, { leading: false });
-  }
-
-  function _iteratePreload(incoming, fn, context) {
-    var chats = incoming.chat;      // This is done this way to keep protocol compatibility
-    var mentions = incoming.mention;
-
-    var items = {};
-    if (chats) {
-      chats.forEach(function(itemId) {
-        items[itemId] = false;
-      });
-    }
-    if (mentions) {
-      mentions.forEach(function(itemId) {
-        items[itemId] = true;
-      });
-    }
-
-    Object.keys(items).forEach(function(itemId) {
-      var mentioned = items[itemId];
-      fn.call(context, itemId, mentioned);
-    });
-
   }
 
   function onceUserIdSet(callback, c) {
@@ -49,180 +27,35 @@ module.exports = (function() {
     }
   }
 
-  // -----------------------------------------------------
-  // The main component of the unread-items-store
-  // Events:
-  // * newcountvalue: (length)
-  // * unreadItemRemoved: (itemId)
-  // * change:status: (itemId, mention)
-  // * itemMarkedRead: (itemId, mention, lurkMode)
-  // * add (itemId, mention)
-  // -----------------------------------------------------
-  var UnreadItemStore = function() {
-    this.length = 0;
-    this._lurkMode = false;
+  var DeletePit = function() {
     this._items = {};
-
-    this.notifyCountLimited = limit(this.notifyCount, this, 30);
+    this._timer = setInterval(this._gc.bind(this), 60000);
   };
 
-  _.extend(UnreadItemStore.prototype, Backbone.Events, {
-    _unreadItemAdded: function(itemId, mention) {
-      // Three options here:
-      // 1 - new item
-      // 2 - item exists and has the same mention status as before (nullop)
-      // 3 - item exists and has a different mention status to before
-
-      if (!this._items.hasOwnProperty(itemId)) {
-        // Case 1
-        this._items[itemId] = mention;
-        this.length++;
-        this.notifyCountLimited();
-
-        this.trigger('add', itemId, mention);
-      } else {
-        if (this._items[itemId] === mention) {
-          // Case 2
-          return;
-        }
-
-        // Case 3
-        this._items[itemId] = mention;
-        this.trigger('change:status', itemId, mention);
-      }
+  DeletePit.prototype = {
+    add: function(itemId) {
+      this._items[itemId] = Date.now();
     },
 
-    _unreadItemRemoved: function(itemId) {
-      if (!this._items.hasOwnProperty(itemId)) return; // Does not exist
-
+    remove: function(itemId) {
       delete this._items[itemId];
-      this.length--;
-      this.notifyCountLimited();
-
-      this.trigger('unreadItemRemoved', itemId);
     },
 
-    _mentionRemoved: function(itemId) {
-      if (!this._items.hasOwnProperty(itemId)) return; // Does not exist
-      this._items[itemId] = false;
-      this.notifyCountLimited();
-      this.trigger('change:status', itemId, false);
+    contains: function(itemId) {
+      return !!this._items[itemId];
     },
 
-    _markItemRead: function(itemId) {
-      var inStore = this._items.hasOwnProperty(itemId);
-      var lurkMode = this._lurkMode;
+    _gc: function() {
+      var horizon = Date.now() - 5 * 60 * 1000; // 5 minutes
+      var items = this._items;
 
-      if (!inStore) {
-        /* Special case for lurk mode, still send the itemMarkedAsRead event
-         * so that the model gets updated (even though its not actually unread)
-         */
-        if (lurkMode) {
-          this.trigger('itemMarkedRead', itemId, false, true);
-        }
-        return;
-      }
-
-      var mentioned = this._items[itemId];
-
-      delete this._items[itemId];
-      this.length--;
-      this.notifyCountLimited();
-      this.trigger('itemMarkedRead', itemId, mentioned, lurkMode);
-    },
-
-    // via Realtime
-    _unreadItemsAdded: function(items) {
-      _iteratePreload(items, function(itemId, mention) {
-        this._unreadItemAdded(itemId, mention);
-      }, this);
-    },
-
-    // via Realtime
-    _unreadItemsRemoved: function(incoming) {
-      function hashArray(array) {
-        if (!array) return {};
-
-        return array.reduce(function(memo, value) {
-          memo[value] = true;
-          return memo;
-        }, {});
-      }
-
-      var chats = hashArray(incoming.chat);
-      var mentions = hashArray(incoming.mention);
-      var all = _.extend({}, chats, mentions);
-      var self = this;
-      Object.keys(all).forEach(function(itemId) {
-        var removeChat = chats[itemId];
-
-        if (removeChat) {
-          self._unreadItemRemoved(itemId);
-        } else {
-          // remove mention from chat
-          self._mentionRemoved(itemId);
+      Object.keys(items).forEach(function(itemId) {
+        if (items[itemId] < horizon) {
+          delete items[itemId];
         }
       });
-
-    },
-
-    notifyCount: function() {
-      this.trigger('newcountvalue', this.length);
-      appEvents.trigger('unreadItemsCount', this.length);
-    },
-
-    getItems: function() {
-      return Object.keys(this._items);
-    },
-
-    getMentions: function() {
-      return Object.keys(this._items).reduce(function(accum, itemId) {
-        if (this._items[itemId]) accum.push(itemId);
-        return accum;
-      }.bind(this), []);
-    },
-
-    enableLurkMode: function() {
-      this._lurkMode = true;
-      this.markAllReadNotification();
-    },
-
-    disableLurkMode: function() {
-      this._lurkMode = false;
-    },
-
-    markAllReadNotification: function() {
-      Object.keys(this._items).forEach(function(itemId) {
-        // Notify that all are read
-        var mention = this._items[itemId];
-        this.trigger('itemMarkedRead', itemId, mention, this._lurkMode);
-      }, this);
-
-      this._items = {};
-      this.length = 0;
-      this.notifyCountLimited();
-    },
-
-    markAllRead: function() {
-      var self = this;
-      onceUserIdSet(function() {
-        apiClient.userRoom.delete("/unreadItems/all")
-          .then(function() {
-            self.markAllReadNotification();
-          });
-      }, self);
-
-    },
-
-    getFirstItem: function() {
-      return Object.keys(this._items).reduce(function(memo, value) {
-        /* min */
-        if (memo === null) return value;
-        return memo < value ? memo : value;
-      }, null);
     }
-
-  });
+  };
 
   // -----------------------------------------------------
   // This component sends read notifications back to the server
@@ -532,7 +365,7 @@ module.exports = (function() {
       var mostRecentUnreadItemId = null;
       var oldestMentionId = null;
       var mostRecentMentionId = null;
-      
+
       chats.forEach(function(itemId) {
         if (itemId < firstItemId) {
           above++;
@@ -578,6 +411,15 @@ module.exports = (function() {
   };
 
   function CollectionSync(store, collection) {
+    collection.on('add', function(model) {
+      /* Prevents a race-condition when something has already been marked as deleted */
+      if (!model.id || !model.get('unread')) return;
+      if (store.isMarkedAsRead(model.id)) {
+        log('uic: item already marked as read');
+        model.set('unread', false);
+      }
+    });
+
     /*
     // * newcountvalue: (length)
     // * unreadItemRemoved: (itemId)
@@ -616,6 +458,12 @@ module.exports = (function() {
     // figuring out if we're on a not-logged-in page
     if(context.troupe().id) {
       _unreadItemStore = new UnreadItemStore();
+
+      // Bridge events to appEvents
+      _unreadItemStore.on('newcountvalue', function(count) {
+        appEvents.trigger('unreadItemsCount', count);
+      });
+
       new ReadItemSender(_unreadItemStore);
       var realtimeSync = new TroupeUnreadItemRealtimeSync(_unreadItemStore);
       realtimeSync._subscribe();
@@ -656,7 +504,13 @@ module.exports = (function() {
 
     markAllRead: function() {
       var unreadItemStore = getUnreadItemStoreReq();
-      unreadItemStore.markAllRead();
+
+      onceUserIdSet(function() {
+        apiClient.userRoom.delete("/unreadItems/all")
+          .then(function() {
+            unreadItemStore.markAllReadNotification();
+          });
+      });
     },
 
     syncCollections: function(collections) {

@@ -1,9 +1,9 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var env               = require('../../utils/env');
-var logger            = env.logger;
+var env               = require('gitter-web-env');
 var stats             = env.stats;
+var debug             = require('debug')('gitter:faye-logging');
 
 function getClientIp(req) {
   if(!req) return;
@@ -33,8 +33,7 @@ module.exports = {
 
       case '/meta/subscribe':
         stats.eventHF('bayeux.subscribe');
-
-        logger.silly("bayeux: subscribe", { clientId: message.clientId, subs: message.subscription });
+        debug("bayeux: subscribe. clientId=%s, subs=%s", message.clientId, message.subscription);
         break;
     }
 
@@ -45,7 +44,8 @@ module.exports = {
     if(message.channel === '/meta/handshake' ) {
       var ip = getClientIp(req);
       var clientId = message.clientId;
-      logger.silly("bayeux: handshake complete", { ip: ip, clientId: clientId });
+
+      debug("bayeux: handshake complete. ip=%s, clientId=%s", ip, clientId);
     }
     callback(message);
   }
