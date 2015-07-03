@@ -2,7 +2,7 @@
 "use strict";
 
 var graphRecommendations = require('gitter-web-recommendations');
-var legacyRecommendations = require('./recommendations/legacy-recommendations');
+// var legacyRecommendations = require('./recommendations/legacy-recommendations');
 
 function getSuggestionsForUser(user, locale) {
   // TODO: deal with locale
