@@ -1,8 +1,10 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var suggestedRoomsService = require('../../services/suggested-room-service');
 var restSerializer        = require("../../serializers/rest-serializer");
+var splitTests            = require('gitter-web-split-tests');
+var graphRecommendations  = require('gitter-web-recommendations');
+var legacyRecommendations = require('../../services/recommendations/legacy-recommendations');
 
 module.exports = {
   id: 'resourceUserSuggestedRoom',
@@ -12,7 +14,11 @@ module.exports = {
       return res.send(403);
     }
 
-    return suggestedRoomsService.getSuggestionsForUser(req.user, req.i18n.getLocale())
+    var variant = splitTests.configure(req, res, 'suggest');
+
+    var backend = variant === 'control' ? legacyRecommendations: graphRecommendations;
+
+    return backend.getSuggestionsForUser(req.user, req.i18n.getLocale())
       .then(function(suggestions) {
         return restSerializer.serializeQ(suggestions, new restSerializer.SuggestedRoomStrategy({ }));
       })

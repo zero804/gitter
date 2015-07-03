@@ -35,20 +35,20 @@ function queryRoomRecommedations(roomId, userId) {
   });
 }
 /** Returns the ids of rooms recommended for the current user */
-function getRoomRecommendations(room, user/*, locale */) {
+function getSuggestionsForRoom(room, user/*, locale */) {
   return queryRoomRecommedations(room.id, user && user.id)
     .then(function(results) {
       return results.data.map(function(f) {
         /* Return the roomId only */
-        return f[0];
+        return { roomId: f[0] };
       });
     });
 
 }
-exports.getRoomRecommendations = getRoomRecommendations;
+exports.getSuggestionsForRoom = getSuggestionsForRoom;
 
 /* Returns the ids of rooms recommendationed for the current user */
-function getUserRecommendations(user /*, locale */) {
+function getSuggestionsForUser(user /*, locale */) {
   console.log('USER IS ', user);
   return query("MATCH (u:User)-[:MEMBER]->(:Room)-[:MEMBER]-(:User)-[:MEMBER]-(r:Room) " +
                "WHERE u.userId = {userId} AND NOT(u-[:MEMBER]-r) AND r.security = 'PUBLIC'" +
@@ -60,8 +60,8 @@ function getUserRecommendations(user /*, locale */) {
           })
     .then(function(results) {
       return results.data.map(function(f) {
-        return f[0];
+        return { roomId: f[0] };
       });
     });
 }
-exports.getUserRecommendations = getUserRecommendations;
+exports.getSuggestionsForUser = getSuggestionsForUser;
