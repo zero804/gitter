@@ -10,8 +10,7 @@ var recommenders = [
   require('./owned-repos'),
   require('./starred-repos'),
   require('./watched-repos'),
-  require('./sibling-rooms'),
-  require('./rooms-with-similar-tags')
+  require('./sibling-rooms')
 ];
 
 module.exports = function (user, currentRoomUri) {
@@ -57,5 +56,5 @@ module.exports = function (user, currentRoomUri) {
         return recommendations;
       });
 
-  })
+  });
 };

@@ -11,11 +11,7 @@ function query(text, params) {
 }
 
 function queryRoomRecommedations(roomId, userId) {
-  roomId = '' + roomId;
-
   if (userId) {
-    userId = '' + userId;
-
     /* Given a user .... */
     return query("MATCH (r:Room)-[:MEMBER]-(:User)-[:MEMBER]-(r2:Room), (u:User) " +
                  "WHERE u.userId = {userId} AND r.roomId = {roomId} AND NOT(u-[:MEMBER]-r2) AND r2.security = 'PUBLIC'" +
@@ -24,7 +20,7 @@ function queryRoomRecommedations(roomId, userId) {
                  "LIMIT 6",
     {
       roomId: roomId,
-      userId: userId,
+      userId: userId
     });
   }
 
@@ -39,8 +35,8 @@ function queryRoomRecommedations(roomId, userId) {
   });
 }
 /** Returns the ids of rooms recommended for the current user */
-function getRoomRecommendations(roomId, userId) {
-  return queryRoomRecommedations(roomId, userId)
+function getRoomRecommendations(room, user/*, locale */) {
+  return queryRoomRecommedations(room.id, user && user.id)
     .then(function(results) {
       return results.data.map(function(f) {
         /* Return the roomId only */
@@ -52,15 +48,15 @@ function getRoomRecommendations(roomId, userId) {
 exports.getRoomRecommendations = getRoomRecommendations;
 
 /* Returns the ids of rooms recommendationed for the current user */
-function getUserRecommendations(userId) {
-  userId = '' + userId;
+function getUserRecommendations(user /*, locale */) {
+  console.log('USER IS ', user);
   return query("MATCH (u:User)-[:MEMBER]->(:Room)-[:MEMBER]-(:User)-[:MEMBER]-(r:Room) " +
                "WHERE u.userId = {userId} AND NOT(u-[:MEMBER]-r) AND r.security = 'PUBLIC'" +
                "RETURN r.roomId, count(*) as occurrence " +
                "ORDER BY occurrence DESC " +
                "LIMIT 6",
           {
-            userId: userId,
+            userId: user.id,
           })
     .then(function(results) {
       return results.data.map(function(f) {
