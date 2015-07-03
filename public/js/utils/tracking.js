@@ -3,6 +3,9 @@
 
 var context = require('utils/context');
 var appEvents = require('utils/appevents');
+var splitTests = require('gitter-web-split-tests');
+var _ = require('underscore');
+
 require('./mixpanel');
 
 module.exports = (function() {
@@ -64,13 +67,12 @@ module.exports = (function() {
       var authenticated = !!context.getUserId();
       var userAgent = window.navigator.userAgent;
 
-      window.mixpanel.track('pageView', {
+      window.mixpanel.track('pageView', _.extend({
         pageName: routeName,
         authenticated: authenticated,
         isUserHome: isUserHome,
-        userAgent: userAgent,
-        variant: context().variant
-      });
+        userAgent: userAgent
+      }, splitTests.listVariants()));
     }
 
     var gs = window._gs;

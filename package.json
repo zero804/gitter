@@ -35,6 +35,7 @@
     "gitter-web-env": "file:modules/env",
     "gitter-web-github": "file:modules/github",
     "gitter-web-shared": "file:shared",
+    "gitter-web-split-tests": "file:modules/split-tests",
     "handlebars": "~3.0.3",
     "heapdump": "^0.2.9",
     "highlight.js": "^8.6.0",
@@ -203,7 +204,7 @@
     "test": "gulp localtest",
     "link": "linklocal link -r",
     "unlink": "linklocal unlink -r",
-    "shrinkwrap": "npm run unlink && npm prune && npm install && npm shrinkwrap && npm run link",
+    "shrinkwrap": "npm run unlink && npm prune && npm install && npm-shrinkwrap && npm run link",
     "preinstall": "(linklocal list --format '%S' --no-summary || find node_modules -maxdepth 1 -type l -exec basename {} \\;)|while read line; do if [ -d \"$line\" ] && [ ! -h \"$line\" ]; then rm -r \"$line\"; fi; done",
     "shrinkwrap-conflict": "rm -f npm-shrinkwrap.json && npm run shrinkwrap"
   },
