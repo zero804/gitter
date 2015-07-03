@@ -28,6 +28,10 @@ function serializeEvent(url, operation, model, callback) {
     .nodeify(callback);
 }
 
+function serializeRemove(url, id) {
+  appEvents.dataChange2(url, "remove", { id: id });
+}
+
 function serializeOneToOneTroupeEvent(userId, operation, model, callback) {
   var oneToOneUserUrl = '/user/' + userId + '/rooms';
 
@@ -212,16 +216,12 @@ module.exports = {
 
           if(!this.oneToOne) {
             /* Dont mark the user as having been removed from the room */
-            var url = "/rooms/" + this.id + "/users";
-            var userUrl = "/user/" + userId + "/rooms";
-
-            promise = Q.all([
-              serializeEvent(url, "remove", troupeUser),
-              serializeEvent(userUrl, "remove", this)
-            ]);
+            serializeRemove('/rooms/' + this.id + '/users', userId);
+            serializeRemove('/user/' + userId + '/rooms', this.id);
 
             // TODO: move this in a remove listener somewhere else in the codebase
             appEvents.userRemovedFromTroupe({ troupeId: this.id, userId: troupeUser.userId });
+            promise = Q.resolve();
           } else {
             promise = serializeOneToOneTroupeEvent(userId, "remove", this);
           }
