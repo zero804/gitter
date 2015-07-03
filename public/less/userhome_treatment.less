@@ -1,0 +1,84 @@
+@import "typography.less";
+@import "colors.less";
+
+// @import "../js/views/userhome/userhome";
+
+body {
+  margin: 0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.userhome__header {
+  background: url('../images/home/banner.jpg') no-repeat center center;
+  height: 19em;
+  position: relative;
+  color: white;
+}
+
+.userhome__header__nav {
+  background-color: rgba(255, 255, 255 ,0.3);
+  width: 100%;
+  height: 2em;
+  margin-top: 4em;
+  display: inline-block;
+  line-height: 2em;
+  padding-left: 6rem;
+  font-weight: 200;
+}
+
+.userhome__header__title {
+  position: absolute;
+  bottom: 0;
+  margin: 3rem 6rem;
+  font-size: 3em;
+  font-weight: 200;
+}
+
+.userhome-main {
+  margin: 3rem 6rem;
+}
+
+.userhome-main__button {
+  color: white;
+  text-decoration: none;
+
+  background-color: #ea9448;
+
+    padding: 0.8em;
+  border-radius: 0.5em;
+  min-width: 11em;
+  display: inline-block;
+  text-align: center;
+
+    text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.8em;
+
+  &:hover {
+    background-color: darken(#ea9448, 5%)
+  }
+}
+
+.userhome-main__app-button {
+    color: inherit;
+  text-decoration: none;
+
+
+    padding: 0.8em;
+  border-radius: 0.5em;
+  min-width: 11em;
+  display: inline-block;
+  text-align: center;
+
+    text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.8em;
+    border: rgb(226, 224, 223) 2px solid;
+
+  &:hover {
+    background-color: darken(white, 5%)
+  }
+}
