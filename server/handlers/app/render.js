@@ -88,7 +88,6 @@ function renderHomePage(req, res, next) {
       res.render(page, {
         bootScriptName: bootScriptName,
         cssFileName: "styles/" + bootScriptName + ".css",
-        troupeName: req.uriContext.uri,
         troupeContext: troupeContext,
         agent: req.headers['user-agent'],
         isUserhome: true,
