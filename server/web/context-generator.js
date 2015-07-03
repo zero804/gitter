@@ -184,7 +184,6 @@ function createTroupeContext(req, options) {
     troupeHash: options.troupeHash,
     isNativeDesktopApp: isNativeDesktopApp(req),
     permissions: options.permissions,
-    locale: req.i18n.locales[req.i18n.locale],
-    variant: req.variant
+    locale: req.i18n.locales[req.i18n.locale]
   }, extras);
 }
