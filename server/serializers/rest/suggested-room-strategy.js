@@ -24,16 +24,14 @@ function SuggestedRoomStrategy() {
 
   this.map = function(suggestedRoomId) {
     var room = roomHash[suggestedRoomId];
-    if (!room) return;
 
     return {
       id: room.id,
       uri: room.uri,
-      githubType: room.githubType,
       avatarUrl: getOwnerAvatarUrl(room),
-      // exists: !!suggestedRoom.room,
-      userCount: room.userCount,
-      description: room.topic
+      userCount: room && room.userCount,
+      description: room && room.topic,
+      exists: !!room
     };
   };
 }
