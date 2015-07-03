@@ -3,6 +3,7 @@
 
 @import "../../../less/base-zindex-levels";
 @import "../../../less/base-transition-mixins";
+@import "../../../less/logo.less";
 
 /* Imports for child views */
 @import "./room-list";
@@ -39,22 +40,14 @@
   height: 100%;
 
   /* colors */
-  background-color: lighten(@trpDarkBlue, 5%);
+  background-color: #383435;
   color: white;
 
   /* effects */
-  transition: background-color 0.3s ease-in-out,
-              margin           0.2s ease-in-out;
+  transition: margin 0.2s ease-in-out;
 
   .nano-pane {
     left: 0;
-  }
-
-  a {
-    text-decoration: none;
-    color: inherit;
-    display: inline-block;
-    width: 100%;
   }
 }
 
@@ -70,8 +63,6 @@ body.hover .menu:hover {
   // slide menu to the right
   margin-left: 0;
   margin-right: -@menuWidth;
-
-  background-color: @trpDarkBlue;
 }
 
 @media @mid-min {
@@ -102,8 +93,6 @@ body.hover .menu:hover .menu__hotspot {
   // slide hotspot away when menu is hovered
   right: 0;
   width: 0;
-
-  transition-delay: 0s;
 }
 
 @media @mid-min {
@@ -111,8 +100,6 @@ body.hover .menu:hover .menu__hotspot {
     // slide hotspot away when menu is inline
     right: 0;
     width: 0;
-
-    transition-delay: 0s;
   }
 }
 
@@ -210,11 +197,22 @@ body.hover .menu:hover .menu__hotspot {
   color: white;
 }
 
-.menu-actions {
-  padding: 8px;
+.menu__create-room-button {
+  display: block;
+  margin: 1em;
+  padding: 1em;
+  background-color: @homepage-green;
+  border-radius: 0.5em;
 
-  a {
-    color: @trpDarkGrey;
+  text-align: center;
+  color: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.8em;
+
+  &:hover {
+    text-decoration: none;
+    background-color: darken(@homepage-green, 5%);
   }
 }
 
@@ -298,3 +296,94 @@ body.dragging .list-favourites li.placeholder {
     color: white;
   }
 }
+
+// SPLIT TEST CSS START
+
+.nli-menu-treatment {
+  .nli-menu;
+
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+
+  background: url('../images/home/banner.jpg') no-repeat center center;
+  background-size: cover;
+
+  // Not so BEM but it's inherited from the Homepage
+  .logo-holder {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    top: 0px;
+    left: 15px;
+  }
+}
+
+.nli-menu-treatment__logo {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  position: absolute;
+  top: 25px;
+  left: 35px;
+}
+
+.nli-menu-treatment__logo-text {
+  position: relative;
+  width: 76px;
+  top: 7px;
+  left: 12px;
+}
+
+
+.nli-menu-treatment__header {
+  font-family: "source-sans-pro";
+  font-weight: 200;
+  font-size: 47px;
+  line-height: 43px;
+  margin: 10vh 0px 5vh 15px;
+  width: 100%;
+}
+
+.nli-menu-treatment__features-header {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 300;
+  margin-left: 15px;
+}
+
+.nli-menu-treatment__price {
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 30px;
+  margin-left: 15px;
+}
+
+.nli-menu-treatment__features {
+  background-color: rgba(255,255,255, 0.1);
+  font-size: 10px;
+  padding: 1vh 15px;
+  margin: 1vh 0px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  width: 100%;
+}
+
+.nli-menu-treatment__footer {
+  display: block;
+  position: absolute;
+  bottom: 25px;
+  margin-left: 15px;
+  a {
+    color: #FFF;
+    border-bottom: 1px dotted #FFF;
+  }
+  a:hover {
+    text-decoration: none;
+  }
+}
+
+// SPLIT TEST CSS END
