@@ -209,6 +209,11 @@ exports.install = function(persistenceService) {
     },
 
     onUpdate: function onTroupeUpdate(model, next) {
+      if (model.modifiedPaths().length === 0) {
+        debug('Skipping update, not modified paths');
+        return next();
+      }
+
       if(model.oneToOne) {
         // Because the troupe needs the
         serializeOneToOneTroupe('update', model);
