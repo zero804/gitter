@@ -3,7 +3,7 @@ var $ = require('jquery');
 var Marionette = require('backbone.marionette');
 var context = require('utils/context');
 var troupeCollections = require('collections/instances/troupes');
-var SuggestedRoomsCollection = require('collections/suggested-rooms');
+var FilteredSuggestedRoomsCollection = require('collections/suggested-rooms').Filtered;
 var userHomeTemplate = require('./tmpl/userHomeTemplate.hbs');
 var OrgCollectionView = require('./homeOrgCollectionView');
 var SuggestedCollectionView = require('./suggested-room-collection-view');
@@ -32,7 +32,7 @@ module.exports = (function() {
     },
 
     initSuggestedRoomsRegion: function(optionsForRegion) {
-      var suggestedRoomCollection = new SuggestedRoomsCollection();
+      var suggestedRoomCollection = new FilteredSuggestedRoomsCollection(null, { roomsCollection: troupeCollections.troupes });
       suggestedRoomCollection.fetchForUser();
 
       return new SuggestedCollectionView(optionsForRegion({ collection: suggestedRoomCollection }));

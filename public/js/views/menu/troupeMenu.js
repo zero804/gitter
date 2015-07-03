@@ -6,7 +6,7 @@ var context = require('utils/context');
 var appEvents = require('utils/appevents');
 var isMobile = require('utils/is-mobile');
 var troupeCollections = require('collections/instances/troupes');
-var SuggestedRoomCollection = require('collections/suggested-rooms');
+var FilteredSuggestedRoomCollection = require('collections/suggested-rooms').Filtered;
 var RoomCollectionView = require('./room-collection-view');
 var SuggestedCollectionView = require('./suggested-collection-view');
 var log = require('utils/log');
@@ -208,7 +208,7 @@ module.exports = (function () {
 
       var collection = this.suggestedRoomsCollection;
       if (!collection) {
-        collection = this.suggestedRoomsCollection = new SuggestedRoomCollection();
+        collection = this.suggestedRoomsCollection = new FilteredSuggestedRoomCollection(null, { roomsCollection: troupeCollections.troupes });
         if (context.getTroupeId()) {
           collection.fetchForRoom();
         }
