@@ -51,6 +51,14 @@
   }
 }
 
+.menu a {
+  color: inherit;
+
+  &:hover {
+    text-decoration: none;
+  }
+}
+
 // mobile override until it uses the same left menu
 // show/hide as desktop
 .menu.menu--mobile {
@@ -193,10 +201,6 @@ body.hover .menu:hover .menu__hotspot {
   line-height: 1.2;
 }
 
-.menu-list__header__details a {
-  color: white;
-}
-
 .menu__create-room-button {
   display: block;
   margin: 1em;
@@ -205,13 +209,11 @@ body.hover .menu:hover .menu__hotspot {
   border-radius: 0.5em;
 
   text-align: center;
-  color: inherit;
   text-transform: uppercase;
   letter-spacing: 0.16em;
   font-size: 0.8em;
 
   &:hover {
-    text-decoration: none;
     background-color: darken(@homepage-green, 5%);
   }
 }
@@ -273,27 +275,6 @@ body.dragging .list-favourites li.placeholder {
 
   @media @retina {
     background-image: url('../images/logo-text-white-48@2x.png');
-  }
-}
-
-.ribbon {
-  width: 100%;
-  position: relative;
-  background: #54A8BD;
-  color: #fff;
-  text-align: center;
-  padding: 1em;
-  margin: 0 0 12px 0px;
-  border-radius: 2px;
-
-  img {
-    width: 20px;
-    height: 20px;
-    display: inline-block;
-  }
-
-  a {
-    color: white;
   }
 }
 
