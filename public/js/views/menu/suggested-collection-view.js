@@ -2,7 +2,8 @@
 var roomNameTrimmer = require('utils/room-name-trimmer'); // TODO: move this to shared
 var Marionette = require('backbone.marionette');
 var template = require('./tmpl/suggested-list-item.hbs');
-var troupeCollections = require('collections/instances/troupes');
+
+var MAX_SUGGESTIONS = 5;
 
 /* How hillbillies manipulate urls */
 function appendToUrl(url, params) {
@@ -33,8 +34,7 @@ module.exports = Marionette.CollectionView.extend({
   tagName: 'ul',
   className: 'room-list',
   childView: SuggestedItemView,
-  filter: function (child/*, index, collection*/) {
-    /* Do not show any items that the user has joined */
-    return !troupeCollections.troupes.get(child.id);
+  filter: function(child, index) { // jshint unused:true
+    return index < MAX_SUGGESTIONS;
   }
 });
