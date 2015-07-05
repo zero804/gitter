@@ -7,8 +7,6 @@
     <div class="menu-list" id="list-mega">
       {{!-- `#recentTroupesList` & `#OrgsList` need to be checked for JS hooks, if so replace with `js-*` --}}
       <div class='menu-list__item' id="recentTroupesList">
-        <h5 class="menu-list__header">All Conversations</h5>
-
         <div class="list-favourites menu-list__section" id="favs-region" data-drop-target="favs">
           <ul class="room-list">
           {{!-- put filtered favourites in here --}}
@@ -48,9 +46,7 @@
   </div>
 </div>
 {{#if showFooterButtons}}
-  <div class="menu-actions">
-    <a class="trpButtonMedium trpBtnWhite gtrCreateRoomButton" href="#createroom">Create a room</a>
-  </div>
+  <a class="menu__create-room-button" href="#createroom">Create a room</a>
 {{/if}}
 {{#if showUnreadTab}}
 <div class="menu__hotspot">
