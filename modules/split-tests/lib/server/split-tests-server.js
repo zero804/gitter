@@ -24,7 +24,6 @@ function configure(req, res, testName, disableSet) {
   // Allow the value to be overriden
   var forcedParam = getValue(req, testName);
 
-  var value = req.cookies[cookieName];
 
   // If cookies are not enabled in the current environment use the set value
   // defaulting to control.
@@ -33,6 +32,9 @@ function configure(req, res, testName, disableSet) {
     if (forcedParam) return 'control';
     return forcedParam;
   }
+
+  // From here on, the cookies middleware has been installed
+  var value = req.cookies[cookieName];
 
   // TODO: remove this anytime after 1 Sep 2015
   if (req.cookies.variant) {
