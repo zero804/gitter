@@ -23,8 +23,8 @@ var SuggestedItemView = Marionette.ItemView.extend({
   serializeData: function() {
     var model = this.model;
     return {
-      avatarUrl: appendToUrl(model.get('avatarUrl'), 'source=suggested-menu&s=30'),
-      linkUrl: '/' + model.get('uri'),
+      avatarUrl: appendToUrl(model.get('avatarUrl'), 's=30'),
+      linkUrl: appendToUrl('/' + model.get('uri'), 'source=suggested-menu'),
       uri: roomNameTrimmer(model.get('uri'))
     };
   }
