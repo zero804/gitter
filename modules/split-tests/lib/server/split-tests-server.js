@@ -11,7 +11,7 @@ function getGroup() {
   return (((Math.floor(Math.random() * 2) + 1) % 2)) === 0 ? 'control' : 'treatment';
 }
 
-function getValue(req, testName) {
+function getVariantFromRequest(req, testName) {
   var queryValue = req.query['_set_variant_' + testName];
   if (queryValue == 'control' || queryValue == 'treatment') {
     return queryValue;
@@ -22,8 +22,7 @@ function configure(req, res, testName, disableSet) {
   var cookieName = 'variant_' + testName;
 
   // Allow the value to be overriden
-  var forcedParam = getValue(req, testName);
-
+  var forcedParam = getVariantFromRequest(req, testName);
 
   // If cookies are not enabled in the current environment use the set value
   // defaulting to control.

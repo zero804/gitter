@@ -72,7 +72,7 @@ gulp.task('validate-client-source', function() {
 
 gulp.task('validate-server-source', function() {
   /* This is a very lax jshint, only looking for major problems */
-  return gulp.src(['server/**/*.js', 'shared/**/*.js', 'modules/**/lib/**/*.js', '!modules/**/node_modules/**'])
+  return gulp.src(['server/**/*.js', 'shared/**/*.js', 'modules/*/lib/**/*.js'])
     .pipe(jshint({
       node: true,
       // globalstrict: true, // ENABLE
