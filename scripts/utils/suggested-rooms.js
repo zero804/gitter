@@ -32,7 +32,7 @@ userService.findByUsername(opts.username)
     if (room) {
       return graphRecommendations.getSuggestionsForRoom(room, user, opts.language);
     }
-    
+
     return graphRecommendations.getSuggestionsForUser(user, opts.language);
   })
   .then(function(suggestions) {
@@ -40,7 +40,7 @@ userService.findByUsername(opts.username)
   })
   .then(function(repos) {
     repos.forEach(function(suggestion) {
-      console.log(suggestion.uri);
+      console.log(suggestion, suggestion.uri);
     });
   })
   .delay(1000)
