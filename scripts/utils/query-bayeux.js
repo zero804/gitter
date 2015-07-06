@@ -6,7 +6,7 @@ var shutdown = require('shutdown');
 var presenceService = require('../../server/services/presence-service');
 var bayeux = require('../../server/web/bayeux');
 var async = require('async');
-var env = require('../../server/utils/env');
+var env = require('gitter-web-env');
 
 env.installUncaughtExceptionHandler();
 
