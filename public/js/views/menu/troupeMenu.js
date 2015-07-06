@@ -209,13 +209,15 @@ module.exports = (function () {
       var collection = this.suggestedRoomsCollection;
       if (!collection) {
         collection = this.suggestedRoomsCollection = new FilteredSuggestedRoomCollection(null, { roomsCollection: troupeCollections.troupes });
+
+        // For now, only fetch the suggested rooms once
         if (context.getTroupeId()) {
           collection.fetchForRoom();
+        } else {
+          this.listenToOnce(appEvents, 'context.troupeId', function() {
+            collection.fetchForRoom();
+          });
         }
-
-        this.listenTo(appEvents, 'context.troupeId', function() {
-          collection.fetchForRoom();
-        });
 
         this.listenTo(collection, 'add remove', this.initNanoScrollerThrottled);
       }
