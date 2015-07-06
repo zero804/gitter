@@ -124,7 +124,6 @@ module.exports = {
 
     app.use(env.middlewares.accessLogger);
 
-    app.use(express.cookieParser());
     app.use(express.urlencoded());
     app.use(express.json());
     app.use(express.methodOverride());
