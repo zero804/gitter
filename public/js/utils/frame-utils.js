@@ -23,11 +23,6 @@ function postMessage(message) {
   }
 }
 
-/* Tell the parent frame that we're loaded */
-if(hasParentFrameSameOrigin()) {
-  postMessage({ type: "chatframe:loaded" });
-}
-
 module.exports = {
   hasParentFrameSameOrigin: hasParentFrameSameOrigin,
   postMessage: postMessage
