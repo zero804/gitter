@@ -5,7 +5,10 @@
   "main": "lib/server/split-tests-server.js",
   "browser": "lib/browser/split-tests-browser.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha test/*"
   },
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "mocha": "^2.2.5"
+  }
 }
