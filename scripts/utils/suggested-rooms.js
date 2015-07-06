@@ -7,7 +7,7 @@ var troupeService = require('../../server/services/troupe-service');
 var restSerializer = require('../../server/serializers/rest-serializer');
 var shutdown = require('shutdown');
 
-var graphRecommendations  = require('gitter-web-recommendations');
+var suggestions  = require('gitter-web-suggestions');
 
 var opts = require("nomnom")
   .option('username', {
@@ -30,10 +30,10 @@ userService.findByUsername(opts.username)
   })
   .spread(function(user, room) {
     if (room) {
-      return graphRecommendations.getSuggestionsForRoom(room, user, opts.language);
+      return suggestions.getSuggestionsForRoom(room, user, opts.language);
     }
 
-    return graphRecommendations.getSuggestionsForUser(user, opts.language);
+    return suggestions.getSuggestionsForUser(user, opts.language);
   })
   .then(function(suggestions) {
     return restSerializer.serializeQ(suggestions, new restSerializer.SuggestedRoomStrategy({ }));

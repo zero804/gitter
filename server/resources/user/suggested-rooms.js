@@ -1,8 +1,8 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var restSerializer        = require("../../serializers/rest-serializer");
-var graphRecommendations  = require('gitter-web-recommendations');
+var restSerializer = require("../../serializers/rest-serializer");
+var suggestions    = require('gitter-web-suggestions');
 
 module.exports = {
   id: 'resourceUserSuggestedRoom',
@@ -12,7 +12,7 @@ module.exports = {
       return res.send(403);
     }
 
-    return graphRecommendations.getSuggestionsForUser(req.user, req.i18n.getLocale())
+    return suggestions.   getSuggestionsForUser(req.user, req.i18n.getLocale())
       .then(function(suggestions) {
         return restSerializer.serializeQ(suggestions, new restSerializer.SuggestedRoomStrategy({ }));
       })
