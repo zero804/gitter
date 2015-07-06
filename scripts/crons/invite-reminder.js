@@ -10,7 +10,7 @@ var troupeService = require('../../server/services/troupe-service');
 var emailNotificationService = require('../../server/services/email-notification-service');
 var Q = require('q');
 
-var logger = require('../../server/utils/env').logger;
+var logger = require('gitter-web-env').logger;
 
 // @const
 var REMINDER_DAYS = 3;
