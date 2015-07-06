@@ -3,8 +3,10 @@
 "use strict";
 
 var userService = require('../../server/services/user-service');
-var suggestedRoomService = require('../../server/services/suggested-room-service');
+var restSerializer = require('../../server/serializers/rest-serializer');
 var shutdown = require('shutdown');
+
+var graphRecommendations  = require('gitter-web-recommendations');
 
 var opts = require("nomnom")
   .option('username', {
@@ -20,11 +22,14 @@ var opts = require("nomnom")
 
 userService.findByUsername(opts.username)
   .then(function(user) {
-    return suggestedRoomService.getSuggestions(user, opts.language);
+    return graphRecommendations.getSuggestionsForUser(user, opts.language);
+  })
+  .then(function(suggestions) {
+    return restSerializer.serializeQ(suggestions, new restSerializer.SuggestedRoomStrategy({ }));
   })
   .then(function(repos) {
     repos.forEach(function(suggestion) {
-      console.log(suggestion.uri, suggestion.score, suggestion.scores);
+      console.log(suggestion.uri);
     });
   })
   .delay(1000)

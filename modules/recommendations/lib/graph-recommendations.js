@@ -49,7 +49,6 @@ exports.getSuggestionsForRoom = getSuggestionsForRoom;
 
 /* Returns the ids of rooms recommendationed for the current user */
 function getSuggestionsForUser(user /*, locale */) {
-  console.log('USER IS ', user);
   return query("MATCH (u:User)-[:MEMBER]->(:Room)-[:MEMBER]-(:User)-[:MEMBER]-(r:Room) " +
                "WHERE u.userId = {userId} AND NOT(u-[:MEMBER]-r) AND r.security = 'PUBLIC'" +
                "RETURN r.roomId, count(*) as occurrence " +
