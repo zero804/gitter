@@ -4,7 +4,7 @@
 "use strict";
 
 var persistence = require('../../server/services/persistence-service');
-var config      = require('../../server/utils/env');
+var config      = require('gitter-web-env');
 var stats       = config.stats;
 var Q           = require('q');
 
