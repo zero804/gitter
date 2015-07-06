@@ -11,6 +11,11 @@ body {
   box-sizing: border-box;
 }
 
+.userhome {
+  display: flex;
+  flex-direction: column;
+}
+
 .userhome__header {
   background: url('../images/home/banner.jpg') no-repeat center center;
   height: 19em;
@@ -32,13 +37,22 @@ body {
 .userhome__header__title {
   position: absolute;
   bottom: 0;
-  margin: 3rem 6rem;
+  margin: 3rem 0 3rem 6rem;
   font-size: 3em;
   font-weight: 200;
 }
 
 .userhome-main {
   margin: 3rem 6rem;
+}
+
+.userhome-buttons {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.userhome-things {
+  margin-right: 4em;
 }
 
 .userhome-main__button {
@@ -62,21 +76,25 @@ body {
   }
 }
 
+.userhome-heading {
+  font-weight: 200;
+}
+
 .userhome-main__app-button {
-    color: inherit;
+  color: inherit;
   text-decoration: none;
 
-
-    padding: 0.8em;
+  padding: 0.5rem 1.5rem;
+  margin-right: 1rem;
   border-radius: 0.5em;
-  min-width: 11em;
   display: inline-block;
   text-align: center;
 
-    text-transform: uppercase;
+  font-weight: 600;
+  text-transform: uppercase;
   letter-spacing: 0.16em;
-  font-size: 0.8em;
-    border: rgb(226, 224, 223) 2px solid;
+  font-size: 0.7em;
+  border: rgb(226, 224, 223) 3px solid;
 
   &:hover {
     background-color: darken(white, 5%)
