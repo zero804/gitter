@@ -4,7 +4,7 @@
 
 var shutdown = require('shutdown');
 var Q = require('q');
-var env = require('../../server/utils/env');
+var env = require('gitter-web-env');
 var userService = require('../../server/services/user-service');
 var emailService = require('../../server/services/email-address-service');
 
