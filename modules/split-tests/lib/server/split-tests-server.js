@@ -28,7 +28,7 @@ function configure(req, res, testName, disableSet) {
   // defaulting to control.
   // CORS with Cookies is more trouble that it's worth
   if (!req.cookies) {
-    if (forcedParam) return 'control';
+    if (!forcedParam) return 'control';
     return forcedParam;
   }
 
