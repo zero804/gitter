@@ -18,10 +18,9 @@ var SuggestedRoomItemView = Marionette.ItemView.extend({
   },
   serializeData: function() {
     var suggestion = this.model.toJSON();
-    // var url = suggestion.exists ? '/' + suggestion.uri + '?source=suggested' : '#confirmSuggested/' + suggestion.uri;
 
     return {
-      url: '/' + suggestion.uri + '?source=suggested',
+      url: appendToUrl('/' + suggestion.uri, 'source=suggested'),
       avatarUrl: appendToUrl(suggestion.avatarUrl, 's=48'),
       name: suggestion.uri,
       description: suggestion.description,

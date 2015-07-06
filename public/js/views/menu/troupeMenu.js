@@ -219,10 +219,8 @@ module.exports = (function () {
           });
         }
 
-        this.listenTo(collection, 'add remove', this.initNanoScrollerThrottled);
+        this.listenTo(collection, 'add remove reset', this.initNanoScrollerThrottled);
       }
-
-      // troupeCollections.suggested.fetch();
 
       var suggestedWrapperView = new CollectionWrapperView({
         collection: collection,
