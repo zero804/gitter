@@ -4,7 +4,7 @@ var env   = require('gitter-web-env');
 var stats = env.stats;
 var cypher = require("cypher-promise");
 var neo4jClient = cypher(env.config.get('neo4j:endpoint'));
-var debug = require('debug')('gitter:graph-recommendations');
+var debug = require('debug')('gitter:graph-suggestions');
 
 function query(text, params) {
   debug("neo4j query: %s %j", text, params);
@@ -21,7 +21,7 @@ function query(text, params) {
     });
   }
 
-function queryRoomRecommedations(roomId, userId) {
+function queryRoomSuggestions(roomId, userId) {
   if (userId) {
     /* Given a user .... */
     return query("MATCH (r:Room)-[:MEMBER]-(:User)-[:MEMBER]-(r2:Room), (u:User) " +
@@ -47,7 +47,7 @@ function queryRoomRecommedations(roomId, userId) {
 }
 /** Returns the ids of rooms recommended for the current user */
 function getSuggestionsForRoom(room, user/*, locale */) {
-  return queryRoomRecommedations(room.id, user && user.id)
+  return queryRoomSuggestions(room.id, user && user.id)
     .then(function(results) {
       return results.data.map(function(f) {
         /* Return the roomId only */

@@ -1682,10 +1682,6 @@
       "version": "1.0.0",
       "resolved": "file:modules/github"
     },
-    "gitter-web-recommendations": {
-      "version": "1.0.0",
-      "resolved": "file:modules/recommendations"
-    },
     "gitter-web-shared": {
       "version": "1.0.0",
       "resolved": "file:shared"
@@ -1693,6 +1689,10 @@
     "gitter-web-split-tests": {
       "version": "1.0.0",
       "resolved": "file:modules/split-tests"
+    },
+    "gitter-web-suggestions": {
+      "version": "1.0.0",
+      "resolved": "file:modules/suggestions"
     },
     "handlebars": {
       "version": "3.0.3",

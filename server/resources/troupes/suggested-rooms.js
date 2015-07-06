@@ -1,14 +1,14 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var restSerializer        = require("../../serializers/rest-serializer");
-var graphRecommendations  = require('gitter-web-recommendations');
+var restSerializer = require("../../serializers/rest-serializer");
+var suggestions    = require('gitter-web-suggestions');
 
 module.exports = {
   id: 'resourceTroupeSuggestedRoom',
 
   index: function(req, res, next) {
-    return graphRecommendations.getSuggestionsForRoom(req.troupe, req.user)
+    return suggestions.getSuggestionsForRoom(req.troupe, req.user)
       .then(function(suggestions) {
         return restSerializer.serializeQ(suggestions, new restSerializer.SuggestedRoomStrategy({ }));
       })
