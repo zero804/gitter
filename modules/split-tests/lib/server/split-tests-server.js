@@ -16,24 +16,10 @@ function getValue(req, testName) {
   if (queryValue == 'control' || queryValue == 'treatment') {
     return queryValue;
   }
-
-  var headerValue = req.headers['x-split-tests'];
-  if (headerValue) {
-    var value = headerValue.split(/\s*,\s*/).map(function(val) {
-      var s = val.split('=');
-      return { name:  s[0], value[1] };
-    }).filter(function(item) {
-      return item.name === testName;
-    })[0];
-
-    
-  }
-
 }
 
 function configure(req, res, testName, disableSet) {
   var cookieName = 'variant_' + testName;
-
 
   // Allow the value to be overriden
   var forcedParam = getValue(req, testName);
