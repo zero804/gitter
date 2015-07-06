@@ -1,10 +1,14 @@
 "use strict";
 
-var Q                    = require('q');
-var _                    = require('underscore');
-var languageDetector     = require('../utils/language-detector');
+var env                    = require('gitter-web-env');
+var stats                  = env.stats;
+
+var Q                      = require('q');
+var _                      = require('underscore');
+var languageDetector       = require('../utils/language-detector');
 var languageAnalyzerMapper = require('../utils/language-analyzer-mapper');
-var client               = require('../utils/elasticsearch-client');
+var client                 = require('../utils/elasticsearch-client');
+
 
 /* Magic way of figuring out the matching terms so that we can highlight */
 function extractHighlights(text) {
@@ -133,15 +137,23 @@ function performQuery(troupeId, parsedQuery, options) {
     }
   };
 
+  var startTime = Date.now();
+
   return Q(client.search(queryRequest))
     .then(function(response) {
+      stats.responseTime('chat.search.exec', Date.now() - startTime);
+
       return response.hits.hits.map(function(hit) {
         return {
           id: hit._id,
           highlights: hit.highlight && extractHighlights(hit.highlight.text)
         };
       });
-    });
+    })
+    .catch(function(err) {
+      stats.event('chat.search.error');
+      throw err;
+    })
 }
 
 /**
