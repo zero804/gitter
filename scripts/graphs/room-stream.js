@@ -9,8 +9,23 @@ var ANTI_MONOPOLY_LOWER_THRESHOLD = 500;
 var ANTI_MONOPOLY_UPPER_THRESHOLD = 3000;
 var MIN_WEIGHT = 0.05;
 
-/* Returns a number between 0 and 1 */
-/* For everything belong 1000, returns 1, then gradually goes down to 0.25 */
+/*
+ * Returns the weighting like this graph so that we don't
+ * get a horrible cliff that rooms will drop off suddenly
+ * and gradually lower the ranking of rooms as they get
+ * larger. A bit like tax rates.
+ *
+ *           1 -|------\
+ *              |       \
+ *              |        \
+ *              |         \
+ *              |          \
+ *   MIN_WEIGHT-|           \------------
+ *              |
+ *             -+------------------------
+ *                     |    |
+ *                    LOW   UP
+ */
 function getWeightForUserCount(userCount) {
   if (userCount <= ANTI_MONOPOLY_LOWER_THRESHOLD) return 1;
   if (userCount > ANTI_MONOPOLY_UPPER_THRESHOLD) return MIN_WEIGHT;
