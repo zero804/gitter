@@ -112,11 +112,11 @@ onready(function () {
 
   allRoomsCollection.on("remove", function(model) {
     if(model.id == context.getTroupeId()) {
-      var username = context.user().get('username');
-      var newLocation = '/' + username;
-      var newFrame = newLocation + '/~home';
+      var newLocation = '/home';
+      var newFrame = '/home/~home';
+      var title = 'home';
 
-      pushState(newFrame, username, newLocation);
+      pushState(newFrame, title, newLocation);
       updateContent(newFrame);
     }
   });
@@ -315,11 +315,10 @@ onready(function () {
       /* Figure out who's the daddy */
       function getParentRoomUri(cb) {
         var currentRoomUri = window.location.pathname.split('/').slice(1).join('/');
-        var userhomeUri = context.user().get('username');
 
-        if(currentRoomUri === userhomeUri) {
+        if(currentRoomUri === 'home') {
           // currently in the userhome, not really a room but whatevs
-          return cb(null, userhomeUri);
+          return cb(null, 'home');
         }
 
         // current room metadata isnt in the app router context
@@ -327,7 +326,7 @@ onready(function () {
           if (err || !room) return cb(null, null);
 
           if (room.get('oneToOne')) {
-            return cb(null, userhomeUri);
+            return cb(null, 'home');
           }
 
           if (room.get('githubType') === 'REPO' || room.get('githubType') === 'ORG') {
