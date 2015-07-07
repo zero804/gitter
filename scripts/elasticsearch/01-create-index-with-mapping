@@ -1,0 +1,154 @@
+#!/bin/bash -xe
+
+set -e
+set -x
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# source $SCRIPT_DIR/vars
+
+if ! curl --fail -vi -XGET "$ES_URL/$INDEX_NAME/_settings"; then
+  curl --fail -vi -XPUT "$ES_URL/$INDEX_NAME?pretty=true" -d @- << EOD
+  {
+    "settings": {
+      "number_of_shards": 4,
+      "number_of_replicas" : 1,
+      "mapper": {
+        "dynamic": false
+      }
+    }
+  }
+EOD
+fi
+
+sleep 10
+
+## Update the language analyzers
+curl -XPOST "$ES_URL/$INDEX_NAME/_close"
+
+for l in $SCRIPT_DIR/languages/*.json; do
+  curl --fail -vi -XPUT "$ES_URL/$INDEX_NAME/_settings?pretty=true" -d @$l
+done
+
+curl -XPOST "$ES_URL/$INDEX_NAME/_open"
+
+curl --fail -vi -XPUT "$ES_URL/$INDEX_NAME/_mapping/user?pretty=true" -d @- << EOD
+{
+  "user": {
+    "dynamic" : "strict",
+    "properties": {
+      "displayName": {
+        "type": "string",
+        "norms": {
+          "enabled": false
+        }
+      },
+      "username": {
+        "type": "string",
+        "norms": {
+          "enabled": false
+        }
+      }
+    }
+  }
+}
+EOD
+
+curl --fail -vi -XPUT "$ES_URL/$INDEX_NAME/_mapping/chat?pretty=true" -d @- << EOD
+{
+  "chat": {
+    "_parent": {
+      "type": "user"
+    },
+    "dynamic" : "strict",
+    "properties": {
+      "text": {
+        "type": "string",
+        "index": "analyzed",
+        "term_vector": "with_positions_offsets",
+        "norms": {
+          "enabled": false
+        }
+      },
+      "lang": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "pub": {
+        "type": "boolean",
+        "index": "not_analyzed"
+      },
+      "sent": {
+        "type": "date"
+      },
+      "toTroupeId": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "fromUserId": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "_analyzer": {
+        "type": "string",
+        "index": "not_analyzed"
+      }
+    }
+  }
+}
+EOD
+
+curl --fail -vi -XPUT "$ES_URL/$INDEX_NAME/_mapping/room?pretty=true" -d @- << EOD
+{
+  "room": {
+    "dynamic" : "strict",
+    "properties": {
+      "uri": {
+        "type": "string",
+        "index": "analyzed",
+        "term_vector": "with_positions_offsets",
+        "norms": {
+          "enabled": false
+        }
+      },
+      "topic": {
+        "type": "string",
+        "index": "analyzed",
+        "term_vector": "with_positions_offsets",
+        "norms": {
+          "enabled": false
+        }
+      },
+      "tags": {
+        "type": "string",
+        "index": "analyzed",
+        "index_name" : "tag",
+        "norms": {
+          "enabled": false
+        }
+      },
+      "security": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "githubType": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "parentId": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "ownerUserId": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "userCount": {
+        "type" : "integer",
+        "null_value" : 0
+      }
+
+    }
+  }
+}
+EOD
