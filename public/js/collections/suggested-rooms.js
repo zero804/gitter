@@ -8,11 +8,11 @@ require('filtered-collection');
 var SuggestedRoomsCollection = Backbone.Collection.extend({
   sync: SyncMixin.sync,
   fetchForUser: function() {
-    this.url = apiClient.user.channel("/suggested-rooms");
+    this.url = apiClient.user.channel("/suggestedRooms");
     this.fetch();
   },
   fetchForRoom: function() {
-    this.url = apiClient.room.channel("/suggested-rooms");
+    this.url = apiClient.room.channel("/suggestedRooms");
     this.fetch();
   }
 });
