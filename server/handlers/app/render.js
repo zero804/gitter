@@ -81,7 +81,8 @@ function renderHomePage(req, res, next) {
         page = 'mobile/mobile-userhome';
         bootScriptName = 'mobile-userhome';
       } else {
-        page = splitTest(troupeContext, 'userhome-template');
+        var variant = splitTests.configure(req, res, 'userhome');
+        page = splitTests.selectTemplate(variant, 'userhome-template_control', 'userhome-template_treatment');
         bootScriptName = 'userhome';
       }
 
