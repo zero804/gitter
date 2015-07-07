@@ -43,16 +43,45 @@ body {
 }
 
 .userhome-main {
-  margin: 3rem 6rem;
+  margin: 4rem 0 1rem 6rem;
 }
 
 .userhome-buttons {
   display: flex;
   flex-wrap: wrap;
+  margin-bottom: 4rem;
+}
+
+.userhome-apps {
+  margin-left: 3rem;
+}
+
+.userhome-apps h3 {
+  margin-bottom: 2rem;
+}
+
+.userhome-apps > i {
+  font-size: 1.6em;
+  vertical-align: middle;
+  margin-right: 1rem;
+  color: lightgrey;
 }
 
 .userhome-things {
   margin-right: 4em;
+}
+
+.userhome-things i {
+  font-size: 1.6em;
+  vertical-align: middle;
+  margin-right: 0.25em;
+  color: lightgrey;
+}
+
+.userhome-things p {
+  color: lightgrey;
+  font-size: 0.8em;
+  margin-left: 3rem;
 }
 
 .userhome-main__button {
@@ -63,7 +92,7 @@ body {
 
     padding: 0.8em;
   border-radius: 0.5em;
-  min-width: 11em;
+  width: 14em;
   display: inline-block;
   text-align: center;
 
@@ -86,6 +115,7 @@ body {
 
   padding: 0.5rem 1.5rem;
   margin-right: 1rem;
+  margin-bottom: 2rem;
   border-radius: 0.5em;
   display: inline-block;
   text-align: center;
@@ -99,4 +129,15 @@ body {
   &:hover {
     background-color: darken(white, 5%)
   }
+}
+
+.userhome-main__app-button i:before {
+  margin-right: 1rem;
+  display: inline;
+}
+
+.apps-link {
+  text-transform: uppercase;
+  color: @homepage-green;
+  font-size: 0.75em;
 }
