@@ -45,7 +45,7 @@ function queryRoomSuggestions(roomId, userId) {
     roomId: roomId
   });
 }
-/** Returns the ids of rooms recommended for the current user */
+/** Returns the ids of rooms suggested for the current user */
 function getSuggestionsForRoom(room, user/*, locale */) {
   return queryRoomSuggestions(room.id, user && user.id)
     .then(function(results) {
@@ -58,7 +58,7 @@ function getSuggestionsForRoom(room, user/*, locale */) {
 }
 exports.getSuggestionsForRoom = getSuggestionsForRoom;
 
-/* Returns the ids of rooms recommendationed for the current user */
+/* Returns the ids of rooms suggested for the current user */
 function getSuggestionsForUser(user /*, locale */) {
   return query("MATCH (u:User)-[:MEMBER]->(:Room)-[:MEMBER]-(:User)-[:MEMBER]-(r:Room) " +
                "WHERE u.userId = {userId} AND NOT(u-[:MEMBER]-r) AND r.security = 'PUBLIC'" +
