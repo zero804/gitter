@@ -12,7 +12,7 @@ module.exports = {
       return res.send(403);
     }
 
-    return suggestions.   getSuggestionsForUser(req.user, req.i18n.getLocale())
+    return suggestions.getSuggestionsForUser(req.user, req.i18n.getLocale())
       .then(function(suggestions) {
         return restSerializer.serializeQ(suggestions, new restSerializer.SuggestedRoomStrategy({ }));
       })

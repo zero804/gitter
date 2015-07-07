@@ -33,7 +33,8 @@ var DEV_MODE = !!process.env.DEV_MODE;
 var testModules = {
   'integration': ['./test/integration/**/*.js', './test/public-js/**/*.js'],
   'cache-wrapper': ['./modules/cache-wrapper/test/*.js'],
-  'github': ['./modules/github/test/*.js']
+  'github': ['./modules/github/test/*.js'],
+  'split-tests': ['./modules/split-tests/test/*.js'],  
 };
 
 /** Make a series of tasks based on the test modules */
