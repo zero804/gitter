@@ -161,9 +161,7 @@ function renderMainFrame(req, res, next, frame) {
         template = 'app-template';
         bootScriptName = 'router-app';
       } else {
-        template = splitTests.selectTemplate(variant, 'app-nli-template', {
-          treatment: 'app-nli-template_treatment'
-        });
+        template = splitTests.selectTemplate(variant, 'app-nli-template', 'app-nli-template_treatment');
         bootScriptName = 'router-nli-app';
       }
 
@@ -392,7 +390,7 @@ function renderOrg404Page(req, res, next) {
 function renderNotLoggedInChatPage(req, res, next) {
   var variant = splitTests.configure(req, res, 'nli');
   return renderChat(req, res, {
-    template: splitTests.selectTemplate(variant, 'chat-nli-template', { treatment: 'chat-nli-template_treatment' }),
+    template: splitTests.selectTemplate(variant, 'chat-nli-template', 'chat-nli-template_treatment'),
     script: 'router-nli-chat',
     unread: false // Not logged in users see chats as read
   }, next);

@@ -36,4 +36,26 @@ describe('split-tests', function() {
 
     assert.equal(result, 'control');
   });
+
+  describe('selectTemplate', function() {
+
+    it('picks the control template correctly', function() {
+      var result = split.selectTemplate('control', 'control_tmpl', 'treatment_tmpl');
+
+      assert.equal(result, 'control_tmpl');
+    });
+
+    it('picks the treatment template correctly', function() {
+      var result = split.selectTemplate('treatment', 'control_tmpl', 'treatment_tmpl');
+
+      assert.equal(result, 'treatment_tmpl');
+    });
+
+    it('defaults to control template if the variant is unknown', function() {
+      var result = split.selectTemplate('NOT A VARIANT', 'control_tmpl', 'treatment_tmpl');
+
+      assert.equal(result, 'control_tmpl');
+    });
+  });
+
 });

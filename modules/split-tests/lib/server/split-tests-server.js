@@ -64,8 +64,8 @@ function middleware(testName, disableSet) {
   };
 }
 
-function selectTemplate(variant, defaultTemplate, variants) {
-  var template = variants[variant] || defaultTemplate;
+function selectTemplate(variant, controlTemplate, variantTemplate) {
+  var template = variant === 'treatment' ? variantTemplate : controlTemplate;
   debug('Selected template %s for variant %s', template, variant);
   return template;
 }
