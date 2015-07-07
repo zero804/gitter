@@ -3,12 +3,11 @@ var $ = require('jquery');
 var Marionette = require('backbone.marionette');
 var context = require('utils/context');
 var troupeCollections = require('collections/instances/troupes');
+var FilteredSuggestedRoomsCollection = require('collections/suggested-rooms').Filtered;
 var userHomeTemplate = require('./tmpl/userHomeTemplate.hbs');
 var OrgCollectionView = require('./homeOrgCollectionView');
 var SuggestedCollectionView = require('./suggested-room-collection-view');
 var isMobile = require('utils/is-mobile');
-var isNative = require('utils/is-native');
-var TroupeCollections = require('collections/troupes');
 require('views/behaviors/isomorphic');
 
 module.exports = (function() {
@@ -33,8 +32,8 @@ module.exports = (function() {
     },
 
     initSuggestedRoomsRegion: function(optionsForRegion) {
-      var suggestedRoomCollection = new TroupeCollections.SuggestedTroupeCollection();
-      suggestedRoomCollection.fetch();
+      var suggestedRoomCollection = new FilteredSuggestedRoomsCollection(null, { roomsCollection: troupeCollections.troupes });
+      suggestedRoomCollection.fetchForUser();
 
       return new SuggestedCollectionView(optionsForRegion({ collection: suggestedRoomCollection }));
     },

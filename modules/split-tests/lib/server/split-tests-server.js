@@ -11,15 +11,29 @@ function getGroup() {
   return (((Math.floor(Math.random() * 2) + 1) % 2)) === 0 ? 'control' : 'treatment';
 }
 
+function getVariantFromRequest(req, testName) {
+  var queryValue = req.query['_set_variant_' + testName];
+  if (queryValue == 'control' || queryValue == 'treatment') {
+    return queryValue;
+  }
+}
+
 function configure(req, res, testName, disableSet) {
   var cookieName = 'variant_' + testName;
-  var value = req.cookies[cookieName];
 
   // Allow the value to be overriden
-  var forcedParam = req.query['_set_variant_' + testName];
-  if (forcedParam && forcedParam !== 'control' && forcedParam !== 'treatment') {
-    forcedParam = null;
+  var forcedParam = getVariantFromRequest(req, testName);
+
+  // If cookies are not enabled in the current environment use the set value
+  // defaulting to control.
+  // CORS with Cookies is more trouble that it's worth
+  if (!req.cookies) {
+    if (!forcedParam) return 'control';
+    return forcedParam;
   }
+
+  // From here on, the cookies middleware has been installed
+  var value = req.cookies[cookieName];
 
   // TODO: remove this anytime after 1 Sep 2015
   if (req.cookies.variant) {

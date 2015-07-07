@@ -3,29 +3,38 @@ var roomNameTrimmer = require('utils/room-name-trimmer'); // TODO: move this to 
 var Marionette = require('backbone.marionette');
 var template = require('./tmpl/suggested-list-item.hbs');
 
-module.exports = (function() {
+var MAX_SUGGESTIONS = 5;
 
-  var SuggestedItemView = Marionette.ItemView.extend({
-    tagName: 'li',
-    className: 'room-list-item',
-    template: template,
-    modelEvents: {
-      change: 'render',
-    },
-    serializeData: function() {
-      var data = this.model.toJSON();
-      data.uri = roomNameTrimmer(data.uri);
-      data.linkUrl = data.exists ? '/' + this.model.get('uri') + '?source=suggested' : '#confirm/' + this.model.get('uri');
-      data.owner = this.model.get('uri').split('/')[0];
-      return data;
-    }
-  });
+/* How hillbillies manipulate urls */
+function appendToUrl(url, params) {
+  if (url.indexOf('?') >= 0) return params + "&" + params;
+  return url + "?" + params;
+}
 
-  return Marionette.CollectionView.extend({
-    tagName: 'ul',
-    className: 'room-list',
-    childView: SuggestedItemView
-  });
+/* This should be united with userhome/suggested-room-collection-view */
 
+var SuggestedItemView = Marionette.ItemView.extend({
+  tagName: 'li',
+  className: 'room-list-item',
+  template: template,
+  modelEvents: {
+    change: 'render',
+  },
+  serializeData: function() {
+    var model = this.model;
+    return {
+      avatarUrl: appendToUrl(model.get('avatarUrl'), 's=30'),
+      linkUrl: appendToUrl('/' + model.get('uri'), 'source=suggested-menu'),
+      uri: roomNameTrimmer(model.get('uri'))
+    };
+  }
+});
 
-})();
+module.exports = Marionette.CollectionView.extend({
+  tagName: 'ul',
+  className: 'room-list',
+  childView: SuggestedItemView,
+  filter: function(child, index) { // jshint unused:true
+    return index < MAX_SUGGESTIONS;
+  }
+});
