@@ -21,12 +21,12 @@ module.exports = {
     }
 
     // loop?
-    installTroupeSubResource('issues', 'issues');
-    installTroupeSubResource('users', 'users');
-    installTroupeSubResource('bans', 'bans');
-    installTroupeSubResource('channels', 'channels');
-    installTroupeSubResource('collaborators', 'collaborators');
-    installTroupeSubResource('suggested-rooms', 'suggested-rooms');
+    installTroupeSubResource('issues',         'issues');
+    installTroupeSubResource('users',          'users');
+    installTroupeSubResource('bans',           'bans');
+    installTroupeSubResource('channels',       'channels');
+    installTroupeSubResource('collaborators',  'collaborators');
+    installTroupeSubResource('suggestedRooms', 'suggested-rooms');
 
     var chatResource = installTroupeSubResource('chatMessages', 'chat-messages');
     var chatReadBy = new Resource('readBy', require('./troupes/chat-read-by'), app);
@@ -57,7 +57,7 @@ module.exports = {
     installUserSubResource('repos',           'repos');
     installUserSubResource('channels',        'channels');
     installUserSubResource('settings',        'user-settings');
-    installUserSubResource('suggested-rooms', 'suggested-rooms');
+    installUserSubResource('suggestedRooms',  'suggested-rooms');
     installUserSubResource('unreadItems',     'aggregated-unread-items');
   }
 };
