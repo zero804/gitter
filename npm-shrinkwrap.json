@@ -250,6 +250,137 @@
         }
       }
     },
+    "cypher-promise": {
+      "version": "1.0.1",
+      "from": "cypher-promise@http://beta-internal:4873/cypher-promise/-/cypher-promise-1.0.1.tgz",
+      "resolved": "http://beta-internal:4873/cypher-promise/-/cypher-promise-1.0.1.tgz",
+      "dependencies": {
+        "any-promise": {
+          "version": "0.1.0",
+          "from": "any-promise@http://beta-internal:4873/any-promise/-/any-promise-0.1.0.tgz",
+          "resolved": "http://beta-internal:4873/any-promise/-/any-promise-0.1.0.tgz"
+        },
+        "node-cypher": {
+          "version": "0.1.4",
+          "from": "node-cypher@http://beta-internal:4873/node-cypher/-/node-cypher-0.1.4.tgz",
+          "resolved": "http://beta-internal:4873/node-cypher/-/node-cypher-0.1.4.tgz",
+          "dependencies": {
+            "request": {
+              "version": "2.34.0",
+              "from": "request@http://beta-internal:4873/request/-/request-2.34.0.tgz",
+              "resolved": "http://beta-internal:4873/request/-/request-2.34.0.tgz",
+              "dependencies": {
+                "aws-sign2": {
+                  "version": "0.5.0",
+                  "from": "aws-sign2@http://beta-internal:4873/aws-sign2/-/aws-sign2-0.5.0.tgz",
+                  "resolved": "http://beta-internal:4873/aws-sign2/-/aws-sign2-0.5.0.tgz"
+                },
+                "forever-agent": {
+                  "version": "0.5.2",
+                  "from": "forever-agent@http://beta-internal:4873/forever-agent/-/forever-agent-0.5.2.tgz",
+                  "resolved": "http://beta-internal:4873/forever-agent/-/forever-agent-0.5.2.tgz"
+                },
+                "form-data": {
+                  "version": "0.1.4",
+                  "from": "form-data@http://beta-internal:4873/form-data/-/form-data-0.1.4.tgz",
+                  "resolved": "http://beta-internal:4873/form-data/-/form-data-0.1.4.tgz",
+                  "dependencies": {
+                    "combined-stream": {
+                      "version": "0.0.7",
+                      "from": "combined-stream@http://beta-internal:4873/combined-stream/-/combined-stream-0.0.7.tgz",
+                      "resolved": "http://beta-internal:4873/combined-stream/-/combined-stream-0.0.7.tgz",
+                      "dependencies": {
+                        "delayed-stream": {
+                          "version": "0.0.5",
+                          "resolved": "https://registry.npmjs.org/delayed-stream/-/delayed-stream-0.0.5.tgz"
+                        }
+                      }
+                    }
+                  }
+                },
+                "hawk": {
+                  "version": "1.0.0",
+                  "from": "hawk@http://beta-internal:4873/hawk/-/hawk-1.0.0.tgz",
+                  "resolved": "http://beta-internal:4873/hawk/-/hawk-1.0.0.tgz",
+                  "dependencies": {
+                    "boom": {
+                      "version": "0.4.2",
+                      "from": "boom@http://beta-internal:4873/boom/-/boom-0.4.2.tgz",
+                      "resolved": "http://beta-internal:4873/boom/-/boom-0.4.2.tgz"
+                    },
+                    "cryptiles": {
+                      "version": "0.2.2",
+                      "from": "cryptiles@http://beta-internal:4873/cryptiles/-/cryptiles-0.2.2.tgz",
+                      "resolved": "http://beta-internal:4873/cryptiles/-/cryptiles-0.2.2.tgz"
+                    },
+                    "hoek": {
+                      "version": "0.9.1",
+                      "from": "hoek@http://beta-internal:4873/hoek/-/hoek-0.9.1.tgz",
+                      "resolved": "http://beta-internal:4873/hoek/-/hoek-0.9.1.tgz"
+                    },
+                    "sntp": {
+                      "version": "0.2.4",
+                      "from": "sntp@http://beta-internal:4873/sntp/-/sntp-0.2.4.tgz",
+                      "resolved": "http://beta-internal:4873/sntp/-/sntp-0.2.4.tgz"
+                    }
+                  }
+                },
+                "http-signature": {
+                  "version": "0.10.1",
+                  "from": "http-signature@http://beta-internal:4873/http-signature/-/http-signature-0.10.1.tgz",
+                  "resolved": "http://beta-internal:4873/http-signature/-/http-signature-0.10.1.tgz",
+                  "dependencies": {
+                    "asn1": {
+                      "version": "0.1.11",
+                      "resolved": "https://registry.npmjs.org/asn1/-/asn1-0.1.11.tgz"
+                    },
+                    "assert-plus": {
+                      "version": "0.1.5",
+                      "from": "assert-plus@http://beta-internal:4873/assert-plus/-/assert-plus-0.1.5.tgz",
+                      "resolved": "http://beta-internal:4873/assert-plus/-/assert-plus-0.1.5.tgz"
+                    },
+                    "ctype": {
+                      "version": "0.5.3",
+                      "resolved": "https://registry.npmjs.org/ctype/-/ctype-0.5.3.tgz"
+                    }
+                  }
+                },
+                "json-stringify-safe": {
+                  "version": "5.0.1",
+                  "from": "json-stringify-safe@http://beta-internal:4873/json-stringify-safe/-/json-stringify-safe-5.0.1.tgz",
+                  "resolved": "http://beta-internal:4873/json-stringify-safe/-/json-stringify-safe-5.0.1.tgz"
+                },
+                "mime": {
+                  "version": "1.2.11",
+                  "from": "mime@http://beta-internal:4873/mime/-/mime-1.2.11.tgz",
+                  "resolved": "http://beta-internal:4873/mime/-/mime-1.2.11.tgz"
+                },
+                "oauth-sign": {
+                  "version": "0.3.0",
+                  "from": "oauth-sign@http://beta-internal:4873/oauth-sign/-/oauth-sign-0.3.0.tgz",
+                  "resolved": "http://beta-internal:4873/oauth-sign/-/oauth-sign-0.3.0.tgz"
+                },
+                "qs": {
+                  "version": "0.6.6",
+                  "from": "qs@http://beta-internal:4873/qs/-/qs-0.6.6.tgz",
+                  "resolved": "http://beta-internal:4873/qs/-/qs-0.6.6.tgz"
+                },
+                "tunnel-agent": {
+                  "version": "0.3.0",
+                  "from": "tunnel-agent@http://beta-internal:4873/tunnel-agent/-/tunnel-agent-0.3.0.tgz",
+                  "resolved": "http://beta-internal:4873/tunnel-agent/-/tunnel-agent-0.3.0.tgz"
+                }
+              }
+            }
+          }
+        },
+        "par": {
+          "version": "0.3.0",
+          "from": "par@http://beta-internal:4873/par/-/par-0.3.0.tgz",
+          "resolved": "http://beta-internal:4873/par/-/par-0.3.0.tgz"
+        }
+      }
+    },
     "debug": {
       "version": "2.2.0",
       "resolved": "http://beta-internal:4873/debug/-/debug-2.2.0.tgz",
@@ -1022,6 +1153,68 @@
         }
       }
     },
+    "fast-csv": {
+      "version": "0.6.0",
+      "resolved": "http://beta-internal:4873/fast-csv/-/fast-csv-0.6.0.tgz",
+      "dependencies": {
+        "extended": {
+          "version": "0.0.6",
+          "resolved": "http://beta-internal:4873/extended/-/extended-0.0.6.tgz",
+          "dependencies": {
+            "extender": {
+              "version": "0.0.10",
+              "resolved": "http://beta-internal:4873/extender/-/extender-0.0.10.tgz",
+              "dependencies": {
+                "declare.js": {
+                  "version": "0.0.8",
+                  "resolved": "http://beta-internal:4873/declare.js/-/declare.js-0.0.8.tgz"
+                }
+              }
+            }
+          }
+        },
+        "is-extended": {
+          "version": "0.0.10",
+          "resolved": "http://beta-internal:4873/is-extended/-/is-extended-0.0.10.tgz"
+        },
+        "object-extended": {
+          "version": "0.0.7",
+          "resolved": "http://beta-internal:4873/object-extended/-/object-extended-0.0.7.tgz",
+          "dependencies": {
+            "array-extended": {
+              "version": "0.0.11",
+              "resolved": "http://beta-internal:4873/array-extended/-/array-extended-0.0.11.tgz",
+              "dependencies": {
+                "arguments-extended": {
+                  "version": "0.0.3",
+                  "resolved": "http://beta-internal:4873/arguments-extended/-/arguments-extended-0.0.3.tgz"
+                }
+              }
+            }
+          }
+        },
+        "string-extended": {
+          "version": "0.0.8",
+          "resolved": "http://beta-internal:4873/string-extended/-/string-extended-0.0.8.tgz",
+          "dependencies": {
+            "array-extended": {
+              "version": "0.0.11",
+              "resolved": "http://beta-internal:4873/array-extended/-/array-extended-0.0.11.tgz",
+              "dependencies": {
+                "arguments-extended": {
+                  "version": "0.0.3",
+                  "resolved": "http://beta-internal:4873/arguments-extended/-/arguments-extended-0.0.3.tgz"
+                }
+              }
+            },
+            "date-extended": {
+              "version": "0.0.6",
+              "resolved": "http://beta-internal:4873/date-extended/-/date-extended-0.0.6.tgz"
+            }
+          }
+        }
+      }
+    },
     "faye-websocket": {
       "version": "0.7.3",
       "from": "faye-websocket@http://beta-internal:4873/faye-websocket/-/faye-websocket-0.7.3.tgz",
@@ -1496,6 +1689,10 @@
     "gitter-web-split-tests": {
       "version": "1.0.0",
       "resolved": "file:modules/split-tests"
+    },
+    "gitter-web-suggestions": {
+      "version": "1.0.0",
+      "resolved": "file:modules/suggestions"
     },
     "handlebars": {
       "version": "3.0.3",
