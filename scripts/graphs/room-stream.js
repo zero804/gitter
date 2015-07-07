@@ -5,18 +5,18 @@ var persistence = require('../../server/services/persistence-service');
 var es = require('event-stream');
 var csv = require('fast-csv');
 
-var NO_AA_THRESHOLD = 500;
-var TOP_AA_THRESHOLD = 3000;
+var ANTI_MONOPOLY_LOWER_THRESHOLD = 500;
+var ANTI_MONOPOLY_UPPER_THRESHOLD = 3000;
 var MIN_WEIGHT = 0.05;
 
 /* Returns a number between 0 and 1 */
 /* For everything belong 1000, returns 1, then gradually goes down to 0.25 */
 function getWeightForUserCount(userCount) {
-  if (userCount <= NO_AA_THRESHOLD) return 1;
-  if (userCount > TOP_AA_THRESHOLD) return MIN_WEIGHT;
+  if (userCount <= ANTI_MONOPOLY_LOWER_THRESHOLD) return 1;
+  if (userCount > ANTI_MONOPOLY_UPPER_THRESHOLD) return MIN_WEIGHT;
 
-  var p = userCount - NO_AA_THRESHOLD;
-  var v = (TOP_AA_THRESHOLD - NO_AA_THRESHOLD - p) / (TOP_AA_THRESHOLD - NO_AA_THRESHOLD) * (1 - MIN_WEIGHT);
+  var p = userCount - ANTI_MONOPOLY_LOWER_THRESHOLD;
+  var v = (ANTI_MONOPOLY_UPPER_THRESHOLD - ANTI_MONOPOLY_LOWER_THRESHOLD - p) / (ANTI_MONOPOLY_UPPER_THRESHOLD - ANTI_MONOPOLY_LOWER_THRESHOLD) * (1 - MIN_WEIGHT);
   return (v + MIN_WEIGHT).toFixed(2);
 }
 
