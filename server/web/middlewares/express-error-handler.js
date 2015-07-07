@@ -14,7 +14,7 @@ function linkStack(stack) {
   return stack.split(/\n/).map(function(i) {
     return i.replace(/\(([^:]+):(\d+):(\d+)\)/, function(match, file, line, col) {
       var ourCode = file.indexOf('node_modules') == -1;
-      var h = "(<a href='subl://open/?url=file://" + file + "&line=" + line + "&column=" + col + "'>" + file + ":" + line + ":" + col + "</a>)";
+      var h = "(<a href='atm://open/?url=file://" + file + "&line=" + line + "&column=" + col + "'>" + file + ":" + line + ":" + col + "</a>)";
       if(ourCode) h = "<b>" + h + "</b>";
       return h;
     });

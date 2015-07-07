@@ -111,8 +111,6 @@ module.exports = {
 
     app.use(require('./middlewares/tokenless-user'));
 
-    app.use(require('./middlewares/set-variant-cookie'));
-
     app.use(app.router);
 
     app.use(require('./middlewares/token-error-handler'));

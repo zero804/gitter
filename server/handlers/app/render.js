@@ -19,9 +19,9 @@ var roomNameTrimmer    = require('../../../public/js/utils/room-name-trimmer');
 var isolateBurst       = require('../../../shared/burst/isolate-burst-array');
 var unreadItemService  = require('../../services/unread-item-service');
 var mongoUtils         = require('../../utils/mongo-utils');
+var splitTests         = require('gitter-web-split-tests');
 var url                = require('url');
 var cdn                = require("../../web/cdn");
-var splitTest          = require('../../utils/split-test');
 
 var avatar   = require('../../utils/avatar');
 var _                 = require('underscore');
@@ -125,6 +125,7 @@ function fixBadLinksOnId(value) {
 }
 
 function renderMainFrame(req, res, next, frame) {
+  var variant = splitTests.configure(req, res, 'nli');
 
   var user = req.user;
   var userId = user && user.id;
@@ -159,7 +160,7 @@ function renderMainFrame(req, res, next, frame) {
         template = 'app-template';
         bootScriptName = 'router-app';
       } else {
-        template = splitTest(troupeContext, 'app-nli-template');
+        template = splitTests.selectTemplate(variant, 'app-nli-template', 'app-nli-template_treatment');
         bootScriptName = 'router-nli-app';
       }
 
@@ -386,8 +387,9 @@ function renderOrg404Page(req, res, next) {
 
 
 function renderNotLoggedInChatPage(req, res, next) {
+  var variant = splitTests.configure(req, res, 'nli');
   return renderChat(req, res, {
-    template: splitTest(req, 'chat-nli-template'),
+    template: splitTests.selectTemplate(variant, 'chat-nli-template', 'chat-nli-template_treatment'),
     script: 'router-nli-chat',
     unread: false // Not logged in users see chats as read
   }, next);

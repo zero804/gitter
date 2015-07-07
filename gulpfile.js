@@ -33,7 +33,8 @@ var DEV_MODE = !!process.env.DEV_MODE;
 var testModules = {
   'integration': ['./test/integration/**/*.js', './test/public-js/**/*.js'],
   'cache-wrapper': ['./modules/cache-wrapper/test/*.js'],
-  'github': ['./modules/github/test/*.js']
+  'github': ['./modules/github/test/*.js'],
+  'split-tests': ['./modules/split-tests/test/*.js'],  
 };
 
 /** Make a series of tasks based on the test modules */
@@ -72,7 +73,7 @@ gulp.task('validate-client-source', function() {
 
 gulp.task('validate-server-source', function() {
   /* This is a very lax jshint, only looking for major problems */
-  return gulp.src(['server/**/*.js', 'shared/**/*.js', 'modules/**/lib/**/*.js'])
+  return gulp.src(['server/**/*.js', 'shared/**/*.js', 'modules/*/lib/**/*.js'])
     .pipe(jshint({
       node: true,
       // globalstrict: true, // ENABLE
