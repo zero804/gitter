@@ -27,6 +27,7 @@ function postMessage(message) {
 // this is needed as node-webkit 0.11.6 loses track
 // of the child iframe event listeners when the iframe.src changes (!)
 // without this, the loading-view never hides on the desktop app
+// https://github.com/nwjs/nw.js/issues/2867
 if(hasParentFrameSameOrigin()) {
   postMessage({ type: 'childframe:loaded' });
 }

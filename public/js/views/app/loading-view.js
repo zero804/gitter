@@ -53,6 +53,7 @@ var LoadingView = function(iframe, loadingFrame) {
 
   // listen to our own load event as node-webkit 0.11.6 loses track
   // of the child iframe event listeners when the iframe.src changes (!)
+  // https://github.com/nwjs/nw.js/issues/2867
   appEvents.on('childframe:loaded', onIframeLoad);
 };
 
