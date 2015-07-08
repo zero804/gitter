@@ -30,5 +30,15 @@ module.exports = {
         res.redirect('/home#createroom');
       });
 
+    app.get('/home/explore',
+      ensureLoggedIn,
+      function (req, res, next) {
+        req.uriContext = {
+          uri: 'home'
+        };
+
+        appRender.renderMainFrame(req, res, next, 'explore');
+      });
+
   }
 };
