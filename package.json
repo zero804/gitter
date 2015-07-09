@@ -99,7 +99,7 @@
     "stringformat": "0.0.5",
     "targetenv": "^1.0.0",
     "temp": "0.4.0",
-    "tentacles": "^0.2.6",
+    "tentacles": "^0.2.7",
     "text-filter": "~0.1.0",
     "throat": "~1.0.0",
     "tough-cookie": "^0.12.1",
