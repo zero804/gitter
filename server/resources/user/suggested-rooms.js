@@ -2,7 +2,8 @@
 "use strict";
 
 var restSerializer = require("../../serializers/rest-serializer");
-var suggestions    = require('gitter-web-suggestions');
+// var suggestions    = require('gitter-web-suggestions');
+var legacyRecommendations = require('../../services/recommendations/legacy-recommendations');
 
 module.exports = {
   id: 'resourceUserSuggestedRoom',
@@ -12,7 +13,7 @@ module.exports = {
       return res.send(403);
     }
 
-    return suggestions.getSuggestionsForUser(req.user, req.i18n.getLocale())
+    return legacyRecommendations.getSuggestionsForUser(req.user, req.i18n.getLocale())
       .then(function(suggestions) {
         return restSerializer.serializeQ(suggestions, new restSerializer.SuggestedRoomStrategy({ }));
       })
