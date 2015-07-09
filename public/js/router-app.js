@@ -236,6 +236,10 @@ onready(function () {
         appEvents.trigger('focus.request.' + message.focus, message.event);
         break;
 
+      case 'childframe:loaded':
+        appEvents.trigger('childframe:loaded');
+        break;
+
       case 'permalink.requested':
         var url = message.url + '?at=' + message.id;
         var frameUrl = message.url + '/~' + message.permalinkType + '?at=' + message.id;
