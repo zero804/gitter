@@ -30,6 +30,29 @@ var _                 = require('underscore');
 var INITIAL_CHAT_COUNT = 50;
 var ROSTER_SIZE = 25;
 
+var WELCOME_MESSAGES = [
+  'Code for people',
+  'Talk about it',
+  "Let's try something new",
+  'Developers, developers, developers',
+  'Computers are pretty cool',
+  "Don't build Skynet",
+  'Make the world better',
+  'Computers need people',
+  'Everyone secretly loves robots',
+  'Initial commit',
+  'Hello World',
+  'From everywhere, with love',
+  '200 OK',
+  'UDP like you just dont care',
+  'Lovely code for lovely people',
+  "Don't drop your computer",
+  'Learn, Teach, Repeat. Always Repeat.',
+  'Help out on the projects you love',
+  "HTTP 418: I'm a teapot",
+  'Hey there, nice to see you',
+  'Welcome home'
+];
 
 function cdnSubResources(resources) {
   return ['vendor'].concat(resources).map(function(f) {
@@ -88,6 +111,7 @@ function renderHomePage(req, res, next) {
       }
 
       res.render(page, {
+        welcomeMessage: WELCOME_MESSAGES[Math.floor(Math.random() * WELCOME_MESSAGES.length)],
         bootScriptName: bootScriptName,
         cssFileName: "styles/" + bootScriptName + ".css",
         troupeContext: troupeContext,
