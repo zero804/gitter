@@ -6,12 +6,12 @@ var context = require('utils/context');
 var Backbone = require('backbone');
 var _ = require('underscore');
 var AppLayout = require('views/layouts/app-layout');
+var LoadingView = require('views/app/loading-view');
 var troupeCollections = require('collections/instances/troupes');
 var TitlebarUpdater = require('components/titlebar');
 var realtime = require('components/realtime');
 var log = require('utils/log');
 var onready = require('./utils/onready');
-var $ = require('jquery');
 var urlParser = require('utils/url-parser');
 var RAF = require('utils/raf');
 var RoomCollectionTracker = require('components/room-collection-tracker');
@@ -29,27 +29,11 @@ require('components/ping');
 // Preload widgets
 require('views/widgets/avatar');
 
-var loading = function (el) {
-  return {
-    show: function () {
-      el.removeClass('hide');
-    },
-    hide: function () {
-      el.addClass('hide');
-    },
-  };
-};
-
 onready(function () {
-  var loadingScreen = loading($('.loading-frame'));
   var chatIFrame = document.getElementById('content-frame');
   var titlebarUpdater = new TitlebarUpdater();
 
-
-  loadingScreen.show();
-
-  chatIFrame.addEventListener('load', loadingScreen.hide, false);
-  appEvents.on('chatframe:loaded', loadingScreen.hide);
+  new LoadingView(chatIFrame, document.getElementById('loading-frame'));
 
   // Send the hash to the child
   if (window.location.hash) {
@@ -156,8 +140,6 @@ onready(function () {
       return;
     }
 
-    loadingScreen.show();
-
     pushState(frameUrl, title, url);
     updateContent(frameUrl);
   });
@@ -254,8 +236,8 @@ onready(function () {
         appEvents.trigger('focus.request.' + message.focus, message.event);
         break;
 
-      case 'chatframe:loaded':
-        appEvents.trigger('chatframe:loaded');
+      case 'childframe:loaded':
+        appEvents.trigger('childframe:loaded');
         break;
 
       case 'permalink.requested':

@@ -91,6 +91,7 @@ module.exports = {
       dateLastSecurityCheck: { type: Date },
       noindex: { type: Boolean, 'default': false},
       githubId: { type: Number, default: null },
+      lang: { type: String }, // Human language of this room
       renamedLcUris: [String],
       _nonce: { type: Number },
       _tv: { type: 'MongooseNumber', 'default': 0 }
