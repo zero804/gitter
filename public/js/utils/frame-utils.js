@@ -23,9 +23,13 @@ function postMessage(message) {
   }
 }
 
-/* Tell the parent frame that we're loaded */
+// Tell the parent frame that weve loaded
+// this is needed as node-webkit 0.11.6 loses track
+// of the child iframe event listeners when the iframe.src changes (!)
+// without this, the loading-view never hides on the desktop app
+// https://github.com/nwjs/nw.js/issues/2867
 if(hasParentFrameSameOrigin()) {
-  postMessage({ type: "chatframe:loaded" });
+  postMessage({ type: 'childframe:loaded' });
 }
 
 module.exports = {

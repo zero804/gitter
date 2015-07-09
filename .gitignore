@@ -1,5 +1,5 @@
 /target
-/node_modules
+node_modules
 .DS_Store
 /.project
 /npm-debug.log
@@ -68,4 +68,5 @@ davisable.sh
 scripts/graphs/membership.csv
 scripts/graphs/one-to-ones.csv
 scripts/graphs/rooms.csv
+data
 scripts/graphs/users.csv

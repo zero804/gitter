@@ -11,11 +11,8 @@ var Sorted = require('backbone-sorted-collection');
 require('filtered-collection');
 
 module.exports = (function() {
-
-
   var orgsCollection = new orgModels.OrgCollection(null, { listen: true });
   var troupeCollection = new troupeModels.TroupeCollection(null, { listen: true });
-  var suggestedCollection = new troupeModels.SuggestedTroupeCollection(null, { listen: false });
 
   unreadItemsClient.installTroupeListener(troupeCollection);
 
@@ -41,14 +38,6 @@ module.exports = (function() {
         context.troupe().set(model.changed);
       });
     }
-
-    var uri = model.get('uri');
-    if(uri) {
-      // No one-to-ones
-      var suggestions = suggestedCollection.findWhere({ uri: uri });
-      suggestedCollection.remove(suggestions);
-    }
-
   });
 
   appEvents.on('activity', function(message) {
@@ -72,7 +61,6 @@ module.exports = (function() {
     /* All rooms */
     troupes: troupeCollection,
     /* Filtered rooms */
-    suggested: suggestedCollection,
     favourites: favourites,
     recentRoomsNonFavourites: recentRoomsNonFavourites,
     orgs: orgsCollection

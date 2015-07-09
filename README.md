@@ -157,4 +157,19 @@ Once you are sure the above is done, preform the following:
 11. Check that there are lots of documents under the Gitter index.
 
 
+## Updating the Social Graph
 
+The social graph updater runs as a batch job in a cron every few hours. You can manually invoke it as follows.
+
+```shell
+NODE_ENV=beta node scripts/graphs/upload-graph.js
+```
+
+The uploader script starts a local webserver, and it will guess the URL for that webserver by looking at the host computers
+network interfaces. If you want to the script against production from your developer computer, you'll need to specify the OpenVPN
+tunnel interface, otherwise the script will serve from a URL inaccessible from OpenVPN.
+
+You can do this as follows:
+```shell
+NODE_ENV=prod LISTEN_IF=utun0 node scripts/graphs/upload-graph.js
+```
