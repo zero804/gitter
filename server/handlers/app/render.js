@@ -22,6 +22,7 @@ var mongoUtils         = require('../../utils/mongo-utils');
 var splitTests         = require('gitter-web-split-tests');
 var url                = require('url');
 var cdn                = require("../../web/cdn");
+var useragent          = require('useragent');
 
 var avatar   = require('../../utils/avatar');
 var _                 = require('underscore');
@@ -110,8 +111,22 @@ function renderHomePage(req, res, next) {
         bootScriptName = 'userhome';
       }
 
+      var osName = useragent.parse(req.headers['user-agent']).os.family.toLowerCase();
+
+      var isLinux = osName.indexOf('linux') >= 0;
+      var isOsx = osName.indexOf('mac') >= 0;
+      var isWindows = osName.indexOf('windows') >= 0;
+
+      // show everything if we cant confirm the os
+      var showOsxApp = !isLinux && !isWindows;
+      var showWindowsApp = !isLinux && !isOsx;
+      var showLinuxApp = !isOsx && !isWindows;
+
       res.render(page, {
         welcomeMessage: WELCOME_MESSAGES[Math.floor(Math.random() * WELCOME_MESSAGES.length)],
+        showOsxApp: showOsxApp,
+        showWindowsApp: showWindowsApp,
+        showLinuxApp: showLinuxApp,
         bootScriptName: bootScriptName,
         cssFileName: "styles/" + bootScriptName + ".css",
         troupeContext: troupeContext,
