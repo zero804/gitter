@@ -1,6 +1,9 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
+var env               = require('gitter-web-env');
+var logger            = env.logger;
+
 var troupeService       = require("./troupe-service");
 
 var restSerializer      = require("../serializers/rest-serializer");
@@ -14,6 +17,12 @@ var GithubMe            = require('gitter-web-github').GitHubMeService;
 var isUserLurkingInRoom = require('./is-user-lurking-in-room');
 var _                   = require('underscore');
 
+
+var survivalMode = !!process.env.SURVIVAL_MODE || false;
+
+if (survivalMode) {
+  logger.error("WARNING: Running in survival mode");
+}
 
 var DEFAULT_CHAT_COUNT_LIMIT = 30;
 
@@ -64,6 +73,10 @@ exports.serializeUsersForTroupe = function(troupeId, userId, options) {
   var searchTerm = options.searchTerm;
 
   if(searchTerm) {
+    if (survivalMode) {
+      return Q.resolve([]);
+    }
+
     /* The limit must only be applied post findUserIdsForTroupe */
     return troupeService.findUserIdsForTroupe(troupeId)
       .then(function(userIds) {
