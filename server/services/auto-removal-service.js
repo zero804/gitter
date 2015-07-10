@@ -27,7 +27,7 @@ function findRemovalCandidates(roomId, options) {
       var oldUserIds = Object.keys(lastAccessDates).map(function(userId) {
           var lastAccess = lastAccessDates[userId];
 
-          if (!lastAccess || lastAccess < cutoff) {
+          if (lastAccess && lastAccess < cutoff) {
             return userId;
           }
         }).filter(function(f) {
