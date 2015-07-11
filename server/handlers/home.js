@@ -40,5 +40,21 @@ module.exports = {
         appRender.renderMainFrame(req, res, next, 'explore');
       });
 
+    app.get('/home/learn',
+      ensureLoggedIn,
+      function (req, res, next) {
+        req.uriContext = {
+          uri: 'learn'
+        };
+
+        appRender.renderMainFrame(req, res, next, 'learn');
+      });
+
+    app.get('/learn/~learn',
+      ensureLoggedIn,
+      function(req, res) {
+        res.render('learn');
+      });
+
   }
 };

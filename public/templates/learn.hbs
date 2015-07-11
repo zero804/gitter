@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
+	<meta charset="utf-8">
+  <link id="favicon" rel="shortcut icon" href="{{cdn 'images/favicon-normal.ico' }}">
+
+	<title>Learn</title>
+
+  <link rel="stylesheet" href="{{cdn 'styles/userhome_treatment.css' }}">
+  <base target="_blank">
+</head>
+<body>
+  <header class="userhome__header">
+    <div class="nli-menu-treatment__logo">
+      {{> logo_man}}
+      <img class="nli-menu-treatment__logo-text" src='{{cdn "images/gitter-vector-logo.svg"}}'>
+    </div>
+    <nav class="userhome__header__nav"><a href="/home" target="_parent">Home</a><span class="arrow"></span>Learn</nav>
+    <h1 class="userhome__header__title">We love when you're learning</h1>
+  </header>
+  <div class="grapes">
+    <section class="what">
+      <h3>Official Support</h3>
+      <a class="section-link" href="http://support.gitter.im">support.gitter.im</a>
+      <h5>RTFM</h5>
+      <a class="other-link" href="https://gitter.zendesk.com/hc/en-us/sections/200062482-The-basics">The basics</a>
+      <a class="other-link" href="https://gitter.zendesk.com/hc/en-us/sections/200062922-Mad-skillz">Mad Skillz</a>
+      <h5>FAQ</h5>
+      <a class="other-link" href="https://gitter.zendesk.com/hc/en-us/sections/200062201-Github">Github</a>
+      <a class="other-link" href="https://gitter.zendesk.com/hc/en-us/sections/200062962-Feedback">Feedback</a>
+      <a class="other-link" href="https://gitter.zendesk.com/hc/en-us/sections/200065242-General">General</a>
+      <a class="other-link" href="https://gitter.zendesk.com/hc/en-us/sections/200062942-Technical-stuff">Technical Stuff</a>
+    </section>
+    <section class="what">
+      <h3>Gitter API</h3>
+      <a class="section-link" href="https://developer.gitter.im">developer.gitter.im</a>
+      <a class="other-link" href="https://developer.gitter.im/docs/rest-api">Rest API</a><br>
+      <a class="other-link" href="https://developer.gitter.im/docs/streaming-api">Streaming API</a><br>
+      <a class="other-link" href="https://developer.gitter.im/docs/faye-endpoint">Faye</a><br>
+      <a class="other-link" href="https://developer.gitter.im/docs/services">Services</a>
+    </section>
+    <section class="what">
+      <h3>On Gitter</h3>
+      <p><a href="/gitterHQ/gitter" target="_parent">gitterHQ/gitter</a> for general product stuff</p>
+      <p><a href="/gitterHQ/developers" target="_parent">gitterHQ/developers</a> for Gitter API developer questions</p>
+    </section>
+    <section class="what">
+      <h3>Old School</h3>
+      <a class="section-link" href="mailto:team@gitter.im">team@gitter.im</a>
+    </section>
+    <section class="what">
+      <h3>Twitter</h3>
+      <a class="section-link" href="https://twitter.com/gitchat">@gitchat</a>
+    </section>
+    <section class="what">
+      <h3>Raise an Issue</h3>
+      <a class="section-link" href="https://github.com/gitterHQ/gitter/issues">github.com/gitterHQ/gitter/issues</a>
+    </section>
+  </div>
+
+  {{{ generateTroupeContext troupeContext }}}
+</body>
+</html>

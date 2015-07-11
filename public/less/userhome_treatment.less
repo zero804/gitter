@@ -33,6 +33,11 @@ body {
   font-weight: 200;
 }
 
+.userhome__header__nav a {
+  color: inherit;
+  text-decoration: none;
+}
+
 .userhome__header__title {
   position: absolute;
   bottom: 0;
@@ -151,4 +156,66 @@ body {
   width: 76px;
   top: 7px;
   left: 12px;
+}
+
+.grapes {
+  margin: 4rem 0 1rem 6rem;
+    display: flex;
+  flex-wrap: wrap;
+}
+
+.what {
+  flex-shrink: 0;
+  flex-basis: 14em;
+  flex-grow: 1;
+  margin-right: 3em;
+  margin-bottom: 3em;
+  width: 258px;
+
+  h3 {
+    margin-bottom: 1rem;
+  }
+
+  h5 {
+    color: grey;
+    font-size: small;
+  }
+
+  a {
+    color: @homepage-green;
+    font-weight: 200;
+    text-decoration: none;
+  }
+
+  a.section-link {
+    display: block;
+    margin-bottom: 1rem;
+  }
+
+  a.other-link {
+    text-transform: uppercase;
+    font-size: 0.7em;
+    margin-bottom: 0.5rem;
+    display: inline-block;
+    margin-right: 1em;
+  }
+
+  p {
+    margin: 0;
+    margin-bottom: 0.5rem;
+    color: grey;
+    font-weight: 200;
+  }
+}
+
+.arrow {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  transform: rotate(45deg);
+  border-right: 1px solid;
+  border-top: 1px solid;
+  margin-bottom: 2px;
+  margin-left: 0.5em;
+  margin-right: 0.5em;
 }
