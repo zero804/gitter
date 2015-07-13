@@ -329,59 +329,47 @@ function findOrCreateOneToOneTroupe(userId1, userId2) {
   });
 
   // Need to use $elemMatch due to a regression in Mongo 2.6, see https://jira.mongodb.org/browse/SERVER-13843
-  return persistence.Troupe.updateQ(
-    { $and: [
-      { oneToOne: true },
-      { 'users': {$elemMatch: {userId: userId1} }},
-      { 'users': {$elemMatch: {userId: userId2} }}
-      ]},
-    {
-      $setOnInsert: insertFields
-    },
-    {
-      upsert: true,
-    }).spread(function(numAffected, raw) {
-      return persistence.Troupe.findOneQ(
-        { $and: [
-          { oneToOne: true },
-          { 'users.userId': userId1 },
-          { 'users.userId': userId2 }
-          ]})
-        .then(function(troupe) {
-          if(!raw.upserted) return troupe;
+  return mongooseUtils.upsert(persistence.Troupe, {
+      $and: [
+        { oneToOne: true },
+        { 'users': {$elemMatch: {userId: userId1} }},
+        { 'users': {$elemMatch: {userId: userId2} }}
+        ]},
+      {
+        $setOnInsert: insertFields
+      })
+    .spread(function(troupe, updatedExisting) {
+      if(updatedExisting) return troupe;
 
-          logger.verbose('Created a oneToOne troupe for ', { userId1: userId1, userId2: userId2 });
+      logger.verbose('Created a oneToOne troupe for ', { userId1: userId1, userId2: userId2 });
 
-          stats.event('new_troupe', {
-            troupeId: troupe.id,
-            oneToOne: true,
-            userId: userId1,
-            oneToOneUpgrade: false
-          });
+      stats.event('new_troupe', {
+        troupeId: troupe.id,
+        oneToOne: true,
+        userId: userId1,
+        oneToOneUpgrade: false
+      });
 
-          // TODO: do this here to get around problems with
-          // circular dependencies. This will probably need to change in
-          // future
-          var restSerializer = require('../serializers/rest-serializer');
+      // TODO: do this here to get around problems with
+      // circular dependencies. This will probably need to change in
+      // future
+      var restSerializer = require('../serializers/rest-serializer');
 
-          troupe.users.forEach(function(troupeUser) {
-            var currentUserId = troupeUser.userId;
-            var url = '/user/' + currentUserId + '/rooms';
+      troupe.users.forEach(function(troupeUser) {
+        var currentUserId = troupeUser.userId;
+        var url = '/user/' + currentUserId + '/rooms';
 
-            var strategy = new restSerializer.TroupeStrategy({ currentUserId: currentUserId });
+        var strategy = new restSerializer.TroupeStrategy({ currentUserId: currentUserId });
 
-            restSerializer.serialize(troupe, strategy, function(err, serializedModel) {
-              if(err) return logger.error('Error while serializing oneToOne troupe: ' + err, { exception: err });
-              appEvents.dataChange2(url, 'create', serializedModel);
-            });
-
-          });
-
-          return troupe;
+        restSerializer.serialize(troupe, strategy, function(err, serializedModel) {
+          if(err) return logger.error('Error while serializing oneToOne troupe: ' + err, { exception: err });
+          appEvents.dataChange2(url, 'create', serializedModel);
         });
 
       });
 
+      return troupe;
+    });
 }
 
 /**

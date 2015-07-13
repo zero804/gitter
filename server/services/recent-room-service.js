@@ -90,7 +90,7 @@ function addTroupeAsFavouriteInLastPosition(userId, troupeId) {
       return persistence.UserTroupeFavourites.updateQ(
         { userId: userId },
         { $set: setOp },
-        { upsert: true })
+        { upsert: true, new: true })
         .thenResolve(lastPosition);
     });
 }
@@ -139,7 +139,7 @@ function addTroupeAsFavouriteInPosition(userId, troupeId, position) {
       return persistence.UserTroupeFavourites.updateQ(
         { userId: userId },
         update,
-        { upsert: true })
+        { upsert: true, new: true })
         .thenResolve(position);
     });
 
@@ -211,7 +211,7 @@ function clearLastVisitedTroupeforUserId(userId, troupeId) {
   return persistence.UserTroupeLastAccess.updateQ(
          { userId: userId },
          { $unset: setOp },
-         { upsert: true });
+         { upsert: true, new: true });
 }
 
 function saveUserTroupeLastAccess(userId, troupeId, lastAccessTime) {
@@ -224,7 +224,7 @@ function saveUserTroupeLastAccess(userId, troupeId, lastAccessTime) {
   return persistence.UserTroupeLastAccess.updateQ(
      { userId: userId },
      { $set: setOp },
-     { upsert: true });
+     { upsert: true, new: true });
 }
 
 /**

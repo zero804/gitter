@@ -832,9 +832,7 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
               userCount:  user ? 1 : 0
             }
           },
-          {
-            upsert: true
-          })
+          { upsert: true, new: true })
           .then(function (newRoom) {
 
             emailNotificationService.createdRoomNotification(user, newRoom); // send an email to the room's owner

@@ -72,7 +72,7 @@ exports.registerDevice = function(deviceId, deviceType, deviceToken, deviceName,
       appBuild: appBuild,
       enabled: true
     },
-    { upsert: true })
+    { upsert: true, new: true })
     .then(function(device) {
       // After we've update the device, look for other devices that have given us the same token
       // these are probably phones that have been reset etc, so we need to prune them
@@ -99,7 +99,7 @@ exports.registerAndroidDevice = function(deviceId, deviceName, registrationId, a
       appVersion: appVersion,
       enabled: true
     },
-    { upsert: true })
+    { upsert: true, new: true })
     .then(function(device) {
       // After we've update the device, look for other devices that have given us the same token
       // these are probably phones that have been reset etc, so we need to prune them
@@ -113,7 +113,7 @@ exports.registerUser = function(deviceId, userId, callback) {
   return PushNotificationDevice.findOneAndUpdateQ(
     { deviceId: deviceId },
     { deviceId: deviceId, userId: userId, timestamp: new Date() },
-    { upsert: true })
+    { upsert: true, new: true })
     .nodeify(callback);
 };
 
