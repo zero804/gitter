@@ -86,8 +86,9 @@ function removeUserFromRoom(room, user, requestingUser) {
   });
 }
 
+
 module.exports = {
   userLeaveRoom: userLeaveRoom,
   removeRecentRoomForUser: removeRecentRoomForUser,
-  removeUserFromRoom: removeUserFromRoom
+  removeUserFromRoom: removeUserFromRoom,
 };
