@@ -10,19 +10,30 @@ body {
   box-sizing: border-box;
 }
 
-.userhome {
-  display: flex;
-  flex-direction: column;
-}
-
-.userhome__header {
+.userhome-header {
   background: url('../images/home/banner.jpg') no-repeat center center;
   height: 16em;
   position: relative;
   color: white;
 }
 
-.userhome__header__nav {
+.userhome-header__logo {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  position: absolute;
+  top: 20px;
+  left: 6em;
+}
+
+.userhome-header__logo-text {
+  position: relative;
+  width: 76px;
+  top: 7px;
+  left: 12px;
+}
+
+.userhome-header__nav {
   background-color: rgba(255, 255, 255 ,0.3);
   width: 100%;
   height: 2em;
@@ -33,7 +44,7 @@ body {
   font-weight: 200;
 }
 
-.userhome__header__nav a {
+.userhome-header__nav a {
   color: inherit;
   text-decoration: none;
   opacity: 0.6;
@@ -43,7 +54,20 @@ body {
   }
 }
 
-.userhome__header__title {
+.userhome-header__nav-arrow {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  transform: rotate(45deg);
+  border-right: 1px solid;
+  border-top: 1px solid;
+  margin-bottom: 2px;
+  margin-left: 0.5em;
+  margin-right: 0.5em;
+  opacity: 0.6;
+}
+
+.userhome-header__title {
   position: absolute;
   bottom: 0;
   margin: 3rem 0 3rem 6rem;
@@ -153,22 +177,6 @@ body {
   font-size: 0.75em;
 }
 
-.nli-menu-treatment__logo {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  position: absolute;
-  top: 20px;
-  left: 6em;
-}
-
-.nli-menu-treatment__logo-text {
-  position: relative;
-  width: 76px;
-  top: 7px;
-  left: 12px;
-}
-
 .learn-section {
   flex-shrink: 0;
   flex-basis: 14em;
@@ -210,17 +218,4 @@ body {
   margin-bottom: 0.5rem;
   display: inline-block;
   margin-right: 1em;
-}
-
-.arrow {
-  display: inline-block;
-  width: 5px;
-  height: 5px;
-  transform: rotate(45deg);
-  border-right: 1px solid;
-  border-top: 1px solid;
-  margin-bottom: 2px;
-  margin-left: 0.5em;
-  margin-right: 0.5em;
-  opacity: 0.6;
 }
