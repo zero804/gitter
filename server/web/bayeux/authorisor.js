@@ -12,6 +12,12 @@ var bayeuxExtension   = require('./extension');
 var Q                 = require('q');
 var userCanAccessRoom = require('../../services/user-can-access-room');
 
+var survivalMode = !!process.env.SURVIVAL_MODE || false;
+
+if (survivalMode) {
+  logger.error("WARNING: Running in survival mode");
+}
+
 // TODO: use a lightweight routing library for this....
 // Strategies for authenticating that a user can subscribe to the given URL
 var routes = [{
@@ -125,14 +131,26 @@ function populateSubTroupeCollection(options) {
 
   switch(collection) {
     case "chatMessages":
+      if (survivalMode) {
+        return Q.resolve(arrayToSnapshot('room.events')([]));
+      }
+
       return restful.serializeChatsForTroupe(troupeId, userId, snapshotOptions)
         .then(arrayToSnapshot('room.chatMessages'));
 
-    case "users": 
+    case "users":
+      if (survivalMode) {
+        return Q.resolve(arrayToSnapshot('room.events')([]));
+      }
+
       return restful.serializeUsersForTroupe(troupeId, userId, snapshotOptions)
       .then(arrayToSnapshot('room.users'));
 
     case "events":
+      if (survivalMode) {
+        return Q.resolve(arrayToSnapshot('room.events')([]));
+      }
+
       return restful.serializeEventsForTroupe(troupeId, userId)
         .then(arrayToSnapshot('room.events'));
 
