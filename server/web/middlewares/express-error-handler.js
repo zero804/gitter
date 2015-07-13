@@ -4,9 +4,8 @@
 var env = require('gitter-web-env');
 var config         = env.config;
 var logger         = env.logger;
-var stats          = env.stats;
 var errorReporter  = env.errorReporter;
-
+var statsClient    = env.createStatsClient({ prefix: config.get('stats:statsd:prefix') });
 var _              = require('underscore');
 
 function linkStack(stack) {
@@ -21,6 +20,22 @@ function linkStack(stack) {
   }).join('\n');
 }
 
+function stat(name, req, additionalTags) {
+  var user = req.user;
+  var username = user && user.username;
+  var tags = additionalTags || [];
+
+  if (username) {
+    tags.push('user:' + username);
+  }
+
+  if (req.path) {
+    tags.push('path:' + req.path);
+  }
+
+  statsClient.increment(name, 1, 1, tags);
+}
+
 
 /* Has to have four args */
 module.exports = function(err, req, res, next) { // jshint unused:false
@@ -30,7 +45,6 @@ module.exports = function(err, req, res, next) { // jshint unused:false
   var status = 500;
   var template = '500';
   var message = "An unknown error occurred";
-  var stack = err && err.stack;
   var extraTemplateValues;
 
   if(_.isNumber(err)) {
@@ -64,12 +78,11 @@ module.exports = function(err, req, res, next) { // jshint unused:false
     return;
   }
 
-
   if(status >= 500) {
     // Send to sentry
     errorReporter (err, { type: 'response', status: status, userId: userId, url: req.url, method: req.method });
     // Send to statsd
-    stats.event('client_error_5xx', { userId: userId, url: req.url });
+    stat('client_error_5xx', req);
 
     extraTemplateValues = {
       title: 'Error ' + status
@@ -83,22 +96,20 @@ module.exports = function(err, req, res, next) { // jshint unused:false
     });
 
     if(err.stack) {
-      logger .error('Error: ' + err.stack);
+      logger.error('Error: ' + err.stack);
     }
 
   } else if(status === 404) {
-    stats.event('client_error_404', { userId: userId });
+    stat('client_error_404', req);
 
     extraTemplateValues = {
       title: 'Page Not Found'
     };
 
     template = status.toString();
-    stack = null;
   } else if(status === 402) {
     /* HTTP 402 = Payment required */
     template = status.toString();
-    stack = null;
 
     var room = err.uri;
     var org = room.split('/')[0];
@@ -109,9 +120,12 @@ module.exports = function(err, req, res, next) { // jshint unused:false
       billingUrl: config.get('web:billingBaseUrl')  + '/bill/' + err.uri,
     };
 
-    stats.event('client_error_402', { userId: userId });
+    stat('client_error_402', req);
+
+  } else if(status === 429) {
+    stat('client_error_429', req);
   } else if(status >= 400 && status < 500) {
-    stats.event('client_error_4xx', { userId: userId });
+    stat('client_error_4xx', req, ['status:' + status]);
   }
 
   res.status(status);
@@ -124,7 +138,8 @@ module.exports = function(err, req, res, next) { // jshint unused:false
          user: req.user,
          userMissingPrivateRepoScope: req.user && !req.user.hasGitHubScope('repo'),
          message: message,
-         stack: config.get('express:showStack') && stack ? linkStack(stack) : null
+         // Only generate the stack-frames when we need to
+         stack: config.get('express:showStack') && err && err.stack && linkStack(err.stack)
        }, extraTemplateValues));
     },
     json: function() {
