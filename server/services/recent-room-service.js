@@ -322,7 +322,7 @@ function findLastAccessTimesForUsersInRoom(roomId, userIds) {
   orClause[1][lastKey] = { $exists: true };
   orClause[2][addedKey] = { $exists: true };
 
-  var query = { userId: { $in: userIds }, $or: [orClause] };
+  var query = { userId: { $in: userIds }, $or: orClause };
 
   var select = { userId: 1, _id: 0 };
   select[troupesKey] = 1;
