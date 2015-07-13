@@ -13,7 +13,7 @@
     "cypher-promise": "^1.0.1",
     "debug": "^2.2.0",
     "diskspace": "0.1.5",
-    "dolph": "^0.1.1",
+    "dolph": "^0.2.0",
     "elasticsearch": "^2.4.3",
     "email-validator": "^1.0.0",
     "ent": "~0.1.0",
