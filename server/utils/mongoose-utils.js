@@ -83,9 +83,10 @@ exports.cloneSchema = function(schema) {
  * Returns a promise [document, updatedExisting]
  */
 exports.upsert = function(schema, query, setOperation) {
-  return schema.updateQ(query, setOperation, { upsert: true })
-    .spread(function(numAffected, raw) {
-      return [schema.findOneQ(query), !!raw.updatedExisting];
+  return schema.findOneAndUpdateQ(query, setOperation, { upsert: true, new: false })
+    .then(function(doc) {
+      console.log('GOT BACK ', doc);
+      return Q.all([schema.findOneQ(query), !!doc]);
     });
 };
 

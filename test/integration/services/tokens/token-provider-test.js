@@ -60,9 +60,7 @@ describe('token-provider', function() {
             expires: new Date(Date.now() + 100000)
           }
         },
-        {
-          upsert: true
-        }, function(err, result) {
+        { upsert: true, new: true }, function(err, result) {
           if (err) return done(err);
 
           var token = result.token;
