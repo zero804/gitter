@@ -4,6 +4,7 @@
 var env            = require('gitter-web-env');
 var mongoose       = require('../utils/mongoose-q');
 var winston        = require('../utils/winston');
+var debug          = require('debug')('gitter:persistence-service');
 
 // Install inc and dec number fields in mongoose
 require('mongoose-number')(mongoose);
@@ -12,6 +13,10 @@ require('mongoose-number')(mongoose);
 env.mongo.configureMongoose(mongoose);
 
 var connection = mongoose.connection;
+
+if (debug.enabled) {
+  mongoose.set('debug', true);
+}
 
 connection.on('error', function(err) {
   winston.info("MongoDB connection error", { exception: err });
