@@ -35,7 +35,6 @@ var WELCOME_MESSAGES = [
   'Code for people',
   'Talk about it',
   "Let's try something new",
-  'Developers, developers, developers',
   'Computers are pretty cool',
   "Don't build Skynet",
   'Make the world better',
