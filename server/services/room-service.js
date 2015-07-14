@@ -1238,16 +1238,6 @@ function updateTroupeLurkForUserId(userId, troupeId, lurk) {
       // Did a change did not occur?
       if(!changed) return;
 
-      stats.event("lurk_room", {
-        userId: '' + userId,
-        troupeId: '' + troupeId,
-        lurking: lurk
-      });
-
-      appEvents.userTroupeLurkModeChange({ userId: userId, troupeId: troupeId, lurk: lurk });
-      // TODO: in future get rid of this but this collection is used by the native clients
-      appEvents.dataChange2('/user/' + userId + '/rooms', 'patch', { id: troupeId, lurk: lurk });
-
       if(lurk) {
         // Delete all the chats in Redis for this person too
         return unreadItemService.markAllChatsRead(userId, troupeId, { member: true });
@@ -1255,8 +1245,6 @@ function updateTroupeLurkForUserId(userId, troupeId, lurk) {
     });
 }
 exports.updateTroupeLurkForUserId = updateTroupeLurkForUserId;
-
-
 
 function searchRooms(userId, queryText, options) {
 
