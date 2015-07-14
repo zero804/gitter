@@ -120,7 +120,6 @@ exports.install = function(persistenceService) {
     onCreate: function(model, next) {
       var url = chatUrlExtractor(model);
       if(!url) return;
-
       serializeEvent(url, 'create', model, function(err, serializedModel) {
         // serializeEvent already reports errors, no need here
         if(err || !serializedModel) return;
