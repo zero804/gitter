@@ -33,7 +33,7 @@ exports.serializeTroupesForUser = function(userId, callback) {
     .then(function(troupeIds) {
       var strategy = new restSerializer.TroupeIdStrategy({
         currentUserId: userId,
-        mapUsers: false
+        // mapUsers: false
       });
 
       return restSerializer.serializeExcludeNulls(troupeIds, strategy);
@@ -142,7 +142,7 @@ exports.serializeEventsForTroupe = function(troupeId, userId, callback) {
 exports.serializeOrgsForUser = function(user, options) {
   var ghUser = new GithubMe(user);
 
-  var strategyOptions = { currentUserId: user.id, mapUsers: options && options.mapUsers };
+  var strategyOptions = { currentUserId: user.id /*, mapUsers: options && options.mapUsers */ };
 
   return ghUser.getOrgs()
     .then(function(ghOrgs) {

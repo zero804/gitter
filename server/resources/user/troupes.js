@@ -27,7 +27,7 @@ module.exports = {
 
   show: function(req, res, next) {
     var strategyOptions = { currentUserId: req.resourceUser.id };
-    if (req.query.include_users) strategyOptions.mapUsers = true;
+    // if (req.query.include_users) strategyOptions.mapUsers = true;
 
     var strategy = new restSerializer.TroupeStrategy(strategyOptions);
 
@@ -53,7 +53,8 @@ module.exports = {
         if('favourite' in updatedTroupe) {
           var fav = updatedTroupe.favourite;
 
-          if(!fav || troupeService.userHasAccessToTroupe(req.resourceUser, troupe)) {
+          // FIXME: NOCOMMIT
+          if(!fav || troupeService.THIS_DOES_NOT_EXIST_userHasAccessToTroupe(req.resourceUser, troupe)) {
             promises.push(recentRoomService.updateFavourite(userId, troupeId, fav));
           } else {
             // The user has added a favourite that they don't belong to

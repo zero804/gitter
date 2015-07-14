@@ -16,31 +16,28 @@ var liveCollectionEvents = require('../live-collection-events');
 module.exports = {
   install: function(mongooseConnection) {
 
-    //
-    // User in a Troupe
-    //
-    var TroupeUserSchema = new Schema({
-      userId: { type: ObjectId },
-      deactivated: { type: Boolean },
-      lurk: { type: Boolean },
-      /** Lurk settings
-        *  false, undefined: no lurking
-        *  true: lurking
-        */
-    });
-    TroupeUserSchema.schemaTypeName = 'TroupeUserSchema';
-
     var TroupeBannedUserSchema = new Schema({
       userId: { type: ObjectId },
       dateBanned: { type: Date, "default": Date.now },
       bannedBy: { type: ObjectId }
     });
     TroupeBannedUserSchema.schemaTypeName = 'TroupeBannedUserSchema';
+    var TroupeBannedUser = mongooseConnection.model('TroupeBannedUser', TroupeBannedUserSchema);
+
+    //
+    // User in a Troupe
+    //
+    var TroupeOneToOneUserSchema = new Schema({
+      userId: { type: ObjectId },
+      deactivated: { type: Boolean }
+    });
+    TroupeOneToOneUserSchema.schemaTypeName = 'TroupeOneToOneUserSchema';
+    var TroupeOneToOneUser = mongooseConnection.model('TroupeOneToOneUser', TroupeOneToOneUserSchema);
+
     //
     // A Troupe
     //
     var TroupeSchema = new Schema({
-      name: { type: String },
       topic: { type: String, 'default':'' },
       uri: { type: String },
       tags: [String],
@@ -49,9 +46,10 @@ module.exports = {
       lcOwner: { type: String, 'default': function() { return this.uri ? this.uri.split('/')[0].toLowerCase() : null; } },
       status: { type: String, "enum": ['ACTIVE', 'DELETED'], "default": 'ACTIVE'},  // DEPRECATED. TODO: remove this
       oneToOne: { type: Boolean, "default": false },
-      users: [TroupeUserSchema],
+      // users: [TroupeUserSchema],
+      oneToOneUsers: [TroupeOneToOneUserSchema],
       // USER COUNT MAY NOT BE UP TO DATE. ONLY USE IT FOR QUERIES, NOT FOR ITERATION ETC.
-      userCount: { type: Number, 'default': function() { return this.users ? this.users.length : 0; } },
+      userCount: { type: Number },
       bans: [TroupeBannedUserSchema],
       parentId: { type: ObjectId, required: false },
       ownerUserId: { type: ObjectId, required: false }, // For channels under a user /suprememoocow/custom
@@ -64,7 +62,8 @@ module.exports = {
       renamedLcUris: [String],
       _nonce: { type: Number },
       _tv: { type: 'MongooseNumber', 'default': 0 }
-    });
+    }, { strict: 'throw' });
+
     TroupeSchema.schemaTypeName = 'TroupeSchema';
 
     TroupeSchema.path('security').validate(function (value) {
@@ -79,57 +78,56 @@ module.exports = {
     TroupeSchema.index({ parentId: 1 });
     TroupeSchema.index({ lcOwner: 1 });
     TroupeSchema.index({ ownerUserId: 1 });
-    TroupeSchema.index({ "users.userId": 1 });
-    TroupeSchema.index({ "users.userId": 1,  "users.deactivated": 2 });
+    TroupeSchema.index({ lcUri: 1 }, { unique: true, sparse: true });
+
+    TroupeSchema.index({ "oneToOneUsers.userId": 1 }, { unique: true, sparse: true });
+    TroupeSchema.index({ "oneToOneUsers.userId": 1,  "oneToOneUsers.deactivated": 2 },  { unique: true, sparse: true });
+
     TroupeSchema.pre('save', function (next) {
       this.lcUri =  this.uri ? this.uri.toLowerCase() : null;
-      this.userCount =  this.users ? this.users.length : 0;
       next();
+      // if (this.security !== 'PUBLIC') return next();
+      // if (this.)
+      // if(this.security !== 'PUBLIC' || this.tags && this.tags.length) {
+      //   // not worth tagging, or already tagged.
+      //   return next();
+      // }
+      //
+      // /* Don't tag test repos */
+      // if(this.githubType === 'REPO' && this.uri.indexOf("_test_") !== 0) {
+      //   var repoService = new RepoService(this.users[0]);
+      //   var self = this;
+      //
+      //   return repoService.getRepo(this.uri)
+      //     .then(function(repo) {
+      //       assert(repo, 'repo lookup failed');
+      //
+      //       self.tags = tagger(self, repo);
+      //     })
+      //     .catch(function(err) {
+      //       winston.warn('repo lookup or tagging failed for ' + this.uri + ' , skipping tagging for now', { exception: err });
+      //     })
+      //     .finally(function() {
+      //       next();
+      //     });
+      //
+      // }
+      //
+      // this.tags = tagger(this);
+      // next();
     });
 
-    TroupeSchema.pre('save', function (next) {
-      if(this.security !== 'PUBLIC' ||
-        !(this.users && this.users.length) ||
-        this.tags && this.tags.length) {
-        // not worth tagging, or already tagged.
-        return next();
-      }
+    // TroupeSchema.methods.getUserIds = function() {
+    //   return troupeUtils.getUserIds(this);
+    // };
 
-      /* Don't tag test repos */
-      if(this.githubType === 'REPO' && this.uri.indexOf("_test_") !== 0) {
-        var repoService = new RepoService(this.users[0]);
-        var self = this;
+    // TroupeSchema.methods.findTroupeUser = function(userId) {
+    //   return troupeUtils.findTroupeUser(this, userId);
+    // };
 
-        return repoService.getRepo(this.uri)
-          .then(function(repo) {
-            assert(repo, 'repo lookup failed');
-
-            self.tags = tagger(self, repo);
-          })
-          .catch(function(err) {
-            winston.warn('repo lookup or tagging failed for ' + this.uri + ' , skipping tagging for now', { exception: err });
-          })
-          .finally(function() {
-            next();
-          });
-
-      }
-
-      this.tags = tagger(this);
-      next();
-    });
-
-    TroupeSchema.methods.getUserIds = function() {
-      return troupeUtils.getUserIds(this);
-    };
-
-    TroupeSchema.methods.findTroupeUser = function(userId) {
-      return troupeUtils.findTroupeUser(this, userId);
-    };
-
-    TroupeSchema.methods.containsUserId = function(userId) {
-      return troupeUtils.containsUserId(this, userId);
-    };
+    // TroupeSchema.methods.containsUserId = function(userId) {
+    //   return troupeUtils.containsUserId(this, userId);
+    // };
 
     TroupeSchema.methods.getOtherOneToOneUserId = function(knownUserId) {
       return troupeUtils.getOtherOneToOneUserId(this, knownUserId);
@@ -141,80 +139,78 @@ module.exports = {
       this.bans.push(ban);
       return ban;
     };
-
-    TroupeSchema.methods.addUserById = function(userId, options) {
-      assert(!this.oneToOne);
-
-      var exists = this.users.some(function(user) { return user.userId == userId; });
-      if(exists) {
-        throw new Error("User already exists in this troupe.");
-      }
-
-      var raw = { userId: userId };
-      if(options && 'lurk' in options) {
-        raw.lurk = options.lurk;
-      }
-
-      // TODO: disable this methods for one-to-one troupes
-      var troupeUser = new TroupeUser(raw);
-      this.post('save', function(postNext) {
-        return liveCollectionEvents.serializeUserAddedToRoom(this, troupeUser)
-          .nodeify(postNext);
-      });
-
-      return this.users.push(troupeUser);
-    };
-
-    TroupeSchema.methods.removeUserById = function(userId) {
-      assert(userId);
-
-      debug("Troupe.removeUserById userId=%s troupeId=%s", userId, this.id);
-
-      // TODO: disable this methods for one-to-one troupes
-      var troupeUser = _.find(this.users, function(troupeUser){ return troupeUser.userId == userId; });
-
-      if(troupeUser) {
-        // TODO: unfortunately the TroupeUser middleware remove isn't being called as we may have expected.....
-        this.post('save', function(postNext) {
-          return liveCollectionEvents.serializeUserRemovedFromRoom(this, userId)
-            .nodeify(postNext);
-        });
-
-        if(this.oneToOne) {
-          troupeUser.deactivated = true;
-        } else {
-          troupeUser.remove();
-        }
-
-      } else {
-        winston.warn("Troupe.removeUserById: User " + userId + " not in troupe " + this.id);
-      }
-    };
-
-    TroupeSchema.methods.reactivateUserById = function(userId) {
-      assert(userId);
-      assert(this.oneToOne);
-
-      debug("Troupe.reactivateUserById userId=%s troupeId=%s", userId, this.id);
-
-      // TODO: disable this methods for one-to-one troupes
-      var troupeUser = _.find(this.users, function(troupeUser){ return troupeUser.userId == userId; });
-
-      if(troupeUser) {
-        // TODO: unfortunately the TroupeUser middleware remove isn't being called as we may have expected.....
-        this.post('save', function(postNext) {
-          liveCollectionEvents.serializeOneToOneTroupeEvent(userId, "create", this, postNext);
-        });
-
-        troupeUser.deactivated = undefined;
-      } else {
-        winston.warn("Troupe.reactivateUserById: User " + userId + " not in troupe " + this.id);
-      }
-    };
+    //
+    // TroupeSchema.methods.addUserById = function(userId, options) {
+    //   assert(!this.oneToOne);
+    //
+    //   var exists = this.users.some(function(user) { return user.userId == userId; });
+    //   if(exists) {
+    //     throw new Error("User already exists in this troupe.");
+    //   }
+    //
+    //   var raw = { userId: userId };
+    //   if(options && 'lurk' in options) {
+    //     raw.lurk = options.lurk;
+    //   }
+    //
+    //   // TODO: disable this methods for one-to-one troupes
+    //   var troupeUser = new TroupeUser(raw);
+    //   this.post('save', function(postNext) {
+    //     return liveCollectionEvents.serializeUserAddedToRoom(this, troupeUser)
+    //       .nodeify(postNext);
+    //   });
+    //
+    //   return this.users.push(troupeUser);
+    // };
+    //
+    // TroupeSchema.methods.removeUserById = function(userId) {
+    //   assert(userId);
+    //
+    //   debug("Troupe.removeUserById userId=%s troupeId=%s", userId, this.id);
+    //
+    //   // TODO: disable this methods for one-to-one troupes
+    //   var troupeUser = _.find(this.users, function(troupeUser){ return troupeUser.userId == userId; });
+    //
+    //   if(troupeUser) {
+    //     // TODO: unfortunately the TroupeUser middleware remove isn't being called as we may have expected.....
+    //     this.post('save', function(postNext) {
+    //       return liveCollectionEvents.serializeUserRemovedFromRoom(this, userId)
+    //         .nodeify(postNext);
+    //     });
+    //
+    //     if(this.oneToOne) {
+    //       troupeUser.deactivated = true;
+    //     } else {
+    //       troupeUser.remove();
+    //     }
+    //
+    //   } else {
+    //     winston.warn("Troupe.removeUserById: User " + userId + " not in troupe " + this.id);
+    //   }
+    // };
+    //
+    // TroupeSchema.methods.reactivateUserById = function(userId) {
+    //   assert(userId);
+    //   assert(this.oneToOne);
+    //
+    //   debug("Troupe.reactivateUserById userId=%s troupeId=%s", userId, this.id);
+    //
+    //   // TODO: disable this methods for one-to-one troupes
+    //   var troupeUser = _.find(this.users, function(troupeUser){ return troupeUser.userId == userId; });
+    //
+    //   if(troupeUser) {
+    //     // TODO: unfortunately the TroupeUser middleware remove isn't being called as we may have expected.....
+    //     this.post('save', function(postNext) {
+    //       liveCollectionEvents.serializeOneToOneTroupeEvent(userId, "create", this, postNext);
+    //     });
+    //
+    //     troupeUser.deactivated = undefined;
+    //   } else {
+    //     winston.warn("Troupe.reactivateUserById: User " + userId + " not in troupe " + this.id);
+    //   }
+    // };
 
     var Troupe = mongooseConnection.model('Troupe', TroupeSchema);
-    var TroupeUser = mongooseConnection.model('TroupeUser', TroupeUserSchema);
-    var TroupeBannedUser = mongooseConnection.model('TroupeBannedUser', TroupeBannedUserSchema);
 
     return {
       model: Troupe,
