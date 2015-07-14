@@ -25,8 +25,7 @@ batcher.listen(function(key, userIdStrings, done) {
   persistence.ChatMessage.findOneAndUpdate(
     { _id: chatId, toTroupeId: troupeId },
     { $addToSet:  { 'readBy': { $each: userIds } } },
-    { select: { readBy: 1, _tv: 1 } },
-    { new: true },
+    { select: { readBy: 1, _tv: 1 }, new: true },
     function(err, chat) {
       if(err) return done(err);
 
