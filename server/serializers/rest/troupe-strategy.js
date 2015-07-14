@@ -224,16 +224,16 @@ function TroupeStrategy(options) {
     });
 
     var userIds;
-    if(options.mapUsers) {
-      userIds = _.flatten(items.map(function(troupe) { return troupe.getUserIds(); }));
-    } else {
+    // if(options.mapUsers) {
+    //   userIds = _.flatten(items.map(function(troupe) { return troupe.getUserIds(); }));
+    // } else {
       userIds = _.flatten(items.map(function(troupe) {
-          if(troupe.oneToOne) return troupe.getUserIds();
+          if(troupe.oneToOne) return troupe.oneToOneUsers.map(function(f) { return f.userId; });
         })).filter(function(f) {
           return !!f;
         });
 
-    }
+    // }
 
     strategies.push({
       strategy: userIdStategy,
@@ -295,8 +295,8 @@ function TroupeStrategy(options) {
       topic: item.topic,
       uri: item.uri,
       oneToOne: item.oneToOne,
-      userCount: item.users.length,
-      users: options.mapUsers && !item.oneToOne ? item.users.map(function(troupeUser) { return userIdStategy.map(troupeUser.userId); }) : undefined,
+      userCount: item.userCount,
+      // users: options.mapUsers && !item.oneToOne ? item.users.map(function(troupeUser) { return userIdStategy.map(troupeUser.userId); }) : undefined,
       user: otherUser,
       unreadItems: unreadItemStategy ? unreadItemStategy.map(item.id) : undefined,
       mentions: mentionCountStrategy ? mentionCountStrategy.map(item.id) : undefined,

@@ -1,5 +1,3 @@
-/*jslint node: true, unused:true */
-/*global describe:true, it: true */
 "use strict";
 
 var testRequire = require('../test-require');
@@ -7,18 +5,26 @@ var Q = require('q');
 var assert = require('assert');
 var FAKE_USER = { id: 'superfake' };
 
-var subscritionFindResult;
+var subscritionFindResult, countUsersInRoomResult, checkRoomMembershipResult;
 
 var assertMemberLimit = testRequire.withProxies('./services/assert-member-limit', {
   './troupe-service': {
-    findByUri: function(uri) {
+    checkGitHubTypeForUri: function(uri, githubType) {
       if (uri === 'org') {
-        return Q.resolve({ githubType: 'ORG' });
+        return Q.resolve(githubType == 'ORG');
       } else if (uri === 'user') {
-        return Q.resolve({ githubType: 'NOT_ORG' });
+        return Q.resolve(githubType == 'NOT_ORG');
       } else {
-        return Q.resolve();
+        return Q.resolve(false);
       }
+    }
+  },
+  './room-membership-service': {
+    checkRoomMembership: function(/*troupeId, userId*/) {
+      return Q.resolve(checkRoomMembershipResult);
+    },
+    countMembersInRoom: function(/*troupeId*/) {
+      return Q.resolve(countUsersInRoomResult);
     }
   },
   './persistence-service': {
@@ -26,10 +32,13 @@ var assertMemberLimit = testRequire.withProxies('./services/assert-member-limit'
   }
 });
 
+
 describe('assert-member-limit:', function() {
 
   beforeEach(function() {
     subscritionFindResult = null;
+    countUsersInRoomResult = 100;
+    checkRoomMembershipResult = false;
   });
 
   describe('user room', function() {
@@ -38,7 +47,6 @@ describe('assert-member-limit:', function() {
       var room = {
         uri: 'user/room',
         security: 'PUBLIC',
-        users: createArray(100)
       };
 
       assertMemberLimit(room, FAKE_USER).nodeify(done);
@@ -48,8 +56,8 @@ describe('assert-member-limit:', function() {
       var room = {
         uri: 'user/room',
         security: 'PRIVATE',
-        users: createArray(100)
       };
+
 
       assertMemberLimit(room, FAKE_USER).nodeify(done);
     });
@@ -62,9 +70,8 @@ describe('assert-member-limit:', function() {
       var room = {
         uri: 'org/room',
         security: 'PUBLIC',
-        users: createArray(26)
       };
-
+      countUsersInRoomResult = 26;
       assertMemberLimit(room, FAKE_USER).nodeify(done);
     });
 
@@ -72,8 +79,8 @@ describe('assert-member-limit:', function() {
       var room = {
         uri: 'org/room',
         security: 'PRIVATE',
-        users: createArray(0)
       };
+      countUsersInRoomResult = 0;
 
       assertMemberLimit(room, FAKE_USER).nodeify(done);
     });
@@ -81,29 +88,27 @@ describe('assert-member-limit:', function() {
     it('allows undefined user to join private room with 10 people inside', function(done) {
       var room = {
         uri: 'org/room',
-        security: 'PRIVATE',
-        users: createArray(10)
+        security: 'PRIVATE'
       };
-
+      countUsersInRoomResult = 10;
       assertMemberLimit(room, undefined).nodeify(done);
     });
 
     it('allows user to join private room with 24 people inside', function(done) {
       var room = {
         uri: 'org/room',
-        security: 'PRIVATE',
-        users: createArray(24)
+        security: 'PRIVATE'
       };
-
+      countUsersInRoomResult = 24;
       assertMemberLimit(room, FAKE_USER).nodeify(done);
     });
 
     it('throws when user tries to join private room with 25 other people inside', function(done) {
       var room = {
         uri: 'org/room',
-        security: 'PRIVATE',
-        users: createArray(25)
+        security: 'PRIVATE'
       };
+      countUsersInRoomResult = 25;
 
       assertMemberLimit(room, FAKE_USER)
         .then(function() {
@@ -119,8 +124,8 @@ describe('assert-member-limit:', function() {
       var room = {
         uri: 'org/room',
         security: 'INHERITED',
-        users: createArray(25)
       };
+      countUsersInRoomResult = 25;
 
       assertMemberLimit(room, FAKE_USER)
         .then(function() {
@@ -135,8 +140,8 @@ describe('assert-member-limit:', function() {
     it('throws when user tries to join room with undefined security with 25 other people inside', function(done) {
       var room = {
         uri: 'org/room',
-        users: createArray(25)
       };
+      countUsersInRoomResult = 25;
 
       assertMemberLimit(room, FAKE_USER)
         .then(function() {
@@ -149,13 +154,12 @@ describe('assert-member-limit:', function() {
     });
 
     it('allows existing org user to join private room with 25 people inside', function(done) {
-      var users = createArray(25);
-      users.push({ userId: FAKE_USER.id });
+      countUsersInRoomResult = 26;
+      checkRoomMembershipResult = true;
 
       var room = {
         uri: 'org/room',
-        security: 'PRIVATE',
-        users: users
+        security: 'PRIVATE'
       };
 
       assertMemberLimit(room, FAKE_USER).nodeify(done);
@@ -163,11 +167,11 @@ describe('assert-member-limit:', function() {
 
     it('allows user to join private room with 25 people in the org with paid plan', function(done) {
       subscritionFindResult = { _id: 'im a subscription!' };
+      countUsersInRoomResult = 25;
 
       var room = {
         uri: 'org/room',
         security: 'PRIVATE',
-        users: createArray(25)
       };
 
       assertMemberLimit(room, FAKE_USER).nodeify(done);
@@ -178,20 +182,20 @@ describe('assert-member-limit:', function() {
   describe('repo room with no clear owner', function() {
 
     it('allows user to join public room', function(done) {
+      countUsersInRoomResult = 100;
       var room = {
         uri: 'xxx/room',
-        security: 'PUBLIC',
-        users: createArray(100)
+        security: 'PUBLIC'
       };
 
       assertMemberLimit(room, FAKE_USER).nodeify(done);
     });
 
     it('allows user to join private room', function(done) {
+      countUsersInRoomResult = 100;
       var room = {
         uri: 'xxx/room',
         security: 'PRIVATE',
-        users: createArray(100)
       };
 
       assertMemberLimit(room, FAKE_USER).nodeify(done);
@@ -200,12 +204,3 @@ describe('assert-member-limit:', function() {
   });
 
 });
-
-function createArray(userCount) {
-  var array = [];
-  for (var i = 0; i < userCount; i++) {
-    array.push({ userId: 'user' + i });
-  }
-
-  return array;
-}

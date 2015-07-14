@@ -135,6 +135,7 @@
     "gulp": "^3.8.11",
     "gulp-expect-file": "0.0.7",
     "gulp-git": "^0.5.4",
+    "gulp-grep-fail": "^0.2.0",
     "gulp-grep-stream": "0.0.2",
     "gulp-gzip": "0.0.8",
     "gulp-if": "^1.2.5",

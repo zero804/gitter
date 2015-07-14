@@ -39,7 +39,10 @@ var assertMemberLimit  = require('./assert-member-limit');
 var redisLockPromise   = require("../utils/redis-lock-promise");
 var unreadItemService  = require('./unread-item-service');
 var debug              = require('debug')('gitter:room-service');
+var roomMembershipService = require('./room-membership-service');
+
 var badgerEnabled      = nconf.get('autoPullRequest:enabled');
+
 exports.testOnly = {};
 
 function localUriLookup(uri, opts) {
@@ -152,8 +155,8 @@ exports.applyAutoHooksForRepoRoom = applyAutoHooksForRepoRoom;
 /**
  * Private method to push creates out to the bus
  */
-function serializeCreateEvent(troupe) {
-  var urls = troupe.users.map(function(troupeUser) { return '/user/' + troupeUser.userId + '/rooms'; });
+function serializeCreateEvent(troupe, initialUsers) {
+  var urls = initialUsers.map(function(userId) { return '/user/' + userId + '/rooms'; });
   serializeEvent(urls, 'create', troupe);
 }
 
@@ -276,10 +279,10 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri, options) {
                 topic: topic || "",
                 security: security,
                 dateLastSecurityCheck: new Date(),
-                users:  user ? [{
-                  _id: new ObjectID(),
-                  userId: user._id
-                }] : [],
+                // users:  user ? [{
+                //   _id: new ObjectID(),
+                //   userId: user._id
+                // }] : [],
                 userCount: user ? 1 : 0
               }
             })
@@ -315,7 +318,7 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri, options) {
               }
 
               /* The room was created atomically */
-              serializeCreateEvent(troupe);
+              serializeCreateEvent(troupe, user ? [user._id] : []);
 
               /* Created here */
               /* TODO: Later we'll need to handle private repos too */
@@ -390,24 +393,15 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri, options) {
 /**
  * Grant or remove the users access to a room
  * Makes the troupe reflect the users access to a room
+ *
+ * Returns true if changes were made
  */
 function ensureAccessControl(user, troupe, access) {
   if(troupe) {
     if(access) {
-      /* In troupe? */
-      if(troupe.containsUserId(user.id)) return Q.resolve(troupe);
-
-      troupe.addUserById(user.id);
-
-      return troupe.saveQ().thenResolve(troupe);
-
+      return roomMembershipService.addRoomMember(troupe._id, user._id);
     } else {
-      /* No access */
-      if(!troupe.containsUserId(user.id)) return Q.resolve(null);
-
-      troupe.removeUserById(user.id);
-
-      return troupe.saveQ().thenResolve(null);
+      return roomMembershipService.removeRoomMember(troupe._id, user._id);
     }
   }
 
@@ -418,7 +412,7 @@ function ensureAccessControl(user, troupe, access) {
 function findAllRoomsIdsForUserIncludingMentions(userId, callback) {
   return Q.all([
       unreadItemService.getRoomIdsMentioningUser(userId),
-      troupeService.findAllTroupesIdsForUser(userId)
+      roomMembershipService.findRoomIdsForUser(userId)
     ])
     .spread(function(mentions, memberships) {
       return _.uniq(mentions.concat(memberships));
@@ -582,18 +576,18 @@ function findOrCreateRoom(user, uri, options) {
           var hookCreationFailedDueToMissingScope = findOrCreateResult.hookCreationFailedDueToMissingScope;
           var didCreate = findOrCreateResult.didCreate;
 
-          // if the user has been granted access to the room, send join stats for the cases of being the owner or just joining the room
-          if(access && (didCreate || !troupe.containsUserId(user.id))) {
-            sendJoinStats(user, troupe, options.tracking);
-          }
-
           if (access && didCreate) {
             emailNotificationService.createdRoomNotification(user, troupe);  // now the san email to the room', wne
           }
 
           return ensureAccessControl(user, troupe, access)
-            .then(function (troupe) {
+            .then(function (userRoomMembershipChanged) {
               if (!access) return denyAccess(uriLookup); // please see comment about denyAccess
+
+              // if the user has been granted access to the room, send join stats for the cases of being the owner or just joining the room
+              if(access && (didCreate || userRoomMembershipChanged)) {
+                sendJoinStats(user, troupe, options.tracking);
+              }
 
               /* Async */
               updateRoomWithGithubIdIfRequired(user, troupe);
@@ -665,7 +659,6 @@ function findAllChannelsForUser(user, callback) {
 }
 exports.findAllChannelsForUser = findAllChannelsForUser;
 
-
 /**
  * Given parent and child ids, find a child channel that is
  * not PRIVATE
@@ -679,9 +672,6 @@ function findUsersChannelRoom(user, childTroupeId, callback) {
     .nodeify(callback);
 }
 exports.findUsersChannelRoom = findUsersChannelRoom;
-
-
-
 
 function assertValidName(name) {
   var matcher = xregexp('^[\\p{L}\\d][\\p{L}\\d\\-\\_]*$');
@@ -813,9 +803,7 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
       .then(function(clash) {
         if(clash) throw new StatusError(409, 'There is already a channel at ' + uri);
 
-        var nonce = Math.floor(Math.random() * 100000);
-
-        return persistence.Troupe.findOneAndUpdateQ(
+        return mongooseUtils.upsert(persistence.Troupe,
           { lcUri: lcUri, githubType: githubType },
           {
             $setOnInsert: {
@@ -823,34 +811,37 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
               lcOwner: lcUri.split('/')[0],
               uri: uri,
               security: security,
-              name: name,
               parentId: parentTroupe && parentTroupe._id,
               ownerUserId: parentTroupe ? null : user._id,
-              _nonce: nonce,
               githubType: githubType,
-              users:  user ? [{ _id: new ObjectID(), userId: user._id }] : [],
+              // users:  user ? [{ _id: new ObjectID(), userId: user._id }] : [],
               userCount:  user ? 1 : 0
             }
-          },
-          { upsert: true, new: true })
-          .then(function (newRoom) {
+          })
+          .spread(function(newRoom, updatedExisting) {
+            if (!user) return [newRoom, updatedExisting];
 
+            return roomMembershipService.addRoomMember(newRoom._id, user._id)
+              .thenResolve([newRoom, updatedExisting]);
+          })
+          .spread(function(newRoom, updatedExisting) {
             emailNotificationService.createdRoomNotification(user, newRoom); // send an email to the room's owner
             sendJoinStats(user, newRoom, options.tracking); // now the channel has now been created, send join stats for owner joining
 
-            // TODO handle adding the user in the event that they didn't create the room!
-            if(newRoom._nonce === nonce) {
-              serializeCreateEvent(newRoom);
-              stats.event("create_room", {
-                userId: user.id,
-                roomType: "channel"
-              });
-              return uriLookupService.reserveUriForTroupeId(newRoom._id, uri)
-                .thenResolve(newRoom);
+            if (updatedExisting) {
+              /* Somehow someone beat us to it */
+              throw new StatusError(409);
             }
 
-            /* Somehow someone beat us to it */
-            throw 409;
+            // TODO handle adding the user in the event that they didn't create the room!
+            serializeCreateEvent(newRoom, user ? [user._id] : []);
+            stats.event("create_room", {
+              userId: user.id,
+              roomType: "channel"
+            });
+            return uriLookupService.reserveUriForTroupeId(newRoom._id, uri)
+              .thenResolve(newRoom);
+
           });
       });
 
@@ -930,7 +921,7 @@ function addUserToRoom(room, instigatingUser, usernameToAdd) {
       return userService.findByUsername(usernameToAdd);
     })
     .then(function (existingUser) {
-      if (existingUser && room.containsUserId(existingUser.id)) throw new StatusError(409, usernameToAdd + ' is already in this room.');
+      // if (existingUser && room.containsUserId(existingUser.id)) throw new StatusError(409, usernameToAdd + ' is already in this room.');
 
       return assertMemberLimit(room, existingUser)
         .then(function() {
@@ -939,15 +930,16 @@ function addUserToRoom(room, instigatingUser, usernameToAdd) {
           return [existingUser || userService.createInvitedUser(usernameToAdd, instigatingUser, room._id), isNewUser];
         });
     })
-    .spread(function (invitedUser, isNewUser) {
-      room.addUserById(invitedUser.id);
-      return room.saveQ()
-        .then(function () {
+    .spread(function (addedUser, isNewUser) {
+      return roomMembershipService.addRoomMember(room._id, addedUser._id)
+        .then(function(wasAdded) {
+          if (!wasAdded) return addedUser;
+
           return Q.all([
-            notifyInvitedUser(instigatingUser, invitedUser, room, isNewUser),
-            updateUserDateAdded(invitedUser.id, room.id)
+            notifyInvitedUser(instigatingUser, addedUser, room, isNewUser),
+            updateUserDateAdded(addedUser.id, room.id)
           ])
-          .thenResolve(invitedUser);
+          .thenResolve(addedUser);
         });
     });
 
@@ -955,22 +947,26 @@ function addUserToRoom(room, instigatingUser, usernameToAdd) {
 
 exports.addUserToRoom = addUserToRoom;
 
+/* Re-insure that each user in the room has access to the room */
 function revalidatePermissionsForUsers(room) {
-  /* Re-insure that each user in the room has access to the room */
-  var userIds = room.getUserIds();
+  return roomMembershipService.findMembersForRoom(room._id)
+    .then(function(userIds) {
+        if(!userIds.length) return Q.resolve();
 
-  if(!userIds.length) return Q.resolve();
-
-  return userService.findByIds(userIds)
-    .then(function(users) {
+        return [userIds, userService.findByIds(userIds)];
+    })
+    .spread(function(userIds, users) {
       var usersHash = collections.indexById(users);
 
+      var removalUserIds = [];
+
+      /** TODO: warning: this may run 10000 promises in parallel */
       return Q.all(userIds.map(function(userId) {
         var user = usersHash[userId];
         if(!user) {
           // Can't find the user?, remove them
           logger.warn('Unable to find user, removing from troupe', { userId: userId, troupeId: room.id });
-          room.removeUserById(userId);
+          removalUserIds.push(userId);
           return;
         }
 
@@ -978,14 +974,16 @@ function revalidatePermissionsForUsers(room) {
           .then(function(access) {
             if(!access) {
               logger.warn('User no longer has access to room', { userId: userId, troupeId: room.id });
-              room.removeUserById(userId);
+              removalUserIds.push(userId);
             }
           });
-      }));
+      }))
+      .then(function() {
+        if (!removalUserIds.length) return;
+        return roomMembershipService.removeRoomMembers(room._id, removalUserIds);
+      });
     })
-    .then(function() {
-      return room.saveQ();
-    });
+
 }
 exports.revalidatePermissionsForUsers = revalidatePermissionsForUsers;
 
@@ -1024,7 +1022,8 @@ function ensureRepoRoomSecurity(uri, security) {
            * multiple events will be generated */
 
           return revalidatePermissionsForUsers(troupe);
-        });
+        })
+        .thenResolve(troupe);
 
     });
 }
@@ -1034,13 +1033,13 @@ exports.ensureRepoRoomSecurity = ensureRepoRoomSecurity;
 function findByIdForReadOnlyAccess(user, roomId) {
   return troupeService.findById(roomId)
     .then(function(troupe) {
-      if(!troupe) throw 404; // Mandatory
+      if(!troupe) throw new StatusError(404); // Mandatory
 
       return roomPermissionsModel(user, 'view', troupe)
         .then(function(access) {
           if(access) return troupe;
-          if(!user) return 401;
-          throw 404;
+          if(!user) throw new StatusError(401);
+          throw new StatusError(404);
         });
     });
 }
@@ -1052,8 +1051,8 @@ function validateRoomForReadOnlyAccess(user, room) {
   return roomPermissionsModel(user, 'view', room)
     .then(function(access) {
       if(access) return;
-      if(!user) return 401;
-      throw 404;
+      if(!user) throw new StatusError(401);
+      throw new StatusError(404);
     });
 }
 exports.validateRoomForReadOnlyAccess = validateRoomForReadOnlyAccess;
@@ -1079,8 +1078,7 @@ function removeUserFromRoom(room, user, requestingUser) {
   })
   // Do the removal
   .then(function() {
-    room.removeUserById(user.id);
-    return room.saveQ();
+    return roomMembershipService.removeRoomMember(room._id, user._id);
   });
 }
 exports.removeUserFromRoom = removeUserFromRoom;
@@ -1128,9 +1126,10 @@ function banUserFromRoom(room, username, requestingUser, options, callback) {
               bannedBy: requestingUser.id
             });
 
-            roomForUpdate.removeUserById(user.id);
-
-            return roomForUpdate.saveQ()
+            return Q.all([
+                roomForUpdate.saveQ(),
+                roomMembershipService.removeRoomMember(roomForUpdate._id, user._id)
+              ])
               .then(function() {
                 if (options && options.removeMessages) {
                   return persistence.ChatMessage.findQ({ toTroupeId: roomForUpdate.id, fromUserId: user.id })

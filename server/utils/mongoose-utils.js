@@ -85,7 +85,7 @@ exports.cloneSchema = function(schema) {
 exports.upsert = function(schema, query, setOperation) {
   return schema.findOneAndUpdateQ(query, setOperation, { upsert: true, new: false })
     .then(function(doc) {
-      console.log('GOT BACK ', doc);
+      // If doc is null then an insert occurred
       return Q.all([schema.findOneQ(query), !!doc]);
     });
 };

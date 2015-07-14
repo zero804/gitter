@@ -46,6 +46,7 @@ module.exports = createExports({
   UserTroupeLastAccess: require('./persistence/user-troupe-last-access-schema'),
   UserTroupeFavourites: require('./persistence/user-troupe-favourites-schema'),
   Troupe: require('./persistence/troupe-schema'),
+  TroupeUser: require('./persistence/troupe-user-schema'),
   UserTroupeSettings: require('./persistence/user-troupe-settings-schema'),
   UserSettings: require('./persistence/user-settings-schema'),
   ChatMessage: require('./persistence/chat-message-schema'),

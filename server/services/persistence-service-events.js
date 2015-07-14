@@ -159,9 +159,9 @@ exports.install = function(persistenceService) {
   });
 
   function serializeOneToOneTroupe(operation, troupe) {
-    troupe.users.forEach(function(troupeUser) {
+    troupe.oneToOneUsers.forEach(function(troupeUser) {
       var currentUserId = troupeUser.userId;
-      var url = '/user/' + troupeUser.userId + '/rooms';
+      var url = '/user/' + currentUserId + '/rooms';
 
       var strategy = new restSerializer.TroupeStrategy({ currentUserId: currentUserId });
 
@@ -175,6 +175,8 @@ exports.install = function(persistenceService) {
   }
 
   function serializeTroupeEventForUsers(troupeUsers, operation, model, next) {
+    // FIXME: NOCOMMIT
+    return next && next();
     var userIds = troupeUsers.map(function(troupeUser) { return troupeUser.userId; });
 
     return presenceService.categorizeUsersByOnlineStatus(userIds)
