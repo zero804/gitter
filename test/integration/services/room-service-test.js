@@ -570,8 +570,6 @@ describe('room-service #slow', function() {
 
       var troupe = {
         uri: 'user/room',
-        containsUserId: function() { return false; },
-        addUserById: function() {},
         saveQ: function() {}
       };
 
@@ -597,8 +595,6 @@ describe('room-service #slow', function() {
       var troupe = {
         _id: _troupId,
         uri: 'user/room',
-        containsUserId: function() { return true; },
-        addUserById: function() {},
         saveQ: function() {}
       };
 
@@ -624,8 +620,6 @@ describe('room-service #slow', function() {
 
       var troupe = {
         uri: 'user/room',
-        containsUserId: function() { return true; },
-        addUserById: function() {},
         saveQ: function() {}
       };
 
