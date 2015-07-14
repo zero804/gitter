@@ -84,7 +84,7 @@ module.exports = {
     TroupeSchema.index({ "oneToOneUsers.userId": 1,  "oneToOneUsers.deactivated": 2 });
 
     TroupeSchema.pre('save', function (next) {
-      this.lcUri =  this.uri ? this.uri.toLowerCase() : null;
+      this.lcUri =  this.uri ? this.uri.toLowerCase() : undefined;
       next();
       // if (this.security !== 'PUBLIC') return next();
       // if (this.)
