@@ -167,10 +167,14 @@ function addRoomMembers(troupeId, userIds) {
 
   var bulk = TroupeUser.collection.initializeUnorderedBulkOp();
 
+  troupeId = mongoUtils.asObjectID(troupeId);
+
   userIds.forEach(function(userId) {
-    bulk.find({ troupeId: troupeId, userId: userId }).upsert().updateOne({
-      $setOnInsert: { troupeId: troupeId, userId:userId }
-    });
+    userId = mongoUtils.asObjectID(userId);
+
+    bulk.find({ troupeId: troupeId, userId: userId })
+      .upsert()
+      .updateOne({ $setOnInsert: { troupeId: troupeId, userId:userId } });
   });
 
   var d = Q.defer();
