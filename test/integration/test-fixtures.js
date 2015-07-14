@@ -152,6 +152,7 @@ function createExpectedFixtures(expected, done) {
     var githubType = f.githubType || 'ORG';
     if(!f.oneToOne) {
       uri = f.uri || generateUri(githubType);
+      githubType = 'ONETOONE';
       lcUri = uri.toLowerCase();
     }
 
@@ -167,7 +168,7 @@ function createExpectedFixtures(expected, done) {
       dateDeleted: f.dateDeleted
     };
 
-    debug('Creating %s with %j', fixtureName, doc);
+    debug('Creating troupe %s with %j', fixtureName, doc);
     return persistence.Troupe.createQ(doc)
       .then(function(troupe) {
         if (!f.userIds || !f.userIds.length) return troupe;
