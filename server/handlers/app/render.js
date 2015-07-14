@@ -105,8 +105,7 @@ function renderHomePage(req, res, next) {
         bootScriptName = 'mobile-userhome';
       } else {
         var variant = splitTests.configure(req, res, 'userhome');
-        // fixme: always showing treatment in order to test
-        page = splitTests.selectTemplate(variant, 'userhome-template_treatment', 'userhome-template_treatment');
+        page = splitTests.selectTemplate(variant, 'userhome-template_control', 'userhome-template_treatment');
         bootScriptName = 'userhome';
       }
 
