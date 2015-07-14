@@ -5,9 +5,11 @@ var TroupeUser               = persistence.TroupeUser;
 var mongoUtils               = require("../utils/mongo-utils");
 var Q                        = require("q");
 var assert                   = require('assert');
+var debug                    = require('debug')('gitter:room-membership-service');
 
 /* Exports */
 exports.findRoomIdsForUser          = findRoomIdsForUser;
+exports.findRoomIdsForUserWithLurk  = findRoomIdsForUserWithLurk;
 exports.checkRoomMembership         = checkRoomMembership;
 exports.findMembersForRoom          = findMembersForRoom;
 exports.countMembersInRoom          = countMembersInRoom;
@@ -18,15 +20,36 @@ exports.removeRoomMember            = removeRoomMember;
 exports.removeRoomMembers           = removeRoomMembers;
 exports.findAllMembersForRooms      = findAllMembersForRooms;
 
+/**
+ * Returns the rooms the user is in
+ */
 function findRoomIdsForUser(userId) {
+  debug("findRoomIdsForUser(%s)", userId);
   assert(userId);
 
-  return TroupeUser.findQ({ 'userId': userId }, { _id: 0, troupeId: 1 }, { lean: true })
-    .spread(function(results) {
-      return results.map(function(d) { return d._id; });
+  return TroupeUser.distinctQ("troupeId", { 'userId': userId });
+}
+
+/**
+ * Returns the rooms the user is in, with lurk status
+ */
+function findRoomIdsForUserWithLurk(userId) {
+  debug("findRoomIdsForUserWithLurk(%s)", userId);
+
+  assert(userId);
+
+  return TroupeUser.findQ({ 'userId': userId }, { _id: 0, troupeId: 1, lurk: 1 }, { lean: true })
+    .then(function(results) {
+      return results.reduce(function(memo, troupeUser) {
+        memo[troupeUser.userId] = !!troupeUser.lurk;
+        return memo;
+      }, {});
     });
 }
 
+/**
+ * Returns true iff the user is a member of the room
+ */
 function checkRoomMembership(troupeId, userId) {
   assert(troupeId);
   assert(userId);

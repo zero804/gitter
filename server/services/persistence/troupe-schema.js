@@ -117,18 +117,6 @@ module.exports = {
       // next();
     });
 
-    // TroupeSchema.methods.getUserIds = function() {
-    //   return troupeUtils.getUserIds(this);
-    // };
-
-    // TroupeSchema.methods.findTroupeUser = function(userId) {
-    //   return troupeUtils.findTroupeUser(this, userId);
-    // };
-
-    // TroupeSchema.methods.containsUserId = function(userId) {
-    //   return troupeUtils.containsUserId(this, userId);
-    // };
-
     TroupeSchema.methods.getOtherOneToOneUserId = function(knownUserId) {
       return troupeUtils.getOtherOneToOneUserId(this, knownUserId);
     };

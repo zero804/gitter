@@ -921,8 +921,6 @@ function addUserToRoom(room, instigatingUser, usernameToAdd) {
       return userService.findByUsername(usernameToAdd);
     })
     .then(function (existingUser) {
-      // if (existingUser && room.containsUserId(existingUser.id)) throw new StatusError(409, usernameToAdd + ' is already in this room.');
-
       return assertMemberLimit(room, existingUser)
         .then(function() {
           var isNewUser = !existingUser;
