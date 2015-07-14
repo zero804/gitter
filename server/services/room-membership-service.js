@@ -20,6 +20,10 @@ exports.removeRoomMember            = removeRoomMember;
 exports.removeRoomMembers           = removeRoomMembers;
 exports.findAllMembersForRooms      = findAllMembersForRooms;
 
+exports.getMemberLurkStatus         = getMemberLurkStatus;
+exports.setMemberLurkStatus         = setMemberLurkStatus;
+exports.setMembersLurkStatus        = setMembersLurkStatus;
+
 /**
  * Returns the rooms the user is in
  */
@@ -192,4 +196,39 @@ function findAllMembersForRooms(troupeIds) {
   });
 
   return TroupeUser.distinctQ("userId", { troupeId: { $in: mongoUtils.asObjectIDs(troupeIds) } });
+}
+
+/**
+ * Returns the lurk status of a single user
+ * Returns true when lurking, false when not, null when user is not found
+ */
+function getMemberLurkStatus(troupeId, userId) {
+  return TroupeUser.findOneQ({ troupeId: troupeId, userId: userId }, { lurk: 1, _id: 0 }, { lean: true })
+  .then(function(troupeUser) {
+     if (!troupeUser) return null;
+     return !!troupeUser.lurk;
+  });
+}
+
+/**
+ * Sets a member to be lurking or not lurking.
+ * Returns true when things changed
+ */
+function setMemberLurkStatus(troupeId, userId, lurk) {
+  lurk = !!lurk; // Force boolean
+
+  return TroupeUser.findOneAndUpdateQ({ troupeId: troupeId, userId: userId }, { $set: { lurk: lurk } })
+  .then(function(oldTroupeUser) {
+     if (!oldTroupeUser) return false;
+     return oldTroupeUser.lurk !== lurk;
+  });
+}
+
+/**
+ * Sets a group of multiple members lurk status.
+ */
+function setMembersLurkStatus(troupeId, userIds, lurk) {
+ lurk = !!lurk; // Force boolean
+
+ return TroupeUser.update({ troupeId: troupeId, userId: { $in: mongoUtils.asObjectIDs(userIds) } }, { $set: { lurk: lurk } }, { multi: true });
 }

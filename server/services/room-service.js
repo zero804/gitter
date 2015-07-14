@@ -1233,36 +1233,26 @@ exports.findBanByUsername = findBanByUsername;
 
 function updateTroupeLurkForUserId(userId, troupeId, lurk) {
   lurk = !!lurk; // Force boolean
-  var setOperation;
-  if(lurk) {
-    setOperation = { $set: { "users.$.lurk" : !!lurk } };
-  } else {
-    setOperation = { $unset: { "users.$.lurk" : "" } };
-  }
+  return roomMembershipService.setMemberLurkStatus(troupeId, userId, lurk)
+    .then(function(changed) {
+      // Did a change did not occur?
+      if(!changed) return;
 
-  return persistence.Troupe.updateQ({
-      _id: mongoUtils.asObjectID(troupeId),
-      'users.userId': mongoUtils.asObjectID(userId)
-    }, setOperation)
-  .then(function(count) {
-    // Odd, user not found
-    if(!count) return;
+      stats.event("lurk_room", {
+        userId: '' + userId,
+        troupeId: '' + troupeId,
+        lurking: lurk
+      });
 
-    stats.event("lurk_room", {
-      userId: '' + userId,
-      troupeId: '' + troupeId,
-      lurking: lurk
+      appEvents.userTroupeLurkModeChange({ userId: userId, troupeId: troupeId, lurk: lurk });
+      // TODO: in future get rid of this but this collection is used by the native clients
+      appEvents.dataChange2('/user/' + userId + '/rooms', 'patch', { id: troupeId, lurk: lurk });
+
+      if(lurk) {
+        // Delete all the chats in Redis for this person too
+        return unreadItemService.markAllChatsRead(userId, troupeId, { member: true });
+      }
     });
-
-    appEvents.userTroupeLurkModeChange({ userId: userId, troupeId: troupeId, lurk: lurk });
-    // TODO: in future get rid of this but this collection is used by the native clients
-    appEvents.dataChange2('/user/' + userId + '/rooms', 'patch', { id: troupeId, lurk: lurk });
-
-    if(lurk) {
-      // Delete all the chats in Redis for this person too
-      return unreadItemService.markAllChatsRead(userId, troupeId, { member: true });
-    }
-  });
 }
 exports.updateTroupeLurkForUserId = updateTroupeLurkForUserId;
 
