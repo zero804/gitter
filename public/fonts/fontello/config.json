@@ -7,21 +7,15 @@
   "ascent": 850,
   "glyphs": [
     {
-      "uid": "f0c301ac841dafc38d8eb1b933fc73e5",
-      "css": "spin2",
-      "code": 59572,
-      "src": "fontelico"
-    },
-    {
-      "uid": "5d2d07f112b8de19f2c0dbfec3e42c05",
-      "css": "spin5",
-      "code": 59573,
-      "src": "fontelico"
-    },
-    {
       "uid": "474656633f79ea2f1dad59ff63f6bf07",
       "css": "star-1",
       "code": 59571,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "12f4ece88e46abd864e40b35e05b11cd",
+      "css": "check",
+      "code": 59580,
       "src": "fontawesome"
     },
     {
@@ -37,9 +31,63 @@
       "src": "fontawesome"
     },
     {
-      "uid": "12f4ece88e46abd864e40b35e05b11cd",
-      "css": "check",
-      "code": 59580,
+      "uid": "500fc1f109021e4b1de4deda2f7ed399",
+      "css": "laptop",
+      "code": 59395,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "0357f7abbc0babf43509669f332e41e6",
+      "css": "mobile",
+      "code": 59396,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "197375a3cea8cb90b02d06e4ddf1433d",
+      "css": "globe",
+      "code": 59393,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "38575a803c4da31ce20d77e1e1236bcb",
+      "css": "paper-plane",
+      "code": 59392,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "107ce08c7231097c7447d8f4d059b55f",
+      "css": "ellipsis",
+      "code": 59579,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "20fc52f9a88bb7bda023ef209acac095",
+      "css": "graduation-cap",
+      "code": 59394,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "809f2374b759f5b9278ac6307e690ba4",
+      "css": "android",
+      "code": 59397,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "e9fa538fd5913046497ac148e27cd8ea",
+      "css": "apple",
+      "code": 59398,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "47a35af762c8e06f3d152750134c8750",
+      "css": "linux",
+      "code": 59400,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "8aff323697468c4a63993cde00386ec6",
+      "css": "windows",
+      "code": 59399,
       "src": "fontawesome"
     },
     {
@@ -77,12 +125,6 @@
       "css": "hash",
       "code": 59575,
       "src": "mfglabs"
-    },
-    {
-      "uid": "107ce08c7231097c7447d8f4d059b55f",
-      "css": "ellipsis",
-      "code": 59579,
-      "src": "fontawesome"
     }
   ]
 }

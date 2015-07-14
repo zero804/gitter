@@ -1,10 +1,17 @@
 
+.icon-paper-plane:before { content: '\e800'; } /* '' */
+.icon-globe:before { content: '\e801'; } /* '' */
+.icon-graduation-cap:before { content: '\e802'; } /* '' */
+.icon-laptop:before { content: '\e803'; } /* '' */
+.icon-mobile:before { content: '\e804'; } /* '' */
+.icon-android:before { content: '\e805'; } /* '' */
+.icon-apple:before { content: '\e806'; } /* '' */
+.icon-windows:before { content: '\e807'; } /* '' */
+.icon-linux:before { content: '\e808'; } /* '' */
 .icon-doc-text:before { content: '\e8a5'; } /* '' */
 .icon-cancel-circle:before { content: '\e8b1'; } /* '' */
 .icon-logout:before { content: '\e8b2'; } /* '' */
 .icon-star-1:before { content: '\e8b3'; } /* '' */
-.icon-spin2:before { content: '\e8b4'; } /* '' */
-.icon-spin5:before { content: '\e8b5'; } /* '' */
 .icon-at:before { content: '\e8b6'; } /* '' */
 .icon-hash:before { content: '\e8b7'; } /* '' */
 .icon-download:before { content: '\e8b8'; } /* '' */
