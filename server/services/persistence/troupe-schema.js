@@ -32,7 +32,7 @@ module.exports = {
       deactivated: { type: Boolean }
     });
     TroupeOneToOneUserSchema.schemaTypeName = 'TroupeOneToOneUserSchema';
-    var TroupeOneToOneUser = mongooseConnection.model('TroupeOneToOneUser', TroupeOneToOneUserSchema);
+    /*var TroupeOneToOneUser = */mongooseConnection.model('TroupeOneToOneUser', TroupeOneToOneUserSchema);
 
     //
     // A Troupe
@@ -80,8 +80,8 @@ module.exports = {
     TroupeSchema.index({ ownerUserId: 1 });
     TroupeSchema.index({ lcUri: 1 }, { unique: true, sparse: true });
 
-    TroupeSchema.index({ "oneToOneUsers.userId": 1 }, { unique: true, sparse: true });
-    TroupeSchema.index({ "oneToOneUsers.userId": 1,  "oneToOneUsers.deactivated": 2 },  { unique: true, sparse: true });
+    TroupeSchema.index({ "oneToOneUsers.userId": 1 });
+    TroupeSchema.index({ "oneToOneUsers.userId": 1,  "oneToOneUsers.deactivated": 2 });
 
     TroupeSchema.pre('save', function (next) {
       this.lcUri =  this.uri ? this.uri.toLowerCase() : null;
