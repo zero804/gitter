@@ -26,7 +26,6 @@ var webpackConfig = {
     "mobile-native-embedded-chat": path.resolve(path.join(__dirname, "./mobile-native-embedded-chat")),
     "mobile-native-userhome": path.resolve(path.join(__dirname, "./mobile-native-userhome")),
     "userhome": path.resolve(path.join(__dirname, "./userhome")),
-    "userhome_treatment": path.resolve(path.join(__dirname, "./userhome_treatment")),
     "router-archive-chat": path.resolve(path.join(__dirname, "./router-archive-chat")),
     "router-archive-home": path.resolve(path.join(__dirname, "./router-archive-home")),
     "router-embed-chat": path.resolve(path.join(__dirname, "./router-embed-chat")),
