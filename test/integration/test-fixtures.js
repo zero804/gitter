@@ -148,12 +148,13 @@ function createExpectedFixtures(expected, done) {
 
     var security = f.security || undefined;
 
-    var uri, lcUri;
-    var githubType = f.githubType || 'ORG';
+    var uri, lcUri, githubType;
     if(!f.oneToOne) {
       uri = f.uri || generateUri(githubType);
-      githubType = 'ONETOONE';
+      githubType = f.githubType || 'ORG';
       lcUri = uri.toLowerCase();
+    } else {
+      githubType = 'ONETOONE';
     }
 
     var doc = {
