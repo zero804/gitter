@@ -4,8 +4,11 @@ var persistence              = require('./persistence-service');
 var TroupeUser               = persistence.TroupeUser;
 var mongoUtils               = require("../utils/mongo-utils");
 var Q                        = require("q");
+var EventEmitter             = require('events').EventEmitter;
 var assert                   = require('assert');
 var debug                    = require('debug')('gitter:room-membership-service');
+
+var roomMembershipEvents     = new EventEmitter();
 
 /* Exports */
 exports.findRoomIdsForUser          = findRoomIdsForUser;
@@ -25,6 +28,9 @@ exports.findAllMembersForRooms      = findAllMembersForRooms;
 exports.getMemberLurkStatus         = getMemberLurkStatus;
 exports.setMemberLurkStatus         = setMemberLurkStatus;
 exports.setMembersLurkStatus        = setMembersLurkStatus;
+
+/* Event emitter */
+exports.events                      = roomMembershipEvents;
 
 /**
  * Returns the rooms the user is in
@@ -74,7 +80,7 @@ function findUserMembershipInRooms(userId, troupeIds) {
   assert(userId);
   if (!troupeIds.length) return Q.resolve([]);
 
-  return TroupeUser.distinctQ("troupeId", { troupeId: { $in: mongoUtils.asObjectIDs(troupeIds) }, userId: userId })
+  return TroupeUser.distinctQ("troupeId", { troupeId: { $in: mongoUtils.asObjectIDs(troupeIds) }, userId: userId });
 }
 /**
  * Find the userIds of all the members of a room.
@@ -137,7 +143,11 @@ function addRoomMember(troupeId, userId) {
     }, { upsert: true, new: false })
     .then(function(previous) {
       var added = !previous;
-      appEvents.emit("room.membership.user.added", troupeId, userId);
+
+      if (added) {
+        roomMembershipEvents.emit("members.added", troupeId, [userId]);
+      }
+
       return added;
     });
 
@@ -167,9 +177,14 @@ function addRoomMembers(troupeId, userIds) {
   bulk.execute(d.makeNodeResolver());
   return d.promise.then(function(bulkResult) {
     var upserted = bulkResult.getUpsertedIds();
-    return upserted.map(function(upsertedDoc) {
+
+    var addedUserIds = upserted.map(function(upsertedDoc) {
       return userIds[upsertedDoc.index];
     });
+
+    roomMembershipEvents.emit("members.added", troupeId, addedUserIds);
+
+    return addedUserIds;
   });
 }
 
@@ -187,7 +202,13 @@ function removeRoomMember(troupeId, userId) {
       userId: userId
     })
     .then(function(existing) {
-      return !!existing;
+      var removed = !!existing;
+
+      if (removed) {
+        roomMembershipEvents.emit("members.removed", troupeId, [userId]);
+      }
+
+      return removed;
     });
 }
 
@@ -197,14 +218,22 @@ function removeRoomMember(troupeId, userId) {
 function removeRoomMembers(troupeId, userIds) {
   assert(troupeId);
   if (!userIds.length) return Q.resolve();
+
   userIds.forEach(function(userId) {
     assert(userId);
   });
 
   return TroupeUser.removeQ({
-    troupeId: troupeId,
-    userId: { $in: mongoUtils.asObjectIDs(userIds) }
-  });
+      troupeId: troupeId,
+      userId: { $in: mongoUtils.asObjectIDs(userIds) }
+    })
+    .then(function() {
+      // Unfortunately we have no way of knowing which of the users
+      // were actually removed and which were already out of the collection
+      // as we have no transactions.
+      //
+      roomMembershipEvents.emit("members.removed", troupeId, userIds);
+    });
 }
 
 /**
@@ -241,7 +270,13 @@ function setMemberLurkStatus(troupeId, userId, lurk) {
   return TroupeUser.findOneAndUpdateQ({ troupeId: troupeId, userId: userId }, { $set: { lurk: lurk } })
   .then(function(oldTroupeUser) {
      if (!oldTroupeUser) return false;
-     return oldTroupeUser.lurk !== lurk;
+     var changed = oldTroupeUser.lurk !== lurk;
+
+     if (changed) {
+       roomMembershipEvents.emit("members.lurk.change", troupeId, [userId], lurk);
+     }
+
+     return changed;
   });
 }
 
@@ -251,5 +286,12 @@ function setMemberLurkStatus(troupeId, userId, lurk) {
 function setMembersLurkStatus(troupeId, userIds, lurk) {
  lurk = !!lurk; // Force boolean
 
- return TroupeUser.update({ troupeId: troupeId, userId: { $in: mongoUtils.asObjectIDs(userIds) } }, { $set: { lurk: lurk } }, { multi: true });
+ return TroupeUser.update({ troupeId: troupeId, userId: { $in: mongoUtils.asObjectIDs(userIds) } }, { $set: { lurk: lurk } }, { multi: true })
+  .then(function() {
+    // Unfortunately we have no way of knowing which of the users
+    // were actually removed and which were already out of the collection
+    // as we have no transactions.
+    //
+    roomMembershipEvents.emit("members.lurk.change", troupeId, userIds, lurk);
+  });
 }

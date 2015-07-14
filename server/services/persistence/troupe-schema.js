@@ -29,7 +29,7 @@ module.exports = {
     //
     var TroupeOneToOneUserSchema = new Schema({
       userId: { type: ObjectId },
-      deactivated: { type: Boolean }
+      deactivated: { type: Boolean } // TODO: NOCOMMIT consider removing altogether potentially
     });
     TroupeOneToOneUserSchema.schemaTypeName = 'TroupeOneToOneUserSchema';
     /*var TroupeOneToOneUser = */mongooseConnection.model('TroupeOneToOneUser', TroupeOneToOneUserSchema);
