@@ -130,6 +130,7 @@ function renderHomePage(req, res, next) {
         troupeContext: troupeContext,
         agent: req.headers['user-agent'],
         isUserhome: true,
+        isNativeDesktopApp: troupeContext.isNativeDesktopApp,
         billingBaseUrl: nconf.get('web:billingBaseUrl')
       });
     })
