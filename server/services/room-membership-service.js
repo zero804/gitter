@@ -11,6 +11,8 @@ var debug                    = require('debug')('gitter:room-membership-service'
 exports.findRoomIdsForUser          = findRoomIdsForUser;
 exports.findRoomIdsForUserWithLurk  = findRoomIdsForUserWithLurk;
 exports.checkRoomMembership         = checkRoomMembership;
+exports.findUserMembershipInRooms   = findUserMembershipInRooms
+
 exports.findMembersForRoom          = findMembersForRoom;
 exports.countMembersInRoom          = countMembersInRoom;
 exports.findMembersForRoomWithLurk  = findMembersForRoomWithLurk;
@@ -64,6 +66,16 @@ function checkRoomMembership(troupeId, userId) {
     });
 }
 
+/**
+ * Given a set of rooms, will return a subset in which the user
+ * is a member
+ */
+function findUserMembershipInRooms(userId, troupeIds) {
+  assert(userId);
+  if (!troupeIds.length) return Q.resolve([]);
+
+  return TroupeUser.distinctQ("troupeId", { troupeId: { $in: mongoUtils.asObjectIDs(troupeIds) }, userId: userId })
+}
 /**
  * Find the userIds of all the members of a room.
  */
