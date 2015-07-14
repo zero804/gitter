@@ -192,6 +192,7 @@
     "style-loader": "^0.8.2",
     "tap-file": "0.0.2",
     "through2": "^0.6.3",
+    "through2-concurrent": "^1.1.0",
     "webpack": "^1.9.5",
     "webpack-dev-middleware": "^1.0.11",
     "xunit-file": "0.0.6",
