@@ -7,7 +7,7 @@ var bayeux            = require('./bayeux');
 var ent               = require('ent');
 var presenceService   = require("../services/presence-service");
 var restSerializer    = require('../serializers/rest-serializer');
-
+var debug             = require('debug')('gitter:bayeux-events-bridge');
 
 function findFailbackChannel(channel) {
   var res = [
@@ -23,6 +23,8 @@ function findFailbackChannel(channel) {
 
 exports.install = function() {
   function publish(channel, message) {
+    debug("Publish on %s: %j", channel, message);
+
     bayeux.publish(channel, message);
 
     var failbackChannel = findFailbackChannel(channel);
@@ -96,7 +98,7 @@ exports.install = function() {
          sound: sound,
          chatId: chatId
       };
-      winston.verbose("Notification to " + url, message);
+      debug("Notification to %s: %j", url, message);
 
       publish(url, message);
   });

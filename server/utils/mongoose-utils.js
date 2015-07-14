@@ -23,7 +23,6 @@ exports.attachNotificationListenersToSchema = function (schema, options) {
 
   if(options.onCreate || options.onUpdate) {
     schema.pre('save', function (next) {
-
       var isNewInstance = this.isNew;
 
       if(ignoredPaths) {
@@ -40,17 +39,20 @@ exports.attachNotificationListenersToSchema = function (schema, options) {
         return next();
       }
 
-      this.post('save', function(postNext) {
-
-        if(isNewInstance) {
-          if(options.onCreate) options.onCreate(this, postNext);
-        } else {
-          if(options.onUpdate) options.onUpdate(this, postNext);
-        }
-      });
-
+      this._gIsNew = isNewInstance;
       next();
     });
+
+    schema.post('save', function(doc, postNext) {
+      var isNewInstance = doc._gIsNew;
+      delete doc._gIsNew;
+      if(isNewInstance) {
+        if(options.onCreate) options.onCreate(doc, postNext);
+      } else {
+        if(options.onUpdate) options.onUpdate(doc, postNext);
+      }
+    });
+
   }
 
   if(options.onRemove) {
