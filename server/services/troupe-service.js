@@ -16,6 +16,7 @@ var roomPermissionsModel     = require('./room-permissions-model');
 var mongooseUtils            = require('../utils/mongoose-utils');
 var StatusError              = require('statuserror');
 var roomMembershipService    = require('./room-membership-service');
+var debug                    = require('debug')('gitter:troupe-service');
 
 function findByUri(uri, callback) {
   var lcUri = uri.toLowerCase();
@@ -189,11 +190,12 @@ function findOrCreateOneToOneTroupe(userId1, userId2) {
         $setOnInsert: insertFields
       })
     .spread(function(troupe, updatedExisting) {
+      debug("One-to-one upsert updated an existing document? %s", updatedExisting);
       if(updatedExisting) return troupe;
 
       return roomMembershipService.addRoomMembers(troupe.id, [userId1, userId2])
         .then(function() {
-          logger.verbose('Created a oneToOne troupe for ', { userId1: userId1, userId2: userId2 });
+          debug('Created a oneToOne troupe for %s and %s', userId1, userId2);
 
           stats.event('new_troupe', {
             troupeId: troupe.id,
@@ -205,18 +207,18 @@ function findOrCreateOneToOneTroupe(userId1, userId2) {
           // TODO: do this here to get around problems with
           // circular dependencies. This will probably need to change in
           // future
-          var restSerializer = require('../serializers/rest-serializer');
-
-          [userId1, userId2].forEach(function(currentUserId) {
-            var url = '/user/' + currentUserId + '/rooms';
-
-            var strategy = new restSerializer.TroupeStrategy({ currentUserId: currentUserId });
-
-            restSerializer.serialize(troupe, strategy, function(err, serializedModel) {
-              if(err) return logger.error('Error while serializing oneToOne troupe: ' + err, { exception: err });
-              appEvents.dataChange2(url, 'create', serializedModel);
-            });
-          });
+          // var restSerializer = require('../serializers/rest-serializer');
+          //
+          // [userId1, userId2].forEach(function(currentUserId) {
+          //   var url = '/user/' + currentUserId + '/rooms';
+          //
+          //   var strategy = new restSerializer.TroupeStrategy({ currentUserId: currentUserId });
+          //
+          //   restSerializer.serialize(troupe, strategy, function(err, serializedModel) {
+          //     if(err) return logger.error('Error while serializing oneToOne troupe: ' + err, { exception: err });
+          //     appEvents.dataChange2(url, 'create', serializedModel);
+          //   });
+          // });
 
           return troupe;
         });
@@ -232,7 +234,8 @@ function findOrCreateOneToOneTroupe(userId1, userId2) {
 function findOrCreateOneToOneTroupeIfPossible(fromUserId, toUserId) {
   assert(fromUserId, 'fromUserId parameter required');
   assert(toUserId, 'toUserId parameter required');
-  if(fromUserId === toUserId) throw new StatusError(417); // You cannot be in a troupe with yourself.
+
+  if("" + fromUserId === "" + toUserId) throw new StatusError(417); // You cannot be in a troupe with yourself.
 
   return Q.all([
       userService.findById(toUserId),
