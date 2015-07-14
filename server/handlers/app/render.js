@@ -120,11 +120,14 @@ function renderHomePage(req, res, next) {
       var showWindowsApp = !isLinux && !isOsx;
       var showLinuxApp = !isOsx && !isWindows;
 
+      var hasPrivateRepoScope = req.user.hasGitHubScope('repo');
+
       res.render(page, {
         welcomeMessage: WELCOME_MESSAGES[Math.floor(Math.random() * WELCOME_MESSAGES.length)],
         showOsxApp: showOsxApp,
         showWindowsApp: showWindowsApp,
         showLinuxApp: showLinuxApp,
+        hasPrivateRepoScope: hasPrivateRepoScope,
         bootScriptName: bootScriptName,
         cssFileName: "styles/" + bootScriptName + ".css",
         troupeContext: troupeContext,
