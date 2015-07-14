@@ -6,14 +6,25 @@ var LoadingView = function(iframe, loadingFrame) {
   var self = this;
   this.iframe = iframe;
   this.loadingFrame = loadingFrame;
+  var unloadTimeout;
 
   function onbeforeunload() {
     // iframe is about to be destroyed, but another listener could abort this process
     // showing the spinner on unload however, feels too slow.
     self.show();
+
+    // if unload never shows, then beforeunload was aborted
+    // usually with mailto links
+    unloadTimeout = setTimeout(function() {
+      self.hide();
+    }, 500);
   }
 
   function onunload() {
+
+    // the unload hasnt been cancelled
+    clearTimeout(unloadTimeout);
+
     // the exiting contentDocument is about to be destroyed, but the
     // iframe's new contentDocument will be instantiated in the next event loop.
     setTimeout(function() {
