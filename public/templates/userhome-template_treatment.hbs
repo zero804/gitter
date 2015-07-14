@@ -38,15 +38,6 @@
       </article>
     </section>
 
-    {{#unless hasPrivateRepoScope}}
-    <section class="userhome-upgrade-oauth">
-      <h3 class="userhome-heading">Enable Private Repos</h3>
-      <p>
-        Can't see your private repos? <a id="userhome-oauth-link" href="/login/upgrade?scopes=repo" target="_blank">Click here</a> to authorise with GitHub.
-      </p>
-    </section>
-    {{/unless}}
-
     <section class="userhome-apps">
       <h3 class="userhome-heading">Download Apps</h3>
 
@@ -71,6 +62,6 @@
   </div>
 
   {{{ generateTroupeContext troupeContext }}}
-  {{{ bootScript 'userhome_treatment' }}}
+  {{{ bootScript 'frame-utils' }}}
 </body>
 </html>
