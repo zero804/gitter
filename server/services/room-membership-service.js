@@ -11,7 +11,7 @@ var debug                    = require('debug')('gitter:room-membership-service'
 exports.findRoomIdsForUser          = findRoomIdsForUser;
 exports.findRoomIdsForUserWithLurk  = findRoomIdsForUserWithLurk;
 exports.checkRoomMembership         = checkRoomMembership;
-exports.findUserMembershipInRooms   = findUserMembershipInRooms
+exports.findUserMembershipInRooms   = findUserMembershipInRooms;
 
 exports.findMembersForRoom          = findMembersForRoom;
 exports.countMembersInRoom          = countMembersInRoom;
@@ -136,13 +136,17 @@ function addRoomMember(troupeId, userId) {
       }
     }, { upsert: true, new: false })
     .then(function(previous) {
-      return !previous;
+      var added = !previous;
+      appEvents.emit("room.membership.user.added", troupeId, userId);
+      return added;
     });
 
 }
 /**
- * Adds members to a room
+ * Adds members to a room.
  * NB: expects the mongo connection to already be established
+ *
+ * Returns an array of the users who were added...
  */
 function addRoomMembers(troupeId, userIds) {
   assert(troupeId);
@@ -161,7 +165,12 @@ function addRoomMembers(troupeId, userIds) {
 
   var d = Q.defer();
   bulk.execute(d.makeNodeResolver());
-  return d.promise;
+  return d.promise.then(function(bulkResult) {
+    var upserted = bulkResult.getUpsertedIds();
+    return upserted.map(function(upsertedDoc) {
+      return userIds[upsertedDoc.index];
+    });
+  });
 }
 
 /**
