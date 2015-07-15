@@ -153,9 +153,13 @@ exports.findOrGenerateIRCToken = function(userId, callback) {
     .nodeify(callback);
 };
 
+exports.deleteToken = function(token, callback) {
+  return tokenProvider.deleteToken(token)
+    .nodeify(callback);
+};
+
 exports.testOnly = {
   invalidateCache: function() {
     return tokenProvider.testOnly.invalidateCache();
   }
 };
-
