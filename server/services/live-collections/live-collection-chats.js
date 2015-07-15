@@ -40,5 +40,5 @@ module.exports = {
     appEvents.dataChange2(url, "remove", { id: chatId });
     appEvents.chat('remove', troupeId, { id: chatId });
   },
-  
+
 };
