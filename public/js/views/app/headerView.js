@@ -143,7 +143,7 @@ module.exports = (function() {
 
       apiClient.room.delete('/users/' + context.getUserId(), { })
         .then(function() {
-          appEvents.trigger('navigation', context.getUser().url, 'home', ''); // TODO: figure out a title
+          appEvents.trigger('navigation', '/home', 'home', ''); // TODO: figure out a title
         });
     },
 
