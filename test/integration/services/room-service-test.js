@@ -15,45 +15,8 @@ var once = times(1);
 
 Q.longStackSupport = true;
 
-var troupeService = testRequire("./services/troupe-service");
 var persistence = testRequire("./services/persistence-service");
 var mongoUtils = testRequire("./utils/mongo-utils");
-
-function makeRoomAssertions(room, usersAllowedIn, usersNotAllowedIn) {
-  return Q.resolve(true);
-
-  var roomService = testRequire("./services/room-service");
-
-  if(!room) return Q.reject('no room');
-  if(!room.uri) return Q.reject('no room.uri');
-
-  return Q.all(usersAllowedIn.map(function(user) {
-
-    return roomService.findOrCreateRoom(user, room.uri)
-      .then(function(uriLookup) {
-        assert(uriLookup);
-      })
-      .fail(function(err) {
-        // console.log('User ' + user.username + ' was incorrectly NOT allowed in the room');
-        throw err;
-      });
-
-  })).then(function() {
-    return Q.all(usersNotAllowedIn.map(function(user) {
-      var failed = 0;
-      return roomService.findOrCreateRoom(user, room.uri)
-        .then(function() {
-          // console.log('User ' + user.username + ' was incorrectly allowed in the room');
-        })
-        .fail(function() {
-          failed++;
-        })
-        .then(function() {
-          assert.equal(failed, 1);
-        });
-    }));
-  });
-}
 
 describe('room-service #slow', function() {
   before(fixtureLoader(fixture, {
@@ -155,7 +118,7 @@ describe('room-service #slow', function() {
       mockito
         .when(troupeServiceMock)
         .findById()
-        .then(function (room) {
+        .then(function () {
           return Q.resolve({
               _id: '5436981c00062eebf0fbc0d5',
               githubType: 'ORG',
@@ -167,9 +130,6 @@ describe('room-service #slow', function() {
               lcUri: 'gitterhq',
               tags: [],
               topic: 'Gitter',
-              containsUserId: function () {
-
-              }
           });
         });
 
@@ -372,7 +332,7 @@ describe('room-service #slow', function() {
 
       });
 
-      mockito.when(roomMembershipServiceMock.findMembersForRoom)().then(function(troupeId) {
+      mockito.when(roomMembershipServiceMock.findMembersForRoom)().then(function() {
         return Q.resolve([fixture.user1._id, fixture.user2._id]);
       });
 
@@ -652,9 +612,7 @@ describe('room-service #slow', function() {
         return roomService.createCustomChildRoom(fixture.troupeOrg1, fixture.user1, { name: 'private', security: 'PRIVATE' })
           .then(function(room) {
             mockito.verify(permissionsModelMock, once)();
-
-            return makeRoomAssertions(room, [fixture.user1, fixture.user2], [fixture.user3])
-              .thenResolve(room);
+            return room;
           })
           .then(function(room) {
             // Get another mock
@@ -705,9 +663,7 @@ describe('room-service #slow', function() {
         return roomService.createCustomChildRoom(fixture.troupeOrg1, fixture.user1, { name: 'open', security: 'PUBLIC' })
           .then(function(room) {
             mockito.verify(permissionsModelMock, once)();
-
-            return makeRoomAssertions(room, [fixture.user1, fixture.user2, fixture.user3], [])
-              .thenResolve(room);
+            return room;
           })
           .then(function(room) {
             // Get another mock
@@ -758,9 +714,7 @@ describe('room-service #slow', function() {
         return roomService.createCustomChildRoom(fixture.troupeOrg1, fixture.user1, { name: 'child', security: 'INHERITED' })
           .then(function(room) {
             mockito.verify(permissionsModelMock, once)();
-
-            return makeRoomAssertions(room, [fixture.user1, fixture.user2], [ fixture.user3])
-              .thenResolve(room);
+            return room;
           })
           .then(function(room) {
             // Get another mock
@@ -815,9 +769,7 @@ describe('room-service #slow', function() {
         return roomService.createCustomChildRoom(fixture.troupeRepo, fixture.user1, { name: 'private', security: 'PRIVATE' })
           .then(function(room) {
             mockito.verify(permissionsModelMock, once)();
-
-            return makeRoomAssertions(room, [fixture.user1], [fixture.user2, fixture.user3])
-              .thenResolve(room);
+            return room;
           })
           .then(function(room) {
             // Get another mock
@@ -869,9 +821,7 @@ describe('room-service #slow', function() {
         return roomService.createCustomChildRoom(fixture.troupeRepo, fixture.user1, { name: 'open', security: 'PUBLIC' })
           .then(function(room) {
             mockito.verify(permissionsModelMock, once)();
-
-            return makeRoomAssertions(room, [fixture.user1, fixture.user2, fixture.user3], [])
-              .thenResolve(room);
+            return room;
           })
           .then(function(room) {
             // Get another mock
@@ -922,9 +872,7 @@ describe('room-service #slow', function() {
         return roomService.createCustomChildRoom(fixture.troupeRepo, fixture.user1, { name: 'child', security: 'INHERITED' })
           .then(function(room) {
             mockito.verify(permissionsModelMock, once)();
-
-            return makeRoomAssertions(room, [fixture.user1, fixture.user2], [fixture.user3])
-              .thenResolve(room);
+            return room;
           })
           .then(function(room) {
             // Get another mock
@@ -979,9 +927,7 @@ describe('room-service #slow', function() {
         return roomService.createCustomChildRoom(null, fixture.user1, { security: 'PRIVATE' })
           .then(function(room) {
             mockito.verify(permissionsModelMock, once)();
-
-            return makeRoomAssertions(room, [fixture.user1], [fixture.user2])
-              .thenResolve(room);
+            return room;
           })
           .then(function(room) {
             // Get another mock
@@ -1033,9 +979,7 @@ describe('room-service #slow', function() {
         return roomService.createCustomChildRoom(null, fixture.user1, { name: 'private',  security: 'PRIVATE' })
           .then(function(room) {
             mockito.verify(permissionsModelMock, once)();
-
-            return makeRoomAssertions(room, [fixture.user1], [fixture.user2])
-              .thenResolve(room);
+            return room;
           })
           .then(function(room) {
             // Get another mock
@@ -1086,9 +1030,7 @@ describe('room-service #slow', function() {
         return roomService.createCustomChildRoom(null, fixture.user1, { name: 'open', security: 'PUBLIC' })
           .then(function(room) {
             mockito.verify(permissionsModelMock, once)();
-
-            return makeRoomAssertions(room, [fixture.user1, fixture.user2], [])
-              .thenResolve(room);
+            return room;
           })
           .then(function(room) {
             // Get another mock
@@ -1253,7 +1195,7 @@ describe('room-service #slow', function() {
     });
     var userIsInRoom = testRequire('./services/user-in-room');
 
-    mockito.when(roomPermissionsModelMock)().then(function(user, perm, incomingRoom) {
+    mockito.when(roomPermissionsModelMock)().then(function(user, perm) {
       assert.equal(perm, 'admin');
 
       if(user.id == fixture.userRemoveNonAdmin.id) {
