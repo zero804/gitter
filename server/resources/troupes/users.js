@@ -91,6 +91,12 @@ module.exports = {
       .catch(next);
   },
 
+  /**
+   * Removes a member from a room. A user can either request this
+   * on their own behalf or delete another person from the room
+   * if they have permission
+   * DELETE /rooms/:roomId/users/:userId
+   */
   destroy: function(req, res, next){
     var user = req.resourceTroupeUser;
     var troupeId = req.troupe.id;
