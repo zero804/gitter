@@ -4,14 +4,10 @@
 var mongoose       = require('../../utils/mongoose-q');
 var Schema         = mongoose.Schema;
 var ObjectId       = Schema.ObjectId;
-var winston        = require('../../utils/winston');
-var assert         = require("assert");
 var _              = require("underscore");
 var tagger         = require('../../utils/room-tagger');
 var RepoService    = require('gitter-web-github').GitHubRepoService;
-var troupeUtils    = require('../../utils/models/troupes');
-var debug          = require('debug')('gitter:troupe-schema');
-var liveCollectionEvents = require('../live-collection-events');
+// var troupeUtils    = require('../../utils/models/troupes');
 
 module.exports = {
   install: function(mongooseConnection) {
@@ -116,10 +112,10 @@ module.exports = {
       // this.tags = tagger(this);
       // next();
     });
-
-    TroupeSchema.methods.getOtherOneToOneUserId = function(knownUserId) {
-      return troupeUtils.getOtherOneToOneUserId(this, knownUserId);
-    };
+    //
+    // TroupeSchema.methods.getOtherOneToOneUserId = function(knownUserId) {
+    //   return troupeUtils.getOtherOneToOneUserId(this, knownUserId);
+    // };
 
     TroupeSchema.methods.addUserBan = function(options) {
       // TODO: add some asserts here

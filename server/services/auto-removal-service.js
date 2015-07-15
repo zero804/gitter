@@ -10,7 +10,6 @@ var Q                         = require('q');
 var qlimit                    = require('qlimit');
 var persistence               = require('./persistence-service');
 var mongoUtils                = require('../utils/mongo-utils');
-// var liveCollectionEvents      = require('./live-collection-events');
 
 /**
  * Returns a list of users who could be lurked
