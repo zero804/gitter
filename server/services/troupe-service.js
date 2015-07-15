@@ -1,10 +1,8 @@
 "use strict";
 
 var env                      = require('gitter-web-env');
-var logger                   = env.logger;
 var stats                    = env.stats;
 
-var appEvents                = require('gitter-web-appevents');
 var userService              = require('./user-service');
 var persistence              = require('./persistence-service');
 var assert                   = require("assert");
@@ -71,23 +69,6 @@ function findByIdLeanWithAccess(troupeId, userId) {
       result.id = mongoUtils.serializeObjectId(result._id);
       return [result, false];
     });
-}
-
-/**
- * @deprecated
- */
-function userHasAccessToTroupe(user, troupe) {
-  assert(false);
-  if(!user) return false;
-  return troupe.containsUserId(user.id);
-}
-
-/**
- * @deprecated
- */
-function userIdHasAccessToTroupe(userId, troupe) {
-  assert(false);
-  return troupe.containsUserId(userId);
 }
 
 /**
@@ -348,8 +329,6 @@ module.exports = {
   findByIdsLean: findByIdsLean,
   findByIdLeanWithAccess: findByIdLeanWithAccess,
   findAllTroupesIdsForUser: findAllTroupesIdsForUser,
-  userHasAccessToTroupe: userHasAccessToTroupe,
-  userIdHasAccessToTroupe: userIdHasAccessToTroupe,
   findAllUserIdsForTroupes: findAllUserIdsForTroupes,
   findAllUserIdsForTroupe: findAllUserIdsForTroupe,
   findUserIdsForTroupeWithLurk: findUserIdsForTroupeWithLurk,
