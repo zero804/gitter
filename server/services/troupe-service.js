@@ -241,38 +241,6 @@ function toggleSearchIndexing(user, troupe, bool) {
     });
 }
 
-function deleteTroupe(troupe, callback) {
-  // FIXME: NOCOMMIT
-  assert(false);
-  //
-  // return Q.all([
-  //   persistence.Troupe.removeQ({ troupeId: troupeId });
-  // ])
-  //
-  // return Q.fcall(function() {
-  //     if (troupe.oneToOne) {
-  //       var userId0 = troupe.users[0] && troupe.users[0].userId;
-  //       var userId1 = troupe.users[1] && troupe.users[1].userId;
-  //       troupe.removeUserById(userId0);
-  //       troupe.removeUserById(userId1);
-  //
-  //       return troupe.removeQ();
-  //     } else {
-  //       if(troupe.users.length !== 1) throw new Error("Can only delete troupes that have a single user");
-  //
-  //       troupe.status = 'DELETED';
-  //       if (!troupe.dateDeleted) {
-  //         troupe.dateDeleted = new Date();
-  //       }
-  //       troupe.removeUserById(troupe.users[0].userId);
-  //
-  //       return troupe.saveQ();
-  //     }
-  //   })
-  //   .thenResolve(troupe)
-  //   .nodeify(callback);
-}
-
 module.exports = {
   findByUri: findByUri,
   findById: findById,
@@ -281,7 +249,6 @@ module.exports = {
   findByIdLeanWithAccess: findByIdLeanWithAccess,
   findOneToOneTroupe: findOneToOneTroupe,
   findOrCreateOneToOneTroupeIfPossible: findOrCreateOneToOneTroupeIfPossible,
-  deleteTroupe: deleteTroupe,
   findOrCreateOneToOneTroupe: findOrCreateOneToOneTroupe,
   updateTopic: updateTopic,
   toggleSearchIndexing: toggleSearchIndexing,
