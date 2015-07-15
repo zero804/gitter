@@ -23,7 +23,6 @@ module.exports = {
     TroupeUserSchema.schemaTypeName = 'TroupeUserSchema';
 
     TroupeUserSchema.index({ "troupeId": 1, "userId": 1 }, { unique: true });
-    TroupeUserSchema.index({ "troupeId": 1, "userId": 1,  "deactivated": 2 },  { unique: true, sparse: true });
     TroupeUserSchema.index({ "troupeId": 1 });
     TroupeUserSchema.index({ "userId": 1 });
 
