@@ -57,46 +57,13 @@ function bulkRemoveUsersFromRoom(roomId, userIds) {
 
   if (!userIds.length) return Q.resolve();
   console.log('Removing ', userIds.length, ' users from ', roomId);
-  // FIXME: NOCOMMIT
-  return persistence.Troupe.updateQ({ _id: mongoUtils.asObjectID(roomId), oneToOne: { $ne: true } }, {
-      $pull: {
-        users: {
-          userId: { $in: mongoUtils.asObjectIDs(userIds) }
-        }
-      },
-      $inc: { userCount: -userIds.length }
-    })
-    .then(function() {
-      // Second attempt at ensuring the room has the right number of people in it
-      // NB: not transaction
-      return persistence.Troupe.aggregateQ([{
-        $match: { _id: mongoUtils.asObjectID(roomId) }
-      }, {
-        $project: { userCount: { $size: "$users" } }
-      }]);
-    })
-    .then(function(x) {
-      var userCount = x && x[0] && x[0].userCount;
-      if (userCount >= 0) {
-        console.log('Updating userCount to ', userCount);
-        // FIXME: NOCOMMIT
-        return persistence.Troupe.updateQ({ _id: mongoUtils.asObjectID(roomId) }, {
-          $set: { userCount: userCount }
-        });
-      }
-    })
+  return roomMembershipService.removeRoomMembers(roomId, userIds)
     .then(function() {
       console.log('Marking items as read');
       return Q.all(userIds.map(bulkUnreadItemLimit(function(userId) {
         return unreadItemService.ensureAllItemsRead(userId, roomId);
       })));
     })
-    // FIXME: NOCOMMIT
-    // .then(function() {
-    //   return Q.all(userIds.map(function(userId) {
-    //     return liveCollectionEvents.serializeUserRemovedFromGroupRoom(roomId, userId);
-    //   }));
-    // })
     .then(function() {
       userIds.forEach(function(userId) {
         stats.event("auto_removed_room", {
