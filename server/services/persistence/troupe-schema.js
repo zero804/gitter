@@ -6,43 +6,12 @@ var Schema         = mongoose.Schema;
 var ObjectId       = Schema.ObjectId;
 var winston        = require('../../utils/winston');
 var assert         = require("assert");
-var Q              = require('q');
-var restSerializer = require('../../serializers/rest-serializer');
-var appEvents      = require('gitter-web-appevents');
 var _              = require("underscore");
 var tagger         = require('../../utils/room-tagger');
 var RepoService    = require('gitter-web-github').GitHubRepoService;
 var troupeUtils    = require('../../utils/models/troupes');
 var debug          = require('debug')('gitter:troupe-schema');
-
-function serializeEvent(url, operation, model, callback) {
-  debug("Serializing %s to %s", operation, url);
-
-  return restSerializer.serializeModel(model)
-    .then(function(serializedModel) {
-      appEvents.dataChange2(url, operation, serializedModel);
-    })
-    .fail(function(err) {
-      winston.error("Silently failing model event: ", { exception: err, url: url, operation: operation });
-    })
-    .nodeify(callback);
-}
-
-function serializeRemove(url, id) {
-  appEvents.dataChange2(url, "remove", { id: id });
-}
-
-function serializeOneToOneTroupeEvent(userId, operation, model, callback) {
-  var oneToOneUserUrl = '/user/' + userId + '/rooms';
-
-  var strategy = new restSerializer.TroupeStrategy({ currentUserId: userId });
-
-  return restSerializer.serialize(model, strategy)
-    .then(function(serializedModel) {
-      appEvents.dataChange2(oneToOneUserUrl, operation, serializedModel);
-    })
-    .nodeify(callback);
-}
+var liveCollectionEvents = require('../live-collection-events');
 
 module.exports = {
   install: function(mongooseConnection) {
@@ -189,13 +158,7 @@ module.exports = {
       // TODO: disable this methods for one-to-one troupes
       var troupeUser = new TroupeUser(raw);
       this.post('save', function(postNext) {
-        var url = "/rooms/" + this.id + "/users";
-        var userUrl = "/user/" + userId + "/rooms";
-
-        Q.all([
-          serializeEvent(url, "create", troupeUser),
-          serializeEvent(userUrl, "create", this)
-          ])
+        return liveCollectionEvents.serializeUserAddedToRoom(this, troupeUser)
           .nodeify(postNext);
       });
 
@@ -213,21 +176,8 @@ module.exports = {
       if(troupeUser) {
         // TODO: unfortunately the TroupeUser middleware remove isn't being called as we may have expected.....
         this.post('save', function(postNext) {
-          var promise;
-
-          if(!this.oneToOne) {
-            /* Dont mark the user as having been removed from the room */
-            serializeRemove('/rooms/' + this.id + '/users', userId);
-            serializeRemove('/user/' + userId + '/rooms', this.id);
-
-            // TODO: move this in a remove listener somewhere else in the codebase
-            appEvents.userRemovedFromTroupe({ troupeId: this.id, userId: troupeUser.userId });
-            promise = Q.resolve();
-          } else {
-            promise = serializeOneToOneTroupeEvent(userId, "remove", this);
-          }
-
-          return promise.nodeify(postNext);
+          return liveCollectionEvents.serializeUserRemovedFromRoom(this, userId)
+            .nodeify(postNext);
         });
 
         if(this.oneToOne) {
@@ -253,7 +203,7 @@ module.exports = {
       if(troupeUser) {
         // TODO: unfortunately the TroupeUser middleware remove isn't being called as we may have expected.....
         this.post('save', function(postNext) {
-          serializeOneToOneTroupeEvent(userId, "create", this, postNext);
+          liveCollectionEvents.serializeOneToOneTroupeEvent(userId, "create", this, postNext);
         });
 
         troupeUser.deactivated = undefined;

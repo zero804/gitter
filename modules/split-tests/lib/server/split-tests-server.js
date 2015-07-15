@@ -27,10 +27,7 @@ function configure(req, res, testName, disableSet) {
   // If cookies are not enabled in the current environment use the set value
   // defaulting to control.
   // CORS with Cookies is more trouble that it's worth
-  if (!req.cookies) {
-    if (!forcedParam) return 'control';
-    return forcedParam;
-  }
+  if (!req.cookies) return forcedParam || 'control';
 
   // From here on, the cookies middleware has been installed
   var value = req.cookies[cookieName];
@@ -67,8 +64,8 @@ function middleware(testName, disableSet) {
   };
 }
 
-function selectTemplate(variant, defaultTemplate, variants) {
-  var template = variants[variant] || defaultTemplate;
+function selectTemplate(variant, controlTemplate, variantTemplate) {
+  var template = variant === 'treatment' ? variantTemplate : controlTemplate;
   debug('Selected template %s for variant %s', template, variant);
   return template;
 }
