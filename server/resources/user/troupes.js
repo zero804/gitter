@@ -86,6 +86,12 @@ module.exports = {
       .fail(next);
   },
 
+  /**
+   * Hides a room from the menu. A user can only request this
+   * on their own behalf.
+   *
+   * DELETE /users/:userId/rooms/:roomId
+   */
   destroy: function(req, res, next) {
     var userId = req.user.id;
 
