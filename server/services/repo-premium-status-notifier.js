@@ -20,6 +20,7 @@ function repoPremiumStatusNotifier(userOrOrg, premiumStatus) {
 
       var userNotificatons = {};
 
+      // TODO: NOCOMMIT 
       return troupeDao.findByOwnerUri(userOrOrg, { 'users.userId': 1 })
         .then(function(troupes) {
 

@@ -7,7 +7,6 @@ var nconf              = env.config;
 var stats              = env.stats;
 var errorReporter      = env.errorReporter;
 
-var ObjectID           = require('mongodb').ObjectID;
 var Q                  = require('q');
 var request            = require('request');
 var _                  = require('underscore');
@@ -21,8 +20,6 @@ var userService        = require('./user-service');
 var troupeService      = require('./troupe-service');
 var GitHubRepoService  = require('gitter-web-github').GitHubRepoService;
 var GitHubOrgService   = require('gitter-web-github').GitHubOrgService;
-var appEvents          = require('gitter-web-appevents');
-var serializeEvent     = require('./persistence-service-events').serializeEvent;
 var validate           = require('../utils/validate');
 var collections        = require('../utils/collections');
 var StatusError        = require('statuserror');
@@ -40,6 +37,7 @@ var redisLockPromise   = require("../utils/redis-lock-promise");
 var unreadItemService  = require('./unread-item-service');
 var debug              = require('debug')('gitter:room-service');
 var roomMembershipService = require('./room-membership-service');
+var liveCollections    = require('./live-collections');
 
 var badgerEnabled      = nconf.get('autoPullRequest:enabled');
 
@@ -151,14 +149,6 @@ function applyAutoHooksForRepoRoom(user, troupe) {
 }
 exports.applyAutoHooksForRepoRoom = applyAutoHooksForRepoRoom;
 
-
-/**
- * Private method to push creates out to the bus
- */
-function serializeCreateEvent(troupe, initialUsers) {
-  var urls = initialUsers.map(function(userId) { return '/user/' + userId + '/rooms'; });
-  serializeEvent(urls, 'create', troupe);
-}
 
 /* Creates a visitor that determines whether a room type creation is allowed */
 function makeRoomTypeCreationFilterFunction(creationFilter) {
@@ -318,7 +308,9 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri, options) {
               }
 
               /* The room was created atomically */
-              serializeCreateEvent(troupe, user ? [user._id] : []);
+              if (user) {
+                liveCollections.rooms.emit('create', troupe, [user._id]);
+              }
 
               /* Created here */
               /* TODO: Later we'll need to handle private repos too */
@@ -834,7 +826,10 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
             }
 
             // TODO handle adding the user in the event that they didn't create the room!
-            serializeCreateEvent(newRoom, user ? [user._id] : []);
+            if (user) {
+              liveCollections.rooms.emit('create', newRoom, [user._id]);
+            }
+
             stats.event("create_room", {
               userId: user.id,
               roomType: "channel"
@@ -980,7 +975,7 @@ function revalidatePermissionsForUsers(room) {
         if (!removalUserIds.length) return;
         return roomMembershipService.removeRoomMembers(room._id, removalUserIds);
       });
-    })
+    });
 
 }
 exports.revalidatePermissionsForUsers = revalidatePermissionsForUsers;
