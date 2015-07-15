@@ -38,10 +38,14 @@ function install() {
 
     Object.keys(lib).forEach(function(eventName) {
       emitter.on(eventName, function() {
-        lib[eventName].apply(lib, arguments)
-          .catch(function(err) {
+        var possiblePromise = lib[eventName].apply(lib, arguments);
+
+        /* Some unimplemented methods don't return anything */
+        if (possiblePromise) {
+          possiblePromise.catch(function(err) {
             logger.error('live-collection handler failed: ' + err, { exception: err });
-          });
+          })
+        }
       });
     });
   });
