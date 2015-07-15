@@ -101,7 +101,7 @@ gulp.task('validate-illegal-markers', function() {
   //   .pipe(grepFail([ '' ]));
 });
 
-gulp.task('validate', ['validate-client-source', 'validate-server-source', 'validate-illegal-markers']);
+gulp.task('validate', ['validate-client-source', 'validate-server-source' /*, 'validate-illegal-markers'*/]);
 
 makeTestTasks('test-mocha', function(name, files) {
   mkdirp.sync('output/test-reports/');
