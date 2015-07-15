@@ -1,13 +1,13 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var troupeService = require('./troupe-service');
 var persistence   = require("./persistence-service");
 var Q             = require('q');
 var client        = require('../utils/elasticsearch-client');
 var collections   = require('../utils/collections');
 var _             = require('underscore');
 var userService   = require('./user-service');
+var roomMembershipService = require('./room-membership-service');
 
 function createRegExpsForQuery(queryText) {
   var normalized = ("" + queryText).trim().toLowerCase();
@@ -140,7 +140,7 @@ exports.searchForUsers = function(userId, queryText, options, callback) {
     .then(function(res) {
       if(!res.length) return emptyResponse;
 
-      return troupeService.findAllTroupesIdsForUser(userId)
+      return roomMembershipService.findRoomIdsForUser(userId)
         .then(function(troupeIds) {
           // No point in including a troupe if it's to be excluded
           if(options.excludeTroupeId) {
@@ -149,7 +149,7 @@ exports.searchForUsers = function(userId, queryText, options, callback) {
 
           if(!troupeIds.length) return emptyResponse;
 
-          return troupeService.findAllUserIdsForTroupes(troupeIds)
+          return roomMembershipService.findAllMembersForRooms(troupeIds)
             .then(function(userIds) {
 
               // Remove the user doing the search
@@ -161,7 +161,7 @@ exports.searchForUsers = function(userId, queryText, options, callback) {
                 return searchForRegularExpressionsWithinUserIds(userIds, res, queryText, options);
               }
 
-              return troupeService.findUserIdsForTroupe(options.excludeTroupeId)
+              return roomMembershipService.findMembersForRoom(options.excludeTroupeId)
                 .then(function(excludedTroupeUserIds) {
                   // Remove the user doing the search
                   userIds = difference(userIds, excludedTroupeUserIds);

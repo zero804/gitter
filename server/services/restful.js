@@ -4,8 +4,6 @@
 var env               = require('gitter-web-env');
 var logger            = env.logger;
 
-var troupeService       = require("./troupe-service");
-
 var restSerializer      = require("../serializers/rest-serializer");
 var unreadItemService   = require("./unread-item-service");
 var chatService         = require("./chat-service");
@@ -76,8 +74,8 @@ exports.serializeUsersForTroupe = function(troupeId, userId, options) {
       return Q.resolve([]);
     }
 
-    /* The limit must only be applied post findUserIdsForTroupe */
-    return troupeService.findUserIdsForTroupe(troupeId)
+    /* The limit must only be applied post findMembersForRoom */
+    return roomMembershipService.findMembersForRoom(troupeId)
       .then(function(userIds) {
 
         return userService.findByIdsAndSearchTerm(userIds, searchTerm, limit || 30)
@@ -88,9 +86,7 @@ exports.serializeUsersForTroupe = function(troupeId, userId, options) {
       });
   }
 
-  return (limit ?
-        troupeService.findUsersIdForTroupeWithLimit(troupeId, limit) :
-        troupeService.findUserIdsForTroupe(troupeId))
+  return roomMembershipService.findMembersForRoom(troupeId, { limit: limit }) /* Limit may be null */
     .then(function(userIds) {
       var strategy = new restSerializer.UserIdStrategy({
         showPresenceForTroupeId: troupeId,

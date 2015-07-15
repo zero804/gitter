@@ -5,11 +5,11 @@ var stats                     = env.stats;
 var recentRoomService         = require('./recent-room-service');
 var persistence               = require('./persistence-service');
 var unreadItemService         = require('./unread-item-service');
-var troupeService             = require('./troupe-service');
 var Q                         = require('q');
 var qlimit                    = require('qlimit');
 var persistence               = require('./persistence-service');
 var mongoUtils                = require('../utils/mongo-utils');
+var roomMembershipService     = require('./room-membership-service');
 
 /**
  * Returns a list of users who could be lurked
@@ -18,7 +18,7 @@ var mongoUtils                = require('../utils/mongo-utils');
 function findRemovalCandidates(roomId, options) {
   var minTimeInDays = (options.minTimeInDays || 14);
 
-  return troupeService.findUserIdsForTroupe(roomId)
+  return roomMembershipService.findMembersForRoom(roomId)
     .then(function(userIds) {
       return recentRoomService.findLastAccessTimesForUsersInRoom(roomId, userIds);
     })

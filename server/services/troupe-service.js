@@ -39,13 +39,6 @@ function findById(id, callback) {
 }
 
 /**
- * @deprecated
- */
-function findAllTroupesIdsForUser(userId) {
-  return roomMembershipService.findRoomIdsForUser(userId);
-}
-
-/**
  * [{troupe without users}, userIsInRoom:boolean]
  */
 function findByIdLeanWithAccess(troupeId, userId) {
@@ -71,33 +64,6 @@ function findByIdLeanWithAccess(troupeId, userId) {
     });
 }
 
-/**
- * Find the userIds of all the troupe.
- *
- * Candidate for redis caching potentially?
- * @deprecated
- */
-function findUserIdsForTroupe(troupeId) {
-  return roomMembershipService.findMembersForRoom(troupeId);
-}
-
-/**
- * Find usersIds for a troupe, with a limit.
- * Defaults to sort with non-lurk first, then join date
- * @deprecated
- */
-function findUsersIdForTroupeWithLimit(troupeId, limit) {
-  return roomMembershipService.findMembersForRoom(troupeId, { limit: limit });
-}
-
-/**
- * Returns a hash of users in the troupe their lurk status as the value.
- * @deprecated
- */
-function findUserIdsForTroupeWithLurk(troupeId) {
-  return roomMembershipService.findMembersForRoomWithLurk(troupeId);
-}
-
 function findOneToOneTroupe(fromUserId, toUserId) {
   if(fromUserId == toUserId) throw "You cannot be in a troupe with yourself.";
   assert(fromUserId, 'fromUserId parameter required');
@@ -111,7 +77,6 @@ function findOneToOneTroupe(fromUserId, toUserId) {
           { 'oneToOneUsers.userId': toUserId }
         ]
     });
-
 }
 
 /**
@@ -185,6 +150,7 @@ function findOrCreateOneToOneTroupe(userId1, userId2) {
             oneToOneUpgrade: false
           });
 
+          // FIXME: NOCOMMIT make this work
           // TODO: do this here to get around problems with
           // circular dependencies. This will probably need to change in
           // future
@@ -275,21 +241,6 @@ function toggleSearchIndexing(user, troupe, bool) {
     });
 }
 
-/**
- * @deprecated
- */
-function findAllUserIdsForTroupes(troupeIds) {
-  return roomMembershipService.findAllMembersForRooms(troupeIds);
-}
-
-
-/**
- * @deprecated
- */
-function findAllUserIdsForTroupe(troupeId) {
-  return roomMembershipService.findMembersForRoom(troupeId);
-}
-
 function deleteTroupe(troupe, callback) {
   // FIXME: NOCOMMIT
   assert(false);
@@ -328,12 +279,6 @@ module.exports = {
   findByIds: findByIds,
   findByIdsLean: findByIdsLean,
   findByIdLeanWithAccess: findByIdLeanWithAccess,
-  findAllTroupesIdsForUser: findAllTroupesIdsForUser,
-  findAllUserIdsForTroupes: findAllUserIdsForTroupes,
-  findAllUserIdsForTroupe: findAllUserIdsForTroupe,
-  findUserIdsForTroupeWithLurk: findUserIdsForTroupeWithLurk,
-  findUserIdsForTroupe: findUserIdsForTroupe,
-  findUsersIdForTroupeWithLimit: findUsersIdForTroupeWithLimit,
   findOneToOneTroupe: findOneToOneTroupe,
   findOrCreateOneToOneTroupeIfPossible: findOrCreateOneToOneTroupeIfPossible,
   deleteTroupe: deleteTroupe,
