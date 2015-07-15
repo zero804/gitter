@@ -2,7 +2,6 @@
 "use strict";
 
 var restful = require('../../services/restful');
-var recentRoomService  = require('../../services/recent-room-service');
 var roomService        = require('../../services/room-service');
 var emailAddressService = require('../../services/email-address-service');
 var userService        = require("../../services/user-service");

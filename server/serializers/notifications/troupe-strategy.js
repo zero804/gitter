@@ -38,7 +38,7 @@ function TroupeStrategy(options) {
   };
 
 
-  function getOtherUserId(item) {
+  function getOtherUserId(troupe) {
     if(!recipientUserId || !troupe.oneToOne || !troupe.oneToOneUsers) return undefined;
 
     for (var i = 0; i < troupe.oneToOneUsers.length; i++) {
