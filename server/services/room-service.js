@@ -611,16 +611,35 @@ exports.findOrCreateRoom = findOrCreateRoom;
 /**
  * Find all non-private channels under a particular parent
  */
-function findAllChannelsForRoom(user, parentTroupe, callback) {
-  // FIXME: NOCOMMIT
-  return persistence.Troupe.findQ({
-      parentId: parentTroupe._id,
-      $or: [
-        { security: { $ne: 'PRIVATE' } }, // Not private...
-        { 'users.userId': user._id },     // ... or you're in the circle of trust
-      ]
-    })
-    .nodeify(callback);
+function findAllChannelsForRoom(user, parentTroupe) {
+  return persistence.Troupe.findQ({ parentId: parentTroupe._id, })
+    .then(function(troupes) {
+      if (!troupes.length) return troupes;
+
+      var privateRooms = troupes
+        .filter(function(troupe) {
+          return troupe.security === 'PRIVATE';
+        })
+        .map(function(troupe) {
+          return troupe._id;
+        });
+
+      if (!privateRooms.length) return troupes;
+
+      // If there are private rooms, we need to filter out
+      // any rooms which the user is not a member of...
+      return roomMembershipService.findUserMembershipInRooms(user._id, privateRooms)
+        .then(function(privateRoomsWithAccess) {
+          var privateRoomsWithAccessHash = collections.hashArray(privateRoomsWithAccess);
+
+          // Filter out all the rooms which are private to which this
+          // use does not have access
+          return troupes.filter(function(troupe) {
+            if (troupe.security !== 'PRIVATE') return true; // Allow all non private rooms
+            return privateRoomsWithAccessHash[troupe._id];
+          });
+        });
+    });
 }
 exports.findAllChannelsForRoom = findAllChannelsForRoom;
 
@@ -628,27 +647,34 @@ exports.findAllChannelsForRoom = findAllChannelsForRoom;
  * Given parent and child ids, find a child channel that is
  * not PRIVATE
  */
-function findChildChannelRoom(user, parentTroupe, childTroupeId, callback) {
+function findChildChannelRoom(user, parentTroupe, childTroupeId) {
   return persistence.Troupe.findOneQ({
       parentId: parentTroupe._id,
-      id: childTroupeId,
-      $or: [
-        { security: { $ne: 'PRIVATE' } }, // Not private...
-        { 'users.userId': user._id },     // ... or you're in the circle of trust
-      ]
+      id: childTroupeId
     })
-    .nodeify(callback);
+    .then(function(channelRoom) {
+      if (!channelRoom) return null;
+
+      if (channelRoom.security !== 'PRIVATE') return channelRoom;
+
+      // Before returning the private room to the user
+      // make sure they have access to the room
+      return roomMembershipService.checkRoomMembership(channelRoom._id, user._id)
+        .then(function(isInRoom) {
+          if (!isInRoom) return null;
+          return channelRoom;
+        });
+    });
 }
 exports.findChildChannelRoom = findChildChannelRoom;
 
 /**
  * Find all non-private channels under a particular parent
  */
-function findAllChannelsForUser(user, callback) {
+function findAllChannelsForUser(user) {
   return persistence.Troupe.findQ({
       ownerUserId: user._id
-    })
-    .nodeify(callback);
+    });
 }
 exports.findAllChannelsForUser = findAllChannelsForUser;
 

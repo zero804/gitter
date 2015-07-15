@@ -110,6 +110,13 @@ module.exports = function(err, req, res, next) { // jshint unused:false
     };
 
     stats.event('client_error_402', { userId: userId });
+  } else if (status === 403) {
+    stats.event('client_error_403', { userId: userId });
+
+    extraTemplateValues = {
+      title: 'Access denied'
+    };
+
   } else if(status >= 400 && status < 500) {
     stats.event('client_error_4xx', { userId: userId });
   }
