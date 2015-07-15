@@ -49,6 +49,7 @@ function findPrivateChannelsWithUser(user, query, options) {
     return { lcUri: re };
   });
 
+  // FIXME: NOCOMMIT
   return persistence.Troupe
     .find({
       $and: filterQueries,

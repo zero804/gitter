@@ -14,9 +14,8 @@ var eventService        = require("./event-service");
 var Q                   = require('q');
 var roomService         = require('./room-service');
 var GithubMe            = require('gitter-web-github').GitHubMeService;
-var isUserLurkingInRoom = require('./is-user-lurking-in-room');
 var _                   = require('underscore');
-
+var roomMembershipService = require('./room-membership-service');
 
 var survivalMode = !!process.env.SURVIVAL_MODE || false;
 
@@ -107,7 +106,7 @@ exports.serializeUsersForTroupe = function(troupeId, userId, options) {
 
 exports.serializeUnreadItemsForTroupe = function(troupeId, userId, callback) {
   return Q.all([
-      isUserLurkingInRoom(userId, troupeId),
+      roomMembershipService.getMemberLurkStatus(troupeId, userId),
       unreadItemService.getUnreadItemsForUser(userId, troupeId)
     ])
     .spread(function(isLurking, items) {

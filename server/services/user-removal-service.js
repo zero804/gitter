@@ -16,6 +16,7 @@ exports.removeByUsername = function(username, options) {
 
       var userId = user.id;
 
+      // FIXME: NOCOMMIT
       return troupeService.findAllTroupesForUser(userId)
         .then(function(troupes) {
           return Q.all(troupes.map(function(troupe) {
