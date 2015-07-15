@@ -8,29 +8,55 @@ var mongoUtils  = require('./mongo-utils');
 var mongoose    = require('mongoose-q')(require('mongoose'), {spread:true});
 var Schema      = mongoose.Schema;
 
-exports.attachNotificationListenersToSchema = function (schema, options) {
-  var ignoredPaths = options.ignoredPaths;
-  var ignoredPathsHash;
-  if(ignoredPaths) {
-    ignoredPathsHash = {};
-    ignoredPaths.forEach(function(path) {
-      ignoredPathsHash[path] = true;
-    });
+function hashList(list) {
+  if(!list) return null;
 
-  } else {
-    ignoredPathsHash = null;
+  return list.reduce(function(memo, item) {
+    memo[item] = true;
+    return memo;
+  }, {});
+}
+exports.attachNotificationListenersToSchema = function (schema, options) {
+  var blacklistHash = hashList(options.ignoredPaths);
+  var whitelistHash = hashList(options.listenPaths);
+
+  if(blacklistHash && whitelistHash) {
+    throw new Error('Please specify either ignoredPaths (blacklist) or listenPaths (whitelist) or neither, not both');
+  }
+
+  function canIgnore(model) {
+    var modified = model.modifiedPaths();
+    if (modified.length === 0) {
+      return true; // No changes
+    }
+    
+    if (blacklistHash) {
+      var allBlacklisted = modified.every(function(path) { return blacklistHash[path]; });
+      if (allBlacklisted) {
+        return true; // All modified paths can be ignored
+      }
+      return false;
+    }
+
+    if (whitelistHash) {
+      var someWhitelisted = modified.some(function(path) { return whitelistHash[path]; });
+      if (someWhitelisted) {
+        return false; // Things on the whitelist - handle this modification
+      } else {
+        return true; // Nothing on the whitelist, ignore
+      }
+    }
+
+    return false;
   }
 
   if(options.onCreate || options.onUpdate) {
     schema.pre('save', function (next) {
-      var isNewInstance = this.isNew;
-
-      if(ignoredPaths) {
-        var allIgnored = this.modifiedPaths().every(function(path) { return ignoredPathsHash[path]; });
-        if(allIgnored) {
-          return next();
-        }
+      if (canIgnore(this)) {
+        return next();
       }
+
+      var isNewInstance = this.isNew;
 
       this.get('_tv').increment();
 

@@ -56,7 +56,7 @@ function removeRecentRoomForUser(room, userId) {
     return removeFavourite(room, userId);
   })
   .then(function() {
-    return roomMembershipService.getMemberLurkStatus(room._id, userId)
+    return roomMembershipService.getMemberLurkStatus(room._id, userId);
   })
   .then(function(userLurkStatus) {
     var roomId = room.id;

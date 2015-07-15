@@ -1,4 +1,5 @@
 "use strict";
+
 var env                       = require('gitter-web-env');
 var stats                     = env.stats;
 var recentRoomService         = require('./recent-room-service');
@@ -9,7 +10,7 @@ var Q                         = require('q');
 var qlimit                    = require('qlimit');
 var persistence               = require('./persistence-service');
 var mongoUtils                = require('../utils/mongo-utils');
-var liveCollectionEvents      = require('./live-collection-events');
+// var liveCollectionEvents      = require('./live-collection-events');
 
 /**
  * Returns a list of users who could be lurked
@@ -57,6 +58,7 @@ function bulkRemoveUsersFromRoom(roomId, userIds) {
 
   if (!userIds.length) return Q.resolve();
   console.log('Removing ', userIds.length, ' users from ', roomId);
+  // FIXME: NOCOMMIT
   return persistence.Troupe.updateQ({ _id: mongoUtils.asObjectID(roomId), oneToOne: { $ne: true } }, {
       $pull: {
         users: {
@@ -78,7 +80,7 @@ function bulkRemoveUsersFromRoom(roomId, userIds) {
       var userCount = x && x[0] && x[0].userCount;
       if (userCount >= 0) {
         console.log('Updating userCount to ', userCount);
-
+        // FIXME: NOCOMMIT
         return persistence.Troupe.updateQ({ _id: mongoUtils.asObjectID(roomId) }, {
           $set: { userCount: userCount }
         });
@@ -90,11 +92,12 @@ function bulkRemoveUsersFromRoom(roomId, userIds) {
         return unreadItemService.ensureAllItemsRead(userId, roomId);
       })));
     })
-    .then(function() {
-      return Q.all(userIds.map(function(userId) {
-        return liveCollectionEvents.serializeUserRemovedFromGroupRoom(roomId, userId);
-      }));
-    })
+    // FIXME: NOCOMMIT
+    // .then(function() {
+    //   return Q.all(userIds.map(function(userId) {
+    //     return liveCollectionEvents.serializeUserRemovedFromGroupRoom(roomId, userId);
+    //   }));
+    // })
     .then(function() {
       userIds.forEach(function(userId) {
         stats.event("auto_removed_room", {
