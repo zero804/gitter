@@ -1395,3 +1395,39 @@ function renameRepo(oldUri, newUri) {
 
 }
 exports.renameRepo = renameRepo;
+
+/**
+ * Delete room
+ */
+function deleteRoom(troupe) {
+  var userListPromise;
+  if (troupe.oneToOne) {
+    userListPromise = Q.resolve(troupe.oneToOneUsers.map(function(t) { return t.userId; }));
+  } else {
+    userListPromise = roomMembershipService.findMembersForRoom(troupe._id);
+  }
+
+  return userListPromise
+    .then(function(userIds) {
+      return Q.all(userIds.map(function(userId) {
+          // Remove favorites, unread items and last access times
+          return recentRoomService.removeRecentRoomForUser(userId, troupe._id);
+        }))
+        .then(function() {
+          // Remove all the folk from the room
+          return roomMembershipService.removeRoomMembers(troupe._id, userIds);
+        });
+    })
+    .then(function() {
+      if (troupe.oneToOne) {
+        return troupe.removeQ();
+      }
+
+      troupe.status = 'DELETED';
+      if (!troupe.dateDeleted) {
+        troupe.dateDeleted = new Date();
+      }
+      return troupe.saveQ();
+    });
+}
+exports.deleteRoom = deleteRoom;
