@@ -134,7 +134,7 @@ exports.serializeEventsForTroupe = function(troupeId, userId, callback) {
     .nodeify(callback);
 };
 
-exports.serializeOrgsForUser = function(user, options) {
+exports.serializeOrgsForUser = function(user/*, options */) {
   var ghUser = new GithubMe(user);
 
   var strategyOptions = { currentUserId: user.id /*, mapUsers: options && options.mapUsers */ };
