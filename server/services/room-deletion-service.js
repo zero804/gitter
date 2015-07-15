@@ -3,8 +3,8 @@
 
 var userService = require('./user-service');
 var troupeService = require('./troupe-service');
+var roomService = require('./room-service');
 var assert = require('assert');
-var removeService = require('./remove-service');
 var persistence = require('./persistence-service');
 var Q = require('q');
 
@@ -21,7 +21,7 @@ function removeUsersFromRoomOneAtATime(room, userIds) {
         var user = users.shift();
 
         logger.info('Removing ' + user.username);
-        return removeService.userLeaveRoom(room, user)
+        return roomService.removeUserFromRoom(room, user, user)
           .then(removeNext);
       }
 

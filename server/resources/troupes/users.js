@@ -105,11 +105,7 @@ module.exports = {
     return troupeService.findById(troupeId)
       .then(function(troupe) {
         if(!troupe) throw new StatusError(404);
-
         return roomService.removeUserFromRoom(troupe, user, req.user);
-      })
-      .then(function() {
-        recentRoomService.removeRecentRoomForUser(user.id, troupeId);
       })
       .then(function() {
         res.send({ success: true });

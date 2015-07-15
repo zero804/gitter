@@ -6,7 +6,6 @@ var restful              = require("../../services/restful");
 var restSerializer       = require("../../serializers/rest-serializer");
 var recentRoomService    = require('../../services/recent-room-service');
 var roomService          = require('../../services/room-service');
-var removeService        = require('../../services/remove-service');
 var Q                    = require('q');
 var mongoUtils           = require('../../utils/mongo-utils');
 var StatusError          = require('statuserror');
@@ -93,15 +92,7 @@ module.exports = {
    * DELETE /users/:userId/rooms/:roomId
    */
   destroy: function(req, res, next) {
-    var userId = req.user.id;
-
-    // Switch a lean troupe object for a full mongoose object
-    return troupeService.findById(req.userTroupe.id)
-      .then(function(troupe) {
-        if (!troupe) throw new StatusError(404);
-
-        return removeService.removeRecentRoomForUser(troupe, userId);
-      })
+    return roomService.hideRoomFromUser(req.userTroupe._id, req.user._id)
       .then(function() {
         res.send({ success: true });
       })
