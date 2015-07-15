@@ -7,6 +7,7 @@ var nconf              = env.config;
 var stats              = env.stats;
 var errorReporter      = env.errorReporter;
 
+var appEvents          = require('gitter-web-appevents');
 var Q                  = require('q');
 var request            = require('request');
 var _                  = require('underscore');
@@ -38,7 +39,7 @@ var unreadItemService  = require('./unread-item-service');
 var debug              = require('debug')('gitter:room-service');
 var roomMembershipService = require('./room-membership-service');
 var liveCollections    = require('./live-collections');
-
+var recentRoomService  = require('./recent-room-service');
 var badgerEnabled      = nconf.get('autoPullRequest:enabled');
 
 exports.testOnly = {};
@@ -1077,31 +1078,65 @@ function validateRoomForReadOnlyAccess(user, room) {
 }
 exports.validateRoomForReadOnlyAccess = validateRoomForReadOnlyAccess;
 
+function checkInstigatingUserPermissionForRemoveUser(room, user, requestingUser) {
+  return Q.fcall(function() {
+    // User is requesting user -> leave
+    if(user.id === requestingUser.id) return true;
+
+    // Check if not in one-to-one room and requesting user is admin
+    return roomPermissionsModel(requestingUser, 'admin', room);
+  });
+}
+
 /**
  * Remove user from room
  * If the user to be removed is not the one requesting, check permissions
  */
 function removeUserFromRoom(room, user, requestingUser) {
-  if(!room) return Q.reject(new StatusError(400, 'Room required'));
-  if(!user) return Q.reject(new StatusError(400, 'User required'));
-  if(!requestingUser) return Q.reject(new StatusError(401, 'Not authenticated'));
-
   return Q.fcall(function() {
-    // User is requesting user -> leave
-    if(user.id === requestingUser.id) return true;
-    // Check if not in one-to-one room and requesting user is admin
-    if(room.githubType === 'ONETOONE') throw new StatusError(400, 'This room does not support removing.');
-    return roomPermissionsModel(requestingUser, 'admin', room)
+      if (!room) return new StatusError(400, 'Room required');
+      if (!user) return new StatusError(400, 'User required');
+      if (!requestingUser) return new StatusError(401, 'Not authenticated');
+      if (room.githubType === 'ONETOONE') throw new StatusError(400, 'This room does not support removing.');
+
+      return checkInstigatingUserPermissionForRemoveUser(room, user, requestingUser);
+    })
     .then(function(access) {
       if(!access) throw new StatusError(403, 'You do not have permission to remove people. Admin permission is needed.');
+
+      return roomMembershipService.removeRoomMember(room._id, user._id);
+    })
+    .then(function() {
+      // Remove favorites, unread items and last access times
+      return recentRoomService.removeRecentRoomForUser(user._id, room._id);
     });
-  })
-  // Do the removal
-  .then(function() {
-    return roomMembershipService.removeRoomMember(room._id, user._id);
-  });
 }
 exports.removeUserFromRoom = removeUserFromRoom;
+
+/**
+ * Hides a room for a user.
+ */
+function hideRoomFromUser(roomId, userId) {
+  return recentRoomService.removeRecentRoomForUser(userId, roomId)
+    .then(function() {
+      return roomMembershipService.getMemberLurkStatus(roomId, userId);
+    })
+    .then(function(userLurkStatus) {
+      if (userLurkStatus === null) {
+        // User does not appear to be in the room...
+        appEvents.dataChange2('/user/' + userId + '/rooms', 'remove', { id: roomId });
+        return;
+      }
+
+      if (userLurkStatus) {
+        return roomMembershipService.removeRoomMember(roomId, userId);
+      }
+
+      // TODO: in future get rid of this but this collection is used by the native clients
+      appEvents.dataChange2('/user/' + userId + '/rooms', 'patch', { id: roomId, favourite: null, lastAccessTime: null, mentions: 0, unreadItems: 0 });
+    });
+}
+exports.hideRoomFromUser = hideRoomFromUser;
 
 function canBanInRoom(room) {
   if(room.githubType === 'ONETOONE') return false;

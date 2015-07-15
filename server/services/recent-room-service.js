@@ -3,7 +3,6 @@
 
 var Q                  = require('q');
 var lazy               = require('lazy.js');
-var troupeService      = require('./troupe-service');
 var troupeUriMapper    = require('./troupe-uri-mapper');
 var mongoUtils         = require('../utils/mongo-utils');
 var persistence        = require('./persistence-service');
@@ -17,46 +16,6 @@ var debug              = require('debug')('gitter:recent-room-service');
 /* const */
 var LEGACY_FAV_POSITION = 1000;
 var DEFAULT_LAST_ACCESS_TIME = new Date('2015-07-01T00:00:00Z');
-
-function generateRoomListForUser(userId) {
-  return Q.all([
-      findFavouriteTroupesForUser(userId),
-      getTroupeLastAccessTimesForUser(userId)
-    ])
-    .spread(function(favourites, lats) {
-      var sortedRooms = lazy(favourites)
-                              .pairs()
-                              .sortBy(function(a) { return isNaN(a[1]) ? 1000 : a[1]; }) // XXX: ? operation no longer needed
-                              .pluck(function(a) { return a[0]; });
-
-      var recentTroupeIds = lazy(lats)
-                              .pairs()
-                              .sortBy(function(a) { return a[1]; }) // Sort on the date
-                              .reverse()                            // Reverse the sort (desc)
-                              .pluck(function(a) { return a[0]; })  // Pick the troupeId
-                              .without(sortedRooms);                // Remove any favourites
-
-      var troupeIds = sortedRooms
-                              .concat(recentTroupeIds); // Add recents
-
-      var positions = troupeIds
-                              .map(function(v, i) {
-                                return [v, i];
-                              })
-                              .toObject();
-
-      return [troupeService.findByIds(troupeIds.toArray()), positions];
-    })
-    .spread(function(rooms, positions) {
-      var sorted = lazy(rooms)
-                .sortBy(function(room) { return positions[room.id]; })
-                .toArray();
-
-      return sorted;
-    });
-
-}
-exports.generateRoomListForUser = generateRoomListForUser;
 
 /**
  * Called when the user removes a room from the left hand menu.
