@@ -612,6 +612,7 @@ exports.findOrCreateRoom = findOrCreateRoom;
  * Find all non-private channels under a particular parent
  */
 function findAllChannelsForRoom(user, parentTroupe, callback) {
+  // FIXME: NOCOMMIT
   return persistence.Troupe.findQ({
       parentId: parentTroupe._id,
       $or: [
