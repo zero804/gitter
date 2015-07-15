@@ -25,6 +25,7 @@ exports.addRoomMembers              = addRoomMembers;
 exports.removeRoomMember            = removeRoomMember;
 exports.removeRoomMembers           = removeRoomMembers;
 exports.findAllMembersForRooms      = findAllMembersForRooms;
+exports.findMembersForRoomMulti     = findMembersForRoomMulti;
 
 exports.getMemberLurkStatus         = getMemberLurkStatus;
 exports.setMemberLurkStatus         = setMemberLurkStatus;
@@ -256,6 +257,34 @@ function findAllMembersForRooms(troupeIds) {
   });
 
   return TroupeUser.distinctQ("userId", { troupeId: { $in: mongoUtils.asObjectIDs(troupeIds) } });
+}
+
+/**
+ * Fetch the membership of multiple rooms, returns
+ * a hash keyed by the roomId, with a userId array
+ * as the value
+ */
+function findMembersForRoomMulti(troupeIds) {
+  if(!troupeIds.length) return Q.resolve({});
+  troupeIds.forEach(function(troupeIds) {
+    assert(troupeIds);
+  });
+
+  return TroupeUser.findQ({ troupeId: { $in: mongoUtils.asObjectIDs(troupeIds) } }, { _id: 0, troupeId: 1, userId: 1 })
+    .then(function(troupeUsers) {
+      return troupeUsers.reduce(function(memo, troupeUser) {
+        var troupeId = troupeUser.troupeId;
+        var userId = troupeUser.userId;
+
+        if (!memo[troupeId]) {
+          memo[troupeId] = [userId];
+        } else {
+          memo[troupeId].push(userId);
+        }
+
+        return memo;
+      }, {});
+    });
 }
 
 /**
