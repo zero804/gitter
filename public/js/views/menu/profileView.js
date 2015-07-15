@@ -63,7 +63,7 @@ module.exports = (function () {
     homeClicked: function (e) {
       e.preventDefault();
       if (context().user.url !== window.location.pathname) {
-        appEvents.trigger('navigation', context.getUser().url, 'home', '');
+        appEvents.trigger('navigation', '/home', 'home', 'home');
       }
     },
 

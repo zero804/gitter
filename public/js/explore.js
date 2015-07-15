@@ -3,6 +3,7 @@ var $ = require('jquery');
 var appEvents = require('utils/appevents');
 var onready = require('./utils/onready');
 require('utils/tracking');
+require('utils/frame-utils');
 
 onready(function() {
 

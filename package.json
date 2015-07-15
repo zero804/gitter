@@ -99,7 +99,7 @@
     "stringformat": "0.0.5",
     "targetenv": "^1.0.0",
     "temp": "0.4.0",
-    "tentacles": "^0.2.6",
+    "tentacles": "^0.2.7",
     "text-filter": "~0.1.0",
     "throat": "~1.0.0",
     "tough-cookie": "^0.12.1",
@@ -210,7 +210,7 @@
     "shrinkwrap": "npm run unlink && npm prune && npm install && npm-shrinkwrap && npm run link",
     "preinstall": "(linklocal list --format '%S' --no-summary || find node_modules -maxdepth 1 -type l -exec basename {} \\;)|while read line; do if [ -d \"$line\" ] && [ ! -h \"$line\" ]; then rm -r \"$line\"; fi; done",
     "shrinkwrap-conflict": "rm -f npm-shrinkwrap.json && npm run shrinkwrap",
-    "fix-shrinkwrap-registry": "sed -i '' 's#https://registry.npmjs.org/#http://beta-internal:4873/#g' npm-shrinkwrap.json"
+    "fix-shrinkwrap-registry": "sed -i '' 's#https://registry.npmjs.org/#http://beta-internal:4873/#g' npm-shrinkwrap.json && sed -i '' 's#http://beta-internal:8089/nexus/content/groups/npm/#http://beta-internal:4873/#g' npm-shrinkwrap.json"
   },
   "git": {
     "scripts": {
