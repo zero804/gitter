@@ -34,6 +34,9 @@ function install() {
 
   Object.keys(emitters).forEach(function(category) {
     var emitter = emitters[category];
+
+    // Don't load the library until install is called otherwise
+    // we'll introduce circular references
     var lib = require(handlers[category]); // Load the handler
 
     Object.keys(lib).forEach(function(eventName) {
