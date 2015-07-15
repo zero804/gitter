@@ -339,6 +339,7 @@ function createExpectedFixtures(expected, done) {
 }
 
 function fixtureLoader(fixture, expected) {
+  debug("Creating fixtures %j", expected);
   return function(done) {
      load(expected, function(err, data) {
        if(err) return done(err);

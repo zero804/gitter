@@ -4,31 +4,20 @@
 var testRequire   = require('../test-require');
 var fixtureLoader = require('../test-fixtures');
 var Q             = require("q");
-var _             = require('underscore');
 var assert        = require("assert");
-var mockito       = require('jsmockito').JsMockito;
-var mongoUtils    = testRequire("./utils/mongo-utils");
-var times         = mockito.Verifiers.times;
-var once          = times(1);
-var times         = mockito.Verifiers.times;
 var fixture       = {};
 
 Q.longStackSupport = true;
 
-function findUserIdPredicate(userId) {
-  return function(x) {
-    return "" + x === "" + userId;
-  }
-}
-
 describe('room-membership-service', function() {
 
   describe('#slow', function() {
-    var roomMembershipService;
+    var roomMembershipService, persistence;
 
     before(function() {
        roomMembershipService = testRequire('./services/room-membership-service');
-    })
+       persistence = testRequire('./services/persistence-service');
+    });
 
     before(fixtureLoader(fixture, {
       user1: {
@@ -58,6 +47,10 @@ describe('room-membership-service', function() {
         })
         .then(function(member) {
           assert(member);
+          return persistence.Troupe.findByIdQ(fixture.troupe1.id);
+        })
+        .then(function(troupe) {
+          assert.strictEqual(troupe.userCount, 1);
           return roomMembershipService.checkRoomMembership(fixture.troupe1.id, fixture.user2.id)
         })
         .then(function(member) {
@@ -70,6 +63,10 @@ describe('room-membership-service', function() {
     it('should allow users to be removed from a room', function(done) {
       roomMembershipService.addRoomMembers(fixture.troupe2.id, [fixture.user1.id, fixture.user2.id])
         .then(function() {
+          return persistence.Troupe.findByIdQ(fixture.troupe2.id);
+        })
+        .then(function(troupe) {
+          assert.strictEqual(troupe.userCount, 2);
           return roomMembershipService.removeRoomMembers(fixture.troupe2.id, [fixture.user1.id]);
         })
         .then(function() {
@@ -77,6 +74,11 @@ describe('room-membership-service', function() {
         })
         .then(function(count) {
           assert.strictEqual(count, 1);
+          return persistence.Troupe.findByIdQ(fixture.troupe2.id);
+        })
+        .then(function(troupe) {
+          assert.strictEqual(troupe.userCount, 1);
+
           return roomMembershipService.checkRoomMembership(fixture.troupe2.id, fixture.user2.id)
         })
         .then(function(member) {
