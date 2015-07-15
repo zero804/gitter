@@ -29,7 +29,7 @@ exports.attachNotificationListenersToSchema = function (schema, options) {
     if (modified.length === 0) {
       return true; // No changes
     }
-    
+
     if (blacklistHash) {
       var allBlacklisted = modified.every(function(path) { return blacklistHash[path]; });
       if (allBlacklisted) {
@@ -73,10 +73,11 @@ exports.attachNotificationListenersToSchema = function (schema, options) {
       var isNewInstance = doc._gIsNew;
       delete doc._gIsNew;
       if(isNewInstance) {
-        if(options.onCreate) options.onCreate(doc, postNext);
+        if(options.onCreate) return options.onCreate(doc, postNext);
       } else {
-        if(options.onUpdate) options.onUpdate(doc, postNext);
+        if(options.onUpdate) return options.onUpdate(doc, postNext);
       }
+      return postNext();
     });
 
   }

@@ -45,7 +45,7 @@ module.exports = {
       // users: [TroupeUserSchema],
       oneToOneUsers: [TroupeOneToOneUserSchema],
       // USER COUNT MAY NOT BE UP TO DATE. ONLY USE IT FOR QUERIES, NOT FOR ITERATION ETC.
-      userCount: { type: Number },
+      userCount: { type: Number, 'default': function() { return this.oneToOne ? 2 : 0; } },
       bans: [TroupeBannedUserSchema],
       parentId: { type: ObjectId, required: false },
       ownerUserId: { type: ObjectId, required: false }, // For channels under a user /suprememoocow/custom

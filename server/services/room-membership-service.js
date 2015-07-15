@@ -2,6 +2,7 @@
 
 var persistence              = require('./persistence-service');
 var TroupeUser               = persistence.TroupeUser;
+var Troupe                   = persistence.Troupe;
 var mongoUtils               = require("../utils/mongo-utils");
 var Q                        = require("q");
 var EventEmitter             = require('events').EventEmitter;
@@ -144,11 +145,11 @@ function addRoomMember(troupeId, userId) {
     .then(function(previous) {
       var added = !previous;
 
-      if (added) {
-        roomMembershipEvents.emit("members.added", troupeId, [userId]);
-      }
+      if (!added) return false;
 
-      return added;
+      roomMembershipEvents.emit("members.added", troupeId, [userId]);
+      return incrementTroupeUserCount(troupeId, 1)
+        .thenResolve(added);
     });
 
 }
@@ -186,9 +187,12 @@ function addRoomMembers(troupeId, userIds) {
       return userIds[upsertedDoc.index];
     });
 
+    if (!addedUserIds.length) return addedUserIds;
+
     roomMembershipEvents.emit("members.added", troupeId, addedUserIds);
 
-    return addedUserIds;
+    return incrementTroupeUserCount(troupeId, addedUserIds.length)
+      .thenResolve(addedUserIds);
   });
 }
 
@@ -208,11 +212,11 @@ function removeRoomMember(troupeId, userId) {
     .then(function(existing) {
       var removed = !!existing;
 
-      if (removed) {
-        roomMembershipEvents.emit("members.removed", troupeId, [userId]);
-      }
+      if (!removed) return false;
 
-      return removed;
+      roomMembershipEvents.emit("members.removed", troupeId, [userId]);
+      return incrementTroupeUserCount(troupeId, -1)
+        .thenResolve(true);
     });
 }
 
@@ -237,6 +241,8 @@ function removeRoomMembers(troupeId, userIds) {
       // as we have no transactions.
       //
       roomMembershipEvents.emit("members.removed", troupeId, userIds);
+
+      return resetTroupeUserCount(troupeId);
     });
 }
 
@@ -298,4 +304,18 @@ function setMembersLurkStatus(troupeId, userIds, lurk) {
     //
     roomMembershipEvents.emit("members.lurk.change", troupeId, userIds, lurk);
   });
+}
+
+/**
+ * Update the userCount value for a room
+ */
+function incrementTroupeUserCount(troupeId, incrementValue) {
+  return Troupe.updateQ({ _id: troupeId }, { $inc: { userCount: incrementValue } });
+}
+
+function resetTroupeUserCount(troupeId) {
+  return countMembersInRoom(troupeId)
+    .then(function(count) {
+      return Troupe.updateQ({ _id: troupeId }, { $set: { userCount: count } });
+    });
 }
