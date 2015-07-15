@@ -148,6 +148,7 @@ function filterRecommendations(recommendations, userId) {
 
   var uris = recommendations.map(function(r) { return r.uri.toLowerCase(); });
 
+  // FIXME: NOCOMMIT
   return persistence.Troupe.findQ({
       lcUri: { $in: uris }
     }, {
