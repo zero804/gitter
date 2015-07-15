@@ -27,6 +27,7 @@ var sourcemaps = require('gulp-sourcemaps');
 var shell = require('gulp-shell');
 var del = require('del');
 var grepFail = require('gulp-grep-fail');
+var runSequence = require('run-sequence');
 
 /* Don't do clean in gulp, use make */
 var DEV_MODE = !!process.env.DEV_MODE;
@@ -48,7 +49,10 @@ function makeTestTasks(taskName, generator) {
     });
   });
 
-  gulp.task(taskName, Object.keys(testModules).map(function(moduleName) { return taskName + '-' + moduleName; }));
+  gulp.task(taskName, function(callback) {
+    var args = Object.keys(testModules).map(function(moduleName) { return taskName + '-' + moduleName; }).concat(callback);
+    runSequence.apply(null, args);
+  });
 }
 
 
