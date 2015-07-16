@@ -24,12 +24,7 @@ var mainFrameMiddlewarePipeline = [
   function (req, res, next) {
 
     if (req.uriContext.ownUrl) {
-      if (req.isPhone) {
-        appRender.renderMobileUserHome(req, res, next, 'home');
-      } else {
-        appRender.renderMainFrame(req, res, next, 'home');
-      }
-      return;
+      return res.redirect('/home');
     }
 
     if(req.isPhone) {
@@ -136,18 +131,12 @@ module.exports = {
         app.get(path, cardMiddlewarePipeline);
       });
 
-
-      [
-        '/:roomPart1/~home'
-      ].forEach(function(path) {
-        app.get(path,
-          ensureLoggedIn,
-          appMiddleware.uriContextResolverMiddleware({ create: false }),
-          appMiddleware.isPhoneMiddleware,
-          function(req, res, next) {
-            appRender.renderHomePage(req, res, next);
-          });
-      });
+      app.get('/home/~home',
+        ensureLoggedIn,
+        appMiddleware.isPhoneMiddleware,
+        function(req, res, next) {
+          appRender.renderHomePage(req, res, next);
+        });
 
       require('./integrations').install(app);
       require('./mobile').install(app);

@@ -22,7 +22,7 @@ var View = Marionette.ItemView.extend({
     switch(button) {
       case 'delete':
         apiClient.room.delete().then(function() {
-          appEvents.trigger('navigation', context.getUser().url, 'home', '');
+          appEvents.trigger('navigation', '/home', 'home', '');
         });
         break;
 
