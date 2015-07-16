@@ -122,7 +122,7 @@ module.exports = function(err, req, res, next) { // jshint unused:false
 
     stat('client_error_402', req);
   } else if (status === 403) {
-    stats('client_error_403', req);
+    stat('client_error_403', req);
 
     extraTemplateValues = {
       title: 'Access denied'
