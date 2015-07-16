@@ -6,7 +6,7 @@ var sampleChatsService = testRequire("./services/sample-chats-service");
 
 describe('sample-chats-service', function() {
 
-  it.skip('should return sample chats #slow', function(done) {
+  it('should return sample chats #slow', function(done) {
     sampleChatsService.getSamples()
       .then(function(chats) {
         assert(Array.isArray(chats));

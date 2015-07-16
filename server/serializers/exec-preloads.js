@@ -10,7 +10,7 @@ var stats  = env.stats;
 var maxSerializerTime = nconf.get('serializer:warning-period');
 
 function execPreloads(preloads, callback) {
-  if(!preloads) return callback();
+  if(!preloads) return Q.resolve().nodeify(callback);
 
   var promises = preloads.map(function(i) {
     var deferred = Q.defer();

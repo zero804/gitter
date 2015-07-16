@@ -25,17 +25,16 @@ var LAZY_LOAD_STRATEGIES = false;
  * Serialize some items using a strategy, returning a promise
  */
 function serialize(items, strat, callback) {
-  var d = Q.defer();
-
-  if(!items) {
-    return Q.resolve().nodeify(callback);
+  if(items === null || items === undefined) {
+    return Q.resolve(items).nodeify(callback);
   }
-
 
   var single;
   if (Array.isArray(items)) {
     /** Array with zero items, shortcut */
-    if (!items.length) return Q.resolve().nodeify(callback);
+    if (!items.length) {
+      return Q.resolve([]).nodeify(callback);
+    }
     single = false;
   } else {
     single = true;
@@ -47,7 +46,7 @@ function serialize(items, strat, callback) {
   }
 
   var start = Date.now();
-
+  var d = Q.defer();
   strat.preload(items, function(err) {
 
     if(err) {
