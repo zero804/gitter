@@ -2,7 +2,6 @@
 "use strict";
 
 var PushNotificationDevice = require("./persistence-service").PushNotificationDevice;
-var winston                = require('../utils/winston');
 var nconf                  = require('../utils/config');
 var crypto                 = require('crypto');
 var _                      = require('underscore');
