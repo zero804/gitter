@@ -2,16 +2,7 @@
 
 var roomMembershipService    = require('./room-membership-service');
 var userService              = require('./user-service');
-var persistence              = require('./persistence-service');
-var TroupeUser               = persistence.TroupeUser;
-var Troupe                   = persistence.Troupe;
-var mongoUtils               = require("../utils/mongo-utils");
 var Q                        = require("q");
-var EventEmitter             = require('events').EventEmitter;
-var assert                   = require('assert');
-var debug                    = require('debug')('gitter:room-user-search-service');
-
-var roomMembershipEvents     = new EventEmitter();
 
 var LARGE_ROOM_SIZE_THRESHOLD = 200;
 

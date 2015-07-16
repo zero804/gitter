@@ -248,8 +248,8 @@ var userService = {
       .then(function(users) {
         return users.map(function(user) {
           return user._id;
-        })
-      })
+        });
+      });
   },
 
   findByUsernames: function(usernames, callback) {

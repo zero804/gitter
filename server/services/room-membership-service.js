@@ -56,7 +56,7 @@ function findRoomIdsForUserWithLurk(userId) {
   return TroupeUser.findQ({ 'userId': userId }, { _id: 0, troupeId: 1, lurk: 1 }, { lean: true })
     .then(function(results) {
       return results.reduce(function(memo, troupeUser) {
-        memo[troupeUser.userId] = !!troupeUser.lurk;
+        memo[troupeUser.troupeId] = !!troupeUser.lurk;
         return memo;
       }, {});
     });
