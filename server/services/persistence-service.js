@@ -5,6 +5,7 @@ var env            = require('gitter-web-env');
 var mongoose       = require('../utils/mongoose-q');
 var winston        = require('../utils/winston');
 var debug          = require('debug')('gitter:persistence-service');
+var mongoDebug     = require('node-mongodb-debug-log');
 
 // Install inc and dec number fields in mongoose
 require('mongoose-number')(mongoose);
@@ -17,6 +18,11 @@ var connection = mongoose.connection;
 if (debug.enabled) {
   mongoose.set('debug', true);
 }
+
+mongoDebug.install(mongoose.mongo, {
+  debugName: 'gitter:mongo',
+  slowLogMS: 10
+});
 
 connection.on('error', function(err) {
   winston.info("MongoDB connection error", { exception: err });

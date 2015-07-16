@@ -10,14 +10,12 @@ var Q                      = require('q');
 var redis                  = require("../utils/redis");
 var mongoUtils             = require('../utils/mongo-utils');
 var redisClient            = redis.getClient();
-
+var debug                  = require('debug')('push-notification-service');
 var Scripto                = require('gitter-redis-scripto');
 var scriptManager          = new Scripto(redisClient);
 scriptManager.loadFromDir(__dirname + '/../../redis-lua/notify');
 
 var minimumUserAlertIntervalS = nconf.get("notifications:minimumUserAlertInterval");
-
-
 
 function buffersEqual(a,b) {
   if (!Buffer.isBuffer(a)) return undefined;
@@ -49,14 +47,14 @@ function findAndRemoveDevicesWithDuplicateTokens(deviceId, deviceType, deviceTok
       });
 
       return Q.all(devicesToRemove.map(function(device) {
-        winston.verbose('Removing unused device ' + device.deviceId);
+        debug('Removing unused device %s', device.deviceId);
         return device.removeQ();
       }));
     });
 }
 
 exports.registerDevice = function(deviceId, deviceType, deviceToken, deviceName, appVersion, appBuild, callback) {
-  winston.verbose("Registering device ", { deviceId: deviceId });
+  debug("Registering device %s", deviceId);
   var tokenHash = crypto.createHash('md5').update(deviceToken).digest('hex');
 
   return PushNotificationDevice.findOneAndUpdateQ(
@@ -83,7 +81,7 @@ exports.registerDevice = function(deviceId, deviceType, deviceToken, deviceName,
 };
 
 exports.registerAndroidDevice = function(deviceId, deviceName, registrationId, appVersion, userId, callback) {
-  winston.verbose("Registering device ", { deviceId: deviceId });
+  debug("Registering device %s", deviceId);
   var tokenHash = crypto.createHash('md5').update(registrationId).digest('hex');
 
   return PushNotificationDevice.findOneAndUpdateQ(
@@ -115,10 +113,6 @@ exports.registerUser = function(deviceId, userId, callback) {
     { deviceId: deviceId, userId: userId, timestamp: new Date() },
     { upsert: true, new: true })
     .nodeify(callback);
-};
-
-exports.findDevicesForUser = function(userId, callback) {
-  PushNotificationDevice.find({ userId: userId }, callback);
 };
 
 var usersWithDevicesCache = null;
@@ -153,13 +147,6 @@ exports.findUsersWithDevices = function(userIds, callback) {
       });
     })
     .nodeify(callback);
-};
-
-exports.findDevicesForUsers = function(userIds, callback) {
-  userIds = _.uniq(userIds);
-  return PushNotificationDevice
-    .where('userId')['in'](userIds)
-    .execQ(callback);
 };
 
 exports.findEnabledDevicesForUsers = function(userIds, callback) {
@@ -239,4 +226,4 @@ exports.canUnlockForNotification = function (userId, troupeId, notificationNumbe
 
 exports.testOnly = {
   expireCachedUsersWithDevices: expireCachedUsersWithDevices
-}
+};
