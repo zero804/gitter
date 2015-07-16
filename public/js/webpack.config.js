@@ -18,6 +18,8 @@ var webpackConfig = {
     "router-chat": path.resolve(path.join(__dirname, "./router-chat.js")),
     "explore": path.resolve(path.join(__dirname, "./explore.js")),
     "just-tracking": path.resolve(path.join(__dirname, "./just-tracking.js")),
+    // plain module requires need to be in an array: https://github.com/webpack/webpack/issues/300
+    "frame-utils": [path.resolve(path.join(__dirname, "./utils/frame-utils.js"))],
     "mobile-userhome": path.resolve(path.join(__dirname, "./mobile-userhome.js")),
     "mobile-nli-app": path.resolve(path.join(__dirname, "./mobile-nli-app.js")),
     "mobile-app": path.resolve(path.join(__dirname, "./mobile-app")),

@@ -42,7 +42,7 @@ module.exports = (function() {
         .then(function () {
           // leaving the room that you are in should take you home
           if (this.model.get('url') === window.location.pathname) {
-            appEvents.trigger('navigation', context.getUser().url, 'home', '');
+            appEvents.trigger('navigation', '/home', 'home', '');
           }
         }.bind(this))
         .then(function() {
