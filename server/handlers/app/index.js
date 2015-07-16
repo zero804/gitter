@@ -22,6 +22,7 @@ var mainFrameMiddlewarePipeline = [
   appMiddleware.isPhoneMiddleware,
   timezoneMiddleware,
   function (req, res, next) {
+
     if (req.uriContext.ownUrl) {
       if (req.isPhone) {
         appRender.renderMobileUserHome(req, res, next, 'home');
