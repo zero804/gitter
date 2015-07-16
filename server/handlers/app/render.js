@@ -22,7 +22,8 @@ var mongoUtils         = require('../../utils/mongo-utils');
 var splitTests         = require('gitter-web-split-tests');
 var url                = require('url');
 var cdn                = require("../../web/cdn");
-
+var roomMembershipService = require('../../services/room-membership-service');
+var troupeService      = require('../../services/troupe-service')
 var avatar   = require('../../utils/avatar');
 var _                 = require('underscore');
 
@@ -369,13 +370,11 @@ function renderMobileNotLoggedInChat(req, res, next) {
 
 function renderOrg404Page(req, res, next) {
   var org = req.uriContext && req.uriContext.uri;
-  var strategy = new restSerializer.TroupeStrategy();
 
-  return PersistenceService.Troupe.find({ lcOwner: org.toLowerCase(), security: 'PUBLIC' })
-    .sort({ userCount: 'desc' })
-    .execQ()
+  return troupeService.findPublicChildRoomsForOrg(org)
     .then(function (rooms) {
-      return new Q(restSerializer.serialize(rooms, strategy));
+      var strategy = new restSerializer.TroupeStrategy();
+      return restSerializer.serialize(rooms, strategy);
     })
     .then(function (rooms) {
       res.render('org-404', {
@@ -397,17 +396,21 @@ function renderNotLoggedInChatPage(req, res, next) {
 }
 
 function renderEmbeddedChat(req, res, next) {
-  return renderChat(req, res, {
-    template: 'chat-embed-template',
-    script: 'router-embed-chat',
-    unread: false, // Embedded users see chats as read
-    classNames: [ 'embedded' ],
-    fetchEvents: false,
-    fetchUsers: false,
-    extras: {
-      usersOnline: req.troupe.users.length
-    }
-  }, next);
+  roomMembershipService.countMembersInRoom(req.troupe._id)
+    .then(function(userCount) {
+      return renderChat(req, res, {
+        template: 'chat-embed-template',
+        script: 'router-embed-chat',
+        unread: false, // Embedded users see chats as read
+        classNames: [ 'embedded' ],
+        fetchEvents: false,
+        fetchUsers: false,
+        extras: {
+          usersOnline: userCount
+        }
+      }, next);
+    })
+    .catch(next);
 }
 
 function renderChatCard(req, res, next) {

@@ -241,6 +241,14 @@ function toggleSearchIndexing(user, troupe, bool) {
     });
 }
 
+function findPublicChildRoomsForOrg(org) {
+  if (!org) return Q.resolve([]);
+
+  return persistence.Troupe.find({ lcOwner: org.toLowerCase(), security: 'PUBLIC' })
+    .sort({ userCount: 'desc' })
+    .execQ();
+}
+
 module.exports = {
   findByUri: findByUri,
   findById: findById,
@@ -252,5 +260,6 @@ module.exports = {
   findOrCreateOneToOneTroupe: findOrCreateOneToOneTroupe,
   updateTopic: updateTopic,
   toggleSearchIndexing: toggleSearchIndexing,
-  checkGitHubTypeForUri: checkGitHubTypeForUri
+  checkGitHubTypeForUri: checkGitHubTypeForUri,
+  findPublicChildRoomsForOrg: findPublicChildRoomsForOrg
 };
