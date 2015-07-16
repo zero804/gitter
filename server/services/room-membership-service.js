@@ -16,6 +16,7 @@ exports.findRoomIdsForUser          = findRoomIdsForUser;
 exports.findRoomIdsForUserWithLurk  = findRoomIdsForUserWithLurk;
 exports.checkRoomMembership         = checkRoomMembership;
 exports.findUserMembershipInRooms   = findUserMembershipInRooms;
+exports.findMembershipForUsersInRoom = findMembershipForUsersInRoom;
 
 exports.findMembersForRoom          = findMembersForRoom;
 exports.countMembersInRoom          = countMembersInRoom;
@@ -84,6 +85,18 @@ function findUserMembershipInRooms(userId, troupeIds) {
 
   return TroupeUser.distinctQ("troupeId", { troupeId: { $in: mongoUtils.asObjectIDs(troupeIds) }, userId: userId });
 }
+
+/**
+ * Given a set of users, will return a subset of those users
+ * who are in the room
+ */
+function findMembershipForUsersInRoom(troupeId, userIds) {
+  assert(troupeId);
+  if (!userIds.length) return Q.resolve([]);
+
+  return TroupeUser.distinctQ("userId", { userId: { $in: mongoUtils.asObjectIDs(userIds) }, troupeId: troupeId });
+}
+
 /**
  * Find the userIds of all the members of a room.
  */

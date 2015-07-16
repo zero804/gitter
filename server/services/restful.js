@@ -8,6 +8,7 @@ var restSerializer      = require("../serializers/rest-serializer");
 var unreadItemService   = require("./unread-item-service");
 var chatService         = require("./chat-service");
 var userService         = require("./user-service");
+var roomUserSearchService = require('./room-user-search-service');
 var eventService        = require("./event-service");
 var Q                   = require('q');
 var roomService         = require('./room-service');
@@ -74,16 +75,12 @@ exports.serializeUsersForTroupe = function(troupeId, userId, options) {
       return Q.resolve([]);
     }
 
-    /* The limit must only be applied post findMembersForRoom */
-    return roomMembershipService.findMembersForRoom(troupeId)
-      .then(function(userIds) {
-
-        return userService.findByIdsAndSearchTerm(userIds, searchTerm, limit || 30)
-          .then(function(users) {
-            var strategy = new restSerializer.UserStrategy();
-            return restSerializer.serializeExcludeNulls(users, strategy);
-          });
+    return roomUserSearchService.findUsersInRoom(troupeId, searchTerm, limit || 30)
+      .then(function(users) {
+        var strategy = new restSerializer.UserStrategy();
+        return restSerializer.serializeExcludeNulls(users, strategy);
       });
+
   }
 
   return roomMembershipService.findMembersForRoom(troupeId, { limit: limit }) /* Limit may be null */
