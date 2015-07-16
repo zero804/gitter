@@ -5,6 +5,7 @@ var troupeService        = require("../../services/troupe-service");
 var restful              = require("../../services/restful");
 var restSerializer       = require("../../serializers/rest-serializer");
 var recentRoomService    = require('../../services/recent-room-service');
+var roomMembershipService = require('../../services/room-membership-service');
 var roomService          = require('../../services/room-service');
 var Q                    = require('q');
 var mongoUtils           = require('../../utils/mongo-utils');
@@ -39,11 +40,11 @@ module.exports = {
 
   update: function(req, res, next) {
     var userId = req.user.id;
+    var troupe = req.userTroupe;
+    var troupeId = troupe.id;
 
-    // Switch a lean troupe object for a full mongoose object
-    return troupeService.findById(req.userTroupe.id)
-      .then(function(troupe) {
-        if (!troupe) throw new StatusError(404);
+    return roomMembershipService.checkRoomMembership(troupeId, userId)
+      .then(function(isMember) {
 
         var updatedTroupe = req.body;
         var troupeId = troupe.id;
@@ -52,29 +53,32 @@ module.exports = {
         if('favourite' in updatedTroupe) {
           var fav = updatedTroupe.favourite;
 
-          // FIXME: NOCOMMIT
-          if(!fav || troupeService.THIS_DOES_NOT_EXIST_userHasAccessToTroupe(req.resourceUser, troupe)) {
+          if(!fav || isMember) {
             promises.push(recentRoomService.updateFavourite(userId, troupeId, fav));
           } else {
             // The user has added a favourite that they don't belong to
             // Add them to the room first
-            promises.push(
-              roomService.findOrCreateRoom(req.resourceUser, troupe.uri)
-                .then(function() {
-                  return recentRoomService.updateFavourite(userId, troupeId, updatedTroupe.favourite);
-                })
-              );
+            if (!troupe.oneToOne) {
+              /* Ignore one-to-one rooms */
+              promises.push(
+                roomService.findOrCreateRoom(req.resourceUser, troupe.uri)
+                  .then(function() {
+                    return recentRoomService.updateFavourite(userId, troupeId, updatedTroupe.favourite);
+                  })
+                );
+            }
           }
         }
 
         if('lurk' in updatedTroupe) {
-          promises.push(roomService.updateTroupeLurkForUserId(userId, troupeId, updatedTroupe.lurk));
+          if (isMember && !troupe.oneToOne) {
+            promises.push(roomService.updateTroupeLurkForUserId(userId, troupeId, updatedTroupe.lurk));
+          }
         }
 
-        return Q.all(promises)
-          .thenResolve(troupe);
+        return Q.all(promises);
       })
-      .then(function(troupe) {
+      .then(function() {
         var strategy = new restSerializer.TroupeStrategy({ currentUserId: userId });
 
         return restSerializer.serializeQ(troupe, strategy);
