@@ -408,7 +408,8 @@ function findAllRoomsIdsForUserIncludingMentions(userId, callback) {
       roomMembershipService.findRoomIdsForUser(userId)
     ])
     .spread(function(mentions, memberships) {
-      return _.uniq(mentions.concat(memberships));
+      var idStrings = mongoUtils.serializeObjectIds(mentions.concat(memberships));
+      return _.uniq(idStrings);
     })
     .nodeify(callback);
 }
