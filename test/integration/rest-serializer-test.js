@@ -24,10 +24,11 @@ describe('restSerializer', function() {
 
   describe('#UserStrategy()', function() {
 
-    var userStrategy = new restSerializer.UserStrategy();
 
     it('should serialize a user ', function(done) {
       var users = [fixture.user1];
+      var userStrategy = new restSerializer.UserStrategy();
+
       restSerializer.serialize(users, userStrategy, function(err, serialized) {
         if(err) return done(err);
         assert(serialized);
@@ -36,8 +37,49 @@ describe('restSerializer', function() {
     });
 
     it('should return the correct display name', function() {
+      var userStrategy = new restSerializer.UserStrategy();
       var mappedUser = userStrategy.map(fixture.user1);
       assert.equal(mappedUser.displayName, fixture.user1.displayName);
+    });
+
+    it('should return when no items are serialized with promises', function(done) {
+      var userStrategy = new restSerializer.UserStrategy();
+
+      restSerializer.serialize([], userStrategy)
+        .then(function(results) {
+          assert.deepEqual(results, []);
+        })
+        .nodeify(done);
+    });
+
+    it('should return when no items are serialized with callbacks', function(done) {
+      var userStrategy = new restSerializer.UserStrategy();
+
+      restSerializer.serialize([], userStrategy, function(err, results) {
+        if (err) return done(err);
+        assert.deepEqual(results, []);
+        done();
+      });
+    });
+
+    it('should return when a null item is serialized with promises', function(done) {
+      var userStrategy = new restSerializer.UserStrategy();
+
+      restSerializer.serialize(null, userStrategy)
+        .then(function(results) {
+          assert.strictEqual(results, null);
+        })
+        .nodeify(done);
+    });
+
+    it('should return when a null item is serialized with callbacks', function(done) {
+      var userStrategy = new restSerializer.UserStrategy();
+
+      restSerializer.serialize(null, userStrategy, function(err, results) {
+        if (err) return done(err);
+        assert.strictEqual(results, null);
+        done();
+      });
     });
 
   });

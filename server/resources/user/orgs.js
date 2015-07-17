@@ -8,7 +8,7 @@ module.exports = {
   index: function(req, res, next) {
     if (!req.user) return res.send(403);
 
-    return restful.serializeOrgsForUser(req.user, { mapUsers: !!req.query.include_users })
+    return restful.serializeOrgsForUser(req.user, { /* mapUsers: !!req.query.include_users */ })
       .then(function(serialized) {
         res.send(serialized);
       })

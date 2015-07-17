@@ -9,6 +9,7 @@ var winston = require('../utils/winston');
 var appEvents = require('gitter-web-appevents');
 var mongoUtils = require('../utils/mongo-utils');
 var Q = require('q');
+var liveCollections = require('./live-collections');
 
 batcher.listen(function(key, userIdStrings, done) {
   var kp = key.split(':', 3);
@@ -16,41 +17,36 @@ batcher.listen(function(key, userIdStrings, done) {
   // Ignore everything except chats for now
   if(kp[0] !== 'chat') return done();
 
-
   var troupeId = mongoUtils.asObjectID(kp[1]);
   var chatId = mongoUtils.asObjectID(kp[2]);
 
   var userIds = userIdStrings.map(mongoUtils.asObjectID);
 
-  persistence.ChatMessage.findOneAndUpdate(
+  persistence.ChatMessage.findOneAndUpdateQ(
     { _id: chatId, toTroupeId: troupeId },
     { $addToSet:  { 'readBy': { $each: userIds } } },
-    { select: { readBy: 1, _tv: 1 } },
-    function(err, chat) {
-      if(err) return done(err);
-
-      if(!chat) {
+    { select: { readBy: 1, _tv: 1 }, new: true })
+    .then(function(chat) {
+      if (!chat) {
         winston.info('Weird. No chat message found');
-      } else {
-
-        appEvents.dataChange2("/rooms/" + troupeId + "/chatMessages", 'patch', {
-          id: "" + chatId,
-          readBy: chat.readBy.length,
-          v: chat._tv ? 0 + chat._tv : undefined
-        });
-
-        // Its too operationally expensive to serialise the full user object
-        userIds.forEach(function(userId) {
-          appEvents.dataChange2("/rooms/" + troupeId + "/chatMessages/" + chatId + '/readBy', 'create', {
-            id: userId
-          });
-        });
-
+        return;
       }
 
-      done();
-    });
+      liveCollections.chats.emit('patch', chatId, troupeId, {
+        readBy: chat.readBy.length,
+        v: chat._tv ? 0 + chat._tv : undefined
+      });
 
+      // Its too operationally expensive to serialise the full user object
+      // TODO: move this across to live-collections
+      userIds.forEach(function(userId) {
+        appEvents.dataChange2("/rooms/" + troupeId + "/chatMessages/" + chatId + '/readBy', 'create', {
+          id: userId
+        });
+      });
+
+    })
+    .nodeify(done);
 });
 
 /**

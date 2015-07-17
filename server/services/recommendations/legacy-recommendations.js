@@ -7,6 +7,7 @@ var Q               = require('q');
 var _               = require('underscore');
 var collections     = require('../../utils/collections');
 var recommendations = require('./index');
+var roomMembershipService = require('../room-membership-service');
 
 var MAX_RECOMMENDATIONS = 20;
 
@@ -146,18 +147,27 @@ function getPreferredComputerLanguages(suggestions) {
 function filterRecommendations(recommendations, userId) {
   if(recommendations.length === 0) return Q.resolve([]);
 
-  var uris = recommendations.map(function(r) { return r.uri.toLowerCase(); });
 
-  return persistence.Troupe.findQ({
-      lcUri: { $in: uris }
-    }, {
-      _id: 1,
-      uri: 1,
-      userCount: 1,
-      users: {
-        $elemMatch: { userId: userId }
-      },
-      lang: 1
+  return roomMembershipService.findRoomIdsForUser(userId)
+    .then(function(existingMemberships) {
+      var uris = recommendations.map(function(r) { return r.uri.toLowerCase(); });
+
+      var query = {
+        lcUri: { $in: uris },
+      };
+
+      // If the user is already in rooms,
+      // exclude them from the results...
+      if (existingMemberships.length) {
+        query._id = { $nin: existingMemberships };
+      }
+
+      return persistence.Troupe.findQ(query, {
+          _id: 1,
+          uri: 1,
+          userCount: 1,
+          lang: 1
+        });
     })
     .then(function(rooms) {
       var roomsHash = collections.indexByProperty(rooms, 'uri');
@@ -168,8 +178,8 @@ function filterRecommendations(recommendations, userId) {
         if (room) {
           recommendation.room = room;
 
-          // Room exists, but user is not in room
-          return !room.users || !room.users.length;
+          // recommend empty rooms
+          return !room.userCount;
         }
 
         var repo = recommendation.repo;

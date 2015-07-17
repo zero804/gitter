@@ -6,6 +6,7 @@ var testRequire = require('../test-require');
 var assert = require('assert');
 var fixtureLoader = require('../test-fixtures');
 var Q = require('q');
+var ObjectID = require('mongodb').ObjectID;
 var fixture = {};
 
 var mockito = require('jsmockito').JsMockito;
@@ -14,45 +15,8 @@ var once = times(1);
 
 Q.longStackSupport = true;
 
-var troupeService = testRequire("./services/troupe-service");
 var persistence = testRequire("./services/persistence-service");
 var mongoUtils = testRequire("./utils/mongo-utils");
-
-function makeRoomAssertions(room, usersAllowedIn, usersNotAllowedIn) {
-  return Q.resolve(true);
-
-  var roomService = testRequire("./services/room-service");
-
-  if(!room) return Q.reject('no room');
-  if(!room.uri) return Q.reject('no room.uri');
-
-  return Q.all(usersAllowedIn.map(function(user) {
-
-    return roomService.findOrCreateRoom(user, room.uri)
-      .then(function(uriLookup) {
-        assert(uriLookup);
-      })
-      .fail(function(err) {
-        // console.log('User ' + user.username + ' was incorrectly NOT allowed in the room');
-        throw err;
-      });
-
-  })).then(function() {
-    return Q.all(usersNotAllowedIn.map(function(user) {
-      var failed = 0;
-      return roomService.findOrCreateRoom(user, room.uri)
-        .then(function() {
-          // console.log('User ' + user.username + ' was incorrectly allowed in the room');
-        })
-        .fail(function() {
-          failed++;
-        })
-        .then(function() {
-          assert.equal(failed, 1);
-        });
-    }));
-  });
-}
 
 describe('room-service #slow', function() {
   before(fixtureLoader(fixture, {
@@ -154,7 +118,7 @@ describe('room-service #slow', function() {
       mockito
         .when(troupeServiceMock)
         .findById()
-        .then(function (room) {
+        .then(function () {
           return Q.resolve({
               _id: '5436981c00062eebf0fbc0d5',
               githubType: 'ORG',
@@ -166,9 +130,6 @@ describe('room-service #slow', function() {
               lcUri: 'gitterhq',
               tags: [],
               topic: 'Gitter',
-              containsUserId: function () {
-
-              }
           });
         });
 
@@ -259,9 +220,9 @@ describe('room-service #slow', function() {
 
             return Q.resolve(true);
           });
-
           return roomService.findOrCreateRoom(fixture.user1, 'gitterhq/sandbox', { ignoreCase: true })
             .then(function(uriContext) {
+
               assert(uriContext.troupe);
               assert(uriContext.troupe.lcUri  === 'gitterhq/sandbox');
               assert(uriContext.troupe.uri    === 'gitterHQ/sandbox');
@@ -347,9 +308,14 @@ describe('room-service #slow', function() {
   describe('user revalidation', function() {
     it('should correctly revalidate the users in a room', function(done) {
       var roomPermissionsModelMock = mockito.mockFunction();
+      var roomMembershipServiceMock = {
+        findMembersForRoom: mockito.mockFunction(),
+        removeRoomMembers:  mockito.mockFunction()
+      };
 
       var roomService = testRequire.withProxies("./services/room-service", {
-        './room-permissions-model': roomPermissionsModelMock
+        './room-permissions-model': roomPermissionsModelMock,
+        './room-membership-service': roomMembershipServiceMock
       });
 
       mockito.when(roomPermissionsModelMock)().then(function(user, perm, incomingRoom) {
@@ -366,11 +332,18 @@ describe('room-service #slow', function() {
 
       });
 
+      mockito.when(roomMembershipServiceMock.findMembersForRoom)().then(function() {
+        return Q.resolve([fixture.user1._id, fixture.user2._id]);
+      });
+
+      mockito.when(roomMembershipServiceMock.removeRoomMembers)().then(function(troupeId, userIds) {
+        assert.deepEqual(userIds, [fixture.user2._id]);
+      });
+
       return roomService.revalidatePermissionsForUsers(fixture.troupeRepo)
         .then(function() {
-          var userIds = fixture.troupeRepo.getUserIds();
-          assert.equal(userIds.length, 1);
-          assert.equal(userIds[0], fixture.user1.id);
+          mockito.verify(roomMembershipServiceMock.findMembersForRoom, once)();
+          mockito.verify(roomMembershipServiceMock.removeRoomMembers, once)();
         })
         .nodeify(done);
 
@@ -412,66 +385,90 @@ describe('room-service #slow', function() {
     it('adds a user to the troupe', function(done) {
       var service = createRoomServiceWithStubs({
         addUser: true,
-        findByUsernameResult: { username: 'test-user', id: userId },
+        findByUsernameResult: { username: 'test-user', id: userId, _id: userId },
         createInvitedUserResult: null,
         canBeInvited: true,
         onInviteEmail: function() {}
       });
 
+      var _troupId = new ObjectID();
+      var _userId = new ObjectID();
+
       var troupe = {
+        _id: _troupId,
+        id: _troupId.toString(),
         uri: 'user/room',
-        containsUserId: function() { return false; },
-        addUserById: function(id) {
-          assert.equal(id, userId);
-          done();
-        },
         saveQ: function() {
           return Q.resolve();
         }
       };
-      service.addUserToRoom(troupe, {}, 'test-user').fail(done);
+
+      var user = {
+        _id: _userId,
+        id: _userId.toString()
+      };
+
+      service.addUserToRoom(troupe, user, 'test-user')
+        .nodeify(done);
     });
 
     it('saves troupe changes', function(done) {
       var service = createRoomServiceWithStubs({
         addUser: true,
-        findByUsernameResult: { username: 'test-user', id: userId },
+        findByUsernameResult: { username: 'test-user', id: userId, _id: userId },
         createInvitedUserResult: null,
         canBeInvited: true,
         onInviteEmail: function() {}
       });
 
+      var _troupId = new ObjectID();
+      var _userId = new ObjectID();
+
       var troupe = {
+        _id: _troupId,
+        id: _troupId.toString(),
         uri: 'user/room',
-        containsUserId: function() { return false; },
-        addUserById: function() {},
         saveQ: function() {
-          done();
           return Q.resolve();
         }
       };
-      service.addUserToRoom(troupe, {}, 'test-user').fail(done);
+
+      var user = {
+        _id: _userId,
+        id: _userId.toString()
+      };
+
+      service.addUserToRoom(troupe, user, 'test-user')
+        .nodeify(done);
     });
 
     it('returns the added user and sets the date the user was added', function(done) {
       var service = createRoomServiceWithStubs({
         addUser: true,
-        findByUsernameResult: { username: 'test-user', id: userId },
+        findByUsernameResult: { username: 'test-user', id: userId, _id: userId },
         createInvitedUserResult: null,
         canBeInvited: true,
         onInviteEmail: function() {}
       });
 
+      var _troupId = new ObjectID();
+      var _userId = new ObjectID();
+
       var troupe = {
+        _id: _troupId,
+
         uri: 'user/room',
-        containsUserId: function() { return false; },
-        addUserById: function() {},
         saveQ: function() {
           return Q.resolve();
         }
       };
 
-      service.addUserToRoom(troupe, {}, 'test-user')
+      var user = {
+        _id: _userId,
+        id: _userId.toString()
+      };
+
+      service.addUserToRoom(troupe, user, 'test-user')
         .then(function(user) {
           assert.equal(user.id, userId);
           assert.equal(user.username, 'test-user');
@@ -493,6 +490,7 @@ describe('room-service #slow', function() {
         findByUsernameResult: null,
         createInvitedUserResult: {
           username: 'test-user',
+          _id: userId,
           id: userId,
           state: 'INVITED',
           emails: ['a@b.com']
@@ -503,16 +501,22 @@ describe('room-service #slow', function() {
         }
       });
 
+      var _troupId = new ObjectID();
+      var _userId = new ObjectID();
+
       var troupe = {
+        _id: _troupId,
         uri: 'user/room',
-        containsUserId: function() { return false; },
-        addUserById: function() {},
         saveQ: function() {
           return Q.resolve();
         }
       };
 
-      service.addUserToRoom(troupe, {}, 'test-user').fail(done);
+      var user = {
+        _id: _userId,
+        id: _userId.toString()
+      };
+      service.addUserToRoom(troupe, user, 'test-user').fail(done);
     });
 
     it('fails with 403 when adding someone to who cant be invited', function(done) {
@@ -526,8 +530,6 @@ describe('room-service #slow', function() {
 
       var troupe = {
         uri: 'user/room',
-        containsUserId: function() { return false; },
-        addUserById: function() {},
         saveQ: function() {}
       };
 
@@ -537,23 +539,33 @@ describe('room-service #slow', function() {
     });
 
     it('fails with 409 when adding someone who is already in the room', function(done) {
+      var _inviteeUserId = new ObjectID();
+
       var service = createRoomServiceWithStubs({
         addUser: true,
-        findByUsernameResult: { username: 'test-user', id: 'test-user-id' },
+        findByUsernameResult: { username: 'test-user', id: _inviteeUserId, _id: _inviteeUserId },
         createInvitedUserResult: null,
         canBeInvited: true,
         onInviteEmail: function() {}
       });
 
+      var _troupId = new ObjectID();
+      var _userId = new ObjectID();
+
       var troupe = {
+        _id: _troupId,
         uri: 'user/room',
-        containsUserId: function() { return true; },
-        addUserById: function() {},
         saveQ: function() {}
       };
 
-      service.addUserToRoom(troupe, {}, 'test-user').fail(function(err) {
-        assert.equal(err.status, 409);
+      var user = {
+        _id: _userId,
+        id: _userId.toString()
+      };
+
+      service.addUserToRoom(troupe, user, 'test-user').fail(function(err) {
+        if (err.status !== 409) throw err;
+
       }).nodeify(done);
     });
 
@@ -568,13 +580,11 @@ describe('room-service #slow', function() {
 
       var troupe = {
         uri: 'user/room',
-        containsUserId: function() { return true; },
-        addUserById: function() {},
         saveQ: function() {}
       };
 
       service.addUserToRoom(troupe, {}, 'test-user').fail(function(err) {
-        assert.equal(err.status, 403);
+        if (err.status !== 403) throw err;
       }).nodeify(done);
     });
 
@@ -602,9 +612,7 @@ describe('room-service #slow', function() {
         return roomService.createCustomChildRoom(fixture.troupeOrg1, fixture.user1, { name: 'private', security: 'PRIVATE' })
           .then(function(room) {
             mockito.verify(permissionsModelMock, once)();
-
-            return makeRoomAssertions(room, [fixture.user1, fixture.user2], [fixture.user3])
-              .thenResolve(room);
+            return room;
           })
           .then(function(room) {
             // Get another mock
@@ -628,10 +636,11 @@ describe('room-service #slow', function() {
               .thenResolve(room);
           })
           .then(function(room) {
-            return troupeService.findById(room.id);
+            var roomMembershipService = testRequire('./services/room-membership-service');
+            return roomMembershipService.checkRoomMembership(room.id, fixture.user3.id);
           })
-          .then(function(room) {
-            assert(room.containsUserId(fixture.user3.id), 'Expected to find newly added user in the room');
+          .then(function(isMember) {
+            assert(isMember, 'Expected to find newly added user in the room');
           })
           .nodeify(done);
       });
@@ -654,9 +663,7 @@ describe('room-service #slow', function() {
         return roomService.createCustomChildRoom(fixture.troupeOrg1, fixture.user1, { name: 'open', security: 'PUBLIC' })
           .then(function(room) {
             mockito.verify(permissionsModelMock, once)();
-
-            return makeRoomAssertions(room, [fixture.user1, fixture.user2, fixture.user3], [])
-              .thenResolve(room);
+            return room;
           })
           .then(function(room) {
             // Get another mock
@@ -680,10 +687,11 @@ describe('room-service #slow', function() {
               .thenResolve(room);
           })
           .then(function(room) {
-            return troupeService.findById(room.id);
+            var roomMembershipService = testRequire('./services/room-membership-service');
+            return roomMembershipService.checkRoomMembership(room.id, fixture.user3.id);
           })
-          .then(function(room) {
-            assert(room.containsUserId(fixture.user3.id), 'Expected to find newly added user in the room');
+          .then(function(isMember) {
+            assert(isMember, 'Expected to find newly added user in the room');
           })
           .nodeify(done);
       });
@@ -706,9 +714,7 @@ describe('room-service #slow', function() {
         return roomService.createCustomChildRoom(fixture.troupeOrg1, fixture.user1, { name: 'child', security: 'INHERITED' })
           .then(function(room) {
             mockito.verify(permissionsModelMock, once)();
-
-            return makeRoomAssertions(room, [fixture.user1, fixture.user2], [ fixture.user3])
-              .thenResolve(room);
+            return room;
           })
           .then(function(room) {
             // Get another mock
@@ -733,10 +739,11 @@ describe('room-service #slow', function() {
               .thenResolve(room);
           })
           .then(function(room) {
-            return troupeService.findById(room.id);
+            var roomMembershipService = testRequire('./services/room-membership-service');
+            return roomMembershipService.checkRoomMembership(room.id, fixture.user3.id);
           })
-          .then(function(room) {
-            assert(room.containsUserId(fixture.user3.id), 'Expected to find newly added user in the room');
+          .then(function(isMember) {
+            assert(isMember, 'Expected to find newly added user in the room');
           })
           .nodeify(done);
       });
@@ -762,9 +769,7 @@ describe('room-service #slow', function() {
         return roomService.createCustomChildRoom(fixture.troupeRepo, fixture.user1, { name: 'private', security: 'PRIVATE' })
           .then(function(room) {
             mockito.verify(permissionsModelMock, once)();
-
-            return makeRoomAssertions(room, [fixture.user1], [fixture.user2, fixture.user3])
-              .thenResolve(room);
+            return room;
           })
           .then(function(room) {
             // Get another mock
@@ -788,10 +793,11 @@ describe('room-service #slow', function() {
               .thenResolve(room);
           })
           .then(function(room) {
-            return troupeService.findById(room.id);
+            var roomMembershipService = testRequire('./services/room-membership-service');
+            return roomMembershipService.checkRoomMembership(room.id, fixture.user3.id);
           })
-          .then(function(room) {
-            assert(room.containsUserId(fixture.user3.id), 'Expected to find newly added user in the room');
+          .then(function(isMember) {
+            assert(isMember, 'Expected to find newly added user in the room');
           })
           .nodeify(done);
       });
@@ -815,9 +821,7 @@ describe('room-service #slow', function() {
         return roomService.createCustomChildRoom(fixture.troupeRepo, fixture.user1, { name: 'open', security: 'PUBLIC' })
           .then(function(room) {
             mockito.verify(permissionsModelMock, once)();
-
-            return makeRoomAssertions(room, [fixture.user1, fixture.user2, fixture.user3], [])
-              .thenResolve(room);
+            return room;
           })
           .then(function(room) {
             // Get another mock
@@ -841,12 +845,12 @@ describe('room-service #slow', function() {
               .thenResolve(room);
           })
           .then(function(room) {
-            return troupeService.findById(room.id);
+            var roomMembershipService = testRequire('./services/room-membership-service');
+            return roomMembershipService.checkRoomMembership(room.id, fixture.user3.id);
           })
-          .then(function(room) {
-            assert(room.containsUserId(fixture.user3.id), 'Expected to find newly added user in the room');
+          .then(function(isMember) {
+            assert(isMember, 'Expected to find newly added user in the room');
           })
-
           .nodeify(done);
       });
 
@@ -868,9 +872,7 @@ describe('room-service #slow', function() {
         return roomService.createCustomChildRoom(fixture.troupeRepo, fixture.user1, { name: 'child', security: 'INHERITED' })
           .then(function(room) {
             mockito.verify(permissionsModelMock, once)();
-
-            return makeRoomAssertions(room, [fixture.user1, fixture.user2], [fixture.user3])
-              .thenResolve(room);
+            return room;
           })
           .then(function(room) {
             // Get another mock
@@ -895,12 +897,12 @@ describe('room-service #slow', function() {
               .thenResolve(room);
           })
           .then(function(room) {
-            return troupeService.findById(room.id);
+            var roomMembershipService = testRequire('./services/room-membership-service');
+            return roomMembershipService.checkRoomMembership(room.id, fixture.user3.id);
           })
-          .then(function(room) {
-            assert(room.containsUserId(fixture.user3.id), 'Expected to find newly added user in the room');
+          .then(function(isMember) {
+            assert(isMember, 'Expected to find newly added user in the room');
           })
-
           .nodeify(done);
       });
 
@@ -925,9 +927,7 @@ describe('room-service #slow', function() {
         return roomService.createCustomChildRoom(null, fixture.user1, { security: 'PRIVATE' })
           .then(function(room) {
             mockito.verify(permissionsModelMock, once)();
-
-            return makeRoomAssertions(room, [fixture.user1], [fixture.user2])
-              .thenResolve(room);
+            return room;
           })
           .then(function(room) {
             // Get another mock
@@ -951,10 +951,11 @@ describe('room-service #slow', function() {
               .thenResolve(room);
           })
           .then(function(room) {
-            return troupeService.findById(room.id);
+            var roomMembershipService = testRequire('./services/room-membership-service');
+            return roomMembershipService.checkRoomMembership(room.id, fixture.user3.id);
           })
-          .then(function(room) {
-            assert(room.containsUserId(fixture.user3.id), 'Expected to find newly added user in the room');
+          .then(function(userIsInRoom) {
+            assert(userIsInRoom, 'Expected to find newly added user in the room');
           })
 
           .nodeify(done);
@@ -978,9 +979,7 @@ describe('room-service #slow', function() {
         return roomService.createCustomChildRoom(null, fixture.user1, { name: 'private',  security: 'PRIVATE' })
           .then(function(room) {
             mockito.verify(permissionsModelMock, once)();
-
-            return makeRoomAssertions(room, [fixture.user1], [fixture.user2])
-              .thenResolve(room);
+            return room;
           })
           .then(function(room) {
             // Get another mock
@@ -1004,10 +1003,11 @@ describe('room-service #slow', function() {
               .thenResolve(room);
           })
           .then(function(room) {
-            return troupeService.findById(room.id);
+            var roomMembershipService = testRequire('./services/room-membership-service');
+            return roomMembershipService.checkRoomMembership(room.id, fixture.user3.id);
           })
-          .then(function(room) {
-            assert(room.containsUserId(fixture.user3.id), 'Expected to find newly added user in the room');
+          .then(function(isMember) {
+            assert(isMember, 'Expected to find newly added user in the room');
           })
           .nodeify(done);
       });
@@ -1030,9 +1030,7 @@ describe('room-service #slow', function() {
         return roomService.createCustomChildRoom(null, fixture.user1, { name: 'open', security: 'PUBLIC' })
           .then(function(room) {
             mockito.verify(permissionsModelMock, once)();
-
-            return makeRoomAssertions(room, [fixture.user1, fixture.user2], [])
-              .thenResolve(room);
+            return room;
           })
           .then(function(room) {
             // Get another mock
@@ -1056,10 +1054,11 @@ describe('room-service #slow', function() {
               .thenResolve(room);
           })
           .then(function(room) {
-            return troupeService.findById(room.id);
+            var roomMembershipService = testRequire('./services/room-membership-service');
+            return roomMembershipService.checkRoomMembership(room.id, fixture.user3.id);
           })
-          .then(function(room) {
-            assert(room.containsUserId(fixture.user3.id), 'Expected to find newly added user in the room');
+          .then(function(userIsInRoom) {
+            assert(userIsInRoom, 'Expected to find newly added user in the room');
           })
 
           .nodeify(done);
@@ -1093,6 +1092,7 @@ describe('room-service #slow', function() {
       var roomService = testRequire.withProxies("./services/room-service", {
         './room-permissions-model': roomPermissionsModelMock
       });
+      var roomMembershipService = testRequire('./services/room-membership-service');
       var userBannedFromRoom = testRequire('./services/user-banned-from-room');
 
       mockito.when(roomPermissionsModelMock)().then(function(user, perm, incomingRoom) {
@@ -1118,12 +1118,12 @@ describe('room-service #slow', function() {
               assert.equal(ban.bannedBy, fixture.userBanAdmin.id);
               assert(ban.dateBanned);
 
-              return persistence.Troupe.findByIdQ(fixture.troupeBan.id);
+              return roomMembershipService.checkRoomMembership(fixture.troupeBan._id, fixture.userBan.id);
             })
-            .then(function(troupe) {
-              assert(!troupe.containsUserId(fixture.userBan.id));
+            .then(function(bannedUserIsInRoom) {
+              assert(!bannedUserIsInRoom);
 
-              return roomService.findBanByUsername(troupe.id, fixture.userBan.username);
+              return roomService.findBanByUsername(fixture.troupeBan.id, fixture.userBan.username);
             })
             .then(function(banAndUser) {
               assert(banAndUser);
@@ -1195,7 +1195,7 @@ describe('room-service #slow', function() {
     });
     var userIsInRoom = testRequire('./services/user-in-room');
 
-    mockito.when(roomPermissionsModelMock)().then(function(user, perm, incomingRoom) {
+    mockito.when(roomPermissionsModelMock)().then(function(user, perm) {
       assert.equal(perm, 'admin');
 
       if(user.id == fixture.userRemoveNonAdmin.id) {
@@ -1257,6 +1257,250 @@ describe('room-service #slow', function() {
           assert(!here);
         })
         .done(done);
+    });
+
+  });
+
+  describe('remove and hide #slow', function() {
+    var troupeService = testRequire('./services/troupe-service');
+    var recentRoomService = testRequire('./services/recent-room-service');
+    var userIsInRoom = testRequire('./services/user-in-room');
+    var appEvents = testRequire('gitter-web-appevents');
+
+    describe('room-service #slow', function() {
+
+      beforeEach(fixtureLoader(fixture, {
+        troupeCanRemove: {
+          security: 'PUBLIC',
+          githubType: 'REPO',
+          users: ['userFavourite', 'userLeave', 'userToRemove', 'userRemoveNonAdmin', 'userRemoveAdmin']
+        },
+        troupeCannotRemove: {
+          security: 'PRIVATE',
+          githubType: 'ONETOONE',
+          users: ['userToRemove', 'userRemoveAdmin']
+        },
+        troupeEmpty: {
+          security: 'PUBLIC',
+          githubType: 'REPO',
+          users: []
+        },
+        userFavourite: {},
+        userLeave: {},
+        userToRemove: {},
+        userRemoveNonAdmin: {},
+        userRemoveAdmin: {}
+      }));
+
+      afterEach(function() {
+        fixture.cleanup();
+      });
+
+      describe('#removeFavourite', function() {
+
+        var roomService = testRequire('./services/room-service');
+
+        var getFavs = function() {
+          return recentRoomService.findFavouriteTroupesForUser(fixture.userFavourite.id);
+        };
+
+        var createFav = function() {
+          return recentRoomService.updateFavourite(fixture.userFavourite.id, fixture.troupeCanRemove.id, true)
+          .then(getFavs)
+          .then(function(favs) {
+            assert(favs[fixture.troupeCanRemove.id]); // Favourite is created
+          });
+        };
+
+        var checkHere = function() {
+          return userIsInRoom(fixture.troupeCanRemove.uri, fixture.userFavourite);
+        };
+
+        // Create an event listener with expected parameters
+        // If the test keeps pending, it means no event is emitted with these parameters
+        var addListenner = function(expected) {
+          var dfd = Q.defer();
+          appEvents.onDataChange2(function(res) {
+            // First filter by url and operation, as other events may have been emitted
+            if (expected.url && expected.url !== res.url) return;
+            if (expected.operation && expected.operation !== res.operation) return;
+            // Check model with deepEqual
+            if (expected.model) dfd.resolve(assert.deepEqual(res.model, expected.model));
+            else dfd.resolve();
+          });
+          return function() {
+            return dfd.promise;
+          };
+        };
+
+        beforeEach(function(done) {
+          createFav().nodeify(done);
+        });
+
+        it('should remove favourite', function(done) {
+          var checkEvent = addListenner({
+            url: '/user/' + fixture.userFavourite.id + '/rooms',
+            operation: 'patch',
+            model: {
+              id: fixture.troupeCanRemove.id,
+              favourite: null,
+              lastAccessTime: null,
+              mentions: 0,
+              unreadItems: 0
+            }
+          });
+
+          roomService.hideRoomFromUser(fixture.troupeCanRemove.id, fixture.userFavourite.id)
+          .then(checkEvent) // Ensure event was emitted
+          .then(getFavs)
+          .then(function(favs) {
+            assert(!favs[fixture.troupeCanRemove.id]); // Favourite is removed
+          })
+          .then(checkHere)
+          .then(function(here) {
+            assert(here); // User is still in room
+          })
+          .done(done);
+        });
+
+        it('should remove user from the room if lurking', function(done) {
+          // Set user as lurking
+          roomService.updateTroupeLurkForUserId(fixture.userFavourite.id, fixture.troupeCanRemove.id, true)
+          .then(function() { // Get updated troupe
+            return troupeService.findById(fixture.troupeCanRemove.id);
+          })
+          .then(function(troupe) {
+            return roomService.hideRoomFromUser(troupe.id, fixture.userFavourite.id);
+          })
+          .then(getFavs)
+          .then(function(favs) {
+            assert(!favs[fixture.troupeCanRemove.id]); // Favourite is removed
+          })
+          .then(checkHere)
+          .then(function(here) {
+            assert(!here); // User has been removed
+          })
+          .done(done);
+        });
+
+        it('should check if the proper event is emitted when the favourite is removed', function(done) {
+          var checkEvent = addListenner({
+            url: '/user/' + fixture.userFavourite.id + '/rooms',
+            operation: 'remove',
+            model: {id: fixture.troupeEmpty.id}
+          });
+
+          userIsInRoom(fixture.troupeEmpty.uri, fixture.userFavourite)
+          .then(function(here) {
+            assert(!here); // Check that user is not in the room
+          })
+          .then(function() {
+            return roomService.hideRoomFromUser(fixture.troupeEmpty.id, fixture.userFavourite.id);
+          })
+          .then(checkEvent) // Ensure event was emitted
+          .then(getFavs)
+          .then(function(favs) {
+            assert(!favs[fixture.troupeEmpty.id]); // Favourite is removed
+          })
+          .done(done);
+        });
+
+      });
+
+      describe('#removeUserFromRoom', function() {
+
+        var roomService = testRequire('./services/room-service');
+
+        it('should remove user from room', function(done) {
+          return userIsInRoom(fixture.troupeCanRemove.uri, fixture.userLeave)
+            .then(function(here) {
+              assert(here);
+              return roomService.removeUserFromRoom(fixture.troupeCanRemove, fixture.userLeave, fixture.userLeave);
+            })
+            .then(function() {
+              return userIsInRoom(fixture.troupeCanRemove.uri, fixture.userLeave);
+            })
+            .then(function(here) {
+              assert(!here);
+            })
+            .done(done);
+        });
+
+      });
+
+      describe('#removeUserFromRoom', function() {
+
+        var roomPermissionsModelMock = mockito.mockFunction();
+        var roomService = testRequire.withProxies('./services/room-service', {
+          './room-permissions-model': roomPermissionsModelMock
+        });
+
+        mockito.when(roomPermissionsModelMock)().then(function(user, perm) {
+          assert.equal(perm, 'admin');
+
+          if(user.id == fixture.userRemoveNonAdmin.id) {
+            return Q.resolve(false);
+          } else if(user.id == fixture.userRemoveAdmin.id) {
+            return Q.resolve(true);
+          } else {
+            assert(false, 'Unknown user');
+          }
+        });
+
+        it('should prevent non-admin from removing users from rooms', function(done) {
+          return userIsInRoom(fixture.troupeCanRemove.uri, fixture.userToRemove)
+            .then(function(here) {
+              assert(here);
+              return roomService.removeUserFromRoom(fixture.troupeCanRemove, fixture.userToRemove, fixture.userRemoveNonAdmin);
+            })
+            .catch(function(err) {
+              assert.equal(err.status, 403);
+            })
+            .then(function() {
+              return userIsInRoom(fixture.troupeCanRemove.uri, fixture.userToRemove);
+            })
+            .then(function(here) {
+              assert(here);
+            })
+            .done(done);
+        });
+
+        it('should prevent from removing users from one-to-one rooms', function(done) {
+          return userIsInRoom(fixture.troupeCannotRemove.uri, fixture.userToRemove)
+            .then(function(here) {
+              assert(here);
+              return roomService.removeUserFromRoom(fixture.troupeCannotRemove, fixture.userToRemove, fixture.userRemoveAdmin);
+            })
+            .catch(function(err) {
+              assert.equal(err.status, 400);
+              assert.equal(err.message, 'This room does not support removing.');
+            })
+            .then(function() {
+              return userIsInRoom(fixture.troupeCannotRemove.uri, fixture.userToRemove);
+            })
+            .then(function(here) {
+              assert(here);
+            })
+            .done(done);
+        });
+
+        it('should remove users from rooms', function(done) {
+          return userIsInRoom(fixture.troupeCanRemove.uri, fixture.userToRemove)
+            .then(function(here) {
+              assert(here);
+              return roomService.removeUserFromRoom(fixture.troupeCanRemove, fixture.userToRemove, fixture.userRemoveAdmin);
+            })
+            .then(function() {
+              return userIsInRoom(fixture.troupeCanRemove.uri, fixture.userToRemove);
+            })
+            .then(function(here) {
+              assert(!here);
+            })
+            .done(done);
+        });
+
+      });
+
     });
 
   });

@@ -19,7 +19,9 @@ function TroupeStrategy(options) {
                         return getOtherUserId(t);
                       } else {
                         // Return all the userIds if one was not specified
-                        return t.getUserIds();
+                        return t.oneToOneUsers.map(function(oneToOneUser) {
+                          return oneToOneUser.userId;
+                        });
                       }
                     }});
 
@@ -36,11 +38,16 @@ function TroupeStrategy(options) {
   };
 
 
-  function getOtherUserId(item) {
-    if(!recipientUserId) return undefined;
-    var userIds = item.getUserIds();
-    var userId = userIds.filter(function(userId) { return "" + userId != "" + recipientUserId; })[0];
-    return userId;
+  function getOtherUserId(troupe) {
+    if(!recipientUserId || !troupe.oneToOne || !troupe.oneToOneUsers) return undefined;
+
+    for (var i = 0; i < troupe.oneToOneUsers.length; i++) {
+      var oneToOneUser = troupe.oneToOneUsers[i];
+      if ("" + oneToOneUser.userId !== "" + recipientUserId) {
+        return oneToOneUser.userId;
+      }
+    }
+
   }
 
   function getHomeUrl(user) {
@@ -50,22 +57,25 @@ function TroupeStrategy(options) {
 
   function getUrlUserMap(troupe) {
     if(recipientUserId || !troupe.oneToOne) return undefined;
-    var result = {};
-    troupe.getUserIds().forEach(function(userId) {
+
+    return troupe.oneToOneUsers.reduce(function(memo, oneToOneUser) {
+      var userId = oneToOneUser.userId;
       var user = userStategy.map(userId);
-      result[userId] = user && getHomeUrl(user);
-    });
-    return result;
+      memo[userId] = user && getHomeUrl(user);
+      return memo;
+    }, {});
   }
 
   function getNameUserMap(troupe) {
     if(recipientUserId || !troupe.oneToOne) return undefined;
-    var result = {};
-    troupe.getUserIds().forEach(function(userId) {
+
+    return troupe.oneToOneUsers.reduce(function(memo, oneToOneUser) {
+      var userId = oneToOneUser.userId;
       var user = userStategy.map(userId);
-      result[userId] = user && user.displayName;
-    });
-    return result;
+      memo[userId] = user && user.displayName;
+      return memo;
+    }, {});
+
   }
 
   this.map = function(item) {
@@ -81,7 +91,6 @@ function TroupeStrategy(options) {
       uri: item.uri,
       oneToOne: item.oneToOne,
       user: user,
-      userIds: item.getUserIds(),
       url: item.oneToOne ? user && user && getHomeUrl(user) : "/" + item.uri,
       urlUserMap: item.oneToOne && getUrlUserMap(item),
       nameUserMap: item.oneToOne && getNameUserMap(item)
@@ -97,4 +106,3 @@ TroupeStrategy.prototype = {
 };
 
 module.exports = TroupeStrategy;
-

@@ -1,15 +1,15 @@
 "use strict";
+
 var env                       = require('gitter-web-env');
 var stats                     = env.stats;
 var recentRoomService         = require('./recent-room-service');
 var persistence               = require('./persistence-service');
 var unreadItemService         = require('./unread-item-service');
-var troupeService             = require('./troupe-service');
 var Q                         = require('q');
 var qlimit                    = require('qlimit');
 var persistence               = require('./persistence-service');
 var mongoUtils                = require('../utils/mongo-utils');
-var liveCollectionEvents      = require('./live-collection-events');
+var roomMembershipService     = require('./room-membership-service');
 
 /**
  * Returns a list of users who could be lurked
@@ -18,7 +18,7 @@ var liveCollectionEvents      = require('./live-collection-events');
 function findRemovalCandidates(roomId, options) {
   var minTimeInDays = (options.minTimeInDays || 14);
 
-  return troupeService.findUserIdsForTroupe(roomId)
+  return roomMembershipService.findMembersForRoom(roomId)
     .then(function(userIds) {
       return recentRoomService.findLastAccessTimesForUsersInRoom(roomId, userIds);
     })
@@ -57,43 +57,12 @@ function bulkRemoveUsersFromRoom(roomId, userIds) {
 
   if (!userIds.length) return Q.resolve();
   console.log('Removing ', userIds.length, ' users from ', roomId);
-  return persistence.Troupe.updateQ({ _id: mongoUtils.asObjectID(roomId), oneToOne: { $ne: true } }, {
-      $pull: {
-        users: {
-          userId: { $in: mongoUtils.asObjectIDs(userIds) }
-        }
-      },
-      $inc: { userCount: -userIds.length }
-    })
-    .then(function() {
-      // Second attempt at ensuring the room has the right number of people in it
-      // NB: not transaction
-      return persistence.Troupe.aggregateQ([{
-        $match: { _id: mongoUtils.asObjectID(roomId) }
-      }, {
-        $project: { userCount: { $size: "$users" } }
-      }]);
-    })
-    .then(function(x) {
-      var userCount = x && x[0] && x[0].userCount;
-      if (userCount >= 0) {
-        console.log('Updating userCount to ', userCount);
-
-        return persistence.Troupe.updateQ({ _id: mongoUtils.asObjectID(roomId) }, {
-          $set: { userCount: userCount }
-        });
-      }
-    })
+  return roomMembershipService.removeRoomMembers(roomId, userIds)
     .then(function() {
       console.log('Marking items as read');
       return Q.all(userIds.map(bulkUnreadItemLimit(function(userId) {
         return unreadItemService.ensureAllItemsRead(userId, roomId);
       })));
-    })
-    .then(function() {
-      return Q.all(userIds.map(function(userId) {
-        return liveCollectionEvents.serializeUserRemovedFromGroupRoom(roomId, userId);
-      }));
     })
     .then(function() {
       userIds.forEach(function(userId) {

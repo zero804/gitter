@@ -3,10 +3,12 @@
 
 var unreadItemService = require("../../services/unread-item-service");
 var recentRoomService = require('../../services/recent-room-service');
+var roomMembershipService = require('../../services/room-membership-service');
 var billingService    = require('../../services/billing-service');
 
 var _                 = require("underscore");
 var winston           = require('../../utils/winston');
+var debug             = require('debug')('gitter:troupe-strategy');
 var execPreloads      = require('../exec-preloads');
 var getVersion        = require('../get-model-version');
 var UserIdStrategy    = require('./user-id-strategy');
@@ -111,21 +113,18 @@ FavouriteTroupesForUserStrategy.prototype = {
 
 function LurkTroupeForUserStrategy(options) {
   var currentUserId = options.currentUserId;
+  var roomsWithLurk;
 
-  this.preload = function(callback) {
-    callback();
+  this.preload = function(data, callback) {
+    roomMembershipService.findRoomIdsForUserWithLurk(currentUserId)
+      .then(function(result) {
+        roomsWithLurk = result;
+      })
+      .nodeify(callback);
   };
 
-  this.map = function(troupeUsers) {
-    for(var i = 0; i < troupeUsers.length; i++) {
-      var troupeUser = troupeUsers[i];
-
-      if(troupeUser.userId == currentUserId) {
-        return !!troupeUser.lurk;
-      }
-    }
-
-    return false;
+  this.map = function(roomId) {
+    return roomsWithLurk[roomId];
   };
 }
 LurkTroupeForUserStrategy.prototype = {
@@ -223,17 +222,24 @@ function TroupeStrategy(options) {
       data: items
     });
 
+    if (lurkStrategy) {
+      strategies.push({
+        strategy: lurkStrategy,
+        data: null
+      });
+    }
+
     var userIds;
-    if(options.mapUsers) {
-      userIds = _.flatten(items.map(function(troupe) { return troupe.getUserIds(); }));
-    } else {
+    // if(options.mapUsers) {
+    //   userIds = _.flatten(items.map(function(troupe) { return troupe.getUserIds(); }));
+    // } else {
       userIds = _.flatten(items.map(function(troupe) {
-          if(troupe.oneToOne) return troupe.getUserIds();
+          if(troupe.oneToOne) return troupe.oneToOneUsers.map(function(f) { return f.userId; });
         })).filter(function(f) {
           return !!f;
         });
 
-    }
+    // }
 
     strategies.push({
       strategy: userIdStategy,
@@ -266,7 +272,7 @@ function TroupeStrategy(options) {
 
     if(item.oneToOne) {
       if(currentUserId) {
-        otherUser =  mapOtherUser(item.users);
+        otherUser =  mapOtherUser(item.oneToOneUsers);
       } else {
         if(!shownWarning) {
           winston.warn('TroupeStrategy initiated without currentUserId, but generating oneToOne troupes. This can be a problem!');
@@ -280,7 +286,7 @@ function TroupeStrategy(options) {
         troupeName = otherUser.displayName;
         troupeUrl = "/" + otherUser.username;
       } else {
-        winston.verbose("Troupe " + item.id + " appears to contain bad users", { users: item.toObject().users });
+        debug("Troupe %s appears to contain bad users", item._id);
         // This should technically never happen......
         return undefined;
       }
@@ -295,14 +301,14 @@ function TroupeStrategy(options) {
       topic: item.topic,
       uri: item.uri,
       oneToOne: item.oneToOne,
-      userCount: item.users.length,
-      users: options.mapUsers && !item.oneToOne ? item.users.map(function(troupeUser) { return userIdStategy.map(troupeUser.userId); }) : undefined,
+      userCount: item.userCount,
+      // users: options.mapUsers && !item.oneToOne ? item.users.map(function(troupeUser) { return userIdStategy.map(troupeUser.userId); }) : undefined,
       user: otherUser,
       unreadItems: unreadItemStategy ? unreadItemStategy.map(item.id) : undefined,
       mentions: mentionCountStrategy ? mentionCountStrategy.map(item.id) : undefined,
       lastAccessTime: lastAccessTimeStategy ? lastAccessTimeStategy.map(item.id) : undefined,
       favourite: favouriteStrategy ? favouriteStrategy.map(item.id) : undefined,
-      lurk: lurkStrategy ? !item.oneToOne && lurkStrategy.map(item.users) : undefined,
+      lurk: lurkStrategy ? !item.oneToOne && lurkStrategy.map(item.id) : undefined,
       url: troupeUrl,
       githubType: item.githubType,
       security: item.security,
