@@ -89,7 +89,7 @@ describe('unread-item-service', function() {
       var userId2;
       var userId3;
       var user3;
-      var troupeService;
+      var roomMembershipService;
       var userService;
       var roomPermissionsModel;
       var unreadItemService;
@@ -150,16 +150,16 @@ describe('unread-item-service', function() {
         };
         troupeAllLurkersUserHash = makeHash(fromUserId, true, userId1, true, userId2, true);
 
-        troupeService = mockito.mock(testRequire('./services/troupe-service'));
+        roomMembershipService = mockito.mock(testRequire('./services/room-membership-service'));
         userService = mockito.mock(testRequire('./services/user-service'));
         roomPermissionsModel = mockito.mockFunction();
 
-        mockito.when(troupeService).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve(troupeNoLurkersUserHash));
-        mockito.when(troupeService).findUserIdsForTroupeWithLurk(troupeId2).thenReturn(Q.resolve(troupeSomeLurkersUserHash));
-        mockito.when(troupeService).findUserIdsForTroupeWithLurk(troupeId3).thenReturn(Q.resolve(troupeAllLurkersUserHash));
+        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId).thenReturn(Q.resolve(troupeNoLurkersUserHash));
+        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId2).thenReturn(Q.resolve(troupeSomeLurkersUserHash));
+        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId3).thenReturn(Q.resolve(troupeAllLurkersUserHash));
 
         unreadItemService = testRequire.withProxies("./services/unread-item-service", {
-          './troupe-service': troupeService,
+          './room-membership-service': roomMembershipService,
           './user-service': userService,
           './room-permissions-model': roomPermissionsModel,
         });
@@ -311,11 +311,11 @@ describe('unread-item-service', function() {
         var userId2 = mongoUtils.getNewObjectIdString();
         var userId3 = mongoUtils.getNewObjectIdString();
 
-        var troupeServiceMock = mockito.mock(testRequire('./services/troupe-service'));
+        var roomMembershipServiceMock = mockito.mock(testRequire('./services/room-membership-service'));
         var appEvents = mockito.spy(testRequire('gitter-web-appevents'));
 
         var unreadItemService = testRequire.withProxies("./services/unread-item-service", {
-          './troupe-service': troupeServiceMock,
+          './room-membership-service': roomMembershipServiceMock,
           'gitter-web-appevents': appEvents
         });
         unreadItemService.testOnly.setSendBadgeUpdates(false);
@@ -325,7 +325,7 @@ describe('unread-item-service', function() {
         usersWithLurkHash[userId2] = false;
         usersWithLurkHash[userId3] = false;
 
-        mockito.when(troupeServiceMock).findUserIdsForTroupeWithLurk(troupeId1).thenReturn(Q.resolve(usersWithLurkHash));
+        mockito.when(roomMembershipServiceMock).findMembersForRoomWithLurk(troupeId1).thenReturn(Q.resolve(usersWithLurkHash));
 
         unreadItemService.testOnly.removeItem(troupeId1, chatId)
           .then(function() {
@@ -355,7 +355,7 @@ describe('unread-item-service', function() {
       var userId2;
       var userId3;
       var user3;
-      var troupeService;
+      var roomMembershipService;
       var appEvents;
       var userService;
       var roomPermissionsModel;
@@ -438,7 +438,7 @@ describe('unread-item-service', function() {
         };
         troupeAllLurkersUserHash = makeHash(fromUserId, true, userId1, true, userId2, true);
 
-        troupeService = mockito.mock(testRequire('./services/troupe-service'));
+        roomMembershipService = mockito.mock(testRequire('./services/room-membership-service'));
         userService = mockito.mock(testRequire('./services/user-service'));
         appEvents = mockito.mock(testRequire('gitter-web-appevents'));
         roomPermissionsModel = mockito.mockFunction();
@@ -452,12 +452,12 @@ describe('unread-item-service', function() {
           }
         };
 
-        mockito.when(troupeService).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve(troupeNoLurkersUserHash));
-        mockito.when(troupeService).findUserIdsForTroupeWithLurk(troupeId2).thenReturn(Q.resolve(troupeSomeLurkersUserHash));
-        mockito.when(troupeService).findUserIdsForTroupeWithLurk(troupeId3).thenReturn(Q.resolve(troupeAllLurkersUserHash));
+        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId).thenReturn(Q.resolve(troupeNoLurkersUserHash));
+        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId2).thenReturn(Q.resolve(troupeSomeLurkersUserHash));
+        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId3).thenReturn(Q.resolve(troupeAllLurkersUserHash));
 
         unreadItemService = testRequire.withProxies("./services/unread-item-service", {
-          './troupe-service': troupeService,
+          './room-membership-service': roomMembershipService,
           './user-service': userService,
           './presence-service': presenceService,
           'gitter-web-appevents': appEvents,
@@ -574,7 +574,7 @@ describe('unread-item-service', function() {
       var userId2;
       var userId3;
       var user3;
-      var troupeService;
+      var roomMembershipService;
       var appEvents;
       var userService;
       var roomPermissionsModel;
@@ -657,7 +657,7 @@ describe('unread-item-service', function() {
         };
         troupeAllLurkersUserHash = makeHash(fromUserId, true, userId1, true, userId2, true);
 
-        troupeService = mockito.mock(testRequire('./services/troupe-service'));
+        roomMembershipService = mockito.mock(testRequire('./services/room-membership-service'));
         userService = mockito.mock(testRequire('./services/user-service'));
         appEvents = mockito.mock(testRequire('gitter-web-appevents'));
         roomPermissionsModel = mockito.mockFunction();
@@ -671,12 +671,12 @@ describe('unread-item-service', function() {
           }
         };
 
-        mockito.when(troupeService).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve(troupeNoLurkersUserHash));
-        mockito.when(troupeService).findUserIdsForTroupeWithLurk(troupeId2).thenReturn(Q.resolve(troupeSomeLurkersUserHash));
-        mockito.when(troupeService).findUserIdsForTroupeWithLurk(troupeId3).thenReturn(Q.resolve(troupeAllLurkersUserHash));
+        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId).thenReturn(Q.resolve(troupeNoLurkersUserHash));
+        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId2).thenReturn(Q.resolve(troupeSomeLurkersUserHash));
+        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId3).thenReturn(Q.resolve(troupeAllLurkersUserHash));
 
         unreadItemService = testRequire.withProxies("./services/unread-item-service", {
-          './troupe-service': troupeService,
+          './room-membership-service': roomMembershipService,
           './user-service': userService,
           './presence-service': presenceService,
           'gitter-web-appevents': appEvents,

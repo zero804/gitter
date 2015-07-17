@@ -18,7 +18,7 @@ var TOTAL_USERS = 10000;
   var troupeId;
   var fromUserId;
   var userIds;
-  var troupeService;
+  var roomMembershipService;
   var appEvents;
   var userService;
   var roomPermissionsModel;
@@ -49,15 +49,15 @@ var TOTAL_USERS = 10000;
       _id: troupeId,
     };
 
-    troupeService = mockito.mock(testRequire('./services/troupe-service'));
+    roomMembershipService = mockito.mock(testRequire('./services/room-membership-service'));
     userService = mockito.mock(testRequire('./services/user-service'));
     appEvents = mockito.mock(testRequire('./app-events'));
     roomPermissionsModel = mockito.mockFunction();
 
-    mockito.when(troupeService).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve(troupeLurkersUserHash));
+    mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId).thenReturn(Q.resolve(troupeLurkersUserHash));
 
     unreadItemService = testRequire.withProxies("./services/unread-item-service", {
-      './troupe-service': troupeService,
+      './room-membership-service': roomMembershipService,
       './user-service': userService,
       '../app-events': appEvents,
       './room-permissions-model': roomPermissionsModel,

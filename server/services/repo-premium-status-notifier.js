@@ -4,6 +4,7 @@
 var troupeDao   = require('./daos/troupe-dao').lean;
 var appEvents   = require('gitter-web-appevents');
 var userService = require('./user-service');
+var roomMembershipService = require('./room-membership-service')
 
 function repoPremiumStatusNotifier(userOrOrg, premiumStatus) {
   return userService.findByUsername(userOrOrg)
@@ -18,37 +19,38 @@ function repoPremiumStatusNotifier(userOrOrg, premiumStatus) {
         });
       }
 
-      var userNotificatons = {};
-
-      return troupeDao.findByOwnerUri(userOrOrg, { 'users.userId': 1 })
+      return troupeDao.findByOwnerUri(userOrOrg, { '_id': 1 })
         .then(function(troupes) {
+          var troupeIds = troupes.map(function(troupe) { return troupe._id; });
+          return roomMembershipService.findMembersForRoomMulti(troupeIds);
+        })
+        .then(function(troupeUsersHash) {
+          var userNotificatons = {};
 
-          if(!troupes || !troupes.length) return;
+          Object.keys(troupeUsersHash).forEach(function(troupeId) {
+            var userIds = troupeUsersHash[troupeId];
 
-          troupes.forEach(function(troupe) {
-
-            troupe.users.forEach(function(user) {
+            userIds.forEach(function(userId) {
 
               if(isOrg) {
                 // TODO: come up with a better mapping from org to user
-                if(!userNotificatons[user.userId]) {
+                if(!userNotificatons[userId]) {
                   // Only do this once per user
-                  userNotificatons[user.userId] = true;
+                  userNotificatons[userId] = true;
 
-                  appEvents.dataChange2("/user/" + user.userId + "/orgs", 'patch', {
+                  appEvents.dataChange2("/user/" + userId + "/orgs", 'patch', {
                     name: userOrOrg, // Id for org is the name
                     premium: premiumStatus
                   });
                 }
               }
 
-              appEvents.dataChange2("/user/" + user.userId + "/rooms", 'patch', {
-                id: "" + troupe._id,
+              appEvents.dataChange2("/user/" + userId + "/rooms", 'patch', {
+                id: "" + troupeId,
                 premium: premiumStatus
               });
 
             });
-
           });
         });
 

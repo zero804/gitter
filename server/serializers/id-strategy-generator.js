@@ -4,6 +4,8 @@
 // var winston = require('../utils/winston');
 var collections = require("../utils/collections");
 var execPreloads = require('./exec-preloads');
+var Q = require('q');
+var debug = require('debug')('gitter:serializer:id-loader');
 
 function idStrategyGenerator(name, FullObjectStrategy, loaderFunction) {
   var Strategy = function IdStrategy(options) {
@@ -11,8 +13,14 @@ function idStrategyGenerator(name, FullObjectStrategy, loaderFunction) {
     var objectHash;
 
     this.preload = function(ids, callback) {
+      if (!ids.length) return Q.resolve([]).nodeify(callback);
+
+      var time = debug.enabled && Date.now();
       return loaderFunction(ids)
         .then(function(fullObjects) {
+          var duration = debug.enabled && Date.now() - time;
+          debug("%s loaded %s items from ids in %sms", name, ids.length, duration);
+
           objectHash = collections.indexById(fullObjects);
 
           return execPreloads([{
@@ -44,4 +52,3 @@ function idStrategyGenerator(name, FullObjectStrategy, loaderFunction) {
   return Strategy;
 }
 module.exports = idStrategyGenerator;
-

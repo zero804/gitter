@@ -5,6 +5,7 @@ var userService              = require("./user-service");
 var collections              = require("../utils/collections");
 var mongoUtils               = require("../utils/mongo-utils");
 var Q                        = require("q");
+var roomMembershipService    = require('./room-membership-service');
 
 /**
  * Returns the URL a particular user would see if they wish to view a URL.
@@ -16,7 +17,7 @@ function getUrlForTroupeForUserId(troupe, userId) {
     return Q.resolve("/" + troupe.uri);
   }
 
-  var otherTroupeUser = troupe.users.filter(function(troupeUser) {
+  var otherTroupeUser = troupe.oneToOneUsers.filter(function(troupeUser) {
     return troupeUser.userId != userId;
   })[0];
 
@@ -25,7 +26,7 @@ function getUrlForTroupeForUserId(troupe, userId) {
   return userService.findUsernameForUserId(otherTroupeUser.userId)
     .then(function(username) {
       return username ? "/" + username
-                      : "/one-one/" + otherTroupeUser.userId;
+                      : "/one-one/" + otherTroupeUser.userId; // TODO: this must go
     });
 
 }
@@ -33,26 +34,18 @@ exports.getUrlForTroupeForUserId = getUrlForTroupeForUserId;
 
 function getUrlOfFirstAccessibleRoom(troupeIds, userId) {
   if (!troupeIds.length) return Q.resolve(null);
-
-  return persistence.Troupe.aggregateQ([{
-      $match: {
-          _id: { $in: mongoUtils.asObjectIDs(troupeIds) },
-          'users.userId': mongoUtils.asObjectID(userId),
+  return roomMembershipService.findUserMembershipInRooms(userId, troupeIds)
+    .then(function(memberTroupeIds) {
+      return persistence.Troupe.findQ({
+          _id: { $in: mongoUtils.asObjectIDs(memberTroupeIds) },
           status: { $ne: 'DELETED' }
-        }
-    }, {
-      $project: {
-        uri: 1,
-        oneToOne: 1,
-        users: {
-          $cond: {
-            if: { $eq: ["$oneToOne", true] },
-            then: "$users",
-            else: null
-          }
-        }
-      }
-    }]).then(function(results) {
+        }, {
+            uri: 1,
+            oneToOne: 1,
+            oneToOneUsers: 1
+        })
+    })
+    .then(function(results) {
       var resultsHash = collections.indexById(results);
       for(var i = 0; i < troupeIds.length; i++) {
         var troupeId = troupeIds[i];

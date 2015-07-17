@@ -9,6 +9,7 @@ var chatService = require('../../server/services/chat-service');
 var mongooseUtils = require('../../server/utils/mongoose-utils');
 var persistence = require('../../server/services/persistence-service');
 var roomService = require('../../server/services/room-service');
+var roomMembershipService = require('../../server/services/room-membership-service');
 var cumberbatch = require('cumberbatch-name');
 
 var opts = require("nomnom")
@@ -51,15 +52,13 @@ Q.all([
 
         return newUser.saveQ()
           .then(function() {
-            room.addUserById(newUser.id);
-          })
-          .then(function() {
             if (++i % 10 === 0) console.log(i);
+            return newUser._id;
           });
 
-      }))).
-      then(function() {
-        return room.saveQ();
+      })))
+      .then(function(userIds) {
+        return roomMembershipService.addRoomMembers(room._id, userIds);
       });
   })
   .delay(1000)
