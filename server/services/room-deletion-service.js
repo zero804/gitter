@@ -4,6 +4,7 @@
 var userService = require('./user-service');
 var troupeService = require('./troupe-service');
 var roomService = require('./room-service');
+var memberService = require('./room-membership-service');
 var assert = require('assert');
 var persistence = require('./persistence-service');
 var Q = require('q');
@@ -34,10 +35,10 @@ exports.removeByUri = function(uri) {
 
   return troupeService.findByUri(uri)
     .then(function(room) {
-      var userIds = room.getUserIds();
-
-      return removeUsersFromRoomOneAtATime(room, userIds)
-        .thenResolve(room);
+      return memberService.findMembersForRoom(room._id)
+        .then(function(userIds) {
+          return removeUsersFromRoomOneAtATime(room, userIds)
+        }).thenResolve(room);
     })
     .then(function(room) {
       return room.removeQ();
