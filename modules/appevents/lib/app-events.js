@@ -157,14 +157,6 @@ module.exports =  {
       localEventEmitter.on('batchUserBadgeCountUpdate', callback);
     },
 
-    troupeDeleted: function(options) {
-      localEventEmitter.emit('troupeDeleted', options);
-    },
-
-    onTroupeDeleted: function(callback) {
-      localEventEmitter.on('troupeDeleted', callback);
-    },
-
     repoPermissionsChangeDetected: function(uri, isPrivate) {
       localEventEmitter.emit('repo_perm_change', {
         uri: uri,

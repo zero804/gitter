@@ -45,7 +45,7 @@ function lookupUri(uri) {
           return persistence.UriLookup.findOneAndUpdateQ(
             { $or: [{ uri: lcUri }, { userId: user._id }] },
             { $set: { uri: lcUri, userId: user._id }, $unset: { troupeId: '' } },
-            { upsert: true });
+            { upsert: true, new: true });
         }
 
         /* Found a room. Add to cache and continue */
@@ -53,7 +53,7 @@ function lookupUri(uri) {
           return persistence.UriLookup.findOneAndUpdateQ(
             { $or: [{ uri: lcUri }, { troupeId: troupe._id }] },
             { $set: { uri: lcUri, troupeId: troupe._id }, $unset: { userId: '' } },
-            { upsert: true });
+            { upsert: true, new: true });
         }
 
         /* Last ditch attempt. Look for a room that has been renamed */
@@ -101,7 +101,7 @@ function reserveUriForTroupeId(troupeId, uri) {
   return persistence.UriLookup.findOneAndUpdateQ(
     { $or: [{ uri: lcUri }, { troupeId: troupeId }] },
     { $set: { uri: lcUri, troupeId: troupeId }, $unset: { userId: '' } },
-    { upsert: true });
+    { upsert: true, new: true });
 }
 
 exports.reserveUriForTroupeId = reserveUriForTroupeId;

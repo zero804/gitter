@@ -6,6 +6,7 @@ var winston           = require('../../utils/winston');
 var collections       = require("../../utils/collections");
 var execPreloads      = require('../exec-preloads');
 var TroupeStrategy    = require('./troupe-strategy');
+var debug             = require('debug')('troupe-id-strategy');
 
 function TroupeIdStrategy(options) {
   var troupeStrategy = new TroupeStrategy(options);
@@ -30,7 +31,7 @@ function TroupeIdStrategy(options) {
   this.map = function(troupeId) {
     var troupe = troupesIndexed[troupeId];
     if(!troupe) {
-      winston.warn("Unable to locate troupeId ", { troupeId: troupeId });
+      debug("Unable to serialize troupe with ID %s as it was not found", troupeId);
       return null;
     }
 

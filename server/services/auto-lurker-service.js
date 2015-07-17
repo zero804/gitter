@@ -3,45 +3,46 @@ var env                       = require('gitter-web-env');
 var stats                     = env.stats;
 var recentRoomService         = require('./recent-room-service');
 var userTroupeSettingsService = require('./user-troupe-settings-service');
-var persistence               = require('./persistence-service');
 var unreadItemService         = require('./unread-item-service');
 var Q                         = require('q');
 var qlimit                    = require('qlimit');
+var roomMembershipService     = require('./room-membership-service');
 
 /**
  * Returns a list of users who could be lurked
  * [{ userId: ..., lastAccessTime: ..., lurk: ..., notificationSettings: ... }]
  */
 function findLurkCandidates(troupe, options) {
-  var userIds = troupe.getUserIds();
-  var minTimeInDays = (options.minTimeInDays || 14);
+  var troupeId = troupe._id;
 
-  var lurkStatus = troupe.users.reduce(function(memo, troupeUser) {
-    memo[troupeUser.userId] = troupeUser.lurk;
-    return memo;
-  }, {});
+  return roomMembershipService.findMembersForRoomWithLurk(troupeId)
+    .then(function(lurkStatus) {
+      var userIds = Object.keys(lurkStatus);
+      var minTimeInDays = (options.minTimeInDays || 14);
 
-  return recentRoomService.findLastAccessTimesForUsersInRoom(troupe.id, userIds)
-    .then(function(lastAccessDates) {
-      var cutoff = Date.now() - minTimeInDays * 86400000;
+      return recentRoomService.findLastAccessTimesForUsersInRoom(troupeId, userIds)
+        .then(function(lastAccessDates) {
+          var cutoff = Date.now() - minTimeInDays * 86400000;
 
-      var oldUserIds = Object.keys(lastAccessDates).map(function(userId) {
-          var lastAccess = lastAccessDates[userId];
+          var oldUserIds = Object.keys(lastAccessDates).map(function(userId) {
+              var lastAccess = lastAccessDates[userId];
 
-          if (lastAccess && lastAccess < cutoff) {
-            return userId;
-          }
-        }).filter(function(f) {
-          return !!f;
+              if (lastAccess && lastAccess < cutoff) {
+                return userId;
+              }
+            }).filter(function(f) {
+              return !!f;
+            });
+
+          return [
+            oldUserIds,
+            lurkStatus,
+            userTroupeSettingsService.getUserTroupeSettingsForUsersInTroupe(troupeId, 'notifications', oldUserIds),
+            lastAccessDates
+          ];
         });
-
-      return [
-        oldUserIds,
-        userTroupeSettingsService.getUserTroupeSettingsForUsersInTroupe(troupe.id, 'notifications', oldUserIds),
-        lastAccessDates
-      ];
     })
-    .spread(function(oldUsersIds, settings, lastAccessDates) {
+    .spread(function(oldUsersIds, lurkStatus, settings, lastAccessDates) {
 
       return oldUsersIds
         .filter(function(userId) {
@@ -73,21 +74,7 @@ var bulkUnreadItemLimit = qlimit(5);
  * Bulk lurk users without putting undue strain on mongodb
  */
 function bulkLurkUsers(troupeId, userIds) {
-  var userHash = userIds.reduce(function(memo, userId) {
-    memo[userId] = true;
-    return memo;
-  }, {});
-
-  return persistence.Troupe.findByIdQ(troupeId)
-    .then(function(troupe) {
-      troupe.users.forEach(function(troupeUser) {
-        if (userHash[troupeUser.userId]) {
-          troupeUser.lurk = true;
-        }
-      });
-      troupe._skipTroupeMiddleware = true; // Don't send out an update
-      return troupe.saveQ();
-    })
+  return roomMembershipService.setMembersLurkStatus(troupeId, userIds, true)
     .then(function() {
       return Q.all(userIds.map(bulkUnreadItemLimit(function(userId) {
         return unreadItemService.ensureAllItemsRead(userId, troupeId);

@@ -20,11 +20,11 @@ module.exports = {
   id: 'userChannel',
 
   index: function(req, res, next) {
-    roomService.findAllChannelsForUser(req.user, function(err, channelTroupes) {
-      if(err) return next(err);
-
-      serialize(channelTroupes, req, res, next);
-    });
+    roomService.findAllChannelsForUser(req.user)
+      .then(function(channelTroupes) {
+        serialize(channelTroupes, req, res, next);
+      })
+      .fail(next);
   },
 
   create: function(req, res, next) {

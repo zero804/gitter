@@ -2,7 +2,6 @@
 "use strict";
 
 var PushNotificationDevice = require("./persistence-service").PushNotificationDevice;
-var winston                = require('../utils/winston');
 var nconf                  = require('../utils/config');
 var crypto                 = require('crypto');
 var _                      = require('underscore');
@@ -10,14 +9,12 @@ var Q                      = require('q');
 var redis                  = require("../utils/redis");
 var mongoUtils             = require('../utils/mongo-utils');
 var redisClient            = redis.getClient();
-
+var debug                  = require('debug')('push-notification-service');
 var Scripto                = require('gitter-redis-scripto');
 var scriptManager          = new Scripto(redisClient);
 scriptManager.loadFromDir(__dirname + '/../../redis-lua/notify');
 
 var minimumUserAlertIntervalS = nconf.get("notifications:minimumUserAlertInterval");
-
-
 
 function buffersEqual(a,b) {
   if (!Buffer.isBuffer(a)) return undefined;
@@ -49,14 +46,14 @@ function findAndRemoveDevicesWithDuplicateTokens(deviceId, deviceType, deviceTok
       });
 
       return Q.all(devicesToRemove.map(function(device) {
-        winston.verbose('Removing unused device ' + device.deviceId);
+        debug('Removing unused device %s', device.deviceId);
         return device.removeQ();
       }));
     });
 }
 
 exports.registerDevice = function(deviceId, deviceType, deviceToken, deviceName, appVersion, appBuild, callback) {
-  winston.verbose("Registering device ", { deviceId: deviceId });
+  debug("Registering device %s", deviceId);
   var tokenHash = crypto.createHash('md5').update(deviceToken).digest('hex');
 
   return PushNotificationDevice.findOneAndUpdateQ(
@@ -72,7 +69,7 @@ exports.registerDevice = function(deviceId, deviceType, deviceToken, deviceName,
       appBuild: appBuild,
       enabled: true
     },
-    { upsert: true })
+    { upsert: true, new: true })
     .then(function(device) {
       // After we've update the device, look for other devices that have given us the same token
       // these are probably phones that have been reset etc, so we need to prune them
@@ -83,7 +80,7 @@ exports.registerDevice = function(deviceId, deviceType, deviceToken, deviceName,
 };
 
 exports.registerAndroidDevice = function(deviceId, deviceName, registrationId, appVersion, userId, callback) {
-  winston.verbose("Registering device ", { deviceId: deviceId });
+  debug("Registering device %s", deviceId);
   var tokenHash = crypto.createHash('md5').update(registrationId).digest('hex');
 
   return PushNotificationDevice.findOneAndUpdateQ(
@@ -99,7 +96,7 @@ exports.registerAndroidDevice = function(deviceId, deviceName, registrationId, a
       appVersion: appVersion,
       enabled: true
     },
-    { upsert: true })
+    { upsert: true, new: true })
     .then(function(device) {
       // After we've update the device, look for other devices that have given us the same token
       // these are probably phones that have been reset etc, so we need to prune them
@@ -113,12 +110,8 @@ exports.registerUser = function(deviceId, userId, callback) {
   return PushNotificationDevice.findOneAndUpdateQ(
     { deviceId: deviceId },
     { deviceId: deviceId, userId: userId, timestamp: new Date() },
-    { upsert: true })
+    { upsert: true, new: true })
     .nodeify(callback);
-};
-
-exports.findDevicesForUser = function(userId, callback) {
-  PushNotificationDevice.find({ userId: userId }, callback);
 };
 
 var usersWithDevicesCache = null;
@@ -153,13 +146,6 @@ exports.findUsersWithDevices = function(userIds, callback) {
       });
     })
     .nodeify(callback);
-};
-
-exports.findDevicesForUsers = function(userIds, callback) {
-  userIds = _.uniq(userIds);
-  return PushNotificationDevice
-    .where('userId')['in'](userIds)
-    .execQ(callback);
 };
 
 exports.findEnabledDevicesForUsers = function(userIds, callback) {
@@ -239,4 +225,4 @@ exports.canUnlockForNotification = function (userId, troupeId, notificationNumbe
 
 exports.testOnly = {
   expireCachedUsersWithDevices: expireCachedUsersWithDevices
-}
+};

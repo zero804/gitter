@@ -5,8 +5,8 @@ var troupeService        = require("../../services/troupe-service");
 var restful              = require("../../services/restful");
 var restSerializer       = require("../../serializers/rest-serializer");
 var recentRoomService    = require('../../services/recent-room-service');
+var roomMembershipService = require('../../services/room-membership-service');
 var roomService          = require('../../services/room-service');
-var removeService        = require('../../services/remove-service');
 var Q                    = require('q');
 var mongoUtils           = require('../../utils/mongo-utils');
 var StatusError          = require('statuserror');
@@ -27,7 +27,7 @@ module.exports = {
 
   show: function(req, res, next) {
     var strategyOptions = { currentUserId: req.resourceUser.id };
-    if (req.query.include_users) strategyOptions.mapUsers = true;
+    // if (req.query.include_users) strategyOptions.mapUsers = true;
 
     var strategy = new restSerializer.TroupeStrategy(strategyOptions);
 
@@ -40,11 +40,11 @@ module.exports = {
 
   update: function(req, res, next) {
     var userId = req.user.id;
+    var troupe = req.userTroupe;
+    var troupeId = troupe.id;
 
-    // Switch a lean troupe object for a full mongoose object
-    return troupeService.findById(req.userTroupe.id)
-      .then(function(troupe) {
-        if (!troupe) throw new StatusError(404);
+    return roomMembershipService.checkRoomMembership(troupeId, userId)
+      .then(function(isMember) {
 
         var updatedTroupe = req.body;
         var troupeId = troupe.id;
@@ -53,28 +53,32 @@ module.exports = {
         if('favourite' in updatedTroupe) {
           var fav = updatedTroupe.favourite;
 
-          if(!fav || troupeService.userHasAccessToTroupe(req.resourceUser, troupe)) {
+          if(!fav || isMember) {
             promises.push(recentRoomService.updateFavourite(userId, troupeId, fav));
           } else {
             // The user has added a favourite that they don't belong to
             // Add them to the room first
-            promises.push(
-              roomService.findOrCreateRoom(req.resourceUser, troupe.uri)
-                .then(function() {
-                  return recentRoomService.updateFavourite(userId, troupeId, updatedTroupe.favourite);
-                })
-              );
+            if (!troupe.oneToOne) {
+              /* Ignore one-to-one rooms */
+              promises.push(
+                roomService.findOrCreateRoom(req.resourceUser, troupe.uri)
+                  .then(function() {
+                    return recentRoomService.updateFavourite(userId, troupeId, updatedTroupe.favourite);
+                  })
+                );
+            }
           }
         }
 
         if('lurk' in updatedTroupe) {
-          promises.push(roomService.updateTroupeLurkForUserId(userId, troupeId, updatedTroupe.lurk));
+          if (isMember && !troupe.oneToOne) {
+            promises.push(roomService.updateTroupeLurkForUserId(userId, troupeId, updatedTroupe.lurk));
+          }
         }
 
-        return Q.all(promises)
-          .thenResolve(troupe);
+        return Q.all(promises);
       })
-      .then(function(troupe) {
+      .then(function() {
         var strategy = new restSerializer.TroupeStrategy({ currentUserId: userId });
 
         return restSerializer.serializeQ(troupe, strategy);
@@ -85,16 +89,14 @@ module.exports = {
       .fail(next);
   },
 
+  /**
+   * Hides a room from the menu. A user can only request this
+   * on their own behalf.
+   *
+   * DELETE /users/:userId/rooms/:roomId
+   */
   destroy: function(req, res, next) {
-    var userId = req.user.id;
-
-    // Switch a lean troupe object for a full mongoose object
-    return troupeService.findById(req.userTroupe.id)
-      .then(function(troupe) {
-        if (!troupe) throw new StatusError(404);
-
-        return removeService.removeRecentRoomForUser(troupe, userId);
-      })
+    return roomService.hideRoomFromUser(req.userTroupe._id, req.user._id)
       .then(function() {
         res.send({ success: true });
       })

@@ -3,6 +3,7 @@
 
 var persistence     = require("./persistence-service");
 var Q               = require('q');
+var roomMembershipService = require('./room-membership-service');
 
 function createRegExpsForQuery(queryText) {
   var normalized = ("" + queryText).trim().toLowerCase();
@@ -41,23 +42,27 @@ function findPublicChannels(user, query, options) {
 }
 
 function findPrivateChannelsWithUser(user, query, options) {
-
   var filters = createRegExpsForQuery(query);
   if(!filters.length) return Q.resolve([]);
 
-  var filterQueries = filters.map(function(re) {
-    return { lcUri: re };
-  });
+  return roomMembershipService.findRoomIdsForUser(user._id)
+    .then(function(membershipTroupeIds) {
+      if (!membershipTroupeIds.length) return [];
 
-  return persistence.Troupe
-    .find({
-      $and: filterQueries,
-      users: { $elemMatch: { userId: user.id } },
-      security: 'PRIVATE',
-      githubType: { $in: ['REPO_CHANNEL', 'ORG_CHANNEL', 'USER_CHANNEL'] }
-    })
-    .limit(options.limit || 20)
-    .execQ();
+      var filterQueries = filters.map(function(re) {
+        return { lcUri: re };
+      });
+
+      return persistence.Troupe
+        .find({
+          $and: filterQueries,
+          _id: { $in: membershipTroupeIds },
+          security: 'PRIVATE',
+          githubType: { $in: ['REPO_CHANNEL', 'ORG_CHANNEL', 'USER_CHANNEL'] }
+        })
+        .limit(options.limit || 20)
+        .execQ();
+    });
 }
 
 function findChannels(user, query, options) {
