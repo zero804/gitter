@@ -5,7 +5,6 @@
 var persistence = require('../../server/services/persistence-service');
 var onMongoConnect = require('../../server/utils/on-mongo-connect');
 var through2Concurrent = require('through2-concurrent');
-var es = require('event-stream');
 var ObjectID = require('mongodb').ObjectID;
 var _ = require('underscore');
 var Q = require('q');
@@ -29,7 +28,7 @@ function createTroupeUsers(room) {
   var d = Q.defer();
   bulk.execute(d.makeNodeResolver());
   return d.promise.then(function() {
-    console.log('bulk added ' + room.users.length + ' items');
+    return persistence.Troupe.updateQ({ _id: room._id }, { $set: { userCount: room.users.length } });
   });
 }
 
@@ -38,11 +37,10 @@ function migrateOneToOneRoom(room) {
     return _.extend({ }, roomUser, { _id: new ObjectID() });
   });
 
-  return persistence.Troupe.updateQ({ _id: room._id }, { $set: { oneToOneUsers: oneToOneUsers } });
+  return persistence.Troupe.updateQ({ _id: room._id }, { $set: { oneToOneUsers: oneToOneUsers, userCount: oneToOneUsers.length } });
 }
 
 function migrateRoom(room) {
-  console.log(room.uri);
   return createTroupeUsers(room)
     .then(function() {
       if (room.oneToOne && room.users) {
@@ -53,7 +51,7 @@ function migrateRoom(room) {
 
 function performMigration() {
   var d = Q.defer();
-
+  var count = 0;
   membershipStream()
     .pipe(through2Concurrent.obj({ maxConcurrency: 24 },
       function (room, enc, callback) {
@@ -65,8 +63,11 @@ function performMigration() {
           .nodeify(callback);
 
     }))
-    .on('data', function(d) {
-      console.log('done,', d);
+    .on('data', function() {
+      count++;
+      if (count % 100 === 0) {
+        console.log('Completed ', count);
+      }
     })
     .on('end', function () {
       console.log('DONE');
