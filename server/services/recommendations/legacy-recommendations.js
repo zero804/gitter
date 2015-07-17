@@ -178,8 +178,8 @@ function filterRecommendations(recommendations, userId) {
         if (room) {
           recommendation.room = room;
 
-          // Room exists, but user is not in room
-          return !room.users || !room.users.length;
+          // recommend empty rooms
+          return !room.usersCount;
         }
 
         var repo = recommendation.repo;
