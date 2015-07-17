@@ -26,15 +26,14 @@ module.exports = {
         return random.generateToken()
           .then(function(token) {
             return persistenceService.OAuthAccessToken.findOneAndUpdateQ(
-              { userId: userId, clientId: clientId },
-              {
-                $setOnInsert: {
-                  token: token
-                }
-              },
-              {
-                upsert: true
-              }).then(function(result) {
+                { userId: userId, clientId: clientId },
+                {
+                  $setOnInsert: {
+                    token: token
+                  }
+                },
+                { upsert: true, new: true })
+              .then(function(result) {
                 return result.token;
               });
           });

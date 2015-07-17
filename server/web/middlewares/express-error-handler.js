@@ -27,7 +27,7 @@ function stat(name, req, additionalTags) {
 
   if (username) {
     tags.push('user:' + username);
-  }
+}
 
   if (req.path) {
     tags.push('path:' + req.path);
@@ -121,7 +121,12 @@ module.exports = function(err, req, res, next) { // jshint unused:false
     };
 
     stat('client_error_402', req);
+  } else if (status === 403) {
+    stat('client_error_403', req);
 
+    extraTemplateValues = {
+      title: 'Access denied'
+    };
   } else if(status === 429) {
     stat('client_error_429', req);
   } else if(status >= 400 && status < 500) {

@@ -22,6 +22,7 @@ function MongooseCachedLookup(options) {
 
     return model.findByIdQ(id, undefined, { lean: true })
       .then(function(doc) {
+        if (!doc) return;
         doc.id = mongoUtils.serializeObjectId(doc._id);
         cache.set(id, doc);
         return doc;
