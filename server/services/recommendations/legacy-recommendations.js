@@ -179,7 +179,7 @@ function filterRecommendations(recommendations, userId) {
           recommendation.room = room;
 
           // recommend empty rooms
-          return !room.usersCount;
+          return !room.userCount;
         }
 
         var repo = recommendation.repo;
