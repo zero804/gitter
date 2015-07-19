@@ -10,7 +10,7 @@ Prerequisites
 -------------
 * node.js 0.10+ `brew install node`
 * Redis 2.8+ `brew install redis`
-* MongoDB 2.4+ `brew install mongo`
+* MongoDB 3.0+ `brew install mongo`
 
 Getting Started
 ---------------
