@@ -18,11 +18,8 @@ module.exports = [
       var adminDb = db.admin();
       adminDb.ping(function(err, pingResult) {
         if(err) return next(err);
-        if(!pingResult ||
-            !pingResult.documents ||
-            !pingResult.documents.length ||
-            !pingResult.documents[0] ||
-            !pingResult.documents[0].ok) return next(new StatusError(500, 'Ping failed'));
+
+        if(!pingResult || !pingResult.ok) return next(new StatusError(500, 'Ping failed'));
 
         adminDb.replSetGetStatus(function(err, info) {
           if(err) return next(err);
