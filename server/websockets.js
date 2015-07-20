@@ -52,5 +52,3 @@ shutdown.addHandler('websockets', 10, function(callback) {
     callback();
   });
 });
-
-

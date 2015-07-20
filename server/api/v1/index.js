@@ -1,49 +1,43 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-module.exports = {
-  install: function(app, apiRoot, authMiddleware) {
+var express = require('express');
+var resourceRoute = require('../../web/resource-route-generator');
+var authMiddleware = require('../../web/middlewares/auth-api');
 
-    require('./private').install(app, apiRoot + '/v1/private', authMiddleware);
+var router = express.Router({ caseSensitive: true, mergeParams: true });
 
-    // app.post(apiRoot + '/v1/location',
-    //     authMiddleware,
-    //     require('./location.js'));
+var usersResources = resourceRoute(require('./user'));
+var roomResources = resourceRoute(require('./rooms'));
 
-    // APN has no auth requirement as user may not have authenticated
-    // and this is used for devices without users
-    app.post(apiRoot + '/v1/apn',
-        require('./apn.js'));
+usersResources.use('/', authMiddleware);
+roomResources.use('/', authMiddleware);
 
-    // userapn ties together devices from /v1/apn and actual users.
-    // this definitely requires auth
-    app.post(apiRoot + '/v1/userapn',
-        authMiddleware,
-        require('./userapn.js'));
+router.use('/user', usersResources);
+router.use('/rooms', roomResources);
 
-    app.post(apiRoot + '/v1/eyeballs',
-        authMiddleware,
-        require('./eyeballs.js'));
+// Misc stuff
 
-    app.get(apiRoot + '/v1/ping',
-        authMiddleware,
-        require('./ping.js'));
+// APN has no auth requirement as user may not have authenticated
+// and this is used for devices without users
+router.post('/apn', require('./apn.js'));
 
-    app.delete(apiRoot + '/v1/sockets/:socketId',
-      require('./sockets.js'));
+// userapn ties together devices from /v1/apn and actual users.
+// this definitely requires auth
+router.post('/userapn', authMiddleware, require('./userapn.js'));
 
-    app.get(apiRoot + '/v1/repo-info',
-        authMiddleware,
-        require('./repo-info.js'));
+router.post('/eyeballs', authMiddleware, require('./eyeballs.js'));
 
-    app.get(apiRoot + '/v1/channel-search',
-        authMiddleware,
-        require('./channel-search.js'));
+router.get('/ping', authMiddleware, require('./ping.js'));
 
-    // Deprecated - remove by 15 November
-    app.get(apiRoot + '/v1/public-repo-search',
-        authMiddleware,
-        require('./public-repo-search.js'));
+router.delete('/sockets/:socketId', require('./sockets.js'));
 
-  }
-};
+router.get('/repo-info', authMiddleware, require('./repo-info.js'));
+
+router.get('/channel-search', authMiddleware, require('./channel-search.js'));
+
+// Deprecated - remove by 15 November
+router.get('/public-repo-search', authMiddleware, require('./public-repo-search.js'));
+
+router.post('/private/gcm', authMiddleware, require('./private/gcm'));
+
+module.exports = router;

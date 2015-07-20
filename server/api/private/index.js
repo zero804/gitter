@@ -1,80 +1,50 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-module.exports = {
-  install: function(app, apiRoot, authMiddleware) {
+var express = require('express');
+var authMiddleware = require('../../web/middlewares/auth-api');
+var router = express.Router({ caseSensitive: true, mergeParams: true });
 
-    app.get(apiRoot + '/private/health_check',
-        // No auth
-        require('./health-check.js'));
+// No auth
+router.get('/health_check', require('./health-check.js'));
 
-    app.get(apiRoot + '/private/health_check/full',
-        // No auth
-        require('./health-check-full.js'));
+// No auth
+router.get('/health_check/full', require('./health-check-full.js'));
 
-    app.get(apiRoot + '/private/gh/repos/*',
-        authMiddleware,
-        require('./github-mirror/repos-mirror'));
+router.get('/gh/repos/*', authMiddleware, require('./github-mirror/repos-mirror'));
 
-    app.get(apiRoot + '/private/gh/users/*',
-        authMiddleware,
-        require('./github-mirror/users-mirror'));
+router.get('/gh/users/*', authMiddleware, require('./github-mirror/users-mirror'));
 
-    app.get(apiRoot + '/private/gh/search/users',
-        authMiddleware,
-        require('./github-mirror/user-search-mirror'));
+router.get('/gh/search/users', authMiddleware, require('./github-mirror/user-search-mirror'));
 
-    // No auth for hooks yet
-    app.post(apiRoot + '/private/hook/:hash',
-        require('./hooks'));
+// No auth for hooks yet
+router.post('/hook/:hash', require('./hooks'));
 
-    app.get(apiRoot + '/private/irc-token',
-        authMiddleware,
-        require('./irc-token.js'));
+router.get('/irc-token', authMiddleware, require('./irc-token.js'));
 
-    app.get(apiRoot + '/private/issue-state',
-        authMiddleware,
-        require('./issue-state.js'));
+router.get('/issue-state', authMiddleware, require('./issue-state.js'));
 
-    app.get(apiRoot + '/private/room-permission',
-        authMiddleware,
-        require('./room-permission.js'));
+router.get('/room-permission', authMiddleware, require('./room-permission.js'));
 
-    app.get(apiRoot + '/private/generate-signature',
-        authMiddleware,
-        require('./transloadit-signature.js'));
+router.get('/generate-signature', authMiddleware, require('./transloadit-signature.js'));
 
-    app.post(apiRoot + '/private/transloadit/:token',
-        // No auth
-        require('./transloadit.js'));
+// No auth
+router.post('/transloadit/:token', require('./transloadit.js'));
 
-    app.get(apiRoot + '/private/chat-heatmap/:roomId',
-        // No auth
-        require('./chat-heatmap.js'));
+// No auth
+router.get('/chat-heatmap/:roomId', require('./chat-heatmap.js'));
 
-    app.get(apiRoot + '/private/orgs/:orgUri/members',
-        authMiddleware,
-        require('./org-members.js'));
+router.get('/orgs/:orgUri/members', authMiddleware, require('./org-members.js'));
 
-    app.post(apiRoot + '/private/subscription/:userOrOrg',
-        require('./subscription-created.js'));
+router.post('/subscription/:userOrOrg', require('./subscription-created.js'));
 
-    app.delete(apiRoot + '/private/subscription/:userOrOrg',
-        require('./subscription-deleted.js'));
+router.delete('/subscription/:userOrOrg', require('./subscription-deleted.js'));
 
-    app.post(apiRoot + '/private/statsc',
-        require('./statsc.js'));
+router.post('/statsc', require('./statsc.js'));
 
-    app.get(apiRoot + '/private/sample-chats',
-        require('./sample-chats.js'));
+router.get('/sample-chats', require('./sample-chats.js'));
 
-    app.post(apiRoot + '/private/create-badge',
-        authMiddleware,
-        require('./create-badge-pr.js'));
+router.post('/create-badge', authMiddleware, require('./create-badge-pr.js'));
 
-    app.post(apiRoot + '/private/invite-user',
-        authMiddleware,
-        require('./invite-user.js'));
+router.post('/invite-user', authMiddleware, require('./invite-user.js'));
 
-  }
-};
+module.exports = router;

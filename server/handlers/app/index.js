@@ -1,12 +1,12 @@
-/*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var ensureLoggedIn     = require('../../web/middlewares/ensure-logged-in');
+var express            = require('express');
 var appRender          = require('./render');
 var appMiddleware      = require('./middleware');
 var recentRoomService  = require('../../services/recent-room-service');
 var isPhone            = require('../../web/is-phone');
 var timezoneMiddleware = require('../../web/middlewares/timezone');
+var archive            = require('./archive');
 
 function saveRoom(req) {
   var userId = req.user && req.user.id;
@@ -105,61 +105,46 @@ var cardMiddlewarePipeline = [
   }
 ];
 
+var router = express.Router({ caseSensitive: true, mergeParams: true });
 
-module.exports = {
-    install: function(app) {
+[
+  '/:roomPart1/~chat',                         // ORG or ONE_TO_ONE
+  '/:roomPart1/:roomPart2/~chat',              // REPO or ORG_CHANNEL or ADHOC
+  '/:roomPart1/:roomPart2/:roomPart3/~chat'    // CUSTOM REPO_ROOM
+].forEach(function(path) {
+  router.get(path, chatMiddlewarePipeline);
+});
 
-      [
-        '/:roomPart1/~chat',                         // ORG or ONE_TO_ONE
-        '/:roomPart1/:roomPart2/~chat',              // REPO or ORG_CHANNEL or ADHOC
-        '/:roomPart1/:roomPart2/:roomPart3/~chat'    // CUSTOM REPO_ROOM
-      ].forEach(function(path) {
-        app.get(path, chatMiddlewarePipeline);
-      });
+[
+  '/:roomPart1/:roomPart2/~embed',              // REPO or ORG_CHANNEL or ADHOC
+  '/:roomPart1/:roomPart2/:roomPart3/~embed'    // CUSTOM REPO_ROOM
+].forEach(function(path) {
+  router.get(path, embedMiddlewarePipeline);
+});
 
-      [
-        '/:roomPart1/:roomPart2/~embed',              // REPO or ORG_CHANNEL or ADHOC
-        '/:roomPart1/:roomPart2/:roomPart3/~embed'    // CUSTOM REPO_ROOM
-      ].forEach(function(path) {
-        app.get(path, embedMiddlewarePipeline);
-      });
+[
+  '/:roomPart1/:roomPart2/~card',              // REPO or ORG_CHANNEL or ADHOC
+  '/:roomPart1/:roomPart2/:roomPart3/~card'    // CUSTOM REPO_ROOM
+].forEach(function(path) {
+  router.get(path, cardMiddlewarePipeline);
+});
 
-      [
-        '/:roomPart1/:roomPart2/~card',              // REPO or ORG_CHANNEL or ADHOC
-        '/:roomPart1/:roomPart2/:roomPart3/~card'    // CUSTOM REPO_ROOM
-      ].forEach(function(path) {
-        app.get(path, cardMiddlewarePipeline);
-      });
+[
+  '/:roomPart1',
+  '/:roomPart1/:roomPart2',
+  '/:roomPart1/:roomPart2/:roomPart3',
+].forEach(function(path) {
+  router.get(path + '/archives/all', archive.datesList);
+  router.get(path + '/archives/:yyyy(\\d{4})/:mm(\\d{2})/:dd(\\d{2})', archive.chatArchive);
+  router.get(path, mainFrameMiddlewarePipeline);
+  router.post(path,
+    appMiddleware.uriContextResolverMiddleware({ create: true }),
+    function(req, res, next) {
+      if(!req.uriContext.troupe || !req.uriContext.ownUrl) return next(404);
 
-      app.get('/home/~home',
-        ensureLoggedIn,
-        appMiddleware.isPhoneMiddleware,
-        function(req, res, next) {
-          appRender.renderHomePage(req, res, next);
-        });
+      // GET after POST
+      res.redirect(req.uri);
+    });
+});
 
-      require('./integrations').install(app);
-      require('./mobile').install(app);
-
-      var archive = require('./archive');
-
-      [
-        '/:roomPart1',
-        '/:roomPart1/:roomPart2',
-        '/:roomPart1/:roomPart2/:roomPart3',
-      ].forEach(function(path) {
-        app.get(path + '/archives/all', archive.datesList);
-        app.get(path + '/archives/:yyyy(\\d{4})/:mm(\\d{2})/:dd(\\d{2})', archive.chatArchive);
-        app.get(path, mainFrameMiddlewarePipeline);
-        app.post(path,
-          appMiddleware.uriContextResolverMiddleware({ create: true }),
-          function(req, res, next) {
-            if(!req.uriContext.troupe || !req.uriContext.ownUrl) return next(404);
-
-            // GET after POST
-            res.redirect(req.uri);
-          });
-      });
-
-    }
-};
+module.exports = router;

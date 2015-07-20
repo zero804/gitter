@@ -56,5 +56,3 @@ function getMetadataForChatPermalink(options) {
 }
 
 module.exports.getMetadataForChatPermalink = getMetadataForChatPermalink;
-
-
