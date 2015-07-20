@@ -1,10 +1,10 @@
 "use strict";
 
 var testRequire = require('./test-require');
-
-var Q = require("q");
+var Q           = require("q");
 var persistence = testRequire("./services/persistence-service");
-var winston = testRequire("./utils/winston");
+var debug       = require('debug')('gitter:test-fixtures');
+
 var counter = 0;
 
 function generateEmail() {
@@ -57,7 +57,7 @@ function createBaseFixture() {
           }
         }))
         .then(function() {
-          winston.verbose('Removed ' + count + ' items');
+          debug('Removed %s items', count);
         })
         .nodeify(callback);
     }
@@ -105,7 +105,7 @@ function load(expected, done) {
 function createExpectedFixtures(expected, done) {
   function createUser(fixtureName, f) {
 
-    winston.verbose('Creating ' + fixtureName);
+    debug('Creating %s', fixtureName);
 
     // A username of true means generate one
     var username = f.username === true ? generateUsername() : f.username;
@@ -123,53 +123,63 @@ function createExpectedFixtures(expected, done) {
     });
   }
 
-  function createContact(fixtureName, f) {
-    winston.verbose('Creating ' + fixtureName);
+  function bulkInsertTroupeUsers(troupeId, userIds) {
+      var bulk = persistence.TroupeUser.collection.initializeUnorderedBulkOp();
 
-    return persistence.Contact.createQ({
-      name:          f.name    || 'John Doe',
-      emails:        f.emails  || [generateEmail()],
-      source:        f.source  || 'google',
-      userId:        f.userId,
-      contactUserId: f.contactUserId
-    });
+      userIds.forEach(function(userId) {
+        bulk.find({ troupeId: troupeId, userId:userId }).upsert().updateOne({
+          $setOnInsert: { troupeId: troupeId, userId:userId }
+        });
+      });
+
+      var d = Q.defer();
+      bulk.execute(d.makeNodeResolver());
+      return d.promise;
   }
 
   function createTroupe(fixtureName, f) {
-    var users;
+    var oneToOneUsers;
 
-    if(f.userIds) {
-      users = f.userIds.map(function(userId) { return { userId: userId }; });
+    if (f.oneToOne && f.userIds) {
+      oneToOneUsers = f.userIds.map(function(userId) { return { userId: userId }; });
     } else {
-      users = [];
+      oneToOneUsers = [];
     }
 
     var security = f.security || undefined;
 
-    winston.verbose('Creating ' + fixtureName);
-
-    var uri;
-    var githubType = f.githubType || 'ORG';
-    if(f.oneToOne) {
-      uri = null;
-    } else {
+    var uri, lcUri, githubType;
+    if(!f.oneToOne) {
       uri = f.uri || generateUri(githubType);
+      githubType = f.githubType || 'ORG';
+      lcUri = uri.toLowerCase();
+    } else {
+      githubType = 'ONETOONE';
     }
 
-    return persistence.Troupe.createQ({
-      name: f.name || '~~~TEST~~~ ' + fixtureName,
+    var doc = {
       uri: uri,
+      lcUri: lcUri,
+      githubId: f.githubId === true ? generateGithubId() : f.githubId || null,
       status: f.status || 'ACTIVE',
       oneToOne: f.oneToOne,
       security: security,
-      users: users,
+      oneToOneUsers: oneToOneUsers,
       githubType: githubType,
       dateDeleted: f.dateDeleted
-    });
+    };
+
+    debug('Creating troupe %s with %j', fixtureName, doc);
+    return persistence.Troupe.createQ(doc)
+      .then(function(troupe) {
+        if (!f.userIds || !f.userIds.length) return troupe;
+        return bulkInsertTroupeUsers(troupe._id, f.userIds)
+          .thenResolve(troupe);
+      });
   }
 
   function createInvite(fixtureName, f) {
-    winston.verbose('Creating ' + fixtureName);
+    debug('Creating %s', fixtureName);
 
     return persistence.Invite.createQ({
       fromUserId:   f.fromUserId,
@@ -183,7 +193,7 @@ function createExpectedFixtures(expected, done) {
   }
 
   function createMessage(fixtureName, f) {
-    winston.verbose('Creating ' + fixtureName);
+    debug('Creating %s', fixtureName);
 
     return persistence.ChatMessage.createQ({
       fromUserId:   f.fromUserId,
@@ -201,8 +211,6 @@ function createExpectedFixtures(expected, done) {
     });
 
   }
-
-
 
   function createUsers(fixture) {
     var userCounter = 0;
@@ -244,31 +252,6 @@ function createExpectedFixtures(expected, done) {
         }
       }
 
-      if(key.match(/^contact/)) {
-        var cu = expected[key];
-
-        if(cu.user) {
-          if(typeof cu.user == 'string') {
-            if(expected[cu.user]) return; // Already specified at the top level
-            expected[cu.user] = {};
-            return createUser(cu.user, {}).then(function(createdUser) {
-              fixture[cu.user] = createdUser;
-            });
-          }
-
-          var fixtureName = 'user' + (++userCounter);
-          expected[fixtureName] = cu.user;
-
-          return createUser(fixtureName, cu.user)
-            .then(function(user) {
-              fixture[fixtureName] = user;
-              cu.user = user;
-            });
-
-
-        }
-      }
-
       return null;
     });
 
@@ -299,28 +282,6 @@ function createExpectedFixtures(expected, done) {
     return Q.all(promises).then(function() { return fixture; });
   }
 
-  function createContacts(fixture) {
-    var promises = Object.keys(expected).map(function(key) {
-
-        if(key.match(/^contact/)) {
-          var expectedContact = expected[key];
-
-          expectedContact.userId = fixture[expectedContact.user]._id;
-
-          if(expectedContact.contactUser) {
-            expectedContact.contactUserId = fixture[expectedContact.contactUser]._id;
-          }
-
-          return createContact(key, expectedContact)
-            .then(function(contact) {
-              fixture[key] = contact;
-            });
-        }
-
-        return null;
-      });
-    return Q.all(promises).then(function() { return fixture; });
-  }
 
   function createInvites(fixture) {
     var promises = Object.keys(expected).map(function(key) {
@@ -370,16 +331,15 @@ function createExpectedFixtures(expected, done) {
     return Q.all(promises).then(function() { return fixture; });
   }
 
-
   return createUsers(createBaseFixture())
     .then(createTroupes)
-    .then(createContacts)
     .then(createInvites)
     .then(createMessages)
     .nodeify(done);
 }
 
 function fixtureLoader(fixture, expected) {
+  debug("Creating fixtures %j", expected);
   return function(done) {
      load(expected, function(err, data) {
        if(err) return done(err);

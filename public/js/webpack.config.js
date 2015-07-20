@@ -18,6 +18,8 @@ var webpackConfig = {
     "router-chat": path.resolve(path.join(__dirname, "./router-chat.js")),
     "explore": path.resolve(path.join(__dirname, "./explore.js")),
     "just-tracking": path.resolve(path.join(__dirname, "./just-tracking.js")),
+    // plain module requires need to be in an array: https://github.com/webpack/webpack/issues/300
+    "frame-utils": [path.resolve(path.join(__dirname, "./utils/frame-utils.js"))],
     "mobile-userhome": path.resolve(path.join(__dirname, "./mobile-userhome.js")),
     "mobile-nli-app": path.resolve(path.join(__dirname, "./mobile-nli-app.js")),
     "mobile-app": path.resolve(path.join(__dirname, "./mobile-app")),
@@ -35,11 +37,11 @@ var webpackConfig = {
       'underscore',
       'jquery',
       'backbone',
-      'marionette',
+      'backbone.marionette',
       'loglevel',
       'utils/log',
-      'backbone.wreqr',
-      'backbone.babysitter',
+      // 'backbone.wreqr',
+      // 'backbone.babysitter',
       'handlebars/runtime',
       'gitter-realtime-client',
       'raven-js',
@@ -65,17 +67,14 @@ var webpackConfig = {
   resolve: {
     alias: {
       "utils": path.resolve(path.join(__dirname, "/utils/")),
-      "shared": path.resolve(path.join(__dirname, "../../shared/")),
+      // "shared": path.resolve(path.join(__dirname, "../../shared/")),
       "views": path.resolve(path.join(__dirname, "./views/")),
       "collections": path.resolve(path.join(__dirname, "./collections")),
       "components": path.resolve(path.join(__dirname, "./components")),
       "template": path.resolve(path.join(__dirname, "./template")),
       "bootstrap_tooltip": path.resolve(path.join(__dirname, "./utils/tooltip.js")),
       "jquery": path.resolve(path.join(__dirname, "../repo/jquery/jquery.js")),
-      "marionette": path.resolve(path.join(__dirname, "../repo/marionette/marionette.js")),
       "mutant": path.resolve(path.join(__dirname, "../repo/mutant/mutant.js")),
-      "backbone.wreqr": path.resolve(path.join(__dirname, "../repo/backbone.wreqr/backbone.wreqr.js")),
-      "backbone.babysitter": path.resolve(path.join(__dirname, "../repo/backbone.babysitter/backbone.babysitter.js")),
       "cocktail": path.resolve(path.join(__dirname, "../repo/cocktail/cocktail.js")),
       "keymaster": path.resolve(path.join(__dirname, "../repo/keymaster/keymaster.js")),
       "filtered-collection": path.resolve(path.join(__dirname, "../repo/filtered-collection/filtered-collection.js")),
@@ -88,7 +87,6 @@ var webpackConfig = {
       "zeroclipboard": path.resolve(path.join(__dirname, "../repo/zeroclipboard/zeroclipboard.js")),
       "backbone-sorted-collection": path.resolve(path.join(__dirname, "../repo/backbone-sorted-collection/backbone-sorted-collection.js")),
       "jquery-sortable": path.resolve(path.join(__dirname, "../repo/jquery-sortable/jquery-sortable.js")),
-      "nanoscroller": path.resolve(path.join(__dirname, "../repo/nanoscroller/nanoscroller.js")),
       "jquery-hammer": path.resolve(path.join(__dirname, "../repo/hammerjs/jquery.hammer.js")),
       "cal-heatmap": path.resolve(path.join(__dirname, "../repo/cal-heatmap/cal-heatmap.js")),
       "d3": path.resolve(path.join(__dirname, "../repo/d3/d3.js")),
@@ -101,7 +99,7 @@ var webpackConfig = {
   },
   plugins: [
     new CommonsChunkPlugin("vendor", "[name].js"),
-    new ContextReplacementPlugin(/moment\/lang$/, /ar|cs|da|de|en-gb|es|fr|it|ja|ko|nl|pl|pt|ru|sv|zh-cn/)
+    new ContextReplacementPlugin(/moment\/locale$/, /ar|cs|da|de|en-gb|es|fr|it|ja|ko|nl|pl|pt|ru|sv|zh-cn/)
   ],
   bail: true,
   recordsPath: '/tmp/records.json'
@@ -109,7 +107,7 @@ var webpackConfig = {
 
 if(devMode) {
   // See http://webpack.github.io/docs/configuration.html#devtool
-  webpackConfig.devtool = 'cheap-module-eval-source-map';
+  webpackConfig.devtool = 'source-map';
   webpackConfig.cache = true;
 } else {
   // webpackConfig.plugins.push(new DedupePlugin());

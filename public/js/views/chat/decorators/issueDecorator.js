@@ -2,7 +2,7 @@
 /* jshint unused:strict, browser:true, strict:true */
 var $ = require('jquery');
 var Backbone = require('backbone');
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var context = require('utils/context');
 var apiClient = require('components/apiClient');
 var appEvents = require('utils/appevents');
@@ -155,7 +155,7 @@ module.exports = (function() {
         $issue.on('click', showPopover);
         $issue.on('mouseover', showPopoverLater);
 
-        view.once('close', function() {
+        view.once('destroy', function() {
           $issue.off('click', showPopover);
           $issue.off('mouseover', showPopoverLater);
         });

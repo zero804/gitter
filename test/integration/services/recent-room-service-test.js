@@ -5,7 +5,7 @@
 var testRequire = require('../test-require');
 var assert = require('assert');
 var fixtureLoader = require('../test-fixtures');
-
+var Q = require('q');
 
 var recentRoomService = testRequire("./services/recent-room-service");
 var persistenceService = testRequire("./services/persistence-service");
@@ -113,18 +113,15 @@ describe('recent-room-service', function() {
     it('should add a troupe to favourites',function(done) {
 
       function fav(val, callback) {
-        recentRoomService.updateFavourite(fixture.user1.id, fixture.troupe1.id, val)
-          .nodeify(function(err) {
-            if(err) return done(err);
-
-            recentRoomService.findFavouriteTroupesForUser(fixture.user1.id, function(err, favs) {
-              if(err) return done(err);
-
-              var isInTroupe = !!favs[fixture.troupe1.id];
-              assert(isInTroupe === val, 'Troupe should ' + (val? '': 'not ') + 'be a favourite');
-              callback();
-            });
-          });
+        return recentRoomService.updateFavourite(fixture.user1.id, fixture.troupe1.id, val)
+          .then(function() {
+            return recentRoomService.findFavouriteTroupesForUser(fixture.user1.id);
+          })
+          .then(function(favs) {
+            var isInTroupe = !!favs[fixture.troupe1.id];
+            assert(isInTroupe === val, 'Troupe should ' + (val? '': 'not ') + 'be a favourite');
+          })
+          .nodeify(callback);
       }
 
       fav(true, function() {
@@ -154,49 +151,45 @@ describe('recent-room-service', function() {
     });
 
     it('should record the time each troupe was last accessed by a user', function(done) {
+      return recentRoomService.saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupe1.id)
+        .then(function() {
+          return persistenceService.User.findByIdQ(fixture.user1.id);
+        })
+        .then(function(user) {
+          assert.equal(user.lastTroupe, fixture.troupe1.id);
 
-      recentRoomService.saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupe1.id, function(err) {
-        if(err) return done(err);
+          return recentRoomService.getTroupeLastAccessTimesForUser(fixture.user1.id);
+        })
+        .then(function(times) {
+          var troupeId = "" + fixture.troupe1.id;
 
-      persistenceService.User.findById(fixture.user1.id, function(err, user) {
-        if(err) return done(err);
+          var after = times[troupeId];
+          assert(after, 'Expected a value for last access time');
 
-        assert.equal(user.lastTroupe, fixture.troupe1.id);
-
-        recentRoomService.getTroupeLastAccessTimesForUser(fixture.user1.id, function(err, times) {
-            if(err) return done(err);
-            var troupeId = "" + fixture.troupe1.id;
-
-            var after = times[troupeId];
-            assert(after, 'Expected a value for last access time');
-
-            recentRoomService.saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupe1.id, function(err) {
-              if(err) return done(err);
-
-              recentRoomService.getTroupeLastAccessTimesForUser(fixture.user1.id, function(err, times) {
-                if(err) return done(err);
-                assert(times[troupeId] > after, 'The last access time for this troupe has not changed. Before it was ' + after + ' now it is ' + times[troupeId]);
-                done();
-              });
+          return recentRoomService.saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupe1.id)
+            .then(function() {
+              return recentRoomService.getTroupeLastAccessTimesForUser(fixture.user1.id);
+            })
+            .then(function(times) {
+              assert(times[troupeId] > after, 'The last access time for this troupe has not changed. Before it was ' + after + ' now it is ' + times[troupeId]);
             });
-          });
-
-        });
-      });
-
-
+      })
+      .nodeify(done);
 
     });
+
   });
 
 
-  describe('#findBestTroupeForUser', function() {
+  describe('#findInitialRoomUrlForUser', function() {
     var fixture = {};
 
     before(fixtureLoader(fixture, {
-      user1: { permissions: { createRoom: true } },
+      user1: { },
+      user2: { },
       userNoTroupes: { },
-      troupe1: { users: ['user1'] }
+      troupe1: { users: ['user1'] },
+      troupeOneToOne: { oneToOne: true, users: ['user1', 'user2'] },
     }));
 
     after(function() {
@@ -205,46 +198,94 @@ describe('recent-room-service', function() {
 
     it('#01 should return null when a user has no troupes',function(done) {
 
-      recentRoomService.saveLastVisitedTroupeforUserId(fixture.userNoTroupes.id, fixture.troupe1.id, function(err) {
-        if(err) return done(err);
-
-
-        recentRoomService.findBestTroupeForUser(fixture.userNoTroupes, function(err, troupe) {
-          if(err) return done(err);
-          assert(troupe === null, 'Expected the troupe to be null');
-          done();
-        });
-      });
-
+      return recentRoomService.saveLastVisitedTroupeforUserId(fixture.userNoTroupes.id, fixture.troupe1.id)
+        .then(function() {
+          fixture.userNoTroupes.lastTroupe = fixture.troupe1.id;
+          return recentRoomService.findInitialRoomUrlForUser(fixture.userNoTroupes);
+        })
+        .then(function(url) {
+          assert(url === null, 'Expected the url to be null');
+        })
+        .nodeify(done);
 
     });
 
     it('#02 should return return the users last troupe when they have one',function(done) {
-      recentRoomService.saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupe1.id, function(err) {
-        if(err) return done(err);
-
-        recentRoomService.findBestTroupeForUser(fixture.user1, function(err, troupe) {
-          if(err) return done(err);
-
-          assert(troupe !== null, 'Expected the troupe not to be null');
-          assert(troupe.uri == fixture.troupe1.uri, 'Expected the troupe uri to be testtroupe1');
-          done();
-        });
-
-      });
-
+      return recentRoomService.saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupe1.id)
+        .then(function() {
+          return recentRoomService.findInitialRoomUrlForUser(fixture.user1);
+        })
+        .then(function(url) {
+          assert.strictEqual(url, '/' + fixture.troupe1.uri);
+        })
+        .nodeify(done);
     });
 
 
     it('#03 should return the users something when the user has troupes, but no last troupe',function(done) {
-      recentRoomService.findBestTroupeForUser(fixture.user1, function(err, troupe) {
-        if(err) return done(err);
+      return recentRoomService.findInitialRoomUrlForUser(fixture.user1)
+        .then(function(url) {
+          assert(url !== null, 'Expected the troupe not to be null');
+        })
+        .nodeify(done);
+    });
 
-        assert(troupe !== null, 'Expected the troupe not to be null');
-        done();
-      });
+    it('#04 should return one to one rooms',function(done) {
+      return recentRoomService.saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupeOneToOne.id)
+        .then(function() {
+          return recentRoomService.findInitialRoomUrlForUser(fixture.user1);
+        })
+        .then(function(url) {
+          assert.strictEqual(url, '/' + fixture.user2.username);
 
+        })
+        .nodeify(done);
     });
 
   });
+
+  describe('#findLastAccessTimesForUsersInRoom', function() {
+    var fixture = {};
+
+    before(fixtureLoader(fixture, {
+      user1: { },
+      user2: { },
+      troupe1: { users: ['user1'] }
+    }));
+
+    after(function() {
+      fixture.cleanup();
+    });
+
+    it('should handle default values', function(done) {
+      return recentRoomService.findLastAccessTimesForUsersInRoom(fixture.troupe1.id, [fixture.user1.id, fixture.user2._id])
+        .then(function(result) {
+          assert(result[fixture.user1.id]);
+          assert(result[fixture.user2.id]);
+        })
+        .nodeify(done);
+    });
+
+    it('should handle non default values', function(done) {
+      return Q.all([
+          recentRoomService.saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupe1.id),
+          recentRoomService.saveLastVisitedTroupeforUserId(fixture.user2.id, fixture.troupe1.id)
+        ])
+        .then(function() {
+          return recentRoomService.findLastAccessTimesForUsersInRoom(fixture.troupe1.id, [fixture.user1.id, fixture.user2._id]);
+        })
+        .then(function(result) {
+          var d1 = Date.now() - result[fixture.user1.id];
+          var d2 = Date.now() - result[fixture.user2.id];
+          assert(d1 >= 0);
+          assert(d1 < 5000);
+
+          assert(d2 >= 0);
+          assert(d2 < 5000);
+        })
+        .nodeify(done);
+    });
+
+  });
+
 });

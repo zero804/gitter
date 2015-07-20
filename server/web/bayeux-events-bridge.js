@@ -2,12 +2,12 @@
 "use strict";
 
 var winston           = require('../utils/winston');
-var appEvents         = require("../app-events");
+var appEvents         = require('gitter-web-appevents');
 var bayeux            = require('./bayeux');
 var ent               = require('ent');
 var presenceService   = require("../services/presence-service");
 var restSerializer    = require('../serializers/rest-serializer');
-
+var debug             = require('debug')('gitter:bayeux-events-bridge');
 
 function findFailbackChannel(channel) {
   var res = [
@@ -23,6 +23,8 @@ function findFailbackChannel(channel) {
 
 exports.install = function() {
   function publish(channel, message) {
+    debug("Publish on %s: %j", channel, message);
+
     bayeux.publish(channel, message);
 
     var failbackChannel = findFailbackChannel(channel);
@@ -84,6 +86,7 @@ exports.install = function() {
       var link = data.link;
       var troupeId = data.troupeId;
       var sound = data.sound;
+      var chatId = data.chatId;
 
       var url = "/api/v1/user/" + userId;
       var message = {
@@ -92,9 +95,10 @@ exports.install = function() {
          text: ent.decode(text),
          link: link,
          troupeId: troupeId,
-         sound: sound
+         sound: sound,
+         chatId: chatId
       };
-      winston.verbose("Notification to " + url, message);
+      debug("Notification to %s: %j", url, message);
 
       publish(url, message);
   });

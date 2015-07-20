@@ -1,13 +1,46 @@
+// The mu unit is defined as 1/18 em
+@mu: 1.0/18.0em;
+
+.katex-display {
+    display: block;
+    margin: 1em 0;
+    text-align: center;
+
+    > .katex {
+        display: inline-block;
+    }
+}
+
 .katex {
     font: normal 1.21em KaTeX_Main;
     line-height: 1.2;
-    white-space: nowrap;
+    pointer-events: none;
+    /*Commented out for mobile wrapping*/
+    /*    white-space: nowrap;*/
 
-    .katex-inner {
+    // Protect elements inside .katex from inheriting text-indent.
+    text-indent: 0;
+
+    .katex-html {
         // Making .katex inline-block allows line breaks before and after,
-        // which is undesireable ("to $x$,"). Instead, adjust the .katex-inner
+        // which is undesireable ("to $x$,"). Instead, adjust the .katex-html
         // style and put nowrap on the inline .katex element.
         display: inline-block;
+    }
+
+    .katex-mathml {
+        // Accessibility hack to only show to screen readers
+        // Found at: http://a11yproject.com/posts/how-to-hide-content/
+        // This hack doesnt work for us, so commented out
+        // TODO: Revisit and figure it out in the future;
+        // position: absolute;
+        // clip: rect(1px, 1px, 1px, 1px);
+        // padding: 0;
+        // border: 0;
+        // height: 1px;
+        // width: 1px;
+        // overflow: hidden;
+        display: none;
     }
 
     .base {
@@ -284,6 +317,7 @@
     .rule {
         display: inline-block;
         border-style: solid;
+        position: relative;
     }
 
     .overline {
@@ -330,6 +364,13 @@
                 display: block;
                 margin-top: -1px;
             }
+        }
+
+        > .root {
+            // These values are taken from the definition of `\r@@t`,
+            // `\mkern 5mu` and `\mkern -10mu`.
+            margin-left: 5*@mu;
+            margin-right: -10*@mu;
         }
     }
 
@@ -424,4 +465,21 @@
             left: 0.326em;
         }
     }
+
+    .arraycolsep {
+        display: inline-block;
+    }
+
+    .col-align-c > .vlist {
+        text-align: center;
+    }
+
+    .col-align-l > .vlist {
+        text-align: left;
+    }
+
+    .col-align-r > .vlist {
+        text-align: right;
+    }
+
 }

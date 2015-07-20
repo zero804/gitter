@@ -2,16 +2,16 @@
 var $ = require('jquery');
 var Popover = require('views/popover');
 var context = require('utils/context');
-var resolveIconClass = require('utils/resolve-icon-class');
 var apiClient = require('components/apiClient');
 var roomNameTrimmer = require('utils/room-name-trimmer');
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var roomListItemTemplate = require('./tmpl/room-list-item.hbs');
 var popoverTemplate = require('./tmpl/leave-buttons.hbs');
 var appEvents = require('utils/appevents');
-var TroupeViews = require('views/base');
-var cocktail = require('cocktail');
 var dataset = require('utils/dataset-shim');
+var toggle = require('utils/toggle');
+var toggleClass = require('utils/toggle-class');
+
 require('jquery-sortable');
 
 
@@ -42,7 +42,7 @@ module.exports = (function() {
         .then(function () {
           // leaving the room that you are in should take you home
           if (this.model.get('url') === window.location.pathname) {
-            appEvents.trigger('navigation', context.getUser().url, 'home', '');
+            appEvents.trigger('navigation', '/home', 'home', '');
           }
         }.bind(this))
         .then(function() {
@@ -63,11 +63,15 @@ module.exports = (function() {
     className: 'room-list-item',
     template: roomListItemTemplate,
     modelEvents: {
-      'change:unreadItems change:lurk change:activity change:mentions change:name': 'render'
+      'change:unreadItems change:lurk change:activity change:mentions change:name change:currentRoom': 'updateRender',
     },
     events: {
       'click': 'clicked',
       'click .js-close-button': 'showPopover'
+    },
+    ui: {
+      unreadBadge: '#unread-badge',
+      roomName: '#room-name'
     },
     showPopover: function(e) {
       e.stopPropagation(); // no navigation
@@ -75,107 +79,116 @@ module.exports = (function() {
       var popover = new Popover({
         view: new PopoverBodyView({model: this.model}),
         targetElement: e.target,
-        placement: 'horizontal'
+        placement: 'horizontal',
+        width: '100px'
       });
       popover.show();
       Popover.singleton(this, popover);
-    },
-    initialize: function() {
-      this.updateCurrentRoom();
-
-      this.listenTo(appEvents, 'navigation', function(url) {
-        // strip off query params etc
-        var parser = document.createElement('a');
-        parser.href = url;
-
-        this.updateCurrentRoom(parser.pathname);
-      });
-    },
-
-    updateCurrentRoom: function (newUrl) {
-      var url = newUrl || window.location.pathname;
-      var isCurrentRoom = this.model.get('url') === url;
-
-      if(this.isCurrentRoom !== isCurrentRoom) {
-        // cannot be stored on the model as it will get wiped by faye
-        this.isCurrentRoom = isCurrentRoom;
-        this.render();
-      }
     },
 
     serializeData: function() {
       var data = this.model.toJSON();
       data.name = roomNameTrimmer(data.name, MAX_NAME_LENGTH);
-      data.iconClass = resolveIconClass(this.model);
+      data.owner = data.url.split('/')[1];
       return data;
     },
+
     onRender: function() {
-      var self = this;
-      this.$el.toggleClass('room-list-item--current-room', !!this.isCurrentRoom);
+      this.updateRender(null); // Null means its the initial render
+    },
 
-      var m = self.model;
-      dataset.set(self.el, 'id', m.id);
-      var e = self.$el;
+    updateRender: function(model) {
+      var changed = model && model.changed;
+      var attributes = model && model.attributes || this.model.attributes;
 
-      var first = !self.initialRender;
-      self.initialRender = true;
-
-      if(!!first && !m.changed) return;
-
-      var unreadBadge = e.find('.js-unread-badge');
-      var lurk = self.model.get('lurk');
-      var mentions = self.model.get('mentions');
-      var ui = self.model.get('unreadItems');
-      var activity = self.model.get('activity');
-
-      function getBadgeText() {
-        if(mentions) return "@";
-
-        if(lurk) return;
-
-        if(ui) {
-          if(ui > MAX_UNREAD) return "99+";
-          return ui;
-        }
+      function hasChanged(property) {
+        return changed && changed.hasOwnProperty(property);
       }
 
+      var el = this.el;
+      var m = this.model;
 
-      var text = getBadgeText() || "";
-      unreadBadge.text(text);
-      unreadBadge.toggleClass('shown', !!text);
-      unreadBadge.toggleClass('mention', !!mentions);
+      if (!changed || hasChanged('currentRoom')) {
+        toggleClass(el, 'room-list-item--current-room', attributes.currentRoom);
+      }
 
-      if(lurk && !mentions) {
-        e.toggleClass('chatting', !!activity);
+      if (!changed) { // Only on first render
+        dataset.set(el, 'id', m.id);
+      }
 
-        if(activity && 'activity' in m.changed) {
-          e.addClass('chatting-now');
+      if (changed && hasChanged('name')) {
+        this.ui.roomName.text(roomNameTrimmer(attributes.name, MAX_NAME_LENGTH));
+      }
+
+      if (!changed || (hasChanged('mentions') || hasChanged('activity') || hasChanged('unreadItems') || hasChanged('lurk'))) {
+        var switches = this.getActivitySwitches(attributes, changed);
+
+        var unreadBadgeEl = this.ui.unreadBadge[0];
+        unreadBadgeEl.textContent = switches.badgeText;
+        toggle(unreadBadgeEl, switches.badge);
+        toggleClass(unreadBadgeEl, 'mention', switches.mention);
+        toggleClass(el, 'chatting', switches.chatting);
+        toggleClass(el, 'chatting-now', switches.chattingNow);
+
+        if (switches.chattingNow) {
+          clearTimeout(this.timeout);
+          this.timeout = setTimeout(this.stopActivityPulse.bind(this), 1600);
         }
 
-        if(self.timeout) {
-          clearTimeout(self.timeout);
-        }
-
-        self.timeout = setTimeout(function() {
-          delete self.timeout;
-          if(self.model.id === context.getTroupeId()) {
-            e.removeClass('chatting chatting-now');
-          } else {
-            e.removeClass('chatting-now');
-          }
-
-        }, 1600);
-
-      } else {
-        // Not lurking
-        e.removeClass('chatting chatting-now');
       }
 
     },
-    clearSearch: function() {
-      $('#list-search-input').val('');
-      $('#list-search').hide();
-      $('#list-mega').show();
+
+    stopActivityPulse: function() {
+      delete this.timeout;
+      var el = this.el;
+
+      if(this.model.id === context.getTroupeId()) {
+        toggleClass(el, 'chatting', false);
+        toggleClass(el, 'chatting-now', false);
+      } else {
+        toggleClass(el, 'chatting-now', false);
+      }
+    },
+
+    /**
+     * Choose the first rule which applies
+     * 1. `mentions > 0`: badge=visible mentionsClass=1 chatting=0
+     * 2. `unreadItems > 0`: badge=visible mentionsClass=0 chatting=0
+     * 3. `lurk`:
+     *     1: `activity+changed`: badge=hidden mentionsClass=0 chatting=1 + chatting now
+     *     2: `activity`: badge=hidden mentionsClass=0 chatting=1
+     * 4. Otherwise: badge=hidden mentionsClass=0 chatting=0 chattingNow=0
+     */
+    getActivitySwitches: function(attributes, changed) {
+      var result = {
+        badge: false,
+        mention: false,
+        badgeText: "",
+        chatting: false,
+        chattingNow: false
+      };
+
+      if (attributes.mentions) {
+        result.badge = true;
+        result.mention = true;
+        result.badgeText = "@";
+        return result;
+      }
+
+      var unreadItems = attributes.unreadItems;
+      if (unreadItems) {
+        result.badge = true;
+        result.badgeText = unreadItems > MAX_UNREAD ? "99+" : unreadItems;
+        return result;
+      }
+
+      if (attributes.lurk && attributes.activity) {
+        result.chatting = true;
+        result.chattingNow = changed && changed.hasOwnProperty('activity');
+      }
+
+      return result;
     },
     clicked: function() {
       var model = this.model;
@@ -191,9 +204,9 @@ module.exports = (function() {
 
   var CollectionView = Marionette.CollectionView.extend({
 
-    itemView: RoomListItemView,
+    childView: RoomListItemView,
 
-    itemViewOptions: function (item) {
+    childViewOptions: function (item) {
       var options = {};
       if (item && item.id) {
         options.el = this.$el.find('.room-list-item[data-id="' + item.id + '"]')[0];
@@ -205,8 +218,6 @@ module.exports = (function() {
     },
 
     initialize: function (options) {
-      this.bindUIElements();
-
       if (options.draggable) {
         this.makeDraggable(options.dropTarget);
       }
@@ -231,26 +242,35 @@ module.exports = (function() {
           item.css(position);
         },
 
-        isValidTarget: function(item, container) {
-          var droppedAt = container.el.parent().attr('id');
-          if (droppedAt === 'list-favs') {
+        getDropTarget: function($el) {
+          var a = $el.data('dropTarget') || $el.parents('[data-drop-target]').data('dropTarget');
+          return a;
+        },
+
+        isValidTarget: function(item, container) { // jshint unused:true
+          var droppedAt = this.getDropTarget(container.el);
+          if (droppedAt === 'favs') {
             $('.dragged').hide();
             $('.placeholder').show();
+            return true;
           }
-          else if (droppedAt === 'list-recents') {
+
+          if (droppedAt === 'recents') {
             $('.dragged').show();
             $('.placeholder').hide();
+            return true;
           }
-          return true;
+
+          return false;
         },
 
         onDrop: function (item, container, _super) {
           var position;
           var el = item[0];
           var model = self.roomsCollection.get(dataset.get(el, 'id'));
-          var droppedAt = container.el.parent().attr('id');
+          var droppedAt = this.getDropTarget(container.el);
           if (!cancelDrop) {
-            if (droppedAt === 'list-favs') {
+            if (droppedAt === 'favs') {
               var previousElement = el.previousElementSibling;
 
               if (!previousElement) {
@@ -261,7 +281,7 @@ module.exports = (function() {
               }
               model.set('favourite', position);
               model.save();
-            } else if (droppedAt === 'list-recents') {
+            } else if (droppedAt === 'recents') {
               model.set('favourite', null);
               model.save();
             }
@@ -287,8 +307,6 @@ module.exports = (function() {
       });
     },
   });
-
-  cocktail.mixin(CollectionView, TroupeViews.SortableMarionetteView);
 
   return CollectionView;
 

@@ -1,17 +1,16 @@
 "use strict";
-var Mutant = require('mutant');
-var RAF = require('utils/raf');
+var Mutant = require('mutantjs');
 var _ = require('underscore');
+var rafUtils = require('utils/raf-utils');
 
 module.exports = (function() {
 
 
   /** @const */ var TRACK_BOTTOM = 1;
-  /** @const */ var TRACK_NO_PASS = 2;
   /** @const */ var STABLE = 3;
 
   /** Number of pixels we need to be within before we say we're at the bottom */
-  /** @const */ var BOTTOM_MARGIN = 30;
+  /** @const */ var BOTTOM_MARGIN = 10;
   /** Number of pixels to show above a message that we scroll to. Context FTW!
   /** @const */ var TOP_OFFSET = 300;
 
@@ -23,10 +22,8 @@ module.exports = (function() {
     this._childContainer = childContainer || target;
     this._mutationHandlers = {};
     this._mutationHandlers[TRACK_BOTTOM] = this.updateTrackBottom.bind(this);
-    this._mutationHandlers[TRACK_NO_PASS] = this.updateTrackNoPass.bind(this);
     this._mutationHandlers[STABLE] = this.updateStableTracking.bind(this);
 
-    this._nopass = null;
     this._stableElement = null;
 
     if (options.doNotTrack) {
@@ -37,27 +34,25 @@ module.exports = (function() {
 
     var adjustScroll = this.adjustScroll.bind(this);
 
-    this.mutant = new Mutant(target, adjustScroll, { transitions: true, observers: { attributes: true, characterData: true  } } );
+    this.mutant = new Mutant(target, adjustScroll, {
+      transitions: true,
+      observers: { attributes: false, characterData: false },
+      ignoreTransitions: ['opacity', 'background-color', 'border', 'color', 'border-right-color'],
+      //ignoreFilter: function(mutationRecords) {
+      //  var filter = mutationRecords.reduce(function(accum, r) {
+      //    var v = r.type === 'attributes' && r.attributeName === 'class' && r.target.id === 'chat-container';
+      //    accum = accum && v;
+      //    return accum;
+      //  }, true);
+      //  return filter;
+      //}
+    });
 
     var _trackLocation = _.throttle(this.trackLocation.bind(this), 100);
     target.addEventListener('scroll', _trackLocation, false);
     window.addEventListener('resize', adjustScroll, false);
     window.addEventListener('focusin', adjustScroll, false);
     window.addEventListener('focusout', adjustScroll, false);
-  }
-
-  function continuous(cb, ms) {
-    var until = Date.now() + ms;
-
-    function next() {
-      cb();
-
-      if(Date.now() < until) {
-        RAF(next);
-      }
-    }
-
-    RAF(next);
   }
 
   Rollers.prototype = {
@@ -68,15 +63,7 @@ module.exports = (function() {
     },
 
     adjustScrollContinuously: function(ms) {
-      continuous(this.adjustScroll.bind(this), ms);
-    },
-
-    /* Specify an element that should not be scrolled past */
-    trackUntil: function(element, force) {
-      if(force || this._mode != STABLE) {
-        this._nopass = element;
-        this._mode = TRACK_NO_PASS;
-      }
+      rafUtils.intervalUntil(this.adjustScroll.bind(this), ms);
     },
 
     initTrackingMode: function() {
@@ -90,15 +77,12 @@ module.exports = (function() {
 
     stable: function(stableElement) {
       var target = this._target;
-
-      this._nopass = null;
       this._mode = STABLE;
 
-      if (stableElement) {
-        this._stableElement = stableElement;
-      } else {
-        this._stableElement = this.getBottomMostVisibleElement();
-      }
+      this._stableElement = stableElement || this.getBottomMostVisibleElement();
+
+      // nothing to stabilize (no content)
+      if (!this._stableElement) return;
 
       // TODO: check that the element is within the targets DOM heirachy
       var scrollBottom = target.scrollTop + target.clientHeight;
@@ -115,17 +99,8 @@ module.exports = (function() {
       }
     },
 
-    cancelTrackUntil: function() {
-      if(!this._nopass) return;
-
-      this._nopass = null;
-
-      this.initTrackingMode();
-    },
-
     disableTrackBottom: function() {
       this.disableTrackBottom = true;
-
     },
 
     enableTrackBottom: function() {
@@ -166,7 +141,6 @@ module.exports = (function() {
       var scrollTop = target.scrollHeight - target.clientHeight;
       target.scrollTop = scrollTop;
 
-      delete this._nopass;
       delete this._stableElement;
       delete this._stableElementFromBottom;
       this._mode = TRACK_BOTTOM;
@@ -206,37 +180,10 @@ module.exports = (function() {
      * Scroll to the bottom and switch the mode to TRACK_BOTTOM
      */
     scrollToBottomContinuously: function(ms) {
-      continuous(this.scrollToBottom.bind(this), ms);
+      rafUtils.intervalUntil(this.scrollToBottom.bind(this), ms);
     },
 
-    updateTrackNoPass: function() {
-      var target = this._target;
-      var targetScrollHeight = target.scrollHeight;
-      var targetClientHeight = target.clientHeight;
-
-      // How far down are we?
-      var scrollTop = targetScrollHeight - targetClientHeight;
-
-      // Get the offset of the element that we should not pass
-      var nopassOffset = this._nopass.offsetTop - target.offsetTop;
-      if(scrollTop < nopassOffset - TOP_OFFSET) {
-        target.scrollTop = scrollTop;
-      } else {
-        target.scrollTop = nopassOffset;
-        this._nopass = null;
-        this._mode = STABLE;
-
-        this._stableElement = this.getBottomMostVisibleElement();
-
-        // TODO: check that the element is within the targets DOM heirachy
-        var scrollBottom = target.scrollTop + target.clientHeight;
-        var stableElementTop = this._stableElement.offsetTop - target.offsetTop;
-
-        // Calculate an record the distance of the stable element to the bottom of the view
-        this._stableElementFromBottom = scrollBottom - stableElementTop;
-      }
-    },
-
+    /* Update the scrollTop to adjust for reflow when in STABLE mode */
     updateStableTracking: function() {
       if(!this._stableElement) return;
       var target = this._target;
@@ -246,6 +193,7 @@ module.exports = (function() {
       target.scrollTop = top;
     },
 
+    /* Track current position */
     trackLocation: function() {
       var target = this._target;
       if(this._postMutateTop === target.scrollTop) {
@@ -256,15 +204,8 @@ module.exports = (function() {
 
       if(!this.modeLocked) {
         if(atBottom) {
-          if(this._nopass) {
-            if(this._mode != TRACK_NO_PASS) {
-              this._mode = TRACK_NO_PASS;
-
-            }
-          } else {
-            if(this._mode != TRACK_BOTTOM) {
-              this._mode = TRACK_BOTTOM;
-            }
+          if(this._mode != TRACK_BOTTOM) {
+            this._mode = TRACK_BOTTOM;
           }
         } else {
           if(this._mode != STABLE) {
@@ -289,11 +230,13 @@ module.exports = (function() {
       return true;
     },
 
+    /* Get the Y coordinate of the bottom of the viewport */
     getScrollBottom: function() {
       var scrollTop = this._target.scrollTop;
       return this._target.clientHeight + scrollTop;
     },
 
+    /* Get the element at the bottom of the viewport */
     getBottomMostVisibleElement: function() {
       var scrollTop = this._target.scrollTop;
       var clientHeight = this._target.clientHeight;
@@ -310,6 +253,7 @@ module.exports = (function() {
       return;
     },
 
+    /* Get the element in the centre of the viewport */
     getMostCenteredElement: function() {
       var scrollTop = this._target.scrollTop;
       var clientHeight = this._target.clientHeight;
@@ -332,4 +276,3 @@ module.exports = (function() {
   return Rollers;
 
 })();
-

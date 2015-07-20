@@ -6,10 +6,11 @@ var nconf = require("../utils/config");
 var winston = require('../utils/winston');
 var events = require('events');
 var Fiber = require('../utils/fiber');
-var appEvents = require('../app-events.js');
+var appEvents = require('gitter-web-appevents');
 var Q = require('q');
 var _ = require("underscore");
 var StatusError = require('statuserror');
+var debug = require('debug')('gitter:presence-service');
 var presenceService = new events.EventEmitter();
 
 var redisClient = redis.getClient();
@@ -612,11 +613,11 @@ function clientEyeballSignal(userId, socketId, eyeballsOn, callback) {
     if(!troupeId) return callback(new StatusError(409, 'Socket is not associated with a troupe'));
 
     if(eyeballsOn) {
-      winston.verbose('presence: Eyeballs on: user ' + userId + ' troupe ' + troupeId);
+      debug('Eyeballs on: user %s troupe %s', userId, troupeId);
       return eyeBallsOnTroupe(userId, socketId, troupeId, callback);
 
     } else {
-      winston.verbose('presence: Eyeballs off: user ' + userId + ' troupe ' + troupeId);
+      debug('Eyeballs off: user %s troupe %s', userId, troupeId);
       return eyeBallsOffTroupe(userId, socketId, troupeId, callback);
     }
   });
@@ -650,13 +651,13 @@ function collectGarbage(bayeux, callback) {
 function validateActiveSockets(bayeux, callback) {
   redisClient.smembers(ACTIVE_SOCKETS_KEY, function(err, sockets) {
     if(!sockets.length) {
-      winston.verbose('presence: Validation: No active sockets.');
+      debug('Validation: No active sockets.');
       return callback(null, 0);
     }
 
     var invalidCount = 0;
 
-    winston.verbose('presence: Validating ' + sockets.length + ' active sockets');
+    debug('Validating %s active sockets', sockets.length);
     var promises = [];
 
     sockets.forEach(function(socketId) {
@@ -667,7 +668,7 @@ function validateActiveSockets(bayeux, callback) {
         if(exists) return d.resolve(); /* All good */
 
         invalidCount++;
-        winston.verbose('Disconnecting invalid socket ' + socketId);
+        debug('Disconnecting invalid socket %s', socketId);
 
         socketGarbageCollected(socketId, function(err) {
           if(err) {
@@ -705,7 +706,7 @@ function introduceDelayForTesting(cb) {
 }
 
 function validateUsersSubset(userIds, callback) {
-  winston.debug('Validating users', { userIds: userIds });
+  debug('Validating %s users ', userIds.length);
 
   // Use a new client due to the WATCH semantics (don't use getClient!)
   redis.createTransientClient(function(err, redisWatchClient) {
@@ -919,28 +920,36 @@ presenceService.validateUsers = validateUsers;
 // Default Events
 // -------------------------------------------------------------------
 
-presenceService.on('userOnline', function(userId) {
-  winston.verbose("presence: User " + userId + " connected.");
-});
+if (debug.enabled) {
+  presenceService.on('userOnline', function(userId) {
+    debug("User %s connected.", userId);
+  });
 
-presenceService.on('userOffline', function(userId) {
-  winston.verbose("presence: User " + userId + " disconnected.");
-});
+  presenceService.on('userOffline', function(userId) {
+    debug("User %s disconnected.", userId);
+  });
+
+  presenceService.on('userJoinedTroupe', function(userId, troupeId) {
+    /* User joining this troupe for the first time.... */
+    debug("User %s has just joined %s", userId, troupeId);
+  });
+
+  presenceService.on('userLeftTroupe', function(userId, troupeId) {
+    debug("User %s is gone from %s", userId, troupeId);
+  });
+
+  presenceService.on('troupeEmpty', function(troupeId) {
+    debug("The last user has disconnected from troupe %s", troupeId);
+  });
+}
 
 presenceService.on('userJoinedTroupe', function(userId, troupeId) {
   /* User joining this troupe for the first time.... */
-  winston.verbose("presence: User " + userId + " has just joined " + troupeId);
   appEvents.userLoggedIntoTroupe(userId, troupeId);
 });
 
 presenceService.on('userLeftTroupe', function(userId, troupeId) {
-  winston.verbose("presence: User " + userId + " is gone from " + troupeId);
-
   appEvents.userLoggedOutOfTroupe(userId, troupeId);
-});
-
-presenceService.on('troupeEmpty', function(troupeId) {
-  winston.verbose("presence: The last user has disconnected from troupe " + troupeId);
 });
 
 presenceService.testOnly = {

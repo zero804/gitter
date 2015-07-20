@@ -7,14 +7,16 @@ var context = require('utils/context');
 var liveContext = require('components/live-context');
 var appEvents = require('utils/appevents');
 var log = require('utils/log');
-var ChatIntegratedView = require('views/app/chatIntegratedView');
-var itemCollections = require('collections/instances/integrated-items');
+var ChatToolbarInputLayout = require('views/layouts/chat-toolbar-input');
+var DropTargetView = require('views/app/dropTargetView');
 var onready = require('./utils/onready');
-var highlightPermalinkChats = require('./utils/highlight-permalink-chats');
 var apiClient = require('components/apiClient');
 var HeaderView = require('views/app/headerView');
 var frameUtils = require('./utils/frame-utils');
-var userModels = require('collections/users');
+var itemCollections = require('collections/instances/integrated-items');
+
+/* Set the timezone cookie */
+require('components/timezone-cookie');
 
 require('components/statsc');
 require('views/widgets/preload');
@@ -26,8 +28,6 @@ require('components/bug-reporting');
 require('components/focus-events');
 
 // Preload widgets
-require('views/widgets/avatar');
-require('views/widgets/timeago');
 require('components/ping');
 
 
@@ -96,7 +96,7 @@ onready(function () {
         var aroundId = query && query.at;
 
         if (aroundId) {
-          highlightPermalinkChats(appView.chatCollectionView, aroundId);
+          appEvents.trigger('chatCollectionView:permalinkHighlight', aroundId);
         }
         break;
     }
@@ -190,7 +190,12 @@ onready(function () {
       });
   });
 
-  var appView = new ChatIntegratedView({ el: 'body' });
+  var appView = new ChatToolbarInputLayout({ template: false, el: 'body', chatCollection: itemCollections.chats });
+  appView.render();
+
+  /* Drag and drop */
+  new DropTargetView({ template: false, el: 'body' }).render();
+
   new HeaderView({ model: context.troupe(), el: '#header' });
 
   // This may require a better home
@@ -214,6 +219,7 @@ onready(function () {
     routes: {
       "": "hideModal",
       "share": "share",
+      "delete": "delete",
       "people": "people",
       "notifications": "notifications",
       "markdown": "markdown",
@@ -223,18 +229,14 @@ onready(function () {
     },
 
     hideModal: function() {
-      appView.dialogRegion.close();
+      appView.dialogRegion.destroy();
     },
 
     people: function() {
-      require.ensure(['views/people/peopleCollectionView'], function(require) {
-        var peopleCollectionView = require('views/people/peopleCollectionView');
+      require.ensure(['views/people/people-modal'], function(require) {
+        var PeopleModal = require('views/people/people-modal');
 
-        // seed the collection with the roster while wait for the full list to load
-        var userCollection = new userModels.UserCollection(itemCollections.roster.models);
-        userCollection.fetch();
-
-        appView.dialogRegion.show(new peopleCollectionView.Modal({ collection: userCollection }));
+        appView.dialogRegion.show(new PeopleModal());
       });
     },
 
@@ -296,6 +298,14 @@ onready(function () {
         var shareView = require('views/share/share-view');
 
         appView.dialogRegion.show(new shareView.Modal({}));
+      });
+    },
+
+    delete: function() {
+      require.ensure(['views/menu/delete-room-modal'], function(require) {
+        var DeleteModal = require('views/menu/delete-room-modal');
+
+        appView.dialogRegion.show(new DeleteModal({}));
       });
     }
 
@@ -368,10 +378,5 @@ onready(function () {
     setTimeout(promptForHook, 1500);
   }
 
-  if (context().permalinkChatId) {
-    highlightPermalinkChats(appView.chatCollectionView, context().permalinkChatId);
-  }
-
   Backbone.history.start();
 });
-

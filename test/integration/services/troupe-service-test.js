@@ -7,98 +7,85 @@
 var testRequire   = require('../test-require');
 var fixtureLoader = require('../test-fixtures');
 var Q             = require("q");
+var _             = require('underscore');
 var assert        = require("assert");
 var mockito       = require('jsmockito').JsMockito;
-var ObjectID      = require('mongodb').ObjectID;
-var persistence   = testRequire("./services/persistence-service");
 var mongoUtils    = testRequire("./utils/mongo-utils");
 var times         = mockito.Verifiers.times;
 var once          = times(1);
 var times         = mockito.Verifiers.times;
-var once          = times(1);
 var fixture       = {};
+
 Q.longStackSupport = true;
 
-function testRequestAcceptance(email, userStatus, emailNotificationConfirmationMethod, done) {
-  var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
-  var troupeService = testRequire.withProxies("./services/troupe-service", {
-    './email-notification-service': emailNotificationServiceMock
-  });
-
-  var troupe = fixture.troupe1;
-
-  persistence.User.createQ({
-      email: email,
-      displayName: 'Test User ' + new Date(),
-      confirmationCode: null,  // IMPORTANT. This is the point of the test!!!
-      status: userStatus })
-    .then(function(user) {
-
-      return troupeService.addRequest(troupe, user)
-        .then(function(request) {
-
-
-          return persistence.Request.findByIdQ(request.id)
-            .then(function(request) {
-
-              if(user.status !== 'UNCONFIRMED')
-                return;
-
-              assert(!request, 'request should not exist as user is not confirmed');
-              user.status = 'ACTIVE';
-              return user.saveQ()
-                .then(function() {
-                  // Install hooks TODO: fix this!
-                  // appEvents.onEmailConfirmed(email, user.id);
-                });
-
-
-            })
-            .then(function() {
-              // The requests should exist at this point
-              return persistence.Request.findByIdQ(request.id)
-                .then(function(request) {
-                  assert(request, 'request does not exist');
-
-                  return troupeService.acceptRequest(request);
-
-                });
-              });
-
-
-        })
-        .then(function() {
-
-          mockito.verify(emailNotificationServiceMock, once)[emailNotificationConfirmationMethod]();
-
-          return persistence.Troupe.findOneQ({ uri: 'testtroupe1' })
-            .then(function(troupe2) {
-
-              assert(troupeService.userHasAccessToTroupe(user, troupe2), 'User has not been granted access to the troupe');
-              assert(troupeService.userIdHasAccessToTroupe(user.id, troupe2), 'User has not been granted access to the troupe');
-
-            });
-        });
-    })
-    .nodeify(done);
+function findUserIdPredicate(userId) {
+  return function(x) {
+    return "" + x === "" + userId;
+  }
 }
-
-
 describe('troupe-service', function() {
-
-
-  describe('#createNewTroupeForExistingUser', function() {
+  describe('oneToOnes #slow', function() {
     var troupeService = testRequire('./services/troupe-service');
+    var roomMembershipService = testRequire('./services/room-membership-service');
 
-    it('should handle the upgrade of a oneToOneTroupe', function(done) {
+    it('should handle the creation of a oneToOneTroupe single', function(done) {
       troupeService.findOrCreateOneToOneTroupeIfPossible(fixture.user1.id, fixture.user2.id)
-        .spread(function(troupe) {
-          if(!troupe) throw 'Cannot findOrCreateOneToOneTroupeIfPossible troupe';
+        .spread(function(troupe, otherUser) {
+          assert(troupe);
+          assert(troupe.oneToOne);
+          assert.strictEqual(troupe.githubType, 'ONETOONE');
+          assert.strictEqual(otherUser.id, fixture.user2.id);
+          assert.strictEqual(troupe.oneToOneUsers.length, 2);
+
+          return roomMembershipService.findMembersForRoom(troupe.id);
+        })
+        .then(function(userIds) {
+          console.log(userIds);
+          assert(_.find(userIds, findUserIdPredicate(fixture.user1.id)));
+          assert(_.find(userIds, findUserIdPredicate(fixture.user2.id)));
         })
         .nodeify(done);
-
-
     });
+
+    it('should handle the creation of a oneToOneTroupe atomicly', function(done) {
+      Q.all([
+          troupeService.findOrCreateOneToOneTroupeIfPossible(fixture.user2.id, fixture.user3.id),
+          troupeService.findOrCreateOneToOneTroupeIfPossible(fixture.user3.id, fixture.user2.id)
+        ])
+        .spread(function(r1, r2) {
+          var troupe1 = r1[0];
+          var otherUser1 = r1[1];
+          var troupe2 = r2[0];
+          var otherUser2 = r2[1];
+
+          assert(troupe1);
+          assert(troupe1.oneToOne);
+          assert.strictEqual(troupe1.githubType, 'ONETOONE');
+          assert.strictEqual(troupe1.oneToOneUsers.length, 2);
+          assert.strictEqual(otherUser1.id, fixture.user3.id);
+
+          assert(troupe2);
+          assert(troupe2.oneToOne);
+          assert.strictEqual(troupe2.githubType, 'ONETOONE');
+          assert.strictEqual(troupe2.oneToOneUsers.length, 2);
+          assert.strictEqual(otherUser2.id, fixture.user2.id);
+
+          assert.strictEqual(troupe1.id, troupe2.id);
+
+          return roomMembershipService.findMembersForRoom(troupe1.id);
+        })
+        .then(function(userIds) {
+          assert(_.find(userIds, findUserIdPredicate(fixture.user2.id)));
+          assert(_.find(userIds, findUserIdPredicate(fixture.user3.id)));
+        })
+        .nodeify(done);
+    });
+
+  });
+
+  describe('#createNewTroupeForExistingUser', function() {
+
+
 
     // xit('should handle the creation of a new troupe', function(done) {
 
@@ -117,111 +104,6 @@ describe('troupe-service', function() {
     //   .nodeify(done);
 
     // });
-
-  });
-
-  describe('#deleteTroupe()', function() {
-    it('#01 should allow an ACTIVE troupe with a single user to be deleted', function(done) {
-      var troupeService = testRequire('./services/troupe-service');
-
-      troupeService.deleteTroupe(fixture.troupeForDeletion2, function(err) {
-        if(err) return done(err);
-
-        troupeService.findById(fixture.troupeForDeletion2.id, function(err, troupe) {
-          if(err) return done(err);
-
-          var earlier = new Date(Date.now() - 10000);
-
-          assert.equal('DELETED', troupe.status);
-          assert.strictEqual(0, troupe.users.length);
-
-          done();
-        });
-      });
-
-    });
-
-    it('#02 should NOT allow an ACTIVE troupe with a two users to be deleted', function(done) {
-      var troupeService = testRequire('./services/troupe-service');
-
-      troupeService.deleteTroupe(fixture.troupeForDeletion3, function(err) {
-        assert(err);
-        done();
-      });
-
-    });
-  });
-
-  describe('#findAllImplicitContactUserIds', function() {
-
-    it('should work as expected', function(done) {
-      var troupeService = testRequire('./services/troupe-service');
-
-      troupeService.findAllImplicitContactUserIds(fixture.user1.id)
-        .then(function(userIds) {
-          assert.equal(userIds.length, 1);
-          assert.equal(userIds[0], fixture.user2.id);
-        })
-        .nodeify(done);
-
-    });
-
-  });
-
-  describe('#findAllConnectedUserIdsForUserId', function() {
-
-    it('should work as expected', function(done) {
-      var troupeService = testRequire('./services/troupe-service');
-
-      troupeService.findAllConnectedUserIdsForUserId(fixture.user1.id)
-        .then(function(userIds) {
-          assert.equal(userIds.length, 1);
-          assert.equal(userIds[0], fixture.user2.id);
-        })
-        .nodeify(done);
-
-    });
-
-  });
-
-
-
-  describe('#indexTroupesByUserIdTroupeId', function() {
-
-    it('should index stuff correctly', function() {
-      var troupeService = testRequire('./services/troupe-service');
-      var userId = new ObjectID();
-      var userIdA = new ObjectID();
-      var userIdB = new ObjectID();
-      var groupTroupeId1 = new ObjectID();
-      var groupTroupeId2 = new ObjectID();
-      var oToTroupeId3 = new ObjectID();
-      var o2oTroupeId4 = new ObjectID();
-
-      var troupes = [new persistence.Troupe({
-        _id: groupTroupeId1
-      }), new persistence.Troupe({
-        _id: groupTroupeId2,
-        oneToOne: false
-      }), new persistence.Troupe({
-        _id: oToTroupeId3,
-        oneToOne: true,
-        users: [{ userId: userId }, { userId: userIdA }]
-      }), new persistence.Troupe({
-        _id: o2oTroupeId4,
-        oneToOne: true,
-        users: [{ userId: userId }, { userId: userIdB }]
-      })];
-
-      var result = troupeService.indexTroupesByUserIdTroupeId(troupes, userId);
-      assert(result.oneToOne[userIdA]);
-      assert(result.oneToOne[userIdB]);
-      assert(!result.oneToOne[userId]);
-      assert(result.groupTroupeIds[groupTroupeId1]);
-      assert(result.groupTroupeIds[groupTroupeId2]);
-      assert(!result.groupTroupeIds[oToTroupeId3]);
-
-    });
 
   });
 

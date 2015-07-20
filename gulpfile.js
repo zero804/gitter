@@ -11,6 +11,7 @@ var istanbul = require('gulp-istanbul');
 var mocha = require('gulp-spawn-mocha');
 var using = require('gulp-using');
 var tar = require('gulp-tar');
+var expect = require('gulp-expect-file');
 var shrinkwrap = require('gulp-shrinkwrap');
 var git = require('gulp-git');
 var fs = require('fs');
@@ -25,9 +26,35 @@ var gulpif = require('gulp-if');
 var sourcemaps = require('gulp-sourcemaps');
 var shell = require('gulp-shell');
 var del = require('del');
+var grepFail = require('gulp-grep-fail');
+var runSequence = require('run-sequence');
 
 /* Don't do clean in gulp, use make */
 var DEV_MODE = !!process.env.DEV_MODE;
+
+var testModules = {
+  'integration': ['./test/integration/**/*.js', './test/public-js/**/*.js'],
+  'cache-wrapper': ['./modules/cache-wrapper/test/*.js'],
+  'github': ['./modules/github/test/*.js'],
+  'split-tests': ['./modules/split-tests/test/*.js'],
+};
+
+/** Make a series of tasks based on the test modules */
+function makeTestTasks(taskName, generator) {
+  Object.keys(testModules).forEach(function(moduleName) {
+    var files = testModules[moduleName];
+
+    gulp.task(taskName + '-' + moduleName, function() {
+      return generator(moduleName, files);
+    });
+  });
+
+  gulp.task(taskName, function(callback) {
+    var args = Object.keys(testModules).map(function(moduleName) { return taskName + '-' + moduleName; }).concat(callback);
+    runSequence.apply(null, args);
+  });
+}
+
 
 gulp.task('validate-client-source', function() {
   /* This is a very lax jshint, only looking for major problems */
@@ -51,7 +78,7 @@ gulp.task('validate-client-source', function() {
 
 gulp.task('validate-server-source', function() {
   /* This is a very lax jshint, only looking for major problems */
-  return gulp.src(['server/**/*.js', 'shared/**/*.js', '!server/web/faye-node.js'])
+  return gulp.src(['server/**/*.js', 'shared/**/*.js', 'modules/*/lib/**/*.js'])
     .pipe(jshint({
       node: true,
       // globalstrict: true, // ENABLE
@@ -66,17 +93,21 @@ gulp.task('validate-server-source', function() {
     .pipe(jshint.reporter('fail'));
 });
 
-gulp.task('validate', ['validate-client-source', 'validate-server-source']);
+gulp.task('validate-illegal-markers', function() {
+  return gulp.src(['server/**/*.js', 'shared/**/*.js', 'modules/*/lib/**/*.js', 'public/js/**/*.js'])
+    .pipe(grepFail([ 'NOCOMMIT' ]));
+  //
+  // return gulp.src()
+  //   .pipe(grepFail([ '' ]));
+});
 
+gulp.task('validate', ['validate-client-source', 'validate-server-source' /*, 'validate-illegal-markers'*/]);
 
-/**
- * test
- */
-gulp.task('test-mocha', function() {
+makeTestTasks('test-mocha', function(name, files) {
   mkdirp.sync('output/test-reports/');
   mkdirp.sync('output/coverage-reports/');
 
-  return gulp.src(['./test/integration/**/*.js', './test/public-js/**/*.js'], { read: false })
+  return gulp.src(files, { read: false })
     .pipe(mocha({
       reporter: 'xunit-file',
       timeout: 10000,
@@ -84,10 +115,10 @@ gulp.task('test-mocha', function() {
         dir: 'output/coverage-reports/'
       },
       env: {
-        TAP_FILE: "output/test-reports/tests.tap",
-        XUNIT_FILE: 'output/test-reports/integration.xml',
+        TAP_FILE: 'output/test-reports/' + name + '.tap',
+        XUNIT_FILE: 'output/test-reports/' + name + '.xml',
         NODE_ENV: 'test',
-        Q_DEBUG: 1
+        Q_DEBUG: 1,
       }
     }));
 });
@@ -98,8 +129,8 @@ gulp.task('test-redis-lua', shell.task([
 
 gulp.task('test', ['test-mocha', 'test-redis-lua']);
 
-gulp.task('localtest', function() {
-  return gulp.src(['./test/integration/**/*.js', './test/public-js/**/*.js'], { read: false })
+makeTestTasks('localtest', function(name, files) {
+  return gulp.src(files, { read: false })
     .pipe(mocha({
       reporter: 'spec',
       timeout: 10000,
@@ -110,7 +141,6 @@ gulp.task('localtest', function() {
       }
     }));
 });
-
 
 /**
  * Matcha tests, submitted to datadog
@@ -147,14 +177,14 @@ gulp.task('localtest-coverage', ['clean:coverage'], function() {
     }));
 });
 
-gulp.task('fasttest', function() {
-  return gulp.src(['./test/integration/**/*.js', './test/public-js/**/*.js'], { read: false })
+makeTestTasks('fasttest', function(name, files) {
+  return gulp.src(files, { read: false })
     .pipe(mocha({
       reporter: 'spec',
       grep: '#slow',
       invert: true,
       env: {
-        TAP_FILE: "output/test-reports/tests.tap",
+        TAP_FILE: "output/test-reports/" + name + ".tap",
         SKIP_BADGER_TESTS: 1,
         DISABLE_CONSOLE_LOGGING: 1
       }
@@ -179,7 +209,8 @@ gulp.task('copy-app-files', function() {
       'scripts/**',
       'server/**',
       'shared/**',
-      'redis-lua/**'
+      'redis-lua/**',
+      'modules/**'
     ], { "base" : "." })
     .pipe(gulp.dest('output/app'));
 });
@@ -308,8 +339,7 @@ gulp.task('css-mobile', function () {
 });
 
 gulp.task('css-web', function () {
-  return gulp.src([
-    'public/less/signup.less',
+  var lessFiles = [
     'public/less/trpAppsPage.less',
     'public/less/error-page.less',
     'public/less/error-layout.less',
@@ -318,7 +348,6 @@ gulp.task('css-web', function () {
     'public/less/login.less',
     'public/less/homepage.less',
     'public/less/explore.less',
-    'public/less/about.less',
     'public/less/router-chat.less',
     'public/less/router-app.less',
     'public/less/router-nli-app.less',
@@ -328,9 +357,13 @@ gulp.task('css-web', function () {
     'public/less/router-archive-home.less',
     'public/less/router-archive-chat.less',
     'public/less/userhome.less',
+    'public/less/userhome_treatment.less',
     'public/less/402.less',
     'public/less/org-404.less'
-    ])
+  ];
+
+  return gulp.src(lessFiles)
+    .pipe(expect({ errorOnFailure: true }, lessFiles))
     .pipe(gulpif(DEV_MODE, sourcemaps.init()))
     .pipe(less({
       paths: ['public/less'],

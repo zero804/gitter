@@ -1,11 +1,12 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var ensureLoggedIn    = require('../../web/middlewares/ensure-logged-in');
-var appRender         = require('./render');
-var appMiddleware     = require('./middleware');
-var recentRoomService = require('../../services/recent-room-service');
-var isPhone     = require('../../web/is-phone');
+var ensureLoggedIn     = require('../../web/middlewares/ensure-logged-in');
+var appRender          = require('./render');
+var appMiddleware      = require('./middleware');
+var recentRoomService  = require('../../services/recent-room-service');
+var isPhone            = require('../../web/is-phone');
+var timezoneMiddleware = require('../../web/middlewares/timezone');
 
 function saveRoom(req) {
   var userId = req.user && req.user.id;
@@ -19,14 +20,11 @@ function saveRoom(req) {
 var mainFrameMiddlewarePipeline = [
   appMiddleware.uriContextResolverMiddleware({ create: 'not-repos' }),
   appMiddleware.isPhoneMiddleware,
+  timezoneMiddleware,
   function (req, res, next) {
+
     if (req.uriContext.ownUrl) {
-      if (req.isPhone) {
-        appRender.renderMobileUserHome(req, res, next, 'home');
-      } else {
-        appRender.renderMainFrame(req, res, next, 'home');
-      }
-      return;
+      return res.redirect('/home');
     }
 
     if(req.isPhone) {
@@ -57,6 +55,7 @@ var mainFrameMiddlewarePipeline = [
 var chatMiddlewarePipeline = [
   appMiddleware.uriContextResolverMiddleware({ create: 'not-repos'}),
   appMiddleware.isPhoneMiddleware,
+  timezoneMiddleware,
   function (req, res, next) {
 
     if (req.uriContext.accessDenied) {
@@ -88,6 +87,7 @@ var chatMiddlewarePipeline = [
 var embedMiddlewarePipeline = [
   appMiddleware.uriContextResolverMiddleware({ create: false }),
   appMiddleware.isPhoneMiddleware,
+  timezoneMiddleware,
   function (req, res, next) {
     if(!req.uriContext.troupe) return next(404);
     appRender.renderEmbeddedChat(req, res, next);
@@ -96,6 +96,7 @@ var embedMiddlewarePipeline = [
 
 var cardMiddlewarePipeline = [
   appMiddleware.uriContextResolverMiddleware({ create: false }),
+  timezoneMiddleware,
   function (req, res, next) {
     if(!req.uriContext.troupe) return next(404);
     if(req.uriContext.troupe.security !== 'PUBLIC') return next(403);
@@ -130,18 +131,12 @@ module.exports = {
         app.get(path, cardMiddlewarePipeline);
       });
 
-
-      [
-        '/:roomPart1/~home'
-      ].forEach(function(path) {
-        app.get(path,
-          ensureLoggedIn,
-          appMiddleware.uriContextResolverMiddleware({ create: false }),
-          appMiddleware.isPhoneMiddleware,
-          function(req, res, next) {
-            appRender.renderHomePage(req, res, next);
-          });
-      });
+      app.get('/home/~home',
+        ensureLoggedIn,
+        appMiddleware.isPhoneMiddleware,
+        function(req, res, next) {
+          appRender.renderHomePage(req, res, next);
+        });
 
       require('./integrations').install(app);
       require('./mobile').install(app);

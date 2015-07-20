@@ -8,17 +8,21 @@ Please symlink pre-commit to .git/hooks/pre-commit to enable the pre-commit hook
 
 Prerequisites
 -------------
-Redis 2.8 (Sentinel 2 is shipped with Redis 2.8) & MongoDB 2.4 must be installed.
+* node.js 0.10+ `brew install node`
+* Redis 2.8+ `brew install redis`
+* MongoDB 3.0+ `brew install mongo`
 
 Getting Started
 ---------------
-1.  `npm install`
-2.  `gulp css`
-3.  `./mongodb.sh`
-4.  `./redis.sh`
-5.  `./scripts/mongo/init-dev-mongo.sh`
-6.  `./scripts/upgrade-data.sh`
-7.  `nodemon` (this will run node and restart when anything changes based on config in nodemon.json)
+1. `npm install`
+2. `npm install -g gulp`
+3. `gulp css` (compiles css)
+4. `./mongodb.sh` (starts mongo database)
+5. `./redis.sh` (starts redis cache)
+6. `./scripts/mongo/init-dev-mongo.sh`
+7. `./scripts/upgrade-data.sh`
+8. `npm install -g nodemon`
+9. `nodemon` (this will run node and restart when anything changes based on config in nodemon.json)
 
 Data Upgrades
 -------------
@@ -39,7 +43,7 @@ Utility Scripts
 ---------------
 These are scripts that can help you answer questions like "What's this user's eyeball state?" and "What's the userId for mydigitalself?". They can be found in `scripts/utils`.
 
-If you want to run against production, ssh into app-00X and run with the NODE_ENV varible set.
+If you want to run against production, ssh into app-00X and run with the `NODE_ENV` varible set.
 
 e.g `NODE_ENV=prod /opt/gitter/gitter-webapp/scripts/utils/unread.js trevorah`
 
@@ -47,6 +51,11 @@ e.g `NODE_ENV=prod /opt/gitter/gitter-webapp/scripts/utils/unread.js trevorah`
 Prints the current online state for a user. Requires a username.
 
 e.g `./scripts/utils/online-state.js trevorah`
+
+### mobile-notify-user.js
+Sends a test push notification to all devices registered by user. Requires a username.
+
+e.g `./scripts/utils/mobile-notify-user.js trevorah`
 
 ### unread.js
 Lists out why a user has an unread badge. Requires a username.
@@ -82,6 +91,13 @@ e.g `./scripts/utils/remove-user.js --username trevorah`
 Migrates all chat messages from one room to another. Requires two rooms.
 
 e.g `./scripts/utils/migrate-messages.js --from trevorah/oldroom --to trevorah/newroom`
+
+### node hellban.js <username> [options]
+
+username     username to hellban e.g trevorah
+
+Options:
+   -u, --unban   unban user from hell
 
 Upgrading gitter-services to add support for more services
 ----------------------------------------------------------
@@ -141,4 +157,19 @@ Once you are sure the above is done, preform the following:
 11. Check that there are lots of documents under the Gitter index.
 
 
+## Updating the Social Graph
 
+The social graph updater runs as a batch job in a cron every few hours. You can manually invoke it as follows.
+
+```shell
+NODE_ENV=beta node scripts/graphs/upload-graph.js
+```
+
+The uploader script starts a local webserver, and it will guess the URL for that webserver by looking at the host computers
+network interfaces. If you want to the script against production from your developer computer, you'll need to specify the OpenVPN
+tunnel interface, otherwise the script will serve from a URL inaccessible from OpenVPN.
+
+You can do this as follows:
+```shell
+NODE_ENV=prod LISTEN_IF=utun0 node scripts/graphs/upload-graph.js
+```

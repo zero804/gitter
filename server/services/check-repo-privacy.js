@@ -3,7 +3,7 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var GithubRepoService = require('./github/github-repo-service');
+var GithubRepoService = require('gitter-web-github').GitHubRepoService;
 var roomService = require('./room-service');
 
 function checkRepoPrivacy(uri) {

@@ -8,9 +8,11 @@
  */
 
 var persistence = require("./persistence-service");
-var Q = require('q');
-var winston = require('../utils/winston');
-var mongoUtils = require('../utils/mongo-utils');
+var Q           = require('q');
+var mongoUtils  = require('../utils/mongo-utils');
+var debug       = require('debug')('gitter:uri-lookup-service');
+
+
 /**
  * Lookup the owner of a URI
  * @return promise of a UriLookup
@@ -19,15 +21,15 @@ function lookupUri(uri) {
 
   var lcUri = uri.toLowerCase();
 
-  winston.verbose('URI lookup: ' + uri);
+  debug('URI lookup: %s', uri);
 
   return persistence.UriLookup.findOneQ({ uri: lcUri })
     .then(function(uriLookup) {
-      winston.verbose('URI lookup returned a result? ' + !!uriLookup);
+      debug('URI lookup returned a result? %s', !!uriLookup);
 
       if(uriLookup && (uriLookup.userId || uriLookup.troupeId )) return uriLookup;
 
-      winston.verbose('Attempting to search through users and troupes to find ' + uri);
+      debug('Attempting to search through users and troupes to find %s', uri);
 
       // Double-check the troupe and user tables to find this uri
       var repoStyle = uri.indexOf('/') >= 0;
@@ -36,14 +38,14 @@ function lookupUri(uri) {
         repoStyle ? null : persistence.User.findOneQ({ username: uri }, 'username', { lean: true }),
         persistence.Troupe.findOneQ({ lcUri: lcUri }, 'uri', { lean: true })
       ]).spread(function(user, troupe) {
-        winston.verbose('Found user? ' + !!user + ' found troupe? ' + !!troupe);
+        debug('Found user? %s found troupe? %s', !!user, !!troupe);
 
         /* Found user. Add to cache and continue */
         if(user) {
           return persistence.UriLookup.findOneAndUpdateQ(
             { $or: [{ uri: lcUri }, { userId: user._id }] },
             { $set: { uri: lcUri, userId: user._id }, $unset: { troupeId: '' } },
-            { upsert: true });
+            { upsert: true, new: true });
         }
 
         /* Found a room. Add to cache and continue */
@@ -51,7 +53,7 @@ function lookupUri(uri) {
           return persistence.UriLookup.findOneAndUpdateQ(
             { $or: [{ uri: lcUri }, { troupeId: troupe._id }] },
             { $set: { uri: lcUri, troupeId: troupe._id }, $unset: { userId: '' } },
-            { upsert: true });
+            { upsert: true, new: true });
         }
 
         /* Last ditch attempt. Look for a room that has been renamed */
@@ -59,7 +61,7 @@ function lookupUri(uri) {
         return persistence.Troupe.findOneQ({ renamedLcUris: lcUri }, { uri: 1, lcUri: 1 }, { lean: true })
           .then(function(renamedTroupe) {
             if (!renamedTroupe) return null;
-            winston.verbose('Room ' + lcUri + ' has been renamed to ' + renamedTroupe.lcUri);
+            debug('Room %s has been renamed to %s', lcUri, renamedTroupe.lcUri);
 
             /* Don't save this lookup */
             return { uri: renamedTroupe.lcUri, troupeId: renamedTroupe._id };
@@ -99,7 +101,7 @@ function reserveUriForTroupeId(troupeId, uri) {
   return persistence.UriLookup.findOneAndUpdateQ(
     { $or: [{ uri: lcUri }, { troupeId: troupeId }] },
     { $set: { uri: lcUri, troupeId: troupeId }, $unset: { userId: '' } },
-    { upsert: true });
+    { upsert: true, new: true });
 }
 
 exports.reserveUriForTroupeId = reserveUriForTroupeId;

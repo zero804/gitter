@@ -2,7 +2,6 @@
 "use strict";
 
 var restful = require('../../services/restful');
-var recentRoomService  = require('../../services/recent-room-service');
 var roomService        = require('../../services/room-service');
 var emailAddressService = require('../../services/email-address-service');
 var userService        = require("../../services/user-service");
@@ -91,6 +90,12 @@ module.exports = {
       .catch(next);
   },
 
+  /**
+   * Removes a member from a room. A user can either request this
+   * on their own behalf or delete another person from the room
+   * if they have permission
+   * DELETE /rooms/:roomId/users/:userId
+   */
   destroy: function(req, res, next){
     var user = req.resourceTroupeUser;
     var troupeId = req.troupe.id;
@@ -99,11 +104,7 @@ module.exports = {
     return troupeService.findById(troupeId)
       .then(function(troupe) {
         if(!troupe) throw new StatusError(404);
-
         return roomService.removeUserFromRoom(troupe, user, req.user);
-      })
-      .then(function() {
-        recentRoomService.removeRecentRoomForUser(user.id, troupeId);
       })
       .then(function() {
         res.send({ success: true });

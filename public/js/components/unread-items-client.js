@@ -1,5 +1,4 @@
 "use strict";
-var $ = require('jquery');
 var _ = require('underscore');
 var context = require('utils/context');
 var realtime = require('./realtime');
@@ -7,26 +6,13 @@ var apiClient = require('./apiClient');
 var log = require('utils/log');
 var Backbone = require('backbone');
 var appEvents = require('utils/appevents');
-var dataset = require('utils/dataset-shim');
-var DoubleHash = require('utils/double-hash');
+var UnreadItemStore = require('./unread-items-client-store');
 
 module.exports = (function() {
 
 
   function limit(fn, context, timeout) {
     return _.throttle(fn.bind(context), timeout || 30, { leading: false });
-  }
-
-  function _iteratePreload(items, fn, context) {
-    var keys = _.keys(items);
-    _.each(keys, function(itemType) {
-      // Ignore the meta
-      if(itemType === '_meta') return;
-
-      _.each(items[itemType], function(itemId) {
-        fn.call(context, itemType, itemId);
-      });
-    });
   }
 
   function onceUserIdSet(callback, c) {
@@ -41,227 +27,78 @@ module.exports = (function() {
     }
   }
 
-  var ADD_TIMEOUT = 500;
-  var REMOVE_TIMEOUT = 600000;
-
-  // -----------------------------------------------------
-  // A doublehash which slows things down
-  // -----------------------------------------------------
-
-  var Tarpit = function(timeout, onDequeue) {
-    DoubleHash.call(this);
-    this._timeout = timeout;
-    this._onDequeue = onDequeue;
+  var DeletePit = function() {
+    this._items = {};
+    this._timer = setInterval(this._gc.bind(this), 60000);
   };
 
-  _.extend(Tarpit.prototype, DoubleHash.prototype, {
-    _onItemAdded: function(itemType, itemId) {
-      var self = this;
-      window.setTimeout(function() {
-        self._promote(itemType, itemId);
-      }, this._timeout);
+  DeletePit.prototype = {
+    add: function(itemId) {
+      this._items[itemId] = Date.now();
     },
 
-    _promote: function(itemType, itemId) {
-      // Has this item already been deleted?
-      if(!this._contains(itemType, itemId)) return;
+    remove: function(itemId) {
+      delete this._items[itemId];
+    },
 
-      this._remove(itemType, itemId);
-      if(this._onDequeue) this._onDequeue(itemType, itemId);
+    contains: function(itemId) {
+      return !!this._items[itemId];
+    },
+
+    _gc: function() {
+      var horizon = Date.now() - 5 * 60 * 1000; // 5 minutes
+      var items = this._items;
+
+      Object.keys(items).forEach(function(itemId) {
+        if (items[itemId] < horizon) {
+          delete items[itemId];
+        }
+      });
     }
-  });
-
-  // -----------------------------------------------------
-  // The main component of the unread-items-store
-  // -----------------------------------------------------
-
-  var UnreadItemStore = function() {
-    DoubleHash.call(this);
-
-    this._maxItems = 100;
-    this._lurkMode = false;
-
-    this._addTarpit = new Tarpit(ADD_TIMEOUT, _.bind(this._promote, this));
-    this._deleteTarpit = new Tarpit(REMOVE_TIMEOUT);
-    this._recountLimited = limit(this._recount, this, 30);
-    this._currentCountValue = undefined;
   };
-
-  _.extend(UnreadItemStore.prototype, Backbone.Events, DoubleHash.prototype, {
-    _unreadItemAdded: function(itemType, itemId) {
-      if(this._deleteTarpit._contains(itemType, itemId)) {
-        /**
-         * Server is resending us the item, we probably need to tell it to mark it as
-         * read a second time
-         */
-        this.trigger('itemMarkedRead', itemType, itemId/*, mentioned*/);
-        return;
-      }
-
-      if(this._contains(itemType, itemId)) {
-        return;
-      }
-
-      this._addTarpit._add(itemType, itemId);
-      /* When the item is promoted, a recount will happen */
-    },
-
-    _unreadItemRemoved: function(itemType, itemId) {
-      if(this._deleteTarpit._contains(itemType, itemId)) return;
-
-      this._deleteTarpit._add(itemType, itemId);
-      this._addTarpit._remove(itemType, itemId);
-      this._remove(itemType, itemId);
-
-      this.trigger('unreadItemRemoved', itemType, itemId);
-      this._recountLimited();
-    },
-
-    _markItemRead: function(itemType, itemId, mentioned) {
-      if(this._lurkMode && !mentioned) {
-        // Lurk mode, but no mention, don't mark as read
-        return;
-      }
-
-      this._unreadItemRemoved(itemType, itemId);
-      this.trigger('itemMarkedRead', itemType, itemId, mentioned);
-    },
-
-    _onItemRemoved: function() {
-      // Recount soon
-      this._recountLimited();
-    },
-
-    _onItemAdded: function() {
-      // Recount soon
-      this._recountLimited();
-    },
-
-    _promote: function(itemType, itemId) {
-      this._add(itemType, itemId);
-      this.trigger('add', itemType, itemId);
-    },
-
-    _recount: function() {
-      var newValue = this._count();
-      this._currentCountValue = newValue;
-      this.trigger('newcountvalue', newValue);
-      appEvents.trigger('unreadItemsCount', newValue);
-
-      return newValue;
-    },
-
-    _currentCount: function() {
-      if(this._currentCountValue) return this._currentCountValue;
-
-      return 0;
-    },
-
-    _unreadItemsAdded: function(items) {
-      _iteratePreload(items, function(itemType, itemId) {
-        this._unreadItemAdded(itemType, itemId);
-      }, this);
-    },
-
-    _unreadItemsRemoved: function(items) {
-      _iteratePreload(items, function(itemType, itemId) {
-        this._unreadItemRemoved(itemType, itemId);
-      }, this);
-    },
-
-    _hasItemBeenMarkedAsRead: function(itemType, itemId) {
-      return this._deleteTarpit._contains(itemType, itemId);
-    },
-
-    preload: function(items) {
-      _iteratePreload(items, function(itemType, itemId) {
-        log.info('uic: Preload of ' + itemType + ':' + itemId);
-
-        // Have we already marked this item as read?
-        if(this._deleteTarpit._contains(itemType, itemId)) return;
-
-        // Have we already got this item in our store?
-        if(this._contains(itemType, itemId)) return;
-
-        // Instantly promote it...
-        this._promote(itemType, itemId);
-      }, this);
-    },
-
-    enableLurkMode: function() {
-      this._lurkMode = true;
-      // Remove from the add tarpit and the current tarpit
-      this._unreadItemsRemoved(this._addTarpit._marshall());
-      this._unreadItemsRemoved(this._marshall());
-    },
-
-    disableLurkMode: function() {
-      this._lurkMode = false;
-    },
-
-    markAllReadNotification: function() {
-      // Remove from the add tarpit and the current tarpit
-      this._unreadItemsRemoved(this._addTarpit._marshall());
-      this._unreadItemsRemoved(this._marshall());
-    },
-
-    markAllRead: function() {
-      var self = this;
-      onceUserIdSet(function() {
-        apiClient.userRoom.delete("/unreadItems/all")
-          .then(function() {
-            // Remove from the add tarpit and the current tarpit
-            self._unreadItemsRemoved(self._addTarpit._marshall());
-            self._unreadItemsRemoved(self._marshall());
-          });
-      }, self);
-
-    },
-
-    getFirstItemOfType: function(type) { 
-      var items = this._getItemsOfType(type);
-      return items.sort()[0];
-    }
-
-  });
 
   // -----------------------------------------------------
   // This component sends read notifications back to the server
   // -----------------------------------------------------
 
   var ReadItemSender = function(unreadItemStore) {
-    this._buffer = new DoubleHash();
+    this._buffer = {};
     this._sendLimited = limit(this._send, this, 1000);
 
-    _.bindAll(this,'_onItemMarkedRead', '_onWindowUnload');
+    unreadItemStore.on('itemMarkedRead', this._onItemMarkedRead.bind(this));
 
-    unreadItemStore.on('itemMarkedRead', this._onItemMarkedRead);
-    $(window).on('unload', this._onWindowUnload);
-    $(window).on('beforeunload', this._onWindowUnload);
+    var bound = this._onWindowUnload.bind(this);
+    ['unload', 'beforeunload'].forEach(function(e) {
+      window.addEventListener(e, bound, false);
+    });
   };
 
   ReadItemSender.prototype = {
-    _onItemMarkedRead: function(itemType, itemId, mentioned) {
-      this._add(itemType, itemId);
+    _onItemMarkedRead: function(itemId, mention, lurkMode) {
+      // Don't sent unread items back to the server in lurk mode unless its a mention
+      if (lurkMode && !mention) return;
+
+      // All items marked as read are send back to the server
+      // as chats
+      this._buffer[itemId] = true;
+      this._sendLimited();
     },
 
     _onWindowUnload: function() {
-      if(this._buffer._count() > 0) {
+      if(Object.keys(this._buffer) > 0) {
         // This causes mainthread locks in Safari
         // TODO: send to the parent frame?
         this._send({ sync: true });
       }
     },
 
-    _add: function(itemType, itemId) {
-      this._buffer._add(itemType, itemId);
-      this._sendLimited();
-    },
-
     _send: function(options) {
       onceUserIdSet(function() {
-        var queue = this._buffer._marshall();
-        this._buffer = new DoubleHash();
+        var items = Object.keys(this._buffer);
+        if (!items.length) return;
+
+        var queue = { chat: items };
+        this._buffer = {};
 
         var async = !options || !options.sync;
         var self = this;
@@ -275,11 +112,9 @@ module.exports = (function() {
 
             // Unable to send messages, requeue them and try again in 5s
             setTimeout(function() {
-              _iteratePreload(queue, function(itemType, itemId) {
-                self._buffer._add(itemType, itemId);
-              }, self);
-
-              self._sendLimited();
+              items.forEach(function(itemId) {
+                self._onItemMarkedRead(itemId);
+              });
             }, 5000);
           });
 
@@ -338,7 +173,7 @@ module.exports = (function() {
             store.enableLurkMode();
           }
 
-          store.preload(snapshot);
+          store._unreadItemsAdded(snapshot);
         });
 
       }, this);
@@ -351,9 +186,9 @@ module.exports = (function() {
   // have been read
   // -----------------------------------------------------
 
-  var TroupeUnreadItemsViewportMonitor = function(scrollElement, unreadItemStore) {
+  var TroupeUnreadItemsViewportMonitor = function(scrollElement, unreadItemStore, collectionView) {
     _.bindAll(this, '_getBounds');
-
+    this._collectionView = collectionView;
     this._scrollElement = scrollElement[0] || scrollElement;
 
     this._store = unreadItemStore;
@@ -372,8 +207,10 @@ module.exports = (function() {
 
     appEvents.on('unreadItemDisplayed', this._getBounds);
 
-    unreadItemStore.on('add', foldCountLimited);
-    unreadItemStore.on('unreadItemRemoved', foldCountLimited);
+    var storeEvents = ['newcountvalue', 'unreadItemRemoved', 'change:status', 'itemMarkedRead', 'add'];
+    storeEvents.forEach(function(evt) {
+      unreadItemStore.on(evt, foldCountLimited);
+    });
 
     // When the UI changes, rescan
     // appEvents.on('appNavigation', this._getBounds);
@@ -421,131 +258,150 @@ module.exports = (function() {
       delete this._scrollTop;
       delete this._scrollBottom;
 
-      var elementAbove, elementBelow;
-      var elementAboveTop, elementBelowTop;
-      var unreadItems = this._scrollElement.querySelectorAll('.unread');
+      var modelsInRange = this.findModelsInViewport(topBound, bottomBound);
+      modelsInRange.forEach(function(model) {
+        if (!model.get('unread')) return;
 
-      var timeout = 1000;
-      var below = 0;
-      /* Beware, this is not an array, it's a nodelist. We can't use array methods like forEach  */
-      for(var i = 0; i < unreadItems.length; i++) {
-        var element = unreadItems[i];
-
-        var itemId = dataset.get(element, 'itemId');
-        var mentioned = dataset.get(element, 'mentioned') === 'true';
-
-        if(itemId) {
-          var top = element.offsetTop;
-
-          if (top >= topBound && top <= bottomBound) {
-            var $e = $(element);
-
-            self._store._markItemRead('chat', itemId, mentioned);
-
-            $e.removeClass('unread').addClass('reading');
-            this._addToMarkReadQueue($e);
-            timeout = timeout + 150;
-          } else if(top > bottomBound) {
-            // This item is below the bottom fold
-            below++;
-            if(elementBelow) {
-              if(top < elementBelowTop) {
-                elementBelow = element;
-                elementBelowTop = top;
-              }
-            } else {
-              elementBelow = element;
-              elementBelowTop = top;
-            }
-          } else if(top < topBound) {
-            // This item is above the top fold
-            if(elementAbove) {
-              if(top > elementAboveTop) {
-                elementAbove = element;
-                elementAboveTop = top;
-              }
-            } else {
-              elementAbove = element;
-              elementAboveTop = top;
-            }
-
-          }
-        }
-
-      }
+        self._store._markItemRead(model.id);
+      });
 
       this._foldCount();
     },
 
+    /**
+     *
+     */
+    findModelsInViewport: function(viewportTop, viewportBottom) {
+      // Note: assuming the collectionView does not have a custom sort
+      var cv = this._collectionView;
+
+      var childCollection = cv.collection;
+      /* Get the children with models */
+
+      /* TEMP TEMP TEMP TEMP TEMP */
+      var models;
+      if (childCollection.models.length === cv.children.length) {
+        models = childCollection.models;
+      } else {
+        log.info("Mismatch between childCollection.models.length and cv.children.length resorting to oddness");
+
+        models = childCollection.models.filter(function(model) {
+          return cv.children.findByModelCid(model.cid);
+        });
+      }
+      /* TEMP TEMP TEMP TEMP TEMP */
+
+      var topIndex = _.sortedIndex(models, viewportTop, function(model) {
+        if(typeof model === 'number') return model;
+        var view = cv.children.findByModelCid(model.cid);
+        return view.el.offsetTop;
+      });
+
+      var remainingChildren = models.slice(topIndex);
+      if (viewportBottom === Number.POSITIVE_INFINITY) {
+        /* Thats the whole lot */
+        return remainingChildren;
+      }
+
+      var bottomIndex = _.sortedIndex(remainingChildren, viewportBottom, function(model) {
+        if(typeof model === 'number') return model;
+        var view = cv.children.findByModelCid(model.cid);
+        return view.el.offsetTop;
+      });
+
+      return remainingChildren.slice(0, bottomIndex);
+    },
+
+    _resetFoldModel: function() {
+       acrossTheFoldModel.set({
+          unreadAbove: 0,
+          unreadBelow: 0,
+          hasUnreadBelow: false,
+          hasUnreadAbove: false,
+          oldestUnreadItemId: null,
+          mostRecentUnreadItemId: null,
+
+          mentionsAbove: 0,
+          mentionsBelow: 0,
+          hasMentionsAbove: false,
+          hasMentionsBelow: false,
+          oldestMentionId: null,
+          mostRecentMentionId: null
+        });
+    },
+
     _foldCount: function() {
-      var chats = this._store._getItemsOfType('chat');
+      var chats = this._store.getItems();
       if(!chats.length) {
-        // If there are no unread items, save the effort.
-        acrossTheFoldModel.set('unreadAbove', 0);
-        acrossTheFoldModel.set('unreadBelow', 0);
+        this._resetFoldModel();
         return;
       }
 
       var above = 0;
       var below = 0;
 
+      var mentionsAbove = 0;
+      var mentionsBelow = 0;
+
       var topBound = this._scrollElement.scrollTop;
       var bottomBound = topBound + this._scrollElement.clientHeight;
+      if (bottomBound >= this._scrollElement.scrollHeight - 10) {
+        /* At the bottom? */
+        bottomBound =  Number.POSITIVE_INFINITY;
+      }
 
-      var allItems = this._scrollElement.querySelectorAll('.chat-item');
-      var chatAboveIndex = _.sortedIndex(allItems, topBound - 1, function(item) {
-        if(typeof item === 'number') return item;
-        return item.offsetTop + item.offsetHeight;
+      var modelsInRange = this.findModelsInViewport(topBound, bottomBound);
+      if (!modelsInRange.length) {
+        this._resetFoldModel();
+        return;
+      }
+
+      var first = modelsInRange[0];
+      var last = modelsInRange[modelsInRange.length - 1];
+      var firstItemId = first.id;
+      var lastItemId = last.id;
+
+      var oldestUnreadItemId = null;
+      var mostRecentUnreadItemId = null;
+      var oldestMentionId = null;
+      var mostRecentMentionId = null;
+
+      chats.forEach(function(itemId) {
+        if (itemId < firstItemId) {
+          above++;
+          if (!oldestUnreadItemId) oldestUnreadItemId = itemId;
+          if (this._store._items[itemId])  {
+            mentionsAbove++;
+            oldestMentionId = itemId;
+          }
+        }
+        if (itemId > lastItemId) {
+          below++;
+          if (!mostRecentUnreadItemId) mostRecentUnreadItemId = itemId;
+          if (this._store._items[itemId]) {
+            mentionsBelow++;
+            if (!mostRecentMentionId) mostRecentMentionId = itemId;
+          }
+        }
+      }.bind(this));
+
+      acrossTheFoldModel.set({
+        unreadAbove: above,
+        unreadBelow: below,
+        hasUnreadAbove: above > 0,
+        hasUnreadBelow: below > 0,
+        oldestUnreadItemId: oldestUnreadItemId,
+        mostRecentUnreadItemId: mostRecentUnreadItemId,
+
+        mentionsAbove: mentionsAbove,
+        mentionsBelow: mentionsBelow,
+        hasMentionsAbove: mentionsAbove > 0,
+        hasMentionsBelow: mentionsBelow > 0,
+        oldestMentionId: oldestMentionId,
+        mostRecentMentionId: mostRecentMentionId
       });
 
-      var chatAboveView = allItems[chatAboveIndex];
-      if(chatAboveView) {
-        var aboveItemId = dataset.get(chatAboveView, 'itemId');
-        if(aboveItemId) {
-          chats.forEach(function(chatId) {
-            if(chatId <= aboveItemId) above++;
-          });
-        }
-      }
-
-      var chatBelowIndex = _.sortedIndex(allItems, bottomBound + 1, function(item) {
-        if(typeof item === 'number') return item;
-        return item.offsetTop;
-      });
-
-      var chatBelowView = allItems[chatBelowIndex];
-      if(chatBelowView) {
-        var belowItemId = dataset.get(chatBelowView, 'itemId');
-        if(belowItemId) {
-          chats.forEach(function(chatId) {
-            if(chatId >= belowItemId) below++;
-          });
-        }
-      }
-      acrossTheFoldModel.set('unreadAbove', above);
-      acrossTheFoldModel.set('unreadBelow', below);
     },
-
-    _scheduleMarkRead: function() {
-      if(this._markQueue.length !== 0 && !this._timer) {
-        var timeout = 300 / this._markQueue.length;
-        this._timer = setTimeout(this._markRead.bind(this), timeout);
-      }
-    },
-
-    _addToMarkReadQueue: function($e) {
-      if(!this._markQueue) this._markQueue = [];
-      this._markQueue.push($e);
-      this._scheduleMarkRead();
-    },
-
-    _markRead: function() {
-      this._timer = null;
-      var $e = this._markQueue.shift();
-      if($e) $e.removeClass('reading').addClass('read');
-      this._scheduleMarkRead();
-    },
-
     _eyeballStateChange: function(newState) {
       this._inFocus = newState;
       if(newState) {
@@ -554,21 +410,40 @@ module.exports = (function() {
     }
   };
 
+  function CollectionSync(store, collection) {
+    collection.on('add', function(model) {
+      /* Prevents a race-condition when something has already been marked as deleted */
+      if (!model.id || !model.get('unread')) return;
+      if (store.isMarkedAsRead(model.id)) {
+        log('uic: item already marked as read');
+        model.set('unread', false);
+      }
+    });
 
-  // -----------------------------------------------------
-  // Monitors the store and removes the css for items that
-  // have been read
-  // -----------------------------------------------------
-  var ReadItemRemover = function(realtimeSync) {
-    realtimeSync.on('unreadItemRemoved', this._onUnreadItemRemoved);
-  };
+    /*
+    // * newcountvalue: (length)
+    // * unreadItemRemoved: (itemId)
+    // * change:status: (itemId, mention)
+    // * itemMarkedRead: (itemId, mention, lurkMode)
+    // * add (itemId, mention)
+     */
+    store.on('unreadItemRemoved', function(itemId) {
+      collection.patch(itemId, { unread: false, mentioned: false });
+    });
 
-  ReadItemRemover.prototype = {
-    _onUnreadItemRemoved: function(itemType, itemId) {
-      var elements = $('.model-id-' + itemId);
-      elements.removeClass('unread').addClass('read');
-    }
-  };
+    store.on('itemMarkedRead', function(itemId, mention) {
+      collection.patch(itemId, { unread: false, mentioned: mention });
+    });
+
+    store.on('change:status', function(itemId, mention) {
+      collection.patch(itemId, { unread: true,  mentioned: mention });
+    });
+
+    store.on('add', function(itemId, mention) {
+      collection.patch(itemId, { unread: true, mentioned: mention });
+    });
+  }
+
 
   var _unreadItemStore;
 
@@ -583,10 +458,16 @@ module.exports = (function() {
     // figuring out if we're on a not-logged-in page
     if(context.troupe().id) {
       _unreadItemStore = new UnreadItemStore();
+
+      // Bridge events to appEvents
+      _unreadItemStore.on('newcountvalue', function(count) {
+        appEvents.trigger('unreadItemsCount', count);
+      });
+
       new ReadItemSender(_unreadItemStore);
       var realtimeSync = new TroupeUnreadItemRealtimeSync(_unreadItemStore);
       realtimeSync._subscribe();
-      new ReadItemRemover(realtimeSync);
+      // new ReadItemRemover(realtimeSync);
 
       return _unreadItemStore;
     }
@@ -609,7 +490,10 @@ module.exports = (function() {
   var acrossTheFoldModel = new Backbone.Model({
     defaults: {
       unreadAbove: 0,
-      unreadBelow: 0
+      unreadBelow: 0,
+      hasUnreadBelow: false,
+      hasUnreadAbove: false,
+      belowItemId: null
     }
   });
 
@@ -618,49 +502,31 @@ module.exports = (function() {
       return acrossTheFoldModel;
     },
 
-    hasItemBeenMarkedAsRead: function(itemType, itemId) {
-      var unreadItemStore = getUnreadItemStoreReq();
-
-      if(!unreadItemStore) {
-        return false;
-      }
-
-      return unreadItemStore._hasItemBeenMarkedAsRead(itemType, itemId);
-    },
-
     markAllRead: function() {
       var unreadItemStore = getUnreadItemStoreReq();
-      unreadItemStore.markAllRead();
+
+      onceUserIdSet(function() {
+        apiClient.userRoom.delete("/unreadItems/all")
+          .then(function() {
+            unreadItemStore.markAllReadNotification();
+          });
+      });
     },
 
     syncCollections: function(collections) {
       var unreadItemStore = getUnreadItemStoreReq();
+      new CollectionSync(unreadItemStore, collections.chat);
 
-      unreadItemStore.on('unreadItemRemoved', function(itemType, itemId) {
-        var collection = collections[itemType];
-        if(!collection) return;
-
-
-        var v = { unread: false, mentioned: false };
-        collection.patch(itemId, v);
-      });
     },
 
-    monitorViewForUnreadItems: function($el) {
+    monitorViewForUnreadItems: function($el, collectionView) {
       var unreadItemStore = getUnreadItemStoreReq();
-      return new TroupeUnreadItemsViewportMonitor($el, unreadItemStore);
-    },
-
-    getFirstUnreadItem: function() {
-      var unreadItemStore = getUnreadItemStoreReq();
-      return unreadItemStore.getFirstItemOfType('chat');
+      return new TroupeUnreadItemsViewportMonitor($el, unreadItemStore, collectionView);
     }
   };
 
   // Mainly useful for testing
   unreadItemsClient.getStore = function() { return _unreadItemStore; };
-  unreadItemsClient.DoubleHash = DoubleHash;
-  unreadItemsClient.Tarpit = Tarpit;
   unreadItemsClient.UnreadItemStore = UnreadItemStore;
 
 

@@ -5,7 +5,7 @@ module.exports = (function() {
 
 
   function getContainer(self) {
-    if(self.$itemViewContainer) return self.$itemViewContainer;
+    if(self.$childViewContainer) return self.$childViewContainer;
     return self.$el;
   }
 
@@ -81,9 +81,9 @@ module.exports = (function() {
         e.stopPropagation();
       }
     },
-    onAfterItemAdded: function(itemView) {
-      if(this.selectedModel && itemView.model.id && itemView.model.id == this.selectedModel.id) {
-        itemView.$el.addClass('selected');
+    onAddChild: function(childView) {
+      if(this.selectedModel && childView.model.id && childView.model.id == this.selectedModel.id) {
+        childView.$el.addClass('selected');
       }
     },
     setSelected: function(model) {
@@ -103,7 +103,7 @@ module.exports = (function() {
         var selectedView = this.children.findByModel(model);
         selectedView.$el.addClass('selected');
       }
-      this.trigger('selected', model);
+      this.triggerMethod('selected', model);
     },
     getActive: function() {
       var $c = getContainer(this);
@@ -161,4 +161,3 @@ module.exports = (function() {
 
 
 })();
-

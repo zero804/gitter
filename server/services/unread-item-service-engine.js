@@ -386,18 +386,39 @@ function getUserUnreadCountsForRooms(userId, troupeIds) {
     });
 }
 
+function getUserMentions(userId) {
+  return redisClient_smembers("m:" + userId)
+    .then(function(troupeIds) {
+      return getUserMentionsForRooms(userId, troupeIds);
+    });
+}
+
 function getUserMentionCounts(userId) {
   return redisClient_smembers("m:" + userId)
     .then(function(troupeIds) {
-      return getUserMentionCountsForRooms(userId, troupeIds);
+      return getUserMentionsForRooms(userId, troupeIds, {onlyCounts: true});
     });
 }
 
 function getUserMentionCountsForRooms(userId, troupeIds) {
+  return getUserMentionsForRooms(userId, troupeIds, {onlyCounts: true});
+}
+
+function getUserMentionsForRoom(userId, troupeId) {
+  return getUserMentionsForRooms(userId, [troupeId])
+  .then(function(results) {
+    return results[troupeId] || [];
+  });
+}
+
+
+function getUserMentionsForRooms(userId, troupeIds, options) {
+  options = options || {};
   var multi = redisClient.multi();
 
   troupeIds.forEach(function(troupeId) {
-    multi.scard("m:" + userId + ":" + troupeId);
+    var key = "m:" + userId + ":" + troupeId;
+    if (options.onlyCounts) { multi.scard(key); } else { multi.smembers(key); }
   });
 
   var d = Q.defer();
@@ -425,6 +446,10 @@ function getUnreadItems(userId, troupeId) {
       // Mask error
       return [];
     });
+}
+
+function getMentions(userId, troupeId) {
+  return redisClient_smembers("m:" + userId + ":" + troupeId);
 }
 
 /**
@@ -541,10 +566,15 @@ engine.listTroupeUsersForEmailNotifications = listTroupeUsersForEmailNotificatio
 engine.getUserUnreadCounts = getUserUnreadCounts;
 engine.getUserUnreadCountsForRooms = getUserUnreadCountsForRooms;
 
+engine.getUserMentions = getUserMentions;
 engine.getUserMentionCounts = getUserMentionCounts;
 engine.getUserMentionCountsForRooms = getUserMentionCountsForRooms;
+engine.getUserMentionsForRooms = getUserMentionsForRooms;
+engine.getUserMentionsForRoom = getUserMentionsForRoom;
+
 
 engine.getUnreadItems = getUnreadItems;
+engine.getMentions = getMentions;
 engine.getUnreadItemsForUserTroupes = getUnreadItemsForUserTroupes;
 
 engine.getAllUnreadItemCounts = getAllUnreadItemCounts;

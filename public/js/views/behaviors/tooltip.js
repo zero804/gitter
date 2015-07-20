@@ -1,16 +1,17 @@
 "use strict";
 // var $ = require('jquery');
 // var _ = require('underscore');
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var behaviourLookup = require('./lookup');
 var matchesSelector = require('utils/matches-selector');
 var RAF = require('utils/raf');
+var isCompact = require('utils/detect-compact');
 
 require('bootstrap_tooltip');
 
 var Behavior = Marionette.Behavior.extend({
   onRender: function() {
-    if (window._troupeCompactView) return;
+    if (isCompact()) return;
     if (!this.tooltips) this.tooltips = {};
     if (!this.handlers) this.handlers = {};
 
@@ -66,13 +67,21 @@ var Behavior = Marionette.Behavior.extend({
       if (!matchesSelector(el, ':hover')) return;
 
       // Force a mouseover event to wake up the tooltip
-      var evt = new MouseEvent("mouseover");
+      var evt;
+      try {
+        evt = new MouseEvent("mouseover");
+      } catch(e) {
+        /* Internet Explorer, good times */
+        evt =  document.createEvent('MouseEvents');
+        evt.initMouseEvent("mouseover", true, true, window, 0, 0, 0, 80, 20, false, false, false, false, 0, null);
+      }
       el.dispatchEvent(evt);
+
     });
 
   },
 
-  onClose: function() {
+  onDestroy: function() {
     var handlers = this.handlers;
     delete this.handlers;
 

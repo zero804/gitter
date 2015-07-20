@@ -4,25 +4,26 @@ var _ = require('underscore');
 var context = require('utils/context');
 var chatModels = require('collections/chat');
 var AvatarView = require('views/widgets/avatar');
-var Marionette = require('marionette');
-var TroupeViews = require('views/base');
+var Marionette = require('backbone.marionette');
 var moment = require('moment');
 var uiVars = require('views/app/uiVars');
 var Popover = require('views/popover');
 var chatItemTemplate = require('./tmpl/chatItemView.hbs');
 var statusItemTemplate = require('./tmpl/statusItemView.hbs');
-var chatInputView = require('views/chat/chatInputView');
+var actionsTemplate = require('./tmpl/actionsView.hbs');
+var ChatInputBoxView = require('views/chat/chat-input-box-view');
 var appEvents = require('utils/appevents');
 var cocktail = require('cocktail');
 var chatCollapse = require('utils/collapsed-item-client');
 var KeyboardEventMixins = require('views/keyboard-events-mixin');
-var apiClient = require('components/apiClient');
+var LoadingCollectionMixin = require('views/loading-mixin');
+var FastAttachMixin = require('views/fast-attach-mixin');
+
 var RAF = require('utils/raf');
+var toggle = require('utils/toggle');
 require('views/behaviors/unread-items');
 require('views/behaviors/widgets');
-require('views/behaviors/sync-status');
 require('views/behaviors/highlight');
-require('views/behaviors/tooltip');
 
 module.exports = (function() {
 
@@ -33,10 +34,6 @@ module.exports = (function() {
   /* @const */
   var EDIT_WINDOW = 1000 * 60 * 10; // 10 minutes
 
-  var msToMinutes = function (ms) {
-    return ms / (60 * 1000);
-  };
-
   var mouseEvents = {
     'click .js-chat-item-edit':       'toggleEdit',
     'click .js-chat-item-collapse':   'toggleCollapse',
@@ -46,7 +43,8 @@ module.exports = (function() {
     'mouseover .js-chat-item-readby': 'showReadByIntent',
     'click .webhook':                 'expandActivity',
     'click':                          'onClick',
-    'dblclick':                       'onDblClick'
+    'dblclick':                       'onDblClick',
+    'click .js-chat-item-actions':    'showActions'
   };
 
   var touchEvents = {
@@ -58,23 +56,21 @@ module.exports = (function() {
     attributes: {
       class: 'chat-item'
     },
-
     ui: {
+      actions: '.js-chat-item-actions',
       collapse: '.js-chat-item-collapse',
       text: '.js-chat-item-text'
     },
 
     behaviors: {
       Widgets: {},
-      Tooltip: {
-        '.js-chat-item-edit': { titleFn: 'getEditTooltip' },
-        '.js-chat-item-collapse': { titleFn: 'getCollapseTooltip' }
-      },
-      UnreadItems: {
-        unreadItemType: 'chat',
-      },
-      SyncStatus: {},
+      UnreadItems: { },
       Highlight: {}
+    },
+
+    modelEvents: {
+      'syncStatusChange': 'onSyncStatusChange',
+      'change': 'onChange'
     },
 
     isEditing: false,
@@ -93,45 +89,24 @@ module.exports = (function() {
     initialize: function(options) {
       this.rollers = options.rollers;
 
-      this.listenToOnce(this.model, 'change:unread', function() {
-        if (!this.model.get('unread')) {
-          this.$el.removeClass('unread');
-        }
-      });
-
       this._oneToOne = context.inOneToOneTroupeContext();
       this.isPermalinkable = !this._oneToOne;
 
       this.userCollection = options.userCollection;
 
-      this.decorators = options.decorators;
+      this.decorated = false;
 
-      this.listenTo(this.model, 'change', this.onChange);
-
-      var timeChange = this.timeChange.bind(this);
       if (this.isInEditablePeriod()) {
         // update once the message is not editable
         var sent = this.model.get('sent');
         var notEditableInMS = sent ? sent.valueOf() - Date.now() + EDIT_WINDOW : EDIT_WINDOW;
-        this.timeChangeTimeout = setTimeout(timeChange, notEditableInMS + 50);
+        this.timeChangeTimeout = setTimeout(this.timeChange.bind(this), notEditableInMS + 50);
       }
 
-      this.listenToOnce(this, 'messageInViewport', function() {
-        _.each(this.decorators, function(decorator) {
-          decorator.decorate(this);
-        }.bind(this));
-        this.markAsRead();
-      }.bind(this));
+      this.listenToOnce(this, 'messageInViewport', this.decorate);
     },
 
-    markAsRead: function() {
-      if (this.model.get('unread')) {
-        apiClient.userRoom.post('/unreadItems', {chat: [this.model.get('id')]});
-      }
-    },
-
-    /** XXX TODO NB: change this to onClose once we've moved to Marionette 2!!!! */
-    onClose: function() {
+    onDestroy: function() {
       clearTimeout(this.timeChangeTimeout);
     },
 
@@ -171,12 +146,6 @@ module.exports = (function() {
     },
 
     onChange: function() {
-      var changed = this.model.changed;
-
-      if ('html' in changed) {
-        this.renderText();
-      }
-
       this.updateRender(this.model.changed);
     },
 
@@ -209,65 +178,97 @@ module.exports = (function() {
       // This needs to be fast. innerHTML is much faster than .html()
       // by an order of magnitude
       this.ui.text[0].innerHTML = html;
+
+      /* If the content has already been decorated, re-perform the decoration */
+      if (this.decorated) {
+        this.decorate();
+      }
+    },
+
+    decorate: function() {
+      this.decorated = true;
+      this.options.decorators.forEach(function(decorator) {
+        decorator.decorate(this);
+      }, this);
     },
 
     onRender: function () {
-      this.renderText();
       this.updateRender();
       this.timeChange();
     },
 
-
     timeChange: function() {
+      var canEdit = this.canEdit();
       this.$el.toggleClass('isEditable', this.isInEditablePeriod());
-      this.$el.toggleClass('canEdit', this.canEdit());
-      this.$el.toggleClass('cantEdit', !this.canEdit());
+      this.$el.toggleClass('canEdit', canEdit);
+      // this.$el.toggleClass('cantEdit', !canEdit);
     },
 
     updateRender: function(changes) {
+      /* NB: `unread` updates occur in the behaviour */
+      var model = this.model;
+      var $el = this.$el;
+      var classList = this.el.classList;
+
+
+      function toggleClass(className, state) {
+        if(state) {
+          classList.add(className);
+        } else {
+          classList.remove(className);
+        }
+      }
+
+      if (!changes || 'html' in changes || 'text' in changes) {
+        this.renderText();
+      }
+
+      if(!changes || 'mentioned' in changes) {
+        toggleClass('mentioned', model.get('mentioned'));
+      }
+
       if(!changes || 'fromUser' in changes) {
-        this.$el.toggleClass('isViewers', this.isOwnMessage());
+        toggleClass('isViewers', this.isOwnMessage());
       }
 
       if(!changes || 'editedAt' in changes) {
-        this.$el.toggleClass('hasBeenEdited', this.hasBeenEdited());
+        toggleClass('hasBeenEdited', this.hasBeenEdited());
       }
 
       if(!changes || 'burstStart' in changes) {
-        this.$el.toggleClass('burstStart', this.model.get('burstStart'));
-        this.$el.toggleClass('burstContinued', !this.model.get('burstStart'));
+        toggleClass('burstStart', !!model.get('burstStart'));
+        toggleClass('burstContinued', !model.get('burstStart'));
       }
 
       if (!changes || 'burstFinal' in changes) {
-        this.$el.toggleClass('burstFinal', this.model.get('burstFinal'));
+        toggleClass('burstFinal', !!model.get('burstFinal'));
       }
 
       /* Don't run on the initial (changed=undefined) as its done in the template */
+      // FIXME this is whole thing is pretty ugly, could do with a refactor
+      // First iteration: we're not appending the read icon here, just adding a class to display it
       if (changes && 'readBy' in changes) {
-        var readByCount = this.model.get('readBy');
-        var oldValue = this.model.previous('readBy');
-
-        var readByLabel = this.$el.find('.js-chat-item-readby');
+        var readByCount = model.get('readBy');
+        var oldValue = model.previous('readBy');
+        var readByLabel = $el.find('.js-chat-item-readby');
+        var className = "chat-item__icon--read-by-some";
 
         if(readByLabel.length === 0) {
           if(readByCount) {
-           readByLabel = $(document.createElement('div')).addClass('chat-item__icon--read js-chat-item-readby');
-           readByLabel.insertBefore(this.$el.find('.js-chat-item-edit'));
-
-           RAF(function() {
-             readByLabel.addClass('readBySome');
-           });
+            RAF(function() {
+              readByLabel.addClass(className);
+            });
           }
         } else {
           if((oldValue === 0) !== (readByCount === 0)) {
             // Things have changed
-            readByLabel.toggleClass('readBySome', !!readByCount);
+            readByLabel.toggleClass(className, !!readByCount);
           }
         }
       }
 
       if(changes && 'collapsed' in changes) {
-        var collapsed = this.model.get('collapsed');
+        var collapsed = model.get('collapsed');
         if(collapsed) {
           this.collapseEmbeds();
         } else {
@@ -277,61 +278,10 @@ module.exports = (function() {
       }
 
       if(!changes || 'isCollapsible' in changes) {
-        var isCollapsible = this.model.get('isCollapsible');
-        var $collapse = this.$el.find('.js-chat-item-collapse');
-        if(isCollapsible) {
-          if ($collapse.length) return;
-
-          var collapseElement = $(document.createElement('div'));
-          var icon = $(document.createElement('i'));
-          icon.addClass('octicon');
-
-          collapseElement.append(icon);
-          collapseElement.addClass('js-chat-item-collapse');
-
-          if(this.model.get('collapsed')) {
-            icon.addClass('octicon-unfold');
-            collapseElement.addClass('chat-item__icon--expand');
-          } else {
-            collapseElement.addClass('chat-item__icon--collapse');
-            icon.addClass('octicon-fold');
-          }
-
-          this.$el.find('.js-chat-item-details').append(collapseElement);
-        } else {
-          $collapse.remove();
-        }
+        var isCollapsible = !!model.get('isCollapsible');
+        var $collapse = this.ui.collapse;
+        toggle($collapse[0], isCollapsible);
       }
-    },
-
-    getEditTooltip: function() {
-      if (this.isEmbedded()) return "You can't edit on embedded chats.";
-
-      if(this.hasBeenEdited()) {
-        return "Edited shortly after being sent";
-      }
-
-      if(this.canEdit()) {
-        return "Edit within " + msToMinutes(EDIT_WINDOW) + " minutes of sending";
-      }
-
-      if(this.isOwnMessage()) {
-        return "It's too late to edit this message.";
-      }
-
-      return  "You can't edit someone else's message";
-    },
-
-    getCollapseTooltip: function() {
-      if (this.model.get('collapsed')) {
-        return  "Show media.";
-      }
-      return "Hide media.";
-    },
-
-    getCollapsedTooltip: function() {
-      // also for expanded
-      return  "Displaying message, click here to collapse.";
     },
 
     focusInput: function() {
@@ -368,7 +318,7 @@ module.exports = (function() {
     },
 
     canEdit: function() {
-      return this.isOwnMessage() && this.isInEditablePeriod() && !this.isEmbedded();
+      return this.model.id && this.isOwnMessage() && this.isInEditablePeriod() && !this.isEmbedded();
     },
 
     hasBeenEdited: function() {
@@ -377,6 +327,10 @@ module.exports = (function() {
 
     hasBeenRead: function() {
       return !!this.model.get('readBy');
+    },
+
+    onToggleEdit: function() {
+      this.toggleEdit();
     },
 
     toggleEdit: function() {
@@ -413,6 +367,10 @@ module.exports = (function() {
       this.model.set('collapsed', !collapsed);
     },
 
+    onToggleCollapse: function() {
+      this.toggleCollapse();
+    },
+
     // deals with collapsing images and embeds
     toggleCollapse: function () {
       var collapsed = this.model.get('collapsed');
@@ -420,7 +378,7 @@ module.exports = (function() {
     },
 
     collapseEmbeds: function() {
-      this.bindUIElements();
+      // this.bindUIElements();
       var self = this;
       var embeds = self.$el.find('.embed');
       var icon = this.ui.collapse.find('i');
@@ -449,7 +407,7 @@ module.exports = (function() {
     },
 
     expandEmbeds: function() {
-      this.bindUIElements();
+      // this.bindUIElements();
       var self = this;
       clearTimeout(self.embedTimeout);
       var icon = this.ui.collapse.find('i');
@@ -531,7 +489,7 @@ module.exports = (function() {
         textarea.val("").val(unsafeText);
       });
 
-      this.inputBox = new chatInputView.ChatInputBoxView({ el: textarea, editMode: true });
+      this.inputBox = new ChatInputBoxView({ el: textarea, editMode: true });
       this.listenTo(this.inputBox, 'save', this.saveChat);
     },
 
@@ -550,7 +508,7 @@ module.exports = (function() {
       var popover = new ReadByPopover({
         model: this.model,
         userCollection: this.userCollection,
-        scroller: this.$el.parents('.primary-scroll'),
+        scroller: this.$el.parents('.primary-scroll'), // TODO: make nice
         placement: 'vertical',
         minHeight: '88px',
         width: '300px',
@@ -562,9 +520,34 @@ module.exports = (function() {
       ReadByPopover.singleton(this, popover);
     },
 
+    showActions: function(e) {
+      e.preventDefault();
+      if(this.popover) return;
+      e.preventDefault();
+
+      var actions = new ActionsPopover({
+        model: this.model,
+        chatItemView: this,
+        targetElement: e.target,
+        placement: 'horizontal',
+        width: '100px'
+      });
+
+      this.listenTo(actions, 'render', function() {
+        this.ui.actions.addClass('selected');
+      }.bind(this));
+
+      this.listenTo(actions, 'destroy', function() {
+        this.ui.actions.removeClass('selected');
+      }.bind(this));
+
+      actions.show();
+      ReadByPopover.singleton(this, actions);
+    },
+
     mentionUser: function () {
-      var mention = "@" + this.model.get('fromUser').username + " ";
-      appEvents.trigger('input.append', mention);
+     var mention = "@" + this.model.get('fromUser').username + " ";
+     appEvents.trigger('input.append', mention);
     },
 
     permalink: function(e) {
@@ -604,25 +587,34 @@ module.exports = (function() {
       self.dblClickTimer = setTimeout(function () {
         self.dblClickTimer = null;
       }, 200);
-    }
+    },
+
+    onSyncStatusChange: function(newState) {
+      this.$el
+        .toggleClass('synced', newState == 'synced')
+        .toggleClass('syncing', newState == 'syncing')
+        .toggleClass('syncerror', newState == 'syncerror');
+    },
+
+    attachElContent: FastAttachMixin.attachElContent
 
   });
 
   cocktail.mixin(ChatItemView, KeyboardEventMixins);
 
   var ReadByView = Marionette.CollectionView.extend({
-    itemView: AvatarView,
+    childView: AvatarView,
     className: 'popoverReadBy',
     initialize: function(options) {
       var c = new chatModels.ReadByCollection(null, { listen: true, chatMessageId: this.model.id, userCollection: options.userCollection });
       c.loading = true;
       this.collection = c;
     },
-    onClose: function(){
+    onDestroy: function(){
       this.collection.unlisten();
     }
   });
-  cocktail.mixin(ReadByView, TroupeViews.LoadingCollectionMixin);
+  cocktail.mixin(ReadByView, LoadingCollectionMixin);
 
   var ReadByPopover = Popover.extend({
     initialize: function(options) {
@@ -631,10 +623,79 @@ module.exports = (function() {
     }
   });
 
+  var ActionsView = Marionette.ItemView.extend({
+    template: actionsTemplate,
+    initialize: function(options) {
+      this.chatItemView = options.chatItemView;
+    },
+    events: {
+      'click .js-chat-action-collapse': 'toggleCollapse',
+      'click .js-chat-action-expand': 'toggleCollapse',
+      'click .js-chat-action-edit': 'edit',
+      'click .js-chat-action-reply': 'reply',
+      'click .js-chat-action-quote': 'quote',
+      'click .js-chat-action-delete': 'delete'
+    },
+    toggleCollapse: function() {
+      this.chatItemView.triggerMethod('toggleCollapse');
+    },
+    edit: function() {
+      this.chatItemView.triggerMethod('toggleEdit');
+    },
+    reply: function() {
+      var mention = "@" + this.model.get('fromUser').username + " ";
+      appEvents.trigger('input.append', mention);
+    },
+    quote: function() {
+      appEvents.trigger('input.append', "> " + this.model.get('text'), { newLine: true });
+    },
+    delete: function() {
+      this.model.set('text', '');
+      this.model.save();
+    },
+    serializeData: function() {
+      var deleted = !this.model.get('text');
+      var data = {actions: [
+        {name: 'reply', description: 'Reply'}
+      ]};
+
+      if (!deleted) data.actions.push({name: 'quote', description: 'Quote'});
+
+      // FIXME Can't really use a triggerMethod here, maybe move the logic of canEdit() to this view?
+      if (!deleted && this.chatItemView.canEdit()) {
+        data.actions.push({name: 'edit', description: 'Edit'});
+        data.actions.push({name: 'delete', description: 'Delete'});
+      } else {
+        data.actions.push({name: 'edit', description: 'Edit', disabled: true});
+        data.actions.push({name: 'delete', description: 'Delete', disabled: true});
+      }
+
+
+      if (!deleted && this.model.get('isCollapsible')) {
+        var action = this.model.get('collapsed') ? {name: 'expand', description: 'Expand'} : {name: 'collapse', description: 'Collapse'};
+        data.actions.push(action);
+      }
+
+      return data;
+    }
+  });
+
+  var ActionsPopover = Popover.extend({
+    initialize: function(options) {
+      Popover.prototype.initialize.apply(this, arguments);
+      this.view = new ActionsView({ model: this.model, chatItemView: options.chatItemView });
+    },
+    events: {
+      'click': 'hide'
+    }
+  });
+
   return {
     ChatItemView: ChatItemView,
     ReadByView: ReadByView,
-    ReadByPopover: ReadByPopover
+    ReadByPopover: ReadByPopover,
+    ActionsView: ActionsView,
+    ActionsPopover: ActionsPopover
   };
 
 

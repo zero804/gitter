@@ -1,5 +1,5 @@
 "use strict";
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var behaviourLookup = require('./lookup');
 var NeverEndingStory = require('utils/never-ending-story');
 
@@ -10,21 +10,21 @@ module.exports = (function() {
     defaults: {
       reverseScrolling: false,
       scrollElementSelector: null,
-      contentWrapper: null
+      contentWrapperSelector: null
     },
     initialize: function() {
-      var scrollElementSelector = this.options.scrollElementSelector;
-      var reverseScrolling = this.options.reverseScrolling;
+      var scrollElement = this.options.scrollElement ||
+                          document.querySelector(this.options.scrollElementSelector) ||
+                          this.view.el;
 
-      var scrollElement = scrollElementSelector ? document.querySelector(scrollElementSelector) : this.view.el;
-      var contentWrapperEl;
-      if(this.options.contentWrapper) {
-        contentWrapperEl = scrollElement.querySelector(this.options.contentWrapper);
-      }
+      var contentWrapper = this.options.contentWrapper ||
+                           document.querySelector(this.options.contentWrapperSelector);
+
+      var reverseScrolling = this.options.reverseScrolling;
 
       var scroll = new NeverEndingStory(scrollElement, {
         reverse: reverseScrolling,
-        contentWrapper: contentWrapperEl
+        contentWrapper: contentWrapper
       });
 
       this.listenTo(scroll, 'approaching.top', function() {
@@ -41,9 +41,10 @@ module.exports = (function() {
       });
 
       this.scroll = scroll;
+      this.view.scroll = scroll;
     },
 
-    onClose: function() {
+    onDestroy: function() {
       this.scroll.disable();
     }
   });
@@ -53,4 +54,3 @@ module.exports = (function() {
   return Behavior;
 
 })();
-

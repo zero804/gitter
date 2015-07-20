@@ -5,7 +5,6 @@ var assert = require('assert');
 var Q = require('q');
 var testGenerator = require('../../test-generator');
 var mockito = require('jsmockito').JsMockito;
-var StatusError = require('statuserror');
 
 var ORG = 'ORG';
 var URI = 'ORG/REPO';
@@ -244,7 +243,9 @@ describe('repo-permissions', function() {
       USERNAME = 'gitterbob';
 
       permissionsModel = testRequire.withProxies("./services/permissions/repo-permissions-model", {
-        '../github/github-repo-service': createMockGitHubRepoService(getRepoMethodMock),
+        'gitter-web-github': {
+          GitHubRepoService: createMockGitHubRepoService(getRepoMethodMock),
+        },
         '../user-in-room': userIsInRoomMock
       });
 

@@ -1,7 +1,7 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var suggestedService = require('../services/suggested-room-service');
+var exploreService = require('../services/explore-service');
 var getRoughMessageCount = require('../services/chat-service').getRoughMessageCount;
 var Q = require('q');
 var langs = require('langs');
@@ -48,6 +48,12 @@ function getSearchName(tags) {
 module.exports = {
   install: function (app) {
 
+    app.get('/home/~explore/(tags)?', function (req, res) {
+      var search = req.query.search;
+      var tags = (search) ? search.split(/[ ,]+/).map(trim).sort().join(',') : DEFAULT_TAGS.join(',');
+      res.redirect('/explore/tags/' + tags);
+    });
+
     // route to handle search only
     app.get('/explore/(tags)?', function (req, res) {
       var search = req.query.search;
@@ -57,7 +63,7 @@ module.exports = {
 
     app.get('/explore/tags/:tags', function (req, res, next) {
       var tags = req.params.tags.split(',');
-      suggestedService.fetchByTags(tags)
+      exploreService.fetchByTags(tags)
         .then(processTagResult)
         .then(function (rooms) {
           var searchNames = getSearchName(tags);

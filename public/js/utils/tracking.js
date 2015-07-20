@@ -3,6 +3,9 @@
 
 var context = require('utils/context');
 var appEvents = require('utils/appevents');
+var splitTests = require('gitter-web-split-tests');
+var _ = require('underscore');
+
 require('./mixpanel');
 
 module.exports = (function() {
@@ -59,17 +62,16 @@ module.exports = (function() {
       if (context.getUserId())
         window.mixpanel.register({ userStatus: 'ACTIVE'});
 
-      var username = context().user && context().user.username;
-      var isUserHome = (username) ? '/' + username === routeName : false; // if we have an username then check if it matches the routeName
+      var isUserHome = '/home' === routeName;
       var authenticated = !!context.getUserId();
       var userAgent = window.navigator.userAgent;
 
-      window.mixpanel.track('pageView', {
+      window.mixpanel.track('pageView', _.extend({
         pageName: routeName,
         authenticated: authenticated,
         isUserHome: isUserHome,
         userAgent: userAgent
-      });
+      }, splitTests.listVariants()));
     }
 
     var gs = window._gs;

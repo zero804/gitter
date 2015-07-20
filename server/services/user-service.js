@@ -7,7 +7,7 @@ var assert                    = require('assert');
 var persistence               = require("./persistence-service");
 var uriLookupService          = require('./uri-lookup-service');
 var Q                         = require('q');
-var githubUserService         = require('./github/github-user-service');
+var githubUserService         = require('gitter-web-github').GitHubUserService;
 var mongooseUtils             = require('../utils/mongoose-utils');
 var extractGravatarVersion    = require('../utils/extract-gravatar-version');
 
@@ -49,7 +49,7 @@ function newUser(options) {
   return mongooseUtils.upsert(persistence.User, { githubId: githubId }, {
       $setOnInsert: insertFields
     })
-    .spread(function(user/*, numAffected, raw*/) {
+    .spread(function(user/*, updateExisting*/) {
       //if(raw.updatedExisting) return user;
 
       // New record was inserted
@@ -229,6 +229,29 @@ var userService = {
       .nodeify(callback);
   },
 
+  findIdsBySearchTerm: function(searchTerm, limit) {
+    if(!searchTerm || !searchTerm.length) {
+      return Q.resolve([]);
+    }
+
+    var searchPattern = '^' + sanitiseUserSearchTerm(searchTerm);
+    return persistence.User.find({
+        $or: [
+          { username: { $regex: searchPattern, $options: 'i' } },
+          { displayName: { $regex: searchPattern, $options: 'i' } }
+        ]
+      })
+      .select({ _id: 1 })
+      .limit(limit)
+      .lean()
+      .execQ()
+      .then(function(users) {
+        return users.map(function(user) {
+          return user._id;
+        });
+      });
+  },
+
   findByUsernames: function(usernames, callback) {
     if(!usernames || !usernames.length) return Q.resolve([]).nodeify(callback);
 
@@ -265,6 +288,27 @@ var userService = {
 
   destroyTokensForUserId: function(userId) {
     return persistence.User.updateQ({ _id: userId }, { $set: { githubToken: null, githubScopes: { }, githubUserToken: null } });
+  },
+
+  /* Update the timezone information for a user */
+  updateTzInfo: function(userId, timezoneInfo) {
+    var update = {};
+
+    function setUnset(key, value) {
+      if (value) {
+        if (!update.$set) update.$set = {};
+        update.$set['tz.' + key] = value;
+      } else {
+        if (!update.$unset) update.$unset = {};
+        update.$unset['tz.' + key] = true;
+      }
+    }
+
+    setUnset('offset', timezoneInfo.offset);
+    setUnset('abbr', timezoneInfo.abbr);
+    setUnset('iana', timezoneInfo.iana);
+
+    return persistence.User.updateQ({ _id: userId }, update);
   }
 
 };
