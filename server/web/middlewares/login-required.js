@@ -23,4 +23,3 @@ module.exports = function(req, res) {
   logger.verbose("User is not logged in, redirecting to login page");
   return res.relativeRedirect("/login");
 };
-
