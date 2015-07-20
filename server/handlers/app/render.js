@@ -165,6 +165,7 @@ function fixBadLinksOnId(value) {
 }
 
 function renderMainFrame(req, res, next, frame) {
+  splitTests.configure(req, res, 'userhome');
   var variant = splitTests.configure(req, res, 'nli');
 
   var user = req.user;
