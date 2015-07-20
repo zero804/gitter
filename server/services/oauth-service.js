@@ -1,7 +1,7 @@
 "use strict";
 
 var WEB_INTERNAL_CLIENT_KEY = 'web-internal';
-var env    = require('../utils/env');
+var env    = require('gitter-web-env');
 var nconf  = env.config;
 var logger = env.logger;
 
@@ -153,9 +153,13 @@ exports.findOrGenerateIRCToken = function(userId, callback) {
     .nodeify(callback);
 };
 
+exports.deleteToken = function(token, callback) {
+  return tokenProvider.deleteToken(token)
+    .nodeify(callback);
+};
+
 exports.testOnly = {
   invalidateCache: function() {
     return tokenProvider.testOnly.invalidateCache();
   }
 };
-

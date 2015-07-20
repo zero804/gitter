@@ -2,7 +2,7 @@
 var $ = require('jquery');
 var context = require('utils/context');
 var apiClient = require('components/apiClient');
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var Backbone = require('backbone');
 var autolink = require('autolink');
 var notifications = require('components/notifications');
@@ -14,35 +14,31 @@ module.exports = (function() {
 
 
   function generateTooltip(troupe) {
-
     if (troupe.get('security') === 'PUBLIC') return 'Anyone can join';
 
-    var tooltip;
     switch(troupe.get('githubType')) {
       case 'REPO':
-        tooltip = 'All repo collaborators can join';
-        break;
+        return 'All repo collaborators can join';
+
       case 'ORG':
-        tooltip = 'All org members can join';
-        break;
+        return 'All org members can join';
+
       case 'REPO_CHANNEL':
         var repoName = troupe.get('uri').split('/')[1];
         var repoRealm = troupe.get('security') === 'PRIVATE' ? 'Only invited users' : 'Anyone in ' + repoName;
-        tooltip = repoRealm + ' can join';
-        break;
+        return repoRealm + ' can join';
+
       case 'ORG_CHANNEL':
         var orgName = troupe.get('uri').split('/')[0];
         var orgRealm = troupe.get('security') === 'PRIVATE' ? 'Only invited users' : 'Anyone in ' + orgName;
-        tooltip = orgRealm + ' can join';
-        break;
-      case 'USER_CHANNEL':
-        tooltip = 'Only invited users can join';
-        break;
-      default:
-        tooltip = troupe.get('oneToOne') ? 'This chat is just between you two' : 'Only invited users can join';
-    }
+        return orgRealm + ' can join';
 
-    return tooltip;
+      case 'USER_CHANNEL':
+        return 'Only invited users can join';
+
+      default:
+        return troupe.get('oneToOne') ? 'This chat is just between you two' : 'Only invited users can join';
+    }
   }
 
   return Marionette.ItemView.extend({
@@ -90,8 +86,9 @@ module.exports = (function() {
         this.ui.favourite.css({ visibility: 'hidden' });
       }
 
-      $('.js-chat-name').attr('title', generateTooltip(context.troupe()));
-      $('.js-chat-name').tooltip({placement: 'right'});
+      $('.js-chat-name').tooltip({ placement: 'right', title: function() {
+        return generateTooltip(context.troupe());
+      }});
 
       this.redisplay();
     },
@@ -106,13 +103,14 @@ module.exports = (function() {
         ];
 
         var c = context();
+        var isAdmin = c.permissions && c.permissions.admin;
         var url = this.model.get('url');
 
         menuItems.push({ title: 'Share this chat room', href: '#share' });
         menuItems.push({ divider: true });
         menuItems.push({ title: 'Notifications', href: '#notifications' });
 
-        if(c.permissions && c.permissions.admin) {
+        if(isAdmin) {
           if(c.isNativeDesktopApp) {
             menuItems.push({ title: 'Integrations', href: context.env('basePath') + url + '#integrations', target: '_blank', dataset: { disableRouting: 1 } });
           } else {
@@ -129,6 +127,12 @@ module.exports = (function() {
           menuItems.push({ title: 'Open in GitHub', href: 'https://www.github.com' + url, target: '_blank' });
         }
 
+        menuItems.push({ divider: true });
+
+        if (isAdmin) {
+          menuItems.push({ title: 'Delete this room', href: '#delete' });
+        }
+
         menuItems.push({ title: 'Leave this room', href: '#leave' });
 
         return menuItems;
@@ -139,7 +143,7 @@ module.exports = (function() {
 
       apiClient.room.delete('/users/' + context.getUserId(), { })
         .then(function() {
-          appEvents.trigger('navigation', context.getUser().url, 'home', ''); // TODO: figure out a title
+          appEvents.trigger('navigation', '/home', 'home', ''); // TODO: figure out a title
         });
     },
 
@@ -194,15 +198,14 @@ module.exports = (function() {
       if (this.editingTopic === true) return;
       this.editingTopic = true;
 
-      var topicInputText = this.$el.find('.js-chat-topic');
-      var unsafeText = topicInputText.text();
+      var unsafeText = this.ui.topic.text();
 
       this.oldTopic = unsafeText;
 
       // create inputview
-      topicInputText.html("<textarea class='topic-input'></textarea>");
+      this.ui.topic.html("<textarea class='topic-input'></textarea>");
 
-      var textarea = topicInputText.find('textarea').val(unsafeText);
+      var textarea = this.ui.topic.find('textarea').val(unsafeText);
 
       setTimeout(function() {
         textarea.select();
@@ -218,9 +221,12 @@ module.exports = (function() {
 
     redisplay: function() {
       var model = this.model;
-      //this.ui.name.text(model.get('name'));
-      this.ui.topic.text(model.get('topic'));
-      autolink(this.ui.topic[0]);
+
+      if (this.ui.topic.length) {
+        this.ui.topic.text(model.get('topic'));
+        autolink(this.ui.topic[0]);
+      }
+
       this.ui.favourite.toggleClass('favourite', !!model.get('favourite'));
     },
 
@@ -229,4 +235,3 @@ module.exports = (function() {
 
 
 })();
-

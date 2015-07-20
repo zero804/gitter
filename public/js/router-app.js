@@ -5,15 +5,16 @@ var appEvents = require('utils/appevents');
 var context = require('utils/context');
 var Backbone = require('backbone');
 var _ = require('underscore');
-var AppIntegratedView = require('views/app/appIntegratedView');
+var AppLayout = require('views/layouts/app-layout');
+var LoadingView = require('views/app/loading-view');
 var troupeCollections = require('collections/instances/troupes');
 var TitlebarUpdater = require('components/titlebar');
 var realtime = require('components/realtime');
 var log = require('utils/log');
 var onready = require('./utils/onready');
-var $ = require('jquery');
 var urlParser = require('utils/url-parser');
 var RAF = require('utils/raf');
+var RoomCollectionTracker = require('components/room-collection-tracker');
 
 require('components/statsc');
 require('views/widgets/preload');
@@ -28,27 +29,11 @@ require('components/ping');
 // Preload widgets
 require('views/widgets/avatar');
 
-var loading = function (el) {
-  return {
-    show: function () {
-      el.removeClass('hide');
-    },
-    hide: function () {
-      el.addClass('hide');
-    },
-  };
-};
-
 onready(function () {
-  var loadingScreen = loading($('.loading-frame'));
   var chatIFrame = document.getElementById('content-frame');
   var titlebarUpdater = new TitlebarUpdater();
 
-
-  loadingScreen.show();
-
-  chatIFrame.addEventListener('load', loadingScreen.hide, false);
-  appEvents.on('chatframe:loaded', loadingScreen.hide);
+  new LoadingView(chatIFrame, document.getElementById('loading-frame'));
 
   // Send the hash to the child
   if (window.location.hash) {
@@ -118,20 +103,24 @@ onready(function () {
       document.querySelector('#content-frame').contentWindow.location.replace(iframeUrl + hash);
      });
   }
-
-  var appView = new AppIntegratedView({ });
-
+  
   var allRoomsCollection = troupeCollections.troupes;
+  new RoomCollectionTracker(allRoomsCollection);
+
+  var appLayout = new AppLayout({ template: false, el: 'body' });
+  appLayout.render();
+
   allRoomsCollection.on("remove", function(model) {
     if(model.id == context.getTroupeId()) {
-      var username = context.user().get('username');
-      var newLocation = '/' + username;
-      var newFrame = newLocation + '/~home';
+      var newLocation = '/home';
+      var newFrame = '/home/~home';
+      var title = 'home';
 
-      pushState(newFrame, username, newLocation);
+      pushState(newFrame, title, newLocation);
       updateContent(newFrame);
     }
   });
+
 
   // Called from the OSX native client for faster page loads
   // when clicking on a chat notification
@@ -150,8 +139,6 @@ onready(function () {
       postMessage({ type: 'permalink.navigate', query: urlParser.parseSearch(parsed.search) });
       return;
     }
-
-    loadingScreen.show();
 
     pushState(frameUrl, title, url);
     updateContent(frameUrl);
@@ -249,8 +236,8 @@ onready(function () {
         appEvents.trigger('focus.request.' + message.focus, message.event);
         break;
 
-      case 'chatframe:loaded':
-        appEvents.trigger('chatframe:loaded');
+      case 'childframe:loaded':
+        appEvents.trigger('childframe:loaded');
         break;
 
       case 'permalink.requested':
@@ -317,72 +304,84 @@ onready(function () {
     },
 
     hideModal: function() {
-      appView.dialogRegion.close();
+      appLayout.dialogRegion.destroy();
     },
 
     createroom: function() {
       require.ensure(['views/createRoom/chooseRoomView'], function(require) {
         var chooseRoomView = require('views/createRoom/chooseRoomView');
-        appView.dialogRegion.show(new chooseRoomView.Modal());
+        appLayout.dialogRegion.show(new chooseRoomView.Modal());
       });
     },
 
     createcustomroom: function(name) {
+
       /* Figure out who's the daddy */
+      function getParentRoomUri(cb) {
+        var currentRoomUri = window.location.pathname.split('/').slice(1).join('/');
 
-      function getParentUri(troupe) {
-        if(troupe.get('oneToOne') === true) {
-          return context.user().get('username');
+        if(currentRoomUri === 'home') {
+          // currently in the userhome, not really a room but whatevs
+          return cb(null, 'home');
         }
 
-        if(troupe.get('githubType') === 'REPO' || troupe.get('githubType') === 'ORG') {
-          return troupe.get('uri');
-        }
+        // current room metadata isnt in the app router context
+        getCurrentRoom(function(err, room) {
+          if (err || !room) return cb(null, null);
 
-        return troupe.get('uri').split('/').slice(0, -1).join('/');
+          if (room.get('oneToOne')) {
+            return cb(null, 'home');
+          }
+
+          if (room.get('githubType') === 'REPO' || room.get('githubType') === 'ORG') {
+            return cb(null, room.get('uri'));
+          }
+
+          return cb(null, room.get('uri').split('/').slice(0, -1).join('/'));
+        });
       }
 
-      function showWithOptions(options) {
+      function getCurrentRoom(cb) {
+        var currentRoom = allRoomsCollection.findWhere({ url: window.location.pathname });
+
+        // room collection is in sync, so thats nice
+        if (currentRoom) return cb(null, currentRoom);
+
+        // room collection has not synced yet, lets wait
+        reallyOnce(allRoomsCollection, 'reset sync', function() {
+          currentRoom = allRoomsCollection.findWhere({ url: window.location.pathname });
+          return cb(null, currentRoom);
+        });
+      }
+
+      getParentRoomUri(function(err, parentUri) {
+        if (err) {
+          // ignore, carry on regardless
+        }
+
         require.ensure(['views/createRoom/createRoomView'], function(require) {
           var createRoomView = require('views/createRoom/createRoomView');
-          appView.dialogRegion.show(new createRoomView.Modal(options));
+          var modal = new createRoomView.Modal({
+            initialParent: parentUri,
+            roomName: name
+          });
+
+          appLayout.dialogRegion.show(modal);
         });
-      }
-
-      var uri = window.location.pathname.split('/').slice(1).join('/');
-      if(uri === context.user().get('username')) {
-        showWithOptions({ initialParent: uri, roomName: name });
-      }
-
-      var current = allRoomsCollection.findWhere({ url: '/' + uri });
-      if(!current) {
-        reallyOnce(allRoomsCollection, 'reset sync', function () {
-          current = allRoomsCollection.findWhere({ url: '/' + uri });
-          if(current) {
-            uri = getParentUri(current);
-            showWithOptions({ initialParent: uri, roomName: name });
-          } else {
-            showWithOptions({ roomName: name });
-          }
-        });
-        return;
-      }
-
-      uri = getParentUri(current);
-      showWithOptions({ initialParent: uri, roomName: name });
+      });
     },
 
     createreporoom: function() {
       require.ensure(['views/createRoom/createRepoRoomView'], function(require) {
         var createRepoRoomView = require('views/createRoom/createRepoRoomView');
-        appView.dialogRegion.show(new createRepoRoomView.Modal());
+        appLayout.dialogRegion.show(new createRepoRoomView.Modal());
       });
     },
 
     confirmRoom: function(uri) {
       require.ensure(['views/createRoom/confirmRepoRoomView'], function(require) {
         var confirmRepoRoomView = require('views/createRoom/confirmRepoRoomView');
-        appView.dialogRegion.show(new confirmRepoRoomView.Modal({ uri: uri }));
+        appLayout.dialogRegion.show(new confirmRepoRoomView.Modal({ uri: uri }));
       });
     }
   });
@@ -393,11 +392,10 @@ onready(function () {
   if (context.popEvent('new_user_signup')) {
     require.ensure("scriptjs", function(require) {
       var $script = require("scriptjs");
-      $script("//platform.twitter.com/oct", function() {
+      $script("//platform.twitter.com/oct.js", function() {
         var twitterOct = window.twttr && window.twttr.conversion;
         twitterOct.trackPid('l4t99');
       });
     });
   }
 });
-

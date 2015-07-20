@@ -1,13 +1,12 @@
 "use strict";
 
-var env                  = require('../utils/env');
+var env                  = require('gitter-web-env');
 var stats                = env.stats;
 var config               = env.config;
 var errorReporter        = env.errorReporter;
 
 var ChatMessage          = require("./persistence-service").ChatMessage;
 var collections          = require("../utils/collections");
-var troupeService        = require("./troupe-service");
 var userService          = require("./user-service");
 var processChat          = require('../utils/markdown-processor');
 var Q                    = require('q');
@@ -17,23 +16,13 @@ var StatusError          = require('statuserror');
 var unreadItemService    = require('./unread-item-service');
 var _                    = require('underscore');
 var mongooseUtils        = require('../utils/mongoose-utils');
-var cacheWrapper         = require('../utils/cache-wrapper');
+var cacheWrapper         = require('gitter-web-cache-wrapper');
 var groupResolver        = require('./group-resolver');
 var chatSearchService    = require('./chat-search-service');
 var unreadItemService    = require('./unread-item-service');
 var markdownMajorVersion = require('gitter-markdown-processor').version.split('.')[0];
 
 var useHints = true;
-
-/*
- * Hey Trouper!
- * This is a changelog of sorts for changes to message processing & metadata.
- * Since version 7, processing is done by a seperate (versioned) module.
- * so check github.com/gitterHQ/gitter-markdown-processor to see what changes at every major version
- */
-var VERSION_SWITCH_TO_SERVER_SIDE_RENDERING = 5;
-var VERSION_KATEX = 6;
-var VERSION_EXTERNAL_GITTER_MARKDOWN_PROCESSOR = 7;
 
 var MAX_CHAT_MESSAGE_LENGTH = 4096;
 
@@ -120,6 +109,10 @@ function resolveMentions(troupe, user, parsedMessage) {
  * to chat in the room
  */
 exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
+  
+  // Keep this up here, set sent time asap to ensure order
+  var sentAt = new Date();
+
   return Q.fcall(function() {
     if(!troupe) throw new StatusError(404, 'Unknown room');
 
@@ -137,7 +130,7 @@ exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
     var chatMessage = new ChatMessage({
       fromUserId: user.id,
       toTroupeId: troupe.id,
-      sent:       new Date(),
+      sent:       sentAt,
       text:       data.text,                    // Keep the raw message.
       status:     data.status,                // Checks if it is a status update
       pub:        troupe.security === 'PUBLIC' || undefined, // Public room - useful for sampling
@@ -148,6 +141,10 @@ exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
       issues:     parsedMessage.issues,
       _md:        parsedMessage.markdownProcessingFailed ? -CURRENT_META_DATA_VERSION : CURRENT_META_DATA_VERSION
     });
+
+    // hellban for users
+    // dont write message to db, just fake it for the troll / asshole
+    if (user.hellbanned) return chatMessage;
 
     return chatMessage.saveQ()
       .then(function() {

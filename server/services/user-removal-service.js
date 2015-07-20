@@ -3,41 +3,43 @@
 
 var userService = require('./user-service');
 var troupeService = require('./troupe-service');
-var recentRoomService = require('./recent-room-service');
+var roomService = require('./room-service');
+var roomMembershipService = require('./room-membership-service');
 var Q = require('q');
-var unreadItemService = require('./unread-item-service');
+var debug = require('debug')('gitter:user-removal-service');
 
-
-exports.removeByUsername = function(username) {
-  console.log('USERNAME IS ', username);
+exports.removeByUsername = function(username, options) {
   return userService.findByUsername(username)
     .then(function(user) {
-      console.log('FOUND USER ', username);
+      debug('Remove by username %s', username);
       if(!user) return;
 
       var userId = user.id;
 
-      return troupeService.findAllTroupesForUser(userId)
+      return roomMembershipService.findRoomIdsForUser(userId)
+        .then(function(troupeIds) {
+          return troupeService.findByIds(troupeIds);
+        })
         .then(function(troupes) {
           return Q.all(troupes.map(function(troupe) {
             if (troupe.oneToOne) {
-              return Q.all([recentRoomService.removeRecentRoomForUser(troupe.users[0].userId, troupe.id, true),
-                            recentRoomService.removeRecentRoomForUser(troupe.users[1].userId, troupe.id, true),
-                            troupeService.deleteTroupe(troupe)]);
+              return roomService.deleteRoom(troupe);
             } else {
-              troupe.removeUserById(userId);
-              return troupe.saveQ()
-                .then(function() {
-                  return unreadItemService.markAllChatsRead(userId, troupe.id);
-                });
+              return roomService.removeUserFromRoom(troupe, user, user);
             }
           }));
         })
         .then(function() {
+          if (options && options.deleteUser) {
+            return user.removeQ();
+          }
+
           user.state = 'REMOVED';
           user.email = undefined;
           user.invitedEmail = undefined;
           user.clearTokens();
+
+          // TODO: remove user from intercom etc
 
           return user.saveQ();
         });

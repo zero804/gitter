@@ -1,62 +1,17 @@
 .issue {
-  border: 1px solid fade(@trpGrey,40%);
-  background-color: fade(@trpGrey,20%);
-  border-radius: 2px;
-  padding: 0 4px;
-  white-space: nowrap;
+  border-bottom: 1px dotted;
   cursor: pointer;
+  padding: 0 2px;
+  border-radius: 2px;
 }
 
 .commit {
-  border: 1px solid fade(@trpAsbestos,30%);
-  background-color: fade(@trpAsbestos,20%);
-  border-radius: 2px;
-  padding: 0 4px;
-  white-space: nowrap;
+  border-bottom: 1px dotted;
   cursor: pointer;
-}
-
-.commit-popover-title {
-  height: 20px;
-  position: relative;
-  a {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-  }
-}
-
-.commit-popover-body {
-  float: left;
-  width: 100%;
-
-  ul.file-list {
-    list-style: none;
-    margin-left: 0;
-  }
-  .modified {
-    font-size: small;
-    &:before {
-      color: @trpYellow;
-    }
-  }
-  .added {
-    font-size: small;
-    &:before {
-      color: @trpGreen;
-    }
-  }
-  .removed {
-    font-size: small;
-    &:before {
-      color: @trpRed;
-    }
-  }
+  padding: 0 2px;
+  background-color: lighten(@purple, 50%);
+  border-radius: 2px;
+  color: @purple;
 }
 
 .popover-footer a.open-in-github {
@@ -67,47 +22,27 @@
   }
 }
 
-.commit:hover {
-  text-decoration: none;
-  background-color: fade(@trpAsbestos, 40%);
-}
-
 a.issue:hover {
   text-decoration: none;
 }
 
 .issue.open {
-  border: 1px solid fade(@trpGreen, 20%);
-  background-color: fade(@trpGreen, 20%);
-}
-
-.issue.open:hover {
-  background-color: fade(@trpGreen, 40%);
+  color: @trpGreen;
+  background-color: lighten(@trpGreen, 45%);
 }
 
 .issue.closed {
-  border: 1px solid fade(@trpRed, 20%);
-  background-color: fade(@trpRed, 20%);
-}
-
-.issue.closed:hover {
-  background-color: fade(@trpRed, 40%)
-}
-
-.issue-popover-body {
-  float: left;
-  width: 100%;
+  color: @trpRed;
+  background-color: lighten(@trpRed, 35%);
 }
 
 .trpChatContainer {
-  /* Below commented out as it makes scrollbar vanish on Safari, which is not the best, really*/
-  /*-webkit-transform: translate3d(0, 0, 0); // scrollbar to respect z-index*/
   box-sizing: border-box;
-  text-align: center;
   display: inline-block;
   width: 100%;
   height: 100%;
   overflow: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 code {
@@ -116,7 +51,7 @@ code {
   border-radius: 2px;
   padding: 0 4px;
   overflow-x: auto;
-  word-wrap: normal;
+  word-wrap: break-word;
 }
 
 pre code {
@@ -133,6 +68,11 @@ blockquote {
 
 .popoverReadBy span {
   margin-right: 5px;
+}
+
+.popoverReadBy .avatar {
+  display: inline-block;
+  margin-right: 0.25em;
 }
 
 .missing {

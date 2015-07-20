@@ -1,0 +1,502 @@
+@import "bootstrap/bootstrap.less";
+
+@import "colors.less";
+@import "trpButtons.less";
+@import "trp3Common.less";
+@import "trpModals.less";
+@import "typography.less";
+
+body {
+  margin: 0;
+  height: 100%;
+  background-color: rgb(0, 0, 0);
+}
+
+html {
+ height: 100%;
+}
+
+h1 {
+  margin: 0;
+}
+
+p {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+a {
+  color: @trpGreen;
+}
+
+.trpHomeTopStripContainer {
+  width: 100%;
+  text-align: center;
+  overflow: hidden;
+  display: block;
+  margin-bottom: 0px;
+  padding-bottom: 0px;
+
+}
+
+.logo-container {
+  float: left;
+  background-image: url('../images/logo-text-white-48.png');
+  width: 244px;
+  height: 48px;
+  margin-top: 20px;
+
+  @media @retina {
+    background-image: url('../images/logo-text-white-48@2x.png');
+    background-size: contain;
+  }
+}
+
+.trpHomeTopStrip {
+  margin: 0px auto;
+  text-align: left;
+  padding-top: 40px;
+  padding-bottom: 12px;
+  max-width: 960px;
+  min-width: 960px;
+  height: 96px;
+}
+
+.trpJobSpec {
+  .trpHomeHero;
+}
+
+.trpJobSpec p {
+  padding-bottom: 12px;
+}
+
+.trpHomeLogo {
+  display:inline-block;
+}
+
+.trpHomeMenu {
+  float: right;
+  color: white;
+  display: inline-block;
+  margin-right: 20px;
+}
+
+.trpHomeMenuItem {
+  display: inline-block;
+  padding-right: 26px;
+  padding-left: 26px;
+  font-weight: lighter;
+  color: white;
+  background-color: rgba(255,255,255, 0.2);
+  border-radius: 2px;
+  border: 1px solid white;
+  text-decoration: none;
+}
+
+.trpHomeMenuItem:hover {
+  background-color: rgba(255,255,255, 0.3);
+}
+
+.trpHomeHeroStripContainer {
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  overflow-x: hidden;
+  display: block;
+  margin-bottom: 0px;
+  padding-bottom: 0px;
+  background-image: url('../images/home/banner.jpg');
+  background-size: cover;
+
+  @media @mobile {
+    height: auto;
+  }
+
+}
+
+.trpHomeMacAppHeroStripContainer {
+  background-image: url('../images/home/banner.jpg');
+}
+
+.trpHomeiOSAppHeroStripContainer {
+  background-image: url('../images/home/banner.jpg');
+}
+
+.trpJobsHeroStripContainer {
+  background-image: url('../images/home/banner.jpg');
+}
+
+.trpHomeHero {
+  display: inline-block;
+  padding-top: 20px;
+  text-align: left;
+  min-height: 540px;
+  width: 100%;
+  width: 960px
+}
+
+.trpHeroText {
+  display: inline-block;
+  max-width: 380px;
+  padding-right: 20px;
+  padding-top: 40px;
+  font-size: 32px;
+  color: white;
+  text-align: left;
+  line-height: 1.3em;
+  vertical-align: top;
+  text-shadow: 0 0 0 transparent,1px 1px 2px rgba(0,0,0,0.55);
+
+  &.failure {
+    background-color: @trpRed;
+    max-width: 90%;
+    margin-top: 40px;
+    border-radius: 4px;
+    padding: 20px;
+  }
+
+}
+
+.trpHeroMacAppText {
+  font-size: 36px;
+  max-width: 720px;
+}
+
+
+.trpHeroSignup {
+  font-size: 32px;
+  line-height: 1.3em;
+}
+
+.trpHeroImage {
+  position: absolute;
+  right: 0px;
+  top: 200px;
+  display: inline-block;
+  text-align: right;
+}
+
+.trpHomeMidStripContainer {
+  width: 100%;
+  text-align: center;
+  margin-top: -4px;
+  padding-top: 38px;
+}
+
+.trpMidStrip {
+  font-size: 28px;
+  color: @trpDarkGrey;
+  padding-top: 10px;
+}
+
+.trpFeatures {
+  display: inline-block;
+  padding-top: 8px;
+  width: 100%;
+  text-align: center;
+  min-width: 960px;
+}
+
+.trpFeature {
+  display: inline-block;
+  width: 300px;
+  vertical-align: top;
+  padding: 20px;
+  margin: 20px;
+  height: 200px;
+}
+
+
+.trpFeatureImage {
+  width: 48px;
+  height: 48px;
+  vertical-align: center;
+  border-radius: 50em;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.bgPurple {
+  background-color: @trpPurple;
+}
+
+.bgGreen {
+  background-color: @trpGreen;
+}
+
+.bgCyan {
+  background-color: @trpCyan;
+}
+
+.bgGrey {
+  background-color: @trpGrey;
+}
+
+.bgDarkGrey {
+  background-color: @trpDarkGrey;
+}
+
+.bgYellow {
+  background-color: @trpYellow;
+}
+
+.trpFeatureHead {
+  padding-top: 16px;
+  padding-bottom: 6px;
+  color: @trpDarkGrey;
+}
+
+.trpFeatureBody {
+  font-weight: lighter;
+  color: @trpDarkGrey;
+  line-height: 1.4em;
+}
+
+.trpHomeVideoStripContainer {
+  background-color: white;
+  width: 100%;
+  text-align: center;
+  overflow: hidden;
+  display: block;
+  margin-bottom: 0px;
+  padding-bottom: 0px;
+  background-image: url('../images/home-video-image.jpg');
+  background-size: cover;
+  height: 506px;
+}
+
+.trpHomeVideo {
+  font-size: 30px;
+  color: white;
+  text-align: center;
+  padding-top: 40px;
+}
+
+.trpHomeVideoSubtext {
+  font-size: 16px;
+  padding-top: 40px;
+  font-weight: normal;
+}
+
+.trpHomeAppStripContainer {
+  background-color: @trpPurple;
+  width: 100%;
+  text-align: center;
+  margin-top: -4px;
+  padding-top: 38px;
+}
+
+.trpHomeAppStrip {
+  padding-top: 10px;
+  color: white;
+}
+
+.trpLegalHero {
+  padding-top: 20px;
+  display: inline-block;
+  min-width: 960px;
+}
+
+.trpLegalHeader{
+  float: left;
+  max-width: 600px;
+  padding-right: 20px;
+  padding-top: 40px;
+  font-size: 24px;
+  color: white;
+  text-align: left;
+  line-height: 1.3em;
+}
+
+.trpLegalText p {
+  float: left;
+  max-width: 600px;
+  padding-right: 20px;
+  padding-bottom: 20px;
+  font-size: 16px;
+  color: white;
+  text-align: left;
+  line-height: 1.3em;
+  letter-spacing: 0.1em;
+}
+
+.trpLegalMidStripContainer {
+  background-color: white;
+  width: 100%;
+  text-align: center;
+  overflow: hidden;
+  display: block;
+  margin-bottom: 0px;
+  padding-bottom: 0px;
+  padding-top: 10px;
+}
+
+.trpLegalHero {
+  display: inline-block;
+  min-width: 960px;
+}
+
+.trpLegalBodyHeader{
+  float: left;
+  max-width: 900px;
+  padding-right: 20px;
+  font-size: 24px;
+  color: white;
+  text-align: left;
+  line-height: 1.3em;
+}
+
+.trpLegalBody p {
+  float: left;
+  max-width: 900px;
+  padding-right: 20px;
+  padding-bottom: 20px;
+  font-size: 16px;
+  color: @trpDarkGrey;
+  text-align: left;
+  line-height: 1.3em;
+  letter-spacing: 0.1em;
+}
+
+.trpApps {
+  display: inline-block;
+  min-width: 960px;
+  padding-top: 28px;
+  padding-bottom: 28px;
+  text-align: center;
+}
+
+.trpApp {
+  display: inline-block;
+  min-width: 240px;
+  height: 208px;
+  vertical-align: top;
+  padding: 5px;
+  margin: 20px;
+}
+
+.trpAppText {
+  font-weight: lighter;
+  color: @trpDarkGrey;
+}
+
+.trpHomeFooterStripContainer {
+  background-color: white;
+  width: 100%;
+  text-align: center;
+  margin-top: -4px;
+  padding-top: 38px;
+  padding-bottom: 38px;
+}
+
+.trpFooterStrip {
+  color: @trpDarkerGrey;
+  padding-top: 10px;
+}
+
+@media (max-width: 768px) {
+  .trpHeroImage {
+    display: none;
+  }
+  .trpHomeHero {
+    width: 100%;
+  }
+  .trpHeroText {
+    font-size: 20px;
+  }
+}
+
+@media screen and (device-width: 360px), (device-width: 720px), (device-width:320px) and (orientation: portrait) {
+
+  body {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  html {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .trpBodyWrapper {
+    height: 100%;
+  }
+
+  .modal {
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    margin-left: 0;
+    max-height: 100%;
+  }
+
+  .modal-body {
+    padding-top: 12px;
+  }
+
+  .trpUsername {
+    margin-left: 0;
+    padding-top: 0;
+  }
+
+  .trpHomeHeroStripContainer {
+    height: 100%;
+  }
+
+  .trpHomeTopStrip {
+    padding-top: 0px;
+    min-width: 320px;
+    width: 300px;
+  }
+
+  .trpHomeHero {
+    display: inline-block;
+    padding-top: 20px;
+    width: 300px;
+    text-align: left;
+    min-height: 100%;
+    height: 100%;
+    padding-left: 0px;
+  }
+
+  .trpHeroText {
+    padding-left: 10px;
+    padding-top: 0px;
+    font-size: 24px;
+  }
+
+  .trpHeroSignup {
+    padding-left: 10px;
+  }
+
+  .trpHeroMacAppText {
+    font-size: 22px;
+  }
+
+  .trpHeroAppStore {
+    padding-top: 20px;
+  }
+
+}
+
+  .trpHomeTopStrip {
+    max-width: 750px;
+    min-width: 750px;
+}
+
+  .trpHomeLogo {
+    padding-left: 20px
+  }
+
+  .trpHomeHero {
+    padding-left: 30px;
+  }
+
+  .trpFeatures {
+    min-width: 750px;
+  }
+
+

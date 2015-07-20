@@ -10,11 +10,13 @@ var username = 'test-user';
 
 function createServiceWithStubData(callback) {
   return testRequire.withProxies('./services/invited-permissions-service', {
-    './github/github-members': {
-      isMember: function(username, uri, githubType) {
-        return Q.fcall(function() {
-          return callback(username, uri, githubType);
-        });
+    'gitter-web-github': {
+      GitHubMembers: {
+        isMember: function(username, uri, githubType) {
+          return Q.fcall(function() {
+            return callback(username, uri, githubType);
+          });
+        }
       }
     }
   });
@@ -370,4 +372,3 @@ describe('invited-permissions-service', function() {
   });
 
 });
-

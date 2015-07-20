@@ -3,12 +3,13 @@
 
 var userService = require('./user-service');
 var troupeService = require('./troupe-service');
+var roomService = require('./room-service');
+var memberService = require('./room-membership-service');
 var assert = require('assert');
-var removeService = require('./remove-service');
 var persistence = require('./persistence-service');
 var Q = require('q');
 
-var env    = require('../utils/env');
+var env    = require('gitter-web-env');
 var logger = env.logger;
 
 function removeUsersFromRoomOneAtATime(room, userIds) {
@@ -21,7 +22,7 @@ function removeUsersFromRoomOneAtATime(room, userIds) {
         var user = users.shift();
 
         logger.info('Removing ' + user.username);
-        return removeService.userLeaveRoom(room, user)
+        return roomService.removeUserFromRoom(room, user, user)
           .then(removeNext);
       }
 
@@ -34,10 +35,10 @@ exports.removeByUri = function(uri) {
 
   return troupeService.findByUri(uri)
     .then(function(room) {
-      var userIds = room.getUserIds();
-
-      return removeUsersFromRoomOneAtATime(room, userIds)
-        .thenResolve(room);
+      return memberService.findMembersForRoom(room._id)
+        .then(function(userIds) {
+          return removeUsersFromRoomOneAtATime(room, userIds)
+        }).thenResolve(room);
     })
     .then(function(room) {
       return room.removeQ();

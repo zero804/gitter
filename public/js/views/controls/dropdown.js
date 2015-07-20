@@ -1,10 +1,9 @@
 "use strict";
 var $ = require('jquery');
 var _ = require('underscore');
-var Marionette = require('marionette');
-var TroupeViews = require('views/base');
+var Marionette = require('backbone.marionette');
 var cocktail = require('cocktail');
-var Mutant = require('mutant');
+var Mutant = require('mutantjs');
 var SelectableMixin = require('./selectable-mixin');
 var itemTemplate = require('./tmpl/dropdownItem.hbs');
 var dataset = require('utils/dataset-shim');
@@ -77,7 +76,7 @@ module.exports = (function() {
   };
 
   var DropdownMenuView = Marionette.CollectionView.extend({
-    itemView: DropdownItemView,
+    childView: DropdownItemView,
     tagName: 'ul',
     className: 'dropdown dropdown-hidden selectable',
     ui: {
@@ -88,7 +87,7 @@ module.exports = (function() {
       'click li a': 'clicked'
     },
 
-    itemViewOptions: function() {
+    childViewOptions: function() {
       var options = {};
       if(this.options.itemTemplate) {
         options.template = this.options.itemTemplate;
@@ -120,7 +119,7 @@ module.exports = (function() {
       this.el.style.zIndex = zIndex;
     },
 
-    onClose: function() {
+    onDestroy: function() {
       if(this.mutant) this.mutant.disconnect();
     },
 
@@ -145,7 +144,7 @@ module.exports = (function() {
       return true;
     },
 
-    onAfterItemAdded: function() {
+    onAddChild: function() {
       setTimeout(function() {
         if(!this.active() && this.showWhenItems && this.hasItems()) {
           this.show();
@@ -153,7 +152,7 @@ module.exports = (function() {
       }.bind(this), 10);
     },
 
-    onItemRemoved: function() {
+    onRemoveChild: function() {
       setTimeout(function() {
         if(!this.hasItems()) {
           this.hide();
@@ -303,8 +302,7 @@ module.exports = (function() {
       e.stopPropagation();
     }
   });
-  cocktail.mixin(DropdownMenuView, TroupeViews.SortableMarionetteView, SelectableMixin);
+  cocktail.mixin(DropdownMenuView, SelectableMixin);
   return DropdownMenuView;
 
 })();
-

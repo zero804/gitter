@@ -1,8 +1,9 @@
 
 {
-  "watch": ["server", "shared"],
+  "watch": ["server", "shared", "modules"],
   "ext": "js",
   "env": {
-    "NODEMON": "1"
+    "NODEMON": "1",
+    "TZ": "UTC"
   }
 }

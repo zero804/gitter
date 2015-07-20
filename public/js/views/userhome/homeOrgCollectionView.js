@@ -1,6 +1,6 @@
 "use strict";
 
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var orgTemplate = require('./tmpl/home-org-view.hbs');
 var orgListItemTemplate = require('./tmpl/homeOrgListItem.hbs');
 var appEvents = require('utils/appevents');
@@ -35,11 +35,11 @@ module.exports = (function() {
     ui: {
       header: '#org-list-header'
     },
-    itemViewContainer: "#org-list-items",
+    childViewContainer: "#org-list-items",
     // tagName: 'ul',
     // className: 'suggested-room-list',
     template: orgTemplate,
-    itemView: OrgItemView,
+    childView: OrgItemView,
     onRender: function() {
       if(this.collection.length > 0) {
         this.ui.header.show();

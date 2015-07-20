@@ -1,20 +1,27 @@
-<div class="trpContentPanel" id="content-wrapper">
-  <div class='scrollHelper js-scroll-to-bottom u-scale-zero'><i class='octicon octicon-chevron-down'></i></div>
-  <div class="trpChatPanel">
-    <div class="trpChatContainer primary-scroll chat-container" id="content-frame">
-      <div id="chat-container">
-        {{#if oneToOneInvited}}
-          {{> chat_invited}}
-        {{else}}
-          {{#each chats}}
-            {{{ chatItemPrerender this lang=../lang locale=../locale}}}
-          {{/each}}
+<div class="trpContentPanel" id="content-wrapper">{{!-- Region--}}
+  <div>
+    <div class="trpChatPanel">
+
+      <div id="unread-banner" style="display:none"></div>
+      <div id="bottom-unread-banner" style="display:none"></div>
+  
+      <div class="trpChatContainer primary-scroll chat-container" id="content-frame">
+        <div id="chat-container">
+          {{#if oneToOneInvited}}
+            {{> chat_invited}}
+          {{else}}
+            <div>
+            {{#each chats}}
+              {{{ chatItemPrerender this lang=../lang locale=../locale}}}
+            {{/each}}
+          </div>
+          {{/if}}
+        </div>
+        {{#if initialBottom}}
+          {{! This is a way of forcing the browser to open at the bottom of the screen }}
+          <div id='initial' style="height:0;width:0;overflow:hidden"><a name="initial"/>_</a></div>
         {{/if}}
       </div>
-      {{#if initialBottom}}
-        {{! This is a way of forcing the browser to open at the bottom of the screen }}
-        <div id='initial' style="height:0;width:0;overflow:hidden"><a name="initial"/>_</a></div>
-      {{/if}}
     </div>
   </div>
 </div>

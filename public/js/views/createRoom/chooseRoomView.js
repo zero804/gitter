@@ -1,7 +1,7 @@
 "use strict";
 
-var Marionette = require('marionette');
-var TroupeViews = require('views/base');
+var Marionette = require('backbone.marionette');
+var ModalView = require('views/modal');
 var template = require('./tmpl/chooseRoom.hbs');
 
 module.exports = (function() {
@@ -39,13 +39,13 @@ module.exports = (function() {
 
   });
 
-  var Modal = TroupeViews.Modal.extend({
+  var Modal = ModalView.extend({
     disableAutoFocus: true,
     initialize: function(options) {
       options = options || {};
       options.title = options.title || "Create a chat room";
 
-      TroupeViews.Modal.prototype.initialize.call(this, options);
+      ModalView.prototype.initialize.call(this, options);
       this.view = new View(options);
     },
     menuItems: [
@@ -61,4 +61,3 @@ module.exports = (function() {
 
 
 })();
-

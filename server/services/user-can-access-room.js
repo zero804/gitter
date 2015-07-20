@@ -3,12 +3,12 @@
 
 var persistence = require('./persistence-service');
 
-var env    = require('../utils/env');
+var env    = require('gitter-web-env');
 var logger = env.logger;
 
 function userCanAccessRoom(userId, troupeId, callback) {
   // TODO: use the room permissions model
-  return persistence.Troupe.findByIdQ(troupeId)
+  return persistence.Troupe.findByIdQ(troupeId, { bans: 1, security: 1 }, { lean: true })
     .then(function(troupe) {
       if(!troupe) return false;
 
@@ -28,14 +28,16 @@ function userCanAccessRoom(userId, troupeId, callback) {
         return false;
       }
 
-      var result = troupe.containsUserId(userId);
+      return persistence.TroupeUser.countQ({ troupeId: troupeId, userId: userId })
+        .then(function(isInRoom) {
+          if(!isInRoom) {
+            logger.info("Denied user " + userId + " access to troupe " + troupe.uri);
+            return false;
+          }
 
-      if(!result) {
-        logger.info("Denied user " + userId + " access to troupe " + troupe.uri);
-        return false;
-      }
+          return true;
+        });
 
-      return result;
     })
     .nodeify(callback);
 }

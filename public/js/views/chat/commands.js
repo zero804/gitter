@@ -76,7 +76,7 @@ module.exports = (function() {
       command: 'fav',
       description: 'Toggle the room as a favourite',
       completion: 'fav ',
-      regexp: /^\/fav/,
+      regexp: /^\/fav\s*$/,
       action: function(view) {
         var isFavourite = !context.troupe().get('favourite');
 
@@ -92,7 +92,7 @@ module.exports = (function() {
       command: 'leave',
       description: 'Leave the room',
       completion: 'leave ',
-      regexp: /^\/leave|\/part/,
+      regexp: /^\/(leave|part)\s*$/,
       criteria: function() {
         return !context.inOneToOneTroupeContext();
       },
@@ -101,7 +101,7 @@ module.exports = (function() {
 
         apiClient.room.delete('/users/' + context.getUserId(), { })
           .then(function() {
-            appEvents.trigger('navigation', context.getUser().url, 'home', ''); // TODO: figure out a title
+            appEvents.trigger('navigation', '/home', 'home', ''); // TODO: figure out a title
           });
 
       }
@@ -110,7 +110,7 @@ module.exports = (function() {
       command: 'lurk',
       description: 'Lurk in the room',
       completion: 'lurk ',
-      regexp: /^\/lurk/,
+      regexp: /^\/lurk\s*$/,
       criteria: function() {
         return !context.inOneToOneTroupeContext();
       },
@@ -191,7 +191,7 @@ module.exports = (function() {
       command: 'collapse',
       description: 'Collapse chat messages with embedded media',
       completion: 'collapse ',
-      regexp: /^\/collapse/,
+      regexp: /^\/collapse\s*$/,
       action: function(view) {
         appEvents.trigger('command.collapse.chat');
         view.reset();
@@ -201,7 +201,7 @@ module.exports = (function() {
       command: 'expand',
       description: 'Expand chat messages with embedded media',
       completion: 'expand ',
-      regexp: /^\/expand/,
+      regexp: /^\/expand\s*$/,
       action: function(view) {
         appEvents.trigger('command.expand.chat');
         view.reset();

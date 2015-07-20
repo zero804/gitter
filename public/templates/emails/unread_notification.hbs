@@ -3,7 +3,7 @@
 {{troupe.name}}
 {{else}}
 {{troupe.uri}}
-{{/if}}: {{__n "%d unread message" "%d unread messages" unreadCount}}
+{{/if}}: {{__n "%d unread message" "%d unread messages" unreadCount}}{{' '}}
 {{/oneLine}}
 {{../emailBasePath}}{{troupe.url}}
 {{/each}}

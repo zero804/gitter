@@ -1,9 +1,10 @@
 "use strict";
 
-var env           = require('../utils/env');
+var env           = require('gitter-web-env');
 var logger        = env.logger;
 var config        = env.config;
 var elasticsearch = require('elasticsearch');
+var debug         = require('debug')('gitter:elasticsearch');
 
 function ElasticSearchLoggingAdapter(/*config*/) {
 }
@@ -21,17 +22,11 @@ ElasticSearchLoggingAdapter.prototype.info = function(message) {
 };
 
 ElasticSearchLoggingAdapter.prototype.debug = function(message) {
-  logger.verbose('es: ' + message);
+  debug(message);
 };
 
-ElasticSearchLoggingAdapter.prototype.trace = function (method, requestUrl, body, responseBody, responseStatus) {
-  logger.silly('es: trace', {
-    method: method,
-    requestUrl: requestUrl,
-    body: body,
-    responseBody: responseBody,
-    responseStatus: responseStatus
-  });
+ElasticSearchLoggingAdapter.prototype.trace = function (method, requestUrl, body/*, responseBody, responseStatus*/) {
+  debug("trace: method=%s url=%s, body=%j", method, requestUrl && requestUrl.path, body);
 };
 ElasticSearchLoggingAdapter.prototype.close = function () { };
 

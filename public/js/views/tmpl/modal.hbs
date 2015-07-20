@@ -1,18 +1,15 @@
-{{^hideHeader}}
 <div class="modal-header">
     <div class="trpModalHeader">
         <div class="trpModalMenu frame-menu-items">
           <div class="trpModalClose">
-               {{^disableClose}}
                <a class="close">×</a>
-                 {{/disableClose}}
             </div>
         </div>
-      {{#customTitle}}<h2>{{title}}</h2>{{/customTitle}}
+      {{#if title}}<h2>{{title}}</h2>{{/if}}
     </div>
 </div>
-{{/hideHeader}}
-<div class="modal-body">
+
+<div id="modal-body-region" class="modal-body">
 
 </div>
 {{#hasMenuItems}}

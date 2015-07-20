@@ -15,7 +15,7 @@ function indexQuery(req, res, next) {
       var filteredRepos = repos.filter(createTextFilter({ query: query, fields: ['full_name']}));
 
       var strategyOptions = { currentUserId: req.user.id };
-      if (req.query.include_users) strategyOptions.mapUsers = true;
+      // if (req.query.include_users) strategyOptions.mapUsers = true;
 
       var strategy = new restSerializer.SearchResultsStrategy({
                             resultItemStrategy: new restSerializer.GithubRepoStrategy(strategyOptions)
@@ -42,7 +42,7 @@ module.exports = {
     }
 
     var strategyOptions = { currentUserId: req.user.id };
-    if (req.query.include_users) strategyOptions.mapUsers = true;
+    // if (req.query.include_users) strategyOptions.mapUsers = true;
 
     repoService.getReposForUser(req.user)
       .then(function(repos) {

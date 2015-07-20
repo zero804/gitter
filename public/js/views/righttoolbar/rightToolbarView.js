@@ -1,7 +1,6 @@
 "use strict";
-var $ = require('jquery');
 var Backbone = require('backbone');
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var context = require('utils/context');
 var itemCollections = require('collections/instances/integrated-items');
 var PeopleCollectionView = require('views/people/peopleCollectionView');
@@ -9,23 +8,43 @@ var SearchView = require('views/search/searchView');
 var SearchInputView = require('views/search/search-input-view');
 var RepoInfoView = require('./repoInfo');
 var RepoInfoModel = require('collections/repo-info');
-var ActivityStream = require('./activity');
+var ActivityCompositeView = require('./activityCompositeView');
+var hasScrollBars = require('utils/scrollbar-detect');
+require('views/behaviors/isomorphic');
 
 module.exports = (function() {
 
+  var RightToolbarLayout = Marionette.LayoutView.extend({
+    className: 'right-toolbar right-toolbar--collapsible',
+    behaviors: {
+      Isomorphic: {
+        search: { el: '#search-results', init: 'initSearchRegion' },
+        header: { el: '#right-toolbar-header-region', init: 'initSearchInputRegion' },
+        repo_info: { el: '#repo-info', init: 'initRepo_infoRegion' },
+        activity: { el: '#activity-region', init: 'initActivityRegion' },
+        roster: { el: '#people-roster', init: 'initRosterRegion' },
+      }
+    },
 
-  var RightToolbarLayout = Marionette.Layout.extend({
-
-    regions: {
-      search: '#search-results',
-      repo_info: "#repo-info"
+    ui: {
+      header: '#toolbar-top-content',
+      footer: '#zendesk-footer',
+      rosterHeader: '#people-header',
+      repoInfoHeader: '#info-header'
     },
 
     events: {
-      'click #upgrade-auth': 'onUpgradeAuthClick',
-      'click #people-header' : 'showPeopleList',
-      'click #info-header' : 'showRepoInfo',
-      'submit #upload-form': 'upload'
+      'click #upgrade-auth':  'onUpgradeAuthClick',
+      'click #people-header': 'showPeopleList',
+      'click #info-header':   'showRepoInfo',
+      'submit #upload-form':  'upload'
+    },
+
+    childEvents: {
+      'search:expand': 'expandSearch',
+      'search:collapse': 'collapseSearch',
+      'search:show': 'showSearch',
+      'search:hide': 'hideSearch'
     },
 
     toggleSearch: function () {
@@ -33,87 +52,81 @@ module.exports = (function() {
     },
 
     initialize: function () {
-      // People View
-      new PeopleCollectionView.ExpandableRosterView({
-        rosterCollection: itemCollections.roster,
-        el: $('#people-roster')
-      });
-
-      // Repo info
-      if (context.troupe().get('githubType') === 'REPO') {
-        var repo = new RepoInfoModel();
-        repo.fetch({ data: { repo: context.troupe().get('uri') } });
-        
-        this.repo_info.show(new RepoInfoView({ model: repo }));
-      }
-
-      // Activity
-      new ActivityStream({
-        el: $('#activity'),
-        collection: itemCollections.events
-      });
-
       // Search
-      var searchState = new Backbone.Model({
+      this.searchState = new Backbone.Model({
         searchTerm: '',
         active: false,
         isLoading: false
       });
 
-      new SearchInputView({
-        el: $('.js-search'),
-        model: searchState
-      }).render();
+    },
 
-      var searchView = new SearchView({
-        el: $('#search-results'),
-        model: searchState
-      }).render();
+    initSearchRegion: function(optionsForRegion) {
+      return new SearchView(optionsForRegion({ model: this.searchState }));
+    },
 
-      searchView.on('search:expand', function () {
-        $('.right-toolbar').addClass('right-toolbar--expanded');
-      });
+    initSearchInputRegion: function(optionsForRegion) {
+      return new SearchInputView(optionsForRegion({ model: this.searchState }));
+    },
 
-      searchView.on('search:collapse', function () {
-        $('.right-toolbar').removeClass('right-toolbar--expanded');
-      });
+    initRepo_infoRegion: function(optionsForRegion) {
+      // Repo info
+      if (context.troupe().get('githubType') !== 'REPO') return;
 
-      searchView.on('search:show', function () {
-        $('#toolbar-top-content').hide();
-        $('#zendesk-footer').hide();
-      }.bind(this));
+      var repo = new RepoInfoModel();
+      repo.fetch({ data: { repo: context.troupe().get('uri') } });
 
-      searchView.on('search:hide', function () {
-        $('#toolbar-top-content').show();
-        $('#zendesk-footer').show();
-      }.bind(this));
+      return new RepoInfoView(optionsForRegion({ model: repo }));
+    },
 
-      itemCollections.events.on('add reset sync', function() {
+    initActivityRegion: function(optionsForRegion, region) {
+      if (hasScrollBars()) {
+        region.$el.addClass("scroller");
+      }
 
-        if (itemCollections.events.length >0) {
-          this.$el.find('#activity-header').show();
-          itemCollections.events.off('add reset sync', null, this);
-        } else {
-          if (context().permissions.admin) {
-            this.$el.find('#activity-header').show();
-          }
+      var oneToOne = context.inOneToOneTroupeContext();
 
-        }
-      }, this);
+      return oneToOne ? null : new ActivityCompositeView(optionsForRegion({ collection: itemCollections.events }));
+    },
+
+    initRosterRegion: function(optionsForRegion) {
+      return new PeopleCollectionView.ExpandableRosterView(optionsForRegion({
+        rosterCollection: itemCollections.roster
+      }));
+    },
+
+    expandSearch: function() {
+      this.$el.addClass('right-toolbar--expanded');
+    },
+
+    collapseSearch: function() {
+      this.$el.removeClass('right-toolbar--expanded');
+    },
+
+    showSearch: function() {
+      this.search.$el.show();
+      this.ui.header.hide();
+      this.ui.footer.hide();
+    },
+
+    hideSearch: function() {
+      this.search.$el.hide();
+      this.ui.header.show();
+      this.ui.footer.show();
     },
 
     showPeopleList: function() {
-      $('#repo-info').hide();
-      $('#people-roster').show();
-      $('#people-header').addClass('selected');
-      $('#info-header').removeClass('selected');
+      this.repo_info.$el.hide();
+      this.roster.$el.show();
+      this.ui.rosterHeader.addClass('selected');
+      this.ui.repoInfoHeader.removeClass('selected');
     },
 
     showRepoInfo: function() {
-      $('#people-roster').hide();
-      $('#repo-info').show();
-      $('#people-header').removeClass('selected');
-      $('#info-header').addClass('selected');
+      this.roster.$el.hide();
+      this.repo_info.$el.show();
+      this.ui.rosterHeader.removeClass('selected');
+      this.ui.repoInfoHeader.addClass('selected');
     }
 
   });

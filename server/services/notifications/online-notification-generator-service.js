@@ -6,7 +6,7 @@ var Q                         = require('q');
 var handlebars                = require('handlebars');
 var userTroupeSettingsService = require('../user-troupe-settings-service');
 var userService               = require('../user-service');
-var appEvents                 = require('../../app-events');
+var appEvents                 = require('gitter-web-appevents');
 var serializer                = require('../../serializers/notification-serializer');
 var collections               = require('../../utils/collections');
 
@@ -221,6 +221,8 @@ exports.sendOnlineNotifications = function (notifications, callback) {
 
               var ns = notificationSettings[notification.userId + ':' + notification.troupeId];
               var notificationSetting = ns && ns.push;
+              var chat;
+
               if (notificationSetting === 'mute') return;
               if (notificationSetting === 'mention') {
                 var user = mentionUsersHash[notification.userId];
@@ -228,7 +230,7 @@ exports.sendOnlineNotifications = function (notifications, callback) {
                 var itemType = notification.itemType;
 
                 if (itemType != 'chat') return;
-                var chat = message.data;
+                chat = message.data;
 
                 if (!user || !chat) return;
 
@@ -251,7 +253,8 @@ exports.sendOnlineNotifications = function (notifications, callback) {
                 title: message.title,
                 text: message.text,
                 link: message.link,
-                sound: message.sound
+                sound: message.sound,
+                chatId: message.data.id
               };
 
               winston.silly("Online notifications: ", n);

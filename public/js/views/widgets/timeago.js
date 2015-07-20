@@ -1,10 +1,14 @@
 "use strict";
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var moment = require('moment');
 var context = require('utils/context');
-var locale = require('utils/locale');
 var widgets = require('views/behaviors/widgets');
+var FastAttachMixin = require('views/fast-attach-mixin');
+var timeFormat = require('gitter-web-shared/time/time-format');
+
 require('views/behaviors/tooltip');
+
+var ONEDAY = 86400000;
 
 module.exports = (function() {
 
@@ -19,7 +23,7 @@ module.exports = (function() {
       }
     },
     initialize: function(options) {
-      this.time = moment(options.time);
+      this.time = moment(options.time).locale(lang);
       this.compact = options.compact;
       this.position = options.position || "top";
       this.tooltipFormat = options.tooltipFormat || 'LLL';
@@ -27,13 +31,12 @@ module.exports = (function() {
       this.calculateNextTimeout();
     },
 
-    /** XXX TODO NB: change this to onDestroy once we've moved to Marionette 2!!!! */
-    onClose: function() {
+    onDestroy: function() {
       clearTimeout(this.timer);
     },
 
     getTooltip: function() {
-      return this.time.format(this.tooltipFormat, { lang: lang });
+      return this.time.locale(lang).format(this.tooltipFormat);
     },
 
     getTooltipPosition: function() {
@@ -66,25 +69,20 @@ module.exports = (function() {
     },
 
     render: function() {
-      var duration = Date.now() - this.time.valueOf();
+      this.el.textContent = timeFormat(this.time, { compact: this.compact });
 
-      var v;
-      if(duration >= 86400000 /* One day */) {
-        v = this.compact ? this.time.format("MMM DD", { lang: lang }) : this.time.format("LL", { lang: lang });
-      } else {
-        var momentDuration = moment.duration(duration);
-
-        v = this.compact ? this.time.format("H:mm", { lang: lang }) : locale("%s ago", momentDuration.humanize());
-      }
-
-      var fullTime = this.time.format("LLL", { lang: lang });
-      this.el.innerText = v;
-      this.el.setAttribute('title', fullTime);
+      var longFormat = this.time.format("LLL");
+      this.el.setAttribute('title', longFormat);
 
       this.triggerMethod("render", this);
     },
 
+    attachElContent: FastAttachMixin.attachElContent
   });
+
+  TimeagoWidget.getPrerendered = function(model, id) { // jshint unused:true
+    return "<span class='widget' data-widget-id='" + id + "'></span>";
+  };
 
   widgets.register({ timeago: TimeagoWidget });
 

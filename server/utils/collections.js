@@ -47,6 +47,8 @@ exports.indexByProperty = function(array, propertyName) {
 
 exports.hashArray = function(array) {
   var a = {};
+  if (!array) return a;
+
   array.forEach(function(item) {
     a[item] = true;
   });
@@ -74,4 +76,3 @@ exports.predicates = {
     return (v !== null) && (v !== undefined);
   }
 };
-

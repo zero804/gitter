@@ -9,6 +9,9 @@ exports.installLocalEventListeners = function() {
     require('../services/notifications/notification-generator-service').install();
     require('../event-listeners/').install();
 
+    require('../services/live-collections').install();
+    require('../services/room-membership-events').install();
+
     installed = true;
   }
 };

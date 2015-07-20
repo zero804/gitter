@@ -32,7 +32,7 @@ var rl = readline.createInterface({
 return troupeService.findByUri(opts.uri)
   .then(function(room) {
     var d = Q.defer();
-    rl.question("Are you sure you want to delete " + room.uri + " with " + room.users.length + " users in it? (yes/no)", function(answer) {
+    rl.question("Are you sure you want to delete " + room.uri + " with " + room.userCount + " users in it? (yes/no)", function(answer) {
       rl.close();
       console.dir(answer);
 
@@ -54,7 +54,7 @@ return troupeService.findByUri(opts.uri)
   })
   .fail(function(err) {
     console.error('Error: ' + err, err);
+    console.log(err.stack);
     shutdown.shutdownGracefully(1);
   })
   .done();
-

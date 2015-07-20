@@ -1,104 +1,152 @@
 "use strict";
-var $ = require('jquery');
-var Backbone = require('backbone');
-var context = require('utils/context');
+
+var Marionette = require('backbone.marionette');
 var template = require('./tmpl/unreadBannerTemplate.hbs');
+var appEvents = require('utils/appevents');
 var unreadItemsClient = require('components/unread-items-client');
+require('views/behaviors/tooltip');
 
-module.exports = (function() {
+var TopBannerView = Marionette.ItemView.extend({
+  octicon: 'octicon-chevron-up',
+  position: 'Above',
+  template: template,
+  hidden: true,
+  className: 'banner-wrapper',
+  actAsScrollHelper: false,
 
+  ui: {
+    bannerMessage: '#banner-message',
+    buttons: 'button'
+  },
 
-  var BottomBannerView = Backbone.View.extend({
-    events: {
-      'click button.main': 'onMainButtonClick'
-    },
-    initialize: function(options) {
-      this.chatCollectionView = options.chatCollectionView;
-      this.listenTo(this.model, 'change:unreadBelow', this.render);
-    },
-    render: function() {
-      if(this.getUnreadCount() > 0 && !this.chatCollectionView.isScrolledToBottom()) {
-        this.showBanner();
-      } else {
-        this.hideBanner();
-      }
-    },
-    getUnreadCount: function() {
-      return this.model.get('unreadBelow');
-    },
-    showBanner: function() {
-      var $banner = this.$el;
-      var unreadCount = this.getUnreadCount();
-      var message;
-      if(unreadCount === 1) {
-        message = '1 unread message';
-      } else if(unreadCount > 99) {
-        message = '99+ unread messages';
-      } else {
-        message = unreadCount +' unread messages';
-      }
-
-      $banner.html(template({message: message}));
-      $banner.parent().show();
-
-      // cant have slide away animation on the same render as a display:none change
-      setTimeout(function() {
-        $banner.removeClass('slide-away');
-      }, 0);
-    },
-    hideBanner: function() {
-      var $banner = this.$el;
-      var self = this;
-
-      $banner.addClass('slide-away');
-
-      setTimeout(function() {
-        if(self.getUnreadCount() === 0) {
-          $banner.parent().hide();
-        }
-      }, 500);
-    },
-    onMainButtonClick: function() {
-      if(this.getUnreadCount() < 1) return;
-
-      this.chatCollectionView.scrollToFirstUnreadBelow();
+  behaviors: {
+    Tooltip: {
+      'button.side': { title: 'Mark as read', placement: 'top' },
     }
-  });
+  },
 
-  var TopBannerView = BottomBannerView.extend({
-    events: {
-      'click button.main': 'onMainButtonClick',
-      'click button.side': 'onSideButtonClick'
-    },
-    initialize: function(options) {
-      this.chatCollectionView = options.chatCollectionView;
-      this.listenTo(this.model, 'change:unreadAbove', this.render);
-    },
-    render: function() {
-      if(this.getUnreadCount() > 0) {
-        this.showBanner();
-      } else {
-        this.hideBanner();
-      }
-    },
-    getUnreadCount: function() {
-      return this.model.get('unreadAbove');
-    },
-    onMainButtonClick: function() {
-      if(this.getUnreadCount() < 1) return;
 
-      this.chatCollectionView.scrollToFirstUnread();
-    },
-    onSideButtonClick: function() {
-      unreadItemsClient.markAllRead();
+  events: {
+    'click button.main': 'onMainButtonClick',
+    'click button.side': 'onSideButtonClick'
+  },
+
+  modelEvents: function() {
+    var events = {};
+    events['change:unread' + this.position]      = 'updateVisibility';
+    events['change:hasUnread' + this.position]   = 'updateVisibility';
+    events['change:hasMentions' + this.position] = 'updateVisibility';
+
+    return events;
+  },
+
+  applyStyles: function() {
+    if (!!this.getMentionsCount()) {
+      this.ui.buttons.removeClass('unread');
+      this.ui.buttons.addClass('mention');
+      return;
     }
-  });
+    if (!!this.getUnreadCount()) {
+      this.ui.buttons.addClass('unread');
+      return;
+    }
+    this.ui.buttons.removeClass('unread');
+    this.ui.buttons.removeClass('mention');
+  },
 
-  return {
-    Top: TopBannerView,
-    Bottom: BottomBannerView
-  };
+  getUnreadCount: function() {
+    return this.model.get('unread' + this.position);
+  },
 
+  getMentionsCount: function() {
+    return this.model.get('mentions' + this.position);
+  },
 
-})();
+  serializeData: function() {
+    return { message: this.getMessage(), octicon: this.octicon };
+  },
 
+  getMessage: function() {
+    var unreadCount = this.getUnreadCount();
+    var mentionsCount = this.getMentionsCount();
+
+    if (!unreadCount && !mentionsCount) return 'Go to bottom';
+    if (mentionsCount === 1)            return '1 mention';
+    if (mentionsCount > 1)              return mentionsCount + '  mentions';
+    if (unreadCount === 1)              return '1 unread';
+    if (unreadCount > 99)               return '99+ unread';
+    return unreadCount + ' unread';
+  },
+
+  shouldBeVisible: function() {
+    return (!!this.getMentionsCount() || !!this.getUnreadCount() || !!this.actAsScrollHelper);
+  },
+
+  updateMessage: function() {
+    this.ui.bannerMessage.text(this.getMessage());
+  },
+
+  updateVisibility: function() {
+    this.applyStyles();
+    this.updateMessage();
+
+    // TODO Add some fancy transitions
+    if (this.shouldBeVisible()) {
+      this.$el.parent().show();
+    } else {
+      this.ui.buttons.blur();
+      this.$el.parent().hide();
+    }
+  },
+
+  onRender: function() {
+    this.updateVisibility();
+  },
+
+  onMainButtonClick: function() {
+    var mentionId = this.model.get('oldestMentionId');
+    if (mentionId) return appEvents.trigger('chatCollectionView:scrollToChatId', mentionId);
+
+    var itemId = this.model.get('oldestUnreadItemId');
+    if (itemId) appEvents.trigger('chatCollectionView:scrollToChatId', itemId);
+  },
+
+  onSideButtonClick: function() {
+    unreadItemsClient.markAllRead();
+  }
+});
+
+var BottomBannerView = TopBannerView.extend({
+  octicon: 'octicon-chevron-down',
+  position: 'Below',
+  className: 'banner-wrapper bottom',
+  actAsScrollHelper: false,
+
+  initialize: function() {
+    this.listenTo(appEvents, 'atBottomChanged', this.toggleScrollHelper);
+  },
+
+  toggleScrollHelper: function(atBottom) {
+    this.actAsScrollHelper = !atBottom;
+    this.updateVisibility();
+  },
+
+  onMainButtonClick: function() {
+    this.toggleScrollHelper(true);
+
+    var mentionId = this.model.get('mostRecentMentionId');
+    if (mentionId) return appEvents.trigger('chatCollectionView:scrollToChatId', mentionId);
+
+    var itemId = this.model.get('mostRecentUnreadItemId');
+    if (itemId) return appEvents.trigger('chatCollectionView:scrollToChatId', itemId);
+
+    appEvents.trigger('chatCollectionView:scrollToBottom');
+  },
+
+  onSideButtonClick: function() {}
+});
+
+module.exports = {
+  Top: TopBannerView,
+  Bottom: BottomBannerView
+};

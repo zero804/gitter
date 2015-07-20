@@ -1,12 +1,12 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var resolveAvatarUrl = require('../../../shared/avatars/resolve-avatar-url');
+var resolveAvatarUrl = require('gitter-web-shared/avatars/resolve-avatar-url');
 
 module.exports = exports = function(template) {
   return function avatarWidgetHandler(params) {
     var hash = params.hash;
-    var user = hash.model || hash.user;
+    var user = hash.model || hash.user || {};
 
     var avatarSize = hash.avatarSize || 's';
     var showBadge = hash.showBadge;

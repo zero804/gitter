@@ -1,6 +1,6 @@
 "use strict";
 var context = require('utils/context');
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var appEvents = require('utils/appevents');
 var isMobile = require('utils/is-mobile');
 var isNative = require('utils/is-native');
@@ -9,37 +9,36 @@ var logout = require('utils/logout');
 
 require('views/behaviors/widgets');
 
+var isMobileResult = isMobile();
+
 module.exports = (function () {
 
   return Marionette.ItemView.extend({
     template: template,
-
+    className: function() {
+      // expanded by default for mobile
+      return isMobileResult ? 'menu-header menu-header--expanded' : 'menu-header';
+    },
     events: {
-      "click #link-home": 'homeClicked',
-      "click #link-logout": 'logoutClicked'
+      'click': 'toggleExpanded',
+      'click #link-home': 'homeClicked',
+      'click #link-logout': 'logoutClicked'
     },
 
     behaviors: {
       Widgets: {}
     },
 
-    initialize: function (options) {
-      this.state = options.state;
-      this.listenTo(this.state, 'change', this.render);
-      this.render();
+    modelEvents: {
+      'change': 'render'
     },
 
     serializeData: function () {
-      var user = context.getUser();
-      var userModel = context.user();
-
-      var isMobileResult = isMobile();
+      var userModel = context.user().toJSON();
       var isNativeResult = isNative();
 
       return {
-        menuHeaderExpanded: this.state.get('menuHeaderExpanded'),
         isMobile: isMobileResult,
-        displayName: user.displayName || user.username,
         user: userModel,
         billingUrl: context.env('billingUrl'),
         showBilling: !isMobileResult,
@@ -48,10 +47,23 @@ module.exports = (function () {
       };
     },
 
+    onRender: function() {
+      if (isMobileResult) {
+        this.$el.addClass('menu-header--expanded');
+      }
+    },
+
+    toggleExpanded: function() {
+      // stay expanded on mobile
+      if (isMobileResult) return;
+
+      this.$el.toggleClass('menu-header--expanded');
+    },
+
     homeClicked: function (e) {
       e.preventDefault();
       if (context().user.url !== window.location.pathname) {
-        appEvents.trigger('navigation', context.getUser().url, 'home', '');
+        appEvents.trigger('navigation', '/home', 'home', 'home');
       }
     },
 
@@ -62,4 +74,3 @@ module.exports = (function () {
   });
 
 })();
-

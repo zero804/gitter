@@ -1,23 +1,43 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
+var env    = require('gitter-web-env');
+var logger = env.logger;
+var nconf  = env.config;
+var stats  = env.stats;
+
+
 var Q       = require("q");
 var winston = require('../utils/winston');
 var fs      = require('fs');
 var path    = require('path');
+var debug   = require('debug')('gitter:serializer');
 
+var maxSerializerTime = nconf.get('serializer:warning-period');
+
+/**
+ * Lazy load strategies used to be important to work around issues with
+ * circular dependencies in nodejs but this has been corrected further
+ * up the dependency graph
+ */
+var LAZY_LOAD_STRATEGIES = false;
 /**
  * Serialize some items using a strategy, returning a promise
  */
 function serialize(items, strat, callback) {
-  var d = Q.defer();
-
-  if(!items) {
-    return Q.resolve().nodeify(callback);
+  if(items === null || items === undefined) {
+    return Q.resolve(items).nodeify(callback);
   }
 
-  var single = !Array.isArray(items);
-  if(single) {
+  var single;
+  if (Array.isArray(items)) {
+    /** Array with zero items, shortcut */
+    if (!items.length) {
+      return Q.resolve([]).nodeify(callback);
+    }
+    single = false;
+  } else {
+    single = true;
     items = [ items ];
   }
 
@@ -25,11 +45,25 @@ function serialize(items, strat, callback) {
     return single ? i[0] : i;
   }
 
+  var start = Date.now();
+  var d = Q.defer();
   strat.preload(items, function(err) {
 
     if(err) {
       winston.error("Error during preload", { exception: err });
       return d.reject(err);
+    }
+
+    var time = Date.now() - start;
+    debug('strategy %s with %s items took %sms to complete', strat.name, items.length, time);
+    if(time > maxSerializerTime) {
+      stats.responseTime('serializer.slow.preload', time);
+
+      logger.warn('Serialization took a excessive amount of time to complete', {
+        strategy: strat.name,
+        time: time,
+        items: items.length
+      });
     }
 
     var serialized = items.map(strat.map)
@@ -89,22 +123,27 @@ module.exports = function(serializerDirectory, e) {
       return match.toUpperCase();
     });
 
-    Object.defineProperty(e, strategyName, {
-      enumerable: true,
-      configurable: true,
-      get: function() {
-        var strategy = require('./' + serializerDirectory + '/' + baseName);
+    if (LAZY_LOAD_STRATEGIES) {
+      Object.defineProperty(e, strategyName, {
+        enumerable: true,
+        configurable: true,
+        get: function() {
+          var strategy = require('./' + serializerDirectory + '/' + baseName);
 
-        Object.defineProperty(e, strategyName, {
-          enumerable: true,
-          configurable: false,
-          writable: false,
-          value: strategy
-        });
+          Object.defineProperty(e, strategyName, {
+            enumerable: true,
+            configurable: false,
+            writable: false,
+            value: strategy
+          });
 
-        return strategy;
-      }
-    });
+          return strategy;
+        }
+      });
+
+    } else {
+      e[strategyName] = require('./' + serializerDirectory + '/' + baseName);
+    }
   });
 
   return e;

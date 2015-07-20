@@ -78,7 +78,9 @@ describe('org room permissions', function() {
     userIsInRoomMock = mockito.mockFunction();
 
     permissionsModel = testRequire.withProxies("./services/permissions/org-permissions-model", {
-      '../github/github-org-service': GitHubOrgServiceMocker,
+      'gitter-web-github': {
+        GitHubOrgService: GitHubOrgServiceMocker,
+      },
       '../user-in-room': userIsInRoomMock
     });
   });
@@ -130,4 +132,3 @@ describe('org room permissions', function() {
     });
   });
 });
-
