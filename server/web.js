@@ -33,7 +33,10 @@ if(nconf.get('ws:startFayeInPrimaryApp')) {
   bayeux.attach(server);
 }
 
-app.use('/api', require('./api/'));
+if (nconf.get("web:startApiInPrimaryApp")) {
+  app.use('/api', require('./api/'));
+}
+app.use('/api_web', require('./api_web/'));
 app.use('/', require('./handlers/'));
 
 require('./services/kue-workers').startWorkers();
