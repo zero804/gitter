@@ -1,19 +1,26 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var troupeService       = require("./troupe-service");
+var env               = require('gitter-web-env');
+var logger            = env.logger;
 
 var restSerializer      = require("../serializers/rest-serializer");
 var unreadItemService   = require("./unread-item-service");
 var chatService         = require("./chat-service");
 var userService         = require("./user-service");
+var roomUserSearchService = require('./room-user-search-service');
 var eventService        = require("./event-service");
 var Q                   = require('q');
 var roomService         = require('./room-service');
 var GithubMe            = require('gitter-web-github').GitHubMeService;
-var isUserLurkingInRoom = require('./is-user-lurking-in-room');
 var _                   = require('underscore');
+var roomMembershipService = require('./room-membership-service');
 
+var survivalMode = !!process.env.SURVIVAL_MODE || false;
+
+if (survivalMode) {
+  logger.error("WARNING: Running in survival mode");
+}
 
 var DEFAULT_CHAT_COUNT_LIMIT = 30;
 
@@ -24,7 +31,7 @@ exports.serializeTroupesForUser = function(userId, callback) {
     .then(function(troupeIds) {
       var strategy = new restSerializer.TroupeIdStrategy({
         currentUserId: userId,
-        mapUsers: false
+        // mapUsers: false
       });
 
       return restSerializer.serializeExcludeNulls(troupeIds, strategy);
@@ -64,21 +71,19 @@ exports.serializeUsersForTroupe = function(troupeId, userId, options) {
   var searchTerm = options.searchTerm;
 
   if(searchTerm) {
-    /* The limit must only be applied post findUserIdsForTroupe */
-    return troupeService.findUserIdsForTroupe(troupeId)
-      .then(function(userIds) {
+    if (survivalMode) {
+      return Q.resolve([]);
+    }
 
-        return userService.findByIdsAndSearchTerm(userIds, searchTerm, limit || 30)
-          .then(function(users) {
-            var strategy = new restSerializer.UserStrategy();
-            return restSerializer.serializeExcludeNulls(users, strategy);
-          });
+    return roomUserSearchService.findUsersInRoom(troupeId, searchTerm, limit || 30)
+      .then(function(users) {
+        var strategy = new restSerializer.UserStrategy();
+        return restSerializer.serializeExcludeNulls(users, strategy);
       });
+
   }
 
-  return (limit ?
-        troupeService.findUsersIdForTroupeWithLimit(troupeId, limit) :
-        troupeService.findUserIdsForTroupe(troupeId))
+  return roomMembershipService.findMembersForRoom(troupeId, { limit: limit }) /* Limit may be null */
     .then(function(userIds) {
       var strategy = new restSerializer.UserIdStrategy({
         showPresenceForTroupeId: troupeId,
@@ -94,7 +99,7 @@ exports.serializeUsersForTroupe = function(troupeId, userId, options) {
 
 exports.serializeUnreadItemsForTroupe = function(troupeId, userId, callback) {
   return Q.all([
-      isUserLurkingInRoom(userId, troupeId),
+      roomMembershipService.getMemberLurkStatus(troupeId, userId),
       unreadItemService.getUnreadItemsForUser(userId, troupeId)
     ])
     .spread(function(isLurking, items) {
@@ -126,10 +131,10 @@ exports.serializeEventsForTroupe = function(troupeId, userId, callback) {
     .nodeify(callback);
 };
 
-exports.serializeOrgsForUser = function(user, options) {
+exports.serializeOrgsForUser = function(user/*, options */) {
   var ghUser = new GithubMe(user);
 
-  var strategyOptions = { currentUserId: user.id, mapUsers: options && options.mapUsers };
+  var strategyOptions = { currentUserId: user.id /*, mapUsers: options && options.mapUsers */ };
 
   return ghUser.getOrgs()
     .then(function(ghOrgs) {

@@ -4,7 +4,6 @@
 var env              = require('gitter-web-env');
 var logger           = env.logger;
 var engine           = require('./unread-item-service-engine');
-var troupeService    = require("./troupe-service");
 var readByService    = require("./readby-service");
 var userService      = require("./user-service");
 var roomPermissionsModel = require('./room-permissions-model');
@@ -16,6 +15,7 @@ var RedisBatcher     = require('../utils/redis-batcher').RedisBatcher;
 var collections      = require('../utils/collections');
 var Q                = require('q');
 var badgeBatcher     = new RedisBatcher('badge', 300);
+var roomMembershipService = require('./room-membership-service');
 
 var sendBadgeUpdates = true;
 engine.on('badge.update', function(userId) {
@@ -56,7 +56,7 @@ function removeItem(troupeId, itemId) {
   if(!troupeId) return reject("removeItem failed. Troupe cannot be null");
   if(!itemId) return reject("removeItem failed. itemId cannot be null");
 
-  return troupeService.findUserIdsForTroupeWithLurk(troupeId)
+  return roomMembershipService.findMembersForRoomWithLurk(troupeId)
     .then(function(userIdsWithLurk) {
       var userIds = Object.keys(userIdsWithLurk);
 
@@ -340,8 +340,7 @@ function parseMentions(fromUserId, troupe, userIdsWithLurk, mentions) {
 }
 
 function parseChat(fromUserId, troupe, mentions) {
-
-  return troupeService.findUserIdsForTroupeWithLurk(troupe._id)
+  return roomMembershipService.findMembersForRoomWithLurk(troupe._id)
     .then(function(userIdsWithLurk) {
       var creatorUserId = fromUserId && "" + fromUserId;
 
