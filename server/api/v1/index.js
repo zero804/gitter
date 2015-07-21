@@ -27,8 +27,6 @@ router.post('/userapn', authMiddleware, require('./userapn.js'));
 
 router.post('/eyeballs', authMiddleware, require('./eyeballs.js'));
 
-router.get('/ping', authMiddleware, require('./ping.js'));
-
 router.delete('/sockets/:socketId', require('./sockets.js'));
 
 router.get('/repo-info', authMiddleware, require('./repo-info.js'));
