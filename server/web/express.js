@@ -152,10 +152,6 @@ module.exports = {
     app.disable('x-powered-by');
     app.set('trust proxy', true);
     app.use(env.middlewares.accessLogger);
-    app.use(express.cookieParser());
-    app.use(express.urlencoded());
-    app.use(express.json());
-
     app.use(require('./middlewares/token-error-handler'));
     app.use(env.middlewares.errorHandler);
   }
