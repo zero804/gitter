@@ -12,8 +12,9 @@ var resolveStatic  = require('./resolve-static');
 var bodyParser     = require('body-parser');
 var cookieParser   = require('cookie-parser');
 var methodOverride = require('method-override');
-var session = require('express-session');
+var session        = require('express-session');
 var devMode        = config.get('dev-mode');
+var favicon        = require('serve-favicon');
 
 // Naughty naughty naught, install some extra methods on the express prototype
 require('./http');
@@ -71,6 +72,9 @@ module.exports = {
       app.use('/_s/l', express.static(resolveStatic(), {
         maxAge: 0
       }));
+
+      app.use(favicon(resolveStatic('favicon.ico')));
+
     }
 
     app.use(env.middlewares.accessLogger);
@@ -112,7 +116,9 @@ module.exports = {
         maxAge: 14400000,
         domain: config.get("web:cookieDomain"),
         secure: config.get("web:secureCookies")
-      }
+      },
+      resave: true,
+      saveUninitialized: true // Passport will force a save anyway
     }));
 
     app.use(passport.initialize());

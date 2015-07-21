@@ -6,8 +6,6 @@ var nconf      = require('../utils/config');
 var resolveStatic = require('../web/resolve-static');
 var social     = require('./social-metadata');
 var langs      = require('langs');
-var favicon    = require('serve-favicon');
-
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
 router.get(nconf.get('web:homeurl'),
@@ -105,7 +103,5 @@ router.get('/about/*', function(req, res) {
 router.get('/_s/cdn/*', function(req, res) {
   res.redirect(req.path.replace('/_s/cdn', ''));
 });
-
-router.use(favicon(resolveStatic('favicon.ico')));
 
 module.exports = router;
