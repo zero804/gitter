@@ -8,6 +8,7 @@ var fixtureLoader = require('../test-fixtures');
 
 var autoLurkerService = testRequire("./services/auto-lurker-service");
 var recentRoomService = testRequire("./services/recent-room-service");
+var roomMembershipService = testRequire("./services/room-membership-service");
 var roomService = testRequire("./services/room-service");
 var persistence = testRequire("./services/persistence-service");
 var userTroupeSettingsService = testRequire("./services/user-troupe-settings-service");
@@ -68,8 +69,7 @@ describe('auto-lurker-service', function() {
       var tenDaysAgo = new Date(Date.now() - 86400000 * 10);
       return userTroupeSettingsService.setUserSettings(fixture.user1.id, fixture.troupe1.id, 'notifications', { })
         .then(function() {
-          fixture.troupe1.users[0].lurk = true; // Workaround
-          return roomService.updateTroupeLurkForUserId(fixture.user1.id, fixture.troupe1.id, true); // lurk!
+          return roomMembershipService.setMemberLurkStatus(fixture.troupe1.id, fixture.user1.id, true);
         })
         .then(function() {
           return recentRoomService.saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupe1.id, { lastAccessTime: tenDaysAgo });
@@ -92,8 +92,7 @@ describe('auto-lurker-service', function() {
       var tenDaysAgo = new Date(Date.now() - 86400000 * 10);
       return userTroupeSettingsService.setUserSettings(fixture.user1.id, fixture.troupe1.id, 'notifications', { push: 'mention' })
         .then(function() {
-          fixture.troupe1.users[0].lurk = true; // Workaround
-          return roomService.updateTroupeLurkForUserId(fixture.user1.id, fixture.troupe1.id, true); // lurk!
+          return roomMembershipService.setMemberLurkStatus(fixture.troupe1.id, fixture.user1.id, true);
         })
         .then(function() {
           return recentRoomService.saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupe1.id, { lastAccessTime: tenDaysAgo });
@@ -163,12 +162,12 @@ describe('auto-lurker-service', function() {
         .then(function() {
           return [
             userTroupeSettingsService.getUserSettings(fixture.user1.id, fixture.troupe1.id, 'notifications'),
-            persistence.Troupe.findOneQ({ _id: fixture.troupe1._id }, { users: { $elemMatch: { userId: fixture.user1._id } } })
+            roomMembershipService.getMemberLurkStatus(fixture.troupe1.id, fixture.user1.id)
           ];
         })
-        .spread(function(settings, t) {
+        .spread(function(settings, lurkStatus) {
           assert.strictEqual(settings.push, 'mention');
-          assert(t.users[0].lurk);
+          assert.strictEqual(true, lurkStatus);
         })
         .nodeify(done);
     });
@@ -185,12 +184,12 @@ describe('auto-lurker-service', function() {
         .then(function() {
           return [
             userTroupeSettingsService.getUserSettings(fixture.user1.id, fixture.troupe1.id, 'notifications'),
-            persistence.Troupe.findOneQ({ _id: fixture.troupe1._id }, { users: { $elemMatch: { userId: fixture.user1._id } } })
+            roomMembershipService.getMemberLurkStatus(fixture.troupe1.id, fixture.user1.id)
           ];
         })
-        .spread(function(settings, t) {
+        .spread(function(settings, lurkStatus) {
           assert.strictEqual(settings.push, 'mention');
-          assert(t.users[0].lurk);
+          assert.strictEqual(true, lurkStatus);
         })
         .nodeify(done);
     });
@@ -199,8 +198,7 @@ describe('auto-lurker-service', function() {
       var tenDaysAgo = new Date(Date.now() - 86400000 * 10);
       return userTroupeSettingsService.setUserSettings(fixture.user1.id, fixture.troupe1.id, 'notifications', { push: 'mute' })
         .then(function() {
-          fixture.troupe1.users[0].lurk = true; // Workaround
-          return roomService.updateTroupeLurkForUserId(fixture.user1.id, fixture.troupe1.id, true); // lurk!
+          return roomMembershipService.setMemberLurkStatus(fixture.troupe1.id, fixture.user1.id, true);
         })
         .then(function() {
           return recentRoomService.saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupe1.id, { lastAccessTime: tenDaysAgo });
@@ -211,12 +209,12 @@ describe('auto-lurker-service', function() {
         .then(function() {
           return [
             userTroupeSettingsService.getUserSettings(fixture.user1.id, fixture.troupe1.id, 'notifications'),
-            persistence.Troupe.findOneQ({ _id: fixture.troupe1._id }, { users: { $elemMatch: { userId: fixture.user1._id } } })
+            roomMembershipService.getMemberLurkStatus(fixture.troupe1.id, fixture.user1.id)
           ];
         })
-        .spread(function(settings, t) {
+        .spread(function(settings, lurkStatus) {
           assert.strictEqual(settings.push, 'mute');
-          assert(t.users[0].lurk);
+          assert.strictEqual(true, lurkStatus);
         })
         .nodeify(done);
     });

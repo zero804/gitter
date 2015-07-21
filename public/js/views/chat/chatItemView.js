@@ -69,7 +69,7 @@ module.exports = (function() {
     },
 
     modelEvents: {
-      //'syncStatusChange': 'onSyncStatusChange',
+      'syncStatusChange': 'onSyncStatusChange',
       'change': 'onChange'
     },
 
@@ -318,7 +318,7 @@ module.exports = (function() {
     },
 
     canEdit: function() {
-      return this.isOwnMessage() && this.isInEditablePeriod() && !this.isEmbedded();
+      return this.model.id && this.isOwnMessage() && this.isInEditablePeriod() && !this.isEmbedded();
     },
 
     hasBeenEdited: function() {

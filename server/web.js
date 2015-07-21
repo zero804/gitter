@@ -51,7 +51,12 @@ require('./services/kue-workers').startWorkers();
 
 // APIS
 var auth = require('./web/middlewares/ensure-logged-in-or-get');
-require('./api/').install(app, '/api', auth);
+if (nconf.get("web:startApiInPrimaryApp")) {
+  require('./api/').install(app, '/api', auth);
+}
+// API calls which must go directly to the webapp, not the API
+require('./api_web/').install(app, auth);
+
 
 /* This should be second last */
 require('./handlers/app').install(app);

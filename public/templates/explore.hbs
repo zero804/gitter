@@ -59,7 +59,7 @@
         {{#if rooms}}
           <div class="page-content__room-list">
             {{#each rooms}}
-              <a class='room-item  js-room-item' href="/{{ room.uri }}?source=explore">
+              <a class='room-item  js-room-item' href="/{{ room.uri }}?source=explore" target="_parent">
                 <header>
                   <img class="room-item__avatar" src="https://avatars.githubusercontent.com/{{ owner }}?s=80">
                   <h3 class="repo-name">
@@ -79,7 +79,7 @@
                   {{!-- <p>Some content, content about something.</p> --}}
                 </section>
                 <footer>
-                  <small><span class="octicon octicon-organization"></span> {{ room.users.length }} {{ pluralize room.users.length 'person' 'people'}}</small>
+                  <small><span class="octicon octicon-organization"></span> {{ room.userCount }} {{ pluralize room.userCount 'person' 'people'}}</small>
                   <small><span class="octicon octicon-comment-discussion"></span> {{ formatNumber messageCount }} {{ pluralize messageCount 'message' 'messages'}}</small>
                 </footer>
               </a>
@@ -88,15 +88,19 @@
         {{/if}}
         <div class='page-content__new-room'>
           <h1><span class="mega-octicon octicon-search"></span> Haven't found what you're looking for?</h1>
-          <p><a href='/home/createroom' class='btn--primary  js-create-new'><span class="octicon octicon-plus"></span> Create a room</a></p>
+          <p><a href='/home/createroom' target="_parent" class='btn--primary  js-create-new'><span class="octicon octicon-plus"></span> Create a room</a></p>
         </div>
       </div>
     </div>
+
+    {{#unless isLoggedIn }}
     <footer>
       <p>Our team is <b>proud</b> to host thousands of public conversations for open-source communities, for free. <b>Gitter</b>, where developers come together to talk.</p>
       <p><a href='/?redirect=no' class='btn--secondary  js-find-out'><span class="octicon octicon-telescope"></span> Find out more</a></p>
       {{!-- <small>Gitter &mdash; 2015 &copy;</small> --}}
     </footer>
+    {{/unless}}
+
     <script type="text/javascript" src="//use.typekit.net/ohh4mcl.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/octicons/2.0.2/octicons.min.css">
     <script type="text/javascript">try{Typekit.load();}catch(e){}</script>

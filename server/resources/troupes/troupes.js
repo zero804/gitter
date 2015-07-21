@@ -55,7 +55,7 @@ module.exports = {
   show: function(req, res, next) {
     var strategyOptions = { currentUserId: req.user && req.user.id };
 
-    if (req.query.include_users) strategyOptions.mapUsers = true;
+    // if (req.query.include_users) strategyOptions.mapUsers = true;
     var strategy = new restSerializer.TroupeIdStrategy(strategyOptions);
 
     return restSerializer.serialize(req.troupe.id, strategy)
@@ -75,7 +75,7 @@ module.exports = {
       .then(function (room) {
         if (!room || !room.troupe) throw new StatusError(403, 'Permission denied');
 
-        var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, mapUsers: true, includeRolesForTroupe: room.troupe });
+        var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, /*mapUsers: true,*/ includeRolesForTroupe: room.troupe });
 
         return restSerializer.serialize(room.troupe, strategy);
       })
@@ -109,7 +109,7 @@ module.exports = {
 
         return Q.all(promises)
           .then(function() {
-            var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, mapUsers: false });
+            var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id /*, mapUsers: false*/ });
 
             restSerializer.serialize(troupe, strategy, function(err, serialized) {
               if(err) return next(err);

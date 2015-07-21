@@ -26,6 +26,8 @@ var gulpif = require('gulp-if');
 var sourcemaps = require('gulp-sourcemaps');
 var shell = require('gulp-shell');
 var del = require('del');
+var grepFail = require('gulp-grep-fail');
+var runSequence = require('run-sequence');
 
 /* Don't do clean in gulp, use make */
 var DEV_MODE = !!process.env.DEV_MODE;
@@ -34,7 +36,7 @@ var testModules = {
   'integration': ['./test/integration/**/*.js', './test/public-js/**/*.js'],
   'cache-wrapper': ['./modules/cache-wrapper/test/*.js'],
   'github': ['./modules/github/test/*.js'],
-  'split-tests': ['./modules/split-tests/test/*.js'],  
+  'split-tests': ['./modules/split-tests/test/*.js'],
 };
 
 /** Make a series of tasks based on the test modules */
@@ -47,7 +49,10 @@ function makeTestTasks(taskName, generator) {
     });
   });
 
-  gulp.task(taskName, Object.keys(testModules).map(function(moduleName) { return taskName + '-' + moduleName; }));
+  gulp.task(taskName, function(callback) {
+    var args = Object.keys(testModules).map(function(moduleName) { return taskName + '-' + moduleName; }).concat(callback);
+    runSequence.apply(null, args);
+  });
 }
 
 
@@ -88,7 +93,15 @@ gulp.task('validate-server-source', function() {
     .pipe(jshint.reporter('fail'));
 });
 
-gulp.task('validate', ['validate-client-source', 'validate-server-source']);
+gulp.task('validate-illegal-markers', function() {
+  return gulp.src(['server/**/*.js', 'shared/**/*.js', 'modules/*/lib/**/*.js', 'public/js/**/*.js'])
+    .pipe(grepFail([ 'NOCOMMIT' ]));
+  //
+  // return gulp.src()
+  //   .pipe(grepFail([ '' ]));
+});
+
+gulp.task('validate', ['validate-client-source', 'validate-server-source' /*, 'validate-illegal-markers'*/]);
 
 makeTestTasks('test-mocha', function(name, files) {
   mkdirp.sync('output/test-reports/');
@@ -344,6 +357,7 @@ gulp.task('css-web', function () {
     'public/less/router-archive-home.less',
     'public/less/router-archive-chat.less',
     'public/less/userhome.less',
+    'public/less/userhome_treatment.less',
     'public/less/402.less',
     'public/less/org-404.less'
   ];

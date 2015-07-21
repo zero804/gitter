@@ -1,8 +1,8 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var env = require('gitter-web-env');
-var config          = env.config;
+var env            = require('gitter-web-env');
+var config         = env.config;
 
 var express        = require('express');
 var passport       = require('passport');
@@ -75,6 +75,19 @@ module.exports = {
     }
 
     app.use(env.middlewares.accessLogger);
+    var debugHttp = require('debug')('gitter:http');
+    if (debugHttp.enabled) {
+      app.use(function(req, res, next) {
+        var start = Date.now();
+        res.on('header', function() {
+          var duration = Date.now() - start;
+          debugHttp("%s %s completed in %sms", req.method, req.path, duration);
+        });
+
+        debugHttp("%s %s", req.method, req.path);
+        next();
+      });
+    }
 
     app.use(express.cookieParser());
     app.use(express.urlencoded());

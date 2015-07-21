@@ -109,6 +109,10 @@ function resolveMentions(troupe, user, parsedMessage) {
  * to chat in the room
  */
 exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
+  
+  // Keep this up here, set sent time asap to ensure order
+  var sentAt = new Date();
+
   return Q.fcall(function() {
     if(!troupe) throw new StatusError(404, 'Unknown room');
 
@@ -126,7 +130,7 @@ exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
     var chatMessage = new ChatMessage({
       fromUserId: user.id,
       toTroupeId: troupe.id,
-      sent:       new Date(),
+      sent:       sentAt,
       text:       data.text,                    // Keep the raw message.
       status:     data.status,                // Checks if it is a status update
       pub:        troupe.security === 'PUBLIC' || undefined, // Public room - useful for sampling

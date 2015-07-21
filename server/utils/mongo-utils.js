@@ -79,6 +79,12 @@ function serializeObjectId(id) {
   return id.toString();
 }
 
+function serializeObjectIds(ids) {
+  if (!ids || !ids.length) return [];
+
+  return ids.map(serializeObjectId);
+}
+
 function createIdForTimestamp(timestamp) {
     var hexSeconds = Math.floor(timestamp/1000).toString(16);
     while(hexSeconds.length < 8) {
@@ -121,5 +127,6 @@ exports.getDateFromObjectId = getDateFromObjectId;
 exports.getTimestampFromObjectId = getTimestampFromObjectId;
 exports.getNewObjectIdString = getNewObjectIdString;
 exports.serializeObjectId = serializeObjectId;
+exports.serializeObjectIds = serializeObjectIds;
 exports.createIdForTimestamp = createIdForTimestamp;
 exports.fieldInPredicate = fieldInPredicate;
