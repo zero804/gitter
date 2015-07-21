@@ -58,7 +58,9 @@ module.exports = {
           noInfo: false,
           quiet: false,
           lazy: false,
-          watchDelay: 300,
+          watchOptions: {
+            aggregateTimeout: 400
+          },
           publicPath: "/_s/l/js/",
           stats: {
               colors: true

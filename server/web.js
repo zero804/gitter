@@ -12,10 +12,6 @@ var domainWrapper = require('./utils/domain-wrapper');
 var serverStats = require('./utils/server-stats');
 var onMongoConnect = require('./utils/on-mongo-connect');
 
-
-/* Load express-resource */
-require('express-resource');
-
 var app = express();
 
 var server = http.createServer(domainWrapper(app));
