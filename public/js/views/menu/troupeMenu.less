@@ -201,12 +201,25 @@ body.hover .menu:hover .menu__hotspot {
   line-height: 1.2;
 }
 
+.menu__heading {
+  margin: 1em 1em 0em 1em;
+  text-transform: none;
+  text-align: center;
+  color: grey;
+}
+
+.menu__heading b {
+  font-weight: normal;
+  color: lightgrey;
+}
+
 .menu__job-button {
   display: block;
-  margin: 1em 1em 0 1em;
+  margin: 1em;
   padding: 1em;
-  background-color: @orange;
+  background-color: rgba(100,100,100,0.1);
   border-radius: 0.5em;
+  border: 1px solid grey;
 
   text-align: center;
   text-transform: uppercase;
@@ -214,7 +227,7 @@ body.hover .menu:hover .menu__hotspot {
   font-size: 0.8em;
 
   &:hover {
-    background-color: darken(@orange, 5%);
+    background-color: rgba(100,100,100,0.3);
   }
 }
 
