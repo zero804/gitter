@@ -21,6 +21,9 @@ module.exports = {
         authMiddleware,
         require('./eyeballs.js'));
 
+    // Remove this after 1 August 2015
+    app.get(apiRoot + '/v1/ping', authMiddleware, require('../../api_web/private/ping.js'));
+
     app.delete(apiRoot + '/v1/sockets/:socketId',
       require('./sockets.js'));
 
