@@ -31,7 +31,7 @@ var corsOptions = {
   ]
 };
 
-app.use(cors(corsOptions));
+app.use(cors(corsOptions));  
 app.options('*', cors(corsOptions));
 
 require('./web/express-static').install(app);
