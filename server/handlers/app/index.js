@@ -57,7 +57,6 @@ var chatMiddlewarePipeline = [
   appMiddleware.isPhoneMiddleware,
   timezoneMiddleware,
   function (req, res, next) {
-
     if (req.uriContext.accessDenied) {
       return appRender.renderOrg404Page(req, res, next);
     }
