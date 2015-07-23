@@ -144,8 +144,16 @@ module.exports = (function() {
             return;
           }
 
-
-          promise = apiClient.post("/v1/rooms/" + ownerModel.get('roomId') + '/channels', payload);
+          if (!ownerModel.get('roomId')) {
+            // we are creating a channel for an owner that doesnt have its own room
+            // so we have to create the owner room first. usually an org room.
+            promise = apiClient.post('/v1/rooms', { uri: ownerModel.get('uri') })
+              .then(function(ownerRoom) {
+                return apiClient.post('/v1/rooms/' + ownerRoom.id + '/channels', payload);
+              });
+          } else {
+            promise = apiClient.post("/v1/rooms/" + ownerModel.get('roomId') + '/channels', payload);
+          }
       }
 
       promise
