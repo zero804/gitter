@@ -89,8 +89,8 @@ onready(function () {
       hash = windowHash;
     }
 
-    // TEMPORARY FIX FOR IE. Fix properly!
-    if (iframeUrl.charAt(0) !== '/') {
+    // fix for IE 10 giving iframeUrls with first slash missing
+    if (iframeUrl.charAt(0) !== '/' && iframeUrl.indexOf(window.location.origin) !== 0) {
       iframeUrl = '/' + iframeUrl;
     }
     /*

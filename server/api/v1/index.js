@@ -15,8 +15,6 @@ roomResources.use('/', authMiddleware);
 router.use('/user', usersResources);
 router.use('/rooms', roomResources);
 
-// Misc stuff
-
 // APN has no auth requirement as user may not have authenticated
 // and this is used for devices without users
 router.post('/apn', require('./apn.js'));
