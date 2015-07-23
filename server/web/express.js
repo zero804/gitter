@@ -4,7 +4,6 @@
 var env            = require('gitter-web-env');
 var config         = env.config;
 
-var express        = require('express');
 var passport       = require('passport');
 var expressHbs     = require('express-hbs');
 var rememberMe     = require('./middlewares/rememberme-middleware');
@@ -14,7 +13,6 @@ var cookieParser   = require('cookie-parser');
 var methodOverride = require('method-override');
 var session        = require('express-session');
 var devMode        = config.get('dev-mode');
-var favicon        = require('serve-favicon');
 
 // Naughty naughty naught, install some extra methods on the express prototype
 require('./http');
