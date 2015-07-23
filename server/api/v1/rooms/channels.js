@@ -36,7 +36,7 @@ module.exports = {
       })
       .fail(function(err) {
         if(err.clientDetail && err.responseStatusCode) {
-          res.send(err.responseStatusCode, err.clientDetail);
+          res.status(err.responseStatusCode).send(err.clientDetail);
         } else {
           next(err);
         }

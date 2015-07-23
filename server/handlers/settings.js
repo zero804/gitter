@@ -43,7 +43,7 @@ function getIntegrations(req, res) {
   }, function(err, resp, hooks) {
     if(err || resp.statusCode != 200 || !Array.isArray(hooks)) {
       logger.error('failed to fetch hooks for troupe', { exception: err, resp: resp, hooks: hooks});
-      res.send(500, 'Unable to perform request. Please try again later.');
+      res.status(500).send('Unable to perform request. Please try again later.');
       return;
     }
     logger.info('hook list received', { hooks: hooks });
@@ -73,7 +73,7 @@ function deleteIntegration(req, res) {
   function(err, resp) {
     if(err || resp.statusCode != 200) {
       logger.error('failed to delete hook for troupe', { exception: err, resp: resp });
-      res.send(500, 'Unable to perform request. Please try again later.');
+      res.status(500).send('Unable to perform request. Please try again later.');
       return;
     }
 
@@ -95,7 +95,7 @@ function createIntegration(req, res) {
   function(err, resp, body) {
     if(err || resp.statusCode != 200 || !body) {
       logger.error('failed to create hook for troupe', { exception: err, resp: resp });
-      res.send(500, 'Unable to perform request. Please try again later.');
+      res.status(500).send('Unable to perform request. Please try again later.');
       return;
     }
 
@@ -161,7 +161,7 @@ router.get('/unsubscribe/:hash', function (req, res, next) {
     var decipher  = crypto.createDecipher('aes256', passphrase);
     plaintext     = decipher.update(req.params.hash, 'hex', 'utf8') + decipher.final('utf8');
   } catch(err) {
-    res.send(400, 'Invalid hash');
+    res.status(400).send('Invalid hash');
     return;
   }
 

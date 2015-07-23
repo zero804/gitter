@@ -15,7 +15,7 @@ module.exports = {
   id: 'userTroupe',
   index: function(req, res, next) {
     if(!req.user) {
-      return res.send(403);
+      return res.sendStatus(403);
     }
 
     restful.serializeTroupesForUser(req.resourceUser.id)

@@ -12,7 +12,7 @@ module.exports = function(req, res) {
     /* API client without access, shouldn't really happen :( */
     logger.warn("User is not logged in, denying access");
 
-    res.send(401, { success: false, loginRequired: true });
+    res.status(401).send({ success: false, loginRequired: true });
     return;
   }
 

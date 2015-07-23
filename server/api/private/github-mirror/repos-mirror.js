@@ -31,8 +31,9 @@ module.exports = function(req, res, next) {
     .then(function(ghResponse) {
       res.send(ghResponse);
     }).fail(function(err) {
-      if(err.statusCode) {
-        res.send(err.statusCode);
+      var status = err.status || err.statusCode;
+      if(status) {
+        res.sendStatus(status);
       } else {
         next(err);
       }

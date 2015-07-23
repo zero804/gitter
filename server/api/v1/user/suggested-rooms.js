@@ -10,7 +10,7 @@ module.exports = {
 
   index: function(req, res, next) {
     if(!req.user) {
-      return res.send(403);
+      return res.sendStatus(403);
     }
 
     return legacyRecommendations.getSuggestionsForUser(req.user, req.i18n.getLocale())

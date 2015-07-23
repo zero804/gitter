@@ -52,7 +52,7 @@ module.exports = {
   },
 
   show: function(req, res, next) {
-    if(req.troupe.githubType != 'REPO') return res.send(404);
+    if(req.troupe.githubType != 'REPO') return res.sendStatus(404);
 
     var issueNumber = req.params.issue;
     var repoName = req.troupe.uri;
