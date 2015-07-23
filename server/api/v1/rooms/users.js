@@ -85,7 +85,7 @@ module.exports = {
           serializedUser.email = maskEmail(email);
         }
 
-        res.send(200, { success: true, user: serializedUser });
+        res.status(200).send({ success: true, user: serializedUser });
       })
       .catch(next);
   },

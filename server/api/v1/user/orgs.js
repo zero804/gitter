@@ -6,7 +6,7 @@ var restful = require('../../../services/restful');
 module.exports = {
   id: 'org',
   index: function(req, res, next) {
-    if (!req.user) return res.send(403);
+    if (!req.user) return res.sendStatus(403);
 
     return restful.serializeOrgsForUser(req.user, { /* mapUsers: !!req.query.include_users */ })
       .then(function(serialized) {

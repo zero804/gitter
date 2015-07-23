@@ -134,7 +134,7 @@ module.exports = {
        return roomDeletionService.removeByUri(troupe.uri);
       })
       .then(function() {
-        res.send(200);
+        res.sendStatus(200);
       })
       .fail(next);
   },
