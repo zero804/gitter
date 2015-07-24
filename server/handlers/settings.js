@@ -15,11 +15,12 @@ var uriContextResolverMiddleware = require('./app/middleware').uriContextResolve
 var jwt                          = require('jwt-simple');
 var cdn                          = require('../web/cdn');
 var services                     = require('gitter-services');
+var identifyRoute                = env.middlewares.identifyRoute;
 
 var supportedServices = [
-  {id: 'github', name: 'GitHub'},
-  {id: 'bitbucket', name: 'BitBucket'},
-  {id: 'trello', name: 'Trello'},
+  { id: 'github',    name: 'GitHub'},
+  { id: 'bitbucket', name: 'BitBucket'},
+  { id: 'trello',    name: 'Trello'},
 ];
 
 var openServices = Object.keys(services).map(function(id) {
@@ -137,53 +138,58 @@ var router = express.Router({ caseSensitive: true, mergeParams: true });
 
   router.get(uri,
     ensureLoggedIn,
+    identifyRoute('settings-room-get'),
     uriContextResolverMiddleware({ create: false }),
     adminAccessCheck,
     getIntegrations);
 
   router.delete(uri,
     ensureLoggedIn,
+    identifyRoute('settings-room-delete'),
     uriContextResolverMiddleware({ create: false }),
     adminAccessCheck,
     deleteIntegration);
 
   router.post(uri,
     ensureLoggedIn,
+    identifyRoute('settings-room-create'),
     uriContextResolverMiddleware({ create: false }),
     adminAccessCheck,
     createIntegration);
 });
 
-router.get('/unsubscribe/:hash', function (req, res, next) {
-  var plaintext;
+router.get('/unsubscribe/:hash',
+  identifyRoute('settings-unsubscribe'),
+  function (req, res, next) {
+    var plaintext;
+    try {
+      var decipher  = crypto.createDecipher('aes256', passphrase);
+      plaintext     = decipher.update(req.params.hash, 'hex', 'utf8') + decipher.final('utf8');
+    } catch(err) {
+      res.status(400).send('Invalid hash');
+      return;
+    }
 
-  try {
-    var decipher  = crypto.createDecipher('aes256', passphrase);
-    plaintext     = decipher.update(req.params.hash, 'hex', 'utf8') + decipher.final('utf8');
-  } catch(err) {
-    res.status(400).send('Invalid hash');
-    return;
-  }
+    var parts             = plaintext.split(',');
+    var userId            = parts[0];
+    var notificationType  = parts[1];
 
-  var parts             = plaintext.split(',');
-  var userId            = parts[0];
-  var notificationType  = parts[1];
+    logger.info("User " + userId + " opted-out from " + notificationType);
+    stats.event('unsubscribed_unread_notifications', {userId: userId});
 
-  logger.info("User " + userId + " opted-out from " + notificationType);
-  stats.event('unsubscribed_unread_notifications', {userId: userId});
+    userSettingsService.setUserSettings(userId, 'unread_notifications_optout', 1)
+      .then(function () {
+        var msg = "Done. You wont receive notifications like that one in the future.";
 
-  userSettingsService.setUserSettings(userId, 'unread_notifications_optout', 1)
-    .then(function () {
-      var msg = "Done. You wont receive notifications like that one in the future.";
+        res.render('unsubscribe', { layout: 'generic-layout', title: 'Unsubscribe', msg: msg });
+      })
+      .fail(next);
 
-      res.render('unsubscribe', { layout: 'generic-layout', title: 'Unsubscribe', msg: msg });
-    })
-    .fail(next);
-
-});
+  });
 
 router.get('/badger/opt-out',
   ensureLoggedIn,
+  identifyRoute('settings-badger-optout'),
   function (req, res, next) {
     var userId = req.user.id;
 

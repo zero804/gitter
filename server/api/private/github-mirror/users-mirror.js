@@ -3,9 +3,12 @@
 
 var Mirror      = require('gitter-web-github').GitHubMirrorService('user');
 var userService = require('../../../services/user-service');
+var StatusError = require('statuserror');
 
 module.exports = function (req, res, next) {
-  var githubUri = 'users/' + req.route.params[0];
+  if (!req.params || req.params[0]) return next(new StatusError(404));
+
+  var githubUri = 'users/' + req.params[0];
   var mirror = new Mirror(req.user);
 
   mirror.get(githubUri)

@@ -4,11 +4,14 @@ var Mirror = require('gitter-web-github').GitHubMirrorService('repo');
 var processChat = require('../../../utils/markdown-processor');
 var util = require('util');
 var highlight = require('highlight.js');
+var StatusError = require('statuserror');
 
 highlight.configure({classPrefix: ''});
 
 module.exports = function(req, res, next) {
-  var githubUri = 'repos/' + req.route.params[0];
+  if (!req.params || req.params[0]) return next(new StatusError(404));
+
+  var githubUri = 'repos/' + req.params[0];
   var mirror = new Mirror(req.user);
 
   mirror.get(githubUri)

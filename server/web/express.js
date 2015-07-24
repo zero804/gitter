@@ -62,7 +62,7 @@ module.exports = {
       });
 
       app.use(responseTime(function (req, res, time) {
-        debugHttp("%s %s completed in %sms", req.method, req.path, time);
+        debugHttp("%s %s completed %s with in %sms", req.method, req.path, res.statusCode, time);
       }));
     }
 

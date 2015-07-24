@@ -2,49 +2,100 @@
 
 var express = require('express');
 var authMiddleware = require('../../web/middlewares/auth-api');
+var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
+
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
 // No auth
-router.get('/health_check', require('./health-check.js'));
+router.get('/health_check',
+  identifyRoute('api-private-health-check'),
+  require('./health-check'));
 
 // No auth
-router.get('/health_check/full', require('./health-check-full.js'));
+router.get('/health_check/full',
+  identifyRoute('api-private-health-check-full'),
+  require('./health-check-full'));
 
-router.get('/gh/repos/*', authMiddleware, require('./github-mirror/repos-mirror'));
+router.get('/gh/repos/*',
+  authMiddleware,
+  identifyRoute('api-private-github-repo-mirror'),
+  require('./github-mirror/repos-mirror'));
 
-router.get('/gh/users/*', authMiddleware, require('./github-mirror/users-mirror'));
+router.get('/gh/users/*',
+  authMiddleware,
+  identifyRoute('api-private-github-users-mirror'),
+  require('./github-mirror/users-mirror'));
 
-router.get('/gh/search/users', authMiddleware, require('./github-mirror/user-search-mirror'));
+router.get('/gh/search/users',
+  authMiddleware,
+  identifyRoute('api-private-github-user-search-mirror'),
+  require('./github-mirror/user-search-mirror'));
 
 // No auth for hooks yet
-router.post('/hook/:hash', require('./hooks'));
+router.post('/hook/:hash',
+  identifyRoute('api-private-hook'),
+  require('./hooks'));
 
-router.get('/irc-token', authMiddleware, require('./irc-token.js'));
+router.get('/irc-token',
+  authMiddleware,
+  identifyRoute('api-private-irc-token'),
+  require('./irc-token'));
 
-router.get('/issue-state', authMiddleware, require('./issue-state.js'));
+router.get('/issue-state',
+  authMiddleware,
+  identifyRoute('api-private-issue-state'),
+  require('./issue-state'));
 
-router.get('/room-permission', authMiddleware, require('./room-permission.js'));
+router.get('/room-permission',
+  authMiddleware,
+  identifyRoute('api-private-room-permission'),
+  require('./room-permission'));
 
-router.get('/generate-signature', authMiddleware, require('./transloadit-signature.js'));
+router.get('/generate-signature',
+  authMiddleware,
+  identifyRoute('api-private-transloadit-signature'),
+  require('./transloadit-signature'));
 
 // No auth
-router.post('/transloadit/:token', require('./transloadit.js'));
+router.post('/transloadit/:token',
+  identifyRoute('api-private-transloadit-callback'),
+  require('./transloadit'));
 
 // No auth
-router.get('/chat-heatmap/:roomId', require('./chat-heatmap.js'));
+router.get('/chat-heatmap/:roomId',
+  identifyRoute('api-private-chat-heatmap'),
+  require('./chat-heatmap'));
 
-router.get('/orgs/:orgUri/members', authMiddleware, require('./org-members.js'));
+router.get('/orgs/:orgUri/members',
+  authMiddleware,
+  identifyRoute('api-private-org-members'),
+  require('./org-members'));
 
-router.post('/subscription/:userOrOrg', require('./subscription-created.js'));
 
-router.delete('/subscription/:userOrOrg', require('./subscription-deleted.js'));
+router.post('/subscription/:userOrOrg',
+  identifyRoute('api-private-subscription-create'),
+  require('./subscription-created'));
 
-router.post('/statsc', require('./statsc.js'));
+router.delete('/subscription/:userOrOrg',
+  identifyRoute('api-private-subscription-delete'),
+  require('./subscription-deleted'));
 
-router.get('/sample-chats', require('./sample-chats.js'));
+router.post('/statsc',
+  identifyRoute('api-private-statsc'),
+  require('./statsc'));
 
-router.post('/create-badge', authMiddleware, require('./create-badge-pr.js'));
+router.get('/sample-chats',
+  identifyRoute('api-private-sample-chats'),
+  require('./sample-chats'));
 
-router.post('/invite-user', authMiddleware, require('./invite-user.js'));
+router.post('/create-badge',
+  authMiddleware,
+  identifyRoute('api-private-create-badge'),
+  require('./create-badge-pr'));
+
+router.post('/invite-user',
+  authMiddleware,
+  identifyRoute('api-private-invite-user'),
+  require('./invite-user'));
 
 module.exports = router;
