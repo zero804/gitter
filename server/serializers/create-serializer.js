@@ -2,7 +2,6 @@
 "use strict";
 
 var env    = require('gitter-web-env');
-var logger = env.logger;
 var nconf  = env.config;
 var stats  = env.stats;
 
@@ -58,12 +57,6 @@ function serialize(items, strat, callback) {
     debug('strategy %s with %s items took %sms to complete', strat.name, items.length, time);
     if(time > maxSerializerTime) {
       stats.responseTime('serializer.slow.preload', time);
-
-      logger.warn('Serialization took a excessive amount of time to complete', {
-        strategy: strat.name,
-        time: time,
-        items: items.length
-      });
     }
 
     var serialized = items.map(strat.map)
