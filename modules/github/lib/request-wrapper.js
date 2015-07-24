@@ -13,7 +13,11 @@ var requestExt = require('request-extensible');
 var RequestHttpCache = require('request-http-cache');
 
 function createRedisClient() {
-  var redisCachingConfig = config.get("redis_caching");
+  var redisCachingConfig = process.env.REDIS_CACHING_CONNECTION_STRING || config.get("redis_caching");
+  if (typeof redisCachingConfig === 'string') {
+    redisCachingConfig = env.redis.parse(redisCachingConfig);
+  }
+
   var redisConfig = _.extend({}, redisCachingConfig, {
     clientOpts: {
       return_buffers: true
