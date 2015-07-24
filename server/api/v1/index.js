@@ -7,8 +7,8 @@ var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
-var usersResources = resourceRoute(require('./user'));
-var roomResources = resourceRoute(require('./rooms'));
+var usersResources = resourceRoute('api-user', require('./user'));
+var roomResources = resourceRoute('api-rooms', require('./rooms'));
 
 usersResources.use('/', authMiddleware);
 roomResources.use('/', authMiddleware);
