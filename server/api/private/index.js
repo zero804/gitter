@@ -48,9 +48,10 @@ module.exports = {
         // No auth
         require('./transloadit.js'));
 
-    app.get(apiRoot + '/private/chat-heatmap/:roomId',
-        // No auth
-        require('./chat-heatmap.js'));
+    // disabled due to massive load
+    // app.get(apiRoot + '/private/chat-heatmap/:roomId',
+    //     // No auth
+    //     require('./chat-heatmap.js'));
 
     app.get(apiRoot + '/private/orgs/:orgUri/members',
         authMiddleware,
