@@ -1,9 +1,10 @@
 'use strict';
 
-var express = require('express');
-var StatusError = require('statuserror');
+var express       = require('express');
+var StatusError   = require('statuserror');
+var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
 
-module.exports = function resourceRoute(resource) {
+module.exports = function resourceRoute(routeIdentifier, resource) {
   var router = express.Router({ caseSensitive: true, mergeParams: true });
   var idParam = resource.id;
 
@@ -21,23 +22,25 @@ module.exports = function resourceRoute(resource) {
     });
   }
 
-  function mount(method, url, impl) {
+  function mount(method, url, subrouteIdentifier, impl) {
     if (!impl) return;
-    router[method](url, impl);
+    router[method](url,
+      identifyRoute(routeIdentifier + '-' + subrouteIdentifier),
+      impl);
   }
 
-  mount('get',    '/',                       resource.index);
-  mount('get',    '/new',                    resource.new);
-  mount('post',   '/',                       resource.create);
-  mount('get',    '/:' + idParam,            resource.get);
-  mount('get',    '/:' + idParam + '/edit',  resource.edit);
-  mount('put',    '/:' + idParam,            resource.update);
-  mount('delete', '/:' + idParam,            resource.destroy);
+  mount('get',    '/',                       'index',   resource.index);
+  mount('get',    '/new',                    'new',     resource.new);
+  mount('post',   '/',                       'create',  resource.create);
+  mount('get',    '/:' + idParam,            'get',     resource.get);
+  mount('get',    '/:' + idParam + '/edit',  'edit',    resource.edit);
+  mount('put',    '/:' + idParam,            'update',  resource.update);
+  mount('delete', '/:' + idParam,            'destroy', resource.destroy);
 
   if (resource.subresources) {
     Object.keys(resource.subresources).forEach(function(subresourceName) {
       var subresource = resource.subresources[subresourceName];
-      router.use('/:' + idParam + '/' + subresourceName, resourceRoute(subresource));
+      router.use('/:' + idParam + '/' + subresourceName, resourceRoute(routeIdentifier + '-' + subresourceName, subresource));
     });
   }
 
