@@ -12,8 +12,10 @@ var env                  = require('gitter-web-env');
 var burstCalculator      = require('../../utils/burst-calculator');
 var roomPermissionsModel = require('../../services/room-permissions-model');
 var timezoneMiddleware   = require('../../web/middlewares/timezone');
+var identifyRoute        = require('gitter-web-env').middlewares.identifyRoute;
 
 exports.datesList = [
+  identifyRoute('app-archive-main'),
   appMiddleware.uriContextResolverMiddleware({ create: false }),
   function(req, res, next) {
     var user = req.user;
@@ -67,6 +69,7 @@ exports.datesList = [
 
 
 exports.chatArchive = [
+  identifyRoute('app-archive-date'),
   appMiddleware.uriContextResolverMiddleware({ create: false }),
   timezoneMiddleware,
   function(req, res, next) {
