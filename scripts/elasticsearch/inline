@@ -1,0 +1,2 @@
+#!/bin/bash
+cat $1| perl -p -e 's/\n/\\n/g;s/"/\\"/g;'
