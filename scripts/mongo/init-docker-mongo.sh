@@ -5,13 +5,11 @@ set -x
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-MONGODB1=`ping -c 1 mongo1 | head -1  | cut -d "(" -f 2 | cut -d ")" -f 1`
-MONGODB2=`ping -c 1 mongo2 | head -1  | cut -d "(" -f 2 | cut -d ")" -f 1`
-MONGODB3=`ping -c 1 mongo3 | head -1  | cut -d "(" -f 2 | cut -d ")" -f 1`
+MONGODB1=$(ping -c 1 mongo1 | head -1  | cut -d "(" -f 2 | cut -d ")" -f 1)
+MONGODB2=$(ping -c 1 mongo2 | head -1  | cut -d "(" -f 2 | cut -d ")" -f 1)
+MONGODB3=$(ping -c 1 mongo3 | head -1  | cut -d "(" -f 2 | cut -d ")" -f 1)
 
-sleep 20
-
-mongo --host ${MONGODB1}:27017 <<EOF
+MONGO_REPLICA_CONFIG=$(cat <<EOF
    var cfg = {
         "_id": "troupeSet",
         "version": 1,
@@ -29,13 +27,19 @@ mongo --host ${MONGODB1}:27017 <<EOF
             {
                 "_id": 2,
                 "host": "${MONGODB3}:27017",
-                "priority": 1
+                "priority": 1,
+                "arbiterOnly": true
             }
         ]
     };
     rs.initiate(cfg);
 EOF
+)
+echo "Waiting to initialize mongo with $MONGO_REPLICA_CONFIG"
+sleep 20
+
+echo "$MONGO_REPLICA_CONFIG" | mongo --host "${MONGODB1}:27017"
 
 sleep 10
 
-$SCRIPT_DIR/../dataupgrades/001-oauth-client/002-add-redirect-uri.sh $MONGODB1/gitter
+"$SCRIPT_DIR/../dataupgrades/001-oauth-client/002-add-redirect-uri.sh" "$MONGODB1/gitter"

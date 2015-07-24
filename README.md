@@ -9,20 +9,20 @@ Please symlink pre-commit to .git/hooks/pre-commit to enable the pre-commit hook
 Prerequisites
 -------------
 * node.js 0.10+ `brew install node`
-* Redis 2.8+ `brew install redis`
-* MongoDB 3.0+ `brew install mongo`
+* [Virtualbox](https://www.virtualbox.org/wiki/Downloads)
+* [Kitematic](https://kitematic.com/) or `boot2docker` if you prefer
+*
 
 Getting Started
 ---------------
-1. `npm install`
-2. `npm install -g gulp`
-3. `gulp css` (compiles css)
-4. `./mongodb.sh` (starts mongo database)
-5. `./redis.sh` (starts redis cache)
-6. `./scripts/mongo/init-dev-mongo.sh`
-7. `./scripts/upgrade-data.sh`
-8. `npm install -g nodemon`
-9. `nodemon` (this will run node and restart when anything changes based on config in nodemon.json)
+1. Open kitematic or setup a boot2docker instance called `dev`.
+2. run `eval "$(docker-machine env dev)"` or, better yet, add it to your bash profile.
+3. run `docker-compose up -d`
+4. `npm install`
+5. `npm install -g gulp`
+6. `gulp css` (compiles css)
+7. `npm install -g nodemon`
+8. `nodemon` (this will run node and restart when anything changes based on config in nodemon.json)
 
 Data Upgrades
 -------------
