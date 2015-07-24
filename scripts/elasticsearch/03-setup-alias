@@ -1,0 +1,27 @@
+#!/bin/bash -xe
+
+set -e
+set -x
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# source $SCRIPT_DIR/vars
+
+if curl --fail "$ES_URL/_alias/$INDEX_NAME"; then
+  ## Update existing
+  curl --silent -XGET "$ES_URL/_alias/$INDEX_NAME?pretty=true" |\
+    $SCRIPT_DIR/transform-alias-to-switch $INDEX_NAME | \
+    curl --fail -vi -XPOST "$ES_URL/_aliases?pretty=true" -d @-
+else
+  ## Create new
+  curl --fail -vi -XPOST "$ES_URL/_aliases?pretty=true" -d @- << EOD
+  {
+    "actions": [{
+      "add": {
+        "index": "$INDEX_NAME",
+        "alias": "gitter-primary"
+      }
+    }]
+  }
+EOD
+fi
