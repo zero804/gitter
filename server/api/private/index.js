@@ -46,11 +46,6 @@ router.get('/issue-state',
   identifyRoute('api-private-issue-state'),
   require('./issue-state'));
 
-router.get('/room-permission',
-  authMiddleware,
-  identifyRoute('api-private-room-permission'),
-  require('./room-permission'));
-
 router.get('/generate-signature',
   authMiddleware,
   identifyRoute('api-private-transloadit-signature'),
