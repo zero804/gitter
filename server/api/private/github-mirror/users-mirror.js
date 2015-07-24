@@ -6,7 +6,7 @@ var userService = require('../../../services/user-service');
 var StatusError = require('statuserror');
 
 module.exports = function (req, res, next) {
-  if (!req.params || req.params[0]) return next(new StatusError(404));
+  if (!req.params || !req.params[0]) return next(new StatusError(404));
 
   var githubUri = 'users/' + req.params[0];
   var mirror = new Mirror(req.user);
