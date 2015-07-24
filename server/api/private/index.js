@@ -36,10 +36,6 @@ module.exports = {
         authMiddleware,
         require('./issue-state.js'));
 
-    app.get(apiRoot + '/private/room-permission',
-        authMiddleware,
-        require('./room-permission.js'));
-
     app.get(apiRoot + '/private/generate-signature',
         authMiddleware,
         require('./transloadit-signature.js'));
