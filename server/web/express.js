@@ -76,7 +76,7 @@ module.exports = {
 
     var RedisStore = require('connect-redis')(session);
     var sessionStore = new RedisStore({
-      client: env.redis.createClient(config.get("redis_nopersist")),
+      client: env.redis.createClient(process.env.REDIS_NOPERSIST_CONNECTION_STRING || config.get("redis_nopersist")),
       ttl: config.get('web:sessionTTL')
     });
 
