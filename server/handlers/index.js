@@ -1,6 +1,7 @@
 "use strict";
 
-var express = require('express');
+var env           = require('gitter-web-env');
+var express       = require('express');
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
@@ -25,6 +26,7 @@ router.get('/*', function(req, res, next) {
 });
 
 // Error Handlers
+router.use(env.middlewares.errorReporter);
 router.use(require('../web/middlewares/token-error-handler'));
 router.use(require('../web/middlewares/express-error-handler'));
 
