@@ -130,6 +130,8 @@ body.hover .menu:hover .menu__hotspot {
   to   { opacity: 1; }
 }
 
+@menu-shadow-size: 3em;
+
 .menu-content {
   // vertically expand as much as possible
   flex: 1;
@@ -154,8 +156,9 @@ body.hover .menu:hover .menu__hotspot {
     vertical-align: top;
     width: 100%;
     transition: 0.1s all ease-in;
+    margin-bottom: @menu-shadow-size;
 
-    .menu-list__item {
+    .menu-list__item:not(:last-child) {
       margin-bottom: 20px;
     }
 
@@ -194,6 +197,15 @@ body.hover .menu:hover .menu__hotspot {
       }
     }
   }
+}
+
+
+.menu-list__overflow-shadow {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: @menu-shadow-size;
+  background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, #383435 100%);
 }
 
 .menu-list__header__details {
