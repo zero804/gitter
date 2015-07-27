@@ -1095,9 +1095,9 @@
       }
     },
     "gitter-env": {
-      "version": "0.20.14",
-      "from": "gitter-env@0.20.14",
-      "resolved": "http://beta-internal:4873/gitter-env/-/gitter-env-0.20.14.tgz",
+      "version": "0.20.15",
+      "from": "gitter-env@0.20.15",
+      "resolved": "http://beta-internal:4873/gitter-env/-/gitter-env-0.20.15.tgz",
       "dependencies": {
         "async": {
           "version": "0.8.0",
