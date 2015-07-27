@@ -52,20 +52,6 @@ module.exports = {
     }
 
     app.use(env.middlewares.accessLogger);
-    var debugHttp = require('debug')('gitter:http');
-    if (debugHttp.enabled) {
-      var responseTime = require('response-time');
-
-      app.use(function(req, res, next) {
-        debugHttp("%s %s", req.method, req.path);
-        next();
-      });
-
-      app.use(responseTime(function (req, res, time) {
-        debugHttp("%s %s completed %s with in %sms", req.method, req.path, res.statusCode, time);
-      }));
-    }
-
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: false }));
 
