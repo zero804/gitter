@@ -32,7 +32,7 @@ if(nconf.get('ws:startFayeInPrimaryApp')) {
 if (nconf.get("web:startApiInPrimaryApp")) {
   app.use('/api', require('./api/'));
 }
-app.use('/api_web', require('./api_web/'));
+app.use('/api_web', require('./api-web/'));
 app.use('/', require('./handlers/'));
 
 require('./services/kue-workers').startWorkers();
