@@ -19,22 +19,30 @@ redis2:
   net: host
   ports:
     - "6380:6380"
-  entrypoint: [ "/usr/local/bin/redis-server", "--port", "6380" ]
+  volumes:
+    - ./config/redis-docker:/redis
+  entrypoint: [ "/usr/local/bin/redis-server", "/redis/slave.conf", "--port", "6380"]
 
   # links:
   #   - 'redis1'
 
 sentinel1:
   image: hpess/redis
-  restart: 'always'
+  restart: 'on-failure:5'
   hostname: sentinel1
   net: host
   environment:
     master_name: 'gitter-master-dev'
-    ## This is horrible....
-    master_ip: '192.168.99.100'
+    ## This is horrible but it's the only way to expose the external ip within sentinel
+    master_ip: 'gitter-dev.local'
+  extra_hosts:
+     - "somehost:162.242.195.82"
+  volumes:
+    - ./config/redis-docker:/redis
   ports:
     - "26379:26379"
+  entrypoint: [ "/usr/local/bin/redis-server", "/redis/redis-sentinel.conf", "--sentinel"]
+
   # links:
   #   - 'redis1'
 
