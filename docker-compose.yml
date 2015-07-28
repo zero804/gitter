@@ -81,8 +81,9 @@ mongosetup:
     - mongo2:mongo2
     - mongo3:mongo3
   volumes:
+    - ./config/mongo-docker:/mongo-docker
     - ./scripts:/scripts
-  entrypoint: [ "/scripts/mongo/init-docker-mongo.sh" ]
+  entrypoint: [ "/bin/bash", "/mongo-docker/init-mongo.sh" ]
 
 # The official elasticsearch:1.4.2 image with mapper-attachments and river-mongodb plugins
 # https://github.com/soldotno/elasticsearch-river-mongodb/blob/master/Dockerfile
