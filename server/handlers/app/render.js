@@ -26,6 +26,8 @@ var troupeService      = require('../../services/troupe-service');
 var useragent          = require('useragent');
 var avatar             = require('../../utils/avatar');
 var _                 = require('underscore');
+var GitHubOrgService   = require('gitter-web-github').GitHubOrgService;
+
 
 /* How many chats to send back */
 var INITIAL_CHAT_COUNT = 50;
@@ -411,20 +413,28 @@ function renderOrgPage(req, res, next) {
   var org = req.uriContext && req.uriContext.uri;
   var opts = {};
 
+  // Show only public rooms to not logged in users
   if (!req.user) opts.security = 'PUBLIC';
 
-  return troupeService.findChildRoomsForOrg(org, opts)
-    .then(function (rooms) {
-      var strategy = new restSerializer.TroupeStrategy();
-      return restSerializer.serialize(rooms, strategy);
-    })
+  var ghOrgService = new GitHubOrgService(req.user);
+
+  return Q.all([
+    ghOrgService.getOrg(org),
+    troupeService.findChildRoomsForOrg(org, opts)
+  ])
+  .spread(function (ghOrg,rooms) {
+    console.log('*** org', ghOrg);
+
+    var strategy = new restSerializer.TroupeStrategy();
+    return restSerializer.serialize(rooms, strategy)
     .then(function (rooms) {
       res.render('org-page', {
-        org: org,
+        org: ghOrg,
         rooms: rooms
       });
-    })
-    .catch(next);
+    });
+  })
+  .catch(next);
 }
 
 
