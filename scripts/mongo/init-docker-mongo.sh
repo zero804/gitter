@@ -9,7 +9,7 @@ MONGODB1=$(ping -c 1 mongo1 | head -1  | cut -d "(" -f 2 | cut -d ")" -f 1)
 MONGODB2=$(ping -c 1 mongo2 | head -1  | cut -d "(" -f 2 | cut -d ")" -f 1)
 MONGODB3=$(ping -c 1 mongo3 | head -1  | cut -d "(" -f 2 | cut -d ")" -f 1)
 
-if [[ "$(mongo --host "$MONGODB1" --quiet --eval 'rs.status().ok')" -ne "0" ]]; then
+if [[ "$(mongo --host "$MONGODB1" --quiet --eval 'rs.status().ok')" -ne "1" ]]; then
   MONGO_REPLICA_CONFIG=$(cat <<EOF
      var cfg = {
           "_id": "troupeSet",
