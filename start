@@ -1,11 +1,33 @@
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+#!/bin/bash
+
+set -e
 
 function startDockerMachine {
   if [[ $(docker-machine ls dev -q) -ne "dev" ]]; then
     docker-machine create -d virtualbox dev --virtualbox-disk-size "30000" --virtual-hostonly-cidr "192.168.99.1/24" -virtualbox-memory "2048" || true
   fi
   eval "$(docker-machine env dev)"
+}
 
+function setupHostAliases {
+  CURRENT_ALIAS=$(grep gitter-dev.local /etc/hosts|sed 's/ .*//')
+  DEV_IP=$(docker-machine ip dev)
+  if [[ "$CURRENT_ALIAS" != "$DEV_IP" ]]; then
+    >&2 echo "Warning. Your current gitter-dev.local ($CURRENT_ALIAS) hostname does not match the docker-machine IP of $DEV_IP"
+    read -p "Would you like to update your hostfile? [yN] " -n 1 -r
+    echo
+    if [[ "$REPLY" =~ ^[Yy]$ ]]; then
+      if [[ -z "$CURRENT_ALIAS" ]]; then
+        sudo /bin/sh -c "echo \"$DEV_IP gitter-dev.local\" >> /etc/hosts"
+      else
+        sudo /bin/sh -c "sed -i.bak \"s/.* gitter-dev.local */$DEV_IP gitter-dev.local/\" /etc/hosts"
+      fi
+    fi
+
+  fi
+}
+
+function startDockerServices {
   if [[ -z $(docker-compose ps -q) ]]; then
     docker-compose up -d
   else
@@ -13,11 +35,11 @@ function startDockerMachine {
   fi
 }
 
-function setupHostAliases {
-  DEV_IP=$(docker-machine ip dev)
-  echo "$DEV_IP gitter-dev.local" > "$SCRIPT_DIR/hostaliases"
-  export HOSTALIASES="$SCRIPT_DIR/hostaliases"
-}
-
 startDockerMachine
 setupHostAliases
+startDockerServices
+
+cat << "EOD"
+# Run this command to configure your shell:
+# eval "$(docker-machine env dev)"
+EOD
