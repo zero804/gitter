@@ -1,50 +1,36 @@
-neo4j:
-  image: kbastani/docker-neo4j
-  restart: 'always'
-  ports:
-    - "7474:7474"
-
 redis1:
-  image: hpess/redis
+  image: redis:3.0.3
   restart: 'always'
   hostname: redis1
-  net: host
   ports:
     - "6379:6379"
+  entrypoint: [ "/usr/local/bin/redis-server", "--bind", "0.0.0.0", "--port", "6379", "--maxclients", "200"]
 
 redis2:
-  image: hpess/redis
+  image: redis:3.0.3
   restart: 'always'
   hostname: redis2
-  net: host
   ports:
     - "6380:6380"
-  volumes:
-    - ./config/redis-docker:/redis
-  entrypoint: [ "/usr/local/bin/redis-server", "/redis/slave.conf", "--port", "6380"]
+  links:
+    - redis1
+  env_file:
+    - ./config/docker/redis-slave.env
+  entrypoint: [ "/bin/bash", "-c", "exec /usr/local/bin/redis-server --bind 0.0.0.0 --port 6380 --slaveof $REDIS_MASTER_IP 6379 --maxclients 200"]
 
-  # links:
-  #   - 'redis1'
 
 sentinel1:
-  image: hpess/redis
+  image: redis:3.0.3
   restart: 'on-failure:5'
   hostname: sentinel1
-  net: host
-  environment:
-    master_name: 'gitter-master-dev'
-    ## This is horrible but it's the only way to expose the external ip within sentinel
-    master_ip: 'gitter-dev.local'
-  extra_hosts:
-     - "somehost:162.242.195.82"
-  volumes:
-    - ./config/redis-docker:/redis
+  links:
+    - redis1
+    - redis2
   ports:
     - "26379:26379"
-  entrypoint: [ "/usr/local/bin/redis-server", "/redis/redis-sentinel.conf", "--sentinel"]
-
-  # links:
-  #   - 'redis1'
+  env_file:
+    - ./config/docker/sentinel.env
+  entrypoint: [ "/bin/bash", "-c", "echo $SENTINEL_CONF > /redis-sentinel.conf && exec /usr/local/bin/redis-server /redis-sentinel.conf --sentinel --bind 0.0.0.0 --maxclients 200"]
 
 mongo2:
   hostname: mongo2
@@ -84,6 +70,12 @@ mongosetup:
     - ./config/mongo-docker:/mongo-docker
     - ./scripts:/scripts
   entrypoint: [ "/bin/bash", "/mongo-docker/init-mongo.sh" ]
+
+neo4j:
+  image: kbastani/docker-neo4j
+  restart: 'always'
+  ports:
+    - "7474:7474"
 
 # The official elasticsearch:1.4.2 image with mapper-attachments and river-mongodb plugins
 # https://github.com/soldotno/elasticsearch-river-mongodb/blob/master/Dockerfile
