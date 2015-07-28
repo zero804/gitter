@@ -140,10 +140,11 @@ module.exports = {
   },
 
   load: function(req, id, callback) {
+    var userId = req.user && req.user._id;
     /* Invalid id? Return 404 */
     if(!mongoUtils.isLikeObjectId(id)) return callback();
 
-    troupeService.findByIdLeanWithAccess(id, req.user && req.user._id)
+    troupeService.findByIdLeanWithAccess(id, userId)
       .spread(function(troupe, access) {
         if(!troupe) throw new StatusError(404);
 

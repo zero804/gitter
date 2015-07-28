@@ -8,13 +8,12 @@ winston.info('Starting server/web.js');
 var express  = require('express');
 var http     = require('http');
 var nconf    = require('./utils/config');
-var domainWrapper = require('./utils/domain-wrapper');
 var serverStats = require('./utils/server-stats');
 var onMongoConnect = require('./utils/on-mongo-connect');
 
 var app = express();
 
-var server = http.createServer(domainWrapper(app));
+var server = http.createServer(app);
 
 require('./web/graceful-shutdown').install(server, app);
 
