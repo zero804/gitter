@@ -15,6 +15,7 @@ module.exports = {
     require('./in-browser-tests').install(app);
     require('./robots').install(app);
     require('./home').install(app);
+    require('./org-pages').install(app);
     require('./diagnostics').install(app);
   }
 };

@@ -407,16 +407,19 @@ function renderMobileNotLoggedInChat(req, res, next) {
   }, next);
 }
 
-function renderOrg404Page(req, res, next) {
+function renderOrgPage(req, res, next) {
   var org = req.uriContext && req.uriContext.uri;
+  var opts = {};
 
-  return troupeService.findPublicChildRoomsForOrg(org)
+  if (!req.user) opts.security = 'PUBLIC';
+
+  return troupeService.findChildRoomsForOrg(org, opts)
     .then(function (rooms) {
       var strategy = new restSerializer.TroupeStrategy();
       return restSerializer.serialize(rooms, strategy);
     })
     .then(function (rooms) {
-      res.render('org-404', {
+      res.render('org-page', {
         org: org,
         rooms: rooms
       });
@@ -527,7 +530,7 @@ module.exports = exports = {
   renderHomePage: renderHomePage,
   renderChatPage: renderChatPage,
   renderMainFrame: renderMainFrame,
-  renderOrg404Page: renderOrg404Page,
+  renderOrgPage: renderOrgPage,
   renderMobileChat: renderMobileChat,
   renderMobileUserHome: renderMobileUserHome,
   renderEmbeddedChat: renderEmbeddedChat,

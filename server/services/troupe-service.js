@@ -241,10 +241,14 @@ function toggleSearchIndexing(user, troupe, bool) {
     });
 }
 
-function findPublicChildRoomsForOrg(org) {
+function findChildRoomsForOrg(org, opts) {
   if (!org) return Q.resolve([]);
+  opts = opts || {};
 
-  return persistence.Troupe.find({ lcOwner: org.toLowerCase(), security: 'PUBLIC' })
+  var query = { lcOwner: org.toLowerCase() };
+  if (opts.security) query.security = opts.security;
+
+  return persistence.Troupe.find(query)
     .sort({ userCount: 'desc' })
     .execQ();
 }
@@ -261,5 +265,5 @@ module.exports = {
   updateTopic: updateTopic,
   toggleSearchIndexing: toggleSearchIndexing,
   checkGitHubTypeForUri: checkGitHubTypeForUri,
-  findPublicChildRoomsForOrg: findPublicChildRoomsForOrg
+  findChildRoomsForOrg: findChildRoomsForOrg
 };

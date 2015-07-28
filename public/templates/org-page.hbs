@@ -8,12 +8,6 @@
     <h1>{{ org }}</h1>
   </header>
   <div class='content'>
-    <p>You've tried to access <strong>{{ org }}'s private</strong> organization room and you do not belong to this organization.</p>
-    {{#if rooms}}
-      <p>But you can still chat by simply selecting one of the public rooms below.</p>
-    {{else}}
-      <p><i class="octicon octicon-alert"></i> Unfortunately this organization has no public rooms.</p>
-    {{/if}}
     {{#each rooms}}
       <a target='_top' href='/{{ uri }}' class='room'>
         <h1><i class='mega-octicon {{ githubTypeToClass githubType }}'></i> {{ getRoomName name }}</h1>
