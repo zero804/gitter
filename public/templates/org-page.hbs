@@ -4,8 +4,18 @@
 </head>
 <body>
   <header>
-    <img width='64' height='64' src='https://avatars.githubusercontent.com/{{ org }}?s=128'>
-    <h1>{{ org }}</h1>
+    <img width='64' height='64' src='https://avatars.githubusercontent.com/{{ org.login }}?s=128'>
+    <h1>{{ org.login }}</h1>
+    <p>{{org.description}}</p>
+    <p>
+      {{#if org.location}}
+        <i class="octicon octicon-location"></i> {{org.location}}
+      {{/if}}
+
+      {{#if org.blog}}
+        <i class="octicon octicon-link"></i><a href="{{org.blog}}"> {{org.blog}}</a>
+      {{/if}}
+    </p>
   </header>
   <div class='content'>
     {{#each rooms}}
