@@ -74,3 +74,4 @@ scripts/utils/output.txt
 scripts/utils/run.txt
 hostaliases
 config/redis-docker
+config/mongo-docker
