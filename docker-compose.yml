@@ -32,7 +32,7 @@ sentinel1:
   environment:
     master_name: 'gitter-master-dev'
     ## This is horrible....
-    master_ip: 'gitter-dev.local'
+    master_ip: '192.168.99.100'
   ports:
     - "26379:26379"
   # links:

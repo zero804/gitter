@@ -16,6 +16,7 @@ Prerequisites
 Getting Started
 ---------------
 1. Open kitematic or setup a boot2docker instance called `dev`.
+2. In Kitematic, choose "Install Docker Commands" from the application menu.
 2. run `eval "$(docker-machine env dev)"` or, better yet, add it to your bash profile.
 3. run `docker-compose up -d`
 4. `npm install`
