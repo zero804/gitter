@@ -173,9 +173,10 @@ exports.formatNumber = function (n) {
 exports.githubTypeToClass = function (type) {
   if (/_CHANNEL/.test(type)) return 'icon-hash';
   else if (/REPO/.test(type)) return 'octicon-repo';
+  else if (/ORG/.test(type)) return 'octicon-organization';
   else return 'default';
 };
 
 exports.getRoomName = function (name) {
-  return name.split('/')[1];
+  return name.split('/')[1] || 'general';
 };
