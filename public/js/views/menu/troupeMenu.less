@@ -40,7 +40,7 @@
   height: 100%;
 
   /* colors */
-  background-color: #383435;
+  background-color: @background-grey;
   color: white;
 
   /* effects */
@@ -130,6 +130,8 @@ body.hover .menu:hover .menu__hotspot {
   to   { opacity: 1; }
 }
 
+@menu-shadow-size: 3em;
+
 .menu-content {
   // vertically expand as much as possible
   flex: 1;
@@ -154,8 +156,9 @@ body.hover .menu:hover .menu__hotspot {
     vertical-align: top;
     width: 100%;
     transition: 0.1s all ease-in;
+    margin-bottom: @menu-shadow-size;
 
-    .menu-list__item {
+    .menu-list__item:not(:last-child) {
       margin-bottom: 20px;
     }
 
@@ -196,21 +199,19 @@ body.hover .menu:hover .menu__hotspot {
   }
 }
 
+
+.menu-list__overflow-shadow {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: @menu-shadow-size;
+  pointer-events: none;
+  background: linear-gradient(to bottom, fade(@background-grey, 0) 0%, @background-grey 100%);
+}
+
 .menu-list__header__details {
   float: right;
   line-height: 1.2;
-}
-
-.menu__heading {
-  margin: 1em 1em 0em 1em;
-  text-transform: none;
-  text-align: center;
-  color: grey;
-}
-
-.menu__heading b {
-  font-weight: normal;
-  color: lightgrey;
 }
 
 .menu__job-button {
