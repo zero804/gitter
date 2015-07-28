@@ -7,8 +7,8 @@ var I18n            = require('i18n-2');
 var path            = require('path');
 var fs              = require('fs');
 
-var localesDir = path.join(__dirname, '..', '..', 'locales');
-var homepageLocalesDir = path.join(__dirname, '..', '..' , 'locales', 'homepage');
+var localesDir = path.join(__dirname,  '../../node_modules/gitter-translations');
+var homepageLocalesDir = path.join(localesDir, 'homepage');
 var devMode =config.runtimeEnvironment === 'dev';
 
 function getLocales(localeDir) {

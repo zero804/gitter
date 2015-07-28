@@ -2,6 +2,7 @@
 "use strict";
 
 var i18n = require('i18n');
+var path = require('path');
 
 // TODO: put this somewhere else
 i18n.configure({
@@ -15,7 +16,7 @@ i18n.configure({
     // cookie: 'yourcookiename',
 
     // where to store json files - defaults to './locales' relative to modules directory
-    directory: __dirname + '/../../public/locales',
+    directory: path.resolve(__dirname, '../../node_modules/gitter-translations'),
 
     // whether to write new locale information to disk - defaults to true
     updateFiles: true
