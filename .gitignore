@@ -76,3 +76,4 @@ hostaliases
 config/redis-docker
 config/mongo-docker
 config/docker
+docker_node_modules
