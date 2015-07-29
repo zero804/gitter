@@ -1,4 +1,5 @@
 @import "typography.less";
+@import "room_card.less";
 
 html {
   box-sizing: border-box;
@@ -12,55 +13,40 @@ body {
   margin: 0;
 }
 
-header {
+.org-page__header {
   padding: 1.25em;
   overflow: hidden;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-}
 
-header h1 {
-  margin: 0;
-  line-height: 64px;
-}
+  h1 {
+    margin: 0;
+    line-height: 64px;
+  }
 
-header img {
-  float: left;
-  border-radius: 4px;
-  margin-right: 1.25em;
-}
-
-.content {
-  padding: 1.25em;
-  max-width: 60em;
-}
-
-.room {
-  display: inline-block;
-  padding: 0.625em;
-  border-radius: 6px;
-  margin-bottom: 0.625em;
-  text-decoration: none;
-  width: 100%;
-  color: inherit;
-  overflow: hidden;
-
-  &:hover {
-    background: rgba(150,150,150,0.2);
+  img {
+    float: left;
+    border-radius: 4px;
+    margin-right: 1.25em;
   }
 }
 
-.room h1 {
-  margin: 0;
-  float: left;
+.org-page__description {
+  margin: 15px 0px;
 }
 
-.room h1 i {
-  color: rgb(187, 187, 187);
-  width: 42px;
-  text-align: center;
+.org-page__details {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
 }
 
-.room__details {
-  line-height: 34px;
-  float: right;
+.org-page__detail {
+  margin-right: 20px;
+}
+
+
+.org-page__room-cards {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
 }

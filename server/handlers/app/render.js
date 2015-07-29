@@ -419,20 +419,37 @@ function renderOrgPage(req, res, next) {
   var ghOrgService = new GitHubOrgService(req.user);
 
   return Q.all([
-    ghOrgService.getOrg(org),
+    ghOrgService.getOrg(org).catch(function() { return {login: org}; }),
     troupeService.findChildRoomsForOrg(org, opts)
   ])
   .spread(function (ghOrg,rooms) {
-    console.log('*** org', ghOrg);
+    var getMembers = rooms.map(function(room) {
+      return roomMembershipService.findMembersForRoom(room.id, {limit: 10});
+    });
 
-    var strategy = new restSerializer.TroupeStrategy();
-    return restSerializer.serialize(rooms, strategy)
-    .then(function (rooms) {
+    return Q.all(getMembers)
+    .then(function(values) {
+      rooms.forEach(function(room, index) {
+        room.userIds = values[index];
+      });
+
+      var populateUsers = rooms.map(function(room) {
+        return userService.findByIds(room.userIds);
+      });
+  
+      return Q.all(populateUsers);
+    })
+    .then(function(values) {
+       rooms.forEach(function(room, index) {
+        room.users = values[index];
+      });
+
       res.render('org-page', {
         org: ghOrg,
         rooms: rooms
       });
     });
+
   })
   .catch(next);
 }
