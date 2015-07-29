@@ -73,9 +73,16 @@ module.exports = {
       .then(function(serialized) {
         res.send(serialized);
       })
-      .fail(function(err) {
-        return next(err);
-      });
+      .fail(next);
+  },
+
+  show: function(req, res, next) {
+    var strategy = new restSerializer.ChatStrategy({ currentUserId: req.user.id, troupeId: req.troupe.id });
+    return restSerializer.serialize(req.chatMessage, strategy)
+      .then(function(serialized) {
+        res.send(serialized);
+      })
+      .fail(next);
   },
 
   update: function(req, res, next) {
@@ -93,7 +100,7 @@ module.exports = {
 
   },
 
-  load: function(id, callback) {
+  load: function(req, id, callback) {
     chatService.findById(id, callback);
   },
 
