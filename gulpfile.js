@@ -203,9 +203,7 @@ gulp.task('copy-app-files', function() {
       'config/**',
       'public/templates/**',
       'public/layouts/**',
-      'public/locales/**',
       'public/js/**',
-      'locales/**',
       'scripts/**',
       'server/**',
       'shared/**',
@@ -262,7 +260,6 @@ gulp.task('prepare-app', ['build-app', 'tar-app']);
 gulp.task('copy-asset-files', function() {
   return gulp.src([
       'public/fonts/**',
-      'public/locales/**', // do we need this
       'public/images/**',
       'public/sprites/**',
       'public/repo/**',
