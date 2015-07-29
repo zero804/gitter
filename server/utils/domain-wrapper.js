@@ -7,7 +7,6 @@ var shutdown = require('shutdown');
 var errorReporter = env.errorReporter;
 
 module.exports = function(app) {
-
   return function(req, res) {
     var reqd = domain.create();
     reqd.add(req);
@@ -39,8 +38,7 @@ module.exports = function(app) {
 
         var userId = req.user && req.user.id;
 
-
-        errorReporter(err, { type: 'domain', userId: userId });
+        errorReporter(err, { type: 'domain', userId: userId, url: req.url, method: req.method, routeIdentifier: req.routeIdentifier });
 
         logger.error('----------------------------------------------------------------');
         logger.error('-- A BadThing has happened.');
