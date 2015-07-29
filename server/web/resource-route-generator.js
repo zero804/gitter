@@ -32,7 +32,7 @@ module.exports = function resourceRoute(routeIdentifier, resource) {
   mount('get',    '/',                       'index',   resource.index);
   mount('get',    '/new',                    'new',     resource.new);
   mount('post',   '/',                       'create',  resource.create);
-  mount('get',    '/:' + idParam,            'get',     resource.get);
+  mount('get',    '/:' + idParam,            'show',    resource.show);
   mount('get',    '/:' + idParam + '/edit',  'edit',    resource.edit);
   mount('put',    '/:' + idParam,            'update',  resource.update);
   mount('delete', '/:' + idParam,            'destroy', resource.destroy);
