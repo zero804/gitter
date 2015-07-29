@@ -5,6 +5,7 @@ var redis = require('./redis');
 var resque = require("node-resque");
 var env = require('gitter-web-env');
 var logger = env.logger;
+var debug = require('debug')('gitter:worker-queue');
 var stats = env.stats;
 var os = require('os');
 
@@ -16,7 +17,7 @@ var connectionDetails = {
 var scheduler = new resque.scheduler({connection: connectionDetails}, function() {});
 
 scheduler.on('start', function() {
-  logger.verbose('worker-queue-redis: scheduler started');
+  debug('scheduler started');
 });
 
 scheduler.on('error', function(err) {
@@ -66,44 +67,47 @@ var Queue = function(name, options, loaderFn) {
     }
   });
 
-  this.internalQueue = new resque.queue({connection: connectionDetails}, jobs, function() {
+  this.internalQueue = new resque.queue({ connection: connectionDetails }, jobs, function() {
     // ready to add to queue
   });
 
   this.worker.on('start', function() {
-    logger.silly('worker-queue-redis: started ' + self.name);
+    debug('started %s', self.name);
     stats.event('resque.worker.started');
   });
 
   this.worker.on('end', function() {
-    logger.silly("worker-queue-redis: ended " + self.name);
+    debug('ended %s', self.name);
     stats.event('resque.worker.ended');
   });
 
   this.worker.on('cleaning_worker', function(worker) {
-    logger.silly("worker-queue-redis: cleaning old worker: " + worker);
+    debug('cleaning old worker %s', worker);
     stats.event('resque.worker.cleaning');
   });
 
   this.worker.on('poll', function() {
+    debug('poll');
     stats.eventHF('resque.worker.polling', 1, 0.005);
   });
 
   this.worker.on('job', function(queue) {
-    logger.silly("worker-queue-redis: working job " + queue);
+    debug("job: %s", queue);
     stats.eventHF('resque.worker.working');
   });
 
-  this.worker.on('reEnqueue', function(queue, job, plugin) {
-    logger.silly("worker-queue-redis: reEnqueue job (" + plugin + ")");
+  this.worker.on('reEnqueue', function(queue/*, job, plugin*/) {
+    debug("reenqueue job on queue %s", queue);
     stats.event('resque.worker.reenqueue');
   });
 
   this.worker.on('pause', function() {
+    debug("paused");
     stats.eventHF('resque.worker.paused', 1, 0.005);
   });
 
-  this.worker.on('success', function(queue, job, result){
+  this.worker.on('success', function(queue, job, result) {
+    debug("success");
     self.fn(result, function(err) {
       if(err) return logger.error('worker-queue-redis: callback failed: ' + err, { queue: queue, job: job, exception: err });
     });
