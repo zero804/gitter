@@ -1,0 +1,35 @@
+<div class="room-card">
+
+  <header class="room-card__header">
+    <a href="/{{ uri }}?source=explore" target="_parent">
+      <h3>{{ uri }} <span class="room-card__usercount">{{userCount}} {{ pluralize userCount 'person' 'people'}}</span></h3>
+    </a>
+  </header>
+
+  <section class='room-card__description'>
+    <small>{{ topic }}</small>
+  </section>
+
+  {{#if users}}
+    <section class='room-card__users'>
+      {{#each users}}
+        <img class="room-card__user-avatar" src="https://avatars.githubusercontent.com/{{ username }}?s=80">
+      {{/each}}
+    </section>
+  {{/if}}
+
+
+  <section class='room-card__content'>
+    {{!-- <p>Some content, content about something.</p> --}}
+  </section>
+
+  <section class='room-card__tags'>
+    {{#each tags}}
+      <div class="room-card__tag">{{this}}</div>
+    {{/each}}
+  </section>
+
+
+  <footer class="room-card__footer">
+  </footer>
+</div>

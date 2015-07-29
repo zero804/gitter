@@ -1,30 +1,33 @@
 <head>
-  <link rel='stylesheet' type='text/css' href="{{ cdn 'styles/org-404.css' }}">
+  <link rel='stylesheet' type='text/css' href="{{ cdn 'styles/org-page.css' }}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/octicons/2.0.2/octicons.min.css">
 </head>
+
 <body>
-  <header>
+
+  <header class="org-page__header">
     <img width='64' height='64' src='https://avatars.githubusercontent.com/{{ org.login }}?s=128'>
     <h1>{{ org.login }}</h1>
-    <p>{{org.description}}</p>
-    <p>
+
+    <div class="org-page__description">
+      {{org.description}}
+    </div>
+
+    <div class="org-page__details">
       {{#if org.location}}
-        <i class="octicon octicon-location"></i> {{org.location}}
+        <div class="org-page__detail"><i class="octicon octicon-location"></i> {{org.location}}</div>
       {{/if}}
 
       {{#if org.blog}}
-        <i class="octicon octicon-link"></i><a href="{{org.blog}}"> {{org.blog}}</a>
+        <div class="org-page__detail"><i class="octicon octicon-link"></i><a href="{{org.blog}}"> {{org.blog}}</a></div>
       {{/if}}
-    </p>
+    </div>
   </header>
-  <div class='content'>
+
+  <div class='org-page__room-cards'>
     {{#each rooms}}
-      <a target='_top' href='/{{ uri }}' class='room'>
-        <h1><i class='mega-octicon {{ githubTypeToClass githubType }}'></i> {{ getRoomName name }}</h1>
-        <div class='room__details'>
-          <small><i class="octicon octicon-organization"></i> {{ formatNumber userCount }} {{ pluralize userCount 'person' 'people'}}</small>
-        </div>
-      </a>
+      {{> room_card }}
     {{/each}}
   </div>
+
 </body>
