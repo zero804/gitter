@@ -29,7 +29,7 @@ module.exports = {
     });
   },
 
-  load: function(id, callback) {
+  load: function(req, id, callback) {
     eventService.findById(id, callback);
   }
 
