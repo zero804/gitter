@@ -16,7 +16,7 @@ i18n.configure({
     // cookie: 'yourcookiename',
 
     // where to store json files - defaults to './locales' relative to modules directory
-    directory: path.resolve(__dirname, '../../node_modules/gitter-translations'),
+    directory: path.resolve(__dirname, '../../node_modules/@gitterhq/translations'),
 
     // whether to write new locale information to disk - defaults to true
     updateFiles: true
