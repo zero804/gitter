@@ -1,4 +1,3 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var env = require('gitter-web-env');
@@ -18,7 +17,7 @@ module.exports = function(app) {
       logger.error('Request failed: ' + err, { message: err.message, name: err.name });
 
       if(!res.headersSent) {
-        res.send(500);
+        res.sendStatus(500);
       } else {
         res.end();
       }
@@ -33,7 +32,7 @@ module.exports = function(app) {
     reqd.on('error', function(err) {
       try {
         if(!res.headersSent) {
-          res.send(500);
+          res.sendStatus(500);
         } else {
           res.end();
         }

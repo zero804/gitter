@@ -4,13 +4,14 @@
 var env            = require('gitter-web-env');
 var config         = env.config;
 
-var express        = require('express');
 var passport       = require('passport');
 var expressHbs     = require('express-hbs');
 var rememberMe     = require('./middlewares/rememberme-middleware');
-var cors           = require('cors');
 var resolveStatic  = require('./resolve-static');
-
+var bodyParser     = require('body-parser');
+var cookieParser   = require('cookie-parser');
+var methodOverride = require('method-override');
+var session        = require('express-session');
 var devMode        = config.get('dev-mode');
 
 // Naughty naughty naught, install some extra methods on the express prototype
@@ -20,14 +21,12 @@ module.exports = {
   /**
    * Configure express for the full web application
    */
-  installFull: function(app, server, sessionStore) {
+  installFull: function(app) {
     require('./register-helpers')(expressHbs);
 
-    app.locals({
-      googleTrackingId: config.get("stats:ga:key"),
-      googleTrackingDomain: config.get("stats:ga:domain"),
-      liveReload: config.get('web:liveReload')
-    });
+    app.locals.googleTrackingId = config.get("stats:ga:key");
+    app.locals.googleTrackingDomain = config.get("stats:ga:domain");
+    app.locals.liveReload = config.get('web:liveReload');
 
     app.engine('hbs', expressHbs.express3({
       partialsDir: resolveStatic('/templates/partials'),
@@ -47,57 +46,27 @@ module.exports = {
       app.enable('view cache');
     }
 
-
     if(devMode) {
-      var webpackMiddleware = require("webpack-dev-middleware");
-      var webpack = require('webpack');
-
-      process.env.WEBPACK_DEV_MODE = '1';
-
-      app.use(webpackMiddleware(webpack(require('../../public/js/webpack.config')), {
-          noInfo: false,
-          quiet: false,
-          lazy: false,
-          watchDelay: 300,
-          publicPath: "/_s/l/js/",
-          stats: {
-              colors: true
-          }
-      }));
-
-      app.use('/_s/l/styles', express.static('output/assets/styles', {
-        maxAge: 0
-      }));
-
-      app.use('/_s/l', express.static(resolveStatic(), {
-        maxAge: 0
-      }));
+      /* Serve static content */
+      require('./express-static').install(app);
     }
 
     app.use(env.middlewares.accessLogger);
-    var debugHttp = require('debug')('gitter:http');
-    if (debugHttp.enabled) {
-      app.use(function(req, res, next) {
-        var start = Date.now();
-        res.on('header', function() {
-          var duration = Date.now() - start;
-          debugHttp("%s %s completed in %sms", req.method, req.path, duration);
-        });
+    app.use(bodyParser.json());
+    app.use(bodyParser.urlencoded({ extended: false }));
 
-        debugHttp("%s %s", req.method, req.path);
-        next();
-      });
-    }
-
-    app.use(express.cookieParser());
-    app.use(express.urlencoded());
-    app.use(express.json());
-    app.use(express.methodOverride());
+    app.use(cookieParser());
+    app.use(methodOverride());
     app.use(require('./middlewares/ie6-post-caching'));
     app.use(require('./middlewares/i18n'));
 
+    var RedisStore = require('connect-redis')(session);
+    var sessionStore = new RedisStore({
+      client: env.redis.createClient(process.env.REDIS_NOPERSIST_CONNECTION_STRING || config.get("redis_nopersist")),
+      ttl: config.get('web:sessionTTL')
+    });
 
-    app.use(express.session({
+    app.use(session({
       secret: config.get('web:sessionSecret'),
       key: config.get('web:cookiePrefix') + 'session',
       store: sessionStore,
@@ -107,7 +76,9 @@ module.exports = {
         maxAge: 14400000,
         domain: config.get("web:cookieDomain"),
         secure: config.get("web:secureCookies")
-      }
+      },
+      resave: true,
+      saveUninitialized: true // Passport will force a save anyway
     }));
 
     app.use(passport.initialize());
@@ -123,12 +94,6 @@ module.exports = {
     app.use(require('./middlewares/enforce-csrf'));
 
     app.use(require('./middlewares/tokenless-user'));
-
-    app.use(app.router);
-
-    app.use(require('./middlewares/token-error-handler'));
-    app.use(require('./middlewares/express-error-handler'));
-
   },
 
   installApi: function(app) {
@@ -137,9 +102,9 @@ module.exports = {
 
     app.use(env.middlewares.accessLogger);
 
-    app.use(express.urlencoded());
-    app.use(express.json());
-    app.use(express.methodOverride());
+    app.use(bodyParser.json());
+    app.use(bodyParser.urlencoded({ extended: false }));
+    app.use(methodOverride());
 
     app.use(require('./middlewares/ie6-post-caching'));
     app.use(require('./middlewares/i18n'));
@@ -147,44 +112,12 @@ module.exports = {
     app.use(passport.initialize());
     app.use(require('./middlewares/rate-limiter'));
     app.use(require('./middlewares/record-client-usage-stats'));
-
-
-    // API uses CORS
-    var corsOptions = {
-      origin: true,
-      methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-      maxAge: 600, // 10 minutes
-      allowedHeaders: [
-        'content-type',
-        'x-access-token',
-        'accept'
-      ],
-      exposedHeaders: [
-        // Rate limiting with dolph
-        'X-RateLimit-Limit',
-        'X-RateLimit-Remaining',
-        'X-RateLimit-Reset'
-      ]
-    };
-
-    app.use(cors(corsOptions));
-
-    app.options('*', cors(corsOptions));
-
-    app.use(app.router);
-
-    app.use(require('./middlewares/token-error-handler'));
-    app.use(env.middlewares.errorHandler);
   },
 
   installSocket: function(app) {
     app.disable('x-powered-by');
     app.set('trust proxy', true);
     app.use(env.middlewares.accessLogger);
-    app.use(express.cookieParser());
-    app.use(express.urlencoded());
-    app.use(express.json());
-
     app.use(require('./middlewares/token-error-handler'));
     app.use(env.middlewares.errorHandler);
   }
