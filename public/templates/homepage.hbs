@@ -290,16 +290,24 @@
           <p>{{ __ "Gitter is built in London by a team of developers just like you. Hell even the product guy writes code, although we generally end up rewriting those bits." }}</p>
           <p>{{ __ "If you're ever around Silicon Roundabout, give us a shout, we love meeting up with other developers." }}</p>
 
-          <ul class="team">
+          <ul class="team-list">
             <li>
-              <b>Mike</b>
-              <a target="_blank" href="https://twitter.com/mydigitalself"><img src="{{cdn 'images/home/twitter.png'}}" alt="Twitter"></a>
-              <a target="_blank" href="https://github.com/mydigitalself"><img src="{{cdn 'images/home/github.png'}}" alt="Github"></a>
-
-              <img src="{{cdn 'images/home/mike.jpeg'}}">
-              <span class="mask"></span>
+              <ul class="team-list__link-list">
+                <li class="team-list__link-list__item">
+                  <b>Mike</b>
+                </li>
+                <li class="team-list__link-list__item">
+                  <a target="_blank" href="https://twitter.com/mydigitalself"><img src="{{cdn 'images/home/twitter.png'}}" alt="Twitter"></a>
+                </li>
+                <li class="team-list__link-list__item">
+                  <a target="_blank" href="https://github.com/mydigitalself"><img src="{{cdn 'images/home/github.png'}}" alt="Github"></a>
+                </li>
+              </ul>
+              <img class="team-list__profile-image"  src="{{cdn 'images/home/mike.jpeg'}}">
+              <span class="team-list__mask"></span>
             </li>
 
+            <!--
             <li>
               <b>Andrew</b>
               <a target="_blank" href="https://twitter.com/suprememoocow"><img src="{{cdn 'images/home/twitter.png'}}" alt="Twitter"></a>
@@ -326,6 +334,25 @@
               <img src="{{cdn 'images/home/andy.jpeg'}}">
               <span class="mask"></span>
             </li>
+
+            <li>
+              <ul class="team__link-list">
+                <li class="team__link-list__item"><b>Ricardo</b></li>
+                <li class="team__link-list__item"><a target="_blank" href="https://twitter.com/ricardobaeta"><img src="{{cdn 'images/home/twitter.png'}}" alt="Twitter"></a></li>
+                <li class="team__link-list__item"><a target="_blank" href="https://github.com/ricardobaeta"><img src="{{cdn 'images/home/github.png'}}" alt="Github"></a></li>
+              </ul>
+              <img src="{{cdn 'images/home/jon.jpeg'}}">
+              <span class="mask"></span>
+            </li>
+
+            <li>
+              <b>Jon</b>
+              <a target="_blank" href="https://twitter.com/cutandpastey"><img src="{{cdn 'images/home/twitter.png'}}" alt="Twitter"></a>
+              <a target="_blank" href="https://github.com/cutandpastey"><img src="{{cdn 'images/home/github.png'}}" alt="Github"></a>
+
+              <img src="{{cdn 'images/home/jon.jpeg'}}">
+              <span class="mask"></span>
+              </li> -->
 
           </ul>
           <small>
