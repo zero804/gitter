@@ -13,7 +13,6 @@ router.use('/rooms', authMiddleware);
 var usersResources = resourceRoute('api-user', require('./user'));
 var roomResources = resourceRoute('api-rooms', require('./rooms'));
 
-
 router.use('/user', usersResources);
 router.use('/rooms', roomResources);
 
