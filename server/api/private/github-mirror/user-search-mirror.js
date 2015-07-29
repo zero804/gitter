@@ -5,9 +5,10 @@ var Mirror      = require('gitter-web-github').GitHubMirrorService('user');
 var userService = require('../../../services/user-service');
 var winston     = require('../../../utils/winston');
 var url         = require('url');
+var StatusError = require('statuserror');
 
 module.exports = function(req, res, next) {
-  if(!req.user) return next(401);
+  if(!req.user) return next(new StatusError(401));
 
   var githubUri = url.format({ pathname: 'search/users', query: req.query });
 

@@ -1,10 +1,11 @@
-/*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
+var express = require('express');
 var exploreService = require('../services/explore-service');
 var getRoughMessageCount = require('../services/chat-service').getRoughMessageCount;
 var Q = require('q');
 var langs = require('langs');
+var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
 
 // @const
 var DEFAULT_TAGS = ['javascript', 'php', 'ruby'];
@@ -44,37 +45,34 @@ function getSearchName(tags) {
   });
 }
 
+var router = express.Router({ caseSensitive: true, mergeParams: true });
 
-module.exports = {
-  install: function (app) {
+/* Seriously, wtf is this all about? */
+router.get('/:tags?',
+  identifyRoute('explore-tags-redirect'),
+  function (req, res) {
+    var search = req.query.search;
+    var tags = (search) ? search.split(/[ ,]+/).map(trim).sort().join(',') : DEFAULT_TAGS.join(',');
+    res.redirect('/explore/tags/' + tags);
+  });
 
-    app.get('/home/~explore/(tags)?', function (req, res) {
-      var search = req.query.search;
-      var tags = (search) ? search.split(/[ ,]+/).map(trim).sort().join(',') : DEFAULT_TAGS.join(',');
-      res.redirect('/explore/tags/' + tags);
-    });
 
-    // route to handle search only
-    app.get('/explore/(tags)?', function (req, res) {
-      var search = req.query.search;
-      var tags = (search) ? search.split(/[ ,]+/).map(trim).sort().join(',') : DEFAULT_TAGS.join(',');
-      res.redirect('/explore/tags/' + tags);
-    });
+router.get('/tags/:tags',
+  identifyRoute('explore-tags'),
+  function (req, res, next) {
+    var tags = req.params.tags.split(',');
+    exploreService.fetchByTags(tags)
+      .then(processTagResult)
+      .then(function (rooms) {
+        var searchNames = getSearchName(tags);
+        res.render('explore', {
+          tags: tags.join(', '),
+          searchName: searchNames.join(', '),
+          rooms: rooms,
+          isLoggedIn: !!req.user
+        });
+      })
+      .fail(next);
+  });
 
-    app.get('/explore/tags/:tags', function (req, res, next) {
-      var tags = req.params.tags.split(',');
-      exploreService.fetchByTags(tags)
-        .then(processTagResult)
-        .then(function (rooms) {
-          var searchNames = getSearchName(tags);
-          res.render('explore', {
-            tags: tags.join(', '),
-            searchName: searchNames.join(', '),
-            rooms: rooms,
-            isLoggedIn: !!req.user
-          });
-        })
-        .fail(next);
-    });
-  }
-};
+module.exports = router;
