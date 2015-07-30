@@ -4,11 +4,11 @@
 var redis = require("../utils/redis");
 var nconf = require("../utils/config");
 var winston = require('../utils/winston');
+var mongoUtils = require('../utils/mongoUtils');
 var events = require('events');
 var Fiber = require('../utils/fiber');
 var appEvents = require('gitter-web-appevents');
 var Q = require('q');
-var _ = require("underscore");
 var StatusError = require('statuserror');
 var debug = require('debug')('gitter:presence-service');
 var presenceService = new events.EventEmitter();
@@ -26,7 +26,6 @@ var MOBILE_USERS_KEY = prefix + 'mobile_u';
 
 var ACTIVE_SOCKETS_KEY = prefix + 'activesockets';
 
-
 function keyUserLock(userId) {
   return prefix + "ul:" + userId;
 }
@@ -41,6 +40,29 @@ function keyTroupeUsers(troupeId) {
 
 function keyUserSockets(troupeId) {
   return prefix + "us:" + troupeId;
+}
+
+function getUniqueUsersAndTroupes(userTroupes) {
+  var userIds = [];
+  var troupeIds = [];
+  var result = [userIds, troupeIds];
+
+  var u = {}, t = {};
+  for (var i = 0; i < userTroupes.length; i++) {
+    var ut = userTroupes[i];
+    var userId = ut.userId;
+    if (!u[userId]) {
+      u[userId] = true;
+      userIds.push(userId);
+    }
+    var troupeId = ut.troupeId;
+    if (!t[troupeId]) {
+      t[troupeId] = true;
+      troupeIds.push(troupeId);
+    }
+  }
+
+  return result;
 }
 
 
@@ -382,10 +404,16 @@ function categorizeUsersByOnlineStatus(userIds, callback) {
 }
 
 function categorizeUserTroupesByOnlineStatus(userTroupes, callback) {
+  debug("categorizeUserTroupesByOnlineStatus for %s items", userTroupes.length);
   var f = new Fiber();
 
-  var troupeIds = _.uniq(userTroupes.map(function(userTroupe) { return userTroupe.troupeId; }));
-  var userIds = _.uniq(userTroupes.map(function(userTroupe) { return userTroupe.userId; }));
+  // Previously this was using _.uniq and taking 300ms in large rooms,
+  // this is much, much, much faster
+  var uniqueUsersAndTroupes = getUniqueUsersAndTroupes(userTroupes);
+  var userIds = uniqueUsersAndTroupes[0];
+  var troupeIds = uniqueUsersAndTroupes[1];
+
+  debug("categorizeUserTroupesByOnlineStatus unique troupes=%s unique users=%s", troupeIds.length, userIds.length);
 
   listOnlineUsersForTroupes(troupeIds, f.waitor());
   categorizeUsersByOnlineStatus(userIds, f.waitor());
@@ -569,7 +597,7 @@ function listActiveSockets(callback) {
 function listOnlineUsersForTroupes(troupeIds, callback) {
   if(!troupeIds || troupeIds.length === 0) return callback(null, {});
 
-  troupeIds = _.uniq(troupeIds);
+  troupeIds = mongoUtils.uniqueIds(troupeIds);
 
   var multi = redisClient.multi();
 
