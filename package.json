@@ -68,6 +68,7 @@
     "mongodb-arbiter-discovery": "^0.1.1",
     "mongodb-connection-string": "^0.1.1",
     "mongodb-datadog-stats": "^0.1.2",
+    "mongodb-unique-ids": "^0.1.2",
     "mongoose": "^4.0.7",
     "mongoose-number": "^0.1.1",
     "mongoose-q": "0.0.17",

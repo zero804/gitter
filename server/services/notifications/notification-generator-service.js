@@ -11,6 +11,7 @@ var onlineNotificationGeneratorService = require('./online-notification-generato
 var pushNotificationPostbox            = require('./push-notification-postbox');
 var mongoUtils                         = require('../../utils/mongo-utils');
 var errorReporter                      = require('gitter-web-env').errorReporter;
+var uniqueIds                          = require('mongodb-unique-ids');
 
 function getStartTimeForItems(items) {
   if(!items.length) return null;
@@ -42,7 +43,7 @@ function userCategorisationStrategy(userTroupes, callback) {
       return done();
     }
 
-    var offlineUsers = _.uniq(offlineUserTroupes.map(function(userTroupe) { return userTroupe.userId; } ));
+    var offlineUsers = uniqueIds(offlineUserTroupes.map(function(userTroupe) { return userTroupe.userId; } ));
 
     var offlineUserTroupeLookup = {};
     offlineUserTroupes.forEach(function(userTroupe) {

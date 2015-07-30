@@ -2102,6 +2102,11 @@
         }
       }
     },
+    "mongodb-unique-ids": {
+      "version": "0.1.2",
+      "from": "mongodb-unique-ids@*",
+      "resolved": "http://beta-internal:4873/mongodb-unique-ids/-/mongodb-unique-ids-0.1.2.tgz"
+    },
     "mongoose": {
       "version": "4.1.0",
       "from": "http://beta-internal:4873/mongoose/-/mongoose-4.1.0.tgz",
