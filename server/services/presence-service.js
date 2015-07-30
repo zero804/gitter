@@ -4,7 +4,6 @@
 var redis = require("../utils/redis");
 var nconf = require("../utils/config");
 var winston = require('../utils/winston');
-var mongoUtils = require('../utils/mongoUtils');
 var events = require('events');
 var Fiber = require('../utils/fiber');
 var appEvents = require('gitter-web-appevents');
@@ -12,7 +11,7 @@ var Q = require('q');
 var StatusError = require('statuserror');
 var debug = require('debug')('gitter:presence-service');
 var presenceService = new events.EventEmitter();
-
+var uniqueIds = require('mongodb-unique-ids');
 var redisClient = redis.getClient();
 
 var Scripto = require('gitter-redis-scripto');
@@ -597,7 +596,7 @@ function listActiveSockets(callback) {
 function listOnlineUsersForTroupes(troupeIds, callback) {
   if(!troupeIds || troupeIds.length === 0) return callback(null, {});
 
-  troupeIds = mongoUtils.uniqueIds(troupeIds);
+  troupeIds = uniqueIds(troupeIds);
 
   var multi = redisClient.multi();
 

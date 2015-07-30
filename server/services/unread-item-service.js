@@ -16,6 +16,7 @@ var collections      = require('../utils/collections');
 var Q                = require('q');
 var badgeBatcher     = new RedisBatcher('badge', 300);
 var roomMembershipService = require('./room-membership-service');
+var uniqueIds        = require('mongodb-unique-ids');
 
 var sendBadgeUpdates = true;
 engine.on('badge.update', function(userId) {
@@ -33,7 +34,7 @@ function sinceFilter(since) {
 
 badgeBatcher.listen(function(key, userIds, done) {
   // Remove duplicates
-  userIds = _.uniq(userIds);
+  userIds = uniqueIds(userIds);
 
   // Get responders to respond
   appEvents.batchUserBadgeCountUpdate({
@@ -475,7 +476,7 @@ function generateMentionDeltaSet(parsedChat, originalMentions) {
 
   /* Arg. Underscore. We need lazy evaluation! */
   originalMentionUserIds = _.flatten(originalMentionUserIds).map(toString);
-  originalMentionUserIds = _.uniq(originalMentionUserIds);
+  originalMentionUserIds = uniqueIds(originalMentionUserIds);
 
   var mentionUserIds = parsedChat.mentionUserIds.map(toString);
 

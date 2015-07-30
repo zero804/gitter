@@ -7,6 +7,7 @@ var roomMembershipService = require('../../services/room-membership-service');
 var billingService    = require('../../services/billing-service');
 
 var _                 = require("underscore");
+var uniqueIds         = require('mongodb-unique-ids');
 var winston           = require('../../utils/winston');
 var debug             = require('debug')('gitter:troupe-strategy');
 var execPreloads      = require('../exec-preloads');
@@ -148,9 +149,8 @@ function ProOrgStrategy() {
       return !!room; // this removes the `undefined` left behind (one-to-ones)
     });
 
-    uris = _.uniq(uris);
-
-    return billingService.findActiveOrgPlans(uris)
+    // uniqueIds should work here as they're strings although it's not strictly correct
+    return billingService.findActiveOrgPlans(uniqueIds(uris))
       .then(function(subscriptions) {
         subscriptions.forEach(function(subscription) {
           proOrgs[subscription.uri.toLowerCase()] = !!subscription;

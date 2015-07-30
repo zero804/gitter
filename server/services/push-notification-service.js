@@ -4,7 +4,6 @@
 var PushNotificationDevice = require("./persistence-service").PushNotificationDevice;
 var nconf                  = require('../utils/config');
 var crypto                 = require('crypto');
-var _                      = require('underscore');
 var Q                      = require('q');
 var redis                  = require("../utils/redis");
 var mongoUtils             = require('../utils/mongo-utils');
@@ -12,6 +11,8 @@ var redisClient            = redis.getClient();
 var debug                  = require('debug')('push-notification-service');
 var Scripto                = require('gitter-redis-scripto');
 var scriptManager          = new Scripto(redisClient);
+var uniqueIds              = require('mongodb-unique-ids');
+
 scriptManager.loadFromDir(__dirname + '/../../redis-lua/notify');
 
 var minimumUserAlertIntervalS = nconf.get("notifications:minimumUserAlertInterval");
@@ -149,7 +150,7 @@ exports.findUsersWithDevices = function(userIds, callback) {
 };
 
 exports.findEnabledDevicesForUsers = function(userIds, callback) {
-  userIds = mongoUtils.asObjectIDs(_.uniq(userIds));
+  userIds = mongoUtils.asObjectIDs(uniqueIds(userIds));
   return PushNotificationDevice
     .where('userId')['in'](userIds)
     .or([ { enabled: true }, { enabled: { $exists: false } } ]) // Exists false === enabled for old devices

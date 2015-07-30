@@ -1,10 +1,10 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var _ = require('underscore');
+var uniqueIds = require('mongodb-unique-ids');
 
 exports.idsIn = function(ids) {
-  return _.uniq(ids).filter(function(id) { return !!id; });
+  return uniqueIds(ids).filter(function(id) { return !!id; });
 };
 
 exports.keys = function(object) {
