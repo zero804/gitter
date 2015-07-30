@@ -2,6 +2,8 @@
 @import "homepage-mobile.less";
 @import "colors.less";
 @import "logo.less";
+@import "./mixins/text/button-text.less";
+@import "./components/home-team-list.less";
 
 .appear__keyframes() {
   0% { opacity: 0; }
@@ -76,12 +78,7 @@ a {
 }
 
 button, .btn, .site-nav a, .team b, footer small a {
-  font-size: 12px;
-  line-height: 1;
-  font-weight: 600;
-  letter-spacing: 2px;
-
-  text-transform: uppercase;
+  .button-text;
 }
 
 h1, h2, h3, h4, blockquote p {
@@ -1125,70 +1122,7 @@ footer small a:hover {
   color: #ea9448;
 }
 
-.team {
-  overflow: hidden;
-  margin-top: 60px;
-  text-align: center;
-}
 
-.team li {
-  position: relative;
-  float: left;
-  width: 208px;
-  height: 208px;
-  margin-right: 20px;
-}
-
-.team li:last-child {
-  margin-right: 0;
-}
-
-.team a {
-  position: absolute;
-  right: 23px;
-  bottom: 13px;
-  z-index: 5;
-
-  opacity: .8;
-}
-
-.team a:hover {
-  opacity: 1;
-}
-
-.team a + a {
-  right: 66px;
-}
-
-.team img {
-  pointer-events: none;
-  border-radius: 6px;
-}
-
-.team b {
-  position: absolute;
-  left: 25px;
-  bottom: 20px;
-  z-index: 4;
-
-  color: #fff;
-  text-shadow: 0 4px 14px rgba(0,0,0,.3);
-}
-
-.team .mask {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  z-index: 3;
-
-  display: block;
-  width: 100%;
-  height: 120px;
-
-  border-radius: 0 0 6px 6px;
-  background: linear-gradient(rgba(40,40,40,0), rgba(40,40,40,.5));
-
-}
 
 .desktopOnly {
   @desktopOnly_bp: 36.25em;
