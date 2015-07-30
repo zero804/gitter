@@ -1,77 +1,96 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-module.exports = {
-  install: function(app, apiRoot, authMiddleware) {
+var express = require('express');
+var authMiddleware = require('../../web/middlewares/auth-api');
+var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
 
-    app.get(apiRoot + '/private/health_check',
-        // No auth
-        require('./health-check.js'));
+var router = express.Router({ caseSensitive: true, mergeParams: true });
 
-    app.get(apiRoot + '/private/health_check/full',
-        // No auth
-        require('./health-check-full.js'));
+// No auth
+router.get('/health_check',
+  identifyRoute('api-private-health-check'),
+  require('./health-check'));
 
-    app.get(apiRoot + '/private/gh/repos/*',
-        authMiddleware,
-        require('./github-mirror/repos-mirror'));
+// No auth
+router.get('/health_check/full',
+  identifyRoute('api-private-health-check-full'),
+  require('./health-check-full'));
 
-    app.get(apiRoot + '/private/gh/users/*',
-        authMiddleware,
-        require('./github-mirror/users-mirror'));
+router.get('/gh/repos/*',
+  authMiddleware,
+  identifyRoute('api-private-github-repo-mirror'),
+  require('./github-mirror/repos-mirror'));
 
-    app.get(apiRoot + '/private/gh/search/users',
-        authMiddleware,
-        require('./github-mirror/user-search-mirror'));
+router.get('/gh/users/*',
+  authMiddleware,
+  identifyRoute('api-private-github-users-mirror'),
+  require('./github-mirror/users-mirror'));
 
-    // No auth for hooks yet
-    app.post(apiRoot + '/private/hook/:hash',
-        require('./hooks'));
+router.get('/gh/search/users',
+  authMiddleware,
+  identifyRoute('api-private-github-user-search-mirror'),
+  require('./github-mirror/user-search-mirror'));
 
-    app.get(apiRoot + '/private/irc-token',
-        authMiddleware,
-        require('./irc-token.js'));
+// No auth for hooks yet
+router.post('/hook/:hash',
+  identifyRoute('api-private-hook'),
+  require('./hooks'));
 
-    app.get(apiRoot + '/private/issue-state',
-        authMiddleware,
-        require('./issue-state.js'));
+router.get('/irc-token',
+  authMiddleware,
+  identifyRoute('api-private-irc-token'),
+  require('./irc-token'));
 
-    app.get(apiRoot + '/private/generate-signature',
-        authMiddleware,
-        require('./transloadit-signature.js'));
+router.get('/issue-state',
+  authMiddleware,
+  identifyRoute('api-private-issue-state'),
+  require('./issue-state'));
 
-    app.post(apiRoot + '/private/transloadit/:token',
-        // No auth
-        require('./transloadit.js'));
+router.get('/generate-signature',
+  authMiddleware,
+  identifyRoute('api-private-transloadit-signature'),
+  require('./transloadit-signature'));
 
-    // disabled due to massive load
-    // app.get(apiRoot + '/private/chat-heatmap/:roomId',
-    //     // No auth
-    //     require('./chat-heatmap.js'));
+// No auth
+router.post('/transloadit/:token',
+  identifyRoute('api-private-transloadit-callback'),
+  require('./transloadit'));
 
-    app.get(apiRoot + '/private/orgs/:orgUri/members',
-        authMiddleware,
-        require('./org-members.js'));
+// disabled due to massive load
+// router.get('/chat-heatmap/:roomId',
+//   identifyRoute('api-private-chat-heatmap'),
+//   require('./chat-heatmap'));
 
-    app.post(apiRoot + '/private/subscription/:userOrOrg',
-        require('./subscription-created.js'));
+router.get('/orgs/:orgUri/members',
+  authMiddleware,
+  identifyRoute('api-private-org-members'),
+  require('./org-members'));
 
-    app.delete(apiRoot + '/private/subscription/:userOrOrg',
-        require('./subscription-deleted.js'));
 
-    app.post(apiRoot + '/private/statsc',
-        require('./statsc.js'));
+router.post('/subscription/:userOrOrg',
+  identifyRoute('api-private-subscription-create'),
+  require('./subscription-created'));
 
-    app.get(apiRoot + '/private/sample-chats',
-        require('./sample-chats.js'));
+router.delete('/subscription/:userOrOrg',
+  identifyRoute('api-private-subscription-delete'),
+  require('./subscription-deleted'));
 
-    app.post(apiRoot + '/private/create-badge',
-        authMiddleware,
-        require('./create-badge-pr.js'));
+router.post('/statsc',
+  identifyRoute('api-private-statsc'),
+  require('./statsc'));
 
-    app.post(apiRoot + '/private/invite-user',
-        authMiddleware,
-        require('./invite-user.js'));
+router.get('/sample-chats',
+  identifyRoute('api-private-sample-chats'),
+  require('./sample-chats'));
 
-  }
-};
+router.post('/create-badge',
+  authMiddleware,
+  identifyRoute('api-private-create-badge'),
+  require('./create-badge-pr'));
+
+router.post('/invite-user',
+  authMiddleware,
+  identifyRoute('api-private-invite-user'),
+  require('./invite-user'));
+
+module.exports = router;
