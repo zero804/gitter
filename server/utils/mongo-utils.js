@@ -49,6 +49,45 @@ function getNewObjectIdString() {
   return objectId.valueOf();
 }
 
+
+/**
+ * Given a list of ids, returns the unique ones.
+ *
+ * Highly optimised so not so pretty
+ */
+function uniqueIds(ids) {
+  if (!ids) return [];
+  if (ids.length < 2) return ids; // You need two items to need uniqueness
+
+  var result = new Array(ids.length);
+
+  var u = {};
+  var c = 0;
+  for (var i = 0; i < ids.length; i++) {
+    var id = ids[i];
+    var idRepresentation;
+    if (!id) {
+      idRepresentation = 'null';
+    } else {
+      if (typeof id == 'string') {
+        idRepresentation = id;
+      } else {
+        idRepresentation = id.id;
+      }
+    }
+
+    if (!u[idRepresentation]) {
+      u[idRepresentation] = true;
+      result[c] = id;
+      c++;
+    }
+  }
+
+  result.length = c;
+
+  return result;
+}
+
 /**
  * Checks to see whether something is either a String or ObjectID (hence ObjectID-like)
  */
@@ -125,6 +164,7 @@ exports.asObjectID = asObjectID;
 exports.asObjectIDs = asObjectIDs;
 exports.getDateFromObjectId = getDateFromObjectId;
 exports.getTimestampFromObjectId = getTimestampFromObjectId;
+exports.uniqueIds = uniqueIds;
 exports.getNewObjectIdString = getNewObjectIdString;
 exports.serializeObjectId = serializeObjectId;
 exports.serializeObjectIds = serializeObjectIds;

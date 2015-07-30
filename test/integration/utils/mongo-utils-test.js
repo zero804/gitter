@@ -123,4 +123,34 @@ describe('mongo-utils', function() {
 
   });
 
+  describe('uniqueIds', function() {
+    it('should work with string ids', function() {
+      assert.deepEqual(['51adcd412aefe1576f000005'], underTest.uniqueIds(
+        ['51adcd412aefe1576f000005', '51adcd412aefe1576f000005']
+      ));
+
+      assert.deepEqual(['51adcd412aefe1576f000005', '51adcd412aefe1576f000006'], underTest.uniqueIds(
+        ['51adcd412aefe1576f000005', '51adcd412aefe1576f000005', '51adcd412aefe1576f000006']
+      ));
+    });
+
+    it('should work with object ids', function() {
+      assert.deepEqual([new ObjectID('51adcd412aefe1576f000005')], underTest.uniqueIds(
+        [new ObjectID('51adcd412aefe1576f000005'), new ObjectID('51adcd412aefe1576f000005')]
+      ));
+
+      assert.deepEqual([new ObjectID('51adcd412aefe1576f000005'), new ObjectID('51adcd412aefe1576f000006')], underTest.uniqueIds(
+        [new ObjectID('51adcd412aefe1576f000005'), new ObjectID('51adcd412aefe1576f000005'), new ObjectID('51adcd412aefe1576f000006')]
+      ));
+    });
+
+    it.skip('should work with mixed', function() {
+      // This does not currently work
+      assert.deepEqual(['51adcd412aefe1576f000005'], underTest.uniqueIds(
+        ['51adcd412aefe1576f000005', new ObjectID('51adcd412aefe1576f000005')]
+      ));
+    });
+
+  });
+
 });
