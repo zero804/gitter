@@ -16,6 +16,9 @@ var StatusError              = require('statuserror');
 var roomMembershipService    = require('./room-membership-service');
 var debug                    = require('debug')('gitter:troupe-service');
 
+var MAX_RAW_TAGS_LENGTH = 100;
+var MAX_TAG_LENGTH = 20;
+
 function findByUri(uri, callback) {
   var lcUri = uri.toLowerCase();
 
@@ -241,6 +244,29 @@ function toggleSearchIndexing(user, troupe, bool) {
     });
 }
 
+function updateTags(user, troupe, tags) {
+  return roomPermissionsModel(user, 'admin', troupe)
+    .then(function(access) {
+      if(!access) throw new StatusError(403); /* Forbidden */
+
+      var cleanTags = tags.trim().slice(0, MAX_RAW_TAGS_LENGTH).split(',')
+      .filter(function(tag) {
+        return !!tag; // 
+      })
+      .map(function(tag) {
+        return tag.trim().slice(0, MAX_TAG_LENGTH);
+      });
+
+      troupe.tags = cleanTags;
+
+      return troupe.saveQ()
+        .then(function() {
+          return troupe;
+        });
+    });
+}
+
+
 function findChildRoomsForOrg(org, opts) {
   if (!org) return Q.resolve([]);
   opts = opts || {};
@@ -252,6 +278,7 @@ function findChildRoomsForOrg(org, opts) {
     .sort({ userCount: 'desc' })
     .execQ();
 }
+
 
 module.exports = {
   findByUri: findByUri,
@@ -265,5 +292,6 @@ module.exports = {
   updateTopic: updateTopic,
   toggleSearchIndexing: toggleSearchIndexing,
   checkGitHubTypeForUri: checkGitHubTypeForUri,
-  findChildRoomsForOrg: findChildRoomsForOrg
+  findChildRoomsForOrg: findChildRoomsForOrg,
+  updateTags: updateTags
 };

@@ -107,6 +107,11 @@ module.exports = {
           promises.push(troupeService.toggleSearchIndexing(req.user, troupe, updatedTroupe.noindex));
         }
 
+        if(updatedTroupe.hasOwnProperty('tags')) {
+          promises.push(troupeService.updateTags(req.user, troupe, updatedTroupe.tags));
+        }
+
+
         return Q.all(promises)
           .then(function() {
             var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id /*, mapUsers: false*/ });

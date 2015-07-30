@@ -116,6 +116,8 @@ module.exports = (function() {
           } else {
             menuItems.push({ title: 'Integrations', href: '#integrations' });
           }
+
+          menuItems.push({ title: 'Edit tags', href: '#tags' });
         }
 
         menuItems.push({ divider: true });
