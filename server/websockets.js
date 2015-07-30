@@ -14,7 +14,6 @@ var shutdown      = require('shutdown');
 var serverStats   = require('./utils/server-stats');
 var onMongoConnect = require('./utils/on-mongo-connect');
 
-
 winston.info("Starting http/ws service");
 
 var app = express();
@@ -52,5 +51,3 @@ shutdown.addHandler('websockets', 10, function(callback) {
     callback();
   });
 });
-
-
