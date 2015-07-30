@@ -63,6 +63,11 @@ var featuredRooms  = [
     name: 'Angular UI',
     language: 'JavaScript',
     locale: 'en'
+  },
+  { uri: 'FreeCodeCamp/FreeCodeCamp',
+    name: 'Free Code Camp',
+    language: 'JavaScript',
+    locale: 'en'
   }
 ];
 
