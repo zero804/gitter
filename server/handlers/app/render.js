@@ -444,6 +444,13 @@ function renderOrgPage(req, res, next) {
         room.users = values[index];
       });
 
+      // Custom data for the org page
+      rooms.forEach(function(room) {
+        room.private = room.security !== 'PUBLIC';
+        var nameParts = room.uri.split('/');
+        room.shortName = nameParts.length === 3 ? nameParts[1] + '/' + nameParts[2] : nameParts[1] || nameParts[0];
+      });
+
       res.render('org-page', {
         org: ghOrg,
         rooms: rooms
