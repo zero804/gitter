@@ -15,7 +15,7 @@ describe('start', function() {
       if (err) return done(err);
 
       var redis = env.redis.getClient();
-      var noPersistRedis = env.redis.createClient(env.config.get("redis_nopersist"));
+      var noPersistRedis = env.redis.createClient(process.env.REDIS_NOPERSIST_CONNECTION_STRING || env.config.get("redis_nopersist"));
 
       redis.info(function(err) {
         if(err) return done(err);

@@ -5,7 +5,7 @@ var logger = env.logger;
 var conf   = env.config;
 
 /* Uses the no-persist redis */
-var redisClient        = env.redis.createClient(conf.get("redis_nopersist"));
+var redisClient        = env.redis.createClient(process.env.REDIS_NOPERSIST_CONNECTION_STRING || conf.get("redis_nopersist"));
 var STANDARD_TTL       = 10 * 60;     /* 10 minutes */
 var ANONYMOUS_TTL      = conf.get('web:sessionTTL') + 60; /* One minute more than the session age */
 

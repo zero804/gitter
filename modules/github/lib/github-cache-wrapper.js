@@ -19,7 +19,7 @@ var util = require("util");
 var redisClient;
 function getRedisCachingClient() {
   if (redisClient) return redisClient;
-  redisClient = env.redis.createClient(config.get("redis_caching"));
+  redisClient = env.redis.createClient(process.env.REDIS_CACHING_CONNECTION_STRING || config.get("redis_caching"));
   return redisClient;
 }
 

@@ -1,0 +1,102 @@
+redis1:
+  image: redis:3.0.3
+  restart: 'always'
+  hostname: redis1
+  ports:
+    - "6379:6379"
+  entrypoint: [ "/usr/local/bin/redis-server", "--bind", "0.0.0.0", "--port", "6379", "--maxclients", "200"]
+
+redis2:
+  image: redis:3.0.3
+  restart: 'always'
+  hostname: redis2
+  ports:
+    - "6380:6380"
+  links:
+    - redis1
+  env_file:
+    - ./config/docker/redis-slave.env
+  entrypoint: [ "/bin/bash", "-c", "exec /usr/local/bin/redis-server --bind 0.0.0.0 --port 6380 --slaveof $REDIS_MASTER_IP 6379 --maxclients 200"]
+
+
+sentinel1:
+  image: redis:3.0.3
+  restart: 'on-failure:5'
+  hostname: sentinel1
+  links:
+    - redis1
+    - redis2
+  ports:
+    - "26379:26379"
+  env_file:
+    - ./config/docker/sentinel.env
+  entrypoint: [ "/bin/bash", "-c", "echo $SENTINEL_CONF > /redis-sentinel.conf && exec /usr/local/bin/redis-server /redis-sentinel.conf --sentinel --bind 0.0.0.0 --maxclients 200"]
+
+mongo2:
+  hostname: mongo2
+  image: mongo:3.0
+  restart: 'always'
+  entrypoint: [ "/usr/bin/mongod", "--replSet", "troupeSet", "--journal", "--smallfiles", "--storageEngine=wiredTiger", "--oplogSize=20" ]
+  ports:
+    - "27018:27017"
+
+mongo3:
+  hostname: mongo3
+  image: mongo:3.0
+  restart: 'always'
+  entrypoint: [ "/usr/bin/mongod", "--replSet", "troupeSet", "--journal", "--smallfiles", "--storageEngine=wiredTiger", "--oplogSize=20" ]
+  ports:
+    - "27019:27017"
+
+mongo1:
+  hostname: mongo1
+  image: mongo:3.0
+  restart: 'always'
+  entrypoint: [ "/usr/bin/mongod", "--replSet", "troupeSet", "--journal", "--smallfiles", "--storageEngine=wiredTiger", "--oplogSize=20" ]
+  ports:
+    - "27017:27017"
+  links:
+    - mongo2:mongo2
+    - mongo3:mongo3
+
+mongosetup:
+  image: mongo:3.0
+  restart: no
+  links:
+    - mongo1:mongo1
+    - mongo2:mongo2
+    - mongo3:mongo3
+  volumes:
+    - ./config/mongo-docker:/mongo-docker
+    - ./scripts:/scripts
+  entrypoint: [ "/bin/bash", "/mongo-docker/init-mongo.sh" ]
+
+neo4j:
+  image: kbastani/docker-neo4j
+  restart: 'always'
+  ports:
+    - "7474:7474"
+
+# The official elasticsearch:1.4.2 image with mapper-attachments and river-mongodb plugins
+# https://github.com/soldotno/elasticsearch-river-mongodb/blob/master/Dockerfile
+elasticsearch:
+  image: stabenfeldt/elasticsearch-river-mongodb
+  ports:
+    - "9200:9200"
+    - "9300:9300"
+  links:
+    - mongo1:mongo1
+    - mongo2:mongo2
+    - mongo3:mongo3
+
+elasticsearchsetup:
+  image: node:0.10.39
+  restart: no
+  links:
+    - mongo1:mongo1
+    - mongo2:mongo2
+    - mongo3:mongo3
+    - elasticsearch:elasticsearch
+  volumes:
+    - ./scripts:/scripts
+  entrypoint: [ "/scripts/elasticsearch/setup-docker-elasticsearch.sh" ]
