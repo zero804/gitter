@@ -1,7 +1,10 @@
 "use strict";
 
+var express = require('express');
 var appMiddleware      = require('./app/middleware');
 var appRender          = require('./app/render');
+
+var router = express.Router({ caseSensitive: true, mergeParams: true });
 
 function renderOrgPage(req, res, next) {
   req.uriContext = {
@@ -20,9 +23,12 @@ function renderOrgPageInFrame(req, res, next) {
   appRender.renderMainFrame(req, res, next, 'iframe');
 }
 
-module.exports = {
-  install: function(app) {
-    app.get('/orgs/:orgName/rooms', appMiddleware.isPhoneMiddleware, renderOrgPageInFrame);
-    app.get('/orgs/:orgName/rooms/~iframe', appMiddleware.isPhoneMiddleware, renderOrgPage);
-  }
-};
+router.get('/:orgName/rooms',
+           appMiddleware.isPhoneMiddleware,
+           renderOrgPageInFrame);
+
+router.get('/:orgName/rooms/~iframe',
+           appMiddleware.isPhoneMiddleware,
+           renderOrgPage);
+
+module.exports = router;
