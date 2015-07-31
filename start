@@ -1,0 +1,117 @@
+#!/bin/bash
+
+set -e
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+function startDockerMachine {
+  if [[ "$(docker-machine ls -q|grep dev)" != "dev" ]]; then
+    # Maybe one day --virtualbox-boot2docker-url https://github.com/rancher/os/releases/download/v0.3.3/machine-rancheros.iso
+    # but it doesn't support shared volumes right now
+    docker-machine create \
+      -d virtualbox \
+      --virtualbox-disk-size "30000" \
+      --virtualbox-hostonly-cidr "192.168.99.1/24" \
+      --virtualbox-memory "2048" \
+      --virtualbox-cpu-count "2" \
+      dev
+  else
+    ## Start the box if it's stopped
+    if [[ $(docker-machine ls --filter state=Stopped -q) = "dev" ]]; then
+      docker-machine start dev
+    fi
+  fi
+  eval "$(docker-machine env dev)"
+}
+
+function setupHostAlias {
+  HOSTNAME=$1
+  IP=$2
+  CURRENT_ALIAS=$(grep " $HOSTNAME *$" /etc/hosts|sed 's/ .*//')
+  if [[ "$CURRENT_ALIAS" != "$IP" ]]; then
+    >&2 echo "Warning. Your current $HOSTNAME ($CURRENT_ALIAS) hostname does not match the IP $IP"
+    read -p "Would you like to update your hostfile? Requires sudo [yN] " -r
+    echo
+    if [[ "$REPLY" =~ ^[Yy]$ ]]; then
+      if [[ -z "$CURRENT_ALIAS" ]]; then
+        sudo /bin/sh -c "echo \"$IP $HOSTNAME\" >> /etc/hosts"
+      else
+        sudo /bin/sh -c "sed -i.bak \"s/.* $HOSTNAME */$IP $HOSTNAME/\" /etc/hosts"
+      fi
+    else
+      echo Remember to add \'"$IP" "$HOSTNAME"\' to your /etc/hosts file
+    fi
+
+  fi
+}
+
+function startDockerServices {
+  docker-compose up -d --no-recreate
+}
+
+function setupRedisConfigs {
+  DEV_IP=$(docker-machine ip dev)
+  mkdir -p "$SCRIPT_DIR/config/docker/"
+
+  cat <<EOD > "$SCRIPT_DIR/config/docker/redis-slave.env"
+REDIS_MASTER_IP=$DEV_IP
+EOD
+
+  cat <<EOD > "$SCRIPT_DIR/config/docker/sentinel.env"
+SENTINEL_CONF=sentinel monitor gitter-master-dev $DEV_IP 6379 1
+EOD
+}
+
+function setupMongoInitScript {
+  DEV_IP=$(docker-machine ip dev)
+  mkdir -p "$SCRIPT_DIR/config/mongo-docker/"
+  cat <<EOF > "$SCRIPT_DIR/config/mongo-docker/init-mongo.sh"
+  mongo $DEV_IP/admin "/mongo-docker/init-replicaset.js"
+  sleep 5
+  "/scripts/dataupgrades/001-oauth-client/002-add-redirect-uri.sh" "$DEV_IP/gitter"
+EOF
+
+  cat <<EOF > "$SCRIPT_DIR/config/mongo-docker/init-replicaset.js"
+    try {
+      rs.conf();
+    } catch(e) {
+      var cfg = {
+          "_id": "troupeSet",
+          "version": 1,
+          "members": [
+              {
+                  "_id": 0,
+                  "host": "${DEV_IP}:27017",
+                  "priority": 2
+              },
+              {
+                  "_id": 1,
+                  "host": "${DEV_IP}:27018",
+                  "priority": 1
+              },
+              {
+                  "_id": 2,
+                  "host": "${DEV_IP}:27019",
+                  "priority": 1,
+                  "arbiterOnly": true
+              }
+          ]
+      };
+      rs.initiate(cfg);
+    }
+EOF
+}
+
+startDockerMachine
+setupHostAlias gitter-mongo-dev "$(docker-machine ip dev)"
+setupHostAlias gitter-redis-dev "$(docker-machine ip dev)"
+setupHostAlias gitter-neo4j-dev "$(docker-machine ip dev)"
+setupHostAlias gitter-es-dev "$(docker-machine ip dev)"
+setupRedisConfigs
+setupMongoInitScript
+startDockerServices
+
+cat << "EOD"
+# Run this command to configure your shell:
+# eval "$(docker-machine env dev)"
+EOD

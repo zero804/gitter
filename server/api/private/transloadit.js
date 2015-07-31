@@ -98,7 +98,7 @@ module.exports = function (req, res, next) {
           });
       })
       .then(function () {
-        res.send(200);
+        res.sendStatus(200);
       })
       .fail(next);
   });

@@ -72,3 +72,8 @@ data
 scripts/graphs/users.csv
 scripts/utils/output.txt
 scripts/utils/run.txt
+hostaliases
+config/redis-docker
+config/mongo-docker
+config/docker
+docker_node_modules

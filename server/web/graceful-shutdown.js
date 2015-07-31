@@ -13,7 +13,7 @@ module.exports = {
       if(!gracefullyClosing) return next();
 
       res.setHeader("Connection", "close");
-      res.send(502, "Server is in the process of restarting");
+      res.status(502).send("Server is in the process of restarting");
     });
 
     shutdown.addHandler('web', 20, function(callback) {
