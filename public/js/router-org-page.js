@@ -24,7 +24,12 @@ onReady(function(){
   var Router = Backbone.Router.extend({
 
     routes: {
+      '': 'index',
       ':org/tags': 'onNavigateTags'
+    },
+
+    index: function(){
+        modalRegion.destroy();
     },
 
     onNavigateTags: function(org){
