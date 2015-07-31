@@ -31,7 +31,7 @@ var webpackConfig = {
     "router-embed-chat": path.resolve(path.join(__dirname, "./router-embed-chat")),
     "homepage": path.resolve(path.join(__dirname, "./homepage")),
     "apps": path.resolve(path.join(__dirname, "./apps.js")),
-    "org-pages": path.resolve(path.join(__dirname, './router-org-room.js')),
+    "router-org-page": path.resolve(path.join(__dirname, './router-org-page.js')),
     vendor: [
       'utils/webpack',
       'utils/context',
