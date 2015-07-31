@@ -8,8 +8,8 @@ var readByService    = require("./readby-service");
 var userService      = require("./user-service");
 var roomPermissionsModel = require('./room-permissions-model');
 var appEvents        = require('gitter-web-appevents');
-var presenceService  = require("./presence-service");
-var _                = require("underscore");
+var categoriseUserInRoom  = require("./categorise-users-in-room");
+var _                = require("lodash");
 var mongoUtils       = require('../utils/mongo-utils');
 var RedisBatcher     = require('../utils/redis-batcher').RedisBatcher;
 var collections      = require('../utils/collections');
@@ -17,6 +17,7 @@ var Q                = require('q');
 var badgeBatcher     = new RedisBatcher('badge', 300);
 var roomMembershipService = require('./room-membership-service');
 var uniqueIds        = require('mongodb-unique-ids');
+var debug            = require('debug')('gitter:unread-item-service');
 
 var sendBadgeUpdates = true;
 engine.on('badge.update', function(userId) {
@@ -391,13 +392,12 @@ function parseChat(fromUserId, troupe, mentions) {
     });
 }
 
-function createNewItemsForParsedChat(troupeId, chatId, parsed) {
-  return engine.newItemWithMentions(troupeId, chatId, parsed.notifyUserIds, parsed.mentionUserIds)
-    .then(function(results) {
-      var allUserIds = parsed.notifyUserIds.concat(parsed.activityOnlyUserIds);
-      return [results, presenceService.categorizeUsersByOnlineStatus(allUserIds)];
-    })
-    .spread(function(results, online) {
+function processResultsForNewItemWithMentions(troupeId, chatId, parsed, results, isEdit) {
+  debug("distributing chat notification to users");
+  var allUserIds = parsed.notifyUserIds.concat(parsed.activityOnlyUserIds);
+
+  return categoriseUserInRoom(troupeId, allUserIds)
+    .then(function(presenceStatus) {
       var mentionsHash = collections.hashArray(parsed.mentionUserIds);
 
       // Firstly, notify all the notifyNewRoomUserIds with room creation messages
@@ -405,41 +405,78 @@ function createNewItemsForParsedChat(troupeId, chatId, parsed) {
         appEvents.userMentionedInNonMemberRoom({ troupeId: troupeId, userId: userId });
       });
 
+      var userIdsForOnlineNotification = [];
+      var userIdsForOnlineNotificationWithMention = [];
+
+      var newUnreadItemNoMention = { chat: [chatId] };
+      var newUnreadItemWithMention = { chat: [chatId], mention: [chatId] };
+
       // Next, notify all the users with unread count changes
       parsed.notifyUserIds.forEach(function(userId) {
-        var isOnline = online[userId];
-        var unreadCount = results[userId] && results[userId].unreadCount;
-        var mentionCount = results[userId] && results[userId].mentionCount;
+        var userResult = results[userId];
 
-        // Not lurking, send them the full update
-        var updateMessage = { chat: [chatId] };
-        if (mentionsHash[userId]) {
-          updateMessage.mention = [chatId];
-        }
+        var onlineStatus = presenceStatus[userId];
+        var unreadCount = userResult && userResult.unreadCount;
+        var mentionCount = userResult && userResult.mentionCount;
+        var hasMention = mentionsHash[userId];
 
         /* We need to do this for all users as it's used for mobile notifications */
-        appEvents.newUnreadItem(userId, troupeId, updateMessage, isOnline);
+        switch(onlineStatus) {
+          case 'inroom':
+          case 'online':
+            var unreadItemMessage = hasMention ? newUnreadItemWithMention : newUnreadItemNoMention;
+            appEvents.newUnreadItem(userId, troupeId, unreadItemMessage, true);
 
-        // Only send out troupeUnreadCountsChange events for online users
-        if (!isOnline) return;
+            /* Not in the room, then send them a notification */
+            if (onlineStatus === 'online') {
+              var notificationQueue = hasMention ? userIdsForOnlineNotificationWithMention : userIdsForOnlineNotification;
+              notificationQueue.push(userId);
+            }
 
-        if(unreadCount >= 0 || mentionCount >= 0) {
-          // Notify the user
-          appEvents.troupeUnreadCountsChange({
-            userId: userId,
-            troupeId: troupeId,
-            total: unreadCount,
-            mentions: mentionCount
-          });
+            if(unreadCount >= 0 || mentionCount >= 0) {
+              // Notify the user
+              appEvents.troupeUnreadCountsChange({
+                userId: userId,
+                troupeId: troupeId,
+                total: unreadCount,
+                mentions: mentionCount
+              });
+            }
+            return;
+
+          case 'push':
+            // TODO: handle push
+            console.error('NEED TO HANDLE PUSH NOTIFICATIONS');
+            return;
         }
       });
 
-      // Next, notify all the lurkers
-      parsed.activityOnlyUserIds.forEach(function(userId) {
-        if (!online[userId]) return;
+      // Next notify all the users currently online but not in this room who
+      // will receive desktop notifications
+      if (userIdsForOnlineNotification.length) {
+        appEvents.newOnlineNotification(troupeId, chatId, userIdsForOnlineNotification, false);
+      }
 
-        appEvents.newLurkActivity({ userId: userId, troupeId: troupeId });
-      });
+      // Next notify all the users currently online but not in this room who
+      // will receive desktop notifications
+      if (userIdsForOnlineNotificationWithMention.length) {
+        appEvents.newOnlineNotification(troupeId, chatId, userIdsForOnlineNotificationWithMention, true);
+      }
+
+      // No activity on edits
+      if (!isEdit) {
+        // Next, notify all the lurkers
+        // Note that this can be a very long list in a big room
+        var activityOnly = parsed.activityOnlyUserIds;
+        for(var i = 0; i < activityOnly.length; i++) {
+          var activityOnlyUserId =  activityOnly[i];
+          var activityOnlyUserIdOnlineStatus = presenceStatus[activityOnlyUserId];
+          if (activityOnlyUserIdOnlineStatus === 'offline') continue;
+          appEvents.newLurkActivity({ userId: activityOnlyUserId, troupeId: troupeId });
+        }
+      }
+
+      debug("distribution of chat notification to users completed");
 
     });
 }
@@ -447,7 +484,10 @@ function createNewItemsForParsedChat(troupeId, chatId, parsed) {
 function createChatUnreadItems(fromUserId, troupe, chat) {
   return parseChat(fromUserId, troupe, chat.mentions)
     .then(function(parsed) {
-      return createNewItemsForParsedChat(troupe.id, chat.id, parsed);
+      return engine.newItemWithMentions(troupe.id, chat.id, parsed.notifyUserIds, parsed.mentionUserIds)
+        .then(function(results) {
+          return processResultsForNewItemWithMentions(troupe.id, chat.id, parsed, results, false);
+        });
     });
 }
 exports.createChatUnreadItems = createChatUnreadItems;
@@ -497,47 +537,7 @@ function generateMentionDeltaSet(parsedChat, originalMentions) {
 }
 
 function addUnreadItemsForUpdatedChat(troupeId, chatId, addNotifyUserIds, addMentionUserIds, addMentionsInNewRoom) {
-  return engine.newItemWithMentions(troupeId, chatId, addNotifyUserIds, addMentionUserIds)
-    .then(function(results) {
-      return [results, presenceService.categorizeUsersByOnlineStatus(addNotifyUserIds)];
-    })
-    .spread(function(results, online) {
-      var mentionsHash = collections.hashArray(addMentionUserIds);
 
-      // Firstly, notify all the notifyNewRoomUserIds with room creation messages
-      addMentionsInNewRoom.forEach(function(userId) {
-        appEvents.userMentionedInNonMemberRoom({ troupeId: troupeId, userId: userId });
-      });
-
-      // Next, notify all the users with unread count changes
-      addNotifyUserIds.forEach(function(userId) {
-        var unreadCount = results[userId] && results[userId].unreadCount;
-        var mentionCount = results[userId] && results[userId].mentionCount;
-        var isOnline = online[userId];
-
-        // Not lurking, send them the full update
-        var updateMessage = { chat: [chatId] };
-        if (mentionsHash[userId]) {
-          updateMessage.mention = [chatId];
-        }
-
-        // Not lurking, send them the full update
-        appEvents.newUnreadItem(userId, troupeId, updateMessage, isOnline);
-
-        if (!isOnline) return; // No need to send out updates to non-online users
-
-        if(unreadCount >= 0 || mentionCount >= 0) {
-          // Notify the user
-          appEvents.troupeUnreadCountsChange({
-            userId: userId,
-            troupeId: troupeId,
-            total: unreadCount,
-            mentions: mentionCount
-          });
-        }
-      });
-
-    });
 
 }
 
@@ -572,11 +572,16 @@ function updateChatUnreadItems(fromUserId, troupe, chat, originalMentions) {
       var delta = generateMentionDeltaSet(parsedChat, originalMentions);
 
       // Remove first
-      return [delta, delta.remove.length && removeMentionsForUpdatedChat(troupeId, chat.id, delta.remove)];
+      return [parsedChat, delta, delta.remove.length && removeMentionsForUpdatedChat(troupeId, chat.id, delta.remove)];
     })
-    .spread(function(delta) {
-      // Add second
-      return delta.addNotify.length && addUnreadItemsForUpdatedChat(troupeId, chat.id, delta.addNotify, delta.addMentions, delta.addNewRoom);
+    .spread(function(parsedChat, delta) {
+      if (!delta.addNotify.length) return;
+
+      // Add additional mentions
+      return engine.newItemWithMentions(troupeId, chat.id, delta.addNotify, delta.addMentions, delta.addNewRoom)
+        .then(function(results) {
+          return processResultsForNewItemWithMentions(troupeId, chat.id, parsedChat, results, true);
+        });
     });
 }
 exports.updateChatUnreadItems = updateChatUnreadItems;

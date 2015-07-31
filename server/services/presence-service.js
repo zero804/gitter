@@ -88,11 +88,7 @@ function disassociateSocketAndDeactivateUserAndTroupe(socketId, userId, callback
 
       var deleteSuccess = result[0];
       if(!deleteSuccess) {
-        winston.silly('presence: disassociateSocketAndDeactivateUserAndTroupe rejected. Socket already deleted.', {
-          socketId: socketId,
-          userId: userId
-        });
-
+        debug('disassociateSocketAndDeactivateUserAndTroupe rejected. Socket already deleted. socketId=%s userId=%s', socketId, userId);
         return callback(new StatusError(404, 'socket not found'));
       }
 
@@ -139,9 +135,8 @@ function sendAppEventsForUserEyeballsOffTroupe(userInTroupeCount, totalUsersInTr
     appEvents.eyeballSignal(userId, troupeId, false);
   }
 
-  if(totalUsersInTroupe === 0) {
-    presenceService.emit('troupeEmpty', troupeId);
-  }
+  // No need to worry about emitting an event if totalUsersInTroupe === 0.
+  // Nothing uses it
 }
 
 
@@ -163,10 +158,7 @@ function userSocketConnected(userId, socketId, connectionType, client, troupeId,
       var lockSuccess = result[0];
 
       if(!lockSuccess)  {
-        winston.silly('presence: associateSocketAndActivateUser rejected. Socket already exists.', {
-          socketId: socketId,
-          userId: userId
-        });
+        debug('associateSocketAndActivateUser rejected. Socket already exists.', socketId, userId);
 
         return callback(new StatusError(409, 'Conflict'));
       }
@@ -190,11 +182,7 @@ function userSocketConnected(userId, socketId, connectionType, client, troupeId,
     var lockSuccess = result[0];
 
     if(!lockSuccess)  {
-      winston.silly('presence: associateSocketAndActivateUser rejected. Socket already exists.', {
-        socketId: socketId,
-        userId: userId
-      });
-
+      debug('presence: associateSocketAndActivateUser rejected. Socket already exists.', socketId, userId);
       return callback(new StatusError(409, 'socket already exists'));
     }
 
@@ -368,7 +356,9 @@ function lookupTroupeIdForSocket (socketId, callback) {
 function findOnlineUsersForTroupe(troupeId, callback) {
   if(!troupeId) return callback(new StatusError(400, 'troupeId expected'));
 
-  redisClient.zrangebyscore(keyTroupeUsers(troupeId), 1, '+inf', callback);
+  var d = Q.defer();
+  redisClient.zrangebyscore(keyTroupeUsers(troupeId), 1, '+inf', d.makeNodeResolver());
+  return d.promise.nodeify(callback);
 }
 
 // Given an array of usersIds, returns a hash with the status of each user. If the user is no in the hash
@@ -662,12 +652,11 @@ function collectGarbage(bayeux, callback) {
     }
 
     var total = Date.now() - start;
-    var message = 'Presence GC took ' + total + 'ms and cleared out ' + invalidSocketCount + ' sockets';
 
     if(invalidSocketCount) {
-      winston.warn(message);
+      winston.warn('Presence GC took ' + total + 'ms and cleared out ' + invalidSocketCount + ' sockets');
     } else {
-      winston.silly(message);
+      debug('Presence GC took %sms and cleared out no invalid sockets', total);
     }
 
     return callback(null, invalidSocketCount);
@@ -963,10 +952,6 @@ if (debug.enabled) {
 
   presenceService.on('userLeftTroupe', function(userId, troupeId) {
     debug("User %s is gone from %s", userId, troupeId);
-  });
-
-  presenceService.on('troupeEmpty', function(troupeId) {
-    debug("The last user has disconnected from troupe %s", troupeId);
   });
 }
 

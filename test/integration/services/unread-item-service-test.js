@@ -14,7 +14,6 @@ var once = times(1);
 
 var allOf = hamcrest.Matchers.allOf;
 var anything = hamcrest.Matchers.anything;
-var hasSize = hamcrest.Matchers.hasSize;
 var hasMember = hamcrest.Matchers.hasMember;
 
 function makeHash() {
@@ -100,7 +99,7 @@ describe('unread-item-service', function() {
       var groupMention;
       var duplicateMention;
       var nonMemberMention;
-      var troupeNoLurkersUserHash, troupeSomeLurkersUserHash, troupeAllLurkersUserHash
+      var troupeNoLurkersUserHash, troupeSomeLurkersUserHash, troupeAllLurkersUserHash;
 
       beforeEach(function() {
         troupeId = mongoUtils.getNewObjectIdString() + "";
@@ -360,7 +359,7 @@ describe('unread-item-service', function() {
       var userService;
       var roomPermissionsModel;
       var unreadItemService;
-      var presenceService;
+      var categoriseUserInRoom;
       var troupeNoLurkers;
       var troupeSomeLurkers;
       var troupeAllLurkers;
@@ -442,15 +441,16 @@ describe('unread-item-service', function() {
         userService = mockito.mock(testRequire('./services/user-service'));
         appEvents = mockito.mock(testRequire('gitter-web-appevents'));
         roomPermissionsModel = mockito.mockFunction();
-        presenceService = {
-          categorizeUsersByOnlineStatus: function(userIds) {
-            /* Always return all users as online */
-            return Q.resolve(userIds.reduce(function(memo, userId) {
-              memo[userId] = 'online';
-              return memo;
-            }, {}));
-          }
-        };
+        categoriseUserInRoom = mockito.mockFunction();
+
+        mockito.when(categoriseUserInRoom)().then(function(roomId, userIds) {
+          /* Always return all users as online */
+          return Q.resolve(userIds.reduce(function(memo, userId) {
+            // TODO: test with some users inroom,push etc
+            memo[userId] = 'online';
+            return memo;
+          }, {}));
+        });
 
         mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId).thenReturn(Q.resolve(troupeNoLurkersUserHash));
         mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId2).thenReturn(Q.resolve(troupeSomeLurkersUserHash));
@@ -459,7 +459,7 @@ describe('unread-item-service', function() {
         unreadItemService = testRequire.withProxies("./services/unread-item-service", {
           './room-membership-service': roomMembershipService,
           './user-service': userService,
-          './presence-service': presenceService,
+          './categorise-users-in-room': categoriseUserInRoom,
           'gitter-web-appevents': appEvents,
           './room-permissions-model': roomPermissionsModel,
         });
@@ -578,7 +578,7 @@ describe('unread-item-service', function() {
       var appEvents;
       var userService;
       var roomPermissionsModel;
-      var presenceService;
+      var categoriseUserInRoom;
       var unreadItemService;
       var troupeNoLurkers;
       var troupeSomeLurkers;
@@ -661,15 +661,16 @@ describe('unread-item-service', function() {
         userService = mockito.mock(testRequire('./services/user-service'));
         appEvents = mockito.mock(testRequire('gitter-web-appevents'));
         roomPermissionsModel = mockito.mockFunction();
-        presenceService = {
-          categorizeUsersByOnlineStatus: function(userIds) {
-            /* Always return all users as online */
-            return Q.resolve(userIds.reduce(function(memo, userId) {
-              memo[userId] = 'online';
-              return memo;
-            }, {}));
-          }
-        };
+        categoriseUserInRoom = mockito.mockFunction();
+
+        mockito.when(categoriseUserInRoom)().then(function(roomId, userIds) {
+          /* Always return all users as online */
+          return Q.resolve(userIds.reduce(function(memo, userId) {
+            // TODO: test with some users inroom,push etc
+            memo[userId] = 'online';
+            return memo;
+          }, {}));
+        });
 
         mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId).thenReturn(Q.resolve(troupeNoLurkersUserHash));
         mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId2).thenReturn(Q.resolve(troupeSomeLurkersUserHash));
@@ -678,7 +679,7 @@ describe('unread-item-service', function() {
         unreadItemService = testRequire.withProxies("./services/unread-item-service", {
           './room-membership-service': roomMembershipService,
           './user-service': userService,
-          './presence-service': presenceService,
+          './categorise-users-in-room': categoriseUserInRoom,
           'gitter-web-appevents': appEvents,
           './room-permissions-model': roomPermissionsModel,
         });

@@ -21,38 +21,48 @@ exports.extract = function(propertyName) {
     };
 };
 
+/** Take an array and hash it by it's ID */
 exports.indexById = function(array) {
+  if (!array || !array.length) return {};
+  var len = array.length;
+
   var a = {};
-  if(array) {
-    array.forEach(function(item) {
-      if(item) {
-        a[item.id || item._id] = item;
-      }
-    });
+  for (var i = 0; i < len; i++) {
+    var item = array[i];
+    if(item) {
+      a[item.id || item._id] = item;
+    }
   }
+
   return a;
 };
 
+/** Take an array and hash it by the supplied property */
 exports.indexByProperty = function(array, propertyName) {
+  if (!array || !array.length) return {};
+  var len = array.length;
+
   var a = {};
-  if(array) {
-    array.forEach(function(item) {
-      if(item) {
-        a[item[propertyName]] = item;
-      }
-    });
+  for (var i = 0; i < len; i++) {
+    var item = array[i];
+    if(item) {
+      a[item[propertyName]] = item;
+    }
   }
+
   return a;
 };
 
+/** Take an array and hash it by the supplied property */
 exports.hashArray = function(array) {
+  if (!array || !array.length) return {};
+  var len = array.length;
+
   var a = {};
-  if (!array) return a;
-
-  array.forEach(function(item) {
+  for (var i = 0; i < len; i++) {
+    var item = array[i];
     a[item] = true;
-  });
-
+  }
   return a;
 };
 
