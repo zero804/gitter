@@ -226,7 +226,7 @@ onready(function () {
       "keys" : "keys",
       "integrations": "integrations",
       "add" : "addPeople",
-      "tags": "editTags"
+    /*  "tags": "editTags"*/
     },
 
     hideModal: function() {
