@@ -1,9 +1,9 @@
-/*jshint unused:true, node:true */
 "use strict";
 
 var EventEmitter = require('events').EventEmitter;
 var util = require('util');
 var _ = require('underscore');
+var debug = require('debug')('gitter:notification-collector');
 
 var NotificationCollector = function (options) {
   this.collection = {};
@@ -15,6 +15,7 @@ var NotificationCollector = function (options) {
 util.inherits(NotificationCollector, EventEmitter);
 
 NotificationCollector.prototype.incomingNotification = function (userId, itemType, items, troupeId) {
+  debug('Incoming notification collection started');  
   if (itemType !== 'chat') return false;
   var key = userId + ':' + troupeId;
   var itemsMapped = items.map(function (itemId) { return { itemType: itemType, itemId: itemId }; });
@@ -28,15 +29,16 @@ NotificationCollector.prototype.incomingNotification = function (userId, itemTyp
   }
   this.itemCount++;
 
-  if (this.collectSoon) return;
-
-  if (this.itemCount > 2000) {
-    this.collectSoon = true;
-    // Performing immediate collection
-    setTimeout(this.collectTimeout.bind(this), 1);
-  } else {
-    this.collect();
+  if (!this.collectSoon) {
+    if (this.itemCount > 2000) {
+      this.collectSoon = true;
+      // Performing immediate collection
+      setTimeout(this.collectTimeout.bind(this), 1);
+    } else {
+      this.collect();
+    }
   }
+  debug('Incoming notification collection finished');
 };
 
 NotificationCollector.prototype.collectTimeout = function () {

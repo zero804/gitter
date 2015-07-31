@@ -4,7 +4,7 @@
 var appEvents                          = require('gitter-web-appevents');
 var winston                            = require('../../utils/winston');
 var pushNotificationService            = require("../push-notification-service");
-var _                                  = require("underscore");
+var _                                  = require("lodash");
 var presenceService                    = require("./../presence-service");
 var NotificationCollector              = require('../../utils/notification-collector');
 var onlineNotificationGeneratorService = require('./online-notification-generator-service');
@@ -99,6 +99,17 @@ function userCategorisationStrategy(userTroupes, callback) {
 // This installs the listeners that will listen to events
 //
 exports.install = function() {
+  // Listen for onNewUnreadItem events generated locally
+  appEvents.onNewOnlineNotification(function(troupeId, chatId, userIds, mentioned) {
+    return onlineNotificationGeneratorService.sendOnlineNotifications(troupeId, chatId, userIds, mentioned)
+      .catch(function (err) {
+        winston.error('Error while generating online notifications: ' + err, { exception: err });
+      });
+  });
+
+  console.log('BADGES AND PUSH NOTIFICATIONS AND EYEBALLS ARE CURRENTLY NOT BEING HANDLED');
+
+  return;
   var pushNotificationGateway = require("../../gateways/push-notification-gateway");
   var notificationCollector = new NotificationCollector({ userCategorisationStrategy: userCategorisationStrategy });
 
