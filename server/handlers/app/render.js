@@ -436,7 +436,7 @@ function renderOrgPage(req, res, next) {
       var populateUsers = rooms.map(function(room) {
         return userService.findByIds(room.userIds);
       });
-  
+
       return Q.all(populateUsers);
     })
     .then(function(values) {
