@@ -13,8 +13,8 @@ var TagModel = Backbone.Model.extend({
 
   validate: function(attrs){
     //todo add tag maximum value??
-    var tagLength = attrs.value.length;
-    if(tagLength <= 0 || tagLength > 20){
+    var tagLength = !!attrs.value && attrs.value.length;
+    if(!tagLength || tagLength <= 0 || tagLength > 20){
       return 'Tags must be of a valid tagLength';
     }
   }
