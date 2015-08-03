@@ -18,7 +18,7 @@ module.exports =  function(req, res, next) {
       stats.eventHF('eyeballs.failed.invalid.socket');
 
       logger.warn('eyeball: socket ' + socketId + ' does not exist. ');
-      return res.send(400);
+      return res.sendStatus(400);
     }
 
     presenceService.clientEyeballSignal(req.user.id, socketId, on, function(err) {
@@ -31,7 +31,7 @@ module.exports =  function(req, res, next) {
           logger.warn('eyeball: socket ' + socketId + ' exists in the faye engine, but not in the presence service.');
           bayeux.destroyClient(socketId);
 
-          return res.send(400);
+          return res.sendStatus(400);
         }
 
         return next(err);

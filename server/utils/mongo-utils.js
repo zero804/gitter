@@ -1,9 +1,16 @@
-/* jshint node:true */
 "use strict";
 
 var winston = require('./winston');
 var ObjectID = require('mongodb').ObjectID;
 var _ = require('underscore');
+
+function stringToObjectID(string) {
+  try {
+    return new ObjectID(string);
+  } catch(e) {
+    throw new Error('Invalid ObjectID ' + string);
+  }
+}
 
 function asObjectID(id) {
   if(!id) {
@@ -11,7 +18,7 @@ function asObjectID(id) {
   }
 
   if(typeof id === 'string') {
-    return new ObjectID(id);
+    return stringToObjectID(id);
   }
 
   return id;
@@ -30,7 +37,7 @@ function getDateFromObjectId(id) {
   }
 
   if(typeof id === 'string') {
-    var objectId = new ObjectID(id);
+    var objectId = stringToObjectID(id);
     return objectId.getTimestamp();
   }
 

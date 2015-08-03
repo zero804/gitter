@@ -4,6 +4,7 @@
 var env = require('gitter-web-env');
 var logger = env.logger;
 var stats = env.stats;
+var StatusError = require('statuserror');
 
 var logout = require('./logout');
 var oauthService = require('../../services/oauth-service');
@@ -31,13 +32,13 @@ module.exports = function(req, res, next) {
     // Are we dealing with an API client? Tell em in HTTP
     if(req.accepts(['json','html']) === 'json') {
       logger.error("User no longer has a token");
-      res.send(401, { success: false, loginRequired: true });
+      res.status(401).send({ success: false, loginRequired: true });
       return;
     }
 
     /* Not a web client? Give them the message straightup */
-    if(req.headers['authorization']) {
-      return next(401);
+    if(req.headers.authorization) {
+      return next(new StatusError(401));
     }
 
     return res.relativeRedirect("/");
