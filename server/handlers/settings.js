@@ -113,7 +113,7 @@ function createIntegration(req, res) {
     res.redirect(body.configurationURL +
       "&rt=" + resp.body.token +
       "&ut=" + encryptedUserToken +
-      "&returnTo=" + config.get('web:basepath') + req.url
+      "&returnTo=" + config.get('web:basepath') + req.originalUrl
     );
   });
 }
