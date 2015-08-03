@@ -93,7 +93,7 @@ var View = Marionette.LayoutView.extend({
 
     var tags = this.$el.find("#tags").val();
 
-    apiClient.room.put('', { tags: tags })
+    apiClient.put('/v1/rooms/' + this.options.roomId, { tags: tags })
     .then(function() {
       this.dialog.hide();
     }.bind(this));
@@ -116,7 +116,7 @@ var Modal = ModalView.extend({
   initialize: function(options) {
     options.title = "Edit tags";
     ModalView.prototype.initialize.apply(this, arguments);
-    this.view = new View({ });
+    this.view = new View({roomId: options.roomId});
   },
   menuItems: [
     { action: "save", text: "Save", className: "trpBtnGreen"}

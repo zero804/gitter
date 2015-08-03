@@ -420,9 +420,10 @@ function renderOrgPage(req, res, next) {
 
   return Q.all([
     ghOrgService.getOrg(org).catch(function() { return {login: org}; }),
-    troupeService.findChildRoomsForOrg(org, opts)
+    troupeService.findChildRoomsForOrg(org, opts),
+    contextGenerator.generateNonChatContext(req)
   ])
-  .spread(function (ghOrg,rooms) {
+  .spread(function (ghOrg,rooms, troupeContext) {
     var getMembers = rooms.map(function(room) {
       return roomMembershipService.findMembersForRoom(room.id, {limit: 10});
     });
@@ -453,7 +454,8 @@ function renderOrgPage(req, res, next) {
 
       res.render('org-page', {
         org: ghOrg,
-        rooms: rooms
+        rooms: rooms,
+        troupeContext: troupeContext
       });
     });
 
