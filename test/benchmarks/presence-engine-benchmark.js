@@ -1,0 +1,132 @@
+/*jslint node: true */
+/*global describe:true, it: true, beforeEach:true, afterEach:true */
+"use strict";
+
+var presenceService = require('gitter-web-presence');
+var _ = require('underscore');
+var assert = require('assert');
+var Q = require("q");
+var Promise = require('bluebird');
+
+var fakeEngine = {
+  clientExists: function(socketId, callback) { callback(!socketId.match(/^TEST/)); }
+};
+
+function FakeClient(socketId, userId, troupeId, script) {
+  _.bindAll(this, 'connect', 'disconnect', 'signalEyeball', 'next');
+  this.socketId = socketId;
+  this.userId = userId;
+  this.troupeId = troupeId;
+  this.script = script;
+  // this.done = done;
+  this.eyeballSignal = 0;
+}
+
+FakeClient.prototype = {
+  connect: function() {
+    return presenceService.userSocketConnected(this.userId, this.socketId, 'test', 'test', this.troupeId, true);
+  },
+
+  disconnect: function() {
+    return presenceService.socketDisconnected(this.socketId);
+  },
+
+  signalEyeball: function() {
+    var newSignal = this.eyeballSignal ? 0 : 1;
+    var self = this;
+    return presenceService.clientEyeballSignal(this.userId, this.socketId, newSignal)
+      .then(function() {
+        self.eyeballSignal = newSignal;
+      });
+  },
+
+  next: Promise.method(function() {
+    var nextAction = this.script.shift();
+    if (!nextAction) return;
+    this.lastAction = nextAction;
+
+    var nextPromise;
+    switch(nextAction) {
+      case 0:
+        nextPromise = this.connect();
+      case 1:
+        nextPromise = this.signalEyeball();
+      case 2:
+        nextPromise = this.disconnect();
+      default:
+        return;
+    }
+
+    var self = this;
+    return nextPromise.then(function() {
+      return self.next();
+    });
+  })
+
+};
+
+function doTest(iterations) {
+  var n = Date.now();
+
+  var iterationsScript = [];
+  for(var i = 0; i < iterations; i++) {
+    var userId = 'TESTUSER' + i + '-' + n;
+    var socketId = 'TESTSOCKET' + i + '-' + n;
+    var troupeId = 'TESTTROUPE' + (i % 10) + '-' + n;
+
+    var script = [0];
+    for(var j = 1; j < i; j++) {
+      script.push(1);
+    }
+    script.push(2);
+
+    iterationsScript.push({
+      socketId: socketId,
+      userId: userId,
+      troupeId: troupeId,
+      script: script
+    });
+  }
+
+  return Promise.map(iterationsScript, function(itr) {
+    var c = new FakeClient(itr.socketId, itr.userId, itr.troupeId, itr.script);
+    return c.next()
+      .then(function() {
+        return presenceService.findOnlineUsersForTroupe(troupeId);
+      })
+      .then(function(online) {
+        assert(online.length === 0);
+      })
+  }, { concurrency: 1 });
+}
+
+suite('presence-engine-benchmark', function() {
+  set('iterations', 20);
+  set('type', 'adaptive');
+
+  function cleanup(done) {
+    return presenceService.collectGarbage(fakeEngine)
+      .nodeify(done);
+  }
+
+  before(function(done) {
+    var userId = 'TESTUSER1' + Date.now();
+    var socketId = 'TESTSOCKET1' + Date.now();
+    var troupeId = 'TESTTROUPE1' + Date.now();
+    var c = new FakeClient(socketId, userId, troupeId, [0,1,1,1,1,1,1,1,1,2]);
+
+    c.next()
+      .then(function() {
+        return cleanup();
+      })
+      .nodeify(done);
+  });
+
+  after(cleanup);
+
+  bench('eyeballs-benchmark', function(done) {
+    return doTest(100)
+      .nodeify(done);
+  });
+
+});

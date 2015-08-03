@@ -1,7 +1,7 @@
 'use strict';
 
 var Q = require('q');
-var presenceService = require('./presence-service');
+var presenceService = require('gitter-web-presence');
 var collections = require('../utils/collections');
 
 var STATUS_INROOM = 'inroom';

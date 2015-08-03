@@ -37,6 +37,7 @@ var testModules = {
   'cache-wrapper': ['./modules/cache-wrapper/test/*.js'],
   'github': ['./modules/github/test/*.js'],
   'split-tests': ['./modules/split-tests/test/*.js'],
+  'presence': ['./modules/presence/test/*.js'],
 };
 
 /** Make a series of tasks based on the test modules */

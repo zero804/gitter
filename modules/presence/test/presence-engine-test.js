@@ -1,9 +1,7 @@
 "use strict";
 
-var testRequire     = require('./test-require');
 var assert          = require('assert');
-var presenceService = testRequire('./services/presence-service');
-var redis           = testRequire("./utils/redis");
+var presenceService = require('..');
 
 var fakeEngine = {
   clientExists: function(clientId, callback) { callback(!clientId.match(/^TEST/)); }
@@ -25,9 +23,9 @@ describe('presenceService', function() {
   beforeEach(cleanup);
   afterEach(cleanup);
 
-  var blockTimer = require('./block-timer');
-  before(blockTimer.on);
-  after(blockTimer.off);
+  // var blockTimer = require('./block-timer');
+  // before(blockTimer.on);
+  // after(blockTimer.off);
 
   it('should cleanup invalid sockets correctly', function(done) {
     presenceService.listOnlineUsers()
@@ -455,7 +453,7 @@ describe('presenceService', function() {
     presenceService.userSocketConnected(userId, socketId, 'online', 'test', null, null, function(err) {
       if(err) return done(err);
 
-      var redisClient = redis.getClient();
+      var redisClient = presenceService.testOnly.redisClient;
 
       // Now mess things up intentionally
       redisClient.zincrby(presenceService.testOnly.ACTIVE_USERS_KEY, 1, userId, function(err) {
@@ -492,7 +490,7 @@ describe('presenceService', function() {
       presenceService.userSocketConnected(userId2, socketId2, 'mobile', 'test', null, null, function(err) {
         if(err) return done(err);
 
-        var redisClient = redis.getClient();
+        var redisClient = presenceService.testOnly.redisClient;
 
         // Now mess things up intentionally
         redisClient.zincrby(presenceService.testOnly.ACTIVE_USERS_KEY, 1, userId2, function(err) {
@@ -540,15 +538,15 @@ describe('presenceService', function() {
     presenceService.userSocketConnected(userId, socketId, 'online', 'test', null, null, function(err) {
       if(err) return done(err);
 
-      var redisClient = redis.getClient();
+      var redisClient = presenceService.testOnly.redisClient;
 
       // now mess things up intentionally
       redisClient.zincrby(presenceService.testOnly.ACTIVE_USERS_KEY, 1, userId, function(err) {
         if(err) return done(err);
 
         presenceService.testOnly.forceDelay = true;
-        presenceService.testOnly.onAfterDelay = function(callback) {
-          presenceService.socketDisconnected(socketId, callback);
+        presenceService.testOnly.onAfterDelay = function() {
+          return presenceService.socketDisconnected(socketId);
         };
 
         presenceService.testOnly.validateUsersSubset([userId], function(err) {
