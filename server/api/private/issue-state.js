@@ -21,7 +21,7 @@ module.exports =  function(req, res, next) {
 
     return service.getIssueState(parts[0] + '/' + parts[1], parts[2])
       .timeout(2500)
-      .fail(function(err) {
+      .catch(function(err) {
 
         winston.warn('Unable to obtain issue state for ' +
             parts[0] + '/' + parts[1] + '#' +parts[2] + ': ' + err,
@@ -34,6 +34,6 @@ module.exports =  function(req, res, next) {
     res.setHeader('Expires', new Date(Date.now() + EXPIRES_MILLISECONDS).toUTCString());
 
     res.send(results);
-  }).fail(next);
+  }).catch(next);
 
 };

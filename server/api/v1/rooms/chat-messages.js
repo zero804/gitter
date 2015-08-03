@@ -57,7 +57,7 @@ module.exports = {
       .then(function(serialized) {
         res.send(serialized);
       })
-      .fail(next);
+      .catch(next);
 
   },
 
@@ -73,7 +73,7 @@ module.exports = {
       .then(function(serialized) {
         res.send(serialized);
       })
-      .fail(next);
+      .catch(next);
   },
 
   show: function(req, res, next) {
@@ -82,7 +82,7 @@ module.exports = {
       .then(function(serialized) {
         res.send(serialized);
       })
-      .fail(next);
+      .catch(next);
   },
 
   update: function(req, res, next) {
@@ -94,7 +94,7 @@ module.exports = {
       .then(function(serialized) {
         res.send(serialized);
       })
-      .fail(function(err) {
+      .catch(function(err) {
         return next(err);
       });
 

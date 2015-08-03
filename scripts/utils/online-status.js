@@ -27,9 +27,9 @@ userService.findByUsername(opts.username)
   .then(function(isOnline) {
     console.log(isOnline ? 'online' : 'offline');
   })
-  .fail(function(err) {
+  .catch(function(err) {
     console.error(err.stack);
   })
-  .fin(function() {
+  .finally(function() {
     shutdown.shutdownGracefully();
   });

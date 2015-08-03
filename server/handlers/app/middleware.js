@@ -73,14 +73,14 @@ function uriContextResolverMiddleware(options) {
         req.uriContext = uriContext;
         next();
       })
-      .fail(function(err) {
+      .catch(function(err) {
         if(err && err.redirect) {
           return res.relativeRedirect(getRedirectUrl(err.redirect, req));
         }
 
         throw err;
       })
-      .fail(next);
+      .catch(next);
   };
 }
 

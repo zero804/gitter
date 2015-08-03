@@ -725,18 +725,6 @@ function hashZset(scoresArray) {
   return hash;
 }
 
-// function introduceDelayForTesting(cb) {
-//   if(presenceService.testOnly.forceDelay) {
-//     setTimeout(function() {
-//       if(presenceService.testOnly.onAfterDelay) {
-//         presenceService.testOnly.onAfterDelay(cb);
-//       }
-//     }, 120);
-//   } else {
-//     cb();
-//   }
-// }
-
 function validateUsersSubset(userIds, callback) {
   debug('Validating %s users ', userIds.length);
 

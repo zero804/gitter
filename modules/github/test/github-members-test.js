@@ -14,7 +14,7 @@ describe('github-members', function() {
       var githubMembers = require('..').GitHubMembers;
 
       githubMembers.getMembers('gitterHQ')
-        .fail(function(err) {
+        .catch(function(err) {
           assert(err);
           done();
         });

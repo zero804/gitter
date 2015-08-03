@@ -52,7 +52,7 @@ return troupeService.findByUri(opts.uri)
   .then(function() {
     shutdown.shutdownGracefully();
   })
-  .fail(function(err) {
+  .catch(function(err) {
     console.error('Error: ' + err, err);
     console.log(err.stack);
     shutdown.shutdownGracefully(1);

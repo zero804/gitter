@@ -183,7 +183,7 @@ router.get('/unsubscribe/:hash',
 
         res.render('unsubscribe', { layout: 'generic-layout', title: 'Unsubscribe', msg: msg });
       })
-      .fail(next);
+      .catch(next);
 
   });
 
@@ -206,7 +206,7 @@ router.get('/badger/opt-out',
           msg: msg
         });
       })
-      .fail(next);
+      .catch(next);
   });
 
 module.exports = router;

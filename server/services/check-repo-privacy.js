@@ -15,9 +15,6 @@ function checkRepoPrivacy(uri) {
       }
 
       return roomService.ensureRepoRoomSecurity(uri, 'PUBLIC');
-    })
-    .fail(function(err) {
-      throw err;
     });
 }
 
