@@ -63,6 +63,51 @@ var featuredRooms  = [
     name: 'Angular UI',
     language: 'JavaScript',
     locale: 'en'
+  },
+  { uri: 'FreeCodeCamp/FreeCodeCamp',
+    name: 'FreeCodeCamp',
+    language: 'JavaScript',
+    locale: 'en'
+  },
+  { uri: 'Aurelia/Discuss',
+    name: 'Aurelia',
+    language: 'JavaScript',
+    locale: 'en'
+  },
+  { uri: 'Dogfalo/materialize',
+    name: 'Materialize',
+    language: 'CSS',
+    locale: 'en'
+  },
+  { uri: 'scala/scala',
+    name: 'Scala',
+    language: 'Scala',
+    locale: 'en'
+  },
+  { uri: 'jspm/jspm',
+    name: 'JSPM',
+    language: 'JavaScript',
+    locale: 'en'
+  },
+  { uri: 'postcss/postcss',
+    name: 'Postcss',
+    language: 'CSS',
+    locale: 'en'
+  },
+  { uri: 'lotus/chat',
+    name: 'Lotus',
+    language: 'Ruby',
+    locale: 'en'
+  },
+  { uri: 'neovim/neovim',
+    name: 'Neovim',
+    language: 'C',
+    locale: 'en'
+  },
+  { uri: 'BinaryMuse/fluxxor',
+    name: 'Fluxxor',
+    language: 'JavaScript',
+    locale: 'en'
   }
 ];
 

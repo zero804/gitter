@@ -10,7 +10,7 @@ module.exports = function(req, res, next) {
   presenceService.socketDisconnectionRequested(userId, socketId, function(err) {
     if(err) {
       if(err.invalidSocketId) {
-        return res.send(400);
+        return res.sendStatus(400);
       }
 
       return next(err);

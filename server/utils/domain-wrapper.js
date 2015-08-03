@@ -1,4 +1,3 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var env = require('gitter-web-env');
@@ -8,7 +7,6 @@ var shutdown = require('shutdown');
 var errorReporter = env.errorReporter;
 
 module.exports = function(app) {
-
   return function(req, res) {
     var reqd = domain.create();
     reqd.add(req);
@@ -18,7 +16,7 @@ module.exports = function(app) {
       logger.error('Request failed: ' + err, { message: err.message, name: err.name });
 
       if(!res.headersSent) {
-        res.send(500);
+        res.sendStatus(500);
       } else {
         res.end();
       }
@@ -33,15 +31,14 @@ module.exports = function(app) {
     reqd.on('error', function(err) {
       try {
         if(!res.headersSent) {
-          res.send(500);
+          res.sendStatus(500);
         } else {
           res.end();
         }
 
         var userId = req.user && req.user.id;
 
-
-        errorReporter(err, { type: 'domain', userId: userId });
+        errorReporter(err, { type: 'domain', userId: userId, url: req.url, method: req.method, routeIdentifier: req.routeIdentifier });
 
         logger.error('----------------------------------------------------------------');
         logger.error('-- A BadThing has happened.');
