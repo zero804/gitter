@@ -13,6 +13,7 @@ module.exports = (function() {
   var INACTIVITY_POLL = 10 * 1000;
 
   function send(value, synchronous) {
+    if (window.localStorage.gitterNoEyeballSignals) return;
     if(!realtime.getClientId()) {
       return;
     }
@@ -200,4 +201,3 @@ module.exports = (function() {
   };
 
 })();
-
