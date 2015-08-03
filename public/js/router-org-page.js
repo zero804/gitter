@@ -30,6 +30,7 @@ onReady(function(){
 
     index: function(){
         modalRegion.destroy();
+        window.location.reload();
     },
 
     onNavigateTags: function(roomId){
@@ -41,5 +42,5 @@ onReady(function(){
   });
 
   new Router();
-  Backbone.history.start();
+  Backbone.history.start({ silent: true });
 });
