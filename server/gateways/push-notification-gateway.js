@@ -9,6 +9,7 @@ var pushNotificationService = require("../services/push-notification-service");
 var unreadItemService = require("../services/unread-item-service");
 var androidGateway = require('./android-notification-gateway');
 var iosGateway = require('./ios-notification-gateway');
+var debug = require('debug')('gitter:push-notification-gateway');
 
 function sendNotificationToDevice(notification, badge, device) {
   var notificationPromise;
@@ -44,7 +45,7 @@ exports.sendUserNotification = function(userId, notification, callback) {
       if(!devices.length) return;
 
       return unreadItemService.getBadgeCountsForUserIds([userId]).then(function(counts) {
-        logger.verbose("push-gateway: Sending to " + devices.length + " potential devices for " + userId);
+        debug("Sending to %s potential devices for %s", devices.length, userId);
 
         var badge = counts[userId] || 0;
 
@@ -58,7 +59,6 @@ exports.sendUserNotification = function(userId, notification, callback) {
 
 exports.sendUsersBadgeUpdates = function(userIds, callback) {
   if(!Array.isArray(userIds)) userIds = [userIds];
-
   pushNotificationService.findEnabledDevicesForUsers(userIds)
     .then(function(devices) {
       if (!devices.length) return;
@@ -72,7 +72,7 @@ exports.sendUsersBadgeUpdates = function(userIds, callback) {
         return device.userId;
       });
 
-      logger.verbose("push-gateway: Sending badge updates to " + iosDevices.length + " potential devices for " + iosUsers.length + " users");
+      debug("Sending badge updates to %s potential devices for %s users", iosDevices.length, iosUsers.length);
 
       return unreadItemService.getBadgeCountsForUserIds(iosUsers)
         .then(function(counts) {

@@ -45,7 +45,7 @@ module.exports = function(app) {
         logger.error('----------------------------------------------------------------');
         logger.error('Domain exception: ' + err, {
           message: err.message,
-          url: req.url,
+          url: req.originalUrl,
           method: req.method,
           name: err.name,
           userId: userId
