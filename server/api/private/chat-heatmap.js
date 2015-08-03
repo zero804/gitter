@@ -49,5 +49,5 @@ module.exports = function(req, res, next) {
           res.send(adjusted);
         });
     })
-    .fail(next);
+    .catch(next);
 };

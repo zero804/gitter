@@ -21,5 +21,5 @@ exports.redirectUserToDefaultTroupe = function(req, res, next) {
     .then(function(url) {
       return res.relativeRedirect(url);
     })
-    .fail(next);
+    .catch(next);
 };

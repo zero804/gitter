@@ -62,7 +62,7 @@ module.exports = function(req, res, next) {
         }
         req.accessToken = sessionAccessToken;
       })
-      .fail(function(err) {
+      .catch(function(err) {
         logger.verbose('csrf: OAuth access token validation failed', { exception: err });
         return generateAccessToken();
       })

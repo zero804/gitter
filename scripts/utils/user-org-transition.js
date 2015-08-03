@@ -108,7 +108,7 @@ performUserToOrgTransition(opts.username, opts['first-user'], opts['dry-run'])
   .then(function() {
     shutdown.shutdownGracefully();
   })
-  .fail(function(err) {
+  .catch(function(err) {
     console.error('Error: ' + err, err.stack);
     shutdown.shutdownGracefully(1);
   })

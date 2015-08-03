@@ -35,7 +35,7 @@ Q.all([
 .then(function() {
   shutdown.shutdownGracefully();
 })
-.fail(function(err) {
+.catch(function(err) {
   console.error('Error: ' + err, err);
   shutdown.shutdownGracefully(1);
 })

@@ -32,7 +32,7 @@ onMongoConnect()
   .then(function() {
     shutdown.shutdownGracefully();
   })
-  .fail(function(err) {
+  .catch(function(err) {
     console.error(err.stack);
     shutdown.shutdownGracefully(1);
   });

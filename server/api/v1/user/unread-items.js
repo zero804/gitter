@@ -47,7 +47,7 @@ module.exports = {
           }
         });
       })
-      .fail(next);
+      .catch(next);
 
   },
 
@@ -68,7 +68,7 @@ module.exports = {
           }
         });
       })
-      .fail(next);
+      .catch(next);
   },
 
 

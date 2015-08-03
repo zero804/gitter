@@ -54,5 +54,5 @@ module.exports = function(req, res, next) {
           res.send(serializeUsers);
         });
     })
-    .fail(next);
+    .catch(next);
 };

@@ -24,7 +24,7 @@ notificationGenerator(sinceTime)
   .then(function() {
     shutdown.shutdownGracefully();
   })
-  .fail(function(err) {
+  .catch(function(err) {
     console.log(err.stack);
     winston.error('send-unread-notifications failed: ' + err, { exception: err });
     shutdown.shutdownGracefully(1);

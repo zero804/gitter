@@ -223,7 +223,7 @@ function sendEmailNotifications(since) {
 
                 count++;
                 return emailNotificationService.sendUnreadItemsNotification(user, troupeData)
-                  .fail(function(err) {
+                  .catch(function(err) {
                     if(err.gitterAction === 'logout_destroy_user_tokens') {
                       stats.event('logout_destroy_user_tokens', { userId: user.id });
 

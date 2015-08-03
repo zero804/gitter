@@ -134,7 +134,7 @@ function renderHomePage(req, res, next) {
         billingBaseUrl: nconf.get('web:billingBaseUrl')
       });
     })
-    .fail(next);
+    .catch(next);
 }
 
 function getPermalinkChatForRoom(troupe, chatId) {
@@ -248,7 +248,7 @@ function renderMainFrame(req, res, next, frame) {
         orgs: orgs
       });
     })
-    .fail(next);
+    .catch(next);
 }
 
 function renderChat(req, res, options, next) {
@@ -347,7 +347,7 @@ function renderChat(req, res, options, next) {
         res.render(options.template, renderOptions);
       });
     })
-    .fail(next);
+    .catch(next);
 }
 
 function renderChatPage(req, res, next) {
@@ -368,7 +368,7 @@ function renderMobileUserHome(req, res, next) {
         dnsPrefetch: dnsPrefetch
       });
     })
-    .fail(next);
+    .catch(next);
 }
 
 function renderMobileChat(req, res, next) {
@@ -493,7 +493,7 @@ function renderUserNotSignedUp(req, res, next) {
         avatarUrl: user.gravatarImageUrl
       });
     })
-    .fail(next);
+    .catch(next);
 }
 
 function renderUserNotSignedUpMainFrame(req, res, next, frame) {
@@ -520,7 +520,8 @@ function renderUserNotSignedUpMainFrame(req, res, next, frame) {
         stagingText: stagingText,
         stagingLink: stagingLink,
       });
-    }).fail(next);
+    })
+    .catch(next);
 }
 
 module.exports = exports = {

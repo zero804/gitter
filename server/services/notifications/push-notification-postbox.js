@@ -38,7 +38,7 @@ exports.postUserTroupes = function(userTroupes) {
           winston.verbose('User troupe is muted. Skipping notification');
           return;
         }
-        
+
 
         pushNotificationService.canLockForNotification(userId, troupeId, userTroupe.startTime, function(err, notificationNumber) {
           if(err) return winston.error('Error while executing canLockForNotification: ' + err, { exception: err });
@@ -74,8 +74,7 @@ exports.postUserTroupes = function(userTroupes) {
       });
 
     })
-    .fail(function(err) {
+    .catch(function(err) {
       winston.error('Unable to queue usertroupes for notification: ' + err, { exception: err });
     });
 };
-
