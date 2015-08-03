@@ -7,6 +7,10 @@ var TagModel = Backbone.Model.extend({
     value: ''
   },
 
+  initialize: function(tag){
+    this.set('value', tag);
+  },
+
   validate: function(attrs){
     //todo add tag maximum value??
     if(attrs.value.length <= 0){
