@@ -18,10 +18,25 @@ var TagModel = Backbone.Model.extend({
       return 'Tags must be of a valid tagLength';
     }
   }
+
 });
 
 var TagCollection = Backbone.Collection.extend({
+
   model: TagModel,
+
+  addModel: function(model) {
+    var val = model.get('value');
+    //if there is a duplicate fire error
+    if(!!this.where({value: val}).length){
+      this.trigger('tag:error:duplicate', val);
+    }
+    else {
+      this.add(model);
+      this.trigger('tag:added', val);
+    }
+  },
+
   toJSON: function(){
     return this.reduce(function(memo, model){
       memo.push(model.get('value'));

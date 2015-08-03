@@ -11,6 +11,7 @@ var TagModel = require('../../collections/tag-collection').TagModel;
 var editTagsTemplate = require('./tmpl/editTagsTemplate.hbs');
 var tagTemplate = require('./tmpl/tagTemplate.hbs');
 var tagInputTemplate = require('./tmpl/tagEditTemplate.hbs');
+var tagErrorTemplate = require('./tmpl/tagErrorTemplate.hbs');
 
 require('views/behaviors/isomorphic');
 
@@ -43,10 +44,7 @@ var TagInputView = Marionette.ItemView.extend({
     //TODO --> what happens if the model is invalid??
     //jp 3/9/15
     if(this.model.isValid()){
-      //if we have a uniq tag
-      if(!this.collection.where({value: this.model.get('value')}).length){
-        this.collection.add(this.model);
-      }
+      this.collection.addModel(this.model);
       this.model = new TagModel();
       this.$el.find('input').val('');
     }
@@ -110,6 +108,33 @@ var TagListView = Marionette.CollectionView.extend({
   }
 });
 
+var TagErrorView = Marionette.ItemView.extend({
+
+  template: tagErrorTemplate,
+
+  model: new Backbone.Model({tag: ''}),
+
+  initialize: function(){
+    this.hide();
+    this.listenTo(this.collection, 'tag:error:duplicate', this.show);
+    this.listenTo(this.collection, 'tag:added', this.hide);
+    this.listenTo(this.model, 'change', this.render);
+  },
+
+  hide: function(){
+    this.$el.hide();
+  },
+
+  show: function(tag){
+    this.model.set({'tag': tag });
+    this.$el.show();
+  },
+
+  onRender: function(){
+    console.log('render');
+  }
+
+});
 
 var View = Marionette.LayoutView.extend({
   template: editTagsTemplate,
@@ -117,7 +142,8 @@ var View = Marionette.LayoutView.extend({
   behaviors: {
     Isomorphic: {
       tagList:  { el: '#tag-list',  init: 'initTagList' },
-      tagInput: { el: '#tag-input', init: 'initTagListEdit' }
+      tagInput: { el: '#tag-input', init: 'initTagListEdit' },
+      tagError: { el: '#tag-error', init: 'initTagError'}
     }
   },
 
@@ -143,6 +169,10 @@ var View = Marionette.LayoutView.extend({
 
   initTagListEdit: function(optionsForRegion){
     return new TagInputView(optionsForRegion({ collection: this.model.get('tagCollection') }));
+  },
+
+  initTagError: function(optionsForRegion){
+    return new TagErrorView(optionsForRegion({ collection: this.model.get('tagCollection') }));
   },
 
   save: function(e) {
