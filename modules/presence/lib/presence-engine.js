@@ -16,8 +16,7 @@ var Promise = require('bluebird');
 
 function createClient() {
   return env.ioredis.createClient(null, {
-    keyPrefix: config.get('presence:prefix') + ':',
-    showFriendlyErrorStack: true // XXX NO COMMIT
+    keyPrefix: config.get('presence:prefix') + ':'
   });
 }
 
