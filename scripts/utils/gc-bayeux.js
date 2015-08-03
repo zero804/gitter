@@ -4,7 +4,7 @@
 
 var bayeux = require('../../server/web/bayeux');
 var winston = require('../../server/utils/winston');
-var presenceService = require('../../server/services/presence-service');
+var presenceService = require('gitter-web-presence');
 var shutdown = require('shutdown');
 
 presenceService.collectGarbage(bayeux, function(err) {

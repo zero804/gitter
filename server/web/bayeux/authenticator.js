@@ -4,7 +4,7 @@ var env               = require('gitter-web-env');
 var logger            = env.logger;
 
 var oauth             = require('../../services/oauth-service');
-var presenceService   = require('../../services/presence-service');
+var presenceService   = require('gitter-web-presence');
 var recentRoomService   = require('../../services/recent-room-service');
 var contextGenerator  = require('../context-generator');
 var StatusError       = require('statuserror');

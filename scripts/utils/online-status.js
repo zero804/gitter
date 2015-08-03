@@ -4,7 +4,7 @@
 
 var userService = require('../../server/services/user-service');
 var troupeService = require('../../server/services/troupe-service');
-var presenceService = require('../../server/services/presence-service.js');
+var presenceService = require('gitter-web-presence');
 var shutdown = require('shutdown');
 var Q = require('q');
 

@@ -4,7 +4,7 @@
 "use strict";
 
 var winston = require('../../server/utils/winston');
-var presenceService = require('../../server/services/presence-service');
+var presenceService = require('gitter-web-presence');
 var shutdown = require('shutdown');
 
 var start = Date.now();
@@ -18,5 +18,3 @@ presenceService.validateUsers(function(err) {
   winston.info('presence-user-validation completed in ' + timeTaken + 'ms');
   shutdown.shutdownGracefully(err ? 1 : 0);
 });
-
-
