@@ -15,6 +15,10 @@ var tagInputTemplate = require('./tmpl/tagEditTemplate.hbs');
 require('views/behaviors/isomorphic');
 
 
+var ENTER_KEY_CODE = 13;
+var BACKSPACE_KEY_CODE = 8;
+
+
 //TODO --> Break the bigger components into their own files
 //jp 3/9/15
 var TagInputView = Marionette.ItemView.extend({
@@ -25,7 +29,8 @@ var TagInputView = Marionette.ItemView.extend({
   //but a click event does, event for keypress... odd
   events: {
     'click': 'onTagSubmit',
-    'input': 'onTagInput'
+    'input': 'onTagInput',
+    'keypress': 'onKeyPressed'
   },
 
   initialize: function(){
@@ -35,7 +40,9 @@ var TagInputView = Marionette.ItemView.extend({
   },
 
   onTagSubmit: function(e){
-    e.preventDefault();
+    if(e) e.preventDefault();
+    //TODO --> what happens if the model is invalid??
+    //jp 3/9/15
     if(this.model.isValid()){
       this.collection.add(this.model);
       this.model = new TagModel();
@@ -44,8 +51,18 @@ var TagInputView = Marionette.ItemView.extend({
   },
 
   onTagInput: function(e){
-    e.preventDefault();
-    this.model.set('value', e.target.value, {validate: true});
+    if(e) e.preventDefault();
+    //guard against manual invocation of this function
+    var val =  e ? e.target.value : this.$el.find('input').val();
+    this.model.set('value', val, {validate: true});
+  },
+
+  onKeyPressed: function(e){
+    //manually trigger tag submission
+    if(e.keyCode === ENTER_KEY_CODE){
+      this.onTagInput();
+      this.onTagSubmit();
+    }
   },
 
   onModelChange: function(){
@@ -115,6 +132,7 @@ var View = Marionette.LayoutView.extend({
 
   save: function(e) {
     if(e) e.preventDefault();
+    //TODO --> need to add error states here jp 3/9/15
     apiClient.put('/v1/rooms/' + this.options.roomId, { tags: this.model.get('tagCollection').toJSON() })
     .then(function() {
       this.dialog.hide();
