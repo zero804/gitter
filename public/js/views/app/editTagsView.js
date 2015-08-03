@@ -56,11 +56,23 @@ var TagInputView = Marionette.ItemView.extend({
 });
 
 var TagView = Marionette.ItemView.extend({
-  template: tagTemplate
+  template: tagTemplate,
+  events: {
+    'click': 'onTagClicked'
+  },
+  onTagClicked: function(){
+    this.triggerMethod('remove:tag', this.model);
+  }
 });
 
 var TagListView = Marionette.CollectionView.extend({
-  childView: TagView
+  childView: TagView,
+  childEvents: {
+    'remove:tag': 'onRemoveTag'
+  },
+  onRemoveTag: function(view, model){
+    this.collection.remove(model);
+  }
 });
 
 
@@ -77,6 +89,7 @@ var View = Marionette.LayoutView.extend({
   initialize: function() {
     this.model = context.troupe();
     this.tagCollection = new TagCollection([{ value: 'tag1'}, { value: 'tag2'}]);
+    this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
   },
 
   initTagList: function(optionsForRegion){
@@ -85,19 +98,17 @@ var View = Marionette.LayoutView.extend({
 
   initTagListEdit: function(optionsForRegion){
     return new TagInputView(optionsForRegion({ collection: this.tagCollection }));
-  }
+  },
 
-  /*
   save: function(e) {
     if(e) e.preventDefault();
 
-    var tags = this.$el.find("#tags").val();
+    console.log(this.options);
 
-    apiClient.put('/v1/rooms/' + this.options.roomId, { tags: tags })
+    apiClient.put('/v1/rooms/' + this.options.roomId, { tags: this.tagCollection.toJSON() })
     .then(function() {
       this.dialog.hide();
-    }.bind(this));
-
+    }.bind(this))
 
   },
 
@@ -108,15 +119,15 @@ var View = Marionette.LayoutView.extend({
         break;
     }
   }
-  */
 
 });
 
 var Modal = ModalView.extend({
   initialize: function(options) {
+    console.log(options, '<--0')
     options.title = "Edit tags";
     ModalView.prototype.initialize.apply(this, arguments);
-    this.view = new View({roomId: options.roomId});
+    this.view = new View({roomId: options.roomId });
   },
   menuItems: [
     { action: "save", text: "Save", className: "trpBtnGreen"}
