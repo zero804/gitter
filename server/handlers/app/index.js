@@ -71,7 +71,8 @@ var chatMiddlewarePipeline = [
     } else {
       // We're doing this so we correctly redirect a logged out
       // user to the right chat post login
-      req.session.returnTo = req.url.replace(/\/~\w+(\?.*)?$/,"");
+      var url = req.originalUrl;
+      req.session.returnTo = url.replace(/\/~\w+(\?.*)?$/,"");
       appRender.renderNotLoggedInChatPage(req, res, next);
     }
 
