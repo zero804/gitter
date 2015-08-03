@@ -30,6 +30,9 @@ onReady(function(){
 
     index: function(){
         modalRegion.destroy();
+        //FIXME: ugly hack to refresh the server rendered page once
+        //a user has added tags to a room
+        //jp 3/9/15
         window.location.reload();
     },
 
