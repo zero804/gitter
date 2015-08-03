@@ -9,6 +9,18 @@ var resolveAvatarUrl = require('gitter-web-shared/avatars/resolve-avatar-url');
 require('views/behaviors/tooltip');
 var FastAttachMixin = require('views/fast-attach-mixin');
 
+function preloadImage(url, callback) {
+  var image = document.createElement('img');
+  image.onload = function() {
+    image.onload = null;
+    callback();
+  }
+  image.onerror = function() {
+    image.onerror = null;
+    callback();
+  }
+  image.src = url;
+}
 module.exports = (function() {
 
   var AvatarWidget = Marionette.ItemView.extend({
@@ -20,7 +32,8 @@ module.exports = (function() {
       'click':     'showDetail'
     },
     ui: {
-      tooltip: ':first-child'
+      tooltip: ':first-child',
+      image: '.trpDisplayPicture'
     },
     modelEvents: {
       change: 'update'
@@ -80,14 +93,20 @@ module.exports = (function() {
     },
 
     updatePresence: function(data) {
-      if (this.showStatus) {
-        this.$el.find('.trpDisplayPicture').toggleClass('online', data.online);
-        this.$el.find('.trpDisplayPicture').toggleClass('offline', !data.online);
+      if (this.options.showStatus) {
+        this.ui.image.toggleClass('online', data.online);
+        this.ui.image.toggleClass('offline', !data.online);
       }
     },
 
     updateAvatar: function(data) {
-      this.$el.find('.trpDisplayPicture').css({ 'background-image': "url('" + data.avatarUrl + "')" });
+      var self = this;
+      var newUrl = "url('" + data.avatarUrl + "')";
+      if (newUrl !== this.ui.image.css('background-image')) {
+        preloadImage(data.avatarUrl, function() {
+          self.ui.image.css({ 'background-image': newUrl });
+        });
+      }
     },
 
     getUserId: function() {
