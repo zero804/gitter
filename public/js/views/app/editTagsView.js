@@ -1,5 +1,6 @@
 "use strict";
 
+var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 var context = require('utils/context');
 var apiClient = require('components/apiClient');
@@ -87,25 +88,31 @@ var View = Marionette.LayoutView.extend({
   },
 
   initialize: function() {
-    this.model = context.troupe();
-    this.tagCollection = new TagCollection([{ value: 'tag1'}, { value: 'tag2'}]);
+    this.model = new Backbone.Model({
+      tagCollection: new TagCollection()
+    });
+
+    //get existing tags
+    apiClient.get('/v1/rooms/' + this.options.roomId)
+    .then(function(data){
+      this.model.set(data);
+      this.model.get('tagCollection').add(data.tags);
+    }.bind(this));
+
     this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
   },
 
   initTagList: function(optionsForRegion){
-    return new TagListView(optionsForRegion({ collection: this.tagCollection }));
+    return new TagListView(optionsForRegion({ collection: this.model.get('tagCollection') }));
   },
 
   initTagListEdit: function(optionsForRegion){
-    return new TagInputView(optionsForRegion({ collection: this.tagCollection }));
+    return new TagInputView(optionsForRegion({ collection: this.model.get('tagCollection') }));
   },
 
   save: function(e) {
     if(e) e.preventDefault();
-
-    console.log(this.options);
-
-    apiClient.put('/v1/rooms/' + this.options.roomId, { tags: this.tagCollection.toJSON() })
+    apiClient.put('/v1/rooms/' + this.options.roomId, { tags: this.model.get('tagCollection').toJSON() })
     .then(function() {
       this.dialog.hide();
     }.bind(this))
@@ -124,7 +131,6 @@ var View = Marionette.LayoutView.extend({
 
 var Modal = ModalView.extend({
   initialize: function(options) {
-    console.log(options, '<--0')
     options.title = "Edit tags";
     ModalView.prototype.initialize.apply(this, arguments);
     this.view = new View({roomId: options.roomId });
