@@ -17,7 +17,7 @@ module.exports = function(req, res) {
   }
 
   if (req.session) {
-    req.session.returnTo = req.url;
+    req.session.returnTo = req.originalUrl;
   }
 
   logger.verbose("User is not logged in, redirecting to login page");
