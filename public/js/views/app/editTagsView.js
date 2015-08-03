@@ -15,6 +15,8 @@ var tagInputTemplate = require('./tmpl/tagEditTemplate.hbs');
 require('views/behaviors/isomorphic');
 
 
+//TODO --> Break the bigger components into their own files
+//jp 3/9/15
 var TagInputView = Marionette.ItemView.extend({
 
   template: tagInputTemplate,
@@ -82,8 +84,8 @@ var View = Marionette.LayoutView.extend({
 
   behaviors: {
     Isomorphic: {
-      tagList: { el: '#tag-list', init: 'initTagList' },
-      tagInput: { el: '#tag-list-edit', init: 'initTagListEdit' }
+      tagList:  { el: '#tag-list', init: 'initTagList' },
+      tagInput: { el: '#tag-input', init: 'initTagListEdit' }
     }
   },
 
@@ -93,6 +95,7 @@ var View = Marionette.LayoutView.extend({
     });
 
     //get existing tags
+    ////TODO need to add error states to the below request
     apiClient.get('/v1/rooms/' + this.options.roomId)
     .then(function(data){
       this.model.set(data);
