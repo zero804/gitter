@@ -25,17 +25,17 @@ onReady(function(){
 
     routes: {
       '': 'index',
-      ':org/tags': 'onNavigateTags'
+      ':roomId/tags': 'onNavigateTags'
     },
 
     index: function(){
         modalRegion.destroy();
     },
 
-    onNavigateTags: function(org){
+    onNavigateTags: function(roomId){
       require.ensure(['views/app/editTagsView'], function(require) {
         var EditTagsView = require('views/app/editTagsView');
-        modalRegion.show(new EditTagsView());
+        modalRegion.show(new EditTagsView({roomId: roomId}));
       });
     }
   });
