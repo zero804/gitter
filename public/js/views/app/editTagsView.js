@@ -28,7 +28,7 @@ var TagInputView = Marionette.ItemView.extend({
   //TODO figure out why submit event does not fire
   //but a click event does, event for keypress... odd
   events: {
-    'click': 'onTagSubmit',
+    'submit': 'onTagSubmit',
     'input': 'onTagInput',
     'keypress': 'onKeyPressed'
   },
@@ -58,10 +58,21 @@ var TagInputView = Marionette.ItemView.extend({
   },
 
   onKeyPressed: function(e){
-    //manually trigger tag submission
-    if(e.keyCode === ENTER_KEY_CODE){
-      this.onTagInput();
-      this.onTagSubmit();
+
+    switch(e.keyCode) {
+      case ENTER_KEY_CODE :
+        //manually trigger tag submission
+        this.onTagInput();
+        this.onTagSubmit();
+        break;
+
+      //if a user presses backspace
+      //and the input is empty
+      //remove the last tag
+      case BACKSPACE_KEY_CODE :
+        var val =  this.$el.find('input').val();
+        if(val === '') this.collection.pop();
+        break;
     }
   },
 
@@ -101,7 +112,7 @@ var View = Marionette.LayoutView.extend({
 
   behaviors: {
     Isomorphic: {
-      tagList:  { el: '#tag-list', init: 'initTagList' },
+      tagList:  { el: '#tag-list',  init: 'initTagList' },
       tagInput: { el: '#tag-input', init: 'initTagListEdit' }
     }
   },
