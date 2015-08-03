@@ -17,6 +17,7 @@ require('views/behaviors/isomorphic');
 
 var ENTER_KEY_CODE = 13;
 var BACKSPACE_KEY_CODE = 8;
+var DELETE_KEY_CODE = 46;
 
 
 //TODO --> Break the bigger components into their own files
@@ -25,8 +26,6 @@ var TagInputView = Marionette.ItemView.extend({
 
   template: tagInputTemplate,
 
-  //TODO figure out why submit event does not fire
-  //but a click event does, event for keypress... odd
   events: {
     'submit': 'onTagSubmit',
     'input': 'onTagInput',
@@ -44,7 +43,10 @@ var TagInputView = Marionette.ItemView.extend({
     //TODO --> what happens if the model is invalid??
     //jp 3/9/15
     if(this.model.isValid()){
-      this.collection.add(this.model);
+      //if we have a uniq tag
+      if(!this.collection.where({value: this.model.get('value')}).length){
+        this.collection.add(this.model);
+      }
       this.model = new TagModel();
       this.$el.find('input').val('');
     }
@@ -58,18 +60,20 @@ var TagInputView = Marionette.ItemView.extend({
   },
 
   onKeyPressed: function(e){
-
     switch(e.keyCode) {
+
+      //submit tag by pressing enter
       case ENTER_KEY_CODE :
         //manually trigger tag submission
         this.onTagInput();
         this.onTagSubmit();
         break;
 
-      //if a user presses backspace
+      //if a user presses backspace/delete
       //and the input is empty
       //remove the last tag
       case BACKSPACE_KEY_CODE :
+      case DELETE_KEY_CODE :
         var val =  this.$el.find('input').val();
         if(val === '') this.collection.pop();
         break;
