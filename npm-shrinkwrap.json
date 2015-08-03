@@ -2355,28 +2355,44 @@
       }
     },
     "gitter-web-appevents": {
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "from": "modules/appevents",
+      "resolved": "file:modules/appevents"
     },
     "gitter-web-cache-wrapper": {
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "from": "modules/cache-wrapper",
+      "resolved": "file:modules/cache-wrapper"
     },
     "gitter-web-env": {
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "from": "modules/env",
+      "resolved": "file:modules/env"
     },
     "gitter-web-github": {
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "from": "modules/github",
+      "resolved": "file:modules/github"
     },
     "gitter-web-presence": {
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "from": "modules/presence",
+      "resolved": "file:modules/presence"
     },
     "gitter-web-shared": {
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "from": "shared",
+      "resolved": "file:shared"
     },
     "gitter-web-split-tests": {
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "from": "modules/split-tests",
+      "resolved": "file:modules/split-tests"
     },
     "gitter-web-suggestions": {
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "from": "modules/suggestions",
+      "resolved": "file:modules/suggestions"
     },
     "handlebars": {
       "version": "3.0.3",
