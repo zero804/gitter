@@ -16,7 +16,13 @@ var TagModel = Backbone.Model.extend({
 });
 
 var TagCollection = Backbone.Collection.extend({
-  model: TagModel
+  model: TagModel,
+  toJSON: function(){
+    return this.reduce(function(memo, model){
+      memo.push(model.get('value'));
+      return memo;
+    }, []).join(',');
+  }
 });
 
 module.exports = {
