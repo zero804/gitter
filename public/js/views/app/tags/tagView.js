@@ -3,7 +3,7 @@
 "use strict";
 
 var Marionette = require('backbone.marionette');
-var tagTemplate = require('./tmpl/tag-template.hbs');
+var tagTemplate = require('./tmpl/tagTemplate.hbs');
 
 var TagView = Marionette.ItemView.extend({
 

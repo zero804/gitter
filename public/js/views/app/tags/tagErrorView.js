@@ -3,7 +3,7 @@
 
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
-var tagErrorTemplate = require('./tmpl/tag-error-template.hbs');
+var tagErrorTemplate = require('./tmpl/tagErrorTemplate.hbs');
 
 var TagErrorView = Marionette.ItemView.extend({
 

@@ -4,7 +4,7 @@
 var Marionette = require('backbone.marionette');
 var TagModel = require('../../../collections/tag-collection.js').TagModel;
 
-var tagInputTemplate = require('./tmpl/tag-input-template.hbs');
+var tagInputTemplate = require('./tmpl/tagInputTemplate.hbs');
 
 var ENTER_KEY_CODE = 13;
 var BACKSPACE_KEY_CODE = 8;

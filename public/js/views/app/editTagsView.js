@@ -5,9 +5,9 @@ var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 
 var ModalView = require('views/modal');
-var TagInputView = require('./tags/tag-input-view');
-var TagListView = require('./tags/tag-list-view');
-var TagErrorView = require('./tags/tag-error-view');
+var TagInputView = require('./tags/tagInputView');
+var TagListView = require('./tags/tagListView');
+var TagErrorView = require('./tags/tagErrorViee');
 
 var TagCollection = require('../../collections/tag-collection').TagCollection;
 
