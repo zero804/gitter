@@ -27,6 +27,7 @@ var useragent          = require('useragent');
 var avatar             = require('../../utils/avatar');
 var _                 = require('underscore');
 var GitHubOrgService   = require('gitter-web-github').GitHubOrgService;
+var orgPermissionModel = require('../../services/permissions/org-permissions-model');
 
 
 /* How many chats to send back */
@@ -421,9 +422,10 @@ function renderOrgPage(req, res, next) {
   return Q.all([
     ghOrgService.getOrg(org).catch(function() { return {login: org}; }),
     troupeService.findChildRoomsForOrg(org, opts),
-    contextGenerator.generateNonChatContext(req)
+    contextGenerator.generateNonChatContext(req),
+    orgPermissionModel(req.user, 'admin', org)
   ])
-  .spread(function (ghOrg,rooms, troupeContext) {
+  .spread(function (ghOrg,rooms, troupeContext, isOrgAdmin) {
     var getMembers = rooms.map(function(room) {
       return roomMembershipService.findMembersForRoom(room.id, {limit: 10});
     });
@@ -447,9 +449,10 @@ function renderOrgPage(req, res, next) {
 
       // Custom data for the org page
       rooms.forEach(function(room) {
-        room.private = room.security !== 'PUBLIC';
         var nameParts = room.uri.split('/');
         room.shortName = nameParts.length === 3 ? nameParts[1] + '/' + nameParts[2] : nameParts[1] || nameParts[0];
+        room.canEditTags = isOrgAdmin;
+        room.private = room.security !== 'PUBLIC';
       });
 
       res.render('org-page', {

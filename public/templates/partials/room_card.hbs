@@ -32,9 +32,11 @@
 
   <footer class="room-card__footer">
     <div class="room-card__footer-content">
-      <a class="btn outline" href="#{{ id }}/tags" target="_parent">
-        Edit tags
-      </a>
+      {{#if canEditTags}}
+        <a class="btn terciary" href="#{{ id }}/tags" target="_parent">
+          Edit tags
+        </a>
+      {{/if}}
 
       <a class="btn secondary" href="/{{ uri }}?source=orgpage" target="_parent">
         Join Room
