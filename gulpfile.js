@@ -28,6 +28,7 @@ var shell = require('gulp-shell');
 var del = require('del');
 var grepFail = require('gulp-grep-fail');
 var runSequence = require('run-sequence');
+var jsonlint = require('gulp-jsonlint');
 
 /* Don't do clean in gulp, use make */
 var DEV_MODE = !!process.env.DEV_MODE;
@@ -56,6 +57,12 @@ function makeTestTasks(taskName, generator) {
   });
 }
 
+gulp.task('validate-config', function() {
+  return gulp.src(['config/*.json'])
+    .pipe(jsonlint())
+    .pipe(jsonlint.reporter())
+    .pipe(jsonlint.failOnError());
+});
 
 gulp.task('validate-client-source', function() {
   /* This is a very lax jshint, only looking for major problems */
@@ -102,7 +109,7 @@ gulp.task('validate-illegal-markers', function() {
   //   .pipe(grepFail([ '' ]));
 });
 
-gulp.task('validate', ['validate-client-source', 'validate-server-source' /*, 'validate-illegal-markers'*/]);
+gulp.task('validate', ['validate-config', 'validate-client-source', 'validate-server-source' /*, 'validate-illegal-markers'*/]);
 
 makeTestTasks('test-mocha', function(name, files) {
   mkdirp.sync('output/test-reports/');

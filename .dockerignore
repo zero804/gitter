@@ -1,2 +1,8 @@
 node_modules
 output
+.git
+.settings
+.idea
+.data
+test
+scripts/graphs
