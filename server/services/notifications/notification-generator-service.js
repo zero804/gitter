@@ -107,6 +107,15 @@ exports.install = function() {
       });
   });
 
+  appEvents.onNewPushNotificationForChat(function(troupeId, chatId, userIds, mentioned) {
+    console.log('NEW PUSH FOR CHAT', troupeId, chatId, userIds, mentioned);
+    pushNotificationPostbox.queueNotificationsForChat(troupeId, chatId, userIds, mentioned);
+    // pushNotificationPostbox.postUserTroupes(userIds.map(function(userId) {
+    //   return { troupeId: troupeId, userId: userId, startTime: Date.now() };
+    // }));
+
+  });
+
   console.log('BADGES AND PUSH NOTIFICATIONS AND EYEBALLS ARE CURRENTLY NOT BEING HANDLED');
 
   return;

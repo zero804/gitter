@@ -142,9 +142,35 @@ function expireCachedUsersWithDevices() {
 exports.findUsersWithDevices = function(userIds, callback) {
   return getCachedUsersWithDevices()
     .then(function(usersWithDevices) {
-      return userIds.filter(function(userId) {
-        return usersWithDevices[userId]; // Only true if the user has a device...
-      });
+      // Not using filter here for performance reasons
+      var result = [];
+      for (var i = 0; i < userIds.length; i++) {
+        var userId = userIds[i];
+        // Only true if the user has a device...
+        if(usersWithDevices[userId]) {
+          result.push(userId);
+        }
+      }
+    })
+    .nodeify(callback);
+};
+
+/** Like findUsersWithDevices, but returns a hash */
+exports.findUsersWithDevicesHashed = function(userIds, callback) {
+  return getCachedUsersWithDevices()
+    .then(function(usersWithDevices) {
+      // Not using filter here for performance reasons
+      var result = {};
+      for (var i = 0; i < userIds.length; i++) {
+        var userId = userIds[i];
+
+        // Only true if the user has a device...
+        if(usersWithDevices[userId]) {
+          result[userId] = true;
+        }
+      }
+
+      return result;
     })
     .nodeify(callback);
 };
@@ -168,7 +194,7 @@ exports.findDeviceForDeviceId = function(deviceId, callback) {
 };
 
 exports.findUsersTroupesAcceptingNotifications = function(userTroupes, callback) {
-
+// THIS MAY BE DELETABLE
   var multi = redisClient.multi();
   userTroupes.forEach(function(userTroupes) {
     var userId = userTroupes.userId;

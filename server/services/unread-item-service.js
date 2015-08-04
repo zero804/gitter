@@ -407,6 +407,9 @@ function processResultsForNewItemWithMentions(troupeId, chatId, parsed, results,
 
       var userIdsForOnlineNotification = [];
       var userIdsForOnlineNotificationWithMention = [];
+      var pushCandidates = [];
+      var pushCandidatesWithMention = [];
+
 
       var newUnreadItemNoMention = { chat: [chatId] };
       var newUnreadItemWithMention = { chat: [chatId], mention: [chatId] };
@@ -446,25 +449,35 @@ function processResultsForNewItemWithMentions(troupeId, chatId, parsed, results,
 
           case 'push':
             // TODO: handle push
-            console.error('NEED TO HANDLE PUSH NOTIFICATIONS');
+            console.error('NEED TO HANDLE PUSH NOTIFICATIONS: ', userId);
+            var pushNotificationQueue = hasMention ? pushCandidatesWithMention : pushCandidates;
+            pushNotificationQueue.push(userId);
             return;
         }
       });
 
-      // Next notify all the users currently online but not in this room who
-      // will receive desktop notifications
-      if (userIdsForOnlineNotification.length) {
-        appEvents.newOnlineNotification(troupeId, chatId, userIdsForOnlineNotification, false);
-      }
-
-      // Next notify all the users currently online but not in this room who
-      // will receive desktop notifications
-      if (userIdsForOnlineNotificationWithMention.length) {
-        appEvents.newOnlineNotification(troupeId, chatId, userIdsForOnlineNotificationWithMention, true);
-      }
-
-      // No activity on edits
       if (!isEdit) {
+
+        // Next notify all the users currently online but not in this room who
+        // will receive desktop notifications
+        if (userIdsForOnlineNotification.length) {
+          appEvents.newOnlineNotification(troupeId, chatId, userIdsForOnlineNotification, false);
+        }
+
+        // Next notify all the users currently online but not in this room who
+        // will receive desktop notifications
+        if (userIdsForOnlineNotificationWithMention.length) {
+          appEvents.newOnlineNotification(troupeId, chatId, userIdsForOnlineNotificationWithMention, true);
+        }
+
+        if (pushCandidatesWithMention.length) {
+          appEvents.newPushNotificationForChat(troupeId, chatId, pushCandidatesWithMention, true);
+        }
+
+        if (pushCandidates.length) {
+          appEvents.newPushNotificationForChat(troupeId, chatId, pushCandidates, false);
+        }
+
         // Next, notify all the lurkers
         // Note that this can be a very long list in a big room
         var activityOnly = parsed.activityOnlyUserIds;
