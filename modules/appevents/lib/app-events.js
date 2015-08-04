@@ -26,14 +26,21 @@ module.exports =  {
       localEventEmitter.on('newUnreadItem', callback);
     },
 
-    newOnlineNotification: function(troupeId, chatId, userIds) {
-      localEventEmitter.emit('newOnlineNotification', troupeId, chatId, userIds);
+    newOnlineNotification: function(troupeId, chatId, userIds, mention) {
+      localEventEmitter.emit('newOnlineNotification', troupeId, chatId, userIds, mention);
     },
 
     onNewOnlineNotification: function(callback) {
       localEventEmitter.on('newOnlineNotification', callback);
     },
 
+    newPushNotificationForChat: function(troupeId, chatId, userIds, mentioned) {
+      localEventEmitter.emit('newPushNotificationForChat', troupeId, chatId, userIds, mentioned);
+    },
+
+    onNewPushNotificationForChat: function(callback) {
+      localEventEmitter.on('newPushNotificationForChat', callback);
+    },
 
     unreadItemsRemoved: function(userId, troupeId, items) {
       localEventEmitter.emit('unreadItemRemoved', {
