@@ -1,4 +1,3 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var env = require('gitter-web-env');
@@ -39,7 +38,7 @@ function sendNotificationToDevice(notification, badge, device) {
   });
 }
 
-exports.sendUserNotification = function(userId, notification, callback) {
+exports.sendUserNotification = function(userId, notification) {
   return pushNotificationService.findEnabledDevicesForUsers([userId])
     .then(function(devices) {
       if(!devices.length) return;
@@ -54,12 +53,13 @@ exports.sendUserNotification = function(userId, notification, callback) {
         }));
     });
 
-  }).nodeify(callback);
+  });
 };
 
-exports.sendUsersBadgeUpdates = function(userIds, callback) {
+exports.sendUsersBadgeUpdates = function(userIds) {
   if(!Array.isArray(userIds)) userIds = [userIds];
-  pushNotificationService.findEnabledDevicesForUsers(userIds)
+
+  return pushNotificationService.findEnabledDevicesForUsers(userIds)
     .then(function(devices) {
       if (!devices.length) return;
 
@@ -83,5 +83,5 @@ exports.sendUsersBadgeUpdates = function(userIds, callback) {
           }));
         });
 
-    }).nodeify(callback);
+    });
 };

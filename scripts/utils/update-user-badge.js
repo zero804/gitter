@@ -24,9 +24,7 @@ onMongoConnect()
     return user._id;
   })
   .then(function(userId) {
-    var d = Q.defer();
-    pushNotificationGateway.sendUsersBadgeUpdates([userId], d.makeNodeResolver());
-    return d.promise;
+    return pushNotificationGateway.sendUsersBadgeUpdates([userId]);
   })
   .delay(5000)
   .then(function() {

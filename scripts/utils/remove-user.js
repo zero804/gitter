@@ -7,7 +7,7 @@ var userRemovalService = require('../../server/services/user-removal-service');
 
 var winston = require('../../server/utils/winston');
 
-require('../../server/utils/event-listeners').installLocalEventListeners();
+require('../../server/event-listeners').install();
 
 var opts = require("nomnom")
    .option('username', {
@@ -18,7 +18,6 @@ var opts = require("nomnom")
    .parse();
 
 require('../../server/services/kue-workers').startWorkers();
-require('../../server/utils/event-listeners').installLocalEventListeners();
 
 return userRemovalService.removeByUsername(opts.username)
   .delay(5000)

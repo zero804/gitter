@@ -30,7 +30,7 @@ var opts = require("nomnom")
    .parse();
 
 require('../../server/services/kue-workers').startWorkers();
-require('../../server/utils/event-listeners').installLocalEventListeners();
+require('../../server/event-listeners').install();
 
 function performUserToOrgTransition(usernameForConversion, firstUserUsername, dryRun) {
   var context = {};
