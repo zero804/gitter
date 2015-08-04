@@ -129,9 +129,6 @@ describe('github-gitter-user-search', function() {
 
     it('should find with reserved words', function(done) {
       return search('AND', user)
-        .then(function(data) {
-          console.log(data);
-        })
         .nodeify(done);
     });
 

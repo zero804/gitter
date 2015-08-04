@@ -4,6 +4,7 @@ var EventEmitter = require('events').EventEmitter;
 var util = require('util');
 var _ = require('underscore');
 var debug = require('debug')('gitter:notification-collector');
+console.log('POSSIBLY REMOVE THIS');
 
 var NotificationCollector = function (options) {
   this.collection = {};
@@ -11,11 +12,10 @@ var NotificationCollector = function (options) {
   this.userCategorisationStrategy = options.userCategorisationStrategy;
   this.collect = _.throttle(this.collectTimeout.bind(this), options.collectionTime || 500, { leading: false });
 };
-
 util.inherits(NotificationCollector, EventEmitter);
 
 NotificationCollector.prototype.incomingNotification = function (userId, itemType, items, troupeId) {
-  debug('Incoming notification collection started');  
+  debug('Incoming notification collection started');
   if (itemType !== 'chat') return false;
   var key = userId + ':' + troupeId;
   var itemsMapped = items.map(function (itemId) { return { itemType: itemType, itemId: itemId }; });

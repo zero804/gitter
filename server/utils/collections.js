@@ -53,7 +53,7 @@ exports.indexByProperty = function(array, propertyName) {
   return a;
 };
 
-/** Take an array and hash it by the supplied property */
+/** Take an array and turn it into a set-like hash */
 exports.hashArray = function(array) {
   if (!array || !array.length) return {};
   var len = array.length;

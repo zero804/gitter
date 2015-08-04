@@ -40,7 +40,6 @@ describe('troupe-service', function() {
           return roomMembershipService.findMembersForRoom(troupe.id);
         })
         .then(function(userIds) {
-          console.log(userIds);
           assert(_.find(userIds, findUserIdPredicate(fixture.user1.id)));
           assert(_.find(userIds, findUserIdPredicate(fixture.user2.id)));
         })
