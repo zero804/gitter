@@ -6,14 +6,28 @@
 <body>
 
   <header class="org-page__header">
-    <img width='64' height='64' src='https://avatars.githubusercontent.com/{{ org.login }}?s=128'>
-    <h1>{{ org.login }}</h1>
 
-    <div class="org-page__description">
-      {{org.description}}
+    <div class="org-page__org">
+      <div class="org-page__org-logo">
+        <img width='64' height='64' src='https://avatars.githubusercontent.com/{{ org.login }}?s=128'>
+      </div>
+
+      <div class="org-page__org-details">
+        <div class="org-page__name">
+          <h1>{{ org.login }}</h1>
+        </div>
+
+        <div class="org-page__description">
+          {{org.description}}
+        </div>
+      </div>
     </div>
 
     <div class="org-page__details">
+      <div class="org-page__detail"><i class="octicon octicon-comment-discussion"></i> {{roomCount}} Rooms</div>
+
+      <div class="org-page__detail"><i class="octicon octicon-organization"></i> {{orgUserCount}} People</div>
+
       {{#if org.location}}
         <div class="org-page__detail"><i class="octicon octicon-location"></i> {{org.location}}</div>
       {{/if}}
