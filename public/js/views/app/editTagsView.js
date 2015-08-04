@@ -1,138 +1,22 @@
+/* global navigator */
+/* jshint node:true  */
 "use strict";
 
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
-var apiClient = require('components/apiClient');
+
 var ModalView = require('views/modal');
+var TagInputView = require('./tags/tagInputView');
+var TagListView = require('./tags/tagListView');
+var TagErrorView = require('./tags/tagErrorView');
+
 var TagCollection = require('../../collections/tag-collection').TagCollection;
-var TagModel = require('../../collections/tag-collection').TagModel;
+
+var apiClient = require('components/apiClient');
 
 var editTagsTemplate = require('./tmpl/editTagsTemplate.hbs');
-var tagTemplate = require('./tmpl/tagTemplate.hbs');
-var tagInputTemplate = require('./tmpl/tagEditTemplate.hbs');
-var tagErrorTemplate = require('./tmpl/tagErrorTemplate.hbs');
 
 require('views/behaviors/isomorphic');
-
-
-var ENTER_KEY_CODE = 13;
-var BACKSPACE_KEY_CODE = 8;
-var DELETE_KEY_CODE = 46;
-
-
-//TODO --> Break the bigger components into their own files
-//jp 3/9/15
-var TagInputView = Marionette.ItemView.extend({
-
-  template: tagInputTemplate,
-
-  events: {
-    'submit': 'onTagSubmit',
-    'input': 'onTagInput',
-    'keypress': 'onKeyPressed'
-  },
-
-  initialize: function(){
-    this.model = new TagModel();
-    this.listenTo(this.model, 'invalid', this.onModelInvalid);
-    this.listenTo(this.model, 'change', this.onModelChange);
-  },
-
-  onTagSubmit: function(e){
-    if(e) e.preventDefault();
-    //TODO --> what happens if the model is invalid??
-    //jp 3/9/15
-    if(this.model.isValid()){
-      this.collection.addModel(this.model);
-      this.model = new TagModel();
-      this.$el.find('input').val('');
-    }
-  },
-
-  onTagInput: function(e){
-    if(e) e.preventDefault();
-    //guard against manual invocation of this function
-    var val =  e ? e.target.value : this.$el.find('input').val();
-    this.model.set('value', val, {validate: true});
-  },
-
-  onKeyPressed: function(e){
-    switch(e.keyCode) {
-
-      //submit tag by pressing enter
-      case ENTER_KEY_CODE :
-        //manually trigger tag submission
-        this.onTagInput();
-        this.onTagSubmit();
-        break;
-
-      //if a user presses backspace/delete
-      //and the input is empty
-      //remove the last tag
-      case BACKSPACE_KEY_CODE :
-      case DELETE_KEY_CODE :
-        var val =  this.$el.find('input').val();
-        if(val === '') this.collection.pop();
-        break;
-    }
-  },
-
-  onModelChange: function(){
-    this.$el.find('input').removeClass('invalid');
-  },
-
-  onModelInvalid: function(){
-    this.$el.find('input').addClass('invalid');
-  }
-
-});
-
-var TagView = Marionette.ItemView.extend({
-
-  template: tagTemplate,
-
-  events: {
-    'click': 'onTagClicked'
-  },
-
-  onTagClicked: function(){
-    this.triggerMethod('remove:tag', this.model);
-  }
-});
-
-var TagListView = Marionette.CollectionView.extend({
-  childView: TagView,
-  childEvents: {
-    'remove:tag': 'onRemoveTag'
-  },
-  onRemoveTag: function(view, model){
-    this.collection.remove(model);
-  }
-});
-
-var TagErrorView = Marionette.ItemView.extend({
-
-  template: tagErrorTemplate,
-
-  model: new Backbone.Model({tag: ''}),
-
-  initialize: function(){
-    this.hide();
-    this.listenTo(this.collection, 'tag:error:duplicate', this.show);
-    this.listenTo(this.collection, 'tag:added', this.hide);
-    this.listenTo(this.model, 'change', this.render);
-  },
-
-  hide: function(){
-    this.$el.hide();
-  },
-
-  show: function(tag){
-    this.model.set({'tag': tag });
-    this.$el.show();
-  }
-
-});
 
 var View = Marionette.LayoutView.extend({
   template: editTagsTemplate,
@@ -146,8 +30,20 @@ var View = Marionette.LayoutView.extend({
   },
 
   initialize: function() {
+
+    //detect OS to get meta key value
+    var meta = /^MacIntel/.test(navigator.platform) ? 'cmd' : 'ctrl';
+
+    var tagCollection = new TagCollection();
+    var errorModel = new Backbone.Model({
+      message: 'Press '+ meta + '+backspace or delete to remove the last tag',
+      class: 'message'
+    });
+
     this.model = new Backbone.Model({
-      tagCollection: new TagCollection()
+      tagCollection: tagCollection,
+      errorModel: errorModel,
+      meta: meta
     });
 
     //get existing tags
@@ -158,19 +54,10 @@ var View = Marionette.LayoutView.extend({
       this.model.get('tagCollection').add(data.tags);
     }.bind(this));
 
+    //events
     this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
-  },
-
-  initTagList: function(optionsForRegion){
-    return new TagListView(optionsForRegion({ collection: this.model.get('tagCollection') }));
-  },
-
-  initTagListEdit: function(optionsForRegion){
-    return new TagInputView(optionsForRegion({ collection: this.model.get('tagCollection') }));
-  },
-
-  initTagError: function(optionsForRegion){
-    return new TagErrorView(optionsForRegion({ collection: this.model.get('tagCollection') }));
+    this.listenTo(tagCollection, 'tag:error:duplicate', this.onDuplicateTag);
+    this.listenTo(tagCollection, 'tag:added', this.onTagEmpty);
   },
 
   save: function(e) {
@@ -189,6 +76,57 @@ var View = Marionette.LayoutView.extend({
         this.save();
         break;
     }
+  },
+
+  onDuplicateTag: function(tag){
+    this.model.get('errorModel').set({
+     message: tag + ' has already been entered',
+     class: 'message'
+    });
+  },
+
+  childEvents: {
+    'tag:valid': 'onTagValid',
+    'tag:error': 'onTagError',
+    'tag:warning:empty': 'onTagEmpty',
+    'tag:removed': 'onTagRemoved'
+  },
+
+  onTagEmpty: function(){
+    this.model.get('errorModel').set({
+     message: 'Press '+ this.model.get('meta') +'+backspace or delete to remove the last tag',
+     class: 'message'
+    });
+  },
+
+  onTagValid: function(model, value){
+    this.model.get('errorModel').set({
+      message: 'Press enter to add ' + value,
+      class: 'message'
+    });
+  },
+
+  onTagError: function(){
+    this.model.get('errorModel').set({
+      message: 'Tags must be between 1 and 20 characters in length',
+      class: 'error'
+    });
+  },
+
+  onTagRemoved: function(){
+    this.tagInput.currentView.focus();
+  },
+
+  initTagList: function(optionsForRegion){
+    return new TagListView(optionsForRegion({ collection: this.model.get('tagCollection') }));
+  },
+
+  initTagListEdit: function(optionsForRegion){
+    return new TagInputView(optionsForRegion({ collection: this.model.get('tagCollection') }));
+  },
+
+  initTagError: function(optionsForRegion){
+    return new TagErrorView(optionsForRegion({ model: this.model.get('errorModel') }));
   }
 
 });
