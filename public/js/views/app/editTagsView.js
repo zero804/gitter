@@ -2,7 +2,6 @@
 
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
-var context = require('utils/context');
 var apiClient = require('components/apiClient');
 var ModalView = require('views/modal');
 var TagCollection = require('../../collections/tag-collection').TagCollection;
@@ -89,10 +88,13 @@ var TagInputView = Marionette.ItemView.extend({
 });
 
 var TagView = Marionette.ItemView.extend({
+
   template: tagTemplate,
+
   events: {
     'click': 'onTagClicked'
   },
+
   onTagClicked: function(){
     this.triggerMethod('remove:tag', this.model);
   }
@@ -128,10 +130,6 @@ var TagErrorView = Marionette.ItemView.extend({
   show: function(tag){
     this.model.set({'tag': tag });
     this.$el.show();
-  },
-
-  onRender: function(){
-    console.log('render');
   }
 
 });
@@ -181,7 +179,7 @@ var View = Marionette.LayoutView.extend({
     apiClient.put('/v1/rooms/' + this.options.roomId, { tags: this.model.get('tagCollection').toJSON() })
     .then(function() {
       this.dialog.hide();
-    }.bind(this))
+    }.bind(this));
 
   },
 
