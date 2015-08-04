@@ -36,7 +36,7 @@ module.exports = function(err, req, res, next) { // jshint unused:false
 
   /* Got a 401, the user isn't logged in and this is a browser? */
   if(status === 401 && req.accepts(['json','html']) === 'html' && !req.user) {
-    var returnUrl = req.url.replace(/\/~(\w+)$/,"");
+    var returnUrl = req.originalUrl.replace(/\/~(\w+)$/,"");
 
     if(req.session) {
       req.session.returnTo = returnUrl;
