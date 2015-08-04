@@ -29,8 +29,16 @@ var View = Marionette.LayoutView.extend({
   },
 
   initialize: function() {
+
+    var tagCollection = new TagCollection();
+    var errorModel = new Backbone.Model({
+      message: 'Press backspace or delete to remove the last tag',
+      class: 'message'
+    });
+
     this.model = new Backbone.Model({
-      tagCollection: new TagCollection()
+      tagCollection: tagCollection,
+      errorModel: errorModel
     });
 
     //get existing tags
@@ -41,27 +49,10 @@ var View = Marionette.LayoutView.extend({
       this.model.get('tagCollection').add(data.tags);
     }.bind(this));
 
+    //events
     this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
-  },
-
-  childEvents: {
-    'tag:warning:empty': 'onTagEmpty'
-  },
-
-  onTagEmpty: function(){
-    this.tagError.currentView.showMessage('Press backspace or delete to remove the last tag');
-  },
-
-  initTagList: function(optionsForRegion){
-    return new TagListView(optionsForRegion({ collection: this.model.get('tagCollection') }));
-  },
-
-  initTagListEdit: function(optionsForRegion){
-    return new TagInputView(optionsForRegion({ collection: this.model.get('tagCollection') }));
-  },
-
-  initTagError: function(optionsForRegion){
-    return new TagErrorView(optionsForRegion({ collection: this.model.get('tagCollection') }));
+    this.listenTo(tagCollection, 'tag:error:duplicate', this.onDuplicateTag);
+    this.listenTo(tagCollection, 'tag:added', this.onTagEmpty);
   },
 
   save: function(e) {
@@ -80,6 +71,46 @@ var View = Marionette.LayoutView.extend({
         this.save();
         break;
     }
+  },
+
+  onDuplicateTag: function(tag){
+    this.tagError.currentView.showError(tag + ' has already been entered');
+  },
+
+  childEvents: {
+    'tag:valid': 'onTagValid',
+    'tag:error': 'onTagError',
+    'tag:warning:empty': 'onTagEmpty'
+  },
+
+  onTagEmpty: function(){
+    this.model.get('errorModel').set({
+     message: 'Press backspace or delete to remove the last tag',
+     class: 'message'
+    });
+  },
+
+  onTagValid: function(){
+    this.model.get('errorModel').set('class', 'hidden');
+  },
+
+  onTagError: function(){
+    this.model.get('errorModel').set({
+      message: 'Tags must be between 1 and 20 characters in length',
+      class: 'error'
+    });
+  },
+
+  initTagList: function(optionsForRegion){
+    return new TagListView(optionsForRegion({ collection: this.model.get('tagCollection') }));
+  },
+
+  initTagListEdit: function(optionsForRegion){
+    return new TagInputView(optionsForRegion({ collection: this.model.get('tagCollection') }));
+  },
+
+  initTagError: function(optionsForRegion){
+    return new TagErrorView(optionsForRegion({ model: this.model.get('errorModel') }));
   }
 
 });

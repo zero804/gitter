@@ -70,10 +70,12 @@ var TagInputView = Marionette.ItemView.extend({
 
   onModelChange: function(){
     this.$el.find('input').removeClass('invalid');
+    this.triggerMethod('tag:valid');
   },
 
   onModelInvalid: function(){
     this.$el.find('input').addClass('invalid');
+    this.triggerMethod('tag:error');
   }
 
 });

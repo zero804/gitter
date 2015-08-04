@@ -1,4 +1,6 @@
-"use strict"
+/* jshint node: true */
+
+"use strict";
 
 var Backbone = require('backbone');
 
@@ -7,6 +9,8 @@ var TagModel = Backbone.Model.extend({
     value: ''
   },
 
+  //we get an array of tag strings from the server
+  //we need to parse them here
   initialize: function(tag){
     this.set('value', tag);
   },
@@ -14,7 +18,6 @@ var TagModel = Backbone.Model.extend({
   validate: function(attrs){
     //todo add tag maximum value??
     var tagLength = !!attrs.value && attrs.value.length;
-    console.log(tagLength)
     if(!tagLength || tagLength <= 0 || tagLength > 20){
       return 'Tags must be of a valid tagLength';
     }
