@@ -3,7 +3,7 @@
 "use strict";
 
 var Marionette = require('backbone.marionette');
-var TagView = require('./tags/tagView');
+var TagView = require('./tagView');
 
 var TagListView = Marionette.CollectionView.extend({
   childView: TagView,

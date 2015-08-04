@@ -7,7 +7,7 @@ var Marionette = require('backbone.marionette');
 var ModalView = require('views/modal');
 var TagInputView = require('./tags/tagInputView');
 var TagListView = require('./tags/tagListView');
-var TagErrorView = require('./tags/tagErrorViee');
+var TagErrorView = require('./tags/tagErrorView');
 
 var TagCollection = require('../../collections/tag-collection').TagCollection;
 
@@ -42,6 +42,14 @@ var View = Marionette.LayoutView.extend({
     }.bind(this));
 
     this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
+  },
+
+  childEvents: {
+    'tag:warning:empty': 'onTagEmpty'
+  },
+
+  onTagEmpty: function(){
+    this.tagError.currentView.showMessage('Press backspace or delete to remove the last tag');
   },
 
   initTagList: function(optionsForRegion){
