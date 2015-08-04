@@ -17,7 +17,7 @@ var TagInputView = Marionette.ItemView.extend({
   events: {
     'submit': 'onTagSubmit',
     'input': 'onTagInput',
-    'keypress': 'onKeyPressed'
+    'keyup': 'onKeyPressed'
   },
 
   initialize: function(){
@@ -92,7 +92,6 @@ var TagInputView = Marionette.ItemView.extend({
   onModelInvalid: function(){
     this.$el.find('input').addClass('invalid');
     //if the tag is empty we want to show a message not error
-    var val = !!this.model && this.model.get('value');
     this.triggerMethod('tag:error');
   },
 
