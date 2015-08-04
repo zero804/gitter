@@ -93,9 +93,7 @@ var TagInputView = Marionette.ItemView.extend({
     this.$el.find('input').addClass('invalid');
     //if the tag is empty we want to show a message not error
     var val = !!this.model && this.model.get('value');
-    if(!!val && val.length !== 0){
-      this.triggerMethod('tag:error');
-    }
+    this.triggerMethod('tag:error');
   },
 
   focus: function(){

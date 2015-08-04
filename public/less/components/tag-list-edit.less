@@ -1,4 +1,5 @@
 @import "bootstrap/mixins";
+@import "colors.less";
 
 
 
@@ -32,9 +33,24 @@
 //TODO --> restyle this (have stolen from room-car__tag styles)
 .tags-modal__tag-list__tag {
   float: left;
-  padding: 2px 5px;
+  padding: 2px 5px 2px 16px;
   margin-right: 5px;
   margin-top: 9px;
   border-radius: 4px;
-  border: 2px solid #D6D6D6;
+
+  color: white;
+  background: #B3B3B3;
+
+  & button {
+    border: none;
+    background: none;
+  }
+
+  & i {
+    font-size: 14px;
+    &:before {
+      margin-top: -1px;
+      color: white;
+    }
+  }
 }

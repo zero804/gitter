@@ -21,7 +21,7 @@ var TagModel = Backbone.Model.extend({
     if(!tagLength || tagLength <= 0 || tagLength > 20){
       //if we have an invalid tag the we want to reset the model
       //the next valid input event will override it
-      this.set('value', '');
+      this.set('value', '', { silent: true });
       return 'Tags must be of a valid tagLength';
     }
   }
