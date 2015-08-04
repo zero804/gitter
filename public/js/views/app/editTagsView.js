@@ -1,91 +1,22 @@
+/* jshint node:true  */
 "use strict";
 
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
-var apiClient = require('components/apiClient');
+
 var ModalView = require('views/modal');
+var TagInputView = require('./tags/tag-input-view.js');
+
 var TagCollection = require('../../collections/tag-collection').TagCollection;
 var TagModel = require('../../collections/tag-collection').TagModel;
 
+var apiClient = require('components/apiClient');
+
 var editTagsTemplate = require('./tmpl/editTagsTemplate.hbs');
 var tagTemplate = require('./tmpl/tagTemplate.hbs');
-var tagInputTemplate = require('./tmpl/tagEditTemplate.hbs');
 var tagErrorTemplate = require('./tmpl/tagErrorTemplate.hbs');
 
 require('views/behaviors/isomorphic');
-
-
-var ENTER_KEY_CODE = 13;
-var BACKSPACE_KEY_CODE = 8;
-var DELETE_KEY_CODE = 46;
-
-
-//TODO --> Break the bigger components into their own files
-//jp 3/9/15
-var TagInputView = Marionette.ItemView.extend({
-
-  template: tagInputTemplate,
-
-  events: {
-    'submit': 'onTagSubmit',
-    'input': 'onTagInput',
-    'keypress': 'onKeyPressed'
-  },
-
-  initialize: function(){
-    this.model = new TagModel();
-    this.listenTo(this.model, 'invalid', this.onModelInvalid);
-    this.listenTo(this.model, 'change', this.onModelChange);
-  },
-
-  onTagSubmit: function(e){
-    if(e) e.preventDefault();
-    //TODO --> what happens if the model is invalid??
-    //jp 3/9/15
-    if(this.model.isValid()){
-      this.collection.addModel(this.model);
-      this.model = new TagModel();
-      this.$el.find('input').val('');
-    }
-  },
-
-  onTagInput: function(e){
-    if(e) e.preventDefault();
-    //guard against manual invocation of this function
-    var val =  e ? e.target.value : this.$el.find('input').val();
-    this.model.set('value', val, {validate: true});
-  },
-
-  onKeyPressed: function(e){
-    switch(e.keyCode) {
-
-      //submit tag by pressing enter
-      case ENTER_KEY_CODE :
-        //manually trigger tag submission
-        this.onTagInput();
-        this.onTagSubmit();
-        break;
-
-      //if a user presses backspace/delete
-      //and the input is empty
-      //remove the last tag
-      case BACKSPACE_KEY_CODE :
-      case DELETE_KEY_CODE :
-        var val =  this.$el.find('input').val();
-        if(val === '') this.collection.pop();
-        break;
-    }
-  },
-
-  onModelChange: function(){
-    this.$el.find('input').removeClass('invalid');
-  },
-
-  onModelInvalid: function(){
-    this.$el.find('input').addClass('invalid');
-  }
-
-});
 
 var TagView = Marionette.ItemView.extend({
 
