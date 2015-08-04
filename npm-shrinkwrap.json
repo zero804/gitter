@@ -1525,22 +1525,22 @@
     },
     "gitter-services": {
       "version": "1.12.0",
-      "from": "git+ssh://git@github.com/gitterHQ/services.git#ee8b5834359170d367e5ce7342712071f646710e",
-      "resolved": "git+ssh://git@github.com/gitterHQ/services.git#ee8b5834359170d367e5ce7342712071f646710e",
+      "from": "git+https://github.com/gitterHQ/services.git#1.12.0",
+      "resolved": "git+https://github.com/gitterHQ/services.git#ee8b5834359170d367e5ce7342712071f646710e",
       "dependencies": {
         "require-all": {
           "version": "0.0.8",
-          "from": "http://beta-internal:4873/require-all/-/require-all-0.0.8.tgz",
+          "from": "require-all@0.0.8",
           "resolved": "http://beta-internal:4873/require-all/-/require-all-0.0.8.tgz"
         },
         "qs": {
           "version": "1.2.2",
-          "from": "http://beta-internal:4873/qs/-/qs-1.2.2.tgz",
+          "from": "qs@>=1.0.0 <2.0.0",
           "resolved": "http://beta-internal:4873/qs/-/qs-1.2.2.tgz"
         },
         "extend": {
           "version": "1.3.0",
-          "from": "http://beta-internal:4873/extend/-/extend-1.3.0.tgz",
+          "from": "extend@>=1.2.1 <2.0.0",
           "resolved": "http://beta-internal:4873/extend/-/extend-1.3.0.tgz"
         }
       }
@@ -1566,7 +1566,9 @@
       "resolved": "file:modules/github"
     },
     "gitter-web-presence": {
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "from": "modules/presence",
+      "resolved": "file:modules/presence"
     },
     "gitter-web-push-notification-filter": {
       "version": "1.0.0",
