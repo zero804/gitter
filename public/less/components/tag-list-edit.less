@@ -1,15 +1,7 @@
 @import "bootstrap/mixins";
+@import "colors.less";
 
-.tags-modal {
-  padding: 0 9px;
-  margin-bottom: 15px;
 
-  border: 1px solid #C0C9C8;
-  border-radius: 4px;
-
-  background: rgba(192, 201, 200, 0.5);
-  color: rgba(0, 0, 0, 1);
-}
 
 .tag-list-edit__input {
 
@@ -41,13 +33,24 @@
 //TODO --> restyle this (have stolen from room-car__tag styles)
 .tags-modal__tag-list__tag {
   float: left;
-  padding: 2px 5px;
+  padding: 2px 5px 2px 16px;
   margin-right: 5px;
   margin-top: 9px;
   border-radius: 4px;
-  border: 2px solid #D6D6D6;
-}
 
-.tags-modal__tag-error {
-  margin-bottom: 15px;
+  color: white;
+  background: #B3B3B3;
+
+  & button {
+    border: none;
+    background: none;
+  }
+
+  & i {
+    font-size: 14px;
+    &:before {
+      margin-top: -1px;
+      color: white;
+    }
+  }
 }
