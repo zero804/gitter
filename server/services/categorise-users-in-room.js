@@ -4,17 +4,26 @@ var Q = require('q');
 var presenceService = require('gitter-web-presence');
 var collections = require('../utils/collections');
 var pushNotificationService = require('./push-notification-service');
+var pushNotificationFilter = require('gitter-web-push-notification-filter');
 
 var STATUS_INROOM = 'inroom';
 var STATUS_ONLINE = 'online';
-var STATUS_OFFLINE = 'offline';
 var STATUS_PUSH = 'push';
+var STATUS_PUSH_NOTIFIED = 'push_notified'; // Has already been notified
 
-/* Categorize users in a room by their notification status */
+/*
+ * Categorize users in a room by their notification status, returns a value
+ * hashed by userid
+ *
+ * values can be:
+ *  - inroom: currently in the room
+ *  - online: currently online
+ *  - push: awaiting a push notification
+ *  - push_notified: already used up all their push notifications. Only push for mentions
+ *  - <doesnotexist>: user is offline, nothing more to do
+ */
 module.exports = function (roomId, userIds) {
-  if (!userIds || !userIds.length) return {};
-  // TODO:
-  console.error('Remember to add push support to this method')
+  if (!userIds || !userIds.length) return Q.resolve({});
 
   return Q.all([
     presenceService.findOnlineUsersForTroupe(roomId),
@@ -41,13 +50,28 @@ module.exports = function (roomId, userIds) {
       return result;
     }
 
-    return pushNotificationService.findUsersWithDevicesHashed(offlineUsers)
-      .then(function(withDevicesHash) {
-        offlineUsers.forEach(function(userId) {
-          result[userId] = withDevicesHash[userId] ? STATUS_PUSH: STATUS_OFFLINE;
-        });
-        
-        return result;
+    return pushNotificationService.findUsersWithDevices(offlineUsers)
+      .then(function(withDevices) {
+        if (!withDevices.length) {
+          /* No devices with push... */
+          return result;
+        }
+
+        return pushNotificationFilter.findUsersInRoomAcceptingNotifications(roomId, withDevices)
+          .then(function(usersWithDevicesAcceptingNotifications) {
+            usersWithDevicesAcceptingNotifications.forEach(function(userId) {
+              result[userId] = STATUS_PUSH;
+            });
+
+            withDevices.forEach(function(userId) {
+              if (!result[userId]) {
+                // If the user is not STATUS_PUSH, they should be STATUS_PUSH_NOTIFIED
+                result[userId] = STATUS_PUSH_NOTIFIED;
+              }
+            });
+
+            return result;
+          });
       });
   });
 

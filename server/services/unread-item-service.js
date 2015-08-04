@@ -449,15 +449,19 @@ function processResultsForNewItemWithMentions(troupeId, chatId, parsed, results,
 
           case 'push':
             // TODO: handle push
-            console.error('NEED TO HANDLE PUSH NOTIFICATIONS: ', userId);
             var pushNotificationQueue = hasMention ? pushCandidatesWithMention : pushCandidates;
             pushNotificationQueue.push(userId);
+            return;
+
+          /* User has already got all their push notifications */
+          case 'push_notified':
+            if (!hasMention) return; // Only notify for mention
+            pushCandidatesWithMention.push(userId);
             return;
         }
       });
 
       if (!isEdit) {
-
         // Next notify all the users currently online but not in this room who
         // will receive desktop notifications
         if (userIdsForOnlineNotification.length) {
@@ -484,7 +488,7 @@ function processResultsForNewItemWithMentions(troupeId, chatId, parsed, results,
         for(var i = 0; i < activityOnly.length; i++) {
           var activityOnlyUserId =  activityOnly[i];
           var activityOnlyUserIdOnlineStatus = presenceStatus[activityOnlyUserId];
-          if (activityOnlyUserIdOnlineStatus === 'offline') continue;
+          if (!activityOnlyUserIdOnlineStatus) continue; // null === offline
           appEvents.newLurkActivity({ userId: activityOnlyUserId, troupeId: troupeId });
         }
       }
@@ -547,11 +551,6 @@ function generateMentionDeltaSet(parsedChat, originalMentions) {
   var addNewRoom = _.intersection(addMentions, parsedChat.notifyNewRoomUserIds.map(toString));
 
   return { addNotify: addNotify, addMentions: addMentions, addNewRoom: addNewRoom, remove: removeMentions };
-}
-
-function addUnreadItemsForUpdatedChat(troupeId, chatId, addNotifyUserIds, addMentionUserIds, addMentionsInNewRoom) {
-
-
 }
 
 function removeMentionsForUpdatedChat(troupeId, chatId, removeUserIds) {

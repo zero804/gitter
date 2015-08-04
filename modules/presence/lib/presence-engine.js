@@ -368,6 +368,7 @@ function categorizeUsersByOnlineStatus(userIds, callback) {
   var key_working_set = "presence_temp_set:" + process.pid + ":" + seconds + ":" + nanoseconds;
   var key_working_output_set = key_working_set + '_out';
 
+  // TODO: switch this out for a pipeline command to make it lock less
   return redisClient.presenceCategorizeUsers(key_working_set, key_working_output_set, ACTIVE_USERS_KEY, userIds)
     .then(function(onlineUsers) {
       var result = {};
@@ -465,6 +466,7 @@ function checkMultiErrors(replies) {
 
   return replies;
 }
+
 function isUserConnectedWithClientType(userId, clientType, callback) {
   return listAllSocketsForUser(userId)
     .then(function(socketIds) {
