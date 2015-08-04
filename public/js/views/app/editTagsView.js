@@ -5,53 +5,19 @@ var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 
 var ModalView = require('views/modal');
-var TagInputView = require('./tags/tag-input-view.js');
-var TagView = require('./tags/tag-view.js');
+var TagInputView = require('./tags/tag-input-view');
+var TagListView = require('./tags/tag-list-view');
+var TagErrorView = require('./tags/tag-error-view');
 
 var TagCollection = require('../../collections/tag-collection').TagCollection;
-var TagModel = require('../../collections/tag-collection').TagModel;
 
 var apiClient = require('components/apiClient');
 
 var editTagsTemplate = require('./tmpl/editTagsTemplate.hbs');
-var tagErrorTemplate = require('./tmpl/tagErrorTemplate.hbs');
 
 require('views/behaviors/isomorphic');
 
 
-var TagListView = Marionette.CollectionView.extend({
-  childView: TagView,
-  childEvents: {
-    'remove:tag': 'onRemoveTag'
-  },
-  onRemoveTag: function(view, model){
-    this.collection.remove(model);
-  }
-});
-
-var TagErrorView = Marionette.ItemView.extend({
-
-  template: tagErrorTemplate,
-
-  model: new Backbone.Model({tag: ''}),
-
-  initialize: function(){
-    this.hide();
-    this.listenTo(this.collection, 'tag:error:duplicate', this.show);
-    this.listenTo(this.collection, 'tag:added', this.hide);
-    this.listenTo(this.model, 'change', this.render);
-  },
-
-  hide: function(){
-    this.$el.hide();
-  },
-
-  show: function(tag){
-    this.model.set({'tag': tag });
-    this.$el.show();
-  }
-
-});
 
 var View = Marionette.LayoutView.extend({
   template: editTagsTemplate,
