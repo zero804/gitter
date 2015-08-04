@@ -35,6 +35,9 @@ var TagInputView = Marionette.ItemView.extend({
     if(e) e.preventDefault();
     //TODO --> what happens if the model is invalid??
     //jp 3/9/15
+
+    console.log(this.model.isValid());
+
     if(this.model.isValid()){
       this.collection.addModel(this.model);
       this.model = new TagModel();
@@ -63,15 +66,24 @@ var TagInputView = Marionette.ItemView.extend({
         this.onTagSubmit();
         break;
 
-      //if a user presses backspace/delete
+      //if a user presses (meta+backspace)/delete
       //and the input is empty
       //remove the last tag
-      case BACKSPACE_KEY_CODE :
       case DELETE_KEY_CODE :
-        var val =  this.$el.find('input').val();
-        if(val === '') this.collection.pop();
+        this.removeLastTag();
+        break;
+
+      case BACKSPACE_KEY_CODE :
+        if(e.metaKey || e.ctrlKey) {
+          this.removeLastTag();
+        }
         break;
     }
+  },
+
+  removeLastTag: function(){
+    var val =  this.$el.find('input').val();
+    if(val === '') this.collection.pop();
   },
 
   onModelChange: function(model){
@@ -81,7 +93,11 @@ var TagInputView = Marionette.ItemView.extend({
 
   onModelInvalid: function(){
     this.$el.find('input').addClass('invalid');
-    this.triggerMethod('tag:error');
+    //if the tag is empty we want to show a message not error
+    var val = !!this.model && this.model.get('value');
+    if(!!val && val.length !== 0){
+      this.triggerMethod('tag:error');
+    }
   },
 
   focus: function(){

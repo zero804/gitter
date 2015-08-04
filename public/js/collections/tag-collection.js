@@ -10,15 +10,18 @@ var TagModel = Backbone.Model.extend({
   },
 
   //we get an array of tag strings from the server
+  //rather than { value: ''  }
   //we need to parse them here
   initialize: function(tag){
     this.set('value', tag);
   },
 
   validate: function(attrs){
-    //todo add tag maximum value??
     var tagLength = !!attrs.value && attrs.value.length;
     if(!tagLength || tagLength <= 0 || tagLength > 20){
+      //if we have an invalid tag the we want to reset the model
+      //the next valid input event will override it
+      this.set('value', '');
       return 'Tags must be of a valid tagLength';
     }
   }
