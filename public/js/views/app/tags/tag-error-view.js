@@ -3,7 +3,7 @@
 
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
-var tagErrorTemplate = require('./tmpl/tag-tag-error-template.hbs');
+var tagErrorTemplate = require('./tmpl/tag-error-template.hbs');
 
 var TagErrorView = Marionette.ItemView.extend({
 
@@ -13,18 +13,23 @@ var TagErrorView = Marionette.ItemView.extend({
 
   initialize: function(){
     this.hide();
-    this.listenTo(this.collection, 'tag:error:duplicate', this.show);
+    this.listenTo(this.collection, 'tag:error:duplicate', this.showError);
     this.listenTo(this.collection, 'tag:added', this.hide);
     this.listenTo(this.model, 'change', this.render);
   },
 
-  hide: function(){
-    this.$el.hide();
+  showError: function(tag){
+    var message = tag + ' has already been entered';
+    this.model.set({ message: message, class: 'error' });
+    this.show();
   },
 
-  show: function(tag){
-    this.model.set({'tag': tag });
+  show: function(){
     this.$el.show();
+  },
+
+  hide: function(){
+    this.$el.hide();
   }
 
 });

@@ -17,8 +17,6 @@ var editTagsTemplate = require('./tmpl/editTagsTemplate.hbs');
 
 require('views/behaviors/isomorphic');
 
-
-
 var View = Marionette.LayoutView.extend({
   template: editTagsTemplate,
 
