@@ -11,12 +11,16 @@
 @import "room_card.less";
 @import "bootstrap/mixins";
 
+@import "colors.less";
+
+
 html {
   box-sizing: border-box;
 }
 
 *, *:before, *:after {
   box-sizing: inherit;
+  vertical-align: bottom;
 }
 
 body {
@@ -27,7 +31,6 @@ body {
 .org-page__header {
   padding: 3.25em 3.25em 2.25em 3.25em;
   overflow: hidden;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 
   h1 {
     margin: 0;
@@ -41,23 +44,53 @@ body {
   }
 }
 
+.org-page__org {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 2em;
+}
+
+.org-page__name {
+  h1 {
+    line-height: inherit;
+  }
+}
+
+.org-page__org-details {
+  display: flex;
+  flex-direction: column;
+}
+
+
 .org-page__description {
-  margin: 15px 0px;
+  color: @trpLightGrey;
 }
 
 .org-page__details {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+  border-bottom: 5px solid #EEE;
+  padding: 20px 0px;
+  font-size: 1em;
 }
 
 .org-page__detail {
-  margin-right: 20px;
+  margin-right: 70px;
+
+  .octicon {
+    margin-right: 6px;
+    font-size: 1.2em;
+    color:  @trpLightGrey;
+  }
+
+  a:hover {
+    text-decoration: none;
+  }
 }
 
-
 .org-page__room-cards {
-  padding: 1.25em 3.25em 3.25em 3.25em;
+  padding: 0 3.25em 3.25em 3.25em;
 
   display: flex;
   flex-direction: row;

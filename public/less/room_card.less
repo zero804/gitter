@@ -68,24 +68,29 @@ button, .btn {
   @color: white;
 
   width: 370px;
-  min-height: 260px;
+  min-height: 280px;
+
+  padding: 10px;
 
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  flex-grow: 1;
 
-  margin: 0.8em 0.8em 0.8em 0;
+  margin: .8em 0 .8em 0;
   color: @trpDarkGrey;
 
   border-radius: 6px;
   border: 1px solid transparent;
 
   &:hover {
+    transition: border 0.3s;
     border: 1px solid #EEE;
   }
 
   &:hover &__footer-content {
-    display: block;
+    transition: opacity 0.3s;
+    opacity: 1;
   }
 
   &__body {
@@ -136,17 +141,18 @@ button, .btn {
   // }
 
   &__users {
-    padding: 5px 10px;
+    padding: 5px 10px 0;
 
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
   }
 
   &__user-avatar {
     border-radius: 4px;
     width: 30px;
     height: 30px;
-    margin-right: 5px;
+    margin: 0 5px 5px 0;
   }
 
 
@@ -197,7 +203,7 @@ button, .btn {
   }
 
   &__footer-content {
-    display: none;
+    opacity: 0;
   }
 
 }

@@ -455,7 +455,13 @@ function renderOrgPage(req, res, next) {
         room.private = room.security !== 'PUBLIC';
       });
 
+      var orgUserCount = rooms.reduce(function(accum, room) {
+        return accum + room.userCount;
+      }, 0);
+
       res.render('org-page', {
+        roomCount: rooms.length,
+        orgUserCount: orgUserCount,
         org: ghOrg,
         rooms: rooms,
         troupeContext: troupeContext
