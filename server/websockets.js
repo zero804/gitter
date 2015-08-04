@@ -30,7 +30,7 @@ app.get('/', function(req, res) {
 app.get('/api/private/health_check', require('./api/private/health-check'));
 app.get('/api/private/health_check/full', require('./api/private/health-check-full'));
 
-require('./utils/event-listeners').installLocalEventListeners();
+require('./event-listeners').install();
 
 var port = nconf.get('PORT') || nconf.get("ws:port");
 

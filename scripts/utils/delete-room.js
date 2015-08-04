@@ -9,7 +9,7 @@ var Q = require('q');
 
 var winston = require('../../server/utils/winston');
 
-require('../../server/utils/event-listeners').installLocalEventListeners();
+require('../../server/event-listeners').install();
 
 var opts = require("nomnom")
    .option('uri', {
@@ -20,7 +20,6 @@ var opts = require("nomnom")
    .parse();
 
 require('../../server/services/kue-workers').startWorkers();
-require('../../server/utils/event-listeners').installLocalEventListeners();
 
 var readline = require('readline');
 

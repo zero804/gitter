@@ -22,7 +22,7 @@ require('./web/express').installFull(app);
 
 require('./web/passport').install();
 
-require('./utils/event-listeners').installLocalEventListeners();
+require('./event-listeners').install();
 
 if(nconf.get('ws:startFayeInPrimaryApp')) {
   var bayeux = require('./web/bayeux');

@@ -3,11 +3,11 @@
 /**
  * Bridges events from the membership service up to the live-collections
  */
+
 var env                   = require('gitter-web-env');
 var stats                 = env.stats;
-var logger                = env.logger;
-var roomMembershipService = require('./room-membership-service');
-var liveCollections       = require('./live-collections');
+var roomMembershipService = require('../services/room-membership-service');
+var liveCollections       = require('../services/live-collections');
 
 function onMembersAdded(troupeId, userIds) {
   liveCollections.roomMembers.emit('added', troupeId, userIds);
