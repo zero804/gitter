@@ -170,8 +170,8 @@ function makeRoomTypeCreationFilterFunction(creationFilter) {
  *
  * @returns Promise of [troupe, hasJoinPermission] if the user is able to join/create the troupe
  */
-function findOrCreateNonOneToOneRoom(user, troupe, uri, options) {
-  debug("findOrCreateNonOneToOneRoom: %s", uri);
+function findOrCreateGroupRoom(user, troupe, uri, options) {
+  debug("findOrCreateGroupRoom: %s", uri);
 
   if(!options) options = {};
 
@@ -563,7 +563,7 @@ function findOrCreateRoom(user, uri, options) {
       debug("localUriLookup returned room %s for uri=%s. Finding or creating room", uriLookup && uriLookup.troupe && uriLookup.troupe.uri, uri);
 
       // need to check for the rooms
-      return findOrCreateNonOneToOneRoom(user, uriLookup && uriLookup.troupe, uri, options)
+      return findOrCreateGroupRoom(user, uriLookup && uriLookup.troupe, uri, options)
         .then(function(findOrCreateResult) {
           var troupe = findOrCreateResult.troupe;
           var access = findOrCreateResult.access;
