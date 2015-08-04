@@ -42,6 +42,9 @@ var TagInputView = Marionette.ItemView.extend({
     //guard against manual invocation of this function
     var val =  e ? e.target.value : this.$el.find('input').val();
     this.model.set('value', val, {validate: true});
+    if(val.length === 0){
+      this.triggerMethod('tag:warning:empty');
+    }
   },
 
   onKeyPressed: function(e){
