@@ -25,11 +25,24 @@ button, .btn {
 
   background: @homepage-green;
   color: #fff;
+
+  text-shadow: none;
 }
 
 
 .btn.secondary {
   background: @homepage-orange;
+}
+
+.btn.secondary:hover {
+  color: #FFF;
+  background: darken(@homepage-orange, 5%);
+}
+
+.btn.terciary {
+  background: #FFF;
+  color: @homepage-orange;
+  box-shadow: none;
 }
 
 .btn.outline {
@@ -55,20 +68,20 @@ button, .btn {
   @color: white;
 
   width: 370px;
-  min-height: 250px;
+  min-height: 260px;
 
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 
-  margin: 0.8em;
+  margin: 0.8em 0.8em 0.8em 0;
   color: @trpDarkGrey;
 
-  border-radius: 10px;
-  border: 2px solid transparent;
+  border-radius: 6px;
+  border: 1px solid transparent;
 
   &:hover {
-    border: 2px solid @trpLightGrey;
+    border: 1px solid #EEE;
   }
 
   &:hover &__footer-content {
@@ -84,7 +97,6 @@ button, .btn {
     padding: 5px 10px;
 
     border: unset;
-    background-color: @color;
     overflow: hidden;
 
     a {
@@ -166,14 +178,16 @@ button, .btn {
 
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
   }
 
   &__tag {
-    padding: 2px 5px;
-    margin-right: 5px;
+    padding: 3px 6px;
+    margin: 2px 5px 2px 0px;
     border-radius: 4px;
-    border: 2px solid @trpLightGrey;
-    color: @mediumgrey;
+    font-size: 0.9em;
+    color: #FFF;
+    background: @trpLightGrey;
   }
 
   &__footer {
