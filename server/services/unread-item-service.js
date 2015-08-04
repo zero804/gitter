@@ -33,6 +33,7 @@ function sinceFilter(since) {
 
 }
 
+// TODO: move this into a listener....
 badgeBatcher.listen(function(key, userIds, done) {
   // Remove duplicates
   userIds = uniqueIds(userIds);
