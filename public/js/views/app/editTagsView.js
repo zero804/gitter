@@ -74,7 +74,10 @@ var View = Marionette.LayoutView.extend({
   },
 
   onDuplicateTag: function(tag){
-    this.tagError.currentView.showError(tag + ' has already been entered');
+    this.model.get('errorModel').set({
+     message: tag + ' has already been entered',
+     class: 'message'
+    });
   },
 
   childEvents: {
@@ -90,8 +93,11 @@ var View = Marionette.LayoutView.extend({
     });
   },
 
-  onTagValid: function(){
-    this.model.get('errorModel').set('class', 'hidden');
+  onTagValid: function(model, value){
+    this.model.get('errorModel').set({
+      message: 'Press enter to add ' + value,
+      class: 'message'
+    });
   },
 
   onTagError: function(){

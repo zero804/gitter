@@ -22,6 +22,11 @@ var TagInputView = Marionette.ItemView.extend({
 
   initialize: function(){
     this.model = new TagModel();
+    this.bindToModel();
+  },
+
+  bindToModel: function(){
+    this.stopListening(this.model);
     this.listenTo(this.model, 'invalid', this.onModelInvalid);
     this.listenTo(this.model, 'change', this.onModelChange);
   },
@@ -33,6 +38,7 @@ var TagInputView = Marionette.ItemView.extend({
     if(this.model.isValid()){
       this.collection.addModel(this.model);
       this.model = new TagModel();
+      this.bindToModel();
       this.$el.find('input').val('');
     }
   },
@@ -68,9 +74,9 @@ var TagInputView = Marionette.ItemView.extend({
     }
   },
 
-  onModelChange: function(){
+  onModelChange: function(model){
     this.$el.find('input').removeClass('invalid');
-    this.triggerMethod('tag:valid');
+    this.triggerMethod('tag:valid', model.get('value'));
   },
 
   onModelInvalid: function(){
