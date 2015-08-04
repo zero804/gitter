@@ -6,6 +6,7 @@ var Marionette = require('backbone.marionette');
 
 var ModalView = require('views/modal');
 var TagInputView = require('./tags/tag-input-view.js');
+var TagView = require('./tags/tag-view.js');
 
 var TagCollection = require('../../collections/tag-collection').TagCollection;
 var TagModel = require('../../collections/tag-collection').TagModel;
@@ -13,23 +14,10 @@ var TagModel = require('../../collections/tag-collection').TagModel;
 var apiClient = require('components/apiClient');
 
 var editTagsTemplate = require('./tmpl/editTagsTemplate.hbs');
-var tagTemplate = require('./tmpl/tagTemplate.hbs');
 var tagErrorTemplate = require('./tmpl/tagErrorTemplate.hbs');
 
 require('views/behaviors/isomorphic');
 
-var TagView = Marionette.ItemView.extend({
-
-  template: tagTemplate,
-
-  events: {
-    'click': 'onTagClicked'
-  },
-
-  onTagClicked: function(){
-    this.triggerMethod('remove:tag', this.model);
-  }
-});
 
 var TagListView = Marionette.CollectionView.extend({
   childView: TagView,
