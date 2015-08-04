@@ -13,6 +13,7 @@ var TagListView = Marionette.CollectionView.extend({
 
   onRemoveTag: function(view, model){
     this.collection.remove(model);
+    this.triggerMethod('tag:removed');
   }
 });
 

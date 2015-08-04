@@ -83,7 +83,8 @@ var View = Marionette.LayoutView.extend({
   childEvents: {
     'tag:valid': 'onTagValid',
     'tag:error': 'onTagError',
-    'tag:warning:empty': 'onTagEmpty'
+    'tag:warning:empty': 'onTagEmpty',
+    'tag:removed': 'onTagRemoved'
   },
 
   onTagEmpty: function(){
@@ -105,6 +106,10 @@ var View = Marionette.LayoutView.extend({
       message: 'Tags must be between 1 and 20 characters in length',
       class: 'error'
     });
+  },
+
+  onTagRemoved: function(){
+    this.tagInput.currentView.focus();
   },
 
   initTagList: function(optionsForRegion){
