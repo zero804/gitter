@@ -11,24 +11,6 @@ var TagErrorView = Marionette.ItemView.extend({
 
   initialize: function(){
     this.listenTo(this.model, 'change', this.render);
-  },
-
-  showError: function(msg){
-    this.model.set({ message: msg, class: 'error' });
-    this.show();
-  },
-
-  showMessage: function(msg){
-    this.model.set({ message: msg, class: 'message' });
-    this.show();
-  },
-
-  show: function(){
-    this.$el.show();
-  },
-
-  hide: function(){
-    this.$el.hide();
   }
 
 });
