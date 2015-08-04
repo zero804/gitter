@@ -36,8 +36,6 @@ var TagInputView = Marionette.ItemView.extend({
     //TODO --> what happens if the model is invalid??
     //jp 3/9/15
 
-    console.log(this.model.isValid());
-
     if(this.model.isValid()){
       this.collection.addModel(this.model);
       this.model = new TagModel();
