@@ -1,3 +1,4 @@
+/* global navigator */
 /* jshint node:true  */
 "use strict";
 
@@ -30,15 +31,19 @@ var View = Marionette.LayoutView.extend({
 
   initialize: function() {
 
+    //detect OS to get meta key value
+    var meta = /^MacIntel/.test(navigator.platform) ? 'cmd' : 'ctrl';
+
     var tagCollection = new TagCollection();
     var errorModel = new Backbone.Model({
-      message: 'Press backspace or delete to remove the last tag',
+      message: 'Press '+ meta + '+backspace or delete to remove the last tag',
       class: 'message'
     });
 
     this.model = new Backbone.Model({
       tagCollection: tagCollection,
-      errorModel: errorModel
+      errorModel: errorModel,
+      meta: meta
     });
 
     //get existing tags
@@ -89,7 +94,7 @@ var View = Marionette.LayoutView.extend({
 
   onTagEmpty: function(){
     this.model.get('errorModel').set({
-     message: 'Press backspace or delete to remove the last tag',
+     message: 'Press '+ this.model.get('meta') +'+backspace or delete to remove the last tag',
      class: 'message'
     });
   },
