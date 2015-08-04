@@ -11,6 +11,7 @@ var mongoUtils = require('../utils/mongo-utils');
 var Q = require('q');
 var liveCollections = require('./live-collections');
 
+// TODO: move this into a listener
 batcher.listen(function(key, userIdStrings, done) {
   var kp = key.split(':', 3);
 

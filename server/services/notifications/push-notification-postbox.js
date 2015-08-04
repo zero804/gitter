@@ -1,11 +1,9 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var winston                   = require('../../utils/winston');
-// var pushNotificationFilter   = require("../push-notification-service");
 var pushNotificationFilter   = require("gitter-web-push-notification-filter");
 var nconf                     = require('../../utils/config');
-var workerQueue               = require('../../utils/worker-queue');
+var workerQueue               = require('../../utils/worker-queue-redis');
 var userTroupeSettingsService = require('../user-troupe-settings-service');
 var pushNotificationGenerator = require('./push-notification-generator');
 var debug                     = require('debug')('gitter:push-notification-postbox');
@@ -84,14 +82,9 @@ function queueNotificationsForChatWithoutMention(troupeId, chatId, userIds) {
 
             var delay = notificationWindowPeriods[notificationNumber - 1];
             if(!delay) {
-              delay = 120000;
-              // debug("User has already gotten two notifications, that's enough. Skipping");
-              // return;
+              debug("User has already gotten two notifications, that's enough. Skipping");
+              return;
             }
-
-
-            // NOCOMMIT
-            delay = 5000;
 
             debug('Queuing notification %s to be send to user %s in %sms', notificationNumber, userId, delay);
 
@@ -114,41 +107,10 @@ function queueNotificationsForChatWithoutMention(troupeId, chatId, userIds) {
     });
 }
 
-
 exports.queueNotificationsForChat = function(troupeId, chatId, userIds, mentioned) {
   if (mentioned) {
     return queueNotificationsForChatWithMention(troupeId, chatId, userIds);
   } else {
     return queueNotificationsForChatWithoutMention(troupeId, chatId, userIds);
   }
-};
-
-/*
- * Returns nothing and has no callback. Post your usertroupes and walk away. No guarantee of delivery.
- */
-exports.postUserTroupes = function(userTroupes) {
-  console.log('THIS IS DEPRECATED.....')
-  userTroupeSettingsService.getMultiUserTroupeSettings(userTroupes, 'notifications')
-    .then(function(userTroupeNotificationSettings) {
-      userTroupes.forEach(function(userTroupe) {
-        var userId = userTroupe.userId;
-        var troupeId = userTroupe.troupeId;
-
-        var notificationSettings = userTroupeNotificationSettings[userId + ':' + troupeId];
-        var pushNotificationSetting = notificationSettings && notificationSettings.push || 'all';
-
-        /* Mute, then don't continue */
-        if(pushNotificationSetting === 'mute') {
-          debug('User troupe is muted. Skipping notification');
-          return;
-        }
-
-
-
-      });
-
-    })
-    .catch(function(err) {
-      winston.error('Unable to queue usertroupes for notification: ' + err, { exception: err });
-    });
 };

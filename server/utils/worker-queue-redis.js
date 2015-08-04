@@ -86,10 +86,9 @@ var Queue = function(name, options, loaderFn) {
     stats.event('resque.worker.cleaning');
   });
 
-  this.worker.on('poll', function() {
-    debug('poll');
-    stats.eventHF('resque.worker.polling', 1, 0.005);
-  });
+  // this.worker.on('poll', function() {
+  //   stats.eventHF('resque.worker.polling', 1, 0.005);
+  // });
 
   this.worker.on('job', function(queue) {
     debug("job: %s", queue);
@@ -101,10 +100,9 @@ var Queue = function(name, options, loaderFn) {
     stats.event('resque.worker.reenqueue');
   });
 
-  this.worker.on('pause', function() {
-    debug("paused");
-    stats.eventHF('resque.worker.paused', 1, 0.005);
-  });
+  // this.worker.on('pause', function() {
+  //   stats.eventHF('resque.worker.paused', 1, 0.005);
+  // });
 
   this.worker.on('success', function(queue, job, result) {
     debug("success");
