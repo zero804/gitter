@@ -1,4 +1,3 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var EVENT_LISTENERS = [
@@ -15,7 +14,7 @@ var installed = false;
 exports.install = function() {
   if (installed) return;
   installed = true;
-  
+
   EVENT_LISTENERS.forEach(function(module) {
     require(module).install();
   });

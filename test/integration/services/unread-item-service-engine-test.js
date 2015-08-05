@@ -517,6 +517,46 @@ describe('unread-item-service', function() {
       });
     });
 
+    describe('getUnreadItemsAndMentions', function() {
+
+      it('should return unread items when use has mentions and unread items', function(done) {
+        unreadItemServiceEngine.getUnreadItemsAndMentions(userId1, troupeId1)
+          .spread(function(unreadItems, mentions) {
+            assert.strictEqual(unreadItems.length, 0);
+            assert.strictEqual(mentions.length, 0);
+            return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, userIds, userIds);
+          })
+          .then(function() {
+            return unreadItemServiceEngine.getUnreadItemsAndMentions(userId1, troupeId1);
+          })
+          .spread(function(unreadItems, mentions) {
+            assert.strictEqual(unreadItems.length, 1);
+            assert.strictEqual(mentions.length, 1);
+            assert.equal(unreadItems[0], itemId1);
+            assert.equal(mentions[0], itemId1);
+          })
+          .nodeify(done);
+      });
+
+      it('should return unread items when use has no mentions and unread items', function(done) {
+        unreadItemServiceEngine.getUnreadItemsAndMentions(userId1, troupeId1)
+          .spread(function(unreadItems, mentions) {
+            assert.strictEqual(unreadItems.length, 0);
+            assert.strictEqual(mentions.length, 0);
+            return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, userIds, []);
+          })
+          .then(function() {
+            return unreadItemServiceEngine.getUnreadItemsAndMentions(userId1, troupeId1);
+          })
+          .spread(function(unreadItems, mentions) {
+            assert.strictEqual(unreadItems.length, 1);
+            assert.strictEqual(mentions.length, 0);
+            assert.equal(unreadItems[0], itemId1);
+          })
+          .nodeify(done);
+      });
+    });
+
 
     describe('getUnreadItemsForUserTroupes', function() {
       it('should return unread items', function(done) {
