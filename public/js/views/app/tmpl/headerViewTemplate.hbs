@@ -4,11 +4,11 @@
 
 <div class="chat-header__buttons">
 
-  {{#unless oneToOne}}
+  {{#if ownerIsOrg}}
     <div class="js-org-page chat-header__org-page">
       <i class="octicon octicon-globe"></i>
     </div>
-  {{/unless}}
+  {{/if}}
 
   {{#if user}}
     <div class="chat-header__favourite">

@@ -285,8 +285,9 @@ function renderChat(req, res, options, next) {
       options.generateContext === false ? null : contextGenerator.generateTroupeContext(req, { snapshots: { chat: snapshotOptions }, permalinkChatId: aroundId }),
       restful.serializeChatsForTroupe(troupe.id, userId, chatSerializerOptions),
       options.fetchEvents === false ? null : restful.serializeEventsForTroupe(troupe.id, userId),
-      options.fetchUsers === false ? null :restful.serializeUsersForTroupe(troupe.id, userId, userSerializerOptions)
-    ]).spread(function (troupeContext, chats, activityEvents, users) {
+      options.fetchUsers === false ? null :restful.serializeUsersForTroupe(troupe.id, userId, userSerializerOptions),
+      troupeService.checkGitHubTypeForUri(troupe.lcOwner || '', 'ORG')
+    ]).spread(function (troupeContext, chats, activityEvents, users, ownerIsOrg) {
       var initialChat = _.find(chats, function(chat) { return chat.initial; });
       var initialBottom = !initialChat;
       var githubLink;
@@ -337,7 +338,8 @@ function renderChat(req, res, options, next) {
           hasHiddenMembers: troupe.userCount > 25,
           integrationsUrl: integrationsUrl,
           inputAutoFocus: !options.mobile,
-          placeholder: 'Click here to type a chat message. Supports GitHub flavoured markdown.'
+          placeholder: 'Click here to type a chat message. Supports GitHub flavoured markdown.',
+          ownerIsOrg: ownerIsOrg
         }, troupeContext && {
           troupeTopic: troupeContext.troupe.topic,
           premium: troupeContext.troupe.premium,
