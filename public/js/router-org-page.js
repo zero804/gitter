@@ -7,6 +7,8 @@ var appEvents = require('utils/appevents');
 var frameUtils = require('./utils/frame-utils');
 var modalRegion = require('components/modal-region');
 
+require('utils/tracking');
+
 onReady(function(){
 
   require('components/link-handler').installLinkHandler();

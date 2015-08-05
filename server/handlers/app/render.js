@@ -428,6 +428,10 @@ function renderOrgPage(req, res, next) {
     orgPermissionModel(req.user, 'admin', org)
   ])
   .spread(function (ghOrg,rooms, troupeContext, isOrgAdmin) {
+
+    // This is used to track pageViews in mixpanel
+    troupeContext.isCommunityPage = true;
+
     var getMembers = rooms.map(function(room) {
       return roomMembershipService.findMembersForRoom(room.id, {limit: 10});
     });
