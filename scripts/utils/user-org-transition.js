@@ -29,7 +29,6 @@ var opts = require("nomnom")
    })
    .parse();
 
-require('../../server/services/kue-workers').startWorkers();
 require('../../server/event-listeners').install();
 
 function performUserToOrgTransition(usernameForConversion, firstUserUsername, dryRun) {

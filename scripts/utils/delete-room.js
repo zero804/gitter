@@ -19,8 +19,6 @@ var opts = require("nomnom")
    })
    .parse();
 
-require('../../server/services/kue-workers').startWorkers();
-
 var readline = require('readline');
 
 var rl = readline.createInterface({

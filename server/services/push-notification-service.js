@@ -2,14 +2,11 @@
 "use strict";
 
 var PushNotificationDevice = require("./persistence-service").PushNotificationDevice;
-var nconf                  = require('../utils/config');
 var crypto                 = require('crypto');
 var Q                      = require('q');
 var mongoUtils             = require('../utils/mongo-utils');
 var debug                  = require('debug')('gitter:push-notification-service');
 var uniqueIds              = require('mongodb-unique-ids');
-
-var minimumUserAlertIntervalS = nconf.get("notifications:minimumUserAlertInterval");
 
 function buffersEqual(a,b) {
   if (!Buffer.isBuffer(a)) return undefined;

@@ -35,7 +35,7 @@ if (nconf.get("web:startApiInPrimaryApp")) {
 app.use('/api_web', require('./api-web/'));
 app.use('/', require('./handlers/'));
 
-require('./services/kue-workers').startWorkers();
+require('./workers').listen();
 
 var port = nconf.get("PORT");
 

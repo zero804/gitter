@@ -5,7 +5,6 @@ var pushNotificationFilter   = require("gitter-web-push-notification-filter");
 var nconf                     = require('../../utils/config');
 var workerQueue               = require('../../utils/worker-queue-redis');
 var userTroupeSettingsService = require('../user-troupe-settings-service');
-var pushNotificationGenerator = require('./push-notification-generator');
 var debug                     = require('debug')('gitter:push-notification-postbox');
 var mongoUtils                = require('../../utils/mongo-utils');
 var Q                         = require('q');
@@ -19,6 +18,8 @@ var notificationWindowPeriods = [
 var mentionNotificationWindowPeriod = 10000;
 
 var queue = workerQueue.queue('generate-push-notifications', {}, function() {
+  var pushNotificationGenerator = require('./push-notification-generator');
+
   return function(data, done) {
     var userId = data.userId;
     var troupeId = data.troupeId;
@@ -36,7 +37,6 @@ var queue = workerQueue.queue('generate-push-notifications', {}, function() {
       .nodeify(done);
   };
 });
-
 
 function queueNotificationsForChatWithMention(troupeId, chatId, userIds) {
   var chatTime = mongoUtils.getTimestampFromObjectId(chatId);
@@ -113,4 +113,8 @@ exports.queueNotificationsForChat = function(troupeId, chatId, userIds, mentione
   } else {
     return queueNotificationsForChatWithoutMention(troupeId, chatId, userIds);
   }
+};
+
+exports.listen = function() {
+  queue.listen();
 };

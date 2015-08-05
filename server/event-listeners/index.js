@@ -14,7 +14,8 @@ var installed = false;
 
 exports.install = function() {
   if (installed) return;
-
+  installed = true;
+  
   EVENT_LISTENERS.forEach(function(module) {
     require(module).install();
   });
