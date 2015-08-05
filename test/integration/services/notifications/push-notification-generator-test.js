@@ -69,31 +69,9 @@ describe('push notification generator service', function() {
       '../../serializers/notification-serializer': notificationSerializerStub
     });
 
-    return service.sendUserTroupeNotification('userId1234', '1234567890', 1, 'some setting')
+    return service.sendUserTroupeNotification('userId1234', '1234567890', 1)
       .then(function() {
         mockito.verify(mockSendUserNotification, once)();
-      })
-      .nodeify(done);
-  });
-
-  it('should not send for muted rooms', function(done) {
-    var mockSendUserNotification = mockito.mockFunction();
-    mockito.when(mockSendUserNotification)().then(function(x, y, callback) { callback(); });
-
-    var service = testRequire.withProxies('./services/notifications/push-notification-generator', {
-      '../user-troupe-settings-service': userTroupeSettingsServiceStub,
-      'gitter-web-push-notification-filter': pushNotificationFilterStub,
-      '../user-service': userServiceStub,
-      '../../gateways/push-notification-gateway': {
-        sendUserNotification: mockSendUserNotification
-      },
-      '../unread-item-service': unreadItemServiceStub,
-      '../../serializers/notification-serializer': notificationSerializerStub
-    });
-
-    return service.sendUserTroupeNotification('userId1234', '1234567890', 1, 'mute')
-      .then(function() {
-        mockito.verify(mockSendUserNotification, never)();
       })
       .nodeify(done);
   });
@@ -120,7 +98,7 @@ describe('push notification generator service', function() {
       '../../serializers/notification-serializer': notificationSerializerStub
     });
 
-    return service.sendUserTroupeNotification('userId1234', '1234567890', 1, 'some setting')
+    return service.sendUserTroupeNotification('userId1234', '1234567890', 1)
       .nodeify(done);
   });
 

@@ -83,6 +83,10 @@ function removeItem(troupeId, itemId) {
               });
             }
 
+            if (removeResult.badgeUpdate) {
+              queueBadgeUpdateForUser(removeResult.userId);
+            }
+
           });
 
         });
@@ -243,10 +247,7 @@ exports.getFirstUnreadItem = function(userId, troupeId) {
 };
 
 exports.getUnreadItemsForUser = function(userId, troupeId, callback) {
-  return Q.all([
-      engine.getUnreadItems(userId, troupeId),
-      engine.getMentions(userId, troupeId)
-    ])
+  return engine.getUnreadItemsAndMentions(userId, troupeId)
     .spread(function(chats, mentions) {
       return {
         chat: chats,

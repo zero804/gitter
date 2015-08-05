@@ -397,6 +397,21 @@ function getUserMentionsForRooms(userId, troupeIds, options) {
   return d.promise;
 }
 
+/*
+ * Returns all unread items and mentions for a user in a room. Returns two arrays:
+ * [ unread_items, mentions ]
+ */
+function getUnreadItemsAndMentions(userId, troupeId) {
+  var keys = ["unread:chat:" + userId + ":" + troupeId, "m:" + userId + ":" + troupeId];
+  return runScript('unread-item-list-with-mentions', keys, [])
+    .catch(function(err) {
+      /* Not sure why we're doing this? */
+      winston.warn("unreadItemService.getUnreadItems failed:" + err, { exception: err });
+      // Mask error
+      return [[], []];
+    });
+}
+
 function getUnreadItems(userId, troupeId) {
   var keys = ["unread:chat:" + userId + ":" + troupeId];
   return runScript('unread-item-list', keys, [])
@@ -537,6 +552,7 @@ exports.getUserMentionsForRoom = getUserMentionsForRoom;
 
 exports.getUnreadItems = getUnreadItems;
 exports.getMentions = getMentions;
+exports.getUnreadItemsAndMentions = getUnreadItemsAndMentions;
 exports.getUnreadItemsForUserTroupes = getUnreadItemsForUserTroupes;
 
 exports.getAllUnreadItemCounts = getAllUnreadItemCounts;

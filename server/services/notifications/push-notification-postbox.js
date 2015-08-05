@@ -14,8 +14,10 @@ var notificationWindowPeriods = [
   nconf.get("notifications:notificationDelay") * 1000,
   nconf.get("notifications:notificationDelay2") * 1000
 ];
+
 /* 10 second window for users on mention */
 var mentionNotificationWindowPeriod = 10000;
+var maxNotificationsForMentions = 10;
 
 var queue = workerQueue.queue('generate-push-notifications', {}, function() {
   var pushNotificationGenerator = require('./push-notification-generator');
@@ -24,12 +26,10 @@ var queue = workerQueue.queue('generate-push-notifications', {}, function() {
     var userId = data.userId;
     var troupeId = data.troupeId;
     var notificationNumber = data.notificationNumber;
-    var userNotifySetting = data.userSetting;
-    var mentioned = data.mentioned;
 
     if (!userId || !troupeId || !notificationNumber) return done();
 
-    return pushNotificationGenerator.sendUserTroupeNotification(userId, troupeId, notificationNumber, userNotifySetting, mentioned)
+    return pushNotificationGenerator.sendUserTroupeNotification(userId, troupeId, notificationNumber)
       .catch(function(err) {
         winston.error('Failed to send notifications: ' + err + '. Failing silently.', { exception: err });
         errorReporter(err, { userId: userId, troupeId: troupeId });
@@ -38,12 +38,16 @@ var queue = workerQueue.queue('generate-push-notifications', {}, function() {
   };
 });
 
-function queueNotificationsForChatWithMention(troupeId, chatId, userIds) {
+exports.queueNotificationsForChat = function(troupeId, chatId, userIds, mentioned) {
   var chatTime = mongoUtils.getTimestampFromObjectId(chatId);
+  debug('queueNotificationsForChat');
 
+  // TODO: consider asking Redis whether its possible to send to this user BEFORE
+  // going to mongo to get notification settings as reversing these two operations
+  // may well be much faster
   return userTroupeSettingsService.getUserTroupeSettingsForUsersInTroupe(troupeId, 'notifications', userIds)
     .then(function(settings) {
-      userIds.forEach(function(userId) {
+      return Q.all(userIds.map(function(userId) {
         var notificationSettings = settings[userId];
         var pushNotificationSetting = notificationSettings && notificationSettings.push || 'all';
 
@@ -52,38 +56,37 @@ function queueNotificationsForChatWithMention(troupeId, chatId, userIds) {
           return;
         }
 
-        console.log('TODO: deal with notifications!')
-        console.log('TODO: cancel any pending non-mention notifications!')
-      });
-    });
-}
-
-function queueNotificationsForChatWithoutMention(troupeId, chatId, userIds) {
-  var chatTime = mongoUtils.getTimestampFromObjectId(chatId);
-  debug('queueNotificationsForChatWithoutMention');
-  return userTroupeSettingsService.getUserTroupeSettingsForUsersInTroupe(troupeId, 'notifications', userIds)
-    .then(function(settings) {
-      return Q.all(userIds.map(function(userId) {
-        var notificationSettings = settings[userId];
-        var pushNotificationSetting = notificationSettings && notificationSettings.push || 'all';
-
-
-        /* Mute, then don't continue */
-        if (pushNotificationSetting === 'mute' || pushNotificationSetting === 'mention') {
+        if (pushNotificationSetting === 'mention' && !mentioned) {
+          // Only pushing on mentions and this ain't a mention
           return;
         }
 
+        // TODO: bulk version of this method please
         return pushNotificationFilter.canLockForNotification(userId, troupeId, chatTime)
           .then(function(notificationNumber) {
             if(!notificationNumber) {
+              // TODO: consider cancelling the current lock on mentions and creating a
+              // new one as if we're in the 60 second window period, we'll need to
+              // wait until the end of the window before sending the mention
               debug('User troupe already has notification queued. Skipping');
               return;
             }
 
-            var delay = notificationWindowPeriods[notificationNumber - 1];
-            if(!delay) {
-              debug("User has already gotten two notifications, that's enough. Skipping");
-              return;
+            var delay;
+            if (mentioned) {
+              if (notificationNumber > maxNotificationsForMentions) {
+                debug("User has receieved too many mention push notifications");
+                return;
+              }
+
+              /* Send the notification to the user very shortly */
+              delay = mentionNotificationWindowPeriod;
+            } else {
+              delay = notificationWindowPeriods[notificationNumber - 1];
+              if(!delay) {
+                debug("User has already gotten two notifications, that's enough. Skipping");
+                return;
+              }
             }
 
             debug('Queuing notification %s to be send to user %s in %sms', notificationNumber, userId, delay);
@@ -91,8 +94,7 @@ function queueNotificationsForChatWithoutMention(troupeId, chatId, userIds) {
             queue.invoke({
               userId: userId,
               troupeId: troupeId,
-              notificationNumber: notificationNumber,
-              userSetting: pushNotificationSetting // TODO: remove
+              notificationNumber: notificationNumber
             }, { delay: delay });
 
           });
@@ -105,14 +107,6 @@ function queueNotificationsForChatWithoutMention(troupeId, chatId, userIds) {
       winston.error('Unable to queue notification: ' + err, { exception: err });
       throw err;
     });
-}
-
-exports.queueNotificationsForChat = function(troupeId, chatId, userIds, mentioned) {
-  if (mentioned) {
-    return queueNotificationsForChatWithMention(troupeId, chatId, userIds);
-  } else {
-    return queueNotificationsForChatWithoutMention(troupeId, chatId, userIds);
-  }
 };
 
 exports.listen = function() {

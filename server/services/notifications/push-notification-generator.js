@@ -1,12 +1,11 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var winston                      = require('../../utils/winston');
 var pushNotificationFilter       = require("gitter-web-push-notification-filter");
 var pushNotificationGateway      = require("../../gateways/push-notification-gateway");
 var serializer                   = require("../../serializers/notification-serializer");
 var notificationMessageGenerator = require('./notification-message-generator');
 var unreadItemService            = require('../unread-item-service');
+var debug                        = require('debug')('gitter:push-notification-generator');
 var Q                            = require('q');
 
 function serializeItems(troupeId, recipientUserId, chatIds) {
@@ -19,14 +18,14 @@ function serializeItems(troupeId, recipientUserId, chatIds) {
   ]);
 }
 
-function notifyUserOfActivitySince(userId, troupeId, since, notificationNumber, userSetting) {
-  winston.verbose('notifyUserOfActivitySince: ', { userId: userId, troupeId: troupeId, since: since, number: notificationNumber, userSetting: userSetting });
+function notifyUserOfActivitySince(userId, troupeId, since, notificationNumber) {
+  debug('notifyUserOfActivitySince userId=%s, troupeId=%s, since=%s, notificationNumber=%s', userId, troupeId, since, notificationNumber);
 
   return unreadItemService.getUnreadItemsForUserTroupeSince(userId, troupeId, since)
     .then(function(unreadItems) {
 
       if (!unreadItems.chat || !unreadItems.chat.length) {
-        winston.verbose('User has no unread items since ', { userId: userId, troupeId: troupeId, since: since, notificationNumber: notificationNumber} );
+        debug('User %s has no unread items since %s in troupeId=%s', userId, since, troupeId);
         return;
       }
 
@@ -34,16 +33,10 @@ function notifyUserOfActivitySince(userId, troupeId, since, notificationNumber, 
         .spread(function(troupe, chats) {
           if (!troupe || !chats || !chats.length) return;
 
-          // TODO: this is horrible!
-          // if(userSetting == 'mention') {
-          //   items = filterUnreadItemsForUserByMention(userId, items);
-          //   // Still want to notify the user?
-          //   if(!items.chat || !items.chat.length) return callback();
-          // }
-
           var notificationLink = '/mobile/chat#' + troupe.id;
 
           var message = notificationMessageGenerator(troupe, chats);
+
           return pushNotificationGateway.sendUserNotification(userId, {
             roomId: troupe.id,
             roomName: troupe.name || troupe.uri,
@@ -61,7 +54,7 @@ function sendUserTroupeNotification(userId, troupeId, notificationNumber, userNo
   return pushNotificationFilter.canUnlockForNotification(userId, troupeId, notificationNumber)
     .then(function(startTime) {
       if(!startTime) {
-        winston.verbose('Unable to obtain lock to notify userTroupe. Skipping');
+        debug('Unable to obtain lock to notify userTroupe. Skipping');
         return;
       }
 
