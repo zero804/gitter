@@ -460,6 +460,7 @@ function renderOrgPage(req, res, next) {
       }, 0);
 
       res.render('org-page', {
+        isLoggedIn: !!req.user,
         roomCount: rooms.length,
         orgUserCount: orgUserCount,
         org: ghOrg,
