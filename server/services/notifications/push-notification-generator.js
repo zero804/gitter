@@ -57,7 +57,7 @@ function notifyUserOfActivitySince(userId, troupeId, since, notificationNumber, 
 
 }
 
-function sendUserTroupeNotification(userId, troupeId, notificationNumber, userNotifySetting, mentioned) {
+function sendUserTroupeNotification(userId, troupeId, notificationNumber, userNotifySetting/*, mentioned*/) {
   return pushNotificationFilter.canUnlockForNotification(userId, troupeId, notificationNumber)
     .then(function(startTime) {
       if(!startTime) {
