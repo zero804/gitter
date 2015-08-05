@@ -34,11 +34,10 @@ function batchBadgeUpdates(key, userIds, done) {
 }
 
 function sinceFilter(since) {
+  var sinceObjectID = mongoUtils.createIdForTimestampString(since).toString();
   return function(id) {
-    var date = mongoUtils.getDateFromObjectId(id);
-    return date.getTime() >= since;
+    return id >= sinceObjectID;
   };
-
 }
 
 function reject(msg) {
@@ -220,21 +219,6 @@ exports.getRoomIdsMentioningUser = function(userId) {
   return engine.getRoomsMentioningUser(userId);
 };
 
-exports.getUnreadItemsForUserTroupeSince = function(userId, troupeId, since, callback) {
-  return engine.getUnreadItems(userId, troupeId)
-    .then(function(chatItems) {
-      chatItems = chatItems.filter(sinceFilter(since));
-
-      var response = {};
-      if(chatItems.length) {
-        response.chat = chatItems;
-      }
-
-      return response;
-    })
-    .nodeify(callback);
-};
-
 exports.getFirstUnreadItem = function(userId, troupeId) {
   return engine.getUnreadItems(userId, troupeId)
     .then(function(members) {
@@ -246,16 +230,28 @@ exports.getFirstUnreadItem = function(userId, troupeId) {
     });
 };
 
-exports.getUnreadItemsForUser = function(userId, troupeId, callback) {
+exports.getUnreadItemsForUser = function(userId, troupeId) {
   return engine.getUnreadItemsAndMentions(userId, troupeId)
     .spread(function(chats, mentions) {
       return {
         chat: chats,
         mention: mentions
       };
-    })
-    .nodeify(callback);
+    });
 };
+
+/* Get unread items and mentions for a user since a particular date */
+exports.getUnreadItemsForUserTroupeSince = function(userId, troupeId, since) {
+  return engine.getUnreadItemsAndMentions(userId, troupeId)
+    .spread(function(chats, mentions) {
+
+      return [
+        chats.filter(sinceFilter(since)),
+        mentions.filter(sinceFilter(since))
+      ];
+    });
+};
+
 
 /**
  * Get the badge counts for userIds

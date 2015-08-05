@@ -92,12 +92,17 @@ function serializeObjectIds(ids) {
   return ids.map(serializeObjectId);
 }
 
+function createIdForTimestampString(timestamp) {
+  var hexSeconds = Math.floor(timestamp/1000).toString(16);
+
+  while(hexSeconds.length < 8) {
+    hexSeconds = "0" + hexSeconds;
+  }
+  return hexSeconds + "0000000000000000";
+}
+
 function createIdForTimestamp(timestamp) {
-    var hexSeconds = Math.floor(timestamp/1000).toString(16);
-    while(hexSeconds.length < 8) {
-      hexSeconds = "0" + hexSeconds;
-    }
-    return new ObjectID(hexSeconds + "0000000000000000");
+  return new ObjectID(createIdForTimestampString(timestamp));
 }
 
 function fieldInPredicate(fieldName, values, additionalClauses) {
@@ -136,4 +141,5 @@ exports.getNewObjectIdString = getNewObjectIdString;
 exports.serializeObjectId = serializeObjectId;
 exports.serializeObjectIds = serializeObjectIds;
 exports.createIdForTimestamp = createIdForTimestamp;
+exports.createIdForTimestampString = createIdForTimestampString;
 exports.fieldInPredicate = fieldInPredicate;
