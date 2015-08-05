@@ -92,7 +92,10 @@ module.exports = (function() {
         return generateTooltip(context.troupe());
       }});
 
-      $('.js-org-page').tooltip({ placement: 'left', title: 'Organization rooms'});
+      $('.js-org-page').tooltip({ placement: 'left', title: function() {
+        var orgName = context().troupe.uri.split('/')[0];
+        return 'More ' + orgName + ' rooms';
+      }});
 
       this.redisplay();
     },
