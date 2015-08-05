@@ -31,8 +31,11 @@ var View = Marionette.LayoutView.extend({
 
   initialize: function() {
 
+    //TODO --> Fix meta key in OSX chrome changing messages to read ctrl for now
+    //jp 5/8/15
     //detect OS to get meta key value
-    var meta = /^MacIntel/.test(navigator.platform) ? 'cmd' : 'ctrl';
+    //var meta = /^MacIntel/.test(navigator.platform) ? 'cmd' : 'ctrl';
+    var meta = 'ctrl';
 
     var tagCollection = new TagCollection();
     var errorModel = new Backbone.Model({
@@ -55,27 +58,17 @@ var View = Marionette.LayoutView.extend({
     }.bind(this));
 
     //events
-    this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
     this.listenTo(tagCollection, 'tag:error:duplicate', this.onDuplicateTag);
     this.listenTo(tagCollection, 'tag:added', this.onTagEmpty);
   },
 
-  save: function(e) {
+  save: function(e, shouldHideDialog) {
     if(e) e.preventDefault();
     //TODO --> need to add error states here jp 3/9/15
     apiClient.put('/v1/rooms/' + this.options.roomId, { tags: this.model.get('tagCollection').toJSON() })
     .then(function() {
-      this.dialog.hide();
+      if(shouldHideDialog) this.dialog.hide();
     }.bind(this));
-
-  },
-
-  menuItemClicked: function (button) {
-    switch (button) {
-      case 'save':
-        this.save();
-        break;
-    }
   },
 
   onDuplicateTag: function(tag){
@@ -89,7 +82,8 @@ var View = Marionette.LayoutView.extend({
     'tag:valid': 'onTagValid',
     'tag:error': 'onTagError',
     'tag:warning:empty': 'onTagEmpty',
-    'tag:removed': 'onTagRemoved'
+    'tag:removed': 'onTagRemoved',
+    'tag:added': 'onTagAdded'
   },
 
   onTagEmpty: function(){
@@ -115,6 +109,11 @@ var View = Marionette.LayoutView.extend({
 
   onTagRemoved: function(){
     this.tagInput.currentView.focus();
+    this.save();
+  },
+
+  onTagAdded: function (){
+    this.save();
   },
 
   initTagList: function(optionsForRegion){
@@ -136,10 +135,7 @@ var Modal = ModalView.extend({
     options.title = "Edit tags";
     ModalView.prototype.initialize.apply(this, arguments);
     this.view = new View({roomId: options.roomId });
-  },
-  menuItems: [
-    { action: "save", text: "Save", className: "trpBtnGreen"}
-  ]
+  }
 });
 
 module.exports = Modal;

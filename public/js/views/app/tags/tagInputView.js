@@ -41,6 +41,7 @@ var TagInputView = Marionette.ItemView.extend({
       this.model = new TagModel();
       this.bindToModel();
       this.$el.find('input').val('');
+      this.triggerMethod('tag:added');
     }
   },
 
