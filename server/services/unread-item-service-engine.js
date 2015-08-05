@@ -7,13 +7,12 @@ var mongoUtils       = require('../utils/mongo-utils');
 var Scripto          = require('gitter-redis-scripto');
 var Q                = require('q');
 var assert           = require('assert');
+var debug            = require('debug')('gitter:unread-items-engine');
 var redisClient      = redis.getClient();
 var scriptManager    = new Scripto(redisClient);
+
 scriptManager.loadFromDir(__dirname + '/../../redis-lua/unread');
 var EMAIL_NOTIFICATION_HASH_KEY = "unread:email_notify";
-var EventEmitter     = require('events').EventEmitter;
-
-var engine = new EventEmitter();
 
 var runScript = Q.nbind(scriptManager.run, scriptManager);
 var redisClient_smembers = Q.nbind(redisClient.smembers, redisClient);
@@ -98,14 +97,6 @@ function newItemWithMentions(troupeId, itemId, userIds, mentionUserIds) {
           var badgeUpdate         = !!(flag & 1);
           var upgradedKey          = flag & 2;
 
-          if (badgeUpdate) {
-            engine.emit('badge.update', userId);
-          }
-
-          if (troupeUnreadCount >= 0) {
-            engine.emit('unread.count', userId, troupeId, troupeUnreadCount);
-          }
-
           resultHash[userId] = {
             unreadCount: troupeUnreadCount >= 0 ? troupeUnreadCount : undefined,
             badgeUpdate: badgeUpdate
@@ -119,7 +110,7 @@ function newItemWithMentions(troupeId, itemId, userIds, mentionUserIds) {
         if (upgradeCount > 10) {
           winston.warn('unread-items: upgraded keys for ' + upgradeCount + ' user:troupes');
         } else if(upgradeCount > 0) {
-          winston.info('unread-items: upgraded keys for ' + upgradeCount + ' user:troupes');
+          debug('unread-items: upgraded keys for user:troupes', upgradeCount);
         }
 
         batchMentionIds.forEach(function(mentionUserId) {
@@ -161,18 +152,6 @@ function removeItem(troupeId, itemId, userIds) {
         var badgeUpdate         = !!(flag & 1);
         var userId              = userIds[i];
 
-        if (badgeUpdate) {
-          engine.emit('badge.update', userId);
-        }
-
-        if (troupeUnreadCount >= 0) {
-          engine.emit('unread.count', userId, troupeId, troupeUnreadCount);
-        }
-
-        if (mentionCount >= 0) {
-          engine.emit('mention.count', userId, troupeId, mentionCount);
-        }
-
         results.push({
           userId: userId,
           unreadCount: troupeUnreadCount >= 0 ? troupeUnreadCount : undefined,
@@ -209,13 +188,6 @@ function ensureAllItemsRead(userId, troupeId) {
     .then(function(flag) {
       var badgeUpdate = flag > 0;
 
-      if (badgeUpdate) {
-        engine.emit('badge.update', userId);
-      }
-
-      engine.emit('unread.count', userId, troupeId, 0);
-      engine.emit('mention.count', userId, troupeId, 0, 'remove');
-
       return {
         unreadCount: 0,
         mentionCount: 0,
@@ -246,18 +218,6 @@ function markItemsRead(userId, troupeId, ids) {
       var mentionCount        = result[1];
       var flag                = result[2];
       var badgeUpdate         = !!(flag & 1);
-
-      if (badgeUpdate) {
-        engine.emit('badge.update', userId);
-      }
-
-      if (troupeUnreadCount >= 0) {
-        engine.emit('unread.count', userId, troupeId, troupeUnreadCount);
-      }
-
-      if (mentionCount >= 0) {
-        engine.emit('mention.count', userId, troupeId, mentionCount);
-      }
 
       return {
         unreadCount: troupeUnreadCount >= 0 ? troupeUnreadCount : undefined,
@@ -556,35 +516,36 @@ function getRoomsCausingBadgeCount(userId) {
   return Q.ninvoke(redisClient, "zrange", ["ub:" + userId, 0, -1]);
 }
 
+/**
+ * Exports
+ */
+exports.newItemWithMentions = newItemWithMentions;
+exports.removeItem = removeItem;
+exports.ensureAllItemsRead = ensureAllItemsRead;
+exports.markItemsRead = markItemsRead;
+exports.listTroupeUsersForEmailNotifications = listTroupeUsersForEmailNotifications;
 
-engine.newItemWithMentions = newItemWithMentions;
-engine.removeItem = removeItem;
-engine.ensureAllItemsRead = ensureAllItemsRead;
-engine.markItemsRead = markItemsRead;
-engine.listTroupeUsersForEmailNotifications = listTroupeUsersForEmailNotifications;
+exports.getUserUnreadCounts = getUserUnreadCounts;
+exports.getUserUnreadCountsForRooms = getUserUnreadCountsForRooms;
 
-engine.getUserUnreadCounts = getUserUnreadCounts;
-engine.getUserUnreadCountsForRooms = getUserUnreadCountsForRooms;
-
-engine.getUserMentions = getUserMentions;
-engine.getUserMentionCounts = getUserMentionCounts;
-engine.getUserMentionCountsForRooms = getUserMentionCountsForRooms;
-engine.getUserMentionsForRooms = getUserMentionsForRooms;
-engine.getUserMentionsForRoom = getUserMentionsForRoom;
+exports.getUserMentions = getUserMentions;
+exports.getUserMentionCounts = getUserMentionCounts;
+exports.getUserMentionCountsForRooms = getUserMentionCountsForRooms;
+exports.getUserMentionsForRooms = getUserMentionsForRooms;
+exports.getUserMentionsForRoom = getUserMentionsForRoom;
 
 
-engine.getUnreadItems = getUnreadItems;
-engine.getMentions = getMentions;
-engine.getUnreadItemsForUserTroupes = getUnreadItemsForUserTroupes;
+exports.getUnreadItems = getUnreadItems;
+exports.getMentions = getMentions;
+exports.getUnreadItemsForUserTroupes = getUnreadItemsForUserTroupes;
 
-engine.getAllUnreadItemCounts = getAllUnreadItemCounts;
-engine.getRoomsMentioningUser = getRoomsMentioningUser;
-engine.getBadgeCountsForUserIds = getBadgeCountsForUserIds;
-engine.getRoomsCausingBadgeCount = getRoomsCausingBadgeCount;
+exports.getAllUnreadItemCounts = getAllUnreadItemCounts;
+exports.getRoomsMentioningUser = getRoomsMentioningUser;
+exports.getBadgeCountsForUserIds = getBadgeCountsForUserIds;
+exports.getRoomsCausingBadgeCount = getRoomsCausingBadgeCount;
 
-engine.testOnly = {
+exports.testOnly = {
   getNewItemBatches: getNewItemBatches,
   UNREAD_BATCH_SIZE: UNREAD_BATCH_SIZE,
   removeAllEmailNotifications: removeAllEmailNotifications
 };
-module.exports = engine;

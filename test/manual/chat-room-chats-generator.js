@@ -7,7 +7,6 @@ var loremIpsum = require('lorem-ipsum');
 var dictionary = require('lorem-ipsum/lib/dictionary').words;
 
 require('../../server/event-listeners').install();
-require('../../server/services/kue-workers').startWorkers();
 
 var opts = require("nomnom")
 .option('room', {

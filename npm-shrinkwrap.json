@@ -1105,145 +1105,145 @@
       }
     },
     "gitter-env": {
-      "version": "0.20.17",
-      "from": "http://beta-internal:4873/gitter-env/-/gitter-env-0.20.17.tgz",
-      "resolved": "http://beta-internal:4873/gitter-env/-/gitter-env-0.20.17.tgz",
+      "version": "0.20.18",
+      "from": "gitter-env@0.20.18",
+      "resolved": "http://beta-internal:4873/gitter-env/-/gitter-env-0.20.18.tgz",
       "dependencies": {
         "async": {
           "version": "0.8.0",
-          "from": "http://beta-internal:4873/async/-/async-0.8.0.tgz",
+          "from": "async@>=0.8.0 <0.9.0",
           "resolved": "http://beta-internal:4873/async/-/async-0.8.0.tgz"
         },
         "blocked": {
           "version": "1.1.0",
-          "from": "http://beta-internal:4873/blocked/-/blocked-1.1.0.tgz",
+          "from": "blocked@>=1.1.0 <2.0.0",
           "resolved": "http://beta-internal:4873/blocked/-/blocked-1.1.0.tgz"
         },
         "gitter-private-cube": {
           "version": "0.2.12",
-          "from": "http://beta-internal:4873/gitter-private-cube/-/gitter-private-cube-0.2.12.tgz",
+          "from": "gitter-private-cube@>=0.2.12 <0.3.0",
           "resolved": "http://beta-internal:4873/gitter-private-cube/-/gitter-private-cube-0.2.12.tgz",
           "dependencies": {
             "mongodb": {
               "version": "1.3.23",
-              "from": "http://beta-internal:4873/mongodb/-/mongodb-1.3.23.tgz",
+              "from": "mongodb@>=1.3.18 <1.4.0",
               "resolved": "http://beta-internal:4873/mongodb/-/mongodb-1.3.23.tgz",
               "dependencies": {
                 "bson": {
                   "version": "0.2.5",
-                  "from": "http://beta-internal:4873/bson/-/bson-0.2.5.tgz",
+                  "from": "bson@0.2.5",
                   "resolved": "http://beta-internal:4873/bson/-/bson-0.2.5.tgz"
                 },
                 "kerberos": {
                   "version": "0.0.3",
-                  "from": "http://beta-internal:4873/kerberos/-/kerberos-0.0.3.tgz",
+                  "from": "kerberos@0.0.3",
                   "resolved": "http://beta-internal:4873/kerberos/-/kerberos-0.0.3.tgz"
                 }
               }
             },
             "node-static": {
               "version": "0.6.5",
-              "from": "http://beta-internal:4873/node-static/-/node-static-0.6.5.tgz",
+              "from": "node-static@0.6.5",
               "resolved": "http://beta-internal:4873/node-static/-/node-static-0.6.5.tgz",
               "dependencies": {
                 "optimist": {
                   "version": "0.6.1",
-                  "from": "http://beta-internal:4873/optimist/-/optimist-0.6.1.tgz",
+                  "from": "optimist@>=0.3.4",
                   "resolved": "http://beta-internal:4873/optimist/-/optimist-0.6.1.tgz",
                   "dependencies": {
                     "wordwrap": {
                       "version": "0.0.3",
-                      "from": "http://beta-internal:4873/wordwrap/-/wordwrap-0.0.3.tgz",
+                      "from": "wordwrap@>=0.0.2 <0.1.0",
                       "resolved": "http://beta-internal:4873/wordwrap/-/wordwrap-0.0.3.tgz"
                     },
                     "minimist": {
                       "version": "0.0.10",
-                      "from": "http://beta-internal:4873/minimist/-/minimist-0.0.10.tgz",
+                      "from": "minimist@>=0.0.1 <0.1.0",
                       "resolved": "http://beta-internal:4873/minimist/-/minimist-0.0.10.tgz"
                     }
                   }
                 },
                 "colors": {
                   "version": "1.1.2",
-                  "from": "http://beta-internal:4873/colors/-/colors-1.1.2.tgz",
+                  "from": "colors@>=0.6.0",
                   "resolved": "http://beta-internal:4873/colors/-/colors-1.1.2.tgz"
                 }
               }
             },
             "pegjs": {
               "version": "0.7.0",
-              "from": "http://beta-internal:4873/pegjs/-/pegjs-0.7.0.tgz",
+              "from": "pegjs@0.7.0",
               "resolved": "http://beta-internal:4873/pegjs/-/pegjs-0.7.0.tgz"
             },
             "vows": {
               "version": "0.7.0",
-              "from": "http://beta-internal:4873/vows/-/vows-0.7.0.tgz",
+              "from": "vows@0.7.0",
               "resolved": "http://beta-internal:4873/vows/-/vows-0.7.0.tgz",
               "dependencies": {
                 "eyes": {
                   "version": "0.1.8",
-                  "from": "http://beta-internal:4873/eyes/-/eyes-0.1.8.tgz",
+                  "from": "eyes@>=0.1.6",
                   "resolved": "http://beta-internal:4873/eyes/-/eyes-0.1.8.tgz"
                 },
                 "diff": {
                   "version": "1.0.8",
-                  "from": "http://beta-internal:4873/diff/-/diff-1.0.8.tgz",
+                  "from": "diff@>=1.0.3 <1.1.0",
                   "resolved": "http://beta-internal:4873/diff/-/diff-1.0.8.tgz"
                 }
               }
             },
             "websocket": {
               "version": "1.0.8",
-              "from": "http://beta-internal:4873/websocket/-/websocket-1.0.8.tgz",
+              "from": "websocket@1.0.8",
               "resolved": "http://beta-internal:4873/websocket/-/websocket-1.0.8.tgz"
             },
             "websocket-server": {
               "version": "1.4.4",
-              "from": "http://beta-internal:4873/websocket-server/-/websocket-server-1.4.4.tgz",
+              "from": "websocket-server@1.4.4",
               "resolved": "http://beta-internal:4873/websocket-server/-/websocket-server-1.4.4.tgz"
             }
           }
         },
         "gitter-redis-sentinel-client": {
           "version": "0.3.0",
-          "from": "http://beta-internal:4873/gitter-redis-sentinel-client/-/gitter-redis-sentinel-client-0.3.0.tgz",
+          "from": "gitter-redis-sentinel-client@>=0.3.0 <0.4.0",
           "resolved": "http://beta-internal:4873/gitter-redis-sentinel-client/-/gitter-redis-sentinel-client-0.3.0.tgz",
           "dependencies": {
             "debug": {
               "version": "0.8.1",
-              "from": "http://beta-internal:4873/debug/-/debug-0.8.1.tgz",
+              "from": "debug@>=0.8.0 <0.9.0",
               "resolved": "http://beta-internal:4873/debug/-/debug-0.8.1.tgz"
             }
           }
         },
         "nconf": {
           "version": "0.6.9",
-          "from": "http://beta-internal:4873/nconf/-/nconf-0.6.9.tgz",
+          "from": "nconf@>=0.6.9 <0.7.0",
           "resolved": "http://beta-internal:4873/nconf/-/nconf-0.6.9.tgz",
           "dependencies": {
             "async": {
               "version": "0.2.9",
-              "from": "http://beta-internal:4873/async/-/async-0.2.9.tgz",
+              "from": "async@0.2.9",
               "resolved": "http://beta-internal:4873/async/-/async-0.2.9.tgz"
             },
             "ini": {
               "version": "1.3.4",
-              "from": "http://beta-internal:4873/ini/-/ini-1.3.4.tgz",
+              "from": "ini@>=1.0.0 <2.0.0",
               "resolved": "http://beta-internal:4873/ini/-/ini-1.3.4.tgz"
             },
             "optimist": {
               "version": "0.6.0",
-              "from": "http://beta-internal:4873/optimist/-/optimist-0.6.0.tgz",
+              "from": "optimist@0.6.0",
               "resolved": "http://beta-internal:4873/optimist/-/optimist-0.6.0.tgz",
               "dependencies": {
                 "wordwrap": {
                   "version": "0.0.3",
-                  "from": "http://beta-internal:4873/wordwrap/-/wordwrap-0.0.3.tgz",
+                  "from": "wordwrap@>=0.0.2 <0.1.0",
                   "resolved": "http://beta-internal:4873/wordwrap/-/wordwrap-0.0.3.tgz"
                 },
                 "minimist": {
                   "version": "0.0.10",
-                  "from": "http://beta-internal:4873/minimist/-/minimist-0.0.10.tgz",
+                  "from": "minimist@>=0.0.1 <0.1.0",
                   "resolved": "http://beta-internal:4873/minimist/-/minimist-0.0.10.tgz"
                 }
               }
@@ -1252,49 +1252,49 @@
         },
         "node-statsd": {
           "version": "0.1.1",
-          "from": "http://beta-internal:4873/node-statsd/-/node-statsd-0.1.1.tgz",
+          "from": "node-statsd@>=0.1.1 <0.2.0",
           "resolved": "http://beta-internal:4873/node-statsd/-/node-statsd-0.1.1.tgz"
         },
         "raven": {
           "version": "0.6.3",
-          "from": "http://beta-internal:4873/raven/-/raven-0.6.3.tgz",
+          "from": "raven@>=0.6.3 <0.7.0",
           "resolved": "http://beta-internal:4873/raven/-/raven-0.6.3.tgz",
           "dependencies": {
             "node-uuid": {
               "version": "1.4.3",
-              "from": "http://beta-internal:4873/node-uuid/-/node-uuid-1.4.3.tgz",
+              "from": "node-uuid@>=1.4.1 <1.5.0",
               "resolved": "http://beta-internal:4873/node-uuid/-/node-uuid-1.4.3.tgz"
             },
             "stack-trace": {
               "version": "0.0.7",
-              "from": "http://beta-internal:4873/stack-trace/-/stack-trace-0.0.7.tgz",
+              "from": "stack-trace@0.0.7",
               "resolved": "http://beta-internal:4873/stack-trace/-/stack-trace-0.0.7.tgz"
             },
             "lsmod": {
               "version": "0.0.3",
-              "from": "http://beta-internal:4873/lsmod/-/lsmod-0.0.3.tgz",
+              "from": "lsmod@>=0.0.3 <0.1.0",
               "resolved": "http://beta-internal:4873/lsmod/-/lsmod-0.0.3.tgz"
             },
             "cookie": {
               "version": "0.1.0",
-              "from": "http://beta-internal:4873/cookie/-/cookie-0.1.0.tgz",
+              "from": "cookie@0.1.0",
               "resolved": "http://beta-internal:4873/cookie/-/cookie-0.1.0.tgz"
             }
           }
         },
         "redis": {
           "version": "0.10.3",
-          "from": "http://beta-internal:4873/redis/-/redis-0.10.3.tgz",
+          "from": "redis@>=0.10.1 <0.11.0",
           "resolved": "http://beta-internal:4873/redis/-/redis-0.10.3.tgz"
         },
         "universal-analytics": {
           "version": "0.3.9",
-          "from": "http://beta-internal:4873/universal-analytics/-/universal-analytics-0.3.9.tgz",
+          "from": "universal-analytics@>=0.3.4 <0.4.0",
           "resolved": "http://beta-internal:4873/universal-analytics/-/universal-analytics-0.3.9.tgz",
           "dependencies": {
             "async": {
               "version": "0.2.10",
-              "from": "http://beta-internal:4873/async/-/async-0.2.10.tgz",
+              "from": "async@>=0.2.0 <0.3.0",
               "resolved": "http://beta-internal:4873/async/-/async-0.2.10.tgz"
             }
           }

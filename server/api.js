@@ -28,7 +28,7 @@ require('./web/passport').installApi();
 
 require('./event-listeners').install();
 
-require('./services/kue-workers').startWorkers();
+require('./workers').listen();
 
 app.use('/', require('./api/'));
 

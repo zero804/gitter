@@ -57,6 +57,8 @@ exports.sendUserNotification = function(userId, notification) {
 };
 
 exports.sendUsersBadgeUpdates = function(userIds) {
+  debug('Sending push notifications to %s users', userIds.length);
+
   if(!Array.isArray(userIds)) userIds = [userIds];
 
   return pushNotificationService.findEnabledDevicesForUsers(userIds)

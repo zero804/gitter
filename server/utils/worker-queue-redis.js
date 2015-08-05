@@ -1,49 +1,128 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var redis = require('./redis');
-var resque = require("node-resque");
 var env = require('gitter-web-env');
 var logger = env.logger;
-var debug = require('debug')('gitter:worker-queue');
 var stats = env.stats;
+
+var resque = require("node-resque");
+var debug = require('debug')('gitter:worker-queue');
+var shutdown = require('shutdown');
+var Promise = require('bluebird');
 var os = require('os');
 
-var connectionDetails = {
-  redis: redis.createClient()
-};
+/* Singleton scheduler for the process, lazy loaded */
+var scheduler;
 
-// scheduler is responbsible for scheduling delayed jobs and giving them to the workers.
-var scheduler = new resque.scheduler({connection: connectionDetails}, function() {});
-
-scheduler.on('start', function() {
-  debug('scheduler started');
-});
-
-scheduler.on('error', function(err) {
-  logger.error('worker-queue-redis: scheduler failed: ' + err, { exception: err });
-  stats.event('resque.scheduler.error');
-});
-
-var jobs = {
-  echo: {
-    perform: function(data, callback) {
-      callback(null, data);
+function createScheduler() {
+  debug('Creating scheduler');
+  // scheduler is responbsible for scheduling delayed jobs and giving them to the workers.
+  var scheduler = new resque.scheduler({
+    connection: {
+      redis: env.redis.getClient()
     }
-  }
-};
+  }, function() {
+    debug('Scheduler ready');
+  });
+
+  scheduler.on('start', function() {
+    debug('Scheduler started');
+  });
+
+  scheduler.on('error', function(err) {
+    logger.error('worker-queue-redis: scheduler failed: ' + err, { exception: err });
+    stats.event('resque.scheduler.error');
+  });
+
+  shutdown.addHandler('worker-queue-scheduler', 90, function(callback) {
+    debug('Shutting down scheduler');
+    if(!scheduler.running) return callback();
+    scheduler.end(callback);
+  });
+
+  return scheduler;
+}
 
 var uniqueWorkerCounter = 0;
 
 var Queue = function(name, options, loaderFn) {
   this.name = name;
-  this.fn = loaderFn();
-
+  this.loaderFn = loaderFn;
   var self = this;
 
+  this.queueReady = Promise.fromNode(function(callback) {
+    self.internalQueue = new resque.queue({
+        connection: { redis: env.redis.getClient() }
+      },
+      {}, // Jobs not defined on queue, only worker
+      callback);
+  }).then(function() {
+    debug('Queue %s ready to receive messages', name);
+    return self.internalQueue;
+  });
+
+};
+
+Queue.prototype.invoke = function(data, options, callback) {
+  if(arguments.length == 2 && typeof options == 'function') {
+    callback = options;
+    options = {};
+  }
+
+  var self = this;
+  // Don't send messages until the queue is ready for them
+  return this.queueReady
+    .then(function(queue) {
+      return Promise.fromNode(function(callback) {
+        debug('Queueing job for invocation on %s', self.name);
+
+        var delay = options && options.delay || 0;
+
+        if (!delay) {
+          queue.enqueue(self.name, 'invoke', data, callback);
+        } else {
+          queue.enqueueIn(delay, self.name, 'invoke', data, callback);
+        }
+      });
+    })
+    .then(function() {
+      debug('Job queued successfully on %s: data %j', self.name, data);
+    })
+    .nodeify(callback);
+};
+
+Queue.prototype.destroy = function() {
+  if (this.worker) {
+    this.worker.end();
+  }
+};
+
+Queue.prototype.listen = function() {
+  debug('Starting worker on queue %s', this.name);
+
+  if (this.worker) {
+    this.worker.start();
+    return;
+  }
+
+  this.worker = this.createWorker();
+};
+
+Queue.prototype.createWorker = function() {
+  debug('Creating worker %s', this.name);
+
+  /* Start the singleton scheduler */
+  if (!scheduler) {
+    scheduler = createScheduler();
+  }
+
   uniqueWorkerCounter++;
+
+  var self = this;
   var workerOpts = {
-    connection: connectionDetails,
+    connection: {
+      redis: env.redis.getClient()
+    },
     timeout: 100,
     /*
      * "If you plan to run more than one worker per nodejs process,
@@ -53,86 +132,93 @@ var Queue = function(name, options, loaderFn) {
      * from https://github.com/taskrabbit/node-resque#notes
      */
     name: os.hostname() + ":" + process.pid + "+" + uniqueWorkerCounter,
-    queues: [name]
+    queues: [this.name]
   };
-  this.worker = new resque.worker(workerOpts, jobs, function() {
+
+  var workerFn = this.loaderFn();
+
+  var jobs = {
+    // TODO: remove 'echo' this by 1 September 2015
+    echo: {
+      perform: function(data, callback) {
+        debug('Invoking echo');
+        workerFn(data, callback);
+      }
+    },
+    invoke: {
+      perform: function(data, callback) {
+        debug('Invoking working invocation');
+        workerFn(data, callback);
+      }
+    }
+  };
+
+  var worker = new resque.worker(workerOpts, jobs, function() {
     if(scheduler.running) {
-      self.worker.workerCleanup();
-      self.worker.start();
+      debug('Starting worker %s immediately', self.name);
+      worker.workerCleanup();
+      worker.start();
     } else {
+      debug('Deferring start until scheduler is ready');
       scheduler.once('start', function() {
-        self.worker.workerCleanup();
-        self.worker.start();
+        debug('Starting worker %s', self.name);
+        worker.workerCleanup();
+        worker.start();
       });
     }
   });
 
-  this.internalQueue = new resque.queue({ connection: connectionDetails }, jobs, function() {
-    // ready to add to queue
+  shutdown.addHandler('worker-queue-worker', 100, function(callback) {
+    debug('Shutting down worker %s', self.name);
+    worker.end(callback);
   });
 
-  this.worker.on('start', function() {
-    debug('started %s', self.name);
+  worker.on('start', function() {
+    debug('Started worker %s', self.name);
     stats.event('resque.worker.started');
   });
 
-  this.worker.on('end', function() {
-    debug('ended %s', self.name);
+  worker.on('end', function() {
+    debug('Ended worker %s', self.name);
     stats.event('resque.worker.ended');
   });
 
-  this.worker.on('cleaning_worker', function(worker) {
-    debug('cleaning old worker %s', worker);
+  worker.on('cleaning_worker', function(worker) {
+    debug('Cleaning old worker %s', worker);
     stats.event('resque.worker.cleaning');
   });
-
-  // this.worker.on('poll', function() {
+  //
+  // worker.on('poll', function() {
+  //   debug('poll');
   //   stats.eventHF('resque.worker.polling', 1, 0.005);
   // });
 
-  this.worker.on('job', function(queue) {
-    debug("job: %s", queue);
+  worker.on('job', function(queue) {
+    debug("Job: %s", queue);
     stats.eventHF('resque.worker.working');
   });
 
-  this.worker.on('reEnqueue', function(queue/*, job, plugin*/) {
-    debug("reenqueue job on queue %s", queue);
+  worker.on('reEnqueue', function(queue/*, job, plugin*/) {
+    debug("Reenqueue job on queue %s", queue);
     stats.event('resque.worker.reenqueue');
   });
 
-  // this.worker.on('pause', function() {
+  // worker.on('pause', function() {
+  //   debug('pause');
   //   stats.eventHF('resque.worker.paused', 1, 0.005);
   // });
 
-  this.worker.on('success', function(queue, job, result) {
-    debug("success");
-    self.fn(result, function(err) {
-      if(err) return logger.error('worker-queue-redis: callback failed: ' + err, { queue: queue, job: job, exception: err });
-    });
+  worker.on('success', function(queue, job) {
+    debug("success for job %s on queue %s", job, queue);
     stats.eventHF('resque.worker.success');
   });
 
-  this.worker.on('error', function(queue, job, err) {
+  worker.on('error', function(queue, job, err) {
     logger.error('worker-queue-redis: failed: ' + err, { queue: queue, job: job, exception: err });
     stats.event('resque.worker.error');
   });
-};
 
-Queue.prototype.invoke = function(data, options, callback) {
-  if(arguments.length == 2 && typeof options == 'function') {
-    callback = options;
-    options = {};
-  }
-
-  var delay = options && options.delay || 0;
-
-  this.internalQueue.enqueueIn(delay, this.name, 'echo', data);
-
-  if(callback) callback();
-};
-
-Queue.prototype.destroy = function() {
-  this.worker.end();
+  return worker;
 };
 
 module.exports = {
@@ -140,10 +226,16 @@ module.exports = {
     if(!options) options = {};
     return new Queue(name, options, loaderFn);
   },
+
   startScheduler: function() {
+    if (!scheduler) {
+      scheduler = createScheduler();
+    }
     scheduler.start();
   },
+
   stopScheduler: function(callback) {
+    if (!scheduler) return callback();
     scheduler.end(callback);
   }
 };

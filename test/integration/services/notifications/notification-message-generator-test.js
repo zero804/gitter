@@ -54,7 +54,7 @@ describe('notification-message-generator', function() {
       { id: '00002', text: 'Why is your name so long?', fromUser: { displayName: 'Andrew Newdigate' } }
     ]);
 
-    assert.equal(message, 'gitterHQ/gitter-webapp  \nMahershalalhashbaz: Hey I ju…  \nAndrew: Why is your name so…');
+    assert.equal(message, 'gitterHQ/gitter-webapp  \nMahershalalhashbaz: Hey I just wanted to run by…  \nAndrew: Why is your name so long?');
   });
 
 
@@ -74,8 +74,6 @@ describe('notification-message-generator', function() {
       { id: '00014', text: 'Hey how are you?', fromUser: { displayName: 'Andrew Newdigate' } } ,
       { id: '00015', text: 'Hey how are you?', fromUser: { displayName: 'Andrew Newdigate' } }
     ]);
-    console.dir(message);
-    console.dir('gitterHQ/gitter-webapp  \nMike: Yo  \nAndrew: Hey how are you?');
     assert.equal(message, 'gitterHQ/gitter-webapp  \nMike: Yo  \nAndrew: Hey how are you?  \nAndrew: Hey how are you?');
   });
 

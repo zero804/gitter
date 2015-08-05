@@ -1,10 +1,13 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var appEvents   = require('gitter-web-appevents');
 var roomService = require('../services/room-service');
 
+var installed = false;
 exports.install = function() {
+  if (installed) return;
+  installed = true;
+
   appEvents.onRepoPermissionsChangeDetected(function(data) {
     var uri = data.uri;
     var isPrivate = data.isPrivate;

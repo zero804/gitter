@@ -23,12 +23,11 @@ Mike Bartlett:
 Mike: hey how are you?
 Mike: blah?
 Mike: ?
-
-
 */
 
-var MAX_LINE_LENGTH = 30;
-var MAX_NOTIFICATION_TEXT = 90;
+var MAX_LINE_LENGTH = 50;
+var MAX_NOTIFICATION_TEXT = 1024;
+var MAX_LINES = 3;
 
 var ent = require('ent');
 
@@ -67,6 +66,7 @@ function summarizeChatsInRoom(troupe, chats, options) {
   var appendText = options && options.appendText;
   var maxLineLength = options && options.maxLineLength || MAX_LINE_LENGTH;
   var maxMessageLength = options && options.maxMessageLength || MAX_NOTIFICATION_TEXT;
+  var maxNumberOfLines = options && options.maxLines || MAX_LINES;
 
   var maxLength = maxMessageLength - (appendText ? appendText.length : 0);
 
@@ -74,7 +74,8 @@ function summarizeChatsInRoom(troupe, chats, options) {
   // Generate notification text
   //
   var notificationText = getHeaderLine(troupe);
-  for(var i = 0; i < chats.length; i++) {
+  var lineCount = 1;
+  for(var i = 0; i < chats.length && lineCount <= maxNumberOfLines; i++) {
     var nextLine = getChatLine(troupe, chats[i]);
     if (!nextLine) continue;
 
@@ -84,6 +85,7 @@ function summarizeChatsInRoom(troupe, chats, options) {
     var lineWithNext = notificationText ? notificationText + '  \n' + nextLine : nextLine;
     if(lineWithNext.length <= maxLength) {
       notificationText = lineWithNext;
+      lineCount++;
     } else {
       break;
     }

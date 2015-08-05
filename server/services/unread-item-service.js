@@ -14,27 +14,14 @@ var mongoUtils       = require('../utils/mongo-utils');
 var RedisBatcher     = require('../utils/redis-batcher').RedisBatcher;
 var collections      = require('../utils/collections');
 var Q                = require('q');
-var badgeBatcher     = new RedisBatcher('badge', 300);
 var roomMembershipService = require('./room-membership-service');
 var uniqueIds        = require('mongodb-unique-ids');
 var debug            = require('debug')('gitter:unread-item-service');
 
-var sendBadgeUpdates = true;
-engine.on('badge.update', function(userId) {
-  if (!sendBadgeUpdates) return;
-  badgeBatcher.add('queue', userId);
-});
+var badgeBatcher     = new RedisBatcher('badge', 1000, batchBadgeUpdates);
 
-function sinceFilter(since) {
-  return function(id) {
-    var date = mongoUtils.getDateFromObjectId(id);
-    return date.getTime() >= since;
-  };
-
-}
-
-// TODO: move this into a listener....
-badgeBatcher.listen(function(key, userIds, done) {
+/* Handles batching badge updates to users */
+function batchBadgeUpdates(key, userIds, done) {
   // Remove duplicates
   userIds = uniqueIds(userIds);
 
@@ -44,7 +31,15 @@ badgeBatcher.listen(function(key, userIds, done) {
   });
 
   done();
-});
+}
+
+function sinceFilter(since) {
+  return function(id) {
+    var date = mongoUtils.getDateFromObjectId(id);
+    return date.getTime() >= since;
+  };
+
+}
 
 function reject(msg) {
   logger.error(msg);
@@ -104,7 +99,7 @@ function ensureAllItemsRead(userId, troupeId) {
   if(!troupeId) return reject("ensureAllItemsRead failed. troupeId required");
 
   return engine.ensureAllItemsRead(userId, troupeId)
-    .then(function() {
+    .then(function(result) {
 
       // Notify the user
       appEvents.troupeUnreadCountsChange({
@@ -113,6 +108,10 @@ function ensureAllItemsRead(userId, troupeId) {
         total: 0,
         mentions: 0
       });
+
+      if (result.badgeUpdate) {
+        queueBadgeUpdateForUser(userId);
+      }
 
     });
 }
@@ -151,6 +150,11 @@ exports.markItemsRead = function(userId, troupeId, itemIds, options) {
           total: result.unreadCount,
           mentions: result.mentionCount
         });
+      }
+
+      /* Do we need to send the user a badge update? */
+      if (result.badgeUpdate) {
+        queueBadgeUpdateForUser(userId);
       }
 
       var recordAsRead = !options || options.recordAsRead === undefined ? true : options.recordAsRead;
@@ -411,18 +415,30 @@ function processResultsForNewItemWithMentions(troupeId, chatId, parsed, results,
       var pushCandidates = [];
       var pushCandidatesWithMention = [];
 
-
       var newUnreadItemNoMention = { chat: [chatId] };
       var newUnreadItemWithMention = { chat: [chatId], mention: [chatId] };
 
+      var badgeUpdateUserIds = [];
+
       // Next, notify all the users with unread count changes
       parsed.notifyUserIds.forEach(function(userId) {
-        var userResult = results[userId];
 
         var onlineStatus = presenceStatus[userId];
-        var unreadCount = userResult && userResult.unreadCount;
-        var mentionCount = userResult && userResult.mentionCount;
         var hasMention = mentionsHash[userId];
+
+        var userResult = results[userId];
+
+        var unreadCount;
+        var mentionCount;
+
+        if (userResult) {
+          unreadCount = userResult.unreadCount;
+          mentionCount = userResult.mentionCount;
+
+          if (userResult.badgeUpdate && onlineStatus) { /* online status null implies the user has no push notification devices */
+            badgeUpdateUserIds.push(userId);
+          }
+        }
 
         /* We need to do this for all users as it's used for mobile notifications */
         switch(onlineStatus) {
@@ -494,6 +510,11 @@ function processResultsForNewItemWithMentions(troupeId, chatId, parsed, results,
         }
       }
 
+      /* Do we need to send the user a badge update? */
+      if (badgeUpdateUserIds.length) {
+        queueBadgeUpdateForUser(badgeUpdateUserIds);
+      }
+
       debug("distribution of chat notification to users completed");
 
     });
@@ -538,7 +559,6 @@ function generateMentionDeltaSet(parsedChat, originalMentions) {
 
   var mentionUserIds = parsedChat.mentionUserIds.map(toString);
 
-
   var addMentions = _.without.apply(null, [mentionUserIds].concat(originalMentionUserIds));
   var removeMentions = _.without.apply(null, [originalMentionUserIds].concat(mentionUserIds));
 
@@ -571,6 +591,11 @@ function removeMentionsForUpdatedChat(troupeId, chatId, removeUserIds) {
             mentions: result.mentionCount
           });
         }
+
+        if (result.badgeUpdate) {
+          queueBadgeUpdateForUser(result.userId);
+        }
+
       });
     });
 }
@@ -598,6 +623,18 @@ function updateChatUnreadItems(fromUserId, troupe, chat, originalMentions) {
     });
 }
 exports.updateChatUnreadItems = updateChatUnreadItems;
+
+var sendBadgeUpdates = true;
+function queueBadgeUpdateForUser(userIds) {
+  if (!sendBadgeUpdates) return;
+  var len = Array.isArray(userIds) ? userIds.length : 1;
+  debug("Batching badge update for %s users", len);
+  badgeBatcher.add('queue', userIds);
+}
+
+exports.listen = function() {
+  badgeBatcher.listen();
+};
 
 exports.testOnly = {
   setSendBadgeUpdates: function(value) {
