@@ -83,12 +83,12 @@ button, .btn {
   border-radius: 6px;
   border: 1px solid transparent;
 
-  &:hover {
+  &:hover, &:focus {
     transition: border 0.3s;
     border: 1px solid #EEE;
   }
 
-  &:hover &__footer-content {
+  &:hover &__footer-content, &:focus &__footer-content {
     transition: opacity 0.3s;
     opacity: 1;
   }
@@ -206,4 +206,20 @@ button, .btn {
     opacity: 0;
   }
 
+}
+
+// JP 5/8/15
+//Filthy hack to get keyboard navigation working
+//see room_card.hbs for more details
+.room-card__hidden-link {
+  width: 100%;
+  height: 1px;
+  opacity: 0;
+}
+
+.room-card__hidden-link:focus + .room-card__footer {
+  & .room-card__footer-content {
+    transition: opacity 0.3s;
+    opacity: 1;
+  }
 }

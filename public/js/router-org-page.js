@@ -11,14 +11,10 @@ onReady(function(){
 
   require('components/link-handler').installLinkHandler();
 
-  appEvents.on('navigation', function(url, type, title) {
-    if(frameUtils.hasParentFrameSameOrigin()) {
-      frameUtils.postMessage({ type: "navigation", url: url, urlType: type, title: title});
-    } else {
-      // No pushState here. Open the link directly
-      // Remember that (window.parent === window) when there is no parent frame
-      window.parent.location.href = url;
-    }
+  //We are always within an iFrame to we can
+  //change the parent url with NO FEAR!
+  appEvents.on('navigation', function(url) {
+    window.parent.location.assign(url);
   });
 
   var Router = Backbone.Router.extend({
