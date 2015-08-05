@@ -38,9 +38,15 @@
         </a>
       {{/if}}
 
-      <a class="btn secondary" href="/{{ uri }}?source=orgpage" target="_parent">
-        Join Room
-      </a>
+      {{#if isLoggedIn}}
+        <a class="btn secondary" href="/{{ uri }}?source=orgpage" target="_parent">
+          Join Room
+        </a>
+      {{else}}
+        <a class="btn secondary" href="/{{ uri }}?source=orgpage" target="_parent">
+          View Room
+        </a>
+      {{/if}}
     </div>
   </footer>
 </div>
