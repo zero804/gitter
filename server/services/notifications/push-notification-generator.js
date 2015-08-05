@@ -7,6 +7,9 @@ var notificationMessageGenerator = require('./notification-message-generator');
 var unreadItemService            = require('../unread-item-service');
 var debug                        = require('debug')('gitter:push-notification-generator');
 var Q                            = require('q');
+var _                            = require('lodash');
+
+var MAX_MESSAGES_FOR_NOTIFICATION = 3;
 
 function serializeItems(troupeId, recipientUserId, chatIds) {
   var troupeStrategy = new serializer.TroupeIdStrategy({ recipientUserId: recipientUserId });
@@ -18,18 +21,54 @@ function serializeItems(troupeId, recipientUserId, chatIds) {
   ]);
 }
 
+/**
+ * Given a set of unread items and mentions, return `n` items
+ * which will be presented to the user in the push notification
+ */
+function selectChatsForNotification(unreadItems, mentions) {
+  // Trivial case: there are three or less unread items, send them immediately
+  if (unreadItems.length <= MAX_MESSAGES_FOR_NOTIFICATION) return unreadItems;
+
+  unreadItems.sort(); // Default sorting works fine with mongoids
+
+  // Simple case: there are no mentions. Just send the first three unread items
+  if (!mentions.length) {
+    return unreadItems.slice(0, MAX_MESSAGES_FOR_NOTIFICATION);
+  }
+
+  // Mentions case: get the first mention and then get the two closest unread items
+  // to that mention (ie, the two before, the two around or the two after)
+  var firstMention = _.min(mentions);
+  var indexOfFirstMention = unreadItems.indexOf(firstMention);
+  if (indexOfFirstMention <= 0) {
+    /* This should never happen. Things are broken. Failback */
+    return unreadItems.slice(0, MAX_MESSAGES_FOR_NOTIFICATION);
+  }
+
+  if (indexOfFirstMention === (unreadItems.length - 1)) {
+    /* Mention is the last message */
+    return unreadItems.slice(-MAX_MESSAGES_FOR_NOTIFICATION);
+  }
+
+  return unreadItems
+    .slice(indexOfFirstMention - Math.floor(MAX_MESSAGES_FOR_NOTIFICATION/2))
+    .slice(0, MAX_MESSAGES_FOR_NOTIFICATION);
+}
+
 function notifyUserOfActivitySince(userId, troupeId, since, notificationNumber) {
   debug('notifyUserOfActivitySince userId=%s, troupeId=%s, since=%s, notificationNumber=%s', userId, troupeId, since, notificationNumber);
 
   return unreadItemService.getUnreadItemsForUserTroupeSince(userId, troupeId, since)
-    .then(function(unreadItems) {
-
-      if (!unreadItems.chat || !unreadItems.chat.length) {
+    .spread(function(unreadItems, mentions) {
+      // mentions should always be a subset of unreadItems
+      if (!unreadItems.length) {
         debug('User %s has no unread items since %s in troupeId=%s', userId, since, troupeId);
         return;
       }
 
-      return serializeItems(troupeId, userId, unreadItems.chat)
+      var chatIdsForNotification = selectChatsForNotification(unreadItems, mentions);
+
+      return serializeItems(troupeId, userId, chatIdsForNotification)
         .spread(function(troupe, chats) {
           if (!troupe || !chats || !chats.length) return;
 
@@ -69,3 +108,6 @@ function sendUserTroupeNotification(userId, troupeId, notificationNumber, userNo
 }
 
 module.exports.sendUserTroupeNotification = sendUserTroupeNotification;
+module.exports.testOnly = {
+  selectChatsForNotification: selectChatsForNotification
+}

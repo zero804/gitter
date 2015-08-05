@@ -29,7 +29,7 @@ var userServiceStub = {
 
 var unreadItemServiceStub = {
   getUnreadItemsForUserTroupeSince: function(x, y, z) {
-    return Q.resolve({ 'chat': ['chat1234567890'] });
+    return Q.resolve([['chat1234567890'], []]);
   }
 };
 
@@ -100,6 +100,35 @@ describe('push notification generator service', function() {
 
     return service.sendUserTroupeNotification('userId1234', '1234567890', 1)
       .nodeify(done);
+  });
+
+  describe('selectChatsForNotification', function() {
+    var service;
+
+    before(function() {
+      service = testRequire('./services/notifications/push-notification-generator');
+    });
+
+    it('should select the first two messages when there are two messages', function() {
+      assert.deepEqual(service.testOnly.selectChatsForNotification(['1', '2'], []), ['1', '2']);
+    });
+
+    it('should select the first three messages when there are four messages', function() {
+      assert.deepEqual(service.testOnly.selectChatsForNotification(['1', '2', '3', '4'], []), ['1', '2', '3']);
+    });
+
+    it('should select the first three messages when the first message is a mention', function() {
+      assert.deepEqual(service.testOnly.selectChatsForNotification(['1', '2', '3', '4', '5'], ['1']), ['1', '2', '3']);
+    });
+
+    it('should select the last three messages when the last message is a mention', function() {
+      assert.deepEqual(service.testOnly.selectChatsForNotification(['1', '2', '3', '4', '5'], ['5']), ['3', '4', '5']);
+    });
+
+    it('should select the two closest messages when the mention is in the middle', function() {
+      assert.deepEqual(service.testOnly.selectChatsForNotification(['1', '2', '3', '4', '5'], ['3']), ['2', '3', '4']);
+    });
+
   });
 
 });

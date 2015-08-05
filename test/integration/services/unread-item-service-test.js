@@ -36,11 +36,12 @@ function deep(object) {
 Q.longStackSupport = true;
 
 describe('unread-item-service', function() {
-  var unreadItemService;
+  var unreadItemService, mongoUtils;
 
   before(function() {
     /* Don't send batches out */
     unreadItemService = testRequire("./services/unread-item-service");
+    mongoUtils = testRequire('./utils/mongo-utils');
     unreadItemService.testOnly.setSendBadgeUpdates(false);
   });
 
@@ -68,13 +69,24 @@ describe('unread-item-service', function() {
   });
 
   describe('since-filter', function() {
-    it('should do what it says on the tin', function() {
-      var underTest = unreadItemService.testOnly.sinceFilter;
-      var ids = ['51adc86e010285b469000005'];
-      var since = 1370343534500;
 
-      var filters = ids.filter(underTest(since));
-      assert.equal(filters.length, 0);
+    it('should do what it says on the tin', function() {
+      var d1 = new Date('2012-01-01T00:00:00Z').valueOf();
+      var d2 = new Date('2013-01-01T00:00:00Z').valueOf();
+      var d3 = new Date('2014-01-01T00:00:00Z').valueOf();
+      var d4 = new Date('2015-01-01T00:00:00Z').valueOf();
+
+      var o1 = mongoUtils.createIdForTimestamp(d1);
+      var o2 = mongoUtils.createIdForTimestamp(d2);
+      var o3 = mongoUtils.createIdForTimestamp(d3);
+      var underTest = unreadItemService.testOnly.sinceFilter;
+
+      var ids = [o1.toString(), o2.toString(), o3.toString()];
+
+      assert.deepEqual(ids.filter(underTest(d1)), [o1.toString(), o2.toString(), o3.toString()]);
+      assert.deepEqual(ids.filter(underTest(d2)), [o2.toString(), o3.toString()]);
+      assert.deepEqual(ids.filter(underTest(d3)), [o3.toString()]);
+      assert.deepEqual(ids.filter(underTest(d4)), []);
     });
   });
 

@@ -2,9 +2,9 @@
 'use strict';
 
 var oauthService = require('../../services/oauth-service');
+var debug = require('debug')('gitter:configure-csrf');
 var env = require('gitter-web-env');
 var stats = env.stats;
-var logger = env.logger;
 
 function setAccessToken(req, userId, accessToken) {
   if(req.session) {
@@ -25,7 +25,7 @@ module.exports = function(req, res, next) {
 
   function generateAccessToken() {
     if(req.user) {
-      logger.verbose('csrf: Using web token');
+      debug('csrf: Using web token');
       stats.eventHF('token.authenticated.web');
 
       return oauthService.findOrGenerateWebToken(req.user.id)
@@ -34,7 +34,7 @@ module.exports = function(req, res, next) {
         });
     }
 
-    logger.verbose('csrf: Generating new anonymous token');
+    debug('csrf: Generating new anonymous token');
     stats.eventHF('token.anonymous.generate');
 
     /* Generate an anonymous token */
@@ -48,7 +48,7 @@ module.exports = function(req, res, next) {
    * so that all related web-requests are made by the same client
    */
   if(req.authInfo && req.authInfo.accessToken) {
-    logger.verbose('csrf: Using OAuth access token');
+    debug('csrf: Using OAuth access token');
     setAccessToken(req, userId, req.authInfo.accessToken);
     return next();
   }
@@ -63,7 +63,7 @@ module.exports = function(req, res, next) {
         req.accessToken = sessionAccessToken;
       })
       .catch(function(err) {
-        logger.verbose('csrf: OAuth access token validation failed', { exception: err });
+        debug('csrf: OAuth access token validation failed: %j', err);
         return generateAccessToken();
       })
       .nodeify(next);

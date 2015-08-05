@@ -27,6 +27,8 @@ var queue = workerQueue.queue('generate-push-notifications', {}, function() {
     var troupeId = data.troupeId;
     var notificationNumber = data.notificationNumber;
 
+    debug('Spooling push notification for %s in %s, #%s', userId, troupeId, notificationNumber);
+
     if (!userId || !troupeId || !notificationNumber) return done();
 
     return pushNotificationGenerator.sendUserTroupeNotification(userId, troupeId, notificationNumber)
