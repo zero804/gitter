@@ -21,6 +21,12 @@
           {{org.description}}
         </div>
       </div>
+
+      {{#unless isLoggedIn}}
+        <div class="org-page__login">
+          Are you a member of {{ org.login }}?  <a class="btn secondary" href="/login/github?action=login&source=orgpage" target="_parent">Login</a>
+        </div>
+      {{/unless}}
     </div>
 
     <div class="org-page__details">
@@ -33,7 +39,7 @@
       {{/if}}
 
       {{#if org.blog}}
-        <div class="org-page__detail"><i class="octicon octicon-link"></i><a href="{{org.blog}}" target="_parent"> {{org.blog}}</a></div>
+        <div class="org-page__detail"><i class="octicon octicon-link"></i><a href="{{org.blog}}" target="_blank"> {{org.blog}}</a></div>
       {{/if}}
     </div>
   </header>
