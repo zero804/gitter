@@ -20,6 +20,8 @@ function renderOrgPageInFrame(req, res, next) {
     uri: 'orgs/' + req.params.orgName + '/rooms'
   };
 
+  if (req.isPhone) return renderOrgPage(req, res, next);
+
   appRender.renderMainFrame(req, res, next, 'iframe');
 }
 
