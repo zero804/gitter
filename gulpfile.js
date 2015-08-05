@@ -113,14 +113,14 @@ gulp.task('validate', ['validate-config', 'validate-client-source', 'validate-se
 
 makeTestTasks('test-mocha', function(name, files) {
   mkdirp.sync('output/test-reports/');
-  mkdirp.sync('output/coverage-reports/');
+  mkdirp.sync('output/coverage-reports/' + name);
 
   return gulp.src(files, { read: false })
     .pipe(mocha({
       reporter: 'xunit-file',
       timeout: 10000,
       istanbul: {
-        dir: 'output/coverage-reports/'
+        dir: 'output/coverage-reports/' + name
       },
       env: {
         TAP_FILE: 'output/test-reports/' + name + '.tap',
@@ -145,7 +145,8 @@ makeTestTasks('localtest', function(name, files) {
       env: {
         SKIP_BADGER_TESTS: 1,
         DISABLE_CONSOLE_LOGGING: 1,
-        Q_DEBUG: 1
+        Q_DEBUG: 1,
+        BLUEBIRD_DEBUG: 1
       }
     }));
 });
@@ -169,18 +170,22 @@ gulp.task('clean:coverage', function (cb) {
   ], cb);
 });
 
-gulp.task('localtest-coverage', ['clean:coverage'], function() {
-  return gulp.src(['./test/integration/**/*.js', './test/public-js/**/*.js'], { read: false })
+makeTestTasks('localtest-coverage', function(name, files) {
+  mkdirp.sync('output/test-reports/');
+  mkdirp.sync('output/coverage-reports/' + name);
+
+  return gulp.src(files, { read: false })
     .pipe(mocha({
       reporter: 'spec',
       timeout: 10000,
       istanbul: {
-        dir: 'output/coverage-reports/'
+        dir: 'output/coverage-reports/' + name
       },
       env: {
         SKIP_BADGER_TESTS: 1,
         DISABLE_CONSOLE_LOGGING: 1,
-        Q_DEBUG: 1
+        Q_DEBUG: 1,
+        BLUEBIRD_DEBUG: 1
       }
     }));
 });
