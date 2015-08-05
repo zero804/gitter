@@ -157,3 +157,7 @@ exports.listen = function() {
   batcherLegacy.listen();
   batcher.listen();
 };
+
+exports.testOnly = {
+  batchUpdateReadbyBatch: batchUpdateReadbyBatch
+};
