@@ -151,18 +151,15 @@ makeTestTasks('localtest', function(name, files) {
     }));
 });
 
-/**
- * Matcha tests, submitted to datadog
- */
-gulp.task('test-perf-matcha', shell.task([
-  'NODE_ENV=test ./node_modules/.bin/matcha -R csv test/benchmarks/* | node test/submit-benchmarks-to-datadog.js',
-]));
+gulp.task('test-perf-benchmarkjs', shell.task([
+  'for i in test/benchmarks/*.js; do NODE_ENV=test node $i; done',
+], { timeout: 120000 }));
 
-gulp.task('test-perf', ['test-perf-matcha']);
+gulp.task('test-perf', ['test-perf-benchmarkjs']);
 
 gulp.task('benchmark-local', shell.task([
-  './node_modules/.bin/matcha --logging:level error test/benchmarks/*',
-]));
+  'for i in test/benchmarks/*.js; do node $i; done',
+], { timeout: 120000 }));
 
 gulp.task('clean:coverage', function (cb) {
   del([

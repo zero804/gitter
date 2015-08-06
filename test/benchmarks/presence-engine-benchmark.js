@@ -1,11 +1,11 @@
-/*jslint node: true */
-/*global describe:true, it: true, beforeEach:true, afterEach:true */
-"use strict";
+/* jshint node:true, unused:true */
+'use strict';
+
+var makeBenchmark = require('../make-benchmark');
 
 var presenceService = require('gitter-web-presence');
 var _ = require('underscore');
 var assert = require('assert');
-var Q = require("q");
 var Promise = require('bluebird');
 
 var fakeEngine = {
@@ -100,16 +100,13 @@ function doTest(iterations) {
   }, { concurrency: 1 });
 }
 
-suite('presence-engine-benchmark', function() {
-  set('iterations', 20);
-  set('type', 'adaptive');
+function cleanup(done) {
+  return presenceService.collectGarbage(fakeEngine)
+    .nodeify(done);
+}
 
-  function cleanup(done) {
-    return presenceService.collectGarbage(fakeEngine)
-      .nodeify(done);
-  }
-
-  before(function(done) {
+makeBenchmark({
+  before: function(done) {
     var userId = 'TESTUSER1' + Date.now();
     var socketId = 'TESTSOCKET1' + Date.now();
     var troupeId = 'TESTTROUPE1' + Date.now();
@@ -120,13 +117,16 @@ suite('presence-engine-benchmark', function() {
         return cleanup();
       })
       .nodeify(done);
-  });
+  },
 
-  after(cleanup);
+  after: function(done) {
+    cleanup(done);
+  },
 
-  bench('eyeballs-benchmark', function(done) {
-    return doTest(100)
-      .nodeify(done);
-  });
-
+  tests: {
+    'eyeballs-benchmark': function(done) {
+      return doTest(100)
+        .nodeify(done);
+    }
+  }
 });
