@@ -13,7 +13,9 @@
     {{#each hooks}}
     <div class="trpHookItem">
       <form method="post">
+        {{!-- start circa-1996 crappy http hack here --}}
         <input type="hidden" name="_method" value="delete">
+        {{!-- end circa-1996 crappy http hack here --}}
         <input type="hidden" name="accessToken" value="{{../accessToken}}">
         <input type="hidden" name="id" value="{{id}}">
 
