@@ -1,0 +1,72 @@
+<div class="room-card">
+
+  <div class="room-card__body">
+
+    <header class="room-card__header">
+      <a href="/{{ uri }}?source=orgpage" target="_parent" tabindex="-1">
+        <h3>
+          {{#if private}}
+            <i class="octicon octicon-lock"></i>
+          {{/if}}
+          {{ shortName }}
+        </h3>
+        <span class="room-card__usercount">
+          {{userCount}} {{ pluralize userCount 'person' 'people'}}
+        </span>
+      </a>
+    </header>
+
+    <section class='room-card__description'>
+      <small>{{ topic }}</small>
+    </section>
+
+    {{#if users}}
+      <section class='room-card__users'>
+        {{#each users}}
+          <img class="room-card__user-avatar" src="https://avatars.githubusercontent.com/{{ username }}?s=80">
+        {{/each}}
+      </section>
+    {{/if}}
+
+
+    {{#if tags}}
+      <section class='room-card__tags'>
+        {{#each tags}}
+          <div class="room-card__tag">{{this}}</div>
+        {{/each}}
+      </section>
+    {{/if}}
+
+  </div>
+
+  {{!--
+  JP 5/8/15
+  This anchor is placed here with a tab index for keyboard navigation.
+    1, You press tab and the browser focuses on this invisible link
+    2, CSS, using a sibling selector (grim...)  displays the action buttons
+    3, You press enter you go to the room
+  --}}
+  <a href="/{{ uri }}?source=orgpage" tabindex="1" class="room-card__hidden-link">&#8203;</a>
+
+  <footer class="room-card__footer">
+
+    <div class="room-card__footer-content">
+      {{#if canEditTags}}
+        <a class="btn terciary" href="#{{ id }}/tags" target="_parent" tabindex="-1">
+          Edit tags
+        </a>
+      {{/if}}
+
+      {{#if isLoggedIn}}
+        <a class="btn secondary" href="/{{ uri }}?source=orgpage" target="_parent" tabindex="-1">
+          Join Room
+        </a>
+      {{else}}
+        <a class="btn secondary" href="/{{ uri }}?source=orgpage" target="_parent" tabindex="-1">
+          View Room
+        </a>
+      {{/if}}
+    </div>
+
+  </footer>
+</div>

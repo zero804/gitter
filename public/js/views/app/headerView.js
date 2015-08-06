@@ -52,7 +52,8 @@ module.exports = (function() {
       dropdownMenu: '#cog-dropdown',
       topic: '.js-chat-topic',
       name: '.js-chat-name',
-      favourite: '.js-favourite-button'
+      favourite: '.js-favourite-button',
+      orgrooms: '.js-org-page'
     },
 
     events: {
@@ -61,6 +62,7 @@ module.exports = (function() {
       'click @ui.favourite': 'toggleFavourite',
       'dblclick @ui.topic': 'showInput',
       'keydown textarea': 'detectKeys',
+      'click @ui.orgrooms': 'goToOrgRooms'
     },
 
     initialize: function() {
@@ -90,6 +92,11 @@ module.exports = (function() {
         return generateTooltip(context.troupe());
       }});
 
+      $('.js-org-page').tooltip({ placement: 'left', title: function() {
+        var orgName = context().troupe.uri.split('/')[0];
+        return 'More ' + orgName + ' rooms';
+      }});
+
       this.redisplay();
     },
 
@@ -116,6 +123,8 @@ module.exports = (function() {
           } else {
             menuItems.push({ title: 'Integrations', href: '#integrations' });
           }
+
+          menuItems.push({ title: 'Edit tags', href: '#tags' });
         }
 
         menuItems.push({ divider: true });
@@ -146,6 +155,12 @@ module.exports = (function() {
           appEvents.trigger('navigation', '/home', 'home', ''); // TODO: figure out a title
         });
     },
+
+    goToOrgRooms: function() {
+      var orgName = context().troupe.uri.split('/')[0];
+      appEvents.trigger('navigation', '/orgs/' + orgName + '/rooms', 'iframe', orgName + ' rooms');
+    },
+
 
     toggleFavourite: function() {
       if(!context.isLoggedIn()) return;
@@ -228,8 +243,7 @@ module.exports = (function() {
       }
 
       this.ui.favourite.toggleClass('favourite', !!model.get('favourite'));
-    },
-
+    }
 
   });
 

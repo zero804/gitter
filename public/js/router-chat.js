@@ -225,7 +225,8 @@ onready(function () {
       "markdown": "markdown",
       "keys" : "keys",
       "integrations": "integrations",
-      "add" : "addPeople"
+      "add" : "addPeople",
+    /*  "tags": "editTags"*/
     },
 
     hideModal: function() {
@@ -280,6 +281,14 @@ onready(function () {
       });
 
     },
+
+    editTags: function() {
+      require.ensure(['views/app/editTagsView'], function(require) {
+        var EditTagsView = require('views/app/editTagsView');
+        appView.dialogRegion.show(new EditTagsView({}));
+      });
+    },
+
 
     integrations: function() {
       if(context().permissions.admin) {
