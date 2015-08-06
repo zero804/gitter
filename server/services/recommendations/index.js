@@ -4,6 +4,7 @@ var Q = require('q');
 var _ = require('underscore');
 var highlightedRoomCache = require('./highlighted-room-cache');
 var collections = require('../../utils/collections');
+var debug = require('debug')('gitter:legacy-recommendations');
 
 var recommenders = [
   require('./highlighted-rooms'),
@@ -17,6 +18,7 @@ module.exports = function (user, currentRoomUri) {
   return Q.all(recommenders.map(function(recommender) {
     return recommender(user, currentRoomUri);
   })).then(function(recommendationResults) {
+
     /* Merge the recommendations into a single list */
     var unique = {};
 
@@ -28,10 +30,11 @@ module.exports = function (user, currentRoomUri) {
         });
       }
     });
-
     return _.values(unique);
   })
   .then(function(recommendations) {
+    debug('Seeded recommendations with %s unique items', recommendations.length);
+
     // Lookup repos
     var requiresLookup = recommendations
       .filter(function(recommendation) {
@@ -42,9 +45,13 @@ module.exports = function (user, currentRoomUri) {
       return recommendations;
     }
 
+    debug('Fetching %s suggested rooms from github or cache', requiresLookup.length);
+
     return Q.all(requiresLookup.map(function(recommendation) {
         return highlightedRoomCache(null, recommendation.uri)
-          .catch(function() { });
+          .catch(function() {
+            debug('Failed to fetch %s', recommendation.uri);
+          });
       }))
       .then(function(lookups) {
         var lookupsHashed = collections.indexByProperty(lookups, 'full_name');
