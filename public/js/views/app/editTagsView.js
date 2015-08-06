@@ -74,7 +74,7 @@ var View = Marionette.LayoutView.extend({
   onDuplicateTag: function(tag){
     this.model.get('errorModel').set({
      message: tag + ' has already been entered',
-     class: 'message'
+     isError: false
     });
   },
 
@@ -89,21 +89,21 @@ var View = Marionette.LayoutView.extend({
   onTagEmpty: function(){
     this.model.get('errorModel').set({
      message: 'Press '+ this.model.get('meta') +'+backspace or delete to remove the last tag',
-     class: 'message'
+     isError: false
     });
   },
 
   onTagValid: function(model, value){
     this.model.get('errorModel').set({
       message: 'Press enter to add ' + value,
-      class: 'message'
+      isError: false
     });
   },
 
   onTagError: function(){
     this.model.get('errorModel').set({
       message: 'Tags must be between 1 and 20 characters in length',
-      class: 'error'
+      isError: true
     });
   },
 
