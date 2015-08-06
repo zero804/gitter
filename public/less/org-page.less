@@ -13,6 +13,7 @@
 
 @import "colors.less";
 
+@mobileBreakPoint: 767px;
 
 html {
   box-sizing: border-box;
@@ -32,7 +33,7 @@ body {
   padding: 3.25em 3.25em 2.25em 3.25em;
   overflow: hidden;
 
-  @media (max-width: 480px) {
+  @media (max-width: @mobileBreakPoint) {
     padding: 1em;
   }
 
@@ -52,7 +53,7 @@ body {
   display: flex;
   flex-direction: row;
   margin-bottom: 2em;
-  @media (max-width: 480px) {
+  @media (max-width: @mobileBreakPoint) {
     flex-wrap: wrap;
   }
 }
@@ -66,7 +67,7 @@ body {
 .org-page__org-logo {
   flex-grow: 0;
   img {
-    @media (max-width: 480px) {
+    @media (max-width: @mobileBreakPoint) {
       width: 42px;
       margin-right: 10px;
     }
@@ -77,6 +78,10 @@ body {
   display: flex;
   flex-direction: column;
   flex-grow: 0;
+
+  @media (max-width: @mobileBreakPoint) {
+    min-width: 45%;
+  }
 }
 
 .org-page__login {
@@ -86,7 +91,7 @@ body {
   vertical-align: middle;
   color: @trpLightGrey;
 
-  @media (max-width: 480px) {
+  @media (max-width: @mobileBreakPoint) {
     text-align: left;
     padding-left: 0.3em;
     padding-top: 2em;
@@ -114,7 +119,7 @@ body {
 .org-page__detail {
   margin-right: 70px;
 
-  @media (max-width: 480px) {
+  @media (max-width: @mobileBreakPoint) {
     margin-right: 0;
     flex-basis: 50%;
   }
@@ -133,7 +138,7 @@ body {
 .org-page__room-cards {
   padding: 0 3.25em 3.25em 3.25em;
 
-  @media (max-width: 480px) {
+  @media (max-width: @mobileBreakPoint) {
     padding: 1em;
   }
 
@@ -147,7 +152,7 @@ body {
 }
 
 .org-page__login__btn {
-  @media (max-width: 480px) {
+  @media (max-width: @mobileBreakPoint) {
     float: right;
     margin-right: 13px;
   }
