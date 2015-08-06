@@ -4,10 +4,13 @@ var Q              = require('q');
 var appEvents      = require('gitter-web-appevents');
 var restSerializer = require("../../serializers/rest-serializer");
 var troupeService  = require('../troupe-service');
+var debug           = require('debug')('gitter:live-collection-room-members');
 
 function notifyGroupRoomOfAddedUsers(room, userIds) {
   /* No point in notifing large rooms */
   if (room.userCount > 100) return Q.resolve();
+
+  debug("Notifying room %s of new users having been added", room._id);
 
   return restSerializer.serialize(userIds, new restSerializer.UserIdStrategy())
     .then(function(serializedUsers) {
@@ -19,6 +22,8 @@ function notifyGroupRoomOfAddedUsers(room, userIds) {
 }
 
 function notifyUsersOfAddedGroupRooms(room, userIds) {
+  debug("Notifying %s of being added to %s", userIds, room._id);
+
   // TODO: custom serializations per user
   return restSerializer.serialize(room, new restSerializer.TroupeStrategy())
     .then(function(serializedRoom) {
@@ -43,14 +48,12 @@ function notifyUsersOfAddedOneToOneRooms(room, userIds) {
 
 module.exports = {
   added: function(troupeId, userIds) {
+    debug('Room %s: %s members added', troupeId, userIds.length);
     return troupeService.findById(troupeId)
       .then(function(room) {
         if (room.oneToOne) {
           return notifyUsersOfAddedOneToOneRooms(room, userIds);
         }
-
-        /** Don't bother in large rooms */
-        if (room.userCount > 100) return;
 
         return Q.all([
           notifyGroupRoomOfAddedUsers(room, userIds),
