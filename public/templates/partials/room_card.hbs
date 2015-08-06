@@ -4,7 +4,15 @@
 
     <header class="room-card__header">
       <a href="/{{ uri }}?source=orgpage" target="_parent" tabindex="-1">
-        <h3>{{#if private}}<i class="octicon octicon-lock"></i>{{/if}} {{ shortName }}</h3> <span class="room-card__usercount">{{userCount}} {{ pluralize userCount 'person' 'people'}}</span>
+        <h3>
+          {{#if private}}
+            <i class="octicon octicon-lock"></i>
+          {{/if}}
+          {{ shortName }}
+        </h3>
+        <span class="room-card__usercount">
+          {{userCount}} {{ pluralize userCount 'person' 'people'}}
+        </span>
       </a>
     </header>
 

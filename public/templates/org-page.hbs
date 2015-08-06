@@ -32,9 +32,15 @@
       </div>
 
       <div class="org-page__details">
-        <div class="org-page__detail"><i class="octicon octicon-comment-discussion"></i> {{roomCount}} Rooms</div>
+        <div class="org-page__detail">
+          <i class="octicon octicon-comment-discussion"></i>
+          {{pluralize roomCount 'Room' 'Rooms'}}
+        </div>
 
-        <div class="org-page__detail"><i class="octicon octicon-organization"></i> {{orgUserCount}} People</div>
+        <div class="org-page__detail">
+          <i class="octicon octicon-organization"></i>
+          {{pluralize orgUserCount 'Person' 'People' }}
+        </div>
 
         {{#if org.location}}
           <div class="org-page__detail"><i class="octicon octicon-location"></i> {{org.location}}</div>
