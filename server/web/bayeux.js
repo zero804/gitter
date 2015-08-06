@@ -126,7 +126,7 @@ function makeServer(endpoint, redisClient, redisSubscribeClient) {
  * Create the servers
  */
 // var serverNew = makeServer('/faye2', env.redis.createClient(nconf.get("redis_nopersist")), env.redis.createClient(nconf.get("redis_nopersist"))); // Subscribe. Needs new client
-var serverLegacy = makeServer('/faye', env.redis.getClient(), env.redis.createClient()); // Subscribe. Needs new client
+var serverLegacy = makeServer('/faye', env.redis.createClient(), env.redis.createClient()); // Subscribe. Needs new client
 
 /**
  * Create the clients

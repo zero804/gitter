@@ -14,13 +14,24 @@ var os = require('os');
 /* Singleton scheduler for the process, lazy loaded */
 var scheduler;
 
+function getConnection() {
+  return {
+    // WARNING! Don't use the main client as
+    // node-resque selects database 0.
+    // Using the main client will wreak havoc
+    // in the application
+    // NB:NB: side effect: workers have always been in db0 and
+    // we can no longer change this, which is a pity.
+    redis: env.redis.createClient(),
+    database: 0 // In case the wierd behaviour in node-resque is ever removed
+  };
+}
+
 function createScheduler() {
   debug('Creating scheduler');
   // scheduler is responbsible for scheduling delayed jobs and giving them to the workers.
   var scheduler = new resque.scheduler({
-    connection: {
-      redis: env.redis.getClient()
-    }
+    connection: getConnection()
   }, function() {
     debug('Scheduler ready');
   });
@@ -52,7 +63,7 @@ var Queue = function(name, options, loaderFn) {
 
   this.queueReady = Promise.fromNode(function(callback) {
     self.internalQueue = new resque.queue({
-        connection: { redis: env.redis.getClient() }
+        connection: getConnection()
       },
       {}, // Jobs not defined on queue, only worker
       callback);
@@ -120,9 +131,7 @@ Queue.prototype.createWorker = function() {
 
   var self = this;
   var workerOpts = {
-    connection: {
-      redis: env.redis.getClient()
-    },
+    connection: getConnection(),
     timeout: 100,
     /*
      * "If you plan to run more than one worker per nodejs process,
