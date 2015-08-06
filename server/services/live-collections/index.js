@@ -47,7 +47,7 @@ function install() {
         if (possiblePromise) {
           possiblePromise.catch(function(err) {
             logger.error('live-collection handler failed: ' + err, { exception: err });
-          })
+          });
         }
       });
     });
