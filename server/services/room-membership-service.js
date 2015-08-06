@@ -144,6 +144,8 @@ function findMembersForRoomWithLurk(troupeId) {
  * room
  */
 function addRoomMember(troupeId, userId) {
+  debug('Adding member %s to room %s', userId, troupeId);
+
   assert(troupeId);
   assert(userId);
 
@@ -159,8 +161,11 @@ function addRoomMember(troupeId, userId) {
     .then(function(previous) {
       var added = !previous;
 
-      if (!added) return false;
-
+      if (!added) {
+        debug('Member %s is already in room %s', userId, troupeId);
+        return false;
+      }
+      
       roomMembershipEvents.emit("members.added", troupeId, [userId]);
       return incrementTroupeUserCount(troupeId, 1)
         .thenResolve(added);
@@ -174,6 +179,8 @@ function addRoomMember(troupeId, userId) {
  * Returns an array of the users who were added...
  */
 function addRoomMembers(troupeId, userIds) {
+  debug('Adding %s members to room %s', userIds.length, troupeId);
+
   assert(troupeId);
   if (!userIds.length) return Q.resolve();
   userIds.forEach(function(userId) {
@@ -216,6 +223,8 @@ function addRoomMembers(troupeId, userIds) {
  * were not in the room
  */
 function removeRoomMember(troupeId, userId) {
+  debug('Removing member %s from room %s', userId, troupeId);
+
   assert(troupeId);
   assert(userId);
 
@@ -238,6 +247,8 @@ function removeRoomMember(troupeId, userId) {
  * Remove users from a room
  */
 function removeRoomMembers(troupeId, userIds) {
+  debug('Removing %s members from room %s', userIds.length, troupeId);
+
   assert(troupeId);
   if (!userIds.length) return Q.resolve();
 
