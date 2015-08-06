@@ -6,16 +6,14 @@ var es = require('event-stream');
 var csv = require('fast-csv');
 
 module.exports = function() {
-  return persistence.Troupe
-    .find({ oneToOne: { $ne: true } })
+  return persistence.TroupeUser
+    .find()
     .lean()
-    .select('users.userId')
+    .select('userId troupeId')
     .slaveOk()
     .stream()
-    .pipe(es.through(function (room) {
-      room.users.forEach(function(roomUser) {
-        this.emit('data', { roomId: '' + room._id, userId: '' + roomUser.userId });
-      }, this);
+    .pipe(es.through(function (roomMembership) {
+      this.emit('data', { roomId: '' + roomMembership.troupeId, userId: '' + roomMembership.userId });
     }))
     .pipe(csv.createWriteStream({ headers: true }));
 };
