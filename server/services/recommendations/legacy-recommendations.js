@@ -8,6 +8,7 @@ var _               = require('underscore');
 var collections     = require('../../utils/collections');
 var recommendations = require('./index');
 var roomMembershipService = require('../room-membership-service');
+var debug           = require('debug')('gitter:legacy-recommendations');
 
 var MAX_RECOMMENDATIONS = 20;
 
@@ -19,6 +20,7 @@ function indexOf(value) {
   }
   return 0;
 }
+
 var CATEGORIES = {
   pushTime: function(item) {
     var repo = item.githubRepo;
@@ -147,9 +149,9 @@ function getPreferredComputerLanguages(suggestions) {
 function filterRecommendations(recommendations, userId) {
   if(recommendations.length === 0) return Q.resolve([]);
 
-
   return roomMembershipService.findRoomIdsForUser(userId)
     .then(function(existingMemberships) {
+
       var uris = recommendations.map(function(r) { return r.uri.toLowerCase(); });
 
       var query = {
@@ -170,25 +172,37 @@ function filterRecommendations(recommendations, userId) {
         });
     })
     .then(function(rooms) {
+      debug('Found %s rooms from recommendation list', rooms.length);
       var roomsHash = collections.indexByProperty(rooms, 'uri');
 
-      return recommendations.filter(function(recommendation) {
+      var filteredRooms = recommendations.filter(function(recommendation) {
         var room = roomsHash[recommendation.uri];
 
         if (room) {
           recommendation.room = room;
 
-          // recommend empty rooms
-          return !room.userCount;
+          if (!room.userCount) {
+            debug('Skipping room %s as it contains no users', recommendation.uri);
+            return false;
+          } else {
+            return true;
+          }
         }
 
         var repo = recommendation.repo;
-        if (!repo) return false;
+        if (!repo) {
+          debug('Skipping room %s it does not have a repo or the user is already in the room', recommendation.uri);
+          return false;
+        }
 
         // Room does not exist.. only recommend it if the user can create it
         return repo && repo.permissions &&
           (repo.permissions.admin || repo.permissions.push);
       });
+
+      debug('Filtered rooms down to %s items', filteredRooms.length);
+
+      return filteredRooms;
 
     });
 }
