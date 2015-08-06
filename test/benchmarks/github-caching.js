@@ -1,30 +1,26 @@
+/* jshint node:true, unused:true */
 'use strict';
 
-var fixtureLoader = require('../integration/test-fixtures');
-var restful = require('../../server/services/restful');
-var GitHubOrgService = require('../../server/services/github/github-org-service');
+var makeBenchmark = require('../make-benchmark');
+var GitHubOrgService = require('gitter-web-github').GitHubOrgService;
 
-suite('restful', function() {
-  set('mintime', 100);
-  set('iterations', 50);
-
-  before(function(done) {
+makeBenchmark({
+  before: function(done) {
     var g = new GitHubOrgService();
     g.getOrg('gitterHQ')
       .nodeify(done);
-  });
+  },
+  tests: {
+    'with snappy': function(done) {
+      var g = new GitHubOrgService();
+      g.getOrg('gitterHQ')
+        .nodeify(done);
+    },
 
-
-  bench('with snappy', function(done) {
-    var g = new GitHubOrgService();
-    g.getOrg('gitterHQ')
-      .nodeify(done);
-  });
-
-  bench('without snappy', function(done) {
-    var g = new GitHubOrgService.raw();
-    g.getOrg('gitterHQ')
-      .nodeify(done);
-  });
-
+    'without snappy': function(done) {
+      var g = new GitHubOrgService.raw();
+      g.getOrg('gitterHQ')
+        .nodeify(done);
+    }
+  }
 });
