@@ -70,6 +70,7 @@ module.exports = (function() {
         pageName: routeName,
         authenticated: authenticated,
         isUserHome: isUserHome,
+        isCommunityPage: context().isCommunityPage,
         userAgent: userAgent
       }, splitTests.listVariants()));
     }
