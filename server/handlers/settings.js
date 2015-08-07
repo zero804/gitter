@@ -16,6 +16,8 @@ var jwt                          = require('jwt-simple');
 var cdn                          = require('../web/cdn');
 var services                     = require('gitter-services');
 var identifyRoute                = env.middlewares.identifyRoute;
+var debug                        = require('debug')('gitter:settings-route');
+var StatusError                  = require('statuserror');
 
 var supportedServices = [
   { id: 'github',    name: 'GitHub'},
@@ -35,19 +37,18 @@ var serviceIdNameMap = supportedServices.concat(openServices).reduce(function(ma
   return map;
 }, {});
 
-function getIntegrations(req, res) {
+function getIntegrations(req, res, next) {
+  debug('Get integrations for %s', req.troupe.url);
+
   var url = config.get('webhooks:basepath')+'/troupes/' + req.troupe.id + '/hooks';
-  logger.info('requesting hook list at ' + url);
   request.get({
     url: url,
     json: true
   }, function(err, resp, hooks) {
     if(err || resp.statusCode != 200 || !Array.isArray(hooks)) {
       logger.error('failed to fetch hooks for troupe', { exception: err, resp: resp, hooks: hooks});
-      res.status(500).send('Unable to perform request. Please try again later.');
-      return;
+      return next(new StatusError(500, 'Unable to perform request. Please try again later.'));
     }
-    logger.info('hook list received', { hooks: hooks });
 
     hooks.forEach(function(hook) {
       hook.serviceDisplayName = serviceIdNameMap[hook.service];
@@ -65,7 +66,8 @@ function getIntegrations(req, res) {
 }
 
 
-function deleteIntegration(req, res) {
+function deleteIntegration(req, res, next) {
+  debug('Delete integration %s for %s', req.body.id, req.troupe.url);
 
   request.del({
     url: config.get('webhooks:basepath') + '/troupes/' + req.troupe.id + '/hooks/' + req.body.id,
@@ -74,8 +76,7 @@ function deleteIntegration(req, res) {
   function(err, resp) {
     if(err || resp.statusCode != 200) {
       logger.error('failed to delete hook for troupe', { exception: err, resp: resp });
-      res.status(500).send('Unable to perform request. Please try again later.');
-      return;
+      return next(new StatusError(500, 'Unable to perform request. Please try again later.'));
     }
 
     res.redirect('/settings/integrations/' + req.troupe.uri);
@@ -83,7 +84,8 @@ function deleteIntegration(req, res) {
 
 }
 
-function createIntegration(req, res) {
+function createIntegration(req, res, next) {
+  debug('Delete integration for %s', req.body.service, req.troupe.url);
 
   request.post({
     url: config.get('webhooks:basepath') + '/troupes/' + req.troupe.id + '/hooks',
@@ -96,8 +98,7 @@ function createIntegration(req, res) {
   function(err, resp, body) {
     if(err || resp.statusCode != 200 || !body) {
       logger.error('failed to create hook for troupe', { exception: err, resp: resp });
-      res.status(500).send('Unable to perform request. Please try again later.');
-      return;
+      return next(new StatusError(500, 'Unable to perform request. Please try again later.'));
     }
 
     var encryptedUserToken;
@@ -122,10 +123,9 @@ function adminAccessCheck(req, res, next) {
   var uriContext = req.uriContext;
   roomPermissionsModel(req.user, 'admin', uriContext.troupe)
     .then(function(access) {
-      if(!access) return next(403);
-
-      next();
-    });
+      if(!access) throw new StatusError(403);
+    })
+    .nodeify(next);
 }
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
@@ -135,6 +135,16 @@ var router = express.Router({ caseSensitive: true, mergeParams: true });
   '/integrations/:roomPart1/:roomPart2',
   '/integrations/:roomPart1/:roomPart2/:roomPart3'
 ].forEach(function(uri) {
+
+  router.use(uri, function(req, res, next) {
+    // Shitty method override because the integrations page
+    // doesn't use javascript and relies on forms aka, the web as of 1996.
+    var _method = req.body && req.body._method ? '' + req.body._method : '';
+    if (req.method === 'POST' &&  _method.toLowerCase() === 'delete') {
+      req.method = 'DELETE';
+    }
+    next();
+  });
 
   router.get(uri,
     ensureLoggedIn,
@@ -166,19 +176,18 @@ router.get('/unsubscribe/:hash',
       var decipher  = crypto.createDecipher('aes256', passphrase);
       plaintext     = decipher.update(req.params.hash, 'hex', 'utf8') + decipher.final('utf8');
     } catch(err) {
-      res.status(400).send('Invalid hash');
-      return;
+      return next(new StatusError(400, 'Invalid hash'));
     }
 
     var parts             = plaintext.split(',');
     var userId            = parts[0];
     var notificationType  = parts[1];
 
-    logger.info("User " + userId + " opted-out from " + notificationType);
-    stats.event('unsubscribed_unread_notifications', {userId: userId});
+    debug("User %s opted-out from ", userId, notificationType);
+    stats.event('unsubscribed_unread_notifications', { userId: userId });
 
     userSettingsService.setUserSettings(userId, 'unread_notifications_optout', 1)
-      .then(function () {
+      .then(function() {
         var msg = "Done. You wont receive notifications like that one in the future.";
 
         res.render('unsubscribe', { layout: 'generic-layout', title: 'Unsubscribe', msg: msg });
@@ -197,7 +206,7 @@ router.get('/badger/opt-out',
     stats.event('optout_badger', { userId: userId });
 
     return userSettingsService.setUserSettings(userId, 'badger_optout', 1)
-      .then(function () {
+      .then(function() {
         var msg = "Done. We won't send you automatic pull-requests in future.";
 
         res.render('unsubscribe', {
