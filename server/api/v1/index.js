@@ -61,7 +61,7 @@ router.post('/private/gcm',
 
 router.post('/private/channels',
   authMiddleware,
-  identifyRoute('create-channel-without-owner'),
-  require('./private/create-channel-without-owner'));
+  identifyRoute('create-channel'),
+  require('./private/create-channel'));
 
 module.exports = router;
