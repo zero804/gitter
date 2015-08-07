@@ -1,3 +1,4 @@
+/* jshint node: true */
 "use strict";
 
 var env           = require('gitter-web-env');
@@ -17,6 +18,7 @@ router.use('/home', require('./home'));
 router.use('/learn', require('./learn'));
 router.use('/mobile', require('./mobile'));
 router.use('/settings', require('./settings'));
+router.use('/orgs', require('./org-pages'));
 
 router.use('/', require('./app'));
 

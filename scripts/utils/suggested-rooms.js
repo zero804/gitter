@@ -5,6 +5,7 @@
 var userService = require('../../server/services/user-service');
 var troupeService = require('../../server/services/troupe-service');
 var restSerializer = require('../../server/serializers/rest-serializer');
+var legacyRecommendations = require('../../server/services/recommendations/legacy-recommendations');
 var shutdown = require('shutdown');
 
 var suggestions  = require('gitter-web-suggestions');
@@ -33,7 +34,8 @@ userService.findByUsername(opts.username)
       return suggestions.getSuggestionsForRoom(room, user, opts.language);
     }
 
-    return suggestions.getSuggestionsForUser(user, opts.language);
+    return legacyRecommendations.getSuggestionsForUser(user, opts.language);
+    // return suggestions.getSuggestionsForUser(user, opts.language);
   })
   .then(function(suggestions) {
     return restSerializer.serializeQ(suggestions, new restSerializer.SuggestedRoomStrategy({ }));

@@ -26,6 +26,9 @@ var troupeService      = require('../../services/troupe-service');
 var useragent          = require('useragent');
 var avatar             = require('../../utils/avatar');
 var _                 = require('underscore');
+var GitHubOrgService   = require('gitter-web-github').GitHubOrgService;
+var orgPermissionModel = require('../../services/permissions/org-permissions-model');
+
 
 /* How many chats to send back */
 var INITIAL_CHAT_COUNT = 50;
@@ -282,8 +285,9 @@ function renderChat(req, res, options, next) {
       options.generateContext === false ? null : contextGenerator.generateTroupeContext(req, { snapshots: { chat: snapshotOptions }, permalinkChatId: aroundId }),
       restful.serializeChatsForTroupe(troupe.id, userId, chatSerializerOptions),
       options.fetchEvents === false ? null : restful.serializeEventsForTroupe(troupe.id, userId),
-      options.fetchUsers === false ? null :restful.serializeUsersForTroupe(troupe.id, userId, userSerializerOptions)
-    ]).spread(function (troupeContext, chats, activityEvents, users) {
+      options.fetchUsers === false ? null :restful.serializeUsersForTroupe(troupe.id, userId, userSerializerOptions),
+      troupeService.checkGitHubTypeForUri(troupe.lcOwner || '', 'ORG')
+    ]).spread(function (troupeContext, chats, activityEvents, users, ownerIsOrg) {
       var initialChat = _.find(chats, function(chat) { return chat.initial; });
       var initialBottom = !initialChat;
       var githubLink;
@@ -334,7 +338,8 @@ function renderChat(req, res, options, next) {
           hasHiddenMembers: troupe.userCount > 25,
           integrationsUrl: integrationsUrl,
           inputAutoFocus: !options.mobile,
-          placeholder: 'Click here to type a chat message. Supports GitHub flavoured markdown.'
+          placeholder: 'Click here to type a chat message. Supports GitHub flavoured markdown.',
+          ownerIsOrg: ownerIsOrg
         }, troupeContext && {
           troupeTopic: troupeContext.troupe.topic,
           premium: troupeContext.troupe.premium,
@@ -407,21 +412,71 @@ function renderMobileNotLoggedInChat(req, res, next) {
   }, next);
 }
 
-function renderOrg404Page(req, res, next) {
+function renderOrgPage(req, res, next) {
   var org = req.uriContext && req.uriContext.uri;
+  var opts = {};
 
-  return troupeService.findPublicChildRoomsForOrg(org)
-    .then(function (rooms) {
-      var strategy = new restSerializer.TroupeStrategy();
-      return restSerializer.serialize(rooms, strategy);
-    })
-    .then(function (rooms) {
-      res.render('org-404', {
-        org: org,
-        rooms: rooms
+  // Show only public rooms to not logged in users
+  if (!req.user) opts.security = 'PUBLIC';
+
+  var ghOrgService = new GitHubOrgService(req.user);
+
+  return Q.all([
+    ghOrgService.getOrg(org).catch(function() { return {login: org}; }),
+    troupeService.findChildRoomsForOrg(org, opts),
+    contextGenerator.generateNonChatContext(req),
+    orgPermissionModel(req.user, 'admin', org)
+  ])
+  .spread(function (ghOrg,rooms, troupeContext, isOrgAdmin) {
+
+    // This is used to track pageViews in mixpanel
+    troupeContext.isCommunityPage = true;
+
+    var getMembers = rooms.map(function(room) {
+      return roomMembershipService.findMembersForRoom(room.id, {limit: 10});
+    });
+
+    return Q.all(getMembers)
+    .then(function(values) {
+      rooms.forEach(function(room, index) {
+        room.userIds = values[index];
       });
+
+      var populateUsers = rooms.map(function(room) {
+        return userService.findByIds(room.userIds);
+      });
+
+      return Q.all(populateUsers);
     })
-    .catch(next);
+    .then(function(values) {
+       rooms.forEach(function(room, index) {
+        room.users = values[index];
+      });
+
+      // Custom data for the org page
+      rooms.forEach(function(room) {
+        var nameParts = room.uri.split('/');
+        room.shortName = nameParts.length === 3 ? nameParts[1] + '/' + nameParts[2] : nameParts[1] || nameParts[0];
+        room.canEditTags = isOrgAdmin;
+        room.private = room.security !== 'PUBLIC';
+      });
+
+      var orgUserCount = rooms.reduce(function(accum, room) {
+        return accum + room.userCount;
+      }, 0);
+
+      res.render('org-page', {
+        isLoggedIn: !!req.user,
+        roomCount: rooms.length,
+        orgUserCount: orgUserCount,
+        org: ghOrg,
+        rooms: rooms,
+        troupeContext: troupeContext
+      });
+    });
+
+  })
+  .catch(next);
 }
 
 
@@ -528,7 +583,7 @@ module.exports = exports = {
   renderHomePage: renderHomePage,
   renderChatPage: renderChatPage,
   renderMainFrame: renderMainFrame,
-  renderOrg404Page: renderOrg404Page,
+  renderOrgPage: renderOrgPage,
   renderMobileChat: renderMobileChat,
   renderMobileUserHome: renderMobileUserHome,
   renderEmbeddedChat: renderEmbeddedChat,
