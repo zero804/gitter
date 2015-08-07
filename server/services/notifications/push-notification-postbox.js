@@ -19,7 +19,28 @@ var notificationWindowPeriods = [
 var mentionNotificationWindowPeriod = 10000;
 var maxNotificationsForMentions = 10;
 
-var queue = workerQueue.queue('generate-push-notifications', {}, function() {
+// This queue is responsible to taking notifications and deciding which users to forward them on to
+var pushNotificationFilterQueue = workerQueue.queue('push-notifications-filter', {}, function() {
+
+  return function(data, done) {
+    var troupeId = data.troupeId;
+    var chatId = data.chatId;
+    var userIds = data.userIds;
+    var mentioned = data.mentioned;
+
+    return filterNotificationsForPush(troupeId, chatId, userIds, mentioned)
+      .then(function() {
+        debug('filterNotificationsForPush complete');
+      })
+      .catch(function(err) {
+        winston.error('Unable to queue notification: ' + err, { exception: err });
+      })
+      .nodeify(done);
+  };
+});
+
+// This queue is responsible to generating the actual content of the push notification and sending it to users
+var pushNotificationGeneratorQueue = workerQueue.queue('push-notifications-generate', {}, function() {
   var pushNotificationGenerator = require('./push-notification-generator');
 
   return function(data, done) {
@@ -40,9 +61,9 @@ var queue = workerQueue.queue('generate-push-notifications', {}, function() {
   };
 });
 
-exports.queueNotificationsForChat = function(troupeId, chatId, userIds, mentioned) {
+function filterNotificationsForPush(troupeId, chatId, userIds, mentioned) {
   var chatTime = mongoUtils.getTimestampFromObjectId(chatId);
-  debug('queueNotificationsForChat');
+  debug('filterNotificationsForPush for %s users', userIds.length);
 
   // TODO: consider asking Redis whether its possible to send to this user BEFORE
   // going to mongo to get notification settings as reversing these two operations
@@ -93,7 +114,7 @@ exports.queueNotificationsForChat = function(troupeId, chatId, userIds, mentione
 
             debug('Queuing notification %s to be send to user %s in %sms', notificationNumber, userId, delay);
 
-            queue.invoke({
+            return pushNotificationGeneratorQueue.invoke({
               userId: userId,
               troupeId: troupeId,
               notificationNumber: notificationNumber
@@ -101,16 +122,21 @@ exports.queueNotificationsForChat = function(troupeId, chatId, userIds, mentione
 
           });
       }));
-    })
-    .then(function() {
-      debug('queueNotificationsForChatWithoutMention complete');
-    })
-    .catch(function(err) {
-      winston.error('Unable to queue notification: ' + err, { exception: err });
-      throw err;
     });
+}
+
+exports.queueNotificationsForChat = function(troupeId, chatId, userIds, mentioned) {
+  debug('queueNotificationsForChat for %s users', userIds.length);
+
+  return pushNotificationFilterQueue.invoke({
+    troupeId: troupeId,
+    chatId: chatId,
+    userIds: userIds,
+    mentioned: mentioned
+  });
 };
 
 exports.listen = function() {
-  queue.listen();
+  pushNotificationGeneratorQueue.listen();
+  pushNotificationFilterQueue.listen();
 };

@@ -37,7 +37,10 @@ exports.getMultiUserTroupeSettings = function(userTroupes, settingsKey) {
     return !!f;
   });
 
-  return persistence.UserTroupeSettings.findQ({ $or: terms }, 'userId troupeId settings.' + settingsKey, { lean: true })
+  return persistence.UserTroupeSettings.findQ({ $or: terms }, 'userId troupeId settings.' + settingsKey, {
+      lean: true,
+      slaveOk: true // This query can be run against a slave. If it's a tiny bit out of date, that shouldn't be a problem
+    })
     .then(function(utses) {
       var hash = utses.reduce(function(memo, uts) {
         memo[uts.userId + ':' + uts.troupeId] = uts.settings && uts.settings[settingsKey];
@@ -57,7 +60,10 @@ exports.getUserTroupeSettingsForUsersInTroupe = function(troupeId, settingsKey, 
       }, {
         userId: { $in: userIds }
       }]
-    }, 'userId settings.' + settingsKey, { lean: true })
+    }, 'userId settings.' + settingsKey, {
+      lean: true,
+      slaveOk: true // This query can be run against a slave. If it's a tiny bit out of date, that shouldn't be a problem
+    })
     .then(function(utses) {
       var hash = utses.reduce(function(memo, uts) {
         memo[uts.userId] = uts.settings && uts.settings[settingsKey];

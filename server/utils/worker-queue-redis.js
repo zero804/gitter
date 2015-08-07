@@ -2,6 +2,7 @@
 "use strict";
 
 var env = require('gitter-web-env');
+var config = env.config;
 var logger = env.logger;
 var stats = env.stats;
 
@@ -9,20 +10,30 @@ var resque = require("node-resque");
 var debug = require('debug')('gitter:worker-queue');
 var shutdown = require('shutdown');
 var Promise = require('bluebird');
+var _ = require('lodash');
 var os = require('os');
 
 /* Singleton scheduler for the process, lazy loaded */
 var scheduler;
 
 function getConnection() {
+  var redisConfiguration = process.env.REDIS_CONNECTION_STRING || config.get('redis');
+  if (typeof redisConfiguration === 'string') {
+    redisConfiguration = env.redis.parse(redisConfiguration);
+  }
+  // Explicitely use db0 for resque, see reasons below
+  // WARNING! Don't use the main client as
+  // node-resque selects database 0.
+  // Using the main client will wreak havoc
+  // in the application
+  // NB:NB: side effect: workers have always been in db0 and
+  // we can no longer change this, which is a pity.
+
+  redisConfiguration = _.extend({ }, redisConfiguration, { redisDb: 0 });
+  var redis = env.redis.createClient(redisConfiguration);
+
   return {
-    // WARNING! Don't use the main client as
-    // node-resque selects database 0.
-    // Using the main client will wreak havoc
-    // in the application
-    // NB:NB: side effect: workers have always been in db0 and
-    // we can no longer change this, which is a pity.
-    redis: env.redis.createClient(),
+    redis: redis,
     database: 0 // In case the wierd behaviour in node-resque is ever removed
   };
 }
@@ -218,7 +229,7 @@ Queue.prototype.createWorker = function() {
   // });
 
   worker.on('success', function(queue, job) {
-    debug("success for job %s on queue %s", job, queue);
+    debug("success for job %j on queue %s", job, queue);
     stats.eventHF('resque.worker.success');
   });
 

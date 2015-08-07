@@ -12,6 +12,7 @@ var debug = require('debug')('gitter:push-notification-gateway');
 
 function sendNotificationToDevice(notification, badge, device) {
   var notificationPromise;
+  debug('sendNotificationToDevice: %j, badge=%s', notification, device);
 
   if (!device.deviceType) {
     logger.warn('Unknown device type: ' + device.deviceType);
