@@ -44,7 +44,7 @@ exports.sendUserNotification = function(userId, notification) {
       if(!devices.length) return;
 
       return unreadItemService.getBadgeCountsForUserIds([userId]).then(function(counts) {
-        debug("Sending to %s potential devices for %s", devices.length, userId);
+        debug("Sending to %s potential devices for %s: %j", devices.length, userId, notification);
 
         var badge = counts[userId] || 0;
 
