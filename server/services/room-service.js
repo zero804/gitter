@@ -505,6 +505,13 @@ function createGithubRoom(user, uri) {
               }
             })
             .spread(function(room, updateExisting) {
+              if (!updateExisting) {
+                stats.event("create_room", {
+                  userId: user.id,
+                  roomType: "github-room"
+                });
+              }
+
               if (updateExisting && room.uri !== uri && githubType === 'REPO') {
                 // room has been renamed!
                 // TODO: deal with ORG renames too!
