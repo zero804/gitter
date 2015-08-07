@@ -144,8 +144,12 @@ module.exports = (function() {
             return;
           }
 
-
-          promise = apiClient.post("/v1/rooms/" + ownerModel.get('roomId') + '/channels', payload);
+          payload.ownerUri = ownerModel.get('uri');
+          // we use a special endpoint that can create an empty owner room if it hasnt been created yet
+          // the current /v1/:room/channels api requires owner room membership, so we need to use our
+          // special endpoint if the owner room is empty as well.
+          promise = apiClient.post('/v1/private/channels', payload);
+          break;
       }
 
       promise
