@@ -80,7 +80,7 @@ function notifyUserOfActivitySince(userId, troupeId, since, notificationNumber) 
             roomId: troupe.id,
             roomName: troupe.name || troupe.uri,
             message: message,
-            sound: notificationNumber == 1 ? 'notify.caf' : 'notify-2.caf',
+            sound: mentions && mentions.length ? 'notify.caf' : 'notify-2.caf',
             link: notificationLink
           });
         });
