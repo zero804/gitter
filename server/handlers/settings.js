@@ -139,13 +139,13 @@ var router = express.Router({ caseSensitive: true, mergeParams: true });
   router.use(uri, function(req, res, next) {
     // Shitty method override because the integrations page
     // doesn't use javascript and relies on forms aka, the web as of 1996.
-    var _method = "" + req.body && req.body._method;
+    var _method = req.body && req.body._method ? '' + req.body._method : '';
     if (req.method === 'POST' &&  _method.toLowerCase() === 'delete') {
       req.method = 'DELETE';
     }
     next();
   });
-  
+
   router.get(uri,
     ensureLoggedIn,
     identifyRoute('settings-room-get'),
