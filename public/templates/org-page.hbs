@@ -34,12 +34,12 @@
       <div class="org-page__details">
         <div class="org-page__detail">
           <i class="octicon octicon-comment-discussion"></i>
-          {{pluralize roomCount 'Room' 'Rooms'}}
+          {{roomCount}} {{pluralize roomCount 'Room' 'Rooms'}}
         </div>
 
         <div class="org-page__detail">
           <i class="octicon octicon-organization"></i>
-          {{pluralize orgUserCount 'Person' 'People' }}
+          {{orgUserCount}} {{pluralize orgUserCount 'Person' 'People' }}
         </div>
 
         {{#if org.location}}
