@@ -43,7 +43,6 @@ describe('notification-message-generator', function() {
       { id: '00001', text: 'Yo', fromUser: { displayName: 'Mike Bartlett '} },
       { id: '00002', text: 'Hey how are you?', fromUser: { displayName: 'Andrew Newdigate' } }
     ]);
-
     assert.equal(message, 'gitterHQ/gitter-webapp  \nMike: Yo  \nAndrew: Hey how are you?');
   });
 
@@ -54,27 +53,18 @@ describe('notification-message-generator', function() {
       { id: '00002', text: 'Why is your name so long?', fromUser: { displayName: 'Andrew Newdigate' } }
     ]);
 
-    assert.equal(message, 'gitterHQ/gitter-webapp  \nMahershalalhashbaz: Hey I just wanted to run by…  \nAndrew: Why is your name so long?');
+    assert.equal(message, 'gitterHQ/gitter-webapp  \nMahershalalhashbaz: Hey I just wanted to run by those accounts figures with you  \nAndrew: Why is your name so long?');
   });
 
 
   it('should handle really long content', function() {
     var message = underTest({ uri: 'gitterHQ/gitter-webapp' }, [
-      { id: '00001', text: 'Yo', fromUser: { displayName: 'Mike Bartlett '} },
-      { id: '00003', text: 'Hey how are you?', fromUser: { displayName: 'Andrew Newdigate' } } ,
-      { id: '00005', text: 'Hey how are you?', fromUser: { displayName: 'Andrew Newdigate' } } ,
-      { id: '00006', text: 'Hey how are you?', fromUser: { displayName: 'Andrew Newdigate' } } ,
-      { id: '00007', text: 'Hey how are you?', fromUser: { displayName: 'Andrew Newdigate' } } ,
-      { id: '00008', text: 'Hey how are you?', fromUser: { displayName: 'Andrew Newdigate' } } ,
-      { id: '00009', text: 'Hey how are you?', fromUser: { displayName: 'Andrew Newdigate' } } ,
-      { id: '00010', text: 'Hey how are you?', fromUser: { displayName: 'Andrew Newdigate' } } ,
-      { id: '00011', text: 'Hey how are you?', fromUser: { displayName: 'Andrew Newdigate' } } ,
-      { id: '00012', text: 'Hey how are you?', fromUser: { displayName: 'Andrew Newdigate' } } ,
-      { id: '00013', text: 'Hey how are you?', fromUser: { displayName: 'Andrew Newdigate' } } ,
-      { id: '00014', text: 'Hey how are you?', fromUser: { displayName: 'Andrew Newdigate' } } ,
-      { id: '00015', text: 'Hey how are you?', fromUser: { displayName: 'Andrew Newdigate' } }
+      { id: '00001', text: 'Freaky', fromUser: { displayName: 'Andrew Newdigate' } } ,
+      { id: '00003', text: Array(10).join('This is a fairly long message do you not thing. I think it is. I\'m quite verbose sometimes when I want to say something.'), fromUser: { displayName: 'Mike Bartlett '} },
+      { id: '00005', text: 'Hey how are you?', fromUser: { displayName: 'Andrew Newdigate' } }
     ]);
-    assert.equal(message, 'gitterHQ/gitter-webapp  \nMike: Yo  \nAndrew: Hey how are you?  \nAndrew: Hey how are you?');
+    assert.strictEqual(message.length, 1024);
+    assert.equal(message, 'gitterHQ/gitter-webapp  \nAndrew: Freaky  \nMike: This is a fairly long message do you not thing. I think it is. I\'m quite verbose sometimes when I want to say something.This is a fairly long message do you not thing. I think it is. I\'m quite verbose sometimes when I want to say something.This is a fairly long message do you not thing. I think it is. I\'m quite verbose sometimes when I want to say something.This is a fairly long message do you not thing. I think it is. I\'m quite verbose sometimes when I want to say something.This is a fairly long message do you not thing. I think it is. I\'m quite verbose sometimes when I want to say something.This is a fairly long message do you not thing. I think it is. I\'m quite verbose sometimes when I want to say something.This is a fairly long message do you not thing. I think it is. I\'m quite verbose sometimes when I want to say something.This is a fairly long message do you not thing. I think it is. I\'m quite verbose sometimes when I want to say something.This is a fairl…');
   });
 
 
