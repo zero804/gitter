@@ -10,6 +10,14 @@ describe('notification-message-generator', function() {
 
     assert.equal(message, 'gitterHQ/gitter-webapp  \nMike: Yo');
   });
+  it('should should not repeat usernames', function() {
+    var message = underTest({ uri: 'gitterHQ/gitter-webapp' }, [
+      { id: '00001', text: 'Yo', fromUser: { displayName: 'Mike Bartlett '} },
+      { id: '00001', text: 'Moo', fromUser: { displayName: 'Mike Bartlett '} },
+    ]);
+
+    assert.equal(message, 'gitterHQ/gitter-webapp  \nMike: Yo  \nMoo');
+  });
 
   it('should generate a message for a one to one', function() {
     var troupe = {
@@ -65,6 +73,39 @@ describe('notification-message-generator', function() {
     ]);
     assert.strictEqual(message.length, 1024);
     assert.equal(message, 'gitterHQ/gitter-webapp  \nAndrew: Freaky  \nMike: This is a fairly long message do you not thing. I think it is. I\'m quite verbose sometimes when I want to say something.This is a fairly long message do you not thing. I think it is. I\'m quite verbose sometimes when I want to say something.This is a fairly long message do you not thing. I think it is. I\'m quite verbose sometimes when I want to say something.This is a fairly long message do you not thing. I think it is. I\'m quite verbose sometimes when I want to say something.This is a fairly long message do you not thing. I think it is. I\'m quite verbose sometimes when I want to say something.This is a fairly long message do you not thing. I think it is. I\'m quite verbose sometimes when I want to say something.This is a fairly long message do you not thing. I think it is. I\'m quite verbose sometimes when I want to say something.This is a fairly long message do you not thing. I think it is. I\'m quite verbose sometimes when I want to say something.This is a fairl…');
+  });
+
+  it('should truncate a second line if it is huge', function() {
+    var text1 = Array(200).join('0123456789');
+
+    var message = underTest({ uri: 'gitterHQ/gitter-webapp' }, [
+      { id: '00003', text: Array(10).join('ABCDEFGHIJ') },
+      { id: '00001', text: text1 }
+    ]);
+    assert.equal(message.length, 1024);
+  });
+  it('should truncate a single line if it is huge', function() {
+    var text1 = Array(200).join('0123456789');
+
+    var message = underTest({ uri: 'gitterHQ/gitter-webapp' }, [
+      { id: '00001', text: text1 } ,
+      { id: '00003', text: Array(10).join('ABCDEFGHIJ') },
+      { id: '00005', text: 'Hey how are you?', fromUser: { displayName: 'Andrew Newdigate' } }
+    ]);
+    assert.equal(message.length, 1024);
+  });
+
+  it('should not make the second line too short', function() {
+    var text1 = Array(100).join('0123456789');
+    assert.strictEqual(text1.length, 990);
+
+    var message = underTest({ uri: 'gitterHQ/gitter-webapp' }, [
+      { id: '00001', text: text1 } ,
+      { id: '00003', text: Array(10).join('ABCDEFGHIJ') },
+      { id: '00005', text: 'Hey how are you?', fromUser: { displayName: 'Andrew Newdigate' } }
+    ]);
+    assert(message.length < 1024);
+    assert.equal(message, 'gitterHQ/gitter-webapp  \n' + text1);
   });
 
 
