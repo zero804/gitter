@@ -145,7 +145,7 @@
 
 }
 
-.chat-item:hover .chat-item__actions {
+.chat-item:hover .chat-item__actions, .chat-item:hover .chat-item__time {
   opacity: 1;
   transition: 0.2s opacity linear;
 }
@@ -198,9 +198,10 @@
 .chat-item__time {
   vertical-align: middle;
   display: inline-block;
-  color: #ddd;
+  color: #aaa;
   float: right;
   margin-top: 2px;
+  opacity: 0.8;
 }
 
 .chat-item__time--permalinkable {
