@@ -24,6 +24,10 @@ module.exports = Marionette.LayoutView.extend({
               /* Why is this on sync only? */
               unreadItemsClient.monitorViewForUnreadItems(this.options.monitorScrollPane, chatCollectionView);
             }, this);
+
+            this.collection.on('add', function(){
+              unreadItemsClient.monitorViewForUnreadItems(this.options.monitorScrollPane, chatCollectionView);
+            }, this);
           }
 
           var c = context();
