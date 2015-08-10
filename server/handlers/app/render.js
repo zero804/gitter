@@ -432,6 +432,8 @@ function renderOrgPage(req, res, next) {
     // This is used to track pageViews in mixpanel
     troupeContext.isCommunityPage = true;
 
+    rooms = rooms.filter(function(room) { return room.security !== 'PRIVATE'; });
+
     var getMembers = rooms.map(function(room) {
       return roomMembershipService.findMembersForRoom(room.id, {limit: 10});
     });
