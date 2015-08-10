@@ -27,6 +27,10 @@ describe('room-service #slow', function() {
       githubType: 'ORG',
       users: ['user1', 'user2']
     },
+    troupeEmptyOrg: {
+      githubType: 'ORG',
+      users: []
+    },
     troupeRepo: {
       security: 'PRIVATE',
       githubType: 'REPO',
@@ -712,6 +716,58 @@ describe('room-service #slow', function() {
         });
 
         return roomService.createCustomChildRoom(fixture.troupeOrg1, fixture.user1, { name: 'child', security: 'INHERITED' })
+          .then(function(room) {
+            mockito.verify(permissionsModelMock, once)();
+            return room;
+          })
+          .then(function(room) {
+            // Get another mock
+            // ADD A PERSON TO THE ROOM
+            var roomPermissionsModelMock = mockito.mockFunction();
+            var roomService = testRequire.withProxies("./services/room-service", {
+              './room-permissions-model': roomPermissionsModelMock,
+              './invited-permissions-service': function() { return Q.resolve(true); }
+            });
+
+            mockito.when(roomPermissionsModelMock)().then(function(user, perm, _room) {
+              assert.equal(user.id, fixture.user1.id);
+              assert.equal(perm, 'adduser');
+              assert.equal(room.id, _room.id);
+              return Q.resolve(true);
+            });
+
+            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username)
+              .then(function() {
+                mockito.verify(roomPermissionsModelMock, once)();
+              })
+              .thenResolve(room);
+          })
+          .then(function(room) {
+            var roomMembershipService = testRequire('./services/room-membership-service');
+            return roomMembershipService.checkRoomMembership(room.id, fixture.user3.id);
+          })
+          .then(function(isMember) {
+            assert(isMember, 'Expected to find newly added user in the room');
+          })
+          .nodeify(done);
+      });
+
+      it('should create inherited rooms for empty orgs', function(done) {
+        var permissionsModelMock = mockito.mockFunction();
+        var roomService = testRequire.withProxies("./services/room-service", {
+          './permissions-model': permissionsModelMock
+        });
+
+        mockito.when(permissionsModelMock)().then(function(user, perm, uri, githubType, security) {
+          assert.equal(user.id, fixture.user1.id);
+          assert.equal(perm, 'create');
+          assert.equal(uri, fixture.troupeEmptyOrg.uri + '/child');
+          assert.equal(githubType, 'ORG_CHANNEL');
+          assert.equal(security, 'INHERITED');
+          return Q.resolve(true);
+        });
+
+        return roomService.createCustomChildRoom(fixture.troupeEmptyOrg, fixture.user1, { name: 'child', security: 'INHERITED' })
           .then(function(room) {
             mockito.verify(permissionsModelMock, once)();
             return room;
@@ -1503,6 +1559,37 @@ describe('room-service #slow', function() {
 
     });
 
+  });
+
+  describe('#createGithubRoom', function() {
+    it('should create an empty room for an organization', function(done) {
+      var permissionsModelMock = mockito.mockFunction();
+
+      var roomService = testRequire.withProxies("./services/room-service", {
+        './permissions-model': permissionsModelMock
+      });
+
+      mockito
+        .when(permissionsModelMock)().then(function (user, right, uri, githubType) {
+        assert.equal(user.username, fixture.user1.username);
+        assert.equal(right, 'create');
+        assert.equal(uri, 'gitterTest');
+        assert.equal(githubType, 'ORG');
+
+        return Q.resolve(true);
+      });
+
+      return roomService
+        .createGithubRoom(fixture.user1, 'gitterTest')
+        .then(function (troupe) {
+          assert.equal(troupe.uri, 'gitterTest');
+          assert.equal(troupe.userCount, 0);
+        })
+        .finally(function () {
+          return persistence.Troupe.removeQ({ uri: 'gitterTest' });
+        })
+        .nodeify(done);
+    });
   });
 
   describe('renames', function() {
