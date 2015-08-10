@@ -87,11 +87,13 @@ module.exports = (function() {
 
 
   function modelFromOrg(m) {
+    var room = m.get('room');
+
     return new ItemModel(m, function(m) {
       return {
         id: m.get('name'),
-        roomId: m.get('room').id,
-        uri: m.get('room').uri,
+        roomId: room && room.id,
+        uri: m.get('name'),
         premium: m.get('premium'),
         name: m.get('name'),
         avatarUrl: m.get('avatar_url'),
@@ -252,9 +254,7 @@ module.exports = (function() {
 
       function defaultResults() {
 
-        return self.orgsCollection.filter(function(m) {
-          return !!m.get('room');
-        }).map(modelFromOrg).concat(modelFromUser(context.user()));
+        return self.orgsCollection.map(modelFromOrg).concat(modelFromUser(context.user()));
       }
     }
 
