@@ -124,7 +124,7 @@ module.exports = (function() {
             menuItems.push({ title: 'Integrations', href: '#integrations' });
           }
 
-          menuItems.push({ title: 'Edit tags', href: '#tags' });
+          menuItems.push({ title: 'Edit tags', href: '#tags/' + context().troupe.id });
         }
 
         menuItems.push({ divider: true });
