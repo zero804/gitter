@@ -76,9 +76,9 @@ exports.serializeUsersForTroupe = function(troupeId, userId, options) {
     }
 
     return userSearchService.searchForUsersInRoom(searchTerm, troupeId, { limit: limit || 30})
-      .then(function(users) {
+      .then(function(resp) {
         var strategy = new restSerializer.UserStrategy();
-        return restSerializer.serializeExcludeNulls(users, strategy);
+        return restSerializer.serializeExcludeNulls(resp.results, strategy);
       });
 
   }
