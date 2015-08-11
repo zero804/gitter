@@ -89,21 +89,20 @@ button, .btn {
   justify-content: space-between;
   flex-grow: 1;
 
-  margin: .8em 0 .8em 0;
+  margin: 0.5em;
   color: @trpDarkGrey;
 
   border-radius: 6px;
   border: 1px solid transparent;
 
-  transition: opacity 0.3s;
-  transition: border 0.3s;
+  transition: border-color 0.2s;
 
   &:hover, &:focus {
-    border: 1px solid #EEE;
+    border-color: #EEE;
   }
 
   @media (max-width: 480px) {
-    border: 1px solid #EEE;
+    border-color: #EEE;
   }
 
   &:hover &__footer-content, &:focus &__footer-content {
@@ -133,6 +132,8 @@ button, .btn {
 
     .octicon {
       color: @trpLightGrey;
+      font-size: inherit;
+      line-height: inherit;
     }
 
     h3 {
@@ -192,8 +193,8 @@ button, .btn {
       bottom: 0;
       left: 0;
       right: 0;
-      height: 25px;
-      background: linear-gradient(to bottom, fade(@color, 0) 0%, @color 100%);
+      height: 10px;
+      background: linear-gradient(to bottom, fade(@color, 0), @color 70%, @color 100%);
     }
   }
 
@@ -221,7 +222,7 @@ button, .btn {
   }
 
   &__footer-content {
-    transition: opacity 0.3s;
+    transition: opacity 0.2s;
 
     @media (max-width: 480px) {
       opacity: 1;
