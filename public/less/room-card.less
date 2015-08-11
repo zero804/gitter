@@ -97,15 +97,14 @@ button, .btn {
   border-radius: 6px;
   border: 1px solid transparent;
 
-  transition: opacity 0.3s;
-  transition: border 0.3s;
+  transition: border-color 0.2s;
 
   &:hover, &:focus {
-    border: 1px solid #EEE;
+    border-color: #EEE;
   }
 
   @media (max-width: 480px) {
-    border: 1px solid #EEE;
+    border-color: #EEE;
   }
 
   &:hover &__footer-content, &:focus &__footer-content {
@@ -225,7 +224,7 @@ button, .btn {
   }
 
   &__footer-content {
-    transition: opacity 0.3s;
+    transition: opacity 0.2s;
 
     @media (max-width: 480px) {
       opacity: 1;
