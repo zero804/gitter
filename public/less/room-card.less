@@ -29,14 +29,28 @@ button, .btn {
   text-shadow: none;
 }
 
+.btn.secondary.pampas {
+  background: #f2f0ee;
+  border: 2px solid #dbdad9;
+  color: #3a3133;
+  transition: background-color 0.2s;
 
-.btn.secondary {
-  background: @homepage-orange;
+  &:hover {
+    background: #dbdad9;
+  }
+
 }
 
-.btn.secondary:hover {
+
+
+.btn.secondary.orange {
+  background: @homepage-orange;
+  transition: background-color 0.2s;
+}
+
+.btn.secondary.orange:hover {
   color: #FFF;
-  background: darken(@homepage-orange, 5%);
+  background: darken(@homepage-orange, 10%);
 }
 
 .btn.terciary {
