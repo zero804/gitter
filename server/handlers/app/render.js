@@ -416,6 +416,8 @@ function renderOrgPage(req, res, next) {
   var org = req.uriContext && req.uriContext.uri;
   var opts = {};
 
+  var ROOMS_PER_PAGE = 15;
+
   // Show only public rooms to not logged in users
   if (!req.user) opts.security = 'PUBLIC';
 
@@ -429,15 +431,29 @@ function renderOrgPage(req, res, next) {
   ])
   .spread(function (ghOrg,rooms, troupeContext, isOrgAdmin) {
 
-    // This is used to track pageViews in mixpanel
-    troupeContext.isCommunityPage = true;
-
+    // Filter out PRIVATE rooms
     rooms = rooms.filter(function(room) { return room.security !== 'PRIVATE'; });
+
+    // Calculate org user count across all rooms (except private)
+    var orgUserCount = rooms.reduce(function(accum, room) {
+      return accum + room.userCount;
+    }, 0);
+
+    // Calculate total number of rooms
+    var roomCount = rooms.length;
+
+    // Calculate total pages
+    var pageCount = Math.ceil(rooms.length / ROOMS_PER_PAGE);
+    var currentPage = req.query.page || 1;
+
+    // Select only the rooms for this page
+    rooms = rooms.slice(currentPage * ROOMS_PER_PAGE - ROOMS_PER_PAGE, currentPage * ROOMS_PER_PAGE);
 
     var getMembers = rooms.map(function(room) {
       return roomMembershipService.findMembersForRoom(room.id, {limit: 10});
     });
 
+    // Get memberships and then users for the rooms in this page
     return Q.all(getMembers)
     .then(function(values) {
       rooms.forEach(function(room, index) {
@@ -463,17 +479,20 @@ function renderOrgPage(req, res, next) {
         room.private = room.security !== 'PUBLIC';
       });
 
-      var orgUserCount = rooms.reduce(function(accum, room) {
-        return accum + room.userCount;
-      }, 0);
+      // This is used to track pageViews in mixpanel
+      troupeContext.isCommunityPage = true;
 
       res.render('org-page', {
         isLoggedIn: !!req.user,
-        roomCount: rooms.length,
+        roomCount: roomCount,
         orgUserCount: orgUserCount,
         org: ghOrg,
         rooms: rooms,
-        troupeContext: troupeContext
+        troupeContext: troupeContext,
+        pagination: {
+          page: currentPage,
+          pageCount: pageCount
+        }
       });
     });
 
