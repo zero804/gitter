@@ -119,12 +119,12 @@ module.exports = (function() {
 
     leave: function () {
       if (!this.options.delay) {
-        return self.hide();
+        // return self.hide();
       }
 
       var self = this;
       this.timeout = setTimeout(function() {
-        self.hide();
+        // self.hide();
       }, self.options.delay);
     },
 
