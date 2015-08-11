@@ -136,10 +136,11 @@ body {
 }
 
 .org-page__room-cards {
-  padding: 0 3.25em 3.25em 3.25em;
+  @excess-card-margin: 0.5em;
+  padding: 0 3.25em-@excess-card-margin 3.25em 3.25em-@excess-card-margin;
 
   @media (max-width: @mobileBreakPoint) {
-    padding: 1em;
+    padding: 1em-@excess-card-margin;
   }
 
   display: flex;
