@@ -12,6 +12,7 @@
 @import "bootstrap/mixins";
 
 @import "colors.less";
+@import "bootstrap/pagination";
 
 @mobileBreakPoint: 767px;
 
@@ -155,5 +156,13 @@ body {
   @media (max-width: @mobileBreakPoint) {
     float: right;
     margin-right: 13px;
+  }
+}
+
+.org-page__pagination {
+  display: flex;
+  flex-grow: 1;
+  .pagination {
+    margin: 20px auto;
   }
 }
