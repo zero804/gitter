@@ -32,7 +32,9 @@ module.exports = Marionette.LayoutView.extend({
             }, this);
 
             this.collection.on('add', function(){
-              unreadItemsClient.monitorViewForUnreadItems(this.options.monitorScrollPane, chatCollectionView);
+              if(document.hasFocus()){
+                unreadItemsClient.monitorViewForUnreadItems(this.options.monitorScrollPane, chatCollectionView);
+              }
             }, this);
           }
 
