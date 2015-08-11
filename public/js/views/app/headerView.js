@@ -123,8 +123,9 @@ module.exports = (function() {
           } else {
             menuItems.push({ title: 'Integrations', href: '#integrations' });
           }
-
-          menuItems.push({ title: 'Edit tags', href: '#tags' });
+          if(context().troupe.githubType !== 'USER_CHANNEL'){
+            menuItems.push({ title: 'Edit tags', href: '#tags/' + context().troupe.id });
+          }
         }
 
         menuItems.push({ divider: true });

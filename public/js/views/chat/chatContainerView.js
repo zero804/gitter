@@ -20,8 +20,10 @@ module.exports = Marionette.LayoutView.extend({
           }));
 
           if (this.options.monitorScrollPane) {
+
+            unreadItemsClient.monitorViewForUnreadItems(this.options.monitorScrollPane, chatCollectionView);
+
             this.collection.once('sync', function() {
-              /* Why is this on sync only? */
               unreadItemsClient.monitorViewForUnreadItems(this.options.monitorScrollPane, chatCollectionView);
             }, this);
 
