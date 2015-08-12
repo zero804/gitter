@@ -130,27 +130,30 @@ exports.globalUserSearch = function(queryText, options, callback) {
 
 exports.searchForUsersInRoom = function(queryText, roomId, options) {
   options = options || {};
-  var limit = options.limit;
-  var skip = options.skip;
+  var limit = options.limit || 30;
 
-  var emptyResponse = {
-    hasMoreResults: undefined,
-    limit: 20,
-    skip: 0,
-    results: []
-  };
+  // no guarentee that these users are in the room
+  // so we get a decent chunk and then filter by membership
+  return performQuery(queryText, { limit: 500 })
+    .then(function(userIds) {
+      return roomMembershipService.findMembershipForUsersInRoom(roomId, userIds);
+    })
+    .then(function(userIds) {
+      userIds = userIds.slice(0, limit);
 
-  return createRegExpsForQuery(queryText)
-    .then(function(res) {
-      if(!res.length) return emptyResponse;
-
-      return roomMembershipService.findMembersForRoom(roomId)
-        .then(function(userIds) {
-          if(!userIds.length) return emptyResponse;
-
-          return searchForRegularExpressionsWithinUserIds(userIds, res, queryText, { limit: limit, skip: skip });
+      return userService.findByIds(userIds)
+        .then(function(users) {
+          return collections.maintainIdOrder(userIds, users);
         });
-      });
+    })
+    .then(function(results) {
+      return {
+        hasMoreResults: undefined,
+        limit: options.limit,
+        skip: 0,
+        results: results
+      };
+    });
 };
 
 exports.searchForUsers = function(userId, queryText, options, callback) {
