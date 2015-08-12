@@ -1,0 +1,91 @@
+<html>
+  <head>
+    <link rel='stylesheet' type='text/css' href="{{ cdn 'styles/org-page.css' }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/octicons/2.0.2/octicons.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+
+  <body>
+
+    <header class="org-page__header">
+
+      <div class="org-page__org">
+        <div class="org-page__org-logo">
+          <img width='64' height='64' src='https://avatars.githubusercontent.com/{{ org.login }}?s=128'>
+        </div>
+
+        <div class="org-page__org-details">
+          <div class="org-page__name">
+            <h1>{{ org.login }}</h1>
+          </div>
+
+          <div class="org-page__description">
+            {{org.description}}
+          </div>
+        </div>
+
+        {{#if isLoggedIn}}
+        <div class="org-page__login">
+         <a class="btn secondary pampas" href="{{socialUrl}}" target="_blank"><i class="icon-twitter"></i> Share</a>
+        </div>
+        {{else}}
+          <div class="org-page__login">
+            Are you a member of {{ org.login }}?  <a class="btn secondary orange sorg-page__login__btn" href="/login/github?action=login&source=orgpage" target="_parent">Login</a>
+          </div>
+        {{/if}}
+      </div>
+
+      <div class="org-page__details">
+        <div class="org-page__detail">
+          <i class="octicon octicon-comment-discussion"></i>
+          {{roomCount}} {{pluralize roomCount 'Room' 'Rooms'}}
+        </div>
+
+        <div class="org-page__detail">
+          <i class="octicon octicon-organization"></i>
+          {{orgUserCount}} {{pluralize orgUserCount 'Person' 'People' }}
+        </div>
+
+        {{#if org.location}}
+          <div class="org-page__detail"><i class="octicon octicon-location"></i> {{org.location}}</div>
+        {{/if}}
+
+        {{#if org.blog}}
+          <div class="org-page__detail"><i class="octicon octicon-link"></i><a href="{{org.blog}}" target="_blank"> {{org.blog}}</a></div>
+        {{/if}}
+      </div>
+    </header>
+
+    <div class='org-page__room-cards'>
+      {{#each rooms}}
+        {{> room_card }}
+      {{/each}}
+    </div>
+
+
+    <div class='org-page__pagination'>
+      <div class="pagination">
+        <ul>
+          {{#paginate pagination type="first"}}
+            <!-- <li {{#if disabled}}class="disabled"{{/if}}><a href="?page={{n}}">First</a></li> -->
+          {{/paginate}}
+          {{#paginate pagination type="previous"}}
+            <li {{#if disabled}}class="disabled"{{/if}}><a href="?page={{n}}">&laquo;</a></li>
+          {{/paginate}}
+          {{#paginate pagination type="middle" limit="7"}}
+            <li {{#if active}}class="active"{{/if}}><a href="?page={{n}}" target="_self">{{n}}</a></li>
+          {{/paginate}}
+          {{#paginate pagination type="next"}}
+            <li {{#if disabled}}class="disabled"{{/if}}><a href="?page={{n}}">&raquo;</a></li>
+          {{/paginate}}
+          {{#paginate pagination type="last"}}
+            <!-- <li {{#if disabled}}class="disabled"{{/if}}><a href="?page={{n}}">Last</a></li> -->
+          {{/paginate}}
+        </ul>
+      </div>
+    </div>
+
+    {{{ generateTroupeContext troupeContext }}}
+    {{{ bootScript 'router-org-page' }}}
+  </body>
+</html>

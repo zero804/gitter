@@ -97,12 +97,6 @@
       "src": "entypo"
     },
     {
-      "uid": "1189604bf305b6b03a74685ce60e6632",
-      "css": "doc-text",
-      "code": 59557,
-      "src": "entypo"
-    },
-    {
       "uid": "ccf71c505b173c61a2e4e8c8cb907dfa",
       "css": "chat-alt",
       "code": 59577,
@@ -125,6 +119,12 @@
       "css": "hash",
       "code": 59575,
       "src": "mfglabs"
+    },
+    {
+      "uid": "627abcdb627cb1789e009c08e2678ef9",
+      "css": "twitter",
+      "code": 59401,
+      "src": "fontawesome"
     }
   ]
 }

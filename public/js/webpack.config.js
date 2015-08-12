@@ -31,6 +31,7 @@ var webpackConfig = {
     "router-embed-chat": path.resolve(path.join(__dirname, "./router-embed-chat")),
     "homepage": path.resolve(path.join(__dirname, "./homepage")),
     "apps": path.resolve(path.join(__dirname, "./apps.js")),
+    "router-org-page": path.resolve(path.join(__dirname, './router-org-page.js')),
     vendor: [
       'utils/webpack',
       'utils/context',
@@ -60,7 +61,12 @@ var webpackConfig = {
     loaders: [
       {
         test: /\.hbs$/,
-        loader: "handlebars-loader" // disable minify for now + path.resolve(path.join(__dirname, "../../build-scripts/html-min-loader"))
+        loader: "handlebars-loader", // disable minify for now + path.resolve(path.join(__dirname, "../../build-scripts/html-min-loader"))
+        query: {
+          'helperDirs[]': [
+            path.resolve(__dirname, '../../shared/handlebars/helpers')
+          ]
+        }
       }
     ]
   },

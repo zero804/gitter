@@ -107,6 +107,11 @@ module.exports = {
           promises.push(troupeService.toggleSearchIndexing(req.user, troupe, updatedTroupe.noindex));
         }
 
+        if(updatedTroupe.hasOwnProperty('tags')) {
+          promises.push(troupeService.updateTags(req.user, troupe, updatedTroupe.tags));
+        }
+
+
         return Q.all(promises)
           .then(function() {
             var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id /*, mapUsers: false*/ });
@@ -140,6 +145,7 @@ module.exports = {
   },
 
   load: function(req, id, callback) {
+    var user = req.user;
     var userId = req.user && req.user._id;
     /* Invalid id? Return 404 */
     if(!mongoUtils.isLikeObjectId(id)) return callback();
@@ -158,9 +164,14 @@ module.exports = {
         }
 
         if(!access) {
-          throw new StatusError(403);
+          // if the user **cann** the admin of the room, we still grant access to load the room
+          // this enables, for example, editing tags even if you're not in the room
+          return roomPermissionsModel(user, 'admin', troupe)
+            .then(function(isAdmin) {
+              if (isAdmin) return troupe;
+              throw new StatusError(403);
+            });
         }
-
         return troupe;
       })
       .nodeify(callback);
