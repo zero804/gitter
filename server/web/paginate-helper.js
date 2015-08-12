@@ -10,8 +10,9 @@ module.exports = function(pagination, options) {
   var newContext = {};
   switch (type) {
     case 'middle':
+      var i;
       if (typeof limit === 'number') {
-        var i = 0;
+        i = 0;
         var leftCount = Math.ceil(limit / 2) - 1;
         var rightCount = limit - leftCount - 1;
         if (page + rightCount > pageCount)
@@ -29,7 +30,7 @@ module.exports = function(pagination, options) {
         }
       }
       else {
-        for (var i = 1; i <= pageCount; i++) {
+        for (i = 1; i <= pageCount; i++) {
           newContext = { n: i };
           if (i === page) newContext.active = true;
           ret = ret + options.fn(newContext);
@@ -38,38 +39,38 @@ module.exports = function(pagination, options) {
       break;
     case 'previous':
       if (page === 1) {
-        newContext = { disabled: true, n: 1 }
+        newContext = { disabled: true, n: 1 };
       }
       else {
-        newContext = { n: page - 1 }
+        newContext = { n: page - 1 };
       }
       ret = ret + options.fn(newContext);
       break;
     case 'next':
       newContext = {};
       if (page === pageCount) {
-        newContext = { disabled: true, n: pageCount }
+        newContext = { disabled: true, n: pageCount };
       }
       else {
-        newContext = { n: page + 1 }
+        newContext = { n: page + 1 };
       }
       ret = ret + options.fn(newContext);
       break;
     case 'first':
       if (page === 1) {
-        newContext = { disabled: true, n: 1 }
+        newContext = { disabled: true, n: 1 };
       }
       else {
-        newContext = { n: 1 }
+        newContext = { n: 1 };
       }
       ret = ret + options.fn(newContext);
       break;
     case 'last':
       if (page === pageCount) {
-        newContext = { disabled: true, n: pageCount }
+        newContext = { disabled: true, n: pageCount };
       }
       else {
-        newContext = { n: pageCount }
+        newContext = { n: pageCount };
       }
       ret = ret + options.fn(newContext);
       break;
