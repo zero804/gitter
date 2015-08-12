@@ -9,6 +9,8 @@ var _             = require('underscore');
 var userService   = require('./user-service');
 var roomMembershipService = require('./room-membership-service');
 
+var LARGE_ROOM_SIZE_THRESHOLD = 200;
+
 function createRegExpsForQuery(queryText) {
   var normalized = ("" + queryText).trim().toLowerCase();
   var parts = normalized.split(/[\s\'']+/)
@@ -79,7 +81,7 @@ function difference(ids, excludeIds) {
   return ids.filter(function(i) { return !o[i]; });
 }
 
-function performQuery(queryString, options) {
+function performQuery(queryText, options) {
   var queryRequest = {
     size: options.limit || 10,
     timeout: 500,
@@ -89,7 +91,7 @@ function performQuery(queryString, options) {
       fields: ["_id"],
       query: {
         query_string: {
-          query: queryString,
+          query: queryText,
           default_operator: "AND"
         }
       },
@@ -99,12 +101,41 @@ function performQuery(queryString, options) {
     }
   };
 
-  return Q(client.search(queryRequest))
-    .then(function(response) {
-      return response.hits.hits.map(function(hit) {
-        return hit._id;
-      });
-    });
+  return Q(client.search(queryRequest)).then(elasticResponseToUserIds);
+}
+
+function performFilteredQuery(queryText, userIds, options) {
+  var queryRequest = {
+    size: options.limit || 10,
+    timeout: 500,
+    index: 'gitter-primary',
+    type: 'user',
+    body: {
+      fields: ["_id"],
+      query: {
+        filtered: {
+          filter: { ids: { values: userIds } },
+          query: {
+            query_string: {
+              query: queryText,
+              default_operator: "AND"
+            }
+          }
+        }
+      },
+      sort: [
+        { _score: { order : "desc"} }
+      ],
+    }
+  };
+
+  return Q(client.search(queryRequest)).then(elasticResponseToUserIds);
+}
+
+function elasticResponseToUserIds(response) {
+  return response.hits.hits.map(function(hit) {
+    return hit._id;
+  });
 }
 
 exports.globalUserSearch = function(queryText, options, callback) {
@@ -128,7 +159,33 @@ exports.globalUserSearch = function(queryText, options, callback) {
     .nodeify(callback);
 };
 
-exports.searchForUsersInRoom = function(queryText, roomId, options) {
+function searchForUsersInSmallRoom(queryText, roomId, options) {
+  options = options || {};
+  var limit = options.limit || 30;
+
+  return roomMembershipService.findMembersForRoom(roomId)
+    .then(function(userIds) {
+      if (!userIds || !userIds.length) return [];
+
+      return performFilteredQuery(queryText, userIds, { limit: limit });
+    })
+    .then(function(userIds) {
+      return userService.findByIds(userIds)
+        .then(function(users) {
+          return collections.maintainIdOrder(userIds, users);
+        });
+    })
+    .then(function(results) {
+      return {
+        hasMoreResults: undefined,
+        limit: limit,
+        skip: 0,
+        results: results
+      };
+    });
+}
+
+function searchForUsersInLargeRoom(queryText, roomId, options) {
   options = options || {};
   var limit = options.limit || 30;
 
@@ -153,6 +210,17 @@ exports.searchForUsersInRoom = function(queryText, roomId, options) {
         skip: 0,
         results: results
       };
+    });
+}
+
+exports.searchForUsersInRoom = function(queryText, roomId, options) {
+  return roomMembershipService.countMembersInRoom(roomId)
+    .then(function(userCount) {
+      if (userCount < LARGE_ROOM_SIZE_THRESHOLD) {
+        return searchForUsersInSmallRoom(queryText, roomId, options);
+      } else {
+        return searchForUsersInLargeRoom(queryText, roomId, options);
+      }
     });
 };
 
