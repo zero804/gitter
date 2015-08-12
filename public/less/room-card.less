@@ -4,9 +4,7 @@
 
 button, .btn {
   font-size: 12px;
-  line-height: 1;
-  font-weight: 600;
-  letter-spacing: 2px;
+  letter-spacing: 1px;
 
   text-transform: uppercase;
 }
@@ -29,14 +27,28 @@ button, .btn {
   text-shadow: none;
 }
 
+.btn.secondary.pampas {
+  background: #f2f0ee;
+  border: 2px solid #dbdad9;
+  color: #3a3133;
+  transition: background-color 0.2s;
 
-.btn.secondary {
-  background: @homepage-orange;
+  &:hover {
+    background: #dbdad9;
+  }
+
 }
 
-.btn.secondary:hover {
+
+
+.btn.secondary.orange {
+  background: @homepage-orange;
+  transition: background-color 0.2s;
+}
+
+.btn.secondary.orange:hover {
   color: #FFF;
-  background: darken(@homepage-orange, 5%);
+  background: darken(@homepage-orange, 10%);
 }
 
 .btn.terciary {
@@ -77,22 +89,20 @@ button, .btn {
   justify-content: space-between;
   flex-grow: 1;
 
-  margin: .8em 0 .8em 0;
+  margin: 0.5em;
   color: @trpDarkGrey;
 
   border-radius: 6px;
   border: 1px solid transparent;
 
-  transition: opacity 0.3s;
+  transition: border-color 0.2s;
 
   &:hover, &:focus {
-    transition: border 0.3s;
-    border: 1px solid #EEE;
+    border-color: #EEE;
   }
 
   @media (max-width: 480px) {
-    transition: border 0.3s;
-    border: 1px solid #EEE;
+    border-color: #EEE;
   }
 
   &:hover &__footer-content, &:focus &__footer-content {
@@ -122,6 +132,8 @@ button, .btn {
 
     .octicon {
       color: @trpLightGrey;
+      font-size: inherit;
+      line-height: inherit;
     }
 
     h3 {
@@ -181,8 +193,8 @@ button, .btn {
       bottom: 0;
       left: 0;
       right: 0;
-      height: 25px;
-      background: linear-gradient(to bottom, fade(@color, 0) 0%, @color 100%);
+      height: 10px;
+      background: linear-gradient(to bottom, fade(@color, 0), @color 70%, @color 100%);
     }
   }
 
@@ -210,9 +222,10 @@ button, .btn {
   }
 
   &__footer-content {
+    transition: opacity 0.2s;
+
     @media (max-width: 480px) {
       opacity: 1;
-      transition: opacity 0.3s;
     }
     opacity: 0;
   }

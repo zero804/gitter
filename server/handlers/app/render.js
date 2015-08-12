@@ -467,7 +467,16 @@ function renderOrgPage(req, res, next) {
         return accum + room.userCount;
       }, 0);
 
+      var orgUri = nconf.get('web:basepath') + "/orgs/" + org + "/rooms";
+      var text = encodeURIComponent('Explore our chat community on Gitter:');
+      var url = 'https://twitter.com/share?' +
+        'text=' + text +
+        '&url=' + orgUri +
+        '&related=gitchat' +
+        '&via=gitchat';
+
       res.render('org-page', {
+        socialUrl: url,
         isLoggedIn: !!req.user,
         roomCount: rooms.length,
         orgUserCount: orgUserCount,
