@@ -482,7 +482,16 @@ function renderOrgPage(req, res, next) {
       // This is used to track pageViews in mixpanel
       troupeContext.isCommunityPage = true;
 
+      var orgUri = nconf.get('web:basepath') + "/orgs/" + org + "/rooms";
+      var text = encodeURIComponent('Explore our chat community on Gitter:');
+      var url = 'https://twitter.com/share?' +
+        'text=' + text +
+        '&url=' + orgUri +
+        '&related=gitchat' +
+        '&via=gitchat';
+
       res.render('org-page', {
+        socialUrl: url,
         isLoggedIn: !!req.user,
         roomCount: roomCount,
         orgUserCount: orgUserCount,

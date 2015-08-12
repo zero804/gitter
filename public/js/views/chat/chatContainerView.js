@@ -1,3 +1,4 @@
+/* global document */
 "use strict";
 
 var Marionette = require('backbone.marionette');
@@ -20,13 +21,20 @@ module.exports = Marionette.LayoutView.extend({
           }));
 
           if (this.options.monitorScrollPane) {
+
+            //only check the items on init if the window is focused
+            if(document.hasFocus()){
+              unreadItemsClient.monitorViewForUnreadItems(this.options.monitorScrollPane, chatCollectionView);
+            }
+
             this.collection.once('sync', function() {
-              /* Why is this on sync only? */
               unreadItemsClient.monitorViewForUnreadItems(this.options.monitorScrollPane, chatCollectionView);
             }, this);
 
             this.collection.on('add', function(){
-              unreadItemsClient.monitorViewForUnreadItems(this.options.monitorScrollPane, chatCollectionView);
+              if(document.hasFocus()){
+                unreadItemsClient.monitorViewForUnreadItems(this.options.monitorScrollPane, chatCollectionView);
+              }
             }, this);
           }
 
