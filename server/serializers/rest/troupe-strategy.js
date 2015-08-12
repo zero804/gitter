@@ -314,6 +314,7 @@ function TroupeStrategy(options) {
       security: item.security,
       premium: isPro,
       noindex: item.noindex,
+      tags: item.tags,
       v: getVersion(item)
     };
   };

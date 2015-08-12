@@ -109,13 +109,9 @@ exports.generateTroupeContext = function(troupeContext, parameters) {
           '</script>';
 };
 
-// credit to @lazd (https://github.com/lazd) - https://github.com/wycats/handlebars.js/issues/249
-exports.pluralize = function(number, singular, plural) {
-  if (number === 1) return singular;
-  return (typeof plural === 'string') ? plural : singular + 's';
-};
+exports.pluralize = require('../../shared/handlebars/helpers/pluralize');
 
-exports.toLowerCase = function (str) {
+  exports.toLowerCase = function (str) {
   return str.toLowerCase();
 };
 
@@ -173,9 +169,10 @@ exports.formatNumber = function (n) {
 exports.githubTypeToClass = function (type) {
   if (/_CHANNEL/.test(type)) return 'icon-hash';
   else if (/REPO/.test(type)) return 'octicon-repo';
+  else if (/ORG/.test(type)) return 'octicon-organization';
   else return 'default';
 };
 
 exports.getRoomName = function (name) {
-  return name.split('/')[1];
+  return name.split('/')[1] || 'general';
 };

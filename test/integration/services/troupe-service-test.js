@@ -24,6 +24,25 @@ function findUserIdPredicate(userId) {
   }
 }
 describe('troupe-service', function() {
+
+  describe('update actions', function() {
+    var troupeService = testRequire.withProxies('./services/troupe-service', {
+      './room-permissions-model': function() { return Q.resolve(true); }
+    });
+
+    it('should update tags', function(done) {
+      var rawTags = 'js, open source,    looooooooooooooooooooooooooooongtag,,,,';
+      var cleanTags = ['js','open source', 'looooooooooooooooooo'];
+
+      troupeService.updateTags(fixture.user1, fixture.troupe1, rawTags)
+      .then(function(troupe) {
+        assert.deepEqual(troupe.tags.toObject(), cleanTags);
+        done();
+      })
+      .catch(done);
+    });
+  });
+
   describe('oneToOnes #slow', function() {
     var troupeService = testRequire('./services/troupe-service');
     var roomMembershipService = testRequire('./services/room-membership-service');
@@ -40,7 +59,6 @@ describe('troupe-service', function() {
           return roomMembershipService.findMembersForRoom(troupe.id);
         })
         .then(function(userIds) {
-          console.log(userIds);
           assert(_.find(userIds, findUserIdPredicate(fixture.user1.id)));
           assert(_.find(userIds, findUserIdPredicate(fixture.user2.id)));
         })

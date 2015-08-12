@@ -51,7 +51,7 @@ var TOTAL_USERS = 10000;
 
     roomMembershipService = mockito.mock(testRequire('./services/room-membership-service'));
     userService = mockito.mock(testRequire('./services/user-service'));
-    appEvents = mockito.mock(testRequire('./app-events'));
+    appEvents = mockito.mock(testRequire('gitter-web-appevents'));
     roomPermissionsModel = mockito.mockFunction();
 
     mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId).thenReturn(Q.resolve(troupeLurkersUserHash));
