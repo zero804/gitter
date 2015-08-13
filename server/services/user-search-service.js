@@ -104,25 +104,47 @@ function performQuery(queryText, options) {
   return Q(client.search(queryRequest)).then(elasticResponseToUserIds);
 }
 
-function performFilteredQuery(queryText, userIds, options) {
+function elasticsearchUserTypeahead(queryText, options) {
+
+  // Normal searches dont work well for typeaheads
+  // e.g searching "maldito" normally wouldnt match malditogeek.
+  // but phrase_prefix handles that.
+  //
+  // Completion Suggester is faster, but requires us to completely
+  // reindex and supply a room context
+
+  options = options || {};
+  var limit = options.limit || 10;
+  var userIds = options.userIds;
+
+  var query = {
+    multi_match: {
+      query: queryText,
+      type: "phrase_prefix",
+      fields: [
+        "username",
+        "displayName"
+      ]
+    }
+  };
+
+  if (userIds) {
+    query = {
+      filtered: {
+        filter: { ids: { values: userIds } },
+        query: query
+      }
+    };
+  }
+
   var queryRequest = {
-    size: options.limit || 10,
+    size: limit,
     timeout: 500,
     index: 'gitter-primary',
     type: 'user',
     body: {
       fields: ["_id"],
-      query: {
-        filtered: {
-          filter: { ids: { values: userIds } },
-          query: {
-            query_string: {
-              query: queryText,
-              default_operator: "AND"
-            }
-          }
-        }
-      },
+      query: query,
       sort: [
         { _score: { order : "desc"} }
       ],
@@ -167,7 +189,7 @@ function searchForUsersInSmallRoom(queryText, roomId, options) {
     .then(function(userIds) {
       if (!userIds || !userIds.length) return [];
 
-      return performFilteredQuery(queryText, userIds, { limit: limit });
+      return elasticsearchUserTypeahead(queryText, { limit: limit, userIds: userIds });
     })
     .then(function(userIds) {
       return userService.findByIds(userIds)
@@ -191,7 +213,7 @@ function searchForUsersInLargeRoom(queryText, roomId, options) {
 
   // no guarentee that these users are in the room
   // so we get a decent chunk and then filter by membership
-  return performQuery(queryText, { limit: 500 })
+  return elasticsearchUserTypeahead(queryText, { limit: 500 })
     .then(function(userIds) {
       return roomMembershipService.findMembershipForUsersInRoom(roomId, userIds);
     })
