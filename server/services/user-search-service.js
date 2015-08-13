@@ -228,7 +228,7 @@ function searchForUsersInLargeRoom(queryText, roomId, options) {
     .then(function(results) {
       return {
         hasMoreResults: undefined,
-        limit: options.limit,
+        limit: limit,
         skip: 0,
         results: results
       };
