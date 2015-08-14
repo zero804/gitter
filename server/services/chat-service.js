@@ -473,11 +473,9 @@ exports.findDailyChatActivityForRoom = function(troupeId, start, end, callback) 
     },
     { $group: {
         _id: {
-            $add: [
-              { $multiply: [{ $year: '$sent' }, 10000] },
-              { $multiply: [{ $month: '$sent' }, 100] },
-              { $dayOfMonth: '$sent' }
-            ]
+          year: { $year : "$sent" },
+          month: { $month : "$sent" },
+          dayOfMonth: { $dayOfMonth : "$sent" },
         },
         count: {
           $sum: 1
@@ -486,9 +484,15 @@ exports.findDailyChatActivityForRoom = function(troupeId, start, end, callback) 
     }
 
   ])
-  .then(function(dates) {
-    return dates.reduce(function(memo, value) {
-      memo[value._id] = value.count;
+  .then(function(results) {
+    return results.reduce(function(memo, result) {
+      var _id = result._id;
+      // mongo dates are 1-based, js months are 0-based
+      var jsMonth = _id.month - 1;
+      var day = new Date(_id.year, jsMonth, _id.dayOfMonth);
+      var unixTime = (day.getTime() / 1000).toFixed(0);
+
+      memo[unixTime] = result.count;
       return memo;
     }, {});
   })
