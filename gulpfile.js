@@ -359,7 +359,7 @@ gulp.task('css-web', function () {
     'public/less/chat-card.less',
     'public/less/router-archive-home.less',
     'public/less/router-archive-chat.less',
-    'public/less/userhome_treatment.less',
+    'public/less/userhome.less',
     'public/less/402.less',
     'public/less/org-page.less',
     'public/less/room-card.less'
