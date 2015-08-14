@@ -107,8 +107,7 @@ function renderHomePage(req, res, next) {
         page = 'mobile/mobile-userhome';
         bootScriptName = 'mobile-userhome';
       } else {
-        var variant = splitTests.configure(req, res, 'userhome');
-        page = splitTests.selectTemplate(variant, 'userhome-template_control', 'userhome-template_treatment');
+        page = 'userhome-template_treatment';
         bootScriptName = 'userhome';
       }
 
@@ -168,7 +167,6 @@ function fixBadLinksOnId(value) {
 }
 
 function renderMainFrame(req, res, next, frame) {
-  splitTests.configure(req, res, 'userhome');
   var variant = splitTests.configure(req, res, 'nli');
 
   var user = req.user;
