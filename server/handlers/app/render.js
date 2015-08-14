@@ -101,15 +101,7 @@ switch(nconf.get('NODE_ENV')) {
 function renderHomePage(req, res, next) {
   contextGenerator.generateNonChatContext(req)
     .then(function (troupeContext) {
-      var page, bootScriptName;
-
-      if(req.isPhone) {
-        page = 'mobile/mobile-userhome';
-        bootScriptName = 'mobile-userhome';
-      } else {
-        page = 'userhome-template';
-        bootScriptName = 'userhome';
-      }
+      var page = req.isPhone ? 'mobile/mobile-userhome' : 'userhome-template';
 
       var osName = useragent.parse(req.headers['user-agent']).os.family.toLowerCase();
 
@@ -127,11 +119,7 @@ function renderHomePage(req, res, next) {
         showOsxApp: showOsxApp,
         showWindowsApp: showWindowsApp,
         showLinuxApp: showLinuxApp,
-        bootScriptName: bootScriptName,
-        cssFileName: "styles/" + bootScriptName + ".css",
         troupeContext: troupeContext,
-        agent: req.headers['user-agent'],
-        isUserhome: true,
         isNativeDesktopApp: troupeContext.isNativeDesktopApp,
         billingBaseUrl: nconf.get('web:billingBaseUrl')
       });
