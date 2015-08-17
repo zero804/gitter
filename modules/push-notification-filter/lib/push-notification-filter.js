@@ -10,7 +10,6 @@ var redisClient = env.ioredis.createClient(null);
 var minimumUserAlertIntervalS = config.get("notifications:minimumUserAlertInterval");
 
 var MAX_NOTIFICATIONS_PER_CYCLE = 100;
-// var MAX_NOTIFICATIONS_PER_CYCLE = 2;
 
 function defineCommand(name, script, keys) {
   redisClient.defineCommand(name, {
