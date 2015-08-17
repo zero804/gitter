@@ -9,10 +9,6 @@ var chatService = require('../../server/services/chat-service');
 require('../../server/event-listeners').install();
 
 var opts = require("nomnom")
-   .option('host', {
-      abbr: 'h',
-      'default': 'http://localhost:5000'
-   })
    .option('user', {
       abbr: 'u',
       required: true
