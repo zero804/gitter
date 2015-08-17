@@ -59,4 +59,9 @@ router.post('/private/gcm',
   identifyRoute('gcm-registration'),
   require('./private/gcm'));
 
+router.post('/private/channels',
+  authMiddleware,
+  identifyRoute('create-channel'),
+  require('./private/create-channel'));
+
 module.exports = router;

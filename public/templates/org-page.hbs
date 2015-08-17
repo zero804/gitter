@@ -24,22 +24,26 @@
           </div>
         </div>
 
-        {{#unless isLoggedIn}}
+        {{#if isLoggedIn}}
+        <div class="org-page__login">
+         <a class="btn secondary pampas" href="{{socialUrl}}" target="_blank"><i class="icon-twitter"></i> Share</a>
+        </div>
+        {{else}}
           <div class="org-page__login">
-            Are you a member of {{ org.login }}?  <a class="btn secondary org-page__login__btn" href="/login/github?action=login&source=orgpage" target="_parent">Login</a>
+            Are you a member of {{ org.login }}?  <a class="btn secondary orange sorg-page__login__btn" href="/login/github?action=login&source=orgpage" target="_parent">Login</a>
           </div>
-        {{/unless}}
+        {{/if}}
       </div>
 
       <div class="org-page__details">
         <div class="org-page__detail">
           <i class="octicon octicon-comment-discussion"></i>
-          {{pluralize roomCount 'Room' 'Rooms'}}
+          {{roomCount}} {{pluralize roomCount 'Room' 'Rooms'}}
         </div>
 
         <div class="org-page__detail">
           <i class="octicon octicon-organization"></i>
-          {{pluralize orgUserCount 'Person' 'People' }}
+          {{orgUserCount}} {{pluralize orgUserCount 'Person' 'People' }}
         </div>
 
         {{#if org.location}}
@@ -56,6 +60,29 @@
       {{#each rooms}}
         {{> room_card }}
       {{/each}}
+    </div>
+
+
+    <div class='org-page__pagination'>
+      <div class="pagination">
+        <ul>
+          {{#paginate pagination type="first"}}
+            <!-- <li {{#if disabled}}class="disabled"{{/if}}><a href="?page={{n}}">First</a></li> -->
+          {{/paginate}}
+          {{#paginate pagination type="previous"}}
+            <li {{#if disabled}}class="disabled"{{/if}}><a href="?page={{n}}">&laquo;</a></li>
+          {{/paginate}}
+          {{#paginate pagination type="middle" limit="7"}}
+            <li {{#if active}}class="active"{{/if}}><a href="?page={{n}}" target="_self">{{n}}</a></li>
+          {{/paginate}}
+          {{#paginate pagination type="next"}}
+            <li {{#if disabled}}class="disabled"{{/if}}><a href="?page={{n}}">&raquo;</a></li>
+          {{/paginate}}
+          {{#paginate pagination type="last"}}
+            <!-- <li {{#if disabled}}class="disabled"{{/if}}><a href="?page={{n}}">Last</a></li> -->
+          {{/paginate}}
+        </ul>
+      </div>
     </div>
 
     {{{ generateTroupeContext troupeContext }}}

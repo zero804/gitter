@@ -83,6 +83,7 @@ var TagInputView = Marionette.ItemView.extend({
   removeLastTag: function(){
     var val =  this.$el.find('input').val();
     if(val === '') this.collection.pop();
+    this.triggerMethod('tag:removed');
   },
 
   onModelChange: function(model){
