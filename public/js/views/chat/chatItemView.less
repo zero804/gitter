@@ -108,13 +108,11 @@
   &.unread .chat-item__container {
     border-right: 2px solid @green;
     background-color: rgba(46, 204, 113,0.08);
-    transition: 1s border linear, 1s background-color linear;
   }
 
   &.unread.mentioned .chat-item__container {
     border-right: 2px solid @orange;
     background-color: rgba(230, 126, 34,0.08);
-    transition: 2s border linear, 2s background-color linear;
   }
 
   &.mentioned .chat-item__text .mention {
@@ -145,7 +143,7 @@
 
 }
 
-.chat-item:hover .chat-item__actions {
+.chat-item:hover .chat-item__actions, .chat-item:hover .chat-item__time {
   opacity: 1;
   transition: 0.2s opacity linear;
 }
@@ -175,8 +173,8 @@
   border-right: 2px solid transparent;
   margin: 0.8em 12px 0px;
   padding-left: 32px;
-  transition: 1s border linear;
-
+  transition-delay: 2s;
+  transition: 2s border linear, 3s background-color linear;
   &.syncerror {
     background-color: #edb2bd;
   }
@@ -198,9 +196,10 @@
 .chat-item__time {
   vertical-align: middle;
   display: inline-block;
-  color: #ddd;
+  color: #aaa;
   float: right;
   margin-top: 2px;
+  opacity: 0.7;
 }
 
 .chat-item__time--permalinkable {
@@ -360,7 +359,7 @@
 
 .chat-item__status {
   .chat-item__text {
-    color: #aaa;
+    color: @purple;
   }
 }
 

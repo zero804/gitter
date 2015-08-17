@@ -31,7 +31,8 @@ var mainFrameMiddlewarePipeline = [
     if(req.isPhone) {
       if(!req.user) {
         if (req.uriContext.accessDenied) {
-          return appRender.renderOrgPage(req, res, next);
+          //return appRender.renderOrgPage(req, res, next);
+          return res.redirect('/orgs/' + req.uriContext.uri +  '/rooms/~iframe');
         }
         appRender.renderMobileNotLoggedInChat(req, res, next);
         return;
@@ -60,7 +61,8 @@ var chatMiddlewarePipeline = [
   timezoneMiddleware,
   function (req, res, next) {
     if (req.uriContext.accessDenied) {
-      return appRender.renderOrgPage(req, res, next);
+      //return appRender.renderOrgPage(req, res, next);
+      return res.redirect('/orgs/' + req.uriContext.uri +  '/rooms/~iframe');
     }
 
     if(!req.uriContext.troupe) return next(404);

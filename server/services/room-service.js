@@ -171,8 +171,8 @@ function makeRoomTypeCreationFilterFunction(creationFilter) {
  *
  * @returns Promise of [troupe, hasJoinPermission] if the user is able to join/create the troupe
  */
-function findOrCreateNonOneToOneRoom(user, troupe, uri, options) {
-  debug("findOrCreateNonOneToOneRoom: %s", uri);
+function findOrCreateGroupRoom(user, troupe, uri, options) {
+  debug("findOrCreateGroupRoom: %s", uri);
 
   if(!options) options = {};
 
@@ -456,6 +456,84 @@ function updateRoomWithGithubIdIfRequired(user, troupe) {
 }
 
 /**
+ * Silently creates a room based on an org or repo (if the user has permission)
+ * no emails are sent, noone is added
+ * used to silently create owner rooms for org channels
+ */
+function createGithubRoom(user, uri) {
+  if(!user) return Q.reject(new StatusError(400, 'user required'));
+  if(!uri) return Q.reject(new StatusError(400, 'uri required'));
+
+  return validateUri(user, uri)
+    .then(function(githubInfo) {
+      if (!githubInfo) throw new StatusError(400, uri + ' is not a github entity');
+
+      var githubType = githubInfo.type;
+
+      if (githubType !== 'ORG' && githubType !== 'REPO') {
+        throw new StatusError(400, uri + ' is not an org or repo on github');
+      }
+
+      var officialUri = githubInfo.uri;
+      var lcUri = officialUri.toLowerCase();
+      var lcOwner = lcUri.split('/')[0];
+      var security = githubInfo.security || null;
+      var githubId = githubInfo.githubId || null;
+      var topic = githubInfo.description || '';
+
+      return permissionsModel(user, 'create', officialUri, githubType, null)
+        .then(function(hasAccess) {
+          if (!hasAccess) throw new StatusError(403, 'no permission to create ' + officialUri);
+        })
+        .then(function() {
+
+          // prefer queries with githubIds, as they survive github renames
+          var queryTerm = githubId ?
+              { githubId: githubId, githubType: githubType } :
+              { lcUri: lcUri, githubType: githubType };
+
+          return mongooseUtils.upsert(persistence.Troupe, queryTerm, {
+               $setOnInsert: {
+                lcUri: lcUri,
+                lcOwner: lcOwner,
+                uri: officialUri,
+                githubType: githubType,
+                githubId: githubId,
+                topic: topic,
+                security: security,
+                dateLastSecurityCheck: new Date(),
+                userCount: 0
+              }
+            })
+            .spread(function(room, updateExisting) {
+              if (!updateExisting) {
+                stats.event("create_room", {
+                  userId: user.id,
+                  roomType: "github-room"
+                });
+              }
+
+              if (updateExisting && room.uri !== uri && githubType === 'REPO') {
+                // room has been renamed!
+                // TODO: deal with ORG renames too!
+                debug('Attempting to rename room %s to %s', room.uri, uri);
+
+                return renameRepo(room.uri, uri)
+                  .then(function() {
+                    // return fresh renamed room
+                    return troupeService.findById(room.id);
+                  });
+              }
+
+              return room;
+            });
+        });
+    });
+}
+
+exports.createGithubRoom = createGithubRoom;
+
+/**
  * Add a user to a room.
  * - If the room does not exist, will create the room if the user has permission
  * - If the room does exist, will add the user to the room if the user has permission
@@ -564,7 +642,7 @@ function findOrCreateRoom(user, uri, options) {
       debug("localUriLookup returned room %s for uri=%s. Finding or creating room", uriLookup && uriLookup.troupe && uriLookup.troupe.uri, uri);
 
       // need to check for the rooms
-      return findOrCreateNonOneToOneRoom(user, uriLookup && uriLookup.troupe, uri, options)
+      return findOrCreateGroupRoom(user, uriLookup && uriLookup.troupe, uri, options)
         .then(function(findOrCreateResult) {
           var troupe = findOrCreateResult.troupe;
           var access = findOrCreateResult.access;

@@ -25,7 +25,6 @@ var webpackConfig = {
     "mobile-app": path.resolve(path.join(__dirname, "./mobile-app")),
     "mobile-native-embedded-chat": path.resolve(path.join(__dirname, "./mobile-native-embedded-chat")),
     "mobile-native-userhome": path.resolve(path.join(__dirname, "./mobile-native-userhome")),
-    "userhome": path.resolve(path.join(__dirname, "./userhome")),
     "router-archive-chat": path.resolve(path.join(__dirname, "./router-archive-chat")),
     "router-archive-home": path.resolve(path.join(__dirname, "./router-archive-home")),
     "router-embed-chat": path.resolve(path.join(__dirname, "./router-embed-chat")),
@@ -61,7 +60,12 @@ var webpackConfig = {
     loaders: [
       {
         test: /\.hbs$/,
-        loader: "handlebars-loader" // disable minify for now + path.resolve(path.join(__dirname, "../../build-scripts/html-min-loader"))
+        loader: "handlebars-loader", // disable minify for now + path.resolve(path.join(__dirname, "../../build-scripts/html-min-loader"))
+        query: {
+          'helperDirs[]': [
+            path.resolve(__dirname, '../../shared/handlebars/helpers')
+          ]
+        }
       }
     ]
   },

@@ -1,4 +1,3 @@
-/* global navigator */
 /* jshint node:true  */
 "use strict";
 
@@ -94,7 +93,7 @@ var View = Marionette.LayoutView.extend({
   },
 
   onTagValid: function(model, value){
-    this.model.get('errorModel').set({
+    model.get('errorModel').set({
       message: 'Press enter to add ' + value,
       isError: false
     });

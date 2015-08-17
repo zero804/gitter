@@ -226,7 +226,7 @@ onready(function () {
       "keys" : "keys",
       "integrations": "integrations",
       "add" : "addPeople",
-    /*  "tags": "editTags"*/
+      "tags/:roomId": "editTags"
     },
 
     hideModal: function() {
@@ -282,10 +282,10 @@ onready(function () {
 
     },
 
-    editTags: function() {
+    editTags: function(roomId) {
       require.ensure(['views/app/editTagsView'], function(require) {
         var EditTagsView = require('views/app/editTagsView');
-        appView.dialogRegion.show(new EditTagsView({}));
+        appView.dialogRegion.show(new EditTagsView({roomId: roomId}));
       });
     },
 
