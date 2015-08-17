@@ -37,6 +37,7 @@ var testModules = {
   'integration': ['./test/integration/**/*.js', './test/public-js/**/*.js'],
   'cache-wrapper': ['./modules/cache-wrapper/test/*.js'],
   'github': ['./modules/github/test/*.js'],
+  'push-notification-filter': ['./modules/push-notification-filter/test/*.js'],
   'split-tests': ['./modules/split-tests/test/*.js'],
   'presence': ['./modules/presence/test/*.js'],
 };
