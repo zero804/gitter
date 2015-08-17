@@ -67,7 +67,7 @@ describe('push-notification-filter', function() {
           return pushNotificationFilter.findUsersInRoomAcceptingNotifications(troupeId, [userId1]);
         })
         .then(function(result) {
-          assert.deepEqual(result, []); // Do not notify
+          assert.deepEqual(result, [userId1]); 
         })
         .nodeify(done);
     });
