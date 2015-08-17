@@ -1,11 +1,12 @@
 #!/usr/bin/env node
-/*jslint node: true */
+/*jslint node: true, unused:true */
 "use strict";
 
 var userService = require('../../server/services/user-service');
 var troupeService = require('../../server/services/troupe-service');
-var oauthService = require('../../server/services/oauth-service');
-var rest = require('restler');
+var chatService = require('../../server/services/chat-service');
+
+require('../../server/event-listeners').install();
 
 var opts = require("nomnom")
    .option('host', {
@@ -25,16 +26,10 @@ var opts = require("nomnom")
    })
    .parse();
 
-function sendMessage(token, troupe, host) {
-  var url = host + '/api/v1/troupes/' + troupe + '/chatMessages';
-  console.log('Chatting to ' + url);
-  rest.post(url, {
-    data: { text: 'The time is ' + new Date() },
-    headers: {
-      'Authorization': 'Bearer ' + token
-    }
-  }).on('complete', function(data, response) {
-    console.log('Done');
+function sendMessage(troupe, user) {
+  console.log('Sending message');
+  return chatService.newChatMessageToTroupe(troupe, user, {
+    text: 'The time is ' + new Date()
   });
 }
 
@@ -52,16 +47,18 @@ userService.findByUsername(opts.user, function(err, user) {
     if(err) return error(err);
     if(!troupe) return error('Troupe not found');
 
-    oauthService.findOrGenerateWebToken(user.id, function(err, token) {
-      if(err) return error(err);
-      if(!token) return error('Token not found');
+    var freq = parseFloat(opts.frequency, 10) * 1000;
 
-      setInterval(function() {
-        sendMessage(token, troupe.id, opts.host);
-      }, parseInt(opts.frequency, 10) * 1000);
-    });
+    function next() {
+      sendMessage(troupe, user)
+        .finally(function() {
+          setTimeout(next, freq);
+        })
+        .done();
+    }
+
+    setTimeout(next, freq);
 
   });
 
 });
-
