@@ -4,6 +4,7 @@ var testRequire = require('../test-require');
 var Q = require('q');
 var assert = require('assert');
 var mongoUtils = testRequire('./utils/mongo-utils');
+var _ = require('lodash');
 
 Q.longStackSupport = true;
 
@@ -1067,6 +1068,37 @@ describe('unread-item-service', function() {
         .nodeify(done);
     });
 
+
+    it('mentions should not be trashed when the user has more than 100 items #slow', function(done) {
+      var userIds = _.range(10).map(function() {
+        return mongoUtils.getNewObjectIdString();
+      });
+
+      var chatIds = _.range(120).map(function() {
+        return "" + mongoUtils.getNewObjectIdString();
+      });
+
+      var userId1 = userIds[1];
+
+      return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, userIds, [userId1])
+        .then(function() {
+          return Q.all(chatIds.map(function(chatId) {
+            return unreadItemServiceEngine.newItemWithMentions(troupeId1, chatId, userIds, []);
+          }));
+        })
+        .then(function() {
+          return unreadItemServiceEngine.getUserMentionCountsForRooms(userId1, [troupeId1]);
+        })
+        .then(function(result) {
+          assert.strictEqual(result[troupeId1], 1);
+          return unreadItemServiceEngine.getUnreadItemsAndMentions(userId1, troupeId1);
+        })
+        .spread(function(unreadItems, mentions) {
+          assert.deepEqual(unreadItems, chatIds.slice(-100));
+          assert.deepEqual(mentions, ["" + itemId1]);
+        })
+        .nodeify(done);
+    });
   });
 
 
