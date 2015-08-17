@@ -69,7 +69,7 @@ onready(function() {
     subDomain: "day",
     considerMissingDataAsZero: false,
     displayLegend: false,
-    data: apiClient.priv.url('/chat-heatmap/' + troupeId + '?start={{d:start}}&end={{d:end}}'),
+    data: apiClient.priv.url('/chat-heatmap/' + troupeId),
     onClick: function(date, value) {
       if(!value) return;
 
