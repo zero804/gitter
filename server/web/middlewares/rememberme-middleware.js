@@ -11,6 +11,7 @@ var uuid            = require('node-uuid');
 var sechash         = require('sechash');
 var userService     = require('../../services/user-service');
 var useragentTagger = require('../../utils/user-agent-tagger');
+var debug           = require('debug')('gitter:rememberme-middleware');
 
 var cookieName = nconf.get('web:cookiePrefix') + 'auth';
 
@@ -66,7 +67,7 @@ function deleteAuthToken(authCookieValue, callback) {
 
   if(!key) return callback();
 
-  logger.verbose('rememberme: Deleting rememberme token', { key: key });
+  debug('Deleting rememberme token %s', key);
 
   var redisKey = "rememberme:" + key;
 
@@ -87,7 +88,7 @@ function validateAuthToken(authCookieValue, callback) {
 
     if(!key) return callback();
 
-    logger.verbose('rememberme: Client has presented a rememberme auth cookie, attempting reauthentication', { key: key });
+    debug('Client has presented a rememberme auth cookie, attempting reauthentication: %s', key);
 
     var redisKey = "rememberme:" + key;
 
@@ -187,7 +188,7 @@ module.exports = {
           var properties = useragentTagger(req.headers['user-agent']);
           stats.userUpdate(user, properties);
 
-          logger.verbose('Rememberme token used for login.', { cookie: req.headers.cookie });
+          debug('Rememberme token used for login: %s', req.headers.cookie);
 
           setupRememberMeTokenCookie(req, res, userId, function(err) {
             if(err) return next(err);
