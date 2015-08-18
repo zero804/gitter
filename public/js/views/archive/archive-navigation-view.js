@@ -3,6 +3,7 @@
 var Marionette = require('backbone.marionette');
 var moment = require('moment');
 var context = require('utils/context');
+var apiClient = require('components/apiClient');
 var template = require('./tmpl/archive-navigation-view.hbs');
 var CalHeatMap = require('cal-heatmap');
 
@@ -70,14 +71,12 @@ module.exports = (function() {
         range: range,
         domain: "month",
         subDomain: "day",
-        subDomainTextFormat: "%d",
-        cellSize: 15,
         verticalOrientation: false,
         considerMissingDataAsZero: false,
         displayLegend: false,
-        //data: '/api/private/chat-heatmap/' + troupeId + '?start={{d:start}}&end={{d:end}}',
+        data: apiClient.priv.url('/chat-heatmap/' + troupeId + '?start={{d:start}}&end={{d:end}}'),
         onClick: function(date, value) {
-          //if(!value) return;
+          if(!value) return;
           var yyyy = date.getFullYear();
           var mm = date.getMonth() + 1;
           if(mm < 10) mm = "0" + mm;

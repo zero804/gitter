@@ -10,12 +10,14 @@ var limit = qlimit(3);
 var _ = require('lodash');
 var debug = require('debug')('gitter:unread-item-service-engine-combined-tests');
 
-var TEST_ITERATIONS = 200;
+var TEST_ITERATIONS = parseInt(process.env.UNREAD_ENGINE_TEST_ITERATIONS, 10) || 200;
 
 Q.longStackSupport = true;
 
+var CHECK_SLOWLOG = process.env.CHECK_SLOWLOG;
+
 describe('unread-item-service-engine-combined #slow', function() {
-  this.timeout(15000);
+  this.timeout(150000);
 
   describe('integration tests', function() {
     var unreadItemServiceEngine, troupeId1, userId1;
@@ -26,6 +28,23 @@ describe('unread-item-service-engine-combined #slow', function() {
       troupeId1 = mongoUtils.getNewObjectIdString();
       userId1 = mongoUtils.getNewObjectIdString();
     });
+
+    if (CHECK_SLOWLOG) {
+      beforeEach(function(done) {
+        unreadItemServiceEngine.testOnly.redisClient.slowlog('RESET', done);
+      });
+
+      afterEach(function(done) {
+        unreadItemServiceEngine.testOnly.redisClient.slowlog('GET', 10, function(err, result) {
+          if (result.length > 0) {
+            console.log('SLOWLOG ', result);
+            assert(false, 'Test generated slowlog entries');
+          }
+          done();
+        });
+
+      });
+    }
 
     var newItemForUsers = limit(function (troupeId, itemId, userIds, mentionUserIds) {
       return unreadItemServiceEngine.newItemWithMentions(troupeId, itemId, userIds, mentionUserIds || []);
