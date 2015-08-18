@@ -67,13 +67,11 @@ onready(function() {
     range: 12,
     domain: "month",
     subDomain: "day",
-    subDomainTextFormat: "%d",
-    cellSize: 15,
     considerMissingDataAsZero: false,
     displayLegend: false,
-    //data: apiClient.priv.url('/chat-heatmap/' + troupeId + '?start={{d:start}}&end={{d:end}}'),
+    data: apiClient.priv.url('/chat-heatmap/' + troupeId),
     onClick: function(date, value) {
-      //if(!value) return;
+      if(!value) return;
 
       var yyyy = date.getFullYear();
       var mm = date.getMonth() + 1;
