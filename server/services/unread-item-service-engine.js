@@ -349,13 +349,7 @@ function getUserUnreadCountsForRooms(userId, troupeIds) {
  */
 function getUnreadItemsAndMentions(userId, troupeId) {
   var keys = ["unread:chat:" + userId + ":" + troupeId, "m:" + userId + ":" + troupeId];
-  return runScript('unread-item-list-with-mentions', keys, [])
-    .catch(function(err) {
-      /* Not sure why we're doing this? */
-      winston.warn("unreadItemService.getUnreadItems failed:" + err, { exception: err });
-      // Mask error
-      return [[], []];
-    });
+  return runScript('unread-item-list-with-mentions', keys, []);
 }
 
 function makeSet(array) {
@@ -417,12 +411,6 @@ function getUnreadItemsForUserTroupes(userTroupes) {
         memo[userTroupe.userId + ":" + userTroupe.troupeId] = results[index];
         return memo;
       }, {});
-    })
-    .catch(function(err) {
-      /* Not sure why we're doing this? */
-      winston.warn("unreadItemService.getUnreadItems failed:" + err, { exception: err });
-      // Mask error
-      return {};
     });
 }
 
@@ -461,13 +449,7 @@ function getAllUnreadItemCounts(userId) {
  * Returns an array of troupeIds for rooms with mention counts
  */
 function getRoomsMentioningUser(userId) {
-  return redisClient_smembers("m:" + userId)
-    .catch(function(err) {
-      /* Not sure why we need to do this? */
-      winston.warn("unreadItemService.getRoomIdsMentioningUser failed:" + err, { exception: err });
-      // Mask error
-      return [];
-    });
+  return redisClient_smembers("m:" + userId);
 }
 
 

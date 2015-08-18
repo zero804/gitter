@@ -5,15 +5,10 @@ var Q = require('q');
 var assert = require('assert');
 var mongoUtils = testRequire('./utils/mongo-utils');
 var randomSeed = require('random-seed');
-var qlimit = require('qlimit');
-var limit = qlimit(3);
 var _ = require('lodash');
 var debug = require('debug')('gitter:unread-item-service-engine-combined-tests');
 
 var TEST_ITERATIONS = parseInt(process.env.UNREAD_ENGINE_TEST_ITERATIONS, 10) || 200;
-
-Q.longStackSupport = true;
-
 var CHECK_SLOWLOG = process.env.CHECK_SLOWLOG;
 
 describe('unread-item-service-engine-combined #slow', function() {
@@ -46,26 +41,13 @@ describe('unread-item-service-engine-combined #slow', function() {
       });
     }
 
-    var newItemForUsers = limit(function (troupeId, itemId, userIds, mentionUserIds) {
-      return unreadItemServiceEngine.newItemWithMentions(troupeId, itemId, userIds, mentionUserIds || []);
-    });
-
-    var markItemsRead = limit(function(userId, troupeId, itemIds) {
-      return unreadItemServiceEngine.markItemsRead(userId, troupeId, itemIds);
-    });
-
-
-    var ensureAllItemsRead = limit(function(userId, troupeId) {
-      return unreadItemServiceEngine.ensureAllItemsRead(userId, troupeId);
-    });
-
     var idSeed = 0;
     function nextId() {
       idSeed = idSeed + 1000;
-       return mongoUtils.createIdForTimestamp(idSeed).toString();
+      return mongoUtils.createIdForTimestamp(idSeed).toString();
     }
 
-    function runWithSeed(seed, done) {
+    function runWithSeed(seed) {
 
       var count = 0;
       var unreadItems = {};
@@ -88,7 +70,8 @@ describe('unread-item-service-engine-combined #slow', function() {
       }
 
       function compareUnreadItems() {
-        debug('comparing results');
+        debug('comparing results: we have %s items, %s mentions', Object.keys(unreadItems).length, Object.keys(mentionItems).length);
+
         return unreadItemServiceEngine.getUnreadItems(userId1, troupeId1)
           .then(function(items) {
             items.sort();
@@ -104,7 +87,35 @@ describe('unread-item-service-engine-combined #slow', function() {
                 assert(false, 'sets do not match. first problem at ' + i + ': ours=' + ourKeys[i] + '. theirs=' + items[i]);
               }
             }
-          });
+
+            return unreadItemServiceEngine.getAllUnreadItemCounts(userId1);
+          })
+          .then(function(counts) {
+            var ourKeys = _.uniq(Object.keys(unreadItems).concat(Object.keys(mentionItems)));
+            if (ourKeys.length) {
+              assert.strictEqual(counts.length, 1);
+              assert.strictEqual(counts[0].unreadItems, ourKeys.length);
+              assert.strictEqual(counts[0].mentions, Object.keys(mentionItems).length);
+            } else {
+              assert.strictEqual(counts.length, 0);
+            }
+
+            return unreadItemServiceEngine.getRoomsMentioningUser(userId1);
+          })
+          .then(function(roomsMentioningUser) {
+            if (Object.keys(mentionItems).length) {
+              assert.strictEqual(roomsMentioningUser.length, 1)
+            } else {
+              assert.strictEqual(roomsMentioningUser.length, 0)
+            }
+
+            return unreadItemServiceEngine.getBadgeCountsForUserIds([userId1]);
+          })
+          .then(function(badgeCounts) {
+            var ourKeys = _.uniq(Object.keys(unreadItems).concat(Object.keys(mentionItems)));
+
+            assert.strictEqual(badgeCounts[userId1], ourKeys.length ? 1 : 0);
+          })
       }
 
       function validateResult(result, expectUnread, expectMentions) {
@@ -112,9 +123,7 @@ describe('unread-item-service-engine-combined #slow', function() {
           var unreadItemCount = Object.keys(unreadItems).length;
           debug('Validating unread items expected %s = actual %s', unreadItemCount, result.unreadCount);
 
-          // if(unreadItemCount !== result.unreadCount) {
-            return compareUnreadItems();
-          // }
+          return compareUnreadItems();
         } else {
           assert(!expectUnread, "Expencted unread items in the results hash but not there");
         }
@@ -131,31 +140,28 @@ describe('unread-item-service-engine-combined #slow', function() {
 
       }
 
-      (function next() {
-        count++;
-        if(count > TEST_ITERATIONS) return done();
+      function nextStep() {
+        var nextOperation = rand(4);
 
-        var nextOperation = rand(3);
-        [
+        return [
           /* 0 */
-          function addMention(cb) {
-            debug('Next operation: addMention');
+          function addMention() {
+            debug('Operation %s: addMention', count);
             var itemId = nextId();
 
-            return newItemForUsers(troupeId1, itemId, [userId1], [userId1])
-                .then(function(result) {
-                  var resultForUser = result[userId1];
+            return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId, [userId1], [userId1])
+              .then(function(result) {
+                var resultForUser = result[userId1];
 
-                  mentionItems[itemId] = true;
-                  unreadItems[itemId] = true;
-                  enforceLimit();
-                  return validateResult(resultForUser, true, true);
-                })
-                .nodeify(cb);
+                mentionItems[itemId] = true;
+                unreadItems[itemId] = true;
+                enforceLimit();
+                return validateResult(resultForUser, true, true);
+              });
           },
           /* 1 */
-          function addItem(cb) {
-            debug('Next operation: addItem');
+          function addItem() {
+            debug('Operation %s: addItem', count);
 
             var largeNumberOfAddItems = rand(10) > 8;
 
@@ -166,7 +172,7 @@ describe('unread-item-service-engine-combined #slow', function() {
             return _.range(numberOfItems).reduce(function(memo) {
                 function addNewItem() {
                   var itemId = nextId();
-                  return newItemForUsers(troupeId1, itemId, [userId1])
+                  return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId, [userId1], [])
                     .then(function(result) {
                       var resultForUser = result[userId1];
                       unreadItems[itemId] = false;
@@ -182,28 +188,34 @@ describe('unread-item-service-engine-combined #slow', function() {
                 }
 
                 return addNewItem();
-              }, null)
-              .nodeify(cb);
+              }, null);
 
           },
           /* 2 */
-          function markItemRead(cb) {
-            debug('Next operation: makeItemRead');
+          function markItemRead() {
+            debug('Operation %s: markItemRead', count);
 
             var largeMarkAsRead = rand(10) > 8;
 
             var percentageOfItems = rand(largeMarkAsRead ? 100 : 30) / 100;
 
-            var i = Object.keys(unreadItems);
+            var readCandidates = _.uniq(Object.keys(unreadItems).concat(Object.keys(mentionItems)));
 
-            var forMarkAsRead = i.slice(0, Math.round(i.length * percentageOfItems + 1));
+            var itemsForReadLength = Math.round(readCandidates.length * percentageOfItems + 1);
+            var forMarkAsRead = [];
+            for (var j = 0; forMarkAsRead.length < itemsForReadLength && readCandidates.length > 0; j++) {
+              var itemIndex = rand(readCandidates.length);
+              var deleted = readCandidates.splice(itemIndex, 1);
+              forMarkAsRead.push(deleted);
+            }
+
             var itemsContainedMentions = forMarkAsRead.some(function(itemId) {
-              return unreadItems[itemId];
+              return mentionItems[itemId];
             });
 
             debug('Marking %s items as read', forMarkAsRead.length);
 
-            return markItemsRead(userId1, troupeId1, forMarkAsRead)
+            return unreadItemServiceEngine.markItemsRead(userId1, troupeId1, forMarkAsRead)
               .then(function(result) {
                 forMarkAsRead.forEach(function(itemId) {
                   delete unreadItems[itemId];
@@ -211,49 +223,57 @@ describe('unread-item-service-engine-combined #slow', function() {
                 });
 
                 return validateResult(result, true, itemsContainedMentions);
-              })
-              .nodeify(cb);
+              });
 
           },
           /* 3 */
-          function markAllItemsRead(cb) {
-            debug('Next operation: markAllItemsRead');
+          function markAllItemsRead() {
 
-            if(rand(3) !== 0) return cb();
-            // console.log('Mark all items read');
-            return ensureAllItemsRead(userId1, troupeId1)
+            /* Only perform this operation one time in 3 */
+            if(rand(3) !== 0) return Q.resolve();
+
+            debug('Operation %s: markAllItemsRead', count);
+
+            return unreadItemServiceEngine.ensureAllItemsRead(userId1, troupeId1)
               .then(function(result) {
                 unreadItems = {};
                 var hadMentionIds = Object.keys(mentionItems).length > 0;
                 mentionItems = {};
                 return validateResult(result, true, hadMentionIds);
-              })
-              .nodeify(cb);
+              });
 
           }
-        ][nextOperation](function(err) {
-          if(err) return done(err);
-          setImmediate(next);
-        });
+        ][nextOperation]();
+      }
 
-      })();
+      function next() {
+        count++;
+        if(count > TEST_ITERATIONS) return; /* completed */
 
+        return nextStep().then(next);
+      }
+
+      return next();
     }
 
     it('test1', function(done) {
-      runWithSeed(2345678, done);
+      runWithSeed(2345678)
+        .nodeify(done);
     });
 
     it('test2', function(done) {
-      runWithSeed(1231123, done);
+      runWithSeed(1231123)
+        .nodeify(done);
     });
 
     it('test3', function(done) {
-      runWithSeed(393828, done);
+      runWithSeed(393828)
+        .nodeify(done);
     });
 
     it('test4', function(done) {
-      runWithSeed(122828, done);
+      runWithSeed(122828)
+        .nodeify(done);
     });
 
   });
