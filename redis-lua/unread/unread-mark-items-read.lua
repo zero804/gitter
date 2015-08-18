@@ -38,12 +38,10 @@ local mentions_removed = false
 for i = 3, #ARGV do
   local item_id = ARGV[i]
 
-  local removed_count;
-
   if key_type == "zset" then
-    removed_count = redis.call("ZREM", user_troupe_key, item_id)
-  else
-    removed_count = redis.call("SREM", user_troupe_key, item_id)
+    redis.call("ZREM", user_troupe_key, item_id)
+  elseif key_type == "set" then
+    redis.call("SREM", user_troupe_key, item_id)
   end
 
   -- Remove the mention if it exists too
@@ -59,27 +57,33 @@ local flag = 0
 
 if key_type == "zset" then
   new_card = redis.call("ZCARD", user_troupe_key)
-else
+elseif key_type == "set" then
   new_card = redis.call("SCARD", user_troupe_key)
+else
+  new_card = 0
 end
 
 -- This should actually be taken care of by a call to
 -- remove-user-mentions, but we do it here too
 -- in order to prevent consistency problems
 if new_card == 0 then
-  new_mention_card = 0
 
-  local r1 = redis.call("DEL", user_troupe_mention_key) > 0
-  local r2 = redis.call("SREM", user_mention_key, troupe_id) > 0
-  local r3 = redis.call("ZREM", user_badge_key, troupe_id) > 0
+  new_mention_card = redis.call("SCARD", user_troupe_mention_key)
 
-  if r1 or r2 or r3 then
-    -- Even though the cardinality was zero
-    -- items exists
-    flag = 1
+  if new_mention_card == 0 then
+    local r1 = redis.call("DEL", user_troupe_mention_key) > 0
+    local r2 = redis.call("SREM", user_mention_key, troupe_id) > 0
+    local r3 = redis.call("ZREM", user_badge_key, troupe_id) > 0
+
+    if r1 or r2 or r3 then
+      -- Even though the cardinality was zero
+      -- items exists
+      flag = 1
+    end
   end
 
 else
+
   -- If the score for the user_badge is wrong, we'll need to
   -- update the badge for the client
   local current_zscore = redis.call("ZSCORE", user_badge_key, troupe_id)

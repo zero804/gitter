@@ -18,7 +18,7 @@
     for i = 1, len do
       local item = unread_items[i]
       if mention_set[item] then
-        table.remove(mention_set, item)
+        mention_set[item] = nil
         outstanding_mention_count = outstanding_mention_count - 1
 
         if outstanding_mention_count == 0 then
