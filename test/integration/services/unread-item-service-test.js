@@ -5,7 +5,6 @@ var mockito = require('jsmockito').JsMockito;
 var hamcrest = require('jshamcrest').JsHamcrest;
 
 var Q = require('q');
-var mongoUtils = testRequire('./utils/mongo-utils');
 var assert = require('assert');
 
 var times = mockito.Verifiers.times;
