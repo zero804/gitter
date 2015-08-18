@@ -57,9 +57,9 @@ router.post('/transloadit/:token',
   require('./transloadit'));
 
 // disabled due to massive load
-// router.get('/chat-heatmap/:roomId',
-//   identifyRoute('api-private-chat-heatmap'),
-//   require('./chat-heatmap'));
+router.get('/chat-heatmap/:roomId',
+  identifyRoute('api-private-chat-heatmap'),
+  require('./chat-heatmap'));
 
 router.get('/orgs/:orgUri/members',
   authMiddleware,
