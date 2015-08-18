@@ -177,7 +177,7 @@ exports.markAllChatsRead = function(userId, troupeId, options) {
   if(!options) options = {};
   appEvents.markAllRead({ userId: userId, troupeId: troupeId });
 
-  return exports.getUnreadItems(userId, troupeId, 'chat')
+  return exports.getUnreadItems(userId, troupeId)
     .then(function(chatIds) {
       /* If we already have everything marked as read, force all read */
       if(!chatIds.length) return ensureAllItemsRead(userId, troupeId, options);
@@ -191,20 +191,8 @@ exports.markAllChatsRead = function(userId, troupeId, options) {
     });
 };
 
-exports.getUserUnreadCounts = function(userId, troupeId) {
-  return engine.getUserUnreadCounts(userId, troupeId);
-};
-
 exports.getUserUnreadCountsForTroupeIds = function(userId, troupeIds) {
   return engine.getUserUnreadCountsForRooms(userId, troupeIds);
-};
-
-exports.getUserMentionCountsForTroupeIds = function(userId, troupeIds) {
-  return engine.getUserMentionCountsForRooms(userId, troupeIds);
-};
-
-exports.getUserMentionCounts = function(userId) {
-  return engine.getUserMentionCounts(userId);
 };
 
 exports.getUnreadItems = function(userId, troupeId) {

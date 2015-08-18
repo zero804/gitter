@@ -431,25 +431,23 @@ describe('unread-item-service', function() {
 
       });
 
-
-
-
     });
 
-
-    describe('getUserUnreadCounts', function() {
+    describe('getUserUnreadCountsForRooms', function() {
 
       it('should return user unread counts', function(done) {
-        unreadItemServiceEngine.getUserUnreadCounts(userId1, troupeId1)
+        unreadItemServiceEngine.getUserUnreadCountsForRooms(userId1, [troupeId1])
           .then(function(result) {
-            assert.strictEqual(result, 0);
+            assert.strictEqual(result[troupeId1].unreadItems, 0);
+            assert.strictEqual(result[troupeId1].mentions, 0);
             return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, userIds, []);
           })
           .then(function() {
-            return unreadItemServiceEngine.getUserUnreadCounts(userId1, troupeId1);
+            return unreadItemServiceEngine.getUserUnreadCountsForRooms(userId1, [troupeId1]);
           })
           .then(function(result) {
-            assert.strictEqual(result, 1);
+            assert.strictEqual(result[troupeId1].unreadItems, 1);
+            assert.strictEqual(result[troupeId1].mentions, 0);
           })
           .nodeify(done);
       });
@@ -462,39 +460,19 @@ describe('unread-item-service', function() {
       it('should return user unread counts', function(done) {
         unreadItemServiceEngine.getUserUnreadCountsForRooms(userId1, [troupeId1])
           .then(function(result) {
-            assert.strictEqual(result[troupeId1], 0);
-            return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, userIds, []);
+            assert.strictEqual(result[troupeId1].unreadItems, 0);
+            assert.strictEqual(result[troupeId1].mentions, 0);
+            return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, [userId1], [userId1]);
           })
           .then(function() {
             return unreadItemServiceEngine.getUserUnreadCountsForRooms(userId1, [troupeId1]);
           })
           .then(function(result) {
-            assert.strictEqual(result[troupeId1], 1);
+            assert.strictEqual(result[troupeId1].unreadItems, 1);
+            assert.strictEqual(result[troupeId1].mentions, 1);
           })
           .nodeify(done);
       });
-
-
-    });
-
-
-    describe('getUserMentionCountsForRooms', function() {
-
-      it('should return user unread counts', function(done) {
-        unreadItemServiceEngine.getUserMentionCountsForRooms(userId1, [troupeId1])
-          .then(function(result) {
-            assert.strictEqual(result[troupeId1], 0);
-            return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, [userId1], [userId1]);
-          })
-          .then(function() {
-            return unreadItemServiceEngine.getUserMentionCountsForRooms(userId1, [troupeId1]);
-          })
-          .then(function(result) {
-            assert.strictEqual(result[troupeId1], 1);
-          })
-          .nodeify(done);
-      });
-
 
     });
 
@@ -716,10 +694,11 @@ describe('unread-item-service', function() {
           })
           .delay(100)
           .then(function() {
-            return unreadItemServiceEngine.getUserUnreadCounts(userId1, troupeId1);
+            return unreadItemServiceEngine.getUserUnreadCountsForRooms(userId1, [troupeId1]);
           })
-          .then(function(count) {
-            assert.equal(count, 100);
+          .then(function(counts) {
+            assert.equal(counts[troupeId1].unreadItems, 100);
+            assert.equal(counts[troupeId1].mentions, 0);
           })
           .nodeify(done);
       });
@@ -854,9 +833,10 @@ describe('unread-item-service', function() {
 
     function expectUserUnreadCounts(userId, troupeId, expected) {
       return function() {
-        return unreadItemServiceEngine.getUserUnreadCounts(userId, troupeId)
+        return unreadItemServiceEngine.getUserUnreadCountsForRooms(userId, [troupeId])
           .then(function(result) {
-            assert.strictEqual(result, expected, 'Expected ' + userId + ' in ' + troupeId + ' to have ' + expected + ' unread items, got ' + result);
+            var unreadCount = result[troupeId].unreadItems;
+            assert.strictEqual(unreadCount, expected, 'Expected ' + userId + ' in ' + troupeId + ' to have ' + expected + ' unread items, got ' + unreadCount);
           });
       };
     }
@@ -878,24 +858,14 @@ describe('unread-item-service', function() {
     function expectMentionCounts(userId, expectedArray) {
       return function() {
         var troupeIds = expectedArray.map(function(x) { return x[0]; });
-        return unreadItemServiceEngine.getUserMentionCountsForRooms(userId, troupeIds)
+        return unreadItemServiceEngine.getUserUnreadCountsForRooms(userId, troupeIds)
           .then(function(result) {
             troupeIds.forEach(function(troupeId, index) {
-              var actual = result[troupeId];
+              var actual = result[troupeId].mentions;
               var expected = expectedArray[index][1];
               assert.strictEqual(actual, expected, 'Expected ' + userId + ' to have ' + expected + ' mention count in ' + troupeId + ', got ' + actual);
             });
-
-            return unreadItemServiceEngine.getUserMentionCounts(userId);
-          })
-          .then(function(result) {
-            troupeIds.forEach(function(troupeId, index) {
-              var actual = result[troupeId] || 0;
-              var expected = expectedArray[index][1] || 0;
-              assert.strictEqual(actual, expected, 'Expected ' + userId + ' to have ' + expected + ' mention count in ' + troupeId + ', got ' + actual);
-            });
           });
-
       };
     }
 
@@ -1087,20 +1057,67 @@ describe('unread-item-service', function() {
           }));
         })
         .then(function() {
-          return unreadItemServiceEngine.getUserMentionCountsForRooms(userId1, [troupeId1]);
+          return unreadItemServiceEngine.getUserUnreadCountsForRooms(userId1, [troupeId1]);
         })
         .then(function(result) {
-          assert.strictEqual(result[troupeId1], 1);
+          assert.strictEqual(result[troupeId1].unreadItems, 101);
+          assert.strictEqual(result[troupeId1].mentions, 1);
           return unreadItemServiceEngine.getUnreadItemsAndMentions(userId1, troupeId1);
         })
         .spread(function(unreadItems, mentions) {
           assert.deepEqual(unreadItems, chatIds.slice(-100));
           assert.deepEqual(mentions, ["" + itemId1]);
+          return unreadItemServiceEngine.getUnreadItems(userId1, troupeId1);
+        })
+        .then(function(unreadItems) {
+          assert.deepEqual(unreadItems, ["" + itemId1].concat(chatIds.slice(-100)));
+
+          return unreadItemServiceEngine.getUserUnreadCountsForRooms(userId1, [troupeId1]);
+        })
+        .then(function(result) {
+          assert.strictEqual(result[troupeId1].unreadItems, 101);
+          assert.strictEqual(result[troupeId1].mentions, 1);
         })
         .nodeify(done);
     });
   });
 
+  describe('mergeUnreadItemsWithMentions', function() {
+    var mergeUnreadItemsWithMentions;
+
+    before(function() {
+      mergeUnreadItemsWithMentions = testRequire('./services/unread-item-service-engine').testOnly.mergeUnreadItemsWithMentions;
+    });
+
+    it('should handle no items', function() {
+      assert.strictEqual(mergeUnreadItemsWithMentions(null, null), null);
+      assert.deepEqual(mergeUnreadItemsWithMentions([], []), []);
+    });
+
+    it('should handle no mentions', function() {
+      assert.deepEqual(mergeUnreadItemsWithMentions(["1"], null), ["1"]);
+      assert.deepEqual(mergeUnreadItemsWithMentions(["1"], []), ["1"]);
+    });
+
+    it('should handle no unread items', function() {
+      assert.deepEqual(mergeUnreadItemsWithMentions(null, ["1"]), ["1"]);
+      assert.deepEqual(mergeUnreadItemsWithMentions([], ["1"]), ["1"]);
+    });
+
+    it('should handle mentions as subsets of unread items', function() {
+      assert.deepEqual(mergeUnreadItemsWithMentions(["1", "2"], ["1"]), ["1", "2"]);
+      assert.deepEqual(mergeUnreadItemsWithMentions(["1", "2"], ["1", "2"]), ["1", "2"]);
+    });
+
+    it('should handle unread items as subsets of mentions', function() {
+      assert.deepEqual(mergeUnreadItemsWithMentions(["1"], ["1", "2"]), ["2", "1"]);
+    });
+
+    it('should handle unread items and mentions as disjunct sets', function() {
+      assert.deepEqual(mergeUnreadItemsWithMentions(["3", "4"], ["1", "2"]), ["1", "2", "3", "4"]);
+    });
+
+  });
 
 
 
