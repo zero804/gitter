@@ -9,6 +9,8 @@ var _             = require('underscore');
 var userService   = require('./user-service');
 var roomMembershipService = require('./room-membership-service');
 
+var LARGE_ROOM_SIZE_THRESHOLD = 200;
+
 function createRegExpsForQuery(queryText) {
   var normalized = ("" + queryText).trim().toLowerCase();
   var parts = normalized.split(/[\s\'']+/)
@@ -79,7 +81,7 @@ function difference(ids, excludeIds) {
   return ids.filter(function(i) { return !o[i]; });
 }
 
-function performQuery(queryString, options) {
+function performQuery(queryText, options) {
   var queryRequest = {
     size: options.limit || 10,
     timeout: 500,
@@ -89,7 +91,7 @@ function performQuery(queryString, options) {
       fields: ["_id"],
       query: {
         query_string: {
-          query: queryString,
+          query: queryText,
           default_operator: "AND"
         }
       },
@@ -99,12 +101,63 @@ function performQuery(queryString, options) {
     }
   };
 
-  return Q(client.search(queryRequest))
-    .then(function(response) {
-      return response.hits.hits.map(function(hit) {
-        return hit._id;
-      });
-    });
+  return Q(client.search(queryRequest)).then(elasticResponseToUserIds);
+}
+
+function elasticsearchUserTypeahead(queryText, options) {
+
+  // Normal searches dont work well for typeaheads
+  // e.g searching "maldito" normally wouldnt match malditogeek.
+  // but phrase_prefix handles that.
+  //
+  // Completion Suggester is faster, but requires us to completely
+  // reindex and supply a room context
+
+  options = options || {};
+  var limit = options.limit || 10;
+  var userIds = options.userIds;
+
+  var query = {
+    multi_match: {
+      query: queryText,
+      type: "phrase_prefix",
+      fields: [
+        "username",
+        "displayName"
+      ]
+    }
+  };
+
+  if (userIds) {
+    query = {
+      filtered: {
+        filter: { ids: { values: userIds } },
+        query: query
+      }
+    };
+  }
+
+  var queryRequest = {
+    size: limit,
+    timeout: 500,
+    index: 'gitter-primary',
+    type: 'user',
+    body: {
+      fields: ["_id"],
+      query: query,
+      sort: [
+        { _score: { order : "desc"} }
+      ],
+    }
+  };
+
+  return Q(client.search(queryRequest)).then(elasticResponseToUserIds);
+}
+
+function elasticResponseToUserIds(response) {
+  return response.hits.hits.map(function(hit) {
+    return hit._id;
+  });
 }
 
 exports.globalUserSearch = function(queryText, options, callback) {
@@ -126,6 +179,71 @@ exports.globalUserSearch = function(queryText, options, callback) {
       };
     })
     .nodeify(callback);
+};
+
+function searchForUsersInSmallRoom(queryText, roomId, options) {
+  options = options || {};
+  var limit = options.limit || 30;
+
+  return roomMembershipService.findMembersForRoom(roomId)
+    .then(function(userIds) {
+      if (!userIds || !userIds.length) return [];
+
+      return elasticsearchUserTypeahead(queryText, { limit: limit, userIds: userIds });
+    })
+    .then(function(userIds) {
+      return userService.findByIds(userIds)
+        .then(function(users) {
+          return collections.maintainIdOrder(userIds, users);
+        });
+    })
+    .then(function(results) {
+      return {
+        hasMoreResults: undefined,
+        limit: limit,
+        skip: 0,
+        results: results
+      };
+    });
+}
+
+function searchForUsersInLargeRoom(queryText, roomId, options) {
+  options = options || {};
+  var limit = options.limit || 30;
+
+  // no guarentee that these users are in the room
+  // so we get a decent chunk and then filter by membership
+  return elasticsearchUserTypeahead(queryText, { limit: 500 })
+    .then(function(userIds) {
+      return roomMembershipService.findMembershipForUsersInRoom(roomId, userIds);
+    })
+    .then(function(userIds) {
+      userIds = userIds.slice(0, limit);
+
+      return userService.findByIds(userIds)
+        .then(function(users) {
+          return collections.maintainIdOrder(userIds, users);
+        });
+    })
+    .then(function(results) {
+      return {
+        hasMoreResults: undefined,
+        limit: limit,
+        skip: 0,
+        results: results
+      };
+    });
+}
+
+exports.searchForUsersInRoom = function(queryText, roomId, options) {
+  return roomMembershipService.countMembersInRoom(roomId)
+    .then(function(userCount) {
+      if (userCount < LARGE_ROOM_SIZE_THRESHOLD) {
+        return searchForUsersInSmallRoom(queryText, roomId, options);
+      } else {
+        return searchForUsersInLargeRoom(queryText, roomId, options);
+      }
+    });
 };
 
 exports.searchForUsers = function(userId, queryText, options, callback) {

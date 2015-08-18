@@ -229,29 +229,6 @@ var userService = {
       .nodeify(callback);
   },
 
-  findIdsBySearchTerm: function(searchTerm, limit) {
-    if(!searchTerm || !searchTerm.length) {
-      return Q.resolve([]);
-    }
-
-    var searchPattern = '^' + sanitiseUserSearchTerm(searchTerm);
-    return persistence.User.find({
-        $or: [
-          { username: { $regex: searchPattern, $options: 'i' } },
-          { displayName: { $regex: searchPattern, $options: 'i' } }
-        ]
-      })
-      .select({ _id: 1 })
-      .limit(limit)
-      .lean()
-      .execQ()
-      .then(function(users) {
-        return users.map(function(user) {
-          return user._id;
-        });
-      });
-  },
-
   findByUsernames: function(usernames, callback) {
     if(!usernames || !usernames.length) return Q.resolve([]).nodeify(callback);
 

@@ -8,7 +8,7 @@ var restSerializer      = require("../serializers/rest-serializer");
 var unreadItemService   = require("./unread-item-service");
 var chatService         = require("./chat-service");
 var userService         = require("./user-service");
-var roomUserSearchService = require('./room-user-search-service');
+var userSearchService   = require('./user-search-service');
 var eventService        = require("./event-service");
 var Q                   = require('q');
 var roomService         = require('./room-service');
@@ -75,10 +75,10 @@ exports.serializeUsersForTroupe = function(troupeId, userId, options) {
       return Q.resolve([]);
     }
 
-    return roomUserSearchService.findUsersInRoom(troupeId, searchTerm, limit || 30)
-      .then(function(users) {
+    return userSearchService.searchForUsersInRoom(searchTerm, troupeId, { limit: limit || 30})
+      .then(function(resp) {
         var strategy = new restSerializer.UserStrategy();
-        return restSerializer.serializeExcludeNulls(users, strategy);
+        return restSerializer.serializeExcludeNulls(resp.results, strategy);
       });
 
   }
