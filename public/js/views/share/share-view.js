@@ -72,10 +72,12 @@ module.exports = (function() {
 
     serializeData: function() {
       var room = context.getTroupe();
+      var isAdmin = context().permissions.admin;
 
       return {
         isRepo: room.githubType === 'REPO',
         isPublic: room.security === 'PUBLIC',
+        allowBadgePR: room.security === 'PUBLIC' && isAdmin,
         hasFlash: this.detectFlash(),
         url: this.getShareUrl(),
         badgeUrl: this.getBadgeUrl(),
