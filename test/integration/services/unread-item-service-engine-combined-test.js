@@ -7,7 +7,8 @@ var mongoUtils = testRequire('./utils/mongo-utils');
 var randomSeed = require('random-seed');
 var qlimit = require('qlimit');
 var limit = qlimit(3);
-var _ = require('underscore');
+var _ = require('lodash');
+var debug = require('debug')('gitter:unread-item-service-engine-combined-tests');
 
 var TEST_ITERATIONS = 200;
 
@@ -58,9 +59,7 @@ describe('unread-item-service-engine-combined #slow', function() {
         var l = u.length;
         if(l > 100) {
           while(l > 100) {
-            var lowestKey = _.min(u, function(id) {
-              return mongoUtils.getTimestampFromObjectId(id);
-            });
+            var lowestKey = _.min(u, mongoUtils.getTimestampFromObjectId);
 
             delete unreadItems[lowestKey];
             l--;
@@ -69,37 +68,42 @@ describe('unread-item-service-engine-combined #slow', function() {
         }
       }
 
-      function compareUnreadItems(reportedUnreadCount) {
-        console.log('comparing results');
+      function compareUnreadItems() {
+        debug('comparing results');
         return unreadItemServiceEngine.getUnreadItems(userId1, troupeId1)
           .then(function(items) {
             items.sort();
-            var ourKeys = Object.keys(unreadItems);
+            var ourKeys = _.uniq(Object.keys(unreadItems).concat(Object.keys(mentionItems)));
+            ourKeys.sort();
             for(var i = 0; i < ourKeys.length; i++) {
               if ("" + ourKeys[i] !== "" + items[i]) {
-                // console.log('OUR KEYS (length==' + ourKeys.length + ')', JSON.stringify(ourKeys, null, '  '));
-                // console.log('REDIS KEYS (length==' + items.length + ')', JSON.stringify(items, null, '  '));
-                console.log('>>>> CHECK OUT unread:chat' + userId1 + ':' + troupeId1);
+                console.log('OUR KEYS (length==' + ourKeys.length + ')', JSON.stringify(ourKeys, null, '  '));
+                console.log('REDIS KEYS (length==' + items.length + ')', JSON.stringify(items, null, '  '));
+                console.log('>>>> CHECK OUT unread:chat:' + userId1 + ':' + troupeId1);
+
+                assert.deepEqual(ourKeys, items);
                 assert(false, 'sets do not match. first problem at ' + i + ': ours=' + ourKeys[i] + '. theirs=' + items[i]);
               }
             }
-            // assert.deepEqual(ourKeys, items);
-            // assert.strictEqual(ourKeys.length, reportedUnreadCount);
           });
       }
 
       function validateResult(result, expectUnread, expectMentions) {
         if(result.unreadCount >= 0) {
           var unreadItemCount = Object.keys(unreadItems).length;
-          if(unreadItemCount !== result.unreadCount) {
+          debug('Validating unread items expected %s = actual %s', unreadItemCount, result.unreadCount);
+
+          // if(unreadItemCount !== result.unreadCount) {
             return compareUnreadItems();
-          }
+          // }
         } else {
           assert(!expectUnread, "Expencted unread items in the results hash but not there");
         }
 
         if(result.mentionCount >= 0) {
           var mentionCount = Object.keys(mentionItems).length;
+          debug('Validating mentions expected %s = actual %s', mentionCount, result.mentionCount);
+
           assert.strictEqual(mentionCount, result.mentionCount);
         } else {
           assert(!expectMentions, "Expencted mentionCount in " + JSON.stringify(result) + " but not there");
@@ -116,8 +120,8 @@ describe('unread-item-service-engine-combined #slow', function() {
         [
           /* 0 */
           function addMention(cb) {
+            debug('Next operation: addMention');
             var itemId = nextId();
-            // console.log('Add mention');
 
             return newItemForUsers(troupeId1, itemId, [userId1], [userId1])
                 .then(function(result) {
@@ -132,8 +136,13 @@ describe('unread-item-service-engine-combined #slow', function() {
           },
           /* 1 */
           function addItem(cb) {
-            var numberOfItems = rand(10) + 1;
-            // console.log('Add ' + numberOfItems + ' items');
+            debug('Next operation: addItem');
+
+            var largeNumberOfAddItems = rand(10) > 8;
+
+            var numberOfItems = largeNumberOfAddItems ? rand(100) + 30 : rand(10) + 1;
+
+            debug('Adding %s new unread items', numberOfItems);
 
             return _.range(numberOfItems).reduce(function(memo) {
                 function addNewItem() {
@@ -160,6 +169,8 @@ describe('unread-item-service-engine-combined #slow', function() {
           },
           /* 2 */
           function markItemRead(cb) {
+            debug('Next operation: makeItemRead');
+
             var largeMarkAsRead = rand(10) > 8;
 
             var percentageOfItems = rand(largeMarkAsRead ? 100 : 30) / 100;
@@ -171,7 +182,7 @@ describe('unread-item-service-engine-combined #slow', function() {
               return unreadItems[itemId];
             });
 
-            // console.log('Marking ' + forMarkAsRead.length + ' items read');
+            debug('Marking %s items as read', forMarkAsRead.length);
 
             return markItemsRead(userId1, troupeId1, forMarkAsRead)
               .then(function(result) {
@@ -187,6 +198,8 @@ describe('unread-item-service-engine-combined #slow', function() {
           },
           /* 3 */
           function markAllItemsRead(cb) {
+            debug('Next operation: markAllItemsRead');
+
             if(rand(3) !== 0) return cb();
             // console.log('Mark all items read');
             return ensureAllItemsRead(userId1, troupeId1)
