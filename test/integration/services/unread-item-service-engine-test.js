@@ -679,18 +679,28 @@ describe('unread-item-service', function() {
 
       it('should not allow a user to have more than 100 unread items in a room', function(done) {
         var adds = [];
-
+        var addItemIds = [];
+        var startTimestamp = Math.floor(Date.now() / 1000) * 1000 - 86400000; // Yesterday
         for(var i = 0; i < 110; i++) {
-          adds.push(unreadItemServiceEngine.newItemWithMentions(troupeId1, mongoUtils.getNewObjectIdString(), [userId1], []));
+          var itemId = mongoUtils.createIdForTimestampString(startTimestamp);
+          startTimestamp = startTimestamp + 1000; // Make sure that each timestamp is a unique second
+          addItemIds.push("" + itemId);
+          adds.push(unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId, [userId1], []));
         }
 
         blockTimer.reset();
         return Q.all(adds)
           .then(function() {
             blockTimer.reset();
+
+            var itemId = mongoUtils.createIdForTimestampString(startTimestamp);
+            startTimestamp = startTimestamp + 1000; // Make sure that each timestamp is a unique second
+
+            addItemIds.push("" + itemId);
+
             // Do a single insert sans contention. In the real world, there will never be this much
             // contention for a single usertroupe
-            return unreadItemServiceEngine.newItemWithMentions(troupeId1, mongoUtils.getNewObjectIdString(), [userId1], []);
+            return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId, [userId1], []);
           })
           .delay(100)
           .then(function() {
@@ -699,6 +709,24 @@ describe('unread-item-service', function() {
           .then(function(counts) {
             assert.equal(counts[troupeId1].unreadItems, 100);
             assert.equal(counts[troupeId1].mentions, 0);
+
+            var d = Q.defer();
+            unreadItemServiceEngine.testOnly.redisClient.zrange('unread:chat:' + userId1 + ':' + troupeId1, 0, -1, 'WITHSCORES', d.makeNodeResolver());
+            return d.promise;
+          })
+          .then(function(unreadItemsWithScores) {
+            // Ensure that the timestamp upgrade works correctly
+            var itemIds = [];
+            for(var i = 0; i < unreadItemsWithScores.length; i = i + 2) {
+              var itemId = unreadItemsWithScores[i];
+              var timestamp = parseInt(unreadItemsWithScores[i + 1], 10);
+
+              assert.strictEqual(timestamp, mongoUtils.getTimestampFromObjectId(itemId));
+              itemIds.push(itemId);
+            }
+
+            var last100 = addItemIds.slice(-100);
+            assert.deepEqual(last100, itemIds);
           })
           .nodeify(done);
       });

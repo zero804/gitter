@@ -525,5 +525,6 @@ exports.testOnly = {
   getNewItemBatches: getNewItemBatches,
   UNREAD_BATCH_SIZE: UNREAD_BATCH_SIZE,
   removeAllEmailNotifications: removeAllEmailNotifications,
-  mergeUnreadItemsWithMentions: mergeUnreadItemsWithMentions
+  mergeUnreadItemsWithMentions: mergeUnreadItemsWithMentions,
+  redisClient: redisClient
 };

@@ -1,6 +1,5 @@
 "use strict";
 
-var winston = require('./winston');
 var ObjectID = require('mongodb').ObjectID;
 var _ = require('underscore');
 
@@ -32,7 +31,6 @@ function asObjectIDs(ids) {
 
 function getDateFromObjectId(id) {
   if(!id) {
-    winston.silly('Null ID passed into getDateFromObjectId.');
     return null;
   }
 
