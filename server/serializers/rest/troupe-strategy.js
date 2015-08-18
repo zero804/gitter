@@ -38,36 +38,6 @@ AllUnreadItemCountStategy.prototype = {
   name: 'AllUnreadItemCountStategy'
 };
 
-/**
- *
- */
-function TroupeMentionCountStategy(options) {
-  var self = this;
-  var userId = options.userId || options.currentUserId;
-
-  this.preload = function(troupeIds, callback) {
-    var operation;
-    if(troupeIds.length <= 5) {
-      operation = unreadItemService.getUserMentionCountsForTroupeIds(userId, troupeIds);
-    } else {
-      operation = unreadItemService.getUserMentionCounts(userId);
-    }
-
-    operation
-      .then(function(result) {
-        self.mentionCounts = result;
-      })
-      .nodeify(callback);
-  };
-
-  this.map = function(id) {
-    return self.mentionCounts[id] ? self.mentionCounts[id] : 0;
-  };
-}
-TroupeMentionCountStategy.prototype = {
-  name: 'TroupeMentionCountStategy'
-};
-
 function LastTroupeAccessTimesForUserStrategy(options) {
   var userId = options.userId || options.currentUserId;
   var timesIndexed;
@@ -177,7 +147,6 @@ function TroupeStrategy(options) {
   var currentUserId = options.currentUserId;
 
   var unreadItemStategy = currentUserId && !options.skipUnreadCounts ? new AllUnreadItemCountStategy(options) : null;
-  var mentionCountStrategy = currentUserId && !options.skipUnreadCounts ? new TroupeMentionCountStategy(options) : null;
   var lastAccessTimeStategy = currentUserId ? new LastTroupeAccessTimesForUserStrategy(options) : null;
   var favouriteStrategy = currentUserId ? new FavouriteTroupesForUserStrategy(options) : null;
   var lurkStrategy = currentUserId ? new LurkTroupeForUserStrategy(options) : null;
@@ -192,13 +161,6 @@ function TroupeStrategy(options) {
     if(unreadItemStategy) {
       strategies.push({
         strategy: unreadItemStategy,
-        data: troupeIds
-      });
-    }
-
-    if(mentionCountStrategy) {
-      strategies.push({
-        strategy: mentionCountStrategy,
         data: troupeIds
       });
     }
@@ -295,6 +257,8 @@ function TroupeStrategy(options) {
         troupeUrl = "/" + item.uri;
     }
 
+    var unreadCounts = unreadItemStategy && unreadItemStategy.map(item.id);
+
     return {
       id: item.id || item._id,
       name: troupeName,
@@ -304,8 +268,8 @@ function TroupeStrategy(options) {
       userCount: item.userCount,
       // users: options.mapUsers && !item.oneToOne ? item.users.map(function(troupeUser) { return userIdStategy.map(troupeUser.userId); }) : undefined,
       user: otherUser,
-      unreadItems: unreadItemStategy ? unreadItemStategy.map(item.id) : undefined,
-      mentions: mentionCountStrategy ? mentionCountStrategy.map(item.id) : undefined,
+      unreadItems: unreadCounts ? unreadCounts.unreadItems : undefined,
+      mentions: unreadCounts ? unreadCounts.mentions : undefined,
       lastAccessTime: lastAccessTimeStategy ? lastAccessTimeStategy.map(item.id) : undefined,
       favourite: favouriteStrategy ? favouriteStrategy.map(item.id) : undefined,
       lurk: lurkStrategy ? !item.oneToOne && lurkStrategy.map(item.id) : undefined,

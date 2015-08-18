@@ -324,77 +324,23 @@ function removeAllEmailNotifications() {
   return Q.ninvoke(redisClient, "del", EMAIL_NOTIFICATION_HASH_KEY);
 }
 
-function getUserUnreadCounts(userId, troupeId) {
-  var key = "unread:chat:" + userId + ":" + troupeId;
-  return runScript('unread-item-count', [key], [])
-    .then(function(result) {
-      return result[0] || 0;
-    });
-}
-
+/**
+ * @return hash of { troupe: { total: x, mentions: y } }
+ */
 function getUserUnreadCountsForRooms(userId, troupeIds) {
-  var keys = troupeIds.map(function(troupeId) {
-    return "unread:chat:" + userId + ":" + troupeId;
-  });
+  var keys = troupeIds.reduce(function(memo, troupeId) {
+    memo.push("unread:chat:" + userId + ":" + troupeId);
+    memo.push("m:" + userId + ":" + troupeId);
+    return memo;
+  }, []);
 
   return runScript('unread-item-count', keys, [])
     .then(function(replies) {
       return troupeIds.reduce(function(memo, troupeId, index) {
-        memo[troupeId] = replies[index];
+        memo[troupeId] = { unreadItems: replies[index * 2], mentions: replies[index * 2 + 1] };
         return memo;
       }, {});
     });
-}
-
-function getUserMentions(userId) {
-  return redisClient_smembers("m:" + userId)
-    .then(function(troupeIds) {
-      return getUserMentionsForRooms(userId, troupeIds);
-    });
-}
-
-function getUserMentionCounts(userId) {
-  return redisClient_smembers("m:" + userId)
-    .then(function(troupeIds) {
-      return getUserMentionsForRooms(userId, troupeIds, {onlyCounts: true});
-    });
-}
-
-function getUserMentionCountsForRooms(userId, troupeIds) {
-  return getUserMentionsForRooms(userId, troupeIds, {onlyCounts: true});
-}
-
-function getUserMentionsForRoom(userId, troupeId) {
-  return getUserMentionsForRooms(userId, [troupeId])
-  .then(function(results) {
-    return results[troupeId] || [];
-  });
-}
-
-
-function getUserMentionsForRooms(userId, troupeIds, options) {
-  options = options || {};
-  var multi = redisClient.multi();
-
-  troupeIds.forEach(function(troupeId) {
-    var key = "m:" + userId + ":" + troupeId;
-    if (options.onlyCounts) { multi.scard(key); } else { multi.smembers(key); }
-  });
-
-  var d = Q.defer();
-
-  multi.exec(function(err, replies) {
-    if(err) return d.reject(err);
-
-    var result = troupeIds.reduce(function(memo, troupeId, index) {
-      memo[troupeId] = replies[index];
-      return memo;
-    }, {});
-
-    d.resolve(result);
-  });
-
-  return d.promise;
 }
 
 /*
@@ -412,19 +358,47 @@ function getUnreadItemsAndMentions(userId, troupeId) {
     });
 }
 
-function getUnreadItems(userId, troupeId) {
-  var keys = ["unread:chat:" + userId + ":" + troupeId];
-  return runScript('unread-item-list', keys, [])
-    .catch(function(err) {
-      /* Not sure why we're doing this? */
-      winston.warn("unreadItemService.getUnreadItems failed:" + err, { exception: err });
-      // Mask error
-      return [];
-    });
+function makeSet(array) {
+  var set = {};
+  if (!array) return set;
+  var length = array.length;
+  if (!array.length) return set;
+
+  for (var i = 0; i < length; i++) {
+    set[array[i]] = true;
+  }
+  return set;
 }
 
-function getMentions(userId, troupeId) {
-  return redisClient_smembers("m:" + userId + ":" + troupeId);
+// Performance optimised merge of two sets
+function mergeUnreadItemsWithMentions(unreadItems, mentions) {
+  if (!mentions || !mentions.length) return unreadItems;
+  if (!unreadItems || !unreadItems.length) return mentions;
+
+  var mentionSet = makeSet(mentions);
+  var outstandingMentionCount = mentions.length;
+
+  for (var i = 0, len = unreadItems.length; i < len; i++) {
+    var item = unreadItems[i];
+    if (mentionSet[item]) {
+      delete mentionSet[item];
+      outstandingMentionCount--;
+
+      // Mentions is a subset of unread items. Done.
+      if (!outstandingMentionCount) return unreadItems;
+    }
+  }
+
+  // Add the mentions to the beginning as they're probably before
+  // the unread item horizon and therefore should appear first
+  return Object.keys(mentionSet).concat(unreadItems);
+}
+
+function getUnreadItems(userId, troupeId) {
+  return getUnreadItemsAndMentions(userId, troupeId)
+    .spread(function(unreadItems, mentions) {
+      return mergeUnreadItemsWithMentions(unreadItems, mentions);
+    });
 }
 
 /**
@@ -509,10 +483,8 @@ function getBadgeCountsForUserIds(userIds) {
   });
 
   var d = Q.defer();
-
-  multi.exec(function(err, replies) {
-    if(err) return d.reject(err);
-
+  multi.exec(d.makeNodeResolver());
+  return d.promise.then(function(replies) {
     var result = {};
 
     userIds.forEach(function(userId, index) {
@@ -520,10 +492,8 @@ function getBadgeCountsForUserIds(userIds) {
       result[userId] = reply;
     });
 
-    d.resolve(result);
+    return result;
   });
-
-  return d.promise;
 }
 
 
@@ -540,18 +510,9 @@ exports.ensureAllItemsRead = ensureAllItemsRead;
 exports.markItemsRead = markItemsRead;
 exports.listTroupeUsersForEmailNotifications = listTroupeUsersForEmailNotifications;
 
-exports.getUserUnreadCounts = getUserUnreadCounts;
 exports.getUserUnreadCountsForRooms = getUserUnreadCountsForRooms;
 
-exports.getUserMentions = getUserMentions;
-exports.getUserMentionCounts = getUserMentionCounts;
-exports.getUserMentionCountsForRooms = getUserMentionCountsForRooms;
-exports.getUserMentionsForRooms = getUserMentionsForRooms;
-exports.getUserMentionsForRoom = getUserMentionsForRoom;
-
-
 exports.getUnreadItems = getUnreadItems;
-exports.getMentions = getMentions;
 exports.getUnreadItemsAndMentions = getUnreadItemsAndMentions;
 exports.getUnreadItemsForUserTroupes = getUnreadItemsForUserTroupes;
 
@@ -563,5 +524,6 @@ exports.getRoomsCausingBadgeCount = getRoomsCausingBadgeCount;
 exports.testOnly = {
   getNewItemBatches: getNewItemBatches,
   UNREAD_BATCH_SIZE: UNREAD_BATCH_SIZE,
-  removeAllEmailNotifications: removeAllEmailNotifications
+  removeAllEmailNotifications: removeAllEmailNotifications,
+  mergeUnreadItemsWithMentions: mergeUnreadItemsWithMentions
 };

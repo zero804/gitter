@@ -30,46 +30,6 @@ describe('unread-item-service-engine-combined #slow', function() {
       return unreadItemServiceEngine.newItemWithMentions(troupeId, itemId, userIds, mentionUserIds || []);
     });
 
-    var expectUserUnreadCounts = limit(function (userId, troupeId, expected) {
-      return unreadItemServiceEngine.getUserUnreadCounts(userId, troupeId)
-        .then(function(result) {
-          assert.strictEqual(result, expected, 'Expected ' + userId + ' in ' + troupeId + ' to have ' + expected + ' unread items, got ' + result);
-        });
-    });
-
-    var expectBadgeCounts = limit(function(expectedArray) {
-      var userIds = expectedArray.map(function(x) { return x[0]; });
-      return unreadItemServiceEngine.getBadgeCountsForUserIds(userIds)
-        .then(function(result) {
-          userIds.forEach(function(userId, index) {
-            var actual = result[userId];
-            var expected = expectedArray[index][1];
-            assert.strictEqual(actual, expected, 'Expected ' + userId + ' to have ' + expected + ' badge count, got ' + actual);
-          });
-        });
-    });
-
-    var expectMentionCounts = limit(function (userId, expectedArray) {
-      var troupeIds = expectedArray.map(function(x) { return x[0]; });
-      return unreadItemServiceEngine.getUserMentionCountsForRooms(userId, troupeIds)
-        .then(function(result) {
-          troupeIds.forEach(function(troupeId, index) {
-            var actual = result[troupeId];
-            var expected = expectedArray[index][1];
-            assert.strictEqual(actual, expected, 'Expected ' + userId + ' to have ' + expected + ' mention count in ' + troupeId + ', got ' + actual);
-          });
-
-          return unreadItemServiceEngine.getUserMentionCounts(userId);
-        })
-        .then(function(result) {
-          troupeIds.forEach(function(troupeId, index) {
-            var actual = result[troupeId] || 0;
-            var expected = expectedArray[index][1] || 0;
-            assert.strictEqual(actual, expected, 'Expected ' + userId + ' to have ' + expected + ' mention count in ' + troupeId + ', got ' + actual);
-          });
-        });
-    });
-
     var markItemsRead = limit(function(userId, troupeId, itemIds) {
       return unreadItemServiceEngine.markItemsRead(userId, troupeId, itemIds);
     });
