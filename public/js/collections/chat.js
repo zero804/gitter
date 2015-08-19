@@ -17,7 +17,6 @@ var userId = context.getUserId();
 var ChatModel = Backbone.Model.extend({
   idAttribute: "id",
   initialize: function() {
-
     this.listenTo(this, 'sync', this.triggerSynced);
     this.listenTo(this, 'request', this.triggerSyncing);
     this.listenTo(this, 'error', this.triggerSyncError);
@@ -28,6 +27,7 @@ var ChatModel = Backbone.Model.extend({
     });
 
   },
+
 
   triggerSynced: function() {
     this.trigger('syncStatusChange', 'synced');
@@ -114,6 +114,18 @@ var ChatCollection = LiveCollection.extend({
     this.listenTo(this, 'reset sync', function () {
       burstCalculator.parse(this);
     });
+
+    this.reSubscribeOnModelChange(context.troupe(), 'name');
+  },
+
+  reSubscribeOnModelChange: function (model, prop){
+    var evtName = prop ? 'change:' + prop : 'change';
+    this.listenTo(model, evtName, function(model){
+      this.reset();
+      this.subscription.cancel();
+      this.subscription = null;
+      this.listen({ snapshot: true });
+    }, this);
   },
 
   parse: function (collection) {
