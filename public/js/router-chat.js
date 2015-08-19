@@ -102,6 +102,7 @@ onready(function () {
 
       case 'navigation':
         console.log(message);
+        console.log(context.troupe());
         break;
     }
   });
@@ -234,6 +235,7 @@ onready(function () {
     },
 
     hideModal: function() {
+      console.log('init');
       appView.dialogRegion.destroy();
     },
 
@@ -390,6 +392,12 @@ onready(function () {
   if(context.popEvent('hooks_require_additional_public_scope')) {
     setTimeout(promptForHook, 1500);
   }
+
+  function init() {
+    console.log('init');
+  }
+
+  init();
 
   Backbone.history.start();
 });
