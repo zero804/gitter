@@ -104,9 +104,9 @@ describe('unread-item-service-engine-combined #slow', function() {
           })
           .then(function(roomsMentioningUser) {
             if (Object.keys(mentionItems).length) {
-              assert.strictEqual(roomsMentioningUser.length, 1)
+              assert.strictEqual(roomsMentioningUser.length, 1);
             } else {
-              assert.strictEqual(roomsMentioningUser.length, 0)
+              assert.strictEqual(roomsMentioningUser.length, 0);
             }
 
             return unreadItemServiceEngine.getBadgeCountsForUserIds([userId1]);
@@ -115,7 +115,7 @@ describe('unread-item-service-engine-combined #slow', function() {
             var ourKeys = _.uniq(Object.keys(unreadItems).concat(Object.keys(mentionItems)));
 
             assert.strictEqual(badgeCounts[userId1], ourKeys.length ? 1 : 0);
-          })
+          });
       }
 
       function validateResult(result, expectUnread, expectMentions) {
