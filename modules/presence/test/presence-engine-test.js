@@ -23,10 +23,6 @@ describe('presenceService', function() {
   beforeEach(cleanup);
   afterEach(cleanup);
 
-  // var blockTimer = require('./block-timer');
-  // before(blockTimer.on);
-  // after(blockTimer.off);
-
   it('should cleanup invalid sockets correctly', function(done) {
     presenceService.listOnlineUsers()
       .then(function(users) {
