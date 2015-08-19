@@ -100,15 +100,19 @@ onready(function () {
      */
      RAF(function() {
       // IE seems to prefer this in a new animation-frame
-      var iframe = document.querySelector('#content-frame');
-      console.log(iframe);
+      // var iframe = document.querySelector('#content-frame');
       //.contentWindow.location.replace(iframeUrl + hash);
 
+      //TODO, is this the best way to do this JP 19/8/15
+      var troupeName = iframeUrl.split('/').splice(1, 2).join('/');
+      var newTroupe = troupeCollections.troupes.where({ name: troupeName })[0];
+
       //post a navigation change to the iframe
-      iframe.contentWindow.postMessage(JSON.stringify({
-        type: 'navigation',
-        url: iframeUrl
-      }), context.env('basePath') );
+      postMessage({
+        type: 'change:room',
+        url: iframeUrl,
+        newTroupe: newTroupe
+      });
 
      });
   }

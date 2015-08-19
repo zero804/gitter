@@ -100,9 +100,10 @@ onready(function () {
         }
         break;
 
-      case 'navigation':
+      case 'change:room':
         console.log(message);
-        console.log(context.troupe());
+        //set the context troupe to new troupe
+        context.setTroupe(message.newTroupe);
         break;
     }
   });
