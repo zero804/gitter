@@ -100,10 +100,19 @@ onready(function () {
      */
      RAF(function() {
       // IE seems to prefer this in a new animation-frame
-      document.querySelector('#content-frame').contentWindow.location.replace(iframeUrl + hash);
+      var iframe = document.querySelector('#content-frame');
+      console.log(iframe);
+      //.contentWindow.location.replace(iframeUrl + hash);
+
+      //post a navigation change to the iframe
+      iframe.contentWindow.postMessage(JSON.stringify({
+        type: 'navigation',
+        url: iframeUrl
+      }), context.env('basePath') );
+
      });
   }
-  
+
   var allRoomsCollection = troupeCollections.troupes;
   new RoomCollectionTracker(allRoomsCollection);
 
