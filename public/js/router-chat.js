@@ -99,6 +99,10 @@ onready(function () {
           appEvents.trigger('chatCollectionView:permalinkHighlight', aroundId);
         }
         break;
+
+      case 'navigation':
+        console.log(message);
+        break;
     }
   });
 
