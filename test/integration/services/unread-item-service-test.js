@@ -69,7 +69,7 @@ describe('unread-item-service', function() {
 
   describe('since-filter', function() {
 
-    it('should do what it says on the tin', function() {
+    it('should correctly filter an array of unix timestamps given a `since` value', function() {
       var d1 = new Date('2012-01-01T00:00:00Z').valueOf();
       var d2 = new Date('2013-01-01T00:00:00Z').valueOf();
       var d3 = new Date('2014-01-01T00:00:00Z').valueOf();
