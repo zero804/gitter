@@ -266,7 +266,6 @@ function TroupeStrategy(options) {
       uri: item.uri,
       oneToOne: item.oneToOne,
       userCount: item.userCount,
-      // users: options.mapUsers && !item.oneToOne ? item.users.map(function(troupeUser) { return userIdStategy.map(troupeUser.userId); }) : undefined,
       user: otherUser,
       unreadItems: unreadCounts ? unreadCounts.unreadItems : undefined,
       mentions: unreadCounts ? unreadCounts.mentions : undefined,
