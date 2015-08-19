@@ -6,8 +6,7 @@ var chatService = require('../../server/services/chat-service');
 var loremIpsum = require('lorem-ipsum');
 var dictionary = require('lorem-ipsum/lib/dictionary').words;
 
-require('../../server/utils/event-listeners').installLocalEventListeners();
-require('../../server/services/kue-workers').startWorkers();
+require('../../server/event-listeners').install();
 
 var opts = require("nomnom")
 .option('room', {

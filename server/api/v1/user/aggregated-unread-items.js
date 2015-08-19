@@ -36,7 +36,7 @@ module.exports = {
             res.send(results);
           });
       })
-      .fail(next);
+      .catch(next);
   },
 
   load: function(req, id, callback) {

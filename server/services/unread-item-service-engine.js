@@ -7,18 +7,19 @@ var mongoUtils       = require('../utils/mongo-utils');
 var Scripto          = require('gitter-redis-scripto');
 var Q                = require('q');
 var assert           = require('assert');
+var debug            = require('debug')('gitter:unread-items-engine');
 var redisClient      = redis.getClient();
 var scriptManager    = new Scripto(redisClient);
+var _                = require('lodash');
+
 scriptManager.loadFromDir(__dirname + '/../../redis-lua/unread');
 var EMAIL_NOTIFICATION_HASH_KEY = "unread:email_notify";
-var EventEmitter     = require('events').EventEmitter;
-
-var engine = new EventEmitter();
 
 var runScript = Q.nbind(scriptManager.run, scriptManager);
 var redisClient_smembers = Q.nbind(redisClient.smembers, redisClient);
 
 var UNREAD_BATCH_SIZE = 100;
+var PRECONVERT_OBJECTID_TO_STRING_THRESHOLD = 1000;
 
 /**
  * Given an array of userIds and an array of mentionUserIds, returns an array of
@@ -29,7 +30,7 @@ var UNREAD_BATCH_SIZE = 100;
  *    such that for any element of the result, `member.memberUserIds` ⊆ `member.userIds`
  */
 function getNewItemBatches(userIds, mentionUserIds) {
-  var mentionUsersHash = mentionUserIds.reduce(function(memo, mentionUserId) {
+  var mentionUsersHash = _.reduce(mentionUserIds, function(memo, mentionUserId) {
     memo[mentionUserId] = true;
     return memo;
   }, {});
@@ -44,7 +45,7 @@ function getNewItemBatches(userIds, mentionUserIds) {
 
   for (var i = 0, count = 0; i < length; i += UNREAD_BATCH_SIZE, count++) {
     var batch = userIds.slice(i, i + UNREAD_BATCH_SIZE);
-    var mentionBatch = batch.filter(userIsMentioned);
+    var mentionBatch = _.filter(batch, userIsMentioned);
 
     results[count] = { userIds: batch, mentionUserIds: mentionBatch };
   }
@@ -59,24 +60,41 @@ function getNewItemBatches(userIds, mentionUserIds) {
 function newItemWithMentions(troupeId, itemId, userIds, mentionUserIds) {
   if(!userIds.length) return Q.resolve({});
 
-  var batches = getNewItemBatches(userIds, mentionUserIds);
+  // Working in strings saves a stack of time
+  troupeId = mongoUtils.serializeObjectId(troupeId);
 
+  // Turn all the userIds into strings up front
+  // in large rooms this is a big performance gain.
+  // In small rooms, it slows things down
+  if (userIds.length > PRECONVERT_OBJECTID_TO_STRING_THRESHOLD) {
+    userIds = _.map(userIds, mongoUtils.serializeObjectId);
+  }
+
+  // Turn all the userIds into strings up front
+  // in large rooms this is a big performance gain.
+  // In small rooms, it slows things down
+  if (mentionUserIds.length > PRECONVERT_OBJECTID_TO_STRING_THRESHOLD) {
+    mentionUserIds = _.map(mentionUserIds, mongoUtils.serializeObjectId);
+  }
+
+  var batches = getNewItemBatches(userIds, mentionUserIds);
   var timestamp = mongoUtils.getTimestampFromObjectId(itemId);
 
-  return Q.all(batches.map(function(batch) {
+  return Q.all(_.map(batches, function(batch) {
       var batchUserIds = batch.userIds;
       var batchMentionIds = batch.mentionUserIds;
 
       // Now talk to redis and do the update
       var keys = [EMAIL_NOTIFICATION_HASH_KEY];
-      batchUserIds.forEach(function(userId) {
+      _.forEach(batchUserIds, function(userId) {
         keys.push("unread:chat:" + userId + ":" + troupeId);
         keys.push("ub:" + userId);
       });
 
-      batchMentionIds.forEach(function(mentionUserId) {
-        keys.push("m:" + mentionUserId + ":" + troupeId);
-        keys.push("m:" + mentionUserId);
+      _.forEach(batchMentionIds, function(mentionUserId) {
+        var mentionKey = "m:" + mentionUserId;
+        keys.push(mentionKey + ":" + troupeId);
+        keys.push(mentionKey);
       });
 
       var values = [batchUserIds.length, troupeId, itemId, timestamp].concat(batchUserIds);
@@ -86,25 +104,19 @@ function newItemWithMentions(troupeId, itemId, userIds, mentionUserIds) {
     .then(function(results) {
       var resultHash = {};
 
-      results.forEach(function(result, index) {
+      // Using _.forEach as its much faster than native in a tight loop like this
+      _.forEach(results, function(result, index) {
         var batch = batches[index];
         var batchUserIds = batch.userIds;
         var batchMentionIds = batch.mentionUserIds;
 
         var upgradeCount = 0;
-        batchUserIds.forEach(function(userId) {
+        // Using _.forEach as its much faster than native in a tight loop like this
+        _.forEach(batchUserIds, function(userId) {
           var troupeUnreadCount   = result.shift();
           var flag                = result.shift();
           var badgeUpdate         = !!(flag & 1);
           var upgradedKey          = flag & 2;
-
-          if (badgeUpdate) {
-            engine.emit('badge.update', userId);
-          }
-
-          if (troupeUnreadCount >= 0) {
-            engine.emit('unread.count', userId, troupeId, troupeUnreadCount);
-          }
 
           resultHash[userId] = {
             unreadCount: troupeUnreadCount >= 0 ? troupeUnreadCount : undefined,
@@ -119,10 +131,10 @@ function newItemWithMentions(troupeId, itemId, userIds, mentionUserIds) {
         if (upgradeCount > 10) {
           winston.warn('unread-items: upgraded keys for ' + upgradeCount + ' user:troupes');
         } else if(upgradeCount > 0) {
-          winston.info('unread-items: upgraded keys for ' + upgradeCount + ' user:troupes');
+          debug('unread-items: upgraded keys for user:troupes', upgradeCount);
         }
 
-        batchMentionIds.forEach(function(mentionUserId) {
+        _.forEach(batchMentionIds, function(mentionUserId) {
           var mentionCount = result.shift();
           resultHash[mentionUserId].mentionCount = mentionCount >= 0 ? mentionCount : undefined;
         });
@@ -161,18 +173,6 @@ function removeItem(troupeId, itemId, userIds) {
         var badgeUpdate         = !!(flag & 1);
         var userId              = userIds[i];
 
-        if (badgeUpdate) {
-          engine.emit('badge.update', userId);
-        }
-
-        if (troupeUnreadCount >= 0) {
-          engine.emit('unread.count', userId, troupeId, troupeUnreadCount);
-        }
-
-        if (mentionCount >= 0) {
-          engine.emit('mention.count', userId, troupeId, mentionCount);
-        }
-
         results.push({
           userId: userId,
           unreadCount: troupeUnreadCount >= 0 ? troupeUnreadCount : undefined,
@@ -209,13 +209,6 @@ function ensureAllItemsRead(userId, troupeId) {
     .then(function(flag) {
       var badgeUpdate = flag > 0;
 
-      if (badgeUpdate) {
-        engine.emit('badge.update', userId);
-      }
-
-      engine.emit('unread.count', userId, troupeId, 0);
-      engine.emit('mention.count', userId, troupeId, 0, 'remove');
-
       return {
         unreadCount: 0,
         mentionCount: 0,
@@ -246,18 +239,6 @@ function markItemsRead(userId, troupeId, ids) {
       var mentionCount        = result[1];
       var flag                = result[2];
       var badgeUpdate         = !!(flag & 1);
-
-      if (badgeUpdate) {
-        engine.emit('badge.update', userId);
-      }
-
-      if (troupeUnreadCount >= 0) {
-        engine.emit('unread.count', userId, troupeId, troupeUnreadCount);
-      }
-
-      if (mentionCount >= 0) {
-        engine.emit('mention.count', userId, troupeId, mentionCount);
-      }
 
       return {
         unreadCount: troupeUnreadCount >= 0 ? troupeUnreadCount : undefined,
@@ -364,92 +345,77 @@ function removeAllEmailNotifications() {
   return Q.ninvoke(redisClient, "del", EMAIL_NOTIFICATION_HASH_KEY);
 }
 
-function getUserUnreadCounts(userId, troupeId) {
-  var key = "unread:chat:" + userId + ":" + troupeId;
-  return runScript('unread-item-count', [key], [])
-    .then(function(result) {
-      return result[0] || 0;
-    });
-}
-
+/**
+ * @return hash of { troupe: { total: x, mentions: y } }
+ */
 function getUserUnreadCountsForRooms(userId, troupeIds) {
-  var keys = troupeIds.map(function(troupeId) {
-    return "unread:chat:" + userId + ":" + troupeId;
-  });
+  var keys = troupeIds.reduce(function(memo, troupeId) {
+    memo.push("unread:chat:" + userId + ":" + troupeId);
+    memo.push("m:" + userId + ":" + troupeId);
+    return memo;
+  }, []);
 
   return runScript('unread-item-count', keys, [])
     .then(function(replies) {
       return troupeIds.reduce(function(memo, troupeId, index) {
-        memo[troupeId] = replies[index];
+        memo[troupeId] = { unreadItems: replies[index * 2], mentions: replies[index * 2 + 1] };
         return memo;
       }, {});
     });
 }
 
-function getUserMentions(userId) {
-  return redisClient_smembers("m:" + userId)
-    .then(function(troupeIds) {
-      return getUserMentionsForRooms(userId, troupeIds);
-    });
+/*
+ * Returns all unread items and mentions for a user in a room. Returns two arrays:
+ * [ unread_items, mentions ]
+ */
+function getUnreadItemsAndMentions(userId, troupeId) {
+  var keys = ["unread:chat:" + userId + ":" + troupeId, "m:" + userId + ":" + troupeId];
+  return runScript('unread-item-list-with-mentions', keys, []);
 }
 
-function getUserMentionCounts(userId) {
-  return redisClient_smembers("m:" + userId)
-    .then(function(troupeIds) {
-      return getUserMentionsForRooms(userId, troupeIds, {onlyCounts: true});
-    });
+function makeSet(array) {
+  var set = {};
+  if (!array) return set;
+  var length = array.length;
+  if (!array.length) return set;
+
+  for (var i = 0; i < length; i++) {
+    set[array[i]] = true;
+  }
+  return set;
 }
 
-function getUserMentionCountsForRooms(userId, troupeIds) {
-  return getUserMentionsForRooms(userId, troupeIds, {onlyCounts: true});
-}
+// Performance optimised merge of two sets
+function mergeUnreadItemsWithMentions(unreadItems, mentions) {
+  if (!mentions || !mentions.length) return unreadItems;
+  if (!unreadItems || !unreadItems.length) return mentions;
 
-function getUserMentionsForRoom(userId, troupeId) {
-  return getUserMentionsForRooms(userId, [troupeId])
-  .then(function(results) {
-    return results[troupeId] || [];
-  });
-}
+  var mentionSet = makeSet(mentions);
+  var outstandingMentionCount = mentions.length;
 
+  for (var i = 0, len = unreadItems.length; i < len; i++) {
+    var item = unreadItems[i];
+    if (mentionSet[item]) {
+      delete mentionSet[item];
+      outstandingMentionCount--;
 
-function getUserMentionsForRooms(userId, troupeIds, options) {
-  options = options || {};
-  var multi = redisClient.multi();
+      // Mentions is a subset of unread items. Done.
+      if (!outstandingMentionCount) return unreadItems;
+    }
+  }
 
-  troupeIds.forEach(function(troupeId) {
-    var key = "m:" + userId + ":" + troupeId;
-    if (options.onlyCounts) { multi.scard(key); } else { multi.smembers(key); }
-  });
-
-  var d = Q.defer();
-
-  multi.exec(function(err, replies) {
-    if(err) return d.reject(err);
-
-    var result = troupeIds.reduce(function(memo, troupeId, index) {
-      memo[troupeId] = replies[index];
-      return memo;
-    }, {});
-
-    d.resolve(result);
-  });
-
-  return d.promise;
+  // Add the mentions to the **beginning** as the reason they're not
+  // in the unread item list is that they're old enough to have slipped
+  // out the end of the unread items list. Their correct ordering is
+  // therefore at the front of the array.
+  return Object.keys(mentionSet).concat(unreadItems);
 }
 
 function getUnreadItems(userId, troupeId) {
-  var keys = ["unread:chat:" + userId + ":" + troupeId];
-  return runScript('unread-item-list', keys, [])
-    .catch(function(err) {
-      /* Not sure why we're doing this? */
-      winston.warn("unreadItemService.getUnreadItems failed:" + err, { exception: err });
-      // Mask error
-      return [];
+  return getUnreadItemsAndMentions(userId, troupeId)
+    .spread(function(unreadItems, mentions) {
+      return mergeUnreadItemsWithMentions(unreadItems, mentions);
     });
-}
-
-function getMentions(userId, troupeId) {
-  return redisClient_smembers("m:" + userId + ":" + troupeId);
 }
 
 /**
@@ -468,12 +434,6 @@ function getUnreadItemsForUserTroupes(userTroupes) {
         memo[userTroupe.userId + ":" + userTroupe.troupeId] = results[index];
         return memo;
       }, {});
-    })
-    .catch(function(err) {
-      /* Not sure why we're doing this? */
-      winston.warn("unreadItemService.getUnreadItems failed:" + err, { exception: err });
-      // Mask error
-      return {};
     });
 }
 
@@ -512,15 +472,8 @@ function getAllUnreadItemCounts(userId) {
  * Returns an array of troupeIds for rooms with mention counts
  */
 function getRoomsMentioningUser(userId) {
-  return redisClient_smembers("m:" + userId)
-    .catch(function(err) {
-      /* Not sure why we need to do this? */
-      winston.warn("unreadItemService.getRoomIdsMentioningUser failed:" + err, { exception: err });
-      // Mask error
-      return [];
-    });
+  return redisClient_smembers("m:" + userId);
 }
-
 
 /**
  * Get the badge counts for userIds
@@ -534,10 +487,8 @@ function getBadgeCountsForUserIds(userIds) {
   });
 
   var d = Q.defer();
-
-  multi.exec(function(err, replies) {
-    if(err) return d.reject(err);
-
+  multi.exec(d.makeNodeResolver());
+  return d.promise.then(function(replies) {
     var result = {};
 
     userIds.forEach(function(userId, index) {
@@ -545,10 +496,8 @@ function getBadgeCountsForUserIds(userIds) {
       result[userId] = reply;
     });
 
-    d.resolve(result);
+    return result;
   });
-
-  return d.promise;
 }
 
 
@@ -556,36 +505,30 @@ function getRoomsCausingBadgeCount(userId) {
   return Q.ninvoke(redisClient, "zrange", ["ub:" + userId, 0, -1]);
 }
 
+/**
+ * Exports
+ */
+exports.newItemWithMentions = newItemWithMentions;
+exports.removeItem = removeItem;
+exports.ensureAllItemsRead = ensureAllItemsRead;
+exports.markItemsRead = markItemsRead;
+exports.listTroupeUsersForEmailNotifications = listTroupeUsersForEmailNotifications;
 
-engine.newItemWithMentions = newItemWithMentions;
-engine.removeItem = removeItem;
-engine.ensureAllItemsRead = ensureAllItemsRead;
-engine.markItemsRead = markItemsRead;
-engine.listTroupeUsersForEmailNotifications = listTroupeUsersForEmailNotifications;
+exports.getUserUnreadCountsForRooms = getUserUnreadCountsForRooms;
 
-engine.getUserUnreadCounts = getUserUnreadCounts;
-engine.getUserUnreadCountsForRooms = getUserUnreadCountsForRooms;
+exports.getUnreadItems = getUnreadItems;
+exports.getUnreadItemsAndMentions = getUnreadItemsAndMentions;
+exports.getUnreadItemsForUserTroupes = getUnreadItemsForUserTroupes;
 
-engine.getUserMentions = getUserMentions;
-engine.getUserMentionCounts = getUserMentionCounts;
-engine.getUserMentionCountsForRooms = getUserMentionCountsForRooms;
-engine.getUserMentionsForRooms = getUserMentionsForRooms;
-engine.getUserMentionsForRoom = getUserMentionsForRoom;
+exports.getAllUnreadItemCounts = getAllUnreadItemCounts;
+exports.getRoomsMentioningUser = getRoomsMentioningUser;
+exports.getBadgeCountsForUserIds = getBadgeCountsForUserIds;
+exports.getRoomsCausingBadgeCount = getRoomsCausingBadgeCount;
 
-
-engine.getUnreadItems = getUnreadItems;
-engine.getMentions = getMentions;
-engine.getUnreadItemsForUserTroupes = getUnreadItemsForUserTroupes;
-
-engine.getAllUnreadItemCounts = getAllUnreadItemCounts;
-engine.getRoomsMentioningUser = getRoomsMentioningUser;
-engine.getBadgeCountsForUserIds = getBadgeCountsForUserIds;
-engine.getRoomsCausingBadgeCount = getRoomsCausingBadgeCount;
-
-engine.testOnly = {
+exports.testOnly = {
   getNewItemBatches: getNewItemBatches,
   UNREAD_BATCH_SIZE: UNREAD_BATCH_SIZE,
   removeAllEmailNotifications: removeAllEmailNotifications,
+  mergeUnreadItemsWithMentions: mergeUnreadItemsWithMentions,
   redisClient: redisClient
 };
-module.exports = engine;

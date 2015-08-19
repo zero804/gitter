@@ -3,7 +3,7 @@
 
 var unreadItemService = require("../../../services/unread-item-service");
 var StatusError = require('statuserror');
-var _ = require('underscore');
+var uniqueIds = require('mongodb-unique-ids');
 
 module.exports = {
   id: 'unreadItem',
@@ -28,7 +28,7 @@ module.exports = {
     if(Array.isArray(unreadItems.chat)) allIds = allIds.concat(unreadItems.chat);
 
     if(Array.isArray(unreadItems.mention) && Array.isArray(unreadItems.chat)) {
-      allIds = _.uniq(allIds);
+      allIds = uniqueIds(allIds);
     }
 
     if(!allIds.length) return next(new StatusError(400, 'No chat or mention items')); /* You comin at me bro? */
@@ -47,7 +47,7 @@ module.exports = {
           }
         });
       })
-      .fail(next);
+      .catch(next);
 
   },
 
@@ -68,7 +68,7 @@ module.exports = {
           }
         });
       })
-      .fail(next);
+      .catch(next);
   },
 
 

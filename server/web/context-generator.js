@@ -2,7 +2,7 @@
 "use strict";
 
 var restSerializer   = require("../serializers/rest-serializer");
-var presenceService  = require("../services/presence-service");
+var presenceService  = require("gitter-web-presence");
 var useragent        = require("useragent");
 var crypto           = require("crypto");
 var roomPermissionsModel = require('../services/room-permissions-model');

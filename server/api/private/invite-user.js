@@ -44,5 +44,5 @@ module.exports =  function (req, res, next) {
       stats.event('manual-invite', { from: req.user.username, to: user.username, room: room.uri });
       res.send({ success: true });
     })
-    .fail(next);
+    .catch(next);
 };

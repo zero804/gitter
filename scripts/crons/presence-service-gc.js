@@ -4,7 +4,7 @@
 "use strict";
 
 var winston = require('../../server/utils/winston');
-var presenceService = require('../../server/services/presence-service');
+var presenceService = require('gitter-web-presence');
 var bayeux = require('../../server/web/bayeux');
 var shutdown = require('shutdown');
 

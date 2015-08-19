@@ -24,15 +24,13 @@ onMongoConnect()
     return user._id;
   })
   .then(function(userId) {
-    var d = Q.defer();
-    pushNotificationGateway.sendUsersBadgeUpdates([userId], d.makeNodeResolver());
-    return d.promise;
+    return pushNotificationGateway.sendUsersBadgeUpdates([userId]);
   })
   .delay(5000)
   .then(function() {
     shutdown.shutdownGracefully();
   })
-  .fail(function(err) {
+  .catch(function(err) {
     console.error(err.stack);
     shutdown.shutdownGracefully(1);
   });

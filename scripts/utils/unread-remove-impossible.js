@@ -77,10 +77,10 @@ getKeys()
   .then(convertToHash)
   .then(markAllWeirdRoomsAsRead)
   .delay(1000)
-  .fail(function(err) {
+  .catch(function(err) {
     console.error(err.stack);
   })
   .delay(10000)
-  .fin(function() {
+  .finally(function() {
     shutdown.shutdownGracefully();
   });

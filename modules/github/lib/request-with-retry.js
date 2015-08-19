@@ -4,6 +4,7 @@
 var env = require('gitter-web-env');
 var logger = env.logger;
 var stats = env.stats;
+var debug = require('debug')('gitter:github');
 
 module.exports = exports = function(options) {
   var maxRetries = options.maxRetries || 4;
@@ -21,7 +22,7 @@ module.exports = exports = function(options) {
       stats.event('github.api.count');
 
       var uri = options.uri || options.url;
-      logger.verbose('github.request', { uri: uri, method: options.method });
+      debug('request: %s %s ', options.method, uri);
 
       request(options, function (error, response, body) {
         var duration = Date.now() - start;
