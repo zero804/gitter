@@ -58,7 +58,6 @@ function removeItem(troupeId, itemId) {
       var userIds = Object.keys(userIdsWithLurk);
 
       // Publish out an unread item removed event
-      // TODO: we could actually check whether this user thinks this item is UNREAD
       var data = { chat: [itemId] };
 
       userIds.forEach(function(userId) {
@@ -450,7 +449,6 @@ function processResultsForNewItemWithMentions(troupeId, chatId, parsed, results,
             return;
 
           case 'push':
-            // TODO: handle push
             var pushNotificationQueue = hasMention ? pushCandidatesWithMention : pushCandidates;
             pushNotificationQueue.push(userId);
             return;
