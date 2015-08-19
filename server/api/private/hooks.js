@@ -26,7 +26,7 @@ function checkRepo(meta) {
 
     /* Do this asynchronously */
     checkRepoPrivacy(repo)
-      .fail(function(err) {
+      .catch(function(err) {
         winston.error('Repo privacy check failed: ' + err, { exception: err });
       });
   }
@@ -65,10 +65,9 @@ module.exports = function(req, res, next) {
       stats.event('webhook.receive.success');
       res.send('OK');
     })
-    .fail(function(err) {
+    .catch(function(err) {
       stats.event('webhook.receive.failure');
       if (err) winston.error('Error creating event: ' + err, { exception: err });
       next(err);
     });
 };
-

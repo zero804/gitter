@@ -63,7 +63,7 @@ exports.datesList = [
               });
           });
       })
-      .fail(next);
+      .catch(next);
   }
 ];
 
@@ -198,6 +198,6 @@ exports.chatArchive = [
 
           });
       })
-      .fail(next);
+      .catch(next);
   }
 ];

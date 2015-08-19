@@ -57,12 +57,12 @@ describe('authorisor', function() {
     testGenerator(FIXTURES, function(name, meta) {
 
       var userCanAccessRoomMock = mockito.mockFunction();
-      var presenceServiceMock = mockito.mock(testRequire('./services/presence-service'));
+      var presenceServiceMock = mockito.mock(testRequire('gitter-web-presence'));
       var restfulMock = mockito.mock(testRequire('./services/restful'));
 
       var authorisor = testRequire.withProxies("./web/bayeux/authorisor", {
         '../../services/user-can-access-room': userCanAccessRoomMock,
-        '../../services/presence-service': presenceServiceMock,
+        'gitter-web-presence': presenceServiceMock,
         '../../services/restful': restfulMock
       });
 
@@ -108,4 +108,3 @@ describe('authorisor', function() {
   });
 
 });
-

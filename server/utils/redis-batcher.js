@@ -13,13 +13,18 @@ function emptyFn (err) {
 }
 
 // Name of batcher and the delay in milliseconds
-var RedisBatcher = function(name, delay) {
+var RedisBatcher = function(name, delay, handler) {
   this.name = name;
   this.redisClient = redis.createClient();
   this.prefix = PREFIX;
   this.delay = delay;
 
-
+  var self = this;
+  this.queue = workerQueue.queue('redis-batch-' + this.name, {}, function() {
+    return function(data, done) {
+      self.dequeue(data.key, handler, done);
+    };
+  });
 };
 
 RedisBatcher.prototype = {
@@ -37,13 +42,19 @@ RedisBatcher.prototype = {
 
     var timeout = this.timeout;
 
-    this.redisClient.rpush(redisKey, item, function(err) {
+    if (Array.isArray(item)) {
+      this.redisClient.rpush.apply(this.redisClient, [redisKey].concat(item).concat(rpushCallback));
+    } else {
+      this.redisClient.rpush(redisKey, item, rpushCallback);
+    }
+
+    function rpushCallback(err) {
       if(err) return callback(err);
 
       var friendlyLockValue = Date.now() + timeout + 1;
 
       // check if batch timeout is already queued
-      self.redisClient.set('ul:'+redisKey, [friendlyLockValue, 'PX', timeout, 'NX'], function(err, reply) {
+      self.redisClient.set('ul:' + redisKey, [friendlyLockValue, 'PX', timeout, 'NX'], function(err, reply) {
         if(err) return callback(err);
 
         if(reply === 'OK') {
@@ -53,17 +64,11 @@ RedisBatcher.prototype = {
           callback();
         }
       });
-    });
+    }
   },
 
-  listen: function(handler) {
-    var self = this;
-
-    this.queue = workerQueue.queue('redis-batch-' + this.name, {}, function() {
-      return function(data, done) {
-        self.dequeue(data.key, handler, done);
-      };
-    });
+  listen: function() {
+    this.queue.listen();
   },
 
   dequeue: function(key, handler, done) {

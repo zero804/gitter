@@ -1,10 +1,10 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var _ = require('underscore');
+var uniqueIds = require('mongodb-unique-ids');
 
 exports.idsIn = function(ids) {
-  return _.uniq(ids).filter(function(id) { return !!id; });
+  return uniqueIds(ids).filter(function(id) { return !!id; });
 };
 
 exports.keys = function(object) {
@@ -21,38 +21,48 @@ exports.extract = function(propertyName) {
     };
 };
 
+/** Take an array and hash it by it's ID */
 exports.indexById = function(array) {
+  if (!array || !array.length) return {};
+  var len = array.length;
+
   var a = {};
-  if(array) {
-    array.forEach(function(item) {
-      if(item) {
-        a[item.id || item._id] = item;
-      }
-    });
+  for (var i = 0; i < len; i++) {
+    var item = array[i];
+    if(item) {
+      a[item.id || item._id] = item;
+    }
   }
+
   return a;
 };
 
+/** Take an array and hash it by the supplied property */
 exports.indexByProperty = function(array, propertyName) {
+  if (!array || !array.length) return {};
+  var len = array.length;
+
   var a = {};
-  if(array) {
-    array.forEach(function(item) {
-      if(item) {
-        a[item[propertyName]] = item;
-      }
-    });
+  for (var i = 0; i < len; i++) {
+    var item = array[i];
+    if(item) {
+      a[item[propertyName]] = item;
+    }
   }
+
   return a;
 };
 
+/** Take an array and turn it into a set-like hash */
 exports.hashArray = function(array) {
+  if (!array || !array.length) return {};
+  var len = array.length;
+
   var a = {};
-  if (!array) return a;
-
-  array.forEach(function(item) {
+  for (var i = 0; i < len; i++) {
+    var item = array[i];
     a[item] = true;
-  });
-
+  }
   return a;
 };
 

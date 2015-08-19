@@ -5,14 +5,10 @@ var Q = require('q');
 var assert = require('assert');
 var mongoUtils = testRequire('./utils/mongo-utils');
 var randomSeed = require('random-seed');
-var qlimit = require('qlimit');
-var limit = qlimit(3);
-var _ = require('underscore');
+var _ = require('lodash');
+var debug = require('debug')('gitter:unread-item-service-engine-combined-tests');
 
 var TEST_ITERATIONS = parseInt(process.env.UNREAD_ENGINE_TEST_ITERATIONS, 10) || 200;
-
-Q.longStackSupport = true;
-
 var CHECK_SLOWLOG = process.env.CHECK_SLOWLOG;
 
 describe('unread-item-service-engine-combined #slow', function() {
@@ -45,66 +41,13 @@ describe('unread-item-service-engine-combined #slow', function() {
       });
     }
 
-    var newItemForUsers = limit(function (troupeId, itemId, userIds, mentionUserIds) {
-      return unreadItemServiceEngine.newItemWithMentions(troupeId, itemId, userIds, mentionUserIds || []);
-    });
-
-    var expectUserUnreadCounts = limit(function (userId, troupeId, expected) {
-      return unreadItemServiceEngine.getUserUnreadCounts(userId, troupeId)
-        .then(function(result) {
-          assert.strictEqual(result, expected, 'Expected ' + userId + ' in ' + troupeId + ' to have ' + expected + ' unread items, got ' + result);
-        });
-    });
-
-    var expectBadgeCounts = limit(function(expectedArray) {
-      var userIds = expectedArray.map(function(x) { return x[0]; });
-      return unreadItemServiceEngine.getBadgeCountsForUserIds(userIds)
-        .then(function(result) {
-          userIds.forEach(function(userId, index) {
-            var actual = result[userId];
-            var expected = expectedArray[index][1];
-            assert.strictEqual(actual, expected, 'Expected ' + userId + ' to have ' + expected + ' badge count, got ' + actual);
-          });
-        });
-    });
-
-    var expectMentionCounts = limit(function (userId, expectedArray) {
-      var troupeIds = expectedArray.map(function(x) { return x[0]; });
-      return unreadItemServiceEngine.getUserMentionCountsForRooms(userId, troupeIds)
-        .then(function(result) {
-          troupeIds.forEach(function(troupeId, index) {
-            var actual = result[troupeId];
-            var expected = expectedArray[index][1];
-            assert.strictEqual(actual, expected, 'Expected ' + userId + ' to have ' + expected + ' mention count in ' + troupeId + ', got ' + actual);
-          });
-
-          return unreadItemServiceEngine.getUserMentionCounts(userId);
-        })
-        .then(function(result) {
-          troupeIds.forEach(function(troupeId, index) {
-            var actual = result[troupeId] || 0;
-            var expected = expectedArray[index][1] || 0;
-            assert.strictEqual(actual, expected, 'Expected ' + userId + ' to have ' + expected + ' mention count in ' + troupeId + ', got ' + actual);
-          });
-        });
-    });
-
-    var markItemsRead = limit(function(userId, troupeId, itemIds) {
-      return unreadItemServiceEngine.markItemsRead(userId, troupeId, itemIds);
-    });
-
-
-    var ensureAllItemsRead = limit(function(userId, troupeId) {
-      return unreadItemServiceEngine.ensureAllItemsRead(userId, troupeId);
-    });
-
     var idSeed = 0;
     function nextId() {
       idSeed = idSeed + 1000;
-       return mongoUtils.createIdForTimestamp(idSeed).toString();
+      return mongoUtils.createIdForTimestamp(idSeed).toString();
     }
 
-    function runWithSeed(seed, done) {
+    function runWithSeed(seed) {
 
       var count = 0;
       var unreadItems = {};
@@ -117,9 +60,7 @@ describe('unread-item-service-engine-combined #slow', function() {
         var l = u.length;
         if(l > 100) {
           while(l > 100) {
-            var lowestKey = _.min(u, function(id) {
-              return mongoUtils.getTimestampFromObjectId(id);
-            });
+            var lowestKey = _.min(u, mongoUtils.getTimestampFromObjectId);
 
             delete unreadItems[lowestKey];
             l--;
@@ -128,37 +69,69 @@ describe('unread-item-service-engine-combined #slow', function() {
         }
       }
 
-      function compareUnreadItems(reportedUnreadCount) {
-        console.log('comparing results');
+      function compareUnreadItems() {
+        debug('comparing results: we have %s items, %s mentions', Object.keys(unreadItems).length, Object.keys(mentionItems).length);
+
         return unreadItemServiceEngine.getUnreadItems(userId1, troupeId1)
           .then(function(items) {
             items.sort();
-            var ourKeys = Object.keys(unreadItems);
+            var ourKeys = _.uniq(Object.keys(unreadItems).concat(Object.keys(mentionItems)));
+            ourKeys.sort();
             for(var i = 0; i < ourKeys.length; i++) {
               if ("" + ourKeys[i] !== "" + items[i]) {
-                // console.log('OUR KEYS (length==' + ourKeys.length + ')', JSON.stringify(ourKeys, null, '  '));
-                // console.log('REDIS KEYS (length==' + items.length + ')', JSON.stringify(items, null, '  '));
-                console.log('>>>> CHECK OUT unread:chat' + userId1 + ':' + troupeId1);
+                console.log('OUR KEYS (length==' + ourKeys.length + ')', JSON.stringify(ourKeys, null, '  '));
+                console.log('REDIS KEYS (length==' + items.length + ')', JSON.stringify(items, null, '  '));
+                console.log('>>>> CHECK OUT unread:chat:' + userId1 + ':' + troupeId1);
+
+                assert.deepEqual(ourKeys, items);
                 assert(false, 'sets do not match. first problem at ' + i + ': ours=' + ourKeys[i] + '. theirs=' + items[i]);
               }
             }
-            // assert.deepEqual(ourKeys, items);
-            // assert.strictEqual(ourKeys.length, reportedUnreadCount);
+
+            return unreadItemServiceEngine.getAllUnreadItemCounts(userId1);
+          })
+          .then(function(counts) {
+            var ourKeys = _.uniq(Object.keys(unreadItems).concat(Object.keys(mentionItems)));
+            if (ourKeys.length) {
+              assert.strictEqual(counts.length, 1);
+              assert.strictEqual(counts[0].unreadItems, Object.keys(unreadItems).length);
+              assert.strictEqual(counts[0].mentions, Object.keys(mentionItems).length);
+            } else {
+              assert.strictEqual(counts.length, 0);
+            }
+
+            return unreadItemServiceEngine.getRoomsMentioningUser(userId1);
+          })
+          .then(function(roomsMentioningUser) {
+            if (Object.keys(mentionItems).length) {
+              assert.strictEqual(roomsMentioningUser.length, 1);
+            } else {
+              assert.strictEqual(roomsMentioningUser.length, 0);
+            }
+
+            return unreadItemServiceEngine.getBadgeCountsForUserIds([userId1]);
+          })
+          .then(function(badgeCounts) {
+            var ourKeys = _.uniq(Object.keys(unreadItems).concat(Object.keys(mentionItems)));
+
+            assert.strictEqual(badgeCounts[userId1], ourKeys.length ? 1 : 0);
           });
       }
 
       function validateResult(result, expectUnread, expectMentions) {
         if(result.unreadCount >= 0) {
           var unreadItemCount = Object.keys(unreadItems).length;
-          if(unreadItemCount !== result.unreadCount) {
-            return compareUnreadItems();
-          }
+          debug('Validating unread items expected %s = actual %s', unreadItemCount, result.unreadCount);
+
+          return compareUnreadItems();
         } else {
           assert(!expectUnread, "Expencted unread items in the results hash but not there");
         }
 
         if(result.mentionCount >= 0) {
           var mentionCount = Object.keys(mentionItems).length;
+          debug('Validating mentions expected %s = actual %s', mentionCount, result.mentionCount);
+
           assert.strictEqual(mentionCount, result.mentionCount);
         } else {
           assert(!expectMentions, "Expencted mentionCount in " + JSON.stringify(result) + " but not there");
@@ -167,37 +140,39 @@ describe('unread-item-service-engine-combined #slow', function() {
 
       }
 
-      (function next() {
-        count++;
-        if(count > TEST_ITERATIONS) return done();
+      function nextStep() {
+        var nextOperation = rand(4);
 
-        var nextOperation = rand(3);
-        [
+        return [
           /* 0 */
-          function addMention(cb) {
+          function addMention() {
+            debug('Operation %s: addMention', count);
             var itemId = nextId();
-            // console.log('Add mention');
 
-            return newItemForUsers(troupeId1, itemId, [userId1], [userId1])
-                .then(function(result) {
-                  var resultForUser = result[userId1];
+            return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId, [userId1], [userId1])
+              .then(function(result) {
+                var resultForUser = result[userId1];
 
-                  mentionItems[itemId] = true;
-                  unreadItems[itemId] = true;
-                  enforceLimit();
-                  return validateResult(resultForUser, true, true);
-                })
-                .nodeify(cb);
+                mentionItems[itemId] = true;
+                unreadItems[itemId] = true;
+                enforceLimit();
+                return validateResult(resultForUser, true, true);
+              });
           },
           /* 1 */
-          function addItem(cb) {
-            var numberOfItems = rand(10) + 1;
-            // console.log('Add ' + numberOfItems + ' items');
+          function addItem() {
+            debug('Operation %s: addItem', count);
+
+            var largeNumberOfAddItems = rand(10) > 8;
+
+            var numberOfItems = largeNumberOfAddItems ? rand(100) + 30 : rand(10) + 1;
+
+            debug('Adding %s new unread items', numberOfItems);
 
             return _.range(numberOfItems).reduce(function(memo) {
                 function addNewItem() {
                   var itemId = nextId();
-                  return newItemForUsers(troupeId1, itemId, [userId1])
+                  return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId, [userId1], [])
                     .then(function(result) {
                       var resultForUser = result[userId1];
                       unreadItems[itemId] = false;
@@ -213,26 +188,34 @@ describe('unread-item-service-engine-combined #slow', function() {
                 }
 
                 return addNewItem();
-              }, null)
-              .nodeify(cb);
+              }, null);
 
           },
           /* 2 */
-          function markItemRead(cb) {
+          function markItemRead() {
+            debug('Operation %s: markItemRead', count);
+
             var largeMarkAsRead = rand(10) > 8;
 
             var percentageOfItems = rand(largeMarkAsRead ? 100 : 30) / 100;
 
-            var i = Object.keys(unreadItems);
+            var readCandidates = _.uniq(Object.keys(unreadItems).concat(Object.keys(mentionItems)));
 
-            var forMarkAsRead = i.slice(0, Math.round(i.length * percentageOfItems + 1));
+            var itemsForReadLength = Math.round(readCandidates.length * percentageOfItems + 1);
+            var forMarkAsRead = [];
+            for (var j = 0; forMarkAsRead.length < itemsForReadLength && readCandidates.length > 0; j++) {
+              var itemIndex = rand(readCandidates.length);
+              var deleted = readCandidates.splice(itemIndex, 1);
+              forMarkAsRead.push(deleted);
+            }
+
             var itemsContainedMentions = forMarkAsRead.some(function(itemId) {
-              return unreadItems[itemId];
+              return mentionItems[itemId];
             });
 
-            // console.log('Marking ' + forMarkAsRead.length + ' items read');
+            debug('Marking %s items as read', forMarkAsRead.length);
 
-            return markItemsRead(userId1, troupeId1, forMarkAsRead)
+            return unreadItemServiceEngine.markItemsRead(userId1, troupeId1, forMarkAsRead)
               .then(function(result) {
                 forMarkAsRead.forEach(function(itemId) {
                   delete unreadItems[itemId];
@@ -240,47 +223,57 @@ describe('unread-item-service-engine-combined #slow', function() {
                 });
 
                 return validateResult(result, true, itemsContainedMentions);
-              })
-              .nodeify(cb);
+              });
 
           },
           /* 3 */
-          function markAllItemsRead(cb) {
-            if(rand(3) !== 0) return cb();
-            // console.log('Mark all items read');
-            return ensureAllItemsRead(userId1, troupeId1)
+          function markAllItemsRead() {
+
+            /* Only perform this operation one time in 3 */
+            if(rand(3) !== 0) return Q.resolve();
+
+            debug('Operation %s: markAllItemsRead', count);
+
+            return unreadItemServiceEngine.ensureAllItemsRead(userId1, troupeId1)
               .then(function(result) {
                 unreadItems = {};
                 var hadMentionIds = Object.keys(mentionItems).length > 0;
                 mentionItems = {};
                 return validateResult(result, true, hadMentionIds);
-              })
-              .nodeify(cb);
+              });
 
           }
-        ][nextOperation](function(err) {
-          if(err) return done(err);
-          setImmediate(next);
-        });
+        ][nextOperation]();
+      }
 
-      })();
+      function next() {
+        count++;
+        if(count > TEST_ITERATIONS) return; /* completed */
 
+        return nextStep().then(next);
+      }
+
+      return next();
     }
 
     it('test1', function(done) {
-      runWithSeed(2345678, done);
+      runWithSeed(2345678)
+        .nodeify(done);
     });
 
     it('test2', function(done) {
-      runWithSeed(1231123, done);
+      runWithSeed(1231123)
+        .nodeify(done);
     });
 
     it('test3', function(done) {
-      runWithSeed(393828, done);
+      runWithSeed(393828)
+        .nodeify(done);
     });
 
     it('test4', function(done) {
-      runWithSeed(122828, done);
+      runWithSeed(122828)
+        .nodeify(done);
     });
 
   });

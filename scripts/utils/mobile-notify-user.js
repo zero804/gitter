@@ -25,9 +25,9 @@ userService.findByUsername(opts.username)
 
     return pushNotificationGateway.sendUserNotification(user.id, notification);
   })
-  .fail(function(err) {
+  .catch(function(err) {
     console.error(err.stack);
   })
-  .fin(function() {
+  .finally(function() {
     shutdown.shutdownGracefully();
   });

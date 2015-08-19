@@ -2,7 +2,7 @@
 /*jslint node: true */
 "use strict";
 
-var presenceService = require('../../server/services/presence-service');
+var presenceService = require('gitter-web-presence');
 var userService = require('../../server/services/user-service');
 var shutdown = require('shutdown');
 

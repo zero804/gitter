@@ -1,81 +1,142 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var winston                   = require('../../utils/winston');
-var pushNotificationService   = require("../push-notification-service");
+var pushNotificationFilter   = require("gitter-web-push-notification-filter");
 var nconf                     = require('../../utils/config');
-var workerQueue               = require('../../utils/worker-queue');
+var workerQueue               = require('../../utils/worker-queue-redis');
 var userTroupeSettingsService = require('../user-troupe-settings-service');
-var pushNotificationGenerator = require('./push-notification-generator');
+var debug                     = require('debug')('gitter:push-notification-postbox');
+var mongoUtils                = require('../../utils/mongo-utils');
+var Q                         = require('q');
+var errorReporter             = require('gitter-web-env').errorReporter;
+
 var notificationWindowPeriods = [
   nconf.get("notifications:notificationDelay") * 1000,
   nconf.get("notifications:notificationDelay2") * 1000
 ];
+
 /* 10 second window for users on mention */
 var mentionNotificationWindowPeriod = 10000;
+var maxNotificationsForMentions = 10;
 
-var queue = workerQueue.queue('generate-push-notifications', {}, function() {
+// This queue is responsible to taking notifications and deciding which users to forward them on to
+var pushNotificationFilterQueue = workerQueue.queue('push-notifications-filter', {}, function() {
+
   return function(data, done) {
-    pushNotificationGenerator.sendUserTroupeNotification(data.userTroupe, data.notificationNumber, data.userSetting, done);
+    var troupeId = data.troupeId;
+    var chatId = data.chatId;
+    var userIds = data.userIds;
+    var mentioned = data.mentioned;
+
+    return filterNotificationsForPush(troupeId, chatId, userIds, mentioned)
+      .then(function() {
+        debug('filterNotificationsForPush complete');
+      })
+      .catch(function(err) {
+        winston.error('Unable to queue notification: ' + err, { exception: err });
+      })
+      .nodeify(done);
   };
 });
 
-/*
- * Returns nothing and has no callback. Post your usertroupes and walk away. No guarantee of delivery.
- */
-exports.postUserTroupes = function(userTroupes) {
-  userTroupeSettingsService.getMultiUserTroupeSettings(userTroupes, 'notifications')
-    .then(function(userTroupeNotificationSettings) {
-      userTroupes.forEach(function(userTroupe) {
-        var userId = userTroupe.userId;
-        var troupeId = userTroupe.troupeId;
+// This queue is responsible to generating the actual content of the push notification and sending it to users
+var pushNotificationGeneratorQueue = workerQueue.queue('push-notifications-generate', {}, function() {
+  var pushNotificationGenerator = require('./push-notification-generator');
 
-        var notificationSettings = userTroupeNotificationSettings[userId + ':' + troupeId];
+  return function(data, done) {
+    var userId = data.userId;
+    var troupeId = data.troupeId;
+    var notificationNumber = data.notificationNumber;
+
+    debug('Spooling push notification for %s in %s, #%s', userId, troupeId, notificationNumber);
+
+    if (!userId || !troupeId || !notificationNumber) return done();
+
+    return pushNotificationGenerator.sendUserTroupeNotification(userId, troupeId, notificationNumber)
+      .catch(function(err) {
+        winston.error('Failed to send notifications: ' + err + '. Failing silently.', { exception: err });
+        errorReporter(err, { userId: userId, troupeId: troupeId });
+      })
+      .nodeify(done);
+  };
+});
+
+function filterNotificationsForPush(troupeId, chatId, userIds, mentioned) {
+  var chatTime = mongoUtils.getTimestampFromObjectId(chatId);
+  debug('filterNotificationsForPush for %s users', userIds.length);
+
+  // TODO: consider asking Redis whether its possible to send to this user BEFORE
+  // going to mongo to get notification settings as reversing these two operations
+  // may well be much faster
+  return userTroupeSettingsService.getUserTroupeSettingsForUsersInTroupe(troupeId, 'notifications', userIds)
+    .then(function(settings) {
+      return Q.all(userIds.map(function(userId) {
+        var notificationSettings = settings[userId];
         var pushNotificationSetting = notificationSettings && notificationSettings.push || 'all';
 
         /* Mute, then don't continue */
-        if(pushNotificationSetting === 'mute') {
-          winston.verbose('User troupe is muted. Skipping notification');
+        if (pushNotificationSetting === 'mute') {
           return;
         }
-        
 
-        pushNotificationService.canLockForNotification(userId, troupeId, userTroupe.startTime, function(err, notificationNumber) {
-          if(err) return winston.error('Error while executing canLockForNotification: ' + err, { exception: err });
+        if (pushNotificationSetting === 'mention' && !mentioned) {
+          // Only pushing on mentions and this ain't a mention
+          return;
+        }
 
-          if(!notificationNumber) {
-            winston.verbose('User troupe already has notification queued. Skipping');
-            return;
-          }
-
-          var delay;
-          if(pushNotificationSetting === 'mention') {
-            delay = mentionNotificationWindowPeriod;
-          } else {
-            delay = notificationWindowPeriods[notificationNumber - 1];
-            if(!delay) {
-              winston.verbose("User has already gotten two notifications, that's enough. Skipping");
+        // TODO: bulk version of this method please
+        return pushNotificationFilter.canLockForNotification(userId, troupeId, chatTime)
+          .then(function(notificationNumber) {
+            if(!notificationNumber) {
+              // TODO: consider cancelling the current lock on mentions and creating a
+              // new one as if we're in the 60 second window period, we'll need to
+              // wait until the end of the window before sending the mention
+              debug('User troupe already has notification queued. Skipping');
               return;
             }
-          }
 
+            var delay;
+            if (mentioned) {
+              if (notificationNumber > maxNotificationsForMentions) {
+                debug("User has receieved too many mention push notifications");
+                return;
+              }
 
+              /* Send the notification to the user very shortly */
+              delay = mentionNotificationWindowPeriod;
+            } else {
+              delay = notificationWindowPeriods[notificationNumber - 1];
+              if(!delay) {
+                debug("User has already gotten two notifications, that's enough. Skipping");
+                return;
+              }
+            }
 
-          winston.verbose('Queuing notification ' + notificationNumber + ' to be send to user ' + userId + ' in ' + delay + 'ms');
+            debug('Queuing notification %s to be send to user %s in %sms', notificationNumber, userId, delay);
 
-          queue.invoke({
-            userTroupe: userTroupe,
-            notificationNumber: notificationNumber,
-            userSetting: pushNotificationSetting
-          }, { delay: delay });
+            return pushNotificationGeneratorQueue.invoke({
+              userId: userId,
+              troupeId: troupeId,
+              notificationNumber: notificationNumber
+            }, { delay: delay });
 
-        });
-
-      });
-
-    })
-    .fail(function(err) {
-      winston.error('Unable to queue usertroupes for notification: ' + err, { exception: err });
+          });
+      }));
     });
+}
+
+exports.queueNotificationsForChat = function(troupeId, chatId, userIds, mentioned) {
+  debug('queueNotificationsForChat for %s users', userIds.length);
+
+  return pushNotificationFilterQueue.invoke({
+    troupeId: troupeId,
+    chatId: chatId,
+    userIds: userIds,
+    mentioned: mentioned
+  });
 };
 
+exports.listen = function() {
+  pushNotificationGeneratorQueue.listen();
+  pushNotificationFilterQueue.listen();
+};

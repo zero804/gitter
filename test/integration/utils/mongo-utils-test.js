@@ -117,7 +117,7 @@ describe('mongo-utils', function() {
 
     it('should serialise nulls', function() {
       var id = null;
-      assert.equal('', underTest.serializeObjectId(id));
+      assert.equal(null, underTest.serializeObjectId(id));
     });
 
 
