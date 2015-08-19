@@ -10,6 +10,7 @@ var assert           = require('assert');
 var debug            = require('debug')('gitter:unread-items-engine');
 var redisClient      = redis.getClient();
 var scriptManager    = new Scripto(redisClient);
+var _                = require('lodash');
 
 scriptManager.loadFromDir(__dirname + '/../../redis-lua/unread');
 var EMAIL_NOTIFICATION_HASH_KEY = "unread:email_notify";
@@ -18,6 +19,7 @@ var runScript = Q.nbind(scriptManager.run, scriptManager);
 var redisClient_smembers = Q.nbind(redisClient.smembers, redisClient);
 
 var UNREAD_BATCH_SIZE = 100;
+var PRECONVERT_OBJECTID_TO_STRING_THRESHOLD = 1000;
 
 /**
  * Given an array of userIds and an array of mentionUserIds, returns an array of
@@ -28,7 +30,7 @@ var UNREAD_BATCH_SIZE = 100;
  *    such that for any element of the result, `member.memberUserIds` ⊆ `member.userIds`
  */
 function getNewItemBatches(userIds, mentionUserIds) {
-  var mentionUsersHash = mentionUserIds.reduce(function(memo, mentionUserId) {
+  var mentionUsersHash = _.reduce(mentionUserIds, function(memo, mentionUserId) {
     memo[mentionUserId] = true;
     return memo;
   }, {});
@@ -43,7 +45,7 @@ function getNewItemBatches(userIds, mentionUserIds) {
 
   for (var i = 0, count = 0; i < length; i += UNREAD_BATCH_SIZE, count++) {
     var batch = userIds.slice(i, i + UNREAD_BATCH_SIZE);
-    var mentionBatch = batch.filter(userIsMentioned);
+    var mentionBatch = _.filter(batch, userIsMentioned);
 
     results[count] = { userIds: batch, mentionUserIds: mentionBatch };
   }
@@ -58,24 +60,42 @@ function getNewItemBatches(userIds, mentionUserIds) {
 function newItemWithMentions(troupeId, itemId, userIds, mentionUserIds) {
   if(!userIds.length) return Q.resolve({});
 
+  // Working in strings saves a stack of time
+  troupeId = mongoUtils.serializeObjectId(troupeId);
+
+  // Turn all the userIds into strings up front
+  // in large rooms this is a big performance gain.
+  // In small rooms, it slows things down
+  if (userIds.length > PRECONVERT_OBJECTID_TO_STRING_THRESHOLD) {
+    userIds = _.map(userIds, mongoUtils.serializeObjectId);
+  }
+
+  // Turn all the userIds into strings up front
+  // in large rooms this is a big performance gain.
+  // In small rooms, it slows things down
+  if (mentionUserIds.length > PRECONVERT_OBJECTID_TO_STRING_THRESHOLD) {
+    mentionUserIds = _.map(mentionUserIds, mongoUtils.serializeObjectId);
+  }
+
   var batches = getNewItemBatches(userIds, mentionUserIds);
 
   var timestamp = mongoUtils.getTimestampFromObjectId(itemId);
 
-  return Q.all(batches.map(function(batch) {
+  return Q.all(_.map(batches, function(batch) {
       var batchUserIds = batch.userIds;
       var batchMentionIds = batch.mentionUserIds;
 
       // Now talk to redis and do the update
       var keys = [EMAIL_NOTIFICATION_HASH_KEY];
-      batchUserIds.forEach(function(userId) {
+      _.forEach(batchUserIds, function(userId) {
         keys.push("unread:chat:" + userId + ":" + troupeId);
         keys.push("ub:" + userId);
       });
 
-      batchMentionIds.forEach(function(mentionUserId) {
-        keys.push("m:" + mentionUserId + ":" + troupeId);
-        keys.push("m:" + mentionUserId);
+      _.forEach(batchMentionIds, function(mentionUserId) {
+        var mentionKey = "m:" + mentionUserId;
+        keys.push(mentionKey + ":" + troupeId);
+        keys.push(mentionKey);
       });
 
       var values = [batchUserIds.length, troupeId, itemId, timestamp].concat(batchUserIds);
@@ -85,13 +105,15 @@ function newItemWithMentions(troupeId, itemId, userIds, mentionUserIds) {
     .then(function(results) {
       var resultHash = {};
 
-      results.forEach(function(result, index) {
+      // Using _.forEach as its much faster than native in a tight loop like this
+      _.forEach(results, function(result, index) {
         var batch = batches[index];
         var batchUserIds = batch.userIds;
         var batchMentionIds = batch.mentionUserIds;
 
         var upgradeCount = 0;
-        batchUserIds.forEach(function(userId) {
+        // Using _.forEach as its much faster than native in a tight loop like this
+        _.forEach(batchUserIds, function(userId) {
           var troupeUnreadCount   = result.shift();
           var flag                = result.shift();
           var badgeUpdate         = !!(flag & 1);
@@ -113,7 +135,7 @@ function newItemWithMentions(troupeId, itemId, userIds, mentionUserIds) {
           debug('unread-items: upgraded keys for user:troupes', upgradeCount);
         }
 
-        batchMentionIds.forEach(function(mentionUserId) {
+        _.forEach(batchMentionIds, function(mentionUserId) {
           var mentionCount = result.shift();
           resultHash[mentionUserId].mentionCount = mentionCount >= 0 ? mentionCount : undefined;
         });
