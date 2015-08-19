@@ -77,10 +77,8 @@ function isLikeObjectId(value) {
 
 
 function serializeObjectId(id) {
-  if(!id) return '';
-  if(typeof id === 'string') {
-    return id;
-  }
+  if(!id) return id;
+  if(typeof id === 'string') { return id; }
   return id.toString();
 }
 

@@ -1032,14 +1032,21 @@ describe('unread-item-service', function() {
 
       return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, userIds, mentionUserIds)
         .then(function(result) {
-          for(var j = 0; j < SIZE; j++) {
-            assert(result[j]);
-            assert.strictEqual(result[j].unreadCount, 1);
-            assert.strictEqual(result[j].badgeUpdate, true);
-            if (j % 3 === 0) {
-              assert.strictEqual(result[j].mentionCount, 1);
+
+          var expected = _.range(SIZE).reduce(function(memo, index) {
+            var result = {
+              unreadCount: 1,
+              badgeUpdate: true
+            };
+
+            if (index % 3 === 0) {
+              result.mentionCount = 1;
             }
-          }
+            memo[index] = result;
+            return memo;
+          }, {});
+
+          assert.deepEqual(result, expected);
 
           var userIds = [];
           var mentionUserIds = [];

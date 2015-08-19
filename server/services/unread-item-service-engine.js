@@ -78,7 +78,6 @@ function newItemWithMentions(troupeId, itemId, userIds, mentionUserIds) {
   }
 
   var batches = getNewItemBatches(userIds, mentionUserIds);
-
   var timestamp = mongoUtils.getTimestampFromObjectId(itemId);
 
   return Q.all(_.map(batches, function(batch) {
