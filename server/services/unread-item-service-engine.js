@@ -404,8 +404,10 @@ function mergeUnreadItemsWithMentions(unreadItems, mentions) {
     }
   }
 
-  // Add the mentions to the beginning as they're probably before
-  // the unread item horizon and therefore should appear first
+  // Add the mentions to the **beginning** as the reason they're not
+  // in the unread item list is that they're old enough to have slipped
+  // out the end of the unread items list. Their correct ordering is
+  // therefore at the front of the array.
   return Object.keys(mentionSet).concat(unreadItems);
 }
 
