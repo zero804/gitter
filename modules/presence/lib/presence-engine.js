@@ -98,18 +98,15 @@ function disassociateSocketAndDeactivateUserAndTroupe(socketId, userId, callback
                      keyUserLock(userId), troupeId ? keyTroupeUsers(troupeId) : null,
                      keyUserSockets(userId),
         /* values */ userId, socketId)
-        .then(function(result) {
-          var deleteSuccess = result[0];
+        .spread(function(deleteSuccess, userSocketCountString, sremResult, userInTroupeCountString, totalUsersInTroupe) {
           if(!deleteSuccess) {
             debug('disassociateSocketAndDeactivateUserAndTroupe rejected. Socket already deleted. socketId=%s userId=%s', socketId, userId);
             throw new StatusError(404, 'socket not found');
           }
 
-          var userSocketCount = parseInt(result[1], 10);
-          var sremResult = result[2];
+          var userSocketCount = parseInt(userSocketCountString, 10);
 
-          var userInTroupeCount = parseInt(result[3], 10);  // If the user was already eboff, this will be -1
-          var totalUsersInTroupe = result[4];               // If the user was already eboff, this will be -1
+          var userInTroupeCount = parseInt(userInTroupeCountString, 10);  // If the user was already eboff, this will be -1
 
           if(sremResult != 1) {
             winston.warn("presence: Socket has already been removed from active sockets. Something fishy is happening.");
@@ -160,15 +157,12 @@ function userSocketConnected(userId, socketId, connectionType, client, troupeId,
     return redisClient.presenceAssociateAnon(
       /* keys */   keySocketUser(socketId), ACTIVE_SOCKETS_KEY, keyUserSockets('anon'),
       /* values */ socketId, Date.now(), isMobileConnection ? 1 : 0, client, troupeId || null)
-      .then(function(result) {
-        var lockSuccess = result[0];
-
+      .spread(function(lockSuccess, saddResult) {
         if(!lockSuccess)  {
           debug('associateSocketAndActivateUser rejected. Socket already exists.', socketId, userId);
           throw new StatusError(409, 'Conflict');
         }
 
-        var saddResult = result[1];
         if(saddResult != 1) {
           winston.warn("presence: Socket has already been added to active sockets. Something fishy is happening.");
         }
@@ -180,16 +174,13 @@ function userSocketConnected(userId, socketId, connectionType, client, troupeId,
   return redisClient.presenceAssociate(
     /* keys */   keySocketUser(socketId), ACTIVE_USERS_KEY, MOBILE_USERS_KEY, ACTIVE_SOCKETS_KEY, keyUserLock(userId), keyUserSockets(userId),
     /* values */ userId, socketId, Date.now(), isMobileConnection ? 1 : 0, client, troupeId || null)
-    .then(function(result) {
-      var lockSuccess = result[0];
-
+    .spread(function(lockSuccess, userSocketCountString, saddResult) {
       if(!lockSuccess)  {
         debug('presence: associateSocketAndActivateUser rejected. Socket already exists.', socketId, userId);
         throw new StatusError(409, 'socket already exists');
       }
 
-      var userSocketCount = parseInt(result[1], 10);
-      var saddResult = result[2];
+      var userSocketCount = parseInt(userSocketCountString, 10);
 
       if(saddResult != 1) {
         winston.warn("presence: Socket has already been added to active sockets. Something fishy is happening.");
@@ -262,15 +253,13 @@ function eyeBallsOnTroupe(userId, socketId, troupeId, callback) {
   return redisClient.presenceEyeballsOn(
       /* keys */   keySocketUser(socketId), keyTroupeUsers(troupeId), keyUserLock(userId),
       /* values */ userId)
-    .then(function(result) {
-      var eyeballLock = result[0];
-
+    .spread(function(eyeballLock, userScoreString) {
       if(!eyeballLock) {
         // Eyeballs is already on, silently ignore
         return;
       }
 
-      var userScore = parseInt(result[1], 10);                   // Score for user is returned as a string
+      var userScore = parseInt(userScoreString, 10);                   // Score for user is returned as a string
       if(userScore == 1) {
         presenceService.emit('userJoinedTroupe', userId, troupeId);
       }
@@ -289,17 +278,13 @@ function eyeBallsOffTroupe(userId, socketId, troupeId, callback) {
   return redisClient.presenceEyeballsOff(
       /* keys */   keySocketUser(socketId), keyTroupeUsers(troupeId), keyUserLock(userId),
       /* values */ userId)
-    .then(function(result) {
-      var eyeballLock = result[0];
-
+    .spread(function(eyeballLock, userInTroupeCountString, totalUsersInTroupe) {
       if(!eyeballLock) {
         // Eyeballs is already off, silently ignore
         return;
       }
 
-      var userInTroupeCount = parseInt(result[1], 10);
-      var totalUsersInTroupe = result[2];
-
+      var userInTroupeCount = parseInt(userInTroupeCountString, 10);
       sendAppEventsForUserEyeballsOffTroupe(userInTroupeCount, totalUsersInTroupe, userId, troupeId, socketId);
     });
 
@@ -308,10 +293,10 @@ function eyeBallsOffTroupe(userId, socketId, troupeId, callback) {
 // Callback -> (err, { userId: X, troupeId: Y })
 function lookupSocketOwnerAndTroupe(socketId, callback) {
   return redisClient.hmget(keySocketUser(socketId), "uid", "tid")
-    .then(function(result) {
+    .spread(function(userId, troupeId) {
       return {
-        userId: result[0],
-        troupeId: result[1]
+        userId: userId,
+        troupeId: troupeId
       };
     })
     .nodeify(callback);
@@ -324,8 +309,8 @@ function lookupUserIdForSocket (socketId, callback) {
   if(!socketId) return Promise.reject(new StatusError(400, 'socketId expected')).nodeify(callback);
 
   return redisClient.hmget(keySocketUser(socketId), "uid", "ctime")
-    .then(function(reply) {
-      return [reply[0], !!reply[1]];
+    .spread(function(userId, exists) {
+      return [userId, !!exists];
     })
     .nodeify(callback, { spread: true });
 }
@@ -510,16 +495,16 @@ function listMobileUsers(callback) {
 
 function getSocket(socketId, callback) {
   return redisClient.hmget(keySocketUser(socketId), 'uid', 'tid', 'eb', 'mob', 'ctime', 'ct')
-    .then(function(result) {
-      if(!result[4]) return;
+    .spread(function(userId, troupeId, eyeballs, mobile, createdTimeString, clientType) {
+      if(!createdTimeString) return;
 
       return {
-        userId: result[0],
-        troupeId: result[1],
-        eyeballs: !!result[2],
-        mobile: !!result[3],
-        createdTime: new Date(parseInt(result[4], 10)),
-        clientType: result[5]
+        userId: userId,
+        troupeId: troupeId,
+        eyeballs: !!eyeballs,
+        mobile: !!mobile,
+        createdTime: new Date(parseInt(createdTimeString, 10)),
+        clientType: clientType
       };
     })
     .nodeify(callback);
