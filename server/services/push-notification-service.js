@@ -7,6 +7,7 @@ var Q                      = require('q');
 var mongoUtils             = require('../utils/mongo-utils');
 var debug                  = require('debug')('gitter:push-notification-service');
 var uniqueIds              = require('mongodb-unique-ids');
+var _                      = require('lodash');
 
 function buffersEqual(a,b) {
   if (!Buffer.isBuffer(a)) return undefined;
@@ -133,17 +134,10 @@ function expireCachedUsersWithDevices() {
 exports.findUsersWithDevices = function(userIds, callback) {
   return getCachedUsersWithDevices()
     .then(function(usersWithDevices) {
-      // Not using filter here for performance reasons
-      var result = [];
-      for (var i = 0; i < userIds.length; i++) {
-        var userId = userIds[i];
+      return _.filter(userIds, function(userId) {
         // Only true if the user has a device...
-        if(usersWithDevices[userId]) {
-          result.push(userId);
-        }
-      }
-
-      return result;
+        return usersWithDevices[userId];
+      });
     })
     .nodeify(callback);
 };
