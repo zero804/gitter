@@ -13,7 +13,6 @@ var expect = require('gulp-expect-file');
 var git = require('gulp-git');
 var fs = require('fs');
 var jshint = require('gulp-jshint');
-// var imagemin = require('gulp-imagemin');
 var postcss = require('gulp-postcss');
 var autoprefixer = require('autoprefixer-core');
 var mqpacker = require('css-mqpacker');
@@ -279,6 +278,7 @@ gulp.task('copy-asset-files', function() {
 // Run this task occassionally and check the results into git...
 // Disabled as it adds loads of extra time to npm install
 // and since we almost never use it
+// It hasn't been deleted as we may one day find it useful again
 // gulp.task('compress-images', function() {
 //   return gulp.src([
 //       'public/images/**',
