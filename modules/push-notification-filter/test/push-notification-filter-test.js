@@ -67,7 +67,7 @@ describe('push-notification-filter', function() {
           return pushNotificationFilter.findUsersInRoomAcceptingNotifications(troupeId, [userId1]);
         })
         .then(function(result) {
-          assert.deepEqual(result, [userId1]); 
+          assert.deepEqual(result, [userId1]);
         })
         .nodeify(done);
     });
@@ -79,29 +79,25 @@ describe('push-notification-filter', function() {
       var troupeId = 'TEST_TROUPE1_' + Date.now();
       var startTime = Date.now();
 
-      pushNotificationFilter.canLockForNotification(userId, troupeId, startTime, function(err, locked) {
-        if(err) return done(err);
-        assert.equal(locked, 1);
-
-        pushNotificationFilter.canLockForNotification(userId, troupeId, startTime, function(err, locked) {
-          if(err) return done(err);
+      return pushNotificationFilter.canLockForNotification(userId, troupeId, startTime)
+        .then(function(locked) {
+          assert.equal(locked, 1);
+          return pushNotificationFilter.canLockForNotification(userId, troupeId, startTime);
+        })
+        .then(function(locked) {
           assert.equal(locked, 0);
 
-          pushNotificationFilter.canUnlockForNotification(userId, troupeId, 1, function(err, st) {
-            if(err) return done(err);
+          return pushNotificationFilter.canUnlockForNotification(userId, troupeId, 1);
+        })
+        .then(function(st) {
+          assert.equal(st, startTime);
 
-            assert.equal(st, startTime);
-
-            pushNotificationFilter.canUnlockForNotification(userId, troupeId, 1, function(err, st) {
-              if(err) return done(err);
-              assert.equal(st, 0);
-
-              done();
-
-            });
-          });
-        });
-      });
+          return pushNotificationFilter.canUnlockForNotification(userId, troupeId, 1);
+        })
+        .then(function(st) {
+          assert.equal(st, 0);
+        })
+        .nodeify(done);
     });
 
    it('should handle notification resets', function(done) {
@@ -109,37 +105,30 @@ describe('push-notification-filter', function() {
       var troupeId = 'TEST_TROUPE1_' + Date.now();
       var startTime = Date.now();
 
-      pushNotificationFilter.resetNotificationsForUserTroupe(userId, troupeId, function(err) {
-        if(err) return done(err);
-
-        pushNotificationFilter.canLockForNotification(userId, troupeId, startTime, function(err, locked) {
-          if(err) return done(err);
+      return pushNotificationFilter.resetNotificationsForUserTroupe(userId, troupeId)
+        .then(function() {
+          return pushNotificationFilter.canLockForNotification(userId, troupeId, startTime);
+        })
+        .then(function(locked) {
           assert.equal(locked, 1);
 
-          pushNotificationFilter.resetNotificationsForUserTroupe(userId, troupeId, function(err) {
-            if(err) return done(err);
+          return pushNotificationFilter.resetNotificationsForUserTroupe(userId, troupeId);
+        })
+        .then(function() {
+          return pushNotificationFilter.canLockForNotification(userId, troupeId, startTime);
+        })
+        .then(function(locked) {
+          assert.equal(locked, 1);
 
-            pushNotificationFilter.canLockForNotification(userId, troupeId, startTime, function(err, locked) {
-              if(err) return done(err);
-              assert.equal(locked, 1);
-
-              pushNotificationFilter.resetNotificationsForUserTroupe(userId, troupeId, function(err) {
-                if(err) return done(err);
-
-                pushNotificationFilter.canUnlockForNotification(userId, troupeId, 1, function(err, st) {
-                  if(err) return done(err);
-                  assert.equal(st, 0);
-
-                  done();
-
-                });
-              });
-
-            });
-          });
-
-        });
-      });
+          return pushNotificationFilter.resetNotificationsForUserTroupe(userId, troupeId);
+        })
+        .then(function() {
+          return pushNotificationFilter.canUnlockForNotification(userId, troupeId, 1);
+        })
+        .then(function(st) {
+          assert.equal(st, 0);
+        })
+        .nodeify(done);
     });
 
   });
