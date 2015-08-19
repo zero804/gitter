@@ -115,7 +115,7 @@ var ChatCollection = LiveCollection.extend({
       burstCalculator.parse(this);
     });
 
-    this.reSubscribeOnModelChange(context.troupe(), 'name');
+    this.reSubscribeOnModelChange(context.troupe(), 'id');
   },
 
   reSubscribeOnModelChange: function (model, prop){
