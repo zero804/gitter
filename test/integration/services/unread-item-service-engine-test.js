@@ -1088,7 +1088,7 @@ describe('unread-item-service', function() {
           return unreadItemServiceEngine.getUserUnreadCountsForRooms(userId1, [troupeId1]);
         })
         .then(function(result) {
-          assert.strictEqual(result[troupeId1].unreadItems, 101);
+          assert.strictEqual(result[troupeId1].unreadItems, 100);
           assert.strictEqual(result[troupeId1].mentions, 1);
           return unreadItemServiceEngine.getUnreadItemsAndMentions(userId1, troupeId1);
         })
@@ -1103,7 +1103,7 @@ describe('unread-item-service', function() {
           return unreadItemServiceEngine.getUserUnreadCountsForRooms(userId1, [troupeId1]);
         })
         .then(function(result) {
-          assert.strictEqual(result[troupeId1].unreadItems, 101);
+          assert.strictEqual(result[troupeId1].unreadItems, 100);
           assert.strictEqual(result[troupeId1].mentions, 1);
         })
         .nodeify(done);

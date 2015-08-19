@@ -452,7 +452,6 @@ function getRoomsMentioningUser(userId) {
   return redisClient_smembers("m:" + userId);
 }
 
-
 /**
  * Get the badge counts for userIds
  * @return promise of a hash { userId1: 1, userId: 2, etc }
