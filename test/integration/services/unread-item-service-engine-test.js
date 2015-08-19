@@ -710,6 +710,16 @@ describe('unread-item-service', function() {
             assert.equal(counts[troupeId1].unreadItems, 100);
             assert.equal(counts[troupeId1].mentions, 0);
 
+            // Additionally, during the unread item inserts above, the lua
+            // script would have upgraded the SET to a ZSET. This requires that
+            // the lua script parse the ObjectIDs into timestamps to use as score
+            // values. The application does not have access to these values
+            // but they are important as they dictate the order in which
+            // unread items are dropped off the bottom of the collection.
+            // As an additional sanity check to ensure that the lua script is
+            // doing it's job, we pull the items with the scores and
+            // confirm that they're correct
+
             var d = Q.defer();
             unreadItemServiceEngine.testOnly.redisClient.zrange('unread:chat:' + userId1 + ':' + troupeId1, 0, -1, 'WITHSCORES', d.makeNodeResolver());
             return d.promise;
