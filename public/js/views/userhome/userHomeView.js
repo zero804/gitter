@@ -14,7 +14,6 @@ module.exports = (function() {
 
   return Marionette.LayoutView.extend({
     template: userHomeTemplate,
-    tagName: 'div',
 
     events: {
       'click #upgrade-auth': 'onUpgradeAuthClick',
