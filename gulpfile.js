@@ -1,22 +1,19 @@
-/* jshint node:true */
+/* jshint node:true, unused:true */
 'use strict';
 
 var gulp = require('gulp');
 var livereload = require('gulp-livereload');
-var gutil = require("gulp-util");
 var webpack = require('gulp-webpack');
 var less = require('gulp-less');
 var gzip = require('gulp-gzip');
-var istanbul = require('gulp-istanbul');
 var mocha = require('gulp-spawn-mocha');
 var using = require('gulp-using');
 var tar = require('gulp-tar');
 var expect = require('gulp-expect-file');
-var shrinkwrap = require('gulp-shrinkwrap');
 var git = require('gulp-git');
 var fs = require('fs');
 var jshint = require('gulp-jshint');
-var imagemin = require('gulp-imagemin');
+// var imagemin = require('gulp-imagemin');
 var postcss = require('gulp-postcss');
 var autoprefixer = require('autoprefixer-core');
 var mqpacker = require('css-mqpacker');
