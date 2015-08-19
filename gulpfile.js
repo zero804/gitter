@@ -280,17 +280,19 @@ gulp.task('copy-asset-files', function() {
 
 
 // Run this task occassionally and check the results into git...
-gulp.task('compress-images', function() {
-  return gulp.src([
-      'public/images/**',
-      'public/sprites/**'
-    ], { "base" : "./public" })
-    .pipe(imagemin({
-       progressive: true,
-       optimizationLevel: 2
-     }))
-    .pipe(gulp.dest('./public'));
-});
+// Disabled as it adds loads of extra time to npm install
+// and since we almost never use it
+// gulp.task('compress-images', function() {
+//   return gulp.src([
+//       'public/images/**',
+//       'public/sprites/**'
+//     ], { "base" : "./public" })
+//     .pipe(imagemin({
+//        progressive: true,
+//        optimizationLevel: 2
+//      }))
+//     .pipe(gulp.dest('./public'));
+// });
 
 gulp.task('css-ios', function () {
   return gulp.src([

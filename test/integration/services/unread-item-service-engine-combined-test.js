@@ -94,7 +94,7 @@ describe('unread-item-service-engine-combined #slow', function() {
             var ourKeys = _.uniq(Object.keys(unreadItems).concat(Object.keys(mentionItems)));
             if (ourKeys.length) {
               assert.strictEqual(counts.length, 1);
-              assert.strictEqual(counts[0].unreadItems, ourKeys.length);
+              assert.strictEqual(counts[0].unreadItems, Object.keys(unreadItems).length);
               assert.strictEqual(counts[0].mentions, Object.keys(mentionItems).length);
             } else {
               assert.strictEqual(counts.length, 0);
