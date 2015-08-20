@@ -31,6 +31,7 @@ var webpackConfig = {
     "homepage": path.resolve(path.join(__dirname, "./homepage")),
     "apps": path.resolve(path.join(__dirname, "./apps.js")),
     "router-org-page": path.resolve(path.join(__dirname, './router-org-page.js')),
+    "router-userhome": path.resolve(path.join(__dirname, './router-userhome.js')),
     vendor: [
       'utils/webpack',
       'utils/context',
