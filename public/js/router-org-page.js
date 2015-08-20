@@ -19,6 +19,13 @@ onReady(function(){
     window.parent.location.assign(url);
   });
 
+  //listen for postMessageCalls
+  window.addEventListener('message', function onWindowMessage(message){
+    var data = JSON.parse(message.data);
+    if(data.type !== 'change:room') return;
+    window.location.replace(data.url);
+  });
+
   var Router = Backbone.Router.extend({
 
     routes: {
