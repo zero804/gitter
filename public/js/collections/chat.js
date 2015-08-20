@@ -118,15 +118,6 @@ var ChatCollection = LiveCollection.extend({
     this.reSubscribeOnModelChange(context.troupe(), 'id');
   },
 
-  reSubscribeOnModelChange: function (model, prop){
-    var evtName = prop ? 'change:' + prop : 'change';
-    this.listenTo(model, evtName, function(model){
-      this.reset();
-      this.subscription.cancel();
-      this.subscription = null;
-      this.listen({ snapshot: true });
-    }, this);
-  },
 
   parse: function (collection) {
     return burstCalculator.parse(collection);
