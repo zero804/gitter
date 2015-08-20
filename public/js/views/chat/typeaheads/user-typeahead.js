@@ -6,16 +6,20 @@ var apiClient = require('components/apiClient');
 var chatCollection = require('collections/instances/integrated-items').chats;
 var template = require('./tmpl/typeahead.hbs');
 var _ = require('underscore');
+var context = require('utils/context');
 
 var MAX_TYPEAHEAD_SUGGESTIONS = isMobile() ? 3 : 10;
 
 function getRecentMessageSenders() {
   var users = chatCollection.map(function(message) {
+    console.log(message.get('text'));
     return message.get('fromUser');
   }).filter(function(user) {
     return !!user;
   }).reverse();
-  return unique(users);
+  users = unique(users);
+  console.log('users', users);
+  return users;
 }
 
 function filterWithTerm(term) {
@@ -69,7 +73,7 @@ function userSearchDebounced(term, callback) {
       lastCallback = null;
 
       userSearch(requestTerm, requestCallback);
-    }, 500);    
+    }, 500);
   }
 }
 
@@ -86,6 +90,12 @@ function userSearch(term, callback) {
 var lcPrevTerm = '';
 var prevResults = [];
 
+//If we change rooms we need to wipe the old results
+context.troupe().on('change:id', function (){
+  lcPrevTerm = '';
+  prevResults = [];
+});
+
 module.exports = {
   match: /(^|\s)@(\/?[a-zA-Z0-9_\-]*)$/,
   maxCount: MAX_TYPEAHEAD_SUGGESTIONS,
@@ -99,6 +109,7 @@ module.exports = {
     }
 
     users = users.concat(getRecentMessageSenders());
+
 
     users = unique(users)
       .filter(isNotCurrentUser)
