@@ -44,6 +44,12 @@ describe('unread-item-service', function() {
     unreadItemService.testOnly.setSendBadgeUpdates(false);
   });
 
+  after(function(done) {
+    var unreadItemServiceEngine = testRequire('./services/unread-item-service-engine');
+    unreadItemServiceEngine.testOnly.removeAllEmailNotifications()
+      .nodeify(done);
+  });
+
   var blockTimer = require('../block-timer');
   before(blockTimer.on);
   after(blockTimer.off);

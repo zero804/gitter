@@ -14,6 +14,12 @@ var CHECK_SLOWLOG = process.env.CHECK_SLOWLOG;
 describe('unread-item-service-engine-combined #slow', function() {
   this.timeout(150000);
 
+  after(function(done) {
+    var unreadItemServiceEngine = testRequire('./services/unread-item-service-engine');
+    unreadItemServiceEngine.testOnly.removeAllEmailNotifications()
+      .nodeify(done);
+  });
+
   describe('integration tests', function() {
     var unreadItemServiceEngine, troupeId1, userId1;
 
