@@ -585,6 +585,7 @@ engine.getRoomsCausingBadgeCount = getRoomsCausingBadgeCount;
 engine.testOnly = {
   getNewItemBatches: getNewItemBatches,
   UNREAD_BATCH_SIZE: UNREAD_BATCH_SIZE,
-  removeAllEmailNotifications: removeAllEmailNotifications
+  removeAllEmailNotifications: removeAllEmailNotifications,
+  redisClient: redisClient
 };
 module.exports = engine;

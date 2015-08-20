@@ -350,7 +350,6 @@ gulp.task('css-web', function () {
     'public/less/generic-layout.less',
     'public/less/trpHooks.less',
     'public/less/login.less',
-    'public/less/homepage.less',
     'public/less/explore.less',
     'public/less/router-chat.less',
     'public/less/router-app.less',
@@ -360,8 +359,8 @@ gulp.task('css-web', function () {
     'public/less/chat-card.less',
     'public/less/router-archive-home.less',
     'public/less/router-archive-chat.less',
+    'public/less/homepage.less',
     'public/less/userhome.less',
-    'public/less/userhome_treatment.less',
     'public/less/402.less',
     'public/less/org-page.less',
     'public/less/room-card.less'
