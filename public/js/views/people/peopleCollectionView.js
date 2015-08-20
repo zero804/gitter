@@ -7,83 +7,87 @@ var collectionTemplate = require('./tmpl/peopleCollectionView.hbs');
 var remainingTempate = require('./tmpl/remainingView.hbs');
 require('views/behaviors/isomorphic');
 
-module.exports = (function() {
-  var PeopleCollectionView = Marionette.CollectionView.extend({
-    tagName: 'ul',
-    className: 'roster',
-    childView: AvatarView,
+var PeopleCollectionView = Marionette.CollectionView.extend({
+  tagName: 'ul',
+  className: 'roster',
+  childView: AvatarView,
 
-    childViewOptions: function(item) {
-      var options = {
-        tagName: 'li',
-        showStatus: true,
-        tooltipPlacement: 'left'
-      };
+  childViewOptions: function(item) {
+    var options = {
+      tagName: 'li',
+      showStatus: true,
+      tooltipPlacement: 'left'
+    };
 
-      if(item && item.id) {
-        var prerenderedUserEl = this.$el.find('.js-model-id-' + item.id)[0];
-        if (prerenderedUserEl) {
-          options.el = prerenderedUserEl;
-        }
+    if(item && item.id) {
+      var prerenderedUserEl = this.$el.find('.js-model-id-' + item.id)[0];
+      if (prerenderedUserEl) {
+        options.el = prerenderedUserEl;
       }
-
-      return options;
     }
-  });
 
-  var RemainingView = Marionette.ItemView.extend({
-    className: 'remaining',
+    return options;
+  }
+});
 
-    template: remainingTempate,
+var RemainingView = Marionette.ItemView.extend({
+  className: 'remaining',
 
-    modelEvents: {
-      'change:userCount': 'render'
-    },
+  template: remainingTempate,
 
-    serializeData: function() {
-      var userCount = this.model.get('userCount');
-      var data = {
-        showAddBadge: context.isLoggedIn() && !context.inOneToOneTroupeContext(),
-        userCount: userCount,
-        hasHiddenMembers: userCount > 25
-      };
+  modelEvents: {
+    'change:userCount': 'render',
+    'change:id': 'render',
+  },
 
-      return data;
-      }
-  });
+  serializeData: function() {
+    var userCount = this.model.get('userCount');
+    var data = {
+      showAddBadge: context.isLoggedIn() && !context.inOneToOneTroupeContext(),
+      userCount: userCount,
+      hasHiddenMembers: userCount > 25
+    };
 
-  var ExpandableRosterView = Marionette.LayoutView.extend({
-    template: collectionTemplate,
-
-    behaviors: {
-      Isomorphic: {
-        rosterRegion: { el: "#roster-region", init: 'initRosterRegion' },
-        remainingRegion: { el: "#remaining-region", init: 'initRemainingRegion' }
-      }
-    },
-
-    initRosterRegion: function(optionsForRegion) {
-      return new PeopleCollectionView(optionsForRegion({ collection: this.options.rosterCollection }));
-    },
-
-    initRemainingRegion: function(optionsForRegion) {
-      return new RemainingView(optionsForRegion({ model: context.troupe() }));
-    },
-
-  });
-
-  var AllUsersModal = ModalView.extend({
-    initialize: function(options) {
-      options = options || {};
-      options.title = "People";
-      ModalView.prototype.initialize.call(this, options);
-      this.view = new PeopleCollectionView(options);
+    return data;
     }
-  });
-  return {
-    ExpandableRosterView: ExpandableRosterView,
-    Modal: AllUsersModal
-  };
+});
+
+var ExpandableRosterView = Marionette.LayoutView.extend({
+  template: collectionTemplate,
+
+  behaviors: {
+    Isomorphic: {
+      rosterRegion: { el: "#roster-region", init: 'initRosterRegion' },
+      remainingRegion: { el: "#remaining-region", init: 'initRemainingRegion' }
+    }
+  },
+
+  initRosterRegion: function(optionsForRegion) {
+    return new PeopleCollectionView(optionsForRegion({
+      collection: this.options.rosterCollection
+    }));
+  },
+
+  initRemainingRegion: function(optionsForRegion) {
+    return new RemainingView(optionsForRegion({
+      model: context.troupe()
+    }));
+  },
+
+});
+
+var AllUsersModal = ModalView.extend({
+  initialize: function(options) {
+    options = options || {};
+    options.title = "People";
+    ModalView.prototype.initialize.call(this, options);
+    this.view = new PeopleCollectionView(options);
+  }
+});
+
+module.exports = {
+  ExpandableRosterView: ExpandableRosterView,
+  Modal: AllUsersModal
+};
 
 
-})();

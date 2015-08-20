@@ -6,6 +6,7 @@ var Backbone = require('backbone');
 var realtime = require('components/realtime');
 var LiveCollection = require('gitter-realtime-client').LiveCollection;
 var SyncMixin = require('./sync-mixin');
+var context = require('utils/context');
 
 var UserModel = Backbone.Model.extend({
   idAttribute: "id",
@@ -29,6 +30,9 @@ var RosterCollection = LiveCollection.extend({
   model: UserModel,
   modelName: 'user',
   url: apiClient.room.channelGenerator('/users'),
+  initialize: function rosterCollectionInit(){
+    this.reSubscribeOnModelChange(context.troupe(), 'id');
+  },
   getSnapshotState: function () {
     return { lean: true, limit: 25 };
   },
