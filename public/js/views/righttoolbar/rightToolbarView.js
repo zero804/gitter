@@ -81,7 +81,9 @@ module.exports = (function() {
 
       var oneToOne = context.inOneToOneTroupeContext();
 
-      return oneToOne ? null : new ActivityCompositeView(optionsForRegion({ collection: itemCollections.events }));
+      return oneToOne ? null : new ActivityCompositeView(optionsForRegion({
+        collection: itemCollections.events
+      }));
     },
 
     initRosterRegion: function(optionsForRegion) {
