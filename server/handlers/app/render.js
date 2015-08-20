@@ -101,16 +101,7 @@ switch(nconf.get('NODE_ENV')) {
 function renderHomePage(req, res, next) {
   contextGenerator.generateNonChatContext(req)
     .then(function (troupeContext) {
-      var page, bootScriptName;
-
-      if(req.isPhone) {
-        page = 'mobile/mobile-userhome';
-        bootScriptName = 'mobile-userhome';
-      } else {
-        var variant = splitTests.configure(req, res, 'userhome');
-        page = splitTests.selectTemplate(variant, 'userhome-template_control', 'userhome-template_treatment');
-        bootScriptName = 'userhome';
-      }
+      var page = req.isPhone ? 'mobile/mobile-userhome' : 'userhome-template';
 
       var osName = useragent.parse(req.headers['user-agent']).os.family.toLowerCase();
 
@@ -128,11 +119,7 @@ function renderHomePage(req, res, next) {
         showOsxApp: showOsxApp,
         showWindowsApp: showWindowsApp,
         showLinuxApp: showLinuxApp,
-        bootScriptName: bootScriptName,
-        cssFileName: "styles/" + bootScriptName + ".css",
         troupeContext: troupeContext,
-        agent: req.headers['user-agent'],
-        isUserhome: true,
         isNativeDesktopApp: troupeContext.isNativeDesktopApp,
         billingBaseUrl: nconf.get('web:billingBaseUrl')
       });
@@ -168,7 +155,6 @@ function fixBadLinksOnId(value) {
 }
 
 function renderMainFrame(req, res, next, frame) {
-  splitTests.configure(req, res, 'userhome');
   var variant = splitTests.configure(req, res, 'nli');
 
   var user = req.user;
@@ -266,91 +252,91 @@ function renderChat(req, res, options, next) {
   .then(function(unreadItems) {
     var limit = unreadItems.chat.length > INITIAL_CHAT_COUNT ? unreadItems.chat.length + 20 : INITIAL_CHAT_COUNT;
 
-  var snapshotOptions = {
-      limit: limit, //options.limit || INITIAL_CHAT_COUNT,
-    aroundId: aroundId,
-    unread: options.unread // Unread can be true, false or undefined
-  };
+    var snapshotOptions = {
+        limit: limit, //options.limit || INITIAL_CHAT_COUNT,
+      aroundId: aroundId,
+      unread: options.unread // Unread can be true, false or undefined
+    };
 
-  var chatSerializerOptions = _.defaults({
-    lean: true
-  }, snapshotOptions);
+    var chatSerializerOptions = _.defaults({
+      lean: true
+    }, snapshotOptions);
 
-  var userSerializerOptions = _.defaults({
-    lean: true,
-    limit: ROSTER_SIZE
-  }, snapshotOptions);
+    var userSerializerOptions = _.defaults({
+      lean: true,
+      limit: ROSTER_SIZE
+    }, snapshotOptions);
 
-  Q.all([
-      options.generateContext === false ? null : contextGenerator.generateTroupeContext(req, { snapshots: { chat: snapshotOptions }, permalinkChatId: aroundId }),
-      restful.serializeChatsForTroupe(troupe.id, userId, chatSerializerOptions),
-      options.fetchEvents === false ? null : restful.serializeEventsForTroupe(troupe.id, userId),
-      options.fetchUsers === false ? null :restful.serializeUsersForTroupe(troupe.id, userId, userSerializerOptions),
-      troupeService.checkGitHubTypeForUri(troupe.lcOwner || '', 'ORG')
-    ]).spread(function (troupeContext, chats, activityEvents, users, ownerIsOrg) {
-      var initialChat = _.find(chats, function(chat) { return chat.initial; });
-      var initialBottom = !initialChat;
-      var githubLink;
-      var classNames = options.classNames || [];
+    return Q.all([
+        options.generateContext === false ? null : contextGenerator.generateTroupeContext(req, { snapshots: { chat: snapshotOptions }, permalinkChatId: aroundId }),
+        restful.serializeChatsForTroupe(troupe.id, userId, chatSerializerOptions),
+        options.fetchEvents === false ? null : restful.serializeEventsForTroupe(troupe.id, userId),
+        options.fetchUsers === false ? null :restful.serializeUsersForTroupe(troupe.id, userId, userSerializerOptions),
+        troupeService.checkGitHubTypeForUri(troupe.lcOwner || '', 'ORG')
+      ]).spread(function (troupeContext, chats, activityEvents, users, ownerIsOrg) {
+        var initialChat = _.find(chats, function(chat) { return chat.initial; });
+        var initialBottom = !initialChat;
+        var githubLink;
+        var classNames = options.classNames || [];
 
 
-      if(troupe.githubType === 'REPO' || troupe.githubType === 'ORG') {
-        githubLink = 'https://github.com/' + req.uriContext.uri;
-      }
+        if(troupe.githubType === 'REPO' || troupe.githubType === 'ORG') {
+          githubLink = 'https://github.com/' + req.uriContext.uri;
+        }
 
-      if (!user) classNames.push("logged-out");
+        if (!user) classNames.push("logged-out");
 
-      var isPrivate = troupe.security !== "PUBLIC";
-      var integrationsUrl;
+        var isPrivate = troupe.security !== "PUBLIC";
+        var integrationsUrl;
 
-      if (troupeContext && troupeContext.isNativeDesktopApp) {
-         integrationsUrl = nconf.get('web:basepath') + '/' + troupeContext.troupe.uri + '#integrations';
-      } else {
-        integrationsUrl = '#integrations';
-      }
+        if (troupeContext && troupeContext.isNativeDesktopApp) {
+           integrationsUrl = nconf.get('web:basepath') + '/' + troupeContext.troupe.uri + '#integrations';
+        } else {
+          integrationsUrl = '#integrations';
+        }
 
-      var cssFileName = options.stylesheet ? "styles/" + options.stylesheet + ".css" : "styles/" + script + ".css"; // css filename matches bootscript
+        var cssFileName = options.stylesheet ? "styles/" + options.stylesheet + ".css" : "styles/" + script + ".css"; // css filename matches bootscript
 
-      var chatsWithBurst = burstCalculator(chats);
-      if (options.filterChats) {
-        chatsWithBurst = options.filterChats(chatsWithBurst);
-      }
+        var chatsWithBurst = burstCalculator(chats);
+        if (options.filterChats) {
+          chatsWithBurst = options.filterChats(chatsWithBurst);
+        }
 
-      var renderOptions = _.extend({
-          isRepo: troupe.githubType === 'REPO',
-          bootScriptName: script,
-          cssFileName: cssFileName,
-          githubLink: githubLink,
-          troupeName: req.uriContext.uri,
-          oneToOne: troupe.oneToOne,
-          user: user,
-          troupeContext: troupeContext,
-          initialBottom: initialBottom,
-          chats: chatsWithBurst,
-          classNames: classNames.join(' '),
-          agent: req.headers['user-agent'],
-          subresources: SUBRESOURCES[script],
-          dnsPrefetch: dnsPrefetch,
-          isPrivate: isPrivate,
-          activityEvents: activityEvents,
-          users: users  && users.sort(userSort),
-          userCount: troupe.userCount,
-          hasHiddenMembers: troupe.userCount > 25,
-          integrationsUrl: integrationsUrl,
-          inputAutoFocus: !options.mobile,
-          placeholder: 'Click here to type a chat message. Supports GitHub flavoured markdown.',
-          ownerIsOrg: ownerIsOrg
-        }, troupeContext && {
-          troupeTopic: troupeContext.troupe.topic,
-          premium: troupeContext.troupe.premium,
-          troupeFavourite: troupeContext.troupe.favourite,
-          avatarUrl: avatar(troupeContext.troupe),
-          isAdmin: troupeContext.permissions.admin,
-          isNativeDesktopApp: troupeContext.isNativeDesktopApp
-        }, options.extras);
+        var renderOptions = _.extend({
+            isRepo: troupe.githubType === 'REPO',
+            bootScriptName: script,
+            cssFileName: cssFileName,
+            githubLink: githubLink,
+            troupeName: req.uriContext.uri,
+            oneToOne: troupe.oneToOne,
+            user: user,
+            troupeContext: troupeContext,
+            initialBottom: initialBottom,
+            chats: chatsWithBurst,
+            classNames: classNames.join(' '),
+            agent: req.headers['user-agent'],
+            subresources: SUBRESOURCES[script],
+            dnsPrefetch: dnsPrefetch,
+            isPrivate: isPrivate,
+            activityEvents: activityEvents,
+            users: users  && users.sort(userSort),
+            userCount: troupe.userCount,
+            hasHiddenMembers: troupe.userCount > 25,
+            integrationsUrl: integrationsUrl,
+            inputAutoFocus: !options.mobile,
+            placeholder: 'Click here to type a chat message. Supports GitHub flavoured markdown.',
+            ownerIsOrg: ownerIsOrg
+          }, troupeContext && {
+            troupeTopic: troupeContext.troupe.topic,
+            premium: troupeContext.troupe.premium,
+            troupeFavourite: troupeContext.troupe.favourite,
+            avatarUrl: avatar(troupeContext.troupe),
+            isAdmin: troupeContext.permissions.admin,
+            isNativeDesktopApp: troupeContext.isNativeDesktopApp
+          }, options.extras);
 
-        res.render(options.template, renderOptions);
-      });
+          res.render(options.template, renderOptions);
+        });
     })
     .fail(next);
 }
