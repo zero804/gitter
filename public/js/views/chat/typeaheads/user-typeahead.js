@@ -12,13 +12,11 @@ var MAX_TYPEAHEAD_SUGGESTIONS = isMobile() ? 3 : 10;
 
 function getRecentMessageSenders() {
   var users = chatCollection.map(function(message) {
-    console.log(message.get('text'));
     return message.get('fromUser');
   }).filter(function(user) {
     return !!user;
   }).reverse();
   users = unique(users);
-  console.log('users', users);
   return users;
 }
 
