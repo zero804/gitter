@@ -333,12 +333,39 @@ function transformUserTroupesWithLimit(userTroupes) {
 }
 
 /**
+ * HGETALL can take down your redis server if the hash is big enough.
+ * This way, we scan the redis server and return things chunk at a time
+ */
+function scanEmailNotifications() {
+  var cursor = '0';
+  var hashValues = {};
+  function iter() {
+    return Q.ninvoke(redisClient, "hscan", EMAIL_NOTIFICATION_HASH_KEY, cursor, 'COUNT', 1000)
+      .spread(function(nextCursor, result) {
+        if (nextCursor === '0') return;
+        for (var i = 0; i < result.length; i = i + 2) {
+          var key = result[i];
+          var value = result[i + 1];
+          hashValues[key] = value;
+        }
+
+        cursor = nextCursor;
+        return iter();
+      });
+  }
+
+  return iter()
+    .then(function() {
+      return hashValues;
+    });
+}
+/**
  * Returns a hash of hash {user:troupe:ids} of users who have
  * outstanding notifications since before the specified time
  * @return a promise of hash
  */
 function listTroupeUsersForEmailNotifications(horizonTime, emailLatchExpiryTimeS) {
-  return Q.ninvoke(redisClient, "hgetall", EMAIL_NOTIFICATION_HASH_KEY)
+  return scanEmailNotifications()
     .then(function(troupeUserHash) {
       if (!troupeUserHash) return {};
 
