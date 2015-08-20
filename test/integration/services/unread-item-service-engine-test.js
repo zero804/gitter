@@ -19,6 +19,12 @@ describe('unread-item-service', function() {
     setTimeout(done, 1000);
   });
 
+  after(function(done) {
+    var unreadItemServiceEngine = testRequire('./services/unread-item-service-engine');
+    unreadItemServiceEngine.testOnly.removeAllEmailNotifications()
+      .nodeify(done);
+  });
+
   describe('single test cases', function() {
 
     var unreadItemServiceEngine, troupeId1, itemId1, itemId2, itemId3, userId1, userId2, userIds, troupeId2;
