@@ -96,7 +96,30 @@ describe('push-notification-filter', function() {
         })
         .then(function(st) {
           assert.equal(st, 0);
+          startTime = Date.now();
+
+          return pushNotificationFilter.canLockForNotification(userId, troupeId, startTime);
         })
+        .then(function(locked) {
+          assert.equal(locked,2);
+
+          return pushNotificationFilter.canUnlockForNotification(userId, troupeId, 2);
+        })
+        .then(function(st) {
+          assert.equal(st, startTime);
+          startTime = Date.now();
+
+          return pushNotificationFilter.canLockForNotification(userId, troupeId, startTime);
+        })
+        .then(function(locked) {
+          assert.equal(locked, 3);
+
+          return pushNotificationFilter.canUnlockForNotification(userId, troupeId, 3);
+        })
+        .then(function(st) {
+          assert.equal(st, startTime);
+        })
+
         .nodeify(done);
     });
 
@@ -131,6 +154,39 @@ describe('push-notification-filter', function() {
         .nodeify(done);
     });
 
+  });
+
+  it('should set the expiry correctly on the redis keys', function(done) {
+    var userId = 'TEST_USER1_' + Date.now();
+    var troupeId = 'TEST_TROUPE1_' + Date.now();
+    var startTime = Date.now();
+
+    return pushNotificationFilter.canLockForNotification(userId, troupeId, startTime)
+      .then(function() {
+        return [
+          pushNotificationFilter.testOnly.redisClient.ttl('nl:' + userId + ':' + troupeId),
+          pushNotificationFilter.testOnly.redisClient.ttl('nl:' + userId + ':' + troupeId)
+        ];
+      })
+      .spread(function(ttl1, ttl2) {
+        assert(ttl1 > 0);
+        assert(ttl2 > 0);
+
+        return pushNotificationFilter.canUnlockForNotification(userId, troupeId, 1);
+      })
+      .then(function() {
+        return [
+          pushNotificationFilter.testOnly.redisClient.ttl('nl:' + userId + ':' + troupeId),
+          pushNotificationFilter.testOnly.redisClient.ttl('nl:' + userId + ':' + troupeId)
+        ];
+      })
+      .spread(function(ttl1, ttl2) {
+        assert(ttl1 > 0);
+        assert(ttl2 > 0);
+
+        return pushNotificationFilter.canUnlockForNotification(userId, troupeId, 1);
+      })
+      .nodeify(done);
   });
 
 });

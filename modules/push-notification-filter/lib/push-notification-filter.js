@@ -98,3 +98,8 @@ exports.findUsersInRoomAcceptingNotifications = findUsersInRoomAcceptingNotifica
 exports.resetNotificationsForUserTroupe = resetNotificationsForUserTroupe;
 exports.canLockForNotification = canLockForNotification;
 exports.canUnlockForNotification = canUnlockForNotification;
+
+
+exports.testOnly = {
+  redisClient: redisClient
+};
