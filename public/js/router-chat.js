@@ -201,7 +201,7 @@ onready(function () {
   /* Drag and drop */
   new DropTargetView({ template: false, el: 'body' }).render();
 
-  new HeaderView({ model: context.troupe(), el: '#header' });
+  //new HeaderView({ model: context.troupe(), el: '#header' });
 
   // This may require a better home
   if (context().permissions.admin && context.troupe().get('userCount') === 1) {
