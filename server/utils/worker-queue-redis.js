@@ -100,10 +100,16 @@ Queue.prototype.invoke = function(data, options, callback) {
 
         var delay = options && options.delay || 0;
 
+        // TODO: change 'echo' to 'invoke' 1 September 2015
+        // This change needs to happen at least a several releases
+        // before the echo queue is removed (see other TODO futher
+        // down in this file for details of that change)
+        var operationName = 'echo';
+
         if (!delay) {
-          queue.enqueue(self.name, 'invoke', data, callback);
+          queue.enqueue(self.name, operationName, data, callback);
         } else {
-          queue.enqueueIn(delay, self.name, 'invoke', data, callback);
+          queue.enqueueIn(delay, self.name, operationName, data, callback);
         }
       });
     })
@@ -159,9 +165,9 @@ Queue.prototype.createWorker = function() {
 
   var jobs = {
     // TODO: remove 'echo' this by 1 September 2015
-    // Reasoning: Because until PR#747, the application servers were 
-    // submitting echo jobs and we need to gracefully roll over to the 
-    // more sane name of invoke. If we dropped it immediately, all the old 
+    // Reasoning: Because until PR#747, the application servers were
+    // submitting echo jobs and we need to gracefully roll over to the
+    // more sane name of invoke. If we dropped it immediately, all the old
     // jobs during the deployment period would be dropped.
     echo: {
       perform: function(data, callback) {
