@@ -31,7 +31,7 @@ var RosterCollection = LiveCollection.extend({
   modelName: 'user',
   url: apiClient.room.channelGenerator('/users'),
   initialize: function rosterCollectionInit(){
-    this.reSubscribeOnModelChange(context.troupe(), 'id');
+    this.resubscribeOnModelChange(context.troupe(), 'id');
   },
   getSnapshotState: function () {
     return { lean: true, limit: 25 };

@@ -39,7 +39,7 @@ var EventCollection = LiveCollection.extend({
   model: EventModel,
   initialize: function() {
     this.listenTo(this, 'add reset', this.trim);
-    this.reSubscribeOnModelChange(context.troupe(), 'id');
+    this.resubscribeOnModelChange(context.troupe(), 'id');
   },
   client: function() {
     return realtime.getClient();
