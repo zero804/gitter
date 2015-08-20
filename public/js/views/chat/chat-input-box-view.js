@@ -8,6 +8,7 @@ var drafty = require('components/drafty');
 var cocktail = require('cocktail');
 var KeyboardEventsMixin = require('views/keyboard-events-mixin');
 var RAF = require('utils/raf');
+var context = require('utils/context');
 require('jquery-textcomplete');
 require('views/behaviors/tooltip');
 
@@ -97,7 +98,7 @@ var ChatInputBoxView = Marionette.ItemView.extend({
       chatResizer.resizeInput();
     });
 
-    if (!this.options.editMode) this.drafty = drafty(this.el);
+    if (!this.options.editMode) this.drafty = drafty(this.el, context.troupe().get('id'));
 
     chatResizer.resetInput(true);
 
