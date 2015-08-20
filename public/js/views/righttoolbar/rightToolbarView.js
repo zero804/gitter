@@ -7,7 +7,6 @@ var PeopleCollectionView = require('views/people/peopleCollectionView');
 var SearchView = require('views/search/searchView');
 var SearchInputView = require('views/search/search-input-view');
 var RepoInfoView = require('./repoInfo');
-var RepoInfoModel = require('collections/repo-info');
 var ActivityCompositeView = require('./activityCompositeView');
 var hasScrollBars = require('utils/scrollbar-detect');
 require('views/behaviors/isomorphic');
@@ -72,11 +71,7 @@ module.exports = (function() {
     initRepo_infoRegion: function(optionsForRegion) {
       // Repo info
       if (context.troupe().get('githubType') !== 'REPO') return;
-
-      var repo = new RepoInfoModel();
-      repo.fetch({ data: { repo: context.troupe().get('uri') } });
-
-      return new RepoInfoView(optionsForRegion({ model: repo }));
+      return new RepoInfoView(optionsForRegion());
     },
 
     initActivityRegion: function(optionsForRegion, region) {
