@@ -6,7 +6,7 @@
 var assert = require('assert');
 var proxyquire = require('proxyquire').noCallThru();
 
-describe('user-typeahead', function() {
+describe.skip('user-typeahead', function() {
 
   it('suggests the latest message senders, most recent first', function() {
     var typeahead = generateTypeahead({
