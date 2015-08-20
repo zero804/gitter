@@ -97,6 +97,8 @@ module.exports = (function() {
         return 'More ' + orgName + ' rooms';
       }});
 
+      this.listenTo(context.troupe(), 'change:id', this.onRoomChange, this);
+
       this.redisplay();
     },
 
@@ -244,7 +246,11 @@ module.exports = (function() {
       }
 
       this.ui.favourite.toggleClass('favourite', !!model.get('favourite'));
-    }
+    },
+
+    onRoomChange: function (model){
+      this.editingTopic = false;
+    },
 
   });
 
