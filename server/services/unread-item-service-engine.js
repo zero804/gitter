@@ -345,7 +345,7 @@ function listTroupeUsersForEmailNotifications(horizonTime, emailLatchExpiryTimeS
       var userTroupesForNotification = selectTroupeUserBatchForEmails(troupeUserHash, horizonTime);
 
       var filteredKeys = Object.keys(userTroupesForNotification);
-      debug('Attempting to send email notifications to %s usertroupes', userTroupesForNotification.length);
+      debug('Attempting to send email notifications to %s usertroupes', filteredKeys.length);
 
       var keys = [EMAIL_NOTIFICATION_HASH_KEY].concat(filteredKeys.map(function(troupeUserKey) {
         return 'uel:' + troupeUserKey;
