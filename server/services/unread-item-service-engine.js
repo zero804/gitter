@@ -342,12 +342,16 @@ function scanEmailNotifications() {
   function iter() {
     return Q.ninvoke(redisClient, "hscan", EMAIL_NOTIFICATION_HASH_KEY, cursor, 'COUNT', 1000)
       .spread(function(nextCursor, result) {
-        if (nextCursor === '0') return;
-        for (var i = 0; i < result.length; i = i + 2) {
-          var key = result[i];
-          var value = result[i + 1];
-          hashValues[key] = value;
+        /* Turn the results into a hash */
+        if (result) {
+          for (var i = 0; i < result.length; i = i + 2) {
+            var key = result[i];
+            var value = result[i + 1];
+            hashValues[key] = value;
+          }
         }
+
+        if (nextCursor === '0') return;
 
         cursor = nextCursor;
         return iter();
