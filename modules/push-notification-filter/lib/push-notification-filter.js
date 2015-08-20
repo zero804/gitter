@@ -58,6 +58,8 @@ function findUsersInRoomAcceptingNotifications(troupeId, userIds) {
         }
       });
 
+      debug('findUsersInRoomAcceptingNotifications filtered %s users down to %s', userIds.length, response.length);
+
       return response;
     });
 }
