@@ -60,7 +60,14 @@ makeBenchmark({
       './room-permissions-model': roomPermissionsModel,
     });
     unreadItemService.testOnly.setSendBadgeUpdates(false);
+  },
 
+  after: function(done) {
+    if (process.env.DISABLE_EMAIL_NOTIFY_CLEAR_AFTER_TEST) return done();
+
+    var unreadItemServiceEngine = testRequire('./services/unread-item-service-engine');
+    unreadItemServiceEngine.testOnly.removeAllEmailNotifications()
+      .nodeify(done);
   },
 
   tests: {

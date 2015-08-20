@@ -36,6 +36,14 @@ for (var i = 0; i < 10000; i++) {
 }
 
 makeBenchmark({
+  after: function(done) {
+    if (process.env.DISABLE_EMAIL_NOTIFY_CLEAR_AFTER_TEST) return done();
+
+    var unreadItemServiceEngine = testRequire('./services/unread-item-service-engine');
+    unreadItemServiceEngine.testOnly.removeAllEmailNotifications()
+      .nodeify(done);
+  },
+
   tests: {
     'newItemWithNoMentions small room, no mentions': function(done) {
       unreadItemsServiceEngine.newItemWithMentions(mongoUtils.getNewObjectIdString(), mongoUtils.getNewObjectIdString(), smallUserSet, [])
