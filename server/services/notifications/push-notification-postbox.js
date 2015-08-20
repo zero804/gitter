@@ -75,11 +75,8 @@ function filterNotificationsForPush(troupeId, chatId, userIds, mentioned) {
         var pushNotificationSetting = notificationSettings && notificationSettings.push || 'all';
 
         /* Mute, then don't continue */
-        if (pushNotificationSetting === 'mute') {
-          return;
-        }
-
-        if (pushNotificationSetting === 'mention' && !mentioned) {
+        if (pushNotificationSetting === 'mute' || (pushNotificationSetting === 'mention' && !mentioned)) {
+          debug('Ignoring push notification for user %s due to push notification setting %s', userId, pushNotificationSetting);
           // Only pushing on mentions and this ain't a mention
           return;
         }
