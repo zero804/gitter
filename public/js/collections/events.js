@@ -7,6 +7,7 @@ var LiveCollection = require('gitter-realtime-client').LiveCollection;
 var realtime = require('components/realtime');
 var Backbone = require('backbone');
 var SyncMixin = require('./sync-mixin');
+var context = require('utils/context');
 
 var EventModel = Backbone.Model.extend({
   idAttribute: "id",
@@ -38,6 +39,7 @@ var EventCollection = LiveCollection.extend({
   model: EventModel,
   initialize: function() {
     this.listenTo(this, 'add reset', this.trim);
+    this.reSubscribeOnModelChange(context.troupe(), 'id');
   },
   client: function() {
     return realtime.getClient();
