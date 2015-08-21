@@ -32,10 +32,16 @@ function getConnection() {
   redisConfiguration = _.extend({ }, redisConfiguration, { redisDb: 0 });
   var redis = env.redis.createClient(redisConfiguration);
 
-  return {
+  var result = {
     redis: redis,
-    database: 0 // In case the wierd behaviour in node-resque is ever removed
+    database: 0 // In case the wierd behaviour in node-resque is ever removed,
   };
+
+  if (config.get('resque:namespace')) {
+    result.namespace = config.get('resque:namespace');  // Allow tests to use their own ns
+  }
+
+  return result;
 }
 
 function createScheduler() {
@@ -68,6 +74,10 @@ function createScheduler() {
 var uniqueWorkerCounter = 0;
 
 var Queue = function(name, options, loaderFn) {
+  if (config.get('resque:queuePrefix')) {
+    name = config.get('resque:queuePrefix') + name;
+  }
+
   this.name = name;
   this.loaderFn = loaderFn;
   var self = this;
