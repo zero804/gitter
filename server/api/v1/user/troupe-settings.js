@@ -10,7 +10,7 @@ module.exports = {
       .then(function(settings) {
         res.json(settings || {});
       })
-      .fail(next);
+      .catch(next);
   },
 
   show: function(req, res) {
@@ -23,7 +23,7 @@ module.exports = {
       .then(function() {
         res.json(settings);
       })
-      .fail(next);
+      .catch(next);
   },
 
   load: function(req, id, callback) {

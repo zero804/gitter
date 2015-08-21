@@ -22,7 +22,7 @@ module.exports = {
       .then(function(serialized) {
         res.send(serialized);
       })
-      .fail(next);
+      .catch(next);
   },
 
   show: function(req, res, next) {
@@ -86,7 +86,7 @@ module.exports = {
       .then(function(troupe) {
         res.send(troupe);
       })
-      .fail(next);
+      .catch(next);
   },
 
   /**
@@ -100,7 +100,7 @@ module.exports = {
       .then(function() {
         res.send({ success: true });
       })
-      .fail(next);
+      .catch(next);
   },
 
   load: function(req, id, callback) {

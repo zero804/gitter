@@ -21,5 +21,5 @@ module.exports = function(req, res, next) {
     .then(function(chatActivity) {
       res.send(chatActivity);
     })
-    .fail(next);
+    .catch(next);
 };

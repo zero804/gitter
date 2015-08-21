@@ -27,9 +27,9 @@ describe('worker-queue-redis', function() {
         }
       };
     });
+    queue.listen();
 
-    queue.invoke(data, { delay: 0 }, function() {});
-
+    queue.invoke(data, { delay: 0 });
   });
 
   it('should callback when invoked', function(done) {

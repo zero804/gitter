@@ -8,7 +8,7 @@ var shutdown = require('shutdown');
 
 var winston = require('../../server/utils/winston');
 
-require('../../server/utils/event-listeners').installLocalEventListeners();
+require('../../server/event-listeners').install();
 
 var opts = require("nomnom")
    .option('user', {

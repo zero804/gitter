@@ -5,7 +5,6 @@ var mockito = require('jsmockito').JsMockito;
 var hamcrest = require('jshamcrest').JsHamcrest;
 
 var Q = require('q');
-var mongoUtils = testRequire('./utils/mongo-utils');
 var assert = require('assert');
 
 var times = mockito.Verifiers.times;
@@ -14,7 +13,6 @@ var once = times(1);
 
 var allOf = hamcrest.Matchers.allOf;
 var anything = hamcrest.Matchers.anything;
-var hasSize = hamcrest.Matchers.hasSize;
 var hasMember = hamcrest.Matchers.hasMember;
 
 function makeHash() {
@@ -37,12 +35,21 @@ function deep(object) {
 Q.longStackSupport = true;
 
 describe('unread-item-service', function() {
-  var unreadItemService;
+  var unreadItemService, mongoUtils;
 
   before(function() {
     /* Don't send batches out */
     unreadItemService = testRequire("./services/unread-item-service");
+    mongoUtils = testRequire('./utils/mongo-utils');
     unreadItemService.testOnly.setSendBadgeUpdates(false);
+  });
+
+  after(function(done) {
+    if (process.env.DISABLE_EMAIL_NOTIFY_CLEAR_AFTER_TEST) return done();
+
+    var unreadItemServiceEngine = testRequire('./services/unread-item-service-engine');
+    unreadItemServiceEngine.testOnly.removeAllEmailNotifications()
+      .nodeify(done);
   });
 
   var blockTimer = require('../block-timer');
@@ -69,13 +76,24 @@ describe('unread-item-service', function() {
   });
 
   describe('since-filter', function() {
-    it('should do what it says on the tin', function() {
-      var underTest = unreadItemService.testOnly.sinceFilter;
-      var ids = ['51adc86e010285b469000005'];
-      var since = 1370343534500;
 
-      var filters = ids.filter(underTest(since));
-      assert.equal(filters.length, 0);
+    it('should correctly filter an array of unix timestamps given a `since` value', function() {
+      var d1 = new Date('2012-01-01T00:00:00Z').valueOf();
+      var d2 = new Date('2013-01-01T00:00:00Z').valueOf();
+      var d3 = new Date('2014-01-01T00:00:00Z').valueOf();
+      var d4 = new Date('2015-01-01T00:00:00Z').valueOf();
+
+      var o1 = mongoUtils.createIdForTimestamp(d1);
+      var o2 = mongoUtils.createIdForTimestamp(d2);
+      var o3 = mongoUtils.createIdForTimestamp(d3);
+      var underTest = unreadItemService.testOnly.sinceFilter;
+
+      var ids = [o1.toString(), o2.toString(), o3.toString()];
+
+      assert.deepEqual(ids.filter(underTest(d1)), [o1.toString(), o2.toString(), o3.toString()]);
+      assert.deepEqual(ids.filter(underTest(d2)), [o2.toString(), o3.toString()]);
+      assert.deepEqual(ids.filter(underTest(d3)), [o3.toString()]);
+      assert.deepEqual(ids.filter(underTest(d4)), []);
     });
   });
 
@@ -100,7 +118,7 @@ describe('unread-item-service', function() {
       var groupMention;
       var duplicateMention;
       var nonMemberMention;
-      var troupeNoLurkersUserHash, troupeSomeLurkersUserHash, troupeAllLurkersUserHash
+      var troupeNoLurkersUserHash, troupeSomeLurkersUserHash, troupeAllLurkersUserHash;
 
       beforeEach(function() {
         troupeId = mongoUtils.getNewObjectIdString() + "";
@@ -360,7 +378,7 @@ describe('unread-item-service', function() {
       var userService;
       var roomPermissionsModel;
       var unreadItemService;
-      var presenceService;
+      var categoriseUserInRoom;
       var troupeNoLurkers;
       var troupeSomeLurkers;
       var troupeAllLurkers;
@@ -442,15 +460,16 @@ describe('unread-item-service', function() {
         userService = mockito.mock(testRequire('./services/user-service'));
         appEvents = mockito.mock(testRequire('gitter-web-appevents'));
         roomPermissionsModel = mockito.mockFunction();
-        presenceService = {
-          categorizeUsersByOnlineStatus: function(userIds) {
-            /* Always return all users as online */
-            return Q.resolve(userIds.reduce(function(memo, userId) {
-              memo[userId] = 'online';
-              return memo;
-            }, {}));
-          }
-        };
+        categoriseUserInRoom = mockito.mockFunction();
+
+        mockito.when(categoriseUserInRoom)().then(function(roomId, userIds) {
+          /* Always return all users as online */
+          return Q.resolve(userIds.reduce(function(memo, userId) {
+            // TODO: test with some users inroom,push etc
+            memo[userId] = 'online';
+            return memo;
+          }, {}));
+        });
 
         mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId).thenReturn(Q.resolve(troupeNoLurkersUserHash));
         mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId2).thenReturn(Q.resolve(troupeSomeLurkersUserHash));
@@ -459,7 +478,7 @@ describe('unread-item-service', function() {
         unreadItemService = testRequire.withProxies("./services/unread-item-service", {
           './room-membership-service': roomMembershipService,
           './user-service': userService,
-          './presence-service': presenceService,
+          './categorise-users-in-room': categoriseUserInRoom,
           'gitter-web-appevents': appEvents,
           './room-permissions-model': roomPermissionsModel,
         });
@@ -578,7 +597,7 @@ describe('unread-item-service', function() {
       var appEvents;
       var userService;
       var roomPermissionsModel;
-      var presenceService;
+      var categoriseUserInRoom;
       var unreadItemService;
       var troupeNoLurkers;
       var troupeSomeLurkers;
@@ -661,15 +680,16 @@ describe('unread-item-service', function() {
         userService = mockito.mock(testRequire('./services/user-service'));
         appEvents = mockito.mock(testRequire('gitter-web-appevents'));
         roomPermissionsModel = mockito.mockFunction();
-        presenceService = {
-          categorizeUsersByOnlineStatus: function(userIds) {
-            /* Always return all users as online */
-            return Q.resolve(userIds.reduce(function(memo, userId) {
-              memo[userId] = 'online';
-              return memo;
-            }, {}));
-          }
-        };
+        categoriseUserInRoom = mockito.mockFunction();
+
+        mockito.when(categoriseUserInRoom)().then(function(roomId, userIds) {
+          /* Always return all users as online */
+          return Q.resolve(userIds.reduce(function(memo, userId) {
+            // TODO: test with some users inroom,push etc
+            memo[userId] = 'online';
+            return memo;
+          }, {}));
+        });
 
         mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId).thenReturn(Q.resolve(troupeNoLurkersUserHash));
         mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId2).thenReturn(Q.resolve(troupeSomeLurkersUserHash));
@@ -678,7 +698,7 @@ describe('unread-item-service', function() {
         unreadItemService = testRequire.withProxies("./services/unread-item-service", {
           './room-membership-service': roomMembershipService,
           './user-service': userService,
-          './presence-service': presenceService,
+          './categorise-users-in-room': categoriseUserInRoom,
           'gitter-web-appevents': appEvents,
           './room-permissions-model': roomPermissionsModel,
         });

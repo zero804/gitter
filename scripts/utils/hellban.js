@@ -29,9 +29,9 @@ userService.findByUsername(opts.username)
     var action = banned ? 'banned to a special kind of hell' : 'redeemed to walk amongst us again';
     console.log(opts.username, 'has been', action);
   })
-  .fail(function(err) {
+  .catch(function(err) {
     console.error(err.stack);
   })
-  .fin(function() {
+  .finally(function() {
     shutdown.shutdownGracefully();
   });

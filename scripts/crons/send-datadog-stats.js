@@ -28,7 +28,7 @@ Q.all([
 .then(function() {
   process.exit(0);
 })
-.fail(function(err) {
+.catch(function(err) {
   console.error('[datadog-counts] Something went wrong: ', err);
   process.exit(1);
 });

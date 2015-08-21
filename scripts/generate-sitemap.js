@@ -92,5 +92,4 @@ persistence.Troupe.findQ({ security: 'PUBLIC', '$or': [{'noindex': {'$exists': f
       process.exit(0);
     });
   })
-  .fail(die);
-
+  .catch(die);

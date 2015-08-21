@@ -5,7 +5,7 @@ var Q              = require('q');
 var appEvents      = require('gitter-web-appevents');
 var restSerializer = require("../../serializers/rest-serializer");
 var roomMembershipService = require('../room-membership-service');
-var presenceService = require('../presence-service');
+var presenceService = require('gitter-web-presence');
 var _              = require('underscore');
 
 function getUserDistribution(troupeId) {

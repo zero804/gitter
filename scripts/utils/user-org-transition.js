@@ -29,8 +29,7 @@ var opts = require("nomnom")
    })
    .parse();
 
-require('../../server/services/kue-workers').startWorkers();
-require('../../server/utils/event-listeners').installLocalEventListeners();
+require('../../server/event-listeners').install();
 
 function performUserToOrgTransition(usernameForConversion, firstUserUsername, dryRun) {
   var context = {};
@@ -108,7 +107,7 @@ performUserToOrgTransition(opts.username, opts['first-user'], opts['dry-run'])
   .then(function() {
     shutdown.shutdownGracefully();
   })
-  .fail(function(err) {
+  .catch(function(err) {
     console.error('Error: ' + err, err.stack);
     shutdown.shutdownGracefully(1);
   })

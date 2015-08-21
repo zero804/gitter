@@ -37,6 +37,6 @@ persistence.Troupe
   .then(function() {
     process.exit(0);
   })
-  .fail(function(err) {
+  .catch(function(err) {
     die(err);
   });

@@ -12,6 +12,6 @@ module.exports = {
       .then(function(serialized) {
         res.send(serialized);
       })
-      .fail(next);
+      .catch(next);
   }
 };

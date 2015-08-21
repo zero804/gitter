@@ -55,7 +55,7 @@ function installApi() {
           // Not yet needed var accessToken = tokenInfo.accessToken;
           done(null, user, { client: client, accessToken: accessToken });
         })
-        .fail(done);
+        .catch(done);
     }
   ));
 }
@@ -297,7 +297,7 @@ function install() {
         }
 
       })
-      .fail(function(err) {
+      .catch(function(err) {
         errorReporter(err, { oauth: "failed" });
         stats.event("oauth_profile.error");
         logger.error('Error during oauth process. Unable to obtain user profile.', err);

@@ -1,5 +1,7 @@
-"use strict";
+/* jshint node:true, unused:true */
+'use strict';
 
+var makeBenchmark = require('../make-benchmark');
 var testRequire = require('../integration/test-require');
 var mockito = require('jsmockito').JsMockito;
 
@@ -8,26 +10,21 @@ var mongoUtils = testRequire('./utils/mongo-utils');
 
 var TOTAL_USERS = 10000;
 
-/**
- * Unfortunately this has some knock on effects
- */
- suite('unread-item-service', function() {
-  // this.timeout(15000);
+var chatId;
+var troupeId;
+var fromUserId;
+var userIds;
+var roomMembershipService;
+var appEvents;
+var userService;
+var roomPermissionsModel;
+var chatWithNoMentions;
+var unreadItemService;
+var troupe;
+var troupeLurkersUserHash;
 
-  var chatId;
-  var troupeId;
-  var fromUserId;
-  var userIds;
-  var roomMembershipService;
-  var appEvents;
-  var userService;
-  var roomPermissionsModel;
-  var chatWithNoMentions;
-  var unreadItemService;
-  var troupe;
-  var troupeLurkersUserHash;
-
-  before(function() {
+makeBenchmark({
+  before: function() {
     troupeId = mongoUtils.getNewObjectIdString() + "";
     chatId = mongoUtils.getNewObjectIdString() + "";
     fromUserId = mongoUtils.getNewObjectIdString() + "";
@@ -63,16 +60,22 @@ var TOTAL_USERS = 10000;
       './room-permissions-model': roomPermissionsModel,
     });
     unreadItemService.testOnly.setSendBadgeUpdates(false);
+  },
 
-  });
+  after: function(done) {
+    if (process.env.DISABLE_EMAIL_NOTIFY_CLEAR_AFTER_TEST) return done();
 
-  bench('createChatUnreadItems#largeRoom', function(done) {
-    unreadItemService.createChatUnreadItems(fromUserId, troupe, chatWithNoMentions)
+    var unreadItemServiceEngine = testRequire('./services/unread-item-service-engine');
+    unreadItemServiceEngine.testOnly.removeAllEmailNotifications()
       .nodeify(done);
-  });
+  },
 
+  tests: {
+    'createChatUnreadItems#largeRoom': function(done) {
+      unreadItemService.createChatUnreadItems(fromUserId, troupe, chatWithNoMentions)
+        .nodeify(done);
+    }
 
-
-
+  }
 
 });
