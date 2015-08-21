@@ -31,14 +31,22 @@ function isTestId(id) {
   return id.indexOf('USER') === 0 || id.indexOf('TROUPE') === 0 || !mongoUtils.isLikeObjectId(id);
 }
 
+/**
+ * Send email notifications to users. Returns true if there were any outstanding
+ * emails in the queue
+ */
 function sendEmailNotifications(since) {
   var start = Date.now();
   if(!since) {
     since = moment().subtract('m', emailNotificationsAfterMins).valueOf();
   }
 
+  var hadEmailsInQueue;
+
   return unreadItemService.listTroupeUsersForEmailNotifications(since, timeBeforeNextEmailNotificationS)
     .then(function(userTroupeUnreadHash) {
+      hadEmailsInQueue = !!Object.keys(userTroupeUnreadHash).length;
+
       if(!filterTestValues) return userTroupeUnreadHash;
 
       /* Remove testing rubbish */
@@ -223,7 +231,7 @@ function sendEmailNotifications(since) {
 
                 count++;
                 return emailNotificationService.sendUnreadItemsNotification(user, troupeData)
-                  .fail(function(err) {
+                  .catch(function(err) {
                     if(err.gitterAction === 'logout_destroy_user_tokens') {
                       stats.event('logout_destroy_user_tokens', { userId: user.id });
 
@@ -240,6 +248,10 @@ function sendEmailNotifications(since) {
           var time = Date.now() - start;
           logger.info("Sent unread notification emails to " + count + " users in " + time + "ms");
         });
+    })
+    .then(function() {
+      /* Return whether the queue was empty or not */
+      return hadEmailsInQueue;
     });
 }
 

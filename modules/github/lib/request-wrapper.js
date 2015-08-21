@@ -20,6 +20,7 @@ function createRedisClient() {
 
   var redisConfig = _.extend({}, redisCachingConfig, {
     clientOpts: {
+      // NB: this needs to be returnBuffers if we switch to IORedis
       return_buffers: true
     }
   });

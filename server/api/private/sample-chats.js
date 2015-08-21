@@ -8,5 +8,5 @@ module.exports =  function(req, res, next) {
     .then(function(samples) {
       res.send(samples);
     })
-    .fail(next);
+    .catch(next);
 };

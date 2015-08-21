@@ -8,32 +8,22 @@ var readByService    = require("./readby-service");
 var userService      = require("./user-service");
 var roomPermissionsModel = require('./room-permissions-model');
 var appEvents        = require('gitter-web-appevents');
-var presenceService  = require("./presence-service");
-var _                = require("underscore");
+var categoriseUserInRoom  = require("./categorise-users-in-room");
+var _                = require("lodash");
 var mongoUtils       = require('../utils/mongo-utils');
 var RedisBatcher     = require('../utils/redis-batcher').RedisBatcher;
 var collections      = require('../utils/collections');
 var Q                = require('q');
-var badgeBatcher     = new RedisBatcher('badge', 300);
 var roomMembershipService = require('./room-membership-service');
+var uniqueIds        = require('mongodb-unique-ids');
+var debug            = require('debug')('gitter:unread-item-service');
 
-var sendBadgeUpdates = true;
-engine.on('badge.update', function(userId) {
-  if (!sendBadgeUpdates) return;
-  badgeBatcher.add('queue', userId);
-});
+var badgeBatcher     = new RedisBatcher('badge', 1000, batchBadgeUpdates);
 
-function sinceFilter(since) {
-  return function(id) {
-    var date = mongoUtils.getDateFromObjectId(id);
-    return date.getTime() >= since;
-  };
-
-}
-
-badgeBatcher.listen(function(key, userIds, done) {
+/* Handles batching badge updates to users */
+function batchBadgeUpdates(key, userIds, done) {
   // Remove duplicates
-  userIds = _.uniq(userIds);
+  userIds = uniqueIds(userIds);
 
   // Get responders to respond
   appEvents.batchUserBadgeCountUpdate({
@@ -41,7 +31,14 @@ badgeBatcher.listen(function(key, userIds, done) {
   });
 
   done();
-});
+}
+
+function sinceFilter(since) {
+  var sinceObjectID = mongoUtils.createIdForTimestampString(since).toString();
+  return function(id) {
+    return id >= sinceObjectID;
+  };
+}
 
 function reject(msg) {
   logger.error(msg);
@@ -61,7 +58,6 @@ function removeItem(troupeId, itemId) {
       var userIds = Object.keys(userIdsWithLurk);
 
       // Publish out an unread item removed event
-      // TODO: we could actually check whether this user thinks this item is UNREAD
       var data = { chat: [itemId] };
 
       userIds.forEach(function(userId) {
@@ -85,6 +81,10 @@ function removeItem(troupeId, itemId) {
               });
             }
 
+            if (removeResult.badgeUpdate) {
+              queueBadgeUpdateForUser(removeResult.userId);
+            }
+
           });
 
         });
@@ -101,7 +101,7 @@ function ensureAllItemsRead(userId, troupeId) {
   if(!troupeId) return reject("ensureAllItemsRead failed. troupeId required");
 
   return engine.ensureAllItemsRead(userId, troupeId)
-    .then(function() {
+    .then(function(result) {
 
       // Notify the user
       appEvents.troupeUnreadCountsChange({
@@ -110,6 +110,10 @@ function ensureAllItemsRead(userId, troupeId) {
         total: 0,
         mentions: 0
       });
+
+      if (result.badgeUpdate) {
+        queueBadgeUpdateForUser(userId);
+      }
 
     });
 }
@@ -150,6 +154,11 @@ exports.markItemsRead = function(userId, troupeId, itemIds, options) {
         });
       }
 
+      /* Do we need to send the user a badge update? */
+      if (result.badgeUpdate) {
+        queueBadgeUpdateForUser(userId);
+      }
+
       var recordAsRead = !options || options.recordAsRead === undefined ? true : options.recordAsRead;
 
       if(recordAsRead) {
@@ -167,7 +176,7 @@ exports.markAllChatsRead = function(userId, troupeId, options) {
   if(!options) options = {};
   appEvents.markAllRead({ userId: userId, troupeId: troupeId });
 
-  return exports.getUnreadItems(userId, troupeId, 'chat')
+  return exports.getUnreadItems(userId, troupeId)
     .then(function(chatIds) {
       /* If we already have everything marked as read, force all read */
       if(!chatIds.length) return ensureAllItemsRead(userId, troupeId, options);
@@ -181,20 +190,8 @@ exports.markAllChatsRead = function(userId, troupeId, options) {
     });
 };
 
-exports.getUserUnreadCounts = function(userId, troupeId) {
-  return engine.getUserUnreadCounts(userId, troupeId);
-};
-
 exports.getUserUnreadCountsForTroupeIds = function(userId, troupeIds) {
   return engine.getUserUnreadCountsForRooms(userId, troupeIds);
-};
-
-exports.getUserMentionCountsForTroupeIds = function(userId, troupeIds) {
-  return engine.getUserMentionCountsForRooms(userId, troupeIds);
-};
-
-exports.getUserMentionCounts = function(userId) {
-  return engine.getUserMentionCounts(userId);
 };
 
 exports.getUnreadItems = function(userId, troupeId) {
@@ -209,21 +206,6 @@ exports.getRoomIdsMentioningUser = function(userId) {
   return engine.getRoomsMentioningUser(userId);
 };
 
-exports.getUnreadItemsForUserTroupeSince = function(userId, troupeId, since, callback) {
-  return engine.getUnreadItems(userId, troupeId)
-    .then(function(chatItems) {
-      chatItems = chatItems.filter(sinceFilter(since));
-
-      var response = {};
-      if(chatItems.length) {
-        response.chat = chatItems;
-      }
-
-      return response;
-    })
-    .nodeify(callback);
-};
-
 exports.getFirstUnreadItem = function(userId, troupeId) {
   return engine.getUnreadItems(userId, troupeId)
     .then(function(members) {
@@ -235,19 +217,28 @@ exports.getFirstUnreadItem = function(userId, troupeId) {
     });
 };
 
-exports.getUnreadItemsForUser = function(userId, troupeId, callback) {
-  return Q.all([
-      engine.getUnreadItems(userId, troupeId),
-      engine.getMentions(userId, troupeId)
-    ])
+exports.getUnreadItemsForUser = function(userId, troupeId) {
+  return engine.getUnreadItemsAndMentions(userId, troupeId)
     .spread(function(chats, mentions) {
       return {
         chat: chats,
         mention: mentions
       };
-    })
-    .nodeify(callback);
+    });
 };
+
+/* Get unread items and mentions for a user since a particular date */
+exports.getUnreadItemsForUserTroupeSince = function(userId, troupeId, since) {
+  return engine.getUnreadItemsAndMentions(userId, troupeId)
+    .spread(function(chats, mentions) {
+
+      return [
+        chats.filter(sinceFilter(since)),
+        mentions.filter(sinceFilter(since))
+      ];
+    });
+};
+
 
 /**
  * Get the badge counts for userIds
@@ -390,13 +381,12 @@ function parseChat(fromUserId, troupe, mentions) {
     });
 }
 
-function createNewItemsForParsedChat(troupeId, chatId, parsed) {
-  return engine.newItemWithMentions(troupeId, chatId, parsed.notifyUserIds, parsed.mentionUserIds)
-    .then(function(results) {
-      var allUserIds = parsed.notifyUserIds.concat(parsed.activityOnlyUserIds);
-      return [results, presenceService.categorizeUsersByOnlineStatus(allUserIds)];
-    })
-    .spread(function(results, online) {
+function processResultsForNewItemWithMentions(troupeId, chatId, parsed, results, isEdit) {
+  debug("distributing chat notification to users");
+  var allUserIds = parsed.notifyUserIds.concat(parsed.activityOnlyUserIds);
+
+  return categoriseUserInRoom(troupeId, allUserIds)
+    .then(function(presenceStatus) {
       var mentionsHash = collections.hashArray(parsed.mentionUserIds);
 
       // Firstly, notify all the notifyNewRoomUserIds with room creation messages
@@ -404,41 +394,111 @@ function createNewItemsForParsedChat(troupeId, chatId, parsed) {
         appEvents.userMentionedInNonMemberRoom({ troupeId: troupeId, userId: userId });
       });
 
+      var userIdsForOnlineNotification = [];
+      var userIdsForOnlineNotificationWithMention = [];
+      var pushCandidates = [];
+      var pushCandidatesWithMention = [];
+
+      var newUnreadItemNoMention = { chat: [chatId] };
+      var newUnreadItemWithMention = { chat: [chatId], mention: [chatId] };
+
+      var badgeUpdateUserIds = [];
+
       // Next, notify all the users with unread count changes
       parsed.notifyUserIds.forEach(function(userId) {
-        var isOnline = online[userId];
-        var unreadCount = results[userId] && results[userId].unreadCount;
-        var mentionCount = results[userId] && results[userId].mentionCount;
 
-        // Not lurking, send them the full update
-        var updateMessage = { chat: [chatId] };
-        if (mentionsHash[userId]) {
-          updateMessage.mention = [chatId];
+        var onlineStatus = presenceStatus[userId];
+        var hasMention = mentionsHash[userId];
+
+        var userResult = results[userId];
+
+        var unreadCount;
+        var mentionCount;
+
+        if (userResult) {
+          unreadCount = userResult.unreadCount;
+          mentionCount = userResult.mentionCount;
+
+          if (userResult.badgeUpdate && onlineStatus) { /* online status null implies the user has no push notification devices */
+            badgeUpdateUserIds.push(userId);
+          }
         }
 
         /* We need to do this for all users as it's used for mobile notifications */
-        appEvents.newUnreadItem(userId, troupeId, updateMessage, isOnline);
+        switch(onlineStatus) {
+          case 'inroom':
+          case 'online':
+            var unreadItemMessage = hasMention ? newUnreadItemWithMention : newUnreadItemNoMention;
+            appEvents.newUnreadItem(userId, troupeId, unreadItemMessage, true);
 
-        // Only send out troupeUnreadCountsChange events for online users
-        if (!isOnline) return;
+            /* Not in the room, then send them a notification */
+            if (onlineStatus === 'online') {
+              var notificationQueue = hasMention ? userIdsForOnlineNotificationWithMention : userIdsForOnlineNotification;
+              notificationQueue.push(userId);
+            }
 
-        if(unreadCount >= 0 || mentionCount >= 0) {
-          // Notify the user
-          appEvents.troupeUnreadCountsChange({
-            userId: userId,
-            troupeId: troupeId,
-            total: unreadCount,
-            mentions: mentionCount
-          });
+            if(unreadCount >= 0 || mentionCount >= 0) {
+              // Notify the user
+              appEvents.troupeUnreadCountsChange({
+                userId: userId,
+                troupeId: troupeId,
+                total: unreadCount,
+                mentions: mentionCount
+              });
+            }
+            return;
+
+          case 'push':
+            var pushNotificationQueue = hasMention ? pushCandidatesWithMention : pushCandidates;
+            pushNotificationQueue.push(userId);
+            return;
+
+          /* User has already got all their push notifications */
+          case 'push_notified':
+            if (!hasMention) return; // Only notify for mention
+            pushCandidatesWithMention.push(userId);
+            return;
         }
       });
 
-      // Next, notify all the lurkers
-      parsed.activityOnlyUserIds.forEach(function(userId) {
-        if (!online[userId]) return;
+      if (!isEdit) {
+        // Next notify all the users currently online but not in this room who
+        // will receive desktop notifications
+        if (userIdsForOnlineNotification.length) {
+          appEvents.newOnlineNotification(troupeId, chatId, userIdsForOnlineNotification, false);
+        }
 
-        appEvents.newLurkActivity({ userId: userId, troupeId: troupeId });
-      });
+        // Next notify all the users currently online but not in this room who
+        // will receive desktop notifications
+        if (userIdsForOnlineNotificationWithMention.length) {
+          appEvents.newOnlineNotification(troupeId, chatId, userIdsForOnlineNotificationWithMention, true);
+        }
+
+        if (pushCandidatesWithMention.length) {
+          appEvents.newPushNotificationForChat(troupeId, chatId, pushCandidatesWithMention, true);
+        }
+
+        if (pushCandidates.length) {
+          appEvents.newPushNotificationForChat(troupeId, chatId, pushCandidates, false);
+        }
+
+        // Next, notify all the lurkers
+        // Note that this can be a very long list in a big room
+        var activityOnly = parsed.activityOnlyUserIds;
+        for(var i = 0; i < activityOnly.length; i++) {
+          var activityOnlyUserId =  activityOnly[i];
+          var activityOnlyUserIdOnlineStatus = presenceStatus[activityOnlyUserId];
+          if (!activityOnlyUserIdOnlineStatus) continue; // null === offline
+          appEvents.newLurkActivity({ userId: activityOnlyUserId, troupeId: troupeId });
+        }
+      }
+
+      /* Do we need to send the user a badge update? */
+      if (badgeUpdateUserIds.length) {
+        queueBadgeUpdateForUser(badgeUpdateUserIds);
+      }
+
+      debug("distribution of chat notification to users completed");
 
     });
 }
@@ -446,7 +506,10 @@ function createNewItemsForParsedChat(troupeId, chatId, parsed) {
 function createChatUnreadItems(fromUserId, troupe, chat) {
   return parseChat(fromUserId, troupe, chat.mentions)
     .then(function(parsed) {
-      return createNewItemsForParsedChat(troupe.id, chat.id, parsed);
+      return engine.newItemWithMentions(troupe.id, chat.id, parsed.notifyUserIds, parsed.mentionUserIds)
+        .then(function(results) {
+          return processResultsForNewItemWithMentions(troupe.id, chat.id, parsed, results, false);
+        });
     });
 }
 exports.createChatUnreadItems = createChatUnreadItems;
@@ -475,10 +538,9 @@ function generateMentionDeltaSet(parsedChat, originalMentions) {
 
   /* Arg. Underscore. We need lazy evaluation! */
   originalMentionUserIds = _.flatten(originalMentionUserIds).map(toString);
-  originalMentionUserIds = _.uniq(originalMentionUserIds);
+  originalMentionUserIds = uniqueIds(originalMentionUserIds);
 
   var mentionUserIds = parsedChat.mentionUserIds.map(toString);
-
 
   var addMentions = _.without.apply(null, [mentionUserIds].concat(originalMentionUserIds));
   var removeMentions = _.without.apply(null, [originalMentionUserIds].concat(mentionUserIds));
@@ -493,51 +555,6 @@ function generateMentionDeltaSet(parsedChat, originalMentions) {
   var addNewRoom = _.intersection(addMentions, parsedChat.notifyNewRoomUserIds.map(toString));
 
   return { addNotify: addNotify, addMentions: addMentions, addNewRoom: addNewRoom, remove: removeMentions };
-}
-
-function addUnreadItemsForUpdatedChat(troupeId, chatId, addNotifyUserIds, addMentionUserIds, addMentionsInNewRoom) {
-  return engine.newItemWithMentions(troupeId, chatId, addNotifyUserIds, addMentionUserIds)
-    .then(function(results) {
-      return [results, presenceService.categorizeUsersByOnlineStatus(addNotifyUserIds)];
-    })
-    .spread(function(results, online) {
-      var mentionsHash = collections.hashArray(addMentionUserIds);
-
-      // Firstly, notify all the notifyNewRoomUserIds with room creation messages
-      addMentionsInNewRoom.forEach(function(userId) {
-        appEvents.userMentionedInNonMemberRoom({ troupeId: troupeId, userId: userId });
-      });
-
-      // Next, notify all the users with unread count changes
-      addNotifyUserIds.forEach(function(userId) {
-        var unreadCount = results[userId] && results[userId].unreadCount;
-        var mentionCount = results[userId] && results[userId].mentionCount;
-        var isOnline = online[userId];
-
-        // Not lurking, send them the full update
-        var updateMessage = { chat: [chatId] };
-        if (mentionsHash[userId]) {
-          updateMessage.mention = [chatId];
-        }
-
-        // Not lurking, send them the full update
-        appEvents.newUnreadItem(userId, troupeId, updateMessage, isOnline);
-
-        if (!isOnline) return; // No need to send out updates to non-online users
-
-        if(unreadCount >= 0 || mentionCount >= 0) {
-          // Notify the user
-          appEvents.troupeUnreadCountsChange({
-            userId: userId,
-            troupeId: troupeId,
-            total: unreadCount,
-            mentions: mentionCount
-          });
-        }
-      });
-
-    });
-
 }
 
 function removeMentionsForUpdatedChat(troupeId, chatId, removeUserIds) {
@@ -557,6 +574,11 @@ function removeMentionsForUpdatedChat(troupeId, chatId, removeUserIds) {
             mentions: result.mentionCount
           });
         }
+
+        if (result.badgeUpdate) {
+          queueBadgeUpdateForUser(result.userId);
+        }
+
       });
     });
 }
@@ -571,14 +593,31 @@ function updateChatUnreadItems(fromUserId, troupe, chat, originalMentions) {
       var delta = generateMentionDeltaSet(parsedChat, originalMentions);
 
       // Remove first
-      return [delta, delta.remove.length && removeMentionsForUpdatedChat(troupeId, chat.id, delta.remove)];
+      return [parsedChat, delta, delta.remove.length && removeMentionsForUpdatedChat(troupeId, chat.id, delta.remove)];
     })
-    .spread(function(delta) {
-      // Add second
-      return delta.addNotify.length && addUnreadItemsForUpdatedChat(troupeId, chat.id, delta.addNotify, delta.addMentions, delta.addNewRoom);
+    .spread(function(parsedChat, delta) {
+      if (!delta.addNotify.length) return;
+
+      // Add additional mentions
+      return engine.newItemWithMentions(troupeId, chat.id, delta.addNotify, delta.addMentions, delta.addNewRoom)
+        .then(function(results) {
+          return processResultsForNewItemWithMentions(troupeId, chat.id, parsedChat, results, true);
+        });
     });
 }
 exports.updateChatUnreadItems = updateChatUnreadItems;
+
+var sendBadgeUpdates = true;
+function queueBadgeUpdateForUser(userIds) {
+  if (!sendBadgeUpdates) return;
+  var len = Array.isArray(userIds) ? userIds.length : 1;
+  debug("Batching badge update for %s users", len);
+  badgeBatcher.add('queue', userIds);
+}
+
+exports.listen = function() {
+  badgeBatcher.listen();
+};
 
 exports.testOnly = {
   setSendBadgeUpdates: function(value) {

@@ -4,7 +4,6 @@ var testRequire = require('./test-require');
 var Q           = require("q");
 var persistence = testRequire("./services/persistence-service");
 var debug       = require('debug')('gitter:test-fixtures');
-
 var counter = 0;
 
 function generateEmail() {
@@ -49,11 +48,12 @@ function createBaseFixture() {
       var self = this;
 
       var count = 0;
+
       return Q.all(Object.keys(this).map(function(key) {
           var o = self[key];
-          if(o.removeQ) {
+          if(typeof o.remove === 'function') {
             count++;
-            return o.removeQ();
+            return o.removeQ().timeout(1000);
           }
         }))
         .then(function() {

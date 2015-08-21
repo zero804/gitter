@@ -3,10 +3,8 @@
 var Marionette = require('backbone.marionette');
 var orgTemplate = require('./tmpl/home-org-view.hbs');
 var orgListItemTemplate = require('./tmpl/homeOrgListItem.hbs');
-var appEvents = require('utils/appevents');
 
 module.exports = (function() {
-
 
   var OrgItemView = Marionette.ItemView.extend({
     tagName: 'li',
@@ -17,14 +15,6 @@ module.exports = (function() {
     },
     serializeData: function() {
       return this.model.toJSON();
-    },
-    events: {
-      click: 'navigate'
-    },
-    navigate: function() {
-      var name = this.model.get('name');
-      var url = '/' + name;
-      appEvents.trigger('navigation', url, 'chat', name);
     }
   });
 
@@ -36,8 +26,6 @@ module.exports = (function() {
       header: '#org-list-header'
     },
     childViewContainer: "#org-list-items",
-    // tagName: 'ul',
-    // className: 'suggested-room-list',
     template: orgTemplate,
     childView: OrgItemView,
     onRender: function() {

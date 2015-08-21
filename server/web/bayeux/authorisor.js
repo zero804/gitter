@@ -4,7 +4,7 @@ var env               = require('gitter-web-env');
 var logger            = env.logger;
 var stats             = env.stats;
 
-var presenceService   = require('../../services/presence-service');
+var presenceService   = require('gitter-web-presence');
 var restful           = require('../../services/restful');
 var mongoUtils        = require('../../utils/mongo-utils');
 var StatusError       = require('statuserror');

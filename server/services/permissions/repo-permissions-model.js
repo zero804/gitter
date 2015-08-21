@@ -112,7 +112,7 @@ module.exports = function repoPermissionsModel(user, right, uri, security) {
         // GitHub call failed and may be down.
         // We can fall back to whether the user is already in the room
         return githubFailurePermissionsModel(user, right, uri, security)
-          .fail(function(nextError) {
+          .catch(function(nextError) {
             winston.warn('Unable to process offline permissions: ' + nextError, { exception: nextError });
 
             throw err; // Throw the original error

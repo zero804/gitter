@@ -13,7 +13,7 @@ var Q = require('q');
 var qlimit = require('qlimit');
 var limit = qlimit(1);
 
-require('../../server/utils/event-listeners').installLocalEventListeners();
+require('../../server/event-listeners').install();
 
 var opts = require("nomnom")
    .option('old', {

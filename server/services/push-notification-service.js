@@ -2,19 +2,12 @@
 "use strict";
 
 var PushNotificationDevice = require("./persistence-service").PushNotificationDevice;
-var nconf                  = require('../utils/config');
 var crypto                 = require('crypto');
-var _                      = require('underscore');
 var Q                      = require('q');
-var redis                  = require("../utils/redis");
 var mongoUtils             = require('../utils/mongo-utils');
-var redisClient            = redis.getClient();
-var debug                  = require('debug')('push-notification-service');
-var Scripto                = require('gitter-redis-scripto');
-var scriptManager          = new Scripto(redisClient);
-scriptManager.loadFromDir(__dirname + '/../../redis-lua/notify');
-
-var minimumUserAlertIntervalS = nconf.get("notifications:minimumUserAlertInterval");
+var debug                  = require('debug')('gitter:push-notification-service');
+var uniqueIds              = require('mongodb-unique-ids');
+var _                      = require('lodash');
 
 function buffersEqual(a,b) {
   if (!Buffer.isBuffer(a)) return undefined;
@@ -141,15 +134,16 @@ function expireCachedUsersWithDevices() {
 exports.findUsersWithDevices = function(userIds, callback) {
   return getCachedUsersWithDevices()
     .then(function(usersWithDevices) {
-      return userIds.filter(function(userId) {
-        return usersWithDevices[userId]; // Only true if the user has a device...
+      return _.filter(userIds, function(userId) {
+        // Only true if the user has a device...
+        return usersWithDevices[userId];
       });
     })
     .nodeify(callback);
 };
 
 exports.findEnabledDevicesForUsers = function(userIds, callback) {
-  userIds = mongoUtils.asObjectIDs(_.uniq(userIds));
+  userIds = mongoUtils.asObjectIDs(uniqueIds(userIds));
   return PushNotificationDevice
     .where('userId')['in'](userIds)
     .or([ { enabled: true }, { enabled: { $exists: false } } ]) // Exists false === enabled for old devices
@@ -164,63 +158,6 @@ exports.findDeviceForDeviceId = function(deviceId, callback) {
   return PushNotificationDevice
     .findOneQ({ deviceId: deviceId })
     .nodeify(callback);
-};
-
-exports.findUsersTroupesAcceptingNotifications = function(userTroupes, callback) {
-
-  var multi = redisClient.multi();
-  userTroupes.forEach(function(userTroupes) {
-    var userId = userTroupes.userId;
-    var troupeId = userTroupes.troupeId;
-    multi.exists("nl:" + userId + ':' + troupeId); // notification 1 sent
-    multi.exists("nls:" + userId + ':' + troupeId); // awaiting timeout before sending note2
-  });
-
-  multi.exec(function(err, replies) {
-    if(err) return callback(err);
-
-    var response = userTroupes.map(function(userTroupe, i) {
-      var globalLock = replies[i * 2];
-      var segmentLock = replies[i * 2 + 1];
-
-      return {
-        userId: userTroupe.userId,
-        troupeId: userTroupe.troupeId,
-        accepting: !globalLock || !segmentLock // Either the user doesn't have a global notification lock or a segment notification lock
-      };
-    });
-
-    callback(null, response);
-  });
-};
-
-exports.resetNotificationsForUserTroupe = function(userId, troupeId, callback) {
-  redisClient.del("nl:" + userId + ':' + troupeId, "nls:" + userId + ':' + troupeId, callback);
-};
-
-
-// Returns callback(err, notificationNumber)
-exports.canLockForNotification = function(userId, troupeId, startTime, callback) {
-  var keys = ['nl:' + userId + ':' + troupeId, 'nls:' + userId + ':' + troupeId ];
-  var values = [startTime, minimumUserAlertIntervalS];
-
-  scriptManager.run('notify-lock-user-troupe', keys, values, function(err, result) {
-    if(err) return callback(err);
-
-    return callback(null, result);
-  });
-};
-
-// Returns callback(err, falsey value or { startTime: Y }])
-exports.canUnlockForNotification = function (userId, troupeId, notificationNumber, callback) {
-  var keys = ['nl:' + userId + ':' + troupeId, 'nls:' + userId + ':' + troupeId ];
-  var values = [notificationNumber];
-
-  scriptManager.run('notify-unlock-user-troupe', keys, values, function(err, result) {
-    if(err) return callback(err);
-
-    return callback(null, result ? parseInt(result, 10) : 0);
-  });
 };
 
 exports.testOnly = {
