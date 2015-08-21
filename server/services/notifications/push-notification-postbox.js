@@ -18,6 +18,7 @@ var notificationWindowPeriods = [
 /* 10 second window for users on mention */
 var mentionNotificationWindowPeriod = 10000;
 var maxNotificationsForMentions = 10;
+var maxNotificationsForNonMentions = notificationWindowPeriods.length;
 
 // This queue is responsible to taking notifications and deciding which users to forward them on to
 var pushNotificationFilterQueue = workerQueue.queue('push-notifications-filter', {}, function() {
@@ -81,30 +82,27 @@ function filterNotificationsForPush(troupeId, chatId, userIds, mentioned) {
           return;
         }
 
+        var maxLocks = mentioned ? maxNotificationsForMentions : maxNotificationsForNonMentions;
+
         // TODO: bulk version of this method please
-        return pushNotificationFilter.canLockForNotification(userId, troupeId, chatTime)
+        return pushNotificationFilter.canLockForNotification(userId, troupeId, chatTime, maxLocks)
           .then(function(notificationNumber) {
             if(!notificationNumber) {
-              // TODO: consider cancelling the current lock on mentions and creating a
+              // TODO: For mentions: consider cancelling the current lock on mentions and creating a
               // new one as if we're in the 60 second window period, we'll need to
               // wait until the end of the window before sending the mention
-              debug('User troupe already has notification queued. Skipping');
+              debug('Unable to obtain a lock (max=%s) for user %s in troupe %s. Will not notify', maxLocks, userId, troupeId);
               return;
             }
 
             var delay;
             if (mentioned) {
-              if (notificationNumber > maxNotificationsForMentions) {
-                debug("User has receieved too many mention push notifications");
-                return;
-              }
-
               /* Send the notification to the user very shortly */
               delay = mentionNotificationWindowPeriod;
             } else {
               delay = notificationWindowPeriods[notificationNumber - 1];
               if(!delay) {
-                debug("User has already gotten two notifications, that's enough. Skipping");
+                debug("Obtained a lock in excess of the maximum lock number of %s", maxLocks);
                 return;
               }
             }

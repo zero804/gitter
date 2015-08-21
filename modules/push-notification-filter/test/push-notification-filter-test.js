@@ -24,7 +24,7 @@ describe('push-notification-filter', function() {
     it('should filter users who have received notifications', function(done) {
       var userId1 = 'TEST_USER1_' + Date.now();
       var troupeId = 'TEST_TROUPE1_' + Date.now();
-
+      var MAX_LOCK_VALUE = 2;
       var startTime1 = Date.now();
       var startTime2;
 
@@ -33,7 +33,7 @@ describe('push-notification-filter', function() {
           assert.deepEqual(result, [userId1]); // Notify
         })
         .then(function() {
-          return pushNotificationFilter.canLockForNotification(userId1, troupeId, startTime1);
+          return pushNotificationFilter.canLockForNotification(userId1, troupeId, startTime1, MAX_LOCK_VALUE);
         })
         .then(function(locked) {
           assert.equal(locked, 1);
@@ -52,7 +52,7 @@ describe('push-notification-filter', function() {
           assert.deepEqual(result, [userId1]); // Notify
           // Second notification
           startTime2 = Date.now();
-          return pushNotificationFilter.canLockForNotification(userId1, troupeId, Date.now());
+          return pushNotificationFilter.canLockForNotification(userId1, troupeId, Date.now(), MAX_LOCK_VALUE);
         })
         .then(function(locked) {
           assert.equal(locked, 2);
@@ -78,11 +78,13 @@ describe('push-notification-filter', function() {
       var userId = 'TEST_USER1_' + Date.now();
       var troupeId = 'TEST_TROUPE1_' + Date.now();
       var startTime = Date.now();
+      var MAX_LOCK_VALUE = 2;
+      var MAX_LOCK_VALUE_MENTIONS = 3;
 
-      return pushNotificationFilter.canLockForNotification(userId, troupeId, startTime)
+      return pushNotificationFilter.canLockForNotification(userId, troupeId, startTime, MAX_LOCK_VALUE)
         .then(function(locked) {
           assert.equal(locked, 1);
-          return pushNotificationFilter.canLockForNotification(userId, troupeId, startTime);
+          return pushNotificationFilter.canLockForNotification(userId, troupeId, startTime, MAX_LOCK_VALUE);
         })
         .then(function(locked) {
           assert.equal(locked, 0);
@@ -96,9 +98,7 @@ describe('push-notification-filter', function() {
         })
         .then(function(st) {
           assert.equal(st, 0);
-          startTime = Date.now();
-
-          return pushNotificationFilter.canLockForNotification(userId, troupeId, startTime);
+          return pushNotificationFilter.canLockForNotification(userId, troupeId, startTime, MAX_LOCK_VALUE);
         })
         .then(function(locked) {
           assert.equal(locked,2);
@@ -109,11 +109,14 @@ describe('push-notification-filter', function() {
           assert.equal(st, startTime);
           startTime = Date.now();
 
-          return pushNotificationFilter.canLockForNotification(userId, troupeId, startTime);
+          return pushNotificationFilter.canLockForNotification(userId, troupeId, startTime, MAX_LOCK_VALUE);
+        })
+        .then(function(locked) {
+          assert.equal(locked, 0);
+          return pushNotificationFilter.canLockForNotification(userId, troupeId, startTime, MAX_LOCK_VALUE_MENTIONS);
         })
         .then(function(locked) {
           assert.equal(locked, 3);
-
           return pushNotificationFilter.canUnlockForNotification(userId, troupeId, 3);
         })
         .then(function(st) {
@@ -127,10 +130,11 @@ describe('push-notification-filter', function() {
       var userId = 'TEST_USER1_' + Date.now();
       var troupeId = 'TEST_TROUPE1_' + Date.now();
       var startTime = Date.now();
+      var MAX_LOCK_VALUE = 2;
 
       return pushNotificationFilter.resetNotificationsForUserTroupe(userId, troupeId)
         .then(function() {
-          return pushNotificationFilter.canLockForNotification(userId, troupeId, startTime);
+          return pushNotificationFilter.canLockForNotification(userId, troupeId, startTime, MAX_LOCK_VALUE);
         })
         .then(function(locked) {
           assert.equal(locked, 1);
@@ -138,7 +142,7 @@ describe('push-notification-filter', function() {
           return pushNotificationFilter.resetNotificationsForUserTroupe(userId, troupeId);
         })
         .then(function() {
-          return pushNotificationFilter.canLockForNotification(userId, troupeId, startTime);
+          return pushNotificationFilter.canLockForNotification(userId, troupeId, startTime, MAX_LOCK_VALUE);
         })
         .then(function(locked) {
           assert.equal(locked, 1);
@@ -160,9 +164,10 @@ describe('push-notification-filter', function() {
     var userId = 'TEST_USER1_' + Date.now();
     var troupeId = 'TEST_TROUPE1_' + Date.now();
     var startTime = Date.now();
+    var MAX_LOCK_VALUE = 2;
 
     var t1;
-    return pushNotificationFilter.canLockForNotification(userId, troupeId, startTime)
+    return pushNotificationFilter.canLockForNotification(userId, troupeId, startTime, MAX_LOCK_VALUE)
       .then(function() {
         return [
           pushNotificationFilter.testOnly.redisClient.pttl('nl:' + userId + ':' + troupeId),
@@ -185,7 +190,7 @@ describe('push-notification-filter', function() {
 
       .spread(function(ttl1, exists) {
         assert(ttl1 > 0);
-        assert(ttl1 <  t1); // Check that the expiry on the key has not been reset. 
+        assert(ttl1 <  t1); // Check that the expiry on the key has not been reset.
 
         assert.strictEqual(exists, 0);
 
