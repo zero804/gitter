@@ -14,4 +14,3 @@ else
 		return segment_start_time
 	end
 end
-
