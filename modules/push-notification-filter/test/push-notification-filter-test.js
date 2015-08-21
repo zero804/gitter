@@ -161,28 +161,33 @@ describe('push-notification-filter', function() {
     var troupeId = 'TEST_TROUPE1_' + Date.now();
     var startTime = Date.now();
 
+    var t1;
     return pushNotificationFilter.canLockForNotification(userId, troupeId, startTime)
       .then(function() {
         return [
-          pushNotificationFilter.testOnly.redisClient.ttl('nl:' + userId + ':' + troupeId),
-          pushNotificationFilter.testOnly.redisClient.ttl('nl:' + userId + ':' + troupeId)
+          pushNotificationFilter.testOnly.redisClient.pttl('nl:' + userId + ':' + troupeId),
+          pushNotificationFilter.testOnly.redisClient.pttl('nls:' + userId + ':' + troupeId)
         ];
       })
       .spread(function(ttl1, ttl2) {
         assert(ttl1 > 0);
         assert(ttl2 > 0);
+        t1 = ttl1;
 
         return pushNotificationFilter.canUnlockForNotification(userId, troupeId, 1);
       })
       .then(function() {
         return [
-          pushNotificationFilter.testOnly.redisClient.ttl('nl:' + userId + ':' + troupeId),
-          pushNotificationFilter.testOnly.redisClient.ttl('nl:' + userId + ':' + troupeId)
+          pushNotificationFilter.testOnly.redisClient.pttl('nl:' + userId + ':' + troupeId),
+          pushNotificationFilter.testOnly.redisClient.exists('nls:' + userId + ':' + troupeId)
         ];
       })
-      .spread(function(ttl1, ttl2) {
+
+      .spread(function(ttl1, exists) {
         assert(ttl1 > 0);
-        assert(ttl2 > 0);
+        assert(ttl1 <  t1); // Check that the expiry on the key has not been reset. 
+
+        assert.strictEqual(exists, 0);
 
         return pushNotificationFilter.canUnlockForNotification(userId, troupeId, 1);
       })
