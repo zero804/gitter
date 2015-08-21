@@ -25,6 +25,8 @@ var extractGravatarVersion = require('../utils/extract-gravatar-version');
 var emailAddressService    = require('../services/email-address-service');
 var userSettingsService    = require('../services/user-settings-service');
 
+var debug                  = require('debug')('gitter:passport');
+
 function installApi() {
   /**
    * BearerStrategy
@@ -242,12 +244,12 @@ function install() {
                 githubUserAgeHours = duration.asHours();
               }
 
-              logger.verbose('About to create GitHub user ', githubUser);
+              debug('About to create GitHub user %j', githubUser);
 
               userService.findOrCreateUserForGithubId(githubUser, function(err, user) {
                 if (err) return done(err);
 
-                logger.verbose('Created GitHub user ', user.toObject());
+                debug('Created GitHub user %j', user.toObject());
 
                 // Save the locale of the new user
                 if (req.i18n && req.i18n.locale) {
