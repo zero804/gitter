@@ -63,6 +63,11 @@
         }
       }
     },
+    "bluebird": {
+      "version": "2.9.34",
+      "from": "bluebird@>=2.9.34 <3.0.0",
+      "resolved": "http://beta-internal:4873/bluebird/-/bluebird-2.9.34.tgz"
+    },
     "body-parser": {
       "version": "1.13.3",
       "from": "http://beta-internal:4873/body-parser/-/body-parser-1.13.3.tgz",
@@ -1485,22 +1490,22 @@
     },
     "gitter-services": {
       "version": "1.13.0",
-      "from": "git+https://github.com/gitterHQ/services.git#e08765b1685153e662d1b3cbaacbb1a8b2e122d1",
+      "from": "git+https://github.com/gitterHQ/services.git#1.13.0",
       "resolved": "git+https://github.com/gitterHQ/services.git#e08765b1685153e662d1b3cbaacbb1a8b2e122d1",
       "dependencies": {
         "require-all": {
           "version": "0.0.8",
-          "from": "https://registry.npmjs.org/require-all/-/require-all-0.0.8.tgz",
+          "from": "require-all@0.0.8",
           "resolved": "https://registry.npmjs.org/require-all/-/require-all-0.0.8.tgz"
         },
         "qs": {
           "version": "1.2.2",
-          "from": "http://beta-internal:4873/qs/-/qs-1.2.2.tgz",
+          "from": "qs@>=1.0.0 <2.0.0",
           "resolved": "http://beta-internal:4873/qs/-/qs-1.2.2.tgz"
         },
         "extend": {
           "version": "1.3.0",
-          "from": "http://beta-internal:4873/extend/-/extend-1.3.0.tgz",
+          "from": "extend@>=1.2.1 <2.0.0",
           "resolved": "http://beta-internal:4873/extend/-/extend-1.3.0.tgz"
         }
       }
@@ -1525,6 +1530,16 @@
       "from": "modules/github",
       "resolved": "file:modules/github"
     },
+    "gitter-web-presence": {
+      "version": "1.0.0",
+      "from": "modules/presence",
+      "resolved": "file:modules/presence"
+    },
+    "gitter-web-push-notification-filter": {
+      "version": "1.0.0",
+      "from": "modules/push-notification-filter",
+      "resolved": "file:modules/push-notification-filter"
+    },
     "gitter-web-shared": {
       "version": "1.0.0",
       "from": "shared",
@@ -1539,6 +1554,337 @@
       "version": "1.0.0",
       "from": "modules/suggestions",
       "resolved": "file:modules/suggestions"
+    },
+    "gulp-util": {
+      "version": "3.0.6",
+      "from": "gulp-util@>=3.0.1 <4.0.0",
+      "resolved": "http://beta-internal:4873/gulp-util/-/gulp-util-3.0.6.tgz",
+      "dependencies": {
+        "array-differ": {
+          "version": "1.0.0",
+          "from": "array-differ@>=1.0.0 <2.0.0",
+          "resolved": "http://beta-internal:4873/array-differ/-/array-differ-1.0.0.tgz"
+        },
+        "array-uniq": {
+          "version": "1.0.2",
+          "from": "array-uniq@>=1.0.2 <2.0.0",
+          "resolved": "http://beta-internal:4873/array-uniq/-/array-uniq-1.0.2.tgz"
+        },
+        "beeper": {
+          "version": "1.1.0",
+          "from": "beeper@>=1.0.0 <2.0.0",
+          "resolved": "http://beta-internal:4873/beeper/-/beeper-1.1.0.tgz"
+        },
+        "chalk": {
+          "version": "1.1.1",
+          "from": "chalk@>=1.0.0 <2.0.0",
+          "resolved": "http://beta-internal:4873/chalk/-/chalk-1.1.1.tgz",
+          "dependencies": {
+            "ansi-styles": {
+              "version": "2.1.0",
+              "from": "ansi-styles@>=2.1.0 <3.0.0",
+              "resolved": "http://beta-internal:4873/ansi-styles/-/ansi-styles-2.1.0.tgz"
+            },
+            "escape-string-regexp": {
+              "version": "1.0.3",
+              "from": "escape-string-regexp@>=1.0.2 <2.0.0",
+              "resolved": "http://beta-internal:4873/escape-string-regexp/-/escape-string-regexp-1.0.3.tgz"
+            },
+            "has-ansi": {
+              "version": "2.0.0",
+              "from": "has-ansi@>=2.0.0 <3.0.0",
+              "resolved": "http://beta-internal:4873/has-ansi/-/has-ansi-2.0.0.tgz",
+              "dependencies": {
+                "ansi-regex": {
+                  "version": "2.0.0",
+                  "from": "ansi-regex@>=2.0.0 <3.0.0",
+                  "resolved": "http://beta-internal:4873/ansi-regex/-/ansi-regex-2.0.0.tgz"
+                }
+              }
+            },
+            "strip-ansi": {
+              "version": "3.0.0",
+              "from": "strip-ansi@>=3.0.0 <4.0.0",
+              "resolved": "http://beta-internal:4873/strip-ansi/-/strip-ansi-3.0.0.tgz",
+              "dependencies": {
+                "ansi-regex": {
+                  "version": "2.0.0",
+                  "from": "ansi-regex@>=2.0.0 <3.0.0",
+                  "resolved": "http://beta-internal:4873/ansi-regex/-/ansi-regex-2.0.0.tgz"
+                }
+              }
+            },
+            "supports-color": {
+              "version": "2.0.0",
+              "from": "supports-color@>=2.0.0 <3.0.0",
+              "resolved": "http://beta-internal:4873/supports-color/-/supports-color-2.0.0.tgz"
+            }
+          }
+        },
+        "dateformat": {
+          "version": "1.0.11",
+          "from": "dateformat@>=1.0.11 <2.0.0",
+          "resolved": "http://beta-internal:4873/dateformat/-/dateformat-1.0.11.tgz",
+          "dependencies": {
+            "get-stdin": {
+              "version": "4.0.1",
+              "from": "get-stdin@*",
+              "resolved": "http://beta-internal:4873/get-stdin/-/get-stdin-4.0.1.tgz"
+            },
+            "meow": {
+              "version": "3.3.0",
+              "from": "meow@*",
+              "resolved": "http://beta-internal:4873/meow/-/meow-3.3.0.tgz",
+              "dependencies": {
+                "camelcase-keys": {
+                  "version": "1.0.0",
+                  "from": "camelcase-keys@>=1.0.0 <2.0.0",
+                  "resolved": "http://beta-internal:4873/camelcase-keys/-/camelcase-keys-1.0.0.tgz",
+                  "dependencies": {
+                    "camelcase": {
+                      "version": "1.2.1",
+                      "from": "camelcase@>=1.0.1 <2.0.0",
+                      "resolved": "https://registry.npmjs.org/camelcase/-/camelcase-1.2.1.tgz"
+                    },
+                    "map-obj": {
+                      "version": "1.0.1",
+                      "from": "map-obj@>=1.0.0 <2.0.0",
+                      "resolved": "http://beta-internal:4873/map-obj/-/map-obj-1.0.1.tgz"
+                    }
+                  }
+                },
+                "indent-string": {
+                  "version": "1.2.2",
+                  "from": "indent-string@>=1.1.0 <2.0.0",
+                  "resolved": "http://beta-internal:4873/indent-string/-/indent-string-1.2.2.tgz",
+                  "dependencies": {
+                    "repeating": {
+                      "version": "1.1.3",
+                      "from": "repeating@>=1.1.0 <2.0.0",
+                      "resolved": "http://beta-internal:4873/repeating/-/repeating-1.1.3.tgz",
+                      "dependencies": {
+                        "is-finite": {
+                          "version": "1.0.1",
+                          "from": "is-finite@>=1.0.0 <2.0.0",
+                          "resolved": "http://beta-internal:4873/is-finite/-/is-finite-1.0.1.tgz",
+                          "dependencies": {
+                            "number-is-nan": {
+                              "version": "1.0.0",
+                              "from": "number-is-nan@>=1.0.0 <2.0.0",
+                              "resolved": "http://beta-internal:4873/number-is-nan/-/number-is-nan-1.0.0.tgz"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "lodash._reescape": {
+          "version": "3.0.0",
+          "from": "lodash._reescape@>=3.0.0 <4.0.0",
+          "resolved": "http://beta-internal:4873/lodash._reescape/-/lodash._reescape-3.0.0.tgz"
+        },
+        "lodash._reevaluate": {
+          "version": "3.0.0",
+          "from": "lodash._reevaluate@>=3.0.0 <4.0.0",
+          "resolved": "http://beta-internal:4873/lodash._reevaluate/-/lodash._reevaluate-3.0.0.tgz"
+        },
+        "lodash._reinterpolate": {
+          "version": "3.0.0",
+          "from": "lodash._reinterpolate@>=3.0.0 <4.0.0",
+          "resolved": "http://beta-internal:4873/lodash._reinterpolate/-/lodash._reinterpolate-3.0.0.tgz"
+        },
+        "lodash.template": {
+          "version": "3.6.2",
+          "from": "lodash.template@>=3.0.0 <4.0.0",
+          "resolved": "http://beta-internal:4873/lodash.template/-/lodash.template-3.6.2.tgz",
+          "dependencies": {
+            "lodash._basecopy": {
+              "version": "3.0.1",
+              "from": "lodash._basecopy@>=3.0.0 <4.0.0",
+              "resolved": "http://beta-internal:4873/lodash._basecopy/-/lodash._basecopy-3.0.1.tgz"
+            },
+            "lodash._basetostring": {
+              "version": "3.0.1",
+              "from": "lodash._basetostring@>=3.0.0 <4.0.0",
+              "resolved": "http://beta-internal:4873/lodash._basetostring/-/lodash._basetostring-3.0.1.tgz"
+            },
+            "lodash._basevalues": {
+              "version": "3.0.0",
+              "from": "lodash._basevalues@>=3.0.0 <4.0.0",
+              "resolved": "http://beta-internal:4873/lodash._basevalues/-/lodash._basevalues-3.0.0.tgz"
+            },
+            "lodash._isiterateecall": {
+              "version": "3.0.9",
+              "from": "lodash._isiterateecall@>=3.0.0 <4.0.0",
+              "resolved": "http://beta-internal:4873/lodash._isiterateecall/-/lodash._isiterateecall-3.0.9.tgz"
+            },
+            "lodash.escape": {
+              "version": "3.0.0",
+              "from": "lodash.escape@>=3.0.0 <4.0.0",
+              "resolved": "http://beta-internal:4873/lodash.escape/-/lodash.escape-3.0.0.tgz"
+            },
+            "lodash.keys": {
+              "version": "3.1.2",
+              "from": "lodash.keys@>=3.0.0 <4.0.0",
+              "resolved": "http://beta-internal:4873/lodash.keys/-/lodash.keys-3.1.2.tgz",
+              "dependencies": {
+                "lodash._getnative": {
+                  "version": "3.9.1",
+                  "from": "lodash._getnative@>=3.0.0 <4.0.0",
+                  "resolved": "http://beta-internal:4873/lodash._getnative/-/lodash._getnative-3.9.1.tgz"
+                },
+                "lodash.isarguments": {
+                  "version": "3.0.4",
+                  "from": "lodash.isarguments@>=3.0.0 <4.0.0",
+                  "resolved": "http://beta-internal:4873/lodash.isarguments/-/lodash.isarguments-3.0.4.tgz"
+                },
+                "lodash.isarray": {
+                  "version": "3.0.4",
+                  "from": "lodash.isarray@>=3.0.0 <4.0.0",
+                  "resolved": "http://beta-internal:4873/lodash.isarray/-/lodash.isarray-3.0.4.tgz"
+                }
+              }
+            },
+            "lodash.restparam": {
+              "version": "3.6.1",
+              "from": "lodash.restparam@>=3.0.0 <4.0.0",
+              "resolved": "http://beta-internal:4873/lodash.restparam/-/lodash.restparam-3.6.1.tgz"
+            },
+            "lodash.templatesettings": {
+              "version": "3.1.0",
+              "from": "lodash.templatesettings@>=3.0.0 <4.0.0",
+              "resolved": "http://beta-internal:4873/lodash.templatesettings/-/lodash.templatesettings-3.1.0.tgz"
+            }
+          }
+        },
+        "minimist": {
+          "version": "1.1.3",
+          "from": "minimist@>=1.1.0 <2.0.0",
+          "resolved": "https://registry.npmjs.org/minimist/-/minimist-1.1.3.tgz"
+        },
+        "multipipe": {
+          "version": "0.1.2",
+          "from": "multipipe@>=0.1.2 <0.2.0",
+          "resolved": "http://beta-internal:4873/multipipe/-/multipipe-0.1.2.tgz",
+          "dependencies": {
+            "duplexer2": {
+              "version": "0.0.2",
+              "from": "duplexer2@0.0.2",
+              "resolved": "https://registry.npmjs.org/duplexer2/-/duplexer2-0.0.2.tgz",
+              "dependencies": {
+                "readable-stream": {
+                  "version": "1.1.13",
+                  "from": "readable-stream@>=1.1.9 <1.2.0",
+                  "resolved": "http://beta-internal:4873/readable-stream/-/readable-stream-1.1.13.tgz",
+                  "dependencies": {
+                    "core-util-is": {
+                      "version": "1.0.1",
+                      "from": "core-util-is@>=1.0.0 <1.1.0",
+                      "resolved": "http://beta-internal:4873/core-util-is/-/core-util-is-1.0.1.tgz"
+                    },
+                    "isarray": {
+                      "version": "0.0.1",
+                      "from": "isarray@0.0.1",
+                      "resolved": "http://beta-internal:4873/isarray/-/isarray-0.0.1.tgz"
+                    },
+                    "string_decoder": {
+                      "version": "0.10.31",
+                      "from": "string_decoder@>=0.10.0 <0.11.0",
+                      "resolved": "http://beta-internal:4873/string_decoder/-/string_decoder-0.10.31.tgz"
+                    },
+                    "inherits": {
+                      "version": "2.0.1",
+                      "from": "inherits@>=2.0.1 <2.1.0",
+                      "resolved": "http://beta-internal:4873/inherits/-/inherits-2.0.1.tgz"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "object-assign": {
+          "version": "3.0.0",
+          "from": "object-assign@>=3.0.0 <4.0.0",
+          "resolved": "http://beta-internal:4873/object-assign/-/object-assign-3.0.0.tgz"
+        },
+        "replace-ext": {
+          "version": "0.0.1",
+          "from": "replace-ext@0.0.1",
+          "resolved": "https://registry.npmjs.org/replace-ext/-/replace-ext-0.0.1.tgz"
+        },
+        "through2": {
+          "version": "2.0.0",
+          "from": "through2@>=2.0.0 <3.0.0",
+          "resolved": "http://beta-internal:4873/through2/-/through2-2.0.0.tgz",
+          "dependencies": {
+            "readable-stream": {
+              "version": "2.0.2",
+              "from": "readable-stream@>=2.0.0 <2.1.0",
+              "resolved": "http://beta-internal:4873/readable-stream/-/readable-stream-2.0.2.tgz",
+              "dependencies": {
+                "core-util-is": {
+                  "version": "1.0.1",
+                  "from": "core-util-is@>=1.0.0 <1.1.0",
+                  "resolved": "http://beta-internal:4873/core-util-is/-/core-util-is-1.0.1.tgz"
+                },
+                "inherits": {
+                  "version": "2.0.1",
+                  "from": "inherits@>=2.0.1 <2.1.0",
+                  "resolved": "http://beta-internal:4873/inherits/-/inherits-2.0.1.tgz"
+                },
+                "isarray": {
+                  "version": "0.0.1",
+                  "from": "isarray@0.0.1",
+                  "resolved": "http://beta-internal:4873/isarray/-/isarray-0.0.1.tgz"
+                },
+                "process-nextick-args": {
+                  "version": "1.0.2",
+                  "from": "process-nextick-args@>=1.0.0 <1.1.0",
+                  "resolved": "http://beta-internal:4873/process-nextick-args/-/process-nextick-args-1.0.2.tgz"
+                },
+                "string_decoder": {
+                  "version": "0.10.31",
+                  "from": "string_decoder@>=0.10.0 <0.11.0",
+                  "resolved": "http://beta-internal:4873/string_decoder/-/string_decoder-0.10.31.tgz"
+                },
+                "util-deprecate": {
+                  "version": "1.0.1",
+                  "from": "util-deprecate@>=1.0.1 <1.1.0",
+                  "resolved": "http://beta-internal:4873/util-deprecate/-/util-deprecate-1.0.1.tgz"
+                }
+              }
+            },
+            "xtend": {
+              "version": "4.0.0",
+              "from": "xtend@>=4.0.0 <4.1.0",
+              "resolved": "http://beta-internal:4873/xtend/-/xtend-4.0.0.tgz"
+            }
+          }
+        },
+        "vinyl": {
+          "version": "0.5.1",
+          "from": "vinyl@>=0.5.0 <0.6.0",
+          "resolved": "http://beta-internal:4873/vinyl/-/vinyl-0.5.1.tgz",
+          "dependencies": {
+            "clone": {
+              "version": "1.0.2",
+              "from": "clone@>=1.0.0 <2.0.0",
+              "resolved": "http://beta-internal:4873/clone/-/clone-1.0.2.tgz"
+            },
+            "clone-stats": {
+              "version": "0.0.1",
+              "from": "clone-stats@>=0.0.1 <0.0.2",
+              "resolved": "http://beta-internal:4873/clone-stats/-/clone-stats-0.0.1.tgz"
+            }
+          }
+        }
+      }
     },
     "handlebars": {
       "version": "3.0.3",
@@ -1763,6 +2109,28 @@
           "version": "0.8.1",
           "from": "http://beta-internal:4873/debug/-/debug-0.8.1.tgz",
           "resolved": "http://beta-internal:4873/debug/-/debug-0.8.1.tgz"
+        }
+      }
+    },
+    "ioredis": {
+      "version": "1.7.5",
+      "from": "ioredis@>=1.7.3 <2.0.0",
+      "resolved": "http://beta-internal:4873/ioredis/-/ioredis-1.7.5.tgz",
+      "dependencies": {
+        "double-ended-queue": {
+          "version": "2.1.0-0",
+          "from": "double-ended-queue@>=2.1.0-0 <3.0.0",
+          "resolved": "http://beta-internal:4873/double-ended-queue/-/double-ended-queue-2.1.0-0.tgz"
+        },
+        "flexbuffer": {
+          "version": "0.0.6",
+          "from": "flexbuffer@0.0.6",
+          "resolved": "http://beta-internal:4873/flexbuffer/-/flexbuffer-0.0.6.tgz"
+        },
+        "lodash": {
+          "version": "3.10.1",
+          "from": "lodash@>=3.6.0 <4.0.0",
+          "resolved": "http://beta-internal:4873/lodash/-/lodash-3.10.1.tgz"
         }
       }
     },
@@ -2066,6 +2434,11 @@
           "resolved": "http://beta-internal:4873/node-statsd/-/node-statsd-0.1.1.tgz"
         }
       }
+    },
+    "mongodb-unique-ids": {
+      "version": "0.1.2",
+      "from": "mongodb-unique-ids@>=0.1.2 <0.2.0",
+      "resolved": "http://beta-internal:4873/mongodb-unique-ids/-/mongodb-unique-ids-0.1.2.tgz"
     },
     "mongoose": {
       "version": "4.1.2",

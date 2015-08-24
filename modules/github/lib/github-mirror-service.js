@@ -65,7 +65,7 @@ module.exports = function(tokenPriority) {
       } else {
         return body;
       }
-    }).fail(badCredentialsCheck);
+    }).catch(badCredentialsCheck);
   };
 
   // return Mirror;
@@ -73,4 +73,3 @@ module.exports = function(tokenPriority) {
     return [tokenStrategy(this.user)];
   });
 };
-

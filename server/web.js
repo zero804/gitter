@@ -22,7 +22,7 @@ require('./web/express').installFull(app);
 
 require('./web/passport').install();
 
-require('./utils/event-listeners').installLocalEventListeners();
+require('./event-listeners').install();
 
 if(nconf.get('ws:startFayeInPrimaryApp')) {
   var bayeux = require('./web/bayeux');
@@ -35,7 +35,7 @@ if (nconf.get("web:startApiInPrimaryApp")) {
 app.use('/api_web', require('./api-web/'));
 app.use('/', require('./handlers/'));
 
-require('./services/kue-workers').startWorkers();
+require('./workers').listen();
 
 var port = nconf.get("PORT");
 

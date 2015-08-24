@@ -25,7 +25,7 @@ function findUserForks(user) {
         });
       }
     });
-    
+
     var forks = repos.filter(function(repo) { return repo.fork; });
     console.log('User:', user.username, ' - Forks:', forks.length);
 
@@ -87,7 +87,7 @@ persistence.User.find({}).sort({_id: 1}).limit(10).skip(0).execQ()
 }).then(function() {
   process.exit(0);
 
-}).fail(function(err) {
+}).catch(function(err) {
   console.log(err, err.stack);
   process.exit(1);
 });

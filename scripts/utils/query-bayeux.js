@@ -3,7 +3,7 @@
 "use strict";
 
 var shutdown = require('shutdown');
-var presenceService = require('../../server/services/presence-service');
+var presenceService = require('gitter-web-presence');
 var bayeux = require('../../server/web/bayeux');
 var async = require('async');
 var env = require('gitter-web-env');

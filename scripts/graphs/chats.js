@@ -42,7 +42,7 @@ persistenceService.ChatMessage.aggregateQ([{
     // g.output( "png", "test01.png" );
     process.exit(0);
   })
-  .fail(function(err) {
+  .catch(function(err) {
     console.error(err);
     process.exit(1);
   });

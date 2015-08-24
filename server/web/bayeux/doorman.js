@@ -2,7 +2,7 @@
 
 var bayeuxExtension   = require('./extension');
 var StatusError       = require('statuserror');
-var presenceService   = require('../../services/presence-service');
+var presenceService   = require('gitter-web-presence');
 
 module.exports = function(server) {
   return bayeuxExtension({

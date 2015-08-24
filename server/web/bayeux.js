@@ -1,4 +1,3 @@
-/*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
 var env               = require('gitter-web-env');
@@ -9,12 +8,13 @@ var stats             = env.stats;
 var faye              = require('gitter-faye');
 var fayeRedis         = require('gitter-faye-redis');
 var deflate           = require('permessage-deflate');
-var presenceService   = require('../services/presence-service');
+var presenceService   = require('gitter-web-presence');
 var shutdown          = require('shutdown');
 var zlib              = require('zlib');
 var adviceAdjuster    = require('./bayeux/advice-adjuster');
 var authenticatorExtension = require('./bayeux/authenticator');
-var loggingExtension = require('./bayeux/logging');
+var loggingExtension  = require('./bayeux/logging');
+var debug             = require('debug')('gitter:bayeux');
 
 /* Disabled after the outage 8 April 2015 XXX investigate further */
 // var createDoormanExtension = require('./bayeux/doorman');
@@ -23,6 +23,7 @@ var superClientExtension = require('./bayeux/super-client');
 var pushOnlyServerExtension = require('./bayeux/push-only');
 var hidePrivateExtension = require('./bayeux/hide-private');
 
+var fayeLoggingLevel = nconf.get('ws:fayeLogging');
 
 var STATS_FREQUENCY = 0.01;
 
@@ -70,25 +71,23 @@ function makeServer(endpoint, redisClient, redisSubscribeClient) {
   server.addExtension(hidePrivateExtension);
 
 
-  if (fayeLoggingLevel === 'debug') {
+  if (debug.enabled) {
     ['connection:open', 'connection:close'].forEach(function(event) {
       server._server._engine.bind(event, function(clientId) {
-        logger.verbose("faye-engine: Client " + clientId + ": " + event);
+        debug("faye-engine: Client %s: %s", clientId, event);
       });
     });
 
     /** Some logging */
     ['handshake', 'disconnect'].forEach(function(event) {
       server.bind(event, function(clientId) {
-        logger.verbose("faye-server: Client " + clientId + ": " + event);
+        debug("faye-server: Client %s: %s", clientId, event);
       });
     });
 
   }
 
   server.bind('disconnect', function(clientId) {
-    logger.info("Client " + clientId + " disconnected");
-
     // Warning, this event may be called on a different Faye engine from
     // where the socket is residing
     presenceService.socketDisconnected(clientId, function(err) {
@@ -127,7 +126,7 @@ function makeServer(endpoint, redisClient, redisSubscribeClient) {
  * Create the servers
  */
 // var serverNew = makeServer('/faye2', env.redis.createClient(nconf.get("redis_nopersist")), env.redis.createClient(nconf.get("redis_nopersist"))); // Subscribe. Needs new client
-var serverLegacy = makeServer('/faye', env.redis.getClient(), env.redis.createClient()); // Subscribe. Needs new client
+var serverLegacy = makeServer('/faye', env.redis.createClient(), env.redis.createClient()); // Subscribe. Needs new client
 
 /**
  * Create the clients
@@ -172,14 +171,17 @@ faye.stringify = function(object) {
 faye.logger = {
 };
 
-var fayeLoggingLevel = nconf.get('ws:fayeLogging');
 var logLevels = ['fatal', 'error', 'warn'];
-if(fayeLoggingLevel === 'info') logLevels.push('info');
-if(fayeLoggingLevel === 'debug') logLevels.push('info', 'debug');
+if(fayeLoggingLevel === 'info' || fayeLoggingLevel === 'debug') logLevels.push('info');
 
 logLevels.forEach(function(level) {
   faye.logger[level] = function(msg) { logger[level]('faye: ' + msg.substring(0,180)); };
 });
+
+if(debug.enabled && fayeLoggingLevel === 'debug') {
+  faye.logger.debug = function(msg) { debug("faye: %s", msg); };
+}
+
 
 /** Returns callback(exists) to match faye */
 exports.clientExists = function(clientId, callback) {

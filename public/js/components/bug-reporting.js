@@ -23,6 +23,7 @@ module.exports = (function() {
 
   if(ravenUrl) {
     Raven.config(ravenUrl, {
+        release: context.env('version'),
         // # we highly recommend restricting exceptions to a domain in order to filter out clutter
         // whitelistUrls: ['example.com/scripts/']
         dataCallback: function(data) {
@@ -88,4 +89,3 @@ module.exports = (function() {
 
 
 })();
-

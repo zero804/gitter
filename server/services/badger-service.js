@@ -188,7 +188,7 @@ function ReadmeUpdater(context) {
 
   function getExistingReadme() {
     return client.get(format('/repos/%s/readme', context.sourceRepo), {})
-      .fail(function(err) {
+      .catch(function(err) {
         if(err.status === 404) return null;
       });
   }
@@ -330,7 +330,7 @@ function sendBadgePullRequest(repo, user) {
       stats.event('badger.succeeded', { userId: user.id });
       return pr;
     })
-    .fail(function(err) {
+    .catch(function(err) {
       stats.event('badger.failed', { userId: user.id });
       logger.error("Badger failed", { exception: err, uri: repo });
 

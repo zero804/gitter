@@ -1,6 +1,5 @@
 "use strict";
 
-var winston = require('./winston');
 var ObjectID = require('mongodb').ObjectID;
 var _ = require('underscore');
 
@@ -32,7 +31,6 @@ function asObjectIDs(ids) {
 
 function getDateFromObjectId(id) {
   if(!id) {
-    winston.silly('Null ID passed into getDateFromObjectId.');
     return null;
   }
 
@@ -79,10 +77,8 @@ function isLikeObjectId(value) {
 
 
 function serializeObjectId(id) {
-  if(!id) return '';
-  if(typeof id === 'string') {
-    return id;
-  }
+  if(!id) return id;
+  if(typeof id === 'string') { return id; }
   return id.toString();
 }
 
@@ -92,12 +88,17 @@ function serializeObjectIds(ids) {
   return ids.map(serializeObjectId);
 }
 
+function createIdForTimestampString(timestamp) {
+  var hexSeconds = Math.floor(timestamp/1000).toString(16);
+
+  while(hexSeconds.length < 8) {
+    hexSeconds = "0" + hexSeconds;
+  }
+  return hexSeconds + "0000000000000000";
+}
+
 function createIdForTimestamp(timestamp) {
-    var hexSeconds = Math.floor(timestamp/1000).toString(16);
-    while(hexSeconds.length < 8) {
-      hexSeconds = "0" + hexSeconds;
-    }
-    return new ObjectID(hexSeconds + "0000000000000000");
+  return new ObjectID(createIdForTimestampString(timestamp));
 }
 
 function fieldInPredicate(fieldName, values, additionalClauses) {
@@ -136,4 +137,5 @@ exports.getNewObjectIdString = getNewObjectIdString;
 exports.serializeObjectId = serializeObjectId;
 exports.serializeObjectIds = serializeObjectIds;
 exports.createIdForTimestamp = createIdForTimestamp;
+exports.createIdForTimestampString = createIdForTimestampString;
 exports.fieldInPredicate = fieldInPredicate;

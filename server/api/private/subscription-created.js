@@ -14,5 +14,5 @@ module.exports = function(req, res, next) {
     .then(function() {
       res.send('OK');
     })
-    .fail(next);
+    .catch(next);
 };

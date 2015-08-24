@@ -11,7 +11,7 @@ module.exports = {
       .then(function(collaborators) {
         return res.send(collaborators);
       })
-      .fail(next);
+      .catch(next);
   }
 
 };

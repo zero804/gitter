@@ -1,7 +1,7 @@
 "use strict";
 
 var troupeService     = require("../../services/troupe-service");
-var presenceService   = require("../../services/presence-service");
+var presenceService   = require("gitter-web-presence");
 var Q                 = require("q");
 var winston           = require('../../utils/winston');
 var collections       = require("../../utils/collections");
