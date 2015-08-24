@@ -20,6 +20,8 @@ var redisClient_smembers = Q.nbind(redisClient.smembers, redisClient);
 
 var UNREAD_BATCH_SIZE = 100;
 var PRECONVERT_OBJECTID_TO_STRING_THRESHOLD = 1000;
+var MAXIMUM_USERS_PER_UNREAD_NOTIFICATION_BATCH = 1000;
+var MAXIMUM_ROOMS_PER_USER_PER_NOTIFICATION = 15;
 
 /**
  * Given an array of userIds and an array of mentionUserIds, returns an array of
@@ -131,7 +133,7 @@ function newItemWithMentions(troupeId, itemId, userIds, mentionUserIds) {
         if (upgradeCount > 10) {
           winston.warn('unread-items: upgraded keys for ' + upgradeCount + ' user:troupes');
         } else if(upgradeCount > 0) {
-          debug('unread-items: upgraded keys for user:troupes', upgradeCount);
+          debug('unread-items: upgraded keys for %s user:troupes', upgradeCount);
         }
 
         _.forEach(batchMentionIds, function(mentionUserId) {
@@ -249,51 +251,132 @@ function markItemsRead(userId, troupeId, ids) {
 }
 
 /**
+ * Given a potentially very large number of troupe user keys
+ * for email, select a batch that we will send emails out to
+ */
+function selectTroupeUserBatchForEmails(troupeUserHash, horizonTime) {
+  var distinctUserIds = {};
+  var distinctUserCount = 0;
+
+  var troupeUserHashKeys = Object.keys(troupeUserHash);
+
+  debug('%s distinct usertroupes with pending emails', troupeUserHashKeys.length);
+
+  if (!troupeUserHashKeys.length) return {};
+
+  var result = {};
+
+  /* Filter out values which are too recent */
+  troupeUserHashKeys.forEach(function(troupeUserKey) {
+    // Don't bother if the total exceeds the maximum number of users in a single batch
+    if (distinctUserCount >= MAXIMUM_USERS_PER_UNREAD_NOTIFICATION_BATCH) return;
+
+    var value = troupeUserHash[troupeUserKey];
+    if(value === 'null' && !value) return;
+
+    var oldest = parseInt(value, 10);
+    if (oldest <= horizonTime) {
+      var troupeUserId = troupeUserKey.split(':');
+      var userId = troupeUserId[1];
+
+      // Add the user to the list of distinct users
+      // who will be receiving an email in this batch
+      if (!distinctUserIds[userId]) {
+        distinctUserIds[userId] = true;
+        distinctUserCount++;
+      }
+      result[troupeUserKey] = true;
+    }
+  });
+
+  /* Add in all the rooms for the users we are going to email */
+  /* Filter out values which are too recent */
+  troupeUserHashKeys.forEach(function(key) {
+    var troupeUserId = key.split(':');
+    var userId = troupeUserId[1];
+
+    if (distinctUserIds[userId]) {
+      result[key] = true;
+    }
+  });
+
+  return result;
+}
+
+/**
+ *  Given a list of userTroupes, return an array of { user: troupe: }
+ *  Also limits the maximum number of rooms per user. So if a
+ *  user has too many rooms for notification we don't kill the server
+ */
+function transformUserTroupesWithLimit(userTroupes) {
+  var troupesPerUser = {};
+
+  return userTroupes.reduce(function(memo, key) {
+    var troupeUserId = key.split(':');
+    var troupeId = troupeUserId[0];
+    var userId = troupeUserId[1];
+
+    if(troupesPerUser[userId]) {
+      if (troupesPerUser[userId] >= MAXIMUM_ROOMS_PER_USER_PER_NOTIFICATION) {
+        /* Skip */
+        return memo;
+      }
+
+      troupesPerUser[userId]++;
+    } else {
+      troupesPerUser[userId] = 1;
+    }
+
+    memo.push({ userId: userId, troupeId: troupeId });
+    return memo;
+  },[]);
+}
+
+/**
+ * HGETALL can take down your redis server if the hash is big enough.
+ * This way, we scan the redis server and return things chunk at a time
+ */
+function scanEmailNotifications() {
+  var cursor = '0';
+  var hashValues = {};
+  function iter() {
+    return Q.ninvoke(redisClient, "hscan", EMAIL_NOTIFICATION_HASH_KEY, cursor, 'COUNT', 1000)
+      .spread(function(nextCursor, result) {
+        /* Turn the results into a hash */
+        if (result) {
+          for (var i = 0; i < result.length; i = i + 2) {
+            var key = result[i];
+            var value = result[i + 1];
+            hashValues[key] = value;
+          }
+        }
+
+        if (nextCursor === '0') return;
+
+        cursor = nextCursor;
+        return iter();
+      });
+  }
+
+  return iter()
+    .then(function() {
+      return hashValues;
+    });
+}
+/**
  * Returns a hash of hash {user:troupe:ids} of users who have
  * outstanding notifications since before the specified time
  * @return a promise of hash
  */
 function listTroupeUsersForEmailNotifications(horizonTime, emailLatchExpiryTimeS) {
-  return Q.ninvoke(redisClient, "hgetall", EMAIL_NOTIFICATION_HASH_KEY)
+  return scanEmailNotifications()
     .then(function(troupeUserHash) {
       if (!troupeUserHash) return {};
 
-      var userTroupesForNotification = {};
-
-      /* Filter out values which are too recent */
-      Object.keys(troupeUserHash).forEach(function(key) {
-        var value = troupeUserHash[key];
-        if(value === 'null') return;
-
-        var oldest = parseInt(value, 10);
-        if (oldest <= horizonTime) {
-          userTroupesForNotification[key] = 1;
-        }
-      });
-
-      if(!Object.keys(userTroupesForNotification).length) return {};
-
-      // Find the distinct list of users
-      var distinctUserIds = {};
-      Object.keys(userTroupesForNotification).forEach(function(troupeUserKey) {
-        var troupeUserId = troupeUserKey.split(':');
-        var userId = troupeUserId[1];
-        distinctUserIds[userId] = 1;
-      });
-
-
-      /* Add in all the rooms for the users we are going to email */
-      /* Filter out values which are too recent */
-      Object.keys(troupeUserHash).forEach(function(key) {
-        var troupeUserId = key.split(':');
-        var userId = troupeUserId[1];
-
-        if (distinctUserIds[userId]) {
-          userTroupesForNotification[key] = 1;
-        }
-      });
+      var userTroupesForNotification = selectTroupeUserBatchForEmails(troupeUserHash, horizonTime);
 
       var filteredKeys = Object.keys(userTroupesForNotification);
+      debug('Attempting to send email notifications to %s usertroupes', filteredKeys.length);
 
       var keys = [EMAIL_NOTIFICATION_HASH_KEY].concat(filteredKeys.map(function(troupeUserKey) {
         return 'uel:' + troupeUserKey;
@@ -305,16 +388,11 @@ function listTroupeUsersForEmailNotifications(horizonTime, emailLatchExpiryTimeS
         .then(function(results) {
 
           /* Remove items that have an email latch on */
-          var userTroupes = filteredKeys.filter(function(value, i) {
+          var filteredUserTroupes = filteredKeys.filter(function(value, i) {
             return results[i];
-          }).map(function(key) {
-            var troupeUserId = key.split(':');
-            var troupeId = troupeUserId[0];
-            var userId = troupeUserId[1];
-
-            return { userId: userId, troupeId: troupeId };
           });
 
+          var userTroupes = transformUserTroupesWithLimit(filteredUserTroupes);
 
           return [userTroupes, getUnreadItemsForUserTroupes(userTroupes)];
         })
@@ -530,5 +608,7 @@ exports.testOnly = {
   UNREAD_BATCH_SIZE: UNREAD_BATCH_SIZE,
   removeAllEmailNotifications: removeAllEmailNotifications,
   mergeUnreadItemsWithMentions: mergeUnreadItemsWithMentions,
-  redisClient: redisClient
+  redisClient: redisClient,
+  selectTroupeUserBatchForEmails: selectTroupeUserBatchForEmails,
+  transformUserTroupesWithLimit: transformUserTroupesWithLimit
 };

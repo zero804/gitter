@@ -7,6 +7,7 @@ var appEvents                 = require('gitter-web-appevents');
 var troupeDao                 = require('../daos/troupe-dao').lean;
 var userDao                   = require('../daos/user-dao').lean;
 var chatService               = require('../chat-service');
+var _                         = require('lodash');
 var debug                     = require('debug')('gitter:online-notification-generator');
 
 function generateChatMessageNotification(troupeId, chatId) {
@@ -42,7 +43,7 @@ function generateChatMessageNotification(troupeId, chatId) {
 function filterUsersByNotificationSettings(troupeId, userIds, mentioned) {
   return userTroupeSettingsService.getUserTroupeSettingsForUsersInTroupe(troupeId, 'notifications', userIds)
     .then(function(notificationSettings) {
-      return userIds.filter(function(userId) {
+      return _.filter(userIds, function(userId) {
         var ns = notificationSettings[userId];
         var notificationSetting = ns && ns.push;
 
@@ -62,7 +63,7 @@ exports.sendOnlineNotifications = function (troupeId, chatId, userIds, mentioned
 
       return generateChatMessageNotification(troupeId, chatId)
         .then(function(notification) {
-          filteredUserIds.forEach(function(userId) {
+          _.forEach(filteredUserIds, function(userId) {
             var n = {
               userId: userId,
               troupeId: troupeId,

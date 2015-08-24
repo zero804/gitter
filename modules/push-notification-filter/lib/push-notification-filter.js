@@ -58,6 +58,8 @@ function findUsersInRoomAcceptingNotifications(troupeId, userIds) {
         }
       });
 
+      debug('findUsersInRoomAcceptingNotifications filtered %s users down to %s', userIds.length, response.length);
+
       return response;
     });
 }
@@ -69,26 +71,23 @@ function resetNotificationsForUserTroupe(userId, troupeId, callback) {
     .nodeify(callback);
 }
 
-// Returns callback(err, notificationNumber)
-function canLockForNotification(userId, troupeId, startTime, callback) {
-  debug("canLockForNotification: userId=%s, troupeId=%s, startTime=%s", userId, troupeId, startTime);
+// Returns falsey value or notification period number
+function canLockForNotification(userId, troupeId, startTime, maxLockValue) {
+  debug("canLockForNotification: userId=%s, troupeId=%s, startTime=%s, maxLockValue=%s", userId, troupeId, startTime, maxLockValue);
   return redisClient.notifyLockUserTroupe(
     /* keys */   'nl:' + userId + ':' + troupeId, 'nls:' + userId + ':' + troupeId,
-    /* values */ startTime, minimumUserAlertIntervalS)
-    .nodeify(callback);
+    /* values */ startTime, minimumUserAlertIntervalS, maxLockValue);
 }
 
-// Returns callback(err, falsey value or { startTime: Y }])
-function canUnlockForNotification(userId, troupeId, notificationNumber, callback) {
-  debug("canLockForNotification: userId=%s, troupeId=%s, notificationNumber=%s", userId, troupeId, notificationNumber);
-
+// Returns falsey value or start-of-notification-period as unix timestamp
+function canUnlockForNotification(userId, troupeId, notificationNumber) {
+  debug("canUnlockForNotification: userId=%s, troupeId=%s, notificationNumber=%s", userId, troupeId, notificationNumber);
   return redisClient.notifyUnlockUserTroupe(
     /* keys */   'nl:' + userId + ':' + troupeId, 'nls:' + userId + ':' + troupeId,
     /* values */ notificationNumber)
-    .then(function(result) {
-      return result ? parseInt(result, 10) : 0
-    })
-    .nodeify(callback);
+  .then(function(result) {
+    return result ? parseInt(result, 10) : 0;
+  });
 }
 
 /* Exports */
@@ -96,3 +95,8 @@ exports.findUsersInRoomAcceptingNotifications = findUsersInRoomAcceptingNotifica
 exports.resetNotificationsForUserTroupe = resetNotificationsForUserTroupe;
 exports.canLockForNotification = canLockForNotification;
 exports.canUnlockForNotification = canUnlockForNotification;
+
+
+exports.testOnly = {
+  redisClient: redisClient
+};

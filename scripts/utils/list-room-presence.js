@@ -11,6 +11,8 @@ var collections = require('../../server/utils/collections');
 var shutdown = require('shutdown');
 
 function pad(string, length) {
+  if (!string) string = '';
+  
   while(string.length < length) {
     string = string + ' ';
   }

@@ -167,13 +167,15 @@ module.exports = (function() {
           }
         });
 
-        realtime.registerForSnapshots(subscription, function(snapshot) {
-          var lurk = snapshot._meta && snapshot._meta.lurk;
-          if(lurk) {
-            store.enableLurkMode();
-          }
+        realtime.getClient().registerSnapshotHandler(subscription, {
+          handleSnapshot: function(snapshot) {
+            var lurk = snapshot._meta && snapshot._meta.lurk;
+            if(lurk) {
+              store.enableLurkMode();
+            }
 
-          store._unreadItemsAdded(snapshot);
+            store._unreadItemsAdded(snapshot);
+          }
         });
 
       }, this);
