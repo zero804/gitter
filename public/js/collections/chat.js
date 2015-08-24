@@ -116,6 +116,12 @@ var ChatCollection = LiveCollection.extend({
     });
 
     this.resubscribeOnModelChange(context.troupe(), 'id');
+
+    //when we change room we want to reset the state
+    this.listenTo(context.troupe(), 'change:id', function(){
+      this.setAtTop(false);
+    });
+
   },
 
 
