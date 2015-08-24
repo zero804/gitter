@@ -19,6 +19,14 @@ describe('unread-item-service', function() {
     setTimeout(done, 1000);
   });
 
+  after(function(done) {
+    if (process.env.DISABLE_EMAIL_NOTIFY_CLEAR_AFTER_TEST) return done();
+
+    var unreadItemServiceEngine = testRequire('./services/unread-item-service-engine');
+    unreadItemServiceEngine.testOnly.removeAllEmailNotifications()
+      .nodeify(done);
+  });
+
   describe('single test cases', function() {
 
     var unreadItemServiceEngine, troupeId1, itemId1, itemId2, itemId3, userId1, userId2, userIds, troupeId2;
@@ -248,6 +256,7 @@ describe('unread-item-service', function() {
 
     describe('listTroupeUsersForEmailNotifications', function() {
       before(function(done) {
+        var unreadItemServiceEngine = testRequire('./services/unread-item-service-engine');
         unreadItemServiceEngine.testOnly.removeAllEmailNotifications()
           .nodeify(done);
       });
@@ -1162,6 +1171,57 @@ describe('unread-item-service', function() {
       assert.deepEqual(mergeUnreadItemsWithMentions(["3", "4"], ["1", "2"]), ["1", "2", "3", "4"]);
     });
 
+  });
+
+  describe('selectTroupeUserBatchForEmails', function() {
+    var selectTroupeUserBatchForEmails;
+
+    before(function() {
+      selectTroupeUserBatchForEmails = testRequire('./services/unread-item-service-engine').testOnly.selectTroupeUserBatchForEmails;
+    });
+
+    it('should limit the maximum number of users in an email batch to 1000', function() {
+      var horizonTime = 1;
+      var batch = {};
+      var expected = {};
+      _.range(2000).forEach(function(userId) {
+        _.range(3).forEach(function(troupeId, index) {
+          batch[troupeId + ':' + userId] = index;
+          if (userId < 1000) {
+            expected[troupeId + ':' + userId] = true;
+          }
+        });
+      });
+
+      var batchForNotification = selectTroupeUserBatchForEmails(batch, horizonTime);
+      assert.deepEqual(batchForNotification, expected);
+    });
+  });
+
+  describe('transformUserTroupesWithLimit', function() {
+    var transformUserTroupesWithLimit;
+
+    before(function() {
+      transformUserTroupesWithLimit = testRequire('./services/unread-item-service-engine').testOnly.transformUserTroupesWithLimit;
+    });
+
+    it('should limit the maximum number of rooms a user gets notified for to 15', function() {
+      var expected = [];
+      var userTroupes = [];
+      _.range(20).forEach(function(userId, userIndex) {
+        _.range(userIndex + 1).forEach(function(troupeId, index) {
+          userTroupes.push(troupeId + ':' + userId);
+
+          if (index < 15) {
+            expected.push({ troupeId: "" + troupeId, userId: "" + userId });
+          }
+        });
+      });
+
+
+      var actual = transformUserTroupesWithLimit(userTroupes);
+      assert.deepEqual(actual, expected);
+    });
   });
 
 

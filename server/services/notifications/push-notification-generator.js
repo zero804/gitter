@@ -93,7 +93,7 @@ function sendUserTroupeNotification(userId, troupeId, notificationNumber, userNo
   return pushNotificationFilter.canUnlockForNotification(userId, troupeId, notificationNumber)
     .then(function(startTime) {
       if(!startTime) {
-        debug('Unable to obtain lock to notify userTroupe. Skipping');
+        debug('Unable to obtain lock to notify %s for user %s troupe %s. Skipping', notificationNumber, userId, troupeId);
         return;
       }
 

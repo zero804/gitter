@@ -3,6 +3,7 @@
 var env = require('gitter-web-env');
 var stats = env.stats;
 var logger = env.logger;
+var debug = require('debug')('gitter:enforce-csrf-middleware');
 
 var escapeRegExp = require('../../utils/escape-regexp');
 
@@ -27,7 +28,7 @@ module.exports = function(req, res, next) {
   if(req.authInfo) return next();
 
   if(isInWhitelist(req)) {
-    logger.verbose('skipping csrf check for ' + req.path);
+    debug('skipping csrf check for %s', req.path);
     return next();
   }
 

@@ -18,6 +18,7 @@ var mongoUtils                = require('../../utils/mongo-utils');
 var emailNotificationService  = require('../email-notification-service');
 var userSettingsService       = require('../user-settings-service');
 var userTroupeSettingsService = require('../user-troupe-settings-service');
+var debug                     = require('debug')('gitter:email-notification-generator-service');
 
 var filterTestValues = config.get('notifications:filterTestValues');
 
@@ -31,14 +32,22 @@ function isTestId(id) {
   return id.indexOf('USER') === 0 || id.indexOf('TROUPE') === 0 || !mongoUtils.isLikeObjectId(id);
 }
 
+/**
+ * Send email notifications to users. Returns true if there were any outstanding
+ * emails in the queue
+ */
 function sendEmailNotifications(since) {
   var start = Date.now();
   if(!since) {
     since = moment().subtract('m', emailNotificationsAfterMins).valueOf();
   }
 
+  var hadEmailsInQueue;
+
   return unreadItemService.listTroupeUsersForEmailNotifications(since, timeBeforeNextEmailNotificationS)
     .then(function(userTroupeUnreadHash) {
+      hadEmailsInQueue = !!Object.keys(userTroupeUnreadHash).length;
+
       if(!filterTestValues) return userTroupeUnreadHash;
 
       /* Remove testing rubbish */
@@ -65,7 +74,7 @@ function sendEmailNotifications(since) {
        * Filter out all users who've opted out of notification emails
        */
       var userIds = Object.keys(userTroupeUnreadHash);
-      logger.verbose('email-notify: Initial user count: ' + userIds.length);
+      debug('Initial user count %s', userIds.length);
       if(!userIds.length) return {};
 
       return userSettingsService.getMultiUserSettings(userIds, 'unread_notifications_optout').
@@ -75,7 +84,7 @@ function sendEmailNotifications(since) {
             // If unread_notifications_optout is truish, the
             // user has opted out
             if(settings[userId]) {
-              logger.verbose('User ' + userId + ' has opted out of unread_notifications, removing from results');
+              debug('User %s has opted out of unread_notifications, removing from results', userId);
               delete userTroupeUnreadHash[userId];
             }
           });
@@ -92,7 +101,7 @@ function sendEmailNotifications(since) {
 
       if(!userIds.length) return {};
 
-      logger.verbose('email-notify: After removing opt-out users: ' + userIds.length);
+      debug('After removing opt-out users: %s', userIds.length);
 
       userIds.forEach(function(userId) {
           var troupeIds = Object.keys(userTroupeUnreadHash[userId]);
@@ -111,7 +120,7 @@ function sendEmailNotifications(since) {
                 var setting = ns && ns.push;
 
                 if(setting && setting !== 'all') {
-                  logger.verbose('User ' + userId + ' has disabled notifications for this troupe');
+                  debug('User %s has disabled notifications for this troupe', userId);
                   delete userTroupeUnreadHash[userId][troupeId];
 
                   if(Object.keys(userTroupeUnreadHash[userId]).length === 0) {
@@ -131,7 +140,7 @@ function sendEmailNotifications(since) {
       var userIds = Object.keys(userTroupeUnreadHash);
       if(!userIds.length) return [userIds, [], [], {}];
 
-      logger.verbose('email-notify: After removing room non-notify users: ' + userIds.length);
+      debug('After removing room non-notify users: %s', userIds.length);
 
       var troupeIds = _.flatten(Object.keys(userTroupeUnreadHash).map(function(userId) {
         return Object.keys(userTroupeUnreadHash[userId]);
@@ -154,7 +163,7 @@ function sendEmailNotifications(since) {
 
       userIds = users.map(function(user) { return user.id; });
 
-      logger.verbose('email-notify: After removing users without the correct token: ' + userIds.length);
+      debug('After removing users without the correct token: %s', userIds.length);
 
       return [userIds, users, allTroupes, userTroupeUnreadHash];
     })
@@ -240,6 +249,10 @@ function sendEmailNotifications(since) {
           var time = Date.now() - start;
           logger.info("Sent unread notification emails to " + count + " users in " + time + "ms");
         });
+    })
+    .then(function() {
+      /* Return whether the queue was empty or not */
+      return hadEmailsInQueue;
     });
 }
 

@@ -3,6 +3,7 @@
 
 var env = require('gitter-web-env');
 var logger = env.logger;
+var debug = require('debug')('gitter:login-required-middleware');
 
 module.exports = function(req, res) {
 
@@ -20,6 +21,6 @@ module.exports = function(req, res) {
     req.session.returnTo = req.originalUrl;
   }
 
-  logger.verbose("User is not logged in, redirecting to login page");
+  debug("User is not logged in, redirecting to login page");
   return res.relativeRedirect("/login");
 };

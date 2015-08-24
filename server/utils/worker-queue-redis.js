@@ -32,10 +32,16 @@ function getConnection() {
   redisConfiguration = _.extend({ }, redisConfiguration, { redisDb: 0 });
   var redis = env.redis.createClient(redisConfiguration);
 
-  return {
+  var result = {
     redis: redis,
-    database: 0 // In case the wierd behaviour in node-resque is ever removed
+    database: 0 // In case the wierd behaviour in node-resque is ever removed,
   };
+
+  if (config.get('resque:namespace')) {
+    result.namespace = config.get('resque:namespace');  // Allow tests to use their own ns
+  }
+
+  return result;
 }
 
 function createScheduler() {
@@ -68,6 +74,10 @@ function createScheduler() {
 var uniqueWorkerCounter = 0;
 
 var Queue = function(name, options, loaderFn) {
+  if (config.get('resque:queuePrefix')) {
+    name = config.get('resque:queuePrefix') + name;
+  }
+
   this.name = name;
   this.loaderFn = loaderFn;
   var self = this;
@@ -100,10 +110,16 @@ Queue.prototype.invoke = function(data, options, callback) {
 
         var delay = options && options.delay || 0;
 
+        // TODO: change 'echo' to 'invoke' 1 September 2015
+        // This change needs to happen at least a several releases
+        // before the echo queue is removed (see other TODO futher
+        // down in this file for details of that change)
+        var operationName = 'echo';
+
         if (!delay) {
-          queue.enqueue(self.name, 'invoke', data, callback);
+          queue.enqueue(self.name, operationName, data, callback);
         } else {
-          queue.enqueueIn(delay, self.name, 'invoke', data, callback);
+          queue.enqueueIn(delay, self.name, operationName, data, callback);
         }
       });
     })
@@ -159,6 +175,10 @@ Queue.prototype.createWorker = function() {
 
   var jobs = {
     // TODO: remove 'echo' this by 1 September 2015
+    // Reasoning: Because until PR#747, the application servers were
+    // submitting echo jobs and we need to gracefully roll over to the
+    // more sane name of invoke. If we dropped it immediately, all the old
+    // jobs during the deployment period would be dropped.
     echo: {
       perform: function(data, callback) {
         debug('Invoking echo');
