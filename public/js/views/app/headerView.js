@@ -141,7 +141,7 @@ module.exports = (function() {
           } else {
             menuItems.push({ title: 'Integrations', href: '#integrations' });
           }
-          if(context().troupe.githubType !== 'USER_CHANNEL'){
+          if(context.troupe().get('githubType') !== 'USER_CHANNEL'){
             menuItems.push({ title: 'Edit tags', href: '#tags/' + context().troupe.id });
           }
         }
@@ -184,8 +184,9 @@ module.exports = (function() {
     toggleFavourite: function() {
       if(!context.isLoggedIn()) return;
 
-      this.ui.favourite.toggleClass('favourite');
-      var isFavourite = this.ui.favourite.hasClass('favourite');
+      this.model.set('favourite', !this.model.get('favourite'));
+      var isFavourite = !!this.model.get('favourite');
+      this.ui.favourite.toggleClass('favourite', isFavourite);
 
       apiClient.userRoom.put('', { favourite: isFavourite });
 
