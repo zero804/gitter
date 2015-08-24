@@ -93,6 +93,7 @@ var View = Marionette.LayoutView.extend({
   },
 
   onTagValid: function(model, value){
+    if(!model.get) return;
     model.get('errorModel').set({
       message: 'Press enter to add ' + value,
       isError: false
