@@ -177,7 +177,7 @@ module.exports = (function() {
    * TroupeContext depends on the user and troupe
    */
   context.env = function(envName) {
-    return env[envName];
+    return !!envName ? env[envName] : env;
   };
 
   context.getAccessToken = function(callback) {
