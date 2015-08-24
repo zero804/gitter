@@ -24,7 +24,7 @@ module.exports = function (room) {
   }
 
   if (room.favourite) {
-    iconName = 'icon-star-1';
+    iconName = 'icon-star-1 favourite';
   }
 
   return iconName;

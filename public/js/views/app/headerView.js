@@ -8,6 +8,8 @@ var autolink = require('autolink');
 var notifications = require('components/notifications');
 var Dropdown = require('views/controls/dropdown');
 var appEvents = require('utils/appevents');
+var HeaderModel = require('../../models/header-model');
+var headerViewTemplate  = require('./tmpl/headerViewTemplate.hbs');
 require('bootstrap_tooltip');
 
 module.exports = (function() {
@@ -42,9 +44,10 @@ module.exports = (function() {
   }
 
   return Marionette.ItemView.extend({
+    template: false,
 
     modelEvents: {
-      change: 'redisplay'
+      change: 'onModelChange'
     },
 
     ui: {
@@ -66,8 +69,17 @@ module.exports = (function() {
     },
 
     initialize: function() {
+      this.model = new HeaderModel();
       this.bindUIElements();
       this.showActivity = true;
+      this.buildDropdown();
+
+      this.listenTo(context.troupe(), 'change:id', this.onRoomChange, this);
+
+      this.redisplay();
+    },
+
+    buildDropdown: function (){
       if(context.isLoggedIn()) {
         this.dropdown = new Dropdown({
           allowClickPropagation: true,
@@ -97,8 +109,12 @@ module.exports = (function() {
         return 'More ' + orgName + ' rooms';
       }});
 
-      this.listenTo(context.troupe(), 'change:id', this.onRoomChange, this);
+    },
 
+    onModelChange: function (){
+      this.render();
+      this.buildDropdown();
+      this.createMenu();
       this.redisplay();
     },
 
@@ -249,6 +265,7 @@ module.exports = (function() {
     },
 
     onRoomChange: function (model){
+      if(!this.template) this.template = headerViewTemplate;
       this.editingTopic = false;
     },
 
