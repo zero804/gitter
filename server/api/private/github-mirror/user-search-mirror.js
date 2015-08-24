@@ -29,11 +29,11 @@ module.exports = function(req, res, next) {
 
         return res.send(body);
       })
-      .fail(function(err) {
+      .catch(function(err) {
         winston.error('githubUsersExists failed' + err, { exception: err });
         res.send(body);
       });
 
-  }).fail(next);
+  }).catch(next);
 
 };

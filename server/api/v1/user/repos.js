@@ -31,7 +31,7 @@ function indexQuery(req, res, next) {
     .then(function(serialized) {
       res.send(serialized);
     })
-    .fail(next);
+    .catch(next);
 }
 
 module.exports = {
@@ -54,6 +54,6 @@ module.exports = {
           res.send(serialized);
         });
       })
-      .fail(next);
+      .catch(next);
   }
 };

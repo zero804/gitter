@@ -31,7 +31,7 @@ function searchRooms(req, res, next) {
     .then(function(searchResults) {
       res.send(searchResults);
     })
-    .fail(next);
+    .catch(next);
 }
 
 module.exports = {
@@ -49,7 +49,7 @@ module.exports = {
       .then(function(serialized) {
         res.send(serialized);
       })
-      .fail(next);
+      .catch(next);
   },
 
   show: function(req, res, next) {
@@ -62,7 +62,7 @@ module.exports = {
       .then(function(serialized) {
         res.send(serialized);
       })
-      .fail(next);
+      .catch(next);
   },
 
   create: function(req, res, next) {
@@ -82,7 +82,7 @@ module.exports = {
       .then(function(serialized) {
         res.send(serialized);
       })
-      .fail(next);
+      .catch(next);
   },
 
   update: function(req, res, next) {
@@ -141,14 +141,14 @@ module.exports = {
       .then(function() {
         res.sendStatus(200);
       })
-      .fail(next);
+      .catch(next);
   },
 
   load: function(req, id, callback) {
     var user = req.user;
     var userId = req.user && req.user._id;
-    /* Invalid id? Return 404 */
-    if(!mongoUtils.isLikeObjectId(id)) return callback();
+
+    if(!mongoUtils.isLikeObjectId(id)) return callback(new StatusError(404));
 
     troupeService.findByIdLeanWithAccess(id, userId)
       .spread(function(troupe, access) {

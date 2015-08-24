@@ -33,7 +33,7 @@ module.exports = function(req, res, next) {
     })
     .then(function(ghResponse) {
       res.send(ghResponse);
-    }).fail(function(err) {
+    }).catch(function(err) {
       var status = err.status || err.statusCode;
       if(status) {
         res.sendStatus(status);

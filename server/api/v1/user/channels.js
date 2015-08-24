@@ -24,7 +24,7 @@ module.exports = {
       .then(function(channelTroupes) {
         serialize(channelTroupes, req, res, next);
       })
-      .fail(next);
+      .catch(next);
   },
 
   create: function(req, res, next) {
@@ -35,7 +35,7 @@ module.exports = {
       .then(function(customRoom) {
         return serialize(customRoom, req, res, next);
       })
-      .fail(function(err) {
+      .catch(function(err) {
         if(err.clientDetail && err.responseStatusCode) {
           res.send(err.responseStatusCode, err.clientDetail);
         } else {

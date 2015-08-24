@@ -5,6 +5,7 @@
 var userService = require('../../server/services/user-service');
 var troupeService = require('../../server/services/troupe-service');
 var chatService = require('../../server/services/chat-service');
+var shutdown = require('shutdown');
 
 require('../../server/event-listeners').install();
 
@@ -22,39 +23,54 @@ var opts = require("nomnom")
    })
    .parse();
 
+var count = 0;
+
 function sendMessage(troupe, user) {
-  console.log('Sending message');
+  console.log('Sending message: ', ++count);
   return chatService.newChatMessageToTroupe(troupe, user, {
     text: 'The time is ' + new Date()
   });
 }
 
-function error(e) {
-  console.error('Error');
-  console.error(e);
-  process.exit(1);
-}
+var finished = false;
 
-userService.findByUsername(opts.user, function(err, user) {
-  if(err) return error(err);
-  if(!user) return error('User not found');
+function chatbot() {
+  return userService.findByUsername(opts.user)
+    .then(function(user) {
+      if(!user) throw new Error('User not found');
 
-  troupeService.findByUri(opts.troupe, function(err, troupe) {
-    if(err) return error(err);
-    if(!troupe) return error('Troupe not found');
+      return troupeService.findByUri(opts.troupe)
+        .then(function(troupe) {
+            if(!troupe) throw new Error('Troupe not found');
 
-    var freq = parseFloat(opts.frequency, 10) * 1000;
+            var freq = parseFloat(opts.frequency, 10) * 1000;
 
-    function next() {
-      sendMessage(troupe, user)
-        .finally(function() {
-          setTimeout(next, freq);
-        })
-        .done();
-    }
+            console.log('Hit any key to stop');
 
-    setTimeout(next, freq);
+            function next() {
+              if (finished) {
+                return;
+              }
+
+              return sendMessage(troupe, user)
+                .delay(freq)
+                .then(next);
+            }
+
+            return next();
+          });
 
   });
 
+}
+
+process.stdin.on('data', function () {
+  console.log('Okay, shutting down');
+  finished = true;
 });
+
+chatbot()
+  .delay(5000)
+  .then(function() {
+    shutdown.shutdownGracefully();
+  });

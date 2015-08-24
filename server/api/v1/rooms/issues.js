@@ -48,7 +48,7 @@ module.exports = {
         var matches = issueNumber.length ? getTopEightMatchingIssues(issues, issueNumber) : getEightSuggestedIssues(issues);
         res.send(matches);
       })
-      .fail(next);
+      .catch(next);
   },
 
   show: function(req, res, next) {
@@ -75,6 +75,6 @@ module.exports = {
         res.send(issue);
 
       })
-      .fail(next);
+      .catch(next);
   }
 };

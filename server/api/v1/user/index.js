@@ -44,7 +44,7 @@ module.exports = {
         .then(function(searchResults) {
           res.send(searchResults);
         })
-        .fail(next);
+        .catch(next);
     }
 
     var strategy = new restSerializer.UserStrategy();

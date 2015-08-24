@@ -1,22 +1,18 @@
-/* jshint node:true */
+/* jshint node:true, unused:true */
 'use strict';
 
 var gulp = require('gulp');
 var livereload = require('gulp-livereload');
-var gutil = require("gulp-util");
 var webpack = require('gulp-webpack');
 var less = require('gulp-less');
 var gzip = require('gulp-gzip');
-var istanbul = require('gulp-istanbul');
 var mocha = require('gulp-spawn-mocha');
 var using = require('gulp-using');
 var tar = require('gulp-tar');
 var expect = require('gulp-expect-file');
-var shrinkwrap = require('gulp-shrinkwrap');
 var git = require('gulp-git');
 var fs = require('fs');
 var jshint = require('gulp-jshint');
-var imagemin = require('gulp-imagemin');
 var postcss = require('gulp-postcss');
 var autoprefixer = require('autoprefixer-core');
 var mqpacker = require('css-mqpacker');
@@ -37,7 +33,9 @@ var testModules = {
   'integration': ['./test/integration/**/*.js', './test/public-js/**/*.js'],
   'cache-wrapper': ['./modules/cache-wrapper/test/*.js'],
   'github': ['./modules/github/test/*.js'],
+  'push-notification-filter': ['./modules/push-notification-filter/test/*.js'],
   'split-tests': ['./modules/split-tests/test/*.js'],
+  'presence': ['./modules/presence/test/*.js'],
 };
 
 /** Make a series of tasks based on the test modules */
@@ -112,14 +110,14 @@ gulp.task('validate', ['validate-config', 'validate-client-source', 'validate-se
 
 makeTestTasks('test-mocha', function(name, files) {
   mkdirp.sync('output/test-reports/');
-  mkdirp.sync('output/coverage-reports/');
+  mkdirp.sync('output/coverage-reports/' + name);
 
   return gulp.src(files, { read: false })
     .pipe(mocha({
       reporter: 'xunit-file',
       timeout: 10000,
       istanbul: {
-        dir: 'output/coverage-reports/'
+        dir: 'output/coverage-reports/' + name
       },
       env: {
         TAP_FILE: 'output/test-reports/' + name + '.tap',
@@ -144,23 +142,21 @@ makeTestTasks('localtest', function(name, files) {
       env: {
         SKIP_BADGER_TESTS: 1,
         DISABLE_CONSOLE_LOGGING: 1,
-        Q_DEBUG: 1
+        Q_DEBUG: 1,
+        BLUEBIRD_DEBUG: 1
       }
     }));
 });
 
-/**
- * Matcha tests, submitted to datadog
- */
-gulp.task('test-perf-matcha', shell.task([
-  'NODE_ENV=test ./node_modules/.bin/matcha -R csv test/benchmarks/* | node test/submit-benchmarks-to-datadog.js',
-]));
+gulp.task('test-perf-benchmarkjs', shell.task([
+  'for i in test/benchmarks/*.js; do NODE_ENV=test node $i; done',
+], { timeout: 120000 }));
 
-gulp.task('test-perf', ['test-perf-matcha']);
+gulp.task('test-perf', ['test-perf-benchmarkjs']);
 
 gulp.task('benchmark-local', shell.task([
-  './node_modules/.bin/matcha --logging:level error test/benchmarks/*',
-]));
+  'for i in test/benchmarks/*.js; do node $i; done',
+], { timeout: 120000 }));
 
 gulp.task('clean:coverage', function (cb) {
   del([
@@ -168,18 +164,22 @@ gulp.task('clean:coverage', function (cb) {
   ], cb);
 });
 
-gulp.task('localtest-coverage', ['clean:coverage'], function() {
-  return gulp.src(['./test/integration/**/*.js', './test/public-js/**/*.js'], { read: false })
+makeTestTasks('localtest-coverage', function(name, files) {
+  mkdirp.sync('output/test-reports/');
+  mkdirp.sync('output/coverage-reports/' + name);
+
+  return gulp.src(files, { read: false })
     .pipe(mocha({
       reporter: 'spec',
       timeout: 10000,
       istanbul: {
-        dir: 'output/coverage-reports/'
+        dir: 'output/coverage-reports/' + name
       },
       env: {
         SKIP_BADGER_TESTS: 1,
         DISABLE_CONSOLE_LOGGING: 1,
-        Q_DEBUG: 1
+        Q_DEBUG: 1,
+        BLUEBIRD_DEBUG: 1
       }
     }));
 });
@@ -276,17 +276,20 @@ gulp.task('copy-asset-files', function() {
 
 
 // Run this task occassionally and check the results into git...
-gulp.task('compress-images', function() {
-  return gulp.src([
-      'public/images/**',
-      'public/sprites/**'
-    ], { "base" : "./public" })
-    .pipe(imagemin({
-       progressive: true,
-       optimizationLevel: 2
-     }))
-    .pipe(gulp.dest('./public'));
-});
+// Disabled as it adds loads of extra time to npm install
+// and since we almost never use it
+// It hasn't been deleted as we may one day find it useful again
+// gulp.task('compress-images', function() {
+//   return gulp.src([
+//       'public/images/**',
+//       'public/sprites/**'
+//     ], { "base" : "./public" })
+//     .pipe(imagemin({
+//        progressive: true,
+//        optimizationLevel: 2
+//      }))
+//     .pipe(gulp.dest('./public'));
+// });
 
 gulp.task('css-ios', function () {
   return gulp.src([

@@ -61,7 +61,7 @@ router.get('/tags/:tags',
   identifyRoute('explore-tags'),
   function (req, res, next) {
     var tags = req.params.tags.split(',');
-    exploreService.fetchByTags(tags)
+    return exploreService.fetchByTags(tags)
       .then(processTagResult)
       .then(function (rooms) {
         var searchNames = getSearchName(tags);
@@ -72,7 +72,7 @@ router.get('/tags/:tags',
           isLoggedIn: !!req.user
         });
       })
-      .fail(next);
+      .catch(next);
   });
 
 module.exports = router;

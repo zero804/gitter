@@ -1,4 +1,3 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var env = require('gitter-web-env');
@@ -13,6 +12,7 @@ var debug = require('debug')('gitter:push-notification-gateway');
 
 function sendNotificationToDevice(notification, badge, device) {
   var notificationPromise;
+  debug('sendNotificationToDevice: %j, badge=%s', notification, device);
 
   if (!device.deviceType) {
     logger.warn('Unknown device type: ' + device.deviceType);
@@ -39,13 +39,13 @@ function sendNotificationToDevice(notification, badge, device) {
   });
 }
 
-exports.sendUserNotification = function(userId, notification, callback) {
+exports.sendUserNotification = function(userId, notification) {
   return pushNotificationService.findEnabledDevicesForUsers([userId])
     .then(function(devices) {
       if(!devices.length) return;
 
       return unreadItemService.getBadgeCountsForUserIds([userId]).then(function(counts) {
-        debug("Sending to %s potential devices for %s", devices.length, userId);
+        debug("Sending to %s potential devices for %s: %j", devices.length, userId, notification);
 
         var badge = counts[userId] || 0;
 
@@ -54,12 +54,15 @@ exports.sendUserNotification = function(userId, notification, callback) {
         }));
     });
 
-  }).nodeify(callback);
+  });
 };
 
-exports.sendUsersBadgeUpdates = function(userIds, callback) {
+exports.sendUsersBadgeUpdates = function(userIds) {
+  debug('Sending push notifications to %s users', userIds.length);
+
   if(!Array.isArray(userIds)) userIds = [userIds];
-  pushNotificationService.findEnabledDevicesForUsers(userIds)
+
+  return pushNotificationService.findEnabledDevicesForUsers(userIds)
     .then(function(devices) {
       if (!devices.length) return;
 
@@ -83,5 +86,5 @@ exports.sendUsersBadgeUpdates = function(userIds, callback) {
           }));
         });
 
-    }).nodeify(callback);
+    });
 };

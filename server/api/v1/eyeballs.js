@@ -5,7 +5,7 @@ var env = require('gitter-web-env');
 var logger = env.logger;
 var stats = env.stats;
 
-var presenceService = require('../../services/presence-service');
+var presenceService = require('gitter-web-presence');
 var bayeux = require('../../web/bayeux');
 
 module.exports =  function(req, res, next) {

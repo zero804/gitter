@@ -12,7 +12,7 @@ var Q = require('q');
 var shutdown = require('shutdown');
 var es = require('event-stream');
 
-// require('../server/utils/event-listeners').installLocalEventListeners();
+// require('../../server/event-listeners').install();
 
 var opts = require("nomnom")
    .option('room', {

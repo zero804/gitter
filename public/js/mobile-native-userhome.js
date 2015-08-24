@@ -4,31 +4,19 @@ var UserHomeView = require('views/userhome/userHomeView');
 var $ = require('jquery');
 var appEvents = require('utils/appevents');
 var Backbone = require('backbone');
-var cordovaNavigate = require('components/cordova-navigate');
 var confirmRepoRoomView = require('views/createRoom/confirmRepoRoomView');
 var modalRegion = require('components/modal-region');
 var onready = require('./utils/onready');
-var FastClick = require('fastclick');
 
 // Preload widgets
 require('views/widgets/avatar');
 require('components/ping');
 
 onready(function() {
-  FastClick.attach(document.body);
 
-  require('components/link-handler').installLinkHandler();
   appEvents.on('navigation', function(url) {
-    if(window.cordova) {
-      // ios only
-      cordovaNavigate.navigate(url);
-    } else {
-      // android
-      window.location.href = url;
-    }
+    window.location.href = url;
   });
-
-  cordovaNavigate.setNativeToUserhome();
 
   function onContextLoad() {
     new UserHomeView({
