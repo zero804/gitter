@@ -2,6 +2,10 @@
 
 var assert          = require('assert');
 var presenceService = require('..');
+var mockito         = require('jsmockito').JsMockito;
+var never           = mockito.Verifiers.never;
+var hamcrest        = require('jshamcrest').JsHamcrest;
+var anything        = hamcrest.Matchers.anything;
 
 var fakeEngine = {
   clientExists: function(clientId, callback) { callback(!clientId.match(/^TEST/)); }
@@ -740,6 +744,243 @@ describe('presenceService', function() {
 
     });
 
+
+  });
+
+  describe('socketReassociated', function() {
+    var userId, socketId, troupeId, troupeId2, presenceChangeMock, eyeballSignalMock;
+
+    beforeEach(function() {
+      userId = 'TESTUSER1' + Date.now();
+      socketId = 'TESTSOCKET1' + Date.now();
+      troupeId = 'TESTTROUPE1' + Date.now();
+      troupeId2 = 'TESTTROUPE2' + Date.now();
+
+      presenceChangeMock = mockito.mockFunction();
+      eyeballSignalMock = mockito.mockFunction();
+
+      presenceService.on('presenceChange', presenceChangeMock);
+      presenceService.on('eyeballSignal', eyeballSignalMock);
+    });
+
+    afterEach(function() {
+      presenceService.removeListener('presenceChange', presenceChangeMock);
+      presenceService.removeListener('eyeballSignal', eyeballSignalMock);
+    });
+
+    describe('non-anonymous', function() {
+
+      it('should reassociate a socket correctly', function(done) {
+        return presenceService.userSocketConnected(userId, socketId, 'online', 'test', troupeId, true)
+          .then(function() {
+            // Validate user is in troupe1
+            return presenceService.listOnlineUsersForTroupes([troupeId]);
+          })
+          .then(function(online) {
+            mockito.verify(presenceChangeMock)(userId, troupeId, true);
+
+            assert.deepEqual(online[troupeId], [userId]);
+            return presenceService.socketReassociated(socketId, userId, troupeId2, true);
+          })
+          .then(function() {
+            mockito.verify(presenceChangeMock)(userId, troupeId, false);
+            mockito.verify(presenceChangeMock)(userId, troupeId2, true);
+
+            // Validate new presence
+            return presenceService.listOnlineUsersForTroupes([troupeId, troupeId2]);
+          })
+          .then(function(online) {
+            assert.deepEqual(online[troupeId], []);
+            assert.deepEqual(online[troupeId2], [userId]);
+
+            // Validate details on socket
+            return presenceService.getSocket(socketId);
+          })
+          .then(function(socket) {
+            assert.strictEqual(socket.userId, userId);
+            assert.strictEqual(socket.troupeId, troupeId2);
+            assert.strictEqual(socket.eyeballs, true);
+            assert.strictEqual(socket.clientType, 'test');
+          })
+          .nodeify(done);
+      });
+
+      it('should reassociate a socket when previously there was no socket', function(done) {
+        return presenceService.userSocketConnected(userId, socketId, 'online', 'test', null, true)
+          .then(function() {
+            // Validate user is in troupe1
+            return presenceService.listOnlineUsersForTroupes([troupeId]);
+          })
+          .then(function(online) {
+            mockito.verify(presenceChangeMock, never())(userId, troupeId, true);
+            assert.deepEqual(online[troupeId], []);
+            return presenceService.socketReassociated(socketId, userId, troupeId2, true);
+          })
+          .then(function() {
+            mockito.verify(presenceChangeMock, never())(userId, troupeId, false);
+            mockito.verify(presenceChangeMock)(userId, troupeId2, true);
+
+            // Validate new presence
+            return presenceService.listOnlineUsersForTroupes([troupeId, troupeId2]);
+          })
+          .then(function(online) {
+            assert.deepEqual(online[troupeId], []);
+            assert.deepEqual(online[troupeId2], [userId]);
+
+            // Validate details on socket
+            return presenceService.getSocket(socketId);
+          })
+          .then(function(socket) {
+            assert.strictEqual(socket.userId, userId);
+            assert.strictEqual(socket.troupeId, troupeId2);
+            assert.strictEqual(socket.eyeballs, true);
+            assert.strictEqual(socket.clientType, 'test');
+          })
+          .nodeify(done);
+      });
+
+      it('should clear a socket troupe association', function(done) {
+        return presenceService.userSocketConnected(userId, socketId, 'online', 'test', troupeId, true)
+          .then(function() {
+            // Validate user is in troupe1
+            return presenceService.listOnlineUsersForTroupes([troupeId]);
+          })
+          .then(function(online) {
+            mockito.verify(presenceChangeMock)(userId, troupeId, true);
+            assert.deepEqual(online[troupeId], [userId]);
+            return presenceService.socketReassociated(socketId, userId, null, true); // Eyeballs true here is incorrect but deliberate as clients can make mistakes
+          })
+          .then(function() {
+            mockito.verify(presenceChangeMock)(userId, troupeId, false);
+            mockito.verify(presenceChangeMock, never())(userId, troupeId2, true);
+
+            // Validate new presence
+            return presenceService.listOnlineUsersForTroupes([troupeId, troupeId2]);
+          })
+          .then(function(online) {
+            assert.deepEqual(online[troupeId], []);
+            assert.deepEqual(online[troupeId2], []);
+
+            // Validate details on socket
+            return presenceService.getSocket(socketId);
+          })
+          .then(function(socket) {
+            console.log(socket);
+            assert.strictEqual(socket.userId, userId);
+            assert.strictEqual(socket.troupeId, null);
+            assert.strictEqual(socket.eyeballs, false);
+            assert.strictEqual(socket.clientType, 'test');
+          })
+          .nodeify(done);
+      });
+    });
+
+    describe('anonymous', function() {
+
+      it('should reassociate a socket correctly', function(done) {
+        return presenceService.userSocketConnected(null, socketId, 'online', 'test', troupeId, true)
+          .then(function() {
+            mockito.verify(presenceChangeMock, never())(null, anything(), anything());
+
+            // Validate user is in troupe1
+            return presenceService.listOnlineUsersForTroupes([troupeId]);
+          })
+          .then(function(online) {
+            assert.deepEqual(online[troupeId], []);
+            return presenceService.socketReassociated(socketId, null, troupeId2, true);
+          })
+          .then(function() {
+            mockito.verify(presenceChangeMock, never())(null, anything(), anything());
+
+            // Validate new presence
+            return presenceService.listOnlineUsersForTroupes([troupeId, troupeId2]);
+          })
+          .then(function(online) {
+            assert.deepEqual(online[troupeId], []);
+            assert.deepEqual(online[troupeId2], []);
+
+            // Validate details on socket
+            return presenceService.getSocket(socketId);
+          })
+          .then(function(socket) {
+            assert.strictEqual(socket.userId, null);
+            assert.strictEqual(socket.troupeId, troupeId2);
+            assert.strictEqual(socket.eyeballs, false);
+            assert.strictEqual(socket.clientType, 'test');
+          })
+          .nodeify(done);
+      });
+
+      it('should reassociate a socket when previously there was no socket', function(done) {
+        return presenceService.userSocketConnected(null, socketId, 'online', 'test', null, true)
+          .then(function() {
+            mockito.verify(presenceChangeMock, never())(null, anything(), anything());
+
+            // Validate user is in troupe1
+            return presenceService.listOnlineUsersForTroupes([troupeId]);
+          })
+          .then(function(online) {
+            assert.deepEqual(online[troupeId], []);
+            return presenceService.socketReassociated(socketId, null, troupeId2, true);
+          })
+          .then(function() {
+            mockito.verify(presenceChangeMock, never())(null, anything(), anything());
+
+            // Validate new presence
+            return presenceService.listOnlineUsersForTroupes([troupeId, troupeId2]);
+          })
+          .then(function(online) {
+            assert.deepEqual(online[troupeId], []);
+            assert.deepEqual(online[troupeId2], []);
+
+            // Validate details on socket
+            return presenceService.getSocket(socketId);
+          })
+          .then(function(socket) {
+            assert.strictEqual(socket.userId, null);
+            assert.strictEqual(socket.troupeId, troupeId2);
+            assert.strictEqual(socket.eyeballs, true);
+            assert.strictEqual(socket.clientType, 'test');
+          })
+          .nodeify(done);
+      });
+
+      it('should clear a socket troupe association', function(done) {
+        return presenceService.userSocketConnected(null, socketId, 'online', 'test', troupeId, true)
+          .then(function() {
+            mockito.verify(presenceChangeMock, never())(null, anything(), anything());
+
+            // Validate user is in troupe1
+            return presenceService.listOnlineUsersForTroupes([troupeId]);
+          })
+          .then(function(online) {
+            mockito.verify(presenceChangeMock, never())(null, anything(), anything());
+            assert.deepEqual(online[troupeId], []);
+            return presenceService.socketReassociated(socketId, null, null, true); // Eyeballs true here is incorrect but deliberate as clients can make mistakes
+          })
+          .then(function() {
+            mockito.verify(presenceChangeMock, never())(null, anything(), anything());
+
+            // Validate new presence
+            return presenceService.listOnlineUsersForTroupes([troupeId, troupeId2]);
+          })
+          .then(function(online) {
+            assert.deepEqual(online[troupeId], []);
+            assert.deepEqual(online[troupeId2], []);
+
+            // Validate details on socket
+            return presenceService.getSocket(socketId);
+          })
+          .then(function(socket) {
+            console.log(socket);
+            assert.strictEqual(socket.userId, null);
+            assert.strictEqual(socket.troupeId, null);
+            assert.strictEqual(socket.eyeballs, false);
+            assert.strictEqual(socket.clientType, 'test');
+          })
+          .nodeify(done);
+      });
+    });
 
   });
 
