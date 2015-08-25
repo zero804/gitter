@@ -21,7 +21,7 @@ module.exports = function (markdown) {
   processor.process(markdown, function (err, result) {
     if(err) {
       stats.event('markdown.failure');
-      errorReporter(err, { text: markdown, processed: !!result });
+      errorReporter(err, { text: markdown, processed: !!result }, { module: 'markdown-processor' });
 
       if(result) {
         // hey, at least we got a result!
