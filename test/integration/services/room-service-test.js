@@ -1721,4 +1721,76 @@ describe('room-service #slow', function() {
 
   });
 
+  describe('createGithubRoom', function() {
+    var fixture = {};
+    var permissionsModelMock, roomPermissionsModelMock, roomValidatorMock, roomService;
+
+    beforeEach(function() {
+      permissionsModelMock = mockito.mockFunction();
+      roomPermissionsModelMock = mockito.mockFunction();
+      roomValidatorMock = mockito.mockFunction();
+      roomService = testRequire.withProxies('./services/room-service', {
+        './permissions-model': permissionsModelMock,
+        './room-permissions-model': roomPermissionsModelMock,
+        'gitter-web-github': {
+          GitHubUriValidator: roomValidatorMock
+        }
+      });
+    });
+
+    before(fixtureLoader(fixture, {
+      troupeOrg1: {
+        githubType: 'ORG',
+        users: []
+      },
+      user1: {}
+    }));
+
+    after(function() {
+      fixture.cleanup();
+    });
+
+    it('should return an new room if one does not exist', function(done) {
+      mockito.when(permissionsModelMock)().thenReturn(Q.resolve(true));
+      var orgUri = fixture.generateUri('ORG');
+
+      mockito.when(roomValidatorMock)().then(function() {
+        return Q.resolve({
+          type: 'ORG',
+          uri: orgUri,
+          githubId: 2345,
+          description: 'renamed',
+          security: 'PUBLIC'
+        });
+      });
+
+      return roomService.createGithubRoom(fixture.user1, orgUri)
+        .then(function(room) {
+          assert.strictEqual(room.uri, orgUri);
+          assert.strictEqual(room.githubId, 2345);
+        })
+        .nodeify(done);
+    });
+
+    it('should return an existing room if it exists', function(done) {
+      mockito.when(permissionsModelMock)().thenReturn(Q.resolve(true));
+
+      mockito.when(roomValidatorMock)().then(function() {
+        return Q.resolve({
+          type: 'ORG',
+          uri: fixture.troupeOrg1.uri,
+          githubId: 1234,
+          description: 'renamed',
+          security: 'PUBLIC'
+        });
+      });
+
+      return roomService.createGithubRoom(fixture.user1, fixture.troupeOrg1.uri)
+        .then(function(room) {
+          assert.strictEqual(room.id, fixture.troupeOrg1.id);
+        })
+        .nodeify(done);
+    });
+
+  });
 });
