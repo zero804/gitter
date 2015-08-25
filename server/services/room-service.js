@@ -1501,15 +1501,15 @@ function deleteRoom(troupe) {
         });
     })
     .then(function() {
-      if (troupe.oneToOne) {
-        return troupe.removeQ();
-      }
+      return troupe.removeQ();
+    })
+    .then(function() {
+      return Q.all([
+          persistence.ChatMessage.removeQ({ toTroupeId: troupe._id }),
+          persistence.Event.removeQ({ toTroupeId: troupe._id }),
+          // TODO: webhooks
+        ]);
 
-      troupe.status = 'DELETED';
-      if (!troupe.dateDeleted) {
-        troupe.dateDeleted = new Date();
-      }
-      return troupe.saveQ();
-    });
+    })
 }
 exports.deleteRoom = deleteRoom;
