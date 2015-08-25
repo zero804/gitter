@@ -271,11 +271,7 @@ function findOrCreateGroupRoom(user, troupe, uri, options) {
                 topic: topic || "",
                 security: security,
                 dateLastSecurityCheck: new Date(),
-                // users:  user ? [{
-                //   _id: new ObjectID(),
-                //   userId: user._id
-                // }] : [],
-                userCount: user ? 1 : 0
+                userCount: 0 
               }
             })
             .spread(function(troupe, updateExisting) {
@@ -914,8 +910,7 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
               parentId: parentTroupe && parentTroupe._id,
               ownerUserId: parentTroupe ? null : user._id,
               githubType: githubType,
-              // users:  user ? [{ _id: new ObjectID(), userId: user._id }] : [],
-              userCount:  user ? 1 : 0
+              userCount: 0
             }
           })
           .spread(function(newRoom, updatedExisting) {

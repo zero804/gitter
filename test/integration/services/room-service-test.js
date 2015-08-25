@@ -170,6 +170,7 @@ describe('room-service #slow', function() {
         .then(function (uriContext) {
           assert(uriContext.didCreate);
           assert.equal(uriContext.troupe.uri, 'gitterTest');
+          assert.equal(uriContext.troupe.userCount, 0);
         })
         .finally(function () {
           return persistence.Troupe.removeQ({ uri: 'gitterTest' });
