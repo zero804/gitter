@@ -1753,12 +1753,12 @@ describe('room-service #slow', function() {
     it('should return an new room if one does not exist', function(done) {
       mockito.when(permissionsModelMock)().thenReturn(Q.resolve(true));
       var orgUri = fixture.generateUri('ORG');
-
+      var githubId = fixture.generateGithubId();
       mockito.when(roomValidatorMock)().then(function() {
         return Q.resolve({
           type: 'ORG',
           uri: orgUri,
-          githubId: 2345,
+          githubId: githubId,
           description: 'renamed',
           security: 'PUBLIC'
         });
@@ -1767,19 +1767,20 @@ describe('room-service #slow', function() {
       return roomService.createGithubRoom(fixture.user1, orgUri)
         .then(function(room) {
           assert.strictEqual(room.uri, orgUri);
-          assert.strictEqual(room.githubId, 2345);
+          assert.strictEqual(room.githubId, githubId);
         })
         .nodeify(done);
     });
 
     it('should return an existing room if it exists', function(done) {
       mockito.when(permissionsModelMock)().thenReturn(Q.resolve(true));
+      var githubId = fixture.generateGithubId();
 
       mockito.when(roomValidatorMock)().then(function() {
         return Q.resolve({
           type: 'ORG',
           uri: fixture.troupeOrg1.uri,
-          githubId: 1234,
+          githubId: githubId,
           description: 'renamed',
           security: 'PUBLIC'
         });
