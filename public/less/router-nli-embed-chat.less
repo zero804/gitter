@@ -1,0 +1,20 @@
+@import "base-web.less";
+@import "typography.less";
+
+// This will go (soon I hope)
+@import "trp3Chat.less";
+
+// Dependencies of the template
+@import "chat-content";
+@import "chat-app";
+@import "chat-embed";
+
+/* Import an CSS required for the server-side template */
+@import "../js/views/app/chatIntegratedView";
+@import "../js/views/chat/chatCollectionView";
+@import "../js/views/chat/decorators/issueDecorator";
+@import "../js/views/chat/decorators/commitDecorator";
+@import "../js/views/chat/decorators/mentionDecorator";
+@import "../js/views/chat/decorators/embedDecorator";
+@import "../js/views/chat/decorators/emojiDecorator";
+@import "../js/views/widgets/preload";
