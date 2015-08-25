@@ -483,10 +483,15 @@ function createGithubRoom(user, uri) {
         })
         .then(function() {
 
-          // prefer queries with githubIds, as they survive github renames
-          var queryTerm = githubId ?
-              { githubId: githubId, githubType: githubType } :
-              { lcUri: lcUri, githubType: githubType };
+          var queryTerm = { githubType: githubType };
+          if (githubId) {
+            // prefer queries with githubIds, as they survive github renames
+            queryTerm.$or = [{ lcUri: lcUri }, { githubId: githubId }];
+          } else {
+            queryTerm.lcUri = lcUri;
+          }
+
+          debug('Upserting room for query %j', queryTerm);
 
           return mongooseUtils.upsert(persistence.Troupe, queryTerm, {
                $setOnInsert: {
@@ -502,6 +507,8 @@ function createGithubRoom(user, uri) {
               }
             })
             .spread(function(room, updateExisting) {
+              debug('Upsert found existing room? %s', updateExisting);
+
               if (!updateExisting) {
                 stats.event("create_room", {
                   userId: user.id,
