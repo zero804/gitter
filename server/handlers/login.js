@@ -156,7 +156,10 @@ router.get('/callback',
         done(function() {
 
           if(err) {
+            stats.event("login_failure");
+
             errorReporter(err, {
+              additionalErrorInfo: err.toString(), // passportjs.InternalOAuthError will return additional information in it's toString
               githubCallbackFailed: "failed",
               username: req.user && req.user.username,
               url: req.url,
