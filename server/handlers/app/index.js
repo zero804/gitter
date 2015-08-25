@@ -95,7 +95,12 @@ var embedMiddlewarePipeline = [
   timezoneMiddleware,
   function (req, res, next) {
     if(!req.uriContext.troupe) return next(404);
-    appRender.renderEmbeddedChat(req, res, next);
+
+    if (req.user) {
+      appRender.renderEmbeddedChat(req, res, next);
+    } else {
+      appRender.renderNotLoggedInEmbeddedChat(req, res, next);
+    }
   }
 ];
 
