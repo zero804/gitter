@@ -327,7 +327,7 @@ function findOrCreateGroupRoom(user, troupe, uri, options) {
                   applyAutoHooksForRepoRoom(user, troupe)
                     .catch(function(err) {
                       logger.error("Unable to apply hooks for new room", { exception: err });
-                      errorReporter(err, { uri: uri, user: user.username });
+                      errorReporter(err, { uri: uri, user: user.username }, { module: 'room-service' });
                     });
                 }
 
@@ -350,7 +350,7 @@ function findOrCreateGroupRoom(user, troupe, uri, options) {
                       return badger.sendBadgePullRequest(uri, user);
                     })
                     .catch(function(err) {
-                      errorReporter(err, { uri: uri, user: user.username });
+                      errorReporter(err, { uri: uri, user: user.username }, { module: 'room-service' });
                       logger.error('Unable to send pull request for new room', { exception: err });
                     });
                 }
