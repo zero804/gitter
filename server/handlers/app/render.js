@@ -413,12 +413,16 @@ function renderOrgPage(req, res, next) {
     ghOrgService.getOrg(org).catch(function() { return {login: org}; }),
     troupeService.findChildRoomsForOrg(org, opts),
     contextGenerator.generateNonChatContext(req),
-    orgPermissionModel(req.user, 'admin', org)
+    orgPermissionModel(req.user, 'admin', org),
+    orgPermissionModel(req.user, 'join', org)
   ])
-  .spread(function (ghOrg,rooms, troupeContext, isOrgAdmin) {
+  .spread(function (ghOrg,rooms, troupeContext, isOrgAdmin, isOrgMember) {
 
     // Filter out PRIVATE rooms
     rooms = rooms.filter(function(room) { return room.security !== 'PRIVATE'; });
+
+    // Filter out the ORG room for non org members
+    if (!isOrgMember) rooms = rooms.filter(function(room) { return room.githubType !== 'ORG'; });
 
     // Calculate org user count across all rooms (except private)
     var orgUserCount = rooms.reduce(function(accum, room) {
