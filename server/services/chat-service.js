@@ -151,7 +151,7 @@ exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
         // Async add unread items
         unreadItemService.createChatUnreadItems(user.id, troupe, chatMessage)
           .catch(function(err) {
-            errorReporter(err, { operation: 'unreadItemService.createChatUnreadItems', chat: chatMessage });
+            errorReporter(err, { operation: 'unreadItemService.createChatUnreadItems', chat: chatMessage }, { module: 'chat-service' });
           });
 
         var statMetadata = _.extend({
@@ -223,7 +223,7 @@ exports.updateChatMessage = function(troupe, chatMessage, user, newText, callbac
           // Async add unread items
           unreadItemService.updateChatUnreadItems(user.id, troupe, chatMessage, originalMentions)
             .catch(function(err) {
-              errorReporter(err, { operation: 'unreadItemService.updateChatUnreadItems', chat: chatMessage });
+              errorReporter(err, { operation: 'unreadItemService.updateChatUnreadItems', chat: chatMessage }, { module: 'chat-service' });
             });
 
           stats.event("edit_chat", {

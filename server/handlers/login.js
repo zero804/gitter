@@ -164,7 +164,7 @@ router.get('/callback',
               username: req.user && req.user.username,
               url: req.url,
               userHasSession: !!req.session
-            });
+            }, { module: 'login-handler' });
 
             if(upgrade) {
               res.redirect('/login/upgrade-failed');
