@@ -101,16 +101,16 @@ onready(function () {
      RAF(function() {
       // IE seems to prefer this in a new animation-frame
 
-      //If we are navigating to a anything other than a chat refresh
-      if(type !== 'chat') {
-        document.querySelector('#content-frame').contentWindow.location.replace(iframeUrl + hash);
-        return;
-      }
-
       //TODO, is this the best way to do this JP 19/8/15
       var segments = iframeUrl.split('/');
       var troupeName = segments.splice(1, segments.length - 2).join('/');
       var newTroupe = troupeCollections.troupes.where({ name: troupeName })[0];
+
+      //If we are navigating to a anything other than a chat refresh
+      if(type !== 'chat' || !newTroupe) {
+        document.querySelector('#content-frame').contentWindow.location.replace(iframeUrl + hash);
+        return;
+      }
 
       //post a navigation change to the iframe
       postMessage({
