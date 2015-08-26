@@ -15,9 +15,6 @@ module.exports = Backbone.Model.extend({
     var roomModel = context.troupe();
     var userModel = context.user();
 
-    console.log(roomModel.get('security'));
-    console.log(roomModel.toJSON());
-
     this.set({
       troupeName:      roomModel.get('name'),
       troupeFavourite: !!roomModel.get('favourite'),
