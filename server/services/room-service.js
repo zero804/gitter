@@ -271,7 +271,7 @@ function findOrCreateGroupRoom(user, troupe, uri, options) {
                 topic: topic || "",
                 security: security,
                 dateLastSecurityCheck: new Date(),
-                userCount: 0 
+                userCount: 0
               }
             })
             .spread(function(troupe, updateExisting) {
@@ -483,10 +483,15 @@ function createGithubRoom(user, uri) {
         })
         .then(function() {
 
-          // prefer queries with githubIds, as they survive github renames
-          var queryTerm = githubId ?
-              { githubId: githubId, githubType: githubType } :
-              { lcUri: lcUri, githubType: githubType };
+          var queryTerm = { githubType: githubType };
+          if (githubId) {
+            // prefer queries with githubIds, as they survive github renames
+            queryTerm.$or = [{ lcUri: lcUri }, { githubId: githubId }];
+          } else {
+            queryTerm.lcUri = lcUri;
+          }
+
+          debug('Upserting room for query %j', queryTerm);
 
           return mongooseUtils.upsert(persistence.Troupe, queryTerm, {
                $setOnInsert: {
@@ -502,6 +507,8 @@ function createGithubRoom(user, uri) {
               }
             })
             .spread(function(room, updateExisting) {
+              debug('Upsert found existing room? %s', updateExisting);
+
               if (!updateExisting) {
                 stats.event("create_room", {
                   userId: user.id,
@@ -1494,15 +1501,16 @@ function deleteRoom(troupe) {
         });
     })
     .then(function() {
-      if (troupe.oneToOne) {
-        return troupe.removeQ();
-      }
+      return troupe.removeQ();
+    })
+    .then(function() {
+      // TODO: NB: remove channel reference from parent room if this is a channel
+      return Q.all([
+          persistence.ChatMessage.removeQ({ toTroupeId: troupe._id }),
+          persistence.Event.removeQ({ toTroupeId: troupe._id }),
+          // TODO: webhooks
+        ]);
 
-      troupe.status = 'DELETED';
-      if (!troupe.dateDeleted) {
-        troupe.dateDeleted = new Date();
-      }
-      return troupe.saveQ();
-    });
+    })
 }
 exports.deleteRoom = deleteRoom;
