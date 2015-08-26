@@ -271,7 +271,7 @@ function findOrCreateGroupRoom(user, troupe, uri, options) {
                 topic: topic || "",
                 security: security,
                 dateLastSecurityCheck: new Date(),
-                userCount: 0 
+                userCount: 0
               }
             })
             .spread(function(troupe, updateExisting) {
@@ -1504,6 +1504,7 @@ function deleteRoom(troupe) {
       return troupe.removeQ();
     })
     .then(function() {
+      // TODO: NB: remove channel reference from parent room if this is a channel
       return Q.all([
           persistence.ChatMessage.removeQ({ toTroupeId: troupe._id }),
           persistence.Event.removeQ({ toTroupeId: troupe._id }),
