@@ -15,6 +15,9 @@ module.exports = Backbone.Model.extend({
     var roomModel = context.troupe();
     var userModel = context.user();
 
+    console.log(roomModel.get('security'));
+    console.log(roomModel.toJSON());
+
     this.set({
       troupeName:      roomModel.get('name'),
       troupeFavourite: !!roomModel.get('favourite'),
@@ -26,7 +29,7 @@ module.exports = Backbone.Model.extend({
       archives:        false,
       onToOne:         (roomModel.get('githubType') === 'ONETOONE'),
       githubLink:      getGithubUrl(roomModel),
-      isPrivate:       (roomModel.get('security') === 'PRIVATE')
+      isPrivate:       getPrivateStatus(roomModel)
     });
   },
 
@@ -35,6 +38,12 @@ module.exports = Backbone.Model.extend({
   }
 
 });
+
+function getPrivateStatus(roomModel){
+  return roomModel.get('githubType') === 'ORG' ?
+    true :
+    roomModel.get('security') === 'PRIVATE';
+}
 
 function getGithubUrl(roomModel) {
   return roomModel.get('githubType') === 'REPO' &&
