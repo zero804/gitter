@@ -172,7 +172,6 @@
     "imports-loader": "^0.6.3",
     "istanbul": "^0.3.6",
     "jquery-builder": "~0.5.0",
-    "jquery-hammerjs": "^1.1.3",
     "jshamcrest": "0.6.7",
     "jsmockito": "~1.0.4",
     "jsonlint": "1.5.1",
