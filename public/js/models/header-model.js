@@ -8,6 +8,7 @@ module.exports = Backbone.Model.extend({
     this.parse();
     //update when a room changes
     this.listenTo(context.troupe(), 'change:id', this.parse, this);
+    this.listenTo(context.troupe(), 'change:topic', this.syncTopic, this);
   },
   parse: function (){
     var roomModel = context.troupe();
@@ -26,7 +27,10 @@ module.exports = Backbone.Model.extend({
       githubLink: getGithubUrl(roomModel),
       isPrivate: (roomModel.get('security') === 'PRIVATE')
     });
-  }
+  },
+  syncTopic: function (roomModel){
+    this.set('topic', roomModel.get('topic'));
+  },
 });
 
 function getGithubUrl(roomModel) {
