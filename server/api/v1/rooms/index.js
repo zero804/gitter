@@ -1,4 +1,3 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var troupeService        = require("../../../services/troupe-service");
@@ -8,7 +7,6 @@ var restSerializer       = require("../../../serializers/rest-serializer");
 var Q                    = require('q');
 var mongoUtils           = require('../../../utils/mongo-utils');
 var StatusError          = require('statuserror');
-var roomDeletionService  = require('../../../services/room-deletion-service');
 var roomPermissionsModel = require('../../../services/room-permissions-model');
 
 function searchRooms(req, res, next) {
@@ -136,7 +134,11 @@ module.exports = {
       .then(function(isAdmin) {
         if (!isAdmin) throw new StatusError(403, 'admin permissions required');
 
-       return roomDeletionService.removeByUri(troupe.uri);
+        // Switch a lean troupe object for a full mongoose object
+        return troupeService.findById(req.troupe.id);
+      })
+      .then(function(troupe) {
+        return roomService.deleteRoom(troupe);
       })
       .then(function() {
         res.sendStatus(200);
