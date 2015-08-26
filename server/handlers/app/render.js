@@ -13,7 +13,9 @@ var social             = require('../social-metadata');
 var restSerializer     = require("../../serializers/rest-serializer");
 var burstCalculator    = require('../../utils/burst-calculator');
 var userSort           = require('../../../public/js/utils/user-sort');
-var roomSort           = require('gitter-realtime-client').sortsFilters.pojo;
+var roomSort           = require('gitter-realtime-client/lib/sorts-filters').pojo; /* <-- Don't use the default export
+                                                                                          will bring in tons of client-side
+                                                                                          libraries that we don't need */
 var roomNameTrimmer    = require('../../../public/js/utils/room-name-trimmer');
 var isolateBurst       = require('../../../shared/burst/isolate-burst-array');
 var unreadItemService  = require('../../services/unread-item-service');

@@ -31,10 +31,22 @@ var connections = {
   'APPLE-BETA-DEV': createConnection('BetaDev')
 };
 
-createFeedbackListener('Prod', true);
-createFeedbackListener('Dev');
-createFeedbackListener('Beta', true);
-createFeedbackListener('BetaDev');
+/* Only create the feedback listeners for the current environment */
+switch(config.get('NODE_ENV') || 'dev') {
+  case 'prod':
+    createFeedbackListener('Prod', true);
+    break;
+
+  case 'beta':
+    createFeedbackListener('Beta', true);
+    createFeedbackListener('BetaDev');
+    break;
+
+  case 'dev':
+    createFeedbackListener('Dev');
+    break;
+}
+
 
 function sendNotificationToDevice(notification, badge, device) {
   var appleNotification = createAppleNotification(notification, badge);
