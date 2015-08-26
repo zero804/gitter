@@ -40,28 +40,8 @@ function getGithubUrl(roomModel) {
 
 function getRoomImgUrl(roomModel, userModel){
     // Room image
-    var imgUrl;
-    var roomType = roomModel.get('githubType');
-
-    //if we have a provate room we use the repo url
-    if(roomModel.get('security') === 'PRIVATE'){
-      roomType = 'REPO';
-    }
-
-    switch(roomType){
-      //a user channel uses the user's avatar
-      case 'USER_CHANNEL':
-      case 'REPO':
-        imgUrl = userModel.get('avatarUrlMedium');
-        break;
-      //org rooms use the org's avatar url
-      case 'ORG_CHANNEL':
-      case 'ORG':
-        imgUrl = 'https://avatars.githubusercontent.com/' +
-                  roomModel.get('name').split('/')[0];
-        break;
-    }
-    return imgUrl;
+    var githubAvatarUrl = 'https://avatars.githubusercontent.com/';
+    return githubAvatarUrl + roomModel.get('name').split('/')[0];
 }
 
 function ownerIsOrg(roomModel){
