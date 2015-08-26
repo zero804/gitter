@@ -1,36 +1,39 @@
-"use strict"
+"use strict";
 
 var Backbone = require('backbone');
 var context = require('utils/context');
 
 module.exports = Backbone.Model.extend({
-  initialize: function (attrs, options){
+  initialize: function (){
     this.parse();
     //update when a room changes
     this.listenTo(context.troupe(), 'change:id', this.parse, this);
     this.listenTo(context.troupe(), 'change:topic', this.syncTopic, this);
   },
+
   parse: function (){
     var roomModel = context.troupe();
     var userModel = context.user();
 
     this.set({
-      troupeName: roomModel.get('name'),
+      troupeName:      roomModel.get('name'),
       troupeFavourite: !!roomModel.get('favourite'),
-      favourite: !!roomModel.get('favourite'),
-      troupeTopic: roomModel.get('topic'),
-      avatarUrl: getRoomImgUrl(roomModel, userModel),
-      ownerIsOrg: ownerIsOrg(roomModel),
-      user: !!userModel.get('id'),
-      archives: false,
-      onToOne: (roomModel.get('githubType') === 'ONETOONE'),
-      githubLink: getGithubUrl(roomModel),
-      isPrivate: (roomModel.get('security') === 'PRIVATE')
+      favourite:       !!roomModel.get('favourite'),
+      troupeTopic:     roomModel.get('topic'),
+      avatarUrl:       getRoomImgUrl(roomModel, userModel),
+      ownerIsOrg:      ownerIsOrg(roomModel),
+      user:            !!userModel.get('id'),
+      archives:        false,
+      onToOne:         (roomModel.get('githubType') === 'ONETOONE'),
+      githubLink:      getGithubUrl(roomModel),
+      isPrivate:       (roomModel.get('security') === 'PRIVATE')
     });
   },
+
   syncTopic: function (roomModel){
     this.set('topic', roomModel.get('topic'));
-  },
+  }
+
 });
 
 function getGithubUrl(roomModel) {
@@ -38,7 +41,7 @@ function getGithubUrl(roomModel) {
     'https://github.com' + roomModel.get('url');
 }
 
-function getRoomImgUrl(roomModel, userModel){
+function getRoomImgUrl(roomModel){
     // Room image
     var githubAvatarUrl = 'https://avatars.githubusercontent.com/';
     return githubAvatarUrl + roomModel.get('name').split('/')[0];
