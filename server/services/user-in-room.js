@@ -4,11 +4,13 @@ var persistence = require('./persistence-service');
 
 function userIsInRoom(uri, user) {
   var lcUri = uri.toLowerCase();
-  return persistence.Troupe.findOneQ({ lcUri: lcUri }, '_id', { lean: true })
+  return persistence.Troupe.findOne({ lcUri: lcUri }, '_id', { lean: true })
+    .exec()
     .then(function(troupe) {
       if(!troupe) return;
 
-      return persistence.TroupeUser.countQ({ troupeId: troupe._id, userId: user._id })
+      return persistence.TroupeUser.count({ troupeId: troupe._id, userId: user._id })
+        .exec()
         .then(function(count) {
           return count > 0;
         });

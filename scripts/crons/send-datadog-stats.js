@@ -8,14 +8,12 @@ var config      = require('gitter-web-env');
 var stats       = config.stats;
 var Q           = require('q');
 
-console.log(stats);
-
 Q.all([
-  persistence.User.countQ(),
-  persistence.ChatMessage.countQ(),
-  persistence.Troupe.countQ({security: 'PUBLIC'}),
-  persistence.Troupe.countQ({security: 'PRIVATE'}),
-  persistence.Troupe.countQ({githubType: 'ORG'})
+  persistence.User.count().exec(),
+  persistence.ChatMessage.count().exec(),
+  persistence.Troupe.count({security: 'PUBLIC'}).exec(),
+  persistence.Troupe.count({security: 'PRIVATE'}).exec(),
+  persistence.Troupe.count({githubType: 'ORG'}).exec()
 ])
 .spread(function(users, messages, public_rooms, private_rooms, org_rooms) {
   // The "1" after the count is the frequency, 1 == not sampled.

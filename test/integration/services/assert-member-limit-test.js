@@ -28,7 +28,7 @@ var assertMemberLimit = testRequire.withProxies('./services/assert-member-limit'
     }
   },
   './persistence-service': {
-    Subscription: { findOneQ: function() { return Q.resolve(subscritionFindResult); } }
+    Subscription: { findOne: function() { return { exec: function() { return Q.resolve(subscritionFindResult); } }; } }
   }
 });
 

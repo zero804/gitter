@@ -22,10 +22,12 @@ function buffersEqual(a,b) {
 }
 
 function findAndRemoveDevicesWithDuplicateTokens(deviceId, deviceType, deviceToken, tokenHash) {
-  return PushNotificationDevice.findQ({
+  return PushNotificationDevice.find({
       tokenHash: tokenHash,
       deviceType: deviceType
-    }).then(function(devices) {
+    })
+    .exec()
+    .then(function(devices) {
       var devicesToRemove = devices.filter(function(device) {
         // This device? Skip
         if(device.deviceId === deviceId) return false;
@@ -40,7 +42,7 @@ function findAndRemoveDevicesWithDuplicateTokens(deviceId, deviceType, deviceTok
 
       return Q.all(devicesToRemove.map(function(device) {
         debug('Removing unused device %s', device.deviceId);
-        return device.removeQ();
+        return device.remove();
       }));
     });
 }
@@ -49,7 +51,7 @@ exports.registerDevice = function(deviceId, deviceType, deviceToken, deviceName,
   debug("Registering device %s", deviceId);
   var tokenHash = crypto.createHash('md5').update(deviceToken).digest('hex');
 
-  return PushNotificationDevice.findOneAndUpdateQ(
+  return PushNotificationDevice.findOneAndUpdate(
     { deviceId: deviceId },
     {
       deviceId: deviceId,
@@ -63,6 +65,7 @@ exports.registerDevice = function(deviceId, deviceType, deviceToken, deviceName,
       enabled: true
     },
     { upsert: true, new: true })
+    .exec()
     .then(function(device) {
       // After we've update the device, look for other devices that have given us the same token
       // these are probably phones that have been reset etc, so we need to prune them
@@ -76,7 +79,7 @@ exports.registerAndroidDevice = function(deviceId, deviceName, registrationId, a
   debug("Registering device %s", deviceId);
   var tokenHash = crypto.createHash('md5').update(registrationId).digest('hex');
 
-  return PushNotificationDevice.findOneAndUpdateQ(
+  return PushNotificationDevice.findOneAndUpdate(
     { deviceId: deviceId },
     {
       userId: userId,
@@ -90,6 +93,7 @@ exports.registerAndroidDevice = function(deviceId, deviceName, registrationId, a
       enabled: true
     },
     { upsert: true, new: true })
+    .exec()
     .then(function(device) {
       // After we've update the device, look for other devices that have given us the same token
       // these are probably phones that have been reset etc, so we need to prune them
@@ -100,10 +104,11 @@ exports.registerAndroidDevice = function(deviceId, deviceName, registrationId, a
 };
 
 exports.registerUser = function(deviceId, userId, callback) {
-  return PushNotificationDevice.findOneAndUpdateQ(
+  return PushNotificationDevice.findOneAndUpdate(
     { deviceId: deviceId },
     { deviceId: deviceId, userId: userId, timestamp: new Date() },
     { upsert: true, new: true })
+    .exec()
     .nodeify(callback);
 };
 
@@ -113,7 +118,8 @@ function getCachedUsersWithDevices() {
     return Q.resolve(usersWithDevicesCache);
   }
 
-  return PushNotificationDevice.distinctQ('userId')
+  return PushNotificationDevice.distinct('userId')
+    .exec()
     .then(function(userIds) {
       usersWithDevicesCache = userIds.reduce(function(memo, userId) {
         memo[userId] = true;
@@ -147,7 +153,7 @@ exports.findEnabledDevicesForUsers = function(userIds, callback) {
   return PushNotificationDevice
     .where('userId')['in'](userIds)
     .or([ { enabled: true }, { enabled: { $exists: false } } ]) // Exists false === enabled for old devices
-    .execQ()
+    .exec()
     .then(function(devices) {
       return devices;
     })
@@ -155,8 +161,8 @@ exports.findEnabledDevicesForUsers = function(userIds, callback) {
 };
 
 exports.findDeviceForDeviceId = function(deviceId, callback) {
-  return PushNotificationDevice
-    .findOneQ({ deviceId: deviceId })
+  return PushNotificationDevice.findOne({ deviceId: deviceId })
+    .exec()
     .nodeify(callback);
 };
 
