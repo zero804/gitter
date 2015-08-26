@@ -1,13 +1,11 @@
 #!/usr/bin/env node
-/*jslint node: true */
+/*jslint node: true, unused:true */
 "use strict";
 
 var shutdown = require('shutdown');
-var roomDeletionService = require('../../server/services/room-deletion-service');
+var roomService = require('../../server/services/room-service');
 var troupeService = require('../../server/services/troupe-service');
 var Q = require('q');
-
-var winston = require('../../server/utils/winston');
 
 require('../../server/event-listeners').install();
 
@@ -34,7 +32,7 @@ return troupeService.findByUri(opts.uri)
       console.dir(answer);
 
       if(answer === 'yes') {
-        d.resolve();
+        d.resolve(room);
       } else {
         d.reject(new Error("Answered no"));
       }
@@ -42,8 +40,11 @@ return troupeService.findByUri(opts.uri)
 
     return d.promise;
   })
+  .then(function(room) {
+    return roomService.deleteRoom(room);
+  })
   .then(function() {
-    return roomDeletionService.removeByUri(opts.uri);
+    console.log('DONE. finishing up.');
   })
   .delay(5000)
   .then(function() {
