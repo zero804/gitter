@@ -157,8 +157,6 @@ function fixBadLinksOnId(value) {
 }
 
 function renderMainFrame(req, res, next, frame) {
-  var variant = splitTests.configure(req, res, 'nli');
-
   var user = req.user;
   var userId = user && user.id;
   var aroundId = fixBadLinksOnId(req.query.at);
@@ -192,7 +190,7 @@ function renderMainFrame(req, res, next, frame) {
         template = 'app-template';
         bootScriptName = 'router-app';
       } else {
-        template = splitTests.selectTemplate(variant, 'app-nli-template', 'app-nli-template_treatment');
+        template = 'app-nli-template';
         bootScriptName = 'router-nli-app';
       }
 
@@ -503,9 +501,8 @@ function renderOrgPage(req, res, next) {
 
 
 function renderNotLoggedInChatPage(req, res, next) {
-  var variant = splitTests.configure(req, res, 'nli');
   return renderChat(req, res, {
-    template: splitTests.selectTemplate(variant, 'chat-nli-template', 'chat-nli-template_treatment'),
+    template: 'chat-nli-template',
     script: 'router-nli-chat',
     unread: false // Not logged in users see chats as read
   }, next);
