@@ -140,7 +140,8 @@ function updateFavourite(userId, troupeId, favouritePosition) {
 exports.updateFavourite = updateFavourite;
 
 function findFavouriteTroupesForUser(userId) {
-  return persistence.UserTroupeFavourites.findOneQ({ userId: userId }, { favs: 1 }, { lean: true })
+  return persistence.UserTroupeFavourites.findOne({ userId: userId }, { favs: 1 }, { lean: true })
+    .exec()
     .then(function(userTroupeFavourites) {
       if(!userTroupeFavourites || !userTroupeFavourites.favs) return {};
 
@@ -209,7 +210,8 @@ function saveLastVisitedTroupeforUserId(userId, troupeId, options) {
 exports.saveLastVisitedTroupeforUserId = saveLastVisitedTroupeforUserId;
 
 function getTroupeLastAccessTimesForUserExcludingHidden(userId) {
-  return persistence.UserTroupeLastAccess.findOneQ({ userId: userId }, { _id: 0, troupes: 1 }, { lean: true })
+  return persistence.UserTroupeLastAccess.findOne({ userId: userId }, { _id: 0, troupes: 1 }, { lean: true })
+    .exec()
     .then(function(userTroupeLastAccess) {
       if(!userTroupeLastAccess || !userTroupeLastAccess.troupes) return {};
       return userTroupeLastAccess.troupes;
@@ -223,7 +225,8 @@ exports.getTroupeLastAccessTimesForUserExcludingHidden = getTroupeLastAccessTime
  * @return promise of a hash of { troupeId1: accessDate, troupeId2: accessDate ... }
  */
 function getTroupeLastAccessTimesForUser(userId) {
-  return persistence.UserTroupeLastAccess.findOneQ({ userId: userId }, { _id: 0, last: 1, troupes: 1 }, { lean: true })
+  return persistence.UserTroupeLastAccess.findOne({ userId: userId }, { _id: 0, last: 1, troupes: 1 }, { lean: true })
+    .exec()
     .then(function(userTroupeLastAccess) {
       if (!userTroupeLastAccess) return {};
 
@@ -288,7 +291,8 @@ function findLastAccessTimesForUsersInRoom(roomId, userIds) {
   select[lastKey] = 1;
   select[addedKey] = 1;
 
-  return persistence.UserTroupeLastAccess.findQ(query, select, { lean: true })
+  return persistence.UserTroupeLastAccess.find(query, select, { lean: true })
+    .exec()
     .then(function(lastAccessTimes) {
 
       var lastAccessTimesHash = lastAccessTimes.reduce(function(memo, item) {

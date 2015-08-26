@@ -78,7 +78,7 @@ function performUserToOrgTransition(usernameForConversion, firstUserUsername, dr
         orQuery.push({ ownerUserId: context.userForConversion._id });
       }
 
-      return persistence.Troupe.findQ({ $or: orQuery });
+      return persistence.Troupe.find({ $or: orQuery }).exec();
     })
     .then(function(troupesForUpdate) {
       /* Update the org rooms */
@@ -96,7 +96,7 @@ function performUserToOrgTransition(usernameForConversion, firstUserUsername, dr
         delete t.ownerUserId;
         t.parentId = context.newOrgRoom._id;
 
-        return t.saveQ();
+        return t.save();
       }));
     });
 

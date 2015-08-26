@@ -1,10 +1,7 @@
 'use strict';
 
-
 var testRequire = require('../test-require');
-var assert = require('assert');
 var fixtureLoader = require('../test-fixtures');
-var Q = require('q');
 
 var repoPremiumStatusNotifier = testRequire("./services/repo-premium-status-notifier");
 var fixture = {};
@@ -33,12 +30,12 @@ describe('repo-premium-status-notifier', function() {
       .nodeify(done);
   });
 
-  it('should work with orgs on', function(done) {
+  it('should work with orgs on #slow', function(done) {
     repoPremiumStatusNotifier('gitterHQ', true)
       .nodeify(done);
   });
 
-  it('should work with users off', function(done) {
+  it('should work with users off #slow', function(done) {
     repoPremiumStatusNotifier('gitterHQ', false)
       .nodeify(done);
   });

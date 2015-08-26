@@ -74,7 +74,8 @@ var fetchGithubInfo = function (uri, user) {
 };
 
 var attachRepoInfoForRepoRoom = function (room) {
-  return persistence.User.findByIdQ(room.users[0].id)
+  return persistence.User.findById(room.users[0].id)
+    .exec()
     .then(function (user) {
       return fetchGithubInfo(room.uri, user);
     })
@@ -134,7 +135,7 @@ var saveRooms = function (rooms) {
 
   return Q.all(
     rooms.map(function (room) {
-      return room.saveQ()
+      return room.save()
         .then(function () {
           TAGGED += 1;
         })

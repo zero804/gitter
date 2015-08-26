@@ -25,7 +25,8 @@ function SuggestedRoomStrategy() {
       return;
     }
 
-    persistence.Troupe.findQ({ _id: { $in: suggestedRoomIds }, security: 'PUBLIC' }, { uri: 1, githubType: 1, userCount: 1, topic: 1 })
+    persistence.Troupe.find({ _id: { $in: suggestedRoomIds }, security: 'PUBLIC' }, { uri: 1, githubType: 1, userCount: 1, topic: 1 })
+      .exec()
       .then(function(rooms) {
         roomHash = collections.indexById(rooms);
       })

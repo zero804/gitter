@@ -31,7 +31,7 @@ stream.pipe(es.through(function(data) {
       if (lang) {
         console.log('Updating ', data.uri, ' to ', lang);
         data.lang = lang;
-        return persistence.Troupe.findOneAndUpdateQ({ _id: data._id }, { $set: { lang: lang } });
+        return persistence.Troupe.findOneAndUpdate({ _id: data._id }, { $set: { lang: lang } }).exec();
       }
     })
     .then(function() {

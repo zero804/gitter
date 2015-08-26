@@ -15,7 +15,7 @@ module.exports = {
 
     return legacyRecommendations.getSuggestionsForUser(req.user, req.i18n.getLocale())
       .then(function(suggestions) {
-        return restSerializer.serializeQ(suggestions, new restSerializer.SuggestedRoomStrategy({ }));
+        return restSerializer.serialize(suggestions, new restSerializer.SuggestedRoomStrategy({ }));
       })
       .then(function(serialized) {
         return res.send(serialized);

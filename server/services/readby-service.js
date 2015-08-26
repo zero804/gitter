@@ -126,10 +126,11 @@ function batchUpdateReadbyBatchLegacy(key, userIdStrings, done) {
 
   var userIds = userIdStrings.map(mongoUtils.asObjectID);
 
-  ChatMessage.findOneAndUpdateQ(
+  ChatMessage.findOneAndUpdate(
     { _id: chatId, toTroupeId: troupeId },
     { $addToSet:  { 'readBy': { $each: userIds } } },
     { select: { readBy: 1, _tv: 1 }, new: true })
+    .exec()
     .then(function(chat) {
       if (!chat) {
         winston.info('Weird. No chat message found');
