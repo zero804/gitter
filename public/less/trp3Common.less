@@ -18,24 +18,6 @@
     100% { transform: scale(1, 1);}
 }
 
-/* Mixin */
-.defaultHidden () {
-  display: none;
-}
-
-.trpPadV14 {
-  padding-top: 14px;
-  padding-bottom: 14px;
-}
-
-.trpIB {
-  display: inline-block;
-}
-
-.trpVTop {
-  vertical-align: top;
-}
-
 .trpStatus {
   position: absolute;
   top: 5px;
@@ -45,24 +27,6 @@
   width: 7px;
   height: 7px;
   display: block;
-}
-
-.DPUnreadCount {
-  .defaultHidden;
-  position: absolute;
-  top: 5px;
-  right: -8px;
-  border-radius: 5em;
-  border: 1px solid white;
-  width: 14px;
-  height: 14px;
-  background-color: @trpGreen;
-}
-
-.trpAvatarContainer {
-  width: 48px;
-  height: 48px;
-  display: inline-block
 }
 
 .trpDisplayPicture.admin {
@@ -110,43 +74,6 @@
   background-color: #ff2400;
 }
 
-.trpButtonGreen {
-	margin-top: 12px;
-	padding: 12px;
-	background-color: @trpGreen;
-	color: white;
-}
-
-.trpButtonAction {
-	cursor: pointer;
-}
-
-.trpButtonMenu {
-	float: right;
-	cursor: pointer;
-}
-
-.trpButtonGreen a {
-	color: white;
-}
-
-.trpMainButton {
-	display: block;
-}
-
-.trpButtonMenuItems {
-	display: none;
-}
-
-.trpButtonMenuItem {
-	display: block;
-	padding-top: 10px;
-}
-
-.trpHand {
-	cursor: pointer;
-}
-
 .trpInput {
   border: 1px solid @trpGrey;
   padding: 8px;
@@ -155,75 +82,8 @@
   margin-bottom: 4px;
 }
 
-.trpFormItem {
-  vertical-align: middle;
-  margin-bottom: 6px;
-}
-
-
-.trpFormLabel {
-  width: 100px;
-  color: #333;
-  display: inline-block;
-}
-
-.trpFormInputAction {
-  display: inline-block;
-  vertical-align: middle;
-  margin-left: 6px;
-}
-
-
-.trpInputSmall {
-  border: 1px solid @trpGrey;
-  padding: 4px;
-  border-radius: 0px;
-  color: @trpDarkGrey;
-}
-
-.tooltip {
-
-}
-
 .tooltip-inner {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.trpHomeActionPanel {
-  width: 317px;
-  text-align: center;
-}
-
-.trpHelpBox {
-  display: inline-block;
-  min-height: 24px;
-  vertical-align: top;
-  border-radius: 0px;
-  padding: 12px 12px;
-  line-height: 150%;
-  color: #333;
-}
-
-.trpUsername {
-  display: inline-block;
-  margin-left: 20px;
-  padding-top: 14px;
-}
-
-.trpSuggestion {
-  background-color: @trpBgColor2;
-  display: inline-block;
-  padding: 4px 12px 3px 10px;
-  border-radius: 2px;
-  margin-right: 4px;
-}
-
-.trpSuggestionAvailable:hover {
-  background-color: @trpGreen;
-}
-
-.trpSuggestionAvailable {
-  .trpHand;
 }
