@@ -146,12 +146,12 @@ module.exports = {
               unsubscribeUrl: unsubscribeUrl
             }
           })
-          .fail(function(err) {
+          .catch(function(err) {
             logger.error('Email send failed: ' + err, { email: email, subject: subject, exception: err });
             throw err;
           });
       })
-      .fail(function(err) {
+      .catch(function(err) {
         logger.error('Unable to send unread items notifications: ' + err, { exception: err });
         throw err;
       });
@@ -228,7 +228,7 @@ module.exports = {
           }
         });
       })
-      .fail(function (err) {
+      .catch(function(err) {
         logger.error('Unable to send unread items notifications: ' + err, { exception: err });
         throw err;
       });

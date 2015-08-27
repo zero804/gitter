@@ -18,9 +18,7 @@ describe('redis-batcher', function() {
   it('should batch tasks together #slow', function(done) {
     var RedisBatcher = testRequire('./utils/redis-batcher').RedisBatcher;
 
-    var underTest = new RedisBatcher('test1-' + uuid.v4(), 0);
-    var count = 0;
-    underTest.listen(function(key, items, cb) {
+    function batchFn(key, items, cb) {
       cb();
       count++;
 
@@ -43,7 +41,11 @@ describe('redis-batcher', function() {
 
       }
 
-    });
+    }
+
+    var underTest = new RedisBatcher('test1-' + uuid.v4(), 0, batchFn);
+    var count = 0;
+    underTest.listen();
 
     underTest.add('chat:1', 'a');
     underTest.add('chat:1', 'b');
@@ -56,10 +58,7 @@ describe('redis-batcher', function() {
   it('should keep separate keys separate #slow', function(done) {
     var RedisBatcher = testRequire('./utils/redis-batcher').RedisBatcher;
 
-    var underTest = new RedisBatcher('test2-' + uuid.v4(), 0);
-
-    var keys = {};
-    underTest.listen(function(key, items, cb) {
+    function batchFn(key, items, cb) {
       cb();
       keys[key] = true;
 
@@ -77,7 +76,12 @@ describe('redis-batcher', function() {
         return done();
       }
 
-    });
+    }
+
+    var underTest = new RedisBatcher('test2-' + uuid.v4(), 0, batchFn);
+
+    var keys = {};
+    underTest.listen();
 
     underTest.add('chat:1', 'a');
     underTest.add('chat:1', 'b');

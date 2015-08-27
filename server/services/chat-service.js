@@ -109,7 +109,7 @@ function resolveMentions(troupe, user, parsedMessage) {
  * to chat in the room
  */
 exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
-  
+
   // Keep this up here, set sent time asap to ensure order
   var sentAt = new Date();
 
@@ -241,6 +241,12 @@ exports.updateChatMessage = function(troupe, chatMessage, user, newText, callbac
 exports.findById = function(id, callback) {
   return ChatMessage.findByIdQ(id)
     .nodeify(callback);
+};
+
+exports.findByIdLean = function(id, fields) {
+  return ChatMessage.findById(id, fields)
+    .lean()
+    .execQ();
 };
 
 exports.findByIdInRoom = function(troupeId, id, callback) {

@@ -46,9 +46,9 @@ userService.findByUsername(opts.username)
     });
   })
   .delay(1000)
-  .fail(function(err) {
+  .catch(function(err) {
     console.error(err.stack);
   })
-  .fin(function() {
+  .finally(function() {
     shutdown.shutdownGracefully();
   });

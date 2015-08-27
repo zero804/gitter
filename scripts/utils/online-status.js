@@ -4,7 +4,7 @@
 
 var userService = require('../../server/services/user-service');
 var troupeService = require('../../server/services/troupe-service');
-var presenceService = require('../../server/services/presence-service.js');
+var presenceService = require('gitter-web-presence');
 var shutdown = require('shutdown');
 var Q = require('q');
 
@@ -27,9 +27,9 @@ userService.findByUsername(opts.username)
   .then(function(isOnline) {
     console.log(isOnline ? 'online' : 'offline');
   })
-  .fail(function(err) {
+  .catch(function(err) {
     console.error(err.stack);
   })
-  .fin(function() {
+  .finally(function() {
     shutdown.shutdownGracefully();
   });

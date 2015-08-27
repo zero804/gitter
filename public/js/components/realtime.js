@@ -201,14 +201,6 @@ module.exports = {
 
   getClient: function () {
     return getOrCreateClient();
-  },
-
-  registerForSnapshots: function (channel, listener, stateProvider) {
-    // TODO: refactor callers to handle registerSnapshotHandler
-    return getOrCreateClient().registerSnapshotHandler(channel, {
-      handleSnapshot: listener,
-      getSnapshotState: stateProvider
-    });
   }
 
 };

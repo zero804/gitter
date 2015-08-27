@@ -19,7 +19,7 @@ function getContributors(uri, user) {
     .then(function(contributors) {
       return withoutCurrentUser(contributors, user);
     })
-    .fail(function() {
+    .catch(function() {
       /* Probably don't have access */
       return [];
     });
@@ -31,7 +31,7 @@ function getCollaborators(uri, user) {
     .then(function(collaborators) {
       return withoutCurrentUser(collaborators, user);
     })
-    .fail(function() {
+    .catch(function() {
       /* Probably don't have access */
       return [];
     });
@@ -43,7 +43,7 @@ function getStargazers(uri, user) {
     .then(function(stargazers) {
       return withoutCurrentUser(stargazers, user);
     })
-    .fail(function() {
+    .catch(function() {
       /* Probably don't have access */
       return [];
     });

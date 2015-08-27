@@ -41,6 +41,7 @@ var roomMembershipService = require('./room-membership-service');
 var liveCollections    = require('./live-collections');
 var recentRoomService  = require('./recent-room-service');
 var badgerEnabled      = nconf.get('autoPullRequest:enabled');
+var uniqueIds          = require('mongodb-unique-ids');
 
 exports.testOnly = {};
 
@@ -409,7 +410,7 @@ function findAllRoomsIdsForUserIncludingMentions(userId, callback) {
     ])
     .spread(function(mentions, memberships) {
       var idStrings = mongoUtils.serializeObjectIds(mentions.concat(memberships));
-      return _.uniq(idStrings);
+      return uniqueIds(idStrings);
     })
     .nodeify(callback);
 }

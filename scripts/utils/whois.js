@@ -68,4 +68,4 @@ getUsers(opts)
   .then(attachEmailAdresses)
   .then(printResults)
   .then(die)
-  .fail(die);
+  .catch(die);

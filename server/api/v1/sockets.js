@@ -1,7 +1,7 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var presenceService = require('../../services/presence-service');
+var presenceService = require('gitter-web-presence');
 
 module.exports = function(req, res, next) {
   var socketId = String(req.params.socketId);

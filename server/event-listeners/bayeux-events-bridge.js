@@ -1,11 +1,10 @@
-/*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
 var winston           = require('../utils/winston');
 var appEvents         = require('gitter-web-appevents');
-var bayeux            = require('./bayeux');
+var bayeux            = require('../web/bayeux');
 var ent               = require('ent');
-var presenceService   = require("../services/presence-service");
+var presenceService   = require("gitter-web-presence");
 var restSerializer    = require('../serializers/rest-serializer');
 var debug             = require('debug')('gitter:bayeux-events-bridge');
 
@@ -21,7 +20,12 @@ function findFailbackChannel(channel) {
   }
 }
 
+var installed = false;
+
 exports.install = function() {
+  if (installed) return;
+  installed = true;
+
   function publish(channel, message) {
     debug("Publish on %s: %j", channel, message);
 

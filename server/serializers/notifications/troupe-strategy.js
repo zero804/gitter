@@ -29,7 +29,7 @@ function TroupeStrategy(options) {
     if(userIds.length) {
       execPreloads([{
         strategy: userStategy,
-        data: _.uniq(userIds)
+        data: userIds
       }], callback);
 
     } else {
