@@ -27,3 +27,10 @@ onready(function() {
   var appView = new ChatLayout({ template: false, el: 'body', chatCollection: chatCollection });
   appView.render();
 });
+
+
+// When the login is complete in the popup it'll post a message back
+window.addEventListener("message", function() {
+  if (event.origin !== window.location.origin) return;
+  if (event.data === 'login_complete') location.reload();
+});
