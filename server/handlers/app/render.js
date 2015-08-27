@@ -20,7 +20,6 @@ var roomNameTrimmer    = require('../../../public/js/utils/room-name-trimmer');
 var isolateBurst       = require('../../../shared/burst/isolate-burst-array');
 var unreadItemService  = require('../../services/unread-item-service');
 var mongoUtils         = require('../../utils/mongo-utils');
-var splitTests         = require('gitter-web-split-tests');
 var url                = require('url');
 var cdn                = require("../../web/cdn");
 var roomMembershipService = require('../../services/room-membership-service');
