@@ -4,6 +4,16 @@ set -e
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+function get_ip {
+  if [ -n "`uname -a | grep -i darwin`" ]; then 
+    echo "$(docker-machine ip dev)" 
+  fi
+
+  if [ -n "`uname -a | grep -i ubuntu`" ]; then
+    echo "$(ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}')"
+  fi
+}
+
 function startDockerMachine {
   if [[ "$(docker-machine ls -q|grep dev)" != "dev" ]]; then
     # Maybe one day --virtualbox-boot2docker-url https://github.com/rancher/os/releases/download/v0.3.3/machine-rancheros.iso
@@ -50,7 +60,7 @@ function startDockerServices {
 }
 
 function setupRedisConfigs {
-  DEV_IP=$(docker-machine ip dev)
+  DEV_IP=$(get_ip)
   mkdir -p "$SCRIPT_DIR/config/docker/"
 
   cat <<EOD > "$SCRIPT_DIR/config/docker/redis-slave.env"
@@ -63,7 +73,7 @@ EOD
 }
 
 function setupMongoInitScript {
-  DEV_IP=$(docker-machine ip dev)
+  DEV_IP=$(get_ip)
   mkdir -p "$SCRIPT_DIR/config/mongo-docker/"
   cat <<EOF > "$SCRIPT_DIR/config/mongo-docker/init-mongo.sh"
   mongo $DEV_IP/admin "/mongo-docker/init-replicaset.js"
@@ -102,11 +112,16 @@ EOF
 EOF
 }
 
-startDockerMachine
-setupHostAlias gitter-mongo-dev "$(docker-machine ip dev)"
-setupHostAlias gitter-redis-dev "$(docker-machine ip dev)"
-setupHostAlias gitter-neo4j-dev "$(docker-machine ip dev)"
-setupHostAlias gitter-es-dev "$(docker-machine ip dev)"
+
+if [ -n "`uname -a | grep -i darwin`" ]; then 
+  startDockerMachine
+fi
+
+setupHostAlias gitter-mongo-dev "$(get_ip)"
+setupHostAlias gitter-redis-dev "$(get_ip)"
+setupHostAlias gitter-neo4j-dev "$(get_ip)"
+setupHostAlias gitter-es-dev    "$(get_ip)"
+
 setupRedisConfigs
 setupMongoInitScript
 startDockerServices
