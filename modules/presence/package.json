@@ -1,0 +1,15 @@
+{
+  "name": "gitter-web-presence",
+  "version": "1.0.0",
+  "main": "lib/presence-engine.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha test/"
+  },
+  "private": true,
+  "dependencies": {
+  }
+}

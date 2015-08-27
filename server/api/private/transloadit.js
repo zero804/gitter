@@ -100,7 +100,7 @@ module.exports = function (req, res, next) {
       .then(function () {
         res.sendStatus(200);
       })
-      .fail(next);
+      .catch(next);
   });
 
 };

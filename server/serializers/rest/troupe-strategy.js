@@ -7,6 +7,7 @@ var roomMembershipService = require('../../services/room-membership-service');
 var billingService    = require('../../services/billing-service');
 
 var _                 = require("underscore");
+var uniqueIds         = require('mongodb-unique-ids');
 var winston           = require('../../utils/winston');
 var debug             = require('debug')('gitter:troupe-strategy');
 var execPreloads      = require('../exec-preloads');
@@ -35,36 +36,6 @@ function AllUnreadItemCountStategy(options) {
 
 AllUnreadItemCountStategy.prototype = {
   name: 'AllUnreadItemCountStategy'
-};
-
-/**
- *
- */
-function TroupeMentionCountStategy(options) {
-  var self = this;
-  var userId = options.userId || options.currentUserId;
-
-  this.preload = function(troupeIds, callback) {
-    var operation;
-    if(troupeIds.length <= 5) {
-      operation = unreadItemService.getUserMentionCountsForTroupeIds(userId, troupeIds);
-    } else {
-      operation = unreadItemService.getUserMentionCounts(userId);
-    }
-
-    operation
-      .then(function(result) {
-        self.mentionCounts = result;
-      })
-      .nodeify(callback);
-  };
-
-  this.map = function(id) {
-    return self.mentionCounts[id] ? self.mentionCounts[id] : 0;
-  };
-}
-TroupeMentionCountStategy.prototype = {
-  name: 'TroupeMentionCountStategy'
 };
 
 function LastTroupeAccessTimesForUserStrategy(options) {
@@ -148,9 +119,8 @@ function ProOrgStrategy() {
       return !!room; // this removes the `undefined` left behind (one-to-ones)
     });
 
-    uris = _.uniq(uris);
-
-    return billingService.findActiveOrgPlans(uris)
+    // uniqueIds should work here as they're strings although it's not strictly correct
+    return billingService.findActiveOrgPlans(uniqueIds(uris))
       .then(function(subscriptions) {
         subscriptions.forEach(function(subscription) {
           proOrgs[subscription.uri.toLowerCase()] = !!subscription;
@@ -177,7 +147,6 @@ function TroupeStrategy(options) {
   var currentUserId = options.currentUserId;
 
   var unreadItemStategy = currentUserId && !options.skipUnreadCounts ? new AllUnreadItemCountStategy(options) : null;
-  var mentionCountStrategy = currentUserId && !options.skipUnreadCounts ? new TroupeMentionCountStategy(options) : null;
   var lastAccessTimeStategy = currentUserId ? new LastTroupeAccessTimesForUserStrategy(options) : null;
   var favouriteStrategy = currentUserId ? new FavouriteTroupesForUserStrategy(options) : null;
   var lurkStrategy = currentUserId ? new LurkTroupeForUserStrategy(options) : null;
@@ -192,13 +161,6 @@ function TroupeStrategy(options) {
     if(unreadItemStategy) {
       strategies.push({
         strategy: unreadItemStategy,
-        data: troupeIds
-      });
-    }
-
-    if(mentionCountStrategy) {
-      strategies.push({
-        strategy: mentionCountStrategy,
         data: troupeIds
       });
     }
@@ -295,6 +257,8 @@ function TroupeStrategy(options) {
         troupeUrl = "/" + item.uri;
     }
 
+    var unreadCounts = unreadItemStategy && unreadItemStategy.map(item.id);
+
     return {
       id: item.id || item._id,
       name: troupeName,
@@ -302,10 +266,9 @@ function TroupeStrategy(options) {
       uri: item.uri,
       oneToOne: item.oneToOne,
       userCount: item.userCount,
-      // users: options.mapUsers && !item.oneToOne ? item.users.map(function(troupeUser) { return userIdStategy.map(troupeUser.userId); }) : undefined,
       user: otherUser,
-      unreadItems: unreadItemStategy ? unreadItemStategy.map(item.id) : undefined,
-      mentions: mentionCountStrategy ? mentionCountStrategy.map(item.id) : undefined,
+      unreadItems: unreadCounts ? unreadCounts.unreadItems : undefined,
+      mentions: unreadCounts ? unreadCounts.mentions : undefined,
       lastAccessTime: lastAccessTimeStategy ? lastAccessTimeStategy.map(item.id) : undefined,
       favourite: favouriteStrategy ? favouriteStrategy.map(item.id) : undefined,
       lurk: lurkStrategy ? !item.oneToOne && lurkStrategy.map(item.id) : undefined,

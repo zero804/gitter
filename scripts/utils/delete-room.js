@@ -9,7 +9,7 @@ var Q = require('q');
 
 var winston = require('../../server/utils/winston');
 
-require('../../server/utils/event-listeners').installLocalEventListeners();
+require('../../server/event-listeners').install();
 
 var opts = require("nomnom")
    .option('uri', {
@@ -18,9 +18,6 @@ var opts = require("nomnom")
       help: 'Uri of the room to delete'
    })
    .parse();
-
-require('../../server/services/kue-workers').startWorkers();
-require('../../server/utils/event-listeners').installLocalEventListeners();
 
 var readline = require('readline');
 
@@ -52,7 +49,7 @@ return troupeService.findByUri(opts.uri)
   .then(function() {
     shutdown.shutdownGracefully();
   })
-  .fail(function(err) {
+  .catch(function(err) {
     console.error('Error: ' + err, err);
     console.log(err.stack);
     shutdown.shutdownGracefully(1);

@@ -4,13 +4,14 @@ var env               = require('gitter-web-env');
 var logger            = env.logger;
 
 var oauth             = require('../../services/oauth-service');
-var presenceService   = require('../../services/presence-service');
+var presenceService   = require('gitter-web-presence');
 var recentRoomService   = require('../../services/recent-room-service');
 var contextGenerator  = require('../context-generator');
 var StatusError       = require('statuserror');
 var bayeuxExtension   = require('./extension');
 var clientUsageStats  = require('../../utils/client-usage-stats');
 var appVersion        = require('../appVersion');
+var debug             = require('debug')('gitter:bayeux-authenticator');
 
 function getConnectionType(incoming) {
   if(!incoming) return 'online';
@@ -58,11 +59,7 @@ module.exports = bayeuxExtension({
         clientUsageStats.record(user, oauthClient);
       }
 
-      logger.silly('bayeux: handshake', {
-        appVersion: ext.appVersion,
-        username: user && user.username,
-        client: oauthClient.name
-      });
+      debug('bayeux: handshake. appVersion=%s, username=%s, client=%s', ext.appVersion, user && user.username, oauthClient.name);
 
       var connectionType = getConnectionType(ext.connType);
 

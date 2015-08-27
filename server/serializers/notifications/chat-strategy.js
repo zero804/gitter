@@ -1,7 +1,6 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var _ = require("underscore");
 var execPreloads = require('../exec-preloads');
 var UserIdStrategy = require('./user-id-strategy');
 var TroupeIdStrategy = require('./troupe-id-strategy');
@@ -18,7 +17,7 @@ function ChatStrategy(options)  {
     var strategies = [];
     strategies.push({
       strategy: userStategy,
-      data: _.uniq(users)
+      data: users
     });
 
     if(troupeStrategy) {

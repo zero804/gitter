@@ -20,7 +20,7 @@ module.exports = {
       .then(function(serialized) {
         return res.send(serialized);
       })
-      .fail(next);
+      .catch(next);
   }
 
 };

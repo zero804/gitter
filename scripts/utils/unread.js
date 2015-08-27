@@ -63,9 +63,9 @@ userService.findByUsername(opts.username)
     console.log('Left menu unread rooms:', leftMenuUnreadTroupeNames);
   })
   .delay(1000)
-  .fail(function(err) {
+  .catch(function(err) {
     console.error(err.stack);
   })
-  .fin(function() {
+  .finally(function() {
     shutdown.shutdownGracefully();
   });
