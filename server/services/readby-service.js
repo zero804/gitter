@@ -78,14 +78,15 @@ function batchUpdateReadbyBatch(troupeIdString, userChatIds, done) {
   bulk.execute(d.makeNodeResolver());
   return d.promise
     .then(function() {
-      return ChatMessage.aggregateQ([
+      return ChatMessage.aggregate([
         { $match: { _id: { $in: chatObjectIds } } },
         { $project: {
             _id: 1,
             _tv: 1,
             readyByC: { $size: "$readBy" }
           }
-        }]);
+        }])
+        .exec();
     })
     .then(function(chats) {
       chats.forEach(function(chat) {

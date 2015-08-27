@@ -427,11 +427,10 @@ function updateRoomWithGithubId(user, troupe) {
       if (!underlying) throw new StatusError(404, 'Unable to find ' + troupe.uri + ' on GitHub.');
       var githubId = underlying.id;
 
-      return persistence.Troupe.updateQ({
-          _id: troupe._id
-        }, {
-          $set: { githubId: githubId }
-        });
+      return persistence.Troupe.update(
+          { _id: troupe._id },
+          { $set: { githubId: githubId } })
+        .exec();
     });
 }
 
@@ -1008,10 +1007,11 @@ function updateUserDateAdded(userId, roomId, date) {
   var setOp = {};
   setOp['added.' + roomId] = date || new Date();
 
-  return persistence.UserTroupeLastAccess.updateQ(
+  return persistence.UserTroupeLastAccess.update(
      { userId: userId },
      { $set: setOp },
-     { upsert: true });
+     { upsert: true })
+     .exec();
 
 }
 exports.testOnly.updateUserDateAdded = updateUserDateAdded;
@@ -1324,7 +1324,7 @@ function unbanUserFromRoom(room, troupeBan, username, requestingUser, callback) 
     .then(function(access) {
       if(!access) throw new StatusError(403, 'You do not have permission to unban people. Admin permission is needed.');
 
-      return persistence.Troupe.updateQ({
+      return persistence.Troupe.update({
           _id: mongoUtils.asObjectID(troupeId)
         }, {
           $pull: {
@@ -1332,7 +1332,8 @@ function unbanUserFromRoom(room, troupeBan, username, requestingUser, callback) 
               userId: troupeBan.userId
             }
           }
-        });
+        })
+        .exec();
     })
     .then(function() {
       return eventService.newEventToTroupe(

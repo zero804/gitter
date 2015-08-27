@@ -362,7 +362,8 @@ function setMemberLurkStatus(troupeId, userId, lurk) {
 function setMembersLurkStatus(troupeId, userIds, lurk) {
  lurk = !!lurk; // Force boolean
 
- return TroupeUser.updateQ({ troupeId: troupeId, userId: { $in: mongoUtils.asObjectIDs(userIds) } }, { $set: { lurk: lurk } }, { multi: true })
+ return TroupeUser.update({ troupeId: troupeId, userId: { $in: mongoUtils.asObjectIDs(userIds) } }, { $set: { lurk: lurk } }, { multi: true })
+  .exec()
   .then(function() {
     // Unfortunately we have no way of knowing which of the users
     // were actually removed and which were already out of the collection
@@ -376,12 +377,14 @@ function setMembersLurkStatus(troupeId, userIds, lurk) {
  * Update the userCount value for a room
  */
 function incrementTroupeUserCount(troupeId, incrementValue) {
-  return Troupe.updateQ({ _id: troupeId }, { $inc: { userCount: incrementValue } });
+  return Troupe.update({ _id: troupeId }, { $inc: { userCount: incrementValue } })
+    .exec();
 }
 
 function resetTroupeUserCount(troupeId) {
   return countMembersInRoom(troupeId)
     .then(function(count) {
-      return Troupe.updateQ({ _id: troupeId }, { $set: { userCount: count } });
+      return Troupe.update({ _id: troupeId }, { $set: { userCount: count } })
+        .exec();
     });
 }

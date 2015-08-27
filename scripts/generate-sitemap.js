@@ -30,7 +30,7 @@ persistence.Troupe.find({ security: 'PUBLIC', '$or': [{'noindex': {'$exists': fa
     var uris = troupes.reduce(function(memo,value) { memo[value._id] = value.uri; return memo; }, {});
     var ids = troupes.map(function(value) { return value._id; });
 
-    return persistence.ChatMessage.aggregateQ([
+    return persistence.ChatMessage.aggregate([
         { $match: {
             toTroupeId: { $in: ids }
           }
@@ -55,6 +55,7 @@ persistence.Troupe.find({ security: 'PUBLIC', '$or': [{'noindex': {'$exists': fa
           }
         }
       ])
+      .exec()
       .then(function(result) {
         var sitemap = sm.createSitemap ({
           hostname: nconf.get('web:basepath')

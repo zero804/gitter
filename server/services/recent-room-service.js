@@ -46,10 +46,11 @@ function addTroupeAsFavouriteInLastPosition(userId, troupeId) {
       var setOp = {};
       setOp['favs.' + troupeId] = lastPosition;
 
-      return persistence.UserTroupeFavourites.updateQ(
+      return persistence.UserTroupeFavourites.update(
         { userId: userId },
         { $set: setOp },
         { upsert: true, new: true })
+        .exec()
         .thenResolve(lastPosition);
     });
 }
@@ -95,10 +96,11 @@ function addTroupeAsFavouriteInPosition(userId, troupeId, position) {
       var update = {$set: set};
       if (!_.isEmpty(inc)) update.$inc = inc; // Empty $inc is invalid
 
-      return persistence.UserTroupeFavourites.updateQ(
+      return persistence.UserTroupeFavourites.update(
         { userId: userId },
         update,
         { upsert: true, new: true })
+        .exec()
         .thenResolve(position);
     });
 
@@ -108,10 +110,11 @@ function clearFavourite(userId, troupeId) {
   var setOp = {};
   setOp['favs.' + troupeId] = 1;
 
-  return persistence.UserTroupeFavourites.updateQ(
+  return persistence.UserTroupeFavourites.update(
     { userId: userId },
     { $unset: setOp },
     { })
+    .exec()
     .thenResolve(null);
 }
 
@@ -168,10 +171,11 @@ function clearLastVisitedTroupeforUserId(userId, troupeId) {
   setOp['troupes.' + troupeId] = 1;
 
   // Update UserTroupeLastAccess
-  return persistence.UserTroupeLastAccess.updateQ(
-         { userId: userId },
-         { $unset: setOp },
-         { upsert: true, new: true });
+  return persistence.UserTroupeLastAccess.update(
+           { userId: userId },
+           { $unset: setOp },
+           { upsert: true, new: true })
+         .exec();
 }
 
 function saveUserTroupeLastAccess(userId, troupeId, lastAccessTime) {
@@ -181,10 +185,11 @@ function saveUserTroupeLastAccess(userId, troupeId, lastAccessTime) {
   setOp['troupes.' + troupeId] = lastAccessTime;
   setOp['last.' + troupeId] = lastAccessTime;
 
-  return persistence.UserTroupeLastAccess.updateQ(
+  return persistence.UserTroupeLastAccess.update(
      { userId: userId },
      { $set: setOp },
-     { upsert: true, new: true });
+     { upsert: true, new: true })
+     .exec();
 }
 
 /**
@@ -197,7 +202,7 @@ function saveLastVisitedTroupeforUserId(userId, troupeId, options) {
   return Q.all([
       saveUserTroupeLastAccess(userId, troupeId, lastAccessTime),
       // Update User
-      persistence.User.updateQ({ _id: userId }, { $set: { lastTroupe: troupeId }})
+      persistence.User.update({ _id: userId }, { $set: { lastTroupe: troupeId }}).exec()
     ])
     .then(function() {
       // XXX: lastAccessTime should be a date but for some bizarre reason it's not
