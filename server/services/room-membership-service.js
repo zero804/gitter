@@ -289,7 +289,8 @@ function findAllMembersForRooms(troupeIds) {
     assert(troupeIds);
   });
 
-  return TroupeUser.distinct("userId", { troupeId: { $in: mongoUtils.asObjectIDs(troupeIds) } });
+  return TroupeUser.distinct("userId", { troupeId: { $in: mongoUtils.asObjectIDs(troupeIds) } })
+    .exec();
 }
 
 /**
