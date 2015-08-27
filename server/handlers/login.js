@@ -277,4 +277,11 @@ router.get("/zendesk",
     .catch(next);
   });
 
+router.get('/embed',
+  ensureLoggedIn,
+  function(req, res) {
+    res.render('embed-login-complete');
+  });
+
+
 module.exports = router;

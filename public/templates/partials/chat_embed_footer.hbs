@@ -4,6 +4,6 @@
   </div>
   <div class='chat-embed-footer__details'>
     <p><i class='icon-person'></i><b>{{usersOnline}}</b> {{pluralize usersOnline 'person' 'people'}} {{!-- use i18n --}} </p>
-    <a class="btn subdued" href="/login/github?action=signup&source=embedded&returnTo=/{{ troupeContext.troupeUri }}">Sign up for free</a>
+    <a id="login" class="btn subdued" href="#" onclick="window.open('/login/github?action=signup&source=embedded&returnTo=/login/embed', '', 'width=800, height=600');">Sign up for free</a>
   </div>
 </div>
