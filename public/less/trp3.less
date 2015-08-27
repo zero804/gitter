@@ -86,17 +86,6 @@ dl, dd {
   margin: 0;
 }
 
-.hidden-input input {
-  outline: 0;
-  box-shadow: none;
-  width: 320px;
-  padding: 9px;
-  border: 1px solid @trpGrey;
-  background-color: fade(@trpGrey, 50%);
-  border-radius: 4px;
-  color: black;
-}
-
 .gtrInput {
   box-sizing: border-box;
   width: 100%;
@@ -116,23 +105,6 @@ dl, dd {
     width: 250px;
   }
 
-}
-
-
-.modal textarea.hidden-input {
-  outline: 0;
-  box-shadow: none;
-  width: 320px;
-  padding: 9px;
-  border: 1px solid @trpGrey;
-  background-color: fade(@trpGrey, 50%);
-  border-radius: 4px;
-  color: black;
-}
-
-.hidden-input input:focus {
-  outline: 0;
-  box-shadow: none;
 }
 
 .scrollbar-measure {
@@ -283,40 +255,6 @@ a:hover {
   opacity: 1;
 }
 
-.trpLeftMenuContainer {
-  height: 100%;
-  overflow: hidden;
-}
-
-.trpLeftMenuWrapper {
-  display: inline-block;
-	overflow-y: auto;
-	overflow-x: hidden;
-  font-weight: 300;
-}
-
-.trpLeftMenuToolbar {
-	padding-left: 26px;
-	padding-bottom: 12px;
-	width: 280px;
-}
-
-.trpLeftMenuToolbarItems {
-	margin: 0;
-	padding: 0;
-	list-style: none;
-}
-
-.trpLeftMenuToolbarItems li {
-	display: inline-block;
-	padding-right: 8px;
-}
-
-.trpLeftMenuIcon {
-	opacity: 0.6;
-	padding: 5px;
-}
-
 .selected {
 	opacity: 1;
 }
@@ -362,20 +300,6 @@ ul li.placeholder:before {
       border-right: none;
 }
 
-.trpUserHome {
-  margin-left: 88px;
-
-  @media @mobile {
-    margin-left: 0px;
-  }
-}
-
-.trpProfileAvatarLink {
-  margin-left: 22px;
-  margin-bottom: -2px;
-  display: inline-block;
-}
-
 .loading-frame {
   display: flex;
   justify-content: center;
@@ -417,37 +341,6 @@ ul li.placeholder:before {
 .loading-frame.hide {
   display: none;
   opacity: 0;
-}
-
-.trpContentSpacer {
-	width: 100%;
-	min-width: 700px;
-  display: inline-block;
-}
-
-.trpActionsMenuLabel {
-  display: none;
-}
-
-.trpActionsMenuLabel.unfavourited {
-  display: inline-block;
-  @media @mid {
-    display: none;
-  }
-}
-
-.trpActionsMenuLabel.unfavourited {
-  display: none;
-  @media @mid {
-    display: none;
-  }
-}
-
-.trpActionsMenuLabel.favourited {
-  display: inline-block;
-  @media @mid {
-    display: none;
-  }
 }
 
 #people-list {
@@ -649,19 +542,6 @@ ul.roster {
   @media @mid {
     display: none;
   }
-}
-
-@media screen and (max-width:1024px) {
-
-  .trpHeaderFavourite {
-    margin-left: 0px;
-  }
-
-  .uv-tab {
-    right: 100px;
-    display: none;
-  }
-
 }
 
 // TODO: as we progress with the css refactoring this will have to be changed. Walter.
