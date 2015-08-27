@@ -1,6 +1,5 @@
 @charset "UTF-8";
 @import "base-web";
-@import "base-transition-mixins";
 
 @import "../../js/views/righttoolbar/rightToolbarView";
 @import "../repo/cal-heatmap/cal-heatmap";
@@ -63,7 +62,7 @@
 
 .gtrArchiveDateNav {
   opacity: 0.6;
-  .transition300ms(opacity);
+  transition: opacity 300ms ease-in-out;
 }
 
 .gtrArchivePrev {

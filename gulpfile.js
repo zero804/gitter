@@ -317,7 +317,6 @@ gulp.task('css-ios', function () {
 
 gulp.task('css-mobile', function () {
   return gulp.src([
-    'public/less/mobile-login.less',
     'public/less/mobile-app.less',
     'public/less/mobile-nli-app.less',
     'public/less/mobile-userhome.less'
