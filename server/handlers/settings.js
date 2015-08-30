@@ -188,7 +188,7 @@ router.get('/unsubscribe/:hash',
 
     userSettingsService.setUserSettings(userId, 'unread_notifications_optout', 1)
       .then(function() {
-        var msg = "Done. You wont receive notifications like that one in the future.";
+        var msg = "Done. You won't receive notifications like that one in the future.";
 
         res.render('unsubscribe', { layout: 'generic-layout', title: 'Unsubscribe', msg: msg });
       })
