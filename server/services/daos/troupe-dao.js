@@ -8,7 +8,8 @@ function create(lean) {
   var module = {};
 
   module.findByIdRequired = function(id, fields) {
-    return persistence.Troupe.findByIdQ(id, fields, { lean: lean })
+    return persistence.Troupe.findById(id, fields, { lean: lean })
+      .exec()
       .then(promiseUtils.required);
   };
 
@@ -21,7 +22,7 @@ function create(lean) {
       return persistence.Troupe
                 .where('lcUri').in(lcUris)
                 .lean(lean)
-                .execQ();
+                .exec();
     });
   };
 
@@ -30,8 +31,8 @@ function create(lean) {
 
     var re = new RegExp('^' + lcUserOrOrg + '($|/)');
 
-    return persistence.Troupe
-              .findQ({ lcUri: re }, fields, { lean: lean });
+    return persistence.Troupe.find({ lcUri: re }, fields, { lean: lean })
+      .exec();
   };
 
   return module;

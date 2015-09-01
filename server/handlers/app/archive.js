@@ -115,7 +115,7 @@ exports.chatArchive = [
 
             return Q.all([
                 contextGenerator.generateTroupeContext(req),
-                restSerializer.serializeQ(chatMessages, strategy)
+                restSerializer.serialize(chatMessages, strategy)
               ]);
           })
           .spread(function(troupeContext, serialized) {

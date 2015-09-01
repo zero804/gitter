@@ -774,6 +774,10 @@ h1:after, h2:after {
 .pricing-panel {
   padding: 80px 0;
   background: #231f20;
+  // there are some overflow issues when the 90% width
+  // automargins are smaller than the 20px price-plan margins
+  // this just sweeps those issues under the carpet
+  overflow-x: hidden;
 }
 
 .pricing-panel__content {

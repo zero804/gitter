@@ -56,7 +56,7 @@ var pushNotificationGeneratorQueue = workerQueue.queue('push-notifications-gener
     return pushNotificationGenerator.sendUserTroupeNotification(userId, troupeId, notificationNumber)
       .catch(function(err) {
         winston.error('Failed to send notifications: ' + err + '. Failing silently.', { exception: err });
-        errorReporter(err, { userId: userId, troupeId: troupeId });
+        errorReporter(err, { userId: userId, troupeId: troupeId }, { module: 'push-notification-postbox' });
       })
       .nodeify(done);
   };

@@ -1,5 +1,4 @@
 @import (reference) "../../../less/base-zindex-levels";
-@import (reference) "../../../less/base-transition-mixins";
 @import (reference) "../../../less/colors.less";
 @import (reference) "../../../less/trp3Vars.less";
 
@@ -141,7 +140,7 @@
 }
 
 // SPLIT TEST CSS START
-.chat-input--treatment {
+.chat-input-nli {
   display: flex;
   flex-grow: 0;
   flex-shrink: 0;
@@ -151,12 +150,12 @@
   padding: 0px 33px;
 }
 
-.chat-input-treatment__placeholder {
+.chat-input__placeholder {
   margin: 0px 10px;
   color: #999;
 }
 
-.chat-input-treatment__btn {
+.chat-input__btn {
   font-family: @font-base;
   font-size: 12px;
   letter-spacing: 2px;
@@ -179,18 +178,18 @@
   flex-shrink: 0;
 }
 
-.chat-input-treatment__btn  img {
+.chat-input__btn  img {
   height: 18px;
   margin: -1px 12px 0 -3px;
   vertical-align: middle;
 }
 
-.chat-input-treatment__btn:hover {
+.chat-input__btn:hover {
   box-shadow: inset 0 0 0 250px rgba(0,0,0,.05);
   text-decoration: none;
 }
 
-.chat-input-treatment__btn:active {
+.chat-input__btn:active {
   box-shadow: inset 0 0 0 250px rgba(0,0,0,.05), inset 0 2px 4px rgba(0,0,0,.15);
   text-decoration: none;
 }

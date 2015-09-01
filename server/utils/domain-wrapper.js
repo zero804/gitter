@@ -38,7 +38,15 @@ module.exports = function(app) {
 
         var userId = req.user && req.user.id;
 
-        errorReporter(err, { type: 'domain', userId: userId, url: req.url, method: req.method, routeIdentifier: req.routeIdentifier });
+        errorReporter(err, {
+          type: 'domain',
+          userId: userId,
+          url: req.url,
+          method: req.method,
+          routeIdentifier: req.routeIdentifierm
+        }, {
+          module: 'domain-wrapper'
+        });
 
         logger.error('----------------------------------------------------------------');
         logger.error('-- A BadThing has happened.');

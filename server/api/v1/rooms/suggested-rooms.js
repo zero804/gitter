@@ -10,7 +10,7 @@ module.exports = {
   index: function(req, res, next) {
     return suggestions.getSuggestionsForRoom(req.troupe, req.user)
       .then(function(suggestions) {
-        return restSerializer.serializeQ(suggestions, new restSerializer.SuggestedRoomStrategy({ }));
+        return restSerializer.serialize(suggestions, new restSerializer.SuggestedRoomStrategy({ }));
       })
       .then(function(serialized) {
         return res.send(serialized);

@@ -38,7 +38,7 @@ userService.findByUsername(opts.username)
     // return suggestions.getSuggestionsForUser(user, opts.language);
   })
   .then(function(suggestions) {
-    return restSerializer.serializeQ(suggestions, new restSerializer.SuggestedRoomStrategy({ }));
+    return restSerializer.serialize(suggestions, new restSerializer.SuggestedRoomStrategy({ }));
   })
   .then(function(repos) {
     repos.forEach(function(suggestion) {

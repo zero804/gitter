@@ -271,11 +271,7 @@ function findOrCreateGroupRoom(user, troupe, uri, options) {
                 topic: topic || "",
                 security: security,
                 dateLastSecurityCheck: new Date(),
-                // users:  user ? [{
-                //   _id: new ObjectID(),
-                //   userId: user._id
-                // }] : [],
-                userCount: user ? 1 : 0
+                userCount: 0
               }
             })
             .spread(function(troupe, updateExisting) {
@@ -327,7 +323,7 @@ function findOrCreateGroupRoom(user, troupe, uri, options) {
                   applyAutoHooksForRepoRoom(user, troupe)
                     .catch(function(err) {
                       logger.error("Unable to apply hooks for new room", { exception: err });
-                      errorReporter(err, { uri: uri, user: user.username });
+                      errorReporter(err, { uri: uri, user: user.username }, { module: 'room-service' });
                     });
                 }
 
@@ -350,7 +346,7 @@ function findOrCreateGroupRoom(user, troupe, uri, options) {
                       return badger.sendBadgePullRequest(uri, user);
                     })
                     .catch(function(err) {
-                      errorReporter(err, { uri: uri, user: user.username });
+                      errorReporter(err, { uri: uri, user: user.username }, { module: 'room-service' });
                       logger.error('Unable to send pull request for new room', { exception: err });
                     });
                 }
@@ -431,11 +427,10 @@ function updateRoomWithGithubId(user, troupe) {
       if (!underlying) throw new StatusError(404, 'Unable to find ' + troupe.uri + ' on GitHub.');
       var githubId = underlying.id;
 
-      return persistence.Troupe.updateQ({
-          _id: troupe._id
-        }, {
-          $set: { githubId: githubId }
-        });
+      return persistence.Troupe.update(
+          { _id: troupe._id },
+          { $set: { githubId: githubId } })
+        .exec();
     });
 }
 
@@ -487,10 +482,15 @@ function createGithubRoom(user, uri) {
         })
         .then(function() {
 
-          // prefer queries with githubIds, as they survive github renames
-          var queryTerm = githubId ?
-              { githubId: githubId, githubType: githubType } :
-              { lcUri: lcUri, githubType: githubType };
+          var queryTerm = { githubType: githubType };
+          if (githubId) {
+            // prefer queries with githubIds, as they survive github renames
+            queryTerm.$or = [{ lcUri: lcUri }, { githubId: githubId }];
+          } else {
+            queryTerm.lcUri = lcUri;
+          }
+
+          debug('Upserting room for query %j', queryTerm);
 
           return mongooseUtils.upsert(persistence.Troupe, queryTerm, {
                $setOnInsert: {
@@ -506,6 +506,8 @@ function createGithubRoom(user, uri) {
               }
             })
             .spread(function(room, updateExisting) {
+              debug('Upsert found existing room? %s', updateExisting);
+
               if (!updateExisting) {
                 stats.event("create_room", {
                   userId: user.id,
@@ -693,7 +695,8 @@ exports.findOrCreateRoom = findOrCreateRoom;
  * Find all non-private channels under a particular parent
  */
 function findAllChannelsForRoom(user, parentTroupe) {
-  return persistence.Troupe.findQ({ parentId: parentTroupe._id, })
+  return persistence.Troupe.find({ parentId: parentTroupe._id, })
+    .exec()
     .then(function(troupes) {
       if (!troupes.length) return troupes;
 
@@ -729,10 +732,11 @@ exports.findAllChannelsForRoom = findAllChannelsForRoom;
  * not PRIVATE
  */
 function findChildChannelRoom(user, parentTroupe, childTroupeId) {
-  return persistence.Troupe.findOneQ({
+  return persistence.Troupe.findOne({
       parentId: parentTroupe._id,
       id: childTroupeId
     })
+    .exec()
     .then(function(channelRoom) {
       if (!channelRoom) return null;
 
@@ -753,9 +757,10 @@ exports.findChildChannelRoom = findChildChannelRoom;
  * Find all non-private channels under a particular parent
  */
 function findAllChannelsForUser(user) {
-  return persistence.Troupe.findQ({
+  return persistence.Troupe.find({
       ownerUserId: user._id
-    });
+    })
+    .exec();
 }
 exports.findAllChannelsForUser = findAllChannelsForUser;
 
@@ -764,11 +769,12 @@ exports.findAllChannelsForUser = findAllChannelsForUser;
  * not PRIVATE
  */
 function findUsersChannelRoom(user, childTroupeId, callback) {
-  return persistence.Troupe.findOneQ({
+  return persistence.Troupe.findOne({
       ownerUserId: user._id,
       id: childTroupeId
       /* Dont filter private as owner can see all private rooms */
     })
+    .exec()
     .nodeify(callback);
 }
 exports.findUsersChannelRoom = findUsersChannelRoom;
@@ -914,8 +920,7 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
               parentId: parentTroupe && parentTroupe._id,
               ownerUserId: parentTroupe ? null : user._id,
               githubType: githubType,
-              // users:  user ? [{ _id: new ObjectID(), userId: user._id }] : [],
-              userCount:  user ? 1 : 0
+              userCount: 0
             }
           })
           .spread(function(newRoom, updatedExisting) {
@@ -1002,10 +1007,11 @@ function updateUserDateAdded(userId, roomId, date) {
   var setOp = {};
   setOp['added.' + roomId] = date || new Date();
 
-  return persistence.UserTroupeLastAccess.updateQ(
+  return persistence.UserTroupeLastAccess.update(
      { userId: userId },
      { $set: setOp },
-     { upsert: true });
+     { upsert: true })
+     .exec();
 
 }
 exports.testOnly.updateUserDateAdded = updateUserDateAdded;
@@ -1115,7 +1121,7 @@ function ensureRepoRoomSecurity(uri, security) {
       troupe.security = security;
       troupe.dateLastSecurityCheck = new Date();
 
-      return troupe.saveQ()
+      return troupe.save()
         .then(function() {
           if(security === 'PUBLIC') return;
 
@@ -1248,7 +1254,7 @@ function banUserFromRoom(room, username, requestingUser, options, callback) {
           if(bannedUserIsAdmin) throw new StatusError(400, 'User ' + username + ' is an admin in this room.');
 
           // Load the full object
-          return persistence.Troupe.findByIdQ(room.id);
+          return persistence.Troupe.findById(room.id).exec();
         })
         .then(function(roomForUpdate) {
           var existingBan = _.find(roomForUpdate.bans, function(ban) { return ban.userId == user.id;} );
@@ -1262,15 +1268,17 @@ function banUserFromRoom(room, username, requestingUser, options, callback) {
             });
 
             return Q.all([
-                roomForUpdate.saveQ(),
+                roomForUpdate.save(),
                 roomMembershipService.removeRoomMember(roomForUpdate._id, user._id)
               ])
               .then(function() {
                 if (options && options.removeMessages) {
-                  return persistence.ChatMessage.findQ({ toTroupeId: roomForUpdate.id, fromUserId: user.id })
+                  // TODO: do this in a single query...
+                  return persistence.ChatMessage.find({ toTroupeId: roomForUpdate.id, fromUserId: user.id })
+                    .exec()
                     .then(function(messages) {
                       return Q.all(messages.map(function(message) {
-                        return message.removeQ();
+                        return message.remove();
                       }));
                     });
 
@@ -1316,7 +1324,7 @@ function unbanUserFromRoom(room, troupeBan, username, requestingUser, callback) 
     .then(function(access) {
       if(!access) throw new StatusError(403, 'You do not have permission to unban people. Admin permission is needed.');
 
-      return persistence.Troupe.updateQ({
+      return persistence.Troupe.update({
           _id: mongoUtils.asObjectID(troupeId)
         }, {
           $pull: {
@@ -1324,7 +1332,8 @@ function unbanUserFromRoom(room, troupeBan, username, requestingUser, callback) 
               userId: troupeBan.userId
             }
           }
-        });
+        })
+        .exec();
     })
     .then(function() {
       return eventService.newEventToTroupe(
@@ -1352,11 +1361,12 @@ function findBanByUsername(troupeId, bannedUsername) {
     .then(function(user) {
       if (!user) return;
 
-      return persistence.Troupe.findOneQ({
+      return persistence.Troupe.findOne({
         _id: mongoUtils.asObjectID(troupeId),
         'bans.userId': user._id },
         { _id: 0, 'bans.$': 1 },
         { lean: true })
+        .exec()
         .then(function(troupe) {
           if (!troupe || !troupe.bans || !troupe.bans.length) return;
 
@@ -1386,7 +1396,7 @@ exports.updateTroupeLurkForUserId = updateTroupeLurkForUserId;
 function searchRooms(userId, queryText, options) {
 
   return persistence.Troupe
-    .findQ({
+    .find({
       'users.userId': userId,
       $or: [{
           'githubType': 'ORG'
@@ -1396,6 +1406,7 @@ function searchRooms(userId, queryText, options) {
     }, {
       _id: 1
     })
+    .exec()
     .then(function(rooms) {
       var privateRoomIds = rooms.map(function(t) {
         return t._id;
@@ -1438,7 +1449,7 @@ function renameRepo(oldUri, newUri) {
           room.renamedLcUris.addToSet(originalLcUri);
         }
 
-        return room.saveQ()
+        return room.save()
           .then(function() {
             return uriLookupService.removeBadUri(oldUri);
           })
@@ -1446,7 +1457,7 @@ function renameRepo(oldUri, newUri) {
             return uriLookupService.reserveUriForTroupeId(room.id, lcUri);
           })
           .then(function() {
-            return persistence.Troupe.findQ({ parentId: room._id });
+            return persistence.Troupe.find({ parentId: room._id }).exec();
           })
           .then(function(channels) {
             return Q.all(channels.map(function(channel) {
@@ -1458,7 +1469,7 @@ function renameRepo(oldUri, newUri) {
               channel.uri = newChannelUri;
               channel.lcOwner = lcOwner;
 
-              return channel.saveQ()
+              return channel.save()
                 .then(function() {
                   return uriLookupService.removeBadUri(originalLcUri);
                 })
@@ -1499,15 +1510,16 @@ function deleteRoom(troupe) {
         });
     })
     .then(function() {
-      if (troupe.oneToOne) {
-        return troupe.removeQ();
-      }
+      return troupe.remove();
+    })
+    .then(function() {
+      // TODO: NB: remove channel reference from parent room if this is a channel
+      return Q.all([
+          persistence.ChatMessage.remove({ toTroupeId: troupe._id }).exec(),
+          persistence.Event.remove({ toTroupeId: troupe._id }).exec(),
+          // TODO: webhooks
+        ]);
 
-      troupe.status = 'DELETED';
-      if (!troupe.dateDeleted) {
-        troupe.dateDeleted = new Date();
-      }
-      return troupe.saveQ();
-    });
+    })
 }
 exports.deleteRoom = deleteRoom;
