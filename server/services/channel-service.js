@@ -33,7 +33,7 @@ function findPublicChannels(user, query, options) {
       githubType: { $in: ['REPO_CHANNEL', 'ORG_CHANNEL', 'USER_CHANNEL'] }
     })
     .limit(options.limit || 20)
-    .execQ()
+    .exec()
     .then(function(troupes) {
       return Q.all(troupes.filter(function(troupe) {
         return troupe.security === 'PUBLIC' || !troupe.security;
@@ -61,7 +61,7 @@ function findPrivateChannelsWithUser(user, query, options) {
           githubType: { $in: ['REPO_CHANNEL', 'ORG_CHANNEL', 'USER_CHANNEL'] }
         })
         .limit(options.limit || 20)
-        .execQ();
+        .exec();
     });
 }
 

@@ -39,7 +39,7 @@ module.exports = {
             resultItemStrategy: new restSerializer.UserStrategy()
           });
 
-          return restSerializer.serializeQ(searchResults, strategy);
+          return restSerializer.serialize(searchResults, strategy);
         })
         .then(function(searchResults) {
           res.send(searchResults);

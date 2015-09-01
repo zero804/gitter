@@ -7,12 +7,14 @@ function create(lean) {
   var module = {};
 
   module.findByIdRequired = function(id, fields) {
-    return persistence.User.findByIdQ(id, fields, { lean: lean })
+    return persistence.User.findById(id, fields, { lean: lean })
+      .exec()
       .then(promiseUtils.required);
   };
 
   module.findById = function(id, fields) {
-    return persistence.User.findByIdQ(id, fields, { lean: lean });
+    return persistence.User.findById(id, fields, { lean: lean })
+      .exec();
   };
 
   return module;

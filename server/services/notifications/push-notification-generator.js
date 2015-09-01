@@ -16,8 +16,8 @@ function serializeItems(troupeId, recipientUserId, chatIds) {
   var chatStrategy = new serializer.ChatIdStrategy({ includeTroupe: false, recipientUserId: recipientUserId });
 
   return Q.all([
-    serializer.serializeQ(troupeId, troupeStrategy),
-    serializer.serializeQ(chatIds, chatStrategy),
+    serializer.serialize(troupeId, troupeStrategy),
+    serializer.serialize(chatIds, chatStrategy),
   ]);
 }
 
