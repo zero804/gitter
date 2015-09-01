@@ -1513,6 +1513,7 @@ function deleteRoom(troupe) {
       return troupe.remove();
     })
     .then(function() {
+      // TODO: NB: remove channel reference from parent room if this is a channel
       return Q.all([
           persistence.ChatMessage.remove({ toTroupeId: troupe._id }).exec(),
           persistence.Event.remove({ toTroupeId: troupe._id }).exec(),
