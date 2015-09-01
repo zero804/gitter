@@ -34,7 +34,7 @@ module.exports =  function (req, res, next) {
       if(!user || !room) throw new StatusError(404);
       user.invitedEmail = email;
 
-      return user.saveQ()
+      return user.save()
         .then(function() {
           return emailService.sendManualInvitation(req.user, user, room, email);
         })

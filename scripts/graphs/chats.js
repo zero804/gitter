@@ -14,23 +14,24 @@ var OTHER_EDGE_COLOR =  "#ff0000";
 var d1 = new Date('13 Nov 2014');
 var d2 = new Date('20 Nov 2014');
 
-persistenceService.ChatMessage.aggregateQ([{
-    $match: {
-      $and: [
-        { sent: { $gt: d1 } },
-        { sent: { $lt: d2 } }
-      ]}
-  }, {
-    $group: {
-      _id: {
-        userId: "$fromUserId",
-        room: "$toTroupeId"
-      },
-      count: {
-        $sum: 1
+persistenceService.ChatMessage.aggregate([{
+      $match: {
+        $and: [
+          { sent: { $gt: d1 } },
+          { sent: { $lt: d2 } }
+        ]}
+    }, {
+      $group: {
+        _id: {
+          userId: "$fromUserId",
+          room: "$toTroupeId"
+        },
+        count: {
+          $sum: 1
+        }
       }
-    }
-  }])
+    }])
+   .exec()
    .then(function(chats) {
     chats.forEach(function(c) {
       g.addNode("" + c._id.userId, { shape: "point" } );

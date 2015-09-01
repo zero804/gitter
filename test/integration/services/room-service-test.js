@@ -170,9 +170,10 @@ describe('room-service #slow', function() {
         .then(function (uriContext) {
           assert(uriContext.didCreate);
           assert.equal(uriContext.troupe.uri, 'gitterTest');
+          assert.equal(uriContext.troupe.userCount, 0);
         })
         .finally(function () {
-          return persistence.Troupe.removeQ({ uri: 'gitterTest' });
+          return persistence.Troupe.remove({ uri: 'gitterTest' }).exec();
         })
         .nodeify(done);
     });
@@ -209,7 +210,8 @@ describe('room-service #slow', function() {
     });
 
     it('should create a room for a repo ignoring the case', function(done) {
-      return persistence.Troupe.findOneAndRemoveQ({ lcUri: 'gitterhq/sandbox' })
+      return persistence.Troupe.findOneAndRemove({ lcUri: 'gitterhq/sandbox' })
+        .exec()
         .then(function() {
           var permissionsModelMock = mockito.mockFunction();
           var roomService = testRequire.withProxies("./services/room-service", {
@@ -250,7 +252,8 @@ describe('room-service #slow', function() {
     });
 
     it('should redirect a user when a URI is in the wrong case and the room is to be created', function(done) {
-      return persistence.Troupe.findOneAndRemoveQ({ lcUri: 'gitterhq/sandbox' })
+      return persistence.Troupe.findOneAndRemove({ lcUri: 'gitterhq/sandbox' })
+        .exec()
         .then(function() {
           var permissionsModelMock = mockito.mockFunction();
           var roomService = testRequire.withProxies("./services/room-service", {
@@ -402,7 +405,7 @@ describe('room-service #slow', function() {
         _id: _troupId,
         id: _troupId.toString(),
         uri: 'user/room',
-        saveQ: function() {
+        save: function() {
           return Q.resolve();
         }
       };
@@ -432,7 +435,7 @@ describe('room-service #slow', function() {
         _id: _troupId,
         id: _troupId.toString(),
         uri: 'user/room',
-        saveQ: function() {
+        save: function() {
           return Q.resolve();
         }
       };
@@ -462,7 +465,7 @@ describe('room-service #slow', function() {
         _id: _troupId,
 
         uri: 'user/room',
-        saveQ: function() {
+        save: function() {
           return Q.resolve();
         }
       };
@@ -477,7 +480,7 @@ describe('room-service #slow', function() {
           assert.equal(user.id, userId);
           assert.equal(user.username, 'test-user');
 
-          return persistence.UserTroupeLastAccess.findOneQ({ userId: user.id });
+          return persistence.UserTroupeLastAccess.findOne({ userId: user.id }).exec();
         })
         .then(function(lastAccess) {
           assert(lastAccess);
@@ -511,7 +514,7 @@ describe('room-service #slow', function() {
       var troupe = {
         _id: _troupId,
         uri: 'user/room',
-        saveQ: function() {
+        save: function() {
           return Q.resolve();
         }
       };
@@ -534,7 +537,7 @@ describe('room-service #slow', function() {
 
       var troupe = {
         uri: 'user/room',
-        saveQ: function() {}
+        save: function() {}
       };
 
       service.addUserToRoom(troupe, {}, 'test-user').fail(function(err) {
@@ -559,7 +562,7 @@ describe('room-service #slow', function() {
       var troupe = {
         _id: _troupId,
         uri: 'user/room',
-        saveQ: function() {}
+        save: function() {}
       };
 
       var user = {
@@ -584,7 +587,7 @@ describe('room-service #slow', function() {
 
       var troupe = {
         uri: 'user/room',
-        saveQ: function() {}
+        save: function() {}
       };
 
       service.addUserToRoom(troupe, {}, 'test-user').fail(function(err) {
@@ -1586,7 +1589,7 @@ describe('room-service #slow', function() {
           assert.equal(troupe.userCount, 0);
         })
         .finally(function () {
-          return persistence.Troupe.removeQ({ uri: 'gitterTest' });
+          return persistence.Troupe.remove({ uri: 'gitterTest' }).exec();
         })
         .nodeify(done);
     });
@@ -1721,4 +1724,77 @@ describe('room-service #slow', function() {
 
   });
 
+  describe('createGithubRoom', function() {
+    var fixture = {};
+    var permissionsModelMock, roomPermissionsModelMock, roomValidatorMock, roomService;
+
+    beforeEach(function() {
+      permissionsModelMock = mockito.mockFunction();
+      roomPermissionsModelMock = mockito.mockFunction();
+      roomValidatorMock = mockito.mockFunction();
+      roomService = testRequire.withProxies('./services/room-service', {
+        './permissions-model': permissionsModelMock,
+        './room-permissions-model': roomPermissionsModelMock,
+        'gitter-web-github': {
+          GitHubUriValidator: roomValidatorMock
+        }
+      });
+    });
+
+    before(fixtureLoader(fixture, {
+      troupeOrg1: {
+        githubType: 'ORG',
+        users: []
+      },
+      user1: {}
+    }));
+
+    after(function() {
+      fixture.cleanup();
+    });
+
+    it('should return an new room if one does not exist', function(done) {
+      mockito.when(permissionsModelMock)().thenReturn(Q.resolve(true));
+      var orgUri = fixture.generateUri('ORG');
+      var githubId = fixture.generateGithubId();
+      mockito.when(roomValidatorMock)().then(function() {
+        return Q.resolve({
+          type: 'ORG',
+          uri: orgUri,
+          githubId: githubId,
+          description: 'renamed',
+          security: 'PUBLIC'
+        });
+      });
+
+      return roomService.createGithubRoom(fixture.user1, orgUri)
+        .then(function(room) {
+          assert.strictEqual(room.uri, orgUri);
+          assert.strictEqual(room.githubId, githubId);
+        })
+        .nodeify(done);
+    });
+
+    it('should return an existing room if it exists', function(done) {
+      mockito.when(permissionsModelMock)().thenReturn(Q.resolve(true));
+      var githubId = fixture.generateGithubId();
+
+      mockito.when(roomValidatorMock)().then(function() {
+        return Q.resolve({
+          type: 'ORG',
+          uri: fixture.troupeOrg1.uri,
+          githubId: githubId,
+          description: 'renamed',
+          security: 'PUBLIC'
+        });
+      });
+
+      return roomService.createGithubRoom(fixture.user1, fixture.troupeOrg1.uri)
+        .then(function(room) {
+          assert.strictEqual(room.id, fixture.troupeOrg1.id);
+        })
+        .nodeify(done);
+    });
+
+  });
 });

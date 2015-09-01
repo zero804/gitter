@@ -49,7 +49,7 @@ module.exports = function(req, res, next) {
         return res.send({ count: users.length });
 
       /* Return the actual users */
-      return restSerializer.serializeQ(users, new restSerializer.UserStrategy())
+      return restSerializer.serialize(users, new restSerializer.UserStrategy())
         .then(function(serializeUsers) {
           res.send(serializeUsers);
         });

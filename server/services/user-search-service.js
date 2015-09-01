@@ -33,7 +33,7 @@ function executeSearch(q, options) {
   return q.limit(limit)
     .skip(skip)
     .select('displayName avatarVersion gravatarImageUrl username')
-    .execQ()
+    .exec()
     .then(function(results) {
       return {
         hasMoreResults: undefined,

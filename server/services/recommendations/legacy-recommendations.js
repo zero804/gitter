@@ -164,12 +164,13 @@ function filterRecommendations(recommendations, userId) {
         query._id = { $nin: existingMemberships };
       }
 
-      return persistence.Troupe.findQ(query, {
+      return persistence.Troupe.find(query, {
           _id: 1,
           uri: 1,
           userCount: 1,
           lang: 1
-        });
+        })
+        .exec();
     })
     .then(function(rooms) {
       debug('Found %s rooms from recommendation list', rooms.length);

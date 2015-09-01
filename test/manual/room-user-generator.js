@@ -50,7 +50,7 @@ Q.all([
           state:              'INVITED'
         });
 
-        return newUser.saveQ()
+        return newUser.save()
           .then(function() {
             if (++i % 10 === 0) console.log(i);
             return newUser._id;

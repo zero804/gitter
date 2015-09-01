@@ -40,7 +40,7 @@ function updateUserTzInfo(user, timezoneInfo) {
   userService.updateTzInfo(user._id, timezoneInfo)
     .catch(function(err) {
       logger.error("Unable to save timezone info for user", { exception: err });
-      errorReporter(err, { user: user.username });
+      errorReporter(err, { user: user.username }, { module: 'timezone-middleware'});
     });
 }
 

@@ -2,7 +2,7 @@
 /* jshint unused:true, browser:true */
 var Backbone = require('backbone');
 var context = require('utils/context');
-var roomSort = require('utils/room-sort');
+var roomSort = require('gitter-realtime-client').sortsFilters.model;
 var troupeModels = require('../troupes');
 var orgModels = require('../orgs');
 var unreadItemsClient = require('components/unread-items-frame-client');

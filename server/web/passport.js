@@ -300,7 +300,7 @@ function install() {
 
       })
       .catch(function(err) {
-        errorReporter(err, { oauth: "failed" });
+        errorReporter(err, { oauth: "failed" }, { module: 'passport' });
         stats.event("oauth_profile.error");
         logger.error('Error during oauth process. Unable to obtain user profile.', err);
 

@@ -8,7 +8,8 @@ var logger = env.logger;
 
 function userCanAccessRoom(userId, troupeId, callback) {
   // TODO: use the room permissions model
-  return persistence.Troupe.findByIdQ(troupeId, { bans: 1, security: 1 }, { lean: true })
+  return persistence.Troupe.findById(troupeId, { bans: 1, security: 1 }, { lean: true })
+    .exec()
     .then(function(troupe) {
       if(!troupe) return false;
 
@@ -28,7 +29,8 @@ function userCanAccessRoom(userId, troupeId, callback) {
         return false;
       }
 
-      return persistence.TroupeUser.countQ({ troupeId: troupeId, userId: userId })
+      return persistence.TroupeUser.count({ troupeId: troupeId, userId: userId })
+        .exec()
         .then(function(isInRoom) {
           if(!isInRoom) {
             logger.info("Denied user " + userId + " access to troupe " + troupe.uri);

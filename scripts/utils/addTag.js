@@ -30,7 +30,7 @@ if (roomUri && tags) {
 function addTag(room) {
   if (!room) throw new Error('Room not found.');
   room.tags = room.tags.concat(tags).filter(dedupe);
-  return room.saveQ();
+  return room.save();
 }
 
 function tagRoom(uri, tags) {

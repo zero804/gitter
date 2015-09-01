@@ -79,11 +79,12 @@ function checkIfOrg(owner) {
 function checkIfProOrg(org) {
   var lcUri = org.toLowerCase();
 
-  return persistence.Subscription.findOneQ({
-    lcUri: lcUri,
-    subscriptionType: 'ORG',
-    status: 'CURRENT'
-  }, '_id', { lean: true })
+  return persistence.Subscription.findOne({
+      lcUri: lcUri,
+      subscriptionType: 'ORG',
+      status: 'CURRENT'
+    }, '_id', { lean: true })
+    .exec()
     .then(function(subscription) {
       return !!subscription;
     });

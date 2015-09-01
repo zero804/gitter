@@ -29,7 +29,8 @@ Q.all([
   assert(fromRoom && fromRoom.id, 'lookup failed for ' + opts.from);
   assert(toRoom && fromRoom.id, 'lookup failed for ' + opts.to);
 
-  return persistance.ChatMessage.updateQ({ toTroupeId: fromRoom.id }, { $set: { toTroupeId: toRoom.id } }, { multi: true });
+  return persistance.ChatMessage.update({ toTroupeId: fromRoom.id }, { $set: { toTroupeId: toRoom.id } }, { multi: true })
+    .exec();
 })
 .delay(5000)
 .then(function() {

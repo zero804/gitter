@@ -8,7 +8,6 @@ var MobileLoginButton = require('views/mobile/mobileLoginButton');
 /* Decorators */
 var emojiDecorator = require('views/chat/decorators/emojiDecorator');
 var mobileDecorator = require('views/chat/decorators/mobileDecorator');
-require('jquery-hammerjs');
 
 require('views/behaviors/isomorphic');
 
@@ -26,10 +25,6 @@ module.exports = Marionette.LayoutView.extend({
   initialize: function(options) {
     this.chatCollection = options.chatCollection;
     this.dialogRegion = modalRegion;
-  },
-
-  onRender: function() {
-    this.$el.hammer();
   },
 
   initChatRegion: function(optionsForRegion) {
