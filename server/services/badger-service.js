@@ -252,7 +252,7 @@ function ReadmeUpdater(context) {
       .then(function(tree) {
 
         var commitRequest = {
-          "message": context.insertedPlaintext ? "Added Gitter link" : "Added Gitter badge",
+          "message": context.insertedPlaintext ? "Add Gitter link" : "Add Gitter badge",
           "author": {
             "name": "The Gitter Badger",
             "email": "badger@gitter.im",
