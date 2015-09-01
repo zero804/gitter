@@ -5,7 +5,8 @@ var persistence = require('./persistence-service');
 
 function userIsBannedFromRoom(uri, user) {
   var lcUri = uri.toLowerCase();
-  return persistence.Troupe.findOneQ({ lcUri: lcUri }, 'bans.userId', { lean: true })
+  return persistence.Troupe.findOne({ lcUri: lcUri }, 'bans.userId', { lean: true })
+    .exec()
     .then(function(troupe) {
       if(!troupe) return false;
       if(!troupe.bans) return false;

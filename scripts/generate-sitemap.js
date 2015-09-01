@@ -24,12 +24,13 @@ function die(error) {
   process.exit(1);
 }
 
-persistence.Troupe.findQ({ security: 'PUBLIC', '$or': [{'noindex': {'$exists': false}}, {'noindex': false}]}, { _id: 1, uri: 1 })
+persistence.Troupe.find({ security: 'PUBLIC', '$or': [{'noindex': {'$exists': false}}, {'noindex': false}]}, { _id: 1, uri: 1 })
+  .exec()
   .then(function(troupes) {
     var uris = troupes.reduce(function(memo,value) { memo[value._id] = value.uri; return memo; }, {});
     var ids = troupes.map(function(value) { return value._id; });
 
-    return persistence.ChatMessage.aggregateQ([
+    return persistence.ChatMessage.aggregate([
         { $match: {
             toTroupeId: { $in: ids }
           }
@@ -54,6 +55,7 @@ persistence.Troupe.findQ({ security: 'PUBLIC', '$or': [{'noindex': {'$exists': f
           }
         }
       ])
+      .exec()
       .then(function(result) {
         var sitemap = sm.createSitemap ({
           hostname: nconf.get('web:basepath')

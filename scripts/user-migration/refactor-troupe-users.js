@@ -28,7 +28,8 @@ function createTroupeUsers(room) {
   var d = Q.defer();
   bulk.execute(d.makeNodeResolver());
   return d.promise.then(function() {
-    return persistence.Troupe.updateQ({ _id: room._id }, { $set: { userCount: room.users.length } });
+    return persistence.Troupe.update({ _id: room._id }, { $set: { userCount: room.users.length } })
+            .exec();
   });
 }
 
@@ -37,7 +38,8 @@ function migrateOneToOneRoom(room) {
     return _.extend({ }, roomUser, { _id: new ObjectID() });
   });
 
-  return persistence.Troupe.updateQ({ _id: room._id }, { $set: { oneToOneUsers: oneToOneUsers, userCount: oneToOneUsers.length } });
+  return persistence.Troupe.update({ _id: room._id }, { $set: { oneToOneUsers: oneToOneUsers, userCount: oneToOneUsers.length } })
+          .exec();
 }
 
 function migrateRoom(room) {

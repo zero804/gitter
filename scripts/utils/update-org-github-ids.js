@@ -22,7 +22,8 @@ function updateOrgRoom(room) {
     .then(function(org) {
       if (!org) return;
       console.log('UPDATE ' + room.uri, 'GITHUB ID ', org.id);
-      return persistence.Troupe.updateQ({ _id: room._id, $or: [{ githubId: null}, { githubId: { $exists: false } }] }, { githubId: org.id });
+      return persistence.Troupe.update({ _id: room._id, $or: [{ githubId: null}, { githubId: { $exists: false } }] }, { githubId: org.id })
+        .exec();
     });
 }
 

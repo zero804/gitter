@@ -53,9 +53,10 @@ function createBaseFixture() {
           var o = self[key];
           if(typeof o.remove === 'function') {
             count++;
-            return o.removeQ().timeout(1000);
+            return o.remove();
           }
         }))
+        .timeout(10000)
         .then(function() {
           debug('Removed %s items', count);
         })
@@ -111,7 +112,7 @@ function createExpectedFixtures(expected, done) {
     var username = f.username === true ? generateUsername() : f.username;
     var confirmationCode = f.confirmationCode === true ? "confirm" + Math.random() : f.confirmationCode;
 
-    return persistence.User.createQ({
+    return persistence.User.create({
       email:            f.email       || generateEmail(),
       displayName:      f.displayName || generateName(),
       githubId:         f.githubId    || generateGithubId(),
@@ -170,7 +171,7 @@ function createExpectedFixtures(expected, done) {
     };
 
     debug('Creating troupe %s with %j', fixtureName, doc);
-    return persistence.Troupe.createQ(doc)
+    return persistence.Troupe.create(doc)
       .then(function(troupe) {
         if (!f.userIds || !f.userIds.length) return troupe;
         return bulkInsertTroupeUsers(troupe._id, f.userIds)
@@ -181,7 +182,7 @@ function createExpectedFixtures(expected, done) {
   function createInvite(fixtureName, f) {
     debug('Creating %s', fixtureName);
 
-    return persistence.Invite.createQ({
+    return persistence.Invite.create({
       fromUserId:   f.fromUserId,
       userId:       f.userId,
       email:        f.email,
@@ -195,7 +196,7 @@ function createExpectedFixtures(expected, done) {
   function createMessage(fixtureName, f) {
     debug('Creating %s', fixtureName);
 
-    return persistence.ChatMessage.createQ({
+    return persistence.ChatMessage.create({
       fromUserId:   f.fromUserId,
       toTroupeId:   f.toTroupeId,
       text:         f.text,

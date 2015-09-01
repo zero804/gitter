@@ -50,7 +50,7 @@ describe('push-notification-service', function() {
           return pushNotificationService.registerDevice('DEVICE2', 'TEST', token, 'OTHERTESTDEVICE', '1.0.1', '122');
         })
         .then(function() {
-          return persistenceService.PushNotificationDevice.findQ({ deviceType: 'TEST', deviceId: 'DEVICE1' });
+          return persistenceService.PushNotificationDevice.find({ deviceType: 'TEST', deviceId: 'DEVICE1' }).exec();
         })
         .then(function(devices) {
           assert.equal(devices.length, 0);

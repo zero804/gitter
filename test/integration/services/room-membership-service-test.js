@@ -47,7 +47,7 @@ describe('room-membership-service', function() {
         })
         .then(function(member) {
           assert(member);
-          return persistence.Troupe.findByIdQ(fixture.troupe1.id);
+          return persistence.Troupe.findById(fixture.troupe1.id).exec();
         })
         .then(function(troupe) {
           assert.strictEqual(troupe.userCount, 1);
@@ -63,7 +63,7 @@ describe('room-membership-service', function() {
     it('should allow users to be removed from a room', function(done) {
       roomMembershipService.addRoomMembers(fixture.troupe2.id, [fixture.user1.id, fixture.user2.id])
         .then(function() {
-          return persistence.Troupe.findByIdQ(fixture.troupe2.id);
+          return persistence.Troupe.findById(fixture.troupe2.id).exec();
         })
         .then(function(troupe) {
           assert.strictEqual(troupe.userCount, 2);
@@ -74,7 +74,7 @@ describe('room-membership-service', function() {
         })
         .then(function(count) {
           assert.strictEqual(count, 1);
-          return persistence.Troupe.findByIdQ(fixture.troupe2.id);
+          return persistence.Troupe.findById(fixture.troupe2.id).exec();
         })
         .then(function(troupe) {
           assert.strictEqual(troupe.userCount, 1);

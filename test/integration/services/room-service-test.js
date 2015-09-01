@@ -173,7 +173,7 @@ describe('room-service #slow', function() {
           assert.equal(uriContext.troupe.userCount, 0);
         })
         .finally(function () {
-          return persistence.Troupe.removeQ({ uri: 'gitterTest' });
+          return persistence.Troupe.remove({ uri: 'gitterTest' }).exec();
         })
         .nodeify(done);
     });
@@ -210,7 +210,8 @@ describe('room-service #slow', function() {
     });
 
     it('should create a room for a repo ignoring the case', function(done) {
-      return persistence.Troupe.findOneAndRemoveQ({ lcUri: 'gitterhq/sandbox' })
+      return persistence.Troupe.findOneAndRemove({ lcUri: 'gitterhq/sandbox' })
+        .exec()
         .then(function() {
           var permissionsModelMock = mockito.mockFunction();
           var roomService = testRequire.withProxies("./services/room-service", {
@@ -251,7 +252,8 @@ describe('room-service #slow', function() {
     });
 
     it('should redirect a user when a URI is in the wrong case and the room is to be created', function(done) {
-      return persistence.Troupe.findOneAndRemoveQ({ lcUri: 'gitterhq/sandbox' })
+      return persistence.Troupe.findOneAndRemove({ lcUri: 'gitterhq/sandbox' })
+        .exec()
         .then(function() {
           var permissionsModelMock = mockito.mockFunction();
           var roomService = testRequire.withProxies("./services/room-service", {
@@ -403,7 +405,7 @@ describe('room-service #slow', function() {
         _id: _troupId,
         id: _troupId.toString(),
         uri: 'user/room',
-        saveQ: function() {
+        save: function() {
           return Q.resolve();
         }
       };
@@ -433,7 +435,7 @@ describe('room-service #slow', function() {
         _id: _troupId,
         id: _troupId.toString(),
         uri: 'user/room',
-        saveQ: function() {
+        save: function() {
           return Q.resolve();
         }
       };
@@ -463,7 +465,7 @@ describe('room-service #slow', function() {
         _id: _troupId,
 
         uri: 'user/room',
-        saveQ: function() {
+        save: function() {
           return Q.resolve();
         }
       };
@@ -478,7 +480,7 @@ describe('room-service #slow', function() {
           assert.equal(user.id, userId);
           assert.equal(user.username, 'test-user');
 
-          return persistence.UserTroupeLastAccess.findOneQ({ userId: user.id });
+          return persistence.UserTroupeLastAccess.findOne({ userId: user.id }).exec();
         })
         .then(function(lastAccess) {
           assert(lastAccess);
@@ -512,7 +514,7 @@ describe('room-service #slow', function() {
       var troupe = {
         _id: _troupId,
         uri: 'user/room',
-        saveQ: function() {
+        save: function() {
           return Q.resolve();
         }
       };
@@ -535,7 +537,7 @@ describe('room-service #slow', function() {
 
       var troupe = {
         uri: 'user/room',
-        saveQ: function() {}
+        save: function() {}
       };
 
       service.addUserToRoom(troupe, {}, 'test-user').fail(function(err) {
@@ -560,7 +562,7 @@ describe('room-service #slow', function() {
       var troupe = {
         _id: _troupId,
         uri: 'user/room',
-        saveQ: function() {}
+        save: function() {}
       };
 
       var user = {
@@ -585,7 +587,7 @@ describe('room-service #slow', function() {
 
       var troupe = {
         uri: 'user/room',
-        saveQ: function() {}
+        save: function() {}
       };
 
       service.addUserToRoom(troupe, {}, 'test-user').fail(function(err) {
@@ -1587,7 +1589,7 @@ describe('room-service #slow', function() {
           assert.equal(troupe.userCount, 0);
         })
         .finally(function () {
-          return persistence.Troupe.removeQ({ uri: 'gitterTest' });
+          return persistence.Troupe.remove({ uri: 'gitterTest' }).exec();
         })
         .nodeify(done);
     });

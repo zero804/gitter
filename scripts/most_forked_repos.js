@@ -19,7 +19,8 @@ function findUserForks(user) {
   .then(function(repos) {
     repos.forEach(function(repo) {
       if (!repo.fork && !repo.private && repo.stargazers_count > 100) {
-        persistence.Troupe.findOneQ({uri: repo.full_name})
+        persistence.Troupe.findOne({ uri: repo.full_name })
+        .exec()
         .then(function(room) {
           if (!room) fs.appendFileSync('popularRepos.csv', repo.full_name + '\n');
         });
@@ -43,7 +44,8 @@ function findUserForks(user) {
   });
 }
 
-persistence.User.find({}).sort({_id: 1}).limit(10).skip(0).execQ()
+persistence.User.find({}).sort({_id: 1}).limit(10).skip(0)
+.exec()
 .then(function(users) {
   var _users = users.filter(function(user) { return user.githubUserToken; });
   var forksPromises = _users.map(function(user) {

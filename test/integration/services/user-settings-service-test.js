@@ -32,7 +32,7 @@ describe("User Settings Service", function() {
         assert.equal(settings.value2, true);
         assert.equal(settings.value3, 'string');
       })
-    .nodeify(done);
+      .nodeify(done);
   });
 
   it('should be able to set multiple keys', function(done) {

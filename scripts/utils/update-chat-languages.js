@@ -93,7 +93,8 @@ function run(chatMessages) {
           logProgress();
         }
         if(result.lang) {
-          return persistence.ChatMessage.findByIdAndUpdateQ(chat.id, { $set: { lang: result.lang }})
+          return persistence.ChatMessage.findByIdAndUpdate(chat.id, { $set: { lang: result.lang }})
+            .exec()
             .then(function() {
               success++;
             });
