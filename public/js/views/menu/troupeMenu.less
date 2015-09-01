@@ -2,7 +2,6 @@
 @import (reference) "../../../less/trp3Vars.less";
 
 @import "../../../less/base-zindex-levels";
-@import "../../../less/base-transition-mixins";
 @import "../../../less/logo.less";
 
 /* Imports for child views */
@@ -250,7 +249,7 @@ body.hover .menu:hover .menu__hotspot {
 }
 
 .list-favourites {
-  .transition300ms(padding);
+  transition: padding 300ms ease-in-out;
 }
 
 body.dragging .list-favourites {
@@ -259,7 +258,7 @@ body.dragging .list-favourites {
   border-top: 1px dashed rgba(255,255,255,0.2);
   border-bottom: 1px dashed rgba(255,255,255,0.2);
   padding: 5px 0;
-  .transition300ms(padding);
+  transition: padding 300ms ease-in-out;
 }
 
 body.dragging .list-favourites li.placeholder {
@@ -281,38 +280,9 @@ body.dragging .list-favourites li.placeholder {
   padding: 20px;
 
   overflow-y: auto;
-  align-items: center;
-  justify-content: center;
 
   background-color: lighten(@trpDarkBlue, 5%);
   color: white;
-}
-
-.nli-menu__intro {
-  max-height: 100%;
-
-  p {
-    margin-bottom: 40px;
-  }
-}
-
-.nli-menu__logo {
-  background-image: url('../images/logo-text-white-48@2x.png');
-  background-size: contain;
-
-  width: 244px;
-  height: 48px;
-  margin-bottom: 40px;
-
-  @media @retina {
-    background-image: url('../images/logo-text-white-48@2x.png');
-  }
-}
-
-// SPLIT TEST CSS START
-
-.nli-menu-treatment {
-  .nli-menu;
 
   flex-direction: column;
   align-items: flex-start;
@@ -331,7 +301,7 @@ body.dragging .list-favourites li.placeholder {
   }
 }
 
-.nli-menu-treatment__logo {
+.nli-menu__logo {
   display: flex;
   flex-direction: row;
   align-items: flex-start;
@@ -340,7 +310,7 @@ body.dragging .list-favourites li.placeholder {
   left: 35px;
 }
 
-.nli-menu-treatment__logo-text {
+.nli-menu__logo-text {
   position: relative;
   width: 76px;
   top: 7px;
@@ -348,7 +318,7 @@ body.dragging .list-favourites li.placeholder {
 }
 
 
-.nli-menu-treatment__header {
+.nli-menu__header {
   font-family: "source-sans-pro";
   font-weight: 200;
   font-size: 47px;
@@ -357,7 +327,7 @@ body.dragging .list-favourites li.placeholder {
   width: 100%;
 }
 
-.nli-menu-treatment__features-header {
+.nli-menu__features-header {
   font-size: 14px;
   text-transform: uppercase;
   letter-spacing: 2px;
@@ -365,7 +335,7 @@ body.dragging .list-favourites li.placeholder {
   margin-left: 15px;
 }
 
-.nli-menu-treatment__price {
+.nli-menu__price {
   font-size: 10px;
   font-weight: bold;
   text-transform: uppercase;
@@ -374,7 +344,7 @@ body.dragging .list-favourites li.placeholder {
   margin-left: 15px;
 }
 
-.nli-menu-treatment__features {
+.nli-menu__features {
   background-color: rgba(255,255,255, 0.1);
   font-size: 10px;
   padding: 1vh 15px;
@@ -384,7 +354,7 @@ body.dragging .list-favourites li.placeholder {
   width: 100%;
 }
 
-.nli-menu-treatment__footer {
+.nli-menu__footer {
   display: block;
   position: absolute;
   bottom: 25px;

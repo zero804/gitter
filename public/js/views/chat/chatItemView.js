@@ -282,6 +282,8 @@ module.exports = (function() {
         var $collapse = this.ui.collapse;
         toggle($collapse[0], isCollapsible);
       }
+
+      if (!context.isLoggedIn()) this.ui.actions.hide();
     },
 
     focusInput: function() {
@@ -522,8 +524,9 @@ module.exports = (function() {
 
     showActions: function(e) {
       e.preventDefault();
+
+      // Don't show if it's already open.
       if(this.popover) return;
-      e.preventDefault();
 
       var actions = new ActionsPopover({
         model: this.model,

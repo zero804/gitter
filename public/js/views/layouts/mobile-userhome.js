@@ -6,7 +6,6 @@ var UserhomeView = require('views/userhome/userHomeView');
 var TroupeMenu = require('views/menu/troupeMenu');
 
 var $ = require('jquery');
-require('jquery-hammerjs');
 
 require('views/behaviors/isomorphic');
 
@@ -27,9 +26,8 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   events: {
-    'tap': 'tap',
-    'touch @ui.showTroupesButton': 'stopClickEvents',
-    'tap @ui.showTroupesButton': 'showHideTroupes'
+    'click @ui.mainPage': 'hideTroupes',
+    'click @ui.showTroupesButton': 'showHideTroupes'
   },
 
   initialize: function() {
@@ -37,7 +35,6 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   onRender: function() {
-    this.$el.hammer();
     this.ui.showTroupesButton.toggle(!this.options.hideMenu);
   },
 
@@ -49,18 +46,13 @@ module.exports = Marionette.LayoutView.extend({
     return new UserhomeView(optionsForRegion());
   },
 
-  tap: function() {
+  hideTroupes: function() {
     this.makeAppFullScreen();
     this.ui.mainPage.removeClass('partiallyOffScreen');
   },
 
   makeAppFullScreen: function() {
     $('html, body').scrollTop($(document).height());
-  },
-
-  stopClickEvents: function(e) {
-    e.gesture.preventDefault();
-    e.stopPropagation();
   },
 
   showHideTroupes: function(e) {
