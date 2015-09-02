@@ -146,7 +146,7 @@ exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
     // dont write message to db, just fake it for the troll / asshole
     if (user.hellbanned) return chatMessage;
 
-    return chatMessage.saveQ()
+    return chatMessage.save()
       .then(function() {
         // Async add unread items
         unreadItemService.createChatUnreadItems(user.id, troupe, chatMessage)
@@ -177,7 +177,7 @@ exports.getRecentPublicChats = function() {
             .where({ sent: { $gt: twentyFourHoursAgo} })
             .sort({ _id: -1 })
             .limit(100)
-            .execQ();
+            .exec();
 
 };
 
@@ -218,7 +218,7 @@ exports.updateChatMessage = function(troupe, chatMessage, user, newText, callbac
       chatMessage._md       = parsedMessage.markdownProcessingFailed ?
                                 -CURRENT_META_DATA_VERSION : CURRENT_META_DATA_VERSION;
 
-      return chatMessage.saveQ()
+      return chatMessage.save()
         .then(function() {
           // Async add unread items
           unreadItemService.updateChatUnreadItems(user.id, troupe, chatMessage, originalMentions)
@@ -239,18 +239,20 @@ exports.updateChatMessage = function(troupe, chatMessage, user, newText, callbac
 };
 
 exports.findById = function(id, callback) {
-  return ChatMessage.findByIdQ(id)
+  return ChatMessage.findById(id)
+    .exec()
     .nodeify(callback);
 };
 
 exports.findByIdLean = function(id, fields) {
   return ChatMessage.findById(id, fields)
     .lean()
-    .execQ();
+    .exec();
 };
 
 exports.findByIdInRoom = function(troupeId, id, callback) {
-  return ChatMessage.findOneQ({ _id: id, toTroupeId: troupeId })
+  return ChatMessage.findOne({ _id: id, toTroupeId: troupeId })
+    .exec()
     .nodeify(callback);
 };
 
@@ -270,7 +272,7 @@ function getDateOfFirstMessageInRoom(troupeId) {
     .select({ _id: 0, sent: 1 })
     .sort({ sent: 'asc' })
     .lean()
-    .execQ()
+    .exec()
     .then(function(r) {
       if(!r.length) return null;
       return r[0].sent;
@@ -282,7 +284,7 @@ exports.getDateOfFirstMessageInRoom = getDateOfFirstMessageInRoom;
  * this does a massive query, so it has to be cached for a long time
  */
 exports.getRoughMessageCount = cacheWrapper('getRoughMessageCount', function(troupeId) {
-  return ChatMessage.countQ({ toTroupeId: troupeId });
+  return ChatMessage.count({ toTroupeId: troupeId }).exec();
 }, {
   ttl: config.get('chat-service:get-rough-message-count-cache-timeout')
 });
@@ -359,7 +361,7 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
           .limit(limit)
           .skip(skip)
           .lean()
-          .execQ()
+          .exec()
           .then(function(results) {
             mongooseUtils.addIdToLeanArray(results);
 
@@ -399,8 +401,8 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
 
       /* Around case */
       return Q.all([
-        q1.execQ(),
-        q2.execQ(),
+        q1.exec(),
+        q2.exec(),
         ])
         .spread(function(a, b) {
           mongooseUtils.addIdToLeanArray(a);
@@ -421,7 +423,7 @@ exports.findChatMessagesForTroupeForDateRange = function(troupeId, startDate, en
           .where('sent').lte(endDate)
           .sort({ sent: 'asc' });
 
-  return q.execQ();
+  return q.exec();
 };
 
 /**

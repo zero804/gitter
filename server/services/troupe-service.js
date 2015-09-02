@@ -22,7 +22,8 @@ var MAX_TAG_LENGTH = 20;
 function findByUri(uri, callback) {
   var lcUri = uri.toLowerCase();
 
-  return persistence.Troupe.findOneQ({ lcUri: lcUri })
+  return persistence.Troupe.findOne({ lcUri: lcUri })
+    .exec()
     .nodeify(callback);
 }
 
@@ -37,7 +38,8 @@ function findByIdsLean(ids, select) {
 function findById(id, callback) {
   assert(mongoUtils.isLikeObjectId(id));
 
-  return persistence.Troupe.findByIdQ(id)
+  return persistence.Troupe.findById(id)
+    .exec()
     .nodeify(callback);
 }
 
@@ -48,7 +50,7 @@ function findByIdLeanWithAccess(troupeId, userId) {
   troupeId = mongoUtils.asObjectID(troupeId);
   if (userId) {
     return Q.all([
-      persistence.Troupe.findOneQ({ _id: troupeId }, { }, { lean: true }),
+      persistence.Troupe.findOne({ _id: troupeId }, { }, { lean: true }).exec(),
       roomMembershipService.checkRoomMembership(troupeId, userId)
     ])
     .spread(function(leanTroupe, access) {
@@ -59,7 +61,8 @@ function findByIdLeanWithAccess(troupeId, userId) {
   }
 
   // Query without userId
-  return persistence.Troupe.findOneQ({ _id: troupeId }, { }, { lean: true })
+  return persistence.Troupe.findOne({ _id: troupeId }, { }, { lean: true })
+    .exec()
     .then(function(result) {
       if (!result) return [null, false];
       result.id = mongoUtils.serializeObjectId(result._id);
@@ -73,13 +76,14 @@ function findOneToOneTroupe(fromUserId, toUserId) {
   assert(toUserId, 'fromUserId parameter required');
 
   /* Find the existing one-to-one.... */
-  return persistence.Troupe.findOneQ({
+  return persistence.Troupe.findOne({
         $and: [
           { oneToOne: true },
           { 'oneToOneUsers.userId': fromUserId },
           { 'oneToOneUsers.userId': toUserId }
         ]
-    });
+    })
+    .exec();
 }
 
 /**
@@ -89,7 +93,8 @@ function findOneToOneTroupe(fromUserId, toUserId) {
 function checkGitHubTypeForUri(uri, githubType) {
   var lcUri = uri.toLowerCase();
 
-  return persistence.Troupe.countQ({ lcUri: lcUri, githubType: githubType })
+  return persistence.Troupe.count({ lcUri: lcUri, githubType: githubType })
+    .exec()
     .then(function(count) {
       return !!count;
     });
@@ -189,13 +194,13 @@ function findOrCreateOneToOneTroupeIfPossible(fromUserId, toUserId) {
 
   return Q.all([
       userService.findById(toUserId),
-      persistence.Troupe.findOneQ({
+      persistence.Troupe.findOne({
         $and: [
           { oneToOne: true },
           { 'oneToOneUsers.userId': fromUserId },
           { 'oneToOneUsers.userId': toUserId }
         ]
-      })
+      }).exec()
     ])
     .spread(function(toUser, troupe) {
       if(!toUser) throw new StatusError(404, "User does not exist");
@@ -223,7 +228,7 @@ function updateTopic(user, troupe, topic) {
 
       troupe.topic = topic;
 
-      return troupe.saveQ()
+      return troupe.save()
         .then(function() {
           return troupe;
         });
@@ -237,7 +242,7 @@ function toggleSearchIndexing(user, troupe, bool) {
 
       troupe.noindex = bool;
 
-      return troupe.saveQ()
+      return troupe.save()
         .then(function() {
           return troupe;
         });
@@ -251,7 +256,7 @@ function updateTags(user, troupe, tags) {
 
       var cleanTags = tags.trim().slice(0, MAX_RAW_TAGS_LENGTH).split(',')
       .filter(function(tag) {
-        return !!tag; // 
+        return !!tag; //
       })
       .map(function(tag) {
         return tag.trim().slice(0, MAX_TAG_LENGTH);
@@ -259,7 +264,7 @@ function updateTags(user, troupe, tags) {
 
       troupe.tags = cleanTags;
 
-      return troupe.saveQ()
+      return troupe.save()
         .then(function() {
           return troupe;
         });
@@ -276,7 +281,7 @@ function findChildRoomsForOrg(org, opts) {
 
   return persistence.Troupe.find(query)
     .sort({ userCount: 'desc' })
-    .execQ();
+    .exec();
 }
 
 

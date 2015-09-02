@@ -9,7 +9,8 @@ var config      = env.config;
 
 function isEarlyAdopter(roomUri) {
   var lcUri = roomUri.toLowerCase();
-  return persistence.Troupe.findOneQ({ lcUri: lcUri }, { _id: 1 }, { lean: true })
+  return persistence.Troupe.findOne({ lcUri: lcUri }, { _id: 1 }, { lean: true })
+    .exec()
     .then(function(troupe) {
       if(!troupe) return false;
 

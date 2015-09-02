@@ -237,7 +237,7 @@ function sendEmailNotifications(since) {
                       stats.event('logout_destroy_user_tokens', { userId: user.id });
 
                       user.destroyTokens();
-                      return user.saveQ();
+                      return user.save();
                     }
                   });
 

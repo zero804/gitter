@@ -81,7 +81,7 @@ module.exports = {
       .then(function() {
         var strategy = new restSerializer.TroupeStrategy({ currentUserId: userId });
 
-        return restSerializer.serializeQ(troupe, strategy);
+        return restSerializer.serialize(troupe, strategy);
       })
       .then(function(troupe) {
         res.send(troupe);

@@ -46,10 +46,11 @@ function addTroupeAsFavouriteInLastPosition(userId, troupeId) {
       var setOp = {};
       setOp['favs.' + troupeId] = lastPosition;
 
-      return persistence.UserTroupeFavourites.updateQ(
+      return persistence.UserTroupeFavourites.update(
         { userId: userId },
         { $set: setOp },
         { upsert: true, new: true })
+        .exec()
         .thenResolve(lastPosition);
     });
 }
@@ -95,10 +96,11 @@ function addTroupeAsFavouriteInPosition(userId, troupeId, position) {
       var update = {$set: set};
       if (!_.isEmpty(inc)) update.$inc = inc; // Empty $inc is invalid
 
-      return persistence.UserTroupeFavourites.updateQ(
+      return persistence.UserTroupeFavourites.update(
         { userId: userId },
         update,
         { upsert: true, new: true })
+        .exec()
         .thenResolve(position);
     });
 
@@ -108,10 +110,11 @@ function clearFavourite(userId, troupeId) {
   var setOp = {};
   setOp['favs.' + troupeId] = 1;
 
-  return persistence.UserTroupeFavourites.updateQ(
+  return persistence.UserTroupeFavourites.update(
     { userId: userId },
     { $unset: setOp },
     { })
+    .exec()
     .thenResolve(null);
 }
 
@@ -140,7 +143,8 @@ function updateFavourite(userId, troupeId, favouritePosition) {
 exports.updateFavourite = updateFavourite;
 
 function findFavouriteTroupesForUser(userId) {
-  return persistence.UserTroupeFavourites.findOneQ({ userId: userId }, { favs: 1 }, { lean: true })
+  return persistence.UserTroupeFavourites.findOne({ userId: userId }, { favs: 1 }, { lean: true })
+    .exec()
     .then(function(userTroupeFavourites) {
       if(!userTroupeFavourites || !userTroupeFavourites.favs) return {};
 
@@ -167,10 +171,11 @@ function clearLastVisitedTroupeforUserId(userId, troupeId) {
   setOp['troupes.' + troupeId] = 1;
 
   // Update UserTroupeLastAccess
-  return persistence.UserTroupeLastAccess.updateQ(
-         { userId: userId },
-         { $unset: setOp },
-         { upsert: true, new: true });
+  return persistence.UserTroupeLastAccess.update(
+           { userId: userId },
+           { $unset: setOp },
+           { upsert: true, new: true })
+         .exec();
 }
 
 function saveUserTroupeLastAccess(userId, troupeId, lastAccessTime) {
@@ -180,10 +185,11 @@ function saveUserTroupeLastAccess(userId, troupeId, lastAccessTime) {
   setOp['troupes.' + troupeId] = lastAccessTime;
   setOp['last.' + troupeId] = lastAccessTime;
 
-  return persistence.UserTroupeLastAccess.updateQ(
+  return persistence.UserTroupeLastAccess.update(
      { userId: userId },
      { $set: setOp },
-     { upsert: true, new: true });
+     { upsert: true, new: true })
+     .exec();
 }
 
 /**
@@ -196,7 +202,7 @@ function saveLastVisitedTroupeforUserId(userId, troupeId, options) {
   return Q.all([
       saveUserTroupeLastAccess(userId, troupeId, lastAccessTime),
       // Update User
-      persistence.User.updateQ({ _id: userId }, { $set: { lastTroupe: troupeId }})
+      persistence.User.update({ _id: userId }, { $set: { lastTroupe: troupeId }}).exec()
     ])
     .then(function() {
       // XXX: lastAccessTime should be a date but for some bizarre reason it's not
@@ -209,7 +215,8 @@ function saveLastVisitedTroupeforUserId(userId, troupeId, options) {
 exports.saveLastVisitedTroupeforUserId = saveLastVisitedTroupeforUserId;
 
 function getTroupeLastAccessTimesForUserExcludingHidden(userId) {
-  return persistence.UserTroupeLastAccess.findOneQ({ userId: userId }, { _id: 0, troupes: 1 }, { lean: true })
+  return persistence.UserTroupeLastAccess.findOne({ userId: userId }, { _id: 0, troupes: 1 }, { lean: true })
+    .exec()
     .then(function(userTroupeLastAccess) {
       if(!userTroupeLastAccess || !userTroupeLastAccess.troupes) return {};
       return userTroupeLastAccess.troupes;
@@ -223,7 +230,8 @@ exports.getTroupeLastAccessTimesForUserExcludingHidden = getTroupeLastAccessTime
  * @return promise of a hash of { troupeId1: accessDate, troupeId2: accessDate ... }
  */
 function getTroupeLastAccessTimesForUser(userId) {
-  return persistence.UserTroupeLastAccess.findOneQ({ userId: userId }, { _id: 0, last: 1, troupes: 1 }, { lean: true })
+  return persistence.UserTroupeLastAccess.findOne({ userId: userId }, { _id: 0, last: 1, troupes: 1 }, { lean: true })
+    .exec()
     .then(function(userTroupeLastAccess) {
       if (!userTroupeLastAccess) return {};
 
@@ -288,7 +296,8 @@ function findLastAccessTimesForUsersInRoom(roomId, userIds) {
   select[lastKey] = 1;
   select[addedKey] = 1;
 
-  return persistence.UserTroupeLastAccess.findQ(query, select, { lean: true })
+  return persistence.UserTroupeLastAccess.find(query, select, { lean: true })
+    .exec()
     .then(function(lastAccessTimes) {
 
       var lastAccessTimesHash = lastAccessTimes.reduce(function(memo, item) {
