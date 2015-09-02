@@ -130,27 +130,22 @@ function getOrCreateClient() {
     appEvents.trigger('stats.' + type, statName, value);
   });
 
-  var userSubscription;
+  // Subscribe to the user object for changes to the user
+  client.subscribeTemplate({
+    urlTemplate: '/v1/user/:userId',
+    contextModel: context.contextModel(),
+    onMessage: function(message) {
+      var user = context.user();
 
-  context.user().watch('change:id', function (user) {
-    if (userSubscription) {
-      userSubscription.cancel();
-      userSubscription = null;
+      if (message.operation === 'patch' && message.model && message.model.id === user.id) {
+        // Patch the updates onto the user
+        user.set(message.model);
+      }
+
+      if (BRIDGE_NOTIFICATIONS[message.notification]) {
+        appEvents.trigger(message.notification, message);
+      }
     }
-
-    if (user.id) {
-      userSubscription = client.subscribe('/v1/user/' + user.id, function (message) {
-        if (message.operation === 'patch' && message.model && message.model.id === user.id) {
-          // Patch the updates onto the user
-          user.set(message.model);
-        }
-
-        if (BRIDGE_NOTIFICATIONS[message.notification]) {
-          appEvents.trigger(message.notification, message);
-        }
-      });
-    }
-
   });
 
   return client;
@@ -191,8 +186,8 @@ function testConnection(reason) {
 module.exports = {
   getClientId: getClientId,
 
-  subscribe: function (channel, callback, context, options) {
-    return getOrCreateClient().subscribe(channel, callback, context, options);
+  subscribe: function (channel, callback, context) {
+    return getOrCreateClient().subscribe(channel, callback, context);
   },
 
   testConnection: testConnection,
