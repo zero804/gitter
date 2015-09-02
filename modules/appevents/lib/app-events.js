@@ -78,22 +78,6 @@ module.exports =  {
       localEventEmitter.on('userMentionedInNonMemberRoom', callback);
     },
 
-    userLoggedIntoTroupe: function(userId, troupeId) {
-      localEventEmitter.emit('userLoggedIntoTroupe', { troupeId: troupeId, userId: userId });
-    },
-
-    onUserLoggedIntoTroupe: function(callback) {
-      localEventEmitter.on('userLoggedIntoTroupe', callback);
-    },
-
-    userLoggedOutOfTroupe: function(userId, troupeId) {
-      localEventEmitter.emit('userLoggedOutOfTroupe', { troupeId: troupeId, userId: userId });
-    },
-
-    onUserLoggedOutOfTroupe: function(callback) {
-      localEventEmitter.on('userLoggedOutOfTroupe', callback);
-    },
-
     // Deprecated
     newNotification: function(troupeId, userId, notificationText, notificationLink) {
       localEventEmitter.emit('newNotification', {
@@ -140,20 +124,6 @@ module.exports =  {
 
     onChat: function(callback) {
       localEventEmitter.on('chat', callback);
-    },
-
-    eyeballSignal: function(userId, troupeId, signal) {
-      localEventEmitter.emit('eyeballSignal', {
-        userId: userId,
-        troupeId: troupeId,
-        signal: signal
-      });
-    },
-
-    onEyeballSignal: function(callback) {
-      localEventEmitter.on('eyeballSignal', function(event) {
-        return callback(event.userId, event.troupeId, event.signal);
-      });
     },
 
     userRemovedFromTroupe: function(options) {
