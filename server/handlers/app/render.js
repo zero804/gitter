@@ -147,12 +147,16 @@ function getPermalinkChatForRoom(troupe, chatId) {
  * /PrismarineJS/node-minecraft-protocol?at=54ea6fcecadb3f7525792ba9)I
  */
 function fixBadLinksOnId(value) {
-  value = value ? '' + value : '';
+  if (!value) return;
+  value = '' + value;
+
   if (value.length > 24) {
     value = value.substring(0, 24);
   }
 
-  return mongoUtils.isLikeObjectId(value) ? value : '';
+  if (!mongoUtils.isLikeObjectId(value)) return;
+
+  return value;
 }
 
 function renderMainFrame(req, res, next, frame) {
