@@ -1421,8 +1421,9 @@
       }
     },
     "gitter-realtime-client": {
-      "version": "0.3.1",
-      "from": "gitter-realtime-client@beta",
+      "version": "0.3.2",
+      "from": "gitter-realtime-client@0.3.2",
+      "resolved": "http://beta-internal:4873/gitter-realtime-client/-/gitter-realtime-client-0.3.2.tgz",
       "dependencies": {
         "backbone-sorted-collection": {
           "version": "0.3.9",
@@ -1438,7 +1439,8 @@
         },
         "backbone-url-resolver": {
           "version": "0.1.1",
-          "from": "backbone-url-resolver@>=0.1.1 <0.2.0"
+          "from": "backbone-url-resolver@>=0.1.1 <0.2.0",
+          "resolved": "http://beta-internal:4873/backbone-url-resolver/-/backbone-url-resolver-0.1.1.tgz"
         },
         "underscore": {
           "version": "1.8.3",
