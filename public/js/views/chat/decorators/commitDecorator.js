@@ -119,8 +119,7 @@ module.exports = (function() {
   }
 
   function syncModel(repo, sha, model) {
-    var url = '/private/gh/repos/' + repo + '/commits/' + sha;
-    apiClient.get(url, { renderPatchIfSingle: true })
+    apiClient.priv.get('/gh/repos/' + repo + '/commits/' + sha, { renderPatchIfSingle: true })
       .then(function(commit) {
         model.set(commit);
       })
@@ -180,4 +179,3 @@ module.exports = (function() {
 
 
 })();
-
