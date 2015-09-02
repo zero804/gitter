@@ -1,6 +1,5 @@
 "use strict";
 
-var apiClient = require('components/apiClient');
 var SmartUserCollection = require('./smart-users');
 var Backbone = require('backbone');
 var realtime = require('components/realtime');
@@ -13,26 +12,11 @@ var UserModel = Backbone.Model.extend({
   sync: SyncMixin.sync
 });
 
-var UserCollection = LiveCollection.extend({
-  model: UserModel,
-  modelName: 'user',
-  url: apiClient.room.channelGenerator('/users'),
-  getSnapshotState: function () {
-    return { lean: true };
-  },
-  client: function() {
-    return realtime.getClient();
-  },
-  sync: SyncMixin.sync
-});
-
 var RosterCollection = LiveCollection.extend({
   model: UserModel,
   modelName: 'user',
-  url: apiClient.room.channelGenerator('/users'),
-  initialize: function rosterCollectionInit(){
-    this.resubscribeOnModelChange(context.troupe(), 'id');
-  },
+  urlTemplate: '/v1/rooms/:troupeId/users',
+  contextModel: context.contextModel(),
   getSnapshotState: function () {
     return { lean: true, limit: 25 };
   },
@@ -46,6 +30,5 @@ var RosterCollection = LiveCollection.extend({
 module.exports = {
   RosterCollection: RosterCollection,
   SortedRosterCollection: SmartUserCollection.SortedAndLimited,
-  UserCollection: UserCollection,
   UserModel: UserModel
 };

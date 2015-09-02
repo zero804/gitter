@@ -133,13 +133,11 @@ module.exports = (function() {
 
   _.extend(TroupeUnreadItemRealtimeSync.prototype, Backbone.Events, {
     _subscribe: function() {
-      onceUserIdSet(function(userId) {
-
-        var store = this._store;
-
-        var subscription = '/v1/user/' + userId + '/rooms/' + context.getTroupeId() + '/unreadItems';
-
-        realtime.subscribe(subscription, function(message) {
+      var store = this._store;
+      realtime.getClient().subscribeTemplate({
+        urlTemplate: '/v1/user/:userId/rooms/:troupeId/unreadItems',
+        contextModel: context.contextModel(),
+        onMessage: function(message) {
           switch(message.notification) {
             // New unread items
             case 'unread_items':
@@ -165,20 +163,19 @@ module.exports = (function() {
               }
               break;
           }
-        });
+        },
 
-        realtime.getClient().registerSnapshotHandler(subscription, {
-          handleSnapshot: function(snapshot) {
-            var lurk = snapshot._meta && snapshot._meta.lurk;
-            if(lurk) {
-              store.enableLurkMode();
-            }
-
-            store._unreadItemsAdded(snapshot);
+        handleSnapshot: function(snapshot) {
+          var lurk = snapshot._meta && snapshot._meta.lurk;
+          if(lurk) {
+            store.enableLurkMode();
           }
-        });
 
-      }, this);
+          // TODO: clear the old unread items from the previous room...
+          store._unreadItemsAdded(snapshot);
+        }
+      });
+
     }
 
   });
