@@ -247,15 +247,6 @@ module.exports = (function() {
         url: function(relativeUrl) {
           return fullUrlFunction(baseUrlFunction, relativeUrl);
         },
-        /**
-         * Returns a function which returns URLs full urls for the
-         * given relative URL
-         */
-        urlGenerator: function(relativeUrl) {
-          return function() {
-            return fullUrlFunction(baseUrlFunction, relativeUrl);
-          };
-        },
         channel: function(relativeUrl) {
           return makeChannel(baseUrlFunction, relativeUrl);
         },
