@@ -55,6 +55,7 @@ var routes = [{
 function validateUserForSubTroupeSubscription(options) {
   var userId = options.userId;
   var match = options.match;
+  var ext = options.message && options.message.ext;
 
   var troupeId = match[1];
 
@@ -62,7 +63,19 @@ function validateUserForSubTroupeSubscription(options) {
     return Q.reject(new StatusError(400, 'Invalid ID: ' + troupeId));
   }
 
-  return userCanAccessRoom(userId, troupeId);
+  var promise = userCanAccessRoom(userId, troupeId);
+  if (ext && ext.reassociate) {
+    promise = promise.then(function(access) {
+      if (!access) return access;
+
+      return presenceService.socketReassociated(options.clientId, userId, troupeId, !!ext.reassociate.eyeballs)
+        .catch(function(err) {
+          logger.error('Unable to reassociate connection: ', { exception: err, userId: userId, troupeId: troupeId });
+        })
+        .return(access);
+    });
+  }
+  return promise;
 }
 
 // This is only used by the native client. The web client publishes to
