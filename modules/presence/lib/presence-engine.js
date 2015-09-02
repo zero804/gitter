@@ -235,7 +235,7 @@ function socketReassociated(socketId, userId, troupeId, eyeballsOn) {
                      socketId,
                      troupeId || null,
                      previousTroupeId || null,
-                     eyeballsOn)
+                     userId ? eyeballsOn : false) // Only non-anonymous users can be eyeballs on
         .spread(function(success, newTroupeUserCount, previousTroupeUserCount) {
           if(!success)  {
             throw new StatusError(500, 'Socket reassociation failed.');

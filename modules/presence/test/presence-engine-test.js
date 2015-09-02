@@ -939,7 +939,7 @@ describe('presenceService', function() {
           .then(function(socket) {
             assert.strictEqual(socket.userId, null);
             assert.strictEqual(socket.troupeId, troupeId2);
-            assert.strictEqual(socket.eyeballs, true);
+            assert.strictEqual(socket.eyeballs, false);
             assert.strictEqual(socket.clientType, 'test');
           })
           .nodeify(done);
