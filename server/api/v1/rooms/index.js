@@ -24,7 +24,7 @@ function searchRooms(req, res, next) {
         resultItemStrategy: new restSerializer.TroupeStrategy({ currentUserId: userId })
       });
 
-      return restSerializer.serializeQ({ results: rooms }, strategy);
+      return restSerializer.serialize({ results: rooms }, strategy);
     })
     .then(function(searchResults) {
       res.send(searchResults);

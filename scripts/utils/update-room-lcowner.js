@@ -78,7 +78,7 @@ var saveRooms = function (rooms) {
 
   return Q.all(
     rooms.map(function (room) {
-      return room.saveQ()
+      return room.save()
         .then(function () {
           UPDATED += 1;
         })

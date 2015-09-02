@@ -1,4 +1,11 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-module.exports = exports = require('mongoose-q')(require('mongoose'), { spread:true });
+var mongoose = require('mongoose');
+var Q = require('q');
+
+// Switch over to Bluebird soon!
+// mongoose.Promise = require('bluebird'); //Q.Promise;
+
+mongoose.Promise = Q.Promise;
+
+module.exports = mongoose;

@@ -15,7 +15,8 @@ var COLOR1 = "#00d1a0";
 var COLOR2 = "#fe0063";
 var COLOR3 = "#ff8d3e";
 
-persistenceService.Troupe.findQ({}, 'oneToOne users.userId githubType security uri')
+persistenceService.Troupe.find({}, 'oneToOne users.userId githubType security uri')
+  .exec()
   .then(function(rooms) {
     rooms.forEach(function(room) {
       if(room.oneToOne) {

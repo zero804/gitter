@@ -16,7 +16,8 @@ exports.findActivePersonalPlansForUsers = function(userIds) {
     status: 'CURRENT'
   });
 
-  return persistence.Subscription.findQ(query);
+  return persistence.Subscription.find(query)
+    .exec();
 };
 
 exports.findActiveOrgPlans = function(orgUris) {
@@ -27,16 +28,17 @@ exports.findActiveOrgPlans = function(orgUris) {
     status: 'CURRENT'
   });
 
-  return persistence.Subscription.findQ(query);
+  return persistence.Subscription.find(query).exec();
 };
 
 exports.findActivePlan = function(uri) {
   var lcUri = toLowerCase(uri);
 
-  return persistence.Subscription.findOneQ({
-    lcUri: lcUri,
-    status: 'CURRENT'
-  });
+  return persistence.Subscription.findOne({
+      lcUri: lcUri,
+      status: 'CURRENT'
+    })
+    .exec();
 
 };
 
@@ -47,5 +49,5 @@ exports.findActivePlans = function(uris) {
     status: 'CURRENT'
   });
 
-  return persistence.Subscription.findQ(query);
+  return persistence.Subscription.find(query).exec();
 };

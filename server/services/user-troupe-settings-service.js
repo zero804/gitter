@@ -14,7 +14,8 @@ exports.getUserSettings = function(userId, troupeId, settingsKey) {
   userId = mongoUtils.asObjectID(userId);
   troupeId = mongoUtils.asObjectID(troupeId);
 
-  return persistence.UserTroupeSettings.findOneQ({ userId: userId, troupeId: troupeId }, 'settings.' + settingsKey, { lean: true })
+  return persistence.UserTroupeSettings.findOne({ userId: userId, troupeId: troupeId }, 'settings.' + settingsKey, { lean: true })
+    .exec()
     .then(function(uts) {
       if(!uts) return;
       if(!uts.settings) return;
@@ -37,10 +38,11 @@ exports.getMultiUserTroupeSettings = function(userTroupes, settingsKey) {
     return !!f;
   });
 
-  return persistence.UserTroupeSettings.findQ({ $or: terms }, 'userId troupeId settings.' + settingsKey, {
+  return persistence.UserTroupeSettings.find({ $or: terms }, 'userId troupeId settings.' + settingsKey, {
       lean: true,
       slaveOk: true // This query can be run against a slave. If it's a tiny bit out of date, that shouldn't be a problem
     })
+    .exec()
     .then(function(utses) {
       var hash = utses.reduce(function(memo, uts) {
         memo[uts.userId + ':' + uts.troupeId] = uts.settings && uts.settings[settingsKey];
@@ -54,7 +56,7 @@ exports.getMultiUserTroupeSettings = function(userTroupes, settingsKey) {
 exports.getUserTroupeSettingsForUsersInTroupe = function(troupeId, settingsKey, userIds) {
   if(!userIds.length) return Q.resolve({});
 
-  return persistence.UserTroupeSettings.findQ({
+  return persistence.UserTroupeSettings.find({
       $and: [{
         troupeId: troupeId
       }, {
@@ -64,6 +66,7 @@ exports.getUserTroupeSettingsForUsersInTroupe = function(troupeId, settingsKey, 
       lean: true,
       slaveOk: true // This query can be run against a slave. If it's a tiny bit out of date, that shouldn't be a problem
     })
+    .exec()
     .then(function(utses) {
       var hash = utses.reduce(function(memo, uts) {
         memo[uts.userId] = uts.settings && uts.settings[settingsKey];
@@ -82,7 +85,8 @@ exports.getAllUserSettings = function(userId, troupeId) {
   userId = mongoUtils.asObjectID(userId);
   troupeId = mongoUtils.asObjectID(troupeId);
 
-  return persistence.UserTroupeSettings.findOneQ({ userId: userId, troupeId: troupeId }, 'settings', { lean: true })
+  return persistence.UserTroupeSettings.findOne({ userId: userId, troupeId: troupeId }, 'settings', { lean: true })
+    .exec()
     .then(function(uts) {
       if(!uts) return;
       return uts.settings || {};
@@ -103,11 +107,7 @@ exports.setUserSettings = function(userId, troupeId, settingsKey, settings) {
   persistence.UserTroupeSettings.collection.update(
       { userId: userId, troupeId: troupeId },
       setOperation,
-      { upsert: true },
-      function(err) {
-        if(err) return d.reject(err);
-        return d.resolve();
-      });
+      { upsert: true }, d.makeNodeResolver());
 
   return d.promise;
 };

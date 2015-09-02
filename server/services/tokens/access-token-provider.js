@@ -9,7 +9,7 @@ module.exports = {
 
     /* TODO: confirm: Its much quicker to lookup the token in MongoDB than it is to generate one with randomByes and then attempt and upsert */
     /* Lookup and possible create */
-    return persistenceService.OAuthAccessToken.findOneQ({
+    return persistenceService.OAuthAccessToken.findOne({
         userId: userId,
         clientId: clientId
       }, {
@@ -17,6 +17,7 @@ module.exports = {
       }, {
         lean: true
       })
+      .exec()
       .then(function(oauthAccessToken) {
         if(oauthAccessToken && oauthAccessToken.token) {
           return oauthAccessToken.token;
@@ -25,7 +26,7 @@ module.exports = {
         /* Generate a token and attempt an upsert */
         return random.generateToken()
           .then(function(token) {
-            return persistenceService.OAuthAccessToken.findOneAndUpdateQ(
+            return persistenceService.OAuthAccessToken.findOneAndUpdate(
                 { userId: userId, clientId: clientId },
                 {
                   $setOnInsert: {
@@ -33,6 +34,7 @@ module.exports = {
                   }
                 },
                 { upsert: true, new: true })
+              .exec()
               .then(function(result) {
                 return result.token;
               });
@@ -45,7 +47,7 @@ module.exports = {
   validateToken: function(token, callback) {
     return persistenceService.OAuthAccessToken.findOne({ token: token }, { _id: 0, userId: 1, clientId: 1 })
       .lean()
-      .execQ()
+      .exec()
       .then(function(accessToken) {
         if(!accessToken) return null;
 
@@ -64,7 +66,8 @@ module.exports = {
   },
 
   deleteToken: function(token, callback) {
-    return persistenceService.OAuthAccessToken.removeQ({ token: token })
+    return persistenceService.OAuthAccessToken.remove({ token: token })
+      .exec()
       .nodeify(callback);
   },
 

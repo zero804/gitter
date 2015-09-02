@@ -36,7 +36,7 @@ function getUrlOfFirstAccessibleRoom(troupeIds, userId) {
   if (!troupeIds.length) return Q.resolve(null);
   return roomMembershipService.findUserMembershipInRooms(userId, troupeIds)
     .then(function(memberTroupeIds) {
-      return persistence.Troupe.findQ({
+      return persistence.Troupe.find({
           _id: { $in: mongoUtils.asObjectIDs(memberTroupeIds) },
           status: { $ne: 'DELETED' }
         }, {
@@ -44,6 +44,7 @@ function getUrlOfFirstAccessibleRoom(troupeIds, userId) {
             oneToOne: 1,
             oneToOneUsers: 1
         })
+        .exec();
     })
     .then(function(results) {
       var resultsHash = collections.indexById(results);

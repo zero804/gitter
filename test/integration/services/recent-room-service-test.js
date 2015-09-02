@@ -153,7 +153,7 @@ describe('recent-room-service', function() {
     it('should record the time each troupe was last accessed by a user', function(done) {
       return recentRoomService.saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupe1.id)
         .then(function() {
-          return persistenceService.User.findByIdQ(fixture.user1.id);
+          return persistenceService.User.findById(fixture.user1.id).exec();
         })
         .then(function(user) {
           assert.equal(user.lastTroupe, fixture.troupe1.id);

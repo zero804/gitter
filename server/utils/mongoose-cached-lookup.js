@@ -20,7 +20,8 @@ function MongooseCachedLookup(options) {
     var cached = cache.get(id);
     if (cached) return Q.resolve(_.clone(cached)); // Shallow clone only!
 
-    return model.findByIdQ(id, undefined, { lean: true })
+    return model.findById(id, undefined, { lean: true })
+      .exec()
       .then(function(doc) {
         if (!doc) return;
         doc.id = mongoUtils.serializeObjectId(doc._id);

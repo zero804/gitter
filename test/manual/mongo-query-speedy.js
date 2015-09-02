@@ -15,4 +15,14 @@ speedy.run ({
     return persistence.User.findQ({ _id: userId })
       .nodeify(done);
   },
+  inClauseWithPromises: function (done) {
+    return persistence.User.find({ _id: { $in: userId }})
+      .exec()
+      .nodeify(done);
+  },
+  orClauseWithPromises: function (done) {
+    return persistence.User.find({ _id: userId })
+      .exec()
+      .nodeify(done);
+  },
 });
