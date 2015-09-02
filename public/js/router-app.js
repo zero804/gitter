@@ -112,6 +112,8 @@ onready(function () {
         return;
       }
 
+      context.setTroupeId(newTroupe.id);
+
       //post a navigation change to the iframe
       postMessage({
         type: 'change:room',
@@ -215,7 +217,7 @@ onready(function () {
         var count = message.count;
         var troupeId = message.troupeId;
         if (troupeId !== context.getTroupeId()) {
-          log.warn('troupeId mismatch in unreadItemsCount');
+          log.warn('troupeId mismatch in unreadItemsCount: got', troupeId, 'expected', context.getTroupeId());
         }
         var v = {
           unreadItems: count
