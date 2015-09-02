@@ -18,7 +18,7 @@ function fetchByTags(tags) {
     .where('tags').in(tags)
     .sort({ userCount: -1 })
     .limit(50)
-    .execQ();
+    .exec();
 }
 
 exports.fetchByTags = fetchByTags;

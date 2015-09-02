@@ -13,7 +13,7 @@ module.exports =  function(req, res, next) {
         resultItemStrategy: new restSerializer.TroupeStrategy({ currentUserId: req.user.id })
       });
 
-      return restSerializer.serializeQ({ results: troupes }, strategy);
+      return restSerializer.serialize({ results: troupes }, strategy);
     })
     .then(function(serialized) {
       res.send(serialized);

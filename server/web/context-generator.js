@@ -131,7 +131,7 @@ function serializeUser(user) {
     showPremiumStatus: true
   });
 
-  return restSerializer.serializeQ(user, strategy);
+  return restSerializer.serialize(user, strategy);
 }
 
 function serializeUserId(userId) {
@@ -142,7 +142,7 @@ function serializeUserId(userId) {
     showPremiumStatus: true
   });
 
-  return restSerializer.serializeQ(userId, strategy);
+  return restSerializer.serialize(userId, strategy);
 }
 
 function serializeHomeUser(user, includeEmail) {
@@ -151,20 +151,20 @@ function serializeHomeUser(user, includeEmail) {
     hideLocation: true
   });
 
-  return restSerializer.serializeQ(user, strategy);
+  return restSerializer.serialize(user, strategy);
 }
 
 function serializeTroupeId(troupeId, userId) {
   var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: userId });
 
-  return restSerializer.serializeQ(troupeId, strategy);
+  return restSerializer.serialize(troupeId, strategy);
 }
 
 
 function serializeTroupe(troupe, user) {
   var strategy = new restSerializer.TroupeStrategy({ currentUserId: user ? user.id : null });
 
-  return restSerializer.serializeQ(troupe, strategy);
+  return restSerializer.serialize(troupe, strategy);
 }
 
 function createTroupeContext(req, options) {

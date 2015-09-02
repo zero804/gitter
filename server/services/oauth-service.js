@@ -16,7 +16,8 @@ var ircClientId;
 var cachedClientLookup = new MongooseCachedLookup({ model: persistenceService.OAuthClient });
 
 /* Load webInternalClientId once */
-var webClientPromise = persistenceService.OAuthClient.findOneQ({ clientKey: WEB_INTERNAL_CLIENT_KEY })
+var webClientPromise = persistenceService.OAuthClient.findOne({ clientKey: WEB_INTERNAL_CLIENT_KEY })
+  .exec()
   .then(function(oauthClient) {
     if(!oauthClient) throw new Error("Unable to load internal client id.");
     oauthClient = oauthClient.toJSON();
@@ -26,7 +27,8 @@ var webClientPromise = persistenceService.OAuthClient.findOneQ({ clientKey: WEB_
   });
 webClientPromise.done();
 
-var ircClientIdPromise = persistenceService.OAuthClient.findOneQ({ clientKey: nconf.get('irc:clientKey') })
+var ircClientIdPromise = persistenceService.OAuthClient.findOne({ clientKey: nconf.get('irc:clientKey') })
+  .exec()
   .then(function(oauthClient) {
     if(!oauthClient) throw new Error("Unable to load IRC client id.");
 
@@ -101,7 +103,8 @@ exports.validateAccessTokenAndClient = function(token, callback) {
 };
 
 exports.removeAllAccessTokensForUser = function(userId, callback) {
-  return persistenceService.OAuthAccessToken.removeQ({ userId: userId })
+  return persistenceService.OAuthAccessToken.remove({ userId: userId })
+    .exec()
     .nodeify(callback);
 };
 

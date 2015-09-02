@@ -26,7 +26,7 @@ exports.newEventToTroupe = function(troupe, user, text, meta, payload, callback)
       event.meta       = meta;
       event.payload    = payload;
 
-      return event.saveQ();
+      return event.save();
     })
     .nodeify(callback);
 };
@@ -48,7 +48,7 @@ exports.findEventsForTroupe = function(troupeId, options, callback) {
   return q.sort(options.sort || { sent: 'desc' })
     .limit(options.limit || 20)
     .skip(options.skip || 0)
-    .execQ()
+    .exec()
     .then(function(results) {
       return results;
     })

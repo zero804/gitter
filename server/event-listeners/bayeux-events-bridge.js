@@ -167,7 +167,7 @@ exports.install = function() {
 
     var mentionUrl = "/api/v1/user/" + userId + "/rooms";
 
-    restSerializer.serializeQ(troupeId, strategy)
+    restSerializer.serialize(troupeId, strategy)
       .then(function(troupe) {
         // Simulate a create on the mentions resource
         publish(mentionUrl, {
