@@ -108,7 +108,7 @@ exports.install = function() {
   });
 
   // When a user's eyeballs changes to on or off...
-  presenceService.on('presenceChange', function(troupeId, userId, presence) {
+  presenceService.on('presenceChange', function(userId, troupeId, presence) {
     publish("/api/v1/rooms/" + troupeId, {
       notification: "presence",
       userId: userId,
