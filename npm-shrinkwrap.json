@@ -1421,7 +1421,7 @@
       }
     },
     "gitter-realtime-client": {
-      "version": "0.3.0",
+      "version": "0.3.1",
       "from": "gitter-realtime-client@beta",
       "dependencies": {
         "backbone-sorted-collection": {
