@@ -100,3 +100,24 @@ elasticsearchsetup:
   volumes:
     - ./scripts:/scripts
   entrypoint: [ "/scripts/elasticsearch/setup-docker-elasticsearch.sh" ]
+
+# For when we want to run the app in docker in future
+# app:
+#   build: .
+#   links:
+#     - mongo1
+#     - mongo2
+#     - mongo3
+#     - redis1
+#     - redis2
+#     - sentinel1
+#     - elasticsearch:gitter-es-dev
+#     - neo4j:gitter-neo4j-dev
+#   extra_hosts:
+#    - "gitter-redis-dev:192.168.99.100"
+#    - "gitter-mongo-dev:192.168.99.100"
+#   ports:
+#     - "5000:5000"
+#   environment:
+#     DEBUG: "gitter:*"
+#   entrypoint: [ "node", "web" ]

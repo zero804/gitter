@@ -3,6 +3,7 @@
 
 var env              = require('gitter-web-env');
 var logger           = env.logger;
+var errorReporter    = env.errorReporter;
 var engine           = require('./unread-item-service-engine');
 var readByService    = require("./readby-service");
 var userService      = require("./user-service");
@@ -262,6 +263,44 @@ function getTroupeIdsCausingBadgeCount(userId) {
   return engine.getRoomsCausingBadgeCount(userId);
 }
 
+/**
+ * Given an array of non-member userIds in a room,
+ * returns an array of those members who have permission to access
+ * the room. They will be notified. People mentions who don't
+ * have access will not.
+ */
+function findNonMembersWithAccess(troupe, userIds) {
+  if (!userIds.length || troupe.oneToOne || troupe.security === 'PRIVATE') {
+    // Trivial case, and the case where only members have access to the room type
+    return Q.resolve([]);
+  }
+
+  // Everyone can always access a public room
+  if (troupe.security === 'PUBLIC') return Q.resolve(userIds);
+
+  return userService.findByIds(userIds)
+    .then(function(users) {
+      var result = [];
+
+      return Q.all(users.map(function(user) {
+        /* TODO: some sort of bulk service here */
+        return roomPermissionsModel(user, 'join', troupe)
+          .then(function(access) {
+            if(access) {
+              result.push("" + user.id);
+            }
+          })
+          .catch(function(e) {
+            // Swallow errors here. If the call fails, the chat should not fail
+            errorReporter(e, { username: user.username, operation: 'findNonMembersWithAccess' }, { module: 'unread-items' });
+          });
+      }))
+      .then(function() {
+        return result;
+      });
+    });
+}
+
 function parseMentions(fromUserId, troupe, userIdsWithLurk, mentions) {
   var creatorUserId = fromUserId && "" + fromUserId;
 
@@ -282,21 +321,23 @@ function parseMentions(fromUserId, troupe, userIdsWithLurk, mentions) {
 
   var memberUserIds = [];
   var nonMemberUserIds = [];
-  var lookupUsers = [];
 
   Object.keys(uniqueUserIds).forEach(function(userId) {
     /* Don't be mentioning yourself yo */
     if(userId == creatorUserId) return;
 
+    // If the user is in the room, add them to the memberUserIds list
     if(userIdsWithLurk.hasOwnProperty(userId)) {
       memberUserIds.push(userId);
       return;
     }
 
-    lookupUsers.push(userId);
+    // The user is not in the room, add them to the nonMembers list
+    nonMemberUserIds.push(userId);
   });
 
-  if(!lookupUsers.length) {
+  // Skip checking if there are no non-members
+  if(!nonMemberUserIds.length) {
     return Q.resolve({
       memberUserIds: memberUserIds,
       nonMemberUserIds: [],
@@ -305,26 +346,14 @@ function parseMentions(fromUserId, troupe, userIdsWithLurk, mentions) {
   }
 
   /* Lookup the non-members and check if they can access the room */
-  return userService.findByIds(lookupUsers)
-    .then(function(users) {
-      /* TODO: do something about users not on gitter here */
-      return Q.all(users.map(function(user) {
-        /* TODO: some sort of bulk service here */
-        return roomPermissionsModel(user, 'join', troupe)
-          .then(function(access) {
-            if(access) {
-              nonMemberUserIds.push("" + user.id);
-            }
-          });
-      }));
-    })
-    .then(function() {
+  return findNonMembersWithAccess(troupe, nonMemberUserIds)
+    .then(function(nonMemberUserIdsFiltered) {
       /* Mentions consists of members and non-members */
-      var mentionUserIds = memberUserIds.concat(nonMemberUserIds);
+      var mentionUserIds = memberUserIds.concat(nonMemberUserIdsFiltered);
 
       return {
         memberUserIds: memberUserIds,
-        nonMemberUserIds: nonMemberUserIds,
+        nonMemberUserIds: nonMemberUserIdsFiltered,
         mentionUserIds: mentionUserIds
       };
     });
@@ -628,5 +657,6 @@ exports.testOnly = {
   removeItem: removeItem,
   getTroupeIdsCausingBadgeCount: getTroupeIdsCausingBadgeCount,
   parseChat: parseChat,
-  generateMentionDeltaSet: generateMentionDeltaSet
+  generateMentionDeltaSet: generateMentionDeltaSet,
+  findNonMembersWithAccess: findNonMembersWithAccess
 };

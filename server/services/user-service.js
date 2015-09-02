@@ -140,14 +140,17 @@ var userService = {
   },
 
   findById: function(id, callback) {
-    return persistence.User.findByIdQ(id).nodeify(callback);
+    return persistence.User.findById(id)
+      .exec()
+      .nodeify(callback);
   },
 
   /**
    * Returns a hash of booleans if the given usernames exist in gitter
    */
   githubUsersExists: function(usernames, callback) {
-    return persistence.User.findQ({ username: { $in: usernames } }, { username: 1, _id: 0 }, { lean: true })
+    return persistence.User.find({ username: { $in: usernames } }, { username: 1, _id: 0 }, { lean: true })
+      .exec()
       .then(function(results) {
         return results.reduce(function(memo, index) {
           memo[index.username] = true;
@@ -158,27 +161,31 @@ var userService = {
   },
 
   findByGithubId: function(githubId, callback) {
-    return persistence.User.findOneQ({ githubId: githubId })
+    return persistence.User.findOne({ githubId: githubId })
+           .exec()
            .nodeify(callback);
   },
 
   findByGithubIdOrUsername: function(githubId, username, callback) {
-    return persistence.User.findOneQ({$or: [{ githubId: githubId }, { username: username }]})
-           .nodeify(callback);
+    return persistence.User.findOne({ $or: [{ githubId: githubId }, { username: username } ]})
+      .exec()
+      .nodeify(callback);
   },
 
   findByEmail: function(email, callback) {
-    return persistence.User.findOneQ({ $or: [{ email: email.toLowerCase()}, { emails: email.toLowerCase() }]})
+    return persistence.User.findOne({ $or: [{ email: email.toLowerCase()}, { emails: email.toLowerCase() }]})
+            .exec()
             .nodeify(callback);
   },
 
   findByEmailsIndexed: function(emails, callback) {
     emails = emails.map(function(email) { return email.toLowerCase(); });
 
-    return persistence.User.findQ({ $or: [
+    return persistence.User.find({ $or: [
               { email: { $in: emails } },
               { emails: { $in: emails } }
               ]})
+      .exec()
       .then(function(users) {
 
         return users.reduce(function(memo, user) {
@@ -195,12 +202,14 @@ var userService = {
   },
 
   findByUnconfirmedEmail: function(email, callback) {
-    return persistence.User.findOneQ({ 'unconfirmedEmails.email': email.toLowerCase() })
+    return persistence.User.findOne({ 'unconfirmedEmails.email': email.toLowerCase() })
+      .exec()
       .nodeify(callback);
   },
 
   findByUsername: function(username, callback) {
-    return persistence.User.findOneQ({username: username})
+    return persistence.User.findOne({ username: username })
+            .exec()
             .nodeify(callback);
   },
 
@@ -225,7 +234,7 @@ var userService = {
         { displayName: { $regex: searchPattern, $options: 'i' } }
       ]
     }).limit(limit)
-      .execQ()
+      .exec()
       .nodeify(callback);
   },
 
@@ -233,7 +242,7 @@ var userService = {
     if(!usernames || !usernames.length) return Q.resolve([]).nodeify(callback);
 
     return persistence.User.where('username')['in'](usernames)
-      .execQ()
+      .exec()
       .nodeify(callback);
   },
 
@@ -253,7 +262,8 @@ var userService = {
    * @return promise of a username or undefined if user or username does not exist
    */
   findUsernameForUserId: function(userId) {
-    return persistence.User.findOneQ({ _id: userId }, 'username')
+    return persistence.User.findOne({ _id: userId }, 'username')
+      .exec()
       .then(function(user) {
         return user && user.username;
       });
@@ -264,7 +274,8 @@ var userService = {
   },
 
   destroyTokensForUserId: function(userId) {
-    return persistence.User.updateQ({ _id: userId }, { $set: { githubToken: null, githubScopes: { }, githubUserToken: null } });
+    return persistence.User.update({ _id: userId }, { $set: { githubToken: null, githubScopes: { }, githubUserToken: null } })
+      .exec();
   },
 
   /* Update the timezone information for a user */
@@ -285,7 +296,7 @@ var userService = {
     setUnset('abbr', timezoneInfo.abbr);
     setUnset('iana', timezoneInfo.iana);
 
-    return persistence.User.updateQ({ _id: userId }, update);
+    return persistence.User.update({ _id: userId }, update).exec();
   }
 
 };

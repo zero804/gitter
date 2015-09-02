@@ -41,7 +41,7 @@ var notificationSerializerStub = {
       this.name = name;
     };
   },
-  serializeQ: function(item, strategy) {
+  serialize: function(item, strategy) {
     return Q.fcall(function() {
       if(strategy.name === 'troupeId') {
         return {id: 'serializedId', name: 'serializedName', url: 'serializedUrl'};

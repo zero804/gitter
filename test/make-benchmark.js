@@ -74,7 +74,7 @@ module.exports = function makeBenchmark(options) {
 
   suite.on('complete', function(event) {
     function doAfter(callback) {
-      if (!options.after) callback();
+      if (!options.after) return callback();
 
       if (options.after.length === 0) {
         try {

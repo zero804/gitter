@@ -31,10 +31,22 @@ var connections = {
   'APPLE-BETA-DEV': createConnection('BetaDev')
 };
 
-createFeedbackListener('Prod', true);
-createFeedbackListener('Dev');
-createFeedbackListener('Beta', true);
-createFeedbackListener('BetaDev');
+/* Only create the feedback listeners for the current environment */
+switch(config.get('NODE_ENV') || 'dev') {
+  case 'prod':
+    createFeedbackListener('Prod', true);
+    break;
+
+  case 'beta':
+    createFeedbackListener('Beta', true);
+    createFeedbackListener('BetaDev');
+    break;
+
+  case 'dev':
+    createFeedbackListener('Dev');
+    break;
+}
+
 
 function sendNotificationToDevice(notification, badge, device) {
   var appleNotification = createAppleNotification(notification, badge);
@@ -70,18 +82,18 @@ function createConnection(suffix, isProduction) {
 
   connection.on('error', function(err) {
     logger.error('ios push notification gateway (' + suffix + ') experienced an error', { error: err.message });
-    errorReporter(err, { apnEnv: suffix });
+    errorReporter(err, { apnEnv: suffix }, { module: 'ios-notification-gateway' });
   });
 
   connection.on('socketError', function(err) {
     logger.error('ios push notification gateway (' + suffix + ') experienced a socketError', { error: err.message });
-    errorReporter(err, { apnEnv: suffix });
+    errorReporter(err, { apnEnv: suffix }, { module: 'ios-notification-gateway' });
   });
 
   connection.on('transmissionError', function(errCode) {
     var err = new Error('apn transmission error ' + errCode +': ' + ERROR_DESCRIPTIONS[errCode]);
     logger.error('ios push notification gateway (' + suffix + ')', { error: err.message });
-    errorReporter(err, { apnEnv: suffix });
+    errorReporter(err, { apnEnv: suffix }, { module: 'ios-notification-gateway' });
   });
 
   return connection;
@@ -107,17 +119,17 @@ function createFeedbackListener(suffix, isProduction) {
 
     feedback.on('error', function(err) {
       logger.error('ios push notification feedback (' + suffix + ') experienced an error', { error: err.message });
-      errorReporter(err, { apnEnv: suffix });
+      errorReporter(err, { apnEnv: suffix }, { module: 'ios-notification-gateway' });
     });
 
     feedback.on('feedbackError', function(err) {
       logger.error('ios push notification feedback (' + suffix + ') experienced a feedbackError', { error: err.message });
-      errorReporter(err, { apnEnv: suffix });
+      errorReporter(err, { apnEnv: suffix }, { module: 'ios-notification-gateway' });
     });
 
   } catch(e) {
     logger.error('Unable to start feedback service (' + suffix + ')', { exception: e });
-    errorReporter(e, { apnEnv: suffix });
+    errorReporter(e, { apnEnv: suffix }, { module: 'ios-notification-gateway' });
   }
 }
 

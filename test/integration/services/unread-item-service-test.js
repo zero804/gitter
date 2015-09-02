@@ -888,4 +888,76 @@ describe('unread-item-service', function() {
 
   });
 
+  describe('findNonMembersWithAccess', function() {
+    var userService, roomPermissionsModel, unreadItemService;
+
+    beforeEach(function() {
+      userService = mockito.mock(testRequire('./services/user-service'));
+      roomPermissionsModel = mockito.mockFunction();
+
+      unreadItemService = testRequire.withProxies("./services/unread-item-service", {
+        './user-service': userService,
+        './room-permissions-model': roomPermissionsModel,
+      });
+    });
+
+    it('should handle an empty array', function(done) {
+      unreadItemService.testOnly.findNonMembersWithAccess({ }, [])
+        .then(function(userIds) {
+          assert.deepEqual(userIds, []);
+        })
+        .nodeify(done);
+    });
+
+    it('should handle one to one rooms', function(done) {
+      unreadItemService.testOnly.findNonMembersWithAccess({ oneToOne: true }, ['1','2','3'])
+        .then(function(userIds) {
+          assert.deepEqual(userIds, []);
+        })
+        .nodeify(done);
+    });
+
+    it('should handle private rooms', function(done) {
+      unreadItemService.testOnly.findNonMembersWithAccess({ security: 'PRIVATE' }, ['1','2','3'])
+        .then(function(userIds) {
+          assert.deepEqual(userIds, []);
+        })
+        .nodeify(done);
+    });
+
+    it('should handle public rooms', function(done) {
+      unreadItemService.testOnly.findNonMembersWithAccess({ security: 'PUBLIC' }, ['1','2','3'])
+        .then(function(userIds) {
+          assert.deepEqual(userIds, ['1','2','3']);
+        })
+        .nodeify(done);
+    });
+
+    it('should handle org and inherited rooms', function(done) {
+      var troupe = {};
+      mockito.when(userService).findByIds().then(function(userIds) {
+        assert.deepEqual(userIds, ['1','2','3']);
+        return Q.resolve(userIds.map(function(userId) {
+          return {
+            _id: userId,
+            id: userId
+          };
+        }));
+      });
+
+      mockito.when(roomPermissionsModel)().then(function(user, operation, pTroupe) {
+        assert(pTroupe === troupe);
+        assert.strictEqual(operation, 'join');
+        return Q.resolve(user.id !== '3');
+      });
+
+      unreadItemService.testOnly.findNonMembersWithAccess(troupe, ['1','2','3'])
+        .then(function(userIds) {
+          assert.deepEqual(userIds, ['1','2']); // User three should not be in the list
+        })
+        .nodeify(done);
+    });
+
+  });
+
 });

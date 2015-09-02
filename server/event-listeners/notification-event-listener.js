@@ -44,7 +44,7 @@ exports.install = function() {
     return pushNotificationGateway.sendUsersBadgeUpdates(userIds)
       .catch(function(err) {
         logger.error('Error while calling sendUsersBadgeUpdates. Silently ignoring. ' + err, { exception: err });
-        errorReporter(err, { users: userIds });
+        errorReporter(err, { users: userIds }, { module: 'notification-event-listener' });
       });
   });
 

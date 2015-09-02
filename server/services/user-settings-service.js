@@ -11,7 +11,8 @@ exports.getUserSettings = function(userId, settingsKey) {
   assert(mongoUtils.isLikeObjectId(userId));
   userId = mongoUtils.asObjectID(userId);
 
-  return persistence.UserSettings.findOneQ({ userId: userId }, 'settings.' + settingsKey, { lean: true })
+  return persistence.UserSettings.findOne({ userId: userId }, 'settings.' + settingsKey, { lean: true })
+    .exec()
     .then(function(us) {
       if(!us) return;
       if(!us.settings) return;
@@ -30,7 +31,8 @@ exports.getMultiUserSettings = function(userIds, settingsKey) {
     return !!f;
   });
 
-  return persistence.UserSettings.findQ({ userId: { $in: userIds } }, 'userId settings.' + settingsKey, { lean: true })
+  return persistence.UserSettings.find({ userId: { $in: userIds } }, 'userId settings.' + settingsKey, { lean: true })
+    .exec()
     .then(function(settings) {
       var hash = settings.reduce(function(memo, us) {
         memo[us.userId] = us.settings && us.settings[settingsKey];
@@ -47,7 +49,8 @@ exports.getAllUserSettings = function(userId) {
   assert(mongoUtils.isLikeObjectId(userId));
   userId = mongoUtils.asObjectID(userId);
 
-  return persistence.UserSettings.findOneQ({ userId: userId }, 'settings', { lean: true })
+  return persistence.UserSettings.findOne({ userId: userId }, 'settings', { lean: true })
+    .exec()
     .then(function(us) {
       if(!us) return;
       return us.settings || {};
@@ -62,10 +65,7 @@ exports.setUserSettings = function (userId, settingsKey, settings) {
   setOperation.$set['settings.' + settingsKey] = settings;
   var d = Q.defer();
 
-  persistence.UserSettings.collection.update({ userId: userId }, setOperation, { upsert: true, new: true }, function (err) {
-    if (err) return d.reject(err);
-    return d.resolve();
-  });
+  persistence.UserSettings.collection.update({ userId: userId }, setOperation, { upsert: true, new: true }, d.makeNodeResolver());
 
   return d.promise;
 };

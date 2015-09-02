@@ -90,9 +90,6 @@ module.exports = function(serializerDirectory, e) {
   e.serialize = serialize;
   e.serializeExcludeNulls = serializeExcludeNulls;
 
-  // XXX: deprecated
-  e.serializeQ = serialize;
-
   function eagerLoadStrategies() {
     Object.keys(e).forEach(function(key) {
       // jshint -W030
