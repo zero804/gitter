@@ -171,7 +171,8 @@ module.exports = (function() {
             store.enableLurkMode();
           }
 
-          // TODO: clear the old unread items from the previous room...
+          // TODO: send the recently marked items back to the server
+          store.reset();
           store._unreadItemsAdded(snapshot);
         }
       });
