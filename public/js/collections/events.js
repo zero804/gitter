@@ -39,7 +39,6 @@ var EventCollection = LiveCollection.extend({
   model: EventModel,
   initialize: function() {
     this.listenTo(this, 'add reset', this.trim);
-    this.resubscribeOnModelChange(context.troupe(), 'id');
   },
   client: function() {
     return realtime.getClient();
@@ -48,7 +47,8 @@ var EventCollection = LiveCollection.extend({
     while (this.length > 20) { this.pop(); }
   },
   modelName: 'event',
-  url: apiClient.room.channelGenerator('/events'),
+  urlTemplate: '/v1/rooms/:troupeId/events',
+  contextModel: context.contextModel,
   comparator: function(e1, e2) {
     var s1 = e1.get('sent');
     var s2 = e2.get('sent');

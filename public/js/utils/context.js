@@ -55,8 +55,23 @@ module.exports = (function() {
     return new WatchableModel(userModel);
   }
 
+  function getContextModel(troupe, user) {
+    var result = new Backbone.Model();
+    result.set({ userId: user.id, troupeId: troupe.id });
+    result.listenTo(user, 'change:id', function(user, newId) { // jshint unused:true
+      result.set({ userId: newId });
+    });
+
+    result.listenTo(troupe, 'change:id', function(troupe, newId) { // jshint unused:true
+      result.set({ troupeId: newId });
+    });
+
+    return result;
+  }
+
   var troupe = getTroupeModel();
   var user = getUserModel();
+  var contextModel = getContextModel(troupe, user);
 
   var context = function() {
     return ctx;
@@ -70,6 +85,10 @@ module.exports = (function() {
     return troupe.id;
   };
 
+  context.contextModel = function() {
+    return contextModel;
+  };
+
   function clearOtherAttributes(s, v) {
     Object.keys(v.attributes).forEach(function(key) {
       if(!s.hasOwnProperty(key)) {
@@ -79,6 +98,8 @@ module.exports = (function() {
 
     return s;
   }
+
+
 
   /** TEMP - lets think of a better way to do this... */
   context.setTroupeId = function(value) {
@@ -253,4 +274,3 @@ module.exports = (function() {
 
 
 })();
-
