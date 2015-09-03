@@ -193,7 +193,7 @@ module.exports = (function() {
 
       templateSubscription.on('resubscribe', function() {
         store.reset();
-      })
+      });
 
     }
 

@@ -6,6 +6,7 @@ var stats             = env.stats;
 
 var presenceService   = require('gitter-web-presence');
 var restful           = require('../../services/restful');
+var restSerializer    = require("../../serializers/rest-serializer");
 var mongoUtils        = require('../../utils/mongo-utils');
 var StatusError       = require('statuserror');
 var bayeuxExtension   = require('./extension');
@@ -22,7 +23,8 @@ if (survivalMode) {
 // Strategies for authenticating that a user can subscribe to the given URL
 var routes = [{
     re: /^\/api\/v1\/(?:troupes|rooms)\/(\w+)$/,
-    validator: validateUserForSubTroupeSubscription
+    validator: validateUserForSubTroupeSubscription,
+    populator: populateTroupe
   }, {
     re: /^\/api\/v1\/(?:troupes|rooms)\/(\w+)\/(\w+)$/,
     validator: validateUserForSubTroupeSubscription,
@@ -102,7 +104,7 @@ function validateUserForUserSubscription(options) {
   return Q.resolve(result);
 }
 
-function arrayToSnapshot(type) {
+function dataToSnapshot(type) {
   return function (data) {
     return { type: type, data: data };
   };
@@ -122,17 +124,35 @@ function populateSubUserCollection(options) {
     case "rooms":
     case "troupes":
       return restful.serializeTroupesForUser(userId)
-        .then(arrayToSnapshot('user.rooms'));
+        .then(dataToSnapshot('user.rooms'));
 
     case "orgs":
       return restful.serializeOrgsForUserId(userId)
-        .then(arrayToSnapshot('user.orgs'));
+        .then(dataToSnapshot('user.orgs'));
 
     default:
       logger.error('Unable to provide snapshot for ' + collection);
   }
 
   return Q.resolve();
+}
+
+function populateTroupe(options) {
+  var userId = options.userId;
+  var match = options.match;
+  var snapshotOptions = options.snapshot || false;
+  var troupeId = match[1];
+
+  /**
+   * For a troupe, the default is no snapshot, but if snapshot=true,
+   * then we return the current troupe to the user
+   */
+
+  if (!snapshotOptions) return Q.resolve();
+
+  var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: userId, includePermissions: true });
+  return restSerializer.serialize(troupeId, strategy)
+    .then(dataToSnapshot('room'));
 }
 
 function populateSubTroupeCollection(options) {
@@ -145,27 +165,27 @@ function populateSubTroupeCollection(options) {
   switch(collection) {
     case "chatMessages":
       if (survivalMode) {
-        return Q.resolve(arrayToSnapshot('room.events')([]));
+        return Q.resolve(dataToSnapshot('room.events')([]));
       }
 
       return restful.serializeChatsForTroupe(troupeId, userId, snapshotOptions)
-        .then(arrayToSnapshot('room.chatMessages'));
+        .then(dataToSnapshot('room.chatMessages'));
 
     case "users":
       if (survivalMode) {
-        return Q.resolve(arrayToSnapshot('room.events')([]));
+        return Q.resolve(dataToSnapshot('room.events')([]));
       }
 
       return restful.serializeUsersForTroupe(troupeId, userId, snapshotOptions)
-      .then(arrayToSnapshot('room.users'));
+      .then(dataToSnapshot('room.users'));
 
     case "events":
       if (survivalMode) {
-        return Q.resolve(arrayToSnapshot('room.events')([]));
+        return Q.resolve(dataToSnapshot('room.events')([]));
       }
 
       return restful.serializeEventsForTroupe(troupeId, userId)
-        .then(arrayToSnapshot('room.events'));
+        .then(dataToSnapshot('room.events'));
 
     default:
       logger.error('Unable to provide snapshot for ' + collection);
@@ -184,7 +204,7 @@ function populateSubSubTroupeCollection(options) {
   switch(collection + '-' + subCollection) {
     case "chatMessages-readBy":
       return restful.serializeReadBysForChat(troupeId, subId)
-        .then(arrayToSnapshot('room.chatMessages.readBy'));
+        .then(dataToSnapshot('room.chatMessages.readBy'));
 
 
     default:
@@ -205,7 +225,7 @@ function populateUserUnreadItemsCollection(options) {
   }
 
   return restful.serializeUnreadItemsForTroupe(troupeId, userId)
-    .then(arrayToSnapshot('user.room.unreadItems'));
+    .then(dataToSnapshot('user.room.unreadItems'));
 }
 
 // Authorize a sbscription message
@@ -308,6 +328,8 @@ module.exports = bayeuxExtension({
 
         stats.responseTime('bayeux.snapshot.time', Date.now() - startTime);
         stats.responseTime('bayeux.snapshot.time.' + snapshot.type, Date.now() - startTime);
+
+        if (snapshot.data === undefined && snapshot.meta === undefined) return message;
 
         if(!message.ext) message.ext = {};
         message.ext.snapshot = snapshot.data;
