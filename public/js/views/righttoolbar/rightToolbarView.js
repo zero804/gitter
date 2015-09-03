@@ -58,6 +58,8 @@ module.exports = (function() {
         isLoading: false
       });
 
+      this.listenTo(context.troupe(), 'change:id', this.onRoomChange, this);
+
     },
 
     initSearchRegion: function(optionsForRegion) {
@@ -124,6 +126,15 @@ module.exports = (function() {
       this.repo_info.$el.show();
       this.ui.rosterHeader.removeClass('selected');
       this.ui.repoInfoHeader.addClass('selected');
+    },
+
+    onRoomChange: function (model){
+      if(model.get('githubType') === 'REPO'){
+        this.$el.find('#info-header').show();
+      }
+      else {
+        this.$el.find('#info-header').hide();
+      }
     }
 
   });
