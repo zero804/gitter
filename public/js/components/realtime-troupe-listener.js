@@ -19,6 +19,18 @@ realtime.getClient().subscribeTemplate({
     }
   },
 
+  getSnapshotState: function() {
+    // True will signal to the server to return the current troupe,
+    // including admin permissions, etc
+    return true;
+  },
+
+  handleSnapshot: function(snapshot) {
+    // TODO: set the context of the current room.
+    // Make sure that snapshot.id == troupe.id as we may have quickly chenged
+    // rooms multiple times
+  },
+
   getSubscribeOptions: function() {
     subscribeCount++;
     // No need to reassociate the connection on the first subscription
