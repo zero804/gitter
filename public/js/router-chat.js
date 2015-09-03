@@ -204,7 +204,7 @@ onready(function () {
   new HeaderView({ model: context.troupe(), el: '#header' });
 
   // This may require a better home
-  if (context().permissions.admin && context.troupe().get('userCount') <= 1) {
+  if (context.isTroupeAdmin() && context.troupe().get('userCount') <= 1) {
     require.ensure([
       'views/app/collaboratorsView',
       'collections/collaborators'],
@@ -296,7 +296,7 @@ onready(function () {
 
 
     integrations: function() {
-      if(context().permissions.admin) {
+      if(context.isTroupeAdmin()) {
         require.ensure(['views/app/integrationSettingsModal'], function(require) {
           var IntegrationSettingsModal = require('views/app/integrationSettingsModal');
 

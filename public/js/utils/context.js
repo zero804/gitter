@@ -4,15 +4,7 @@ var qs = require('./qs');
 
 module.exports = (function() {
 
-
   var ctx = window.troupeContext || {};
-
-  var WatchableModel = Backbone.Model.extend({
-    watch: function(event, callback, context) {
-      this.on(event, callback, context);
-      callback.call(context, this);
-    }
-  });
 
   function getTroupeModel() {
     var troupeModel;
@@ -40,7 +32,7 @@ module.exports = (function() {
       troupeModel = { id: qs.troupeId };
     }
 
-    return new WatchableModel(troupeModel);
+    return new Backbone.Model(troupeModel);
   }
 
   function getUserModel() {
@@ -52,7 +44,7 @@ module.exports = (function() {
       userModel = { id: ctx.userId };
     }
 
-    return new WatchableModel(userModel);
+    return new Backbone.Model(userModel);
   }
 
   function getContextModel(troupe, user) {
@@ -246,6 +238,12 @@ module.exports = (function() {
         callback.call(c, user.id);
       });
     }
+  };
+
+  context.isTroupeAdmin = function() {
+    var permissions = troupe.get('permissions');
+    if (!permissions) return false;
+    return !!permissions.admin;
   };
 
   context.lang = function() {

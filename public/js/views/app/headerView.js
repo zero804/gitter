@@ -126,7 +126,7 @@ module.exports = Marionette.ItemView.extend({
       ];
 
       var c = context();
-      var isAdmin = c.permissions && c.permissions.admin;
+      var isAdmin = context.isTroupeAdmin();
       var url = this.model.get('url');
 
       menuItems.push({ title: 'Share this chat room', href: '#share' });
@@ -229,7 +229,7 @@ module.exports = Marionette.ItemView.extend({
   },
 
   showInput: function() {
-    if (!context().permissions.admin) return;
+    if (!context.isTroupeAdmin()) return;
     if (this.editingTopic === true) return;
     this.editingTopic = true;
 
@@ -271,5 +271,3 @@ module.exports = Marionette.ItemView.extend({
   },
 
 });
-
-

@@ -64,7 +64,7 @@ module.exports = (function() {
       var isntSelf = data.login !== context.user().get('username');
       var chatPrivately = data.has_gitter_login && isntSelf;
       var mentionable = isntSelf;
-      var removable = isntSelf && context().permissions.admin;
+      var removable = isntSelf && context.isTroupeAdmin();
 
       // Special case
       if(context.inOneToOneTroupeContext()) {
