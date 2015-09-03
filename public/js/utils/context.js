@@ -116,10 +116,6 @@ module.exports = (function() {
     return !!user.id;
   };
 
-  context.getHomeUser = function() {
-    return context().homeUser;
-  };
-
   context.inTroupeContext = function() {
     return !!troupe.id;
   };
