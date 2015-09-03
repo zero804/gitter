@@ -305,6 +305,9 @@ function renderChat(req, res, options, next) {
           chatsWithBurst = options.filterChats(chatsWithBurst);
         }
 
+        /* This is less than ideal way of checking if the user is the admin */
+        var isAdmin = troupeContext.troupe && troupeContext.troupe.permissions && troupeContext.troupe.permissions.admin;
+
         var renderOptions = _.extend({
             isRepo: troupe.githubType === 'REPO',
             bootScriptName: script,
@@ -334,7 +337,7 @@ function renderChat(req, res, options, next) {
             premium: troupeContext.troupe.premium,
             troupeFavourite: troupeContext.troupe.favourite,
             avatarUrl: avatar(troupeContext.troupe),
-            isAdmin: troupeContext.permissions.admin,
+            isAdmin: isAdmin,
             isNativeDesktopApp: troupeContext.isNativeDesktopApp
           }, options.extras);
 

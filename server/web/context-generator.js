@@ -5,7 +5,7 @@ var restSerializer   = require("../serializers/rest-serializer");
 var presenceService  = require("gitter-web-presence");
 var useragent        = require("useragent");
 var crypto           = require("crypto");
-var roomPermissionsModel = require('../services/room-permissions-model');
+var userService      = require('../services/user-service');
 var userSettingsService = require('../services/user-settings-service');
 var isNative         = require('../../public/js/utils/is-native');
 
@@ -34,14 +34,22 @@ exports.generateNonChatContext = function(req) {
 };
 
 exports.generateSocketContext = function(userId, troupeId) {
-  return Q.all([
-      userId && serializeUserId(userId),
-      troupeId && serializeTroupeId(troupeId, userId) || undefined
-    ])
+  function getUser() {
+    if (!userId) return Q.resolve(null);
+    return userService.findById(userId);
+  }
+
+  return getUser()
+    .then(function(user) {
+      return [
+        user && serializeUser(user),
+        troupeId && serializeTroupeId(troupeId, user)
+      ];
+    })
     .spread(function(serializedUser, serializedTroupe) {
       return {
-        user: serializedUser,
-        troupe: serializedTroupe
+        user: serializedUser || undefined,
+        troupe: serializedTroupe  || undefined
       };
     });
 };
@@ -52,7 +60,6 @@ exports.generateTroupeContext = function(req, extras) {
   assert(uriContext);
 
   var troupe = req.uriContext.troupe;
-  var homeUser = req.uriContext.oneToOne && req.uriContext.otherUser; // The users page being looked at
 
   var troupeHash;
   if(troupe) {
@@ -63,27 +70,16 @@ exports.generateTroupeContext = function(req, extras) {
 
   return Q.all([
     user ? serializeUser(user) : null,
-    homeUser ? serializeHomeUser(homeUser) : undefined, //include email if the user has an invite
     troupe ? serializeTroupe(troupe, user) : undefined,
-    determineDesktopNotifications(user, req),
-    roomPermissionsModel(user, 'admin', troupe)
+    determineDesktopNotifications(user, req)
   ])
-  .spread(function(serializedUser, serializedHomeUser, serializedTroupe, desktopNotifications, adminAccess) {
-
-    var status;
-    if(user) {
-      status = user.status;
-    }
+  .spread(function(serializedUser, serializedTroupe, desktopNotifications) {
 
     return createTroupeContext(req, {
       user: serializedUser,
-      homeUser: serializedHomeUser,
       troupe: serializedTroupe,
       desktopNotifications: desktopNotifications,
       troupeHash: troupeHash,
-      permissions: {
-        admin: adminAccess
-      },
       extras: extras
     });
   });
@@ -134,35 +130,23 @@ function serializeUser(user) {
   return restSerializer.serialize(user, strategy);
 }
 
-function serializeUserId(userId) {
-  var strategy = new restSerializer.UserIdStrategy({
-    exposeRawDisplayName: true,
-    includeScopes: true,
-    includePermissions: true,
-    showPremiumStatus: true
+function serializeTroupeId(troupeId, user) {
+  var strategy = new restSerializer.TroupeIdStrategy({
+    currentUserId: user ? user.id : null,
+    currentUser: user,
+    includePermissions: true
   });
-
-  return restSerializer.serialize(userId, strategy);
-}
-
-function serializeHomeUser(user, includeEmail) {
-  var strategy = new restSerializer.UserStrategy({
-    includeEmail: includeEmail,
-    hideLocation: true
-  });
-
-  return restSerializer.serialize(user, strategy);
-}
-
-function serializeTroupeId(troupeId, userId) {
-  var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: userId });
 
   return restSerializer.serialize(troupeId, strategy);
 }
 
 
 function serializeTroupe(troupe, user) {
-  var strategy = new restSerializer.TroupeStrategy({ currentUserId: user ? user.id : null });
+  var strategy = new restSerializer.TroupeStrategy({
+    currentUserId: user ? user.id : null,
+    currentUser: user,
+    includePermissions: true
+  });
 
   return restSerializer.serialize(troupe, strategy);
 }
