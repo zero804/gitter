@@ -31,12 +31,14 @@ module.exports = Marionette.ItemView.extend({
 
   //update when  room changes
   onRoomChange: function repoInfoRoomChange(roomModel){
-    var uri = roomModel.get('uri');
-    this.model.fetch({
-      data: {
-        repo: uri
-      }
-    });
+    if(roomModel.get('githubType') === 'REPO') {
+      var uri = roomModel.get('uri');
+      this.model.fetch({
+        data: {
+          repo: uri
+        }
+      });
+    }
   }
 
 });
