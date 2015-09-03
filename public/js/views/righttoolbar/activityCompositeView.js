@@ -140,7 +140,7 @@ module.exports = (function() {
     },
     getEmptyView: function() {
       // Admins see "Configure your integrations" empty
-      if (context().permissions.admin) return ActivityEmptyItemView;
+      if (context.isTroupeAdmin()) return ActivityEmptyItemView;
     },
     ui: {
       header: '#activity-header'
@@ -154,7 +154,7 @@ module.exports = (function() {
     _showHideHeader: function() {
       // Admins see the header when the collection is empty
       // so that they get to
-      var headerVisible = !!(context().permissions.admin || this.collection.length);
+      var headerVisible = !!(context.isTroupeAdmin() || this.collection.length);
       this.ui.header.toggle(headerVisible);
     },
     _renderTemplate: function() {

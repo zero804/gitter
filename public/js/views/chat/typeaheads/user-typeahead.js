@@ -122,7 +122,7 @@ module.exports = {
       callback(users, true);
     }
 
-    if ('/all'.indexOf(lcTerm) === 0 && context().permissions.admin) {
+    if ('/all'.indexOf(lcTerm) === 0 && context.isTroupeAdmin()) {
       users = users.slice(0, MAX_TYPEAHEAD_SUGGESTIONS - 1);
       users.push({ username: '/all', displayName: 'Group' });
 
