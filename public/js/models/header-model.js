@@ -24,10 +24,11 @@ module.exports = Backbone.Model.extend({
       ownerIsOrg:      ownerIsOrg(roomModel),
       user:            !!userModel.get('id'),
       archives:        false,
-      onToOne:         (roomModel.get('githubType') === 'ONETOONE'),
+      oneToOne:         (roomModel.get('githubType') === 'ONETOONE'),
       githubLink:      getGithubUrl(roomModel),
       isPrivate:       getPrivateStatus(roomModel)
     });
+
   },
 
   syncTopic: function (roomModel){
