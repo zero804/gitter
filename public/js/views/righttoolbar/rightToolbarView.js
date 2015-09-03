@@ -72,7 +72,6 @@ module.exports = (function() {
 
     initRepo_infoRegion: function(optionsForRegion) {
       // Repo info
-      if (context.troupe().get('githubType') !== 'REPO') return;
       return new RepoInfoView(optionsForRegion());
     },
 
@@ -129,11 +128,16 @@ module.exports = (function() {
     },
 
     onRoomChange: function (model){
-      if(model.get('githubType') === 'REPO'){
-        this.$el.find('#info-header').show();
-      }
-      else {
-        this.$el.find('#info-header').hide();
+      var roomType = model.get('githubType');
+      var repoInfoHeader = this.$el.find('#info-header');
+      var isNotRepo = (roomType !== 'REPO');
+
+      //hide the 'REPO INFO' tab if we are not in a repo room
+      repoInfoHeader.toggleClass('hidden', isNotRepo);
+
+      //move back to the people list if we are showing repo info for a non repo room
+      if(repoInfoHeader.hasClass('selected') && isNotRepo){
+        this.showPeopleList();
       }
     }
 
