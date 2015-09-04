@@ -1,17 +1,18 @@
-"use strict";
+'use strict';
 
 var Backbone = require('backbone');
 var context = require('utils/context');
 
 module.exports = Backbone.Model.extend({
-  initialize: function (){
+  initialize: function() {
     this.parse();
+
     //update when a room changes
     this.listenTo(context.troupe(), 'change:id', this.parse, this);
     this.listenTo(context.troupe(), 'change:topic', this.syncTopic, this);
   },
 
-  parse: function (){
+  parse: function() {
     var roomModel = context.troupe();
     var userModel = context.user();
 
@@ -24,20 +25,20 @@ module.exports = Backbone.Model.extend({
       ownerIsOrg:      ownerIsOrg(roomModel),
       user:            !!userModel.get('id'),
       archives:        false,
-      oneToOne:         (roomModel.get('githubType') === 'ONETOONE'),
+      oneToOne:        (roomModel.get('githubType') === 'ONETOONE'),
       githubLink:      getGithubUrl(roomModel),
-      isPrivate:       getPrivateStatus(roomModel)
+      isPrivate:       getPrivateStatus(roomModel),
     });
 
   },
 
-  syncTopic: function (roomModel){
+  syncTopic: function(roomModel) {
     this.set('topic', roomModel.get('topic'));
-  }
+  },
 
 });
 
-function getPrivateStatus(roomModel){
+function getPrivateStatus(roomModel) {
   return roomModel.get('githubType') === 'ORG' ?
     true :
     roomModel.get('security') === 'PRIVATE';
@@ -48,13 +49,13 @@ function getGithubUrl(roomModel) {
     'https://github.com' + roomModel.get('url');
 }
 
-function getRoomImgUrl(roomModel){
-    // Room image
-    var githubAvatarUrl = 'https://avatars.githubusercontent.com/';
-    return githubAvatarUrl + roomModel.get('name').split('/')[0];
+function getRoomImgUrl(roomModel) {
+  // Room image
+  var githubAvatarUrl = 'https://avatars.githubusercontent.com/';
+  return githubAvatarUrl + roomModel.get('name').split('/')[0];
 }
 
-function ownerIsOrg(roomModel){
+function ownerIsOrg(roomModel) {
   var roomType = roomModel.get('githubType');
   return (roomType === 'ORG' || roomType === 'ORG_CHANNEL');
 }

@@ -244,8 +244,8 @@ module.exports = (function() {
       //don't fetch for one-to-one rooms
       if(roomType === 'ONETOONE') return false;
       //don't fetch if the user is not an admin
-      if(!context.isTroupeAdmin()) return false;
-      //don't fetch if we have more than one user
+      if(!context().isTroupeAdmin()) return false;
+      //don't run if we have more than one user
       if(userCount > 1) return false;
       //if all else fails fetch some data
       return true;
