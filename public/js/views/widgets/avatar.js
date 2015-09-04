@@ -69,7 +69,6 @@ module.exports = (function() {
     },
 
     showDetail: function(e) {
-      if (this.compactView) return;
       e.preventDefault();
 
       if (this.popover) return;
