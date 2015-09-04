@@ -9,6 +9,7 @@ var template = require('./tmpl/collaboratorsView.hbs');
 var itemTemplate = require('./tmpl/collaboratorsItemView.hbs');
 var emptyViewTemplate = require('./tmpl/collaboratorsEmptyView.hbs');
 var appEvents = require('utils/appevents');
+var collaboratorsModels = require('collections/collaborators');
 
 module.exports = (function() {
 
@@ -161,27 +162,64 @@ module.exports = (function() {
 
     template: template,
 
-    serializeData: function() {
-      return {
-        isPublic: context.troupe().get('security') === 'PUBLIC',
-        twitterLink: social.generateTwitterShareUrl(),
-        facebookLink: social.generateFacebookShareUrl()
-      };
+    constructor: function (){
+      //instantiate our collection
+      this.collection = new collaboratorsModels.CollabCollection();
+      //if we should fetch data we should
+      if(this.shouldFetch()) {
+        //If we render initially we will get a flash of the empty view
+        //to avoid that we set hasGotData to signify that we have not yet received any data
+        this.collection.fetch();
+        this.hasGotSomeData = false;
+      }
+      //if we don't need to get some data we should reset the catch
+      else this.hasGotSomeData = true;
+      this.listenTo(this.collection, 'sync', function(){
+        //once we get some data we set it to true so we can
+        //once again render
+        this.hasGotSomeData = true;
+        //and call a manual render
+        this.render();
+      }, this);
+
+      //call super()
+      Marionette.CompositeView.prototype.constructor.apply(this, arguments);
     },
 
-    initialize: function() {
+    initialize: function(attrs) {
       var ctx = context();
       appEvents.triggerParent('track-event', 'welcome-add-user-suggestions', {
         uri: ctx.troupe.uri,
         security: ctx.troupe.security,
         count: this.collection.length
       });
+
+      //listen to room changes so we can refresh the collection
+      this.listenTo(context.troupe(), 'change:id', this.onRoomChange, this);
     },
 
     events: {
       'click .js-close': 'dismiss',
       'click #add-button' : 'clickAddButton',
       'click #share-button' : 'clickShareButton',
+    },
+
+    //when a room changes refresh the collection
+    onRoomChange: function (model){
+      //hide the view so we don't see collaborators from previous rooms
+      this.$el.hide();
+      //fetch if we need to
+      if(this.shouldFetch()) return this.collection.fetch();
+      //render if we do not
+      this.render();
+    },
+
+    serializeData: function() {
+      return {
+        isPublic: context.troupe().get('security') === 'PUBLIC',
+        twitterLink: social.generateTwitterShareUrl(),
+        facebookLink: social.generateFacebookShareUrl()
+      };
     },
 
     clickAddButton: function() {
@@ -196,7 +234,41 @@ module.exports = (function() {
 
     dismiss: function() {
       this.remove();
+    },
+
+    shouldFetch: function (){
+      var roomModel = context.troupe();
+      var roomType  = roomModel.get('githubType');
+      var userCount = roomModel.get('userCount');
+
+      //don't fetch for one-to-one rooms
+      if(roomType === 'ONETOONE') return false;
+      //don't fetch if the user is not an admin
+      if(!context().permissions.admin) return false;
+      //don't fetch if we have more than one user
+      if(userCount > 1) return false;
+      //if all else fails fetch some data
+      return true;
+    },
+
+    shouldRender: function (){
+      //if we should fetch data && have have previously
+      //in the app life cycle had some data
+      if(this.shouldFetch() && this.hasGotSomeData) return true;
+    },
+
+    render: function (){
+      if(!this.shouldRender()) {
+        this.$el.hide();
+        return this;
+      }
+      else {
+        Marionette.CompositeView.prototype.render.apply(this, arguments);
+        this.$el.show();
+      }
+      return this;
     }
+
   });
 
   return View;
