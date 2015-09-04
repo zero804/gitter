@@ -25,6 +25,6 @@ var getPixelDensity = targetEnv.isBrowser ?
 // make sure to pass the size for non-retina screens
 module.exports = function (url, size) {
   var pixelDensity = getPixelDensity();
-  size = (size || 60) * pixelDensity;
+  size = (size || 48) * pixelDensity;
   return build(url, size);
 };
