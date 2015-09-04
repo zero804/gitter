@@ -502,8 +502,6 @@ module.exports = (function() {
     },
 
     showReadBy: function(e) {
-      if (this.compactView) return;
-
       if(this.popover) return;
       e.preventDefault();
 
