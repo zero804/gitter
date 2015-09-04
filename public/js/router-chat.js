@@ -103,6 +103,14 @@ onready(function () {
       case 'change:room':
         //set the context troupe to new troupe
         context.setTroupe(message.newTroupe);
+
+        //if we have a query in the url string
+        if(/\?/.test(message.url)){
+          //get the id out of the url sting
+          var id = message.url.split('=').pop();
+          //navigate to it
+          appEvents.trigger('chatCollectionView:permalinkHighlight', id);
+        }
         break;
     }
   });
