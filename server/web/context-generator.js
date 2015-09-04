@@ -4,7 +4,6 @@
 var restSerializer   = require("../serializers/rest-serializer");
 var presenceService  = require("gitter-web-presence");
 var useragent        = require("useragent");
-var crypto           = require("crypto");
 var userService      = require('../services/user-service');
 var userSettingsService = require('../services/user-settings-service');
 var isNative         = require('../../public/js/utils/is-native');
