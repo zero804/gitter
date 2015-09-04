@@ -12,6 +12,7 @@ var typeaheads = require('./typeaheads');
 var ChatInputBoxView = require('./chat-input-box-view');
 require('jquery-textcomplete');
 require('views/behaviors/tooltip');
+require('views/behaviors/widgets');
 
 /* This value is also in chatItemView and in chat-service on the server*/
 /** @const */
@@ -306,4 +307,3 @@ var ChatInputView = Marionette.ItemView.extend({
 cocktail.mixin(ChatInputView, KeyboardEventsMixin);
 
 module.exports =  ChatInputView;
-
