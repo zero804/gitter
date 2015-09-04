@@ -8,6 +8,7 @@ var KeyboardEventsMixin = require('views/keyboard-events-mixin');
 var unreadItemsClient = require('components/unread-items-client');
 var UnreadBannerView = require('views/app/unreadBannerView');
 var ChatToolbarLayout = require('./chat-toolbar');
+var CollaboratorsView = require('views/app/collaboratorsView');
 
 require('views/behaviors/isomorphic');
 
@@ -46,6 +47,11 @@ var ChatToolbarInputLayout = ChatToolbarLayout.extend({
       bannerBottom: {
         el: '#bottom-unread-banner',
         init: 'initBannerBottomRegion'
+      },
+
+      collaborators: {
+        el: '#collaborators-container',
+        init: 'initCollaboratorsView'
       }
     }
   },
@@ -66,6 +72,10 @@ var ChatToolbarInputLayout = ChatToolbarLayout.extend({
     return new UnreadBannerView.Bottom(optionsForRegion({
       model: unreadItemsClient.acrossTheFold()
     }));
+  },
+
+  initCollaboratorsView: function (optionsForRegion){
+    return new CollaboratorsView(optionsForRegion());
   },
 
   onKeyBackspace: function(e) {

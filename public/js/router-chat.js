@@ -211,23 +211,6 @@ onready(function () {
 
   new HeaderView({ model: context.troupe(), el: '#header' });
 
-  // This may require a better home
-  if (context().permissions.admin && context.troupe().get('userCount') <= 1) {
-    require.ensure([
-      'views/app/collaboratorsView',
-      'collections/collaborators'],
-      function(require) {
-        var CollaboratorsView = require('views/app/collaboratorsView');
-        var collaboratorsModels = require('collections/collaborators');
-        var collaborators = new collaboratorsModels.CollabCollection();
-        collaborators.fetch();
-        collaborators.once('sync', function() {
-          var collaboratorsView = new CollaboratorsView({ collection: collaborators });
-          $('#content-frame').prepend(collaboratorsView.render().el);
-        });
-    });
-  }
-
   var Router = Backbone.Router.extend({
     routes: {
       "": "hideModal",
