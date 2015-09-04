@@ -61,13 +61,6 @@ exports.generateTroupeContext = function(req, extras) {
 
   var troupe = req.uriContext.troupe;
 
-  var troupeHash;
-  if(troupe) {
-    var cipher = crypto.createCipher('aes256', '***REMOVED***');
-    var hash   = cipher.update(troupe.id, 'utf8', 'hex') + cipher.final('hex');
-    troupeHash  = hash;
-  }
-
   return Q.all([
     user ? serializeUser(user) : null,
     troupe ? serializeTroupe(troupe, user) : undefined,
@@ -79,7 +72,6 @@ exports.generateTroupeContext = function(req, extras) {
       user: serializedUser,
       troupe: serializedTroupe,
       desktopNotifications: desktopNotifications,
-      troupeHash: troupeHash,
       extras: extras
     });
   });
