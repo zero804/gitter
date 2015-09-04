@@ -10,35 +10,9 @@ var Dropdown = require('views/controls/dropdown');
 var appEvents = require('utils/appevents');
 var HeaderModel = require('../../models/header-model');
 var headerViewTemplate  = require('./tmpl/headerViewTemplate.hbs');
-require('bootstrap_tooltip');
 
-function generateTooltip(troupe) {
-  if (troupe.get('security') === 'PUBLIC') return 'Anyone can join';
-
-  switch(troupe.get('githubType')) {
-    case 'REPO':
-      return 'All repo collaborators can join';
-
-    case 'ORG':
-      return 'All org members can join';
-
-    case 'REPO_CHANNEL':
-      var repoName = troupe.get('uri').split('/')[1];
-      var repoRealm = troupe.get('security') === 'PRIVATE' ? 'Only invited users' : 'Anyone in ' + repoName;
-      return repoRealm + ' can join';
-
-    case 'ORG_CHANNEL':
-      var orgName = troupe.get('uri').split('/')[0];
-      var orgRealm = troupe.get('security') === 'PRIVATE' ? 'Only invited users' : 'Anyone in ' + orgName;
-      return orgRealm + ' can join';
-
-    case 'USER_CHANNEL':
-      return 'Only invited users can join';
-
-    default:
-      return troupe.get('oneToOne') ? 'This chat is just between you two' : 'Only invited users can join';
-  }
-}
+require('views/behaviors/widgets');
+require('views/behaviors/tooltip');
 
 module.exports = Marionette.ItemView.extend({
   template: false,
@@ -63,6 +37,14 @@ module.exports = Marionette.ItemView.extend({
     'dblclick @ui.topic': 'showInput',
     'keydown textarea': 'detectKeys',
     'click @ui.orgrooms': 'goToOrgRooms'
+  },
+
+  behaviors: {
+    Widgets: {},
+    Tooltip: {
+      '.js-chat-name': { titleFn: 'getChatNameTitle', placement: 'right' },
+      '.js-org-page': { titleFn: 'getOrgPageTitle', placement: 'left' }
+    },
   },
 
   initialize: function() {
@@ -96,16 +78,41 @@ module.exports = Marionette.ItemView.extend({
     } else {
       this.ui.favourite.css({ visibility: 'hidden' });
     }
+  },
 
-    $('.js-chat-name').tooltip({ placement: 'right', title: function() {
-      return generateTooltip(context.troupe());
-    }});
+  getChatNameTitle: function() {
+    var model = context.troupe();
+    if (model.get('security') === 'PUBLIC') return 'Anyone can join';
 
-    $('.js-org-page').tooltip({ placement: 'left', title: function() {
-      var orgName = context().troupe.uri.split('/')[0];
-      return 'More ' + orgName + ' rooms';
-    }});
+    switch(model.get('githubType')) {
+      case 'REPO':
+        return 'All repo collaborators can join';
 
+      case 'ORG':
+        return 'All org members can join';
+
+      case 'REPO_CHANNEL':
+        var repoName = model.get('uri').split('/')[1];
+        var repoRealm = model.get('security') === 'PRIVATE' ? 'Only invited users' : 'Anyone in ' + repoName;
+        return repoRealm + ' can join';
+
+      case 'ORG_CHANNEL':
+        var orgName = model.get('uri').split('/')[0];
+        var orgRealm = model.get('security') === 'PRIVATE' ? 'Only invited users' : 'Anyone in ' + orgName;
+        return orgRealm + ' can join';
+
+      case 'USER_CHANNEL':
+        return 'Only invited users can join';
+
+      default:
+        return model.get('oneToOne') ? 'This chat is just between you two' : 'Only invited users can join';
+    }
+  },
+
+  getOrgPageTitle: function() {
+    var uri = context.troupe().get('uri');
+    var orgName = uri.split('/')[0];
+    return 'More ' + orgName + ' rooms';
   },
 
   onModelChange: function (){
