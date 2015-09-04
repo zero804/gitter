@@ -5,25 +5,8 @@
 @import "trp3Common.less";
 @import "trpModals.less";
 
-html {
- @media @mobile {
-  width: 100%;
-  overflow: hidden;
- }
-}
-
 body {
   margin: 0;
-  @media @mobile {
-   width: 100%;
-   overflow: hidden;
-  }
-}
-
-h1 {
-  @media @mobile {
-    font-size: 16px;
-  }
 }
 
 a {
@@ -39,6 +22,7 @@ a.close {
 }
 
 header {
+  box-sizing: border-box;
   width: 100%;
   padding: 30px;
   background-color: @trpDarkBlue;
