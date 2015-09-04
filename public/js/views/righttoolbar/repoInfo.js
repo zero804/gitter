@@ -21,11 +21,13 @@ module.exports = Marionette.ItemView.extend({
   },
 
   initialize: function repoInfoViewInit(attrs, options){
-    this.model.fetch({
-      data: {
-        repo: this.roomModel.get('uri')
-      }
-    });
+    if(this.roomModel.get('githubType') === 'REPO') {
+      this.model.fetch({
+        data: {
+          repo: this.roomModel.get('uri')
+        }
+      });
+    }
     this.listenTo(this.roomModel, 'change:id', this.onRoomChange, this);
   },
 
