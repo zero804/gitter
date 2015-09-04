@@ -99,18 +99,21 @@ onready(function () {
      * The history has already been pushed via the pushstate, so we don't want to double up
      */
      RAF(function() {
-      // IE seems to prefer this in a new animation-frame
+      function fallback() {
+        document.querySelector('#content-frame').contentWindow.location.replace(iframeUrl + hash);
+      }
 
-      //TODO, is this the best way to do this JP 19/8/15
-      var segments = iframeUrl.split('/');
-      var troupeName = segments.splice(1, segments.length - 2).join('/');
-      var newTroupe = troupeCollections.troupes.where({ name: troupeName })[0];
+      if (type !== 'chat') return fallback();
+
+      // IE seems to prefer this in a new animation-frame
+      var match = iframeUrl.match(/(\/.*?)(\/~\w+)?$/);
+      var referenceUrl = match && match[1];
+      if (!referenceUrl) return fallback();
+
+      var newTroupe = troupeCollections.troupes.where({ url: referenceUrl })[0];
 
       //If we are navigating to a anything other than a chat refresh
-      if(type !== 'chat' || !newTroupe) {
-        document.querySelector('#content-frame').contentWindow.location.replace(iframeUrl + hash);
-        return;
-      }
+      if(!newTroupe) return fallback();
 
       context.setTroupeId(newTroupe.id);
 
