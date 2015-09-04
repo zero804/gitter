@@ -41,10 +41,10 @@
   margin-top: 10px;
   margin-left: 44px;
   margin-bottom: 10px;
+}
 
-  @media @mobile {
-    margin-left: 12px;
-  }
+body.mobile .chat-input__container {
+  margin-left: 12px;
 }
 
 .chat-input__area {
@@ -56,10 +56,10 @@
   right: 10px;
   top: 0;
   height: 50px;
+}
 
-  @media @mobile {
-    display: none;
-  }
+body.mobile .chat-input__buttons {
+  display: none;
 }
 
 .chat-input__buttons a {
@@ -99,17 +99,18 @@
   float: left;
 }
 
+@avatarWidth: 30px;
+
 .chat-input__box {
-  @avatarWidth: 30px;
   margin-left: @avatarWidth + 22px;
   margin-right: 52px;
   margin-bottom: 0;
   vertical-align: top;
+}
 
-  @media @mobile {
-    margin-left: @avatarWidth + 12px;
-    margin-right: 12px;
-  }
+body.mobile .chat-input__box {
+  margin-left: @avatarWidth + 12px;
+  margin-right: 12px;
 }
 
 .chat-input__text-area {
