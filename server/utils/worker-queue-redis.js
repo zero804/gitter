@@ -5,6 +5,7 @@ var env = require('gitter-web-env');
 var config = env.config;
 var logger = env.logger;
 var stats = env.stats;
+var errorReporter = env.errorReporter;
 
 var resque = require("node-resque");
 var debug = require('debug')('gitter:worker-queue');
@@ -254,7 +255,7 @@ Queue.prototype.createWorker = function() {
   });
 
   worker.on('error', function(queue, job, err) {
-    logger.error('worker-queue-redis: failed: ' + err, { queue: queue, job: job, exception: err });
+    errorReporter(err, { job: job, queue: queue }, { module: 'worker-queue' });
     stats.event('resque.worker.error');
   });
 
