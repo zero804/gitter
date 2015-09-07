@@ -1,4 +1,5 @@
 "use strict";
+var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 var $ = require('jquery');
 var context = require('utils/context');
@@ -10,8 +11,9 @@ var KeyboardEventsMixin = require('views/keyboard-events-mixin');
 var platformKeys = require('utils/platform-keys');
 var typeaheads = require('./typeaheads');
 var ChatInputBoxView = require('./chat-input-box-view');
+var ChatInputButtons = require('./chat-input-buttons');
+
 require('jquery-textcomplete');
-require('views/behaviors/tooltip');
 
 module.exports = (function() {
 
@@ -28,46 +30,38 @@ module.exports = (function() {
   /** @const */
   var PLACEHOLDER_COMPOSE_MODE = PLACEHOLDER+' '+ platformKeys.cmd +'+Enter to send.';
 
-  var ComposeMode = function() {
-    var stringBoolean = window.localStorage.getItem('compose_mode_enabled') || 'false';
-    this.disabled = JSON.parse(stringBoolean);
-  };
+  setTimeout(function() {
+    window.localStorage.removeItem('compose_mode_enabled');
+  }, 0);
 
-  ComposeMode.prototype.toggle = function() {
-    this.disabled = !this.disabled;
-    var stringBoolean = JSON.stringify(this.disabled);
-    window.localStorage.setItem('compose_mode_enabled', stringBoolean);
-  };
+  var ComposeMode = Backbone.Model.extend({
+    defaults: {
+      isComposeModeEnabled: false,
+    }
+  });
 
-  ComposeMode.prototype.isEnabled = function() {
-    return this.disabled;
-  };
-
-  var ChatInputView = Marionette.ItemView.extend({
+  var ChatInputView = Marionette.LayoutView.extend({
 
     template: template,
 
     behaviors: {
-      Widgets: {},
-      Tooltip: {
-        '.js-toggle-compose-mode': { titleFn: 'getComposeModeTitle' },
-        '.js-md-help': { titleFn: 'getShowMarkdownTitle' }
-      },
+      Widgets: {}
+    },
 
+    regions: {
+      chatInputButtons: '#chat-input-buttons-region'
     },
 
     ui: {
-      composeToggle: '.js-toggle-compose-mode',
-      textarea: '#chat-input-textarea',
+      textarea: '#chat-input-textarea'
     },
 
     events: {
-      'click @ui.composeToggle': 'toggleComposeMode',
       'paste': 'onPaste'
     },
 
     keyboardEvents: {
-      'chat.compose.auto': 'composeModeAutoFillCodeBlock',
+      'chat.compose.auto': 'createCodeBlockOnNewline',
       'chat.toggle': 'toggleComposeMode'
     },
 
@@ -75,6 +69,8 @@ module.exports = (function() {
       this.bindUIElements(); // TODO: use regions
       this.composeMode = new ComposeMode();
       this.compactView = options.compactView;
+
+      this.listenTo(this.composeMode, 'change', this.updatePlaceholder);
 
       this.listenTo(appEvents, 'input.append', function(text, options) {
         if(this.inputBox) {
@@ -90,17 +86,8 @@ module.exports = (function() {
       });
     },
 
-    getComposeModeTitle: function() {
-      var mode = this.composeMode.isEnabled() ? 'chat' : 'compose';
-      return 'Switch to '+ mode +' mode ('+ platformKeys.cmd +' + /)';
-    },
-
-    getShowMarkdownTitle: function() {
-      return 'Markdown help ('+ platformKeys.cmd +' + '+ platformKeys.gitter +' + m)';
-    },
-
     serializeData: function() {
-      var isComposeModeEnabled = this.composeMode.isEnabled();
+      var isComposeModeEnabled = this.composeMode.get('isComposeModeEnabled');
       var placeholder;
 
       if(this.compactView) {
@@ -113,7 +100,7 @@ module.exports = (function() {
 
       return {
         user: context.user(),
-        isComposeModeEnabled: this.composeMode.isEnabled(),
+        isComposeModeEnabled: isComposeModeEnabled,
         placeholder: placeholder,
         autofocus: !this.compactView,
         composeModeToggleTitle: this.getComposeModeTitle(),
@@ -162,45 +149,47 @@ module.exports = (function() {
       this.listenTo(this.inputBox, 'save', this.send);
       this.listenTo(this.inputBox, 'subst', this.subst);
       this.listenTo(this.inputBox, 'editLast', this.editLast);
+
+      this.getRegion('chatInputButtons').show(new ChatInputButtons({ model: this.composeMode }));
     },
 
-    toggleComposeMode: function (event) {
-      if(event && !event.origin) event.preventDefault();
-
-      this.composeMode.toggle();
-      var isComposeModeEnabled = this.composeMode.isEnabled();
-
-      var $icon = this.ui.composeToggle.find('i');
-      // remove all classes from icon
-      $icon.removeClass();
-      $icon.addClass(isComposeModeEnabled ? 'icon-keyboard-1' : 'icon-chat-alt');
-
-      var placeholder = isComposeModeEnabled ? PLACEHOLDER_COMPOSE_MODE : PLACEHOLDER;
-      this.$el.find('textarea').attr('placeholder', placeholder).focus();
+    updatePlaceholder: function () {
+      var placeholder = this.composeMode.get('isComposeModeEnabled') ? PLACEHOLDER_COMPOSE_MODE : PLACEHOLDER;
+      this.ui.textarea.attr('placeholder', placeholder);
     },
 
-    /**
-     * composeModeAutoFillCodeBlock() automatically toggles compose mode and creates a Marked down codeblock template
-     */
-    composeModeAutoFillCodeBlock: function (event) {
-      var inputBox = this.inputBox.$el;
-      var val = inputBox.val();
+    createCodeBlockOnNewline: function (event) {
+      var $inputBox = this.inputBox.$el;
+      var val = $inputBox.val();
+
+      // only continue if user has just started code block (```)
       var m = val.match(/^```([\w\-]+)?$/);
-      if (!m) return; // only continue if the content is '```'
-      var wasInChatMode = !this.composeMode.isEnabled();
+      if (!m) return;
 
-      event.preventDefault(); // shouldn't allow the creation of a new line
-
-      if (wasInChatMode) {
-        this.toggleComposeMode(event); // switch to compose mode
-        this.listenToOnce(this.inputBox, 'save', this.toggleComposeMode.bind(this, null)); // if we were in chat mode make sure that we set the state back to chat mode
-      }
-
-      inputBox.val(function (index, val) { // jshint unused:true
-        return val + '\n\n```'; // 1. create the code block
+      // create the rest of the code block
+      $inputBox.val(function (index, val) { // jshint unused:true
+        return val + '\n\n```';
       });
 
-      this.inputBox.setCaretPosition(m[0].length + 1); // 2. move caret inside the block (textarea)
+      // move caret inside the new code block
+      this.inputBox.setCaretPosition(m[0].length + 1);
+
+      if (!this.composeMode.get('isComposeModeEnabled')) {
+        // switch to compose mode for the lifetime of this message
+        this.composeMode.set('isComposeModeEnabled', true);
+        this.listenToOnce(this.inputBox, 'save', function() {
+          this.composeMode.set('isComposeModeEnabled', false);
+        });
+      }
+
+      // we've already created a new line so stop the original return event
+      event.preventDefault();
+    },
+
+    toggleComposeMode: function(event) {
+      var newVal = !this.composeMode.get('isComposeModeEnabled');
+      this.composeMode.set('isComposeModeEnabled', newVal);
+      event.preventDefault();
     },
 
     /**

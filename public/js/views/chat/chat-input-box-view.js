@@ -21,21 +21,6 @@ function calculateMaxHeight() {
   return $(document).height() - headerHeight - 140;
 }
 
-var ComposeMode = function() {
-  var stringBoolean = window.localStorage.getItem('compose_mode_enabled') || 'false';
-  this.disabled = JSON.parse(stringBoolean);
-};
-
-ComposeMode.prototype.toggle = function() {
-  this.disabled = !this.disabled;
-  var stringBoolean = JSON.stringify(this.disabled);
-  window.localStorage.setItem('compose_mode_enabled', stringBoolean);
-};
-
-ComposeMode.prototype.isEnabled = function() {
-  return this.disabled;
-};
-
 var ChatCollectionResizer = function(options) {
   var el = options.el;
   var $el = $(el);
@@ -160,7 +145,7 @@ var ChatInputBoxView = Marionette.ItemView.extend({
   },
 
   onKeySend: function(event, handler) {
-    var isComposeModeEnabled = this.composeMode && this.composeMode.isEnabled();
+    var isComposeModeEnabled = this.composeMode.get('isComposeModeEnabled');
     // Has a modifier or not in compose mode
     var shouldHandle = handler.mods.length || !isComposeModeEnabled;
     // Need to test behaviour with typeahead
