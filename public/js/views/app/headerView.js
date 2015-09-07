@@ -186,7 +186,7 @@ module.exports = Marionette.ItemView.extend({
 
       menuItems.push({ divider: true });
 
-      menuItems.push({ title: 'Archives', href: 'archives/all', target: '_blank'});
+      menuItems.push({ title: 'Archives', href: url + '/archives/all', target: '_blank'});
 
       var githubType = this.model.get('githubType');
       if(githubType === 'REPO' || githubType === 'ORG') {
