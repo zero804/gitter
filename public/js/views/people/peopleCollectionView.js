@@ -36,7 +36,6 @@ var RemainingView = Marionette.ItemView.extend({
   template: remainingTempate,
 
   modelEvents: {
-    'change:userCount': 'render',
     'change:id': 'render',
   },
 
@@ -49,7 +48,7 @@ var RemainingView = Marionette.ItemView.extend({
     };
 
     return data;
-    }
+  }
 });
 
 var ExpandableRosterView = Marionette.LayoutView.extend({
