@@ -207,12 +207,13 @@ module.exports = (function() {
     // this is not a live collection so this will not work inside an SPA
     //$('.mobile-scroll-class').on('scroll', this._getBounds);
 
-    appEvents.on('unreadItemDisplayed', this._getBounds);
-
     var storeEvents = ['newcountvalue', 'unreadItemRemoved', 'change:status', 'itemMarkedRead', 'add'];
     storeEvents.forEach(function(evt) {
       unreadItemStore.on(evt, foldCountLimited);
     });
+
+    // Check for unread items when things are added to the collection
+    collectionView.collection.on('add', this._getBounds);
 
     // When the UI changes, rescan
     // appEvents.on('appNavigation', this._getBounds);
