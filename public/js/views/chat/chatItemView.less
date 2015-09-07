@@ -87,13 +87,6 @@
     .chat-item__avatar {
       display: none;
     }
-
-    @media @mobile {
-      .chat-item__details { display: none; }
-      .chat-item__text {
-        margin: 0;
-      }
-    }
   }
 
   &.deleted {
@@ -136,11 +129,10 @@
   text-align: right;
   opacity: 0;
   width: 40px;
+}
 
-  @media @mobile {
-    display: none;
-  }
-
+body.mobile .chat-item__actions {
+  display: none;
 }
 
 .chat-item:hover .chat-item__actions, .chat-item:hover .chat-item__time {
@@ -178,10 +170,10 @@
   &.syncerror {
     background-color: #edb2bd;
   }
+}
 
-  @media @mobile {
-    padding-left: 0;
-  }
+body.mobile .chat-item__container {
+  padding-left: 0;
 }
 
 .chat-item__from {
@@ -227,11 +219,10 @@
   .isViewers & {
     opacity: 1;
   }
+}
 
-  @media @mobile {
-    display: none;
-  }
-
+body.mobile .chat-item__icon--read {
+  display: none;
 }
 
 .chat-item__icon--read-by-some {
@@ -350,11 +341,11 @@
   pre {
     margin: 4px 0 0 0;
   }
+}
 
-  @media @mobile {
-    margin-left: @avatarWidth + 12px;
-    margin-right: 12px;
-  }
+body.mobile .chat-item__content {
+  margin-left: @avatarWidth + 12px;
+  margin-right: 12px;
 }
 
 .chat-item__status {
