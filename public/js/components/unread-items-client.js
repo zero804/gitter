@@ -189,7 +189,7 @@ module.exports = (function() {
   // -----------------------------------------------------
 
   var TroupeUnreadItemsViewportMonitor = function(scrollElement, unreadItemStore, collectionView) {
-    _.bindAll(this, '_getBounds');
+    var boundGetBounds = this._getBounds.bind(this);
     this._collectionView = collectionView;
     this._scrollElement = scrollElement[0] || scrollElement;
 
@@ -202,22 +202,22 @@ module.exports = (function() {
 
     appEvents.on('eyeballStateChange', this._eyeballStateChange, this);
 
-    this._scrollElement.addEventListener('scroll', this._getBounds, false);
+    this._scrollElement.addEventListener('scroll', boundGetBounds, false);
 
     // this is not a live collection so this will not work inside an SPA
-    //$('.mobile-scroll-class').on('scroll', this._getBounds);
+    //$('.mobile-scroll-class').on('scroll', boundGetBounds);
 
-    var storeEvents = ['newcountvalue', 'unreadItemRemoved', 'change:status', 'itemMarkedRead', 'add'];
-    storeEvents.forEach(function(evt) {
-      unreadItemStore.on(evt, foldCountLimited);
+    unreadItemStore.on('newcountvalue', foldCountLimited);
+    ['unreadItemRemoved', 'change:status', 'itemMarkedRead', 'add'].forEach(function(evt) {
+      unreadItemStore.on(evt, boundGetBounds);
     });
 
     // Check for unread items when things are added to the collection
-    collectionView.collection.on('add', this._getBounds);
+    collectionView.collection.on('add', boundGetBounds);
 
     // When the UI changes, rescan
     // appEvents.on('appNavigation', this._getBounds);
-    setTimeout(this._getBounds, 250);
+    setTimeout(boundGetBounds, 250);
   };
 
   TroupeUnreadItemsViewportMonitor.prototype = {
