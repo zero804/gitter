@@ -36,6 +36,11 @@ var ChatToolbarInputLayout = ChatToolbarLayout.extend({
         init: 'initInputRegion'
       },
 
+      header: {
+        el: '#header-wrapper',
+        init: 'initHeaderRegion' // Declared in super
+      },
+
       // TODO Move to chat-toolbar layout and
       // decide how are they gonna look like in mobile
       bannerTop: {
