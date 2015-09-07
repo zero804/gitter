@@ -1,5 +1,5 @@
 "use strict";
-var $ = require('jquery');
+var _ = require('underscore');
 var context = require('utils/context');
 var apiClient = require('components/apiClient');
 var Marionette = require('backbone.marionette');
@@ -8,17 +8,32 @@ var autolink = require('autolink');
 var notifications = require('components/notifications');
 var Dropdown = require('views/controls/dropdown');
 var appEvents = require('utils/appevents');
-var HeaderModel = require('../../models/header-model');
 var headerViewTemplate  = require('./tmpl/headerViewTemplate.hbs');
+var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
 
 require('views/behaviors/widgets');
 require('views/behaviors/tooltip');
 
+
+function ownerIsOrg(roomType) {
+  // This logic isn't right. As repo's can be owned by an ORG too
+  return (roomType === 'ORG' || roomType === 'ORG_CHANNEL');
+}
+
+function getPrivateStatus(data) {
+  return data.githubType === 'ORG' || data.githubType === 'ONETOONE' || data.security === 'PRIVATE';
+}
+
+function getGithubUrl(data) {
+  if (data.githubType !== 'REPO') return;
+  return 'https://github.com' + data.url;
+}
+
 module.exports = Marionette.ItemView.extend({
-  template: false,
+  template: headerViewTemplate,
 
   modelEvents: {
-    change: 'onModelChange'
+    change: 'renderIfRequired'
   },
 
   ui: {
@@ -48,23 +63,37 @@ module.exports = Marionette.ItemView.extend({
   },
 
   initialize: function() {
-    this.model = new HeaderModel();
-    this.bindUIElements();
-    this.showActivity = true;
+    this.menuItemsCollection = new Backbone.Collection([]);
     this.buildDropdown();
+  },
 
-    this.listenTo(context.troupe(), 'change:id', this.onRoomChange, this);
+  serializeData: function() {
+    var data = this.model.toJSON();
+    _.extend(data, {
+      troupeName:      data.name,
+      troupeFavourite: !!data.favourite,
+      favourite:       !!data.favourite,
+      troupeTopic:     data.topic,
+      avatarUrl:       resolveRoomAvatarUrl(data.url),
+      ownerIsOrg:      ownerIsOrg(data.githubType),
+      user:            !!context.isLoggedIn(),
+      archives:        false, // TODO: XXX: fix this
+      oneToOne:        (data.githubType === 'ONETOONE'),
+      githubLink:      getGithubUrl(data),
+      isPrivate:       getPrivateStatus(data),
+    });
 
-    this.redisplay();
+    return data;
   },
 
   buildDropdown: function (){
     if(context.isLoggedIn()) {
       this.dropdown = new Dropdown({
         allowClickPropagation: true,
-        collection: new Backbone.Collection(this.createMenu()),
-        targetElement: this.ui.cog[0],
-        placement: 'right'
+        collection: this.menuItemsCollection,
+        placement: 'right',
+        // Do not set the target element for now as it's re-rendered on room
+        // change. We'll set it dynamically before showing the dropdown
       });
 
       this.listenTo(this.dropdown, 'selected', function(e) {
@@ -75,13 +104,11 @@ module.exports = Marionette.ItemView.extend({
           this.requestBrowserNotificationsPermission();
         }
       });
-    } else {
-      this.ui.favourite.css({ visibility: 'hidden' });
     }
   },
 
   getChatNameTitle: function() {
-    var model = context.troupe();
+    var model = this.model;
     if (model.get('security') === 'PUBLIC') return 'Anyone can join';
 
     switch(model.get('githubType')) {
@@ -110,20 +137,27 @@ module.exports = Marionette.ItemView.extend({
   },
 
   getOrgPageTitle: function() {
-    var uri = context.troupe().get('uri');
+    var uri = this.model.get('uri');
     var orgName = uri.split('/')[0];
     return 'More ' + orgName + ' rooms';
   },
 
-  onModelChange: function (){
-    this.dropdown.hide();
-    this.render();
-    this.buildDropdown();
-    this.createMenu();
-    this.redisplay();
+  onRender: function() {
+    if (this.dropdown) {
+      // Deal with re-renders
+      this.dropdown.hide();
+    }
+    this.ui.favourite.css({ visibility: context.isLoggedIn() ? 'visible' : 'hidden' });
+    this.ui.favourite.toggleClass('favourite', !!this.model.get('favourite'));
+    var topicEl = this.ui.topic[0];
+    if (topicEl) {
+      autolink(topicEl);
+    }
   },
 
   showDropdown: function() {
+    this.dropdown.setTargetElement(this.ui.cog[0]);
+    this.menuItemsCollection.reset(this.createMenu());
     this.dropdown.show();
   },
 
@@ -209,7 +243,7 @@ module.exports = Marionette.ItemView.extend({
 
   cancelEditTopic: function() {
     this.editingTopic = false;
-    this.redisplay();
+    this.render();
   },
 
   detectKeys: function(e) {
@@ -223,7 +257,6 @@ module.exports = Marionette.ItemView.extend({
       e.stopPropagation();
       e.preventDefault();
       this.saveTopic();
-      this.redisplay();
     }
   },
 
@@ -231,7 +264,6 @@ module.exports = Marionette.ItemView.extend({
     if (e.keyCode === 27) {
       // found escape, cancel edit
       this.cancelEditTopic();
-      this.redisplay();
     }
   },
 
@@ -240,7 +272,7 @@ module.exports = Marionette.ItemView.extend({
     if (this.editingTopic === true) return;
     this.editingTopic = true;
 
-    var unsafeText = this.ui.topic.text();
+    var unsafeText = this.model.get('topic');
 
     this.oldTopic = unsafeText;
 
@@ -261,20 +293,24 @@ module.exports = Marionette.ItemView.extend({
     }
   },
 
-  redisplay: function() {
+  // Look at the attributes that have changed
+  // and decide whether to re-render
+  renderIfRequired: function() {
     var model = this.model;
 
-    if (this.ui.topic.length) {
-      this.ui.topic.text(model.get('topic'));
-      autolink(this.ui.topic[0]);
+    function changedContains(changedAttributes) {
+      var changed = model.changed;
+      if (!changed) return;
+      for (var i = 0; i < changedAttributes.length; i++) {
+        if (changed.hasOwnProperty(changedAttributes[i])) return true;
+      }
     }
 
-    this.ui.favourite.toggleClass('favourite', !!model.get('favourite'));
-  },
-
-  onRoomChange: function (model){
-    if(!this.template) this.template = headerViewTemplate;
-    this.editingTopic = false;
-  },
-
+    if (changedContains(['name', 'id', 'githubType', 'favourite', 'topic'])) {
+      // The template may have been set to false
+      // by the Isomorphic layout
+      this.options.template = headerViewTemplate;
+      this.render();
+    }
+  }
 });

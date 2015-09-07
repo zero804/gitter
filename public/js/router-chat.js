@@ -11,7 +11,6 @@ var ChatToolbarInputLayout = require('views/layouts/chat-toolbar-input');
 var DropTargetView = require('views/app/dropTargetView');
 var onready = require('./utils/onready');
 var apiClient = require('components/apiClient');
-var HeaderView = require('views/app/headerView');
 var frameUtils = require('./utils/frame-utils');
 var itemCollections = require('collections/instances/integrated-items');
 
@@ -208,8 +207,6 @@ onready(function () {
 
   /* Drag and drop */
   new DropTargetView({ template: false, el: 'body' }).render();
-
-  new HeaderView({ model: context.troupe(), el: '#header' });
 
   // This may require a better home
   if (context.isTroupeAdmin() && context.troupe().get('userCount') <= 1) {
