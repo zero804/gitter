@@ -2,6 +2,7 @@
 
 var Backbone = require('backbone');
 var context = require('utils/context');
+var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
 
 module.exports = Backbone.Model.extend({
   initialize: function() {
@@ -21,7 +22,7 @@ module.exports = Backbone.Model.extend({
       troupeFavourite: !!roomModel.get('favourite'),
       favourite:       !!roomModel.get('favourite'),
       troupeTopic:     roomModel.get('topic'),
-      avatarUrl:       getRoomImgUrl(roomModel, userModel),
+      avatarUrl:       resolveRoomAvatarUrl(roomModel.get('url')),
       ownerIsOrg:      ownerIsOrg(roomModel),
       user:            !!userModel.get('id'),
       archives:        false,
@@ -47,12 +48,6 @@ function getPrivateStatus(roomModel) {
 function getGithubUrl(roomModel) {
   return roomModel.get('githubType') === 'REPO' &&
     'https://github.com' + roomModel.get('url');
-}
-
-function getRoomImgUrl(roomModel) {
-  // Room image
-  var githubAvatarUrl = 'https://avatars.githubusercontent.com/';
-  return githubAvatarUrl + roomModel.get('name').split('/')[0];
 }
 
 function ownerIsOrg(roomModel) {

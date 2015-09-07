@@ -25,11 +25,10 @@ var cdn                = require("../../web/cdn");
 var roomMembershipService = require('../../services/room-membership-service');
 var troupeService      = require('../../services/troupe-service');
 var useragent          = require('useragent');
-var avatar             = require('../../utils/avatar');
 var _                 = require('underscore');
 var GitHubOrgService   = require('gitter-web-github').GitHubOrgService;
 var orgPermissionModel = require('../../services/permissions/org-permissions-model');
-
+var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
 
 /* How many chats to send back */
 var INITIAL_CHAT_COUNT = 50;
@@ -336,7 +335,7 @@ function renderChat(req, res, options, next) {
             troupeTopic: troupeContext.troupe.topic,
             premium: troupeContext.troupe.premium,
             troupeFavourite: troupeContext.troupe.favourite,
-            avatarUrl: avatar(troupeContext.troupe),
+            avatarUrl:  resolveRoomAvatarUrl(troupeContext.troupe.url),
             isAdmin: isAdmin,
             isNativeDesktopApp: troupeContext.isNativeDesktopApp
           }, options.extras);
