@@ -135,7 +135,13 @@ module.exports = (function() {
       this.$targetElement.off('mouseenter', this.enter);
       this.$targetElement.off('mouseleave', this.leave);
 
+      if (this.titleView) {
+        this.titleView.destroy();
+      }
       this.view.destroy();
+      if (this.footerView) {
+        this.footerView.destroy();
+      }
     },
 
     show: function () {
