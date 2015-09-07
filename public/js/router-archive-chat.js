@@ -46,7 +46,7 @@ onready(function() {
   });
 
   // TODO: XXX move this across to a layoutview
-  new HeaderView({ model: context.troupe(), el: '#header' }).render();
+  new HeaderView({ model: context.troupe(), el: '#header', archives: true }).render();
 
   var archiveContext = context().archive;
 

@@ -72,12 +72,11 @@ module.exports = Marionette.ItemView.extend({
     _.extend(data, {
       troupeName:      data.name,
       troupeFavourite: !!data.favourite,
-      favourite:       !!data.favourite,
       troupeTopic:     data.topic,
       avatarUrl:       resolveRoomAvatarUrl(data.url),
       ownerIsOrg:      ownerIsOrg(data.githubType),
       user:            !!context.isLoggedIn(),
-      archives:        false, // TODO: XXX: fix this
+      archives:        this.options.archives,
       oneToOne:        (data.githubType === 'ONETOONE'),
       githubLink:      getGithubUrl(data),
       isPrivate:       getPrivateStatus(data),
