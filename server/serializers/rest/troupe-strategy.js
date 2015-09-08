@@ -191,15 +191,17 @@ var TroupeOwnerIsOrgStrategy = function (){
   var ownerIsOrg = {};
 
   this.preload = function (troupes, callback){
-    return Q.all(troupes.map(function(troupe){
+    // Use uniq as the list of items will probably be much smaller than the original set, this means way fewer queries to mongodb
+    var ownersForQuery = _.uniq(troupes.filter(function(troupe){ return !!troupe.lcOwner;}));
+
+    return Q.all(ownersForQuery.map(function(troupe){
       //sadly Q does not want to resolve the promise if you pass through the
       //troupe as part of an array
       //eg `return [ troupe, troupeService... ]`
       return troupeService.checkGitHubTypeForUri(troupe.lcOwner || '', 'ORG');
     }))
-    .spread(function(){
-      Array.prototype.slice.apply(arguments)
-        .forEach(function(result, index){
+    .then(function(results){
+        results.forEach(function(result, index){
           //not being able to pass the troupe means we ASSUME they come through in order correctly
           var troupe = troupes[index];
           ownerIsOrg[troupe.id] = result;

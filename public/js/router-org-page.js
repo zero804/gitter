@@ -1,11 +1,13 @@
 /*global require, console, window, document */
 "use strict";
 
-var onReady = require('./utils/onready');
-var Backbone= require('backbone');
-var appEvents = require('utils/appevents');
-var frameUtils = require('./utils/frame-utils');
+var onReady     = require('./utils/onready');
+var Backbone    = require('backbone');
+var appEvents   = require('utils/appevents');
+var frameUtils  = require('./utils/frame-utils');
 var modalRegion = require('components/modal-region');
+var _           = require('underscore');
+var context     = require('utils/context');
 
 require('utils/tracking');
 
@@ -20,8 +22,22 @@ onReady(function(){
   });
 
   //listen for postMessageCalls
-  window.addEventListener('message', function onWindowMessage(message){
-    var data = JSON.parse(message.data);
+  window.addEventListener('message', function onWindowMessage(message, targetOrigin){
+    if (message.origin !== context.env('basePath')) return;
+
+    var data;
+    if(_.isString(message.data)) {
+      try {
+        data = JSON.parse(message.data);
+      }
+      catch(e){
+        //FIXME JP 8/9/15 Should so something with this error
+        data = message.data;
+      }
+    }
+    else {
+      data = message.data;
+    }
     if(data.type !== 'change:room') return;
     window.location.replace(data.url);
   });
