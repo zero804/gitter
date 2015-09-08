@@ -1,14 +1,14 @@
 "use strict";
-var Backbone = require('backbone');
-var Marionette = require('backbone.marionette');
-var context = require('utils/context');
-var itemCollections = require('collections/instances/integrated-items');
-var PeopleCollectionView = require('views/people/peopleCollectionView');
-var SearchView = require('views/search/searchView');
-var SearchInputView = require('views/search/search-input-view');
-var RepoInfoView = require('./repoInfo');
+var Backbone              = require('backbone');
+var Marionette            = require('backbone.marionette');
+var context               = require('utils/context');
+var itemCollections       = require('collections/instances/integrated-items');
+var PeopleCollectionView  = require('views/people/peopleCollectionView');
+var SearchView            = require('views/search/searchView');
+var SearchInputView       = require('views/search/search-input-view');
+var RepoInfoView          = require('./repoInfo');
 var ActivityCompositeView = require('./activityCompositeView');
-var hasScrollBars = require('utils/scrollbar-detect');
+var hasScrollBars         = require('utils/scrollbar-detect');
 require('views/behaviors/isomorphic');
 
 module.exports = (function() {
@@ -17,18 +17,18 @@ module.exports = (function() {
     className: 'right-toolbar right-toolbar--collapsible',
     behaviors: {
       Isomorphic: {
-        search: { el: '#search-results', init: 'initSearchRegion' },
-        header: { el: '#right-toolbar-header-region', init: 'initSearchInputRegion' },
+        search:    { el: '#search-results', init: 'initSearchRegion' },
+        header:    { el: '#right-toolbar-header-region', init: 'initSearchInputRegion' },
         repo_info: { el: '#repo-info', init: 'initRepo_infoRegion' },
-        activity: { el: '#activity-region', init: 'initActivityRegion' },
-        roster: { el: '#people-roster', init: 'initRosterRegion' },
+        activity:  { el: '#activity-region', init: 'initActivityRegion' },
+        roster:    { el: '#people-roster', init: 'initRosterRegion' },
       }
     },
 
     ui: {
-      header: '#toolbar-top-content',
-      footer: '#zendesk-footer',
-      rosterHeader: '#people-header',
+      header:         '#toolbar-top-content',
+      footer:         '#zendesk-footer',
+      rosterHeader:   '#people-header',
       repoInfoHeader: '#info-header'
     },
 
@@ -40,14 +40,23 @@ module.exports = (function() {
     },
 
     childEvents: {
-      'search:expand': 'expandSearch',
+      'search:expand':   'expandSearch',
       'search:collapse': 'collapseSearch',
-      'search:show': 'showSearch',
-      'search:hide': 'hideSearch'
+      'search:show':     'showSearch',
+      'search:hide':     'hideSearch'
+    },
+
+    collectionEvents: {
+      'add sync reset remove': 'onCollectionUpdate'
     },
 
     toggleSearch: function () {
       // hide all regions and show/hide search...
+    },
+
+    constructor: function (){
+      this.collection = itemCollections.roster;
+      Marionette.LayoutView.prototype.constructor.apply(this, arguments);
     },
 
     initialize: function () {
@@ -139,7 +148,12 @@ module.exports = (function() {
       if(repoInfoHeader.hasClass('selected') && isNotRepo){
         this.showPeopleList();
       }
-    }
+    },
+
+    onCollectionUpdate: function (){
+      var peopleList = this.$el.find('#people-list');
+      peopleList.toggleClass('hidden', !this.collection.length);
+    },
 
   });
 
