@@ -26,32 +26,34 @@ module.exports = Marionette.ItemView.extend({
   template: headerViewTemplate,
 
   modelEvents: {
-    change: 'renderIfRequired',
+    change:              'renderIfRequired',
+    //always render if the owber status changes
+    //usually from snapshot retrieval
     'change:ownerIsOrg': 'render'
   },
 
   ui: {
-    cog: '.js-chat-settings',
+    cog:          '.js-chat-settings',
     dropdownMenu: '#cog-dropdown',
-    topic: '.js-chat-topic',
-    name: '.js-chat-name',
-    favourite: '.js-favourite-button',
-    orgrooms: '.js-org-page'
+    topic:        '.js-chat-topic',
+    name:         '.js-chat-name',
+    favourite:    '.js-favourite-button',
+    orgrooms:     '.js-org-page'
   },
 
   events: {
-    'click @ui.cog': 'showDropdown',
-    'click #leave-room': 'leaveRoom',
+    'click @ui.cog':       'showDropdown',
+    'click #leave-room':   'leaveRoom',
     'click @ui.favourite': 'toggleFavourite',
-    'dblclick @ui.topic': 'showInput',
-    'keydown textarea': 'detectKeys',
-    'click @ui.orgrooms': 'goToOrgRooms'
+    'dblclick @ui.topic':  'showInput',
+    'keydown textarea':    'detectKeys',
+    'click @ui.orgrooms':  'goToOrgRooms'
   },
 
   behaviors: {
     Tooltip: {
       '.js-chat-name': { titleFn: 'getChatNameTitle', placement: 'right' },
-      '.js-org-page': { titleFn: 'getOrgPageTitle', placement: 'left' }
+      '.js-org-page':  { titleFn: 'getOrgPageTitle', placement: 'left' }
     },
   },
 
