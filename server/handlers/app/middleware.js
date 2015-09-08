@@ -1,10 +1,12 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var roomService = require('../../services/room-service');
+// var roomService = require('../../services/room-service');
+var roomContextService = require('../../services/room-context-service');
 var isPhone     = require('../../web/is-phone');
 var url         = require('url');
 var debug       = require('debug')('gitter:app-middleware');
+var StatusError = require('statuserror');
 
 function normaliseUrl(params) {
   if(params.roomPart3) {
@@ -30,57 +32,86 @@ function uriContextResolverMiddleware(options) {
 
   return function(req, res, next) {
     var uri = normaliseUrl(req.params);
-    var tracking = { source: req.query.source };
+    // var tracking = { source: req.query.source };
 
     debug("Looking up normalised uri %s", uri);
 
-    var creationFilter = {
-      all: false
-    };
-
-    if(options && options.create) {
-      creationFilter.all = true;
-      if(options.create === 'not-repos') {
-        creationFilter.REPO = false;
-      }
-    }
-
-    return roomService.findOrCreateRoom(req.user, uri, { tracking: tracking, creationFilter: creationFilter })
+    // var creationFilter = {
+    //   all: false
+    // };
+    //
+    // if(options && options.create) {
+    //   creationFilter.all = true;
+    //   if(options.create === 'not-repos') {
+    //     creationFilter.REPO = false;
+    //   }
+    // }
+    return roomContextService.findContextForUri(req.user, uri, options)
       .then(function(uriContext) {
-
-        var isValid = uriContext && (uriContext.troupe || uriContext.ownUrl);
-        var accessToOrgRoomDenied = uriContext && uriContext.accessDenied && uriContext.accessDenied.githubType === 'ORG';
-
-        if (!isValid && !accessToOrgRoomDenied) {
-          if(!req.user) {
-            throw 401;
-          }
-
-          throw 404;
-        }
-
-        var events = req.session.events;
-        if(!events) {
-          events = [];
-          req.session.events = events;
-        }
-
-        if(uriContext.hookCreationFailedDueToMissingScope) {
-          events.push('hooks_require_additional_public_scope');
-        }
-
         req.troupe = uriContext.troupe;
+
         req.uriContext = uriContext;
         next();
       })
-      .catch(function(err) {
-        if(err && err.redirect) {
-          return res.relativeRedirect(getRedirectUrl(err.redirect, req));
-        }
+      .catch(function(e) {
+        if (!(e instanceof StatusError)) throw e;
+        switch(e.status) {
+          case 301:
+            // TODO: check this works for userhome....
+            if (e.path) {
+              res.redirect(getRedirectUrl(e.path, req));
+              return;
+            }
+            throw new StatusError(500, 'Invalid redirect');
 
-        throw err;
+          case 404:
+            if (e.githubType === 'ORG' && e.uri) {
+              res.redirect('/orgs/' + e.uri + '/rooms');
+              return;
+            }
+        }
+        throw e;
       })
       .catch(next);
+
+    // This becomes
+    // roomService.findRoomContext(req.user, uri)
+    // return roomService.findOrCreateRoom(req.user, uri, { tracking: tracking, creationFilter: creationFilter })
+    //   .then(function(uriContext) {
+    //
+    //     var isValid = uriContext && (uriContext.troupe || uriContext.ownUrl);
+    //     var accessToOrgRoomDenied = uriContext && uriContext.accessDenied && uriContext.accessDenied.githubType === 'ORG';
+    //
+    //     if (!isValid && !accessToOrgRoomDenied) {
+    //       if(!req.user) {
+    //         throw 401;
+    //       }
+    //
+    //       throw 404;
+    //     }
+    //
+    //     var events = req.session.events;
+    //     if(!events) {
+    //       events = [];
+    //       req.session.events = events;
+    //     }
+    //
+    //     if(uriContext.hookCreationFailedDueToMissingScope) {
+    //       events.push('hooks_require_additional_public_scope');
+    //     }
+    //
+    //     req.troupe = uriContext.troupe;
+    //     req.uriContext = uriContext;
+    //     next();
+    //   })
+    //   .catch(function(err) {
+    //     if(err && err.redirect) {
+    //       return res.relativeRedirect(getRedirectUrl(err.redirect, req));
+    //     }
+    //
+    //     throw err;
+    //   })
+    //   .catch(next);
   };
 }
 
