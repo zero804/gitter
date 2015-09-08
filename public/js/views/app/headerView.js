@@ -13,12 +13,6 @@ var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avata
 
 require('views/behaviors/tooltip');
 
-
-function ownerIsOrg(roomType) {
-  // This logic isn't right. As repo's can be owned by an ORG too
-  return (roomType === 'ORG' || roomType === 'ORG_CHANNEL');
-}
-
 function getPrivateStatus(data) {
   return data.githubType === 'ORG' || data.githubType === 'ONETOONE' || data.security === 'PRIVATE';
 }
@@ -32,7 +26,8 @@ module.exports = Marionette.ItemView.extend({
   template: headerViewTemplate,
 
   modelEvents: {
-    change: 'renderIfRequired'
+    change: 'renderIfRequired',
+    'change:ownerIsOrg': 'render'
   },
 
   ui: {
@@ -72,7 +67,6 @@ module.exports = Marionette.ItemView.extend({
       troupeFavourite: !!data.favourite,
       troupeTopic:     data.topic,
       avatarUrl:       resolveRoomAvatarUrl(data.url),
-      ownerIsOrg:      ownerIsOrg(data.githubType),
       user:            !!context.isLoggedIn(),
       archives:        this.options.archives,
       oneToOne:        (data.githubType === 'ONETOONE'),

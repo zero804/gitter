@@ -307,6 +307,9 @@ function renderChat(req, res, options, next) {
         /* This is less than ideal way of checking if the user is the admin */
         var isAdmin = troupeContext.troupe && troupeContext.troupe.permissions && troupeContext.troupe.permissions.admin;
 
+        //add ownerIsOrg to the troupe model
+        troupeContext.troupe.ownerIsOrg = ownerIsOrg;
+
         var renderOptions = _.extend({
             isRepo: troupe.githubType === 'REPO',
             bootScriptName: script,
