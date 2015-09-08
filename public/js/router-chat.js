@@ -208,22 +208,6 @@ onready(function () {
   /* Drag and drop */
   new DropTargetView({ template: false, el: 'body' }).render();
 
-  // This may require a better home
-  if (context.isTroupeAdmin() && context.troupe().get('userCount') <= 1) {
-    require.ensure([
-      'views/app/collaboratorsView',
-      'collections/collaborators'],
-      function(require) {
-        var CollaboratorsView = require('views/app/collaboratorsView');
-        var collaboratorsModels = require('collections/collaborators');
-        var collaborators = new collaboratorsModels.CollabCollection();
-        collaborators.fetch();
-        collaborators.once('sync', function() {
-          var collaboratorsView = new CollaboratorsView({ collection: collaborators });
-          $('#content-frame').prepend(collaboratorsView.render().el);
-        });
-    });
-  }
 
   var Router = Backbone.Router.extend({
     routes: {
