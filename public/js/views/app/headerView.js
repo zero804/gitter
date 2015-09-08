@@ -11,7 +11,6 @@ var appEvents = require('utils/appevents');
 var headerViewTemplate  = require('./tmpl/headerViewTemplate.hbs');
 var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
 
-require('views/behaviors/widgets');
 require('views/behaviors/tooltip');
 
 
@@ -55,7 +54,6 @@ module.exports = Marionette.ItemView.extend({
   },
 
   behaviors: {
-    Widgets: {},
     Tooltip: {
       '.js-chat-name': { titleFn: 'getChatNameTitle', placement: 'right' },
       '.js-org-page': { titleFn: 'getOrgPageTitle', placement: 'left' }
