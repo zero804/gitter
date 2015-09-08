@@ -42,70 +42,9 @@ var liveCollections    = require('./live-collections');
 var recentRoomService  = require('./recent-room-service');
 var badgerEnabled      = nconf.get('autoPullRequest:enabled');
 var uniqueIds          = require('mongodb-unique-ids');
+var uriResolver        = require('./uri-resolver');
 
 exports.testOnly = {};
-
-function localUriLookup(uri, opts) {
-  debug("localUriLookup %s", uri);
-
-  return uriLookupService.lookupUri(uri)
-    .then(function (uriLookup) {
-      if (!uriLookup) return;
-
-      if(uriLookup.userId) {
-        /* One to one */
-        return userService.findById(uriLookup.userId)
-          .then(function(user) {
-            if(!user) {
-              logger.info('Removing stale uri: ' + uri + ' from URI lookups');
-
-              return uriLookupService.removeBadUri(uri)
-                                      .thenResolve(null);
-            }
-
-            if(!opts.ignoreCase &&
-                user.username != uri &&
-                user.username.toLowerCase() === uri.toLowerCase()) {
-              logger.info('Incorrect case for room: ' + uri + ' redirecting to ' + user.username);
-              throw { redirect: '/' + user.username };
-            }
-
-            return { user: user };
-          });
-      }
-
-      if(uriLookup.troupeId) {
-        // TODO: get rid of this findById, make it lean, etc
-        return troupeService.findById(uriLookup.troupeId)
-          .then(function (troupe) {
-            if(!troupe) {
-              logger.info('Removing stale uri: ' + uri + ' from URI lookups');
-
-              return uriLookupService.removeBadUri(uri)
-                                      .thenResolve(null);
-            }
-
-            if (troupe.uri != uri) {
-              if(troupe.uri.toLowerCase() === uri.toLowerCase()) {
-                /* Only the case is wrong.... */
-                if(!opts.ignoreCase) {
-                  logger.info('Incorrect case for room: ' + uri + ' redirecting to ' + troupe.uri);
-                  throw { redirect: '/' + troupe.uri };
-                }
-                /* Otherwise, continue */
-              } else {
-                // The name is completely different (due to a rename), always redirect
-                throw { redirect: '/' + troupe.uri };
-              }
-            }
-
-            return { troupe: troupe };
-          });
-      }
-
-      return null;
-    });
-}
 
 /**
  * sendJoinStats() sends information to MixPanels about a join_room event
@@ -554,46 +493,43 @@ function findOrCreateRoom(user, uri, options) {
    * this function returns an object containing accessDenied, which is used by the middlewares to allow the display
    * of public rooms instead of the standard 404
    */
-  function denyAccess(uriLookup) {
-    if (!uriLookup) return null;
-    if (!uriLookup.troupe) return null;
+  function denyAccess(resolvedTroupe) {
+    if (!resolvedTroupe) return null;
 
-    var troupe = uriLookup.troupe;
-    var uri = troupe && troupe.uri;
+    var uri = resolvedTroupe.uri;
 
     return {
       accessDenied: {
-        githubType: troupe && troupe.githubType
+        githubType: resolvedTroupe.githubType
       },
       uri: uri
     };
   }
 
   /* First off, try use local data to figure out what this url is for */
-  return localUriLookup(uri, options)
-    .then(function (uriLookup) {
+  return uriResolver(uri, options)
+    .spread(function (resolvedUser, resolvedTroupe) {
       /* Deal with the case of the nonloggedin user first */
       if(!user) {
-        if(!uriLookup) return null;
-
-        if(uriLookup.user) {
-          debug("localUriLookup returned user for uri=%s", uri);
+        if(resolvedUser) {
+          debug("uriResolver returned user for uri=%s", uri);
 
           // TODO: figure out what we do for nonloggedin users viewing
           // user profiles
         }
 
-        if(uriLookup.troupe) {
-          debug("localUriLookup returned troupe for uri=%s", uri);
+        if(resolvedTroupe) {
+          debug("uriResolver returned troupe for uri=%s", uri);
 
-          var troupe = uriLookup.troupe;
-
-          return roomPermissionsModel(null, 'view', troupe)
+          return roomPermissionsModel(null, 'view', resolvedTroupe)
             .then(function (access) {
-              if (!access) return denyAccess(uriLookup); // please see comment about denyAccess
+              if (!access) {
+                return denyAccess(resolvedTroupe); // please see comment about denyAccess
+              }
+
               return {
-                troupe: troupe,
-                uri: troupe.uri
+                troupe: resolvedTroupe,
+                uri: resolvedTroupe.uri
               };
             });
         }
@@ -602,10 +538,9 @@ function findOrCreateRoom(user, uri, options) {
       }
 
       // If the Uri Lookup returned a user, do a one-to-one
-      if(uriLookup && uriLookup.user) {
-        var otherUser = uriLookup.user;
+      if(resolvedUser) {
 
-        if(otherUser.id == userId) {
+        if(resolvedUser.id == userId) {
           debug("localUriLookup returned own user for uri=%s", uri);
 
           return {
@@ -613,7 +548,7 @@ function findOrCreateRoom(user, uri, options) {
             oneToOne: false,
             troupe: null,
             didCreate: false,
-            uri: otherUser.username
+            uri: resolvedUser.username
           };
         }
 
@@ -626,16 +561,16 @@ function findOrCreateRoom(user, uri, options) {
           return null;
         }
 
-        return permissionsModel(user, 'view', otherUser.username, 'ONETOONE', null)
+        return permissionsModel(user, 'view', resolvedUser.username, 'ONETOONE', null)
           .then(function(access) {
             if(!access) return null;
-            return troupeService.findOrCreateOneToOneTroupeIfPossible(userId, otherUser.id)
-              .spread(function(troupe, otherUser) {
+            return troupeService.findOrCreateOneToOneTroupeIfPossible(userId, resolvedUser.id)
+              .spread(function(troupe, resolvedUser) {
                 return {
                   oneToOne: true,
                   troupe: troupe,
-                  otherUser: otherUser,
-                  uri: otherUser.username
+                  otherUser: resolvedUser,
+                  uri: resolvedUser.username
                 };
               });
           });
@@ -644,7 +579,7 @@ function findOrCreateRoom(user, uri, options) {
       debug("localUriLookup returned room %s for uri=%s. Finding or creating room", uriLookup && uriLookup.troupe && uriLookup.troupe.uri, uri);
 
       // need to check for the rooms
-      return findOrCreateGroupRoom(user, uriLookup && uriLookup.troupe, uri, options)
+      return findOrCreateGroupRoom(user, resolvedTroupe, uri, options)
         .then(function(findOrCreateResult) {
           var troupe = findOrCreateResult.troupe;
           var access = findOrCreateResult.access;
@@ -657,7 +592,7 @@ function findOrCreateRoom(user, uri, options) {
 
           return ensureAccessControl(user, troupe, access)
             .then(function (userRoomMembershipChanged) {
-              if (!access) return denyAccess(uriLookup); // please see comment about denyAccess
+              if (!access) return denyAccess(resolvedTroupe); // please see comment about denyAccess
 
               // if the user has been granted access to the room, send join stats for the cases of being the owner or just joining the room
               if(access && (didCreate || userRoomMembershipChanged)) {
