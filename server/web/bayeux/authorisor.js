@@ -150,7 +150,11 @@ function populateTroupe(options) {
 
   if (!snapshotOptions) return Q.resolve();
 
-  var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: userId, includePermissions: true });
+  var strategy = new restSerializer.TroupeIdStrategy({
+    currentUserId: userId,
+    includePermissions: true,
+    includeOwner: true
+  });
   return restSerializer.serialize(troupeId, strategy)
     .then(dataToSnapshot('room'));
 }

@@ -224,8 +224,8 @@ module.exports = (function() {
 
     serializeData: function() {
       return {
-        isPublic: context.troupe().get('security') === 'PUBLIC',
-        twitterLink: social.generateTwitterShareUrl(),
+        isPublic:     context.troupe().get('security') === 'PUBLIC',
+        twitterLink:  social.generateTwitterShareUrl(),
         facebookLink: social.generateFacebookShareUrl(),
       };
     },

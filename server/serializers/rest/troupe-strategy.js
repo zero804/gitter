@@ -1,13 +1,14 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var logger            = require('gitter-web-env').logger;
-var unreadItemService = require("../../services/unread-item-service");
-var userService       = require("../../services/user-service");
-var recentRoomService = require('../../services/recent-room-service');
+var logger                = require('gitter-web-env').logger;
+var unreadItemService     = require("../../services/unread-item-service");
+var userService           = require("../../services/user-service");
+var recentRoomService     = require('../../services/recent-room-service');
 var roomMembershipService = require('../../services/room-membership-service');
-var billingService    = require('../../services/billing-service');
-var roomPermissionsModel = require('../../services/room-permissions-model');
+var billingService        = require('../../services/billing-service');
+var roomPermissionsModel  = require('../../services/room-permissions-model');
+var troupeService         = require('../../services/troupe-service');
 
 var _                 = require("lodash");
 var uniqueIds         = require('mongodb-unique-ids');
@@ -185,18 +186,50 @@ TroupePermissionsStrategy.prototype = {
   name: 'TroupePermissionsStrategy'
 };
 
+var TroupeOwnerIsOrgStrategy = function (){
+
+  var ownerIsOrg = {};
+
+  this.preload = function (troupes, callback){
+    return Q.all(troupes.map(function(troupe){
+      //sadly Q does not want to resolve the promise if you pass through the
+      //troupe as part of an array
+      //eg `return [ troupe, troupeService... ]`
+      return troupeService.checkGitHubTypeForUri(troupe.lcOwner || '', 'ORG');
+    }))
+    .spread(function(){
+      Array.prototype.slice.apply(arguments)
+        .forEach(function(result, index){
+          //not being able to pass the troupe means we ASSUME they come through in order correctly
+          var troupe = troupes[index];
+          ownerIsOrg[troupe.id] = result;
+        });
+      callback();
+    });
+  };
+
+  this.map = function (troupe){
+    return (ownerIsOrg[troupe.id] || false);
+  };
+};
+
+TroupeOwnerIsOrgStrategy.prototype = {
+  name: 'TroupeOwnerIsOrgStrategy'
+};
+
 function TroupeStrategy(options) {
   if(!options) options = {};
 
   var currentUserId = options.currentUserId;
 
-  var unreadItemStategy = currentUserId && !options.skipUnreadCounts ? new AllUnreadItemCountStategy(options) : null;
+  var unreadItemStategy     = currentUserId && !options.skipUnreadCounts ? new AllUnreadItemCountStategy(options) : null;
   var lastAccessTimeStategy = currentUserId ? new LastTroupeAccessTimesForUserStrategy(options) : null;
-  var favouriteStrategy = currentUserId ? new FavouriteTroupesForUserStrategy(options) : null;
-  var lurkStrategy = currentUserId ? new LurkTroupeForUserStrategy(options) : null;
-  var userIdStategy = new UserIdStrategy(options);
-  var proOrgStrategy = new ProOrgStrategy(options);
-  var permissionsStategy = (currentUserId || options.currentUser) && options.includePermissions ? new TroupePermissionsStrategy(options) : null;
+  var favouriteStrategy     = currentUserId ? new FavouriteTroupesForUserStrategy(options) : null;
+  var lurkStrategy          = currentUserId ? new LurkTroupeForUserStrategy(options) : null;
+  var userIdStategy         = new UserIdStrategy(options);
+  var proOrgStrategy        = new ProOrgStrategy(options);
+  var permissionsStategy    = (currentUserId || options.currentUser) && options.includePermissions ? new TroupePermissionsStrategy(options) : null;
+  var ownerIsOrgStrategy    = (options.includeOwner) ? new TroupeOwnerIsOrgStrategy(options) : null;
 
   this.preload = function(items, callback) {
     var strategies = [];
@@ -259,6 +292,13 @@ function TroupeStrategy(options) {
       strategy: userIdStategy,
       data: userIds
     });
+
+    if(ownerIsOrgStrategy) {
+      strategies.push({
+        strategy: ownerIsOrgStrategy,
+        data: items
+      });
+    }
 
     execPreloads(strategies, callback);
   };
@@ -331,6 +371,7 @@ function TroupeStrategy(options) {
       noindex: item.noindex,
       tags: item.tags,
       permissions: permissionsStategy ? permissionsStategy.map(item) : undefined,
+      ownerIsOrg: ownerIsOrgStrategy ? ownerIsOrgStrategy.map(item) : undefined,
       v: getVersion(item)
     };
   };
