@@ -191,21 +191,34 @@ var TroupeOwnerIsOrgStrategy = function (){
   var ownerIsOrg = {};
 
   this.preload = function (troupes, callback){
-    // Use uniq as the list of items will probably be much smaller than the original set, this means way fewer queries to mongodb
-    var ownersForQuery = _.uniq(troupes.filter(function(troupe){ return !!troupe.lcOwner;}));
+    // Use uniq as the list of items will probably be much smaller than the original set,
+    // this means way fewer queries to mongodb
+    var ownersForQuery = _.uniq(troupes.map(function(troupe){
+      return troupe.lcOwner;
+    }).filter(function(t){
+      return !!t;
+    }));
 
-    return Q.all(ownersForQuery.map(function(troupe){
+    return Q.all(ownersForQuery.map(function(lcOwner){
       //sadly Q does not want to resolve the promise if you pass through the
       //troupe as part of an array
       //eg `return [ troupe, troupeService... ]`
-      return troupeService.checkGitHubTypeForUri(troupe.lcOwner || '', 'ORG');
+      console.log('--- ', lcOwner, ' ---');
+      return troupeService.checkGitHubTypeForUri(lcOwner || '', 'ORG');
     }))
     .then(function(results){
-        results.forEach(function(result, index){
-          //not being able to pass the troupe means we ASSUME they come through in order correctly
-          var troupe = troupes[index];
-          ownerIsOrg[troupe.id] = result;
-        });
+
+      var hashed = ownersForQuery.reduce(function(memo, lcOwnerId, index){
+        memo[lcOwnerId] = results[index];
+        return memo;
+      }, {});
+
+      results.forEach(function(result, index){
+        //not being able to pass the troupe means we ASSUME they come through in order correctly
+        var troupe = troupes[index];
+        ownerIsOrg[troupe.id] = troupe.lcOwner && hashed[troupe.lcOwner];
+      });
+
       callback();
     });
   };
