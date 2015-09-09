@@ -6,7 +6,7 @@ var troupeService        = require('./troupe-service');
 var debug                = require('debug')('gitter:room-context-service');
 var roomPermissionsModel = require('./room-permissions-model');
 var permissionsModel     = require('./permissions-model');
-var Q                    = require('Q');
+var Q                    = require('q');
 
 /**
  * Given a user and a URI returns (promise of) a context object.
