@@ -10,6 +10,9 @@ var KeyboardEventsMixin = require('views/keyboard-events-mixin');
 var platformKeys = require('utils/platform-keys');
 var typeaheads = require('./typeaheads');
 var ChatInputBoxView = require('./chat-input-box-view');
+var apiClient = require('components/apiClient');
+
+require('views/behaviors/isomorphic');
 require('jquery-textcomplete');
 require('views/behaviors/tooltip');
 
@@ -59,11 +62,13 @@ module.exports = (function() {
     ui: {
       composeToggle: '.js-toggle-compose-mode',
       textarea: '#chat-input-textarea',
+      joinRoom: '.js-join-room'
     },
 
     events: {
       'click @ui.composeToggle': 'toggleComposeMode',
-      'paste': 'onPaste'
+      'paste': 'onPaste',
+      'click @ui.joinRoom': 'joinRoom'
     },
 
     keyboardEvents: {
@@ -72,7 +77,7 @@ module.exports = (function() {
     },
 
     initialize: function(options) {
-      this.bindUIElements(); // TODO: use regions
+      //this.bindUIElements(); // TODO: use regions
       this.composeMode = new ComposeMode();
       this.compactView = options.compactView;
 
@@ -125,43 +130,48 @@ module.exports = (function() {
     onRender: function() {
       var $textarea = this.ui.textarea;
 
-      var inputBox = new ChatInputBoxView({
-        el: $textarea,
-        composeMode: this.composeMode,
-        autofocus: !this.compactView,
-        value: $textarea.val(),
-        commands: commands,
-        template: false
-      });
-      inputBox.render();
+      // goddam why is not picking up the UI.
+      $('.js-join-room').click(this.joinRoom)
+      
+      if ($textarea.length) {
+        var inputBox = new ChatInputBoxView({
+          el: $textarea,
+          composeMode: this.composeMode,
+          autofocus: !this.compactView,
+          value: $textarea.val(),
+          commands: commands,
+          template: false
+        });
+        inputBox.render();
 
-      this.inputBox = inputBox;
-      $textarea.textcomplete(typeaheads);
+        this.inputBox = inputBox;
+        $textarea.textcomplete(typeaheads);
 
-      // Use 'on' and 'off' instead of proper booleans as attributes are strings
-      $textarea.on('textComplete:show', function() {
-        $textarea.attr('data-prevent-keys', 'on');
-      });
+        // Use 'on' and 'off' instead of proper booleans as attributes are strings
+        $textarea.on('textComplete:show', function() {
+          $textarea.attr('data-prevent-keys', 'on');
+        });
 
-      $textarea.on('textComplete:hide', function() {
-        // Defer change to make sure the last key event is prevented
-        setTimeout(function() {
-          $textarea.attr('data-prevent-keys', 'off');
-        }, 0);
-      });
+        $textarea.on('textComplete:hide', function() {
+          // Defer change to make sure the last key event is prevented
+          setTimeout(function() {
+            $textarea.attr('data-prevent-keys', 'off');
+          }, 0);
+        });
 
-      // http://stackoverflow.com/questions/16149083/keyboardshrinksview-makes-lose-focus/18904886#18904886
-      $textarea.on('touchend', function(){
-        window.setTimeout(function() {
-          $textarea.focus();
-        }, 300);
+        // http://stackoverflow.com/questions/16149083/keyboardshrinksview-makes-lose-focus/18904886#18904886
+        $textarea.on('touchend', function(){
+          window.setTimeout(function() {
+            $textarea.focus();
+          }, 300);
 
-        return true;
-      });
+          return true;
+        });
 
-      this.listenTo(this.inputBox, 'save', this.send);
-      this.listenTo(this.inputBox, 'subst', this.subst);
-      this.listenTo(this.inputBox, 'editLast', this.editLast);
+        this.listenTo(this.inputBox, 'save', this.send);
+        this.listenTo(this.inputBox, 'subst', this.subst);
+        this.listenTo(this.inputBox, 'editLast', this.editLast);
+      }
     },
 
     toggleComposeMode: function (event) {
@@ -302,6 +312,15 @@ module.exports = (function() {
         el.selectionStart = el.selectionEnd = selectionStart + markdown.length;
         e.preventDefault();
       }
+    },
+
+    joinRoom: function(e) {
+      if (e) e.preventDefault();
+
+      apiClient.post('/v1/rooms/' + context.getTroupeId() + '/users')
+      .then(function(res) {
+        location.reload();
+      });
     }
   });
 

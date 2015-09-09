@@ -279,6 +279,8 @@ function renderChat(req, res, options, next) {
         var classNames = options.classNames || [];
 
 
+        console.log('uriContext', req.uriContext);
+
         if(troupe.githubType === 'REPO' || troupe.githubType === 'ORG') {
           githubLink = 'https://github.com/' + req.uriContext.uri;
         }
@@ -324,7 +326,8 @@ function renderChat(req, res, options, next) {
             integrationsUrl: integrationsUrl,
             inputAutoFocus: !options.mobile,
             placeholder: 'Click here to type a chat message. Supports GitHub flavoured markdown.',
-            ownerIsOrg: ownerIsOrg
+            ownerIsOrg: ownerIsOrg,
+            roomMember: req.uriContext.roomMember
           }, troupeContext && {
             troupeTopic: troupeContext.troupe.topic,
             premium: troupeContext.troupe.premium,

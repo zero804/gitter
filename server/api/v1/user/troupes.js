@@ -43,6 +43,8 @@ module.exports = {
     var troupe = req.userTroupe;
     var troupeId = troupe.id;
 
+    console.log('POSTED TO TROUPE');
+
     return roomMembershipService.checkRoomMembership(troupeId, userId)
       .then(function(isMember) {
 
@@ -74,6 +76,10 @@ module.exports = {
           if (isMember && !troupe.oneToOne) {
             promises.push(roomService.updateTroupeLurkForUserId(userId, troupeId, updatedTroupe.lurk));
           }
+        }
+
+        if (!isMember) {
+          console.log('not a member');
         }
 
         return Q.all(promises);
