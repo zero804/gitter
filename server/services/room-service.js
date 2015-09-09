@@ -61,6 +61,12 @@ function sendJoinStats(user, room, tracking) {
   });
 }
 
+function extendStatusError(statusCode, options) {
+  var err = new StatusError(statusCode);
+  _.extend(err, options);
+  return err;
+}
+
 function applyAutoHooksForRepoRoom(user, troupe) {
   validate.expect(user, 'user is required');
   validate.expect(troupe, 'troupe is required');
@@ -178,8 +184,7 @@ function findOrCreateGroupRoom(user, troupe, uri, options) {
         officialUri.toLowerCase() === uri.toLowerCase()) {
 
         debug('Redirecting client from %s to official uri %s', uri, officialUri);
-
-        throw { redirect: '/' + officialUri };
+        throw extendStatusError(301, { path:  '/' + officialUri  });
       }
 
       /* Room does not yet exist */
@@ -507,8 +512,8 @@ function findOrCreateRoom(user, uri, options) {
   }
 
   /* First off, try use local data to figure out what this url is for */
-  return uriResolver(uri, options)
-    .spread(function (resolvedUser, resolvedTroupe) {
+  return uriResolver(user && user.id, uri, options)
+    .spread(function (resolvedUser, resolvedTroupe, roomMember) {
       /* Deal with the case of the nonloggedin user first */
       if(!user) {
         if(resolvedUser) {
@@ -529,7 +534,8 @@ function findOrCreateRoom(user, uri, options) {
 
               return {
                 troupe: resolvedTroupe,
-                uri: resolvedTroupe.uri
+                uri: resolvedTroupe.uri,
+                roomMember: false
               };
             });
         }
@@ -563,24 +569,40 @@ function findOrCreateRoom(user, uri, options) {
 
         return permissionsModel(user, 'view', resolvedUser.username, 'ONETOONE', null)
           .then(function(access) {
-            if(!access) return null;
+            if(!access) {
+              // TODO: check whether this needs a slash at the front
+              throw extendStatusError(404, { githubType: 'ONETOONE', uri: resolvedUser.username });
+            }
             return troupeService.findOrCreateOneToOneTroupeIfPossible(userId, resolvedUser.id)
               .spread(function(troupe, resolvedUser) {
                 return {
                   oneToOne: true,
                   troupe: troupe,
                   otherUser: resolvedUser,
-                  uri: resolvedUser.username
+                  uri: resolvedUser.username,
+                  roomMember: true
                 };
               });
           });
       }
 
-      debug("localUriLookup returned room %s for uri=%s. Finding or creating room", uriLookup && uriLookup.troupe && uriLookup.troupe.uri, uri);
+
+      if (resolvedTroupe && roomMember) {
+        debug("User is already a member of the room %s. Allowing access", resolvedTroupe.uri);
+
+        return {
+          troupe: resolvedTroupe,
+          uri: resolvedTroupe.uri,
+          roomMember: roomMember
+        };
+      }
+
+      debug("localUriLookup returned room %s for uri=%s. Finding or creating room", resolvedTroupe && resolvedTroupe.uri, uri);
 
       // need to check for the rooms
       return findOrCreateGroupRoom(user, resolvedTroupe, uri, options)
         .then(function(findOrCreateResult) {
+          console.log('findOrCreateResult', findOrCreateResult);
           var troupe = findOrCreateResult.troupe;
           var access = findOrCreateResult.access;
           var hookCreationFailedDueToMissingScope = findOrCreateResult.hookCreationFailedDueToMissingScope;
@@ -590,9 +612,24 @@ function findOrCreateRoom(user, uri, options) {
             emailNotificationService.createdRoomNotification(user, troupe);  // now the san email to the room', wne
           }
 
+          if(didCreate) {
+            stats.event("create_room", {
+              userId: user.id,
+              roomType: "github-room"
+            });
+          }
+
           return ensureAccessControl(user, troupe, access)
             .then(function (userRoomMembershipChanged) {
-              if (!access) return denyAccess(resolvedTroupe); // please see comment about denyAccess
+              if (!access) {
+                var githubType = troupe && troupe.githubType;
+                // Only leak the githubType for ORGS and USERS
+                // otherwise it's a security breach
+                if (githubType != 'ORG' && githubType !== 'ONETOONE') githubType = null
+                var uri = githubType ? troupe && troupe.uri : null;
+
+                throw extendStatusError(404, { githubType: githubType, uri: uri });
+              }
 
               // if the user has been granted access to the room, send join stats for the cases of being the owner or just joining the room
               if(access && (didCreate || userRoomMembershipChanged)) {
@@ -603,7 +640,7 @@ function findOrCreateRoom(user, uri, options) {
               updateRoomWithGithubIdIfRequired(user, troupe);
 
               return {
-                oneToOne: false,
+                // oneToOne: false,
                 troupe: troupe,
                 hookCreationFailedDueToMissingScope: hookCreationFailedDueToMissingScope,
                 didCreate: didCreate,
@@ -611,16 +648,6 @@ function findOrCreateRoom(user, uri, options) {
               };
             });
         });
-    })
-    .then(function(uriLookup) {
-      if(uriLookup && uriLookup.didCreate) {
-        stats.event("create_room", {
-          userId: user.id,
-          roomType: "github-room"
-        });
-      }
-
-      return uriLookup;
     });
 }
 

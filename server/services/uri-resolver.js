@@ -10,15 +10,16 @@ var debug              = require('debug')('gitter:uri-resolver');
 var StatusError        = require('statuserror');
 
 /**
- * Returns [user, troupe] where either user XOR troupe
+ * Returns [user, troupe, roomMember] where either user XOR troupe and access is set
+ * if the uri resolved to a troupe (not a user)
  */
-module.exports = function uriResolver(uri, options) {
+module.exports = function uriResolver(userId, uri, options) {
   debug("uriResolver %s", uri);
   var ignoreCase = options && options.ignoreCase;
 
   return uriLookupService.lookupUri(uri)
     .then(function (uriLookup) {
-      if (!uriLookup) throw new StatusError(404);
+      if (!uriLookup) return [];
 
       if(uriLookup.userId) {
         /* One to one */
@@ -29,7 +30,7 @@ module.exports = function uriResolver(uri, options) {
 
               return uriLookupService.removeBadUri(uri)
                 .then(function() {
-                  throw new StatusError(404);
+                  return [];
                 });
             }
 
@@ -47,28 +48,27 @@ module.exports = function uriResolver(uri, options) {
       }
 
       if(uriLookup.troupeId) {
-        // TODO: get rid of this findById, make it lean, etc
-        return troupeService.findById(uriLookup.troupeId)
-          .then(function(troupe) {
+        return troupeService.findByIdLeanWithAccess(uriLookup.troupeId, userId)
+          .spread(function(troupe, roomMember) {
             if(!troupe) {
               logger.info('Removing stale uri: ' + uri + ' from URI lookups');
 
               return uriLookupService.removeBadUri(uri)
                 .then(function() {
-                  throw new StatusError(404);
+                  return [];
                 });
             }
 
             // The room is an exact match
             if (troupe.uri === uri) {
-              return [null, troupe];
+              return [null, troupe, roomMember];
             }
 
             // The room resolves, but differs from the requested uri
             if(troupe.uri.toLowerCase() === uri.toLowerCase() && ignoreCase) {
               /* Only the case is wrong and we're ignore case differences.... */
               logger.info('Incorrect case for room: ' + uri + ' redirecting to ' + troupe.uri);
-              return [null, troupe];
+              return [null, troupe, roomMember];
             }
 
             var redirect = new StatusError(301);

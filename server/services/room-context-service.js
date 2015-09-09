@@ -33,8 +33,9 @@ function findContextForUri(user, uri, options) {
   if (!uri) return Q.reject(new StatusError(400, 'uri required'));
 
   /* First off, try use local data to figure out what this url is for */
-  return uriResolver(uri, options)
-    .spread(function (resolvedUser, resolvedTroupe) {
+  return uriResolver(user && user.id, uri, options)
+    .spread(function (resolvedUser, resolvedTroupe, roomMember) {
+
       // The uri resolved to a user, we need to do a one-to-one
       if(resolvedUser) {
         if(!user) {
@@ -60,6 +61,7 @@ function findContextForUri(user, uri, options) {
               .spread(function(troupe, resolvedUser) {
                 return {
                   troupe: troupe,
+                  roomMember: true,
                   oneToOneUser: resolvedUser,
                   uri: resolvedUser.username
                 };
@@ -68,6 +70,15 @@ function findContextForUri(user, uri, options) {
       }
 
       if (resolvedTroupe) {
+        if (roomMember) {
+          // TODO: periodically check whether the user still has access
+          return {
+            troupe: resolvedTroupe,
+            uri: resolvedTroupe.uri,
+            roomMember: true
+          };
+        }
+
         return roomPermissionsModel(user, 'view', resolvedTroupe)
           .then(function(access) {
             if (!access) {
@@ -80,17 +91,19 @@ function findContextForUri(user, uri, options) {
 
             return {
               troupe: resolvedTroupe,
-              uri: resolvedTroupe.uri
+              uri: resolvedTroupe.uri,
+              roomMember: false
             };
           });
       }
 
-      // No user, no room. This shouldn't happen
+      // No user, no room. 404
       throw new StatusError(404);
     });
 
 }
 
+// TODO: needs work, needs to expose roomMember
 function findContextForId(user, troupeId, readOnly) {
   return troupeService.findByIdLeanWithAccess(troupeId, user.id)
     .spread(function(troupe, access) {
