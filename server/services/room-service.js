@@ -602,7 +602,6 @@ function findOrCreateRoom(user, uri, options) {
       // need to check for the rooms
       return findOrCreateGroupRoom(user, resolvedTroupe, uri, options)
         .then(function(findOrCreateResult) {
-          console.log('findOrCreateResult', findOrCreateResult);
           var troupe = findOrCreateResult.troupe;
           var access = findOrCreateResult.access;
           var hookCreationFailedDueToMissingScope = findOrCreateResult.hookCreationFailedDueToMissingScope;
@@ -625,7 +624,7 @@ function findOrCreateRoom(user, uri, options) {
                 var githubType = troupe && troupe.githubType;
                 // Only leak the githubType for ORGS and USERS
                 // otherwise it's a security breach
-                if (githubType != 'ORG' && githubType !== 'ONETOONE') githubType = null
+                if (githubType != 'ORG' && githubType !== 'ONETOONE') githubType = null;
                 var uri = githubType ? troupe && troupe.uri : null;
 
                 throw extendStatusError(404, { githubType: githubType, uri: uri });
@@ -1482,6 +1481,6 @@ function deleteRoom(troupe) {
           // TODO: webhooks
         ]);
 
-    })
+    });
 }
 exports.deleteRoom = deleteRoom;
