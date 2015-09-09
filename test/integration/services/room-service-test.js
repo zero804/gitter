@@ -80,8 +80,10 @@ describe('room-service #slow', function() {
       });
 
       return roomService.findOrCreateRoom(fixture.user1, 'gitterTest')
-        .then(function (uriContext) {
-          assert.equal(uriContext, null);
+        .then(function () {
+          assert(false, 'Expected an exception');
+        }, function(err) {
+          assert.strictEqual(err.status, 404);
         })
         .nodeify(done);
     });
@@ -89,13 +91,13 @@ describe('room-service #slow', function() {
     it('should deny access but provide public rooms #slow', function (done) {
 
       var permissionsModelMock = mockito.mockFunction();
-      var uriLookupServiceMock = mockito.mock(testRequire('./services/uri-lookup-service'));
+      // var uriLookupServiceMock = mockito.mock(testRequire('./services/uri-lookup-service'));
+      var uriResolver = mockito.mockFunction();
       var troupeServiceMock = mockito.mock(testRequire('./services/troupe-service'));
 
       var roomService = testRequire.withProxies('./services/room-service', {
-        './uri-lookup-service': uriLookupServiceMock,
-        './permissions-model': permissionsModelMock,
-        './troupe-service':  troupeServiceMock
+        './uri-resolver': uriResolver,
+        './permissions-model': permissionsModelMock
       });
 
       mockito
@@ -110,20 +112,9 @@ describe('room-service #slow', function() {
         });
 
       mockito
-        .when(uriLookupServiceMock)
-        .lookupUri()
+        .when(uriResolver)()
         .then(function () {
-          return Q.resolve({
-            uri: 'gitterTest',
-            troupeId: '5436981c00062eebf0fbc0d5'
-          });
-        });
-
-      mockito
-        .when(troupeServiceMock)
-        .findById()
-        .then(function () {
-          return Q.resolve({
+          return Q.resolve([null, {
               _id: '5436981c00062eebf0fbc0d5',
               githubType: 'ORG',
               uri: 'gitterTest',
@@ -134,15 +125,18 @@ describe('room-service #slow', function() {
               lcUri: 'gitterhq',
               tags: [],
               topic: 'Gitter',
-          });
+          }, false]);
         });
 
       // test
       roomService
         .findOrCreateRoom(fixture.user1, 'gitterTest')
-        .then(function (uriContext) {
-          var githubType = uriContext.accessDenied && uriContext.accessDenied.githubType;
-          assert(githubType === 'ORG');
+        .then(function () {
+          assert(false, 'Expected an exception');
+        }, function(err) {
+          assert.strictEqual(err.status, 404);
+          assert.strictEqual(err.githubType, 'ORG');
+          assert.strictEqual(err.uri, 'gitterTest');
         })
         .nodeify(done);
     });
@@ -203,7 +197,19 @@ describe('room-service #slow', function() {
     });
 
     it('should create a room for a repo', function(done) {
-      var roomService = testRequire("./services/room-service");
+      var permissionsModelMock = mockito.mockFunction();
+      var roomService = testRequire.withProxies("./services/room-service", {
+        './permissions-model': permissionsModelMock
+      });
+
+      mockito.when(permissionsModelMock)().then(function(user, right, uri, githubType) {
+        assert.equal(user.username, fixture.user1.username);
+        assert.equal(right, 'create');
+        assert.equal(uri, 'gitterHQ/cloaked-avenger');
+        assert.equal(githubType, 'REPO');
+
+        return Q.resolve(true);
+      });
 
       return roomService.findOrCreateRoom(fixture.user1, 'gitterHQ/cloaked-avenger')
         .nodeify(done);
@@ -273,7 +279,8 @@ describe('room-service #slow', function() {
             .then(function() {
               assert(false, 'Expected redirect');
             }, function(err) {
-              assert(err.redirect, 'gitterHQ/sandbox');
+              assert.strictEqual(err.status, 301);
+              assert.strictEqual(err.path, '/gitterHQ/sandbox');
             });
         })
         .nodeify(done);
@@ -283,8 +290,10 @@ describe('room-service #slow', function() {
       var roomService = testRequire("./services/room-service");
 
       return roomService.findOrCreateRoom(fixture.user1, 'joyent')
-        .then(function (uriContext) {
-          assert(!uriContext);
+        .then(function () {
+          assert(false, 'Expected exception');
+        }, function(err) {
+          assert.strictEqual(err.status, 404);
         })
         .nodeify(done);
     });
@@ -303,10 +312,12 @@ describe('room-service #slow', function() {
       });
 
       return roomService.findOrCreateRoom(fixture.user3, fixture.troupeOrg1.uri)
-        .then(function(result) {
-          assert(result.accessDenied);
-          assert.strictEqual(result.accessDenied.githubType, 'ORG');
-          assert.strictEqual(result.uri, fixture.troupeOrg1.uri);
+        .then(function () {
+          assert(false, 'Expected exception');
+        }, function(err) {
+          assert.strictEqual(err.status, 404);
+          assert.strictEqual(err.githubType, 'ORG');
+          assert.strictEqual(err.uri, fixture.troupeOrg1.uri);
         })
         .nodeify(done);
     });
