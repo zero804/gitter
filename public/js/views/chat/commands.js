@@ -18,16 +18,13 @@ module.exports = (function() {
       },
       completion: 'ban @',
       regexp: /^\/ban/,
-      action: function(view) {
-        var userMatch = view.$el.val().match(/\/ban @([\w\-]+)(\s+(removemsgs))?/);
+      action: function(text) {
+        var userMatch = text.match(/\/ban @([\w\-]+)(\s+(removemsgs))?/);
         if (!userMatch) return;
         var user = userMatch[1];
         var removeMessages = !!userMatch[3];
 
         apiClient.room.post('/bans', { username: user, removeMessages: removeMessages })
-          .then(function() {
-            view.reset();
-          })
           .fail(function(xhr) {
             var errorMessage;
             switch(xhr.status) {
@@ -59,12 +56,10 @@ module.exports = (function() {
       description: 'Create/join a channel',
       completion: 'channel ',
       regexp: /^\/channel/,
-      action: function(view) {
-        var input = view.$el.val();
-        var channelMatch = input.match(/^\s*\/channel(?:\s+(\w+))?/);
+      action: function(text) {
+        var channelMatch = text.match(/^\s*\/channel(?:\s+(\w+))?/);
         var channel = channelMatch[1];
 
-        view.$el.val('');
         if(channel) {
           appEvents.trigger('route', 'createcustomroom/' + channel);
         } else {
@@ -77,15 +72,10 @@ module.exports = (function() {
       description: 'Toggle the room as a favourite',
       completion: 'fav ',
       regexp: /^\/fav\s*$/,
-      action: function(view) {
+      action: function() {
         var isFavourite = !context.troupe().get('favourite');
 
-        apiClient.userRoom.put('', { favourite: isFavourite })
-          .then(function() {
-            view.reset();
-          });
-
-        view.reset();
+        apiClient.userRoom.put('', { favourite: isFavourite });
       }
     },
     {
@@ -96,14 +86,11 @@ module.exports = (function() {
       criteria: function() {
         return !context.inOneToOneTroupeContext();
       },
-      action: function(view) {
-        view.reset();
-
+      action: function() {
         apiClient.room.delete('/users/' + context.getUserId(), { })
           .then(function() {
             appEvents.trigger('navigation', '/home', 'home', ''); // TODO: figure out a title
           });
-
       }
     },
     {
@@ -114,9 +101,7 @@ module.exports = (function() {
       criteria: function() {
         return !context.inOneToOneTroupeContext();
       },
-      action: function(view) {
-        view.reset();
-
+      action: function() {
         var c = 0;
         function done() {
           if(++c == 2) {
@@ -145,11 +130,10 @@ module.exports = (function() {
       description: 'Have a private conversation with @username',
       completion: 'query @',
       regexp: /^\/query/,
-      action: function(view) {
-        var userMatch = view.$el.val().match(/\/query @([\w\-]+)/);
+      action: function(text) {
+        var userMatch = text.match(/\/query @([\w\-]+)/);
         if (!userMatch) return;
         var user = userMatch[1];
-        view.reset();
 
         var url = '/' + user;
         var type = user === context.user().get('username') ? 'home' : 'chat';
@@ -166,25 +150,22 @@ module.exports = (function() {
       },
       completion: 'remove @',
       regexp: /^\/remove/,
-      action: function(view) {
-        var userMatch = view.$el.val().match(/\/remove @([\w\-]+)/);
+      action: function(text) {
+        var userMatch = text.match(/\/remove @([\w\-]+)/);
         if (!userMatch) return;
         var user = userMatch[1];
         appEvents.trigger('command.room.remove', user);
-        view.reset();
       }
     },
     {
       command: 'subst',
       regexp: /^s\/([^\/]+)\/([^\/]*)\/i?(g?)\s*$/,
-      action: function(view) {
-        var re = this.regexp.exec(view.$el.val());
+      action: function(text) {
+        var re = this.regexp.exec(text);
         var search = re[1];
         var replace = re[2];
         var global = !!re[3];
-        view.trigger('subst', search, replace, global);
-
-        view.reset();
+        appEvents.trigger('chatCollectionView:substLastChat', context.getUserId(), search, replace, global);
       }
     },
     {
@@ -192,9 +173,8 @@ module.exports = (function() {
       description: 'Collapse chat messages with embedded media',
       completion: 'collapse ',
       regexp: /^\/collapse\s*$/,
-      action: function(view) {
+      action: function() {
         appEvents.trigger('command.collapse.chat');
-        view.reset();
       }
     },
     {
@@ -202,9 +182,8 @@ module.exports = (function() {
       description: 'Expand chat messages with embedded media',
       completion: 'expand ',
       regexp: /^\/expand\s*$/,
-      action: function(view) {
+      action: function() {
         appEvents.trigger('command.expand.chat');
-        view.reset();
       }
     },
     {
@@ -215,11 +194,10 @@ module.exports = (function() {
       },
       completion: 'topic ',
       regexp: /^\/topic/,
-      action: function(view) {
-        var topicMatch = view.$el.val().match(/^\/topic (.+)/);
+      action: function(text) {
+        var topicMatch = text.match(/^\/topic (.+)/);
         if (topicMatch) {
           var topic = topicMatch[1];
-          view.reset();
 
           context.troupe().set('topic', topic);
 
@@ -237,15 +215,12 @@ module.exports = (function() {
       },
       completion: 'unban @',
       regexp: /^\/unban/,
-      action: function(view) {
-        var userMatch = view.$el.val().match(/\/unban @([\w\-]+)/);
+      action: function(text) {
+        var userMatch = text.match(/\/unban @([\w\-]+)/);
         if (!userMatch) return;
         var user = userMatch[1];
 
         apiClient.room.delete('/bans/' + user, { })
-          .then(function() {
-            view.reset();
-          })
           .fail(function(xhr) {
             var errorMessage;
             switch(xhr.status) {

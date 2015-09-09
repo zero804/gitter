@@ -35,6 +35,15 @@ module.exports = (function() {
     return element === parent;
   }
 
+  function getLastEditableMessageFromUser(collection, userId) {
+    var usersChats = collection.filter(function(f) {
+      var fromUser = f.get('fromUser');
+      return fromUser && fromUser.id === userId;
+    });
+
+    return usersChats[usersChats.length - 1];
+  }
+
   /** @const */
   var PAGE_SIZE = 100;
 
@@ -186,7 +195,8 @@ module.exports = (function() {
 
       this.listenTo(appEvents, 'chatCollectionView:pageUp', this.pageUp);
       this.listenTo(appEvents, 'chatCollectionView:pageDown', this.pageDown);
-      this.listenTo(appEvents, 'chatCollectionView:editChat', this.editChat);
+      this.listenTo(appEvents, 'chatCollectionView:editLastChat', this.editLastChat);
+      this.listenTo(appEvents, 'chatCollectionView:substLastChat', this.substLastChat);
       this.listenTo(appEvents, 'chatCollectionView:viewportResize', this.viewportResize);
       this.listenTo(appEvents, 'chatCollectionView:scrollToChatId', this.scrollToChatId);
     },
@@ -362,11 +372,24 @@ module.exports = (function() {
       e.preventDefault();
     },
 
-    editChat: function(chat) {
-      var chatItemView = this.children.findByModel(chat);
+    editLastChat: function(userId) {
+      var model = getLastEditableMessageFromUser(this.collection, userId);
+      if (!model) return;
+
+      var chatItemView = this.children.findByModel(model);
       if(!chatItemView) return;
 
       chatItemView.toggleEdit();
+    },
+
+    substLastChat: function(userId, search, replace, global) {
+      var model = getLastEditableMessageFromUser(this.collection, userId);
+      if (!model) return;
+
+      var chatItemView = this.children.findByModel(model);
+      if(!chatItemView) return;
+
+      chatItemView.subst(search, replace, global);
     },
 
     viewportResize: function(animated) {
