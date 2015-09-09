@@ -173,6 +173,7 @@ function createTroupeContext(req, options) {
   if (events) { req.session.events = []; }
 
   return _.extend({
+    roomMember: req.uriContext.roomMember,
     user: options.user,
     troupe: options.troupe,
     homeUser: options.homeUser,
