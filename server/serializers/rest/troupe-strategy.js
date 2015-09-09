@@ -203,7 +203,6 @@ var TroupeOwnerIsOrgStrategy = function (){
       //sadly Q does not want to resolve the promise if you pass through the
       //troupe as part of an array
       //eg `return [ troupe, troupeService... ]`
-      console.log('--- ', lcOwner, ' ---');
       return troupeService.checkGitHubTypeForUri(lcOwner || '', 'ORG');
     }))
     .then(function(results){
