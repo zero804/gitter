@@ -355,6 +355,19 @@ module.exports = (function() {
       }
     },
 
+    subst: function(search, replace, global) {
+      if(!this.canEdit()) return;
+
+      var reString = search.replace(/(^|[^\[])\^/g, '$1');
+      var re = new RegExp(reString, global ? "gi" : "i");
+      var newText = this.model.get('text').replace(re, replace);
+
+      this.model.set({
+        text: newText,
+        html: null
+      }).save();
+    },
+
     setCollapse: function (state) {
       state = !!state;
       var chatId = this.model.get('id');

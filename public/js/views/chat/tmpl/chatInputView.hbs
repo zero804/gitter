@@ -2,8 +2,6 @@
   <div class="chat-input__avatar">
     {{ widget "avatar" model=user size='s' showTooltip=false }}
   </div>
-  <form class="chat-input__box" name="chat">
-    <textarea class="chat-input__text-area" name="chat" id="chat-input-textarea" placeholder="{{placeholder}}" {{#if inputAutoFocus}}autofocus{{/if}} autocomplete="off" maxlength="4096">{{value}}</textarea>
-  </form>
+  <div id="chat-input-box-region"></div>
   <div id="chat-input-buttons-region" class="chat-input__buttons"></div>
 </div>
