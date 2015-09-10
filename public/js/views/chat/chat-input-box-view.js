@@ -168,15 +168,15 @@ var ChatInputBoxView = Marionette.ItemView.extend({
     var shouldHandle = handler.mods.length || !isComposeModeEnabled;
     // Need to test behaviour with typeahead
     if(!this.isTypeaheadShowing() && shouldHandle) {
-      if(this.hasVisibleText()) {
-        this.processInput();
-      }
+      this.processInput();
       event.preventDefault();
       return false;
     }
   },
 
   processInput: function() {
+    if (!this.hasVisibleText()) return;
+
     var text = this.ui.textarea.val();
     var cmd = commands.findMatch(text);
     if (cmd) {
