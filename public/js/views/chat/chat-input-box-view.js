@@ -108,7 +108,11 @@ var ChatInputBoxView = Marionette.ItemView.extend({
   },
 
   onTextChange: function() {
-    console.log('change');
+    if (this.ui.textarea.val()) {
+      this.expandTextareaIfNeeded();
+    } else {
+      this.shrinkTextarea();
+    }
   },
 
   onPaste: function(e) {
@@ -140,20 +144,20 @@ var ChatInputBoxView = Marionette.ItemView.extend({
     }
   },
 
-  onKeyUp: function() {
-    // this.chatResizer.resizeInput();
-  },
-
   onBlur: function() {
     function isMobile() {return false;}
 
-    if(isMobile() && !this.isTypeaheadShowing()) {
+    if (this.isTypeaheadShowing()) return;
+
+    if (isMobile()) {
       this.processInput();
+    } else {
+      this.resetTextareaSize();
     }
   },
 
   onKeyEditLast: function() {
-    if (this.hasVisibleText()) return;
+    if (this.ui.textarea.val()) return;
 
     appEvents.trigger('chatCollectionView:editLastChat', context.getUserId());
   },
@@ -203,7 +207,6 @@ var ChatInputBoxView = Marionette.ItemView.extend({
   clear: function() {
     this.setText('');
     if (this.drafty) this.drafty.reset();
-    // this.chatResizer.resetInput();
   },
 
   append: function(text, options) {
@@ -254,8 +257,8 @@ var ChatInputBoxView = Marionette.ItemView.extend({
   setText: function(text) {
     this.ui.textarea.val(text);
 
-    // trigger any dom listeners
-    this.onInput();
+    // trigger the textarea resizing
+    this.onTextChange();
   },
 
   setCaretPosition: function(position) {
@@ -265,6 +268,31 @@ var ChatInputBoxView = Marionette.ItemView.extend({
     var el = this.ui.textarea[0];
     el.focus();
     el.setSelectionRange(position, position);
+  },
+
+  resetTextareaSize: function() {
+    this.shrinkTextarea();
+    this.expandTextareaIfNeeded();
+  },
+
+  shrinkTextarea: function() {
+    this.ui.textarea.css('height', '');
+    appEvents.trigger('chatCollectionView:viewportResize', false);
+  },
+
+  expandTextareaIfNeeded: function() {
+    var $textarea = this.ui.textarea;
+    var textarea = $textarea[0];
+    var currentHeight = textarea.offsetHeight;
+    var scrollHeight = textarea.scrollHeight;
+    var maxHeight = window.innerHeight / 2;
+
+    var newHeight = Math.min(scrollHeight, maxHeight);
+
+    if (newHeight > currentHeight) {
+      $textarea.css('height', newHeight);
+      appEvents.trigger('chatCollectionView:viewportResize', true);
+    }
   },
 
   addTextareaExtensions: function() {
