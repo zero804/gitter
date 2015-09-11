@@ -147,7 +147,7 @@ exports.authorization = [
   },
   function(err, req, res, next) {
     stats.event('oauth.authorize.failed');
-    errorReporter(err, { oauthAuthorizationDialog: "failed" });
+    errorReporter(err, { oauthAuthorizationDialog: "failed" }, { module: 'oauth2' });
 
     var missingParams = ['response_type', 'redirect_uri', 'client_id']
           .filter(function(param) {

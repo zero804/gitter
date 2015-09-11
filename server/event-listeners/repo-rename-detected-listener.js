@@ -16,7 +16,7 @@ exports.install = function() {
     roomService.renameRepo(oldFullName, newFullName)
       .catch(function(err) {
         logger.error('Error while renaming repo ' + oldFullName + ' to ' + newFullName + ': ' + err, { exception: err });
-        errorReporter(err, { oldFullName: oldFullName, newFullName: newFullName });
+        errorReporter(err, { oldFullName: oldFullName, newFullName: newFullName }, { module: 'repo-renamer' });
       });
   });
 };

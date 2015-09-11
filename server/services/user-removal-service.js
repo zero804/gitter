@@ -31,7 +31,7 @@ exports.removeByUsername = function(username, options) {
         })
         .then(function() {
           if (options && options.deleteUser) {
-            return user.removeQ();
+            return user.remove();
           }
 
           user.state = 'REMOVED';
@@ -41,7 +41,7 @@ exports.removeByUsername = function(username, options) {
 
           // TODO: remove user from intercom etc
 
-          return user.saveQ();
+          return user.save();
         });
 
     });

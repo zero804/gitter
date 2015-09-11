@@ -501,10 +501,15 @@ module.exports = (function() {
     },
 
     scroll: function() {
+      //FIXME JP 26/8/15
+      //https://github.com/troupe/gitter-webapp/issues/517
+
+      /*
       var mv = this.messagesView.children.findByModel(this.navigation.current());
       if (mv) this.messagesView.scrollTo(mv);
       var rv = this.roomsView.children.findByModel(this.navigation.current());
       if (rv) this.roomsView.scrollTo(rv);
+      */
     }
   });
 

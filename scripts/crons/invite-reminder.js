@@ -46,12 +46,13 @@ function populate(users, invitees, rooms) {
 
 function markAsReminded(user) {
   user.inviteReminderSent = new Date();
-  return user.saveQ().catch(die); // This seems a bit nasty?
+  return user.save().catch(die); // This seems a bit nasty?
 }
 
 // run the script
 persistenceService.User
-  .findQ({ state: 'INVITED', _id: { $lt: mongoUtils.createIdForTimestamp(Date.now() - REMINDER_DAYS * DAY) }, inviteReminderSent: { $exists: false }, invitedByUser: { $exists: true }, invitedToRoom: { $exists: true } })
+  .find({ state: 'INVITED', _id: { $lt: mongoUtils.createIdForTimestamp(Date.now() - REMINDER_DAYS * DAY) }, inviteReminderSent: { $exists: false }, invitedByUser: { $exists: true }, invitedToRoom: { $exists: true } })
+  .exec()
   .then(function (users) { console.log(users); return users; })
   .then(mapInviteesAndRooms)
   .spread(populate)

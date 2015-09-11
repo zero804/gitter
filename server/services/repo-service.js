@@ -69,7 +69,7 @@ function findPublicReposWithRoom(user, query, options) {
       security: 'PUBLIC'
     })
     .limit(options.limit || 20)
-    .execQ()
+    .exec()
     .then(function(troupes) {
       return Q.all(troupes.map(function(troupe) {
         if(troupe.security === 'PUBLIC') {
@@ -105,7 +105,7 @@ function findReposByUris(uris) {
   });
 
   winston.info("Querying findReposByUris for " + uris.length + " repositories");
-  return persistence.Troupe.findQ({
+  return persistence.Troupe.find({
       githubType: 'REPO',
       lcUri: { $in: uris }
     }, {
@@ -113,6 +113,7 @@ function findReposByUris(uris) {
       githubId: 1,
       security: 1
     })
+    .exec()
     .then(function(troupes) {
       return troupes.map(function(t) {
         return {

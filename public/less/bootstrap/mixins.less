@@ -421,12 +421,12 @@
 #gradient {
   .horizontal(@startColor: #555, @endColor: #333) {
     background-color: @endColor;
-    background-image: linear-gradient(left, @startColor, @endColor); // Le standard
+    background-image: linear-gradient(to right, @startColor, @endColor); // Le standard
     background-repeat: repeat-x;
   }
   .vertical(@startColor: #555, @endColor: #333) {
     background-color: mix(@startColor, @endColor, 60%);
-    background-image: linear-gradient(top, @startColor, @endColor); // The standard
+    background-image: linear-gradient(to bottom, @startColor, @endColor); // The standard
     background-repeat: repeat-x;
   }
   .directional(@startColor: #555, @endColor: #333, @deg: 45deg) {

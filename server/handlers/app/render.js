@@ -13,12 +13,13 @@ var social             = require('../social-metadata');
 var restSerializer     = require("../../serializers/rest-serializer");
 var burstCalculator    = require('../../utils/burst-calculator');
 var userSort           = require('../../../public/js/utils/user-sort');
-var roomSort           = require('../../../public/js/utils/room-sort');
+var roomSort           = require('gitter-realtime-client/lib/sorts-filters').pojo; /* <-- Don't use the default export
+                                                                                          will bring in tons of client-side
+                                                                                          libraries that we don't need */
 var roomNameTrimmer    = require('../../../public/js/utils/room-name-trimmer');
 var isolateBurst       = require('../../../shared/burst/isolate-burst-array');
 var unreadItemService  = require('../../services/unread-item-service');
 var mongoUtils         = require('../../utils/mongo-utils');
-var splitTests         = require('gitter-web-split-tests');
 var url                = require('url');
 var cdn                = require("../../web/cdn");
 var roomMembershipService = require('../../services/room-membership-service');
@@ -155,8 +156,6 @@ function fixBadLinksOnId(value) {
 }
 
 function renderMainFrame(req, res, next, frame) {
-  var variant = splitTests.configure(req, res, 'nli');
-
   var user = req.user;
   var userId = user && user.id;
   var aroundId = fixBadLinksOnId(req.query.at);
@@ -190,7 +189,7 @@ function renderMainFrame(req, res, next, frame) {
         template = 'app-template';
         bootScriptName = 'router-app';
       } else {
-        template = splitTests.selectTemplate(variant, 'app-nli-template', 'app-nli-template_treatment');
+        template = 'app-nli-template';
         bootScriptName = 'router-nli-app';
       }
 
@@ -413,12 +412,16 @@ function renderOrgPage(req, res, next) {
     ghOrgService.getOrg(org).catch(function() { return {login: org}; }),
     troupeService.findChildRoomsForOrg(org, opts),
     contextGenerator.generateNonChatContext(req),
-    orgPermissionModel(req.user, 'admin', org)
+    orgPermissionModel(req.user, 'admin', org),
+    orgPermissionModel(req.user, 'join', org)
   ])
-  .spread(function (ghOrg,rooms, troupeContext, isOrgAdmin) {
+  .spread(function (ghOrg,rooms, troupeContext, isOrgAdmin, isOrgMember) {
 
     // Filter out PRIVATE rooms
     rooms = rooms.filter(function(room) { return room.security !== 'PRIVATE'; });
+
+    // Filter out the ORG room for non org members
+    if (!isOrgMember) rooms = rooms.filter(function(room) { return room.githubType !== 'ORG'; });
 
     // Calculate org user count across all rooms (except private)
     var orgUserCount = rooms.reduce(function(accum, room) {
@@ -497,9 +500,8 @@ function renderOrgPage(req, res, next) {
 
 
 function renderNotLoggedInChatPage(req, res, next) {
-  var variant = splitTests.configure(req, res, 'nli');
   return renderChat(req, res, {
-    template: splitTests.selectTemplate(variant, 'chat-nli-template', 'chat-nli-template_treatment'),
+    template: 'chat-nli-template',
     script: 'router-nli-chat',
     unread: false // Not logged in users see chats as read
   }, next);

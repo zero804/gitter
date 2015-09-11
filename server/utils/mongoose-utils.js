@@ -1,11 +1,11 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
+
 var Q           = require('q');
 var _           = require('underscore');
 var collections = require('./collections');
 var mongoUtils  = require('./mongo-utils');
 
-var mongoose    = require('mongoose-q')(require('mongoose'), {spread:true});
+var mongoose    = require('./mongoose-q');
 var Schema      = mongoose.Schema;
 
 function hashList(list) {
@@ -90,17 +90,6 @@ exports.attachNotificationListenersToSchema = function (schema, options) {
 
 };
 
-// Adapts a mongoose promise to q
-exports.monq = function(promise) {
-  var deferred = Q.defer();
-
-  promise.addCallback(deferred.resolve);
-  promise.addErrback(deferred.reject);
-
-  return deferred.promise;
-
-};
-
 exports.cloneSchema = function(schema) {
   var tree = _.extend({}, schema.tree);
   delete tree.id;
@@ -112,10 +101,11 @@ exports.cloneSchema = function(schema) {
  * Returns a promise [document, updatedExisting]
  */
 exports.upsert = function(schema, query, setOperation) {
-  return schema.findOneAndUpdateQ(query, setOperation, { upsert: true, new: false })
+  return schema.findOneAndUpdate(query, setOperation, { upsert: true, new: false })
+    .exec()
     .then(function(doc) {
       // If doc is null then an insert occurred
-      return Q.all([schema.findOneQ(query), !!doc]);
+      return Q.all([schema.findOne(query).exec(), !!doc]);
     });
 };
 
@@ -128,7 +118,8 @@ exports.findByIds = function(Model, ids, callback) {
 
     /* Special case for a single ID */
     if (ids.length === 1) {
-      return Model.findByIdQ(ids[0])
+      return Model.findById(ids[0])
+        .exec()
         .then(function(doc) {
           if (doc) return [doc];
           return [];
@@ -136,7 +127,7 @@ exports.findByIds = function(Model, ids, callback) {
     }
 
     /* Usual case */
-    return Model.where('_id')['in'](mongoUtils.asObjectIDs(collections.idsIn(ids))).execQ();
+    return Model.where('_id')['in'](mongoUtils.asObjectIDs(collections.idsIn(ids))).exec();
   }).nodeify(callback);
 };
 
@@ -149,7 +140,8 @@ exports.findByIdsLean = function(Model, ids, select) {
 
     /* Special case for a single ID */
     if (ids.length === 1) {
-      return Model.findByIdQ(ids[0], select, { lean: true })
+      return Model.findById(ids[0], select, { lean: true })
+        .exec()
         .then(function(doc) {
           if (doc) return [mongoUtils.setId(doc)];
           return [];
@@ -161,7 +153,7 @@ exports.findByIdsLean = function(Model, ids, select) {
       .in(mongoUtils.asObjectIDs(collections.idsIn(ids)))
       .select(select)
       .lean()
-      .execQ()
+      .exec()
       .then(mongoUtils.setIds);
 
   });
@@ -175,7 +167,8 @@ exports.findByFieldInValue = function(Model, field, values, callback) {
     if (values.length === 1) {
       var query = {};
       query[field] = values[0];
-      return Model.findOneQ(query)
+      return Model.findOne(query)
+        .exec()
         .then(function(doc) {
           if (doc) return [doc];
           return [];
@@ -183,7 +176,7 @@ exports.findByFieldInValue = function(Model, field, values, callback) {
     }
 
     /* Usual case */
-    return Model.where(field).in(values).execQ();
+    return Model.where(field).in(values).exec();
   }).nodeify(callback);
 };
 

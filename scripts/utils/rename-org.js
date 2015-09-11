@@ -41,7 +41,7 @@ function checkForClashes(newUris) {
     return u.toLowerCase();
   });
   return persistence.Troupe.find({ lcUri: { $in: lcNewUris } })
-    .execQ();
+    .exec();
 }
 
 function confirm() {
@@ -63,7 +63,7 @@ function confirm() {
 
 }
 persistence.Troupe.find({ $or: [{ lcUri: lcOld }, { lcOwner: lcOld }] })
-  .execQ()
+  .exec()
   .then(function(rooms) {
     var newUris = rooms.map(function(f) {
 
@@ -102,7 +102,7 @@ persistence.Troupe.find({ $or: [{ lcUri: lcOld }, { lcOwner: lcOld }] })
           }
           console.log('Updating ', oldName, ' to ', newName);
 
-          return room.saveQ()
+          return room.save()
             .then(function() {
               return uriLookupService.removeBadUri(lcOldName);
             })
