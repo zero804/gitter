@@ -206,6 +206,7 @@ module.exports = (function() {
 
   var TroupeUnreadItemsViewportMonitor = function(scrollElement, unreadItemStore, collectionView) {
     var boundGetBounds = this._getBounds.bind(this);
+    var limitedGetBounds = limit(this._getBounds, this, 100);
     this._collectionView = collectionView;
     this._scrollElement = scrollElement[0] || scrollElement;
 
@@ -225,15 +226,16 @@ module.exports = (function() {
 
     unreadItemStore.on('newcountvalue', foldCountLimited);
     ['unreadItemRemoved', 'change:status', 'itemMarkedRead', 'add'].forEach(function(evt) {
-      unreadItemStore.on(evt, boundGetBounds);
+      unreadItemStore.on(evt, limitedGetBounds);
     });
 
     // Check for unread items when things are added to the collection
-    collectionView.collection.on('add', boundGetBounds);
+    // Only do it every 100ms or so
+    collectionView.collection.on('add', limitedGetBounds);
 
-    // When the UI changes, rescan
-    // appEvents.on('appNavigation', this._getBounds);
-    setTimeout(boundGetBounds, 250);
+    // This is a catch all for for unread items that are
+    // not marked as read
+    setInterval(limitedGetBounds, 2000);
   };
 
   TroupeUnreadItemsViewportMonitor.prototype = {
@@ -350,7 +352,8 @@ module.exports = (function() {
     },
 
     _foldCount: function() {
-      var chats = this._store.getItems();
+      var store = this._store;
+      var chats = store.getItems();
       if(!chats.length) {
         this._resetFoldModel();
         return;
@@ -362,9 +365,11 @@ module.exports = (function() {
       var mentionsAbove = 0;
       var mentionsBelow = 0;
 
-      var topBound = this._scrollElement.scrollTop;
-      var bottomBound = topBound + this._scrollElement.clientHeight;
-      if (bottomBound >= this._scrollElement.scrollHeight - 10) {
+      var scrollElement = this._scrollElement;
+
+      var topBound = scrollElement.scrollTop;
+      var bottomBound = topBound + scrollElement.clientHeight;
+      if (bottomBound >= scrollElement.scrollHeight - 10) {
         /* At the bottom? */
         bottomBound =  Number.POSITIVE_INFINITY;
       }
@@ -389,7 +394,7 @@ module.exports = (function() {
         if (itemId < firstItemId) {
           above++;
           if (!oldestUnreadItemId) oldestUnreadItemId = itemId;
-          if (this._store._items[itemId])  {
+          if (store._items[itemId])  {
             mentionsAbove++;
             oldestMentionId = itemId;
           }
@@ -397,12 +402,12 @@ module.exports = (function() {
         if (itemId > lastItemId) {
           below++;
           if (!mostRecentUnreadItemId) mostRecentUnreadItemId = itemId;
-          if (this._store._items[itemId]) {
+          if (store._items[itemId]) {
             mentionsBelow++;
             if (!mostRecentMentionId) mostRecentMentionId = itemId;
           }
         }
-      }.bind(this));
+      });
 
       acrossTheFoldModel.set({
         unreadAbove: above,
