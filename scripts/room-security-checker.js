@@ -28,7 +28,7 @@ persistence.Troupe
   .where('githubType', 'REPO')
   .sort({ dateLastSecurityCheck: 1 })
   .limit(opts.max)
-  .execQ()
+  .exec()
   .then(function(repos) {
     return Q.all(repos.map(function(repo) {
       return checkRepoPrivacy(repo.uri);

@@ -4,7 +4,8 @@
 var troupeDao   = require('./daos/troupe-dao').lean;
 var appEvents   = require('gitter-web-appevents');
 var userService = require('./user-service');
-var roomMembershipService = require('./room-membership-service')
+var roomMembershipService = require('./room-membership-service');
+var debug       = require('debug')('gitter:repo-premium-status-notifier');
 
 function repoPremiumStatusNotifier(userOrOrg, premiumStatus) {
   return userService.findByUsername(userOrOrg)
@@ -12,6 +13,7 @@ function repoPremiumStatusNotifier(userOrOrg, premiumStatus) {
       var isOrg = !user;
 
       if(!isOrg) {
+        debug('Notifying of user premium status change: %s', userOrOrg);
         // For a user
         appEvents.dataChange2("/user/" + user._id, 'patch', {
           id: "" + user._id,
@@ -19,19 +21,25 @@ function repoPremiumStatusNotifier(userOrOrg, premiumStatus) {
         });
       }
 
+      debug('Searching for all rooms owned by: %s', userOrOrg);
       return troupeDao.findByOwnerUri(userOrOrg, { '_id': 1 })
         .then(function(troupes) {
+          debug('Found %s rooms owned by %s', troupes.length, userOrOrg);
+
           var troupeIds = troupes.map(function(troupe) { return troupe._id; });
+
+          debug('Search for all users in all rooms owned by %s', userOrOrg);
           return roomMembershipService.findMembersForRoomMulti(troupeIds);
         })
         .then(function(troupeUsersHash) {
+          var count = 0;
           var userNotificatons = {};
 
           Object.keys(troupeUsersHash).forEach(function(troupeId) {
             var userIds = troupeUsersHash[troupeId];
 
             userIds.forEach(function(userId) {
-
+              count++;
               if(isOrg) {
                 // TODO: come up with a better mapping from org to user
                 if(!userNotificatons[userId]) {
@@ -52,6 +60,8 @@ function repoPremiumStatusNotifier(userOrOrg, premiumStatus) {
 
             });
           });
+
+          debug('Notified %s users of change of premium status', count);
         });
 
     });

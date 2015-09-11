@@ -23,7 +23,8 @@ function lookupUri(uri) {
 
   debug('URI lookup: %s', uri);
 
-  return persistence.UriLookup.findOneQ({ uri: lcUri })
+  return persistence.UriLookup.findOne({ uri: lcUri })
+    .exec()
     .then(function(uriLookup) {
       debug('URI lookup returned a result? %s', !!uriLookup);
 
@@ -35,30 +36,33 @@ function lookupUri(uri) {
       var repoStyle = uri.indexOf('/') >= 0;
 
       return Q.all([
-        repoStyle ? null : persistence.User.findOneQ({ username: uri }, 'username', { lean: true }),
-        persistence.Troupe.findOneQ({ lcUri: lcUri }, 'uri', { lean: true })
+        repoStyle ? null : persistence.User.findOne({ username: uri }, 'username', { lean: true }).exec(),
+        persistence.Troupe.findOne({ lcUri: lcUri }, 'uri', { lean: true }).exec()
       ]).spread(function(user, troupe) {
         debug('Found user? %s found troupe? %s', !!user, !!troupe);
 
         /* Found user. Add to cache and continue */
         if(user) {
-          return persistence.UriLookup.findOneAndUpdateQ(
+          return persistence.UriLookup.findOneAndUpdate(
             { $or: [{ uri: lcUri }, { userId: user._id }] },
             { $set: { uri: lcUri, userId: user._id }, $unset: { troupeId: '' } },
-            { upsert: true, new: true });
+            { upsert: true, new: true })
+            .exec();
         }
 
         /* Found a room. Add to cache and continue */
         if(troupe) {
-          return persistence.UriLookup.findOneAndUpdateQ(
+          return persistence.UriLookup.findOneAndUpdate(
             { $or: [{ uri: lcUri }, { troupeId: troupe._id }] },
             { $set: { uri: lcUri, troupeId: troupe._id }, $unset: { userId: '' } },
-            { upsert: true, new: true });
+            { upsert: true, new: true })
+            .exec();
         }
 
         /* Last ditch attempt. Look for a room that has been renamed */
         /* TODO: look for users who have been renamed too */
-        return persistence.Troupe.findOneQ({ renamedLcUris: lcUri }, { uri: 1, lcUri: 1 }, { lean: true })
+        return persistence.Troupe.findOne({ renamedLcUris: lcUri }, { uri: 1, lcUri: 1 }, { lean: true })
+          .exec()
           .then(function(renamedTroupe) {
             if (!renamedTroupe) return null;
             debug('Room %s has been renamed to %s', lcUri, renamedTroupe.lcUri);
@@ -75,33 +79,37 @@ function lookupUri(uri) {
  * @return promise of nothing
  */
 function removeUsernameForUserId(userId) {
-  return persistence.UriLookup.findOneAndRemoveQ({ userId: userId });
+  return persistence.UriLookup.findOneAndRemove({ userId: userId })
+    .exec();
 }
 
 function reserveUriForUsername(userId, username) {
   var lcUri = username.toLowerCase();
   userId = mongoUtils.asObjectID(userId);
 
-  return persistence.UriLookup.findOneAndUpdateQ(
+  return persistence.UriLookup.findOneAndUpdate(
     { $or: [{ uri: lcUri }, { userId: userId }] },
     { $set: { uri: lcUri, userId: userId }, $unset: { troupeId: '' } },
-    { upsert: true });
+    { upsert: true })
+    .exec();
 }
 
 function removeBadUri(uri) {
   var lcUri = uri.toLowerCase();
 
-  return persistence.UriLookup.removeQ({ uri: lcUri });
+  return persistence.UriLookup.remove({ uri: lcUri })
+    .exec();
 }
 
 function reserveUriForTroupeId(troupeId, uri) {
   var lcUri = uri.toLowerCase();
   troupeId = mongoUtils.asObjectID(troupeId);
 
-  return persistence.UriLookup.findOneAndUpdateQ(
+  return persistence.UriLookup.findOneAndUpdate(
     { $or: [{ uri: lcUri }, { troupeId: troupeId }] },
     { $set: { uri: lcUri, troupeId: troupeId }, $unset: { userId: '' } },
-    { upsert: true, new: true });
+    { upsert: true, new: true })
+    .exec();
 }
 
 exports.reserveUriForTroupeId = reserveUriForTroupeId;

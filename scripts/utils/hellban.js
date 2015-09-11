@@ -22,7 +22,7 @@ var banned = !opts.unban;
 userService.findByUsername(opts.username)
   .then(function(user) {
     user.hellbanned = banned;
-    return user.saveQ();
+    return user.save();
   })
   .delay(5000)
   .then(function() {
