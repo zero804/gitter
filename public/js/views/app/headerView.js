@@ -26,10 +26,7 @@ module.exports = Marionette.ItemView.extend({
   template: headerViewTemplate,
 
   modelEvents: {
-    change:              'renderIfRequired',
-    //always render if the owber status changes
-    //usually from snapshot retrieval
-    'change:ownerIsOrg': 'render'
+    change:       'renderIfRequired'
   },
 
   ui: {
@@ -299,7 +296,7 @@ module.exports = Marionette.ItemView.extend({
       }
     }
 
-    if (changedContains(['name', 'id', 'githubType', 'favourite', 'topic'])) {
+    if (changedContains(['name', 'id', 'githubType', 'favourite', 'topic', 'ownerIsOrg'])) {
       // The template may have been set to false
       // by the Isomorphic layout
       this.options.template = headerViewTemplate;
