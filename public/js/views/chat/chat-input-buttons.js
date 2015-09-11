@@ -19,6 +19,13 @@ module.exports = Marionette.ItemView.extend({
     composeToggle: '.js-toggle-compose-mode'
   },
 
+  onRender: function() {
+    // this.options.template is false for first render as it just
+    // binds to the existing server-side rendered html.
+    // this ensures that the next render will have a template.
+    this.options.template = template;
+  },
+
   events: {
     'click .js-toggle-compose-mode': 'toggleComposeMode',
   },

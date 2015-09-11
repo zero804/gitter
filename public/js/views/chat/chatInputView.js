@@ -8,6 +8,8 @@ var KeyboardEventsMixin = require('views/keyboard-events-mixin');
 var ChatInputBoxView = require('./chat-input-box-view');
 var ChatInputButtons = require('./chat-input-buttons');
 
+require('views/behaviors/isomorphic');
+
 module.exports = (function() {
 
   setTimeout(function() {
@@ -25,7 +27,11 @@ module.exports = (function() {
     template: template,
 
     behaviors: {
-      Widgets: {}
+      Widgets: {},
+      Isomorphic: {
+        chatInputBox: { el: '#chat-input-box-region', init: 'initChatInputBoxRegion' },
+        chatInputButtons: { el: '#chat-input-buttons-region', init: 'initChatInputButtonsRegion' }
+      }
     },
 
     regions: {
@@ -45,12 +51,15 @@ module.exports = (function() {
       return { user: context.user() };
     },
 
-    onRender: function() {
-      this.getRegion('chatInputBox').show(new ChatInputBoxView({
+    initChatInputBoxRegion: function(optionsForRegion) {
+      return new ChatInputBoxView(optionsForRegion({
         composeMode: this.composeMode,
         collection: this.collection
       }));
-      this.getRegion('chatInputButtons').show(new ChatInputButtons({
+    },
+
+    initChatInputButtonsRegion: function(optionsForRegion) {
+      return new ChatInputButtons(optionsForRegion({
         model: this.composeMode
       }));
     }
