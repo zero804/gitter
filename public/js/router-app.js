@@ -76,6 +76,10 @@ onready(function () {
     return;
   };
 
+  function getFrameType(locationHref) {
+    var match = locationHref.match(/(\/.*?)(\/~(\w+))?$/);
+    return match && match[3];
+  }
 
   function updateContent(iframeUrl, type) {
     var hash;
@@ -99,10 +103,20 @@ onready(function () {
      * The history has already been pushed via the pushstate, so we don't want to double up
      */
      RAF(function() {
+      var contentFrame = document.querySelector('#content-frame');
+
       function fallback() {
-        document.querySelector('#content-frame').contentWindow.location.replace(iframeUrl + hash);
+        contentFrame.contentWindow.location.replace(iframeUrl + hash);
       }
 
+      var currentDomain = contentFrame.contentWindow.location.protocol + '//' + contentFrame.contentWindow.location.host;
+      if (currentDomain !== context.env('basePath')) {
+        return fallback();
+      }
+
+      var currentType = getFrameType(contentFrame.contentWindow.location.pathname);
+
+      if (currentType !== 'chat') return fallback();
       if (type !== 'chat') return fallback();
 
       // IE seems to prefer this in a new animation-frame
@@ -110,7 +124,7 @@ onready(function () {
       var referenceUrl = match && match[1];
       if (!referenceUrl) return fallback();
 
-      var newTroupe = troupeCollections.troupes.where({ url: referenceUrl })[0];
+      var newTroupe = troupeCollections.troupes.findWhere({ url: referenceUrl });
 
       //If we are navigating to a anything other than a chat refresh
       if(!newTroupe) return fallback();
