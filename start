@@ -3,9 +3,10 @@
 set -e
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DOCKER_MACHINE_NAME=${DOCKER_MACHINE_NAME-dev}
 
 function startDockerMachine {
-  if [[ "$(docker-machine ls -q|grep dev)" != "dev" ]]; then
+  if [[ "$(docker-machine ls -q|grep "$DOCKER_MACHINE_NAME")" != "$DOCKER_MACHINE_NAME" ]]; then
     # Maybe one day --virtualbox-boot2docker-url https://github.com/rancher/os/releases/download/v0.3.3/machine-rancheros.iso
     # but it doesn't support shared volumes right now
     docker-machine create \
@@ -14,14 +15,14 @@ function startDockerMachine {
       --virtualbox-hostonly-cidr "192.168.99.1/24" \
       --virtualbox-memory "2048" \
       --virtualbox-cpu-count "2" \
-      dev
+      $DOCKER_MACHINE_NAME
   else
     ## Start the box if it's stopped
-    if [[ $(docker-machine ls --filter state=Stopped -q) = "dev" ]]; then
-      docker-machine start dev
+    if [[ $(docker-machine ls --filter state=Stopped -q) = "$DOCKER_MACHINE_NAME" ]]; then
+      docker-machine start $DOCKER_MACHINE_NAME
     fi
   fi
-  eval "$(docker-machine env dev)"
+  eval "$(docker-machine env $DOCKER_MACHINE_NAME)"
 }
 
 function setupHostAlias {
@@ -50,7 +51,6 @@ function startDockerServices {
 }
 
 function setupRedisConfigs {
-  DEV_IP=$(docker-machine ip dev)
   mkdir -p "$SCRIPT_DIR/config/docker/"
 
   cat <<EOD > "$SCRIPT_DIR/config/docker/redis-slave.env"
@@ -63,7 +63,6 @@ EOD
 }
 
 function setupMongoInitScript {
-  DEV_IP=$(docker-machine ip dev)
   mkdir -p "$SCRIPT_DIR/config/mongo-docker/"
   cat <<EOF > "$SCRIPT_DIR/config/mongo-docker/init-mongo.sh"
   mongo $DEV_IP/admin "/mongo-docker/init-replicaset.js"
@@ -103,10 +102,11 @@ EOF
 }
 
 startDockerMachine
-setupHostAlias gitter-mongo-dev "$(docker-machine ip dev)"
-setupHostAlias gitter-redis-dev "$(docker-machine ip dev)"
-setupHostAlias gitter-neo4j-dev "$(docker-machine ip dev)"
-setupHostAlias gitter-es-dev "$(docker-machine ip dev)"
+DEV_IP=$(docker-machine ip "$DOCKER_MACHINE_NAME")
+setupHostAlias gitter-mongo-dev "$DEV_IP"
+setupHostAlias gitter-redis-dev "$DEV_IP"
+setupHostAlias gitter-neo4j-dev "$DEV_IP"
+setupHostAlias gitter-es-dev "$DEV_IP"
 setupRedisConfigs
 setupMongoInitScript
 startDockerServices
