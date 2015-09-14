@@ -1141,9 +1141,9 @@ function checkInstigatingUserPermissionForRemoveUser(room, user, requestingUser)
  */
 function removeUserFromRoom(room, user, requestingUser) {
   return Q.fcall(function() {
-      if (!room) return new StatusError(400, 'Room required');
-      if (!user) return new StatusError(400, 'User required');
-      if (!requestingUser) return new StatusError(401, 'Not authenticated');
+      if (!room) throw new StatusError(400, 'Room required');
+      if (!user) throw new StatusError(400, 'User required');
+      if (!requestingUser) throw new StatusError(401, 'Not authenticated');
       if (room.githubType === 'ONETOONE') throw new StatusError(400, 'This room does not support removing.');
 
       return checkInstigatingUserPermissionForRemoveUser(room, user, requestingUser);
