@@ -47,13 +47,7 @@ var ChatInputBoxView = Marionette.ItemView.extend({
     'paste textarea': 'onPaste',
     'keydown textarea': 'onKeydown',
     'blur textarea': 'onBlur',
-    'touchend textarea': function() {
-      // http://stackoverflow.com/questions/16149083/keyboardshrinksview-makes-lose-focus/18904886#18904886
-      var self = this;
-      setTimeout(function() {
-        self.ui.textarea.focus();
-      }, 300);
-    },
+    'touchend textarea': 'onTouchend',
     'textComplete:show textarea': function() {
       this.ui.textarea.attr('data-prevent-keys', 'on');
     },
@@ -155,6 +149,17 @@ var ChatInputBoxView = Marionette.ItemView.extend({
     } else {
       this.resetTextareaSize();
     }
+  },
+
+  onTouchend: function() {
+    // this fixed an issue with the ios native client, but is super annoying
+    // on normal mobile web and webviews
+    // TODO: check if this is still a problem.
+    // http://stackoverflow.com/questions/16149083/keyboardshrinksview-makes-lose-focus/18904886#18904886
+    // var self = this;
+    // setTimeout(function() {
+    //   self.ui.textarea.focus();
+    // }, 300);
   },
 
   onKeyEditLast: function() {
