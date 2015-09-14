@@ -255,7 +255,7 @@ var ChatInputBoxView = Marionette.ItemView.extend({
     // move caret inside the new code block
     this.setCaretPosition(matches[0].length + 1);
 
-    if (!this.composeMode.get('isComposeModeEnabled')) {
+    if (!this.composeMode.get('isComposeModeEnabled') && !isMobile()) {
       // switch to compose mode for the lifetime of this message
       this.composeMode.set('isComposeModeEnabled', true);
       this.listenToOnce(appEvents, 'chat.send', function() {

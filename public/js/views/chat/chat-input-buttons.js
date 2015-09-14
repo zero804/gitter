@@ -51,9 +51,10 @@ var ChatInputButtons = Marionette.ItemView.extend({
   },
 
   toggleComposeMode: function() {
-    // compose mode is always on for mobile
-    var newVal = isMobile() ? true : !this.model.get('isComposeModeEnabled');
-    this.model.set('isComposeModeEnabled', newVal);
+    // compose mode is always off for mobile
+    if (isMobile()) return;
+
+    this.model.set('isComposeModeEnabled', !this.model.get('isComposeModeEnabled'));
   }
 
 });
