@@ -4,9 +4,6 @@
 var persistence = require('./persistence-service');
 var roomPermissionsModel = require('./room-permissions-model');
 
-var env    = require('gitter-web-env');
-var logger = env.logger;
-
 function userCanAccessRoom(userId, troupeId, callback) {
   return persistence.Troupe.findById(troupeId, { bans: 1, security: 1, githubType: 1, uri: 1 }, { lean: true })
     .exec()
