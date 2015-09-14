@@ -48,16 +48,8 @@ var ChatInputBoxView = Marionette.ItemView.extend({
     'keydown textarea': 'onKeydown',
     'blur textarea': 'onBlur',
     'touchend textarea': 'onTouchend',
-    'textComplete:show textarea': function() {
-      this.ui.textarea.attr('data-prevent-keys', 'on');
-    },
-    'textComplete:hide textarea': function() {
-      var self = this;
-      // Defer change to make sure the last key event is prevented
-      setTimeout(function() {
-        self.ui.textarea.attr('data-prevent-keys', 'off');
-      }, 0);
-    }
+    'textComplete:show textarea': 'onTextCompleteShow',
+    'textComplete:hide textarea': 'onTextCompleteHide'
   },
 
   keyboardEvents: {
@@ -160,6 +152,21 @@ var ChatInputBoxView = Marionette.ItemView.extend({
     // setTimeout(function() {
     //   self.ui.textarea.focus();
     // }, 300);
+  },
+
+  // disable keyboard shortcuts
+  onTextCompleteShow: function() {
+    this.ui.textarea.attr('data-prevent-keys', 'on');
+  },
+
+  // reenable keyboard shortcuts
+  onTextCompleteHide: function() {
+    var self = this;
+
+    // Defer change to make sure the last key event is prevented
+    setTimeout(function() {
+      self.ui.textarea.attr('data-prevent-keys', 'off');
+    }, 0);
   },
 
   onKeyEditLast: function() {
@@ -302,7 +309,6 @@ var ChatInputBoxView = Marionette.ItemView.extend({
   },
 
   addTextareaExtensions: function() {
-
     this.ui.textarea.textcomplete(typeaheads());
     this.drafty = drafty(this.ui.textarea[0]);
   },
