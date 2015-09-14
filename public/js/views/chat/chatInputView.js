@@ -5,7 +5,6 @@ var context = require('utils/context');
 var template = require('./tmpl/chatInputView.hbs');
 var ChatInputBoxView = require('./chat-input-box-view');
 var ChatInputButtons = require('./chat-input-buttons');
-var isMobile = require('utils/is-mobile');
 
 require('views/behaviors/isomorphic');
 
@@ -34,7 +33,7 @@ module.exports = (function() {
     },
 
     initialize: function() {
-      this.composeMode = new Backbone.Model({ isComposeModeEnabled: isMobile() });
+      this.composeMode = new Backbone.Model({ isComposeModeEnabled: false });
     },
 
     serializeData: function() {
