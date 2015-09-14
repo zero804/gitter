@@ -25,7 +25,13 @@ module.exports = (function() {
 
     clicked: function(e) {
       e.preventDefault();
-      appEvents.trigger('navigation', '/' + this.model.get('name'), 'chat', this.model.get('name'), null);
+
+      if(!this.model.get('room')) {
+        window.location.hash = '#confirm/' + this.model.get('name');
+      } else {
+        appEvents.trigger('navigation', '/' + this.model.get('name'), 'chat', this.model.get('name'), null);
+      }
+
     }
   });
 
