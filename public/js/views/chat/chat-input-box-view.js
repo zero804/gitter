@@ -11,13 +11,13 @@ var cocktail = require('cocktail');
 var KeyboardEventsMixin = require('views/keyboard-events-mixin');
 var appEvents = require('utils/appevents');
 var context = require('utils/context');
+var isMobile = require('utils/is-mobile');
 
 require('jquery-textcomplete');
 
 var PLACEHOLDER = 'Click here to type a chat message. Supports GitHub flavoured markdown.';
-
-/** @const */
-var PLACEHOLDER_COMPOSE_MODE = PLACEHOLDER+' '+ platformKeys.cmd +'+Enter to send.';
+var PLACEHOLDER_MOBILE = 'Touch here to type a chat message.';
+var PLACEHOLDER_COMPOSE_MODE = PLACEHOLDER + ' ' + platformKeys.cmd + '+Enter to send.';
 
 function isStatusMessage(text) {
   // if it starts with '/me' it should be a status update
@@ -73,7 +73,6 @@ var ChatInputBoxView = Marionette.ItemView.extend({
   },
 
   initialize: function(options) {
-    window.parent.xxx = this;
     this.composeMode = options.composeMode;
     this.listenTo(this.composeMode, 'change:isComposeModeEnabled', this.onComposeModeChange);
     this.listenTo(appEvents, 'input.append', this.append);
@@ -84,9 +83,7 @@ var ChatInputBoxView = Marionette.ItemView.extend({
     this.removeTextareaExtensions();
     this.addTextareaExtensions();
 
-    var isMobile = false;
-
-    if (!isMobile) {
+    if (!isMobile()) {
       var self = this;
       RAF(function() {
         // firefox only respects the "autofocus" attr if it is present on source html
@@ -100,9 +97,15 @@ var ChatInputBoxView = Marionette.ItemView.extend({
   },
 
   onComposeModeChange: function(model, isComposeModeEnabled) {
-    var placeholder = isComposeModeEnabled ? PLACEHOLDER_COMPOSE_MODE : PLACEHOLDER;
-    this.ui.textarea.attr('placeholder', placeholder);
+    var placeholder;
 
+    if (isMobile()) {
+      placeholder = PLACEHOLDER_MOBILE;
+    } else {
+      placeholder = isComposeModeEnabled ? PLACEHOLDER_COMPOSE_MODE : PLACEHOLDER;
+    }
+
+    this.ui.textarea.attr('placeholder', placeholder);
     // regain focus as user is about to type something.
     this.ui.textarea.focus();
   },
@@ -145,8 +148,6 @@ var ChatInputBoxView = Marionette.ItemView.extend({
   },
 
   onBlur: function() {
-    function isMobile() {return false;}
-
     if (this.isTypeaheadShowing()) return;
 
     if (isMobile()) {
@@ -296,7 +297,8 @@ var ChatInputBoxView = Marionette.ItemView.extend({
   },
 
   addTextareaExtensions: function() {
-    this.ui.textarea.textcomplete(typeaheads);
+
+    this.ui.textarea.textcomplete(typeaheads());
     this.drafty = drafty(this.ui.textarea[0]);
   },
 

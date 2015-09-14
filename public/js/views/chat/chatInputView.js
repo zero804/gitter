@@ -3,24 +3,18 @@ var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 var context = require('utils/context');
 var template = require('./tmpl/chatInputView.hbs');
-var cocktail = require('cocktail');
-var KeyboardEventsMixin = require('views/keyboard-events-mixin');
 var ChatInputBoxView = require('./chat-input-box-view');
 var ChatInputButtons = require('./chat-input-buttons');
+var isMobile = require('utils/is-mobile');
 
 require('views/behaviors/isomorphic');
 
 module.exports = (function() {
 
+  // clean up old compose mode persistance in the next event loop.
   setTimeout(function() {
     window.localStorage.removeItem('compose_mode_enabled');
   }, 0);
-
-  var ComposeMode = Backbone.Model.extend({
-    defaults: {
-      isComposeModeEnabled: false,
-    }
-  });
 
   var ChatInputView = Marionette.LayoutView.extend({
 
@@ -39,12 +33,8 @@ module.exports = (function() {
       chatInputButtons: '#chat-input-buttons-region'
     },
 
-    keyboardEvents: {
-      'chat.toggle': 'toggleComposeMode'
-    },
-
     initialize: function() {
-      this.composeMode = new ComposeMode();
+      this.composeMode = new Backbone.Model({ isComposeModeEnabled: isMobile() });
     },
 
     serializeData: function() {
@@ -65,8 +55,6 @@ module.exports = (function() {
     }
 
   });
-
-  cocktail.mixin(ChatInputView, KeyboardEventsMixin);
 
   return ChatInputView;
 

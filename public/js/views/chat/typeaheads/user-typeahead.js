@@ -7,8 +7,6 @@ var chatCollection = require('collections/instances/integrated-items').chats;
 var template = require('./tmpl/typeahead.hbs');
 var _ = require('underscore');
 
-var MAX_TYPEAHEAD_SUGGESTIONS = isMobile() ? 3 : 10;
-
 function getRecentMessageSenders() {
   var users = chatCollection.map(function(message) {
     return message.get('fromUser');
@@ -74,7 +72,7 @@ function userSearchDebounced(term, callback) {
 }
 
 function userSearch(term, callback) {
-  apiClient.room.get('/users', { q: term, limit: MAX_TYPEAHEAD_SUGGESTIONS })
+  apiClient.room.get('/users', { q: term, limit: isMobile() ? 3 : 10 })
     .then(function(users) {
       callback(users);
     })
@@ -86,65 +84,68 @@ function userSearch(term, callback) {
 var lcPrevTerm = '';
 var prevResults = [];
 
-module.exports = {
-  match: /(^|\s)@(\/?[a-zA-Z0-9_\-]*)$/,
-  maxCount: MAX_TYPEAHEAD_SUGGESTIONS,
-  search: function(term, callback) {
-    var lcTerm = term.toLowerCase();
+module.exports = function() {
+  var maxCount = isMobile() ? 3 : 10;
+  return {
+    match: /(^|\s)@(\/?[a-zA-Z0-9_\-]*)$/,
+    maxCount: maxCount,
+    search: function(term, callback) {
+      var lcTerm = term.toLowerCase();
 
-    var users = [];
+      var users = [];
 
-    if (lcTerm.indexOf(lcPrevTerm) === 0) {
-      users = prevResults;
-    }
-
-    users = users.concat(getRecentMessageSenders());
-
-    users = unique(users)
-      .filter(isNotCurrentUser)
-      .filter(filterWithTerm(term));
-
-    lcPrevTerm = lcTerm;
-    prevResults = users;
-
-    if (users.length) {
-      // give instant feedback
-      // (jquery.textcomplete supports multiple callbacks)
-      callback(users, true);
-    }
-
-    if ('/all'.indexOf(lcTerm) === 0 && context().permissions.admin) {
-      users = users.slice(0, MAX_TYPEAHEAD_SUGGESTIONS - 1);
-      users.push({ username: '/all', displayName: 'Group' });
-
-      // there will be no server results for '/all', so return now.
-      return callback(users);
-    }
-
-    if (term.length === 0) {
-      // server results wont improve anything, so return now.
-      return callback(users);
-    }
-
-    // lets get some server results!
-    return userSearchDebounced(term, function(serverUsers) {
-      serverUsers = serverUsers.filter(isNotCurrentUser);
-      users = unique(users.concat(serverUsers));
-
-      if (lcTerm === lcPrevTerm) {
-        prevResults = users;
+      if (lcTerm.indexOf(lcPrevTerm) === 0) {
+        users = prevResults;
       }
 
-      callback(users);
-    });
-  },
-  template: function(user) {
-    return template({
-      name: user.username,
-      description: user.displayName
-    });
-  },
-  replace: function(user) {
-    return '$1@' + user.username + ' ';
-  }
+      users = users.concat(getRecentMessageSenders());
+
+      users = unique(users)
+        .filter(isNotCurrentUser)
+        .filter(filterWithTerm(term));
+
+      lcPrevTerm = lcTerm;
+      prevResults = users;
+
+      if (users.length) {
+        // give instant feedback
+        // (jquery.textcomplete supports multiple callbacks)
+        callback(users, true);
+      }
+
+      if ('/all'.indexOf(lcTerm) === 0 && context().permissions.admin) {
+        users = users.slice(0, maxCount - 1);
+        users.push({ username: '/all', displayName: 'Group' });
+
+        // there will be no server results for '/all', so return now.
+        return callback(users);
+      }
+
+      if (term.length === 0) {
+        // server results wont improve anything, so return now.
+        return callback(users);
+      }
+
+      // lets get some server results!
+      return userSearchDebounced(term, function(serverUsers) {
+        serverUsers = serverUsers.filter(isNotCurrentUser);
+        users = unique(users.concat(serverUsers));
+
+        if (lcTerm === lcPrevTerm) {
+          prevResults = users;
+        }
+
+        callback(users);
+      });
+    },
+    template: function(user) {
+      return template({
+        name: user.username,
+        description: user.displayName
+      });
+    },
+    replace: function(user) {
+      return '$1@' + user.username + ' ';
+    }
+  };
 };

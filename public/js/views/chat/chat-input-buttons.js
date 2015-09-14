@@ -3,9 +3,12 @@
 var Marionette = require('backbone.marionette');
 var template = require('./tmpl/chat-input-buttons.hbs');
 var platformKeys = require('utils/platform-keys');
+var cocktail = require('cocktail');
+var KeyboardEventsMixin = require('views/keyboard-events-mixin');
+var isMobile = require('utils/is-mobile');
 require('views/behaviors/tooltip');
 
-module.exports = Marionette.ItemView.extend({
+var ChatInputButtons = Marionette.ItemView.extend({
   template: template,
 
   behaviors: {
@@ -34,6 +37,10 @@ module.exports = Marionette.ItemView.extend({
     'change:isComposeModeEnabled': 'render'
   },
 
+  keyboardEvents: {
+    'chat.toggle': 'toggleComposeMode'
+  },
+
   getComposeModeTitle: function() {
     var mode = this.model.get('isComposeModeEnabled') ? 'chat' : 'compose';
     return 'Switch to '+ mode +' mode ('+ platformKeys.cmd +' + /)';
@@ -44,8 +51,13 @@ module.exports = Marionette.ItemView.extend({
   },
 
   toggleComposeMode: function() {
-    var newVal = !this.model.get('isComposeModeEnabled');
+    // compose mode is always on for mobile
+    var newVal = isMobile() ? true : !this.model.get('isComposeModeEnabled');
     this.model.set('isComposeModeEnabled', newVal);
   }
 
 });
+
+cocktail.mixin(ChatInputButtons, KeyboardEventsMixin);
+
+module.exports = ChatInputButtons;
