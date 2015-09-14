@@ -317,7 +317,7 @@ module.exports = (function() {
     joinRoom: function(e) {
       if (e) e.preventDefault();
 
-      apiClient.post('/v1/rooms/' + context.getTroupeId() + '/users')
+      apiClient.post('/v1/rooms/' + context.getTroupeId() + '/users', {username: context().user.username})
       .then(function(res) {
         location.reload();
       });

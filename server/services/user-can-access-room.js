@@ -2,13 +2,13 @@
 "use strict";
 
 var persistence = require('./persistence-service');
+var roomPermissionsModel = require('./room-permissions-model');
 
 var env    = require('gitter-web-env');
 var logger = env.logger;
 
 function userCanAccessRoom(userId, troupeId, callback) {
-  // TODO: use the room permissions model
-  return persistence.Troupe.findById(troupeId, { bans: 1, security: 1 }, { lean: true })
+  return persistence.Troupe.findById(troupeId, { bans: 1, security: 1, githubType: 1, uri: 1 }, { lean: true })
     .exec()
     .then(function(troupe) {
       if(!troupe) return false;
@@ -33,8 +33,11 @@ function userCanAccessRoom(userId, troupeId, callback) {
         .exec()
         .then(function(isInRoom) {
           if(!isInRoom) {
-            logger.info("Denied user " + userId + " access to troupe " + troupe.uri);
-            return false;
+            // TODO: This might be too slow for prod?
+            return persistence.User.findById(userId)
+            .then(function(user) {
+              return roomPermissionsModel(user, 'view', troupe);
+            });
           }
 
           return true;
