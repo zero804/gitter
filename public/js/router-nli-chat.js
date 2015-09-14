@@ -2,10 +2,8 @@
 
 var appEvents = require('utils/appevents');
 var Backbone = require('backbone');
-var context = require('utils/context');
 var itemCollections = require('collections/instances/integrated-items');
 var PeopleModal = require('views/people/people-modal');
-var HeaderView = require('views/app/headerView');
 var onready = require('./utils/onready');
 var ChatToolbarLayout = require('views/layouts/chat-toolbar');
 
@@ -34,9 +32,6 @@ onready(function() {
 
   var appView = new ChatToolbarLayout({ template: false, el: 'body', chatCollection: itemCollections.chats });
   appView.render();
-
-  // TODO: add this to the appView
-  new HeaderView({ model: context.troupe(), el: '#header' });
 
   var Router = Backbone.Router.extend({
     routes: {

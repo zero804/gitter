@@ -3,58 +3,43 @@ var context = require('utils/context');
 var troupeModels = require('collections/troupes');
 var realtime = require('./realtime');
 var log = require('utils/log');
-var apiClient = require('components/apiClient');
 
-module.exports = (function() {
+module.exports = {
+  syncRoom: function() {
+    realtime.getClient().subscribeTemplate({
+      urlTemplate: '/v1/user/:userId/rooms',
+      contextModel: context.contextModel(),
+      onMessage: function(message) {
+        var operation = message.operation;
+        var newModel = message.model;
+        var id = newModel.id;
 
+        /* Only operate on the current context */
+        if(id !== context.getTroupeId()) return;
 
-  function attachRoom(room) {
-    var url = apiClient.user.channel('/rooms');
-    realtime.subscribe(url, function(data) {
-      var operation = data.operation;
-      var newModel = data.model;
-      var id = newModel.id;
+        var parsed = new troupeModels.TroupeModel(newModel, { parse: true });
 
-      /* Only operate on the current context */
-      if(id !== room.id) return;
+        switch(operation) {
+          case 'create':
+          case 'patch':
+          case 'update':
+            // There can be existing documents for create events if the doc was created on this
+            // client and lazy-inserted into the collection
+            context.troupe().set(parsed.attributes);
+            break;
 
-      var parsed = new troupeModels.TroupeModel(newModel, { parse: true });
+          case 'remove':
+            // TODO: send out an event that we've been removed from the collection
+            break;
 
-      switch(operation) {
-        case 'create':
-        case 'patch':
-        case 'update':
-          // There can be existing documents for create events if the doc was created on this
-          // client and lazy-inserted into the collection
-          room.set(parsed.attributes);
-          break;
-
-        case 'remove':
-          // TODO: send out an event that we've been removed from the collection
-          break;
-
-        default:
-          log.info("Unknown operation " + operation + ", ignoring");
-
+          default:
+            log.info("Unknown operation " + operation + ", ignoring");
+        }
+      },
+      getSnapshotState: function() {
+        /* We don't want snapshots. Just the live stream */
+        return false;
       }
-
-    }, null, { snapshot: false });
+    });
   }
-
-  return {
-    syncRoom: function() {
-      var room = context.troupe();
-
-      if(room.id) {
-        attachRoom(room);
-      } else {
-        room.once('change:id', function() {
-          attachRoom(room);
-        });
-      }
-
-    }
-  };
-
-})();
-
+};
