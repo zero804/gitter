@@ -2,10 +2,14 @@
 
 
 module.exports = (function() {
+  var memo;
 
-  return function(userAgentString) {
-    var stringToTest = userAgentString || navigator.userAgent;
-    return stringToTest.indexOf('Mobile') >= 0;
+  return function() {
+    if (typeof memo === 'undefined') {
+      memo = document.body.classList.contains('mobile');
+    }
+
+    return memo;
   };
 
 })();

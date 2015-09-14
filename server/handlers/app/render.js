@@ -322,8 +322,7 @@ function renderChat(req, res, options, next) {
             userCount: troupe.userCount,
             hasHiddenMembers: troupe.userCount > 25,
             integrationsUrl: integrationsUrl,
-            inputAutoFocus: !options.mobile,
-            placeholder: 'Click here to type a chat message. Supports GitHub flavoured markdown.',
+            isMobile: options.isMobile,
             ownerIsOrg: ownerIsOrg
           }, troupeContext && {
             troupeTopic: troupeContext.troupe.topic,
@@ -365,13 +364,13 @@ function renderMobileChat(req, res, next) {
   return renderChat(req, res, {
     template: 'mobile/mobile-chat',
     script: 'mobile-app',
-    mobile: true
+    isMobile: true
   }, next);
 }
 
 function renderMobileNativeEmbeddedChat(req, res) {
   res.render('mobile/native-embedded-chat-app', {
-    mobile: true,
+    isMobile: true,
     troupeContext: {}
   });
 }
@@ -393,7 +392,7 @@ function renderMobileNotLoggedInChat(req, res, next) {
     unread: false, // Not logged in users see chats as read
     fetchEvents: false,
     fetchUsers: false,
-    mobile: true
+    isMobile: true
   }, next);
 }
 
