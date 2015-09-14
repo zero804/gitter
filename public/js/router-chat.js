@@ -11,7 +11,6 @@ var ChatToolbarInputLayout = require('views/layouts/chat-toolbar-input');
 var DropTargetView = require('views/app/dropTargetView');
 var onready = require('./utils/onready');
 var apiClient = require('components/apiClient');
-var HeaderView = require('views/app/headerView');
 var frameUtils = require('./utils/frame-utils');
 var itemCollections = require('collections/instances/integrated-items');
 
@@ -97,6 +96,19 @@ onready(function () {
 
         if (aroundId) {
           appEvents.trigger('chatCollectionView:permalinkHighlight', aroundId);
+        }
+        break;
+
+      case 'change:room':
+        //set the context troupe to new troupe
+        context.setTroupe(message.newTroupe);
+
+        //if we have a query in the url string
+        if(/\?/.test(message.url)){
+          //get the id out of the url sting
+          var id = message.url.split('=').pop();
+          //navigate to it
+          appEvents.trigger('chatCollectionView:permalinkHighlight', id);
         }
         break;
     }
@@ -196,24 +208,6 @@ onready(function () {
   /* Drag and drop */
   new DropTargetView({ template: false, el: 'body' }).render();
 
-  new HeaderView({ model: context.troupe(), el: '#header' });
-
-  // This may require a better home
-  if (context().permissions.admin && context.troupe().get('userCount') <= 1) {
-    require.ensure([
-      'views/app/collaboratorsView',
-      'collections/collaborators'],
-      function(require) {
-        var CollaboratorsView = require('views/app/collaboratorsView');
-        var collaboratorsModels = require('collections/collaborators');
-        var collaborators = new collaboratorsModels.CollabCollection();
-        collaborators.fetch();
-        collaborators.once('sync', function() {
-          var collaboratorsView = new CollaboratorsView({ collection: collaborators });
-          $('#content-frame').prepend(collaboratorsView.render().el);
-        });
-    });
-  }
 
   var Router = Backbone.Router.extend({
     routes: {
@@ -291,7 +285,7 @@ onready(function () {
 
 
     integrations: function() {
-      if(context().permissions.admin) {
+      if(context.isTroupeAdmin()) {
         require.ensure(['views/app/integrationSettingsModal'], function(require) {
           var IntegrationSettingsModal = require('views/app/integrationSettingsModal');
 

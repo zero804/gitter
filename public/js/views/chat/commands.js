@@ -14,7 +14,7 @@ module.exports = (function() {
       criteria: function() {
         var isOrgRoom = false;
         if (context.troupe().get("githubType") == "ORG") isOrgRoom = true;
-        return !context.inOneToOneTroupeContext() && context().permissions.admin && !isOrgRoom;
+        return !context.inOneToOneTroupeContext() && context.isTroupeAdmin() && !isOrgRoom;
       },
       completion: 'ban @',
       regexp: /^\/ban/,
@@ -162,7 +162,7 @@ module.exports = (function() {
       command: 'remove @username',
       description: 'Remove somebody from the room',
       criteria: function() {
-        return !context.inOneToOneTroupeContext() && context().permissions.admin;
+        return !context.inOneToOneTroupeContext() && context.isTroupeAdmin();
       },
       completion: 'remove @',
       regexp: /^\/remove/,
@@ -211,7 +211,7 @@ module.exports = (function() {
       command: 'topic foo',
       description: 'Set room topic to foo',
       criteria: function() {
-        return !context.inOneToOneTroupeContext() && context().permissions.admin;
+        return !context.inOneToOneTroupeContext() && context.isTroupeAdmin();
       },
       completion: 'topic ',
       regexp: /^\/topic/,
@@ -233,7 +233,7 @@ module.exports = (function() {
       criteria: function() {
         var isOrgRoom = false;
         if (context.troupe().get("githubType") == "ORG") isOrgRoom = true;
-        return !context.inOneToOneTroupeContext() && context().permissions.admin && !isOrgRoom;
+        return !context.inOneToOneTroupeContext() && context.isTroupeAdmin() && !isOrgRoom;
       },
       completion: 'unban @',
       regexp: /^\/unban/,

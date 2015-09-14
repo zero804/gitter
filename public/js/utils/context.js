@@ -4,15 +4,7 @@ var qs = require('./qs');
 
 module.exports = (function() {
 
-
   var ctx = window.troupeContext || {};
-
-  var WatchableModel = Backbone.Model.extend({
-    watch: function(event, callback, context) {
-      this.on(event, callback, context);
-      callback.call(context, this);
-    }
-  });
 
   function getTroupeModel() {
     var troupeModel;
@@ -40,7 +32,7 @@ module.exports = (function() {
       troupeModel = { id: qs.troupeId };
     }
 
-    return new WatchableModel(troupeModel);
+    return new Backbone.Model(troupeModel);
   }
 
   function getUserModel() {
@@ -52,11 +44,26 @@ module.exports = (function() {
       userModel = { id: ctx.userId };
     }
 
-    return new WatchableModel(userModel);
+    return new Backbone.Model(userModel);
+  }
+
+  function getContextModel(troupe, user) {
+    var result = new Backbone.Model();
+    result.set({ userId: user.id, troupeId: troupe.id });
+    result.listenTo(user, 'change:id', function(user, newId) { // jshint unused:true
+      result.set({ userId: newId });
+    });
+
+    result.listenTo(troupe, 'change:id', function(troupe, newId) { // jshint unused:true
+      result.set({ troupeId: newId });
+    });
+
+    return result;
   }
 
   var troupe = getTroupeModel();
   var user = getUserModel();
+  var contextModel = getContextModel(troupe, user);
 
   var context = function() {
     return ctx;
@@ -70,6 +77,10 @@ module.exports = (function() {
     return troupe.id;
   };
 
+  context.contextModel = function() {
+    return contextModel;
+  };
+
   function clearOtherAttributes(s, v) {
     Object.keys(v.attributes).forEach(function(key) {
       if(!s.hasOwnProperty(key)) {
@@ -79,6 +90,8 @@ module.exports = (function() {
 
     return s;
   }
+
+
 
   /** TEMP - lets think of a better way to do this... */
   context.setTroupeId = function(value) {
@@ -101,10 +114,6 @@ module.exports = (function() {
 
   context.isAuthed = function() {
     return !!user.id;
-  };
-
-  context.getHomeUser = function() {
-    return context().homeUser;
   };
 
   context.inTroupeContext = function() {
@@ -177,7 +186,7 @@ module.exports = (function() {
    * TroupeContext depends on the user and troupe
    */
   context.env = function(envName) {
-    return env[envName];
+    return !!envName ? env[envName] : env;
   };
 
   context.getAccessToken = function(callback) {
@@ -227,6 +236,12 @@ module.exports = (function() {
     }
   };
 
+  context.isTroupeAdmin = function() {
+    var permissions = troupe.get('permissions');
+    if (!permissions) return false;
+    return !!permissions.admin;
+  };
+
   context.lang = function() {
     if(ctx.lang) return ctx.lang;
     var e = context.env('lang');
@@ -253,4 +268,3 @@ module.exports = (function() {
 
 
 })();
-

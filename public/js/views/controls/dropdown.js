@@ -96,8 +96,10 @@ module.exports = (function() {
     },
 
     initialize: function(options) {
-      this.targetElement = options.targetElement;
-      this.$targetElement = $(this.targetElement);
+      if (options.targetElement) {
+        this.setTargetElement(options.targetElement);
+      }
+
       this.options = _.extend({}, DEFAULTS, options);
 
       /* From the selectable-mixin */
@@ -105,6 +107,11 @@ module.exports = (function() {
         this.hide();
       });
 
+    },
+
+    setTargetElement: function(el) {
+      this.targetElement = el;
+      this.$targetElement = $(el);
     },
 
     active: function() {
