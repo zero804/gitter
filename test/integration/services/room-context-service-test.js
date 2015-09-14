@@ -50,7 +50,7 @@ describe('room-context-service', function() {
     mockito.when(roomPermissionsModelMock)().thenReturn(Q.resolve(false));
 
     return roomContextService.findContextForUri(fixture.user1, fixture.troupe2.uri, {})
-    .then(function(roomContext) {
+    .then(function(/*roomContext*/) {
     })
     .catch(function(err) {
       assert(err.status === 404);
@@ -65,14 +65,12 @@ describe('room-context-service', function() {
     .then(function(roomContext) {
       assert(roomContext.roomMember);
     })
-    .catch(function(err) {
-    })
     .nodeify(done);
   });
 
   it('should throw a redirect for 1:1 same user', function(done) {
     return roomContextService.findContextForUri(fixture.user1, fixture.user1.username, {})
-    .then(function(roomContext) {
+    .then(function(/*roomContext*/) {
     })
     .catch(function(err) {
       assert(err.status === 301);
@@ -83,7 +81,7 @@ describe('room-context-service', function() {
 
   it('should be logged in to see a 1:1', function(done) {
     return roomContextService.findContextForUri(null, fixture.user1.username, {})
-    .then(function(roomContext) {
+    .then(function(/*roomContext*/) {
     })
     .catch(function(err) {
       assert(err.status === 401);
