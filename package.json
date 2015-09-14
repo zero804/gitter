@@ -50,7 +50,6 @@
     "highlight.js": "^8.6.0",
     "i18n": "~0.4.1",
     "i18n-2": "^0.4.6",
-    "imagemagick": "0.1.2",
     "intercom.io": "~0.0.8",
     "ioredis": "^1.7.3",
     "jwt-simple": "~0.1.0",
