@@ -4,6 +4,8 @@ var context = require('utils/context');
 var Marionette = require('backbone.marionette');
 var orgListItemTemplate = require('./tmpl/org-list-item.hbs');
 var appEvents = require('utils/appevents');
+var troupesCollections = require('collections/instances/troupes');
+
 
 module.exports = (function() {
 
@@ -26,12 +28,18 @@ module.exports = (function() {
     clicked: function(e) {
       e.preventDefault();
 
-      if(!this.model.get('room')) {
-        window.location.hash = '#confirm/' + this.model.get('name');
-      } else {
+      if (this.model.get('room')) {
         appEvents.trigger('navigation', '/' + this.model.get('name'), 'chat', this.model.get('name'), null);
+        return;
       }
 
+      var exists = troupesCollections.troupes.findWhere({uri: this.model.get('name')});
+
+      if (exists) {
+        appEvents.trigger('navigation', '/' + this.model.get('name'), 'chat', this.model.get('name'), null);
+      } else {
+        window.location.hash = '#confirm/' + this.model.get('name');
+      }
     }
   });
 
