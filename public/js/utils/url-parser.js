@@ -11,7 +11,8 @@ function parse(url) {
     pathname: parser.pathname,
     search: parser.search,
     hash: parser.hash,
-    host: parser.host
+    host: parser.host,
+    href: parser.href
   };
 }
 
@@ -35,7 +36,21 @@ function parseSearch(search) {
   return result;
 }
 
+function format(options) {
+  var parser = document.createElement('a');
+  parser.href = document.location.href;
+
+  ['href', 'protocol', 'hostname', 'search', 'hash', 'pathname'].forEach(function(key) {
+    if (options.hasOwnProperty(key) && options[key] !== undefined) {
+      parser[key] = options[key];
+    }
+  });
+
+  return parser.href;
+}
+
 module.exports = {
   parse: parse,
-  parseSearch: parseSearch
+  parseSearch: parseSearch,
+  format: format
 };
