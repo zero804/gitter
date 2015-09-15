@@ -62,6 +62,8 @@ onready(function() {
 
   var roomSwitcher = new SPARoomSwitcher(troupeCollections.troupes, context.env('basePath'), getContentFrameLocation);
   roomSwitcher.on('replace', function(href) {
+    log.info('Room switch: replace ', href);
+
     context.setTroupeId(undefined); // TODO: update the title....
     /*
      * Use location.replace so as not to affect the history state of the application
@@ -74,6 +76,7 @@ onready(function() {
   });
 
   roomSwitcher.on('reload', function() {
+    log.info('Room switch: reload');
     context.setTroupeId(undefined); // TODO: update the title....
     RAF(function() {
       getContentFrameLocation().reload(true);
@@ -81,6 +84,8 @@ onready(function() {
   });
 
   roomSwitcher.on('switch', function(troupe, permalinkChatId) {
+    log.info('Room switch: switch to ', troupe.attributes);
+
     context.setTroupeId(troupe.id);
 
     //post a navigation change to the iframe
