@@ -33,6 +33,8 @@ module.exports = (function() {
         return;
       }
 
+      // An org could not have a 'room' at render time but someone else could have meanwhile created the org
+      // room and added you. So we'll look it up in the live collection of troupes and navigate if exists.
       var exists = troupesCollections.troupes.findWhere({uri: this.model.get('name')});
 
       if (exists) {
