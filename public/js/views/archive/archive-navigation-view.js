@@ -48,7 +48,7 @@ module.exports = (function() {
     },
 
     onRender: function() {
-      var a = this.options.archiveDate && moment(this.options.archiveDate).utc();
+      var a = moment(this.options.archiveDate).utc();
       var range = 3;
 
       var start = moment(a).subtract(1, 'months');
