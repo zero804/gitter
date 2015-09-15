@@ -48,7 +48,6 @@ function RoomMembershipStrategy(options) {
   var userId = options.userId || options.currentUserId;
 
   this.preload = function(troupeIds, callback) {
-    console.log('RoomMembershipStrategy troupeIds:', troupeIds);
     self.memberships = {};
 
     var promises = troupeIds.reduce(function(accum, troupeId) {
