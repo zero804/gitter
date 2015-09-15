@@ -7,6 +7,7 @@ var context = require('utils/context');
 var apiClient = require('components/apiClient');
 var template = require('./tmpl/archive-navigation-view.hbs');
 var CalHeatMap = require('cal-heatmap');
+var getTimezoneInfo = require('utils/detect-timezone');
 
 module.exports = (function() {
 
@@ -51,7 +52,10 @@ module.exports = (function() {
       var a = moment(this.options.archiveDate).utc();
       var range = 3;
 
-      var start = moment(a).subtract(1, 'months');
+      //var start = moment(a).subtract(1, 'months');
+
+      var start = moment(a).subtract(32, 'days');
+      var end = moment(a).add(32, 'days');
       var troupeId = context.getTroupeId();
 
       // Get the date **in the local timezone** so that the highlighted
@@ -60,8 +64,9 @@ module.exports = (function() {
 
       var cal = new CalHeatMap();
       var startIso = start.toISOString()
-      var endIso = moment.utc().toISOString()
-      var heatmapURL = '/chat-heatmap/' + troupeId + '?start=' + startIso + '&end='+ endIso;
+      var endIso = end.toISOString()
+      var tz = getTimezoneInfo().iso;
+      var heatmapURL = '/chat-heatmap/' + troupeId + '?start=' + startIso + '&end='+ endIso + '&tz=' + tz;
       apiClient.priv.get(heatmapURL)
         .then(_.bind(function(heatmapData) {
           cal.init({
