@@ -114,6 +114,7 @@ module.exports = (function() {
         .then(function(heatmapData) {
           cal.update(heatmapData);
           mangleHeatmap();
+          setTimeout(mangleHeatmap, 0);
         });
     }
   });

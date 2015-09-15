@@ -97,6 +97,7 @@ onready(function() {
     .then(function(heatmapData) {
       cal.update(heatmapData);
       mangleHeatmap();
+      setTimeout(mangleHeatmap, 0);
     });
 
   // new Router();
