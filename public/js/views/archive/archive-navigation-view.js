@@ -50,24 +50,30 @@ module.exports = (function() {
 
     onRender: function() {
       var a = moment(this.options.archiveDate).utc();
-      var range = 3;
-
-      //var start = moment(a).subtract(1, 'months');
-
-      var start = moment(a).subtract(32, 'days');
-      var end = moment(a).add(32, 'days');
-      var troupeId = context.getTroupeId();
-
       // Get the date **in the local timezone** so that the highlighted
       // date does not display incorrectly for west-of-the-meridian locations
       var highlightDate = new Date(a.year(), a.month(), a.date());
 
-      var cal = new CalHeatMap();
+      var range = 3;
+
+      // if the first day of the next month is in the future, subtract one from range
+      var next = moment(new Date(a.year(), a.month(), 1)).add(1, 'months');
+      if (next > moment()) {
+        range = 2;
+      }
+
+      // start and end is only for elasticsearch, so fine if it is outside of
+      // the range we're going to display. In fact we deliberately add a day on
+      // each end just in case for timezones
+      var start = moment(a).subtract(32, 'days');
+      var end = moment(a).add(32, 'days');
       var startIso = start.toISOString()
       var endIso = end.toISOString()
+      var troupeId = context.getTroupeId();
       var tz = getTimezoneInfo().iso;
       var heatmapURL = '/chat-heatmap/' + troupeId + '?start=' + startIso + '&end='+ endIso + '&tz=' + tz;
 
+      var cal = new CalHeatMap();
       cal.init({
         itemSelector: this.ui.navigation[0],
         start: start.toDate(),
