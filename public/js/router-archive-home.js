@@ -77,6 +77,22 @@ onready(function() {
     considerMissingDataAsZero: false,
     displayLegend: false,
     data: {},
+    previousSelector: '.previous-domain',
+    nextSelector: '.next-domain',
+    onMinDomainReached: function(reached) {
+      if (reached) {
+        $('.previous-domain').addClass('disabled');
+      } else {
+        $('.previous-domain').removeClass('disabled');
+      }
+    },
+    onMaxDomainReached: function(reached) {
+      if (reached) {
+        $('.next-domain').addClass('disabled');
+      } else {
+        $('.next-domain').removeClass('disabled');
+      }
+    },
     onClick: function(date, value) {
       if(!value) return;
 
