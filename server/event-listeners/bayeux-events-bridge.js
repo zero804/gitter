@@ -107,28 +107,13 @@ exports.install = function() {
       publish(url, message);
   });
 
-  appEvents.onUserLoggedIntoTroupe(function(data) {
-    var troupeId = data.troupeId;
-    var userId = data.userId;
-
+  // When a user's eyeballs changes to on or off...
+  presenceService.on('presenceChange', function(userId, troupeId, presence) {
     publish("/api/v1/rooms/" + troupeId, {
       notification: "presence",
       userId: userId,
-      status: "in"
+      status: presence ? "in" : "out"
     });
-
-  });
-
-  appEvents.onUserLoggedOutOfTroupe(function(data) {
-    var troupeId = data.troupeId;
-    var userId = data.userId;
-
-    publish("/api/v1/rooms/" + troupeId, {
-      notification: "presence",
-      userId: userId,
-      status: "out"
-    });
-
   });
 
   ////////////////////

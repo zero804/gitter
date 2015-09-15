@@ -13,6 +13,7 @@ var burstCalculator      = require('../../utils/burst-calculator');
 var roomPermissionsModel = require('../../services/room-permissions-model');
 var timezoneMiddleware   = require('../../web/middlewares/timezone');
 var identifyRoute        = require('gitter-web-env').middlewares.identifyRoute;
+var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
 
 exports.datesList = [
   identifyRoute('app-archive-main'),
@@ -31,7 +32,7 @@ exports.datesList = [
         }
 
         var roomUrl = '/api/v1/rooms/' + troupe.id;
-        var avatarUrl = "https://avatars.githubusercontent.com/" + troupe.uri.split('/')[0];
+        var avatarUrl = resolveRoomAvatarUrl(troupe.uri);
         var isPrivate = troupe.security !== "PUBLIC";
 
         return roomPermissionsModel(user, 'admin', troupe)
@@ -161,7 +162,7 @@ exports.chatArchive = [
             var billingUrl = env.config.get('web:billingBaseUrl') + '/bill/' + req.uriContext.uri.split('/')[0];
             var roomUrl = '/api/v1/rooms/' + troupe.id;
 
-            var avatarUrl = "https://avatars.githubusercontent.com/" + troupe.uri.split('/')[0];
+            var avatarUrl = resolveRoomAvatarUrl(troupe.uri);
             var isPrivate = troupe.security !== "PUBLIC";
 
             return res.render('chat-archive-template', {

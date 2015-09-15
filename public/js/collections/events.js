@@ -7,6 +7,7 @@ var LiveCollection = require('gitter-realtime-client').LiveCollection;
 var realtime = require('components/realtime');
 var Backbone = require('backbone');
 var SyncMixin = require('./sync-mixin');
+var context = require('utils/context');
 
 var EventModel = Backbone.Model.extend({
   idAttribute: "id",
@@ -46,7 +47,8 @@ var EventCollection = LiveCollection.extend({
     while (this.length > 20) { this.pop(); }
   },
   modelName: 'event',
-  url: apiClient.room.channelGenerator('/events'),
+  urlTemplate: '/v1/rooms/:troupeId/events',
+  contextModel: context.contextModel,
   comparator: function(e1, e2) {
     var s1 = e1.get('sent');
     var s2 = e2.get('sent');

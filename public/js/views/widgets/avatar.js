@@ -9,18 +9,7 @@ var resolveAvatarUrl = require('gitter-web-shared/avatars/resolve-avatar-url');
 require('views/behaviors/tooltip');
 var FastAttachMixin = require('views/fast-attach-mixin');
 
-function preloadImage(url, callback) {
-  var image = document.createElement('img');
-  image.onload = function() {
-    image.onload = null;
-    callback();
-  }
-  image.onerror = function() {
-    image.onerror = null;
-    callback();
-  }
-  image.src = url;
-}
+
 module.exports = (function() {
 
   var AvatarWidget = Marionette.ItemView.extend({
@@ -100,11 +89,10 @@ module.exports = (function() {
     },
 
     updateAvatar: function(data) {
-      var self = this;
       var newUrl = "url('" + data.avatarUrl + "')";
       if (newUrl !== this.ui.image.css('background-image')) {
-        preloadImage(data.avatarUrl, function() {
-          self.ui.image.css({ 'background-image': newUrl });
+        this.preloadImage(data.avatarUrl, function() {
+          this.ui.image.css({ 'background-image': newUrl });
         });
       }
     },
@@ -121,6 +109,25 @@ module.exports = (function() {
 
     getTooltip: function() {
       return this.model.get('displayName');
+    },
+
+    preloadImage: function(url, callback) {
+      var image = document.createElement('img');
+      var self = this;
+
+      image.onload = function() {
+        if (self.isDestroyed) return;
+        image.onload = null;
+        callback.call(self);
+      }
+
+      image.onerror = function() {
+        if (self.isDestroyed) return;
+        image.onerror = null;
+        callback.call(self);
+      }
+
+      image.src = url;
     },
 
     attachElContent: FastAttachMixin.attachElContent

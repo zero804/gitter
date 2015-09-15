@@ -76,8 +76,12 @@ onready(function () {
     return;
   };
 
+  function getFrameType(locationHref) {
+    var match = locationHref.match(/(\/.*?)(\/~(\w+))?$/);
+    return match && match[3];
+  }
 
-  function updateContent(iframeUrl) {
+  function updateContent(iframeUrl, type) {
     var hash;
     var windowHash = window.location.hash;
 
@@ -99,11 +103,44 @@ onready(function () {
      * The history has already been pushed via the pushstate, so we don't want to double up
      */
      RAF(function() {
+      var contentFrame = document.querySelector('#content-frame');
+
+      function fallback() {
+        contentFrame.contentWindow.location.replace(iframeUrl + hash);
+      }
+
+      var currentDomain = contentFrame.contentWindow.location.protocol + '//' + contentFrame.contentWindow.location.host;
+      if (currentDomain !== context.env('basePath')) {
+        return fallback();
+      }
+
+      var currentType = getFrameType(contentFrame.contentWindow.location.pathname);
+
+      if (currentType !== 'chat') return fallback();
+      if (type !== 'chat') return fallback();
+
       // IE seems to prefer this in a new animation-frame
-      document.querySelector('#content-frame').contentWindow.location.replace(iframeUrl + hash);
+      var match = iframeUrl.match(/(\/.*?)(\/~\w+)?$/);
+      var referenceUrl = match && match[1];
+      if (!referenceUrl) return fallback();
+
+      var newTroupe = troupeCollections.troupes.findWhere({ url: referenceUrl });
+
+      //If we are navigating to a anything other than a chat refresh
+      if(!newTroupe) return fallback();
+
+      context.setTroupeId(newTroupe.id);
+
+      //post a navigation change to the iframe
+      postMessage({
+        type: 'change:room',
+        url: iframeUrl,
+        newTroupe: newTroupe
+      });
+
      });
   }
-  
+
   var allRoomsCollection = troupeCollections.troupes;
   new RoomCollectionTracker(allRoomsCollection);
 
@@ -141,7 +178,7 @@ onready(function () {
     }
 
     pushState(frameUrl, title, url);
-    updateContent(frameUrl);
+    updateContent(frameUrl, type);
   });
 
   window.addEventListener('message', function(e) {
@@ -197,7 +234,7 @@ onready(function () {
         var count = message.count;
         var troupeId = message.troupeId;
         if (troupeId !== context.getTroupeId()) {
-          log.warn('troupeId mismatch in unreadItemsCount');
+          log.warn('troupeId mismatch in unreadItemsCount: got', troupeId, 'expected', context.getTroupeId());
         }
         var v = {
           unreadItems: count

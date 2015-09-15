@@ -25,11 +25,10 @@ var cdn                = require("../../web/cdn");
 var roomMembershipService = require('../../services/room-membership-service');
 var troupeService      = require('../../services/troupe-service');
 var useragent          = require('useragent');
-var avatar             = require('../../utils/avatar');
 var _                 = require('underscore');
 var GitHubOrgService   = require('gitter-web-github').GitHubOrgService;
 var orgPermissionModel = require('../../services/permissions/org-permissions-model');
-
+var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
 
 /* How many chats to send back */
 var INITIAL_CHAT_COUNT = 50;
@@ -147,12 +146,16 @@ function getPermalinkChatForRoom(troupe, chatId) {
  * /PrismarineJS/node-minecraft-protocol?at=54ea6fcecadb3f7525792ba9)I
  */
 function fixBadLinksOnId(value) {
-  value = value ? '' + value : '';
+  if (!value) return;
+  value = '' + value;
+
   if (value.length > 24) {
     value = value.substring(0, 24);
   }
 
-  return mongoUtils.isLikeObjectId(value) ? value : '';
+  if (!mongoUtils.isLikeObjectId(value)) return;
+
+  return value;
 }
 
 function renderMainFrame(req, res, next, frame) {
@@ -303,6 +306,12 @@ function renderChat(req, res, options, next) {
           chatsWithBurst = options.filterChats(chatsWithBurst);
         }
 
+        /* This is less than ideal way of checking if the user is the admin */
+        var isAdmin = troupeContext.troupe && troupeContext.troupe.permissions && troupeContext.troupe.permissions.admin;
+
+        //add ownerIsOrg to the troupe model
+        troupeContext.troupe.ownerIsOrg = ownerIsOrg;
+
         var renderOptions = _.extend({
             isRepo: troupe.githubType === 'REPO',
             bootScriptName: script,
@@ -332,8 +341,8 @@ function renderChat(req, res, options, next) {
             troupeTopic: troupeContext.troupe.topic,
             premium: troupeContext.troupe.premium,
             troupeFavourite: troupeContext.troupe.favourite,
-            avatarUrl: avatar(troupeContext.troupe),
-            isAdmin: troupeContext.permissions.admin,
+            avatarUrl:  resolveRoomAvatarUrl(troupeContext.troupe.url),
+            isAdmin: isAdmin,
             isNativeDesktopApp: troupeContext.isNativeDesktopApp
           }, options.extras);
 
