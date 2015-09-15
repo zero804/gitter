@@ -11,7 +11,8 @@ function parse(url) {
     pathname: parser.pathname,
     search: parser.search,
     hash: parser.hash,
-    host: parser.host
+    host: parser.host,
+    href: parser.href
   };
 }
 
