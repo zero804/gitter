@@ -90,9 +90,9 @@ exports.chatArchive = [
         var dd = parseInt(req.params.dd, 10);
         var tz = req.query.tz || 'Z'
 
-        var dateString = yyyy + "-" + mm + "-" + dd + tz;
-        var startDate = moment(dateString, "YYYY-MM-DDZ");
-        var endDate = moment(startDate).endOf('day');
+        var dateString = yyyy+'-'+mm+'-'+dd+' 00:00 '+tz;
+        var startDate = moment(dateString, "YYYY-MM-DD HH:mm Z");
+        var endDate = moment(startDate).add(1, 'days')
 
         var troupeId = troupe.id;
 
