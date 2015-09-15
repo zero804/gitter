@@ -88,8 +88,10 @@ exports.chatArchive = [
         var yyyy = parseInt(req.params.yyyy, 10);
         var mm = parseInt(req.params.mm, 10);
         var dd = parseInt(req.params.dd, 10);
+        var tz = req.query.tz || 'Z'
 
-        var startDate = moment(yyyy + "-" + mm + "-" + dd + "Z", "YYYY-MM-DDZ");
+        var dateString = yyyy + "-" + mm + "-" + dd + tz;
+        var startDate = moment(dateString, "YYYY-MM-DDZ");
         var endDate = moment(startDate).endOf('day');
 
         var troupeId = troupe.id;
