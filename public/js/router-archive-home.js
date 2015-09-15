@@ -79,7 +79,7 @@ onready(function() {
       var dd = date.getDate();
       if(dd < 10) dd = "0" + dd;
 
-      window.location.assign('/' + context.troupe().get('uri') + '/archives/' + yyyy + '/' + mm + '/' + dd);
+      window.location.assign('/' + context.troupe().get('uri') + '/archives/' + yyyy + '/' + mm + '/' + dd + '?tz=' + tz);
     }
   });
 
