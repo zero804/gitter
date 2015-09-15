@@ -59,31 +59,33 @@ onready(function() {
 
   var tz = getTimezoneInfo().iso;
 
+  cal.init({
+    start: elevenFullMonthsAgo, // eleven months + this partial month = 12 blocks shown
+    maxDate: today,
+    minDate: gitterLaunchDate,
+    range: 12,
+    domain: "month",
+    subDomain: "day",
+    considerMissingDataAsZero: false,
+    displayLegend: false,
+    data: {},
+    onClick: function(date, value) {
+      if(!value) return;
+
+      var yyyy = date.getFullYear();
+      var mm = date.getMonth() + 1;
+      if(mm < 10) mm = "0" + mm;
+
+      var dd = date.getDate();
+      if(dd < 10) dd = "0" + dd;
+
+      window.location.assign('/' + context.troupe().get('uri') + '/archives/' + yyyy + '/' + mm + '/' + dd);
+    }
+  });
+
   apiClient.priv.get('/chat-heatmap/' + troupeId + '?tz='+tz)
     .then(function(heatmapData) {
-      cal.init({
-        start: elevenFullMonthsAgo, // eleven months + this partial month = 12 blocks shown
-        maxDate: today,
-        minDate: gitterLaunchDate,
-        range: 12,
-        domain: "month",
-        subDomain: "day",
-        considerMissingDataAsZero: false,
-        displayLegend: false,
-        data: heatmapData,
-        onClick: function(date, value) {
-          if(!value) return;
-
-          var yyyy = date.getFullYear();
-          var mm = date.getMonth() + 1;
-          if(mm < 10) mm = "0" + mm;
-
-          var dd = date.getDate();
-          if(dd < 10) dd = "0" + dd;
-
-          window.location.assign('/' + context.troupe().get('uri') + '/archives/' + yyyy + '/' + mm + '/' + dd);
-        }
-      });
+      cal.update(heatmapData);
     });
 
   // new Router();
