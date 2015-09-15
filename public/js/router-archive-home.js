@@ -55,10 +55,18 @@ onready(function() {
   var today = new Date();
   var elevenFullMonthsAgo = new Date(today.getFullYear(), today.getMonth() - 11, 1);
   var gitterLaunchDate = new Date(2013, 10, 1); // 1 November 2013
-  var cal = new CalHeatMap();
 
   var tz = getTimezoneInfo().iso;
 
+  function mangleHeatmap() {
+    var $rects = $('.graph-rect').not('.q1,.q2,.q3,.q4,.q5');
+    $rects.each(function(i, el) {
+      el.classList.remove('hover_cursor');
+      el.classList.add('empty');
+    });
+  }
+
+  var cal = new CalHeatMap();
   cal.init({
     start: elevenFullMonthsAgo, // eleven months + this partial month = 12 blocks shown
     maxDate: today,
@@ -80,19 +88,15 @@ onready(function() {
       if(dd < 10) dd = "0" + dd;
 
       window.location.assign('/' + context.troupe().get('uri') + '/archives/' + yyyy + '/' + mm + '/' + dd + '?tz=' + tz);
+    },
+    onComplete: function() {
+      mangleHeatmap();
     }
   });
-
   apiClient.priv.get('/chat-heatmap/' + troupeId + '?tz='+tz)
     .then(function(heatmapData) {
       cal.update(heatmapData);
-      setTimeout(function() {
-        var $rects = $('.graph-rect').not('.q1,.q2,.q3,.q4,.q5');
-        $rects.each(function(i, el) {
-          el.classList.remove('hover_cursor');
-          el.classList.add('empty');
-        });
-      }, 0);
+      mangleHeatmap();
     });
 
   // new Router();

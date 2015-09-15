@@ -73,6 +73,14 @@ module.exports = (function() {
       var tz = getTimezoneInfo().iso;
       var heatmapURL = '/chat-heatmap/' + troupeId + '?start=' + startIso + '&end='+ endIso + '&tz=' + tz;
 
+      function mangleHeatmap() {
+        var $rects = $('.graph-rect').not('.q1,.q2,.q3,.q4,.q5');
+        $rects.each(function(i, el) {
+          el.classList.remove('hover_cursor');
+          el.classList.add('empty');
+        });
+      }
+
       var cal = new CalHeatMap();
       cal.init({
         itemSelector: this.ui.navigation[0],
@@ -97,18 +105,15 @@ module.exports = (function() {
           if(dd < 10) dd = "0" + dd;
 
           window.location.assign('/' + context.troupe().get('uri') + '/archives/' + yyyy + '/' + mm + '/' + dd + '?tz=' + tz);
+        },
+        onComplete: function() {
+          mangleHeatmap();
         }
       });
       apiClient.priv.get(heatmapURL)
         .then(function(heatmapData) {
           cal.update(heatmapData);
-          setTimeout(function() {
-            var $rects = $('.graph-rect').not('.q1,.q2,.q3,.q4,.q5');
-            $rects.each(function(i, el) {
-              el.classList.remove('hover_cursor');
-              el.classList.add('empty');
-            });
-          }, 0);
+          mangleHeatmap();
         });
     }
   });
