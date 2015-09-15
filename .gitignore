@@ -79,4 +79,3 @@ config/docker
 docker_node_modules
 *.cpuprofile
 *-v8.log
-docker-elasticsearch.sh
