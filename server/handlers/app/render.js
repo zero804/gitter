@@ -335,7 +335,9 @@ function renderChat(req, res, options, next) {
             inputAutoFocus: !options.mobile,
             placeholder: 'Click here to type a chat message. Supports GitHub flavoured markdown.',
             ownerIsOrg: ownerIsOrg,
-            roomMember: req.uriContext.roomMember
+            troupe: {
+              roomMember: req.uriContext.roomMember
+            }
           }, troupeContext && {
             troupeTopic: troupeContext.troupe.topic,
             premium: troupeContext.troupe.premium,
