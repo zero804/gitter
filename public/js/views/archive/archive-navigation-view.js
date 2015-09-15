@@ -1,5 +1,6 @@
 'use strict';
 
+var _ = require('underscore');
 var Marionette = require('backbone.marionette');
 var moment = require('moment');
 var context = require('utils/context');
@@ -62,31 +63,37 @@ module.exports = (function() {
       var highlightDate = new Date(a.year(), a.month(), a.date());
 
       var cal = new CalHeatMap();
-      cal.init({
-        itemSelector: this.ui.navigation[0],
-        start: start.toDate(),
-        maxDate: new Date(),
-        highlight: [highlightDate],
-        minDate: new Date(2013, 10, 1), // 1 November 2013
-        range: range,
-        domain: "month",
-        subDomain: "day",
-        verticalOrientation: false,
-        considerMissingDataAsZero: false,
-        displayLegend: false,
-        data: apiClient.priv.url('/chat-heatmap/' + troupeId + '?start={{d:start}}&end={{d:end}}'),
-        onClick: function(date, value) {
-          if(!value) return;
-          var yyyy = date.getFullYear();
-          var mm = date.getMonth() + 1;
-          if(mm < 10) mm = "0" + mm;
+      var startIso = start.toISOString()
+      var endIso = moment.utc().toISOString()
+      var heatmapURL = '/chat-heatmap/' + troupeId + '?start=' + startIso + '&end='+ endIso;
+      apiClient.priv.get(heatmapURL)
+        .then(_.bind(function(heatmapData) {
+          cal.init({
+            itemSelector: this.ui.navigation[0],
+            start: start.toDate(),
+            maxDate: new Date(),
+            highlight: [highlightDate],
+            minDate: new Date(2013, 10, 1), // 1 November 2013
+            range: range,
+            domain: "month",
+            subDomain: "day",
+            verticalOrientation: false,
+            considerMissingDataAsZero: false,
+            displayLegend: false,
+            data: heatmapData,
+            onClick: function(date, value) {
+              if(!value) return;
+              var yyyy = date.getFullYear();
+              var mm = date.getMonth() + 1;
+              if(mm < 10) mm = "0" + mm;
 
-          var dd = date.getDate();
-          if(dd < 10) dd = "0" + dd;
+              var dd = date.getDate();
+              if(dd < 10) dd = "0" + dd;
 
-          window.location.assign('/' + context.troupe().get('uri') + '/archives/' + yyyy + '/' + mm + '/' + dd);
-        }
-      });
+              window.location.assign('/' + context.troupe().get('uri') + '/archives/' + yyyy + '/' + mm + '/' + dd);
+            }
+          });
+        }, this));
     }
   });
 
