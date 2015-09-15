@@ -90,7 +90,7 @@ module.exports = (function() {
           var dd = date.getDate();
           if(dd < 10) dd = "0" + dd;
 
-          window.location.assign('/' + context.troupe().get('uri') + '/archives/' + yyyy + '/' + mm + '/' + dd + '?tz='+tz);
+          window.location.assign('/' + context.troupe().get('uri') + '/archives/' + yyyy + '/' + mm + '/' + dd + '?tz=' + tz);
         }
       });
       apiClient.priv.get(heatmapURL)
