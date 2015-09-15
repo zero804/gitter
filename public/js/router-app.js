@@ -15,6 +15,7 @@ var onready               = require('./utils/onready');
 var urlParser             = require('utils/url-parser');
 var RAF                   = require('utils/raf');
 var RoomCollectionTracker = require('components/room-collection-tracker');
+var SPARoomSwitcher       = require('components/spa-room-switcher');
 
 require('components/statsc');
 require('views/widgets/preload');
@@ -53,6 +54,43 @@ onready(function() {
    */
   window.history.replaceState(chatIFrame.src, '', window.location.href);
 
+
+  function getContentFrameLocation() {
+    var contentFrame = document.querySelector('#content-frame');
+    return contentFrame.contentWindow.location;
+  }
+
+  var roomSwitcher = new SPARoomSwitcher(troupeCollections.troupes, context.env('basePath'), getContentFrameLocation);
+  roomSwitcher.on('replace', function(href) {
+    context.setTroupeId(undefined); // TODO: update the title....
+    /*
+     * Use location.replace so as not to affect the history state of the application
+     *
+     * The history has already been pushed via the pushstate, so we don't want to double up
+     */
+    RAF(function() {
+      getContentFrameLocation.replace(href);
+    });
+  });
+
+  roomSwitcher.on('reload', function() {
+    context.setTroupeId(undefined); // TODO: update the title....
+    RAF(function() {
+      getContentFrameLocation.reload(true);
+    });
+  });
+
+  roomSwitcher.on('switch', function(troupe, permalinkChatId) {
+    context.setTroupeId(troupe.id);
+
+    //post a navigation change to the iframe
+    postMessage({
+      type: 'change:room',
+      newTroupe: troupe,
+      permalinkChatId: permalinkChatId
+    });
+  });
+
   function pushState(state, title, url) {
     if (state == window.history.state) {
       // Don't repush the same state...
@@ -83,9 +121,9 @@ onready(function() {
     if (parsedIFrameUrl.type === 'chat') {
       //manually trigger a navigation
       appEvents.trigger('navigation', parsedIFrameUrl.room, 'chat', parsedIFrameUrl.room);
-      updateContent(parsedIFrameUrl.room);
+      roomSwitcher.change(parsedIFrameUrl.room);
     } else {
-      updateContent(iframeUrl);
+      roomSwitcher.change(iframeUrl);
     }
 
     appEvents.trigger('track', window.location.pathname + window.location.hash);
@@ -99,67 +137,6 @@ onready(function() {
       room: match && match[1],
       type: match && match[3],
     };
-  }
-
-  function updateContent(iframeUrl) {
-    var hash;
-    var windowHash = window.location.hash;
-
-    if (!windowHash || windowHash === '#') {
-      hash = '#initial';
-    } else {
-      hash = windowHash;
-    }
-
-    // fix for IE 10 giving iframeUrls with first slash missing
-    if (iframeUrl.charAt(0) !== '/' && iframeUrl.indexOf(window.location.origin) !== 0) {
-      iframeUrl = '/' + iframeUrl;
-    }
-
-    var contentFrame = document.querySelector('#content-frame');
-
-    function fallback() {
-      context.setTroupeId(undefined); // TODO: update the title....
-      /*
-       * Use location.replace so as not to affect the history state of the application
-       *
-       * The history has already been pushed via the pushstate, so we don't want to double up
-       */
-      RAF(function() {
-        contentFrame.contentWindow.location.replace(iframeUrl + hash);
-      });
-    }
-
-    var currentDomain = contentFrame.contentWindow.location.protocol + '//' + contentFrame.contentWindow.location.host;
-    if (currentDomain !== context.env('basePath')) {
-      return fallback();
-    }
-
-    var currentType = getFrameType(contentFrame.contentWindow.location.pathname).type;
-
-    if (currentType !== 'chat') return fallback();
-
-    // IE seems to prefer this in a new animation-frame
-    var match = iframeUrl.match(/(\/.*?)(\/~\w+)?$/);
-    var referenceUrl = match && match[1];
-    if (!referenceUrl) return fallback();
-
-    var newTroupe = troupeCollections.troupes.findWhere({
-      url: referenceUrl,
-    });
-
-    //If we are navigating to a anything other than a chat refresh
-    if (!newTroupe) return fallback();
-
-    context.setTroupeId(newTroupe.id);
-
-    //post a navigation change to the iframe
-    postMessage({
-      type: 'change:room',
-      url: iframeUrl,
-      newTroupe: newTroupe,
-    });
-
   }
 
   var allRoomsCollection = troupeCollections.troupes;
@@ -178,7 +155,7 @@ onready(function() {
       var title = 'home';
 
       pushState(newFrame, title, newLocation);
-      updateContent(newFrame);
+      roomSwitcher.change(newFrame);
     }
   });
 
@@ -204,7 +181,7 @@ onready(function() {
     }
 
     pushState(frameUrl, title, url);
-    updateContent(frameUrl, type);
+    roomSwitcher.change(frameUrl);
   });
 
   window.addEventListener('message', function(e) {
