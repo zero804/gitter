@@ -1,18 +1,23 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var unreadItemService = require("../../services/unread-item-service");
-var recentRoomService = require('../../services/recent-room-service');
+var logger                = require('gitter-web-env').logger;
+var unreadItemService     = require("../../services/unread-item-service");
+var userService           = require("../../services/user-service");
+var recentRoomService     = require('../../services/recent-room-service');
 var roomMembershipService = require('../../services/room-membership-service');
-var billingService    = require('../../services/billing-service');
+var billingService        = require('../../services/billing-service');
+var roomPermissionsModel  = require('../../services/room-permissions-model');
+var troupeService         = require('../../services/troupe-service');
 
-var _                 = require("underscore");
+var _                 = require("lodash");
 var uniqueIds         = require('mongodb-unique-ids');
 var winston           = require('../../utils/winston');
 var debug             = require('debug')('gitter:troupe-strategy');
 var execPreloads      = require('../exec-preloads');
 var getVersion        = require('../get-model-version');
 var UserIdStrategy    = require('./user-id-strategy');
+var Q                 = require('q');
 
 /**
  *
@@ -141,22 +146,121 @@ ProOrgStrategy.prototype = {
   name: 'ProOrgStrategy'
 };
 
+/** Returns the permissions the user has in the orgs. This is not intended to be used for large sets, rather individual items */
+function TroupePermissionsStrategy(options) {
+  var isAdmin = {};
+
+  function getUser() {
+    if (options.currentUser) return Q.resolve(options.currentUser);
+    return userService.findById(options.currentUserId);
+  }
+
+  this.preload = function (troupes, callback) {
+    return getUser()
+      .then(function(user) {
+        if (!user) return;
+
+        return Q.all(troupes.map(function(troupe) {
+          return roomPermissionsModel(user, 'admin', troupe)
+            .then(function(admin) {
+              isAdmin[troupe.id] = admin;
+            })
+            .catch(function(err) {
+              // Fallback in case of GitHub API downtime
+              logger.error('Unable to obtain admin permissions', { exception: err });
+              isAdmin[troupe.id] = false;
+            });
+        }));
+      })
+      .nodeify(callback);
+  };
+
+  this.map = function(troupe) {
+    return {
+      admin: isAdmin[troupe.id] || false
+    };
+  };
+}
+
+TroupePermissionsStrategy.prototype = {
+  name: 'TroupePermissionsStrategy'
+};
+
+var TroupeOwnerIsOrgStrategy = function (){
+
+  var ownerIsOrg = {};
+
+  this.preload = function (troupes, callback){
+    // Use uniq as the list of items will probably be much smaller than the original set,
+    // this means way fewer queries to mongodb
+    var ownersForQuery = _.uniq(troupes.map(function(troupe){
+      return troupe.lcOwner;
+    }).filter(function(t){
+      return !!t;
+    }));
+
+    return Q.all(ownersForQuery.map(function(lcOwner){
+      //sadly Q does not want to resolve the promise if you pass through the
+      //troupe as part of an array
+      //eg `return [ troupe, troupeService... ]`
+      return troupeService.checkGitHubTypeForUri(lcOwner || '', 'ORG');
+    }))
+    .then(function(results){
+
+      var hashed = ownersForQuery.reduce(function(memo, lcOwnerId, index){
+        memo[lcOwnerId] = results[index];
+        return memo;
+      }, {});
+
+      results.forEach(function(result, index){
+        //not being able to pass the troupe means we ASSUME they come through in order correctly
+        var troupe = troupes[index];
+        ownerIsOrg[troupe.id] = troupe.lcOwner && hashed[troupe.lcOwner];
+      });
+
+      callback();
+    });
+  };
+
+  this.map = function (troupe){
+    return (ownerIsOrg[troupe.id] || false);
+  };
+};
+
+TroupeOwnerIsOrgStrategy.prototype = {
+  name: 'TroupeOwnerIsOrgStrategy'
+};
+
 function TroupeStrategy(options) {
   if(!options) options = {};
 
   var currentUserId = options.currentUserId;
 
-  var unreadItemStategy = currentUserId && !options.skipUnreadCounts ? new AllUnreadItemCountStategy(options) : null;
+  var unreadItemStategy     = currentUserId && !options.skipUnreadCounts ? new AllUnreadItemCountStategy(options) : null;
   var lastAccessTimeStategy = currentUserId ? new LastTroupeAccessTimesForUserStrategy(options) : null;
-  var favouriteStrategy = currentUserId ? new FavouriteTroupesForUserStrategy(options) : null;
-  var lurkStrategy = currentUserId ? new LurkTroupeForUserStrategy(options) : null;
-  var userIdStategy = new UserIdStrategy(options);
-  var proOrgStrategy = new ProOrgStrategy(options);
+  var favouriteStrategy     = currentUserId ? new FavouriteTroupesForUserStrategy(options) : null;
+  var lurkStrategy          = currentUserId ? new LurkTroupeForUserStrategy(options) : null;
+  var userIdStategy         = new UserIdStrategy(options);
+  var proOrgStrategy        = new ProOrgStrategy(options);
+  var permissionsStategy    = (currentUserId || options.currentUser) && options.includePermissions ? new TroupePermissionsStrategy(options) : null;
+  var ownerIsOrgStrategy    = (options.includeOwner) ? new TroupeOwnerIsOrgStrategy(options) : null;
 
   this.preload = function(items, callback) {
-
     var strategies = [];
-    var troupeIds = items.map(function(i) { return i.id; });
+    var troupeIds = [];
+    var userIdSet = {};
+
+    _.each(items, function(troupe) {
+      troupeIds.push(troupe.id);
+
+      // Add one-to-one users to the mix
+      if(troupe.oneToOne) {
+        _.each(troupe.oneToOneUsers, function(troupeUser) {
+          userIdSet[troupeUser.userId] = true;
+        });
+      }
+    });
+    var userIds = Object.keys(userIdSet);
 
     if(unreadItemStategy) {
       strategies.push({
@@ -191,22 +295,24 @@ function TroupeStrategy(options) {
       });
     }
 
-    var userIds;
-    // if(options.mapUsers) {
-    //   userIds = _.flatten(items.map(function(troupe) { return troupe.getUserIds(); }));
-    // } else {
-      userIds = _.flatten(items.map(function(troupe) {
-          if(troupe.oneToOne) return troupe.oneToOneUsers.map(function(f) { return f.userId; });
-        })).filter(function(f) {
-          return !!f;
-        });
-
-    // }
+    if (permissionsStategy) {
+      strategies.push({
+        strategy: permissionsStategy,
+        data: items
+      });
+    }
 
     strategies.push({
       strategy: userIdStategy,
       data: userIds
     });
+
+    if(ownerIsOrgStrategy) {
+      strategies.push({
+        strategy: ownerIsOrgStrategy,
+        data: items
+      });
+    }
 
     execPreloads(strategies, callback);
   };
@@ -278,6 +384,8 @@ function TroupeStrategy(options) {
       premium: isPro,
       noindex: item.noindex,
       tags: item.tags,
+      permissions: permissionsStategy ? permissionsStategy.map(item) : undefined,
+      ownerIsOrg: ownerIsOrgStrategy ? ownerIsOrgStrategy.map(item) : undefined,
       v: getVersion(item)
     };
   };

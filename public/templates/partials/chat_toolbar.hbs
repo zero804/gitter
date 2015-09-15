@@ -14,11 +14,9 @@
           <h5 class="trpToolbarHeaderItem selected" id="people-header">
             People
           </h5>
-          {{#isRepo}}
-            <h5 class="trpToolbarHeaderItem" id="info-header">
+          <h5 class="trpToolbarHeaderItem {{#unless isRepo}}hidden{{/unless}}" id="info-header">
               Repo info
-            </h5>
-          {{/isRepo}}
+          </h5>
         </div>
         <div class="trpToolbarList">
           <div class="trpToolbarListContent" id="people-roster">

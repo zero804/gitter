@@ -1,34 +1,22 @@
 "use strict";
 
-var apiClient = require('components/apiClient');
 var SmartUserCollection = require('./smart-users');
 var Backbone = require('backbone');
 var realtime = require('components/realtime');
 var LiveCollection = require('gitter-realtime-client').LiveCollection;
 var SyncMixin = require('./sync-mixin');
+var context = require('utils/context');
 
 var UserModel = Backbone.Model.extend({
   idAttribute: "id",
   sync: SyncMixin.sync
 });
 
-var UserCollection = LiveCollection.extend({
-  model: UserModel,
-  modelName: 'user',
-  url: apiClient.room.channelGenerator('/users'),
-  getSnapshotState: function () {
-    return { lean: true };
-  },
-  client: function() {
-    return realtime.getClient();
-  },
-  sync: SyncMixin.sync
-});
-
 var RosterCollection = LiveCollection.extend({
   model: UserModel,
   modelName: 'user',
-  url: apiClient.room.channelGenerator('/users'),
+  urlTemplate: '/v1/rooms/:troupeId/users',
+  contextModel: context.contextModel(),
   getSnapshotState: function () {
     return { lean: true, limit: 25 };
   },
@@ -42,6 +30,5 @@ var RosterCollection = LiveCollection.extend({
 module.exports = {
   RosterCollection: RosterCollection,
   SortedRosterCollection: SmartUserCollection.SortedAndLimited,
-  UserCollection: UserCollection,
   UserModel: UserModel
 };
