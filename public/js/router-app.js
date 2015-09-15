@@ -72,7 +72,7 @@ onready(function() {
     var upperBound = (iframeUrl.indexOf('#') !== -1) ? iframeUrl.indexOf('#') : Infinity;
 
     //pull off the host information and any has parameters
-    iframeUrl = iframeUrl.substring(context.env('basePath'), upperBound);
+    iframeUrl = iframeUrl.substring(context.env('basePath').length, upperBound);
 
     if (!iframeUrl) {
       return;
@@ -83,9 +83,10 @@ onready(function() {
     if (parsedIFrameUrl.type === 'chat') {
       //manually trigger a navigation
       appEvents.trigger('navigation', parsedIFrameUrl.room, 'chat', parsedIFrameUrl.room);
+      updateContent(parsedIFrameUrl.room);
+    } else {
+      updateContent(iframeUrl);
     }
-
-    updateContent(iframeUrl);
 
     appEvents.trigger('track', window.location.pathname + window.location.hash);
     return;
