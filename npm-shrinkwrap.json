@@ -1421,30 +1421,29 @@
       }
     },
     "gitter-realtime-client": {
-      "version": "0.3.3",
-      "from": "http://beta-internal:4873/gitter-realtime-client/-/gitter-realtime-client-0.3.3.tgz",
-      "resolved": "http://beta-internal:4873/gitter-realtime-client/-/gitter-realtime-client-0.3.3.tgz",
+      "version": "0.3.4",
+      "from": "gitter-realtime-client@beta",
       "dependencies": {
         "backbone-sorted-collection": {
           "version": "0.3.9",
-          "from": "git://github.com/gitterhq/backbone-sorted-collection.git#79ce5228344e26a64f2d5b648698a9349c9030dd",
+          "from": "git://github.com/gitterhq/backbone-sorted-collection.git#79ce522",
           "resolved": "git://github.com/gitterhq/backbone-sorted-collection.git#79ce5228344e26a64f2d5b648698a9349c9030dd",
           "dependencies": {
             "backbone-collection-proxy": {
               "version": "0.2.5",
-              "from": "http://beta-internal:4873/backbone-collection-proxy/-/backbone-collection-proxy-0.2.5.tgz",
+              "from": "backbone-collection-proxy@>=0.2.0 <0.3.0",
               "resolved": "http://beta-internal:4873/backbone-collection-proxy/-/backbone-collection-proxy-0.2.5.tgz"
             }
           }
         },
         "backbone-url-resolver": {
           "version": "0.1.1",
-          "from": "http://beta-internal:4873/backbone-url-resolver/-/backbone-url-resolver-0.1.1.tgz",
+          "from": "backbone-url-resolver@>=0.1.1 <0.2.0",
           "resolved": "http://beta-internal:4873/backbone-url-resolver/-/backbone-url-resolver-0.1.1.tgz"
         },
         "underscore": {
           "version": "1.8.3",
-          "from": "http://beta-internal:4873/underscore/-/underscore-1.8.3.tgz",
+          "from": "underscore@>=1.7.0 <2.0.0",
           "resolved": "http://beta-internal:4873/underscore/-/underscore-1.8.3.tgz"
         }
       }
