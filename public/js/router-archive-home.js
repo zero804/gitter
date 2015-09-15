@@ -6,6 +6,7 @@ var apiClient = require('components/apiClient');
 var CalHeatMap = require('cal-heatmap');
 var onready = require('./utils/onready');
 var appEvents = require('utils/appevents');
+var getTimezoneInfo = require('utils/detect-timezone');
 
 require('views/widgets/preload');
 require('filtered-collection');
@@ -14,7 +15,6 @@ require('template/helpers/all');
 require('components/bug-reporting');
 require('utils/tracking');
 require('components/ping');
-
 
 onready(function() {
 
@@ -57,7 +57,9 @@ onready(function() {
   var gitterLaunchDate = new Date(2013, 10, 1); // 1 November 2013
   var cal = new CalHeatMap();
 
-  apiClient.priv.get('/chat-heatmap/' + troupeId)
+  var tz = getTimezoneInfo().iso;
+
+  apiClient.priv.get('/chat-heatmap/' + troupeId + '?tz='+tz)
     .then(function(heatmapData) {
       cal.init({
         start: elevenFullMonthsAgo, // eleven months + this partial month = 12 blocks shown

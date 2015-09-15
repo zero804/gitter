@@ -11,8 +11,10 @@ var assert = require('assert');
  *
  * startMonth and endMonth are optional, limits heatmap for archive nav view.
  */
-exports.getHeatmapForRoom = function(roomId, startMonth, endMonth) {
+exports.getHeatmapForRoom = function(roomId, startMonth, endMonth, tz) {
   assert(roomId, 'roomId required');
+
+  tz = tz || 0;
 
   var filter = { term: { toTroupeId: roomId } };
 
@@ -50,7 +52,11 @@ exports.getHeatmapForRoom = function(roomId, startMonth, endMonth) {
       },
       aggregations: {
         messages_per_day: {
-          date_histogram: { field : 'sent', interval : 'day' }
+          date_histogram: {
+            field: 'sent',
+            interval: 'day',
+            time_zone: tz
+          }
         }
       }
     }
@@ -61,7 +67,7 @@ exports.getHeatmapForRoom = function(roomId, startMonth, endMonth) {
       var unixTime = (bucket.key / 1000).toFixed(0);
 
       memo[unixTime] = bucket.doc_count;
-      return memo; 
+      return memo;
     }, {});
   });
 };
