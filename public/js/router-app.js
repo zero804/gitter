@@ -95,9 +95,9 @@ onready(function() {
   function getFrameType(locationHref) {
     var match = locationHref.match(/(\/.*?)(\/~(\w+))?$/);
     return {
-      path: match[0],
-      room: match[1],
-      type: match[3],
+      path: match && match[0],
+      room: match && match[1],
+      type: match && match[3],
     };
   }
 
