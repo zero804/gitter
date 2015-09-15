@@ -94,8 +94,8 @@ exports.chatArchive = [
 
         var troupeId = troupe.id;
 
-        var nextDate = moment(startDate).add('days', 1);
-        var previousDate = moment(startDate).subtract('days', 1);
+        var nextDate = moment(startDate).add(1, 'days');
+        var previousDate = moment(startDate).subtract(1, 'days');
 
         var today = moment().endOf('day');
         if(moment(nextDate).endOf('day').isAfter(today)) {
