@@ -286,10 +286,10 @@ onready(function() {
 
     },
 
-    editTags: function(roomId) {
+    editTags: function() {
       require.ensure(['views/app/editTagsView'], function(require) {
         var EditTagsView = require('views/app/editTagsView');
-        appView.dialogRegion.show(new EditTagsView({roomId: roomId}));
+        appView.dialogRegion.show(new EditTagsView({roomId: context.troupe().get('id')}));
       });
     },
 
