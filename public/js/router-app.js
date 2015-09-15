@@ -135,7 +135,6 @@ onready(function () {
       var currentType = getFrameType(contentFrame.contentWindow.location.pathname);
 
       if (currentType !== 'chat') return fallback();
-      console.log(currentType, iframeUrl);
 
       // IE seems to prefer this in a new animation-frame
       var match = iframeUrl.match(/(\/.*?)(\/~\w+)?$/);
