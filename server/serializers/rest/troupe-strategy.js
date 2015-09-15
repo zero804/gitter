@@ -43,6 +43,38 @@ AllUnreadItemCountStategy.prototype = {
   name: 'AllUnreadItemCountStategy'
 };
 
+function RoomMembershipStrategy(options) {
+  var self = this;
+  var userId = options.userId || options.currentUserId;
+
+  this.preload = function(troupeIds, callback) {
+    console.log('RoomMembershipStrategy troupeIds:', troupeIds);
+    self.memberships = {};
+
+    var promises = troupeIds.reduce(function(accum, troupeId) {
+      accum.push(roomMembershipService.checkRoomMembership(troupeId, userId));
+      return accum;
+    }, []);
+    
+    Q.all(promises)
+    .then(function(results) {
+      results.forEach(function(result, i) {
+        self.memberships[troupeIds[i]] = result;
+      });
+    })
+    .nodeify(callback);
+  };
+
+  this.map = function(id) {
+    return self.memberships[id] ? self.memberships[id] : false;
+  };
+}
+
+RoomMembershipStrategy.prototype = {
+  name: 'AllUnreadItemCountStategy'
+};
+
+
 function LastTroupeAccessTimesForUserStrategy(options) {
   var userId = options.userId || options.currentUserId;
   var timesIndexed;
@@ -244,6 +276,7 @@ function TroupeStrategy(options) {
   var proOrgStrategy        = new ProOrgStrategy(options);
   var permissionsStategy    = (currentUserId || options.currentUser) && options.includePermissions ? new TroupePermissionsStrategy(options) : null;
   var ownerIsOrgStrategy    = (options.includeOwner) ? new TroupeOwnerIsOrgStrategy(options) : null;
+  var roomMembershipStrategy = currentUserId ? new RoomMembershipStrategy(options) : null;
 
   this.preload = function(items, callback) {
     var strategies = [];
@@ -261,6 +294,13 @@ function TroupeStrategy(options) {
       }
     });
     var userIds = Object.keys(userIdSet);
+
+    if (roomMembershipStrategy) {
+      strategies.push({
+        strategy: roomMembershipStrategy,
+        data: troupeIds
+      });
+    }
 
     if(unreadItemStategy) {
       strategies.push({
@@ -386,7 +426,8 @@ function TroupeStrategy(options) {
       tags: item.tags,
       permissions: permissionsStategy ? permissionsStategy.map(item) : undefined,
       ownerIsOrg: ownerIsOrgStrategy ? ownerIsOrgStrategy.map(item) : undefined,
-      v: getVersion(item)
+      v: getVersion(item),
+      roomMember: roomMembershipStrategy ? roomMembershipStrategy.map(item.id) : undefined
     };
   };
 }
