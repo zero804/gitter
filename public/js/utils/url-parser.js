@@ -38,14 +38,17 @@ function parseSearch(search) {
 
 function format(options) {
   var parser = document.createElement('a');
-  ['href', 'protocol', 'host', 'hostname', 'port', 'search', 'hash'].forEach(function(key) {
-    if (options.hasOwnProperty(key)) {
+  parser.href = document.location.href;
+  
+  ['href', 'protocol', 'host', 'port', 'hostname', 'search', 'hash', 'pathname'].forEach(function(key) {
+    if (options.hasOwnProperty(key) && options[key] !== undefined) {
       parser[key] = options[key];
     }
   });
 
   return parser.href;
 }
+
 module.exports = {
   parse: parse,
   parseSearch: parseSearch,
