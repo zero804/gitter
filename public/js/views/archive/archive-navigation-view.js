@@ -1,6 +1,7 @@
 'use strict';
 
 var _ = require('underscore');
+var $ = require('jquery');
 var Marionette = require('backbone.marionette');
 var moment = require('moment');
 var context = require('utils/context');
