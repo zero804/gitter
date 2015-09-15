@@ -39,8 +39,8 @@ function parseSearch(search) {
 function format(options) {
   var parser = document.createElement('a');
   parser.href = document.location.href;
-  
-  ['href', 'protocol', 'host', 'port', 'hostname', 'search', 'hash', 'pathname'].forEach(function(key) {
+
+  ['href', 'protocol', 'hostname', 'search', 'hash', 'pathname'].forEach(function(key) {
     if (options.hasOwnProperty(key) && options[key] !== undefined) {
       parser[key] = options[key];
     }
