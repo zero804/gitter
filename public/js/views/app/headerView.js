@@ -1,14 +1,14 @@
-"use strict";
-var _ = require('underscore');
-var context = require('utils/context');
-var apiClient = require('components/apiClient');
-var Marionette = require('backbone.marionette');
-var Backbone = require('backbone');
-var autolink = require('autolink');
-var notifications = require('components/notifications');
-var Dropdown = require('views/controls/dropdown');
-var appEvents = require('utils/appevents');
-var headerViewTemplate  = require('./tmpl/headerViewTemplate.hbs');
+'use strict';
+var _                    = require('underscore');
+var context              = require('utils/context');
+var apiClient            = require('components/apiClient');
+var Marionette           = require('backbone.marionette');
+var Backbone             = require('backbone');
+var autolink             = require('autolink');
+var notifications        = require('components/notifications');
+var Dropdown             = require('views/controls/dropdown');
+var appEvents            = require('utils/appevents');
+var headerViewTemplate   = require('./tmpl/headerViewTemplate.hbs');
 var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
 
 require('views/behaviors/tooltip');
@@ -26,7 +26,7 @@ module.exports = Marionette.ItemView.extend({
   template: headerViewTemplate,
 
   modelEvents: {
-    change:       'renderIfRequired'
+    change:       'renderIfRequired',
   },
 
   ui: {
@@ -35,7 +35,7 @@ module.exports = Marionette.ItemView.extend({
     topic:        '.js-chat-topic',
     name:         '.js-chat-name',
     favourite:    '.js-favourite-button',
-    orgrooms:     '.js-org-page'
+    orgrooms:     '.js-org-page',
   },
 
   events: {
@@ -44,13 +44,13 @@ module.exports = Marionette.ItemView.extend({
     'click @ui.favourite': 'toggleFavourite',
     'dblclick @ui.topic':  'showInput',
     'keydown textarea':    'detectKeys',
-    'click @ui.orgrooms':  'goToOrgRooms'
+    'click @ui.orgrooms':  'goToOrgRooms',
   },
 
   behaviors: {
     Tooltip: {
       '.js-chat-name': { titleFn: 'getChatNameTitle', placement: 'right' },
-      '.js-org-page':  { titleFn: 'getOrgPageTitle', placement: 'left' }
+      '.js-org-page':  { titleFn: 'getOrgPageTitle', placement: 'left' },
     },
   },
 
@@ -76,21 +76,22 @@ module.exports = Marionette.ItemView.extend({
     return data;
   },
 
-  buildDropdown: function (){
-    if(context.isLoggedIn()) {
+  buildDropdown: function() {
+    if (context.isLoggedIn()) {
       this.dropdown = new Dropdown({
         allowClickPropagation: true,
         collection: this.menuItemsCollection,
         placement: 'right',
+
         // Do not set the target element for now as it's re-rendered on room
         // change. We'll set it dynamically before showing the dropdown
       });
 
       this.listenTo(this.dropdown, 'selected', function(e) {
         var href = e.get('href');
-        if(href === '#leave') {
+        if (href === '#leave') {
           this.leaveRoom();
-        } else if(href === '#notifications') {
+        } else if (href === '#notifications') {
           this.requestBrowserNotificationsPermission();
         }
       });
@@ -101,7 +102,7 @@ module.exports = Marionette.ItemView.extend({
     var model = this.model;
     if (model.get('security') === 'PUBLIC') return 'Anyone can join';
 
-    switch(model.get('githubType')) {
+    switch (model.get('githubType')) {
       case 'REPO':
         return 'All repo collaborators can join';
 
@@ -137,6 +138,7 @@ module.exports = Marionette.ItemView.extend({
       // Deal with re-renders
       this.dropdown.hide();
     }
+
     this.ui.favourite.css({ visibility: context.isLoggedIn() ? 'visible' : 'hidden' });
     this.ui.favourite.toggleClass('favourite', !!this.model.get('favourite'));
     var topicEl = this.ui.topic[0];
@@ -153,7 +155,7 @@ module.exports = Marionette.ItemView.extend({
 
   createMenu: function() {
       var menuItems = [
-        { title: 'Add people to this room', href: '#add' }
+        { title: 'Add people to this room', href: '#add' },
       ];
 
       var c = context();
@@ -164,13 +166,14 @@ module.exports = Marionette.ItemView.extend({
       menuItems.push({ divider: true });
       menuItems.push({ title: 'Notifications', href: '#notifications' });
 
-      if(isAdmin) {
-        if(c.isNativeDesktopApp) {
+      if (isAdmin) {
+        if (c.isNativeDesktopApp) {
           menuItems.push({ title: 'Integrations', href: context.env('basePath') + url + '#integrations', target: '_blank', dataset: { disableRouting: 1 } });
         } else {
           menuItems.push({ title: 'Integrations', href: '#integrations' });
         }
-        if(context.troupe().get('githubType') !== 'USER_CHANNEL'){
+
+        if (context.troupe().get('githubType') !== 'USER_CHANNEL') {
           menuItems.push({ title: 'Edit tags', href: '#tags/' + context().troupe.id });
         }
       }
@@ -180,7 +183,7 @@ module.exports = Marionette.ItemView.extend({
       menuItems.push({ title: 'Archives', href: url + '/archives/all', target: '_blank'});
 
       var githubType = this.model.get('githubType');
-      if(githubType === 'REPO' || githubType === 'ORG') {
+      if (githubType === 'REPO' || githubType === 'ORG') {
         menuItems.push({ title: 'Open in GitHub', href: 'https://www.github.com' + url, target: '_blank' });
       }
 
@@ -196,7 +199,7 @@ module.exports = Marionette.ItemView.extend({
     },
 
   leaveRoom: function() {
-    if(!context.isLoggedIn()) return;
+    if (!context.isLoggedIn()) return;
 
     apiClient.room.delete('/users/' + context.getUserId(), { })
       .then(function() {
@@ -209,9 +212,8 @@ module.exports = Marionette.ItemView.extend({
     appEvents.trigger('navigation', '/orgs/' + orgName + '/rooms', 'iframe', orgName + ' rooms');
   },
 
-
   toggleFavourite: function() {
-    if(!context.isLoggedIn()) return;
+    if (!context.isLoggedIn()) return;
 
     this.model.set('favourite', !this.model.get('favourite'));
     var isFavourite = !!this.model.get('favourite');
@@ -242,7 +244,7 @@ module.exports = Marionette.ItemView.extend({
   },
 
   detectReturn: function(e) {
-    if(e.keyCode === 13 && (!e.ctrlKey && !e.shiftKey)) {
+    if (e.keyCode === 13 && (!e.ctrlKey && !e.shiftKey)) {
       // found submit
       e.stopPropagation();
       e.preventDefault();
@@ -267,7 +269,7 @@ module.exports = Marionette.ItemView.extend({
     this.oldTopic = unsafeText;
 
     // create inputview
-    this.ui.topic.html("<textarea class='topic-input'></textarea>");
+    this.ui.topic.html('<textarea class=\'topic-input\'></textarea>');
 
     var textarea = this.ui.topic.find('textarea').val(unsafeText);
 
@@ -278,7 +280,7 @@ module.exports = Marionette.ItemView.extend({
   },
 
   requestBrowserNotificationsPermission: function() {
-    if(context().desktopNotifications) {
+    if (context().desktopNotifications) {
       notifications.enable();
     }
   },
@@ -302,5 +304,5 @@ module.exports = Marionette.ItemView.extend({
       this.options.template = headerViewTemplate;
       this.render();
     }
-  }
+  },
 });
