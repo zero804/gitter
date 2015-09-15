@@ -96,6 +96,13 @@ module.exports = (function() {
       apiClient.priv.get(heatmapURL)
         .then(function(heatmapData) {
           cal.update(heatmapData);
+          setTimeout(function() {
+            var $rects = $('.graph-rect').not('.q1,.q2,.q3,.q4,.q5');
+            $rects.each(function(i, el) {
+              el.classList.remove('hover_cursor');
+              el.classList.add('empty');
+            });
+          }, 0);
         });
     }
   });

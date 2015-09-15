@@ -86,6 +86,13 @@ onready(function() {
   apiClient.priv.get('/chat-heatmap/' + troupeId + '?tz='+tz)
     .then(function(heatmapData) {
       cal.update(heatmapData);
+      setTimeout(function() {
+        var $rects = $('.graph-rect').not('.q1,.q2,.q3,.q4,.q5');
+        $rects.each(function(i, el) {
+          el.classList.remove('hover_cursor');
+          el.classList.add('empty');
+        });
+      }, 0);
     });
 
   // new Router();
