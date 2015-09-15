@@ -100,9 +100,13 @@ onready(function () {
         break;
 
       case 'change:room':
+        //destroy any modal views
+        appView.dialogRegion.destroy();
+
         //set the context troupe to new troupe
         context.setTroupe(message.newTroupe);
 
+        //FIXME JP 15/9/15 This implementation is too brittle
         //if we have a query in the url string
         if(/\?/.test(message.url)){
           //get the id out of the url sting

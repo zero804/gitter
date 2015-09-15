@@ -65,23 +65,41 @@ onready(function () {
   }
 
   /* Deal with the popstate */
-  window.onpopstate = function(e) {
+  window.onpopstate = function (e) {
     var iframeUrl = e.state;
-    if(!iframeUrl) {
+
+    //if the url contains a hash we will need to remove it
+    var upperBound = (iframeUrl.indexOf('#') !== -1) ? iframeUrl.indexOf('#') : Infinity;
+    //pull off the host information and any has parameters
+    iframeUrl = iframeUrl.substring(document.location.origin.length, upperBound);
+
+    if (!iframeUrl) {
       return;
     }
 
+    //parse the url to get the path with no ~chat
+    var parsedIFrameUrl = parseIframePath(iframeUrl);
+    if (parsedIFrameUrl && parsedIFrameUrl[3] === 'chat') {
+      //manually trigger a navigation
+      appEvents.trigger('navigation', parsedIFrameUrl[1], 'chat', parsedIFrameUrl[1]);
+    }
+
     updateContent(iframeUrl);
+
     appEvents.trigger('track', window.location.pathname + window.location.hash);
     return;
   };
 
+  function parseIframePath(locationHref){
+    return locationHref.match(/(\/.*?)(\/~(\w+))?$/);
+  }
+
   function getFrameType(locationHref) {
-    var match = locationHref.match(/(\/.*?)(\/~(\w+))?$/);
+    var match = parseIframePath(locationHref);
     return match && match[3];
   }
 
-  function updateContent(iframeUrl, type) {
+  function updateContent(iframeUrl) {
     var hash;
     var windowHash = window.location.hash;
 
@@ -102,7 +120,7 @@ onready(function () {
      *
      * The history has already been pushed via the pushstate, so we don't want to double up
      */
-     RAF(function() {
+    RAF(function () {
       var contentFrame = document.querySelector('#content-frame');
 
       function fallback() {
@@ -117,17 +135,19 @@ onready(function () {
       var currentType = getFrameType(contentFrame.contentWindow.location.pathname);
 
       if (currentType !== 'chat') return fallback();
-      if (type !== 'chat') return fallback();
+      console.log(currentType, iframeUrl);
 
       // IE seems to prefer this in a new animation-frame
       var match = iframeUrl.match(/(\/.*?)(\/~\w+)?$/);
       var referenceUrl = match && match[1];
       if (!referenceUrl) return fallback();
 
-      var newTroupe = troupeCollections.troupes.findWhere({ url: referenceUrl });
+      var newTroupe = troupeCollections.troupes.findWhere({
+        url: referenceUrl
+      });
 
       //If we are navigating to a anything other than a chat refresh
-      if(!newTroupe) return fallback();
+      if (!newTroupe) return fallback();
 
       context.setTroupeId(newTroupe.id);
 
@@ -138,17 +158,20 @@ onready(function () {
         newTroupe: newTroupe
       });
 
-     });
+    });
   }
 
   var allRoomsCollection = troupeCollections.troupes;
   new RoomCollectionTracker(allRoomsCollection);
 
-  var appLayout = new AppLayout({ template: false, el: 'body' });
+  var appLayout = new AppLayout({
+    template: false,
+    el: 'body'
+  });
   appLayout.render();
 
-  allRoomsCollection.on("remove", function(model) {
-    if(model.id == context.getTroupeId()) {
+  allRoomsCollection.on("remove", function (model) {
+    if (model.id == context.getTroupeId()) {
       var newLocation = '/home';
       var newFrame = '/home/~home';
       var title = 'home';
@@ -161,8 +184,8 @@ onready(function () {
 
   // Called from the OSX native client for faster page loads
   // when clicking on a chat notification
-  window.gitterLoader = function(url) {
-    var title = url.replace(/^\//,'');
+  window.gitterLoader = function (url) {
+    var title = url.replace(/^\//, '');
     appEvents.trigger('navigation', url, 'chat', title);
   };
 
@@ -173,7 +196,10 @@ onready(function () {
 
     if (parsed.pathname === window.location.pathname) {
       pushState(frameUrl, title, url);
-      postMessage({ type: 'permalink.navigate', query: urlParser.parseSearch(parsed.search) });
+      postMessage({
+        type: 'permalink.navigate',
+        query: urlParser.parseSearch(parsed.search)
+      });
       return;
     }
 
@@ -181,9 +207,9 @@ onready(function () {
     updateContent(frameUrl, type);
   });
 
-  window.addEventListener('message', function(e) {
+  window.addEventListener('message', function (e) {
     log.debug('rapp: window message: ', e.data);
-    if(e.origin !== context.env('basePath')) {
+    if (e.origin !== context.env('basePath')) {
       log.info('rapp: Ignoring message from ' + e.origin);
       return;
     }
@@ -191,98 +217,101 @@ onready(function () {
     var message;
     try {
       message = JSON.parse(e.data);
-    } catch(err) {
+    } catch (err) {
       /* It seems as through chrome extensions use this event to pass messages too. Ignore them. */
       return;
     }
 
     log.info('rapp: Received message ', message);
 
-    var makeEvent = function(message) {
+    var makeEvent = function (message) {
       var origin = 'chat';
       if (message.event && message.event.origin) origin = message.event.origin;
       message.event = {
         origin: origin,
-        preventDefault: function() {
+        preventDefault: function () {
           log.warn('rapp: could not call preventDefault() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
         },
-        stopPropagation: function() {
+        stopPropagation: function () {
           log.warn('rapp: could not call stopPropagation() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
         },
-        stopImmediatePropagation: function() {
+        stopImmediatePropagation: function () {
           log.warn('rapp: could not call stopImmediatePropagation() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
         }
       };
     };
 
-    switch(message.type) {
-      case 'context.troupeId':
-        context.setTroupeId(message.troupeId);
-        titlebarUpdater.setRoomName(message.name);
-        appEvents.trigger('context.troupeId', message.troupeId);
-        break;
+    switch (message.type) {
+    case 'context.troupeId':
+      context.setTroupeId(message.troupeId);
+      titlebarUpdater.setRoomName(message.name);
+      appEvents.trigger('context.troupeId', message.troupeId);
+      break;
 
-      case 'navigation':
-        appEvents.trigger('navigation', message.url, message.urlType, message.title);
-        break;
+    case 'navigation':
+      appEvents.trigger('navigation', message.url, message.urlType, message.title);
+      break;
 
-      case 'route':
-        window.location.hash = '#' + message.hash;
-        break;
+    case 'route':
+      window.location.hash = '#' + message.hash;
+      break;
 
-      case 'unreadItemsCount':
-        var count = message.count;
-        var troupeId = message.troupeId;
-        if (troupeId !== context.getTroupeId()) {
-          log.warn('troupeId mismatch in unreadItemsCount: got', troupeId, 'expected', context.getTroupeId());
-        }
-        var v = {
-          unreadItems: count
-        };
+    case 'unreadItemsCount':
+      var count = message.count;
+      var troupeId = message.troupeId;
+      if (troupeId !== context.getTroupeId()) {
+        log.warn('troupeId mismatch in unreadItemsCount: got', troupeId, 'expected', context.getTroupeId());
+      }
+      var v = {
+        unreadItems: count
+      };
 
-        if(count === 0) {
-          // If there are no unread items, there can't be unread mentions
-          // either
-          v.mentions = 0;
-        }
+      if (count === 0) {
+        // If there are no unread items, there can't be unread mentions
+        // either
+        v.mentions = 0;
+      }
 
-        log.info('rapp: Received unread count message ', { troupeId: troupeId, update: v });
-        allRoomsCollection.patch(troupeId, v);
-        break;
+      log.info('rapp: Received unread count message ', {
+        troupeId: troupeId,
+        update: v
+      });
+      allRoomsCollection.patch(troupeId, v);
+      break;
 
-      case 'realtime.testConnection':
-        var reason = message.reason;
-        realtime.testConnection('chat.' + reason);
-        break;
+    case 'realtime.testConnection':
+      var reason = message.reason;
+      realtime.testConnection('chat.' + reason);
+      break;
 
       // No parameters
-      case 'chat.edit.hide':
-      case 'chat.edit.show':
-      case 'ajaxError':
-        appEvents.trigger(message.type);
-        break;
+    case 'chat.edit.hide':
+    case 'chat.edit.show':
+    case 'ajaxError':
+      appEvents.trigger(message.type);
+      break;
 
-      case 'keyboard':
-        makeEvent(message);
-        appEvents.trigger('keyboard.' + message.name, message.event, message.handler);
-        appEvents.trigger('keyboard.all', message.name, message.event, message.handler);
-        break;
+    case 'keyboard':
+      makeEvent(message);
+      appEvents.trigger('keyboard.' + message.name, message.event, message.handler);
+      appEvents.trigger('keyboard.all', message.name, message.event, message.handler);
+      break;
 
-      case 'focus':
-        makeEvent(message);
-        appEvents.trigger('focus.request.' + message.focus, message.event);
-        break;
+    case 'focus':
+      makeEvent(message);
+      appEvents.trigger('focus.request.' + message.focus, message.event);
+      break;
 
-      case 'childframe:loaded':
-        appEvents.trigger('childframe:loaded');
-        break;
+    case 'childframe:loaded':
+      appEvents.trigger('childframe:loaded');
+      break;
 
-      case 'permalink.requested':
-        var url = message.url + '?at=' + message.id;
-        var frameUrl = message.url + '/~' + message.permalinkType + '?at=' + message.id;
-        var title = message.url.substring(1);
-        pushState(frameUrl, title, url);
-        break;
+    case 'permalink.requested':
+      var url = message.url + '?at=' + message.id;
+      var frameUrl = message.url + '/~' + message.permalinkType + '?at=' + message.id;
+      var title = message.url.substring(1);
+      pushState(frameUrl, title, url);
+      break;
     }
   }, false);
 
@@ -291,17 +320,25 @@ onready(function () {
   }
 
   // Call preventDefault() on tab events so that we can manage focus as we want
-  appEvents.on('keyboard.tab.next keyboard.tab.prev', function(e) {
+  appEvents.on('keyboard.tab.next keyboard.tab.prev', function (e) {
     if (!e.origin) e.preventDefault();
   });
 
   // Send focus events to chat frame
-  appEvents.on('focus.request.chat.in', function(event) {
-    postMessage({type: 'focus', focus: 'in', event: event});
+  appEvents.on('focus.request.chat.in', function (event) {
+    postMessage({
+      type: 'focus',
+      focus: 'in',
+      event: event
+    });
   });
 
-  appEvents.on('focus.request.chat.out', function(event) {
-    postMessage({type: 'focus', focus: 'out', event: event});
+  appEvents.on('focus.request.chat.out', function (event) {
+    postMessage({
+      type: 'focus',
+      focus: 'out',
+      event: event
+    });
   });
 
   // Sent keyboard events to chat frame
@@ -313,14 +350,16 @@ onready(function () {
       name: name,
       // JSON serialisation makes it not possible to send the event object
       // Keep track of the origin in case of return
-      event: {origin: event.origin},
+      event: {
+        origin: event.origin
+      },
       handler: handler
     };
     postMessage(message);
   });
 
   function reallyOnce(emitter, name, callback, context) {
-    var once = _.once(function() {
+    var once = _.once(function () {
       emitter.off(name, once);
       callback.apply(context, arguments);
     });
@@ -336,34 +375,34 @@ onready(function () {
       "createcustomroom": "createcustomroom",
       "createcustomroom/:name": "createcustomroom",
       "createreporoom": "createreporoom",
-      "createroom" : "createroom",
-      "confirm/*uri" : "confirmRoom"
+      "createroom": "createroom",
+      "confirm/*uri": "confirmRoom"
     },
 
-    hideModal: function() {
+    hideModal: function () {
       appLayout.dialogRegion.destroy();
     },
 
-    createroom: function() {
-      require.ensure(['views/createRoom/chooseRoomView'], function(require) {
+    createroom: function () {
+      require.ensure(['views/createRoom/chooseRoomView'], function (require) {
         var chooseRoomView = require('views/createRoom/chooseRoomView');
         appLayout.dialogRegion.show(new chooseRoomView.Modal());
       });
     },
 
-    createcustomroom: function(name) {
+    createcustomroom: function (name) {
 
       /* Figure out who's the daddy */
       function getParentRoomUri(cb) {
         var currentRoomUri = window.location.pathname.split('/').slice(1).join('/');
 
-        if(currentRoomUri === 'home') {
+        if (currentRoomUri === 'home') {
           // currently in the userhome, not really a room but whatevs
           return cb(null, 'home');
         }
 
         // current room metadata isnt in the app router context
-        getCurrentRoom(function(err, room) {
+        getCurrentRoom(function (err, room) {
           if (err || !room) return cb(null, null);
 
           if (room.get('oneToOne')) {
@@ -379,24 +418,28 @@ onready(function () {
       }
 
       function getCurrentRoom(cb) {
-        var currentRoom = allRoomsCollection.findWhere({ url: window.location.pathname });
+        var currentRoom = allRoomsCollection.findWhere({
+          url: window.location.pathname
+        });
 
         // room collection is in sync, so thats nice
         if (currentRoom) return cb(null, currentRoom);
 
         // room collection has not synced yet, lets wait
-        reallyOnce(allRoomsCollection, 'reset sync', function() {
-          currentRoom = allRoomsCollection.findWhere({ url: window.location.pathname });
+        reallyOnce(allRoomsCollection, 'reset sync', function () {
+          currentRoom = allRoomsCollection.findWhere({
+            url: window.location.pathname
+          });
           return cb(null, currentRoom);
         });
       }
 
-      getParentRoomUri(function(err, parentUri) {
+      getParentRoomUri(function (err, parentUri) {
         if (err) {
           // ignore, carry on regardless
         }
 
-        require.ensure(['views/createRoom/createRoomView'], function(require) {
+        require.ensure(['views/createRoom/createRoomView'], function (require) {
           var createRoomView = require('views/createRoom/createRoomView');
           var modal = new createRoomView.Modal({
             initialParent: parentUri,
@@ -408,17 +451,19 @@ onready(function () {
       });
     },
 
-    createreporoom: function() {
-      require.ensure(['views/createRoom/createRepoRoomView'], function(require) {
+    createreporoom: function () {
+      require.ensure(['views/createRoom/createRepoRoomView'], function (require) {
         var createRepoRoomView = require('views/createRoom/createRepoRoomView');
         appLayout.dialogRegion.show(new createRepoRoomView.Modal());
       });
     },
 
-    confirmRoom: function(uri) {
-      require.ensure(['views/createRoom/confirmRepoRoomView'], function(require) {
+    confirmRoom: function (uri) {
+      require.ensure(['views/createRoom/confirmRepoRoomView'], function (require) {
         var confirmRepoRoomView = require('views/createRoom/confirmRepoRoomView');
-        appLayout.dialogRegion.show(new confirmRepoRoomView.Modal({ uri: uri }));
+        appLayout.dialogRegion.show(new confirmRepoRoomView.Modal({
+          uri: uri
+        }));
       });
     }
   });
@@ -427,9 +472,9 @@ onready(function () {
   Backbone.history.start();
 
   if (context.popEvent('new_user_signup')) {
-    require.ensure("scriptjs", function(require) {
+    require.ensure("scriptjs", function (require) {
       var $script = require("scriptjs");
-      $script("//platform.twitter.com/oct.js", function() {
+      $script("//platform.twitter.com/oct.js", function () {
         var twitterOct = window.twttr && window.twttr.conversion;
         twitterOct.trackPid('l4t99');
       });
