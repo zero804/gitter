@@ -52,37 +52,37 @@ onready(function() {
   new HeaderView({ model: context.troupe(), el: '#header' });
 
   var troupeId = context.getTroupeId();
-
-
-  var cal = new CalHeatMap();
-
   var today = new Date();
   var elevenFullMonthsAgo = new Date(today.getFullYear(), today.getMonth() - 11, 1);
   var gitterLaunchDate = new Date(2013, 10, 1); // 1 November 2013
+  var cal = new CalHeatMap();
 
-  cal.init({
-    start: elevenFullMonthsAgo, // eleven months + this partial month = 12 blocks shown
-    maxDate: today,
-    minDate: gitterLaunchDate,
-    range: 12,
-    domain: "month",
-    subDomain: "day",
-    considerMissingDataAsZero: false,
-    displayLegend: false,
-    data: apiClient.priv.url('/chat-heatmap/' + troupeId),
-    onClick: function(date, value) {
-      if(!value) return;
+  apiClient.priv.get('/chat-heatmap/' + troupeId)
+    .then(function(heatmapData) {
+      cal.init({
+        start: elevenFullMonthsAgo, // eleven months + this partial month = 12 blocks shown
+        maxDate: today,
+        minDate: gitterLaunchDate,
+        range: 12,
+        domain: "month",
+        subDomain: "day",
+        considerMissingDataAsZero: false,
+        displayLegend: false,
+        data: heatmapData,
+        onClick: function(date, value) {
+          if(!value) return;
 
-      var yyyy = date.getFullYear();
-      var mm = date.getMonth() + 1;
-      if(mm < 10) mm = "0" + mm;
+          var yyyy = date.getFullYear();
+          var mm = date.getMonth() + 1;
+          if(mm < 10) mm = "0" + mm;
 
-      var dd = date.getDate();
-      if(dd < 10) dd = "0" + dd;
+          var dd = date.getDate();
+          if(dd < 10) dd = "0" + dd;
 
-      window.location.assign('/' + context.troupe().get('uri') + '/archives/' + yyyy + '/' + mm + '/' + dd);
-    }
-  });
+          window.location.assign('/' + context.troupe().get('uri') + '/archives/' + yyyy + '/' + mm + '/' + dd);
+        }
+      });
+    });
 
   // new Router();
 
