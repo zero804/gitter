@@ -14,7 +14,7 @@ function SpaRoomSwitcher(troupesCollection, baseUrl, locationDelegate, windowLoc
 _.extend(SpaRoomSwitcher.prototype, Backbone.Events, {
   change: function(iframeUrl) {
 
-    if (!iframeUrl.search(/^https?:/i) && iframeUrl.charAt(0) !== '/') {
+    if (iframeUrl.search(/^https?:/i) < 0 && iframeUrl.charAt(0) !== '/') {
       // fix for IE 10 giving iframeUrls with first slash missing
       iframeUrl = '/' + iframeUrl;
     }
