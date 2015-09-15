@@ -1,7 +1,8 @@
-{{#if roomMember}}
+<div id='chat-input-el'>
+{{#if troupe.roomMember}}
   <div class="chat-input__area">
     <div class="chat-input__avatar">
-      {{ widget "avatar" model=user size='s' showTooltip=false }}
+      {{ widget "avatar" user=user size='s' showTooltip=false }}
     </div>
     <form class="chat-input__box" name="chat">
       <textarea class="chat-input__text-area" name="chat" id="chat-input-textarea" placeholder="{{placeholder}}" {{#if inputAutoFocus}}autofocus{{/if}} autocomplete="off" maxlength="4096">{{value}}</textarea>
@@ -16,3 +17,4 @@
     Join room
   </a>
 {{/if}}
+</div>
