@@ -12,7 +12,7 @@ var typeaheads = require('./typeaheads');
 var ChatInputBoxView = require('./chat-input-box-view');
 var apiClient = require('components/apiClient');
 
-require('views/behaviors/isomorphic');
+//require('views/behaviors/isomorphic');
 require('jquery-textcomplete');
 require('views/behaviors/tooltip');
 require('views/behaviors/widgets');
@@ -90,6 +90,8 @@ var ChatInputView = Marionette.ItemView.extend({
         appEvents.trigger('focus.change.chat');
       }
     });
+
+    this.listenTo(context.troupe(), 'change', this.render);
   },
 
   getComposeModeTitle: function() {
@@ -113,8 +115,9 @@ var ChatInputView = Marionette.ItemView.extend({
       placeholder = PLACEHOLDER;
     }
 
-    return {
-      user: context.user(),
+    var data = {
+      user: context.user().toJSON(),
+      troupe: context.troupe().toJSON(),
       isComposeModeEnabled: this.composeMode.isEnabled(),
       placeholder: placeholder,
       autofocus: !this.compactView,
@@ -122,6 +125,8 @@ var ChatInputView = Marionette.ItemView.extend({
       showMarkdownTitle: this.getShowMarkdownTitle(),
       value: $("#chat-input-textarea").val()
     };
+
+    return data;
   },
 
   onRender: function() {
@@ -172,12 +177,12 @@ var ChatInputView = Marionette.ItemView.extend({
     this.listenTo(this.inputBox, 'editLast', this.editLast);
 
   
-    },
+  },
   
-    toggleComposeMode: function (event) {
-      if(event && !event.origin) event.preventDefault();
-  
-      this.composeMode.toggle();
+  toggleComposeMode: function (event) {
+    if(event && !event.origin) event.preventDefault();
+ 
+    this.composeMode.toggle();
     var isComposeModeEnabled = this.composeMode.isEnabled();
 
     var $icon = this.ui.composeToggle.find('i');
