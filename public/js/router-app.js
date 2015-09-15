@@ -69,14 +69,14 @@ onready(function() {
      * The history has already been pushed via the pushstate, so we don't want to double up
      */
     RAF(function() {
-      getContentFrameLocation.replace(href);
+      getContentFrameLocation().replace(href);
     });
   });
 
   roomSwitcher.on('reload', function() {
     context.setTroupeId(undefined); // TODO: update the title....
     RAF(function() {
-      getContentFrameLocation.reload(true);
+      getContentFrameLocation().reload(true);
     });
   });
 
