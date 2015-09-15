@@ -282,7 +282,6 @@ function renderChat(req, res, options, next) {
         var classNames = options.classNames || [];
 
 
-        console.log('uriContext', req.uriContext);
 
         if(troupe.githubType === 'REPO' || troupe.githubType === 'ORG') {
           githubLink = 'https://github.com/' + req.uriContext.uri;
