@@ -105,6 +105,7 @@ onready(function() {
   /* Deal with the popstate */
   window.onpopstate = function(e) {
     var iframeUrl = e.state;
+    if (!iframeUrl) return;
     roomSwitcher.change(iframeUrl);
   };
 
