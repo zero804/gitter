@@ -105,39 +105,8 @@ onready(function() {
   /* Deal with the popstate */
   window.onpopstate = function(e) {
     var iframeUrl = e.state;
-
-    //if the url contains a hash we will need to remove it
-    var upperBound = (iframeUrl.indexOf('#') !== -1) ? iframeUrl.indexOf('#') : Infinity;
-
-    //pull off the host information and any has parameters
-    iframeUrl = iframeUrl.substring(context.env('basePath').length, upperBound);
-
-    if (!iframeUrl) {
-      return;
-    }
-
-    //parse the url to get the path with no ~chat
-    var parsedIFrameUrl = getFrameType(iframeUrl);
-    if (parsedIFrameUrl.type === 'chat') {
-      //manually trigger a navigation
-      appEvents.trigger('navigation', parsedIFrameUrl.room, 'chat', parsedIFrameUrl.room);
-      roomSwitcher.change(parsedIFrameUrl.room);
-    } else {
-      roomSwitcher.change(iframeUrl);
-    }
-
-    appEvents.trigger('track', window.location.pathname + window.location.hash);
-    return;
+    roomSwitcher.change(iframeUrl);
   };
-
-  function getFrameType(locationHref) {
-    var match = locationHref.match(/(\/.*?)(\/~(\w+))?$/);
-    return {
-      path: match && match[0],
-      room: match && match[1],
-      type: match && match[3],
-    };
-  }
 
   var allRoomsCollection = troupeCollections.troupes;
   new RoomCollectionTracker(allRoomsCollection);
