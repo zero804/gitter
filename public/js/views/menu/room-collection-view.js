@@ -42,7 +42,8 @@ module.exports = (function() {
         .then(function () {
           // leaving the room that you are in should take you home
           if (this.model.get('url') === window.location.pathname) {
-            appEvents.trigger('navigation', '/home', 'home', '');
+            //appEvents.trigger('navigation', '/home', 'home', '');
+            context.troupe().set('roomMember', false);
           }
         }.bind(this))
         .then(function() {

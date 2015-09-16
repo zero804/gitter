@@ -95,6 +95,10 @@ var ChatInputBoxView = Marionette.ItemView.extend({
         });
       }
     }
+
+    //if (!context.troupe().get('roomMember')) {
+    //  this.joinRoom();
+    //}
   },
 
   onComposeModeChange: function(model, isComposeModeEnabled) {
@@ -350,7 +354,8 @@ var ChatInputBoxView = Marionette.ItemView.extend({
 
     apiClient.post('/v1/rooms/' + context.getTroupeId() + '/users', {username: context().user.username})
     .then(function(res) {
-      location.reload();
+      //location.reload();
+      context.troupe().set('roomMember', true);
     });
   }
 
