@@ -231,6 +231,15 @@ onready(function() {
       'integrations': 'integrations',
       'add': 'addPeople',
       'tags/:roomId': 'editTags',
+      'autojoin': 'autojoin'
+    },
+
+    autojoin: function() {
+      apiClient.post('/v1/rooms/' + context.getTroupeId() + '/users', {username: context().user.username})
+      .then(function(res) {
+        //location.reload();
+        context.troupe().set('roomMember', true);
+      });
     },
 
     hideModal: function() {
