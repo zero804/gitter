@@ -66,6 +66,8 @@ var LoadingView = function(iframe, loadingFrame) {
   // of the child iframe event listeners when the iframe.src changes (!)
   // https://github.com/nwjs/nw.js/issues/2867
   appEvents.on('childframe:loaded', onIframeLoad);
+  appEvents.on('loading:true', this.show, this);
+  appEvents.on('loading:false', this.hide, this);
 };
 
 LoadingView.prototype.show = function() {

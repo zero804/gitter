@@ -233,7 +233,7 @@ var ChatInputBoxView = Marionette.ItemView.extend({
         current = current + ' ' + text;
       }
     }
-    // this.chatResizer.resizeInput();
+
     this.setText(current);
     this.setCaretPosition();
     this.ui.textarea.focus();
@@ -310,7 +310,7 @@ var ChatInputBoxView = Marionette.ItemView.extend({
 
   addTextareaExtensions: function() {
     this.ui.textarea.textcomplete(typeaheads());
-    this.drafty = drafty(this.ui.textarea[0]);
+    this.drafty = drafty(this.ui.textarea[0], context.troupe().get('id'));
   },
 
   removeTextareaExtensions: function() {

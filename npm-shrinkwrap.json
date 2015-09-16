@@ -1,6 +1,6 @@
 {
   "name": "gitter-webapp",
-  "version": "9.9.0",
+  "version": "13.4.0",
   "dependencies": {
     "@gitterhq/translations": {
       "version": "1.0.0",
@@ -1421,9 +1421,9 @@
       }
     },
     "gitter-realtime-client": {
-      "version": "0.2.0",
-      "from": "http://beta-internal:4873/gitter-realtime-client/-/gitter-realtime-client-0.2.0.tgz",
-      "resolved": "http://beta-internal:4873/gitter-realtime-client/-/gitter-realtime-client-0.2.0.tgz",
+      "version": "0.3.3",
+      "from": "http://beta-internal:4873/gitter-realtime-client/-/gitter-realtime-client-0.3.3.tgz",
+      "resolved": "http://beta-internal:4873/gitter-realtime-client/-/gitter-realtime-client-0.3.3.tgz",
       "dependencies": {
         "backbone-sorted-collection": {
           "version": "0.3.9",
@@ -1436,6 +1436,11 @@
               "resolved": "http://beta-internal:4873/backbone-collection-proxy/-/backbone-collection-proxy-0.2.5.tgz"
             }
           }
+        },
+        "backbone-url-resolver": {
+          "version": "0.1.1",
+          "from": "http://beta-internal:4873/backbone-url-resolver/-/backbone-url-resolver-0.1.1.tgz",
+          "resolved": "http://beta-internal:4873/backbone-url-resolver/-/backbone-url-resolver-0.1.1.tgz"
         },
         "underscore": {
           "version": "1.8.3",
@@ -1621,11 +1626,6 @@
           "resolved": "http://beta-internal:4873/sprintf/-/sprintf-0.1.5.tgz"
         }
       }
-    },
-    "imagemagick": {
-      "version": "0.1.2",
-      "from": "http://beta-internal:4873/imagemagick/-/imagemagick-0.1.2.tgz",
-      "resolved": "http://beta-internal:4873/imagemagick/-/imagemagick-0.1.2.tgz"
     },
     "intercom.io": {
       "version": "0.0.8",

@@ -1,19 +1,17 @@
-"use strict";
+'use strict';
 require('utils/initial-setup');
 
-var $ = require('jquery');
-var Backbone = require('backbone');
-var context = require('utils/context');
-var liveContext = require('components/live-context');
-var appEvents = require('utils/appevents');
-var log = require('utils/log');
+var Backbone               = require('backbone');
+var context                = require('utils/context');
+var liveContext            = require('components/live-context');
+var appEvents              = require('utils/appevents');
+var log                    = require('utils/log');
 var ChatToolbarInputLayout = require('views/layouts/chat-toolbar-input');
-var DropTargetView = require('views/app/dropTargetView');
-var onready = require('./utils/onready');
-var apiClient = require('components/apiClient');
-var HeaderView = require('views/app/headerView');
-var frameUtils = require('./utils/frame-utils');
-var itemCollections = require('collections/instances/integrated-items');
+var DropTargetView         = require('views/app/dropTargetView');
+var onready                = require('./utils/onready');
+var apiClient              = require('components/apiClient');
+var frameUtils             = require('./utils/frame-utils');
+var itemCollections        = require('collections/instances/integrated-items');
 
 /* Set the timezone cookie */
 require('components/timezone-cookie');
@@ -30,12 +28,11 @@ require('components/focus-events');
 // Preload widgets
 require('components/ping');
 
-
-onready(function () {
+onready(function() {
 
   appEvents.on('navigation', function(url, type, title) {
-    if(frameUtils.hasParentFrameSameOrigin()) {
-      frameUtils.postMessage({ type: "navigation", url: url, urlType: type, title: title});
+    if (frameUtils.hasParentFrameSameOrigin()) {
+      frameUtils.postMessage({ type: 'navigation', url: url, urlType: type, title: title});
     } else {
       // No pushState here. Open the link directly
       // Remember that (window.parent === window) when there is no parent frame
@@ -46,7 +43,7 @@ onready(function () {
   require('components/link-handler').installLinkHandler();
 
   window.addEventListener('message', function(e) {
-    if(e.origin !== context.env('basePath')) {
+    if (e.origin !== context.env('basePath')) {
       log.info('rchat: Ignoring message from ' + e.origin);
       return;
     }
@@ -54,7 +51,7 @@ onready(function () {
     var message;
     try {
       message = JSON.parse(e.data);
-    } catch(err) {
+    } catch (err) {
       /* It seems as through chrome extensions use this event to pass messages too. Ignore them. */
       return;
     }
@@ -69,26 +66,28 @@ onready(function () {
         preventDefault: function() {
           log.warn('rchat: could not use preventDefault() because the event comes from the `' + this.origin + '` frame');
         },
+
         stopPropagation: function() {
           log.warn('rchat: could not use stopPropagation() because the event comes from the `' + this.origin + '` frame');
         },
+
         stopImmediatePropagation: function() {
           log.warn('rchat: could not use stopImmediatePropagation() because the event comes from the `' + this.origin + '` frame');
-        }
+        },
       };
     };
 
-    switch(message.type) {
+    switch (message.type) {
       case 'keyboard':
         makeEvent(message);
         appEvents.trigger('keyboard.' + message.name, message.event, message.handler);
         appEvents.trigger('keyboard.all', message.name, message.event, message.handler);
-        break;
+      break;
 
       case 'focus':
         makeEvent(message);
         appEvents.trigger('focus.request.' + message.focus, message.event);
-        break;
+      break;
 
       case 'permalink.navigate':
         var query = message.query;
@@ -98,14 +97,35 @@ onready(function () {
         if (aroundId) {
           appEvents.trigger('chatCollectionView:permalinkHighlight', aroundId);
         }
-        break;
+
+      break;
+
+      case 'change:room':
+
+        //destroy any modal views
+        appView.dialogRegion.destroy();
+
+        //set the context troupe to new troupe
+        context.setTroupe(message.newTroupe);
+
+        //FIXME JP 15/9/15 This implementation is too brittle
+        //if we have a query in the url string
+        if (/\?/.test(message.url)) {
+          //get the id out of the url sting
+          var id = message.url.split('=').pop();
+
+          //navigate to it
+          appEvents.trigger('chatCollectionView:permalinkHighlight', id);
+        }
+
+      break;
     }
   });
 
-  frameUtils.postMessage({ type: "context.troupeId", troupeId: context.getTroupeId(), name: context.troupe().get('name') });
+  frameUtils.postMessage({ type: 'context.troupeId', troupeId: context.getTroupeId(), name: context.troupe().get('name') });
 
   appEvents.on('route', function(hash) {
-    frameUtils.postMessage({ type: "route", hash: hash });
+    frameUtils.postMessage({ type: 'route', hash: hash });
   });
 
   appEvents.on('permalink.requested', function(type, chat, options) {
@@ -119,35 +139,36 @@ onready(function () {
       appEvents.trigger('input.append', ':point_up: [' + formattedDate + '](' + fullUrl + ')');
     }
 
-    frameUtils.postMessage({ type: "permalink.requested", url: url, permalinkType: type, id: id });
+    frameUtils.postMessage({ type: 'permalink.requested', url: url, permalinkType: type, id: id });
   });
 
   appEvents.on('realtime.testConnection', function(reason) {
-    frameUtils.postMessage({ type: "realtime.testConnection", reason: reason });
+    frameUtils.postMessage({ type: 'realtime.testConnection', reason: reason });
   });
 
   appEvents.on('realtime:newConnectionEstablished', function() {
-    frameUtils.postMessage({ type: "realtime.testConnection", reason: 'newConnection' });
+    frameUtils.postMessage({ type: 'realtime.testConnection', reason: 'newConnection' });
   });
 
   appEvents.on('unreadItemsCount', function(newCount) {
-    var message = { type: "unreadItemsCount", count: newCount, troupeId: context.getTroupeId() };
+    var message = { type: 'unreadItemsCount', count: newCount, troupeId: context.getTroupeId() };
 
     log.info('rchat: Posting unread items count ', message);
     frameUtils.postMessage(message);
   });
 
   // Bubble keyboard events
-  appEvents.on('keyboard.all', function (name, event, handler) {
+  appEvents.on('keyboard.all', function(name, event, handler) {
     // Don't send back events coming from the app frame
     if (event.origin && event.origin === 'app') return;
     var message = {
       type: 'keyboard',
       name: name,
+
       // JSON serialisation makes it not possible to send the event object
       // Keep track of the origin in case of return
       event: {origin: event.origin},
-      handler: handler
+      handler: handler,
     };
     frameUtils.postMessage(message);
   });
@@ -156,6 +177,7 @@ onready(function () {
   appEvents.on('chat.edit.show', function() {
     frameUtils.postMessage({type: 'chat.edit.show'});
   });
+
   appEvents.on('chat.edit.hide', function() {
     frameUtils.postMessage({type: 'chat.edit.hide'});
   });
@@ -164,6 +186,7 @@ onready(function () {
   appEvents.on('focus.request.app.in', function(event) {
     frameUtils.postMessage({type: 'focus', focus: 'in', event: event});
   });
+
   appEvents.on('focus.request.app.out', function(event) {
     frameUtils.postMessage({type: 'focus', focus: 'out', event: event});
   });
@@ -176,18 +199,18 @@ onready(function () {
     appEvents.triggerParent('user_notification', {
       title: 'Failed to remove user',
       text: message,
-      className: 'notification-error'
+      className: 'notification-error',
     });
   };
 
   appEvents.on('command.room.remove', function(username) {
     if (!username) return;
 
-    apiClient.room.delete("/users/" + username + '?type=username', "")
-      .fail(function(xhr) {
-        if (xhr.status < 500) notifyRemoveError(xhr.responseJSON.error);
-        else notifyRemoveError('');
-      });
+    apiClient.room.delete('/users/' + username + '?type=username', '')
+    .fail(function(xhr) {
+      if (xhr.status < 500) notifyRemoveError(xhr.responseJSON.error);
+      else notifyRemoveError('');
+    });
   });
 
   var appView = new ChatToolbarInputLayout({ template: false, el: 'body', chatCollection: itemCollections.chats });
@@ -196,37 +219,18 @@ onready(function () {
   /* Drag and drop */
   new DropTargetView({ template: false, el: 'body' }).render();
 
-  new HeaderView({ model: context.troupe(), el: '#header' });
-
-  // This may require a better home
-  if (context().permissions.admin && context.troupe().get('userCount') <= 1) {
-    require.ensure([
-      'views/app/collaboratorsView',
-      'collections/collaborators'],
-      function(require) {
-        var CollaboratorsView = require('views/app/collaboratorsView');
-        var collaboratorsModels = require('collections/collaborators');
-        var collaborators = new collaboratorsModels.CollabCollection();
-        collaborators.fetch();
-        collaborators.once('sync', function() {
-          var collaboratorsView = new CollaboratorsView({ collection: collaborators });
-          $('#content-frame').prepend(collaboratorsView.render().el);
-        });
-    });
-  }
-
   var Router = Backbone.Router.extend({
     routes: {
-      "": "hideModal",
-      "share": "share",
-      "delete": "delete",
-      "people": "people",
-      "notifications": "notifications",
-      "markdown": "markdown",
-      "keys" : "keys",
-      "integrations": "integrations",
-      "add" : "addPeople",
-      "tags/:roomId": "editTags"
+      '': 'hideModal',
+      'share': 'share',
+      'delete': 'delete',
+      'people': 'people',
+      'notifications': 'notifications',
+      'markdown': 'markdown',
+      'keys': 'keys',
+      'integrations': 'integrations',
+      'add': 'addPeople',
+      'tags/:roomId': 'editTags',
     },
 
     hideModal: function() {
@@ -267,9 +271,9 @@ onready(function () {
         var room = context.troupe();
         var maxFreeMembers = context.env('maxFreeOrgRoomMembers');
         var isOverLimit = room.get('security') !== 'PUBLIC' &&
-                          room.get('githubType').indexOf('ORG') >= 0 &&
-                          !room.get('premium') &&
-                          room.get('userCount') >= maxFreeMembers;
+          room.get('githubType').indexOf('ORG') >= 0 &&
+          !room.get('premium') &&
+          room.get('userCount') >= maxFreeMembers;
 
         if (isOverLimit) {
           var GetProViewModal = require('views/app/upgradeToProView');
@@ -282,16 +286,15 @@ onready(function () {
 
     },
 
-    editTags: function(roomId) {
+    editTags: function() {
       require.ensure(['views/app/editTagsView'], function(require) {
         var EditTagsView = require('views/app/editTagsView');
-        appView.dialogRegion.show(new EditTagsView({roomId: roomId}));
+        appView.dialogRegion.show(new EditTagsView({roomId: context.troupe().get('id')}));
       });
     },
 
-
     integrations: function() {
-      if(context().permissions.admin) {
+      if (context.isTroupeAdmin()) {
         require.ensure(['views/app/integrationSettingsModal'], function(require) {
           var IntegrationSettingsModal = require('views/app/integrationSettingsModal');
 
@@ -316,7 +319,7 @@ onready(function () {
 
         appView.dialogRegion.show(new DeleteModal({}));
       });
-    }
+    },
 
   });
 
@@ -354,16 +357,16 @@ onready(function () {
   liveContext.syncRoom();
 
   function oauthUpgradeCallback(e) {
-    if(e.data !== "oauth_upgrade_complete") return;
+    if (e.data !== 'oauth_upgrade_complete') return;
 
-    window.removeEventListener("message", oauthUpgradeCallback, false);
+    window.removeEventListener('message', oauthUpgradeCallback, false);
 
     apiClient.room.put('', { autoConfigureHooks: 1 })
-      .then(function() {
-        appEvents.trigger('user_notification', {
-          title: 'Thank You',
-          text: 'Your integrations have been setup.'
-        });
+    .then(function() {
+      appEvents.trigger('user_notification', {
+        title: 'Thank You',
+        text: 'Your integrations have been setup.',
+      });
     });
   }
 
@@ -371,19 +374,20 @@ onready(function () {
     appEvents.trigger('user_notification', {
       click: function(e) {
         e.preventDefault();
-        window.addEventListener("message", oauthUpgradeCallback, false);
+        window.addEventListener('message', oauthUpgradeCallback, false);
         window.open('/login/upgrade?scopes=public_repo');
       },
+
       title: 'Authorisation',
       text: 'Your room has been created, but we weren\'t able ' +
-            'to integrate with the repository as we need write ' +
-            'access to your GitHub repositories. Click here to ' +
-            'give Gitter access to do this.',
-      timeout: 12000
+        'to integrate with the repository as we need write ' +
+        'access to your GitHub repositories. Click here to ' +
+        'give Gitter access to do this.',
+      timeout: 12000,
     });
   }
 
-  if(context.popEvent('hooks_require_additional_public_scope')) {
+  if (context.popEvent('hooks_require_additional_public_scope')) {
     setTimeout(promptForHook, 1500);
   }
 

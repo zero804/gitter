@@ -47,6 +47,10 @@ DeletePit.prototype = {
     return !!this._items[itemId];
   },
 
+  reset: function() {
+    this._items = {};
+  },
+
   _gc: function() {
     var horizon = Date.now() - 5 * 60 * 1000; // 5 minutes
     var items = this._items;
@@ -234,6 +238,14 @@ _.extend(UnreadItemStore.prototype, Backbone.Events, {
 
   isMarkedAsRead: function(itemId) {
     return this._read.contains(itemId);
+  },
+
+  reset: function() {
+    this.length = 0;
+    this._lurkMode = false;
+    this._items = {};
+    this._read.reset();
+    this.notifyCountLimited();
   }
 
 });
