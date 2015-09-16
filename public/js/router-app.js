@@ -125,12 +125,13 @@ onready(function() {
 
   allRoomsCollection.on('remove', function(model) {
     if (model.id === context.getTroupeId()) {
-      var newLocation = '/home';
-      var newFrame = '/home/~home';
-      var title = 'home';
+      context.troupe().set('roomMember', false);
+      //var newLocation = '/home';
+      //var newFrame = '/home/~home';
+      //var title = 'home';
 
-      pushState(newFrame, title, newLocation);
-      roomSwitcher.change(newFrame);
+      //pushState(newFrame, title, newLocation);
+      //roomSwitcher.change(newFrame);
     }
   });
 

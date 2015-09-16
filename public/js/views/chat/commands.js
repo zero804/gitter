@@ -89,7 +89,8 @@ module.exports = (function() {
       action: function() {
         apiClient.room.delete('/users/' + context.getUserId(), { })
           .then(function() {
-            appEvents.trigger('navigation', '/home', 'home', ''); // TODO: figure out a title
+            //appEvents.trigger('navigation', '/home', 'home', ''); // TODO: figure out a title
+            context.troupe().set('roomMember', false); // Will re-render the chat input area
           });
       }
     },
