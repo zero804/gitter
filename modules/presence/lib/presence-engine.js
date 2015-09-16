@@ -5,7 +5,6 @@ var config = env.config;
 var winston = env.logger;
 
 var events = require('events');
-var appEvents = require('gitter-web-appevents');
 var StatusError = require('statuserror');
 var debug = require('debug')('gitter:presence-engine');
 var presenceService = new events.EventEmitter();
@@ -36,6 +35,7 @@ defineCommand('presenceDisassociateAnon', 'presence-disassociate-anon', 3);
 defineCommand('presenceDisassociate', 'presence-disassociate', 7);
 defineCommand('presenceEyeballsOff', 'presence-eyeballs-off', 3);
 defineCommand('presenceEyeballsOn', 'presence-eyeballs-on', 3);
+defineCommand('presenceReassociate', 'presence-reassociate', 4);
 
 var ACTIVE_USERS_KEY = 'active_u';
 var MOBILE_USERS_KEY = 'mobile_u';
@@ -135,12 +135,17 @@ function sendAppEventsForUserEyeballsOffTroupe(userInTroupeCount, totalUsersInTr
 
   /* If userInTroupeCount is -1, eyeballs were already off */
   if(userInTroupeCount === 0) {
-    presenceService.emit('userLeftTroupe', userId, troupeId);
+    presenceService.emit('presenceChange', userId, troupeId, false);
+  } else {
+
+    /* If totalUsersInTroupe is -1, eyeballs were already off */
+    if(totalUsersInTroupe !== -1) {
+      presenceService.emit('presenceChange', userId, troupeId, false);
+    }
   }
 
-  /* If totalUsersInTroupe is -1, eyeballs were already off */
-  if(totalUsersInTroupe !== -1) {
-    appEvents.eyeballSignal(userId, troupeId, false);
+  if (userId) {
+    presenceService.emit('eyeballSignal', userId, troupeId, false);
   }
 
   // No need to worry about emitting an event if totalUsersInTroupe === 0.
@@ -205,7 +210,58 @@ function userSocketConnected(userId, socketId, connectionType, client, troupeId,
       return userSocketCount;
     })
     .nodeify(callback);
+}
 
+function socketReassociated(socketId, userId, troupeId, eyeballsOn) {
+  return lookupSocketOwnerAndTroupe(socketId)
+    .spread(function(userId2, previousTroupeId) {
+      if(userId !== userId2) {
+        winston.warn("User " + userId + " attempted to eyeball socket " + socketId + " but that socket belongs to " + userId2);
+        var err2 = new StatusError(400, 'Invalid socket for user');
+        err2.invalidSocketId = true;
+        throw err2;
+      }
+
+      if (previousTroupeId === troupeId) {
+        // No change... process eyeballs and be done
+      }
+
+      return redisClient.presenceReassociate(
+        /* keys */   keySocketUser(socketId),
+                     keyUserLock(userId),
+                     troupeId ? keyTroupeUsers(troupeId) : null,
+                     previousTroupeId ? keyTroupeUsers(previousTroupeId) : null,
+        /* values */ userId,
+                     socketId,
+                     troupeId || null,
+                     previousTroupeId || null,
+                     userId ? eyeballsOn : false) // Only non-anonymous users can be eyeballs on
+        .spread(function(success, newTroupeUserCount, previousTroupeUserCount) {
+          if(!success)  {
+            throw new StatusError(500, 'Socket reassociation failed.');
+          }
+
+          previousTroupeUserCount = parseInt(previousTroupeUserCount, 10);
+          newTroupeUserCount = parseInt(newTroupeUserCount, 10);
+
+          /* previousTroupeUserCount = -1 if nothing happened, 0..n are the user score */
+          if(previousTroupeUserCount === 0) {
+            presenceService.emit('presenceChange', userId, previousTroupeId, false);
+          }
+
+          if (userId) {
+            presenceService.emit('eyeballSignal', userId, previousTroupeId, false);
+          }
+
+          if (newTroupeUserCount === 1) {
+            presenceService.emit('presenceChange', userId, troupeId, true);
+          }
+
+          if (userId) {
+            presenceService.emit('eyeballSignal', userId, troupeId, eyeballsOn);
+          }
+        });
+    });
 }
 
 function socketDisconnectionRequested(userId, socketId, callback) {
@@ -261,10 +317,10 @@ function eyeBallsOnTroupe(userId, socketId, troupeId, callback) {
 
       var userScore = parseInt(userScoreString, 10);                   // Score for user is returned as a string
       if(userScore == 1) {
-        presenceService.emit('userJoinedTroupe', userId, troupeId);
+        presenceService.emit('presenceChange', userId, troupeId, true);
       }
 
-      appEvents.eyeballSignal(userId, troupeId, true);
+      presenceService.emit('eyeballSignal', userId, troupeId, true);
     })
     .nodeify(callback);
 
@@ -290,16 +346,9 @@ function eyeBallsOffTroupe(userId, socketId, troupeId, callback) {
 
 }
 
-// Callback -> (err, { userId: X, troupeId: Y })
-function lookupSocketOwnerAndTroupe(socketId, callback) {
-  return redisClient.hmget(keySocketUser(socketId), "uid", "tid")
-    .spread(function(userId, troupeId) {
-      return {
-        userId: userId,
-        troupeId: troupeId
-      };
-    })
-    .nodeify(callback);
+// Return user and troupe for a given socket
+function lookupSocketOwnerAndTroupe(socketId) {
+  return redisClient.hmget(keySocketUser(socketId), "uid", "tid");
 }
 
 /**
@@ -500,7 +549,7 @@ function getSocket(socketId, callback) {
 
       return {
         userId: userId,
-        troupeId: troupeId,
+        troupeId: troupeId || null,
         eyeballs: !!eyeballs,
         mobile: !!mobile,
         createdTime: new Date(parseInt(createdTimeString, 10)),
@@ -614,15 +663,7 @@ function clientEyeballSignal(userId, socketId, eyeballsOn, callback) {
   if(!socketId) return Promise.reject(new StatusError(400, 'socketId expected')).nodeify(callback);
 
   return lookupSocketOwnerAndTroupe(socketId)
-    .then(function(socketInfo) {
-      if(!socketInfo) {
-        winston.warn("User " + userId + " attempted to eyeball missing socket " + socketId);
-        var err = new StatusError(400, 'Invalid socket');
-        err.invalidSocketId = true;
-        throw err;
-      }
-
-      var userId2 = socketInfo.userId;
+    .spread(function(userId2, troupeId) {
       if(userId !== userId2) {
         winston.warn("User " + userId + " attempted to eyeball socket " + socketId + " but that socket belongs to " + userId2);
         var err2 = new StatusError(400, 'Invalid socket for user');
@@ -630,7 +671,6 @@ function clientEyeballSignal(userId, socketId, eyeballsOn, callback) {
         throw err2;
       }
 
-      var troupeId = socketInfo.troupeId;
       if(!troupeId) throw new StatusError(409, 'Socket is not associated with a troupe');
 
       if(eyeballsOn) {
@@ -892,6 +932,7 @@ function validateUsers(callback) {
 presenceService.userSocketConnected = userSocketConnected;
 presenceService.socketDisconnected =  socketDisconnected;
 presenceService.socketDisconnectionRequested = socketDisconnectionRequested;
+presenceService.socketReassociated = socketReassociated;
 
 // Query Status
 presenceService.lookupUserIdForSocket =  lookupUserIdForSocket;
@@ -929,24 +970,10 @@ if (debug.enabled) {
     debug("User %s disconnected.", userId);
   });
 
-  presenceService.on('userJoinedTroupe', function(userId, troupeId) {
-    /* User joining this troupe for the first time.... */
-    debug("User %s has just joined %s", userId, troupeId);
-  });
-
-  presenceService.on('userLeftTroupe', function(userId, troupeId) {
-    debug("User %s is gone from %s", userId, troupeId);
+  presenceService.on('presenceChange', function(userId, troupeId, presence) {
+    debug("User %s presence in room %s: %s", userId, troupeId, presence);
   });
 }
-
-presenceService.on('userJoinedTroupe', function(userId, troupeId) {
-  /* User joining this troupe for the first time.... */
-  appEvents.userLoggedIntoTroupe(userId, troupeId);
-});
-
-presenceService.on('userLeftTroupe', function(userId, troupeId) {
-  appEvents.userLoggedOutOfTroupe(userId, troupeId);
-});
 
 presenceService.testOnly = {
   ACTIVE_USERS_KEY: ACTIVE_USERS_KEY,

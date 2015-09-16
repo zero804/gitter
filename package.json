@@ -1,6 +1,6 @@
 {
   "name": "gitter-webapp",
-  "version": "9.9.0",
+  "version": "13.4.0",
   "private": true,
   "dependencies": {
     "@gitterhq/translations": "^1.0.0",
@@ -33,7 +33,7 @@
     "gitter-passport-github": "^0.1.8-f",
     "gitter-passport-http-bearer": "^1.1.2",
     "gitter-passport-oauth2": "^1.1.2-b",
-    "gitter-realtime-client": "^0.2.0",
+    "gitter-realtime-client": "^0.3.3",
     "gitter-redis-scripto": "^0.2.2",
     "gitter-services": "git+https://github.com/gitterHQ/services.git#1.13.0",
     "gitter-web-appevents": "file:modules/appevents",
@@ -50,7 +50,6 @@
     "highlight.js": "^8.6.0",
     "i18n": "~0.4.1",
     "i18n-2": "^0.4.6",
-    "imagemagick": "0.1.2",
     "intercom.io": "~0.0.8",
     "ioredis": "^1.7.3",
     "jwt-simple": "~0.1.0",

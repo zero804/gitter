@@ -259,10 +259,10 @@ module.exports = (function() {
     },
 
     getSnapshotState: function() {
-      // If snapshot state has been passed from the server use it once
       var initialSnapshot = context().snapshots;
       if(initialSnapshot) {
         var config = initialSnapshot[this.modelName];
+
         if(config) {
           // Come up with a better algorithm for this
           this.setAtTop(false);
@@ -304,4 +304,3 @@ module.exports = (function() {
   };
 
 })();
-

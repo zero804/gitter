@@ -78,48 +78,63 @@ module.exports = (function() {
       // Don't sent unread items back to the server in lurk mode unless its a mention
       if (lurkMode && !mention) return;
 
+      var troupeId = context.getTroupeId();
+      var buffer = this._buffer[troupeId];
+      if (!buffer) {
+        buffer = this._buffer[troupeId] = {};
+      }
+
       // All items marked as read are send back to the server
       // as chats
-      this._buffer[itemId] = true;
+      buffer[itemId] = true;
       this._sendLimited();
     },
 
     _onWindowUnload: function() {
       if(Object.keys(this._buffer) > 0) {
-        // This causes mainthread locks in Safari
-        // TODO: send to the parent frame?
+        // Beware: This causes mainthread locks in Safari
         this._send({ sync: true });
       }
     },
 
     _send: function(options) {
-      onceUserIdSet(function() {
-        var items = Object.keys(this._buffer);
-        if (!items.length) return;
+      Object.keys(this._buffer).forEach(function(troupeId) {
+        this._sendForRoom(troupeId, options);
+      }, this);
+    },
 
-        var queue = { chat: items };
-        this._buffer = {};
+    _sendForRoom: function(troupeId, options) {
+      var items = Object.keys(this._buffer[troupeId]);
+      delete this._buffer[troupeId];
+      if (!items.length) return;
 
-        var async = !options || !options.sync;
-        var self = this;
+      var queue = { chat: items };
 
-        apiClient.userRoom.post('/unreadItems', queue, {
+      var async = !options || !options.sync;
+
+      var attempts = 0;
+      function attemptPost() {
+        // Note, we can't use the apiClient.userRoom endpoint
+        // as the room may have changed since the item was read.
+        // For example, after a room switch we don't want to
+        // be marking items as read in another room
+        apiClient.user.post('/rooms/' + troupeId + '/unreadItems', queue, {
             async: async,
             global: false
           })
           .fail(function() {
             log.info('uic: Error posting unread items to server. Will attempt again in 5s');
 
-            // Unable to send messages, requeue them and try again in 5s
-            setTimeout(function() {
-              items.forEach(function(itemId) {
-                self._onItemMarkedRead(itemId);
-              });
-            }, 5000);
+            if (++attempts < 10) {
+              // Unable to send messages, requeue them and try again in 5s
+              setTimeout(attemptPost, 5000);
+            }
+
           });
 
-      }, this);
+      }
 
+      onceUserIdSet(attemptPost);
     }
   };
 
@@ -133,13 +148,11 @@ module.exports = (function() {
 
   _.extend(TroupeUnreadItemRealtimeSync.prototype, Backbone.Events, {
     _subscribe: function() {
-      onceUserIdSet(function(userId) {
-
-        var store = this._store;
-
-        var subscription = '/v1/user/' + userId + '/rooms/' + context.getTroupeId() + '/unreadItems';
-
-        realtime.subscribe(subscription, function(message) {
+      var store = this._store;
+      var templateSubscription = realtime.getClient().subscribeTemplate({
+        urlTemplate: '/v1/user/:userId/rooms/:troupeId/unreadItems',
+        contextModel: context.contextModel(),
+        onMessage: function(message) {
           switch(message.notification) {
             // New unread items
             case 'unread_items':
@@ -165,20 +178,23 @@ module.exports = (function() {
               }
               break;
           }
-        });
+        },
 
-        realtime.getClient().registerSnapshotHandler(subscription, {
-          handleSnapshot: function(snapshot) {
-            var lurk = snapshot._meta && snapshot._meta.lurk;
-            if(lurk) {
-              store.enableLurkMode();
-            }
-
-            store._unreadItemsAdded(snapshot);
+        handleSnapshot: function(snapshot) {
+          var lurk = snapshot._meta && snapshot._meta.lurk;
+          if(lurk) {
+            store.enableLurkMode();
           }
-        });
 
-      }, this);
+          // TODO: send the recently marked items back to the server
+          store._unreadItemsAdded(snapshot);
+        }
+      });
+
+      templateSubscription.on('resubscribe', function() {
+        store.reset();
+      });
+
     }
 
   });
@@ -190,6 +206,7 @@ module.exports = (function() {
 
   var TroupeUnreadItemsViewportMonitor = function(scrollElement, unreadItemStore, collectionView) {
     var boundGetBounds = this._getBounds.bind(this);
+    var limitedGetBounds = limit(this._getBounds, this, 100);
     this._collectionView = collectionView;
     this._scrollElement = scrollElement[0] || scrollElement;
 
@@ -209,15 +226,16 @@ module.exports = (function() {
 
     unreadItemStore.on('newcountvalue', foldCountLimited);
     ['unreadItemRemoved', 'change:status', 'itemMarkedRead', 'add'].forEach(function(evt) {
-      unreadItemStore.on(evt, boundGetBounds);
+      unreadItemStore.on(evt, limitedGetBounds);
     });
 
     // Check for unread items when things are added to the collection
-    collectionView.collection.on('add', boundGetBounds);
+    // Only do it every 100ms or so
+    collectionView.collection.on('add', limitedGetBounds);
 
-    // When the UI changes, rescan
-    // appEvents.on('appNavigation', this._getBounds);
-    setTimeout(boundGetBounds, 250);
+    // This is a catch all for for unread items that are
+    // not marked as read
+    setInterval(limitedGetBounds, 2000);
   };
 
   TroupeUnreadItemsViewportMonitor.prototype = {
@@ -334,7 +352,8 @@ module.exports = (function() {
     },
 
     _foldCount: function() {
-      var chats = this._store.getItems();
+      var store = this._store;
+      var chats = store.getItems();
       if(!chats.length) {
         this._resetFoldModel();
         return;
@@ -346,9 +365,11 @@ module.exports = (function() {
       var mentionsAbove = 0;
       var mentionsBelow = 0;
 
-      var topBound = this._scrollElement.scrollTop;
-      var bottomBound = topBound + this._scrollElement.clientHeight;
-      if (bottomBound >= this._scrollElement.scrollHeight - 10) {
+      var scrollElement = this._scrollElement;
+
+      var topBound = scrollElement.scrollTop;
+      var bottomBound = topBound + scrollElement.clientHeight;
+      if (bottomBound >= scrollElement.scrollHeight - 10) {
         /* At the bottom? */
         bottomBound =  Number.POSITIVE_INFINITY;
       }
@@ -373,7 +394,7 @@ module.exports = (function() {
         if (itemId < firstItemId) {
           above++;
           if (!oldestUnreadItemId) oldestUnreadItemId = itemId;
-          if (this._store._items[itemId])  {
+          if (store._items[itemId])  {
             mentionsAbove++;
             oldestMentionId = itemId;
           }
@@ -381,12 +402,12 @@ module.exports = (function() {
         if (itemId > lastItemId) {
           below++;
           if (!mostRecentUnreadItemId) mostRecentUnreadItemId = itemId;
-          if (this._store._items[itemId]) {
+          if (store._items[itemId]) {
             mentionsBelow++;
             if (!mostRecentMentionId) mostRecentMentionId = itemId;
           }
         }
-      }.bind(this));
+      });
 
       acrossTheFoldModel.set({
         unreadAbove: above,

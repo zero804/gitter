@@ -1,12 +1,13 @@
 "use strict";
-var $ = require('jquery');
-var _ = require('underscore');
-var log = require('utils/log');
-var Marionette = require('backbone.marionette');
-var appEvents = require('utils/appevents');
+var $            = require('jquery');
+var _            = require('underscore');
+var log          = require('utils/log');
+var Marionette   = require('backbone.marionette');
+var appEvents    = require('utils/appevents');
 var chatItemView = require('./chatItemView');
-var Rollers = require('utils/rollers');
+var Rollers      = require('utils/rollers');
 var isolateBurst = require('gitter-web-shared/burst/isolate-burst-bb');
+var context      = require('utils/context');
 
 require('views/behaviors/infinite-scroll');
 require('views/behaviors/smooth-scroll');
@@ -199,6 +200,11 @@ module.exports = (function() {
       this.listenTo(appEvents, 'chatCollectionView:substLastChat', this.substLastChat);
       this.listenTo(appEvents, 'chatCollectionView:viewportResize', this.viewportResize);
       this.listenTo(appEvents, 'chatCollectionView:scrollToChatId', this.scrollToChatId);
+
+      //When we change room, scroll to the bottom of the chatCollection
+      this.listenTo(context.troupe(), 'change:id', function(){
+        this.rollers.scrollToBottom();
+      }, this);
     },
 
     onTrackViewportCenter: function() {
