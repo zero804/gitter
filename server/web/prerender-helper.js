@@ -10,6 +10,8 @@ var PRERENDERED_VIEWS = [
   "js/views/menu/tmpl/troupeMenu",
   "js/views/app/tmpl/headerViewTemplate",
   "js/views/chat/tmpl/chatInputView",
+  "js/views/chat/tmpl/chat-input-box",
+  "js/views/chat/tmpl/chat-input-buttons",
   "js/views/search/tmpl/search-input",
   "js/views/search/tmpl/search",
   'js/views/people/tmpl/peopleCollectionView',

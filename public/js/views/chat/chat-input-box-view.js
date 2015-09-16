@@ -1,227 +1,333 @@
 "use strict";
+
 var Marionette = require('backbone.marionette');
-var $ = require('jquery');
-var appEvents = require('utils/appevents');
-var hasScrollBars = require('utils/scrollbar-detect');
-var isMobile = require('utils/is-mobile');
+var template = require('./tmpl/chat-input-box.hbs');
 var drafty = require('components/drafty');
+var commands = require('./commands');
+var typeaheads = require('./typeaheads');
+var platformKeys = require('utils/platform-keys');
+var RAF = require('utils/raf');
 var cocktail = require('cocktail');
 var KeyboardEventsMixin = require('views/keyboard-events-mixin');
-var RAF = require('utils/raf');
+var appEvents = require('utils/appevents');
 var context = require('utils/context');
+var isMobile = require('utils/is-mobile');
+
 require('jquery-textcomplete');
-require('views/behaviors/tooltip');
 
-function calculateMaxHeight() {
-  // TODO: this sucks. normalise everything to HEADER
-  var header = $("#header-wrapper");
-  if(!header.length) header = $("header");
+var PLACEHOLDER = 'Click here to type a chat message. Supports GitHub flavoured markdown.';
+var PLACEHOLDER_MOBILE = 'Touch here to type a chat message.';
+var PLACEHOLDER_COMPOSE_MODE = PLACEHOLDER + ' ' + platformKeys.cmd + '+Enter to send.';
 
-  var headerHeight = header.height();
-
-  return $(document).height() - headerHeight - 140;
+function isStatusMessage(text) {
+  // if it starts with '/me' it should be a status update
+  return (/^\/me /).test(text);
 }
 
-var ComposeMode = function() {
-  var stringBoolean = window.localStorage.getItem('compose_mode_enabled') || 'false';
-  this.disabled = JSON.parse(stringBoolean);
-};
-
-ComposeMode.prototype.toggle = function() {
-  this.disabled = !this.disabled;
-  var stringBoolean = JSON.stringify(this.disabled);
-  window.localStorage.setItem('compose_mode_enabled', stringBoolean);
-};
-
-ComposeMode.prototype.isEnabled = function() {
-  return this.disabled;
-};
-
-var ChatCollectionResizer = function(options) {
-  var el = options.el;
-  var $el = $(el);
-
-  this.resetInput = function(initial) {
-    $el.css({ height: '', 'overflow-y': '' });
-
-    adjustScroll(initial);
-  };
-
-  this.resizeInput = function() {
-    var maxHeight = calculateMaxHeight();
-    var scrollHeight = el.scrollHeight;
-    var height = scrollHeight > maxHeight ? maxHeight : scrollHeight;
-    var offsetHeight = el.offsetHeight;
-
-    if(offsetHeight == height) {
-      return;
-    }
-
-    $el.height(height);
-
-    adjustScroll();
-  };
-
-  function adjustScroll(initial) {
-    /* Tell the chatCollectionView that the viewport will resize
-     * the argument is whether the resize is animated */
-    appEvents.trigger('chatCollectionView:viewportResize', !initial);
-  }
-};
+function textToStatus(text) {
+  return text.replace(/^\/me /, '@' + context.getUser().username + ' ');
+}
 
 var ChatInputBoxView = Marionette.ItemView.extend({
+  template: template,
+
+  tagName: 'form',
+
+  attributes: {
+    class: 'chat-input__box',
+    name: 'chat'
+  },
+
+  ui: {
+    textarea: 'textarea'
+  },
+
   events: {
-    "keyup": "onKeyUp",
-    "keydown": "onKeyDown",
-    "blur": "onBlur"
+    'input textarea': 'onTextChange',
+    'paste textarea': 'onPaste',
+    'keydown textarea': 'onKeydown',
+    'blur textarea': 'onBlur',
+    'touchend textarea': 'onTouchend',
+    'textComplete:show textarea': 'onTextCompleteShow',
+    'textComplete:hide textarea': 'onTextCompleteHide'
   },
 
   keyboardEvents: {
-    "chat.edit.openLast": "onKeyEditLast",
-    "chat.send": "onKeySend"
+    'chat.compose.auto': 'createCodeBlockOnNewline',
+    'chat.edit.openLast': 'onKeyEditLast',
+    'chat.send': 'onKeySend'
   },
 
-  // pass in the textarea as el for ChatInputBoxView
-  // pass in a scroll delegate
   initialize: function(options) {
-    if(hasScrollBars()) {
-      this.$el.addClass("scroller");
-    }
-
-    var chatResizer = new ChatCollectionResizer({
-      el: this.el
-    });
-
-    this.chatResizer = chatResizer;
-
-    this.listenTo(this, 'change', function() {
-      chatResizer.resizeInput();
-    });
-
-    if (!this.options.editMode) this.drafty = drafty(this.el, context.troupe().get('id'));
-
-    chatResizer.resetInput(true);
-
     this.composeMode = options.composeMode;
-    this.chatResizer.resizeInput();
+    this.listenTo(this.composeMode, 'change:isComposeModeEnabled', this.onComposeModeChange);
+    this.listenTo(appEvents, 'input.append', this.append);
+    this.listenTo(appEvents, 'focus.request.chat', function() { this.ui.textarea.focus(); });
   },
 
   onRender: function() {
-    if (this.options.autofocus) {
+    this.removeTextareaExtensions();
+    this.addTextareaExtensions();
+
+    if (!isMobile()) {
       var self = this;
       RAF(function() {
         // firefox only respects the "autofocus" attr if it is present on source html
         // also, dont show keyboard right away on mobile
         // Also, move the cursor to the end of the textarea text
 
-        self.setCaretPosition(self.$el.val().length);
-        self.el.focus();
+        self.setCaretPosition();
+        self.ui.textarea.focus();
       });
     }
   },
 
-  /**
-   * setCaretPosition() moves the caret on a given text element
-   * credits to http://blog.vishalon.net/index.php/javascript-getting-and-setting-caret-position-in-textarea/
-   */
-  setCaretPosition: function(position) {
-    var el = this.el;
-    if (el.setSelectionRange) {
-      el.focus();
-      el.setSelectionRange(position,position);
-      return;
-    } else if (el.createTextRange) {
-      var range = el.createTextRange();
-      range.collapse(true);
-      range.moveEnd('character', position);
-      range.moveStart('character', position);
-      range.select();
-      return;
+  onComposeModeChange: function(model, isComposeModeEnabled) {
+    var placeholder;
+
+    if (isMobile()) {
+      placeholder = PLACEHOLDER_MOBILE;
+    } else {
+      placeholder = isComposeModeEnabled ? PLACEHOLDER_COMPOSE_MODE : PLACEHOLDER;
+    }
+
+    this.ui.textarea.attr('placeholder', placeholder);
+  },
+
+  onTextChange: function() {
+    if (this.ui.textarea.val()) {
+      this.expandTextareaIfNeeded();
+    } else {
+      this.shrinkTextarea();
+    }
+  },
+
+  onPaste: function(e) {
+    if (e.originalEvent) e = e.originalEvent;
+    if (!e.clipboardData) return;
+    var markdown = e.clipboardData.getData('text/x-markdown');
+
+    if (markdown) {
+      var val = this.ui.textarea.val();
+      var el = this.ui.textarea[0];
+
+      var selectionStart = el.selectionStart;
+      var selectionEnd = el.selectionEnd;
+
+      this.setText(val.substring(0, selectionStart) + markdown + val.substring(selectionEnd));
+
+      this.setCaretPosition(selectionStart + markdown.length);
+
+      // dont paste twice
+      e.preventDefault();
+    }
+  },
+
+  onKeydown: function(e) {
+    if (e.keyCode === 33 || e.keyCode === 34) {
+      appEvents.trigger(e.keyCode === 33 ? 'chatCollectionView:pageUp' : 'chatCollectionView:pageDown');
+      // dont scroll the textarea
+      e.preventDefault();
     }
   },
 
   onBlur: function() {
-    if(isMobile() && !this.isTypeaheadShowing()) {
+    if (this.isTypeaheadShowing()) return;
+
+    if (isMobile()) {
       this.processInput();
+    } else {
+      this.resetTextareaSize();
     }
   },
-  onKeyDown: function(e) {
-    if (e.keyCode === 33 || e.keyCode === 34) {
-      appEvents.trigger(e.keyCode === 33 ? 'chatCollectionView:pageUp' : 'chatCollectionView:pageDown');
-      e.stopPropagation();
-      e.preventDefault();
-    }
+
+  onTouchend: function() {
+    // this fixed an issue with the ios native client, but is super annoying
+    // on normal mobile web and webviews
+    // TODO: check if this is still a problem.
+    // http://stackoverflow.com/questions/16149083/keyboardshrinksview-makes-lose-focus/18904886#18904886
+    // var self = this;
+    // setTimeout(function() {
+    //   self.ui.textarea.focus();
+    // }, 300);
   },
-  onKeyUp: function() {
-    this.chatResizer.resizeInput();
+
+  // disable keyboard shortcuts
+  onTextCompleteShow: function() {
+    this.ui.textarea.attr('data-prevent-keys', 'on');
+  },
+
+  // reenable keyboard shortcuts
+  onTextCompleteHide: function() {
+    var self = this;
+
+    // Defer change to make sure the last key event is prevented
+    setTimeout(function() {
+      self.ui.textarea.attr('data-prevent-keys', 'off');
+    }, 0);
   },
 
   onKeyEditLast: function() {
-    if(!this.$el.val()) this.trigger('editLast');
+    if (this.ui.textarea.val()) return;
+
+    appEvents.trigger('chatCollectionView:editLastChat', context.getUserId());
   },
 
   onKeySend: function(event, handler) {
-    var isComposeModeEnabled = this.composeMode && this.composeMode.isEnabled();
+    var isComposeModeEnabled = this.composeMode.get('isComposeModeEnabled');
     // Has a modifier or not in compose mode
     var shouldHandle = handler.mods.length || !isComposeModeEnabled;
     // Need to test behaviour with typeahead
     if(!this.isTypeaheadShowing() && shouldHandle) {
-      if(this.hasVisibleText()) {
-        this.processInput();
-      }
+      this.processInput();
       event.preventDefault();
       return false;
     }
   },
 
   processInput: function() {
-    var cmd = this.options.commands && this.options.commands.findMatch(this.$el.val());
-    if(cmd && cmd.action) {
-      cmd.action(this);
+    if (!this.hasVisibleText()) return;
+
+    var text = this.ui.textarea.val();
+    var cmd = commands.findMatch(text);
+    if (cmd) {
+      cmd.action(text);
     } else {
-      this.send();
+      this.send(text);
     }
+    this.clear();
   },
 
-  send: function() {
-    this.trigger('save', this.$el.val());
-    this.reset();
+  send: function(text) {
+    var newMessage = {
+      text: text,
+      fromUser: context.getUser(),
+      sent: null,
+    };
+
+    if (isStatusMessage(text)) {
+      newMessage.text = textToStatus(text);
+      newMessage.status = true;
+    }
+
+    this.collection.create(newMessage);
+
+    appEvents.trigger('chat.send');
   },
 
-  reset: function() {
-    $('#chatInputForm').trigger('reset');
-    this.el.value = '';
-    if (this.drafty) this.drafty.reset(); // Drafty is disabled in editMode
-    this.chatResizer.resetInput();
+  clear: function() {
+    this.setText('');
+    if (this.drafty) this.drafty.reset();
   },
 
   append: function(text, options) {
-    var current = this.$el.val();
-    var start = current.length;
-    if(!current || current.match(/\s+$/)) {
+    var current = this.ui.textarea.val();
+    if (!this.hasVisibleText()) {
       current = current + text;
     } else {
       if(options && options.newLine) {
-        start++;
         current = current + '\n' + text;
       } else {
         current = current + ' ' + text;
       }
     }
-    this.chatResizer.resizeInput();
-    this.$el.val(current);
-    this.el.setSelectionRange(current.length, current.length);
-    this.el.focus();
 
-    this.el.scrollTop = this.el.clientHeight;
+    this.setText(current);
+    this.setCaretPosition();
+    this.ui.textarea.focus();
+
+    // scroll input to bottom
+    this.ui.textarea[0].scrollTop = this.ui.textarea[0].clientHeight;
+  },
+
+  createCodeBlockOnNewline: function (event) {
+    var text = this.ui.textarea.val();
+
+    // only continue if user has just started code block (```)
+    var matches = text.match(/^```([\w\-]+)?$/);
+    if (!matches) return;
+
+    // create the rest of the code block
+    this.setText(text + '\n\n```');
+
+    // move caret inside the new code block
+    this.setCaretPosition(matches[0].length + 1);
+
+    if (!this.composeMode.get('isComposeModeEnabled') && !isMobile()) {
+      // switch to compose mode for the lifetime of this message
+      this.composeMode.set('isComposeModeEnabled', true);
+      this.listenToOnce(appEvents, 'chat.send', function() {
+        this.composeMode.set('isComposeModeEnabled', false);
+      });
+    }
+
+    // we've already created a new line so stop the original return event
+    event.preventDefault();
+  },
+
+  setText: function(text) {
+    this.ui.textarea.val(text);
+
+    // trigger the textarea resizing
+    this.onTextChange();
+  },
+
+  setCaretPosition: function(position) {
+    // default to end of text
+    position = position || this.ui.textarea.val().length;
+
+    var el = this.ui.textarea[0];
+    el.focus();
+    el.setSelectionRange(position, position);
+  },
+
+  resetTextareaSize: function() {
+    this.shrinkTextarea();
+    this.expandTextareaIfNeeded();
+  },
+
+  shrinkTextarea: function() {
+    this.ui.textarea.css('height', '');
+    appEvents.trigger('chatCollectionView:viewportResize', false);
+  },
+
+  expandTextareaIfNeeded: function() {
+    var $textarea = this.ui.textarea;
+    var textarea = $textarea[0];
+    var currentHeight = textarea.offsetHeight;
+    var scrollHeight = textarea.scrollHeight;
+    var maxHeight = window.innerHeight / 2;
+
+    var newHeight = Math.min(scrollHeight, maxHeight);
+
+    if (newHeight > currentHeight) {
+      $textarea.css('height', newHeight);
+      appEvents.trigger('chatCollectionView:viewportResize', true);
+    }
+  },
+
+  addTextareaExtensions: function() {
+    this.ui.textarea.textcomplete(typeaheads());
+    this.drafty = drafty(this.ui.textarea[0], context.troupe().get('id'));
+  },
+
+  removeTextareaExtensions: function() {
+    // only way to remove textcomplete's event listeners
+    this.ui.textarea.off();
+    if (this.drafty) this.drafty.disconnect();
   },
 
   isTypeaheadShowing: function() {
-    return this.$el.parent().find('.dropdown-menu').is(":visible");
+    return this.$el.find('.dropdown-menu').is(':visible');
   },
 
   hasVisibleText: function() {
-    return !this.$el.val().match(/^\s+$/);
+    var text = this.ui.textarea.val();
+    return text && !text.match(/^\s+$/);
+  },
+
+  onDestroy: function() {
+    this.removeTextareaExtensions();
   }
 
 });
