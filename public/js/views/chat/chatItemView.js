@@ -11,7 +11,7 @@ var Popover = require('views/popover');
 var chatItemTemplate = require('./tmpl/chatItemView.hbs');
 var statusItemTemplate = require('./tmpl/statusItemView.hbs');
 var actionsTemplate = require('./tmpl/actionsView.hbs');
-var ChatInputBoxView = require('views/chat/chat-input-box-view');
+var ChatEditView = require('views/chat/chat-edit-view');
 var appEvents = require('utils/appevents');
 var cocktail = require('cocktail');
 var chatCollapse = require('utils/collapsed-item-client');
@@ -355,6 +355,19 @@ module.exports = (function() {
       }
     },
 
+    subst: function(search, replace, global) {
+      if(!this.canEdit()) return;
+
+      var reString = search.replace(/(^|[^\[])\^/g, '$1');
+      var re = new RegExp(reString, global ? "gi" : "i");
+      var newText = this.model.get('text').replace(re, replace);
+
+      this.model.set({
+        text: newText,
+        html: null
+      }).save();
+    },
+
     setCollapse: function (state) {
       state = !!state;
       var chatId = this.model.get('id');
@@ -491,7 +504,7 @@ module.exports = (function() {
         textarea.val("").val(unsafeText);
       });
 
-      this.inputBox = new ChatInputBoxView({ el: textarea, editMode: true });
+      this.inputBox = new ChatEditView({ el: textarea });
       this.listenTo(this.inputBox, 'save', this.saveChat);
     },
 
@@ -502,8 +515,6 @@ module.exports = (function() {
     },
 
     showReadBy: function(e) {
-      if (this.compactView) return;
-
       if(this.popover) return;
       e.preventDefault();
 
