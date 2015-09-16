@@ -92,8 +92,6 @@ var ChatInputBoxView = Marionette.ItemView.extend({
     }
 
     this.ui.textarea.attr('placeholder', placeholder);
-    // regain focus as user is about to type something.
-    this.ui.textarea.focus();
   },
 
   onTextChange: function() {
