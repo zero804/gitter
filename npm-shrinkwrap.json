@@ -4481,9 +4481,8 @@
       }
     },
     "text-filter": {
-      "version": "0.1.0",
-      "from": "http://beta-internal:4873/text-filter/-/text-filter-0.1.0.tgz",
-      "resolved": "http://beta-internal:4873/text-filter/-/text-filter-0.1.0.tgz"
+      "version": "0.1.1",
+      "from": "text-filter@0.1.1"
     },
     "throat": {
       "version": "1.0.0",
