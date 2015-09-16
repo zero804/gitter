@@ -88,7 +88,7 @@ exports.chatArchive = [
         var yyyy = parseInt(req.params.yyyy, 10);
         var mm = parseInt(req.params.mm, 10);
         var dd = parseInt(req.params.dd, 10);
-        var tz = req.query.tz || 'Z'
+        var tz = '' + (req.query.tz || 'Z');
 
         var dateString = yyyy+'-'+mm+'-'+dd+' 00:00 '+tz;
         var startDate = moment(dateString, "YYYY-MM-DD HH:mm Z");
