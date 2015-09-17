@@ -5,7 +5,6 @@ var troupeService        = require("../../../services/troupe-service");
 var restful              = require("../../../services/restful");
 var restSerializer       = require("../../../serializers/rest-serializer");
 var recentRoomService    = require('../../../services/recent-room-service');
-var roomMembershipService = require('../../../services/room-membership-service');
 var roomService          = require('../../../services/room-service');
 var Q                    = require('q');
 var mongoUtils           = require('../../../utils/mongo-utils');
