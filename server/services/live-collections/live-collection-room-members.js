@@ -25,7 +25,7 @@ function notifyUsersOfAddedGroupRooms(room, userIds) {
   debug("Notifying %s of being added to %s", userIds, room._id);
 
   // TODO: custom serializations per user
-  return restSerializer.serialize(room, new restSerializer.TroupeStrategy())
+  return restSerializer.serialize(room, new restSerializer.TroupeStrategy({ isRoomMember: true }))
     .then(function(serializedRoom) {
 
         userIds.forEach(function(userId) {
@@ -37,7 +37,7 @@ function notifyUsersOfAddedGroupRooms(room, userIds) {
 
 function notifyUsersOfAddedOneToOneRooms(room, userIds) {
   return Q.all(userIds.map(function(userId) {
-    var strategy = new restSerializer.TroupeStrategy({ currentUserId: userId });
+    var strategy = new restSerializer.TroupeStrategy({ currentUserId: userId, isRoomMember: true });
 
     return restSerializer.serialize(room, strategy)
       .then(function(serializedRoom) {
