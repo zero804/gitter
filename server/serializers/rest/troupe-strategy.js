@@ -47,11 +47,12 @@ AllUnreadItemCountStategy.prototype = {
 function RoomMembershipStrategy(options) {
   var userId = options.userId || options.currentUserId;
   var nonMemberTroupeIds = options.nonMemberTroupeIds && collections.hashArray(options.nonMemberTroupeIds);
+  var predefinedValue = options.isRoomMember !== undefined;
   var memberships;
 
   this.preload = function(troupeIds, callback) {
     // Shortcut logic
-    if (nonMemberTroupeIds) {
+    if (nonMemberTroupeIds || predefinedValue) {
       return callback();
     }
 
@@ -63,6 +64,10 @@ function RoomMembershipStrategy(options) {
   };
 
   this.map = function(id) {
+    if (predefinedValue) {
+      return options.isRoomMember;
+    }
+
     if (nonMemberTroupeIds) {
       return !nonMemberTroupeIds[id]; // Negate
     }
@@ -277,7 +282,7 @@ function TroupeStrategy(options) {
   var proOrgStrategy        = new ProOrgStrategy(options);
   var permissionsStategy    = (currentUserId || options.currentUser) && options.includePermissions ? new TroupePermissionsStrategy(options) : null;
   var ownerIsOrgStrategy    = (options.includeOwner) ? new TroupeOwnerIsOrgStrategy(options) : null;
-  var roomMembershipStrategy = currentUserId ? new RoomMembershipStrategy(options) : null;
+  var roomMembershipStrategy = currentUserId || options.isRoomMember !== undefined ? new RoomMembershipStrategy(options) : null;
 
   this.preload = function(items, callback) {
     var strategies = [];
@@ -427,8 +432,8 @@ function TroupeStrategy(options) {
       tags: item.tags,
       permissions: permissionsStategy ? permissionsStategy.map(item) : undefined,
       ownerIsOrg: ownerIsOrgStrategy ? ownerIsOrgStrategy.map(item) : undefined,
-      v: getVersion(item),
-      roomMember: roomMembershipStrategy ? roomMembershipStrategy.map(item.id) : undefined
+      roomMember: roomMembershipStrategy ? roomMembershipStrategy.map(item.id) : undefined,
+      v: getVersion(item)
     };
   };
 }
