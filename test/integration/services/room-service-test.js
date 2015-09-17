@@ -18,7 +18,7 @@ Q.longStackSupport = true;
 var persistence = testRequire("./services/persistence-service");
 var mongoUtils = testRequire("./utils/mongo-utils");
 
-describe('room-service #slow', function() {
+describe('room-service', function() {
   before(fixtureLoader(fixture, {
     user1: { },
     user2: { },
@@ -1575,7 +1575,7 @@ describe('room-service #slow', function() {
 
   });
 
-  describe('#createGithubRoom', function() {
+  describe('createGithubRoom #slow', function() {
     it('should create an empty room for an organization', function(done) {
       var permissionsModelMock = mockito.mockFunction();
 
@@ -1606,7 +1606,7 @@ describe('room-service #slow', function() {
     });
   });
 
-  describe('renames', function() {
+  describe('renames #slow', function() {
     var originalUrl = 'moo/cow-' + Date.now();
     var renamedUrl = 'bob/renamed-cow-' + Date.now();
 
@@ -1735,7 +1735,7 @@ describe('room-service #slow', function() {
 
   });
 
-  describe('createGithubRoom', function() {
+  describe('createGithubRoom #slow', function() {
     var fixture = {};
     var permissionsModelMock, roomPermissionsModelMock, roomValidatorMock, roomService;
 
@@ -1808,4 +1808,69 @@ describe('room-service #slow', function() {
     });
 
   });
+
+  describe('findAllRoomsIdsForUserIncludingMentions', function() {
+    var getRoomIdsMentioningUserMock, findRoomIdsForUserMock, roomService;
+
+    beforeEach(function() {
+      getRoomIdsMentioningUserMock = mockito.mockFunction();
+      findRoomIdsForUserMock = mockito.mockFunction();
+      roomService = testRequire.withProxies('./services/room-service', {
+        './unread-item-service': {
+          getRoomIdsMentioningUser: getRoomIdsMentioningUserMock
+        },
+        './room-membership-service': {
+          findRoomIdsForUser: findRoomIdsForUserMock
+        }
+      });
+    });
+
+    function runWithValues(roomIdsForUser, roomIdsMentioningUser, expected, expectedNonMembers, done) {
+      var userId = 'user1';
+
+      mockito.when(getRoomIdsMentioningUserMock)().then(function(pUserId) {
+        assert.strictEqual(pUserId, userId);
+        return Q.resolve(roomIdsMentioningUser);
+      });
+
+      mockito.when(findRoomIdsForUserMock)().then(function(pUserId) {
+        assert.strictEqual(pUserId, userId);
+        return Q.resolve(roomIdsForUser);
+      });
+
+      return roomService.findAllRoomsIdsForUserIncludingMentions(userId)
+        .spread(function(allTroupeIds, nonMemberTroupeIds) {
+          allTroupeIds.sort();
+          nonMemberTroupeIds.sort();
+          expected.sort();
+          expectedNonMembers.sort();
+          assert.deepEqual(allTroupeIds, expected);
+          assert.deepEqual(nonMemberTroupeIds, expectedNonMembers);
+        })
+        .nodeify(done);
+    }
+
+    it('should handle the trivial case of no rooms', function(done) {
+      runWithValues([], [], [], [], done);
+    });
+
+    it('should handle the non member rooms only case', function(done) {
+      runWithValues([], ['1'], ['1'], ['1'], done);
+    });
+
+    it('should handle the member rooms only case', function(done) {
+      runWithValues(['1'], [], ['1'], [], done);
+    });
+
+    it('should handle the member rooms only case with mentions', function(done) {
+      runWithValues(['1'], ['1'], ['1'], [], done);
+    });
+
+    it('should handle the mixed cases', function(done) {
+      runWithValues(['1','2','3'], ['2','3','4'], ['1','2','3', '4'], ['4'], done);
+    });
+
+
+  });
+
 });

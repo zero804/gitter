@@ -10,14 +10,15 @@ var billingService        = require('../../services/billing-service');
 var roomPermissionsModel  = require('../../services/room-permissions-model');
 var troupeService         = require('../../services/troupe-service');
 
-var _                 = require("lodash");
-var uniqueIds         = require('mongodb-unique-ids');
-var winston           = require('../../utils/winston');
-var debug             = require('debug')('gitter:troupe-strategy');
-var execPreloads      = require('../exec-preloads');
-var getVersion        = require('../get-model-version');
-var UserIdStrategy    = require('./user-id-strategy');
-var Q                 = require('q');
+var _                     = require("lodash");
+var uniqueIds             = require('mongodb-unique-ids');
+var winston               = require('../../utils/winston');
+var collections           = require('../../utils/collections');
+var debug                 = require('debug')('gitter:troupe-strategy');
+var execPreloads          = require('../exec-preloads');
+var getVersion            = require('../get-model-version');
+var UserIdStrategy        = require('./user-id-strategy');
+var Q                     = require('q');
 
 /**
  *
@@ -44,28 +45,29 @@ AllUnreadItemCountStategy.prototype = {
 };
 
 function RoomMembershipStrategy(options) {
-  var self = this;
   var userId = options.userId || options.currentUserId;
+  var nonMemberTroupeIds = options.nonMemberTroupeIds && collections.hashArray(options.nonMemberTroupeIds);
+  var memberships;
 
   this.preload = function(troupeIds, callback) {
-    self.memberships = {};
+    // Shortcut logic
+    if (nonMemberTroupeIds) {
+      return callback();
+    }
 
-    var promises = troupeIds.reduce(function(accum, troupeId) {
-      accum.push(roomMembershipService.checkRoomMembership(troupeId, userId));
-      return accum;
-    }, []);
-    
-    Q.all(promises)
-    .then(function(results) {
-      results.forEach(function(result, i) {
-        self.memberships[troupeIds[i]] = result;
-      });
-    })
-    .nodeify(callback);
+    return roomMembershipService.findUserMembershipInRooms(userId, troupeIds)
+      .then(function(memberTroupeIds) {
+        memberships = collections.hashArray(memberTroupeIds);
+      })
+      .nodeify(callback);
   };
 
   this.map = function(id) {
-    return self.memberships[id] ? self.memberships[id] : false;
+    if (nonMemberTroupeIds) {
+      return !nonMemberTroupeIds[id]; // Negate
+    }
+
+    return !!memberships[id];
   };
 }
 

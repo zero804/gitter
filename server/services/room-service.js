@@ -10,7 +10,7 @@ var errorReporter      = env.errorReporter;
 var appEvents          = require('gitter-web-appevents');
 var Q                  = require('q');
 var request            = require('request');
-var _                  = require('underscore');
+var _                  = require('lodash');
 var xregexp            = require('xregexp').XRegExp;
 var persistence        = require('./persistence-service');
 var validateUri        = require('gitter-web-github').GitHubUriValidator;
@@ -41,7 +41,6 @@ var roomMembershipService = require('./room-membership-service');
 var liveCollections    = require('./live-collections');
 var recentRoomService  = require('./recent-room-service');
 var badgerEnabled      = nconf.get('autoPullRequest:enabled');
-var uniqueIds          = require('mongodb-unique-ids');
 var uriResolver        = require('./uri-resolver');
 
 exports.testOnly = {};
@@ -342,15 +341,27 @@ function ensureAccessControl(user, troupe, access) {
   return Q.resolve(null);
 }
 
-
+/**
+ * Returns the list of rooms to be displayed for the user. This will
+ * include all rooms in which the user is a member and additionally
+ * the list of rooms where the user is not a member but has been mentioned.
+ */
 function findAllRoomsIdsForUserIncludingMentions(userId, callback) {
   return Q.all([
       unreadItemService.getRoomIdsMentioningUser(userId),
       roomMembershipService.findRoomIdsForUser(userId)
     ])
     .spread(function(mentions, memberships) {
-      var idStrings = mongoUtils.serializeObjectIds(mentions.concat(memberships));
-      return uniqueIds(idStrings);
+      var hash = collections.hashArray(memberships);
+      var nonMemberRooms = [];
+      _.each(mentions, function(mentionTroupeId) {
+        if (!hash[mentionTroupeId]) {
+          hash[mentionTroupeId] = true;
+          nonMemberRooms.push(mentionTroupeId);
+        }
+      });
+
+      return [Object.keys(hash), nonMemberRooms];
     })
     .nodeify(callback);
 }
