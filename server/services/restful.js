@@ -28,13 +28,14 @@ exports.serializeTroupesForUser = function(userId, callback) {
   if(!userId) return Q.resolve([]);
 
   return roomService.findAllRoomsIdsForUserIncludingMentions(userId)
-    .then(function(troupeIds) {
+    .spread(function(allTroupeIds, nonMemberTroupeIds) {
       var strategy = new restSerializer.TroupeIdStrategy({
         currentUserId: userId,
-        // mapUsers: false
+        nonMemberTroupeIds: nonMemberTroupeIds // This will save the troupeId strategy
+                                               // from having to do a second query
       });
 
-      return restSerializer.serializeExcludeNulls(troupeIds, strategy);
+      return restSerializer.serializeExcludeNulls(allTroupeIds, strategy);
     })
     .nodeify(callback);
 };
