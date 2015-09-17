@@ -1,4 +1,3 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var userTroupeSettingsService = require("../../../services/user-troupe-settings-service");
@@ -6,32 +5,28 @@ var userTroupeSettingsService = require("../../../services/user-troupe-settings-
 module.exports = {
   id: 'setting',
   index: function(req, res, next) {
-    userTroupeSettingsService.getAllUserSettings(req.resourceUser.id, req.userTroupe.id)
+    userTroupeSettingsService.getAllUserSettings(req.resourceUser.id, req.params.userTroupeId)
       .then(function(settings) {
         res.json(settings || {});
       })
       .catch(next);
   },
 
-  show: function(req, res) {
-    res.json(req.setting.settings || {});
-  },
-
-  update: function(req, res, next) {
-    var settings = req.body;
-    userTroupeSettingsService.setUserSettings(req.resourceUser.id, req.userTroupe.id, req.setting.settingsKey, settings)
-      .then(function() {
-        res.json(settings);
+  show: function(req, res, next) {
+    userTroupeSettingsService.getUserSettings(req.resourceUser.id, req.params.userTroupeId, req.params.setting)
+      .then(function(f) {
+        res.json(f || {});
       })
       .catch(next);
   },
 
-  load: function(req, id, callback) {
-    userTroupeSettingsService.getUserSettings(req.resourceUser.id, req.userTroupe.id, id)
-      .then(function(f) {
-        return { settingsKey: id, settings: f };
+  update: function(req, res, next) {
+    var settings = req.body;
+    userTroupeSettingsService.setUserSettings(req.resourceUser.id, req.params.userTroupeId, req.params.setting, settings)
+      .then(function() {
+        res.json(settings);
       })
-      .nodeify(callback);
+      .catch(next);
   }
 
 };

@@ -1,4 +1,3 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var unreadItemService = require("../../../services/unread-item-service");
@@ -10,7 +9,7 @@ module.exports = {
   index: function(req, res, next) {
     var userId = req.resourceUser.id;
 
-    unreadItemService.getUnreadItemsForUser(userId, req.userTroupe.id)
+    unreadItemService.getUnreadItemsForUser(userId, req.params.userTroupeId)
       .then(function(data) {
         res.send(data);
       })
@@ -31,9 +30,9 @@ module.exports = {
       allIds = uniqueIds(allIds);
     }
 
-    if(!allIds.length) return next(new StatusError(400, 'No chat or mention items')); /* You comin at me bro? */
+    if(!allIds.length) return next(new StatusError(400)); /* You comin at me bro? */
 
-    return unreadItemService.markItemsRead(req.resourceUser.id, req.userTroupe.id, allIds)
+    return unreadItemService.markItemsRead(req.resourceUser.id, req.params.userTroupeId, allIds)
       .then(function() {
         res.format({
           text: function() {
@@ -52,9 +51,9 @@ module.exports = {
   },
 
   destroy: function(req, res, next) {
-    if(req.params.unreadItem.toLowerCase() !== 'all') return next(new StatusError(404, 'Not found'));
+    if(req.params.unreadItem.toLowerCase() !== 'all') return next(new StatusError(404));
 
-    return unreadItemService.markAllChatsRead(req.resourceUser.id, req.userTroupe.id, { member: true })
+    return unreadItemService.markAllChatsRead(req.resourceUser.id, req.params.userTroupeId, { member: true })
       .then(function() {
         res.format({
           text: function() {
@@ -69,11 +68,6 @@ module.exports = {
         });
       })
       .catch(next);
-  },
-
-
-  load: function(req, id, callback) {
-    return callback(null, id);
   }
 
 };
