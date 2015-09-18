@@ -5,9 +5,10 @@ var roomService          = require("../../../services/room-service");
 var restful              = require("../../../services/restful");
 var restSerializer       = require("../../../serializers/rest-serializer");
 var Q                    = require('q');
-var mongoUtils           = require('../../../utils/mongo-utils');
 var StatusError          = require('statuserror');
 var roomPermissionsModel = require('../../../services/room-permissions-model');
+var userCanAccessRoom    = require('../../../services/user-can-access-room');
+var paramLoaders         = require('./param-loaders');
 
 function searchRooms(req, res, next) {
   var user = req.user;
@@ -33,7 +34,7 @@ function searchRooms(req, res, next) {
 }
 
 module.exports = {
-  id: 'troupe',
+  id: 'troupeId',
   index: function(req, res, next) {
     if (!req.user) {
       return next(new StatusError(401));
@@ -51,12 +52,9 @@ module.exports = {
   },
 
   show: function(req, res, next) {
-    var strategyOptions = { currentUserId: req.user && req.user.id };
+    var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: req.user && req.user.id });
 
-    // if (req.query.include_users) strategyOptions.mapUsers = true;
-    var strategy = new restSerializer.TroupeIdStrategy(strategyOptions);
-
-    return restSerializer.serialize(req.troupe.id, strategy)
+    return restSerializer.serialize(req.params.troupeId, strategy)
       .then(function(serialized) {
         res.send(serialized);
       })
@@ -73,7 +71,7 @@ module.exports = {
       .then(function (room) {
         if (!room || !room.troupe) throw new StatusError(403, 'Permission denied');
 
-        var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, /*mapUsers: true,*/ includeRolesForTroupe: room.troupe });
+        var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, includeRolesForTroupe: room.troupe });
 
         return restSerializer.serialize(room.troupe, strategy);
       })
@@ -83,48 +81,41 @@ module.exports = {
       .catch(next);
   },
 
-  update: function(req, res, next) {
+  update: [paramLoaders.troupeLoader, function(req, res, next) {
     var updatedTroupe = req.body;
+    var troupe = req.troupe;
 
-    // Switch a lean troupe object for a full mongoose object
-    return troupeService.findById(req.troupe.id)
-      .then(function(troupe) {
-        if(!troupe) throw new StatusError(404);
+    var promises = [];
 
-        var promises = [];
+    if(updatedTroupe.autoConfigureHooks) {
+      promises.push(roomService.applyAutoHooksForRepoRoom(req.user, troupe));
+    }
 
-        if(updatedTroupe.autoConfigureHooks) {
-          promises.push(roomService.applyAutoHooksForRepoRoom(req.user, troupe));
-        }
+    if(updatedTroupe.hasOwnProperty('topic')) {
+      promises.push(troupeService.updateTopic(req.user, troupe, updatedTroupe.topic));
+    }
 
-        if(updatedTroupe.hasOwnProperty('topic')) {
-          promises.push(troupeService.updateTopic(req.user, troupe, updatedTroupe.topic));
-        }
+    if(updatedTroupe.hasOwnProperty('noindex')) {
+      promises.push(troupeService.toggleSearchIndexing(req.user, troupe, updatedTroupe.noindex));
+    }
 
-        if(updatedTroupe.hasOwnProperty('noindex')) {
-          promises.push(troupeService.toggleSearchIndexing(req.user, troupe, updatedTroupe.noindex));
-        }
+    if(updatedTroupe.hasOwnProperty('tags')) {
+      promises.push(troupeService.updateTags(req.user, troupe, updatedTroupe.tags));
+    }
 
-        if(updatedTroupe.hasOwnProperty('tags')) {
-          promises.push(troupeService.updateTags(req.user, troupe, updatedTroupe.tags));
-        }
+    return Q.all(promises)
+      .then(function() {
+        var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id });
 
-
-        return Q.all(promises)
-          .then(function() {
-            var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id /*, mapUsers: false*/ });
-
-            restSerializer.serialize(troupe, strategy, function(err, serialized) {
-              if(err) return next(err);
-
-              res.send(serialized);
-            });
-          });
+        return restSerializer.serialize(troupe, strategy);
+      })
+      .then(function(serialized) {
+        res.send(serialized);
       })
       .catch(next);
-  },
+  }],
 
-  destroy: function(req, res, next) {
+  destroy: [paramLoaders.troupeLoader, function(req, res, next) {
     var user = req.user;
     var troupe = req.troupe;
 
@@ -134,47 +125,34 @@ module.exports = {
       .then(function(isAdmin) {
         if (!isAdmin) throw new StatusError(403, 'admin permissions required');
 
-        // Switch a lean troupe object for a full mongoose object
-        return troupeService.findById(req.troupe.id);
-      })
-      .then(function(troupe) {
         return roomService.deleteRoom(troupe);
       })
       .then(function() {
         res.sendStatus(200);
       })
       .catch(next);
-  },
+  }],
 
   load: function(req, id, callback) {
-    var user = req.user;
     var userId = req.user && req.user._id;
 
-    if(!mongoUtils.isLikeObjectId(id)) return callback(new StatusError(404));
+    return userCanAccessRoom(userId, id)
+      .then(function(access) {
+        if (!access) throw new StatusError(404);
 
-    troupeService.findByIdLeanWithAccess(id, userId)
-      .spread(function(troupe, access) {
-        if(!troupe) throw new StatusError(404);
-
-        if(troupe.security === 'PUBLIC' && req.method === 'GET') {
-          return troupe;
+        if (access === 'view') {
+          if (req.method === 'GET') {
+            return id;
+          } else {
+            throw new StatusError(userId ? 403 : 401);
+          }
         }
 
-        /* From this point forward we need a user */
-        if(!req.user) {
-          throw new StatusError(401);
+        if (access === 'member') {
+          return id;
         }
 
-        if(!access) {
-          // if the user **cann** the admin of the room, we still grant access to load the room
-          // this enables, for example, editing tags even if you're not in the room
-          return roomPermissionsModel(user, 'admin', troupe)
-            .then(function(isAdmin) {
-              if (isAdmin) return troupe;
-              throw new StatusError(403);
-            });
-        }
-        return troupe;
+        throw new StatusError(500, 'Unknown access type');
       })
       .nodeify(callback);
   },

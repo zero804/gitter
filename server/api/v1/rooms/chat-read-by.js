@@ -1,17 +1,15 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var restSerializer = require("../../../serializers/rest-serializer");
+var restful = require('../../../services/restful');
 
 module.exports = {
   id: 'readBy',
 
   index: function(req, res, next) {
-    var strategy = new restSerializer.UserIdStrategy({});
-
-    restSerializer.serialize(req.chatMessage.readBy, strategy, function(err, serialized) {
-      if(err) return next(err);
-      res.send(serialized);
-    });
+    return restful.serializeReadBysForChat(req.params.troupeId, req.params.chatMessageId)
+      .then(function(serialized) {
+        res.send(serialized);
+      })
+      .catch(next);
   }
 };

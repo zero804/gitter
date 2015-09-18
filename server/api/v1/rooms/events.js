@@ -1,7 +1,6 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var eventService = require("../../../services/event-service");
+var eventService   = require("../../../services/event-service");
 var restSerializer = require("../../../serializers/rest-serializer");
 
 module.exports = {
@@ -13,24 +12,20 @@ module.exports = {
     var beforeId = req.query.beforeId;
 
     var options = {
-        skip: skip ? skip : 0,
-        beforeId: beforeId ? beforeId : null,
-        limit: limit ? limit: 50
+      skip: skip ? skip : 0,
+      beforeId: beforeId ? beforeId : null,
+      limit: limit ? limit: 50
     };
 
-    eventService.findEventsForTroupe(req.troupe.id, options, function(err, events) {
+    eventService.findEventsForTroupe(req.params.troupeId, options, function(err, events) {
       if(err) return next(err);
 
-      var strategy = new restSerializer.EventStrategy({ currentUserId: req.user.id, troupeId: req.troupe.id });
+      var strategy = new restSerializer.EventStrategy({ currentUserId: req.user.id, troupeId: req.params.troupeId });
       restSerializer.serialize(events, strategy, function(err, serialized) {
         if(err) return next(err);
         res.send(serialized);
       });
     });
-  },
-
-  load: function(req, id, callback) {
-    eventService.findById(id, callback);
   }
 
 };

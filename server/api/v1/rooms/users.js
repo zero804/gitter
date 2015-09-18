@@ -1,14 +1,14 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var restful = require('../../../services/restful');
-var roomService        = require('../../../services/room-service');
+var restful             = require('../../../services/restful');
+var roomService         = require('../../../services/room-service');
 var emailAddressService = require('../../../services/email-address-service');
-var userService        = require("../../../services/user-service");
-var restSerializer     = require("../../../serializers/rest-serializer");
-var mongoUtils         = require('../../../utils/mongo-utils');
-var troupeService      = require("../../../services/troupe-service");
-var StatusError        = require('statuserror');
+var userService         = require("../../../services/user-service");
+var restSerializer      = require("../../../serializers/rest-serializer");
+var mongoUtils          = require('../../../utils/mongo-utils');
+var troupeService       = require("../../../services/troupe-service");
+var StatusError         = require('statuserror');
+var paramLoaders        = require('./param-loaders');
 
 function maskEmail(email) {
   return email
@@ -52,7 +52,7 @@ module.exports = {
       searchTerm: req.query.q
     };
 
-    restful.serializeUsersForTroupe(req.troupe.id, req.user && req.user.id, options)
+    restful.serializeUsersForTroupe(req.params.troupeId, req.user && req.user.id, options)
       .then(function (data) {
         res.send(data);
       })
@@ -61,17 +61,10 @@ module.exports = {
       });
   },
 
-  create: function(req, res, next) {
+  create: [paramLoaders.troupeLoader, function(req, res, next) {
     var username = req.body.username;
-    var troupeId = req.troupe.id;
 
-    // Switch a lean troupe object for a full mongoose object
-    return troupeService.findById(troupeId)
-      .then(function(troupe) {
-        if(!troupe) throw new StatusError(404);
-
-        return roomService.addUserToRoom(troupe, req.user, username);
-      })
+    return roomService.addUserToRoom(req.troupe, req.user, username)
       .then(function(addedUser) {
         var strategy = new restSerializer.UserStrategy();
 
@@ -88,7 +81,7 @@ module.exports = {
         res.status(200).send({ success: true, user: serializedUser });
       })
       .catch(next);
-  },
+  }],
 
   /**
    * Removes a member from a room. A user can either request this
@@ -96,27 +89,21 @@ module.exports = {
    * if they have permission
    * DELETE /rooms/:roomId/users/:userId
    */
-  destroy: function(req, res, next){
+  destroy: [paramLoaders.troupeLoader, function(req, res, next){
     var user = req.resourceTroupeUser;
-    var troupeId = req.troupe.id;
 
-    // Switch a lean troupe object for a full mongoose object
-    return troupeService.findById(troupeId)
-      .then(function(troupe) {
-        if(!troupe) throw new StatusError(404);
-        return roomService.removeUserFromRoom(troupe, user, req.user);
-      })
+    return roomService.removeUserFromRoom(req.troupe, user, req.user)
       .then(function() {
         res.send({ success: true });
       })
       .catch(next);
-  },
+  }],
 
   // identifier can be an id or a username. id by default
   // e.g /troupes/:id/users/123456
   // e.g /troupes/:id/users/steve?type=username
   load: function(req, identifier, callback) {
-    var troupeId = req.troupe.id;
+    var troupeId = req.params.troupeId;
 
     if (req.query.type === 'username') {
       var username = identifier;
@@ -130,8 +117,7 @@ module.exports = {
         .nodeify(callback);
     }
 
-    // calls back undefined to throw a 404
-    return callback();
+    return callback(new StatusError(404));
   }
 
 };
