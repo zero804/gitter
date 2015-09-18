@@ -213,8 +213,7 @@ module.exports = (function() {
     this._store = unreadItemStore;
     this._windowScrollLimited = limit(this._windowScroll, this, 50);
 
-    var foldCountLimited = limit(this._foldCount, this, 50);
-    this._foldCountLimited = foldCountLimited;
+    var foldCountLimited = this._foldCountLimited = limit(this._foldCount, this, 50);
     this._inFocus = true;
 
     appEvents.on('eyeballStateChange', this._eyeballStateChange, this);
@@ -239,8 +238,20 @@ module.exports = (function() {
   };
 
   TroupeUnreadItemsViewportMonitor.prototype = {
+    _viewReady: function() {
+      var cv = this._collectionView;
+      var childCollection = cv.collection;
+      var ready = childCollection.models.length === cv.children.length;
+
+      if (!ready) {
+        debug("Mismatch: collection.length=%s, collectionView.length=%s", childCollection.models.length, cv.children.length);
+      }
+
+      return ready;
+    },
+
     _getBounds: function() {
-      if(!this._inFocus) {
+      if (!this._inFocus) {
         this._foldCountLimited();
         return;
       }
@@ -266,6 +277,13 @@ module.exports = (function() {
 
     _windowScroll: function() {
       if(!this._inFocus) {
+        return;
+      }
+
+      if (!this._viewReady()) {
+        debug('Skipping windowScroll until view is ready....');
+        // Not ready, try again later
+        this._windowScrollLimited();
         return;
       }
 
@@ -352,6 +370,13 @@ module.exports = (function() {
     },
 
     _foldCount: function() {
+      if (!this._viewReady()) {
+        debug('Skipping fold count until view is ready');
+        // Not ready, try again later
+        this._foldCountLimited();
+        return;
+      }
+
       var store = this._store;
       var chats = store.getItems();
       if(!chats.length) {
