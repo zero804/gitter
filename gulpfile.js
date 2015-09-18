@@ -428,9 +428,12 @@ gulp.task('package', ['prepare-app', 'prepare-assets']);
 /**
  * default
  */
-gulp.task('default', ['validate', 'test', 'package']);
-
-
+gulp.task('default', function(callback) {
+  runSequence('validate',
+              'test',
+              'package',
+              callback);
+});
 
 /**
  * watch

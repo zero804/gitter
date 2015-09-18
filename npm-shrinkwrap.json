@@ -1421,7 +1421,7 @@
       }
     },
     "gitter-realtime-client": {
-      "version": "0.3.4",
+      "version": "0.3.5",
       "from": "gitter-realtime-client@beta",
       "dependencies": {
         "backbone-sorted-collection": {
@@ -1440,6 +1440,11 @@
           "version": "0.1.1",
           "from": "backbone-url-resolver@>=0.1.1 <0.2.0",
           "resolved": "http://beta-internal:4873/backbone-url-resolver/-/backbone-url-resolver-0.1.1.tgz"
+        },
+        "debug-proxy": {
+          "version": "0.1.2",
+          "from": "debug-proxy@>=0.1.2 <0.2.0",
+          "resolved": "http://beta-internal:4873/debug-proxy/-/debug-proxy-0.1.2.tgz"
         },
         "underscore": {
           "version": "1.8.3",
