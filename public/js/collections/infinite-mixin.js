@@ -11,6 +11,14 @@ module.exports = (function() {
     initialize: function() {
       this.atTop = false;
       this.atBottom = true;
+
+      this.listenTo(this, 'request', function() {
+        this._isFetching = true;
+      });
+
+      this.listenTo(this, 'sync', function() {
+        this._isFetching = false;
+      });
     },
 
     getLoadLimit: function() {
