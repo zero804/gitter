@@ -666,8 +666,8 @@ exports.findOrCreateRoom = findOrCreateRoom;
 /**
  * Find all non-private channels under a particular parent
  */
-function findAllChannelsForRoom(user, parentTroupe) {
-  return persistence.Troupe.find({ parentId: parentTroupe._id, })
+function findAllChannelsForRoomId(user, parentTroupeId) {
+  return persistence.Troupe.find({ parentId: parentTroupeId, })
     .exec()
     .then(function(troupes) {
       if (!troupes.length) return troupes;
@@ -697,15 +697,15 @@ function findAllChannelsForRoom(user, parentTroupe) {
         });
     });
 }
-exports.findAllChannelsForRoom = findAllChannelsForRoom;
+exports.findAllChannelsForRoomId = findAllChannelsForRoomId;
 
 /**
  * Given parent and child ids, find a child channel that is
  * not PRIVATE
  */
-function findChildChannelRoom(user, parentTroupe, childTroupeId) {
+function findChildChannelRoom(user, parentTroupeId, childTroupeId) {
   return persistence.Troupe.findOne({
-      parentId: parentTroupe._id,
+      parentId: parentTroupeId,
       id: childTroupeId
     })
     .exec()

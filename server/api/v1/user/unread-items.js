@@ -1,25 +1,20 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var unreadItemService = require("../../../services/unread-item-service");
-var StatusError = require('statuserror');
-var uniqueIds = require('mongodb-unique-ids');
+var StatusError       = require('statuserror');
+var uniqueIds         = require('mongodb-unique-ids');
 
 module.exports = {
   id: 'unreadItem',
-  index: function(req, res, next) {
+  index: function(req) {
     var userId = req.resourceUser.id;
 
-    unreadItemService.getUnreadItemsForUser(userId, req.userTroupe.id)
-      .then(function(data) {
-        res.send(data);
-      })
-      .catch(next);
+    return unreadItemService.getUnreadItemsForUser(userId, req.params.userTroupeId);
   },
 
-  create: function(req, res, next) {
+  create: function(req) {
     var unreadItems = req.body;
-    if(!unreadItems) return next(new StatusError(400, 'No body'));
+    if(!unreadItems) throw new StatusError(400, 'No body');
 
     var allIds = [];
 
@@ -31,49 +26,21 @@ module.exports = {
       allIds = uniqueIds(allIds);
     }
 
-    if(!allIds.length) return next(new StatusError(400, 'No chat or mention items')); /* You comin at me bro? */
+    if(!allIds.length) throw new StatusError(400); /* You comin at me bro? */
 
-    return unreadItemService.markItemsRead(req.resourceUser.id, req.userTroupe.id, allIds)
+    return unreadItemService.markItemsRead(req.resourceUser.id, req.params.userTroupeId, allIds)
       .then(function() {
-        res.format({
-          text: function() {
-            res.send('OK');
-          },
-          json: function() {
-            res.send({ success: true });
-          },
-          html: function() {
-            res.send('OK');
-          }
-        });
-      })
-      .catch(next);
-
+        return { success: true };
+      });
   },
 
-  destroy: function(req, res, next) {
-    if(req.params.unreadItem.toLowerCase() !== 'all') return next(new StatusError(404, 'Not found'));
+  destroy: function(req) {
+    if(req.params.unreadItem.toLowerCase() !== 'all') throw new StatusError(404);
 
-    return unreadItemService.markAllChatsRead(req.resourceUser.id, req.userTroupe.id, { member: true })
+    return unreadItemService.markAllChatsRead(req.resourceUser.id, req.params.userTroupeId, { member: true })
       .then(function() {
-        res.format({
-          text: function() {
-            res.send('OK');
-          },
-          json: function() {
-            res.send({ success: true });
-          },
-          html: function() {
-            res.send('OK');
-          }
-        });
-      })
-      .catch(next);
-  },
-
-
-  load: function(req, id, callback) {
-    return callback(null, id);
+        return { success: true };
+      });
   }
 
 };

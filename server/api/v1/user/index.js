@@ -1,22 +1,18 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var restSerializer = require("../../../serializers/rest-serializer");
-var userService = require("../../../services/user-service");
+var restSerializer         = require("../../../serializers/rest-serializer");
 var githubGitterUserSearch = require("../../../services/github-gitter-user-search");
-var gitterUserSearch = require("../../../services/user-search-service");
-var Q = require('q');
-var StatusError = require('statuserror');
+var gitterUserSearch       = require("../../../services/user-search-service");
+var StatusError            = require('statuserror');
 
 module.exports = {
   id: 'resourceUser',
-  index: function(req, res, next) {
+  index: function(req) {
     if(!req.user) {
-      return next(new StatusError(403));
+      throw new StatusError(403);
     }
 
     if(req.query.q) {
-
       var searchQuery = req.query.q;
       var user = req.user;
       var searchType = req.query.type;
@@ -27,55 +23,37 @@ module.exports = {
         excludeTroupeId: req.query.excludeTroupeId
       };
 
-      return Q.fcall(function() {
-          if(searchType === 'gitter') {
-            return gitterUserSearch.globalUserSearch(searchQuery, options);
-          } else {
-            return githubGitterUserSearch(searchQuery, user, options);
-          }
-        })
+      return (searchType === 'gitter' ?
+                gitterUserSearch.globalUserSearch(searchQuery, options) :
+                githubGitterUserSearch(searchQuery, user, options))
         .then(function(searchResults) {
           var strategy = new restSerializer.SearchResultsStrategy({
             resultItemStrategy: new restSerializer.UserStrategy()
           });
 
           return restSerializer.serialize(searchResults, strategy);
-        })
-        .then(function(searchResults) {
-          res.send(searchResults);
-        })
-        .catch(next);
+        });
     }
 
     var strategy = new restSerializer.UserStrategy();
-    restSerializer.serialize(req.user, strategy, function(err, serialized) {
-      if(err) return next(err);
-
-      res.send([serialized]);
-    });
+    return restSerializer.serialize([req.user], strategy);
   },
 
-  show: function(req, res, next) {
+  show: function(req) {
     var strategy = new restSerializer.UserStrategy();
-
-    restSerializer.serialize(req.resourceUser, strategy, function(err, serialized) {
-      if(err) return next(err);
-
-      res.send(serialized);
-    });
+    return restSerializer.serialize(req.resourceUser, strategy);
   },
 
-  load: function(req, id, callback) {
-    if(!req.user) return callback(new StatusError(401));
-    if(id === 'me') {
-      id = req.user.id;
-    } else {
-      // TODO: can the currently logged in user view information about this other user?
-      // For the moment, you'll only be able to see your own information
-      if(req.user.id != id) return callback(new StatusError(403));
-    }
+  load: function(req, id) {
+    if(!req.user) throw new StatusError(401);
 
-    userService.findById(id, callback);
+    if(id === 'me') return req.user;
+
+    // TODO: can the currently logged in user view information about this other user?
+    // For the moment, you'll only be able to see your own information
+    if(req.user.id != id) throw new StatusError(403);
+
+    return req.user;
   },
 
   subresources: {
