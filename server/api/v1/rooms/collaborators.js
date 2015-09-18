@@ -6,7 +6,7 @@ var loadTroupeFromParam    = require('./load-troupe-param');
 module.exports = {
   id: 'resourceTroupeUser',
 
-  indexAsync: function(req) {
+  index: function(req) {
     return loadTroupeFromParam(req)
       .then(function(troupe) {
         // Why does this not use a serializer?

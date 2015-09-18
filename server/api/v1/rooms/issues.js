@@ -35,7 +35,7 @@ function trimDownIssue(issue) {
 module.exports = {
   id: 'issue',
 
-  indexAsync: function(req) {
+  index: function(req) {
     return loadTroupeFromParam(req)
       .then(function(troupe) {
         var query = req.query || {};
@@ -55,7 +55,7 @@ module.exports = {
       });
   },
 
-  showAsync: function(req) {
+  show: function(req) {
     return loadTroupeFromParam(req)
       .then(function(troupe) {
         if(troupe.githubType != 'REPO') throw new StatusError(404);

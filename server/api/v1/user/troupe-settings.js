@@ -4,29 +4,23 @@ var userTroupeSettingsService = require("../../../services/user-troupe-settings-
 
 module.exports = {
   id: 'setting',
-  index: function(req, res, next) {
-    userTroupeSettingsService.getAllUserSettings(req.resourceUser.id, req.params.userTroupeId)
+  index: function(req) {
+    return userTroupeSettingsService.getAllUserSettings(req.resourceUser.id, req.params.userTroupeId)
       .then(function(settings) {
-        res.json(settings || {});
-      })
-      .catch(next);
+        return settings || {};
+      });
   },
 
-  show: function(req, res, next) {
-    userTroupeSettingsService.getUserSettings(req.resourceUser.id, req.params.userTroupeId, req.params.setting)
+  show: function(req) {
+    return userTroupeSettingsService.getUserSettings(req.resourceUser.id, req.params.userTroupeId, req.params.setting)
       .then(function(f) {
-        res.json(f || {});
-      })
-      .catch(next);
+        return f || {};
+      });
   },
 
-  update: function(req, res, next) {
+  update: function(req) {
     var settings = req.body;
-    userTroupeSettingsService.setUserSettings(req.resourceUser.id, req.params.userTroupeId, req.params.setting, settings)
-      .then(function() {
-        res.json(settings);
-      })
-      .catch(next);
+    return userTroupeSettingsService.setUserSettings(req.resourceUser.id, req.params.userTroupeId, req.params.setting, settings);
   }
 
 };

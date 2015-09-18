@@ -7,7 +7,7 @@ var loadTroupeFromParam = require('./load-troupe-param');
 module.exports = {
   id: 'resourceTroupeSuggestedRoom',
 
-  indexAsync: function(req) {
+  index: function(req) {
     return loadTroupeFromParam(req)
       .then(function(troupe) {
         return suggestions.getSuggestionsForRoom(troupe, req.user);

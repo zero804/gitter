@@ -44,7 +44,7 @@ function getTroupeUserFromUsername(troupeId, username) {
 module.exports = {
   id: 'resourceTroupeUser',
 
-  indexAsync: function(req) {
+  index: function(req) {
     var options = {
       lean: !!req.query.lean,
       limit: req.query.limit && parseInt(req.query.limit, 10) || undefined,
@@ -54,7 +54,7 @@ module.exports = {
     return restful.serializeUsersForTroupe(req.params.troupeId, req.user && req.user.id, options);
   },
 
-  createAsync: function(req) {
+  create: function(req) {
     return loadTroupeFromParam(req)
       .then(function(troupe) {
         var username = req.body.username;
@@ -84,7 +84,7 @@ module.exports = {
    * if they have permission
    * DELETE /rooms/:roomId/users/:userId
    */
-  destroyAsync: function(req) {
+  destroy: function(req) {
     return loadTroupeFromParam(req)
       .then(function(troupe) {
         var user = req.resourceTroupeUser;
@@ -99,7 +99,7 @@ module.exports = {
   // identifier can be an id or a username. id by default
   // e.g /troupes/:id/users/123456
   // e.g /troupes/:id/users/steve?type=username
-  loadAsync: function(req, identifier) {
+  load: function(req, identifier) {
     var troupeId = req.params.troupeId;
 
     if (req.query.type === 'username') {

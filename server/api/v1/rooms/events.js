@@ -6,7 +6,7 @@ var restSerializer = require("../../../serializers/rest-serializer");
 module.exports = {
   id: 'event',
 
-  indexAsync: function(req) {
+  index: function(req) {
     var skip = req.query.skip;
     var limit = req.query.limit;
     var beforeId = req.query.beforeId;
