@@ -8,7 +8,7 @@ var restSerializer      = require("../../../serializers/rest-serializer");
 var mongoUtils          = require('../../../utils/mongo-utils');
 var troupeService       = require("../../../services/troupe-service");
 var StatusError         = require('statuserror');
-var paramLoaders        = require('./param-loaders');
+var loadTroupeFromParam = require('./load-troupe-param');
 
 function maskEmail(email) {
   return email
@@ -44,27 +44,23 @@ function getTroupeUserFromUsername(troupeId, username) {
 module.exports = {
   id: 'resourceTroupeUser',
 
-  index: function(req, res, next) {
-
+  indexAsync: function(req) {
     var options = {
       lean: !!req.query.lean,
       limit: req.query.limit && parseInt(req.query.limit, 10) || undefined,
       searchTerm: req.query.q
     };
 
-    restful.serializeUsersForTroupe(req.params.troupeId, req.user && req.user.id, options)
-      .then(function (data) {
-        res.send(data);
-      })
-      .catch(function (err) {
-        next(err);
-      });
+    return restful.serializeUsersForTroupe(req.params.troupeId, req.user && req.user.id, options);
   },
 
-  create: [paramLoaders.troupeLoader, function(req, res, next) {
-    var username = req.body.username;
+  createAsync: function(req) {
+    return loadTroupeFromParam(req)
+      .then(function(troupe) {
+        var username = req.body.username;
 
-    return roomService.addUserToRoom(req.troupe, req.user, username)
+        return roomService.addUserToRoom(troupe, req.user, username);
+      })
       .then(function(addedUser) {
         var strategy = new restSerializer.UserStrategy();
 
@@ -78,10 +74,9 @@ module.exports = {
           serializedUser.email = maskEmail(email);
         }
 
-        res.status(200).send({ success: true, user: serializedUser });
-      })
-      .catch(next);
-  }],
+        return { success: true, user: serializedUser };
+      });
+  },
 
   /**
    * Removes a member from a room. A user can either request this
@@ -89,35 +84,35 @@ module.exports = {
    * if they have permission
    * DELETE /rooms/:roomId/users/:userId
    */
-  destroy: [paramLoaders.troupeLoader, function(req, res, next){
-    var user = req.resourceTroupeUser;
+  destroyAsync: function(req) {
+    return loadTroupeFromParam(req)
+      .then(function(troupe) {
+        var user = req.resourceTroupeUser;
 
-    return roomService.removeUserFromRoom(req.troupe, user, req.user)
-      .then(function() {
-        res.send({ success: true });
+        return roomService.removeUserFromRoom(troupe, user, req.user);
       })
-      .catch(next);
-  }],
+      .then(function() {
+        return { success: true };
+      });
+  },
 
   // identifier can be an id or a username. id by default
   // e.g /troupes/:id/users/123456
   // e.g /troupes/:id/users/steve?type=username
-  load: function(req, identifier, callback) {
+  loadAsync: function(req, identifier) {
     var troupeId = req.params.troupeId;
 
     if (req.query.type === 'username') {
       var username = identifier;
-      return getTroupeUserFromUsername(troupeId, username)
-        .nodeify(callback);
+      return getTroupeUserFromUsername(troupeId, username);
     }
 
     if (mongoUtils.isLikeObjectId(identifier)) {
       var userId = identifier;
-      return getTroupeUserFromId(troupeId, userId)
-        .nodeify(callback);
+      return getTroupeUserFromId(troupeId, userId);
     }
 
-    return callback(new StatusError(404));
+    throw new StatusError(404);
   }
 
 };

@@ -1,15 +1,16 @@
 "use strict";
 
-var chatService    = require('../../../services/chat-service');
-var restSerializer = require('../../../serializers/rest-serializer');
-var userAgentTags  = require('../../../utils/user-agent-tagger');
-var _              = require('underscore');
-var StatusError    = require('statuserror');
-var paramLoaders   = require('./param-loaders');
+var chatService         = require('../../../services/chat-service');
+var restSerializer      = require('../../../serializers/rest-serializer');
+var userAgentTags       = require('../../../utils/user-agent-tagger');
+var _                   = require('underscore');
+var StatusError         = require('statuserror');
+var loadTroupeFromParam = require('./load-troupe-param');
+var Q                   = require('q');
 
 module.exports = {
   id: 'chatMessageId',
-  index: function(req, res, next) {
+  indexAsync: function(req) {
     var skip = req.query.skip;
     var limit = req.query.limit;
     var beforeId = req.query.beforeId;
@@ -55,56 +56,40 @@ module.exports = {
         });
 
         return restSerializer.serialize(chatMessages, strategy);
-      })
-      .then(function(serialized) {
-        res.send(serialized);
-      })
-      .catch(next);
-
+      });
   },
 
-  create: [paramLoaders.troupeLoader, function(req, res, next) {
-    var data = _.clone(req.body);
-    data.stats = userAgentTags(req.headers['user-agent']);
+  createAsync: function(req) {
+    return loadTroupeFromParam(req)
+      .then(function(troupe) {
+        var data = _.clone(req.body);
+        data.stats = userAgentTags(req.headers['user-agent']);
 
-    return chatService.newChatMessageToTroupe(req.troupe, req.user, data)
-      .then(function (chatMessage) {
+        return chatService.newChatMessageToTroupe(troupe, req.user, data);
+      })
+      .then(function(chatMessage) {
         var strategy = new restSerializer.ChatStrategy({ currentUserId: req.user.id, troupeId: req.params.troupeId });
         return restSerializer.serialize(chatMessage, strategy);
-      })
-      .then(function(serialized) {
-        res.send(serialized);
-      })
-      .catch(next);
-  }],
+      });
+  },
 
-  show: function(req, res, next) {
+  showAsync: function(req) {
     // TODO: ensure troupeId matches
     var strategy = new restSerializer.ChatIdStrategy({ currentUserId: req.user.id, troupeId: req.params.troupeId });
-    return restSerializer.serialize(req.params.chatMessageId, strategy)
-      .then(function(serialized) {
-        res.send(serialized);
-      })
-      .catch(next);
+    return restSerializer.serialize(req.params.chatMessageId, strategy);
   },
 
-  update: [paramLoaders.troupeLoader, function(req, res, next) {
-    return chatService.findById(req.params.chatMessageId)
-      .then(function(chatMessage) {
+  updateAsync: function(req) {
+    return Q.all([loadTroupeFromParam(req), chatService.findById(req.params.chatMessageId)])
+      .spread(function(troupe, chatMessage) {
         if (!chatMessage) throw new StatusError(404);
-        return chatService.updateChatMessage(req.troupe, chatMessage, req.user, req.body.text);
+        return chatService.updateChatMessage(troupe, chatMessage, req.user, req.body.text);
       })
       .then(function(chatMessage) {
         var strategy = new restSerializer.ChatStrategy({ currentUserId: req.user.id, troupeId: req.params.troupeId });
         return restSerializer.serialize(chatMessage, strategy);
-      })
-      .then(function(serialized) {
-        res.send(serialized);
-      })
-      .catch(function(err) {
-        return next(err);
       });
-  }],
+  },
 
   subresources: {
     'readBy': require('./chat-read-by')
