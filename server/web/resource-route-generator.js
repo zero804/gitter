@@ -10,24 +10,10 @@ module.exports = function resourceRoute(routeIdentifier, resource) {
   var idParam = resource.id;
 
   if (resource.load) {
-    router.param(idParam, function(req, res, next, id) {
-      resource.load(req, id, function(err, value) {
-        if (err) return next(err);
-        if (value === null || value === undefined) {
-          return next(new StatusError(404));
-        }
-
-        req[idParam] = value;
-        next();
-      });
-    });
-  }
-
-  if (resource.loadAsync) {
-    var loadAsyncPromisified = Promise.method(resource.loadAsync);
+    var loadPromisified = Promise.method(resource.load);
 
     router.param(idParam, function(req, res, next, id) {
-      loadAsyncPromisified(req, id)
+      loadPromisified(req, id)
         .then(function(value) {
           if (value === null || value === undefined) {
             throw new StatusError(404);
@@ -41,36 +27,25 @@ module.exports = function resourceRoute(routeIdentifier, resource) {
   }
 
   function mount(method, url, methodName) {
-    /* Promise implementation */
-    var promiseImpl = resource[methodName + 'Async'];
-    if (promiseImpl) {
-      promiseImpl = Promise.method(promiseImpl);
+    var promiseImpl = resource[methodName];
+    if (!promiseImpl) return;
 
-      router[method](url,
-        identifyRoute(routeIdentifier + '-' + methodName),
-        function(req, res, next) {
-          return promiseImpl(req, res)
-            .then(function(response) {
-              if (response === undefined) {
-                res.sendStatus(200);
-              } else {
-                res.send(response);
-              }
-            })
-            .catch(next)
-            .done();
-        });
+    promiseImpl = Promise.method(promiseImpl);
 
-      return;
-    }
-
-    /* Legacy implementation */
-    var middlewareImpl = resource[methodName];
-    if (middlewareImpl) {
-      router[method](url,
-        identifyRoute(routeIdentifier + '-' + methodName),
-        middlewareImpl);
-    }
+    router[method](url,
+      identifyRoute(routeIdentifier + '-' + methodName),
+      function(req, res, next) {
+        return promiseImpl(req, res)
+          .then(function(response) {
+            if (response === undefined) {
+              res.sendStatus(200);
+            } else {
+              res.send(response);
+            }
+          })
+          .catch(next)
+          .done();
+      });
   }
 
   mount('get',    '/',                       'index');

@@ -31,7 +31,7 @@ function searchRooms(req) {
 
 module.exports = {
   id: 'troupeId',
-  indexAsync: function(req) {
+  index: function(req) {
     if (!req.user) {
       throw new StatusError(401);
     }
@@ -43,13 +43,13 @@ module.exports = {
     return restful.serializeTroupesForUser(req.user.id);
   },
 
-  showAsync: function(req) {
+  show: function(req) {
     var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: req.user && req.user.id });
 
     return restSerializer.serialize(req.params.troupeId, strategy);
   },
 
-  createAsync: function(req) {
+  create: function(req) {
     var roomUri = req.query.uri || req.body.uri;
     var addBadge = req.body.addBadge || false;
 
@@ -65,7 +65,7 @@ module.exports = {
       });
   },
 
-  updateAsync: function(req) {
+  update: function(req) {
     return loadTroupeFromParam(req)
       .then(function(troupe) {
         var updatedTroupe = req.body;
@@ -97,7 +97,7 @@ module.exports = {
       });
   },
 
-  destroyAsync: function(req) {
+  destroy: function(req) {
     return loadTroupeFromParam(req)
       .then(function(troupe) {
         var user = req.user;
@@ -116,7 +116,7 @@ module.exports = {
       });
   },
 
-  loadAsync: function(req, id) {
+  load: function(req, id) {
     var userId = req.user && req.user._id;
 
     return userCanAccessRoom(userId, id)

@@ -10,7 +10,7 @@ var Q                   = require('q');
 
 module.exports = {
   id: 'chatMessageId',
-  indexAsync: function(req) {
+  index: function(req) {
     var skip = req.query.skip;
     var limit = req.query.limit;
     var beforeId = req.query.beforeId;
@@ -59,7 +59,7 @@ module.exports = {
       });
   },
 
-  createAsync: function(req) {
+  create: function(req) {
     return loadTroupeFromParam(req)
       .then(function(troupe) {
         var data = _.clone(req.body);
@@ -73,13 +73,13 @@ module.exports = {
       });
   },
 
-  showAsync: function(req) {
+  show: function(req) {
     // TODO: ensure troupeId matches
     var strategy = new restSerializer.ChatIdStrategy({ currentUserId: req.user.id, troupeId: req.params.troupeId });
     return restSerializer.serialize(req.params.chatMessageId, strategy);
   },
 
-  updateAsync: function(req) {
+  update: function(req) {
     return Q.all([loadTroupeFromParam(req), chatService.findById(req.params.chatMessageId)])
       .spread(function(troupe, chatMessage) {
         if (!chatMessage) throw new StatusError(404);

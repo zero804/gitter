@@ -1,4 +1,3 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var troupeService        = require("../../../services/troupe-service");
@@ -12,19 +11,13 @@ var StatusError          = require('statuserror');
 
 module.exports = {
   id: 'userTroupeId',
-  index: function(req, res, next) {
-    if(!req.user) {
-      return next(new StatusError(401));
-    }
+  index: function(req) {
+    if(!req.user) throw new StatusError(401);
 
-    return restful.serializeTroupesForUser(req.resourceUser.id)
-      .then(function(serialized) {
-        res.send(serialized);
-      })
-      .catch(next);
+    return restful.serializeTroupesForUser(req.resourceUser.id);
   },
 
-  update: function(req, res, next) {
+  update: function(req) {
     var userId = req.user.id;
     var troupeId = req.params.userTroupeId;
 
@@ -66,11 +59,7 @@ module.exports = {
         var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: userId });
 
         return restSerializer.serialize(req.params.userTroupeId, strategy);
-      })
-      .then(function(troupe) {
-        res.send(troupe);
-      })
-      .catch(next);
+      });
   },
 
   /**
@@ -79,22 +68,18 @@ module.exports = {
    *
    * DELETE /users/:userId/rooms/:roomId
    */
-  destroy: function(req, res, next) {
-    return roomService.hideRoomFromUser(req.params.userTroupeId, req.user._id)
-      .then(function() {
-        res.send({ success: true });
-      })
-      .catch(next);
+  destroy: function(req) {
+    return roomService.hideRoomFromUser(req.params.userTroupeId, req.user._id);
   },
 
-  load: function(req, id, callback) {
-    if(!mongoUtils.isLikeObjectId(id)) return callback(new StatusError(400));
+  load: function(req, id) {
+    if(!mongoUtils.isLikeObjectId(id)) throw new StatusError(400);
+
     return troupeService.checkIdExists(id)
       .then(function(exists) {
         if (!exists) throw new StatusError(404);
         return id;
-      })
-      .nodeify(callback);
+      });
   },
 
   subresources: {

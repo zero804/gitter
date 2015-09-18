@@ -12,14 +12,14 @@ function serialize(items, req) {
 
 module.exports = {
   id: 'channel',
-  indexAsync: function(req) {
+  index: function(req) {
     return roomService.findAllChannelsForRoomId(req.user, req.params.troupeId)
       .then(function(channelTroupes) {
         return serialize(channelTroupes, req);
       });
   },
 
-  createAsync: function(req, res) {
+  create: function(req, res) {
     return loadTroupeFromParam(req)
       .then(function(troupe) {
         var body = req.body;
@@ -40,7 +40,7 @@ module.exports = {
       });
   },
 
-  loadAsync: function(req, id) {
+  load: function(req, id) {
     return roomService.findChildChannelRoom(req.user, req.params.troupeId, id);
   }
 

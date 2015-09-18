@@ -13,14 +13,14 @@ function serialize(bans) {
 module.exports = {
   id: 'troupeBan',
 
-  indexAsync: function(req) {
+  index: function(req) {
     return loadTroupeFromParam(req)
       .then(function(troupe) {
         return serialize(troupe.bans);
       });
   },
 
-  createAsync: function(req) {
+  create: function(req) {
     return loadTroupeFromParam(req)
       .then(function(troupe) {
         var username = req.body.username;
@@ -33,11 +33,11 @@ module.exports = {
       });
   },
 
-  showAsync: function(req) {
+  show: function(req) {
     return serialize(req.troupeBan);
   },
 
-  destroyAsync: function(req) {
+  destroy: function(req) {
     return loadTroupeFromParam(req)
       .then(function(troupe) {
         return roomService.unbanUserFromRoom(troupe, req.troupeBan, req.troupeBanUser.username, req.user);
@@ -47,7 +47,7 @@ module.exports = {
       });
   },
 
-  loadAsync: function(req, id) {
+  load: function(req, id) {
     return roomService.findBanByUsername(req.params.troupeId, id)
       .then(function(banAndUser) {
         if(!banAndUser) return;
