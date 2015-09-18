@@ -1,10 +1,10 @@
 "use strict";
 
-var RepoService        = require('gitter-web-github').GitHubRepoService;
-var GitHubIssueService = require('gitter-web-github').GitHubIssueService;
-var processChat        = require('../../../utils/markdown-processor');
-var StatusError        = require('statuserror');
-var paramLoaders       = require('./param-loaders');
+var RepoService         = require('gitter-web-github').GitHubRepoService;
+var GitHubIssueService  = require('gitter-web-github').GitHubIssueService;
+var processChat         = require('../../../utils/markdown-processor');
+var StatusError         = require('statuserror');
+var loadTroupeFromParam = require('./load-troupe-param');
 
 function getEightSuggestedIssues(issues) {
   var suggestedIssues = [];
@@ -34,47 +34,50 @@ function trimDownIssue(issue) {
 
 module.exports = {
   id: 'issue',
-  index: [paramLoaders.troupeLoader, function(req, res, next) {
-    var query = req.query || {};
-    var repoName = query.repoName || (req.troupe.githubType === 'REPO' && req.troupe.uri);
 
-    if(!repoName) return res.send([]);
+  indexAsync: function(req) {
+    return loadTroupeFromParam(req)
+      .then(function(troupe) {
+        var query = req.query || {};
+        var repoName = query.repoName || (troupe.githubType === 'REPO' && troupe.uri);
 
-    var issueNumber = query.issueNumber || '';
-    var service = new RepoService(req.user);
+        if(!repoName) return [];
 
-    service.getIssues(repoName)
-      .then(function(issues) {
-        var matches = issueNumber.length ? getTopEightMatchingIssues(issues, issueNumber) : getEightSuggestedIssues(issues);
-        res.send(matches);
+        var issueNumber = query.issueNumber || '';
+        var service = new RepoService(req.user);
+
+        return service.getIssues(repoName)
+          .then(function(issues) {
+            var matches = issueNumber.length ? getTopEightMatchingIssues(issues, issueNumber) : getEightSuggestedIssues(issues);
+            return matches;
+          });
+
+      });
+  },
+
+  showAsync: function(req) {
+    return loadTroupeFromParam(req)
+      .then(function(troupe) {
+        if(troupe.githubType != 'REPO') throw new StatusError(404);
+
+        var issueNumber = req.params.issue;
+        var repoName = troupe.uri;
+
+        var issueService = new GitHubIssueService(req.user);
+        return issueService.getIssue(repoName, issueNumber);
       })
-      .catch(next);
-  }],
-
-  show: [paramLoaders.troupeLoader, function(req, res, next) {
-    if(req.troupe.githubType != 'REPO') return res.sendStatus(404);
-
-    var issueNumber = req.params.issue;
-    var repoName = req.troupe.uri;
-
-    var issueService = new GitHubIssueService(req.user);
-    issueService.getIssue(repoName, issueNumber)
       .then(function(issue) {
-        if(!issue) {
-          throw new StatusError(404);
-        }
+        if(!issue) throw new StatusError(404);
 
         if(req.query.renderMarkdown && issue.body) {
           return processChat(issue.body)
             .then(function(result) {
               issue.body_html = result.html;
-              res.send(issue);
+              return issue;
             });
         }
 
-        res.send(issue);
-
-      })
-      .catch(next);
-  }]
+        return issue;
+      });
+  }
 };

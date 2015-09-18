@@ -8,9 +8,9 @@ var Q                    = require('q');
 var StatusError          = require('statuserror');
 var roomPermissionsModel = require('../../../services/room-permissions-model');
 var userCanAccessRoom    = require('../../../services/user-can-access-room');
-var paramLoaders         = require('./param-loaders');
+var loadTroupeFromParam  = require('./load-troupe-param');
 
-function searchRooms(req, res, next) {
+function searchRooms(req) {
   var user = req.user;
 
   var options = {
@@ -26,46 +26,34 @@ function searchRooms(req, res, next) {
       });
 
       return restSerializer.serialize({ results: rooms }, strategy);
-    })
-    .then(function(searchResults) {
-      res.send(searchResults);
-    })
-    .catch(next);
+    });
 }
 
 module.exports = {
   id: 'troupeId',
-  index: function(req, res, next) {
+  indexAsync: function(req) {
     if (!req.user) {
-      return next(new StatusError(401));
+      throw new StatusError(401);
     }
 
     if(req.query.q) {
-      return searchRooms(req, res, next);
+      return searchRooms(req);
     }
 
-    restful.serializeTroupesForUser(req.user.id)
-      .then(function(serialized) {
-        res.send(serialized);
-      })
-      .catch(next);
+    return restful.serializeTroupesForUser(req.user.id);
   },
 
-  show: function(req, res, next) {
+  showAsync: function(req) {
     var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: req.user && req.user.id });
 
-    return restSerializer.serialize(req.params.troupeId, strategy)
-      .then(function(serialized) {
-        res.send(serialized);
-      })
-      .catch(next);
+    return restSerializer.serialize(req.params.troupeId, strategy);
   },
 
-  create: function(req, res, next) {
+  createAsync: function(req) {
     var roomUri = req.query.uri || req.body.uri;
     var addBadge = req.body.addBadge || false;
 
-    if (!roomUri) return next(new StatusError(400));
+    if (!roomUri) throw new StatusError(400);
 
     return roomService.findOrCreateRoom(req.user, roomUri, { ignoreCase: true, addBadge: addBadge })
       .then(function (room) {
@@ -74,66 +62,61 @@ module.exports = {
         var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, includeRolesForTroupe: room.troupe });
 
         return restSerializer.serialize(room.troupe, strategy);
-      })
-      .then(function(serialized) {
-        res.send(serialized);
-      })
-      .catch(next);
+      });
   },
 
-  update: [paramLoaders.troupeLoader, function(req, res, next) {
-    var updatedTroupe = req.body;
-    var troupe = req.troupe;
+  updateAsync: function(req) {
+    return loadTroupeFromParam(req)
+      .then(function(troupe) {
+        var updatedTroupe = req.body;
 
-    var promises = [];
+        var promises = [];
 
-    if(updatedTroupe.autoConfigureHooks) {
-      promises.push(roomService.applyAutoHooksForRepoRoom(req.user, troupe));
-    }
+        if(updatedTroupe.autoConfigureHooks) {
+          promises.push(roomService.applyAutoHooksForRepoRoom(req.user, troupe));
+        }
 
-    if(updatedTroupe.hasOwnProperty('topic')) {
-      promises.push(troupeService.updateTopic(req.user, troupe, updatedTroupe.topic));
-    }
+        if(updatedTroupe.hasOwnProperty('topic')) {
+          promises.push(troupeService.updateTopic(req.user, troupe, updatedTroupe.topic));
+        }
 
-    if(updatedTroupe.hasOwnProperty('noindex')) {
-      promises.push(troupeService.toggleSearchIndexing(req.user, troupe, updatedTroupe.noindex));
-    }
+        if(updatedTroupe.hasOwnProperty('noindex')) {
+          promises.push(troupeService.toggleSearchIndexing(req.user, troupe, updatedTroupe.noindex));
+        }
 
-    if(updatedTroupe.hasOwnProperty('tags')) {
-      promises.push(troupeService.updateTags(req.user, troupe, updatedTroupe.tags));
-    }
+        if(updatedTroupe.hasOwnProperty('tags')) {
+          promises.push(troupeService.updateTags(req.user, troupe, updatedTroupe.tags));
+        }
 
-    return Q.all(promises)
+        return Q.all(promises);
+      })
       .then(function() {
-        var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id });
+        var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: req.user.id });
 
-        return restSerializer.serialize(troupe, strategy);
+        return restSerializer.serialize(req.params.troupeId, strategy);
+      });
+  },
+
+  destroyAsync: function(req) {
+    return loadTroupeFromParam(req)
+      .then(function(troupe) {
+        var user = req.user;
+
+        if (!troupe.uri) throw new StatusError(400, 'cannot delete one to one rooms');
+
+        return [troupe, roomPermissionsModel(user, 'admin', troupe)];
       })
-      .then(function(serialized) {
-        res.send(serialized);
-      })
-      .catch(next);
-  }],
-
-  destroy: [paramLoaders.troupeLoader, function(req, res, next) {
-    var user = req.user;
-    var troupe = req.troupe;
-
-    if (!troupe.uri) return next(new StatusError(400, 'cannot delete one to one rooms'));
-
-    return roomPermissionsModel(user, 'admin', troupe)
-      .then(function(isAdmin) {
+      .spread(function(troupe, isAdmin) {
         if (!isAdmin) throw new StatusError(403, 'admin permissions required');
 
         return roomService.deleteRoom(troupe);
       })
       .then(function() {
-        res.sendStatus(200);
-      })
-      .catch(next);
-  }],
+        return; // Undefined returns a 200 status only
+      });
+  },
 
-  load: function(req, id, callback) {
+  loadAsync: function(req, id) {
     var userId = req.user && req.user._id;
 
     return userCanAccessRoom(userId, id)
@@ -153,8 +136,7 @@ module.exports = {
         }
 
         throw new StatusError(500, 'Unknown access type');
-      })
-      .nodeify(callback);
+      });
   },
 
   subresources: {

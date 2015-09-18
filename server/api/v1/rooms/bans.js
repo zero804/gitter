@@ -1,56 +1,53 @@
 "use strict";
 
-var roomService        = require('../../../services/room-service');
-var restSerializer     = require("../../../serializers/rest-serializer");
-var paramLoaders       = require('./param-loaders');
+var roomService         = require('../../../services/room-service');
+var restSerializer      = require("../../../serializers/rest-serializer");
+var loadTroupeFromParam = require('./load-troupe-param');
 
-function serialize(bans, callback) {
+function serialize(bans) {
   var strategy = new restSerializer.TroupeBanStrategy({ });
 
-  restSerializer.serializeExcludeNulls(bans, strategy, callback);
+  return restSerializer.serializeExcludeNulls(bans, strategy);
 }
 
 module.exports = {
   id: 'troupeBan',
 
-  index: [paramLoaders.troupeLoader, function(req, res, next) {
-    serialize(req.troupe.bans, function(err, serialized) {
-      if(err) return next(err);
-      res.send(serialized);
-    });
-  }],
-
-  create: [paramLoaders.troupeLoader, function(req, res, next) {
-    var username = req.body.username;
-    var removeMessages = !!req.body.removeMessages;
-
-    return roomService.banUserFromRoom(req.troupe, username, req.user, { removeMessages: removeMessages }, function(err, ban) {
-      if(err) return next(err);
-
-      serialize(ban, function(err, serialized) {
-        if(err) return next(err);
-        res.send(serialized);
+  indexAsync: function(req) {
+    return loadTroupeFromParam(req)
+      .then(function(troupe) {
+        return serialize(troupe.bans);
       });
-
-    });
-
-  }],
-
-  show: function(req, res, next) {
-    serialize(req.troupeBan, function(err, serialized) {
-      if(err) return next(err);
-      res.send(serialized);
-    });
   },
 
-  destroy: [paramLoaders.troupeLoader, function(req, res, next) {
-    return roomService.unbanUserFromRoom(req.troupe, req.troupeBan, req.troupeBanUser.username, req.user, function(err) {
-      if(err) return next(err);
-      res.send({ success: true });
-    });
-  }],
+  createAsync: function(req) {
+    return loadTroupeFromParam(req)
+      .then(function(troupe) {
+        var username = req.body.username;
+        var removeMessages = !!req.body.removeMessages;
 
-  load: function(req, id, callback) {
+        return roomService.banUserFromRoom(troupe, username, req.user, { removeMessages: removeMessages });
+      })
+      .then(function(ban) {
+        return serialize(ban);
+      });
+  },
+
+  showAsync: function(req) {
+    return serialize(req.troupeBan);
+  },
+
+  destroyAsync: function(req) {
+    return loadTroupeFromParam(req)
+      .then(function(troupe) {
+        return roomService.unbanUserFromRoom(troupe, req.troupeBan, req.troupeBanUser.username, req.user);
+      })
+      .then(function() {
+        return { success: true };
+      });
+  },
+
+  loadAsync: function(req, id) {
     return roomService.findBanByUsername(req.params.troupeId, id)
       .then(function(banAndUser) {
         if(!banAndUser) return;
@@ -59,8 +56,7 @@ module.exports = {
         req.troupeBanUser = banAndUser.user;
 
         return banAndUser.ban;
-      })
-      .nodeify(callback);
+      });
   }
 
 };
