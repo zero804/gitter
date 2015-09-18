@@ -1,14 +1,16 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var chatService = require('../../../services/chat-service');
-var restSerializer = require('../../../serializers/rest-serializer');
-var userAgentTags = require('../../../utils/user-agent-tagger');
-var _ = require('underscore');
+var chatService         = require('../../../services/chat-service');
+var restSerializer      = require('../../../serializers/rest-serializer');
+var userAgentTags       = require('../../../utils/user-agent-tagger');
+var _                   = require('underscore');
+var StatusError         = require('statuserror');
+var loadTroupeFromParam = require('./load-troupe-param');
+var Q                   = require('q');
 
 module.exports = {
-  id: 'chatMessage',
-  index: function(req, res, next) {
+  id: 'chatMessageId',
+  index: function(req) {
     var skip = req.query.skip;
     var limit = req.query.limit;
     var beforeId = req.query.beforeId;
@@ -18,6 +20,7 @@ module.exports = {
     var marker = req.query.marker;
     var q = req.query.q;
     var userId = req.user && req.user.id;
+    var troupeId = req.params.troupeId;
     var options;
 
     var query;
@@ -29,7 +32,7 @@ module.exports = {
         userId: userId
       };
 
-      query = chatService.searchChatMessagesForRoom(req.troupe.id, "" + q, options);
+      query = chatService.searchChatMessagesForRoom(troupeId, "" + q, options);
     } else {
       options = {
         skip: parseInt(skip, 10) || 0,
@@ -40,7 +43,7 @@ module.exports = {
         marker: marker && "" + marker || undefined,
         userId: userId
       };
-      query = chatService.findChatMessagesForTroupe(req.troupe.id, options);
+      query = chatService.findChatMessagesForTroupe(troupeId, options);
     }
 
     return query
@@ -48,60 +51,44 @@ module.exports = {
         var userId = req.user && req.user.id;
         var strategy = new restSerializer.ChatStrategy({
           currentUserId: userId,
-          troupeId: req.troupe.id,
+          troupeId: troupeId,
           initialId: aroundId
         });
 
         return restSerializer.serialize(chatMessages, strategy);
-      })
-      .then(function(serialized) {
-        res.send(serialized);
-      })
-      .catch(next);
-
-  },
-
-  create: function(req, res, next) {
-    var data = _.clone(req.body);
-    data.stats = userAgentTags(req.headers['user-agent']);
-
-    return chatService.newChatMessageToTroupe(req.troupe, req.user, data)
-      .then(function (chatMessage) {
-        var strategy = new restSerializer.ChatStrategy({ currentUserId: req.user.id, troupeId: req.troupe.id });
-        return restSerializer.serialize(chatMessage, strategy);
-      })
-      .then(function(serialized) {
-        res.send(serialized);
-      })
-      .catch(next);
-  },
-
-  show: function(req, res, next) {
-    var strategy = new restSerializer.ChatStrategy({ currentUserId: req.user.id, troupeId: req.troupe.id });
-    return restSerializer.serialize(req.chatMessage, strategy)
-      .then(function(serialized) {
-        res.send(serialized);
-      })
-      .catch(next);
-  },
-
-  update: function(req, res, next) {
-    return chatService.updateChatMessage(req.troupe, req.chatMessage, req.user, req.body.text)
-      .then(function(chatMessage) {
-        var strategy = new restSerializer.ChatStrategy({ currentUserId: req.user.id, troupeId: req.troupe.id });
-        return restSerializer.serialize(chatMessage, strategy);
-      })
-      .then(function(serialized) {
-        res.send(serialized);
-      })
-      .catch(function(err) {
-        return next(err);
       });
-
   },
 
-  load: function(req, id, callback) {
-    chatService.findById(id, callback);
+  create: function(req) {
+    return loadTroupeFromParam(req)
+      .then(function(troupe) {
+        var data = _.clone(req.body);
+        data.stats = userAgentTags(req.headers['user-agent']);
+
+        return chatService.newChatMessageToTroupe(troupe, req.user, data);
+      })
+      .then(function(chatMessage) {
+        var strategy = new restSerializer.ChatStrategy({ currentUserId: req.user.id, troupeId: req.params.troupeId });
+        return restSerializer.serialize(chatMessage, strategy);
+      });
+  },
+
+  show: function(req) {
+    // TODO: ensure troupeId matches
+    var strategy = new restSerializer.ChatIdStrategy({ currentUserId: req.user.id, troupeId: req.params.troupeId });
+    return restSerializer.serialize(req.params.chatMessageId, strategy);
+  },
+
+  update: function(req) {
+    return Q.all([loadTroupeFromParam(req), chatService.findById(req.params.chatMessageId)])
+      .spread(function(troupe, chatMessage) {
+        if (!chatMessage) throw new StatusError(404);
+        return chatService.updateChatMessage(troupe, chatMessage, req.user, req.body.text);
+      })
+      .then(function(chatMessage) {
+        var strategy = new restSerializer.ChatStrategy({ currentUserId: req.user.id, troupeId: req.params.troupeId });
+        return restSerializer.serialize(chatMessage, strategy);
+      });
   },
 
   subresources: {

@@ -1,14 +1,14 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var restful = require('../../../services/restful');
-var roomService        = require('../../../services/room-service');
+var restful             = require('../../../services/restful');
+var roomService         = require('../../../services/room-service');
 var emailAddressService = require('../../../services/email-address-service');
-var userService        = require("../../../services/user-service");
-var restSerializer     = require("../../../serializers/rest-serializer");
-var mongoUtils         = require('../../../utils/mongo-utils');
-var troupeService      = require("../../../services/troupe-service");
-var StatusError        = require('statuserror');
+var userService         = require("../../../services/user-service");
+var restSerializer      = require("../../../serializers/rest-serializer");
+var mongoUtils          = require('../../../utils/mongo-utils');
+var troupeService       = require("../../../services/troupe-service");
+var StatusError         = require('statuserror');
+var loadTroupeFromParam = require('./load-troupe-param');
 
 function maskEmail(email) {
   return email
@@ -44,31 +44,20 @@ function getTroupeUserFromUsername(troupeId, username) {
 module.exports = {
   id: 'resourceTroupeUser',
 
-  index: function(req, res, next) {
-
+  index: function(req) {
     var options = {
       lean: !!req.query.lean,
       limit: req.query.limit && parseInt(req.query.limit, 10) || undefined,
       searchTerm: req.query.q
     };
 
-    restful.serializeUsersForTroupe(req.troupe.id, req.user && req.user.id, options)
-      .then(function (data) {
-        res.send(data);
-      })
-      .catch(function (err) {
-        next(err);
-      });
+    return restful.serializeUsersForTroupe(req.params.troupeId, req.user && req.user.id, options);
   },
 
-  create: function(req, res, next) {
-    var username = req.body.username;
-    var troupeId = req.troupe.id;
-
-    // Switch a lean troupe object for a full mongoose object
-    return troupeService.findById(troupeId)
+  create: function(req) {
+    return loadTroupeFromParam(req)
       .then(function(troupe) {
-        if(!troupe) throw new StatusError(404);
+        var username = req.body.username;
 
         return roomService.addUserToRoom(troupe, req.user, username);
       })
@@ -85,9 +74,8 @@ module.exports = {
           serializedUser.email = maskEmail(email);
         }
 
-        res.status(200).send({ success: true, user: serializedUser });
-      })
-      .catch(next);
+        return { success: true, user: serializedUser };
+      });
   },
 
   /**
@@ -96,42 +84,35 @@ module.exports = {
    * if they have permission
    * DELETE /rooms/:roomId/users/:userId
    */
-  destroy: function(req, res, next){
-    var user = req.resourceTroupeUser;
-    var troupeId = req.troupe.id;
-
-    // Switch a lean troupe object for a full mongoose object
-    return troupeService.findById(troupeId)
+  destroy: function(req) {
+    return loadTroupeFromParam(req)
       .then(function(troupe) {
-        if(!troupe) throw new StatusError(404);
+        var user = req.resourceTroupeUser;
+
         return roomService.removeUserFromRoom(troupe, user, req.user);
       })
       .then(function() {
-        res.send({ success: true });
-      })
-      .catch(next);
+        return { success: true };
+      });
   },
 
   // identifier can be an id or a username. id by default
   // e.g /troupes/:id/users/123456
   // e.g /troupes/:id/users/steve?type=username
-  load: function(req, identifier, callback) {
-    var troupeId = req.troupe.id;
+  load: function(req, identifier) {
+    var troupeId = req.params.troupeId;
 
     if (req.query.type === 'username') {
       var username = identifier;
-      return getTroupeUserFromUsername(troupeId, username)
-        .nodeify(callback);
+      return getTroupeUserFromUsername(troupeId, username);
     }
 
     if (mongoUtils.isLikeObjectId(identifier)) {
       var userId = identifier;
-      return getTroupeUserFromId(troupeId, userId)
-        .nodeify(callback);
+      return getTroupeUserFromId(troupeId, userId);
     }
 
-    // calls back undefined to throw a 404
-    return callback();
+    throw new StatusError(404);
   }
 
 };

@@ -113,6 +113,7 @@ exports.serializeUnreadItemsForTroupe = function(troupeId, userId, callback) {
 };
 
 exports.serializeReadBysForChat = function(troupeId, chatId, callback) {
+  // TODO: assert that troupeId=chat.troupeId....
   return chatService.findById(chatId)
     .then(function(chatMessage) {
       var strategy = new restSerializer.UserIdStrategy({});

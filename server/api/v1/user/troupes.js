@@ -1,53 +1,30 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var troupeService        = require("../../../services/troupe-service");
 var restful              = require("../../../services/restful");
 var restSerializer       = require("../../../serializers/rest-serializer");
 var recentRoomService    = require('../../../services/recent-room-service');
-var roomMembershipService = require('../../../services/room-membership-service');
 var roomService          = require('../../../services/room-service');
 var Q                    = require('q');
 var mongoUtils           = require('../../../utils/mongo-utils');
 var StatusError          = require('statuserror');
 
 module.exports = {
-  id: 'userTroupe',
-  index: function(req, res, next) {
-    if(!req.user) {
-      return res.sendStatus(403);
-    }
+  id: 'userTroupeId',
+  index: function(req) {
+    if(!req.user) throw new StatusError(401);
 
-    restful.serializeTroupesForUser(req.resourceUser.id)
-      .then(function(serialized) {
-        res.send(serialized);
-      })
-      .catch(next);
+    return restful.serializeTroupesForUser(req.resourceUser.id);
   },
 
-  show: function(req, res, next) {
-    var strategyOptions = { currentUserId: req.resourceUser.id };
-    // if (req.query.include_users) strategyOptions.mapUsers = true;
-
-    var strategy = new restSerializer.TroupeStrategy(strategyOptions);
-
-    restSerializer.serialize(req.userTroupe, strategy, function(err, serialized) {
-      if(err) return next(err);
-
-      res.send(serialized);
-    });
-  },
-
-  update: function(req, res, next) {
+  update: function(req) {
     var userId = req.user.id;
-    var troupe = req.userTroupe;
-    var troupeId = troupe.id;
+    var troupeId = req.params.userTroupeId;
 
-    return roomMembershipService.checkRoomMembership(troupeId, userId)
-      .then(function(isMember) {
+    return troupeService.findByIdLeanWithAccess(troupeId, req.user && req.user._id)
+      .spread(function(troupe, isMember) {
 
         var updatedTroupe = req.body;
-        var troupeId = troupe.id;
         var promises = [];
 
         if('favourite' in updatedTroupe) {
@@ -79,14 +56,10 @@ module.exports = {
         return Q.all(promises);
       })
       .then(function() {
-        var strategy = new restSerializer.TroupeStrategy({ currentUserId: userId });
+        var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: userId });
 
-        return restSerializer.serialize(troupe, strategy);
-      })
-      .then(function(troupe) {
-        res.send(troupe);
-      })
-      .catch(next);
+        return restSerializer.serialize(req.params.userTroupeId, strategy);
+      });
   },
 
   /**
@@ -95,38 +68,18 @@ module.exports = {
    *
    * DELETE /users/:userId/rooms/:roomId
    */
-  destroy: function(req, res, next) {
-    return roomService.hideRoomFromUser(req.userTroupe._id, req.user._id)
-      .then(function() {
-        res.send({ success: true });
-      })
-      .catch(next);
+  destroy: function(req) {
+    return roomService.hideRoomFromUser(req.params.userTroupeId, req.user._id);
   },
 
-  load: function(req, id, callback) {
-    /* Invalid id? Return 404 */
-    if(!mongoUtils.isLikeObjectId(id)) return callback();
+  load: function(req, id) {
+    if(!mongoUtils.isLikeObjectId(id)) throw new StatusError(400);
 
-    return troupeService.findByIdLeanWithAccess(id, req.user && req.user._id)
-      .spread(function(troupe, access) {
-        if(!troupe) throw new StatusError(404);
-
-        if(troupe.security === 'PUBLIC' && req.method === 'GET') {
-          return troupe;
-        }
-
-        /* From this point forward we need a user */
-        if(!req.user) {
-          throw new StatusError(401);
-        }
-
-        if(!access) {
-          throw new StatusError(403);
-        }
-
-        return troupe;
-      })
-      .nodeify(callback);
+    return troupeService.checkIdExists(id)
+      .then(function(exists) {
+        if (!exists) throw new StatusError(404);
+        return id;
+      });
   },
 
   subresources: {

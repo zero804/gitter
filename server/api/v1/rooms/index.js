@@ -5,11 +5,12 @@ var roomService          = require("../../../services/room-service");
 var restful              = require("../../../services/restful");
 var restSerializer       = require("../../../serializers/rest-serializer");
 var Q                    = require('q');
-var mongoUtils           = require('../../../utils/mongo-utils');
 var StatusError          = require('statuserror');
 var roomPermissionsModel = require('../../../services/room-permissions-model');
+var userCanAccessRoom    = require('../../../services/user-can-access-room');
+var loadTroupeFromParam  = require('./load-troupe-param');
 
-function searchRooms(req, res, next) {
+function searchRooms(req) {
   var user = req.user;
 
   var options = {
@@ -25,71 +26,49 @@ function searchRooms(req, res, next) {
       });
 
       return restSerializer.serialize({ results: rooms }, strategy);
-    })
-    .then(function(searchResults) {
-      res.send(searchResults);
-    })
-    .catch(next);
+    });
 }
 
 module.exports = {
-  id: 'troupe',
-  index: function(req, res, next) {
+  id: 'troupeId',
+  index: function(req) {
     if (!req.user) {
-      return next(new StatusError(401));
+      throw new StatusError(401);
     }
 
     if(req.query.q) {
-      return searchRooms(req, res, next);
+      return searchRooms(req);
     }
 
-    restful.serializeTroupesForUser(req.user.id)
-      .then(function(serialized) {
-        res.send(serialized);
-      })
-      .catch(next);
+    return restful.serializeTroupesForUser(req.user.id);
   },
 
-  show: function(req, res, next) {
-    var strategyOptions = { currentUserId: req.user && req.user.id };
+  show: function(req) {
+    var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: req.user && req.user.id });
 
-    // if (req.query.include_users) strategyOptions.mapUsers = true;
-    var strategy = new restSerializer.TroupeIdStrategy(strategyOptions);
-
-    return restSerializer.serialize(req.troupe.id, strategy)
-      .then(function(serialized) {
-        res.send(serialized);
-      })
-      .catch(next);
+    return restSerializer.serialize(req.params.troupeId, strategy);
   },
 
-  create: function(req, res, next) {
+  create: function(req) {
     var roomUri = req.query.uri || req.body.uri;
     var addBadge = req.body.addBadge || false;
 
-    if (!roomUri) return next(new StatusError(400));
+    if (!roomUri) throw new StatusError(400);
 
     return roomService.findOrCreateRoom(req.user, roomUri, { ignoreCase: true, addBadge: addBadge })
       .then(function (room) {
         if (!room || !room.troupe) throw new StatusError(403, 'Permission denied');
 
-        var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, /*mapUsers: true,*/ includeRolesForTroupe: room.troupe });
+        var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, includeRolesForTroupe: room.troupe });
 
         return restSerializer.serialize(room.troupe, strategy);
-      })
-      .then(function(serialized) {
-        res.send(serialized);
-      })
-      .catch(next);
+      });
   },
 
-  update: function(req, res, next) {
-    var updatedTroupe = req.body;
-
-    // Switch a lean troupe object for a full mongoose object
-    return troupeService.findById(req.troupe.id)
+  update: function(req) {
+    return loadTroupeFromParam(req)
       .then(function(troupe) {
-        if(!troupe) throw new StatusError(404);
+        var updatedTroupe = req.body;
 
         var promises = [];
 
@@ -109,74 +88,55 @@ module.exports = {
           promises.push(troupeService.updateTags(req.user, troupe, updatedTroupe.tags));
         }
 
-
-        return Q.all(promises)
-          .then(function() {
-            var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id /*, mapUsers: false*/ });
-
-            restSerializer.serialize(troupe, strategy, function(err, serialized) {
-              if(err) return next(err);
-
-              res.send(serialized);
-            });
-          });
+        return Q.all(promises);
       })
-      .catch(next);
+      .then(function() {
+        var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: req.user.id });
+
+        return restSerializer.serialize(req.params.troupeId, strategy);
+      });
   },
 
-  destroy: function(req, res, next) {
-    var user = req.user;
-    var troupe = req.troupe;
+  destroy: function(req) {
+    return loadTroupeFromParam(req)
+      .then(function(troupe) {
+        var user = req.user;
 
-    if (!troupe.uri) return next(new StatusError(400, 'cannot delete one to one rooms'));
+        if (!troupe.uri) throw new StatusError(400, 'cannot delete one to one rooms');
 
-    return roomPermissionsModel(user, 'admin', troupe)
-      .then(function(isAdmin) {
+        return [troupe, roomPermissionsModel(user, 'admin', troupe)];
+      })
+      .spread(function(troupe, isAdmin) {
         if (!isAdmin) throw new StatusError(403, 'admin permissions required');
 
-        // Switch a lean troupe object for a full mongoose object
-        return troupeService.findById(req.troupe.id);
-      })
-      .then(function(troupe) {
         return roomService.deleteRoom(troupe);
       })
       .then(function() {
-        res.sendStatus(200);
-      })
-      .catch(next);
+        return; // Undefined returns a 200 status only
+      });
   },
 
-  load: function(req, id, callback) {
-    var user = req.user;
+  load: function(req, id) {
     var userId = req.user && req.user._id;
 
-    if(!mongoUtils.isLikeObjectId(id)) return callback(new StatusError(404));
+    return userCanAccessRoom(userId, id)
+      .then(function(access) {
+        if (!access) throw new StatusError(404);
 
-    troupeService.findByIdLeanWithAccess(id, userId)
-      .spread(function(troupe, access) {
-        if(!troupe) throw new StatusError(404);
-
-        if(troupe.security === 'PUBLIC' && req.method === 'GET') {
-          return troupe;
+        if (access === 'view') {
+          if (req.method === 'GET') {
+            return id;
+          } else {
+            throw new StatusError(userId ? 403 : 401);
+          }
         }
 
-        /* From this point forward we need a user */
-        if(!req.user) {
-          throw new StatusError(401);
+        if (access === 'member') {
+          return id;
         }
 
-        if(!access) {
-          // if the user **cann** the admin of the room, we still grant access to load the room
-          // this enables, for example, editing tags even if you're not in the room
-          return roomPermissionsModel(user, 'admin', troupe)
-            .then(function(isAdmin) {
-              if (isAdmin) return troupe;
-              throw new StatusError(403);
-            });
-        }
-        return troupe;
-      })
-      .nodeify(callback);
+        throw new StatusError(500, 'Unknown access type');
+      });
   },
 
   subresources: {
