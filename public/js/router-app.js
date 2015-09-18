@@ -10,12 +10,12 @@ var LoadingView           = require('views/app/loading-view');
 var troupeCollections     = require('collections/instances/troupes');
 var TitlebarUpdater       = require('components/titlebar');
 var realtime              = require('components/realtime');
-var log                   = require('utils/log');
 var onready               = require('./utils/onready');
 var urlParser             = require('utils/url-parser');
 var RAF                   = require('utils/raf');
 var RoomCollectionTracker = require('components/room-collection-tracker');
 var SPARoomSwitcher       = require('components/spa-room-switcher');
+var debug                 = require('debug-proxy')('app:router-app');
 
 require('components/statsc');
 require('views/widgets/preload');
@@ -62,7 +62,7 @@ onready(function() {
 
   var roomSwitcher = new SPARoomSwitcher(troupeCollections.troupes, context.env('basePath'), getContentFrameLocation);
   roomSwitcher.on('replace', function(href) {
-    log.info('Room switch: replace ', href);
+    debug('Room switch: replace %s', href);
 
     context.setTroupeId(undefined); // TODO: update the title....
     /*
@@ -76,7 +76,7 @@ onready(function() {
   });
 
   roomSwitcher.on('reload', function() {
-    log.info('Room switch: reload');
+    debug('Room switch: reload');
     context.setTroupeId(undefined); // TODO: update the title....
     RAF(function() {
       getContentFrameLocation().reload(true);
@@ -84,7 +84,7 @@ onready(function() {
   });
 
   roomSwitcher.on('switch', function(troupe, permalinkChatId) {
-    log.info('Room switch: switch to ', troupe.attributes);
+    debug('Room switch: switch to %s', troupe.attributes);
 
     context.setTroupeId(troupe.id);
 
@@ -142,7 +142,7 @@ onready(function() {
   };
 
   appEvents.on('navigation', function(url, type, title) {
-    log.debug('navigation:', url);
+    debug('navigation: %s', url);
     var parsed = urlParser.parse(url);
     var frameUrl = parsed.pathname + '/~' + type + parsed.search;
 
@@ -160,9 +160,8 @@ onready(function() {
   });
 
   window.addEventListener('message', function(e) {
-    log.debug('rapp: window message: ', e.data);
     if (e.origin !== context.env('basePath')) {
-      log.info('rapp: Ignoring message from ' + e.origin);
+      debug('Ignoring message from %s', e.origin);
       return;
     }
 
@@ -174,7 +173,7 @@ onready(function() {
       return;
     }
 
-    log.info('rapp: Received message ', message);
+    debug('Received message %j', message);
 
     var makeEvent = function(message) {
       var origin = 'chat';
@@ -182,15 +181,10 @@ onready(function() {
       message.event = {
         origin: origin,
         preventDefault: function() {
-          log.warn('rapp: could not call preventDefault() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
         },
-
         stopPropagation: function() {
-          log.warn('rapp: could not call stopPropagation() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
         },
-
         stopImmediatePropagation: function() {
-          log.warn('rapp: could not call stopImmediatePropagation() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
         },
       };
     };
@@ -214,7 +208,7 @@ onready(function() {
         var count = message.count;
         var troupeId = message.troupeId;
         if (troupeId !== context.getTroupeId()) {
-          log.warn('troupeId mismatch in unreadItemsCount: got', troupeId, 'expected', context.getTroupeId());
+          debug('troupeId mismatch in unreadItemsCount: got', troupeId, 'expected', context.getTroupeId());
         }
 
         var v = {
@@ -227,10 +221,7 @@ onready(function() {
           v.mentions = 0;
         }
 
-        log.info('rapp: Received unread count message ', {
-        troupeId: troupeId,
-        update: v,
-      });
+        debug('Received unread count message: troupeId=%s, update=%j ', troupeId, v);
         allRoomsCollection.patch(troupeId, v);
       break;
 

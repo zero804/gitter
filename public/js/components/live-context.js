@@ -2,7 +2,7 @@
 var context = require('utils/context');
 var troupeModels = require('collections/troupes');
 var realtime = require('./realtime');
-var log = require('utils/log');
+var debug = require('debug-proxy')('app:live-context');
 
 module.exports = {
   syncRoom: function() {
@@ -10,6 +10,8 @@ module.exports = {
       urlTemplate: '/v1/user/:userId/rooms',
       contextModel: context.contextModel(),
       onMessage: function(message) {
+        debug("Incoming: %j", message);
+
         var operation = message.operation;
         var newModel = message.model;
         var id = newModel.id;
@@ -33,7 +35,7 @@ module.exports = {
             break;
 
           default:
-            log.info("Unknown operation " + operation + ", ignoring");
+            debug("Unknown operation %s ignoring", operation);
         }
       },
       getSnapshotState: function() {
