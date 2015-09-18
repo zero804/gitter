@@ -3,7 +3,7 @@ var _ = require('underscore');
 var context = require('utils/context');
 var realtime = require('./realtime');
 var apiClient = require('./apiClient');
-var log = require('utils/log');
+var debug = require('debug-proxy')('app:unread-items-client');
 var Backbone = require('backbone');
 var appEvents = require('utils/appevents');
 var UnreadItemStore = require('./unread-items-client-store');
@@ -123,7 +123,7 @@ module.exports = (function() {
             global: false
           })
           .fail(function() {
-            log.info('uic: Error posting unread items to server. Will attempt again in 5s');
+            debug('Error posting unread items to server. Will attempt again in 5s');
 
             if (++attempts < 10) {
               // Unable to send messages, requeue them and try again in 5s
@@ -304,7 +304,7 @@ module.exports = (function() {
       if (childCollection.models.length === cv.children.length) {
         models = childCollection.models;
       } else {
-        log.info("Mismatch between childCollection.models.length and cv.children.length resorting to oddness");
+        debug("Mismatch between childCollection.models.length (%s) and cv.children.length (%s) resorting to oddness", childCollection.models.length, cv.children.length);
 
         models = childCollection.models.filter(function(model) {
           return cv.children.findByModelCid(model.cid);
@@ -439,7 +439,7 @@ module.exports = (function() {
       /* Prevents a race-condition when something has already been marked as deleted */
       if (!model.id || !model.get('unread')) return;
       if (store.isMarkedAsRead(model.id)) {
-        log('uic: item already marked as read');
+        debug('item already marked as read');
         model.set('unread', false);
       }
     });

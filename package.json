@@ -138,6 +138,7 @@
     "csswring": "^3.0.0",
     "cumberbatch-name": "^1.0.9",
     "datadog-metrics": "^0.2.1",
+    "debug-proxy": "^0.1.2",
     "del": "^1.1.1",
     "extract-text-webpack-plugin": "^0.8.0",
     "fastclick": "^1.0.6",
