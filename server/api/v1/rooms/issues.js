@@ -1,10 +1,10 @@
-/*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var RepoService =  require('gitter-web-github').GitHubRepoService;
-var GitHubIssueService =  require('gitter-web-github').GitHubIssueService;
-var processChat = require('../../../utils/markdown-processor');
-var StatusError = require('statuserror');
+var RepoService        = require('gitter-web-github').GitHubRepoService;
+var GitHubIssueService = require('gitter-web-github').GitHubIssueService;
+var processChat        = require('../../../utils/markdown-processor');
+var StatusError        = require('statuserror');
+var paramLoaders       = require('./param-loaders');
 
 function getEightSuggestedIssues(issues) {
   var suggestedIssues = [];
@@ -34,7 +34,7 @@ function trimDownIssue(issue) {
 
 module.exports = {
   id: 'issue',
-  index: function(req, res, next) {
+  index: [paramLoaders.troupeLoader, function(req, res, next) {
     var query = req.query || {};
     var repoName = query.repoName || (req.troupe.githubType === 'REPO' && req.troupe.uri);
 
@@ -49,9 +49,9 @@ module.exports = {
         res.send(matches);
       })
       .catch(next);
-  },
+  }],
 
-  show: function(req, res, next) {
+  show: [paramLoaders.troupeLoader, function(req, res, next) {
     if(req.troupe.githubType != 'REPO') return res.sendStatus(404);
 
     var issueNumber = req.params.issue;
@@ -76,5 +76,5 @@ module.exports = {
 
       })
       .catch(next);
-  }
+  }]
 };

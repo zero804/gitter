@@ -1,8 +1,8 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var roomService    = require("../../../services/room-service");
 var restSerializer = require("../../../serializers/rest-serializer");
+var paramLoaders   = require('./param-loaders');
 
 function serialize(items, req, res, next) {
 
@@ -19,14 +19,14 @@ function serialize(items, req, res, next) {
 module.exports = {
   id: 'channel',
   index: function(req, res, next){
-    roomService.findAllChannelsForRoom(req.user, req.troupe)
+    roomService.findAllChannelsForRoomId(req.user, req.params.troupeId)
       .then(function(channelTroupes) {
         serialize(channelTroupes, req, res, next);
       })
       .catch(next);
   },
 
-  create: function(req, res, next) {
+  create: [paramLoaders.troupeLoader, function(req, res, next) {
     var body = req.body;
     var security = body.security || 'INHERITED';
 
@@ -41,10 +41,10 @@ module.exports = {
           next(err);
         }
       });
-  },
+  }],
 
   load: function(req, id, callback){
-    roomService.findChildChannelRoom(req.user, req.troupe, id)
+    roomService.findChildChannelRoom(req.user, req.params.troupeId, id)
       .nodeify(callback);
   }
 

@@ -50,40 +50,48 @@ function doFullAccessCheck(troupeId, userId) {
     });
 }
 
-function userCanAccessRoom(userId, troupeId, callback) {
+/**
+ * Returns one of three options: null (for no access), 'view', 'member'
+ */
+function userCanAccessRoom(userId, troupeId) {
+  if(!mongoUtils.isLikeObjectId(troupeId)) return Q.resolve(null);
+  
   userId = mongoUtils.asObjectID(userId);
   troupeId = mongoUtils.asObjectID(troupeId);
 
-  // TODO: use the room permissions model
-  return persistence.Troupe.findById(troupeId, {
-      _id: 1,
-      'bans': { $elemMatch: { userId: userId } },
-      security: 1,
-      githubType: 1
-    }, {
-      lean: true
-    })
+  var query = {
+    _id: 1,
+    security: 1,
+    githubType: 1
+  };
+
+  if (userId) {
+    query.bans = { $elemMatch: { userId: userId } };
+  }
+
+  return persistence.Troupe.findById(troupeId, query, { lean: true })
     .exec()
     .then(function(troupe) {
-      if (!troupe) return false;
+      if (!troupe) return null;
+
       // Is the user banned from the room?
-      if (troupe.bans && troupe.bans.length) return false;
+      if (troupe.bans && troupe.bans.length) return null;
 
-      if(troupe.security === 'PUBLIC') {
-        return true;
-      }
-
-      // After this point, everything needs to be authenticated
+      // No user? Only allow access to public rooms
       if(!userId) {
-        return false;
+        return troupe.security === 'PUBLIC' ? 'view' : null;
       }
-
 
       return roomMembershipService.checkRoomMembership(troupeId, userId)
         .then(function(isInRoom) {
+
+          if(troupe.security === 'PUBLIC') {
+            return isInRoom ? 'member' : 'view';
+          }
+
           if(!isInRoom) {
             logger.info("Denied user " + userId + " access to troupe " + troupe.uri);
-            return false;
+            return null;
           }
 
           var isChannel = troupe.githubType === 'ORG_CHANNEL' ||
@@ -92,12 +100,12 @@ function userCanAccessRoom(userId, troupeId, callback) {
 
           // No need to consult GitHub for private channels.
           if (isChannel && troupe.security === 'PRIVATE') {
-            return true;
+            return 'member';
           }
 
           // Skip full-access check for one-to-one rooms
           if (troupe.githubType === 'ONETOONE') {
-            return true;
+            return 'member';
           }
 
           return doFullAccessCheck(troupeId, userId)
@@ -106,17 +114,16 @@ function userCanAccessRoom(userId, troupeId, callback) {
                 // This person no longer actually has access. Remove them!
                 return roomMembershipService.removeRoomMember(troupeId, userId)
                   .then(function() {
-                    return false;
+                    return null;
                   });
               }
 
-              return true;
+              return 'member';
             });
 
         });
 
-    })
-    .nodeify(callback);
+    });
 }
 
 module.exports = userCanAccessRoom;
