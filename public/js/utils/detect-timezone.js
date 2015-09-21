@@ -21,6 +21,7 @@ module.exports = function getTimezoneInfo() {
 
   return {
     offset: sign + (hours > 9 ? hours : '0' + hours) + (mins > 9 ? mins : '0' + mins),
+    iso: sign + (hours > 9 ? hours : '0' + hours) + ':' + (mins > 9 ? mins : '0' + mins),
     abbr: abbr,
     iana: getIana()
   };
