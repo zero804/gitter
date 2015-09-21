@@ -89,9 +89,7 @@ module.exports = (function() {
         region.$el.addClass("scroller");
       }
 
-      var oneToOne = context.inOneToOneTroupeContext();
-
-      return oneToOne ? null : new ActivityCompositeView(optionsForRegion({
+      return new ActivityCompositeView(optionsForRegion({
         collection: itemCollections.events
       }));
     },
