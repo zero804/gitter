@@ -35,11 +35,6 @@ module.exports = (function() {
         this.view.collection.fetchMoreAfter({});
       });
 
-      this.listenTo(scroll, 'near.top.changed', function(nearTop) {
-        this.nearTop = nearTop;
-        this.view.trigger('near.top.changed', nearTop);
-      });
-
       this.scroll = scroll;
       this.view.scroll = scroll;
     },

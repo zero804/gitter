@@ -1,7 +1,7 @@
 "use strict";
 var Marionette = require('backbone.marionette');
 var Backbone = require('backbone');
-var loadingMixins = require('collections/loading-mixins');
+var loadingFilteredCollection = require('collections/loading-filtered-collection');
 var template = require('./tmpl/repoSelectView.hbs');
 var itemTemplate = require('./tmpl/repoItemView.hbs');
 var emptyTemplate = require('./tmpl/repoEmptyView.hbs');
@@ -11,14 +11,11 @@ var SelectableMixin = require('views/controls/selectable-mixin');
 var LoadingCollectionMixin = require('views/loading-mixin');
 var liveSearch = require('views/controls/live-search');
 var dataset = require('utils/dataset-shim');
+
 require('filtered-collection');
 
 module.exports = (function() {
 
-
-  // TODO: put this somewhere else
-  var FilteredLoadingCollection = Backbone.FilteredCollection.extend({ });
-  cocktail.mixin(FilteredLoadingCollection, loadingMixins.UnderlyingLoadingMixin);
 
   var ItemView = Marionette.ItemView.extend({
     template: itemTemplate,
@@ -57,7 +54,9 @@ module.exports = (function() {
     var underlying = new repoModels.ReposCollection();
     underlying.fetch();
 
-    var c = new FilteredLoadingCollection(null, { model: repoModels.RepoModel, collection: underlying });
+    var c = new Backbone.FilteredCollection(null, { model: repoModels.RepoModel, collection: underlying });
+    // Trigger loading/loaded triggers on the filtered collection
+    loadingFilteredCollection(c);
     c.setFilter(function() {
       return true;
     });
