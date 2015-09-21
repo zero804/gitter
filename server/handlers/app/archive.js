@@ -88,14 +88,16 @@ exports.chatArchive = [
         var yyyy = parseInt(req.params.yyyy, 10);
         var mm = parseInt(req.params.mm, 10);
         var dd = parseInt(req.params.dd, 10);
+        var tz = '' + (req.query.tz || 'Z');
 
-        var startDate = moment(yyyy + "-" + mm + "-" + dd + "Z");
-        var endDate = moment(startDate).endOf('day');
+        var dateString = yyyy+'-'+mm+'-'+dd+' 00:00 '+tz;
+        var startDate = moment(dateString, "YYYY-MM-DD HH:mm Z");
+        var endDate = moment(startDate).add(1, 'days')
 
         var troupeId = troupe.id;
 
-        var nextDate = moment(startDate).add('days', 1);
-        var previousDate = moment(startDate).subtract('days', 1);
+        var nextDate = moment(startDate).add(1, 'days');
+        var previousDate = moment(startDate).subtract(1, 'days');
 
         var today = moment().endOf('day');
         if(moment(nextDate).endOf('day').isAfter(today)) {
