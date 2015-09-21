@@ -46,16 +46,6 @@ module.exports = (function() {
         this.trigger('approaching.bottom');
       }
 
-      if(this._nearTop != nearTop) {
-        this._nearTop = nearTop;
-        this.trigger('near.top.changed', nearTop);
-      }
-
-      if(this._nearBottom != nearBottom) {
-        this._nearBottom = nearBottom;
-        this.trigger('near.bottom.changed', nearBottom);
-      }
-
       this.scrollRate();
     },
 
