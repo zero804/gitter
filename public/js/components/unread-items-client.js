@@ -207,6 +207,7 @@ module.exports = (function() {
   var TroupeUnreadItemsViewportMonitor = function(scrollElement, unreadItemStore, collectionView) {
     var boundGetBounds = this._getBounds.bind(this);
     var limitedGetBounds = limit(this._getBounds, this, 100);
+    var debouncedGetBounds = _.debounce(this._getBounds.bind(this), 100);
     this._collectionView = collectionView;
     this._scrollElement = scrollElement[0] || scrollElement;
 
@@ -230,7 +231,7 @@ module.exports = (function() {
 
     // Check for unread items when things are added to the collection
     // Only do it every 100ms or so
-    collectionView.collection.on('add', limitedGetBounds);
+    collectionView.collection.on('add', debouncedGetBounds);
 
     // This is a catch all for for unread items that are
     // not marked as read

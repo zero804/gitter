@@ -55,7 +55,7 @@ TroupeUnreadNotifier.prototype = {
       current: currentUnreadTotal
     };
 
-    debug('troupeUnreadTotalChange: overall=%s, current=$s', newTroupeUnreadTotal, currentUnreadTotal);
+    debug('troupeUnreadTotalChange: overall=%s, current=%s', newTroupeUnreadTotal, currentUnreadTotal);
 
     appEvents.trigger('troupeUnreadTotalChange', counts);
 
