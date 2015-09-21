@@ -1,6 +1,5 @@
 "use strict";
 
-var SmartUserCollection = require('./smart-users');
 var Backbone = require('backbone');
 var realtime = require('components/realtime');
 var LiveCollection = require('gitter-realtime-client').LiveCollection;
@@ -28,6 +27,5 @@ var RosterCollection = LiveCollection.extend({
 
 module.exports = {
   RosterCollection: RosterCollection,
-  SortedRosterCollection: SmartUserCollection.SortedAndLimited,
   UserModel: UserModel
 };
