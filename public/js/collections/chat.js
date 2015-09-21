@@ -1,16 +1,16 @@
 "use strict";
-var _ = require('underscore');
-var Backbone = require('backbone');
-var context = require('utils/context');
-var apiClient = require('components/apiClient');
-var moment = require('moment');
-var burstCalculator = require('../utils/burst-calculator');
+
+var _                       = require('underscore');
+var Backbone                = require('backbone');
+var context                 = require('utils/context');
+var moment                  = require('moment');
+var burstCalculator         = require('../utils/burst-calculator');
 var InfiniteCollectionMixin = require('./infinite-mixin');
-var cocktail = require('cocktail');
-var log = require('utils/log');
-var LiveCollection = require('gitter-realtime-client').LiveCollection;
-var realtime = require('components/realtime');
-var SyncMixin = require('./sync-mixin');
+var cocktail                = require('cocktail');
+var log                     = require('utils/log');
+var LiveCollection          = require('gitter-realtime-client').LiveCollection;
+var realtime                = require('components/realtime');
+var SyncMixin               = require('./sync-mixin');
 
 var userId = context.getUserId();
 

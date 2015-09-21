@@ -620,11 +620,12 @@ module.exports = (function() {
     childView: AvatarView,
     className: 'popoverReadBy',
     initialize: function(options) {
-      var c = new chatModels.ReadByCollection(null, { listen: true, chatMessageId: this.model.id, userCollection: options.userCollection });
-      c.loading = true;
-      this.collection = c;
+      this.collection = new chatModels.ReadByCollection(null, { listen: true, chatMessageId: this.model.id, userCollection: options.userCollection });
+      this.collection.loading = true; // Messy workaround until the loading-mixin handles loading/loaded transitions correctly
     },
-    onDestroy: function(){
+    onDestroy: function() {
+      // The unlisten will send out a reset, which may cause problems, unlisten manually
+      this.stopListening(this.collection);
       this.collection.unlisten();
     }
   });
