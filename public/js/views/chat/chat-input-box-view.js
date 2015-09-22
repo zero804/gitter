@@ -65,6 +65,12 @@ var ChatInputBoxView = Marionette.ItemView.extend({
     this.listenTo(appEvents, 'focus.request.chat', function() { this.ui.textarea.focus(); });
   },
 
+  serializeData: function() {
+    return {
+      isMobile: isMobile()
+    };
+  },
+
   onRender: function() {
     this.removeTextareaExtensions();
     this.addTextareaExtensions();
