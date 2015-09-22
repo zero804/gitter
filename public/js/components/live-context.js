@@ -24,10 +24,9 @@ module.exports = {
 
         switch(operation) {
           case 'create':
-            var attributes = _.extend({}, parsed.attributes, { roomMember: true });
             // There can be existing documents for create events if the doc was created on this
             // client and lazy-inserted into the collection
-            context.troupe().set(attributes);
+            context.troupe().set(parsed.attributes);
             break;
 
           case 'patch':
