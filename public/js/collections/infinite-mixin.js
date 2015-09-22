@@ -1,8 +1,9 @@
 "use strict";
-var _ = require('underscore');
-var utils = require('../utils/utils');
-var context = require('../utils/context');
+var _         = require('underscore');
+var utils     = require('../utils/utils');
+var context   = require('../utils/context');
 var appEvents = require('utils/appevents');
+var debug     = require('debug-proxy')('app:infinite-mixin');
 
 module.exports = (function() {
 
@@ -11,6 +12,7 @@ module.exports = (function() {
     initialize: function() {
       this.atTop = false;
       this.atBottom = true;
+      // TODO: deal with state on RESET
     },
 
     getLoadLimit: function() {
@@ -30,7 +32,7 @@ module.exports = (function() {
     fetchLatest: function(options, callback, context) {
       var self = this;
       if(this.atBottom) return;
-      if(this._isFetching) return;
+      if(this.loading) return;
 
       var loadLimit = this.getLoadLimit();
 
@@ -39,13 +41,15 @@ module.exports = (function() {
 
       var existingIds = utils.index(this.pluck('id'), utils.identityTransform);
 
+      debug('Fetch latest: options=%j data=%j', options, data);
+      this.trigger('fetch:latest');
       this.fetch({
         remove: ('remove' in options) ? options.remove : false,
         add: ('add' in options) ? options.add : true,
         merge: ('merge' in options) ? options.merge : true,
         data: data,
         success: function(collection, response/*, options*/) { // jshint unused:true
-          delete self._isFetching;
+          self.trigger('fetch:latest:complete');
           self.setAtBottom(true);
 
           var responseIds = response.map(utils.idTransform);
@@ -70,11 +74,10 @@ module.exports = (function() {
             self.trimTop();
           }
 
-          self.trigger('scroll.fetch', 'previous');
-
           if(callback) callback.call(context);
         },
         error: function (err) {
+          self.trigger('fetch:latest:complete');
           if (callback) callback.call(context || null, err);
         }
       });
@@ -83,8 +86,7 @@ module.exports = (function() {
 
     fetchMoreBefore: function(options, callback, context) {
       if(this.atTop) return;
-      if(this._isFetching) return;
-      this._isFetching = true;
+      if(this.loading) return;
 
       var beforeId;
       if(this.length) {
@@ -96,27 +98,27 @@ module.exports = (function() {
       var data = this.getQuery && this.getQuery() || {};
       data = _.defaults(data, { beforeId: beforeId, limit: loadLimit });
 
-      // var data = { beforeId: beforeId, limit: loadLimit };
       var self = this;
-
+      debug('Fetch before: options=%j data=%j', options, data);
+      this.trigger('fetch:before');
       this.fetch({
         remove: ('remove' in options) ? options.remove : false,
         add: ('add' in options) ? options.add : true,
         merge: ('merge' in options) ? options.merge : true,
         data: data,
         success: function(collection, response) {  // jshint unused:true
-          delete self._isFetching;
+          self.trigger('fetch:before:complete');
+
           if(response.length < loadLimit) {
             // NO MORE
             self.setAtTop(true);
           }
           self.trimBottom();
 
-          self.trigger('scroll.fetch', 'previous');
-
           if(callback) callback.call(context);
         },
         error: function(err) {
+          self.trigger('fetch:before:complete');
           if(callback) callback.call(err);
         }
       });
@@ -125,8 +127,8 @@ module.exports = (function() {
     fetchMoreAfter: function(options, callback, context) {
       var self = this;
       if(this.atBottom) return;
-      if(this._isFetching) return;
-      this._isFetching = true;
+      if(this.loading) return;
+
       var afterId;
       if(this.length) {
         afterId = utils.max(this.pluck('id'));
@@ -135,30 +137,27 @@ module.exports = (function() {
       var loadLimit = this.getLoadLimit();
       var data = this.getQuery && this.getQuery() || {};
       data = _.defaults(data, { afterId: afterId, limit: loadLimit });
-      // var data = { afterId: afterId, limit: loadLimit };
 
-      this.trigger('fetch.started');
-
+      debug('Fetch after: options=%j data=%j', options, data);
+      this.trigger('fetch:after');
       this.fetch({
         remove: ('remove' in options) ? options.remove : false,
         add: ('add' in options) ? options.add : true,
         merge: ('merge' in options) ? options.merge : true,
         data: data,
         success: function(collection, response) { // jshint unused:true
-          self.trigger('fetch.completed');
+          self.trigger('fetch:after:complete');
 
-          delete self._isFetching;
           if(response.length < loadLimit) {
             // NO MORE
             self.setAtBottom(true);
           }
           self.trimTop();
-          self.trigger('scroll.fetch', 'next');
 
           if(callback) callback.call(context);
         },
         error: function(err) {
-          self.trigger('fetch.completed');
+          self.trigger('fetch:after:completed');
           if(callback) callback.call(err);
         }
       });
@@ -167,8 +166,7 @@ module.exports = (function() {
     fetchAtPoint: function(query, options, callback, context) {
       if (!options) options = {};
       // if(this.atTop) return; // Already at the top
-      if(this._isFetching) return;
-      this._isFetching = true;
+      if(this.loading) return;
 
       var loadLimit = this.getLoadLimit();
 
@@ -178,14 +176,15 @@ module.exports = (function() {
       data = _.defaults(data, query, { limit: loadLimit });
       var self = this;
 
+      debug('Fetch around: options=%j data=%j', options, data);
+      this.trigger('fetch:at');
       this.fetch({
         remove: ('remove' in options) ? options.remove : false,
         add: ('add' in options) ? options.add : true,
         merge: ('merge' in options) ? options.merge : true,
         data: data,
         success: function(collection, response) { // jshint unused:true
-          delete self._isFetching;
-
+          self.trigger('fetch:at:complete');
           var responseIds = response.map(utils.idTransform);
           var responseOverlaps = responseIds.some(function(id) {
             return existingIds[id];
@@ -205,11 +204,10 @@ module.exports = (function() {
           // Ideally we should trim both sides
           self.trimBottom();
 
-          self.trigger('scroll.fetch', 'marker');
-
           if(callback) callback.call(context);
         },
         error: function(err) {
+          self.trigger('fetch:at:complete');
           if(callback) callback.call(err);
         }
       });
@@ -259,6 +257,11 @@ module.exports = (function() {
     },
 
     getSnapshotState: function() {
+      var extras;
+      if (this.getSnapshotExtras) {
+        extras = this.getSnapshotExtras();
+      }
+
       var initialSnapshot = context().snapshots;
       if(initialSnapshot) {
         var config = initialSnapshot[this.modelName];
@@ -271,22 +274,22 @@ module.exports = (function() {
           this.listenToOnce(this, 'snapshot', function() {
             delete initialSnapshot[this.modelName];
           });
-        }
 
-        return config;
+          return _.extend(config, extras);
+        }
       }
 
       // TODO: handle initial load
-      if(!this.length) return;
+      if(!this.length) return extras;
 
       if(this.atBottom) {
         // At the bottom is easy-ish
-        return { limit: this.length };
+        return _.extend({ limit: this.length }, extras);
       }
 
       var end = this.at(this.length - 1).get('id');
 
-      return { limit: this.length, beforeInclId: end };
+      return _.extend({ limit: this.length, beforeInclId: end }, extras);
     },
 
     setAtTop: function(value) {

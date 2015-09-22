@@ -5,7 +5,7 @@ var Backbone               = require('backbone');
 var context                = require('utils/context');
 var liveContext            = require('components/live-context');
 var appEvents              = require('utils/appevents');
-var log                    = require('utils/log');
+var debug                  = require('debug-proxy')('app:router-chat');
 var ChatToolbarInputLayout = require('views/layouts/chat-toolbar-input');
 var DropTargetView         = require('views/app/dropTargetView');
 var onready                = require('./utils/onready');
@@ -44,7 +44,7 @@ onready(function() {
 
   window.addEventListener('message', function(e) {
     if (e.origin !== context.env('basePath')) {
-      log.info('rchat: Ignoring message from ' + e.origin);
+      debug('Ignoring message from ' + e.origin);
       return;
     }
 
@@ -56,7 +56,7 @@ onready(function() {
       return;
     }
 
-    log.info('rchat: Received message ', message);
+    debug('Received message %j', message);
 
     var makeEvent = function(message) {
       var origin = 'app';
@@ -64,15 +64,12 @@ onready(function() {
       message.event = {
         origin: origin,
         preventDefault: function() {
-          log.warn('rchat: could not use preventDefault() because the event comes from the `' + this.origin + '` frame');
         },
 
         stopPropagation: function() {
-          log.warn('rchat: could not use stopPropagation() because the event comes from the `' + this.origin + '` frame');
         },
 
         stopImmediatePropagation: function() {
-          log.warn('rchat: could not use stopImmediatePropagation() because the event comes from the `' + this.origin + '` frame');
         },
       };
     };
@@ -151,10 +148,7 @@ onready(function() {
   });
 
   appEvents.on('unreadItemsCount', function(newCount) {
-    var message = { type: 'unreadItemsCount', count: newCount, troupeId: context.getTroupeId() };
-
-    log.info('rchat: Posting unread items count ', message);
-    frameUtils.postMessage(message);
+    frameUtils.postMessage({ type: 'unreadItemsCount', count: newCount, troupeId: context.getTroupeId() });
   });
 
   // Bubble keyboard events

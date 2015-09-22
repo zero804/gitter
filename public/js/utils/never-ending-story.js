@@ -1,7 +1,8 @@
 "use strict";
-var _ = require('underscore');
+
+var _        = require('underscore');
 var Backbone = require('backbone');
-var log = require('utils/log');
+var debug    = require('debug-proxy')('app:nes');
 
 module.exports = (function() {
 
@@ -44,16 +45,6 @@ module.exports = (function() {
       } else if(deltaBottom > 0 && nearBottom) {
         /* We're scrolling towards the bottom */
         this.trigger('approaching.bottom');
-      }
-
-      if(this._nearTop != nearTop) {
-        this._nearTop = nearTop;
-        this.trigger('near.top.changed', nearTop);
-      }
-
-      if(this._nearBottom != nearBottom) {
-        this._nearBottom = nearBottom;
-        this.trigger('near.bottom.changed', nearBottom);
       }
 
       this.scrollRate();
@@ -135,7 +126,7 @@ module.exports = (function() {
       var self = this;
 
       if(!this._enabled) {
-        log.info('enabling scroll listener');
+        debug('enabling scroll listener');
         this._target.addEventListener('scroll', this._scrollHandler, false);
         this._enabled = true;
 
@@ -153,7 +144,7 @@ module.exports = (function() {
 
     disable: function() {
       if(this._enabled) {
-        log.info('disabling scroll listener');
+        debug('disabling scroll listener');
         this._target.removeEventListener('scroll', this._scrollHandler, false);
         this._enabled = false;
       }
