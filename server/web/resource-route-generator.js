@@ -21,8 +21,7 @@ module.exports = function resourceRoute(routeIdentifier, resource) {
 
           req[idParam] = value;
         })
-        .nodeify(next)
-        .done();
+        .nodeify(next);
     });
   }
 
@@ -43,8 +42,7 @@ module.exports = function resourceRoute(routeIdentifier, resource) {
               res.send(response);
             }
           })
-          .catch(next)
-          .done();
+          .catch(next);
       });
   }
 
