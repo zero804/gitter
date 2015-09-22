@@ -39,6 +39,8 @@ css.eachDecl(function(decl) {
 
   if(decl.prop !== 'src' || decl.parent.name !== 'font-face') return;
 
+  if (!decl.parent.decls) return;
+
   var d = decl.parent.decls.filter(function(d) {
     return d.prop === 'src' && d.parent.name === 'font-face';
   });

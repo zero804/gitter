@@ -79,7 +79,7 @@ function generateTypeahead(options) {
     'components/apiClient': {},
     'collections/instances/integrated-items': { chats: chats },
     './tmpl/typeahead.hbs': function() {}
-  });
+  })();
 }
 
 function usernames(users) {
