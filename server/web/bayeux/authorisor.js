@@ -241,7 +241,7 @@ function authorizeSubscribe(message, callback) {
     if(err) return callback(err);
 
     if(!exists) {
-      debug("Client %s does not exist. userId=%s", userId);
+      debug("Client %s does not exist. userId=%s", clientId, userId);
       return callback(new StatusError(401, 'Client ' + clientId + ' not authenticated'));
     }
 
