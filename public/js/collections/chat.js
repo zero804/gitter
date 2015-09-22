@@ -121,6 +121,10 @@ var ChatCollection = LiveCollection.extend({
     });
   },
 
+  getQuery: function() {
+    return { lean: true };
+  },
+
   getSnapshotExtras: function() {
     return { lean: true };
   },
