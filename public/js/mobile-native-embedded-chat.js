@@ -4,7 +4,7 @@ var context = require('utils/context');
 var cordovaNav = require('components/cordova-navigate');
 var chatModels = require('collections/chat');
 var ChatCollectionView = require('views/chat/chatCollectionView');
-var chatInputView = require('views/chat/chatInputView');
+var ChatInputView = require('views/chat/chatInputView');
 var unreadItemsClient = require('components/unread-items-client');
 var cacheSync = require('components/cache-sync');
 var emojiDecorator = require('views/chat/decorators/emojiDecorator');
@@ -20,7 +20,7 @@ require('components/ping');
 // Preload widgets
 require('views/widgets/avatar');
 require('views/widgets/timeago');
-
+require('template/helpers/all');
 
 onready(function() {
   FastClick.attach(document.body);
@@ -53,7 +53,7 @@ onready(function() {
 
   unreadItemsClient.monitorViewForUnreadItems($('#content-frame'), chatCollectionView);
 
-  new chatInputView.ChatInputView({
+  new ChatInputView({
     el: $('#chat-input'),
     collection: chatCollection,
     compactView: true

@@ -1,13 +1,13 @@
 "use strict";
 var $            = require('jquery');
 var _            = require('underscore');
-var log          = require('utils/log');
 var Marionette   = require('backbone.marionette');
 var appEvents    = require('utils/appevents');
 var chatItemView = require('./chatItemView');
 var Rollers      = require('utils/rollers');
 var isolateBurst = require('gitter-web-shared/burst/isolate-burst-bb');
 var context      = require('utils/context');
+var debug        = require('debug-proxy')('app:chat-collection-view');
 
 require('views/behaviors/infinite-scroll');
 require('views/behaviors/smooth-scroll');
@@ -44,9 +44,6 @@ module.exports = (function() {
 
     return usersChats[usersChats.length - 1];
   }
-
-  /** @const */
-  var PAGE_SIZE = 100;
 
   var SCROLL_ELEMENT = "#content-frame";
 
@@ -182,12 +179,19 @@ module.exports = (function() {
         }, this);
       });
 
-      this.listenTo(this.collection, 'fetch.started', function() {
+      // Special case when scrolling back down to the bottom.
+      // If we are tracking 'bottom' we need to ensure
+      // that we stop tracking bottom and switch to stable
+      // as scroll view should track the visible elements,
+      // not the bottom
+      this.listenTo(this.collection, 'fetch:after', function() {
+        debug('Switching rollers to stable and locking');
         this.rollers.stable();
         this.rollers.setModeLocked(true);
       });
 
-      this.listenTo(this.collection, 'fetch.completed', function() {
+      this.listenTo(this.collection, 'fetch:after:complete', function() {
+        debug('Unlocking rollers');
         this.rollers.setModeLocked(false);
       });
 
@@ -275,29 +279,8 @@ module.exports = (function() {
       try {
         this.highlightChat(old);
       } catch (e) {
-        log.info('Could not clear previously highlighted item');
+        debug('Could not clear previously highlighted item');
       }
-    },
-
-    getFetchData: function() {
-      log.info("Loading next message chunk.");
-
-      var ids = this.collection.map(function(m) { return m.get('id'); });
-      var lowestId = _.min(ids, function(a, b) {
-        if(a < b) return -1;
-        if(a > b) return 1;
-        return 0;
-      });
-
-      if (lowestId === Infinity) {
-        log.info('No messages loaded, cancelling pagenation (!!)');
-        return;
-      }
-
-      return {
-        beforeId: lowestId,
-        limit: PAGE_SIZE
-      };
     },
 
     findLastCollapsibleChat: function() {
