@@ -42,12 +42,14 @@ module.exports = (function() {
       var existingIds = utils.index(this.pluck('id'), utils.identityTransform);
 
       debug('Fetch latest: options=%j data=%j', options, data);
+      this.trigger('fetch:latest');
       this.fetch({
         remove: ('remove' in options) ? options.remove : false,
         add: ('add' in options) ? options.add : true,
         merge: ('merge' in options) ? options.merge : true,
         data: data,
         success: function(collection, response/*, options*/) { // jshint unused:true
+          self.trigger('fetch:latest:complete');
           self.setAtBottom(true);
 
           var responseIds = response.map(utils.idTransform);
@@ -72,11 +74,10 @@ module.exports = (function() {
             self.trimTop();
           }
 
-          self.trigger('scroll.fetch', 'previous');
-
           if(callback) callback.call(context);
         },
         error: function (err) {
+          self.trigger('fetch:latest:complete');
           if (callback) callback.call(context || null, err);
         }
       });
@@ -99,23 +100,25 @@ module.exports = (function() {
 
       var self = this;
       debug('Fetch before: options=%j data=%j', options, data);
+      this.trigger('fetch:before');
       this.fetch({
         remove: ('remove' in options) ? options.remove : false,
         add: ('add' in options) ? options.add : true,
         merge: ('merge' in options) ? options.merge : true,
         data: data,
         success: function(collection, response) {  // jshint unused:true
+          self.trigger('fetch:before:complete');
+
           if(response.length < loadLimit) {
             // NO MORE
             self.setAtTop(true);
           }
           self.trimBottom();
 
-          self.trigger('scroll.fetch', 'previous');
-
           if(callback) callback.call(context);
         },
         error: function(err) {
+          self.trigger('fetch:before:complete');
           if(callback) callback.call(err);
         }
       });
@@ -134,31 +137,27 @@ module.exports = (function() {
       var loadLimit = this.getLoadLimit();
       var data = this.getQuery && this.getQuery() || {};
       data = _.defaults(data, { afterId: afterId, limit: loadLimit });
-      // var data = { afterId: afterId, limit: loadLimit };
-
-      // TODO: remove this trigger
-      this.trigger('fetch.started');
 
       debug('Fetch after: options=%j data=%j', options, data);
+      this.trigger('fetch:after');
       this.fetch({
         remove: ('remove' in options) ? options.remove : false,
         add: ('add' in options) ? options.add : true,
         merge: ('merge' in options) ? options.merge : true,
         data: data,
         success: function(collection, response) { // jshint unused:true
-          self.trigger('fetch.completed');
+          self.trigger('fetch:after:complete');
 
           if(response.length < loadLimit) {
             // NO MORE
             self.setAtBottom(true);
           }
           self.trimTop();
-          self.trigger('scroll.fetch', 'next');
 
           if(callback) callback.call(context);
         },
         error: function(err) {
-          self.trigger('fetch.completed');
+          self.trigger('fetch:after:completed');
           if(callback) callback.call(err);
         }
       });
@@ -178,12 +177,14 @@ module.exports = (function() {
       var self = this;
 
       debug('Fetch around: options=%j data=%j', options, data);
+      this.trigger('fetch:at');
       this.fetch({
         remove: ('remove' in options) ? options.remove : false,
         add: ('add' in options) ? options.add : true,
         merge: ('merge' in options) ? options.merge : true,
         data: data,
         success: function(collection, response) { // jshint unused:true
+          self.trigger('fetch:at:complete');
           var responseIds = response.map(utils.idTransform);
           var responseOverlaps = responseIds.some(function(id) {
             return existingIds[id];
@@ -203,11 +204,10 @@ module.exports = (function() {
           // Ideally we should trim both sides
           self.trimBottom();
 
-          self.trigger('scroll.fetch', 'marker');
-
           if(callback) callback.call(context);
         },
         error: function(err) {
+          self.trigger('fetch:at:complete');
           if(callback) callback.call(err);
         }
       });

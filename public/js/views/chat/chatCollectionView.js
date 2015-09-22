@@ -179,16 +179,21 @@ module.exports = (function() {
         }, this);
       });
 
-      // this.listenTo(this.collection, 'loading', function() {
-        // debug('Switching rollers to stable and locking');
-        // this.rollers.stable();
-        // this.rollers.setModeLocked(true);
-      // });
+      // Special case when scrolling back down to the bottom.
+      // If we are tracking 'bottom' we need to ensure
+      // that we stop tracking bottom and switch to stable
+      // as scroll view should track the visible elements,
+      // not the bottom
+      this.listenTo(this.collection, 'fetch:after', function() {
+        debug('Switching rollers to stable and locking');
+        this.rollers.stable();
+        this.rollers.setModeLocked(true);
+      });
 
-      // this.listenTo(this.collection, 'loaded', function() {
-        // debug('Unlocking rollers');
-        // this.rollers.setModeLocked(false);
-      // });
+      this.listenTo(this.collection, 'fetch:after:complete', function() {
+        debug('Unlocking rollers');
+        this.rollers.setModeLocked(false);
+      });
 
       this.listenTo(appEvents, 'command.collapse.chat', this.collapseChats);
       this.listenTo(appEvents, 'command.expand.chat', this.expandChats);
