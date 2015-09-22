@@ -1421,9 +1421,8 @@
       }
     },
     "gitter-realtime-client": {
-      "version": "0.3.6",
-      "from": "gitter-realtime-client@0.3.6",
-      "resolved": "http://beta-internal:4873/gitter-realtime-client/-/gitter-realtime-client-0.3.6.tgz",
+      "version": "0.3.7",
+      "from": "gitter-realtime-client@beta",
       "dependencies": {
         "backbone-sorted-collection": {
           "version": "0.3.9",
