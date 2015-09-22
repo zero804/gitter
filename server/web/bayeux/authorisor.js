@@ -12,6 +12,7 @@ var StatusError       = require('statuserror');
 var bayeuxExtension   = require('./extension');
 var Q                 = require('q');
 var userCanAccessRoom = require('../../services/user-can-access-room');
+var debug             = require('debug')('gitter:bayeux-authorisor');
 
 var survivalMode = !!process.env.SURVIVAL_MODE || false;
 
@@ -233,14 +234,16 @@ function populateUserUnreadItemsCollection(options) {
 }
 
 // Authorize a sbscription message
-// callback(err, allowAccess)
 function authorizeSubscribe(message, callback) {
   var clientId = message.clientId;
 
   presenceService.lookupUserIdForSocket(clientId, function(err, userId, exists) {
     if(err) return callback(err);
 
-    if(!exists) return callback({ status: 401, message: 'Socket association does not exist' });
+    if(!exists) {
+      debug("Client %s does not exist. userId=%s", userId);
+      return callback(new StatusError(401, 'Client ' + clientId + ' not authenticated'));
+    }
 
     var match = null;
 
