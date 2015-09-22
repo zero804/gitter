@@ -237,36 +237,36 @@ function populateUserUnreadItemsCollection(options) {
 function authorizeSubscribe(message, callback) {
   var clientId = message.clientId;
 
-  presenceService.lookupUserIdForSocket(clientId, function(err, userId, exists) {
-    if(err) return callback(err);
-
-    if(!exists) {
-      debug("Client %s does not exist. userId=%s", clientId, userId);
-      return callback(new StatusError(401, 'Client ' + clientId + ' not authenticated'));
-    }
-
-    var match = null;
-
-    var hasMatch = routes.some(function(route) {
-      var m = route.re.exec(message.subscription);
-      if(m) {
-        match = { route: route, match: m };
+  return presenceService.lookupUserIdForSocket(clientId)
+    .spread(function(userId, exists) {
+      if(!exists) {
+        debug("Client %s does not exist. userId=%s", clientId, userId);
+        throw new StatusError(401, 'Client ' + clientId + ' not authenticated');
       }
-      return m;
-    });
 
-    if(!hasMatch) return callback(new StatusError(404, "Unknown subscription " + message.subscription));
+      var match = null;
 
-    var validator = match.route.validator;
-    var m = match.match;
+      var hasMatch = routes.some(function(route) {
+        var m = route.re.exec(message.subscription);
+        if(m) {
+          match = { route: route, match: m };
+        }
+        return m;
+      });
 
-    validator({ userId: userId, match: m, message: message, clientId: clientId })
-      .then(function(allowed) {
-        return { userId: userId, allowed: allowed };
-      })
-      .nodeify(callback);
-  });
+      if(!hasMatch) {
+        throw new StatusError(404, "Unknown subscription " + message.subscription);
+      }
 
+      var validator = match.route.validator;
+      var m = match.match;
+
+      return validator({ userId: userId, match: m, message: message, clientId: clientId })
+        .then(function(allowed) {
+          return [userId, allowed];
+        });
+    })
+    .nodeify(callback);
 }
 
 //
@@ -282,24 +282,21 @@ module.exports = bayeuxExtension({
   privateState: true,
   incoming: function(message, req, callback) {
     // Do we allow this user to connect to the requested channel?
-    authorizeSubscribe(message, function(err, subscribeAuth) {
-      if(err) return callback(err);
+    return authorizeSubscribe(message)
+      .spread(function(userId, allowed) {
 
-      var allowed = subscribeAuth.allowed;
-      var userId = subscribeAuth.userId;
+        if(!allowed) {
+          throw new StatusError(403, "Authorisation denied.");
+        }
 
-      if(!allowed) {
-        return callback(new StatusError(403, "Authorisation denied."));
-      }
+        message._private.authorisor = {
+          snapshot: message.ext && message.ext.snapshot,
+          userId: userId
+        };
 
-      message._private.authorisor = {
-        snapshot: message.ext && message.ext.snapshot,
-        userId: userId
-      };
-
-      return callback(null, message);
-    });
-
+        return message;
+      })
+      .nodeify(callback);
   },
 
   outgoing: function(message, req, callback) {
