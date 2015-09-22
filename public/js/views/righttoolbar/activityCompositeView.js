@@ -5,7 +5,7 @@ var appEvents = require('utils/appevents');
 var issueDecorator = require('views/chat/decorators/issueDecorator');
 var commitDecorator = require('views/chat/decorators/commitDecorator');
 var mentionDecorator = require('views/chat/decorators/mentionDecorator');
-var log = require('utils/log');
+var debug = require('debug-proxy')('app:activity-composite-view');
 var githubPushTemplate = require('./tmpl/githubPush.hbs');
 var githubIssuesTemplate = require('./tmpl/githubIssues.hbs');
 var githubIssueCommentTemplate = require('./tmpl/githubIssueComment.hbs');
@@ -99,7 +99,7 @@ module.exports = (function() {
       } catch (e) {
         var modelData = this.model && this.model.attributes;
         appEvents.trigger('bugreport', e, { extra: modelData });
-        log.info('ERROR rendering activity item:', e.message, e.stack, modelData);
+        debug('Err rendering activity item: error=%s, stack=%s, data=%j', e.message, e.stack, modelData);
         return {};
       }
     },
