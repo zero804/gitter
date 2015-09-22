@@ -10,8 +10,6 @@ var notifications = require('components/notifications');
 
 module.exports = (function() {
 
-
-
   var View = Marionette.ItemView.extend({
     template: troupeSettingsTemplate,
     events: {
@@ -31,11 +29,10 @@ module.exports = (function() {
         .then(function(settings) {
           self.settings = settings && settings.push || "all";
           self.$el.find("#notification-options").val(self.settings);
-          // self.trigger('settingsLoaded', settings);
           self.setLurkButton();
         })
-        .fail(function() {
-          log.info('An error occurred while communicating with notification settings');
+        .fail(function(err) {
+          log.error('An error occurred while communicating with notification settings', err);
         });
     },
 

@@ -10,13 +10,14 @@ module.exports = function(req, res, next) {
 
   var start = req.query.start ? moment(req.query.start).toDate() : null;
   var end = req.query.end ? moment(req.query.end).toDate() : null;
+  var tz = req.query.tz ? req.query.tz : 0;
 
   // simple auth check, throws on failure
   roomService.findByIdForReadOnlyAccess(req.user, roomId)
     .then(function(room) {
       var roomId = room.id;
 
-      return heatmapService.getHeatmapForRoom(roomId, start, end);
+      return heatmapService.getHeatmapForRoom(roomId, start, end, tz);
     })
     .then(function(chatActivity) {
       res.send(chatActivity);

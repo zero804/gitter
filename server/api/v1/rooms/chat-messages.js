@@ -21,6 +21,7 @@ module.exports = {
     var q = req.query.q;
     var userId = req.user && req.user.id;
     var troupeId = req.params.troupeId;
+    var lean = !!req.query.lean;
     var options;
 
     var query;
@@ -52,7 +53,8 @@ module.exports = {
         var strategy = new restSerializer.ChatStrategy({
           currentUserId: userId,
           troupeId: troupeId,
-          initialId: aroundId
+          initialId: aroundId,
+          lean: lean
         });
 
         return restSerializer.serialize(chatMessages, strategy);

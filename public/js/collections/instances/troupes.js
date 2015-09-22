@@ -31,15 +31,6 @@ module.exports = (function() {
   var recentRoomsNonFavourites = filterTroupeCollection(roomSort.recents.filter);
   recentRoomsNonFavourites.setSort(roomSort.recents.sort);
 
-  // Sync up with the context
-  troupeCollection.on("add", function(model) {
-    if(model.id == context.getTroupeId()) {
-      model.on('change', function(model) {
-        context.troupe().set(model.changed);
-      });
-    }
-  });
-
   appEvents.on('activity', function(message) {
     /* Lurk mode... */
 

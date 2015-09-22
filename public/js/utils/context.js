@@ -1,6 +1,7 @@
 "use strict";
 var Backbone = require('backbone');
 var qs = require('./qs');
+var _ = require('underscore');
 
 module.exports = (function() {
 
@@ -61,6 +62,28 @@ module.exports = (function() {
     return result;
   }
 
+  function getDelayedContextModel(contextModel, delay) {
+    var result = new Backbone.Model();
+    result.set({ userId: contextModel.get('userId'), troupeId: contextModel.get('troupeId') });
+
+    var delayedUpdate = _.debounce(function() {
+      result.set({ troupeId: contextModel.get('troupeId') });
+    }, delay);
+
+    result.listenTo(contextModel, 'change:userId', function(user, newId) { // jshint unused:true
+      result.set({ userId: newId });
+    });
+
+    result.listenTo(contextModel, 'change:troupeId', function() {
+      // Clear the troupeId...
+      result.set({ troupeId: null });
+
+      // ...and reset it after a period of time
+      delayedUpdate();
+    });
+
+    return result;
+  }
   var troupe = getTroupeModel();
   var user = getUserModel();
   var contextModel = getContextModel(troupe, user);
@@ -79,6 +102,10 @@ module.exports = (function() {
 
   context.contextModel = function() {
     return contextModel;
+  };
+
+  context.delayedContextModel = function(delay) {
+    return getDelayedContextModel(contextModel, delay);
   };
 
   function clearOtherAttributes(s, v) {
