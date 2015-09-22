@@ -1010,7 +1010,13 @@ function addUserToRoom(room, instigatingUser, usernameToAdd) {
         });
     })
     .spread(function (addedUser, isNewUser) {
-      return roomMembershipService.addRoomMember(room._id, addedUser._id)
+      // We need to add the last access time before adding the member to the room
+      // so that the serialized create that the user receives will contain
+      // the last access time and not be hidden in the troupe list
+      return recentRoomService.saveLastVisitedTroupeforUserId(addedUser._id, room._id, { skipFayeUpdate: true })
+        .then(function() {
+          return roomMembershipService.addRoomMember(room._id, addedUser._id);
+        })
         .then(function(wasAdded) {
           if (!wasAdded) return addedUser;
 
