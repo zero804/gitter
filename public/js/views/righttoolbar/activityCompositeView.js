@@ -129,8 +129,12 @@ module.exports = (function() {
 
   var ActivityView = Marionette.CompositeView.extend({
     template: activityTemplate,
+    className: 'gtrActivityContainer',
     childViewContainer: '#activity-list',
     childView: ActivityItemView,
+    collectionEvents: {
+      'add reset sync reset loaded loading': '_showHideHeader'
+    },
     childViewOptions: function(item) {
       if(item && item.id) {
         // This allows the chat collection view to bind to an existing element...
@@ -145,16 +149,15 @@ module.exports = (function() {
     ui: {
       header: '#activity-header'
     },
-    collectionEvents: {
-      'add reset sync reset': '_showHideHeader'
-    },
     onRender: function() {
       this._showHideHeader();
     },
     _showHideHeader: function() {
       // Admins see the header when the collection is empty
       // so that they get to
-      var headerVisible = !!(context.isTroupeAdmin() || this.collection.length);
+      var viewReloading = this.collection.length === 0 && this.collection.loading;
+      this.$el.toggleClass('loading', viewReloading);
+      var headerVisible =  !context.inOneToOneTroupeContext() && !!(context.isTroupeAdmin() || this.collection.length);
       this.ui.header.toggle(headerVisible);
     },
     _renderTemplate: function() {

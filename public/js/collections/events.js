@@ -48,7 +48,7 @@ var EventCollection = LiveCollection.extend({
   },
   modelName: 'event',
   urlTemplate: '/v1/rooms/:troupeId/events',
-  contextModel: context.contextModel,
+  contextModel: context.delayedContextModel(2000),
   comparator: function(e1, e2) {
     var s1 = e1.get('sent');
     var s2 = e2.get('sent');

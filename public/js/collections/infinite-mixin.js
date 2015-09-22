@@ -257,6 +257,11 @@ module.exports = (function() {
     },
 
     getSnapshotState: function() {
+      var extras;
+      if (this.getSnapshotExtras) {
+        extras = this.getSnapshotExtras();
+      }
+
       var initialSnapshot = context().snapshots;
       if(initialSnapshot) {
         var config = initialSnapshot[this.modelName];
@@ -269,22 +274,22 @@ module.exports = (function() {
           this.listenToOnce(this, 'snapshot', function() {
             delete initialSnapshot[this.modelName];
           });
-        }
 
-        return config;
+          return _.extend(config, extras);
+        }
       }
 
       // TODO: handle initial load
-      if(!this.length) return;
+      if(!this.length) return extras;
 
       if(this.atBottom) {
         // At the bottom is easy-ish
-        return { limit: this.length };
+        return _.extend({ limit: this.length }, extras);
       }
 
       var end = this.at(this.length - 1).get('id');
 
-      return { limit: this.length, beforeInclId: end };
+      return _.extend({ limit: this.length, beforeInclId: end }, extras);
     },
 
     setAtTop: function(value) {

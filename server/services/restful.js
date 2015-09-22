@@ -30,8 +30,7 @@ exports.serializeTroupesForUser = function(userId, callback) {
   return roomService.findAllRoomsIdsForUserIncludingMentions(userId)
     .then(function(troupeIds) {
       var strategy = new restSerializer.TroupeIdStrategy({
-        currentUserId: userId,
-        // mapUsers: false
+        currentUserId: userId
       });
 
       return restSerializer.serializeExcludeNulls(troupeIds, strategy);
@@ -55,7 +54,8 @@ exports.serializeChatsForTroupe = function(troupeId, userId, options, callback) 
         initialId: initialId,
         currentUserId: userId,
         troupeId: troupeId,
-        unread: options.unread
+        unread: options.unread,
+        lean: options.lean
       });
 
       return restSerializer.serializeExcludeNulls(chatMessages, strategy);

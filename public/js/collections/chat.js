@@ -28,7 +28,6 @@ var ChatModel = Backbone.Model.extend({
 
   },
 
-
   triggerSynced: function() {
     this.trigger('syncStatusChange', 'synced');
   },
@@ -120,9 +119,15 @@ var ChatCollection = LiveCollection.extend({
     this.listenTo(context.troupe(), 'change:id', function(){
       this.setAtTop(false);
     });
-
   },
 
+  getQuery: function() {
+    return { lean: true };
+  },
+
+  getSnapshotExtras: function() {
+    return { lean: true };
+  },
 
   parse: function (collection) {
     return burstCalculator.parse(collection);

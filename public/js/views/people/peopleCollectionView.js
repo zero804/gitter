@@ -11,7 +11,6 @@ var PeopleCollectionView = Marionette.CollectionView.extend({
   tagName: 'ul',
   className: 'roster',
   childView: AvatarView,
-
   childViewOptions: function(item) {
     var options = {
       tagName: 'li',
@@ -63,7 +62,10 @@ var ExpandableRosterView = Marionette.LayoutView.extend({
 
   initRosterRegion: function(optionsForRegion) {
     return new PeopleCollectionView(optionsForRegion({
-      collection: this.options.rosterCollection
+      collection: this.options.rosterCollection,
+      filter: function(child, index) { // jshint unused:true
+        return index < 25; // Only show the first 25 users
+      }
     }));
   },
 
@@ -88,5 +90,3 @@ module.exports = {
   ExpandableRosterView: ExpandableRosterView,
   Modal: AllUsersModal
 };
-
-
