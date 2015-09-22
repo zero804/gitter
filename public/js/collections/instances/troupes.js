@@ -1,7 +1,6 @@
 'use strict';
-/* jshint unused:true, browser:true */
+
 var Backbone = require('backbone');
-var context = require('utils/context');
 var roomSort = require('gitter-realtime-client').sortsFilters.model;
 var troupeModels = require('../troupes');
 var orgModels = require('../orgs');
