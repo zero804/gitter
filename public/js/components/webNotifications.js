@@ -5,7 +5,6 @@ var template = require('./tmpl/notification.hbs');
 var appEvents = require('../utils/appevents');
 var urlParser = require('../utils/url-parser');
 var linkHandler = require('./link-handler');
-var notifications = require('./notifications');
 
 require('./notify');
 
@@ -14,8 +13,6 @@ module.exports = (function() {
   var $notifyEl = $('<div id="notification-center" class="notification-center"></div>').appendTo('body');
 
   appEvents.on('user_notification', function(message) {
-    if (notifications.hasBeenGranted()) return;
-
     if (message.troupeId && message.troupeId === context.getTroupeId()) {
       return;
     }
