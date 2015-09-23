@@ -60,6 +60,15 @@ onready(function() {
     return contentFrame.contentWindow.location;
   }
 
+  function focusFrame() {
+    var f = document.querySelector('#content-frame');
+    try {
+      f.focus();
+    } catch(e) {
+      console.error(e);
+    }
+  }
+
   var roomSwitcher = new SPARoomSwitcher(troupeCollections.troupes, context.env('basePath'), getContentFrameLocation);
   roomSwitcher.on('replace', function(href) {
     debug('Room switch: replace %s', href);
@@ -72,6 +81,7 @@ onready(function() {
      */
     RAF(function() {
       getContentFrameLocation().replace(href);
+      focusFrame();
     });
   });
 
@@ -80,6 +90,7 @@ onready(function() {
     context.setTroupeId(undefined); // TODO: update the title....
     RAF(function() {
       getContentFrameLocation().reload(true);
+      focusFrame();
     });
   });
 
@@ -94,6 +105,7 @@ onready(function() {
       newTroupe: troupe,
       permalinkChatId: permalinkChatId
     });
+    focusFrame();
   });
 
   function pushState(state, title, url) {
