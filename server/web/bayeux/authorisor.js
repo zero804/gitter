@@ -13,6 +13,7 @@ var bayeuxExtension   = require('./extension');
 var Q                 = require('q');
 var userCanAccessRoom = require('../../services/user-can-access-room');
 var debug             = require('debug')('gitter:bayeux-authorisor');
+var recentRoomService = require('../../services/recent-room-service');
 
 var survivalMode = !!process.env.SURVIVAL_MODE || false;
 
@@ -72,8 +73,14 @@ function validateUserForSubTroupeSubscription(options) {
       if (!access) return access;
 
       return presenceService.socketReassociated(options.clientId, userId, troupeId, !!ext.reassociate.eyeballs)
+        .then(function() {
+          // Update the lastAccessTime for the room
+          if(userId) {
+            return recentRoomService.saveLastVisitedTroupeforUserId(userId, troupeId);
+          }
+        })
         .catch(function(err) {
-          logger.error('Unable to reassociate connection: ', { exception: err, userId: userId, troupeId: troupeId });
+          logger.error('Unable to reassociate connection or update last access: ', { exception: err, userId: userId, troupeId: troupeId });
         })
         .return(access);
     });

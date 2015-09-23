@@ -197,6 +197,7 @@ function saveUserTroupeLastAccess(userId, troupeId, lastAccessTime) {
  * Returns a promise of nothing
  */
 function saveLastVisitedTroupeforUserId(userId, troupeId, options) {
+  debug('saveLastVisitedTroupeforUserId: userId=%s, troupeId=%s, options=%j', userId, troupeId, options);
   var lastAccessTime = options && options.lastAccessTime || new Date();
 
   return Q.all([
