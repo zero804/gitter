@@ -1,17 +1,17 @@
 "use strict";
 var appEvents = require('utils/appevents');
 var cdn = require('../utils/cdn');
-var Notification = window.Notification;
+var WindowNotification = window.Notification;
 var webkitNotifications = window.webkitNotifications;
 var urlParser = require('../utils/url-parser');
 var linkHandler = require('./link-handler');
 
 function getPermissionType() {
-  if(!Notification) return;
+  if(!WindowNotification) return;
 
   // Notification.permission undefined in chrome 31 and earlier
-  if(Notification.permission) {
-    return Notification.permission;
+  if(WindowNotification.permission) {
+    return WindowNotification.permission;
   } else {
     switch(webkitNotifications.checkPermission()) {
       case 0: return "granted";
@@ -27,7 +27,7 @@ function showNotification(message) {
   var text = message.text;
   var icon = cdn('images/icon-logo-red-64.png');
 
-  var notification = new Notification(title, { body: text, icon: icon });
+  var notification = new WindowNotification(title, { body: text, icon: icon });
 
   notification.onshow = function() {
     setTimeout(function() {
@@ -59,7 +59,7 @@ module.exports = {
   },
 
   enable: function() {
-    if(!Notification) return;
+    if(!WindowNotification) return;
 
     if(getPermissionType() === 'granted') {
       // no need to request permission
@@ -67,7 +67,7 @@ module.exports = {
         showNotification(message);
       });
     } else {
-      Notification.requestPermission(function() {
+      WindowNotification.requestPermission(function() {
         appEvents.on('user_notification', function(message) {
           showNotification(message);
         });
