@@ -67,7 +67,10 @@ function userCanAccessRoom(userId, troupeId, callback) {
     .then(function(troupe) {
       if (!troupe) return false;
       // Is the user banned from the room?
-      if (troupe.bans && troupe.bans.length) return false;
+      if (troupe.bans && troupe.bans.length) {
+        debug('User %s is banned from room %s, disallowing access', userId, troupeId);
+        return false;
+      }
 
       if(troupe.security === 'PUBLIC') {
         return true;
@@ -82,7 +85,7 @@ function userCanAccessRoom(userId, troupeId, callback) {
       return roomMembershipService.checkRoomMembership(troupeId, userId)
         .then(function(isInRoom) {
           if(!isInRoom) {
-            logger.info("Denied user " + userId + " access to troupe " + troupe.uri);
+            debug("Denied user %s access to troupe %s", userId, troupe.uri);
             return false;
           }
 
