@@ -55,14 +55,24 @@ module.exports = {
 
     if (!roomUri) throw new StatusError(400);
 
-    return roomService.findOrCreateRoom(req.user, roomUri, { ignoreCase: true, addBadge: addBadge })
+    return roomService.findOrCreateRoom(req.user, roomUri, {ignoreCase: true, addBadge: addBadge})
       .then(function (room) {
         if (!room || !room.troupe) throw new StatusError(403, 'Permission denied');
 
         var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, includeRolesForTroupe: room.troupe });
 
-        return restSerializer.serialize(room.troupe, strategy);
-      });
+        return restSerializer.serialize(room.troupe, strategy)
+        .then(function(serialized) {
+
+          serialized.extra = {
+            access: room.access,
+            didCreate: room.didCreate,
+            hookCreationFailedDueToMissingScope: room.hookCreationFailedDueToMissingScope
+          };
+
+          return serialized;
+        });
+    });
   },
 
   update: function(req) {
