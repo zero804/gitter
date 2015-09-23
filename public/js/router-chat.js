@@ -359,40 +359,5 @@ onready(function() {
   // Listen for changes to the room
   liveContext.syncRoom();
 
-  function oauthUpgradeCallback(e) {
-    if (e.data !== 'oauth_upgrade_complete') return;
-
-    window.removeEventListener('message', oauthUpgradeCallback, false);
-
-    apiClient.room.put('', { autoConfigureHooks: 1 })
-    .then(function() {
-      appEvents.trigger('user_notification', {
-        title: 'Thank You',
-        text: 'Your integrations have been setup.',
-      });
-    });
-  }
-
-  function promptForHook() {
-    appEvents.trigger('user_notification', {
-      click: function(e) {
-        e.preventDefault();
-        window.addEventListener('message', oauthUpgradeCallback, false);
-        window.open('/login/upgrade?scopes=public_repo');
-      },
-
-      title: 'Authorisation',
-      text: 'Your room has been created, but we weren\'t able ' +
-        'to integrate with the repository as we need write ' +
-        'access to your GitHub repositories. Click here to ' +
-        'give Gitter access to do this.',
-      timeout: 12000,
-    });
-  }
-
-  if (context.popEvent('hooks_require_additional_public_scope')) {
-    setTimeout(promptForHook, 1500);
-  }
-
   Backbone.history.start();
 });
