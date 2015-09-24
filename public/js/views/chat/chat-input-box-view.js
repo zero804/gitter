@@ -41,7 +41,6 @@ var ChatInputBoxView = Marionette.ItemView.extend({
 
   ui: {
     textarea: 'textarea',
-    joinRoom: '.js-join-room'
   },
 
   events: {
@@ -51,8 +50,7 @@ var ChatInputBoxView = Marionette.ItemView.extend({
     'blur textarea': 'onBlur',
     'touchend textarea': 'onTouchend',
     'textComplete:show textarea': 'onTextCompleteShow',
-    'textComplete:hide textarea': 'onTextCompleteHide',
-    'click @ui.joinRoom': 'joinRoom'
+    'textComplete:hide textarea': 'onTextCompleteHide'
   },
 
   keyboardEvents: {
@@ -70,12 +68,9 @@ var ChatInputBoxView = Marionette.ItemView.extend({
   },
 
   serializeData: function() {
-    var data = {
-      isMobile: isMobile(),
-      troupe: context.troupe().toJSON()
+    return {
+      isMobile: isMobile()
     };
-
-    return data;
   },
 
   onRender: function() {
@@ -347,18 +342,7 @@ var ChatInputBoxView = Marionette.ItemView.extend({
 
   onDestroy: function() {
     this.removeTextareaExtensions();
-  },
-
-  joinRoom: function(e) {
-    if (e) e.preventDefault();
-
-    apiClient.post('/v1/rooms/' + context.getTroupeId() + '/users', {username: context().user.username})
-    .then(function(res) {
-      //location.reload();
-      context.troupe().set('roomMember', true);
-    });
   }
-
 });
 
 cocktail.mixin(ChatInputBoxView, KeyboardEventsMixin);
