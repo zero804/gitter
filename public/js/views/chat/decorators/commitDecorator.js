@@ -8,18 +8,19 @@ var template = require('./tmpl/commitPopover.hbs');
 var titleTemplate = require('./tmpl/commitPopoverTitle.hbs');
 var footerTemplate = require('./tmpl/commitPopoverFooter.hbs');
 var moment = require('moment');
+var Marionette = require('backbone.marionette');
 
 module.exports = (function() {
 
-
   var MAX_PATH_LENGTH = 40;
 
-  var BodyView = Backbone.View.extend({
+  var BodyView = Marionette.ItemView.extend({
     className: 'commit-popover-body',
-    initialize: function() {
-      this.listenTo(this.model, 'change', this.render);
+    template: template,
+    modelEvents: {
+      change: 'render'
     },
-    render: function() {
+    serializeData: function() {
       var data = this.model.toJSON();
 
       if(data.author) {
@@ -49,35 +50,31 @@ module.exports = (function() {
         }
       }
 
-      this.$el.html(template(data));
-      return this;
+      return data;
     }
   });
 
-  var TitleView = Backbone.View.extend({
+  var TitleView = Marionette.ItemView.extend({
     className: 'commit-popover-title',
-    initialize: function() {
-      this.listenTo(this.model, 'change', this.render);
+    modelEvents: {
+      change: 'render'
     },
-    render: function() {
+    template: titleTemplate,
+    serializeData: function() {
       var data = this.model.toJSON();
       data.shortSha = data.sha.substring(0,7);
-      this.$el.html(titleTemplate(data));
-      return this;
+      return data;
     }
   });
 
-  var FooterView = Backbone.View.extend({
+  var FooterView = Marionette.ItemView.extend({
     className: 'commit-popover-footer',
-    initialize: function() {
-      this.listenTo(this.model, 'change', this.render);
+    template: footerTemplate,
+    modelEvents: {
+      change: 'render'
     },
     events: {
       'click button.mention': 'onMentionClick'
-    },
-    render: function() {
-      this.$el.html(footerTemplate(this.model.toJSON()));
-      return this;
     },
     onMentionClick: function() {
       var mentionText = this.model.get('repo')+'@'+this.model.get('sha').substring(0,7);

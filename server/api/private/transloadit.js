@@ -46,8 +46,12 @@ module.exports = function (req, res, next) {
       return next(new Error('Transloadit json parse error: ' + e.message));
     }
 
-    if (!transloadit || transloadit.ok !== 'ASSEMBLY_COMPLETED') {
-      return next(new Error('Transload did not return ASSEMBLY_COMPLETED.'));
+    if (!transloadit) {
+      return next(new Error('Failed to parse transloadit response'));
+    }
+
+    if (transloadit.ok !== 'ASSEMBLY_COMPLETED') {
+      return next(new Error('Transload did not return ASSEMBLY_COMPLETED: ok=' + transloadit.ok + ', error=' + transloadit.error + ', message=' + transloadit.message));
     }
 
     troupeService.findByIdLeanWithAccess(metadata.room_id, metadata.user_id)
@@ -100,7 +104,10 @@ module.exports = function (req, res, next) {
       .then(function () {
         res.sendStatus(200);
       })
-      .catch(next);
+      .catch(function(err) {
+        stats.event('transloadit.failure');
+        next(err);
+      });
   });
 
 };
