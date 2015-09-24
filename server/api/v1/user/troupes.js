@@ -17,6 +17,21 @@ module.exports = {
     return restful.serializeTroupesForUser(req.resourceUser.id);
   },
 
+  // Join a room
+  create: function(req) {
+    if(!req.user) throw new StatusError(401);
+
+    var troupeId = req.body && req.body.id && "" + req.body.id;
+    if(!troupeId || !mongoUtils.isLikeObjectId(troupeId)) throw new StatusError(400);
+
+    return roomService.joinRoom(troupeId, req.user)
+      .then(function() {
+        var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: req.user.id });
+
+        return restSerializer.serialize(troupeId, strategy);
+      });
+  },
+
   update: function(req) {
     var userId = req.user.id;
     var troupeId = req.params.userTroupeId;

@@ -1,5 +1,6 @@
 "use strict";
 
+var context = require('utils/context');
 var Marionette = require('backbone.marionette');
 var modalRegion = require('components/modal-region');
 var ChatContainerView = require('views/chat/chatContainerView');
@@ -63,6 +64,7 @@ module.exports = Marionette.LayoutView.extend({
   initInputRegion: function(optionsForRegion) {
     return new ChatInputView(optionsForRegion({
       compactView: true,
+      model: context.troupe(),
       collection: this.options.chatCollection,
     }));
   },

@@ -1,5 +1,6 @@
 "use strict";
 
+var context = require('utils/context');
 var appEvents = require('utils/appevents');
 var ChatInputView = require('views/chat/chatInputView');
 var itemCollections = require('collections/instances/integrated-items');
@@ -63,6 +64,7 @@ var ChatToolbarInputLayout = ChatToolbarLayout.extend({
 
   initInputRegion: function(optionsForRegion) {
     return new ChatInputView(optionsForRegion({
+      model: context.troupe(),
       collection: itemCollections.chats
     }, {rerender: true}));
   },
