@@ -1,87 +1,77 @@
 "use strict";
 var appEvents = require('utils/appevents');
 var cdn = require('../utils/cdn');
+var WindowNotification = window.Notification;
+var webkitNotifications = window.webkitNotifications;
+var urlParser = require('../utils/url-parser');
+var linkHandler = require('./link-handler');
 
-module.exports = (function() {
+function getPermissionType() {
+  if(!WindowNotification) return;
 
-
-  var Notification = window.Notification;
-  var webkitNotifications = window.webkitNotifications;
-
-  function getPermissionType() {
-    if(!Notification) return;
-
-    // Notification.permission undefined in chrome 31 and earlier
-    if(Notification.permission) {
-      return Notification.permission;
-    } else {
-      switch(webkitNotifications.checkPermission()) {
-        case 0: return "granted";
-        case 1: return "default";
-        case 2: return "denied";
-      }
+  // Notification.permission undefined in chrome 31 and earlier
+  if(WindowNotification.permission) {
+    return WindowNotification.permission;
+  } else {
+    switch(webkitNotifications.checkPermission()) {
+      case 0: return "granted";
+      case 1: return "default";
+      case 2: return "denied";
     }
   }
+}
 
-  function showNotification(message) {
-    var link = message.link;
-    var title = message.title;
-    var text = message.text;
-    var icon = cdn('images/icon-logo-red-64.png');
+function showNotification(message) {
+  var link = message.link;
+  var title = message.title;
+  var text = message.text;
+  var icon = cdn('images/icon-logo-red-64.png');
 
-    var notification = new Notification(title, { body: text, icon: icon });
+  var notification = new WindowNotification(title, { body: text, icon: icon });
 
-    notification.onshow = function() {
-      setTimeout(function() {
-        notification.close();
-      }, 10000);
-    };
+  notification.onshow = function() {
+    setTimeout(function() {
+      notification.close();
+    }, 10000);
+  };
 
-    notification.onclick = function() {
-      window.focus();
-      if(link) {
-        if(link == window.location.pathname) return;
+  notification.onclick = function() {
+    window.focus();
+    if (!link) return;
 
-        if(link.split('#')[0] == window.location.pathname) {
-          window.location.replace('#' + link.split('#',2)[1]);
-          return;
-        }
-        window.location.replace(link);
-      }
-    };
-  }
+    var parsed = urlParser.parse(link);
+    linkHandler.routeLink(parsed, { appFrame: true });
+  };
+}
 
-  return {
-    hasNotBeenSetup: function() {
-      return getPermissionType() === 'default';
-    },
 
-    hasBeenDenied: function() {
-      return getPermissionType() === 'denied';
-    },
+module.exports = {
+  hasNotBeenSetup: function() {
+    return getPermissionType() === 'default';
+  },
 
-    hasBeenGranted: function() {
-      return getPermissionType() === 'granted';
-    },
+  hasBeenDenied: function() {
+    return getPermissionType() === 'denied';
+  },
 
-    enable: function() {
-      if(!Notification) return;
+  hasBeenGranted: function() {
+    return getPermissionType() === 'granted';
+  },
 
-      if(getPermissionType() === 'granted') {
-        // no need to request permission
+  enable: function() {
+    if(!WindowNotification) return;
+
+    if(getPermissionType() === 'granted') {
+      // no need to request permission
+      appEvents.on('user_notification', function(message) {
+        showNotification(message);
+      });
+    } else {
+      WindowNotification.requestPermission(function() {
         appEvents.on('user_notification', function(message) {
           showNotification(message);
         });
-      } else {
-        Notification.requestPermission(function() {
-          appEvents.on('user_notification', function(message) {
-            showNotification(message);
-          });
-        });
-      }
+      });
     }
-  };
-
-
-})();
-
+  }
+};

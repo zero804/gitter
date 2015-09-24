@@ -105,14 +105,8 @@ onready(function() {
         //set the context troupe to new troupe
         context.setTroupe(message.newTroupe);
 
-        //FIXME JP 15/9/15 This implementation is too brittle
-        //if we have a query in the url string
-        if (/\?/.test(message.url)) {
-          //get the id out of the url sting
-          var id = message.url.split('=').pop();
-
-          //navigate to it
-          appEvents.trigger('chatCollectionView:permalinkHighlight', id);
+        if (message.permalinkChatId) {
+          appEvents.trigger('chatCollectionView:permalinkHighlight', message.permalinkChatId);
         }
 
       break;

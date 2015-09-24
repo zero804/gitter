@@ -1,48 +1,17 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var crypto  = require('crypto');
-var nconf   = require('../../utils/config');
-var nodeEnv = process.env['NODE_ENV'] || 'dev';
-var redis   = require('../../utils/redis');
-var uuid    = require('node-uuid');
+var nconf             = require('../../utils/config');
+var redis             = require('../../utils/redis');
+var uuid              = require('node-uuid');
+
+var TransloaditClient = require('transloadit');
+var transloadit       = new TransloaditClient({
+  authKey    : nconf.get('transloadit:key'),
+  authSecret : nconf.get('transloadit:secret')
+});
 
 var redisClient = redis.getClient();
-
-var utcDateString = function(time) {
-  function pad(val, len) {
-    val = String(val);
-    len = len || 2;
-    while (val.length < len) val = "0" + val;
-    return val;
-  }
-
-  var now = new Date();
-  now.setTime(time);
-
-  var utc = new Date(
-    Date.UTC(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
-      now.getHours(),
-      now.getMinutes(),
-      now.getSeconds()
-    )
-  );
-
-  var cDate  = utc.getDate();
-  var cMonth = utc.getMonth();
-  var cYear  = utc.getFullYear();
-  var cHour  = utc.getHours();
-  var cMin   = utc.getMinutes();
-  var cSec   = utc.getSeconds();
-
-  var result = cYear + '/' + pad((cMonth + 1)) + '/' + pad(cDate);
-  result += ' ' + pad(cHour) + ':' + pad(cMin) + ':' + pad(cSec) + '+00:00';
-
-  return result;
-};
 
 function randomString(length) {
     var chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -52,15 +21,9 @@ function randomString(length) {
 }
 
 module.exports =  function(req, res) {
-
-  // 1 hours from now (this must be milliseconds)
-  var expiresIn  = 1 * 60 * 60 * 1000;
-  var expires    = utcDateString((+new Date()) + expiresIn);
   var token      = uuid.v4();
   var shortToken = randomString(4);
-
-  // Host for Transloadit callback. In dev env you'll need to use localtunnel
-  var host = (nodeEnv === 'dev') ? 'https://grwzkpxsle.localtunnel.me' : nconf.get('web:basepath');
+  var apiBasePath = nconf.get('web:apiBasePath');
 
   var templateId = nconf.get('transloadit:template_id');
   if(req.query.type === 'image') {
@@ -72,9 +35,7 @@ module.exports =  function(req, res) {
 
   var params = {
     auth: {
-      expires: expires,
-      key: nconf.get('transloadit:key'),
-      max_size: 20971520
+      max_size: 20971520 // 20MB
     },
     template_id: templateId,
     fields: {
@@ -89,16 +50,8 @@ module.exports =  function(req, res) {
         path: '${fields.room_uri}/${fields.token}/thumb/${file.url_name}'
       },
     },
-    notify_url: host + '/api/private/transloadit/' + token
+    notify_url: apiBasePath + '/private/transloadit/' + token
   };
-
-  var paramsString = JSON.stringify(params);
-
-  // Generate the signature hmac
-  var signature = crypto
-      .createHmac('sha1', nconf.get('transloadit:secret'))
-      .update(new Buffer(paramsString, 'utf-8'))
-      .digest('hex');
 
   // Store the token temporarily to verify Transloadit callback
   var expiry = 30 * 60; // 30 mins to be safe, S3 uploads, etc
@@ -109,9 +62,9 @@ module.exports =  function(req, res) {
 
   redisClient.setex('transloadit:' + token, expiry, JSON.stringify(metadata));
 
+  var signed = transloadit.calcSignature(params);
   res.send({
-    sig:    signature,
-    params: paramsString
+    sig:    signed.signature,
+    params: signed.params
   });
 };
-

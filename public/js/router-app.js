@@ -16,6 +16,8 @@ var RAF                   = require('utils/raf');
 var RoomCollectionTracker = require('components/room-collection-tracker');
 var SPARoomSwitcher       = require('components/spa-room-switcher');
 var debug                 = require('debug-proxy')('app:router-app');
+var urlParser             = require('./utils/url-parser');
+var linkHandler           = require('./components/link-handler');
 
 require('components/statsc');
 require('views/widgets/preload');
@@ -137,8 +139,12 @@ onready(function() {
   // Called from the OSX native client for faster page loads
   // when clicking on a chat notification
   window.gitterLoader = function(url) {
-    var title = url.replace(/^\//, '');
-    appEvents.trigger('navigation', url, 'chat', title);
+    if (url[0] !== '/') {
+      url = '/' + url;
+    }
+    
+    var parsed = urlParser.parse(url);
+    linkHandler.routeLink(parsed, { appFrame: true })
   };
 
   appEvents.on('navigation', function(url, type, title) {
