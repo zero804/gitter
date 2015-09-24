@@ -435,6 +435,11 @@ module.exports = (function() {
         this.chats.resetWith(masterCollection);
       });
 
+      this.listenTo(context.troupe(), 'change:id', function() {
+        masterCollection.reset();
+        this.model.set('active', false);
+      });
+
     },
 
     initRoomsRegion: function(optionsForRegion) {

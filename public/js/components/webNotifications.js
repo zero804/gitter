@@ -1,17 +1,19 @@
 "use strict";
 var $ = require('jquery');
-var context = require('utils/context');
+var context = require('../utils/context');
 var template = require('./tmpl/notification.hbs');
-var appEvents = require('utils/appevents');
+var appEvents = require('../utils/appevents');
+var urlParser = require('../utils/url-parser');
+var linkHandler = require('./link-handler');
+
 require('./notify');
 
 module.exports = (function() {
 
-
-  var notifications = $('<div id="notification-center" class="notification-center"></div>').appendTo('body');
+  var $notifyEl = $('<div id="notification-center" class="notification-center"></div>').appendTo('body');
 
   appEvents.on('user_notification', function(message) {
-    if(message.troupeId && message.troupeId === context.getTroupeId()) {
+    if (message.troupeId && message.troupeId === context.getTroupeId()) {
       return;
     }
 
@@ -26,20 +28,25 @@ module.exports = (function() {
     if(message.click) {
       $(element).on('click', message.click);
     } else if(message.link) {
-      $(element).on('click', function() {
-        window.location.href = message.link;
+      $(element).on('click', function(e) {
+        var parsed = urlParser.parse(message.link);
+
+        if (linkHandler.routeLink(parsed, { appFrame: true })) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
       });
     }
 
-    notifications.notify({
+    $notifyEl.notify({
       content: element,
       className: className
     });
   });
 
-  // websocket notifications
+  // websocket $notifyEl
   appEvents.on('app.version.mismatch', function() {
-    notifications.notify({
+    $notifyEl.notify({
       content: "A new version of the application has been deployed. Click here to reload",
       click: function() {
         window.location.reload(true);
@@ -50,7 +57,7 @@ module.exports = (function() {
 
   appEvents.on('ajaxError', function() {
 
-    notifications.notify({
+    $notifyEl.notify({
       id: 'ajax-error',
       className: 'notification-error',
       content: "We're having problems communicating with the server at the moment...."
@@ -58,9 +65,9 @@ module.exports = (function() {
 
   });
 
-  // // websocket notifications
+  // // websocket $notifyEl
   // appEvents.on('connectionFailure', function() {
-  //   notifications.notify({
+  //   $notifyEl.notify({
   //     id: 'realtime-error',
   //     className: 'notification-error',
   //     content: "Unable to establish a realtime connection with the server… Retrying",
@@ -72,7 +79,7 @@ module.exports = (function() {
   // });
 
   // appEvents.on('connectionRestored', function() {
-  //   notifications.notify({
+  //   $notifyEl.notify({
   //     id: 'realtime-error',
   //     action: 'hide'
   //   });
@@ -85,10 +92,9 @@ module.exports = (function() {
 
   return {
     notify: function(options) {
-      notifications.notify(options);
+      $notifyEl.notify(options);
     }
   };
 
 
 })();
-

@@ -1,7 +1,6 @@
 "use strict";
 
 var env                   = require('gitter-web-env');
-var logger                = env.logger;
 var redisClient           = env.redis.getClient();
 var errorReporter         = env.errorReporter;
 
@@ -55,7 +54,7 @@ function doFullAccessCheck(troupeId, userId) {
  */
 function userCanAccessRoom(userId, troupeId) {
   if(!mongoUtils.isLikeObjectId(troupeId)) return Q.resolve(null);
-  
+
   userId = mongoUtils.asObjectID(userId);
   troupeId = mongoUtils.asObjectID(troupeId);
 
@@ -75,7 +74,10 @@ function userCanAccessRoom(userId, troupeId) {
       if (!troupe) return null;
 
       // Is the user banned from the room?
-      if (troupe.bans && troupe.bans.length) return null;
+      if (troupe.bans && troupe.bans.length) {
+        debug('User %s is banned from room %s, disallowing access', userId, troupeId);
+        return null;
+      }
 
       // No user? Only allow access to public rooms
       if(!userId) {
@@ -90,7 +92,7 @@ function userCanAccessRoom(userId, troupeId) {
           }
 
           if(!isInRoom) {
-            logger.info("Denied user " + userId + " access to troupe " + troupe.uri);
+            debug("Denied user %s access to troupe %s", userId, troupe.uri);
             return null;
           }
 

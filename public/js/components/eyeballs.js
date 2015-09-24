@@ -2,7 +2,6 @@
 var context = require('utils/context');
 var apiClient = require('components/apiClient');
 var realtime = require('./realtime');
-var log = require('utils/log');
 var appEvents = require('utils/appevents');
 var _ = require('underscore');
 var debug = require('debug-proxy')('app:eyeballs');
@@ -67,6 +66,10 @@ module.exports = (function() {
       appEvents.trigger('eyeballStateChange', true);
     }
   }
+
+  appEvents.on('change:room', function() {
+    eyeballsOn();
+  });
 
   window.addEventListener('blur', function() {
     eyeballsOff();
