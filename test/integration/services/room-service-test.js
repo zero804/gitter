@@ -91,9 +91,7 @@ describe('room-service', function() {
     it('should deny access but provide public rooms #slow', function (done) {
 
       var permissionsModelMock = mockito.mockFunction();
-      // var uriLookupServiceMock = mockito.mock(testRequire('./services/uri-lookup-service'));
       var uriResolver = mockito.mockFunction();
-      var troupeServiceMock = mockito.mock(testRequire('./services/troupe-service'));
 
       var roomService = testRequire.withProxies('./services/room-service', {
         './uri-resolver': uriResolver,
@@ -1870,6 +1868,212 @@ describe('room-service', function() {
       runWithValues(['1','2','3'], ['2','3','4'], ['1','2','3', '4'], ['4'], done);
     });
 
+
+  });
+
+  describe('joinRoom', function() {
+    describe('unit tests', function() {
+      var roomService;
+      var troupeServiceFindById;
+      var roomPermissionsModel;
+      var assertMemberLimit;
+      var recentRoomServiceSaveLastVisitedTroupeforUserId;
+      var roomMembershipServiceAddRoomMember;
+      var troupe;
+      var access;
+      var limitReached;
+      var user;
+      var userId;
+      var troupeId;
+
+      beforeEach(function() {
+        userId = 'userId1';
+        troupeId = 'troupeId1';
+        user = {
+          id: userId,
+          _id: userId
+        };
+        troupe = {
+          id: troupeId,
+          _id: troupeId
+        };
+
+        troupeServiceFindById = mockito.mockFunction();
+        roomPermissionsModel = mockito.mockFunction();
+        assertMemberLimit = mockito.mockFunction();
+        recentRoomServiceSaveLastVisitedTroupeforUserId = mockito.mockFunction();
+        roomMembershipServiceAddRoomMember = mockito.mockFunction();
+
+        mockito.when(troupeServiceFindById)().then(function(pTroupeId) {
+          assert.strictEqual(pTroupeId, troupeId);
+          return Q.resolve(troupe);
+        });
+
+        mockito.when(roomPermissionsModel)().then(function(pUser, pPerm, pRoom) {
+          assert.strictEqual(pUser, user);
+          assert.strictEqual(pPerm, 'join');
+          assert.strictEqual(pRoom, troupe);
+          return Q.resolve(access);
+        });
+
+        mockito.when(assertMemberLimit)().then(function(pRoom, pUser) {
+          assert.strictEqual(pUser, user);
+          assert.strictEqual(pRoom, troupe);
+          if (limitReached) return Q.reject(new Error());
+          return Q.resolve();
+        });
+
+        mockito.when(recentRoomServiceSaveLastVisitedTroupeforUserId)().then(function(pUserId, pRoomId, pOptions) {
+          assert.strictEqual(pUserId, userId);
+          assert.strictEqual(pRoomId, troupeId);
+          assert.deepEqual(pOptions, { skipFayeUpdate: true });
+          return Q.resolve();
+        });
+
+        mockito.when(roomMembershipServiceAddRoomMember)().then(function(pRoomId, pUserId) {
+          assert.strictEqual(pUserId, userId);
+          assert.strictEqual(pRoomId, troupeId);
+          return Q.resolve();
+        });
+
+        roomService = testRequire.withProxies('./services/room-service', {
+          './troupe-service': {
+            findById: troupeServiceFindById
+          },
+          './room-membership-service': {
+            addRoomMember: roomMembershipServiceAddRoomMember
+          },
+          './assert-member-limit': assertMemberLimit,
+          './recent-room-service': {
+            saveLastVisitedTroupeforUserId: recentRoomServiceSaveLastVisitedTroupeforUserId
+          },
+          './room-permissions-model': roomPermissionsModel
+        });
+      })
+
+      it('should allow a user to join a room when they have permission', function(done) {
+        access = true;
+        limitReached = false;
+        roomService.joinRoom(troupeId, user)
+          .then(function() {
+            mockito.verify(troupeServiceFindById, once)();
+            mockito.verify(roomPermissionsModel, once)();
+            mockito.verify(assertMemberLimit, once)();
+            mockito.verify(recentRoomServiceSaveLastVisitedTroupeforUserId, once)();
+            mockito.verify(roomMembershipServiceAddRoomMember, once)();
+          })
+          .nodeify(done);
+      });
+
+      it('should deny a user join room when they don\'t have permission', function(done) {
+        access = false;
+        limitReached = false;
+
+        roomService.joinRoom(troupeId, user)
+          .then(function() {
+            assert.ok(false, 'Expected an exception');
+          }, function(err) {
+            assert.strictEqual(err.status, 403);
+          })
+          .then(function() {
+            mockito.verify(troupeServiceFindById, once)();
+            mockito.verify(roomPermissionsModel, once)();
+          })
+          .nodeify(done);
+      });
+
+      it('should deny a user join room there are too many people in the room', function(done) {
+        access = true;
+        limitReached = true;
+
+        roomService.joinRoom(troupeId, user)
+          .then(function() {
+            assert.ok(false, 'Expected an exception');
+          }, function() {
+            // Swallow the error
+          })
+          .then(function() {
+            mockito.verify(troupeServiceFindById, once)();
+            mockito.verify(roomPermissionsModel, once)();
+            mockito.verify(assertMemberLimit, once)();
+          })
+          .nodeify(done);
+      });
+    });
+
+    describe('integration tests #slow', function() {
+      var fixture = {};
+      var roomService;
+      var roomPermissionsModel;
+      var assertMemberLimit;
+      var access;
+      var roomMembershipService;
+
+      before(fixtureLoader(fixture, {
+        troupeOrg1: {
+          githubType: 'ORG',
+          users: []
+        },
+        user1: {}
+      }));
+
+      after(function() {
+        fixture.cleanup();
+      });
+
+      beforeEach(function() {
+        roomMembershipService = testRequire('./services/room-membership-service');
+        roomPermissionsModel = mockito.mockFunction();
+        assertMemberLimit = mockito.mockFunction();
+
+        mockito.when(roomPermissionsModel)().then(function(pUser, pPerm, pRoom) {
+          assert.strictEqual(pUser, fixture.user1);
+          assert.strictEqual(pPerm, 'join');
+          assert.strictEqual(pRoom.id, fixture.troupeOrg1.id);
+          return Q.resolve(access);
+        });
+
+
+        roomService = testRequire.withProxies('./services/room-service', {
+          './room-permissions-model': roomPermissionsModel
+        });
+      });
+
+
+      it('should add a member to the room', function(done) {
+        access = true;
+
+        roomService.joinRoom(fixture.troupeOrg1.id, fixture.user1)
+          .then(function() {
+            return roomMembershipService.checkRoomMembership(fixture.troupeOrg1.id, fixture.user1.id);
+          })
+          .then(function(isMember) {
+            assert.strictEqual(isMember,true);
+          })
+          .nodeify(done);
+      });
+
+      it('should be idempotent', function(done) {
+        access = true;
+
+        roomService.joinRoom(fixture.troupeOrg1.id, fixture.user1)
+          .then(function() {
+            return roomMembershipService.checkRoomMembership(fixture.troupeOrg1.id, fixture.user1.id);
+          })
+          .then(function(isMember) {
+            assert.strictEqual(isMember,true);
+            return roomService.joinRoom(fixture.troupeOrg1.id, fixture.user1);
+          })
+          .then(function() {
+            return roomMembershipService.checkRoomMembership(fixture.troupeOrg1.id, fixture.user1.id);
+          })
+          .then(function(isMember) {
+            assert.strictEqual(isMember,true);
+          })
+          .nodeify(done);
+      });
+
+    });
 
   });
 
