@@ -143,7 +143,7 @@ onready(function() {
     if (url[0] !== '/') {
       url = '/' + url;
     }
-    
+
     var parsed = urlParser.parse(url);
     linkHandler.routeLink(parsed, { appFrame: true })
   };
@@ -291,6 +291,12 @@ onready(function() {
       type: 'focus',
       focus: 'out',
       event: event,
+    });
+  });
+
+  appEvents.on('about.to.leave.current.room', function() {
+    postMessage({
+      type: 'about.to.leave.current.room'
     });
   });
 

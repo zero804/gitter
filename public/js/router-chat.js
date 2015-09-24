@@ -98,7 +98,6 @@ onready(function() {
       break;
 
       case 'change:room':
-
         //destroy any modal views
         appView.dialogRegion.destroy();
 
@@ -108,6 +107,10 @@ onready(function() {
         if (message.permalinkChatId) {
           appEvents.trigger('chatCollectionView:permalinkHighlight', message.permalinkChatId);
         }
+      break;
+
+      case 'about.to.leave.current.room':
+        context.troupe().set('aboutToLeave', true);
 
       break;
     }
