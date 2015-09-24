@@ -8,7 +8,7 @@ var RealtimeClient = require('gitter-realtime-client').RealtimeClient;
 var debug = require('debug-proxy')('app:realtime');
 
 function isMobile() {
-  return navigator.userAgent.indexOf('Mobile/') >= 0;
+  return navigator.userAgent.toLowerCase().indexOf('mobile') >= 0;
 }
 
 var eyeballState = true;
