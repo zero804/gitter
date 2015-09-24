@@ -566,7 +566,6 @@ module.exports = (function() {
     },
 
     syncCollections: function(collections) {
-      console.log('syncing collections');
       var unreadItemStore = getUnreadItemStoreReq();
       new CollectionSync(unreadItemStore, collections.chat);
 
