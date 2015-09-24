@@ -62,7 +62,9 @@ var ChatInputView = Marionette.LayoutView.extend({
         collection: this.collection
       }));
     } else {
-      this.chatInputBox.show(new JoinRoomView({ }));
+      if (!this.model.get('aboutToLeave')) {
+        this.chatInputBox.show(new JoinRoomView({ }));
+      }
     }
   },
 
