@@ -11,10 +11,10 @@ function routeLink(target, options) {
   var internalLink = targetOrigin === context.env('basePath');
 
   var location = window.location;
-
+  var appFrame = options && options.appFrame;
   // If the only difference between the current URL and the clicked URL is the hash
   // then force a window.location update so that Backbone.Router can take care of it
-  if (options && !options.appFrame) {
+  if (!appFrame) {
     if (location.scheme === target.scheme &&
         location.host === target.host &&
         location.pathname === target.pathname &&
