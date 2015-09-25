@@ -5,7 +5,7 @@ module.exports = (function() {
   return function trim(name, maxLength) {
     maxLength = maxLength || 25; // defaults to 25
 
-    if (name.length < maxLength) return name; // avoid computing
+    if (!name || (name.length < maxLength)) return name; // avoid computing
 
     var parts = name.split('/'); // break it down
 
