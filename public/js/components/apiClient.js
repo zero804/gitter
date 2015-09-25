@@ -50,9 +50,9 @@
 var $ = require('jquery');
 var context = require('utils/context');
 var appEvents = require('utils/appevents');
+var debug = require('debug-proxy')('app:api-client');
 
 module.exports = (function() {
-
 
   /* @const */
   var DEFAULT_TIMEOUT = 60 * 1000;
@@ -144,7 +144,7 @@ module.exports = (function() {
     return accessTokenDeferred()
       .then(function(accessToken) {
         var fullUrl = fullUrlFunction(baseUrlFunction, url);
-
+        debug('%s: %s', method, fullUrl);
         var deferred = $.ajax({
           url: fullUrl,
           contentType: options.contentType,
