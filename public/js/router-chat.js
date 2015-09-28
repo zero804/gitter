@@ -204,7 +204,7 @@ onready(function() {
     });
   });
 
-  var appView = new ChatToolbarInputLayout({ template: false, el: 'body', chatCollection: itemCollections.chats });
+  var appView = new ChatToolbarInputLayout({ model: context.troupe(), template: false, el: 'body', chatCollection: itemCollections.chats });
   appView.render();
 
   /* Drag and drop */

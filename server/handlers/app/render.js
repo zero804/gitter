@@ -334,9 +334,7 @@ function renderChat(req, res, options, next) {
             integrationsUrl: integrationsUrl,
             isMobile: options.isMobile,
             ownerIsOrg: ownerIsOrg,
-            troupe: {
-              roomMember: req.uriContext.roomMember
-            }
+            roomMember: req.uriContext.roomMember
           }, troupeContext && {
             troupeTopic: troupeContext.troupe.topic,
             premium: troupeContext.troupe.premium,
