@@ -8,6 +8,7 @@ var onready = require('./utils/onready');
 var appEvents = require('utils/appevents');
 var getTimezoneInfo = require('utils/detect-timezone');
 
+require('components/timezone-cookie');
 require('views/widgets/preload');
 require('filtered-collection');
 require('components/dozy');
@@ -103,13 +104,13 @@ onready(function() {
       var dd = date.getDate();
       if(dd < 10) dd = "0" + dd;
 
-      window.location.assign('/' + context.troupe().get('uri') + '/archives/' + yyyy + '/' + mm + '/' + dd + '?tz=' + tz);
+      window.location.assign('/' + context.troupe().get('uri') + '/archives/' + yyyy + '/' + mm + '/' + dd);
     },
     onComplete: function() {
       mangleHeatmap();
     }
   });
-  apiClient.priv.get('/chat-heatmap/' + troupeId + '?tz='+tz)
+  apiClient.priv.get('/chat-heatmap/' + troupeId, { tz: tz })
     .then(function(heatmapData) {
       cal.update(heatmapData);
       mangleHeatmap();
@@ -122,4 +123,3 @@ onready(function() {
 
 
 });
-
