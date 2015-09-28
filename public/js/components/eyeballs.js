@@ -46,6 +46,7 @@ module.exports = (function() {
     if(eyesOnState)  {
       stopInactivityPoller();
 
+      debug('Eyeballs off');
       eyesOnState = false;
       send(0, synchronous);
 
@@ -60,6 +61,7 @@ module.exports = (function() {
     if(!eyesOnState)  {
       startInactivityPoller();
 
+      debug('Eyeballs on');
       eyesOnState = true;
       send(1);
 
