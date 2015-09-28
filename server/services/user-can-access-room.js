@@ -91,10 +91,10 @@ function userCanAccessRoom(userId, troupeId) {
             return isInRoom ? 'member' : 'view';
           }
 
-          if(!isInRoom) {
-            debug("Denied user %s access to troupe %s", userId, troupe.uri);
-            return null;
-          }
+          //if(!isInRoom) {
+          //  debug("Denied user %s access to troupe %s", userId, troupe.uri);
+          //  return null;
+          //}
 
           var isChannel = troupe.githubType === 'ORG_CHANNEL' ||
             troupe.githubType === 'REPO_CHANNEL' ||
