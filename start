@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# This may be set for node debug, but those
+# values will break python scripts
+export DEBUG=
+
 set -e
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
