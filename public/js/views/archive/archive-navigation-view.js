@@ -72,7 +72,6 @@ module.exports = (function() {
       var endIso = end.toISOString()
       var troupeId = context.getTroupeId();
       var tz = getTimezoneInfo().iso;
-      var heatmapURL = '/chat-heatmap/' + troupeId + '?start=' + startIso + '&end='+ endIso + '&tz=' + tz;
 
       function mangleHeatmap() {
         var $rects = $('.graph-rect').not('.q1,.q2,.q3,.q4,.q5');
@@ -105,13 +104,13 @@ module.exports = (function() {
           var dd = date.getDate();
           if(dd < 10) dd = "0" + dd;
 
-          window.location.assign('/' + context.troupe().get('uri') + '/archives/' + yyyy + '/' + mm + '/' + dd + '?tz=' + tz);
+          window.location.assign('/' + context.troupe().get('uri') + '/archives/' + yyyy + '/' + mm + '/' + dd);
         },
         onComplete: function() {
           mangleHeatmap();
         }
       });
-      apiClient.priv.get(heatmapURL)
+      apiClient.priv.get('/chat-heatmap/' + troupeId, { start: startIso, end: endIso, tz: tz })
         .then(function(heatmapData) {
           cal.update(heatmapData);
           mangleHeatmap();
