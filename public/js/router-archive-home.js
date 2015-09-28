@@ -6,7 +6,9 @@ var apiClient = require('components/apiClient');
 var CalHeatMap = require('cal-heatmap');
 var onready = require('./utils/onready');
 var appEvents = require('utils/appevents');
+var getTimezoneInfo = require('utils/detect-timezone');
 
+require('components/timezone-cookie');
 require('views/widgets/preload');
 require('filtered-collection');
 require('components/dozy');
@@ -14,7 +16,6 @@ require('template/helpers/all');
 require('components/bug-reporting');
 require('utils/tracking');
 require('components/ping');
-
 
 onready(function() {
 
@@ -52,14 +53,21 @@ onready(function() {
   new HeaderView({ model: context.troupe(), el: '#header' });
 
   var troupeId = context.getTroupeId();
-
-
-  var cal = new CalHeatMap();
-
   var today = new Date();
   var elevenFullMonthsAgo = new Date(today.getFullYear(), today.getMonth() - 11, 1);
   var gitterLaunchDate = new Date(2013, 10, 1); // 1 November 2013
 
+  var tz = getTimezoneInfo().iso;
+
+  function mangleHeatmap() {
+    var $rects = $('.graph-rect').not('.q1,.q2,.q3,.q4,.q5');
+    $rects.each(function(i, el) {
+      el.classList.remove('hover_cursor');
+      el.classList.add('empty');
+    });
+  }
+
+  var cal = new CalHeatMap();
   cal.init({
     start: elevenFullMonthsAgo, // eleven months + this partial month = 12 blocks shown
     maxDate: today,
@@ -69,7 +77,23 @@ onready(function() {
     subDomain: "day",
     considerMissingDataAsZero: false,
     displayLegend: false,
-    data: apiClient.priv.url('/chat-heatmap/' + troupeId),
+    data: {},
+    previousSelector: '.previous-domain',
+    nextSelector: '.next-domain',
+    onMinDomainReached: function(reached) {
+      if (reached) {
+        $('.previous-domain').addClass('disabled');
+      } else {
+        $('.previous-domain').removeClass('disabled');
+      }
+    },
+    onMaxDomainReached: function(reached) {
+      if (reached) {
+        $('.next-domain').addClass('disabled');
+      } else {
+        $('.next-domain').removeClass('disabled');
+      }
+    },
     onClick: function(date, value) {
       if(!value) return;
 
@@ -81,8 +105,17 @@ onready(function() {
       if(dd < 10) dd = "0" + dd;
 
       window.location.assign('/' + context.troupe().get('uri') + '/archives/' + yyyy + '/' + mm + '/' + dd);
+    },
+    onComplete: function() {
+      mangleHeatmap();
     }
   });
+  apiClient.priv.get('/chat-heatmap/' + troupeId, { tz: tz })
+    .then(function(heatmapData) {
+      cal.update(heatmapData);
+      mangleHeatmap();
+      setTimeout(mangleHeatmap, 0);
+    });
 
   // new Router();
 
@@ -90,4 +123,3 @@ onready(function() {
 
 
 });
-

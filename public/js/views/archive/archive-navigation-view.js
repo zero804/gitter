@@ -1,11 +1,14 @@
 'use strict';
 
+var _ = require('underscore');
+var $ = require('jquery');
 var Marionette = require('backbone.marionette');
 var moment = require('moment');
 var context = require('utils/context');
 var apiClient = require('components/apiClient');
 var template = require('./tmpl/archive-navigation-view.hbs');
 var CalHeatMap = require('cal-heatmap');
+var getTimezoneInfo = require('utils/detect-timezone');
 
 module.exports = (function() {
 
@@ -47,19 +50,36 @@ module.exports = (function() {
     },
 
     onRender: function() {
-      var a = this.options.archiveDate && moment(this.options.archiveDate).utc();
-      var v = a.diff(new Date());
-      var range = 3;
-      if(moment.duration(v).asMonths() < 1) {
-        range = 3;
-      }
-
-      var start = moment(a).subtract(1, 'months');
-      var troupeId = context.getTroupeId();
-
+      var a = moment(this.options.archiveDate).utc();
       // Get the date **in the local timezone** so that the highlighted
       // date does not display incorrectly for west-of-the-meridian locations
       var highlightDate = new Date(a.year(), a.month(), a.date());
+
+      var range = 3;
+
+      // if the first day of the next month is in the future, subtract one from range
+      var next = moment(new Date(a.year(), a.month(), 1)).add(1, 'months');
+      if (next > moment()) {
+        range = 2;
+      }
+
+      // start and end is only for elasticsearch, so fine if it is outside of
+      // the range we're going to display. In fact we deliberately add a day on
+      // each end just in case for timezones
+      var start = moment(a).subtract(32, 'days');
+      var end = moment(a).add(32, 'days');
+      var startIso = start.toISOString()
+      var endIso = end.toISOString()
+      var troupeId = context.getTroupeId();
+      var tz = getTimezoneInfo().iso;
+
+      function mangleHeatmap() {
+        var $rects = $('.graph-rect').not('.q1,.q2,.q3,.q4,.q5');
+        $rects.each(function(i, el) {
+          el.classList.remove('hover_cursor');
+          el.classList.add('empty');
+        });
+      }
 
       var cal = new CalHeatMap();
       cal.init({
@@ -74,7 +94,7 @@ module.exports = (function() {
         verticalOrientation: false,
         considerMissingDataAsZero: false,
         displayLegend: false,
-        data: apiClient.priv.url('/chat-heatmap/' + troupeId + '?start={{d:start}}&end={{d:end}}'),
+        data: {},
         onClick: function(date, value) {
           if(!value) return;
           var yyyy = date.getFullYear();
@@ -85,8 +105,17 @@ module.exports = (function() {
           if(dd < 10) dd = "0" + dd;
 
           window.location.assign('/' + context.troupe().get('uri') + '/archives/' + yyyy + '/' + mm + '/' + dd);
+        },
+        onComplete: function() {
+          mangleHeatmap();
         }
       });
+      apiClient.priv.get('/chat-heatmap/' + troupeId, { start: startIso, end: endIso, tz: tz })
+        .then(function(heatmapData) {
+          cal.update(heatmapData);
+          mangleHeatmap();
+          setTimeout(mangleHeatmap, 0);
+        });
     }
   });
 

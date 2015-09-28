@@ -13,6 +13,9 @@ var burstCalculator      = require('../../utils/burst-calculator');
 var roomPermissionsModel = require('../../services/room-permissions-model');
 var timezoneMiddleware   = require('../../web/middlewares/timezone');
 var identifyRoute        = require('gitter-web-env').middlewares.identifyRoute;
+var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
+var dateTZtoUTC          = require('gitter-web-shared/time/date-timezone-to-utc');
+var debug                = require('debug')('gitter:app-archive');
 
 exports.datesList = [
   identifyRoute('app-archive-main'),
@@ -31,7 +34,7 @@ exports.datesList = [
         }
 
         var roomUrl = '/api/v1/rooms/' + troupe.id;
-        var avatarUrl = "https://avatars.githubusercontent.com/" + troupe.uri.split('/')[0];
+        var avatarUrl = resolveRoomAvatarUrl(troupe.uri);
         var isPrivate = troupe.security !== "PUBLIC";
 
         return roomPermissionsModel(user, 'admin', troupe)
@@ -78,6 +81,7 @@ exports.chatArchive = [
 
     return roomService.validateRoomForReadOnlyAccess(user, troupe)
       .then(function() {
+        var troupeId = troupe.id;
 
         // This is where we want non-logged-in users to return
         if(!user && req.session) {
@@ -88,24 +92,25 @@ exports.chatArchive = [
         var mm = parseInt(req.params.mm, 10);
         var dd = parseInt(req.params.dd, 10);
 
-        var startDate = moment(yyyy + "-" + mm + "-" + dd + "Z");
-        var endDate = moment(startDate).endOf('day');
+        var startDateUTC = moment({ year: yyyy, month: mm - 1, day: dd });
 
-        var troupeId = troupe.id;
+        var nextDateUTC = moment(startDateUTC).add(1, 'days');
+        var previousDateUTC = moment(startDateUTC).subtract(1, 'days');
 
-        var nextDate = moment(startDate).add('days', 1);
-        var previousDate = moment(startDate).subtract('days', 1);
+        var startDateLocal = dateTZtoUTC(yyyy, mm, dd, res.locals.tzOffset);
+        var endDateLocal = moment(startDateLocal).add(1, 'days').toDate();
 
         var today = moment().endOf('day');
-        if(moment(nextDate).endOf('day').isAfter(today)) {
-          nextDate = null;
+        if(moment(nextDateUTC).endOf('day').isAfter(today)) {
+          nextDateUTC = null;
         }
 
-        if(moment(previousDate).startOf('day').isBefore(moment([2013, 11, 1]))) {
-          previousDate = null;
+        if(moment(previousDateUTC).startOf('day').isBefore(moment([2013, 11, 1]))) {
+          previousDateUTC = null;
         }
 
-        return chatService.findChatMessagesForTroupeForDateRange(troupeId, startDate.toDate(), endDate.toDate())
+        debug('Archive searching for messages in troupe %s in date range %s-%s', troupeId, startDateLocal, endDateLocal);
+        return chatService.findChatMessagesForTroupeForDateRange(troupeId, startDateLocal, endDateLocal)
           .then(function(chatMessages) {
 
             var strategy = new restSerializer.ChatStrategy({
@@ -120,9 +125,9 @@ exports.chatArchive = [
           })
           .spread(function(troupeContext, serialized) {
             troupeContext.archive = {
-              archiveDate: startDate,
-              nextDate: nextDate,
-              previousDate: previousDate
+              archiveDate: startDateUTC,
+              nextDate: nextDateUTC,
+              previousDate: previousDateUTC
             };
 
             var language = req.headers['accept-language'];
@@ -132,16 +137,14 @@ exports.chatArchive = [
               language = 'en-uk';
             }
 
-            var p = previousDate && moment(previousDate);
-            var n = nextDate && moment(nextDate);
+            var p = previousDateUTC && moment(previousDateUTC);
+            var n = nextDateUTC && moment(nextDateUTC);
             var uri = req.uriContext.uri;
 
-            var startDateLocale = moment(startDate).locale(language);
+            var startDateLocale = moment(startDateUTC).locale(language);
 
             var ordinalDate = startDateLocale.format('Do');
             var numericDate = startDateLocale.format('D');
-
-
 
             var ordinalPart;
             if(ordinalDate.indexOf('' + numericDate) === 0) {
@@ -156,12 +159,12 @@ exports.chatArchive = [
             var previousDateLink = p && '/' + uri + '/archives/' + p.format('YYYY/MM/DD');
             var nextDateFormatted = n && moment(n.valueOf()).locale(language).format('Do MMM YYYY');
             var nextDateLink = n && '/' + uri + '/archives/' + n.format('YYYY/MM/DD');
-            var monthYearFormatted = startDateLocale.format('MMM YYYYY');
+            var monthYearFormatted = startDateLocale.format('MMM YYYY');
 
             var billingUrl = env.config.get('web:billingBaseUrl') + '/bill/' + req.uriContext.uri.split('/')[0];
             var roomUrl = '/api/v1/rooms/' + troupe.id;
 
-            var avatarUrl = "https://avatars.githubusercontent.com/" + troupe.uri.split('/')[0];
+            var avatarUrl = resolveRoomAvatarUrl(troupe.uri);
             var isPrivate = troupe.security !== "PUBLIC";
 
             return res.render('chat-archive-template', {

@@ -72,7 +72,7 @@ module.exports = (function() {
 
     serializeData: function() {
       var room = context.getTroupe();
-      var isAdmin = context().permissions.admin;
+      var isAdmin = context.isTroupeAdmin();
 
       return {
         isRepo: room.githubType === 'REPO',

@@ -3,7 +3,7 @@ var _ = require('underscore');
 var context = require('utils/context');
 var realtime = require('./realtime');
 var apiClient = require('./apiClient');
-var log = require('utils/log');
+var debug = require('debug-proxy')('app:unread-items-client');
 var Backbone = require('backbone');
 var appEvents = require('utils/appevents');
 var UnreadItemStore = require('./unread-items-client-store');
@@ -78,48 +78,63 @@ module.exports = (function() {
       // Don't sent unread items back to the server in lurk mode unless its a mention
       if (lurkMode && !mention) return;
 
+      var troupeId = context.getTroupeId();
+      var buffer = this._buffer[troupeId];
+      if (!buffer) {
+        buffer = this._buffer[troupeId] = {};
+      }
+
       // All items marked as read are send back to the server
       // as chats
-      this._buffer[itemId] = true;
+      buffer[itemId] = true;
       this._sendLimited();
     },
 
     _onWindowUnload: function() {
       if(Object.keys(this._buffer) > 0) {
-        // This causes mainthread locks in Safari
-        // TODO: send to the parent frame?
+        // Beware: This causes mainthread locks in Safari
         this._send({ sync: true });
       }
     },
 
     _send: function(options) {
-      onceUserIdSet(function() {
-        var items = Object.keys(this._buffer);
-        if (!items.length) return;
+      Object.keys(this._buffer).forEach(function(troupeId) {
+        this._sendForRoom(troupeId, options);
+      }, this);
+    },
 
-        var queue = { chat: items };
-        this._buffer = {};
+    _sendForRoom: function(troupeId, options) {
+      var items = Object.keys(this._buffer[troupeId]);
+      delete this._buffer[troupeId];
+      if (!items.length) return;
 
-        var async = !options || !options.sync;
-        var self = this;
+      var queue = { chat: items };
 
-        apiClient.userRoom.post('/unreadItems', queue, {
+      var async = !options || !options.sync;
+
+      var attempts = 0;
+      function attemptPost() {
+        // Note, we can't use the apiClient.userRoom endpoint
+        // as the room may have changed since the item was read.
+        // For example, after a room switch we don't want to
+        // be marking items as read in another room
+        apiClient.user.post('/rooms/' + troupeId + '/unreadItems', queue, {
             async: async,
             global: false
           })
           .fail(function() {
-            log.info('uic: Error posting unread items to server. Will attempt again in 5s');
+            debug('Error posting unread items to server. Will attempt again in 5s');
 
-            // Unable to send messages, requeue them and try again in 5s
-            setTimeout(function() {
-              items.forEach(function(itemId) {
-                self._onItemMarkedRead(itemId);
-              });
-            }, 5000);
+            if (++attempts < 10) {
+              // Unable to send messages, requeue them and try again in 5s
+              setTimeout(attemptPost, 5000);
+            }
+
           });
 
-      }, this);
+      }
 
+      onceUserIdSet(attemptPost);
     }
   };
 
@@ -133,13 +148,11 @@ module.exports = (function() {
 
   _.extend(TroupeUnreadItemRealtimeSync.prototype, Backbone.Events, {
     _subscribe: function() {
-      onceUserIdSet(function(userId) {
-
-        var store = this._store;
-
-        var subscription = '/v1/user/' + userId + '/rooms/' + context.getTroupeId() + '/unreadItems';
-
-        realtime.subscribe(subscription, function(message) {
+      var store = this._store;
+      var templateSubscription = realtime.getClient().subscribeTemplate({
+        urlTemplate: '/v1/user/:userId/rooms/:troupeId/unreadItems',
+        contextModel: context.contextModel(),
+        onMessage: function(message) {
           switch(message.notification) {
             // New unread items
             case 'unread_items':
@@ -165,20 +178,23 @@ module.exports = (function() {
               }
               break;
           }
-        });
+        },
 
-        realtime.getClient().registerSnapshotHandler(subscription, {
-          handleSnapshot: function(snapshot) {
-            var lurk = snapshot._meta && snapshot._meta.lurk;
-            if(lurk) {
-              store.enableLurkMode();
-            }
-
-            store._unreadItemsAdded(snapshot);
+        handleSnapshot: function(snapshot) {
+          var lurk = snapshot._meta && snapshot._meta.lurk;
+          if(lurk) {
+            store.enableLurkMode();
           }
-        });
 
-      }, this);
+          // TODO: send the recently marked items back to the server
+          store._unreadItemsAdded(snapshot);
+        }
+      });
+
+      templateSubscription.on('resubscribe', function() {
+        store.reset();
+      });
+
     }
 
   });
@@ -191,14 +207,14 @@ module.exports = (function() {
   var TroupeUnreadItemsViewportMonitor = function(scrollElement, unreadItemStore, collectionView) {
     var boundGetBounds = this._getBounds.bind(this);
     var limitedGetBounds = limit(this._getBounds, this, 100);
+    var debouncedGetBounds = _.debounce(this._getBounds.bind(this), 100);
     this._collectionView = collectionView;
     this._scrollElement = scrollElement[0] || scrollElement;
 
     this._store = unreadItemStore;
     this._windowScrollLimited = limit(this._windowScroll, this, 50);
 
-    var foldCountLimited = limit(this._foldCount, this, 50);
-    this._foldCountLimited = foldCountLimited;
+    var foldCountLimited = this._foldCountLimited = limit(this._foldCount, this, 50);
     this._inFocus = true;
 
     appEvents.on('eyeballStateChange', this._eyeballStateChange, this);
@@ -215,7 +231,7 @@ module.exports = (function() {
 
     // Check for unread items when things are added to the collection
     // Only do it every 100ms or so
-    collectionView.collection.on('add', limitedGetBounds);
+    collectionView.collection.on('add', debouncedGetBounds);
 
     // This is a catch all for for unread items that are
     // not marked as read
@@ -223,8 +239,20 @@ module.exports = (function() {
   };
 
   TroupeUnreadItemsViewportMonitor.prototype = {
+    _viewReady: function() {
+      var cv = this._collectionView;
+      var childCollection = cv.collection;
+      var ready = childCollection.models.length === cv.children.length;
+
+      if (!ready) {
+        debug("Mismatch: collection.length=%s, collectionView.length=%s", childCollection.models.length, cv.children.length);
+      }
+
+      return ready;
+    },
+
     _getBounds: function() {
-      if(!this._inFocus) {
+      if (!this._inFocus) {
         this._foldCountLimited();
         return;
       }
@@ -250,6 +278,13 @@ module.exports = (function() {
 
     _windowScroll: function() {
       if(!this._inFocus) {
+        return;
+      }
+
+      if (!this._viewReady()) {
+        debug('Skipping windowScroll until view is ready....');
+        // Not ready, try again later
+        this._windowScrollLimited();
         return;
       }
 
@@ -288,7 +323,7 @@ module.exports = (function() {
       if (childCollection.models.length === cv.children.length) {
         models = childCollection.models;
       } else {
-        log.info("Mismatch between childCollection.models.length and cv.children.length resorting to oddness");
+        debug("Mismatch between childCollection.models.length (%s) and cv.children.length (%s) resorting to oddness", childCollection.models.length, cv.children.length);
 
         models = childCollection.models.filter(function(model) {
           return cv.children.findByModelCid(model.cid);
@@ -336,6 +371,13 @@ module.exports = (function() {
     },
 
     _foldCount: function() {
+      if (!this._viewReady()) {
+        debug('Skipping fold count until view is ready');
+        // Not ready, try again later
+        this._foldCountLimited();
+        return;
+      }
+
       var store = this._store;
       var chats = store.getItems();
       if(!chats.length) {
@@ -423,7 +465,7 @@ module.exports = (function() {
       /* Prevents a race-condition when something has already been marked as deleted */
       if (!model.id || !model.get('unread')) return;
       if (store.isMarkedAsRead(model.id)) {
-        log('uic: item already marked as read');
+        debug('item already marked as read');
         model.set('unread', false);
       }
     });

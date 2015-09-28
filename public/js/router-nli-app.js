@@ -1,10 +1,10 @@
 "use strict";
 
-var appEvents = require('utils/appevents');
-var context = require('utils/context');
+var appEvents       = require('utils/appevents');
+var context         = require('utils/context');
 var TitlebarUpdater = require('components/titlebar');
-var log = require('utils/log');
-var onready = require('./utils/onready');
+var onready         = require('./utils/onready');
+var debug           = require('debug-proxy')('app:router-nli-app');
 
 require('views/widgets/preload');
 require('components/webNotifications');
@@ -94,7 +94,7 @@ onready(function() {
 
   window.addEventListener('message', function(e) {
     if(e.origin !== context.env('basePath')) {
-      log.info('Ignoring message from ' + e.origin);
+      debug('Ignoring message from %s', e.origin);
       return;
     }
 
@@ -105,7 +105,7 @@ onready(function() {
       return; // Ignore non-json from extensions
     }
 
-    log.info('Received message ', message);
+    debug('Received message %j', message);
 
     switch(message.type) {
       case 'context.troupeId':
@@ -129,4 +129,3 @@ onready(function() {
   });
 
 });
-
