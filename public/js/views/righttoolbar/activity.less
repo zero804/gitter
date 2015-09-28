@@ -1,5 +1,14 @@
 @import (reference) "../../../less/colors.less";
 
+.gtrActivityContainer {
+  transition: opacity 0.3s linear;
+
+  &.loading {
+    opacity: 0;
+    transition: none;
+  }
+}
+
 .gtrActivityList {
   list-style-type: none;
   margin: 0;

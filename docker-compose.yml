@@ -80,7 +80,7 @@ neo4j:
 # The official elasticsearch:1.4.2 image with mapper-attachments and river-mongodb plugins
 # https://github.com/soldotno/elasticsearch-river-mongodb/blob/master/Dockerfile
 elasticsearch:
-  image: stabenfeldt/elasticsearch-river-mongodb
+  image: elasticsearch:1.4.2
   ports:
     - "9200:9200"
     - "9300:9300"
@@ -88,6 +88,11 @@ elasticsearch:
     - mongo1:mongo1
     - mongo2:mongo2
     - mongo3:mongo3
+  volumes:
+    - ./scripts:/scripts
+  env_file:
+    - ./config/docker/elasticsearch.env
+  entrypoint: [ "/scripts/elasticsearch/docker-elasticsearch.sh" ]
 
 elasticsearchsetup:
   image: node:0.10.39

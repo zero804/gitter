@@ -36,4 +36,4 @@ module.exports = {
     model.trigger('request', model, null, options);
     return promise;
   }
-}
+};

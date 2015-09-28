@@ -74,11 +74,11 @@ describe('authorisor', function() {
         };
 
         mockito.when(presenceServiceMock).lookupUserIdForSocket()
-          .then(function(clientId, callback) {
+          .then(function(clientId) {
             assert.equal(clientId, meta.clientId);
-            if(!meta.socketExists) return callback(null, null, false);
+            if(!meta.socketExists) return Q.resolve([null, false]);
 
-            return callback(null, meta.userId, true);
+            return Q.resolve([meta.userId, true]);
           });
 
         mockito.when(userCanAccessRoomMock)()

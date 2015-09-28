@@ -10,18 +10,18 @@
     </div>
   {{/if}}
 
-  {{#if user}}
-    <div class="chat-header__favourite">
-      <i class="js-favourite-button icon-star-1 {{#if troupeFavourite}}favourite{{/if}}"></i>
-    </div>
-    {{#unless archives}}
-      {{#unless oneToOne}}
-        <div class="chat-header__settings">
-          <i class="js-chat-settings octicon octicon-tools" data-toggle="dropdown"></i>
-        </div>
-      {{/unless}}
-    {{/unless}}
-  {{/if}}
+  {{#unless archives}}
+    {{#if user}}
+      <div class="chat-header__favourite">
+        <i class="js-favourite-button icon-star-1 {{#if troupeFavourite}}favourite{{/if}}"></i>
+      </div>
+        {{#unless oneToOne}}
+          <div class="chat-header__settings">
+            <i class="js-chat-settings octicon octicon-tools" data-toggle="dropdown"></i>
+          </div>
+        {{/unless}}
+    {{/if}}
+  {{/unless}}
 
 </div>
 

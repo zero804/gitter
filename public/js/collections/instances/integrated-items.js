@@ -1,5 +1,5 @@
 "use strict";
-/* jshint unused:true, browser:true */
+
 var userModels = require('../users');
 var chatModels = require('../chat');
 var eventModels = require('../events');
@@ -11,7 +11,6 @@ require('components/realtime-troupe-listener');
 module.exports = (function() {
   var chatCollection          = new chatModels.ChatCollection(null, { listen: true });
   var rosterCollection        = new userModels.RosterCollection(null, { listen: true });
-  var sortedRosterCollection  = new userModels.SortedRosterCollection(null, { users: rosterCollection, limit: 25 });
   var eventCollection         = new eventModels.EventCollection(null,  { listen: true, snapshot: true });
 
   // update online status of user models
@@ -37,7 +36,7 @@ module.exports = (function() {
 
   var collections = {
     chats: chatCollection,
-    roster: sortedRosterCollection,
+    roster: rosterCollection,
     events: eventCollection
   };
 
