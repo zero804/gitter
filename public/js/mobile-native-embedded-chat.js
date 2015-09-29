@@ -55,6 +55,7 @@ onready(function() {
 
   new ChatInputView({
     el: $('#chat-input'),
+    model: context.troupe(),
     collection: chatCollection,
     compactView: true
   }).render();

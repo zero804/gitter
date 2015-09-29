@@ -181,8 +181,10 @@ module.exports = (function() {
         },
 
         handleSnapshot: function(snapshot) {
+          var roomMember = context.troupe().get('roomMember');
           var lurk = snapshot._meta && snapshot._meta.lurk;
-          if(lurk) {
+
+          if(lurk || !roomMember) {
             store.enableLurkMode();
           }
 
