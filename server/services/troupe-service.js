@@ -43,6 +43,16 @@ function findById(id, callback) {
     .nodeify(callback);
 }
 
+function checkIdExists(id) {
+  return persistence.Troupe.findById(id)
+    .count()
+    .exec()
+    .then(function(count) {
+      return count > 0;
+    });
+
+}
+
 /**
  * [{troupe without users}, userIsInRoom:boolean]
  */
@@ -288,6 +298,7 @@ function findChildRoomsForOrg(org, opts) {
 module.exports = {
   findByUri: findByUri,
   findById: findById,
+  checkIdExists: checkIdExists,
   findByIds: findByIds,
   findByIdsLean: findByIdsLean,
   findByIdLeanWithAccess: findByIdLeanWithAccess,

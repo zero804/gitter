@@ -12,6 +12,7 @@ var KeyboardEventsMixin = require('views/keyboard-events-mixin');
 var appEvents = require('utils/appevents');
 var context = require('utils/context');
 var isMobile = require('utils/is-mobile');
+var apiClient = require('components/apiClient');
 
 require('jquery-textcomplete');
 
@@ -39,7 +40,7 @@ var ChatInputBoxView = Marionette.ItemView.extend({
   },
 
   ui: {
-    textarea: 'textarea'
+    textarea: 'textarea',
   },
 
   events: {
@@ -63,6 +64,7 @@ var ChatInputBoxView = Marionette.ItemView.extend({
     this.listenTo(this.composeMode, 'change:isComposeModeEnabled', this.onComposeModeChange);
     this.listenTo(appEvents, 'input.append', this.append);
     this.listenTo(appEvents, 'focus.request.chat', function() { this.ui.textarea.focus(); });
+    this.listenTo(context.troupe(), 'change', this.render);
   },
 
   serializeData: function() {
@@ -72,20 +74,26 @@ var ChatInputBoxView = Marionette.ItemView.extend({
   },
 
   onRender: function() {
-    this.removeTextareaExtensions();
-    this.addTextareaExtensions();
+    if (this.ui.textarea.length) {
+      this.removeTextareaExtensions();
+      this.addTextareaExtensions();
 
-    if (!isMobile()) {
-      var self = this;
-      RAF(function() {
-        // firefox only respects the "autofocus" attr if it is present on source html
-        // also, dont show keyboard right away on mobile
-        // Also, move the cursor to the end of the textarea text
+      if (!isMobile()) {
+        var self = this;
+        RAF(function() {
+          // firefox only respects the "autofocus" attr if it is present on source html
+          // also, dont show keyboard right away on mobile
+          // Also, move the cursor to the end of the textarea text
 
-        self.setCaretPosition();
-        self.ui.textarea.focus();
-      });
+          self.setCaretPosition();
+          self.ui.textarea.focus();
+        });
+      }
     }
+
+    //if (!context.troupe().get('roomMember')) {
+    //  this.joinRoom();
+    //}
   },
 
   onComposeModeChange: function(model, isComposeModeEnabled) {
@@ -337,7 +345,6 @@ var ChatInputBoxView = Marionette.ItemView.extend({
   onDestroy: function() {
     this.removeTextareaExtensions();
   }
-
 });
 
 cocktail.mixin(ChatInputBoxView, KeyboardEventsMixin);

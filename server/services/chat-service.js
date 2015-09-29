@@ -143,7 +143,6 @@ exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
     // hellban for users
     // dont write message to db, just fake it for the troll / asshole
     if (user.hellbanned) return chatMessage;
-
     return chatMessage.save()
       .then(function() {
         // Async add unread items

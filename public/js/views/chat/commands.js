@@ -87,9 +87,10 @@ module.exports = (function() {
         return !context.inOneToOneTroupeContext();
       },
       action: function() {
+        context.troupe().set('aboutToLeave', true);
         apiClient.room.delete('/users/' + context.getUserId(), { })
           .then(function() {
-            appEvents.trigger('navigation', '/home', 'home', ''); // TODO: figure out a title
+            appEvents.trigger('navigation', '/home', 'home', '');
           });
       }
     },
