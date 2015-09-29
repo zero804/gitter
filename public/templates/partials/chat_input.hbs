@@ -3,6 +3,23 @@
     <div class="progress__bar" id="file-progress-bar"></div>
   </div>
   <div class="chat-input__container js-chat-input-container" id="chat-input">
-    {{#if user}}{{{ prerenderView "js/views/chat/tmpl/chatInputView" }}}{{/if}}
+    {{#if user}}
+
+    <div class="chat-input__area">
+      <div class="chat-input__avatar">
+        {{ widget "avatar" model=user size='s' showTooltip=false }}
+      </div>
+      <div id="chat-input-box-region">
+        <form class="chat-input__box" name="chat">
+          {{{ prerenderView "js/views/chat/tmpl/chat-input-box" }}}
+        </form>
+      </div>
+      <div id="chat-input-buttons-region" class="chat-input__buttons">
+        <div>
+          {{{ prerenderView "js/views/chat/tmpl/chat-input-buttons" }}}
+        </div>
+      </div>
+    </div>
+    {{/if}}
   </div>
 </footer>

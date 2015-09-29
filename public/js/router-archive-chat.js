@@ -45,7 +45,8 @@ onready(function() {
     window.parent.location.href = href;
   });
 
-  new HeaderView({ model: context.troupe(), el: '#header' });
+  // TODO: XXX move this across to a layoutview
+  new HeaderView({ model: context.troupe(), el: '#header', archives: true }).render();
 
   var archiveContext = context().archive;
 

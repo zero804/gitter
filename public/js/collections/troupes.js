@@ -1,6 +1,6 @@
 "use strict";
 
-var apiClient = require('components/apiClient');
+var context = require('utils/context');
 var realtime = require('components/realtime');
 var gitterRealtimeClient = require('gitter-realtime-client');
 var SyncMixin = require('./sync-mixin');
@@ -11,7 +11,8 @@ var RoomModel = gitterRealtimeClient.RoomModel.extend({
 
 var TroupeCollection = gitterRealtimeClient.RoomCollection.extend({
   model: RoomModel,
-  url: apiClient.user.channelGenerator("/rooms"),
+  urlTemplate: '/v1/user/:userId/rooms',
+  contextModel: context.contextModel(),
   client: function() {
     return realtime.getClient();
   },

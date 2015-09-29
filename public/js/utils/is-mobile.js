@@ -1,12 +1,11 @@
 "use strict";
 
+var memo;
 
-module.exports = (function() {
+module.exports = function() {
+  if (typeof memo === 'undefined') {
+    memo = document.body.classList.contains('mobile');
+  }
 
-  return function(userAgentString) {
-    var stringToTest = userAgentString || navigator.userAgent;
-    return stringToTest.indexOf('Mobile') >= 0;
-  };
-
-})();
-
+  return memo;
+};

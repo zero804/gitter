@@ -4,12 +4,7 @@
 var persistence = require('../../services/persistence-service');
 var collections = require('../../utils/collections');
 var mongoUtils = require('../../utils/mongo-utils');
-
-function getOwnerAvatarUrl(roomUri) {
-  if (!roomUri) return;
-
-  return 'https://avatars.githubusercontent.com/' + roomUri.split('/')[0];
-}
+var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
 
 function SuggestedRoomStrategy() {
   var roomHash;
@@ -41,7 +36,7 @@ function SuggestedRoomStrategy() {
     return {
       id: room && room.id,
       uri: uri,
-      avatarUrl: getOwnerAvatarUrl(uri),
+      avatarUrl: resolveRoomAvatarUrl(uri),
       userCount: room && room.userCount || suggestedRoom.userCount,
       description: room && room.topic || suggestedRoom.topic,
       exists: !!room

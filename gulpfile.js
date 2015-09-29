@@ -429,9 +429,12 @@ gulp.task('package', ['prepare-app', 'prepare-assets']);
 /**
  * default
  */
-gulp.task('default', ['validate', 'test', 'package']);
-
-
+gulp.task('default', function(callback) {
+  runSequence('validate',
+              'test',
+              'package',
+              callback);
+});
 
 /**
  * watch
@@ -440,3 +443,16 @@ gulp.task('watch', ['css'], function() {
   livereload.listen();
   gulp.watch('public/**/*.less', ['css']).on('change', livereload.changed);
 });
+
+
+// Run gulp safe-install --package xyz@0.1.0
+var opts = require("nomnom").parse();
+gulp.task('safe-install', shell.task([
+  'npm run unlink',
+  'npm install',
+  'npm prune',
+  'npm install ' + opts.package + ' --save',
+  'npm shrinkwrap',
+  'npm run link',
+  'npm run fix-shrinkwrap-registry'
+]));

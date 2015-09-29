@@ -2,9 +2,9 @@
 var context = require('utils/context');
 var apiClient = require('components/apiClient');
 var realtime = require('./realtime');
-var log = require('utils/log');
 var appEvents = require('utils/appevents');
 var _ = require('underscore');
+var debug = require('debug-proxy')('app:eyeballs');
 
 module.exports = (function() {
 
@@ -33,10 +33,10 @@ module.exports = (function() {
       })
       .fail(function(xhr) {
         if(xhr.status !== 400) {
-          log.info('An error occurred while communicating eyeballs');
+          debug('An error occurred while communicating eyeballs');
         } else {
           // The connection is gone...
-          log.info('Eyeballs returned 400. Realtime connection may be dead.');
+          debug('Eyeballs returned 400. Realtime connection may be dead.');
           appEvents.trigger('eyeballsInvalid', clientId);
         }
       });
@@ -46,6 +46,7 @@ module.exports = (function() {
     if(eyesOnState)  {
       stopInactivityPoller();
 
+      debug('Eyeballs off');
       eyesOnState = false;
       send(0, synchronous);
 
@@ -60,12 +61,17 @@ module.exports = (function() {
     if(!eyesOnState)  {
       startInactivityPoller();
 
+      debug('Eyeballs on');
       eyesOnState = true;
       send(1);
 
       appEvents.trigger('eyeballStateChange', true);
     }
   }
+
+  appEvents.on('change:room', function() {
+    eyeballsOn();
+  });
 
   window.addEventListener('blur', function() {
     eyeballsOff();
@@ -94,8 +100,6 @@ module.exports = (function() {
       }
 
       document.addEventListener("resume", function() {
-        // log.info('resume: eyeballs set to ' + eyesOnState);
-
         updateLastUserInteraction();
         window.setTimeout(function() {
           eyeballsOn();
@@ -105,8 +109,6 @@ module.exports = (function() {
       // Cordova specific events
       document.addEventListener("pause", function() {
         eyesOnState = false;
-        // log.info('pause');
-
       }, false);
 
     }, false);
@@ -124,7 +126,6 @@ module.exports = (function() {
     }, false);
 
     window.addEventListener('pagehide', function() {
-      // log.info('pagehide');
       eyeballsOff();
     }, false);
 
@@ -178,7 +179,7 @@ module.exports = (function() {
 
       window.setTimeout(function() {
         if(Date.now() - lastUserInteraction > (INACTIVITY - INACTIVITY_POLL)) {
-          log.info('inactivity');
+          debug('inactivity');
           inactivity = true;
           stopInactivityPoller();
           eyeballsOff();

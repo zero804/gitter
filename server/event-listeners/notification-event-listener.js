@@ -5,6 +5,7 @@ var errorReporter                      = env.errorReporter;
 var logger                             = env.logger;
 
 var appEvents                          = require('gitter-web-appevents');
+var presenceService                    = require('gitter-web-presence');
 var onlineNotificationGeneratorService = require('../services/notifications/online-notification-generator-service');
 var pushNotificationPostbox            = require('../services/notifications/push-notification-postbox');
 var debug                              = require('debug')('gitter:notification-event-listener');
@@ -47,13 +48,13 @@ exports.install = function() {
       });
   });
 
-  appEvents.onEyeballSignal(function(userId, troupeId, eyeballSignal) {
-    if(eyeballSignal) {
-      return pushNotificationFilter.resetNotificationsForUserTroupe(userId, troupeId)
-        .catch(function(err) {
-          logger.error('Error while calling resetNotificationsForUserTroupe. Silently ignoring. ' + err, { exception: err });
-        });
-    }
+  presenceService.on('eyeballSignal', function(userId, troupeId, eyeballSignal) {
+    if(!eyeballSignal) return; // Only clear the notifications when signals eyeballs on
+
+    return pushNotificationFilter.resetNotificationsForUserTroupe(userId, troupeId)
+      .catch(function(err) {
+        logger.error('Error while calling resetNotificationsForUserTroupe. Silently ignoring. ' + err, { exception: err });
+      });
   });
 
 };

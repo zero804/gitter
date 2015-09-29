@@ -4,6 +4,8 @@
   "ext": "js",
   "env": {
     "NODEMON": "1",
+    "Q_DEBUG": "1",
+    "BLUEBIRD_DEBUG": "1",
     "TZ": "UTC"
   }
 }

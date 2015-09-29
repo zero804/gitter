@@ -1,6 +1,7 @@
 "use strict";
+
 var apiClient = require('components/apiClient');
-var log = require('utils/log');
+var debug     = require('debug-proxy')('app:ping');
 
 var PING_POLL = 10 * 60 * 1000;
 
@@ -9,7 +10,7 @@ window.setInterval(function() {
   apiClient.web.get('/api_web/private/ping', undefined, {
       global: false
     })
-    .fail(function() {
-      log.info('An error occurred pinging the server');
+    .fail(function(err) {
+      debug('An error occurred pinging the server: %j', err);
     });
 }, PING_POLL);

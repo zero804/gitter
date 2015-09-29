@@ -13,22 +13,22 @@ function ensureUserHasSignedUp(uri) {
       err.uri = uri;
       err.userNotSignedUp = true;
       throw err;
-    })
-};
+    });
+}
 
 /**
  * ONE-TO-ONE permissions model
  */
 module.exports = function oneToOnePermissionsModel(user, right, uri, security) {
   // Security is only for child rooms
-  if(security) {
+  if (security) {
     return Q.reject(new Error('oneToOnes do not have security'));
   }
 
   // For now, only authenticated users can be in onetoones
-  if(!user) return Q.resolve(false);
+  if (!user) return Q.resolve(false);
 
-  switch(right) {
+  switch (right) {
     case 'create':
     case 'view':
     case 'join':
