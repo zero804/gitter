@@ -204,7 +204,9 @@ var ChatInputBoxView = Marionette.ItemView.extend({
 
     var text = this.ui.textarea.val();
     var cmd = commands.findMatch(text);
-    if (cmd) {
+
+    // `/me` command has no action, is handled by `send`
+    if (cmd && cmd.action) {
       cmd.action(text);
     } else {
       this.send(text);
