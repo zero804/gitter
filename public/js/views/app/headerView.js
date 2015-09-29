@@ -208,7 +208,7 @@ module.exports = Marionette.ItemView.extend({
   },
 
   goToOrgRooms: function() {
-    var orgName = context().troupe.uri.split('/')[0];
+    var orgName = context.troupe().get('uri').split('/')[0];
     appEvents.trigger('navigation', '/orgs/' + orgName + '/rooms', 'iframe', orgName + ' rooms');
   },
 
