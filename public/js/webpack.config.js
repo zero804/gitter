@@ -32,6 +32,7 @@ var webpackConfig = {
     "homepage": path.resolve(path.join(__dirname, "./homepage")),
     "apps": path.resolve(path.join(__dirname, "./apps.js")),
     "router-org-page": path.resolve(path.join(__dirname, './router-org-page.js')),
+    "router-userhome": path.resolve(path.join(__dirname, './router-userhome.js')),
     vendor: [
       'utils/webpack',
       'utils/context',
@@ -93,7 +94,6 @@ var webpackConfig = {
       "zeroclipboard": path.resolve(path.join(__dirname, "../repo/zeroclipboard/zeroclipboard.js")),
       "backbone-sorted-collection": path.resolve(path.join(__dirname, "../repo/backbone-sorted-collection/backbone-sorted-collection.js")),
       "jquery-sortable": path.resolve(path.join(__dirname, "../repo/jquery-sortable/jquery-sortable.js")),
-      "cal-heatmap": path.resolve(path.join(__dirname, "../repo/cal-heatmap/cal-heatmap.js")),
       "d3": path.resolve(path.join(__dirname, "../repo/d3/d3.js")),
 
       // Prevent duplicates
@@ -117,6 +117,9 @@ if(devMode) {
 } else {
   // webpackConfig.plugins.push(new DedupePlugin());
   // webpackConfig.plugins.push(new OccurrenceOrderPlugin());
-  webpackConfig.plugins.push(new UglifyJsPlugin());
+  webpackConfig.plugins.push(new UglifyJsPlugin({
+    mangle: false
+  }));
+  webpackConfig.devtool = 'source-map';
 }
 module.exports = webpackConfig;

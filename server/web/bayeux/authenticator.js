@@ -2,10 +2,12 @@
 
 var env               = require('gitter-web-env');
 var logger            = env.logger;
+var errorReporter     = env.errorReporter;
 
 var oauth             = require('../../services/oauth-service');
+var mongoUtils        = require('../../utils/mongo-utils');
 var presenceService   = require('gitter-web-presence');
-var recentRoomService   = require('../../services/recent-room-service');
+var recentRoomService = require('../../services/recent-room-service');
 var contextGenerator  = require('../context-generator');
 var StatusError       = require('statuserror');
 var bayeuxExtension   = require('./extension');
@@ -98,12 +100,16 @@ module.exports = bayeuxExtension({
         return callback(err);
       }
 
-      logger.info("bayeux: connection " + clientId + ' is associated to ' + userId, { troupeId: troupeId, client: client });
+      debug("Connection %s is associated to user %s (troupeId=%s, clientId=%s)", clientId, userId, troupeId, client);
 
       message.ext.userId = userId;
 
-      if(troupeId && userId) {
-        recentRoomService.saveLastVisitedTroupeforUserId(userId, troupeId, { skipFayeUpdate: true });
+      if(userId && troupeId && mongoUtils.isLikeObjectId(troupeId)) {
+        recentRoomService.saveLastVisitedTroupeforUserId(userId, troupeId, { skipFayeUpdate: true })
+          .catch(function(err) {
+            logger.error('Error while saving last visted room. Silently ignoring. ' + err, { exception: err });
+            errorReporter(err, { troupeId: troupeId, userId: userId }, { module: 'authenticator' });
+          });
       }
 
       // If the troupeId was included, it means we've got a native

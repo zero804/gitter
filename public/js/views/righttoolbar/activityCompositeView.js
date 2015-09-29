@@ -5,7 +5,7 @@ var appEvents = require('utils/appevents');
 var issueDecorator = require('views/chat/decorators/issueDecorator');
 var commitDecorator = require('views/chat/decorators/commitDecorator');
 var mentionDecorator = require('views/chat/decorators/mentionDecorator');
-var log = require('utils/log');
+var debug = require('debug-proxy')('app:activity-composite-view');
 var githubPushTemplate = require('./tmpl/githubPush.hbs');
 var githubIssuesTemplate = require('./tmpl/githubIssues.hbs');
 var githubIssueCommentTemplate = require('./tmpl/githubIssueComment.hbs');
@@ -99,7 +99,7 @@ module.exports = (function() {
       } catch (e) {
         var modelData = this.model && this.model.attributes;
         appEvents.trigger('bugreport', e, { extra: modelData });
-        log.info('ERROR rendering activity item:', e.message, e.stack, modelData);
+        debug('Err rendering activity item: error=%s, stack=%s, data=%j', e.message, e.stack, modelData);
         return {};
       }
     },
@@ -129,8 +129,12 @@ module.exports = (function() {
 
   var ActivityView = Marionette.CompositeView.extend({
     template: activityTemplate,
+    className: 'gtrActivityContainer',
     childViewContainer: '#activity-list',
     childView: ActivityItemView,
+    collectionEvents: {
+      'add reset sync reset loaded loading': '_showHideHeader'
+    },
     childViewOptions: function(item) {
       if(item && item.id) {
         // This allows the chat collection view to bind to an existing element...
@@ -140,13 +144,10 @@ module.exports = (function() {
     },
     getEmptyView: function() {
       // Admins see "Configure your integrations" empty
-      if (context().permissions.admin) return ActivityEmptyItemView;
+      if (context.isTroupeAdmin()) return ActivityEmptyItemView;
     },
     ui: {
       header: '#activity-header'
-    },
-    collectionEvents: {
-      'add reset sync reset': '_showHideHeader'
     },
     onRender: function() {
       this._showHideHeader();
@@ -154,7 +155,9 @@ module.exports = (function() {
     _showHideHeader: function() {
       // Admins see the header when the collection is empty
       // so that they get to
-      var headerVisible = !!(context().permissions.admin || this.collection.length);
+      var viewReloading = this.collection.length === 0 && this.collection.loading;
+      this.$el.toggleClass('loading', viewReloading);
+      var headerVisible =  !context.inOneToOneTroupeContext() && !!(context.isTroupeAdmin() || this.collection.length);
       this.ui.header.toggle(headerVisible);
     },
     _renderTemplate: function() {

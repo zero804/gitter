@@ -168,6 +168,21 @@ var DropTargetView = Marionette.ItemView.extend({
     }
   },
 
+  // Returns image iff all files are safe for opening in a browser
+  // otherwise returns ''
+  getFileType: function(files) {
+    if (!files.length) return '';
+
+    for (var i = 0; i < files.length; i++) {
+      var file = files[i];
+      var fileType = file.type;
+      if (fileType.indexOf('image/') !== 0) {
+        return '';
+      }
+    }
+    return 'image';
+  },
+
   upload: function(files) {
     if (!files.length) return;
     var self = this;
@@ -195,20 +210,9 @@ var DropTargetView = Marionette.ItemView.extend({
     };
 
     var formData = new FormData();
-    var type = '';
 
     for (var i = 0; i < files.length; i++) {
       var file = files[i];
-      var t = file.type.split('/').shift();
-
-      if (!i) {
-        type = t;
-      } else {
-        if (t !== type) {
-          type = '';
-        }
-      }
-
       formData.append('file', file);
     }
 
@@ -216,7 +220,7 @@ var DropTargetView = Marionette.ItemView.extend({
     apiClient.priv.get('/generate-signature', {
         room_uri: context.troupe().get('oneToOne') ? context.user().get('username') : context.troupe().get('uri'),
         room_id: context.getTroupeId(),
-        type: type
+        type: this.getFileType(files)
       })
       .then(function(res) {
         formData.append("signature", res.sig);

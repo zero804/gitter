@@ -1,23 +1,22 @@
 "use strict";
-var _ = require('underscore');
-var Backbone = require('backbone');
-var context = require('utils/context');
-var apiClient = require('components/apiClient');
-var moment = require('moment');
-var burstCalculator = require('../utils/burst-calculator');
+
+var _                       = require('underscore');
+var Backbone                = require('backbone');
+var context                 = require('utils/context');
+var moment                  = require('moment');
+var burstCalculator         = require('../utils/burst-calculator');
 var InfiniteCollectionMixin = require('./infinite-mixin');
-var cocktail = require('cocktail');
-var log = require('utils/log');
-var LiveCollection = require('gitter-realtime-client').LiveCollection;
-var realtime = require('components/realtime');
-var SyncMixin = require('./sync-mixin');
+var cocktail                = require('cocktail');
+var log                     = require('utils/log');
+var LiveCollection          = require('gitter-realtime-client').LiveCollection;
+var realtime                = require('components/realtime');
+var SyncMixin               = require('./sync-mixin');
 
 var userId = context.getUserId();
 
 var ChatModel = Backbone.Model.extend({
   idAttribute: "id",
   initialize: function() {
-
     this.listenTo(this, 'sync', this.triggerSynced);
     this.listenTo(this, 'request', this.triggerSyncing);
     this.listenTo(this, 'error', this.triggerSyncError);
@@ -82,7 +81,8 @@ var ChatCollection = LiveCollection.extend({
   client: function() {
     return realtime.getClient();
   },
-  url: apiClient.room.channelGenerator('/chatMessages'),
+  urlTemplate: '/v1/rooms/:troupeId/chatMessages',
+  contextModel: context.contextModel(),
   comparator: function(chat1, chat2) {
     var s1 = chat1.get('sent');
     var s2 = chat2.get('sent');
@@ -114,6 +114,19 @@ var ChatCollection = LiveCollection.extend({
     this.listenTo(this, 'reset sync', function () {
       burstCalculator.parse(this);
     });
+
+    //when we change room we want to reset the state
+    this.listenTo(context.troupe(), 'change:id', function(){
+      this.setAtTop(false);
+    });
+  },
+
+  getQuery: function() {
+    return { lean: true };
+  },
+
+  getSnapshotExtras: function() {
+    return { lean: true };
   },
 
   parse: function (collection) {
@@ -153,6 +166,11 @@ var ReadByCollection = LiveCollection.extend({
   client: function() {
     return realtime.getClient();
   },
+  urlTemplate: '/v1/rooms/:troupeId/chatMessages/:chatId/readBy',
+  contextModel: function() {
+    // Note, this contextModel is not live
+    return new Backbone.Model({ troupeId: context.getTroupeId(), chatId: this.chatMessageId });
+  },
   initialize: function(models, options) { // jshint unused:true
     var userCollection = options.userCollection;
     if(userCollection) {
@@ -160,12 +178,12 @@ var ReadByCollection = LiveCollection.extend({
         var m = userCollection.get(model.id);
         if(m) return m.toJSON();
 
+        // If the user is not in the user roster, this is broken.. need to lookup the user
         return model;
       };
     }
 
-    var chatMessageId = options.chatMessageId;
-    this.url = apiClient.room.channelGenerator("/chatMessages/" + chatMessageId + "/readBy");
+    this.chatMessageId = options.chatMessageId;
   },
   sync: SyncMixin.sync
 });

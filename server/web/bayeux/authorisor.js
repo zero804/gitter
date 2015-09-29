@@ -6,11 +6,14 @@ var stats             = env.stats;
 
 var presenceService   = require('gitter-web-presence');
 var restful           = require('../../services/restful');
+var restSerializer    = require("../../serializers/rest-serializer");
 var mongoUtils        = require('../../utils/mongo-utils');
 var StatusError       = require('statuserror');
 var bayeuxExtension   = require('./extension');
 var Q                 = require('q');
 var userCanAccessRoom = require('../../services/user-can-access-room');
+var debug             = require('debug')('gitter:bayeux-authorisor');
+var recentRoomService = require('../../services/recent-room-service');
 
 var survivalMode = !!process.env.SURVIVAL_MODE || false;
 
@@ -22,7 +25,8 @@ if (survivalMode) {
 // Strategies for authenticating that a user can subscribe to the given URL
 var routes = [{
     re: /^\/api\/v1\/(?:troupes|rooms)\/(\w+)$/,
-    validator: validateUserForSubTroupeSubscription
+    validator: validateUserForSubTroupeSubscription,
+    populator: populateTroupe
   }, {
     re: /^\/api\/v1\/(?:troupes|rooms)\/(\w+)\/(\w+)$/,
     validator: validateUserForSubTroupeSubscription,
@@ -55,6 +59,7 @@ var routes = [{
 function validateUserForSubTroupeSubscription(options) {
   var userId = options.userId;
   var match = options.match;
+  var ext = options.message && options.message.ext;
 
   var troupeId = match[1];
 
@@ -62,7 +67,25 @@ function validateUserForSubTroupeSubscription(options) {
     return Q.reject(new StatusError(400, 'Invalid ID: ' + troupeId));
   }
 
-  return userCanAccessRoom(userId, troupeId);
+  var promise = userCanAccessRoom(userId, troupeId);
+  if (ext && ext.reassociate) {
+    promise = promise.then(function(access) {
+      if (!access) return access;
+
+      return presenceService.socketReassociated(options.clientId, userId, troupeId, !!ext.reassociate.eyeballs)
+        .then(function() {
+          // Update the lastAccessTime for the room
+          if(userId) {
+            return recentRoomService.saveLastVisitedTroupeforUserId(userId, troupeId);
+          }
+        })
+        .catch(function(err) {
+          logger.error('Unable to reassociate connection or update last access: ', { exception: err, userId: userId, troupeId: troupeId });
+        })
+        .return(access);
+    });
+  }
+  return promise;
 }
 
 // This is only used by the native client. The web client publishes to
@@ -89,7 +112,7 @@ function validateUserForUserSubscription(options) {
   return Q.resolve(result);
 }
 
-function arrayToSnapshot(type) {
+function dataToSnapshot(type) {
   return function (data) {
     return { type: type, data: data };
   };
@@ -109,17 +132,39 @@ function populateSubUserCollection(options) {
     case "rooms":
     case "troupes":
       return restful.serializeTroupesForUser(userId)
-        .then(arrayToSnapshot('user.rooms'));
+        .then(dataToSnapshot('user.rooms'));
 
     case "orgs":
       return restful.serializeOrgsForUserId(userId)
-        .then(arrayToSnapshot('user.orgs'));
+        .then(dataToSnapshot('user.orgs'));
 
     default:
       logger.error('Unable to provide snapshot for ' + collection);
   }
 
   return Q.resolve();
+}
+
+function populateTroupe(options) {
+  var userId = options.userId;
+  var match = options.match;
+  var snapshotOptions = options.snapshot || false;
+  var troupeId = match[1];
+
+  /**
+   * For a troupe, the default is no snapshot, but if snapshot=true,
+   * then we return the current troupe to the user
+   */
+
+  if (!snapshotOptions) return Q.resolve();
+
+  var strategy = new restSerializer.TroupeIdStrategy({
+    currentUserId: userId,
+    includePermissions: true,
+    includeOwner: true
+  });
+  return restSerializer.serialize(troupeId, strategy)
+    .then(dataToSnapshot('room'));
 }
 
 function populateSubTroupeCollection(options) {
@@ -132,27 +177,27 @@ function populateSubTroupeCollection(options) {
   switch(collection) {
     case "chatMessages":
       if (survivalMode) {
-        return Q.resolve(arrayToSnapshot('room.events')([]));
+        return Q.resolve(dataToSnapshot('room.events')([]));
       }
 
       return restful.serializeChatsForTroupe(troupeId, userId, snapshotOptions)
-        .then(arrayToSnapshot('room.chatMessages'));
+        .then(dataToSnapshot('room.chatMessages'));
 
     case "users":
       if (survivalMode) {
-        return Q.resolve(arrayToSnapshot('room.events')([]));
+        return Q.resolve(dataToSnapshot('room.events')([]));
       }
 
       return restful.serializeUsersForTroupe(troupeId, userId, snapshotOptions)
-      .then(arrayToSnapshot('room.users'));
+      .then(dataToSnapshot('room.users'));
 
     case "events":
       if (survivalMode) {
-        return Q.resolve(arrayToSnapshot('room.events')([]));
+        return Q.resolve(dataToSnapshot('room.events')([]));
       }
 
       return restful.serializeEventsForTroupe(troupeId, userId)
-        .then(arrayToSnapshot('room.events'));
+        .then(dataToSnapshot('room.events'));
 
     default:
       logger.error('Unable to provide snapshot for ' + collection);
@@ -171,7 +216,7 @@ function populateSubSubTroupeCollection(options) {
   switch(collection + '-' + subCollection) {
     case "chatMessages-readBy":
       return restful.serializeReadBysForChat(troupeId, subId)
-        .then(arrayToSnapshot('room.chatMessages.readBy'));
+        .then(dataToSnapshot('room.chatMessages.readBy'));
 
 
     default:
@@ -192,41 +237,43 @@ function populateUserUnreadItemsCollection(options) {
   }
 
   return restful.serializeUnreadItemsForTroupe(troupeId, userId)
-    .then(arrayToSnapshot('user.room.unreadItems'));
+    .then(dataToSnapshot('user.room.unreadItems'));
 }
 
 // Authorize a sbscription message
-// callback(err, allowAccess)
 function authorizeSubscribe(message, callback) {
   var clientId = message.clientId;
 
-  presenceService.lookupUserIdForSocket(clientId, function(err, userId, exists) {
-    if(err) return callback(err);
-
-    if(!exists) return callback({ status: 401, message: 'Socket association does not exist' });
-
-    var match = null;
-
-    var hasMatch = routes.some(function(route) {
-      var m = route.re.exec(message.subscription);
-      if(m) {
-        match = { route: route, match: m };
+  return presenceService.lookupUserIdForSocket(clientId)
+    .spread(function(userId, exists) {
+      if(!exists) {
+        debug("Client %s does not exist. userId=%s", clientId, userId);
+        throw new StatusError(401, 'Client ' + clientId + ' not authenticated');
       }
-      return m;
-    });
 
-    if(!hasMatch) return callback(new StatusError(404, "Unknown subscription " + message.subscription));
+      var match = null;
 
-    var validator = match.route.validator;
-    var m = match.match;
+      var hasMatch = routes.some(function(route) {
+        var m = route.re.exec(message.subscription);
+        if(m) {
+          match = { route: route, match: m };
+        }
+        return m;
+      });
 
-    validator({ userId: userId, match: m, message: message, clientId: clientId })
-      .then(function(allowed) {
-        return { userId: userId, allowed: allowed };
-      })
-      .nodeify(callback);
-  });
+      if(!hasMatch) {
+        throw new StatusError(404, "Unknown subscription " + message.subscription);
+      }
 
+      var validator = match.route.validator;
+      var m = match.match;
+
+      return validator({ userId: userId, match: m, message: message, clientId: clientId })
+        .then(function(allowed) {
+          return [userId, allowed];
+        });
+    })
+    .nodeify(callback);
 }
 
 //
@@ -242,24 +289,21 @@ module.exports = bayeuxExtension({
   privateState: true,
   incoming: function(message, req, callback) {
     // Do we allow this user to connect to the requested channel?
-    authorizeSubscribe(message, function(err, subscribeAuth) {
-      if(err) return callback(err);
+    return authorizeSubscribe(message)
+      .spread(function(userId, allowed) {
 
-      var allowed = subscribeAuth.allowed;
-      var userId = subscribeAuth.userId;
+        if(!allowed) {
+          throw new StatusError(403, "Authorisation denied.");
+        }
 
-      if(!allowed) {
-        return callback(new StatusError(403, "Authorisation denied."));
-      }
+        message._private.authorisor = {
+          snapshot: message.ext && message.ext.snapshot,
+          userId: userId
+        };
 
-      message._private.authorisor = {
-        snapshot: message.ext && message.ext.snapshot,
-        userId: userId
-      };
-
-      return callback(null, message);
-    });
-
+        return message;
+      })
+      .nodeify(callback);
   },
 
   outgoing: function(message, req, callback) {
@@ -295,6 +339,8 @@ module.exports = bayeuxExtension({
 
         stats.responseTime('bayeux.snapshot.time', Date.now() - startTime);
         stats.responseTime('bayeux.snapshot.time.' + snapshot.type, Date.now() - startTime);
+
+        if (snapshot.data === undefined && snapshot.meta === undefined) return message;
 
         if(!message.ext) message.ext = {};
         message.ext.snapshot = snapshot.data;

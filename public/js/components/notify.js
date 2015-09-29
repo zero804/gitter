@@ -1,9 +1,7 @@
 "use strict";
 var $ = require('jquery');
-var log = require('utils/log');
 
 module.exports = (function() {
-
 
   $.prototype.notify = function(options) {
     var container = this;
@@ -144,4 +142,3 @@ module.exports = (function() {
 
 
 })();
-

@@ -194,6 +194,10 @@ a:hover {
   display: inline-block;
   opacity: 0.5;
   transition: opacity 300ms ease-in-out;
+
+  &.hidden {
+    display: none;
+  }
 }
 
 .trpToolbarHeaderItem:hover {
@@ -297,6 +301,9 @@ ul li.placeholder:before {
 }
 
 #people-list {
+  &.hidden {
+    display: none;
+  }
 
   .remaining {
     // display: none;

@@ -64,7 +64,7 @@ CollapsedItemStrategy.prototype = {
 function ChatStrategy(options)  {
   if(!options) options = {};
 
-  var userStategy = options.user ? null : new UserIdStrategy();
+  var userStategy = options.user ? null : new UserIdStrategy({ lean: options.lean });
   var unreadItemStategy, collapsedItemStategy;
   /* If options.unread has been set, we don't need a strategy */
   if(options.currentUserId && options.unread === undefined) {
@@ -115,9 +115,22 @@ function ChatStrategy(options)  {
     execPreloads(strategies, callback);
   };
 
+  function safeArray(array) {
+    if (!array) return [];
+    return array;
+  }
+
+  function undefinedForEmptyArray(array) {
+    if (!array) return undefined;
+    if (!array.length) return undefined;
+    return array;
+  }
+
   this.map = function(item) {
     var unread = unreadItemStategy ? unreadItemStategy.map(item._id) : defaultUnreadStatus;
     var collapsed = collapsedItemStategy && collapsedItemStategy.map(item._id);
+
+    var castArray = options.lean ? undefinedForEmptyArray : safeArray;
 
     return {
       id: item._id,
@@ -125,24 +138,24 @@ function ChatStrategy(options)  {
       status: item.status,
       html: item.html,
       sent: formatDate(item.sent),
-      editedAt: formatDate(item.editedAt),
+      editedAt: item.editedAt ? formatDate(item.editedAt) : undefined,
       fromUser: options.user ? options.user : userStategy.map(item.fromUserId),
       unread: unread,
       collapsed: collapsed,
       room: troupeStrategy ? troupeStrategy.map(item.toTroupeId) : undefined,
       readBy: item.readBy ? item.readBy.length : undefined,
-      urls: item.urls || [],
+      urls: castArray(item.urls),
       initial: options.initialId && item._id == options.initialId || undefined,
-      mentions: item.mentions ? item.mentions.map(function(m) {
+      mentions: castArray(item.mentions.map(function(m) {
           return {
             screenName: m.screenName,
             userId: m.userId,
             userIds: m.userIds, // For groups
             group: m.group
           };
-        }) : [],
-      issues: item.issues || [],
-      meta: item.meta || {},
+        })),
+      issues: castArray(item.issues),
+      meta: castArray(item.meta),
       highlights: item.highlights,
       v: getVersion(item)
     };

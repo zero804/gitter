@@ -5,15 +5,16 @@ var appEvents = require('utils/appevents');
 var log = require('utils/log');
 var logout = require('utils/logout');
 var RealtimeClient = require('gitter-realtime-client').RealtimeClient;
+var debug = require('debug-proxy')('app:realtime');
 
 function isMobile() {
-  return navigator.userAgent.indexOf('Mobile/') >= 0;
+  return navigator.userAgent.toLowerCase().indexOf('mobile') >= 0;
 }
 
 var eyeballState = true;
 
 appEvents.on('eyeballStateChange', function (state) {
-  log.info('rt: Switching eyeball state to ', state);
+  debug('Switching eyeball state to %s', state);
   eyeballState = state;
 });
 
@@ -43,7 +44,7 @@ var handshakeExtension = {
       if (ext) {
         if (ext.appVersion && ext.appVersion !== context.env('version')) {
 
-          log.info('rt: Application version mismatch');
+          debug('Application version mismatch');
           if (!updateTimers) {
             // Give the servers time to complete the upgrade
             updateTimers = [setTimeout(function () {
@@ -93,7 +94,7 @@ var accessTokenFailureExtension = {
       if (!terminating) {
         terminating = true;
         // More needs to be done here!
-        log.error('rt: Access denied', message);
+        log.error('Access denied', message);
 
         window.alert('Realtime communications with the server have been disconnected.');
         logout();
@@ -130,39 +131,34 @@ function getOrCreateClient() {
     appEvents.trigger('stats.' + type, statName, value);
   });
 
-  var userSubscription;
+  // Subscribe to the user object for changes to the user
+  client.subscribeTemplate({
+    urlTemplate: '/v1/user/:userId',
+    contextModel: context.contextModel(),
+    onMessage: function(message) {
+      var user = context.user();
 
-  context.user().watch('change:id', function (user) {
-    if (userSubscription) {
-      userSubscription.cancel();
-      userSubscription = null;
+      if (message.operation === 'patch' && message.model && message.model.id === user.id) {
+        // Patch the updates onto the user
+        user.set(message.model);
+      }
+
+      if (BRIDGE_NOTIFICATIONS[message.notification]) {
+        appEvents.trigger(message.notification, message);
+      }
     }
-
-    if (user.id) {
-      userSubscription = client.subscribe('/v1/user/' + user.id, function (message) {
-        if (message.operation === 'patch' && message.model && message.model.id === user.id) {
-          // Patch the updates onto the user
-          user.set(message.model);
-        }
-
-        if (BRIDGE_NOTIFICATIONS[message.notification]) {
-          appEvents.trigger(message.notification, message);
-        }
-      });
-    }
-
   });
 
   return client;
 }
 
 appEvents.on('eyeballsInvalid', function (originalClientId) {
-  log.info('rt: Resetting connection after invalid eyeballs');
+  debug('Resetting connection after invalid eyeballs');
   reset(originalClientId);
 });
 
 appEvents.on('reawaken', function () {
-  log.info('rt: Recycling connection after reawaken');
+  debug('Recycling connection after reawaken');
   reset(getClientId());
 });
 
@@ -170,7 +166,7 @@ appEvents.on('reawaken', function () {
 if (document.addEventListener) {
   document.addEventListener("deviceReady", function () {
     document.addEventListener("online", function () {
-      log.info('rt: online');
+      debug('online');
       testConnection('device_ready');
     }, false);
   }, false);
@@ -191,8 +187,8 @@ function testConnection(reason) {
 module.exports = {
   getClientId: getClientId,
 
-  subscribe: function (channel, callback, context, options) {
-    return getOrCreateClient().subscribe(channel, callback, context, options);
+  subscribe: function (channel, callback, context) {
+    return getOrCreateClient().subscribe(channel, callback, context);
   },
 
   testConnection: testConnection,
