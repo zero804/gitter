@@ -206,8 +206,8 @@ module.exports = Marionette.ItemView.extend({
 
     apiClient.room.delete('/users/' + context.getUserId(), { })
       .then(function() {
-        //appEvents.trigger('navigation', '/home', 'home', ''); // TODO: figure out a title
-        context.troupe().set('roomMember', false);
+        appEvents.trigger('navigation', '/home', 'home', ''); // TODO: figure out a title
+        //context.troupe().set('roomMember', false);
       });
   },
 
