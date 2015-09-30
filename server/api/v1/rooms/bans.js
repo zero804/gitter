@@ -1,57 +1,54 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var roomService        = require('../../../services/room-service');
-var restSerializer     = require("../../../serializers/rest-serializer");
+var roomService         = require('../../../services/room-service');
+var restSerializer      = require("../../../serializers/rest-serializer");
+var loadTroupeFromParam = require('./load-troupe-param');
 
-function serialize(bans, callback) {
+function serialize(bans) {
   var strategy = new restSerializer.TroupeBanStrategy({ });
 
-  restSerializer.serializeExcludeNulls(bans, strategy, callback);
+  return restSerializer.serializeExcludeNulls(bans, strategy);
 }
 
 module.exports = {
   id: 'troupeBan',
 
-  index: function(req, res, next) {
-    serialize(req.troupe.bans, function(err, serialized) {
-      if(err) return next(err);
-      res.send(serialized);
-    });
-  },
-
-  create: function(req, res, next) {
-    var username = req.body.username;
-    var removeMessages = !!req.body.removeMessages;
-
-    return roomService.banUserFromRoom(req.troupe, username, req.user, { removeMessages: removeMessages }, function(err, ban) {
-      if(err) return next(err);
-
-      serialize(ban, function(err, serialized) {
-        if(err) return next(err);
-        res.send(serialized);
+  index: function(req) {
+    return loadTroupeFromParam(req)
+      .then(function(troupe) {
+        return serialize(troupe.bans);
       });
-
-    });
-
   },
 
-  show: function(req, res, next) {
-    serialize(req.troupeBan, function(err, serialized) {
-      if(err) return next(err);
-      res.send(serialized);
-    });
+  create: function(req) {
+    return loadTroupeFromParam(req)
+      .then(function(troupe) {
+        var username = req.body.username;
+        var removeMessages = !!req.body.removeMessages;
+
+        return roomService.banUserFromRoom(troupe, username, req.user, { removeMessages: removeMessages });
+      })
+      .then(function(ban) {
+        return serialize(ban);
+      });
   },
 
-  destroy: function(req, res, next) {
-    return roomService.unbanUserFromRoom(req.troupe, req.troupeBan, req.troupeBanUser.username, req.user, function(err) {
-      if(err) return next(err);
-      res.send({ success: true });
-    });
+  show: function(req) {
+    return serialize(req.troupeBan);
   },
 
-  load: function(req, id, callback) {
-    return roomService.findBanByUsername(req.troupe.id, id)
+  destroy: function(req) {
+    return loadTroupeFromParam(req)
+      .then(function(troupe) {
+        return roomService.unbanUserFromRoom(troupe, req.troupeBan, req.troupeBanUser.username, req.user);
+      })
+      .then(function() {
+        return { success: true };
+      });
+  },
+
+  load: function(req, id) {
+    return roomService.findBanByUsername(req.params.troupeId, id)
       .then(function(banAndUser) {
         if(!banAndUser) return;
 
@@ -59,8 +56,7 @@ module.exports = {
         req.troupeBanUser = banAndUser.user;
 
         return banAndUser.ban;
-      })
-      .nodeify(callback);
+      });
   }
 
 };

@@ -282,6 +282,7 @@ function renderChat(req, res, options, next) {
         var classNames = options.classNames || [];
 
 
+
         if(troupe.githubType === 'REPO' || troupe.githubType === 'ORG') {
           githubLink = 'https://github.com/' + req.uriContext.uri;
         }
@@ -332,7 +333,8 @@ function renderChat(req, res, options, next) {
             hasHiddenMembers: troupe.userCount > 25,
             integrationsUrl: integrationsUrl,
             isMobile: options.isMobile,
-            ownerIsOrg: ownerIsOrg
+            ownerIsOrg: ownerIsOrg,
+            roomMember: req.uriContext.roomMember
           }, troupeContext && {
             troupeTopic: troupeContext.troupe.topic,
             premium: troupeContext.troupe.premium,

@@ -22,7 +22,8 @@ module.exports = (function() {
     },
 
     initialize: function(options) {
-      this.model = new Backbone.Model({ uri: options.uri });
+      var isOrg = options.uri.split('/').length === 1 ? true : false;
+      this.model = new Backbone.Model({ uri: options.uri, isOrg: isOrg });
       this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
     },
 

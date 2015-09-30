@@ -4,6 +4,8 @@ var context = require('utils/context');
 var Marionette = require('backbone.marionette');
 var orgListItemTemplate = require('./tmpl/org-list-item.hbs');
 var appEvents = require('utils/appevents');
+var troupesCollections = require('collections/instances/troupes');
+
 
 module.exports = (function() {
 
@@ -25,7 +27,21 @@ module.exports = (function() {
 
     clicked: function(e) {
       e.preventDefault();
-      appEvents.trigger('navigation', '/' + this.model.get('name'), 'chat', this.model.get('name'), null);
+
+      if (this.model.get('room')) {
+        appEvents.trigger('navigation', '/' + this.model.get('name'), 'chat', this.model.get('name'), null);
+        return;
+      }
+
+      // An org could not have a 'room' at render time but someone else could have meanwhile created the org
+      // room and added you. So we'll look it up in the live collection of troupes and navigate if exists.
+      var exists = troupesCollections.troupes.findWhere({uri: this.model.get('name')});
+
+      if (exists) {
+        appEvents.trigger('navigation', '/' + this.model.get('name'), 'chat', this.model.get('name'), null);
+      } else {
+        window.location.hash = '#confirm/' + this.model.get('name');
+      }
     }
   });
 
