@@ -2,6 +2,8 @@
 
 //var ChatLayout = require('views/layouts/chat');
 var onready = require('./utils/onready');
+var context = require('utils/context');
+
 
 /* Set the timezone cookie */
 require('components/timezone-cookie');
@@ -27,8 +29,8 @@ require('views/widgets/timeago');
 
 onready(function() {
   var itemCollections = require('collections/instances/integrated-items');
-  var ChatInputLayout = require('views/layouts/chat-embed');
-  var appView = new ChatInputLayout({ template: false, el: 'body', chatCollection: itemCollections.chats });
+  var EmbedLayout = require('views/layouts/chat-embed');
+  var appView = new EmbedLayout({ model: context.troupe(), template: false, el: 'body', chatCollection: itemCollections.chats });
   appView.render();
 
   //var appView = new ChatLayout({ template: false, el: 'body', chatCollection: chatCollection });
