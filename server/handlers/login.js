@@ -54,9 +54,7 @@ router.get('/github',
     req.session.source = query.source;
 
     // checks if we have a relative url path and adds it to the session
-    // TODO Find out if this is dangerous or not.
-    //if (query.returnTo) && isRelativeURL(query.returnTo)) {
-    if (query.returnTo) {
+    if (query.returnTo && isRelativeURL(query.returnTo)) {
       req.session.returnTo = query.returnTo;
     }
 
