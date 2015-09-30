@@ -64,7 +64,6 @@ var ChatInputBoxView = Marionette.ItemView.extend({
     this.listenTo(this.composeMode, 'change:isComposeModeEnabled', this.onComposeModeChange);
     this.listenTo(appEvents, 'input.append', this.append);
     this.listenTo(appEvents, 'focus.request.chat', function() { this.ui.textarea.focus(); });
-    this.listenTo(context.troupe(), 'change', this.render);
   },
 
   serializeData: function() {
@@ -90,10 +89,6 @@ var ChatInputBoxView = Marionette.ItemView.extend({
         });
       }
     }
-
-    //if (!context.troupe().get('roomMember')) {
-    //  this.joinRoom();
-    //}
   },
 
   onComposeModeChange: function(model, isComposeModeEnabled) {
