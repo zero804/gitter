@@ -8,6 +8,10 @@ var KeyboardEventsMixin = require('views/keyboard-events-mixin');
 var unreadItemsClient = require('components/unread-items-client');
 var UnreadBannerView = require('views/app/unreadBannerView');
 
+var context = require('utils/context');
+var JoinRoomView = require('views/chat/join-room-view');
+
+
 //var ChatToolbarLayout = require('./chat-toolbar');
 var ChatLayout = require('./chat');
 
@@ -20,6 +24,27 @@ var ChatInputLayout = ChatLayout.extend({
     'backspace': 'onKeyBackspace',
     'quote': 'onKeyQuote'
   },
+
+  modelEvents: {
+    'change:roomMember': '_roomMemberChanged'
+  },
+
+  _roomMemberChanged: function() {
+    var inputRegion = this.regionManager.get('input');
+
+    if (this.model.get('roomMember')) {
+      inputRegion.show(new ChatInputView({
+        model: context.troupe(),
+        collection: itemCollections.chats
+      }));
+    } else {
+      if (!this.model.get('aboutToLeave')) {
+        inputRegion.show(new JoinRoomView({ }));
+      }
+    }
+
+  },
+
 
   behaviors: {
     Isomorphic: {
@@ -49,9 +74,14 @@ var ChatInputLayout = ChatLayout.extend({
   },
 
   initInputRegion: function(optionsForRegion) {
-    return new ChatInputView(optionsForRegion({
-      collection: itemCollections.chats
-    }));
+    if (this.model.get('roomMember')) {
+      return  new ChatInputView(optionsForRegion({
+        model: context.troupe(),
+        collection: itemCollections.chats
+      }, {rerender: true}));
+    } else {
+      return new JoinRoomView(optionsForRegion({}, {rerender: true}));
+    }
   },
 
   initBannerTopRegion: function(optionsForRegion) {
