@@ -38,9 +38,7 @@ var ChatInputLayout = ChatLayout.extend({
         collection: itemCollections.chats
       }));
     } else {
-      if (!this.model.get('aboutToLeave')) {
-        inputRegion.show(new JoinRoomView({ }));
-      }
+      inputRegion.show(new JoinRoomView({ }));
     }
 
   },
