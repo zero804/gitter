@@ -28,6 +28,7 @@ var webpackConfig = {
     "router-archive-chat": path.resolve(path.join(__dirname, "./router-archive-chat")),
     "router-archive-home": path.resolve(path.join(__dirname, "./router-archive-home")),
     "router-embed-chat": path.resolve(path.join(__dirname, "./router-embed-chat")),
+    "router-nli-embed-chat": path.resolve(path.join(__dirname, "./router-nli-embed-chat")),
     "homepage": path.resolve(path.join(__dirname, "./homepage")),
     "apps": path.resolve(path.join(__dirname, "./apps.js")),
     "router-org-page": path.resolve(path.join(__dirname, './router-org-page.js')),

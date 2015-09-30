@@ -535,6 +535,25 @@ function renderEmbeddedChat(req, res, next) {
     .catch(next);
 }
 
+function renderNotLoggedInEmbeddedChat(req, res, next) {
+  roomMembershipService.countMembersInRoom(req.troupe._id)
+    .then(function(userCount) {
+      return renderChat(req, res, {
+        template: 'chat-nli-embed-template',
+        script: 'router-nli-embed-chat',
+        unread: false, // Embedded users see chats as read
+        classNames: [ 'embedded' ],
+        fetchEvents: false,
+        fetchUsers: false,
+        extras: {
+          usersOnline: userCount
+        }
+      }, next);
+    })
+    .catch(next);
+}
+
+
 function renderChatCard(req, res, next) {
   if (!req.query.at) return next(400);
   var aroundId = req.query.at;
@@ -615,6 +634,7 @@ module.exports = exports = {
   renderMobileChat: renderMobileChat,
   renderMobileUserHome: renderMobileUserHome,
   renderEmbeddedChat: renderEmbeddedChat,
+  renderNotLoggedInEmbeddedChat: renderNotLoggedInEmbeddedChat,
   renderChatCard: renderChatCard,
   renderMobileNotLoggedInChat: renderMobileNotLoggedInChat,
   renderNotLoggedInChatPage: renderNotLoggedInChatPage,
