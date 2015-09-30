@@ -71,6 +71,7 @@ module.exports = Marionette.ItemView.extend({
       oneToOne:        (data.githubType === 'ONETOONE'),
       githubLink:      getGithubUrl(data),
       isPrivate:       getPrivateStatus(data),
+      ownerIsOrg:      (data.ownerIsOrg === null) ? /ORG/.test(data.githubType) : data.ownerIsOrg,
     });
 
     return data;
@@ -208,7 +209,7 @@ module.exports = Marionette.ItemView.extend({
   },
 
   goToOrgRooms: function() {
-    var orgName = context.troupe().get('uri').split('/')[0];
+    var orgName = this.model.get('uri').split('/')[0];
     appEvents.trigger('navigation', '/orgs/' + orgName + '/rooms', 'iframe', orgName + ' rooms');
   },
 
