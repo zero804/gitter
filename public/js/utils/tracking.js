@@ -57,7 +57,7 @@ module.exports = (function() {
 
 
   function trackPageView(routeName) {
-    if (window.mixpanel) {
+    if (window.mixpanel && window.mixpanel.register) {
 
       if (context.getUserId())
         window.mixpanel.register({ userStatus: 'ACTIVE'});
@@ -88,7 +88,7 @@ module.exports = (function() {
   }
 
   function trackError(message, file, line) {
-    // if(window.mixpanel) {
+    // if(window.mixpanel && window.mixpanel.track) {
     //   window.mixpanel.track('jserror', { message: message, file: file, line: line } );
     // }
 
@@ -102,7 +102,7 @@ module.exports = (function() {
   });
 
   appEvents.on('track-event', function(eventName, data) {
-    if (window.mixpanel) {
+    if (window.mixpanel && window.mixpanel.track) {
       window.mixpanel.track(eventName, data);
     }
   });
