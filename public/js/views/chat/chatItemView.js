@@ -611,7 +611,6 @@ module.exports = (function() {
     },
 
     attachElContent: FastAttachMixin.attachElContent
-
   });
 
   cocktail.mixin(ChatItemView, KeyboardEventMixins);
@@ -624,9 +623,14 @@ module.exports = (function() {
       this.collection.loading = true; // Messy workaround until the loading-mixin handles loading/loaded transitions correctly
     },
     onDestroy: function() {
+      var readByCollection = this.collection;
+
       // The unlisten will send out a reset, which may cause problems, unlisten manually
-      this.stopListening(this.collection);
-      this.collection.unlisten();
+      this.stopListening(readByCollection);
+      readByCollection.unlisten();
+
+      // Stop listening to events (memory leaks)
+      readByCollection.stopListening();
     }
   });
   cocktail.mixin(ReadByView, LoadingCollectionMixin);
