@@ -4,6 +4,10 @@ var onready = require('./utils/onready');
 var context = require('utils/context');
 var itemCollections = require('collections/instances/integrated-items');
 var EmbedLayout = require('views/layouts/chat-embed');
+var Backbone   = require('backbone');
+var apiClient  = require('components/apiClient');
+
+
 
 /* Set the timezone cookie */
 require('components/timezone-cookie');
@@ -20,6 +24,21 @@ require('views/widgets/avatar');
 require('views/widgets/timeago');
 
 onready(function() {
+  var Router = Backbone.Router.extend({
+    routes: {
+      'autojoin': 'autojoin'
+    },
+
+    autojoin: function() {
+      apiClient.post('/v1/rooms/' + context.getTroupeId() + '/users', {username: context().user.username})
+      .then(function(res) {
+        context.troupe().set('roomMember', true);
+      });
+    }
+  });
+
+  var router = new Router();
+
   var appView = new EmbedLayout({
     el: 'body', 
     model: context.troupe(), 
@@ -27,4 +46,7 @@ onready(function() {
     chatCollection: itemCollections.chats 
   });
   appView.render();
+
+  Backbone.history.start();
+
 });
