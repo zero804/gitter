@@ -1,9 +1,9 @@
 "use strict";
 
-//var ChatLayout = require('views/layouts/chat');
 var onready = require('./utils/onready');
 var context = require('utils/context');
-
+var itemCollections = require('collections/instances/integrated-items');
+var EmbedLayout = require('views/layouts/chat-embed');
 
 /* Set the timezone cookie */
 require('components/timezone-cookie');
@@ -19,20 +19,12 @@ require('components/ping');
 require('views/widgets/avatar');
 require('views/widgets/timeago');
 
-
-//var chatModels = require('collections/chat');
-//var chatCollection = new chatModels.ChatCollection(null, { listen: true });
-//chatCollection.on('add', function (item) {
-//  setTimeout(item.set.bind(item, 'unread', false), 500);
-//});
-
-
 onready(function() {
-  var itemCollections = require('collections/instances/integrated-items');
-  var EmbedLayout = require('views/layouts/chat-embed');
-  var appView = new EmbedLayout({ model: context.troupe(), template: false, el: 'body', chatCollection: itemCollections.chats });
+  var appView = new EmbedLayout({
+    el: 'body', 
+    model: context.troupe(), 
+    template: false, 
+    chatCollection: itemCollections.chats 
+  });
   appView.render();
-
-  //var appView = new ChatLayout({ template: false, el: 'body', chatCollection: chatCollection });
-  //appView.render();
 });
