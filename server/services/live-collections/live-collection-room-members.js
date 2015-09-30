@@ -24,20 +24,22 @@ function notifyGroupRoomOfAddedUsers(room, userIds) {
 function notifyUsersOfAddedGroupRooms(room, userIds) {
   debug("Notifying %s of being added to %s", userIds, room._id);
 
+  var singleUserId = userIds.length === 1 && userIds[0];
+
   // TODO: custom serializations per user
-  return restSerializer.serialize(room, new restSerializer.TroupeStrategy())
+  return restSerializer.serialize(room, new restSerializer.TroupeStrategy({ isRoomMember: true, currentUserId: singleUserId }))
     .then(function(serializedRoom) {
 
-        userIds.forEach(function(userId) {
-          var userUrl = "/user/" + userId + "/rooms";
-          appEvents.dataChange2(userUrl, "create", serializedRoom);
-        });
+      userIds.forEach(function(userId) {
+        var userUrl = "/user/" + userId + "/rooms";
+        appEvents.dataChange2(userUrl, "create", serializedRoom);
+      });
     });
 }
 
 function notifyUsersOfAddedOneToOneRooms(room, userIds) {
   return Q.all(userIds.map(function(userId) {
-    var strategy = new restSerializer.TroupeStrategy({ currentUserId: userId });
+    var strategy = new restSerializer.TroupeStrategy({ currentUserId: userId, isRoomMember: true });
 
     return restSerializer.serialize(room, strategy)
       .then(function(serializedRoom) {

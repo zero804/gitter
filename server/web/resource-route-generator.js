@@ -3,39 +3,56 @@
 var express       = require('express');
 var StatusError   = require('statuserror');
 var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
+var Promise       = require('bluebird');
 
 module.exports = function resourceRoute(routeIdentifier, resource) {
   var router = express.Router({ caseSensitive: true, mergeParams: true });
   var idParam = resource.id;
 
   if (resource.load) {
-    router.param(idParam, function(req, res, next, id) {
-      resource.load(req, id, function(err, value) {
-        if (err) return next(err);
-        if (value === null) {
-          return next(new StatusError(404));
-        }
+    var loadPromisified = Promise.method(resource.load);
 
-        req[idParam] = value;
-        next();
-      });
+    router.param(idParam, function(req, res, next, id) {
+      loadPromisified(req, id)
+        .then(function(value) {
+          if (value === null || value === undefined) {
+            throw new StatusError(404);
+          }
+
+          req[idParam] = value;
+        })
+        .nodeify(next);
     });
   }
 
-  function mount(method, url, subrouteIdentifier, impl) {
-    if (!impl) return;
+  function mount(method, url, methodName) {
+    var promiseImpl = resource[methodName];
+    if (!promiseImpl) return;
+
+    promiseImpl = Promise.method(promiseImpl);
+
     router[method](url,
-      identifyRoute(routeIdentifier + '-' + subrouteIdentifier),
-      impl);
+      identifyRoute(routeIdentifier + '-' + methodName),
+      function(req, res, next) {
+        return promiseImpl(req, res)
+          .then(function(response) {
+            if (response === undefined) {
+              res.sendStatus(200);
+            } else {
+              res.send(response);
+            }
+          })
+          .catch(next);
+      });
   }
 
-  mount('get',    '/',                       'index',   resource.index);
-  mount('get',    '/new',                    'new',     resource.new);
-  mount('post',   '/',                       'create',  resource.create);
-  mount('get',    '/:' + idParam,            'show',    resource.show);
-  mount('get',    '/:' + idParam + '/edit',  'edit',    resource.edit);
-  mount('put',    '/:' + idParam,            'update',  resource.update);
-  mount('delete', '/:' + idParam,            'destroy', resource.destroy);
+  mount('get',    '/',                       'index');
+  mount('get',    '/new',                    'new');
+  mount('post',   '/',                       'create');
+  mount('get',    '/:' + idParam,            'show');
+  mount('get',    '/:' + idParam + '/edit',  'edit');
+  mount('put',    '/:' + idParam,            'update');
+  mount('delete', '/:' + idParam,            'destroy');
 
   if (resource.subresources) {
     Object.keys(resource.subresources).forEach(function(subresourceName) {

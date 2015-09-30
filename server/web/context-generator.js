@@ -125,7 +125,8 @@ function serializeTroupeId(troupeId, user) {
   var strategy = new restSerializer.TroupeIdStrategy({
     currentUserId: user ? user.id : null,
     currentUser: user,
-    includePermissions: true
+    includePermissions: true,
+    includeOwner: true
   });
 
   return restSerializer.serialize(troupeId, strategy);
@@ -136,7 +137,8 @@ function serializeTroupe(troupe, user) {
   var strategy = new restSerializer.TroupeStrategy({
     currentUserId: user ? user.id : null,
     currentUser: user,
-    includePermissions: true
+    includePermissions: true,
+    includeOwner: true
   });
 
   return restSerializer.serialize(troupe, strategy);
@@ -148,6 +150,7 @@ function createTroupeContext(req, options) {
   if (events) { req.session.events = []; }
 
   return _.extend({
+    roomMember: req.uriContext && req.uriContext.roomMember,
     user: options.user,
     troupe: options.troupe,
     homeUser: options.homeUser,

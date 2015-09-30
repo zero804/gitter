@@ -10,14 +10,15 @@ var billingService        = require('../../services/billing-service');
 var roomPermissionsModel  = require('../../services/room-permissions-model');
 var troupeService         = require('../../services/troupe-service');
 
-var _                 = require("lodash");
-var uniqueIds         = require('mongodb-unique-ids');
-var winston           = require('../../utils/winston');
-var debug             = require('debug')('gitter:troupe-strategy');
-var execPreloads      = require('../exec-preloads');
-var getVersion        = require('../get-model-version');
-var UserIdStrategy    = require('./user-id-strategy');
-var Q                 = require('q');
+var _                     = require("lodash");
+var uniqueIds             = require('mongodb-unique-ids');
+var winston               = require('../../utils/winston');
+var collections           = require('../../utils/collections');
+var debug                 = require('debug')('gitter:troupe-strategy');
+var execPreloads          = require('../exec-preloads');
+var getVersion            = require('../get-model-version');
+var UserIdStrategy        = require('./user-id-strategy');
+var Q                     = require('q');
 
 /**
  *
@@ -42,6 +43,43 @@ function AllUnreadItemCountStategy(options) {
 AllUnreadItemCountStategy.prototype = {
   name: 'AllUnreadItemCountStategy'
 };
+
+function RoomMembershipStrategy(options) {
+  var userId = options.userId || options.currentUserId;
+  var nonMemberTroupeIds = options.nonMemberTroupeIds && collections.hashArray(options.nonMemberTroupeIds);
+  var predefinedValue = options.isRoomMember !== undefined;
+  var memberships;
+
+  this.preload = function(troupeIds, callback) {
+    // Shortcut logic
+    if (nonMemberTroupeIds || predefinedValue) {
+      return callback();
+    }
+
+    return roomMembershipService.findUserMembershipInRooms(userId, troupeIds)
+      .then(function(memberTroupeIds) {
+        memberships = collections.hashArray(memberTroupeIds);
+      })
+      .nodeify(callback);
+  };
+
+  this.map = function(id) {
+    if (predefinedValue) {
+      return options.isRoomMember;
+    }
+
+    if (nonMemberTroupeIds) {
+      return !nonMemberTroupeIds[id]; // Negate
+    }
+
+    return !!memberships[id];
+  };
+}
+
+RoomMembershipStrategy.prototype = {
+  name: 'AllUnreadItemCountStategy'
+};
+
 
 function LastTroupeAccessTimesForUserStrategy(options) {
   var userId = options.userId || options.currentUserId;
@@ -244,6 +282,7 @@ function TroupeStrategy(options) {
   var proOrgStrategy        = new ProOrgStrategy(options);
   var permissionsStategy    = (currentUserId || options.currentUser) && options.includePermissions ? new TroupePermissionsStrategy(options) : null;
   var ownerIsOrgStrategy    = (options.includeOwner) ? new TroupeOwnerIsOrgStrategy(options) : null;
+  var roomMembershipStrategy = currentUserId || options.isRoomMember !== undefined ? new RoomMembershipStrategy(options) : null;
 
   this.preload = function(items, callback) {
     var strategies = [];
@@ -261,6 +300,13 @@ function TroupeStrategy(options) {
       }
     });
     var userIds = Object.keys(userIdSet);
+
+    if (roomMembershipStrategy) {
+      strategies.push({
+        strategy: roomMembershipStrategy,
+        data: troupeIds
+      });
+    }
 
     if(unreadItemStategy) {
       strategies.push({
@@ -386,6 +432,7 @@ function TroupeStrategy(options) {
       tags: item.tags,
       permissions: permissionsStategy ? permissionsStategy.map(item) : undefined,
       ownerIsOrg: ownerIsOrgStrategy ? ownerIsOrgStrategy.map(item) : undefined,
+      roomMember: roomMembershipStrategy ? roomMembershipStrategy.map(item.id) : undefined,
       v: getVersion(item)
     };
   };
