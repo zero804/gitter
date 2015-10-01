@@ -26,6 +26,9 @@ require('components/desktopNotifications');
 require('template/helpers/all');
 require('components/bug-reporting');
 require('components/focus-events');
+
+require('./components/chat-cache/chat-collection-pool');
+
 require('utils/tracking');
 require('components/ping');
 
