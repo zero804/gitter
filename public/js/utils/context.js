@@ -295,6 +295,27 @@ module.exports = (function() {
   // } catch(e) {
   // }
 
+
+  context.getIndexedDBConfig = function() {
+    return {
+      name: 'gitter',
+      version: 2,
+      objects: [
+        {
+          name: 'chats',
+          indexes: [
+            {
+              name: 'sentIndex',
+            },
+            {
+              name: 'roomId',
+            },
+          ],
+        },
+      ],
+    };
+  };
+
   return context;
 
 

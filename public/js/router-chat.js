@@ -25,6 +25,8 @@ require('components/eyeballs');
 require('components/bug-reporting');
 require('components/focus-events');
 
+require('./components/chat-cache/snapshot-injector.js');
+
 // Preload widgets
 require('components/ping');
 
