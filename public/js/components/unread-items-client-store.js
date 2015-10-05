@@ -83,7 +83,7 @@ var UnreadItemStore = function() {
 };
 
 _.extend(UnreadItemStore.prototype, Backbone.Events, {
-  state: 'LOADED',
+  state: 'LOADING',
   _unreadItemAdded: function(itemId, mention) {
     // Three options here:
     // 1 - new item
