@@ -83,6 +83,7 @@ var UnreadItemStore = function() {
 };
 
 _.extend(UnreadItemStore.prototype, Backbone.Events, {
+  state: 'LOADED',
   _unreadItemAdded: function(itemId, mention) {
     // Three options here:
     // 1 - new item
@@ -245,7 +246,7 @@ _.extend(UnreadItemStore.prototype, Backbone.Events, {
     this._lurkMode = false;
     this._items = {};
     this._read.reset();
-    this.notifyCountLimited();
+    if (this.state === 'LOADED') this.notifyCountLimited();
   }
 
 });
