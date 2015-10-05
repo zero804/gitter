@@ -10,8 +10,8 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 DOCKER_MACHINE_NAME=${DOCKER_MACHINE_NAME-dev}
 
 function get_ip {
-  if [ -n "`uname -a | grep -i darwin`" ]; then 
-    echo "$(docker-machine ip dev)" 
+  if [ -n "`uname -a | grep -i darwin`" ]; then
+    echo "$(docker-machine ip dev)"
   fi
 
   if [ -n "`uname -a | grep -i ubuntu`" ]; then
@@ -129,7 +129,7 @@ EOF
 EOF
 }
 
-if [ -n "`uname -a | grep -i darwin`" ]; then 
+if [ -n "`uname -a | grep -i darwin`" ]; then
   startDockerMachine
 fi
 
