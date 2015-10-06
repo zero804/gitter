@@ -4,11 +4,8 @@ set -x
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 TEMP_DIR=${TMPDIR-/tmp}
-#SITEMAP_FILE=$TEMP_DIR/gitter-sitemap.xml
-#rm -f $SITEMAP_FILE $SITEMAP_FILE.gz
 rm -f $TEMP_DIR/sitemap*
 
-#$SCRIPT_DIR/../generate-sitemap.js --sitemap $SITEMAP_FILE
 $SCRIPT_DIR/../generate-sitemap.js --tempdir $TEMP_DIR --name sitemap
 # will write:
 # * sitemap.xml
@@ -17,7 +14,6 @@ $SCRIPT_DIR/../generate-sitemap.js --tempdir $TEMP_DIR --name sitemap
 # * sitemap-2.xml
 # * ...
 
-#gzip -9 $SITEMAP_FILE
 gzip -9 $TEMP_DIR/sitemap*
 # should end up with
 # * sitemap.xml.gz
@@ -31,7 +27,6 @@ gzip -9 $TEMP_DIR/sitemap*
 # browser that once you unzip it it is an xml file other than the file
 # extension? If that's OK then why bother with content-encoding gzip in the
 # first place? We could just link straight to sitemap-*.xml.gz
-#/usr/local/bin/aws s3 cp $SITEMAP_FILE.gz s3://gitter-sitemap/$NODE_ENV/sitemap.xml --content-encoding gzip --acl public-read
 for f in $TEMP_DIR/sitemap*.xml.gz
 do
   NAME=$(basename $f .gz)
@@ -44,7 +39,6 @@ done
 # /tmp/sitemap-2.xml.gz to sitemap-2.xml
 
 
-#rm -f $SITEMAP_FILE $SITEMAP_FILE.gz
 rm -f $TEMP_DIR/sitemap*
 
 
