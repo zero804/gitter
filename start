@@ -11,7 +11,7 @@ DOCKER_MACHINE_NAME=${DOCKER_MACHINE_NAME-dev}
 
 function get_ip {
   if [ -n "`uname -a | grep -i darwin`" ]; then
-    echo "$(docker-machine ip dev)"
+    echo "$(docker-machine ip $DOCKER_MACHINE_NAME)"
   fi
 
   if [ -n "`uname -a | grep -i ubuntu`" ]; then
