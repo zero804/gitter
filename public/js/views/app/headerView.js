@@ -163,11 +163,14 @@ module.exports = Marionette.ItemView.extend({
 
       var c = context();
       var isAdmin = context.isTroupeAdmin();
+      var isRoomMember = context.isRoomMember();
+
       var url = this.model.get('url');
 
       menuItems.push({ title: 'Share this chat room', href: '#share' });
       menuItems.push({ divider: true });
-      menuItems.push({ title: 'Notifications', href: '#notifications' });
+
+      if (isRoomMember) menuItems.push({ title: 'Notifications', href: '#notifications' });
 
       if (isAdmin) {
         if (c.isNativeDesktopApp) {
@@ -196,7 +199,7 @@ module.exports = Marionette.ItemView.extend({
         menuItems.push({ title: 'Delete this room', href: '#delete' });
       }
 
-      menuItems.push({ title: 'Leave this room', href: '#leave' });
+      if (isRoomMember) menuItems.push({ title: 'Leave this room', href: '#leave' });
 
       return menuItems;
     },
@@ -207,6 +210,7 @@ module.exports = Marionette.ItemView.extend({
     apiClient.room.delete('/users/' + context.getUserId(), { })
       .then(function() {
         appEvents.trigger('navigation', '/home', 'home', ''); // TODO: figure out a title
+        //context.troupe().set('roomMember', false);
       });
   },
 
@@ -296,7 +300,7 @@ module.exports = Marionette.ItemView.extend({
       }
     }
 
-    if (changedContains(['name', 'id', 'githubType', 'favourite', 'topic', 'ownerIsOrg'])) {
+    if (changedContains(['name', 'id', 'githubType', 'favourite', 'topic', 'ownerIsOrg', 'roomMember'])) {
       // The template may have been set to false
       // by the Isomorphic layout
       this.options.template = headerViewTemplate;

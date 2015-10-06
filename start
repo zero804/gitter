@@ -8,6 +8,15 @@ set -e
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 DOCKER_MACHINE_NAME=${DOCKER_MACHINE_NAME-dev}
+HAS_DOCKER_MACHINE=$(which docker-machine)
+
+function get_ip {
+  if [ HAS_DOCKER_MACHINE ]; then
+    echo "$(docker-machine ip dev)"
+  else
+    echo "$(ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}')"
+  fi
+}
 
 function startDockerMachine {
   if [[ "$(docker-machine ls -q|grep "$DOCKER_MACHINE_NAME")" != "$DOCKER_MACHINE_NAME" ]]; then
@@ -55,6 +64,8 @@ function startDockerServices {
 }
 
 function setupRedisConfigs {
+  DEV_IP=$(get_ip)
+
   mkdir -p "$SCRIPT_DIR/config/docker/"
 
   cat <<EOD > "$SCRIPT_DIR/config/docker/redis-slave.env"
@@ -67,6 +78,8 @@ EOD
 }
 
 function setupElasticSearchConfigs {
+  DEV_IP=$(get_ip)
+
   mkdir -p "$SCRIPT_DIR/config/docker/"
 
   cat <<EOD > "$SCRIPT_DIR/config/docker/elasticsearch.env"
@@ -75,6 +88,8 @@ EOD
 }
 
 function setupMongoInitScript {
+  DEV_IP=$(get_ip)
+
   mkdir -p "$SCRIPT_DIR/config/mongo-docker/"
   cat <<EOF > "$SCRIPT_DIR/config/mongo-docker/init-mongo.sh"
   mongo $DEV_IP/admin "/mongo-docker/init-replicaset.js"
@@ -113,12 +128,15 @@ EOF
 EOF
 }
 
-startDockerMachine
-DEV_IP=$(docker-machine ip "$DOCKER_MACHINE_NAME")
-setupHostAlias gitter-mongo-dev "$DEV_IP"
-setupHostAlias gitter-redis-dev "$DEV_IP"
-setupHostAlias gitter-neo4j-dev "$DEV_IP"
-setupHostAlias gitter-es-dev "$DEV_IP"
+if [ HAS_DOCKER_MACHINE ]; then
+  startDockerMachine
+fi
+
+setupHostAlias gitter-mongo-dev "$(get_ip)"
+setupHostAlias gitter-redis-dev "$(get_ip)"
+setupHostAlias gitter-neo4j-dev "$(get_ip)"
+setupHostAlias gitter-es-dev    "$(get_ip)"
+
 setupRedisConfigs
 setupElasticSearchConfigs
 setupMongoInitScript

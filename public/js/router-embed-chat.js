@@ -1,8 +1,13 @@
 "use strict";
 
-var ChatLayout = require('views/layouts/chat');
-var chatModels = require('collections/chat');
 var onready = require('./utils/onready');
+var context = require('utils/context');
+var itemCollections = require('collections/instances/integrated-items');
+var EmbedLayout = require('views/layouts/chat-embed');
+var Backbone   = require('backbone');
+var apiClient  = require('components/apiClient');
+
+
 
 /* Set the timezone cookie */
 require('components/timezone-cookie');
@@ -18,12 +23,30 @@ require('components/ping');
 require('views/widgets/avatar');
 require('views/widgets/timeago');
 
-var chatCollection = new chatModels.ChatCollection(null, { listen: true });
-chatCollection.on('add', function (item) {
-  setTimeout(item.set.bind(item, 'unread', false), 500);
-});
-
 onready(function() {
-  var appView = new ChatLayout({ template: false, el: 'body', chatCollection: chatCollection });
+  var Router = Backbone.Router.extend({
+    routes: {
+      'autojoin': 'autojoin'
+    },
+
+    autojoin: function() {
+      apiClient.post('/v1/rooms/' + context.getTroupeId() + '/users', {username: context().user.username})
+      .then(function(res) {
+        context.troupe().set('roomMember', true);
+      });
+    }
+  });
+
+  var router = new Router();
+
+  var appView = new EmbedLayout({
+    el: 'body', 
+    model: context.troupe(), 
+    template: false, 
+    chatCollection: itemCollections.chats 
+  });
   appView.render();
+
+  Backbone.history.start();
+
 });

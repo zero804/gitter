@@ -35,19 +35,23 @@ module.exports = (function() {
     },
     onItemLeave: function(e) {
       e.stopPropagation(); // no navigation
+      var self = this;
+
+      if (self.model.id === context.getTroupeId()) {
+        appEvents.trigger('about.to.leave.current.room');
+      }
 
       // We can't use the room resource as the room might not be the current one
       apiClient
-        .delete('/v1/rooms/' + this.model.id + '/users/' + context.getUserId())
+        .delete('/v1/rooms/' + self.model.id + '/users/' + context.getUserId())
         .then(function () {
           // leaving the room that you are in should take you home
-          if (this.model.get('url') === window.location.pathname) {
+          if (self.model.id === context.getTroupeId()) {
             appEvents.trigger('navigation', '/home', 'home', '');
           }
-        }.bind(this))
-        .then(function() {
-          this.parentPopover.hide();
-        }.bind(this));
+
+          self.parentPopover.hide();
+        });
     }
   });
 
