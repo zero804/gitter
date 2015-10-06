@@ -7,6 +7,17 @@
         <button class="trpButton trpBtnGreen switch-domain previous-domain">Previous</button>
         <button class="trpButton trpBtnGreen switch-domain next-domain">Next</button>
         -->
+        <div class="daylinks">
+          {{#each chatTree as |year|}}
+            <h1>{{year.year}}</h1>
+            {{#each year.months as |month|}}
+              <h2>{{month.monthName}}</h2>
+              {{#each month.days as |day|}}
+                <a href="/{{../../../troupeContext.troupe.uri}}/archives/{{year.year}}/{{month.month}}/{{day.day}}" title="{{day.count}}">{{day.day}}</a>
+              {{/each}}
+            {{/each}}
+          {{/each}}
+        </div>
       </div>
     </div>
   </div>
