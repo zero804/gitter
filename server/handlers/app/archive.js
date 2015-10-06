@@ -17,6 +17,7 @@ var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avata
 var dateTZtoUTC          = require('gitter-web-shared/time/date-timezone-to-utc');
 var debug                = require('debug')('gitter:app-archive');
 
+
 exports.datesList = [
   identifyRoute('app-archive-main'),
   appMiddleware.uriContextResolverMiddleware({ create: false }),
@@ -24,47 +25,45 @@ exports.datesList = [
     var user = req.user;
     var troupe = req.uriContext.troupe;
 
+    // This is where we want non-logged-in users to return
+    if(!user && req.session) {
+      req.session.returnTo = '/' + troupe.uri;
+    }
+
+    var roomUrl = '/api/v1/rooms/' + troupe.id;
+    var avatarUrl = resolveRoomAvatarUrl(troupe.uri);
+    var isPrivate = troupe.security !== "PUBLIC";
+
+    var templateContext = {
+      //isAdmin: access,
+      //troupeContext: troupeContext,
+      layout: 'archive',
+      user: user,
+      archives: true,
+      bootScriptName: 'router-archive-home',
+      cssFileName: 'styles/router-archive-home.css',
+      troupeTopic: troupe.topic,
+      githubLink: '/' + req.uriContext.uri,
+      troupeName: req.uriContext.uri,
+      isHomePage: true,
+      noindex: troupe.noindex,
+      roomUrl: roomUrl,
+      accessToken: req.accessToken,
+      public: troupe.security === 'PUBLIC',
+      avatarUrl: avatarUrl,
+      isPrivate: isPrivate
+    };
+
     return roomService.validateRoomForReadOnlyAccess(user, troupe)
       .then(function() {
-        var troupe = req.uriContext.troupe;
-
-        // This is where we want non-logged-in users to return
-        if(!user && req.session) {
-          req.session.returnTo = '/' + troupe.uri;
-        }
-
-        var roomUrl = '/api/v1/rooms/' + troupe.id;
-        var avatarUrl = resolveRoomAvatarUrl(troupe.uri);
-        var isPrivate = troupe.security !== "PUBLIC";
-
         return roomPermissionsModel(user, 'admin', troupe)
-          .then(function(access) {
-
-            return contextGenerator.generateTroupeContext(req)
-              .then(function(troupeContext) {
-
-                res.render('archive-home-template', {
-                  layout: 'archive',
-                  user: user,
-                  isAdmin: access,
-                  archives: true,
-                  troupeContext: troupeContext,
-                  bootScriptName: 'router-archive-home',
-                  cssFileName: 'styles/router-archive-home.css',
-                  troupeTopic: troupe.topic,
-                  githubLink: '/' + req.uriContext.uri,
-                  troupeName: req.uriContext.uri,
-                  isHomePage: true,
-                  noindex: troupe.noindex,
-                  roomUrl: roomUrl,
-                  accessToken: req.accessToken,
-                  public: troupe.security === 'PUBLIC',
-                  avatarUrl: avatarUrl,
-                  isPrivate: isPrivate
-                });
-
-              });
-          });
+      })
+      .then(function(chatActivity) {
+        return contextGenerator.generateTroupeContext(req)
+      })
+      .then(function(troupeContext) {
+        templateContext.troupeContext = troupeContext;
+        res.render('archive-home-template', templateContext);
       })
       .catch(next);
   }
