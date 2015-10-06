@@ -142,7 +142,7 @@ setupElasticSearchConfigs
 setupMongoInitScript
 startDockerServices
 
-cat << "EOD"
+cat << EOD
 # Run this command to configure your shell:
-# eval "$(docker-machine env dev)"
+eval "\$(docker-machine env $DOCKER_MACHINE_NAME)"
 EOD
