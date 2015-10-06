@@ -35,7 +35,6 @@ module.exports = Marionette.ItemView.extend({
     topic:        '.js-chat-topic',
     name:         '.js-chat-name',
     favourite:    '.js-favourite-button',
-    orgrooms:     '.js-org-page',
   },
 
   events: {
@@ -44,7 +43,6 @@ module.exports = Marionette.ItemView.extend({
     'click @ui.favourite': 'toggleFavourite',
     'dblclick @ui.topic':  'showInput',
     'keydown textarea':    'detectKeys',
-    'click @ui.orgrooms':  'goToOrgRooms',
   },
 
   behaviors: {
@@ -61,6 +59,8 @@ module.exports = Marionette.ItemView.extend({
 
   serializeData: function() {
     var data = this.model.toJSON();
+    var orgName = data.uri.split('/')[0];
+
     _.extend(data, {
       troupeName:      data.name,
       troupeFavourite: !!data.favourite,
@@ -72,6 +72,8 @@ module.exports = Marionette.ItemView.extend({
       githubLink:      getGithubUrl(data),
       isPrivate:       getPrivateStatus(data),
       ownerIsOrg:      (data.ownerIsOrg === null) ? /ORG/.test(data.githubType) : data.ownerIsOrg,
+      orgName:         orgName,
+      orgPageHref:    '/orgs/' + orgName + '/rooms/',
     });
 
     return data;
@@ -206,11 +208,6 @@ module.exports = Marionette.ItemView.extend({
       .then(function() {
         appEvents.trigger('navigation', '/home', 'home', ''); // TODO: figure out a title
       });
-  },
-
-  goToOrgRooms: function() {
-    var orgName = this.model.get('uri').split('/')[0];
-    appEvents.trigger('navigation', '/orgs/' + orgName + '/rooms', 'iframe', orgName + ' rooms');
   },
 
   toggleFavourite: function() {
