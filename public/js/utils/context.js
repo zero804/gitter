@@ -276,6 +276,10 @@ module.exports = (function() {
     return [window.navigator.language];
   };
 
+  context.isRoomMember = function() {
+    return troupe.get('roomMember');
+  };
+
   context.testOnly = {
     resetTroupeContext: function(newContext) {
 

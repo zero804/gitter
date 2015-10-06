@@ -38,7 +38,7 @@ function markAllWeirdRoomsAsReadForUser(userId, roomIds) {
 
 function findAllWeirdRoomIdsForUser(userId, userUnreadRoomIds) {
   return roomService.findAllRoomsIdsForUserIncludingMentions(userId)
-    .then(function(userRoomIds) {
+    .spread(function(userRoomIds) {
       return _.difference(userUnreadRoomIds, userRoomIds);
     });
 }

@@ -12,6 +12,7 @@ var KeyboardEventsMixin = require('views/keyboard-events-mixin');
 var appEvents = require('utils/appevents');
 var context = require('utils/context');
 var isMobile = require('utils/is-mobile');
+var apiClient = require('components/apiClient');
 
 require('jquery-textcomplete');
 
@@ -39,7 +40,7 @@ var ChatInputBoxView = Marionette.ItemView.extend({
   },
 
   ui: {
-    textarea: 'textarea'
+    textarea: 'textarea',
   },
 
   events: {
@@ -72,19 +73,21 @@ var ChatInputBoxView = Marionette.ItemView.extend({
   },
 
   onRender: function() {
-    this.removeTextareaExtensions();
-    this.addTextareaExtensions();
+    if (this.ui.textarea.length) {
+      this.removeTextareaExtensions();
+      this.addTextareaExtensions();
 
-    if (!isMobile()) {
-      var self = this;
-      RAF(function() {
-        // firefox only respects the "autofocus" attr if it is present on source html
-        // also, dont show keyboard right away on mobile
-        // Also, move the cursor to the end of the textarea text
+      if (!isMobile()) {
+        var self = this;
+        RAF(function() {
+          // firefox only respects the "autofocus" attr if it is present on source html
+          // also, dont show keyboard right away on mobile
+          // Also, move the cursor to the end of the textarea text
 
-        self.setCaretPosition();
-        self.ui.textarea.focus();
-      });
+          self.setCaretPosition();
+          self.ui.textarea.focus();
+        });
+      }
     }
   },
 
@@ -196,7 +199,9 @@ var ChatInputBoxView = Marionette.ItemView.extend({
 
     var text = this.ui.textarea.val();
     var cmd = commands.findMatch(text);
-    if (cmd) {
+
+    // `/me` command has no action, is handled by `send`
+    if (cmd && cmd.action) {
       cmd.action(text);
     } else {
       this.send(text);
@@ -335,7 +340,6 @@ var ChatInputBoxView = Marionette.ItemView.extend({
   onDestroy: function() {
     this.removeTextareaExtensions();
   }
-
 });
 
 cocktail.mixin(ChatInputBoxView, KeyboardEventsMixin);

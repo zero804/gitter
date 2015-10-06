@@ -1,4 +1,3 @@
-/* global document */
 "use strict";
 
 var Marionette = require('backbone.marionette');

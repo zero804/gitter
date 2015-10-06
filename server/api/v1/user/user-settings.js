@@ -1,4 +1,3 @@
-/*jshint node:true */
 'use strict';
 
 var userSettingsService = require('../../../services/user-settings-service');
@@ -6,38 +5,31 @@ var userSettingsService = require('../../../services/user-settings-service');
 module.exports = {
   id: 'userSetting',
 
-  index: function (req, res, next) {
-    userSettingsService.getAllUserSettings(req.resourceUser.id)
+  index: function(req) {
+    return userSettingsService.getAllUserSettings(req.resourceUser.id)
       .then(function (settings) {
-        res.json(settings || {});
-      })
-      .catch(next);
+        return settings || {};
+      });
   },
 
-  show: function (req, res) {
-    res.json(req.userSetting.settings || {});
+  show: function(req) {
+    return userSettingsService.getUserSettings(req.resourceUser.id, req.params.userSetting)
+      .then(function(f) {
+        return f || {};
+      });
   },
 
-  update: function (req, res, next) {
+  update: function(req) {
     var settings = req.body;
 
     if (settings.hasOwnProperty('value')) {
       settings = settings.value;
     }
 
-    userSettingsService.setUserSettings(req.resourceUser.id, req.userSetting.settingsKey, settings)
-      .then(function () {
-        res.json(settings);
-      })
-      .catch(next);
-  },
-
-  load: function (req, id, callback) {
-    userSettingsService.getUserSettings(req.resourceUser.id, id)
-      .then(function (f) {
-        return { settingsKey: id, settings: f };
-      })
-      .nodeify(callback);
+    userSettingsService.setUserSettings(req.resourceUser.id, req.params.userSetting, settings)
+      .then(function() {
+        return settings;
+      });
   }
 
 };
