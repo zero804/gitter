@@ -71,7 +71,6 @@ module.exports = Marionette.ItemView.extend({
       oneToOne:        (data.githubType === 'ONETOONE'),
       githubLink:      getGithubUrl(data),
       isPrivate:       getPrivateStatus(data),
-      ownerIsOrg:      (data.ownerIsOrg === null) ? /ORG/.test(data.githubType) : data.ownerIsOrg,
       orgName:         orgName,
       orgPageHref:    '/orgs/' + orgName + '/rooms/',
     });
