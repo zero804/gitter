@@ -47,7 +47,7 @@ function createSitemap(urls) {
   urls.forEach(function(url) {
     xml.push('<url>');
     xml.push('<loc>'+url+'</loc>');
-    xml.push('<changefreq>monthly</changefreq>');
+    xml.push('<changefreq>hourly</changefreq>');
     xml.push('</url>');
   });
   xml.push('</urlset>');
