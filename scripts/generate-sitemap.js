@@ -90,7 +90,7 @@ persistence.Troupe
 
       var urls = [];
       list.forEach(function(room) {
-        var url = basePath + '/' + room.uri + '/archives/all';
+        var url = basePath + '/' + room.uri + '/archives';
         urls.push(url);
       });
       var sitemapData = createSitemap(urls);
