@@ -14,7 +14,8 @@ var ModalView = Marionette.LayoutView.extend({
   className: "modal",
 
   events: {
-    'click .close': 'hide',
+    'click .close':                     'hide',
+    'click [data-action=close]':        'hide',
     'click [data-component=modal-btn]': 'onMenuItemClicked'
   },
 
