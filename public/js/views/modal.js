@@ -7,6 +7,7 @@ var modalTemplate = require('./tmpl/modal.hbs');
 var isCompact     = require('utils/detect-compact');
 
 require('../template/helpers/all');
+require('gitter-styleguide/css/components/modals.css');
 
 var ModalView = Marionette.LayoutView.extend({
   template: modalTemplate,
@@ -14,7 +15,7 @@ var ModalView = Marionette.LayoutView.extend({
 
   events: {
     'click .close': 'hide',
-    'click .button': 'onMenuItemClicked'
+    'click [data-component=modal-btn]': 'onMenuItemClicked'
   },
 
   regions: {

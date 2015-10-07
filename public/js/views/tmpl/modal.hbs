@@ -1,4 +1,26 @@
-<div class="modal-header">
+<div class="modal--default">
+  <header class="modal--default__header">
+    {{#if title}}
+    <h1 class="modal--default__header__title">{{title}}</h1> {{/if}}
+    <i class="modal--default__header__icon fa fa-times-circle"></i>
+  </header>
+  <section class="modal--default__content" id="modal-body-region"></section>
+  {{#hasMenuItems}}
+  <footer class="modal--default__footer">
+    {{#each menuItems}}
+    <button
+      {{#if this.className}}class="{{this.className}}"  {{/if}}
+      {{#if this.action}} data-action="{{this.action}}" {{/if}}
+      data-component="modal-btn"
+      >
+      {{this.text}}
+    </button>
+    {{/each}}
+  </footer>
+  {{/hasMenuItems}}
+</div>
+
+<!-- <div class="modal-header">
     <div class="trpModalHeader">
         <div class="trpModalMenu frame-menu-items">
           <div class="trpModalClose">
@@ -23,3 +45,4 @@
   {{/each}}
 </div>
 {{/hasMenuItems}}
+-->
