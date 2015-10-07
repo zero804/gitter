@@ -10,6 +10,8 @@ var cdn           = require('utils/cdn');
 var template      = require('./tmpl/share.hbs');
 var ZeroClipboard = require('zeroclipboard');
 
+require('gitter-styleguide/css/components/buttons.css');
+
 ZeroClipboard.config({ swfPath: cdn('repo/zeroclipboard/ZeroClipboard.swf') });
 
 var View = Marionette.ItemView.extend({
