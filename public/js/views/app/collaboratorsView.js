@@ -11,6 +11,8 @@ var emptyViewTemplate = require('./tmpl/collaboratorsEmptyView.hbs');
 var appEvents = require('utils/appevents');
 var collaboratorsModels = require('collections/collaborators');
 
+require('gitter-styleguide/css/components/buttons.css');
+
 module.exports = (function() {
 
   var ItemView = Marionette.ItemView.extend({
