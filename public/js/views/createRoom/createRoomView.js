@@ -383,9 +383,9 @@ module.exports = (function() {
       this.view = new View(options);
     },
     menuItems: [
-      { action: "create", text: "Create", className: "trpBtnGreen action" },
-      { action: "back", text: "Back", className: "trpBtnLightGrey action" },
-      { action: "cancel", text: "Cancel", className: "trpBtnLightGrey action"}
+      { action: "cancel", text: "Cancel", className: "modal--default__footer__btn--negative"},
+      { action: "back", text: "Back", className: "modal--default__footer__link--negative" },
+      { action: "create", text: "Create", className: "modal--default__footer__btn" },
     ]
   });
 

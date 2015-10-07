@@ -122,8 +122,8 @@ module.exports = (function() {
         this.view = new View({ });
       },
       menuItems: [
-        { action: "close", text: "Close",      className: "modal--default__footer__btn--negative" },
-        { action: "lurk", text: "Enable lurk mode",      className: "modal--default__footer__btn" },
+        { action: "close", text: "Close", className: "modal--default__footer__btn--negative" },
+        { action: "lurk", text: "Enable lurk mode", className: "modal--default__footer__btn" },
       ]
     });
 
