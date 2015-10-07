@@ -1,5 +1,5 @@
 <div class="welcome-modal__collaborators">
-  <div class="welcome-modal__close js-close"><i class='octicon octicon-x'></i></div>
+  <div class="welcome-modal__close js-close"><i class="octicon octicon-x"></i></div>
   <div class="welcome-modal__header">
     {{#if isPublic}}
       <h3>Get Started: Spread the word</h3>
@@ -7,12 +7,18 @@
       <h3>Get Started: Add some team mates</h3>
     {{/if}}
   </div>
-  <div class='welcome-modal__container  js-container'></div>
+  <div class="welcome-modal__container  js-container"></div>
     <div class="welcome-modal__share">
-      <a class='trpButtonMedium trpBtnLightGrey button' href='#add'>Search other users</a>
+      <a class="share-button button-caribbean" href="#add">Search other users</a>
       {{#if isPublic}}
-      <a class="share-button share-button--twitter" href='{{ twitterLink }}' target='_blank'><img src="{{cdn "images/icon-twitter-white.png" }}" class="share-button__icon"><span>Tweet</span></a>
-      <a class="share-button share-button--facebook" target="_blank" href="{{ facebookLink }}"><img src="{{cdn "images/icon-facebook-white.png" }}" class="share-button__icon"><span>Share</span></a>
+      <a class="share-button  button-twitter" href="{{ twitterLink }}" target="_blank">
+        <i class="fa fa-twitter"></i>
+        Tweet
+      </a>
+      <a class="share-button button-facebook" target="_blank" href="{{ facebookLink }}">
+        <i class="fa fa-facebook-official"></i>
+        Share
+      </a>
       {{/if}}
     </div>
 </div>
