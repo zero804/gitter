@@ -1,10 +1,13 @@
 <div class="modal--default">
+
   <header class="modal--default__header">
     {{#if title}}
     <h1 class="modal--default__header__title">{{title}}</h1> {{/if}}
     <i class="modal--default__header__icon fa fa-times-circle close"></i>
   </header>
+
   <section class="modal--default__content" id="modal-body-region"></section>
+
   {{#hasMenuItems}}
   <footer class="modal--default__footer">
     {{#each menuItems}}
@@ -20,31 +23,5 @@
     {{/each}}
   </footer>
   {{/hasMenuItems}}
-</div>
-
-<!-- <div class="modal-header">
-    <div class="trpModalHeader">
-        <div class="trpModalMenu frame-menu-items">
-          <div class="trpModalClose">
-               <a class="close">×</a>
-            </div>
-        </div>
-      {{#if title}}<h2>{{title}}</h2>{{/if}}
-    </div>
-</div>
-
-<div id="modal-body-region" class="modal-body">
 
 </div>
-{{#hasMenuItems}}
-<div class="modal-footer frame-menu-items">
-  {{#each menuItems}}
-  {{#if this.disabled }}
-  <button class="trpModalButton trpButtonMedium {{this.className}} button" data-action="{{this.action}}" disabled>{{this.text}}</button>
-  {{ else }}
-  <button class="trpModalButton trpButtonMedium {{this.className}} button" data-action="{{this.action}}">{{this.text}}</button>
-  {{/if}}
-  {{/each}}
-</div>
-{{/hasMenuItems}}
--->

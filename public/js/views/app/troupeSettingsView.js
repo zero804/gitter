@@ -1,12 +1,12 @@
 "use strict";
-var Marionette = require('backbone.marionette');
-var _ = require('underscore');
-var context = require('utils/context');
-var apiClient = require('components/apiClient');
-var ModalView = require('views/modal');
+var Marionette             = require('backbone.marionette');
+var _                      = require('underscore');
+var context                = require('utils/context');
+var apiClient              = require('components/apiClient');
+var ModalView              = require('views/modal');
 var troupeSettingsTemplate = require('./tmpl/troupeSettingsTemplate.hbs');
-var log = require('utils/log');
-var notifications = require('components/notifications');
+var log                    = require('utils/log');
+var notifications          = require('components/notifications');
 
 module.exports = (function() {
 
@@ -24,6 +24,8 @@ module.exports = (function() {
       this.model = context.troupe();
 
       this.listenTo(this.model, 'change:lurk', this.setShowUnreadBadgeValue);
+      this.listenTo(this, 'menuItemClicked', this.menuItemClicked, this);
+
       var self = this;
       apiClient.userRoom.get('/settings/notifications')
         .then(function(settings) {
@@ -34,6 +36,14 @@ module.exports = (function() {
         .fail(function(err) {
           log.error('An error occurred while communicating with notification settings', err);
         });
+    },
+
+    menuItemClicked: function (type){
+      switch(type){
+        case 'lurk':
+          this.enableLurkMode();
+        break;
+      }
     },
 
     formChange: function() {
@@ -110,7 +120,11 @@ module.exports = (function() {
         options.title = "Notification Settings";
         ModalView.prototype.initialize.apply(this, arguments);
         this.view = new View({ });
-      }
+      },
+      menuItems: [
+        { action: "close", text: "Close",      className: "modal--default__footer__btn--negative" },
+        { action: "lurk", text: "Enable lurk mode",      className: "modal--default__footer__btn" },
+      ]
     });
 
 })();
