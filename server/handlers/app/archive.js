@@ -76,14 +76,61 @@ exports.datesList = [
     var isPrivate = troupe.security !== "PUBLIC";
 
     var templateContext = {
-      //isAdmin: access,
-      //troupeContext: troupeContext,
-      //chatTree: chatTree,
       layout: 'archive',
       user: user,
       archives: true,
       bootScriptName: 'router-archive-home',
       cssFileName: 'styles/router-archive-home.css',
+      troupeTopic: troupe.topic,
+      githubLink: '/' + req.uriContext.uri,
+      troupeName: req.uriContext.uri,
+      isHomePage: true,
+      noindex: troupe.noindex,
+      roomUrl: roomUrl,
+      accessToken: req.accessToken,
+      public: troupe.security === 'PUBLIC',
+      avatarUrl: avatarUrl,
+      isPrivate: isPrivate
+    };
+
+    return roomService.validateRoomForReadOnlyAccess(user, troupe)
+      .then(function() {
+        return roomPermissionsModel(user, 'admin', troupe)
+      })
+      .then(function(access) {
+        templateContext.isAdmin = access
+        return contextGenerator.generateTroupeContext(req)
+      })
+      .then(function(troupeContext) {
+        templateContext.troupeContext = troupeContext;
+        res.render('archive-home-template', templateContext);
+      })
+      .catch(next);
+  }
+];
+
+exports.linksList = [
+  identifyRoute('app-archive-links'),
+  appMiddleware.uriContextResolverMiddleware({ create: false }),
+  function(req, res, next) {
+    var user = req.user;
+    var troupe = req.uriContext.troupe;
+
+    // This is where we want non-logged-in users to return
+    if(!user && req.session) {
+      req.session.returnTo = '/' + troupe.uri;
+    }
+
+    var roomUrl = '/api/v1/rooms/' + troupe.id;
+    var avatarUrl = resolveRoomAvatarUrl(troupe.uri);
+    var isPrivate = troupe.security !== "PUBLIC";
+
+    var templateContext = {
+      layout: 'archive',
+      user: user,
+      archives: true,
+      bootScriptName: 'router-archive-links',
+      cssFileName: 'styles/router-archive-links.css',
       troupeTopic: troupe.topic,
       githubLink: '/' + req.uriContext.uri,
       troupeName: req.uriContext.uri,
@@ -111,7 +158,8 @@ exports.datesList = [
       })
       .then(function(troupeContext) {
         templateContext.troupeContext = troupeContext;
-        res.render('archive-home-template', templateContext);
+
+        res.render('archive-links-template', templateContext);
       })
       .catch(next);
   }
