@@ -419,8 +419,8 @@ onready(function() {
     },
 
     confirmRoom: function(uri) {
-      require.ensure(['views/createRoom/confirmRepoRoomView'], function(require) {
-        var confirmRepoRoomView = require('views/createRoom/confirmRepoRoomView');
+      require.ensure(['views/modals/confirm-repo-room-view'], function(require) {
+        var confirmRepoRoomView = require('views/modals/confirm-repo-room-view');
         appLayout.dialogRegion.show(new confirmRepoRoomView.Modal({
           uri: uri,
         }));
