@@ -41,7 +41,6 @@ module.exports = ModalView.extend({
       this.view = new View({ });
     },
     menuItems: [
-      { action: "cancel", text: "Close", className: "modal--default__footer__btn--neutral" },
       {
         action: "showMarkdownHelp",
         text: "Markdown Help ("+ platformKeys.cmd +" + "+ platformKeys.gitter +" + m)",
