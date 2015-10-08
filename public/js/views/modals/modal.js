@@ -6,7 +6,7 @@ var Marionette    = require('backbone.marionette');
 var modalTemplate = require('./tmpl/modal.hbs');
 var isCompact     = require('utils/detect-compact');
 
-require('../template/helpers/all');
+require('../../template/helpers/all');
 require('gitter-styleguide/css/components/modals.css');
 
 var ModalView = Marionette.LayoutView.extend({

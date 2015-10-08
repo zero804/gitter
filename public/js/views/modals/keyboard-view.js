@@ -2,7 +2,7 @@
 
 var Marionette       = require('backbone.marionette');
 var platformKeys     = require('utils/platform-keys');
-var ModalView        = require('views/modal');
+var ModalView        = require('./modal');
 var keyboardTemplate = require('./tmpl/keyboard-view.hbs');
 
 var View = Marionette.ItemView.extend({

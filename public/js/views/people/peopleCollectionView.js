@@ -2,7 +2,7 @@
 
 var Marionette         = require('backbone.marionette');
 var context            = require('utils/context');
-var ModalView          = require('views/modal');
+var ModalView          = require('views/modals/modal');
 var AvatarView         = require('views/widgets/avatar');
 var collectionTemplate = require('./tmpl/peopleCollectionView.hbs');
 var remainingTempate   = require('./tmpl/remainingView.hbs');
