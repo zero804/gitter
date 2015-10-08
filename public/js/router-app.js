@@ -399,8 +399,9 @@ onready(function() {
         // ignore, carry on regardless
         //}
 
-        require.ensure(['views/modals/choose-room-view'], function(require) {
-          var createRoomView = require('views/modals/choose-room-view');
+        console.log('require');
+        require.ensure(['views/modals/create-room-view'], function(require) {
+          var createRoomView = require('views/modals/create-room-view');
           var modal = new createRoomView.Modal({
             initialParent: parentUri,
             roomName: name,

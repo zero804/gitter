@@ -38,7 +38,7 @@ onready(function() {
       // Remember that (window.parent === window) when there is no parent frame
       window.parent.location.href = url;
     }
-  });
+ });
 
   require('components/link-handler').installLinkHandler();
 
