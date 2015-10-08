@@ -165,6 +165,8 @@ exports.linksList = [
   }
 ];
 
+var EXPIRES_SECONDS = 60 * 60 * 24 * 365; // 1 year
+var EXPIRES_MILLISECONDS = EXPIRES_SECONDS * 1000;
 
 exports.chatArchive = [
   identifyRoute('app-archive-date'),
@@ -261,6 +263,23 @@ exports.chatArchive = [
 
             var avatarUrl = resolveRoomAvatarUrl(troupe.uri);
             var isPrivate = troupe.security !== "PUBLIC";
+
+            /*
+            What I'm trying to do here is: The current day is still in-progress, so
+            it shouldn't be cached because it can still gain more messages.  All
+            past days are done, so they can all safely be cached. But the concept
+            of when the day starts and ends depends on res.locals.tzOffset, so
+            to make 100% sure I'm just adding an extra 12 hours to the utc day
+            (as -12 to +12 are all possible) and then I can avoid doing
+            complicated timezone maths using moment and it should work for all
+            timezones.
+            */
+            var startOfTodayUTC = moment.utc().startOf('day');
+            var worstCaseStartUTC = startOfTodayUTC.subtract(12, 'hours');
+            if (endDateLocal < worstCaseStartUTC) {
+              res.setHeader('Cache-Control', 'public, max-age=' + EXPIRES_SECONDS);
+              res.setHeader('Expires', new Date(Date.now() + EXPIRES_MILLISECONDS).toUTCString());
+            }
 
             return res.render('chat-archive-template', {
               layout: 'archive',
