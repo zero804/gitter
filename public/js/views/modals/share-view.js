@@ -7,7 +7,7 @@ var apiClient     = require('components/apiClient');
 var social        = require('utils/social');
 var ModalView     = require('views/modal');
 var cdn           = require('utils/cdn');
-var template      = require('./tmpl/share.hbs');
+var template      = require('./tmpl/share-view.hbs');
 var ZeroClipboard = require('zeroclipboard');
 
 require('gitter-styleguide/css/components/buttons.css');
