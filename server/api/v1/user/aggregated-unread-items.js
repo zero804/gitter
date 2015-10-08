@@ -1,4 +1,3 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var unreadItemService = require("../../../services/unread-item-service");
@@ -7,7 +6,7 @@ var restSerializer = require('../../../serializers/rest-serializer');
 
 module.exports = {
   id: 'aggregatedUnreadItem',
-  index: function(req, res, next) {
+  index: function(req) {
     var userId = req.resourceUser.id;
 
     return unreadItemService.getAllUnreadItemCounts(userId)
@@ -33,14 +32,9 @@ module.exports = {
               }
             });
 
-            res.send(results);
+            return results;
           });
-      })
-      .catch(next);
-  },
-
-  load: function(req, id, callback) {
-    return callback(null, id);
+      });
   }
 
 };

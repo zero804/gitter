@@ -1,4 +1,5 @@
 "use strict";
+
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 var context = require('utils/context');
@@ -27,6 +28,7 @@ var ChatInputView = Marionette.LayoutView.extend({
 
   initialize: function() {
     // clean up old compose mode persistance in the next event loop.
+    // Remove this by 1 December 2015
     setTimeout(function() {
       window.localStorage.removeItem('compose_mode_enabled');
     }, 0);
@@ -35,14 +37,14 @@ var ChatInputView = Marionette.LayoutView.extend({
   },
 
   serializeData: function() {
-    return { user: context.user() };
+    return { user: context.user().toJSON() };
   },
 
   initChatInputBoxRegion: function(optionsForRegion) {
     return new ChatInputBoxView(optionsForRegion({
       composeMode: this.composeMode,
       collection: this.collection
-    }));
+    },  { rerender: true }));
   },
 
   initChatInputButtonsRegion: function(optionsForRegion) {

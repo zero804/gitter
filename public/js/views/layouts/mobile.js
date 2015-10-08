@@ -1,14 +1,20 @@
 "use strict";
 
+var context = require('utils/context');
 var Marionette = require('backbone.marionette');
 var modalRegion = require('components/modal-region');
 var ChatContainerView = require('views/chat/chatContainerView');
+
+var itemCollections = require('collections/instances/integrated-items');
+
 
 /* Decorators */
 var emojiDecorator = require('views/chat/decorators/emojiDecorator');
 var TroupeMenu = require('views/menu/troupeMenu');
 var mobileDecorator = require('views/chat/decorators/mobileDecorator');
 var ChatInputView = require('views/chat/chatInputView');
+var JoinRoomView = require('views/chat/join-room-view');
+
 
 var $ = require('jquery');
 
@@ -37,6 +43,27 @@ module.exports = Marionette.LayoutView.extend({
     'click @ui.showTroupesButton': 'showHideTroupes'
   },
 
+  modelEvents: {
+    'change:roomMember': '_roomMemberChanged'
+  },
+
+  _roomMemberChanged: function() {
+    var inputRegion = this.regionManager.get('input');
+
+    if (this.model.get('roomMember')) {
+      inputRegion.show(new ChatInputView({
+        model: context.troupe(),
+        collection: itemCollections.chats
+      }));
+    } else {
+      if (!this.model.get('aboutToLeave')) {
+        inputRegion.show(new JoinRoomView({ }));
+      }
+    }
+
+  },
+
+
   initialize: function(options) {
     this.chatCollection = options.chatCollection;
     this.dialogRegion = modalRegion;
@@ -61,10 +88,20 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   initInputRegion: function(optionsForRegion) {
-    return new ChatInputView(optionsForRegion({
-      compactView: true,
-      collection: this.options.chatCollection,
-    }));
+    //return new ChatInputView(optionsForRegion({
+    //  compactView: true,
+    //  model: context.troupe(),
+    //  collection: this.options.chatCollection,
+    //}));
+    if (this.model.get('roomMember')) {
+      return  new ChatInputView(optionsForRegion({
+        model: context.troupe(),
+        collection: itemCollections.chats
+      }, {rerender: true}));
+    } else {
+      return new JoinRoomView(optionsForRegion({}, {rerender: true}));
+    }
+
   },
 
   hideTroupes: function() {

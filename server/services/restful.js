@@ -28,12 +28,14 @@ exports.serializeTroupesForUser = function(userId, callback) {
   if(!userId) return Q.resolve([]);
 
   return roomService.findAllRoomsIdsForUserIncludingMentions(userId)
-    .then(function(troupeIds) {
+    .spread(function(allTroupeIds, nonMemberTroupeIds) {
       var strategy = new restSerializer.TroupeIdStrategy({
-        currentUserId: userId
+        currentUserId: userId,
+        nonMemberTroupeIds: nonMemberTroupeIds // This will save the troupeId strategy
+                                               // from having to do a second query
       });
 
-      return restSerializer.serializeExcludeNulls(troupeIds, strategy);
+      return restSerializer.serializeExcludeNulls(allTroupeIds, strategy);
     })
     .nodeify(callback);
 };
@@ -112,6 +114,7 @@ exports.serializeUnreadItemsForTroupe = function(troupeId, userId, callback) {
 };
 
 exports.serializeReadBysForChat = function(troupeId, chatId, callback) {
+  // TODO: assert that troupeId=chat.troupeId....
   return chatService.findById(chatId)
     .then(function(chatMessage) {
       var strategy = new restSerializer.UserIdStrategy({});
