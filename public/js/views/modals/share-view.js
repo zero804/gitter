@@ -122,7 +122,6 @@ var Modal = ModalView.extend({
     this.view = new View(options);
   },
   menuItems: [
-    { action: "cancel", text: "Close",      className: "modal--default__footer__btn--negative" },
     { action: "add",    text: "Add people", className: "modal--default__footer__btn"}
   ]
 });

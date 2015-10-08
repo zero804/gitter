@@ -7,32 +7,32 @@ var troupeCollections = require('collections/instances/troupes');
 var ModalView         = require('./modal');
 var apiClient         = require('components/apiClient');
 var ParentSelectView  = require('views/createRoom/parentSelectView');
-var template          = require('/tmpl/createRoom.hbs');
+var template          = require('./tmpl/create-room-view.hbs');
 var appEvents         = require('utils/appevents');
 
 var View = Marionette.LayoutView.extend({
   template: template,
 
-  ui: {
-    autoJoin: "#auto-join",
-    permPublic: "#perm-select-public",
-    permPrivate: "#perm-select-private",
-    permInheritedOrg: "#perm-select-inherited-org",
-    validation: '#modal-failure',
+  ui:                     {
+    autoJoin:             "#auto-join",
+    permPublic:           "#perm-select-public",
+    permPrivate:          "#perm-select-private",
+    permInheritedOrg:     "#perm-select-inherited-org",
+    validation:           '#modal-failure',
     selectParentRequired: "#perm-select-required",
-    existing: '#existing',
-    parentNameLabel: "#parent-name",
-    permInheritedLabel: '#perm-inherited-label',
-    roomNameInput: '#room-name',
-    dropDownButton: '#dd-button',
-    permissionsLabel: '#permissions-label',
+    existing:             '#existing',
+    parentNameLabel:      "#parent-name",
+    permInheritedLabel:   '#perm-inherited-label',
+    roomNameInput:        '#room-name',
+    dropDownButton:       '#dd-button',
+    permissionsLabel:     '#permissions-label',
   },
 
-  events: {
+  events:                       {
     'change @ui.roomNameInput': 'roomNameChange',
-    'cut @ui.roomNameInput': 'roomNameChange',
-    'paste @ui.roomNameInput': 'roomNameChange',
-    'input @ui.roomNameInput': 'roomNameChange',
+    'cut @ui.roomNameInput':    'roomNameChange',
+    'paste @ui.roomNameInput':  'roomNameChange',
+    'input @ui.roomNameInput':  'roomNameChange',
     'click @ui.dropDownButton': 'clickDropDown',
     'change input[type=radio]': 'permissionsChange'
   },
@@ -381,8 +381,8 @@ var Modal = ModalView.extend({
     this.view = new View(options);
   },
   menuItems: [
-    { action: "cancel", text: "Cancel", className: "modal--default__footer__btn--negative"},
-    { action: "back", text: "Back", className: "modal--default__footer__link--negative" },
+    { action: "cancel", text: "Cancel", className: "modal--default__footer__btn--neutral"},
+    { action: "back", text: "Back", className: "modal--default__footer__link--neutral" },
     { action: "create", text: "Create", className: "modal--default__footer__btn" },
   ]
 });
