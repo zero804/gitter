@@ -10,10 +10,15 @@
 @import "../js/views/widgets/preload";
 @import "staging-indicator";
 
-.dropdown {
-  font-size: 1rem;
-}
 
-.owner {
+/*
+  Recent changes in html { dont-size: 62.5% }
+  mean some styles have to be reset. This should go away over time
+  once all components have been integrated
+*/
+.dropdown,
+.owner,
+#repo-select,
+.notification-text{
   font-size: 1rem;
 }

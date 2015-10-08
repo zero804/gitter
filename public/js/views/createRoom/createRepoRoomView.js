@@ -90,8 +90,8 @@ module.exports = (function() {
       this.view = new View(options);
     },
     menuItems: [
-      { action: "back", text: "Back", className: "trpBtnLightGrey"},
-      { action: "cancel", text: "Cancel", className: "trpBtnLightGrey"}
+      { action: "back", text: "Back", className: "modal--default__footer__btn--negative"},
+      { action: "cancel", text: "Cancel", className: "modal--default__footer__btn"}
     ]
   });
 
