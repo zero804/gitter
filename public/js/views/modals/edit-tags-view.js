@@ -4,12 +4,12 @@
 var Backbone         = require('backbone');
 var Marionette       = require('backbone.marionette');
 var ModalView        = require('views/modal');
-var TagInputView     = require('./tags/tagInputView');
-var TagListView      = require('./tags/tagListView');
-var TagErrorView     = require('./tags/tagErrorView');
-var TagCollection    = require('../../collections/tag-collection').TagCollection;
+var TagInputView     = require('views/app/tags/tagInputView');
+var TagListView      = require('views/app/tags/tagListView');
+var TagErrorView     = require('views/app/tags/tagErrorView');
+var TagCollection    = require('collections/tag-collection').TagCollection;
 var apiClient        = require('components/apiClient');
-var editTagsTemplate = require('./tmpl/editTagsTemplate.hbs');
+var editTagsTemplate = require('./tmpl/edit-tags-view.hbs');
 
 require('views/behaviors/isomorphic');
 
@@ -134,7 +134,7 @@ var Modal = ModalView.extend({
     this.view = new View({roomId: options.roomId });
   },
   menuItems: [
-    { action: "close", text: "Close",      className: "modal--default__footer__btn--negative" },
+    { action: "close", text: "Close",      className: "modal--default__footer__btn--neutral" },
   ]
 });
 

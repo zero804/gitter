@@ -287,8 +287,8 @@ onready(function() {
     },
 
     editTags: function() {
-      require.ensure(['views/app/editTagsView'], function(require) {
-        var EditTagsView = require('views/app/editTagsView');
+      require.ensure(['views/modals/edit-tags-view'], function(require) {
+        var EditTagsView = require('views/modals/edit-tags-view');
         appView.dialogRegion.show(new EditTagsView({roomId: context.troupe().get('id')}));
       });
     },
