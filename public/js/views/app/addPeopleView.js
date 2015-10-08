@@ -225,7 +225,7 @@ var View = Marionette.CompositeView.extend({
 });
 
 var modalButtons = [
-  { action: "done", text: "Done", className: "modal--default__footer__btn--negative"},
+  { action: "done", text: "Done", className: "modal--default__footer__btn"},
   { action: "get-pro", text: "Upgrade to Pro", className: "modal--default__footer__link" }
 ];
 

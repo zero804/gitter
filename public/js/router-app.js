@@ -344,8 +344,8 @@ onready(function() {
     },
 
     createroom: function() {
-      require.ensure(['views/createRoom/chooseRoomView'], function(require) {
-        var chooseRoomView = require('views/createRoom/chooseRoomView');
+      require.ensure(['views/modals/choose-room-view'], function(require) {
+        var chooseRoomView = require('views/modals/choose-room-view');
         appLayout.dialogRegion.show(new chooseRoomView.Modal());
       });
     },
