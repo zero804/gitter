@@ -314,8 +314,8 @@ onready(function() {
     },
 
     delete: function() {
-      require.ensure(['views/menu/delete-room-modal'], function(require) {
-        var DeleteModal = require('views/menu/delete-room-modal');
+      require.ensure(['views/modals/delete-room-view'], function(require) {
+        var DeleteModal = require('views/modals/delete-room-view');
 
         appView.dialogRegion.show(new DeleteModal({}));
       });
