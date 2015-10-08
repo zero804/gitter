@@ -43,8 +43,12 @@ module.exports = (function() {
         this.view = new View({ });
       },
       menuItems: [
-        { action: "cancel", text: "Close", className: "trpBtnLightGrey" },
-        { action: "showMarkdownHelp", text: "Markdown Help ("+ platformKeys.cmd +" + "+ platformKeys.gitter +" + m)", className: "trpBtnBlue trpBtnRight"}
+        { action: "cancel", text: "Close", className: "modal--default__footer__btn--negative" },
+        {
+          action: "showMarkdownHelp",
+          text: "Markdown Help ("+ platformKeys.cmd +" + "+ platformKeys.gitter +" + m)",
+          className: "modal--default__footer__btn"
+        }
       ]
     });
 

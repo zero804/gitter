@@ -35,8 +35,12 @@ module.exports = (function() {
         this.view = new View({ });
       },
       menuItems: [
-        { action: "cancel", text: "Close", className: "trpBtnLightGrey" },
-        { action: "showKeyboardShortcuts", text: "Keyboard shortcuts ("+ platformKeys.cmd +" + "+ platformKeys.gitter +" + k)", className: "trpBtnBlue trpBtnRight"}
+        { action: "cancel", text: "Close", className: "modal--default__footer__btn--negative" },
+        {
+          action: "showKeyboardShortcuts",
+          text: "Keyboard shortcuts ("+ platformKeys.cmd +" + "+ platformKeys.gitter +" + k)",
+          className: "modal--default__footer__btn"
+        }
       ]
     });
 
