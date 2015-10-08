@@ -43,6 +43,10 @@
   margin-bottom: 10px;
 }
 
+body.embedded .chat-input__container {
+  margin-left: 28px;
+}
+
 body.mobile .chat-input__container {
   margin-left: 12px;
 }
@@ -109,6 +113,10 @@ body.mobile .chat-input__buttons {
   vertical-align: top;
 }
 
+body.embedded .chat-input__box {
+  margin-left: 0px;
+}
+
 body.mobile .chat-input__box {
   margin-left: @avatarWidth + 12px;
   margin-right: 12px;
@@ -162,16 +170,16 @@ body.mobile .chat-input__box {
   position: relative;
   display: inline-block;
 
-  padding: 15px 34px 14px 34px;
+  padding: 1.1em 3em;
+  margin-top: 4px;
 
   text-transform: uppercase;
   text-decoration: none;
-  font-weight: bold;
 
   border: none;
   border-radius: 6px;
 
-  background: @homepage-green;
+  background: @homepage-orange;
   color: #fff;
 
   flex-shrink: 0;

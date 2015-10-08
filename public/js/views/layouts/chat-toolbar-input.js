@@ -1,5 +1,6 @@
 "use strict";
 
+var context = require('utils/context');
 var appEvents = require('utils/appevents');
 var ChatInputView = require('views/chat/chatInputView');
 var itemCollections = require('collections/instances/integrated-items');
@@ -9,6 +10,8 @@ var unreadItemsClient = require('components/unread-items-client');
 var UnreadBannerView = require('views/app/unreadBannerView');
 var ChatToolbarLayout = require('./chat-toolbar');
 var CollaboratorsView = require('views/app/collaboratorsView');
+var JoinRoomView = require('views/chat/join-room-view');
+
 
 require('views/behaviors/isomorphic');
 
@@ -18,6 +21,27 @@ var ChatToolbarInputLayout = ChatToolbarLayout.extend({
     'backspace': 'onKeyBackspace',
     'quote': 'onKeyQuote'
   },
+
+  modelEvents: {
+    'change:roomMember': '_roomMemberChanged'
+  },
+
+  _roomMemberChanged: function() {
+    var inputRegion = this.regionManager.get('input');
+
+    if (this.model.get('roomMember')) {
+      inputRegion.show(new ChatInputView({
+        model: context.troupe(),
+        collection: itemCollections.chats
+      }));
+    } else {
+      if (!this.model.get('aboutToLeave')) {
+        inputRegion.show(new JoinRoomView({ }));
+      }
+    }
+
+  },
+
 
   behaviors: {
     Isomorphic: {
@@ -62,9 +86,14 @@ var ChatToolbarInputLayout = ChatToolbarLayout.extend({
   },
 
   initInputRegion: function(optionsForRegion) {
-    return new ChatInputView(optionsForRegion({
-      collection: itemCollections.chats
-    }));
+    if (this.model.get('roomMember')) {
+      return  new ChatInputView(optionsForRegion({
+        model: context.troupe(),
+        collection: itemCollections.chats
+      }, {rerender: true}));
+    } else {
+      return new JoinRoomView(optionsForRegion({}, {rerender: true}));
+    }
   },
 
   initBannerTopRegion: function(optionsForRegion) {

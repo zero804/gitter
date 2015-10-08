@@ -12,6 +12,7 @@ var KeyboardEventsMixin = require('views/keyboard-events-mixin');
 var appEvents = require('utils/appevents');
 var context = require('utils/context');
 var isMobile = require('utils/is-mobile');
+var apiClient = require('components/apiClient');
 
 require('jquery-textcomplete');
 
@@ -39,7 +40,7 @@ var ChatInputBoxView = Marionette.ItemView.extend({
   },
 
   ui: {
-    textarea: 'textarea'
+    textarea: 'textarea',
   },
 
   events: {
@@ -72,6 +73,8 @@ var ChatInputBoxView = Marionette.ItemView.extend({
   },
 
   onRender: function() {
+    if (!this.ui.textarea.length) return;
+    
     this.removeTextareaExtensions();
     this.addTextareaExtensions();
 
@@ -337,7 +340,6 @@ var ChatInputBoxView = Marionette.ItemView.extend({
   onDestroy: function() {
     this.removeTextareaExtensions();
   }
-
 });
 
 cocktail.mixin(ChatInputBoxView, KeyboardEventsMixin);

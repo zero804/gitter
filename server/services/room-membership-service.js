@@ -86,6 +86,14 @@ function findUserMembershipInRooms(userId, troupeIds) {
   assert(userId);
   if (!troupeIds.length) return Q.resolve([]);
 
+  if (troupeIds.length === 1) {
+    // Optimise for single troupeIds, which happens a lot
+    return checkRoomMembership(troupeIds[0], userId)
+      .then(function(isMember) {
+        return isMember ? troupeIds : [];
+      });
+  }
+
   return TroupeUser.distinct("troupeId", { troupeId: { $in: mongoUtils.asObjectIDs(troupeIds) }, userId: userId })
     .exec();
 }

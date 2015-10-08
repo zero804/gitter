@@ -10,8 +10,6 @@ var collections          = require("../utils/collections");
 var userService          = require("./user-service");
 var processChat          = require('../utils/markdown-processor');
 var Q                    = require('q');
-var mongoUtils           = require('../utils/mongo-utils');
-var moment               = require('moment');
 var StatusError          = require('statuserror');
 var unreadItemService    = require('./unread-item-service');
 var _                    = require('underscore');
@@ -145,7 +143,6 @@ exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
     // hellban for users
     // dont write message to db, just fake it for the troll / asshole
     if (user.hellbanned) return chatMessage;
-
     return chatMessage.save()
       .then(function() {
         // Async add unread items

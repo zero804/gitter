@@ -7,8 +7,11 @@ var logout = require('utils/logout');
 var RealtimeClient = require('gitter-realtime-client').RealtimeClient;
 var debug = require('debug-proxy')('app:realtime');
 
+var PING_INTERVAL = 30000;
+var ENABLE_APP_LAYER_PINGS = true;
+
 function isMobile() {
-  return navigator.userAgent.indexOf('Mobile/') >= 0;
+  return navigator.userAgent.toLowerCase().indexOf('mobile') >= 0;
 }
 
 var eyeballState = true;
@@ -111,6 +114,7 @@ var BRIDGE_NOTIFICATIONS = {
 };
 
 var client;
+var pingTimer;
 
 function getOrCreateClient() {
   if (client) return client;
@@ -130,6 +134,13 @@ function getOrCreateClient() {
   client.on('stats', function (type, statName, value) {
     appEvents.trigger('stats.' + type, statName, value);
   });
+
+  if (ENABLE_APP_LAYER_PINGS) {
+    pingTimer = setInterval(function() {
+      debug('Performing ping');
+      client.testConnection('ping');
+    }, PING_INTERVAL);
+  }
 
   // Subscribe to the user object for changes to the user
   client.subscribeTemplate({

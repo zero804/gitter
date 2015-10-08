@@ -1,11 +1,11 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var restSerializer   = require("../../../serializers/rest-serializer");
 var repoService      = require("../../../services/repo-service");
 var createTextFilter = require('text-filter');
+var StatusError      = require('statuserror');
 
-function indexQuery(req, res, next) {
+function indexQuery(req) {
   var limit = req.query.limit ? parseInt(req.query.limit, 10) : 0;
 
   return repoService.getReposForUser(req.user)
@@ -26,34 +26,25 @@ function indexQuery(req, res, next) {
       }
 
       return restSerializer.serialize({ results: filteredRepos }, strategy);
-    })
-
-    .then(function(serialized) {
-      res.send(serialized);
-    })
-    .catch(next);
+    });
 }
 
 module.exports = {
   id: 'repo',
-  index: function(req, res, next) {
+  index: function(req) {
+    if (!req.user) throw new StatusError(401);
+
     if(req.query.q) {
-      return indexQuery(req, res, next);
+      return indexQuery(req);
     }
 
     var strategyOptions = { currentUserId: req.user.id };
-    // if (req.query.include_users) strategyOptions.mapUsers = true;
 
-    repoService.getReposForUser(req.user)
+    return repoService.getReposForUser(req.user)
       .then(function(repos) {
         var strategy = new restSerializer.GithubRepoStrategy(strategyOptions);
 
-        restSerializer.serialize(repos, strategy, function(err, serialized) {
-          if(err) return next(err);
-
-          res.send(serialized);
-        });
-      })
-      .catch(next);
+        return restSerializer.serialize(repos, strategy);
+      });
   }
 };
