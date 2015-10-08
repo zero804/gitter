@@ -238,8 +238,8 @@ onready(function() {
     },
 
     people: function() {
-      require.ensure(['views/people/people-modal'], function(require) {
-        var PeopleModal = require('views/people/people-modal');
+      require.ensure(['views/modals/people-modal'], function(require) {
+        var PeopleModal = require('views/modals/people-modal');
 
         appView.dialogRegion.show(new PeopleModal());
       });

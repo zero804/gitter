@@ -6,8 +6,8 @@ var Marionette        = require('backbone.marionette');
 var troupeCollections = require('collections/instances/troupes');
 var ModalView         = require('views/modal');
 var apiClient         = require('components/apiClient');
-var ParentSelectView  = require('./parentSelectView');
-var template          = require('./tmpl/createRoom.hbs');
+var ParentSelectView  = require('views/createRoom/parentSelectView');
+var template          = require('/tmpl/createRoom.hbs');
 var appEvents         = require('utils/appevents');
 
 var View = Marionette.LayoutView.extend({
