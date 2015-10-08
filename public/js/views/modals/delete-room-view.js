@@ -65,12 +65,11 @@ var Modal = ModalView.extend({
     options.title = 'Careful Now...';
     var roomName = context.troupe().get('uri');
     options.menuItems = [
-    { action: "cancel", text: "Cancel", className: "modal--default__footer__btn--neutral" },
     {
       disabled: true,
       action: 'delete',
       text: 'Delete "' + roomName + '"',
-      className: 'modal--default__footer__btn'
+      className: 'modal--default__footer__btn--negative'
     }];
 
     var lock = new DelayLock();

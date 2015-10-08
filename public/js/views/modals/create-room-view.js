@@ -382,7 +382,7 @@ var Modal = ModalView.extend({
   },
   menuItems: [
     { action: "cancel", text: "Cancel", className: "modal--default__footer__btn--neutral"},
-    { action: "back", text: "Back", className: "modal--default__footer__link--neutral" },
+    { action: "back", text: "Back", className: "modal--default__footer__link" },
     { action: "create", text: "Create", className: "modal--default__footer__btn" },
   ]
 });
