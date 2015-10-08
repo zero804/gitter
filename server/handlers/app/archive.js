@@ -109,6 +109,9 @@ exports.datesList = [
   }
 ];
 
+var ONE_DAY_SECONDS = 60 * 60 * 24; // 1 day
+var ONE_DAY_MILLISECONDS = ONE_DAY_SECONDS * 1000;
+
 exports.linksList = [
   identifyRoute('app-archive-links'),
   appMiddleware.uriContextResolverMiddleware({ create: false }),
@@ -159,14 +162,16 @@ exports.linksList = [
       .then(function(troupeContext) {
         templateContext.troupeContext = troupeContext;
 
+        res.setHeader('Cache-Control', 'public, max-age=' + ONE_DAY_SECONDS);
+        res.setHeader('Expires', new Date(Date.now() + ONE_DAY_MILLISECONDS).toUTCString());
         res.render('archive-links-template', templateContext);
       })
       .catch(next);
   }
 ];
 
-var EXPIRES_SECONDS = 60 * 60 * 24 * 365; // 1 year
-var EXPIRES_MILLISECONDS = EXPIRES_SECONDS * 1000;
+var ONE_YEAR_SECONDS = 60 * 60 * 24 * 365; // 1 year
+var ONE_YEAR_MILLISECONDS = ONE_YEAR_SECONDS * 1000;
 
 exports.chatArchive = [
   identifyRoute('app-archive-date'),
@@ -277,8 +282,8 @@ exports.chatArchive = [
             var startOfTodayUTC = moment.utc().startOf('day');
             var worstCaseStartUTC = startOfTodayUTC.subtract(12, 'hours');
             if (endDateLocal < worstCaseStartUTC) {
-              res.setHeader('Cache-Control', 'public, max-age=' + EXPIRES_SECONDS);
-              res.setHeader('Expires', new Date(Date.now() + EXPIRES_MILLISECONDS).toUTCString());
+              res.setHeader('Cache-Control', 'public, max-age=' + ONE_YEAR_SECONDS);
+              res.setHeader('Expires', new Date(Date.now() + ONE_YEAR_MILLISECONDS).toUTCString());
             }
 
             return res.render('chat-archive-template', {
