@@ -14,9 +14,9 @@
 
       <button
         {{#if this.className}}class="{{this.className}}"  {{/if}}
-        {{#if this.action}} data-action="{{this.action}}" {{/if}}
-        data-component="modal-btn"
-        >
+        {{#if this.action}}   data-action="{{this.action}}" {{/if}}
+        {{#if this.disabled}} disabled="true" {{/if}}
+        data-component="modal-btn">
         {{this.text}}
       </button>
 
