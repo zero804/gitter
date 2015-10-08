@@ -253,8 +253,8 @@ onready(function() {
     },
 
     markdown: function() {
-      require.ensure(['views/app/markdownView'], function(require) {
-        var MarkdownView = require('views/app/markdownView');
+      require.ensure(['views/modals/markdown-view'], function(require) {
+        var MarkdownView = require('views/modals/markdown-view');
         appView.dialogRegion.show(new MarkdownView({}));
       });
     },
