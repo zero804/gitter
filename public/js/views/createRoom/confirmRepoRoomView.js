@@ -69,8 +69,8 @@ module.exports = (function() {
       this.view = new View(options);
     },
     menuItems: [
-      { action: "create", text: "Create", className: "trpBtnGreen action" },
-      { action: "cancel", text: "Cancel", className: "trpBtnLightGrey"}
+      { action: "cancel", text: "Cancel", className: "modal--default__footer__btn--negative"},
+      { action: "create", text: "Create", className: "modal--default__footer__btn" },
     ]
   });
 

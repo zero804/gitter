@@ -50,8 +50,8 @@ module.exports = (function() {
         this.view = new View({ });
       },
       menuItems: [
-        { action: "upgrade", text: "Upgrade now", className: "trpBtnGreen" },
-        { action: "cancel", text: "Close", className: "trpBtnLightGrey" },
+        { action: "cancel", text: "Close", className: "modal--default__footer__btn--negative" },
+        { action: "upgrade", text: "Upgrade now", className: "modal--default__footer__btn" },
       ]
     });
 
