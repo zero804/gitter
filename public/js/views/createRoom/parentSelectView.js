@@ -1,11 +1,12 @@
 "use strict";
-var Marionette = require('backbone.marionette');
-var context = require('utils/context');
-var template = require('./tmpl/parentSelectView.hbs');
+
+var Marionette   = require('backbone.marionette');
+var context      = require('utils/context');
+var template     = require('./tmpl/parentSelectView.hbs');
 var itemTemplate = require('./tmpl/parentItemView.hbs');
-var Typeahead = require('views/controls/typeahead');
-var Backbone = require('backbone');
-var cdn = require('../../utils/cdn');
+var Typeahead    = require('views/controls/typeahead');
+var Backbone     = require('backbone');
+var cdn          = require('../../utils/cdn');
 
 module.exports = (function() {
 

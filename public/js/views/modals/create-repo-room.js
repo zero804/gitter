@@ -3,7 +3,7 @@ var Marionette     = require('backbone.marionette');
 var ModalView      = require('./modal');
 var context        = require('utils/context');
 var apiClient      = require('components/apiClient');
-var RepoSelectView = require('../createRoom/parentSelectView.js');
+var RepoSelectView = require('../createRoom/repoSelectView.js');
 var template       = require('./tmpl/create-repo-room.hbs');
 var appEvents      = require('utils/appevents');
 
@@ -23,7 +23,7 @@ var View = Marionette.LayoutView.extend({
       repoSelectRegion: {
         el: '#repo-select',
         init: function(optionsForRegion) {
-          return new RepoSelectView(optionsForRegion({ collection: RepoSelectView.createCollection() }));
+          return new RepoSelectView.View(optionsForRegion({ collection: RepoSelectView.createCollection() }));
         }
       }
     }
