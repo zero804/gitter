@@ -2,7 +2,7 @@
 
 var Marionette = require('backbone.marionette');
 var Backbone   = require('backbone');
-var ModalView  = require('views/modal');
+var ModalView  = require('./modal');
 var context    = require('utils/context');
 var apiClient  = require('components/apiClient');
 var appEvents  = require('utils/appevents');

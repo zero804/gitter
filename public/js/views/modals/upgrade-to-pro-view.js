@@ -3,7 +3,7 @@
 var context    = require('utils/context');
 var Marionette = require('backbone.marionette');
 var template   = require('./tmpl/upgrade-to-pro-view.hbs');
-var ModalView  = require('views/modal');
+var ModalView  = require('./modal');
 
 
 

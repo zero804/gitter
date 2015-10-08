@@ -1,6 +1,6 @@
 "use strict";
 var Marionette     = require('backbone.marionette');
-var ModalView      = require('views/modal');
+var ModalView      = require('./modal');
 var context        = require('utils/context');
 var apiClient      = require('components/apiClient');
 var RepoSelectView = require('../createRoom/parentSelectView.js');

@@ -3,7 +3,7 @@
 
 var Backbone         = require('backbone');
 var Marionette       = require('backbone.marionette');
-var ModalView        = require('views/modal');
+var ModalView        = require('./modal');
 var TagInputView     = require('views/app/tags/tagInputView');
 var TagListView      = require('views/app/tags/tagListView');
 var TagErrorView     = require('views/app/tags/tagErrorView');
