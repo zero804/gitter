@@ -246,8 +246,8 @@ onready(function() {
     },
 
     notifications: function() {
-      require.ensure(['views/app/troupeSettingsView'], function(require) {
-        var TroupeSettingsView = require('views/app/troupeSettingsView');
+      require.ensure(['views/modals/room-settings-view'], function(require) {
+        var TroupeSettingsView = require('views/modals/room-settings-view');
         appView.dialogRegion.show(new TroupeSettingsView({}));
       });
     },
@@ -295,8 +295,8 @@ onready(function() {
 
     integrations: function() {
       if (context.isTroupeAdmin()) {
-        require.ensure(['views/app/integrationSettingsModal'], function(require) {
-          var IntegrationSettingsModal = require('views/app/integrationSettingsModal');
+        require.ensure(['views/modals/integration-settings-view'], function(require) {
+          var IntegrationSettingsModal = require('views/modals/integration-settings-view');
 
           appView.dialogRegion.show(new IntegrationSettingsModal({}));
         });
