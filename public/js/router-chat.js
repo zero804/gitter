@@ -260,8 +260,8 @@ onready(function() {
     },
 
     keys: function() {
-      require.ensure(['views/app/keyboardView'], function(require) {
-        var KeyboardView = require('views/app/keyboardView');
+      require.ensure(['views/modals/keyboard-view'], function(require) {
+        var KeyboardView = require('views/modals/keyboard-view');
         appView.dialogRegion.show(new KeyboardView({}));
       });
     },
