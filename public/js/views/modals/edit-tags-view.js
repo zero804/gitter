@@ -133,9 +133,7 @@ var Modal = ModalView.extend({
     ModalView.prototype.initialize.apply(this, arguments);
     this.view = new View({roomId: options.roomId });
   },
-  menuItems: [
-    { action: "close", text: "Close",      className: "modal--default__footer__btn--neutral" },
-  ]
+  menuItems: []
 });
 
 module.exports = Modal;

@@ -122,7 +122,6 @@ module.exports = ModalView.extend({
       this.view = new View({ });
     },
     menuItems: [
-      { action: "close", text: "Close", className: "modal--default__footer__btn--neutral" },
       { action: "lurk", text: "Enable lurk mode", className: "modal--default__footer__btn" },
     ]
   });

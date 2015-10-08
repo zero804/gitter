@@ -8,8 +8,8 @@
 
   <section class="modal--default__content" id="modal-body-region"></section>
 
-  {{#hasMenuItems}}
   <footer class="modal--default__footer">
+    {{#hasMenuItems}}
     {{#each menuItems}}
 
       <button
@@ -21,7 +21,7 @@
       </button>
 
     {{/each}}
+    {{/hasMenuItems}}
   </footer>
-  {{/hasMenuItems}}
 
 </div>
