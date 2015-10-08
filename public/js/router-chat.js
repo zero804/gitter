@@ -306,8 +306,8 @@ onready(function() {
     },
 
     share: function() {
-      require.ensure(['views/share/share-view'], function(require) {
-        var shareView = require('views/share/share-view');
+      require.ensure(['views/modals/share-view'], function(require) {
+        var shareView = require('views/modals/share-view');
 
         appView.dialogRegion.show(new shareView.Modal({}));
       });
