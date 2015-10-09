@@ -5,7 +5,6 @@
 
 var _ = require('underscore');
 var persistence = require('../server/services/persistence-service');
-//var sm = require('sitemap');
 var moment = require('moment');
 var nconf = require('../server/utils/config');
 var fs = require('fs');
