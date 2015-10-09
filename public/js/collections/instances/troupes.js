@@ -1,17 +1,22 @@
 'use strict';
 
-var Backbone = require('backbone');
-var roomSort = require('gitter-realtime-client').sortsFilters.model;
-var troupeModels = require('../troupes');
-var orgModels = require('../orgs');
+var Backbone          = require('backbone');
+var roomSort          = require('gitter-realtime-client').sortsFilters.model;
+var troupeModels      = require('../troupes');
+var orgModels         = require('../orgs');
 var unreadItemsClient = require('components/unread-items-frame-client');
-var appEvents = require('utils/appevents');
-var Sorted = require('backbone-sorted-collection');
+var appEvents         = require('utils/appevents');
+var Sorted            = require('backbone-sorted-collection');
+var errorHandle       = require('utils/live-collection-error-handle');
+
+
 require('filtered-collection');
 
 module.exports = (function() {
   var orgsCollection = new orgModels.OrgCollection(null, { listen: true });
   var troupeCollection = new troupeModels.TroupeCollection(null, { listen: true });
+
+  orgsCollection.on('error', errorHandle.bind(null, 'org-collection'));
 
   unreadItemsClient.installTroupeListener(troupeCollection);
 
