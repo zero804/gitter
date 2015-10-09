@@ -17,8 +17,13 @@ var identifyRoute        = require('gitter-web-env').middlewares.identifyRoute;
 var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
 var dateTZtoUTC          = require('gitter-web-shared/time/date-timezone-to-utc');
 var debug                = require('debug')('gitter:app-archive');
+var _                    = require('underscore');
 
-var _ = require('underscore');
+var ONE_DAY_SECONDS = 60 * 60 * 24; // 1 day
+var ONE_DAY_MILLISECONDS = ONE_DAY_SECONDS * 1000;
+var ONE_YEAR_SECONDS = 60 * 60 * 24 * 365; // 1 year
+var ONE_YEAR_MILLISECONDS = ONE_YEAR_SECONDS * 1000;
+
 function generateChatTree(chatActivity) {
   // group things in nested maps
   var yearMap = {};
@@ -109,9 +114,6 @@ exports.datesList = [
   }
 ];
 
-var ONE_DAY_SECONDS = 60 * 60 * 24; // 1 day
-var ONE_DAY_MILLISECONDS = ONE_DAY_SECONDS * 1000;
-
 exports.linksList = [
   identifyRoute('app-archive-links'),
   appMiddleware.uriContextResolverMiddleware({ create: false }),
@@ -169,9 +171,6 @@ exports.linksList = [
       .catch(next);
   }
 ];
-
-var ONE_YEAR_SECONDS = 60 * 60 * 24 * 365; // 1 year
-var ONE_YEAR_MILLISECONDS = ONE_YEAR_SECONDS * 1000;
 
 exports.chatArchive = [
   identifyRoute('app-archive-date'),
