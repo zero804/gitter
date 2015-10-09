@@ -281,7 +281,7 @@ module.exports = Marionette.ItemView.extend({
   },
 
   requestBrowserNotificationsPermission: function() {
-    if (context().desktopNotifications) {
+    if(notifications.hasNotBeenSetup() && context().desktopNotifications){
       notifications.enable();
     }
   },
