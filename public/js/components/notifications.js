@@ -6,6 +6,8 @@ var webkitNotifications = window.webkitNotifications;
 var urlParser = require('../utils/url-parser');
 var linkHandler = require('./link-handler');
 
+var notificationsHaveBeenEnabled = false;
+
 function getPermissionType() {
   if(!WindowNotification) return;
 
@@ -60,6 +62,12 @@ module.exports = {
 
   enable: function() {
     if(!WindowNotification) return;
+
+    //if enable has already been called bail
+    if(notificationsHaveBeenEnabled) return;
+
+    //track that this has previously been called
+    notificationsHaveBeenEnabled = true;
 
     if(getPermissionType() === 'granted') {
       // no need to request permission
