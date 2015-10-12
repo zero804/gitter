@@ -145,6 +145,76 @@ LurkTroupeForUserStrategy.prototype = {
   name: 'LurkTroupeForUserStrategy'
 };
 
+//function LastSeenForUserStrategy(options) {
+//  var currentUserId = options.currentUserId;
+//  var lastSeen = [];
+//
+//  this.preload = function(troupeIds, callback) {
+//    var promises = troupeIds.map(function(troupeId) {
+//      return unreadItemService.lastItemSeen(currentUserId, troupeId);
+//    });
+//
+//    Promise.all(promises)
+//    .then(function(values) {
+//      troupeIds.forEach(function(troupeId, i) {
+//        lastSeen[troupeId] = values[i];
+//      });
+//
+//      return lastSeen;
+//    })
+//    .then(function(values) {
+//      return callback(null, values);
+//    })
+//    .catch(function(err) {
+//      return callback(err, null);
+//    });
+//    //.nodeify(callback);
+//  };
+//
+//  this.map = function(roomId) {
+//    return lastSeen[roomId];
+//  };
+//}
+//LastSeenForUserStrategy.prototype = {
+//  name: 'LastSeenForUserStrategy'
+//};
+
+function ActivityForUserStrategy(options) {
+  var currentUserId = options.currentUserId;
+  var activity = [];
+
+  this.preload = function(troupeIds, callback) {
+    var promises = troupeIds.map(function(troupeId) {
+      return unreadItemService.getActivityIndicator(troupeId, currentUserId);
+    });
+
+    Promise.all(promises)
+    .then(function(values) {
+      troupeIds.forEach(function(troupeId, i) {
+        activity[troupeId] = values[i];
+      });
+
+      return activity;
+    })
+    .then(function(values) {
+      return callback(null, values);
+    })
+    .catch(function(err) {
+      return callback(err, null);
+    });
+    //.nodeify(callback);
+  };
+
+  this.map = function(roomId) {
+    return activity[roomId];
+  };
+}
+ActivityForUserStrategy.prototype = {
+  name: 'ActivityForUserStrategy'
+};
+
+
+
 
 function ProOrgStrategy() {
   var proOrgs = {};
@@ -278,6 +348,8 @@ function TroupeStrategy(options) {
   var lastAccessTimeStategy = currentUserId ? new LastTroupeAccessTimesForUserStrategy(options) : null;
   var favouriteStrategy     = currentUserId ? new FavouriteTroupesForUserStrategy(options) : null;
   var lurkStrategy          = currentUserId ? new LurkTroupeForUserStrategy(options) : null;
+  var activityStrategy      = currentUserId ? new ActivityForUserStrategy(options) : null;
+
   var userIdStategy         = new UserIdStrategy(options);
   var proOrgStrategy        = new ProOrgStrategy(options);
   var permissionsStategy    = (currentUserId || options.currentUser) && options.includePermissions ? new TroupePermissionsStrategy(options) : null;
@@ -360,6 +432,14 @@ function TroupeStrategy(options) {
       });
     }
 
+    if(activityStrategy) {
+      strategies.push({
+        strategy: activityStrategy,
+        data: troupeIds
+      });
+    }
+
+
     execPreloads(strategies, callback);
   };
 
@@ -424,6 +504,7 @@ function TroupeStrategy(options) {
       lastAccessTime: lastAccessTimeStategy ? lastAccessTimeStategy.map(item.id) : undefined,
       favourite: favouriteStrategy ? favouriteStrategy.map(item.id) : undefined,
       lurk: lurkStrategy ? !item.oneToOne && lurkStrategy.map(item.id) : undefined,
+      activity: activityStrategy ? activityStrategy.map(item.id) : undefined,
       url: troupeUrl,
       githubType: item.githubType,
       security: item.security,
