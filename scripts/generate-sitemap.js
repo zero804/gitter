@@ -100,6 +100,7 @@ var projection = { _id: 1, uri: 1 };
 var stream = persistence.Troupe
   .find(query, projection)
   .sort({_id: 1})
+  .slaveOk()
   .stream();
 
 stream.pipe(batch);
