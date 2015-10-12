@@ -9,7 +9,7 @@ var moment = require('moment');
 var nconf = require('../server/utils/config');
 var fs = require('fs');
 var BatchStream = require('batch-stream');
-var through2 = require('through2');
+var through2Concurrent = require('through2-concurrent');
 var basePath = nconf.get('web:basepath');
 var sitemapLocation = nconf.get('sitemap:location');
 
@@ -86,23 +86,17 @@ var stream = persistence.Troupe
   .slaveOk()
   .stream()
   .pipe(new BatchStream({size: 50000}))
-  .pipe(through2.obj(function(rooms, enc, callback) {
+  .pipe(through2Concurrent.obj({maxConcurrency: 10}, function(rooms, enc, callback) {
     pageNum++;
-    var data = {
-      url: sitemapLocation.replace('.xml', '-'+pageNum+'.xml'),
-      sitemap: createSitemap(rooms.map(roomToURL)),
-      pageNum: pageNum
-    };
-    this.push(data);
-    fs.writeFile(opts.tempdir+'/'+opts.name+'-'+data.pageNum+'.xml', data.sitemap, callback);
+    sitemapURLs.push(sitemapLocation.replace('.xml', '-'+pageNum+'.xml'));
+    var sitemap = createSitemap(rooms.map(roomToURL));
+    fs.writeFile(opts.tempdir+'/'+opts.name+'-'+pageNum+'.xml', sitemap, callback);
   }))
-  .on('data', function(data) {
-    sitemapURLs.push(data.url);
-  })
+  .on('data', function() {})
   .on('end', function() {
-    var indexData = createSitemapIndex(sitemapURLs);
-    fs.writeFile(opts.tempdir+'/'+opts.name+'.xml', indexData, function() {
-      process.exit(0);
-    });
+      var indexData = createSitemapIndex(sitemapURLs);
+      fs.writeFile(opts.tempdir+'/'+opts.name+'.xml', indexData, function() {
+        process.exit(0);
+      });
   })
   .on('error', die);
