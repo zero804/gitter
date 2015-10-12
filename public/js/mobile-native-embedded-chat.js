@@ -9,9 +9,7 @@ var unreadItemsClient = require('components/unread-items-client');
 var cacheSync = require('components/cache-sync');
 var emojiDecorator = require('views/chat/decorators/emojiDecorator');
 var mobileDecorator = require('views/chat/decorators/mobileDecorator');
-var log = require('utils/log');
 var onready = require('./utils/onready');
-var appEvents = require('./utils/appevents');
 var FastClick = require('fastclick');
 
 require('components/eyeballs');
@@ -24,17 +22,6 @@ require('template/helpers/all');
 
 onready(function() {
   FastClick.attach(document.body);
-
-  appEvents.on('app.version.mismatch', function() {
-    try {
-      if(window.applicationCache.status == 1) {
-        log.info('Attempting to update application cache');
-        window.applicationCache.update();
-      }
-    } catch(e) {
-      log.info('Unable to update application cache: ' + e, e);
-    }
-  });
 
   cordovaNav.syncNativeWithWebContext(context.troupe());
 
