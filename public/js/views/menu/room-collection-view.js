@@ -227,6 +227,17 @@ module.exports = (function() {
       }
 
       this.roomsCollection = options.roomsCollection;
+
+      this.listenTo(context.troupe(), 'change:id', this.onRoomChange, this);
+    },
+
+    onRoomChange: function(){
+      //this is a very hacky way of changing the selected menu item
+      //this should be moved into the collection as a `selected` property
+      //whicih could then be changed in the troupeCollection on room change
+      //jp 12-10-15
+      this.$el.find('.room-list-item--current-room').removeClass('room-list-item--current-room');
+      this.$el.find('[data-id=' + context.troupe().get('id')  + ']').addClass('room-list-item--current-room');
     },
 
     makeDraggable: function(drop) {

@@ -99,7 +99,6 @@ onready(function() {
   });
 
   function pushState(state, title, url) {
-    console.log(arguments);
     if (state == window.history.state) {
       // Don't repush the same state...
       return;
