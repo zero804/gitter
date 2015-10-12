@@ -1,10 +1,11 @@
 "use strict";
-var appEvents = require('utils/appevents');
-var cdn = require('../utils/cdn');
-var WindowNotification = window.Notification;
+
+var appEvents           = require('utils/appevents');
+var cdn                 = require('../utils/cdn');
+var WindowNotification  = window.Notification;
 var webkitNotifications = window.webkitNotifications;
-var urlParser = require('../utils/url-parser');
-var linkHandler = require('./link-handler');
+var urlParser           = require('../utils/url-parser');
+var linkHandler         = require('./link-handler');
 
 var notificationsHaveBeenEnabled = false;
 
@@ -22,6 +23,7 @@ function getPermissionType() {
     }
   }
 }
+
 
 function showNotification(message) {
   var link = message.link;
@@ -47,6 +49,20 @@ function showNotification(message) {
 }
 
 
+function initNotifications(){
+  //if enable has already been called bail
+  if(notificationsHaveBeenEnabled) return;
+
+  //track that this has previously been called
+  notificationsHaveBeenEnabled = true;
+
+  //subscribe to notifications
+  appEvents.on('user_notification', function(message) {
+    showNotification(message);
+  });
+}
+
+
 module.exports = {
   hasNotBeenSetup: function() {
     return getPermissionType() === 'default';
@@ -64,30 +80,10 @@ module.exports = {
     if(!WindowNotification) return;
 
     if(getPermissionType() === 'granted') {
-
-      //if enable has already been called bail
-      if(notificationsHaveBeenEnabled) return;
-
-      //track that this has previously been called
-      notificationsHaveBeenEnabled = true;
-
-      // no need to request permission
-      appEvents.on('user_notification', function(message) {
-        showNotification(message);
-      });
+      initNotifications();
     } else {
       WindowNotification.requestPermission(function() {
-
-        //if enable has already been called bail
-        if(notificationsHaveBeenEnabled) return;
-
-        //track that this has previously been called
-        notificationsHaveBeenEnabled = true;
-
-        //subscribe to notifications
-        appEvents.on('user_notification', function(message) {
-          showNotification(message);
-        });
+        initNotifications();
       });
     }
   }
