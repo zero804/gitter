@@ -73,21 +73,21 @@ var ChatInputBoxView = Marionette.ItemView.extend({
   },
 
   onRender: function() {
-    if (this.ui.textarea.length) {
-      this.removeTextareaExtensions();
-      this.addTextareaExtensions();
+    if (!this.ui.textarea.length) return;
+    
+    this.removeTextareaExtensions();
+    this.addTextareaExtensions();
 
-      if (!isMobile()) {
-        var self = this;
-        RAF(function() {
-          // firefox only respects the "autofocus" attr if it is present on source html
-          // also, dont show keyboard right away on mobile
-          // Also, move the cursor to the end of the textarea text
+    if (!isMobile()) {
+      var self = this;
+      RAF(function() {
+        // firefox only respects the "autofocus" attr if it is present on source html
+        // also, dont show keyboard right away on mobile
+        // Also, move the cursor to the end of the textarea text
 
-          self.setCaretPosition();
-          self.ui.textarea.focus();
-        });
-      }
+        self.setCaretPosition();
+        self.ui.textarea.focus();
+      });
     }
   },
 
