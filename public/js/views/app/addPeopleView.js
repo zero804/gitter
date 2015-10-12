@@ -229,7 +229,7 @@ var modalButtons = [
 ];
 
 if(context.troupe().get('security') !== 'PRIVATE') {
-  modalButtons.push({ action: "share", text: "Share this room", className: "modal--default__footer__btn--neutral"});
+  modalButtons.push({ action: "share", text: "Share this room", className: "modal--default__footer__link"});
 }
 
 module.exports =  ModalView.extend({
