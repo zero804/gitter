@@ -63,19 +63,28 @@ module.exports = {
   enable: function() {
     if(!WindowNotification) return;
 
-    //if enable has already been called bail
-    if(notificationsHaveBeenEnabled) return;
-
-    //track that this has previously been called
-    notificationsHaveBeenEnabled = true;
-
     if(getPermissionType() === 'granted') {
+
+      //if enable has already been called bail
+      if(notificationsHaveBeenEnabled) return;
+
+      //track that this has previously been called
+      notificationsHaveBeenEnabled = true;
+
       // no need to request permission
       appEvents.on('user_notification', function(message) {
         showNotification(message);
       });
     } else {
       WindowNotification.requestPermission(function() {
+
+        //if enable has already been called bail
+        if(notificationsHaveBeenEnabled) return;
+
+        //track that this has previously been called
+        notificationsHaveBeenEnabled = true;
+
+        //subscribe to notifications
         appEvents.on('user_notification', function(message) {
           showNotification(message);
         });
