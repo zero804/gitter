@@ -1,12 +1,12 @@
 "use strict";
 var $ = require('jquery');
 var context = require('utils/context');
+var liveContext = require('components/live-context');
 var cordovaNav = require('components/cordova-navigate');
 var chatModels = require('collections/chat');
 var ChatCollectionView = require('views/chat/chatCollectionView');
 var ChatInputView = require('views/chat/chatInputView');
 var unreadItemsClient = require('components/unread-items-client');
-var cacheSync = require('components/cache-sync');
 var emojiDecorator = require('views/chat/decorators/emojiDecorator');
 var mobileDecorator = require('views/chat/decorators/mobileDecorator');
 var onready = require('./utils/onready');
@@ -26,7 +26,6 @@ onready(function() {
   cordovaNav.syncNativeWithWebContext(context.troupe());
 
   var chatCollection = new chatModels.ChatCollection(null, { listen: true });
-  cacheSync.install(chatCollection);
 
   var chatCollectionView = new ChatCollectionView({
     el: $('#chat-container'),
@@ -40,10 +39,28 @@ onready(function() {
 
   unreadItemsClient.monitorViewForUnreadItems($('#content-frame'), chatCollectionView);
 
+  var $chatInputWrapper = $('#chat-input-wrapper');
+  var room = context.troupe();
+
+  if (!room.get('roomMember')) {
+    $chatInputWrapper.hide();
+  }
+
   new ChatInputView({
     el: $('#chat-input'),
     collection: chatCollection,
   }).render();
+
+  room.on('change:roomMember', function(room, isMember) {
+    if (isMember) {
+      $chatInputWrapper.show();
+    } else {
+      $chatInputWrapper.hide();
+    }
+  });
+
+  // Listen for changes to the room
+  liveContext.syncRoom();
 
   $('html').removeClass('loading');
 });
