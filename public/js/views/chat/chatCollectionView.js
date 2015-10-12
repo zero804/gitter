@@ -195,6 +195,23 @@ module.exports = (function() {
         this.rollers.setModeLocked(false);
       });
 
+      this.listenTo(this.collection, 'snapshot', function() {
+        if (!context.troupe().get('lurk')) return;
+
+        var lastAccess = new Date(context.troupe().get('lastAccessTime'));
+
+        this.collection.some(function(chat) { 
+          var isAfter = chat.get('sent').isAfter(lastAccess);
+
+          if (isAfter) {
+            var view = this.children.findByModel(chat);
+            if (view) view.highlight();
+            return true;
+          }
+        }.bind(this));
+      });
+
+
       this.listenTo(appEvents, 'command.collapse.chat', this.collapseChats);
       this.listenTo(appEvents, 'command.expand.chat', this.expandChats);
 
@@ -210,6 +227,19 @@ module.exports = (function() {
         this.rollers.scrollToBottom();
       }, this);
     },
+
+    //onRender: function() {
+    //  var lastItemSeen = context.troupe().get('lastItemSeen');
+    //  console.debug('lastItemSeen', lastItemSeen);
+    //  if (!lastItemSeen) return;
+
+    //  this.collection.ensureLoaded(lastItemSeen, function() {
+    //    var model = this.collection.get(lastItemSeen);
+    //    var view = this.children.findByModel(model);
+    //    if (view) view.highlight();
+    //    this.scrollToChatId(lastItemSeen);
+    //  }.bind(this));
+    //},
 
     onTrackViewportCenter: function() {
       if (!this.isScrolledToBottom()) {

@@ -18,6 +18,12 @@ var Q                = require('q');
 var roomMembershipService = require('./room-membership-service');
 var uniqueIds        = require('mongodb-unique-ids');
 var debug            = require('debug')('gitter:unread-item-service');
+var recentRoomService = require('./recent-room-service');
+
+
+var redisClient      = require('../utils/redis').createClient();
+var Promise          = require('bluebird');
+
 
 var badgeBatcher     = new RedisBatcher('badge', 1000, batchBadgeUpdates);
 
@@ -258,6 +264,16 @@ function getOldestId(ids) {
     return mongoUtils.getTimestampFromObjectId(id);
   });
 }
+
+function getNewestId(ids) {
+  if(!ids.length) return null;
+
+  return _.max(ids, function(id) {
+    // Create a new ObjectID with a specific timestamp
+    return mongoUtils.getTimestampFromObjectId(id);
+  });
+}
+
 
 function getTroupeIdsCausingBadgeCount(userId) {
   return engine.getRoomsCausingBadgeCount(userId);
@@ -516,8 +532,17 @@ function processResultsForNewItemWithMentions(troupeId, chatId, parsed, results,
         var activityOnly = parsed.activityOnlyUserIds;
         for(var i = 0; i < activityOnly.length; i++) {
           var activityOnlyUserId =  activityOnly[i];
-          var activityOnlyUserIdOnlineStatus = presenceStatus[activityOnlyUserId];
-          if (!activityOnlyUserIdOnlineStatus) continue; // null === offline
+
+          //var activityOnlyUserIdOnlineStatus = presenceStatus[activityOnlyUserId];
+          //if (!activityOnlyUserIdOnlineStatus) continue; // null === offline
+
+          debug('presenceStatus for ' + activityOnlyUserId, presenceStatus[activityOnlyUserId]);
+
+          // If lurking user is not in the room, persist activity
+          if (presenceStatus[activityOnlyUserId] !== 'inroom') {
+            persistActivityForLurkingUser(troupeId, activityOnlyUserId, chatId);
+          }
+
           appEvents.newLurkActivity({ userId: activityOnlyUserId, troupeId: troupeId });
         }
       }
@@ -643,6 +668,77 @@ function queueBadgeUpdateForUser(userIds) {
   debug("Batching badge update for %s users", len);
   badgeBatcher.add('queue', userIds);
 }
+
+
+exports.saveLastItemSeen = function(userId, troupeId, chatIds) {
+  var oldestId = getNewestId(chatIds);
+  var lastSeenKey = 'chat:lastseen:' + userId + ':' + troupeId;
+  return new Promise(function(resolve, reject) {
+    redisClient.set(lastSeenKey, oldestId, function(err, value) {
+      if (err) return reject(err);
+      resolve(value);
+    });
+  });
+};
+
+//exports.lastItemSeen = function(userId, troupeId) {
+//  var lastSeenKey = 'chat:lastseen:' + userId + ':' + troupeId;
+//  return new Promise(function(resolve, reject) {
+//    redisClient.get(lastSeenKey, function(err, value) {
+//      if (err) return reject(err);
+//      resolve(value);
+//    });
+//  });
+//};
+
+function persistActivityForLurkingUser(troupeId, userId, chatId) {
+  debug('persistActivityForLurkingUser');
+  return recentRoomService.getTroupeLastAccessTimesForUser(userId)
+  .then(function(times) {
+    var lastAccess = times[troupeId];
+    
+    var chatTimestamp = mongoUtils.getTimestampFromObjectId(chatId);
+    var chatDate = new Date(chatTimestamp);
+
+    if (chatDate > lastAccess) {
+      var activityKey = 'activity:' + userId + ':' + troupeId;
+      debug('persistActivityForLurkingUser: ', activityKey);
+
+      return new Promise(function(resolve, reject) {
+        redisClient.set(activityKey, chatId, function(err, value) {
+          if (err) return reject(err);
+          resolve(value);
+        });
+      });
+
+    }
+  });
+}
+
+exports.clearActivityIndicator = function(troupeId, userId) {
+  var activityKey = 'activity:' + userId + ':' + troupeId;
+
+  debug('clearActivityIndicator: ', activityKey);
+
+  return new Promise(function(resolve, reject) {
+    redisClient.del(activityKey, function(err, value) {
+      if (err) return reject(err);
+      resolve(value);
+    });
+  });
+};
+
+exports.getActivityIndicator = function(troupeId, userId) {
+  var activityKey = 'activity:' + userId + ':' + troupeId;
+
+  return new Promise(function(resolve, reject) {
+    redisClient.get(activityKey, function(err, value) {
+      if (err) return reject(err);
+      resolve(value);
+    });
+  });
+};
+
 
 exports.listen = function() {
   badgeBatcher.listen();

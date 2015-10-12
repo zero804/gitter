@@ -1,17 +1,18 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var Q                  = require('q');
-var lazy               = require('lazy.js');
-var troupeUriMapper    = require('./troupe-uri-mapper');
-var mongoUtils         = require('../utils/mongo-utils');
-var persistence        = require('./persistence-service');
-var assert             = require('assert');
-var appEvents          = require('gitter-web-appevents');
-var moment             = require('moment');
-var _                  = require('underscore');
-var unreadItemsService = require('./unread-item-service');
-var debug              = require('debug')('gitter:recent-room-service');
+var Q                       = require('q');
+var lazy                    = require('lazy.js');
+var troupeUriMapper         = require('./troupe-uri-mapper');
+var mongoUtils              = require('../utils/mongo-utils');
+var persistence             = require('./persistence-service');
+var assert                  = require('assert');
+var appEvents               = require('gitter-web-appevents');
+var moment                  = require('moment');
+var _                       = require('underscore');
+var unreadItemsService      = require('./unread-item-service');
+var roomMembershipService   = require('./room-membership-service');
+var debug                   = require('debug')('gitter:recent-room-service');
 
 /* const */
 var LEGACY_FAV_POSITION = 1000;
@@ -200,17 +201,30 @@ function saveLastVisitedTroupeforUserId(userId, troupeId, options) {
   debug('saveLastVisitedTroupeforUserId: userId=%s, troupeId=%s, options=%j', userId, troupeId, options);
   var lastAccessTime = options && options.lastAccessTime || new Date();
 
-  return Q.all([
+  return roomMembershipService.getMemberLurkStatus(troupeId, userId)
+  .then(function(lurking) {
+
+    var actions = [
       saveUserTroupeLastAccess(userId, troupeId, lastAccessTime),
-      // Update User
       persistence.User.update({ _id: userId }, { $set: { lastTroupe: troupeId }}).exec()
-    ])
-    .then(function() {
-      // XXX: lastAccessTime should be a date but for some bizarre reason it's not
-      // serializing properly
-      if (!options || !options.skipFayeUpdate) {
-        appEvents.dataChange2('/user/' + userId + '/rooms', 'patch', { id: troupeId, lastAccessTime: moment(lastAccessTime).toISOString() });
-      }
+    ];
+
+    if (lurking) {
+      actions.push(unreadItemsService.clearActivityIndicator(troupeId, userId));
+    }
+
+    console.log('*** lurking?', lurking);
+
+    console.log('*** actions', actions.length);
+
+    return Q.all(actions)
+      .then(function() {
+        // XXX: lastAccessTime should be a date but for some bizarre reason it's not
+        // serializing properly
+        if (!options || !options.skipFayeUpdate) {
+          appEvents.dataChange2('/user/' + userId + '/rooms', 'patch', { id: troupeId, lastAccessTime: moment(lastAccessTime).toISOString() });
+        }
+      });
     });
 }
 exports.saveLastVisitedTroupeforUserId = saveLastVisitedTroupeforUserId;
