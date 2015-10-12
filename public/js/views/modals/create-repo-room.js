@@ -90,7 +90,7 @@ var Modal = ModalView.extend({
     this.view = new View(options);
   },
   menuItems: [
-    { action: "back", text: "Back", className: "modal--default__footer__link"},
+    { action: "back", text: "Back", className: "modal--default__footer__link", pull: 'left'},
   ]
 });
 
