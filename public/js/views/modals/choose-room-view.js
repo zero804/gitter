@@ -46,7 +46,6 @@ var Modal = ModalView.extend({
     this.view = new View(options);
   },
   menuItems: [
-    { action: "cancel", text: "Cancel", className: "modal--default__footer__btn--neutral"},
     { action: "next", text: "Next", className: "modal--default__footer__btn" },
   ]
 });

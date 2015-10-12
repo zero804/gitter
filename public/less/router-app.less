@@ -1,5 +1,5 @@
-@import "typography.less";
 @import "base-web.less";
+@import "typography.less";
 @import "bootstrap/mixins";
 
 @import "../js/views/layouts/app-layout";
@@ -9,16 +9,3 @@
 @import "../js/views/modals/create-room-view.less";
 @import "../js/views/widgets/preload";
 @import "staging-indicator";
-
-
-/*
-  Recent changes in html { dont-size: 62.5% }
-  mean some styles have to be reset. This should go away over time
-  once all components have been integrated
-*/
-.dropdown,
-.owner,
-#repo-select,
-.notification-text{
-  font-size: 1rem;
-}
