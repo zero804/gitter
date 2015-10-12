@@ -237,7 +237,7 @@ module.exports = (function() {
       if (currentlySelectedRoom) currentlySelectedRoom.set('currentRoom', false);
 
       //select new room
-      var newlySelectedRoom = this.collection.where({ id: context.troupe().get('id') })[0];
+      var newlySelectedRoom = this.collection.get(context.troupe().get('id'));
       if (newlySelectedRoom) newlySelectedRoom.set('currentRoom', true);
 
     },
