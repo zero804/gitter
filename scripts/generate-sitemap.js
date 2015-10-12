@@ -9,6 +9,11 @@ var moment = require('moment');
 var nconf = require('../server/utils/config');
 var fs = require('fs');
 var BatchStream = require('batch-stream');
+var through2 = require('through2');
+var basePath = nconf.get('web:basepath');
+var sitemapLocation = nconf.get('sitemap:location');
+
+
 
 var opts = require("nomnom")
   .option('tempdir', {
@@ -23,11 +28,14 @@ var opts = require("nomnom")
   })
   .parse();
 
-
 function die(error) {
   console.error(error);
   console.error(error.stack);
   process.exit(1);
+}
+
+function roomToURL(room) {
+  return basePath + '/' + room.uri + '/archives';
 }
 
 function createSitemap(urls) {
@@ -62,33 +70,8 @@ function createSitemapIndex(urls) {
   return xml.join('\n')
 };
 
-var batch = new BatchStream({size: 50000});
 var pageNum = 0;
 var sitemapURLs = [];
-var basePath = nconf.get('web:basepath');
-var sitemapLocation = nconf.get('sitemap:location');
-
-batch.on('data', function(rooms) {
-  pageNum++;
-
-  var sitemapURL = sitemapLocation.replace('.xml', '-'+pageNum+'.xml');
-  sitemapURLs.push(sitemapURL);
-
-  var urls = [];
-  rooms.forEach(function(room) {
-    var url = basePath + '/' + room.uri + '/archives';
-    urls.push(url);
-  });
-  var sitemapData = createSitemap(urls);
-  fs.writeFileSync(opts.tempdir+'/'+opts.name+'-'+pageNum+'.xml', sitemapData);
-});
-
-batch.on('end', function() {
-  var indexData = createSitemapIndex(sitemapURLs);
-  fs.writeFileSync(opts.tempdir+'/'+opts.name+'.xml', indexData);
-  process.exit(0);
-});
-
 var query = {
   security: 'PUBLIC',
   '$or': [
@@ -101,6 +84,25 @@ var stream = persistence.Troupe
   .find(query, projection)
   .sort({_id: 1})
   .slaveOk()
-  .stream();
-
-stream.pipe(batch);
+  .stream()
+  .pipe(new BatchStream({size: 50000}))
+  .pipe(through2.obj(function(rooms, enc, callback) {
+    pageNum++;
+    var data = {
+      url: sitemapLocation.replace('.xml', '-'+pageNum+'.xml'),
+      sitemap: createSitemap(rooms.map(roomToURL)),
+      pageNum: pageNum
+    };
+    this.push(data);
+    fs.writeFile(opts.tempdir+'/'+opts.name+'-'+data.pageNum+'.xml', data.sitemap, callback);
+  }))
+  .on('data', function(data) {
+    sitemapURLs.push(data.url);
+  })
+  .on('end', function() {
+    var indexData = createSitemapIndex(sitemapURLs);
+    fs.writeFile(opts.tempdir+'/'+opts.name+'.xml', indexData, function() {
+      process.exit(0);
+    });
+  })
+  .on('error', die);
