@@ -12,7 +12,7 @@ HAS_DOCKER_MACHINE=$(which docker-machine)
 
 function get_ip {
   if [ HAS_DOCKER_MACHINE ]; then
-    echo "$(docker-machine ip dev)"
+    echo "$(docker-machine ip $DOCKER_MACHINE_NAME)"
   else
     echo "$(ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}')"
   fi
@@ -142,7 +142,7 @@ setupElasticSearchConfigs
 setupMongoInitScript
 startDockerServices
 
-cat << "EOD"
+cat << EOD
 # Run this command to configure your shell:
-# eval "$(docker-machine env dev)"
+eval "\$(docker-machine env $DOCKER_MACHINE_NAME)"
 EOD
