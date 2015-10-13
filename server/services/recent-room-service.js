@@ -213,10 +213,6 @@ function saveLastVisitedTroupeforUserId(userId, troupeId, options) {
       actions.push(unreadItemsService.clearActivityIndicator(troupeId, userId));
     }
 
-    console.log('*** lurking?', lurking);
-
-    console.log('*** actions', actions.length);
-
     return Q.all(actions)
       .then(function() {
         // XXX: lastAccessTime should be a date but for some bizarre reason it's not
