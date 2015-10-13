@@ -37,7 +37,7 @@ var ChatInputView = Marionette.LayoutView.extend({
   },
 
   serializeData: function() {
-    return { user: context.user().toJSON() };
+    return { user: context.user() };
   },
 
   initChatInputBoxRegion: function(optionsForRegion) {
