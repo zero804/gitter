@@ -72,7 +72,7 @@ var ModalView = Marionette.LayoutView.extend({
   },
 
   setButtonState: function(name,state) {
-    var $s = this.$el.find('.modal-footer button[data-action=' + name + ']');
+    var $s = this.$el.find('button[data-action=' + name + ']');
     if(state) {
       $s.removeAttr('disabled');
     } else {
