@@ -43,6 +43,10 @@ onready(function() {
   var room = context.troupe();
 
   if (!room.get('roomMember')) {
+    // Im Andy Trevorah and I wrote this instead of using region switching because:
+    // a) we need to hide the border between chat collection view and chat input
+    // b) using web textinput on native apps is on its way out anyway
+    // c) im lazy
     $chatInputWrapper.hide();
   }
 
@@ -52,6 +56,10 @@ onready(function() {
   }).render();
 
   room.on('change:roomMember', function(room, isMember) {
+    // Im Andy Trevorah and I wrote this instead of using region switching because:
+    // a) we need to hide the border between chat collection view and chat input
+    // b) using web textinput on native apps is on its way out anyway
+    // c) im so lazy that I copy and paste all my excuses
     if (isMember) {
       $chatInputWrapper.show();
     } else {
