@@ -16,6 +16,7 @@
 .share-view__section {
   display: flex;
   margin-bottom: 24px;
+  flex-wrap: wrap;
 }
 
 .share-view__section > *:not(:last-child) {
@@ -23,18 +24,20 @@
 }
 
 .share-view__copy-field {
-  font-family: 'Open Sans','HelveticaNeue',sans-serif;
-  font-size: 14px;
-  outline: 0;
-  box-shadow: none;
   width: 100%;
   padding: 9px;
-  border: 1px solid @trpGrey;
-  margin: 0;
+  margin: 0 0 1rem 0;
 
   background-color: fade(@trpGrey, 50%);
+  border: 1px solid @trpGrey;
   border-radius: 4px;
+  box-shadow: none;
+
+  font-family: 'Open Sans','HelveticaNeue',sans-serif;
+  font-size: 14px;
   color: black;
+
+  outline: 0;
 
   &:focus {
     outline: 0;
