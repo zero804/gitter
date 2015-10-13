@@ -59,7 +59,7 @@ module.exports = Marionette.ItemView.extend({
 
   serializeData: function() {
     var data = this.model.toJSON();
-    var orgName = data.uri.split('/')[0];
+    var orgName = data.name;
 
     _.extend(data, {
       troupeName:      data.name,
