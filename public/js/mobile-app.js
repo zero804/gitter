@@ -1,4 +1,6 @@
 "use strict";
+
+var context = require('utils/context');
 var $ = require('jquery');
 var appEvents = require('utils/appevents');
 var chatModels = require('collections/chat');
@@ -30,7 +32,7 @@ onready(function() {
   new RoomCollectionTracker(troupeCollections.troupes);
 
   var chatCollection = new chatModels.ChatCollection(null, { listen: true });
-  var appView = new MobileLayout({ template: false, el: 'body', chatCollection: chatCollection });
+  var appView = new MobileLayout({ model: context.troupe(), template: false, el: 'body', chatCollection: chatCollection });
   appView.render();
 
   var Router = Backbone.Router.extend({

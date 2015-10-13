@@ -181,6 +181,7 @@ module.exports = (function() {
         },
 
         handleSnapshot: function(snapshot) {
+          store.state = 'LOADED';
           var roomMember = context.troupe().get('roomMember');
           var lurk = snapshot._meta && snapshot._meta.lurk;
 
@@ -194,6 +195,7 @@ module.exports = (function() {
       });
 
       templateSubscription.on('resubscribe', function() {
+        store.state = 'LOADING';
         store.reset();
       });
 
