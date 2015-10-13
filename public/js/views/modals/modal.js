@@ -92,7 +92,7 @@ var ModalView = Marionette.LayoutView.extend({
   },
 
   showPremium: function() {
-    var $s = this.$el.find('.modal-footer .premium');
+    var $s = this.$el.find('.premium');
     $s.removeClass('hidden');
     $s.show();
   },

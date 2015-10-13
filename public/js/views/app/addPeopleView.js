@@ -225,7 +225,7 @@ var View = Marionette.CompositeView.extend({
 });
 
 var modalButtons = [
-  { action: "get-pro", text: "Upgrade to Pro", className: "modal--default__footer__link" }
+  { action: "get-pro", text: "Upgrade to Pro", className: "modal--default__footer__link premium hidden" }
 ];
 
 if(context.troupe().get('security') !== 'PRIVATE') {
