@@ -91,6 +91,7 @@ module.exports = (function() {
         apiClient.room.delete('/users/' + context.getUserId(), { })
           .then(function() {
             appEvents.trigger('navigation', '/home', 'home', '');
+            context.troupe().set('roomMember', false);
           });
       }
     },

@@ -3,6 +3,7 @@ node_modules
 .DS_Store
 /.project
 /npm-debug.log
+/nodemon.log
 /.externalToolBuilders
 /.settings
 troupe.sublime-project
@@ -79,3 +80,4 @@ config/docker
 docker_node_modules
 *.cpuprofile
 *-v8.log
+.vagrant/

@@ -95,7 +95,12 @@ var embedMiddlewarePipeline = [
   timezoneMiddleware,
   function (req, res, next) {
     if(!req.uriContext.troupe) return next(404);
-    appRender.renderEmbeddedChat(req, res, next);
+
+    if (req.user) {
+      appRender.renderEmbeddedChat(req, res, next);
+    } else {
+      appRender.renderNotLoggedInEmbeddedChat(req, res, next);
+    }
   }
 ];
 
@@ -140,6 +145,7 @@ var router = express.Router({ caseSensitive: true, mergeParams: true });
   '/:roomPart1/:roomPart2',
   '/:roomPart1/:roomPart2/:roomPart3',
 ].forEach(function(path) {
+  router.get(path + '/archives', archive.linksList);
   router.get(path + '/archives/all', archive.datesList);
   router.get(path + '/archives/:yyyy(\\d{4})/:mm(\\d{2})/:dd(\\d{2})', archive.chatArchive);
   router.get(path, mainFrameMiddlewarePipeline);
