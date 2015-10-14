@@ -134,7 +134,16 @@ module.exports = (function() {
   });
 
   function serializeData(user, options) {
-    if (!user) user = options.user || {};
+    // This is overly complicated....
+    // TODO: simplify the pre-rendering process
+    if (!user) {
+      if (options.model) {
+        user = options.model.toJSON();
+      } else {
+        user = options.user || {};
+      }
+    }
+
     var currentUserId = context.getUserId();
     var avatarUrl = resolveAvatarUrl({ username: user.username, version: user.gv, size: (options.avatarSize == 'm' ? 60 : 32) });
 

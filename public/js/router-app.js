@@ -113,6 +113,18 @@ onready(function() {
   window.onpopstate = function(e) {
     var iframeUrl = e.state;
     if (!iframeUrl) return;
+
+    //generate title
+    var urlDetails = urlParser.parse(iframeUrl);
+    var pageTitle = urlDetails.pathname.split('/');
+    pageTitle.pop();
+    pageTitle = pageTitle.join('/');
+    pageTitle = pageTitle.substring(1);
+
+    //update title
+    titlebarUpdater.setRoomName(pageTitle);
+
+    //switch rooms
     roomSwitcher.change(iframeUrl);
   };
 
