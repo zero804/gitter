@@ -1,17 +1,23 @@
 "use strict";
 
-var userModels = require('../users');
-var chatModels = require('../chat');
-var eventModels = require('../events');
-var appEvents = require('utils/appevents');
-var context = require('utils/context');
+var userModels        = require('../users');
+var chatModels        = require('../chat');
+var eventModels       = require('../events');
+var appEvents         = require('utils/appevents');
+var context           = require('utils/context');
 var unreadItemsClient = require('components/unread-items-client');
+var errorHandle       = require('utils/live-collection-error-handle');
+
 require('components/realtime-troupe-listener');
 
 module.exports = (function() {
   var chatCollection          = new chatModels.ChatCollection(null, { listen: true });
   var rosterCollection        = new userModels.RosterCollection(null, { listen: true });
   var eventCollection         = new eventModels.EventCollection(null,  { listen: true, snapshot: true });
+
+  chatCollection.on('error', errorHandle.bind(null, 'chat-collection'));
+  rosterCollection.on('error', errorHandle.bind(null, 'roster-collection'));
+  eventCollection.on('error', errorHandle.bind(null, 'events-collection'));
 
   // update online status of user models
   appEvents.on('userLoggedIntoTroupe', updateUserStatus);
