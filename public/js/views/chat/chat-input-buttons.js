@@ -13,8 +13,8 @@ var ChatInputButtons = Marionette.ItemView.extend({
 
   behaviors: {
     Tooltip: {
-      '.js-toggle-compose-mode': { titleFn: 'getComposeModeTitle' },
-      '.js-markdown-help': { titleFn: 'getShowMarkdownTitle' }
+      '.js-toggle-compose-mode': { titleFn: 'getComposeModeTitle', placement: 'left' },
+      '.js-markdown-help': { titleFn: 'getShowMarkdownTitle', placement: 'left'}
     }
   },
 
