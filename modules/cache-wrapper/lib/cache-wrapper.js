@@ -1,11 +1,27 @@
 'use strict';
 
-var env = require('gitter-web-env');
-var config = env.config;
-
+var env         = require('gitter-web-env');
+var config      = env.config;
+var _           = require('lodash');
 var SnappyCache = require('snappy-cache');
-var Q = require('q');
-var assert = require('assert');
+var Q           = require('q');
+var assert      = require('assert');
+
+function getRedisCachingClient() {
+  var redisCachingConfig = process.env.REDIS_CACHING_CONNECTION_STRING || config.get("redis_caching");
+  if (typeof redisCachingConfig === 'string') {
+    redisCachingConfig = env.redis.parse(redisCachingConfig);
+  }
+
+  var redisConfig = _.extend({}, redisCachingConfig, {
+    clientOpts: {
+      // Snappy cache needs detect_buffers on
+      detect_buffers: true
+    }
+  });
+
+  return env.redis.createClient(redisConfig);
+}
 
 var redisClient;
 function getRedisCachingClient() {
@@ -72,6 +88,7 @@ module.exports = function(moduleName, module, options) {
   var cache = new SnappyCache({
     prefix: 'sc:',
     redis: getRedisCachingClient(),
+    validateRedisClient: false,
     ttl: options && options.ttl || 0
   });
 
