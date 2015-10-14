@@ -1,7 +1,7 @@
 var assert = require('assert');
 var getOrgNameFromTroupeName = require('../../../shared/get-org-name-from-troupe-name');
 
-describe.only('Get a org name from a room name', function(){
+describe('Get an org name from a room name', function(){
 
   it('should return the org name if only the org name is passed', function(){
     var expected = 'gitterHQ';
