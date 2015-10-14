@@ -530,18 +530,25 @@ function processResultsForNewItemWithMentions(troupeId, chatId, parsed, results,
         // Next, notify all the lurkers
         // Note that this can be a very long list in a big room
         var activityOnly = parsed.activityOnlyUserIds;
+
+        var eyeballsOffUsers = activityOnly.filter(function(userId) {
+          return presenceStatus[userId] !== 'inroom';
+        });
+
+        persistActivityForLurkingUsers(troupeId, eyeballsOffUsers, chatId);
+
         for(var i = 0; i < activityOnly.length; i++) {
           var activityOnlyUserId =  activityOnly[i];
 
-          //var activityOnlyUserIdOnlineStatus = presenceStatus[activityOnlyUserId];
-          //if (!activityOnlyUserIdOnlineStatus) continue; // null === offline
+          var activityOnlyUserIdOnlineStatus = presenceStatus[activityOnlyUserId];
+          if (!activityOnlyUserIdOnlineStatus) continue; // null === offline
 
-          debug('presenceStatus for ' + activityOnlyUserId, presenceStatus[activityOnlyUserId]);
+          //debug('presenceStatus for ' + activityOnlyUserId, presenceStatus[activityOnlyUserId]);
 
           // If lurking user is not in the room, persist activity
-          if (presenceStatus[activityOnlyUserId] !== 'inroom') {
-            persistActivityForLurkingUser(troupeId, activityOnlyUserId, chatId);
-          }
+          //if (presenceStatus[activityOnlyUserId] !== 'inroom') {
+          //  persistActivityForLurkingUser(troupeId, activityOnlyUserId, chatId);
+          //}
 
           appEvents.newLurkActivity({ userId: activityOnlyUserId, troupeId: troupeId });
         }
@@ -691,27 +698,29 @@ exports.saveLastItemSeen = function(userId, troupeId, chatIds) {
 //  });
 //};
 
-function persistActivityForLurkingUser(troupeId, userId, chatId) {
-  debug('persistActivityForLurkingUser');
-  return recentRoomService.getTroupeLastAccessTimesForUser(userId)
+function persistActivityForLurkingUsers(roomId, userIds, chatId) {
+  debug('persistActivityForLurkingUsers');
+
+  return recentRoomService.findLastAccessTimesForUsersInRoom(roomId, userIds)
   .then(function(times) {
-    var lastAccess = times[troupeId];
-    
     var chatTimestamp = mongoUtils.getTimestampFromObjectId(chatId);
     var chatDate = new Date(chatTimestamp);
 
-    if (chatDate > lastAccess) {
-      var activityKey = 'activity:' + userId + ':' + troupeId;
-      debug('persistActivityForLurkingUser: ', activityKey);
+    var _userIds = userIds.filter(function(userId) {
+      return chatDate > times[userId];
+    });
 
-      return new Promise(function(resolve, reject) {
-        redisClient.set(activityKey, chatId, function(err, value) {
-          if (err) return reject(err);
-          resolve(value);
-        });
+    return new Promise(function(resolve, reject) {
+      var transaction = redisClient.multi();
+      _userIds.forEach(function(userId) {
+        var activityKey = 'activity:' + userId + ':' + roomId;
+        transaction.set(activityKey, chatId);
       });
-
-    }
+      transaction.exec(function(err, replies) {
+        if (err) return reject(err);
+        resolve(replies);
+      });
+    });
   });
 }
 
