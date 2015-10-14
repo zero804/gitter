@@ -1,69 +1,9 @@
 'use strict';
 
 var _ = require('underscore');
+var localStore = require('./local-store');
 
 var EVENTS = ['change', 'keydown', 'click', 'cut', 'paste'];
-var TEST_KEY = '_drafty_test_key';
-
-var windowLocalStorage;
-
-try { windowLocalStorage = window.localStorage; } catch(e) {}
-
-/* Attempts to use localStorage to check whether it's actually available for use */
-function isLocalStorageAvailable() {
-  if (!windowLocalStorage) return false;
-  try {
-    windowLocalStorage[TEST_KEY] = 1;
-    windowLocalStorage.removeItem(TEST_KEY);
-  } catch(e) {
-    return false;
-  }
-}
-
-/* Null storage driver for when localStorage isn't available */
-function InMemoryStore() {
-  this.values = {};
-}
-
-InMemoryStore.prototype = {
-  get: function(key) {
-    return this.values[key] || '';
-  },
-  set: function(key, value) {
-    this.values[key] = value;
-  },
-  remove: function(key) {
-    delete this.values[key];
-  }
-};
-
-/* Localstorage, the default driver */
-function LocalStorageStore() {
-}
-
-LocalStorageStore.prototype = {
-  get: function(key) {
-    try {
-      return windowLocalStorage[key] || '';
-    } catch(e) {
-      return '';
-    }
-  },
-
-  set: function(key, value) {
-    try {
-      windowLocalStorage[key] = value;
-    } catch(e) {
-    }
-  },
-
-  remove: function(key) {
-    try {
-      windowLocalStorage.removeItem(key);
-    } catch(e) {
-    }
-  }
-};
 
 function Drafty(el, uniqueId) {
   this.el = el;
@@ -71,15 +11,9 @@ function Drafty(el, uniqueId) {
     uniqueId =  window.location.pathname.split('/').splice(1).join('_');
   }
 
-  if (isLocalStorageAvailable()) {
-    this.store = new LocalStorageStore();
-  } else {
-    this.store = new InMemoryStore();
-  }
-
   this.uniqueId = uniqueId;
 
-  var value = this.store.get('drafty_' + this.uniqueId);
+  var value = localStore.get('drafty_' + this.uniqueId);
 
   if(value && !el.value) {
     el.value = value;
@@ -96,7 +30,7 @@ function Drafty(el, uniqueId) {
 }
 
 Drafty.prototype.refresh = function (){
-  var value = this.store.get('drafty_' + this.uniqueId);
+  var value = localStore.get('drafty_' + this.uniqueId);
   this.el.value = value;
 };
 
@@ -109,14 +43,14 @@ Drafty.prototype.update = function() {
   }
 
   if(value) {
-    this.store.set('drafty_' + this.uniqueId, value);
+    localStore.set('drafty_' + this.uniqueId, value);
   } else {
     this.reset();
   }
 };
 
 Drafty.prototype.reset = function() {
-  this.store.remove('drafty_' + this.uniqueId);
+  localStore.remove('drafty_' + this.uniqueId);
 };
 
 Drafty.prototype.disconnect = function() {
