@@ -1,5 +1,5 @@
 var assert = require('assert');
-var getOrgNameFromTroupeName = require('../../../public/js/utils/get-org-name-from-troupe-name');
+var getOrgNameFromTroupeName = require('../../../shared/get-org-name-from-troupe-name');
 
 describe.only('Get a org name from a room name', function(){
 
