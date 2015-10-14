@@ -60,6 +60,7 @@ module.exports = Marionette.ItemView.extend({
   serializeData: function() {
     var data = this.model.toJSON();
     var orgName = data.name;
+    var orgPageHref = '/orgs/' + orgName + '/rooms/';
 
     _.extend(data, {
       troupeName:      data.name,
@@ -72,7 +73,7 @@ module.exports = Marionette.ItemView.extend({
       githubLink:      getGithubUrl(data),
       isPrivate:       getPrivateStatus(data),
       orgName:         orgName,
-      orgPageHref:    '/orgs/' + orgName + '/rooms/',
+      orgPageHref:     orgPageHref
     });
 
     return data;
