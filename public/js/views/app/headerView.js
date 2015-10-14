@@ -35,6 +35,7 @@ module.exports = Marionette.ItemView.extend({
     topic:        '.js-chat-topic',
     name:         '.js-chat-name',
     favourite:    '.js-favourite-button',
+    orgrooms:     '.js-org-page',
   },
 
   events: {
@@ -43,6 +44,7 @@ module.exports = Marionette.ItemView.extend({
     'click @ui.favourite': 'toggleFavourite',
     'dblclick @ui.topic':  'showInput',
     'keydown textarea':    'detectKeys',
+    'click @ui.orgrooms':  'goToOrgRooms',
   },
 
   behaviors: {
@@ -212,6 +214,13 @@ module.exports = Marionette.ItemView.extend({
         appEvents.trigger('navigation', '/home', 'home', ''); // TODO: figure out a title
         //context.troupe().set('roomMember', false);
       });
+  },
+
+  goToOrgRooms: function(e) {
+    e.preventDefault();
+    var name = context.troupe().get('name');
+    var orgName =  /\//.test(name) ? name.split('/')[0] : name;
+    appEvents.trigger('navigation', '/orgs/' + orgName + '/rooms', 'iframe', orgName + ' rooms');
   },
 
   toggleFavourite: function() {
