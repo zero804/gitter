@@ -3,6 +3,7 @@ node_modules
 .DS_Store
 /.project
 /npm-debug.log
+/nodemon.log
 /.externalToolBuilders
 /.settings
 troupe.sublime-project
