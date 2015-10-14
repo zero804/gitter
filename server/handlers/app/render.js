@@ -1,34 +1,35 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var winston            = require('../../utils/winston');
-var nconf              = require('../../utils/config');
-var Q                  = require('q');
-var contextGenerator   = require('../../web/context-generator');
-var restful            = require('../../services/restful');
-var userService        = require('../../services/user-service');
-var chatService        = require('../../services/chat-service');
-var appVersion         = require('../../web/appVersion');
-var social             = require('../social-metadata');
-var restSerializer     = require("../../serializers/rest-serializer");
-var burstCalculator    = require('../../utils/burst-calculator');
-var userSort           = require('../../../public/js/utils/user-sort');
-var roomSort           = require('gitter-realtime-client/lib/sorts-filters').pojo; /* <-- Don't use the default export
+var winston                  = require('../../utils/winston');
+var nconf                    = require('../../utils/config');
+var Q                        = require('q');
+var contextGenerator         = require('../../web/context-generator');
+var restful                  = require('../../services/restful');
+var userService              = require('../../services/user-service');
+var chatService              = require('../../services/chat-service');
+var appVersion               = require('../../web/appVersion');
+var social                   = require('../social-metadata');
+var restSerializer           = require("../../serializers/rest-serializer");
+var burstCalculator          = require('../../utils/burst-calculator');
+var userSort                 = require('../../../public/js/utils/user-sort');
+var roomSort                 = require('gitter-realtime-client/lib/sorts-filters').pojo; /* <-- Don't use the default export
                                                                                           will bring in tons of client-side
                                                                                           libraries that we don't need */
-var roomNameTrimmer    = require('../../../public/js/utils/room-name-trimmer');
-var isolateBurst       = require('../../../shared/burst/isolate-burst-array');
-var unreadItemService  = require('../../services/unread-item-service');
-var mongoUtils         = require('../../utils/mongo-utils');
-var url                = require('url');
-var cdn                = require("../../web/cdn");
-var roomMembershipService = require('../../services/room-membership-service');
-var troupeService      = require('../../services/troupe-service');
-var useragent          = require('useragent');
-var _                 = require('underscore');
-var GitHubOrgService   = require('gitter-web-github').GitHubOrgService;
-var orgPermissionModel = require('../../services/permissions/org-permissions-model');
-var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
+var roomNameTrimmer          = require('../../../public/js/utils/room-name-trimmer');
+var isolateBurst             = require('../../../shared/burst/isolate-burst-array');
+var unreadItemService        = require('../../services/unread-item-service');
+var mongoUtils               = require('../../utils/mongo-utils');
+var url                      = require('url');
+var cdn                      = require("../../web/cdn");
+var roomMembershipService    = require('../../services/room-membership-service');
+var troupeService            = require('../../services/troupe-service');
+var useragent                = require('useragent');
+var _                        = require('underscore');
+var GitHubOrgService         = require('gitter-web-github').GitHubOrgService;
+var orgPermissionModel       = require('../../services/permissions/org-permissions-model');
+var resolveRoomAvatarUrl     = require('gitter-web-shared/avatars/resolve-room-avatar-url');
+var getOrgNameFromTroupeName = require('../../../shared/get-org-name-from-troupe-name');
 
 /* How many chats to send back */
 var INITIAL_CHAT_COUNT = 50;
@@ -310,8 +311,7 @@ function renderChat(req, res, options, next) {
 
         //add ownerIsOrg to the troupe model
         troupeContext.troupe.ownerIsOrg = ownerIsOrg;
-        var name        = troupeContext.troupe.name;
-        var orgName     = /\//.test(name) ? name.split('/')[0] : name;
+        var orgName     = getOrgNameFromTroupeName(troupeContext.troupe.name);
         var orgPageHref = '/orgs/' + orgName + '/rooms/';
 
         var renderOptions = _.extend({
