@@ -310,6 +310,9 @@ function renderChat(req, res, options, next) {
 
         //add ownerIsOrg to the troupe model
         troupeContext.troupe.ownerIsOrg = ownerIsOrg;
+        var name        = troupeContext.troupe.name;
+        var orgName     = /\//.test(name) ? name.split('/')[0] : name;
+        var orgPageHref = '/orgs/' + orgName + '/rooms/';
 
         var renderOptions = _.extend({
             isRepo: troupe.githubType === 'REPO',
@@ -334,6 +337,7 @@ function renderChat(req, res, options, next) {
             integrationsUrl: integrationsUrl,
             isMobile: options.isMobile,
             ownerIsOrg: ownerIsOrg,
+            orgPageHref: orgPageHref,
             roomMember: req.uriContext.roomMember
           }, troupeContext && {
             troupeTopic: troupeContext.troupe.topic,
