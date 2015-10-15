@@ -2,6 +2,7 @@
 var Backbone = require('backbone');
 var qs = require('./qs');
 var _ = require('underscore');
+var localStore = require('../components/local-store');
 
 module.exports = (function() {
 
@@ -20,14 +21,14 @@ module.exports = (function() {
        * This means that the we can use the same url for all rooms, and so cache one page in
        * the user's web view.
        */
-      var id = window.location.hash.split('#')[1] || window.localStorage.lastTroupeId;
+      var id = window.location.hash.split('#')[1] || localStore.get('lastTroupeId');
 
       if(!id) {
         window.location.pathname = '/mobile/home';
         return;
       }
 
-      window.localStorage.lastTroupeId = id;
+      localStore.set('lastTroupeId', id);
       troupeModel = { id: id };
     } else if(qs.troupeId) {
       troupeModel = { id: qs.troupeId };

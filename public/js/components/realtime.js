@@ -14,6 +14,14 @@ function isMobile() {
   return navigator.userAgent.toLowerCase().indexOf('mobile') >= 0;
 }
 
+function isIos() {
+  var userAgent = navigator.userAgent.toLowerCase();
+
+  return userAgent.indexOf('iphone') >= 0 ||
+         userAgent.indexOf('ipad') >= 0 ||
+         userAgent.indexOf('ipod') >= 0;
+}
+
 var eyeballState = true;
 
 appEvents.on('eyeballStateChange', function (state) {
@@ -124,7 +132,8 @@ function getOrCreateClient() {
     fayeUrl: c.fayeUrl,
     authProvider: authProvider,
     fayeOptions: c.options,
-    websocketsDisabled: isMobile(),
+    // ios 7 webviews and safari still crashes with websockets
+    websocketsDisabled: isIos(),
     extensions: [
         handshakeExtension,
         accessTokenFailureExtension

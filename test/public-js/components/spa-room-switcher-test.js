@@ -157,4 +157,99 @@ describe('spa-room-switcher', function() {
     assert.strictEqual(count, 1);
   });
 
+  it('replace with a path name if a fully qualified org room url is passed', function(){
+
+    var roomSwitcher = new SPARoomSwitcher(fixtureTroupes(), BASE_PATH, locationDelegate('https://gitter.im/suprememoocow/~chat?at=1838383838383'), locationDelegate('https://gitter.im/suprememoocow/'));
+
+    roomSwitcher.on('replace', function(href) {
+      assert.equal('/orgs/gitterHQ/rooms/~iframe', href);
+    });
+
+    roomSwitcher.on('reload', function() {
+      assert.ok(false);
+    });
+
+    roomSwitcher.on('switch', function(/*troupe, permalinkChatId*/) {
+      assert.ok(false);
+    });
+
+    roomSwitcher.change('http://localhost:5000/orgs/gitterHQ/rooms');
+  });
+
+  it('replace with a path name if a fully qualified org room url with a trailing slash is passed', function(){
+
+    var roomSwitcher = new SPARoomSwitcher(fixtureTroupes(), BASE_PATH, locationDelegate('https://gitter.im/suprememoocow/~chat?at=1838383838383'), locationDelegate('https://gitter.im/suprememoocow/'));
+
+    roomSwitcher.on('replace', function(href) {
+      assert.equal('/orgs/gitterHQ/rooms/~iframe', href);
+    });
+
+    roomSwitcher.on('reload', function() {
+      assert.ok(false);
+    });
+
+    roomSwitcher.on('switch', function(/*troupe, permalinkChatId*/) {
+      assert.ok(false);
+    });
+
+    roomSwitcher.change('http://localhost:5000/orgs/gitterHQ/rooms/');
+  });
+
+  it('replace with a path name if a fully qualified org room url with a trailing ~iframe is passed', function(){
+
+    var roomSwitcher = new SPARoomSwitcher(fixtureTroupes(), BASE_PATH, locationDelegate('https://gitter.im/suprememoocow/~chat?at=1838383838383'), locationDelegate('https://gitter.im/suprememoocow/'));
+
+    roomSwitcher.on('replace', function(href) {
+      assert.equal('/orgs/gitterHQ/rooms/~iframe', href);
+    });
+
+    roomSwitcher.on('reload', function() {
+      assert.ok(false);
+    });
+
+    roomSwitcher.on('switch', function(/*troupe, permalinkChatId*/) {
+      assert.ok(false);
+    });
+
+    roomSwitcher.change('http://localhost:5000/orgs/gitterHQ/rooms/~iframe');
+  });
+
+  it('should not replace a valid user name with an org room url', function(){
+
+    var roomSwitcher = new SPARoomSwitcher(fixtureTroupes(), BASE_PATH, locationDelegate('https://gitter.im/suprememoocow/~chat?at=1838383838383'), locationDelegate('https://gitter.im/suprememoocow/'));
+
+    roomSwitcher.on('replace', function(href) {
+      assert.notEqual('/borgs/~iframe', href);
+    });
+
+    roomSwitcher.on('reload', function() {
+      assert.ok(false);
+    });
+
+    roomSwitcher.on('switch', function(/*troupe, permalinkChatId*/) {
+      assert.ok(false);
+    });
+
+    roomSwitcher.change('http://localhost:5000/borgs');
+  });
+
+  it('should not replace a valid repo name with an org room url', function(){
+
+    var roomSwitcher = new SPARoomSwitcher(fixtureTroupes(), BASE_PATH, locationDelegate('https://gitter.im/suprememoocow/~chat?at=1838383838383'), locationDelegate('https://gitter.im/suprememoocow/'));
+
+    roomSwitcher.on('replace', function(href) {
+      assert.notEqual('/orgs/porgs/~iframe', href);
+    });
+
+    roomSwitcher.on('reload', function() {
+      assert.ok(false);
+    });
+
+    roomSwitcher.on('switch', function(/*troupe, permalinkChatId*/) {
+      assert.ok(false);
+    });
+
+    roomSwitcher.change('http://localhost:5000/orgs/porgs/');
+  });
+
 });

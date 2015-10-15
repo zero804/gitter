@@ -1,15 +1,16 @@
 'use strict';
-var _                    = require('underscore');
-var context              = require('utils/context');
-var apiClient            = require('components/apiClient');
-var Marionette           = require('backbone.marionette');
-var Backbone             = require('backbone');
-var autolink             = require('autolink');
-var notifications        = require('components/notifications');
-var Dropdown             = require('views/controls/dropdown');
-var appEvents            = require('utils/appevents');
-var headerViewTemplate   = require('./tmpl/headerViewTemplate.hbs');
-var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
+var _                        = require('underscore');
+var context                  = require('utils/context');
+var apiClient                = require('components/apiClient');
+var Marionette               = require('backbone.marionette');
+var Backbone                 = require('backbone');
+var autolink                 = require('autolink');
+var notifications            = require('components/notifications');
+var Dropdown                 = require('views/controls/dropdown');
+var appEvents                = require('utils/appevents');
+var headerViewTemplate       = require('./tmpl/headerViewTemplate.hbs');
+var resolveRoomAvatarUrl     = require('gitter-web-shared/avatars/resolve-room-avatar-url');
+var getOrgNameFromTroupeName = require('../../../../shared/get-org-name-from-troupe-name');
 
 require('views/behaviors/tooltip');
 
@@ -35,6 +36,7 @@ module.exports = Marionette.ItemView.extend({
     topic:        '.js-chat-topic',
     name:         '.js-chat-name',
     favourite:    '.js-favourite-button',
+    orgrooms:     '.js-org-page',
   },
 
   events: {
@@ -43,6 +45,7 @@ module.exports = Marionette.ItemView.extend({
     'click @ui.favourite': 'toggleFavourite',
     'dblclick @ui.topic':  'showInput',
     'keydown textarea':    'detectKeys',
+    'click @ui.orgrooms':  'goToOrgRooms',
   },
 
   behaviors: {
@@ -59,7 +62,8 @@ module.exports = Marionette.ItemView.extend({
 
   serializeData: function() {
     var data = this.model.toJSON();
-    var orgName = data.uri.split('/')[0];
+    var orgName = getOrgNameFromTroupeName(data.name);
+    var orgPageHref = '/orgs/' + orgName + '/rooms/';
 
     _.extend(data, {
       troupeName:      data.name,
@@ -72,7 +76,7 @@ module.exports = Marionette.ItemView.extend({
       githubLink:      getGithubUrl(data),
       isPrivate:       getPrivateStatus(data),
       orgName:         orgName,
-      orgPageHref:    '/orgs/' + orgName + '/rooms/',
+      orgPageHref:     orgPageHref
     });
 
     return data;
@@ -213,6 +217,12 @@ module.exports = Marionette.ItemView.extend({
       });
   },
 
+  goToOrgRooms: function(e) {
+    e.preventDefault();
+    var orgName = getOrgNameFromTroupeName(context.troupe().get('name'));
+    appEvents.trigger('navigation', '/orgs/' + orgName + '/rooms', 'iframe', orgName + ' rooms');
+  },
+
   toggleFavourite: function() {
     if (!context.isLoggedIn()) return;
 
@@ -281,7 +291,7 @@ module.exports = Marionette.ItemView.extend({
   },
 
   requestBrowserNotificationsPermission: function() {
-    if (context().desktopNotifications) {
+    if(notifications.hasNotBeenSetup() && context().desktopNotifications){
       notifications.enable();
     }
   },
