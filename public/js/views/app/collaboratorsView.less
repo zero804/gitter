@@ -27,6 +27,14 @@
   }
 }
 
+.welcome-modal__container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  max-height: 400px;
+  overflow-y: scroll;
+}
+
 .welcome-modal__collaborators {
   text-align: left;
   background: #f4f5f6;
@@ -44,14 +52,6 @@
   }
 }
 
-.welcome-modal__container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  max-height: 400px;
-  overflow-y: scroll;
-}
-
 .welcome-modal__collaborator {
 
   * {
@@ -60,12 +60,11 @@
 
   background-color: #eee;
   overflow: hidden;
-  flex-grow: 1;
   padding: 0.625em;
   margin: 0.625em;
   border-radius: 4px;
   display: flex;
-  width: 190px;
+  width: 21rem;
   max-width: 350px;
   cursor: default;
   &:hover {
@@ -163,7 +162,7 @@
 .welcome-modal__share {
   display: flex;
   align-items: center;
-  padding: 10px;
+  padding: 10px 10px 10px 20px;
 }
 
 a.share-button {
