@@ -1,0 +1,46 @@
+<h3 class="share-view__heading">
+  Classic
+</h3>
+
+<section class="share-view__section">
+  <input class="share-view__copy-field" value="{{url}}" onclick="this.select();">
+
+  {{#if hasFlash}}
+  <button class="button-jaffa--small js-copy" data-clipboard-text="{{url}}">Copy</button>
+  {{/if}}
+</section>
+
+{{#if isRepo}}
+<h3 class="share-view__heading">
+  README badge ( <img class="share-view__badge" src="{{badgeUrl}}"> )
+</h3>
+
+<section class="share-view__section">
+  <input class="share-view__copy-field share-view__copy-field--readme" value="{{badgeMD}}" onclick="this.select();">
+
+  {{#if hasFlash}}
+  <button class="button-jaffa--small js-copy" data-clipboard-text="{{badgeMD}}">Copy</button>
+  {{/if}}
+
+  {{#if allowBadgePR}}
+  <button class='button-jaffa--small js-badge'>Send Pull Request</button>
+  {{/if}}
+</section>
+{{/if}}
+
+{{#if isPublic}}
+<h3 class="share-view__heading">
+  Social
+</h3>
+
+<section class="share-view__section">
+  <a href="{{twitterUrl}}" target="_blank" class="button-twitter--small">
+    <i class="fa fa-twitter"></i>
+    <span>Tweet</span>
+  </a>
+  <a href="{{facebookUrl}}" target="_blank" class="button-facebook--small">
+    <i class="fa fa-facebook-official"></i>
+    <span>Share</span>
+  </a>
+</section>
+{{/if}}

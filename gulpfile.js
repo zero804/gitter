@@ -361,6 +361,7 @@ gulp.task('css-web', function () {
     'public/less/router-nli-embed-chat.less',
     'public/less/chat-card.less',
     'public/less/router-archive-home.less',
+    'public/less/router-archive-links.less',
     'public/less/router-archive-chat.less',
     'public/less/homepage.less',
     'public/less/userhome.less',
