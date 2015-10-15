@@ -157,7 +157,7 @@ onready(function() {
     }
 
     var parsed = urlParser.parse(url);
-    linkHandler.routeLink(parsed, { appFrame: true })
+    linkHandler.routeLink(parsed, { appFrame: true });
   };
 
   appEvents.on('navigation', function(url, type, title) {
