@@ -29,7 +29,7 @@ _.extend(SpaRoomSwitcher.prototype, Backbone.Events, {
       var hash = (!windowHash || windowHash === '#') ? '#initial' : windowHash;
       targetParsed.hash = hash;
       var href = urlParser.format(targetParsed);
-      href = /orgs/.test(href) ? getOrgRoomUrl(href) : href;
+      href = /\/orgs\/([^\/]+)\/rooms\/?/.test(href) ? getOrgRoomUrl(href) : href;
 
       // If the only thing that differs is the hash, then force a reload
       if (href.replace(/#.*$/,'') === frameLocation.href.replace(/#.*$/,'')) {
