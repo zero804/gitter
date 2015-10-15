@@ -1,0 +1,27 @@
+<div class="modal--default">
+
+  <header class="modal--default__header">
+    {{#if title}}
+    <h1 class="modal--default__header__title">{{title}}</h1> {{/if}}
+    <span class="modal--default__header__icon fa fa-times-circle" data-action="close"></span>
+  </header>
+
+  <section class="modal--default__content" id="modal-body-region"></section>
+
+  <footer class="modal--default__footer">
+    {{#hasMenuItems}}
+    {{#each menuItems}}
+
+      <button
+        {{#if this.className}}class="{{this.className}} {{#if this.pull}}pull-{{pull}}{{/if}}"  {{/if}}
+        {{#if this.action}}   data-action="{{this.action}}" {{/if}}
+        {{#if this.disabled}} disabled="true" {{/if}}
+        data-component="modal-btn">
+        {{this.text}}
+      </button>
+
+    {{/each}}
+    {{/hasMenuItems}}
+  </footer>
+
+</div>
