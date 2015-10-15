@@ -29,6 +29,7 @@ _.extend(SpaRoomSwitcher.prototype, Backbone.Events, {
       var hash = (!windowHash || windowHash === '#') ? '#initial' : windowHash;
       targetParsed.hash = hash;
       var href = urlParser.format(targetParsed);
+      href = /^\/orgs\/([^\/]+)\/rooms\/?/.test(targetParsed.pathname) ? getOrgRoomUrl(targetParsed.pathname) : href;
 
       // If the only thing that differs is the hash, then force a reload
       if (href.replace(/#.*$/,'') === frameLocation.href.replace(/#.*$/,'')) {
@@ -72,5 +73,10 @@ _.extend(SpaRoomSwitcher.prototype, Backbone.Events, {
     };
   },
 });
+
+function getOrgRoomUrl(pathname) {
+  pathname = pathname.replace('~iframe', '');
+  return pathname +  (/\/$/.test(pathname) ? '~iframe' :  '/~iframe');
+}
 
 module.exports = SpaRoomSwitcher;
