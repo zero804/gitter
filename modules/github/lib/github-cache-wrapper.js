@@ -17,11 +17,26 @@ var _ = require('underscore');
 var util = require("util");
 
 var redisClient;
+
 function getRedisCachingClient() {
   if (redisClient) return redisClient;
-  redisClient = env.redis.createClient(process.env.REDIS_CACHING_CONNECTION_STRING || config.get("redis_caching"));
+
+  var redisCachingConfig = process.env.REDIS_CACHING_CONNECTION_STRING || config.get("redis_caching");
+  if (typeof redisCachingConfig === 'string') {
+    redisCachingConfig = env.redis.parse(redisCachingConfig);
+  }
+
+  var redisConfig = _.extend({}, redisCachingConfig, {
+    clientOpts: {
+      // Snappy cache needs detect_buffers on
+      detect_buffers: true
+    }
+  });
+
+  redisClient = env.redis.createClient(redisConfig);
   return redisClient;
 }
+
 
 function getKeys(method, contextValues, args) {
   var arr = [method]
@@ -40,6 +55,7 @@ function wrap(Service, contextFunction, options) {
   var sc = new SnappyCache(_.defaults(options, {
     prefix: 'sc:',
     redis: getRedisCachingClient(),
+    validateRedisClient: false,
     ttl: config.get('github:cache-timeout')
   }));
 
