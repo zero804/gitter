@@ -700,7 +700,6 @@ exports.saveLastItemSeen = function(userId, troupeId, chatIds) {
 
 function persistActivityForLurkingUsers(roomId, userIds, chatId) {
   debug('persistActivityForLurkingUsers');
-
   return recentRoomService.findLastAccessTimesForUsersInRoom(roomId, userIds)
   .then(function(times) {
     var chatTimestamp = mongoUtils.getTimestampFromObjectId(chatId);
@@ -740,6 +739,8 @@ exports.clearActivityIndicator = function(troupeId, userId) {
 exports.getActivityIndicator = function(troupeId, userId) {
   var activityKey = 'activity:' + userId + ':' + troupeId;
 
+  debug('getActivityIndicator: ', activityKey);
+
   return new Promise(function(resolve, reject) {
     redisClient.get(activityKey, function(err, value) {
       if (err) return reject(err);
@@ -763,5 +764,6 @@ exports.testOnly = {
   getTroupeIdsCausingBadgeCount: getTroupeIdsCausingBadgeCount,
   parseChat: parseChat,
   generateMentionDeltaSet: generateMentionDeltaSet,
-  findNonMembersWithAccess: findNonMembersWithAccess
+  findNonMembersWithAccess: findNonMembersWithAccess,
+  persistActivityForLurkingUsers: persistActivityForLurkingUsers
 };
