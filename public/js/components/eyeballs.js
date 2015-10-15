@@ -1,6 +1,7 @@
 "use strict";
 var context = require('utils/context');
 var apiClient = require('components/apiClient');
+var localStore = require('./local-store');
 var realtime = require('./realtime');
 var appEvents = require('utils/appevents');
 var _ = require('underscore');
@@ -13,7 +14,8 @@ module.exports = (function() {
   var INACTIVITY_POLL = 10 * 1000;
 
   function send(value, synchronous) {
-    if (window.localStorage.gitterNoEyeballSignals) return;
+    if (localStore.get('gitterNoEyeballSignals')) return;
+
     if(!realtime.getClientId()) {
       return;
     }

@@ -436,7 +436,38 @@ module.exports = (function() {
 
         self.scrollToChat(models[0]);
       });
-    }
+    },
+
+    /**
+     * There appears to be a race condition,
+     * possibly caused by issuing multiple resets
+     * in quick succession, whereby child
+     * elements are cleaned up, but occassionally
+     * stranded. See https://github.com/troupe/gitter-webapp/issues/615
+     *
+     * Although the views have been destroyed, the
+     * DOM elements remain.
+     *
+     * This work-around trashes the inner DOM on a reset.
+     *
+     * Additionally, there is probably a performance
+     * advantage to trashing the entire DOM in a single
+     * remove
+     */
+    onBeforeRender: function() {
+      if (this.collection.length) return;
+
+      // The first time the collection is setup,
+      // there will be pre-rendered content, so
+      // don't trash the first time
+      if (!this.isRendered) return;
+
+      var el = this.el;
+      var child;
+      while ((child = el.firstChild)) {
+        el.removeChild(child);
+      }
+    },
 
   });
 

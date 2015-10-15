@@ -1,6 +1,7 @@
 'use strict';
+
 var _ = require('underscore');
-var context = require('utils/context');
+var localStore = require('./local-store');
 
 var EVENTS = ['change', 'keydown', 'click', 'cut', 'paste'];
 
@@ -10,10 +11,9 @@ function Drafty(el, uniqueId) {
     uniqueId =  window.location.pathname.split('/').splice(1).join('_');
   }
 
-  this.store = window.localStorage;
   this.uniqueId = uniqueId;
 
-  var value = this.store['drafty_' + this.uniqueId];
+  var value = localStore.get('drafty_' + this.uniqueId);
 
   if(value && !el.value) {
     el.value = value;
@@ -27,17 +27,10 @@ function Drafty(el, uniqueId) {
   });
 
   this.update = this.update.bind(this);
-
-  //window.addEventListener("beforeunload", this.update, false);
-  context.troupe().on('change:id', function (model){
-    this.uniqueId = model.get('id');
-    this.refresh();
-  }, this);
-
 }
 
 Drafty.prototype.refresh = function (){
-  var value = this.store['drafty_' + this.uniqueId] || '';
+  var value = localStore.get('drafty_' + this.uniqueId);
   this.el.value = value;
 };
 
@@ -50,14 +43,14 @@ Drafty.prototype.update = function() {
   }
 
   if(value) {
-    this.store['drafty_' + this.uniqueId] = value;
+    localStore.set('drafty_' + this.uniqueId, value);
   } else {
     this.reset();
   }
 };
 
 Drafty.prototype.reset = function() {
-  this.store.removeItem('drafty_' + this.uniqueId);
+  localStore.remove('drafty_' + this.uniqueId);
 };
 
 Drafty.prototype.disconnect = function() {
@@ -66,12 +59,14 @@ Drafty.prototype.disconnect = function() {
   EVENTS.forEach(function(e) {
     el.removeEventListener(e, periodic, false);
   });
-  window.removeEventListener("beforeunload", this.update, false);
+};
+
+Drafty.prototype.setUniqueId = function(newUniqueId) {
+  // TODO: consider saving the current text before the switch?
+  this.uniqueId = newUniqueId;
+  this.refresh();
 };
 
 module.exports = function(element, id) {
   return new Drafty(element, id);
 };
-
-
-

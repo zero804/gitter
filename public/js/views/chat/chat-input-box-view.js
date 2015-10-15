@@ -12,7 +12,6 @@ var KeyboardEventsMixin = require('views/keyboard-events-mixin');
 var appEvents = require('utils/appevents');
 var context = require('utils/context');
 var isMobile = require('utils/is-mobile');
-var apiClient = require('components/apiClient');
 
 require('jquery-textcomplete');
 
@@ -64,6 +63,14 @@ var ChatInputBoxView = Marionette.ItemView.extend({
     this.listenTo(this.composeMode, 'change:isComposeModeEnabled', this.onComposeModeChange);
     this.listenTo(appEvents, 'input.append', this.append);
     this.listenTo(appEvents, 'focus.request.chat', function() { this.ui.textarea.focus(); });
+
+    this.listenTo(context.troupe(), 'change:id', function (model) {
+      // Get drafty to switch rooms
+      var drafty = this.drafty;
+      if (!drafty) return;
+      drafty.setUniqueId(model.id);
+    });
+
   },
 
   serializeData: function() {
@@ -74,7 +81,7 @@ var ChatInputBoxView = Marionette.ItemView.extend({
 
   onRender: function() {
     if (!this.ui.textarea.length) return;
-    
+
     this.removeTextareaExtensions();
     this.addTextareaExtensions();
 
@@ -326,6 +333,7 @@ var ChatInputBoxView = Marionette.ItemView.extend({
     // only way to remove textcomplete's event listeners
     this.ui.textarea.off();
     if (this.drafty) this.drafty.disconnect();
+    this.drafty = null;
   },
 
   isTypeaheadShowing: function() {
