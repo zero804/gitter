@@ -1,10 +1,8 @@
-/*global require, console, window, document */
 "use strict";
 
 var onReady     = require('./utils/onready');
 var Backbone    = require('backbone');
 var appEvents   = require('utils/appevents');
-var frameUtils  = require('./utils/frame-utils');
 var modalRegion = require('components/modal-region');
 var _           = require('underscore');
 var context     = require('utils/context');
@@ -58,8 +56,8 @@ onReady(function(){
     },
 
     onNavigateTags: function(roomId){
-      require.ensure(['views/app/editTagsView'], function(require) {
-        var EditTagsView = require('views/app/editTagsView');
+      require.ensure(['views/modals/edit-tags-view'], function(require) {
+        var EditTagsView = require('views/modals/edit-tags-view');
         modalRegion.show(new EditTagsView({ roomId: roomId }));
       });
     }

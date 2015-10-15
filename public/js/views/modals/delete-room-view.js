@@ -1,12 +1,12 @@
 "use strict";
 
 var Marionette = require('backbone.marionette');
-var Backbone = require('backbone');
-var ModalView = require('views/modal');
-var context = require('utils/context');
-var apiClient = require('components/apiClient');
-var appEvents = require('utils/appevents');
-var template = require('./tmpl/delete-room-modal.hbs');
+var Backbone   = require('backbone');
+var ModalView  = require('./modal');
+var context    = require('utils/context');
+var apiClient  = require('components/apiClient');
+var appEvents  = require('utils/appevents');
+var template   = require('./tmpl/delete-room-view.hbs');
 
 var View = Marionette.ItemView.extend({
   tagName: 'p',
@@ -65,12 +65,11 @@ var Modal = ModalView.extend({
     options.title = 'Careful Now...';
     var roomName = context.troupe().get('uri');
     options.menuItems = [
-    { action: "cancel", text: "Cancel", className: "trpBtnLightGrey" },
     {
       disabled: true,
       action: 'delete',
       text: 'Delete "' + roomName + '"',
-      className: 'trpBtnRed trpBtnRight'
+      className: 'modal--default__footer__btn--negative'
     }];
 
     var lock = new DelayLock();

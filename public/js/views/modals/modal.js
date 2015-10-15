@@ -1,18 +1,22 @@
 "use strict";
-var $ = require('jquery');
-var _ = require('underscore');
-var Marionette = require('backbone.marionette');
+
+var $             = require('jquery');
+var _             = require('underscore');
+var Marionette    = require('backbone.marionette');
 var modalTemplate = require('./tmpl/modal.hbs');
-var isCompact = require('utils/detect-compact');
-require('../template/helpers/all');
+var isCompact     = require('utils/detect-compact');
+
+require('../../template/helpers/all');
+require('gitter-styleguide/css/components/modals.css');
 
 var ModalView = Marionette.LayoutView.extend({
   template: modalTemplate,
   className: "modal",
 
   events: {
-    'click .close': 'hide',
-    'click .button': 'onMenuItemClicked'
+    'click .close':                     'hide',
+    'click [data-action=close]':        'hide',
+    'click [data-component=modal-btn]': 'onMenuItemClicked'
   },
 
   regions: {
@@ -68,7 +72,7 @@ var ModalView = Marionette.LayoutView.extend({
   },
 
   setButtonState: function(name,state) {
-    var $s = this.$el.find('.modal-footer button[data-action=' + name + ']');
+    var $s = this.$el.find('button[data-action=' + name + ']');
     if(state) {
       $s.removeAttr('disabled');
     } else {
@@ -88,7 +92,7 @@ var ModalView = Marionette.LayoutView.extend({
   },
 
   showPremium: function() {
-    var $s = this.$el.find('.modal-footer .premium');
+    var $s = this.$el.find('.premium');
     $s.removeClass('hidden');
     $s.show();
   },
