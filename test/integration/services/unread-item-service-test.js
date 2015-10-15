@@ -99,6 +99,93 @@ describe('unread-item-service', function() {
 
   describe('mocked out', function() {
 
+    describe('persistActivity', function() {
+      var chatId, troupeId, userId1, userId2, userId3, userIds, recentRoomService, unreadItemService;
+
+      beforeEach(function() {
+        chatId = mongoUtils.getNewObjectIdString() + "";
+        troupeId = mongoUtils.getNewObjectIdString() + "";
+        userId1 = mongoUtils.getNewObjectIdString() + "";
+        userId2 = mongoUtils.getNewObjectIdString() + "";
+        userId3 = mongoUtils.getNewObjectIdString() + "";
+
+        userIds = [userId1, userId2, userId3];
+
+        recentRoomService = mockito.mock(testRequire('./services/recent-room-service'));
+
+        var now = new Date();
+        var oneHourAgo = now - 60 * 60 * 1000;
+  
+        mockito.when(recentRoomService).findLastAccessTimesForUsersInRoom(troupeId, userIds)
+        .thenReturn(Q.resolve(makeHash(
+          userId1, oneHourAgo,
+          userId2, oneHourAgo,
+          userId3, oneHourAgo
+        )));
+
+        mockito.when(recentRoomService).findLastAccessTimesForUsersInRoom(troupeId, [userId1])
+        .thenReturn(Q.resolve(makeHash(
+          userId1, oneHourAgo
+        )));
+
+        unreadItemService = testRequire.withProxies("./services/unread-item-service", {
+          './recent-room-service': recentRoomService
+        });
+      });
+
+      it('should persist activity for lurkers', function(done) {
+        unreadItemService.testOnly.persistActivityForLurkingUsers(troupeId, userIds, chatId)
+        .then(function(results) {
+          assert.deepEqual(['OK', 'OK', 'OK'], results);
+          done();
+        })
+        .catch(done);
+      });
+
+      it('should clear activity indicator', function(done) {
+        unreadItemService.testOnly.persistActivityForLurkingUsers(troupeId, [userId1], chatId)
+        .then(function() {
+          return unreadItemService.clearActivityIndicator(troupeId, userId1);
+        })
+        .then(function(result) {
+          assert.equal(1, result);
+          done();
+        })
+        .catch(done);
+      });
+
+      it('should ignore clear activity indicator for invald users', function(done) {
+        unreadItemService.clearActivityIndicator(troupeId, userId1)
+        .then(function(result) {
+          assert.equal(0, result);
+          done();
+        })
+        .catch(done);
+      });
+
+      it('should get activity indicator for a user', function(done) {
+        unreadItemService.testOnly.persistActivityForLurkingUsers(troupeId, [userId1], chatId)
+        .then(function() {
+          return unreadItemService.getActivityIndicator(troupeId, userId1);
+        })
+        .then(function(result) {
+          assert.equal(chatId, result);
+          done();
+        })
+        .catch(done);
+      });
+
+      it('should not get activity indicator for an invalid user', function(done) {
+        unreadItemService.getActivityIndicator(troupeId, userId2)
+        .then(function(result) {
+          assert.equal(undefined, result);
+          done();
+        })
+        .catch(done);
+      });
+
+    });
+
     describe('parseChat', function() {
       var chatId;
       var troupeId, troupeId2, troupeId3;
