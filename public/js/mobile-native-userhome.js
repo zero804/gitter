@@ -4,7 +4,7 @@ var UserHomeView = require('views/userhome/userHomeView');
 var $ = require('jquery');
 var appEvents = require('utils/appevents');
 var Backbone = require('backbone');
-var confirmRepoRoomView = require('views/createRoom/confirmRepoRoomView');
+var confirmRepoRoomView = require('views/modals/confirm-repo-room-view');
 var modalRegion = require('components/modal-region');
 var onready = require('./utils/onready');
 

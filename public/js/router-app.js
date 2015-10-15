@@ -356,8 +356,8 @@ onready(function() {
     },
 
     createroom: function() {
-      require.ensure(['views/createRoom/chooseRoomView'], function(require) {
-        var chooseRoomView = require('views/createRoom/chooseRoomView');
+      require.ensure(['views/modals/choose-room-view'], function(require) {
+        var chooseRoomView = require('views/modals/choose-room-view');
         appLayout.dialogRegion.show(new chooseRoomView.Modal());
       });
     },
@@ -411,8 +411,8 @@ onready(function() {
         // ignore, carry on regardless
         //}
 
-        require.ensure(['views/createRoom/createRoomView'], function(require) {
-          var createRoomView = require('views/createRoom/createRoomView');
+        require.ensure(['views/modals/create-room-view'], function(require) {
+          var createRoomView = require('views/modals/create-room-view');
           var modal = new createRoomView.Modal({
             initialParent: parentUri,
             roomName: name,
@@ -424,15 +424,15 @@ onready(function() {
     },
 
     createreporoom: function() {
-      require.ensure(['views/createRoom/createRepoRoomView'], function(require) {
-        var createRepoRoomView = require('views/createRoom/createRepoRoomView');
+      require.ensure(['views/modals/create-repo-room'], function(require) {
+        var createRepoRoomView = require('views/modals/create-repo-room');
         appLayout.dialogRegion.show(new createRepoRoomView.Modal());
       });
     },
 
     confirmRoom: function(uri) {
-      require.ensure(['views/createRoom/confirmRepoRoomView'], function(require) {
-        var confirmRepoRoomView = require('views/createRoom/confirmRepoRoomView');
+      require.ensure(['views/modals/confirm-repo-room-view'], function(require) {
+        var confirmRepoRoomView = require('views/modals/confirm-repo-room-view');
         appLayout.dialogRegion.show(new confirmRepoRoomView.Modal({
           uri: uri,
         }));
