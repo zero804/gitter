@@ -3,8 +3,6 @@
 var unreadItemService = require("../../../services/unread-item-service");
 var StatusError       = require('statuserror');
 var uniqueIds         = require('mongodb-unique-ids');
-var roomMembershipService = require('../../../services/room-membership-service');
-
 
 module.exports = {
   id: 'unreadItem',
@@ -30,18 +28,12 @@ module.exports = {
 
     if(!allIds.length) throw new StatusError(400); /* You comin at me bro? */
 
-    return roomMembershipService.getMemberLurkStatus(req.params.userTroupeId, req.resourceUser.id)
-    .then(function(lurking) {
-      if (lurking) {
-        return unreadItemService.saveLastItemSeen(req.resourceUser.id, req.params.userTroupeId, allIds);
-      } else {
-        return unreadItemService.markItemsRead(req.resourceUser.id, req.params.userTroupeId, allIds);
-      }
-    })
+    return unreadItemService.markItemsRead(req.resourceUser.id, req.params.userTroupeId, allIds)
     .then(function() {
       return { success: true };
     });
-  },
+
+   },
 
   destroy: function(req) {
     if(req.params.unreadItem.toLowerCase() !== 'all') throw new StatusError(404);

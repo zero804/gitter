@@ -20,11 +20,7 @@ var uniqueIds        = require('mongodb-unique-ids');
 var debug            = require('debug')('gitter:unread-item-service');
 var recentRoomService = require('./recent-room-service');
 
-
 var redisClient      = require('../utils/redis').createClient();
-var Promise          = require('bluebird');
-
-
 var badgeBatcher     = new RedisBatcher('badge', 1000, batchBadgeUpdates);
 
 /* Handles batching badge updates to users */
@@ -675,28 +671,6 @@ function queueBadgeUpdateForUser(userIds) {
   debug("Batching badge update for %s users", len);
   badgeBatcher.add('queue', userIds);
 }
-
-
-exports.saveLastItemSeen = function(userId, troupeId, chatIds) {
-  var oldestId = getNewestId(chatIds);
-  var lastSeenKey = 'chat:lastseen:' + userId + ':' + troupeId;
-  return new Promise(function(resolve, reject) {
-    redisClient.set(lastSeenKey, oldestId, function(err, value) {
-      if (err) return reject(err);
-      resolve(value);
-    });
-  });
-};
-
-//exports.lastItemSeen = function(userId, troupeId) {
-//  var lastSeenKey = 'chat:lastseen:' + userId + ':' + troupeId;
-//  return new Promise(function(resolve, reject) {
-//    redisClient.get(lastSeenKey, function(err, value) {
-//      if (err) return reject(err);
-//      resolve(value);
-//    });
-//  });
-//};
 
 function persistActivityForLurkingUsers(roomId, userIds, chatId) {
   debug('persistActivityForLurkingUsers');
