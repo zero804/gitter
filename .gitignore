@@ -81,3 +81,4 @@ docker_node_modules
 *.cpuprofile
 *-v8.log
 .vagrant/
+test/in-browser/fixtures/build/*
