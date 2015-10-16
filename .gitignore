@@ -82,3 +82,4 @@ docker_node_modules
 *-v8.log
 .vagrant/
 test/in-browser/fixtures/build/*
+test/in-browser/browserstack-run.pid
