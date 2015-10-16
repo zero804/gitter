@@ -1,11 +1,15 @@
 /*jshint unused:true, browser:true*/
 define([
   'utils/is-mobile',
-], function(isMobile) {
+  'assert'
+], function(isMobile, assert) {
 
   describe('is-mobile', function() {
     it('detects iPhone is mobile', function() {
       var userAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 6_1 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10B141 Safari/8536.25';
+      console.log('-----------------------');
+      console.log(isMobile(userAgent));
+      console.log('-----------------------');
       assert(isMobile(userAgent));
     });
 
