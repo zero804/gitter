@@ -30,6 +30,14 @@ GitHubOrgService.prototype.members = function(org) {
   });
 };
 
+GitHubOrgService.prototype.someMembers = function(org) {
+  return tentacles.orgMember.listMembers(org, {
+    accessToken: this.accessToken,
+    firstPageOnly: true,
+    headers: { Accept: githubMediaTypes.MOONDRAGON }
+  });
+};
+
 GitHubOrgService.prototype.member = function(org, username) {
   return tentacles.orgMember.checkMembershipForUser(org, username, {
     accessToken: this.accessToken,
