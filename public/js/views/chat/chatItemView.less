@@ -9,6 +9,8 @@
 @import "../repo/katex/katex";
 @import "../repo/katex/fonts";
 
+@import (reference) "../../../less/colors.less";
+
 @chat-spacing: 0.2em;
 
 .trpChatContainer .isViewers:last-child .chat-item__details {
@@ -367,4 +369,21 @@ body.mobile .chat-item__content {
   .chat-item {
     cursor: hand
   }
+}
+
+.lastMessageSeen {
+  border-top: 1px solid @homepage-green;
+}
+
+
+.lastMessageSeen::before {
+  content: "You left here";
+  font-size: 10px;
+  border-radius: 4px 4px 0px 0px;
+  background: @homepage-green;
+  color: white;
+  position: relative;
+  left: 50%;
+  top: -26px;
+  padding: 2px 5px;
 }

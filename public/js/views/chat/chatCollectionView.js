@@ -204,8 +204,9 @@ module.exports = (function() {
           var isAfter = chat.get('sent').isAfter(lastAccess);
 
           if (isAfter) {
-            var view = this.children.findByModel(chat);
-            if (view) view.highlight();
+            //var view = this.children.findByModel(chat);
+            //if (view) view.highlight();
+            chat.set('lastMessageSeen', true);
             return true;
           }
         }.bind(this));
@@ -227,19 +228,6 @@ module.exports = (function() {
         this.rollers.scrollToBottom();
       }, this);
     },
-
-    //onRender: function() {
-    //  var lastItemSeen = context.troupe().get('lastItemSeen');
-    //  console.debug('lastItemSeen', lastItemSeen);
-    //  if (!lastItemSeen) return;
-
-    //  this.collection.ensureLoaded(lastItemSeen, function() {
-    //    var model = this.collection.get(lastItemSeen);
-    //    var view = this.children.findByModel(model);
-    //    if (view) view.highlight();
-    //    this.scrollToChatId(lastItemSeen);
-    //  }.bind(this));
-    //},
 
     onTrackViewportCenter: function() {
       if (!this.isScrolledToBottom()) {
