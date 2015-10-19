@@ -24,6 +24,8 @@ var toggle = require('utils/toggle');
 require('views/behaviors/unread-items');
 require('views/behaviors/widgets');
 require('views/behaviors/highlight');
+require('views/behaviors/last-message-seen');
+
 
 module.exports = (function() {
 
@@ -65,7 +67,8 @@ module.exports = (function() {
     behaviors: {
       Widgets: {},
       UnreadItems: { },
-      Highlight: {}
+      Highlight: {},
+      LastMessageSeen: {}
     },
 
     modelEvents: {
