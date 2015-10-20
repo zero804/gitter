@@ -3,6 +3,7 @@
 var targetEnv = require('targetenv');
 var urlParser = require('../urls/url-parser');
 var resolveAvatarUrl = require('./resolve-avatar-url');
+var _ = require('underscore');
 
 // So when we prerender we get 1, if not then the real thing? Won't that
 // potentially be weird? Rather just return 2x, 3x or 4x always? - 1x screens
@@ -32,28 +33,57 @@ function sizeUrlForAvatarUrl(url, size) {
   return urlParser.format(parsed);
 }
 
-module.exports = function getUserAvatarForSize(user, size) {
-  // NOTE: user could just be a serialised partial bit of json too
+function safeGet(obj, key) {
+  // normal object
+  if (obj[key] !== undefined) {
+    return obj[key];
+  }
+  // backbone model
+  if (obj.get) {
+    return obj.get(key);
+  }
+}
 
-  var size = (size || 30) * getPixelDensity();
+
+var AVATAR_KEYS = [
+  'gravatarImageUrl', // what's in the db, also the ideal
+  'avatar_url', // returned by github, some strategies
+  'avatarUrl', // some backbone models or marionette serializeData()
+  'avatarUrlSmall', // some strategies (deprecated?)
+  'avatarUrlMedium', // some strategies (deprecated?)
+];
+
+module.exports = function getUserAvatarForSize(user, size) {
+  // NOTE: user could just be a serialised partial bit of json or a backbone model too
+
+  var size = (size || 60) * getPixelDensity();
 
   if (user) {
-    if (user.gravatarImageUrl) {
-      // prefer the full avatar URL if present
-      return sizeUrlForAvatarUrl(user.gravatarImageUrl, size);
+    var key = _.find(AVATAR_KEYS, function(key) {
+      return safeGet(user, key) !== undefined;
+    });
 
-    } else if (user.username) {
-      // fall back to the github optimised method
-      var spec = {username: user.username, size: size};
+    if (key) {
+      // prefer a full avatar URL if present
+      return sizeUrlForAvatarUrl(safeGet(user, key), size);
 
-      if (user.gravatarVersion) {
-        spec.version = user.gravatarVersion;
+    } else {
+      var username = safeGet(user, 'username');
+      if (username) {
+        // fall back to the github optimised method
+        var spec = {username: username, size: size};
 
-      } else if (user.gv) {
-        spec.version = user.gv;
+        var gravatarVersion = safeGet(user, 'gravatarVersion');
+        var gv = safeGet(user, 'gv');
+        if (gravatarVersion) {
+          spec.version = gravatarVersion;
+
+        } else if (gv) {
+          spec.version = gv;
+        }
+
+        return resolveAvatarUrl(spec);
       }
-
-      return resolveAvatarUrl(spec);
     }
   }
 
