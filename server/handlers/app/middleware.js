@@ -67,8 +67,8 @@ function uriContextResolverMiddleware(options) {
           case 404:
             if (e.githubType === 'ORG' && e.uri) {
               var url = '/orgs/' + e.uri + '/rooms';
-              //test if we are trying to load the org page
-              //in the chat frame.
+              //test if we are trying to load the org page in the chat frame.
+              //fixes: https://github.com/troupe/gitter-webapp/issues/628
               if(/~chat$/.test(req.route.path)){
                 url = url += '/~iframe';
               }
