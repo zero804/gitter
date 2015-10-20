@@ -56,7 +56,7 @@ var AVATAR_KEYS = [
 module.exports = function getUserAvatarForSize(user, size) {
   // NOTE: user could just be a serialised partial bit of json or a backbone model too
 
-  var size = (size || 60) * getPixelDensity();
+  size = (size || 60) * getPixelDensity();
 
   if (user) {
     var key = _.find(AVATAR_KEYS, function(key) {
