@@ -29,6 +29,7 @@ var _                        = require('underscore');
 var GitHubOrgService         = require('gitter-web-github').GitHubOrgService;
 var orgPermissionModel       = require('../../services/permissions/org-permissions-model');
 var resolveRoomAvatarUrl     = require('gitter-web-shared/avatars/resolve-room-avatar-url');
+var getUserAvatarForSize     = require('gitter-web-shared/avatars/get-user-avatar-for-size');
 var getOrgNameFromTroupeName = require('../../../shared/get-org-name-from-troupe-name');
 
 /* How many chats to send back */
@@ -472,6 +473,9 @@ function renderOrgPage(req, res, next) {
     .then(function(values) {
        rooms.forEach(function(room, index) {
         room.users = values[index];
+        _.each(room.users, function(user) {
+          user.avatarUrlSmall = getUserAvatarForSize(user, 60)
+        });
       });
 
       // Custom data for the org page
