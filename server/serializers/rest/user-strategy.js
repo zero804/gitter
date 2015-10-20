@@ -213,7 +213,8 @@ function UserStrategy(options) {
       obj.gv = user.gravatarVersion;
     } else {
       // non-github
-      obj.gravatarImageUrl = user.gravatarImageUrl;
+      // NOTE: should we just remove this and keep using avatarUrlSmall for now?
+      //obj.gravatarImageUrl = user.gravatarImageUrl;
     }
 
     return obj;
