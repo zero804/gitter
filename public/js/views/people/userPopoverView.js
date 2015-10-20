@@ -11,10 +11,6 @@ var SyncMixin = require('collections/sync-mixin');
 
 module.exports = (function() {
 
-  function largeAvatar(data) {
-    return resolveAvatarUrl({ username: data.login, size: 128 });
-  }
-
   var UserView = Marionette.ItemView.extend({
     template: template,
     modelEvents: {
@@ -31,7 +27,10 @@ module.exports = (function() {
         }
       }
       data.inactive = data.invited || data.removed;
-      data.avatarUrl = largeAvatar(data);
+      // TODO: switch to getUserAvatarForSize. Needs more than just the github
+      // username., but then again - this entire popover will have to change to
+      // work with more than just data pulled from github, so..
+      data.avatarUrl = resolveAvatarUrl({ username: data.login, size: 128 });
 
       return data;
     }

@@ -5,7 +5,7 @@ var context = require('utils/context');
 var template = require('./tmpl/avatar.hbs');
 var UserPopoverView = require('views/people/userPopoverView');
 var widgets = require('views/behaviors/widgets');
-var resolveAvatarUrl = require('gitter-web-shared/avatars/resolve-avatar-url');
+var getUserAvatarForSize = require('gitter-web-shared/avatars/get-user-avatar-for-size');
 require('views/behaviors/tooltip');
 var FastAttachMixin = require('views/fast-attach-mixin');
 
@@ -145,7 +145,8 @@ module.exports = (function() {
     }
 
     var currentUserId = context.getUserId();
-    var avatarUrl = resolveAvatarUrl({ username: user.username, version: user.gv, size: (options.avatarSize == 'm' ? 60 : 32) });
+    // NOTE: shouldn't this just use avatarUrlSmall or something?
+    var avatarUrl = getUserAvatarForSize(user, (options.avatarSize == 'm' ? 60 : 32));
 
     var online = user.id === currentUserId || !!user.online; // only the people view tries to show avatar status so there is a model object, it won't necessarily work in other cases
 

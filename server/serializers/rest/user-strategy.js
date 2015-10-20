@@ -10,7 +10,7 @@ var execPreloads      = require('../exec-preloads');
 var getVersion        = require('../get-model-version');
 var billingService    = require('../../services/billing-service');
 var leanUserDao       = require('../../services/daos/user-dao').full;
-var resolveAvatarUrl  = require('gitter-web-shared/avatars/resolve-avatar-url');
+var getUserAvatarForSize = require('gitter-web-shared/avatars/get-user-avatar-for-size');
 
 function UserPremiumStatusStrategy() {
   var usersWithPlans;
@@ -166,29 +166,37 @@ function UserStrategy(options) {
     }
 
     if (lean) {
-      return {
+      var obj = {
         id: user.id,
         status: options.includeEmail ? user.status : undefined,
         username: user.username,
         online: userPresenceInTroupeStrategy && userPresenceInTroupeStrategy.map(user.id) || undefined,
         role: userRoleInTroupeStrategy && userRoleInTroupeStrategy.map(user.username) || undefined,
-        gv: user.gravatarVersion,
         invited: user.state === 'INVITED' || undefined, // true or undefined
         removed: user.state === 'REMOVED' || undefined, // true or undefined
         v: getVersion(user)
       };
+
+      if (user.gravatarVersion) {
+        // github
+        obj.gv = user.gravatarVersion;
+      } else {
+        // non-github
+        obj.gravatarImageUrl = user.gravatarImageUrl;
+      }
+
+      return obj;
     }
 
-    return {
+    var obj = {
       id: user.id,
       status: options.includeEmail ? user.status : undefined,
       username: user.username,
       displayName: options.exposeRawDisplayName ? user.displayName : user.getDisplayName(),
       fallbackDisplayName: options.exposeRawDisplayName && user.getDisplayName(),
       url: user.getHomeUrl(),
-      avatarUrlSmall: resolveAvatarUrl({ username: user.username, version: user.gravatarVersion, size: 60 }),
-      avatarUrlMedium: resolveAvatarUrl({ username: user.username, version: user.gravatarVersion, size: 128 }),
-      gv: user.gravatarVersion,
+      avatarUrlSmall: getUserAvatarForSize(user, 60),
+      avatarUrlMedium: getUserAvatarForSize(user, 128),
       scopes: scopes,
       online: userPresenceInTroupeStrategy && userPresenceInTroupeStrategy.map(user.id) || undefined,
       role: userRoleInTroupeStrategy && userRoleInTroupeStrategy.map(user.username) || undefined,
@@ -198,6 +206,17 @@ function UserStrategy(options) {
       removed: user.state === 'REMOVED' || undefined, // true or undefined
       v: getVersion(user)
     };
+
+    // NOTE: does it make sense to send gv (or the full url) AND small&medium?
+    if (user.gravatarVersion) {
+      // github
+      obj.gv = user.gravatarVersion;
+    } else {
+      // non-github
+      obj.gravatarImageUrl = user.gravatarImageUrl;
+    }
+
+    return obj;
   };
 }
 UserStrategy.prototype = {

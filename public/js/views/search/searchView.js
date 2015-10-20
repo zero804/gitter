@@ -78,6 +78,9 @@ module.exports = (function() {
       data.selected = this.model.get('selected');
       data.detail = this.model.get('githubType');
       data.text = uri;
+      // TODO: replace with getUserAvatarForSize. Needs more than just the
+      // username so that rooms search results that aren't just github user
+      // rooms will also work.
       data.avatarUrl = resolveAvatarUrl({ username: uri.split('/')[0], size: 50 });
       return data;
     },
