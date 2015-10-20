@@ -1,7 +1,7 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var resolveAvatarUrl = require('gitter-web-shared/avatars/resolve-avatar-url');
+var getUserAvatarForSize = require('gitter-web-shared/avatars/get-user-avatar-for-size');
 
 module.exports = exports = function(template) {
   return function avatarWidgetHandler(params) {
@@ -12,7 +12,8 @@ module.exports = exports = function(template) {
     var showBadge = hash.showBadge;
     var showStatus = hash.showStatus;
 
-    var avatarUrl = resolveAvatarUrl({ username: user.username, size: (avatarSize == 'm' ? 60 : 30) });
+    // TODO: shouldn't this use avatarUrlSmall or something?
+    var avatarUrl = getUserAvatarForSize(user, (avatarSize == 'm' ? 60 : 30));
 
     var r = template({
       avatarUrl: avatarUrl,

@@ -158,6 +158,7 @@ function initEmbedPanel() {
     var owner = room.uri.split('/')[0];
 
     $this.html(
+      // TODO: switch to getUserAvatarForSize, but that needs more than just a username
       '<img src="' + resolveAvatarUrl({ username: owner, size: 48 }) + '" width="48" height="48">' +
       '<h3>' + room.name + '</h3>' +
       '<em>' + room.language + '</em>');
