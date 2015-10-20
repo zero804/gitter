@@ -19,6 +19,7 @@ var ensureLoggedIn   = require('../web/middlewares/ensure-logged-in');
 var GithubMeService  = require('gitter-web-github').GitHubMeService;
 var identifyRoute    = env.middlewares.identifyRoute;
 var express          = require('express');
+var getUserAvatarForSize = require('gitter-web-shared/avatars/get-user-avatar-for-size');
 
 /** TODO move onto its own method once we find the need for it elsewhere
  * isRelativeURL() checks if the URL is relative
@@ -253,7 +254,7 @@ router.get("/zendesk",
         "name": req.user.displayName,
         "email": email,
         "external_id": req.user.id,
-        "remote_photo_url": "https://avatars.githubusercontent.com/" + req.user.username,
+        "remote_photo_url": getUserAvatarForSize(req.user, 128),
         "user_fields": {
           "username": req.user.username
         }
