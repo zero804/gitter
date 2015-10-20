@@ -165,8 +165,9 @@ function UserStrategy(options) {
       };
     }
 
+    var obj;
     if (lean) {
-      var obj = {
+      obj = {
         id: user.id,
         status: options.includeEmail ? user.status : undefined,
         username: user.username,
@@ -188,7 +189,7 @@ function UserStrategy(options) {
       return obj;
     }
 
-    var obj = {
+    obj = {
       id: user.id,
       status: options.includeEmail ? user.status : undefined,
       username: user.username,
