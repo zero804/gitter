@@ -176,7 +176,7 @@ function install() {
 
                 user.username         = githubUserProfile.login;
                 user.displayName      = githubUserProfile.name || githubUserProfile.login;
-                user.gravatarImageUrl = githubUserProfile.avatar_url; // TODO: deprecate this
+                user.gravatarImageUrl = githubUserProfile.avatar_url;
                 user.githubId         = githubUserProfile.id;
                 var gravatarVersion   = extractGravatarVersion(githubUserProfile.avatar_url);
                 if (gravatarVersion) {
@@ -231,7 +231,7 @@ function install() {
                 username:           githubUserProfile.login,
                 displayName:        githubUserProfile.name || githubUserProfile.login,
                 emails:             githubUserProfile.email ? [githubUserProfile.email] : [],
-                gravatarImageUrl:   githubUserProfile.avatar_url, // TODO: Deprecate this....
+                gravatarImageUrl:   githubUserProfile.avatar_url,
                 gravatarVersion:    extractGravatarVersion(githubUserProfile.avatar_url),
                 githubUserToken:    accessToken,
                 githubId:           githubUserProfile.id,
