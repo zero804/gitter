@@ -31,7 +31,7 @@ onready(function() {
   // FIXME: this is pretty shit but it's being rendered server side so...
   $('#login').click(function(evt) {
     evt.preventDefault();
-    window.open('/login/github?action=signup&source=embedded&returnTo=/login/embed', '', 'width=800, height=600');
+    window.open('/login/github?action=signup&source=embedded&returnTo=/login/embed', '', 'width=1100, height=600');
   });
 });
 
