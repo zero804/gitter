@@ -261,16 +261,6 @@ function getOldestId(ids) {
   });
 }
 
-function getNewestId(ids) {
-  if(!ids.length) return null;
-
-  return _.max(ids, function(id) {
-    // Create a new ObjectID with a specific timestamp
-    return mongoUtils.getTimestampFromObjectId(id);
-  });
-}
-
-
 function getTroupeIdsCausingBadgeCount(userId) {
   return engine.getRoomsCausingBadgeCount(userId);
 }
@@ -539,13 +529,6 @@ function processResultsForNewItemWithMentions(troupeId, chatId, parsed, results,
           var activityOnlyUserIdOnlineStatus = presenceStatus[activityOnlyUserId];
           if (!activityOnlyUserIdOnlineStatus) continue; // null === offline
 
-          //debug('presenceStatus for ' + activityOnlyUserId, presenceStatus[activityOnlyUserId]);
-
-          // If lurking user is not in the room, persist activity
-          //if (presenceStatus[activityOnlyUserId] !== 'inroom') {
-          //  persistActivityForLurkingUser(troupeId, activityOnlyUserId, chatId);
-          //}
-
           appEvents.newLurkActivity({ userId: activityOnlyUserId, troupeId: troupeId });
         }
       }
@@ -679,13 +662,13 @@ function persistActivityForLurkingUsers(roomId, userIds, chatId) {
     var chatTimestamp = mongoUtils.getTimestampFromObjectId(chatId);
     var chatDate = new Date(chatTimestamp);
 
-    var _userIds = userIds.filter(function(userId) {
+    var unawareUserIds = userIds.filter(function(userId) {
       return chatDate > times[userId];
     });
 
     return new Promise(function(resolve, reject) {
       var transaction = redisClient.multi();
-      _userIds.forEach(function(userId) {
+      unawareUserIds.forEach(function(userId) {
         var activityKey = 'activity:' + userId + ':' + roomId;
         transaction.set(activityKey, chatId);
       });
