@@ -3,7 +3,7 @@
 var appEvents = require('utils/appevents');
 var Backbone = require('backbone');
 var itemCollections = require('collections/instances/integrated-items');
-var PeopleModal = require('views/people/people-modal');
+var PeopleModal = require('views/modals/people-modal');
 var onready = require('./utils/onready');
 var ChatToolbarLayout = require('views/layouts/chat-toolbar');
 

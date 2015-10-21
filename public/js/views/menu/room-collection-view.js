@@ -227,6 +227,19 @@ module.exports = (function() {
       }
 
       this.roomsCollection = options.roomsCollection;
+
+      this.listenTo(context.troupe(), 'change:id', this.onRoomChange, this);
+    },
+
+    onRoomChange: function(){
+      //deselect the current room
+      var currentlySelectedRoom = this.collection.where({ currentRoom: true})[0];
+      if (currentlySelectedRoom) currentlySelectedRoom.set('currentRoom', false);
+
+      //select new room
+      var newlySelectedRoom = this.collection.get(context.troupe().get('id'));
+      if (newlySelectedRoom) newlySelectedRoom.set('currentRoom', true);
+
     },
 
     makeDraggable: function(drop) {

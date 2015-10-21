@@ -14,7 +14,7 @@ var assert = require('assert');
 exports.getHeatmapForRoom = function(roomId, startMonth, endMonth, tz) {
   assert(roomId, 'roomId required');
 
-  tz = '' + (tz || 0);
+  tz = '' + (tz || '0:00');
 
   var filter = { term: { toTroupeId: roomId } };
 

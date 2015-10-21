@@ -40,7 +40,7 @@ onready(function() {
       // Remember that (window.parent === window) when there is no parent frame
       window.parent.location.href = url;
     }
-  });
+ });
 
   require('components/link-handler').installLinkHandler();
 
@@ -240,36 +240,36 @@ onready(function() {
     },
 
     people: function() {
-      require.ensure(['views/people/people-modal'], function(require) {
-        var PeopleModal = require('views/people/people-modal');
+      require.ensure(['views/modals/people-modal'], function(require) {
+        var PeopleModal = require('views/modals/people-modal');
 
         appView.dialogRegion.show(new PeopleModal());
       });
     },
 
     notifications: function() {
-      require.ensure(['views/app/troupeSettingsView'], function(require) {
-        var TroupeSettingsView = require('views/app/troupeSettingsView');
+      require.ensure(['views/modals/room-settings-view'], function(require) {
+        var TroupeSettingsView = require('views/modals/room-settings-view');
         appView.dialogRegion.show(new TroupeSettingsView({}));
       });
     },
 
     markdown: function() {
-      require.ensure(['views/app/markdownView'], function(require) {
-        var MarkdownView = require('views/app/markdownView');
+      require.ensure(['views/modals/markdown-view'], function(require) {
+        var MarkdownView = require('views/modals/markdown-view');
         appView.dialogRegion.show(new MarkdownView({}));
       });
     },
 
     keys: function() {
-      require.ensure(['views/app/keyboardView'], function(require) {
-        var KeyboardView = require('views/app/keyboardView');
+      require.ensure(['views/modals/keyboard-view'], function(require) {
+        var KeyboardView = require('views/modals/keyboard-view');
         appView.dialogRegion.show(new KeyboardView({}));
       });
     },
 
     addPeople: function() {
-      require.ensure(['views/app/addPeopleView', 'views/app/upgradeToProView'], function(require) {
+      require.ensure(['views/app/addPeopleView', 'views/modals/upgrade-to-pro-view'], function(require) {
         var room = context.troupe();
         var maxFreeMembers = context.env('maxFreeOrgRoomMembers');
         var isOverLimit = room.get('security') !== 'PUBLIC' &&
@@ -278,7 +278,7 @@ onready(function() {
           room.get('userCount') >= maxFreeMembers;
 
         if (isOverLimit) {
-          var GetProViewModal = require('views/app/upgradeToProView');
+          var GetProViewModal = require('views/modals/upgrade-to-pro-view');
           appView.dialogRegion.show(new GetProViewModal({}));
         } else {
           var AddPeopleViewModal = require('views/app/addPeopleView');
@@ -289,16 +289,16 @@ onready(function() {
     },
 
     editTags: function() {
-      require.ensure(['views/app/editTagsView'], function(require) {
-        var EditTagsView = require('views/app/editTagsView');
+      require.ensure(['views/modals/edit-tags-view'], function(require) {
+        var EditTagsView = require('views/modals/edit-tags-view');
         appView.dialogRegion.show(new EditTagsView({roomId: context.troupe().get('id')}));
       });
     },
 
     integrations: function() {
       if (context.isTroupeAdmin()) {
-        require.ensure(['views/app/integrationSettingsModal'], function(require) {
-          var IntegrationSettingsModal = require('views/app/integrationSettingsModal');
+        require.ensure(['views/modals/integration-settings-view'], function(require) {
+          var IntegrationSettingsModal = require('views/modals/integration-settings-view');
 
           appView.dialogRegion.show(new IntegrationSettingsModal({}));
         });
@@ -308,16 +308,16 @@ onready(function() {
     },
 
     share: function() {
-      require.ensure(['views/share/share-view'], function(require) {
-        var shareView = require('views/share/share-view');
+      require.ensure(['views/modals/share-view'], function(require) {
+        var shareView = require('views/modals/share-view');
 
         appView.dialogRegion.show(new shareView.Modal({}));
       });
     },
 
     delete: function() {
-      require.ensure(['views/menu/delete-room-modal'], function(require) {
-        var DeleteModal = require('views/menu/delete-room-modal');
+      require.ensure(['views/modals/delete-room-view'], function(require) {
+        var DeleteModal = require('views/modals/delete-room-view');
 
         appView.dialogRegion.show(new DeleteModal({}));
       });
