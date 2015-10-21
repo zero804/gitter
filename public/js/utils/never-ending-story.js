@@ -17,7 +17,7 @@ module.exports = (function() {
     this._prevScrollTime = Date.now();
     this._nearTop = false;
     this._nearBottom = false;
-    this._scrollHandler = isMobile() ? _.throttle(this.mobileScroll.bind(this), 100) : _.throttle(this.scroll.bind(this), 100);
+    this._scrollHandler = _.throttle((isMobile() ? this.mobileScroll.bind(this) : this.scroll.bind(this)), 100);
     this._contentWrapper = options && options.contentWrapper;
     this.enable();
   }
@@ -71,13 +71,13 @@ module.exports = (function() {
       var deltaTop = prevScrollTop - scrollTop;
       var deltaBottom = prevScrollBottom - scrollBottom;
 
-      var atTop = scrollTop <= 0;
-      var atBottom = scrollBottom <= 0;
+      var isAtTop = scrollTop <= 0;
+      var isAtBottom = scrollBottom <= 0;
 
-      if(deltaTop > 0 && atTop) {
+      if(deltaTop > 0 && isAtTop) {
         /* We're scrolling towards the top */
         this.trigger('approaching.top');
-      } else if(deltaBottom > 0 && atBottom) {
+      } else if(deltaBottom > 0 && isAtBottom) {
         /* We're scrolling towards the bottom */
         this.trigger('approaching.bottom');
       }
