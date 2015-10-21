@@ -14,8 +14,8 @@ var GithubMeService = require('gitter-web-github').GitHubMeService;
 var ensureLoggedIn = require('../web/middlewares/ensure-logged-in');
 var express = require('express');
 
-var github = require('./providers/github');
-var google = require('./providers/google');
+var github = require('./auth-providers/github');
+//var google = require('./auth-providers/google');
 
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
