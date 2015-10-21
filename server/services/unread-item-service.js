@@ -19,9 +19,14 @@ var roomMembershipService = require('./room-membership-service');
 var uniqueIds        = require('mongodb-unique-ids');
 var debug            = require('debug')('gitter:unread-item-service');
 var recentRoomService = require('./recent-room-service');
-
 var redisClient      = require('../utils/redis').createClient();
 var badgeBatcher     = new RedisBatcher('badge', 1000, batchBadgeUpdates);
+var Promise          = require('bluebird');
+
+// FIXME Maybe we should switch to ioredis everywhere so we get promises?
+var redisGet  = Promise.promisify(redisClient.get, redisClient);
+var redisDel  = Promise.promisify(redisClient.del, redisClient);
+var redisMget = Promise.promisify(redisClient.mget, redisClient);
 
 /* Handles batching badge updates to users */
 function batchBadgeUpdates(key, userIds, done) {
@@ -682,28 +687,22 @@ function persistActivityForLurkingUsers(roomId, userIds, chatId) {
 
 exports.clearActivityIndicator = function(troupeId, userId) {
   var activityKey = 'activity:' + userId + ':' + troupeId;
-
   debug('clearActivityIndicator: ', activityKey);
-
-  return new Promise(function(resolve, reject) {
-    redisClient.del(activityKey, function(err, value) {
-      if (err) return reject(err);
-      resolve(value);
-    });
-  });
+  return redisDel(activityKey);
 };
 
 exports.getActivityIndicator = function(troupeId, userId) {
   var activityKey = 'activity:' + userId + ':' + troupeId;
-
   debug('getActivityIndicator: ', activityKey);
+  return redisGet(activityKey);
+};
 
-  return new Promise(function(resolve, reject) {
-    redisClient.get(activityKey, function(err, value) {
-      if (err) return reject(err);
-      resolve(value);
-    });
+exports.getActivityIndicatorForTroupeIds = function(troupeIds, userId) {
+  var activityKeys = troupeIds.map(function(troupeId) {
+    return 'activity:' + userId + ':' + troupeId;
   });
+  debug('getActivityIndicatorForUserIds: ', activityKeys);
+  return redisMget(activityKeys);
 };
 
 
