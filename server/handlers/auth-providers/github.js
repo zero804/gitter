@@ -11,7 +11,9 @@ var ensureLoggedIn = require('../../web/middlewares/ensure-logged-in');
 var redirectAfterLogin = require('../../web/middlewares/redirect-after-login');
 var passportCallbackForStrategy = require('../../web/middlewares/passport-callback-for-strategy');
 
-exports.login = [
+var routes = {};
+
+routes.login = [
   identifyRoute('login-github'),
   trackLoginForProvider('github'),
   passport.authorize('github_user', {
@@ -19,7 +21,8 @@ exports.login = [
     failWithError: true
   })
 ];
-exports.invited = [
+
+routes.invited = [
   identifyRoute('login-invited'),
   function(req, res) {
     var query = req.query;
@@ -33,14 +36,16 @@ exports.invited = [
     });
   }
 ];
-exports.explain = [
+
+routes.explain = [
   identifyRoute('login-explain'),
   function(req, res) {
     res.render('github-explain', {
     });
   }
 ];
-exports.upgrade = [
+
+routes.upgrade = [
   ensureLoggedIn,
   identifyRoute('login-upgrade'),
   function(req, res, next) {
@@ -69,7 +74,8 @@ exports.upgrade = [
     })(req, res, next);
   }
 ];
-exports.callback = [
+
+routes.callback = [
   identifyRoute('login-callback'),
   function(req, res, next) {
     var upgrade = req.session && req.session.githubScopeUpgrade;
@@ -86,3 +92,4 @@ exports.callback = [
   redirectAfterLogin
 ];
 
+module.exports = routes;
