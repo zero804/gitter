@@ -1,13 +1,13 @@
 {
-    "undef": true,
-    "node": true,
-    "unused": true,
-    "predef": [
-        "describe", 
-        "it",
-        "before",
-        "after",
-        "beforeEach",
-        "afterEach"
-    ]
+  "undef": true,
+  "node": true,
+  "unused": true,
+  "predef": [
+      "describe",
+      "it",
+      "before",
+      "after",
+      "beforeEach",
+      "afterEach"
+  ]
 }
