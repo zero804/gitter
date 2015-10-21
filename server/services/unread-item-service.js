@@ -24,7 +24,6 @@ var badgeBatcher     = new RedisBatcher('badge', 1000, batchBadgeUpdates);
 var Promise          = require('bluebird');
 
 // FIXME Maybe we should switch to ioredis everywhere so we get promises?
-var redisGet  = Promise.promisify(redisClient.get, redisClient);
 var redisDel  = Promise.promisify(redisClient.del, redisClient);
 var redisMget = Promise.promisify(redisClient.mget, redisClient);
 
