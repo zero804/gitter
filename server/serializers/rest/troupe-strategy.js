@@ -145,64 +145,19 @@ LurkTroupeForUserStrategy.prototype = {
   name: 'LurkTroupeForUserStrategy'
 };
 
-//function LastSeenForUserStrategy(options) {
-//  var currentUserId = options.currentUserId;
-//  var lastSeen = [];
-//
-//  this.preload = function(troupeIds, callback) {
-//    var promises = troupeIds.map(function(troupeId) {
-//      return unreadItemService.lastItemSeen(currentUserId, troupeId);
-//    });
-//
-//    Promise.all(promises)
-//    .then(function(values) {
-//      troupeIds.forEach(function(troupeId, i) {
-//        lastSeen[troupeId] = values[i];
-//      });
-//
-//      return lastSeen;
-//    })
-//    .then(function(values) {
-//      return callback(null, values);
-//    })
-//    .catch(function(err) {
-//      return callback(err, null);
-//    });
-//    //.nodeify(callback);
-//  };
-//
-//  this.map = function(roomId) {
-//    return lastSeen[roomId];
-//  };
-//}
-//LastSeenForUserStrategy.prototype = {
-//  name: 'LastSeenForUserStrategy'
-//};
-
 function ActivityForUserStrategy(options) {
   var currentUserId = options.currentUserId;
   var activity = [];
 
   this.preload = function(troupeIds, callback) {
-    var promises = troupeIds.map(function(troupeId) {
-      return unreadItemService.getActivityIndicator(troupeId, currentUserId);
-    });
-
-    Promise.all(promises)
+    unreadItemService.getActivityIndicatorForTroupeIds(troupeIds, currentUserId)
     .then(function(values) {
       troupeIds.forEach(function(troupeId, i) {
         activity[troupeId] = values[i];
       });
-
       return activity;
     })
-    .then(function(values) {
-      return callback(null, values);
-    })
-    .catch(function(err) {
-      return callback(err, null);
-    });
-    //.nodeify(callback);
+    .nodeify(callback);
   };
 
   this.map = function(roomId) {
@@ -212,9 +167,6 @@ function ActivityForUserStrategy(options) {
 ActivityForUserStrategy.prototype = {
   name: 'ActivityForUserStrategy'
 };
-
-
-
 
 function ProOrgStrategy() {
   var proOrgs = {};
