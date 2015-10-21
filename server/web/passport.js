@@ -1,6 +1,9 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
+var env = require('gitter-web-env');
+var logger = env.logger;
+
 var passport               = require('passport');
 var ClientPasswordStrategy = require('passport-oauth2-client-password').Strategy;
 var BearerStrategy         = require('gitter-passport-http-bearer').Strategy;
@@ -8,7 +11,7 @@ var userService            = require('../services/user-service');
 var oauthService           = require('../services/oauth-service');
 var githubUserStrategy     = require('./strategies/github-user');
 var githubUpgradeStrategy  = require('./strategies/github-upgrade');
-var googleStrategy         = require('./strategies/google');
+//var googleStrategy         = require('./strategies/google');
 
 
 function installApi() {
