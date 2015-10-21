@@ -1,3 +1,5 @@
+'use strict'
+
 var env = require('gitter-web-env');
 var stats = env.stats;
 var mixpanel = require('../../web/mixpanelUtils');

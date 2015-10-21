@@ -1,3 +1,5 @@
+'use strict'
+
 var env = require('gitter-web-env');
 var identifyRoute = env.middlewares.identifyRoute;
 var config = env.config;
