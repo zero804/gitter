@@ -14,13 +14,13 @@ var passport               = require('passport');
 var ClientPasswordStrategy = require('passport-oauth2-client-password').Strategy;
 var BearerStrategy         = require('gitter-passport-http-bearer').Strategy;
 var TokenStateProvider     = require('gitter-passport-oauth2').TokenStateProvider;
-
 var oauthService           = require('../services/oauth-service');
 var mixpanel               = require('../web/mixpanelUtils');
 var useragentTagger        = require('../utils/user-agent-tagger');
 var GitHubStrategy         = require('gitter-passport-github').Strategy;
 var GitHubMeService        = require('gitter-web-github').GitHubMeService;
 var gaCookieParser         = require('../utils/ga-cookie-parser');
+var GoogleStrategy         = require('passport-google-oauth2').Strategy;
 var extractGravatarVersion = require('../utils/extract-gravatar-version');
 var emailAddressService    = require('../services/email-address-service');
 var userSettingsService    = require('../services/user-settings-service');
@@ -60,6 +60,55 @@ function installApi() {
         .catch(done);
     }
   ));
+}
+
+// TODO: move to a google-specific file
+function googleOauth2Callback(req, accessToken, refreshToken, params, profile, done) {
+  /*
+  var logData = {
+    accessToken: accessToken,
+    refreshToken: refreshToken,
+    params: params,
+    profile: profile
+  };
+  console.log(JSON.stringify(logData, null, 2));
+  */
+
+  var avatar = profile.photos[0].value; // is this always set?
+
+  var googleUser = {
+    username: profile.id+'_google',
+    displayName: profile.displayName,
+    emails: [profile.emails.map(function(obj) {return obj.value})],
+    noGitHubIdentity: true,
+    googleId: profile.id,
+    gravatarImageUrl: avatar
+  };
+  var googleIdentity = {
+    provider: profile.privider, // 'google'
+    id: profile.id,
+    displayName: profile.displayName,
+    accessToken: accessToken,
+    refreshToken: refreshToken, // doesn't look like google returns this
+    avatar: avatar
+  };
+  return userService.findOrCreateUserForGoogleId(googleUser, googleIdentity)
+    .spread(function(user, identity) {
+      var logData = {
+        user: user,
+        identity: identity
+      };
+      //console.log(JSON.stringify(logData, null, 2));
+      req.logIn(user, function(err) {
+        if (err) { return done(err); }
+
+        // Remove the old token for this user
+        // TODO: this is duplicated code
+        req.accessToken = null;
+        return done(null, user);
+      });
+    })
+    .catch(done);
 }
 
 function install() {
@@ -117,6 +166,7 @@ function install() {
   /* Install the API OAuth strategy too */
   installApi();
 
+  // TODO: move to a github-specific file
   function githubOauthCallback(req, accessToken, refreshToken, params, _profile, done) {
     var googleAnalyticsUniqueId = gaCookieParser(req);
 
@@ -176,7 +226,7 @@ function install() {
 
                 user.username         = githubUserProfile.login;
                 user.displayName      = githubUserProfile.name || githubUserProfile.login;
-                user.gravatarImageUrl = githubUserProfile.avatar_url; // TODO: deprecate this
+                user.gravatarImageUrl = githubUserProfile.avatar_url;
                 user.githubId         = githubUserProfile.id;
                 var gravatarVersion   = extractGravatarVersion(githubUserProfile.avatar_url);
                 if (gravatarVersion) {
@@ -231,7 +281,7 @@ function install() {
                 username:           githubUserProfile.login,
                 displayName:        githubUserProfile.name || githubUserProfile.login,
                 emails:             githubUserProfile.email ? [githubUserProfile.email] : [],
-                gravatarImageUrl:   githubUserProfile.avatar_url, // TODO: Deprecate this....
+                gravatarImageUrl:   githubUserProfile.avatar_url,
                 gravatarVersion:    extractGravatarVersion(githubUserProfile.avatar_url),
                 githubUserToken:    accessToken,
                 githubId:           githubUserProfile.id,
@@ -308,7 +358,7 @@ function install() {
       });
   }
 
-  var userStrategy = new GitHubStrategy({
+  var githubUserStrategy = new GitHubStrategy({
       clientID:          config.get('github:user_client_id'),
       clientSecret:      config.get('github:user_client_secret'),
       callbackURL:       config.get('web:basepath') + '/login/callback',
@@ -316,10 +366,10 @@ function install() {
       skipUserProfile:   true,
       passReqToCallback: true
     }, githubOauthCallback);
-  userStrategy.name = 'github_user';
-  passport.use(userStrategy);
+  githubUserStrategy.name = 'github_user';
+  passport.use(githubUserStrategy);
 
-  var upgradeStrategy = new GitHubStrategy({
+  var githubUpgradeStrategy = new GitHubStrategy({
       clientID:          config.get('github:client_id'),
       clientSecret:      config.get('github:client_secret'),
       callbackURL:       config.get('web:basepath') + '/login/callback',
@@ -327,9 +377,19 @@ function install() {
       skipUserProfile:   true,
       passReqToCallback: true
     }, githubOauthCallback);
-  upgradeStrategy.name = 'github_upgrade';
-  passport.use(upgradeStrategy);
+  githubUpgradeStrategy.name = 'github_upgrade';
+  passport.use(githubUpgradeStrategy);
 
+  var googleStrategy = new GoogleStrategy({
+      clientID:          config.get('googleoauth2:client_id'),
+      clientSecret:      config.get('googleoauth2:client_secret'),
+      callbackURL:       config.get('web:basepath') + '/login/google/callback',
+      passReqToCallback: true
+    }, googleOauth2Callback);
+  googleStrategy.name = 'google';
+  passport.use(googleStrategy);
+
+  // TODO: also add all sorts of other providers
 }
 
 module.exports = {

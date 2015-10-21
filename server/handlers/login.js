@@ -1,37 +1,25 @@
 "use strict";
 
-var env              = require('gitter-web-env');
-var stats            = env.stats;
-var logger           = env.logger;
-var config           = env.config;
-var errorReporter    = env.errorReporter;
+var env = require('gitter-web-env');
+var stats = env.stats;
+var logger = env.logger;
+var config = env.config;
+var identifyRoute = env.middlewares.identifyRoute;
 
-var passport         = require('passport');
-var client           = require("../utils/redis").getClient();
-var lock             = require("redis-lock")(client);
-var jwt              = require('jwt-simple');
-var uuid             = require('node-uuid');
-var url              = require('url');
-var oauth2           = require('../web/oauth2');
-var mixpanel         = require('../web/mixpanelUtils');
-var rememberMe       = require('../web/middlewares/rememberme-middleware');
-var ensureLoggedIn   = require('../web/middlewares/ensure-logged-in');
-var GithubMeService  = require('gitter-web-github').GitHubMeService;
-var identifyRoute    = env.middlewares.identifyRoute;
-var express          = require('express');
+var jwt = require('jwt-simple');
+var uuid = require('node-uuid');
+var url = require('url');
+var oauth2 = require('../web/oauth2');
+var GithubMeService = require('gitter-web-github').GitHubMeService;
+var ensureLoggedIn = require('../web/middlewares/ensure-logged-in');
+var express = require('express');
 
-/** TODO move onto its own method once we find the need for it elsewhere
- * isRelativeURL() checks if the URL is relative
- *
- * url      String - the url to be check
- * @return  Boolean - the result of the check
- */
-function isRelativeURL(url) {
-  var relativeUrl = new RegExp('^\/[^/]');
-  return relativeUrl.test(url);
-}
+var github = require('./providers/github');
+var google = require('./providers/google');
+
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
+
 router.get('/*', function(req, res, next) {
   // Fix for Windows Phone
   req.nonApiRoute = true;
@@ -44,179 +32,45 @@ router.get('/',
     res.render('login', { });
   });
 
-// Redirect user to GitHub OAuth authorization page.
-router.get('/github',
-  identifyRoute('login-github'),
-  function (req, res, next) {
-    var query = req.query;
-
-    // adds the source of the action to the session (for tracking how users 'come in' to the app)
-    req.session.source = query.source;
-
-    // checks if we have a relative url path and adds it to the session
-    if (query.returnTo && isRelativeURL(query.returnTo)) {
-      req.session.returnTo = query.returnTo;
-    }
-
-    //send data to stats service
-    if (query.action == 'login') {
-      stats.event("login_clicked", {
-        distinctId: mixpanel.getMixpanelDistinctId(req.cookies),
-        method: 'github_oauth',
-        button: query.source
-      });
-    }
-    if (query.action == 'signup') {
-      stats.event("signup_clicked", {
-        distinctId: mixpanel.getMixpanelDistinctId(req.cookies),
-        method: 'github_oauth',
-        button: query.source
-      });
-    }
-    next();
-  },
-  passport.authorize('github_user', { scope: 'user:email,read:org', failWithError: true }));
-
-router.get('/invited',
-  identifyRoute('login-invited'),
-  function(req, res) {
-    var query = req.query;
-
-    // checks if we have a relative url path and adds it to the session
-    if (query.uri) req.session.returnTo = config.get('web:basepath') + '/' + query.uri;
-
-    res.render('login_invited', {
-      username: query.welcome,
-      uri: query.uri
-    });
-  });
-
-router.get('/explain',
-  identifyRoute('login-explain'),
-  function(req, res) {
-    res.render('github-explain', {
-    });
-  });
-
-router.get('/upgrade',
-  ensureLoggedIn,
-  identifyRoute('login-upgrade'),
-  function(req, res, next) {
-    var scopes = req.query.scopes ? req.query.scopes.split(/\s*,\s*/) : [''];
-    scopes.push('user:email');  // Always request user:email scope
-    scopes.push('read:org');    // Always request read-only access to orgs
-    var existing = req.user.githubScopes || { };
-    var addedScopes = false;
-
-    scopes.forEach(function(scope) {
-      if(!existing[scope]) addedScopes = true;
-      existing[scope] = true;
-    });
-
-    if(!addedScopes) {
-      res.render('github-upgrade-complete');
-      return;
-    }
-
-    var requestedScopes = Object.keys(existing).filter(function(f) { return !!f; });
-    req.session.githubScopeUpgrade = true;
-
-    passport.authorize('github_upgrade', { scope: requestedScopes, failWithError: true })(req, res, next);
-  });
+// ----------------------------------------------------------
+// Common across different providers
+// ----------------------------------------------------------
 
 router.get('/upgrade-failed',
   identifyRoute('login-upgrade-failed'),
   function(req, res) {
-    res.render('github-upgrade-failed');
+    res.render('upgrade-failed');
   });
 
 router.get('/failed',
   identifyRoute('login-failed'),
   function(req, res) {
-    res.render('github-login-failed', {
+    res.render('login-failed', {
       message: req.query.message
     });
   });
 
-// Welcome GitHub users.
-router.get('/callback',
-  identifyRoute('login-callback'),
-  function(req, res, next) {
-    var code = req.query.code;
-    lock("oalock:" + code, function(done) {
-      var handler;
-      var upgrade = req.session && req.session.githubScopeUpgrade;
-      if(upgrade) {
-        handler = passport.authorize('github_upgrade', { failWithError: true });
-      } else {
-        handler = passport.authorize('github_user', { failWithError: true });
-      }
+// ----------------------------------------------------------
+// GitHub
+// ----------------------------------------------------------
 
-      handler(req, res, function(err) {
-        done(function() {
+router.get('/github', github.login);
+router.get('/invited', github.invited);
+router.get('/explain', github.explain);
+router.get('/upgrade', github.upgrade);
 
-          if(err) {
-            stats.event("login_failure");
+// alias the old /callback to the new /github/callback for backwards
+// compatibility and so we can switch over without downtime
+['/github/callback', '/callback'].forEach(function(path) {
+  router.get(path, github.callback);
+});
 
-            errorReporter(err, {
-              additionalErrorInfo: err.toString(), // passportjs.InternalOAuthError will return additional information in it's toString
-              githubCallbackFailed: "failed",
-              username: req.user && req.user.username,
-              url: req.url,
-              userHasSession: !!req.session
-            }, { module: 'login-handler' });
+// ----------------------------------------------------------
+// Google
+// ----------------------------------------------------------
 
-            if(upgrade) {
-              res.redirect('/login/upgrade-failed');
-            } else {
-              /* For some reason, the user is now logged in, just continue as normal */
-              var user = req.user;
-              if(user) {
-                if(req.session && req.session.returnTo) {
-                  res.redirect(req.session.returnTo);
-                } else {
-                  res.redirect('/' + user.username);
-                }
-                return;
-              }
-
-              if(err.message) {
-                res.redirect('/login/failed?message=' + encodeURIComponent(err.message));
-              } else {
-                res.redirect('/login/failed');
-              }
-            }
-            return;
-          }
-
-          next();
-        });
-      });
-
-    });
-  },
-
-  ensureLoggedIn,
-  rememberMe.generateRememberMeTokenMiddleware,
-  function(req, res) {
-    if(req.session && req.session.githubScopeUpgrade) {
-      delete req.session.githubScopeUpgrade;
-      res.render('github-upgrade-complete');
-      return;
-    }
-
-    if(req.session && req.session.returnTo) {
-      res.redirect(req.session.returnTo);
-      return;
-    }
-
-    var user = req.user;
-    if(user) {
-      res.redirect('/' + user.username);
-    } else {
-      res.redirect('/');
-    }
-  });
+//router.get('/google', google.login);
+//router.get('/google/callback', google.callback);
 
 // ----------------------------------------------------------
 // OAuth for our own clients
