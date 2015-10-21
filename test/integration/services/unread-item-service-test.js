@@ -166,7 +166,7 @@ describe('unread-item-service', function() {
       it('should get activity indicator for a user', function(done) {
         unreadItemService.testOnly.persistActivityForLurkingUsers(troupeId, [userId1], chatId)
         .then(function() {
-          return unreadItemService.getActivityIndicator(troupeId, userId1);
+          return unreadItemService.getActivityIndicatorForTroupeIds([troupeId], userId1);
         })
         .then(function(result) {
           assert.equal(chatId, result);
@@ -176,9 +176,9 @@ describe('unread-item-service', function() {
       });
 
       it('should not get activity indicator for an invalid user', function(done) {
-        unreadItemService.getActivityIndicator(troupeId, userId2)
+        unreadItemService.getActivityIndicatorForTroupeIds([troupeId], userId2)
         .then(function(result) {
-          assert.equal(undefined, result);
+          assert.deepEqual([null], result);
           done();
         })
         .catch(done);

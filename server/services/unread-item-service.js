@@ -691,12 +691,6 @@ exports.clearActivityIndicator = function(troupeId, userId) {
   return redisDel(activityKey);
 };
 
-exports.getActivityIndicator = function(troupeId, userId) {
-  var activityKey = 'activity:' + userId + ':' + troupeId;
-  debug('getActivityIndicator: ', activityKey);
-  return redisGet(activityKey);
-};
-
 exports.getActivityIndicatorForTroupeIds = function(troupeIds, userId) {
   var activityKeys = troupeIds.map(function(troupeId) {
     return 'activity:' + userId + ':' + troupeId;
