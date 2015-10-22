@@ -474,7 +474,7 @@ function renderOrgPage(req, res, next) {
        rooms.forEach(function(room, index) {
         room.users = values[index];
         _.each(room.users, function(user) {
-          user.avatarUrlSmall = getUserAvatarForSize(user, 60)
+          user.avatarUrlSmall = getUserAvatarForSize(user, 60);
         });
       });
 

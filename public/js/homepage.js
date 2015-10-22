@@ -159,7 +159,7 @@ function initEmbedPanel() {
 
     $this.html(
       // TODO: send more than just the username
-      '<img src="' + getUserAvatarForSize({ username: owner }, 48) + '" width="48" height="48">' +
+      '<img src="' + getUserAvatarForSize({ username: owner }, 48*2) + '" width="48" height="48">' +
       '<h3>' + room.name + '</h3>' +
       '<em>' + room.language + '</em>');
   });

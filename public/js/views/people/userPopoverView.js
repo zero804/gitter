@@ -28,6 +28,9 @@ module.exports = (function() {
       }
       data.inactive = data.invited || data.removed;
       // TODO: send more than just a username
+      // NOTE: this actually gets displayed at 128 css pixels wide, so retina
+      // would have to be 256. But that doesn't map to avatarUrlSmall or
+      // avatarUrlMedium
       data.avatarUrl = getUserAvatarForSize({ username: data.login }, 128);
 
       return data;
