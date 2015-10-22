@@ -18,6 +18,8 @@ var SPARoomSwitcher       = require('components/spa-room-switcher');
 var debug                 = require('debug-proxy')('app:router-app');
 var urlParser             = require('./utils/url-parser');
 var linkHandler           = require('./components/link-handler');
+var roomListGenerator     = require('./components/chat-cache/room-list-generator');
+
 
 require('components/statsc');
 require('views/widgets/preload');
@@ -27,7 +29,6 @@ require('template/helpers/all');
 require('components/bug-reporting');
 require('components/focus-events');
 
-require('./components/chat-cache/chat-collection-pool');
 
 require('utils/tracking');
 require('components/ping');
@@ -455,4 +456,19 @@ onready(function() {
       });
     });
   }
+
+  troupeCollections.troupes.once('change', function(){
+    //HACK HACK HACK REMOVE THIS IN FAVOUR OF SOME
+    //PROPER MESSAGING
+    //basically the chat frame should request this
+    setTimeout(function(){
+
+      postMessage({
+        type: 'roomList',
+        rooms: roomListGenerator(),
+      });
+
+    }, 1000);
+  });
+
 });
