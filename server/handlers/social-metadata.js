@@ -7,8 +7,6 @@ function getMetadata(options) {
   var room = options && options.room;
 
   var owner = room && room.uri && room.uri.split('/')[0];
-  // TODO: this will break when called for a room that's not a github user
-  // derived room. Ideas?
   var image = 'https://avatars.githubusercontent.com/' + ( owner || 'gitterHQ' );
 
   var title = room && room.uri || 'Gitter';
