@@ -93,4 +93,8 @@ router.post('/invite-user',
   identifyRoute('api-private-invite-user'),
   require('./invite-user'));
 
+router.get('/user-avatar/:username',
+  identifyRoute('api-private-invite-user'),
+  require('./user-avatar'));
+
 module.exports = router;
