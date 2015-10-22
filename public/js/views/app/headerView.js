@@ -1,15 +1,15 @@
 'use strict';
-var _                        = require('underscore');
-var context                  = require('utils/context');
-var apiClient                = require('components/apiClient');
-var Marionette               = require('backbone.marionette');
-var Backbone                 = require('backbone');
-var autolink                 = require('autolink');
-var notifications            = require('components/notifications');
-var Dropdown                 = require('views/controls/dropdown');
-var appEvents                = require('utils/appevents');
-var headerViewTemplate       = require('./tmpl/headerViewTemplate.hbs');
-var resolveRoomAvatarUrl     = require('gitter-web-shared/avatars/resolve-room-avatar-url');
+var _                    = require('underscore');
+var context              = require('utils/context');
+var apiClient            = require('components/apiClient');
+var Marionette           = require('backbone.marionette');
+var Backbone             = require('backbone');
+var autolink             = require('autolink');
+var notifications        = require('components/notifications');
+var Dropdown             = require('views/controls/dropdown');
+var appEvents            = require('utils/appevents');
+var headerViewTemplate   = require('./tmpl/headerViewTemplate.hbs');
+var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 var getOrgNameFromTroupeName = require('../../../../shared/get-org-name-from-troupe-name');
 
 require('views/behaviors/tooltip');
@@ -69,7 +69,7 @@ module.exports = Marionette.ItemView.extend({
       troupeName:      data.name,
       troupeFavourite: !!data.favourite,
       troupeTopic:     data.topic,
-      avatarUrl:       resolveRoomAvatarUrl(data.url),
+      avatarSrcSet:    resolveRoomAvatarSrcSet(data.url, 48),
       user:            !!context.isLoggedIn(),
       archives:        this.options.archives,
       oneToOne:        (data.githubType === 'ONETOONE'),

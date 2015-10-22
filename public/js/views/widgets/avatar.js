@@ -5,10 +5,13 @@ var context = require('utils/context');
 var template = require('./tmpl/avatar.hbs');
 var UserPopoverView = require('views/people/userPopoverView');
 var widgets = require('views/behaviors/widgets');
-var resolveAvatarUrl = require('gitter-web-shared/avatars/resolve-avatar-url');
+var resolveAvatarSrcSet = require('gitter-web-shared/avatars/resolve-avatar-srcset');
 require('views/behaviors/tooltip');
 var FastAttachMixin = require('views/fast-attach-mixin');
 
+var AVATAR_SIZE_MEDIUM = 64;
+var AVATAR_SIZE_SMALL = 30;
+var FALLBACK_IMAGE_URL = "https://avatars.githubusercontent.com/u/0";
 
 module.exports = (function() {
 
@@ -18,11 +21,13 @@ module.exports = (function() {
     template: template,
     events: {
       'mouseover': 'showDetailIntent',
-      'click':     'showDetail'
+      'click':     'showDetail',
+      'error img': 'onImageError'
     },
     ui: {
       tooltip: ':first-child',
-      image: '.trpDisplayPicture'
+      wrapper: '.trpDisplayPicture',
+      image: 'img'
     },
     modelEvents: {
       change: 'update'
@@ -46,9 +51,20 @@ module.exports = (function() {
       //
       // this.user = options.user ? options.user : {};
       // this.showEmail = options.showEmail || {};
-      // this.showBadge = options.showBadge;
       // this.showStatus = options.showStatus;
       // this.avatarSize = options.size ? options.size : 's';
+    },
+
+    onRender: function() {
+      var img = this.ui.image[0];
+      if (!img) return;
+      img.onerror = this.onImageError.bind(this);
+    },
+
+    onDestroy: function() {
+      var img = this.ui.image[0];
+      if (!img) return;
+      img.onerror = null;
     },
 
     showDetailIntent: function(e) {
@@ -82,18 +98,17 @@ module.exports = (function() {
 
     updatePresence: function(data) {
       if (this.options.showStatus) {
-        this.ui.image.toggleClass('online', data.online);
-        this.ui.image.toggleClass('offline', !data.online);
+        var wrapper = this.ui.wrapper;
+        wrapper.toggleClass('online', data.online);
+        wrapper.toggleClass('offline', !data.online);
       }
     },
 
     updateAvatar: function(data) {
-      var newUrl = "url('" + data.avatarUrl + "')";
-      if (newUrl !== this.ui.image.css('background-image')) {
-        this.preloadImage(data.avatarUrl, function() {
-          this.ui.image.css({ 'background-image': newUrl });
-        });
-      }
+      var img = this.ui.image[0];
+      var avatarSrcSet = data.avatarSrcSet;
+      img.src = avatarSrcSet.src;
+      img.srcset = avatarSrcSet.srcset;
     },
 
     getUserId: function() {
@@ -110,23 +125,20 @@ module.exports = (function() {
       return this.model.get('displayName');
     },
 
-    preloadImage: function(url, callback) {
-      var image = document.createElement('img');
-      var self = this;
+    onImageError: function(e) {
+      var img = e.currentTarget;
+      var options = this.options || {};
+      var avatarSize = options.avatarSize || 's';
+      var imgSize =  avatarSize == 'm' ? AVATAR_SIZE_MEDIUM : AVATAR_SIZE_SMALL;
 
-      image.onload = function() {
-        if (self.isDestroyed) return;
-        image.onload = null;
-        callback.call(self);
+      var user = this.model && this.model.toJSON();
+      var avatarSrcSet = resolveAvatarSrcSet({ username: user.username, version: user.gv, size: imgSize });
+
+      // Still pointing at the same location?
+      if(img.src === avatarSrcSet.src) {
+        img.src = FALLBACK_IMAGE_URL;
+        img.srcset = "";
       }
-
-      image.onerror = function() {
-        if (self.isDestroyed) return;
-        image.onerror = null;
-        callback.call(self);
-      }
-
-      image.src = url;
     },
 
     attachElContent: FastAttachMixin.attachElContent
@@ -144,8 +156,11 @@ module.exports = (function() {
       }
     }
 
+    var avatarSize = options.avatarSize || 's';
+    var imgSize =  avatarSize == 'm' ? AVATAR_SIZE_MEDIUM : AVATAR_SIZE_SMALL;
+
     var currentUserId = context.getUserId();
-    var avatarUrl = resolveAvatarUrl({ username: user.username, version: user.gv, size: (options.avatarSize == 'm' ? 60 : 32) });
+    var avatarSrcSet = resolveAvatarSrcSet({ username: user.username, version: user.gv, size: imgSize });
 
     var online = user.id === currentUserId || !!user.online; // only the people view tries to show avatar status so there is a model object, it won't necessarily work in other cases
 
@@ -158,11 +173,11 @@ module.exports = (function() {
 
     return {
       id: user.id,
-      showBadge: options.showBadge,
       showStatus: options.showStatus,
       userDisplayName: user.displayName,
-      avatarUrl: avatarUrl,
-      avatarSize: options.avatarSize || 's',
+      avatarSrcSet: avatarSrcSet,
+      avatarSize: avatarSize || 's',
+      imgSize: imgSize,
       presenceClass: presenceClass,
       online: online,
       offline: !online,
