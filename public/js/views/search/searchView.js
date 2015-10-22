@@ -5,7 +5,7 @@ var apiClient = require('components/apiClient');
 var context = require('utils/context');
 var appEvents = require('utils/appevents');
 var Rollers = require('utils/rollers');
-var resolveAvatarUrl = require('gitter-web-shared/avatars/resolve-avatar-url');
+var getUserAvatarForSize = require('gitter-web-shared/avatars/get-user-avatar-for-size');
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 var _ = require('underscore');
@@ -78,10 +78,8 @@ module.exports = (function() {
       data.selected = this.model.get('selected');
       data.detail = this.model.get('githubType');
       data.text = uri;
-      // TODO: replace with getUserAvatarForSize. Needs more than just the
-      // username so that rooms search results that aren't just github user
-      // rooms will also work.
-      data.avatarUrl = resolveAvatarUrl({ username: uri.split('/')[0], size: 50 });
+      // TODO: send more than just a username and don't fish it out of the url
+      data.avatarUrl = getUserAvatarForSize({ username: uri.split('/')[0]}, 50);
       return data;
     },
 
