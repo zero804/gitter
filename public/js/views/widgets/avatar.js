@@ -145,7 +145,6 @@ module.exports = (function() {
     }
 
     var currentUserId = context.getUserId();
-    // NOTE: shouldn't this just use avatarUrlSmall or something?
     var avatarUrl = getUserAvatarForSize(user, (options.avatarSize == 'm' ? 60 : 32));
 
     var online = user.id === currentUserId || !!user.online; // only the people view tries to show avatar status so there is a model object, it won't necessarily work in other cases
