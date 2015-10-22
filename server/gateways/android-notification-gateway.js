@@ -27,12 +27,16 @@ var sendNotificationToDevice = function(notification, badge, device) {
   var deferred = Q.defer();
   sender.send(message, [device.androidToken], MAX_RETRIES, deferred.makeNodeResolver());
 
-  return deferred.promise.then(function(results) {
-    if (results.canonical_ids) {
+  return deferred.promise.then(function(body) {
+    if (body.canonical_ids) {
       // this registration id/token is an old duplicate which has been superceded by a canonical id,
       // and we've probably just sent two identical messages to the same phone.
-      return pushNotificationService.deregisterAndroidDevice(device.androidToken)
-        .thenResolve(results);
+      return pushNotificationService.deregisterAndroidDevice(device.androidToken).thenResolve(body);
+    } else if (body.failure && body.results[0] && body.results[0].error === "NotRegistered") {
+      // app has been uninstalled / token revoked
+      return pushNotificationService.deregisterAndroidDevice(device.androidToken).thenResolve(body);
+    } else {
+      return body;
     }
   });
 };
