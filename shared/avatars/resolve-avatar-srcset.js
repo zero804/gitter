@@ -11,6 +11,7 @@ module.exports = function (spec) {
     /* Best we can do */
     return {
       src: DEFAULT,
+      size: size
     };
   }
 
@@ -21,6 +22,7 @@ module.exports = function (spec) {
   var base = BASE + hash(username) + GITHUB_URL + username + '?' + (version ? 'v=' + version + '&' : '');
   return {
     src: base + 's=' + size,
+    size: size,
     srcset: base + 's=' + (size * 2) + ' 2x'
   };
 };
