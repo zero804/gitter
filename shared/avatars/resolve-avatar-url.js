@@ -31,8 +31,7 @@ function build(spec) {
     return BASE + hash(username) + GITHUB_URL + username + '?' + (version ? 'v=' + version : '') + '&s=' + size;
   } else {
     // not github, send to resolver
-    // TODO: what url should we use?
-    return '/avatar/'+username+'/?s='+size
+    return '/api/private/user-avatar/'+username+'?s='+size;
   }
 }
 
