@@ -237,7 +237,8 @@ function renderMainFrame(req, res, next, frame) {
             .filter(roomSort.recents.filter)
             .sort(roomSort.recents.sort)
         },
-        orgs: orgs
+        orgs: orgs,
+        userHasNoOrgs: !orgs || !orgs.length
       });
     })
     .catch(next);
