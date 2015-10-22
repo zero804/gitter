@@ -3,13 +3,14 @@
 var hash        = require('./hash-avatar-to-cdn');
 var BASE        = 'https://avatars';
 var GITHUB_URL  = '.githubusercontent.com/';
+var DEFAULT     = BASE + GITHUB_URL + 'u/0';
 
 // make sure to pass the size for non-retina screens
 module.exports = function (spec) {
   if (!spec || !spec.username) {
     /* Best we can do */
     return {
-      src: "https://avatars1.githubusercontent.com/u/0",
+      src: DEFAULT,
     };
   }
 
