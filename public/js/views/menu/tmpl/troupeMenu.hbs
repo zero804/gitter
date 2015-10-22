@@ -36,7 +36,7 @@
           <div id="list">
             <ul class="room-list">
               {{#each orgs}}
-              {{{ prerenderView "js/views/menu/tmpl/org-list-item" wrap="li" dataId=true className="room-list-item" }}}
+              {{{ prerenderOrgListItem this }}}
               {{/each}}
             </ul>
           </div>

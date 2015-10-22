@@ -11,6 +11,7 @@ var FastAttachMixin = require('views/fast-attach-mixin');
 
 var AVATAR_SIZE_MEDIUM = 64;
 var AVATAR_SIZE_SMALL = 30;
+var FALLBACK_IMAGE_URL = "https://avatars1.githubusercontent.com/u/0";
 
 module.exports = (function() {
 
@@ -135,7 +136,7 @@ module.exports = (function() {
 
       // Still pointing at the same location?
       if(img.src === avatarSrcSet.src) {
-        img.src = "https://avatars1.githubusercontent.com/u/0";
+        img.src = FALLBACK_IMAGE_URL;
         img.srcset = "";
       }
     },
