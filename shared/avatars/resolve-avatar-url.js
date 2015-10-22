@@ -24,19 +24,21 @@ function build(spec) {
 
   var username = spec.username;
   var version = spec.version;
-  var size = spec.size || 30;
+  var size = spec.size || 60;
 
-  return BASE + hash(username) + GITHUB_URL + username + '?' + (version ? 'v=' + version : '') + '&s=' + size;
+  if (username.indexOf('_') == -1) {
+    // github namespace
+    return BASE + hash(username) + GITHUB_URL + username + '?' + (version ? 'v=' + version : '') + '&s=' + size;
+  } else {
+    // not github, send to resolver
+    // TODO: what url should we use?
+    return '/avatar/'+username+'/?s='+size
+  }
 }
 
-var getPixelDensity = targetEnv.isBrowser ?
-  function() { return window.devicePixelRatio || 1; } :
-  function() { return 1; };
-
 // make sure to pass the size for non-retina screens
-module.exports = function (spec) {
-  var pixelDensity = getPixelDensity();
-  spec.size = (spec.size || 30) * pixelDensity;
+module.exports = function resolveAvatarUrl(spec) {
+  spec.size = spec.size || 60;
   var url = build(spec);
   return url;
 };
