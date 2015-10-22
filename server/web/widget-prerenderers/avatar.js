@@ -1,7 +1,6 @@
-/*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var resolveAvatarUrl = require('gitter-web-shared/avatars/resolve-avatar-url');
+var resolveAvatarSrcSet = require('gitter-web-shared/avatars/resolve-avatar-srcset');
 
 module.exports = exports = function(template) {
   return function avatarWidgetHandler(params) {
@@ -9,18 +8,17 @@ module.exports = exports = function(template) {
     var user = hash.model || hash.user || {};
 
     var avatarSize = hash.avatarSize || 's';
-    var showBadge = hash.showBadge;
     var showStatus = hash.showStatus;
-
-    var avatarUrl = resolveAvatarUrl({ username: user.username, size: (avatarSize == 'm' ? 60 : 30) });
+    var imgSize = avatarSize == 'm' ? 60 : 30;
+    var avatarSrcSet = resolveAvatarSrcSet({ username: user.username, size: imgSize });
 
     var r = template({
-      avatarUrl: avatarUrl,
+      avatarSrcSet: avatarSrcSet,
       avatarSize: avatarSize,
+      imgSize: imgSize,
       id: user.id,
       role: user.role,
       showStatus: showStatus,
-      showBadge: showBadge,
       presenceClass: user.online ? 'online' : 'offline',
       inactive: user.invited
     });

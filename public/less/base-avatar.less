@@ -17,8 +17,8 @@
 .trpDisplayPicture {
   display: inline-block;
   text-align: center;
-  box-sizing: border-box;
   transform: translate3d(0, 0, 0);
+  border-bottom: 2px solid transparent;
 
   &.unread {
     animation: pulsate 3s ease-out;
@@ -31,6 +31,72 @@
       animation-iteration-count: infinite;
     }
   }
+
+  & img {
+    width: 30px;
+    max-width: 30px;
+    border-radius: 4px;
+    box-sizing: border-box;
+    height: 30px;
+    border: none;
+    background-color: #eee;
+  }
+
+  &.admin:before,
+  &.contributor:before {
+    content: " ";
+    position: absolute;
+    bottom: 0px;
+    height: 4px;
+    left: 0;
+    right: 0;
+    box-sizing: border-box;
+    border-radius: 4px;
+  }
+
+  &.admin:before {
+    background-color: #34495e;
+  }
+
+  &.contributor:before {
+    background-color: #3498db;
+  }
+
+  &.admin:after,
+  &.contributor:after {
+    content: " ";
+    position: absolute;
+    bottom: 3px;
+    height: 1px;
+    left: 0;
+    right: 0;
+    box-sizing: border-box;
+    border-bottom: 1px solid white;
+  }
+
+  &.invited {
+
+    @invitedGray: 0;
+    @invitedOpacity: 0.3;
+    @MSinvitedOpacity: @invitedOpacity * 100; /* DO NOT CHANGE */ /* OH YEAH? WHY NOT? */
+
+    opacity: @invitedOpacity;
+    filter: grayscale(@invitedGray);
+
+    .trpStatus {
+      display: none;
+    }
+  }
+
+  &.online .trpStatus{
+    background-color: #06ff00;
+  }
+
+  &.offline .trpStatus {
+    background-color: #ffffff;
+    box-shadow: inset 0 0 0 2px #fcb316;
+  }
+
 }
 
 a .trpDisplayPicture {
