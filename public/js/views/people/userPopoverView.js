@@ -1,7 +1,7 @@
 "use strict";
 var Marionette = require('backbone.marionette');
 var Backbone = require('backbone');
-var resolveAvatarUrl = require('gitter-web-shared/avatars/resolve-avatar-url');
+var getUserAvatarForSize = require('gitter-web-shared/avatars/get-user-avatar-for-size');
 var Popover = require('views/popover');
 var template = require('./tmpl/userPopoverView.hbs');
 var footerTemplate = require('./tmpl/userPopoverFooterView.hbs');
@@ -27,10 +27,8 @@ module.exports = (function() {
         }
       }
       data.inactive = data.invited || data.removed;
-      // TODO: switch to getUserAvatarForSize. Needs more than just the github
-      // username., but then again - this entire popover will have to change to
-      // work with more than just data pulled from github, so..
-      data.avatarUrl = resolveAvatarUrl({ username: data.login, size: 128 });
+      // TODO: send more than just a username
+      data.avatarUrl = getUserAvatarForSize({ username: data.login }, 128);
 
       return data;
     }
