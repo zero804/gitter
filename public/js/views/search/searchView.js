@@ -79,7 +79,7 @@ module.exports = (function() {
       data.detail = this.model.get('githubType');
       data.text = uri;
       // TODO: send more than just a username and don't fish it out of the url
-      data.avatarUrl = getUserAvatarForSize({ username: uri.split('/')[0]}, 50);
+      data.avatarUrl = getUserAvatarForSize({ username: uri.split('/')[0]}, 48);
       return data;
     },
 

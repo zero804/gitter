@@ -145,7 +145,9 @@ module.exports = (function() {
     }
 
     var currentUserId = context.getUserId();
-    var avatarUrl = getUserAvatarForSize(user, (options.avatarSize == 'm' ? 60 : 32));
+    // NOTE: 60*2 doesn't map to avatarUrlSmall or avatarUrlMedium. It gets
+    // displayed at 30 wide, so 60 makes sense for retina.
+    var avatarUrl = getUserAvatarForSize(user, (options.avatarSize == 'm' ? 128 : 60));
 
     var online = user.id === currentUserId || !!user.online; // only the people view tries to show avatar status so there is a model object, it won't necessarily work in other cases
 

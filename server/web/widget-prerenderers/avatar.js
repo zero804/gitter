@@ -12,7 +12,8 @@ module.exports = exports = function(template) {
     var showBadge = hash.showBadge;
     var showStatus = hash.showStatus;
 
-    var avatarUrl = getUserAvatarForSize(user, (avatarSize == 'm' ? 60 : 30));
+    // NOTE: changing the sizes it asks for to what actually gets used
+    var avatarUrl = getUserAvatarForSize(user, (avatarSize == 'm' ? 128 : 60));
 
     var r = template({
       avatarUrl: avatarUrl,
