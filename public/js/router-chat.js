@@ -117,7 +117,6 @@ onready(function() {
       break;
 
       case 'roomList':
-        console.log('got items');
         chatCollectionPool(message.rooms);
         break;
     }
