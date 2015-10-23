@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var _                       = require('underscore');
 var Backbone                = require('backbone');
@@ -15,7 +15,7 @@ var SyncMixin               = require('./sync-mixin');
 var userId = context.getUserId();
 
 var ChatModel = Backbone.Model.extend({
-  idAttribute: "id",
+  idAttribute: 'id',
   initialize: function() {
     this.listenTo(this, 'sync', this.triggerSynced);
     this.listenTo(this, 'request', this.triggerSyncing);
@@ -41,7 +41,7 @@ var ChatModel = Backbone.Model.extend({
     this.trigger('syncStatusChange', 'syncerror');
   },
 
-  parse: function (message) {
+  parse: function(message) {
     if (message.sent) {
       message.sent = moment(message.sent, moment.defaultFormat);
     }
@@ -59,10 +59,11 @@ var ChatModel = Backbone.Model.extend({
 
     return message;
   },
+
   toJSON: function() {
     var d = _.clone(this.attributes);
     var sent = this.get('sent');
-    if(sent) {
+    if (sent) {
       // Turn the moment sent value into a string
       d.sent = sent.format();
     }
@@ -72,8 +73,10 @@ var ChatModel = Backbone.Model.extend({
 
     return d;
   },
-  sync: SyncMixin.sync
+
+  sync: SyncMixin.sync,
 });
+
 
 var ChatCollection = LiveCollection.extend({
   model: ChatModel,
@@ -81,8 +84,13 @@ var ChatCollection = LiveCollection.extend({
   client: function() {
     return realtime.getClient();
   },
+
   urlTemplate: '/v1/rooms/:troupeId/chatMessages',
-  contextModel: context.contextModel(),
+  //we set this to a new model as we dont want to reset the collection
+  //on room change
+  contextModel: new Backbone.Model({
+    troupeId: context.troupe().get('id'),
+  }),
   comparator: function(chat1, chat2) {
     var s1 = chat1.get('sent');
     var s2 = chat2.get('sent');
@@ -90,17 +98,19 @@ var ChatCollection = LiveCollection.extend({
       if (!s2) return 0; // null === null
       return 1; // null > s2
     }
+
     if (!s2) return -1; // s1 < null
     return s1.valueOf() - s2.valueOf();
   },
+
   initialize: function() {
-    this.listenTo(this, 'add remove', function (model, collection) {
-      collection.once('sort', function () {
+    this.listenTo(this, 'add remove', function(model, collection) {
+      collection.once('sort', function() {
         burstCalculator.calc.call(this, model);
       });
     });
 
-    this.listenTo(this, 'sync', function (model) {
+    this.listenTo(this, 'sync', function(model) {
       // Sync is for collections and models
       if (!(model instanceof Backbone.Model)) return;
 
@@ -111,12 +121,12 @@ var ChatCollection = LiveCollection.extend({
       this.checkClientClockSkew(model);
     });
 
-    this.listenTo(this, 'reset sync', function () {
+    this.listenTo(this, 'reset sync', function() {
       burstCalculator.parse(this);
     });
 
     //when we change room we want to reset the state
-    this.listenTo(context.troupe(), 'change:id', function(){
+    this.listenTo(context.troupe(), 'change:id', function() {
       this.setAtTop(false);
     });
   },
@@ -129,11 +139,11 @@ var ChatCollection = LiveCollection.extend({
     return { lean: true };
   },
 
-  parse: function (collection) {
+  parse: function(collection) {
     return burstCalculator.parse(collection);
   },
 
-  findModelForOptimisticMerge: function (newModel) {
+  findModelForOptimisticMerge: function(newModel) {
     var optimisticModel = this.find(function(model) {
       return !model.id && model.get('text') === newModel.get('text');
     });
@@ -152,12 +162,13 @@ var ChatCollection = LiveCollection.extend({
       }
     }
   },
-  sync: SyncMixin.sync
+
+  sync: SyncMixin.sync,
 });
 cocktail.mixin(ChatCollection, InfiniteCollectionMixin);
 
 var ReadByModel = Backbone.Model.extend({
-  idAttribute: "id"
+  idAttribute: 'id',
 });
 
 var ReadByCollection = LiveCollection.extend({
@@ -166,17 +177,19 @@ var ReadByCollection = LiveCollection.extend({
   client: function() {
     return realtime.getClient();
   },
+
   urlTemplate: '/v1/rooms/:troupeId/chatMessages/:chatId/readBy',
   contextModel: function() {
     // Note, this contextModel is not live
     return new Backbone.Model({ troupeId: context.getTroupeId(), chatId: this.chatMessageId });
   },
+
   initialize: function(models, options) { // jshint unused:true
     var userCollection = options.userCollection;
-    if(userCollection) {
+    if (userCollection) {
       this.transformModel = function(model) {
         var m = userCollection.get(model.id);
-        if(m) return m.toJSON();
+        if (m) return m.toJSON();
 
         // If the user is not in the user roster, this is broken.. need to lookup the user
         return model;
@@ -185,12 +198,13 @@ var ReadByCollection = LiveCollection.extend({
 
     this.chatMessageId = options.chatMessageId;
   },
-  sync: SyncMixin.sync
+
+  sync: SyncMixin.sync,
 });
 
 module.exports = {
   ReadByModel: ReadByModel,
   ReadByCollection: ReadByCollection,
   ChatModel: ChatModel,
-  ChatCollection: ChatCollection
+  ChatCollection: ChatCollection,
 };

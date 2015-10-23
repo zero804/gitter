@@ -48,6 +48,7 @@ function onRoomChange(model) {
   var name = model.get('name');
   var collection = pool[name];
   pool[lastRoom] = chatCollection.collection;
+  console.log(chatCollection.collection);
   lastRoom = name;
   console.log(collection);
   chatCollection.switchCollection(collection);
