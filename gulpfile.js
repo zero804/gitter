@@ -25,9 +25,8 @@ var del = require('del');
 var grepFail = require('gulp-grep-fail');
 var runSequence = require('run-sequence');
 var jsonlint = require('gulp-jsonlint');
-
-/* Don't do clean in gulp, use make */
-var DEV_MODE = !!process.env.DEV_MODE;
+var replace = require('gulp-replace');
+var vinylPaths = require('vinyl-paths');
 
 var testModules = {
   'integration': ['./test/integration/**/*.js', './test/public-js/**/*.js'],
@@ -290,13 +289,39 @@ gulp.task('copy-asset-files', function() {
 //      }))
 //     .pipe(gulp.dest('./public'));
 // });
+//
+function getSourceMapUrl() {
+  if (!process.env.BUILD_URL) return;
+
+  return process.env.BUILD_URL + '/artifact/output/maps/';
+}
+
+function getSourceMapOptions() {
+  var sourceMapUrl = getSourceMapUrl();
+  if (!sourceMapUrl) {
+    return {
+      dest: 'output/assets/styles'
+    };
+  }
+
+  mkdirp.sync('output/maps');
+  return {
+    dest: 'output/maps',
+    options: {
+      sourceMappingURLPrefix: sourceMapUrl
+    }
+  };
+
+}
 
 gulp.task('css-ios', function () {
+  var sourceMapOpts = getSourceMapOptions();
+
   return gulp.src([
     'public/less/mobile-native-chat.less',
     'public/less/mobile-native-userhome.less'
     ])
-    .pipe(gulpif(DEV_MODE, sourcemaps.init()))
+    .pipe(sourcemaps.init())
     .pipe(less({
       paths: ['public/less'],
       globalVars: {
@@ -311,17 +336,18 @@ gulp.task('css-ios', function () {
       mqpacker,
       csswring
     ]))
-    .pipe(gulpif(DEV_MODE, sourcemaps.write('output/assets/styles')))
+    .pipe(sourcemaps.write(sourceMapOpts.destination, sourceMapOpts.options))
     .pipe(gulp.dest('output/assets/styles'));
 });
 
 gulp.task('css-mobile', function () {
+  var sourceMapOpts = getSourceMapOptions();
   return gulp.src([
     'public/less/mobile-app.less',
     'public/less/mobile-nli-app.less',
     'public/less/mobile-userhome.less'
     ])
-    .pipe(gulpif(DEV_MODE, sourcemaps.init()))
+    .pipe(sourcemaps.init())
     .pipe(less({
       paths: ['public/less'],
       globalVars: {
@@ -340,11 +366,13 @@ gulp.task('css-mobile', function () {
       mqpacker,
       csswring
     ]))
-    .pipe(gulpif(DEV_MODE, sourcemaps.write('output/assets/styles')))
+    .pipe(sourcemaps.write(sourceMapOpts.destination, sourceMapOpts.options))
     .pipe(gulp.dest('output/assets/styles'));
 });
 
 gulp.task('css-web', function () {
+  var sourceMapOpts = getSourceMapOptions();
+
   var lessFiles = [
     'public/less/trpAppsPage.less',
     'public/less/error-page.less',
@@ -372,7 +400,7 @@ gulp.task('css-web', function () {
 
   return gulp.src(lessFiles)
     .pipe(expect({ errorOnFailure: true }, lessFiles))
-    .pipe(gulpif(DEV_MODE, sourcemaps.init()))
+    .pipe(sourcemaps.init())
     .pipe(less({
       paths: ['public/less'],
       globalVars: {
@@ -391,7 +419,7 @@ gulp.task('css-web', function () {
       mqpacker,
       csswring
     ]))
-    .pipe(gulpif(DEV_MODE, sourcemaps.write('output/assets/styles')))
+    .pipe(sourcemaps.write(sourceMapOpts.destination, sourceMapOpts.options))
     .pipe(gulp.dest('output/assets/styles'));
 });
 
@@ -403,7 +431,27 @@ gulp.task('webpack', function() {
     .pipe(gulp.dest('output/assets/js'));
 });
 
-gulp.task('build-assets', ['copy-asset-files', 'css', 'webpack']);
+gulp.task('webpack', function() {
+  return gulp.src('./public/js/webpack.config')
+    .pipe(webpack(require('./public/js/webpack.config')))
+    .pipe(gulp.dest('output/assets/js'));
+});
+
+gulp.task('update-webpack-sourcemap-url', ['webpack'], function() {
+  var sourceMapUrl = getSourceMapUrl();
+
+  return gulp.src('output/assets/js/*.js')
+    .pipe(gulpif(sourceMapUrl, replace(/(\/\/\#\s*sourceMappingURL=)([\w\d\-\_\.]*)\s*$/g, '$1' + sourceMapUrl +'$2')))
+    .pipe(gulp.dest('output/assets/js'));
+});
+
+gulp.task('move-webpack-sourcemaps', ['webpack'], function() {
+  return gulp.src('output/assets/js/*.map')
+    .pipe(vinylPaths(del))
+    .pipe(gulp.dest('output/maps'));
+});
+
+gulp.task('build-assets', ['copy-asset-files', 'css', 'webpack', 'update-webpack-sourcemap-url', 'move-webpack-sourcemaps']);
 
 
 gulp.task('compress-assets', ['build-assets'], function() {

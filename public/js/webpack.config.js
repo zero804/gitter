@@ -173,9 +173,11 @@ var webpackConfig = {
 
 if(devMode) {
   // See http://webpack.github.io/docs/configuration.html#devtool
-  webpackConfig.devtool = 'source-map';
+  webpackConfig.devtool = 'eval-cheap-module-source-map';
   webpackConfig.cache = true;
 } else {
+  webpackConfig.devtool = 'source-map';
+
   // webpackConfig.plugins.push(new DedupePlugin());
   // webpackConfig.plugins.push(new OccurrenceOrderPlugin());
   webpackConfig.plugins.push(new UglifyJsPlugin({
