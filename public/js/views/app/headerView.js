@@ -1,16 +1,16 @@
 'use strict';
-var _                    = require('underscore');
-var context              = require('utils/context');
-var apiClient            = require('components/apiClient');
-var Marionette           = require('backbone.marionette');
-var Backbone             = require('backbone');
-var autolink             = require('autolink');
-var notifications        = require('components/notifications');
-var Dropdown             = require('views/controls/dropdown');
-var appEvents            = require('utils/appevents');
-var headerViewTemplate   = require('./tmpl/headerViewTemplate.hbs');
+var _                        = require('underscore');
+var context                  = require('utils/context');
+var apiClient                = require('components/apiClient');
+var Marionette               = require('backbone.marionette');
+var Backbone                 = require('backbone');
+var autolink                 = require('autolink');
+var notifications            = require('components/notifications');
+var Dropdown                 = require('views/controls/dropdown');
+var appEvents                = require('utils/appevents');
+var headerViewTemplate       = require('./tmpl/headerViewTemplate.hbs');
+var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
-var getOrgNameFromTroupeName = require('../../../../shared/get-org-name-from-troupe-name');
 
 require('views/behaviors/tooltip');
 

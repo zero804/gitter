@@ -1,5 +1,5 @@
 var assert = require('assert');
-var getOrgNameFromTroupeName = require('../../../shared/get-org-name-from-troupe-name');
+var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 
 describe('Get an org name from a room name', function(){
 

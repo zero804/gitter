@@ -103,6 +103,10 @@ exports.registerAndroidDevice = function(deviceId, deviceName, registrationId, a
     .nodeify(callback);
 };
 
+exports.deregisterAndroidDevice = function(registrationId) {
+  return PushNotificationDevice.findOneAndRemove({ androidToken: registrationId }).exec();
+};
+
 exports.registerUser = function(deviceId, userId, callback) {
   return PushNotificationDevice.findOneAndUpdate(
     { deviceId: deviceId },
