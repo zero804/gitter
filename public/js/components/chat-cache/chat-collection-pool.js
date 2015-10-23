@@ -5,6 +5,7 @@ var chatCollection   = require('collections/instances/integrated-items').chats;
 var context          = require('utils/context');
 
 var pool = {};
+var lastRoom;
 
 module.exports = function chatCollectionPool(roomList) {
   roomList.forEach(function(roomData) {
@@ -12,9 +13,9 @@ module.exports = function chatCollectionPool(roomList) {
     pool[name] =  initListeners(roomData.id);
   });
 
+  window.pool = pool;
 
-  console.log(pool);
-
+  lastRoom = context.troupe().get('name');
   context.troupe().on('change:id', onRoomChange);
 };
 
@@ -46,6 +47,8 @@ function initListeners(roomId) {
 function onRoomChange(model) {
   var name = model.get('name');
   var collection = pool[name];
+  pool[lastRoom] = chatCollection.collection;
+  lastRoom = name;
   console.log(collection);
   chatCollection.switchCollection(collection);
 }
