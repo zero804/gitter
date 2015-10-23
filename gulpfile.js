@@ -431,17 +431,12 @@ gulp.task('webpack', function() {
     .pipe(gulp.dest('output/assets/js'));
 });
 
-gulp.task('webpack', function() {
-  return gulp.src('./public/js/webpack.config')
-    .pipe(webpack(require('./public/js/webpack.config')))
-    .pipe(gulp.dest('output/assets/js'));
-});
-
 gulp.task('update-webpack-sourcemap-url', ['webpack'], function() {
   var sourceMapUrl = getSourceMapUrl();
+  console.log('Using sourcemap url', sourceMapUrl);
 
   return gulp.src('output/assets/js/*.js')
-    .pipe(gulpif(sourceMapUrl, replace(/(\/\/\#\s*sourceMappingURL=)([\w\d\-\_\.]*)\s*$/g, '$1' + sourceMapUrl +'$2')))
+    .pipe(gulpif(!!sourceMapUrl, replace(/(\/\/\#\s*sourceMappingURL=)([\w\d\-\_\.]*)\s*$/g, '$1' + sourceMapUrl +'$2')))
     .pipe(gulp.dest('output/assets/js'));
 });
 
@@ -455,14 +450,14 @@ gulp.task('build-assets', ['copy-asset-files', 'css', 'webpack', 'update-webpack
 
 
 gulp.task('compress-assets', ['build-assets'], function() {
-  return gulp.src(['output/assets/**/*.{css,js,ttf,svg}'], { base: 'output/assets/' })
+  return gulp.src(['output/assets/**/*.{css,js,ttf,svg}', '!**/*.map'], { base: 'output/assets/' })
     .pipe(using())
     .pipe(gzip({ append: true, gzipOptions: { level: 9 } }))
     .pipe(gulp.dest('output/assets/'));
 });
 
 gulp.task('tar-assets', ['build-assets', 'compress-assets'], function () {
-    return gulp.src(['output/assets/**'])
+    return gulp.src(['output/assets/**', '!**/*.map'])
       .pipe(tar('assets.tar'))
       .pipe(gzip({ append: true, gzipOptions: { level: 9 } }))
       .pipe(gulp.dest('output'));
