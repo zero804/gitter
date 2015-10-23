@@ -54,6 +54,7 @@ function executeBatch(urlBase) {
   return (function next() {
     var op = operations.shift();
     if (!op) return;
+    console.log(op);
     return neo4jClient.query(op)
       .catch(function(e) {
         console.error(e);

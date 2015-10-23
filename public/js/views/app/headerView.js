@@ -10,7 +10,7 @@ var Dropdown                 = require('views/controls/dropdown');
 var appEvents                = require('utils/appevents');
 var headerViewTemplate       = require('./tmpl/headerViewTemplate.hbs');
 var resolveRoomAvatarUrl     = require('gitter-web-shared/avatars/resolve-room-avatar-url');
-var getOrgNameFromTroupeName = require('../../../../shared/get-org-name-from-troupe-name');
+var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 
 require('views/behaviors/tooltip');
 
