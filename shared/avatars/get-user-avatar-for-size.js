@@ -2,8 +2,10 @@
 
 var targetEnv = require('targetenv');
 var urlParser = require('../urls/url-parser');
-var resolveAvatarUrl = require('./resolve-avatar-url');
 var _ = require('underscore');
+var djb2Hash = require('../djb2-hash');
+
+var DEFAULT_AVATAR_URL = 'https://avatars1.githubusercontent.com/u/0';
 
 function getAliasForSizeFromHostname(hostname) {
   // This might have to get more granular than just per-hostname in future if
@@ -19,7 +21,9 @@ function getAliasForSizeFromHostname(hostname) {
   return 's';
 }
 
-function sizeUrlForAvatarUrl(url, size) {
+function sizeUrlForAvatarUrl(url, size, username) {
+  // username is optional and only useful for the github optimisation below
+
   // NOTE: This will only happen server-side because the client will just use
   // avatarUrlSmall without going through this again.
   var parsed = urlParser.parse(url, true);
@@ -30,7 +34,28 @@ function sizeUrlForAvatarUrl(url, size) {
 
   parsed.query[getAliasForSizeFromHostname(parsed.hostname)] = size;
 
+  // try and do the same hashing to pull from different subdomains
+  if (parsed.hostname.indexOf('github') !== -1 && username) {
+    parsed.hostname = 'avatars' + djb2Hash(username) + '.githubusercontent.com';
+  }
+
   return urlParser.format(parsed);
+}
+
+function buildAvatarUrlForUsername(spec) {
+  // This is the old fallback method that just sticks a username in there.
+
+  var username = spec.username;
+  var version = spec.version;
+  var size = spec.size;
+
+  if (username.indexOf('_') == -1) {
+    // github namespace
+    return 'https://avatars' + djb2Hash(username) + '.githubusercontent.com/' + username + '?' + (version ? 'v=' + version : '') + '&s=' + size;
+  } else {
+    // not github, send to resolver
+    return '/api/private/user-avatar/'+username+'?s='+size;
+  }
 }
 
 module.exports = function getUserAvatarForSize(user, size) {
@@ -51,7 +76,7 @@ module.exports = function getUserAvatarForSize(user, size) {
 
     } else if (user.gravatarImageUrl) {
       // straight outta the db, so figure out what parameter to add
-      return sizeUrlForAvatarUrl(user.gravatarImageUrl, size);
+      return sizeUrlForAvatarUrl(user.gravatarImageUrl, size, username);
 
     } else if (username) {
       // fall back to the username method
@@ -66,10 +91,10 @@ module.exports = function getUserAvatarForSize(user, size) {
         spec.version = gv;
       }
 
-      return resolveAvatarUrl(spec);
+      return buildAvatarUrlForUsername(spec);
     }
   }
 
   // return the default
-  return "https://avatars1.githubusercontent.com/u/0";
+  return DEFAULT_AVATAR_URL;
 };
