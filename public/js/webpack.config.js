@@ -180,9 +180,8 @@ if(devMode) {
 
   // webpackConfig.plugins.push(new DedupePlugin());
   // webpackConfig.plugins.push(new OccurrenceOrderPlugin());
-  webpackConfig.plugins.push(new UglifyJsPlugin({
-    mangle: false
-  }));
-  webpackConfig.devtool = 'source-map';
+  // webpackConfig.plugins.push(new UglifyJsPlugin({
+  //   mangle: false
+  // }));
 }
 module.exports = webpackConfig;
