@@ -4,9 +4,12 @@ var troupeCollection = require('collections/instances/troupes');
 
 module.exports = function roomListGenerator() {
   return troupeCollection.troupes.map(function(model) {
+    var lastAccess = model.get('lastAccessTime');
+    lastAccess = +new Date(lastAccess);
     return {
       name: model.get('name'),
       id: model.get('id'),
+      lastAccess: lastAccess,
     };
   });
 };

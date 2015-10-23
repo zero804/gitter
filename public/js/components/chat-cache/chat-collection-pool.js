@@ -1,25 +1,37 @@
 'use strict';
+
 var Backbone         = require('backbone');
 var ChatCollection   = require('collections/chat').ChatCollection;
 var chatCollection   = require('collections/instances/integrated-items').chats;
 var context          = require('utils/context');
 
-var pool = {};
+var pool     = {};
+var poolSize = 10;
 var lastRoom;
 
 module.exports = function chatCollectionPool(roomList) {
-  roomList.forEach(function(roomData) {
-    var name = roomData.name;
-    pool[name] =  initListeners(roomData.id);
+  //sort by last access time
+  roomList = roomList.sort(function(roomA, roomB) {
+    return roomA.lastAccess > roomB.lastAccess ? -1 : 1;
   });
 
-  window.pool = pool;
+  //only grab the top 10 rooms
+  roomList.slice(0, poolSize).forEach(function(roomData) {
+    var name = roomData.name;
+    pool[name] =  generateCollection(roomData.id);
+  });
 
+  //save the last selected room
   lastRoom = context.troupe().get('name');
+
+
+  //listen to room changes
   context.troupe().on('change:id', onRoomChange);
 };
 
-function initListeners(roomId) {
+function generateCollection(roomId) {
+
+  roomId = (roomId || context.troupe().get('id'));
 
   //we make a new context model so we can request chats
   //from different rooms
@@ -46,8 +58,16 @@ function initListeners(roomId) {
 
 function onRoomChange(model) {
   var name = model.get('name');
-  var collection = pool[name];
+
+  //if we don't have a cache entry just grab a new one
+  var collection = (pool[name] || generateCollection());
+
+  //save to old collection
   pool[lastRoom] = chatCollection.collection;
+
+  //save the room name
   lastRoom = name;
+
+  //switch collections
   chatCollection.switchCollection(collection);
 }
