@@ -28,7 +28,9 @@ function sizeUrlForAvatarUrl(url, size, username) {
   // avatarUrlSmall without going through this again.
   var parsed = urlParser.parse(url, true);
 
-  // delete these otherwise urlParser.format() wll not use parsed.query
+  // delete these otherwise urlParser.format() wll not use parsed.query or
+  // parsed.hostname
+  delete parsed.host;
   delete parsed.href;
   delete parsed.search;
 
@@ -49,7 +51,7 @@ function buildAvatarUrlForUsername(spec) {
   var version = spec.version;
   var size = spec.size;
 
-  if (username.indexOf('_') == -1) {
+  if (username.indexOf('_') === -1) {
     // github namespace
     return 'https://avatars' + djb2Hash(username) + '.githubusercontent.com/' + username + '?' + (version ? 'v=' + version : '') + '&s=' + size;
   } else {
