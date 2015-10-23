@@ -8,16 +8,19 @@ describe('user avatar url generator', function() {
   describe('when passed a user object', function() {
     it('should return a github url for a github gravatarImageUrl', function() {
       var user = {
+        username: 'lerouxb',
         gravatarImageUrl: 'https://avatars.githubusercontent.com/u/69737?v=3'
       };
-      assert.equal(getUserAvatarForSize(user, 40), user.gravatarImageUrl+'&s=40');
+      var result = getUserAvatarForSize(user, 40);
+      assert.equal(result, 'https://avatars1.githubusercontent.com/u/69737?v=3&s=40');
     });
 
     it('should return a google url for a google gravatarImageUrl', function() {
       var user = {
         gravatarImageUrl: 'https://lh5.googleusercontent.com/-8JzxZyD84qE/AAAAAAAAAAI/AAAAAAAAAN4/_x36v4AaxKo/photo.jpg'
       };
-      assert.equal(getUserAvatarForSize(user, 40), user.gravatarImageUrl+'?sw=40');
+      var result = getUserAvatarForSize(user, 40)
+      assert.equal(result, user.gravatarImageUrl+'?sw=40');
     });
   });
 
@@ -33,17 +36,19 @@ describe('user avatar url generator', function() {
 
     it('should return a github url for github username and version', function() {
       var user = {
-        username: 'lerouxb',
+        username: 'whaaaaat',
         gv: '3'
       };
-      assert.equal(getUserAvatarForSize(user, 60), 'https://avatars1.githubusercontent.com/lerouxb?v=3&s=60');
+      var result = getUserAvatarForSize(user, 60);
+      assert.equal(result, 'https://avatars0.githubusercontent.com/whaaaaat?v=3&s=60');
     });
 
     it('should return a resolver url for non-github username', function() {
       var user = {
         username: '1234_'
       };
-      assert.equal(getUserAvatarForSize(user, 60), '/api/private/user-avatar/1234_?s=60');
+      var result = getUserAvatarForSize(user, 60);
+      assert.equal(result, '/api/private/user-avatar/1234_?s=60');
     });
   });
 
