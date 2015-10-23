@@ -18,15 +18,13 @@ var autoprefixer = require('autoprefixer-core');
 var mqpacker = require('css-mqpacker');
 var csswring = require('csswring');
 var mkdirp = require('mkdirp');
-var gulpif = require('gulp-if');
 var sourcemaps = require('gulp-sourcemaps');
 var shell = require('gulp-shell');
 var del = require('del');
 var grepFail = require('gulp-grep-fail');
 var runSequence = require('run-sequence');
 var jsonlint = require('gulp-jsonlint');
-var replace = require('gulp-replace');
-var vinylPaths = require('vinyl-paths');
+var uglify = require('gulp-uglify');
 
 var testModules = {
   'integration': ['./test/integration/**/*.js', './test/public-js/**/*.js'],
@@ -300,13 +298,13 @@ function getSourceMapOptions() {
   var sourceMapUrl = getSourceMapUrl();
   if (!sourceMapUrl) {
     return {
-      dest: 'output/assets/styles'
+      dest: '.'
     };
   }
 
   mkdirp.sync('output/maps');
   return {
-    dest: 'output/maps',
+    dest: '../../maps',
     options: {
       sourceMappingURLPrefix: sourceMapUrl
     }
@@ -336,7 +334,7 @@ gulp.task('css-ios', function () {
       mqpacker,
       csswring
     ]))
-    .pipe(sourcemaps.write(sourceMapOpts.destination, sourceMapOpts.options))
+    .pipe(sourcemaps.write(sourceMapOpts.dest, sourceMapOpts.options))
     .pipe(gulp.dest('output/assets/styles'));
 });
 
@@ -366,7 +364,7 @@ gulp.task('css-mobile', function () {
       mqpacker,
       csswring
     ]))
-    .pipe(sourcemaps.write(sourceMapOpts.destination, sourceMapOpts.options))
+    .pipe(sourcemaps.write(sourceMapOpts.dest, sourceMapOpts.options))
     .pipe(gulp.dest('output/assets/styles'));
 });
 
@@ -419,7 +417,7 @@ gulp.task('css-web', function () {
       mqpacker,
       csswring
     ]))
-    .pipe(sourcemaps.write(sourceMapOpts.destination, sourceMapOpts.options))
+    .pipe(sourcemaps.write(sourceMapOpts.dest, sourceMapOpts.options))
     .pipe(gulp.dest('output/assets/styles'));
 });
 
@@ -431,22 +429,16 @@ gulp.task('webpack', function() {
     .pipe(gulp.dest('output/assets/js'));
 });
 
-gulp.task('update-webpack-sourcemap-url', ['webpack'], function() {
-  var sourceMapUrl = getSourceMapUrl();
-  console.log('Using sourcemap url', sourceMapUrl);
-
-  return gulp.src('output/assets/js/*.js')
-    .pipe(gulpif(!!sourceMapUrl, replace(/(\/\/\#\s*sourceMappingURL=)([\w\d\-\_\.]*)\s*$/g, '$1' + sourceMapUrl +'$2')))
+gulp.task('uglify', ['webpack'], function() {
+  var sourceMapOpts = getSourceMapOptions();
+  return gulp.src('output/assets/js/*.js', { base: 'output/assets/js/' })
+    .pipe(sourcemaps.init({ loadMaps: true }))
+    .pipe(uglify())
+    .pipe(sourcemaps.write(sourceMapOpts.dest, sourceMapOpts.options))
     .pipe(gulp.dest('output/assets/js'));
 });
 
-gulp.task('move-webpack-sourcemaps', ['webpack'], function() {
-  return gulp.src('output/assets/js/*.map')
-    .pipe(vinylPaths(del))
-    .pipe(gulp.dest('output/maps'));
-});
-
-gulp.task('build-assets', ['copy-asset-files', 'css', 'webpack', 'update-webpack-sourcemap-url', 'move-webpack-sourcemaps']);
+gulp.task('build-assets', ['copy-asset-files', 'css', 'webpack', 'uglify']);
 
 
 gulp.task('compress-assets', ['build-assets'], function() {
