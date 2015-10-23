@@ -72,7 +72,7 @@ function getCollaboratorsForRepo(repoUri, security, user) {
 
 function getCollaboratorsForOrg(uri, user) {
   var ghOrg = new OrgService(user);
-  return ghOrg.members(uri)
+  return ghOrg.someMembers(uri)
     .then(function(orgMembers) {
       return withoutCurrentUser(orgMembers, user);
     });
@@ -84,7 +84,7 @@ function getCollaboratorsForUser(user) {
 
   return ghMe.getOrgs()
     .then(function(orgs) {
-      var promises = orgs.map(function(o) { return ghOrg.members(o.login); });
+      var promises = orgs.map(function(o) { return ghOrg.someMembers(o.login); });
       return Q.allSettled(promises);
     })
     .then(function (results) {
