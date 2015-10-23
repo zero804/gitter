@@ -195,6 +195,8 @@ module.exports = (function() {
         this.rollers.setModeLocked(false);
       });
 
+      this.listenTo(this.collection, 'change:collection', this.render, this);
+
       this.listenTo(appEvents, 'command.collapse.chat', this.collapseChats);
       this.listenTo(appEvents, 'command.expand.chat', this.expandChats);
 
