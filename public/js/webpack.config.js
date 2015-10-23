@@ -1,12 +1,23 @@
 /* jshint node:true */
 "use strict";
 
-var path = require("path");
-var CommonsChunkPlugin = require("webpack/lib/optimize/CommonsChunkPlugin");
+var path                     = require("path");
+var CommonsChunkPlugin       = require("webpack/lib/optimize/CommonsChunkPlugin");
 var ContextReplacementPlugin = require("webpack/lib/ContextReplacementPlugin");
-var DedupePlugin = require('webpack/lib/optimize/DedupePlugin');
-var OccurrenceOrderPlugin = require('webpack/lib/optimize/OccurrenceOrderPlugin');
-var UglifyJsPlugin = require('webpack/lib/optimize/UglifyJsPlugin');
+var DedupePlugin             = require('webpack/lib/optimize/DedupePlugin');
+var OccurrenceOrderPlugin    = require('webpack/lib/optimize/OccurrenceOrderPlugin');
+var UglifyJsPlugin           = require('webpack/lib/optimize/UglifyJsPlugin');
+
+//POSTCSS
+var mixins       = require('postcss-sassy-mixins');
+var atImport     = require('postcss-import');
+var simpleVars   = require('postcss-simple-vars');
+var forLoops     = require('postcss-for-var');
+var calc         = require('postcss-calc');
+var autoprefixer = require('autoprefixer');
+var nested       = require('postcss-nested');
+var conditionals = require('postcss-conditionals');
+
 
 var devMode = process.env.WEBPACK_DEV_MODE === '1';
 
@@ -27,6 +38,7 @@ var webpackConfig = {
     "mobile-native-userhome": path.resolve(path.join(__dirname, "./mobile-native-userhome")),
     "router-archive-chat": path.resolve(path.join(__dirname, "./router-archive-chat")),
     "router-archive-home": path.resolve(path.join(__dirname, "./router-archive-home")),
+    "router-archive-links": path.resolve(path.join(__dirname, "./router-archive-links")),
     "router-embed-chat": path.resolve(path.join(__dirname, "./router-embed-chat")),
     "router-nli-embed-chat": path.resolve(path.join(__dirname, "./router-nli-embed-chat")),
     "homepage": path.resolve(path.join(__dirname, "./homepage")),
@@ -68,7 +80,11 @@ var webpackConfig = {
             path.resolve(__dirname, '../../shared/handlebars/helpers')
           ]
         }
-      }
+      },
+      {
+        test:    /.css$/,
+        loader:  'style-loader!css-loader!postcss-loader',
+      },
     ]
   },
   resolve: {
@@ -107,7 +123,52 @@ var webpackConfig = {
     new ContextReplacementPlugin(/moment\/locale$/, /ar|cs|da|de|en-gb|es|fr|it|ja|ko|nl|pl|pt|ru|sv|zh-cn/)
   ],
   bail: true,
-  recordsPath: '/tmp/records.json'
+  recordsPath: '/tmp/records.json',
+  postcss: function() {
+    return [
+
+      //parse @import statements
+      atImport({
+        path: [
+          path.resolve(__dirname, '../../node_modules'),
+          path.resolve(__dirname, '../../node_modules/gitter-styleguide/css'),
+        ],
+
+        //tell webpack to watch @import declarations
+        onImport: function(files) {
+          files.forEach(this.addDependency);
+        }.bind(this),
+      }),
+
+
+      //added before simple vars so @mixin {name} ($var) can process $var
+      mixins(),
+
+      //parse $var: 'some-awesomeo-variable';
+      simpleVars({
+        variables: function() {
+          return require('gitter-styleguide/config/variables.js');
+        },
+      }),
+
+      //parse @for
+      forLoops(),
+
+      //parse calc();
+      calc(),
+
+      conditionals(),
+
+      //added here to process mixins after vars have been parsed
+      mixins(),
+
+      //parse .className{ &:hover{} }
+      nested(),
+
+      //make old browsers work like a boss (kinda...)
+      autoprefixer(),
+    ];
+  },
 };
 
 if(devMode) {

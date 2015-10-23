@@ -50,7 +50,8 @@ function createScheduler() {
   // scheduler is responbsible for scheduling delayed jobs and giving them to the workers.
   var scheduler = new resque.scheduler({
     connection: getConnection()
-  }, function() {
+  });
+  scheduler.connect(function() {
     debug('Scheduler ready');
   });
 
@@ -87,8 +88,8 @@ var Queue = function(name, options, loaderFn) {
     self.internalQueue = new resque.queue({
         connection: getConnection()
       },
-      {}, // Jobs not defined on queue, only worker
-      callback);
+      {}); // Jobs not defined on queue, only worker
+    self.internalQueue.connect(callback);
   }).then(function() {
     debug('Queue %s ready to receive messages', name);
     return self.internalQueue;
@@ -194,7 +195,8 @@ Queue.prototype.createWorker = function() {
     }
   };
 
-  var worker = new resque.worker(workerOpts, jobs, function() {
+  var worker = new resque.worker(workerOpts, jobs);
+  worker.connect(function() {
     if(scheduler.running) {
       debug('Starting worker %s immediately', self.name);
       worker.workerCleanup();

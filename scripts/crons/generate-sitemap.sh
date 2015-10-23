@@ -3,15 +3,20 @@ set -e
 set -x
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-SITEMAP_FILE=${TMPDIR-/tmp}/gitter-sitemap.xml
-rm -f $SITEMAP_FILE $SITEMAP_FILE.gz
+TEMP_DIR=${TMPDIR-/tmp}
+rm -f $TEMP_DIR/sitemap*
 
-$SCRIPT_DIR/../generate-sitemap.js --sitemap $SITEMAP_FILE
+$SCRIPT_DIR/../generate-sitemap.js --tempdir $TEMP_DIR --name sitemap
 
-gzip -9 $SITEMAP_FILE
+gzip -9 $TEMP_DIR/sitemap*
 
-/usr/local/bin/aws s3 cp $SITEMAP_FILE.gz s3://gitter-sitemap/$NODE_ENV/sitemap.xml --content-encoding gzip --acl public-read
+for f in $TEMP_DIR/sitemap*.xml.gz
+do
+  NAME=$(basename $f .gz)
+  /usr/local/bin/aws s3 cp $f s3://gitter-sitemap/$NODE_ENV/$NAME --content-encoding gzip --acl public-read
+done
 
-rm -f $SITEMAP_FILE $SITEMAP_FILE.gz
+
+rm -f $TEMP_DIR/sitemap*
 
 
