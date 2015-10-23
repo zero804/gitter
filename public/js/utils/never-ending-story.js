@@ -3,6 +3,8 @@
 var _        = require('underscore');
 var Backbone = require('backbone');
 var debug    = require('debug-proxy')('app:nes');
+var isMobile = require('utils/is-mobile');
+
 
 module.exports = (function() {
 
@@ -15,7 +17,7 @@ module.exports = (function() {
     this._prevScrollTime = Date.now();
     this._nearTop = false;
     this._nearBottom = false;
-    this._scrollHandler = _.throttle(this.scroll.bind(this), 100);
+    this._scrollHandler = _.throttle((isMobile() ? this.mobileScroll.bind(this) : this.scroll.bind(this)), 100);
     this._contentWrapper = options && options.contentWrapper;
     this.enable();
   }
@@ -48,6 +50,37 @@ module.exports = (function() {
       }
 
       this.scrollRate();
+    },
+
+    mobileScroll: function() {
+      // ios and android have to stop scrolling in order to load more content above/below the fold (see rollers.js)
+      // the best time to do that is at a natural stop, which happens to be at the start or end of the
+      // current loaded content.
+
+      var target = this._target;
+
+      var scrollTop = target.scrollTop;
+      var scrollBottom = target.scrollHeight - target.scrollTop - target.clientHeight;
+
+      var prevScrollTop = this._prevScrollTop;
+      var prevScrollBottom = this._prevScrollBottom;
+
+      this._prevScrollTop = scrollTop;
+      this._prevScrollBottom = scrollBottom;
+
+      var deltaTop = prevScrollTop - scrollTop;
+      var deltaBottom = prevScrollBottom - scrollBottom;
+
+      var isAtTop = scrollTop <= 0;
+      var isAtBottom = scrollBottom <= 0;
+
+      if(deltaTop > 0 && isAtTop) {
+        /* We're scrolling towards the top */
+        this.trigger('approaching.top');
+      } else if(deltaBottom > 0 && isAtBottom) {
+        /* We're scrolling towards the bottom */
+        this.trigger('approaching.bottom');
+      }
     },
 
     scrollRate: function() {
