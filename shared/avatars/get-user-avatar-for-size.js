@@ -11,7 +11,7 @@ function getAliasForSizeFromHostname(hostname) {
   // component rather than a query string parameter. Will rethink once we get
   // there.
 
-  if (hostname.indexOf('google') === -1) {
+  if (hostname.indexOf('google') !== -1) {
     return 'sw';
   }
 
@@ -23,7 +23,13 @@ function sizeUrlForAvatarUrl(url, size) {
   // NOTE: This will only happen server-side because the client will just use
   // avatarUrlSmall without going through this again.
   var parsed = urlParser.parse(url, true);
+
+  // delete these otherwise urlParser.format() wll not use parsed.query
+  delete parsed.href;
+  delete parsed.search;
+
   parsed.query[getAliasForSizeFromHostname(parsed.hostname)] = size;
+
   return urlParser.format(parsed);
 }
 
