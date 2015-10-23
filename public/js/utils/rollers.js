@@ -2,6 +2,7 @@
 var Mutant = require('mutantjs');
 var _ = require('underscore');
 var rafUtils = require('utils/raf-utils');
+var isMobile = require('utils/is-mobile');
 
 module.exports = (function() {
 
@@ -13,18 +14,6 @@ module.exports = (function() {
   /** @const */ var BOTTOM_MARGIN = 10;
   /** Number of pixels to show above a message that we scroll to. Context FTW!
   /** @const */ var TOP_OFFSET = 300;
-
-  function scroll(element, numberOfPixelsScrolled) {
-    // haha, you think scrolling is easy? WELCOME TO MOBILE!
-    // https://code.google.com/p/android/issues/detail?id=19625
-    // http://stackoverflow.com/questions/12225456/jquery-scrolltop-does-not-work-in-scrolling-div-on-mobile-browsers-alternativ
-
-    // ios and android will ignore scrollTop if the element is currently being scrolled,
-    // probably due to internal performance reasons. This forces the element to scroll:
-    element.style.overflow = 'hidden';
-    element.scrollTop = numberOfPixelsScrolled;
-    element.style.overflow = '';
-  }
 
   /* Put your scrolling panels on rollers */
   function Rollers(target, childContainer, options) {
@@ -134,7 +123,7 @@ module.exports = (function() {
     updateTrackBottom: function() {
       var target = this._target;
       var scrollTop = target.scrollHeight - target.clientHeight;
-      scroll(target, scrollTop);
+      this.scroll(scrollTop);
     },
 
     startTransition: function(element, maxTimeMs) {
@@ -151,7 +140,7 @@ module.exports = (function() {
     scrollToBottom: function() {
       var target = this._target;
       var scrollTop = target.scrollHeight - target.clientHeight;
-      scroll(target, scrollTop);
+      this.scroll(scrollTop);
 
       delete this._stableElement;
       delete this._stableElementFromBottom;
@@ -181,7 +170,7 @@ module.exports = (function() {
 
       if(scrollTop < 0) scrollTop = 0;
 
-      scroll(target, scrollTop);
+      this.scroll(scrollTop);
 
       this.stable(element);
     },
@@ -201,7 +190,7 @@ module.exports = (function() {
       var stableElementTop = this._stableElement.offsetTop - target.offsetTop;
       var top = stableElementTop - target.clientHeight + this._stableElementFromBottom;
 
-      scroll(target, top);
+      this.scroll(top);
     },
 
     /* Track current position */
@@ -281,6 +270,23 @@ module.exports = (function() {
       }
 
       return;
+    },
+
+    scroll: function(pixelsFromTop) {
+      if (isMobile()) {
+        // haha, you think scrolling is easy? WELCOME TO MOBILE!
+        // https://code.google.com/p/android/issues/detail?id=19625
+        // http://stackoverflow.com/questions/12225456/jquery-scrolltop-does-not-work-in-scrolling-div-on-mobile-browsers-alternativ
+
+        // ios and android will ignore scrollTop if the element is currently being scrolled,
+        // probably due to internal performance reasons. This forces the element to scroll:
+        this._target.style.overflow = 'hidden';
+        this._target.scrollTop = pixelsFromTop;
+        this._target.style.overflow = '';
+      } else {
+        this._target.scrollTop = pixelsFromTop;
+      }
+
     }
   };
 
