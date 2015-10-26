@@ -12,7 +12,7 @@ var express = require('express');
 var GithubMeService = require('gitter-web-github').GitHubMeService;
 var oauth2 = require('../web/oauth2');
 var ensureLoggedIn = require('../web/middlewares/ensure-logged-in');
-var getUserAvatarForSize = require('gitter-web-shared/avatars/get-user-avatar-for-size');
+var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-srcset');
 
 var github = require('./auth-providers/github');
 //var google = require('./auth-providers/google');
@@ -107,7 +107,7 @@ router.get("/zendesk",
         "name": req.user.displayName,
         "email": email,
         "external_id": req.user.id,
-        "remote_photo_url": getUserAvatarForSize(req.user, 128),
+        "remote_photo_url": resolveUserAvatarUrl(req.user, 128),
         "user_fields": {
           "username": req.user.username
         }

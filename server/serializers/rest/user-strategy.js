@@ -10,7 +10,7 @@ var execPreloads      = require('../exec-preloads');
 var getVersion        = require('../get-model-version');
 var billingService    = require('../../services/billing-service');
 var leanUserDao       = require('../../services/daos/user-dao').full;
-var getUserAvatarForSize = require('gitter-web-shared/avatars/get-user-avatar-for-size');
+var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 
 function UserPremiumStatusStrategy() {
   var usersWithPlans;
@@ -196,8 +196,8 @@ function UserStrategy(options) {
       displayName: options.exposeRawDisplayName ? user.displayName : user.getDisplayName(),
       fallbackDisplayName: options.exposeRawDisplayName && user.getDisplayName(),
       url: user.getHomeUrl(),
-      avatarUrlSmall: getUserAvatarForSize(user, 60),
-      avatarUrlMedium: getUserAvatarForSize(user, 128),
+      avatarUrlSmall: resolveUserAvatarUrl(user, 60),
+      avatarUrlMedium: resolveUserAvatarUrl(user, 128),
       scopes: scopes,
       online: userPresenceInTroupeStrategy && userPresenceInTroupeStrategy.map(user.id) || undefined,
       role: userRoleInTroupeStrategy && userRoleInTroupeStrategy.map(user.username) || undefined,

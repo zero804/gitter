@@ -28,7 +28,7 @@ var useragent                = require('useragent');
 var _                        = require('underscore');
 var GitHubOrgService         = require('gitter-web-github').GitHubOrgService;
 var orgPermissionModel       = require('../../services/permissions/org-permissions-model');
-var getUserAvatarForSize     = require('gitter-web-shared/avatars/get-user-avatar-for-size');
+var resolveUserAvatarUrl     = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 var resolveRoomAvatarSrcSet  = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 
@@ -475,7 +475,7 @@ function renderOrgPage(req, res, next) {
        rooms.forEach(function(room, index) {
         room.users = values[index];
         _.each(room.users, function(user) {
-          user.avatarUrlSmall = getUserAvatarForSize(user, 60);
+          user.avatarUrlSmall = resolveUserAvatarUrl(user, 60);
         });
       });
 

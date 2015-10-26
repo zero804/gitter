@@ -1,6 +1,6 @@
 "use strict";
 
-var getUserAvatarForSize = require('gitter-web-shared/avatars/get-user-avatar-for-size');
+var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 
 function UserStrategy(options) {
   options = options ? options : {};
@@ -16,8 +16,8 @@ function UserStrategy(options) {
       id: user.id,
       username: user.username,
       displayName: user.getDisplayName(),
-      avatarUrlSmall: getUserAvatarForSize(user, 60),
-      avatarUrlMedium: getUserAvatarForSize(user, 128)
+      avatarUrlSmall: resolveUserAvatarUrl(user, 60),
+      avatarUrlMedium: resolveUserAvatarUrl(user, 128)
     };
   };
 }

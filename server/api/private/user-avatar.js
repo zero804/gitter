@@ -1,6 +1,6 @@
 'use strict';
 
-var getUserAvatarForSize = require('gitter-web-shared/avatars/get-user-avatar-for-size');
+var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 var userService = require('../../services/user-service');
 var StatusError = require('statuserror');
 
@@ -14,7 +14,7 @@ function resolveAvatarForUsername(req, res, next) {
     .then(function(user) {
       var url;
       if (user) {
-        url = getUserAvatarForSize(user, size);
+        url = resolveUserAvatarUrl(user, size);
         if (url.indexOf('/api/private/user-avatar/') != -1) {
           // don't keep redirecting back here in a loop..
           url = DEFAULT_AVATAR_URL;

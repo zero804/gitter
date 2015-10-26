@@ -5,7 +5,7 @@ var appEvents = require('utils/appevents');
 var context = require('utils/context');
 var mapMessageTemplate = require('./map-message.hbs');
 var roomNameTrimmer = require('utils/room-name-trimmer');
-var getUserAvatarForSize = require('gitter-web-shared/avatars/get-user-avatar-for-size');
+var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 var apiClient = require('components/apiClient');
 var onready = require('./utils/onready');
 
@@ -159,7 +159,7 @@ function initEmbedPanel() {
 
     $this.html(
       // TODO: send more than just the username
-      '<img src="' + getUserAvatarForSize({ username: owner }, 48*2) + '" width="48" height="48">' +
+      '<img src="' + resolveUserAvatarUrl({ username: owner }, 48*2) + '" width="48" height="48">' +
       '<h3>' + room.name + '</h3>' +
       '<em>' + room.language + '</em>');
   });

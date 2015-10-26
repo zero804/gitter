@@ -5,7 +5,7 @@ var apiClient = require('components/apiClient');
 var context = require('utils/context');
 var appEvents = require('utils/appevents');
 var Rollers = require('utils/rollers');
-var getUserAvatarForSize = require('gitter-web-shared/avatars/get-user-avatar-for-size');
+var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-srcset');
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 var _ = require('underscore');
@@ -79,7 +79,7 @@ module.exports = (function() {
       data.detail = this.model.get('githubType');
       data.text = uri;
       // TODO: send more than just a username and don't fish it out of the url
-      data.avatarUrl = getUserAvatarForSize({ username: uri.split('/')[0]}, 48);
+      data.avatarUrl = resolveUserAvatarUrl({ username: uri.split('/')[0]}, 48);
       return data;
     },
 

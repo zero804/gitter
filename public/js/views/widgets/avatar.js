@@ -5,7 +5,7 @@ var context = require('utils/context');
 var template = require('./tmpl/avatar.hbs');
 var UserPopoverView = require('views/people/userPopoverView');
 var widgets = require('views/behaviors/widgets');
-var resolveAvatarSrcSet = require('gitter-web-shared/avatars/resolve-avatar-srcset');
+var resolveUserAvatarSrcSet = require('gitter-web-shared/avatars/resolve-user-avatar-srcset');
 require('views/behaviors/tooltip');
 var FastAttachMixin = require('views/fast-attach-mixin');
 
@@ -132,7 +132,7 @@ module.exports = (function() {
       var imgSize =  avatarSize == 'm' ? AVATAR_SIZE_MEDIUM : AVATAR_SIZE_SMALL;
 
       var user = this.model && this.model.toJSON();
-      var avatarSrcSet = resolveAvatarSrcSet({ username: user.username, version: user.gv, size: imgSize });
+      var avatarSrcSet = resolveUserAvatarSrcSet(user, imgSize);
 
       // Still pointing at the same location?
       if(img.src === avatarSrcSet.src) {
@@ -160,7 +160,7 @@ module.exports = (function() {
     var imgSize =  avatarSize == 'm' ? AVATAR_SIZE_MEDIUM : AVATAR_SIZE_SMALL;
 
     var currentUserId = context.getUserId();
-    var avatarSrcSet = resolveAvatarSrcSet({ username: user.username, version: user.gv, size: imgSize });
+    var avatarSrcSet = resolveUserAvatarSrcSet(user, imgSize);
 
     var online = user.id === currentUserId || !!user.online; // only the people view tries to show avatar status so there is a model object, it won't necessarily work in other cases
 
