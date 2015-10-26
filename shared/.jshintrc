@@ -8,5 +8,6 @@
   "predef": [
     "module",
     "require"
-  ]
+  ],
+  "strict": true
 }

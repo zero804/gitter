@@ -1,3 +1,6 @@
+@collaborator-padding: 0.625em;
+@collaborator-img-width: 30px;
+
 .welcome-modal__close {
   cursor: pointer;
   transition: opacity 300ms ease-in-out;
@@ -32,6 +35,8 @@
   flex-wrap: wrap;
   justify-content: flex-start;
   max-height: 400px;
+  max-height: 40vh;
+  min-height: calc((2 * @collaborator-padding) + @collaborator-img-width);
   overflow-y: scroll;
 }
 
@@ -61,20 +66,21 @@
   background-color: #eee;
   overflow: hidden;
   padding: 0.625em;
-  margin: 0.625em;
+  margin: @collaborator-padding;
   border-radius: 4px;
   display: flex;
   width: 21rem;
   max-width: 350px;
   cursor: default;
+  max-height: 40px;
   &:hover {
     background-color: #ccc;
   }
 
   img {
     border-radius: 4px;
-    width: 40px;
-    height: 40px;
+    width: @collaborator-img-width;
+    height: @collaborator-img-width;
     flex-shrink: 0;
   }
 
