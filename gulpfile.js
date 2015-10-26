@@ -438,6 +438,30 @@ gulp.task('uglify', ['webpack'], function() {
     .pipe(gulp.dest('output/assets/js'));
 });
 
+gulp.task('sentry-release', function(done){
+
+  var sourceMapOpts = getSourceMapOptions();
+  git.revParse({ args: 'HEAD' }, function (err, commit) {
+
+    if (err) return done(err);
+
+    var isStaged = (process.env.STAGED_ENVIRONMENT === 'true');
+    var sentryRelease = require('gulp-sentry-release')('./package.json', {
+      DOMAIN: isStaged ? 'https://beta.gitter.im' : 'https://gitter.im',
+      //API_KEY must be present to run this
+      API_URL: 'https://app.getsentry.com/api/0/projects/gitter/' + isStaged  ? 'frontend-staging' : 'frontend',
+      debug: true,
+      versionPrefix: commit,
+    });
+
+    gulp.src([sourceMapOpts.dest + '/**/*.js', 'output/assets/js/**/*.js'])
+      .pipe(sentryRelease.release())
+      .pipe(done);
+
+
+  });
+});
+
 gulp.task('build-assets', ['copy-asset-files', 'css', 'webpack', 'uglify']);
 
 
@@ -492,3 +516,5 @@ gulp.task('safe-install', shell.task([
   'npm run link',
   'npm run fix-shrinkwrap-registry'
 ]));
+
+
