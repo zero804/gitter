@@ -71,6 +71,3 @@ function onRoomChange(model) {
   //switch collections
   chatCollection.switchCollection(collection);
 }
-
-
-//comment
