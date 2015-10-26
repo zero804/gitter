@@ -20,6 +20,16 @@ function getAliasForSizeFromHostname(hostname) {
   return 's';
 }
 
+function joinUrl(opts) {
+  // urlParser.format adds the port number from the current page when running
+  // in the browser
+  var pairs = _.map(opts.query || {}, function(v, k) {
+    return k+'='+v;
+  });
+  var query = pairs.join('&');
+  return opts.protocol+'//'+opts.hostname+opts.pathname+'?'+query;
+}
+
 function srcSetForUser(user, size) {
   // required: user.gravatarImageUrl
   // optional: user.username (for github round-robin)
@@ -27,12 +37,6 @@ function srcSetForUser(user, size) {
   // NOTE: url parsing will only happen server-side because client-side the
   // browser will just use avatarUrlSmall without going through this again.
   var parsed = urlParser.parse(user.gravatarImageUrl, true);
-
-  // delete these otherwise urlParser.format() wll not use parsed.query or
-  // parsed.hostname
-  delete parsed.host;
-  delete parsed.href;
-  delete parsed.search;
 
   // try and do the same hashing to pull from different subdomains
   if (parsed.hostname.indexOf('github') !== -1 && user.username) {
@@ -42,10 +46,10 @@ function srcSetForUser(user, size) {
   var attr = getAliasForSizeFromHostname(parsed.hostname);
 
   parsed.query[attr] = size;
-  var src = urlParser.format(parsed);
+  var src = joinUrl(parsed);
 
   parsed.query[attr] = size*2;
-  var srcset = urlParser.format(parsed) + ' 2x';
+  var srcset = joinUrl(parsed) + ' 2x';
 
   return {
     src: src,
