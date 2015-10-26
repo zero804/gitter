@@ -99,7 +99,7 @@ exports.datesList = [
       public: troupe.security === 'PUBLIC',
       avatarUrl: avatarUrl,
       isPrivate: isPrivate,
-      avatarSrcSet: resolveRoomAvatarSrcSet(req.uriContext.uri)
+      avatarSrcSet: resolveRoomAvatarSrcSet({ uri: req.uriContext.uri }, 48)
     };
 
     return roomService.validateRoomForReadOnlyAccess(user, troupe)
@@ -306,7 +306,7 @@ exports.chatArchive = [
               accessToken: req.accessToken,
               avatarUrl: avatarUrl,
               isPrivate: isPrivate,
-              avatarSrcSet: resolveRoomAvatarSrcSet(req.uriContext.uri),
+              avatarSrcSet: resolveRoomAvatarSrcSet({ uri: req.uriContext.uri }, 48),
 
               /* For prerendered archive-navigation-view */
               previousDate: previousDateFormatted,
