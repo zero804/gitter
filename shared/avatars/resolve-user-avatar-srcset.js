@@ -2,9 +2,66 @@
 
 var _ = require('underscore');
 var hash = require('./hash-avatar-to-cdn');
-var urlParser = require('../urls/url-parser');
-
+var targetEnv = require('targetenv');
 var DEFAULT_AVATAR_URL = 'https://avatars1.githubusercontent.com/u/0';
+
+function parseUrl(urlStr, parseQueryString, slashesDenoteHost) {
+  if (targetEnv.isBrowser) {
+    var parsed = parse(urlStr);
+    parsed.query = parseSearch(parsed.search);
+    return parsed;
+
+  } else {
+    var url = require('url');
+    return url.parse(urlStr, parseQueryString, slashesDenoteHost);
+  }
+
+  function parse(url) {
+    var parser = document.createElement('a');
+    parser.href = url;
+
+    return {
+      protocol: parser.protocol,
+      hostname: parser.hostname,
+      port: parser.port,
+      pathname: parser.pathname,
+      search: parser.search,
+      hash: parser.hash,
+      host: parser.host,
+      href: parser.href
+    };
+  }
+
+  function decodePart(s) {
+    return decodeURIComponent(s.replace(/\+/g, " "));
+  }
+
+  function parseSearch(search) {
+    var result = {};
+
+    if (!search) return result;
+    var query = search.substring(1);
+
+    var match;
+    var re = /([^&=]+)=?([^&]*)/g;
+
+    while ((match = re.exec(query))) {
+      result[decodePart(match[1])] = decodePart(match[2]);
+    }
+
+    return result;
+  }
+}
+
+function formatUrl(opts) {
+  // urlParser.format adds the port number from the current page when running
+  // in the browser
+  var pairs = _.map(opts.query || {}, function(v, k) {
+    return k+'='+v;
+  });
+  var query = pairs.join('&');
+  return opts.protocol+'//'+opts.hostname+opts.pathname+'?'+query;
+}
 
 function getAliasForSizeFromHostname(hostname) {
   // This might have to get more granular than just per-hostname in future if
@@ -20,23 +77,14 @@ function getAliasForSizeFromHostname(hostname) {
   return 's';
 }
 
-function joinUrl(opts) {
-  // urlParser.format adds the port number from the current page when running
-  // in the browser
-  var pairs = _.map(opts.query || {}, function(v, k) {
-    return k+'='+v;
-  });
-  var query = pairs.join('&');
-  return opts.protocol+'//'+opts.hostname+opts.pathname+'?'+query;
-}
-
 function srcSetForUser(user, size) {
   // required: user.gravatarImageUrl
   // optional: user.username (for github round-robin)
 
-  // NOTE: url parsing will only happen server-side because client-side the
-  // browser will just use avatarUrlSmall without going through this again.
-  var parsed = urlParser.parse(user.gravatarImageUrl, true);
+  // NOTE: url parsing should only happen server-side because client-side the
+  // browser will just use avatarUrlSmall (if it is set by the serializer
+  // strategy) without going through this again.
+  var parsed = parseUrl(user.gravatarImageUrl, true);
 
   // try and do the same hashing to pull from different subdomains
   if (parsed.hostname.indexOf('github') !== -1 && user.username) {
@@ -46,10 +94,10 @@ function srcSetForUser(user, size) {
   var attr = getAliasForSizeFromHostname(parsed.hostname);
 
   parsed.query[attr] = size;
-  var src = joinUrl(parsed);
+  var src = formatUrl(parsed);
 
   parsed.query[attr] = size*2;
-  var srcset = joinUrl(parsed) + ' 2x';
+  var srcset = formatUrl(parsed) + ' 2x';
 
   return {
     src: src,
