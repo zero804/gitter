@@ -91,7 +91,7 @@ module.exports = function resolveUserAvatarSrcSet(user, size) {
     return {
       src: buildAvatarUrlForUsername(user.username, version, size),
       size: size,
-      srcset: buildAvatarUrlForUsername(user.username, version, size) + ' 2x'
+      srcset: buildAvatarUrlForUsername(user.username, version, size*2) + ' 2x'
     };
 
   }
