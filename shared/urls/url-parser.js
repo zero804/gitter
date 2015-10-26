@@ -12,7 +12,7 @@ if (targetEnv.isBrowser) {
       if (parseQueryString) {
         parsed.query = urlParser.parseSearch(parsed.search);
       }
-      return parsed
+      return parsed;
     },
     format: urlParser.format
   };
