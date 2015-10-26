@@ -227,6 +227,14 @@ onready(function() {
         window.location.hash = '#' + message.hash;
       break;
 
+      case 'request:roomList':
+        //when the chat app requests the room list send it
+        postMessage({
+          type: 'roomList',
+          rooms: roomListGenerator(),
+        });
+        break;
+
       case 'unreadItemsCount':
         var count = message.count;
         var troupeId = message.troupeId;
@@ -456,19 +464,5 @@ onready(function() {
       });
     });
   }
-
-  troupeCollections.troupes.once('change', function(){
-    //HACK HACK HACK REMOVE THIS IN FAVOUR OF SOME
-    //PROPER MESSAGING
-    //basically the chat frame should request this
-    setTimeout(function(){
-
-      postMessage({
-        type: 'roomList',
-        rooms: roomListGenerator(),
-      });
-
-    }, 1000);
-  });
 
 });
