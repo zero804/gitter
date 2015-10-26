@@ -80,7 +80,7 @@ exports.datesList = [
     }
 
     var roomUrl = '/api/v1/rooms/' + troupe.id;
-    var avatarUrl = resolveRoomAvatarUrl(troupe.uri);
+    var avatarUrl = resolveRoomAvatarUrl(troupe, 48);
     var isPrivate = troupe.security !== "PUBLIC";
 
     var templateContext = {
@@ -131,7 +131,7 @@ exports.linksList = [
     }
 
     var roomUrl = '/api/v1/rooms/' + troupe.id;
-    var avatarUrl = resolveRoomAvatarUrl(troupe.uri);
+    var avatarUrl = resolveRoomAvatarUrl(troupe, 48);
     var isPrivate = troupe.security !== "PUBLIC";
 
     var templateContext = {
@@ -269,7 +269,7 @@ exports.chatArchive = [
             var billingUrl = env.config.get('web:billingBaseUrl') + '/bill/' + req.uriContext.uri.split('/')[0];
             var roomUrl = '/api/v1/rooms/' + troupe.id;
 
-            var avatarUrl = resolveRoomAvatarUrl(troupe.uri);
+            var avatarUrl = resolveRoomAvatarUrl(troupe, 48);
             var isPrivate = troupe.security !== "PUBLIC";
 
             /*

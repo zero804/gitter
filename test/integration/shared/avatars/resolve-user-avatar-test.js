@@ -1,7 +1,7 @@
 'use strict';
 
 var assert = require('assert');
-var getUserAvatarForSize = require('gitter-web-shared/avatars/get-user-avatar-for-size');
+var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 
 describe('user avatar url generator', function() {
 
@@ -11,7 +11,7 @@ describe('user avatar url generator', function() {
         username: 'lerouxb',
         gravatarImageUrl: 'https://avatars.githubusercontent.com/u/69737?v=3'
       };
-      var result = getUserAvatarForSize(user, 40);
+      var result = resolveUserAvatarUrl(user, 40);
       assert.equal(result, 'https://avatars1.githubusercontent.com/u/69737?v=3&s=40');
     });
 
@@ -19,7 +19,7 @@ describe('user avatar url generator', function() {
       var user = {
         gravatarImageUrl: 'https://lh5.googleusercontent.com/-8JzxZyD84qE/AAAAAAAAAAI/AAAAAAAAAN4/_x36v4AaxKo/photo.jpg'
       };
-      var result = getUserAvatarForSize(user, 40)
+      var result = resolveUserAvatarUrl(user, 40)
       assert.equal(result, user.gravatarImageUrl+'?sw=40');
     });
   });
@@ -30,8 +30,8 @@ describe('user avatar url generator', function() {
         avatarUrlSmall: 'https://avatars.githubusercontent.com/u/69737?v=3&s=60',
         avatarUrlMedium: 'https://avatars.githubusercontent.com/u/69737?v=3&s=128'
       };
-      assert.equal(getUserAvatarForSize(user, 60), user.avatarUrlSmall);
-      assert.equal(getUserAvatarForSize(user, 128), user.avatarUrlMedium);
+      assert.equal(resolveUserAvatarUrl(user, 60), user.avatarUrlSmall);
+      assert.equal(resolveUserAvatarUrl(user, 128), user.avatarUrlMedium);
     });
 
     it('should return a github url for github username and version', function() {
@@ -39,7 +39,7 @@ describe('user avatar url generator', function() {
         username: 'whaaaaat',
         gv: '3'
       };
-      var result = getUserAvatarForSize(user, 60);
+      var result = resolveUserAvatarUrl(user, 60);
       assert.equal(result, 'https://avatars0.githubusercontent.com/whaaaaat?v=3&s=60');
     });
 
@@ -47,7 +47,7 @@ describe('user avatar url generator', function() {
       var user = {
         username: '1234_'
       };
-      var result = getUserAvatarForSize(user, 60);
+      var result = resolveUserAvatarUrl(user, 60);
       assert.equal(result, '/api/private/user-avatar/1234_?s=60');
     });
   });

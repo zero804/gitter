@@ -1,7 +1,7 @@
 "use strict";
 var Marionette = require('backbone.marionette');
 var Backbone = require('backbone');
-var getUserAvatarForSize = require('gitter-web-shared/avatars/get-user-avatar-for-size');
+var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 var Popover = require('views/popover');
 var template = require('./tmpl/userPopoverView.hbs');
 var footerTemplate = require('./tmpl/userPopoverFooterView.hbs');
@@ -31,7 +31,7 @@ module.exports = (function() {
       // NOTE: this actually gets displayed at 128 css pixels wide, so retina
       // would have to be 256. But that doesn't map to avatarUrlSmall or
       // avatarUrlMedium
-      data.avatarUrl = getUserAvatarForSize({ username: data.login }, 128);
+      data.avatarUrl = resolveUserAvatarUrl({ username: data.login }, 128);
 
       return data;
     }
