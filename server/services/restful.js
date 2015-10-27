@@ -11,6 +11,7 @@ var userService         = require("./user-service");
 var userSearchService   = require('./user-search-service');
 var eventService        = require("./event-service");
 var Q                   = require('q');
+var Promise             = require('bluebird');
 var roomService         = require('./room-service');
 var GithubMe            = require('gitter-web-github').GitHubMeService;
 var _                   = require('underscore');
@@ -135,6 +136,13 @@ exports.serializeEventsForTroupe = function(troupeId, userId, callback) {
 };
 
 exports.serializeOrgsForUser = function(user/*, options */) {
+  // HACK: for now just return nothing if the user doesn't have a github token,
+  // but we should actually join together all the user's providers' orgs. Just
+  // trying to not make it hit GitHub for now.
+  if (!user.githubToken) {
+    return new Promise.resolve([]);
+  }
+
   var ghUser = new GithubMe(user);
 
   var strategyOptions = { currentUserId: user.id /*, mapUsers: options && options.mapUsers */ };
