@@ -11,7 +11,7 @@ var userService            = require('../services/user-service');
 var oauthService           = require('../services/oauth-service');
 var githubUserStrategy     = require('./strategies/github-user');
 var githubUpgradeStrategy  = require('./strategies/github-upgrade');
-//var googleStrategy         = require('./strategies/google');
+var googleStrategy         = require('./strategies/google');
 
 
 function installApi() {
@@ -108,7 +108,7 @@ function install() {
 
   passport.use(githubUserStrategy);
   passport.use(githubUpgradeStrategy);
-  //passport.use(googleStrategy);
+  passport.use(googleStrategy);
 }
 
 module.exports = {
