@@ -15,7 +15,7 @@ var ensureLoggedIn = require('../web/middlewares/ensure-logged-in');
 var express = require('express');
 
 var github = require('./auth-providers/github');
-//var google = require('./auth-providers/google');
+var google = require('./auth-providers/google');
 
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
@@ -69,8 +69,8 @@ router.get('/upgrade', github.upgrade);
 // Google
 // ----------------------------------------------------------
 
-//router.get('/google', google.login);
-//router.get('/google/callback', google.callback);
+router.get('/google', google.login);
+router.get('/google/callback', google.callback);
 
 // ----------------------------------------------------------
 // OAuth for our own clients

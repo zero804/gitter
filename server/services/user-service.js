@@ -139,6 +139,32 @@ var userService = {
       .nodeify(callback);
   },
 
+  findOrCreateUserForGoogleId: function(userData, identityData) {
+    winston.info("Locating or creating user", {
+      userData: userData,
+      identityData: identityData
+    });
+
+    // should I assert all the required user and identity fields?
+
+    var userQuery = { googleId: userData.googleId };
+    var upsertOptions = { upsert: true, new: true };
+    return persistence.User.findOneAndUpdate(userQuery, userData, upsertOptions)
+      .exec()
+      .then(function(user) {
+        identityData.userId = user._id;
+        var identityQuery = { provider: identityData.provider, userId: user._id };
+        return persistence.Identity.findOneAndUpdate(identityQuery, identityData, upsertOptions)
+          .exec()
+          .then(function(identity) {
+
+            // TODO: do I need this?
+            // return uriLookupService.reserveUriForUsername(user._id, user.username).thenResolve(user);
+            return [user, identity];
+          });
+      });
+  },
+
   findById: function(id, callback) {
     return persistence.User.findById(id)
       .exec()
