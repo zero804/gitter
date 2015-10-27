@@ -12,7 +12,7 @@ exports.install = function(persistenceService) {
    * Users
    */
   mongooseUtils.attachNotificationListenersToSchema(schemas.UserSchema, {
-    listenPaths: ['displayName', 'username', 'gravatarVersion', 'state'],
+    listenPaths: ['displayName', 'username', 'gravatarVersion', 'gravatarImageUrl', 'state'],
     // ignoredPaths: ['lastTroupe','confirmationCode','status','passwordHash','passwordResetCode'],
     onUpdate: function onUserUpdate(model, next) {
       liveCollections.users.emit("update", model);
