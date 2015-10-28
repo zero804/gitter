@@ -17,21 +17,85 @@ var extractGravatarVersion = require('../../utils/extract-gravatar-version');
 var emailAddressService = require('../../services/email-address-service');
 var debug = require('debug')('gitter:passport');
 
+var Promise = require('bluebird');
 
-function updateUser(req, accessToken, user, githubUserProfile, done) {
-  var googleAnalyticsUniqueId = gaCookieParser(req);
 
-  // TODO: split out? can non-github users be invited?
+function updateUserLocaleFromRequest(req, user) {
+  if (req.i18n && req.i18n.locale) {
+    userSettingsService.setUserSettings(user.id, 'lang', req.i18n.locale)
+      .catch(function(err) {
+        logger.error("Failed to save lang user setting", {
+          userId: user.id,
+          lang: req.i18n.locale,
+          exception: err
+        });
+      });
+  }
+}
+
+function trackNewUser(req, user) {
+  // NOTE: tracking a signup after an invite is separate to this
+  emailAddressService(user)
+    .then(function(email) {
+      // this is only set because stats.userUpdate requires it
+      user.email = email;
+      stats.userUpdate(user);
+
+      // NOTE: other stats calls also pass in properties
+      stats.event("new_user", {
+        userId: user.id,
+        email: email,
+        method: 'github_oauth',
+        username: user.username,
+        source: req.session.source,
+        googleAnalyticsUniqueId: gaCookieParser(req)
+      });
+    });
+}
+
+function trackUserLogin(req, user) {
+  emailAddressService(user)
+    .then(function(email) {
+      var properties = useragentTagger(req.headers['user-agent']);
+
+      // this is only set because stats.userUpdate requires it
+      user.email = email;
+      stats.userUpdate(user, properties);
+
+      // NOTE: other stats calls also pass in source and googleAnalyticsUniqueId
+      stats.event("user_login", _.extend({
+        userId: user.id,
+        method: 'github_oauth',
+        username: user.username
+      }, properties));
+    });
+}
+
+function ageInHours(date) {
+  var ageHours;
+
+  if (date) {
+    var dateMoment = moment(date);
+    var duration = moment.duration(Date.now() - dateMoment.valueOf());
+    ageHours = duration.asHours();
+  }
+
+  return ageHours;
+}
+
+function updateUser(req, accessToken, user, githubUserProfile) {
   // If the user was in the DB already but was invited, notify stats services
   if (user.isInvited()) {
     // IMPORTANT: The alias can only happen ONCE. Do not remove.
-    stats.alias(mixpanel.getMixpanelDistinctId(req.cookies), user.id, function() {
+    stats.alias(mixpanel.getMixpanelDistinctId(req.cookies), user.id, function(err) {
+      if (err) logger.error('Error aliasing user:', { exception: err });
+
       stats.event("new_user", {
         userId: user.id,
         method: 'github_oauth',
         username: user.username,
         source: 'invited',
-        googleAnalyticsUniqueId: googleAnalyticsUniqueId
+        googleAnalyticsUniqueId: gaCookieParser(req)
       });
     });
   }
@@ -47,46 +111,25 @@ function updateUser(req, accessToken, user, githubUserProfile, done) {
   user.githubUserToken  = accessToken;
   user.state            = undefined;
 
-  user.save(function(err) {
-    if (err) logger.error("Failed to update GH token for user ", user.username);
+  return user.save()
+    .then(function() {
+      trackUserLogin(req, user);
 
-    // Tracking
-    var properties = useragentTagger(req.headers['user-agent']);
+      updateUserLocaleFromRequest(req, user);
 
-    emailAddressService(user)
-      .then(function(email) {
-        user.email = email;
-        stats.userUpdate(user, properties);
-      });
-
-    // TODO: split out? more tracking
-    stats.event("user_login", _.extend({
-      userId: user.id,
-      method: 'github_oauth',
-      username: user.username
-    }, properties));
-
-    // TODO: split out to updateUserLocale()
-    if (req.i18n && req.i18n.locale) {
-      userSettingsService.setUserSettings(user.id, 'lang', req.i18n.locale)
-        .catch(function(err) {
-          logger.error("Failed to save lang user setting", { userId: user.id, lang: req.i18n.locale, exception: err });
-        });
-    }
-
-    req.logIn(user, function(err) {
-      if (err) { return done(err); }
-
+      // NOTE: tried with {context: req} so that .call() isn't needed, but it
+      // wouldn't work
+      var login = Promise.promisify(req.logIn);
+      return login.call(req, user);
+    })
+    .then(function() {
       // Remove the old token for this user
       req.accessToken = null;
-      return done(null, user);
+      return user;
     });
-  });
 }
 
-function addUser(req, accessToken, githubUserProfile, done) {
-  var googleAnalyticsUniqueId = gaCookieParser(req);
-
+function addUser(req, accessToken, githubUserProfile) {
   var githubUser = {
     username:           githubUserProfile.login,
     displayName:        githubUserProfile.name || githubUserProfile.login,
@@ -99,67 +142,41 @@ function addUser(req, accessToken, githubUserProfile, done) {
 
   debug('About to create GitHub user %j', githubUser);
 
-  userService.findOrCreateUserForGithubId(githubUser, function(err, user) {
-    if (err) return done(err);
+  var user;
+  return userService.findOrCreateUserForGithubId(githubUser)
+    .then(function(_user) {
+      user = _user;
 
-    debug('Created GitHub user %j', user.toObject());
+      debug('Created GitHub user %j', user.toObject());
 
-    // TODO: split out into setLocale(req, user) or something
-    // NOTE: this happens async in the background and next steps don't wait for
-    // it. Is that intentional?
-    // Save the locale of the new user
-    if (req.i18n && req.i18n.locale) {
-      userSettingsService.setUserSettings(user.id, 'lang', req.i18n.locale)
-        .catch(function(err) {
-          logger.error("Failed to save lang user setting", { userId: user.id, lang: req.i18n.locale, exception: err });
-        });
-    }
+      updateUserLocaleFromRequest(req, user);
 
-    // TODO: split out?
-    // IMPORTANT: The alias can only happen ONCE. Do not remove.
-    stats.alias(mixpanel.getMixpanelDistinctId(req.cookies), user.id, function(err) {
-      if (err) logger.error('Error aliasing user:', { exception: err });
+      // IMPORTANT: The alias can only happen ONCE. Do not remove.
+      stats.alias(mixpanel.getMixpanelDistinctId(req.cookies), user.id, function(err) {
+        if (err) logger.error('Error aliasing user:', { exception: err });
 
-      // TODO: make emailAddressService aware of different providers
-      emailAddressService(user)
-        .then(function(email) {
-          user.email = email;
+        trackNewUser(req, user);
 
-          stats.userUpdate(user);
-
-          stats.event("new_user", {
+        // Flag the user as a new github user if they've created their account
+        // in the last two hours
+        // NOTE: this relies on the fact that undefined is not smaller than 2..
+        if (ageInHours(githubUserProfile.created_at) < 2) {
+          stats.event("new_github_user", {
             userId: user.id,
-            email: email,
-            method: 'github_oauth',
             username: user.username,
-            source: req.session.source,
-            googleAnalyticsUniqueId: googleAnalyticsUniqueId
+            googleAnalyticsUniqueId: gaCookieParser(req)
           });
-        });
+        }
+      });
 
-      // TODO: will we need something similar to this for non-github users?
-      // Flag the user as a new github user if they've created
-      // their account in the last two hours
-      var githubUserAgeHours;
-      if (githubUserProfile.created_at) {
-        var createdAt = moment(githubUserProfile.created_at);
-        var duration = moment.duration(Date.now() - createdAt.valueOf());
-        githubUserAgeHours = duration.asHours();
-      }
-      if (githubUserAgeHours < 2) {
-        stats.event("new_github_user", {
-          userId: user.id,
-          username: user.username,
-          googleAnalyticsUniqueId: googleAnalyticsUniqueId
-        });
-      }
+      // NOTE: tried with {context: req} so that .call() isn't needed, but it
+      // wouldn't work
+      var login = Promise.promisify(req.logIn);
+      return login.call(req, user);
+    })
+    .then(function() {
+      return user;
     });
-
-    req.logIn(user, function(err) {
-      if (err) { return done(err); }
-      return done(null, user);
-    });
-  });
 }
 
 function githubUserCallback(req, accessToken, refreshToken, params, _profile, done) {
@@ -171,7 +188,6 @@ function githubUserCallback(req, accessToken, refreshToken, params, _profile, do
       return userService.findByGithubIdOrUsername(githubUserProfile.id, githubUserProfile.login)
     })
     .then(function(user) {
-      // TODO: split out into addSignupEvent(req)
       if (req.session && (!user || user.isInvited())) {
         var events = req.session.events;
         if (!events) {
@@ -183,13 +199,15 @@ function githubUserCallback(req, accessToken, refreshToken, params, _profile, do
 
       // Update an existing user
       if (user) {
-        return updateUser(req, accessToken, user, githubUserProfile, done);
+        return updateUser(req, accessToken, user, githubUserProfile);
       } else {
-        return addUser(req, accessToken, githubUserProfile, done);
+        return addUser(req, accessToken, githubUserProfile);
       }
     })
+    .then(function(user) {
+      done(null, user);
+    })
     .catch(function(err) {
-      // TODO: split out into oauthErrorHandler
       errorReporter(err, { oauth: "failed" }, { module: 'passport' });
       stats.event("oauth_profile.error");
       logger.error('Error during oauth process. Unable to obtain user profile.', err);
