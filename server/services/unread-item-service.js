@@ -19,13 +19,9 @@ var roomMembershipService = require('./room-membership-service');
 var uniqueIds        = require('mongodb-unique-ids');
 var debug            = require('debug')('gitter:unread-item-service');
 var recentRoomService = require('./recent-room-service');
-var redisClient      = require('../utils/redis').createClient();
 var badgeBatcher     = new RedisBatcher('badge', 1000, batchBadgeUpdates);
-var Promise          = require('bluebird');
-
-// FIXME Maybe we should switch to ioredis everywhere so we get promises?
-var redisDel  = Promise.promisify(redisClient.del, redisClient);
-var redisMget = Promise.promisify(redisClient.mget, redisClient);
+var Promise          = require('q');
+var chatService      = require('./chat-service');
 
 /* Handles batching badge updates to users */
 function batchBadgeUpdates(key, userIds, done) {
@@ -521,12 +517,6 @@ function processResultsForNewItemWithMentions(troupeId, chatId, parsed, results,
         // Note that this can be a very long list in a big room
         var activityOnly = parsed.activityOnlyUserIds;
 
-        var eyeballsOffUsers = activityOnly.filter(function(userId) {
-          return presenceStatus[userId] !== 'inroom';
-        });
-
-        persistActivityForLurkingUsers(troupeId, eyeballsOffUsers, chatId);
-
         for(var i = 0; i < activityOnly.length; i++) {
           var activityOnlyUserId =  activityOnly[i];
 
@@ -659,43 +649,32 @@ function queueBadgeUpdateForUser(userIds) {
   badgeBatcher.add('queue', userIds);
 }
 
-function persistActivityForLurkingUsers(roomId, userIds, chatId) {
-  debug('persistActivityForLurkingUsers');
-  return recentRoomService.findLastAccessTimesForUsersInRoom(roomId, userIds)
-  .then(function(times) {
-    var chatTimestamp = mongoUtils.getTimestampFromObjectId(chatId);
-    var chatDate = new Date(chatTimestamp);
-
-    var unawareUserIds = userIds.filter(function(userId) {
-      return chatDate > times[userId];
-    });
-
-    return new Promise(function(resolve, reject) {
-      var transaction = redisClient.multi();
-      unawareUserIds.forEach(function(userId) {
-        var activityKey = 'activity:' + userId + ':' + roomId;
-        transaction.set(activityKey, chatId);
-      });
-      transaction.exec(function(err, replies) {
-        if (err) return reject(err);
-        resolve(replies);
-      });
-    });
-  });
-}
-
-exports.clearActivityIndicator = function(troupeId, userId) {
-  var activityKey = 'activity:' + userId + ':' + troupeId;
-  debug('clearActivityIndicator: ', activityKey);
-  return redisDel(activityKey);
-};
-
 exports.getActivityIndicatorForTroupeIds = function(troupeIds, userId) {
-  var activityKeys = troupeIds.map(function(troupeId) {
-    return 'activity:' + userId + ':' + troupeId;
-  });
-  debug('getActivityIndicatorForUserIds: ', activityKeys);
-  return redisMget(activityKeys);
+  return recentRoomService.getTroupeLastAccessTimesForUser(userId)
+    .then(function(times) {
+      var timesMap = troupeIds.reduce(function(accum, troupeId) {
+        if (!times[troupeId]) return accum;
+
+        accum[troupeId] = times[troupeId];
+        return accum;
+      }, {});
+
+      // Use timemap to query only for troupes with times
+      var queries = Object.keys(times).map(function(troupeId) {
+        return chatService.getDateOfLastMessageInRoom(troupeId);
+      });
+
+      return Promise.all(queries)
+      .then(function(dates) {
+        var mappedDates = Object.keys(times).reduce(function(accum, troupeId, index) {
+          accum[troupeId] = dates[index] > timesMap[troupeId];
+          return accum;
+        }, {});
+
+        return mappedDates;
+      });
+    });
+
 };
 
 
@@ -713,6 +692,5 @@ exports.testOnly = {
   getTroupeIdsCausingBadgeCount: getTroupeIdsCausingBadgeCount,
   parseChat: parseChat,
   generateMentionDeltaSet: generateMentionDeltaSet,
-  findNonMembersWithAccess: findNonMembersWithAccess,
-  persistActivityForLurkingUsers: persistActivityForLurkingUsers
+  findNonMembersWithAccess: findNonMembersWithAccess
 };

@@ -29,9 +29,9 @@ module.exports = {
     if(!allIds.length) throw new StatusError(400); /* You comin at me bro? */
 
     return unreadItemService.markItemsRead(req.resourceUser.id, req.params.userTroupeId, allIds)
-    .then(function() {
-      return { success: true };
-    });
+      .then(function() {
+        return { success: true };
+      });
 
    },
 
