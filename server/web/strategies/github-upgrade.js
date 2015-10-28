@@ -6,33 +6,28 @@ var logger = env.logger;
 
 var GitHubStrategy = require('gitter-passport-github').Strategy;
 var TokenStateProvider = require('gitter-passport-oauth2').TokenStateProvider;
-var githubUserCallback = require('./github-user-callback');
 
 
 function githubUpgradeCallback(req, accessToken, refreshToken, params, _profile, done) {
-  if (req.user && req.session.githubScopeUpgrade) {
-    var requestedScopes = params.scope.split(/,/);
-    var scopeHash = requestedScopes.reduce(function(memo, v) {
-      memo[v] = true;
-      return memo;
-    }, {});
+  var requestedScopes = params.scope.split(/,/);
+  var scopeHash = requestedScopes.reduce(function(memo, v) {
+    memo[v] = true;
+    return memo;
+  }, {});
 
-    req.user.githubToken = accessToken;
-    req.user.githubScopes = scopeHash;
+  req.user.githubToken = accessToken;
+  req.user.githubScopes = scopeHash;
 
-    req.user.save(function(err) {
-      if (err) {
-        logger.error('passport: user save failed: ' + err, { exception: err });
-        return done(err);
-      }
+  req.user.save(function(err) {
+    if (err) {
+      logger.error('passport: user save failed: ' + err, { exception: err });
+      return done(err);
+    }
 
-      logger.info('passport: User updated with token');
-      return done(null, req.user);
-    });
+    logger.info('passport: User updated with token');
+    return done(null, req.user);
+  });
 
-  } else {
-    githubUserCallback(req, accessToken, refreshToken, params, _profile, done);
-  }
 }
 
 var githubUpgradeStrategy = new GitHubStrategy({
