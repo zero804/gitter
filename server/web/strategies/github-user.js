@@ -5,7 +5,7 @@ var config = env.config;
 
 var GitHubStrategy = require('gitter-passport-github').Strategy;
 var TokenStateProvider = require('gitter-passport-oauth2').TokenStateProvider;
-var githubOauthCallback = require('./github-oauth-callback');
+var githubUserCallback = require('./github-user-callback');
 
 var githubUserStrategy = new GitHubStrategy({
     clientID: config.get('github:user_client_id'),
@@ -14,7 +14,7 @@ var githubUserStrategy = new GitHubStrategy({
     stateProvider: new TokenStateProvider({ passphrase: config.get('github:statePassphrase') }),
     skipUserProfile: true,
     passReqToCallback: true
-  }, githubOauthCallback);
+  }, githubUserCallback);
 
 githubUserStrategy.name = 'github_user';
 
