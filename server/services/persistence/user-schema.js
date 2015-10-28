@@ -23,6 +23,7 @@ var UserSchema = new Schema({
   githubUserToken: { type: String }, // The scope for this token will always be 'user'
   githubId: {type: Number },
   googleId: {type: Number },
+  noGitHubIdentity: { type: Boolean, 'default': false },
   permissions: {
     createRoom: { type: Boolean, 'default': true }
   },
@@ -35,8 +36,7 @@ var UserSchema = new Schema({
     abbr: String,   // Abbreviation, like PDT (note that these are NOT globally unique)
     iana: String    // Timezone IANA description, eg `Europe/London` or `America/Los_Angeles`
   },
-  _tv: { type: 'MongooseNumber', 'default': 0 },
-  noGitHubIdentity: { type: Boolean, 'default': false }
+  _tv: { type: 'MongooseNumber', 'default': 0 }
 });
 
 UserSchema.index({ githubId: 1 }, { unique: true, sparse: true }); // TODO: does this still need to be sparse?
