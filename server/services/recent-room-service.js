@@ -202,25 +202,21 @@ function saveLastVisitedTroupeforUserId(userId, troupeId, options) {
   debug('saveLastVisitedTroupeforUserId: userId=%s, troupeId=%s, options=%j', userId, troupeId, options);
   var lastAccessTime = options && options.lastAccessTime || new Date();
 
-  return roomMembershipService.getMemberLurkStatus(troupeId, userId)
-  .then(function(lurking) {
-
-    var actions = [
+  return Q.all([
       saveUserTroupeLastAccess(userId, troupeId, lastAccessTime),
+      // Update User
       persistence.User.update({ _id: userId }, { $set: { lastTroupe: troupeId }}).exec()
-    ];
-
-    return Q.all(actions)
-      .then(function() {
-        // XXX: lastAccessTime should be a date but for some bizarre reason it's not
-        // serializing properly
-        if (!options || !options.skipFayeUpdate) {
-          appEvents.dataChange2('/user/' + userId + '/rooms', 'patch', { id: troupeId, lastAccessTime: moment(lastAccessTime).toISOString() });
-        }
-      });
+    ])
+    .then(function() {
+      // XXX: lastAccessTime should be a date but for some bizarre reason it's not
+      // serializing properly
+      if (!options || !options.skipFayeUpdate) {
+        appEvents.dataChange2('/user/' + userId + '/rooms', 'patch', { id: troupeId, lastAccessTime: moment(lastAccessTime).toISOString() });
+      }
     });
 }
 exports.saveLastVisitedTroupeforUserId = saveLastVisitedTroupeforUserId;
+
 
 function getTroupeLastAccessTimesForUserExcludingHidden(userId) {
   return persistence.UserTroupeLastAccess.findOne({ userId: userId }, { _id: 0, troupes: 1 }, { lean: true })
