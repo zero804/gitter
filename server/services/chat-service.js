@@ -262,12 +262,14 @@ function findByIds(ids, callback) {
 exports.findByIds = findByIds;
 
 /* This is much more cacheable than searching less than a date */
-function getDateOfFirstMessageInRoom(troupeId) {
+function getDateOfMessageInRoom(troupeId, sortOrder) {
+  if (!sortOrder) return null;
+
   return ChatMessage
     .where('toTroupeId', troupeId)
     .limit(1)
     .select({ _id: 0, sent: 1 })
-    .sort({ sent: 'asc' })
+    .sort({ sent: sortOrder })
     .lean()
     .exec()
     .then(function(r) {
@@ -275,7 +277,16 @@ function getDateOfFirstMessageInRoom(troupeId) {
       return r[0].sent;
     });
 }
+
+function getDateOfFirstMessageInRoom(troupeId) {
+  return getDateOfMessageInRoom(troupeId, 'asc');
+}
 exports.getDateOfFirstMessageInRoom = getDateOfFirstMessageInRoom;
+
+function getDateOfLastMessageInRoom(troupeId) {
+  return getDateOfMessageInRoom(troupeId, 'desc');
+}
+exports.getDateOfLastMessageInRoom = getDateOfLastMessageInRoom;
 
 /*
  * this does a massive query, so it has to be cached for a long time

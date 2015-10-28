@@ -192,6 +192,7 @@ function saveUserTroupeLastAccess(userId, troupeId, lastAccessTime) {
      { upsert: true, new: true })
      .exec();
 }
+exports.saveUserTroupeLastAccess = saveUserTroupeLastAccess;
 
 /**
  * Update the last visited troupe for the user, sending out appropriate events
@@ -208,10 +209,6 @@ function saveLastVisitedTroupeforUserId(userId, troupeId, options) {
       saveUserTroupeLastAccess(userId, troupeId, lastAccessTime),
       persistence.User.update({ _id: userId }, { $set: { lastTroupe: troupeId }}).exec()
     ];
-
-    if (lurking) {
-      actions.push(unreadItemsService.clearActivityIndicator(troupeId, userId));
-    }
 
     return Q.all(actions)
       .then(function() {
@@ -329,3 +326,4 @@ function findLastAccessTimesForUsersInRoom(roomId, userIds) {
 
 }
 exports.findLastAccessTimesForUsersInRoom = findLastAccessTimesForUsersInRoom;
+

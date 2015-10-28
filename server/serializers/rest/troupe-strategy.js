@@ -147,14 +147,12 @@ LurkTroupeForUserStrategy.prototype = {
 
 function ActivityForUserStrategy(options) {
   var currentUserId = options.currentUserId;
-  var activity = [];
+  var activity = {};
 
   this.preload = function(troupeIds, callback) {
     unreadItemService.getActivityIndicatorForTroupeIds(troupeIds, currentUserId)
     .then(function(values) {
-      troupeIds.forEach(function(troupeId, i) {
-        activity[troupeId] = values[i];
-      });
+      activity = values;
       return activity;
     })
     .nodeify(callback);
