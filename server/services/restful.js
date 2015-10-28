@@ -11,7 +11,6 @@ var userService         = require("./user-service");
 var userSearchService   = require('./user-search-service');
 var eventService        = require("./event-service");
 var Q                   = require('q');
-var Promise             = require('bluebird');
 var roomService         = require('./room-service');
 var GithubMe            = require('gitter-web-github').GitHubMeService;
 var _                   = require('underscore');
@@ -140,7 +139,7 @@ exports.serializeOrgsForUser = function(user/*, options */) {
   // but we should actually join together all the user's providers' orgs. Just
   // trying to not make it hit GitHub for now.
   if (!user.githubToken) {
-    return new Promise.resolve([]);
+    return Q.resolve([]);
   }
 
   var ghUser = new GithubMe(user);
