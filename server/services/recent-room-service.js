@@ -11,7 +11,6 @@ var appEvents               = require('gitter-web-appevents');
 var moment                  = require('moment');
 var _                       = require('underscore');
 var unreadItemsService      = require('./unread-item-service');
-var roomMembershipService   = require('./room-membership-service');
 var debug                   = require('debug')('gitter:recent-room-service');
 
 /* const */
