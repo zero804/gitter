@@ -28,7 +28,7 @@ var useragent                = require('useragent');
 var _                        = require('underscore');
 var GitHubOrgService         = require('gitter-web-github').GitHubOrgService;
 var orgPermissionModel       = require('../../services/permissions/org-permissions-model');
-var resolveRoomAvatarUrl     = require('gitter-web-shared/avatars/resolve-room-avatar-url');
+var resolveRoomAvatarSrcSet  = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 
 /* How many chats to send back */
@@ -237,7 +237,8 @@ function renderMainFrame(req, res, next, frame) {
             .filter(roomSort.recents.filter)
             .sort(roomSort.recents.sort)
         },
-        orgs: orgs
+        orgs: orgs,
+        userHasNoOrgs: !orgs || !orgs.length
       });
     })
     .catch(next);
@@ -343,7 +344,7 @@ function renderChat(req, res, options, next) {
             troupeTopic: troupeContext.troupe.topic,
             premium: troupeContext.troupe.premium,
             troupeFavourite: troupeContext.troupe.favourite,
-            avatarUrl:  resolveRoomAvatarUrl(troupeContext.troupe.url),
+            avatarSrcSet:  resolveRoomAvatarSrcSet(troupeContext.troupe.url),
             isAdmin: isAdmin,
             isNativeDesktopApp: troupeContext.isNativeDesktopApp
           }, options.extras);

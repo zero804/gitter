@@ -3,9 +3,7 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var _ = require('underscore');
 var persistence = require('../server/services/persistence-service');
-var moment = require('moment');
 var nconf = require('../server/utils/config');
 var fs = require('fs');
 var BatchStream = require('batch-stream');
