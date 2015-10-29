@@ -42,6 +42,9 @@ var webpackConfig = {
     "apps": path.resolve(path.join(__dirname, "./apps.js")),
     "router-org-page": path.resolve(path.join(__dirname, './router-org-page.js')),
     "router-userhome": path.resolve(path.join(__dirname, './router-userhome.js')),
+
+    "mobile-native-userhome": path.resolve(path.join(__dirname, "./mobile-native-userhome")),
+
     vendor: [
       'utils/webpack',
       'utils/context',
