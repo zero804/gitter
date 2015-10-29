@@ -7,6 +7,7 @@ var errorReporter = env.errorReporter;
 
 var moment = require('moment');
 var _ = require('underscore');
+var Q = require('q');
 var GitHubMeService = require('gitter-web-github').GitHubMeService;
 var userService = require('../../services/user-service');
 var userSettingsService = require('../../services/user-settings-service');
@@ -16,8 +17,6 @@ var mixpanel = require('../../web/mixpanelUtils');
 var extractGravatarVersion = require('../../utils/extract-gravatar-version');
 var emailAddressService = require('../../services/email-address-service');
 var debug = require('debug')('gitter:passport');
-
-var Promise = require('bluebird');
 
 
 function updateUserLocaleFromRequest(req, user) {
@@ -117,10 +116,15 @@ function updateUser(req, accessToken, user, githubUserProfile) {
 
       updateUserLocaleFromRequest(req, user);
 
-      // NOTE: tried with {context: req} so that .call() isn't needed, but it
-      // wouldn't work
-      var login = Promise.promisify(req.logIn);
-      return login.call(req, user);
+      var deferred = Q.defer();
+      req.logIn(function(err) {
+        if (err) {
+          deferred.reject(err);
+        } else {
+          deferred.resolve();
+        }
+      });
+      return deferred.promise;
     })
     .then(function() {
       // Remove the old token for this user
@@ -169,10 +173,15 @@ function addUser(req, accessToken, githubUserProfile) {
         }
       });
 
-      // NOTE: tried with {context: req} so that .call() isn't needed, but it
-      // wouldn't work
-      var login = Promise.promisify(req.logIn);
-      return login.call(req, user);
+      var deferred = Q.defer();
+      req.logIn(function(err) {
+        if (err) {
+          deferred.reject(err);
+        } else {
+          deferred.resolve();
+        }
+      });
+      return deferred.promise;
     })
     .then(function() {
       return user;
