@@ -457,24 +457,3 @@ gulp.task('safe-install', shell.task([
   'npm run link',
   'npm run fix-shrinkwrap-registry'
 ]));
-
-
-/* Generate embedded native */
-gulp.task('embedded-webpack', function() {
-  return gulp.src('./public/js/webpack-mobile-native.config')
-    .pipe(webpack(require('./public/js/webpack-mobile-native.config')))
-    .pipe(gulp.dest('output/assets/js'));
-});
-
-gulp.task('embedded-copy-asset-files', function() {
-  return gulp.src([
-      'public/fonts/**',
-      'public/images/**',
-      // 'public/sprites/**',
-      'public/repo/katex/**',
-    ], { "base" : "./public" })
-    .pipe(gulp.dest('output/assets'));
-});
-
-
-gulp.task('embedded-package', ['embedded-webpack', 'css-ios', 'embedded-copy-asset-files']);
