@@ -77,7 +77,7 @@ exports.getGitHubToken = function(user, scope) {
 };
 
 exports.isGitHubUser = function(user) {
-  return user.indexOf('_') === -1;
+  return (user.username.indexOf('_') === -1);
 };
 
 
