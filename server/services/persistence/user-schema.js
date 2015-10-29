@@ -35,8 +35,7 @@ var UserSchema = new Schema({
     abbr: String,   // Abbreviation, like PDT (note that these are NOT globally unique)
     iana: String    // Timezone IANA description, eg `Europe/London` or `America/Los_Angeles`
   },
-  _tv: { type: 'MongooseNumber', 'default': 0 },
-  noGitHubIdentity: { type: Boolean, 'default': false }
+  _tv: { type: 'MongooseNumber', 'default': 0 }
 });
 
 UserSchema.index({ githubId: 1 }, { unique: true, sparse: true }); // TODO: does this still need to be sparse?
@@ -55,6 +54,10 @@ UserSchema.methods.getGitHubScopes = function() {
 
 UserSchema.methods.getGitHubToken = function(scope) {
   return userScopes.getGitHubToken(this, scope);
+};
+
+UserSchema.methods.isGitHubUser = function() {
+  return userScopes.isGitHubUser(this);
 };
 
 UserSchema.methods.isMissingTokens = function() {

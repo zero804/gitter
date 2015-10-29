@@ -76,13 +76,15 @@ exports.getGitHubToken = function(user, scope) {
   return user.githubToken || user.githubUserToken;
 };
 
+exports.isGitHubUser = function(user) {
+  return user.indexOf('_') === -1;
+};
+
 
 exports.isMissingTokens = function(user) {
+  // TODO: replace this with something more "provider-aware"
   // non-github users cannot miss their github tokens
-  // TODO: this should probably check all your providers, because if you are a
-  // Google user and you are missing your google token, then you're missing
-  // your tokens, no?
-  if (user.noGitHubIdentity) return false;
+  if (!user.isGitHubUser()) return false;
   return !user.githubToken && !user.githubUserToken;
 };
 

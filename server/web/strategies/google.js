@@ -13,7 +13,6 @@ function googleOauth2Callback(req, accessToken, refreshToken, params, profile, d
     username: profile.id+'_google',
     displayName: profile.displayName,
     emails: [profile.emails.map(function(obj) {return obj.value})],
-    noGitHubIdentity: true,
     googleId: profile.id,
     gravatarImageUrl: avatar
   };
