@@ -4,14 +4,16 @@
 var path                     = require("path");
 var _                        = require('lodash');
 var mainWebpackConfig        = require('./webpack.config');
+var DedupePlugin             = require('webpack/lib/optimize/DedupePlugin');
 
 var mobileConfig = _.extend({}, mainWebpackConfig);
 
-// R
 mobileConfig.entry = {
   "mobile-native-embedded-chat": path.resolve(path.join(__dirname, "./mobile-native-embedded-chat")),
-  "mobile-native-userhome": path.resolve(path.join(__dirname, "./mobile-native-userhome")),
   vendor: mainWebpackConfig.entry.vendor
 };
+
+mobileConfig.plugins = mobileConfig.plugins.slice();
+mobileConfig.plugins.push(new DedupePlugin());
 
 module.exports = mobileConfig;

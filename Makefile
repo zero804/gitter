@@ -72,12 +72,9 @@ embedded-chat: clean
 	mkdir -p output/embedded/www/mobile
 	NODE_ENV=prod ./build-scripts/render-embedded-chat.js  -o output/embedded/www/mobile/embedded-chat.html
 	gulp embedded-package
-	ls output/assets/js/*  >> output/embedded-resources.txt
-	ls output/assets/styles/*  >> output/embedded-resources.txt
+	ls output/assets/js/*.js  >> output/embedded-resources.txt
+	ls output/assets/styles/*.css  >> output/embedded-resources.txt
 
-	# echo output/assets/js/vendor.js > output/embedded-resources.txt
-	# echo output/assets/js/mobile-native-embedded-chat.js >> output/embedded-resources.txt
-	# echo output/assets/styles/mobile-native-chat.css >> output/embedded-resources.txt
 	ls output/assets/images/emoji/*  >> output/embedded-resources.txt
 
 	./build-scripts/extract-urls.js output/assets/styles/mobile-native-chat.css >> output/embedded-resources.txt
