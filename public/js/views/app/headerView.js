@@ -9,8 +9,8 @@ var notifications            = require('components/notifications');
 var Dropdown                 = require('views/controls/dropdown');
 var appEvents                = require('utils/appevents');
 var headerViewTemplate       = require('./tmpl/headerViewTemplate.hbs');
-var resolveRoomAvatarUrl     = require('gitter-web-shared/avatars/resolve-room-avatar-url');
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
+var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 
 require('views/behaviors/tooltip');
 
@@ -69,7 +69,7 @@ module.exports = Marionette.ItemView.extend({
       troupeName:      data.name,
       troupeFavourite: !!data.favourite,
       troupeTopic:     data.topic,
-      avatarUrl:       resolveRoomAvatarUrl(data.url),
+      avatarSrcSet:    resolveRoomAvatarSrcSet(data.url, 48),
       user:            !!context.isLoggedIn(),
       archives:        this.options.archives,
       oneToOne:        (data.githubType === 'ONETOONE'),
