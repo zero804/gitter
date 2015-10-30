@@ -158,18 +158,24 @@ var userService = {
     // TODO: should we assert all the required user and identity fields?
 
     var userQuery = {
-      identities: [{
-        provider: identityData.provider,
-        providerKey: identityData.providerKey
-      }]
+      identities: {
+        $elemMatch: {
+          provider: identityData.provider,
+          providerKey: identityData.providerKey
+        }
+      }
     };
 
     var user;
     var isNewUser;
+    var userInsertData = _.extend({
+      identities: [{
+          provider: identityData.provider,
+          providerKey: identityData.providerKey
+        }]
+    }, userData);
     return mongooseUtils.upsert(persistence.User, userQuery, {
-        $setOnInsert: _.extend({
-          identities: userQuery.identities
-        }, userData)
+        $setOnInsert: userInsertData
       })
       .spread(function(_user, _isNewUser) {
         user = _user;
@@ -178,13 +184,14 @@ var userService = {
           provider: identityData.provider,
           userId: user._id
         };
+        var identitySetData = _.extend({
+          userId: user._id
+        }, identityData);
         return mongooseUtils.upsert(persistence.Identity, identityQuery, {
           // NOTE: set the identity fields regardless, because the tokens and
           // things could be newer than what we have if this is a login and
           // not a signup.
-          $set: _.extend({
-            userId: user._id
-          }, identityData)
+          $set: identitySetData
         });
       })
       .spread(function() {

@@ -18,7 +18,7 @@ function googleOauth2Callback(req, accessToken, refreshToken, params, profile, d
     gravatarImageUrl: avatar
   };
   var googleIdentity = {
-    provider: profile.privider, // 'google'
+    provider: 'google',
     providerKey: profile.id,
     displayName: profile.displayName,
     accessToken: accessToken,
