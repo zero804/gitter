@@ -1,13 +1,13 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-// var sechash                   = require('sechash');
-var winston                   = require('../utils/winston');
 var assert                    = require('assert');
-var persistence               = require("./persistence-service");
-var uriLookupService          = require('./uri-lookup-service');
+var _                         = require('underscore');
 var Q                         = require('q');
 var githubUserService         = require('gitter-web-github').GitHubUserService;
+var persistence               = require("./persistence-service");
+var uriLookupService          = require('./uri-lookup-service');
+var winston                   = require('../utils/winston');
 var mongooseUtils             = require('../utils/mongoose-utils');
 var extractGravatarVersion    = require('../utils/extract-gravatar-version');
 
@@ -139,29 +139,59 @@ var userService = {
       .nodeify(callback);
   },
 
-  findOrCreateUserForGoogleId: function(userData, identityData) {
+
+  /**
+   * Add the user if one doesn't exist for this identity and set the data for
+   * that provider for the user whether the user is new or not.
+   * @return promise of [user, isNewIdentity]
+   */
+  findOrCreateUserForProvider: function(userData, identityData) {
     winston.info("Locating or creating user", {
       userData: userData,
       identityData: identityData
     });
 
-    // should I assert all the required user and identity fields?
+    // This is not for GitHub. Only for newer providers. At least until we
+    // finally migrate all the github data one day.
+    assert.notEqual(identityData.provider, 'github');
 
-    var userQuery = { googleId: userData.googleId };
-    var upsertOptions = { upsert: true, new: true };
-    return persistence.User.findOneAndUpdate(userQuery, userData, upsertOptions)
-      .exec()
-      .then(function(user) {
-        identityData.userId = user._id;
-        var identityQuery = { provider: identityData.provider, userId: user._id };
-        return persistence.Identity.findOneAndUpdate(identityQuery, identityData, upsertOptions)
-          .exec()
-          .then(function(identity) {
+    // TODO: should we assert all the required user and identity fields?
 
-            // TODO: do I need this?
-            // return uriLookupService.reserveUriForUsername(user._id, user.username).thenResolve(user);
-            return [user, identity];
-          });
+    var userQuery = {
+      identities: [{
+        provider: identityData.provider,
+        providerKey: identityData.providerKey
+      }]
+    };
+
+    var user;
+    var isNewUser;
+    return mongooseUtils.upsert(persistence.User, userQuery, {
+        $setOnInsert: _.extend({
+          identities: userQuery.identities
+        }, userData)
+      })
+      .spread(function(_user, _isNewUser) {
+        user = _user;
+        isNewUser = _isNewUser;
+        var identityQuery = {
+          provider: identityData.provider,
+          userId: user._id
+        };
+        return mongooseUtils.upsert(persistence.Identity, identityQuery, {
+          // NOTE: set the identity fields regardless, because the tokens and
+          // things could be newer than what we have if this is a login and
+          // not a signup.
+          $set: _.extend({
+            userId: user._id
+          }, identityData)
+        });
+      })
+      .spread(function() {
+        return uriLookupService.reserveUriForUsername(user._id, user.username)
+      })
+      .then(function() {
+        return [user, isNewUser];
       });
   },
 

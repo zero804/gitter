@@ -6,7 +6,7 @@ var Schema         = mongoose.Schema;
 
 var IdentitySchema = new Schema({
   provider: { type: String },
-  id: { type: Number },
+  providerKey: { type: String },
   username: { type: String },
   displayName: { type: String },
   accessToken: { type: String },
@@ -17,7 +17,7 @@ var IdentitySchema = new Schema({
 IdentitySchema.schemaTypeName = 'IdentitySchema';
 
 IdentitySchema.index({ userId: 1, provider: 1 }, { unique: true });
-IdentitySchema.index({ provider: 1, id: 1 }, { unique: true });
+IdentitySchema.index({ provider: 1, providerKey: 1 }, { unique: true });
 IdentitySchema.index({ provider: 1, username: 1 }, { unique: true });
 
 module.exports = {
