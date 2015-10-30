@@ -2,9 +2,11 @@
 
 var mongoose       = require('../../utils/mongoose-q');
 var Schema         = mongoose.Schema;
+var ObjectId       = Schema.ObjectId;
 
 
 var IdentitySchema = new Schema({
+  userId: { type: ObjectId },
   provider: { type: String },
   providerKey: { type: String },
   username: { type: String },
