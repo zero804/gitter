@@ -3,8 +3,11 @@
 var env = require('gitter-web-env');
 var config = env.config;
 
+var Q = require('q');
 var GoogleStrategy = require('passport-google-oauth2').Strategy;
 var userService = require('../../services/user-service');
+var trackSignupOrLogin = require('../../utils/track-signup-or-login');
+var updateUserLocale = require('../../utils/update-user-locale');
 
 function googleOauth2Callback(req, accessToken, refreshToken, params, profile, done) {
   var avatar = profile.photos[0].value; // is this always set?
@@ -12,28 +15,37 @@ function googleOauth2Callback(req, accessToken, refreshToken, params, profile, d
   var googleUser = {
     username: profile.id+'_google',
     displayName: profile.displayName,
-    emails: [profile.emails.map(function(obj) {return obj.value})],
-    googleId: profile.id,
     gravatarImageUrl: avatar
   };
   var googleIdentity = {
     provider: profile.privider, // 'google'
-    id: profile.id,
+    providerKey: profile.id,
     displayName: profile.displayName,
     accessToken: accessToken,
     refreshToken: refreshToken, // doesn't look like google returns this
     avatar: avatar
   };
-  return userService.findOrCreateUserForGoogleId(googleUser, googleIdentity)
-    .spread(function(user, identity) {
-      req.logIn(user, function(err) {
-        if (err) { return done(err); }
+  var user;
+  return userService.findOrCreateUserForProvider(googleUser, googleIdentity)
+    .spread(function(_user, isNewUser) {
+      user = _user;
 
-        // Remove the old token for this user
-        // TODO: this is duplicated code
-        req.accessToken = null;
-        return done(null, user);
+      trackSignupOrLogin(req, user, isNewUser);
+      updateUserLocale(req, user);
+
+      // blegh
+      var deferred = Q.defer();
+      req.logIn(user, function(err) {
+        if (err) {
+          deferred.reject(err);
+        } else {
+          deferred.resolve();
+        }
       });
+      return deferred.promise;
+    })
+    .then(function() {
+      done(null, user);
     })
     .catch(done);
 }
