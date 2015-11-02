@@ -8,12 +8,8 @@ module.exports = function redirectAfterLogin(req, res) {
   }
 
   if (req.session && req.session.returnTo) {
-    if (req.session.returnTo.indexOf('callback') == -1) {
-      res.redirect(req.session.returnTo);
-      return;
-    } else {
-      delete req.session.returnTo;
-    }
+    res.redirect(req.session.returnTo);
+    return;
   }
 
   var user = req.user;
