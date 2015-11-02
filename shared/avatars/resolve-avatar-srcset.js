@@ -20,8 +20,14 @@ module.exports = function (spec) {
   var version = spec.version;
 
   var base = BASE + hash(username) + GITHUB_URL + username + '?' + (version ? 'v=' + version + '&' : '');
+  var srcSize = size;
+  if (typeof window !== 'undefined') {
+    // fallback for retina displays without srcset support (e.g native android webviews)
+    srcSize = size * (window.devicePixelRatio || 1);
+  }
+
   return {
-    src: base + 's=' + size,
+    src: base + 's=' + srcSize,
     size: size,
     srcset: base + 's=' + (size * 2) + ' 2x'
   };
