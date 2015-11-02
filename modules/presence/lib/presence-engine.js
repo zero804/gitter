@@ -12,6 +12,7 @@ var uniqueIds = require('mongodb-unique-ids');
 var fs = require('fs');
 var path = require('path');
 var Promise = require('bluebird');
+var _ = require('lodash');
 
 function createClient() {
   return env.ioredis.createClient(null, {
@@ -30,7 +31,7 @@ function defineCommand(name, script, keys) {
 
 defineCommand('presenceAssociateAnon', 'presence-associate-anon', 3);
 defineCommand('presenceAssociate', 'presence-associate', 6);
-defineCommand('presenceCategorizeUsers', 'presence-categorize-users', 3);
+defineCommand('presenceCategorizeUsers', 'presence-categorize-users', 4);
 defineCommand('presenceDisassociateAnon', 'presence-disassociate-anon', 3);
 defineCommand('presenceDisassociate', 'presence-disassociate', 7);
 defineCommand('presenceEyeballsOff', 'presence-eyeballs-off', 3);
@@ -403,11 +404,18 @@ function categorizeUsersByOnlineStatus(userIds, callback) {
   var key_working_output_set = key_working_set + '_out';
 
   // TODO: switch this out for a pipeline command to make it lock less
-  return redisClient.presenceCategorizeUsers(key_working_set, key_working_output_set, ACTIVE_USERS_KEY, userIds)
-    .then(function(onlineUsers) {
+  return redisClient.presenceCategorizeUsers(key_working_set, key_working_output_set, ACTIVE_USERS_KEY, MOBILE_USERS_KEY, userIds)
+    .spread(function(onlineUsers, mobileUsers) {
       var result = {};
+
+      if (mobileUsers) {
+        _.each(mobileUsers, function(userId) {
+          result[userId] = 'mobile';
+        });
+      }
+
       if(onlineUsers) {
-        onlineUsers.forEach(function(userId) {
+        _.each(onlineUsers, function(userId) {
           result[userId] = 'online';
         });
       }

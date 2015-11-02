@@ -5,11 +5,15 @@ var presenceService = require('gitter-web-presence');
 var collections = require('../utils/collections');
 var pushNotificationService = require('./push-notification-service');
 var pushNotificationFilter = require('gitter-web-push-notification-filter');
+var _ = require('lodash');
 
 var STATUS_INROOM = 'inroom';
 var STATUS_ONLINE = 'online';
+var STATUS_MOBILE = 'mobile';
 var STATUS_PUSH = 'push';
-var STATUS_PUSH_NOTIFIED = 'push_notified'; // Has already been notified
+var STATUS_PUSH_CONNECTED = 'push_connected';
+var STATUS_PUSH_NOTIFIED = 'push_notified';
+var STATUS_PUSH_NOTIFIED_CONNECTED = 'push_notified_connected';
 
 /*
  * Categorize users in a room by their notification status, returns a value
@@ -18,8 +22,11 @@ var STATUS_PUSH_NOTIFIED = 'push_notified'; // Has already been notified
  * values can be:
  *  - inroom: currently in the room
  *  - online: currently online
+ *  - mobile: currently online on mobile, without push notifications
  *  - push: awaiting a push notification
+ *  - push_connected:  similar to push, but user is connected via bayeux
  *  - push_notified: already used up all their push notifications. Only push for mentions
+ *  - push_notified_connected: similar to push_notified, but user is connected via bayeux
  *  - <doesnotexist>: user is offline, nothing more to do
  */
 module.exports = function (roomId, userIds) {
@@ -32,25 +39,32 @@ module.exports = function (roomId, userIds) {
     var inRoomHash = collections.hashArray(userIdsInRoom);
 
     var result = {};
-    var offlineUsers = [];
+    var mobileAndOffline = [];
 
-    userIds.forEach(function(userId) {
+    _.each(userIds, function(userId) {
       if (inRoomHash[userId]) {
         result[userId] = STATUS_INROOM;
       } else {
-        if (onlineStatus[userId] === 'online') {
-          result[userId] = STATUS_ONLINE;
-        } else {
-          offlineUsers.push(userId);
+        var status = onlineStatus[userId];
+        switch(status) {
+          case 'online':
+            result[userId] = STATUS_ONLINE;
+            break;
+          case 'mobile':
+            result[userId] = STATUS_MOBILE;
+            mobileAndOffline.push(userId);
+            break;
+          default:
+            mobileAndOffline.push(userId);
         }
       }
     });
 
-    if (!offlineUsers.length) {
+    if (!mobileAndOffline.length) {
       return result;
     }
 
-    return pushNotificationService.findUsersWithDevices(offlineUsers)
+    return pushNotificationService.findUsersWithDevices(mobileAndOffline)
       .then(function(withDevices) {
         if (!withDevices.length) {
           /* No devices with push... */
@@ -59,14 +73,21 @@ module.exports = function (roomId, userIds) {
 
         return pushNotificationFilter.findUsersInRoomAcceptingNotifications(roomId, withDevices)
           .then(function(usersWithDevicesAcceptingNotifications) {
-            usersWithDevicesAcceptingNotifications.forEach(function(userId) {
-              result[userId] = STATUS_PUSH;
+            _.each(usersWithDevicesAcceptingNotifications, function(userId) {
+              if (result[userId] === STATUS_MOBILE) {
+                result[userId] = STATUS_PUSH_CONNECTED;
+              } else {
+                result[userId] = STATUS_PUSH;
+              }
             });
 
-            withDevices.forEach(function(userId) {
-              if (!result[userId]) {
+            _.each(withDevices, function(userId) {
+              var status = result[userId]
+              if (!status) {
                 // If the user is not STATUS_PUSH, they should be STATUS_PUSH_NOTIFIED
                 result[userId] = STATUS_PUSH_NOTIFIED;
+              } else if (status === STATUS_MOBILE) {
+                result[userId] = STATUS_PUSH_NOTIFIED_CONNECTED;
               }
             });
 
