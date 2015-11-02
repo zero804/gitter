@@ -1283,9 +1283,9 @@
       }
     },
     "gitter-markdown-processor": {
-      "version": "9.0.0",
-      "from": "http://beta-internal:4873/gitter-markdown-processor/-/gitter-markdown-processor-9.0.0.tgz",
-      "resolved": "http://beta-internal:4873/gitter-markdown-processor/-/gitter-markdown-processor-9.0.0.tgz",
+      "version": "11.0.1",
+      "from": "gitter-markdown-processor@11.0.1",
+      "resolved": "http://beta-internal:4873/gitter-markdown-processor/-/gitter-markdown-processor-11.0.1.tgz",
       "dependencies": {
         "gitter-marked": {
           "version": "0.9.0",
@@ -1303,9 +1303,9 @@
           "resolved": "http://beta-internal:4873/htmlencode/-/htmlencode-0.0.4.tgz"
         },
         "katex": {
-          "version": "0.4.3",
-          "from": "http://beta-internal:4873/katex/-/katex-0.4.3.tgz",
-          "resolved": "http://beta-internal:4873/katex/-/katex-0.4.3.tgz",
+          "version": "0.5.1",
+          "from": "http://beta-internal:4873/katex/-/katex-0.5.1.tgz",
+          "resolved": "http://beta-internal:4873/katex/-/katex-0.5.1.tgz",
           "dependencies": {
             "match-at": {
               "version": "0.1.0",
@@ -1507,6 +1507,11 @@
       "version": "1.0.0",
       "from": "modules/github",
       "resolved": "file:modules/github"
+    },
+    "gitter-web-google": {
+      "version": "1.0.0",
+      "from": "modules/google",
+      "resolved": "file:modules/google"
     },
     "gitter-web-presence": {
       "version": "1.0.0",
@@ -3150,7 +3155,7 @@
     },
     "passport-google-oauth2": {
       "version": "0.1.6",
-      "from": "passport-google-oauth2@0.1.6",
+      "from": "passport-google-oauth2@>=0.1.6 <0.2.0",
       "resolved": "http://beta-internal:4873/passport-google-oauth2/-/passport-google-oauth2-0.1.6.tgz",
       "dependencies": {
         "passport-oauth2": {
@@ -3203,12 +3208,12 @@
     },
     "passport-oauth2-client-password": {
       "version": "0.1.2",
-      "from": "http://beta-internal:4873/passport-oauth2-client-password/-/passport-oauth2-client-password-0.1.2.tgz",
+      "from": "passport-oauth2-client-password@0.1.2",
       "resolved": "http://beta-internal:4873/passport-oauth2-client-password/-/passport-oauth2-client-password-0.1.2.tgz",
       "dependencies": {
         "passport-strategy": {
           "version": "1.0.0",
-          "from": "http://beta-internal:4873/passport-strategy/-/passport-strategy-1.0.0.tgz",
+          "from": "passport-strategy@>=1.0.0 <2.0.0",
           "resolved": "http://beta-internal:4873/passport-strategy/-/passport-strategy-1.0.0.tgz"
         }
       }
