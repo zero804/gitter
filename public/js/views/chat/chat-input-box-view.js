@@ -325,7 +325,7 @@ var ChatInputBoxView = Marionette.ItemView.extend({
   },
 
   addTextareaExtensions: function() {
-    this.ui.textarea.textcomplete(typeaheads());
+    this.ui.textarea.textcomplete(typeaheads(this.collection));
     this.drafty = drafty(this.ui.textarea[0], context.troupe().get('id'));
   },
 
