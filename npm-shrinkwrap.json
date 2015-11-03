@@ -1508,11 +1508,6 @@
       "from": "modules/github",
       "resolved": "file:modules/github"
     },
-    "gitter-web-google": {
-      "version": "1.0.0",
-      "from": "modules/google",
-      "resolved": "file:modules/google"
-    },
     "gitter-web-presence": {
       "version": "1.0.0",
       "from": "modules/presence",

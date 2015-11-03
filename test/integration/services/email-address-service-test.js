@@ -76,7 +76,7 @@ function createEmailAddressService(stubData) {
     }
   };
 
-  return testRequire.withProxies('./services/email-address-service', {
+  return testRequire.withProxies('./backends/github/github-email-address-service', {
     'gitter-web-env': env,
     'gitter-web-github': {
       GitHubMeService: GitHubMeService,

@@ -10,6 +10,7 @@ var mixpanel = require('../web/mixpanelUtils');
 
 
 module.exports = function trackSignupOrLogin(req, user, isNewUser) {
+  console.log('tracking signup or login');
   if (isNewUser) {
     stats.alias(mixpanel.getMixpanelDistinctId(req.cookies), user.id, function(err) {
       if (err) logger.error('Error aliasing user:', { exception: err });
