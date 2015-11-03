@@ -40,7 +40,6 @@
     "gitter-web-cache-wrapper": "file:modules/cache-wrapper",
     "gitter-web-env": "file:modules/env",
     "gitter-web-github": "file:modules/github",
-    "gitter-web-google": "file:modules/google",
     "gitter-web-presence": "file:modules/presence",
     "gitter-web-push-notification-filter": "file:modules/push-notification-filter",
     "gitter-web-shared": "file:shared",

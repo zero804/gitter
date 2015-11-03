@@ -21,8 +21,12 @@ function googleOauth2Callback(req, accessToken, refreshToken, params, profile, d
     provider: 'google',
     providerKey: profile.id,
     displayName: profile.displayName,
+    email: profile.email,
+    // Google accessTokens only live one hour.
     accessToken: accessToken,
-    refreshToken: refreshToken, // doesn't look like google returns this
+    // Google will only give you a refreshToken if you ask for offline access
+    // and you force an approval prompt. So this will just be undefined for us.
+    refreshToken: refreshToken,
     avatar: avatar
   };
   var user;

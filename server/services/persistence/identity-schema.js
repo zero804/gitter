@@ -11,6 +11,7 @@ var IdentitySchema = new Schema({
   providerKey: { type: String },
   username: { type: String },
   displayName: { type: String },
+  email: { type: String },
   accessToken: { type: String },
   refreshToken: { type: String },
   avatar: { type: String }
@@ -21,6 +22,7 @@ IdentitySchema.schemaTypeName = 'IdentitySchema';
 IdentitySchema.index({ userId: 1, provider: 1 }, { unique: true });
 IdentitySchema.index({ provider: 1, providerKey: 1 }, { unique: true });
 IdentitySchema.index({ provider: 1, username: 1 }, { unique: true });
+IdentitySchema.index({ provider: 1, email: 1 }, { unique: true });
 
 module.exports = {
   install: function(mongooseConnection) {
