@@ -438,6 +438,9 @@ module.exports = (function() {
       this.listenTo(context.troupe(), 'change:id', function() {
         masterCollection.reset();
         this.model.set('active', false);
+        //Super hacky implementation as this will be moved
+        //JP 4/11/15
+        this.$el.find('.js-troupe-name')[0].innerHTML = context.troupe().get('name');
       });
 
     },
