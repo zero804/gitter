@@ -6,6 +6,13 @@ var targetEnv = require('targetenv');
 var DEFAULT_AVATAR_URL = 'https://avatars1.githubusercontent.com/u/0';
 var urlParser = require('../url-parser')
 
+function defaultAvatarForSize(size) {
+  return {
+    src: DEFAULT_AVATAR_URL + '?s=' + size,
+    size: size,
+    srcset: DEFAULT_AVATAR_URL + '?s=' + (size*2) + ' 2x'
+  };
+}
 
 function getAliasForSizeFromHostname(hostname) {
   // This might have to get more granular than just per-hostname in future if
@@ -29,6 +36,8 @@ function srcSetForUser(user, size) {
   // browser will just use avatarUrlSmall (if it is set by the serializer
   // strategy) without going through this again.
   var parsed = urlParser.parseUrl(user.gravatarImageUrl);
+  if (!parsed) return defaultAvatarForSize(size);
+
   parsed.query = parsed.query || {};
 
   // try and do the same hashing to pull from different subdomains
@@ -101,10 +110,6 @@ module.exports = function resolveUserAvatarSrcSet(user, size) {
   }
 
   // default: best we can do
-  return {
-    src: DEFAULT_AVATAR_URL + '?s=' + size,
-    size: size,
-    srcset: DEFAULT_AVATAR_URL + '?s=' + (size*2) + ' 2x'
-  };
+  return defaultAvatarForSize(size);
 };
 
