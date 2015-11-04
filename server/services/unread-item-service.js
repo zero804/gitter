@@ -495,18 +495,18 @@ function processResultsForNewItemWithMentions(troupeId, chatId, parsed, results,
         }
 
         if (connected) {
-            var unreadItemMessage = hasMention ? newUnreadItemWithMention : newUnreadItemNoMention;
-            appEvents.newUnreadItem(userId, troupeId, unreadItemMessage, true);
+          var unreadItemMessage = hasMention ? newUnreadItemWithMention : newUnreadItemNoMention;
+          appEvents.newUnreadItem(userId, troupeId, unreadItemMessage, true);
 
-            if(unreadCount >= 0 || mentionCount >= 0) {
-              // Notify the user
-              appEvents.troupeUnreadCountsChange({
-                userId: userId,
-                troupeId: troupeId,
-                total: unreadCount,
-                mentions: mentionCount
-              });
-            }
+          if(unreadCount >= 0 || mentionCount >= 0) {
+            // Notify the user
+            appEvents.troupeUnreadCountsChange({
+              userId: userId,
+              troupeId: troupeId,
+              total: unreadCount,
+              mentions: mentionCount
+            });
+          }
         }
 
         /* User needs a web notification */
@@ -517,14 +517,14 @@ function processResultsForNewItemWithMentions(troupeId, chatId, parsed, results,
 
         /* User needs a push notification */
         if (push) {
-            var pushNotificationQueue = hasMention ? pushCandidatesWithMention : pushCandidates;
-            pushNotificationQueue.push(userId);
+          var pushNotificationQueue = hasMention ? pushCandidatesWithMention : pushCandidates;
+          pushNotificationQueue.push(userId);
         }
 
         /* User has already received a push notification */
         if (pushNotified) {
-            if (!hasMention) return; // Only notify for mention
-            pushCandidatesWithMention.push(userId);
+          if (!hasMention) return; // Only notify for mention
+          pushCandidatesWithMention.push(userId);
         }
 
       });
