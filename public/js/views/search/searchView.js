@@ -65,6 +65,8 @@ module.exports = (function() {
     },
 
     handleSelect: function () {
+      //tell the chat input view to focus
+      appEvents.trigger('focus.request.chat');
       appEvents.trigger('track-event', 'search_result_selected');
       this.selectItem();
     }
