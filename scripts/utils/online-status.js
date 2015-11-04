@@ -19,7 +19,7 @@ userService.findByUsername(opts.username)
     return user._id;
   })
   .then(function(userId) {
-    return Q.ninvoke(presenceService, 'categorizeUsersByOnlineStatus', [userId])
+    return presenceService.categorizeUsersByOnlineStatus([userId])
       .then(function(statusHash) {
         return !!statusHash[userId];
       });

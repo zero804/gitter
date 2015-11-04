@@ -78,7 +78,6 @@ embedded-chat: clean
 	ls output/assets/images/emoji/*  >> output/embedded-resources.txt
 
 	./build-scripts/extract-urls.js output/assets/styles/mobile-native-chat.css >> output/embedded-resources.txt
-	./build-scripts/extract-urls.js output/assets/styles/mobile-native-userhome.css >> output/embedded-resources.txt
 	./build-scripts/copy-embedded-resources.sh
 
 

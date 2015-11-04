@@ -2,6 +2,7 @@
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 var context = require('utils/context');
+var isMobile = require('utils/is-mobile');
 var template = require('./tmpl/avatar.hbs');
 var UserPopoverView = require('views/people/userPopoverView');
 var widgets = require('views/behaviors/widgets');
@@ -74,6 +75,8 @@ module.exports = (function() {
     },
 
     showDetail: function(e) {
+      if (isMobile()) return;
+
       e.preventDefault();
 
       if (this.popover) return;
