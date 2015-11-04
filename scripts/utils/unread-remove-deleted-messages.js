@@ -13,7 +13,7 @@ var limit1 = qlimit(1);
 var shutdown = require('shutdown');
 var Q = require('q');
 
-require('../../server/event-listeners').install();
+// require('../../server/event-listeners').install();
 
 var opts = require("nomnom")
   .option('uri', {
