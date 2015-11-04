@@ -3,29 +3,47 @@
 // loosey goosey first order approximation
 var protocol = '([^:]+:)';
 var host = '([^/]+)';
-var pathname = '(\/[^?#]+)';
+var pathname = '(\/[^?#]*)';
 var search = '((\\?[^#]*)?)';
 var hash = '((#.*)?)';
 
 var URL_PARSE_EXPRESSION = protocol+'\/\/'+host+pathname+search+hash;
 
+function objectKeys(obj) {
+  var keys = [];
+  for (var key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      keys.push(key);
+    }
+  }
+  keys.sort();
+  return keys;
+}
+
 function parseSearch(search) {
-  // trim ? and # from the start
-  while (search && ['?', '&'].indexOf(search[0]) !== -1) {
+  // trim ?
+  if (search && search[0] == '?') {
     search = search.slice(1);
   }
 
-  if (!search) return;
+  if (!search) return undefined;
 
   var query = {};
   var terms = search.split('&');
   terms.forEach(function(term) {
+    if (!term) return;
     var termParts = term.split('=');
     // join all parts after the first = together into one just in case there
     // were multiple = characters
     query[termParts[0]] = termParts.slice(1).join('=');
   });
-  return query;
+
+  // blank keys shouldn't return an empty object
+  if (objectKeys(query).length) {
+    return query;
+  } else {
+    return undefined;
+  }
 }
 
 function parseUrl(url) {
@@ -59,11 +77,11 @@ function parseUrl(url) {
 
 function formatSearch(query) {
   var terms = [];
-  for (var key in query) {
-    if (query.hasOwnProperty(key)) {
-      terms.push(key + '=' + query[key]);
-    }
-  }
+  // add them in order
+  var keys = objectKeys(query);
+  keys.forEach(function(key) {
+    terms.push(key + '=' + query[key]);
+  });
   return terms.join('&');
 }
 
