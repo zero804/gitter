@@ -9,6 +9,8 @@
 @import "../repo/katex/katex";
 @import "../repo/katex/fonts";
 
+@import (reference) "../../../less/colors.less";
+
 @chat-spacing: 0.2em;
 
 .trpChatContainer .isViewers:last-child .chat-item__details {
@@ -17,6 +19,7 @@
 
 .chat-container .chat-item:last-child {
   padding-bottom: @chat-spacing*2;
+  clear: both;
 }
 
 .chat-item {
@@ -167,6 +170,7 @@ body.mobile .chat-item__actions {
   padding-left: 32px;
   transition-delay: 2s;
   transition: 2s border linear, 3s background-color linear;
+  clear: both;
   &.syncerror {
     background-color: #edb2bd;
   }
@@ -367,4 +371,21 @@ body.mobile .chat-item__content {
   .chat-item {
     cursor: hand
   }
+}
+
+.lastMessageSeen {
+  border-top: 1px solid @homepage-green;
+}
+
+
+.lastMessageSeen::before {
+  content: "New messages";
+  font-size: 10px;
+  background: white;
+  color: @homepage-green;
+  position: relative;
+  float: right;
+  top: -11px;
+  padding: 0 5px;
+  text-transform: uppercase;
 }
