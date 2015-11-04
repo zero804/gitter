@@ -565,7 +565,7 @@ function processResultsForNewItemWithMentions(troupeId, chatId, parsed, results,
             case 'mobile':
             case 'push_connected':
             case 'push_notified_connected':
-          appEvents.newLurkActivity({ userId: activityOnlyUserId, troupeId: troupeId });
+              appEvents.newLurkActivity({ userId: activityOnlyUserId, troupeId: troupeId });
           }
         }
       }
