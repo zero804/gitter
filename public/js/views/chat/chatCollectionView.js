@@ -204,8 +204,6 @@ module.exports = (function() {
           var isAfter = chat.get('sent').isAfter(lastAccess);
 
           if (isAfter) {
-            //var view = this.children.findByModel(chat);
-            //if (view) view.highlight();
             chat.set('lastMessageSeen', true);
             return true;
           }

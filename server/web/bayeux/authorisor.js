@@ -76,7 +76,12 @@ function validateUserForSubTroupeSubscription(options) {
         .then(function() {
           // Update the lastAccessTime for the room
           if(userId) {
-            return recentRoomService.saveLastVisitedTroupeforUserId(userId, troupeId);
+            return new Promise(function(resolve) {
+              function delayedLastAccessUpdate() {
+                resolve(recentRoomService.saveLastVisitedTroupeforUserId(userId, troupeId));
+              }
+              setTimeout(delayedLastAccessUpdate, 1000);
+            });
           }
         })
         .catch(function(err) {
