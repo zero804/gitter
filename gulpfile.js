@@ -293,8 +293,7 @@ gulp.task('copy-asset-files', function() {
 
 gulp.task('css-ios', function () {
   return gulp.src([
-    'public/less/mobile-native-chat.less',
-    'public/less/mobile-native-userhome.less'
+    'public/less/mobile-native-chat.less'
     ])
     .pipe(gulpif(DEV_MODE, sourcemaps.init()))
     .pipe(less({
@@ -319,7 +318,8 @@ gulp.task('css-mobile', function () {
   return gulp.src([
     'public/less/mobile-app.less',
     'public/less/mobile-nli-app.less',
-    'public/less/mobile-userhome.less'
+    'public/less/mobile-userhome.less',
+    'public/less/mobile-native-userhome.less'
     ])
     .pipe(gulpif(DEV_MODE, sourcemaps.init()))
     .pipe(less({

@@ -24,8 +24,15 @@ module.exports = function (url, size) {
     };
   }
 
+
+  var srcSize = size;
+  if (typeof window !== 'undefined') {
+    // fallback for retina displays without srcset support (e.g native android webviews)
+    srcSize = size * (window.devicePixelRatio || 1);
+  }
+
   return {
-    src: BASE_URL + base + '?s=' + size,
+    src: BASE_URL + base + '?s=' + srcSize,
     srcset: BASE_URL + base + '?s=' + (size * 2) + ' 2x',
     size: size
   };
