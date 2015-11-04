@@ -19,6 +19,7 @@
 
 .chat-container .chat-item:last-child {
   padding-bottom: @chat-spacing*2;
+  clear: both;
 }
 
 .chat-item {
@@ -169,6 +170,7 @@ body.mobile .chat-item__actions {
   padding-left: 32px;
   transition-delay: 2s;
   transition: 2s border linear, 3s background-color linear;
+  clear: both;
   &.syncerror {
     background-color: #edb2bd;
   }
@@ -379,11 +381,11 @@ body.mobile .chat-item__content {
 .lastMessageSeen::before {
   content: "New messages";
   font-size: 10px;
-  border-radius: 4px 4px 0px 0px;
-  background: @homepage-green;
-  color: white;
+  background: white;
+  color: @homepage-green;
   position: relative;
-  left: 50%;
-  top: -22px;
-  padding: 2px 5px;
+  float: right;
+  top: -11px;
+  padding: 0 5px;
+  text-transform: uppercase;
 }
