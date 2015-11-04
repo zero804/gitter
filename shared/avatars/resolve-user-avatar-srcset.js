@@ -93,11 +93,18 @@ function srcSetForUser(user, size) {
 
   var attr = getAliasForSizeFromHostname(parsed.hostname);
 
-  parsed.query[attr] = size;
+  var srcSize = size;
+  if (typeof window !== 'undefined') {
+    // fallback for retina displays without srcset support (e.g native android webviews)
+    srcSize = size * (window.devicePixelRatio || 1);
+  }
+
+  parsed.query[attr] = srcSize;
   var src = formatUrl(parsed);
 
   parsed.query[attr] = size*2;
   var srcset = formatUrl(parsed) + ' 2x';
+
 
   return {
     src: src,
