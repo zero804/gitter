@@ -113,6 +113,7 @@ function createExpectedFixtures(expected, done) {
     var confirmationCode = f.confirmationCode === true ? "confirm" + Math.random() : f.confirmationCode;
 
     return persistence.User.create({
+      identities:       f.identities,
       email:            f.email       || generateEmail(),
       displayName:      f.displayName || generateName(),
       githubId:         f.githubId    || generateGithubId(),
