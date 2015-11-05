@@ -4,7 +4,7 @@ var _ = require('underscore');
 var hash = require('./hash-avatar-to-cdn');
 var targetEnv = require('targetenv');
 var DEFAULT_AVATAR_URL = 'https://avatars1.githubusercontent.com/u/0';
-var urlParser = require('../url-parser')
+var parse = require('url-parse');
 
 function defaultAvatarForSize(size) {
   return {
@@ -35,17 +35,15 @@ function srcSetForUser(user, size) {
   // NOTE: url parsing should only happen server-side because client-side the
   // browser will just use avatarUrlSmall (if it is set by the serializer
   // strategy) without going through this again.
-  var parsed = urlParser.parseUrl(user.gravatarImageUrl);
-  if (!parsed) return defaultAvatarForSize(size);
-
-  parsed.query = parsed.query || {};
+  var url = parse(user.gravatarImageUrl, true);
+  if (!url) return defaultAvatarForSize(size);
 
   // try and do the same hashing to pull from different subdomains
-  if (parsed.hostname.indexOf('github') !== -1 && user.username) {
-    parsed.hostname = 'avatars' + hash(user.username) + '.githubusercontent.com';
+  if (url.hostname.indexOf('github') !== -1 && user.username) {
+    url.set('hostname', 'avatars' + hash(user.username) + '.githubusercontent.com');
   }
 
-  var attr = getAliasForSizeFromHostname(parsed.hostname);
+  var attr = getAliasForSizeFromHostname(url.hostname);
 
   var srcSize = size;
   if (typeof window !== 'undefined') {
@@ -53,11 +51,11 @@ function srcSetForUser(user, size) {
     srcSize = size * (window.devicePixelRatio || 1);
   }
 
-  parsed.query[attr] = srcSize;
-  var src = urlParser.formatUrl(parsed);
+  url.query[attr] = srcSize;
+  var src = url.toString();
 
-  parsed.query[attr] = size*2;
-  var srcset = urlParser.formatUrl(parsed) + ' 2x';
+  url.query[attr] = size*2;
+  var srcset = url.toString() + ' 2x';
 
 
   return {

@@ -12,7 +12,7 @@ describe('user avatar url generator', function() {
         gravatarImageUrl: 'https://avatars.githubusercontent.com/u/69737?v=3'
       };
       var result = resolveUserAvatarUrl(user, 40);
-      assert.equal(result, 'https://avatars1.githubusercontent.com/u/69737?s=40&v=3');
+      assert.equal(result, 'https://avatars1.githubusercontent.com/u/69737?v=3&s=40');
     });
 
     it('should return a google url for a google gravatarImageUrl', function() {
