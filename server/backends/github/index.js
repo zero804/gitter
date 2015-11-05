@@ -2,8 +2,13 @@
 
 var GitHubEmailAddressService = require('./github-email-address-service');
 
-module.exports = {
-  getEmailAddress: function getEmailAddress(user, preferStoredEmail) {
-    return GitHubEmailAddressService(user, preferStoredEmail);
-  }
+function GitHubBackend(user, identity) {
+  this.user = user;
+  this.identity = identity;
+}
+
+GitHubBackend.prototype.getEmailAddress = function(preferStoredEmail) {
+  return GitHubEmailAddressService(this.user, preferStoredEmail);
 };
+
+module.exports = GitHubBackend;

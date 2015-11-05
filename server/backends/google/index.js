@@ -1,9 +1,14 @@
 'use strict';
 
-var GoogleEmailAddressService = require('./google-email-address-service');
+var Q = require('q');
 
-module.exports = {
-  getEmailAddress: function getEmailAddress(user, preferStoredEmail) {
-    return GoogleEmailAddressService(user, preferStoredEmail);
-  }
+function GoogleBackend(user, identity) {
+  this.user = user;
+  this.identity = identity;
+}
+
+GoogleBackend.prototype.getEmailAddress = function(preferStoredEmail) {
+  return Q.resolve(this.identity.email);
 };
+
+module.exports = GoogleBackend;
