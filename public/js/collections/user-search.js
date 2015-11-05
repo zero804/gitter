@@ -11,7 +11,9 @@ var UserSearchCollection = Backbone.Collection.extend({
   url: '/v1/user',
   model: UserSearchModel,
   parse: function (response) {
-    return response.results;
+    return (response.results && !!response.results.length) ?
+      response.results :
+      [];
   },
   sync: SyncMixin.sync
 });
