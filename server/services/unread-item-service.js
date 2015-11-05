@@ -18,8 +18,10 @@ var Q                = require('q');
 var roomMembershipService = require('./room-membership-service');
 var uniqueIds        = require('mongodb-unique-ids');
 var debug            = require('debug')('gitter:unread-item-service');
-
+var recentRoomService = require('./recent-room-service');
 var badgeBatcher     = new RedisBatcher('badge', 1000, batchBadgeUpdates);
+var Promise          = require('q');
+var chatService      = require('./chat-service');
 
 /* Handles batching badge updates to users */
 function batchBadgeUpdates(key, userIds, done) {
@@ -551,10 +553,11 @@ function processResultsForNewItemWithMentions(troupeId, chatId, parsed, results,
         // Next, notify all the lurkers
         // Note that this can be a very long list in a big room
         var activityOnly = parsed.activityOnlyUserIds;
+
         for(var i = 0; i < activityOnly.length; i++) {
           var activityOnlyUserId =  activityOnly[i];
-          var activityOnlyUserIdOnlineStatus = presenceStatus[activityOnlyUserId];
 
+          var activityOnlyUserIdOnlineStatus = presenceStatus[activityOnlyUserId];
           /* User is connected? Send them a status update */
           switch(activityOnlyUserIdOnlineStatus) {
             case 'inroom':
@@ -688,6 +691,35 @@ function queueBadgeUpdateForUser(userIds) {
   debug("Batching badge update for %s users", len);
   badgeBatcher.add('queue', userIds);
 }
+
+exports.getActivityIndicatorForTroupeIds = function(troupeIds, userId) {
+  return recentRoomService.getTroupeLastAccessTimesForUser(userId)
+    .then(function(times) {
+      var timesMap = troupeIds.reduce(function(accum, troupeId) {
+        if (!times[troupeId]) return accum;
+
+        accum[troupeId] = times[troupeId];
+        return accum;
+      }, {});
+
+      // Use timemap to query only for troupes with times
+      var queries = Object.keys(times).map(function(troupeId) {
+        return chatService.getDateOfLastMessageInRoom(troupeId);
+      });
+
+      return Promise.all(queries)
+      .then(function(dates) {
+        var mappedDates = Object.keys(times).reduce(function(accum, troupeId, index) {
+          accum[troupeId] = dates[index] > timesMap[troupeId];
+          return accum;
+        }, {});
+
+        return mappedDates;
+      });
+    });
+
+};
+
 
 exports.listen = function() {
   badgeBatcher.listen();
