@@ -281,6 +281,7 @@ onready(function() {
 
       case 'childframe:loaded':
         appEvents.trigger('childframe:loaded');
+        roomSwitcher.setIFrameLoadingState(false);
       break;
 
       case 'permalink.requested':

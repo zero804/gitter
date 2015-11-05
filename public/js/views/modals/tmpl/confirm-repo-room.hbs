@@ -3,15 +3,7 @@
   <p><strong>Do you want to create it?</strong></p>
   <br/>
   {{#unless isOrg}}
-
-  <!-- Removed untill gitter-badger is fixed
-  <p>
-    <input class='js-add-badge' type='checkbox' checked="true" id='addBadge'/>
-    <label for='addBadge'>Add badge to README on GitHub (via pull request)
-    </label>
-  </p>
-  -->
-
+  <p><input class='js-add-badge' type='checkbox' checked="true" id='addBadge'/> <label for='addBadge'>Add badge to README on GitHub (via pull request)</label></p>
   {{/unless}}
 </div>
 <div class="modal--default__content__error" id="modal-failure" style="display:none">{{ error }}</div>

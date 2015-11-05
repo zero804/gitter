@@ -3,12 +3,11 @@
 var isMobile = require('utils/is-mobile');
 var context = require('utils/context');
 var apiClient = require('components/apiClient');
-var chatCollection = require('collections/instances/integrated-items').chats;
 var template = require('./tmpl/typeahead.hbs');
 var _ = require('underscore');
 var context = require('utils/context');
 
-function getRecentMessageSenders() {
+function getRecentMessageSenders(chatCollection) {
   var users = chatCollection.map(function(message) {
     return message.get('fromUser');
   }).filter(function(user) {
@@ -92,7 +91,7 @@ context.troupe().on('change:id', function (){
   prevResults = [];
 });
 
-module.exports = function() {
+module.exports = function(chatCollection) {
   var maxCount = isMobile() ? 3 : 10;
   return {
     match: /(^|\s)@(\/?[a-zA-Z0-9_\-]*)$/,
@@ -106,7 +105,7 @@ module.exports = function() {
         users = prevResults;
       }
 
-      users = users.concat(getRecentMessageSenders());
+      users = users.concat(getRecentMessageSenders(chatCollection));
 
       users = unique(users)
         .filter(isNotCurrentUser)
