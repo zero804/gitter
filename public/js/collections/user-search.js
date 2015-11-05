@@ -11,7 +11,10 @@ var UserSearchCollection = Backbone.Collection.extend({
   url: '/v1/user',
   model: UserSearchModel,
   parse: function (response) {
-    return response.results;
+    //If we don't get any results make sure we return an empty array
+    //this stops erroneous blank results being shown in typeaheads
+    //jp 5/11/15
+    return [].concat(response.results || []);
   },
   sync: SyncMixin.sync
 });

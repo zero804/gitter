@@ -293,8 +293,7 @@ gulp.task('copy-asset-files', function() {
 
 gulp.task('css-ios', function () {
   return gulp.src([
-    'public/less/mobile-native-chat.less',
-    'public/less/mobile-native-userhome.less'
+    'public/less/mobile-native-chat.less'
     ])
     .pipe(gulpif(DEV_MODE, sourcemaps.init()))
     .pipe(less({
@@ -319,7 +318,8 @@ gulp.task('css-mobile', function () {
   return gulp.src([
     'public/less/mobile-app.less',
     'public/less/mobile-nli-app.less',
-    'public/less/mobile-userhome.less'
+    'public/less/mobile-userhome.less',
+    'public/less/mobile-native-userhome.less'
     ])
     .pipe(gulpif(DEV_MODE, sourcemaps.init()))
     .pipe(less({
@@ -457,3 +457,24 @@ gulp.task('safe-install', shell.task([
   'npm run link',
   'npm run fix-shrinkwrap-registry'
 ]));
+
+
+/* Generate embedded native */
+gulp.task('embedded-webpack', function() {
+  return gulp.src('./public/js/webpack-mobile-native.config')
+    .pipe(webpack(require('./public/js/webpack-mobile-native.config')))
+    .pipe(gulp.dest('output/assets/js'));
+});
+
+gulp.task('embedded-copy-asset-files', function() {
+  return gulp.src([
+      'public/fonts/**',
+      'public/images/**',
+      // 'public/sprites/**',
+      'public/repo/katex/**',
+    ], { "base" : "./public" })
+    .pipe(gulp.dest('output/assets'));
+});
+
+
+gulp.task('embedded-package', ['embedded-webpack', 'css-ios', 'embedded-copy-asset-files']);

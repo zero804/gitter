@@ -195,8 +195,26 @@ module.exports = (function() {
         this.rollers.setModeLocked(false);
       });
 
-      this.listenTo(this.collection, 'collection:change', this.render, this);
+      // This uses the last message seen behaviour to show an unread line
+      // between the messages. Keeping it here for now, it wont user the
+      // lastAccessTime in the future but will behave the same wa.
+      //this.listenTo(this.collection, 'snapshot', function() {
+      //  if (!context.troupe().get('lurk')) return;
 
+      //  var lastAccess = new Date(context.troupe().get('lastAccessTime'));
+
+      //  this.collection.some(function(chat) {
+      //    var isAfter = chat.get('sent').isAfter(lastAccess);
+
+      //    if (isAfter) {
+      //      chat.set('lastMessageSeen', true);
+      //      return true;
+      //    }
+      //  }.bind(this));
+      //});
+
+
+      this.listenTo(this.collection, 'collection:change', this.render, this);
       this.listenTo(appEvents, 'command.collapse.chat', this.collapseChats);
       this.listenTo(appEvents, 'command.expand.chat', this.expandChats);
 

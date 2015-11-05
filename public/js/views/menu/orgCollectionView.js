@@ -1,10 +1,10 @@
 "use strict";
 
-var context = require('utils/context');
 var Marionette = require('backbone.marionette');
 var orgListItemTemplate = require('./tmpl/org-list-item.hbs');
 var appEvents = require('utils/appevents');
 var troupesCollections = require('collections/instances/troupes');
+var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 
 
 module.exports = (function() {
@@ -23,6 +23,12 @@ module.exports = (function() {
 
     events: {
       click: 'clicked'
+    },
+
+    serializeData: function() {
+      var data = this.model.toJSON();
+      data.roomAvatarSrcSet = resolveRoomAvatarSrcSet(data.name, 16);
+      return data;
     },
 
     clicked: function(e) {
