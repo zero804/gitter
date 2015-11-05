@@ -5,12 +5,16 @@ var persistence = require("./persistence-service");
 
 var identityService = {
   findForUser: function(user) {
+    if (user._cachedIdentities) {
+      return Q.resolve(user._cachedIdentities);
+    }
+
     return persistence.Identity.find({userId: user._id})
-      .exec();
-  },
-  getForUserAndProvider: function(user, provider) {
-    return persistence.Identity.findOne({userId: user._id, provider: provider})
-      .exec();
+      .exec()
+      .then(function(identities) {
+        user._cachedIdentities = identities;
+        return identities;
+      });
   }
 };
 

@@ -124,6 +124,22 @@ function createExpectedFixtures(expected, done) {
     });
   }
 
+  function createIdentity(fixtureName, f) {
+    debug('Creating %s', fixtureName);
+
+    return persistence.Identity.create({
+      userId: f.userId,
+      provider: f.provider,
+      providerKey: f.providerKey,
+      username: f.username,
+      displayName: f.displayName,
+      email: f.email,
+      accessToken: f.accessToken,
+      refreshToken: f.refreshToken,
+      avatar: f.avatar
+    });
+  }
+
   function bulkInsertTroupeUsers(troupeId, userIds) {
       var bulk = persistence.TroupeUser.collection.initializeUnorderedBulkOp();
 
@@ -259,6 +275,25 @@ function createExpectedFixtures(expected, done) {
     return Q.all(promises).then(function() { return fixture; });
   }
 
+  function createIdentities(fixture) {
+    var promises = Object.keys(expected).map(function(key) {
+      if (key.match(/^identity/)) {
+        var expectedIdentity = expected[key];
+
+        expectedIdentity.userId = fixture[expectedIdentity.user]._id;
+
+        return createIdentity(key, expectedIdentity)
+          .then(function(identity) {
+            fixture[key] = identity;
+          });
+      }
+
+      return null;
+    });
+
+    return Q.all(promises).then(function() { return fixture; });
+  }
+
   function createTroupes(fixture) {
     var promises = Object.keys(expected).map(function(key) {
 
@@ -333,6 +368,7 @@ function createExpectedFixtures(expected, done) {
   }
 
   return createUsers(createBaseFixture())
+    .then(createIdentities)
     .then(createTroupes)
     .then(createInvites)
     .then(createMessages)
