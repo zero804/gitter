@@ -24,7 +24,7 @@ describe('url parser', function() {
 
   it('returns a blank query when there is none', function() {
     var parsed = urlParser.parseUrl('https://gitter.im/');
-    assert.equal(parsed.query, undefined);
+    assert.deepEqual(parsed.query, {});
   });
 
   it('formats the modified query string', function() {
@@ -52,11 +52,11 @@ describe('url parser', function() {
     assert.equal(urlParser.formatUrl(parsed), 'https://gitter.im/?a=1');
 
     var parsed = urlParser.parseUrl('https://gitter.im/?');
-    assert.equal(parsed.query, undefined);
+    assert.deepEqual(parsed.query, {});
     assert.equal(urlParser.formatUrl(parsed), 'https://gitter.im/');
 
     var parsed = urlParser.parseUrl('https://gitter.im/?&');
-    assert.equal(parsed.query, undefined);
+    assert.deepEqual(parsed.query, {});
     assert.equal(urlParser.formatUrl(parsed), 'https://gitter.im/');
   });
 });

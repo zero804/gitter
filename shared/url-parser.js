@@ -16,24 +16,24 @@ function parseSearch(search) {
     search = search.slice(1);
   }
 
-  if (!search) return undefined;
+  if (!search) return {};
 
   var query = {};
   var terms = search.split('&');
-  terms.forEach(function(term) {
-    if (!term) return;
-    var termParts = term.split('=');
-    // join all parts after the first = together into one just in case there
-    // were multiple = characters
-    query[termParts[0]] = termParts.slice(1).join('=');
-  });
-
-  // blank keys shouldn't return an empty object
-  if (Object.keys(query).length) {
-    return query;
-  } else {
-    return undefined;
+  for (var i = 0; i < terms.length; i++) {
+    var pair = terms[i];
+    if (!pair) {
+      continue;
+    }
+    var eqIndex = pair.indexOf('=');
+    if (eqIndex < 0) {
+      query[pair] = '';
+    } else {
+      query[pair.substr(0, eqIndex)] = pair.substr(eqIndex + 1);
+    }
   }
+
+  return query;
 }
 
 function parseUrl(url) {
@@ -78,10 +78,16 @@ function formatSearch(query) {
 
 function formatUrl(opts) {
   var url = opts.protocol + '//' + opts.hostname;
-  if (opts.port) url = url + ':' + opts.port;
+  if (opts.port) {
+    url = url + ':' + opts.port;
+  }
   url = url + opts.pathname;
-  if (opts.query) url = url + '?' + formatSearch(opts.query);
-  if (opts.hash) url = url + opts.hash;
+  if (opts.query && Object.keys(opts.query).length) {
+    url = url + '?' + formatSearch(opts.query);
+  }
+  if (opts.hash) {
+    url = url + opts.hash;
+  }
   return url;
 }
 
