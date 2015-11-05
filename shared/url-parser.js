@@ -9,16 +9,6 @@ var hash = '((#.*)?)';
 
 var URL_PARSE_EXPRESSION = protocol+'\/\/'+host+pathname+search+hash;
 
-function objectKeys(obj) {
-  var keys = [];
-  for (var key in obj) {
-    if (obj.hasOwnProperty(key)) {
-      keys.push(key);
-    }
-  }
-  keys.sort();
-  return keys;
-}
 
 function parseSearch(search) {
   // trim ?
@@ -39,7 +29,7 @@ function parseSearch(search) {
   });
 
   // blank keys shouldn't return an empty object
-  if (objectKeys(query).length) {
+  if (Object.keys(query).length) {
     return query;
   } else {
     return undefined;
@@ -78,7 +68,8 @@ function parseUrl(url) {
 function formatSearch(query) {
   var terms = [];
   // add them in order
-  var keys = objectKeys(query);
+  var keys = Object.keys(query);
+  keys.sort();
   keys.forEach(function(key) {
     terms.push(key + '=' + query[key]);
   });
