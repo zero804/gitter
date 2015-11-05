@@ -42,7 +42,7 @@ function format(options) {
 
   ['href', 'protocol', 'hostname', 'search', 'hash', 'pathname'].forEach(function(key) {
     if (options.hasOwnProperty(key) && options[key] !== undefined) {
-      if(options[key] === "") return;
+      if((key === 'protocol' || key === 'hostname') && options[key] === "") return;
       parser[key] = options[key];
     }
   });
