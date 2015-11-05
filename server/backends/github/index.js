@@ -1,6 +1,6 @@
 'use strict';
 
-var GitHubEmailAddressService = require('./github-email-address-service');
+var gitHubEmailAddressService = require('./github-email-address-service');
 
 function GitHubBackend(user, identity) {
   this.user = user;
@@ -8,7 +8,7 @@ function GitHubBackend(user, identity) {
 }
 
 GitHubBackend.prototype.getEmailAddress = function(preferStoredEmail) {
-  return GitHubEmailAddressService(this.user, preferStoredEmail);
+  return gitHubEmailAddressService(this.user, preferStoredEmail);
 };
 
 module.exports = GitHubBackend;
