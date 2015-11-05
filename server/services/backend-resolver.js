@@ -2,6 +2,7 @@
 
 var Q = require('q');
 var userScopes = require('../utils/models/user-scopes');
+var identityService = require('./identity-service');
 
 var registeredBackends = {
   google: require('../backends/google'),
@@ -9,80 +10,87 @@ var registeredBackends = {
   // ...
 };
 
-
 function resolveBackendForProvider(provider) {
   return registeredBackends[provider];
 }
 
 function resolveUserBackends(user) {
-  var userBackends = [];
-  if (userScopes.isGitHubUser(user)) {
-    userBackends.push(resolveBackendForProvider('github'));
-  }
-  if (user.identities) {
-    user.identities.forEach(function(identity) {
-      userBackends.push(resolveBackendForProvider(identity.provider));
-    });
-  }
-  return userBackends;
-}
-
-/*
-backendResolver.findAllResults(user, 'getEmailAddress') -> [array of email addresses]
-backendResolver.findAllResults(user, 'getOrgs') -> [array of arrays of orgs]
-
-user.getOrgs() or userScopes.getOrgs(user) could just use this, but would have
-to concatenate things itself.
-*/
-function findAllResults(user, method, args) {
-  args = args || [];
-
-  var userBackends = resolveUserBackends(user);
-  var promises = userBackends.map(function(backend) {
-    return backend[method].apply(backend, args);
-  });
-  return Q.all(promises)
-}
-
-/*
-backendResolver.getFirstResult(user, 'getEmailAddress') -> email address or undefined
-user.getEmailAddress() or userScopes.getEmailAddress(user) could use this.
-*/
-function getFirstResult(user, method, args) {
-  args = args || [];
-
-  var userBackends = resolveUserBackends(user);
-  var deferred = Q.defer();
-
-  function tryNext() {
-    var nextBackend = userBackends.shift();
-    if (nextBackend) {
-      nextBackend[method].apply(nextBackend, args)
-        .then(function(result) {
-          if (result) {
-            deferred.resolve(result);
-          } else {
-            tryNext();
-          }
-        })
-        .catch(function(err) {
-          deferred.reject(err);
+  return identityService.findForUser(user)
+    .then(function(identities) {
+      return identities.reduce(function(map, identity) {
+        map[identity.provider] = identity;
+        return map;
+      }, {});
+    })
+    .then(function(identityMap) {
+      var userBackends = [];
+      if (userScopes.isGitHubUser(user)) {
+        var Backend = resolveBackendForProvider('github');
+        userBackends.push(new Backend(user, identityMap['github']));
+      }
+      if (user.identities) {
+        user.identities.forEach(function(identity) {
+          var Backend = resolveBackendForProvider(identity.provider);
+          userBackends.push(new Backend(user, identityMap[identity.provider]));
         });
-    } else {
-      deferred.resolve(); // with an empty value
-    }
-  }
-
-  tryNext();
-
-  return deferred.promise;
+      }
+      return userBackends;
+    });
 }
 
+function BackendResolver(user) {
+  this.user = user;
+}
 
-module.exports = {
-  registeredBackends: registeredBackends,
-  resolveBackendForProvider: resolveBackendForProvider,
-  resolveUserBackends: resolveUserBackends,
-  findAllResults: findAllResults,
-  getFirstResult: getFirstResult
+BackendResolver.prototype.findAllResults = function(method, args) {
+  args = args || [];
+
+  return resolveUserBackends(this.user)
+    .then(function(userBackends) {
+      var promises = userBackends.map(function(backend) {
+        return backend[method].apply(backend, args);
+      });
+      return Q.all(promises);
+    })
+    .then(function(arrays) {
+      return [].concat.apply([], arrays);
+    });
 };
+
+BackendResolver.prototype.getFirstResult = function(method, args) {
+  args = args || [];
+
+  return resolveUserBackends(this.user)
+    .then(function(userBackends) {
+      var deferred = Q.defer();
+
+      function tryNext() {
+        var nextBackend = userBackends.shift();
+        if (nextBackend) {
+          nextBackend[method].apply(nextBackend, args)
+            .then(function(result) {
+              if (result) {
+                deferred.resolve(result);
+              } else {
+                tryNext();
+              }
+            })
+            .catch(function(err) {
+              deferred.reject(err);
+            });
+        } else {
+          deferred.resolve(); // with an empty value
+        }
+      }
+
+      tryNext();
+
+      return deferred.promise;
+    });
+}
+
+BackendResolver.prototype.getEmailAddress = function(preferStoredEmail) {
+  return this.getFirstResult('getEmailAddress', [preferStoredEmail]);
+}
+
+module.exports = BackendResolver;

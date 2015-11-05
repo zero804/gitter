@@ -1,7 +1,8 @@
 'use strict';
 
-var backendResolver = require('./backend-resolver');
+var BackendResolver = require('./backend-resolver');
 
 module.exports = function(user, preferStoredEmail) {
-  return backendResolver.getFirstResult(user, 'getEmailAddress', [user, preferStoredEmail]);
+  var backendResolver = new BackendResolver(user);
+  return backendResolver.getEmailAddress(preferStoredEmail);
 };
