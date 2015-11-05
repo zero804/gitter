@@ -5,7 +5,7 @@ var apiClient = require('components/apiClient');
 var context = require('utils/context');
 var appEvents = require('utils/appevents');
 var Rollers = require('utils/rollers');
-var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-srcset');
+var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 var _ = require('underscore');
@@ -78,8 +78,8 @@ module.exports = (function() {
       data.selected = this.model.get('selected');
       data.detail = this.model.get('githubType');
       data.text = uri;
-      // TODO: send more than just a username and don't fish it out of the url
-      data.avatarUrl = resolveUserAvatarUrl({ username: uri.split('/')[0]}, 48);
+      // TODO: send a room object
+      data.avatarUrl = resolveRoomAvatarUrl({ uri: uri }, 48);
       return data;
     },
 
