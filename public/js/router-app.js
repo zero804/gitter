@@ -227,12 +227,24 @@ onready(function() {
         window.location.hash = '#' + message.hash;
       break;
 
+      //when the chat app requests the room list send it
       case 'request:roomList':
-        //when the chat app requests the room list send it
-        postMessage({
-          type: 'roomList',
-          rooms: roomListGenerator(),
-        });
+        //if we don't have any troupes in the troupeCollection
+        //wait for it to sync before posting the message
+        if(!troupeCollections.troupes.length) {
+          troupeCollections.troupes.once('sync', function(){
+            postMessage({
+              type: 'roomList',
+              rooms: roomListGenerator(),
+            });
+          });
+        }
+        else {
+          postMessage({
+            type: 'roomList',
+            rooms: roomListGenerator(),
+          });
+        }
         break;
 
       case 'unreadItemsCount':
