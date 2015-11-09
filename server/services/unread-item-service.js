@@ -453,41 +453,78 @@ function processResultsForNewItemWithMentions(troupeId, chatId, parsed, results,
           }
         }
 
+        var connected = false;
+        var push = false;
+        var pushNotified = false;
+        var webNotification = false;
+
         /* We need to do this for all users as it's used for mobile notifications */
         switch(onlineStatus) {
           case 'inroom':
+            connected = true;
+            break;
+
           case 'online':
-            var unreadItemMessage = hasMention ? newUnreadItemWithMention : newUnreadItemNoMention;
-            appEvents.newUnreadItem(userId, troupeId, unreadItemMessage, true);
+            connected = true;
+            webNotification = true;
+            break;
 
-            /* Not in the room, then send them a notification */
-            if (onlineStatus === 'online') {
-              var notificationQueue = hasMention ? userIdsForOnlineNotificationWithMention : userIdsForOnlineNotification;
-              notificationQueue.push(userId);
-            }
-
-            if(unreadCount >= 0 || mentionCount >= 0) {
-              // Notify the user
-              appEvents.troupeUnreadCountsChange({
-                userId: userId,
-                troupeId: troupeId,
-                total: unreadCount,
-                mentions: mentionCount
-              });
-            }
-            return;
+          case 'mobile':
+            connected = true;
+            break;
 
           case 'push':
-            var pushNotificationQueue = hasMention ? pushCandidatesWithMention : pushCandidates;
-            pushNotificationQueue.push(userId);
-            return;
+            push = true;
+            break;
 
-          /* User has already got all their push notifications */
+          case 'push_connected':
+            push = true;
+            connected = true;
+            break;
+
           case 'push_notified':
-            if (!hasMention) return; // Only notify for mention
-            pushCandidatesWithMention.push(userId);
-            return;
+            pushNotified = true;
+            break;
+
+          case 'push_notified_connected':
+            pushNotified = true;
+            connected = true;
+            break;
         }
+
+        if (connected) {
+          var unreadItemMessage = hasMention ? newUnreadItemWithMention : newUnreadItemNoMention;
+          appEvents.newUnreadItem(userId, troupeId, unreadItemMessage, true);
+
+          if(unreadCount >= 0 || mentionCount >= 0) {
+            // Notify the user
+            appEvents.troupeUnreadCountsChange({
+              userId: userId,
+              troupeId: troupeId,
+              total: unreadCount,
+              mentions: mentionCount
+            });
+          }
+        }
+
+        /* User needs a web notification */
+        if (webNotification) {
+          var notificationQueue = hasMention ? userIdsForOnlineNotificationWithMention : userIdsForOnlineNotification;
+          notificationQueue.push(userId);
+        }
+
+        /* User needs a push notification */
+        if (push) {
+          var pushNotificationQueue = hasMention ? pushCandidatesWithMention : pushCandidates;
+          pushNotificationQueue.push(userId);
+        }
+
+        /* User has already received a push notification */
+        if (pushNotified) {
+          if (!hasMention) return; // Only notify for mention
+          pushCandidatesWithMention.push(userId);
+        }
+
       });
 
       if (!isEdit) {
@@ -517,8 +554,16 @@ function processResultsForNewItemWithMentions(troupeId, chatId, parsed, results,
         for(var i = 0; i < activityOnly.length; i++) {
           var activityOnlyUserId =  activityOnly[i];
           var activityOnlyUserIdOnlineStatus = presenceStatus[activityOnlyUserId];
-          if (!activityOnlyUserIdOnlineStatus) continue; // null === offline
-          appEvents.newLurkActivity({ userId: activityOnlyUserId, troupeId: troupeId });
+
+          /* User is connected? Send them a status update */
+          switch(activityOnlyUserIdOnlineStatus) {
+            case 'inroom':
+            case 'online':
+            case 'mobile':
+            case 'push_connected':
+            case 'push_notified_connected':
+              appEvents.newLurkActivity({ userId: activityOnlyUserId, troupeId: troupeId });
+          }
         }
       }
 

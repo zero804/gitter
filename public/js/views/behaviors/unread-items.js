@@ -4,8 +4,6 @@ var context = require('utils/context');
 var Marionette = require('backbone.marionette');
 var behaviourLookup = require('./lookup');
 
-var loggedIn = context.isLoggedIn();
-
 var transitionQueue = [];
 var highwaterMark = 0;
 
@@ -41,7 +39,7 @@ var Behavior = Marionette.Behavior.extend({
   },
 
   onRender: function() {
-    if(!loggedIn) return;
+    if(!context.isLoggedIn()) return;
 
     var model = this.view.model;
     if(!model) return;
