@@ -1,7 +1,7 @@
 'use strict';
 
-var _ = require('underscore');
-var Backbone = require('backbone');
+var _         = require('underscore');
+var Backbone  = require('backbone');
 var urlParser = require('../utils/url-parser');
 
 function SpaRoomSwitcher(troupesCollection, baseUrl, locationDelegate, windowLocationDelegate) {
@@ -9,6 +9,7 @@ function SpaRoomSwitcher(troupesCollection, baseUrl, locationDelegate, windowLoc
   this._baseUrl = baseUrl;
   this._locationDelegate = locationDelegate;
   this._windowLocationDelegate = windowLocationDelegate || function() { return window.location; }; // Makes testing in node easier.
+  this._isLoadingIFrame = false;
 }
 
 _.extend(SpaRoomSwitcher.prototype, Backbone.Events, {
@@ -25,6 +26,7 @@ _.extend(SpaRoomSwitcher.prototype, Backbone.Events, {
 
     var self = this;
     function fallback() {
+      self._isLoadingIFrame = true;
       var windowHash = windowLocation.hash;
       var hash = (!windowHash || windowHash === '#') ? '#initial' : windowHash;
       targetParsed.hash = hash;
@@ -38,6 +40,11 @@ _.extend(SpaRoomSwitcher.prototype, Backbone.Events, {
         self.trigger('replace', href);
       }
     }
+
+    //if we are ever in the process of loading a frame
+    //throw the baby out with the bath water and refresh the whole frame
+    //JP 4/11/15
+    if(!!this._isLoadingIFrame) return fallback();
 
     // The frame is currently pointing at another site. Unlikely but possible
     var currentDomain = frameLocation.protocol + '//' + frameLocation.host;
@@ -72,6 +79,11 @@ _.extend(SpaRoomSwitcher.prototype, Backbone.Events, {
       type: match[3],
     };
   },
+
+  setIFrameLoadingState: function (state){
+    this._isLoadingIFrame = state;
+  },
+
 });
 
 function getOrgRoomUrl(pathname) {
