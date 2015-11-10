@@ -12,7 +12,8 @@ var ProxyCollection   = require('backbone-proxy-collection');
 require('components/realtime-troupe-listener');
 
 module.exports = (function() {
-  var chatCollection          = new chatModels.ChatCollection(null, { listen: true });
+  var currentChats            = new chatModels.ChatCollection(null, { listen: true });
+  var chatCollection          = new ProxyCollection({ collection: currentChats });
   var rosterCollection        = new userModels.RosterCollection(null, { listen: true });
   var eventCollection         = new eventModels.EventCollection(null,  { listen: true, snapshot: true });
 
@@ -42,9 +43,7 @@ module.exports = (function() {
   }
 
   var collections = {
-    chats: new ProxyCollection({
-      collection: chatCollection
-    }),
+    chats: chatCollection,
     roster: rosterCollection,
     events: eventCollection
   };
