@@ -61,7 +61,7 @@ mongo1:
 
 mongosetup:
   image: mongo:3.0
-  restart: no
+  restart: 'no'
   links:
     - mongo1:mongo1
     - mongo2:mongo2
@@ -96,7 +96,7 @@ elasticsearch:
 
 elasticsearchsetup:
   image: node:0.10.39
-  restart: no
+  restart: 'no'
   links:
     - mongo1:mongo1
     - mongo2:mongo2
