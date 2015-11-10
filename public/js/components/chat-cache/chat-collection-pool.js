@@ -54,8 +54,18 @@ function generatePool(userRooms) {
     }
   });
 
+  //we should have already set the roomQueue up
+  //if it does not exist at this point then something went wrong
+  //maybe we got an empty array from the main app
+  //either way bail .....
+  //TODO throw stats event because this shouldn't happen JP 10/11/15
+  if (!roomQueue) return;
+
   //the finial promise needs to be resolved
   roomQueue.then(resolveOnCollectionCreated);
+
+  //finish the promise so errors get thrown correctly
+  roomQueue.done();
 }
 
 function resolveOnCollectionCreated(result) {
@@ -68,6 +78,10 @@ function generateCollection(roomId, roomName) {
     //the first collection will not receive a snapshot because its active
     //therefore we need to just store it in the pool
     if (roomName === initialRoomName) {
+
+      //stop the original chat collection (behind the proxy) from
+      //responding to any room change events
+      chatCollection.collection.stopListening('change:id');
       return resolve({ roomName: roomName, collection: chatCollection.collection });
     }
 
@@ -108,8 +122,10 @@ function generateCollection(roomId, roomName) {
 function getUncachedCollection(id, name) {
 
   //figure out which is the oldest collection in the pool
-  var staleCollection = Object.keys(pool)
-    .map(function(key) {
+  var roomNames = Object.keys(pool);
+  if (!roomNames.length) return fallback(id);
+
+  var staleCollection = roomNames.map(function(key) {
       return { key: key, collection: pool[key] };
     })
     .reduce(function(prev, current) {
@@ -137,6 +153,9 @@ function onRoomChange(model) {
   //if we don't have a cache entry just grab a new one
   var collection = (pool[name] || getUncachedCollection(id, name));
 
+  //if something went wrong just fall-back
+  if (!collection) return fallback(id);
+
   //set a last access time
   collection = stampCollection(collection);
 
@@ -145,6 +164,18 @@ function onRoomChange(model) {
 }
 
 function stampCollection(collection) {
+
+  if (!collection) return;
+
   collection.lastAccess = +new Date();
   return collection;
+}
+
+function fallback(id) {
+
+  //if we somehow fall-back with no id the application with just trip out
+  //so as we are good people, lets throw an error
+  if (!id) throw new Error('chat-collection-cache tried to manually fallback but no troupeId was provided ... bad times');
+
+  chatCollection.collection.contextModel.set('troupeId', id);
 }
