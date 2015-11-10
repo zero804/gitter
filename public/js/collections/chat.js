@@ -88,7 +88,9 @@ var ChatCollection = LiveCollection.extend({
   urlTemplate: '/v1/rooms/:troupeId/chatMessages',
   //we set this to a new model as we dont want to reset the collection
   //on room change
-  contextModel: context.contextModel(),
+  contextModel: new Backbone.Model({
+    troupeId: context.troupe().get('id'),
+  }),
   comparator: function(chat1, chat2) {
     var s1 = chat1.get('sent');
     var s2 = chat2.get('sent');
