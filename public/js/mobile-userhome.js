@@ -7,6 +7,7 @@ var modalRegion = require('components/modal-region');
 var onready = require('./utils/onready');
 var MobileUserhomeLayout = require('views/layouts/mobile-userhome');
 var FastClick = require('fastclick');
+require('utils/tracking');
 
 // Preload widgets
 require('views/widgets/avatar');

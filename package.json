@@ -46,7 +46,7 @@
     "gitter-web-split-tests": "file:modules/split-tests",
     "gitter-web-suggestions": "file:modules/suggestions",
     "handlebars": "~3.0.3",
-    "heapdump": "^0.2.9",
+    "heapdump": "^0.3.7",
     "highlight.js": "^8.6.0",
     "i18n": "~0.4.1",
     "i18n-2": "^0.4.6",
