@@ -1,12 +1,14 @@
 'use strict';
 
-var Backbone         = require('backbone');
-var ChatCollection   = require('collections/chat').ChatCollection;
-var chatCollection   = require('collections/instances/integrated-items').chats;
-var context          = require('utils/context');
+var Q               = require('q');
+var Backbone        = require('backbone');
+var ChatCollection  = require('collections/chat').ChatCollection;
+var chatCollection  = require('collections/instances/integrated-items').chats;
+var context         = require('utils/context');
 
-var pool        = {};
-var poolSize    = 10;
+var pool            = {};
+var poolSize        = 10;
+var initialRoomName = context.troupe().get('name');
 
 module.exports = function chatCollectionPool(roomList) {
 
@@ -27,49 +29,85 @@ function generatePool(userRooms) {
   //only grab the top 10 rooms
   var rooms = _roomList.slice(0, poolSize);
 
+  var roomQueue;
+
   //we reverse here because lastAccess is generated along with the collection.
   //Because the most recent room will be first && we use a time stamp
   //we want that room to have the highest time stamp value possible
   //hence reversing the list, this makes no difference to the pool as it is a #
   rooms.reverse().forEach(function(roomData) {
-    var name = roomData.name;
 
-    //if we don't already have a collection create one
-    if (!pool[name]) pool[name] =  generateCollection(roomData.id, roomData.name);
+    //we want to lad collections synchronously (after they receive a snapshot)
+    //so we need to queue the async actions
+    //therefore if we don't already have a promise chain we make one then attach the
+    //other generations to that.
+    if (!roomQueue) roomQueue = generateCollection(roomData.id, roomData.name);
+    else {
+      roomQueue = roomQueue.then(function(result) {
+
+        //send the result to be added to the pool
+        resolveOnCollectionCreated(result);
+
+        //make a new collection
+        return generateCollection(roomData.id, roomData.name);
+      });
+    }
   });
+
+  //the finial promise needs to be resolved
+  roomQueue.then(resolveOnCollectionCreated);
 }
 
-function generateCollection(roomId) {
+function resolveOnCollectionCreated(result) {
+  pool[result.roomName] = stampCollection(result.collection);
+}
 
-  roomId = (roomId || context.troupe().get('id'));
+function generateCollection(roomId, roomName) {
+  return Q.Promise(function(resolve) {
 
-  //we make a new context model so we can request chats
-  //from different rooms
-  var contextModel = new Backbone.Model();
+    //the first collection will not receive a snapshot because its active
+    //therefore we need to just store it in the pool
+    if (roomName === initialRoomName) {
+      return resolve({ roomName: roomName, collection: chatCollection.collection });
+    }
 
-  //we extend ChatCollection to replace the contextModel with our new instance
-  var BackgroundChatCollection = ChatCollection.extend({
-    contextModel: contextModel,
+    //get a default id (just to be safe)
+    roomId = (roomId || context.troupe().get('id'));
 
-    //override to stop re-subscription
-    onRoomChange: function() {},
+    //we make a new context model so we can request chats
+    //from different rooms
+    var contextModel = new Backbone.Model();
+
+    //we extend ChatCollection to replace the contextModel with our new instance
+    var BackgroundChatCollection = ChatCollection.extend({
+      contextModel: contextModel,
+
+      //override to stop re-subscription
+      onRoomChange: function() {},
+    });
+
+    //Instantiate the new collection
+    var collection = new BackgroundChatCollection(null, {
+      listen: true,
+    });
+
+    //only resolve once we have received a snapshot
+    collection.once('snapshot', function() {
+      resolve({
+        roomName:   roomName,
+        collection: collection,
+      });
+    });
+
+    //set the new contextModel which forces a sync
+    contextModel.set('troupeId', roomId);
+
   });
-
-  //Instantiate the new collection
-  var collection = new BackgroundChatCollection(null, {
-    listen: true,
-  });
-
-  collection.lastAccess = +new Date();
-
-  //set the new contextModel which forces a sync
-  contextModel.set('troupeId', roomId);
-
-  return collection;
 }
 
 function getUncachedCollection(id, name) {
 
+  //figure out which is the oldest collection in the pool
   var staleCollection = Object.keys(pool)
     .map(function(key) {
       return { key: key, collection: pool[key] };
@@ -78,16 +116,18 @@ function getUncachedCollection(id, name) {
       return prev.collection.lastAccess < current.collection.lastAccess ? prev : current;
     });
 
-  //resubscribe to the new room
-  staleCollection.collection.contextModel.set('troupeId', id);
+  var collection = staleCollection.collection;
+
+  //resubscribe to the new room with the oldest collection (recycle it)
+  collection.contextModel.set('troupeId', id);
 
   //store the new collection under it's new room
-  pool[name] = staleCollection.collection;
+  pool[name] = collection;
 
-  //remove old collection
+  //remove old reference to the collection from the pool
   delete pool[staleCollection.key];
 
-  return staleCollection.collection;
+  return collection;
 }
 
 function onRoomChange(model) {
@@ -96,8 +136,15 @@ function onRoomChange(model) {
 
   //if we don't have a cache entry just grab a new one
   var collection = (pool[name] || getUncachedCollection(id, name));
-  collection.lastAccess = +new Date();
+
+  //set a last access time
+  collection = stampCollection(collection);
 
   //switch collections
   chatCollection.switchCollection(collection);
+}
+
+function stampCollection(collection) {
+  collection.lastAccess = +new Date();
+  return collection;
 }
