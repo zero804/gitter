@@ -18,7 +18,6 @@ var autoprefixer = require('autoprefixer');
 var nested       = require('postcss-nested');
 var conditionals = require('postcss-conditionals');
 
-
 var devMode = process.env.WEBPACK_DEV_MODE === '1';
 
 var webpackConfig = {
@@ -34,8 +33,6 @@ var webpackConfig = {
     "mobile-userhome": path.resolve(path.join(__dirname, "./mobile-userhome.js")),
     "mobile-nli-app": path.resolve(path.join(__dirname, "./mobile-nli-app.js")),
     "mobile-app": path.resolve(path.join(__dirname, "./mobile-app")),
-    "mobile-native-embedded-chat": path.resolve(path.join(__dirname, "./mobile-native-embedded-chat")),
-    "mobile-native-userhome": path.resolve(path.join(__dirname, "./mobile-native-userhome")),
     "router-archive-chat": path.resolve(path.join(__dirname, "./router-archive-chat")),
     "router-archive-home": path.resolve(path.join(__dirname, "./router-archive-home")),
     "router-archive-links": path.resolve(path.join(__dirname, "./router-archive-links")),
@@ -45,6 +42,9 @@ var webpackConfig = {
     "apps": path.resolve(path.join(__dirname, "./apps.js")),
     "router-org-page": path.resolve(path.join(__dirname, './router-org-page.js')),
     "router-userhome": path.resolve(path.join(__dirname, './router-userhome.js')),
+
+    "mobile-native-userhome": path.resolve(path.join(__dirname, "./mobile-native-userhome")),
+
     vendor: [
       'utils/webpack',
       'utils/context',
@@ -178,9 +178,7 @@ if(devMode) {
 } else {
   // webpackConfig.plugins.push(new DedupePlugin());
   // webpackConfig.plugins.push(new OccurrenceOrderPlugin());
-  webpackConfig.plugins.push(new UglifyJsPlugin({
-    mangle: false
-  }));
+  webpackConfig.plugins.push(new UglifyJsPlugin());
   webpackConfig.devtool = 'source-map';
 }
 module.exports = webpackConfig;

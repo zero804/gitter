@@ -1,17 +1,17 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var Q                  = require('q');
-var lazy               = require('lazy.js');
-var troupeUriMapper    = require('./troupe-uri-mapper');
-var mongoUtils         = require('../utils/mongo-utils');
-var persistence        = require('./persistence-service');
-var assert             = require('assert');
-var appEvents          = require('gitter-web-appevents');
-var moment             = require('moment');
-var _                  = require('underscore');
-var unreadItemsService = require('./unread-item-service');
-var debug              = require('debug')('gitter:recent-room-service');
+var Q                       = require('q');
+var lazy                    = require('lazy.js');
+var troupeUriMapper         = require('./troupe-uri-mapper');
+var mongoUtils              = require('../utils/mongo-utils');
+var persistence             = require('./persistence-service');
+var assert                  = require('assert');
+var appEvents               = require('gitter-web-appevents');
+var moment                  = require('moment');
+var _                       = require('underscore');
+var unreadItemsService      = require('./unread-item-service');
+var debug                   = require('debug')('gitter:recent-room-service');
 
 /* const */
 var LEGACY_FAV_POSITION = 1000;
@@ -191,6 +191,7 @@ function saveUserTroupeLastAccess(userId, troupeId, lastAccessTime) {
      { upsert: true, new: true })
      .exec();
 }
+exports.saveUserTroupeLastAccess = saveUserTroupeLastAccess;
 
 /**
  * Update the last visited troupe for the user, sending out appropriate events
@@ -214,6 +215,7 @@ function saveLastVisitedTroupeforUserId(userId, troupeId, options) {
     });
 }
 exports.saveLastVisitedTroupeforUserId = saveLastVisitedTroupeforUserId;
+
 
 function getTroupeLastAccessTimesForUserExcludingHidden(userId) {
   return persistence.UserTroupeLastAccess.findOne({ userId: userId }, { _id: 0, troupes: 1 }, { lean: true })
@@ -319,3 +321,4 @@ function findLastAccessTimesForUsersInRoom(roomId, userIds) {
 
 }
 exports.findLastAccessTimesForUsersInRoom = findLastAccessTimesForUsersInRoom;
+
