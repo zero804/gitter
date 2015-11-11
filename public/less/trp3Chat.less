@@ -51,6 +51,13 @@ code {
   padding: 0 4px;
   overflow-x: auto;
   word-wrap: break-word;
+  font-size: 1.4rem;
+}
+
+// font-size: 1.4rem; has made the code blocks on mobile become massive
+// this is a quick and dirty fix. See https://github.com/gitterHQ/gitter/issues/957
+body.mobile code {
+  font-size: inherit;
 }
 
 pre code {
@@ -60,7 +67,6 @@ pre code {
 
 blockquote {
   margin-bottom: 0;
-  font-size: 14px;
   font-weight: 300;
   line-height: 27.5px;
 }

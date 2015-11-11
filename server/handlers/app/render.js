@@ -17,7 +17,7 @@ var roomSort                 = require('gitter-realtime-client/lib/sorts-filters
                                                                                           will bring in tons of client-side
                                                                                           libraries that we don't need */
 var roomNameTrimmer          = require('../../../public/js/utils/room-name-trimmer');
-var isolateBurst             = require('../../../shared/burst/isolate-burst-array');
+var isolateBurst             = require('gitter-web-shared/burst/isolate-burst-array');
 var unreadItemService        = require('../../services/unread-item-service');
 var mongoUtils               = require('../../utils/mongo-utils');
 var url                      = require('url');
@@ -28,8 +28,8 @@ var useragent                = require('useragent');
 var _                        = require('underscore');
 var GitHubOrgService         = require('gitter-web-github').GitHubOrgService;
 var orgPermissionModel       = require('../../services/permissions/org-permissions-model');
-var resolveRoomAvatarUrl     = require('gitter-web-shared/avatars/resolve-room-avatar-url');
-var getOrgNameFromTroupeName = require('../../../shared/get-org-name-from-troupe-name');
+var resolveRoomAvatarSrcSet  = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
+var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 
 /* How many chats to send back */
 var INITIAL_CHAT_COUNT = 50;
@@ -237,7 +237,8 @@ function renderMainFrame(req, res, next, frame) {
             .filter(roomSort.recents.filter)
             .sort(roomSort.recents.sort)
         },
-        orgs: orgs
+        orgs: orgs,
+        userHasNoOrgs: !orgs || !orgs.length
       });
     })
     .catch(next);
@@ -343,7 +344,7 @@ function renderChat(req, res, options, next) {
             troupeTopic: troupeContext.troupe.topic,
             premium: troupeContext.troupe.premium,
             troupeFavourite: troupeContext.troupe.favourite,
-            avatarUrl:  resolveRoomAvatarUrl(troupeContext.troupe.url),
+            avatarSrcSet:  resolveRoomAvatarSrcSet(troupeContext.troupe.url),
             isAdmin: isAdmin,
             isNativeDesktopApp: troupeContext.isNativeDesktopApp
           }, options.extras);

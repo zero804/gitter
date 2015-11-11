@@ -7,7 +7,7 @@ var MAX_SUGGESTIONS = 5;
 
 /* How hillbillies manipulate urls */
 function appendToUrl(url, params) {
-  if (url.indexOf('?') >= 0) return params + "&" + params;
+  if (url.indexOf('?') >= 0) return url + "&" + params;
   return url + "?" + params;
 }
 

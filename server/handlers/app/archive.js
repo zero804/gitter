@@ -1,24 +1,26 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var moment                 = require('moment');
-var appMiddleware          = require('./middleware');
-var chatService            = require('../../services/chat-service');
-var heatmapService         = require('../../services/chat-heatmap-service');
-var restSerializer         = require('../../serializers/rest-serializer');
-var contextGenerator       = require('../../web/context-generator');
-var Q                      = require('q');
-var roomService            = require('../../services/room-service');
-var env                    = require('gitter-web-env');
-var burstCalculator        = require('../../utils/burst-calculator');
-var roomPermissionsModel   = require('../../services/room-permissions-model');
-var timezoneMiddleware     = require('../../web/middlewares/timezone');
-var identifyRoute          = require('gitter-web-env').middlewares.identifyRoute;
-var resolveRoomAvatarUrl   = require('gitter-web-shared/avatars/resolve-room-avatar-url');
-var dateTZtoUTC            = require('gitter-web-shared/time/date-timezone-to-utc');
-var beforeTodayAnyTimezone = require('gitter-web-shared/time/before-today-any-timezone');
-var debug                  = require('debug')('gitter:app-archive');
-var _                      = require('underscore');
+var moment                  = require('moment');
+var appMiddleware           = require('./middleware');
+var chatService             = require('../../services/chat-service');
+var heatmapService          = require('../../services/chat-heatmap-service');
+var restSerializer          = require('../../serializers/rest-serializer');
+var contextGenerator        = require('../../web/context-generator');
+var Q                       = require('q');
+var roomService             = require('../../services/room-service');
+var env                     = require('gitter-web-env');
+var burstCalculator         = require('../../utils/burst-calculator');
+var roomPermissionsModel    = require('../../services/room-permissions-model');
+var timezoneMiddleware      = require('../../web/middlewares/timezone');
+var identifyRoute           = require('gitter-web-env').middlewares.identifyRoute;
+var resolveRoomAvatarUrl    = require('gitter-web-shared/avatars/resolve-room-avatar-url');
+var dateTZtoUTC             = require('gitter-web-shared/time/date-timezone-to-utc');
+var beforeTodayAnyTimezone  = require('gitter-web-shared/time/before-today-any-timezone');
+var debug                   = require('debug')('gitter:app-archive');
+var _                       = require('underscore');
+var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
+
 
 var ONE_DAY_SECONDS = 60 * 60 * 24; // 1 day
 var ONE_DAY_MILLISECONDS = ONE_DAY_SECONDS * 1000;
@@ -96,7 +98,8 @@ exports.datesList = [
       accessToken: req.accessToken,
       public: troupe.security === 'PUBLIC',
       avatarUrl: avatarUrl,
-      isPrivate: isPrivate
+      isPrivate: isPrivate,
+      avatarSrcSet: resolveRoomAvatarSrcSet(req.uriContext.uri)
     };
 
     return roomService.validateRoomForReadOnlyAccess(user, troupe)
@@ -303,6 +306,7 @@ exports.chatArchive = [
               accessToken: req.accessToken,
               avatarUrl: avatarUrl,
               isPrivate: isPrivate,
+              avatarSrcSet: resolveRoomAvatarSrcSet(req.uriContext.uri),
 
               /* For prerendered archive-navigation-view */
               previousDate: previousDateFormatted,
