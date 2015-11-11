@@ -50,4 +50,11 @@ describe('valid-room-uri', function () {
     test('/gitterHQ/gitter?test=true');
     test('/gitterHQ/gitter/channel?test=true');
   });
+
+  /**
+   * https://github.com/troupe/gitter-webapp/issues/683
+   */
+  it('should detect orgs with dashes in their names', function() {
+    test('/orgs/dev-ua/rooms', false);
+  });
 });
