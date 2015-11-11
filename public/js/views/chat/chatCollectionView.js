@@ -230,11 +230,15 @@ module.exports = (function() {
       //When we change room, scroll to the bottom of the chatCollection
       this.listenTo(context.troupe(), 'change:id', this.render, this);
 
-      this.listenTo(this.collection, 'collection:change', function() {
+      //listen for when the cache is constructed then stop listening to room change events
+      //this will stop a double render call
+      this.listenTo(appEvents, 'chat-cache:ok', function(){
+        this.stopListening('chat-cache:ok');
+        this.stopListening(context.troupe());
+      }, this);
 
-        //now we have the caching in place there is no need to scroll on room change
-        //we do this here instead
-        this.stopListening(context.troupe(), 'change:id');
+      //when the collection changes re render
+      this.listenTo(this.collection, 'collection:change', function() {
 
         //render the new content
         this.render();
@@ -244,6 +248,8 @@ module.exports = (function() {
         this.shouldScrollAfterRoomChange = true;
       }, this);
 
+      //when the collaboratorsView has rendered we will want to scroll to the bottom of the page
+      //to show the most recent chat content
       this.listenTo(appEvents, 'collaboratorsView:show', function() {
         if (this.shouldScrollAfterRoomChange) {
           this.scrollToBottom();
