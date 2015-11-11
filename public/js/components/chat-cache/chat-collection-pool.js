@@ -1,10 +1,11 @@
 'use strict';
 
-var Q               = require('q');
-var Backbone        = require('backbone');
-var ChatCollection  = require('collections/chat').ChatCollection;
-var chatCollection  = require('collections/instances/integrated-items').chats;
-var context         = require('utils/context');
+var Q              = require('q');
+var Backbone       = require('backbone');
+var ChatCollection = require('collections/chat').ChatCollection;
+var chatCollection = require('collections/instances/integrated-items').chats;
+var context        = require('utils/context');
+var appEvents      = require('utils/appevents');
 
 var pool            = {};
 var poolSize        = 10;
@@ -62,7 +63,10 @@ function generatePool(userRooms) {
   if (!roomQueue) return;
 
   //the finial promise needs to be resolved
-  roomQueue.then(resolveOnCollectionCreated);
+  roomQueue.then(function(result){
+    resolveOnCollectionCreated(result);
+    appEvents.trigger('chat-cache:ok');
+  });
 
   //finish the promise so errors get thrown correctly
   roomQueue.done();
