@@ -57,4 +57,26 @@ describe('valid-room-uri', function () {
   it('should detect orgs with dashes in their names', function() {
     test('/orgs/dev-ua/rooms', false);
   });
+
+  /**
+   * https://github.com/troupe/gitter-webapp/issues/683
+   */
+  it('should detect orgs community with underscores in their names', function() {
+    test('/orgs/dev_ua/rooms', false);
+  });
+
+  /**
+  /**
+   * https://github.com/troupe/gitter-webapp/issues/683
+   */
+  it('should anything under /orgs/', function() {
+    test('/orgs/blah/blah/blah', false);
+  });
+
+  /**
+   *
+   */
+  it.skip('should ensure that org names do not have underscores in them', function() {
+    test('/gitter_hq', false);
+  });
 });
