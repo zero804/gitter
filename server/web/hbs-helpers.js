@@ -130,12 +130,6 @@ exports.pad = function(options) {
   return content;
 };
 
-exports.oneLine = function(options) {
-  var content = "" + options.fn(this);
-  content=content.replace(/\n/g,"");
-  return content;
-};
-
 // FIXME REMOVE THIS ONCE THE NEW ERRORS PAGES ARE DONE
 exports.typewriter = function (el, str) {
   return util.format('<script type="text/javascript">\n' +
