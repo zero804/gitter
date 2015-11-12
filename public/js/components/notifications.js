@@ -31,6 +31,11 @@ function showNotification(message) {
   var text = message.text;
   var icon = cdn('images/icon-logo-red-64.png');
 
+  if (message.troupeId) {
+    var owner = link.split('/')[1];
+    icon = 'https://avatars.githubusercontent.com/' + owner + '?s=80';
+  }
+
   var notification = new WindowNotification(title, { body: text, icon: icon });
 
   notification.onshow = function() {
