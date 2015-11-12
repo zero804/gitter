@@ -176,17 +176,9 @@ if(devMode) {
   webpackConfig.devtool = 'eval-cheap-module-source-map';
   webpackConfig.cache = true;
 } else {
-  webpackConfig.devtool = 'source-map';
-
   // webpackConfig.plugins.push(new DedupePlugin());
   // webpackConfig.plugins.push(new OccurrenceOrderPlugin());
-<<<<<<< HEAD
-  // webpackConfig.plugins.push(new UglifyJsPlugin({
-  //   mangle: false
-  // }));
-=======
   webpackConfig.plugins.push(new UglifyJsPlugin());
   webpackConfig.devtool = 'source-map';
->>>>>>> develop
 }
 module.exports = webpackConfig;

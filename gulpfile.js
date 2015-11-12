@@ -448,7 +448,7 @@ gulp.task('sentry-release', function(done){
     var isStaged = (process.env.STAGED_ENVIRONMENT === 'true');
     var sentryRelease = require('gulp-sentry-release')('./package.json', {
       DOMAIN: isStaged ? 'https://beta.gitter.im' : 'https://gitter.im',
-      //API_KEY must be present to run this
+      API_KEY: process.env.SENTRY_API_KEY,
       API_URL: 'https://app.getsentry.com/api/0/projects/gitter/' + isStaged  ? 'frontend-staging' : 'frontend',
       debug: true,
       versionPrefix: commit,
