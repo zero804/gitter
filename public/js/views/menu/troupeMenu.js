@@ -82,7 +82,15 @@ module.exports = (function () {
       };
     },
 
-    onRender: function() {
+    onBeforeRender: function() {
+      var options = this.options;
+      if (options.prerendered && !this.isRendered) {
+        // Don't hide the wrapper if the item has been prerendered on
+        // the server as the client collection may not yet be populated
+        // and the user will see a flash until the server side collection
+        // has been loaded
+        return;
+      }
       this.display();
     },
 
@@ -157,6 +165,7 @@ module.exports = (function () {
               collection: troupeCollections.orgs,
               childView: OrgCollectionView,
               header: 'Your Organizations',
+              prerendered: true
             }));
 
           }
