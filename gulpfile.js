@@ -438,7 +438,7 @@ gulp.task('uglify', ['webpack'], function() {
     .pipe(gulp.dest('output/assets/js'));
 });
 
-gulp.task('sentry-release', function(done){
+gulp.task('sentry-release', ['uglify'], function(done){
 
   var sourceMapOpts = getSourceMapOptions();
   git.revParse({ args: 'HEAD' }, function (err, commit) {
@@ -462,7 +462,7 @@ gulp.task('sentry-release', function(done){
   });
 });
 
-gulp.task('build-assets', ['copy-asset-files', 'css', 'webpack', 'uglify']);
+gulp.task('build-assets', ['copy-asset-files', 'css', 'webpack', 'uglify', 'sentry-release']);
 
 
 gulp.task('compress-assets', ['build-assets'], function() {
