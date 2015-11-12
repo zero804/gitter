@@ -7,7 +7,10 @@ var SnappyCache = require('snappy-cache');
 var Q           = require('q');
 var assert      = require('assert');
 
+var redisClient;
 function getRedisCachingClient() {
+  if (redisClient) return redisClient;
+
   var redisCachingConfig = process.env.REDIS_CACHING_CONNECTION_STRING || config.get("redis_caching");
   if (typeof redisCachingConfig === 'string') {
     redisCachingConfig = env.redis.parse(redisCachingConfig);
@@ -20,13 +23,7 @@ function getRedisCachingClient() {
     }
   });
 
-  return env.redis.createClient(redisConfig);
-}
-
-var redisClient;
-function getRedisCachingClient() {
-  if (redisClient) return redisClient;
-  redisClient = env.redis.createClient(process.env.REDIS_CACHING_CONNECTION_STRING || config.get("redis_caching"));
+  redisClient = env.redis.createClient(redisConfig);
   return redisClient;
 }
 
