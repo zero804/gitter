@@ -65,6 +65,8 @@ module.exports = (function() {
     },
 
     handleSelect: function () {
+      //tell the chat input view to focus
+      appEvents.trigger('focus.request.chat');
       appEvents.trigger('track-event', 'search_result_selected');
       this.selectItem();
     }
@@ -438,6 +440,9 @@ module.exports = (function() {
       this.listenTo(context.troupe(), 'change:id', function() {
         masterCollection.reset();
         this.model.set('active', false);
+        //Super hacky implementation as this will be moved
+        //JP 4/11/15
+        this.$el.find('.js-troupe-name')[0].innerHTML = context.troupe().get('name');
       });
 
     },

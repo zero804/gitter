@@ -145,6 +145,26 @@ LurkTroupeForUserStrategy.prototype = {
   name: 'LurkTroupeForUserStrategy'
 };
 
+function ActivityForUserStrategy(options) {
+  var currentUserId = options.currentUserId;
+  var activity = {};
+
+  this.preload = function(troupeIds, callback) {
+    unreadItemService.getActivityIndicatorForTroupeIds(troupeIds, currentUserId)
+    .then(function(values) {
+      activity = values;
+      return activity;
+    })
+    .nodeify(callback);
+  };
+
+  this.map = function(roomId) {
+    return activity[roomId];
+  };
+}
+ActivityForUserStrategy.prototype = {
+  name: 'ActivityForUserStrategy'
+};
 
 function ProOrgStrategy() {
   var proOrgs = {};
@@ -278,6 +298,8 @@ function TroupeStrategy(options) {
   var lastAccessTimeStategy = currentUserId ? new LastTroupeAccessTimesForUserStrategy(options) : null;
   var favouriteStrategy     = currentUserId ? new FavouriteTroupesForUserStrategy(options) : null;
   var lurkStrategy          = currentUserId ? new LurkTroupeForUserStrategy(options) : null;
+  var activityStrategy      = currentUserId ? new ActivityForUserStrategy(options) : null;
+
   var userIdStategy         = new UserIdStrategy(options);
   var proOrgStrategy        = new ProOrgStrategy(options);
   var permissionsStategy    = (currentUserId || options.currentUser) && options.includePermissions ? new TroupePermissionsStrategy(options) : null;
@@ -360,6 +382,14 @@ function TroupeStrategy(options) {
       });
     }
 
+    if(activityStrategy) {
+      strategies.push({
+        strategy: activityStrategy,
+        data: troupeIds
+      });
+    }
+
+
     execPreloads(strategies, callback);
   };
 
@@ -424,6 +454,7 @@ function TroupeStrategy(options) {
       lastAccessTime: lastAccessTimeStategy ? lastAccessTimeStategy.map(item.id) : undefined,
       favourite: favouriteStrategy ? favouriteStrategy.map(item.id) : undefined,
       lurk: lurkStrategy ? !item.oneToOne && lurkStrategy.map(item.id) : undefined,
+      activity: activityStrategy ? activityStrategy.map(item.id) : undefined,
       url: troupeUrl,
       githubType: item.githubType,
       security: item.security,

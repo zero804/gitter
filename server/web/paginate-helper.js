@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = function(pagination, options) {
   var type = options.hash.type || 'middle';
   var ret = '';

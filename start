@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 # This may be set for node debug, but those
 # values will break python scripts
@@ -7,7 +7,7 @@ export DEBUG=
 set -e
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-DOCKER_MACHINE_NAME=${DOCKER_MACHINE_NAME-dev}
+DOCKER_MACHINE_NAME=${DOCKER_MACHINE_NAME-default}
 HAS_DOCKER_MACHINE=$(which docker-machine)
 
 function get_ip {
@@ -31,7 +31,7 @@ function startDockerMachine {
       $DOCKER_MACHINE_NAME
   else
     ## Start the box if it's stopped
-    if [[ $(docker-machine ls --filter state=Stopped -q) = "$DOCKER_MACHINE_NAME" ]]; then
+    if [[ $(docker-machine ls --filter state=Stopped -q|grep "$DOCKER_MACHINE_NAME") = "$DOCKER_MACHINE_NAME" ]]; then
       docker-machine start $DOCKER_MACHINE_NAME
     fi
   fi
