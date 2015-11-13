@@ -37,11 +37,9 @@ function showNotification(message) {
 
   var notification = new WindowNotification(title, { body: text, icon: icon });
 
-  notification.onshow = function() {
-    setTimeout(function() {
-      notification.close();
-    }, 10000);
-  };
+  setTimeout(function() {
+    notification.close();
+  }, 10000);
 
   notification.onclick = function() {
     window.focus();
