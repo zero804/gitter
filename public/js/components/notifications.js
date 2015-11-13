@@ -6,6 +6,7 @@ var WindowNotification  = window.Notification;
 var webkitNotifications = window.webkitNotifications;
 var urlParser           = require('../utils/url-parser');
 var linkHandler         = require('./link-handler');
+var resolveAvatarUrl    = require('gitter-web-shared/avatars/resolve-avatar-url');
 
 var notificationsHaveBeenEnabled = false;
 
@@ -29,10 +30,11 @@ function showNotification(message) {
   var link = message.link;
   var title = message.title;
   var text = message.text;
+  var username = message.username;
   var icon = cdn('images/icon-logo-red-64.png');
 
-  if (message.username) {
-    icon = 'https://avatars.githubusercontent.com/' + message.username + '?s=80';
+  if (username) {
+    icon = resolveAvatarUrl({ username: username, size: 80 });
   }
 
   var notification = new WindowNotification(title, { body: text, icon: icon });
