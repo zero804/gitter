@@ -27,14 +27,16 @@ function generateChatMessageNotification(troupeId, chatId) {
       if (oneToOne) {
         return {
           text: chat.text,
-          title: 'New chat from ' + fromUser.username,
-          link: '/' + fromUser.username
+          title: fromUser.username,
+          link: '/' + fromUser.username,
+          username: fromUser.username
         };
       } else {
         return {
-          text: fromUser.username + ": " + chat.text,
-          title: 'New chat on ' + troupe.uri,
-          link: '/' + troupe.uri
+          text: chat.text,
+          title: fromUser.username + ' @ ' + troupe.uri,
+          link: '/' + troupe.uri,
+          username: fromUser.username
         };
       }
     });
@@ -70,6 +72,7 @@ exports.sendOnlineNotifications = function (troupeId, chatId, userIds, mentioned
               title: notification.title,
               text: notification.text,
               link: notification.link,
+              username: notification.username,
               sound: notification.sound,
               chatId: chatId
             };
