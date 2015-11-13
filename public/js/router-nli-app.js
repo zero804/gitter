@@ -125,6 +125,13 @@ onready(function() {
       //   var reason = message.reason;
       //   realtime.testConnection('chat.' + reason);
       //   break;
+
+      case 'permalink.requested':
+        var url = message.url + '?at=' + message.id;
+        var frameUrl = message.url + '/~' + message.permalinkType + '?at=' + message.id;
+        var title = message.url.substring(1);
+        pushState(frameUrl, title, url);
+        break;
     }
   });
 
