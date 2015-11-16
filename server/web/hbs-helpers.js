@@ -62,9 +62,9 @@ function cdnUrlGenerator(url, options) {
 
 exports.bootScript = function(url, parameters) {
   var options = parameters.hash;
-  var jsRoot = options && options.jsRoot || "js/";
+  var jsRoot = options && options.jsRoot || "js";
 
-  var baseUrl = cdnUrlGenerator(jsRoot, options);
+  var baseUrl = cdnUrlGenerator(jsRoot + '/', options);
   var vendorScriptUrl = cdnUrlGenerator(jsRoot + "/vendor.js", options);
   var bootScriptUrl = cdnUrlGenerator(jsRoot + "/" + url + ".js", options);
 
