@@ -20,10 +20,6 @@ var chatSearchService    = require('./chat-search-service');
 var unreadItemService    = require('./unread-item-service');
 var markdownMajorVersion = require('gitter-markdown-processor').version.split('.')[0];
 
-var redis       = require("../utils/redis");
-var redisClient = redis.getClient();
-
-
 var useHints = true;
 
 var MAX_CHAT_MESSAGE_LENGTH = 4096;
