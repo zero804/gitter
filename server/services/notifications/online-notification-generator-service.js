@@ -4,6 +4,7 @@
 var Q                         = require('q');
 var userTroupeSettingsService = require('../user-troupe-settings-service');
 var appEvents                 = require('gitter-web-appevents');
+var resolveAvatarUrl          = require('gitter-web-shared/avatars/resolve-avatar-url');
 var troupeDao                 = require('../daos/troupe-dao').lean;
 var userDao                   = require('../daos/user-dao').lean;
 var chatService               = require('../chat-service');
@@ -18,7 +19,7 @@ function generateChatMessageNotification(troupeId, chatId) {
     .spread(function(chat, troupe) {
       if (!chat) throw new Error('Chat not found');
 
-      return [chat, troupe, userDao.findById(chat.fromUserId, { username: 1, displayName: 1 })];
+      return [chat, troupe, userDao.findById(chat.fromUserId, { username: 1, displayName: 1, gravatarVersion: 1 })];
     })
     .spread(function(chat, troupe, fromUser) {
       var oneToOne = troupe.oneToOne;
@@ -29,14 +30,14 @@ function generateChatMessageNotification(troupeId, chatId) {
           text: chat.text,
           title: fromUser.username,
           link: '/' + fromUser.username,
-          username: fromUser.username
+          icon: resolveAvatarUrl({ username: fromUser.username, version: fromUser.gravatarVersion, size: 128 })
         };
       } else {
         return {
           text: chat.text,
           title: fromUser.username + ' @ ' + troupe.uri,
           link: '/' + troupe.uri,
-          username: fromUser.username
+          icon: resolveAvatarUrl({ username: fromUser.username, version: fromUser.gravatarVersion, size: 128 })
         };
       }
     });
@@ -72,7 +73,7 @@ exports.sendOnlineNotifications = function (troupeId, chatId, userIds, mentioned
               title: notification.title,
               text: notification.text,
               link: notification.link,
-              username: notification.username,
+              icon: notification.icon,
               sound: notification.sound,
               chatId: chatId
             };

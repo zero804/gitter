@@ -30,12 +30,7 @@ function showNotification(message) {
   var link = message.link;
   var title = message.title;
   var text = message.text;
-  var username = message.username;
-  var icon = cdn('images/icon-logo-red-64.png');
-
-  if (username) {
-    icon = resolveAvatarUrl({ username: username, size: 80 });
-  }
+  var icon = message.icon || cdn('images/icon-logo-red-64.png');
 
   var notification = new WindowNotification(title, { body: text, icon: icon });
 
