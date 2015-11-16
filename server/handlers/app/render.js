@@ -135,6 +135,12 @@ function renderHomePage(req, res, next) {
       var showWindowsApp = !isLinux && !isOsx;
       var showLinuxApp = !isOsx && !isWindows;
 
+      var jsRoot;
+      // Feature toggle
+      if (req.fflip && req.fflip.has('halley')) {
+        jsRoot = "js/halley";
+      }
+
       res.render(page, {
         welcomeMessage: WELCOME_MESSAGES[Math.floor(Math.random() * WELCOME_MESSAGES.length)],
         showOsxApp: showOsxApp,
@@ -142,7 +148,8 @@ function renderHomePage(req, res, next) {
         showLinuxApp: showLinuxApp,
         troupeContext: troupeContext,
         isNativeDesktopApp: troupeContext.isNativeDesktopApp,
-        billingBaseUrl: nconf.get('web:billingBaseUrl')
+        billingBaseUrl: nconf.get('web:billingBaseUrl'),
+        jsRoot: jsRoot
       });
     })
     .catch(next);
@@ -215,7 +222,7 @@ function renderMainFrame(req, res, next, frame) {
         bootScriptName = 'router-app';
 
         // Feature toggle
-        if (req.fflip.has('halley')) {
+        if (req.fflip && req.fflip.has('halley')) {
           jsRoot = "js/halley";
         }
 
@@ -278,6 +285,12 @@ function renderChat(req, res, options, next) {
   var script = options.script;
   var user = req.user;
   var userId = user && user.id;
+  var jsRoot;
+
+  // Feature toggle
+  if (req.fflip && req.fflip.has('halley')) {
+    jsRoot = "js/halley";
+  }
 
   // It's ok if there's no user (logged out), unreadItems will be 0
   return unreadItemService.getUnreadItemsForUser(userId, troupe.id)
@@ -310,8 +323,6 @@ function renderChat(req, res, options, next) {
         var initialBottom = !initialChat;
         var githubLink;
         var classNames = options.classNames || [];
-
-
 
         if(troupe.githubType === 'REPO' || troupe.githubType === 'ORG') {
           githubLink = 'https://github.com/' + req.uriContext.uri;
@@ -346,6 +357,7 @@ function renderChat(req, res, options, next) {
         var renderOptions = _.extend({
             isRepo: troupe.githubType === 'REPO',
             bootScriptName: script,
+            jsRoot: jsRoot, 
             cssFileName: cssFileName,
             githubLink: githubLink,
             troupeName: req.uriContext.uri,
