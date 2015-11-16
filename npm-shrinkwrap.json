@@ -1104,6 +1104,11 @@
         }
       }
     },
+    "fflip": {
+      "version": "2.1.0",
+      "from": "fflip@*",
+      "resolved": "http://beta-internal:4873/fflip/-/fflip-2.1.0.tgz"
+    },
     "gitter-env": {
       "version": "0.20.22",
       "from": "http://beta-internal:4873/gitter-env/-/gitter-env-0.20.22.tgz",
@@ -1988,7 +1993,7 @@
     },
     "heapdump": {
       "version": "0.3.7",
-      "from": "heapdump@latest",
+      "from": "http://beta-internal:4873/heapdump/-/heapdump-0.3.7.tgz",
       "resolved": "http://beta-internal:4873/heapdump/-/heapdump-0.3.7.tgz"
     },
     "highlight.js": {
@@ -4456,14 +4461,7 @@
                 "fstream": {
                   "version": "1.0.8",
                   "from": "http://beta-internal:4873/fstream/-/fstream-1.0.8.tgz",
-                  "resolved": "http://beta-internal:4873/fstream/-/fstream-1.0.8.tgz",
-                  "dependencies": {
-                    "inherits": {
-                      "version": "2.0.1",
-                      "from": "http://beta-internal:4873/inherits/-/inherits-2.0.1.tgz",
-                      "resolved": "http://beta-internal:4873/inherits/-/inherits-2.0.1.tgz"
-                    }
-                  }
+                  "resolved": "http://beta-internal:4873/fstream/-/fstream-1.0.8.tgz"
                 },
                 "glob": {
                   "version": "4.5.3",
@@ -4481,11 +4479,6 @@
                           "resolved": "http://beta-internal:4873/wrappy/-/wrappy-1.0.1.tgz"
                         }
                       }
-                    },
-                    "inherits": {
-                      "version": "2.0.1",
-                      "from": "http://beta-internal:4873/inherits/-/inherits-2.0.1.tgz",
-                      "resolved": "http://beta-internal:4873/inherits/-/inherits-2.0.1.tgz"
                     },
                     "minimatch": {
                       "version": "2.0.10",
@@ -4593,11 +4586,6 @@
                               "version": "0.10.31",
                               "from": "http://beta-internal:4873/string_decoder/-/string_decoder-0.10.31.tgz",
                               "resolved": "http://beta-internal:4873/string_decoder/-/string_decoder-0.10.31.tgz"
-                            },
-                            "inherits": {
-                              "version": "2.0.1",
-                              "from": "http://beta-internal:4873/inherits/-/inherits-2.0.1.tgz",
-                              "resolved": "http://beta-internal:4873/inherits/-/inherits-2.0.1.tgz"
                             }
                           }
                         }
@@ -4740,11 +4728,6 @@
                             }
                           }
                         },
-                        "inherits": {
-                          "version": "2.0.1",
-                          "from": "http://beta-internal:4873/inherits/-/inherits-2.0.1.tgz",
-                          "resolved": "http://beta-internal:4873/inherits/-/inherits-2.0.1.tgz"
-                        },
                         "minimatch": {
                           "version": "3.0.0",
                           "from": "http://beta-internal:4873/minimatch/-/minimatch-3.0.0.tgz",
@@ -4804,11 +4787,6 @@
                       "version": "0.0.8",
                       "from": "http://beta-internal:4873/block-stream/-/block-stream-0.0.8.tgz",
                       "resolved": "http://beta-internal:4873/block-stream/-/block-stream-0.0.8.tgz"
-                    },
-                    "inherits": {
-                      "version": "2.0.1",
-                      "from": "http://beta-internal:4873/inherits/-/inherits-2.0.1.tgz",
-                      "resolved": "http://beta-internal:4873/inherits/-/inherits-2.0.1.tgz"
                     }
                   }
                 },
