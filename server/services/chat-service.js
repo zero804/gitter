@@ -228,7 +228,6 @@ exports.updateChatMessage = function(troupe, chatMessage, user, newText, callbac
             troupeId: troupe.id,
             username: user.username
           });
-
         })
         .thenResolve(chatMessage);
     })
