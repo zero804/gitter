@@ -88,6 +88,7 @@ exports.install = function() {
       var title = data.title;
       var text = data.text;
       var link = data.link;
+      var icon = data.icon;
       var troupeId = data.troupeId;
       var sound = data.sound;
       var chatId = data.chatId;
@@ -98,6 +99,7 @@ exports.install = function() {
          title: title,
          text: ent.decode(text),
          link: link,
+         icon: icon,
          troupeId: troupeId,
          sound: sound,
          chatId: chatId
