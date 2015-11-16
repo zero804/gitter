@@ -696,13 +696,9 @@ function queueBadgeUpdateForUser(userIds) {
 
 exports.getActivityIndicatorForTroupeIds = function(troupeIds, userId) {
 
-  var tsCacheKeys = troupeIds.map(function(troupeId) {
-    return "lmts:" + troupeId;
-  });
-
   return Q.all([
     recentRoomService.getTroupeLastAccessTimesForUser(userId),
-    Q.ninvoke(redisClient, "mget", tsCacheKeys)
+    engine.getLastChatTimestamps(troupeIds)
   ])
     .spread(function(allLastAccessTimes, rawLastMsgTimes) {
 
@@ -713,7 +709,8 @@ exports.getActivityIndicatorForTroupeIds = function(troupeIds, userId) {
 
       var lastMsgTimes = troupeIds.reduce(function(accum, troupeId, index) {
         if (!rawLastMsgTimes[index]) return accum;
-        accum[troupeId] = new Date(rawLastMsgTimes[index]);
+        var ts = parseInt(rawLastMsgTimes[index]);
+        accum[troupeId] = new Date(ts);
         return accum;
       }, {});
 

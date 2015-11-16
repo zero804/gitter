@@ -164,12 +164,6 @@ exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
         stats.event("new_chat", statMetadata);
 
         return chatMessage;
-      })
-      .then(function(chatMessage) {
-        // Cache the timestamp of the last message sent to the room
-        Q.ninvoke(redisClient, "set", "lmts:" + troupe.id, sentAt.toISOString());
-
-        return chatMessage;
       });
   })
   .nodeify(callback);
@@ -192,8 +186,6 @@ exports.getRecentPublicChats = function() {
  * NB: It is the callers responsibility to ensure that the user has access to the room!
  */
 exports.updateChatMessage = function(troupe, chatMessage, user, newText, callback) {
-  var updatedAt = new Date();
-
   return Q.fcall(function() {
       var age = (Date.now() - chatMessage.sent.valueOf()) / 1000;
       if(age > MAX_CHAT_EDIT_AGE_SECONDS) {
@@ -240,13 +232,6 @@ exports.updateChatMessage = function(troupe, chatMessage, user, newText, callbac
             troupeId: troupe.id,
             username: user.username
           });
-
-        })
-        .then(function(chatMessage) {
-          // Cache the timestamp of the last message updated in the room
-          Q.ninvoke(redisClient, "set", "lmts:" + troupe.id, updatedAt.toISOString());
-
-          return chatMessage;
         })
         .thenResolve(chatMessage);
     })
