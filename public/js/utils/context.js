@@ -291,10 +291,10 @@ module.exports = (function() {
     }
   };
 
-  // try {
-  //   document.domain = context.env('domain');
-  // } catch(e) {
-  // }
+  // Has a feature been enabled?
+  context.hasFeature = function(featureName) {
+    return ctx.features && ctx.features.indexOf(featureName) >= 0;
+  };
 
   return context;
 
