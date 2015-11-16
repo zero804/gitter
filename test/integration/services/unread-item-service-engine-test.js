@@ -43,6 +43,35 @@ describe('unread-item-service', function() {
       userIds = [userId1, userId2];
     });
 
+
+    describe('LastChatTimestamps', function() {
+
+      it('should save the last chat in redis', function(done) {
+        var ts = mongoUtils.getTimestampFromObjectId(itemId1);
+        console.log('ts:', ts);
+        return unreadItemServiceEngine.testOnly.setLastChatTimestamp(troupeId1, ts)
+          .then(function() {
+            return Q.ninvoke(unreadItemServiceEngine.testOnly.redisClient, 'get', 'lmts:' + troupeId1);
+          })
+          .then(function(storedTs) {
+            assert.deepEqual(ts, storedTs);
+          })
+          .nodeify(done);
+      });
+
+      it('should fetch last msg timestamps for the given troupeIds', function(done) {
+        return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, userIds, [])
+          .then(function() {
+            return unreadItemServiceEngine.getLastChatTimestamps([troupeId1]);
+          })
+          .then(function(timestamps) {
+            var expected = mongoUtils.getTimestampFromObjectId(itemId1);
+            assert.deepEqual(timestamps, [expected]);
+          })
+          .nodeify(done);
+      });
+    });
+
     describe('newItemWithMentions', function() {
 
       it('should add items without mentions', function(done) {
