@@ -22,9 +22,6 @@ var recentRoomService = require('./recent-room-service');
 var badgeBatcher     = new RedisBatcher('badge', 1000, batchBadgeUpdates);
 var Q                = require('q');
 
-var redis       = require("../utils/redis");
-var redisClient = redis.getClient();
-
 /* Handles batching badge updates to users */
 function batchBadgeUpdates(key, userIds, done) {
   // Remove duplicates
