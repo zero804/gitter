@@ -165,9 +165,11 @@ exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
 
         return chatMessage;
       })
-      .then(function() {
+      .then(function(chatMessage) {
         // Cache the timestamp of the last message sent to the room
         Q.ninvoke(redisClient, "set", "lmts:" + troupe.id, sentAt.toISOString());
+
+        return chatMessage;
       });
   })
   .nodeify(callback);
