@@ -20,6 +20,10 @@ var chatSearchService    = require('./chat-search-service');
 var unreadItemService    = require('./unread-item-service');
 var markdownMajorVersion = require('gitter-markdown-processor').version.split('.')[0];
 
+var redis       = require("../utils/redis");
+var redisClient = redis.getClient();
+
+
 var useHints = true;
 
 var MAX_CHAT_MESSAGE_LENGTH = 4096;
@@ -160,6 +164,10 @@ exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
         stats.event("new_chat", statMetadata);
 
         return chatMessage;
+      })
+      .then(function() {
+        // Cache the timestamp of the last message sent to the room
+        Q.ninvoke(redisClient, "set", "lmts:" + troupe.id, sentAt.toISOString());
       });
   })
   .nodeify(callback);
