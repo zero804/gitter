@@ -6,6 +6,7 @@ var appMiddleware      = require('./middleware');
 var recentRoomService  = require('../../services/recent-room-service');
 var isPhone            = require('../../web/is-phone');
 var timezoneMiddleware = require('../../web/middlewares/timezone');
+var featureToggles     = require('../../web/middlewares/feature-toggles');
 var archive            = require('./archive');
 var identifyRoute      = require('gitter-web-env').middlewares.identifyRoute;
 
@@ -20,6 +21,7 @@ function saveRoom(req) {
 
 var mainFrameMiddlewarePipeline = [
   identifyRoute('app-main-frame'),
+  featureToggles,
   appMiddleware.uriContextResolverMiddleware({ create: 'not-repos' }),
   appMiddleware.isPhoneMiddleware,
   timezoneMiddleware,
@@ -56,6 +58,7 @@ var mainFrameMiddlewarePipeline = [
 
 var chatMiddlewarePipeline = [
   identifyRoute('app-chat-frame'),
+  featureToggles,
   appMiddleware.uriContextResolverMiddleware({ create: 'not-repos'}),
   appMiddleware.isPhoneMiddleware,
   timezoneMiddleware,
@@ -90,6 +93,7 @@ var chatMiddlewarePipeline = [
 
 var embedMiddlewarePipeline = [
   identifyRoute('app-embed-frame'),
+  featureToggles,
   appMiddleware.uriContextResolverMiddleware({ create: false }),
   appMiddleware.isPhoneMiddleware,
   timezoneMiddleware,

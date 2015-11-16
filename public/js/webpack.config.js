@@ -54,14 +54,12 @@ var webpackConfig = {
       'backbone.marionette',
       'loglevel',
       'utils/log',
-      // 'backbone.wreqr',
-      // 'backbone.babysitter',
       'handlebars/runtime',
       'gitter-realtime-client',
       'raven-js',
       'keymaster',
       'moment'
-      ]
+    ]
   },
   output: {
     path: __dirname + "/../../output/assets/js/",
