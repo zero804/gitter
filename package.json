@@ -155,6 +155,7 @@
     "fs-extra": "^0.8.1",
     "gitter-styleguide": "1.2.9",
     "gulp": "^3.8.11",
+    "gulp-coveralls": "^0.1.4",
     "gulp-expect-file": "0.0.7",
     "gulp-git": "^0.5.4",
     "gulp-grep-fail": "^0.2.0",
