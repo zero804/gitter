@@ -48,7 +48,6 @@ describe('unread-item-service', function() {
 
       it('should save the last chat in redis', function(done) {
         var ts = mongoUtils.getTimestampFromObjectId(itemId1);
-        console.log('ts:', ts);
         return unreadItemServiceEngine.testOnly.setLastChatTimestamp(troupeId1, ts)
           .then(function() {
             return Q.ninvoke(unreadItemServiceEngine.testOnly.redisClient, 'get', 'lmts:' + troupeId1);
