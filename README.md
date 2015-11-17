@@ -172,3 +172,16 @@ You can do this as follows:
 ```shell
 NODE_ENV=prod LISTEN_IF=utun0 node scripts/graphs/upload-graph.js
 ```
+
+Testing
+-----------------------
+
+All unit tests etc can be run with `npm test`
+
+Tests run in the browser context will not be included within the above command.
+To tun these tests you will need these variables within your `env`:
+
+BROWSERSTACK_USERNAME
+BROWSERSTACK_KEY
+
+once you have these you can run `npm run test:unit:browser` which should kick off the tests via browserstack

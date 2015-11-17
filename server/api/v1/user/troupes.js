@@ -69,7 +69,7 @@ module.exports = {
         }
 
         if('updateLastAccess' in updatedTroupe) {
-          promises.push(recentRoomService.saveUserTroupeLastAccess(userId, troupeId));
+          promises.push(recentRoomService.saveLastVisitedTroupeforUserId(userId, troupeId));
         }
 
         return Q.all(promises);

@@ -46,7 +46,7 @@
             },
             "isarray": {
               "version": "0.0.1",
-              "from": "http://beta-internal:4873/isarray/-/isarray-0.0.1.tgz",
+              "from": "isarray@0.0.1",
               "resolved": "http://beta-internal:4873/isarray/-/isarray-0.0.1.tgz"
             },
             "string_decoder": {
@@ -56,7 +56,7 @@
             },
             "inherits": {
               "version": "2.0.1",
-              "from": "http://beta-internal:4873/inherits/-/inherits-2.0.1.tgz",
+              "from": "inherits@>=2.0.1 <2.1.0",
               "resolved": "http://beta-internal:4873/inherits/-/inherits-2.0.1.tgz"
             }
           }
@@ -166,50 +166,50 @@
       }
     },
     "cld": {
-      "version": "2.4.4",
-      "from": "http://beta-internal:4873/cld/-/cld-2.4.4.tgz",
-      "resolved": "http://beta-internal:4873/cld/-/cld-2.4.4.tgz",
+      "version": "2.4.5",
+      "from": "cld@>=2.4.5 <3.0.0",
+      "resolved": "http://beta-internal:4873/cld/-/cld-2.4.5.tgz",
       "dependencies": {
         "glob": {
-          "version": "5.0.14",
-          "from": "http://beta-internal:4873/glob/-/glob-5.0.14.tgz",
-          "resolved": "http://beta-internal:4873/glob/-/glob-5.0.14.tgz",
+          "version": "5.0.15",
+          "from": "glob@>=5.0.10 <6.0.0",
+          "resolved": "http://beta-internal:4873/glob/-/glob-5.0.15.tgz",
           "dependencies": {
             "inflight": {
               "version": "1.0.4",
-              "from": "http://beta-internal:4873/inflight/-/inflight-1.0.4.tgz",
+              "from": "inflight@>=1.0.4 <2.0.0",
               "resolved": "http://beta-internal:4873/inflight/-/inflight-1.0.4.tgz",
               "dependencies": {
                 "wrappy": {
                   "version": "1.0.1",
-                  "from": "http://beta-internal:4873/wrappy/-/wrappy-1.0.1.tgz",
+                  "from": "wrappy@>=1.0.0 <2.0.0",
                   "resolved": "http://beta-internal:4873/wrappy/-/wrappy-1.0.1.tgz"
                 }
               }
             },
             "inherits": {
               "version": "2.0.1",
-              "from": "http://beta-internal:4873/inherits/-/inherits-2.0.1.tgz",
+              "from": "inherits@>=2.0.0 <3.0.0",
               "resolved": "http://beta-internal:4873/inherits/-/inherits-2.0.1.tgz"
             },
             "minimatch": {
-              "version": "2.0.10",
-              "from": "http://beta-internal:4873/minimatch/-/minimatch-2.0.10.tgz",
-              "resolved": "http://beta-internal:4873/minimatch/-/minimatch-2.0.10.tgz",
+              "version": "3.0.0",
+              "from": "minimatch@>=2.0.0 <3.0.0||>=3.0.0 <4.0.0",
+              "resolved": "http://beta-internal:4873/minimatch/-/minimatch-3.0.0.tgz",
               "dependencies": {
                 "brace-expansion": {
-                  "version": "1.1.0",
-                  "from": "http://beta-internal:4873/brace-expansion/-/brace-expansion-1.1.0.tgz",
-                  "resolved": "http://beta-internal:4873/brace-expansion/-/brace-expansion-1.1.0.tgz",
+                  "version": "1.1.1",
+                  "from": "brace-expansion@>=1.0.0 <2.0.0",
+                  "resolved": "http://beta-internal:4873/brace-expansion/-/brace-expansion-1.1.1.tgz",
                   "dependencies": {
                     "balanced-match": {
-                      "version": "0.2.0",
-                      "from": "http://beta-internal:4873/balanced-match/-/balanced-match-0.2.0.tgz",
-                      "resolved": "http://beta-internal:4873/balanced-match/-/balanced-match-0.2.0.tgz"
+                      "version": "0.2.1",
+                      "from": "balanced-match@>=0.2.0 <0.3.0",
+                      "resolved": "http://beta-internal:4873/balanced-match/-/balanced-match-0.2.1.tgz"
                     },
                     "concat-map": {
                       "version": "0.0.1",
-                      "from": "http://beta-internal:4873/concat-map/-/concat-map-0.0.1.tgz",
+                      "from": "concat-map@0.0.1",
                       "resolved": "http://beta-internal:4873/concat-map/-/concat-map-0.0.1.tgz"
                     }
                   }
@@ -218,32 +218,32 @@
             },
             "once": {
               "version": "1.3.2",
-              "from": "http://beta-internal:4873/once/-/once-1.3.2.tgz",
+              "from": "once@>=1.3.0 <2.0.0",
               "resolved": "http://beta-internal:4873/once/-/once-1.3.2.tgz",
               "dependencies": {
                 "wrappy": {
                   "version": "1.0.1",
-                  "from": "http://beta-internal:4873/wrappy/-/wrappy-1.0.1.tgz",
+                  "from": "wrappy@>=1.0.0 <2.0.0",
                   "resolved": "http://beta-internal:4873/wrappy/-/wrappy-1.0.1.tgz"
                 }
               }
             },
             "path-is-absolute": {
               "version": "1.0.0",
-              "from": "http://beta-internal:4873/path-is-absolute/-/path-is-absolute-1.0.0.tgz",
+              "from": "path-is-absolute@>=1.0.0 <2.0.0",
               "resolved": "http://beta-internal:4873/path-is-absolute/-/path-is-absolute-1.0.0.tgz"
             }
           }
         },
         "nan": {
-          "version": "1.9.0",
-          "from": "http://beta-internal:4873/nan/-/nan-1.9.0.tgz",
-          "resolved": "http://beta-internal:4873/nan/-/nan-1.9.0.tgz"
+          "version": "2.1.0",
+          "from": "nan@>=2.0.5 <3.0.0",
+          "resolved": "http://beta-internal:4873/nan/-/nan-2.1.0.tgz"
         },
         "rimraf": {
-          "version": "2.4.2",
-          "from": "http://beta-internal:4873/rimraf/-/rimraf-2.4.2.tgz",
-          "resolved": "http://beta-internal:4873/rimraf/-/rimraf-2.4.2.tgz"
+          "version": "2.4.3",
+          "from": "rimraf@>=2.4.0 <3.0.0",
+          "resolved": "http://beta-internal:4873/rimraf/-/rimraf-2.4.3.tgz"
         }
       }
     },
@@ -1284,7 +1284,7 @@
     },
     "gitter-markdown-processor": {
       "version": "11.0.1",
-      "from": "gitter-markdown-processor@11.0.1",
+      "from": "http://beta-internal:4873/gitter-markdown-processor/-/gitter-markdown-processor-11.0.1.tgz",
       "resolved": "http://beta-internal:4873/gitter-markdown-processor/-/gitter-markdown-processor-11.0.1.tgz",
       "dependencies": {
         "gitter-marked": {
@@ -1467,23 +1467,23 @@
       }
     },
     "gitter-services": {
-      "version": "1.13.0",
-      "from": "git+https://github.com/gitterHQ/services.git#e08765b1685153e662d1b3cbaacbb1a8b2e122d1",
-      "resolved": "git+https://github.com/gitterHQ/services.git#e08765b1685153e662d1b3cbaacbb1a8b2e122d1",
+      "version": "1.14.0",
+      "from": "git+https://github.com/gitterHQ/services.git#1.14.0",
+      "resolved": "git+https://github.com/gitterHQ/services.git#4572a7646acf37425c86c0f99bb94da8634cdd22",
       "dependencies": {
         "require-all": {
           "version": "0.0.8",
-          "from": "http://beta-internal:4873/require-all/-/require-all-0.0.8.tgz",
+          "from": "require-all@0.0.8",
           "resolved": "http://beta-internal:4873/require-all/-/require-all-0.0.8.tgz"
         },
         "qs": {
           "version": "1.2.2",
-          "from": "http://beta-internal:4873/qs/-/qs-1.2.2.tgz",
+          "from": "qs@>=1.0.0 <2.0.0",
           "resolved": "http://beta-internal:4873/qs/-/qs-1.2.2.tgz"
         },
         "extend": {
           "version": "1.3.0",
-          "from": "http://beta-internal:4873/extend/-/extend-1.3.0.tgz",
+          "from": "extend@>=1.2.1 <2.0.0",
           "resolved": "http://beta-internal:4873/extend/-/extend-1.3.0.tgz"
         }
       }
@@ -1594,9 +1594,9 @@
       }
     },
     "heapdump": {
-      "version": "0.2.10",
-      "from": "http://beta-internal:4873/heapdump/-/heapdump-0.2.10.tgz",
-      "resolved": "http://beta-internal:4873/heapdump/-/heapdump-0.2.10.tgz"
+      "version": "0.3.7",
+      "from": "heapdump@>=0.3.7 <0.4.0",
+      "resolved": "http://beta-internal:4873/heapdump/-/heapdump-0.3.7.tgz"
     },
     "highlight.js": {
       "version": "8.7.0",
@@ -2640,47 +2640,47 @@
         "concat-stream": {
           "version": "1.5.0",
           "from": "concat-stream@>=1.5.0 <2.0.0",
-          "resolved": "http://beta-internal:4873/concat-stream/-/concat-stream-1.5.0.tgz",
+          "resolved": "https://registry.npmjs.org/concat-stream/-/concat-stream-1.5.0.tgz",
           "dependencies": {
             "inherits": {
               "version": "2.0.1",
               "from": "inherits@>=2.0.1 <2.1.0",
-              "resolved": "http://beta-internal:4873/inherits/-/inherits-2.0.1.tgz"
+              "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz"
             },
             "typedarray": {
               "version": "0.0.6",
               "from": "typedarray@>=0.0.5 <0.1.0",
-              "resolved": "http://beta-internal:4873/typedarray/-/typedarray-0.0.6.tgz"
+              "resolved": "https://registry.npmjs.org/typedarray/-/typedarray-0.0.6.tgz"
             },
             "readable-stream": {
               "version": "2.0.2",
               "from": "readable-stream@>=2.0.0 <2.1.0",
-              "resolved": "http://beta-internal:4873/readable-stream/-/readable-stream-2.0.2.tgz",
+              "resolved": "https://registry.npmjs.org/readable-stream/-/readable-stream-2.0.2.tgz",
               "dependencies": {
                 "core-util-is": {
                   "version": "1.0.1",
                   "from": "core-util-is@>=1.0.0 <1.1.0",
-                  "resolved": "http://beta-internal:4873/core-util-is/-/core-util-is-1.0.1.tgz"
+                  "resolved": "https://registry.npmjs.org/core-util-is/-/core-util-is-1.0.1.tgz"
                 },
                 "isarray": {
                   "version": "0.0.1",
                   "from": "isarray@0.0.1",
-                  "resolved": "http://beta-internal:4873/isarray/-/isarray-0.0.1.tgz"
+                  "resolved": "https://registry.npmjs.org/isarray/-/isarray-0.0.1.tgz"
                 },
                 "process-nextick-args": {
                   "version": "1.0.2",
                   "from": "process-nextick-args@>=1.0.0 <1.1.0",
-                  "resolved": "http://beta-internal:4873/process-nextick-args/-/process-nextick-args-1.0.2.tgz"
+                  "resolved": "https://registry.npmjs.org/process-nextick-args/-/process-nextick-args-1.0.2.tgz"
                 },
                 "string_decoder": {
                   "version": "0.10.31",
                   "from": "string_decoder@>=0.10.0 <0.11.0",
-                  "resolved": "http://beta-internal:4873/string_decoder/-/string_decoder-0.10.31.tgz"
+                  "resolved": "https://registry.npmjs.org/string_decoder/-/string_decoder-0.10.31.tgz"
                 },
                 "util-deprecate": {
                   "version": "1.0.1",
                   "from": "util-deprecate@>=1.0.1 <1.1.0",
-                  "resolved": "http://beta-internal:4873/util-deprecate/-/util-deprecate-1.0.1.tgz"
+                  "resolved": "https://registry.npmjs.org/util-deprecate/-/util-deprecate-1.0.1.tgz"
                 }
               }
             }
@@ -2689,73 +2689,73 @@
         "https-proxy-agent": {
           "version": "0.3.6",
           "from": "https-proxy-agent@>=0.3.5 <0.4.0",
-          "resolved": "http://beta-internal:4873/https-proxy-agent/-/https-proxy-agent-0.3.6.tgz",
+          "resolved": "https://registry.npmjs.org/https-proxy-agent/-/https-proxy-agent-0.3.6.tgz",
           "dependencies": {
             "agent-base": {
               "version": "1.0.2",
               "from": "agent-base@>=1.0.1 <1.1.0",
-              "resolved": "http://beta-internal:4873/agent-base/-/agent-base-1.0.2.tgz"
+              "resolved": "https://registry.npmjs.org/agent-base/-/agent-base-1.0.2.tgz"
             },
             "debug": {
               "version": "2.2.0",
               "from": "debug@>=2.0.0 <3.0.0",
-              "resolved": "http://beta-internal:4873/debug/-/debug-2.2.0.tgz",
+              "resolved": "https://registry.npmjs.org/debug/-/debug-2.2.0.tgz",
               "dependencies": {
                 "ms": {
                   "version": "0.7.1",
                   "from": "ms@0.7.1",
-                  "resolved": "http://beta-internal:4873/ms/-/ms-0.7.1.tgz"
+                  "resolved": "https://registry.npmjs.org/ms/-/ms-0.7.1.tgz"
                 }
               }
             },
             "extend": {
               "version": "3.0.0",
               "from": "extend@>=3.0.0 <4.0.0",
-              "resolved": "http://beta-internal:4873/extend/-/extend-3.0.0.tgz"
+              "resolved": "https://registry.npmjs.org/extend/-/extend-3.0.0.tgz"
             }
           }
         },
         "json-stringify-safe": {
           "version": "5.0.1",
           "from": "json-stringify-safe@>=5.0.0 <6.0.0",
-          "resolved": "http://beta-internal:4873/json-stringify-safe/-/json-stringify-safe-5.0.1.tgz"
+          "resolved": "https://registry.npmjs.org/json-stringify-safe/-/json-stringify-safe-5.0.1.tgz"
         },
         "readable-stream": {
           "version": "1.1.13",
           "from": "readable-stream@>=1.1.13 <2.0.0",
-          "resolved": "http://beta-internal:4873/readable-stream/-/readable-stream-1.1.13.tgz",
+          "resolved": "https://registry.npmjs.org/readable-stream/-/readable-stream-1.1.13.tgz",
           "dependencies": {
             "core-util-is": {
               "version": "1.0.1",
               "from": "core-util-is@>=1.0.0 <1.1.0",
-              "resolved": "http://beta-internal:4873/core-util-is/-/core-util-is-1.0.1.tgz"
+              "resolved": "https://registry.npmjs.org/core-util-is/-/core-util-is-1.0.1.tgz"
             },
             "isarray": {
               "version": "0.0.1",
               "from": "isarray@0.0.1",
-              "resolved": "http://beta-internal:4873/isarray/-/isarray-0.0.1.tgz"
+              "resolved": "https://registry.npmjs.org/isarray/-/isarray-0.0.1.tgz"
             },
             "string_decoder": {
               "version": "0.10.31",
               "from": "string_decoder@>=0.10.0 <0.11.0",
-              "resolved": "http://beta-internal:4873/string_decoder/-/string_decoder-0.10.31.tgz"
+              "resolved": "https://registry.npmjs.org/string_decoder/-/string_decoder-0.10.31.tgz"
             },
             "inherits": {
               "version": "2.0.1",
               "from": "inherits@>=2.0.1 <2.1.0",
-              "resolved": "http://beta-internal:4873/inherits/-/inherits-2.0.1.tgz"
+              "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz"
             }
           }
         },
         "semver": {
           "version": "4.3.6",
           "from": "semver@>=4.2.0 <5.0.0",
-          "resolved": "http://beta-internal:4873/semver/-/semver-4.3.6.tgz"
+          "resolved": "https://registry.npmjs.org/semver/-/semver-4.3.6.tgz"
         },
         "yakaa": {
           "version": "1.0.1",
           "from": "yakaa@>=1.0.1 <2.0.0",
-          "resolved": "http://beta-internal:4873/yakaa/-/yakaa-1.0.1.tgz"
+          "resolved": "https://registry.npmjs.org/yakaa/-/yakaa-1.0.1.tgz"
         }
       }
     },
@@ -3174,12 +3174,12 @@
     },
     "passport-oauth2-client-password": {
       "version": "0.1.2",
-      "from": "passport-oauth2-client-password@0.1.2",
+      "from": "http://beta-internal:4873/passport-oauth2-client-password/-/passport-oauth2-client-password-0.1.2.tgz",
       "resolved": "http://beta-internal:4873/passport-oauth2-client-password/-/passport-oauth2-client-password-0.1.2.tgz",
       "dependencies": {
         "passport-strategy": {
           "version": "1.0.0",
-          "from": "passport-strategy@>=1.0.0 <2.0.0",
+          "from": "http://beta-internal:4873/passport-strategy/-/passport-strategy-1.0.0.tgz",
           "resolved": "http://beta-internal:4873/passport-strategy/-/passport-strategy-1.0.0.tgz"
         }
       }
@@ -4884,7 +4884,7 @@
     },
     "text-filter": {
       "version": "0.1.1",
-      "from": "text-filter@0.1.1",
+      "from": "http://beta-internal:4873/text-filter/-/text-filter-0.1.1.tgz",
       "resolved": "http://beta-internal:4873/text-filter/-/text-filter-0.1.1.tgz"
     },
     "throat": {
@@ -4901,54 +4901,54 @@
     },
     "through2-concurrent": {
       "version": "1.1.0",
-      "from": "through2-concurrent@1.1.0",
+      "from": "http://beta-internal:4873/through2-concurrent/-/through2-concurrent-1.1.0.tgz",
       "resolved": "http://beta-internal:4873/through2-concurrent/-/through2-concurrent-1.1.0.tgz",
       "dependencies": {
         "through2": {
           "version": "2.0.0",
-          "from": "through2@>=2.0.0 <3.0.0",
+          "from": "http://beta-internal:4873/through2/-/through2-2.0.0.tgz",
           "resolved": "http://beta-internal:4873/through2/-/through2-2.0.0.tgz",
           "dependencies": {
             "readable-stream": {
               "version": "2.0.2",
-              "from": "readable-stream@>=2.0.0 <2.1.0",
+              "from": "http://beta-internal:4873/readable-stream/-/readable-stream-2.0.2.tgz",
               "resolved": "http://beta-internal:4873/readable-stream/-/readable-stream-2.0.2.tgz",
               "dependencies": {
                 "core-util-is": {
                   "version": "1.0.1",
-                  "from": "core-util-is@>=1.0.0 <1.1.0",
+                  "from": "http://beta-internal:4873/core-util-is/-/core-util-is-1.0.1.tgz",
                   "resolved": "http://beta-internal:4873/core-util-is/-/core-util-is-1.0.1.tgz"
                 },
                 "inherits": {
                   "version": "2.0.1",
-                  "from": "inherits@>=2.0.1 <2.1.0",
+                  "from": "http://beta-internal:4873/inherits/-/inherits-2.0.1.tgz",
                   "resolved": "http://beta-internal:4873/inherits/-/inherits-2.0.1.tgz"
                 },
                 "isarray": {
                   "version": "0.0.1",
-                  "from": "isarray@0.0.1",
+                  "from": "http://beta-internal:4873/isarray/-/isarray-0.0.1.tgz",
                   "resolved": "http://beta-internal:4873/isarray/-/isarray-0.0.1.tgz"
                 },
                 "process-nextick-args": {
                   "version": "1.0.3",
-                  "from": "process-nextick-args@>=1.0.0 <1.1.0",
+                  "from": "http://beta-internal:4873/process-nextick-args/-/process-nextick-args-1.0.3.tgz",
                   "resolved": "http://beta-internal:4873/process-nextick-args/-/process-nextick-args-1.0.3.tgz"
                 },
                 "string_decoder": {
                   "version": "0.10.31",
-                  "from": "string_decoder@>=0.10.0 <0.11.0",
+                  "from": "http://beta-internal:4873/string_decoder/-/string_decoder-0.10.31.tgz",
                   "resolved": "http://beta-internal:4873/string_decoder/-/string_decoder-0.10.31.tgz"
                 },
                 "util-deprecate": {
                   "version": "1.0.2",
-                  "from": "util-deprecate@>=1.0.1 <1.1.0",
+                  "from": "http://beta-internal:4873/util-deprecate/-/util-deprecate-1.0.2.tgz",
                   "resolved": "http://beta-internal:4873/util-deprecate/-/util-deprecate-1.0.2.tgz"
                 }
               }
             },
             "xtend": {
               "version": "4.0.0",
-              "from": "xtend@>=4.0.0 <4.1.0",
+              "from": "http://beta-internal:4873/xtend/-/xtend-4.0.0.tgz",
               "resolved": "http://beta-internal:4873/xtend/-/xtend-4.0.0.tgz"
             }
           }
@@ -5084,17 +5084,17 @@
     },
     "url-parse": {
       "version": "1.0.5",
-      "from": "url-parse@1.0.5",
+      "from": "http://beta-internal:4873/url-parse/-/url-parse-1.0.5.tgz",
       "resolved": "http://beta-internal:4873/url-parse/-/url-parse-1.0.5.tgz",
       "dependencies": {
         "querystringify": {
           "version": "0.0.3",
-          "from": "querystringify@>=0.0.0 <0.1.0",
+          "from": "http://beta-internal:4873/querystringify/-/querystringify-0.0.3.tgz",
           "resolved": "http://beta-internal:4873/querystringify/-/querystringify-0.0.3.tgz"
         },
         "requires-port": {
           "version": "1.0.0",
-          "from": "requires-port@>=1.0.0 <1.1.0",
+          "from": "http://beta-internal:4873/requires-port/-/requires-port-1.0.0.tgz",
           "resolved": "http://beta-internal:4873/requires-port/-/requires-port-1.0.0.tgz"
         }
       }

@@ -11,6 +11,7 @@ var MobileLayout = require('views/layouts/mobile');
 var FastClick = require('fastclick');
 var RoomCollectionTracker = require('components/room-collection-tracker');
 var troupeCollections = require('collections/instances/troupes');
+require('utils/tracking');
 
 /* Set the timezone cookie */
 require('components/timezone-cookie');

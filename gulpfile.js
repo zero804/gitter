@@ -450,10 +450,11 @@ gulp.task('watch', ['css'], function() {
 var opts = require("nomnom").parse();
 gulp.task('safe-install', shell.task([
   'npm run unlink',
-  'npm install',
-  'npm prune',
+  'npm install --production',
+  'npm prune --production',
   'npm install ' + opts.package + ' --save',
   'npm shrinkwrap',
+  'npm install',
   'npm run link',
   'npm run fix-shrinkwrap-registry'
 ]));
