@@ -25,7 +25,7 @@ var cdn                      = require("../../web/cdn");
 var roomMembershipService    = require('../../services/room-membership-service');
 var troupeService            = require('../../services/troupe-service');
 var useragent                = require('useragent');
-var _                        = require('underscore');
+var _                        = require('lodash');
 var GitHubOrgService         = require('gitter-web-github').GitHubOrgService;
 var orgPermissionModel       = require('../../services/permissions/org-permissions-model');
 var resolveRoomAvatarSrcSet  = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
@@ -482,10 +482,14 @@ function renderOrgPage(req, res, next) {
   .spread(function (ghOrg,rooms, troupeContext, isOrgAdmin, isOrgMember) {
 
     // Filter out PRIVATE rooms
-    rooms = rooms.filter(function(room) { return room.security !== 'PRIVATE'; });
+    _.remove(rooms, function(room) { return room.security === 'PRIVATE'; });
 
-    // Filter out the ORG room for non org members
-    if (!isOrgMember) rooms = rooms.filter(function(room) { return room.githubType !== 'ORG'; });
+    // Filter out ORG room and INHERITED permission rooms for non-org members
+    if (!isOrgMember) {
+      _.remove(rooms, function(room) { 
+        return (room.githubType === 'ORG' || room.security === 'INHERITED'); 
+      });
+    }
 
     // Calculate org user count across all rooms (except private)
     var orgUserCount = rooms.reduce(function(accum, room) {

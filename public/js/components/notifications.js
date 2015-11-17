@@ -6,6 +6,7 @@ var WindowNotification  = window.Notification;
 var webkitNotifications = window.webkitNotifications;
 var urlParser           = require('../utils/url-parser');
 var linkHandler         = require('./link-handler');
+var resolveAvatarUrl    = require('gitter-web-shared/avatars/resolve-avatar-url');
 
 var notificationsHaveBeenEnabled = false;
 
@@ -29,15 +30,13 @@ function showNotification(message) {
   var link = message.link;
   var title = message.title;
   var text = message.text;
-  var icon = cdn('images/icon-logo-red-64.png');
+  var icon = message.icon || cdn('images/icon-logo-red-64.png');
 
   var notification = new WindowNotification(title, { body: text, icon: icon });
 
-  notification.onshow = function() {
-    setTimeout(function() {
-      notification.close();
-    }, 10000);
-  };
+  setTimeout(function() {
+    notification.close();
+  }, 10000);
 
   notification.onclick = function() {
     window.focus();
