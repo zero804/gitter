@@ -29,6 +29,10 @@ var View = Marionette.LayoutView.extend({
     }
   },
 
+  events: {
+    'click #upgrade-auth': 'upgradeAuthClicked'
+  },
+
   childEvents: {
     'selected': 'repoSelected'
   },
@@ -72,6 +76,12 @@ var View = Marionette.LayoutView.extend({
     }
   },
 
+  upgradeAuthClicked: function(e) {
+    // don't also click the closest room..
+    e.stopPropagation();
+    window.addEventListener('message', oauthUpgradeAfterRequestedCallback, false);
+  },
+
   serializeData: function () {
     return {
       privateRepoScope: !!context.getUser().scopes.private_repo
@@ -103,7 +113,7 @@ function promptForHook() {
   appEvents.trigger('user_notification', {
     click: function(e) {
       e.preventDefault();
-      window.addEventListener('message', oauthUpgradeCallback, false);
+      window.addEventListener('message', oauthUpgradeAfterRoomCreationCallback, false);
       window.open('/login/upgrade?scopes=public_repo');
     },
 
@@ -116,10 +126,10 @@ function promptForHook() {
   });
 }
 
-function oauthUpgradeCallback(e) {
+function oauthUpgradeAfterRoomCreationCallback(e) {
   if (e.data !== 'oauth_upgrade_complete') return;
 
-  window.removeEventListener('message', oauthUpgradeCallback, false);
+  window.removeEventListener('message', oauthUpgradeAfterRoomCreationCallback, false);
 
   apiClient.room.put('', { autoConfigureHooks: 1 })
   .then(function() {
@@ -128,4 +138,12 @@ function oauthUpgradeCallback(e) {
       text: 'Your integrations have been setup.',
     });
   });
+}
+
+function oauthUpgradeAfterRequestedCallback(e) {
+  if (e.data !== 'oauth_upgrade_complete') return;
+
+  window.removeEventListener('message', oauthUpgradeAfterRequestedCallback, false);
+
+  window.location.reload();
 }
