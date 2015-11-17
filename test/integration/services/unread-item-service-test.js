@@ -99,6 +99,71 @@ describe('unread-item-service', function() {
 
   describe('mocked out', function() {
 
+    describe('activityIndicator', function() {
+      var troupeId1, troupeId2, troupeId3, troupeId4;
+      var userId1;
+      var unreadItemService, recentRoomService, engine;
+
+      beforeEach(function() {
+        troupeId1 = mongoUtils.getNewObjectIdString() + "";
+        troupeId2 = mongoUtils.getNewObjectIdString() + "";
+        troupeId3 = mongoUtils.getNewObjectIdString() + "";
+        troupeId4 = mongoUtils.getNewObjectIdString() + "";
+        userId1   = mongoUtils.getNewObjectIdString() + "";
+
+        recentRoomService = mockito.mock(testRequire('./services/recent-room-service'));
+        engine = mockito.mock(testRequire('./services/unread-item-service-engine'));
+
+        // Last access times for all the rooms userId1 has visited
+        var lastAccessTimes = {};
+        lastAccessTimes[troupeId1] = new Date('2015-11-17T15:00:00.000Z');
+        lastAccessTimes[troupeId2] = new Date('2015-11-17T16:00:00.000Z');
+        lastAccessTimes[troupeId3] = new Date('2015-11-17T17:00:00.000Z');
+        lastAccessTimes[troupeId4] = new Date('2015-11-17T18:00:00.000Z');
+
+        // Last chat times only for the requested troupeIds
+        var lastChatTimes = [
+          '1447774200000',  // for troupeId1 => 2015-11-17T15:30:00.000Z
+          null,             // for troupeId2 => no recent chats
+          '1447777800000'   // for troupeId3 => 2015-11-17T16:30:00.000Z
+        ];
+
+        mockito.when(recentRoomService).getTroupeLastAccessTimesForUser(userId1)
+        .thenReturn(Q.resolve(lastAccessTimes));
+
+        mockito.when(engine).getLastChatTimestamps([troupeId1, troupeId2, troupeId3])
+        .thenReturn(Q.resolve(lastChatTimes));
+
+        mockito.when(engine).getLastChatTimestamps([])
+        .thenReturn(Q.resolve({}));
+
+        unreadItemService = testRequire.withProxies("./services/unread-item-service", {
+          './recent-room-service': recentRoomService,
+          './unread-item-service-engine': engine
+        });
+
+      });
+
+      it('should get activity for rooms with recent messages', function(done) {
+        unreadItemService.getActivityIndicatorForTroupeIds([troupeId1, troupeId2, troupeId3], userId1)
+        .then(function(activity) {
+          assert.deepEqual(Object.keys(activity).length, 2);
+          assert.deepEqual(activity[troupeId1], true); // Message more recent than the last access
+          assert.deepEqual(activity[troupeId3], false); // User visited the room after this msg
+        })
+        .nodeify(done);
+      });
+
+      it('should not return any activity if no rooms provided', function(done) {
+        unreadItemService.getActivityIndicatorForTroupeIds([], userId1)
+        .then(function(activity) {
+          assert.deepEqual(Object.keys(activity).length, 0);
+        })
+        .nodeify(done);
+      });
+
+    });
+
     describe('parseChat', function() {
       var chatId;
       var troupeId, troupeId2, troupeId3;
