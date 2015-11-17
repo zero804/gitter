@@ -32,7 +32,8 @@ module.exports = {
       .then(function() {
         return { success: true };
       });
-  },
+
+   },
 
   destroy: function(req) {
     if(req.params.unreadItem.toLowerCase() !== 'all') throw new StatusError(404);

@@ -64,6 +64,8 @@ module.exports = (function() {
   var ReadItemSender = function(unreadItemStore) {
     this._buffer = {};
     this._sendLimited = limit(this._send, this, 1000);
+    this._updateLastAccessLimited = limit(this._updateLastAccess, this, 1000);
+
 
     unreadItemStore.on('itemMarkedRead', this._onItemMarkedRead.bind(this));
 
@@ -75,6 +77,10 @@ module.exports = (function() {
 
   ReadItemSender.prototype = {
     _onItemMarkedRead: function(itemId, mention, lurkMode) {
+
+      // Update last access time to keep track of last viewed items
+      if (lurkMode) this._updateLastAccessLimited();
+
       // Don't sent unread items back to the server in lurk mode unless its a mention
       if (lurkMode && !mention) return;
 
@@ -95,6 +101,13 @@ module.exports = (function() {
         // Beware: This causes mainthread locks in Safari
         this._send({ sync: true });
       }
+    },
+
+    _updateLastAccess: function() {
+      apiClient.userRoom.put('', { updateLastAccess: new Date() })
+      .then(function() {
+        debug('updateLastAccess done');
+      });
     },
 
     _send: function(options) {
@@ -240,6 +253,18 @@ module.exports = (function() {
     // This is a catch all for for unread items that are
     // not marked as read
     setInterval(limitedGetBounds, 2000);
+
+    // If the user seen this messages and updated the last access time in 
+    // a different window, mark the messages in this window as read.
+    if (context.troupe().get('lurk')) {
+      collectionView.listenTo(context.troupe(), 'change:lastAccessTime', function(room) {
+        var lastAccess = room.get('lastAccessTime');
+        this.collection.forEach(function(chat) {
+          if (chat.get('sent').isBefore(lastAccess) && chat.get('unread'))
+            chat.set('unread', false);
+        });
+      });
+    }
   };
 
   TroupeUnreadItemsViewportMonitor.prototype = {

@@ -115,6 +115,7 @@ module.exports = (function() {
 
       if (!changed || hasChanged('currentRoom')) {
         toggleClass(el, 'room-list-item--current-room', attributes.currentRoom);
+        if (attributes.currentRoom) toggleClass(el, 'chatting', false);
       }
 
       if (!changed) { // Only on first render

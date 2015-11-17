@@ -68,6 +68,10 @@ module.exports = {
           }
         }
 
+        if('updateLastAccess' in updatedTroupe) {
+          promises.push(recentRoomService.saveLastVisitedTroupeforUserId(userId, troupeId));
+        }
+
         return Q.all(promises);
       })
       .then(function() {

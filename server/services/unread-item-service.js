@@ -18,8 +18,9 @@ var Q                = require('q');
 var roomMembershipService = require('./room-membership-service');
 var uniqueIds        = require('mongodb-unique-ids');
 var debug            = require('debug')('gitter:unread-item-service');
-
+var recentRoomService = require('./recent-room-service');
 var badgeBatcher     = new RedisBatcher('badge', 1000, batchBadgeUpdates);
+var Q                = require('q');
 
 /* Handles batching badge updates to users */
 function batchBadgeUpdates(key, userIds, done) {
@@ -551,10 +552,11 @@ function processResultsForNewItemWithMentions(troupeId, chatId, parsed, results,
         // Next, notify all the lurkers
         // Note that this can be a very long list in a big room
         var activityOnly = parsed.activityOnlyUserIds;
+
         for(var i = 0; i < activityOnly.length; i++) {
           var activityOnlyUserId =  activityOnly[i];
-          var activityOnlyUserIdOnlineStatus = presenceStatus[activityOnlyUserId];
 
+          var activityOnlyUserIdOnlineStatus = presenceStatus[activityOnlyUserId];
           /* User is connected? Send them a status update */
           switch(activityOnlyUserIdOnlineStatus) {
             case 'inroom':
@@ -688,6 +690,38 @@ function queueBadgeUpdateForUser(userIds) {
   debug("Batching badge update for %s users", len);
   badgeBatcher.add('queue', userIds);
 }
+
+exports.getActivityIndicatorForTroupeIds = function(troupeIds, userId) {
+
+  return Q.all([
+    recentRoomService.getTroupeLastAccessTimesForUser(userId),
+    engine.getLastChatTimestamps(troupeIds)
+  ])
+    .spread(function(allLastAccessTimes, rawLastMsgTimes) {
+
+      var lastAccessTimes = troupeIds.reduce(function(accum, troupeId) {
+        accum[troupeId] = allLastAccessTimes[troupeId];
+        return accum;
+      }, {});
+
+      var lastMsgTimes = troupeIds.reduce(function(accum, troupeId, index) {
+        if (!rawLastMsgTimes[index]) return accum;
+        var ts = parseInt(rawLastMsgTimes[index]);
+        accum[troupeId] = new Date(ts);
+        return accum;
+      }, {});
+
+
+      var activity = Object.keys(lastAccessTimes).reduce(function(accum, troupeId) {
+        if (!lastMsgTimes[troupeId]) return accum;
+        accum[troupeId] = lastMsgTimes[troupeId] > lastAccessTimes[troupeId];
+        return accum;
+      }, {});
+
+      return activity;
+  });
+};
+
 
 exports.listen = function() {
   badgeBatcher.listen();
