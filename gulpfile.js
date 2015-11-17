@@ -25,6 +25,7 @@ var del = require('del');
 var grepFail = require('gulp-grep-fail');
 var runSequence = require('run-sequence');
 var jsonlint = require('gulp-jsonlint');
+var coveralls = require('gulp-coveralls');
 
 /* Don't do clean in gulp, use make */
 var DEV_MODE = !!process.env.DEV_MODE;
@@ -132,7 +133,14 @@ gulp.task('test-redis-lua', shell.task([
   './test/redis-lua/run-tests'
 ]));
 
-gulp.task('test', ['test-mocha', 'test-redis-lua']);
+
+gulp.task('submit-coveralls', ['test-mocha', 'test-redis-lua'], function() {
+  process.env.COVERALLS_GIT_COMMIT = process.env.GIT_COMMIT;
+  return gulp.src('output/coverage-reports/**/lcov.info')
+    .pipe(coveralls());
+});
+
+gulp.task('test', ['test-mocha', 'test-redis-lua', 'submit-coveralls']);
 
 makeTestTasks('localtest', function(name, files) {
   return gulp.src(files, { read: false })

@@ -185,3 +185,28 @@ BROWSERSTACK_USERNAME
 BROWSERSTACK_KEY
 
 once you have these you can run `npm run test:unit:browser` which should kick off the tests via browserstack
+
+
+
+## Shrinkwrap Cheatsheat
+
+### 1. I've got a conflict in my shrinkwrap
+
+1. Merge any conflicts in your `package.json`, but ignore conflicts in your `npm-shrinkwrap.json`
+2. Run `npm run npm shrinkwrap-conflict`
+2. Commit your changes to `npm-shrinkwrap.json` and `package.json`
+
+### 2. I would like to add a dev-dependency
+
+1. Use the normal `npm install x@y --save-dev` command
+2. Commit your changes to `package.json`
+
+### 3. I would like to add a runtime dependency
+
+1. Use `gulp safe-install --package module@version`
+2. Commit your changes to `npm-shrinkwrap.json` and `package.json`
+
+### 4. The shrinkwrap file is completely screwed up. Can I recreate it?
+
+1. Use `npm clean-shrinkwrap`
+2. Commit your changes to `npm-shrinkwrap.json`
