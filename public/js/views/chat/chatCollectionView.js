@@ -195,6 +195,19 @@ module.exports = (function() {
         this.rollers.setModeLocked(false);
       });
 
+      // If the user seen this messages and updated the last access time in 
+      // a different window, mark the messages in this window as read.
+      this.listenTo(context.troupe(), 'change:lastAccessTime', function(room) {
+        if (!room.get('lurk')) return;
+
+        var lastAccess = room.get('lastAccessTime');
+        this.collection.forEach(function(chat) {
+          if (chat.get('sent').isBefore(lastAccess) && chat.get('unread'))
+            chat.set('unread', false);
+        });
+      }.bind(this));
+
+
       // This uses the last message seen behaviour to show an unread line
       // between the messages. Keeping it here for now, it wont user the
       // lastAccessTime in the future but will behave the same wa.

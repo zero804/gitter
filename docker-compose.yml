@@ -16,7 +16,7 @@ redis2:
     - redis1
   env_file:
     - ./config/docker/redis-slave.env
-  entrypoint: [ "/bin/bash", "-c", "exec /usr/local/bin/redis-server --bind 0.0.0.0 --port 6380 --slaveof $REDIS_MASTER_IP 6379 --maxclients 200"]
+  entrypoint: [ "/bin/bash", "-c", "exec /usr/local/bin/redis-server --bind 0.0.0.0 --port 6380 --slaveof $$REDIS_MASTER_IP 6379 --maxclients 200"]
 
 
 sentinel1:
@@ -30,7 +30,7 @@ sentinel1:
     - "26379:26379"
   env_file:
     - ./config/docker/sentinel.env
-  entrypoint: [ "/bin/bash", "-c", "echo $SENTINEL_CONF > /redis-sentinel.conf && exec /usr/local/bin/redis-server /redis-sentinel.conf --sentinel --bind 0.0.0.0 --maxclients 200"]
+  entrypoint: [ "/bin/bash", "-c", "echo $$SENTINEL_CONF > /redis-sentinel.conf && exec /usr/local/bin/redis-server /redis-sentinel.conf --sentinel --bind 0.0.0.0 --maxclients 200"]
 
 mongo2:
   hostname: mongo2
@@ -61,7 +61,7 @@ mongo1:
 
 mongosetup:
   image: mongo:3.0
-  restart: no
+  restart: 'no'
   links:
     - mongo1:mongo1
     - mongo2:mongo2
@@ -96,7 +96,7 @@ elasticsearch:
 
 elasticsearchsetup:
   image: node:0.10.39
-  restart: no
+  restart: 'no'
   links:
     - mongo1:mongo1
     - mongo2:mongo2
