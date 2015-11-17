@@ -39,8 +39,13 @@ npm-full:
 	rm -rf node_modules/
 	npm install
 
+npm-full-bulletproof:
+	rm -rf node_modules/
+	npm install --production --ignore-scripts
+	npm rebuild
+
 npm:
-	make npm-quick || make npm-full
+	make npm-quick || make npm-full || make npm-full-bulletproof
 
 sprites:
 	@mkdir -p output/temp-sprites
