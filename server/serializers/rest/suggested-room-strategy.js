@@ -36,7 +36,7 @@ function SuggestedRoomStrategy() {
     return {
       id: room && room.id,
       uri: uri,
-      avatarUrl: resolveRoomAvatarUrl(uri),
+      avatarUrl: resolveRoomAvatarUrl((room && room.uri) ? room : suggestedRoom, 48),
       userCount: room && room.userCount || suggestedRoom.userCount,
       description: room && room.topic || suggestedRoom.topic,
       exists: !!room

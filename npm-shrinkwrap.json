@@ -5111,6 +5111,23 @@
       "from": "http://beta-internal:4873/underscore/-/underscore-1.6.0.tgz",
       "resolved": "http://beta-internal:4873/underscore/-/underscore-1.6.0.tgz"
     },
+    "url-parse": {
+      "version": "1.0.5",
+      "from": "http://beta-internal:4873/url-parse/-/url-parse-1.0.5.tgz",
+      "resolved": "http://beta-internal:4873/url-parse/-/url-parse-1.0.5.tgz",
+      "dependencies": {
+        "querystringify": {
+          "version": "0.0.3",
+          "from": "http://beta-internal:4873/querystringify/-/querystringify-0.0.3.tgz",
+          "resolved": "http://beta-internal:4873/querystringify/-/querystringify-0.0.3.tgz"
+        },
+        "requires-port": {
+          "version": "1.0.0",
+          "from": "http://beta-internal:4873/requires-port/-/requires-port-1.0.0.tgz",
+          "resolved": "http://beta-internal:4873/requires-port/-/requires-port-1.0.0.tgz"
+        }
+      }
+    },
     "useragent": {
       "version": "2.0.6",
       "from": "http://beta-internal:4873/useragent/-/useragent-2.0.6.tgz",
