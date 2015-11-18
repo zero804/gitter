@@ -11,4 +11,8 @@ GoogleBackend.prototype.getEmailAddress = function(preferStoredEmail) {
   return Q.resolve(this.identity.email);
 };
 
+GoogleBackend.prototype.getSerializedOrgs = function() {
+  return Q.resolve([]);
+};
+
 module.exports = GoogleBackend;
