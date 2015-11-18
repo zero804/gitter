@@ -55,96 +55,116 @@ function getNewItemBatches(userIds, mentionUserIds) {
   return results;
 }
 
+
 /**
  *
  * Note: mentionUserIds must always be a subset of usersIds (or equal)
  */
 function newItemWithMentions(troupeId, itemId, userIds, mentionUserIds) {
-  if(!userIds.length) return Q.resolve({});
 
-  // Working in strings saves a stack of time
-  troupeId = mongoUtils.serializeObjectId(troupeId);
-
-  // Turn all the userIds into strings up front
-  // in large rooms this is a big performance gain.
-  // In small rooms, it slows things down
-  if (userIds.length > PRECONVERT_OBJECTID_TO_STRING_THRESHOLD) {
-    userIds = _.map(userIds, mongoUtils.serializeObjectId);
-  }
-
-  // Turn all the userIds into strings up front
-  // in large rooms this is a big performance gain.
-  // In small rooms, it slows things down
-  if (mentionUserIds.length > PRECONVERT_OBJECTID_TO_STRING_THRESHOLD) {
-    mentionUserIds = _.map(mentionUserIds, mongoUtils.serializeObjectId);
-  }
-
-  var batches = getNewItemBatches(userIds, mentionUserIds);
   var timestamp = mongoUtils.getTimestampFromObjectId(itemId);
 
-  return Q.all(_.map(batches, function(batch) {
-      var batchUserIds = batch.userIds;
-      var batchMentionIds = batch.mentionUserIds;
+  return setLastChatTimestamp(troupeId, timestamp)
+    .then(function() {
 
-      // Now talk to redis and do the update
-      var keys = [EMAIL_NOTIFICATION_HASH_KEY];
-      _.forEach(batchUserIds, function(userId) {
-        keys.push("unread:chat:" + userId + ":" + troupeId);
-        keys.push("ub:" + userId);
-      });
+    if(!userIds.length) return Q.resolve({});
 
-      _.forEach(batchMentionIds, function(mentionUserId) {
-        var mentionKey = "m:" + mentionUserId;
-        keys.push(mentionKey + ":" + troupeId);
-        keys.push(mentionKey);
-      });
+    // Working in strings saves a stack of time
+    troupeId = mongoUtils.serializeObjectId(troupeId);
 
-      var values = [batchUserIds.length, troupeId, itemId, timestamp].concat(batchUserIds);
+    // Turn all the userIds into strings up front
+    // in large rooms this is a big performance gain.
+    // In small rooms, it slows things down
+    if (userIds.length > PRECONVERT_OBJECTID_TO_STRING_THRESHOLD) {
+      userIds = _.map(userIds, mongoUtils.serializeObjectId);
+    }
 
-      return runScript('unread-add-item-with-mentions', keys, values);
-    }))
-    .then(function(results) {
-      var resultHash = {};
+    // Turn all the userIds into strings up front
+    // in large rooms this is a big performance gain.
+    // In small rooms, it slows things down
+    if (mentionUserIds.length > PRECONVERT_OBJECTID_TO_STRING_THRESHOLD) {
+      mentionUserIds = _.map(mentionUserIds, mongoUtils.serializeObjectId);
+    }
 
-      // Using _.forEach as its much faster than native in a tight loop like this
-      _.forEach(results, function(result, index) {
-        var batch = batches[index];
+    var batches = getNewItemBatches(userIds, mentionUserIds);
+
+    return Q.all(_.map(batches, function(batch) {
         var batchUserIds = batch.userIds;
         var batchMentionIds = batch.mentionUserIds;
 
-        var upgradeCount = 0;
-        // Using _.forEach as its much faster than native in a tight loop like this
+        // Now talk to redis and do the update
+        var keys = [EMAIL_NOTIFICATION_HASH_KEY];
         _.forEach(batchUserIds, function(userId) {
-          var troupeUnreadCount   = result.shift();
-          var flag                = result.shift();
-          var badgeUpdate         = !!(flag & 1);
-          var upgradedKey          = flag & 2;
-
-          resultHash[userId] = {
-            unreadCount: troupeUnreadCount >= 0 ? troupeUnreadCount : undefined,
-            badgeUpdate: badgeUpdate
-          };
-
-          if(upgradedKey) {
-            upgradeCount++;
-          }
+          keys.push("unread:chat:" + userId + ":" + troupeId);
+          keys.push("ub:" + userId);
         });
-
-        if (upgradeCount > 10) {
-          winston.warn('unread-items: upgraded keys for ' + upgradeCount + ' user:troupes');
-        } else if(upgradeCount > 0) {
-          debug('unread-items: upgraded keys for %s user:troupes', upgradeCount);
-        }
 
         _.forEach(batchMentionIds, function(mentionUserId) {
-          var mentionCount = result.shift();
-          resultHash[mentionUserId].mentionCount = mentionCount >= 0 ? mentionCount : undefined;
+          var mentionKey = "m:" + mentionUserId;
+          keys.push(mentionKey + ":" + troupeId);
+          keys.push(mentionKey);
         });
 
-      });
+        var values = [batchUserIds.length, troupeId, itemId, timestamp].concat(batchUserIds);
 
-      return resultHash;
-    });
+        return runScript('unread-add-item-with-mentions', keys, values);
+      }))
+      .then(function(results) {
+        var resultHash = {};
+
+        // Using _.forEach as its much faster than native in a tight loop like this
+        _.forEach(results, function(result, index) {
+          var batch = batches[index];
+          var batchUserIds = batch.userIds;
+          var batchMentionIds = batch.mentionUserIds;
+
+          var upgradeCount = 0;
+          // Using _.forEach as its much faster than native in a tight loop like this
+          _.forEach(batchUserIds, function(userId) {
+            var troupeUnreadCount   = result.shift();
+            var flag                = result.shift();
+            var badgeUpdate         = !!(flag & 1);
+            var upgradedKey          = flag & 2;
+
+            resultHash[userId] = {
+              unreadCount: troupeUnreadCount >= 0 ? troupeUnreadCount : undefined,
+              badgeUpdate: badgeUpdate
+            };
+
+            if(upgradedKey) {
+              upgradeCount++;
+            }
+          });
+
+          if (upgradeCount > 10) {
+            winston.warn('unread-items: upgraded keys for ' + upgradeCount + ' user:troupes');
+          } else if(upgradeCount > 0) {
+            debug('unread-items: upgraded keys for %s user:troupes', upgradeCount);
+          }
+
+          _.forEach(batchMentionIds, function(mentionUserId) {
+            var mentionCount = result.shift();
+            resultHash[mentionUserId].mentionCount = mentionCount >= 0 ? mentionCount : undefined;
+          });
+
+        });
+
+        return resultHash;
+      });
+  });
+}
+
+
+function setLastChatTimestamp(troupeId, timestamp) {
+  return Q.ninvoke(redisClient, "set", "lmts:" + troupeId, timestamp);
+}
+
+function getLastChatTimestamps(troupeIds) {
+  var tsCacheKeys = troupeIds.map(function(troupeId) {
+    return "lmts:" + troupeId;
+  });
+
+  return Q.ninvoke(redisClient, "mget", tsCacheKeys);
 }
 
 /**
@@ -603,6 +623,8 @@ exports.getRoomsMentioningUser = getRoomsMentioningUser;
 exports.getBadgeCountsForUserIds = getBadgeCountsForUserIds;
 exports.getRoomsCausingBadgeCount = getRoomsCausingBadgeCount;
 
+exports.getLastChatTimestamps = getLastChatTimestamps;
+
 exports.testOnly = {
   getNewItemBatches: getNewItemBatches,
   UNREAD_BATCH_SIZE: UNREAD_BATCH_SIZE,
@@ -610,5 +632,6 @@ exports.testOnly = {
   mergeUnreadItemsWithMentions: mergeUnreadItemsWithMentions,
   redisClient: redisClient,
   selectTroupeUserBatchForEmails: selectTroupeUserBatchForEmails,
-  transformUserTroupesWithLimit: transformUserTroupesWithLimit
+  transformUserTroupesWithLimit: transformUserTroupesWithLimit,
+  setLastChatTimestamp: setLastChatTimestamp
 };

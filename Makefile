@@ -39,8 +39,13 @@ npm-full:
 	rm -rf node_modules/
 	npm install
 
+npm-full-bulletproof:
+	rm -rf node_modules/
+	npm install --production --ignore-scripts
+	npm rebuild
+
 npm:
-	make npm-quick || make npm-full
+	make npm-quick || make npm-full || make npm-full-bulletproof
 
 sprites:
 	@mkdir -p output/temp-sprites
@@ -78,7 +83,6 @@ embedded-chat: clean
 	ls output/assets/images/emoji/*  >> output/embedded-resources.txt
 
 	./build-scripts/extract-urls.js output/assets/styles/mobile-native-chat.css >> output/embedded-resources.txt
-	./build-scripts/extract-urls.js output/assets/styles/mobile-native-userhome.css >> output/embedded-resources.txt
 	./build-scripts/copy-embedded-resources.sh
 
 

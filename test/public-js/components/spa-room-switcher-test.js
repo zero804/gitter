@@ -252,4 +252,26 @@ describe('spa-room-switcher', function() {
     roomSwitcher.change('http://localhost:5000/orgs/porgs/');
   });
 
+  /**
+   * https://github.com/troupe/gitter-webapp/issues/683
+   */
+  it('should not have issues with the dev-ua room ', function(done) {
+    var roomSwitcher = new SPARoomSwitcher(fixtureTroupes(), BASE_PATH, locationDelegate('https://gitter.im/dev-ua/~chat'), locationDelegate('https://gitter.im/dev-ua/'));
+
+    roomSwitcher.on('replace', function(href) {
+      assert.strictEqual('/orgs/dev-ua/rooms/~iframe', href);
+      done();
+    });
+
+    roomSwitcher.on('reload', function() {
+      assert.ok(false);
+    });
+
+    roomSwitcher.on('switch', function(/*troupe, permalinkChatId*/) {
+      assert.ok(false);
+    });
+
+    roomSwitcher.change('https://gitter.im/orgs/dev-ua/rooms/');
+  });
+
 });

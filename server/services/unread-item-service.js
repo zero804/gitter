@@ -18,8 +18,9 @@ var Q                = require('q');
 var roomMembershipService = require('./room-membership-service');
 var uniqueIds        = require('mongodb-unique-ids');
 var debug            = require('debug')('gitter:unread-item-service');
-
+var recentRoomService = require('./recent-room-service');
 var badgeBatcher     = new RedisBatcher('badge', 1000, batchBadgeUpdates);
+var Q                = require('q');
 
 /* Handles batching badge updates to users */
 function batchBadgeUpdates(key, userIds, done) {
@@ -453,41 +454,78 @@ function processResultsForNewItemWithMentions(troupeId, chatId, parsed, results,
           }
         }
 
+        var connected = false;
+        var push = false;
+        var pushNotified = false;
+        var webNotification = false;
+
         /* We need to do this for all users as it's used for mobile notifications */
         switch(onlineStatus) {
           case 'inroom':
+            connected = true;
+            break;
+
           case 'online':
-            var unreadItemMessage = hasMention ? newUnreadItemWithMention : newUnreadItemNoMention;
-            appEvents.newUnreadItem(userId, troupeId, unreadItemMessage, true);
+            connected = true;
+            webNotification = true;
+            break;
 
-            /* Not in the room, then send them a notification */
-            if (onlineStatus === 'online') {
-              var notificationQueue = hasMention ? userIdsForOnlineNotificationWithMention : userIdsForOnlineNotification;
-              notificationQueue.push(userId);
-            }
-
-            if(unreadCount >= 0 || mentionCount >= 0) {
-              // Notify the user
-              appEvents.troupeUnreadCountsChange({
-                userId: userId,
-                troupeId: troupeId,
-                total: unreadCount,
-                mentions: mentionCount
-              });
-            }
-            return;
+          case 'mobile':
+            connected = true;
+            break;
 
           case 'push':
-            var pushNotificationQueue = hasMention ? pushCandidatesWithMention : pushCandidates;
-            pushNotificationQueue.push(userId);
-            return;
+            push = true;
+            break;
 
-          /* User has already got all their push notifications */
+          case 'push_connected':
+            push = true;
+            connected = true;
+            break;
+
           case 'push_notified':
-            if (!hasMention) return; // Only notify for mention
-            pushCandidatesWithMention.push(userId);
-            return;
+            pushNotified = true;
+            break;
+
+          case 'push_notified_connected':
+            pushNotified = true;
+            connected = true;
+            break;
         }
+
+        if (connected) {
+          var unreadItemMessage = hasMention ? newUnreadItemWithMention : newUnreadItemNoMention;
+          appEvents.newUnreadItem(userId, troupeId, unreadItemMessage, true);
+
+          if(unreadCount >= 0 || mentionCount >= 0) {
+            // Notify the user
+            appEvents.troupeUnreadCountsChange({
+              userId: userId,
+              troupeId: troupeId,
+              total: unreadCount,
+              mentions: mentionCount
+            });
+          }
+        }
+
+        /* User needs a web notification */
+        if (webNotification) {
+          var notificationQueue = hasMention ? userIdsForOnlineNotificationWithMention : userIdsForOnlineNotification;
+          notificationQueue.push(userId);
+        }
+
+        /* User needs a push notification */
+        if (push) {
+          var pushNotificationQueue = hasMention ? pushCandidatesWithMention : pushCandidates;
+          pushNotificationQueue.push(userId);
+        }
+
+        /* User has already received a push notification */
+        if (pushNotified) {
+          if (!hasMention) return; // Only notify for mention
+          pushCandidatesWithMention.push(userId);
+        }
+
       });
 
       if (!isEdit) {
@@ -514,11 +552,20 @@ function processResultsForNewItemWithMentions(troupeId, chatId, parsed, results,
         // Next, notify all the lurkers
         // Note that this can be a very long list in a big room
         var activityOnly = parsed.activityOnlyUserIds;
+
         for(var i = 0; i < activityOnly.length; i++) {
           var activityOnlyUserId =  activityOnly[i];
+
           var activityOnlyUserIdOnlineStatus = presenceStatus[activityOnlyUserId];
-          if (!activityOnlyUserIdOnlineStatus) continue; // null === offline
-          appEvents.newLurkActivity({ userId: activityOnlyUserId, troupeId: troupeId });
+          /* User is connected? Send them a status update */
+          switch(activityOnlyUserIdOnlineStatus) {
+            case 'inroom':
+            case 'online':
+            case 'mobile':
+            case 'push_connected':
+            case 'push_notified_connected':
+              appEvents.newLurkActivity({ userId: activityOnlyUserId, troupeId: troupeId });
+          }
         }
       }
 
@@ -643,6 +690,38 @@ function queueBadgeUpdateForUser(userIds) {
   debug("Batching badge update for %s users", len);
   badgeBatcher.add('queue', userIds);
 }
+
+exports.getActivityIndicatorForTroupeIds = function(troupeIds, userId) {
+
+  return Q.all([
+    recentRoomService.getTroupeLastAccessTimesForUser(userId),
+    engine.getLastChatTimestamps(troupeIds)
+  ])
+    .spread(function(allLastAccessTimes, rawLastMsgTimes) {
+
+      var lastAccessTimes = troupeIds.reduce(function(accum, troupeId) {
+        accum[troupeId] = allLastAccessTimes[troupeId];
+        return accum;
+      }, {});
+
+      var lastMsgTimes = troupeIds.reduce(function(accum, troupeId, index) {
+        if (!rawLastMsgTimes[index]) return accum;
+        var ts = parseInt(rawLastMsgTimes[index]);
+        accum[troupeId] = new Date(ts);
+        return accum;
+      }, {});
+
+
+      var activity = Object.keys(lastAccessTimes).reduce(function(accum, troupeId) {
+        if (!lastMsgTimes[troupeId]) return accum;
+        accum[troupeId] = lastMsgTimes[troupeId] > lastAccessTimes[troupeId];
+        return accum;
+      }, {});
+
+      return activity;
+  });
+};
+
 
 exports.listen = function() {
   badgeBatcher.listen();
