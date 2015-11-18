@@ -53,7 +53,7 @@ BackendResolver.prototype.findAllResults = function(method, args) {
       return Q.all(promises);
     })
     .then(function(arrays) {
-      return [].concat.apply([], arrays);
+      return Array.prototype.concat.apply([], arrays);
     });
 };
 
