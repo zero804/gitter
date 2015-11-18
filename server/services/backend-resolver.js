@@ -87,10 +87,14 @@ BackendResolver.prototype.getFirstResult = function(method, args) {
 
       return deferred.promise;
     });
-}
+};
 
 BackendResolver.prototype.getEmailAddress = function(preferStoredEmail) {
   return this.getFirstResult('getEmailAddress', [preferStoredEmail]);
-}
+};
+
+BackendResolver.prototype.getSerializedOrgs = function() {
+  return this.findAllResults('getSerializedOrgs');
+};
 
 module.exports = BackendResolver;
