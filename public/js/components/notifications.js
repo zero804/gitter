@@ -6,7 +6,6 @@ var WindowNotification  = window.Notification;
 var webkitNotifications = window.webkitNotifications;
 var urlParser           = require('../utils/url-parser');
 var linkHandler         = require('./link-handler');
-var resolveAvatarUrl    = require('gitter-web-shared/avatars/resolve-avatar-url');
 
 var notificationsHaveBeenEnabled = false;
 
