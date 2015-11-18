@@ -69,6 +69,18 @@ describe('unread-item-service', function() {
           })
           .nodeify(done);
       });
+
+      it('should return an empty set if troupeIds are missing', function(done) {
+        return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, userIds, [])
+          .then(function() {
+            return unreadItemServiceEngine.getLastChatTimestamps([]);
+          })
+          .then(function(timestamps) {
+            assert.deepEqual(timestamps, []);
+          })
+          .nodeify(done);
+      });
+
     });
 
     describe('newItemWithMentions', function() {
