@@ -107,6 +107,9 @@ onready(function() {
         if (message.permalinkChatId) {
           appEvents.trigger('chatCollectionView:permalinkHighlight', message.permalinkChatId);
         }
+
+        //after the room change is complete, focus on the chat input jp 5/11/15
+        appEvents.trigger('focus.request.chat');
       break;
 
       case 'about.to.leave.current.room':

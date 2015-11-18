@@ -327,6 +327,24 @@ describe('presenceService', function() {
 
   });
 
+  it('should categorise mobile users as mobile', function(done) {
+    var userId = 'TESTUSER5' + Date.now();
+    var socketId = 'TESTSOCKET5' + Date.now();
+
+    presenceService.userSocketConnected(userId, socketId, 'mobile', 'test', null, null)
+      .then(function() {
+        return presenceService.categorizeUsersByOnlineStatus([userId]);
+      })
+      .then(function(categorised) {
+        var expected = {};
+        expected[userId] = 'mobile';
+        assert.deepEqual(expected, categorised);
+      })
+      .nodeify(done);
+
+
+  });
+
   it('should show mobile users in a troupe as in the troupe', function(done) {
     var userId = 'TESTUSER4' + Date.now();
     var socketId = 'TESTSOCKET4' + Date.now();

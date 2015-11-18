@@ -3,7 +3,6 @@ var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 var Dropdown = require('./dropdown');
 var liveSearch = require('./live-search');
-var context = require('utils/context');
 
 var TypeaheadView = Marionette.ItemView.extend({
   tagName: 'input',
