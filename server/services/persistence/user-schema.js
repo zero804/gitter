@@ -63,10 +63,6 @@ UserSchema.methods.getGitHubToken = function(scope) {
   return userScopes.getGitHubToken(this, scope);
 };
 
-UserSchema.methods.isGitHubUser = function() {
-  return userScopes.isGitHubUser(this);
-};
-
 UserSchema.methods.isMissingTokens = function() {
   return userScopes.isMissingTokens(this);
 };
