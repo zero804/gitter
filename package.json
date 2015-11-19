@@ -190,6 +190,7 @@
     "jsmockito": "~1.0.4",
     "jsonlint": "1.5.1",
     "keymaster": "^1.6.2",
+    "lcov-result-merger": "^1.0.2",
     "less": "~1.5.1",
     "less-loader": "^0.7.7",
     "lorem-ipsum": "^1.0.1",

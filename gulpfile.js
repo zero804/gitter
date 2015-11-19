@@ -26,6 +26,7 @@ var grepFail = require('gulp-grep-fail');
 var runSequence = require('run-sequence');
 var jsonlint = require('gulp-jsonlint');
 var coveralls = require('gulp-coveralls');
+var lcovMerger = require ('lcov-result-merger');
 
 /* Don't do clean in gulp, use make */
 var DEV_MODE = !!process.env.DEV_MODE;
@@ -133,10 +134,16 @@ gulp.task('test-redis-lua', shell.task([
   './test/redis-lua/run-tests'
 ]));
 
-
-gulp.task('submit-coveralls', ['test-mocha', 'test-redis-lua'], function() {
-  process.env.COVERALLS_GIT_COMMIT = process.env.GIT_COMMIT;
+gulp.task('merge-lcov', ['test-mocha', 'test-redis-lua'], function() {
   return gulp.src('output/coverage-reports/**/lcov.info')
+    .pipe(using())
+    .pipe(lcovMerger())
+    .pipe(gulp.dest('output/coverage-reports/lcov-merged.info'));
+});
+
+gulp.task('submit-coveralls', ['test-mocha', 'test-redis-lua', 'merge-lcov'], function() {
+  process.env.COVERALLS_GIT_COMMIT = process.env.GIT_COMMIT;
+  return gulp.src('output/coverage-reports/lcov-merged.info')
     .pipe(coveralls());
 });
 
