@@ -138,12 +138,12 @@ gulp.task('merge-lcov', ['test-mocha', 'test-redis-lua'], function() {
   return gulp.src('output/coverage-reports/**/lcov.info')
     .pipe(using())
     .pipe(lcovMerger())
-    .pipe(gulp.dest('output/coverage-reports/lcov-merged.info'));
+    .pipe(gulp.dest('output/coverage-reports/merged/'));
 });
 
 gulp.task('submit-coveralls', ['test-mocha', 'test-redis-lua', 'merge-lcov'], function() {
   process.env.COVERALLS_GIT_COMMIT = process.env.GIT_COMMIT;
-  return gulp.src('output/coverage-reports/lcov-merged.info')
+  return gulp.src('output/coverage-reports/merged/lcov.info')
     .pipe(coveralls());
 });
 
