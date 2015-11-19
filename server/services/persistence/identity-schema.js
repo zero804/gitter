@@ -21,8 +21,12 @@ IdentitySchema.schemaTypeName = 'IdentitySchema';
 
 IdentitySchema.index({ userId: 1, provider: 1 }, { unique: true });
 IdentitySchema.index({ provider: 1, providerKey: 1 }, { unique: true });
-IdentitySchema.index({ provider: 1, username: 1 }, { unique: true });
-IdentitySchema.index({ provider: 1, email: 1 }, { unique: true });
+// not all of them have usernames or email addresses, so it will cause key
+// errors if you set unique. It hought sparse might help, but with compound
+// indexes it will still go ahead if at least one is set and provider is always
+// set.
+//IdentitySchema.index({ provider: 1, username: 1 }, { unique: true });
+//IdentitySchema.index({ provider: 1, email: 1 }, { unique: true });
 
 module.exports = {
   install: function(mongooseConnection) {

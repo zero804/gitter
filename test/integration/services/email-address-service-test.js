@@ -62,15 +62,16 @@ describe("email-address-service", function() {
     var fixture = {};
     before(fixtureLoader(fixture, {
       user1: {
-        identities: [{provider: 'google', providerKey: 1}]
+        identities: [{provider: 'google', providerKey: 'google-email'}]
       },
       identity1: {
         user: 'user1',
         provider: 'google',
-        providerKey: 1,
+        providerKey: 'google-email',
         email: 'foo@bar.com'
       },
     }));
+
     after(function() {
       fixture.cleanup();
     });

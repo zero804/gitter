@@ -13,7 +13,7 @@ describe('identityService', function() {
     identity1: {
       user: 'user1',
       provider: 'google',
-      providerKey: 1
+      providerKey: 'google-identity'
     },
   }));
 
