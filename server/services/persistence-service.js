@@ -49,6 +49,7 @@ function createExports(schemas) {
 
 module.exports = createExports({
   User: require('./persistence/user-schema'),
+  Identity: require('./persistence/identity-schema'),
   UserTroupeLastAccess: require('./persistence/user-troupe-last-access-schema'),
   UserTroupeFavourites: require('./persistence/user-troupe-favourites-schema'),
   Troupe: require('./persistence/troupe-schema'),

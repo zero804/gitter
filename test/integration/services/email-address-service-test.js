@@ -3,8 +3,10 @@
 "use strict";
 
 var testRequire = require('./../test-require');
+var fixtureLoader = require('../test-fixtures');
 var Q = require('q');
 var assert = require('assert');
+
 
 describe("email-address-service", function() {
 
@@ -54,6 +56,33 @@ describe("email-address-service", function() {
       }).nodeify(done);
   });
 
+  describe('non-github emails', function() {
+    var emailAddressService = testRequire('./services/email-address-service');
+
+    var fixture = {};
+    before(fixtureLoader(fixture, {
+      user1: {
+        identities: [{provider: 'google', providerKey: 'google-email'}]
+      },
+      identity1: {
+        user: 'user1',
+        provider: 'google',
+        providerKey: 'google-email',
+        email: 'foo@bar.com'
+      },
+    }));
+
+    after(function() {
+      fixture.cleanup();
+    });
+
+    it('returns the email from the identity for google', function() {
+      return emailAddressService(fixture.user1)
+        .then(function(email) {
+          assert.equal(email, fixture.identity1.email);
+        });
+    });
+  });
 });
 
 function createEmailAddressService(stubData) {
@@ -76,7 +105,7 @@ function createEmailAddressService(stubData) {
     }
   };
 
-  return testRequire.withProxies('./services/email-address-service', {
+  return testRequire.withProxies('./backends/github/github-email-address-service', {
     'gitter-web-env': env,
     'gitter-web-github': {
       GitHubMeService: GitHubMeService,
