@@ -93,6 +93,9 @@ module.exports = {
     app.use(require('./middlewares/configure-csrf'));
     app.use(require('./middlewares/enforce-csrf'));
 
+    // NOTE: it might be better to just drop this middleware entirely or at
+    // least substantially change the behavior, because not having github
+    // tokens is now fine. Maybe it is also fine not having any tokens at all?
     app.use(require('./middlewares/tokenless-user'));
   },
 

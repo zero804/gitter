@@ -2776,6 +2776,35 @@
         }
       }
     },
+    "passport-google-oauth2": {
+      "version": "0.1.6",
+      "from": "passport-google-oauth2@>=0.1.6 <0.2.0",
+      "resolved": "http://beta-internal:4873/passport-google-oauth2/-/passport-google-oauth2-0.1.6.tgz",
+      "dependencies": {
+        "passport-oauth2": {
+          "version": "1.1.2",
+          "from": "passport-oauth2@>=1.1.2 <2.0.0",
+          "resolved": "http://beta-internal:4873/passport-oauth2/-/passport-oauth2-1.1.2.tgz",
+          "dependencies": {
+            "passport-strategy": {
+              "version": "1.0.0",
+              "from": "passport-strategy@>=1.0.0 <2.0.0",
+              "resolved": "http://beta-internal:4873/passport-strategy/-/passport-strategy-1.0.0.tgz"
+            },
+            "oauth": {
+              "version": "0.9.14",
+              "from": "oauth@>=0.9.0 <0.10.0",
+              "resolved": "http://beta-internal:4873/oauth/-/oauth-0.9.14.tgz"
+            },
+            "uid2": {
+              "version": "0.0.3",
+              "from": "uid2@>=0.0.0 <0.1.0",
+              "resolved": "http://beta-internal:4873/uid2/-/uid2-0.0.3.tgz"
+            }
+          }
+        }
+      }
+    },
     "passport-http": {
       "version": "0.2.2",
       "from": "passport-http@>=0.2.2 <0.3.0",
