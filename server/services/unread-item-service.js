@@ -1,4 +1,4 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
+/* jshint maxcomplexity:20 */
 "use strict";
 
 var env              = require('gitter-web-env');

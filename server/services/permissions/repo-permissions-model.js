@@ -1,4 +1,4 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
+/* jshint maxcomplexity:18 */
 "use strict";
 
 var GitHubRepoService    = require('gitter-web-github').GitHubRepoService;
