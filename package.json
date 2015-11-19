@@ -106,7 +106,6 @@
     "shutdown": "^0.2.3",
     "sitemap": "https://registry.npmjs.org/sitemap/-/sitemap-0.7.2.tgz",
     "snappy-cache": "^0.2.2",
-    "sshpk": "^1.6.2",
     "statuserror": "0.0.1",
     "stringformat": "0.0.5",
     "targetenv": "^1.0.0",
