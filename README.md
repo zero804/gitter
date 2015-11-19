@@ -1,6 +1,8 @@
 Gitter Webapp
 =============
 
+[![Coverage Status](https://coveralls.io/repos/troupe/gitter-webapp/badge.svg?branch=develop&service=github&t=IjAtJj)](https://coveralls.io/github/troupe/gitter-webapp?branch=develop)
+
 Copyright Troupe Technology Limited 2012 - 2015
 All rights reserved.
 
