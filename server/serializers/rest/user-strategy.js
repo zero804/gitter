@@ -1,3 +1,4 @@
+/* jshint maxcomplexity:18 */
 "use strict";
 
 var troupeService     = require("../../services/troupe-service");

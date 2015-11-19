@@ -207,6 +207,7 @@ module.exports = (function() {
       // this.$el.toggleClass('cantEdit', !canEdit);
     },
 
+    /* jshint maxcomplexity: 23 */
     updateRender: function(changes) {
       /* NB: `unread` updates occur in the behaviour */
       var model = this.model;
