@@ -30,7 +30,8 @@ var lcovMerger = require ('lcov-result-merger');
 
 /* Don't do clean in gulp, use make */
 var DEV_MODE = !!process.env.DEV_MODE;
-var RUN_TESTS_IN_PARALLEL = false;
+var RUN_TESTS_IN_PARALLEL = true;
+var SPAWN_WEBPACK = true;
 
 var testModules = {
   'integration': ['./test/integration/**/*.js', './test/public-js/**/*.js'],
@@ -422,18 +423,42 @@ gulp.task('css-web', function () {
 
 gulp.task('css', ['css-web', 'css-mobile', 'css-ios']);
 
-gulp.task('webpack', function() {
-  return gulp.src('./public/js/webpack.config')
-    .pipe(webpack(require('./public/js/webpack.config')))
-    .pipe(gulp.dest('output/assets/js'));
-});
+if (SPAWN_WEBPACK) {
+  gulp.task('webpack-spawn', function() {
+    return gulp.src('./public/js/webpack.config')
+      .pipe(webpack(require('./public/js/webpack.config')))
+      .pipe(gulp.dest('output/assets/js'));
+  });
 
-/* Generate embedded native */
-gulp.task('halley-webpack', function() {
-  return gulp.src('./public/js/webpack-halley.config')
-    .pipe(webpack(require('./public/js/webpack-halley.config')))
-    .pipe(gulp.dest('output/assets/js/halley'));
-});
+  /* Generate embedded native */
+  gulp.task('halley-webpack-spawn', function() {
+    return gulp.src('./public/js/webpack-halley.config')
+      .pipe(webpack(require('./public/js/webpack-halley.config')))
+      .pipe(gulp.dest('output/assets/js/halley'));
+  });
+
+  gulp.task('webpack', shell.task([
+    'gulp webpack-spawn',
+  ]));
+
+  gulp.task('halley-webpack', shell.task([
+    'gulp halley-webpack-spawn',
+  ]));
+
+} else {
+  gulp.task('webpack', function() {
+    return gulp.src('./public/js/webpack.config')
+      .pipe(webpack(require('./public/js/webpack.config')))
+      .pipe(gulp.dest('output/assets/js'));
+  });
+
+  /* Generate embedded native */
+  gulp.task('halley-webpack', function() {
+    return gulp.src('./public/js/webpack-halley.config')
+      .pipe(webpack(require('./public/js/webpack-halley.config')))
+      .pipe(gulp.dest('output/assets/js/halley'));
+  });
+}
 
 
 gulp.task('build-assets', ['copy-asset-files', 'css', 'webpack', 'halley-webpack']);
