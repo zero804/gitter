@@ -1,3 +1,4 @@
+/* jshint maxcomplexity:17 */
 'use strict';
 require('utils/initial-setup');
 

@@ -4,7 +4,7 @@
 var Q                         = require('q');
 var userTroupeSettingsService = require('../user-troupe-settings-service');
 var appEvents                 = require('gitter-web-appevents');
-var resolveAvatarUrl          = require('gitter-web-shared/avatars/resolve-avatar-url');
+var resolveUserAvatarUrl          = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 var troupeDao                 = require('../daos/troupe-dao').lean;
 var userDao                   = require('../daos/user-dao').lean;
 var chatService               = require('../chat-service');
@@ -30,14 +30,14 @@ function generateChatMessageNotification(troupeId, chatId) {
           text: chat.text,
           title: fromUser.username,
           link: '/' + fromUser.username,
-          icon: resolveAvatarUrl({ username: fromUser.username, version: fromUser.gravatarVersion, size: 128 })
+          icon: resolveUserAvatarUrl({ username: fromUser.username, version: fromUser.gravatarVersion}, 128)
         };
       } else {
         return {
           text: chat.text,
           title: fromUser.username + ' @ ' + troupe.uri,
           link: '/' + troupe.uri,
-          icon: resolveAvatarUrl({ username: fromUser.username, version: fromUser.gravatarVersion, size: 128 })
+          icon: resolveUserAvatarUrl({ username: fromUser.username, version: fromUser.gravatarVersion }, 128)
         };
       }
     });

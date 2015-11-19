@@ -1,4 +1,4 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
+/* jshint maxcomplexity:16 */
 "use strict";
 
 var Q                     = require('q');
@@ -81,4 +81,3 @@ module.exports = function userChannelPermissionsModel(user, right, uri, security
   }
 
 };
-

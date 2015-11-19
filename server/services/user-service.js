@@ -96,7 +96,7 @@ var userService = {
         var gitterUser = {
           username:           githubUser.login,
           displayName:        githubUser.name || githubUser.login,
-          gravatarImageUrl:   githubUser.avatar_url, // TODO: remove, deprecated
+          gravatarImageUrl:   githubUser.avatar_url,
           gravatarVersion:    extractGravatarVersion(githubUser.avatar_url),
           githubId:           githubUser.id,
           invitedByUser:      user && user._id,

@@ -1,3 +1,4 @@
+/* jshint maxcomplexity:19 */
 'use strict';
 
 module.exports = function(pagination, options) {
