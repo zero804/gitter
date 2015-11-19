@@ -294,7 +294,7 @@ gulp.task('copy-asset-files', function() {
       'public/fonts/**',
       'public/images/**',
       'public/sprites/**',
-      'public/repo/**',
+      'public/repo/**'
     ], { "base" : "./public" })
     .pipe(gulp.dest('output/assets'));
 });
@@ -428,18 +428,25 @@ gulp.task('webpack', function() {
     .pipe(gulp.dest('output/assets/js'));
 });
 
-gulp.task('build-assets', ['copy-asset-files', 'css', 'webpack']);
+/* Generate embedded native */
+gulp.task('halley-webpack', function() {
+  return gulp.src('./public/js/webpack-halley.config')
+    .pipe(webpack(require('./public/js/webpack-halley.config')))
+    .pipe(gulp.dest('output/assets/js/halley'));
+});
 
+
+gulp.task('build-assets', ['copy-asset-files', 'css', 'webpack', 'halley-webpack']);
 
 gulp.task('compress-assets', ['build-assets'], function() {
-  return gulp.src(['output/assets/**/*.{css,js,ttf,svg}'], { base: 'output/assets/' })
+  return gulp.src(['output/assets/**/*.{css,js,ttf,svg}', '!**/*.map'], { base: 'output/assets/' })
     .pipe(using())
     .pipe(gzip({ append: true, gzipOptions: { level: 9 } }))
     .pipe(gulp.dest('output/assets/'));
 });
 
 gulp.task('tar-assets', ['build-assets', 'compress-assets'], function () {
-    return gulp.src(['output/assets/**'])
+    return gulp.src(['output/assets/**', '!**/*.map'])
       .pipe(tar('assets.tar'))
       .pipe(gzip({ append: true, gzipOptions: { level: 9 } }))
       .pipe(gulp.dest('output'));

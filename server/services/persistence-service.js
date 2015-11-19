@@ -63,7 +63,8 @@ module.exports = createExports({
   OAuthAccessToken: require('./persistence/oauth-access-token-schema'),
   PushNotificationDevice: require('./persistence/push-notification-device-schema'),
   UriLookup: require('./persistence/uri-lookup-schema'),
-  Subscription: require('./persistence/subscription-schema')
+  Subscription: require('./persistence/subscription-schema'),
+  FeatureToggle: require('./persistence/feature-toggle-schema')
 });
 
 var events = require("./persistence-service-events");
