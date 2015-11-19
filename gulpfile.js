@@ -30,6 +30,7 @@ var lcovMerger = require ('lcov-result-merger');
 
 /* Don't do clean in gulp, use make */
 var DEV_MODE = !!process.env.DEV_MODE;
+var RUN_TESTS_IN_PARALLEL = false;
 
 var testModules = {
   'integration': ['./test/integration/**/*.js', './test/public-js/**/*.js'],
@@ -50,10 +51,19 @@ function makeTestTasks(taskName, generator) {
     });
   });
 
-  gulp.task(taskName, function(callback) {
-    var args = Object.keys(testModules).map(function(moduleName) { return taskName + '-' + moduleName; }).concat(callback);
-    runSequence.apply(null, args);
-  });
+  var childTasks = Object.keys(testModules).map(function(moduleName) { return taskName + '-' + moduleName; });
+
+  if (RUN_TESTS_IN_PARALLEL) {
+    // Run tests in parallel
+    gulp.task(taskName, childTasks);
+  } else {
+    // Run tests in sequence
+    gulp.task(taskName, function(callback) {
+      var args = childTasks.concat(callback);
+      runSequence.apply(null, args);
+    });
+  }
+
 }
 
 gulp.task('validate-config', function() {
