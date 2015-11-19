@@ -25,9 +25,10 @@ var cdn                      = require("../../web/cdn");
 var roomMembershipService    = require('../../services/room-membership-service');
 var troupeService            = require('../../services/troupe-service');
 var useragent                = require('useragent');
-var _                        = require('underscore');
+var _                        = require('lodash');
 var GitHubOrgService         = require('gitter-web-github').GitHubOrgService;
 var orgPermissionModel       = require('../../services/permissions/org-permissions-model');
+var resolveUserAvatarUrl     = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 var resolveRoomAvatarSrcSet  = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 
@@ -344,7 +345,7 @@ function renderChat(req, res, options, next) {
             troupeTopic: troupeContext.troupe.topic,
             premium: troupeContext.troupe.premium,
             troupeFavourite: troupeContext.troupe.favourite,
-            avatarSrcSet:  resolveRoomAvatarSrcSet(troupeContext.troupe.url),
+            avatarSrcSet:  resolveRoomAvatarSrcSet({ uri: troupeContext.troupe.url }, 48),
             isAdmin: isAdmin,
             isNativeDesktopApp: troupeContext.isNativeDesktopApp
           }, options.extras);
@@ -433,10 +434,14 @@ function renderOrgPage(req, res, next) {
   .spread(function (ghOrg,rooms, troupeContext, isOrgAdmin, isOrgMember) {
 
     // Filter out PRIVATE rooms
-    rooms = rooms.filter(function(room) { return room.security !== 'PRIVATE'; });
+    _.remove(rooms, function(room) { return room.security === 'PRIVATE'; });
 
-    // Filter out the ORG room for non org members
-    if (!isOrgMember) rooms = rooms.filter(function(room) { return room.githubType !== 'ORG'; });
+    // Filter out ORG room and INHERITED permission rooms for non-org members
+    if (!isOrgMember) {
+      _.remove(rooms, function(room) { 
+        return (room.githubType === 'ORG' || room.security === 'INHERITED'); 
+      });
+    }
 
     // Calculate org user count across all rooms (except private)
     var orgUserCount = rooms.reduce(function(accum, room) {
@@ -473,6 +478,9 @@ function renderOrgPage(req, res, next) {
     .then(function(values) {
        rooms.forEach(function(room, index) {
         room.users = values[index];
+        _.each(room.users, function(user) {
+          user.avatarUrlSmall = resolveUserAvatarUrl(user, 60);
+        });
       });
 
       // Custom data for the org page

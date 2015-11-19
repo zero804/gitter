@@ -141,8 +141,11 @@ var DropTargetView = Marionette.ItemView.extend({
     this.upload(files);
   },
 
-  isImage: function(blob) {
-    return /image\//.test(blob.type);
+  isImage: function(file) {
+    var fileType = file.type;
+    // svg causes an INVALID_FILE_META_DATA error from transloadit.
+    // see https://github.com/gitterHQ/gitter/issues/721
+    return fileType !== 'image/svg+xml' && fileType.indexOf('image/') >= 0;
   },
 
   /**
@@ -175,8 +178,7 @@ var DropTargetView = Marionette.ItemView.extend({
 
     for (var i = 0; i < files.length; i++) {
       var file = files[i];
-      var fileType = file.type;
-      if (fileType.indexOf('image/') !== 0) {
+      if (!this.isImage(file)) {
         return '';
       }
     }

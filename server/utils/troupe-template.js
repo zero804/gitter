@@ -11,7 +11,6 @@ var Q           = require('q');
 // TODO: add caching!
 handlebars.registerHelper('cdn', hbsHelpers.cdn);
 handlebars.registerHelper('pad', hbsHelpers.pad);
-handlebars.registerHelper('oneLine', hbsHelpers.oneLine);
 
 var defaultI18n = i18nFactory.get();
 

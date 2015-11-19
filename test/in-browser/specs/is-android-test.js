@@ -1,7 +1,8 @@
 /*jshint unused:true, browser:true*/
 define([
   'utils/is-android',
-], function(isAndroid) {
+  'assert',
+], function(isAndroid, assert) {
 
   describe('phone detection', function() {
     it('detects iPhone is not android', function() {
