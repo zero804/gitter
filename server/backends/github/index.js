@@ -14,10 +14,11 @@ GitHubBackend.prototype.getEmailAddress = function(preferStoredEmail) {
 };
 
 GitHubBackend.prototype.getSerializedOrgs = function() {
-  var ghUser = new GithubMe(this.user);
+  var user = this.user;
+  var ghUser = new GithubMe(user);
   return ghUser.getOrgs()
     .then(function(ghOrgs) {
-      var strategyOptions = { currentUserId: this.user.id };
+      var strategyOptions = { currentUserId: user.id };
       var strategy = new restSerializer.GithubOrgStrategy(strategyOptions);
       return restSerializer.serializeExcludeNulls(ghOrgs, strategy);
     });
