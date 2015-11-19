@@ -4,6 +4,7 @@
 var path                     = require("path");
 var CommonsChunkPlugin       = require("webpack/lib/optimize/CommonsChunkPlugin");
 var ContextReplacementPlugin = require("webpack/lib/ContextReplacementPlugin");
+var DefinePlugin             = require("webpack/lib/DefinePlugin");
 var DedupePlugin             = require('webpack/lib/optimize/DedupePlugin');
 var OccurrenceOrderPlugin    = require('webpack/lib/optimize/OccurrenceOrderPlugin');
 var UglifyJsPlugin           = require('webpack/lib/optimize/UglifyJsPlugin');
@@ -118,7 +119,10 @@ var webpackConfig = {
   },
   plugins: [
     new CommonsChunkPlugin("vendor", "[name].js"),
-    new ContextReplacementPlugin(/moment\/locale$/, /ar|cs|da|de|en-gb|es|fr|it|ja|ko|nl|pl|pt|ru|sv|zh-cn/)
+    new ContextReplacementPlugin(/moment\/locale$/, /ar|cs|da|de|en-gb|es|fr|it|ja|ko|nl|pl|pt|ru|sv|zh-cn/),
+    new DefinePlugin({
+      USE_HALLEY: JSON.stringify(false)
+    })
   ],
   bail: true,
   recordsPath: '/tmp/records.json',
