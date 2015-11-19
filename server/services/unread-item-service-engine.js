@@ -160,6 +160,10 @@ function setLastChatTimestamp(troupeId, timestamp) {
 }
 
 function getLastChatTimestamps(troupeIds) {
+  if (!troupeIds || !troupeIds.length) {
+    return Q.resolve([]);
+  }
+
   var tsCacheKeys = troupeIds.map(function(troupeId) {
     return "lmts:" + troupeId;
   });

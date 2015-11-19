@@ -1,3 +1,4 @@
+/* jshint maxcomplexity:16 */
 "use strict";
 var $            = require('jquery');
 var _            = require('underscore');
