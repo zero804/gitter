@@ -1,7 +1,8 @@
 /*jshint unused:true, browser:true*/
 define([
   'utils/is-mobile',
-], function(isMobile) {
+  'assert'
+], function(isMobile, assert) {
 
   describe('is-mobile', function() {
     it('detects iPhone is mobile', function() {

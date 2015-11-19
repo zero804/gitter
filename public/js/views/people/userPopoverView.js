@@ -1,7 +1,7 @@
 "use strict";
 var Marionette = require('backbone.marionette');
 var Backbone = require('backbone');
-var resolveAvatarUrl = require('gitter-web-shared/avatars/resolve-avatar-url');
+var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 var Popover = require('views/popover');
 var template = require('./tmpl/userPopoverView.hbs');
 var footerTemplate = require('./tmpl/userPopoverFooterView.hbs');
@@ -10,10 +10,6 @@ var context = require('utils/context');
 var SyncMixin = require('collections/sync-mixin');
 
 module.exports = (function() {
-
-  function largeAvatar(data) {
-    return resolveAvatarUrl({ username: data.login, size: 128 });
-  }
 
   var UserView = Marionette.ItemView.extend({
     template: template,
@@ -31,7 +27,11 @@ module.exports = (function() {
         }
       }
       data.inactive = data.invited || data.removed;
-      data.avatarUrl = largeAvatar(data);
+      // TODO: send more than just a username
+      // NOTE: this actually gets displayed at 128 css pixels wide, so retina
+      // would have to be 256. But that doesn't map to avatarUrlSmall or
+      // avatarUrlMedium
+      data.avatarUrl = resolveUserAvatarUrl({ username: data.login }, 128);
 
       return data;
     }

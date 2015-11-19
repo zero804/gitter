@@ -4,15 +4,15 @@ var env = require('gitter-web-env');
 var logger = env.logger;
 var config = env.config;
 var identifyRoute = env.middlewares.identifyRoute;
-var resolveAvatarUrl = require('gitter-web-shared/avatars/resolve-avatar-url');
 
 var jwt = require('jwt-simple');
 var uuid = require('node-uuid');
 var url = require('url');
-var oauth2 = require('../web/oauth2');
-var GithubMeService = require('gitter-web-github').GitHubMeService;
-var ensureLoggedIn = require('../web/middlewares/ensure-logged-in');
 var express = require('express');
+var GithubMeService = require('gitter-web-github').GitHubMeService;
+var oauth2 = require('../web/oauth2');
+var ensureLoggedIn = require('../web/middlewares/ensure-logged-in');
+var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-srcset');
 
 var github = require('./auth-providers/github');
 //var google = require('./auth-providers/google');
@@ -107,7 +107,7 @@ router.get("/zendesk",
         "name": req.user.displayName,
         "email": email,
         "external_id": req.user.id,
-        "remote_photo_url": resolveAvatarUrl({ username: req.user.username, size: 128 }),
+        "remote_photo_url": resolveUserAvatarUrl(req.user, 128),
         "user_fields": {
           "username": req.user.username
         }

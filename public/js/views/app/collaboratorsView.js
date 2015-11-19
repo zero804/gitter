@@ -10,7 +10,7 @@ var itemTemplate        = require('./tmpl/collaboratorsItemView.hbs');
 var emptyViewTemplate   = require('./tmpl/collaboratorsEmptyView.hbs');
 var appEvents           = require('utils/appevents');
 var collaboratorsModels = require('collections/collaborators');
-var resolveAvatarSrcSet = require('gitter-web-shared/avatars/resolve-avatar-srcset');
+var resolveUserAvatarSrcSet = require('gitter-web-shared/avatars/resolve-user-avatar-srcset');
 
 require('gitter-styleguide/css/components/buttons.css');
 require('gitter-styleguide/css/components/links.css');
@@ -116,7 +116,7 @@ module.exports = (function() {
       };
 
       var data = states[state] || states.initial;
-      data.avatarSrcSet = resolveAvatarSrcSet({ username: username, size: 30 });
+      data.avatarSrcSet = resolveUserAvatarSrcSet({ username: username }, 30);
 
       return data;
     },
