@@ -82,29 +82,30 @@ module.exports = function resolveUserAvatarSrcSet(user, size) {
 
   size = size || 60;
 
-  if (user.avatarUrlSmall) {
-    // Don't recalculate it if we already have it. The problem this poses is
-    // that avatarUrlSmall is just a single value, not srcset, so we gotta
-    // hack it a bit.
-    return {
-      src: user.avatarUrlSmall.replace('=60', '='+size),
-      size: size,
-      srcset: user.avatarUrlSmall.replace('=60', '='+(size*2))+' 2x'
-    };
+  if (user) {
+    if (user.avatarUrlSmall) {
+      // Don't recalculate it if we already have it. The problem this poses is
+      // that avatarUrlSmall is just a single value, not srcset, so we gotta
+      // hack it a bit.
+      return {
+        src: user.avatarUrlSmall.replace('=60', '='+size),
+        size: size,
+        srcset: user.avatarUrlSmall.replace('=60', '='+(size*2))+' 2x'
+      };
 
-  } else if (user.gravatarImageUrl) {
-    // straight outta the db, so figure out what parameter to add
-    return srcSetForUser(user, size);
+    } else if (user.gravatarImageUrl) {
+      // straight outta the db, so figure out what parameter to add
+      return srcSetForUser(user, size);
 
-  } else if (user.username) {
-    // fall back to the username method
-    var version = user.gravatarVersion || user.gv; // or undefined
-    return {
-      src: buildAvatarUrlForUsername(user.username, version, size),
-      size: size,
-      srcset: buildAvatarUrlForUsername(user.username, version, size*2) + ' 2x'
-    };
-
+    } else if (user.username) {
+      // fall back to the username method
+      var version = user.gravatarVersion || user.gv; // or undefined
+      return {
+        src: buildAvatarUrlForUsername(user.username, version, size),
+        size: size,
+        srcset: buildAvatarUrlForUsername(user.username, version, size*2) + ' 2x'
+      };
+    }
   }
 
   // default: best we can do

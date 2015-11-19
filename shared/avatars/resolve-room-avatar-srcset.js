@@ -7,7 +7,7 @@ module.exports = function resolveRoomAvatarSrcSet(room, size) {
   // room.owner or something would make more sense in future?
   size = size || 48;
 
-  if (room.uri) {
+  if (room && room.uri) {
     var leadingSlash = room.uri[0] === '/';
     var base = room.uri.split('/')[leadingSlash ? 1 : 0];
     if (base) {

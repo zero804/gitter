@@ -39,7 +39,7 @@ function getMetadataForChatPermalink(options) {
 
   var fromUser = chat.fromUser;
 
-  var image = resolveUserAvatarUrl({ username: fromUser }, METADATA_IMAGE_SIZE);
+  var image = resolveUserAvatarUrl(fromUser, METADATA_IMAGE_SIZE);
 
   var title = room && room.uri || 'Gitter';
   var description = '@' + fromUser.username + ': ' + chat.text;
