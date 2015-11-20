@@ -33,7 +33,6 @@ var sentryRelease = require('gulp-sentry-release');
 /* Don't do clean in gulp, use make */
 var DEV_MODE = !!process.env.DEV_MODE;
 var RUN_TESTS_IN_PARALLEL = false;
-var IS_STAGED = process.env.STAGED_ENVIRONMENT && JSON.parse(process.env.STAGED_ENVIRONMENT);
 
 var testModules = {
   'integration': ['./test/integration/**/*.js', './test/public-js/**/*.js'],
@@ -517,7 +516,7 @@ gulp.task('halley-uglify', ['webpack'], function() {
     .pipe(gulp.dest('output/assets/js/halley'));
 });
 
-gulp.task('create-sentry-version', /*['add-version-files'],*/ function(done) {
+gulp.task('create-sentry-version', ['add-version-files'], function(done) {
   if (!process.env.SENTRY_API_KEY || !process.env.SENTRY_SLUG || !process.env.SENTRY_DOMAIN) {
     return done();
   }
@@ -537,7 +536,7 @@ gulp.task('create-sentry-version', /*['add-version-files'],*/ function(done) {
 
 });
 
-gulp.task('sentry-release', ['create-sentry-version'/*, 'uglify', 'halley-uglify', 'add-version-files'*/], function() {
+gulp.task('sentry-release', ['create-sentry-version', 'uglify', 'halley-uglify', 'add-version-files'], function() {
   if (!process.env.SENTRY_API_KEY || !process.env.SENTRY_SLUG || !process.env.SENTRY_DOMAIN) {
     return;
   }
