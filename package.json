@@ -205,7 +205,6 @@
     "mkdirp": "^0.5.1",
     "mocha": "^2.2.5",
     "mocha-istanbul": "0.2.0",
-    "mocha-phantomjs": "~3.1.6",
     "ms": "^0.7.1",
     "mutantjs": "^0.2.0",
     "nanoscroller": "^0.8.7",

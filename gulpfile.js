@@ -361,6 +361,7 @@ function getSourceMapOptions(mapsSubDir) {
   return {
     dest: path.relative('./output/assets/js/' + suffix + '/', './output/maps/' + suffix + '/'),
     options: {
+      sourceRoot: path.relative('./output/maps/' + suffix, './output/assets/js/' + suffix ),
       sourceMappingURLPrefix: sourceMapUrl,
     }
   };
@@ -503,7 +504,7 @@ function getUglifyOptions() {
 
 gulp.task('uglify', ['webpack'], function() {
   var sourceMapOpts = getSourceMapOptions();
-  return gulp.src('output/assets/js/*.js', { base: 'output/assets/js/' })
+  return gulp.src('output/assets/js/*.js')
     .pipe(sourcemaps.init({ loadMaps: true }))
     .pipe(uglify(getUglifyOptions()))
     .pipe(sourcemaps.write(sourceMapOpts.dest, sourceMapOpts.options))
@@ -512,7 +513,7 @@ gulp.task('uglify', ['webpack'], function() {
 
 gulp.task('halley-uglify', ['halley-webpack'], function() {
   var sourceMapOpts = getSourceMapOptions('halley');
-  return gulp.src('output/assets/js/halley/*.js', { base: 'output/assets/js/halley/' })
+  return gulp.src('output/assets/js/halley/*.js')
     .pipe(sourcemaps.init({ loadMaps: true }))
     .pipe(uglify(getUglifyOptions()))
     .pipe(sourcemaps.write(sourceMapOpts.dest, sourceMapOpts.options))
