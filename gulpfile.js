@@ -30,7 +30,7 @@ var lcovMerger = require ('lcov-result-merger');
 
 /* Don't do clean in gulp, use make */
 var DEV_MODE = !!process.env.DEV_MODE;
-var RUN_TESTS_IN_PARALLEL = true;
+var RUN_TESTS_IN_PARALLEL = false;
 var SPAWN_WEBPACK = true;
 
 var testModules = {
@@ -137,6 +137,28 @@ makeTestTasks('test-mocha', function(name, files) {
         XUNIT_FILE: 'output/test-reports/' + name + '.xml',
         NODE_ENV: 'test',
         Q_DEBUG: 1,
+      }
+    }));
+});
+
+makeTestTasks('test-docker', function(name, files) {
+  mkdirp.sync('output/test-reports/');
+  mkdirp.sync('output/coverage-reports/' + name);
+
+  return gulp.src(files, { read: false })
+    .pipe(mocha({
+      reporter: 'xunit-file',
+      timeout: 10000,
+      istanbul: {
+        dir: 'output/coverage-reports/' + name
+      },
+      env: {
+        TAP_FILE: 'output/test-reports/' + name + '.tap',
+        XUNIT_FILE: 'output/test-reports/' + name + '.xml',
+        NODE_ENV: 'test-docker',
+        DEBUG: 'gitter:*',
+        Q_DEBUG: 1,
+        BLUEBIRD_DEBUG: 1
       }
     }));
 });
