@@ -29,6 +29,7 @@ var coveralls = require('gulp-coveralls');
 var lcovMerger = require ('lcov-result-merger');
 var gutil = require('gulp-util');
 var sentryRelease = require('gulp-sentry-release');
+var path = require('path');
 
 /* Don't do clean in gulp, use make */
 var DEV_MODE = !!process.env.DEV_MODE;
@@ -343,22 +344,24 @@ gulp.task('copy-asset-files', function() {
 function getSourceMapUrl() {
   if (!process.env.BUILD_URL) return;
 
-  return process.env.BUILD_URL + '/artifact/output/maps/';
+  return process.env.BUILD_URL + '/artifact/output';
 }
 
-function getSourceMapOptions() {
+function getSourceMapOptions(mapsSubDir) {
   var sourceMapUrl = getSourceMapUrl();
   if (!sourceMapUrl) {
     return {
       dest: '.'
     };
   }
+  var suffix = mapsSubDir ? mapsSubDir + '/' : '';
 
-  mkdirp.sync('output/maps');
+  mkdirp.sync('output/maps/' + suffix);
+
   return {
-    dest: '../../maps',
+    dest: path.relative('./output/assets/js/' + suffix + '/', './output/maps/' + suffix + '/'),
     options: {
-      sourceMappingURLPrefix: sourceMapUrl
+      sourceMappingURLPrefix: sourceMapUrl,
     }
   };
 
@@ -507,8 +510,8 @@ gulp.task('uglify', ['webpack'], function() {
     .pipe(gulp.dest('output/assets/js'));
 });
 
-gulp.task('halley-uglify', ['webpack'], function() {
-  var sourceMapOpts = getSourceMapOptions();
+gulp.task('halley-uglify', ['halley-webpack'], function() {
+  var sourceMapOpts = getSourceMapOptions('halley');
   return gulp.src('output/assets/js/halley/*.js', { base: 'output/assets/js/halley/' })
     .pipe(sourcemaps.init({ loadMaps: true }))
     .pipe(uglify(getUglifyOptions()))
