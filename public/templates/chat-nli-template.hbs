@@ -4,6 +4,7 @@
   {{> chat_toolbar}}
   <div class="chat-app">
     {{> chat_header}}
+    <div class="collaborators-container" id="collaborators-container"></div>
     {{> chat_content}}
     {{> chat_nli_input}}
   </div>
@@ -11,4 +12,4 @@
 <div class="trpBlankPage"></div>
 {{> set_initial_position}}
 {{{ generateTroupeContext troupeContext }}}
-{{{ bootScript bootScriptName }}}
+{{{ bootScript bootScriptName jsRoot=jsRoot }}}

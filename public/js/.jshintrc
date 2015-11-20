@@ -9,5 +9,8 @@
     "module",
     "require"
   ],
-  "strict": true
+  "strict": true,
+  "maxstatements": 50,
+  "maxcomplexity": 12,
+  "maxdepth": 4
 }

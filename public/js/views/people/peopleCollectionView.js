@@ -42,13 +42,15 @@ var RemainingView = Marionette.ItemView.extend({
 
   serializeData: function() {
     var userCount = this.model.get('userCount');
-    var data = {
-      showAddBadge: context.isLoggedIn() && !context.inOneToOneTroupeContext(),
+    var isOneToOne = this.model.get('oneToOne');
+    var isLoggedIn = context.isLoggedIn();
+
+    return {
+      showAddButton: isLoggedIn && !isOneToOne,
+      showPeopleButton: !isOneToOne,
       userCount: userCount,
       hasHiddenMembers: userCount > 25
     };
-
-    return data;
   }
 });
 

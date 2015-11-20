@@ -12,9 +12,9 @@ var userSearchService   = require('./user-search-service');
 var eventService        = require("./event-service");
 var Q                   = require('q');
 var roomService         = require('./room-service');
-var GithubMe            = require('gitter-web-github').GitHubMeService;
 var _                   = require('underscore');
 var roomMembershipService = require('./room-membership-service');
+var BackendResolver = require('./backend-resolver');
 
 var survivalMode = !!process.env.SURVIVAL_MODE || false;
 
@@ -134,17 +134,9 @@ exports.serializeEventsForTroupe = function(troupeId, userId, callback) {
     .nodeify(callback);
 };
 
-exports.serializeOrgsForUser = function(user/*, options */) {
-  var ghUser = new GithubMe(user);
-
-  var strategyOptions = { currentUserId: user.id /*, mapUsers: options && options.mapUsers */ };
-
-  return ghUser.getOrgs()
-    .then(function(ghOrgs) {
-      var strategy = new restSerializer.GithubOrgStrategy(strategyOptions);
-
-      return restSerializer.serializeExcludeNulls(ghOrgs, strategy);
-    });
+exports.serializeOrgsForUser = function(user) {
+  var backendResolver = new BackendResolver(user);
+  return backendResolver.getSerializedOrgs();
 };
 
 exports.serializeOrgsForUserId = function(userId, options) {
