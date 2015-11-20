@@ -344,7 +344,7 @@ gulp.task('copy-asset-files', function() {
 function getSourceMapUrl() {
   if (!process.env.BUILD_URL) return;
 
-  return process.env.BUILD_URL + '/artifact/output';
+  return process.env.BUILD_URL + 'artifact/output';
 }
 
 function getSourceMapOptions(mapsSubDir) {
