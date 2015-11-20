@@ -486,11 +486,20 @@ gulp.task('halley-webpack', function() {
     .pipe(gulp.dest('output/assets/js/halley'));
 });
 
+function getUglifyOptions() {
+  if (process.env.FAST_UGLIFY) {
+    return {
+      mangle: false,
+      compress: false
+    };
+  }
+}
+
 gulp.task('uglify', ['webpack'], function() {
   var sourceMapOpts = getSourceMapOptions();
   return gulp.src('output/assets/js/*.js', { base: 'output/assets/js/' })
     .pipe(sourcemaps.init({ loadMaps: true }))
-    .pipe(uglify())
+    .pipe(uglify(getUglifyOptions()))
     .pipe(sourcemaps.write(sourceMapOpts.dest, sourceMapOpts.options))
     .pipe(gulp.dest('output/assets/js'));
 });
@@ -499,12 +508,15 @@ gulp.task('halley-uglify', ['webpack'], function() {
   var sourceMapOpts = getSourceMapOptions();
   return gulp.src('output/assets/js/halley/*.js', { base: 'output/assets/js/halley/' })
     .pipe(sourcemaps.init({ loadMaps: true }))
-    .pipe(uglify())
+    .pipe(uglify(getUglifyOptions()))
     .pipe(sourcemaps.write(sourceMapOpts.dest, sourceMapOpts.options))
     .pipe(gulp.dest('output/assets/js/halley'));
 });
 
 gulp.task('sentry-release', ['uglify', 'halley-uglify'], function(done){
+  if (!process.env.SENTRY_API_KEY) {
+    return done();
+  }
 
   var sourceMapOpts = getSourceMapOptions();
   git.revParse({ args: 'HEAD' }, function (err, commit) {
