@@ -487,7 +487,7 @@ gulp.task('halley-webpack', function() {
 });
 
 function getUglifyOptions() {
-  if (process.env.FAST_UGLIFY) {
+  if (process.env.FAST_UGLIFY && JSON.parse(process.env.FAST_UGLIFY)) {
     return {
       mangle: false,
       compress: false
