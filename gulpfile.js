@@ -505,7 +505,7 @@ function getUglifyOptions() {
 gulp.task('uglify', ['webpack'], function() {
   var sourceMapOpts = getSourceMapOptions();
   return gulp.src('output/assets/js/*.js')
-    .pipe(sourcemaps.init({ loadMaps: true }))
+    .pipe(sourcemaps.init({ /* loadMaps: true */ }))
     .pipe(uglify(getUglifyOptions()))
     .pipe(sourcemaps.write(sourceMapOpts.dest, sourceMapOpts.options))
     .pipe(gulp.dest('output/assets/js'));
@@ -514,7 +514,7 @@ gulp.task('uglify', ['webpack'], function() {
 gulp.task('halley-uglify', ['halley-webpack'], function() {
   var sourceMapOpts = getSourceMapOptions('halley');
   return gulp.src('output/assets/js/halley/*.js')
-    .pipe(sourcemaps.init({ loadMaps: true }))
+    .pipe(sourcemaps.init({ /* loadMaps: true */ }))
     .pipe(uglify(getUglifyOptions()))
     .pipe(sourcemaps.write(sourceMapOpts.dest, sourceMapOpts.options))
     .pipe(gulp.dest('output/assets/js/halley'));
