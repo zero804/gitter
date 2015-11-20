@@ -28,10 +28,12 @@ var uglify = require('gulp-uglify');
 var coveralls = require('gulp-coveralls');
 var lcovMerger = require ('lcov-result-merger');
 var gutil = require('gulp-util');
+var sentryRelease = require('gulp-sentry-release');
 
 /* Don't do clean in gulp, use make */
 var DEV_MODE = !!process.env.DEV_MODE;
 var RUN_TESTS_IN_PARALLEL = false;
+var IS_STAGED = process.env.STAGED_ENVIRONMENT && JSON.parse(process.env.STAGED_ENVIRONMENT);
 
 var testModules = {
   'integration': ['./test/integration/**/*.js', './test/public-js/**/*.js'],
@@ -515,31 +517,44 @@ gulp.task('halley-uglify', ['webpack'], function() {
     .pipe(gulp.dest('output/assets/js/halley'));
 });
 
-gulp.task('sentry-release', ['uglify', 'halley-uglify'], function(done){
-  if (!process.env.SENTRY_API_KEY) {
+gulp.task('create-sentry-version', /*['add-version-files'],*/ function(done) {
+  if (!process.env.SENTRY_API_KEY || !process.env.SENTRY_SLUG || !process.env.SENTRY_DOMAIN) {
     return done();
   }
 
-  var sourceMapOpts = getSourceMapOptions();
-  git.revParse({ args: 'HEAD' }, function (err, commit) {
-
-    if (err) return done(err);
-
-    var isStaged = (process.env.STAGED_ENVIRONMENT === 'true');
-    var sentryRelease = require('gulp-sentry-release')('./package.json', {
-      DOMAIN: isStaged ? 'https://beta.gitter.im' : 'https://gitter.im',
-      API_KEY: process.env.SENTRY_API_KEY,
-      API_URL: 'https://app.getsentry.com/api/0/projects/gitter/' + isStaged  ? 'frontend-staging' : 'frontend',
-      debug: true,
-      versionPrefix: commit,
-    });
-
-    gulp.src([sourceMapOpts.dest + '/**/*.js', 'output/assets/js/**/*.js'])
-      .pipe(sentryRelease.release())
-      .pipe(done);
-
-
+  var version = fs.readFileSync('./output/app/ASSET_TAG');
+  var release = sentryRelease('./package.json', {
+    DOMAIN: process.env.SENTRY_DOMAIN,
+    API_KEY: process.env.SENTRY_API_KEY,
+    API_URL: 'https://app.getsentry.com/api/0/projects/' + process.env.SENTRY_SLUG,
+    debug: true,
+    versionPrefix: '',
   });
+
+  release.sentryAPI.create(version, function(err) {
+    done();
+  });
+
+});
+
+gulp.task('sentry-release', ['create-sentry-version'/*, 'uglify', 'halley-uglify', 'add-version-files'*/], function() {
+  if (!process.env.SENTRY_API_KEY || !process.env.SENTRY_SLUG || !process.env.SENTRY_DOMAIN) {
+    return;
+  }
+
+  var version = fs.readFileSync('./output/app/ASSET_TAG');
+
+  var release = sentryRelease('./package.json', {
+    DOMAIN: process.env.SENTRY_DOMAIN,
+    API_KEY: process.env.SENTRY_API_KEY,
+    API_URL: 'https://app.getsentry.com/api/0/projects/' + process.env.SENTRY_SLUG + '/',
+    debug: true,
+    versionPrefix: '',
+  });
+
+  return gulp.src(['output/assets/js/**/*.js', 'output/assets/js/**/*.map'])
+    .pipe(using())
+    .pipe(release.release(version));
 });
 
 gulp.task('build-assets', ['copy-asset-files', 'css', 'webpack', 'uglify', 'halley-webpack', 'halley-uglify', 'sentry-release']);
