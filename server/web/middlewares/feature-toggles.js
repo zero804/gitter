@@ -35,7 +35,7 @@ function getFeatures(callback) {
     .then(function(togglesList) {
 
       if (!togglesList || togglesList.length === 0) {
-        callback({});
+        return callback({});
       }
 
       var featureToggles = togglesList.reduce(function(memo, toggle) {
