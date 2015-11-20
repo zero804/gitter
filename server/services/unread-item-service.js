@@ -1,4 +1,4 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
+/* jshint maxcomplexity:20 */
 "use strict";
 
 var env              = require('gitter-web-env');
@@ -20,8 +20,7 @@ var uniqueIds        = require('mongodb-unique-ids');
 var debug            = require('debug')('gitter:unread-item-service');
 var recentRoomService = require('./recent-room-service');
 var badgeBatcher     = new RedisBatcher('badge', 1000, batchBadgeUpdates);
-var Promise          = require('q');
-var chatService      = require('./chat-service');
+var Q                = require('q');
 
 /* Handles batching badge updates to users */
 function batchBadgeUpdates(key, userIds, done) {
@@ -693,31 +692,34 @@ function queueBadgeUpdateForUser(userIds) {
 }
 
 exports.getActivityIndicatorForTroupeIds = function(troupeIds, userId) {
-  return recentRoomService.getTroupeLastAccessTimesForUser(userId)
-    .then(function(times) {
-      var timesMap = troupeIds.reduce(function(accum, troupeId) {
-        if (!times[troupeId]) return accum;
 
-        accum[troupeId] = times[troupeId];
+  return Q.all([
+    recentRoomService.getTroupeLastAccessTimesForUser(userId),
+    engine.getLastChatTimestamps(troupeIds)
+  ])
+    .spread(function(allLastAccessTimes, rawLastMsgTimes) {
+
+      var lastAccessTimes = troupeIds.reduce(function(accum, troupeId) {
+        accum[troupeId] = allLastAccessTimes[troupeId];
         return accum;
       }, {});
 
-      // Use timemap to query only for troupes with times
-      var queries = Object.keys(times).map(function(troupeId) {
-        return chatService.getDateOfLastMessageInRoom(troupeId);
-      });
+      var lastMsgTimes = troupeIds.reduce(function(accum, troupeId, index) {
+        if (!rawLastMsgTimes[index]) return accum;
+        var ts = parseInt(rawLastMsgTimes[index]);
+        accum[troupeId] = new Date(ts);
+        return accum;
+      }, {});
 
-      return Promise.all(queries)
-      .then(function(dates) {
-        var mappedDates = Object.keys(times).reduce(function(accum, troupeId, index) {
-          accum[troupeId] = dates[index] > timesMap[troupeId];
-          return accum;
-        }, {});
 
-        return mappedDates;
-      });
-    });
+      var activity = Object.keys(lastAccessTimes).reduce(function(accum, troupeId) {
+        if (!lastMsgTimes[troupeId]) return accum;
+        accum[troupeId] = lastMsgTimes[troupeId] > lastAccessTimes[troupeId];
+        return accum;
+      }, {});
 
+      return activity;
+  });
 };
 
 

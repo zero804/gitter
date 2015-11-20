@@ -1,15 +1,16 @@
 "use strict";
 
 var nconf = require('../utils/config');
-var resolveAvatarUrl = require('gitter-web-shared/avatars/resolve-avatar-url');
-var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-avatar-url');
+var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-url');
+var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
 
 var METADATA_IMAGE_SIZE = 256;
 
 function getMetadata(options) {
   var room = options && options.room;
 
-  var image = resolveRoomAvatarUrl(room && room.uri || 'gitterHQ', METADATA_IMAGE_SIZE);
+  var resolveRoom = (room && room.uri) ? room : {uri: 'gitterHQ'};
+  var image = resolveRoomAvatarUrl(resolveRoom, METADATA_IMAGE_SIZE);
 
   var title = room && room.uri || 'Gitter';
   var description = room && room.topic || 'Where developers come to talk.';
@@ -38,7 +39,7 @@ function getMetadataForChatPermalink(options) {
 
   var fromUser = chat.fromUser;
 
-  var image = resolveAvatarUrl({ username: fromUser, size: METADATA_IMAGE_SIZE });
+  var image = resolveUserAvatarUrl(fromUser, METADATA_IMAGE_SIZE);
 
   var title = room && room.uri || 'Gitter';
   var description = '@' + fromUser.username + ': ' + chat.text;

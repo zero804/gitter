@@ -49,6 +49,7 @@ function createExports(schemas) {
 
 module.exports = createExports({
   User: require('./persistence/user-schema'),
+  Identity: require('./persistence/identity-schema'),
   UserTroupeLastAccess: require('./persistence/user-troupe-last-access-schema'),
   UserTroupeFavourites: require('./persistence/user-troupe-favourites-schema'),
   Troupe: require('./persistence/troupe-schema'),
@@ -62,7 +63,8 @@ module.exports = createExports({
   OAuthAccessToken: require('./persistence/oauth-access-token-schema'),
   PushNotificationDevice: require('./persistence/push-notification-device-schema'),
   UriLookup: require('./persistence/uri-lookup-schema'),
-  Subscription: require('./persistence/subscription-schema')
+  Subscription: require('./persistence/subscription-schema'),
+  FeatureToggle: require('./persistence/feature-toggle-schema')
 });
 
 var events = require("./persistence-service-events");
