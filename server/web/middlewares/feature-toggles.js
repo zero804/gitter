@@ -33,6 +33,11 @@ function getFeatures(callback) {
     .lean()
     .exec()
     .then(function(togglesList) {
+
+      if (!togglesList || togglesList.length === 0) {
+        callback({});
+      }
+
       var featureToggles = togglesList.reduce(function(memo, toggle) {
         memo[toggle.name] = { criteria: toggle.criteria };
         return memo;

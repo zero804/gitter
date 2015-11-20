@@ -82,9 +82,9 @@ var SUBRESOURCE_MAPPINGS = {
 };
 
 var CACHED_SUBRESOURCES = Object.keys(SUBRESOURCE_MAPPINGS).reduce(function(memo, key) {
-  memo[key] = cdnSubResources(['router-app', 'router-chat'], 'js');
+  memo[key] = cdnSubResources(SUBRESOURCE_MAPPINGS[key], 'js');
   return memo;
-});
+}, {});
 
 function getSubResources(entryPoint, jsRoot) {
   if (!jsRoot) {
@@ -358,7 +358,7 @@ function renderChat(req, res, options, next) {
         var renderOptions = _.extend({
             isRepo: troupe.githubType === 'REPO',
             bootScriptName: script,
-            jsRoot: jsRoot, 
+            jsRoot: jsRoot,
             cssFileName: cssFileName,
             githubLink: githubLink,
             troupeName: req.uriContext.uri,
@@ -487,8 +487,8 @@ function renderOrgPage(req, res, next) {
 
     // Filter out ORG room and INHERITED permission rooms for non-org members
     if (!isOrgMember) {
-      _.remove(rooms, function(room) { 
-        return (room.githubType === 'ORG' || room.security === 'INHERITED'); 
+      _.remove(rooms, function(room) {
+        return (room.githubType === 'ORG' || room.security === 'INHERITED');
       });
     }
 
