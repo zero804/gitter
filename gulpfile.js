@@ -27,6 +27,7 @@ var jsonlint = require('gulp-jsonlint');
 var uglify = require('gulp-uglify');
 var coveralls = require('gulp-coveralls');
 var lcovMerger = require ('lcov-result-merger');
+var gutil = require('gulp-util');
 
 /* Don't do clean in gulp, use make */
 var DEV_MODE = !!process.env.DEV_MODE;
@@ -488,6 +489,7 @@ gulp.task('halley-webpack', function() {
 
 function getUglifyOptions() {
   if (process.env.FAST_UGLIFY && JSON.parse(process.env.FAST_UGLIFY)) {
+    gutil.log('Using fast uglify. The resulting javascript artifacts will be much bigger');
     return {
       mangle: false,
       compress: false
