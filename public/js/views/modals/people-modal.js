@@ -7,7 +7,6 @@ var ModalView              = require('./modal');
 var itemTemplate           = require('./tmpl/people-modal-result.hbs');
 var apiClient              = require('components/apiClient');
 var template               = require('./tmpl/people-modal.hbs');
-var rosterCollection       = require('collections/instances/integrated-items').roster;
 var SyncMixin              = require('collections/sync-mixin');
 var InfiniteScrollBehavior = require('views/behaviors/infinite-scroll');
 var context                = require('utils/context');
@@ -130,7 +129,7 @@ var Modal = ModalView.extend({
 
     var room = context.troupe();
 
-    var users = new UserCollection(rosterCollection.models);
+    var users = new UserCollection(options.rosterCollection.models);
     users.fetchWithLimit();
     // make the user collection seem live
     users.listenTo(room, 'change:userCount', users.fetchWithLimit);
