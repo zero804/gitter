@@ -256,13 +256,14 @@ module.exports = (function() {
 
     // If the user seen this messages and updated the last access time in
     // a different window, mark the messages in this window as read.
+    var self = this;
     collectionView.listenTo(context.troupe(), 'change:lastAccessTime', function(room) {
       if (!context.troupe().get('lurk')) return;
 
       var lastAccess = room.get('lastAccessTime');
       this.collection.forEach(function(chat) {
         if (chat.get('sent').isBefore(lastAccess) && chat.get('unread')) {
-          chat.set('unread', false);
+          self._store._markItemRead(chat.id);
         }
       });
 
