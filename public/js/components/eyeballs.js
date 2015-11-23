@@ -164,6 +164,7 @@ module.exports = (function() {
 
   document.addEventListener("keydown",    debouncedInteractionTracking, false);
   document.addEventListener("mousemove",  debouncedInteractionTracking, false);
+  document.addEventListener("touchstart", debouncedInteractionTracking, false);
   window.addEventListener("scroll",       debouncedInteractionTracking, false);
 
 
