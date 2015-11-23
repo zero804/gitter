@@ -173,7 +173,6 @@
     "gulp-matcha": "^1.0.3",
     "gulp-postcss": "^5.0.0",
     "gulp-replace": "^0.5.4",
-    "gulp-sentry-release": "^1.0.1",
     "gulp-shell": "^0.4.1",
     "gulp-shrinkwrap": "^1.0.1",
     "gulp-sourcemaps": "^1.6.0",
