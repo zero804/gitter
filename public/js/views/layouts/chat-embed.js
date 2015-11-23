@@ -2,7 +2,6 @@
 
 var appEvents = require('utils/appevents');
 var ChatInputView = require('views/chat/chatInputView');
-var itemCollections = require('collections/instances/integrated-items');
 var cocktail = require('cocktail');
 var KeyboardEventsMixin = require('views/keyboard-events-mixin');
 var unreadItemsClient = require('components/unread-items-client');
@@ -18,7 +17,7 @@ var ChatLayout = require('./chat');
 require('views/behaviors/isomorphic');
 
 
-var ChatInputLayout = ChatLayout.extend({
+var EmbedLayout = ChatLayout.extend({
   monitorUnreadItems: true,
   keyboardEvents: {
     'backspace': 'onKeyBackspace',
@@ -35,7 +34,7 @@ var ChatInputLayout = ChatLayout.extend({
     if (this.model.get('roomMember')) {
       inputRegion.show(new ChatInputView({
         model: context.troupe(),
-        collection: itemCollections.chats
+        collection: this.options.chatCollection
       }));
     } else {
       inputRegion.show(new JoinRoomView({ }));
@@ -75,7 +74,7 @@ var ChatInputLayout = ChatLayout.extend({
     if (this.model.get('roomMember')) {
       return  new ChatInputView(optionsForRegion({
         model: context.troupe(),
-        collection: itemCollections.chats
+        collection: this.options.chatCollection
       }, {rerender: true}));
     } else {
       return new JoinRoomView(optionsForRegion({}, {rerender: true}));
@@ -123,6 +122,6 @@ var ChatInputLayout = ChatLayout.extend({
   },
 });
 
-cocktail.mixin(ChatInputLayout, KeyboardEventsMixin);
+cocktail.mixin(EmbedLayout, KeyboardEventsMixin);
 
-module.exports = ChatInputLayout;
+module.exports = EmbedLayout;

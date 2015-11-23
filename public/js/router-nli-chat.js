@@ -54,7 +54,9 @@ onready(function() {
     },
 
     people: function() {
-      appView.dialogRegion.show(new PeopleModal());
+      appView.dialogRegion.show(new PeopleModal({
+        rosterCollection: itemCollections.roster
+      }));
     },
 
   });

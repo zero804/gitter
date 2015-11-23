@@ -5,16 +5,12 @@ var Marionette = require('backbone.marionette');
 var modalRegion = require('components/modal-region');
 var ChatContainerView = require('views/chat/chatContainerView');
 
-var itemCollections = require('collections/instances/integrated-items');
-
-
 /* Decorators */
 var emojiDecorator = require('views/chat/decorators/emojiDecorator');
 var TroupeMenu = require('views/menu/troupeMenu');
 var mobileDecorator = require('views/chat/decorators/mobileDecorator');
 var ChatInputView = require('views/chat/chatInputView');
 var JoinRoomView = require('views/chat/join-room-view');
-
 
 var $ = require('jquery');
 
@@ -53,7 +49,7 @@ module.exports = Marionette.LayoutView.extend({
     if (this.model.get('roomMember')) {
       inputRegion.show(new ChatInputView({
         model: context.troupe(),
-        collection: itemCollections.chats
+        collection: this.options.chatCollection
       }));
     } else {
       if (!this.model.get('aboutToLeave')) {
@@ -96,7 +92,7 @@ module.exports = Marionette.LayoutView.extend({
     if (this.model.get('roomMember')) {
       return  new ChatInputView(optionsForRegion({
         model: context.troupe(),
-        collection: itemCollections.chats
+        collection: this.options.chatCollection
       }, {rerender: true}));
     } else {
       return new JoinRoomView(optionsForRegion({}, {rerender: true}));

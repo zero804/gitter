@@ -3,7 +3,6 @@
 var context = require('utils/context');
 var appEvents = require('utils/appevents');
 var ChatInputView = require('views/chat/chatInputView');
-var itemCollections = require('collections/instances/integrated-items');
 var cocktail = require('cocktail');
 var KeyboardEventsMixin = require('views/keyboard-events-mixin');
 var unreadItemsClient = require('components/unread-items-client');
@@ -32,7 +31,7 @@ var ChatToolbarInputLayout = ChatToolbarLayout.extend({
     if (this.model.get('roomMember')) {
       inputRegion.show(new ChatInputView({
         model: context.troupe(),
-        collection: itemCollections.chats
+        collection: this.options.chatCollection
       }));
     } else {
       if (!this.model.get('aboutToLeave')) {
@@ -89,8 +88,8 @@ var ChatToolbarInputLayout = ChatToolbarLayout.extend({
     if (this.model.get('roomMember')) {
       return  new ChatInputView(optionsForRegion({
         model: context.troupe(),
-        collection: itemCollections.chats
-      }, {rerender: true}));
+        collection: this.options.chatCollection
+      }, { rerender: true }));
     } else {
       return new JoinRoomView(optionsForRegion({}, {rerender: true}));
     }
