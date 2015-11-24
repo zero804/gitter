@@ -39,7 +39,7 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   initMenuRegion: function(optionsForRegion) {
-    return new TroupeMenu(optionsForRegion());
+    //return new TroupeMenu(optionsForRegion());
   },
 
   initUserhomeRegion: function(optionsForRegion) {

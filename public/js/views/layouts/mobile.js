@@ -7,7 +7,6 @@ var ChatContainerView = require('views/chat/chatContainerView');
 
 /* Decorators */
 var emojiDecorator = require('views/chat/decorators/emojiDecorator');
-var TroupeMenu = require('views/menu/troupeMenu');
 var mobileDecorator = require('views/chat/decorators/mobileDecorator');
 var ChatInputView = require('views/chat/chatInputView');
 var JoinRoomView = require('views/chat/join-room-view');
@@ -23,7 +22,6 @@ module.exports = Marionette.LayoutView.extend({
   behaviors: {
     Isomorphic: {
       chat: { el: '#content-wrapper', init: 'initChatRegion' },
-      menu: { el: '#menu-region', init: 'initMenuRegion' },
       input: { el: '#chat-input', init: 'initInputRegion' },
     }
   },
@@ -80,7 +78,7 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   initMenuRegion: function(optionsForRegion) {
-    return new TroupeMenu(optionsForRegion());
+    //return new TroupeMenu(optionsForRegion());
   },
 
   initInputRegion: function(optionsForRegion) {
@@ -102,6 +100,7 @@ module.exports = Marionette.LayoutView.extend({
 
   hideTroupes: function() {
     this.makeAppFullScreen();
+    //TODO Remove jp 24-11-15
     this.ui.mainPage.removeClass('partiallyOffScreen');
   },
 
@@ -110,6 +109,7 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   showHideTroupes: function(e) {
+    //TODO Remove jp 24-11-15
     this.makeAppFullScreen();
     this.ui.mainPage.toggleClass('partiallyOffScreen');
     e.stopPropagation();
