@@ -1,6 +1,5 @@
 "use strict";
 var Marionette = require('backbone.marionette');
-var TroupeMenu = require('views/menu/troupeMenu');
 var modalRegion = require('components/modal-region');
 
 require('views/behaviors/isomorphic');
@@ -16,7 +15,6 @@ module.exports = (function () {
 
     behaviors: {
       Isomorphic: {
-        menu: { el: "#menu-region", init: 'initMenuRegion' }
       }
     },
 
@@ -26,10 +24,6 @@ module.exports = (function () {
 
     initialize: function () {
       this.dialogRegion = modalRegion;
-    },
-
-    initMenuRegion: function(optionsForRegion) {
-      return new TroupeMenu(optionsForRegion());
     },
 
     onKeyDown: function(e) {

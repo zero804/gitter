@@ -6,8 +6,6 @@ var prerenderWrapper = require('./prerender-wrapper');
 var PRERENDERED_VIEWS = [
   "js/views/archive/tmpl/archive-navigation-view",
   "js/views/app/tmpl/headerViewTemplate",
-  "js/views/menu/tmpl/troupeMenu",
-  "js/views/menu/tmpl/troupeMenu",
   "js/views/app/tmpl/headerViewTemplate",
   "js/views/chat/tmpl/chatInputView",
   "js/views/chat/tmpl/chat-input-box",

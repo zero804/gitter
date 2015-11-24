@@ -26,14 +26,8 @@
   </style>
 </head>
 <body class="mobile with-sideMenu">
-
-  <div id="menu-region" class="menu-region">
-    <nav class="menu menu--mobile">
-      {{{ prerenderView "js/views/menu/tmpl/troupeMenu" }}}
-    </nav>
-  </div>
-
   <div id="mainPage" class="chat-app">
+
     <header>
       <div id="showTroupesButton">
         <img src='{{cdn "images/icon-more@2x.png" }}' width="16" height="16" id="menu-toggle" style="margin-left: 8px">
@@ -42,6 +36,7 @@
     </header>
 
     <div id="userhome-region"></div>
+
   </div>
   {{>live_reload}}
 </body>

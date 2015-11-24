@@ -3,7 +3,6 @@
 var Marionette = require('backbone.marionette');
 var modalRegion = require('components/modal-region');
 var UserhomeView = require('views/userhome/userHomeView');
-var TroupeMenu = require('views/menu/troupeMenu');
 
 var $ = require('jquery');
 
@@ -15,7 +14,6 @@ module.exports = Marionette.LayoutView.extend({
 
   behaviors: {
     Isomorphic: {
-      menu: { el: '#menu-region', init: 'initMenuRegion' },
       userhome: { el: '#userhome-region', init: 'initUserhomeRegion' }
     }
   },
@@ -36,10 +34,6 @@ module.exports = Marionette.LayoutView.extend({
 
   onRender: function() {
     this.ui.showTroupesButton.toggle(!this.options.hideMenu);
-  },
-
-  initMenuRegion: function(optionsForRegion) {
-    //return new TroupeMenu(optionsForRegion());
   },
 
   initUserhomeRegion: function(optionsForRegion) {
