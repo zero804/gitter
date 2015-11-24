@@ -236,14 +236,14 @@ onready(function() {
           troupeCollections.troupes.once('sync', function(){
             postMessage({
               type: 'roomList',
-              rooms: roomListGenerator(),
+              rooms: roomListGenerator(troupeCollections.troupes),
             });
           });
         }
         else {
           postMessage({
             type: 'roomList',
-            rooms: roomListGenerator(),
+            rooms: roomListGenerator(troupeCollections.troupes),
           });
         }
         break;

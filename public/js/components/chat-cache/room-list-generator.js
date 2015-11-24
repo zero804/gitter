@@ -1,9 +1,7 @@
 'use strict';
 
-var troupeCollection = require('collections/instances/troupes');
-
-module.exports = function roomListGenerator() {
-  return troupeCollection.troupes.map(function(model) {
+module.exports = function roomListGenerator(troupeCollection) {
+  return troupeCollection.map(function(model) {
     var lastAccess = model.get('lastAccessTime');
     lastAccess = +new Date(lastAccess);
     return {
