@@ -113,6 +113,7 @@ function createExpectedFixtures(expected, done) {
     var confirmationCode = f.confirmationCode === true ? "confirm" + Math.random() : f.confirmationCode;
 
     return persistence.User.create({
+      identities:       f.identities,
       email:            f.email       || generateEmail(),
       displayName:      f.displayName || generateName(),
       githubId:         f.githubId    || generateGithubId(),
@@ -121,6 +122,22 @@ function createExpectedFixtures(expected, done) {
       username:         username      || generateUsername(),
       status:           f.status      || 'ACTIVE',
       permissions:      f.permissions
+    });
+  }
+
+  function createIdentity(fixtureName, f) {
+    debug('Creating %s', fixtureName);
+
+    return persistence.Identity.create({
+      userId: f.userId,
+      provider: f.provider,
+      providerKey: f.providerKey,
+      username: f.username,
+      displayName: f.displayName,
+      email: f.email,
+      accessToken: f.accessToken,
+      refreshToken: f.refreshToken,
+      avatar: f.avatar
     });
   }
 
@@ -259,6 +276,25 @@ function createExpectedFixtures(expected, done) {
     return Q.all(promises).then(function() { return fixture; });
   }
 
+  function createIdentities(fixture) {
+    var promises = Object.keys(expected).map(function(key) {
+      if (key.match(/^identity/)) {
+        var expectedIdentity = expected[key];
+
+        expectedIdentity.userId = fixture[expectedIdentity.user]._id;
+
+        return createIdentity(key, expectedIdentity)
+          .then(function(identity) {
+            fixture[key] = identity;
+          });
+      }
+
+      return null;
+    });
+
+    return Q.all(promises).then(function() { return fixture; });
+  }
+
   function createTroupes(fixture) {
     var promises = Object.keys(expected).map(function(key) {
 
@@ -333,6 +369,7 @@ function createExpectedFixtures(expected, done) {
   }
 
   return createUsers(createBaseFixture())
+    .then(createIdentities)
     .then(createTroupes)
     .then(createInvites)
     .then(createMessages)
