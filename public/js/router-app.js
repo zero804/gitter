@@ -1,4 +1,4 @@
-/* jshint maxcomplexity:17 */
+/* jshint maxcomplexity:18 */
 'use strict';
 require('utils/initial-setup');
 
@@ -61,6 +61,24 @@ onready(function() {
    */
   window.history.replaceState(chatIFrame.src, '', window.location.href);
 
+  function initChatCache() {
+    //if we don't have any troupes in the troupeCollection
+    //wait for it to sync before posting the message
+    if(!troupeCollections.troupes.length) {
+      troupeCollections.troupes.once('sync', function(){
+        postMessage({
+          type: 'roomList',
+          rooms: roomListGenerator(troupeCollections.troupes),
+        });
+      });
+    }
+    else {
+      postMessage({
+        type: 'roomList',
+        rooms: roomListGenerator(troupeCollections.troupes),
+      });
+    }
+  }
 
   function getContentFrameLocation() {
     var contentFrame = document.querySelector('#content-frame');
@@ -230,22 +248,7 @@ onready(function() {
 
       //when the chat app requests the room list send it
       case 'request:roomList':
-        //if we don't have any troupes in the troupeCollection
-        //wait for it to sync before posting the message
-        if(!troupeCollections.troupes.length) {
-          troupeCollections.troupes.once('sync', function(){
-            postMessage({
-              type: 'roomList',
-              rooms: roomListGenerator(troupeCollections.troupes),
-            });
-          });
-        }
-        else {
-          postMessage({
-            type: 'roomList',
-            rooms: roomListGenerator(troupeCollections.troupes),
-          });
-        }
+        initChatCache();
         break;
 
       case 'unreadItemsCount':
