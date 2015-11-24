@@ -10,7 +10,6 @@ var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 var _ = require('underscore');
 var cocktail = require('cocktail');
-var itemCollections = require('collections/instances/integrated-items');
 var ChatSearchModels = require('collections/chat-search');
 var resultTemplate = require('./tmpl/result.hbs');
 var noResultsTemplate = require('./tmpl/no-results.hbs');
@@ -119,10 +118,7 @@ module.exports = (function() {
     selectItem: function () {
       var id = this.model.get('id');
 
-      // updating the collection around the message to be scrolled to
-      itemCollections.chats.ensureLoaded(id, function () {
-        appEvents.trigger('chatCollectionView:selectedChat', id, { highlights: this.model.get('highlights') });
-      }, this);
+      appEvents.trigger('chatCollectionView:loadAndHighlight', id, { highlights: this.model.get('highlights') });
     }
   });
 
