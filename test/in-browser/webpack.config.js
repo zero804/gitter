@@ -6,6 +6,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, './fixtures/build'),
     filename: 'test.js',
+    publicPath: '/fixtures/build/',
   },
   module: {
     loaders: appWebpackConfig.module.loaders,

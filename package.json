@@ -198,6 +198,7 @@
     "lcov-result-merger": "^1.0.2",
     "less": "~1.5.1",
     "less-loader": "^0.7.7",
+    "live-reload": "^1.1.0",
     "lorem-ipsum": "^1.0.1",
     "matcha": "^0.6.0",
     "matchdep": "^0.3.0",
@@ -254,7 +255,8 @@
     "preinstall": "(linklocal list --format '%S' --no-summary || find node_modules -maxdepth 1 -type l -exec basename {} \\;)|while read line; do if [ -d \"$line\" ] && [ ! -h \"$line\" ]; then rm -r \"$line\"; fi; done",
     "shrinkwrap-conflict": "rm -f npm-shrinkwrap.json && npm run shrinkwrap",
     "fix-shrinkwrap-registry": "sed -i '' 's#https://registry.npmjs.org/#http://beta-internal:4873/#g' npm-shrinkwrap.json && sed -i '' 's#http://beta-internal:8089/nexus/content/groups/npm/#http://beta-internal:4873/#g' npm-shrinkwrap.json",
-    "test:unit:browser": "cd ./test/in-browser && webpack && browserstack-runner --verbose"
+    "test:unit:browser": "cd ./test/in-browser && webpack && browserstack-runner --verbose",
+    "test:unit:browser:watch": "cd ./test/in-browser && webpack -w --progress & http-server ./test/in-browser -p 9090 & live-reload --port=9091 ./"
   },
   "git": {
     "scripts": {
