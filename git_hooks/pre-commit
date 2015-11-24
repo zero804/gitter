@@ -10,5 +10,5 @@ if [ "$branch" = "refs/heads/master" ]; then
     exit 1
 fi
 
-cd $repo_dir/node_modules/.bin/
-gulp validate && gulp fasttest
+gulp="$repo_dir/node_modules/.bin/gulp"
+${gulp} validate && ${gulp} fasttest
