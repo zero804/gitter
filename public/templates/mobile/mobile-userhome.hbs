@@ -11,7 +11,7 @@
 
   {{{ generateTroupeContext troupeContext }}}
   {{{ bootScript "mobile-userhome" }}}
-  
+
   <link rel="apple-touch-icon" href='{{ cdn "images/touch-icon-iphone.png" }}'>
   <link rel="shortcut icon" href='{{ cdn "images/favicon5.png"}}'>
   {{#each dnsPrefetch}}
@@ -26,6 +26,7 @@
   </style>
 </head>
 <body class="mobile with-sideMenu">
+
   <div id="menu-region" class="menu-region">
     <nav class="menu menu--mobile">
       {{{ prerenderView "js/views/menu/tmpl/troupeMenu" }}}
