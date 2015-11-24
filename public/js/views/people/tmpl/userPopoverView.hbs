@@ -6,15 +6,19 @@
 <div style="float: left"><img src="{{avatarUrl}}" class="avatar-l"/></div>
 <div class="trpPopoverDetails">
   <h2>{{name}}</h2>
-  <h3><a href="http://github.com/{{login}}" target="_blank">{{login}}</a></h3>
-  <div class="vcard-stats">
-      <strong class="vcard-stat-count">{{followers}}</strong>
-      followers &nbsp;
-      <strong class="vcard-stat-count">{{public_repos}}</strong>
-      repos &nbsp;
-      <strong class="vcard-stat-count">{{following}}</strong>
-      following &nbsp;
-  </div>
+  {{#if isGitHubUser}}
+    <h3><a href="http://github.com/{{login}}" target="_blank">{{login}}</a></h3>
+      {{#if isLoaded}}
+        <div class="vcard-stats">
+            <strong class="vcard-stat-count">{{followers}}</strong>
+            {{ pluralize followers 'follower' 'followers' }}&nbsp;
+            <strong class="vcard-stat-count">{{public_repos}}</strong>
+            {{ pluralize public_repos 'repo' 'repos' }} &nbsp;
+            <strong class="vcard-stat-count">{{following}}</strong>
+            following &nbsp;
+        </div>
+      {{/if}}
+  {{/if}}
 
   <ul class="trpUserDetails">
     {{#if company}}
