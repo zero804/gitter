@@ -16,12 +16,6 @@ module.exports = (function() {
   var orgsCollection = new orgModels.OrgCollection(null, { listen: true });
   var troupeCollection = new troupeModels.TroupeCollection(null, { listen: true });
 
-  troupeCollection.on('sync', function(){
-    console.log('-----------------------');
-    console.log(troupeCollection.toJSON());
-    console.log('-----------------------');
-  });
-
   orgsCollection.on('error', errorHandle.bind(null, 'org-collection'));
 
   unreadItemsClient.installTroupeListener(troupeCollection);
