@@ -120,7 +120,12 @@ onready(function() {
       break;
 
       case 'roomList':
-        chatCollectionPool(message.rooms);
+        //If we have chat caching turned on trigger it
+        //TODO remove when 100% of users have caching enabled
+        //JP 24/11/15
+        if(context.hasFeature('chat-cache')) {
+          chatCollectionPool(message.rooms);
+        }
         break;
     }
   });
