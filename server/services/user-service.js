@@ -1,13 +1,13 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-// var sechash                   = require('sechash');
-var winston                   = require('../utils/winston');
 var assert                    = require('assert');
-var persistence               = require("./persistence-service");
-var uriLookupService          = require('./uri-lookup-service');
+var _                         = require('underscore');
 var Q                         = require('q');
 var githubUserService         = require('gitter-web-github').GitHubUserService;
+var persistence               = require("./persistence-service");
+var uriLookupService          = require('./uri-lookup-service');
+var winston                   = require('../utils/winston');
 var mongooseUtils             = require('../utils/mongoose-utils');
 var extractGravatarVersion    = require('../utils/extract-gravatar-version');
 
@@ -137,6 +137,69 @@ var userService = {
         return newUser(options);
       })
       .nodeify(callback);
+  },
+
+
+  /**
+   * Add the user if one doesn't exist for this identity and set the data for
+   * that provider for the user whether the user is new or not.
+   * @return promise of [user, isNewIdentity]
+   */
+  findOrCreateUserForProvider: function(userData, identityData) {
+    winston.info("Locating or creating user", {
+      userData: userData,
+      identityData: identityData
+    });
+
+    // This is not for GitHub. Only for newer providers. At least until we
+    // finally migrate all the github data one day.
+    assert.notEqual(identityData.provider, 'github');
+
+    // TODO: should we assert all the required user and identity fields?
+
+    var userQuery = {
+      identities: {
+        $elemMatch: {
+          provider: identityData.provider,
+          providerKey: identityData.providerKey
+        }
+      }
+    };
+
+    var user;
+    var isNewUser;
+    var userInsertData = _.extend({
+      identities: [{
+          provider: identityData.provider,
+          providerKey: identityData.providerKey
+        }]
+    }, userData);
+    return mongooseUtils.upsert(persistence.User, userQuery, {
+        $setOnInsert: userInsertData
+      })
+      .spread(function(_user, _isNewUser) {
+        user = _user;
+        isNewUser = _isNewUser;
+        var identityQuery = {
+          provider: identityData.provider,
+          userId: user._id
+        };
+        var identitySetData = _.extend({
+          userId: user._id
+        }, identityData);
+        return mongooseUtils.upsert(persistence.Identity, identityQuery, {
+          // NOTE: set the identity fields regardless, because the tokens and
+          // things could be newer than what we have if this is a login and
+          // not a signup.
+          $set: identitySetData
+        });
+      })
+      .spread(function() {
+        return uriLookupService.reserveUriForUsername(user._id, user.username)
+      })
+      .then(function() {
+        return [user, isNewUser];
+      });
   },
 
   findById: function(id, callback) {
