@@ -8,7 +8,7 @@ var context        = require('utils/context');
 var appEvents      = require('utils/appevents');
 
 var pool            = {};
-var poolSize        = 10;
+var poolSize        = 2;
 var initialRoomName = context.troupe().get('name');
 
 module.exports = function chatCollectionPool(roomList) {
