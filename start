@@ -10,6 +10,10 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 DOCKER_MACHINE_NAME=${DOCKER_MACHINE_NAME-default}
 HAS_DOCKER_MACHINE=$(which docker-machine)
 
+echo  '---------------------------------'
+echo HAS_DOCKER_MACHINE;
+echo  '---------------------------------'
+
 function get_ip {
   if [ HAS_DOCKER_MACHINE ]; then
     echo "$(docker-machine ip $DOCKER_MACHINE_NAME)"

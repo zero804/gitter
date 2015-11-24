@@ -1,4 +1,5 @@
 /*jshint unused:true, browser:true*/
+/*
 require([
   'assert',
   'utils/mixpanel'
@@ -17,3 +18,4 @@ require([
   });
 
 });
+*/
