@@ -5,12 +5,11 @@ var apiClient = require('components/apiClient');
 var context = require('utils/context');
 var appEvents = require('utils/appevents');
 var Rollers = require('utils/rollers');
-var resolveAvatarUrl = require('gitter-web-shared/avatars/resolve-avatar-url');
+var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 var _ = require('underscore');
 var cocktail = require('cocktail');
-var itemCollections = require('collections/instances/integrated-items');
 var ChatSearchModels = require('collections/chat-search');
 var resultTemplate = require('./tmpl/result.hbs');
 var noResultsTemplate = require('./tmpl/no-results.hbs');
@@ -80,7 +79,8 @@ module.exports = (function() {
       data.selected = this.model.get('selected');
       data.detail = this.model.get('githubType');
       data.text = uri;
-      data.avatarUrl = resolveAvatarUrl({ username: uri.split('/')[0], size: 50 });
+      // TODO: send a room object
+      data.avatarUrl = resolveRoomAvatarUrl({ uri: uri }, 48);
       return data;
     },
 
@@ -118,10 +118,7 @@ module.exports = (function() {
     selectItem: function () {
       var id = this.model.get('id');
 
-      // updating the collection around the message to be scrolled to
-      itemCollections.chats.ensureLoaded(id, function () {
-        appEvents.trigger('chatCollectionView:selectedChat', id, { highlights: this.model.get('highlights') });
-      }, this);
+      appEvents.trigger('chatCollectionView:loadAndHighlight', id, { highlights: this.model.get('highlights') });
     }
   });
 

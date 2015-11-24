@@ -213,7 +213,13 @@ onready(function() {
     });
   });
 
-  var appView = new ChatToolbarInputLayout({ model: context.troupe(), template: false, el: 'body', chatCollection: itemCollections.chats });
+  var appView = new ChatToolbarInputLayout({
+    model: context.troupe(),
+    template: false,
+    el: 'body',
+    chatCollection: itemCollections.chats
+  });
+
   appView.render();
 
   /* Drag and drop */
@@ -236,7 +242,7 @@ onready(function() {
 
     autojoin: function() {
       apiClient.post('/v1/rooms/' + context.getTroupeId() + '/users', {username: context().user.username})
-      .then(function(res) {
+      .then(function() {
         //location.reload();
         context.troupe().set('roomMember', true);
       });
@@ -250,7 +256,9 @@ onready(function() {
       require.ensure(['views/modals/people-modal'], function(require) {
         var PeopleModal = require('views/modals/people-modal');
 
-        appView.dialogRegion.show(new PeopleModal());
+        appView.dialogRegion.show(new PeopleModal({
+          rosterCollection: itemCollections.roster
+        }));
       });
     },
 

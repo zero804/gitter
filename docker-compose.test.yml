@@ -1,0 +1,14 @@
+test:
+  build: .
+  links:
+    - mongo1
+    - mongo2
+    - mongo3
+    - redis1
+    - redis2
+    - sentinel1
+    - elasticsearch
+    - neo4j
+  environment:
+    DEBUG: "gitter:*"
+  entrypoint: [  "/bin/bash", "-c", "cd /src; ./node_modules/.bin/gulp test-docker"]

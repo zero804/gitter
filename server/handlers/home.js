@@ -6,11 +6,13 @@ var appMiddleware      = require('./app/middleware');
 var timezoneMiddleware = require('../web/middlewares/timezone');
 var appRender          = require('./app/render');
 var identifyRoute      = require('gitter-web-env').middlewares.identifyRoute;
+var featureToggles     = require('../web/middlewares/feature-toggles');
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
 router.get('/',
   identifyRoute('home-main'),
+  featureToggles,
   appMiddleware.isPhoneMiddleware,
   timezoneMiddleware,
   function (req, res, next) {
@@ -27,8 +29,9 @@ router.get('/',
 
 
 router.get('/~home',
-  ensureLoggedIn,
   identifyRoute('home-frame'),
+  ensureLoggedIn,
+  featureToggles,
   appMiddleware.isPhoneMiddleware,
   function(req, res, next) {
     appRender.renderHomePage(req, res, next);
@@ -37,15 +40,17 @@ router.get('/~home',
 
 // This is used from the explore page
 router.get('/createroom',
-  ensureLoggedIn,
   identifyRoute('create-room-redirect'),
+  ensureLoggedIn,
+  featureToggles,
   function (req, res) {
     res.redirect('/home#createroom');
   });
 
 router.get('/explore',
-  ensureLoggedIn,
   identifyRoute('home-explore'),
+  ensureLoggedIn,
+  featureToggles,
   function (req, res, next) {
     req.uriContext = {
       uri: 'home'
@@ -55,8 +60,9 @@ router.get('/explore',
   });
 
 router.get('/learn',
-  ensureLoggedIn,
   identifyRoute('home-learn-main'),
+  ensureLoggedIn,
+  featureToggles,
   function (req, res, next) {
     req.uriContext = {
       uri: 'learn'

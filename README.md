@@ -1,6 +1,8 @@
 Gitter Webapp
 =============
 
+[![Coverage Status](https://coveralls.io/repos/troupe/gitter-webapp/badge.svg?branch=develop&service=github&t=IjAtJj)](https://coveralls.io/github/troupe/gitter-webapp?branch=develop)
+
 Copyright Troupe Technology Limited 2012 - 2015
 All rights reserved.
 
@@ -172,3 +174,41 @@ You can do this as follows:
 ```shell
 NODE_ENV=prod LISTEN_IF=utun0 node scripts/graphs/upload-graph.js
 ```
+
+Testing
+-----------------------
+
+All unit tests etc can be run with `npm test`
+
+Tests run in the browser context will not be included within the above command.
+To tun these tests you will need these variables within your `env`:
+
+BROWSERSTACK_USERNAME
+BROWSERSTACK_KEY
+
+once you have these you can run `npm run test:unit:browser` which should kick off the tests via browserstack
+
+
+
+## Shrinkwrap Cheatsheat
+
+### 1. I've got a conflict in my shrinkwrap
+
+1. Merge any conflicts in your `package.json`, but ignore conflicts in your `npm-shrinkwrap.json`
+2. Run `npm run npm shrinkwrap-conflict`
+2. Commit your changes to `npm-shrinkwrap.json` and `package.json`
+
+### 2. I would like to add a dev-dependency
+
+1. Use the normal `npm install x@y --save-dev` command
+2. Commit your changes to `package.json`
+
+### 3. I would like to add a runtime dependency
+
+1. Use `gulp safe-install --package module@version`
+2. Commit your changes to `npm-shrinkwrap.json` and `package.json`
+
+### 4. The shrinkwrap file is completely screwed up. Can I recreate it?
+
+1. Use `npm clean-shrinkwrap`
+2. Commit your changes to `npm-shrinkwrap.json`

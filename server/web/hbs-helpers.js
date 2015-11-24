@@ -62,10 +62,11 @@ function cdnUrlGenerator(url, options) {
 
 exports.bootScript = function(url, parameters) {
   var options = parameters.hash;
+  var jsRoot = options && options.jsRoot || "js";
 
-  var baseUrl = cdnUrlGenerator("js/", options);
-  var vendorScriptUrl = cdnUrlGenerator("js/vendor.js", options);
-  var bootScriptUrl = cdnUrlGenerator("js/" + url + ".js", options);
+  var baseUrl = cdnUrlGenerator(jsRoot + '/', options);
+  var vendorScriptUrl = cdnUrlGenerator(jsRoot + "/vendor.js", options);
+  var bootScriptUrl = cdnUrlGenerator(jsRoot + "/" + url + ".js", options);
 
   return util.format(
          "<script type='text/javascript'>window.webpackPublicPath = '%s';</script>" +
@@ -127,12 +128,6 @@ exports.pad = function(options) {
       content=" " + content;
     }
   }
-  return content;
-};
-
-exports.oneLine = function(options) {
-  var content = "" + options.fn(this);
-  content=content.replace(/\n/g,"");
   return content;
 };
 

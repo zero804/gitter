@@ -4,6 +4,7 @@
 var Q                         = require('q');
 var userTroupeSettingsService = require('../user-troupe-settings-service');
 var appEvents                 = require('gitter-web-appevents');
+var resolveUserAvatarUrl          = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 var troupeDao                 = require('../daos/troupe-dao').lean;
 var userDao                   = require('../daos/user-dao').lean;
 var chatService               = require('../chat-service');
@@ -18,7 +19,7 @@ function generateChatMessageNotification(troupeId, chatId) {
     .spread(function(chat, troupe) {
       if (!chat) throw new Error('Chat not found');
 
-      return [chat, troupe, userDao.findById(chat.fromUserId, { username: 1, displayName: 1 })];
+      return [chat, troupe, userDao.findById(chat.fromUserId, { username: 1, displayName: 1, gravatarVersion: 1 })];
     })
     .spread(function(chat, troupe, fromUser) {
       var oneToOne = troupe.oneToOne;
@@ -27,14 +28,16 @@ function generateChatMessageNotification(troupeId, chatId) {
       if (oneToOne) {
         return {
           text: chat.text,
-          title: 'New chat from ' + fromUser.username,
-          link: '/' + fromUser.username
+          title: fromUser.username,
+          link: '/' + fromUser.username,
+          icon: resolveUserAvatarUrl({ username: fromUser.username, version: fromUser.gravatarVersion}, 128)
         };
       } else {
         return {
-          text: fromUser.username + ": " + chat.text,
-          title: 'New chat on ' + troupe.uri,
-          link: '/' + troupe.uri
+          text: chat.text,
+          title: fromUser.username + ' @ ' + troupe.uri,
+          link: '/' + troupe.uri,
+          icon: resolveUserAvatarUrl({ username: fromUser.username, version: fromUser.gravatarVersion }, 128)
         };
       }
     });
@@ -70,6 +73,7 @@ exports.sendOnlineNotifications = function (troupeId, chatId, userIds, mentioned
               title: notification.title,
               text: notification.text,
               link: notification.link,
+              icon: notification.icon,
               sound: notification.sound,
               chatId: chatId
             };

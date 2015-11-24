@@ -25,9 +25,10 @@ var cdn                      = require("../../web/cdn");
 var roomMembershipService    = require('../../services/room-membership-service');
 var troupeService            = require('../../services/troupe-service');
 var useragent                = require('useragent');
-var _                        = require('underscore');
+var _                        = require('lodash');
 var GitHubOrgService         = require('gitter-web-github').GitHubOrgService;
 var orgPermissionModel       = require('../../services/permissions/org-permissions-model');
+var resolveUserAvatarUrl     = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 var resolveRoomAvatarSrcSet  = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 
@@ -58,21 +59,41 @@ var WELCOME_MESSAGES = [
   'Welcome home'
 ];
 
-function cdnSubResources(resources) {
-  return ['vendor'].concat(resources).map(function(f) {
-    return cdn('js/' + f + '.js');
-  }).concat(cdn('fonts/sourcesans/SourceSansPro-Regular.otf.woff'));
+function cdnSubResources(resources, jsRoot) {
+  var resourceList = ['vendor'];
+  if (resources) {
+    resourceList = resourceList.concat(resources);
+  }
+
+  return resourceList.map(function(f) {
+      return cdn(jsRoot + '/' + f + '.js');
+    })
+    .concat(cdn('fonts/sourcesans/SourceSansPro-Regular.otf.woff'));
 }
 
-var SUBRESOURCES = {
-  'router-app': cdnSubResources(['router-app', 'router-chat']),
-  'mobile-nli-app': cdnSubResources(['mobile-nli-app', 'router-nli-chat']),
-  'mobile-userhome': cdnSubResources(['mobile-userhome']),
-  'userhome': cdnSubResources(['userhome']),
-  'router-chat': cdnSubResources(['router-chat']),
-  'router-nli-chat': cdnSubResources(['router-nli-chat']),
-  'mobile-app': cdnSubResources(['mobile-app'])
+var SUBRESOURCE_MAPPINGS = {
+  'router-app': ['router-app', 'router-chat'],
+  'mobile-nli-app': ['mobile-nli-app', 'router-nli-chat'],
+  'mobile-userhome': ['mobile-userhome'],
+  'userhome': ['userhome'],
+  'router-chat': ['router-chat'],
+  'router-nli-chat': ['router-nli-chat'],
+  'mobile-app': ['mobile-app']
 };
+
+var CACHED_SUBRESOURCES = Object.keys(SUBRESOURCE_MAPPINGS).reduce(function(memo, key) {
+  memo[key] = cdnSubResources(SUBRESOURCE_MAPPINGS[key], 'js');
+  return memo;
+}, {});
+
+function getSubResources(entryPoint, jsRoot) {
+  if (!jsRoot) {
+    return CACHED_SUBRESOURCES[entryPoint];
+  }
+
+  return cdnSubResources(SUBRESOURCE_MAPPINGS[entryPoint], jsRoot);
+}
+
 
 var stagingText, stagingLink;
 var dnsPrefetch = (nconf.get('cdn:hosts') || []).concat([
@@ -115,6 +136,12 @@ function renderHomePage(req, res, next) {
       var showWindowsApp = !isLinux && !isOsx;
       var showLinuxApp = !isOsx && !isWindows;
 
+      var jsRoot;
+      // Feature toggle
+      if (req.fflip && req.fflip.has('halley')) {
+        jsRoot = "js/halley";
+      }
+
       res.render(page, {
         welcomeMessage: WELCOME_MESSAGES[Math.floor(Math.random() * WELCOME_MESSAGES.length)],
         showOsxApp: showOsxApp,
@@ -122,7 +149,8 @@ function renderHomePage(req, res, next) {
         showLinuxApp: showLinuxApp,
         troupeContext: troupeContext,
         isNativeDesktopApp: troupeContext.isNativeDesktopApp,
-        billingBaseUrl: nconf.get('web:billingBaseUrl')
+        billingBaseUrl: nconf.get('web:billingBaseUrl'),
+        jsRoot: jsRoot
       });
     })
     .catch(next);
@@ -188,10 +216,17 @@ function renderMainFrame(req, res, next, frame) {
       });
 
       var template, bootScriptName;
+      var jsRoot;
 
       if (req.user) {
         template = 'app-template';
         bootScriptName = 'router-app';
+
+        // Feature toggle
+        if (req.fflip && req.fflip.has('halley')) {
+          jsRoot = "js/halley";
+        }
+
       } else {
         template = 'app-nli-template';
         bootScriptName = 'router-nli-app';
@@ -216,6 +251,7 @@ function renderMainFrame(req, res, next, frame) {
       res.render(template, {
         socialMetadata: socialMetadata,
         bootScriptName: bootScriptName,
+        jsRoot: jsRoot,
         cssFileName: "styles/" + bootScriptName + ".css",
         troupeName: req.uriContext.uri,
         troupeContext: troupeContext,
@@ -224,7 +260,7 @@ function renderMainFrame(req, res, next, frame) {
         stagingText: stagingText,
         stagingLink: stagingLink,
         dnsPrefetch: dnsPrefetch,
-        subresources: SUBRESOURCES[bootScriptName],
+        subresources: getSubResources(bootScriptName),
         showFooterButtons: true,
         showUnreadTab: true,
         menuHeaderExpanded: false,
@@ -250,6 +286,12 @@ function renderChat(req, res, options, next) {
   var script = options.script;
   var user = req.user;
   var userId = user && user.id;
+  var jsRoot;
+
+  // Feature toggle
+  if (req.fflip && req.fflip.has('halley')) {
+    jsRoot = "js/halley";
+  }
 
   // It's ok if there's no user (logged out), unreadItems will be 0
   return unreadItemService.getUnreadItemsForUser(userId, troupe.id)
@@ -282,8 +324,6 @@ function renderChat(req, res, options, next) {
         var initialBottom = !initialChat;
         var githubLink;
         var classNames = options.classNames || [];
-
-
 
         if(troupe.githubType === 'REPO' || troupe.githubType === 'ORG') {
           githubLink = 'https://github.com/' + req.uriContext.uri;
@@ -318,6 +358,7 @@ function renderChat(req, res, options, next) {
         var renderOptions = _.extend({
             isRepo: troupe.githubType === 'REPO',
             bootScriptName: script,
+            jsRoot: jsRoot,
             cssFileName: cssFileName,
             githubLink: githubLink,
             troupeName: req.uriContext.uri,
@@ -328,7 +369,7 @@ function renderChat(req, res, options, next) {
             chats: chatsWithBurst,
             classNames: classNames.join(' '),
             agent: req.headers['user-agent'],
-            subresources: SUBRESOURCES[script],
+            subresources: getSubResources(script),
             dnsPrefetch: dnsPrefetch,
             isPrivate: isPrivate,
             activityEvents: activityEvents,
@@ -344,7 +385,7 @@ function renderChat(req, res, options, next) {
             troupeTopic: troupeContext.troupe.topic,
             premium: troupeContext.troupe.premium,
             troupeFavourite: troupeContext.troupe.favourite,
-            avatarSrcSet:  resolveRoomAvatarSrcSet(troupeContext.troupe.url),
+            avatarSrcSet:  resolveRoomAvatarSrcSet({ uri: troupeContext.troupe.url }, 48),
             isAdmin: isAdmin,
             isNativeDesktopApp: troupeContext.isNativeDesktopApp
           }, options.extras);
@@ -356,9 +397,18 @@ function renderChat(req, res, options, next) {
 }
 
 function renderChatPage(req, res, next) {
+  var scriptName = 'router-chat';
+  var jsRoot;
+
+  // Feature toggle
+  if (req.fflip.has('halley')) {
+    jsRoot = "js/halley";
+  }
+
   return renderChat(req, res, {
     template: 'chat-template',
-    script: 'router-chat'
+    script: scriptName,
+    jsRoot: jsRoot
   }, next);
 }
 
@@ -433,10 +483,14 @@ function renderOrgPage(req, res, next) {
   .spread(function (ghOrg,rooms, troupeContext, isOrgAdmin, isOrgMember) {
 
     // Filter out PRIVATE rooms
-    rooms = rooms.filter(function(room) { return room.security !== 'PRIVATE'; });
+    _.remove(rooms, function(room) { return room.security === 'PRIVATE'; });
 
-    // Filter out the ORG room for non org members
-    if (!isOrgMember) rooms = rooms.filter(function(room) { return room.githubType !== 'ORG'; });
+    // Filter out ORG room and INHERITED permission rooms for non-org members
+    if (!isOrgMember) {
+      _.remove(rooms, function(room) {
+        return (room.githubType === 'ORG' || room.security === 'INHERITED');
+      });
+    }
 
     // Calculate org user count across all rooms (except private)
     var orgUserCount = rooms.reduce(function(accum, room) {
@@ -473,6 +527,9 @@ function renderOrgPage(req, res, next) {
     .then(function(values) {
        rooms.forEach(function(room, index) {
         room.users = values[index];
+        _.each(room.users, function(user) {
+          user.avatarUrlSmall = resolveUserAvatarUrl(user, 60);
+        });
       });
 
       // Custom data for the org page
