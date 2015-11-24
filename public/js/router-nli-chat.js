@@ -1,10 +1,12 @@
 "use strict";
 
 var appEvents = require('utils/appevents');
+var context = require('utils/context');
 var Backbone = require('backbone');
 var itemCollections = require('collections/instances/integrated-items');
 var PeopleModal = require('views/modals/people-modal');
 var onready = require('./utils/onready');
+var frameUtils = require('./utils/frame-utils');
 var ChatToolbarLayout = require('views/layouts/chat-toolbar');
 
 /* Set the timezone cookie */
@@ -30,6 +32,14 @@ onready(function() {
     window.parent.location.href = url;
   });
 
+  appEvents.on('permalink.requested', function(type, chat) {
+    if (context.inOneToOneTroupeContext()) return; // No permalinks to one-to-one chats
+    var url = context.troupe().get('url');
+    var id = chat.id;
+
+    frameUtils.postMessage({ type: 'permalink.requested', url: url, permalinkType: type, id: id });
+  });
+
   var appView = new ChatToolbarLayout({ template: false, el: 'body', chatCollection: itemCollections.chats });
   appView.render();
 
@@ -44,7 +54,9 @@ onready(function() {
     },
 
     people: function() {
-      appView.dialogRegion.show(new PeopleModal());
+      appView.dialogRegion.show(new PeopleModal({
+        rosterCollection: itemCollections.roster
+      }));
     },
 
   });

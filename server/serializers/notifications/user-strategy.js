@@ -1,6 +1,6 @@
 "use strict";
 
-var resolveAvatarUrl  = require('../../../shared/avatars/resolve-avatar-url');
+var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 
 function UserStrategy(options) {
   options = options ? options : {};
@@ -16,8 +16,8 @@ function UserStrategy(options) {
       id: user.id,
       username: user.username,
       displayName: user.getDisplayName(),
-      avatarUrlSmall: resolveAvatarUrl({ username: user.username, version: user.gravatarVersion, size: 60 }),
-      avatarUrlMedium: resolveAvatarUrl({ username: user.username, version: user.gravatarVersion, size: 128 })
+      avatarUrlSmall: resolveUserAvatarUrl(user, 60),
+      avatarUrlMedium: resolveUserAvatarUrl(user, 128)
     };
   };
 }

@@ -6,6 +6,13 @@ var Schema   = mongoose.Schema;
 var ObjectId = Schema.ObjectId;
 var assert   = require('assert');
 
+var ProviderKeySchema = new Schema({
+  provider: { type: String },
+  providerKey: { type: String },
+});
+
+ProviderKeySchema.schemaTypeName = 'ProviderKeySchema';
+
 var UserSchema = new Schema({
   displayName: { type: String },
   emails: [String],                            // Secondary email addresses
@@ -22,6 +29,7 @@ var UserSchema = new Schema({
   githubToken: { type: String },
   githubUserToken: { type: String }, // The scope for this token will always be 'user'
   githubId: {type: Number },
+  identities: [ProviderKeySchema],
   permissions: {
     createRoom: { type: Boolean, 'default': true }
   },
@@ -38,6 +46,7 @@ var UserSchema = new Schema({
 });
 
 UserSchema.index({ githubId: 1 }, { unique: true, sparse: true }); // TODO: does this still need to be sparse?
+UserSchema.index({'identities.provider': 1, 'identities.providerKey': 1}, { unique: true, sparse: true });
 UserSchema.index({ username: 1 }, { unique: true /*, sparse: true */});
 UserSchema.index({ stripeCustomerId: 1 }, { unique: true, sparse: true });
 UserSchema.schemaTypeName = 'UserSchema';
@@ -130,6 +139,9 @@ UserSchema.methods.isRemoved = function() {
 module.exports = {
   install: function(mongooseConnection) {
     var model = mongooseConnection.model('User', UserSchema);
+
+    // do we need this?
+    //var ProviderKey = mongooseConnection.model('ProviderKey', ProviderKeySchema);
 
     return {
       model: model,

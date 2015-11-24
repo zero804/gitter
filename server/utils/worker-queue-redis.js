@@ -51,6 +51,7 @@ function createScheduler() {
   var scheduler = new resque.scheduler({
     connection: getConnection()
   });
+
   scheduler.connect(function() {
     debug('Scheduler ready');
   });
@@ -89,7 +90,13 @@ var Queue = function(name, options, loaderFn) {
         connection: getConnection()
       },
       {}); // Jobs not defined on queue, only worker
+
+    self.internalQueue.on('error', function(err) {
+      logger.error('worker-queue-redis: queue error ' + err, { exception: err });
+    });
+    
     self.internalQueue.connect(callback);
+
   }).then(function() {
     debug('Queue %s ready to receive messages', name);
     return self.internalQueue;

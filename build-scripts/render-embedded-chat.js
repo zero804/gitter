@@ -2,10 +2,10 @@
 /* jshint node:true */
 "use strict";
 
-var express  = require('express');
-var fs       = require('fs');
-var http     = require('http');
-var redis    = require('../server/utils/redis');
+var express       = require('express');
+var fs            = require('fs');
+var expressHbs    = require('express-hbs');
+var resolveStatic = require('../server/web/resolve-static');
 
 var opts = require("nomnom")
   .option('output', {
@@ -21,12 +21,19 @@ function die(err) {
 }
 
 var app = express();
+require('../server/web/register-helpers')(expressHbs);
 
-var server = http.createServer(app);
+app.engine('hbs', expressHbs.express3({
+  partialsDir: resolveStatic('/templates/partials'),
+  onCompile: function(exhbs, source) {
+     return exhbs.handlebars.compile(source, { preventIndent: true });
+  },
+  layoutsDir: resolveStatic('/layouts'),
+  contentHelperName: 'content'
+}));
 
-require('../server/web/graceful-shutdown').install(server, app);
-
-require('../server/web/express').installFull(app);
+app.set('view engine', 'hbs');
+app.set('views', resolveStatic('/templates'));
 
 app.render('mobile/native-embedded-chat-app', {}, function(err, html) {
   if(err) return die(err);
@@ -34,5 +41,3 @@ app.render('mobile/native-embedded-chat-app', {}, function(err, html) {
   fs.writeFileSync(opts.output, html, { encoding: 'utf8' });
   process.exit(0);
 });
-
-

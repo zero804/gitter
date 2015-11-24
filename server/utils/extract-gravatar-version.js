@@ -6,7 +6,9 @@ var url = require('url');
 module.exports = function extractGravatarVersion(avatarUrl) {
   try {
     var parsed = url.parse(avatarUrl, true, true);
-    return parsed.query.v || undefined;
+    if (parsed.hostname == 'avatars.githubusercontent.com') {
+      return parsed.query.v || undefined;
+    }
   } catch(e) {
   }
 };

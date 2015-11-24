@@ -253,6 +253,21 @@ module.exports = (function() {
     // This is a catch all for for unread items that are
     // not marked as read
     setInterval(limitedGetBounds, 2000);
+
+    // If the user seen this messages and updated the last access time in
+    // a different window, mark the messages in this window as read.
+    var self = this;
+    collectionView.listenTo(context.troupe(), 'change:lastAccessTime', function(room) {
+      if (!context.troupe().get('lurk')) return;
+
+      var lastAccess = room.get('lastAccessTime');
+      this.collection.forEach(function(chat) {
+        if (chat.get('sent').isBefore(lastAccess) && chat.get('unread')) {
+          self._store._markItemRead(chat.id);
+        }
+      });
+
+    });
   };
 
   TroupeUnreadItemsViewportMonitor.prototype = {

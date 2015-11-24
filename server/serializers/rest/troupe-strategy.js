@@ -1,4 +1,4 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
+/* jshint maxcomplexity:15 */
 "use strict";
 
 var logger                = require('gitter-web-env').logger;

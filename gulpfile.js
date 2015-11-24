@@ -18,16 +18,20 @@ var autoprefixer = require('autoprefixer-core');
 var mqpacker = require('css-mqpacker');
 var csswring = require('csswring');
 var mkdirp = require('mkdirp');
-var gulpif = require('gulp-if');
 var sourcemaps = require('gulp-sourcemaps');
 var shell = require('gulp-shell');
 var del = require('del');
 var grepFail = require('gulp-grep-fail');
 var runSequence = require('run-sequence');
 var jsonlint = require('gulp-jsonlint');
+var uglify = require('gulp-uglify');
+var coveralls = require('gulp-coveralls');
+var lcovMerger = require ('lcov-result-merger');
+var gutil = require('gulp-util');
+var path = require('path');
 
 /* Don't do clean in gulp, use make */
-var DEV_MODE = !!process.env.DEV_MODE;
+var RUN_TESTS_IN_PARALLEL = false;
 
 var testModules = {
   'integration': ['./test/integration/**/*.js', './test/public-js/**/*.js'],
@@ -48,10 +52,19 @@ function makeTestTasks(taskName, generator) {
     });
   });
 
-  gulp.task(taskName, function(callback) {
-    var args = Object.keys(testModules).map(function(moduleName) { return taskName + '-' + moduleName; }).concat(callback);
-    runSequence.apply(null, args);
-  });
+  var childTasks = Object.keys(testModules).map(function(moduleName) { return taskName + '-' + moduleName; });
+
+  if (RUN_TESTS_IN_PARALLEL) {
+    // Run tests in parallel
+    gulp.task(taskName, childTasks);
+  } else {
+    // Run tests in sequence
+    gulp.task(taskName, function(callback) {
+      var args = childTasks.concat(callback);
+      runSequence.apply(null, args);
+    });
+  }
+
 }
 
 gulp.task('validate-config', function() {
@@ -128,11 +141,46 @@ makeTestTasks('test-mocha', function(name, files) {
     }));
 });
 
+makeTestTasks('test-docker', function(name, files) {
+  mkdirp.sync('output/test-reports/');
+  mkdirp.sync('output/coverage-reports/' + name);
+
+  return gulp.src(files, { read: false })
+    .pipe(mocha({
+      reporter: 'xunit-file',
+      timeout: 10000,
+      istanbul: {
+        dir: 'output/coverage-reports/' + name
+      },
+      env: {
+        TAP_FILE: 'output/test-reports/' + name + '.tap',
+        XUNIT_FILE: 'output/test-reports/' + name + '.xml',
+        NODE_ENV: 'test-docker',
+        DEBUG: 'gitter:*',
+        Q_DEBUG: 1,
+        BLUEBIRD_DEBUG: 1
+      }
+    }));
+});
+
 gulp.task('test-redis-lua', shell.task([
   './test/redis-lua/run-tests'
 ]));
 
-gulp.task('test', ['test-mocha', 'test-redis-lua']);
+gulp.task('merge-lcov', ['test-mocha', 'test-redis-lua'], function() {
+  return gulp.src('output/coverage-reports/**/lcov.info')
+    .pipe(using())
+    .pipe(lcovMerger())
+    .pipe(gulp.dest('output/coverage-reports/merged/'));
+});
+
+gulp.task('submit-coveralls', ['test-mocha', 'test-redis-lua', 'merge-lcov'], function() {
+  process.env.COVERALLS_GIT_COMMIT = process.env.GIT_COMMIT;
+  return gulp.src('output/coverage-reports/merged/lcov.info')
+    .pipe(coveralls());
+});
+
+gulp.task('test', ['test-mocha', 'test-redis-lua', 'submit-coveralls']);
 
 makeTestTasks('localtest', function(name, files) {
   return gulp.src(files, { read: false })
@@ -269,7 +317,7 @@ gulp.task('copy-asset-files', function() {
       'public/fonts/**',
       'public/images/**',
       'public/sprites/**',
-      'public/repo/**',
+      'public/repo/**'
     ], { "base" : "./public" })
     .pipe(gulp.dest('output/assets'));
 });
@@ -290,12 +338,41 @@ gulp.task('copy-asset-files', function() {
 //      }))
 //     .pipe(gulp.dest('./public'));
 // });
+//
+function getSourceMapUrl() {
+  if (!process.env.BUILD_URL) return;
+
+  return process.env.BUILD_URL + 'artifact/output';
+}
+
+function getSourceMapOptions(mapsSubDir) {
+  var sourceMapUrl = getSourceMapUrl();
+  if (!sourceMapUrl) {
+    return {
+      dest: '.'
+    };
+  }
+  var suffix = mapsSubDir ? mapsSubDir + '/' : '';
+
+  mkdirp.sync('output/maps/' + suffix);
+
+  return {
+    dest: path.relative('./output/assets/js/' + suffix + '/', './output/maps/' + suffix + '/'),
+    options: {
+      sourceRoot: path.relative('./output/maps/' + suffix, './output/assets/js/' + suffix ),
+      sourceMappingURLPrefix: sourceMapUrl,
+    }
+  };
+
+}
 
 gulp.task('css-ios', function () {
+  var sourceMapOpts = getSourceMapOptions();
+
   return gulp.src([
     'public/less/mobile-native-chat.less'
     ])
-    .pipe(gulpif(DEV_MODE, sourcemaps.init()))
+    .pipe(sourcemaps.init())
     .pipe(less({
       paths: ['public/less'],
       globalVars: {
@@ -310,18 +387,19 @@ gulp.task('css-ios', function () {
       mqpacker,
       csswring
     ]))
-    .pipe(gulpif(DEV_MODE, sourcemaps.write('output/assets/styles')))
+    .pipe(sourcemaps.write(sourceMapOpts.dest, sourceMapOpts.options))
     .pipe(gulp.dest('output/assets/styles'));
 });
 
 gulp.task('css-mobile', function () {
+  var sourceMapOpts = getSourceMapOptions();
   return gulp.src([
     'public/less/mobile-app.less',
     'public/less/mobile-nli-app.less',
     'public/less/mobile-userhome.less',
     'public/less/mobile-native-userhome.less'
     ])
-    .pipe(gulpif(DEV_MODE, sourcemaps.init()))
+    .pipe(sourcemaps.init())
     .pipe(less({
       paths: ['public/less'],
       globalVars: {
@@ -340,11 +418,13 @@ gulp.task('css-mobile', function () {
       mqpacker,
       csswring
     ]))
-    .pipe(gulpif(DEV_MODE, sourcemaps.write('output/assets/styles')))
+    .pipe(sourcemaps.write(sourceMapOpts.dest, sourceMapOpts.options))
     .pipe(gulp.dest('output/assets/styles'));
 });
 
 gulp.task('css-web', function () {
+  var sourceMapOpts = getSourceMapOptions();
+
   var lessFiles = [
     'public/less/trpAppsPage.less',
     'public/less/error-page.less',
@@ -372,7 +452,7 @@ gulp.task('css-web', function () {
 
   return gulp.src(lessFiles)
     .pipe(expect({ errorOnFailure: true }, lessFiles))
-    .pipe(gulpif(DEV_MODE, sourcemaps.init()))
+    .pipe(sourcemaps.init())
     .pipe(less({
       paths: ['public/less'],
       globalVars: {
@@ -391,7 +471,7 @@ gulp.task('css-web', function () {
       mqpacker,
       csswring
     ]))
-    .pipe(gulpif(DEV_MODE, sourcemaps.write('output/assets/styles')))
+    .pipe(sourcemaps.write(sourceMapOpts.dest, sourceMapOpts.options))
     .pipe(gulp.dest('output/assets/styles'));
 });
 
@@ -403,18 +483,52 @@ gulp.task('webpack', function() {
     .pipe(gulp.dest('output/assets/js'));
 });
 
-gulp.task('build-assets', ['copy-asset-files', 'css', 'webpack']);
+/* Generate embedded native */
+gulp.task('halley-webpack', function() {
+  return gulp.src('./public/js/webpack-halley.config')
+    .pipe(webpack(require('./public/js/webpack-halley.config')))
+    .pipe(gulp.dest('output/assets/js/halley'));
+});
 
+function getUglifyOptions() {
+  if (process.env.FAST_UGLIFY && JSON.parse(process.env.FAST_UGLIFY)) {
+    gutil.log('Using fast uglify. The resulting javascript artifacts will be much bigger');
+    return {
+      mangle: false,
+      compress: false
+    };
+  }
+}
+
+gulp.task('uglify', ['webpack'], function() {
+  var sourceMapOpts = getSourceMapOptions();
+  return gulp.src('output/assets/js/*.js')
+    .pipe(sourcemaps.init({ /* loadMaps: true */ }))
+    .pipe(uglify(getUglifyOptions()))
+    .pipe(sourcemaps.write(sourceMapOpts.dest, sourceMapOpts.options))
+    .pipe(gulp.dest('output/assets/js'));
+});
+
+gulp.task('halley-uglify', ['halley-webpack'], function() {
+  var sourceMapOpts = getSourceMapOptions('halley');
+  return gulp.src('output/assets/js/halley/*.js')
+    .pipe(sourcemaps.init({ /* loadMaps: true */ }))
+    .pipe(uglify(getUglifyOptions()))
+    .pipe(sourcemaps.write(sourceMapOpts.dest, sourceMapOpts.options))
+    .pipe(gulp.dest('output/assets/js/halley'));
+});
+
+gulp.task('build-assets', ['copy-asset-files', 'css', 'webpack', 'uglify', 'halley-webpack', 'halley-uglify']);
 
 gulp.task('compress-assets', ['build-assets'], function() {
-  return gulp.src(['output/assets/**/*.{css,js,ttf,svg}'], { base: 'output/assets/' })
+  return gulp.src(['output/assets/**/*.{css,js,ttf,svg}', '!**/*.map'], { base: 'output/assets/' })
     .pipe(using())
     .pipe(gzip({ append: true, gzipOptions: { level: 9 } }))
     .pipe(gulp.dest('output/assets/'));
 });
 
 gulp.task('tar-assets', ['build-assets', 'compress-assets'], function () {
-    return gulp.src(['output/assets/**'])
+    return gulp.src(['output/assets/**', '!**/*.map'])
       .pipe(tar('assets.tar'))
       .pipe(gzip({ append: true, gzipOptions: { level: 9 } }))
       .pipe(gulp.dest('output'));
@@ -450,10 +564,11 @@ gulp.task('watch', ['css'], function() {
 var opts = require("nomnom").parse();
 gulp.task('safe-install', shell.task([
   'npm run unlink',
-  'npm install',
-  'npm prune',
+  'npm install --production',
+  'npm prune --production',
   'npm install ' + opts.package + ' --save',
   'npm shrinkwrap',
+  'npm install',
   'npm run link',
   'npm run fix-shrinkwrap-registry'
 ]));

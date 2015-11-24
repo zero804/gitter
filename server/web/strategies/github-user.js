@@ -2,10 +2,181 @@
 
 var env = require('gitter-web-env');
 var config = env.config;
+var errorReporter = env.errorReporter;
+var stats = env.stats;
+var logger = env.logger;
 
+var Q = require('q');
+var moment = require('moment');
 var GitHubStrategy = require('gitter-passport-github').Strategy;
 var TokenStateProvider = require('gitter-passport-oauth2').TokenStateProvider;
-var githubOauthCallback = require('./github-oauth-callback');
+var mixpanel = require('../../web/mixpanelUtils');
+var extractGravatarVersion = require('../../utils/extract-gravatar-version');
+var gaCookieParser = require('../../utils/ga-cookie-parser');
+var userService = require('../../services/user-service');
+var GitHubMeService = require('gitter-web-github').GitHubMeService;
+var trackNewUser = require('../../utils/track-new-user');
+var trackUserLogin = require('../../utils/track-user-login');
+var updateUserLocale = require('../../utils/update-user-locale');
+var debug = require('debug')('gitter:passport');
+
+
+
+// Move this out once we use it multiple times. We're only interested in
+// account age for github users at this stage.
+function ageInHours(date) {
+  var ageHours;
+
+  if (date) {
+    var dateMoment = moment(date);
+    var duration = moment.duration(Date.now() - dateMoment.valueOf());
+    ageHours = duration.asHours();
+  }
+
+  return ageHours;
+}
+
+function updateUser(req, accessToken, user, githubUserProfile) {
+  // If the user was in the DB already but was invited, notify stats services
+  if (user.isInvited()) {
+    // IMPORTANT: The alias can only happen ONCE. Do not remove.
+    stats.alias(mixpanel.getMixpanelDistinctId(req.cookies), user.id, function(err) {
+      if (err) logger.error('Error aliasing user:', { exception: err });
+
+      stats.event("new_user", {
+        userId: user.id,
+        method: 'github_oauth',
+        username: user.username,
+        source: 'invited',
+        googleAnalyticsUniqueId: gaCookieParser(req)
+      });
+    });
+  }
+
+  user.username         = githubUserProfile.login;
+  user.displayName      = githubUserProfile.name || githubUserProfile.login;
+  user.gravatarImageUrl = githubUserProfile.avatar_url;
+  user.githubId         = githubUserProfile.id;
+  var gravatarVersion   = extractGravatarVersion(githubUserProfile.avatar_url);
+  if (gravatarVersion) {
+    user.gravatarVersion = extractGravatarVersion(githubUserProfile.avatar_url);
+  }
+  user.githubUserToken  = accessToken;
+  user.state            = undefined;
+
+  return user.save()
+    .then(function() {
+      trackUserLogin(req, user);
+
+      updateUserLocale(req, user);
+
+      var deferred = Q.defer();
+      req.logIn(user, function(err) {
+        if (err) {
+          deferred.reject(err);
+        } else {
+          deferred.resolve();
+        }
+      });
+      return deferred.promise;
+    })
+    .then(function() {
+      // Remove the old token for this user
+      req.accessToken = null;
+      return user;
+    });
+}
+
+function addUser(req, accessToken, githubUserProfile) {
+  var githubUser = {
+    username:           githubUserProfile.login,
+    displayName:        githubUserProfile.name || githubUserProfile.login,
+    emails:             githubUserProfile.email ? [githubUserProfile.email] : [],
+    gravatarImageUrl:   githubUserProfile.avatar_url,
+    gravatarVersion:    extractGravatarVersion(githubUserProfile.avatar_url),
+    githubUserToken:    accessToken,
+    githubId:           githubUserProfile.id,
+  };
+
+  debug('About to create GitHub user %j', githubUser);
+
+  var user;
+  return userService.findOrCreateUserForGithubId(githubUser)
+    .then(function(_user) {
+      user = _user;
+
+      debug('Created GitHub user %j', user.toObject());
+
+      updateUserLocale(req, user);
+
+      // IMPORTANT: The alias can only happen ONCE. Do not remove.
+      stats.alias(mixpanel.getMixpanelDistinctId(req.cookies), user.id, function(err) {
+        if (err) logger.error('Error aliasing user:', { exception: err });
+
+        trackNewUser(req, user);
+
+        // Flag the user as a new github user if they've created their account
+        // in the last two hours
+        // NOTE: this relies on the fact that undefined is not smaller than 2..
+        if (ageInHours(githubUserProfile.created_at) < 2) {
+          stats.event("new_github_user", {
+            userId: user.id,
+            username: user.username,
+            googleAnalyticsUniqueId: gaCookieParser(req)
+          });
+        }
+      });
+
+      var deferred = Q.defer();
+      req.logIn(user, function(err) {
+        if (err) {
+          deferred.reject(err);
+        } else {
+          deferred.resolve();
+        }
+      });
+      return deferred.promise;
+    })
+    .then(function() {
+      return user;
+    });
+}
+
+function githubUserCallback(req, accessToken, refreshToken, params, _profile, done) {
+  var githubMeService = new GitHubMeService({ githubUserToken: accessToken });
+  var githubUserProfile;
+  return githubMeService.getUser()
+    .then(function(_githubUserProfile) {
+      githubUserProfile = _githubUserProfile;
+      return userService.findByGithubIdOrUsername(githubUserProfile.id, githubUserProfile.login)
+    })
+    .then(function(user) {
+      if (req.session && (!user || user.isInvited())) {
+        var events = req.session.events;
+        if (!events) {
+          events = [];
+          req.session.events = events;
+        }
+        events.push('new_user_signup');
+      }
+
+      // Update an existing user
+      if (user) {
+        return updateUser(req, accessToken, user, githubUserProfile);
+      } else {
+        return addUser(req, accessToken, githubUserProfile);
+      }
+    })
+    .then(function(user) {
+      done(null, user);
+    })
+    .catch(function(err) {
+      errorReporter(err, { oauth: "failed" }, { module: 'passport' });
+      stats.event("oauth_profile.error");
+      logger.error('Error during oauth process. Unable to obtain user profile.', err);
+      return done(err);
+    });
+}
 
 var githubUserStrategy = new GitHubStrategy({
     clientID: config.get('github:user_client_id'),
@@ -14,7 +185,7 @@ var githubUserStrategy = new GitHubStrategy({
     stateProvider: new TokenStateProvider({ passphrase: config.get('github:statePassphrase') }),
     skipUserProfile: true,
     passReqToCallback: true
-  }, githubOauthCallback);
+  }, githubUserCallback);
 
 githubUserStrategy.name = 'github_user';
 

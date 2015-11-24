@@ -1,4 +1,4 @@
-/* jshint -W041 */
+/* jshint -W041, maxdepth:5, maxcomplexity: 31 */
 "use strict";
 var _ = require('underscore');
 
@@ -115,4 +115,3 @@ module.exports = (function() {
   };
 
 })();
-

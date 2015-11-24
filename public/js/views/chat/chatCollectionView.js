@@ -1,4 +1,6 @@
-'use strict';
+/* jshint maxcomplexity:16 */
+"use strict";
+
 var $            = require('jquery');
 var _            = require('underscore');
 var Marionette   = require('backbone.marionette');
@@ -170,6 +172,8 @@ module.exports = (function() {
       this.listenTo(appEvents, 'chatCollectionView:permalinkHighlight', this.highlightPermalinkChat);
 
       this.listenTo(appEvents, 'chatCollectionView:clearHighlight', this.clearHighlight);
+
+      this.listenTo(appEvents, 'chatCollectionView:loadAndHighlight', this.loadAndHighlight);
 
       var contentFrame = document.querySelector(SCROLL_ELEMENT);
       this.rollers = new Rollers(contentFrame, this.el);
@@ -454,6 +458,26 @@ module.exports = (function() {
 
         self.scrollToChat(models[0]);
       });
+    },
+
+    loadAndHighlight: function(id, options) {
+      this.collection.ensureLoaded(id, function(err, model) {
+        if (err) return; // Log this?
+        if (!model) return;
+
+        // clearing previously highlighted chat.
+        this.clearHighlight();
+
+        if (!model) return;
+
+        // highlighting new and replacing "current"
+        this.highlightChat(model, options && options.highlights);
+        this.highlighted = model;
+
+        // finally scroll to it
+        this.scrollToChat(model);
+
+      }.bind(this));
     },
 
     /**
