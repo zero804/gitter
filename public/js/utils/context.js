@@ -296,28 +296,6 @@ module.exports = (function() {
     return ctx.features && ctx.features.indexOf(featureName) >= 0;
   };
 
-
-  context.getIndexedDBConfig = function() {
-    return {
-      name: 'gitter',
-      version: 2,
-      objects: [
-        {
-          name: 'chats',
-          indexes: [
-            {
-              name: 'sentIndex',
-            },
-            {
-              name: 'roomId',
-            },
-          ],
-        },
-      ],
-    };
-  };
-
   return context;
-
 
 })();
