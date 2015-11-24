@@ -11,6 +11,8 @@ var MobileLayout = require('views/layouts/mobile');
 var FastClick = require('fastclick');
 var RoomCollectionTracker = require('components/room-collection-tracker');
 var troupeCollections = require('collections/instances/troupes');
+var unreadItemsClient = require('components/unread-items-client');
+
 require('utils/tracking');
 
 /* Set the timezone cookie */
@@ -33,6 +35,11 @@ onready(function() {
   new RoomCollectionTracker(troupeCollections.troupes);
 
   var chatCollection = new chatModels.ChatCollection(null, { listen: true });
+
+  unreadItemsClient.syncCollections({
+    'chat': chatCollection
+  });
+
   var appView = new MobileLayout({ model: context.troupe(), template: false, el: 'body', chatCollection: chatCollection });
   appView.render();
 

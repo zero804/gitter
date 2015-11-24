@@ -12,6 +12,8 @@ GIT_BRANCH ?= $(shell git rev-parse --abbrev-ref HEAD)
 GIT_COMMIT ?= $(shell git rev-parse HEAD)
 ASSET_TAG_PREFIX =
 ASSET_TAG = $(ASSET_TAG_PREFIX)$(shell echo $(GIT_COMMIT)|cut -c 1-6)
+EMBEDDED_NODE_ENV ?= prod
+EMBEDDED_WWW_DIRECTORY ?= ~/code/gitter/ios/Troupe/www/build
 ifeq ($(FAST_BUILD), 1)
 CLEAN_FILES = $(shell echo output/ coverage/ cobertura-coverage.xml html-report/ public-processed/ public/styles/)
 else
@@ -70,7 +72,7 @@ clean-embedded-chat:
 
 embedded-chat: clean
 	mkdir -p output/embedded/www/mobile
-	NODE_ENV=prod ./build-scripts/render-embedded-chat.js  -o output/embedded/www/mobile/embedded-chat.html
+	NODE_ENV=$(EMBEDDED_NODE_ENV) ./build-scripts/render-embedded-chat.js  -o output/embedded/www/mobile/embedded-chat.html
 	gulp embedded-package
 	ls output/assets/js/*.js  >> output/embedded-resources.txt
 	ls output/assets/styles/*.css  >> output/embedded-resources.txt
@@ -80,6 +82,10 @@ embedded-chat: clean
 	./build-scripts/extract-urls.js output/assets/styles/mobile-native-chat.css >> output/embedded-resources.txt
 	./build-scripts/copy-embedded-resources.sh
 
+embedded-chat-copy: embedded-chat
+	rm -rf $(EMBEDDED_WWW_DIRECTORY)
+	mkdir -p $(EMBEDDED_WWW_DIRECTORY)
+	cp -R output/embedded/www/* $(EMBEDDED_WWW_DIRECTORY)/
 
 # make-jquery:
 # 	npm install

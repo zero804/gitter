@@ -63,11 +63,12 @@ var webpackConfig = {
     ]
   },
   output: {
-    path: __dirname + "/../../output/assets/js/",
+    path: path.resolve(__dirname, "../../output/assets/js/"),
     filename: "[name].js",
     chunkFilename: "[id].chunk.js",
     publicPath: "/_s/l/js/",
-    devtoolModuleFilenameTemplate: "[absolute-resource-path]",
+    devtoolModuleFilenameTemplate: "[resource-path]",
+    devtoolFallbackModuleFilenameTemplate: "[resource-path]?[hash]"
   },
   module: {
     loaders: [
@@ -175,12 +176,10 @@ var webpackConfig = {
 
 if(devMode) {
   // See http://webpack.github.io/docs/configuration.html#devtool
-  webpackConfig.devtool = 'source-map';
+  webpackConfig.devtool = 'eval-cheap-module-source-map';
   webpackConfig.cache = true;
 } else {
-  // webpackConfig.plugins.push(new DedupePlugin());
-  // webpackConfig.plugins.push(new OccurrenceOrderPlugin());
-  webpackConfig.plugins.push(new UglifyJsPlugin());
   webpackConfig.devtool = 'source-map';
+
 }
 module.exports = webpackConfig;
