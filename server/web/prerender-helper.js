@@ -4,6 +4,7 @@ var compileTemplate = require('./compile-web-template');
 var prerenderWrapper = require('./prerender-wrapper');
 
 var PRERENDERED_VIEWS = [
+  "js/views/menu/tmpl/room-menu",
   "js/views/archive/tmpl/archive-navigation-view",
   "js/views/app/tmpl/headerViewTemplate",
   "js/views/app/tmpl/headerViewTemplate",
