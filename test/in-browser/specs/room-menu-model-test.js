@@ -107,28 +107,28 @@ describe('RoomMenuModel', function() {
 
   });
 
-  describe('search', function(){
+  describe('search', function() {
 
-    it('should have a default search term', function(){
+    it('should have a default search term', function() {
 
       assert.equal('', roomMenuModel.get('searchTerm'));
 
     });
 
-    it('should contain a search term collection', function(){
+    it('should contain a search term collection', function() {
 
       assert.ok(roomMenuModel.searchTerms);
 
     });
 
-    it('should assign the search term collection to the secondary collection when in a search state', function(){
+    it('should assign the search term collection to the secondary collection when in a search state', function() {
 
       roomMenuModel.set('state', 'search');
       assert.deepEqual(roomMenuModel.searchTerms, roomMenuModel.secondaryCollection.collection);
 
     });
 
-    it('should only save a search term after a delay', function(done){
+    it('should only save a search term after a delay', function(done) {
 
       roomMenuModel.set('state', 'search');
       roomMenuModel.set('searchTerm', 't');
@@ -136,7 +136,7 @@ describe('RoomMenuModel', function() {
       roomMenuModel.set('searchTerm', 'ter');
       roomMenuModel.set('searchTerm', 'term');
       assert.equal(0, roomMenuModel.secondaryCollection.length);
-      setTimeout(function(){
+      setTimeout(function() {
         assert.equal(1, roomMenuModel.secondaryCollection.length);
         assert.equal('term', roomMenuModel.secondaryCollection.at(0).get('term'));
         done();
@@ -178,6 +178,7 @@ describe('RoomMenuModel', function() {
           roomMenuModel.primaryCollection.forEach(function(model, index) {
             assert.ok(!!model.get('favourite'));
           });
+
           done();
 
         });

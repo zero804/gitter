@@ -16,9 +16,10 @@ var SEARCH_DEBOUNCE_INTERVAL = 100;
 
 module.exports = Backbone.Model.extend({
 
-  defaults: {
-    state: 'all',
-    searchTerm: '',
+  defaults:         {
+    state:          'all',
+    searchTerm:     '',
+    panelOpenState: false
   },
 
   initialize: function(attrs) {

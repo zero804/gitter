@@ -1,5 +1,27 @@
-<aside class="minibar">
-  This is the news
-</aside>
+<aside id="room-menu-container" class="room-menu-container">
+  <div class="room-menu">
+    <div id="minibar" class="minibar">
+      <ul class="room-menu-options">
 
-<section class="room-menu">This is a panel</section>
+        <li data-state-change="all" class="room-menu-options__item--home">
+          <a href="#">H</a>
+        </li>
+
+        <li data-state-change="search" class="room-menu-options__item--search">
+          <a href="#">S</a>
+        </li>
+
+        <li data-state-change="favourite" class="room-menu-options__item--favourite">
+          <a href="#">F</a>
+        </li>
+
+        <li data-state-change="people" class="room-menu-options__item--people">
+          <a href="#">P</a>
+        </li>
+
+      </ul>
+      <ul id="room-menu-orgs" class="room-menu-orgs"></ul>
+    </div>
+    <div id="room-menu__panel" class="room-menu__panel">Room menu</div>
+  </div>
+</aside>
