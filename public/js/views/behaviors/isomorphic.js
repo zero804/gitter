@@ -40,7 +40,7 @@ var Behavior = Marionette.Behavior.extend({
           baseOptions = {};
         } else if (regionElChildLen === 1) {
           if (config && config.rerender) {
-            baseOptions = { el: regionEl.children[0] };            
+            baseOptions = { el: regionEl.children[0] };
           } else {
             baseOptions = { template: false, el: regionEl.children[0] };
           }
