@@ -1,6 +1,7 @@
 'use strict';
 
 var Marionette = require('backbone.marionette');
+var Hammer     = require('hammerjs');
 
 module.exports = Marionette.ItemView.extend({
 
