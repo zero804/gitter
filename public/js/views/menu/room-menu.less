@@ -29,7 +29,7 @@
     width:        100vh;
     height:       100%;
     padding-left: 100%;
-    background:   #ececec;
+    background:   #333132;
     transform:    translateX(-100%);
     transition:   transform .2s linear;
 
@@ -44,29 +44,50 @@
   }
 
   .room-menu-options__item {
-    height: @header-height;
+    height:      @header-height;
+    color:       white;
     line-height: @header-height;
-    text-align: center;
+    text-align:  center;
+
+    & a {
+      color: inherit;
+    }
   }
 
   .room-menu-options__item--home {
     .room-menu-options__item;
     background: black;
+
+    &.active {
+      background: #ed1965;
+    }
   }
 
   .room-menu-options__item--search {
     .room-menu-options__item;
     background: #131314;
+
+    &.active {
+      background: #f68d44;
+    }
   }
 
   .room-menu-options__item--people {
     .room-menu-options__item;
     background: #1f1f1f;
+
+    &.active {
+      background: #48bd98;
+    }
   }
 
   .room-menu-options__item--favourite {
     .room-menu-options__item;
     background: #1a191b;
+
+    &.active {
+      background: #964793;
+    }
   }
 
 }
