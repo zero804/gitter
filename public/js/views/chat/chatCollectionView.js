@@ -1,5 +1,6 @@
 /* jshint maxcomplexity:16 */
 "use strict";
+
 var $            = require('jquery');
 var _            = require('underscore');
 var Marionette   = require('backbone.marionette');
@@ -46,7 +47,7 @@ module.exports = (function() {
     return usersChats[usersChats.length - 1];
   }
 
-  var SCROLL_ELEMENT = "#content-frame";
+  var SCROLL_ELEMENT = '#content-frame';
 
   function getModelsInRange(collectionView, startElement, endElement) {
     var models = [];
@@ -54,21 +55,23 @@ module.exports = (function() {
     var child, children = collectionView.children;
 
     /* Find the start element */
-    while(i < children.length) {
+    while (i < children.length) {
       child = children.findByIndex(i);
       if (child.el === startElement) {
         break;
       }
+
       i++;
     }
 
     /* Find the end element */
-    while(i < children.length) {
+    while (i < children.length) {
       child = children.findByIndex(i);
       models.push(child.model);
       if (child.el === endElement) {
         return models;
       }
+
       i++;
     }
     /* Didn't find the end */
@@ -82,17 +85,18 @@ module.exports = (function() {
       if (models.length > 1 && model.get('burstStart')) {
         var user = model.get('fromUser');
         var username = user && user.username;
-        if (username) username = "@" + username;
+        if (username) username = '@' + username;
         text = username + '\n' + model.get('text');
       } else {
         text = model.get('text');
       }
+
       if (!text) return '';
       if (text.charAt(text.length - 1) !== '\n') text = text + '\n';
       return text;
     }).join('');
 
-    if (text.charAt(text.length -1) === '\n') return text.substring(0, text.length - 1);
+    if (text.charAt(text.length - 1) === '\n') return text.substring(0, text.length - 1);
 
     return text;
   }
@@ -108,16 +112,16 @@ module.exports = (function() {
       InfiniteScroll: {
         reverseScrolling: true,
         scrollElementSelector: SCROLL_ELEMENT,
-        contentWrapperSelector: '#chat-container'
+        contentWrapperSelector: '#chat-container',
       },
       SmoothScroll: {
         scrollElementSelector: SCROLL_ELEMENT,
-        contentWrapper: '#chat-container'
-      }
+        contentWrapper: '#chat-container',
+      },
     },
 
     events: {
-      "copy": "onCopy"
+      'copy': 'onCopy',
     },
 
     childView: chatItemView.ChatItemView,
@@ -125,14 +129,15 @@ module.exports = (function() {
     childViewOptions: function(item) {
       var options = {
         decorators: this.decorators,
-        rollers: this.rollers
+        rollers: this.rollers,
       };
 
-      if(item && item.id) {
+      if (item && item.id) {
         // This allows the chat collection view to bind to an existing element...
         var e = this.$el.find('.model-id-' + item.id)[0];
-        if(e) options.el = e;
+        if (e) options.el = e;
       }
+
       return options;
     },
 
@@ -141,13 +146,13 @@ module.exports = (function() {
       this.viewComparator = this.collection.comparator;
 
       this.listenTo(appEvents, 'chatCollectionView:scrollToBottom', function() {
-        this.collection.fetchLatest({}, function () {
+        this.collection.fetchLatest({}, function() {
           this.rollers.scrollToBottom();
           this.clearHighlight();
         }, this);
       });
 
-      this.listenTo(appEvents, 'chatCollectionView:selectedChat', function (id, opts) {
+      this.listenTo(appEvents, 'chatCollectionView:selectedChat', function(id, opts) {
         var model = this.collection.get(id);
 
         // clearing previously highlighted chat.
@@ -209,8 +214,21 @@ module.exports = (function() {
       this.listenTo(appEvents, 'chatCollectionView:scrollToChatId', this.scrollToChatId);
 
       //When we change room, scroll to the bottom of the chatCollection
-      this.listenTo(context.troupe(), 'change:id', function(){
-        this.rollers.scrollToBottom();
+      this.listenTo(context.troupe(), 'change:id', this.render, this);
+
+      //listen for when the cache is constructed then stop listening to room change events
+      //this will stop a double render call
+      this.listenTo(appEvents, 'chat-cache:ok', function(){
+        this.stopListening('chat-cache:ok');
+        this.stopListening(context.troupe());
+      }, this);
+
+      //when the collection changes re render
+      this.listenTo(this.collection, 'collection:change', function() {
+
+        //render the new content
+        this.render();
+        this.scrollToBottom();
       }, this);
     },
 
@@ -232,7 +250,7 @@ module.exports = (function() {
       });
 
       var element = unreadItems[firstOffscreenElement];
-      if(element) {
+      if (element) {
         this.rollers.scrollToElement(element);
       }
     },
@@ -253,14 +271,14 @@ module.exports = (function() {
       this.scroll.pageDown();
     },
 
-    scrollToChat: function (chat) {
+    scrollToChat: function(chat) {
       var view = this.children.findByModel(chat);
       if (!view) return;
       this.rollers.scrollToElement(view.el, { centre: true });
       return true;
     },
 
-    scrollToChatId: function (id) {
+    scrollToChatId: function(id) {
       var model = this.collection.get(id);
       if (model) return this.scrollToChat(model);
       var self = this;
@@ -272,11 +290,11 @@ module.exports = (function() {
 
     // used to highlight and "dim" chat messages, the behaviour Highlight responds to these changes.
     // to "dim" simply leave out the arr argument
-    highlightChat: function (model, arr) {
+    highlightChat: function(model, arr) {
       model.set('highlights', arr || []);
     },
 
-    clearHighlight: function () {
+    clearHighlight: function() {
       var old = this.highlighted;
       if (!old) return;
       try {
@@ -288,9 +306,9 @@ module.exports = (function() {
 
     findLastCollapsibleChat: function() {
       var c = this.collection;
-      for(var i = c.length - 1; i >= 0; i--) {
+      for (var i = c.length - 1; i >= 0; i--) {
         var m = c.at(i);
-        if(m.get('isCollapsible')) {
+        if (m.get('isCollapsible')) {
           return m;
         }
       }
@@ -298,9 +316,9 @@ module.exports = (function() {
 
     setLastCollapsibleChat: function(state) {
       var last = this.findLastCollapsibleChat();
-      if(!last) return;
+      if (!last) return;
       var chatItem = this.children.findByModel(last);
-      if(chatItem) chatItem.setCollapse(state);
+      if (chatItem) chatItem.setCollapse(state);
     },
 
     /* Collapses the most recent chat with embedded media */
@@ -325,7 +343,7 @@ module.exports = (function() {
       }
 
       var range = selection.getRangeAt(0);
-      var plainText ='' + selection;
+      var plainText = '' + selection;
 
       var start = $(range.startContainer).parents('.chat-item')[0];
       var end = $(range.endContainer).parents('.chat-item')[0];
@@ -340,7 +358,7 @@ module.exports = (function() {
       /* Has a single chat been selected? If so, only use markdown if the WHOLE chat has been selected, and not a partial selection */
       if (startText && endText && startText === endText) {
         /* Partial selection */
-        if(range.startOffset > 0 || range.endOffset < range.endContainer.textContent.length) return;
+        if (range.startOffset > 0 || range.endOffset < range.endContainer.textContent.length) return;
 
         var atStart = isAtStartOfParent(startText, range.startContainer);
         var atEnd = isAtEndOfParent(startText, range.endContainer);
@@ -369,7 +387,7 @@ module.exports = (function() {
       if (!model) return;
 
       var chatItemView = this.children.findByModel(model);
-      if(!chatItemView) return;
+      if (!chatItemView) return;
 
       chatItemView.toggleEdit();
     },
@@ -379,20 +397,20 @@ module.exports = (function() {
       if (!model) return;
 
       var chatItemView = this.children.findByModel(model);
-      if(!chatItemView) return;
+      if (!chatItemView) return;
 
       chatItemView.subst(search, replace, global);
     },
 
     viewportResize: function(animated) {
-      if(animated) {
+      if (animated) {
         this.rollers.adjustScrollContinuously(500);
       } else {
         this.rollers.adjustScroll(500);
       }
     },
 
-    highlightPermalinkChat: function (id) {
+    highlightPermalinkChat: function(id) {
       var self = this;
       this.collection.ensureLoaded(id, function(err, model) {
         if (err) return; // Log this?
