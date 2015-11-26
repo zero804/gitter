@@ -82,9 +82,6 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   initMenuRegion: function(optionsForRegion) {
-    console.log('-----------------------');
-    console.log(this);
-    console.log('-----------------------');
     return new RoomMenuView(optionsForRegion({
       bus: appEvents,
       roomCollection: this.roomCollection
