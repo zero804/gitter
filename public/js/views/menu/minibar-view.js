@@ -28,18 +28,31 @@ var MiniBarView = Marionette.ItemView.extend({
       this.listenTo(view, 'room-item-view:clicked', this.onItemClicked, this);
 
     }.bind(this));
+
+    this.listenTo(this.model, 'change:panelOpenState', this.onPanelStateChange, this);
   },
 
   onItemClicked: function(type) {
     //deactive the old active item
-    var currentActiveModel = this.roomMenuItemModels.where({ active: true })[0];
-    currentActiveModel.set('active', false);
+    var currentActiveModel = this._getCurrentlyActiveChildModel();
+    if (!!currentActiveModel) currentActiveModel.set('active', false);
 
     //activate the next item
     var nextActiveModel = this.roomMenuItemModels.where({ type: type })[0];
     nextActiveModel.set('active', true);
 
     this.trigger('minibar:clicked');
+  },
+
+  onPanelStateChange: function(model, state) {/*jshint unused:true */
+    if (!state) {
+      var currentActiveModel = this._getCurrentlyActiveChildModel();
+      currentActiveModel.set('active', false);
+    }
+  },
+
+  _getCurrentlyActiveChildModel: function() {
+    return this.roomMenuItemModels.where({ active: true })[0];
   },
 
   destroy: function() {

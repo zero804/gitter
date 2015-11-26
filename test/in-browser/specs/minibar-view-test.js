@@ -55,9 +55,24 @@ describe('MinibarView', function() {
     assert.ok(miniBar.roomMenuItemModels.at(1).get('active'));
   });
 
-  it.only('should remove all active models when panelOpenState changes to false', function(){
+  it('should remove all active models when panelOpenState changes to false', function() {
     miniBar.model.set('panelOpenState', false);
     assert.equal(0, miniBar.roomMenuItemModels.where({ active: true }));
+  });
+
+  it('should not throw an error if there is no currently active child model and the panelStateChanges', function(done) {
+    try {
+      //close the panel
+      miniBar.model.set('panelOpenState', false);
+      //try triggering a menu item clicked
+      miniBar.roomMenuItems[1].trigger('room-item-view:clicked', 'search');
+      done();
+    }
+    catch (e) {
+      assert.ok(false,
+                'an error was thrown whilst trying to click a menu item  after the panel has been closed');
+      done();
+    }
   });
 
 });
