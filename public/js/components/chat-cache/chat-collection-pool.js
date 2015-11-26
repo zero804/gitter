@@ -73,7 +73,7 @@ function generatePool(userRooms) {
 }
 
 function resolveOnCollectionCreated(result) {
-  pool[result.roomName] = stampCollection(result.collection);
+  pool[result.id] = stampCollection(result.collection);
 }
 
 function generateCollection(roomId, roomName) {
@@ -89,7 +89,7 @@ function generateCollection(roomId, roomName) {
 
       //stop the initialCollections contextmodel listening for changes on the current troupeModel
       initialCollection.contextModel.stopListening(context.troupe());
-      return resolve({ roomName: roomName, collection: initialCollection });
+      return resolve({ roomName: roomName, collection: initialCollection, id: roomId });
     }
 
     //get a default id (just to be safe)
@@ -117,6 +117,7 @@ function generateCollection(roomId, roomName) {
       resolve({
         roomName:   roomName,
         collection: collection,
+        id: roomId
       });
     });
 
@@ -126,7 +127,7 @@ function generateCollection(roomId, roomName) {
   });
 }
 
-function getUncachedCollection(id, name) {
+function getUncachedCollection(id) {
 
   //figure out which is the oldest collection in the pool
   var roomNames = Object.keys(pool);
@@ -145,7 +146,7 @@ function getUncachedCollection(id, name) {
   collection.contextModel.set('troupeId', id);
 
   //store the new collection under it's new room
-  pool[name] = collection;
+  pool[id] = collection;
 
   //remove old reference to the collection from the pool
   delete pool[staleCollection.key];
@@ -154,11 +155,10 @@ function getUncachedCollection(id, name) {
 }
 
 function onRoomChange(model) {
-  var name = model.get('name');
   var id   = model.get('id');
 
   //if we don't have a cache entry just grab a new one
-  var collection = (pool[name] || getUncachedCollection(id, name));
+  var collection = (pool[id] || getUncachedCollection(id));
 
   //if something went wrong just fall-back
   if (!collection) return fallback(id);
