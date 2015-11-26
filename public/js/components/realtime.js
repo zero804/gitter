@@ -210,3 +210,5 @@ module.exports = {
   }
 
 };
+
+window._realtime = module.exports;
