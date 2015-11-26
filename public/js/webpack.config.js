@@ -59,7 +59,8 @@ var webpackConfig = {
       'gitter-realtime-client',
       'raven-js',
       'keymaster',
-      'moment'
+      'moment',
+      'bluebird'
     ]
   },
   output: {
@@ -116,6 +117,8 @@ var webpackConfig = {
       "moment": path.resolve(path.join(__dirname, "utils/moment-wrapper")),
       "underscore": path.resolve(path.join(__dirname, "utils/underscore-wrapper")),
       "backbone": path.resolve(path.join(__dirname, "../../node_modules/backbone")),
+
+      "bluebird": path.resolve(path.join(__dirname, "utils/bluebird-wrapper")),  
     },
   },
   plugins: [
