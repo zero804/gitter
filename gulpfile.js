@@ -156,7 +156,6 @@ makeTestTasks('test-docker', function(name, files) {
         TAP_FILE: 'output/test-reports/' + name + '.tap',
         XUNIT_FILE: 'output/test-reports/' + name + '.xml',
         NODE_ENV: 'test-docker',
-        DEBUG: 'gitter:*',
         Q_DEBUG: 1,
         BLUEBIRD_DEBUG: 1
       }
