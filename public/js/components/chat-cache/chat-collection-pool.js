@@ -38,7 +38,7 @@ function generatePool(userRooms) {
   //hence reversing the list, this makes no difference to the pool as it is a #
   rooms.reverse().forEach(function(roomData) {
 
-    //we want to lad collections synchronously (after they receive a snapshot)
+    //we want to add collections synchronously (after they receive a snapshot)
     //so we need to queue the async actions
     //therefore if we don't already have a promise chain we make one then attach the
     //other generations to that.
