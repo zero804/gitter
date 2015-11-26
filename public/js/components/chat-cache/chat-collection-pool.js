@@ -85,11 +85,11 @@ function generateCollection(roomId, roomName) {
 
       //stop the original chat collection (behind the proxy) from
       //responding to any room change events
-      var collection = chatCollection.collection;
+      var initialCollection = chatCollection.collection;
 
-      //stop the collections contextmodel listening for changes on the current troupeModel
-      collection.contextModel.stopListening(context.troupe());
-      return resolve({ roomName: roomName, collection: collection });
+      //stop the initialCollections contextmodel listening for changes on the current troupeModel
+      initialCollection.contextModel.stopListening(context.troupe());
+      return resolve({ roomName: roomName, collection: initialCollection });
     }
 
     //get a default id (just to be safe)
