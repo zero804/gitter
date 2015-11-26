@@ -9,7 +9,7 @@ var appEvents      = require('utils/appevents');
 
 var pool            = {};
 var poolSize        = 5;
-var initialRoomName = context.troupe().get('name');
+var initialRoomId   = context.troupe().get('id');
 
 module.exports = function chatCollectionPool(roomList) {
 
@@ -63,7 +63,7 @@ function generatePool(userRooms) {
   if (!roomQueue) return;
 
   //the finial promise needs to be resolved
-  roomQueue.then(function(result){
+  roomQueue.then(function(result) {
     resolveOnCollectionCreated(result);
     appEvents.trigger('chat-cache:ok');
   });
@@ -81,7 +81,7 @@ function generateCollection(roomId, roomName) {
 
     //the first collection will not receive a snapshot because its active
     //therefore we need to just store it in the pool
-    if (roomName === initialRoomName) {
+    if (roomId === initialRoomId) {
 
       //stop the original chat collection (behind the proxy) from
       //responding to any room change events
