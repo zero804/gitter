@@ -156,7 +156,7 @@
     "faye": "^1.1.2",
     "file-loader": "^0.8.1",
     "fs-extra": "^0.8.1",
-    "gitter-realtime-client-halley-TEMP": "^1.0.3",
+    "gitter-realtime-client-halley-TEMP": "^1.0.4",
     "gitter-styleguide": "1.2.9",
     "gulp": "^3.8.11",
     "gulp-coveralls": "^0.1.4",
