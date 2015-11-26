@@ -23,17 +23,20 @@
     html.loading body > * { visibility: hidden; }
   </style>
 </head>
-<body class="mobile with-sideMenu">
+<body class="mobile mobile-userhome-container">
+
+  {{{ prerenderView "js/views/menu/tmpl/room-menu" }}}
 
   <div id="mainPage" class="chat-app">
+
     <header>
-      <div id="showTroupesButton">
-        <img src='{{cdn "images/icon-more@2x.png" }}' width="16" height="16" id="menu-toggle" style="margin-left: 8px">
-      </div>
       <span class="trpTitle">{{troupeName}}</span>
     </header>
+
     {{> chat_content}}
+
     {{> chat_input}}
+
   </div>
   {{>live_reload}}
   {{>set_initial_position}}
