@@ -117,6 +117,33 @@ Once you are sure the above is done, preform the following:
 3. `make sprites`
 4. commit your changes and release!
 
+## Adjusting Feature Toggles
+
+Use the `./scripts/utils/feature-toggle.js` script to adjust feature toggles:
+
+For example,
+
+```shell
+# Include suprememoocow and trevorah in the test
+NODE_ENV=beta ./scripts/utils/feature-toggle.js fancy-new-feature --include-user suprememoocow --include-user trevorah
+
+# Exclude users from the test
+NODE_ENV=beta ./scripts/utils/feature-toggle.js fancy-new-feature --exclude-user suprememoocow --exclude-user trevorah
+
+# Include a percentage of all users
+NODE_ENV=beta ./scripts/utils/feature-toggle.js fancy-new-feature --percentage 70
+
+# Undo "include a percentage of all users"
+NODE_ENV=beta ./scripts/utils/feature-toggle.js fancy-new-feature --percentage-off
+
+# Include everyone
+NODE_ENV=beta ./scripts/utils/feature-toggle.js fancy-new-feature --enable
+
+# Undo "include everyone"
+NODE_ENV=beta ./scripts/utils/feature-toggle.js fancy-new-feature --enable-off
+
+```
+
 ## Setting up ElasticSearch
 
 1. Install ElasticSearch 1.2.2
@@ -152,11 +179,9 @@ Once you are sure the above is done, preform the following:
 [2014-10-20 22:04:27,307][INFO ][org.elasticsearch.river.mongodb.Slurper] Number documents indexed: 21541
 ```
 
-10. Log into HQ: http://localhost:9200/_plugin/HQ -> Connect
-
+10. Log into HQ: http://localhost:9200/_plugin/HQ Connect
 
 11. Check that there are lots of documents under the Gitter index.
-
 
 ## Updating the Social Graph
 
