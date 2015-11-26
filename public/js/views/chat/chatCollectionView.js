@@ -228,21 +228,8 @@ module.exports = (function() {
 
         //render the new content
         this.render();
-
-        //mark that we have just changed rooms and should scroll to the bottom
-        //when the collaborators view has rendered
-        this.shouldScrollAfterRoomChange = true;
+        this.scrollToBottom();
       }, this);
-
-      //when the collaboratorsView has rendered we will want to scroll to the bottom of the page
-      //to show the most recent chat content
-      this.listenTo(appEvents, 'collaboratorsView:show', function() {
-        if (this.shouldScrollAfterRoomChange) {
-          this.scrollToBottom();
-          this.shouldScrollAfterRoomChange = false;
-        }
-      }, this);
-
     },
 
     onTrackViewportCenter: function() {

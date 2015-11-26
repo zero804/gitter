@@ -1,6 +1,6 @@
 'use strict';
 
-var Q              = require('q');
+var Promise        = require('bluebird');
 var Backbone       = require('backbone');
 var ChatCollection = require('collections/chat').ChatCollection;
 var chatCollection = require('collections/instances/integrated-items').chats;
@@ -77,7 +77,7 @@ function resolveOnCollectionCreated(result) {
 }
 
 function generateCollection(roomId, roomName) {
-  return Q.Promise(function(resolve) {
+  return new Promise(function(resolve) {
 
     //the first collection will not receive a snapshot because its active
     //therefore we need to just store it in the pool
