@@ -86,7 +86,9 @@ function generateCollection(roomId, roomName) {
       //stop the original chat collection (behind the proxy) from
       //responding to any room change events
       var collection = chatCollection.collection;
-      collection.stopListening(collection.templateSubscription);
+
+      //stop the collections contextmodel listening for changes on the current troupeModel
+      collection.contextModel.stopListening(context.troupe());
       return resolve({ roomName: roomName, collection: collection });
     }
 
