@@ -12,7 +12,7 @@ var halleyConfig = _.extend({
 
 // Deep clone resolve.alias
 halleyConfig.resolve.alias = _.extend({ }, halleyConfig.resolve.alias, {
-  'gitter-realtime-client': path.resolve(path.join(__dirname, "../../node_modules/gitter-realtime-client-halley-TEMP"))
+  'gitter-realtime-client': path.resolve(path.join(__dirname, "../../node_modules/gitter-realtime-client-halley-TEMP")),
 });
 
 

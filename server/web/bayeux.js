@@ -35,7 +35,8 @@ function makeServer(endpoint, redisClient, redisSubscribeClient) {
     engine: {
       type: fayeRedis,
       client: redisClient,
-      subscriberClient: redisSubscribeClient, // Subscribe. Needs new client
+      subscriberClient: redisSubscribeClient, // Subscribe. Needs new client,
+      interval: 0.5, // Amount of time before sending queued messages
       includeSequence: true,
       namespace: 'fr:',
       statsDelegate: function(category, event) {

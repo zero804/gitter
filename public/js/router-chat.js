@@ -12,6 +12,7 @@ var onready                = require('./utils/onready');
 var apiClient              = require('components/apiClient');
 var frameUtils             = require('./utils/frame-utils');
 var itemCollections        = require('collections/instances/integrated-items');
+var chatCollectionPool     = require('./components/chat-cache/chat-collection-pool');
 
 /* Set the timezone cookie */
 require('components/timezone-cookie');
@@ -24,6 +25,7 @@ require('template/helpers/all');
 require('components/eyeballs');
 require('components/bug-reporting');
 require('components/focus-events');
+
 
 // Preload widgets
 require('components/ping');
@@ -116,6 +118,15 @@ onready(function() {
         context.troupe().set('aboutToLeave', true);
 
       break;
+
+      case 'roomList':
+        //If we have chat caching turned on trigger it
+        //TODO remove when 100% of users have caching enabled
+        //JP 24/11/15
+        if(context.hasFeature('chat-cache')) {
+          chatCollectionPool(message.rooms);
+        }
+        break;
     }
   });
 
@@ -368,4 +379,7 @@ onready(function() {
   liveContext.syncRoom();
 
   Backbone.history.start();
+
+  //request the room list from the parent application
+  frameUtils.postMessage({ type: 'request:roomList' });
 });

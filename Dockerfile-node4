@@ -1,7 +1,6 @@
-FROM node:0.10.38
-RUN npm install -g npm
-RUN npm install -g nodemon
+FROM node:4
 RUN npm install -g node-gyp
+RUN apt-get install comerr-dev
 
 RUN mkdir /src
 
