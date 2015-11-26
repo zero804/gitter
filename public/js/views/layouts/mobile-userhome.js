@@ -4,6 +4,7 @@ var Marionette   = require('backbone.marionette');
 var modalRegion  = require('components/modal-region');
 var UserhomeView = require('views/userhome/userHomeView');
 var appEvents    = require('../../utils/appevents.js');
+//TODO Move this into the upper js container
 var troupes      = require('../../collections/instances/troupes').troupes;
 var RoomMenuView = require('../menu/room-menu-view');
 

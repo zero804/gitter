@@ -2,9 +2,11 @@
 
 .mobile {
   .room-menu-container {
+    position:   relative;
     width:      @mobile-menu-width;
     height:     100%;
     background: @menu-bg;
+    z-index:    101;
   }
 
   .room-menu {
@@ -26,7 +28,7 @@
     position:     absolute;
     top:          0;
     left:         0;
-    width:        100vh;
+    width:        100vw;
     height:       100%;
     padding-left: 100%;
     background:   #333132;

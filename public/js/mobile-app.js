@@ -40,7 +40,13 @@ onready(function() {
     'chat': chatCollection
   });
 
-  var appView = new MobileLayout({ model: context.troupe(), template: false, el: 'body', chatCollection: chatCollection });
+  var appView = new MobileLayout({
+    model: context.troupe(),
+    template: false,
+    el: 'body',
+    chatCollection: chatCollection,
+    roomCollection: troupeCollections.troupes
+  });
   appView.render();
 
   var Router = Backbone.Router.extend({

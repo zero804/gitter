@@ -1,15 +1,17 @@
 "use strict";
 
-var context = require('utils/context');
-var Marionette = require('backbone.marionette');
-var modalRegion = require('components/modal-region');
+var context           = require('utils/context');
+var Marionette        = require('backbone.marionette');
+var modalRegion       = require('components/modal-region');
 var ChatContainerView = require('views/chat/chatContainerView');
+var RoomMenuView      = require('../menu/room-menu-view');
+var appEvents         = require('utils/appevents');
 
 /* Decorators */
-var emojiDecorator = require('views/chat/decorators/emojiDecorator');
+var emojiDecorator  = require('views/chat/decorators/emojiDecorator');
 var mobileDecorator = require('views/chat/decorators/mobileDecorator');
-var ChatInputView = require('views/chat/chatInputView');
-var JoinRoomView = require('views/chat/join-room-view');
+var ChatInputView   = require('views/chat/chatInputView');
+var JoinRoomView    = require('views/chat/join-room-view');
 
 var $ = require('jquery');
 
@@ -23,6 +25,7 @@ module.exports = Marionette.LayoutView.extend({
     Isomorphic: {
       chat: { el: '#content-wrapper', init: 'initChatRegion' },
       input: { el: '#chat-input', init: 'initInputRegion' },
+      roomMenu: { el: '#room-menu-container', init: 'initMenuRegion' }
     }
   },
 
@@ -61,6 +64,7 @@ module.exports = Marionette.LayoutView.extend({
   initialize: function(options) {
     this.chatCollection = options.chatCollection;
     this.dialogRegion = modalRegion;
+    this.roomCollection = options.roomCollection;
   },
 
   onRender: function() {
@@ -78,7 +82,13 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   initMenuRegion: function(optionsForRegion) {
-    //return new TroupeMenu(optionsForRegion());
+    console.log('-----------------------');
+    console.log(this);
+    console.log('-----------------------');
+    return new RoomMenuView(optionsForRegion({
+      bus: appEvents,
+      roomCollection: this.roomCollection
+    }));
   },
 
   initInputRegion: function(optionsForRegion) {
