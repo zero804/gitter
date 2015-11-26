@@ -144,6 +144,18 @@ NODE_ENV=beta ./scripts/utils/feature-toggle.js fancy-new-feature --enable-off
 
 ```
 
+To turn on and off features manually in your browser:
+
+```
+https://beta.gitter.im/api_web/features/[feature]/[0/1]
+```
+
+For example:
+
+```
+https://beta.gitter.im/api_web/features/chat-cache/1
+```
+
 ## Setting up ElasticSearch
 
 1. Install ElasticSearch 1.2.2
