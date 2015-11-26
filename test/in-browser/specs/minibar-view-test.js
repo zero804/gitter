@@ -2,6 +2,7 @@
 'use strict';
 
 var assert      = require('assert');
+var Backbone    = require('backbone');
 var MiniBarView = require('../../../public/js/views/menu/minibar-view');
 
 describe('MinibarView', function() {
@@ -10,6 +11,7 @@ describe('MinibarView', function() {
   var el;
   var innerEl;
   var innerEl2;
+  var model;
 
   beforeEach(function() {
 
@@ -23,7 +25,9 @@ describe('MinibarView', function() {
     innerEl2.dataset.stateChange = 'search';
     el.appendChild(innerEl2);
 
-    miniBar = new MiniBarView({ el: el });
+    model = new Backbone.Model({ panelOpenState: true });
+
+    miniBar = new MiniBarView({ el: el, model: model });
   });
 
   it('should emit an event when its element is clicked', function(done) {
@@ -49,6 +53,11 @@ describe('MinibarView', function() {
     miniBar.roomMenuItems[1].trigger('room-item-view:clicked', 'search');
     assert.ok(!miniBar.roomMenuItemModels.at(0).get('active'));
     assert.ok(miniBar.roomMenuItemModels.at(1).get('active'));
+  });
+
+  it.only('should remove all active models when panelOpenState changes to false', function(){
+    miniBar.model.set('panelOpenState', false);
+    assert.equal(0, miniBar.roomMenuItemModels.where({ active: true }));
   });
 
 });

@@ -6,7 +6,6 @@ var confirmRepoRoomView  = require('views/modals/confirm-repo-room-view.js');
 var modalRegion          = require('components/modal-region');
 var onready              = require('./utils/onready');
 var MobileUserhomeLayout = require('views/layouts/mobile-userhome');
-var FastClick            = require('fastclick');
 
 require('utils/tracking');
 
@@ -16,7 +15,6 @@ require('components/ping');
 require('template/helpers/all');
 
 onready(function() {
-  FastClick.attach(document.body);
 
   require('components/link-handler').installLinkHandler();
   appEvents.on('navigation', function(url) {

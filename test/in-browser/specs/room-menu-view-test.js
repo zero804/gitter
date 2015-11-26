@@ -20,13 +20,15 @@ describe('RoomMenuView', function() {
     roomMenuView   = new RoomMenuView({ el: el, model: model, roomCollection: roomCollection, bus: Backbone.Events});
   });
 
-  it('should change the models panel state when the correct event is triggered', function() {
+  it.skip('should change the models panel state when the correct event is triggered', function() {
 
     assert.ok(!model.get('panelOpenState'));
 
     roomMenuView.minibar.trigger('minibar:clicked');
     assert.ok(model.get('panelOpenState'));
 
+    roomMenuView.minibar.trigger('minibar:clicked');
+    assert.ok(!model.get('panelOpenState'));
   });
 
 });
