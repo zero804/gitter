@@ -78,7 +78,7 @@ module.exports = (function() {
       data.mentionable = mentionable;
       data.removable = removable;
       data.isGitHubUser = true; // TODO
-      data.isLoaded = !!this.model.isLoaded;
+      data.loaded = !!this.model.loaded;
       return data;
     }
 
@@ -105,7 +105,7 @@ module.exports = (function() {
       ghModel.sync = SyncMixin.sync; // XXX This is less than ideal
       ghModel.url = '/private/gh/users/' + username;
       ghModel.fetch(function() {
-        ghModel.isLoaded = true;
+        ghModel.loaded = true;
       });
 
       options.footerView = new UserPopoverFooterView({ model: ghModel });
