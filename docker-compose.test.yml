@@ -1,14 +1,47 @@
+mongo1:
+  build: config/docker-tests/mongo
+
+redistest1:
+  image: redis:3.0.3
+  restart: 'always'
+  entrypoint: [ "/usr/local/bin/redis-server", "--bind", "0.0.0.0", "--port", "6379", "--maxclients", "200"]
+
+redistest2:
+  image: redis:3.0.3
+  restart: 'always'
+  links:
+    - redistest1
+  entrypoint: [ "/usr/local/bin/redis-server", "--bind", "0.0.0.0", "--port", "6380", "--slaveof", "redistest1", "6379", "--maxclients", "200"]
+
+sentineltest1:
+  build: config/docker-tests/sentinel
+  restart: 'always'
+  links:
+    - redistest1
+    - redistest2
+
 test:
   build: .
   links:
     - mongo1
-    - mongo2
-    - mongo3
-    - redis1
-    - redis2
-    - sentinel1
-    - elasticsearch
-    - neo4j
+    - redistest1
+    - redistest2
+    - sentineltest1
+  extra_hosts:
+     - "beta-internal:10.0.0.140"
   environment:
-    DEBUG: "gitter:*"
-  entrypoint: [  "/bin/bash", "-c", "cd /src; ./node_modules/.bin/gulp test-docker"]
+    SKIP_BADGER_TESTS: 1
+  entrypoint: [  "./node_modules/.bin/gulp", "test-docker"]
+
+test-node4:
+  build: .
+  dockerfile: Dockerfile-node4
+  links:
+    - mongo1
+    - redistest1
+    - sentineltest1
+  extra_hosts:
+     - "beta-internal:10.0.0.140"
+  environment:
+    SKIP_BADGER_TESTS: 1
+  entrypoint: [  "./node_modules/.bin/gulp", "test-docker"]
