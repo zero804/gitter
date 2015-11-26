@@ -85,8 +85,9 @@ function generateCollection(roomId, roomName) {
 
       //stop the original chat collection (behind the proxy) from
       //responding to any room change events
-      chatCollection.collection.stopListening('change:id');
-      return resolve({ roomName: roomName, collection: chatCollection.collection });
+      var collection = chatCollection.collection;
+      collection.stopListening(collection.templateSubscription);
+      return resolve({ roomName: roomName, collection: collection });
     }
 
     //get a default id (just to be safe)
