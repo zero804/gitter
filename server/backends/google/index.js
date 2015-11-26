@@ -15,4 +15,9 @@ GoogleBackend.prototype.getSerializedOrgs = function() {
   return Q.resolve([]);
 };
 
+GoogleBackend.prototype.getProfile = function() {
+  // TODO: gravatar or fullcontact?
+  return Q.resolve({provider: 'google'});
+};
+
 module.exports = GoogleBackend;

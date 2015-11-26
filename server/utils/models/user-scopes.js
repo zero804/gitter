@@ -89,3 +89,17 @@ exports.isMissingTokens = function(user) {
 };
 
 exports.REQUIRED_FIELDS = { githubToken: 1, githubUserToken: 1, githubScopes: 1 };
+
+exports.getIdentities = function(user) {
+  // Just the provider name and id. Basically user.identities, but also
+  // including github. If you want the full identities, use identityService
+  // rather.
+  var identities = [];
+  if (exports.isGitHubUser(user)) {
+    identities.push({provider: 'github', providerKey: user.githubId});
+  }
+  if (user.identities) {
+    identities.push.apply(identities, user.identities);
+  }
+  return identities;
+}

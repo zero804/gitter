@@ -97,4 +97,8 @@ BackendResolver.prototype.getSerializedOrgs = function() {
   return this.findAllResults('getSerializedOrgs');
 };
 
+BackendResolver.prototype.getProfile = function() {
+  return this.getFirstResult('getProfile');
+};
+
 module.exports = BackendResolver;

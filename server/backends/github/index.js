@@ -3,6 +3,7 @@
 var gitHubEmailAddressService = require('./github-email-address-service');
 var restSerializer = require("../../serializers/rest-serializer");
 var GithubMe = require('gitter-web-github').GitHubMeService;
+var Q = require('q');
 
 function GitHubBackend(user, identity) {
   this.user = user;
@@ -22,6 +23,11 @@ GitHubBackend.prototype.getSerializedOrgs = function() {
       var strategy = new restSerializer.GithubOrgStrategy(strategyOptions);
       return restSerializer.serializeExcludeNulls(ghOrgs, strategy);
     });
+};
+
+GitHubBackend.prototype.getProfile = function() {
+  // TODO: get it all from github
+  return Q.resolve({provider: 'github'});
 };
 
 module.exports = GitHubBackend;
