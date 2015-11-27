@@ -22,6 +22,7 @@ var identityService = {
     return mongooseUtils.findByFieldInValue(persistence.Identity, 'userId', userIds);
   },
 
+  // TODO: move this to more of a "fat service"
   findByUsers: function(users) {
     // Take the existing cached identities into account and also cache the
     // newly loaded ones. Return them all.
@@ -41,7 +42,7 @@ var identityService = {
     // short circuit if the array is null
     if (!userIds.length) return allIdentities;
 
-    return identityService.findForUserIds(userIds)
+    return identityService.findByUserIds(userIds)
       .then(function(identities) {
         for (var i=0; i<identities.length; i++) {
           var identity = identities[i];
