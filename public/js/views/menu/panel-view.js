@@ -1,7 +1,7 @@
 'use strict';
 
 var Marionette = require('backbone.marionette');
-var Hammer     = require('hammerjs');
+var appEvents  = require('utils/appevents');
 
 module.exports = Marionette.ItemView.extend({
 
@@ -10,9 +10,7 @@ module.exports = Marionette.ItemView.extend({
   },
 
   initialize: function() {
-    this.onSwipeLeft = this.onSwipeLeft.bind(this);
-    this.hammertime = new Hammer(this.el);
-    this.hammertime.on('swipeleft', this.onSwipeLeft);
+    appEvents.on('ui:swipeleft', this.onSwipeLeft, this);
   },
 
   onPanelOpenStateChange: function(model, val) { /*jshint unused: true */
@@ -22,13 +20,8 @@ module.exports = Marionette.ItemView.extend({
     if(!!val) this.$el.click();
   },
 
-  onSwipeLeft: function() {
-    this.model.set('panelOpenState', false);
-  },
-
-  destroy: function (){
-    this.hammertime.destroy();
-    Marionette.ItemView.prototype.destroy.apply(this, arguments);
+  onSwipeLeft: function(e) {
+    if(e.target === this.el) { this.model.set('panelOpenState', false); }
   },
 
 });

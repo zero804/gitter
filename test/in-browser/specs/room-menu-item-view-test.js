@@ -4,6 +4,7 @@
 var assert       = require('assert');
 var Backbone     = require('backbone');
 var RoomItemView = require('../../../public/js/views/menu/room-menu-item-view');
+var appEvents    = require('utils/appevents');
 
 describe('RoomMenuItemView', function() {
 
@@ -30,6 +31,16 @@ describe('RoomMenuItemView', function() {
     });
 
     el.click();
+  });
+
+  it('trigger an event when it\'s el is swiped', function(done) {
+
+    roomItemView.on('room-item-view:clicked', function() {
+      assert.ok(true);
+      done();
+    });
+
+    appEvents.trigger('ui:swiperight', { target: el });
   });
 
   it('should pass the right data with the event', function(done) {
