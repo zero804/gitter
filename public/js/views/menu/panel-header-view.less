@@ -1,0 +1,33 @@
+.panel-header {
+  background: transparent;
+  text-align: left;
+}
+
+.panel-header__title--all {
+  height:     @header-height;
+  width:      100%;
+  background: @ruby;
+}
+
+.panel-header__title {
+  padding:     0 0 0 @menu-left-padding;
+  margin:      0;
+  line-height: @header-height;
+  font-weight: 300;
+  font-size:   2.5rem;
+}
+
+.panel-header__title--search  {
+  .panel-header__title;
+  color:       @jaffa;
+}
+
+.panel-header__title--favourite {
+  .panel-header__title;
+  color:       @caribbean;
+}
+
+.panel-header__title--people {
+  .panel-header__title;
+  color:       @people-bg;
+}

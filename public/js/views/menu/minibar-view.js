@@ -41,7 +41,7 @@ var MiniBarView = Marionette.ItemView.extend({
     var nextActiveModel = this.roomMenuItemModels.where({ type: type })[0];
     nextActiveModel.set('active', true);
 
-    this.trigger('minibar:clicked');
+    this.trigger('minibar:clicked', type);
   },
 
   onPanelStateChange: function(model, state) {/*jshint unused:true */

@@ -24,8 +24,9 @@ module.exports = Marionette.ItemView.extend({
 
   },
 
-  onMiniBarClicked: function() {
+  onMiniBarClicked: function(type) {
     this.model.set('panelOpenState', true);
+    this.model.setState(type);
   },
 
   destroy: function() {
