@@ -7,6 +7,9 @@ var Q = require('q');
 function UserProfileStrategy(options) {
   options = options ? options : {};
 
+  // TODO: if I require this at the top, then it comes back as {}
+  var BackendResolver = require('../../services/backend-resolver');
+
   this.preload = function(users, callback) {
     // pre-fill the cache
     return identityService.findForUsers(users)
@@ -14,8 +17,6 @@ function UserProfileStrategy(options) {
         var promises = [];
         for (var i=0; i<users.length; i++) {
           var user = users[i];
-          // TODO: if I require this at the top, then it comes back as {}
-          var BackendResolver = require('../../services/backend-resolver');
           var backendResolver = new BackendResolver(user);
           // we're only interested in the first profile
           var promise = backendResolver.getProfile()
