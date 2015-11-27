@@ -1,10 +1,9 @@
 'use strict';
 
-var Marionette      = require('backbone.marionette');
-var appEvents       = require('utils/appevents');
-var PanelHeaderView = require('./panel-header-view');
-
-require('views/behaviors/isomorphic');
+var Marionette            = require('backbone.marionette');
+var appEvents             = require('utils/appevents');
+var PanelHeaderView       = require('./panel-header-view');
+var PrimaryCollectionView = require('./primary-collection-view');
 
 module.exports = Marionette.LayoutView.extend({
 
@@ -13,8 +12,17 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   initialize: function() {
+
     this.header = new PanelHeaderView({ el: '#panel-header', model: this.model });
     this.header.render();
+
+    this.primaryCollectionView = new PrimaryCollectionView({
+      el: '#primary-collection',
+      collection: this.model.primaryCollection
+    });
+
+    this.primaryCollectionView.render();
+
     appEvents.on('ui:swipeleft', this.onSwipeLeft, this);
   },
 
