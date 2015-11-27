@@ -20,10 +20,6 @@ module.exports = Marionette.ItemView.extend({
     Marionette.ItemView.prototype.constructor.apply(this, arguments);
   },
 
-  initialize: function (){
-
-  },
-
   onMiniBarClicked: function(type) {
     this.model.set('panelOpenState', true);
     this.model.setState(type);
