@@ -1,4 +1,3 @@
-/*jshint -W083*/
 "use strict";
 
 var identityService = require("../../services/identity-service");
@@ -14,16 +13,21 @@ function UserProfileStrategy(options) {
     // pre-fill the cache
     return identityService.findForUsers(users)
       .then(function() {
+        var user;
+        var backendResolver;
+        var promise;
+
+        function fillUserProfile(profile) {
+          // cache the profile so we can get it out later.
+          // (is this the best variable name?)
+          user.profile = profile;
+        }
+
         var promises = [];
         for (var i=0; i<users.length; i++) {
-          var user = users[i];
-          var backendResolver = new BackendResolver(user);
-          // we're only interested in the first profile
-          var promise = backendResolver.getProfile()
-            .then(function(profile) {
-              // cache the profile so we can get it out later.
-              user.profile = profile;
-            });
+          user = users[i];
+          backendResolver = new BackendResolver(user);
+          promise = backendResolver.getProfile().then(fillUserProfile);
           promises.push(promise);
         }
         return Q.all(promises);
