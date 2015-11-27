@@ -45,6 +45,8 @@ module.exports = Backbone.Model.extend({
 
     this.listenTo(this.primaryCollection, 'snapshot', this.onPrimaryCollectionSnapshot, this);
 
+    //TODO have added setState so this can be removed
+    //tests must be migrated
     this.bus = attrs.bus;
     this.listenTo(this.bus, 'room-menu:change:state', this.onStateChangeCalled, this);
 
@@ -61,6 +63,10 @@ module.exports = Backbone.Model.extend({
     this.trigger('change:state:pre', this.get('state'), newState);
     this.set('state', newState);
     this.trigger('change:state:post', this.get('state'));
+  },
+
+  setState: function (type){
+    this.onStateChangeCalled(type);
   },
 
   onSearchTermChange: _.debounce(function() {

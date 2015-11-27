@@ -1,15 +1,20 @@
 'use strict';
 
-var Marionette = require('backbone.marionette');
-var appEvents  = require('utils/appevents');
+var Marionette      = require('backbone.marionette');
+var appEvents       = require('utils/appevents');
+var PanelHeaderView = require('./panel-header-view');
 
-module.exports = Marionette.ItemView.extend({
+require('views/behaviors/isomorphic');
+
+module.exports = Marionette.LayoutView.extend({
 
   modelEvents: {
     'change:panelOpenState': 'onPanelOpenStateChange',
   },
 
   initialize: function() {
+    this.header = new PanelHeaderView({ el: '#panel-header', model: this.model });
+    this.header.render();
     appEvents.on('ui:swipeleft', this.onSwipeLeft, this);
   },
 
