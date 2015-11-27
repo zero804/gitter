@@ -18,11 +18,11 @@ var identityService = {
       });
   },
 
-  findForUserIds: function(userIds) {
+  findByUserIds: function(userIds) {
     return mongooseUtils.findByFieldInValue(persistence.Identity, 'userId', userIds);
   },
 
-  findForUsers: function(users) {
+  findByUsers: function(users) {
     // Take the existing cached identities into account and also cache the
     // newly loaded ones. Return them all.
     var allIdentities = [];
