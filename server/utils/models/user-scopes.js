@@ -76,15 +76,16 @@ exports.getGitHubToken = function(user, scope) {
   return user.githubToken || user.githubUserToken;
 };
 
-exports.isGitHubUser = function(user) {
+function isGitHubUser(user) {
   return (!user.username || user.username.indexOf('_') === -1);
-};
+}
+exports.isGitHubUser = isGitHubUser;
 
 
 exports.isMissingTokens = function(user) {
   // TODO: replace this with something more "provider-aware"
   // non-github users cannot miss their github tokens
-  if (!exports.isGitHubUser(user)) return false;
+  if (!isGitHubUser(user)) return false;
   return !user.githubToken && !user.githubUserToken;
 };
 
@@ -95,7 +96,7 @@ exports.getIdentities = function(user) {
   // including github. If you want the full identities, use identityService
   // rather.
   var identities = [];
-  if (exports.isGitHubUser(user)) {
+  if (isGitHubUser(user)) {
     identities.push({provider: 'github', providerKey: user.githubId});
   }
   if (user.identities) {
