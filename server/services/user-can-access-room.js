@@ -54,7 +54,6 @@ function doFullAccessCheck(troupeId, userId) {
  */
 function userCanAccessRoom(userId, troupeId) {
   if(!mongoUtils.isLikeObjectId(troupeId)) return Q.resolve(null);
-
   userId = mongoUtils.asObjectID(userId);
   troupeId = mongoUtils.asObjectID(troupeId);
 
@@ -86,17 +85,18 @@ function userCanAccessRoom(userId, troupeId) {
 
       return roomMembershipService.checkRoomMembership(troupeId, userId)
         .then(function(isInRoom) {
+          // if(troupe.security === 'PUBLIC' && isInRoom) return 'member';
 
-          if(troupe.security === 'PUBLIC' && isInRoom) return 'member';
+          if(troupe.security === 'PUBLIC') {
+            // TODO: when `writeAccessRequired` param is introduced, then
+            // we need to actually query for the member
+            return isInRoom ? 'member' : 'view';
+          }
 
-          //if(troupe.security === 'PUBLIC') {
-          //  return isInRoom ? 'member' : 'view';
-          //}
-
-          //if(!isInRoom) {
-          //  debug("Denied user %s access to troupe %s", userId, troupe.uri);
-          //  return null;
-          //}
+          if(!isInRoom) {
+           debug("Denied user %s access to troupe %s", userId, troupe.uri);
+           return null;
+          }
 
           var isChannel = troupe.githubType === 'ORG_CHANNEL' ||
             troupe.githubType === 'REPO_CHANNEL' ||
