@@ -1,17 +1,17 @@
 "use strict";
 
-var context = require('utils/context');
-var $ = require('jquery');
-var appEvents = require('utils/appevents');
-var chatModels = require('collections/chat');
-var Backbone = require('backbone');
-var TroupeSettingsView = require('views/modals/room-settings-view');
-var onready = require('./utils/onready');
-var MobileLayout = require('views/layouts/mobile');
-var FastClick = require('fastclick');
+var context               = require('utils/context');
+var $                     = require('jquery');
+var appEvents             = require('utils/appevents');
+var chatModels            = require('collections/chat');
+var Backbone              = require('backbone');
+var TroupeSettingsView    = require('views/modals/room-settings-view');
+var onready               = require('./utils/onready');
+var MobileLayout          = require('views/layouts/mobile');
 var RoomCollectionTracker = require('components/room-collection-tracker');
-var troupeCollections = require('collections/instances/troupes');
-var unreadItemsClient = require('components/unread-items-client');
+var troupeCollections     = require('collections/instances/troupes');
+var unreadItemsClient     = require('components/unread-items-client');
+var gestures              = require('utils/gesture-controller');
 
 require('utils/tracking');
 
@@ -23,9 +23,11 @@ require('views/widgets/avatar');
 require('views/widgets/timeago');
 require('components/ping');
 require('template/helpers/all');
+require('utils/gesture-controller');
 
 onready(function() {
-  FastClick.attach(document.body);
+
+  gestures.init();
 
   require('components/link-handler').installLinkHandler();
   appEvents.on('navigation', function(url) {
