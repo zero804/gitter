@@ -26,12 +26,12 @@ var identityService = {
   findByUsers: function(users) {
     // Take the existing cached identities into account and also cache the
     // newly loaded ones. Return them all.
-    var allIdentities = [];
+    var cachedIdentities = [];
     var userMap = {};
     var userIds = users.reduce(function(ids, user) {
       userMap[user.id] = user;
       if (user._cachedIdentities) {
-        allIdentities.push.apply(allIdentities, user._cachedIdentities);
+        cachedIdentities.push.apply(cachedIdentities, user._cachedIdentities);
       } else {
         user._cachedIdentities = [];
         ids.push(user.id);
@@ -40,16 +40,14 @@ var identityService = {
     }, []);
 
     // short circuit if the array is null
-    if (!userIds.length) return allIdentities;
+    if (!userIds.length) return cachedIdentities;
 
     return identityService.findByUserIds(userIds)
       .then(function(identities) {
-        for (var i=0; i<identities.length; i++) {
-          var identity = identities[i];
-          allIdentities.push(identity);
+        identities.forEach(function(identity) {
           userMap[identity.userId]._cachedIdentities.push(identity);
-        }
-        return allIdentities;
+        });
+        return cachedIdentities.concat(identities);
       });
   }
 };
