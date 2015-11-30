@@ -12,7 +12,7 @@ describe('PanelHeaderView', function() {
   var el;
 
   beforeEach(function() {
-    model           = new Backbone.Model({ state: 'all' });
+    model           = new Backbone.Model({ state: 'all', profileMenuOpenState: false });
     el              = document.createElement('div');
     panelHeaderView = new PanelHeaderView({ el: el, model: model });
     panelHeaderView.render();
@@ -42,5 +42,12 @@ describe('PanelHeaderView', function() {
     assert.equal(1, result.length);
   });
 
+  it('should toggle the profileMenuOpenState when clicked', function(){
+    assert.ok(!model.get('profileMenuOpenState'));
+    el.click();
+    assert.ok(model.get('profileMenuOpenState'));
+    el.click();
+    assert.ok(!model.get('profileMenuOpenState'));
+  });
 
 });

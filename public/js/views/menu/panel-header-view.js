@@ -11,6 +11,10 @@ module.exports = Marionette.ItemView.extend({
     'change:state': 'render',
   },
 
+  events: {
+    'click': 'onClick',
+  },
+
   serializeData: function() {
     var state = this.model.get('state');
     return {
@@ -19,6 +23,10 @@ module.exports = Marionette.ItemView.extend({
       isFavouriteState: (state === 'favourite'),
       isPeopleState: (state === 'people')
     };
+  },
+
+  onClick: function (){
+    this.model.set('profileMenuOpenState', !this.model.get('profileMenuOpenState'));
   },
 
 });
