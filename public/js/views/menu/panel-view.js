@@ -4,6 +4,7 @@ var Marionette            = require('backbone.marionette');
 var appEvents             = require('utils/appevents');
 var PanelHeaderView       = require('./panel-header-view');
 var PrimaryCollectionView = require('./primary-collection-view');
+var ProfileMenuView       = require('./profile-menu-view');
 
 module.exports = Marionette.LayoutView.extend({
 
@@ -16,13 +17,14 @@ module.exports = Marionette.LayoutView.extend({
     this.header = new PanelHeaderView({ el: '#panel-header', model: this.model });
     this.header.render();
 
+    this.profileMenu = new ProfileMenuView({ el: '#profile-menu', model: this.model });
+
     this.primaryCollectionView = new PrimaryCollectionView({
       el: '#primary-collection',
       collection: this.model.primaryCollection
     });
 
     this.primaryCollectionView.render();
-
     appEvents.on('ui:swipeleft', this.onSwipeLeft, this);
   },
 

@@ -15,7 +15,11 @@ describe('RoomMenuView', function() {
 
   beforeEach(function() {
     el             = document.createElement('div');
-    model          = new Backbone.Model({ defults: { panelOpenState: false }});
+    model          = new Backbone.Model({
+      setState: function(){},
+      defults: { panelOpenState: false }
+    });
+
     roomCollection = new MockRoomCollection();
     roomMenuView   = new RoomMenuView({ el: el, model: model, roomCollection: roomCollection, bus: Backbone.Events});
   });
@@ -30,5 +34,6 @@ describe('RoomMenuView', function() {
     roomMenuView.minibar.trigger('minibar:clicked');
     assert.ok(!model.get('panelOpenState'));
   });
+
 
 });

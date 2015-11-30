@@ -1,0 +1,26 @@
+@import "./primary-collection-item-view";
+
+.profile-menu {
+  margin-left: 0;
+  margin-bottom: 0;
+  background: #262525;
+
+  max-height: 0;
+  transition: all .2s linear;
+  overflow:   hidden;
+
+  &.active {
+    max-height: 40rem;
+  }
+}
+
+.profile-menu__item {
+  .room-item;
+}
+
+.profile-menu__item__title {
+  .room-item__title;
+  a {
+    color: inherit;
+  }
+}
