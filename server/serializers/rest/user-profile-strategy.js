@@ -37,7 +37,8 @@ function UserProfileStrategy(options) {
       username: user.username,
       displayName: user.displayName,
       invited: user.state === 'INVITED' || undefined, // isInvited?
-      removed: user.state === 'REMOVED' || undefined // isRemoved?
+      removed: user.state === 'REMOVED' || undefined, // isRemoved?
+      has_gitter_login: true // by definition
     };
 
     // standard stuff goes to the bottom level

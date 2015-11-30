@@ -7,8 +7,9 @@
   <button class="trpBtnLightGrey trpButtonSmall" id="button-mention">
     Mention
   </button>
-  {{#if isGitHubUser}}
-  <a href="{{html_url}}" target="_blank" class="trpBtnLightGrey trpButtonSmall open-in-github">Open in GitHub</a>
+  {{#if profile}}
+  <!-- TODO: not open-in-github -->
+  <a href="{{profile}}" target="_blank" class="trpBtnLightGrey trpButtonSmall open-in-github">Open Profile</a>
   {{/if}}
 {{/if}}
 {{#if chatPrivately}}
