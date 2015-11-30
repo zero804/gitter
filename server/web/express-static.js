@@ -24,6 +24,19 @@ exports.install = function(app) {
       }
   }));
 
+  app.use(webpackMiddleware(webpack(require('../../public/js/webpack-halley.config')), {
+      noInfo: false,
+      quiet: false,
+      lazy: true,
+      watchOptions: {
+        aggregateTimeout: 400
+      },
+      publicPath: "/_s/l/js/halley",
+      stats: {
+          colors: true
+      }
+  }));
+
   app.use('/_s/l/styles', express.static('output/assets/styles', {
     maxAge: 0
   }));

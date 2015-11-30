@@ -147,6 +147,15 @@ function serializeTroupe(troupe, user) {
 function createTroupeContext(req, options) {
   var events = req.session && req.session.events;
   var extras = options.extras || {};
+
+  // Pass the feature toggles through to the client
+  var features;
+  if (req.fflip && req.fflip.features) {
+    features = Object.keys(req.fflip.features).filter(function(featureKey) {
+      return req.fflip.features[featureKey];
+    });
+  }
+
   if (events) { req.session.events = []; }
 
   return _.extend({
@@ -162,6 +171,7 @@ function createTroupeContext(req, options) {
     troupeHash: options.troupeHash,
     isNativeDesktopApp: isNativeDesktopApp(req),
     permissions: options.permissions,
-    locale: req.i18n.locales[req.i18n.locale]
+    locale: req.i18n.locales[req.i18n.locale],
+    features: features
   }, extras);
 }
