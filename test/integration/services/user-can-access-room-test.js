@@ -16,7 +16,9 @@ var FIXTURES = [{
     roomGithubType: 'ORG_CHANNEL',
   },
   tests: [
-    { expectedResult: true },
+    { requestedPerm: 'read', expectedResult: true },
+    { requestedPerm: 'write', recentCheck: false, expectedResult: true },
+    { requestedPerm: 'write', recentCheck: true, expectedResult: true },
   ]
 }, {
   name: 'banned-users-never-get-access',
@@ -25,12 +27,18 @@ var FIXTURES = [{
     anonymous: false,
   },
   tests: [
-    { roomGithubType: 'ORG_CHANNEL', roomSecurity: 'PUBLIC', inRoom: true, expectedResult: false },
-    { roomGithubType: 'ORG_CHANNEL', roomSecurity: 'PUBLIC', inRoom: false, expectedResult: false },
-    { roomGithubType: 'REPO_CHANNEL', roomSecurity: 'PUBLIC', inRoom: true, expectedResult: false },
-    { roomGithubType: 'REPO_CHANNEL', roomSecurity: 'PUBLIC', inRoom: false, expectedResult: false },
-    { roomGithubType: 'REPO', roomSecurity: 'PUBLIC', inRoom: true, expectedResult: false },
-    { roomGithubType: 'REPO', roomSecurity: 'PUBLIC', inRoom: false, expectedResult: false },
+    { requestedPerm: 'read', roomGithubType: 'ORG_CHANNEL', roomSecurity: 'PUBLIC', inRoom: true, expectedResult: false },
+    { requestedPerm: 'read', roomGithubType: 'ORG_CHANNEL', roomSecurity: 'PUBLIC', inRoom: false, expectedResult: false },
+    { requestedPerm: 'read', roomGithubType: 'REPO_CHANNEL', roomSecurity: 'PUBLIC', inRoom: true, expectedResult: false },
+    { requestedPerm: 'read', roomGithubType: 'REPO_CHANNEL', roomSecurity: 'PUBLIC', inRoom: false, expectedResult: false },
+    { requestedPerm: 'read', roomGithubType: 'REPO', roomSecurity: 'PUBLIC', inRoom: true, expectedResult: false },
+    { requestedPerm: 'read', roomGithubType: 'REPO', roomSecurity: 'PUBLIC', inRoom: false, expectedResult: false },
+    { requestedPerm: 'write', roomGithubType: 'ORG_CHANNEL', roomSecurity: 'PUBLIC', inRoom: true, expectedResult: false },
+    { requestedPerm: 'write', roomGithubType: 'ORG_CHANNEL', roomSecurity: 'PUBLIC', inRoom: false, expectedResult: false },
+    { requestedPerm: 'write', roomGithubType: 'REPO_CHANNEL', roomSecurity: 'PUBLIC', inRoom: true, expectedResult: false },
+    { requestedPerm: 'write', roomGithubType: 'REPO_CHANNEL', roomSecurity: 'PUBLIC', inRoom: false, expectedResult: false },
+    { requestedPerm: 'write', roomGithubType: 'REPO', roomSecurity: 'PUBLIC', inRoom: true, expectedResult: false },
+    { requestedPerm: 'write', roomGithubType: 'REPO', roomSecurity: 'PUBLIC', inRoom: false, expectedResult: false },
   ]
 }, {
   name: 'anonymous-users-can-only-view-public-rooms',
@@ -40,17 +48,28 @@ var FIXTURES = [{
     recentCheck: false
   },
   tests: [
-    { roomGithubType: 'REPO', roomSecurity: 'PUBLIC', expectedResult: true },
-    { roomGithubType: 'REPO', roomSecurity: 'PRIVATE', expectedResult: false },
-    { roomGithubType: 'REPO_CHANNEL', roomSecurity: 'PUBLIC', expectedResult: true },
-    { roomGithubType: 'REPO_CHANNEL', roomSecurity: 'INHERITED', expectedResult: false },
-    { roomGithubType: 'REPO_CHANNEL', roomSecurity: 'PRIVATE', expectedResult: false },
-    { roomGithubType: 'ORG_CHANNEL', roomSecurity: 'PUBLIC', expectedResult: true },
-    { roomGithubType: 'ORG_CHANNEL', roomSecurity: 'INHERITED', expectedResult: false },
-    { roomGithubType: 'ORG_CHANNEL', roomSecurity: 'PRIVATE', expectedResult: false },
-    { roomGithubType: 'USER_CHANNEL', roomSecurity: 'PUBLIC', expectedResult: true },
-    { roomGithubType: 'USER_CHANNEL', roomSecurity: 'PRIVATE', expectedResult: false },
-    { roomGithubType: 'ORG', roomSecurity: null, expectedResult: false }
+    { requestedPerm: 'read', roomGithubType: 'REPO', roomSecurity: 'PUBLIC', expectedResult: true },
+    { requestedPerm: 'read', roomGithubType: 'REPO', roomSecurity: 'PRIVATE', expectedResult: false },
+    { requestedPerm: 'read', roomGithubType: 'REPO_CHANNEL', roomSecurity: 'PUBLIC', expectedResult: true },
+    { requestedPerm: 'read', roomGithubType: 'REPO_CHANNEL', roomSecurity: 'INHERITED', expectedResult: false },
+    { requestedPerm: 'read', roomGithubType: 'REPO_CHANNEL', roomSecurity: 'PRIVATE', expectedResult: false },
+    { requestedPerm: 'read', roomGithubType: 'ORG_CHANNEL', roomSecurity: 'PUBLIC', expectedResult: true },
+    { requestedPerm: 'read', roomGithubType: 'ORG_CHANNEL', roomSecurity: 'INHERITED', expectedResult: false },
+    { requestedPerm: 'read', roomGithubType: 'ORG_CHANNEL', roomSecurity: 'PRIVATE', expectedResult: false },
+    { requestedPerm: 'read', roomGithubType: 'USER_CHANNEL', roomSecurity: 'PUBLIC', expectedResult: true },
+    { requestedPerm: 'read', roomGithubType: 'USER_CHANNEL', roomSecurity: 'PRIVATE', expectedResult: false },
+    { requestedPerm: 'read', roomGithubType: 'ORG', roomSecurity: null, expectedResult: false },
+    { requestedPerm: 'write', roomGithubType: 'REPO', roomSecurity: 'PUBLIC', expectedResult: false },
+    { requestedPerm: 'write', roomGithubType: 'REPO', roomSecurity: 'PRIVATE', expectedResult: false },
+    { requestedPerm: 'write', roomGithubType: 'REPO_CHANNEL', roomSecurity: 'PUBLIC', expectedResult: false },
+    { requestedPerm: 'write', roomGithubType: 'REPO_CHANNEL', roomSecurity: 'INHERITED', expectedResult: false },
+    { requestedPerm: 'write', roomGithubType: 'REPO_CHANNEL', roomSecurity: 'PRIVATE', expectedResult: false },
+    { requestedPerm: 'write', roomGithubType: 'ORG_CHANNEL', roomSecurity: 'PUBLIC', expectedResult: false },
+    { requestedPerm: 'write', roomGithubType: 'ORG_CHANNEL', roomSecurity: 'INHERITED', expectedResult: false },
+    { requestedPerm: 'write', roomGithubType: 'ORG_CHANNEL', roomSecurity: 'PRIVATE', expectedResult: false },
+    { requestedPerm: 'write', roomGithubType: 'USER_CHANNEL', roomSecurity: 'PUBLIC', expectedResult: false },
+    { requestedPerm: 'write', roomGithubType: 'USER_CHANNEL', roomSecurity: 'PRIVATE', expectedResult: false },
+    { requestedPerm: 'write', roomGithubType: 'ORG', roomSecurity: null, expectedResult: false }
   ]
 }, {
   name: 'non-members-can-never-access-private-channels',
@@ -61,9 +80,12 @@ var FIXTURES = [{
     inRoom: false,
   },
   tests: [
-    { roomGithubType: 'REPO_CHANNEL', expectedResult: false },
-    { roomGithubType: 'USER_CHANNEL', expectedResult: false },
-    { roomGithubType: 'ORG_CHANNEL', expectedResult: false }
+    { requestedPerm: 'read', roomGithubType: 'REPO_CHANNEL', expectedResult: false },
+    { requestedPerm: 'read', roomGithubType: 'USER_CHANNEL', expectedResult: false },
+    { requestedPerm: 'read', roomGithubType: 'ORG_CHANNEL', expectedResult: false },
+    { requestedPerm: 'write', roomGithubType: 'REPO_CHANNEL', expectedResult: false },
+    { requestedPerm: 'write', roomGithubType: 'USER_CHANNEL', expectedResult: false },
+    { requestedPerm: 'write', roomGithubType: 'ORG_CHANNEL', expectedResult: false }
   ]
 }, {
   name: 'non-members-can-access-public-rooms',
@@ -72,12 +94,18 @@ var FIXTURES = [{
     anonymous: false,
     roomSecurity: 'PUBLIC',
     inRoom: false,
+    recentCheck: false,
+    roomPermissionsGrantsAccess: false
   },
   tests: [
-    { roomGithubType: 'REPO', expectedResult: true },
-    { roomGithubType: 'REPO_CHANNEL', expectedResult: true },
-    { roomGithubType: 'USER_CHANNEL', expectedResult: true },
-    { roomGithubType: 'ORG_CHANNEL', expectedResult: true }
+    { requestedPerm: 'read', roomGithubType: 'REPO', expectedResult: true },
+    { requestedPerm: 'read', roomGithubType: 'REPO_CHANNEL', expectedResult: true },
+    { requestedPerm: 'read', roomGithubType: 'USER_CHANNEL', expectedResult: true },
+    { requestedPerm: 'read', roomGithubType: 'ORG_CHANNEL', expectedResult: true },
+    { requestedPerm: 'write', roomGithubType: 'REPO', expectedResult: false },
+    { requestedPerm: 'write', roomGithubType: 'REPO_CHANNEL', expectedResult: false },
+    { requestedPerm: 'write', roomGithubType: 'USER_CHANNEL', expectedResult: false },
+    { requestedPerm: 'write', roomGithubType: 'ORG_CHANNEL', expectedResult: false }
   ]
 }, {
   name: 'members-can-access-private-channels',
@@ -88,9 +116,12 @@ var FIXTURES = [{
     inRoom: true,
   },
   tests: [
-    { roomGithubType: 'REPO_CHANNEL', expectedResult: true },
-    { roomGithubType: 'USER_CHANNEL', expectedResult: true },
-    { roomGithubType: 'ORG_CHANNEL', expectedResult: true }
+    { requestedPerm: 'read', roomGithubType: 'REPO_CHANNEL', expectedResult: true },
+    { requestedPerm: 'read', roomGithubType: 'USER_CHANNEL', expectedResult: true },
+    { requestedPerm: 'read', roomGithubType: 'ORG_CHANNEL', expectedResult: true },
+    { requestedPerm: 'write', roomGithubType: 'REPO_CHANNEL', expectedResult: true },
+    { requestedPerm: 'write', roomGithubType: 'USER_CHANNEL', expectedResult: true },
+    { requestedPerm: 'write', roomGithubType: 'ORG_CHANNEL', expectedResult: true }
   ]
 },{
   name: 'one-to-ones',
@@ -101,8 +132,10 @@ var FIXTURES = [{
     roomGithubType: 'ONETOONE',
   },
   tests: [
-    { inRoom: true, expectedResult: true },
-    { inRoom: false, expectedResult: false },
+    { requestedPerm: 'read', inRoom: true, expectedResult: true },
+    { requestedPerm: 'read', inRoom: false, expectedResult: false },
+        { requestedPerm: 'write', inRoom: true, expectedResult: true },
+    { requestedPerm: 'write', inRoom: false, expectedResult: false },
   ]
 },{
   name: 'user-is-member-of-github-backed-room-with-recent-check',
@@ -113,10 +146,14 @@ var FIXTURES = [{
     recentCheck: true,
   },
   tests: [
-    { roomGithubType: 'ORG_CHANNEL', security: 'INHERITED', expectedResult: true },
-    { roomGithubType: 'REPO_CHANNEL', security: 'INHERITED', expectedResult: true },
-    { roomGithubType: 'REPO', security: 'PRIVATE', expectedResult: true },
-    { roomGithubType: 'ORG', security: null, expectedResult: true },
+    { requestedPerm: 'read', roomGithubType: 'ORG_CHANNEL', security: 'INHERITED', expectedResult: true },
+    { requestedPerm: 'read', roomGithubType: 'REPO_CHANNEL', security: 'INHERITED', expectedResult: true },
+    { requestedPerm: 'read', roomGithubType: 'REPO', security: 'PRIVATE', expectedResult: true },
+    { requestedPerm: 'read', roomGithubType: 'ORG', security: null, expectedResult: true },
+    { requestedPerm: 'write', roomGithubType: 'ORG_CHANNEL', security: 'INHERITED', expectedResult: true },
+    { requestedPerm: 'write', roomGithubType: 'REPO_CHANNEL', security: 'INHERITED', expectedResult: true },
+    { requestedPerm: 'write', roomGithubType: 'REPO', security: 'PRIVATE', expectedResult: true },
+    { requestedPerm: 'write', roomGithubType: 'ORG', security: null, expectedResult: true },
   ]
 },{
   name: 'user-is-member-of-github-backed-room-without-recent-check-with-check-success',
@@ -128,10 +165,14 @@ var FIXTURES = [{
     roomPermissionsGrantsAccess: true
   },
   tests: [
-    { roomGithubType: 'ORG_CHANNEL', security: 'INHERITED', expectedResult: true },
-    { roomGithubType: 'REPO_CHANNEL', security: 'INHERITED', expectedResult: true },
-    { roomGithubType: 'REPO', security: 'PRIVATE', expectedResult: true },
-    { roomGithubType: 'ORG', security: null, expectedResult: true },
+    { requestedPerm: 'read', roomGithubType: 'ORG_CHANNEL', security: 'INHERITED', expectedResult: true },
+    { requestedPerm: 'read', roomGithubType: 'REPO_CHANNEL', security: 'INHERITED', expectedResult: true },
+    { requestedPerm: 'read', roomGithubType: 'REPO', security: 'PRIVATE', expectedResult: true },
+    { requestedPerm: 'read', roomGithubType: 'ORG', security: null, expectedResult: true },
+    { requestedPerm: 'write', roomGithubType: 'ORG_CHANNEL', security: 'INHERITED', expectedResult: true },
+    { requestedPerm: 'write', roomGithubType: 'REPO_CHANNEL', security: 'INHERITED', expectedResult: true },
+    { requestedPerm: 'write', roomGithubType: 'REPO', security: 'PRIVATE', expectedResult: true },
+    { requestedPerm: 'write', roomGithubType: 'ORG', security: null, expectedResult: true },
   ]
 },{
   name: 'user-is-member-of-github-backed-room-without-recent-check-with-check-throw',
@@ -143,10 +184,14 @@ var FIXTURES = [{
     roomPermissionsGrantsAccess: 'throw'
   },
   tests: [
-    { roomGithubType: 'ORG_CHANNEL', security: 'INHERITED', expectedResult: true },
-    { roomGithubType: 'REPO_CHANNEL', security: 'INHERITED', expectedResult: true },
-    { roomGithubType: 'REPO', security: 'PRIVATE', expectedResult: true },
-    { roomGithubType: 'ORG', security: null, expectedResult: true },
+    { requestedPerm: 'read', roomGithubType: 'ORG_CHANNEL', security: 'INHERITED', expectedResult: true },
+    { requestedPerm: 'read', roomGithubType: 'REPO_CHANNEL', security: 'INHERITED', expectedResult: true },
+    { requestedPerm: 'read', roomGithubType: 'REPO', security: 'PRIVATE', expectedResult: true },
+    { requestedPerm: 'read', roomGithubType: 'ORG', security: null, expectedResult: true },
+    { requestedPerm: 'write', roomGithubType: 'ORG_CHANNEL', security: 'INHERITED', expectedResult: true },
+    { requestedPerm: 'write', roomGithubType: 'REPO_CHANNEL', security: 'INHERITED', expectedResult: true },
+    { requestedPerm: 'write', roomGithubType: 'REPO', security: 'PRIVATE', expectedResult: true },
+    { requestedPerm: 'write', roomGithubType: 'ORG', security: null, expectedResult: true },
   ]
 },{
   name: 'user-is-member-of-github-backed-room-without-recent-check-with-check-failure',
@@ -159,10 +204,14 @@ var FIXTURES = [{
     expectRemoveRoomMember: true
   },
   tests: [
-    { roomGithubType: 'ORG_CHANNEL', security: 'INHERITED', expectedResult: false },
-    { roomGithubType: 'REPO_CHANNEL', security: 'INHERITED', expectedResult: false },
-    { roomGithubType: 'REPO', security: 'PRIVATE', expectedResult: false },
-    { roomGithubType: 'ORG', security: null, expectedResult: false },
+    { requestedPerm: 'read', roomGithubType: 'ORG_CHANNEL', security: 'INHERITED', expectedResult: false },
+    { requestedPerm: 'read', roomGithubType: 'REPO_CHANNEL', security: 'INHERITED', expectedResult: false },
+    { requestedPerm: 'read', roomGithubType: 'REPO', security: 'PRIVATE', expectedResult: false },
+    { requestedPerm: 'read', roomGithubType: 'ORG', security: null, expectedResult: false },
+    { requestedPerm: 'write', roomGithubType: 'ORG_CHANNEL', security: 'INHERITED', expectedResult: false },
+    { requestedPerm: 'write', roomGithubType: 'REPO_CHANNEL', security: 'INHERITED', expectedResult: false },
+    { requestedPerm: 'write', roomGithubType: 'REPO', security: 'PRIVATE', expectedResult: false },
+    { requestedPerm: 'write', roomGithubType: 'ORG', security: null, expectedResult: false },
   ]
 }];
 
@@ -180,6 +229,7 @@ describe('user-can-access-room', function() {
     var expectedResult = meta.expectedResult;
     var expectRemoveRoomMember = meta.expectRemoveRoomMember;
     var removeRoomMemberCount = 0;
+    var requestedPerm = meta.requestedPerm;
 
     var userId = anonymous ? null : "56587d431f74b2c84cecb8db";
     var troupeId = "56587cfb6628d29f4e8d150d";
@@ -267,7 +317,16 @@ describe('user-can-access-room', function() {
         './room-membership-service': roomMembershipService
       });
 
-      userCanAccessRoom.permissionToRead(userId, troupeId)
+      var func;
+      if (requestedPerm === 'read') {
+        func = userCanAccessRoom.permissionToRead;
+      } else if (requestedPerm === 'write') {
+        func = userCanAccessRoom.permissionToWrite;
+      } else {
+        return done(new Error('requestedPerm not set'));
+      }
+
+      func(userId, troupeId)
         .then(function(result) {
           if(expectedResult !== 'throw') {
             assert.strictEqual(result, expectedResult);
