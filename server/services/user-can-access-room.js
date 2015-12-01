@@ -20,7 +20,7 @@ var rateLimiter = dolph.rateLimiter({
 
 var RATE = 600; // Every 10 minutes do a full access check against GitHub
 
-function relaxedPermCheck(userId, roomId) {
+function relaxedPermCheck(userId, roomId, permission) {
   var d = Q.defer();
   rateLimiter(userId + ':' + roomId, RATE, function(err, count/*, ttl*/) {
     if (err) return d.reject(err);
@@ -32,7 +32,7 @@ function relaxedPermCheck(userId, roomId) {
       // No check required this time, user can stay
       if (!checkRequired) return true;
 
-      return permCheck(userId, roomId);
+      return permCheck(userId, roomId, permission);
     })
     .catch(function(err) {
       errorReporter(err, { roomId: roomId, userId: userId }, { module: 'user-can-access-room' });
