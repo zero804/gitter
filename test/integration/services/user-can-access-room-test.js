@@ -213,6 +213,61 @@ var FIXTURES = [{
     { requestedPerm: 'write', roomGithubType: 'REPO', security: 'PRIVATE', expectedResult: false },
     { requestedPerm: 'write', roomGithubType: 'ORG', security: null, expectedResult: false },
   ]
+},{
+  name: 'user-isnt-room-member-but-org-member-of-github-backed-room',
+  meta: {
+    banned: false,
+    anonymous: false,
+    inRoom: false,
+    roomPermissionsGrantsAccess: true,
+  },
+  tests: [
+    { requestedPerm: 'read', roomGithubType: 'ORG_CHANNEL', security: 'INHERITED', expectedResult: true },
+    { requestedPerm: 'read', roomGithubType: 'REPO_CHANNEL', security: 'INHERITED', expectedResult: true },
+    { requestedPerm: 'read', roomGithubType: 'REPO', security: 'PRIVATE', expectedResult: true },
+    { requestedPerm: 'read', roomGithubType: 'ORG', security: null, expectedResult: true },
+    { requestedPerm: 'write', roomGithubType: 'ORG_CHANNEL', security: 'INHERITED', expectedResult: true },
+    { requestedPerm: 'write', roomGithubType: 'REPO_CHANNEL', security: 'INHERITED', expectedResult: true },
+    { requestedPerm: 'write', roomGithubType: 'REPO', security: 'PRIVATE', expectedResult: true },
+    { requestedPerm: 'write', roomGithubType: 'ORG', security: null, expectedResult: true },
+  ]
+},{
+  name: 'user-isnt-room-member-but-org-member-of-github-backed-room-with-check-throw',
+  meta: {
+    banned: false,
+    anonymous: false,
+    inRoom: false,
+    roomPermissionsGrantsAccess: 'throw'
+  },
+  tests: [
+    { requestedPerm: 'read', roomGithubType: 'ORG_CHANNEL', security: 'INHERITED', expectedResult: 'throw' },
+    { requestedPerm: 'read', roomGithubType: 'REPO_CHANNEL', security: 'INHERITED', expectedResult: 'throw' },
+    { requestedPerm: 'read', roomGithubType: 'REPO', security: 'PRIVATE', expectedResult: 'throw' },
+    { requestedPerm: 'read', roomGithubType: 'ORG', security: null, expectedResult: 'throw' },
+    { requestedPerm: 'write', roomGithubType: 'ORG_CHANNEL', security: 'INHERITED', expectedResult: 'throw' },
+    { requestedPerm: 'write', roomGithubType: 'REPO_CHANNEL', security: 'INHERITED', expectedResult: 'throw' },
+    { requestedPerm: 'write', roomGithubType: 'REPO', security: 'PRIVATE', expectedResult: 'throw' },
+    { requestedPerm: 'write', roomGithubType: 'ORG', security: null, expectedResult: 'throw' },
+  ]
+},{
+  name: 'user-isnt-room-member-but-org-member-of-github-backed-room-with-check-failure',
+  meta: {
+    banned: false,
+    anonymous: false,
+    inRoom: false,
+    roomPermissionsGrantsAccess: false,
+    expectRemoveRoomMember: false
+  },
+  tests: [
+    { requestedPerm: 'read', roomGithubType: 'ORG_CHANNEL', security: 'INHERITED', expectedResult: false },
+    { requestedPerm: 'read', roomGithubType: 'REPO_CHANNEL', security: 'INHERITED', expectedResult: false },
+    { requestedPerm: 'read', roomGithubType: 'REPO', security: 'PRIVATE', expectedResult: false },
+    { requestedPerm: 'read', roomGithubType: 'ORG', security: null, expectedResult: false },
+    { requestedPerm: 'write', roomGithubType: 'ORG_CHANNEL', security: 'INHERITED', expectedResult: false },
+    { requestedPerm: 'write', roomGithubType: 'REPO_CHANNEL', security: 'INHERITED', expectedResult: false },
+    { requestedPerm: 'write', roomGithubType: 'REPO', security: 'PRIVATE', expectedResult: false },
+    { requestedPerm: 'write', roomGithubType: 'ORG', security: null, expectedResult: false },
+  ]
 }];
 
 var count = 0;
