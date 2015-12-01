@@ -314,7 +314,7 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
     findMarker = Q.resolve(null);
   }
 
-  var limit = options.limit || 50;
+  var limit = Math.min(options.limit || 50, 100);
   var skip = options.skip || 0;
 
   return findMarker
