@@ -11,7 +11,6 @@ var userService           = require('./user-service');
 var troupeService         = require('./troupe-service');
 var roomPermissionsModel  = require('./room-permissions-model');
 var roomMembershipService = require('./room-membership-service');
-var debug                 = require('debug')('gitter:user-can-access-room');
 var mongoUtils            = require('../utils/mongo-utils');
 
 var rateLimiter = dolph.rateLimiter({
@@ -21,42 +20,72 @@ var rateLimiter = dolph.rateLimiter({
 
 var RATE = 600; // Every 10 minutes do a full access check against GitHub
 
-function doFullAccessCheck(troupeId, userId) {
+/**
+ * checks permissions properly for one call in every 10 mins
+ * only use if permission has already been granted
+ */
+function goodFaithPermCheck(userId, roomId, permission) {
   var d = Q.defer();
-  rateLimiter(userId + ':' + troupeId, RATE, function(err, count/*, ttl*/) {
+  rateLimiter(userId + ':' + roomId, RATE, function(err, count/*, ttl*/) {
     if (err) return d.reject(err);
     d.resolve(count === 1);
   });
 
   return d.promise
     .then(function(checkRequired) {
-      if (!checkRequired) return true; // No check required
+      // No check required this time, user can stay
+      if (!checkRequired) return true;
 
-      debug('Full access check required.');
-      return Q.all([
-          userService.findById(userId),
-          troupeService.findById(troupeId)
-        ])
-        .spread(function(user, troupe) {
-          if (!user || !troupe) return false;
-          return roomPermissionsModel(user, 'join', troupe);
-        });
+      return permCheck(userId, roomId, permission);
     })
     .catch(function(err) {
-      errorReporter(err, { troupeId: troupeId, userId: userId }, { module: 'user-can-access-room' });
+      errorReporter(err, { roomId: roomId, userId: userId }, { module: 'user-can-access-room' });
       // Something is broken, let the user (who is already in the room) through for now
       return true;
     });
 }
 
-/**
- * Returns one of three options: null (for no access), 'view', 'member'
- */
-function userCanAccessRoom(userId, troupeId) {
-  if(!mongoUtils.isLikeObjectId(troupeId)) return Q.resolve(null);
-  userId = mongoUtils.asObjectID(userId);
-  troupeId = mongoUtils.asObjectID(troupeId);
+function permCheck(userId, roomId, permission) {
+  return Q.all([
+      userService.findById(userId),
+      troupeService.findById(roomId)
+    ])
+    .spread(function(user, room) {
+      if (!user || !room) return false;
 
+      return roomPermissionsModel(user, permission, room);
+    });
+}
+
+function isPrivateChannel(room) {
+  return room.security === 'PRIVATE' &&
+           (room.githubType === 'ORG_CHANNEL' ||
+            room.githubType === 'REPO_CHANNEL' ||
+            room.githubType === 'USER_CHANNEL');
+}
+
+function checkExpensivePerms(userId, roomId, permission, isInRoom) {
+  if (isInRoom) {
+    // we can be more relaxed in here as they have already passed
+    // as permissions check in the past
+    // We dont need to check github all the time
+    return goodFaithPermCheck(userId, roomId, permission)
+      .then(function(passes) {
+        if (passes) return true;
+
+        // This person no longer actually has access. Remove them!
+        return roomMembershipService.removeRoomMember(roomId, userId)
+          .then(function() {
+            return false;
+          });
+        });
+  } else {
+    // cant trust this user. we must be strict.
+    return permCheck(userId, roomId, permission);
+  }
+}
+
+function getLeanRoom(roomId, userId) {
   var query = {
     _id: 1,
     security: 1,
@@ -67,67 +96,70 @@ function userCanAccessRoom(userId, troupeId) {
     query.bans = { $elemMatch: { userId: userId } };
   }
 
-  return persistence.Troupe.findById(troupeId, query, { lean: true })
-    .exec()
-    .then(function(troupe) {
-      if (!troupe) return null;
+  return persistence.Troupe.findById(roomId, query, { lean: true }).exec();
+}
 
-      // Is the user banned from the room?
-      if (troupe.bans && troupe.bans.length) {
-        debug('User %s is banned from room %s, disallowing access', userId, troupeId);
-        return null;
+function checkIfBanned(leanRoom) {
+  return leanRoom.bans && leanRoom.bans.length;
+}
+
+function permissionToRead(userId, roomId) {
+  if(!mongoUtils.isLikeObjectId(roomId)) return Q.resolve(false);
+
+  userId = mongoUtils.asObjectID(userId);
+  roomId = mongoUtils.asObjectID(roomId);
+
+  return getLeanRoom(roomId, userId)
+    .then(function(leanRoom) {
+      if (!leanRoom) return false;
+
+      if (!userId) {
+        return leanRoom.security === 'PUBLIC';
       }
 
-      // No user? Only allow access to public rooms
-      if(!userId) {
-        return troupe.security === 'PUBLIC' ? 'view' : null;
-      }
+      if (checkIfBanned(leanRoom)) return false;
 
-      return roomMembershipService.checkRoomMembership(troupeId, userId)
+      if (leanRoom.security === 'PUBLIC') return true;
+
+      return roomMembershipService.checkRoomMembership(roomId, userId)
         .then(function(isInRoom) {
-          // if(troupe.security === 'PUBLIC' && isInRoom) return 'member';
 
-          if(troupe.security === 'PUBLIC') {
-            // TODO: when `writeAccessRequired` param is introduced, then
-            // we need to actually query for the member
-            return isInRoom ? 'member' : 'view';
+          if (leanRoom.githubType === 'ONETOONE' || isPrivateChannel(leanRoom)) {
+            return isInRoom;
           }
 
-          if(!isInRoom) {
-           debug("Denied user %s access to troupe %s", userId, troupe.uri);
-           return null;
-          }
-
-          var isChannel = troupe.githubType === 'ORG_CHANNEL' ||
-            troupe.githubType === 'REPO_CHANNEL' ||
-            troupe.githubType === 'USER_CHANNEL';
-
-          // No need to consult GitHub for private channels.
-          if (isChannel && troupe.security === 'PRIVATE') {
-            return 'member';
-          }
-
-          // Skip full-access check for one-to-one rooms
-          if (troupe.githubType === 'ONETOONE') {
-            return 'member';
-          }
-
-          return doFullAccessCheck(troupeId, userId)
-            .then(function(fullAccessCheckResult) {
-              if (!fullAccessCheckResult) {
-                // This person no longer actually has access. Remove them!
-                return roomMembershipService.removeRoomMember(troupeId, userId)
-                  .then(function() {
-                    return null;
-                  });
-              }
-
-              return 'member';
-            });
-
+          return checkExpensivePerms(userId, roomId, 'view', isInRoom);
         });
-
     });
 }
 
-module.exports = userCanAccessRoom;
+function permissionToWrite(userId, roomId) {
+  if(!mongoUtils.isLikeObjectId(roomId)) return Q.resolve(false);
+
+  userId = mongoUtils.asObjectID(userId);
+  roomId = mongoUtils.asObjectID(roomId);
+
+  if (!userId) return Q.resolve(false);
+
+  return getLeanRoom(roomId, userId)
+    .then(function(leanRoom) {
+      if (!leanRoom) return false;
+
+      if (checkIfBanned(leanRoom)) return false;
+
+      return roomMembershipService.checkRoomMembership(roomId, userId)
+        .then(function(isInRoom) {
+
+          if (leanRoom.githubType === 'ONETOONE' || isPrivateChannel(leanRoom)) {
+            return isInRoom;
+          }
+
+          return checkExpensivePerms(userId, roomId, 'join', isInRoom);
+        });
+    });
+}
+
+module.exports = {
+  permissionToRead: permissionToRead,
+  permissionToWrite: permissionToWrite
+};
