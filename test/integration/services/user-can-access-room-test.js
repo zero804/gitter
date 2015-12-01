@@ -268,6 +268,24 @@ var FIXTURES = [{
     { requestedPerm: 'write', roomGithubType: 'REPO', security: 'PRIVATE', expectedResult: false },
     { requestedPerm: 'write', roomGithubType: 'ORG', security: null, expectedResult: false },
   ]
+},{
+  name: 'fail-with-dodgy-room-id',
+  meta: {
+    roomId: 'not_a_room_id'
+  },
+  tests: [
+    { requestedPerm: 'read', expectedResult: false },
+    { requestedPerm: 'write', expectedResult: false }
+  ]
+},{
+  name: 'fail-with-no-room-id',
+  meta: {
+    roomId: null
+  },
+  tests: [
+    { requestedPerm: 'read', expectedResult: false },
+    { requestedPerm: 'write', expectedResult: false }
+  ]
 }];
 
 var count = 0;
@@ -287,7 +305,7 @@ describe('user-can-access-room', function() {
     var requestedPerm = meta.requestedPerm;
 
     var userId = anonymous ? null : "56587d431f74b2c84cecb8db";
-    var troupeId = "56587cfb6628d29f4e8d150d";
+    var troupeId = typeof meta.roomId === 'undefined' ? "56587cfb6628d29f4e8d150d" : meta.roomId;
 
     var testName = '#' + (++count) + ' ' +
       Object.keys(meta)
