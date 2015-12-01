@@ -20,7 +20,11 @@ var rateLimiter = dolph.rateLimiter({
 
 var RATE = 600; // Every 10 minutes do a full access check against GitHub
 
-function relaxedPermCheck(userId, roomId, permission) {
+/**
+ * checks permissions properly for one call in every 10 mins
+ * only use if permission has already been granted
+ */
+function goodFaithPermCheck(userId, roomId, permission) {
   var d = Q.defer();
   rateLimiter(userId + ':' + roomId, RATE, function(err, count/*, ttl*/) {
     if (err) return d.reject(err);
@@ -65,7 +69,7 @@ function checkExpensivePerms(userId, roomId, permission, isInRoom) {
     // we can be more relaxed in here as they have already passed
     // as permissions check in the past
     // We dont need to check github all the time
-    return relaxedPermCheck(userId, roomId, permission)
+    return goodFaithPermCheck(userId, roomId, permission)
       .then(function(passes) {
         if (passes) return true;
 
