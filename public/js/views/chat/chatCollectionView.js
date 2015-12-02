@@ -214,44 +214,16 @@ module.exports = (function() {
       this.listenTo(appEvents, 'chatCollectionView:scrollToChatId', this.scrollToChatId);
 
       //When we change room, scroll to the bottom of the chatCollection
-      // this.listenTo(context.troupe(), 'change:id', this.render, this);
+      this.listenTo(context.troupe(), 'change:id', function() {
+        this.scrollToBottom();
+      });
 
-      //listen for when the cache is constructed then stop listening to room change events
-      //this will stop a double render call
-      // this.listenTo(appEvents, 'chat-cache:ok', function(){
-      //   this.stopListening('chat-cache:ok');
-      //   this.stopListening(context.troupe());
-      // }, this);
-
-      // //when the collection changes re render
-      // this.listenTo(this.collection, 'collection:change', function() {
-      //
-      //   //render the new content
-      //   this.render();
-      //   this.scrollToBottom();
-      // }, this);
     },
 
     onTrackViewportCenter: function() {
       if (!this.isScrolledToBottom()) {
         var el = this.rollers.getMostCenteredElement();
         this.rollers.stable(el);
-      }
-    },
-
-    scrollToFirstUnreadBelow: function() {
-      // TODO: this won't work if we're not at the bottom
-      var contentFrame = document.querySelector(SCROLL_ELEMENT);
-
-      var unreadItems = contentFrame.querySelectorAll('.unread');
-      var viewportBottom = this.rollers.getScrollBottom() + 1;
-      var firstOffscreenElement = _.sortedIndex(unreadItems, viewportBottom, function(element) {
-        return element.offsetTop;
-      });
-
-      var element = unreadItems[firstOffscreenElement];
-      if (element) {
-        this.rollers.scrollToElement(element);
       }
     },
 

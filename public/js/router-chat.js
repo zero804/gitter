@@ -100,6 +100,7 @@ onready(function() {
       break;
 
       case 'change:room':
+        debug('changing room: %j', message.newTroupe);
         //destroy any modal views
         appView.dialogRegion.destroy();
 

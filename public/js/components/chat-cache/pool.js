@@ -3,6 +3,7 @@
 var Backbone = require('backbone');
 var _ = require('underscore');
 var Promise = require('bluebird');
+var debug = require('debug-proxy')('app:collection-pool');
 
 var DEFAULT_POOL_SIZE = 5;
 
@@ -35,6 +36,7 @@ Pool.prototype = {
     // If the item is already in the pool, just use it
     var slot = this.lookup[id];
     if (slot) {
+      debug('Pool hit %s', id);
       slot.access = Date.now();
       return slot.collection;
     }
@@ -43,6 +45,8 @@ Pool.prototype = {
     var emptySlot = this._findEmpty();
 
     if (emptySlot) {
+      debug('Pool miss, using empty slot for %s', id);
+
       emptySlot.model.set(idAttribute, id);
       emptySlot.access = Date.now();
       this.lookup[id] = emptySlot;
@@ -54,6 +58,8 @@ Pool.prototype = {
     var lruSlot = this._findLRU();
 
     var oldId = lruSlot.model.get(idAttribute);
+    debug('Pool miss, replacing slot %s with %s', oldId, id);
+
     delete this.lookup[oldId];
 
     lruSlot.model.set(idAttribute, id);
@@ -72,22 +78,31 @@ Pool.prototype = {
 
     var slot = this.lookup[id];
     if (slot) {
+      debug('Pool preload, collection %s already loaded', id);
       return;
     }
 
     // Try find an empty slot
     var emptySlot = this._findEmpty();
 
-    if (emptySlot) {
-      emptySlot.model.set(idAttribute, id);
-      emptySlot.access = accessTime || Date.now();
-
-      this.lookup[id] = emptySlot;
-      return new Promise(function(resolve) {
-        // TODO, do this better
-        emptySlot.collection.once('snapshot', resolve);
-      });
+    if (!emptySlot) {
+      debug('Pool preload, ignoring collection %s due to lack of slots', id);
+      return;
     }
+
+    debug('Pool preload, loading collection %s', id);
+
+    emptySlot.model.set(idAttribute, id);
+    emptySlot.access = accessTime || Date.now();
+
+    this.lookup[id] = emptySlot;
+    return new Promise(function(resolve) {
+      // TODO, do this better
+      emptySlot.collection.once('snapshot', function() {
+        debug('Pool preload, collection %s load complete', id);
+        resolve();
+      });
+    });
 
   },
 
