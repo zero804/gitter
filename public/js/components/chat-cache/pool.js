@@ -8,12 +8,10 @@ var debug = require('debug-proxy')('app:collection-pool');
 var DEFAULT_POOL_SIZE = 5;
 
 function Pool(Collection, options) {
-  this.Collection = Collection;
   this.idAttribute = options && options.idAttribute || "id";
   var size = this.size = options && options.size || DEFAULT_POOL_SIZE;
 
   // Initialize the pool with a fixed number of entries which will never change
-  var Collection = this.Collection;
   this.lookup = {};
   this.pool = _.chain(size)
     .range()
