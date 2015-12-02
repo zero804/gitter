@@ -12,7 +12,7 @@ var onready                = require('./utils/onready');
 var apiClient              = require('components/apiClient');
 var frameUtils             = require('./utils/frame-utils');
 var itemCollections        = require('collections/instances/integrated-items');
-var chatCollectionPool     = require('./components/chat-cache/chat-collection-pool');
+var chatCollection         = require('collections/instances/chats-cached');
 
 /* Set the timezone cookie */
 require('components/timezone-cookie');
@@ -120,12 +120,7 @@ onready(function() {
       break;
 
       case 'roomList':
-        //If we have chat caching turned on trigger it
-        //TODO remove when 100% of users have caching enabled
-        //JP 24/11/15
-        if(context.hasFeature('chat-cache')) {
-          chatCollectionPool(message.rooms);
-        }
+        appEvents.trigger('chat-cache:preload', message.rooms);
         break;
     }
   });
@@ -222,7 +217,7 @@ onready(function() {
     model: context.troupe(),
     template: false,
     el: 'body',
-    chatCollection: itemCollections.chats
+    chatCollection: chatCollection
   });
 
   appView.render();

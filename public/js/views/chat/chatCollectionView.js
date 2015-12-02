@@ -214,22 +214,22 @@ module.exports = (function() {
       this.listenTo(appEvents, 'chatCollectionView:scrollToChatId', this.scrollToChatId);
 
       //When we change room, scroll to the bottom of the chatCollection
-      this.listenTo(context.troupe(), 'change:id', this.render, this);
+      // this.listenTo(context.troupe(), 'change:id', this.render, this);
 
       //listen for when the cache is constructed then stop listening to room change events
       //this will stop a double render call
-      this.listenTo(appEvents, 'chat-cache:ok', function(){
-        this.stopListening('chat-cache:ok');
-        this.stopListening(context.troupe());
-      }, this);
+      // this.listenTo(appEvents, 'chat-cache:ok', function(){
+      //   this.stopListening('chat-cache:ok');
+      //   this.stopListening(context.troupe());
+      // }, this);
 
-      //when the collection changes re render
-      this.listenTo(this.collection, 'collection:change', function() {
-
-        //render the new content
-        this.render();
-        this.scrollToBottom();
-      }, this);
+      // //when the collection changes re render
+      // this.listenTo(this.collection, 'collection:change', function() {
+      //
+      //   //render the new content
+      //   this.render();
+      //   this.scrollToBottom();
+      // }, this);
     },
 
     onTrackViewportCenter: function() {
