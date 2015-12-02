@@ -23,10 +23,16 @@ function invokeChatPreload(pool, rooms) {
     .first(pool.size)
     .value();
 
-  Promise.each(ids, function(room) {
-    // Preload the rooms in sequence
-    return pool.preload(room.id, room.lastAccessTime);
-  });
+
+  // TODO: wait for initial snapshot to return rather than waiting for a
+  // predefined period of time
+  Promise.delay(1000)
+    .then(function() {
+      Promise.each(ids, function(room) {
+        // Preload the rooms in sequence
+        return pool.preload(room.id, room.lastAccessTime);
+      });
+    });
 }
 
 function create() {
