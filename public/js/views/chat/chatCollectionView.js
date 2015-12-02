@@ -452,6 +452,19 @@ module.exports = (function() {
       }
     },
 
+    onRender: function() {
+      if (!this.collection.length) return;
+      
+      var c = context();
+      var permalinkChatId = c.permalinkChatId;
+
+      if (permalinkChatId) {
+        this.highlightPermalinkChat(permalinkChatId);
+        delete c.permalinkChatId;
+      }
+
+    }
+
   });
 
   return ChatCollectionView;
