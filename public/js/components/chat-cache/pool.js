@@ -10,23 +10,23 @@ var DEFAULT_POOL_SIZE = 5;
 function Pool(Collection, options) {
   this.Collection = Collection;
   this.idAttribute = options && options.idAttribute || "id";
-  this.size = options && options.size || DEFAULT_POOL_SIZE;
-  this._init();
+  var size = this.size = options && options.size || DEFAULT_POOL_SIZE;
+
+  // Initialize the pool with a fixed number of entries which will never change
+  var Collection = this.Collection;
+  this.lookup = {};
+  this.pool = _.chain(size)
+    .range()
+    .map(function() {
+      var model = new Backbone.Model();
+      var collection = new Collection([], { contextModel: model, listen: true });
+      return { model: model, collection: collection, access: null };
+    })
+    .value();
+
 }
 
 Pool.prototype = {
-  _init: function() {
-    var pool = [];
-    for (var i = 0; i < this.size; i++) {
-      var model = new Backbone.Model();
-      var collection = new this.Collection([], { contextModel: model, listen: true });
-      pool.push({ model: model, collection: collection, access: null });
-    }
-
-    this.lookup = {};
-    this.pool = pool;
-  },
-
   /**
    * Returns a collection for the given id
    */
