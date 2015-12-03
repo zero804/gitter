@@ -46,15 +46,15 @@ function create() {
     });
   }
 
+  initialPromise.then(function() {
+    //request the room list from the parent application
+    frameUtils.postMessage({ type: 'request:roomList' });
 
-  //request the room list from the parent application
-  frameUtils.postMessage({ type: 'request:roomList' });
-
-  appEvents.once('chat-cache:preload', function(rooms) {
-    initialPromise.then(function() {
+    appEvents.once('chat-cache:preload', function(rooms) {
       invokeChatPreload(pool, rooms);
     });
   });
+
 
   return chatCollection;
 }
