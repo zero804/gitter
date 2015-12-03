@@ -41,7 +41,11 @@ var MiniBarView = Marionette.ItemView.extend({
     var nextActiveModel = this.roomMenuItemModels.where({ type: type })[0];
     nextActiveModel.set('active', true);
 
-    this.model.set('panelOpenState', true);
+    this.model.set({
+      panelOpenState: true,
+      state: type,
+      profileMenuOpenState:  (type !== 'all'),
+    });
   },
 
   onPanelStateChange: function(model, state) {/*jshint unused:true */

@@ -25,15 +25,25 @@ describe('MinibarView', function() {
     innerEl2.dataset.stateChange = 'search';
     el.appendChild(innerEl2);
 
-    model = new Backbone.Model({ panelOpenState: true });
+    model = new Backbone.Model({
+      panelOpenState: false,
+      state: 'all',
+      profileMenuOpenState: false
+    });
 
     miniBar = new MiniBarView({ el: el, model: model });
   });
 
-  it.skip('should set the panelOpenState when clicked', function(done) {
+  it('should set the correct model attributes when a click is triggered', function() {
     assert.ok(!model.get('panelOpenState'));
-    miniBar.roomMenuItems[0].trigger('change:panelStateOpen', 'search');
-    assert.ok(!model.get('panelOpenState'));
+    assert.equal('all', model.get('state'));
+    assert.ok(!model.get('profileMenuOpenState'));
+
+    miniBar.roomMenuItems[0].trigger('room-item-view:clicked', 'search');
+
+    assert.ok(model.get('panelOpenState'));
+    assert.equal('search', model.get('state'));
+    assert.ok(model.get('profileMenuOpenState'));
   });
 
   it('should create child views for each child element with the correct dataset', function() {
@@ -51,6 +61,7 @@ describe('MinibarView', function() {
   });
 
   it('should remove all active models when panelOpenState changes to false', function() {
+    miniBar.model.set('panelOpenState', true);
     miniBar.model.set('panelOpenState', false);
     assert.equal(0, miniBar.roomMenuItemModels.where({ active: true }));
   });
