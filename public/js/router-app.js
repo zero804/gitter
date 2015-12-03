@@ -157,6 +157,7 @@ onready(function() {
   var appLayout = new AppLayout({
     template: false,
     el: 'body',
+    roomCollection: troupeCollections.troupes
   });
   appLayout.render();
 
