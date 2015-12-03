@@ -218,6 +218,7 @@ module.exports = (function() {
     onRoomChange: function() {
       //hide the view so we don't see collaborators from previous rooms
       this.$el.hide();
+      appEvents.trigger('collaboratorsView:hide');
 
       //fetch if we need to
       if (this.shouldFetch()) return this.collection.fetch();
@@ -276,10 +277,12 @@ module.exports = (function() {
     render: function() {
       if (!this.shouldRender()) {
         this.$el.hide();
+        appEvents.trigger('collaboratorsView:hide');
         return this;
       } else {
         Marionette.CompositeView.prototype.render.apply(this, arguments);
         this.$el.show();
+        appEvents.trigger('collaboratorsView:show');
       }
 
       return this;

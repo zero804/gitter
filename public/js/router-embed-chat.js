@@ -1,11 +1,11 @@
 "use strict";
 
-var onready = require('./utils/onready');
-var context = require('utils/context');
-var itemCollections = require('collections/instances/integrated-items');
-var EmbedLayout = require('views/layouts/chat-embed');
-var Backbone   = require('backbone');
-var apiClient  = require('components/apiClient');
+var onready         = require('./utils/onready');
+var context         = require('utils/context');
+var chatCollection  = require('collections/instances/chats');
+var EmbedLayout     = require('views/layouts/chat-embed');
+var Backbone        = require('backbone');
+var apiClient       = require('components/apiClient');
 
 
 
@@ -30,7 +30,7 @@ onready(function() {
     },
 
     autojoin: function() {
-      apiClient.post('/v1/rooms/' + context.getTroupeId() + '/users', {username: context().user.username})
+      apiClient.post('/v1/rooms/' + context.getTroupeId() + '/users', { username: context().user.username })
       .then(function(res) {
         context.troupe().set('roomMember', true);
       });
@@ -40,10 +40,10 @@ onready(function() {
   var router = new Router();
 
   var appView = new EmbedLayout({
-    el: 'body', 
-    model: context.troupe(), 
-    template: false, 
-    chatCollection: itemCollections.chats 
+    el: 'body',
+    model: context.troupe(),
+    template: false,
+    chatCollection: chatCollection
   });
   appView.render();
 
