@@ -4,6 +4,7 @@ var appEvents = require('utils/appevents');
 var context = require('utils/context');
 var Backbone = require('backbone');
 var itemCollections = require('collections/instances/integrated-items');
+var chatCollection  = require('collections/instances/chats');
 var PeopleModal = require('views/modals/people-modal');
 var onready = require('./utils/onready');
 var frameUtils = require('./utils/frame-utils');
@@ -40,7 +41,7 @@ onready(function() {
     frameUtils.postMessage({ type: 'permalink.requested', url: url, permalinkType: type, id: id });
   });
 
-  var appView = new ChatToolbarLayout({ template: false, el: 'body', chatCollection: itemCollections.chats });
+  var appView = new ChatToolbarLayout({ template: false, el: 'body', chatCollection: chatCollection });
   appView.render();
 
   var Router = Backbone.Router.extend({
