@@ -23,12 +23,6 @@ module.exports = Marionette.LayoutView.extend({
             unreadItemsClient.monitorViewForUnreadItems(this.options.monitorScrollPane, chatCollectionView);
           }
 
-          var c = context();
-          if (c.permalinkChatId) {
-            chatCollectionView.highlightPermalinkChat(c.permalinkChatId);
-            delete c.permalinkChatId;
-          }
-
           return chatCollectionView;
         }
       }
