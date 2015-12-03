@@ -53,8 +53,11 @@ function UserProfileStrategy(options) {
     }
 
     // all the non-standard stuff along with "provider" goes in identities/
-    profile.identities = user.profiles.map(function(p) {
-      return _.omit(p, STANDARD_ATTRIBUTES)
+    user.profiles.forEach(function(p) {
+      var providerFields = _.omit(p, STANDARD_ATTRIBUTES.concat(['provider']));
+      if (!_.isEmpty(providerFields)) {
+        profile[p.provider] = providerFields;
+      }
     });
 
     return profile;

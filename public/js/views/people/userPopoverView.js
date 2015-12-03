@@ -65,11 +65,6 @@ module.exports = (function() {
       data.chatPrivately = chatPrivately;
       data.mentionable = mentionable;
       data.removable = removable;
-      if (data.identities) {
-        data.identities.forEach(function(identity) {
-          data[identity.provider] = _.omit(identity, 'provider');
-        });
-      }
       data.loaded = !!this.model.loaded;
       return data;
     }
