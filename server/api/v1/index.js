@@ -9,8 +9,7 @@ var router = express.Router({ caseSensitive: true, mergeParams: true });
 
 router.use('/user', authMiddleware);
 router.use('/rooms', authMiddleware);
-// TODO: close this gap. Just leaving it commented for testing for now.
-//router.use('/users', authMiddleware);
+router.use('/users', authMiddleware);
 
 var userResources = resourceRoute('api-user', require('./user'));
 var roomsResources = resourceRoute('api-rooms', require('./rooms'));
