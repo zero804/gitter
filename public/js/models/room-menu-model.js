@@ -19,7 +19,7 @@ module.exports = Backbone.Model.extend({
   defaults:         {
     state:          'all',
     searchTerm:     '',
-    panelOpenState: false
+    panelOpenState: false,
   },
 
   initialize: function(attrs) {
@@ -65,7 +65,7 @@ module.exports = Backbone.Model.extend({
     this.trigger('change:state:post', this.get('state'));
   },
 
-  setState: function (type){
+  setState: function(type) {
     this.onStateChangeCalled(type);
   },
 
