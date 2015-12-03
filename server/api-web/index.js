@@ -26,4 +26,12 @@ router.get('/features/:name/:action',
   featureToggles,
   fflip.express_route);
   
+router.post('/features/:name/:action',
+  featureToggles,
+  fflip.express_route);
+
+router.get('/features/',
+  featureToggles,
+  require('./feature-list'));
+
 module.exports = router;

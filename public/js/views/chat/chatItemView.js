@@ -307,7 +307,7 @@ module.exports = (function() {
     },
 
     isOwnMessage: function() {
-      if (this.model.get('fromUser') === null) return false;
+      if (!this.model.get('fromUser')) return false;
       return this.model.get('fromUser').id === context.getUserId();
     },
 
