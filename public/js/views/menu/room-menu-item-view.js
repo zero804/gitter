@@ -23,7 +23,8 @@ module.exports = Marionette.ItemView.extend({
     }
   },
 
-  onItemClicked: function() {
+  onItemClicked: function(e) {
+    e.preventDefault();
     this.trigger('room-item-view:clicked', this.$el.data('state-change'));
   },
 

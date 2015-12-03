@@ -23,9 +23,10 @@
     {{/each}}
 
   </head>
-  <body class='hover'>
+  <body class='hover desktop application-container'>
     {{> staging_marker}}
 
+    {{{ prerenderView "js/views/menu/tmpl/room-menu" }}}
     <div class="app-layout">
 
       <div id="iframe-region" class="iframe-region">

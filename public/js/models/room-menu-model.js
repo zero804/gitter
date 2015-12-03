@@ -1,7 +1,7 @@
 'use strict';
 
 var Backbone        = require('backbone');
-var _               = require('lodash');
+var _               = require('underscore');
 var ProxyCollection = require('backbone-proxy-collection');
 
 var states = [

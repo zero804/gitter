@@ -1,6 +1,8 @@
 "use strict";
-var Marionette = require('backbone.marionette');
+var Marionette  = require('backbone.marionette');
 var modalRegion = require('components/modal-region');
+var RoomMenu    = require('views/menu/room-menu-view');
+var appEvents   = require('utils/appevents');
 
 require('views/behaviors/isomorphic');
 
@@ -15,6 +17,7 @@ module.exports = (function () {
 
     behaviors: {
       Isomorphic: {
+        roomMenu: { el: '#room-menu-container', init: 'initMenuRegion' }
       }
     },
 
@@ -22,8 +25,16 @@ module.exports = (function () {
       "keydown": "onKeyDown"
     },
 
-    initialize: function () {
+    initialize: function (options) {
+      this.roomCollection = options.roomCollection;
       this.dialogRegion = modalRegion;
+    },
+
+    initMenuRegion: function (optionsForRegion){
+      return new RoomMenu(optionsForRegion({
+        bus: appEvents,
+        roomCollection: this.roomCollection
+      }));
     },
 
     onKeyDown: function(e) {

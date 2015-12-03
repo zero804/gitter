@@ -2,97 +2,132 @@
 @import "./panel-header-view";
 @import "./primary-collection-item-view";
 @import "./profile-menu";
+@import "./seach-input-view";
+
+//TODO FIGURE OUT WHY THIS IS NEEDED:
+html {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
 
 .mobile {
   .room-menu-container {
-    position:   relative;
-    width:      @mobile-menu-width;
-    height:     100%;
-    background: @menu-bg;
-    z-index:    101;
-  }
-
-  .room-menu {
-    height:   100%;
-    position: relative;
-    z-index:  2;
-  }
-
-  .minibar {
-    position:   relative;
-    width:      100%;
-    height:     100%;
-    z-index:    1;
-    background: @menu-bg;
+    width: @mobile-menu-width;
   }
 
   .room-menu__panel {
-    box-sizing:   border-box;
-    position:     absolute;
-    top:          0;
-    left:         0;
-    width:        100vw;
-    height:       100%;
-    padding-left: 100%;
-    background:   #333132;
-    transform:    translateX(-100%);
-    transition:   transform .2s linear;
-
-    &.active {
-      transform: translateX(0);
-    }
+    width: 100vw;
   }
-
-  .room-menu-options {
-    list-style: none;
-    margin-left: 0;
-  }
-
-  .room-menu-options__item {
-    height:      @header-height;
-    color:       white;
-    line-height: @header-height;
-    text-align:  center;
-
-    & a {
-      color: inherit;
-    }
-  }
-
-  .room-menu-options__item--home {
-    .room-menu-options__item;
-    background: black;
-
-    &.active {
-      background: @ruby;
-    }
-  }
-
-  .room-menu-options__item--search {
-    .room-menu-options__item;
-    background: #131314;
-
-    &.active {
-      background: @jaffa;
-    }
-  }
-
-  .room-menu-options__item--people {
-    .room-menu-options__item;
-    background: #1f1f1f;
-
-    &.active {
-      background: @people-bg;
-    }
-  }
-
-  .room-menu-options__item--favourite {
-    .room-menu-options__item;
-    background: #1a191b;
-
-    &.active {
-      background: @caribbean;
-    }
-  }
-
 }
+
+.desktop {
+  .room-menu-container {
+    width: @desktop-menu-width;
+  }
+
+  .room-menu__panel {
+    width: 35vw;
+  }
+}
+
+.room-menu-container {
+  position:   relative;
+  height:     100%;
+  background: @menu-bg;
+  z-index:    101;
+}
+
+.room-menu {
+  height:   100%;
+  position: relative;
+  z-index:  2;
+}
+
+.minibar {
+  position:   relative;
+  width:      100%;
+  height:     100%;
+  z-index:    1;
+  background: @menu-bg;
+}
+
+.room-menu__panel {
+  box-sizing:   border-box;
+  position:     absolute;
+  top:          0;
+  left:         0;
+  height:       100%;
+  padding-left: 100%;
+  background:   #333132;
+  transform:    translateX(-100%);
+  transition:   transform .2s linear;
+
+  &.active {
+    transform: translateX(0);
+  }
+}
+
+.room-menu-options {
+  list-style: none;
+  margin-left: 0;
+}
+
+.room-menu-options__item {
+  height:      @header-height;
+  color:       white;
+  line-height: @header-height;
+  text-align:  center;
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  & a {
+    color: inherit;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+}
+
+.room-menu-options__item--home {
+  .room-menu-options__item;
+  background: black;
+
+  &.active {
+    background: @ruby;
+  }
+}
+
+.room-menu-options__item--search {
+  .room-menu-options__item;
+  background: #131314;
+
+  &.active {
+    background: @jaffa;
+  }
+}
+
+.room-menu-options__item--people {
+  .room-menu-options__item;
+  background: #1f1f1f;
+
+  &.active {
+    background: @people-bg;
+  }
+}
+
+.room-menu-options__item--favourite {
+  .room-menu-options__item;
+  background: #1a191b;
+
+  &.active {
+    background: @caribbean;
+  }
+}
+

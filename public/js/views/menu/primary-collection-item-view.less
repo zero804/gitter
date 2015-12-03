@@ -1,6 +1,27 @@
+@import "trp3Vars";
+
+.desktop {
+  .room-item__title {
+    font-size: 2rem;
+  }
+}
+
 .room-item {
-  height: @header-height;
-  padding-left: @menu-left-padding;
+  display:        flex;
+  flex-direction: row;
+  height:         @header-height;
+  padding-left:   @menu-left-padding;
+  align-items:    center;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.room-item__avatar {
+  width:       auto;
+  height:      2rem;
+  margin-right: @menu-left-padding;
 }
 
 .room-item__title {
@@ -8,4 +29,17 @@
   font-weight: 200;
   line-height: @header-height;
   color:       @menu-item-color;
+}
+
+.room-item__unread {
+  background:    black;
+  border-radius: 100%;
+  height:        @menu-unread-badge-size;
+  width:         @menu-unread-badge-size;
+  margin-left:   auto;
+  margin-right:  @menu-left-padding;
+  font-size:     1.1rem;
+  line-height:   @menu-unread-badge-size;
+  text-align:    center;
+  color:         white;
 }
