@@ -6,13 +6,15 @@ var Q = require('q');
 var qlimit = require('qlimit');
 var limit = qlimit(2); // ?
 
+// TODO: if I require this at the top, then it comes back as {}
+var BackendResolver = require('../../services/backend-resolver');
+console.log(BackendResolver);
+
 var STANDARD_ATTRIBUTES = ['company', 'location', 'email', 'website', 'profile'];
 
 function UserProfileStrategy(options) {
   options = options ? options : {};
 
-  // TODO: if I require this at the top, then it comes back as {}
-  var BackendResolver = require('../../services/backend-resolver');
 
   this.preload = function(users, callback) {
     // pre-fill the cache
