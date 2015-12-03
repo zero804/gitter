@@ -12,6 +12,7 @@ var onready                = require('./utils/onready');
 var apiClient              = require('components/apiClient');
 var frameUtils             = require('./utils/frame-utils');
 var itemCollections        = require('collections/instances/integrated-items');
+var chatCollection         = require('collections/instances/chats-cached');
 
 /* Set the timezone cookie */
 require('components/timezone-cookie');
@@ -24,6 +25,7 @@ require('template/helpers/all');
 require('components/eyeballs');
 require('components/bug-reporting');
 require('components/focus-events');
+
 
 // Preload widgets
 require('components/ping');
@@ -98,6 +100,7 @@ onready(function() {
       break;
 
       case 'change:room':
+        debug('changing room: %j', message.newTroupe);
         //destroy any modal views
         appView.dialogRegion.destroy();
 
@@ -116,6 +119,10 @@ onready(function() {
         context.troupe().set('aboutToLeave', true);
 
       break;
+
+      case 'roomList':
+        appEvents.trigger('chat-cache:preload', message.rooms);
+        break;
     }
   });
 
@@ -211,7 +218,7 @@ onready(function() {
     model: context.troupe(),
     template: false,
     el: 'body',
-    chatCollection: itemCollections.chats
+    chatCollection: chatCollection
   });
 
   appView.render();

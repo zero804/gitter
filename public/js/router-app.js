@@ -1,4 +1,4 @@
-/* jshint maxcomplexity:17 */
+/* jshint maxcomplexity:18 */
 'use strict';
 require('utils/initial-setup');
 
@@ -19,6 +19,8 @@ var SPARoomSwitcher       = require('components/spa-room-switcher');
 var debug                 = require('debug-proxy')('app:router-app');
 var urlParser             = require('./utils/url-parser');
 var linkHandler           = require('./components/link-handler');
+var roomListGenerator     = require('./components/chat-cache/room-list-generator');
+
 
 require('components/statsc');
 require('views/widgets/preload');
@@ -27,6 +29,8 @@ require('components/desktopNotifications');
 require('template/helpers/all');
 require('components/bug-reporting');
 require('components/focus-events');
+
+
 require('utils/tracking');
 require('components/ping');
 
@@ -57,6 +61,24 @@ onready(function() {
    */
   window.history.replaceState(chatIFrame.src, '', window.location.href);
 
+  function initChatCache() {
+    //if we don't have any troupes in the troupeCollection
+    //wait for it to sync before posting the message
+    if(!troupeCollections.troupes.length) {
+      troupeCollections.troupes.once('sync', function(){
+        postMessage({
+          type: 'roomList',
+          rooms: roomListGenerator(troupeCollections.troupes),
+        });
+      });
+    }
+    else {
+      postMessage({
+        type: 'roomList',
+        rooms: roomListGenerator(troupeCollections.troupes),
+      });
+    }
+  }
 
   function getContentFrameLocation() {
     var contentFrame = document.querySelector('#content-frame');
@@ -223,6 +245,11 @@ onready(function() {
       case 'route':
         window.location.hash = '#' + message.hash;
       break;
+
+      //when the chat app requests the room list send it
+      case 'request:roomList':
+        initChatCache();
+        break;
 
       case 'unreadItemsCount':
         var count = message.count;
@@ -454,4 +481,5 @@ onready(function() {
       });
     });
   }
+
 });
