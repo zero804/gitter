@@ -179,7 +179,7 @@ var webpackConfig = {
 
 if(devMode) {
   // See http://webpack.github.io/docs/configuration.html#devtool
-  webpackConfig.devtool = 'cheap-eval-source-map';
+  webpackConfig.devtool = 'cheap-source-map';
   webpackConfig.cache = true;
 } else {
   webpackConfig.devtool = 'source-map';
