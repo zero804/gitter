@@ -375,7 +375,4 @@ onready(function() {
   liveContext.syncRoom();
 
   Backbone.history.start();
-
-  //request the room list from the parent application
-  frameUtils.postMessage({ type: 'request:roomList' });
 });
