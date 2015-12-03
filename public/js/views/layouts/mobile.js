@@ -4,7 +4,7 @@ var context           = require('utils/context');
 var Marionette        = require('backbone.marionette');
 var modalRegion       = require('components/modal-region');
 var ChatContainerView = require('views/chat/chatContainerView');
-var RoomMenuView      = require('../menu/room-menu-view');
+var RoomMenuLayout    = require('../menu/room/layout/room-menu-layout');
 var appEvents         = require('utils/appevents');
 
 /* Decorators */
@@ -82,7 +82,7 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   initMenuRegion: function(optionsForRegion) {
-    return new RoomMenuView(optionsForRegion({
+    return new RoomMenuLayout(optionsForRegion({
       bus: appEvents,
       roomCollection: this.roomCollection
     }));

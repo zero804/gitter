@@ -21,6 +21,8 @@ module.exports = {
       cocktail: path.resolve(__dirname, '../../public/repo/cocktail/cocktail.js'),
       'backbone-sorted-collection': path.resolve(__dirname, '../../public/repo/backbone-sorted-collection/backbone-sorted-collection.js'),
       'bootstrap_tooltip': path.resolve(__dirname, '../../public/js/utils/tooltip.js'),
+      'public': path.resolve(__dirname, '../../public'),
+      'fixtures': path.resolve(__dirname, './fixtures'),
     },
   },
 };

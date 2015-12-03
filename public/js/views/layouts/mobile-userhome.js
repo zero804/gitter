@@ -6,7 +6,7 @@ var UserhomeView = require('views/userhome/userHomeView');
 var appEvents    = require('../../utils/appevents.js');
 //TODO Move this into the upper js container
 var troupes      = require('../../collections/instances/troupes').troupes;
-var RoomMenuView = require('../menu/room-menu-view');
+var RoomMenuLayout = require('../menu/room/layout/room-menu-layout');
 
 require('views/behaviors/isomorphic');
 
@@ -30,7 +30,7 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   initMenuRegion: function(optionsForRegion) {
-    return new RoomMenuView(optionsForRegion({ bus: appEvents, roomCollection: troupes }));
+    return new RoomMenuLayout(optionsForRegion({ bus: appEvents, roomCollection: troupes }));
   }
 
 });
