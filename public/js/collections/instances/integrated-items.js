@@ -11,7 +11,6 @@ require('components/realtime-troupe-listener');
 var rosterCollection        = new userModels.RosterCollection(null, { listen: true });
 var eventCollection         = new eventModels.EventCollection(null,  { listen: true, snapshot: true });
 
-// chatCollection.on('error', errorHandle.bind(null, 'chat-collection'));
 rosterCollection.on('error', errorHandle.bind(null, 'roster-collection'));
 eventCollection.on('error', errorHandle.bind(null, 'events-collection'));
 
