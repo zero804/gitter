@@ -13,11 +13,13 @@ router.use('/users', authMiddleware);
 
 var userResources = resourceRoute('api-user', require('./user'));
 var roomsResources = resourceRoute('api-rooms', require('./rooms'));
-var usersResources = resourceRoute('api-user', require('./users'));
 
 router.use('/user', userResources);
 router.use('/rooms', roomsResources);
-router.use('/users', usersResources);
+
+router.use('/users/:username',
+  identifyRoute('user-profile'),
+  require('./user-profile'));
 
 // APN has no auth requirement as user may not have authenticated
 // and this is used for devices without users
