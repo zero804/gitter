@@ -7,6 +7,26 @@ var debug = require('debug-proxy')('app:collection-pool');
 
 var DEFAULT_POOL_SIZE = 5;
 
+/**
+ * This is a fairly generic collection pool component, designed to work with
+ * live collections that have context models.
+ *
+ * The pool holds a fixed number of live collections. These collections
+ * have the same life-cycle as the pool itself, but are changed to point
+ * at different channels by manipulating the contextModel of the collections.
+ *
+ * This approach means that the complexity of subscribing, unsubscribing,
+ * listening and unlistening is removed from the component.
+ *
+ * The pool has two public operations.
+ * * `get`: returns a reference to the collection with the given id.
+ *              This may mean reusing an existing collection if there are
+ *              no empty slots.
+ *   `preload`: returns a promise of a collection once it's fully loaded
+ *              Importantly, it will never reuse an existing slot. It will
+ *              simply igonore the preload request if no more slots
+ *              are available.          
+ */
 function Pool(Collection, options) {
   this.idAttribute = options && options.idAttribute || "id";
   var size = this.size = options && options.size || DEFAULT_POOL_SIZE;
