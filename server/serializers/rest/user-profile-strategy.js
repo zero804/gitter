@@ -8,7 +8,6 @@ var limit = qlimit(2); // ?
 
 // TODO: if I require this at the top, then it comes back as {}
 var BackendResolver = require('../../services/backend-resolver');
-console.log(BackendResolver);
 
 var STANDARD_ATTRIBUTES = ['company', 'location', 'email', 'website', 'profile'];
 
