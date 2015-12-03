@@ -1,7 +1,7 @@
 "use strict";
 var Marionette  = require('backbone.marionette');
 var modalRegion = require('components/modal-region');
-var RoomMenu    = require('views/menu/room-menu-view');
+var RoomMenuLayout    = require('../menu/room/layout/room-menu-layout');
 var appEvents   = require('utils/appevents');
 
 require('views/behaviors/isomorphic');
@@ -17,7 +17,7 @@ module.exports = (function () {
 
     behaviors: {
       Isomorphic: {
-        roomMenu: { el: '#room-menu-container', init: 'initMenuRegion' }
+        RoomMenuLayout: { el: '#room-menu-container', init: 'initMenuRegion' }
       }
     },
 
@@ -31,7 +31,7 @@ module.exports = (function () {
     },
 
     initMenuRegion: function (optionsForRegion){
-      return new RoomMenu(optionsForRegion({
+      return new RoomMenuLayout(optionsForRegion({
         bus: appEvents,
         roomCollection: this.roomCollection
       }));
