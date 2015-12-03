@@ -1,7 +1,6 @@
 'use strict';
 
 var gitHubEmailAddressService = require('./github-email-address-service');
-var restSerializer = require("../../serializers/rest-serializer");
 var GithubMe = require('gitter-web-github').GitHubMeService;
 var Mirror = require('gitter-web-github').GitHubMirrorService('user');
 var Q = require('q');
@@ -21,6 +20,9 @@ GitHubBackend.prototype.getSerializedOrgs = function() {
   return ghUser.getOrgs()
     .then(function(ghOrgs) {
       var strategyOptions = { currentUserId: user.id };
+      // TODO: if this is imported at the top level, then it causes an
+      // elaborate circular dependency
+      var restSerializer = require("../../serializers/rest-serializer");
       var strategy = new restSerializer.GithubOrgStrategy(strategyOptions);
       return restSerializer.serializeExcludeNulls(ghOrgs, strategy);
     });
@@ -39,8 +41,6 @@ GitHubBackend.prototype.getProfile = function() {
   return mirror.get(githubUri)
     .then(function(body) {
       if (!body || !body.login) return profile;
-
-      console.log(body);
 
       var blogUrl;
       if (body.blog) {
@@ -62,8 +62,6 @@ GitHubBackend.prototype.getProfile = function() {
       profile.followers = body.followers;
       profile.public_repos = body.public_repos;
       profile.following = body.following;
-
-      console.log(profile);
 
       return profile;
     })
