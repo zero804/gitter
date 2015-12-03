@@ -16,7 +16,7 @@ function UserProfileStrategy(options) {
 
   this.preload = function(users, callback) {
     // pre-fill the cache
-    return identityService.findByUsers(users)
+    return identityService.preloadForUsers(users)
       .then(function() {
         return Q.all(users.map(limit(function(user) {
           var backendResolver = new BackendResolver(user);

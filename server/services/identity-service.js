@@ -22,8 +22,7 @@ var identityService = {
     return mongooseUtils.findByFieldInValue(persistence.Identity, 'userId', userIds);
   },
 
-  // TODO: move this to more of a "fat service"
-  findByUsers: function(users) {
+  preloadForUsers: function(users) {
     // Take the existing cached identities into account and also cache the
     // newly loaded ones. Return them all.
     var cachedIdentities = [];
