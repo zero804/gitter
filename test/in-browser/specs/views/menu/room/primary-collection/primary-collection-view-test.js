@@ -3,7 +3,7 @@
 
 var assert                = require('assert');
 var Backbone              = require('backbone');
-var PrimaryCollectionView = require('../../../public/js/views/menu/primary-collection-view');
+var PrimaryCollectionView = require('public/js/views/menu/room/primary-collection/primary-collection-view');
 
 describe('PrimaryCollectionView', function() {
 

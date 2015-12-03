@@ -1,7 +1,7 @@
 'use strict';
 
 var Marionette = require('backbone.marionette');
-var template   = require('./tmpl/panel-header-view.hbs');
+var template   = require('./header-view.hbs');
 
 module.exports = Marionette.ItemView.extend({
 

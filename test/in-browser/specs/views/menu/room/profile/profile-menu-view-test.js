@@ -3,7 +3,7 @@
 
 var assert          = require('assert');
 var Backbone        = require('backbone');
-var ProfileMenuView = require('../../../public/js/views/menu/profile-menu-view');
+var ProfileMenuView = require('public/js/views/menu/room/profile/profile-menu-view');
 
 describe('ProfileMenuView', function(){
   var model;

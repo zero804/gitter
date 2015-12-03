@@ -2,7 +2,7 @@
 
 var _             = require('underscore');
 var Marionette    = require('backbone.marionette');
-var itemTemplate  = require('./tmpl/primary-collection-item-view.hbs');
+var itemTemplate  = require('./primary-collection-view.hbs');
 var getRoomAvatar = require('utils/get-room-avatar');
 
 var ItemView = Marionette.ItemView.extend({

@@ -3,7 +3,7 @@
 
 var assert       = require('assert');
 var Backbone     = require('backbone');
-var RoomItemView = require('../../../public/js/views/menu/room-menu-item-view');
+var RoomItemView = require('public/js/views/menu/room/minibar/minibar-item-view');
 var appEvents    = require('utils/appevents');
 
 describe('RoomMenuItemView', function() {

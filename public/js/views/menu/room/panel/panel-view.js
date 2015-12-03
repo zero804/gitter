@@ -2,10 +2,10 @@
 
 var Marionette            = require('backbone.marionette');
 var appEvents             = require('utils/appevents');
-var PanelHeaderView       = require('./panel-header-view');
-var PrimaryCollectionView = require('./primary-collection-view');
-var ProfileMenuView       = require('./profile-menu-view');
-var SearchInputView       = require('./seach-input-view');
+var PanelHeaderView       = require('../header/header-view');
+var PrimaryCollectionView = require('../primary-collection/primary-collection-view');
+var ProfileMenuView       = require('../profile/profile-menu-view');
+var SearchInputView       = require('../search-input/search-input-view');
 
 module.exports = Marionette.LayoutView.extend({
 
