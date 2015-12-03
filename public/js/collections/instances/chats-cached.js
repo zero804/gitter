@@ -23,22 +23,19 @@ function invokeChatPreload(pool, rooms) {
     .first(pool.size)
     .value();
 
-
-  // TODO: wait for initial snapshot to return rather than waiting for a
-  // predefined period of time
-  Promise.delay(1000)
-    .then(function() {
-      Promise.each(ids, function(room) {
-        // Preload the rooms in sequence
-        return pool.preload(room.id, room.lastAccessTime);
-      });
+    return Promise.each(ids, function(room) {
+      // Preload the rooms in sequence
+      return pool.preload(room.id, room.lastAccessTime);
     });
 }
 
 function create() {
   var pool = new Pool(chatModels.ChatCollection, { idAttribute: "troupeId" });
 
-  var initial = pool.get(context.getTroupeId());
+  var currentRoomId = context.getTroupeId();
+  var initialPromise = pool.preload(currentRoomId, Date.now());
+
+  var initial = pool.get();
   var chatCollection = new ProxyCollection({ collection: initial });
 
   context.contextModel().on('change:troupeId', function() {
@@ -58,8 +55,10 @@ function create() {
     });
   }
 
-  appEvents.on('chat-cache:preload', function(rooms) {
-    invokeChatPreload(pool, rooms);
+  appEvents.once('chat-cache:preload', function(rooms) {
+    initialPromise.then(function() {
+      invokeChatPreload(pool, rooms);
+    });
   });
 
   return chatCollection;
