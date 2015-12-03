@@ -3,7 +3,7 @@
 
 var assert          = require('assert');
 var Backbone        = require('backbone');
-var PanelHeaderView = require('../../../public/js/views/menu/panel-header-view');
+var PanelHeaderView = require('public/js/views/menu/room/header/header-view');
 
 describe('PanelHeaderView', function() {
 

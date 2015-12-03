@@ -3,7 +3,7 @@
 
 var assert          = require('assert');
 var Backbone        = require('backbone');
-var SearchInputView = require('../../../public/js/views/menu/seach-input-view');
+var SearchInputView = require('public/js/views/menu/room/search-input/search-input-view');
 
 describe('SearchInputView', function() {
 

@@ -3,8 +3,8 @@
 
 var assert    = require('assert');
 var Backbone  = require('backbone');
-var PanelView = require('../../../public/js/views/menu/panel-view');
-var appEvents = require('../../../public/js/utils/appevents');
+var PanelView = require('public/js/views/menu/room/panel/panel-view');
+var appEvents = require('public/js/utils/appevents');
 
 describe('PanelView', function() {
 

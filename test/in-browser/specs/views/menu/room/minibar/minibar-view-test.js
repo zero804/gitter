@@ -3,7 +3,7 @@
 
 var assert      = require('assert');
 var Backbone    = require('backbone');
-var MiniBarView = require('../../../public/js/views/menu/minibar-view');
+var MiniBarView = require('public/js/views/menu/room/minibar/minibar-view');
 
 describe('MinibarView', function() {
 
@@ -30,15 +30,10 @@ describe('MinibarView', function() {
     miniBar = new MiniBarView({ el: el, model: model });
   });
 
-  it('should emit an event when its element is clicked', function(done) {
-
-    miniBar.on('minibar:clicked', function() {
-      assert.ok(true);
-      done();
-    });
-
-    innerEl.click();
-
+  it.skip('should set the panelOpenState when clicked', function(done) {
+    assert.ok(!model.get('panelOpenState'));
+    miniBar.roomMenuItems[0].trigger('change:panelStateOpen', 'search');
+    assert.ok(!model.get('panelOpenState'));
   });
 
   it('should create child views for each child element with the correct dataset', function() {

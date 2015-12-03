@@ -2,8 +2,8 @@
 
 var Marionette    = require('backbone.marionette');
 var RoomMenuModel = require('../../../../models/room-menu-model');
-var MiniBarView   = require('../../minibar-view');
-var PanelView     = require('../../panel-view');
+var MiniBarView   = require('../minibar/minibar-view');
+var PanelView     = require('../panel/panel-view');
 
 require('views/behaviors/isomorphic');
 
