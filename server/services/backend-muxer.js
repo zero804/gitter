@@ -5,8 +5,8 @@ var userScopes = require('../utils/models/user-scopes');
 var identityService = require('./identity-service');
 
 var registeredBackends = {
-  google: require('../backends/google'),
-  github: require('../backends/github'),
+  google: require('gitter-web-google-backend'),
+  github: require('gitter-web-github-backend'),
   // ...
 };
 
