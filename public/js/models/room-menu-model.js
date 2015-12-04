@@ -32,11 +32,16 @@ module.exports = Backbone.Model.extend({
       throw new Error('A valid room collection must be passed to a new RoomMenuModel');
     }
 
+    if (!attrs || !attrs.userModel) {
+      throw new Error('A valid user model must be passed to a new RoomMenuModel');
+    }
+
     this.searchInterval = SEARCH_DEBOUNCE_INTERVAL;
 
     //assign internal collections
     this._roomCollection    = attrs.roomCollection;
     this._detailCollection  = (attrs.detailCollection || new Backbone.Collection());
+    this.userModel          = attrs.userModel;
 
     //expose the public collection
     this.primaryCollection   = new ProxyCollection({ collection: this._roomCollection });

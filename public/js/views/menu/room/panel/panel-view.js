@@ -16,12 +16,15 @@ module.exports = Marionette.LayoutView.extend({
       header: { el: '#panel-header', init: 'initHeader'},
       profile: { el: '#profile-menu', init: 'initProfileMenu'},
       primaryCollection: { el: '#primary-collection', init: 'initPrimaryCollection' },
-      search: { el: '#search', init: 'initSearchInput' }
+      search: { el: '#search', init: 'initSearchInput' },
     },
   },
 
   initHeader: function(optionsForRegion) {
-    return new PanelHeaderView(optionsForRegion({ model: this.model }));
+    return new PanelHeaderView(optionsForRegion({
+      model: this.model,
+      userModel: this.model.userModel,
+    }));
   },
 
   initProfileMenu: function(optionsForRegion) {
@@ -35,7 +38,7 @@ module.exports = Marionette.LayoutView.extend({
     }));
   },
 
-  initSearchInput: function (optionsForRegion){
+  initSearchInput: function(optionsForRegion) {
     return new SearchInputView(optionsForRegion({ model: this.model }));
   },
 

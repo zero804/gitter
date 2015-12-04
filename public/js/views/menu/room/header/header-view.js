@@ -21,12 +21,12 @@ module.exports = Marionette.ItemView.extend({
       isAllState: (state === 'all'),
       isSearchState: (state === 'search'),
       isFavouriteState: (state === 'favourite'),
-      isPeopleState: (state === 'people')
+      isPeopleState: (state === 'people'),
+      user: this.model.userModel.toJSON()
     };
   },
 
   onClick: function (){
-    console.log('--- CLICK ---');
     this.model.set('profileMenuOpenState', !this.model.get('profileMenuOpenState'));
   },
 
