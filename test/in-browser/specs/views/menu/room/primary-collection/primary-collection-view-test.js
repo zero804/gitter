@@ -2,7 +2,7 @@
 'use strict';
 
 /*
- *  TODO TEST VIEW FILTEREING FOR DIFFERENT MODEL STATES
+ *  TODO TEST VIEW FILTERING FOR DIFFERENT MODEL STATES
  * */
 
 var assert                = require('assert');
