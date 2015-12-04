@@ -45,23 +45,27 @@ onready(function() {
 
   require('components/link-handler').installLinkHandler();
 
-  window.addEventListener('message', function(e) {
+  function parsePostMessage(e) {
     // Shortcut for performance
-    if (!e.data || typeof e.data !== 'string') return;
+    if (!e || !e.data || typeof e.data !== 'string') return;
 
     if (e.origin !== context.env('basePath')) {
       debug('Ignoring message from ' + e.origin);
       return;
     }
 
-    var message;
     try {
-      message = JSON.parse(e.data);
+      return JSON.parse(e.data);
     } catch (err) {
       /* It seems as through chrome extensions use this event to pass messages too. Ignore them. */
       return;
     }
+  }
 
+  window.addEventListener('message', function(e) {
+    var message = parsePostMessage(e);
+    if (!message) return;
+    
     debug('Received message %j', message);
 
     var makeEvent = function(message) {
