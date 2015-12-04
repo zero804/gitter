@@ -18,7 +18,7 @@ describe('RoomMenuModel', function() {
     roomMenuModel = new RoomMenuModel({
       bus:            Backbone.Events,
       roomCollection: mockRoomCollection,
-      userModel:      new Backbone.Model()
+      userModel:      new Backbone.Model(),
     });
 
   });
@@ -48,14 +48,14 @@ describe('RoomMenuModel', function() {
 
     });
 
-    it('should throw an error if no user model is passed', function(done){
+    it('should throw an error if no user model is passed', function(done) {
       try {
         new RoomMenuModel({
           bus: Backbone.Events,
-          roomCollection: mockRoomCollection
+          roomCollection: mockRoomCollection,
         });
       }
-      catch(e){
+      catch (e) {
         assert.equal(e.message,
                      'A valid user model must be passed to a new RoomMenuModel');
         done();
@@ -184,64 +184,6 @@ describe('RoomMenuModel', function() {
         });
 
       });
-
-      it('should only contain favourite items when in the favourite state', function(done) {
-
-        roomMenuModel.on('primary-collection:snapshot', function() {
-
-          roomMenuModel.set('state', 'favourite');
-          roomMenuModel.primaryCollection.forEach(function(model, index) {
-            assert.ok(!!model.get('favourite'));
-          });
-
-          done();
-
-        });
-
-      });
-
-      it('should contain all items when in the all state', function(done) {
-
-        roomMenuModel.on('primary-collection:snapshot', function() {
-
-          roomMenuModel.set('state', 'favourite');
-          roomMenuModel.primaryCollection.forEach(function(model, index) {
-            assert.ok(!!model.get('favourite'));
-          });
-
-          roomMenuModel.set('state', 'all');
-          mockRoomCollection.forEach(function(model, index) {
-            assert.equal(model, roomMenuModel.primaryCollection.at(index));
-          });
-
-          done();
-
-        });
-
-      });
-
-      it('should contain only one-to-one rooms in the people state', function(done) {
-
-        roomMenuModel.on('primary-collection:snapshot', function() {
-          roomMenuModel.set('state', 'people');
-          roomMenuModel.primaryCollection.forEach(function(model, index) {
-            assert.ok(model.get('githubType') === 'ONETOONE');
-          });
-
-          done();
-        });
-
-      });
-
-      it('should initially contain no items when in the search state', function(done) {
-
-        roomMenuModel.on('primary-collection:snapshot', function() {
-          roomMenuModel.set('state', 'search');
-          assert.equal(0, roomMenuModel.primaryCollection.models.length);
-          done();
-        });
-      });
-
     });
   });
 });

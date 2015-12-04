@@ -55,7 +55,6 @@ module.exports = Backbone.Model.extend({
     this.bus = attrs.bus;
     this.listenTo(this.bus, 'room-menu:change:state', this.onStateChangeCalled, this);
 
-    this.listenTo(this, 'change:state', this.onStateChange, this);
     this.listenTo(this, 'change:searchTerm', this.onSearchTermChange, this);
   },
 
@@ -80,42 +79,6 @@ module.exports = Backbone.Model.extend({
 
   onPrimaryCollectionSnapshot: function() {
     this.trigger('primary-collection:snapshot');
-  },
-
-  onStateChange: function(self, state) { /*jshint unused: true */
-    switch (state) {
-      case 'search':
-        this.generateSearchCollection();
-        this.secondaryCollection.switchCollection(this.searchTerms);
-        break;
-      case 'favourite':
-        this.generateFavourites();
-        break;
-      case 'people':
-        this.generateOneToOnes();
-        break;
-      default:
-        this.primaryCollection.switchCollection(this._roomCollection);
-        break;
-    }
-  },
-
-  generateSearchCollection: function() {
-    this.primaryCollection.switchCollection(new Backbone.Collection());
-  },
-
-  generateFavourites: function() {
-    var data = this._roomCollection.toJSON().filter(function(model) { return !!model.favourite});
-
-    var collection = new Backbone.Collection(data);
-    this.primaryCollection.switchCollection(collection);
-  },
-
-  generateOneToOnes: function() {
-    var data = this._roomCollection.toJSON().filter(function(model) { return model.githubType === 'ONETOONE' });
-
-    var collection = new Backbone.Collection(data);
-    this.primaryCollection.switchCollection(collection);
   },
 
 });
