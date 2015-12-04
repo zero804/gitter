@@ -11,7 +11,7 @@ GoogleBackend.prototype.getEmailAddress = function(preferStoredEmail) {
   return Q.resolve(this.identity.email);
 };
 
-GoogleBackend.prototype.getSerializedOrgs = function() {
+GoogleBackend.prototype.findOrgs = function() {
   return Q.resolve([]);
 };
 

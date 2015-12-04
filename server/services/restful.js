@@ -136,7 +136,13 @@ exports.serializeEventsForTroupe = function(troupeId, userId, callback) {
 
 exports.serializeOrgsForUser = function(user) {
   var backendMuxer = new BackendMuxer(user);
-  return backendMuxer.getSerializedOrgs();
+  return backendMuxer.findOrgs()
+    .then(function(orgs) {
+      var strategyOptions = { currentUserId: user.id };
+      // TODO: not all organisations are going to be github ones in future!
+      var strategy = new restSerializer.GitHubOrgStrategy(strategyOptions);
+      return restSerializer.serializeExcludeNulls(orgs, strategy);
+    });
 };
 
 exports.serializeOrgsForUserId = function(userId, options) {
