@@ -103,8 +103,8 @@ BackendMuxer.prototype.getEmailAddress = function(preferStoredEmail) {
   return this.getFirstResult('getEmailAddress', [preferStoredEmail]);
 };
 
-BackendMuxer.prototype.getSerializedOrgs = function() {
-  return this.findAllResults('getSerializedOrgs');
+BackendMuxer.prototype.findOrgs = function() {
+  return this.findAllResults('findOrgs');
 };
 
 BackendMuxer.prototype.findProfiles = function() {
