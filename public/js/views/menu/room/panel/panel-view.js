@@ -4,6 +4,7 @@ var Marionette            = require('backbone.marionette');
 var appEvents             = require('utils/appevents');
 var PanelHeaderView       = require('../header/header-view');
 var PrimaryCollectionView = require('../primary-collection/primary-collection-view');
+var SecondaryCollection   = require('../secondary-collection/secondary-collection-view');
 var ProfileMenuView       = require('../profile/profile-menu-view');
 var SearchInputView       = require('../search-input/search-input-view');
 var RAF                   = require('utils/raf');
@@ -17,6 +18,7 @@ module.exports = Marionette.LayoutView.extend({
       header: { el: '#panel-header', init: 'initHeader'},
       profile: { el: '#profile-menu', init: 'initProfileMenu'},
       primaryCollection: { el: '#primary-collection', init: 'initPrimaryCollection' },
+      secondaryCollection: { el: '#secondary-collection', init: 'initSecondaryCollection' },
       search: { el: '#search', init: 'initSearchInput' },
     },
   },
@@ -36,6 +38,13 @@ module.exports = Marionette.LayoutView.extend({
     return new PrimaryCollectionView(optionsForRegion({
       collection: this.model.primaryCollection,
       model: this.model,
+    }));
+  },
+
+  initSecondaryCollection: function(optionsForRegion) {
+    return new SecondaryCollection(optionsForRegion({
+      collection: this.model.secondaryCollection,
+      model: this.model
     }));
   },
 

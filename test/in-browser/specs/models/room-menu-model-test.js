@@ -185,5 +185,33 @@ describe('RoomMenuModel', function() {
 
       });
     });
+
+    describe('SecondaryCollection', function() {
+
+      it('should set secondaryCollectionActive only for appropriate states', function(done) {
+        roomMenuModel.on('primary-collection:snapshot', function() {
+            assert.ok(!roomMenuModel.get('secondaryCollectionActive'));
+            roomMenuModel.setState('search');
+            assert.ok(roomMenuModel.get('secondaryCollectionActive'));
+            roomMenuModel.setState('all');
+            assert.ok(!roomMenuModel.get('secondaryCollectionActive'));
+            roomMenuModel.setState('org');
+            assert.ok(roomMenuModel.get('secondaryCollectionActive'));
+            done();
+          });
+      });
+
+      it('should set the secondary header title on appropriate states', function() {
+        roomMenuModel.on('primary-collection:snapshot', function() {
+          assert.equal('', roomMenuModel.get('secondaryCollectionHeader'));
+          roomMenuModel.setState('search');
+          assert.equal('Recent Searches', roomMenuModel.get('secondaryCollectionHeader'));
+          roomMenuModel.setState('orgs');
+          assert.equal('All Rooms', roomMenuModel.get('secondaryCollectionHeader'));
+        });
+      });
+
+    });
+
   });
 });
