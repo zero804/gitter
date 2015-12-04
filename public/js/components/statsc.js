@@ -1,8 +1,9 @@
 "use strict";
-var _ = require('underscore');
+var _         = require('underscore');
 var appEvents = require('utils/appevents');
 var apiClient = require('components/apiClient');
-var log = require('utils/log');
+var log       = require('utils/log');
+var debug     = require('debug-proxy')('app:stats');
 
 module.exports = (function() {
 
@@ -36,6 +37,7 @@ module.exports = (function() {
   var throttledSend = _.throttle(send, 1000, { leading: false });
 
   appEvents.on('stats.event', function(stat) {
+    debug('event: %s', stat);
     if(counters[stat]) {
       counters[stat]++;
     } else {
@@ -45,11 +47,13 @@ module.exports = (function() {
   });
 
   appEvents.on('stats.gauge', function(stat, value) {
+    debug('gauge: %s: %s', stat, value);
     statQueue.push({ stat: stat, value: value });
     throttledSend();
   });
 
   appEvents.on('stats.time', function(stat, time) {
+    debug('time: %s: %sms', stat, time);
     statQueue.push({ stat: stat, time: time });
     throttledSend();
   });
@@ -60,4 +64,3 @@ module.exports = (function() {
 
 
 })();
-
