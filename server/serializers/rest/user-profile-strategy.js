@@ -6,8 +6,7 @@ var Q = require('q');
 var qlimit = require('qlimit');
 var limit = qlimit(2); // ?
 
-// TODO: if I require this at the top, then it comes back as {}
-var BackendResolver = require('../../services/backend-resolver');
+var BackendMuxer = require('../../services/backend-muxer');
 
 var STANDARD_ATTRIBUTES = ['company', 'location', 'email', 'website', 'profile'];
 
@@ -20,8 +19,8 @@ function UserProfileStrategy(options) {
     return identityService.preloadForUsers(users)
       .then(function() {
         return Q.all(users.map(limit(function(user) {
-          var backendResolver = new BackendResolver(user);
-          return backendResolver.findProfiles()
+          var backendMuxer = new BackendMuxer(user);
+          return backendMuxer.findProfiles()
             .then(function(profiles) {
               // cache the profiles so we can get them out later.
               // (is this the best variable name?)
