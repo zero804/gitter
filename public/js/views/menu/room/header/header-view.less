@@ -1,12 +1,32 @@
+@import "../../../../../less/components/menu/room/avatar.less";
+@import "../../../../../less/components/menu/room/menu-text.less";
+
 .panel-header {
   background: transparent;
   text-align: left;
 }
 
 .panel-header__title--all {
-  height:     @header-height;
-  width:      100%;
-  background: @ruby;
+  box-sizing:   border-box;
+  display:      flex;
+  align-items:  center;
+  height:       @header-height;
+  width:        100%;
+  padding-left: @menu-left-padding;
+  background:   @ruby;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.panel-header__avatar {
+  .room-menu-avatar();
+}
+
+.panel-header__display-name {
+  .room-menu-text();
+  color: white;
 }
 
 .panel-header__title {

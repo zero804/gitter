@@ -1,4 +1,5 @@
-@import (reference)  "../primary-collection/primary-collection-item-view.less";
+@import "../../../../../less/components/menu/room/avatar.less";
+@import "../../../../../less/components/menu/room/menu-text.less";
 
 .profile-menu {
   margin-left: 0;
@@ -15,18 +16,11 @@
 }
 
 .profile-menu__item {
-  .room-item;
+  padding-left: @menu-left-padding;
 }
-
-.desktop {
-  .profile-menu__item__title {
-    font-size: 2rem;
-  }
-}
-
 
 .profile-menu__item__title {
-  .room-item__title;
+  .room-menu-text();
   a {
     color: inherit;
     &:hover {

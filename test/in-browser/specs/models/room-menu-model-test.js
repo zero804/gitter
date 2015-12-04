@@ -4,8 +4,8 @@
 var assert             = require('assert');
 var Backbone           = require('backbone');
 var ProxyCollection    = require('backbone-proxy-collection');
-var MockRoomCollection = require('../fixtures/helpers/room-collection');
-var RoomMenuModel      = require('../../../public/js/models/room-menu-model');
+var MockRoomCollection = require('fixtures/helpers/room-collection');
+var RoomMenuModel      = require('public/js/models/room-menu-model');
 
 describe('RoomMenuModel', function() {
 
@@ -18,6 +18,7 @@ describe('RoomMenuModel', function() {
     roomMenuModel = new RoomMenuModel({
       bus:            Backbone.Events,
       roomCollection: mockRoomCollection,
+      userModel:      new Backbone.Model()
     });
 
   });
@@ -45,6 +46,20 @@ describe('RoomMenuModel', function() {
         done();
       }
 
+    });
+
+    it('should throw an error if no user model is passed', function(done){
+      try {
+        new RoomMenuModel({
+          bus: Backbone.Events,
+          roomCollection: mockRoomCollection
+        });
+      }
+      catch(e){
+        assert.equal(e.message,
+                     'A valid user model must be passed to a new RoomMenuModel');
+        done();
+      }
     });
 
   });

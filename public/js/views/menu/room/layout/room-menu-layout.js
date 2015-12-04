@@ -4,6 +4,7 @@ var Marionette    = require('backbone.marionette');
 var RoomMenuModel = require('../../../../models/room-menu-model');
 var MiniBarView   = require('../minibar/minibar-view');
 var PanelView     = require('../panel/panel-view');
+var context       = require('utils/context');
 
 require('views/behaviors/isomorphic');
 
@@ -25,7 +26,11 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   initialize: function (attrs){
-    this.model   = new RoomMenuModel({ bus: attrs.bus, roomCollection: attrs.roomCollection });
+    this.model   = new RoomMenuModel({
+      bus: attrs.bus,
+      roomCollection: attrs.roomCollection,
+      userModel: context.user(),
+    });
   },
 
 });
