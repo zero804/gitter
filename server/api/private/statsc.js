@@ -1,14 +1,35 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var env            = require('gitter-web-env');
 var stats          = env.stats;
 var logger         = env.logger;
 
-function handleStats(incomingStats) {
-  if(!incomingStats || !Array.isArray(incomingStats)) return;
+function parse(incoming) {
+  if (!incoming) return;
 
-  incomingStats.forEach(function(s) {
+  // Old way: just post an array
+  if (Array.isArray(incoming)) {
+    return { stats: incoming };
+  }
+
+  // New way: post a hash
+  if (incoming.stats && Array.isArray(incoming.stats)) {
+    return incoming;
+  }
+}
+
+function handleStats(incomingStats) {
+  var processed = parse(incomingStats);
+  if (!processed) return;
+
+  var tags;
+  if (processed.features && Array.isArray(processed.features)) {
+    tags = processed.features.map(function(feature) {
+      return 'feature_' + feature + ':1'
+    });
+  }
+
+  processed.stats.forEach(function(s) {
     if(!s) return;
 
     var stat = s.stat;
@@ -19,23 +40,25 @@ function handleStats(incomingStats) {
     }
 
     var statsName = 'client.' + stat;
-
     if('value' in s) {
       var value = s.value;
       if(typeof value !== 'number') return; /* Ignore */
-      stats.gaugeHF(statsName, value);
+      stats.gaugeHF(statsName, value, 0.1, tags);
       return;
     }
 
     if('time' in s) {
       var time = s.time;
       if(typeof time !== 'number') return; /* Ignore */
-      stats.responseTime(statsName, time);
+      stats.responseTime(statsName, time, tags);
       return;
     }
 
     var count = s.count;
-    stats.eventHF(statsName, count || 1);
+    if (count) {
+      stats.eventHF(statsName, count || 1, 0.1, tags);
+      return;
+    }
   });
 }
 
@@ -50,4 +73,3 @@ module.exports =  function(req, res) {
 
   res.send('OK');
 };
-
