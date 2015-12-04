@@ -38,13 +38,13 @@ function resolveUserBackends(user) {
     });
 }
 
-function BackendResolver(user) {
+function BackendMuxer(user) {
   this.user = user;
 }
 
 // Use this when each Backend returns an object or value and you just want them
 // all as one array.
-BackendResolver.prototype.findResults = function(method, args) {
+BackendMuxer.prototype.findResults = function(method, args) {
   args = args || [];
 
   return resolveUserBackends(this.user)
@@ -58,7 +58,7 @@ BackendResolver.prototype.findResults = function(method, args) {
 
 // Use this when each backend returns an array and you want to concatenate them
 // all into one array.
-BackendResolver.prototype.findAllResults = function(method, args) {
+BackendMuxer.prototype.findAllResults = function(method, args) {
   return this.findResults(method, args)
     .then(function(arrays) {
       return Array.prototype.concat.apply([], arrays);
@@ -67,7 +67,7 @@ BackendResolver.prototype.findAllResults = function(method, args) {
 
 // Try the backends one by one and return the first one that returns a result's
 // result.
-BackendResolver.prototype.getFirstResult = function(method, args) {
+BackendMuxer.prototype.getFirstResult = function(method, args) {
   args = args || [];
 
   return resolveUserBackends(this.user)
@@ -99,16 +99,16 @@ BackendResolver.prototype.getFirstResult = function(method, args) {
     });
 };
 
-BackendResolver.prototype.getEmailAddress = function(preferStoredEmail) {
+BackendMuxer.prototype.getEmailAddress = function(preferStoredEmail) {
   return this.getFirstResult('getEmailAddress', [preferStoredEmail]);
 };
 
-BackendResolver.prototype.getSerializedOrgs = function() {
+BackendMuxer.prototype.getSerializedOrgs = function() {
   return this.findAllResults('getSerializedOrgs');
 };
 
-BackendResolver.prototype.findProfiles = function() {
+BackendMuxer.prototype.findProfiles = function() {
   return this.findResults('getProfile');
 };
 
-module.exports = BackendResolver;
+module.exports = BackendMuxer;

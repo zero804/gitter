@@ -14,7 +14,7 @@ var Q                   = require('q');
 var roomService         = require('./room-service');
 var _                   = require('underscore');
 var roomMembershipService = require('./room-membership-service');
-var BackendResolver = require('./backend-resolver');
+var BackendMuxer = require('./backend-muxer');
 
 var survivalMode = !!process.env.SURVIVAL_MODE || false;
 
@@ -135,8 +135,8 @@ exports.serializeEventsForTroupe = function(troupeId, userId, callback) {
 };
 
 exports.serializeOrgsForUser = function(user) {
-  var backendResolver = new BackendResolver(user);
-  return backendResolver.getSerializedOrgs();
+  var backendMuxer = new BackendMuxer(user);
+  return backendMuxer.getSerializedOrgs();
 };
 
 exports.serializeOrgsForUserId = function(userId, options) {
