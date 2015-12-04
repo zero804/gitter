@@ -9,6 +9,7 @@ module.exports = Marionette.ItemView.extend({
 
   modelEvents: {
     'change:state': 'render',
+    'change:selectedOrgName': 'render'
   },
 
   events: {
@@ -22,7 +23,9 @@ module.exports = Marionette.ItemView.extend({
       isSearchState: (state === 'search'),
       isFavouriteState: (state === 'favourite'),
       isPeopleState: (state === 'people'),
-      user: this.model.userModel.toJSON()
+      isOrgState: (state ===  'org'),
+      user: this.model.userModel.toJSON(),
+      orgName: this.model.get('selectedOrgName')
     };
   },
 

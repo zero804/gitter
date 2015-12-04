@@ -18,7 +18,7 @@ describe('RoomMenuItemView', function() {
     el = document.createElement('div');
     el.dataset.stateChange = 'people';
 
-    model = new Backbone.Model();
+    model = new Backbone.Model({ type: 'people' });
 
     roomItemView = new RoomItemView({ el: el, model: model });
   });
