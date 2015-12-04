@@ -20,6 +20,8 @@ module.exports = Backbone.Model.extend({
     state:          'all',
     searchTerm:     '',
     panelOpenState: false,
+    secondaryCollectionActive: false,
+    secondaryCollectionHeader: ''
   },
 
   initialize: function(attrs) {
@@ -55,7 +57,9 @@ module.exports = Backbone.Model.extend({
     this.bus = attrs.bus;
     this.listenTo(this.bus, 'room-menu:change:state', this.onStateChangeCalled, this);
 
+
     this.listenTo(this, 'change:searchTerm', this.onSearchTermChange, this);
+    this.listenTo(this, 'change:state', this.onSwitchState, this);
   },
 
   onStateChangeCalled: function(newState) {
@@ -71,6 +75,25 @@ module.exports = Backbone.Model.extend({
 
   setState: function(type) {
     this.onStateChangeCalled(type);
+  },
+
+  onSwitchState: function (model, val){/*jshint unused: true */
+    switch(val) {
+      case 'search':
+        this.set({
+          secondaryCollectionHeader: 'Recent Searches',
+          secondaryCollectionActive: true
+        });
+        break;
+      case 'org':
+        this.set({
+          secondaryCollectionHeader: 'All Rooms',
+          secondaryCollectionActive: true
+        });
+        break;
+      default:
+        this.set('secondaryCollectionActive', false);
+    }
   },
 
   onSearchTermChange: _.debounce(function() {
