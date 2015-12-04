@@ -10,6 +10,7 @@ var ChatToolbarInputLayout = require('views/layouts/chat-toolbar-input');
 var DropTargetView         = require('views/app/dropTargetView');
 var onready                = require('./utils/onready');
 var apiClient              = require('components/apiClient');
+var perfTiming             = require('./components/perf-timing');
 var frameUtils             = require('./utils/frame-utils');
 var itemCollections        = require('collections/instances/integrated-items');
 var chatCollection         = require('collections/instances/chats-cached');
@@ -45,6 +46,9 @@ onready(function() {
   require('components/link-handler').installLinkHandler();
 
   window.addEventListener('message', function(e) {
+    // Shortcut for performance
+    if (!e.data || typeof e.data !== 'string') return;
+
     if (e.origin !== context.env('basePath')) {
       debug('Ignoring message from ' + e.origin);
       return;
@@ -100,6 +104,8 @@ onready(function() {
       break;
 
       case 'change:room':
+        perfTiming.start('room-switch.render');
+
         debug('changing room: %j', message.newTroupe);
         //destroy any modal views
         appView.dialogRegion.destroy();

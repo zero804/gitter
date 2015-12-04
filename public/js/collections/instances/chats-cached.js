@@ -27,7 +27,11 @@ function create() {
   var initialPromise = pool.preload(currentRoomId, Date.now());
 
   var initial = pool.get(currentRoomId);
-  var chatCollection = new ProxyCollection({ collection: initial });
+  var chatCollection = new ProxyCollection({
+    collection: initial,
+    klass: chatModels.ChatCollection,
+    properties: ['loading']
+  });
 
   context.contextModel().on('change:troupeId', function() {
     var troupeId = context.getTroupeId();
