@@ -19,6 +19,12 @@
           <a>P</a>
         </li>
 
+        {{#each orgs}}
+          <li data-state-change="org" data-room-id="{{id}}" class="room-menu-options__item--org">
+            <a><img class="room-menu-options__item__avatar"  src="{{avatar_url}}"/></a>
+          </li>
+        {{/each}}
+
       </ul>
     </nav>
     <div id="room-menu__panel">
