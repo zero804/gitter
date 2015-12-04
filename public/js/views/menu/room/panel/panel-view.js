@@ -7,31 +7,43 @@ var PrimaryCollectionView = require('../primary-collection/primary-collection-vi
 var ProfileMenuView       = require('../profile/profile-menu-view');
 var SearchInputView       = require('../search-input/search-input-view');
 
+require('views/behaviors/isomorphic');
+
 module.exports = Marionette.LayoutView.extend({
 
+  behaviors: {
+    Isomorphic: {
+      header: { el: '#panel-header', init: 'initHeader'},
+      profile: { el: '#profile-menu', init: 'initProfileMenu'},
+      primaryCollection: { el: '#primary-collection', init: 'initPrimaryCollection' },
+      search: { el: '#search', init: 'initSearchInput' }
+    },
+  },
+
+  initHeader: function(optionsForRegion) {
+    return new PanelHeaderView(optionsForRegion({ model: this.model }));
+  },
+
+  initProfileMenu: function(optionsForRegion) {
+    return new ProfileMenuView(optionsForRegion({ model: this.model }));
+  },
+
+  initPrimaryCollection: function(optionsForRegion) {
+    return new PrimaryCollectionView(optionsForRegion({
+      collection: this.model.primaryCollection,
+      model: this.model,
+    }));
+  },
+
+  initSearchInput: function (optionsForRegion){
+    return new SearchInputView(optionsForRegion({ model: this.model }));
+  },
+
   modelEvents: {
-    'change:panelOpenState': 'onPanelOpenStateChange'
+    'change:panelOpenState': 'onPanelOpenStateChange',
   },
 
   initialize: function() {
-
-    this.header = new PanelHeaderView({ el: '#panel-header', model: this.model });
-    this.header.render();
-
-    this.profileMenu = new ProfileMenuView({ el: '#profile-menu', model: this.model });
-    this.primaryCollectionView = new PrimaryCollectionView({
-      el: '#primary-collection',
-      collection: this.model.primaryCollection,
-      model: this.model
-    });
-    this.primaryCollectionView.render();
-
-    this.searchInputView = new SearchInputView({
-      el: '#search',
-      model: this.model
-    });
-    this.searchInputView.render();
-
     appEvents.on('ui:swipeleft', this.onSwipeLeft, this);
   },
 
@@ -40,7 +52,7 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   onSwipeLeft: function(e) {
-    if(e.target === this.el) { this.model.set('panelOpenState', false); }
+    if (e.target === this.el) { this.model.set('panelOpenState', false); }
   },
 
 });

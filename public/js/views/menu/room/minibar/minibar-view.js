@@ -44,7 +44,7 @@ var MiniBarView = Marionette.ItemView.extend({
     this.model.set({
       panelOpenState: true,
       state: type,
-      profileMenuOpenState:  (type !== 'all'),
+      profileMenuOpenState: false
     });
   },
 
