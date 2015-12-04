@@ -32,19 +32,21 @@ var MiniBarView = Marionette.ItemView.extend({
     this.listenTo(this.model, 'change:panelOpenState', this.onPanelStateChange, this);
   },
 
-  onItemClicked: function(type) {
+  onItemClicked: function(type, orgId) {
     //deactive the old active item
     var currentActiveModel = this._getCurrentlyActiveChildModel();
     if (!!currentActiveModel) currentActiveModel.set('active', false);
 
     //activate the next item
-    var nextActiveModel = this.roomMenuItemModels.where({ type: type })[0];
-    nextActiveModel.set('active', true);
+    var query = !!orgId ? { orgId: orgId }: { type: type };
+    var nextActiveModel = this.roomMenuItemModels.where(query)[0];
+    if (!!nextActiveModel) nextActiveModel.set('active', true);
 
     this.model.set({
       panelOpenState: true,
       state: type,
-      profileMenuOpenState: false
+      profileMenuOpenState: false,
+      selectedOrgId: orgId,
     });
   },
 

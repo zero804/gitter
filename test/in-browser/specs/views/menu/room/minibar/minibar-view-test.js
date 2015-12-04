@@ -11,6 +11,7 @@ describe('MinibarView', function() {
   var el;
   var innerEl;
   var innerEl2;
+  var innerEl3;
   var model;
 
   beforeEach(function() {
@@ -19,16 +20,24 @@ describe('MinibarView', function() {
 
     innerEl = document.createElement('div');
     innerEl.dataset.stateChange = 'people';
+    innerEl.dataset.roomId = 1;
     el.appendChild(innerEl);
 
     innerEl2 = document.createElement('div');
     innerEl2.dataset.stateChange = 'search';
+    innerEl2.dataset.roomId = 2;
     el.appendChild(innerEl2);
+
+    innerEl3 = document.createElement('div');
+    innerEl3.dataset.stateChange = 'org';
+    innerEl3.dataset.roomId = 3;
+    el.appendChild(innerEl3);
+
 
     model = new Backbone.Model({
       panelOpenState: false,
       state: 'all',
-      profileMenuOpenState: false
+      profileMenuOpenState: false,
     });
 
     miniBar = new MiniBarView({ el: el, model: model });
@@ -60,6 +69,16 @@ describe('MinibarView', function() {
     assert.ok(miniBar.roomMenuItemModels.at(1).get('active'));
   });
 
+  it('should select an active model by orgId if one is passed', function() {
+    miniBar.roomMenuItems[1].trigger('room-item-view:clicked', 'org', 3);
+    console.log(miniBar.roomMenuItemModels);
+    assert.ok(miniBar.roomMenuItemModels.at(2).get('active'));
+    assert.ok(!miniBar.roomMenuItemModels.at(1).get('active'));
+    miniBar.roomMenuItems[1].trigger('room-item-view:clicked', 'org', 2);
+    assert.ok(miniBar.roomMenuItemModels.at(1).get('active'));
+  });
+
+
   it('should remove all active models when panelOpenState changes to false', function() {
     miniBar.model.set('panelOpenState', true);
     miniBar.model.set('panelOpenState', false);
@@ -70,6 +89,7 @@ describe('MinibarView', function() {
     try {
       //close the panel
       miniBar.model.set('panelOpenState', false);
+
       //try triggering a menu item clicked
       miniBar.roomMenuItems[1].trigger('room-item-view:clicked', 'search');
       done();
