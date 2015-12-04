@@ -517,7 +517,7 @@
               "dependencies": {
                 "ansi-regex": {
                   "version": "0.2.1",
-                  "from": "ansi-regex@>=0.2.1 <0.3.0",
+                  "from": "ansi-regex@>=0.2.0 <0.3.0",
                   "resolved": "http://beta-internal:4873/ansi-regex/-/ansi-regex-0.2.1.tgz"
                 }
               }
@@ -529,7 +529,7 @@
               "dependencies": {
                 "ansi-regex": {
                   "version": "0.2.1",
-                  "from": "ansi-regex@>=0.2.1 <0.3.0",
+                  "from": "ansi-regex@>=0.2.0 <0.3.0",
                   "resolved": "http://beta-internal:4873/ansi-regex/-/ansi-regex-0.2.1.tgz"
                 }
               }
@@ -1070,9 +1070,9 @@
       "resolved": "http://beta-internal:4873/fflip/-/fflip-2.1.0.tgz"
     },
     "gitter-env": {
-      "version": "0.20.23",
-      "from": "gitter-env@>=0.20.23 <0.21.0",
-      "resolved": "http://beta-internal:4873/gitter-env/-/gitter-env-0.20.23.tgz",
+      "version": "0.20.24",
+      "from": "gitter-env@>=0.20.24 <0.21.0",
+      "resolved": "http://beta-internal:4873/gitter-env/-/gitter-env-0.20.24.tgz",
       "dependencies": {
         "async": {
           "version": "0.8.0",
@@ -3519,9 +3519,9 @@
           "resolved": "http://beta-internal:4873/redis/-/redis-0.12.1.tgz"
         },
         "snappy": {
-          "version": "4.0.4",
+          "version": "4.0.5",
           "from": "snappy@>=4.0.3 <5.0.0",
-          "resolved": "http://beta-internal:4873/snappy/-/snappy-4.0.4.tgz",
+          "resolved": "http://beta-internal:4873/snappy/-/snappy-4.0.5.tgz",
           "dependencies": {
             "bindings": {
               "version": "1.2.1",
@@ -3534,9 +3534,9 @@
               "resolved": "http://beta-internal:4873/nan/-/nan-2.1.0.tgz"
             },
             "node-gyp": {
-              "version": "3.0.3",
-              "from": "node-gyp@3.0.3",
-              "resolved": "http://beta-internal:4873/node-gyp/-/node-gyp-3.0.3.tgz",
+              "version": "3.2.1",
+              "from": "node-gyp@3.2.1",
+              "resolved": "http://beta-internal:4873/node-gyp/-/node-gyp-3.2.1.tgz",
               "dependencies": {
                 "fstream": {
                   "version": "1.0.8",
@@ -3893,9 +3893,9 @@
                   "resolved": "http://beta-internal:4873/semver/-/semver-5.1.0.tgz"
                 },
                 "tar": {
-                  "version": "1.0.3",
-                  "from": "tar@>=1.0.0 <2.0.0",
-                  "resolved": "http://beta-internal:4873/tar/-/tar-1.0.3.tgz",
+                  "version": "2.2.1",
+                  "from": "tar@>=2.0.0 <3.0.0",
+                  "resolved": "http://beta-internal:4873/tar/-/tar-2.2.1.tgz",
                   "dependencies": {
                     "block-stream": {
                       "version": "0.0.8",
