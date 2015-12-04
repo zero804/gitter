@@ -3,6 +3,7 @@
 var Marionette   = require('backbone.marionette');
 var Backbone     = require('backbone');
 var itemTemplate = require('./profile-menu-item-view.hbs');
+var RAF          = require('utils/raf');
 
 var profileCollection = new Backbone.Collection([
   { name: 'Home', url: '/home' },
@@ -34,6 +35,8 @@ module.exports = Marionette.CollectionView.extend({
 
   onOpenStateChange: function(model, val) {/*jshint unused:true */
     if (this.model.get('state') !== 'all') return;
-    this.$el.toggleClass('active', !!val);
+    RAF(function(){
+      this.$el.toggleClass('active', !!val);
+    }.bind(this));
   },
 });

@@ -6,6 +6,7 @@ var PanelHeaderView       = require('../header/header-view');
 var PrimaryCollectionView = require('../primary-collection/primary-collection-view');
 var ProfileMenuView       = require('../profile/profile-menu-view');
 var SearchInputView       = require('../search-input/search-input-view');
+var RAF                   = require('utils/raf');
 
 require('views/behaviors/isomorphic');
 
@@ -51,7 +52,9 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   onPanelOpenStateChange: function(model, val) { /*jshint unused: true */
-    this.$el.toggleClass('active', val);
+    RAF(function() {
+      this.$el.toggleClass('active', val);
+    }.bind(this));
   },
 
   onSwipeLeft: function(e) {

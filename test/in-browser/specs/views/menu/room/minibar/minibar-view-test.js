@@ -56,11 +56,11 @@ describe('MinibarView', function() {
   });
 
   it('should create child views for each child element with the correct dataset', function() {
-    assert.equal(2, miniBar.roomMenuItems.length);
+    assert.equal(3, miniBar.roomMenuItems.length);
   });
 
   it('should create child models for each child element with the correct dataset', function() {
-    assert.equal(2, miniBar.roomMenuItemModels.length);
+    assert.equal(3, miniBar.roomMenuItemModels.length);
   });
 
   it('should swap active models on click', function() {

@@ -1,7 +1,8 @@
 'use strict';
 
 var Marionette = require('backbone.marionette');
-var template = require('./search-input-view.hbs');
+var template   = require('./search-input-view.hbs');
+var RAF        = require('utils/raf');
 
 module.exports = Marionette.ItemView.extend({
   className: 'search-input-container',
@@ -16,7 +17,9 @@ module.exports = Marionette.ItemView.extend({
   },
 
   onModelChangeState: function(model, val) { /*jshint unused: true */
-    this.$el.toggleClass('active', (val === 'search'));
+    RAF(function(){
+      this.$el.toggleClass('active', (val === 'search'));
+    }.bind(this));
     if (val === 'search') { this.$el.focus(); }
   },
 

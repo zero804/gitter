@@ -32,7 +32,7 @@ var MiniBarView = Marionette.ItemView.extend({
     this.listenTo(this.model, 'change:panelOpenState', this.onPanelStateChange, this);
   },
 
-  onItemClicked: function(type, orgId) {
+  onItemClicked: function(type, orgId, orgName) {
     //deactive the old active item
     var currentActiveModel = this._getCurrentlyActiveChildModel();
     if (!!currentActiveModel) currentActiveModel.set('active', false);
@@ -47,6 +47,7 @@ var MiniBarView = Marionette.ItemView.extend({
       state: type,
       profileMenuOpenState: false,
       selectedOrgId: orgId,
+      selectedOrgName: orgName
     });
   },
 

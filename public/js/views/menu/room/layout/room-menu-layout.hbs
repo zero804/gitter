@@ -20,8 +20,11 @@
         </li>
 
         {{#each orgs}}
-          <li data-state-change="org" data-room-id="{{id}}" class="room-menu-options__item--org">
-            <a><img class="room-menu-options__item__avatar"  src="{{avatar_url}}"/></a>
+        <li data-state-change="org"
+            data-room-id="{{id}}"
+            data-org-name="{{name}}"
+            class="room-menu-options__item--org">
+              <a><img class="room-menu-options__item__avatar"  src="{{avatar_url}}"/></a>
           </li>
         {{/each}}
 

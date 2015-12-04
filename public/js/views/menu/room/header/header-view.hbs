@@ -16,3 +16,10 @@
 {{#if isPeopleState}}
 <h1 class="panel-header__title--people">People</h1>
 {{/if}}
+
+{{#if isOrgState}}
+<div class="panel-header__container">
+  <h1 class="panel-header__title--org">{{orgName}}</h1>
+  <a class="panel-header__org-icon">&#127760;</a>
+</div>
+{{/if}}
