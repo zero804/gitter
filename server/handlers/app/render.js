@@ -205,6 +205,7 @@ function renderMainFrame(req, res, next, frame) {
       aroundId && getPermalinkChatForRoom(req.troupe, aroundId)
     ])
     .spread(function (troupeContext, rooms, orgs, permalinkChat) {
+
       var chatAppQuery = {};
       if (aroundId) {
         chatAppQuery.at = aroundId;
@@ -318,8 +319,15 @@ function renderChat(req, res, options, next) {
         restful.serializeChatsForTroupe(troupe.id, userId, chatSerializerOptions),
         options.fetchEvents === false ? null : restful.serializeEventsForTroupe(troupe.id, userId),
         options.fetchUsers === false ? null :restful.serializeUsersForTroupe(troupe.id, userId, userSerializerOptions),
-        troupeService.checkGitHubTypeForUri(troupe.lcOwner || '', 'ORG')
-      ]).spread(function (troupeContext, chats, activityEvents, users, ownerIsOrg) {
+        troupeService.checkGitHubTypeForUri(troupe.lcOwner || '', 'ORG'),
+        //JP 4/12/15 Not sure if this is appropriate here /cc @suprememoocow
+        restful.serializeOrgsForUserId(userId).catch(function(err) {
+          // Workaround for GitHub outage
+          winston.error('Failed to serialize orgs:' + err, { exception: err });
+          return [];
+        }),
+
+      ]).spread(function (troupeContext, chats, activityEvents, users, ownerIsOrg, orgs) {
         var initialChat = _.find(chats, function(chat) { return chat.initial; });
         var initialBottom = !initialChat;
         var githubLink;
@@ -380,7 +388,8 @@ function renderChat(req, res, options, next) {
             isMobile: options.isMobile,
             ownerIsOrg: ownerIsOrg,
             orgPageHref: orgPageHref,
-            roomMember: req.uriContext.roomMember
+            roomMember: req.uriContext.roomMember,
+            orgs: orgs
           }, troupeContext && {
             troupeTopic: troupeContext.troupe.topic,
             premium: troupeContext.troupe.premium,
@@ -413,14 +422,25 @@ function renderChatPage(req, res, next) {
 }
 
 function renderMobileUserHome(req, res, next) {
-  contextGenerator.generateNonChatContext(req)
-    .then(function(troupeContext) {
+  var user = req.user;
+  var userId = user && user.id;
+  Q.all([
+      contextGenerator.generateNonChatContext(req),
+      //JP 4/12/15 Not sure if this is appropriate here /cc @suprememoocow
+      restful.serializeOrgsForUserId(userId).catch(function(err) {
+        // Workaround for GitHub outage
+        winston.error('Failed to serialize orgs:' + err, { exception: err });
+        return [];
+      }),
+    ])
+    .spread(function(troupeContext, orgs) {
       res.render('mobile/mobile-userhome', {
         troupeName: req.uriContext.uri,
         troupeContext: troupeContext,
         agent: req.headers['user-agent'],
         user: req.user,
-        dnsPrefetch: dnsPrefetch
+        dnsPrefetch: dnsPrefetch,
+        orgs: orgs
       });
     })
     .catch(next);
