@@ -4,6 +4,7 @@ var Marionette = require('backbone.marionette');
 var template = require('./search-input-view.hbs');
 
 module.exports = Marionette.ItemView.extend({
+  className: 'search-input-container',
   template: template,
 
   modelEvents: {

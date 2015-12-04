@@ -6,6 +6,7 @@ var itemTemplate  = require('./primary-collection-view.hbs');
 var getRoomAvatar = require('utils/get-room-avatar');
 
 var ItemView = Marionette.ItemView.extend({
+  className: 'room-item',
   template: itemTemplate,
   serializeData: function() {
     var data = this.model.toJSON();

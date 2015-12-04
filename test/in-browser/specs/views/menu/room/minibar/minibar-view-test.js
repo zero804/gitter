@@ -43,7 +43,7 @@ describe('MinibarView', function() {
 
     assert.ok(model.get('panelOpenState'));
     assert.equal('search', model.get('state'));
-    assert.ok(model.get('profileMenuOpenState'));
+    assert.ok(!model.get('profileMenuOpenState'));
   });
 
   it('should create child views for each child element with the correct dataset', function() {
