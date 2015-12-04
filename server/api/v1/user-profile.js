@@ -1,10 +1,10 @@
 "use strict";
 
-var Mirror      = require('gitter-web-github').GitHubMirrorService('user');
 var userService = require("../../services/user-service");
 var restSerializer = require("../../serializers/rest-serializer");
 var userScopes = require("../../utils/models/user-scopes");
 var StatusError = require('statuserror');
+var gitHubProfileService = require('../../backends/github/github-profile-service');
 
 module.exports = function getUserProfile(req, res, next) {
   if (!req.params || !req.params.username) return next(new StatusError(404));
@@ -17,41 +17,13 @@ module.exports = function getUserProfile(req, res, next) {
         return restSerializer.serialize(user, strategy);
 
       } else {
-        var githubUri = 'users/' + username;
-        var githubUser = {username: username};
+        var gitHubUser = {username: username};
 
-        if (!userScopes.isGitHubUser(githubUser)) {
+        if (!userScopes.isGitHubUser(gitHubUser)) {
           return next(new StatusError(404));
         }
 
-        var mirror = new Mirror(githubUser);
-
-        return mirror.get(githubUri)
-          .then(function (body) {
-            if (!body || !body.login) throw new StatusError(404);
-
-            var blogUrl;
-            if (body.blog) {
-              if (!body.blog.match(/^https?:\/\//)) {
-                blogUrl = 'http://' + body.blog;
-              } else {
-                blogUrl = body.blog;
-              }
-            }
-
-            var profile = {
-              username: body.login,
-              displayName: body.name
-            };
-
-            profile.company = body.company;
-            profile.location = body.location;
-            profile.email = body.email;
-            profile.website = blogUrl;
-            profile.profile = body.html_url;
-
-            return profile;
-          });
+        return gitHubProfileService(gitHubUser, true);
       }
     })
     .then(function(response) {

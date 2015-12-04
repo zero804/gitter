@@ -1,9 +1,11 @@
 'use strict';
 
 var gitHubEmailAddressService = require('./github-email-address-service');
+var gitHubProfileService = require('./github-profile-service');
 var GithubMe = require('gitter-web-github').GitHubMeService;
 var Mirror = require('gitter-web-github').GitHubMirrorService('user');
 var Q = require('q');
+var _ = require('lodash');
 
 function GitHubBackend(user, identity) {
   this.user = user;
@@ -31,40 +33,11 @@ GitHubBackend.prototype.getSerializedOrgs = function() {
 GitHubBackend.prototype.getProfile = function() {
   // the minimum response
   var profile = {provider: 'github'};
-
-  var githubUri = 'users/' + this.user.username;
-
-  // erm. This uses the user we're looking up's tokens, not the user requesting
-  // the lookup.
-  var mirror = new Mirror(this.user);
-
-  return mirror.get(githubUri)
-    .then(function(body) {
-      if (!body || !body.login) return profile;
-
-      var blogUrl;
-      if (body.blog) {
-        if (!body.blog.match(/^https?:\/\//)) {
-          blogUrl = 'http://' + body.blog;
-        } else {
-          blogUrl = body.blog;
-        }
-      }
-
-      //standard
-      profile.company = body.company;
-      profile.location = body.location;
-      profile.email = body.email;
-      profile.website = blogUrl;
-      profile.profile = body.html_url;
-
-      // github-specific
-      profile.followers = body.followers;
-      profile.public_repos = body.public_repos;
-      profile.following = body.following;
-
+  return gitHubProfileService(this.user, false)
+    .then(function(gitHubProfile) {
+      _.extend(profile, gitHubProfile);
       return profile;
-    })
+    });
 };
 
 module.exports = GitHubBackend;
