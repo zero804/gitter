@@ -132,6 +132,21 @@ var ChatCollection = LiveCollection.extend({
     });
   },
 
+  transformModel: function(model) {
+    // If the incoming model is marked as read,
+    // but the existing model is unread
+    // ignore that part of the update
+    if (model.unread) {
+      var id = model.id;
+      var existing = this.get(id);
+      if (existing && existing.unread === false) {
+        delete model.unread;
+      }
+    }
+
+    return model;
+  },
+
   getQuery: function() {
     return { lean: true };
   },
