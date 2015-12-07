@@ -22,8 +22,6 @@ module.exports = Marionette.CollectionView.extend({
   initialize: function(options) {
     this.model = options.model;
     this.listenTo(options.model, 'change:state change:selectedOrgId', this.onModelStateChange, this);
-    this.listenTo(this.collection, 'collection:change', this.render, this);
-    this.onModelStateChange(this.model, this.model.get('state'));
   },
 
   filter: function(model){
