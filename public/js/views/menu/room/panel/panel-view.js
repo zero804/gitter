@@ -59,7 +59,10 @@ module.exports = Marionette.LayoutView.extend({
 
   initialize: function() {
     appEvents.on('ui:swipeleft', this.onSwipeLeft, this);
-    this.$el.nanoScroller({ iOSNativeScrolling: true });
+    this.$el.find('.nano').nanoScroller({
+      iOSNativeScrolling: true,
+      alwaysVisible: true
+    });
   },
 
   onPanelOpenStateChange: function(model, val) { /*jshint unused: true */
