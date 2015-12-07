@@ -38,10 +38,16 @@ module.exports = function gitHubProfileService(gitHubUser, includeCore) {
       profile.website = blogUrl;
       profile.profile = body.html_url;
 
+      // For gitter users we use what's in the db, but for github users that
+      // aren't, we have to use what github returns.
+      profile.gravatarImageUrl = body.avatar_url;
+
       // github-specific
-      profile.followers = body.followers;
-      profile.public_repos = body.public_repos;
-      profile.following = body.following;
+      profile.github = {
+        followers: body.followers,
+        public_repos: body.public_repos,
+        following: body.following
+      };
 
       return profile;
     })
