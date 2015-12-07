@@ -41,24 +41,18 @@ function UserProfileStrategy(options) {
       has_gitter_login: true // by definition
     };
 
-    // standard stuff goes to the bottom level
-    _.extend(profile, _.pick(user.profiles[0], STANDARD_ATTRIBUTES));
+    // Provider is just the one that matched and we prefer the avatar in the
+    // database over what's coming from the API so that it is easier to reuse
+    // gravatarVersion for github users.
+    _.extend(profile, _.omit(user.profiles[0], ['provider', 'gravatarImageUrl']));
 
     if (user.gravatarVersion) {
-      // githubcompan
+      // github
       profile.gv = user.gravatarVersion;
     } else {
       // non-github
       profile.gravatarImageUrl = user.gravatarImageUrl;
     }
-
-    // all the non-standard stuff along with "provider" goes in identities/
-    user.profiles.forEach(function(p) {
-      var providerFields = _.omit(p, STANDARD_ATTRIBUTES.concat(['provider']));
-      if (!_.isEmpty(providerFields)) {
-        profile[p.provider] = providerFields;
-      }
-    });
 
     return profile;
   }
