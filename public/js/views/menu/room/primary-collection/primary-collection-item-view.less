@@ -5,7 +5,6 @@
 .room-item {
   display:        flex;
   flex-direction: row;
-  padding-left:   @menu-left-padding;
   align-items:    center;
 
   &:hover {
@@ -15,10 +14,12 @@
 
   .desktop & {
     height: @desktop-header-height;
+    padding-left: @desktop-menu-left-padding;
   }
 
   .mobile & {
     height: @mobile-header-height;
+    padding-left: @mobile-menu-left-padding;
   }
 }
 
@@ -36,9 +37,16 @@
   height:        @menu-unread-badge-size;
   width:         @menu-unread-badge-size;
   margin-left:   auto;
-  margin-right:  @menu-left-padding;
   font-size:     1.1rem;
   line-height:   @menu-unread-badge-size;
   text-align:    center;
   color:         white;
+
+  .desktop & {
+    margin-right:  @desktop-menu-left-padding;
+  }
+
+  .mobile & {
+    margin-right:  @mobile-menu-left-padding;
+  }
 }

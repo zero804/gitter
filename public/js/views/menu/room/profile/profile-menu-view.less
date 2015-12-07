@@ -16,7 +16,12 @@
 }
 
 .profile-menu__item {
-  padding-left: @menu-left-padding;
+  .desktop & {
+    padding-left: @desktop-menu-left-padding;
+  }
+  .mobile {
+    padding-left: @mobile-menu-left-padding;
+  }
 }
 
 .profile-menu__item__title {

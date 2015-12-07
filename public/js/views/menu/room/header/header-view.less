@@ -11,7 +11,6 @@
   display:      flex;
   align-items:  center;
   width:        100%;
-  padding-left: @menu-left-padding;
   background:   @ruby;
 
   &:hover {
@@ -20,10 +19,12 @@
 
   .desktop & {
     height: @desktop-header-height;
+    padding-left: @desktop-menu-left-padding;
   }
 
   .mobile & {
     height: @mobile-header-height;
+    padding-left: @mobile-menu-left-padding;
   }
 }
 
@@ -37,16 +38,17 @@
 }
 
 .panel-header__title {
-  padding:     0 0 0 @menu-left-padding;
   margin:      0;
   font-weight: 300;
   font-size:   2.5rem;
 
   .desktop & {
+    padding:     0 0 0 @desktop-menu-left-padding;
     line-height: @desktop-header-height;
   }
 
   .mobile & {
+    padding:     0 0 0 @mobile-menu-left-padding;
     line-height: @mobile-header-height;
   }
 }
@@ -79,12 +81,16 @@
 
 .panel-header__org-icon {
   margin-left:  auto;
-  margin-right: @menu-left-padding;
   color:        @org-bg;
   font-size:    2rem;
 
   .desktop & {
     font-size: 3rem;
+    margin-right: @desktop-menu-left-padding;
+  }
+
+  .mobile & {
+    margin-right: @mobile-menu-left-padding;
   }
 
 }
