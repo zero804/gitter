@@ -1,20 +1,24 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var env               = require('gitter-web-env');
-var logger            = env.logger;
+var env                   = require('gitter-web-env');
+var logger                = env.logger;
 
-var restSerializer      = require("../serializers/rest-serializer");
-var unreadItemService   = require("./unread-item-service");
-var chatService         = require("./chat-service");
-var userService         = require("./user-service");
-var userSearchService   = require('./user-search-service');
-var eventService        = require("./event-service");
-var Q                   = require('q');
-var roomService         = require('./room-service');
-var _                   = require('underscore');
+var Q                     = require('q');
+var StatusError           = require('statuserror');
+var _                     = require('underscore');
+var gitHubProfileService  = require('gitter-web-github-backend/lib/github-profile-service');
+var restSerializer        = require("../serializers/rest-serializer");
+var unreadItemService     = require("./unread-item-service");
+var chatService           = require("./chat-service");
+var userService           = require("./user-service");
+var userSearchService     = require('./user-search-service');
+var eventService          = require("./event-service");
+var roomService           = require('./room-service');
 var roomMembershipService = require('./room-membership-service');
-var BackendMuxer = require('./backend-muxer');
+var BackendMuxer          = require('./backend-muxer');
+var userScopes            = require("../utils/models/user-scopes");
+
 
 var survivalMode = !!process.env.SURVIVAL_MODE || false;
 
@@ -151,5 +155,24 @@ exports.serializeOrgsForUserId = function(userId, options) {
       if(!user) return [];
 
       return exports.serializeOrgsForUser(user, options);
+    });
+};
+
+exports.serializeProfileForUsername = function(username) {
+  return userService.findByUsername(username)
+    .then(function(user) {
+      if (user) {
+        var strategy = new restSerializer.UserProfileStrategy();
+        return restSerializer.serialize(user, strategy);
+
+      } else {
+        var gitHubUser = {username: username};
+
+        if (!userScopes.isGitHubUser(gitHubUser)) {
+          throw new StatusError(404);
+        }
+
+        return gitHubProfileService(gitHubUser, true);
+      }
     });
 };
