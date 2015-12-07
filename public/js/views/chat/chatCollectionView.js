@@ -2,13 +2,13 @@
 "use strict";
 
 var $            = require('jquery');
-var _            = require('underscore');
 var Marionette   = require('backbone.marionette');
 var appEvents    = require('utils/appevents');
 var chatItemView = require('./chatItemView');
 var Rollers      = require('utils/rollers');
 var isolateBurst = require('gitter-web-shared/burst/isolate-burst-bb');
 var context      = require('utils/context');
+var perfTiming   = require('../../components/perf-timing');
 var debug        = require('debug-proxy')('app:chat-collection-view');
 
 require('views/behaviors/infinite-scroll');
@@ -438,6 +438,10 @@ module.exports = (function() {
      * remove
      */
     onBeforeRender: function() {
+      perfTiming.start('chat-collection.render');
+
+      this._renderStartTime = Date.now();
+
       if (this.collection.length) return;
 
       // The first time the collection is setup,
@@ -453,8 +457,15 @@ module.exports = (function() {
     },
 
     onRender: function() {
-      if (!this.collection.length) return;
-      
+      var hasItems = this.collection.length;
+
+      if (!hasItems) return;
+      perfTiming.end('chat-collection.render');
+
+      if (!this.collection.loading) {
+        perfTiming.end('room-switch.render'); 
+      }
+
       var c = context();
       var permalinkChatId = c.permalinkChatId;
 
@@ -462,7 +473,6 @@ module.exports = (function() {
         this.highlightPermalinkChat(permalinkChatId);
         delete c.permalinkChatId;
       }
-
     }
 
   });
