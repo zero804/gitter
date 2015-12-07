@@ -66,8 +66,13 @@ var ChatModel = Backbone.Model.extend({
     if (sent) {
       // Turn the moment sent value into a string
       d.sent = sent.format();
+    } else {
+      delete d.sent;
     }
 
+    delete d.burstStart;
+    delete d.burstFinal;
+    delete d.fromUser;
     // No need to send html back to the server
     delete d.html;
 
