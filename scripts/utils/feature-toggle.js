@@ -24,6 +24,14 @@ var opts = require("nomnom")
      flag: true,
      help: 'Turn off percentage'
    })
+   .option('disable-browser', {
+     help: 'Disable a specific browser, up to a given version. eg "Chrome:47" or "Safari:all". Browser family names come from npm package `useragent`.',
+     list: true
+   })
+   .option('disable-browser-off', {
+     help: 'Renable for a specific browser, eg "Chrome"',
+     list: true
+   })
    .option('enable', {
      flag: true,
      help: 'Enabled'
@@ -57,6 +65,23 @@ function runWithOpts(opts) {
   if (excludeUsers) {
     excludeUsers.forEach(function(username) {
       unset['criteria.allowUsernames.' + username] = true;
+    });
+  }
+
+  var disableBrowser = opts['disable-browser'];
+  if (disableBrowser) {
+    disableBrowser.forEach(function(browserVersion) {
+      var pair = browserVersion.split(':');
+      var browserName = pair[0];
+      var version = parseInt(pair[1], 10) || 'all';
+      set['criteria.disableBrowser.' + browserName] = version;
+    });
+  }
+
+  var disableBrowserOff = opts['disable-browser-off'];
+  if (disableBrowserOff) {
+    disableBrowserOff.forEach(function(browser) {
+      unset['criteria.disableBrowser.' + browser] = true;
     });
   }
 

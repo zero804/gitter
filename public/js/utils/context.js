@@ -296,6 +296,10 @@ module.exports = (function() {
     return ctx.features && ctx.features.indexOf(featureName) >= 0;
   };
 
+  context.getFeatures = function() {
+    return ctx.features || [];
+  };
+
   return context;
 
 })();

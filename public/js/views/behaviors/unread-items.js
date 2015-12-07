@@ -50,11 +50,22 @@ var Behavior = Marionette.Behavior.extend({
     }
   },
 
-  unreadChanged: function(model) {
-    if (model.get('unread')) return; // Changed to read? Don't know how to handle that yet...
+  unreadChanged: function(model, value, options) {
+    if (value) {
+      // Changing to unread
+      this.el.classList.add('unread');
+      return;
+    }
+
     var previous = model.previous('unread');
     if (!previous) return; // On send, unread is undefined. Ignore changes from undefined to false
-    queueTransition(this.el);
+
+    if (options && options.fast) {
+      this.el.classList.add('fast'); // Remove the transition
+      this.el.classList.remove('unread');
+    } else {
+      queueTransition(this.el);
+    }
   }
 });
 
