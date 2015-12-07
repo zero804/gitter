@@ -142,6 +142,14 @@ NODE_ENV=beta ./scripts/utils/feature-toggle.js fancy-new-feature --enable
 # Undo "include everyone"
 NODE_ENV=beta ./scripts/utils/feature-toggle.js fancy-new-feature --enable-off
 
+# Disable Chrome, version 47 and below
+NODE_ENV=beta ./scripts/utils/feature-toggle.js fancy-new-feature --disable-browser Chrome:47
+
+# Disable all versions of IE
+NODE_ENV=beta ./scripts/utils/feature-toggle.js fancy-new-feature --disable-browser IE:all
+
+# Renable the feature for Chrome
+NODE_ENV=beta ./scripts/utils/feature-toggle.js fancy-new-feature --disable-browser-off Chrome
 ```
 
 To turn on and off features manually in your browser:

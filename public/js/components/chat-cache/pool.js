@@ -25,7 +25,7 @@ var DEFAULT_POOL_SIZE = 5;
  *   `preload`: returns a promise of a collection once it's fully loaded
  *              Importantly, it will never reuse an existing slot. It will
  *              simply igonore the preload request if no more slots
- *              are available.          
+ *              are available.
  */
 function Pool(Collection, options) {
   this.idAttribute = options && options.idAttribute || "id";
@@ -49,6 +49,7 @@ Pool.prototype = {
    * Returns a collection for the given id
    */
   get: function(id) {
+    if (!id) throw new Error('id required');
     var idAttribute = this.idAttribute;
 
     // If the item is already in the pool, just use it
@@ -92,6 +93,8 @@ Pool.prototype = {
    * unallocated slots
    */
   preload: function(id, accessTime) {
+    if (!id) throw new Error('id required');
+
     var idAttribute = this.idAttribute;
 
     var slot = this.lookup[id];
