@@ -10,6 +10,7 @@ var ChatToolbarInputLayout = require('views/layouts/chat-toolbar-input');
 var DropTargetView         = require('views/app/dropTargetView');
 var onready                = require('./utils/onready');
 var apiClient              = require('components/apiClient');
+var perfTiming             = require('./components/perf-timing');
 var frameUtils             = require('./utils/frame-utils');
 var itemCollections        = require('collections/instances/integrated-items');
 var chatCollection         = require('collections/instances/chats-cached');
@@ -44,20 +45,27 @@ onready(function() {
 
   require('components/link-handler').installLinkHandler();
 
-  window.addEventListener('message', function(e) {
+  function parsePostMessage(e) {
+    // Shortcut for performance
+    if (!e || !e.data || typeof e.data !== 'string') return;
+
     if (e.origin !== context.env('basePath')) {
       debug('Ignoring message from ' + e.origin);
       return;
     }
 
-    var message;
     try {
-      message = JSON.parse(e.data);
+      return JSON.parse(e.data);
     } catch (err) {
       /* It seems as through chrome extensions use this event to pass messages too. Ignore them. */
       return;
     }
+  }
 
+  window.addEventListener('message', function(e) {
+    var message = parsePostMessage(e);
+    if (!message) return;
+    
     debug('Received message %j', message);
 
     var makeEvent = function(message) {
@@ -100,6 +108,8 @@ onready(function() {
       break;
 
       case 'change:room':
+        perfTiming.start('room-switch.render');
+
         debug('changing room: %j', message.newTroupe);
         //destroy any modal views
         appView.dialogRegion.destroy();
@@ -375,7 +385,4 @@ onready(function() {
   liveContext.syncRoom();
 
   Backbone.history.start();
-
-  //request the room list from the parent application
-  frameUtils.postMessage({ type: 'request:roomList' });
 });

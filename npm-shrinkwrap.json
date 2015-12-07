@@ -617,7 +617,7 @@
           "dependencies": {
             "mime-types": {
               "version": "2.1.8",
-              "from": "mime-types@>=2.1.6 <2.2.0",
+              "from": "mime-types@>=2.1.8 <2.2.0",
               "resolved": "http://beta-internal:4873/mime-types/-/mime-types-2.1.8.tgz",
               "dependencies": {
                 "mime-db": {
@@ -806,7 +806,7 @@
             },
             "mime-types": {
               "version": "2.1.8",
-              "from": "mime-types@>=2.1.6 <2.2.0",
+              "from": "mime-types@>=2.1.8 <2.2.0",
               "resolved": "http://beta-internal:4873/mime-types/-/mime-types-2.1.8.tgz",
               "dependencies": {
                 "mime-db": {
@@ -1071,7 +1071,7 @@
     },
     "gitter-env": {
       "version": "0.20.24",
-      "from": "gitter-env@>=0.20.23 <0.21.0",
+      "from": "gitter-env@>=0.20.24 <0.21.0",
       "resolved": "http://beta-internal:4873/gitter-env/-/gitter-env-0.20.24.tgz",
       "dependencies": {
         "async": {
@@ -1461,7 +1461,7 @@
     },
     "gitter-realtime-client": {
       "version": "0.3.14",
-      "from": "gitter-realtime-client@>=0.3.13 <0.4.0",
+      "from": "gitter-realtime-client@>=0.3.14 <0.4.0",
       "resolved": "http://beta-internal:4873/gitter-realtime-client/-/gitter-realtime-client-0.3.14.tgz",
       "dependencies": {
         "backbone": {
