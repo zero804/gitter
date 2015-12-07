@@ -4,7 +4,7 @@ var userService = require("../../services/user-service");
 var restSerializer = require("../../serializers/rest-serializer");
 var userScopes = require("../../utils/models/user-scopes");
 var StatusError = require('statuserror');
-var gitHubProfileService = require('../../backends/github/github-profile-service');
+var gitHubProfileService = require('gitter-web-github-backend/lib/github-profile-service');
 
 module.exports = function getUserProfile(req, res, next) {
   if (!req.params || !req.params.username) return next(new StatusError(404));
