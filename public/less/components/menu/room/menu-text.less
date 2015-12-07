@@ -1,10 +1,14 @@
 .room-menu-text() {
   font-size:   1.5rem;
   font-weight: 200;
-  line-height: @header-height;
   color:       @menu-item-color;
 
+  .mobile & {
+    line-height: @mobile-header-height;
+  }
+
   .desktop & {
+    line-height: @desktop-header-height;
     font-size: 2rem;
   }
 }

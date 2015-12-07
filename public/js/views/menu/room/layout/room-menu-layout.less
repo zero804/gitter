@@ -16,31 +16,22 @@ html {
   width: 100%;
 }
 
-.mobile {
-  .room-menu-container {
-    width: @mobile-menu-width;
-  }
-
-  .room-menu__panel {
-    width: 100vw;
-  }
-}
-
-.desktop {
-  .room-menu-container {
-    width: @desktop-menu-width;
-  }
-
-  .room-menu__panel {
-    width: 35vw;
-  }
-}
-
 .room-menu-container {
   position:   relative;
   height:     100%;
   background: @menu-bg;
   z-index:    101;
+
+  .mobile & {
+    width: @mobile-menu-width;
+    min-width: @mobile-header-height;
+  }
+
+  .desktop & {
+    width: @desktop-menu-width;
+    min-width: @desktop-header-height;
+  }
+
 }
 
 .room-menu {
@@ -64,13 +55,23 @@ html {
   left:         0;
   height:       100%;
   padding-left: 100%;
-  padding-bottom: 4rem;
   background:   #333132;
   transform:    translateX(-100%);
   transition:   all .2s linear .1s;
 
   &.active {
     transform: translateX(0);
+  }
+
+  .mobile & {
+    width: 100vw;
+    padding-bottom: @mobile-header-height;
+  }
+
+  .desktop & {
+    width: 25vw;
+    min-width: 40rem;
+    padding-bottom: @desktop-header-height;
   }
 }
 
@@ -79,10 +80,8 @@ html {
   margin-left: 0;
 }
 
-.room-menu-options__item {
-  height:      @header-height;
+.room-menu-options__item() {
   color:       white;
-  line-height: @header-height;
   text-align:  center;
 
   &:hover {
@@ -97,10 +96,21 @@ html {
       text-decoration: none;
     }
   }
+
+  .mobile & {
+    line-height: @mobile-header-height;
+    height:      @mobile-header-height;
+  }
+
+  .desktop & {
+    line-height: @desktop-header-height;
+    height:      @desktop-header-height;
+  }
+
 }
 
 .room-menu-options__item--home {
-  .room-menu-options__item;
+  .room-menu-options__item();
   background: black;
 
   &.active {
@@ -109,7 +119,7 @@ html {
 }
 
 .room-menu-options__item--search {
-  .room-menu-options__item;
+  .room-menu-options__item();
   background: #131314;
 
   &.active {
@@ -118,7 +128,7 @@ html {
 }
 
 .room-menu-options__item--people {
-  .room-menu-options__item;
+  .room-menu-options__item();
   background: #1f1f1f;
 
   &.active {
@@ -127,7 +137,7 @@ html {
 }
 
 .room-menu-options__item--favourite {
-  .room-menu-options__item;
+  .room-menu-options__item();
   background: #1a191b;
 
   &.active {
@@ -136,7 +146,7 @@ html {
 }
 
 .room-menu-options__item--org {
-  .room-menu-options__item;
+  .room-menu-options__item();
 
   a {
     display:         flex;
