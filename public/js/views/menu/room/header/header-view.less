@@ -10,13 +10,20 @@
   box-sizing:   border-box;
   display:      flex;
   align-items:  center;
-  height:       @header-height;
   width:        100%;
   padding-left: @menu-left-padding;
   background:   @ruby;
 
   &:hover {
     cursor: pointer;
+  }
+
+  .desktop & {
+    height: @desktop-header-height;
+  }
+
+  .mobile & {
+    height: @mobile-header-height;
   }
 }
 
@@ -32,9 +39,16 @@
 .panel-header__title {
   padding:     0 0 0 @menu-left-padding;
   margin:      0;
-  line-height: @header-height;
   font-weight: 300;
   font-size:   2.5rem;
+
+  .desktop & {
+    line-height: @desktop-header-height;
+  }
+
+  .mobile & {
+    line-height: @mobile-header-height;
+  }
 }
 
 .panel-header__title--search  {

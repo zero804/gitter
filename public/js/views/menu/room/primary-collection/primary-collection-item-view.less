@@ -5,13 +5,20 @@
 .room-item {
   display:        flex;
   flex-direction: row;
-  height:         @header-height;
   padding-left:   @menu-left-padding;
   align-items:    center;
 
   &:hover {
     cursor: pointer;
     background-color: rgba(255, 255, 255, .1);
+  }
+
+  .desktop & {
+    height: @desktop-header-height;
+  }
+
+  .mobile & {
+    height: @mobile-header-height;
   }
 }
 
