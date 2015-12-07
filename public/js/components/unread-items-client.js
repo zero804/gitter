@@ -104,19 +104,25 @@ module.exports = (function() {
     },
 
     _updateLastAccess: function() {
+      debug('_updateLastAccess');
+
       apiClient.userRoom.put('', { updateLastAccess: new Date() })
       .then(function() {
-        debug('updateLastAccess done');
+        debug('_updateLastAccess done');
       });
     },
 
     _send: function(options) {
+      debug('_send');
+
       Object.keys(this._buffer).forEach(function(troupeId) {
         this._sendForRoom(troupeId, options);
       }, this);
     },
 
     _sendForRoom: function(troupeId, options) {
+      debug('_sendForRoom: %s', troupeId);
+
       var items = Object.keys(this._buffer[troupeId]);
       delete this._buffer[troupeId];
       if (!items.length) return;
@@ -166,6 +172,8 @@ module.exports = (function() {
         urlTemplate: '/v1/user/:userId/rooms/:troupeId/unreadItems',
         contextModel: context.contextModel(),
         onMessage: function(message) {
+          debug('Realtime: Channel message: %j', message);
+
           switch(message.notification) {
             // New unread items
             case 'unread_items':
@@ -194,7 +202,8 @@ module.exports = (function() {
         },
 
         handleSnapshot: function(snapshot) {
-          store.state = 'LOADED';
+          debug('Realtime: Channel snapshot: %j', snapshot);
+
           var roomMember = context.troupe().get('roomMember');
           var lurk = snapshot._meta && snapshot._meta.lurk;
 
@@ -203,11 +212,13 @@ module.exports = (function() {
           }
 
           // TODO: send the recently marked items back to the server
-          store._unreadItemsAdded(snapshot);
+          store.reset(snapshot);
         }
       });
 
       templateSubscription.on('resubscribe', function() {
+        debug('Realtime: resubscribe');
+
         store.state = 'LOADING';
         store.reset();
       });
@@ -510,19 +521,45 @@ module.exports = (function() {
     // * add (itemId, mention)
      */
     store.on('unreadItemRemoved', function(itemId) {
+      debug('CollectionSync: unreadItemRemoved: %s mention=%s', itemId);
       collection.patch(itemId, { unread: false, mentioned: false });
     });
 
     store.on('itemMarkedRead', function(itemId, mention) {
+      debug('CollectionSync: itemMarkedRead: %s mention=%s', itemId, mention);
+
       collection.patch(itemId, { unread: false, mentioned: mention });
     });
 
     store.on('change:status', function(itemId, mention) {
+      debug('CollectionSync: change:status: %s mention=%s', itemId);
+
       collection.patch(itemId, { unread: true,  mentioned: mention });
     });
 
     store.on('add', function(itemId, mention) {
+      debug('CollectionSync: add: %s mention=%s', itemId);
       collection.patch(itemId, { unread: true, mentioned: mention });
+    });
+
+    store.on('reset', function() {
+      debug('CollectionSync: reset');
+      var items = store.getItemHash();
+
+      collection.each(function(model) {
+        var id = model.id;
+        var unreadState = items[id];
+        var setOptions = { fast: true };
+
+        if (unreadState === false) {
+          model.set({ unread: true, mentioned: false }, setOptions);
+        } else if (unreadState === true) {
+          model.set({ unread: true, mentioned: true }, setOptions);
+        } else {
+          model.set({ unread: false, mentioned: false }, setOptions);
+        }
+      });
+
     });
   }
 
