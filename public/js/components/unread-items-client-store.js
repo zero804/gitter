@@ -84,34 +84,51 @@ var UnreadItemStore = function() {
 
 _.extend(UnreadItemStore.prototype, Backbone.Events, {
   state: 'LOADING',
-  _unreadItemAdded: function(itemId, mention) {
+
+  /**
+   * Returns `true` if the result changes the state of the store
+   * options: { silent } will not trigger a recount or events
+   */
+  _unreadItemAdded: function(itemId, mention, options) {
     // Three options here:
     // 1 - new item
     // 2 - item exists and has the same mention status as before (nullop)
     // 3 - item exists and has a different mention status to before
+    var silent = options && options.silent;
 
     if (!this._items.hasOwnProperty(itemId)) {
       // Case 1: new item
       this._items[itemId] = mention;
       this.length++;
-      this.notifyCountLimited();
 
       // Since the item may already have been read BEFORE
       // the user was mentioned, remove the item from
       // the tarpit
       this._read.remove(itemId);
 
-      this.trigger('add', itemId, mention);
+      if (!silent) {
+        this.notifyCountLimited();
+        this.trigger('add', itemId, mention);
+      }
+
+      return true;
     } else {
       if (this._items[itemId] === mention) {
         // Case 2
-        return;
+        return false;
       }
 
       // Case 3
       this._items[itemId] = mention;
-      this.trigger('change:status', itemId, mention);
+
+      if (!silent) {
+        this.trigger('change:status', itemId, mention);
+      }
+
+      return true;
     }
+
+    return false;
   },
 
   _unreadItemRemoved: function(itemId) {
@@ -201,6 +218,10 @@ _.extend(UnreadItemStore.prototype, Backbone.Events, {
     return Object.keys(this._items);
   },
 
+  getItemHash: function() {
+    return this._items;
+  },
+
   getMentions: function() {
     return Object.keys(this._items).reduce(function(accum, itemId) {
       if (this._items[itemId]) accum.push(itemId);
@@ -241,12 +262,24 @@ _.extend(UnreadItemStore.prototype, Backbone.Events, {
     return this._read.contains(itemId);
   },
 
-  reset: function() {
+  reset: function(items) {
     this.length = 0;
     this._lurkMode = false;
-    this._items = {};
     this._read.reset();
-    if (this.state === 'LOADED') this.notifyCountLimited();
+
+    this._items = {};
+    if (items) {
+      this.state = 'LOADED';
+      _iteratePreload(items, function(itemId, mention) {
+        this._unreadItemAdded(itemId, mention, { silent: true });
+      }, this);
+
+      this.trigger('reset');
+      this.notifyCountLimited();
+    } else {
+      if (this.state === 'LOADED') this.notifyCountLimited();
+    }
+
   }
 
 });
