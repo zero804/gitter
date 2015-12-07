@@ -10,6 +10,7 @@ var SearchInputView       = require('../search-input/search-input-view');
 var RAF                   = require('utils/raf');
 
 require('views/behaviors/isomorphic');
+require('nanoscroller');
 
 module.exports = Marionette.LayoutView.extend({
 
@@ -58,6 +59,7 @@ module.exports = Marionette.LayoutView.extend({
 
   initialize: function() {
     appEvents.on('ui:swipeleft', this.onSwipeLeft, this);
+    this.$el.nanoScroller({ iOSNativeScrolling: true });
   },
 
   onPanelOpenStateChange: function(model, val) { /*jshint unused: true */
