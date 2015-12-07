@@ -61,7 +61,7 @@ module.exports = Marionette.LayoutView.extend({
     appEvents.on('ui:swipeleft', this.onSwipeLeft, this);
     this.$el.find('.nano').nanoScroller({
       iOSNativeScrolling: true,
-      alwaysVisible: true
+      sliderMaxHeight: 200
     });
   },
 
