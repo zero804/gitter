@@ -122,7 +122,7 @@ module.exports = (function() {
     },
 
     serializeData: function() {
-      var data = this.model.toJSON();
+      var data = _.clone(this.model.attributes);
 
       if (data.fromUser) {
         data.username = data.fromUser.username;
@@ -307,7 +307,7 @@ module.exports = (function() {
     },
 
     isOwnMessage: function() {
-      if (this.model.get('fromUser') === null) return false;
+      if (!this.model.get('fromUser')) return false;
       return this.model.get('fromUser').id === context.getUserId();
     },
 

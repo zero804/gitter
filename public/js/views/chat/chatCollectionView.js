@@ -2,13 +2,13 @@
 "use strict";
 
 var $            = require('jquery');
-var _            = require('underscore');
 var Marionette   = require('backbone.marionette');
 var appEvents    = require('utils/appevents');
 var chatItemView = require('./chatItemView');
 var Rollers      = require('utils/rollers');
 var isolateBurst = require('gitter-web-shared/burst/isolate-burst-bb');
 var context      = require('utils/context');
+var perfTiming   = require('../../components/perf-timing');
 var debug        = require('debug-proxy')('app:chat-collection-view');
 
 require('views/behaviors/infinite-scroll');
@@ -214,44 +214,16 @@ module.exports = (function() {
       this.listenTo(appEvents, 'chatCollectionView:scrollToChatId', this.scrollToChatId);
 
       //When we change room, scroll to the bottom of the chatCollection
-      this.listenTo(context.troupe(), 'change:id', this.render, this);
-
-      //listen for when the cache is constructed then stop listening to room change events
-      //this will stop a double render call
-      this.listenTo(appEvents, 'chat-cache:ok', function(){
-        this.stopListening('chat-cache:ok');
-        this.stopListening(context.troupe());
-      }, this);
-
-      //when the collection changes re render
-      this.listenTo(this.collection, 'collection:change', function() {
-
-        //render the new content
-        this.render();
+      this.listenTo(context.troupe(), 'change:id', function() {
         this.scrollToBottom();
-      }, this);
+      });
+
     },
 
     onTrackViewportCenter: function() {
       if (!this.isScrolledToBottom()) {
         var el = this.rollers.getMostCenteredElement();
         this.rollers.stable(el);
-      }
-    },
-
-    scrollToFirstUnreadBelow: function() {
-      // TODO: this won't work if we're not at the bottom
-      var contentFrame = document.querySelector(SCROLL_ELEMENT);
-
-      var unreadItems = contentFrame.querySelectorAll('.unread');
-      var viewportBottom = this.rollers.getScrollBottom() + 1;
-      var firstOffscreenElement = _.sortedIndex(unreadItems, viewportBottom, function(element) {
-        return element.offsetTop;
-      });
-
-      var element = unreadItems[firstOffscreenElement];
-      if (element) {
-        this.rollers.scrollToElement(element);
       }
     },
 
@@ -466,6 +438,10 @@ module.exports = (function() {
      * remove
      */
     onBeforeRender: function() {
+      perfTiming.start('chat-collection.render');
+
+      this._renderStartTime = Date.now();
+
       if (this.collection.length) return;
 
       // The first time the collection is setup,
@@ -479,6 +455,25 @@ module.exports = (function() {
         el.removeChild(child);
       }
     },
+
+    onRender: function() {
+      var hasItems = this.collection.length;
+
+      if (!hasItems) return;
+      perfTiming.end('chat-collection.render');
+
+      if (!this.collection.loading) {
+        perfTiming.end('room-switch.render'); 
+      }
+
+      var c = context();
+      var permalinkChatId = c.permalinkChatId;
+
+      if (permalinkChatId) {
+        this.highlightPermalinkChat(permalinkChatId);
+        delete c.permalinkChatId;
+      }
+    }
 
   });
 

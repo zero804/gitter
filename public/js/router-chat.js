@@ -10,9 +10,10 @@ var ChatToolbarInputLayout = require('views/layouts/chat-toolbar-input');
 var DropTargetView         = require('views/app/dropTargetView');
 var onready                = require('./utils/onready');
 var apiClient              = require('components/apiClient');
+var perfTiming             = require('./components/perf-timing');
 var frameUtils             = require('./utils/frame-utils');
 var itemCollections        = require('collections/instances/integrated-items');
-var chatCollectionPool     = require('./components/chat-cache/chat-collection-pool');
+var chatCollection         = require('collections/instances/chats-cached');
 
 /* Set the timezone cookie */
 require('components/timezone-cookie');
@@ -44,20 +45,27 @@ onready(function() {
 
   require('components/link-handler').installLinkHandler();
 
-  window.addEventListener('message', function(e) {
+  function parsePostMessage(e) {
+    // Shortcut for performance
+    if (!e || !e.data || typeof e.data !== 'string') return;
+
     if (e.origin !== context.env('basePath')) {
       debug('Ignoring message from ' + e.origin);
       return;
     }
 
-    var message;
     try {
-      message = JSON.parse(e.data);
+      return JSON.parse(e.data);
     } catch (err) {
       /* It seems as through chrome extensions use this event to pass messages too. Ignore them. */
       return;
     }
+  }
 
+  window.addEventListener('message', function(e) {
+    var message = parsePostMessage(e);
+    if (!message) return;
+    
     debug('Received message %j', message);
 
     var makeEvent = function(message) {
@@ -100,6 +108,9 @@ onready(function() {
       break;
 
       case 'change:room':
+        perfTiming.start('room-switch.render');
+
+        debug('changing room: %j', message.newTroupe);
         //destroy any modal views
         appView.dialogRegion.destroy();
 
@@ -120,12 +131,7 @@ onready(function() {
       break;
 
       case 'roomList':
-        //If we have chat caching turned on trigger it
-        //TODO remove when 100% of users have caching enabled
-        //JP 24/11/15
-        if(context.hasFeature('chat-cache')) {
-          chatCollectionPool(message.rooms);
-        }
+        appEvents.trigger('chat-cache:preload', message.rooms);
         break;
     }
   });
@@ -222,7 +228,7 @@ onready(function() {
     model: context.troupe(),
     template: false,
     el: 'body',
-    chatCollection: itemCollections.chats
+    chatCollection: chatCollection
   });
 
   appView.render();
@@ -379,7 +385,4 @@ onready(function() {
   liveContext.syncRoom();
 
   Backbone.history.start();
-
-  //request the room list from the parent application
-  frameUtils.postMessage({ type: 'request:roomList' });
 });
