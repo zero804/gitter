@@ -6,7 +6,7 @@ var Backbone     = require('backbone');
 var RoomItemView = require('public/js/views/menu/room/minibar/minibar-item-view');
 var appEvents    = require('utils/appevents');
 
-describe('RoomMenuItemView', function() {
+describe('MinibarItemView', function() {
 
   var el;
   var model;
@@ -53,14 +53,18 @@ describe('RoomMenuItemView', function() {
     el.click();
   });
 
+  //Sadly as we are using request animation frame some checks must be wrapped
+  //in timeouts ... yuck jp 8/12/15
   it('should add an active class to it\'s el on model change', function(){
     assert.ok(!el.classList.contains('active'));
-
     roomItemView.model.set('active', true);
-    assert.ok(el.classList.contains('active'));
-
-    roomItemView.model.set('active', false);
-    assert.ok(!el.classList.contains('active'));
+    setTimeout(function(){
+      assert.ok(el.classList.contains('active'));
+      roomItemView.model.set('active', false);
+      setTimeout(function(){
+        assert.ok(!el.classList.contains('active'));
+      });
+    });
   });
 
 

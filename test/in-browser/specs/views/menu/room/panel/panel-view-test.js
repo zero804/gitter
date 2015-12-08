@@ -18,24 +18,28 @@ describe('PanelView', function() {
     panelView = new PanelView({ model: model, el: el });
   });
 
-  it('should toggle a class on it\'s el when it\'s model changes', function() {
-
+  //Sadly as we are using request animation frame some checks must be wrapped
+  //in timeouts ... yuck jp 8/12/15
+  it('should toggle a class on it\'s el when it\'s model changes', function(done) {
     assert.ok(!el.classList.contains('active'));
-
     model.set('panelOpenState', true);
-    assert.ok(el.classList.contains('active'));
-
-    model.set('panelOpenState', false);
-    assert.ok(!el.classList.contains('active'));
+    setTimeout(function() {
+      assert.ok(el.classList.contains('active'));
+      model.set('panelOpenState', false);
+      setTimeout(function() {
+        assert.ok(!el.classList.contains('active'));
+        done();
+      }, 50);
+    }, 50);
 
   });
 
-  it('should set the panelOpenState to false on swipe left', function(){
-    assert.ok(!model.get('panelOpenState')) ;
+  it('should set the panelOpenState to false on swipe left', function() {
+    assert.ok(!model.get('panelOpenState'));
     model.set('panelOpenState', true);
-    assert.ok(model.get('panelOpenState')) ;
+    assert.ok(model.get('panelOpenState'));
     appEvents.trigger('ui:swipeleft', { target: el });
-    assert.ok(!model.get('panelOpenState')) ;
+    assert.ok(!model.get('panelOpenState'));
   });
 
 });

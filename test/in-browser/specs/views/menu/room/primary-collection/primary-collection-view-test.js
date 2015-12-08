@@ -27,12 +27,18 @@ describe('PrimaryCollectionView', function() {
     });
   });
 
-  it('should add a class to its element when its model is in a search state', function() {
-    assert.ok(el.classList.contains('active'));
+  //Sadly as we are using request animation frame some checks must be wrapped
+  //in timeouts ... yuck jp 8/12/15
+  it('should add a class to its element when its model is in a search state', function(done) {
     model.set('state', 'search');
-    assert.ok(!el.classList.contains('active'));
-    model.set('state', 'all');
-    assert.ok(el.classList.contains('active'));
+    setTimeout(function(){
+      assert.ok(!el.classList.contains('active'));
+      model.set('state', 'all');
+      setTimeout(function(){
+        assert.ok(el.classList.contains('active'));
+        done();
+      }, 50);
+    }, 50);
   });
 
 });

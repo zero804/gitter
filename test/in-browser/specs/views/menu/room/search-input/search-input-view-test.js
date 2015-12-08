@@ -30,12 +30,17 @@ describe('SearchInputView', function() {
     assert.ok(!!searchInputView.$el.find('input').length);
   });
 
-  it('should add an active class to it\'s el when it\'s model is in the search state', function(){
+  it('should add an active class to it\'s el when it\'s model is in the search state', function(done){
     assert.ok(!el.classList.contains('active'));
     model.set('state', 'search');
-    assert.ok(el.classList.contains('active'));
-    model.set('state', 'all');
-    assert.ok(!el.classList.contains('active'));
+    setTimeout(function(){
+      assert.ok(el.classList.contains('active'));
+      model.set('state', 'all');
+      setTimeout(function(){
+        assert.ok(!el.classList.contains('active'));
+        done();
+      }, 50);
+    }, 50);
   });
 
 });

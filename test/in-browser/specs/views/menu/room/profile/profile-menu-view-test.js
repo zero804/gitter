@@ -16,17 +16,22 @@ describe('ProfileMenuView', function(){
     profileMenuView = new ProfileMenuView({ el: el, model: model });
   });
 
-  it('should toggle its elements class when the profileMenuOpenState changes', function(){
+  //Sadly as we are using request animation frame some checks must be wrapped
+  //in timeouts ... yuck jp 8/12/15
+  it('should toggle its elements class when the profileMenuOpenState changes', function(done){
     assert.ok(!model.get('profileMenuOpenState'));
     assert.ok(!el.classList.contains('active'));
-
     model.set('profileMenuOpenState', true);
-    assert.ok(model.get('profileMenuOpenState'));
-    assert.ok(el.classList.contains('active'));
 
-    model.set('profileMenuOpenState', false);
-    assert.ok(!model.get('profileMenuOpenState'));
-    assert.ok(!el.classList.contains('active'));
+    setTimeout(function(){
+      assert.ok(el.classList.contains('active'));
+      model.set('profileMenuOpenState', false);
+      setTimeout(function(){
+        assert.ok(!el.classList.contains('active'));
+        done();
+      },50);
+    }, 50);
+
   });
 
   it('should toggle its elements class when the profileMenuOpenState changes only when the models state is "all"', function(){

@@ -65,7 +65,7 @@ module.exports = Backbone.Model.extend({
   onStateChangeCalled: function(newState) {
 
     if (states.indexOf(newState) === -1) {
-      throw new Error('Please only pass a valid state to roomMenuModel change state');
+      throw new Error('Please only pass a valid state to roomMenuModel change state, you passed:' + newState);
     }
 
     this.trigger('change:state:pre', this.get('state'), newState);
