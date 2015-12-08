@@ -18,8 +18,13 @@ describe('PrimaryCollectionView', function() {
 
   beforeEach(function() {
     el = document.createElement('div');
-    model = new Backbone.Model({ state: 'all' });
-    collection = new Backbone.Collection();
+    model = new Backbone.Model({ state: 'all', panelOpenState: true });
+    collection = new Backbone.Collection([
+      { name:  '1' },
+      { name:  '2' },
+      { name:  '3' },
+      { name:  '4' },
+    ]);
     primaryCollectionView = new PrimaryCollectionView({
       el: el,
       model: model,
@@ -53,6 +58,20 @@ describe('PrimaryCollectionView', function() {
     assert.equal(0, primaryCollectionView.render.callCount);
     model.set('selectedOrgName', 'troupe');
     assert.equal(1, primaryCollectionView.render.callCount);
+  });
+
+  it('should call onItemClicked when a child is clicked', function(){
+    sinon.stub(primaryCollectionView, 'onItemClicked');
+    primaryCollectionView.render();
+    el.firstChild.click();
+    assert.equal(1, primaryCollectionView.onItemClicked.callCount);
+  });
+
+  it('should change the models panelOpenState when clicked', function(){
+    assert.ok(model.get('panelOpenState'));
+    primaryCollectionView.render();
+    el.firstChild.click();
+    assert.ok(!model.get('panelOpenState'));
   });
 
 });
