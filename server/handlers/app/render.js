@@ -31,6 +31,8 @@ var orgPermissionModel       = require('../../services/permissions/org-permissio
 var resolveUserAvatarUrl     = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 var resolveRoomAvatarSrcSet  = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
+//TODO figure out why 'gtter-web-shared' does not work
+var suggestedOrgsFromRoomList= require('../../../shared/orgs/suggested-orgs-from-room-list');
 
 /* How many chats to send back */
 var INITIAL_CHAT_COUNT = 50;
@@ -197,11 +199,6 @@ function renderMainFrame(req, res, next, frame) {
   Q.all([
       contextGenerator.generateNonChatContext(req),
       restful.serializeTroupesForUser(userId),
-      restful.serializeOrgsForUserId(userId).catch(function(err) {
-        // Workaround for GitHub outage
-        winston.error('Failed to serialize orgs:' + err, { exception: err });
-        return [];
-      }),
       aroundId && getPermalinkChatForRoom(req.troupe, aroundId)
     ])
     .spread(function (troupeContext, rooms, orgs, permalinkChat) {
@@ -266,6 +263,8 @@ function renderMainFrame(req, res, next, frame) {
         showUnreadTab: true,
         menuHeaderExpanded: false,
         user: user,
+        //TODO TIDY THIS AS IT IS NO LONGER NEEDED FOR THE PRE RENDER
+        //JP 8/12/15
         rooms: {
           favourites: rooms
             .filter(roomSort.favourites.filter)
@@ -274,7 +273,7 @@ function renderMainFrame(req, res, next, frame) {
             .filter(roomSort.recents.filter)
             .sort(roomSort.recents.sort)
         },
-        orgs: orgs,
+        orgs: suggestedOrgsFromRoomList(rooms),
         userHasNoOrgs: !orgs || !orgs.length
       });
     })
