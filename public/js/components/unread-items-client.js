@@ -106,6 +106,7 @@ module.exports = (function() {
     _updateLastAccess: function() {
       debug('_updateLastAccess');
 
+      // TODO: fix this date. It is too far into the future
       apiClient.userRoom.put('', { updateLastAccess: new Date() })
       .then(function() {
         debug('_updateLastAccess done');
@@ -177,12 +178,12 @@ module.exports = (function() {
           switch(message.notification) {
             // New unread items
             case 'unread_items':
-              store._unreadItemsAdded(message.items);
+              store.add(message.items);
               break;
 
             // Unread items removed
             case 'unread_items_removed':
-              store._unreadItemsRemoved(message.items);
+              store.remove(message.items);
               break;
 
             // New unread items
@@ -274,7 +275,7 @@ module.exports = (function() {
       var lastAccess = room.get('lastAccessTime');
       this.collection.forEach(function(chat) {
         if (chat.get('sent').isBefore(lastAccess) && chat.get('unread')) {
-          self._store._markItemRead(chat.id);
+          self._store.markItemRead(chat.id);
         }
       });
 
@@ -345,7 +346,7 @@ module.exports = (function() {
       modelsInRange.forEach(function(model) {
         if (!model.get('unread')) return;
 
-        self._store._markItemRead(model.id);
+        self._store.markItemRead(model.id);
       });
 
       this._foldCount();
@@ -522,7 +523,7 @@ module.exports = (function() {
      */
     store.on('unreadItemRemoved', function(itemId) {
       debug('CollectionSync: unreadItemRemoved: %s mention=%s', itemId);
-      collection.patch(itemId, { unread: false, mentioned: false });
+      collection.patch(itemId, { unread: false, mentioned: false }, { fast: true });
     });
 
     store.on('itemMarkedRead', function(itemId, mention) {
@@ -627,7 +628,7 @@ module.exports = (function() {
       onceUserIdSet(function() {
         apiClient.userRoom.delete("/unreadItems/all")
           .then(function() {
-            unreadItemStore.markAllReadNotification();
+            unreadItemStore.markAllRead();
           });
       });
     },
