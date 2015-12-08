@@ -74,12 +74,10 @@ function userSearchDebounced(term, callback) {
 
 function userSearch(term, callback) {
   apiClient.room.get('/users', { q: term, limit: isMobile() ? 3 : 10 })
-    .then(function(users) {
-      callback(users);
+    .catch(function() {
+      return [];
     })
-    .fail(function() {
-      callback([]);
-    });
+    .asCallback(callback);
 }
 
 var lcPrevTerm = '';
