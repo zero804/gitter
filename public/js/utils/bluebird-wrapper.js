@@ -4,9 +4,6 @@
 /* Webpack config will alias all usages of moment to this module */
 var Promise = require('../../../node_modules/bluebird');
 
-var browserSetImmediate = require('setimmediate');
-Promise.setScheduler(browserSetImmediate.setImmediate);
-
 function getBluebirdConfig() {
   try {
     return {
