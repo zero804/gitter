@@ -34,14 +34,4 @@ describe('ProfileMenuView', function(){
 
   });
 
-  it('should toggle its elements class when the profileMenuOpenState changes only when the models state is "all"', function(){
-
-    model.set('state', 'search');
-    model.set('profileMenuOpenState', true);
-    assert.ok(!el.classList.contains('active'));
-
-    model.set('profileMenuOpenState', false);
-    assert.ok(!el.classList.contains('active'));
-  });
-
 });

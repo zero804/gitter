@@ -34,7 +34,6 @@ module.exports = Marionette.CollectionView.extend({
   },
 
   onOpenStateChange: function(model, val) {/*jshint unused:true */
-    if (this.model.get('state') !== 'all') return;
     RAF(function(){
       this.$el.toggleClass('active', !!val);
     }.bind(this));
