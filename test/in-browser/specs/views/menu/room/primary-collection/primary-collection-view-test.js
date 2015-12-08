@@ -29,7 +29,22 @@ describe('PrimaryCollectionView', function() {
       el: el,
       model: model,
       collection: collection,
+      bus: Backbone.Events
     });
+  });
+
+  it('should throw an error if no buss is passed on init', function(done){
+    try {
+      new PrimaryCollectionView({
+        el: el,
+        model: model,
+        collection: collection
+      });
+    }
+    catch(e){
+      assert.equal(e.message, 'A valid event bus must be passed to a new PrimaryCollectionView');
+      done();
+    }
   });
 
   //Sadly as we are using request animation frame some checks must be wrapped
@@ -73,5 +88,17 @@ describe('PrimaryCollectionView', function() {
     el.firstChild.click();
     assert.ok(!model.get('panelOpenState'));
   });
+
+  it('should emit a navigation event when an item is clicked', function(done){
+    primaryCollectionView.render();
+    Backbone.Events.on('navigation', function(url, type, title){
+      assert.equal('/1', url);
+      assert.equal('chat', type);
+      assert.equal('1', title);
+      done();
+    });
+    el.firstChild.click();
+  });
+
 
 });

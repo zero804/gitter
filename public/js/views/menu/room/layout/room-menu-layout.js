@@ -22,12 +22,13 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   initMenuPanel: function(optionsForRegion){
-    return new PanelView(optionsForRegion({ model: this.model }));
+    return new PanelView(optionsForRegion({ model: this.model, bus: this.bus }));
   },
 
   initialize: function (attrs){
+    this.bus = attrs.bus;
     this.model   = new RoomMenuModel({
-      bus: attrs.bus,
+      bus: this.bus,
       roomCollection: attrs.roomCollection,
       userModel: context.user(),
     });
