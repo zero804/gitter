@@ -9,6 +9,9 @@ var RAF           = require('utils/raf');
 var ItemView = Marionette.ItemView.extend({
   className: 'room-item',
   template: itemTemplate,
+  triggers: {
+    'click': 'item:clicked',
+  },
   serializeData: function() {
     var data = this.model.toJSON();
     return _.extend({}, data, {
@@ -18,6 +21,9 @@ var ItemView = Marionette.ItemView.extend({
 });
 
 module.exports = Marionette.CollectionView.extend({
+  childEvents: {
+    'item:clicked': 'onItemClicked',
+  },
   childView: ItemView,
   initialize: function(options) {
     this.model = options.model;
@@ -25,10 +31,10 @@ module.exports = Marionette.CollectionView.extend({
     this.listenTo(this.model, 'change:selectedOrgName', this.onModelStateChange, this);
   },
 
-  filter: function(model){
+  filter: function(model) {
     var orgName = this.model.get('selectedOrgName');
 
-    switch(this.model.get('state')) {
+    switch (this.model.get('state')) {
 
       case 'org':
         var name = model.get('name').split('/')[0];
@@ -41,6 +47,7 @@ module.exports = Marionette.CollectionView.extend({
         return model.get('githubType') === 'ONETOONE';
 
       case 'search':
+
         //TODO remove as collection members should be search results
         return false;
 
@@ -49,10 +56,15 @@ module.exports = Marionette.CollectionView.extend({
     }
   },
 
-  onModelStateChange: function (model, val){ /*jshint unused: true*/
+  onModelStateChange: function(model, val) { /*jshint unused: true*/
     this.render();
-    RAF(function(){
+    RAF(function() {
       this.$el.toggleClass('active', (val !== 'search'));
     }.bind(this));
   },
+
+  onItemClicked: function() {
+    this.model.set('panelOpenState', false);
+  },
+
 });
