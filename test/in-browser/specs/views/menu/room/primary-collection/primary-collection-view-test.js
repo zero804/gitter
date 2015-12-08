@@ -1,4 +1,4 @@
-/*global describe:true, it:true, beforeEach:true */
+/*global describe:true, it:true, beforeEach:true, sinon: true */
 'use strict';
 
 /*
@@ -39,6 +39,20 @@ describe('PrimaryCollectionView', function() {
         done();
       }, 50);
     }, 50);
+  });
+
+  it('should render when the model changes state', function(){
+    sinon.stub(primaryCollectionView, 'render');
+    assert.equal(0, primaryCollectionView.render.callCount);
+    model.set('state', 'search');
+    assert.equal(1, primaryCollectionView.render.callCount);
+  });
+
+  it('should render when selectedOrgName is changed', function(){
+    sinon.stub(primaryCollectionView, 'render');
+    assert.equal(0, primaryCollectionView.render.callCount);
+    model.set('selectedOrgName', 'troupe');
+    assert.equal(1, primaryCollectionView.render.callCount);
   });
 
 });

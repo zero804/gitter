@@ -20,17 +20,17 @@ describe('MinibarView', function() {
 
     innerEl = document.createElement('div');
     innerEl.dataset.stateChange = 'people';
-    innerEl.dataset.roomId = 1;
+    innerEl.dataset.orgName = 'test1';
     el.appendChild(innerEl);
 
     innerEl2 = document.createElement('div');
     innerEl2.dataset.stateChange = 'search';
-    innerEl2.dataset.roomId = 2;
+    innerEl2.dataset.orgName = 'test2';
     el.appendChild(innerEl2);
 
     innerEl3 = document.createElement('div');
     innerEl3.dataset.stateChange = 'org';
-    innerEl3.dataset.roomId = 3;
+    innerEl3.dataset.orgName = 'test3';
     el.appendChild(innerEl3);
 
 
@@ -69,12 +69,11 @@ describe('MinibarView', function() {
     assert.ok(miniBar.roomMenuItemModels.at(1).get('active'));
   });
 
-  it('should select an active model by orgId if one is passed', function() {
-    miniBar.roomMenuItems[1].trigger('room-item-view:clicked', 'org', 3);
-    console.log(miniBar.roomMenuItemModels);
+  it('should select an active model by orgName if one is passed', function() {
+    miniBar.roomMenuItems[1].trigger('room-item-view:clicked', 'org', 'test3');
     assert.ok(miniBar.roomMenuItemModels.at(2).get('active'));
     assert.ok(!miniBar.roomMenuItemModels.at(1).get('active'));
-    miniBar.roomMenuItems[1].trigger('room-item-view:clicked', 'org', 2);
+    miniBar.roomMenuItems[1].trigger('room-item-view:clicked', 'org', 'test2');
     assert.ok(miniBar.roomMenuItemModels.at(1).get('active'));
   });
 

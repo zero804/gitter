@@ -15,7 +15,6 @@ module.exports = Marionette.ItemView.extend({
   },
 
   initialize: function() {
-    this.model.set('orgId', this.$el.data('room-id'));
     this.model.set('orgName', this.$el.data('org-name'));
     this.listenTo(appEvents, 'ui:swiperight', this.onSwipeRight, this);
   },
@@ -34,7 +33,6 @@ module.exports = Marionette.ItemView.extend({
   _triggerRoomChange: function() {
     this.trigger('room-item-view:clicked',
                  this.model.get('type'),
-                 this.model.get('orgId'),
                  this.model.get('orgName')
                 );
   },

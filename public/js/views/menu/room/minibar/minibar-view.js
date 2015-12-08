@@ -32,13 +32,13 @@ var MiniBarView = Marionette.ItemView.extend({
     this.listenTo(this.model, 'change:panelOpenState', this.onPanelStateChange, this);
   },
 
-  onItemClicked: function(type, orgId, orgName) {
+  onItemClicked: function(type, orgName) {
     //deactive the old active item
     var currentActiveModel = this._getCurrentlyActiveChildModel();
     if (!!currentActiveModel) currentActiveModel.set('active', false);
 
     //activate the next item
-    var query = !!orgId ? { orgId: orgId }: { type: type };
+    var query = !!orgName ? { orgName: orgName }: { type: type };
     var nextActiveModel = this.roomMenuItemModels.where(query)[0];
     if (!!nextActiveModel) nextActiveModel.set('active', true);
 
@@ -46,7 +46,6 @@ var MiniBarView = Marionette.ItemView.extend({
       panelOpenState: true,
       state: type,
       profileMenuOpenState: false,
-      selectedOrgId: orgId,
       selectedOrgName: orgName
     });
   },
