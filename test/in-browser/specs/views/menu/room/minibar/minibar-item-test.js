@@ -17,6 +17,7 @@ describe('MinibarItemView', function() {
 
     el = document.createElement('div');
     el.dataset.stateChange = 'people';
+    el.dataset.orgName = 'someorg';
 
     model = new Backbone.Model({ type: 'people' });
 
@@ -45,8 +46,9 @@ describe('MinibarItemView', function() {
 
   it('should pass the right data with the event', function(done) {
 
-    roomItemView.on('room-item-view:clicked', function(data) {
-      assert.equal('people', data);
+    roomItemView.on('room-item-view:clicked', function(state, orgName) {
+      assert.equal('people', state);
+      assert.equal('someorg', orgName);
       done();
     });
 
