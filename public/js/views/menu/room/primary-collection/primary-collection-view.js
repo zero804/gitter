@@ -26,6 +26,12 @@ module.exports = Marionette.CollectionView.extend({
   },
   childView: ItemView,
   initialize: function(options) {
+
+    if(!options || !options.bus) {
+      throw new Error('A valid event bus must be passed to a new PrimaryCollectionView');
+    }
+
+    this.bus = options.bus;
     this.model = options.model;
     this.listenTo(this.model, 'change:state', this.onModelStateChange, this);
     this.listenTo(this.model, 'change:selectedOrgName', this.onModelStateChange, this);
@@ -63,8 +69,14 @@ module.exports = Marionette.CollectionView.extend({
     }.bind(this));
   },
 
-  onItemClicked: function() {
+  onItemClicked: function(view) {
+    var viewModel = view.model;
+    var name = viewModel.get('name');
+    var url = '/' + name;
     this.model.set('panelOpenState', false);
+    RAF(function(){
+      this.bus.trigger('navigation', url, 'chat', name);
+    }.bind(this));
   },
 
 });

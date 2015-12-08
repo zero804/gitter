@@ -39,13 +39,14 @@ module.exports = Marionette.LayoutView.extend({
     return new PrimaryCollectionView(optionsForRegion({
       collection: this.model.primaryCollection,
       model: this.model,
+      bus: this.bus
     }));
   },
 
   initSecondaryCollection: function(optionsForRegion) {
     return new SecondaryCollection(optionsForRegion({
       collection: this.model.secondaryCollection,
-      model: this.model
+      model: this.model,
     }));
   },
 
@@ -57,11 +58,12 @@ module.exports = Marionette.LayoutView.extend({
     'change:panelOpenState': 'onPanelOpenStateChange',
   },
 
-  initialize: function() {
+  initialize: function(attrs) {
+    this.bus = attrs.bus;
     appEvents.on('ui:swipeleft', this.onSwipeLeft, this);
     this.$el.find('.nano').nanoScroller({
       iOSNativeScrolling: true,
-      sliderMaxHeight: 200
+      sliderMaxHeight: 200,
     });
   },
 
