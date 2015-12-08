@@ -4,8 +4,8 @@
 var assert = require('assert');
 var SecondaryCollectionView  = require('public/js/views/menu/room/secondary-collection/secondary-collection-view.js');
 
-describe('SecondaryCollectionView', function(){
+describe.skip('SecondaryCollectionView', function(){
   it('should od some stuff', function(){
-    asset.ok(true);
+    assert.ok(true);
   });
 });
