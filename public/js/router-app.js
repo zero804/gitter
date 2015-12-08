@@ -478,6 +478,8 @@ onready(function() {
       var $script = require('scriptjs');
       $script('//platform.twitter.com/oct.js', function() {
         var twitterOct = window.twttr && window.twttr.conversion;
+        // Will no exist if it's been blocked by ad-blockers
+        if (!twitterOct) return;
         twitterOct.trackPid('l4t99');
       });
     });

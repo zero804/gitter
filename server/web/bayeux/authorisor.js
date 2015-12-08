@@ -67,7 +67,7 @@ function validateUserForSubTroupeSubscription(options) {
     return Q.reject(new StatusError(400, 'Invalid ID: ' + troupeId));
   }
 
-  var promise = userCanAccessRoom(userId, troupeId);
+  var promise = userCanAccessRoom.permissionToRead(userId, troupeId);
   if (ext && ext.reassociate) {
     promise = promise.then(function(access) {
       if (!access) return access;

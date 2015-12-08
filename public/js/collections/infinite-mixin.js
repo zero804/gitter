@@ -266,7 +266,9 @@ module.exports = (function() {
       if(initialSnapshot) {
         var config = initialSnapshot[this.modelName];
 
-        if(config) {
+        // The initial snapshot config should only ever be configured
+        // for the current room. ignore for preload cache stuff
+        if (config && (this.contextModel.get('troupeId') === context.getTroupeId())) {
           // Come up with a better algorithm for this
           this.setAtTop(false);
           this.setAtBottom(!config.aroundId);
@@ -274,8 +276,8 @@ module.exports = (function() {
           this.listenToOnce(this, 'snapshot', function() {
             delete initialSnapshot[this.modelName];
           });
-
-          return _.extend(config, extras);
+          var snapshotState = _.extend(config, extras);
+          return snapshotState;
         }
       }
 

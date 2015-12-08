@@ -129,24 +129,17 @@ module.exports = {
   load: function(req, id) {
     var userId = req.user && req.user._id;
 
-    return userCanAccessRoom(userId, id)
-      .then(function(access) {
-        if (!access) throw new StatusError(404);
+    var permsPromise = req.method === 'GET' ?
+      userCanAccessRoom.permissionToRead(userId, id) :
+      userCanAccessRoom.permissionToWrite(userId, id);
 
-        if (access === 'view') {
-          if (req.method === 'GET') {
-            return id;
-          } else {
-            throw new StatusError(userId ? 403 : 401);
-          }
-        }
-
-        if (access === 'member') {
-          return id;
-        }
-
-        throw new StatusError(500, 'Unknown access type');
-      });
+    return permsPromise.then(function(access) {
+      if (access) {
+        return id;
+      } else {
+        throw new StatusError(userId ? 403 : 401);
+      }
+    });
   },
 
   subresources: {

@@ -44,7 +44,7 @@ var View = Marionette.ItemView.extend({
   },
 
   getBadgeUrl: function() {
-    return context.env('badgeBaseUrl') + '/Join%20Chat.svg';
+    return context.env('badgeBaseUrl') + '/' + context.getTroupe().uri + '.svg';
   },
 
   getBadgeMD: function() {

@@ -584,7 +584,6 @@ function renderEmbeddedChat(req, res, next) {
       return renderChat(req, res, {
         template: 'chat-embed-template',
         script: 'router-embed-chat',
-        unread: false, // Embedded users see chats as read
         classNames: [ 'embedded' ],
         fetchEvents: false,
         fetchUsers: false,
