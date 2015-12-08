@@ -4,6 +4,7 @@ var Mirror = require('gitter-web-github').GitHubMirrorService('user');
 
 
 module.exports = function gitHubProfileService(gitHubUser, options) {
+  options = options || {};
   var gitHubUri = 'users/' + gitHubUser.username;
 
   // erm. This uses the user we're looking up's tokens, not the user requesting
