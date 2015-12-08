@@ -29,7 +29,7 @@ GitHubBackend.prototype.findOrgs = function() {
 GitHubBackend.prototype.getProfile = function() {
   // the minimum response
   var profile = {provider: 'github'};
-  return gitHubProfileService(this.user, false)
+  return gitHubProfileService(this.user)
     .then(function(gitHubProfile) {
       _.extend(profile, gitHubProfile);
       return profile;

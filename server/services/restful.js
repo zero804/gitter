@@ -172,7 +172,7 @@ exports.serializeProfileForUsername = function(username) {
           throw new StatusError(404);
         }
 
-        return gitHubProfileService(gitHubUser, true);
+        return gitHubProfileService(gitHubUser, {includeCore: true});
       }
     });
 };

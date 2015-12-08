@@ -3,7 +3,7 @@
 var Mirror = require('gitter-web-github').GitHubMirrorService('user');
 
 
-module.exports = function gitHubProfileService(gitHubUser, includeCore) {
+module.exports = function gitHubProfileService(gitHubUser, options) {
   var gitHubUri = 'users/' + gitHubUser.username;
 
   // erm. This uses the user we're looking up's tokens, not the user requesting
@@ -25,8 +25,9 @@ module.exports = function gitHubProfileService(gitHubUser, includeCore) {
 
       var profile = {};
 
-      if (includeCore) {
-        // core fields are only useful if we aren't using what's in our db
+      // core fields are only useful if we aren't using what's already in our
+      // db for those values
+      if (options.includeCore) {
         profile.username = body.login;
         profile.displayName =  body.name;
       }
