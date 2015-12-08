@@ -1,7 +1,6 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var winston                  = require('../../utils/winston');
 var nconf                    = require('../../utils/config');
 var Q                        = require('q');
 var contextGenerator         = require('../../web/context-generator');
