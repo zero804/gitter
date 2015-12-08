@@ -77,7 +77,9 @@ function userSearch(term, callback) {
     .catch(function() {
       return [];
     })
-    .asCallback(callback);
+    .then(function(response) {
+      callback(response);
+    });
 }
 
 var lcPrevTerm = '';
