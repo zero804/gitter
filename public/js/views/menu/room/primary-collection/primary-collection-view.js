@@ -74,9 +74,9 @@ module.exports = Marionette.CollectionView.extend({
     var name = viewModel.get('name');
     var url = '/' + name;
     this.model.set('panelOpenState', false);
-    RAF(function(){
+    setTimeout(function(){
       this.bus.trigger('navigation', url, 'chat', name);
-    }.bind(this));
+    }.bind(this), 250);
   },
 
 });
