@@ -9,7 +9,8 @@ module.exports = Marionette.ItemView.extend({
 
   modelEvents: {
     'change:state': 'render',
-    'change:selectedOrgName': 'render'
+    'change:selectedOrgName': 'render',
+    'change:roomMenuIsPinned': 'onPinStateChange'
   },
 
   events: {
@@ -35,11 +36,16 @@ module.exports = Marionette.ItemView.extend({
   },
 
   onCloseClicked: function (e){
+    if(this.model.get('roomMenuIsPinned')) return;
     e.stopPropagation();
     this.model.set({
       profileMenuOpenState: false,
       panelOpenState:       false
     });
+  },
+
+  onPinStateChange: function (model, val){ /*jshint unused: true */
+    this.$el.find('#menu-panel-header-close').toggleClass('active', !val);
   },
 
 });

@@ -27,7 +27,7 @@ module.exports = Marionette.CollectionView.extend({
   childView: ItemView,
   initialize: function(options) {
 
-    if(!options || !options.bus) {
+    if (!options || !options.bus) {
       throw new Error('A valid event bus must be passed to a new PrimaryCollectionView');
     }
 
@@ -73,8 +73,13 @@ module.exports = Marionette.CollectionView.extend({
     var viewModel = view.model;
     var name = viewModel.get('name');
     var url = '/' + name;
-    this.model.set('panelOpenState', false);
-    setTimeout(function(){
+
+    //If thr room menu is pinned dont try to close the pannel
+    if (!this.model.get('roomMenuIsPinned')) {
+      this.model.set('panelOpenState', false);
+    }
+
+    setTimeout(function() {
       this.bus.trigger('navigation', url, 'chat', name);
     }.bind(this), 250);
   },

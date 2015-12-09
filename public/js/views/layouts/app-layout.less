@@ -1,8 +1,14 @@
 .app-layout {
   display: flex;
   position: absolute;
+  right: 0;
   height: 100%;
   width: 100% - @desktop-menu-width;
+  transition: width .2s ease-in;
+
+  &.pinned {
+    width: calc(100% - @menu-panel-desktop-width);
+  }
 }
 
 .menu-region {

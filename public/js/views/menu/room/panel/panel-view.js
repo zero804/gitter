@@ -20,26 +20,27 @@ module.exports = Marionette.LayoutView.extend({
 
   behaviors: {
     Isomorphic: {
-      header: { el: '#panel-header', init: 'initHeader'},
-      profile: { el: '#profile-menu', init: 'initProfileMenu'},
-      primaryCollection: { el: '#primary-collection', init: 'initPrimaryCollection' },
+      header:              { el: '#panel-header', init: 'initHeader'},
+      profile:             { el: '#profile-menu', init: 'initProfileMenu'},
+      primaryCollection:   { el: '#primary-collection', init: 'initPrimaryCollection' },
       secondaryCollection: { el: '#secondary-collection', init: 'initSecondaryCollection' },
-      searchInput: { el: '#search-input', init: 'initSearchInput' },
-      search: { el: '#search-results', init: 'initSearch' },
-      footer: { el: '#panel-footer', init: 'initFooter'}
+      searchInput:         { el: '#search-input', init: 'initSearchInput' },
+      search:              { el: '#search-results', init: 'initSearch' },
+      footer:              { el: '#panel-footer', init: 'initFooter'}
     },
   },
 
   initHeader: function(optionsForRegion) {
     return new PanelHeaderView(optionsForRegion({
-      model: this.model,
+      model:     this.model,
       userModel: this.model.userModel,
     }));
   },
 
   initFooter: function (optionsForRegion){
     return new PanelFooterView(optionsForRegion({
-
+      model: this.model,
+      bus:   this.bus,
     }));
   },
 
@@ -50,15 +51,15 @@ module.exports = Marionette.LayoutView.extend({
   initPrimaryCollection: function(optionsForRegion) {
     return new PrimaryCollectionView(optionsForRegion({
       collection: this.model.primaryCollection,
-      model: this.model,
-      bus: this.bus
+      model:      this.model,
+      bus:        this.bus
     }));
   },
 
   initSecondaryCollection: function(optionsForRegion) {
     return new SecondaryCollection(optionsForRegion({
       collection: this.model.secondaryCollection,
-      model: this.model,
+      model:      this.model,
     }));
   },
 
@@ -81,14 +82,14 @@ module.exports = Marionette.LayoutView.extend({
     appEvents.on('ui:swipeleft', this.onSwipeLeft, this);
     this.$el.find('.nano').nanoScroller({
       iOSNativeScrolling: true,
-      sliderMaxHeight: 200,
+      sliderMaxHeight:    200,
     });
 
     /* TODO PATCHED FROM RIGHT TOOLBAR */
     this.searchState = new Backbone.Model({
       searchTerm: '',
-      active: false,
-      isLoading: false
+      active:     false,
+      isLoading:  false
     });
     /* TODO PATCHED FROM RIGHT TOOLBAR */
 
