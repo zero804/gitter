@@ -21,7 +21,7 @@ function getAliasForSizeFromHostname(hostname) {
   // there.
 
   if (hostname.indexOf('google') !== -1) {
-    return 'sw';
+    return 'sz';
   }
 
   // github uses s and we assume that's a good default
