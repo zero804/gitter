@@ -5,6 +5,7 @@ var Schema        = mongoose.Schema;
 
 var FeatureToggle = new Schema({
   name: String,
+  description: String,
   criteria: Schema.Types.Mixed
 });
 FeatureToggle.schemaTypeName = 'FeatureToggle';
