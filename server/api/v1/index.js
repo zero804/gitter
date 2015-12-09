@@ -9,12 +9,15 @@ var router = express.Router({ caseSensitive: true, mergeParams: true });
 
 router.use('/user', authMiddleware);
 router.use('/rooms', authMiddleware);
+router.use('/users', authMiddleware);
 
-var usersResources = resourceRoute('api-user', require('./user'));
-var roomResources = resourceRoute('api-rooms', require('./rooms'));
+var userResources = resourceRoute('api-user', require('./user'));
+var roomsResources = resourceRoute('api-rooms', require('./rooms'));
+var usersResources = resourceRoute('api-rooms', require('./users'));
 
-router.use('/user', usersResources);
-router.use('/rooms', roomResources);
+router.use('/user', userResources);
+router.use('/rooms', roomsResources);
+router.use('/users', usersResources);
 
 // APN has no auth requirement as user may not have authenticated
 // and this is used for devices without users

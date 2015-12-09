@@ -46,6 +46,8 @@
     "gitter-web-shared": "file:shared",
     "gitter-web-split-tests": "file:modules/split-tests",
     "gitter-web-suggestions": "file:modules/suggestions",
+    "gitter-web-github-backend": "file:modules/github-backend",
+    "gitter-web-google-backend": "file:modules/google-backend",
     "handlebars": "~3.0.3",
     "heapdump": "^0.3.7",
     "highlight.js": "^8.6.0",

@@ -7,7 +7,9 @@
   <button class="trpBtnLightGrey trpButtonSmall" id="button-mention">
     Mention
   </button>
-  <a href="{{html_url}}" target="_blank" class="trpBtnLightGrey trpButtonSmall open-in-github">Open in GitHub</a>
+  {{#if profile}}
+  <a href="{{profile}}" target="_blank" class="trpBtnLightGrey trpButtonSmall open-profile">Open Profile</a>
+  {{/if}}
 {{/if}}
 {{#if chatPrivately}}
   <button class="trpBtnGreen trpButtonSmall" id="button-onetoone">
