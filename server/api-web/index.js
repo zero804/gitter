@@ -3,8 +3,6 @@
 var express        = require('express');
 var authMiddleware = require('../web/middlewares/ensure-logged-in-or-get');
 var identifyRoute  = require('gitter-web-env').middlewares.identifyRoute;
-var featureToggles = require('../web/middlewares/feature-toggles');
-var fflip          = require('fflip');
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
@@ -22,16 +20,6 @@ router.get('/private/health_check/full',
   identifyRoute('api-web-health-check-full'),
   require('../api/private/health-check-full'));
 
-router.get('/features/:name/:action',
-  featureToggles,
-  fflip.express_route);
-  
-router.post('/features/:name/:action',
-  featureToggles,
-  fflip.express_route);
-
-router.get('/features/',
-  featureToggles,
-  require('./feature-list'));
+router.use('/features', require('./features'));
 
 module.exports = router;
