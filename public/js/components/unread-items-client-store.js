@@ -84,34 +84,55 @@ var UnreadItemStore = function() {
 
 _.extend(UnreadItemStore.prototype, Backbone.Events, {
   state: 'LOADING',
-  _unreadItemAdded: function(itemId, mention) {
-    // Three options here:
+
+  /**
+   * Returns `true` if the result changes the state of the store
+   * options: { silent } will not trigger a recount or events
+   */
+  _unreadItemAdded: function(itemId, mention, options) {
+
+    // Four options here:
+    // 0 - The item has already been marked as read
     // 1 - new item
     // 2 - item exists and has the same mention status as before (nullop)
     // 3 - item exists and has a different mention status to before
+    var silent = options && options.silent;
+    var lurkMode = this._lurkMode;
 
-    if (!this._items.hasOwnProperty(itemId)) {
-      // Case 1: new item
-      this._items[itemId] = mention;
-      this.length++;
-      this.notifyCountLimited();
-
-      // Since the item may already have been read BEFORE
-      // the user was mentioned, remove the item from
-      // the tarpit
-      this._read.remove(itemId);
-
-      this.trigger('add', itemId, mention);
-    } else {
-      if (this._items[itemId] === mention) {
-        // Case 2
-        return;
+    // Case 0: already read
+    if (this._read.contains(itemId)) {
+      if (!silent) {
+        this.trigger('itemMarkedRead', itemId, mention, lurkMode);
       }
 
-      // Case 3
+      return false;
+    }
+
+    // Case 1: new item
+    if (!this._items.hasOwnProperty(itemId)) {
       this._items[itemId] = mention;
+      this.length++;
+
+      if (!silent) {
+        this.notifyCountLimited();
+        this.trigger('add', itemId, mention);
+      }
+
+      return true;
+    }
+
+    // Case 2
+    if (this._items[itemId] === mention) {
+      return false;
+    }
+
+    // Case 3...
+    this._items[itemId] = mention;
+    if (!silent) {
       this.trigger('change:status', itemId, mention);
     }
+
+    return true;
   },
 
   _unreadItemRemoved: function(itemId) {
@@ -121,8 +142,6 @@ _.extend(UnreadItemStore.prototype, Backbone.Events, {
     this.length--;
     this.notifyCountLimited();
 
-    this._read.add(itemId);
-
     this.trigger('unreadItemRemoved', itemId);
   },
 
@@ -130,43 +149,38 @@ _.extend(UnreadItemStore.prototype, Backbone.Events, {
     if (!this._items.hasOwnProperty(itemId)) return; // Does not exist
     this._items[itemId] = false;
     this.notifyCountLimited();
+
     this.trigger('change:status', itemId, false);
   },
 
-  _markItemRead: function(itemId) {
+  markItemRead: function(itemId) {
     var inStore = this._items.hasOwnProperty(itemId);
     var lurkMode = this._lurkMode;
 
+    var mentioned;
     if (!inStore) {
-      /* Special case for lurk mode, still send the itemMarkedAsRead event
-       * so that the model gets updated (even though its not actually unread)
-       */
-      if (lurkMode) {
-        this.trigger('itemMarkedRead', itemId, false, true);
-      }
-      return;
+      mentioned = false;
+    } else {
+      mentioned = this._items[itemId];
+
+      delete this._items[itemId];
+      this.length--;
+      this.notifyCountLimited();
     }
 
-    var mentioned = this._items[itemId];
-
-    delete this._items[itemId];
-    this.length--;
-    this.notifyCountLimited();
-
     this._read.add(itemId);
-
     this.trigger('itemMarkedRead', itemId, mentioned, lurkMode);
   },
 
   // via Realtime
-  _unreadItemsAdded: function(items) {
+  add: function(items) {
     _iteratePreload(items, function(itemId, mention) {
       this._unreadItemAdded(itemId, mention);
     }, this);
   },
 
   // via Realtime
-  _unreadItemsRemoved: function(incoming) {
+  remove: function(incoming) {
     function hashArray(array) {
       if (!array) return {};
 
@@ -201,6 +215,10 @@ _.extend(UnreadItemStore.prototype, Backbone.Events, {
     return Object.keys(this._items);
   },
 
+  getItemHash: function() {
+    return this._items;
+  },
+
   getMentions: function() {
     return Object.keys(this._items).reduce(function(accum, itemId) {
       if (this._items[itemId]) accum.push(itemId);
@@ -217,11 +235,28 @@ _.extend(UnreadItemStore.prototype, Backbone.Events, {
     this._lurkMode = false;
   },
 
+  markAllRead: function() {
+    var lurkMode = this._lurkMode;
+    
+    Object.keys(this._items).forEach(function(itemId) {
+      var mention = this._items[itemId];
+
+      // Notify that all are read
+      this._read.add(itemId);
+      this.trigger('itemMarkedRead', itemId, mention, lurkMode);
+    }, this);
+
+    this._items = {};
+    this.length = 0;
+    this.notifyCountLimited();
+
+  },
+
+  /* Realtime notification that everything was marked as ready somewhere else */
   markAllReadNotification: function() {
     Object.keys(this._items).forEach(function(itemId) {
       // Notify that all are read
-      var mention = this._items[itemId];
-      this.trigger('itemMarkedRead', itemId, mention, this._lurkMode);
+      this.trigger('unreadItemRemoved', itemId);
     }, this);
 
     this._items = {};
@@ -241,12 +276,24 @@ _.extend(UnreadItemStore.prototype, Backbone.Events, {
     return this._read.contains(itemId);
   },
 
-  reset: function() {
+  reset: function(items) {
     this.length = 0;
     this._lurkMode = false;
-    this._items = {};
     this._read.reset();
-    if (this.state === 'LOADED') this.notifyCountLimited();
+
+    this._items = {};
+    if (items) {
+      this.state = 'LOADED';
+      _iteratePreload(items, function(itemId, mention) {
+        this._unreadItemAdded(itemId, mention, { silent: true });
+      }, this);
+
+      this.trigger('reset');
+      this.notifyCountLimited();
+    } else {
+      if (this.state === 'LOADED') this.notifyCountLimited();
+    }
+
   }
 
 });

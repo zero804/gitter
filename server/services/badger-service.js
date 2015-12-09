@@ -16,7 +16,7 @@ var badger               = require('readme-badger');
 var path                 = require('path');
 
 function insertBadge(repo, content, fileExt, user) {
-  var imageUrl = conf.get('web:badgeBaseUrl') + '/Join%20Chat.svg';
+  var imageUrl = conf.get('web:badgeBaseUrl') + '/' + repo + '.svg';
   var linkUrl =  conf.get('web:basepath') + '/' + repo + '?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge';
   var altText = 'Join the chat at ' + conf.get('web:basepath') + '/' + repo;
 
@@ -315,7 +315,7 @@ function updateFileAndCreatePullRequest(sourceRepo, user, branchPrefix) {
 function getBadgeMarkdown(repo, content) {
   var contentLink = content ? '&utm_content=' + content : '';
 
-  var imageUrl = conf.get('web:badgeBaseUrl') + '/Join%20Chat.svg';
+  var imageUrl = conf.get('web:badgeBaseUrl') + '/' + repo + '.svg';
   var linkUrl =  conf.get('web:basepath') + '/' + repo + '?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge' + contentLink;
   return '\n[![Gitter](' + imageUrl + ')](' + linkUrl + ')';
 }

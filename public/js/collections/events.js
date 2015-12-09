@@ -17,22 +17,7 @@ var EventModel = Backbone.Model.extend({
     }
 
     return message;
-  },
-
-  toJSON: function() {
-    var d = _.clone(this.attributes);
-    var sent = this.get('sent');
-    if(sent) {
-      // Turn the moment sent value into a string
-      d.sent = sent.format();
-    }
-
-    // No need to send html back to the server
-    delete d.html;
-
-    return d;
   }
-
 });
 
 var EventCollection = LiveCollection.extend({
