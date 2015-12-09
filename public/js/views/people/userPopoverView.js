@@ -8,6 +8,7 @@ var footerTemplate = require('./tmpl/userPopoverFooterView.hbs');
 var appEvents = require('utils/appevents');
 var context = require('utils/context');
 var SyncMixin = require('collections/sync-mixin');
+var _ = require('underscore');
 
 module.exports = (function() {
 
@@ -18,21 +19,8 @@ module.exports = (function() {
     },
     serializeData: function() {
       var data = this.model.toJSON();
-
-      if(data.blog) {
-        if(!data.blog.match(/^https?:\/\//)) {
-          data.blogUrl = 'http://' + data.blog;
-        } else {
-          data.blogUrl = data.blog;
-        }
-      }
       data.inactive = data.invited || data.removed;
-      // TODO: send more than just a username
-      // NOTE: this actually gets displayed at 128 css pixels wide, so retina
-      // would have to be 256. But that doesn't map to avatarUrlSmall or
-      // avatarUrlMedium
-      data.avatarUrl = resolveUserAvatarUrl({ username: data.login }, 128);
-
+      data.avatarUrl = resolveUserAvatarUrl(data, 128);
       return data;
     }
   });
@@ -45,30 +33,30 @@ module.exports = (function() {
     events: {
       'click #button-onetoone': function() {
         this.parentPopover.hide();
-        var username = this.model.get('login');
+        var username = this.model.get('username');
         appEvents.trigger('navigation', '/' + username, 'chat', username, this.model.id);
       },
       'click #button-mention': function() {
         this.parentPopover.hide();
-        var username = this.model.get('login');
+        var username = this.model.get('username');
         appEvents.trigger('input.append', '@' + username + " ");
       },
       'click #button-remove': function() {
         this.parentPopover.hide();
-        var username = this.model.get('login');
+        var username = this.model.get('username');
         appEvents.trigger('command.room.remove', username);
       }
     },
     serializeData: function() {
       var data = this.model.toJSON();
-      var isntSelf = data.login !== context.user().get('username');
+      var isntSelf = data.username !== context.user().get('username');
       var chatPrivately = data.has_gitter_login && isntSelf;
       var mentionable = isntSelf;
       var removable = isntSelf && context.isTroupeAdmin();
 
       // Special case
       if(context.inOneToOneTroupeContext()) {
-        if(context.troupe().get('user').username === data.login) {
+        if(context.troupe().get('user').username === data.username) {
           chatPrivately = false;
         }
       }
@@ -77,6 +65,7 @@ module.exports = (function() {
       data.chatPrivately = chatPrivately;
       data.mentionable = mentionable;
       data.removable = removable;
+      data.loaded = !!this.model.loaded;
       return data;
     }
 
@@ -97,12 +86,14 @@ module.exports = (function() {
       }
 
       var ghModel = new Backbone.Model({
-        login: username,
-        name: displayName
+        username: username,
+        displayName: displayName
       });
       ghModel.sync = SyncMixin.sync; // XXX This is less than ideal
-      ghModel.url = '/private/gh/users/' + username;
-      ghModel.fetch();
+      ghModel.url = '/v1/users/' + username;
+      ghModel.fetch(function() {
+        ghModel.loaded = true;
+      });
 
       options.footerView = new UserPopoverFooterView({ model: ghModel });
 
