@@ -73,6 +73,7 @@ module.exports = Marionette.LayoutView.extend({
   },
   /* TODO PATCHED FROM RIGHT TOOLBAR */
 
+
   modelEvents: {
     'change:panelOpenState': 'onPanelOpenStateChange',
   },

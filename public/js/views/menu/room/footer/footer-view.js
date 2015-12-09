@@ -13,6 +13,7 @@ module.exports = Marionette.ItemView.extend({
     if (!attrs || !attrs.bus) {
       throw new Error('A valid event bus must be passed to a new instance of PanelFooterView');
     }
+
     this.bus = attrs.bus;
   },
 
@@ -21,5 +22,8 @@ module.exports = Marionette.ItemView.extend({
     var newVal = !this.model.get('roomMenuIsPinned');
     this.model.set('roomMenuIsPinned', newVal);
     this.bus.trigger('room-menu:pin', newVal);
+    if (!newVal) {
+      this.model.set('panelOpenState', false);
+    }
   },
 });
