@@ -57,17 +57,12 @@ describe('MinibarItemView', function() {
 
   //Sadly as we are using request animation frame some checks must be wrapped
   //in timeouts ... yuck jp 8/12/15
-  it('should add an active class to it\'s el on model change', function(){
+  it('should add an active class to it\'s el on model change', function() {
     assert.ok(!el.classList.contains('active'));
     roomItemView.model.set('active', true);
-    setTimeout(function(){
-      assert.ok(el.classList.contains('active'));
-      roomItemView.model.set('active', false);
-      setTimeout(function(){
-        assert.ok(!el.classList.contains('active'));
-      });
-    });
+    assert.ok(el.classList.contains('active'));
+    roomItemView.model.set('active', false);
+    assert.ok(!el.classList.contains('active'));
   });
-
 
 });

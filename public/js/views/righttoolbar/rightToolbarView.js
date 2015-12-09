@@ -72,11 +72,11 @@ module.exports = (function() {
     },
 
     initSearchRegion: function(optionsForRegion) {
-      return new SearchView(optionsForRegion({ model: this.searchState }));
+      //return new SearchView(optionsForRegion({ model: this.searchState }));
     },
 
     initSearchInputRegion: function(optionsForRegion) {
-      return new SearchInputView(optionsForRegion({ model: this.searchState }));
+      //return new SearchInputView(optionsForRegion({ model: this.searchState }));
     },
 
     initRepo_infoRegion: function(optionsForRegion) {

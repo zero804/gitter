@@ -23,14 +23,10 @@ describe('PanelView', function() {
   it('should toggle a class on it\'s el when it\'s model changes', function(done) {
     assert.ok(!el.classList.contains('active'));
     model.set('panelOpenState', true);
-    setTimeout(function() {
-      assert.ok(el.classList.contains('active'));
-      model.set('panelOpenState', false);
-      setTimeout(function() {
-        assert.ok(!el.classList.contains('active'));
-        done();
-      }, 50);
-    }, 50);
+    assert.ok(el.classList.contains('active'));
+    model.set('panelOpenState', false);
+    assert.ok(!el.classList.contains('active'));
+    done();
 
   });
 

@@ -1,13 +1,16 @@
 'use strict';
 
+var Backbone              = require('backbone');
 var Marionette            = require('backbone.marionette');
 var appEvents             = require('utils/appevents');
 var PanelHeaderView       = require('../header/header-view');
 var PrimaryCollectionView = require('../primary-collection/primary-collection-view');
 var SecondaryCollection   = require('../secondary-collection/secondary-collection-view');
 var ProfileMenuView       = require('../profile/profile-menu-view');
-var SearchInputView       = require('../search-input/search-input-view');
 var RAF                   = require('utils/raf');
+
+var SearchView            = require('views/search/searchView');
+var SearchInputView       = require('views/search/search-input-view');
 
 require('views/behaviors/isomorphic');
 require('nanoscroller');
@@ -20,7 +23,8 @@ module.exports = Marionette.LayoutView.extend({
       profile: { el: '#profile-menu', init: 'initProfileMenu'},
       primaryCollection: { el: '#primary-collection', init: 'initPrimaryCollection' },
       secondaryCollection: { el: '#secondary-collection', init: 'initSecondaryCollection' },
-      search: { el: '#search', init: 'initSearchInput' },
+      searchInput: { el: '#search-input', init: 'initSearchInput' },
+      search: { el: '#search-results', init: 'initSearch' },
     },
   },
 
@@ -50,9 +54,15 @@ module.exports = Marionette.LayoutView.extend({
     }));
   },
 
-  initSearchInput: function(optionsForRegion) {
-    return new SearchInputView(optionsForRegion({ model: this.model }));
+  /* TODO PATCHED FROM RIGHT TOOLBAR */
+  initSearch: function(optionsForRegion) {
+    return new SearchView(optionsForRegion({ model: this.searchState }));
   },
+
+  initSearchInput: function(optionsForRegion) {
+    return new SearchInputView(optionsForRegion({ model: this.searchState }));
+  },
+  /* TODO PATCHED FROM RIGHT TOOLBAR */
 
   modelEvents: {
     'change:panelOpenState': 'onPanelOpenStateChange',
@@ -65,6 +75,15 @@ module.exports = Marionette.LayoutView.extend({
       iOSNativeScrolling: true,
       sliderMaxHeight: 200,
     });
+
+    /* TODO PATCHED FROM RIGHT TOOLBAR */
+    this.searchState = new Backbone.Model({
+      searchTerm: '',
+      active: false,
+      isLoading: false
+    });
+    /* TODO PATCHED FROM RIGHT TOOLBAR */
+
   },
 
   onPanelOpenStateChange: function(model, val) { /*jshint unused: true */
