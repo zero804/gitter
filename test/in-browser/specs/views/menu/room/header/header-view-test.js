@@ -13,7 +13,11 @@ describe('PanelHeaderView', function() {
   var el;
 
   beforeEach(function() {
-    model           = new Backbone.Model({ state: 'all', profileMenuOpenState: false });
+    model           = new Backbone.Model({
+      state: 'all',
+      profileMenuOpenState: false,
+      panelOpenState: true,
+    });
     userModel       = model.userModel = new Backbone.Model();
     el              = document.createElement('div');
     panelHeaderView = new PanelHeaderView({ el: el, model: model });
@@ -26,36 +30,51 @@ describe('PanelHeaderView', function() {
 
   });
 
-  it('should render the correct content when in the search state', function(){
+  it('should render the correct content when in the search state', function() {
     model.set('state', 'search');
     var result = panelHeaderView.$el.find('.panel-header__title--search');
     assert.equal(1, result.length);
   });
 
-  it('should render the correct content when in the favourite state', function(){
+  it('should render the correct content when in the favourite state', function() {
     model.set('state', 'favourite');
     var result = panelHeaderView.$el.find('.panel-header__title--favourite');
     assert.equal(1, result.length);
   });
 
-  it('should render the correct content when in the people state', function(){
+  it('should render the correct content when in the people state', function() {
     model.set('state', 'people');
     var result = panelHeaderView.$el.find('.panel-header__title--people');
     assert.equal(1, result.length);
   });
 
-  it('should render the correct content when in the people state', function(){
+  it('should render the correct content when in the people state', function() {
     model.set('state', 'org');
     var result = panelHeaderView.$el.find('.panel-header__title--org');
     assert.equal(1, result.length);
   });
 
-  it('should toggle the profileMenuOpenState when clicked', function(){
+  it('should toggle the profileMenuOpenState when clicked', function() {
     assert.ok(!model.get('profileMenuOpenState'));
     el.click();
     assert.ok(model.get('profileMenuOpenState'));
     el.click();
     assert.ok(!model.get('profileMenuOpenState'));
+  });
+
+  it('should change the panelMenuOpenState when the close button is clicked', function() {
+    model.set('profileMenuOpenState', true);
+    assert.ok(model.get('profileMenuOpenState'));
+    panelHeaderView.render();
+    panelHeaderView.$el.find('#menu-panel-header-close').click();
+    assert.ok(!model.get('profileMenuOpenState'));
+  });
+
+  it('should change the panelOpenState when the close button is clicked', function() {
+    assert.ok(model.get('panelOpenState'));
+    panelHeaderView.render();
+    panelHeaderView.$el.find('#menu-panel-header-close').click();
+    assert.ok(!model.get('panelOpenState'));
   });
 
 });

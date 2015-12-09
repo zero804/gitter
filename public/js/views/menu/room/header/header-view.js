@@ -14,6 +14,7 @@ module.exports = Marionette.ItemView.extend({
 
   events: {
     'click': 'onClick',
+    'click #menu-panel-header-close': 'onCloseClicked'
   },
 
   serializeData: function() {
@@ -31,6 +32,14 @@ module.exports = Marionette.ItemView.extend({
 
   onClick: function (){
     this.model.set('profileMenuOpenState', !this.model.get('profileMenuOpenState'));
+  },
+
+  onCloseClicked: function (e){
+    e.stopPropagation();
+    this.model.set({
+      profileMenuOpenState: false,
+      panelOpenState:       false
+    });
   },
 
 });
