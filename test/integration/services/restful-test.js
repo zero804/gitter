@@ -6,6 +6,8 @@ var userService = testRequire('./services/user-service');
 var fixtureLoader = require('../test-fixtures');
 var assert = require('assert');
 
+var restSerializer = testRequire("./serializers/rest-serializer");
+
 var counter = 0;
 
 // identities need providerKey and it has to be unique
@@ -120,8 +122,11 @@ describe('restful', function() {
       .then(function() {
         assert.ok(false, 'Expected a throw');
       }, function(err) {
-        console.log(err);
         assert.strictEqual(err.status, 404);
       });
+  });
+
+  it('serializes orgs', function() {
+    return restful.serializeOrgsForUserId(fixture.user1.id);
   });
 });
