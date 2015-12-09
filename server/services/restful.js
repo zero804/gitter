@@ -144,7 +144,7 @@ exports.serializeOrgsForUser = function(user) {
     .then(function(orgs) {
       var strategyOptions = { currentUserId: user.id };
       // TODO: not all organisations are going to be github ones in future!
-      var strategy = new restSerializer.GitHubOrgStrategy(strategyOptions);
+      var strategy = new restSerializer.GithubOrgStrategy(strategyOptions);
       return restSerializer.serializeExcludeNulls(orgs, strategy);
     });
 };
