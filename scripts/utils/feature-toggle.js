@@ -9,6 +9,11 @@ var opts = require("nomnom")
      list: false,
      help: 'Name of feature'
    })
+   .option('description',{
+     required: false,
+     list: false,
+     help: 'Description of feature'
+   })
    .option('include-user', {
      list: true,
      help: 'Username of user to allow'
@@ -100,6 +105,10 @@ function runWithOpts(opts) {
 
   if (opts['enable-off']) {
     unset['criteria.enabled'] = true;
+  }
+
+  if (opts.description) {
+    set['description'] = opts.description;
   }
 
   var update = {
