@@ -5,12 +5,12 @@ var assert          = require('assert');
 var Backbone        = require('backbone');
 var ProfileMenuView = require('public/js/views/menu/room/profile/profile-menu-view');
 
-describe('ProfileMenuView', function(){
+describe('ProfileMenuView', function() {
   var model;
   var el;
   var profileMenuView;
 
-  beforeEach(function(){
+  beforeEach(function() {
     model = new Backbone.Model({ state: 'all', profileMenuOpenState: false });
     el = document.createElement('div');
     profileMenuView = new ProfileMenuView({ el: el, model: model });
@@ -18,19 +18,15 @@ describe('ProfileMenuView', function(){
 
   //Sadly as we are using request animation frame some checks must be wrapped
   //in timeouts ... yuck jp 8/12/15
-  it('should toggle its elements class when the profileMenuOpenState changes', function(done){
+  it('should toggle its elements class when the profileMenuOpenState changes', function(done) {
     assert.ok(!model.get('profileMenuOpenState'));
     assert.ok(!el.classList.contains('active'));
     model.set('profileMenuOpenState', true);
 
-    setTimeout(function(){
-      assert.ok(el.classList.contains('active'));
-      model.set('profileMenuOpenState', false);
-      setTimeout(function(){
-        assert.ok(!el.classList.contains('active'));
-        done();
-      },50);
-    }, 50);
+    assert.ok(el.classList.contains('active'));
+    model.set('profileMenuOpenState', false);
+    assert.ok(!el.classList.contains('active'));
+    done();
 
   });
 

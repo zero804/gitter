@@ -23,6 +23,9 @@ module.exports = {
       'bootstrap_tooltip': path.resolve(__dirname, '../../public/js/utils/tooltip.js'),
       'public': path.resolve(__dirname, '../../public'),
       'fixtures': path.resolve(__dirname, './fixtures'),
+      'views/search/searchView': path.resolve(__dirname, './fixtures/helpers/search-results-view.js'),
+      'views/search/search-input-view': path.resolve(__dirname, './fixtures/helpers/search-input-view.js'),
+      'utils/raf': path.resolve(__dirname, './fixtures/helpers/raf.js'),
     },
   },
 };
