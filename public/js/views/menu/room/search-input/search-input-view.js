@@ -1,7 +1,7 @@
 "use strict";
 
 var Marionette = require('backbone.marionette');
-var template = require('./tmpl/search-input.hbs');
+var template = require('./search-input-view.hbs');
 
 var SearchInputView = Marionette.ItemView.extend({
 

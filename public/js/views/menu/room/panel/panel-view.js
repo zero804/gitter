@@ -10,7 +10,7 @@ var ProfileMenuView       = require('../profile/profile-menu-view');
 var RAF                   = require('utils/raf');
 
 var SearchView            = require('views/search/searchView');
-var SearchInputView       = require('views/search/search-input-view');
+var SearchInputView       = require('../search-input/search-input-view');
 
 require('views/behaviors/isomorphic');
 require('nanoscroller');
