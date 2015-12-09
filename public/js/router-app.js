@@ -2,6 +2,7 @@
 'use strict';
 require('utils/initial-setup');
 
+var $                     = require('jquery');
 var appEvents             = require('utils/appevents');
 var context               = require('utils/context');
 var Backbone              = require('backbone');
@@ -340,6 +341,10 @@ onready(function() {
     postMessage({
       type: 'about.to.leave.current.room'
     });
+  });
+
+  appEvents.on('room-menu:pin', function(val) {
+    $('.app-layout').toggleClass('pinned', val);
   });
 
   // Sent keyboard events to chat frame

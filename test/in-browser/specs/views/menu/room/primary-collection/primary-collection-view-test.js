@@ -85,6 +85,14 @@ describe('PrimaryCollectionView', function() {
     assert.ok(!model.get('panelOpenState'));
   });
 
+  it('should not change the models panelOpenState when the roomMenuIsPinned', function(){
+    model.set('roomMenuIsPinned', true);
+    assert.ok(model.get('panelOpenState'));
+    primaryCollectionView.render();
+    el.firstChild.click();
+    assert.ok(model.get('panelOpenState'));
+  });
+
   it('should emit a navigation event when an item is clicked', function(done) {
     primaryCollectionView.render();
     Backbone.Events.on('navigation', function(url, type, title) {
