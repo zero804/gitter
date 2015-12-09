@@ -12,8 +12,8 @@ var PRERENDERED_VIEWS = [
   "js/views/chat/tmpl/chat-input-box",
   "js/views/chat/tmpl/chat-input-buttons",
   "js/views/chat/tmpl/join-room-view",
-  "js/views/search/tmpl/search-input",
-  "js/views/search/tmpl/search",
+  "js/views/menu/room/search-input/search-input-view",
+  "js/views/menu/room/search-results/search-results-view",
   'js/views/people/tmpl/peopleCollectionView',
   /* new */
 ].reduce(function(memo, v) {

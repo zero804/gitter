@@ -4,13 +4,14 @@ var Backbone              = require('backbone');
 var Marionette            = require('backbone.marionette');
 var appEvents             = require('utils/appevents');
 var PanelHeaderView       = require('../header/header-view');
+var PanelFooterView       = require('../footer/footer-view');
 var PrimaryCollectionView = require('../primary-collection/primary-collection-view');
 var SecondaryCollection   = require('../secondary-collection/secondary-collection-view');
 var ProfileMenuView       = require('../profile/profile-menu-view');
 var RAF                   = require('utils/raf');
 
-var SearchView            = require('views/search/searchView');
-var SearchInputView       = require('../search-input/search-input-view');
+var SearchView            = require('views/menu/room/search-results/search-results-view');
+var SearchInputView       = require('views/menu/room/search-input/search-input-view');
 
 require('views/behaviors/isomorphic');
 require('nanoscroller');
@@ -25,6 +26,7 @@ module.exports = Marionette.LayoutView.extend({
       secondaryCollection: { el: '#secondary-collection', init: 'initSecondaryCollection' },
       searchInput: { el: '#search-input', init: 'initSearchInput' },
       search: { el: '#search-results', init: 'initSearch' },
+      footer: { el: '#panel-footer', init: 'initFooter'}
     },
   },
 
@@ -32,6 +34,12 @@ module.exports = Marionette.LayoutView.extend({
     return new PanelHeaderView(optionsForRegion({
       model: this.model,
       userModel: this.model.userModel,
+    }));
+  },
+
+  initFooter: function (optionsForRegion){
+    return new PanelFooterView(optionsForRegion({
+
     }));
   },
 
@@ -56,11 +64,11 @@ module.exports = Marionette.LayoutView.extend({
 
   /* TODO PATCHED FROM RIGHT TOOLBAR */
   initSearch: function(optionsForRegion) {
-    return new SearchView(optionsForRegion({ model: this.searchState }));
+    //return new SearchView(optionsForRegion({ model: this.searchState }));
   },
 
   initSearchInput: function(optionsForRegion) {
-    return new SearchInputView(optionsForRegion({ model: this.searchState }));
+    //return new SearchInputView(optionsForRegion({ model: this.searchState }));
   },
   /* TODO PATCHED FROM RIGHT TOOLBAR */
 
