@@ -4,7 +4,9 @@ var Marionette = require('backbone.marionette');
 var template = require('./tmpl/search-input.hbs');
 
 var SearchInputView = Marionette.ItemView.extend({
+
   template: template,
+
   ui: {
     input: '.js-search-input',
     clearIcon: '.js-search-clear-icon',

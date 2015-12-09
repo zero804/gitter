@@ -4,8 +4,6 @@ var Marionette            = require('backbone.marionette');
 var context               = require('utils/context');
 var itemCollections       = require('collections/instances/integrated-items');
 var PeopleCollectionView  = require('views/people/peopleCollectionView');
-var SearchView            = require('views/search/searchView');
-var SearchInputView       = require('views/search/search-input-view');
 var RepoInfoView          = require('./repoInfo');
 var ActivityCompositeView = require('./activityCompositeView');
 var hasScrollBars         = require('utils/scrollbar-detect');
@@ -17,8 +15,6 @@ module.exports = (function() {
     className: 'right-toolbar right-toolbar--collapsible',
     behaviors: {
       Isomorphic: {
-        search:    { el: '#search-results', init: 'initSearchRegion' },
-        header:    { el: '#right-toolbar-header-region', init: 'initSearchInputRegion' },
         repo_info: { el: '#repo-info', init: 'initRepo_infoRegion' },
         activity:  { el: '#activity-region', init: 'initActivityRegion' },
         roster:    { el: '#people-roster', init: 'initRosterRegion' },
@@ -69,14 +65,6 @@ module.exports = (function() {
 
       this.listenTo(context.troupe(), 'change:id', this.onRoomChange, this);
 
-    },
-
-    initSearchRegion: function(optionsForRegion) {
-      //return new SearchView(optionsForRegion({ model: this.searchState }));
-    },
-
-    initSearchInputRegion: function(optionsForRegion) {
-      //return new SearchInputView(optionsForRegion({ model: this.searchState }));
     },
 
     initRepo_infoRegion: function(optionsForRegion) {
