@@ -4,7 +4,7 @@
 var env    = require('gitter-web-env');
 var nconf  = env.config;
 var stats  = env.stats;
-
+var statsd = env.createStatsClient({ prefix: nconf.get('stats:statsd:prefix') + 'serializer.' });
 
 var Q       = require("q");
 var winston = require('../utils/winston');
@@ -15,12 +15,6 @@ var debug   = require('debug')('gitter:serializer');
 var maxSerializerTime = nconf.get('serializer:warning-period');
 
 /**
- * Lazy load strategies used to be important to work around issues with
- * circular dependencies in nodejs but this has been corrected further
- * up the dependency graph
- */
-var LAZY_LOAD_STRATEGIES = false;
-/**
  * Serialize some items using a strategy, returning a promise
  */
 function serialize(items, strat, callback) {
@@ -28,24 +22,27 @@ function serialize(items, strat, callback) {
     return Q.resolve(items).nodeify(callback);
   }
 
+  var statsPrefix = strat.strategyType ?
+          'serializer.' + strat.strategyType + '.' + strat.name :
+          'serializer.' + strat.name;
+
   var single;
   if (Array.isArray(items)) {
     /** Array with zero items, shortcut */
     if (!items.length) {
       return Q.resolve([]).nodeify(callback);
     }
+
+    statsd.histogram(statsPrefix + '.size', items.length, 0.01);
+
     single = false;
   } else {
     single = true;
     items = [ items ];
   }
 
-  function pkg(i) {
-    return single ? i[0] : i;
-  }
-
-  var start = Date.now();
   var d = Q.defer();
+  var start = Date.now();
   strat.preload(items, function(err) {
 
     if(err) {
@@ -55,6 +52,8 @@ function serialize(items, strat, callback) {
 
     var time = Date.now() - start;
     debug('strategy %s with %s items took %sms to complete', strat.name, items.length, time);
+    statsd.timing(statsPrefix + '.timing', time, 0.01);
+
     if(time > maxSerializerTime) {
       stats.responseTime('serializer.slow.preload', time);
     }
@@ -68,7 +67,11 @@ function serialize(items, strat, callback) {
       serialized = strat.post(serialized);
     }
 
-    d.resolve(pkg(serialized));
+    if (single) {
+      return d.resolve(serialized[0]);
+    } else {
+      return d.resolve(serialized);
+    }
   });
 
   return d.promise.nodeify(callback);
@@ -113,27 +116,10 @@ module.exports = function(serializerDirectory, e) {
       return match.toUpperCase();
     });
 
-    if (LAZY_LOAD_STRATEGIES) {
-      Object.defineProperty(e, strategyName, {
-        enumerable: true,
-        configurable: true,
-        get: function() {
-          var strategy = require('./' + serializerDirectory + '/' + baseName);
+    var Strategy = require('./' + serializerDirectory + '/' + baseName);
+    Strategy.prototype.strategyType = serializerDirectory; // Not ideal
 
-          Object.defineProperty(e, strategyName, {
-            enumerable: true,
-            configurable: false,
-            writable: false,
-            value: strategy
-          });
-
-          return strategy;
-        }
-      });
-
-    } else {
-      e[strategyName] = require('./' + serializerDirectory + '/' + baseName);
-    }
+    e[strategyName] = require('./' + serializerDirectory + '/' + baseName);
   });
 
   return e;
