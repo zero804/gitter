@@ -31,6 +31,7 @@ describe('MinibarView', function() {
     innerEl3 = document.createElement('div');
     innerEl3.dataset.stateChange = 'org';
     innerEl3.dataset.orgName = 'test3';
+    innerEl3.id = 'menu-close-button';
     el.appendChild(innerEl3);
 
 
@@ -98,6 +99,20 @@ describe('MinibarView', function() {
                 'an error was thrown whilst trying to click a menu item  after the panel has been closed');
       done();
     }
+  });
+
+  it('should change the panelOpenState when the close button is clicked', function(){
+    miniBar.model.set('panelOpenState', true);
+    miniBar.$el.find('#menu-close-button').click();
+    assert.ok(!miniBar.model.get('panelOpenState'));
+  });
+
+  it('should add an active class to the close button when the panelOpenState is true', function(){
+    assert.ok(!miniBar.$el.find('#menu-close-button').hasClass('active'));
+    miniBar.model.set('panelOpenState', true);
+    assert.ok(miniBar.$el.find('#menu-close-button').hasClass('active'));
+    miniBar.model.set('panelOpenState', false);
+    assert.ok(!miniBar.$el.find('#menu-close-button').hasClass('active'));
   });
 
 });

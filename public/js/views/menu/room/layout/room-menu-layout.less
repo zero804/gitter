@@ -77,6 +77,8 @@ html {
 }
 
 .room-menu-options {
+  display: flex;
+  flex-direction: column;
   list-style: none;
   margin-left: 0;
 }
@@ -165,6 +167,22 @@ html {
 
   &.active {
     background: @org-bg;
+  }
+}
+
+.room-menu-options__item--explore {
+  .room-menu-options__item();
+  margin-top: auto;
+}
+
+.room-menu-options__item--close {
+  .room-menu-options__item();
+}
+
+.menu-close-button {
+  transition: transform .2s linear;
+  &.active {
+    transform: rotate(90deg);
   }
 }
 

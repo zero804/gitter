@@ -8,6 +8,10 @@ require('nanoscroller');
 
 var MiniBarView = Marionette.ItemView.extend({
 
+  events: {
+    'click #menu-close-button': 'onCloseButtonClicked',
+  },
+
   initialize: function() {
     this.roomMenuItems = [];
     this.roomMenuItemModels = new Backbone.Collection();
@@ -45,7 +49,7 @@ var MiniBarView = Marionette.ItemView.extend({
     if (!!currentActiveModel) currentActiveModel.set('active', false);
 
     //activate the next item
-    var query = !!orgName ? { orgName: orgName }: { type: type };
+    var query = !!orgName ? { orgName: orgName } : { type: type };
     var nextActiveModel = this.roomMenuItemModels.where(query)[0];
     if (!!nextActiveModel) nextActiveModel.set('active', true);
 
@@ -53,15 +57,21 @@ var MiniBarView = Marionette.ItemView.extend({
       panelOpenState: true,
       state: type,
       profileMenuOpenState: false,
-      selectedOrgName: orgName
+      selectedOrgName: orgName,
     });
   },
 
   onPanelStateChange: function(model, state) {/*jshint unused:true */
+    this.$el.find('#menu-close-button').toggleClass('active', state);
     if (!state) {
       var currentActiveModel = this._getCurrentlyActiveChildModel();
       currentActiveModel.set('active', false);
     }
+  },
+
+  onCloseButtonClicked: function(e) {
+    e.stopPropagation();
+    this.model.set('panelOpenState', false);
   },
 
   _getCurrentlyActiveChildModel: function() {
