@@ -4,10 +4,11 @@ var Marionette       = require('backbone.marionette');
 var Backbone         = require('backbone');
 var RoomMenuItemView = require('./minibar-item-view');
 
+require('nanoscroller');
+
 var MiniBarView = Marionette.ItemView.extend({
 
   initialize: function() {
-
     this.roomMenuItems = [];
     this.roomMenuItemModels = new Backbone.Collection();
 
@@ -30,6 +31,12 @@ var MiniBarView = Marionette.ItemView.extend({
     }.bind(this));
 
     this.listenTo(this.model, 'change:panelOpenState', this.onPanelStateChange, this);
+
+    this.$el.find('.nano').nanoScroller({
+      iOSNativeScrolling: true,
+      sliderMaxHeight:    200,
+    });
+
   },
 
   onItemClicked: function(type, orgName) {
