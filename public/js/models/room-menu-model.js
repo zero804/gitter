@@ -97,6 +97,7 @@ module.exports = Backbone.Model.extend({
   },
 
   onSearchTermChange: _.debounce(function() {
+    console.log('CHANGED');
     this.searchTerms.add({ term: this.get('searchTerm') });
   }, SEARCH_DEBOUNCE_INTERVAL),
 
