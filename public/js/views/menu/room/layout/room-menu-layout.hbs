@@ -4,19 +4,19 @@
       <ul class="room-menu-options">
 
         <li data-state-change="all" class="room-menu-options__item--home">
-          <a>H</a>
+          <a><img class="room-menu-options__item__avatar" src='{{cdn "images/gitter-vector-logo.svg"}}'/></a>
         </li>
 
         <li data-state-change="search" class="room-menu-options__item--search">
-          <a>S</a>
+          <a><img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/search.svg"}}'/></a>
         </li>
 
         <li data-state-change="favourite" class="room-menu-options__item--favourite">
-          <a>F</a>
+          <a><img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/favourites.svg"}}'/></a>
         </li>
 
         <li data-state-change="people" class="room-menu-options__item--people">
-          <a>P</a>
+          <a><img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/people.svg"}}'/></a>
         </li>
 
         {{#each orgs}}
@@ -39,9 +39,9 @@
         <div class="nano">
           <div class="nano-content">
             <div id="search-input"></div>
-            <div id="search-results">
-              {{{ prerenderView "js/views/menu/room/search-results/search-results-view" wrap="div" }}}
-            </div>
+            {{!<div id="search-results">i }}
+              {{! {{{ prerenderView "js/views/menu/room/search-results/search-results-view" wrap="div" }}
+            {{! </div> }}
 
             <section class="primary-collection" id="primary-collection"></section>
             <section class="secondary-collection" id="secondary-collection"></section>
