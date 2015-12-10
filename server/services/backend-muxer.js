@@ -7,6 +7,7 @@ var identityService = require('./identity-service');
 var registeredBackends = {
   google: require('gitter-web-google-backend'),
   github: require('gitter-web-github-backend'),
+  twitter: require('gitter-web-twitter-backend'),
   // ...
 };
 
