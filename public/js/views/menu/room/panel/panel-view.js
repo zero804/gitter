@@ -38,10 +38,12 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   initFooter: function (optionsForRegion){
+    /*
     return new PanelFooterView(optionsForRegion({
       model: this.model,
       bus:   this.bus,
     }));
+    */
   },
 
   initProfileMenu: function(optionsForRegion) {
