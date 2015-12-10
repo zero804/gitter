@@ -65,7 +65,7 @@ module.exports = Marionette.LayoutView.extend({
 
   /* TODO PATCHED FROM RIGHT TOOLBAR */
   initSearch: function(optionsForRegion) {
-    return new SearchView(optionsForRegion({ model: this.searchState }));
+    //return new SearchView(optionsForRegion({ model: this.searchState }));
   },
 
   initSearchInput: function(optionsForRegion) {
