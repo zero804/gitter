@@ -29,4 +29,10 @@ describe('getRoomAvatar', function(){
     assert.equal(expected, result);
   });
 
+  it('should sanitise a username and return the correct result', function(){
+    var result = getRoomAvatar('Ricardo Baeta');
+    var expected = 'https://avatars1.githubusercontent.com/RicardoBaeta';
+    assert.equal(expected, result);
+  });
+
 });
