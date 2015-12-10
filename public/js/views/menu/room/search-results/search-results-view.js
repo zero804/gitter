@@ -10,7 +10,11 @@ var apiClient             = require('components/apiClient');
 var context               = require('utils/context');
 var appEvents             = require('utils/appevents');
 var Rollers               = require('utils/rollers');
+
+//OOPS
 var resolveRoomAvatarUrl  = require('gitter-web-shared/avatars/resolve-room-avatar-url');
+var getRoomAvatar = require('utils/get-room-avatar');
+
 var textFilter            = require('utils/text-filter');
 var KeyboardEventsMixin   = require('views/keyboard-events-mixin');
 var ChatSearchModels      = require('collections/chat-search');
@@ -54,7 +58,7 @@ module.exports = (function() {
 
     template: resultTemplate,
 
-    className: 'result',
+    className: 'room-item',
 
     initialize: function () {
       this.toggleSelected();
@@ -76,14 +80,11 @@ module.exports = (function() {
   var RoomResultItemView = ResultItemView.extend({
 
     serializeData: function () {
-      var data = {};
-      var uri = this.model.get('url').replace(/^\//,'');
-      data.selected = this.model.get('selected');
-      data.detail = this.model.get('githubType');
-      data.text = uri;
-      // TODO: send a room object
-      data.avatarUrl = resolveRoomAvatarUrl({ uri: uri }, 48);
-      return data;
+      var data = this.model.toJSON();
+      return {
+        name:          data.name,
+        roomAvatarUrl: getRoomAvatar(data.name)
+      };
     },
 
     selectItem: function () {
@@ -106,14 +107,24 @@ module.exports = (function() {
       var model = this.model;
       var fromUser = model.get('fromUser');
       var username = fromUser && fromUser.username || "";
-      var sent = model.get('sent');
 
+      console.log(username);
+
+      //var sent = model.get('sent');
+
+      /*
       return {
         selected: model.get('selected'),
         detail: username,
         sent: sent,
         text: model.get('text'),
         avatarUrl: fromUser && fromUser.avatarUrlSmall
+      };
+      */
+
+      return {
+        name: model.get('text'),
+        roomAvatarUrl: getRoomAvatar(username)
       };
     },
 
@@ -378,6 +389,10 @@ module.exports = (function() {
         debouncedRun();
       });
 
+      this.listenTo(this.model, 'change:state', function(model, val) {//jshint unused: true
+        this.$el.toggleClass('hidden', (val !== 'search'));
+      }, this);
+
       this.listenTo(this.model, 'change:active', function (m, active) {  // jshint unused:true
         if (active) {
           this.triggerMethod('search:expand');
@@ -438,10 +453,10 @@ module.exports = (function() {
 
       this.listenTo(context.troupe(), 'change:id', function() {
         masterCollection.reset();
-        this.model.set('active', false);
+        //this.model.set('active', false);
         //Super hacky implementation as this will be moved
         //JP 4/11/15
-        this.$el.find('.js-troupe-name')[0].innerHTML = context.troupe().get('name');
+        //this.$el.find('.js-troupe-name')[0].innerHTML = context.troupe().get('name');
       });
 
     },
@@ -472,6 +487,7 @@ module.exports = (function() {
     },
 
     run: function (/*model, searchTerm*/) {
+      console.log('GOT A CHANGE');
       if (this.isSearchTermEmpty()) return this.hide();
 
       var searchTerm = this.model.get('searchTerm');

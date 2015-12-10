@@ -1,6 +1,17 @@
-<h5 class='search-header  u-uppercase'>Rooms &amp; People</h5>
+<header class="search-result-header">
+  <h5>Rooms &amp; People</h5>
+  <span class="search-result-header__chevron">&rsaquo;</span>
+</header>
+
 <div class='js-search-rooms'></div>
-<h5 class='search-header  u-uppercase'>Messages {{#if isOneToOne}}with{{else}}in{{/if}}
-  <span class="js-troupe-name">{{troupeName}}</span>
-</h5>
+
+<header class="search-result-header">
+  <h5>Messages</h5>
+  <span class="search-result-header__chevron">&rsaquo;</span>
+</header>
+
+{{!<h5 class='search-header  u-uppercase'>Messages {{#if isOneToOne}}{{!with{{else}}{{!in{{/if}}
+  {{!<span class="js-troupe-name">{{troupeName}}{{!</span>}}
+{{!</h5> }}
+
 <div class='js-search-messages'></div>
