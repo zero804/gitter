@@ -17,10 +17,6 @@ module.exports = Marionette.LayoutView.extend({
     }
   },
 
-  events: {
-    'mouseleave': 'onMouseLeave'
-  },
-
   initMiniBar: function (optionsForRegion){
     return new MiniBarView(optionsForRegion({ model: this.model }));
   },
@@ -36,12 +32,6 @@ module.exports = Marionette.LayoutView.extend({
       roomCollection: attrs.roomCollection,
       userModel: context.user(),
     });
-  },
-
-  onMouseLeave: function (){
-    if(!this.model.get('roomMenuIsPinned')){
-      this.model.set('panelOpenState', false);
-    }
-  },
+  }
 
 });

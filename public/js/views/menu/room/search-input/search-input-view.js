@@ -6,6 +6,7 @@ var template = require('./search-input-view.hbs');
 var SearchInputView = Marionette.ItemView.extend({
 
   template: template,
+  className: 'search-input-container',
 
   ui: {
     input: '.js-search-input',
@@ -14,17 +15,22 @@ var SearchInputView = Marionette.ItemView.extend({
   },
 
   events: {
-    'click .js-activate-search': 'activate',
+    //'click .js-activate-search': 'activate',
     'click @ui.clearIcon' : 'clearSearchTerm',
     'click @ui.input': 'activate',
-    'blur @ui.input': 'onBlur',
+    //'blur @ui.input': 'onBlur',
     'change @ui.input': 'handleChange',
     'input @ui.input': 'handleChange'
   },
 
   modelEvents: {
-    'change:isLoading': 'onResultsLoading',
-    'change:active': 'onActiveChange'
+    //'change:isLoading': 'onResultsLoading',
+    //'change:active': 'onActiveChange'
+    'change:state': 'onModelStateChange'
+  },
+
+  onModelStateChange: function(model, val) { /*jshint unused: true*/
+    this.$el.toggleClass('active', (val === 'search'));
   },
 
   activate: function() {

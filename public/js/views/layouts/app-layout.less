@@ -7,7 +7,7 @@
   transition: width .2s ease-in;
 
   &.pinned {
-    width: calc(100% - @menu-panel-desktop-width);
+    width: ~"calc(100% - (" @menu-panel-desktop-width  ~"+" @desktop-menu-width ~"))";
   }
 }
 
