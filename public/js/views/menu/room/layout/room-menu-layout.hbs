@@ -30,6 +30,17 @@
           </li>
         {{/each}}
 
+        <li class="room-menu-options__item--explore">
+        {{! replace svg  with unicode character}}
+          <a href="/explore"><img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/explore.svg"}}'/></a>
+        </li>
+
+        <li data-state-change="all" class="room-menu-options__item--close">
+          <a id="menu-close-button" class="menu-close-button">
+            <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/hamburger.svg"}}'/>
+          </a>
+        </li>
+
       </ul>
     </nav>
     <div id="room-menu__panel">
