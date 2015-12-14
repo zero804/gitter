@@ -19,6 +19,7 @@ var trackNewUser = require('../../utils/track-new-user');
 var trackUserLogin = require('../../utils/track-user-login');
 var updateUserLocale = require('../../utils/update-user-locale');
 var debug = require('debug')('gitter:passport');
+var _ = require('lodash');
 
 
 
@@ -142,11 +143,26 @@ function addUser(req, accessToken, githubUserProfile) {
     });
 }
 
+function obfuscateToken(token) {
+  token = token || '';
+  return token.slice(0, 6) + _.repeat('*', token.length - 6);
+}
+
 function githubUserCallback(req, accessToken, refreshToken, params, _profile, done) {
+  var loggableToken = obfuscateToken(accessToken);
+
+  logger.info('GitHub OAUTH succeeded', {
+    accessToken: loggableToken
+  });
+
   var githubMeService = new GitHubMeService({ githubUserToken: accessToken });
   var githubUserProfile;
   return githubMeService.getUser()
     .then(function(_githubUserProfile) {
+      logger.info('GitHub profile obtained', {
+        accessToken: loggableToken
+      });
+
       githubUserProfile = _githubUserProfile;
       return userService.findByGithubIdOrUsername(githubUserProfile.id, githubUserProfile.login)
     })
@@ -173,7 +189,10 @@ function githubUserCallback(req, accessToken, refreshToken, params, _profile, do
     .catch(function(err) {
       errorReporter(err, { oauth: "failed" }, { module: 'passport' });
       stats.event("oauth_profile.error");
-      logger.error('Error during oauth process. Unable to obtain user profile.', err);
+      logger.error('Error during GitHub OAUTH process. Unable to obtain user profile.', {
+        exception: err,
+        accessToken: loggableToken
+      });
       return done(err);
     });
 }
