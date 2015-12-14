@@ -13,6 +13,7 @@ describe('MinibarView', function() {
   var innerEl2;
   var innerEl3;
   var model;
+  var closeBtn;
 
   beforeEach(function() {
 
@@ -31,9 +32,11 @@ describe('MinibarView', function() {
     innerEl3 = document.createElement('div');
     innerEl3.dataset.stateChange = 'org';
     innerEl3.dataset.orgName = 'test3';
-    innerEl3.id = 'menu-close-button';
     el.appendChild(innerEl3);
 
+    closeBtn = document.createElement('div');
+    closeBtn.id = 'menu-close-button';
+    innerEl3.appendChild(closeBtn);
 
     model = new Backbone.Model({
       panelOpenState: false,
@@ -78,7 +81,6 @@ describe('MinibarView', function() {
     assert.ok(miniBar.roomMenuItemModels.at(1).get('active'));
   });
 
-
   it('should remove all active models when panelOpenState changes to false', function() {
     miniBar.model.set('panelOpenState', true);
     miniBar.model.set('panelOpenState', false);
@@ -101,18 +103,10 @@ describe('MinibarView', function() {
     }
   });
 
-  it('should change the panelOpenState when the close button is clicked', function(){
+  it('should change the panelOpenState when the close button is clicked', function() {
     miniBar.model.set('panelOpenState', true);
     miniBar.$el.find('#menu-close-button').click();
     assert.ok(!miniBar.model.get('panelOpenState'));
-  });
-
-  it('should add an active class to the close button when the panelOpenState is true', function(){
-    assert.ok(!miniBar.$el.find('#menu-close-button').hasClass('active'));
-    miniBar.model.set('panelOpenState', true);
-    assert.ok(miniBar.$el.find('#menu-close-button').hasClass('active'));
-    miniBar.model.set('panelOpenState', false);
-    assert.ok(!miniBar.$el.find('#menu-close-button').hasClass('active'));
   });
 
 });

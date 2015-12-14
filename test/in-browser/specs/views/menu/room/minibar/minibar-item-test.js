@@ -12,6 +12,9 @@ describe('MinibarItemView', function() {
   var model;
   var innerEl;
   var roomItemView;
+  var close;
+  var container;
+  var closeButtonView;
 
   beforeEach(function() {
 
@@ -22,6 +25,12 @@ describe('MinibarItemView', function() {
     model = new Backbone.Model({ type: 'people' });
 
     roomItemView = new RoomItemView({ el: el, model: model });
+
+    container = document.createElement('div');
+    close = document.createElement('div');
+    close.id = 'menu-close-button';
+    container.appendChild(close);
+    closeButtonView = new RoomItemView({ el: container });
   });
 
   it('trigger an event when it\'s el is clicked', function(done) {
@@ -55,14 +64,25 @@ describe('MinibarItemView', function() {
     el.click();
   });
 
-  //Sadly as we are using request animation frame some checks must be wrapped
-  //in timeouts ... yuck jp 8/12/15
   it('should add an active class to it\'s el on model change', function() {
     assert.ok(!el.classList.contains('active'));
     roomItemView.model.set('active', true);
     assert.ok(el.classList.contains('active'));
     roomItemView.model.set('active', false);
     assert.ok(!el.classList.contains('active'));
+  });
+
+  it('should assign the correct property to its model if it contains a close button', function() {
+    assert.ok(closeButtonView.model.get('isCloseButton'));
+    assert.ok(!roomItemView.model.get('isCloseBubtton'));
+  });
+
+  it('should send isCloseButton when its el is clicked', function(done){
+    closeButtonView.on('room-item-view:clicked', function(type, name, isCloseButton){
+      assert.ok(isCloseButton);
+      done();
+    });
+    container.click();
   });
 
 });

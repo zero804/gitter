@@ -108,7 +108,6 @@ module.exports = (function() {
       var fromUser = model.get('fromUser');
       var username = fromUser && fromUser.username || "";
 
-      console.log(username);
 
       //var sent = model.get('sent');
 
@@ -389,27 +388,10 @@ module.exports = (function() {
         debouncedRun();
       });
 
-      this.listenTo(this.model, 'change:state', function(model, val) {//jshint unused: true
-        this.$el.toggleClass('hidden', (val !== 'search'));
-      }, this);
+      this.listenTo(this.model, 'change:state', this.onModelChangeState, this);
+      //trigger this initially so we can hide the search view on init
+      this.onModelChangeState(this.model, this.model.get('state'));
 
-      this.listenTo(this.model, 'change:active', function (m, active) {  // jshint unused:true
-        if (active) {
-          this.triggerMethod('search:expand');
-
-          if (window.innerWidth < 880) {
-            appEvents.triggerParent('menu:hide'); // hide menu
-          }
-        } else {
-          this.model.set('searchTerm', '');
-          this.hide();
-          this.triggerMethod('search:collapse');
-
-          appEvents.triggerParent('menu:show'); // show menu
-          appEvents.trigger('chatCollectionView:clearHighlight'); // remove highlights
-        }
-
-      });
 
       // master collection to enable easier navigation
       var masterCollection = new Backbone.Collection([]);
@@ -481,13 +463,16 @@ module.exports = (function() {
       this.model.set('active', false);
     },
 
+    onModelChangeState: function (model, val){ // jshint unused: true
+      this.$el.toggleClass('hidden', (val !== 'search'));
+    },
+
     hide: function () {
       this.triggerMethod('search:hide');
       this.search.clearCache();
     },
 
     run: function (/*model, searchTerm*/) {
-      console.log('GOT A CHANGE');
       if (this.isSearchTermEmpty()) return this.hide();
 
       var searchTerm = this.model.get('searchTerm');
