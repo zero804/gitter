@@ -173,7 +173,7 @@ function githubUserCallback(req, accessToken, refreshToken, params, _profile, do
     .catch(function(err) {
       errorReporter(err, { oauth: "failed" }, { module: 'passport' });
       stats.event("oauth_profile.error");
-      logger.error('Error during oauth process. Unable to obtain user profile.', err);
+      logger.error('Error during oauth process. Unable to obtain user profile.', {exception: err});
       return done(err);
     });
 }
