@@ -1,5 +1,6 @@
 'use strict';
 
+var Backbone   = require('backbone');
 var Marionette = require('backbone.marionette');
 var appEvents  = require('utils/appevents');
 var RAF        = require('utils/raf');
@@ -15,7 +16,11 @@ module.exports = Marionette.ItemView.extend({
   },
 
   initialize: function() {
-    this.model.set('orgName', this.$el.data('org-name'));
+    this.model = (this.model || new Backbone.Model());
+    this.model.set({
+      orgName:       this.$el.data('org-name'),
+      isCloseButton: !!this.$el.find('#menu-close-button').length
+    });
     this.listenTo(appEvents, 'ui:swiperight', this.onSwipeRight, this);
   },
 
@@ -33,7 +38,8 @@ module.exports = Marionette.ItemView.extend({
   _triggerRoomChange: function() {
     this.trigger('room-item-view:clicked',
                  this.model.get('type'),
-                 this.model.get('orgName')
+                 this.model.get('orgName'),
+                 this.model.get('isCloseButton')
                 );
   },
 

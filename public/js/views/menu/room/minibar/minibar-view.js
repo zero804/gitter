@@ -8,10 +8,6 @@ require('nanoscroller');
 
 var MiniBarView = Marionette.ItemView.extend({
 
-  events: {
-    'click #menu-close-button': 'onCloseButtonClicked',
-  },
-
   initialize: function() {
     this.roomMenuItems = [];
     this.roomMenuItemModels = new Backbone.Collection();
@@ -43,7 +39,15 @@ var MiniBarView = Marionette.ItemView.extend({
 
   },
 
-  onItemClicked: function(type, orgName) {
+  onItemClicked: function(type, orgName, isCloseButton) {
+
+    // If the button clicked is the close button
+    // AND the menu is already open
+    // JUST close it
+    if (isCloseButton && this.model.get('panelOpenState')) {
+      return this.model.set('panelOpenState', false);
+    }
+
     //deactive the old active item
     var currentActiveModel = this._getCurrentlyActiveChildModel();
     if (!!currentActiveModel) currentActiveModel.set('active', false);
@@ -67,11 +71,6 @@ var MiniBarView = Marionette.ItemView.extend({
       var currentActiveModel = this._getCurrentlyActiveChildModel();
       currentActiveModel.set('active', false);
     }
-  },
-
-  onCloseButtonClicked: function(e) {
-    e.stopPropagation();
-    this.model.set('panelOpenState', false);
   },
 
   _getCurrentlyActiveChildModel: function() {
