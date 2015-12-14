@@ -76,10 +76,10 @@ exports.getGitHubToken = function(user, scope) {
   return user.githubToken || user.githubUserToken;
 };
 
-exports.isGitHubUser = function(user) {
-  return (!user.username || user.username.indexOf('_') === -1);
-};
-
+function isGitHubUser(user) {
+  return (user.username && user.username.indexOf('_') === -1);
+}
+exports.isGitHubUser = isGitHubUser;
 
 exports.isMissingTokens = function(user) {
   // TODO: replace this with something more "provider-aware"
