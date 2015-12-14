@@ -20,7 +20,7 @@ describe('user avatar url generator', function() {
         gravatarImageUrl: 'https://lh5.googleusercontent.com/-8JzxZyD84qE/AAAAAAAAAAI/AAAAAAAAAN4/_x36v4AaxKo/photo.jpg'
       };
       var result = resolveUserAvatarUrl(user, 40)
-      assert.equal(result, user.gravatarImageUrl+'?sw=40');
+      assert.equal(result, user.gravatarImageUrl+'?sz=40');
     });
   });
 
