@@ -46,6 +46,8 @@ var MiniBarView = Marionette.ItemView.extend({
     // AND the menu is already open
     // JUST close it
     if (isCloseButton && this.model.get('panelOpenState')) {
+      if (this.model.get('roomMenuIsPinned')) { return }
+
       return this.model.set('panelOpenState', false);
     }
 
