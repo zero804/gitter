@@ -67,7 +67,7 @@ module.exports = Marionette.LayoutView.extend({
 
     this.timeout = setTimeout(function() {
       this.model.set('panelOpenState', false);
-    }.bind(this), 1000);
+    }.bind(this), 500);
 
   },
 
