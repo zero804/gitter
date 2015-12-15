@@ -6,6 +6,12 @@
   padding-top: 2rem;
 }
 
+.room-item-selected() {
+  cursor: pointer;
+  background-color: rgba(255, 255, 255, .1);
+  color: white;
+}
+
 .room-item {
   display:        flex;
   flex-direction: row;
@@ -13,8 +19,11 @@
   height: 3.8rem;;
 
   &:hover {
-    cursor: pointer;
-    background-color: rgba(255, 255, 255, .1);
+    .room-item-selected();
+  }
+
+  &.selected {
+    .room-item-selected();
   }
 
   .desktop & {

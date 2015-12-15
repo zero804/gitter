@@ -82,7 +82,10 @@ module.exports = Marionette.LayoutView.extend({
 
   initialize: function(attrs) {
     this.bus = attrs.bus;
-    appEvents.on('ui:swipeleft', this.onSwipeLeft, this);
+
+    this.listenTo(this.bus, 'ui:swipeleft', this.onSwipeLeft, this);
+    this.listenTo(this.bus, 'focus.request.chat', this.onSearchItemSelected, this);
+
     this.$el.find('.nano').nanoScroller({
       iOSNativeScrolling: true,
       sliderMaxHeight:    200,
@@ -106,6 +109,10 @@ module.exports = Marionette.LayoutView.extend({
 
   onSwipeLeft: function(e) {
     if (e.target === this.el) { this.model.set('panelOpenState', false); }
+  },
+
+  onSearchItemSelected: function (){
+    this.model.set('panelOpenState', false);
   },
 
 });
