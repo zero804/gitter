@@ -61,7 +61,7 @@ var MiniBarView = Marionette.ItemView.extend({
     this.$el.find('#menu-close-button').toggleClass('active', state);
     if (!state) {
       var currentActiveModel = this._getCurrentlyActiveChildModel();
-      currentActiveModel.set('active', false);
+      if (currentActiveModel) currentActiveModel.set('active', false);
     }
   },
 

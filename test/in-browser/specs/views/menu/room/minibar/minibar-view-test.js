@@ -104,6 +104,7 @@ describe('MinibarView', function() {
   });
 
   it('should change the panelOpenState when the close button is clicked', function() {
+    console.log(miniBar.model);
     miniBar.model.set('panelOpenState', true);
     miniBar.$el.find('#menu-close-button').click();
     assert.ok(!miniBar.model.get('panelOpenState'));
