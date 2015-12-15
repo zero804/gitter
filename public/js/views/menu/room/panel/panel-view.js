@@ -26,7 +26,7 @@ module.exports = Marionette.LayoutView.extend({
       secondaryCollection: { el: '#secondary-collection', init: 'initSecondaryCollection' },
       searchInput:         { el: '#search-input', init: 'initSearchInput' },
       search:              { el: '#search-results', init: 'initSearch' },
-      footer:              { el: '#panel-footer', init: 'initFooter'}
+      footer:              { el: '#panel-footer', init: 'initFooter'},
     },
   },
 
@@ -37,7 +37,7 @@ module.exports = Marionette.LayoutView.extend({
     }));
   },
 
-  initFooter: function (optionsForRegion){
+  initFooter: function(optionsForRegion) {
     /*
     return new PanelFooterView(optionsForRegion({
       model: this.model,
@@ -54,7 +54,7 @@ module.exports = Marionette.LayoutView.extend({
     return new PrimaryCollectionView(optionsForRegion({
       collection: this.model.primaryCollection,
       model:      this.model,
-      bus:        this.bus
+      bus:        this.bus,
     }));
   },
 
@@ -75,10 +75,9 @@ module.exports = Marionette.LayoutView.extend({
   },
   /* TODO PATCHED FROM RIGHT TOOLBAR */
 
-
   modelEvents: {
     'change:panelOpenState': 'onPanelOpenStateChange',
-    'primary-collection:snapshot': 'onPrimaryCollectionRender'
+    'primary-collection:snapshot': 'onPrimaryCollectionRender',
   },
 
   initialize: function(attrs) {
@@ -96,7 +95,7 @@ module.exports = Marionette.LayoutView.extend({
     this.searchState = new Backbone.Model({
       searchTerm: '',
       active:     false,
-      isLoading:  false
+      isLoading:  false,
     });
     /* TODO PATCHED FROM RIGHT TOOLBAR */
 
@@ -112,12 +111,14 @@ module.exports = Marionette.LayoutView.extend({
     if (e.target === this.el) { this.model.set('panelOpenState', false); }
   },
 
-  onSearchItemSelected: function (){
-    this.model.set('panelOpenState', false);
+  onSearchItemSelected: function() {
+    if (!this.model.get('roomMenuIsPinned')) {
+      this.model.set('panelOpenState', false);
+    }
   },
 
-  onPrimaryCollectionRender: function (){
-    RAF(function(){
+  onPrimaryCollectionRender: function() {
+    RAF(function() {
       this.$el.removeClass('loading');
     }.bind(this));
   },

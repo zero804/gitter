@@ -1,5 +1,6 @@
 'use strict';
 
+var $             = require('jquery');
 var Marionette    = require('backbone.marionette');
 var RoomMenuModel = require('../../../../models/room-menu-model');
 var MiniBarView   = require('../minibar/minibar-view');
@@ -31,6 +32,7 @@ module.exports = Marionette.LayoutView.extend({
       bus: this.bus,
       roomCollection: attrs.roomCollection,
       userModel: context.user(),
+      roomMenuIsPinned: $('.app-layout').hasClass('pinned')
     });
   },
 });

@@ -21,7 +21,8 @@ module.exports = Backbone.Model.extend({
     searchTerm:     '',
     panelOpenState: false,
     secondaryCollectionActive: false,
-    secondaryCollectionHeader: ''
+    secondaryCollectionHeader: '',
+    roomMenuIsPinned: false
   },
 
   initialize: function(attrs) {
