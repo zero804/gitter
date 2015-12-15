@@ -1,5 +1,14 @@
 @import "../../../../../less/components/menu/room/menu-text";
 
+.secondary-collection {
+  opacity: 0;
+  transition: opacity .2s ease-in-out;
+
+  &.active {
+    opacity: 1;
+  }
+}
+
 .secondary-collection__title {
   .room-menu-text();
   box-sizing:   border-box;

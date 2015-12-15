@@ -6,6 +6,7 @@ var template = require('./footer-view.hbs');
 module.exports = Marionette.ItemView.extend({
   template: template,
   className: 'panel-footer',
+
   events: {
     'click #room-menu-footer-pin-button': 'onPinButtonClicked',
   },
@@ -24,4 +25,6 @@ module.exports = Marionette.ItemView.extend({
     this.model.set('panelOpenState', newVal);
     this.bus.trigger('room-menu:pin', newVal);
   },
+
+
 });
