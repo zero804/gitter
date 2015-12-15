@@ -48,11 +48,7 @@ var MiniBarView = Marionette.ItemView.extend({
     //TODO Tidy this
     if (isCloseButton) {
       var newVal = !this.model.get('roomMenuIsPinned');
-      this.model.set({
-        roomMenuIsPinned: newVal,
-        panelOpenState:   newVal,
-      });
-
+      this.model.set({ roomMenuIsPinned: newVal });
       return this.bus.trigger('room-menu:pin', newVal);
     }
 
