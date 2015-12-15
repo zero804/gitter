@@ -1,4 +1,4 @@
-/*global describe:true, it:true, beforeEach:true */
+/*global describe:true, it:true, beforeEach:true, sinon: true */
 'use strict';
 
 var assert    = require('assert');
@@ -15,11 +15,9 @@ describe('PanelView', function() {
   beforeEach(function() {
     el        = document.createElement('div');
     model     = new Backbone.Model({ panelOpenState: false });
-    panelView = new PanelView({ model: model, el: el });
+    panelView = new PanelView({ model: model, el: el, bus: Backbone.Events });
   });
 
-  //Sadly as we are using request animation frame some checks must be wrapped
-  //in timeouts ... yuck jp 8/12/15
   it('should toggle a class on it\'s el when it\'s model changes', function(done) {
     assert.ok(!el.classList.contains('active'));
     model.set('panelOpenState', true);
@@ -30,12 +28,20 @@ describe('PanelView', function() {
 
   });
 
-  it('should set the panelOpenState to false on swipe left', function() {
+  it.skip('should set the panelOpenState to false on swipe left', function() {
     assert.ok(!model.get('panelOpenState'));
     model.set('panelOpenState', true);
     assert.ok(model.get('panelOpenState'));
     appEvents.trigger('ui:swipeleft', { target: el });
     assert.ok(!model.get('panelOpenState'));
+  });
+
+  it('should change the panelOpenState to false when a search item is selected', function(){
+    sinon.stub(PanelView.prototype, 'onSearchItemSelected');
+    panelView = new PanelView({ model: model, el: el, bus: Backbone.Events });
+    Backbone.Events.trigger('focus.request.chat');
+    assert.equal(1, panelView.onSearchItemSelected.callCount);
+    assert.equal(false, panelView.model.get('panelOpenState'));
   });
 
 });

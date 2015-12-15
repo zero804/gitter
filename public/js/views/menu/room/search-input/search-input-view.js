@@ -31,6 +31,9 @@ var SearchInputView = Marionette.ItemView.extend({
 
   onModelStateChange: function(model, val) { /*jshint unused: true*/
     this.$el.toggleClass('active', (val === 'search'));
+    if(val === 'search') {
+      this.ui.input.focus();
+    }
   },
 
   activate: function() {

@@ -1,3 +1,5 @@
+@import "../../../../../less/components/menu/room/menu-text";
+
 .search-result-header {
   display:       flex;
   align-items:   center;
@@ -13,4 +15,12 @@
   margin-right: @desktop-menu-left-padding;
   font-size:    3.5rem;
   color:        @jaffa;
+}
+
+.left-menu-search-results-empty {
+  padding-left: @desktop-menu-left-padding;
+}
+
+.left-menu-search-results-empty__text {
+  .room-menu-text();
 }

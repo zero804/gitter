@@ -1,3 +1,12 @@
-.secondary-collection__title {
+@import "../../../../../less/components/menu/room/menu-text";
 
+.secondary-collection__title {
+  .room-menu-text();
+  box-sizing:   border-box;
+  padding-left: @desktop-menu-left-padding;
+  color:        @org-bg;
+
+  &.search {
+    color: @jaffa;
+  }
 }

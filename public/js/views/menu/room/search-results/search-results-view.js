@@ -11,7 +11,7 @@ var context               = require('utils/context');
 var appEvents             = require('utils/appevents');
 var Rollers               = require('utils/rollers');
 
-//OOPS
+//OOPS TODO use this lovely thing @leroux made.
 var resolveRoomAvatarUrl  = require('gitter-web-shared/avatars/resolve-room-avatar-url');
 var getRoomAvatar = require('utils/get-room-avatar');
 
@@ -20,7 +20,7 @@ var KeyboardEventsMixin   = require('views/keyboard-events-mixin');
 var ChatSearchModels      = require('collections/chat-search');
 
 var resultTemplate        = require('./search-results-item.hbs');
-var noResultsTemplate     = require('./search-results-item.hbs');
+var noResultsTemplate     = require('./search-results-empty.hbs');
 var noRoomResultsTemplate = require('./search-results-rooms-empty.hbs');
 
 require('views/behaviors/widgets');
@@ -73,7 +73,11 @@ module.exports = (function() {
       //tell the chat input view to focus
       appEvents.trigger('focus.request.chat');
       appEvents.trigger('track-event', 'search_result_selected');
-      this.selectItem();
+      //We have to wait to select an item here
+      //as the menu needs to animate out
+      setTimeout(function(){
+        this.selectItem();
+      }.bind(this), 300);
     }
   });
 
