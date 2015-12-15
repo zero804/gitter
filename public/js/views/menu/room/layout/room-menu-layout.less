@@ -64,6 +64,31 @@ html {
     transform: translateX(0);
   }
 
+  &:after {
+
+    content:         ' ';
+    display:         flex;
+    justify-content: center;
+    align-items:     center;
+    position:        absolute;
+    top:             0;
+    left:            0;
+    width:           100%;
+    height:          100%;
+    background:      @menu-panel-bg;
+    color:           @menu-item-color;
+    pointer-events:  none;
+    transition:      opacity .2s ease-in-out;
+    opacity:         0;
+
+  }
+
+  &.loading {
+    &:after {
+      opacity: 1;
+    }
+  }
+
   .mobile & {
     width: @menu-panel-mobile-width;
     padding-bottom: @mobile-header-height;
