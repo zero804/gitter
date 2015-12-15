@@ -143,7 +143,7 @@ module.exports = Backbone.Model.extend({
     // menu state is persisted on the server
     // JP 15/12/15
     this.set(_.extend({}, attrs, {
-      panelIsOpen:      true,
+      panelOpenState:   true,
       roomMenuIsPinned: true
     }));
 

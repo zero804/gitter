@@ -33,13 +33,16 @@ module.exports = Marionette.LayoutView.extend({
 
   initialize: function(attrs) {
     this.bus = attrs.bus;
+
+    var isPinned = $('.app-layout').hasClass('pinned');
     this.model   = new RoomMenuModel({
       bus:              this.bus,
       roomCollection:   attrs.roomCollection,
       userModel:        context.user(),
 
       //Is this the right way to do this?? JP 15/12/15
-      roomMenuIsPinned: $('.app-layout').hasClass('pinned'),
+      roomMenuIsPinned: isPinned,
+      panelOpenState:   isPinned
     });
   },
 
