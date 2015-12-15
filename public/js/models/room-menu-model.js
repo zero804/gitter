@@ -133,6 +133,7 @@ module.exports = Backbone.Model.extend({
 
     //read
     attrs = store.get(this.cid);
+    attrs = (attrs  || '{}');
     attrs = JSON.parse(attrs);
     this.set(attrs);
 
