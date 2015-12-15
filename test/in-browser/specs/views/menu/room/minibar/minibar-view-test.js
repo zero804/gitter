@@ -44,7 +44,12 @@ describe('MinibarView', function() {
       profileMenuOpenState: false,
     });
 
-    miniBar = new MiniBarView({ el: el, model: model });
+    miniBar = new MiniBarView({
+      el:    el,
+      model: model,
+      bus:   Backbone.Events
+    });
+
   });
 
   it('should set the correct model attributes when a click is triggered', function() {

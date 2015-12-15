@@ -19,11 +19,17 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   initMiniBar: function(optionsForRegion) {
-    return new MiniBarView(optionsForRegion({ model: this.model }));
+    return new MiniBarView(optionsForRegion({
+      model: this.model,
+      bus: this.bus
+    }));
   },
 
   initMenuPanel: function(optionsForRegion) {
-    return new PanelView(optionsForRegion({ model: this.model, bus: this.bus }));
+    return new PanelView(optionsForRegion({
+      model: this.model,
+      bus: this.bus
+    }));
   },
 
   events: {

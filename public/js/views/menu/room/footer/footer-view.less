@@ -1,4 +1,14 @@
 @import "trp3Vars";
+@import "../../../../../less/components/menu/room/menu-text.less";
+
+.panel-footer__link {
+  .room-menu-text();
+  padding-right: @desktop-menu-left-padding;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
 
 .panel-footer {
   position:   absolute;
