@@ -1,11 +1,15 @@
 'use strict';
 
 var Marionette = require('backbone.marionette');
-var template = require('./footer-view.hbs');
+var template   = require('./footer-view.hbs');
 
 module.exports = Marionette.ItemView.extend({
   template: template,
   className: 'panel-footer',
+
+  modelEvents: {
+    'change': 'render'
+  },
 
   events: {
     'click #room-menu-footer-pin-button': 'onPinButtonClicked',

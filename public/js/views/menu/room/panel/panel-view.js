@@ -73,7 +73,7 @@ module.exports = Marionette.LayoutView.extend({
 
   modelEvents: {
     'change:panelOpenState':       'onPanelOpenStateChange',
-    'primary-collection:snapshot': 'onPrimaryCollectionSnapshot',
+    'primary-collection:snapshot': 'onPrimaryCollectionSnapshot'
   },
 
   initialize: function(attrs) {

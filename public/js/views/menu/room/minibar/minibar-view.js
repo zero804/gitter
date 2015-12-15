@@ -8,7 +8,10 @@ require('nanoscroller');
 
 var MiniBarView = Marionette.ItemView.extend({
 
-  initialize: function() {
+  initialize: function(attrs) {
+    //TODO Test this
+    this.bus = attrs.bus;
+
     this.roomMenuItems = [];
     this.roomMenuItemModels = new Backbone.Collection();
 
@@ -42,13 +45,15 @@ var MiniBarView = Marionette.ItemView.extend({
 
   onItemClicked: function(type, orgName, isCloseButton) {
 
-    // If the button clicked is the close button
-    // AND the menu is already open
-    // JUST close it
-    if (isCloseButton && this.model.get('panelOpenState')) {
-      if (this.model.get('roomMenuIsPinned')) { return }
+    //TODO Tidy this
+    if (isCloseButton) {
+      var newVal = !this.model.get('roomMenuIsPinned');
+      this.model.set({
+        roomMenuIsPinned: newVal,
+        panelOpenState:   newVal,
+      });
 
-      return this.model.set('panelOpenState', false);
+      return this.bus.trigger('room-menu:pin', newVal);
     }
 
     this.model.set({

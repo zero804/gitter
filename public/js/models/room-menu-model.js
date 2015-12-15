@@ -84,6 +84,7 @@ module.exports = Backbone.Model.extend({
     this.trigger('change:state:post', this.get('state'));
   },
 
+  //This may be redundant
   setState: function(type) {
     this.onStateChangeCalled(type);
   },
