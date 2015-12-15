@@ -65,7 +65,6 @@ module.exports = Marionette.LayoutView.extend({
     }));
   },
 
-  /* TODO PATCHED FROM RIGHT TOOLBAR */
   initSearch: function(optionsForRegion) {
     return new SearchView(optionsForRegion({ model: this.model }));
   },
@@ -73,11 +72,10 @@ module.exports = Marionette.LayoutView.extend({
   initSearchInput: function(optionsForRegion) {
     return new SearchInputView(optionsForRegion({ model: this.model }));
   },
-  /* TODO PATCHED FROM RIGHT TOOLBAR */
 
   modelEvents: {
-    'change:panelOpenState': 'onPanelOpenStateChange',
-    'primary-collection:snapshot': 'onPrimaryCollectionRender',
+    'change:panelOpenState':       'onPanelOpenStateChange',
+    'primary-collection:snapshot': 'onPrimaryCollectionSnapshot',
   },
 
   initialize: function(attrs) {
@@ -90,15 +88,6 @@ module.exports = Marionette.LayoutView.extend({
       iOSNativeScrolling: true,
       sliderMaxHeight:    200,
     });
-
-    /* TODO PATCHED FROM RIGHT TOOLBAR */
-    this.searchState = new Backbone.Model({
-      searchTerm: '',
-      active:     false,
-      isLoading:  false,
-    });
-    /* TODO PATCHED FROM RIGHT TOOLBAR */
-
   },
 
   onPanelOpenStateChange: function(model, val) { /*jshint unused: true */
@@ -117,10 +106,22 @@ module.exports = Marionette.LayoutView.extend({
     }
   },
 
-  onPrimaryCollectionRender: function() {
-    RAF(function() {
-      this.$el.removeClass('loading');
-    }.bind(this));
+  //when the primary collection's snapshot is received
+  //fetch the model data from local storage
+  //remove the loading class that obscures the menu
+  onPrimaryCollectionSnapshot: function() {
+    var self = this;
+    //fetch the model data
+    this.model.fetch({
+      success: function() {
+        //ask for the next free frame
+        RAF(function() {
+          //show the menu
+          self.$el.removeClass('loading');
+        });
+      },
+    });
+
   },
 
 });
