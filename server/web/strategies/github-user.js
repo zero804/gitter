@@ -19,7 +19,7 @@ var trackNewUser = require('../../utils/track-new-user');
 var trackUserLogin = require('../../utils/track-user-login');
 var updateUserLocale = require('../../utils/update-user-locale');
 var debug = require('debug')('gitter:passport');
-var _ = require('lodash');
+var obfuscateToken = require('gitter-web-github').obfuscateToken;
 
 
 
@@ -143,11 +143,6 @@ function addUser(req, accessToken, githubUserProfile) {
     });
 }
 
-function obfuscateToken(token) {
-  token = token || '';
-  return _.repeat('*', token.length-8) + token.slice(token.length-8);
-}
-
 function githubUserCallback(req, accessToken, refreshToken, params, _profile, done) {
   var loggableToken = obfuscateToken(accessToken);
 
@@ -157,7 +152,7 @@ function githubUserCallback(req, accessToken, refreshToken, params, _profile, do
 
   var githubMeService = new GitHubMeService({ githubUserToken: accessToken });
   var githubUserProfile;
-  return githubMeService.getUser()
+  return githubMeService.getUser({ logRequest: true })
     .then(function(_githubUserProfile) {
       logger.info('GitHub profile obtained', {
         accessToken: loggableToken
