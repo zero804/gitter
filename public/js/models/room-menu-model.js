@@ -17,13 +17,15 @@ var SEARCH_DEBOUNCE_INTERVAL = 100;
 
 module.exports = Backbone.Model.extend({
 
-  defaults:         {
+  //TODO: Review these defaults once the pin
+  //behaviour is finalised
+  defaults: {
     state:                     'all',
     searchTerm:                '',
-    panelOpenState:            false,
+    panelOpenState:            true,
     secondaryCollectionActive: false,
     secondaryCollectionHeader: '',
-    roomMenuIsPinned:          false,
+    roomMenuIsPinned:          true,
     selectedOrgName:           ''
   },
 
@@ -121,6 +123,8 @@ module.exports = Backbone.Model.extend({
     }, {});
   },
 
+  // TODO Should we be using cid here as the key?
+  // JP 15/12/15
   sync: function(method, model, options) {//jshint unused: true
     var attrs;
 
