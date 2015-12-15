@@ -38,6 +38,7 @@ module.exports = function(options, callback, request) {
       logger.info('Response from GitHub', {
         statusCode: response && response.statusCode,
         uri: options.uri || options.url,
+        headers: response && response.headers,
         message: body
       });
     }
