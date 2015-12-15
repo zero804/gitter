@@ -38,6 +38,7 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   initialize: function(attrs) {
+    localStorage.delay = 200;
     this.bus = attrs.bus;
 
     var isPinned = $('.app-layout').hasClass('pinned');
@@ -67,7 +68,7 @@ module.exports = Marionette.LayoutView.extend({
 
     this.timeout = setTimeout(function() {
       this.model.set('panelOpenState', false);
-    }.bind(this), 500);
+    }.bind(this), localStorage.delay);
 
   },
 
