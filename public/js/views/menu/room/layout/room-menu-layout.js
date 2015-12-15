@@ -38,7 +38,6 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   initialize: function(attrs) {
-    localStorage.delay = 200;
     this.bus = attrs.bus;
 
     var isPinned = $('.app-layout').hasClass('pinned');
