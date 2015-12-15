@@ -15,10 +15,10 @@ module.exports = Marionette.CompositeView.extend({
   itemView: ItemView,
   childViewContainer: '#secondary-collection-list',
   template: template,
+  className: 'secondary-collection',
 
   modelEvents: {
-    'change:secondaryCollectionActive': 'onActiveStateChange',
-    'change:secondaryCollectionHeader': 'render'
+    'change:state': 'onModelChangeState'
   },
 
   serializeData: function(){
@@ -28,10 +28,10 @@ module.exports = Marionette.CompositeView.extend({
     });
   },
 
-  onActiveStateChange: function (model, val){ /*jshint unused: true*/
+  onModelChangeState: function (model, val){ /*jshint unused: true*/
     this.render();
     RAF(function(){
-      this.$el.toggleClass('active', !!val);
+      this.$el.toggleClass('active', (val === 'search' || val === 'org'));
     }.bind(this));
   },
 

@@ -48,5 +48,4 @@ describe('PanelFooterView', function() {
     panelFooterView.$el.find('#room-menu-footer-pin-button').click();
     assert.ok(model.get('roomMenuIsPinned'), 'check roomMenuIsPinned has been reversed');
   });
-
 });
