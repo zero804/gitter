@@ -131,9 +131,9 @@ module.exports = (function() {
       };
     },
 
+    //TODO FIGURE OUT WHY THIS DOESN'T WORK JP 15/12/15
     selectItem: function () {
       var id = this.model.get('id');
-
       appEvents.trigger('chatCollectionView:loadAndHighlight', id, { highlights: this.model.get('highlights') });
     }
   });
