@@ -145,7 +145,7 @@ function addUser(req, accessToken, githubUserProfile) {
 
 function obfuscateToken(token) {
   token = token || '';
-  return token.slice(0, 6) + _.repeat('*', token.length - 6);
+  return _.repeat('*', token.length-8) + token.slice(token.length-8);
 }
 
 function githubUserCallback(req, accessToken, refreshToken, params, _profile, done) {
