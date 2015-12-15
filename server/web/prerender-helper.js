@@ -27,6 +27,11 @@ module.exports = exports = function (templateFile, options) {
   var template = PRERENDERED_VIEWS[templateFile];
   if (!template) throw new Error('Template ' + templateFile + ' has not been precompiled.');
 
+  //assign the desktop prop here so it can be passed
+  //down to the child template
+  //jp 15/12/15
+  this.desktop = hash.desktop;
+
   var inner = template(this);
   var wrap = hash.wrap;
   if (!wrap) return inner;

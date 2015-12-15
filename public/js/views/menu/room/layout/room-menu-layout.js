@@ -32,6 +32,5 @@ module.exports = Marionette.LayoutView.extend({
       roomCollection: attrs.roomCollection,
       userModel: context.user(),
     });
-  }
-
+  },
 });

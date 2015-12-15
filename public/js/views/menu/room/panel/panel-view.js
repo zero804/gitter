@@ -78,6 +78,7 @@ module.exports = Marionette.LayoutView.extend({
 
   modelEvents: {
     'change:panelOpenState': 'onPanelOpenStateChange',
+    'primary-collection:snapshot': 'onPrimaryCollectionRender'
   },
 
   initialize: function(attrs) {
@@ -113,6 +114,12 @@ module.exports = Marionette.LayoutView.extend({
 
   onSearchItemSelected: function (){
     this.model.set('panelOpenState', false);
+  },
+
+  onPrimaryCollectionRender: function (){
+    RAF(function(){
+      this.$el.removeClass('loading');
+    }.bind(this));
   },
 
 });
