@@ -44,4 +44,10 @@ describe('PanelView', function() {
     assert.equal(false, panelView.model.get('panelOpenState'));
   });
 
+  it('should not change the panelState to false when a search item is selected when the panel is pinned', function(){
+    model.set('roomMenuIsPinned', true);
+    model.set('panelOpenState', true);
+    Backbone.Events.trigger('focus.request.chat');
+    assert.ok(panelView.model.get('panelOpenState'));
+  });
 });
