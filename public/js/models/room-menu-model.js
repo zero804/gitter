@@ -139,7 +139,13 @@ module.exports = Backbone.Model.extend({
     attrs = store.get(this.cid);
     attrs = (attrs  || '{}');
     attrs = JSON.parse(attrs);
-    this.set(attrs);
+    // TODO Remove these overrides once the
+    // menu state is persisted on the server
+    // JP 15/12/15
+    this.set(_.extend({}, attrs, {
+      panelIsOpen:      true,
+      roomMenuIsPinned: true
+    }));
 
     if(options.success) options.success();
   },
