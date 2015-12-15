@@ -25,8 +25,7 @@ module.exports = Marionette.ItemView.extend({
   onPinButtonClicked: function(e) {
     e.preventDefault();
     var newVal = !this.model.get('roomMenuIsPinned');
-    this.model.set('roomMenuIsPinned', newVal);
-    this.model.set('panelOpenState', newVal);
+    this.model.set({ roomMenuIsPinned: newVal });
     this.bus.trigger('room-menu:pin', newVal);
   },
 
