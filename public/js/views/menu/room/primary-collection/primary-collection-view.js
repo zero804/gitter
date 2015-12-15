@@ -31,16 +31,22 @@ module.exports = Marionette.CollectionView.extend({
       throw new Error('A valid event bus must be passed to a new PrimaryCollectionView');
     }
 
-    this.bus = options.bus;
+    this.bus   = options.bus;
     this.model = options.model;
+
     this.listenTo(this.model, 'change:state', this.onModelStateChange, this);
     this.listenTo(this.model, 'change:selectedOrgName', this.onModelStateChange, this);
   },
 
   filter: function(model) {
+    var state   = this.model.get('state');
     var orgName = this.model.get('selectedOrgName');
 
-    switch (this.model.get('state')) {
+    if (state === 'org' && orgName === '') {
+      throw new Error('Room Menu Model is in the org state with no selectedOrgName');
+    }
+
+    switch (state) {
 
       case 'org':
         var name = model.get('name').split('/')[0];
@@ -52,11 +58,11 @@ module.exports = Marionette.CollectionView.extend({
       case 'people':
         return model.get('githubType') === 'ONETOONE';
 
+      //should no show no results when in the search state
       case 'search':
-
-        //TODO remove as collection members should be search results
         return false;
 
+      //show all models in the deffault state
       default:
         return true;
     }
