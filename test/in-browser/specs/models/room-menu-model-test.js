@@ -7,6 +7,7 @@ var ProxyCollection    = require('backbone-proxy-collection');
 var MockRoomCollection = require('fixtures/helpers/room-collection');
 var RoomMenuModel      = require('public/js/models/room-menu-model');
 
+//TODO write tests for local storage save() && fetch();
 describe('RoomMenuModel', function() {
 
   var roomMenuModel;

@@ -3,6 +3,7 @@
 var Backbone        = require('backbone');
 var _               = require('underscore');
 var ProxyCollection = require('backbone-proxy-collection');
+var store           = require('components/local-store');
 
 var states = [
   'all',
@@ -17,12 +18,13 @@ var SEARCH_DEBOUNCE_INTERVAL = 100;
 module.exports = Backbone.Model.extend({
 
   defaults:         {
-    state:          'all',
-    searchTerm:     '',
-    panelOpenState: false,
+    state:                     'all',
+    searchTerm:                '',
+    panelOpenState:            false,
     secondaryCollectionActive: false,
     secondaryCollectionHeader: '',
-    roomMenuIsPinned: false
+    roomMenuIsPinned:          false,
+    selectedOrgName:           ''
   },
 
   initialize: function(attrs) {
@@ -43,8 +45,13 @@ module.exports = Backbone.Model.extend({
 
     //assign internal collections
     this._roomCollection    = attrs.roomCollection;
+    delete attrs.roomCollection;
+
     this._detailCollection  = (attrs.detailCollection || new Backbone.Collection());
+    delete attrs.detailCollection;
+
     this.userModel          = attrs.userModel;
+    delete attrs.userModel;
 
     //expose the public collection
     this.primaryCollection   = new ProxyCollection({ collection: this._roomCollection });
@@ -56,11 +63,12 @@ module.exports = Backbone.Model.extend({
     //TODO have added setState so this can be removed
     //tests must be migrated
     this.bus = attrs.bus;
+    delete attrs.bus;
+
     this.listenTo(this.bus, 'room-menu:change:state', this.onStateChangeCalled, this);
-
-
     this.listenTo(this, 'change:searchTerm', this.onSearchTermChange, this);
     this.listenTo(this, 'change:state', this.onSwitchState, this);
+    this.listenTo(this, 'change', this.save, this);
   },
 
   onStateChangeCalled: function(newState) {
@@ -78,18 +86,18 @@ module.exports = Backbone.Model.extend({
     this.onStateChangeCalled(type);
   },
 
-  onSwitchState: function (model, val){/*jshint unused: true */
-    switch(val) {
+  onSwitchState: function(model, val) {/*jshint unused: true */
+    switch (val) {
       case 'search':
         this.set({
           secondaryCollectionHeader: 'Recent Searches',
-          secondaryCollectionActive: true
+          secondaryCollectionActive: true,
         });
         break;
       case 'org':
         this.set({
           secondaryCollectionHeader: 'All Rooms',
-          secondaryCollectionActive: true
+          secondaryCollectionActive: true,
         });
         break;
       default:
@@ -103,6 +111,32 @@ module.exports = Backbone.Model.extend({
 
   onPrimaryCollectionSnapshot: function() {
     this.trigger('primary-collection:snapshot');
+  },
+
+  toJSON: function (){
+    var attrs = this.attributes;
+    return Object.keys(this.defaults).reduce(function(memo, key){
+      memo[key] = attrs[key];
+      return memo;
+    }, {});
+  },
+
+  sync: function(method, model, options) {//jshint unused: true
+    var attrs;
+
+    //save
+    if (method === 'create' || method === 'update' || method === 'patch') {
+      attrs = this.toJSON();
+      attrs = JSON.stringify(attrs);
+      return store.set(this.cid, attrs);
+    }
+
+    //read
+    attrs = store.get(this.cid);
+    attrs = JSON.parse(attrs);
+    this.set(attrs);
+
+    if(options.success) options.success();
   },
 
 });

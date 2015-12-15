@@ -31,6 +31,7 @@ var MiniBarView = Marionette.ItemView.extend({
     }.bind(this));
 
     this.listenTo(this.model, 'change:panelOpenState', this.onPanelStateChange, this);
+    this.listenTo(this.model, 'change', this.onMenuChange, this);
 
     this.$el.find('.nano').nanoScroller({
       iOSNativeScrolling: true,
@@ -48,20 +49,11 @@ var MiniBarView = Marionette.ItemView.extend({
       return this.model.set('panelOpenState', false);
     }
 
-    //deactive the old active item
-    var currentActiveModel = this._getCurrentlyActiveChildModel();
-    if (!!currentActiveModel) currentActiveModel.set('active', false);
-
-    //activate the next item
-    var query = !!orgName ? { orgName: orgName } : { type: type };
-    var nextActiveModel = this.roomMenuItemModels.where(query)[0];
-    if (!!nextActiveModel) nextActiveModel.set('active', true);
-
     this.model.set({
-      panelOpenState: true,
-      state: type,
+      panelOpenState:       true,
+      state:                type,
       profileMenuOpenState: false,
-      selectedOrgName: orgName,
+      selectedOrgName:      orgName,
     });
   },
 
@@ -75,6 +67,22 @@ var MiniBarView = Marionette.ItemView.extend({
 
   _getCurrentlyActiveChildModel: function() {
     return this.roomMenuItemModels.where({ active: true })[0];
+  },
+
+  onMenuChange: function() {
+
+    var orgName = this.model.get('selectedOrgName');
+    var type    = this.model.get('state');
+
+    //deactive the old active item
+    var currentActiveModel = this._getCurrentlyActiveChildModel();
+    if (!!currentActiveModel) currentActiveModel.set('active', false);
+
+    //activate the next item
+    var query = !!orgName ? { orgName: orgName } : { type: type };
+    var nextActiveModel = this.roomMenuItemModels.where(query)[0];
+    if (!!nextActiveModel) nextActiveModel.set('active', true);
+
   },
 
   destroy: function() {
