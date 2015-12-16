@@ -92,9 +92,6 @@ onready(function() {
 
   // Revert to a previously saved state
   window.onpopstate = function(e) {
-    var iframeUrl = e.state;
-    if (!iframeUrl) return;
-
     updateContent(iframeUrl || window.location.pathname + '/~chat');
     appEvents.trigger('track', window.location.pathname + window.location.hash);
     return true;
