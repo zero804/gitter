@@ -1,24 +1,8 @@
 'use strict';
 
-var _             = require('underscore');
 var Marionette    = require('backbone.marionette');
-var itemTemplate  = require('./primary-collection-view.hbs');
-var getRoomAvatar = require('utils/get-room-avatar');
 var RAF           = require('utils/raf');
-
-var ItemView = Marionette.ItemView.extend({
-  className: 'room-item',
-  template: itemTemplate,
-  triggers: {
-    'click': 'item:clicked',
-  },
-  serializeData: function() {
-    var data = this.model.toJSON();
-    return _.extend({}, data, {
-      roomAvatarUrl:  getRoomAvatar(data.name),
-    });
-  },
-});
+var ItemView      = require('./primary-collection-item-view');
 
 module.exports = Marionette.CollectionView.extend({
   childEvents: {
