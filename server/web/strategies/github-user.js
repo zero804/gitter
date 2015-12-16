@@ -152,7 +152,7 @@ function githubUserCallback(req, accessToken, refreshToken, params, _profile, do
 
   var githubMeService = new GitHubMeService({ githubUserToken: accessToken });
   var githubUserProfile;
-  return githubMeService.getUser({ logRequest: true })
+  return githubMeService.getUser()
     .then(function(_githubUserProfile) {
       logger.info('GitHub profile obtained', {
         accessToken: loggableToken
