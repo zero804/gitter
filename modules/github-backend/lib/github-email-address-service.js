@@ -1,7 +1,6 @@
 'use strict';
 
 var env = require('gitter-web-env');
-var config = env.config;
 var stats  = env.stats;
 
 var Q = require('q');
@@ -50,29 +49,26 @@ function getEmailFromCommit(user) {
   });
 }
 
-module.exports = function gitHubEmailAddressService(user, preferStoredEmail) {
-  if (!user) return Q.reject(new Error('User required'));
+module.exports = function gitHubEmailAddressService(user, options) {
+  if (user.githubUserToken || user.githubToken) {
+    return getPrivateEmailAddress(user);
+  }
 
-  // test email address, should be set in `config.user-overrides.json`
-  var testEmail = config.get('email:toAddress');
-  if (testEmail) return Q.resolve(testEmail);
-
-  if (preferStoredEmail && user.invitedEmail) return Q.resolve(user.invitedEmail);
-
-  if (user.githubUserToken || user.githubToken) { return getPrivateEmailAddress(user); }
+  if (!options || !options.attemptDiscovery) return Q.resolve(null);
 
   // attempt to get a public email address
   return getValidPublicEmailAddress(user.username)
     .then(function (email) {
       if (email) return email; // we have found a public email address
-      return getEmailFromCommit(user); // try get an email from commit
-    })
-    .then(function (emailFromCommit) {
-      if (emailFromCommit) return emailFromCommit;
-      stats.event('email-from-commit-failed', { username: user.username }); // sadpanda
-      return null;
+
+       // try get an email from commit
+      return getEmailFromCommit(user)
+        .then(function(email) {
+          if(email && isValidEmail(email)) return email;
+        });
     })
     .catch(function () {
+      stats.event('github.email.discovery.failed', { username: user.username }); // sadpanda
       return null;
     });
 };
