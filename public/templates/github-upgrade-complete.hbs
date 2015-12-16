@@ -4,8 +4,12 @@
 <title>Gitter - Chat, for GitHub</title>
 <script type="text/javascript">
 window.onload = function() {
-  window.opener.postMessage("oauth_upgrade_complete", "*");
-  window.close();
+  if (window.opener) {
+    window.opener.postMessage("oauth_upgrade_complete", "*");
+    window.close();
+  } else {
+    location.href = '/';
+  }
 }
 </script>
 </head>
