@@ -66,7 +66,7 @@ module.exports = {
 
         return [
           restSerializer.serialize(addedUser, strategy),
-          emailAddressService(addedUser)
+          emailAddressService(addedUser, { attemptDiscovery: true })
         ];
       })
       .spread(function(serializedUser, email) {
