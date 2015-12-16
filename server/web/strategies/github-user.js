@@ -19,7 +19,7 @@ var trackNewUser = require('../../utils/track-new-user');
 var trackUserLogin = require('../../utils/track-user-login');
 var updateUserLocale = require('../../utils/update-user-locale');
 var debug = require('debug')('gitter:passport');
-var _ = require('lodash');
+var obfuscateToken = require('gitter-web-github').obfuscateToken;
 
 
 
@@ -141,11 +141,6 @@ function addUser(req, accessToken, githubUserProfile) {
     .then(function() {
       return user;
     });
-}
-
-function obfuscateToken(token) {
-  token = token || '';
-  return token.slice(0, 6) + _.repeat('*', token.length - 6);
 }
 
 function githubUserCallback(req, accessToken, refreshToken, params, _profile, done) {
