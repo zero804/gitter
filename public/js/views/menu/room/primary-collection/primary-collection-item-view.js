@@ -5,18 +5,20 @@ var getRoomAvatar = require('utils/get-room-avatar');
 var itemTemplate  = require('./primary-collection-view.hbs');
 var _             = require('underscore');
 
-
 module.exports = Marionette.ItemView.extend({
 
   className: 'room-item',
 
   template: itemTemplate,
 
-  triggers: {
-    'click': 'item:clicked',
+  attributes: function() {
+    return {
+      'data-room-id': this.model.get('id'),
+    };
   },
 
-  initialize: function (){
+  triggers: {
+    'click': 'item:clicked',
   },
 
   serializeData: function() {
@@ -25,12 +27,5 @@ module.exports = Marionette.ItemView.extend({
       roomAvatarUrl:  getRoomAvatar(data.name),
     });
   },
-
-  destroy: function (){
-    console.log('--- DESTROY ---');
-    Marionette.ItemView.prototype.destroy.apply(this, arguments);
-  },
-
 });
-
 

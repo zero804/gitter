@@ -1,8 +1,6 @@
 'use strict';
 
-var Backbone              = require('backbone');
 var Marionette            = require('backbone.marionette');
-var appEvents             = require('utils/appevents');
 var PanelHeaderView       = require('../header/header-view');
 var PanelFooterView       = require('../footer/footer-view');
 var PrimaryCollectionView = require('../primary-collection/primary-collection-view');
@@ -73,7 +71,7 @@ module.exports = Marionette.LayoutView.extend({
 
   modelEvents: {
     'change:panelOpenState':       'onPanelOpenStateChange',
-    'primary-collection:snapshot': 'onPrimaryCollectionSnapshot'
+    'primary-collection:snapshot': 'onPrimaryCollectionSnapshot',
   },
 
   initialize: function(attrs) {
@@ -86,6 +84,7 @@ module.exports = Marionette.LayoutView.extend({
       iOSNativeScrolling: true,
       sliderMaxHeight:    200,
     });
+
   },
 
   onPanelOpenStateChange: function(model, val) { /*jshint unused: true */
@@ -109,6 +108,7 @@ module.exports = Marionette.LayoutView.extend({
   //remove the loading class that obscures the menu
   onPrimaryCollectionSnapshot: function() {
     var self = this;
+
     //fetch the model data
     this.model.fetch({
       success: function() {

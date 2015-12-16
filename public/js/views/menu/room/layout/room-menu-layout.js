@@ -33,8 +33,8 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   events: {
-    'mouseenter': 'onMouseEnter',
-    'mouseleave': 'onMouseLeave',
+    'mouseenter': 'openPanel',
+    'mouseleave': 'cloasePanel',
   },
 
   initialize: function(attrs) {
@@ -50,21 +50,19 @@ module.exports = Marionette.LayoutView.extend({
       roomMenuIsPinned: isPinned,
       panelOpenState:   isPinned
     });
+
+    this.listenTo(this.bus, 'room-menu:start-drag', this.openPanel.bind(this));
+    this.listenTo(this.bus, 'room-menu:finish-drag', this.closePanel.bind(this));
   },
 
-  onMouseEnter: function() {
-
+  openPanel: function() {
     if (this.model.get('roomMenuIsPinned')) { return }
-
     this.model.set('panelOpenState', true);
-
     if (this.timeout) { clearTimeout(this.timeout); }
   },
 
-  onMouseLeave: function() {
-
+  closePanel: function() {
     if (this.model.get('roomMenuIsPinned')) { return }
-
     this.timeout = setTimeout(function() {
       this.model.set('panelOpenState', false);
     }.bind(this), localStorage.delay);

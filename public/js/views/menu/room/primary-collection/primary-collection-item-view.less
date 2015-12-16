@@ -1,6 +1,7 @@
 @import "trp3Vars";
 @import "../../../../../less/components/menu/room/avatar.less";
 @import "../../../../../less/components/menu/room/menu-text.less";
+@import (inline) "../../../../../../node_modules/dragula/dist/dragula.css";
 
 .primary-collection {
   padding-top: 2rem;
@@ -17,6 +18,10 @@
   flex-direction: row;
   align-items:    center;
   height: 3.8rem;;
+
+  &.gu-mirror, &.gu-transit {
+    .room-item-selected();
+  }
 
   &:hover {
     .room-item-selected();

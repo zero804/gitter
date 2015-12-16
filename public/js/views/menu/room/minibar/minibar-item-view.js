@@ -48,5 +48,4 @@ module.exports = Marionette.ItemView.extend({
       this.$el.toggleClass('active', val);
     }.bind(this));
   },
-
 });
