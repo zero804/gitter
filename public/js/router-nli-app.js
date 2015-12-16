@@ -31,6 +31,11 @@ onready(function() {
     chatIFrame.src = noHashSrc + window.location.hash;
   }
 
+  /* Replace the `null` state on startup with the real state, so that when a client clicks back to the
+   * first page of gitter, we know what the original URL was (instead of null)
+   */
+  window.history.replaceState(chatIFrame.src, '', window.location.href);
+
   function pushState(state, title, url) {
     window.history.pushState(state, title, url);
     appEvents.trigger('track', url);
@@ -87,7 +92,10 @@ onready(function() {
 
   // Revert to a previously saved state
   window.onpopstate = function(e) {
-    updateContent(e.state || window.location.pathname + '/~chat');
+    var iframeUrl = e.state;
+    if (!iframeUrl) return;
+
+    updateContent(iframeUrl || window.location.pathname + '/~chat');
     appEvents.trigger('track', window.location.pathname + window.location.hash);
     return true;
   };
