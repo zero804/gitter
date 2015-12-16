@@ -81,7 +81,6 @@ function isGitHubUser(user) {
 }
 exports.isGitHubUser = isGitHubUser;
 
-
 exports.isMissingTokens = function(user) {
   // TODO: replace this with something more "provider-aware"
   // non-github users cannot miss their github tokens
