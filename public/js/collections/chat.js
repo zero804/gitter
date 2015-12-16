@@ -66,8 +66,13 @@ var ChatModel = Backbone.Model.extend({
     if (sent) {
       // Turn the moment sent value into a string
       d.sent = sent.format();
+    } else {
+      delete d.sent;
     }
 
+    delete d.burstStart;
+    delete d.burstFinal;
+    delete d.fromUser;
     // No need to send html back to the server
     delete d.html;
 
@@ -125,6 +130,21 @@ var ChatCollection = LiveCollection.extend({
     this.listenTo(context.troupe(), 'change:id', function() {
       this.setAtTop(false);
     });
+  },
+
+  transformModel: function(model) {
+    // If the incoming model is marked as read,
+    // but the existing model is unread
+    // ignore that part of the update
+    if (model.unread) {
+      var id = model.id;
+      var existing = this.get(id);
+      if (existing && existing.unread === false) {
+        delete model.unread;
+      }
+    }
+
+    return model;
   },
 
   getQuery: function() {

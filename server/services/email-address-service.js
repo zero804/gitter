@@ -1,8 +1,8 @@
 'use strict';
 
-var BackendResolver = require('./backend-resolver');
+var BackendMuxer = require('./backend-muxer');
 
 module.exports = function(user, preferStoredEmail) {
-  var backendResolver = new BackendResolver(user);
-  return backendResolver.getEmailAddress(preferStoredEmail);
+  var backendMuxer = new BackendMuxer(user);
+  return backendMuxer.getEmailAddress(preferStoredEmail);
 };

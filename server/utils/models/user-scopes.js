@@ -84,8 +84,22 @@ exports.isGitHubUser = isGitHubUser;
 exports.isMissingTokens = function(user) {
   // TODO: replace this with something more "provider-aware"
   // non-github users cannot miss their github tokens
-  if (!exports.isGitHubUser(user)) return false;
+  if (!isGitHubUser(user)) return false;
   return !user.githubToken && !user.githubUserToken;
 };
 
 exports.REQUIRED_FIELDS = { githubToken: 1, githubUserToken: 1, githubScopes: 1 };
+
+exports.getIdentities = function(user) {
+  // Just the provider name and id. Basically user.identities, but also
+  // including github. If you want the full identities, use identityService
+  // rather.
+  var identities = [];
+  if (isGitHubUser(user)) {
+    identities.push({provider: 'github', providerKey: user.githubId});
+  }
+  if (user.identities) {
+    identities.push.apply(identities, user.identities);
+  }
+  return identities;
+}
