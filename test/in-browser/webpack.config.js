@@ -1,5 +1,6 @@
-var path = require('path');
+var path             = require('path');
 var appWebpackConfig = require('../../public/js/webpack.config.js');
+var _                = require('underscore');
 
 module.exports = {
   entry: path.resolve(__dirname, './fixtures/runner.js'),
@@ -16,7 +17,7 @@ module.exports = {
       path.resolve(__dirname, '../../node_modules'),
       path.resolve(__dirname, '../../public/js'),
     ],
-    alias: {
+    alias: _.extend(appWebpackConfig.alias, {
       jquery:  path.resolve(__dirname, '../../public/repo/jquery/jquery.js'),
       cocktail: path.resolve(__dirname, '../../public/repo/cocktail/cocktail.js'),
       'backbone-sorted-collection': path.resolve(__dirname, '../../public/repo/backbone-sorted-collection/backbone-sorted-collection.js'),
@@ -26,6 +27,6 @@ module.exports = {
       'views/menu/room/search-results/search-results-view': path.resolve(__dirname, './fixtures/helpers/search-results-view.js'),
       'views/menu/room/search-input/search-input-view': path.resolve(__dirname, './fixtures/helpers/search-input-view.js'),
       'utils/raf': path.resolve(__dirname, './fixtures/helpers/raf.js'),
-    },
+    }),
   },
 };

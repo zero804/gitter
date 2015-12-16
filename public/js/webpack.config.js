@@ -118,7 +118,7 @@ var webpackConfig = {
       "underscore": path.resolve(path.join(__dirname, "utils/underscore-wrapper")),
       "backbone": path.resolve(path.join(__dirname, "../../node_modules/backbone")),
 
-      "bluebird": path.resolve(path.join(__dirname, "utils/bluebird-wrapper")),
+      "bluebird": path.resolve(path.join(__dirname, "utils/bluebird-wrapper"))
     },
   },
   plugins: [

@@ -152,6 +152,7 @@
     "debug-proxy": "^0.2.0",
     "deep-equal": "^1.0.1",
     "del": "^1.1.1",
+    "draggabilly": "^1.2.4",
     "expect": "^1.12.2",
     "extract-text-webpack-plugin": "^0.8.0",
     "fastclick": "^1.0.6",
