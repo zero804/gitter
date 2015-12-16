@@ -28,7 +28,20 @@ var PeopleCollectionView = Marionette.CollectionView.extend({
     }
 
     return options;
-  }
+  },
+  collectionEvents: {
+    'reset': 'onCollectionReset',
+  },
+  onCollectionReset: function() {
+    if (this.collection.length) return;
+
+    var el = this.el;
+
+    var child;
+    while ((child = el.firstChild)) {
+      el.removeChild(child);
+    }
+  },
 });
 
 var RemainingView = Marionette.ItemView.extend({
