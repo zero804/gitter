@@ -5,6 +5,7 @@ var env = require('gitter-web-env');
 var config = env.config;
 var _ = require('lodash');
 var fetchAllPages = require('./fetch-all-pages');
+var logRequest = require('./log-request');
 var logFailingRequest = require('./log-failing-request');
 var logRateLimit = require('./log-rate-limit');
 var requestWithRetry = require('./request-with-retry');
@@ -38,6 +39,7 @@ module.exports = requestExt({
   extensions: [
     publicTokenPool,
     fetchAllPages,
+    logRequest,
     logFailingRequest,
     httpRequestCache.extension,
     requestWithRetry({ maxRetries: 3 }),
