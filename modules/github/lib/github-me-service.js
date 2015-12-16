@@ -10,12 +10,8 @@ function GitHubMeService(user) {
   this.accessToken = userTokenSelector(user);
 }
 
-GitHubMeService.prototype.getUser = function(options) {
-  options = options || {};
-  return tentacles.user.getAuthUser({
-    accessToken: this.accessToken,
-    logRequest: options.logRequest
-  });
+GitHubMeService.prototype.getUser = function() {
+  return tentacles.user.getAuthUser({ accessToken: this.accessToken });
 };
 
 GitHubMeService.prototype.getEmail = function() {
