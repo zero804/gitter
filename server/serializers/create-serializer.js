@@ -33,7 +33,7 @@ function serialize(items, strat, callback) {
       return Q.resolve([]).nodeify(callback);
     }
 
-    statsd.histogram(statsPrefix + '.size', items.length, 0.01);
+    statsd.histogram(statsPrefix + '.size', items.length, 0.1);
 
     single = false;
   } else {
@@ -52,7 +52,7 @@ function serialize(items, strat, callback) {
 
     var time = Date.now() - start;
     debug('strategy %s with %s items took %sms to complete', strat.name, items.length, time);
-    statsd.timing(statsPrefix + '.timing', time, 0.01);
+    statsd.timing(statsPrefix + '.timing', time, 0.1);
 
     if(time > maxSerializerTime) {
       stats.responseTime('serializer.slow.preload', time);

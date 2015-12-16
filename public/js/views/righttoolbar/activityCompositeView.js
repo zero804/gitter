@@ -133,7 +133,8 @@ module.exports = (function() {
     childViewContainer: '#activity-list',
     childView: ActivityItemView,
     collectionEvents: {
-      'add reset sync reset loaded loading': '_showHideHeader'
+      'add reset sync reset loaded loading': '_showHideHeader',
+      'reset': 'onCollectionReset',
     },
     childViewOptions: function(item) {
       if(item && item.id) {
@@ -148,6 +149,17 @@ module.exports = (function() {
     },
     ui: {
       header: '#activity-header'
+    },
+    onCollectionReset: function() {
+      if (this.collection.length) return;
+
+      var el = this.$el.find(this.childViewContainer)[0];
+      if (!el) return;
+
+      var child;
+      while ((child = el.firstChild)) {
+        el.removeChild(child);
+      }
     },
     onRender: function() {
       this._showHideHeader();

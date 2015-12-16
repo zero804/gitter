@@ -67,7 +67,7 @@ describe('restful', function() {
     fixture.cleanup();
   });
 
-  it('returns a github-backed profile #slow', function() {
+  it('returns a github-backed profile #slow', function(done) {
     return ensureGitHubUser(hardcodedGitHubUser)
       .then(function() {
         return restful.serializeProfileForUsername(hardcodedGitHubUser.username)
@@ -77,19 +77,21 @@ describe('restful', function() {
         assert.equal(profile.username, hardcodedGitHubUser.username);
         assert.equal(profile.displayName, hardcodedGitHubUser.displayName);
         assert.equal(profile.location, hardcodedLocation);
-      });
+      })
+      .nodeify(done);
   });
 
-  it('returns a google-backed profile', function() {
+  it('returns a google-backed profile', function(done) {
     return restful.serializeProfileForUsername(fixture.user1.username)
       .then(function(profile) {
         assert(profile.id);
         assert.equal(profile.username, fixture.user1.username);
         assert.equal(profile.displayName, fixture.user1.displayName);
-      });
+      })
+      .nodeify(done);
   });
 
-  it('returns a github user that is not on gitter yet #slow', function() {
+  it('returns a github user that is not on gitter yet #slow', function(done) {
     // this will be useless if defunkt ever manages to get an account on our
     // test environment..
     return restful.serializeProfileForUsername('defunkt')
@@ -102,28 +104,36 @@ describe('restful', function() {
         assert(profile.gravatarImageUrl);
         // assuming this is never 0 ;)
         assert(profile.github.followers);
-      });
+      })
+      .nodeify(done);
   });
 
   // github users that don't exist in our db will be checked against github
-  it('returns a 404 for a github user that does not exist on github #slow', function() {
+  it('returns a 404 for a github user that does not exist on github #slow', function(done) {
     return restful.serializeProfileForUsername(fixture.user2.username)
       .then(function() {
         assert.ok(false, 'Expected a throw');
       }, function(err) {
         assert.strictEqual(err.status, 404);
-      });
+      })
+      .nodeify(done);
   });
 
   // non-github users that don't exist in our db don't get any further
   // processing
-  it('returns a 404 for a google user that does not exist in our database', function() {
+  it('returns a 404 for a google user that does not exist in our database', function(done) {
     return restful.serializeProfileForUsername('thisshouldnotexist_google')
       .then(function() {
         assert.ok(false, 'Expected a throw');
       }, function(err) {
         assert.strictEqual(err.status, 404);
-      });
+      })
+      .nodeify(done);
+  });
+
+  it('serializes orgs', function(done) {
+    return restful.serializeOrgsForUserId(fixture.user1.id)
+      .nodeify(done);
   });
 
   it('serializes orgs', function() {
