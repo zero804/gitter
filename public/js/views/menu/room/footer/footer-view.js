@@ -2,18 +2,18 @@
 
 var Marionette = require('backbone.marionette');
 var template   = require('./footer-view.hbs');
+var RAF        = require('utils/raf');
+
+require('gitter-styleguide/css/components/buttons.css');
 
 module.exports = Marionette.ItemView.extend({
   template: template,
   className: 'panel-footer',
 
   modelEvents: {
-    'change': 'render'
+    'change:state': 'onModelChange',
   },
 
-  events: {
-    'click #room-menu-footer-pin-button': 'onPinButtonClicked',
-  },
   initialize: function(attrs) {
     if (!attrs || !attrs.bus) {
       throw new Error('A valid event bus must be passed to a new instance of PanelFooterView');
@@ -22,12 +22,11 @@ module.exports = Marionette.ItemView.extend({
     this.bus = attrs.bus;
   },
 
-  onPinButtonClicked: function(e) {
-    e.preventDefault();
-    var newVal = !this.model.get('roomMenuIsPinned');
-    this.model.set({ roomMenuIsPinned: newVal });
-    this.bus.trigger('room-menu:pin', newVal);
+  onModelChange: function(model, val) {//jshint unused: true
+    console.log(val);
+    RAF(function(){
+      this.$el.toggleClass('active', (val === 'search'));
+    }.bind(this));
   },
-
 
 });

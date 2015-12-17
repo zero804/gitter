@@ -1,14 +1,9 @@
 'use strict';
 
-var $          = require('jquery');
 var Marionette = require('backbone.marionette');
 var RAF        = require('utils/raf');
 var ItemView   = require('./primary-collection-item-view');
-var dragula    = require('dragula');
 
-
-//TODO MOVE ALL DRAGGABLE THINGS INTO A ROOM-MENU-DRAG-CONTROLLER
-////AND WRITE TESTS FOR IT
 module.exports = Marionette.CollectionView.extend({
   childEvents: {
     'item:clicked': 'onItemClicked',
@@ -25,7 +20,7 @@ module.exports = Marionette.CollectionView.extend({
     this.dndCtrl = options.dndCtrl;
 
     //TODO turn this inot an error
-    if(this.dndCtrl)this.dndCtrl.pushContainer(this.el);
+    if (this.dndCtrl)this.dndCtrl.pushContainer(this.el);
 
     this.listenTo(this.model, 'change:state', this.onModelStateChange, this);
     this.listenTo(this.model, 'change:selectedOrgName', this.onModelStateChange, this);

@@ -31,21 +31,4 @@ describe('PanelFooterView', function() {
     }
   });
 
-  it('should emit an event (with the right payload) when the pin button is clicked', function(done) {
-    Backbone.Events.on('room-menu:pin', function(roomMenuIsPinned) {
-      assert.ok(roomMenuIsPinned);
-      done();
-    });
-
-    assert.ok(!model.get('roomMenuIsPinned'));
-    panelFooterView.render();
-    panelFooterView.$el.find('#room-menu-footer-pin-button').click();
-  });
-
-  it('should toggle roomMenuIsPinned when the pin button is clicked', function(){
-    panelFooterView.render();
-    assert.ok(!model.get('roomMenuIsPinned'), 'Check initial roomMenuIsPinned value');
-    panelFooterView.$el.find('#room-menu-footer-pin-button').click();
-    assert.ok(model.get('roomMenuIsPinned'), 'check roomMenuIsPinned has been reversed');
-  });
 });

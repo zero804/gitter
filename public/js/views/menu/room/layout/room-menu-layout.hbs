@@ -30,11 +30,6 @@
           </li>
         {{/each}}
 
-        <li class="room-menu-options__item--explore">
-        {{! replace svg  with unicode character}}
-          <a href="/explore"><img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/explore.svg"}}'/></a>
-        </li>
-
         <li data-state-change="all" class="room-menu-options__item--close">
           <a id="menu-close-button" class="menu-close-button {{#if desktop}}active{{/if}}">
             <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/hamburger.svg"}}'/>
@@ -57,9 +52,9 @@
 
             <section class="primary-collection" id="primary-collection"></section>
             <section id="secondary-collection"></section>
+            <footer id="panel-footer" class="panel-footer-container"></footer>
           </div>
         </div>
-        <footer id="panel-footer"></footer>
       </section>
     </div>
   </section>
