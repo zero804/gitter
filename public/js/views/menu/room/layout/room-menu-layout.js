@@ -6,6 +6,7 @@ var RoomMenuModel = require('../../../../models/room-menu-model');
 var MiniBarView   = require('../minibar/minibar-view');
 var PanelView     = require('../panel/panel-view');
 var context       = require('utils/context');
+var DNDCtrl       = require('../../../../components/menu/room/dnd-controller');
 
 require('views/behaviors/isomorphic');
 
@@ -21,14 +22,16 @@ module.exports = Marionette.LayoutView.extend({
   initMiniBar: function(optionsForRegion) {
     return new MiniBarView(optionsForRegion({
       model: this.model,
-      bus: this.bus
+      bus: this.bus,
+      dndCtrl: this.dndCtrl
     }));
   },
 
   initMenuPanel: function(optionsForRegion) {
     return new PanelView(optionsForRegion({
       model: this.model,
-      bus: this.bus
+      bus: this.bus,
+      dndCtrl: this.dndCtrl
     }));
   },
 
@@ -52,8 +55,10 @@ module.exports = Marionette.LayoutView.extend({
       panelOpenState:   isPinned
     });
 
-    this.listenTo(this.bus, 'room-menu:start-drag', this.onDragStart.bind(this));
-    this.listenTo(this.bus, 'room-menu:finish-drag', this.onDragEnd.bind(this));
+    this.dndCtrl = new DNDCtrl({ model: this.model });
+
+    this.listenTo(this.dndCtrl, 'dnd:start-drag', this.onDragStart.bind(this));
+    this.listenTo(this.dndCtrl, 'dnd:end-drag', this.onDragEnd.bind(this));
   },
 
   onDragStart: function (){

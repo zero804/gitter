@@ -16,12 +16,16 @@ var DNDCtrl = function(attrs){
     move: this.shouldItemMove.bind(this),
   });
 
+  this.drag.on('dragend', this.onDragEnd.bind(this));
+  this.drag.on('drag', this.onDragStart.bind(this));
+  this.drag.on('drop', this.onItemDropped.bind(this));
+
 };
 
 DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
 
   shouldCopyDraggedItem: function (){
-    return (this.model.get('state') === 'favourite');
+    return (this.model.get('state') !== 'favourite');
   },
 
   shouldItemMove: function (el){
@@ -35,14 +39,21 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
   onItemDropped: function(el, target){//jshint unused: true
     //guard against no drop target
     if(!target || !target.dataset) { return }
-    console.log('working', target.dataset.stateChange, this.model.get('state'));
 
     if (this.model.get('state') !== 'favourite' &&
         target.dataset.stateChange === 'favourite') {
       this.trigger('room-menu:add-favourite', el.dataset.roomId);
     }
 
-  }
+  },
+
+  onDragStart: function (){
+    this.trigger('dnd:start-drag');
+  },
+
+  onDragEnd: function (){
+    this.trigger('dnd:end-drag');
+  },
 
 });
 
