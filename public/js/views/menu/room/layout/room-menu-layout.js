@@ -57,13 +57,18 @@ module.exports = Marionette.LayoutView.extend({
 
   //TODO Test this  jp 16/12/15
   onDragStart: function (){
+    this.model.set('roomMenuWasPinned', this.model.get('roomMenuIsPinned'));
     this.model.set('roomMenuIsPinned', true);
     this.openPanel();
   },
 
   //TODO Test this  jp 16/12/15
   onDragEnd: function (){
-    this.model.set('roomMenuIsPinned', false);
+
+    if(!this.model.get('roomMenuWasPinned')){
+      this.model.set('roomMenuIsPinned', false);
+    }
+
     this.openPanel();
   },
 

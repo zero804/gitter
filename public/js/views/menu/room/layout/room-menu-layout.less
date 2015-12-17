@@ -215,6 +215,18 @@ html {
   .room-menu-options__item();
   background: #1a191b;
 
+  //Replace with class
+  & img {
+    transition: transform .2s linear;
+  }
+
+  &.dropped {
+    background: @caribbean;
+    & img {
+      transform: rotate(90deg) scale(1.5);
+    }
+  }
+
   &.active {
     background: @caribbean;
   }
