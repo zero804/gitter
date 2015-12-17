@@ -68,29 +68,29 @@ describe('MenuLayout', function() {
 
   it('should set menuWasPinned correctly on dragStart', function(){
     menuLayout.model.set('roomMenuIsPinned', false);
-    Backbone.Events.trigger('room-menu:start-drag');
+    menuLayout.dndCtrl.trigger('dnd:start-drag');
     assert.ok(!menuLayout.model.get('roomMenuWasPinned'));
     menuLayout.model.set('roomMenuIsPinned', true);
-    Backbone.Events.trigger('room-menu:start-drag');
+    menuLayout.dndCtrl.trigger('dnd:start-drag');
     assert.ok(menuLayout.model.get('roomMenuWasPinned'));
   });
 
   it('should set roomMenuIsPinned on dragStart', function(){
     menuLayout.model.set('roomMenuIsPinned', false);
-    Backbone.Events.trigger('room-menu:start-drag');
+    menuLayout.dndCtrl.trigger('dnd:start-drag');
     assert.ok(menuLayout.model.get('roomMenuIsPinned'));
   });
 
   it('should set roomMenuIsPinned if the roomMenu was not pinned on dragEnd', function(){
     menuLayout.model.set('roomMenuWasPinned', false);
     menuLayout.model.set('roomMenuIsPinned', true);
-    Backbone.Events.trigger('room-menu:finish-drag');
+    menuLayout.dndCtrl.trigger('dnd:end-drag');
     assert.ok(!menuLayout.model.get('roomMenuIsPinned'));
   });
 
   it('should open the panel on drag end', function(){
     menuLayout.model.set('panelOpenState', false);
-    Backbone.Events.trigger('room-menu:finish-drag');
+    menuLayout.dndCtrl.trigger('dnd:end-drag');
     assert(menuLayout.model.get('panelOpenState'));
   });
 

@@ -27,11 +27,11 @@ describe('DNDCtrl', function(){
     assert.ok(dndCtrl.drag);
   });
 
-  it('its shouldCopyDraggedItem function should only yreturn true when the model is in a favourite state', function(){
+  it('its shouldCopyDraggedItem function should return true when the model is not in a favourite state', function(){
     model.set('state', 'all');
-    assert.ok(!dndCtrl.shouldCopyDraggedItem());
-    model.set('state', 'favourite');
     assert.ok(dndCtrl.shouldCopyDraggedItem());
+    model.set('state', 'favourite');
+    assert.ok(!dndCtrl.shouldCopyDraggedItem());
   });
 
   it('its shouldMoveItem should return true for everything other than an anchor', function(){

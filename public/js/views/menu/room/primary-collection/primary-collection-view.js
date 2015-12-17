@@ -20,40 +20,15 @@ module.exports = Marionette.CollectionView.extend({
       throw new Error('A valid event bus must be passed to a new PrimaryCollectionView');
     }
 
-    this.bus   = options.bus;
-    this.model = options.model;
+    this.bus     = options.bus;
+    this.model   = options.model;
+    this.dndCtrl = options.dndCtrl;
+
+    //TODO turn this inot an error
+    if(this.dndCtrl)this.dndCtrl.pushContainer(this.el);
 
     this.listenTo(this.model, 'change:state', this.onModelStateChange, this);
     this.listenTo(this.model, 'change:selectedOrgName', this.onModelStateChange, this);
-
-    //TODO this should maybe be added somewhere else
-    //as in this view should not know about the favourites class
-    this.drag = dragula([this.el, $('.room-menu-options__item--favourite')[0]], {
-      copy: this.shouldCopyADraggedItem.bind(this),
-      moves: function(el){
-        //seems a bit shoddy
-        return el.tagName  !== 'A';
-      }
-    });
-
-    this.drag.on('drop', this.onItemDropped.bind(this));
-    this.drag.on('drag', function(){ this.bus.trigger('room-menu:start-drag')}.bind(this));
-    this.drag.on('dragend', function(){ this.bus.trigger('room-menu:finish-drag')}.bind(this));
-  },
-
-  //Dont copy the .room-item UNLESS we are looking at favourites
-  shouldCopyADraggedItem: function() {
-    return this.model.get('state') !== 'favourite';
-  },
-
-  onItemDropped: function(el, target) {//jshint unused: true
-    //guard against no drop target
-    if(!target || !target.dataset) { return }
-
-    if (this.model.get('state') !== 'favourite' &&
-        target.dataset.stateChange === 'favourite') {
-      this.bus.trigger('room-menu:add-favourite', el.dataset.roomId);
-    }
   },
 
   filter: function(model) {

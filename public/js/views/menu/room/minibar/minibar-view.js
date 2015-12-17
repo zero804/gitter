@@ -11,6 +11,7 @@ var MiniBarView = Marionette.ItemView.extend({
   initialize: function(attrs) {
     //TODO Test this
     this.bus = attrs.bus;
+    this.dndCtrl = attrs.dndCtrl;
 
     this.roomMenuItems = [];
     this.roomMenuItemModels = new Backbone.Collection();
@@ -26,7 +27,12 @@ var MiniBarView = Marionette.ItemView.extend({
       var model = new Backbone.Model({ active: (index === 0), type: type });
       this.roomMenuItemModels.add(model);
 
-      var view = new RoomMenuItemView({ model: model, el: el, bus: attrs.bus });
+      var view = new RoomMenuItemView({
+        model:   model,
+        el:      el,
+        bus:     attrs.bus ,
+        dndCtrl: this.dndCtrl
+      });
       this.roomMenuItems.push(view);
 
       this.listenTo(view, 'room-item-view:clicked', this.onItemClicked, this);

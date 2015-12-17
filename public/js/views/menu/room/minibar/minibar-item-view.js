@@ -22,14 +22,16 @@ module.exports = Marionette.ItemView.extend({
       isCloseButton: !!this.$el.find('#menu-close-button').length,
     });
 
-    this.bus = attrs.bus;
+    this.bus     = attrs.bus;
+    this.dndCtrl = attrs.dndCtrl;
     this.listenTo(this.bus, 'ui:swiperight', this.onSwipeRight, this);
 
     //This component should be extended here instead of the check
     if (this.model.get('type') === 'favourite') {
-      this.listenTo(this.bus, 'room-menu:start-drag', this.onDragStart, this);
-      this.listenTo(this.bus, 'room-menu:finish-drag', this.onDragStop, this);
-      this.listenTo(this.bus, 'room-menu:add-favourite', this.onFavourite, this);
+      this.dndCtrl.pushContainer(this.el);
+      this.listenTo(this.dndCtrl, 'dnd:start-drag', this.onDragStart, this);
+      this.listenTo(this.dndCtrl, 'dnd:end-drag', this.onDragStop, this);
+      this.listenTo(this.dndCtrl, 'room-menu:add-favourite', this.onFavourite, this);
     }
   },
 
@@ -46,6 +48,7 @@ module.exports = Marionette.ItemView.extend({
     this.$el.addClass('dropped');
     setTimeout(function() {
       this.$el.removeClass('dropped');
+
       //Dragula places dropped items into the drop container
       //This needs to be fixed upstream
       //util that date just remove the dropped container manually

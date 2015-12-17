@@ -51,6 +51,7 @@ module.exports = Marionette.LayoutView.extend({
       collection: this.model.primaryCollection,
       model:      this.model,
       bus:        this.bus,
+      dndCtrl:    this.dndCtrl
     }));
   },
 
@@ -75,7 +76,8 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   initialize: function(attrs) {
-    this.bus = attrs.bus;
+    this.bus     = attrs.bus;
+    this.dndCtrl = attrs.dndCtrl;
 
     this.listenTo(this.bus, 'ui:swipeleft', this.onSwipeLeft, this);
     this.listenTo(this.bus, 'focus.request.chat', this.onSearchItemSelected, this);
