@@ -4,7 +4,6 @@
 var assert       = require('assert');
 var Backbone     = require('backbone');
 var RoomItemView = require('public/js/views/menu/room/minibar/minibar-item-view');
-var appEvents    = require('utils/appevents');
 
 describe('MinibarItemView', function() {
 
@@ -24,7 +23,11 @@ describe('MinibarItemView', function() {
 
     model = new Backbone.Model({ type: 'people' });
 
-    roomItemView = new RoomItemView({ el: el, model: model });
+    roomItemView = new RoomItemView({
+      el: el,
+      model: model,
+      bus: Backbone.Events
+    });
 
     container = document.createElement('div');
     close = document.createElement('div');
@@ -50,7 +53,7 @@ describe('MinibarItemView', function() {
       done();
     });
 
-    appEvents.trigger('ui:swiperight', { target: el });
+    Backbone.Events.trigger('ui:swiperight', { target: el });
   });
 
   it('should pass the right data with the event', function(done) {
