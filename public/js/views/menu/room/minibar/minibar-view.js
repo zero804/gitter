@@ -53,7 +53,7 @@ var MiniBarView = Marionette.ItemView.extend({
     //TODO Tidy this
     if (isCloseButton) {
       var newVal = !this.model.get('roomMenuIsPinned');
-      var ANIMATION_TIME = 150;
+      var ANIMATION_TIME = 300;
 
       //TODO TEST THIS LOGIC
 
