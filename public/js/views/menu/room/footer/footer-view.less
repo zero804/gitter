@@ -1,29 +1,41 @@
 @import "trp3Vars";
 @import "../../../../../less/components/menu/room/menu-text.less";
 
-.panel-footer__link {
-  .room-menu-text();
-  padding-right: @desktop-menu-left-padding;
-
-  &:hover {
-    cursor: pointer;
-  }
+.panel-footer-container {
+  margin-top: auto;
 }
 
 .panel-footer {
-  position:   absolute;
-  bottom:     0;
-  right:      0;
+  position:   relative;
+  text-align: center;
+  padding:    @desktop-menu-left-padding;
+  transition: transform .2s ease-in-out;
+  transform: translateY(100%);
 
-  display: flex;
-  flex-direction: row-reverse;
-
-  height:     @menu-footer-height;
-  width:      100%;
-  background: @menu-panel-bg;
-
-  //hide on mobile
-  .mobile & {
-    display: none;
+  &.active {
+    transform: translateY(0);
   }
+}
+
+.panel-footer__title {
+  color:     white;
+  font-size: 2.5rem;
+}
+
+.panel-footer__desc {
+  .room-menu-text();
+  line-height: 1.5;
+}
+
+.panel-footer__link {
+  border: 1px solid @ruby;
+}
+
+.panel-footer__img {
+  position: absolute;
+  bottom:   0;
+  left:     0;
+  width:    100%;
+  height:   auto;
+  pointer-events: none;
 }
