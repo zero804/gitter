@@ -39,6 +39,7 @@ module.exports = Marionette.LayoutView.extend({
 
   initialize: function(attrs) {
     this.bus = attrs.bus;
+    this.delay = localStorage.delay;
 
     var isPinned = $('.app-layout').hasClass('pinned');
     this.model   = new RoomMenuModel({
@@ -55,36 +56,30 @@ module.exports = Marionette.LayoutView.extend({
     this.listenTo(this.bus, 'room-menu:finish-drag', this.onDragEnd.bind(this));
   },
 
-  //TODO Test this  jp 16/12/15
   onDragStart: function (){
     this.model.set('roomMenuWasPinned', this.model.get('roomMenuIsPinned'));
     this.model.set('roomMenuIsPinned', true);
     this.openPanel();
   },
 
-  //TODO Test this  jp 16/12/15
   onDragEnd: function (){
-
     if(!this.model.get('roomMenuWasPinned')){
       this.model.set('roomMenuIsPinned', false);
     }
-
     this.openPanel();
   },
 
-  //TODO Test this  jp 16/12/15
   openPanel: function() {
     if (this.model.get('roomMenuIsPinned')) { return }
     this.model.set('panelOpenState', true);
     if (this.timeout) { clearTimeout(this.timeout); }
   },
 
-  //TODO Test this  jp 16/12/15
   closePanel: function() {
     if (this.model.get('roomMenuIsPinned')) { return }
     this.timeout = setTimeout(function() {
       this.model.set('panelOpenState', false);
-    }.bind(this), localStorage.delay);
+    }.bind(this), this.delay);
 
   },
 
