@@ -34,7 +34,7 @@ module.exports = Marionette.LayoutView.extend({
 
   events: {
     'mouseenter': 'openPanel',
-    'mouseleave': 'cloasePanel',
+    'mouseleave': 'closePanel',
   },
 
   initialize: function(attrs) {
@@ -51,16 +51,30 @@ module.exports = Marionette.LayoutView.extend({
       panelOpenState:   isPinned
     });
 
-    this.listenTo(this.bus, 'room-menu:start-drag', this.openPanel.bind(this));
-    this.listenTo(this.bus, 'room-menu:finish-drag', this.closePanel.bind(this));
+    this.listenTo(this.bus, 'room-menu:start-drag', this.onDragStart.bind(this));
+    this.listenTo(this.bus, 'room-menu:finish-drag', this.onDragEnd.bind(this));
   },
 
+  //TODO Test this  jp 16/12/15
+  onDragStart: function (){
+    this.model.set('roomMenuIsPinned', true);
+    this.openPanel();
+  },
+
+  //TODO Test this  jp 16/12/15
+  onDragEnd: function (){
+    this.model.set('roomMenuIsPinned', false);
+    this.openPanel();
+  },
+
+  //TODO Test this  jp 16/12/15
   openPanel: function() {
     if (this.model.get('roomMenuIsPinned')) { return }
     this.model.set('panelOpenState', true);
     if (this.timeout) { clearTimeout(this.timeout); }
   },
 
+  //TODO Test this  jp 16/12/15
   closePanel: function() {
     if (this.model.get('roomMenuIsPinned')) { return }
     this.timeout = setTimeout(function() {
