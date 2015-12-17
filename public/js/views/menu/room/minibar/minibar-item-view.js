@@ -2,7 +2,6 @@
 
 var Backbone   = require('backbone');
 var Marionette = require('backbone.marionette');
-var appEvents  = require('utils/appevents');
 var RAF        = require('utils/raf');
 
 module.exports = Marionette.ItemView.extend({
@@ -15,13 +14,32 @@ module.exports = Marionette.ItemView.extend({
     'change:active': 'onActiveStateChange',
   },
 
-  initialize: function() {
+  initialize: function(attrs) {
     this.model = (this.model || new Backbone.Model());
     this.model.set({
+      type:          this.$el.data('stateChange'),
       orgName:       this.$el.data('org-name'),
-      isCloseButton: !!this.$el.find('#menu-close-button').length
+      isCloseButton: !!this.$el.find('#menu-close-button').length,
     });
-    this.listenTo(appEvents, 'ui:swiperight', this.onSwipeRight, this);
+
+    this.bus = attrs.bus;
+    this.listenTo(this.bus, 'ui:swiperight', this.onSwipeRight, this);
+
+    //This component should be extended here instead of the check
+    if (this.model.get('type') === 'favourite') {
+      this.listenTo(this.bus, 'room-menu:start-drag', this.onDragStart, this);
+      this.listenTo(this.bus, 'room-menu:finish-drag', this.onDragStop, this);
+    }
+  },
+
+  onDragStart: function() {
+    console.log('start');
+    this.$el.addClass('drag-start');
+  },
+
+  onDragStop: function() {
+    console.log('stopListeningkkkk')
+    this.$el.removeClass('drag-start');
   },
 
   onSwipeRight: function(e) {

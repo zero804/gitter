@@ -26,7 +26,7 @@ var MiniBarView = Marionette.ItemView.extend({
       var model = new Backbone.Model({ active: (index === 0), type: type });
       this.roomMenuItemModels.add(model);
 
-      var view = new RoomMenuItemView({ model: model, el: el });
+      var view = new RoomMenuItemView({ model: model, el: el, bus: attrs.bus });
       this.roomMenuItems.push(view);
 
       this.listenTo(view, 'room-item-view:clicked', this.onItemClicked, this);
