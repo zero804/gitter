@@ -29,6 +29,7 @@ module.exports = Marionette.ItemView.extend({
     if (this.model.get('type') === 'favourite') {
       this.listenTo(this.bus, 'room-menu:start-drag', this.onDragStart, this);
       this.listenTo(this.bus, 'room-menu:finish-drag', this.onDragStop, this);
+      this.listenTo(this.bus, 'room-menu:add-favourite', this.onFavourite, this);
     }
   },
 
@@ -38,6 +39,19 @@ module.exports = Marionette.ItemView.extend({
 
   onDragStop: function() {
     this.$el.removeClass('drag-start');
+  },
+
+  //Test this
+  onFavourite: function() {
+    this.$el.addClass('dropped');
+    setTimeout(function() {
+      this.$el.removeClass('dropped');
+      //Dragula places dropped items into the drop container
+      //This needs to be fixed upstream
+      //util that date just remove the dropped container manually
+      //https://github.com/bevacqua/dragula/issues/188
+      this.$el.find('.room-item').remove();
+    }.bind(this), 200);
   },
 
   onSwipeRight: function(e) {
