@@ -30,8 +30,8 @@ var MiniBarView = Marionette.ItemView.extend({
       var view = new RoomMenuItemView({
         model:   model,
         el:      el,
-        bus:     attrs.bus ,
-        dndCtrl: this.dndCtrl
+        bus:     attrs.bus,
+        dndCtrl: this.dndCtrl,
       });
       this.roomMenuItems.push(view);
 
@@ -54,7 +54,12 @@ var MiniBarView = Marionette.ItemView.extend({
     if (isCloseButton) {
       var newVal = !this.model.get('roomMenuIsPinned');
       this.model.set({ roomMenuIsPinned: newVal });
-      this.model.set({ panelOpenState: newVal });
+
+      //to account for the transition we wait
+      setTimeout(function() {
+        this.model.set({ panelOpenState: newVal });
+      }.bind(this), 400);
+
       return this.bus.trigger('room-menu:pin', newVal);
     }
 
