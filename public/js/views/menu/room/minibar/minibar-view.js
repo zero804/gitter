@@ -53,14 +53,32 @@ var MiniBarView = Marionette.ItemView.extend({
     //TODO Tidy this
     if (isCloseButton) {
       var newVal = !this.model.get('roomMenuIsPinned');
-      this.model.set({ roomMenuIsPinned: newVal });
 
-      //to account for the transition we wait
-      setTimeout(function() {
+      //TODO TEST THIS LOGIC
+
+      //if we are opening the panel
+      if(newVal === true) {
+        if(this.model.get('panelOpenState') === true) {
+          this.model.set({ roomMenuIsPinned: newVal });
+          this.bus.trigger('room-menu:pin', newVal);
+        }
+        else {
+          setTimeout(function(){
+            this.model.set({ roomMenuIsPinned: newVal });
+            this.bus.trigger('room-menu:pin', newVal);
+          }.bind(this), 300);
+        }
+
         this.model.set({ panelOpenState: newVal });
-      }.bind(this), 400);
+      }
+      else {
+        this.model.set({ roomMenuIsPinned: newVal });
+        this.bus.trigger('room-menu:pin', newVal);
+        setTimeout(function(){
+          this.model.set({ panelOpenState: newVal });
+        }.bind(this), 300);
+      }
 
-      return this.bus.trigger('room-menu:pin', newVal);
     }
 
     this.model.set({
