@@ -6,7 +6,7 @@ var PrimartCollectionItemView = require('public/js/views/menu/room/primary-colle
 
 describe('PrimartCollectionItemView', function() {
 
-  it.only('should do some stuff', function() {
+  it.skip('should do some stuff', function() {
 
   });
 
