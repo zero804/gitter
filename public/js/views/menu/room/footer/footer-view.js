@@ -23,7 +23,6 @@ module.exports = Marionette.ItemView.extend({
   },
 
   onModelChange: function(model, val) {//jshint unused: true
-    console.log(val);
     RAF(function(){
       this.$el.toggleClass('active', (val === 'search'));
     }.bind(this));
