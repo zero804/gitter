@@ -33,12 +33,10 @@ module.exports = Marionette.ItemView.extend({
   },
 
   onDragStart: function() {
-    console.log('start');
     this.$el.addClass('drag-start');
   },
 
   onDragStop: function() {
-    console.log('stopListeningkkkk')
     this.$el.removeClass('drag-start');
   },
 
