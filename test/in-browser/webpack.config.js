@@ -14,10 +14,10 @@ module.exports = {
   },
   resolve: {
     modulesDirectories: [
-      path.resolve(__dirname, '../../node_modules'),
+      'node_modules',
       path.resolve(__dirname, '../../public/js'),
     ],
-    alias: _.extend(appWebpackConfig.alias, {
+    alias: {
       jquery:  path.resolve(__dirname, '../../public/repo/jquery/jquery.js'),
       cocktail: path.resolve(__dirname, '../../public/repo/cocktail/cocktail.js'),
       'backbone-sorted-collection': path.resolve(__dirname, '../../public/repo/backbone-sorted-collection/backbone-sorted-collection.js'),
@@ -26,7 +26,7 @@ module.exports = {
       'fixtures': path.resolve(__dirname, './fixtures'),
       'views/menu/room/search-results/search-results-view': path.resolve(__dirname, './fixtures/helpers/search-results-view.js'),
       'views/menu/room/search-input/search-input-view': path.resolve(__dirname, './fixtures/helpers/search-input-view.js'),
-      'utils/raf': path.resolve(__dirname, './fixtures/helpers/raf.js'),
-    }),
+      'utils/raf': path.resolve(__dirname, './fixtures/helpers/raf.js')
+    },
   },
 };
