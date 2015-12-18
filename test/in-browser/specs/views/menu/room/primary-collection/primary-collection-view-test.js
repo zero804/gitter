@@ -15,21 +15,29 @@ describe('PrimaryCollectionView', function() {
   var model;
   var el;
   var primaryCollectionView;
+  var dndCtrl;
+
 
   beforeEach(function() {
     el = document.createElement('div');
     model = new Backbone.Model({ state: 'all', panelOpenState: true });
     collection = new Backbone.Collection([
-      { name:  '1' },
-      { name:  '2' },
-      { name:  '3' },
-      { name:  '4' },
+      { name:  '1', id: 1, favourite: 1 },
+      { name:  '2', id: 2 },
+      { name:  '3', id: 3 },
+      { name:  '4', id: 4 },
     ]);
+    sinon.stub(collection.models[1], 'save');
+
+    dndCtrl = new Backbone.View();
+    dndCtrl.pushContainer = function() {};
+
     primaryCollectionView = new PrimaryCollectionView({
-      el: el,
-      model: model,
+      el:         el,
+      model:      model,
       collection: collection,
-      bus: Backbone.Events,
+      bus:        Backbone.Events,
+      dndCtrl:    dndCtrl,
     });
   });
 
@@ -85,7 +93,7 @@ describe('PrimaryCollectionView', function() {
     assert.ok(!model.get('panelOpenState'));
   });
 
-  it('should not change the models panelOpenState when the roomMenuIsPinned', function(){
+  it('should not change the models panelOpenState when the roomMenuIsPinned', function() {
     model.set('roomMenuIsPinned', true);
     assert.ok(model.get('panelOpenState'));
     primaryCollectionView.render();
@@ -103,6 +111,18 @@ describe('PrimaryCollectionView', function() {
     });
 
     el.firstChild.click();
+  });
+
+  it('should favourite a model on the correct event and save it', function() {
+    var favModel = collection.get(2);
+    dndCtrl.trigger('room-menu:add-favourite', 2);
+    assert.equal(3, favModel.get('favourite'));
+  });
+
+  it('should favourite the model after its been saved', function() {
+    var favModel = collection.get(2);
+    dndCtrl.trigger('room-menu:add-favourite', 2);
+    assert.equal(1, favModel.save.callCount);
   });
 
 });
