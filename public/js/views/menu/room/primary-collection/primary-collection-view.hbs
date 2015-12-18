@@ -1,4 +1,3 @@
 <img class="room-item__avatar" src="{{ roomAvatarUrl }}" />
 <h2 class="room-item__title">{{name}}</h2>
-{{! TODO Replace favourite (testing with this right now) and re add unreadItems}}
-{{#if favourite }}<div class="room-item__unread">{{favourite}}</div>{{/if}}
+{{#if unreadItems }}<div class="room-item__unread">{{unreadItems}}</div>{{/if}}
