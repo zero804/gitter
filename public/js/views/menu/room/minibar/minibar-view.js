@@ -32,6 +32,7 @@ var MiniBarView = Marionette.ItemView.extend({
         el:      el,
         bus:     attrs.bus,
         dndCtrl: this.dndCtrl,
+        menuModel: this.model
       });
       this.roomMenuItems.push(view);
 

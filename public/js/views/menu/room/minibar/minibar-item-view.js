@@ -1,5 +1,6 @@
 'use strict';
 
+var _          = require('underscore');
 var Backbone   = require('backbone');
 var Marionette = require('backbone.marionette');
 var RAF        = require('utils/raf');
@@ -22,8 +23,9 @@ module.exports = Marionette.ItemView.extend({
       isCloseButton: !!this.$el.find('#menu-close-button').length,
     });
 
-    this.bus     = attrs.bus;
-    this.dndCtrl = attrs.dndCtrl;
+    this.bus       = attrs.bus;
+    this.dndCtrl   = attrs.dndCtrl;
+    this.menuModel = attrs.menuModel;
     this.listenTo(this.bus, 'ui:swiperight', this.onSwipeRight, this);
 
     //This component should be extended here instead of the check
@@ -33,7 +35,31 @@ module.exports = Marionette.ItemView.extend({
       this.listenTo(this.dndCtrl, 'dnd:end-drag', this.onDragStop, this);
       this.listenTo(this.dndCtrl, 'room-menu:add-favourite', this.onFavourite, this);
     }
+
+    if(this.model.get('isCloseButton')) {
+      this.listenTo(this.menuModel, 'change:roomMenuIsPinned change:panelOpenState', this.onPanelOpen, this);
+    }
+
   },
+
+  onPanelOpen: _.debounce(function (model){
+    var pinState  = model.get('roomMenuIsPinned');
+    var openState = model.get('panelOpenState');
+
+    //if the menu is open && pinned
+    if(!!openState && !!pinState) {
+      this.$el.addClass('left');
+      this.$el.removeClass('right');
+    }
+    if(!!openState && !pinState) {
+      this.$el.addClass('right');
+      this.$el.removeClass('left');
+    }
+    if(!openState) {
+      this.$el.removeClass('left');
+      this.$el.removeClass('right');
+    }
+  }, 200),
 
   onDragStart: function() {
     this.$el.addClass('drag-start');
@@ -77,6 +103,7 @@ module.exports = Marionette.ItemView.extend({
   },
 
   onActiveStateChange: function(model, val) {/*jshint unused:true */
+    if(this.model.get('isCloseButton')) return;
     RAF(function() {
       this.$el.toggleClass('active', val);
     }.bind(this));

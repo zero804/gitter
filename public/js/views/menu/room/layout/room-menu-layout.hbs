@@ -4,35 +4,34 @@
       <ul class="room-menu-options nano-content">
 
         <li data-state-change="all" class="room-menu-options__item--home">
-          <a><img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/logo.svg"}}'/></a>
+          <a><img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/logo.svg"}}' /></a>
         </li>
 
         <li data-state-change="search" class="room-menu-options__item--search">
-          <a><img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/search.svg"}}'/></a>
+          <a><img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/search.svg"}}' /></a>
         </li>
 
         <li data-state-change="favourite" class="room-menu-options__item--favourite">
-          <a><img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/favourites.svg"}}'/></a>
+          <a><img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/favourites.svg"}}' /></a>
         </li>
 
         <li data-state-change="people" class="room-menu-options__item--people">
-          <a><img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/people.svg"}}'/></a>
+          <a><img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/people.svg"}}' /></a>
         </li>
 
-        {{#each orgs}}
-          {{! JP 9/12/15 }}
-          {{! TODO SHOULD THIS BE MOVED INTO A PARTIAL TO BE SHARED AROUND }}
-          <li
-            data-state-change="org"
-            data-org-name="{{name}}"
-            class="room-menu-options__item--org" >
-            <a><img class="room-menu-options__item__avatar" src="{{imgUrl}}"  /></a>
-          </li>
+        {{#each orgs}} {{! JP 9/12/15 }} {{! TODO SHOULD THIS BE MOVED INTO A PARTIAL TO BE SHARED AROUND }}
+        <li data-state-change="org" data-org-name="{{name}}" class="room-menu-options__item--org">
+          <a><img class="room-menu-options__item__avatar" src="{{imgUrl}}" /></a>
+        </li>
         {{/each}}
 
-        <li data-state-change="all" class="room-menu-options__item--close">
-          <a id="menu-close-button" class="menu-close-button {{#if desktop}}active{{/if}}">
-            <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/hamburger.svg"}}'/>
+        <li data-state-change="all" class="room-menu-options__item--close {{#if desktop}}left{{/if}}">
+          <a id="menu-close-button" class="menu-close-button">
+            <div class="close-icon">
+              <div class="close-icon-stay"></div>
+              <div class="close-icon-stay"></div>
+              <div class="close-icon-stay"></div>
+            </div>
           </a>
         </li>
 
