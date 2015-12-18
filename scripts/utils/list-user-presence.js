@@ -27,7 +27,7 @@ presence.listAllSocketsForUser(opts.userId)
     //console.log(_sockets);
     sockets = _.sortBy(_.values(_sockets), 'createdTime');
     var troupeIds = _.pluck(sockets, 'troupeId');
-    return troupeService.findByIdsLean(troupeIds, {id: 1, uri: 1});
+    return troupeService.findByIdsLean(troupeIds, {uri: 1});
   })
   .then(function(troupes) {
     // just modify it in place
