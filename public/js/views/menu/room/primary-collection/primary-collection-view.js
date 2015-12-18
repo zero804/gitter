@@ -30,7 +30,10 @@ module.exports = Marionette.CollectionView.extend({
     this.dndCtrl = options.dndCtrl;
 
     //TODO turn this inot an error
-    if (this.dndCtrl)this.dndCtrl.pushContainer(this.el);
+    if (this.dndCtrl){
+      this.dndCtrl.pushContainer(this.el);
+      this.listenTo(this.dndCtrl, 'room-menu:add-favourite', this.onFavouriteAdded, this);
+    }
 
     this.listenTo(this.model, 'change:state', this.onModelStateChange, this);
     this.listenTo(this.model, 'change:selectedOrgName', this.onModelStateChange, this);
@@ -66,8 +69,25 @@ module.exports = Marionette.CollectionView.extend({
     }
   },
 
+  //WHERE SHOULD THIS GO? IT ALSO NEEDS TO BE TESTED
+  sortFavourites: function (a, b){
+    if(!a.get('favourite')) return -1;
+    if(!b.get('favourite')) return 1;
+    return (a.get('favourite') < b.get('favourite')) ? -1 : 1;
+  },
+
   onModelStateChange: function(model, val) { /*jshint unused: true*/
-    this.render();
+
+    if(model.get('state') === 'favourite') {
+      //This feels gross
+      this.collection.comparator = this.sortFavourites;
+      this.collection.sort();
+    }
+    else {
+      this.collection.comparator = null;
+      this.render();
+    }
+
     RAF(function() {
       this.$el.toggleClass('active', (val !== 'search'));
     }.bind(this));
@@ -86,6 +106,15 @@ module.exports = Marionette.CollectionView.extend({
     setTimeout(function() {
       this.bus.trigger('navigation', url, 'chat', name);
     }.bind(this), 250);
+  },
+
+  //TODO The filter should be resued within the view filter method?
+  onFavouriteAdded: function (id){
+    var newFavModel = this.collection.get(id);
+    var favIndex = this.collection
+      .filter(function(model){ return !!model.get('favourite') }).length;
+    newFavModel.set('favourite', (favIndex + 2));
+    newFavModel.save();
   },
 
   render: function() {

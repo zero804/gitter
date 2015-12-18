@@ -4,7 +4,6 @@ var Marionette    = require('backbone.marionette');
 var getRoomAvatar = require('utils/get-room-avatar');
 var itemTemplate  = require('./primary-collection-view.hbs');
 var _             = require('underscore');
-var RAF           = require('utils/raf');
 
 module.exports = Marionette.ItemView.extend({
 
