@@ -17,10 +17,17 @@
   display:        flex;
   flex-direction: row;
   align-items:    center;
-  height: 3.8rem;;
+  height:         3.8rem;
+  opacity:        0;
+  transition:     opacity .2s ease-in;
+
+  .loaded & {
+    opacity: 1;
+  }
 
   &.gu-mirror, &.gu-transit {
     .room-item-selected();
+    opacity: 1;
   }
 
   &:hover {
