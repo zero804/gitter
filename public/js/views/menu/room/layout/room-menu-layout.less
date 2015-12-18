@@ -275,13 +275,6 @@ html {
   margin-top: auto;
 }
 
-.menu-close-button {
-  transition: transform .2s linear;
-  &.active {
-    transform: rotate(90deg);
-  }
-}
-
 .room-menu-options__item__avatar  {
   width:         2.34rem;
   height:        2.34rem;
@@ -293,8 +286,57 @@ html {
   }
 }
 
-
 .nano {
   width: 100%;
   height: 100%;
+}
+
+.half-stay(){
+  content: ' ';
+  display: inline-block;
+  position: absolute;
+  width: 100%;
+  height: 50%;
+  background: @ruby;
+  transition: transform .2s linear;
+}
+
+.close-icon {
+  position:       relative;
+  width:          20px;
+  height:         30px;
+  transition:     transform .2s linear;
+  transform:      rotate(0);
+
+  .left &  { transform: rotate(0); }
+  .right & { transform: rotate(-180deg);}
+}
+
+.close-icon-stay {
+  width:    1px;
+  height:   100%;
+  position: absolute;
+  top:      0;
+  left:     50%;
+
+  &:first-child { left: 0; }
+  &:last-child  { left: 100%; }
+
+  &:before { .half-stay(); top: 0;}
+  &:after  { .half-stay(); bottom: 0;}
+
+  .left & {
+    &:first-child {
+      &:before { transform: skewX(-25deg);}
+      &:after  { transform: skewX(25deg);}
+    }
+  }
+
+  .right & {
+    &:first-child {
+      &:before { transform: skewX(-25deg);}
+      &:after  { transform: skewX(25deg);}
+    }
+  }
+
 }
