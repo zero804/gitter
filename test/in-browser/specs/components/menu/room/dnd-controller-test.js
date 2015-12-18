@@ -67,4 +67,15 @@ describe('DNDCtrl', function(){
     dndCtrl.onItemDropped(el, target);
   });
 
+  it('should trigger a different event with the wrong target', function(done){
+     dndCtrl.on('room-menu:sort-favourite', function(id){
+      assert.ok(true);
+      done();
+    });
+
+    var el = document.createElement('div');
+    dndCtrl.onItemDropped(null, el);
+
+  });
+
 });

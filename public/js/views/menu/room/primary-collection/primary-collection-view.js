@@ -33,6 +33,7 @@ module.exports = Marionette.CollectionView.extend({
     if (this.dndCtrl){
       this.dndCtrl.pushContainer(this.el);
       this.listenTo(this.dndCtrl, 'room-menu:add-favourite', this.onFavouriteAdded, this);
+      this.listenTo(this.dndCtrl, 'room-menu:sort-favourite', this.onFavouritesSorted, this);
     }
 
     this.listenTo(this.model, 'change:state', this.onModelStateChange, this);
@@ -81,6 +82,7 @@ module.exports = Marionette.CollectionView.extend({
     if(model.get('state') === 'favourite') {
       //This feels gross
       this.collection.comparator = this.sortFavourites;
+      //a sort will trigger a render so we can skip out on the render part
       this.collection.sort();
     }
     else {
@@ -115,6 +117,19 @@ module.exports = Marionette.CollectionView.extend({
       .filter(function(model){ return !!model.get('favourite') }).length;
     newFavModel.set('favourite', (favIndex + 2));
     newFavModel.save();
+  },
+
+  //TODO TEST THIS - Need to test it a lot
+  //this logic is a bit crazy :(
+  onFavouritesSorted: function (id){
+    var elements = this.$el.find('[data-room-id]');
+    Array.prototype.slice.apply(elements).forEach(function(el, index){
+      //This can't be the right way to do this
+      if(el.dataset.roomId !== id) return;
+      var model = this.collection.get(el.dataset.roomId);
+      model.set('favourite', (index + 1));
+      model.save();
+    }.bind(this));
   },
 
   render: function() {

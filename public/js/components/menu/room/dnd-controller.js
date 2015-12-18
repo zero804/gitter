@@ -13,7 +13,7 @@ var DNDCtrl = function(attrs){
 
   this.drag = dragula([], {
     copy: this.shouldCopyDraggedItem.bind(this),
-    moves: this.shouldItemMove.bind(this),
+    moves: this.shouldItemMove.bind(this)
   });
 
   this.drag.on('dragend', this.onDragEnd.bind(this));
@@ -43,6 +43,9 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
     if (this.model.get('state') !== 'favourite' &&
         target.dataset.stateChange === 'favourite') {
       this.trigger('room-menu:add-favourite', el.dataset.roomId);
+    }
+    else {
+      this.trigger('room-menu:sort-favourite', el.dataset.roomId);
     }
 
   },
