@@ -39,6 +39,7 @@ presence.listAllSocketsForUser(opts.userId)
     });
     console.log(sockets);
     console.log(_.countBy(sockets, 'createdTime'));
+    console.log('Total:', sockets.length);
   })
   .catch(function(err) {
     console.error(err.stack);
