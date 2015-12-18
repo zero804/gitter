@@ -42,6 +42,7 @@ module.exports = Marionette.ItemView.extend({
 
   },
 
+  //TODO TEST THIS
   onPanelOpen: _.debounce(function (model){
     var pinState  = model.get('roomMenuIsPinned');
     var openState = model.get('panelOpenState');
