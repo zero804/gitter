@@ -131,8 +131,7 @@ module.exports = Backbone.Model.extend({
 
     //save
     if (method === 'create' || method === 'update' || method === 'patch') {
-      attrs = this.toJSON();
-      attrs = JSON.stringify(attrs);
+      attrs = JSON.stringify(this);
       return store.set(this.cid, attrs);
     }
 
