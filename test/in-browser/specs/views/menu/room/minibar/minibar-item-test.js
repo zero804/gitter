@@ -27,7 +27,7 @@ describe('MinibarItemView', function() {
     roomItemView = new RoomItemView({
       el: el,
       model: model,
-      bus: Backbone.Events
+      bus: Backbone.Events,
     });
 
     container = document.createElement('div');
@@ -35,7 +35,11 @@ describe('MinibarItemView', function() {
     close.id = 'menu-close-button';
     container.appendChild(close);
     closeModel = new Backbone.Model();
-    closeButtonView = new RoomItemView({ el: container, model:  closeModel });
+    closeButtonView = new RoomItemView({
+      el: container,
+      menuModel: closeModel,
+    });
+
   });
 
   it('trigger an event when it\'s el is clicked', function(done) {
@@ -82,16 +86,12 @@ describe('MinibarItemView', function() {
     assert.ok(!roomItemView.model.get('isCloseBubtton'));
   });
 
-  it('should send isCloseButton when its el is clicked', function(done){
-    closeButtonView.on('room-item-view:clicked', function(type, name, isCloseButton){
+  it('should send isCloseButton when its el is clicked', function(done) {
+    closeButtonView.on('room-item-view:clicked', function(type, name, isCloseButton) {
       assert.ok(isCloseButton);
       done();
     });
+
     container.click();
   });
-
-  it('should assign the correct directional class onPanelStateChange (if its a close button)', function(){
-    closeModel.set({ roomMenuIsPinned: true, panelOpenState: true });
-  });
-
 });

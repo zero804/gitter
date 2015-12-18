@@ -309,7 +309,7 @@ html {
   transform:      rotate(90deg);
 
   .left &  { transform: rotate(0); }
-  .right & { transform: rotate(180deg);}
+  .right & { transform: rotate(0);}
 }
 
 .close-icon-stay {
@@ -333,9 +333,9 @@ html {
   }
 
   .right & {
-    &:first-child {
-      &:before { transform: skewX(-25deg);}
-      &:after  { transform: skewX(25deg);}
+    &:last-child {
+      &:before { transform: skewX(25deg);}
+      &:after  { transform: skewX(-25deg);}
     }
   }
 
