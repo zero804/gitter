@@ -38,7 +38,10 @@ presence.listAllSocketsForUser(opts.userId)
       delete socket.userId;
     });
     console.log(sockets);
-    console.log(_.countBy(sockets, 'createdTime'));
+    console.log(_.countBy(sockets, function(socket) {
+      // isostring seems to contain milliseconds
+      return socket.createdTime.toISOString();
+    }));
     console.log('Total:', sockets.length);
   })
   .catch(function(err) {
