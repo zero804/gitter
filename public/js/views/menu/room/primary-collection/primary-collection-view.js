@@ -1,5 +1,6 @@
 'use strict';
 
+var _          = require('underscore');
 var Marionette = require('backbone.marionette');
 var RAF        = require('utils/raf');
 var ItemView   = require('./primary-collection-item-view');
@@ -9,6 +10,15 @@ module.exports = Marionette.CollectionView.extend({
     'item:clicked': 'onItemClicked',
   },
   childView: ItemView,
+
+  buildChildView: function(model, ItemView, attrs) {
+    var index = this.collection.indexOf(model);
+    return new ItemView(_.extend({}, attrs, {
+      model: model,
+      index: index,
+    }));
+  },
+
   initialize: function(options) {
 
     if (!options || !options.bus) {
@@ -76,6 +86,16 @@ module.exports = Marionette.CollectionView.extend({
     setTimeout(function() {
       this.bus.trigger('navigation', url, 'chat', name);
     }.bind(this), 250);
+  },
+
+  render: function() {
+    this.$el.removeClass('loaded');
+    RAF(function() {
+      Marionette.CollectionView.prototype.render.apply(this, arguments);
+      RAF(function() {
+        this.$el.addClass('loaded');
+      }.bind(this));
+    }.bind(this));
   },
 
 });
