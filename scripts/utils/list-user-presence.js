@@ -24,7 +24,8 @@ presence.listAllSocketsForUser(opts.userId)
     return presence.getSockets(socketIds);
   })
   .then(function(_sockets) {
-    sockets = _.values(_sockets);
+    //console.log(_sockets);
+    sockets = _.sortBy(_.values(_sockets), 'createdTime');
     var troupeIds = _.pluck(sockets, 'troupeId');
     return troupeService.findByIdsLean(troupeIds, {id: 1, uri: 1});
   })
@@ -37,6 +38,7 @@ presence.listAllSocketsForUser(opts.userId)
       delete socket.userId;
     });
     console.log(sockets);
+    console.log(_.countBy(sockets, 'createdTime'));
   })
   .catch(function(err) {
     console.error(err.stack);
