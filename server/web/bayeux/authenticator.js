@@ -70,6 +70,7 @@ module.exports = bayeuxExtension({
         connectionType: connectionType,
         client: ext.client,
         troupeId: ext.troupeId,
+        oauthClientId: oauthClient.id,
         eyeballState: parseInt(ext.eyeballs, 10) || 0
       };
 
@@ -88,19 +89,20 @@ module.exports = bayeuxExtension({
     var userId = state.userId;
     var connectionType = state.connectionType;
     var clientId = message.clientId;
-    var client = state.client;
+    var clientType = state.client;
     var troupeId = state.troupeId;
+    var oauthClientId = state.oauthClientId;
     var eyeballState = state.eyeballState;
 
     // Get the presence service involved around about now
-    presenceService.userSocketConnected(userId, clientId, connectionType, client, troupeId, eyeballState, function(err) {
+    presenceService.userSocketConnected(userId, clientId, connectionType, clientType, troupeId, oauthClientId, eyeballState, function(err) {
 
       if(err) {
-        logger.warn("bayeux: Unable to associate connection " + clientId + ' to ' + userId, { troupeId: troupeId, client: client, exception: err });
+        logger.warn("bayeux: Unable to associate connection " + clientId + ' to ' + userId, { troupeId: troupeId, client: clientType, exception: err });
         return callback(err);
       }
 
-      debug("Connection %s is associated to user %s (troupeId=%s, clientId=%s)", clientId, userId, troupeId, client);
+      debug("Connection %s is associated to user %s (troupeId=%s, clientId=%s, oauthClientId=%s)", clientId, userId, troupeId, clientType, oauthClientId);
 
       message.ext.userId = userId;
 
