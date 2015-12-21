@@ -24,7 +24,7 @@ redis.call("HSET", key_socket_user, "uid", user_id)
 redis.call("HSET", key_socket_user, "ctime", create_time)
 redis.call("HSET", key_socket_user, "ct", client_type)
 redis.call("HSET", key_socket_user, "tid", troupe_id)
-redis.call("HSET", key_socket_user, "cid", oauth_client_id)
+redis.call("HSET", key_socket_user, "ocid", oauth_client_id)
 
 local user_socket_count = -1
 
