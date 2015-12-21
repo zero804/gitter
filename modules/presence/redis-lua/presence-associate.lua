@@ -11,6 +11,7 @@ local create_time = ARGV[3];
 local mobile_connection = tonumber(ARGV[4]);
 local client_type = ARGV[5];
 local troupe_id = ARGV[6];
+local oauth_client_id = ARGV[7];
 
 if redis.call("EXISTS", key_socket_user) == 1 then
 	return { 0 }
@@ -23,6 +24,7 @@ redis.call("HSET", key_socket_user, "uid", user_id)
 redis.call("HSET", key_socket_user, "ctime", create_time)
 redis.call("HSET", key_socket_user, "ct", client_type)
 redis.call("HSET", key_socket_user, "tid", troupe_id)
+redis.call("HSET", key_socket_user, "cid", oauth_client_id)
 
 local user_socket_count = -1
 
