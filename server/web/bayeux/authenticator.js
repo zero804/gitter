@@ -1,8 +1,10 @@
 'use strict';
 
 var env               = require('gitter-web-env');
+var nconf  = env.config;
 var logger            = env.logger;
 var errorReporter     = env.errorReporter;
+var statsd = env.createStatsClient({ prefix: nconf.get('stats:statsd:prefix')});
 
 var oauth             = require('../../services/oauth-service');
 var mongoUtils        = require('../../utils/mongo-utils');
@@ -46,6 +48,12 @@ module.exports = bayeuxExtension({
       return callback(new StatusError(401, "Access token required"));
     }
 
+    var tags = [];
+    if (ext.realtimeLibrary) {
+      tags.push('library: ' + ext.realtimeLibrary);
+    }
+    statsd.increment('bayeux.handshake.attempt', 1, 0.25, tags);
+
     oauth.validateAccessTokenAndClient(ext.token, function(err, tokenInfo) {
       if(err) return callback(err);
 
@@ -71,6 +79,8 @@ module.exports = bayeuxExtension({
         client: ext.client,
         troupeId: ext.troupeId,
         oauthClientId: oauthClient.id,
+        uniqueClientId: ext.uniqueClientId,
+        realtimeLibrary: ext.realtimeLibrary,
         eyeballState: parseInt(ext.eyeballs, 10) || 0
       };
 
@@ -93,10 +103,11 @@ module.exports = bayeuxExtension({
     var troupeId = state.troupeId;
     var oauthClientId = state.oauthClientId;
     var uniqueClientId = state.uniqueClientId;
+    var realtimeLibrary = state.realtimeLibrary;
     var eyeballState = state.eyeballState;
 
     // Get the presence service involved around about now
-    presenceService.userSocketConnected(userId, clientId, connectionType, clientType, troupeId, oauthClientId, uniqueClientId, eyeballState, function(err) {
+    presenceService.userSocketConnected(userId, clientId, connectionType, clientType, realtimeLibrary, troupeId, oauthClientId, uniqueClientId, eyeballState, function(err) {
 
       if(err) {
         logger.warn("bayeux: Unable to associate connection " + clientId + ' to ' + userId, { troupeId: troupeId, client: clientType, exception: err });

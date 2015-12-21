@@ -10,9 +10,10 @@ local socket_id = ARGV[2];
 local create_time = ARGV[3];
 local mobile_connection = tonumber(ARGV[4]);
 local client_type = ARGV[5];
-local troupe_id = ARGV[6];
-local oauth_client_id = ARGV[7];
-local unique_client_id = ARGV[8];
+local realtime_library = ARGV[6];
+local troupe_id = ARGV[7];
+local oauth_client_id = ARGV[8];
+local unique_client_id = ARGV[9];
 
 if redis.call("EXISTS", key_socket_user) == 1 then
 	return { 0 }
@@ -24,6 +25,9 @@ redis.call("EXPIRE", key_user_lock, 10);
 redis.call("HSET", key_socket_user, "uid", user_id)
 redis.call("HSET", key_socket_user, "ctime", create_time)
 redis.call("HSET", key_socket_user, "ct", client_type)
+if realtime_library ~= "" then
+  redis.call("HSET", key_socket_user, "rl", realtime_library)
+end
 redis.call("HSET", key_socket_user, "tid", troupe_id)
 if oauth_client_id ~= "" then
   redis.call("HSET", key_socket_user, "ocid", oauth_client_id)
