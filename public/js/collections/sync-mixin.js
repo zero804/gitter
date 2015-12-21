@@ -14,8 +14,6 @@ var methodMap = {
 module.exports = {
   sync: function(method, model, options) {
 
-    console.log('sync', method, model, options);
-
     var url = options.url || _.result(model, 'url');
     if(!url) throw new Error('URL required');
 
@@ -29,10 +27,7 @@ module.exports = {
     }
 
     if(options.success) {
-      promise = promise.then(function(){
-        console.log(arguments);
-        options.success.apply(null, arguments);
-      });
+      promise = promise.then(options.success);
     }
 
     if(options.error) {

@@ -18,8 +18,6 @@ module.exports = (function() {
   /* Put your scrolling panels on rollers */
   function Rollers(target, childContainer, options) {
 
-    console.log('making a roller', target, childContainer, options);
-
     options = options || {};
 
     this._target = target;
