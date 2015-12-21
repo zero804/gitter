@@ -16,7 +16,7 @@ end
 redis.call("HSET", key_socket_user, "ctime", create_time)
 redis.call("HSET", key_socket_user, "ct", client)
 redis.call("HSET", key_socket_user, "tid", troupe_id)
-redis.call("HSET", key_socket_user, "cid", oauth_client_id)
+redis.call("HSET", key_socket_user, "ocid", oauth_client_id)
 
 -- For mobile users, add them to the mobile users collection
 if mobile_connection == 1 then
