@@ -200,7 +200,7 @@ function renderMainFrame(req, res, next, frame) {
       restful.serializeTroupesForUser(userId),
       aroundId && getPermalinkChatForRoom(req.troupe, aroundId)
     ])
-    .spread(function (troupeContext, rooms, orgs, permalinkChat) {
+    .spread(function (troupeContext, rooms, permalinkChat) {
 
       var chatAppQuery = {};
       if (aroundId) {
@@ -273,7 +273,6 @@ function renderMainFrame(req, res, next, frame) {
             .sort(roomSort.recents.sort)
         },
         orgs: suggestedOrgsFromRoomList(rooms),
-        userHasNoOrgs: !orgs || !orgs.length
       });
     })
     .catch(next);

@@ -74,7 +74,8 @@ describe('DNDCtrl', function(){
     });
 
     var el = document.createElement('div');
-    dndCtrl.onItemDropped(null, el);
+    var el2 = document.createElement('div');
+    dndCtrl.onItemDropped(el2, el);
 
   });
 
