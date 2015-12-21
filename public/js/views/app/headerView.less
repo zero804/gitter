@@ -5,17 +5,22 @@
 
 @import "../controls/dropdown";
 
+.chat-header-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
 .chat-header {
 
   box-sizing: border-box;
 
-  z-index: @l1;
+  z-index: 101;
   position: absolute;
   width: 100%;
   // header can expand to fit long topics when hovered over
   min-height: @desktop-header-height;
 
-  padding: 10px 26px 5px @desktop-menu-left-padding;
+  padding: 10px 26px 2px @desktop-menu-left-padding;
 
   background-color: @header-bg;
   border-bottom: 1px solid rgba(0,0,0,0.05);
@@ -67,7 +72,7 @@
   box-sizing: border-box;
   overflow: hidden;
   width: auto;
-  margin: 0 38px 0 68px;
+  margin: 0 38px 0 48px;
 
   .topic-input {
     width: 95%;
@@ -94,7 +99,7 @@
 .chat-header__topic {
   color: #777;
   // min height so that an empty topic can be double clicked to edit
-  min-height: 30px;
+  min-height: 20px;
   // max height to allow height animations
   max-height: 30px;
   line-height: 25px;
@@ -163,7 +168,7 @@
 }
 
 .chat-header__avatar {
-  @side: 48px;
+  @side: 38px;
   height: @side;
   float: left;
   box-sizing: border-box;
@@ -196,5 +201,5 @@
 
 // stop the header from covering the first chat message
 .collaborators-container {
-  margin-top: 72px;
+  margin-top: 65px;
 }
