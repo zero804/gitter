@@ -92,10 +92,11 @@ module.exports = bayeuxExtension({
     var clientType = state.client;
     var troupeId = state.troupeId;
     var oauthClientId = state.oauthClientId;
+    var uniqueClientId = state.uniqueClientId;
     var eyeballState = state.eyeballState;
 
     // Get the presence service involved around about now
-    presenceService.userSocketConnected(userId, clientId, connectionType, clientType, troupeId, oauthClientId, eyeballState, function(err) {
+    presenceService.userSocketConnected(userId, clientId, connectionType, clientType, troupeId, oauthClientId, uniqueClientId, eyeballState, function(err) {
 
       if(err) {
         logger.warn("bayeux: Unable to associate connection " + clientId + ' to ' + userId, { troupeId: troupeId, client: clientType, exception: err });

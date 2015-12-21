@@ -154,7 +154,7 @@ function sendAppEventsForUserEyeballsOffTroupe(userInTroupeCount, totalUsersInTr
 }
 
 
-function userSocketConnected(userId, socketId, connectionType, clientType, troupeId, oauthClientId, eyeballState, callback) {
+function userSocketConnected(userId, socketId, connectionType, clientType, troupeId, oauthClientId, uniqueClientId, eyeballState, callback) {
   if(!socketId) return Promise.reject(new StatusError(400, 'socketId expected')).nodeify(callback);
 
   var isMobileConnection = connectionType == 'mobile';
@@ -162,7 +162,7 @@ function userSocketConnected(userId, socketId, connectionType, clientType, troup
   if(!userId) {
     return redisClient.presenceAssociateAnon(
       /* keys */   keySocketUser(socketId), ACTIVE_SOCKETS_KEY, keyUserSockets('anon'),
-      /* values */ socketId, Date.now(), isMobileConnection ? 1 : 0, clientType, troupeId || null, oauthClientId)
+      /* values */ socketId, Date.now(), isMobileConnection ? 1 : 0, clientType, troupeId || null, oauthClientId, uniqueClientId)
       .spread(function(lockSuccess, saddResult) {
         if(!lockSuccess)  {
           debug('associateSocketAndActivateUser rejected. Socket already exists.', socketId, userId);
@@ -179,7 +179,7 @@ function userSocketConnected(userId, socketId, connectionType, clientType, troup
 
   return redisClient.presenceAssociate(
     /* keys */   keySocketUser(socketId), ACTIVE_USERS_KEY, MOBILE_USERS_KEY, ACTIVE_SOCKETS_KEY, keyUserLock(userId), keyUserSockets(userId),
-    /* values */ userId, socketId, Date.now(), isMobileConnection ? 1 : 0, clientType, troupeId || null, oauthClientId)
+    /* values */ userId, socketId, Date.now(), isMobileConnection ? 1 : 0, clientType, troupeId || null, oauthClientId, uniqueClientId)
     .spread(function(lockSuccess, userSocketCountString, saddResult) {
       if(!lockSuccess)  {
         debug('presence: associateSocketAndActivateUser rejected. Socket already exists.', socketId, userId);
