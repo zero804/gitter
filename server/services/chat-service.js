@@ -4,6 +4,7 @@ var env                  = require('gitter-web-env');
 var stats                = env.stats;
 var config               = env.config;
 var errorReporter        = env.errorReporter;
+var logger               = env.logger;
 
 var ChatMessage          = require("./persistence-service").ChatMessage;
 var collections          = require("../utils/collections");
@@ -353,10 +354,19 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
           q.hint({ toTroupeId: 1, sent: -1 });
         }
 
-        return q.sort(options.sort || { sent: sentOrder })
-          .limit(limit)
-          .skip(skip)
-          .lean()
+        q = q.sort(options.sort || { sent: sentOrder })
+          .limit(limit);
+
+        if (skip) {
+          if (skip > 1000) {
+            logger.warn('chat-service: Client requested large skip value on chat message collection query', { troupeId: troupeId, skip: skip })
+          }
+
+          q = q.skip(skip)
+            .read('secondaryPreferred');
+        }
+
+        q = q.lean()
           .exec()
           .then(function(results) {
             mongooseUtils.addIdToLeanArray(results);
