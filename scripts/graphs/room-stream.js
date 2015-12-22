@@ -47,7 +47,8 @@ module.exports = function roomStream() {
         roomId: '' + room._id,
         security: room.security,
         weight: weight,
-        lcOwner: room.lcOwner
+        lcOwner: room.lcOwner,
+        uri:room.uri
       });
     }))
     .pipe(csv.createWriteStream({ headers: true }));

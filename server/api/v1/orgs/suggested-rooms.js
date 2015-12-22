@@ -1,9 +1,11 @@
 'use strict';
 
+var suggestions         = require('gitter-web-suggestions');
+
 module.exports = {
   index: function(req) {
-    console.log('-----------------------');
-    console.log('holy what now', req.params);
-    console.log('-----------------------');
+    var userId  = req.user._id;
+    var orgName = req.params.orgName.toLowerCase();
+    return suggestions.getSuggestionsForOrg(orgName, userId);
   },
 };
