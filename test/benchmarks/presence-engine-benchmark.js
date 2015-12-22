@@ -24,7 +24,7 @@ function FakeClient(socketId, userId, troupeId, script) {
 
 FakeClient.prototype = {
   connect: function() {
-    return presenceService.userSocketConnected(this.userId, this.socketId, 'test', 'test', this.troupeId, null, true);
+    return presenceService.userSocketConnected(this.userId, this.socketId, 'test', 'test', 'fake', null, this.troupeId, null, true);
   },
 
   disconnect: function() {
