@@ -4,6 +4,7 @@ var env                  = require('gitter-web-env');
 var stats                = env.stats;
 var config               = env.config;
 var errorReporter        = env.errorReporter;
+var logger               = env.logger;
 
 var ChatMessage          = require("./persistence-service").ChatMessage;
 var collections          = require("../utils/collections");
@@ -307,15 +308,19 @@ function sentAfter(objectId) {
  * Returns a promise of messages
  */
 exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
+  var limit = Math.min(options.limit || 50, 100);
+  var skip = options.skip || 0;
+
+  if (skip > 5000) {
+    return Q.reject(new StatusError(400, 'Skip is limited to 5000 items. Please use beforeId rather than skip. See https://developer.gitter.im'));
+  }
+
   var findMarker;
   if(options.marker === 'first-unread' && options.userId) {
     findMarker = findFirstUnreadMessageId(troupeId, options.userId);
   } else {
     findMarker = Q.resolve(null);
   }
-
-  var limit = Math.min(options.limit || 50, 100);
-  var skip = options.skip || 0;
 
   return findMarker
     .then(function(markerId) {
@@ -353,10 +358,19 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
           q.hint({ toTroupeId: 1, sent: -1 });
         }
 
-        return q.sort(options.sort || { sent: sentOrder })
-          .limit(limit)
-          .skip(skip)
-          .lean()
+        q = q.sort(options.sort || { sent: sentOrder })
+          .limit(limit);
+
+        if (skip) {
+          if (skip > 1000) {
+            logger.warn('chat-service: Client requested large skip value on chat message collection query', { troupeId: troupeId, skip: skip })
+          }
+
+          q = q.skip(skip)
+            .read('secondaryPreferred');
+        }
+
+        return q.lean()
           .exec()
           .then(function(results) {
             mongooseUtils.addIdToLeanArray(results);
