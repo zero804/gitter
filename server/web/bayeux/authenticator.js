@@ -50,7 +50,7 @@ module.exports = bayeuxExtension({
 
     var tags = [];
     if (ext.realtimeLibrary) {
-      tags.push('library: ' + ext.realtimeLibrary);
+      tags.push('library:' + ext.realtimeLibrary);
     }
     statsd.increment('bayeux.handshake.attempt', 1, 0.25, tags);
 
