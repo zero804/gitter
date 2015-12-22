@@ -75,3 +75,15 @@ function getSuggestionsForUser(user /*, locale */) {
     });
 }
 exports.getSuggestionsForUser = getSuggestionsForUser;
+
+//TODO Test this JP 21/12/15
+function getSuggestionsForOrg(orgName) {
+  return query("MATCH (r:Room) RETURN r")
+    .then(function(result){
+      console.log('-----------------------');
+      console.log(result);
+      console.log('-----------------------');
+      return result;
+    });
+}
+exports.getSuggestionsForOrg = getSuggestionsForOrg;
