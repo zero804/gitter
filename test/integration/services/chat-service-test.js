@@ -118,14 +118,25 @@ describe('chatService', function() {
         })
         .nodeify(done);
     });
+
     it('should find messages with skip', function(done) {
       return chatService.findChatMessagesForTroupe(fixture.troupe1.id, { skip: 1 })
         .then(function(chats) {
           assert.strictEqual(chats.filter(function(f) { return f.id == chat1; }).length, 1);
           assert.strictEqual(chats.filter(function(f) { return f.id == chat2; }).length, 1);
-          
+
           // This message should not be there
           assert.strictEqual(chats.filter(function(f) { return f.id == chat3; }).length, 0);
+        })
+        .nodeify(done);
+    });
+
+    it('should not allow skip greater than 5000', function(done) {
+      return chatService.findChatMessagesForTroupe(fixture.troupe1.id, { skip: 10000 })
+        .then(function() {
+          assert.ok(false);
+        }, function(err) {
+          assert.strictEqual(err.message, 'Skip is limited to 5000 items. Please use beforeId rather than skip. See https://developer.gitter.im');
         })
         .nodeify(done);
     });
