@@ -308,15 +308,19 @@ function sentAfter(objectId) {
  * Returns a promise of messages
  */
 exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
+  var limit = Math.min(options.limit || 50, 100);
+  var skip = options.skip || 0;
+
+  if (skip > 5000) {
+    return Q.reject(new StatusError(400, 'Skip is limited to 5000 items. Please use beforeId rather than skip. See https://developer.gitter.im'));
+  }
+
   var findMarker;
   if(options.marker === 'first-unread' && options.userId) {
     findMarker = findFirstUnreadMessageId(troupeId, options.userId);
   } else {
     findMarker = Q.resolve(null);
   }
-
-  var limit = Math.min(options.limit || 50, 100);
-  var skip = options.skip || 0;
 
   return findMarker
     .then(function(markerId) {
@@ -366,7 +370,7 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
             .read('secondaryPreferred');
         }
 
-        q = q.lean()
+        return q.lean()
           .exec()
           .then(function(results) {
             mongooseUtils.addIdToLeanArray(results);

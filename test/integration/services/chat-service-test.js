@@ -118,6 +118,17 @@ describe('chatService', function() {
         })
         .nodeify(done);
     });
+    it('should find messages with skip', function(done) {
+      return chatService.findChatMessagesForTroupe(fixture.troupe1.id, { skip: 1 })
+        .then(function(chats) {
+          assert.strictEqual(chats.filter(function(f) { return f.id == chat1; }).length, 1);
+          assert.strictEqual(chats.filter(function(f) { return f.id == chat2; }).length, 1);
+          
+          // This message should not be there
+          assert.strictEqual(chats.filter(function(f) { return f.id == chat3; }).length, 0);
+        })
+        .nodeify(done);
+    });
 
     it('should find messages using beforeId', function(done) {
       return chatService.findChatMessagesForTroupe(fixture.troupe1.id, { beforeId: chat2 })
@@ -155,4 +166,3 @@ describe('chatService', function() {
   });
 
 });
-
