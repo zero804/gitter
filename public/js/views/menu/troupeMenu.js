@@ -164,7 +164,7 @@ module.exports = (function () {
             return new CollectionWrapperView(optionsForRegion({
               collection: troupeCollections.orgs,
               childView: OrgCollectionView,
-              header: 'Your Organizations',
+              header: 'Your Organisations',
               prerendered: true
             }));
 
