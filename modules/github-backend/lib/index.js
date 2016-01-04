@@ -19,6 +19,9 @@ GitHubBackend.prototype.getEmailAddress = function(preferStoredEmail) {
 GitHubBackend.prototype.findOrgs = function() {
   var user = this.user;
   var ghUser = new GithubMe(user);
+  if (!ghUser.accessToken) {
+    return Q.resolve([]);
+  }
   return ghUser.getOrgs()
     .then(function(ghOrgs) {
       // TODO: change these to be in a standard internal format
