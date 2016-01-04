@@ -210,6 +210,7 @@
     "mutantjs": "^0.2.0",
     "nanoscroller": "^0.8.7",
     "node-spritesheet": "trevorah/node-spritesheet",
+    "nodemon": "^1.8.1",
     "object-inspect": "^1.0.2",
     "postcss": "^4.0.0",
     "postcss-calc": "^5.0.0",
