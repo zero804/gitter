@@ -80,8 +80,8 @@ exports.getSuggestionsForUser = getSuggestionsForUser;
 function getSuggestionsForOrg(orgName, userId) {
   return query("MATCH (u:User)-[:MEMBER]->(r:Room)" +
                "WHERE r.lcOwner = {orgName} " +
-                  //"AND u.userId = {userId}"  +
-                  //"AND NOT (u-[:MEMBER]-r)" +
+                  "AND u.userId = {userId}"  +
+                  "AND NOT (u-[:MEMBER]-r)" +
                "RETURN r.roomId, count(*) * r.weight as occurrence " +
                "ORDER BY occurrence DESC " +
                "LIMIT 6",
