@@ -77,13 +77,22 @@ function getSuggestionsForUser(user /*, locale */) {
 exports.getSuggestionsForUser = getSuggestionsForUser;
 
 //TODO Test this JP 21/12/15
-function getSuggestionsForOrg(orgName) {
-  return query("MATCH (r:Room) RETURN r")
-    .then(function(result){
-      console.log('-----------------------');
-      console.log(result);
-      console.log('-----------------------');
-      return result;
+function getSuggestionsForOrg(orgName, userId) {
+  return query("MATCH (u:User)-[:MEMBER]->(r:Room)" +
+               "WHERE r.lcOwner = {orgName} " +
+                  //"AND u.userId = {userId}"  +
+                  //"AND NOT (u-[:MEMBER]-r)" +
+               "RETURN r.roomId, count(*) * r.weight as occurrence " +
+               "ORDER BY occurrence DESC " +
+               "LIMIT 6",
+        {
+          orgName: orgName,
+          userId:  userId
+        })
+    .then(function(results){
+      return results.data.map(function(f){
+        return { roomId: f[0] };
+      });
     });
 }
 exports.getSuggestionsForOrg = getSuggestionsForOrg;
