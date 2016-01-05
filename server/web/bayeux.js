@@ -15,6 +15,7 @@ var adviceAdjuster    = require('./bayeux/advice-adjuster');
 var authenticatorExtension = require('./bayeux/authenticator');
 var loggingExtension  = require('./bayeux/logging');
 var debug             = require('debug')('gitter:bayeux');
+var Q                 = require('q');
 
 /* Disabled after the outage 8 April 2015 XXX investigate further */
 // var createDoormanExtension = require('./bayeux/doorman');
@@ -27,16 +28,16 @@ var fayeLoggingLevel = nconf.get('ws:fayeLogging');
 
 var STATS_FREQUENCY = 0.01;
 
-function makeServer(endpoint, redisClient, redisSubscribeClient) {
+function makeServer(endpoint, redisClient, redisSubscribeClient, timeout) {
   var server = new faye.NodeAdapter({
     mount: endpoint,
-    timeout: nconf.get('ws:fayeTimeout'), // Time before an inactive client is timed out
+    timeout: timeout, // Time before an inactive client is timed out
     ping: nconf.get('ws:fayePing'),       // Time between pings from the server to the client
     engine: {
       type: fayeRedis,
       client: redisClient,
       subscriberClient: redisSubscribeClient, // Subscribe. Needs new client,
-      interval: 0.5, // Amount of time before sending queued messages
+      interval: 0.5, // Amount of time between `connect` messages
       includeSequence: true,
       namespace: 'fr:',
       statsDelegate: function(category, event) {
@@ -126,8 +127,15 @@ function makeServer(endpoint, redisClient, redisSubscribeClient) {
 /**
  * Create the servers
  */
-var serverNew = makeServer('/bayeux', env.redis.createClient(nconf.get("redis_faye")), env.redis.createClient(nconf.get("redis_faye"))); // Subscribe. Needs new client
-var serverLegacy = makeServer('/faye', env.redis.createClient(), env.redis.createClient()); // Subscribe. Needs new client
+var serverNew = makeServer('/bayeux',
+                  env.redis.createClient(nconf.get("redis_faye")),
+                  env.redis.createClient(nconf.get("redis_faye")),
+                  nconf.get('ws:fayeTimeout'));
+
+var serverLegacy = makeServer('/faye',
+                    env.redis.createClient(),
+                    env.redis.createClient(),
+                    nconf.get('ws:fayeTimeoutOLD'));
 
 /**
  * Create the clients
@@ -137,7 +145,6 @@ clientNew.addExtension(superClientExtension);
 
 var clientLegacy = serverLegacy.getClient();
 clientLegacy.addExtension(superClientExtension);
-
 
 /* This function is used a lot, this version excludes try-catch so that it can be optimised */
 function stringifyInternal(object) {
@@ -211,28 +218,20 @@ exports.publish = function(channel, message) {
 exports.destroyClient = function(clientId, callback) {
   if (!clientId) return;
 
+  var engineNew = serverNew._server._engine;
+  var engineLegacy = serverLegacy._server._engine;
+
   logger.info('bayeux: client ' + clientId + ' intentionally destroyed.');
 
-  var engineLegacy = serverLegacy._server._engine;
-  engineLegacy.destroyClient(clientId, callback);
+  var p1 = new Q.Promise(function(resolve) {
+    engineNew.destroyClient(clientId, resolve);
+  });
 
-  // setImmediate(function() {
-  //   var count = 0;
-  //
-  //   // Wait for both callbacks
-  //   function done() {
-  //     count++;
-  //     if (count === 2) {
-  //       if (callback) return callback();
-  //     }
-  //   }
-  //
-  //   var engineNew = serverNew._server._engine;
-  //   engineNew.destroyClient(clientId, done);
-  //
-  //   var engineLegacy = serverLegacy._server._engine;
-  //   engineLegacy.destroyClient(clientId, done);
-  // });
+  var p2 = new Q.Promise(function(resolve) {
+    engineLegacy.destroyClient(clientId, resolve);
+  });
+
+  return Q.all([p1, p2]).nodeify(callback);
 };
 
 /**
