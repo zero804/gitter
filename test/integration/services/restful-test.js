@@ -135,4 +135,8 @@ describe('restful', function() {
     return restful.serializeOrgsForUserId(fixture.user1.id)
       .nodeify(done);
   });
+
+  it('serializes orgs', function() {
+    return restful.serializeOrgsForUserId(fixture.user1.id);
+  });
 });
