@@ -126,14 +126,14 @@ function makeServer(endpoint, redisClient, redisSubscribeClient) {
 /**
  * Create the servers
  */
-// var serverNew = makeServer('/faye2', env.redis.createClient(nconf.get("redis_nopersist")), env.redis.createClient(nconf.get("redis_nopersist"))); // Subscribe. Needs new client
+var serverNew = makeServer('/bayeux', env.redis.createClient(nconf.get("redis_faye")), env.redis.createClient(nconf.get("redis_faye"))); // Subscribe. Needs new client
 var serverLegacy = makeServer('/faye', env.redis.createClient(), env.redis.createClient()); // Subscribe. Needs new client
 
 /**
  * Create the clients
  */
-// var clientNew = serverNew.getClient();
-// clientNew.addExtension(superClientExtension);
+var clientNew = serverNew.getClient();
+clientNew.addExtension(superClientExtension);
 
 var clientLegacy = serverLegacy.getClient();
 clientLegacy.addExtension(superClientExtension);
@@ -187,21 +187,21 @@ if(debug.enabled && fayeLoggingLevel === 'debug') {
 /** Returns callback(exists) to match faye */
 exports.clientExists = function(clientId, callback) {
   // Try the new server first
-  // serverNew._server._engine.clientExists(clientId, function(exists) {
-  //   if (exists) return callback(true);
+  serverNew._server._engine.clientExists(clientId, function(exists) {
+    if (exists) return callback(true);
 
     // Try the legacy server next
     serverLegacy._server._engine.clientExists(clientId, function(exists) {
       return callback(exists);
     });
-  // });
+  });
 };
 
 /**
  * Publish a message on Faye
  */
 exports.publish = function(channel, message) {
-  // clientNew.publish(channel, message);
+  clientNew.publish(channel, message);
   clientLegacy.publish(channel, message);
 };
 
@@ -239,6 +239,6 @@ exports.destroyClient = function(clientId, callback) {
  * Attach the faye instance to the server
  */
 exports.attach = function(httpServer) {
-  // serverNew.attach(httpServer);
+  serverNew.attach(httpServer);
   serverLegacy.attach(httpServer);
 };
