@@ -8,6 +8,7 @@ var registeredBackends = {
   google: require('gitter-web-google-backend'),
   github: require('gitter-web-github-backend'),
   twitter: require('gitter-web-twitter-backend'),
+  linkedin: require('gitter-web-linkedin-backend'),
   // ...
 };
 

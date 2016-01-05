@@ -42,17 +42,17 @@
             "core-util-is": {
               "version": "1.0.2",
               "from": "core-util-is@>=1.0.0 <1.1.0",
-              "resolved": "https://registry.npmjs.org/core-util-is/-/core-util-is-1.0.2.tgz"
+              "resolved": "http://beta-internal:4873/core-util-is/-/core-util-is-1.0.2.tgz"
             },
             "isarray": {
               "version": "0.0.1",
               "from": "isarray@0.0.1",
-              "resolved": "http://beta-internal:4873/isarray/-/isarray-0.0.1.tgz"
+              "resolved": "https://registry.npmjs.org/isarray/-/isarray-0.0.1.tgz"
             },
             "string_decoder": {
               "version": "0.10.31",
               "from": "string_decoder@>=0.10.0 <0.11.0",
-              "resolved": "https://registry.npmjs.org/string_decoder/-/string_decoder-0.10.31.tgz"
+              "resolved": "http://beta-internal:4873/string_decoder/-/string_decoder-0.10.31.tgz"
             },
             "inherits": {
               "version": "2.0.1",
@@ -521,7 +521,7 @@
         "ms": {
           "version": "0.7.1",
           "from": "ms@0.7.1",
-          "resolved": "https://registry.npmjs.org/ms/-/ms-0.7.1.tgz"
+          "resolved": "http://beta-internal:4873/ms/-/ms-0.7.1.tgz"
         }
       }
     },
@@ -970,17 +970,17 @@
                 "core-util-is": {
                   "version": "1.0.2",
                   "from": "core-util-is@>=1.0.0 <1.1.0",
-                  "resolved": "https://registry.npmjs.org/core-util-is/-/core-util-is-1.0.2.tgz"
+                  "resolved": "http://beta-internal:4873/core-util-is/-/core-util-is-1.0.2.tgz"
                 },
                 "isarray": {
                   "version": "0.0.1",
                   "from": "isarray@0.0.1",
-                  "resolved": "http://beta-internal:4873/isarray/-/isarray-0.0.1.tgz"
+                  "resolved": "https://registry.npmjs.org/isarray/-/isarray-0.0.1.tgz"
                 },
                 "string_decoder": {
                   "version": "0.10.31",
                   "from": "string_decoder@>=0.10.0 <0.11.0",
-                  "resolved": "https://registry.npmjs.org/string_decoder/-/string_decoder-0.10.31.tgz"
+                  "resolved": "http://beta-internal:4873/string_decoder/-/string_decoder-0.10.31.tgz"
                 },
                 "inherits": {
                   "version": "2.0.1",
@@ -1624,6 +1624,11 @@
       "from": "modules/google-backend",
       "resolved": "file:modules/google-backend"
     },
+    "gitter-web-linkedin-backend": {
+      "version": "1.0.0",
+      "from": "modules/linkedin-backend",
+      "resolved": "file:modules/linkedin-backend"
+    },
     "gitter-web-presence": {
       "version": "1.0.0",
       "from": "modules/presence",
@@ -2150,17 +2155,17 @@
             "core-util-is": {
               "version": "1.0.2",
               "from": "core-util-is@>=1.0.0 <1.1.0",
-              "resolved": "https://registry.npmjs.org/core-util-is/-/core-util-is-1.0.2.tgz"
+              "resolved": "http://beta-internal:4873/core-util-is/-/core-util-is-1.0.2.tgz"
             },
             "isarray": {
               "version": "0.0.1",
               "from": "isarray@0.0.1",
-              "resolved": "http://beta-internal:4873/isarray/-/isarray-0.0.1.tgz"
+              "resolved": "https://registry.npmjs.org/isarray/-/isarray-0.0.1.tgz"
             },
             "string_decoder": {
               "version": "0.10.31",
               "from": "string_decoder@>=0.10.0 <0.11.0",
-              "resolved": "https://registry.npmjs.org/string_decoder/-/string_decoder-0.10.31.tgz"
+              "resolved": "http://beta-internal:4873/string_decoder/-/string_decoder-0.10.31.tgz"
             },
             "inherits": {
               "version": "2.0.1",
@@ -2301,17 +2306,17 @@
                 "core-util-is": {
                   "version": "1.0.2",
                   "from": "core-util-is@>=1.0.0 <1.1.0",
-                  "resolved": "https://registry.npmjs.org/core-util-is/-/core-util-is-1.0.2.tgz"
+                  "resolved": "http://beta-internal:4873/core-util-is/-/core-util-is-1.0.2.tgz"
                 },
                 "isarray": {
                   "version": "0.0.1",
                   "from": "isarray@0.0.1",
-                  "resolved": "http://beta-internal:4873/isarray/-/isarray-0.0.1.tgz"
+                  "resolved": "https://registry.npmjs.org/isarray/-/isarray-0.0.1.tgz"
                 },
                 "string_decoder": {
                   "version": "0.10.31",
                   "from": "string_decoder@>=0.10.0 <0.11.0",
-                  "resolved": "https://registry.npmjs.org/string_decoder/-/string_decoder-0.10.31.tgz"
+                  "resolved": "http://beta-internal:4873/string_decoder/-/string_decoder-0.10.31.tgz"
                 },
                 "inherits": {
                   "version": "2.0.1",
@@ -2689,17 +2694,17 @@
                     "core-util-is": {
                       "version": "1.0.2",
                       "from": "core-util-is@>=1.0.0 <1.1.0",
-                      "resolved": "https://registry.npmjs.org/core-util-is/-/core-util-is-1.0.2.tgz"
+                      "resolved": "http://beta-internal:4873/core-util-is/-/core-util-is-1.0.2.tgz"
                     },
                     "isarray": {
                       "version": "0.0.1",
                       "from": "isarray@0.0.1",
-                      "resolved": "http://beta-internal:4873/isarray/-/isarray-0.0.1.tgz"
+                      "resolved": "https://registry.npmjs.org/isarray/-/isarray-0.0.1.tgz"
                     },
                     "string_decoder": {
                       "version": "0.10.31",
                       "from": "string_decoder@>=0.10.0 <0.11.0",
-                      "resolved": "https://registry.npmjs.org/string_decoder/-/string_decoder-0.10.31.tgz"
+                      "resolved": "http://beta-internal:4873/string_decoder/-/string_decoder-0.10.31.tgz"
                     },
                     "inherits": {
                       "version": "2.0.1",
@@ -2924,6 +2929,40 @@
         }
       }
     },
+    "passport-linkedin-oauth2": {
+      "version": "1.4.0",
+      "from": "passport-linkedin-oauth2@latest",
+      "resolved": "http://beta-internal:4873/passport-linkedin-oauth2/-/passport-linkedin-oauth2-1.4.0.tgz",
+      "dependencies": {
+        "passport-oauth2": {
+          "version": "1.1.2",
+          "from": "passport-oauth2@>=1.1.2 <2.0.0",
+          "resolved": "http://beta-internal:4873/passport-oauth2/-/passport-oauth2-1.1.2.tgz",
+          "dependencies": {
+            "passport-strategy": {
+              "version": "1.0.0",
+              "from": "passport-strategy@>=1.0.0 <2.0.0",
+              "resolved": "http://beta-internal:4873/passport-strategy/-/passport-strategy-1.0.0.tgz"
+            },
+            "oauth": {
+              "version": "0.9.14",
+              "from": "oauth@>=0.9.0 <0.10.0",
+              "resolved": "http://beta-internal:4873/oauth/-/oauth-0.9.14.tgz"
+            },
+            "uid2": {
+              "version": "0.0.3",
+              "from": "uid2@>=0.0.0 <0.1.0",
+              "resolved": "http://beta-internal:4873/uid2/-/uid2-0.0.3.tgz"
+            }
+          }
+        },
+        "underscore": {
+          "version": "1.8.3",
+          "from": "underscore@>=1.7.0 <2.0.0",
+          "resolved": "http://beta-internal:4873/underscore/-/underscore-1.8.3.tgz"
+        }
+      }
+    },
     "passport-oauth2-client-password": {
       "version": "0.1.2",
       "from": "passport-oauth2-client-password@>=0.1.2 <0.2.0",
@@ -3145,7 +3184,7 @@
                     "core-util-is": {
                       "version": "1.0.2",
                       "from": "core-util-is@>=1.0.0 <1.1.0",
-                      "resolved": "https://registry.npmjs.org/core-util-is/-/core-util-is-1.0.2.tgz"
+                      "resolved": "http://beta-internal:4873/core-util-is/-/core-util-is-1.0.2.tgz"
                     },
                     "inherits": {
                       "version": "2.0.1",
@@ -3155,7 +3194,7 @@
                     "isarray": {
                       "version": "0.0.1",
                       "from": "isarray@0.0.1",
-                      "resolved": "http://beta-internal:4873/isarray/-/isarray-0.0.1.tgz"
+                      "resolved": "https://registry.npmjs.org/isarray/-/isarray-0.0.1.tgz"
                     },
                     "process-nextick-args": {
                       "version": "1.0.6",
@@ -3165,7 +3204,7 @@
                     "string_decoder": {
                       "version": "0.10.31",
                       "from": "string_decoder@>=0.10.0 <0.11.0",
-                      "resolved": "https://registry.npmjs.org/string_decoder/-/string_decoder-0.10.31.tgz"
+                      "resolved": "http://beta-internal:4873/string_decoder/-/string_decoder-0.10.31.tgz"
                     },
                     "util-deprecate": {
                       "version": "1.0.2",
@@ -3689,7 +3728,7 @@
                     "core-util-is": {
                       "version": "1.0.2",
                       "from": "core-util-is@>=1.0.0 <1.1.0",
-                      "resolved": "https://registry.npmjs.org/core-util-is/-/core-util-is-1.0.2.tgz"
+                      "resolved": "http://beta-internal:4873/core-util-is/-/core-util-is-1.0.2.tgz"
                     },
                     "inherits": {
                       "version": "2.0.1",
@@ -3699,7 +3738,7 @@
                     "isarray": {
                       "version": "0.0.1",
                       "from": "isarray@0.0.1",
-                      "resolved": "http://beta-internal:4873/isarray/-/isarray-0.0.1.tgz"
+                      "resolved": "https://registry.npmjs.org/isarray/-/isarray-0.0.1.tgz"
                     },
                     "process-nextick-args": {
                       "version": "1.0.6",
@@ -3709,7 +3748,7 @@
                     "string_decoder": {
                       "version": "0.10.31",
                       "from": "string_decoder@>=0.10.0 <0.11.0",
-                      "resolved": "https://registry.npmjs.org/string_decoder/-/string_decoder-0.10.31.tgz"
+                      "resolved": "http://beta-internal:4873/string_decoder/-/string_decoder-0.10.31.tgz"
                     },
                     "util-deprecate": {
                       "version": "1.0.2",
@@ -4086,7 +4125,7 @@
                 "core-util-is": {
                   "version": "1.0.2",
                   "from": "core-util-is@>=1.0.0 <1.1.0",
-                  "resolved": "https://registry.npmjs.org/core-util-is/-/core-util-is-1.0.2.tgz"
+                  "resolved": "http://beta-internal:4873/core-util-is/-/core-util-is-1.0.2.tgz"
                 },
                 "inherits": {
                   "version": "2.0.1",
@@ -4096,7 +4135,7 @@
                 "isarray": {
                   "version": "0.0.1",
                   "from": "isarray@0.0.1",
-                  "resolved": "http://beta-internal:4873/isarray/-/isarray-0.0.1.tgz"
+                  "resolved": "https://registry.npmjs.org/isarray/-/isarray-0.0.1.tgz"
                 },
                 "process-nextick-args": {
                   "version": "1.0.6",
@@ -4106,7 +4145,7 @@
                 "string_decoder": {
                   "version": "0.10.31",
                   "from": "string_decoder@>=0.10.0 <0.11.0",
-                  "resolved": "https://registry.npmjs.org/string_decoder/-/string_decoder-0.10.31.tgz"
+                  "resolved": "http://beta-internal:4873/string_decoder/-/string_decoder-0.10.31.tgz"
                 },
                 "util-deprecate": {
                   "version": "1.0.2",
