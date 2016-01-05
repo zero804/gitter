@@ -14,15 +14,15 @@ var Criteria = {
     var user = userDetails.user;
     if (!user) return false;
     var timestamp = Math.round(mongoUtils.getTimestampFromObjectId(user._id) / 1000) || 0;
-    return (timestamp % 100 < percent);
+    return (timestamp % 100 < percent) || undefined;
   },
 
   /* Allow a hash of usernames */
   allowUsernames: function(userDetails, usernameHash) {
     var user = userDetails.user;
     if (!user) return false;
-    if (!usernameHash) return false;
-    return !!usernameHash[user.username];
+    if (!usernameHash) return undefined;
+    return !!usernameHash[user.username] || undefined;
   },
 
   disableBrowser: function(userDetails, browsers) {
@@ -66,7 +66,9 @@ function getFeatures(callback) {
 fflip.config({
   criteria: Criteria,
   features: getFeatures,
-  reload: 60 // Reload features every 60 seconds
+  reload: 60, // Reload features every 60 seconds
+  maxCookieAge: 31 * 86400 * 1000,
+  useVetoVoting: true
 });
 
 
