@@ -56,11 +56,20 @@ function getTwitterUrlForSize(url, size) {
 }
 
 function getSrcSetForTwitterUrl(url, options) {
-  // see https://dev.twitter.com/overview/general/user-profile-images-and-banners
   return {
     src: getTwitterUrlForSize(url, options.srcSize),
     size: options.size,
     srcset: getTwitterUrlForSize(url, options.size*2) + ' 2x'
+  }
+}
+
+function getSrcSetForLinkedInUrl(url, options) {
+  // TODO: doesn't look like linkedin profile pics are resizable, so just send the
+  // originals for now
+  return {
+    src: url,
+    size: options.size,
+    srcset: url + ' 2x'
   }
 }
 
@@ -110,6 +119,9 @@ function srcSetForUser(user, size) {
 
   if (url.hostname == 'pbs.twimg.com') {
     return getSrcSetForTwitterUrl(url, options);
+
+  } else if (url.hostname == 'media.licdn.com') {
+    return getSrcSetForLinkedInUrl(url, options);
 
   } else {
     return getSrcSetForDefaultUrl(url, options);
