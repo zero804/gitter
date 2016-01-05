@@ -14,7 +14,7 @@ var Criteria = {
     var user = userDetails.user;
     if (!user) return false;
     var timestamp = Math.round(mongoUtils.getTimestampFromObjectId(user._id) / 1000) || 0;
-    return (timestamp % 100 < percent);
+    return (timestamp % 100 < percent) || undefined;
   },
 
   /* Allow a hash of usernames */
@@ -22,7 +22,7 @@ var Criteria = {
     var user = userDetails.user;
     if (!user) return false;
     if (!usernameHash) return false;
-    return !!usernameHash[user.username];
+    return !!usernameHash[user.username] || undefined;
   },
 
   disableBrowser: function(userDetails, browsers) {
