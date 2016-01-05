@@ -21,7 +21,7 @@ var Criteria = {
   allowUsernames: function(userDetails, usernameHash) {
     var user = userDetails.user;
     if (!user) return false;
-    if (!usernameHash) return false;
+    if (!usernameHash) return undefined;
     return !!usernameHash[user.username] || undefined;
   },
 
@@ -66,7 +66,9 @@ function getFeatures(callback) {
 fflip.config({
   criteria: Criteria,
   features: getFeatures,
-  reload: 60 // Reload features every 60 seconds
+  reload: 60, // Reload features every 60 seconds
+  maxCookieAge: 31 * 86400 * 1000,
+  useVetoVoting: true
 });
 
 
