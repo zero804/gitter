@@ -8,10 +8,14 @@ require('gitter-styleguide/css/components/buttons.css');
 
 module.exports = Marionette.ItemView.extend({
   template: template,
-  className: 'panel-footer',
 
   modelEvents: {
     'change:state': 'onModelChange',
+  },
+
+  ui: {
+    searchFooter: '#panel-footer--search',
+    allFooter: '#panel-footer--all'
   },
 
   initialize: function(attrs) {
@@ -24,7 +28,8 @@ module.exports = Marionette.ItemView.extend({
 
   onModelChange: function(model, val) {//jshint unused: true
     RAF(function(){
-      this.$el.toggleClass('active', (val === 'search'));
+      this.ui.searchFooter.toggleClass('active', (val === 'search'));
+      this.ui.allFooter.toggleClass('active', (val !== 'search'));
     }.bind(this));
   },
 

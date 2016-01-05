@@ -2,21 +2,39 @@
 @import "../../../../../less/components/menu/room/menu-text.less";
 
 .panel-footer-container {
-  margin-top: auto;
-  overflow:   hidden;
+  position:     absolute;
+  bottom:       0;
+  left:         -1px;
+  width:        100%;
+  z-index:      1;
 }
 
-.panel-footer {
-  position:       relative;
-  text-align:     center;
-  padding:        @desktop-menu-left-padding;
-  padding-bottom: 8.8rem;
-  transition:     transform .2s ease-in-out;
-  transform:      translateY(100%);
+.panel-footer__item {
+  position:   absolute;
+  bottom:     0;
+  width:      100%;
+  box-sizing: border-box;
+  padding:    2.3rem;
+  transform:  translateY(100%);
+  transition: transform .2s ease-in-out;
 
   &.active {
     transform: translateY(0);
   }
+}
+
+.panel-footer__item--search {
+  .panel-footer__item();
+  box-sizing:     border-box;
+  padding-bottom: 8.8rem;
+  text-align:     center;
+}
+
+.panel-footer__item--all {
+  .panel-footer__item();
+  display:         flex;
+  flex-direction:  row-reverse;
+  align-item:      center;
 }
 
 .panel-footer__title {
@@ -26,7 +44,8 @@
 
 .panel-footer__desc {
   .room-menu-text();
-  line-height: 1.5;
+  margin-bottom: 2.2rem;
+  line-height:   1.5;
 }
 
 .panel-footer__link {
@@ -34,10 +53,19 @@
 }
 
 .panel-footer__img {
-  position: absolute;
-  bottom:   0;
-  left:     0;
-  width:    100%;
-  height:   auto;
+  position:       absolute;
+  bottom:         0;
+  left:           0;
+  width:          100%;
+  height:         auto;
   pointer-events: none;
+}
+
+.panel-footer__create-room {
+  width:  3.3rem;
+  height: 3.3rem;
+
+  &:hover {
+    cursor: pointer;
+  }
 }
