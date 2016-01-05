@@ -26,15 +26,16 @@ var Criteria = {
   },
 
   disableBrowser: function(userDetails, browsers) {
-    if (!browsers) return true;
+    if (!browsers) return undefined;
 
     var agent = useragent.parse(userDetails.userAgent);
 
-    var allowedVersion = browsers[agent.family];
-    if (!allowedVersion) return true;
+    var disabledVersion = browsers[agent.family];
+    if (!disabledVersion) return undefined;
 
-    if (allowedVersion === 'all') return false;
-    return agent.major > allowedVersion;
+    if (disabledVersion === 'all') return false;
+    if (agent.major <= disabledVersion) return false;
+    return undefined;
   },
 
   /* Enabled criteria */
