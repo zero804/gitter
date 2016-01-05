@@ -21,12 +21,11 @@ function linkedinOauth2Callback(req, accessToken, refreshToken, profile, done) {
     provider: 'linkedin',
     providerKey: profile.id,
     displayName: profile.displayName,
-    // this is null for linkedin for some reason even though we ask for
-    // permission for the email address and the user opts in to it.
     email: profile.email,
     // LinkedIn accessTokens only live 60 days
     accessToken: accessToken,
     // appears to be undefined for LinkedIn
+    //https://github.com/auth0/passport-linkedin-oauth2/issues/18
     refreshToken: refreshToken,
     avatar: avatar
   };
@@ -59,6 +58,9 @@ var linkedInStrategy = new LinkedInStrategy({
     clientID: config.get('linkedinoauth2:client_id'),
     clientSecret: config.get('linkedinoauth2:client_secret'),
     callbackURL: config.get('web:basepath') + '/login/linkedin/callback',
+    // see https://github.com/auth0/passport-linkedin-oauth2/issues/2
+    // (scope only works here and not when calling passport.authorize)
+    scope: ['r_basicprofile', 'r_emailaddress'],
     passReqToCallback: true
   }, linkedinOauth2Callback);
 
