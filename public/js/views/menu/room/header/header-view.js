@@ -2,49 +2,70 @@
 
 var Marionette = require('backbone.marionette');
 var template   = require('./header-view.hbs');
+var RAF        = require('utils/raf');
 
 module.exports = Marionette.ItemView.extend({
 
   template: template,
 
   modelEvents: {
-    'change:state': 'render',
+    'change:state': 'updateActiveElement',
     'change:selectedOrgName': 'render',
-    'change:roomMenuIsPinned': 'onPinStateChange'
+    'change:roomMenuIsPinned': 'onPinStateChange',
   },
 
   events: {
     'click': 'onClick',
-    'click #menu-panel-header-close': 'onCloseClicked'
+    'click #menu-panel-header-close': 'onCloseClicked',
+  },
+
+  ui: {
+    headerAll:       '#panel-header-all',
+    headerSearch:    '#panel-header-search',
+    headerFavourite: '#panel-header-favourite',
+    headerPeople:    '#panel-header-people',
+    headerOrg:       '#panel-header-org',
   },
 
   serializeData: function() {
-    var state = this.model.get('state');
     return {
-      isAllState: (state === 'all'),
-      isSearchState: (state === 'search'),
-      isFavouriteState: (state === 'favourite'),
-      isPeopleState: (state === 'people'),
-      isOrgState: (state ===  'org'),
-      user: this.model.userModel.toJSON(),
-      orgName: this.model.get('selectedOrgName')
+      user:    this.model.userModel.toJSON(),
+      orgName: this.model.get('selectedOrgName'),
     };
   },
 
-  onClick: function (){
+  updateActiveElement: function(model, state) { //jshint unused: true
+    //This can be called after render so we need to add a small delay to get the transitions working
+    //jp 6/12/16
+    setTimeout(function() {
+      RAF(function() {
+        this.ui.headerAll.toggleClass('active', state === 'all');
+        this.ui.headerSearch.toggleClass('active', state === 'search');
+        this.ui.headerFavourite.toggleClass('active', state === 'favourite');
+        this.ui.headerPeople.toggleClass('active', state === 'people');
+        this.ui.headerOrg.toggleClass('active', state === 'org');
+      }.bind(this));
+    }.bind(this));
+  },
+
+  onRender: function() {
+    this.updateActiveElement(this.model, this.model.get('state'));
+  },
+
+  onClick: function() {
     this.model.set('profileMenuOpenState', !this.model.get('profileMenuOpenState'));
   },
 
-  onCloseClicked: function (e){
-    if(this.model.get('roomMenuIsPinned')) return;
+  onCloseClicked: function(e) {
+    if (this.model.get('roomMenuIsPinned')) return;
     e.stopPropagation();
     this.model.set({
       profileMenuOpenState: false,
-      panelOpenState:       false
+      panelOpenState:       false,
     });
   },
 
-  onPinStateChange: function (model, val){ /*jshint unused: true */
+  onPinStateChange: function(model, val) { /*jshint unused: true */
     this.$el.find('#menu-panel-header-close').toggleClass('active', !val);
   },
 
