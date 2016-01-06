@@ -20,7 +20,7 @@ module.exports = Backbone.Model.extend({
   //TODO: Review these defaults once the pin
   //behaviour is finalised
   defaults: {
-    state:                     'all',
+    state:                     '',
     searchTerm:                '',
     panelOpenState:            true,
     secondaryCollectionActive: false,

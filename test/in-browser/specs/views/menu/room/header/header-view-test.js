@@ -14,10 +14,10 @@ describe('PanelHeaderView', function() {
 
   beforeEach(function() {
     model           = new Backbone.Model({
-      state: 'all',
+      state:                'all',
       profileMenuOpenState: false,
-      panelOpenState: true,
-      roomMenuIsPinned: false
+      panelOpenState:       true,
+      roomMenuIsPinned:     false
     });
     userModel       = model.userModel = new Backbone.Model();
     el              = document.createElement('div');
@@ -26,7 +26,9 @@ describe('PanelHeaderView', function() {
   });
 
   it('should render the correct initial content', function() {
-    var result = panelHeaderView.$el.find('.panel-header__title--all').length;
+    model.set('state', 'all');
+    console.log(panelHeaderView.el);
+    var result = panelHeaderView.$el.find('.panel-header__container--all').length;
     assert.equal(1, result);
 
   });
@@ -94,5 +96,4 @@ describe('PanelHeaderView', function() {
     model.set('roomMenuIsPinned', false);
     assert.ok(panelHeaderView.$el.find('#menu-panel-header-close').hasClass('active'));
   });
-
 });
