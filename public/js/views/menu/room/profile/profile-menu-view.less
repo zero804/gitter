@@ -17,7 +17,7 @@
 }
 
 .profile-menu__item {
-  height: @mobile-header-height;
+  height: @menu-item-height;
   .desktop & {
     padding-left: @desktop-menu-left-padding;
   }
@@ -29,6 +29,7 @@
 .profile-menu__item__title {
   .room-menu-text();
   a {
+    display: block;
     color: inherit;
     &:hover {
       text-decoration: none;
