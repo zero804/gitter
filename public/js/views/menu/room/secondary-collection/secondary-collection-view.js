@@ -8,6 +8,9 @@ var RAF          = require('utils/raf');
 
 var ItemView = Marionette.ItemView.extend({
   template: itemTemplate,
+  triggers: {
+    'click': 'item:clicked'
+  },
 });
 
 module.exports = Marionette.CompositeView.extend({
@@ -18,6 +21,10 @@ module.exports = Marionette.CompositeView.extend({
 
   modelEvents: {
     'change:state': 'onModelChangeState'
+  },
+
+  childEvents: {
+    'item:clicked': 'onItemClicked'
   },
 
   serializeData: function(){
@@ -36,6 +43,12 @@ module.exports = Marionette.CompositeView.extend({
     RAF(function(){
       this.$el.toggleClass('active', (val === 'search' || val === 'org'));
     }.bind(this));
+  },
+
+  onItemClicked: function (view){
+    if(this.model.get('state') === 'search') {
+      this.model.set('searchTerm', view.model.get('name'));
+    }
   },
 
 });

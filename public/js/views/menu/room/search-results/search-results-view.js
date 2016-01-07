@@ -59,7 +59,7 @@ module.exports = (function() {
 
     template: resultTemplate,
 
-    className: 'room-item--active',
+    className: 'room-item--search',
 
     initialize: function() {
       this.toggleSelected();
