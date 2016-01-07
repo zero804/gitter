@@ -1,9 +1,10 @@
 'use strict';
 
-var Backbone        = require('backbone');
-var _               = require('underscore');
-var ProxyCollection = require('backbone-proxy-collection');
-var store           = require('components/local-store');
+var Backbone                 = require('backbone');
+var _                        = require('underscore');
+var ProxyCollection          = require('backbone-proxy-collection');
+var store                    = require('components/local-store');
+var RecentSearchesCollection = require('../collections/recent-searches');
 
 var states = [
   'all',
@@ -57,8 +58,8 @@ module.exports = Backbone.Model.extend({
 
     //expose the public collection
     this.primaryCollection   = new ProxyCollection({ collection: this._roomCollection });
-    this.secondaryCollection = new ProxyCollection({ collection: this._detailCollection });
-    this.searchTerms         = new Backbone.Collection();
+    this.searchTerms         = new RecentSearchesCollection();
+    this.secondaryCollection = new ProxyCollection({ collection: this.searchTerms });
 
     this.listenTo(this.primaryCollection, 'snapshot', this.onPrimaryCollectionSnapshot, this);
 
@@ -90,6 +91,8 @@ module.exports = Backbone.Model.extend({
   },
 
   onSwitchState: function(model, val) {/*jshint unused: true */
+    //TODO these should prbably be moved into the secondary collection
+    //jp 7/1/16
     switch (val) {
       case 'search':
         this.set({
@@ -109,7 +112,7 @@ module.exports = Backbone.Model.extend({
   },
 
   onSearchTermChange: _.debounce(function() {
-    this.searchTerms.add({ term: this.get('searchTerm') });
+    this.searchTerms.add({ name: this.get('searchTerm') });
   }, SEARCH_DEBOUNCE_INTERVAL),
 
   onPrimaryCollectionSnapshot: function() {

@@ -3,16 +3,15 @@
 var Marionette   = require('backbone.marionette');
 var _            = require('underscore');
 var template     = require('./secondary-collection-view.hbs');
-var itemTemplate = require('../primary-collection/primary-collection-view');
+var itemTemplate = require('./secondary-collection-item-view.hbs');
 var RAF          = require('utils/raf');
 
 var ItemView = Marionette.ItemView.extend({
-  tagName: 'li',
-  template: itemTemplate
+  template: itemTemplate,
 });
 
 module.exports = Marionette.CompositeView.extend({
-  itemView: ItemView,
+  childView: ItemView,
   childViewContainer: '#secondary-collection-list',
   template: template,
   className: 'secondary-collection',
@@ -36,3 +35,4 @@ module.exports = Marionette.CompositeView.extend({
   },
 
 });
+
