@@ -14,7 +14,7 @@ var states = [
   'org',
 ];
 
-var SEARCH_DEBOUNCE_INTERVAL = 100;
+var SEARCH_DEBOUNCE_INTERVAL = 400;
 
 module.exports = Backbone.Model.extend({
 
