@@ -64,15 +64,23 @@
   }
 }
 
-.room-item--active {
+.room-item--search {
   .room-item();
   opacity: 1;
+
+  &:hover{
+    cursor: pointer;
+  }
 }
 
 .room-item__container {
   display:        flex;
   flex-direction: row;
   align-items:    center;
+
+  &:hover {
+    cursor: pointer;
+  }
 }
 
 .room-item__avatar {
