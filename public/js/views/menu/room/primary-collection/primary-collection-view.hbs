@@ -1,5 +1,5 @@
 <div class="room-item__container">
-  <img class="room-item__avatar" src="{{ roomAvatarUrl }}" />
+  {{#if roomAvatarUrl}}<img class="room-item__avatar" src="{{ roomAvatarUrl }}" />{{/if}}
   <h2 class="room-item__title">{{name}}</h2>
   <img class="room-item__options" data-component="room-item-options-toggle" src='{{cdn "images/svg/menu/room-options.svg"}}'/>
   {{#if unreadItems }}<div class="room-item__unread">{{unreadItems}}</div>{{/if}}
