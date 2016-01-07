@@ -1,5 +1,6 @@
 'use strict';
 
+var Backbone      = require('backbone');
 var Marionette    = require('backbone.marionette');
 var getRoomAvatar = require('utils/get-room-avatar');
 var itemTemplate  = require('./primary-collection-view.hbs');
@@ -19,13 +20,23 @@ module.exports = Marionette.ItemView.extend({
     };
   },
 
+  events: {
+    'click [data-component=room-item-options-toggle]': 'onOptionsClicked',
+    'mouseleave': 'onMouseOut'
+  },
+
   triggers: {
     'click': 'item:clicked',
   },
 
   constructor: function (attrs){
     this.index = attrs.index;
+    this.uiModel = new Backbone.Model({ menuIsOpen: false });
     Marionette.ItemView.prototype.constructor.apply(this, arguments);
+  },
+
+  initialize: function (){
+    this.listenTo(this.uiModel, 'change:menuIsOpen', this.onModelToggleMenu, this);
   },
 
   serializeData: function() {
@@ -34,5 +45,19 @@ module.exports = Marionette.ItemView.extend({
       roomAvatarUrl:  getRoomAvatar(data.name),
     });
   },
+
+  onOptionsClicked: function (e){
+    e.stopPropagation();
+    this.uiModel.set('menuIsOpen', !this.uiModel.get('menuIsOpen'));
+  },
+
+  onModelToggleMenu: function (model, val){// jshint unused: true
+    this.$el.toggleClass('active', val);
+  },
+
+  onMouseOut: function (){
+    this.uiModel.set('menuIsOpen', false);
+  },
+
 });
 
