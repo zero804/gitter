@@ -124,8 +124,9 @@
 }
 
 .room-item__options-menu {
-  list-style: none;
   margin-left: 0;
+  list-style:  disc inside;
+  color:       @ruby;
 }
 
 .room-item__options-menu__item {
@@ -139,8 +140,10 @@
 
   & a {
     .room-menu-text();
+    display: block;
     &:hover {
       text-decoration: none;
+      color:           @ruby;
     }
   }
 
