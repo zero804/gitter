@@ -95,18 +95,21 @@ module.exports = Backbone.Model.extend({
     //jp 7/1/16
     switch (val) {
       case 'search':
+        this.secondaryCollection.switchCollection(this.searchTerms);
         this.set({
           secondaryCollectionHeader: 'Recent Searches',
           secondaryCollectionActive: true,
         });
         break;
       case 'org':
+        this.secondaryCollection.switchCollection(new Backbone.Collection([]));
         this.set({
           secondaryCollectionHeader: 'All Rooms',
           secondaryCollectionActive: true,
         });
         break;
       default:
+        this.secondaryCollection.switchCollection(new Backbone.Collection([]));
         this.set('secondaryCollectionActive', false);
     }
   },
