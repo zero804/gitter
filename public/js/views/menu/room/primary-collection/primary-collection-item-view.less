@@ -14,24 +14,39 @@
 }
 
 .room-item {
-  display:        flex;
-  flex-direction: row;
-  align-items:    center;
-  height:         @menu-item-height;
-  opacity:        0;
-  transition:     opacity .2s ease-in;
+  height:     @menu-item-height * 3;
+  max-height: @menu-item-height;
+  opacity:    0;
+  transition:
+    opacity .2s ease-in,
+    max-height .2s ease-in;
+  overflow:   hidden;
+
+  &.active {
+    max-height: @menu-item-height * 3;
+  }
 
   .loaded & {
     opacity: 1;
   }
 
   &.gu-mirror, &.gu-transit {
+
     .room-item-selected();
+    max-height: @menu-item-height;
     opacity: 1;
+
+    & .room-item__options-menu {
+      display: none;
+    }
   }
 
   &:hover {
     .room-item-selected();
+
+    & .room-item__options {
+      opacity: 1;
+    }
   }
 
   &.selected {
@@ -39,12 +54,20 @@
   }
 
   .desktop & {
-    padding-left: @desktop-menu-left-padding;
+    padding-left:  @desktop-menu-left-padding;
+    padding-right: @desktop-menu-left-padding;
   }
 
   .mobile & {
-    padding-left: @mobile-menu-left-padding;
+    padding-left:  @mobile-menu-left-padding;
+    padding-right: @mobile-menu-left-padding;
   }
+}
+
+.room-item__container {
+  display:        flex;
+  flex-direction: row;
+  align-items:    center;
 }
 
 .room-item__avatar {
@@ -73,4 +96,39 @@
   .mobile & {
     margin-right:  @mobile-menu-left-padding;
   }
+}
+
+.room-item__options {
+  width: 1.5rem;
+  height: @menu-item-height;
+  //default is off, when a room-item is hovered we show it
+  opacity: 0;
+  margin-left: auto;
+  transition: opacity .2s ease-out;
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.room-item__options-menu {
+  list-style: none;
+  margin-left: 0;
+}
+
+.room-item__options-menu__item {
+  .room-item();
+  padding-left: 0;
+  padding-right: 0;
+
+  &:hover {
+    background-color: inherit;
+  }
+
+  & a {
+    .room-menu-text();
+    &:hover {
+      text-decoration: none;
+    }
+  }
+
 }

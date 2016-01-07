@@ -45,7 +45,7 @@ module.exports = Marionette.LayoutView.extend({
     this.delay = localStorage.delay;
 
     var isPinned = $('.app-layout').hasClass('pinned');
-    this.model   = new RoomMenuModel({
+    this.model = window.roomModel  = new RoomMenuModel({
       bus:              this.bus,
       roomCollection:   attrs.roomCollection,
       userModel:        context.user(),
