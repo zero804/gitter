@@ -43,6 +43,7 @@ module.exports = Marionette.ItemView.extend({
     var data = this.model.toJSON();
     return _.extend({}, data, {
       roomAvatarUrl:  getRoomAvatar(data.name),
+      isNotOneToOne: (data.githubType !== 'ONETOONE')
     });
   },
 

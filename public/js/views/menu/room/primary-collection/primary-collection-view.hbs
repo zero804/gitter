@@ -5,6 +5,6 @@
   {{#if unreadItems }}<div class="room-item__unread">{{unreadItems}}</div>{{/if}}
 </div>
 <ul class="room-item__options-menu">
-  <li class="room-item__options-menu__item"><a>This is a List Item</a></li>
-  <li class="room-item__options-menu__item"><a>This is a List Item</a></li>
+  {{#if isNotOneToOne}}<li class="room-item__options-menu__item"><a>Leave</a></li>{{/if}}
+  <li class="room-item__options-menu__item"><a>Hide</a></li>
 </ul>
