@@ -27,6 +27,10 @@ module.exports = Marionette.CompositeView.extend({
     });
   },
 
+  filter: function(model, index){//jshint unused: true
+    return (index <= 10);
+  },
+
   onModelChangeState: function (model, val){ /*jshint unused: true*/
     this.render();
     RAF(function(){
