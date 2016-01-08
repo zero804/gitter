@@ -5,6 +5,7 @@ var _                        = require('underscore');
 var ProxyCollection          = require('backbone-proxy-collection');
 var store                    = require('components/local-store');
 var RecentSearchesCollection = require('../collections/recent-searches');
+var SuggestedOrgCollection   = require('../collections/org-suggested-rooms');
 
 var states = [
   'all',
@@ -27,7 +28,7 @@ module.exports = Backbone.Model.extend({
     secondaryCollectionActive: false,
     secondaryCollectionHeader: '',
     roomMenuIsPinned:          true,
-    selectedOrgName:           ''
+    selectedOrgName:           '',
   },
 
   initialize: function(attrs) {
@@ -45,20 +46,24 @@ module.exports = Backbone.Model.extend({
     }
 
     this.searchInterval = SEARCH_DEBOUNCE_INTERVAL;
+    //TODO id this the best way to do this? JP 8/1/16
+    this.set('id', this.cid);
 
     //assign internal collections
-    this._roomCollection    = attrs.roomCollection;
+    this._roomCollection = attrs.roomCollection;
     delete attrs.roomCollection;
 
-    this._detailCollection  = (attrs.detailCollection || new Backbone.Collection());
+    this._detailCollection = (attrs.detailCollection || new Backbone.Collection());
     delete attrs.detailCollection;
 
-    this.userModel          = attrs.userModel;
+    this.userModel = attrs.userModel;
     delete attrs.userModel;
 
     //expose the public collection
-    this.primaryCollection   = new ProxyCollection({ collection: this._roomCollection });
     this.searchTerms         = new RecentSearchesCollection();
+    this.suggestedOrgs       = new SuggestedOrgCollection([], { contextModel: this });
+
+    this.primaryCollection   = new ProxyCollection({ collection: this._roomCollection });
     this.secondaryCollection = new ProxyCollection({ collection: this.searchTerms });
 
     this.listenTo(this.primaryCollection, 'snapshot', this.onPrimaryCollectionSnapshot, this);
@@ -91,6 +96,7 @@ module.exports = Backbone.Model.extend({
   },
 
   onSwitchState: function(model, val) {/*jshint unused: true */
+
     //TODO these should prbably be moved into the secondary collection
     //jp 7/1/16
     switch (val) {
@@ -102,14 +108,13 @@ module.exports = Backbone.Model.extend({
         });
         break;
       case 'org':
-        this.secondaryCollection.switchCollection(new Backbone.Collection([]));
+        this.secondaryCollection.switchCollection(this.suggestedOrgs);
         this.set({
           secondaryCollectionHeader: 'All Rooms',
           secondaryCollectionActive: true,
         });
         break;
       default:
-        this.secondaryCollection.switchCollection(new Backbone.Collection([]));
         this.set('secondaryCollectionActive', false);
     }
   },
@@ -122,16 +127,17 @@ module.exports = Backbone.Model.extend({
     this.trigger('primary-collection:snapshot');
   },
 
-  toJSON: function (){
+  toJSON: function() {
     var attrs = this.attributes;
-    return Object.keys(this.defaults).reduce(function(memo, key){
+    //only ever store the defaults everything else is determined at run-time
+    return Object.keys(this.defaults).reduce(function(memo, key) {
       memo[key] = attrs[key];
       return memo;
     }, {});
   },
 
-  // TODO Should we be using cid here as the key?
-  // JP 15/12/15
+  //This can be changed to userPreferences once the data is maintained
+  //JP 8/1/16
   sync: function(method, model, options) {//jshint unused: true
     var attrs;
 
@@ -145,15 +151,16 @@ module.exports = Backbone.Model.extend({
     attrs = store.get(this.cid);
     attrs = (attrs  || '{}');
     attrs = JSON.parse(attrs);
+
     // TODO Remove these overrides once the
     // menu state is persisted on the server
     // JP 15/12/15
     this.set(_.extend({}, attrs, {
       panelOpenState:   true,
-      roomMenuIsPinned: true
+      roomMenuIsPinned: true,
     }));
 
-    if(options.success) options.success();
+    if (options.success) options.success();
   },
 
 });

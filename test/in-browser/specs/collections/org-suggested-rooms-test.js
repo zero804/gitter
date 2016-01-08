@@ -5,14 +5,14 @@ var assert                 = require('assert');
 var Backbone               = require('backbone');
 var SuggestedOrgCollection = require('public/js/collections/org-suggested-rooms');
 
-describe.only('SuggestedOrgCollection()', function() {
+describe('SuggestedOrgCollection()', function() {
 
   var model;
   var suggestedOrgCollection;
 
   beforeEach(function() {
     model                        = new Backbone.Model({ selectedOrgName: 'test', id: 1});
-    suggestedOrgCollection       = new SuggestedOrgCollection([], { model: model });
+    suggestedOrgCollection       = new SuggestedOrgCollection([], { contextModel: model });
     suggestedOrgCollection.fetch = sinon.spy();
   });
 
