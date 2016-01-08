@@ -92,7 +92,7 @@ onready(function() {
 
   // Revert to a previously saved state
   window.onpopstate = function(e) {
-    updateContent(event.state || window.location.pathname + '/~chat');
+    updateContent(e.state || window.location.pathname + '/~chat');
     appEvents.trigger('track', window.location.pathname + window.location.hash);
     return true;
   };
