@@ -1,10 +1,11 @@
 'use strict';
 
-var Backbone      = require('backbone');
-var Marionette    = require('backbone.marionette');
-var getRoomAvatar = require('utils/get-room-avatar');
-var itemTemplate  = require('./primary-collection-view.hbs');
-var _             = require('underscore');
+var Backbone          = require('backbone');
+var Marionette        = require('backbone.marionette');
+var getRoomAvatar     = require('utils/get-room-avatar');
+var itemTemplate      = require('./primary-collection-view.hbs');
+var _                 = require('underscore');
+var roomNameShortener = require('../../../../utils/room-menu-name-shortener');
 
 module.exports = Marionette.ItemView.extend({
 
@@ -42,8 +43,9 @@ module.exports = Marionette.ItemView.extend({
   serializeData: function() {
     var data = this.model.toJSON();
     return _.extend({}, data, {
-      roomAvatarUrl:  getRoomAvatar(data.name),
-      isNotOneToOne: (data.githubType !== 'ONETOONE')
+      roomAvatarUrl: getRoomAvatar(data.name),
+      isNotOneToOne: (data.githubType !== 'ONETOONE'),
+      name:          roomNameShortener(data.name)
     });
   },
 
