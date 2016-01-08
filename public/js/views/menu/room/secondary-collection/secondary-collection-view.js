@@ -9,6 +9,7 @@ var PrimaryCollectionView = require('../primary-collection/primary-collection-vi
 
 var ItemView = Marionette.ItemView.extend({
   template: itemTemplate,
+  className: 'room-item--secondary',
   triggers: {
     'click': 'item:clicked',
   },
@@ -16,7 +17,7 @@ var ItemView = Marionette.ItemView.extend({
     var data = this.model.toJSON();
     return _.extend({}, data, {
       //TODO trim this if its too long JP 8/1/16
-      name: data.uri,
+      name: (data.name || data.uri),
     });
   },
 });
