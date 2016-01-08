@@ -59,6 +59,7 @@ module.exports = Marionette.LayoutView.extend({
     return new SecondaryCollectionView(optionsForRegion({
       collection: this.model.secondaryCollection,
       model:      this.model,
+      bus:        this.bus,
     }));
   },
 

@@ -97,7 +97,7 @@ module.exports = Marionette.CollectionView.extend({
 
   onItemClicked: function(view) {
     var viewModel = view.model;
-    var name = viewModel.get('name');
+    var name = viewModel.get('uri');
     var url = '/' + name;
 
     //If thr room menu is pinned dont try to close the pannel
