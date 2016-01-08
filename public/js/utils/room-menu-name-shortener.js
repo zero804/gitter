@@ -1,5 +1,6 @@
 'use strict';
 
 module.exports = function roomNameShortener(name){
-  return (name.length > 18) ? name.split('/')[1] : name;
+  if(!name) return '';
+  return (name.length > 19) ? name.split('/')[1] : name;
 };
