@@ -10,6 +10,12 @@
 
 .panel-header__avatar {
   .room-menu-avatar();
+  margin-left: auto;
+  //This is needed because of the room-menu-avatar
+  //has a `.desktop & {}` rule whicih is more specific.
+  //TODO remove important !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  //jp 8/1/16
+  margin-right: 2rem !important;
 }
 
 .panel-header__display-name {
@@ -107,18 +113,3 @@
 
 }
 
-.panel-header__close-icon {
-  color:        white;
-  margin-left:  auto;
-  margin-right: @mobile-menu-left-padding;
-  opacity: 0;
-  transition: opacity .2s ease-in;
-
-  &.active {
-    opacity:  1;
-  }
-
-  .desktop & {
-    margin-right: @desktop-menu-left-padding;
-  }
-}
