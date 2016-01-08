@@ -2,11 +2,12 @@
 @import "../../../../../less/components/menu/room/menu-text.less";
 
 .panel-footer-container {
-  position:     absolute;
-  bottom:       0;
-  left:         -1px;
-  width:        100%;
-  z-index:      1;
+  position:       absolute;
+  bottom:         0;
+  left:           -1px;
+  width:          100%;
+  z-index:        1;
+  pointer-events: none;
 }
 
 .panel-footer__item {
@@ -48,8 +49,9 @@
   line-height:   1.5;
 }
 
-.panel-footer__link {
-  border: 1px solid @ruby;
+.panel-footer__button {
+  border:         1px solid @ruby;
+  pointer-events: all;
 }
 
 .panel-footer__img {
@@ -68,4 +70,8 @@
   &:hover {
     cursor: pointer;
   }
+}
+
+.panel-footer__link  {
+  pointer-events: all;
 }

@@ -6,6 +6,7 @@ var template              = require('./secondary-collection-view.hbs');
 var itemTemplate          = require('./secondary-collection-item-view.hbs');
 var RAF                   = require('utils/raf');
 var PrimaryCollectionView = require('../primary-collection/primary-collection-view');
+var roomNameShortener     = require('../../../../utils/room-menu-name-shortener');
 
 var ItemView = Marionette.ItemView.extend({
   template: itemTemplate,
@@ -17,7 +18,7 @@ var ItemView = Marionette.ItemView.extend({
     var data = this.model.toJSON();
     return _.extend({}, data, {
       //TODO trim this if its too long JP 8/1/16
-      name: (data.name || data.uri),
+      name: roomNameShortener((data.name || data.uri)),
     });
   },
 });
