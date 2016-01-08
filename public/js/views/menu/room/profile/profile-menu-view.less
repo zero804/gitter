@@ -18,11 +18,17 @@
 
 .profile-menu__item {
   height: @menu-item-height;
+
   .desktop & {
     padding-left: @desktop-menu-left-padding;
   }
+
   .mobile {
     padding-left: @mobile-menu-left-padding;
+  }
+
+  &:hover {
+    background-color: rgba(255, 255, 255, .1);
   }
 }
 
