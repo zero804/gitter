@@ -21,20 +21,21 @@ var Criteria = {
   allowUsernames: function(userDetails, usernameHash) {
     var user = userDetails.user;
     if (!user) return false;
-    if (!usernameHash) return false;
+    if (!usernameHash) return undefined;
     return !!usernameHash[user.username] || undefined;
   },
 
   disableBrowser: function(userDetails, browsers) {
-    if (!browsers) return true;
+    if (!browsers) return undefined;
 
     var agent = useragent.parse(userDetails.userAgent);
 
-    var allowedVersion = browsers[agent.family];
-    if (!allowedVersion) return true;
+    var disabledVersion = browsers[agent.family];
+    if (!disabledVersion) return undefined;
 
-    if (allowedVersion === 'all') return false;
-    return agent.major > allowedVersion;
+    if (disabledVersion === 'all') return false;
+    if (agent.major <= disabledVersion) return false;
+    return undefined;
   },
 
   /* Enabled criteria */
@@ -66,7 +67,9 @@ function getFeatures(callback) {
 fflip.config({
   criteria: Criteria,
   features: getFeatures,
-  reload: 60 // Reload features every 60 seconds
+  reload: 60, // Reload features every 60 seconds
+  maxCookieAge: 31 * 86400 * 1000,
+  useVetoVoting: true
 });
 
 

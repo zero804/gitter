@@ -1,10 +1,10 @@
 'use strict';
 
-var env               = require('gitter-web-env');
-var nconf  = env.config;
-var logger            = env.logger;
-var errorReporter     = env.errorReporter;
-var statsd = env.createStatsClient({ prefix: nconf.get('stats:statsd:prefix')});
+var env           = require('gitter-web-env');
+var nconf         = env.config;
+var logger        = env.logger;
+var errorReporter = env.errorReporter;
+var statsd        = env.createStatsClient({ prefix: nconf.get('stats:statsd:prefix')});
 
 var oauth             = require('../../services/oauth-service');
 var mongoUtils        = require('../../utils/mongo-utils');
@@ -15,6 +15,7 @@ var StatusError       = require('statuserror');
 var bayeuxExtension   = require('./extension');
 var clientUsageStats  = require('../../utils/client-usage-stats');
 var appVersion        = require('../appVersion');
+var useragent         = require('useragent');
 var debug             = require('debug')('gitter:bayeux-authenticator');
 
 function getConnectionType(incoming) {
@@ -27,6 +28,14 @@ function getConnectionType(incoming) {
     default:
       return 'online';
   }
+}
+
+function getUserAgentFamily(req) {
+  if (!req || !req.headers) return;
+  var useragentHeader = req.headers['user-agent'];
+  if (!useragentHeader) return;
+  var agent = useragent.lookup(useragentHeader);
+  return agent && agent.family;
 }
 
 var version = appVersion.getVersion();
@@ -44,7 +53,7 @@ module.exports = bayeuxExtension({
 
     var token = ext.token;
 
-    if(!token) {
+    if(!token || typeof token !== 'string') {
       return callback(new StatusError(401, "Access token required"));
     }
 
@@ -52,6 +61,21 @@ module.exports = bayeuxExtension({
     if (ext.realtimeLibrary) {
       tags.push('library:' + ext.realtimeLibrary);
     }
+
+    // Quick way of telling anonymous users apart
+    var isAnonymous = token.charAt(0) === '$';
+    if (isAnonymous) {
+      tags.push('anonymous:1');
+    } else {
+      tags.push('anonymous:0');
+    }
+
+
+    var useragentFamily = getUserAgentFamily(req);
+    if (useragentFamily) {
+      tags.push('useragent:' + useragentFamily);
+    }
+
     statsd.increment('bayeux.handshake.attempt', 1, 0.25, tags);
 
     oauth.validateAccessTokenAndClient(ext.token, function(err, tokenInfo) {

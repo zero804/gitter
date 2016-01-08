@@ -551,8 +551,8 @@ function listMobileUsers(callback) {
 }
 
 function getSocket(socketId, callback) {
-  return redisClient.hmget(keySocketUser(socketId), 'uid', 'tid', 'eb', 'mob', 'ctime', 'ct')
-    .spread(function(userId, troupeId, eyeballs, mobile, createdTimeString, clientType) {
+  return redisClient.hmget(keySocketUser(socketId), 'uid', 'tid', 'eb', 'mob', 'ctime', 'ct', 'rl', 'ocid', 'ucid')
+    .spread(function(userId, troupeId, eyeballs, mobile, createdTimeString, clientType, realtimeLibrary, oauthClientId, uniqueClientId) {
       if(!createdTimeString) return;
 
       return {
@@ -561,7 +561,10 @@ function getSocket(socketId, callback) {
         eyeballs: !!eyeballs,
         mobile: !!mobile,
         createdTime: new Date(parseInt(createdTimeString, 10)),
-        clientType: clientType
+        clientType: clientType,
+        realtimeLibrary: realtimeLibrary,
+        oauthClientId: oauthClientId,
+        uniqueClientId: uniqueClientId,
       };
     })
     .nodeify(callback);
@@ -570,7 +573,7 @@ function getSocket(socketId, callback) {
 function getSockets(socketIds, callback) {
   var multi = redisClient.multi();
   socketIds.forEach(function(socketId) {
-    multi.hmget(keySocketUser(socketId), 'uid', 'tid', 'eb', 'mob', 'ctime', 'ct');
+    multi.hmget(keySocketUser(socketId), 'uid', 'tid', 'eb', 'mob', 'ctime', 'ct', 'rl', 'ocid', 'ucid');
   });
 
   return multi.exec()
@@ -591,7 +594,10 @@ function getSockets(socketIds, callback) {
           eyeballs: !!result[2],
           mobile: !!result[3],
           createdTime: new Date(parseInt(result[4], 10)),
-          clientType: result[5]
+          clientType: result[5],
+          realtimeLibrary: result[6],
+          oauthClientId: result[7],
+          uniqueClientId: result[8],
         };
 
         return hash;
