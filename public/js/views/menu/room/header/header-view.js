@@ -53,7 +53,9 @@ module.exports = Marionette.ItemView.extend({
   },
 
   onClick: function() {
-    this.model.set('profileMenuOpenState', !this.model.get('profileMenuOpenState'));
+    if(this.model.get('state') === 'all') {
+      this.model.set('profileMenuOpenState', !this.model.get('profileMenuOpenState'));
+    }
   },
 
   onCloseClicked: function(e) {

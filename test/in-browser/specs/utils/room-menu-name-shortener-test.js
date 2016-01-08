@@ -4,7 +4,7 @@
 var assert            = require('assert');
 var roomNameShortener = require('public/js/utils/room-menu-name-shortener');
 
-describe.only('roomNameShortener()', function() {
+describe('roomNameShortener()', function() {
 
   it('it should shorten strings longer than 19 characters', function() {
     var result = roomNameShortener('thisisareally/reallylongroomname');
