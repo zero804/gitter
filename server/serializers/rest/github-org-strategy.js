@@ -60,7 +60,7 @@ function GitHubOrgStrategy(options) {
 }
 
 GitHubOrgStrategy.prototype = {
-  name: 'GitHubOrgStrategy'
+  name: 'GithubOrgStrategy'
 };
 
 module.exports = GitHubOrgStrategy;

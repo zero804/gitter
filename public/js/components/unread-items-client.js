@@ -539,7 +539,7 @@ module.exports = (function() {
     });
 
     store.on('add', function(itemId, mention) {
-      debug('CollectionSync: add: %s mention=%s', itemId);
+      debug('CollectionSync: add: %s mention=%s', itemId, mention);
       collection.patch(itemId, { unread: true, mentioned: mention });
     });
 

@@ -25,6 +25,10 @@ var apiClient = require('components/apiClient');
 
 require('nanoscroller');
 
+require('gitter-styleguide/css/components/buttons.css');
+
+
+
 var SUGGESTED_ROOMS_THRESHOLD = 10; // non inclusive
 
 module.exports = (function () {
@@ -164,7 +168,7 @@ module.exports = (function () {
             return new CollectionWrapperView(optionsForRegion({
               collection: troupeCollections.orgs,
               childView: OrgCollectionView,
-              header: 'Your Organizations',
+              header: 'Your Organisations',
               prerendered: true
             }));
 
