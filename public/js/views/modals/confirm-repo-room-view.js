@@ -49,7 +49,7 @@ var View = Marionette.ItemView.extend({
         if (self.dialog) { self.dialog.hide(); }
         appEvents.trigger('navigation', '/' + uri, 'chat', uri, null);
       })
-      .fail(function (/*xhr*/) {
+      .catch(function (/*err*/) {
         self.model.set('error', 'Unable to create room');
         self.ui.modalFailure.show('fast');
         // Do something here.
