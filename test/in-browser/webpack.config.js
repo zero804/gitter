@@ -2,11 +2,13 @@ var path = require('path');
 var appWebpackConfig = require('../../public/js/webpack.config.js');
 
 module.exports = {
-  entry: path.resolve(__dirname, './fixtures/runner.js'),
+  entry: './fixtures/runner.js',
   output: {
-    path: path.resolve(__dirname, './fixtures/build'),
+    path: path.join(__dirname, './fixtures/build'),
     filename: 'test.js',
   },
+
+  devtool: 'inline-source-map',
   module: {
     loaders: appWebpackConfig.module.loaders,
   },

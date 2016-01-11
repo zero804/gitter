@@ -35,7 +35,7 @@ module.exports = (function() {
     };
 
     apiClient.priv.post('/statsc', body, { dataType: 'text' })
-      .fail(function() {
+      .catch(function() {
         log.info('An error occurred while communicating stats');
       });
 
