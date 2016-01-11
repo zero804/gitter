@@ -144,6 +144,7 @@
     "browserstack-runner": "^0.3.8",
     "cal-heatmap": "^3.5.4",
     "callsite": "1.0.0",
+    "chai": "^3.4.1",
     "css-loader": "^0.19.0",
     "css-mqpacker": "^3.0.0",
     "csswring": "^3.0.0",
@@ -196,6 +197,13 @@
     "jshamcrest": "0.6.7",
     "jsmockito": "~1.0.4",
     "jsonlint": "1.5.1",
+    "karma": "^0.13.19",
+    "karma-browserstack-launcher": "^0.1.8",
+    "karma-chai": "^0.1.0",
+    "karma-chrome-launcher": "^0.2.2",
+    "karma-mocha": "^0.2.1",
+    "karma-phantomjs-launcher": "^0.2.3",
+    "karma-sourcemap-loader": "^0.3.6",
     "keymaster": "^1.6.2",
     "lcov-result-merger": "^1.0.2",
     "less": "~1.5.1",
@@ -211,6 +219,7 @@
     "nanoscroller": "^0.8.7",
     "node-spritesheet": "trevorah/node-spritesheet",
     "object-inspect": "^1.0.2",
+    "phantomjs": "^1.9.19",
     "postcss": "^4.0.0",
     "postcss-calc": "^5.0.0",
     "postcss-conditionals": "^2.0.0",
@@ -235,7 +244,7 @@
     "tap-file": "0.0.2",
     "through2": "^0.6.3",
     "vinyl-paths": "^2.0.0",
-    "webpack": "^1.12.2",
+    "webpack": "^1.12.10",
     "webpack-dev-middleware": "^1.0.11",
     "xunit-file": "0.0.9",
     "zip-stream": "^0.5.1"
@@ -256,7 +265,8 @@
     "preinstall": "(linklocal list --format '%S' --no-summary || find node_modules -maxdepth 1 -type l -exec basename {} \\;)|while read line; do if [ -d \"$line\" ] && [ ! -h \"$line\" ]; then rm -r \"$line\"; fi; done",
     "shrinkwrap-conflict": "rm -f npm-shrinkwrap.json && npm run shrinkwrap",
     "fix-shrinkwrap-registry": "sed -i '' 's#https://registry.npmjs.org/#http://beta-internal:4873/#g' npm-shrinkwrap.json && sed -i '' 's#http://beta-internal:8089/nexus/content/groups/npm/#http://beta-internal:4873/#g' npm-shrinkwrap.json",
-    "test:unit:browser": "cd ./test/in-browser && webpack && browserstack-runner --verbose"
+    "flush-dev-db": "mongo gitter-mongo-dev/gitter --eval 'printjson(db.dropDatabase())'; ./scripts/dataupgrades/001-oauth-client/002-add-redirect-uri.sh gitter-mongo-dev/gitter; redis-cli -h gitter-redis-dev flushall",
+    "test:unit:browser": "cd ./test/in-browser && webpack && karma start karma.conf.js"
   },
   "git": {
     "scripts": {

@@ -10,9 +10,6 @@
  * The basic form of requests is:
  * apiClient.operation(url, data, options) -> $.Deferrer
  *
- * Note that altough the client returns a deferred, it will
- * in future return a promise.
- *
  * apiClient.get('/v1/eyeballs', data, options)
  * apiClient.post('/v1/eyeballs', data, options)
  * apiClient.put('/v1/eyeballs', data, options)
@@ -43,14 +40,15 @@
  *   .then(function(response) {
  *     window.alert('I did a post.');
  *   })
- *   .fail(function(xhr) {
- *     window.alert('I am a failure: ' + xhr.status);
+ *   .catch(function(err) {
+ *     window.alert('I am a failure: ' + err.status);
  *   })
  */
 var $ = require('jquery');
 var context = require('utils/context');
 var appEvents = require('utils/appevents');
 var debug = require('debug-proxy')('app:api-client');
+var Promise = require('bluebird');
 
 module.exports = (function() {
 
@@ -114,17 +112,6 @@ module.exports = (function() {
     return baseUrlFunction() + url;
   }
 
-  function accessTokenDeferred() {
-    var deferred = $.Deferred();
-
-    context.getAccessToken(function(accessToken) {
-      deferred.resolve(accessToken);
-    });
-
-    return deferred;
-  }
-
-  // TODO return a proper promise instead of a $.Deferred
   function operation(fullUrlFunction, baseUrlFunction, method, defaultOptions, url, data, options) {
     options = defaults(options, defaultOptions);
 
@@ -141,34 +128,74 @@ module.exports = (function() {
       dataSerialized = data;
     }
 
-    return accessTokenDeferred()
+    return context.getAccessToken()
       .then(function(accessToken) {
-        var fullUrl = fullUrlFunction(baseUrlFunction, url);
-        debug('%s: %s', method, fullUrl);
-        var deferred = $.ajax({
-          url: fullUrl,
-          contentType: options.contentType,
-          dataType: options.dataType,
-          type: method,
-          global: options.global,
-          data: dataSerialized,
-          context: options.context, // NB: deprecated: cant use with real promises
-          timeout: options.timeout,
-          async: options.async,
-          headers: {
-            'x-access-token': accessToken
+
+        var promise = new Promise(function(resolve, reject) {
+          var headers = {};
+
+          if (accessToken) {
+            headers['x-access-token'] = accessToken;
           }
+
+          // TODO: drop jquery `ajax`
+          var fullUrl = fullUrlFunction(baseUrlFunction, url);
+
+          function makeError(jqXhr, textStatus, errorThrown) {
+            var json = jqXhr.responseJSON;
+            var friendlyMessage = json && (json.message || json.error);
+
+            var e = new Error(friendlyMessage || errorThrown || textStatus || "AJAX error");
+            e.url = fullUrl;
+            e.friendlyMessage = friendlyMessage;
+            e.response = json;
+            e.method = method;
+            e.status = jqXhr.status;
+            e.statusText = jqXhr.statusText;
+            return e;
+          }
+
+          debug('%s: %s', method, fullUrl);
+          $.ajax({
+            url: fullUrl,
+            contentType: options.contentType,
+            dataType: options.dataType,
+            type: method,
+            global: options.global,
+            data: dataSerialized,
+            timeout: options.timeout,
+            async: options.async,
+            headers: headers,
+            success: function(data, textStatus, xhr) {
+              var status = xhr.status;
+              if (status >= 400 && status !== 1223) {
+
+                var e = new Error(textStatus);
+                e.status = status;
+                return reject(makeError(xhr, textStatus, "HTTP Status " + status));
+              }
+
+              resolve(data);
+            },
+            error: function(xhr, textStatus, errorThrown) {
+              return reject(makeError(xhr, textStatus, errorThrown));
+            }
+          });
         });
 
-        /* Don't add this to the 'promise' chain */
-        deferred.fail(function(xhr) {
-          if(options.global) {
+        if(options.global) {
+          promise.catch(function(err) {
             /* Asyncronously notify */
-            handleApiError(xhr, method, fullUrl);
-          }
-        });
+            handleApiError(err.status, err.statusText, err.method, err.url);
+          });
+        }
 
-        return deferred;
+        if (options.context) {
+          // TODO: remove this option
+          promise.bind(context);
+        }
+
+        return promise;
       });
 
   }
@@ -190,12 +217,10 @@ module.exports = (function() {
     }
   }
 
-  function handleApiError(xhr, method, url) {
-    var status = xhr.status;
-
+  function handleApiError(status, statusText, method, url) {
     var route = findRouteForUrl(url);
 
-    if(xhr.statusText == "error" && status === 404) {
+    if(statusText == "error" && status === 404) {
       /* Unreachable server */
       appEvents.trigger('bugreport', 'ajaxError: unreachable: '+ method + ' ' + (route || url), {
         tags: {
