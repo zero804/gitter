@@ -16,5 +16,7 @@
 
 <div class="panel-header__container" id="panel-header-org">
   <h1 class="panel-header__title--org">{{orgName}}</h1>
-  <a class="panel-header__org-icon">&#127760;</a>
+  {{! TODO Should this links navigation be handled in the JS so we just chnage the frames src?
+      JP 11/1/16 }}
+  <a class="panel-header__org-icon" href="/orgs/{{orgName}}/rooms">&#127760;</a>
 </div>
