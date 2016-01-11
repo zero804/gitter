@@ -3,9 +3,9 @@
 var Backbone                 = require('backbone');
 var _                        = require('underscore');
 var ProxyCollection          = require('backbone-proxy-collection');
-var store                    = require('components/local-store');
 var RecentSearchesCollection = require('../collections/recent-searches');
 var SuggestedOrgCollection   = require('../collections/org-suggested-rooms');
+var apiClient                = require('components/apiClient');
 
 var states = [
   'all',
@@ -46,8 +46,6 @@ module.exports = Backbone.Model.extend({
     }
 
     this.searchInterval = SEARCH_DEBOUNCE_INTERVAL;
-    //TODO id this the best way to do this? JP 8/1/16
-    this.set('id', this.cid);
 
     //assign internal collections
     this._roomCollection = attrs.roomCollection;
@@ -139,28 +137,22 @@ module.exports = Backbone.Model.extend({
   //This can be changed to userPreferences once the data is maintained
   //JP 8/1/16
   sync: function(method, model, options) {//jshint unused: true
+    var self = this;
     var attrs;
 
     //save
     if (method === 'create' || method === 'update' || method === 'patch') {
       attrs = JSON.stringify(this);
-      return store.set(this.cid, attrs);
+      return apiClient.user.put('/settings/leftRoomMenu', this.toJSON())
+        .then(function(){ if(options.success) options.success.apply(self, arguments) })
+        .catch(function(err){ if(options.error) options.error(err) });
     }
 
     //read
-    attrs = store.get(this.cid);
-    attrs = (attrs  || '{}');
-    attrs = JSON.parse(attrs);
+    apiClient.user.get('/settings/leftRoomMenu')
+      .then(function(result){ self.set(result); if(options.success) options.success.apply(self, arguments) })
+      .catch(function(err){ if(options.error) options.error(err); });
 
-    // TODO Remove these overrides once the
-    // menu state is persisted on the server
-    // JP 15/12/15
-    this.set(_.extend({}, attrs, {
-      panelOpenState:   true,
-      roomMenuIsPinned: true,
-    }));
-
-    if (options.success) options.success();
   },
 
 });

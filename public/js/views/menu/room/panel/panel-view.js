@@ -115,6 +115,7 @@ module.exports = Marionette.LayoutView.extend({
     //fetch the model data
     this.model.fetch({
       success: function() {
+        console.log('SUCCESS');
         //ask for the next free frame
         RAF(function() {
           //show the menu
