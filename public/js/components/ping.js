@@ -10,7 +10,7 @@ window.setInterval(function() {
   apiClient.web.get('/api_web/private/ping', undefined, {
       global: false
     })
-    .fail(function(err) {
+    .catch(function(err) {
       debug('An error occurred pinging the server: %j', err);
     });
 }, PING_POLL);
