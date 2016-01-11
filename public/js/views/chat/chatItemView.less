@@ -31,10 +31,6 @@
     background-color: @permalink-highlight-bg;
   }
 
-  &:hover {
-    background-color: rgba(240,240,240,0.3);
-  }
-
   &.synced {
     opacity: 1.0;
   }
@@ -134,6 +130,10 @@
   &:last-child {
     &.burstStart { padding-bottom: @chat-spacing*2; }
   }
+}
+
+body:not(.mobile) .chat-item:hover {
+    background-color: rgba(240,240,240,0.3);
 }
 
 .chat-item__aside {
