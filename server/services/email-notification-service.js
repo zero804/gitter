@@ -158,15 +158,14 @@ module.exports = {
   },
 
   sendInvitation: function(fromUser, toUser, room) {
-    return emailAddressService(toUser)
+    return emailAddressService(toUser, { preferInvitedEmail: true,  attemptDiscovery: true })
     .then(function(email) {
       return sendInvite(fromUser, toUser, room, email, 'invitation', 'invitation_sent');
     });
   },
 
   sendInvitationReminder: function(fromUser, toUser, room) {
-    var preferStoredEmail = true;
-    return emailAddressService(toUser, preferStoredEmail)
+    return emailAddressService(toUser, { preferInvitedEmail: true,  attemptDiscovery: true })
     .then(function(email) {
       return sendInvite(fromUser, toUser, room, email, 'invitation-reminder', 'invitation_reminder_sent');
     });
@@ -252,7 +251,7 @@ module.exports = {
           return;
         }
 
-        return emailAddressService(toUser)
+        return emailAddressService(toUser, { attemptDiscovery: true })
           .then(function(email) {
             if (!email) {
               logger.info('Skipping email notification for ' + toUser.username + ' as they have no primary confirmed email');
