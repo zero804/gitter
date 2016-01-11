@@ -148,11 +148,11 @@ module.exports = Backbone.Model.extend({
         .catch(function(err){ if(options.error) options.error(err) });
     }
 
-    //read
-    apiClient.user.get('/settings/leftRoomMenu')
-      .then(function(result){ self.set(result); if(options.success) options.success.apply(self, arguments) })
-      .catch(function(err){ if(options.error) options.error(err); });
-
+    //The only time we need to fetch data is on page load
+    //so we can just pull it our of the troupe context
+    //JP 11/1/16
+    this.set(window.troupeContext.leftRoomMenuState);
+    if(options.success) options.success();
   },
 
 });

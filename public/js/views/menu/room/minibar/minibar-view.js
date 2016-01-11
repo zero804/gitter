@@ -83,6 +83,10 @@ var MiniBarView = Marionette.ItemView.extend({
 
     }
 
+    //If the pin button is clicked retain the current state
+    if(type === 'pin') { type = this.model.get('state') }
+    if(!orgName) { orgName = this.model.get('selectedOrgName') }
+
     this.model.set({
       panelOpenState:       true,
       state:                type,
@@ -108,12 +112,14 @@ var MiniBarView = Marionette.ItemView.extend({
     var orgName = this.model.get('selectedOrgName');
     var type    = this.model.get('state');
 
-    //deactive the old active item
+    if(!this.model.get('panelOpenState')) { return }
+
+    //de-activate the old active item
     var currentActiveModel = this._getCurrentlyActiveChildModel();
     if (!!currentActiveModel) currentActiveModel.set('active', false);
 
     //activate the next item
-    var query = !!orgName ? { orgName: orgName } : { type: type };
+    var query = (type === 'org') ? { orgName: orgName } : { type: type };
     var nextActiveModel = this.roomMenuItemModels.where(query)[0];
     if (!!nextActiveModel) nextActiveModel.set('active', true);
 

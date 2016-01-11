@@ -252,6 +252,7 @@ function renderMainFrame(req, res, next, frame) {
         cssFileName: "styles/" + bootScriptName + ".css",
         troupeName: req.uriContext.uri,
         troupeContext: troupeContext,
+        roomMenuIsPinned: troupeContext.leftRoomMenuState.roomMenuIsPinned,
         chatAppLocation: chatAppLocation,
         agent: req.headers['user-agent'],
         stagingText: stagingText,

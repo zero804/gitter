@@ -11,8 +11,7 @@ module.exports = Marionette.ItemView.extend({
 
   modelEvents: {
     'change:state': 'updateActiveElement',
-    'change:selectedOrgName': 'render',
-    'change:roomMenuIsPinned': 'onPinStateChange',
+    'change:selectedOrgName': 'render'
   },
 
   events: {
@@ -72,8 +71,5 @@ module.exports = Marionette.ItemView.extend({
     });
   },
 
-  onPinStateChange: function(model, val) { /*jshint unused: true */
-    this.$el.find('#menu-panel-header-close').toggleClass('active', !val);
-  },
 
 });

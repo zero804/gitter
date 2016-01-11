@@ -22,12 +22,14 @@ exports.generateNonChatContext = function(req) {
       user ? serializeUser(user) : null,
       user ? determineDesktopNotifications(user, req) : false,
       user ? userSettingsService.getUserSettings(user.id, 'suggestedRoomsHidden') : false,
+      user ? userSettingsService.getUserSettings(user.id, 'leftRoomMenu') : false,
     ])
-    .spread(function (serializedUser, desktopNotifications, suggestedRoomsHidden) {
+    .spread(function (serializedUser, desktopNotifications, suggestedRoomsHidden, leftRoomMenuState) {
       return createTroupeContext(req, {
-        user: serializedUser,
+        user:                 serializedUser,
         suggestedRoomsHidden: suggestedRoomsHidden,
         desktopNotifications: desktopNotifications,
+        leftRoomMenuState:    leftRoomMenuState
       });
     });
 };
@@ -172,6 +174,7 @@ function createTroupeContext(req, options) {
     isNativeDesktopApp: isNativeDesktopApp(req),
     permissions: options.permissions,
     locale: req.i18n.locales[req.i18n.locale],
-    features: features
+    features: features,
+    leftRoomMenuState: options.leftRoomMenuState
   }, extras);
 }
