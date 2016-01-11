@@ -31,4 +31,7 @@ module.exports = {
       'utils/raf': path.resolve(__dirname, './fixtures/helpers/raf.js')
     },
   },
+  node: {
+    fs: 'empty'
+  }
 };
