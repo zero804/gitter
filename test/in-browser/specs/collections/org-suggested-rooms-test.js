@@ -1,7 +1,8 @@
-/*global describe:true, it:true, beforeEach:true, sinon: true */
+/*global describe:true, it:true, beforeEach:true */
 'use strict';
 
 var assert                 = require('assert');
+var sinon                  = require('sinon');
 var Backbone               = require('backbone');
 var SuggestedOrgCollection = require('public/js/collections/org-suggested-rooms');
 
