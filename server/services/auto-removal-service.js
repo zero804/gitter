@@ -2,13 +2,10 @@
 
 var env                       = require('gitter-web-env');
 var stats                     = env.stats;
-var recentRoomService         = require('./recent-room-service');
-var persistence               = require('./persistence-service');
+var recentRoomCore            = require('./core/recent-room-core');
 var unreadItemService         = require('./unread-item-service');
 var Q                         = require('q');
 var qlimit                    = require('qlimit');
-var persistence               = require('./persistence-service');
-var mongoUtils                = require('../utils/mongo-utils');
 var roomMembershipService     = require('./room-membership-service');
 
 /**
@@ -20,7 +17,7 @@ function findRemovalCandidates(roomId, options) {
 
   return roomMembershipService.findMembersForRoom(roomId)
     .then(function(userIds) {
-      return recentRoomService.findLastAccessTimesForUsersInRoom(roomId, userIds);
+      return recentRoomCore.findLastAccessTimesForUsersInRoom(roomId, userIds);
     })
     .then(function(lastAccessDates) {
       var cutoff = Date.now() - minTimeInDays * 86400000;
