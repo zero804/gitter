@@ -27,6 +27,8 @@ if (survivalMode) {
 }
 
 var DEFAULT_CHAT_COUNT_LIMIT = 30;
+var DEFAULT_USERS_LIMIT = 30;
+var MAX_USERS_LIMIT = 100;
 
 exports.serializeTroupesForUser = function(userId, callback) {
   if(!userId) return Q.resolve([]);
@@ -73,15 +75,26 @@ exports.serializeChatsForTroupe = function(troupeId, userId, options, callback) 
 exports.serializeUsersForTroupe = function(troupeId, userId, options) {
   if (!options) options = {};
 
+  var skip = options.skip;
+  if (!skip || isNaN(skip)) {
+    skip = 0;
+  }
+
   var limit = options.limit;
   var searchTerm = options.searchTerm;
+
+  if (!limit || isNaN(limit)) {
+    limit = DEFAULT_USERS_LIMIT;
+  } else if (limit > MAX_USERS_LIMIT) {
+    limit = MAX_USERS_LIMIT;
+  }
 
   if(searchTerm) {
     if (survivalMode) {
       return Q.resolve([]);
     }
 
-    return userSearchService.searchForUsersInRoom(searchTerm, troupeId, { limit: limit || 30})
+    return userSearchService.searchForUsersInRoom(searchTerm, troupeId, { limit: limit })
       .then(function(resp) {
         var strategy = new restSerializer.UserStrategy();
         return restSerializer.serializeExcludeNulls(resp.results, strategy);
@@ -89,7 +102,7 @@ exports.serializeUsersForTroupe = function(troupeId, userId, options) {
 
   }
 
-  return roomMembershipService.findMembersForRoom(troupeId, { limit: limit }) /* Limit may be null */
+  return roomMembershipService.findMembersForRoom(troupeId, { limit: limit, skip: skip })
     .then(function(userIds) {
       var strategy = new restSerializer.UserIdStrategy({
         showPresenceForTroupeId: troupeId,
@@ -144,7 +157,7 @@ exports.serializeOrgsForUser = function(user) {
     .then(function(orgs) {
       var strategyOptions = { currentUserId: user.id };
       // TODO: not all organisations are going to be github ones in future!
-      var strategy = new restSerializer.GitHubOrgStrategy(strategyOptions);
+      var strategy = new restSerializer.GithubOrgStrategy(strategyOptions);
       return restSerializer.serializeExcludeNulls(orgs, strategy);
     });
 };

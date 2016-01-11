@@ -13,4 +13,5 @@ module.exports = {
   GitHubRepoService: require('./github-repo-service'),
   GitHubUriValidator: require('./github-uri-validator'),
   GitHubUserService: require('./github-user-service'),
+  obfuscateToken: require('./obfuscate-token'),
 };

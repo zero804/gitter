@@ -117,6 +117,9 @@ function findMembersForRoom(troupeId, options) {
   assert(troupeId);
 
   var query = TroupeUser.find({ troupeId: troupeId }, { _id: 0, userId: 1 }, { lean: true });
+  if (options && options.skip) {
+    query.skip(options.skip);
+  }
   if (options && options.limit) {
     query.limit(options.limit);
   }

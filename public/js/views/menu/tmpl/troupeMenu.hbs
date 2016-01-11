@@ -31,7 +31,7 @@
       <div class='menu-list__item' id="orgs-region">
         <div {{#if userHasNoOrgs}}style="display:none"{{/if}}>
           <div class="menu-list__header">
-            <h5>Your Organizations</h5>
+            <h5>Your Organisations</h5>
           </div>
           <div id="list">
             <ul class="room-list">
@@ -47,7 +47,9 @@
   <div class="menu-list__overflow-shadow"></div>
 </div>
 {{#if showFooterButtons}}
-  <a class="menu__create-room-button" href="#createroom">Create a room</a>
+<div class="menu__create-room-wrapper">
+  <a class="menu__create-room-button button-caribbean--small" href="#createroom">Create a room</a>
+</div>
 {{/if}}
 {{#if showUnreadTab}}
 <div class="menu__hotspot">
