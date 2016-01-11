@@ -18,12 +18,10 @@ module.exports = function() {
       if(issueNumber) query.issueNumber = issueNumber;
 
       apiClient.room.get('/issues', query)
-        .then(function(resp) {
-          callback(resp);
+        .catch(function() {
+          return [];
         })
-        .fail(function() {
-          callback([]);
-        });
+        .asCallback(callback);
     },
     template: function(issue) {
       return template({

@@ -31,7 +31,7 @@ onready(function() {
 
     autojoin: function() {
       apiClient.post('/v1/rooms/' + context.getTroupeId() + '/users', { username: context().user.username })
-      .then(function(res) {
+      .then(function() {
         context.troupe().set('roomMember', true);
       });
     }

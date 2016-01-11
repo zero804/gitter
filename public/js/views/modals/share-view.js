@@ -106,7 +106,7 @@ var View = Marionette.ItemView.extend({
       .then(function() {
         $btn.text('Pull Request sent!');
       })
-      .fail(function() {
+      .catch(function() {
         $btn.text('Failed. Try again?');
         btn.disabled = false;
       });

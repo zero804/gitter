@@ -942,7 +942,7 @@ exports.createCustomChildRoom = createCustomChildRoom;
  */
 function notifyInvitedUser(fromUser, invitedUser, room/*, isNewUser*/) {
   // get the email address
-  return emailAddressService(invitedUser)
+  return emailAddressService(invitedUser, { attemptDiscovery: true })
     .then(function (emailAddress) {
       var notification;
 

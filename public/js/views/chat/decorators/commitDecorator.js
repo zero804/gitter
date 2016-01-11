@@ -120,7 +120,7 @@ module.exports = (function() {
       .then(function(commit) {
         model.set(commit);
       })
-      .fail(function(err) {
+      .catch(function(err) {
         model.set('error', err.status);
       });
   }
