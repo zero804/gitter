@@ -27,7 +27,6 @@ describe('PanelHeaderView', function() {
 
   it('should render the correct initial content', function() {
     model.set('state', 'all');
-    console.log(panelHeaderView.el);
     var result = panelHeaderView.$el.find('.panel-header__container--all').length;
     assert.equal(1, result);
 
@@ -63,37 +62,5 @@ describe('PanelHeaderView', function() {
     assert.ok(model.get('profileMenuOpenState'));
     el.click();
     assert.ok(!model.get('profileMenuOpenState'));
-  });
-
-  it('should change the panelMenuOpenState when the close button is clicked', function() {
-    model.set('profileMenuOpenState', true);
-    assert.ok(model.get('profileMenuOpenState'));
-    panelHeaderView.render();
-    panelHeaderView.$el.find('#menu-panel-header-close').click();
-    assert.ok(!model.get('profileMenuOpenState'));
-  });
-
-  it('should change the panelOpenState when the close button is clicked', function() {
-    assert.ok(model.get('panelOpenState'));
-    panelHeaderView.render();
-    panelHeaderView.$el.find('#menu-panel-header-close').click();
-    assert.ok(!model.get('panelOpenState'));
-  });
-
-  it('should not change the panelOpenState when the roomMenuIsPinned is ture', function(){
-    model.set('roomMenuIsPinned', true);
-    assert.ok(model.get('panelOpenState'));
-    panelHeaderView.render();
-    panelHeaderView.$el.find('#menu-panel-header-close').click();
-    assert.ok(model.get('panelOpenState'));
-  });
-
-  it('should toggle a class on the close button as the roomMenuIsPinned changes', function(){
-    panelHeaderView.render();
-    assert.ok(panelHeaderView.$el.find('#menu-panel-header-close').hasClass('active'));
-    model.set('roomMenuIsPinned', true);
-    assert.ok(!panelHeaderView.$el.find('#menu-panel-header-close').hasClass('active'));
-    model.set('roomMenuIsPinned', false);
-    assert.ok(panelHeaderView.$el.find('#menu-panel-header-close').hasClass('active'));
   });
 });

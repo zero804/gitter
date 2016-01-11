@@ -1,7 +1,8 @@
-/*global describe:true, it:true, beforeEach:true, sinon: true */
+/*global describe:true, it:true, beforeEach:true */
 'use strict';
 
 var assert    = require('assert');
+var sinon     = require('sinon');
 var Backbone  = require('backbone');
 var PanelView = require('public/js/views/menu/room/panel/panel-view');
 var appEvents = require('public/js/utils/appevents');

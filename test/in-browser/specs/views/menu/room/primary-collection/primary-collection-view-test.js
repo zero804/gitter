@@ -1,4 +1,4 @@
-/*global describe:true, it:true, beforeEach:true, sinon: true */
+/*global describe:true, it:true, beforeEach:true */
 'use strict';
 
 /*
@@ -6,6 +6,7 @@
  * */
 
 var assert                = require('assert');
+var sinon                 = require('sinon');
 var Backbone              = require('backbone');
 var PrimaryCollectionView = require('public/js/views/menu/room/primary-collection/primary-collection-view');
 
