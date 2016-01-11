@@ -1,20 +1,24 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var env               = require('gitter-web-env');
-var logger            = env.logger;
+var env                   = require('gitter-web-env');
+var logger                = env.logger;
 
-var restSerializer      = require("../serializers/rest-serializer");
-var unreadItemService   = require("./unread-item-service");
-var chatService         = require("./chat-service");
-var userService         = require("./user-service");
-var userSearchService   = require('./user-search-service');
-var eventService        = require("./event-service");
-var Q                   = require('q');
-var roomService         = require('./room-service');
-var _                   = require('underscore');
+var Q                     = require('q');
+var StatusError           = require('statuserror');
+var _                     = require('underscore');
+var gitHubProfileService  = require('gitter-web-github-backend/lib/github-profile-service');
+var restSerializer        = require("../serializers/rest-serializer");
+var unreadItemService     = require("./unread-item-service");
+var chatService           = require("./chat-service");
+var userService           = require("./user-service");
+var userSearchService     = require('./user-search-service');
+var eventService          = require("./event-service");
+var roomService           = require('./room-service');
 var roomMembershipService = require('./room-membership-service');
-var BackendResolver = require('./backend-resolver');
+var BackendMuxer          = require('./backend-muxer');
+var userScopes            = require("../utils/models/user-scopes");
+
 
 var survivalMode = !!process.env.SURVIVAL_MODE || false;
 
@@ -23,6 +27,8 @@ if (survivalMode) {
 }
 
 var DEFAULT_CHAT_COUNT_LIMIT = 30;
+var DEFAULT_USERS_LIMIT = 30;
+var MAX_USERS_LIMIT = 100;
 
 exports.serializeTroupesForUser = function(userId, callback) {
   if(!userId) return Q.resolve([]);
@@ -69,15 +75,26 @@ exports.serializeChatsForTroupe = function(troupeId, userId, options, callback) 
 exports.serializeUsersForTroupe = function(troupeId, userId, options) {
   if (!options) options = {};
 
+  var skip = options.skip;
+  if (!skip || isNaN(skip)) {
+    skip = 0;
+  }
+
   var limit = options.limit;
   var searchTerm = options.searchTerm;
+
+  if (!limit || isNaN(limit)) {
+    limit = DEFAULT_USERS_LIMIT;
+  } else if (limit > MAX_USERS_LIMIT) {
+    limit = MAX_USERS_LIMIT;
+  }
 
   if(searchTerm) {
     if (survivalMode) {
       return Q.resolve([]);
     }
 
-    return userSearchService.searchForUsersInRoom(searchTerm, troupeId, { limit: limit || 30})
+    return userSearchService.searchForUsersInRoom(searchTerm, troupeId, { limit: limit })
       .then(function(resp) {
         var strategy = new restSerializer.UserStrategy();
         return restSerializer.serializeExcludeNulls(resp.results, strategy);
@@ -85,7 +102,7 @@ exports.serializeUsersForTroupe = function(troupeId, userId, options) {
 
   }
 
-  return roomMembershipService.findMembersForRoom(troupeId, { limit: limit }) /* Limit may be null */
+  return roomMembershipService.findMembersForRoom(troupeId, { limit: limit, skip: skip })
     .then(function(userIds) {
       var strategy = new restSerializer.UserIdStrategy({
         showPresenceForTroupeId: troupeId,
@@ -135,8 +152,14 @@ exports.serializeEventsForTroupe = function(troupeId, userId, callback) {
 };
 
 exports.serializeOrgsForUser = function(user) {
-  var backendResolver = new BackendResolver(user);
-  return backendResolver.getSerializedOrgs();
+  var backendMuxer = new BackendMuxer(user);
+  return backendMuxer.findOrgs()
+    .then(function(orgs) {
+      var strategyOptions = { currentUserId: user.id };
+      // TODO: not all organisations are going to be github ones in future!
+      var strategy = new restSerializer.GithubOrgStrategy(strategyOptions);
+      return restSerializer.serializeExcludeNulls(orgs, strategy);
+    });
 };
 
 exports.serializeOrgsForUserId = function(userId, options) {
@@ -145,5 +168,24 @@ exports.serializeOrgsForUserId = function(userId, options) {
       if(!user) return [];
 
       return exports.serializeOrgsForUser(user, options);
+    });
+};
+
+exports.serializeProfileForUsername = function(username) {
+  return userService.findByUsername(username)
+    .then(function(user) {
+      if (user) {
+        var strategy = new restSerializer.UserProfileStrategy();
+        return restSerializer.serialize(user, strategy);
+
+      } else {
+        var gitHubUser = {username: username};
+
+        if (!userScopes.isGitHubUser(gitHubUser)) {
+          throw new StatusError(404);
+        }
+
+        return gitHubProfileService(gitHubUser, {includeCore: true});
+      }
     });
 };

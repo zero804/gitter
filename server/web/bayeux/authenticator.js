@@ -1,8 +1,10 @@
 'use strict';
 
-var env               = require('gitter-web-env');
-var logger            = env.logger;
-var errorReporter     = env.errorReporter;
+var env           = require('gitter-web-env');
+var nconf         = env.config;
+var logger        = env.logger;
+var errorReporter = env.errorReporter;
+var statsd        = env.createStatsClient({ prefix: nconf.get('stats:statsd:prefix')});
 
 var oauth             = require('../../services/oauth-service');
 var mongoUtils        = require('../../utils/mongo-utils');
@@ -13,6 +15,7 @@ var StatusError       = require('statuserror');
 var bayeuxExtension   = require('./extension');
 var clientUsageStats  = require('../../utils/client-usage-stats');
 var appVersion        = require('../appVersion');
+var useragent         = require('useragent');
 var debug             = require('debug')('gitter:bayeux-authenticator');
 
 function getConnectionType(incoming) {
@@ -25,6 +28,14 @@ function getConnectionType(incoming) {
     default:
       return 'online';
   }
+}
+
+function getUserAgentFamily(req) {
+  if (!req || !req.headers) return;
+  var useragentHeader = req.headers['user-agent'];
+  if (!useragentHeader) return;
+  var agent = useragent.lookup(useragentHeader);
+  return agent && agent.family;
 }
 
 var version = appVersion.getVersion();
@@ -42,9 +53,30 @@ module.exports = bayeuxExtension({
 
     var token = ext.token;
 
-    if(!token) {
+    if(!token || typeof token !== 'string') {
       return callback(new StatusError(401, "Access token required"));
     }
+
+    var tags = [];
+    if (ext.realtimeLibrary) {
+      tags.push('library:' + ext.realtimeLibrary);
+    }
+
+    // Quick way of telling anonymous users apart
+    var isAnonymous = token.charAt(0) === '$';
+    if (isAnonymous) {
+      tags.push('anonymous:1');
+    } else {
+      tags.push('anonymous:0');
+    }
+
+
+    var useragentFamily = getUserAgentFamily(req);
+    if (useragentFamily) {
+      tags.push('useragent:' + useragentFamily);
+    }
+
+    statsd.increment('bayeux.handshake.attempt', 1, 0.25, tags);
 
     oauth.validateAccessTokenAndClient(ext.token, function(err, tokenInfo) {
       if(err) return callback(err);
@@ -70,6 +102,9 @@ module.exports = bayeuxExtension({
         connectionType: connectionType,
         client: ext.client,
         troupeId: ext.troupeId,
+        oauthClientId: oauthClient.id,
+        uniqueClientId: ext.uniqueClientId,
+        realtimeLibrary: ext.realtimeLibrary,
         eyeballState: parseInt(ext.eyeballs, 10) || 0
       };
 
@@ -88,19 +123,22 @@ module.exports = bayeuxExtension({
     var userId = state.userId;
     var connectionType = state.connectionType;
     var clientId = message.clientId;
-    var client = state.client;
+    var clientType = state.client;
     var troupeId = state.troupeId;
+    var oauthClientId = state.oauthClientId;
+    var uniqueClientId = state.uniqueClientId;
+    var realtimeLibrary = state.realtimeLibrary;
     var eyeballState = state.eyeballState;
 
     // Get the presence service involved around about now
-    presenceService.userSocketConnected(userId, clientId, connectionType, client, troupeId, eyeballState, function(err) {
+    presenceService.userSocketConnected(userId, clientId, connectionType, clientType, realtimeLibrary, troupeId, oauthClientId, uniqueClientId, eyeballState, function(err) {
 
       if(err) {
-        logger.warn("bayeux: Unable to associate connection " + clientId + ' to ' + userId, { troupeId: troupeId, client: client, exception: err });
+        logger.warn("bayeux: Unable to associate connection " + clientId + ' to ' + userId, { troupeId: troupeId, client: clientType, exception: err });
         return callback(err);
       }
 
-      debug("Connection %s is associated to user %s (troupeId=%s, clientId=%s)", clientId, userId, troupeId, client);
+      debug("Connection %s is associated to user %s (troupeId=%s, clientId=%s, oauthClientId=%s)", clientId, userId, troupeId, clientType, oauthClientId);
 
       message.ext.userId = userId;
 

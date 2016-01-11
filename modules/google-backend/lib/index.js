@@ -11,8 +11,13 @@ GoogleBackend.prototype.getEmailAddress = function(preferStoredEmail) {
   return Q.resolve(this.identity.email);
 };
 
-GoogleBackend.prototype.getSerializedOrgs = function() {
+GoogleBackend.prototype.findOrgs = function() {
   return Q.resolve([]);
+};
+
+GoogleBackend.prototype.getProfile = function() {
+  // TODO: gravatar or fullcontact?
+  return Q.resolve({provider: 'google'});
 };
 
 module.exports = GoogleBackend;

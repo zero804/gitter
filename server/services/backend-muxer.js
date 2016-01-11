@@ -5,8 +5,8 @@ var userScopes = require('../utils/models/user-scopes');
 var identityService = require('./identity-service');
 
 var registeredBackends = {
-  google: require('../backends/google'),
-  github: require('../backends/github'),
+  google: require('gitter-web-google-backend'),
+  github: require('gitter-web-github-backend'),
   // ...
 };
 
@@ -38,11 +38,13 @@ function resolveUserBackends(user) {
     });
 }
 
-function BackendResolver(user) {
+function BackendMuxer(user) {
   this.user = user;
 }
 
-BackendResolver.prototype.findAllResults = function(method, args) {
+// Use this when each Backend returns an object or value and you just want them
+// all as one array.
+BackendMuxer.prototype.findResults = function(method, args) {
   args = args || [];
 
   return resolveUserBackends(this.user)
@@ -52,12 +54,20 @@ BackendResolver.prototype.findAllResults = function(method, args) {
       });
       return Q.all(promises);
     })
+};
+
+// Use this when each backend returns an array and you want to concatenate them
+// all into one array.
+BackendMuxer.prototype.findAllResults = function(method, args) {
+  return this.findResults(method, args)
     .then(function(arrays) {
       return Array.prototype.concat.apply([], arrays);
     });
 };
 
-BackendResolver.prototype.getFirstResult = function(method, args) {
+// Try the backends one by one and return the first one that returns a result's
+// result.
+BackendMuxer.prototype.getFirstResult = function(method, args) {
   args = args || [];
 
   return resolveUserBackends(this.user)
@@ -89,12 +99,16 @@ BackendResolver.prototype.getFirstResult = function(method, args) {
     });
 };
 
-BackendResolver.prototype.getEmailAddress = function(preferStoredEmail) {
+BackendMuxer.prototype.getEmailAddress = function(preferStoredEmail) {
   return this.getFirstResult('getEmailAddress', [preferStoredEmail]);
 };
 
-BackendResolver.prototype.getSerializedOrgs = function() {
-  return this.findAllResults('getSerializedOrgs');
+BackendMuxer.prototype.findOrgs = function() {
+  return this.findAllResults('findOrgs');
 };
 
-module.exports = BackendResolver;
+BackendMuxer.prototype.findProfiles = function() {
+  return this.findResults('getProfile');
+};
+
+module.exports = BackendMuxer;

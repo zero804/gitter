@@ -83,3 +83,4 @@ docker_node_modules
 .vagrant/
 test/in-browser/fixtures/build/*
 test/in-browser/browserstack-run.pid
+drop-dev-database.sh
