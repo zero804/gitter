@@ -220,6 +220,11 @@ You can do this as follows:
 NODE_ENV=prod LISTEN_IF=utun0 node scripts/graphs/upload-graph.js
 ```
 
+## Auto Lurk Script
+```shell
+NODE_ENV=prod scripts/utils/auto-lurk-room.js --members 30000 --min 31
+```
+
 Testing
 -----------------------
 
