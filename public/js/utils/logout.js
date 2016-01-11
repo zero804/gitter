@@ -19,7 +19,7 @@ module.exports = function logout() {
         navigate('/');
       }
     })
-    .fail(function() {
+    .catch(function() {
       navigate('/');
     });
 

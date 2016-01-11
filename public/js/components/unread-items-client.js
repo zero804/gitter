@@ -142,7 +142,7 @@ module.exports = (function() {
             async: async,
             global: false
           })
-          .fail(function() {
+          .catch(function() {
             debug('Error posting unread items to server. Will attempt again in 5s');
 
             if (++attempts < 10) {

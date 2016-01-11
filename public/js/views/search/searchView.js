@@ -16,6 +16,7 @@ var noResultsTemplate = require('./tmpl/no-results.hbs');
 var noRoomResultsTemplate = require('./tmpl/no-room-results.hbs');
 var textFilter = require('utils/text-filter');
 var KeyboardEventsMixin = require('views/keyboard-events-mixin');
+var Promise = require('bluebird');
 
 require('views/behaviors/widgets');
 require('views/behaviors/highlight');
@@ -198,49 +199,48 @@ module.exports = (function() {
     },
 
     fetchLocalRooms: function () {
-      var p = $.Deferred();
-      appEvents.triggerParent('troupeRequest', { }); // request troupe from parent frame
-      appEvents.once('troupesResponse', p.resolve);
-      return p;
+      return new Promise(function(resolve) {
+        appEvents.triggerParent('troupeRequest', { }); // request troupe from parent frame
+        appEvents.once('troupesResponse', resolve);
+      });
     },
 
     fetchMessages: function (args) {
-      var p = $.Deferred();
       var messages = this.messages;
       var query = args.query;
       var self = this;
 
       messages.reset(); // we must clear the collection before fetching more
-      messages.fetchSearch(query, function (err) {
-        if (err) {
-          appEvents.trigger('track-event', 'search_messages_failed');
-          return p.reject(err);
-        }
+      return new Promise(function(resolve, reject) {
+        messages.fetchSearch(query, function (err) {
+          if (err) {
+            appEvents.trigger('track-event', 'search_messages_failed');
+            return reject(err);
+          }
 
-        var results = messages.models
-          .map(function (item) {
-            item.set('priority', 3); // this ensures that messages are added at the bottom
-            return item;
-          });
+          var results = messages.models
+            .map(function (item) {
+              item.set('priority', 3); // this ensures that messages are added at the bottom
+              return item;
+            });
 
-        self.trigger('loaded:messages', results, query);
-        p.resolve();
-      }, this);
-
-      return p;
+          self.trigger('loaded:messages', results, query);
+          resolve();
+        }, this);
+      });
     },
 
     fetchRooms: function (args) {
-      var p = $.Deferred();
       var query = args.query;
       var limit = typeof args.limit === 'undefined' ? 3 : args.limit;
 
-      var users = apiClient.get('/v1/user', { q: query, limit: limit, type: 'gitter' });
-      var repos = apiClient.user.get('/repos', { q: query, limit: limit });
-      var publicRepos = apiClient.get('/v1/rooms', { q: query, limit: limit });
-
-      $.when(users, repos, publicRepos)
-        .done(function (users, repos, publicRepos) {
+      return Promise.all([
+          apiClient.get('/v1/user', { q: query, limit: limit, type: 'gitter' }),
+          apiClient.user.get('/repos', { q: query, limit: limit }),
+          apiClient.get('/v1/rooms', { q: query, limit: limit })
+        ])
+        .bind(this)
+        .spread(function (users, repos, publicRepos) {
           // assuring that object are uniform since repos have a boolean (exists)
           users[0].results.map(function (i) { i.exists = true; });
           publicRepos[0].results.map(function (i) { i.exists = true; });
@@ -259,14 +259,12 @@ module.exports = (function() {
             .filter(this.notCurrentRoom);
 
           this.trigger('loaded:rooms', results, query);
-          p.resolve(results);
-        }.bind(this))
-        .fail(function (err) {
+          return results;
+        })
+        .catch(function (err) {
           appEvents.trigger('track-event', 'search_rooms_failed');
-          p.reject(err);
+          throw err;
         });
-
-      return p;
     },
 
     notCurrentRoom: function (room) {
@@ -286,7 +284,7 @@ module.exports = (function() {
     cacheRooms: function (rooms) {
       var cache = this.cache;
       cache.set(this.formatRooms(rooms));
-      return $.Deferred().resolve(cache);
+      return Promise.resolve(cache);
     },
 
     clearCache: function () {
@@ -295,28 +293,23 @@ module.exports = (function() {
     },
 
     getLocalRooms: function () {
-      var p = $.Deferred();
       var cache = this.cache;
 
       if (_.isEmpty(cache.models)) {
-        this.fetchLocalRooms()
+        return this.fetchLocalRooms()
           .then(this.cacheRooms.bind(this))
-          .then(p.resolve);
-      } else {
-        p.resolve(cache);
       }
 
-      return p;
+      return Promise.resolve(cache);
     },
 
     local: function (query) {
-      var p = $.Deferred();
-
       if (!query) {
-        return p.resolve(); // to avoid fetching empty queries
+        return Promise.resolve(); // to avoid fetching empty queries
       }
 
-      this.getLocalRooms()
+      return this.getLocalRooms()
+        .bind(this)
         .then(function (rooms) {
           var filter = textFilter({ query: query, fields: ['url', 'name'] });
           rooms = rooms.filter(filter).slice(0, 3).map(function (item) {
@@ -325,22 +318,18 @@ module.exports = (function() {
           }); // show the top 3 results only
 
           this.trigger('loaded:rooms', rooms, query);
-          p.resolve();
-        }.bind(this));
-      return p;
+        });
     },
 
     remote: function (query) {
-      var p = $.Deferred();
-
       if (!query) {
-        return p.resolve(); // to avoid fetching empty queries
+        return Promise.resolve(); // to avoid fetching empty queries
       }
 
-      $.when(this.fetchMessages({ query: query }), this.fetchRooms({ query: query }))
-        .done(p.resolve)
-        .fail(p.reject);
-      return p;
+      return Promise.all([
+        this.fetchMessages({ query: query }),
+        this.fetchRooms({ query: query })
+      ]);
     }
   });
 
@@ -473,16 +462,17 @@ module.exports = (function() {
       if (this.isSearchTermEmpty()) return this.hide();
 
       var searchTerm = this.model.get('searchTerm');
-      var finishedLoading = function () {
-        this.model.set('isLoading', false);
-        appEvents.trigger('track-event', 'search_complete');
-      }.bind(this);
-
       this.model.set('isLoading', true);
 
-      $.when(this.search.local(searchTerm), this.search.remote(searchTerm))
-        .then(finishedLoading)
-        .fail(finishedLoading);
+      Promise.all([
+        this.search.local(searchTerm),
+        this.search.remote(searchTerm)
+      ])
+      .bind(this)
+      .finally(function() {
+        this.model.set('isLoading', false);
+        appEvents.trigger('track-event', 'search_complete');
+      });
 
       this.triggerMethod('search:show'); // hide top toolbar content
     },

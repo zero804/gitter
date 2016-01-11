@@ -22,19 +22,20 @@ appEvents.on('eyeballStateChange', function (state) {
 });
 
 function authProvider(callback) {
-  context.getAccessToken(function (accessToken) {
-    var mobile = isMobile();
+  context.getAccessToken()
+    .then(function(accessToken) {
+      var mobile = isMobile();
 
-    return callback({
-      token: accessToken,
-      version: context.env('version'),
-      troupeId: context.getTroupeId(),
-      connType: mobile ? 'mobile' : 'online',
-      client: mobile ? 'mobweb' : 'web',
-      eyeballs: eyeballState ? 1 : 0
+      return callback({
+        token: accessToken,
+        version: context.env('version'),
+        troupeId: context.getTroupeId(),
+        connType: mobile ? 'mobile' : 'online',
+        client: mobile ? 'mobweb' : 'web',
+        eyeballs: eyeballState ? 1 : 0
+      });
+
     });
-
-  });
 }
 
 var updateTimers;

@@ -3,6 +3,7 @@ var Backbone = require('backbone');
 var qs = require('./qs');
 var _ = require('underscore');
 var localStore = require('../components/local-store');
+var Promise = require('bluebird');
 
 module.exports = (function() {
 
@@ -217,16 +218,16 @@ module.exports = (function() {
     return !!envName ? env[envName] : env;
   };
 
-  context.getAccessToken = function(callback) {
+  context.getAccessToken = Promise.method(function() {
     var iterations = 0;
     if(env.anonymous) {
-      return callback();
+      return;
     }
 
     function checkToken() {
       // This is a very rough first attempt
       var token = window.bearerToken || qs.bearerToken || ctx.accessToken;
-      if(token) return callback(token);
+      if(token) return token;
 
       iterations++;
       if(iterations > 50) {
@@ -239,12 +240,16 @@ module.exports = (function() {
 
           window.sessionStorage.setItem('forced_reload', Date.now() + 60000);
         }
-        return window.location.reload(true);
+
+        window.location.reload(true);
+        return;
       }
-      setTimeout(checkToken, 100);
+
+      return Promise.delay(100).then(checkToken);
     }
-    checkToken();
-  };
+
+    return checkToken();
+  });
 
   context.isLoggedIn = function() {
     // If we're in a context where one cannot be logged out...
@@ -252,16 +257,6 @@ module.exports = (function() {
 
     // TODO: this is not ideal. perhaps make this better
     return !!user.id;
-  };
-
-  context.onUserId = function(callback, c) {
-    if(user.id) {
-      callback.call(c, user.id);
-    } else {
-      user.once('change:id', function() {
-        callback.call(c, user.id);
-      });
-    }
   };
 
   context.isTroupeAdmin = function() {
