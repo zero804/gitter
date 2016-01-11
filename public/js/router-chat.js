@@ -65,7 +65,7 @@ onready(function() {
   window.addEventListener('message', function(e) {
     var message = parsePostMessage(e);
     if (!message) return;
-    
+
     debug('Received message %j', message);
 
     var makeEvent = function(message) {
@@ -218,10 +218,9 @@ onready(function() {
     if (!username) return;
 
     apiClient.room.delete('/users/' + username + '?type=username', '')
-    .fail(function(xhr) {
-      if (xhr.status < 500) notifyRemoveError(xhr.responseJSON.error);
-      else notifyRemoveError('');
-    });
+      .catch(function(e) {
+        notifyRemoveError(e.friendlyMessage || 'Unable to remove user');
+      });
   });
 
   var appView = new ChatToolbarInputLayout({

@@ -32,7 +32,7 @@ onready(function() {
         var msg = 'Room indexing disabled. The change will take effect the next time a search engine crawls this room.';
         $('#noindexStatus').html(!noindex ? msg : '');
       })
-      .fail(function() {
+      .catch(function() {
         $('#noindexStatus').html('Oops, something went wrong. Reload and try again.');
       });
   });
