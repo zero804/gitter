@@ -245,7 +245,7 @@ module.exports = (function () {
             .then(function () {
               collection.reset();
             })
-            .fail(function (err) {
+            .catch(function (err) {
               log.error(err);
             });
         }

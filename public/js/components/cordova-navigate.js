@@ -13,13 +13,11 @@ module.exports = (function() {
   }
 
   function getIdForUri(uri, cb) {
-    apiClient.post('/v1/rooms', { uri: uri })
+    return apiClient.post('/v1/rooms', { uri: uri })
       .then(function(room) {
-        cb(null, room.id);
+        return room.id;
       })
-      .fail(function() {
-        return cb(new Error('API call failed'));
-      });
+      .asCallback(cb);
   }
 
   /**
@@ -91,4 +89,3 @@ module.exports = (function() {
 
 
 })();
-

@@ -155,20 +155,15 @@ var View = Marionette.LayoutView.extend({
         self.dialog.hide();
         appEvents.trigger('navigation', data.url , 'chat#add', data.uri);
       })
-      .fail(function(xhr) {
-        var response;
-        try {
-          response = JSON.parse(xhr.responseText);
-        } catch (e) {
-          // Ignore
-        }
+      .catch(function(err) {
 
-        var status = xhr.status;
+
+        var status = err.status;
         var message = 'Unable to create channel.';
 
         switch (status) {
           case 400:
-            if (response && response.illegalName) {
+            if (err.response && err.response.illegalName) {
               message = 'Please choose a channel name consisting of letter and number characters.';
               self.ui.roomNameInput.focus();
             } else {
@@ -295,11 +290,12 @@ var View = Marionette.LayoutView.extend({
     function checkForRepoExistence(repo, cb) {
       apiClient.priv.get('/gh/repos/' + repo)
         .then(function () {
-          cb(true);
+          return true;
         })
-        .fail(function () {
-          cb(false);
-        });
+        .catch(function () {
+          return false;
+        })
+        .asCallback(cb);
     }
 
     function applyShowHides() {
