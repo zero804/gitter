@@ -31,6 +31,11 @@ onready(function() {
     chatIFrame.src = noHashSrc + window.location.hash;
   }
 
+  /* Replace the `null` state on startup with the real state, so that when a client clicks back to the
+   * first page of gitter, we know what the original URL was (instead of null)
+   */
+  window.history.replaceState(chatIFrame.src, '', window.location.href);
+
   function pushState(state, title, url) {
     window.history.pushState(state, title, url);
     appEvents.trigger('track', url);
