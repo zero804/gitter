@@ -62,7 +62,7 @@ module.exports = Marionette.LayoutView.extend({
     this.delay = MENU_HIDE_DELAY;
 
     //Make a new model
-    this.model = new RoomMenuModel({
+    this.model = window.model = new RoomMenuModel({
       bus:              this.bus,
       roomCollection:   this.roomCollection,
       userModel:        context.user(),
