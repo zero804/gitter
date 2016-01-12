@@ -8,7 +8,7 @@ var MenuLayout         = require('public/js/views/menu/room/layout/room-menu-lay
 var RoomMenuModel      = require('public/js/models/room-menu-model');
 var MockRoomCollection = require('fixtures/helpers/room-collection');
 
-describe('MenuLayout', function() {
+describe.only('MenuLayout', function() {
 
   var menuLayout;
   var roomCollection;
@@ -27,8 +27,34 @@ describe('MenuLayout', function() {
 
   });
 
+  it('should throw an error if no bus is passed', function(){
+    try{ new MenuLayout(); }
+    catch(e) {
+      assert.equal(e.message, 'A valid event bus needs to be passed to a new instance of RoomMenuLayout');
+    }
+  });
+
+  it('should throw an error if no roomCollection is passed', function(){
+    try{ new MenuLayout({ bus: Backbone.Events }); }
+    catch(e) {
+      assert.equal(e.message, 'A valid room collection needs to be passed to a new instance of RoomMenyLayout');
+    }
+  });
+
+  it('should assign a delay', function(){
+    assert.ok(menuLayout.delay);
+  });
+
   it('should create a room menu model on init', function() {
     assert.ok(menuLayout.model instanceof RoomMenuModel);
+  });
+
+  it('should create a room menu model with a user object', function(){
+    assert.ok(menuLayout.model.get('userModel') instanceof Backbone.Model);
+  });
+
+  it('should make a new drag & drop controller', function(){
+    assert.ok(menuLayout.dndCtrl);
   });
 
   it('should open the panel onMouseEnter when the roomMenu is not pinned', function() {
@@ -66,7 +92,7 @@ describe('MenuLayout', function() {
     }, 1);
   });
 
-  it('should set menuWasPinned correctly on dragStart', function(){
+  it('should set menuWasPinned correctly on dragStart', function() {
     menuLayout.model.set('roomMenuIsPinned', false);
     menuLayout.dndCtrl.trigger('dnd:start-drag');
     assert.ok(!menuLayout.model.get('roomMenuWasPinned'));
@@ -75,20 +101,20 @@ describe('MenuLayout', function() {
     assert.ok(menuLayout.model.get('roomMenuWasPinned'));
   });
 
-  it('should set roomMenuIsPinned on dragStart', function(){
+  it('should set roomMenuIsPinned on dragStart', function() {
     menuLayout.model.set('roomMenuIsPinned', false);
     menuLayout.dndCtrl.trigger('dnd:start-drag');
     assert.ok(menuLayout.model.get('roomMenuIsPinned'));
   });
 
-  it('should set roomMenuIsPinned if the roomMenu was not pinned on dragEnd', function(){
+  it('should set roomMenuIsPinned if the roomMenu was not pinned on dragEnd', function() {
     menuLayout.model.set('roomMenuWasPinned', false);
     menuLayout.model.set('roomMenuIsPinned', true);
     menuLayout.dndCtrl.trigger('dnd:end-drag');
     assert.ok(!menuLayout.model.get('roomMenuIsPinned'));
   });
 
-  it('should open the panel on drag end', function(){
+  it('should open the panel on drag end', function() {
     menuLayout.model.set('panelOpenState', false);
     menuLayout.dndCtrl.trigger('dnd:end-drag');
     assert(menuLayout.model.get('panelOpenState'));
