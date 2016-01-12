@@ -29,12 +29,15 @@ exports.install = function() {
   if (installed) return;
   installed = true;
 
-  function publish(channel, message, channelType, operation) {
+  function publish(channel, message, channelType, operation, modelType) {
     debug("Publish on %s: %j", channel, message);
 
     var tags = ['channelType:' + channelType];
     if (operation) {
       tags.push('operation:' + operation);
+    }
+    if (modelType) {
+      tags.push('modelType:' + modelType);
     }
     statsd.increment('bayeux.publish', 1, 0.25, tags);
 
@@ -52,6 +55,7 @@ exports.install = function() {
     var operation = data.operation;
     var model = data.model;
     var url = "/api/v1" + data.url;
+    var type = data.type;
 
     switch(operation) {
       case 'create':
@@ -63,7 +67,7 @@ exports.install = function() {
           model: model
         };
 
-        publish(url, message, 'dataChange2', operation);
+        publish(url, message, 'dataChange2', operation, type);
 
         break;
       default:
