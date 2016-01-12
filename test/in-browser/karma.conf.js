@@ -19,7 +19,7 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      './specs/**/*-test.js'
+      './fixtures/runner.js'
     ],
 
     // list of files to exclude
@@ -29,13 +29,12 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      './specs/**/*-test.js': ['webpack', 'coverage']
+      './fixtures/runner.js': ['webpack', 'coverage']
     },
 
     plugins: [
-      require('karma-webpack'),
+      require('karma-webpack-with-fast-source-maps'),
       require('karma-chrome-launcher'),
-      require('karma-phantomjs-launcher'),
       require('karma-mocha'),
       require('karma-chai'),
       require('karma-sourcemap-loader'),
