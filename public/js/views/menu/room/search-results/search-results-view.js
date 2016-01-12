@@ -1,6 +1,5 @@
 'use strict';
 
-var $                     = require('jquery');
 var _                     = require('underscore');
 var Backbone              = require('backbone');
 var Marionette            = require('backbone.marionette');
@@ -129,10 +128,6 @@ module.exports = (function() {
         avatarUrl: fromUser && fromUser.avatarUrlSmall
       };
       */
-
-      console.log('-----------------------');
-      console.log(username);
-      console.log('-----------------------');
 
       return {
         name: model.get('text'),
