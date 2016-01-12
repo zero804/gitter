@@ -114,7 +114,7 @@ function batchUpdateReadbyBatch(troupeIdString, userChatIds, done) {
         userIdsReadChat.forEach(function(userId) {
           appEvents.dataChange2("/rooms/" + troupeIdString + "/chatMessages/" + chatIdString + '/readBy', 'create', {
             id: userId
-          });
+          }, 'readBy');
         });
       });
 
