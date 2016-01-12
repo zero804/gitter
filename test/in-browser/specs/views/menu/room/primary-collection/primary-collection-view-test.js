@@ -10,9 +10,7 @@ var sinon                 = require('sinon');
 var Backbone              = require('backbone');
 var PrimaryCollectionView = require('public/js/views/menu/room/primary-collection/primary-collection-view');
 
-//TODO fix this, the hbs cnd helper makes everything cry :'(
-//JP 8/1/16
-describe.skip('PrimaryCollectionView', function() {
+describe('PrimaryCollectionView', function() {
 
   var collection;
   var model;
@@ -25,10 +23,10 @@ describe.skip('PrimaryCollectionView', function() {
     el = document.createElement('div');
     model = new Backbone.Model({ state: 'all', panelOpenState: true });
     collection = new Backbone.Collection([
-      { name:  '1', id: 1, favourite: 1 },
-      { name:  '2', id: 2 },
-      { name:  '3', id: 3 },
-      { name:  '4', id: 4 },
+      { name:  '1', id: 1, favourite: 1, uri: '1' },
+      { name:  '2', id: 2, uri: '2' },
+      { name:  '3', id: 3, uri: '3' },
+      { name:  '4', id: 4, uri: '4' },
     ]);
     sinon.stub(collection.models[1], 'save');
 
