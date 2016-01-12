@@ -16,7 +16,7 @@ function notifyGroupRoomOfAddedUsers(room, userIds) {
     .then(function(serializedUsers) {
       var roomUrl = "/rooms/" + room.id + "/users";
       serializedUsers.forEach(function(serializedUser) {
-        appEvents.dataChange2(roomUrl, "create", serializedUser);
+        appEvents.dataChange2(roomUrl, "create", serializedUser, 'user');
       });
     });
 }
@@ -32,7 +32,7 @@ function notifyUsersOfAddedGroupRooms(room, userIds) {
 
       userIds.forEach(function(userId) {
         var userUrl = "/user/" + userId + "/rooms";
-        appEvents.dataChange2(userUrl, "create", serializedRoom);
+        appEvents.dataChange2(userUrl, "create", serializedRoom, 'room');
       });
     });
 }
@@ -43,7 +43,7 @@ function notifyUsersOfAddedOneToOneRooms(room, userIds) {
 
     return restSerializer.serialize(room, strategy)
       .then(function(serializedRoom) {
-        appEvents.dataChange2('/user/' + userId + '/rooms', "create", serializedRoom);
+        appEvents.dataChange2('/user/' + userId + '/rooms', "create", serializedRoom, 'room');
       });
   }));
 }
@@ -68,8 +68,8 @@ module.exports = {
     // FIXME: NOCOMMIT deal with one to ones
     userIds.forEach(function(userId) {
       /* Dont mark the user as having been removed from the room */
-      appEvents.dataChange2('/rooms/' + troupeId + '/users', "remove", { id: userId });
-      appEvents.dataChange2('/user/' + userId + '/rooms', "remove", { id: troupeId });
+      appEvents.dataChange2('/rooms/' + troupeId + '/users', "remove", { id: userId }, 'user');
+      appEvents.dataChange2('/user/' + userId + '/rooms', "remove", { id: troupeId }, 'room');
 
       appEvents.userRemovedFromTroupe({ troupeId: troupeId, userId: userId });
     });
@@ -82,7 +82,7 @@ module.exports = {
       appEvents.userTroupeLurkModeChange({ userId: userId, troupeId: troupeId, lurk: lurk });
 
       // TODO: in future get rid of this but this collection is used by the native clients
-      appEvents.dataChange2('/user/' + userId + '/rooms', 'patch', { id: troupeId, lurk: lurk });
+      appEvents.dataChange2('/user/' + userId + '/rooms', 'patch', { id: troupeId, lurk: lurk }, 'room');
     });
 
     return Q.resolve();

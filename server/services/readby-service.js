@@ -104,7 +104,7 @@ function batchUpdateReadbyBatch(troupeIdString, userChatIds, done) {
         userIdsReadChat.forEach(function(userId) {
           appEvents.dataChange2("/rooms/" + troupeIdString + "/chatMessages/" + chatIdString + '/readBy', 'create', {
             id: userId
-          });
+          }, 'readBy');
         });
 
       });
@@ -148,7 +148,7 @@ function batchUpdateReadbyBatchLegacy(key, userIdStrings, done) {
       userIds.forEach(function(userId) {
         appEvents.dataChange2("/rooms/" + troupeId + "/chatMessages/" + chatId + '/readBy', 'create', {
           id: userId
-        });
+        }, 'readBy');
       });
 
     })
