@@ -1,12 +1,10 @@
 "use strict";
 
-var testRequire = require('../test-require');
-
-var readyByService = testRequire('./services/readby-service');
+var testRequire        = require('../test-require');
+var readyByService     = testRequire('./services/readby-service');
 var persistenceService = testRequire('./services/persistence-service');
-var mongoUtils = testRequire('./utils/mongo-utils');
-var collections = testRequire('./utils/collections');
-var fixtureLoader = require('../test-fixtures');
+var collections        = testRequire('./utils/collections');
+var fixtureLoader      = require('../test-fixtures');
 
 var assert = require("assert");
 
@@ -24,6 +22,12 @@ describe('readby-service', function() {
       sent: new Date("01/01/2014")
     },
     message2: {
+      user: 'user1',
+      troupe: 'troupe1',
+      text: 'old_message',
+      sent: new Date("01/01/2014")
+    },
+    message3: {
       user: 'user1',
       troupe: 'troupe1',
       text: 'old_message',
@@ -67,5 +71,29 @@ describe('readby-service', function() {
             });
         });
     });
+
+    it('should handle sequential batches', function() {
+      var user1 = fixture.user1;
+      var user2 = fixture.user2;
+      var message3 = fixture.message3;
+
+      return readyByService.testOnly.batchUpdateReadbyBatch(fixture.troupe1.id, [user1.id + ':' + message3.id])
+        .then(function() {
+          return readyByService.testOnly.batchUpdateReadbyBatch(fixture.troupe1.id, [user2.id + ':' + message3.id]);
+        })
+        .then(function() {
+          return persistenceService.ChatMessage
+            .findOne({ _id: message3._id })
+            .exec();
+        })
+        .then(function(m3) {
+          assert.strictEqual(m3.readBy.length, 2);
+          assert(m3.readBy.indexOf(user1._id) >= 0);
+          assert(m3.readBy.indexOf(user2._id) >= 0);
+        });
+
+    });
+
+
   });
 });
