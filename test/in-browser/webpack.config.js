@@ -11,7 +11,16 @@ module.exports = {
 
   devtool: 'inline-source-map',
   module: {
-    loaders: appWebpackConfig.module.loaders,
+    loaders: [
+      {
+        test: /\.hbs$/,
+        loader: 'handlebars-loader?helperDirs[]=' + path.resolve(__dirname, './fixtures/hbs'),
+      },
+      {
+        test:    /.css$/,
+        loader:  'style-loader!css-loader!postcss-loader',
+      },
+    ],
   },
   resolve: {
     modulesDirectories: [
@@ -27,10 +36,10 @@ module.exports = {
       'fixtures': path.resolve(__dirname, './fixtures'),
       'views/menu/room/search-results/search-results-view': path.resolve(__dirname, './fixtures/helpers/search-results-view.js'),
       'views/menu/room/search-input/search-input-view': path.resolve(__dirname, './fixtures/helpers/search-input-view.js'),
-      'utils/raf': path.resolve(__dirname, './fixtures/helpers/raf.js')
+      'utils/raf': path.resolve(__dirname, './fixtures/helpers/raf.js'),
     },
   },
   node: {
-    fs: 'empty'
-  }
+    fs: 'empty',
+  },
 };

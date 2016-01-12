@@ -72,6 +72,7 @@ var webpackConfig = {
     devtoolFallbackModuleFilenameTemplate: "[resource-path]?[hash]"
   },
   module: {
+    //JP 12/1/16 If you add a loader remember to add it to /test/in-browser/webpack.config.js
     loaders: [
       {
         test: /\.hbs$/,
