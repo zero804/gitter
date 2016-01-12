@@ -135,6 +135,14 @@ function getOrCreateClient() {
     appEvents.trigger('stats.' + type, statName, value);
   });
 
+  client.on('connection:up', function() {
+    appEvents.trigger('realtime-connectivity:up');
+  });
+
+  client.on('connection:down', function() {
+    appEvents.trigger('realtime-connectivity:down');
+  });
+
   if (ENABLE_APP_LAYER_PINGS) {
     pingTimer = setInterval(function() {
       debug('Performing ping');
