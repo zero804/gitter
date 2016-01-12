@@ -230,5 +230,15 @@ describe('RoomMenuModel', function() {
       });
     });
 
+    it('should set the roomMenuIsPinned to false if isMobile is true', function(done){
+      roomMenuModel.set('isMobile', true);
+      roomMenuModel.fetch({
+        success: function(){
+          assert.ok(!roomMenuModel.get('panelOpenState'));
+          done();
+        }
+      });
+    });
+
   });
 });

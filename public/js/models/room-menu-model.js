@@ -127,9 +127,10 @@ module.exports = Backbone.Model.extend({
 
   toJSON: function() {
     var attrs = this.attributes;
+
     //only ever store the defaults everything else is determined at run-time
     return Object.keys(this.defaults).reduce(function(memo, key) {
-      if(key === 'searchTerm') return memo;
+      if (key === 'searchTerm') return memo;
       memo[key] = attrs[key];
       return memo;
     }, {});
@@ -145,16 +146,17 @@ module.exports = Backbone.Model.extend({
     if (method === 'create' || method === 'update' || method === 'patch') {
       attrs = JSON.stringify(this);
       return apiClient.user.put('/settings/leftRoomMenu', this.toJSON())
-        .then(function(){ if(options.success) options.success.apply(self, arguments) })
-        .catch(function(err){ if(options.error) options.error(err) });
+        .then(function() { if (options.success) options.success.apply(self, arguments) })
+        .catch(function(err) { if (options.error) options.error(err) });
     }
 
     //if we are in a mobile environment then the menu will never be pinned
-    if(this.get('isMobile')) {
+    if (this.get('isMobile')) {
       window.troupeContext = {
         leftRoomMenuState: {
-          roomMenuIsPinned: false
-        }
+          roomMenuIsPinned: false,
+          panelOpenState:   false
+        },
       };
     }
 
@@ -162,7 +164,7 @@ module.exports = Backbone.Model.extend({
     //so we can just pull it our of the troupe context
     //JP 11/1/16
     this.set(window.troupeContext.leftRoomMenuState);
-    if(options.success) options.success();
+    if (options.success) options.success();
   },
 
 });
