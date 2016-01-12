@@ -245,6 +245,12 @@ function renderMainFrame(req, res, next, frame) {
         social.getMetadataForChatPermalink({ room: req.troupe, chat: permalinkChat  }) :
         social.getMetadata({ room: req.troupe  });
 
+      //guard against new users who have no previous leftRoomMenuState
+      //JP 12/1/16
+      troupeContext.leftRoomMenuState = (troupeContext.leftRoomMenuState || {
+        roomMenuIsPinned: true,
+      });
+
       res.render(template, {
         socialMetadata: socialMetadata,
         bootScriptName: bootScriptName,
