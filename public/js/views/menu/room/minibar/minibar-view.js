@@ -9,8 +9,15 @@ require('nanoscroller');
 var MiniBarView = Marionette.ItemView.extend({
 
   initialize: function(attrs) {
-    //TODO Test this
+
+    if(!attrs || !attrs.bus) {
+      throw new Error('A valid event bus must be passed to a new instance of the MiniBarView');
+    }
     this.bus = attrs.bus;
+
+    if(!attrs || !attrs.dndCtrl)  {
+      throw new Error('A valid drag & drop controller must be passed to a new instance of the MiniBarView');
+    }
     this.dndCtrl = attrs.dndCtrl;
 
     this.roomMenuItems = [];
@@ -50,13 +57,13 @@ var MiniBarView = Marionette.ItemView.extend({
 
   },
 
+  //TODO this sequencing is not 100% decided upon
+  //when it is the login needs to be tests
+  //JP 12/1/16
   onItemClicked: function(type, orgName, isCloseButton) {
-    //TODO Tidy this
     if (isCloseButton) {
       var newVal = !this.model.get('roomMenuIsPinned');
       var ANIMATION_TIME = 300;
-
-      //TODO TEST THIS LOGIC
 
       //if we are opening the panel
       if(newVal === true) {
@@ -80,7 +87,6 @@ var MiniBarView = Marionette.ItemView.extend({
           this.model.set({ panelOpenState: newVal });
         }.bind(this), ANIMATION_TIME);
       }
-
     }
 
     //If the pin button is clicked retain the current state

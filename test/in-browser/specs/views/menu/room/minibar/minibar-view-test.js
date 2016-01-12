@@ -45,11 +45,34 @@ describe('MinibarView', function() {
     });
 
     miniBar = new MiniBarView({
-      el:    el,
-      model: model,
-      bus:   Backbone.Events
+      el:      el,
+      model:   model,
+      bus:     Backbone.Events,
+      dndCtrl: new Backbone.View(),
     });
 
+  });
+
+  it('should throw an error if no bus is passed', function(done) {
+    try { new MiniBarView(); }
+    catch (e) {
+      assert.equal(e.message, 'A valid event bus must be passed to a new instance of the MiniBarView');
+      done();
+    }
+  });
+
+  it('should throw an error if no drag & drop controller is passed', function(done) {
+    try { new MiniBarView({ bus: Backbone.Events });}
+    catch (e) {
+      assert.equal(e.message, 'A valid drag & drop controller must be passed to a new instance of the MiniBarView');
+      done();
+    }
+  });
+
+
+  it('should create roomMenuItems and roomMenuItemModles', function(){
+    assert.ok(miniBar.roomMenuItems instanceof Array);
+    assert.ok(miniBar.roomMenuItemModels instanceof Backbone.Collection);
   });
 
   it('should set the correct model attributes when a click is triggered', function() {
@@ -70,6 +93,10 @@ describe('MinibarView', function() {
 
   it('should create child models for each child element with the correct dataset', function() {
     assert.equal(3, miniBar.roomMenuItemModels.length);
+  });
+
+  it('should return an active model the _getCurrentlyActiveChildModel is called', function(){
+    assert.ok(miniBar._getCurrentlyActiveChildModel() instanceof Backbone.Model);
   });
 
   it('should swap active models on click', function() {
@@ -108,11 +135,14 @@ describe('MinibarView', function() {
     }
   });
 
-  //This test passes when it has .only
-  //It fails with the click instruction when in the batch of tests
-  //so it is skipped
-  //TODO investigate why
-  it.skip('should change the roomMenuIsPinned when the close button is clicked', function() {
+
+  it('should stop listening to child views when destroyed', function(){
+    miniBar.destroy();
+    miniBar.roomMenuItems[1].trigger('room-item-view:clicked', 'org', 'test2');
+    assert.ok(!miniBar.roomMenuItemModels.at(1).get('active'));
+  });
+
+  it('should change the roomMenuIsPinned when the close button is clicked', function() {
     miniBar.model.set('roomMenuIsPinned', true);
     miniBar.$el.find('#menu-close-button').click();
     assert.ok(!miniBar.model.get('roomMenuIsPinned'));

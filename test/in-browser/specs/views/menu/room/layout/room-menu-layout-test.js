@@ -8,7 +8,7 @@ var MenuLayout         = require('public/js/views/menu/room/layout/room-menu-lay
 var RoomMenuModel      = require('public/js/models/room-menu-model');
 var MockRoomCollection = require('fixtures/helpers/room-collection');
 
-describe.only('MenuLayout', function() {
+describe('MenuLayout', function() {
 
   var menuLayout;
   var roomCollection;
@@ -27,17 +27,19 @@ describe.only('MenuLayout', function() {
 
   });
 
-  it('should throw an error if no bus is passed', function(){
+  it('should throw an error if no bus is passed', function(done){
     try{ new MenuLayout(); }
     catch(e) {
       assert.equal(e.message, 'A valid event bus needs to be passed to a new instance of RoomMenuLayout');
+      done();
     }
   });
 
-  it('should throw an error if no roomCollection is passed', function(){
+  it('should throw an error if no roomCollection is passed', function(done){
     try{ new MenuLayout({ bus: Backbone.Events }); }
     catch(e) {
       assert.equal(e.message, 'A valid room collection needs to be passed to a new instance of RoomMenyLayout');
+      done();
     }
   });
 
@@ -54,7 +56,7 @@ describe.only('MenuLayout', function() {
   });
 
   it('should make a new drag & drop controller', function(){
-    assert.ok(menuLayout.dndCtrl);
+      assert.ok(menuLayout.dndCtrl);
   });
 
   it('should open the panel onMouseEnter when the roomMenu is not pinned', function() {
