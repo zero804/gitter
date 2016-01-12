@@ -102,11 +102,12 @@ module.exports =  {
       localEventEmitter.on('userNotification', callback);
     },
 
-    dataChange2: function(url, operation, model) {
+    dataChange2: function(url, operation, model, type) {
       localEventEmitter.emit('dataChange2', {
         url: url,
         operation: operation,
-        model: model
+        model: model,
+        type: type
       });
     },
 
