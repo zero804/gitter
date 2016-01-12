@@ -3,13 +3,13 @@ var appWebpackConfig = require('../../public/js/webpack.config.js');
 var _                = require('underscore');
 
 module.exports = {
-  entry: './fixtures/runner.js',
   output: {
     path: path.join(__dirname, './fixtures/build'),
     filename: 'test.js',
     publicPath: '/fixtures/build/',
   },
 
+  watch: (process.env.NODE_ENV !== 'prod'),
   devtool: 'inline-source-map',
   module: {
     loaders: appWebpackConfig.module.loaders,

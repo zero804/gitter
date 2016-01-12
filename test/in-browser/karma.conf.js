@@ -1,12 +1,7 @@
 'use strict';
 
-var path = require('path');
-
-// Karma configuration
-// Generated on Thu Jan 07 2016 09:58:34 GMT-0600 (CST)
-
-var _ = require('underscore');
-
+var path          = require('path');
+var _             = require('underscore');
 var webpackConfig = require('./webpack.config');
 
 module.exports = function(config) {
@@ -24,7 +19,7 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'fixtures/build/test.js',
+      './specs/**/*-test.js'
     ],
 
     // list of files to exclude
@@ -34,10 +29,11 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      'fixtures/build/test.js': ['coverage'],
+      './specs/**/*-test.js': ['webpack', 'coverage']
     },
 
     plugins: [
+      require('karma-webpack'),
       require('karma-chrome-launcher'),
       require('karma-phantomjs-launcher'),
       require('karma-mocha'),
@@ -50,6 +46,8 @@ module.exports = function(config) {
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
     reporters: ['progress', 'coverage'],
+
+    webpack: webpackConfig,
 
     // web server port
     port: 9876,
