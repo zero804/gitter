@@ -1,3 +1,5 @@
+'use strict';
+
 var Marionette = require('backbone.marionette');
 var template = require('./tmpl/chatConnectivityIndicator.hbs');
 var appEvents = require('utils/appevents');
