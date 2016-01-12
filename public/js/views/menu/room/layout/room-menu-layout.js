@@ -1,12 +1,13 @@
 'use strict';
 
-var $             = require('jquery');
 var Marionette    = require('backbone.marionette');
 var RoomMenuModel = require('../../../../models/room-menu-model');
 var MiniBarView   = require('../minibar/minibar-view');
 var PanelView     = require('../panel/panel-view');
 var context       = require('utils/context');
 var DNDCtrl       = require('../../../../components/menu/room/dnd-controller');
+
+var MENU_HIDE_DELAY = 200;
 
 require('views/behaviors/isomorphic');
 
@@ -41,20 +42,30 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   initialize: function(attrs) {
-    this.bus = attrs.bus;
-    this.delay = localStorage.delay;
 
-    var isPinned = $('.app-layout').hasClass('pinned');
+    //Event Bus
+    if(!attrs || !attrs.bus) {
+      throw new Error('A valid event bus needs to be passed to a new instance of RoomMenuLayout');
+    }
+    this.bus   = attrs.bus;
+
+    //Room Collection
+    if(!attrs || !attrs.roomCollection) {
+      throw new Error('A valid room collection needs to be passed to a new instance of RoomMenyLayout');
+    }
+    this.roomCollection = attrs.roomCollection;
+
+    //Menu Hide Delay
+    this.delay = MENU_HIDE_DELAY;
+
+    //Make a new model
     this.model  = new RoomMenuModel({
       bus:              this.bus,
-      roomCollection:   attrs.roomCollection,
+      roomCollection:   this.roomCollection,
       userModel:        context.user(),
-
-      //Is this the right way to do this?? JP 15/12/15
-      roomMenuIsPinned: isPinned,
-      panelOpenState:   isPinned
     });
 
+    //Make a new drag & drop control
     this.dndCtrl = new DNDCtrl({ model: this.model });
 
     this.listenTo(this.dndCtrl, 'dnd:start-drag', this.onDragStart.bind(this));

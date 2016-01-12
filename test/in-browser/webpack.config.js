@@ -9,7 +9,6 @@ module.exports = {
     publicPath: '/fixtures/build/',
   },
 
-  watch: (process.env.NODE_ENV !== 'prod'),
   devtool: 'inline-source-map',
   module: {
     loaders: appWebpackConfig.module.loaders,
