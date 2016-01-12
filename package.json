@@ -206,6 +206,7 @@
     "karma-coverage": "^0.5.3",
     "karma-mocha": "^0.2.1",
     "karma-sourcemap-loader": "^0.3.6",
+    "karma-webpack": "^1.7.0",
     "keymaster": "^1.6.2",
     "lcov-result-merger": "^1.0.2",
     "less": "~1.5.1",
@@ -267,7 +268,7 @@
     "preinstall": "(linklocal list --format '%S' --no-summary || find node_modules -maxdepth 1 -type l -exec basename {} \\;)|while read line; do if [ -d \"$line\" ] && [ ! -h \"$line\" ]; then rm -r \"$line\"; fi; done",
     "shrinkwrap-conflict": "rm -f npm-shrinkwrap.json && npm run shrinkwrap",
     "fix-shrinkwrap-registry": "sed -i '' 's#https://registry.npmjs.org/#http://beta-internal:4873/#g' npm-shrinkwrap.json && sed -i '' 's#http://beta-internal:8089/nexus/content/groups/npm/#http://beta-internal:4873/#g' npm-shrinkwrap.json",
-    "test:unit:browser": "cd ./test/in-browser && webpack && karma start karma.conf.js"
+    "test:unit:browser": "cd ./test/in-browser && karma start karma.conf.js"
   },
   "git": {
     "scripts": {
