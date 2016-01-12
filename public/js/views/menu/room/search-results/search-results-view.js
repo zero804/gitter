@@ -92,8 +92,8 @@ module.exports = (function() {
     serializeData: function() {
       var data = this.model.toJSON();
       return {
-        name:          data.name,
-        roomAvatarUrl: getRoomAvatar(data.name),
+        name:          (data.name || data.username),
+        roomAvatarUrl: getRoomAvatar(data.name || data.username || ' '),
       };
     },
 
@@ -130,9 +130,13 @@ module.exports = (function() {
       };
       */
 
+      console.log('-----------------------');
+      console.log(username);
+      console.log('-----------------------');
+
       return {
         name: model.get('text'),
-        roomAvatarUrl: getRoomAvatar(username),
+        roomAvatarUrl: getRoomAvatar(username || ' '),
       };
     },
 
@@ -262,12 +266,13 @@ module.exports = (function() {
         .bind(this)
         .spread(function (users, repos, publicRepos) {
           // assuring that object are uniform since repos have a boolean (exists)
-          users[0].results.map(function(i) { i.exists = true; });
 
-          publicRepos[0].results.map(function(i) { i.exists = true; });
+          users.results.map(function(i) { i.exists = true; });
+          publicRepos.results.map(function(i) { i.exists = true; });
+
 
           var results = [users, repos, publicRepos]
-            .map(function(data) { return data[0].results; })
+            .map(function(data) { return data.results; })
             .reduce(function(fold, arr) { return fold.concat(arr); }, [])
             .map(function(r) {
               if (!r) return;
