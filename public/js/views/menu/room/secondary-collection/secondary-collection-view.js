@@ -31,6 +31,7 @@ module.exports = Marionette.CompositeView.extend({
 
   modelEvents: {
     'change:state': 'onModelChangeState',
+    'change:searchTerm': 'onSearchTermChange',
   },
 
   childEvents: {
@@ -68,6 +69,11 @@ module.exports = Marionette.CompositeView.extend({
     //TODO this seems kinda sucky, is there a better way to do this?
     //JP 8/1/16
     PrimaryCollectionView.prototype.onItemClicked.apply(this, arguments);
+  },
+
+  onSearchTermChange: function(model, val) { //jshint unused: true
+    if(model.get('state') !== 'search') { return }
+    this.$el.toggleClass('active', !val);
   },
 
 });
