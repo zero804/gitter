@@ -14,6 +14,12 @@ describe('RoomMenuModel', function() {
   var mockRoomCollection;
   beforeEach(function() {
 
+    window.troupeContext = {
+      leftRoomMenuState: {
+        roomMenuIsPinned: true
+      }
+    };
+
     mockRoomCollection = new MockRoomCollection();
 
     roomMenuModel = new RoomMenuModel({
