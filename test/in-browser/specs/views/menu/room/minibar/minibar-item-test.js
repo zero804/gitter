@@ -25,9 +25,11 @@ describe('MinibarItemView', function() {
     model = new Backbone.Model({ type: 'people' });
 
     roomItemView = new RoomItemView({
-      el: el,
-      model: model,
-      bus: Backbone.Events,
+      el:        el,
+      model:     model,
+      bus:       Backbone.Events,
+      dndCtrl:   new Backbone.View(),
+      menuModel: new Backbone.Model(),
     });
 
     container = document.createElement('div');
@@ -36,14 +38,49 @@ describe('MinibarItemView', function() {
     container.appendChild(close);
     closeModel = new Backbone.Model();
     closeButtonView = new RoomItemView({
-      el: container,
+      el:        container,
       menuModel: closeModel,
+      bus:       Backbone.Events,
+      dndCtrl:   new Backbone.View(),
     });
 
   });
 
-  it('trigger an event when it\'s el is clicked', function(done) {
+  it('should create a model if one is not passed', function() {
+    var view = new RoomItemView({ bus: Backbone.Events, dndCtrl: new Backbone.View(), menuModel: new Backbone.Model() });
+    assert.ok(view.model instanceof Backbone.Model);
+  });
 
+  it('should set the correct attributes on the model', function() {
+    assert.equal(roomItemView.model.get('type'), 'people');
+    assert.equal(roomItemView.model.get('orgName'), 'someorg');
+  });
+
+  it('should throw an error if no bus is passed', function(done) {
+    try { new RoomItemView(); }
+    catch (e) {
+      assert.equal(e.message, 'A valid event bus must be passed to a new instance of MiniBarItemView');
+      done();
+    }
+  });
+
+  it('should throw an error id no drag & drop controller is passed', function(done) {
+    try { new RoomItemView({ bus: Backbone.Events }); }
+    catch (e) {
+      assert.equal(e.message, 'A valid drag & drop controller must be passed to a new instance of MiniBarItemView');
+      done();
+    }
+  });
+
+  it('should throw an error if no menuModel is passed', function(done) {
+    try { new RoomItemView({ bus: Backbone.Events, dndCtrl: new Backbone.View() });}
+    catch (e) {
+      assert.equal(e.message, 'A valid roomMenuModel must be passed to a new instance of MiniBarItemView');
+      done();
+    }
+  });
+
+  it('should trigger an event when it\'s el is clicked', function(done) {
     roomItemView.on('room-item-view:clicked', function() {
       assert.ok(true);
       done();
@@ -53,7 +90,6 @@ describe('MinibarItemView', function() {
   });
 
   it('trigger an event when it\'s el is swiped', function(done) {
-
     roomItemView.on('room-item-view:clicked', function() {
       assert.ok(true);
       done();
@@ -63,7 +99,6 @@ describe('MinibarItemView', function() {
   });
 
   it('should pass the right data with the event', function(done) {
-
     roomItemView.on('room-item-view:clicked', function(state, orgName) {
       assert.equal('people', state);
       assert.equal('someorg', orgName);
@@ -94,4 +129,36 @@ describe('MinibarItemView', function() {
 
     container.click();
   });
+
+  it('should assign a debounceTime', function() {
+    assert.ok(closeButtonView.debounceTime);
+  });
+
+  it('should assign a "left" class when the room is pinned and the panel is open', function(done) {
+    closeButtonView.menuModel.set({ roomMenuIsPinned: true, panelOpenState: true });
+    setTimeout(function() {
+      assert.ok(closeButtonView.el.classList.contains('left'));
+      assert.ok(!closeButtonView.el.classList.contains('right'));
+      done();
+    }, closeButtonView.debounceTime);
+  });
+
+  it('should assign a right class when the room is not pinned and the menu is open', function(done) {
+    closeButtonView.menuModel.set({ roomMenuIsPinned: false, panelOpenState: true });
+    setTimeout(function() {
+      assert.ok(!closeButtonView.el.classList.contains('left'));
+      assert.ok(closeButtonView.el.classList.contains('right'));
+      done();
+    }, closeButtonView.debounceTime);
+  });
+
+  it('should remove both left & right classes when the menu is closed', function(done) {
+    closeButtonView.menuModel.set({ panelOpenState: false });
+    setTimeout(function() {
+      assert.ok(!closeButtonView.el.classList.contains('left'));
+      assert.ok(!closeButtonView.el.classList.contains('right'));
+      done();
+    }, closeButtonView.debounceTime);
+  });
+
 });
