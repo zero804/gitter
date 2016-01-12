@@ -16,8 +16,8 @@ describe('RoomMenuModel', function() {
 
     window.troupeContext = {
       leftRoomMenuState: {
-        roomMenuIsPinned: true
-      }
+        roomMenuIsPinned: true,
+      },
     };
 
     mockRoomCollection = new MockRoomCollection();
@@ -220,23 +220,23 @@ describe('RoomMenuModel', function() {
 
     });
 
-    it('should set the roomMenuIsPinned to false if isMobile is true', function(done){
+    it('should set the roomMenuIsPinned to false if isMobile is true', function(done) {
       roomMenuModel.set('isMobile', true);
       roomMenuModel.fetch({
-        success: function(){
+        success: function() {
           assert.ok(!roomMenuModel.get('roomMenuIsPinned'));
           done();
-        }
+        },
       });
     });
 
-    it('should set the roomMenuIsPinned to false if isMobile is true', function(done){
+    it('should set the roomMenuIsPinned to false if isMobile is true', function(done) {
       roomMenuModel.set('isMobile', true);
       roomMenuModel.fetch({
-        success: function(){
+        success: function() {
           assert.ok(!roomMenuModel.get('panelOpenState'));
           done();
-        }
+        },
       });
     });
 
