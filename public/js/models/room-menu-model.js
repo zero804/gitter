@@ -129,6 +129,7 @@ module.exports = Backbone.Model.extend({
     var attrs = this.attributes;
     //only ever store the defaults everything else is determined at run-time
     return Object.keys(this.defaults).reduce(function(memo, key) {
+      if(key === 'searchTerm') return memo;
       memo[key] = attrs[key];
       return memo;
     }, {});
