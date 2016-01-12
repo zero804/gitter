@@ -13,7 +13,7 @@ var liveCollections = require('./live-collections');
 
 var batcher = new RedisBatcher('readby2', 600, batchUpdateReadbyBatch);
 
-var disableLiveUpdateReadByCollections = !!config.get('disableLiveUpdateReadByCollections');
+var enableLiveUpdateReadByCollections = !!config.get('enableLiveUpdateReadByCollections');
 
 /**
  * Record items as having been read
@@ -102,9 +102,9 @@ function batchUpdateReadbyBatch(troupeIdString, userChatIds, done) {
         });
       });
 
-      // Allow operators to turn live collection updates off
+      // Allow operators to turn live collection updates on
       // for readBy items
-      if (disableLiveUpdateReadByCollections) return;
+      if (enableLiveUpdateReadByCollections) return;
 
       chatIds.forEach(function(chatIdString) {
         var userIdsReadChat = userChatHash[chatIdString];
