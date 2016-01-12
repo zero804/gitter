@@ -56,8 +56,6 @@ var SearchInputView = Marionette.ItemView.extend({
 
   handleChange: function(e) {
     var val = e.target.value.trim();
-    if (val === '') { return }
-
     this.model.set('searchTerm', val);
   },
 
