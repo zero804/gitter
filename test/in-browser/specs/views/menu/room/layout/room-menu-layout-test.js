@@ -20,9 +20,9 @@ describe('MenuLayout', function() {
     roomCollection = new MockRoomCollection();
 
     menuLayout = new MenuLayout({
-      bus: Backbone.Events,
+      bus:            Backbone.Events,
       roomCollection: roomCollection,
-      el: el,
+      el:             el,
     });
 
   });
