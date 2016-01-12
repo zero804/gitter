@@ -47,7 +47,7 @@ function saveLastVisitedTroupeforUserId(userId, troupeId, options) {
       // XXX: lastAccessTime should be a date but for some bizarre reason it's not
       // serializing properly
       if (!options || !options.skipFayeUpdate) {
-        appEvents.dataChange2('/user/' + userId + '/rooms', 'patch', { id: troupeId, lastAccessTime: moment(lastAccessTime).toISOString() });
+        appEvents.dataChange2('/user/' + userId + '/rooms', 'patch', { id: troupeId, lastAccessTime: moment(lastAccessTime).toISOString() }, 'room');
       }
     });
 }
@@ -83,7 +83,7 @@ function updateFavourite(userId, troupeId, favouritePosition) {
   return recentRoomCore.updateFavourite(userId, troupeId, favouritePosition)
     .then(function(position) {
       // TODO: in future get rid of this but this collection is used by the native clients
-      appEvents.dataChange2('/user/' + userId + '/rooms', 'patch', { id: troupeId, favourite: position });
+      appEvents.dataChange2('/user/' + userId + '/rooms', 'patch', { id: troupeId, favourite: position }, 'room');
     });
 
 }
