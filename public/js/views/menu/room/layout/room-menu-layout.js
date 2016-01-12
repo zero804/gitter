@@ -1,5 +1,6 @@
 'use strict';
 
+var $             = require('jquery');
 var Marionette    = require('backbone.marionette');
 var RoomMenuModel = require('../../../../models/room-menu-model');
 var MiniBarView   = require('../minibar/minibar-view');
@@ -24,7 +25,7 @@ module.exports = Marionette.LayoutView.extend({
     return new MiniBarView(optionsForRegion({
       model: this.model,
       bus: this.bus,
-      dndCtrl: this.dndCtrl
+      dndCtrl: this.dndCtrl,
     }));
   },
 
@@ -32,7 +33,7 @@ module.exports = Marionette.LayoutView.extend({
     return new PanelView(optionsForRegion({
       model: this.model,
       bus: this.bus,
-      dndCtrl: this.dndCtrl
+      dndCtrl: this.dndCtrl,
     }));
   },
 
@@ -44,15 +45,17 @@ module.exports = Marionette.LayoutView.extend({
   initialize: function(attrs) {
 
     //Event Bus
-    if(!attrs || !attrs.bus) {
+    if (!attrs || !attrs.bus) {
       throw new Error('A valid event bus needs to be passed to a new instance of RoomMenuLayout');
     }
+
     this.bus   = attrs.bus;
 
     //Room Collection
-    if(!attrs || !attrs.roomCollection) {
+    if (!attrs || !attrs.roomCollection) {
       throw new Error('A valid room collection needs to be passed to a new instance of RoomMenyLayout');
     }
+
     this.roomCollection = attrs.roomCollection;
 
     //Menu Hide Delay
@@ -63,6 +66,8 @@ module.exports = Marionette.LayoutView.extend({
       bus:              this.bus,
       roomCollection:   this.roomCollection,
       userModel:        context.user(),
+      //TODO id this the best way to do this? JP 12/1/16
+      isMobile:         $('body').hasClass('mobile'),
     });
 
     //Make a new drag & drop control
@@ -72,27 +77,30 @@ module.exports = Marionette.LayoutView.extend({
     this.listenTo(this.dndCtrl, 'dnd:end-drag', this.onDragEnd.bind(this));
   },
 
-  onDragStart: function (){
+  onDragStart: function() {
     this.model.set('roomMenuWasPinned', this.model.get('roomMenuIsPinned'));
     this.model.set('roomMenuIsPinned', true);
     this.openPanel();
   },
 
-  onDragEnd: function (){
-    if(!this.model.get('roomMenuWasPinned')){
+  onDragEnd: function() {
+    if (!this.model.get('roomMenuWasPinned')) {
       this.model.set('roomMenuIsPinned', false);
     }
+
     this.openPanel();
   },
 
   openPanel: function() {
     if (this.model.get('roomMenuIsPinned')) { return }
+
     this.model.set('panelOpenState', true);
     if (this.timeout) { clearTimeout(this.timeout); }
   },
 
   closePanel: function() {
     if (this.model.get('roomMenuIsPinned')) { return }
+
     this.timeout = setTimeout(function() {
       this.model.set('panelOpenState', false);
     }.bind(this), this.delay);

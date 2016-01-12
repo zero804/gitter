@@ -1,4 +1,4 @@
-/*global describe:true, it:true, beforeEach:true */
+/*global describe:true, it:true, beforeEach:true, afterEach: true */
 'use strict';
 
 var $                  = require('jquery');
@@ -25,6 +25,11 @@ describe('MenuLayout', function() {
       el:             el,
     });
 
+  });
+
+  afterEach(function(){
+    $('body').removeClass('mobile');
+    $('body').removeClass('desktop');
   });
 
   it('should throw an error if no bus is passed', function(done){
@@ -57,6 +62,16 @@ describe('MenuLayout', function() {
 
   it('should make a new drag & drop controller', function(){
       assert.ok(menuLayout.dndCtrl);
+  });
+
+  it('should assign isMobile correctly depending on the body.class', function(){
+    $('body').addClass('mobile');
+    menuLayout = new MenuLayout({
+      bus:            Backbone.Events,
+      roomCollection: roomCollection,
+      el:             el,
+    });
+    assert.ok(menuLayout.model.get('isMobile'));
   });
 
   it('should open the panel onMouseEnter when the roomMenu is not pinned', function() {
