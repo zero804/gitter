@@ -39,7 +39,7 @@ exports.install = function() {
     if (modelType) {
       tags.push('modelType:' + modelType);
     }
-    statsd.increment('bayeux.publish', 1, 0.25, tags);
+    statsd.increment('bayeux.publish', 1, 0.1, tags);
 
     bayeux.publish(channel, message);
 
