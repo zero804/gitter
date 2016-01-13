@@ -1,5 +1,8 @@
 "use strict";
 
+var env               = require('gitter-web-env');
+var nconf             = env.config;
+var statsd            = env.createStatsClient({ prefix: nconf.get('stats:statsd:prefix')});
 var winston           = require('../utils/winston');
 var appEvents         = require('gitter-web-appevents');
 var bayeux            = require('../web/bayeux');
@@ -26,8 +29,17 @@ exports.install = function() {
   if (installed) return;
   installed = true;
 
-  function publish(channel, message) {
+  function publish(channel, message, channelType, operation, modelType) {
     debug("Publish on %s: %j", channel, message);
+
+    var tags = ['channelType:' + channelType];
+    if (operation) {
+      tags.push('operation:' + operation);
+    }
+    if (modelType) {
+      tags.push('modelType:' + modelType);
+    }
+    statsd.increment('bayeux.publish', 1, 0.1, tags);
 
     bayeux.publish(channel, message);
 
@@ -43,6 +55,7 @@ exports.install = function() {
     var operation = data.operation;
     var model = data.model;
     var url = "/api/v1" + data.url;
+    var type = data.type;
 
     switch(operation) {
       case 'create':
@@ -54,7 +67,7 @@ exports.install = function() {
           model: model
         };
 
-        publish(url, message);
+        publish(url, message, 'dataChange2', operation, type);
 
         break;
       default:
@@ -106,7 +119,7 @@ exports.install = function() {
       };
       debug("Notification to %s: %j", url, message);
 
-      publish(url, message);
+      publish(url, message, 'onUserNotification');
   });
 
   // When a user's eyeballs changes to on or off...
@@ -115,7 +128,7 @@ exports.install = function() {
       notification: "presence",
       userId: userId,
       status: presence ? "in" : "out"
-    });
+    }, 'presenceChange');
   });
 
   ////////////////////
@@ -132,7 +145,7 @@ exports.install = function() {
       troupeId: troupeId,
       totalUnreadItems: total,
       DEPRECATED: true
-    });
+    }, 'troupeUnreadCountsChangeA');
 
     if(mentions >= 0) {
       // TODO: this is deprecated but still used by the OSX client
@@ -141,7 +154,7 @@ exports.install = function() {
         troupeId: troupeId,
         mentions: mentions,
         DEPRECATED: true
-      });
+      }, 'troupeUnreadCountsChangeB');
     }
 
     var url = "/api/v1/user/" + userId + "/rooms";
@@ -155,7 +168,7 @@ exports.install = function() {
     };
 
     // Just patch the mention count
-    publish(url, message);
+    publish(url, message, 'troupeUnreadCountsChange');
 
   });
 
@@ -175,7 +188,7 @@ exports.install = function() {
         publish(mentionUrl, {
           operation: 'create',
           model: troupe
-        });
+        }, 'userMentionedInNonMemberRoom');
       });
   });
 
@@ -186,7 +199,7 @@ exports.install = function() {
     publish("/api/v1/user/" + userId, {
       notification: "activity",
       troupeId: troupeId
-    });
+    }, 'newLurkActivity');
 
   });
 
@@ -203,7 +216,7 @@ exports.install = function() {
     publish("/api/v1/user/" + userId + '/rooms/' + troupeId + '/unreadItems', {
       notification: "unread_items",
       items: items
-    });
+    }, 'newUnreadItem');
 
   });
 
@@ -215,7 +228,7 @@ exports.install = function() {
     publish("/api/v1/user/" + userId + '/rooms/' + troupeId + '/unreadItems', {
       notification: "unread_items_removed",
       items: items
-    });
+    }, 'unreadItemsRemoved');
 
   });
 
@@ -227,7 +240,7 @@ exports.install = function() {
     publish("/api/v1/user/" + userId + '/rooms/' + troupeId + '/unreadItems', {
       notification: "lurk_change",
       lurk: lurk
-    });
+    }, 'userTroupeLurkModeChange');
 
   });
 
@@ -238,7 +251,7 @@ exports.install = function() {
 
     publish("/api/v1/user/" + userId + '/rooms/' + troupeId + '/unreadItems', {
       notification: "mark_all_read"
-    });
+    }, 'markAllRead');
 
   });
 };

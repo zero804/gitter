@@ -174,9 +174,17 @@ gulp.task('merge-lcov', ['test-mocha', 'test-redis-lua'], function() {
 });
 
 gulp.task('submit-coveralls', ['test-mocha', 'test-redis-lua', 'merge-lcov'], function() {
-  process.env.COVERALLS_GIT_COMMIT = process.env.GIT_COMMIT;
+  var GIT_BRANCH = process.env.GIT_BRANCH;
+  if (GIT_BRANCH) {
+    // Make coveralls play nice with Jenkins (lame)
+    process.env.GIT_BRANCH = GIT_BRANCH.replace(/^origin\//,'');
+  }
+
   return gulp.src('output/coverage-reports/merged/lcov.info')
-    .pipe(coveralls());
+    .pipe(coveralls())
+    .on('end', function() {
+      process.env.GIT_BRANCH = GIT_BRANCH;
+    });
 });
 
 gulp.task('test', ['test-mocha', 'test-redis-lua', 'submit-coveralls']);
