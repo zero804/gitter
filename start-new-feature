@@ -1,0 +1,15 @@
+#!/bin/bash
+
+set -e
+set -u
+set -x
+set -o pipefail
+
+FEATURE_NAME=$1
+git fetch origin
+git flow feature start "${FEATURE_NAME}"
+git commit --allow-empty -m "Start of feature ${FEATURE_NAME}" --no-verify
+git push -v --set-upstream origin "refs/heads/feature/${FEATURE_NAME}:refs/heads/feature/${FEATURE_NAME}"
+PR_URL=$(gh pull-request -m "${FEATURE_NAME}" -b develop)
+
+open "${PR_URL}"

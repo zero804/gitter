@@ -18,7 +18,7 @@ var Q                = require('q');
 var roomMembershipService = require('./room-membership-service');
 var uniqueIds        = require('mongodb-unique-ids');
 var debug            = require('debug')('gitter:unread-item-service');
-var recentRoomService = require('./recent-room-service');
+var recentRoomCore   = require('./core/recent-room-core');
 var badgeBatcher     = new RedisBatcher('badge', 1000, batchBadgeUpdates);
 var Q                = require('q');
 
@@ -694,7 +694,7 @@ function queueBadgeUpdateForUser(userIds) {
 exports.getActivityIndicatorForTroupeIds = function(troupeIds, userId) {
 
   return Q.all([
-    recentRoomService.getTroupeLastAccessTimesForUser(userId),
+    recentRoomCore.getTroupeLastAccessTimesForUser(userId),
     engine.getLastChatTimestamps(troupeIds)
   ])
     .spread(function(allLastAccessTimes, rawLastMsgTimes) {

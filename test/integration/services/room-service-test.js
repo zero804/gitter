@@ -1333,6 +1333,7 @@ describe('room-service', function() {
     var troupeService = testRequire('./services/troupe-service');
     var recentRoomService = testRequire('./services/recent-room-service');
     var userIsInRoom = testRequire('./services/user-in-room');
+    var recentRoomCore = testRequire('./services/core/recent-room-core');
     var appEvents = testRequire('gitter-web-appevents');
 
     describe('room-service #slow', function() {
@@ -1369,7 +1370,7 @@ describe('room-service', function() {
         var roomService = testRequire('./services/room-service');
 
         var getFavs = function() {
-          return recentRoomService.findFavouriteTroupesForUser(fixture.userFavourite.id);
+          return recentRoomCore.findFavouriteTroupesForUser(fixture.userFavourite.id);
         };
 
         var createFav = function() {
@@ -1949,7 +1950,7 @@ describe('room-service', function() {
           },
           './room-permissions-model': roomPermissionsModel
         });
-      })
+      });
 
       it('should allow a user to join a room when they have permission', function(done) {
         access = true;
