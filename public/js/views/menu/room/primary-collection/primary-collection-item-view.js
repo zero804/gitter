@@ -59,7 +59,7 @@ module.exports = Marionette.ItemView.extend({
   },
 
   onMouseOut: function (){
-    //this.uiModel.set('menuIsOpen', false);
+    this.uiModel.set('menuIsOpen', false);
   },
 
 });
