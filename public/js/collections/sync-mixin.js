@@ -30,7 +30,7 @@ module.exports = {
     }
 
     if(options.error) {
-      promise = promise.fail(options.error); // Backbone will trigger the 'error' event
+      promise = promise.catch(options.error); // Backbone will trigger the 'error' event
     }
 
     model.trigger('request', model, null, options);

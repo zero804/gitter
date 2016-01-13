@@ -102,7 +102,7 @@ describe('unread-item-service', function() {
     describe('activityIndicator', function() {
       var troupeId1, troupeId2, troupeId3, troupeId4;
       var userId1;
-      var unreadItemService, recentRoomService, engine;
+      var unreadItemService, recentRoomCore, engine;
 
       beforeEach(function() {
         troupeId1 = mongoUtils.getNewObjectIdString() + "";
@@ -111,7 +111,7 @@ describe('unread-item-service', function() {
         troupeId4 = mongoUtils.getNewObjectIdString() + "";
         userId1   = mongoUtils.getNewObjectIdString() + "";
 
-        recentRoomService = mockito.mock(testRequire('./services/recent-room-service'));
+        recentRoomCore = mockito.mock(testRequire('./services/core/recent-room-core'));
         engine = mockito.mock(testRequire('./services/unread-item-service-engine'));
 
         // Last access times for all the rooms userId1 has visited
@@ -128,7 +128,7 @@ describe('unread-item-service', function() {
           '1447777800000'   // for troupeId3 => 2015-11-17T16:30:00.000Z
         ];
 
-        mockito.when(recentRoomService).getTroupeLastAccessTimesForUser(userId1)
+        mockito.when(recentRoomCore).getTroupeLastAccessTimesForUser(userId1)
         .thenReturn(Q.resolve(lastAccessTimes));
 
         mockito.when(engine).getLastChatTimestamps([troupeId1, troupeId2, troupeId3])
@@ -138,7 +138,7 @@ describe('unread-item-service', function() {
         .thenReturn(Q.resolve({}));
 
         unreadItemService = testRequire.withProxies("./services/unread-item-service", {
-          './recent-room-service': recentRoomService,
+          './core/recent-room-core': recentRoomCore,
           './unread-item-service-engine': engine
         });
 

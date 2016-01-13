@@ -25,7 +25,4 @@ module.exports = function trackNewUser(req, user) {
         googleAnalyticsUniqueId: gaCookieParser(req)
       });
     });
-}
-
-
-
+};

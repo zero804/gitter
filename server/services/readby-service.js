@@ -1,19 +1,19 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var RedisBatcher = require('../utils/redis-batcher').RedisBatcher;
-var ChatMessage = require('./persistence-service').ChatMessage;
-var assert = require('assert');
-var winston = require('../utils/winston');
-var appEvents = require('gitter-web-appevents');
-var mongoUtils = require('../utils/mongo-utils');
-var Q = require('q');
+var env             = require('gitter-web-env');
+var logger          = env.logger;
+var config          = env.config;
+var RedisBatcher    = require('../utils/redis-batcher').RedisBatcher;
+var ChatMessage     = require('./persistence-service').ChatMessage;
+var assert          = require('assert');
+var appEvents       = require('gitter-web-appevents');
+var mongoUtils      = require('../utils/mongo-utils');
+var Q               = require('q');
 var liveCollections = require('./live-collections');
 
-// TODO: remove by 1 September 2015
-var batcherLegacy = new RedisBatcher('readby', 600, batchUpdateReadbyBatchLegacy);
-
 var batcher = new RedisBatcher('readby2', 600, batchUpdateReadbyBatch);
+
+var enableLiveUpdateReadByCollections = !!config.get('enableLiveUpdateReadByCollections');
 
 /**
  * Record items as having been read
@@ -56,47 +56,57 @@ function batchUpdateReadbyBatch(troupeIdString, userChatIds, done) {
   });
 
   var chatIds = Object.keys(userChatHash);
+  var chatObjectIds = chatIds.map(mongoUtils.asObjectID);
 
-  var bulk = ChatMessage.collection.initializeUnorderedBulkOp();
-  var chatObjectIds = [];
-
-  chatIds.forEach(function(chatIdString) {
-    var userIdStrings = userChatHash[chatIdString];
-    var chatId = mongoUtils.asObjectID(chatIdString);
-    var userIds = userIdStrings.map(mongoUtils.asObjectID);
-
-    chatObjectIds.push(chatId);
-
-    bulk
-      .find({ _id: chatId, toTroupeId: troupeId })
-      .updateOne({
-        $addToSet:  { 'readBy': { $each: userIds } }
-      });
-  });
-
-  var d = Q.defer();
-  bulk.execute(d.makeNodeResolver());
-  return d.promise
-    .then(function() {
-      return ChatMessage.aggregate([
-        { $match: { _id: { $in: chatObjectIds } } },
-        { $project: {
-            _id: 1,
-            _tv: 1,
-            readyByC: { $size: "$readBy" }
-          }
-        }])
-        .exec();
+  return ChatMessage.find({
+      _id: { $in: chatObjectIds },
+      $or: [{ readBy: { $size: 0 } }, { readBy: { $exists: false }}]
+    }, {
+      _id: 1,
+      _tv: 1
+    }, {
+      lean: true
     })
-    .then(function(chats) {
-      chats.forEach(function(chat) {
+    // Great candidate for readConcern: major in future
+    .exec(function(unreadChats) {
+      var bulk = ChatMessage.collection.initializeUnorderedBulkOp();
+
+      chatIds.forEach(function(chatIdString, index) {
+        var userIdStrings = userChatHash[chatIdString];
+        var chatId = chatObjectIds[index];
+        var userIds = userIdStrings.map(mongoUtils.asObjectID);
+
+        bulk
+          .find({ _id: chatId, toTroupeId: troupeId })
+          .updateOne({
+            $addToSet:  { 'readBy': { $each: userIds } }
+          });
+      });
+
+      var d = Q.defer();
+      bulk.execute(d.makeNodeResolver());
+
+      return d.promise
+        .thenResolve(unreadChats);
+    })
+    .then(function(unreadChats) {
+      // If the message was previously not read, send out a
+      // notification to clients, but don't update it again
+      unreadChats.forEach(function(chat) {
         var chatIdString = mongoUtils.serializeObjectId(chat._id);
+        var userIdsReadChat = userChatHash[chatIdString];
 
         liveCollections.chats.emit('patch', chatIdString, troupeId, {
-          readBy: chat.readyByC,
+          readBy: userIdsReadChat.length,
           v: chat._tv ? 0 + chat._tv : undefined
         });
+      });
 
+      // Allow operators to turn live collection updates on
+      // for readBy items
+      if (enableLiveUpdateReadByCollections) return;
+
+      chatIds.forEach(function(chatIdString) {
         var userIdsReadChat = userChatHash[chatIdString];
 
         // Its too operationally expensive to serialise the full user object
@@ -104,59 +114,20 @@ function batchUpdateReadbyBatch(troupeIdString, userChatIds, done) {
         userIdsReadChat.forEach(function(userId) {
           appEvents.dataChange2("/rooms/" + troupeIdString + "/chatMessages/" + chatIdString + '/readBy', 'create', {
             id: userId
-          });
-        });
-
-      });
-    })
-    .nodeify(done);
-
-}
-
-// TODO: remove by 1 September 2015
-function batchUpdateReadbyBatchLegacy(key, userIdStrings, done) {
-  var kp = key.split(':', 3);
-
-  // TODO: batch by troupeId only and get this operation to use batch updates
-
-  // Ignore everything except chats for now
-  if(kp[0] !== 'chat') return done();
-
-  var troupeId = mongoUtils.asObjectID(kp[1]);
-  var chatId = mongoUtils.asObjectID(kp[2]);
-
-  var userIds = userIdStrings.map(mongoUtils.asObjectID);
-
-  ChatMessage.findOneAndUpdate(
-    { _id: chatId, toTroupeId: troupeId },
-    { $addToSet:  { 'readBy': { $each: userIds } } },
-    { select: { readBy: 1, _tv: 1 }, new: true })
-    .exec()
-    .then(function(chat) {
-      if (!chat) {
-        winston.info('Weird. No chat message found');
-        return;
-      }
-
-      liveCollections.chats.emit('patch', chatId, troupeId, {
-        readBy: chat.readBy.length,
-        v: chat._tv ? 0 + chat._tv : undefined
-      });
-
-      // Its too operationally expensive to serialise the full user object
-      // TODO: move this across to live-collections
-      userIds.forEach(function(userId) {
-        appEvents.dataChange2("/rooms/" + troupeId + "/chatMessages/" + chatId + '/readBy', 'create', {
-          id: userId
+          }, 'readBy');
         });
       });
 
     })
+    .catch(function(err) {
+      logger.error('batchUpdateReadbyBatch failed: ' + err.message, { exception: err });
+      throw err;
+    })
     .nodeify(done);
+
 }
 
 exports.listen = function() {
-  batcherLegacy.listen();
   batcher.listen();
 };
 
