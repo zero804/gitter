@@ -2,6 +2,7 @@
 'use strict';
 
 var assert       = require('assert');
+var $            = require('jquery');
 var Backbone     = require('backbone');
 var RoomItemView = require('public/js/views/menu/room/minibar/minibar-item-view');
 
@@ -86,7 +87,7 @@ describe('MinibarItemView', function() {
       done();
     });
 
-    el.click();
+    $(el).click();
   });
 
   it('trigger an event when it\'s el is swiped', function(done) {
@@ -105,7 +106,7 @@ describe('MinibarItemView', function() {
       done();
     });
 
-    el.click();
+    $(el).click();
   });
 
   it('should add an active class to it\'s el on model change', function() {
@@ -127,7 +128,7 @@ describe('MinibarItemView', function() {
       done();
     });
 
-    container.click();
+    $(container).click();
   });
 
   it('should assign a debounceTime', function() {

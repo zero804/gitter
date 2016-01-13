@@ -15,30 +15,31 @@ module.exports = function(config) {
     frameworks: [
       'mocha',
       'chai',
+      'es5-shim',
     ],
 
     // list of files / patterns to load in the browser
     files: [
-      './fixtures/runner.js'
+      './fixtures/runner.js',
     ],
 
     // list of files to exclude
     exclude: [
+      path.resolve(__dirname, '../../node_modules'),
     ],
 
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      './fixtures/runner.js': ['webpack', 'coverage']
+      './fixtures/runner.js': ['webpack', 'coverage'],
     },
 
     plugins: [
-      require('karma-webpack-with-fast-source-maps'),
-      require('karma-chrome-launcher'),
+      require('karma-es5-shim'),
       require('karma-mocha'),
       require('karma-chai'),
       require('karma-sourcemap-loader'),
-      require('karma-coverage')
+      require('karma-coverage'),
     ],
 
     // test results reporter to use
@@ -77,18 +78,6 @@ module.exports = function(config) {
     // Concurrency level
     // how many browser should be started simultaneous
     concurrency: Infinity,
-
-    // optionally, configure the reporter
-    coverageReporter: {
-      type: 'text-summary',
-      check: {
-        global: {
-          excludes: [
-            path.resolve(__dirname, '../../node_modules/**/*.*')
-          ]
-        }
-      }
-    },
   };
 
   var browserstackKarmaConfig = {
@@ -141,11 +130,65 @@ module.exports = function(config) {
     singleRun: true,
   };
 
+  //Optimised for quick testing
+  var phantomKarmaConfig = {
+    browsers: ['PhantomJS'],
+
+    files: [
+      './fixtures/runner.js',
+    ],
+
+    coverageReporter: {
+      type: 'text-summary',
+      check: {
+        global: {
+          excludes: [
+            path.resolve(__dirname, '../../node_modules/**/*.*'),
+          ],
+        },
+      },
+    },
+
+  };
+
+  //Optimised for debugging
+  var chromeKarmaConfig = {
+    browsers: ['Chrome'],
+
+    files: [
+      './specs/**/*-test.js',
+    ],
+
+    preprocessors: {
+      './specs/**/*-test.js': ['webpack', 'sourcemap', 'coverage'],
+    },
+
+
+    coverageReporter: {
+      type: 'html',
+      dir: path.resolve(__dirname, './fixtures/coverage'),
+    },
+
+  };
+
   // If in production mode, move the testing to browserstack
   if (process.env.NODE_ENV === 'prod') {
     karmaConfig.plugins.push(require('karma-browserstack-launcher'));
-    karmaConfig = _.extend(karmaConfig, browserstackKarmaConfig);
+    karmaConfig.plugins.push(require('karma-webpack'));
+    karmaConfig = _.extend(karmaConfig, chromeKarmaConfig, browserstackKarmaConfig);
+  }
+  //
+  else if (process.env.NODE_ENV === 'debug') {
+    karmaConfig.plugins.push(require('karma-chrome-launcher'));
+    karmaConfig.plugins.push(require('karma-webpack'));
+    karmaConfig = _.extend(karmaConfig, chromeKarmaConfig);
+  }
+  //
+  else {
+    karmaConfig.plugins.push(require('karma-phantomjs-launcher'));
+    karmaConfig.plugins.push(require('karma-webpack-with-fast-source-maps'));
+    karmaConfig = _.extend(karmaConfig, phantomKarmaConfig);
   }
 
   config.set(karmaConfig);
-}
+};
