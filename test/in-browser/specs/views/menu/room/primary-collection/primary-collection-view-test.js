@@ -6,7 +6,6 @@
  * */
 
 var assert                = require('assert');
-var $                     = require('jquery')
 var sinon                 = require('sinon');
 var Backbone              = require('backbone');
 var PrimaryCollectionView = require('public/js/views/menu/room/primary-collection/primary-collection-view');
