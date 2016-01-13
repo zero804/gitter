@@ -6,6 +6,7 @@ var Backbone = require('backbone');
 var itemCollections = require('collections/instances/integrated-items');
 var chatCollection  = require('collections/instances/chats');
 var PeopleModal = require('views/modals/people-modal');
+var LoginView = require('views/modals/login-view');
 var onready = require('./utils/onready');
 var frameUtils = require('./utils/frame-utils');
 var ChatToolbarLayout = require('views/layouts/chat-toolbar');
@@ -47,6 +48,7 @@ onready(function() {
     routes: {
       "": "hideModal",
       "people": "people",
+      "login": "login"
     },
 
     hideModal: function() {
@@ -57,6 +59,10 @@ onready(function() {
       appView.dialogRegion.show(new PeopleModal({
         rosterCollection: itemCollections.roster
       }));
+    },
+
+    login: function() {
+      appView.dialogRegion.show(new LoginView());
     },
 
   });
