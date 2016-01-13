@@ -25,7 +25,6 @@ module.exports = function(config) {
 
     // list of files to exclude
     exclude: [
-      path.resolve(__dirname, '../../node_modules'),
     ],
 
     // preprocess matching files before serving them to the browser
@@ -154,16 +153,6 @@ module.exports = function(config) {
   //Optimised for debugging
   var chromeKarmaConfig = {
     browsers: ['Chrome'],
-
-    files: [
-      './specs/**/*-test.js',
-    ],
-
-    preprocessors: {
-      './specs/**/*-test.js': ['webpack', 'sourcemap', 'coverage'],
-    },
-
-
     coverageReporter: {
       type: 'html',
       dir: path.resolve(__dirname, './fixtures/coverage'),
@@ -177,12 +166,14 @@ module.exports = function(config) {
     karmaConfig.plugins.push(require('karma-webpack'));
     karmaConfig = _.extend(karmaConfig, chromeKarmaConfig, browserstackKarmaConfig);
   }
+
   //
   else if (process.env.NODE_ENV === 'debug') {
     karmaConfig.plugins.push(require('karma-chrome-launcher'));
     karmaConfig.plugins.push(require('karma-webpack'));
     karmaConfig = _.extend(karmaConfig, chromeKarmaConfig);
   }
+
   //
   else {
     karmaConfig.plugins.push(require('karma-phantomjs-launcher'));

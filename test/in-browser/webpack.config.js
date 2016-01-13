@@ -1,6 +1,7 @@
-var path             = require('path');
-var appWebpackConfig = require('../../public/js/webpack.config.js');
-var _                = require('underscore');
+var path              = require('path');
+var appWebpackConfig  = require('../../public/js/webpack.config.js');
+var _                 = require('underscore');
+var ProgressBarPlugin = require('progress-bar-webpack-plugin');
 
 module.exports = {
   output: {
@@ -11,6 +12,13 @@ module.exports = {
 
   devtool: 'inline-source-map',
   module: {
+    preLoaders: [
+      {
+        test: /\.js$/,
+        exclude: /(test|node_modules|repo)/,
+        loader: 'istanbul-instrumenter',
+      },
+    ],
     loaders: [
       {
         test: /\.hbs$/,
@@ -22,6 +30,9 @@ module.exports = {
       },
     ],
   },
+  plugins: [
+     new ProgressBarPlugin(),
+  ],
   resolve: {
     modulesDirectories: [
       'node_modules',
