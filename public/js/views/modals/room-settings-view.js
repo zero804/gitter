@@ -33,7 +33,7 @@ var View = Marionette.ItemView.extend({
         self.$el.find("#notification-options").val(self.settings);
         self.setLurkButton();
       })
-      .fail(function(err) {
+      .catch(function(err) {
         log.error('An error occurred while communicating with notification settings', err);
       });
   },

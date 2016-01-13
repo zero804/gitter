@@ -942,7 +942,7 @@ exports.createCustomChildRoom = createCustomChildRoom;
  */
 function notifyInvitedUser(fromUser, invitedUser, room/*, isNewUser*/) {
   // get the email address
-  return emailAddressService(invitedUser)
+  return emailAddressService(invitedUser, { attemptDiscovery: true })
     .then(function (emailAddress) {
       var notification;
 
@@ -1211,7 +1211,7 @@ function hideRoomFromUser(roomId, userId) {
     .then(function(userLurkStatus) {
       if (userLurkStatus === null) {
         // User does not appear to be in the room...
-        appEvents.dataChange2('/user/' + userId + '/rooms', 'remove', { id: roomId });
+        appEvents.dataChange2('/user/' + userId + '/rooms', 'remove', { id: roomId }, 'room');
         return;
       }
 
@@ -1220,7 +1220,7 @@ function hideRoomFromUser(roomId, userId) {
       }
 
       // TODO: in future get rid of this but this collection is used by the native clients
-      appEvents.dataChange2('/user/' + userId + '/rooms', 'patch', { id: roomId, favourite: null, lastAccessTime: null, mentions: 0, unreadItems: 0 });
+      appEvents.dataChange2('/user/' + userId + '/rooms', 'patch', { id: roomId, favourite: null, lastAccessTime: null, mentions: 0, unreadItems: 0 }, 'room');
     });
 }
 exports.hideRoomFromUser = hideRoomFromUser;

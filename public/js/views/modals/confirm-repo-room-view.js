@@ -46,10 +46,10 @@ var View = Marionette.ItemView.extend({
 
     apiClient.post('/v1/rooms', { uri: uri, addBadge: addBadge })
       .then(function () {
-        self.dialog.hide();
+        if (self.dialog) { self.dialog.hide(); }
         appEvents.trigger('navigation', '/' + uri, 'chat', uri, null);
       })
-      .fail(function (/*xhr*/) {
+      .catch(function (/*err*/) {
         self.model.set('error', 'Unable to create room');
         self.ui.modalFailure.show('fast');
         // Do something here.

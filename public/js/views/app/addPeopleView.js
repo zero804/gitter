@@ -50,10 +50,8 @@ var RowView = Marionette.ItemView.extend({
           added: false
         });
       })
-      .fail(function(e) {
-        var json = e.responseJSON;
-        var message = json && (json.message || json.error) || "Unable to invite user to Gitter";
-
+      .catch(function(e) {
+        var message = e.friendlyMessage || "Unable to invite user to Gitter";
         self.trigger('invite:error', message);
       });
 
@@ -180,10 +178,9 @@ var View = Marionette.CompositeView.extend({
         self.collection.add(m);
         self.typeahead.clear();
       })
-      .fail(function (xhr) {
-        var json = xhr.responseJSON;
+      .catch(function (e) {
         self.ui.loading.toggleClass('hide');
-        var m = json && (json.error || json.message) || 'Error';
+        var m = e.friendlyMessage || 'Error';
 
         // XXX: why not use the payment required status code for this?
         if (m.match(/has reached its limit/)) self.dialog.showPremium();

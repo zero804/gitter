@@ -33,15 +33,19 @@ presence.listAllSocketsForUser(opts.userId)
     // just modify it in place
     var troupeHash = collections.indexById(troupes);
     sockets.forEach(function(socket) {
-      socket.troupe = troupeHash[socket.troupeId] && troupeHash[socket.troupeId].uri;
+      if (troupeHash[socket.troupeId]) {
+        socket.troupe =  troupeHash[socket.troupeId].uri;
+      }
       // this is all the same anyway
       delete socket.userId;
     });
     console.log(sockets);
+    /*
     console.log(_.countBy(sockets, function(socket) {
       // isostring seems to contain milliseconds
       return socket.createdTime.toISOString();
     }));
+    */
     console.log('Total:', sockets.length);
   })
   .catch(function(err) {

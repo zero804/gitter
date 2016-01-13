@@ -25,6 +25,10 @@ var apiClient = require('components/apiClient');
 
 require('nanoscroller');
 
+require('gitter-styleguide/css/components/buttons.css');
+
+
+
 var SUGGESTED_ROOMS_THRESHOLD = 10; // non inclusive
 
 module.exports = (function () {
@@ -241,7 +245,7 @@ module.exports = (function () {
             .then(function () {
               collection.reset();
             })
-            .fail(function (err) {
+            .catch(function (err) {
               log.error(err);
             });
         }

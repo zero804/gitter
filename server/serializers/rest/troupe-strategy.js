@@ -4,7 +4,7 @@
 var logger                = require('gitter-web-env').logger;
 var unreadItemService     = require("../../services/unread-item-service");
 var userService           = require("../../services/user-service");
-var recentRoomService     = require('../../services/recent-room-service');
+var recentRoomCore        = require('../../services/core/recent-room-core');
 var roomMembershipService = require('../../services/room-membership-service');
 var billingService        = require('../../services/billing-service');
 var roomPermissionsModel  = require('../../services/room-permissions-model');
@@ -86,7 +86,7 @@ function LastTroupeAccessTimesForUserStrategy(options) {
   var timesIndexed;
 
   this.preload = function(data, callback) {
-    return recentRoomService.getTroupeLastAccessTimesForUserExcludingHidden(userId)
+    return recentRoomCore.getTroupeLastAccessTimesForUserExcludingHidden(userId)
       .then(function(times) {
         timesIndexed = times;
       })
@@ -107,7 +107,7 @@ function FavouriteTroupesForUserStrategy(options) {
   var userId = options.userId || options.currentUserId;
 
   this.preload = function(data, callback) {
-    recentRoomService.findFavouriteTroupesForUser(userId)
+    recentRoomCore.findFavouriteTroupesForUser(userId)
       .then(function(favs) {
         self.favs = favs;
       })
