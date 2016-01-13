@@ -6,6 +6,7 @@
  * */
 
 var assert                = require('assert');
+var $                     = require('jquery')
 var sinon                 = require('sinon');
 var Backbone              = require('backbone');
 var PrimaryCollectionView = require('public/js/views/menu/room/primary-collection/primary-collection-view');
@@ -83,14 +84,14 @@ describe('PrimaryCollectionView', function() {
   it('should call onItemClicked when a child is clicked', function() {
     sinon.stub(primaryCollectionView, 'onItemClicked');
     primaryCollectionView.render();
-    el.firstChild.click();
+    $(el.firstChild).click();
     assert.equal(1, primaryCollectionView.onItemClicked.callCount);
   });
 
   it('should change the models panelOpenState when clicked', function() {
     assert.ok(model.get('panelOpenState'));
     primaryCollectionView.render();
-    el.firstChild.click();
+    $(el.firstChild).click();
     assert.ok(!model.get('panelOpenState'));
   });
 
@@ -98,7 +99,7 @@ describe('PrimaryCollectionView', function() {
     model.set('roomMenuIsPinned', true);
     assert.ok(model.get('panelOpenState'));
     primaryCollectionView.render();
-    el.firstChild.click();
+    $(el.firstChild).click();
     assert.ok(model.get('panelOpenState'));
   });
 
@@ -111,7 +112,7 @@ describe('PrimaryCollectionView', function() {
       done();
     });
 
-    el.firstChild.click();
+    $(el.firstChild).click();
   });
 
   it('should favourite a model on the correct event and save it', function() {

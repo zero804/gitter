@@ -2,6 +2,7 @@
 'use strict';
 
 var assert          = require('assert');
+var $               = require('jquery');
 var Backbone        = require('backbone');
 var PanelHeaderView = require('public/js/views/menu/room/header/header-view');
 
@@ -58,9 +59,9 @@ describe('PanelHeaderView', function() {
 
   it('should toggle the profileMenuOpenState when clicked', function() {
     assert.ok(!model.get('profileMenuOpenState'));
-    el.click();
+    $(el).click();
     assert.ok(model.get('profileMenuOpenState'));
-    el.click();
+    $(el).click();
     assert.ok(!model.get('profileMenuOpenState'));
   });
 });
