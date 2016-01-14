@@ -27,7 +27,7 @@
 
 <div class="chat-header__content">
 
-  <h2 class='js-chat-name' title="{{ lockTooltip }}">
+  <h1 class='js-chat-name' title="{{ lockTooltip }}">
     {{#if githubLink}}
       <a href="{{ githubLink }}" class="chat-header__title" target="_blank">{{ troupeName }}</a>
     {{else}}
@@ -36,7 +36,7 @@
     {{#if isPrivate}}
       <i class='octicon octicon-lock chat-header__permission-icon'></i>
     {{/if}}
-  </h2>
+  </h1>
 
   {{#unless oneToOne}}
   <p class="js-chat-topic chat-header__topic">{{troupeTopic}}</p>
