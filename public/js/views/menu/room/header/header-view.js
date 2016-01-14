@@ -3,7 +3,6 @@
 var Marionette = require('backbone.marionette');
 var template   = require('./header-view.hbs');
 var RAF        = require('utils/raf');
-var context    = require('utils/context');
 
 module.exports = Marionette.ItemView.extend({
 
@@ -46,10 +45,6 @@ module.exports = Marionette.ItemView.extend({
         this.ui.headerOrg.toggleClass('active', state === 'org');
       }.bind(this));
     }.bind(this));
-  },
-
-  initialize: function (){
-    this.listenTo(context.troupe(), 'change:id', this.render, this);
   },
 
   onRender: function() {
