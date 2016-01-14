@@ -1,5 +1,6 @@
 'use strict';
 
+var _                       = require('underscore');
 var Marionette              = require('backbone.marionette');
 var PanelHeaderView         = require('../header/header-view');
 var PanelFooterView         = require('../footer/footer-view');
@@ -51,7 +52,7 @@ module.exports = Marionette.LayoutView.extend({
       collection: this.model.primaryCollection,
       model:      this.model,
       bus:        this.bus,
-      dndCtrl:    this.dndCtrl
+      dndCtrl:    this.dndCtrl,
     }));
   },
 
@@ -76,19 +77,24 @@ module.exports = Marionette.LayoutView.extend({
     'primary-collection:snapshot': 'onPrimaryCollectionSnapshot',
   },
 
+  childEvents: {
+    'render': 'onChildViewRender'
+  },
+
   initialize: function(attrs) {
     this.bus     = attrs.bus;
     this.dndCtrl = attrs.dndCtrl;
 
     this.listenTo(this.bus, 'ui:swipeleft', this.onSwipeLeft, this);
     this.listenTo(this.bus, 'focus.request.chat', this.onSearchItemSelected, this);
+  },
 
+  onChildViewRender: _.debounce(function(){
     this.$el.find('.nano').nanoScroller({
       iOSNativeScrolling: true,
       sliderMaxHeight:    200,
     });
-
-  },
+  },50),
 
   onPanelOpenStateChange: function(model, val) { /*jshint unused: true */
     RAF(function() {

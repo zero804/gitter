@@ -21,6 +21,6 @@ module.exports = Backbone.Collection.extend({
 
   onOrgNameUpdate: function(model, val) {//jshint unused: true
     if (!val || val  === '') return;
-    this.fetch({ reset: true});
+    this.fetch({ reset: true });
   },
 });
