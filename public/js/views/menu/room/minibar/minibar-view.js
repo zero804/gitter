@@ -1,23 +1,31 @@
 'use strict';
 
-var Marionette       = require('backbone.marionette');
-var Backbone         = require('backbone');
-var RoomMenuItemView = require('./minibar-item-view');
+var Marionette          = require('backbone.marionette');
+var Backbone            = require('backbone');
+var RoomMenuItemView    = require('./minibar-item-view');
+var cocktail            = require('cocktail');
+var KeyboardEventsMixin = require('views/keyboard-events-mixin');
 
 require('nanoscroller');
 
 var MiniBarView = Marionette.ItemView.extend({
 
+  keyboardEvents: {
+     'room.1 room.2 room.3 room.4 room.5 room.6 room.7 room.8 room.9': 'onKeypressFocus',
+  },
+
   initialize: function(attrs) {
 
-    if(!attrs || !attrs.bus) {
+    if (!attrs || !attrs.bus) {
       throw new Error('A valid event bus must be passed to a new instance of the MiniBarView');
     }
+
     this.bus = attrs.bus;
 
-    if(!attrs || !attrs.dndCtrl)  {
+    if (!attrs || !attrs.dndCtrl)  {
       throw new Error('A valid drag & drop controller must be passed to a new instance of the MiniBarView');
     }
+
     this.dndCtrl = attrs.dndCtrl;
 
     this.roomMenuItems = [];
@@ -39,7 +47,7 @@ var MiniBarView = Marionette.ItemView.extend({
         el:      el,
         bus:     attrs.bus,
         dndCtrl: this.dndCtrl,
-        menuModel: this.model
+        menuModel: this.model,
       });
       this.roomMenuItems.push(view);
 
@@ -66,32 +74,31 @@ var MiniBarView = Marionette.ItemView.extend({
       var ANIMATION_TIME = 300;
 
       //if we are opening the panel
-      if(newVal === true) {
-        if(this.model.get('panelOpenState') === true) {
+      if (newVal === true) {
+        if (this.model.get('panelOpenState') === true) {
           this.model.set({ roomMenuIsPinned: newVal });
           this.bus.trigger('room-menu:pin', newVal);
-        }
-        else {
-          setTimeout(function(){
+        } else {
+          setTimeout(function() {
             this.model.set({ roomMenuIsPinned: newVal });
             this.bus.trigger('room-menu:pin', newVal);
           }.bind(this), ANIMATION_TIME);
         }
 
         this.model.set({ panelOpenState: newVal });
-      }
-      else {
+      } else {
         this.model.set({ roomMenuIsPinned: newVal });
         this.bus.trigger('room-menu:pin', newVal);
-        setTimeout(function(){
+        setTimeout(function() {
           this.model.set({ panelOpenState: newVal });
         }.bind(this), ANIMATION_TIME);
       }
     }
 
     //If the pin button is clicked retain the current state
-    if(type === 'pin') { type = this.model.get('state') }
-    if(!orgName) { orgName = this.model.get('selectedOrgName') }
+    if (type === 'pin') { type = this.model.get('state') }
+
+    if (!orgName) { orgName = this.model.get('selectedOrgName') }
 
     this.model.set({
       panelOpenState:       true,
@@ -109,16 +116,12 @@ var MiniBarView = Marionette.ItemView.extend({
     }
   },
 
-  _getCurrentlyActiveChildModel: function() {
-    return this.roomMenuItemModels.where({ active: true })[0];
-  },
-
   onMenuChange: function() {
 
     var orgName = this.model.get('selectedOrgName');
     var type    = this.model.get('state');
 
-    if(!this.model.get('panelOpenState')) { return }
+    if (!this.model.get('panelOpenState')) { return }
 
     //de-activate the old active item
     var currentActiveModel = this._getCurrentlyActiveChildModel();
@@ -129,6 +132,23 @@ var MiniBarView = Marionette.ItemView.extend({
     var nextActiveModel = this.roomMenuItemModels.where(query)[0];
     if (!!nextActiveModel) nextActiveModel.set('active', true);
 
+  },
+
+  //TODO this feals too much like the above function, start extracting the functionality
+  onKeypressFocus: function(e, handler) {//jshint unused: true
+    console.log('minibar got keypress');
+    var index = handler.key.split('+').slice(-1)[0];
+    index = parseInt(index, 10) - 1;
+    var nextActiveModel = this.roomMenuItemModels.at(index);
+    if (!nextActiveModel) { return }
+
+    this.onItemClicked(nextActiveModel.get('type'), nextActiveModel.get('orgName'), false);
+    this.bus.trigger('room-menu:keyboard:focus');
+    this.bus.trigger('focus.request.out', e);
+  },
+
+  _getCurrentlyActiveChildModel: function() {
+    return this.roomMenuItemModels.where({ active: true })[0];
   },
 
   destroy: function() {
@@ -142,5 +162,7 @@ var MiniBarView = Marionette.ItemView.extend({
   },
 
 });
+
+cocktail.mixin(MiniBarView, KeyboardEventsMixin);
 
 module.exports = MiniBarView;

@@ -87,9 +87,11 @@ module.exports = Marionette.LayoutView.extend({
 
     this.listenTo(this.bus, 'ui:swipeleft', this.onSwipeLeft, this);
     this.listenTo(this.bus, 'focus.request.chat', this.onSearchItemSelected, this);
+    this.listenTo(this.bus, 'room-menu:keyboard:select-last', this.onLastRoomItemSelected, this);
   },
 
   onChildViewRender: _.debounce(function(){
+    //TODO should this be in the ui hash?
     this.$el.find('.nano').nanoScroller({
       iOSNativeScrolling: true,
       sliderMaxHeight:    200,
@@ -129,6 +131,14 @@ module.exports = Marionette.LayoutView.extend({
       },
     });
 
+  },
+
+  onLastRoomItemSelected: function (id){
+    this.$el.find('.nano').nanoScroller({
+      iOSNativeScrolling: true,
+      sliderMaxHeight:    200,
+      scrollTo: '[data-room-id=' + id + ']'
+    });
   },
 
 });

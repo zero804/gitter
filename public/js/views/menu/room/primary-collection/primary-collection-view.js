@@ -1,12 +1,16 @@
 'use strict';
 
-var _          = require('underscore');
-var Marionette = require('backbone.marionette');
-var RAF        = require('utils/raf');
-var ItemView   = require('./primary-collection-item-view');
-var context    = require('utils/context');
+var _                   = require('underscore');
+var Backbone            = require('backbone');
+var Marionette          = require('backbone.marionette');
+var RAF                 = require('utils/raf');
+var ItemView            = require('./primary-collection-item-view');
+var context             = require('utils/context');
+var cocktail            = require('cocktail');
+var KeyboardEventsMixin = require('../../../keyboard-events-mixin.js');
 
-module.exports = Marionette.CollectionView.extend({
+var PrimaryCollectionView = Marionette.CollectionView.extend({
+
   childEvents: {
     'item:clicked': 'onItemClicked',
   },
@@ -20,6 +24,11 @@ module.exports = Marionette.CollectionView.extend({
     }));
   },
 
+  keyboardEvents: {
+    'room.up': 'onKeyboardUpPressed',
+    'room.down': 'onKeyboardDownPressed',
+  },
+
   initialize: function(options) {
 
     if (!options || !options.bus) {
@@ -29,17 +38,20 @@ module.exports = Marionette.CollectionView.extend({
     this.bus     = options.bus;
     this.model   = options.model;
     this.dndCtrl = options.dndCtrl;
+    this.uiModel = new Backbone.Model({ isFocused: false });
 
-    //TODO turn this inot an error
-    if (this.dndCtrl){
+    //TODO turn this into an error if there is a dndCtrl
+    if (this.dndCtrl) {
       this.dndCtrl.pushContainer(this.el);
       this.listenTo(this.dndCtrl, 'room-menu:add-favourite', this.onFavouriteAdded, this);
       this.listenTo(this.dndCtrl, 'room-menu:sort-favourite', this.onFavouritesSorted, this);
     }
 
+    this.listenTo(this.bus, 'room-menu:keyboard:focus', this.onKeyboardFocus, this);
     this.listenTo(this.model, 'change:state', this.onModelStateChange, this);
     this.listenTo(this.model, 'change:selectedOrgName', this.onModelStateChange, this);
     this.listenTo(context.troupe(), 'change:id', this.updateSelectedModel, this);
+
     this.updateSelectedModel();
   },
 
@@ -74,21 +86,21 @@ module.exports = Marionette.CollectionView.extend({
   },
 
   //WHERE SHOULD THIS GO? IT ALSO NEEDS TO BE TESTED
-  sortFavourites: function (a, b){
-    if(!a.get('favourite')) return -1;
-    if(!b.get('favourite')) return 1;
+  sortFavourites: function(a, b) {
+    if (!a.get('favourite')) return -1;
+    if (!b.get('favourite')) return 1;
     return (a.get('favourite') < b.get('favourite')) ? -1 : 1;
   },
 
   onModelStateChange: function(model, val) { /*jshint unused: true*/
 
-    if(model.get('state') === 'favourite') {
+    if (model.get('state') === 'favourite') {
       //This feels gross
       this.collection.comparator = this.sortFavourites;
+
       //a sort will trigger a render so we can skip out on the render part
       this.collection.sort();
-    }
-    else {
+    } else {
       this.collection.comparator = null;
       this.render();
     }
@@ -103,7 +115,7 @@ module.exports = Marionette.CollectionView.extend({
     var name = viewModel.get('uri');
     var url = '/' + name;
 
-    //If thr room menu is pinned dont try to close the pannel
+    //If the room menu is pinned dont try to close the pannel
     if (!this.model.get('roomMenuIsPinned')) {
       this.model.set('panelOpenState', false);
     }
@@ -114,32 +126,64 @@ module.exports = Marionette.CollectionView.extend({
   },
 
   //TODO The filter should be resued within the view filter method?
-  onFavouriteAdded: function (id){
+  onFavouriteAdded: function(id) {
     var newFavModel = this.collection.get(id);
-    var favIndex = this.collection
-      .filter(function(model){ return !!model.get('favourite') }).length;
+    var favIndex    = this.collection
+      .filter(function(model) { return !!model.get('favourite') }).length;
     newFavModel.set('favourite', (favIndex + 2));
     newFavModel.save();
   },
 
   //TODO TEST THIS - Need to test it a lot
   //this logic is a bit crazy :(
-  onFavouritesSorted: function (id){
+  onFavouritesSorted: function(id) {
     var elements = this.$el.find('[data-room-id]');
-    Array.prototype.slice.apply(elements).forEach(function(el, index){
+    Array.prototype.slice.apply(elements).forEach(function(el, index) {
       //This can't be the right way to do this
-      if(el.dataset.roomId !== id) return;
+      if (el.dataset.roomId !== id) return;
       var model = this.collection.get(el.dataset.roomId);
       model.set('favourite', (index + 1));
       model.save();
     }.bind(this));
   },
 
-  updateSelectedModel: function (){
-    var selectedModel = this.collection.where({ selected: true })[0];
-    if(selectedModel) selectedModel.set('selected', false);
-    var newlySelectedModel =  this.collection.where({ id: context.troupe().get('id') })[0];
-    if(newlySelectedModel) newlySelectedModel.set('selected', true);
+  updateSelectedModel: function() {
+    var selectedModel      = this.collection.findWhere({ selected: true });
+    var newlySelectedModel = this.collection.findWhere({ id: context.troupe().get('id') });
+
+    if (selectedModel) selectedModel.set('selected', false);
+    if (newlySelectedModel) newlySelectedModel.set('selected', true);
+  },
+
+  onKeyboardFocus: function() {
+    console.log('keyboard focus');
+    if(!this.collection.findWhere({ focus: true })) {
+      this.collection.at(0).set('focus', true);
+    }
+    this.uiModel.set('isFocused', true);
+  },
+
+  onKeyboardUpPressed: function() {
+    console.log('kry ip');
+    this._onKeyboardMovement(-1);
+  },
+
+  onKeyboardDownPressed: function() {
+    console.log('key down');
+    this._onKeyboardMovement(1);
+  },
+
+  _onKeyboardMovement: function(indexMod) {
+    var currentlyFocusedModel = this.collection.findWhere({ focus: true });
+    var index = this.collection.indexOf(currentlyFocusedModel) + indexMod;
+    //cycle if we need to
+    if(index >= this.collection.length) { index = 0 }
+    var newlyFocusedModel = this.collection.at(index);
+
+    if (currentlyFocusedModel) currentlyFocusedModel.set('focus', false);
+    if (newlyFocusedModel) newlyFocusedModel.set('focus', true);
+    this.bus.trigger('room-menu:keyboard:select-last', newlyFocusedModel.get('id'));
+
   },
 
   render: function() {
@@ -153,3 +197,7 @@ module.exports = Marionette.CollectionView.extend({
   },
 
 });
+
+cocktail.mixin(PrimaryCollectionView, KeyboardEventsMixin);
+
+module.exports = PrimaryCollectionView;

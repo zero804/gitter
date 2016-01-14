@@ -32,7 +32,8 @@ module.exports = Marionette.ItemView.extend({
   },
 
   modelEvents: {
-    'change:selected': 'onSelectedChange'
+    'change:selected': 'onSelectedChange',
+    'change:focus': 'onItemFocused',
   },
 
   triggers: {
@@ -89,8 +90,12 @@ module.exports = Marionette.ItemView.extend({
       });
   },
 
-  onSelectedChange: function (model, val){ //jshint unused: true
+  onSelectedChange: function(model, val) { //jshint unused: true
     this.$el.children(':first').toggleClass('selected', !!val);
+  },
+
+  onItemFocused: function(model, val) {//jshint unused: true
+    this.$el.children(':first').toggleClass('focus', !!val);
   },
 
 });

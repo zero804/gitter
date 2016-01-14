@@ -95,4 +95,12 @@ describe('PrimartCollectionItemView', function() {
     assert(!itemView.el.firstChild.classList.contains('selected'));
   });
 
+  it('should assign a focus class when the model is focused', function(){
+    assert(!itemView.el.firstChild.classList.contains('focus'));
+    itemView.model.set('focus', true);
+    assert(itemView.el.firstChild.classList.contains('focus'));
+    itemView.model.set('focus', false);
+    assert(!itemView.el.firstChild.classList.contains('focus'));
+  });
+
 });

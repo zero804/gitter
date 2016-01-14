@@ -20,7 +20,6 @@ describe('PrimaryCollectionView', function() {
   var primaryCollectionView;
   var dndCtrl;
 
-
   beforeEach(function() {
     context.troupe().set('id', 1);
     el = document.createElement('div');
@@ -129,44 +128,98 @@ describe('PrimaryCollectionView', function() {
     assert.equal(1, favModel.save.callCount);
   });
 
-  it('should throw an error when filter is called in the org state with no selectedOrgName', function(done){
+  it('should throw an error when filter is called in the org state with no selectedOrgName', function(done) {
     try {
       primaryCollectionView.model.set('state', 'org');
       primaryCollectionView.model.set('selectedOrgName', '');
       primaryCollectionView.filter(new Backbone.Model());
     }
-    catch(e) {
+    catch (e) {
       assert.equal(e.message, 'Room Menu Model is in the org state with no selectedOrgName');
       done();
     }
   });
 
-  it('should filter favourites when the room model is in the favourite state', function(){
+  it('should filter favourites when the room model is in the favourite state', function() {
     primaryCollectionView.model.set('state', 'favourite');
     assert(primaryCollectionView.filter(new Backbone.Model({ favourite: true })));
     assert(!primaryCollectionView.filter(new Backbone.Model({ favourite: false })));
   });
 
-  it('should filter by github type when in the people state', function(){
+  it('should filter by github type when in the people state', function() {
     primaryCollectionView.model.set('state', 'people');
     assert(primaryCollectionView.filter(new Backbone.Model({ githubType: 'ONETOONE' })));
     assert(!primaryCollectionView.filter(new Backbone.Model({ githubType: 'REPO' })));
   });
 
-  it('should select the correct model on init', function(){
+  it('should select the correct model on init', function() {
     assert.equal(1, primaryCollectionView.collection.where({ selected: true })[0].get('id'));
   });
 
-  it('should only have selected one model when the troupe model changes id', function(){
+  it('should only have selected one model when the troupe model changes id', function() {
     assert.equal(1, primaryCollectionView.collection.where({ selected: true }).length);
     context.troupe().set('id', 2);
     assert.equal(1, primaryCollectionView.collection.where({ selected: true }).length);
   });
 
-  it('should update the selected model when the troupe model changes', function(){
+  it('should update the selected model when the troupe model changes', function() {
     assert.equal(1, primaryCollectionView.collection.where({ selected: true })[0].get('id'));
     context.troupe().set('id', 2);
     assert.equal(2, primaryCollectionView.collection.where({ selected: true })[0].get('id'));
+  });
+
+  it('should focus the first element of its collection when keyboard focus is triggered', function() {
+    assert.equal(0, primaryCollectionView.collection.where({ focus: true }));
+    primaryCollectionView.bus.trigger('room-menu:keyboard:focus');
+    assert(primaryCollectionView.collection.at(0).get('focus'));
+  });
+
+  it('should generate a uiModel', function() {
+    assert(primaryCollectionView.uiModel);
+    assert(!primaryCollectionView.uiModel.get('isFocused'));
+  });
+
+  it('should set isFocused after a keyboard focus event', function() {
+    assert(!primaryCollectionView.uiModel.get('isFocused'));
+    primaryCollectionView.bus.trigger('room-menu:keyboard:focus');
+    assert(primaryCollectionView.uiModel.get('isFocused'));
+  });
+
+  it('should select the next item in the collection when keyboard down is pressed', function() {
+    primaryCollectionView.bus.trigger('room-menu:keyboard:focus');
+    primaryCollectionView.bus.trigger('keyboard.room.down');
+    assert(!primaryCollectionView.collection.at(0).get('focus'));
+    assert(primaryCollectionView.collection.at(1).get('focus'));
+  });
+
+  it('should select the previous item in the collection when keyboard up is pressed', function() {
+    primaryCollectionView.bus.trigger('room-menu:keyboard:focus');
+    primaryCollectionView.bus.trigger('keyboard.room.down');
+    primaryCollectionView.bus.trigger('keyboard.room.up');
+    assert(primaryCollectionView.collection.at(0).get('focus'));
+    assert(!primaryCollectionView.collection.at(1).get('focus'));
+  });
+
+  it('should emit an event on keyboard up movement', function(done) {
+    primaryCollectionView.bus.on('room-menu:keyboard:select-last', function(id) {
+      assert(true);
+      done();
+    });
+
+    primaryCollectionView.bus.trigger('room-menu:keyboard:focus');
+    assert(primaryCollectionView.collection.at(0).get('focus'));
+    primaryCollectionView.bus.trigger('keyboard.room.up');
+  });
+
+  it('should emit an event on keyboard up movement', function(done) {
+    primaryCollectionView.bus.on('room-menu:keyboard:select-last', function(id) {
+      assert(true);
+      done();
+    });
+
+    primaryCollectionView.bus.trigger('room-menu:keyboard:focus');
+    assert(primaryCollectionView.collection.at(0).get('focus'));
+    primaryCollectionView.bus.trigger('keyboard.room.down');
   });
 
 });
