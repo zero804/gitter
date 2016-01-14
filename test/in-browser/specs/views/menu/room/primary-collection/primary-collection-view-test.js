@@ -5,10 +5,12 @@
  *  TODO TEST VIEW FILTERING FOR DIFFERENT MODEL STATES
  * */
 
+var $                     = require('jquery');
 var assert                = require('assert');
 var sinon                 = require('sinon');
 var Backbone              = require('backbone');
 var PrimaryCollectionView = require('public/js/views/menu/room/primary-collection/primary-collection-view');
+var context               = require('utils/context');
 
 describe('PrimaryCollectionView', function() {
 
@@ -20,8 +22,9 @@ describe('PrimaryCollectionView', function() {
 
 
   beforeEach(function() {
+    context.troupe().set('id', 1);
     el = document.createElement('div');
-    model = new Backbone.Model({ state: 'all', panelOpenState: true });
+    model = new Backbone.Model({ state: 'all', panelOpenState: true, selectedOrgName: 'gitterHQ' });
     collection = new Backbone.Collection([
       { name:  '1', id: 1, favourite: 1, uri: '1' },
       { name:  '2', id: 2, uri: '2' },
@@ -124,6 +127,46 @@ describe('PrimaryCollectionView', function() {
     var favModel = collection.get(2);
     dndCtrl.trigger('room-menu:add-favourite', 2);
     assert.equal(1, favModel.save.callCount);
+  });
+
+  it('should throw an error when filter is called in the org state with no selectedOrgName', function(done){
+    try {
+      primaryCollectionView.model.set('state', 'org');
+      primaryCollectionView.model.set('selectedOrgName', '');
+      primaryCollectionView.filter(new Backbone.Model());
+    }
+    catch(e) {
+      assert.equal(e.message, 'Room Menu Model is in the org state with no selectedOrgName');
+      done();
+    }
+  });
+
+  it('should filter favourites when the room model is in the favourite state', function(){
+    primaryCollectionView.model.set('state', 'favourite');
+    assert(primaryCollectionView.filter(new Backbone.Model({ favourite: true })));
+    assert(!primaryCollectionView.filter(new Backbone.Model({ favourite: false })));
+  });
+
+  it('should filter by github type when in the people state', function(){
+    primaryCollectionView.model.set('state', 'people');
+    assert(primaryCollectionView.filter(new Backbone.Model({ githubType: 'ONETOONE' })));
+    assert(!primaryCollectionView.filter(new Backbone.Model({ githubType: 'REPO' })));
+  });
+
+  it('should select the correct model on init', function(){
+    assert.equal(1, primaryCollectionView.collection.where({ selected: true })[0].get('id'));
+  });
+
+  it('should only have selected one model when the troupe model changes id', function(){
+    assert.equal(1, primaryCollectionView.collection.where({ selected: true }).length);
+    context.troupe().set('id', 2);
+    assert.equal(1, primaryCollectionView.collection.where({ selected: true }).length);
+  });
+
+  it('should update the selected model when the troupe model changes', function(){
+    assert.equal(1, primaryCollectionView.collection.where({ selected: true })[0].get('id'));
+    context.troupe().set('id', 2);
+    assert.equal(2, primaryCollectionView.collection.where({ selected: true })[0].get('id'));
   });
 
 });

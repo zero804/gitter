@@ -77,9 +77,6 @@ describe('PrimartCollectionItemView', function() {
   //TODO this fails when all tests are run
   it.skip('should trigger a navigation event if it represents the current room & leave is clicked', function(done) {
     appEvents.on('navigation', function(url, type) {
-      console.log('-----------------------');
-      console.log(arguments);
-      console.log('-----------------------');
       assert.equal('/home', url);
       assert.equal('home', type);
       done();
@@ -88,6 +85,14 @@ describe('PrimartCollectionItemView', function() {
     context.getTroupeId = function() { return itemView.model.get('id'); };
 
     itemView.$el.find('[data-component="room-item-leave"]').click();
+  });
+
+  it('should toggle a selected class dependant on its models selected value', function(){
+    assert(!itemView.el.firstChild.classList.contains('selected'));
+    itemView.model.set('selected', true);
+    assert(itemView.el.firstChild.classList.contains('selected'));
+    itemView.model.set('selected', false);
+    assert(!itemView.el.firstChild.classList.contains('selected'));
   });
 
 });
