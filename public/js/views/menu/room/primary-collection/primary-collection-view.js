@@ -156,33 +156,43 @@ var PrimaryCollectionView = Marionette.CollectionView.extend({
   },
 
   onKeyboardFocus: function() {
-    console.log('keyboard focus');
-    if(!this.collection.findWhere({ focus: true })) {
+    if (!this.collection.findWhere({ focus: true })) {
       this.collection.at(0).set('focus', true);
     }
+
     this.uiModel.set('isFocused', true);
   },
 
   onKeyboardUpPressed: function() {
-    console.log('kry ip');
     this._onKeyboardMovement(-1);
   },
 
   onKeyboardDownPressed: function() {
-    console.log('key down');
     this._onKeyboardMovement(1);
   },
 
   _onKeyboardMovement: function(indexMod) {
     var currentlyFocusedModel = this.collection.findWhere({ focus: true });
     var index = this.collection.indexOf(currentlyFocusedModel) + indexMod;
+
     //cycle if we need to
-    if(index >= this.collection.length) { index = 0 }
+    if (index >= this.collection.length) { index = 0 }
+
     var newlyFocusedModel = this.collection.at(index);
 
     if (currentlyFocusedModel) currentlyFocusedModel.set('focus', false);
     if (newlyFocusedModel) newlyFocusedModel.set('focus', true);
-    this.bus.trigger('room-menu:keyboard:select-last', newlyFocusedModel.get('id'));
+
+    //Scrolling Logic
+    var scrollOffset = index - 10;
+    var scrollType = 'offset';
+
+    //TODO TEST
+    if (scrollOffset < 0) { scrollOffset = 0 }
+    if (index >= this.collection.length) { scrollOffset = index }
+    if(scrollOffset <= 10) scrollType = 'top';
+
+    this.bus.trigger('room-menu:keyboard:select-last', newlyFocusedModel.get('id'), scrollOffset);
 
   },
 

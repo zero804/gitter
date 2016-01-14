@@ -78,7 +78,7 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   childEvents: {
-    'render': 'onChildViewRender'
+    'render': 'onChildViewRender',
   },
 
   initialize: function(attrs) {
@@ -90,13 +90,13 @@ module.exports = Marionette.LayoutView.extend({
     this.listenTo(this.bus, 'room-menu:keyboard:select-last', this.onLastRoomItemSelected, this);
   },
 
-  onChildViewRender: _.debounce(function(){
+  onChildViewRender: _.debounce(function() {
     //TODO should this be in the ui hash?
     this.$el.find('.nano').nanoScroller({
       iOSNativeScrolling: true,
       sliderMaxHeight:    200,
     });
-  },50),
+  }, 50),
 
   onPanelOpenStateChange: function(model, val) { /*jshint unused: true */
     RAF(function() {
@@ -133,11 +133,9 @@ module.exports = Marionette.LayoutView.extend({
 
   },
 
-  onLastRoomItemSelected: function (id){
+  onLastRoomItemSelected: function(id, offset) {
     this.$el.find('.nano').nanoScroller({
-      iOSNativeScrolling: true,
-      sliderMaxHeight:    200,
-      scrollTo: '[data-room-id=' + id + ']'
+      scrollTo: '[data-collection-index=' + offset + ']',
     });
   },
 
