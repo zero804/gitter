@@ -296,7 +296,7 @@ module.exports = (function() {
 
       if (_.isEmpty(cache.models)) {
         return this.fetchLocalRooms()
-          .then(this.cacheRooms.bind(this))
+          .then(this.cacheRooms.bind(this));
       }
 
       return Promise.resolve(cache);
