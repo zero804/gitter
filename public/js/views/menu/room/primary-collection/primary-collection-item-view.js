@@ -21,6 +21,7 @@ module.exports = Marionette.ItemView.extend({
     return {
       'data-room-id': this.model.get('id'),
       'style': 'transition-delay: ' + delay + 's',
+      'data-collection-index': this.index,
     };
   },
 
