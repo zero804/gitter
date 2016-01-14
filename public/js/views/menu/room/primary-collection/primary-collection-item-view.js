@@ -31,6 +31,10 @@ module.exports = Marionette.ItemView.extend({
     'mouseleave': 'onMouseOut',
   },
 
+  modelEvents: {
+    'change:selected': 'onSelectedChange'
+  },
+
   triggers: {
     'click': 'item:clicked',
   },
@@ -83,6 +87,10 @@ module.exports = Marionette.ItemView.extend({
       .then(function() {
         appEvents.trigger('navigation', '/home', 'home', '');
       });
+  },
+
+  onSelectedChange: function (model, val){ //jshint unused: true
+    this.$el.children(':first').toggleClass('selected', !!val);
   },
 
 });

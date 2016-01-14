@@ -4,6 +4,7 @@ var _          = require('underscore');
 var Marionette = require('backbone.marionette');
 var RAF        = require('utils/raf');
 var ItemView   = require('./primary-collection-item-view');
+var context    = require('utils/context');
 
 module.exports = Marionette.CollectionView.extend({
   childEvents: {
@@ -38,6 +39,8 @@ module.exports = Marionette.CollectionView.extend({
 
     this.listenTo(this.model, 'change:state', this.onModelStateChange, this);
     this.listenTo(this.model, 'change:selectedOrgName', this.onModelStateChange, this);
+    this.listenTo(context.troupe(), 'change:id', this.updateSelectedModel, this);
+    this.updateSelectedModel();
   },
 
   filter: function(model) {
@@ -130,6 +133,13 @@ module.exports = Marionette.CollectionView.extend({
       model.set('favourite', (index + 1));
       model.save();
     }.bind(this));
+  },
+
+  updateSelectedModel: function (){
+    var selectedModel = this.collection.where({ selected: true })[0];
+    if(selectedModel) selectedModel.set('selected', false);
+    var newlySelectedModel =  this.collection.where({ id: context.troupe().get('id') })[0];
+    if(newlySelectedModel) newlySelectedModel.set('selected', true);
   },
 
   render: function() {
