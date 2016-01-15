@@ -27,6 +27,7 @@ var PrimaryCollectionView = Marionette.CollectionView.extend({
   keyboardEvents: {
     'room.up': 'onKeyboardUpPressed',
     'room.down': 'onKeyboardDownPressed',
+    'room.enter': 'onKeyboardEnterPressed'
   },
 
   initialize: function(options) {
@@ -112,6 +113,7 @@ var PrimaryCollectionView = Marionette.CollectionView.extend({
 
   onItemClicked: function(view) {
     var viewModel = view.model;
+    //DRY
     var name = viewModel.get('uri');
     var url = '/' + name;
 
@@ -120,6 +122,7 @@ var PrimaryCollectionView = Marionette.CollectionView.extend({
       this.model.set('panelOpenState', false);
     }
 
+    //TODO The timeout is only needed if the room menu is not pinned
     setTimeout(function() {
       this.bus.trigger('navigation', url, 'chat', name);
     }.bind(this), 250);
@@ -163,6 +166,14 @@ var PrimaryCollectionView = Marionette.CollectionView.extend({
     this.uiModel.set('isFocused', true);
   },
 
+  onKeyboardEnterPressed: function (){
+    var focusedModel = this.collection.findWhere({ focus: true });
+    if(!focusedModel){ return }
+    var name = focusedModel.get('uri');
+    var url  = '/' + name;
+    this.bus.trigger('navigation', url, 'chat', name);
+  },
+
   onKeyboardUpPressed: function() {
     this._onKeyboardMovement(-1);
   },
@@ -171,6 +182,9 @@ var PrimaryCollectionView = Marionette.CollectionView.extend({
     this._onKeyboardMovement(1);
   },
 
+
+  //TODO, some of this logic is crazy so test it.
+  //JP 15/1/16
   _onKeyboardMovement: function(indexMod) {
     var currentlyFocusedModel = this.collection.findWhere({ focus: true });
     var index = this.collection.indexOf(currentlyFocusedModel) + indexMod;
@@ -185,15 +199,18 @@ var PrimaryCollectionView = Marionette.CollectionView.extend({
 
     //Scrolling Logic
     var scrollOffset = index - 10;
-    var scrollType = 'offset';
+    var scrollType;
 
     //TODO TEST
-    if (scrollOffset < 0) { scrollOffset = 0 }
-    if (index >= this.collection.length) { scrollOffset = index }
-    if(scrollOffset <= 10) scrollType = 'top';
+    if (scrollOffset < 0) { scrollOffset = 0; }
+    if (scrollOffset <= 10) { scrollType = 'top'; }
+    if (index >= this.collection.length) {
+      //TODO pass focus to secondary collection
+      scrollOffset = index;
+      scrollType = 'bottom';
+    }
 
-    this.bus.trigger('room-menu:keyboard:select-last', newlyFocusedModel.get('id'), scrollOffset);
-
+    this.bus.trigger('room-menu:keyboard:change-focus', scrollOffset, scrollType);
   },
 
   render: function() {

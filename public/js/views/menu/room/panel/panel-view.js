@@ -87,16 +87,16 @@ module.exports = Marionette.LayoutView.extend({
 
     this.listenTo(this.bus, 'ui:swipeleft', this.onSwipeLeft, this);
     this.listenTo(this.bus, 'focus.request.chat', this.onSearchItemSelected, this);
-    this.listenTo(this.bus, 'room-menu:keyboard:select-last', this.onLastRoomItemSelected, this);
+    this.listenTo(this.bus, 'room-menu:keyboard:change-focus', this.onFocusChangeRequested, this);
   },
 
   onChildViewRender: _.debounce(function() {
-    //TODO should this be in the ui hash?
-    this.$el.find('.nano').nanoScroller({
-      iOSNativeScrolling: true,
-      sliderMaxHeight:    200,
-    });
+    this._initNano({ iOSNativeScrolling: true, sliderMaxHeight: 200 });
   }, 50),
+
+  _initNano: function(params) {
+    this.$el.find('.nano').nanoScroller(params);
+  },
 
   onPanelOpenStateChange: function(model, val) { /*jshint unused: true */
     RAF(function() {
@@ -133,10 +133,10 @@ module.exports = Marionette.LayoutView.extend({
 
   },
 
-  onLastRoomItemSelected: function(id, offset) {
-    this.$el.find('.nano').nanoScroller({
-      scrollTo: '[data-collection-index=' + offset + ']',
-    });
+  onFocusChangeRequested: function(offset, type) { //jshint unused: true
+    if (type) { return this._initNano({ scroll: type }); }
+
+    this._initNano({ scrollTo: '[data-collection-index=' + offset + ']'});
   },
 
 });
