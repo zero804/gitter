@@ -168,9 +168,7 @@ var PrimaryCollectionView = Marionette.CollectionView.extend({
   },
 
   onKeyboardEnterPressed: function() {
-    if (!this.uiModel.get('isFocused')) {
-      console.log('IS NOT FOCUSED');
-      return }
+    if (!this.uiModel.get('isFocused')) { return }
 
     var focusedModel = this.collection.findWhere({ focus: true });
     if (!focusedModel) { return }
