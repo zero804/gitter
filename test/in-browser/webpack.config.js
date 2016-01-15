@@ -49,7 +49,8 @@ module.exports = {
       'views/menu/room/search-input/search-input-view':     path.resolve(__dirname, './fixtures/helpers/search-input-view.js'),
       'utils/raf':                                          path.resolve(__dirname, './fixtures/helpers/raf.js'),
       'components/apiClient':                               path.resolve(__dirname, './fixtures/helpers/apiclient.js'),
-      'utils/appevents':                                    path.resolve(__dirname, './fixtures/helpers/appevents.js')
+      'utils/appevents':                                    path.resolve(__dirname, './fixtures/helpers/appevents.js'),
+      'filtered-collection':                                path.resolve(__dirname, '../../public/repo/filtered-collection/filtered-collection.js'),
     },
   },
   node: {

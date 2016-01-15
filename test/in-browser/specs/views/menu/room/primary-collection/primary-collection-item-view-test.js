@@ -9,7 +9,7 @@ var apiClient                 = require('components/apiClient');
 var appEvents                 = require('utils/appevents');
 var context                   = require('utils/context');
 
-describe('PrimartCollectionItemView', function() {
+describe('PrimaryCollectionItemView()', function() {
 
   var itemView;
   var el;
