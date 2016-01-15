@@ -25,10 +25,10 @@ describe('PrimaryCollectionView', function() {
     el = document.createElement('div');
     model = new Backbone.Model({ state: 'all', panelOpenState: true, selectedOrgName: 'gitterHQ' });
     collection = new Backbone.Collection([
-      { name:  '1', id: 1, favourite: 1, uri: '1' },
-      { name:  '2', id: 2, uri: '2' },
-      { name:  '3', id: 3, uri: '3' },
-      { name:  '4', id: 4, uri: '4' },
+      { name:  '1', id: 1, favourite: 1, uri: '1/1' },
+      { name:  '2', id: 2, uri: '2/2' },
+      { name:  '3', id: 3, uri: '3/3' },
+      { name:  '4', id: 4, uri: '4/4' },
     ]);
     sinon.stub(collection.models[1], 'save');
 
@@ -201,7 +201,7 @@ describe('PrimaryCollectionView', function() {
   });
 
   it('should emit an event on keyboard up movement', function(done) {
-    primaryCollectionView.bus.on('room-menu:keyboard:select-last', function(id) {
+    primaryCollectionView.bus.on('room-menu:keyboard:change-focus', function(id) {
       assert(true);
       done();
     });
@@ -212,7 +212,7 @@ describe('PrimaryCollectionView', function() {
   });
 
   it('should emit an event on keyboard up movement', function(done) {
-    primaryCollectionView.bus.on('room-menu:keyboard:select-last', function(id) {
+    primaryCollectionView.bus.on('room-menu:keyboard:change-focus', function(id) {
       assert(true);
       done();
     });
@@ -220,6 +220,15 @@ describe('PrimaryCollectionView', function() {
     primaryCollectionView.bus.trigger('room-menu:keyboard:focus');
     assert(primaryCollectionView.collection.at(0).get('focus'));
     primaryCollectionView.bus.trigger('keyboard.room.down');
+  });
+
+  it.only('should emit a navigation event when the enter key is pressed', function(done) {
+    primaryCollectionView.bus.trigger('room-menu:keyboard:focus');
+    primaryCollectionView.bus.on('navigation', function() {
+      assert(true);
+      done();
+    });
+    primaryCollectionView.bus.trigger('keyboard.room.enter');
   });
 
 });
