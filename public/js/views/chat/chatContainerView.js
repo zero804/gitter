@@ -34,9 +34,9 @@ module.exports = Marionette.LayoutView.extend({
     }
   },
 
-  initConnectivityIndicatorView: function(options) {
+  initConnectivityIndicatorView: function(optionsForRegion) {
     if(context.hasFeature('connectivity-indicator')) {
-      return new ChatConnectionIndicatorView();
+      return new ChatConnectionIndicatorView(optionsForRegion({ }));
     }
   },
 
