@@ -202,6 +202,13 @@ var PrimaryCollectionView = Marionette.CollectionView.extend({
     if (newlyFocusedModel) newlyFocusedModel.set('focus', true);
 
     //Scrolling Logic
+    //Scrolling to the top pushes the first item
+    //right to the top of the container and moves any padded area
+    //as such we need to use an offset to maintain the visual space
+    //at the top of the primary collection
+    //sadly adding padding-bottom/margin-bottom to an element
+    //above .nano causes many layout issues - nanoScroller is crazy
+    //JP 15/1/16
     var scrollOffset = index - 10;
     var scrollType;
 
