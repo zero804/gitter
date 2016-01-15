@@ -172,8 +172,6 @@ describe('RoomMenuModel', function() {
 
     it('should be instantiated with two child collections', function() {
 
-      assert.ok(roomMenuModel.primaryCollection);
-      assert.ok(roomMenuModel.primaryCollection instanceof ProxyCollection);
       assert.ok(roomMenuModel.secondaryCollection);
       assert.ok(roomMenuModel.secondaryCollection instanceof ProxyCollection);
 

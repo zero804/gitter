@@ -56,36 +56,6 @@ var PrimaryCollectionView = Marionette.CollectionView.extend({
     this.updateSelectedModel();
   },
 
-  filter: function(model) {
-    var state   = this.model.get('state');
-    var orgName = this.model.get('selectedOrgName');
-
-    if (state === 'org' && orgName === '') {
-      throw new Error('Room Menu Model is in the org state with no selectedOrgName');
-    }
-
-    switch (state) {
-
-      case 'org':
-        var name = model.get('name').split('/')[0];
-        return (name === orgName) && !!model.get('roomMember');
-
-      case 'favourite':
-        return !!model.get('favourite');
-
-      case 'people':
-        return model.get('githubType') === 'ONETOONE';
-
-      //should no show no results when in the search state
-      case 'search':
-        return false;
-
-      //show all models in the deffault state
-      default:
-        return true;
-    }
-  },
-
   //WHERE SHOULD THIS GO? IT ALSO NEEDS TO BE TESTED
   sortFavourites: function(a, b) {
     if (!a.get('favourite')) return -1;
@@ -165,7 +135,8 @@ var PrimaryCollectionView = Marionette.CollectionView.extend({
 
   onKeyboardFocus: function() {
     if (!this.collection.findWhere({ focus: true })) {
-      this.collection.at(0).set('focus', true);
+      var firstModel = this.collection.at(0);
+      if (firstModel) firstModel.set('focus', true);
     }
 
     this.uiModel.set('isFocused', true);

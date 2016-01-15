@@ -129,30 +129,6 @@ describe('PrimaryCollectionView', function() {
     assert.equal(1, favModel.save.callCount);
   });
 
-  it('should throw an error when filter is called in the org state with no selectedOrgName', function(done) {
-    try {
-      primaryCollectionView.model.set('state', 'org');
-      primaryCollectionView.model.set('selectedOrgName', '');
-      primaryCollectionView.filter(new Backbone.Model());
-    }
-    catch (e) {
-      assert.equal(e.message, 'Room Menu Model is in the org state with no selectedOrgName');
-      done();
-    }
-  });
-
-  it('should filter favourites when the room model is in the favourite state', function() {
-    primaryCollectionView.model.set('state', 'favourite');
-    assert(primaryCollectionView.filter(new Backbone.Model({ favourite: true })));
-    assert(!primaryCollectionView.filter(new Backbone.Model({ favourite: false })));
-  });
-
-  it('should filter by github type when in the people state', function() {
-    primaryCollectionView.model.set('state', 'people');
-    assert(primaryCollectionView.filter(new Backbone.Model({ githubType: 'ONETOONE' })));
-    assert(!primaryCollectionView.filter(new Backbone.Model({ githubType: 'REPO' })));
-  });
-
   it('should select the correct model on init', function() {
     assert.equal(1, primaryCollectionView.collection.where({ selected: true })[0].get('id'));
   });
