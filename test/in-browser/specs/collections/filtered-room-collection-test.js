@@ -63,7 +63,7 @@ describe('FilteredRoomCollection()', function() {
     });
   });
 
-  it('should filter everything when in the saerch state', function(done) {
+  it('should filter everything when in the search state', function(done) {
     roomCollection.on('snapshot', function() {
       model.set('state', 'search');
       assert.equal(0, filteredRoomCollection.length);
@@ -71,11 +71,24 @@ describe('FilteredRoomCollection()', function() {
     });
   });
 
-  it('should proxy the snapshot event', function(done){
-    filteredRoomCollection.on('snapshot', function(){
+  it('should proxy the snapshot event', function(done) {
+    filteredRoomCollection.on('snapshot', function() {
       assert(true);
       done();
     });
+  });
+
+  it.only('should filter org rooms when in an org state', function(done) {
+
+    roomCollection.on('snapshot', function() {
+      model.set({ state: 'org', selectedOrgName: 'gitterHQ' });
+      filteredRoomCollection.models.forEach(function(model) {
+        assert(/^ORG/.test(model.get('githubType')));
+      });
+
+      done();
+    });
+
   });
 
 });

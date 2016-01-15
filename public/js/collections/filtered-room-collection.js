@@ -32,6 +32,9 @@ module.exports = Backbone.FilteredCollection.extend({
       case 'search' :
         this.setFilter(this.filterSearches);
         break;
+      case 'org' :
+        this.setFilter(this.filterOrgRooms.bind(this));
+        break;
       default:
         this.setFilter(false);
         break;
@@ -48,6 +51,12 @@ module.exports = Backbone.FilteredCollection.extend({
 
   filterSearches: function(){
     return false;
+  },
+
+  filterOrgRooms: function (model){
+    var orgName = this.roomModel.get('selectedOrgName');
+    var name    = model.get('name').split('/')[0];
+    return (name === orgName) && !!model.get('roomMember');
   },
 
   onRoomCollectionSnapshot: function (){

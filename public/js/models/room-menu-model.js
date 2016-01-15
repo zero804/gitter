@@ -6,6 +6,7 @@ var ProxyCollection          = require('backbone-proxy-collection');
 var RecentSearchesCollection = require('../collections/recent-searches');
 var SuggestedOrgCollection   = require('../collections/org-suggested-rooms');
 var apiClient                = require('components/apiClient');
+var FilteredRoomCollection   = require('../collections/filtered-room-collection.js');
 
 var states = [
   'all',
@@ -61,7 +62,11 @@ module.exports = Backbone.Model.extend({
     this.searchTerms         = new RecentSearchesCollection();
     this.suggestedOrgs       = new SuggestedOrgCollection([], { contextModel: this });
 
-    this.primaryCollection   = new ProxyCollection({ collection: this._roomCollection });
+    this.primaryCollection   = new FilteredRoomCollection(null, {
+      roomModel: this,
+      collection: this._roomCollection
+    });
+
     this.secondaryCollection = new ProxyCollection({ collection: this.searchTerms });
 
     this.listenTo(this.primaryCollection, 'snapshot', this.onPrimaryCollectionSnapshot, this);
