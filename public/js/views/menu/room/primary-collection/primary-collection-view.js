@@ -123,6 +123,10 @@ var PrimaryCollectionView = Marionette.CollectionView.extend({
       this.model.set('panelOpenState', false);
     }
 
+    //reset any models that have keyboard focus
+    var focusedModels = this.collection.where({ focus: true });
+    focusedModels.forEach(function(model) { model.set('focus', false)});
+
     //TODO The timeout is only needed if the room menu is not pinned
     setTimeout(function() {
       this.bus.trigger('navigation', url, 'chat', name);
@@ -217,7 +221,7 @@ var PrimaryCollectionView = Marionette.CollectionView.extend({
 
     if (scrollOffset <= 10) { scrollType = 'top'; }
 
-    if (index === (this.collection.length -1) || index === -1 ) {
+    if (index === (this.collection.length - 1) || index === -1) {
       //TODO pass focus to secondary collection
       scrollOffset = index;
       scrollType = 'bottom';
