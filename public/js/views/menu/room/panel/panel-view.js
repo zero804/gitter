@@ -134,6 +134,7 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   onFocusChangeRequested: function(offset, type) { //jshint unused: true
+    console.log(type);
     if (type) { return this._initNano({ scroll: type }); }
 
     this._initNano({ scrollTo: '[data-collection-index=' + offset + ']'});

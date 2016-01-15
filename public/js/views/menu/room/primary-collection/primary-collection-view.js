@@ -210,7 +210,7 @@ var PrimaryCollectionView = Marionette.CollectionView.extend({
 
     if (scrollOffset <= 10) { scrollType = 'top'; }
 
-    if (index >= this.collection.length) {
+    if (index === (this.collection.length -1) || index === -1 ) {
       //TODO pass focus to secondary collection
       scrollOffset = index;
       scrollType = 'bottom';
