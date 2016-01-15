@@ -222,13 +222,25 @@ describe('PrimaryCollectionView', function() {
     primaryCollectionView.bus.trigger('keyboard.room.down');
   });
 
-  it.only('should emit a navigation event when the enter key is pressed', function(done) {
+  it('should emit a navigation event when the enter key is pressed', function(done) {
     primaryCollectionView.bus.trigger('room-menu:keyboard:focus');
     primaryCollectionView.bus.on('navigation', function() {
       assert(true);
       done();
     });
+
     primaryCollectionView.bus.trigger('keyboard.room.enter');
+  });
+
+  it('should not emit a navigation event on keyboard enter when its uiModel is not focused ', function(done) {
+    primaryCollectionView.bus.trigger('room-menu:keyboard:focus');
+    primaryCollectionView.uiModel.set('isFocused', false);
+    primaryCollectionView.bus.on('navigation', function() {
+      assert(false);
+    });
+
+    primaryCollectionView.bus.trigger('keyboard.room.enter');
+    done();
   });
 
 });
