@@ -29,12 +29,17 @@ module.exports = Marionette.LayoutView.extend({
       },
       connectivityIndicator: {
         el: '.chat-connectivity-indicator-wrapper',
-        init: function(options) {
-          return new ChatConnectionIndicatorView();
-        }
+        init: 'initConnectivityIndicatorView'
       }
     }
   },
+
+  initConnectivityIndicatorView: function(options) {
+    if(context.hasFeature('connectivity-indicator')) {
+      return new ChatConnectionIndicatorView();
+    }
+  },
+
 
   ui: {
     primaryScroll: '.primary-scroll',
