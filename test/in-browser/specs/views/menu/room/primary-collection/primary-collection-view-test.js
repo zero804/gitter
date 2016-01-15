@@ -246,4 +246,12 @@ describe('PrimaryCollectionView', function() {
     done();
   });
 
+  it('clicking an element should remove and focused models', function(){
+    primaryCollectionView.render();
+    primaryCollectionView.bus.trigger('room-menu:keyboard:focus');
+    assert(primaryCollectionView.collection.findWhere({ focus: true }));
+    $(el.firstChild).click();
+    assert(!primaryCollectionView.collection.findWhere({ focus: true }));
+  });
+
 });
