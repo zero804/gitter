@@ -9,33 +9,26 @@ module.exports = Marionette.ItemView.extend({
 
   template: template,
   className: 'chat-connectivity-indicator',
-
+  model: new Backbone.Model({ hasConnectivity: true }),
   ui: {
     indicator: '.chat-connectivity-indicator'
   },
 
-  modelEvents: function() {
-    var events = {
-      'change': 'onConnectivityChange'
-    };
-
-    return events;
-  },
-
-  constructor: function() {
-    this.model = new Backbone.Model({ hasConnectivity: true });
-    // Call the super constructor
-    Marionette.ItemView.prototype.constructor.apply(this, arguments);
+  modelEvents: {
+    'change': 'onConnectivityChange'
   },
 
   initialize: function() {
-    appEvents.on('realtime-connectivity:up', function(type, chat, options) {
+    this.listenTo(appEvents, 'realtime-connectivity:up', function() {
       this.model.set('hasConnectivity', true);
-    }.bind(this));
-    appEvents.on('realtime-connectivity:down', function(type, chat, options) {
-      this.model.set('hasConnectivity', false);
-    }.bind(this));
+    });
 
+    this.listenTo(appEvents, 'realtime-connectivity:down', function() {
+      this.model.set('hasConnectivity', false);
+    });
+  },
+
+  onRender: function() {
     this.onConnectivityChange();
   },
 
