@@ -27,7 +27,7 @@ var PrimaryCollectionView = Marionette.CollectionView.extend({
   keyboardEvents: {
     'room.up': 'onKeyboardUpPressed',
     'room.down': 'onKeyboardDownPressed',
-    'room.enter': 'onKeyboardEnterPressed'
+    'room.enter': 'onKeyboardEnterPressed',
   },
 
   initialize: function(options) {
@@ -113,6 +113,7 @@ var PrimaryCollectionView = Marionette.CollectionView.extend({
 
   onItemClicked: function(view) {
     var viewModel = view.model;
+
     //DRY
     var name = viewModel.get('uri');
     var url = '/' + name;
@@ -166,11 +167,15 @@ var PrimaryCollectionView = Marionette.CollectionView.extend({
     this.uiModel.set('isFocused', true);
   },
 
-  onKeyboardEnterPressed: function (){
+  onKeyboardEnterPressed: function() {
+    if (!this.uiModel.get('isFocused')) { return }
+
     var focusedModel = this.collection.findWhere({ focus: true });
-    if(!focusedModel){ return }
+    if (!focusedModel) { return }
+
     var name = focusedModel.get('uri');
     var url  = '/' + name;
+
     this.bus.trigger('navigation', url, 'chat', name);
   },
 
@@ -181,7 +186,6 @@ var PrimaryCollectionView = Marionette.CollectionView.extend({
   onKeyboardDownPressed: function() {
     this._onKeyboardMovement(1);
   },
-
 
   //TODO, some of this logic is crazy so test it.
   //JP 15/1/16
@@ -203,7 +207,9 @@ var PrimaryCollectionView = Marionette.CollectionView.extend({
 
     //TODO TEST
     if (scrollOffset < 0) { scrollOffset = 0; }
+
     if (scrollOffset <= 10) { scrollType = 'top'; }
+
     if (index >= this.collection.length) {
       //TODO pass focus to secondary collection
       scrollOffset = index;
