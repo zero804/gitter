@@ -78,7 +78,7 @@ describe('FilteredRoomCollection()', function() {
     });
   });
 
-  it.only('should filter org rooms when in an org state', function(done) {
+  it('should filter org rooms when in an org state', function(done) {
 
     roomCollection.on('snapshot', function() {
       model.set({ state: 'org', selectedOrgName: 'gitterHQ' });
