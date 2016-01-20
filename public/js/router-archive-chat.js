@@ -20,6 +20,10 @@ require('components/ping');
 require('views/widgets/avatar');
 require('views/widgets/timeago');
 
+require('gitter-styleguide/css/components/buttons.css');
+
+
+
 onready(function() {
 
   $(document).on("click", "a", function(e) {
@@ -69,5 +73,7 @@ onready(function() {
   } catch (err) {
     // TODO: Handle the error? WC.
   }
+
+
 
 });
