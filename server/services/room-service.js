@@ -989,7 +989,8 @@ function updateUserDateAdded(userId, roomId, date) {
 exports.testOnly.updateUserDateAdded = updateUserDateAdded;
 
 /* When a user wants to join a room */
-function joinRoom(roomId, user) {
+function joinRoom(roomId, user, options) {
+  options = options || {};
   return troupeService.findById(roomId)
     .then(function(room) {
       return roomPermissionsModel(user, 'join', room)
@@ -1006,6 +1007,9 @@ function joinRoom(roomId, user) {
         })
         .then(function() {
           return roomMembershipService.addRoomMember(room._id, user._id);
+        })
+        .then(function() {
+          sendJoinStats(user, room, options.tracking);
         });
     });
 }
