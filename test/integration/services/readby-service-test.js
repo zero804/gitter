@@ -42,33 +42,32 @@ describe('readby-service', function() {
 
   describe('batchUpdateReadbyBatch', function() {
 
-    it('should batch update the readby for lots of chat messages', function(done) {
+    it('should batch update the readby for lots of chat messages', function() {
       var user1 = fixture.user1;
       var user2 = fixture.user2;
       var message1 = fixture.message1;
       var message2 = fixture.message2;
 
-      readyByService.testOnly.batchUpdateReadbyBatch(fixture.troupe1.id, [
-        user1.id + ':' + message1.id,
-        user2.id + ':' + message1.id,
-        user1.id + ':' + message2.id
+      return readyByService.testOnly.batchUpdateReadbyBatch(fixture.troupe1.id, [
+          user1.id + ':' + message1.id,
+          user2.id + ':' + message1.id,
+          user1.id + ':' + message2.id
+        ])
+        .then(function() {
+          return persistenceService.ChatMessage
+              .find({ _id: { $in: [message1._id, message2._id] } })
+              .exec();
+        })
+        .then(function(chats) {
+          var chatsById = collections.indexById(chats);
+          var m1 = chatsById[message1.id];
+          var m2 = chatsById[message2.id];
 
-        ], function(err) {
-          if (err) return done(err);
-          persistenceService.ChatMessage
-            .find({ _id: { $in: [message1._id, message2._id] } })
-            .exec(function(err, chats) {
-              var chatsById = collections.indexById(chats);
-              var m1 = chatsById[message1.id];
-              var m2 = chatsById[message2.id];
-
-              assert.strictEqual(m1.readBy.length, 2);
-              assert.strictEqual(m2.readBy.length, 1);
-              assert(m1.readBy.indexOf(user1._id) >= 0);
-              assert(m1.readBy.indexOf(user2._id) >= 0);
-              assert(m2.readBy.indexOf(user1._id) >= 0);
-              done();
-            });
+          assert.strictEqual(m1.readBy.length, 2);
+          assert.strictEqual(m2.readBy.length, 1);
+          assert(m1.readBy.indexOf(user1._id) >= 0);
+          assert(m1.readBy.indexOf(user2._id) >= 0);
+          assert(m2.readBy.indexOf(user1._id) >= 0);
         });
     });
 
@@ -93,7 +92,6 @@ describe('readby-service', function() {
         });
 
     });
-
 
   });
 });
