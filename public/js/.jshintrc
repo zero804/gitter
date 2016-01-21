@@ -3,13 +3,12 @@
   "browser": true,
   "unused": "strict",
   "loopfunc": true,
-  "globalstrict": true,
   "undef": true,
   "predef": [
     "module",
     "require"
   ],
-  "strict": true,
+  "strict": "global",
   "maxstatements": 50,
   "maxcomplexity": 12,
   "maxdepth": 4
