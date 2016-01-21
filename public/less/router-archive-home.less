@@ -1,11 +1,16 @@
 @import "base-web.less";
 @import "typography.less";
 
-@import "layouts/archive";
 @import "chat-app.less";
 
 @import "../js/views/app/chatIntegratedView";
 @import "../js/views/app/headerView";
+@import "layouts/archive";
+
+@import "chat-content.less";
+// This will go (soon I hope)
+@import "trp3Chat.less";
+
 @import (less) "../../node_modules/cal-heatmap/cal-heatmap.css";
 @import "../js/views/widgets/preload";
 
@@ -20,6 +25,12 @@
 }
 .cal-heatmap-container .graph-subdomain-group rect.empty:hover {
   stroke-width: 0;
+}
+
+.cal-heatmap-container .graph {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
 }
 
 button {
