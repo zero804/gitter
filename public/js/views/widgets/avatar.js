@@ -178,6 +178,7 @@ module.exports = (function() {
       id: user.id,
       showStatus: options.showStatus,
       userDisplayName: user.displayName,
+      alt: options.screenReadUsername ? user.username: '',
       avatarSrcSet: avatarSrcSet,
       avatarSize: avatarSize || 's',
       imgSize: imgSize,
