@@ -4,9 +4,10 @@
 
 var userService = require('../../server/services/user-service');
 var troupeService = require('../../server/services/troupe-service');
-var categoriseUsersInRoom = require('../../server/services/categorise-users-in-room');
-var roomMembershipService = require('../../server/services/room-membership-service');
+var unreadItemService = require('../../server/services/unread-item-service');
 var collections = require('../../server/utils/collections');
+var categoriseUsersInRoom = require('../../server/services/categorise-users-in-room');
+
 var Q = require('q');
 
 var shutdown = require('shutdown');
@@ -54,21 +55,52 @@ function getTroupe() {
 
 getTroupe()
   .then(function(troupe) {
-    if (!troupe) throw new Error('No room found');
-    return [troupe, roomMembershipService.findMembersForRoom(troupe._id)];
+    if (!troupe) throw new Error('Room not found');
+    return [troupe, unreadItemService.testOnly.parseChat(null, troupe)];
   })
-  .spread(function(troupe, userIds) {
-    return categoriseUsersInRoom(troupe._id, userIds);
+  .spread(function(troupe, result) {
+    var allUserIds = {};
+    Object.keys(result).forEach(function(key) {
+      var value = result[key];
+      if (value) {
+        value.forEach(function(userId) {
+          allUserIds[userId] = 1;
+        });
+      }
+    });
+
+    allUserIds = Object.keys(allUserIds);
+    return [troupe, userService.findByIdsLean(allUserIds, { username: 1 }), result];
   })
-  .then(function(result) {
-    return [result, userService.findByIdsLean(Object.keys(result), { username: 1 })];
+  .spread(function(troupe, users, result) {
+    var allUserIds = result.notifyUserIds.concat(result.activityOnlyUserIds);
+
+    return [troupe, users, result, categoriseUsersInRoom(troupe._id, allUserIds)];
   })
-  .spread(function(result, users) {
+  .spread(function(troupe, users, result, categorised) {
     var usersHash = collections.indexById(users);
-    Object.keys(result).forEach(function(userId) {
+
+    var m = {};
+    Object.keys(result).forEach(function(key) {
+      var value = result[key];
+      if (value) {
+        m[key] = value.map(function(userId) {
+          var user = usersHash[userId];
+          return user && user.username;
+        });
+      }
+    });
+
+    console.log(m);
+
+    console.log(Object.keys(categorised).reduce(function(memo, userId) {
       var user = usersHash[userId];
-      console.log(pad(user && user.username, 30), ' ', result[userId]);
-    })
+      if (user) {
+        memo[user.username] = categorised[userId];
+      }
+
+      return memo;
+    }, {}));
   })
   .catch(function(err) {
     console.error(err.stack);

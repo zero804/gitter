@@ -17,7 +17,8 @@ var PeopleCollectionView = Marionette.CollectionView.extend({
     var options = {
       tagName: 'li',
       showStatus: true,
-      tooltipPlacement: 'left'
+      tooltipPlacement: 'left',
+      screenReadUsername: true
     };
 
     if(item && item.id) {
