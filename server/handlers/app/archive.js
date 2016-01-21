@@ -132,6 +132,7 @@ exports.linksList = [
 
     var roomUrl = '/api/v1/rooms/' + troupe.id;
     var avatarUrl = resolveRoomAvatarUrl(troupe, 48);
+    var srcSetUrl = resolveRoomAvatarSrcSet(troupe, 48);
     var isPrivate = troupe.security !== "PUBLIC";
 
     var templateContext = {
@@ -149,6 +150,7 @@ exports.linksList = [
       accessToken: req.accessToken,
       public: troupe.security === 'PUBLIC',
       avatarUrl: avatarUrl,
+      avatarSrcSet: srcSetUrl,
       isPrivate: isPrivate
     };
 
