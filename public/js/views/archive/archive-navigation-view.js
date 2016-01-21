@@ -9,6 +9,7 @@ var apiClient = require('components/apiClient');
 var template = require('./tmpl/archive-navigation-view.hbs');
 var CalHeatMap = require('cal-heatmap');
 var getTimezoneInfo = require('utils/detect-timezone');
+var heatmapUtils = require('components/archive-heatmap-utils');
 
 module.exports = (function() {
 
@@ -67,55 +68,20 @@ module.exports = (function() {
       // the range we're going to display. In fact we deliberately add a day on
       // each end just in case for timezones
       var start = moment(a).subtract(32, 'days');
-      var end = moment(a).add(32, 'days');
-      var startIso = start.toISOString()
-      var endIso = end.toISOString()
-      var troupeId = context.getTroupeId();
-      var tz = getTimezoneInfo().iso;
 
-      function mangleHeatmap() {
-        var $rects = $('.graph-rect').not('.q1,.q2,.q3,.q4,.q5');
-        $rects.each(function(i, el) {
-          el.classList.remove('hover_cursor');
-          el.classList.add('empty');
-        });
-      }
 
-      var cal = new CalHeatMap();
-      cal.init({
-        itemSelector: this.ui.navigation[0],
+      heatmapUtils.createResponsiveHeatMap(this.ui.navigation[0], {
         start: start.toDate(),
-        maxDate: new Date(),
-        highlight: [highlightDate],
-        minDate: new Date(2013, 10, 1), // 1 November 2013
-        range: range,
-        domain: "month",
-        subDomain: "day",
-        verticalOrientation: false,
-        considerMissingDataAsZero: false,
-        displayLegend: false,
-        data: {},
-        onClick: function(date, value) {
-          if(!value) return;
-          var yyyy = date.getFullYear();
-          var mm = date.getMonth() + 1;
-          if(mm < 10) mm = "0" + mm;
-
-          var dd = date.getDate();
-          if(dd < 10) dd = "0" + dd;
-
-          window.location.assign('/' + context.troupe().get('uri') + '/archives/' + yyyy + '/' + mm + '/' + dd);
-        },
-        onComplete: function() {
-          mangleHeatmap();
-        }
+        range: range
       });
-      apiClient.priv.get('/chat-heatmap/' + troupeId, { start: startIso, end: endIso, tz: tz })
-        .then(function(heatmapData) {
-          cal.update(heatmapData);
-          mangleHeatmap();
-          setTimeout(mangleHeatmap, 0);
-        });
+
+      // See `./archive-heatmap-utils.js->breakpointList` and `trp3Vars.less->@archive-mid`
+      if($(window).width() < 960) {
+        $('.js-archive-navigation-wrapper').hide();
+      }
+      $('.js-toggle-archive-navigation').on('click', function() {
+        $('.js-archive-navigation-wrapper').slideToggle();
+      });
     }
   });
 
