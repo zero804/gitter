@@ -11,13 +11,16 @@
     <div class="welcome-modal__share">
       <a class="link--positive" href="#add">Search other users</a>
       {{#if isPublic}}
-      <a class="share-button button-twitter" href="{{ twitterLink }}" target="_blank">
+      <a class="share-button button-twitter--small" href="{{ twitterLink }}" target="_blank">
         <i class="icon-twitter"></i>
         Tweet
       </a>
-      <a class="share-button button-facebook" target="_blank" href="{{ facebookLink }}">
+      <a class="share-button button-facebook--small" target="_blank" href="{{ facebookLink }}">
         <i class="icon-facebook-official"></i>
         Share
+      </a>
+      <a class="share-button button-pampas--small" href="#share">
+        More…
       </a>
       {{/if}}
     </div>
