@@ -10,7 +10,11 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 DOCKER_MACHINE_NAME=${DOCKER_MACHINE_NAME-default}
 
 function get_ip {
-  echo "$(docker-machine ip $DOCKER_MACHINE_NAME)"
+  if [[ "$OSTYPE" != "linux-gnu" ]]; then
+    echo "$(docker-machine ip $DOCKER_MACHINE_NAME)"
+  else
+    ip route get 8.8.8.8 | head -1 | cut -d' ' -f8
+  fi
 }
 
 function startDockerMachine {
@@ -31,7 +35,7 @@ function startDockerMachine {
       $DOCKER_MACHINE_NAME
   else
     ## Start the box if it's stopped
-    if [[ $(docker-machine ls --filter state=Stopped -q|grep "$DOCKER_MACHINE_NAME") = "$DOCKER_MACHINE_NAME" ]]; then
+    if [[ "$(docker-machine ls -q --filter \"name=$DOCKER_MACHINE_NAME\" --filter state=Stopped)" = "$DOCKER_MACHINE_NAME" ]]; then
       echo "-- Docker machine $DOCKER_MACHINE_NAME is not running. Starting."
 
       docker-machine start $DOCKER_MACHINE_NAME
