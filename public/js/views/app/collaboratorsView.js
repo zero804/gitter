@@ -228,10 +228,11 @@ module.exports = (function() {
     },
 
     serializeData: function() {
+      var uri = context.troupe().get('uri');
       return {
         isPublic:     context.troupe().get('security') === 'PUBLIC',
-        twitterLink:  social.generateTwitterShareUrl(),
-        facebookLink: social.generateFacebookShareUrl(),
+        twitterLink:  social.generateTwitterShareUrl(uri),
+        facebookLink: social.generateFacebookShareUrl(uri),
       };
     },
 
