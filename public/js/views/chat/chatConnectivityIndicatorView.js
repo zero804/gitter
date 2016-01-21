@@ -34,6 +34,6 @@ module.exports = Marionette.ItemView.extend({
 
   onConnectivityChange: function() {
     var hasConnectivity = this.model.get('hasConnectivity');
-    this.$el.toggleClass('is-hidden', hasConnectivity)
+    this.$el.toggleClass('is-hidden', hasConnectivity);
   }
 });
