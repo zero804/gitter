@@ -1,4 +1,3 @@
-/* globals USE_HALLEY:false */
 'use strict';
 
 var Backbone = require('backbone');
