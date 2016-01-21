@@ -7,12 +7,13 @@ var troupeService = require('../../server/services/troupe-service');
 var categoriseUsersInRoom = require('../../server/services/categorise-users-in-room');
 var roomMembershipService = require('../../server/services/room-membership-service');
 var collections = require('../../server/utils/collections');
+var Q = require('q');
 
 var shutdown = require('shutdown');
 
 function pad(string, length) {
   if (!string) string = '';
-  
+
   while(string.length < length) {
     string = string + ' ';
   }
@@ -20,14 +21,40 @@ function pad(string, length) {
 }
 var opts = require("nomnom")
   .option('uri', {
-    position: 0,
-    required: true,
     help: "uri of room to list presence for"
+  })
+  .option('fromUser', {
+    help: "id of room to list presence for"
+  })
+  .option('toUser', {
+    help: "id of room to list presence for"
   })
   .parse();
 
-troupeService.findByUri(opts.uri)
+function getTroupe() {
+  if (opts.uri)
+    return troupeService.findByUri(opts.uri);
+
+  if (!opts.fromUser || !opts.toUser) {
+    return Q.reject('Please specify either a uri or a fromUser and toUser');
+  }
+
+  return Q.all([
+    userService.findByUsername(opts.fromUser),
+    userService.findByUsername(opts.toUser),
+  ])
+  .spread(function(fromUser, toUser) {
+    if (!fromUser) throw new Error('User ' + opts.fromUser + ' not found');
+    if (!toUser) throw new Error('User ' + opts.toUser + ' not found');
+
+    return troupeService.findOneToOneTroupe(fromUser._id, toUser._id);
+  });
+
+}
+
+getTroupe()
   .then(function(troupe) {
+    if (!troupe) throw new Error('No room found');
     return [troupe, roomMembershipService.findMembersForRoom(troupe._id)];
   })
   .spread(function(troupe, userIds) {
