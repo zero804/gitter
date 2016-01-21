@@ -67,7 +67,7 @@ function getSrcSetForLinkedInUrl(url, options) {
   // TODO: doesn't look like linkedin profile pics are resizable, so just send the
   // originals for now
   return {
-    src: url,
+    src: url.toString(),
     size: options.size,
     srcset: url + ' 2x'
   }
@@ -147,6 +147,7 @@ module.exports = function resolveUserAvatarSrcSet(user, size) {
 
   if (user) {
     if (user.avatarUrlSmall) {
+      console.log(user.avatarUrlSmall);
       // Don't recalculate it if we already have it. The problem this poses is
       // that avatarUrlSmall is just a single value, not srcset, so we gotta
       // hack it a bit.
