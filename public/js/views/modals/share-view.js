@@ -82,7 +82,9 @@ var View = Marionette.ItemView.extend({
       badgeUrl: this.getBadgeUrl(),
       badgeMD: this.getBadgeMD(),
       twitterUrl: social.generateTwitterShareUrl(),
-      facebookUrl: social.generateFacebookShareUrl()
+      facebookUrl: social.generateFacebookShareUrl(),
+      linkedinLink: social.generateLinkedinShareUrl(),
+      googlePlusLink: social.generateGooglePlusShareUrl()
     };
   },
 
