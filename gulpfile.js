@@ -526,7 +526,7 @@ gulp.task('halley-uglify', ['halley-webpack'], function() {
     .pipe(gulp.dest('output/assets/js/halley'));
 });
 
-gulp.task('build-assets', ['copy-asset-files', 'css', 'webpack', 'uglify', 'halley-webpack', 'halley-uglify']);
+gulp.task('build-assets', ['copy-asset-files', 'css', 'webpack', /*'uglify', */ 'halley-webpack' /*, 'halley-uglify'*/]);
 
 gulp.task('compress-assets', ['build-assets'], function() {
   return gulp.src(['output/assets/**/*.{css,js,ttf,svg}', '!**/*.map'], { base: 'output/assets/' })
