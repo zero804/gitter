@@ -10,5 +10,28 @@
 
 
 .archive-days {
+  margin-top: 10px;
   margin-bottom: 20px;
+
+  @media @archive-mid {
+    font-size: 1.4em;
+  }
+}
+
+.archive-day-item {
+  display: inline-block;
+
+  margin: 3px;
+  padding: 0.24em 0.42em;
+
+  background-color: #ededed;
+  border: 1px solid transparent;
+
+  transition: border-color 0.1s ease;
+
+  &:hover,
+  &:focus {
+    margin: 5px;
+    border: 1px solid #000000;
+  }
 }
