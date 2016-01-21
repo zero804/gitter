@@ -54,7 +54,7 @@ module.exports = (function() {
         .then(function() {
           self.stateModel.set('state', 'invited');
         })
-        .fail(function() {
+        .catch(function() {
           self.stateModel.set('state', 'fail');
         });
 
@@ -85,14 +85,14 @@ module.exports = (function() {
             });
           }
         })
-        .fail(function(xhr) {
-          if (xhr.status === 402) {
+        .catch(function(e) {
+          if (e.status === 402) {
             // money required, let the add modal explain it.
             window.location.href = '#add';
 
             // reset the state so the user can try again after paying.
             self.stateModel.set('state', 'initial');
-          } else if (xhr.status === 409) {
+          } else if (e.status === 409) {
             self.stateModel.set('state', 'fail_409');
           } else {
             self.stateModel.set('state', 'fail');
@@ -228,10 +228,11 @@ module.exports = (function() {
     },
 
     serializeData: function() {
+      var uri = context.troupe().get('uri');
       return {
         isPublic:     context.troupe().get('security') === 'PUBLIC',
-        twitterLink:  social.generateTwitterShareUrl(),
-        facebookLink: social.generateFacebookShareUrl(),
+        twitterLink:  social.generateTwitterShareUrl(uri),
+        facebookLink: social.generateFacebookShareUrl(uri),
       };
     },
 

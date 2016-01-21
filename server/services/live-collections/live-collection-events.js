@@ -1,4 +1,3 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var _              = require('underscore');
@@ -10,7 +9,7 @@ function serializeEventToRoom(operation, event) {
 
   return restSerializer.serializeModel(event)
     .then(function(serializedEvent) {
-      appEvents.dataChange2(url, operation, serializedEvent);
+      appEvents.dataChange2(url, operation, serializedEvent, 'event');
     });
 }
 
@@ -25,7 +24,7 @@ module.exports = {
 
   patch: function(eventId, troupeId, patch) {
     var url = "/rooms/" + troupeId + "/events";
-    appEvents.dataChange2(url, "patch", _.extend({ }, patch, { id: eventId }));
+    appEvents.dataChange2(url, "patch", _.extend({ }, patch, { id: eventId }), 'event');
   },
 
   remove: function(event) {
@@ -34,6 +33,6 @@ module.exports = {
 
   removeId: function(eventId, troupeId) {
     var url = "/rooms/" + troupeId + "/events";
-    appEvents.dataChange2(url, "remove", { id: eventId });
+    appEvents.dataChange2(url, "remove", { id: eventId }, 'event');
   }
 };

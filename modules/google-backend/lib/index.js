@@ -7,7 +7,7 @@ function GoogleBackend(user, identity) {
   this.identity = identity;
 }
 
-GoogleBackend.prototype.getEmailAddress = function(preferStoredEmail) {
+GoogleBackend.prototype.getEmailAddress = function(options) {
   return Q.resolve(this.identity.email);
 };
 

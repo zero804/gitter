@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var winston = require('../../server/utils/winston');

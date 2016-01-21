@@ -8,7 +8,7 @@ var Q                        = require("q");
 var EventEmitter             = require('events').EventEmitter;
 var assert                   = require('assert');
 var debug                    = require('debug')('gitter:room-membership-service');
-
+var recentRoomCore           = require('./core/recent-room-core');
 var roomMembershipEvents     = new EventEmitter();
 
 /* Exports */
@@ -117,6 +117,9 @@ function findMembersForRoom(troupeId, options) {
   assert(troupeId);
 
   var query = TroupeUser.find({ troupeId: troupeId }, { _id: 0, userId: 1 }, { lean: true });
+  if (options && options.skip) {
+    query.skip(options.skip);
+  }
   if (options && options.limit) {
     query.limit(options.limit);
   }
@@ -181,8 +184,14 @@ function addRoomMember(troupeId, userId) {
         return false;
       }
 
-      roomMembershipEvents.emit("members.added", troupeId, [userId]);
-      return incrementTroupeUserCount(troupeId, 1)
+      // Set the last access time for the user to now if the user
+      // has just been added to the room
+      return recentRoomCore.saveUserTroupeLastAccess(userId, troupeId)
+        .then(function() {
+          roomMembershipEvents.emit("members.added", troupeId, [userId]);
+
+          return incrementTroupeUserCount(troupeId, 1);
+        })
         .thenResolve(added);
     });
 

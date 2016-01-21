@@ -1,4 +1,3 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var env                   = require('gitter-web-env');
@@ -75,6 +74,11 @@ exports.serializeChatsForTroupe = function(troupeId, userId, options, callback) 
 exports.serializeUsersForTroupe = function(troupeId, userId, options) {
   if (!options) options = {};
 
+  var skip = options.skip;
+  if (!skip || isNaN(skip)) {
+    skip = 0;
+  }
+
   var limit = options.limit;
   var searchTerm = options.searchTerm;
 
@@ -97,7 +101,7 @@ exports.serializeUsersForTroupe = function(troupeId, userId, options) {
 
   }
 
-  return roomMembershipService.findMembersForRoom(troupeId, { limit: limit })
+  return roomMembershipService.findMembersForRoom(troupeId, { limit: limit, skip: skip })
     .then(function(userIds) {
       var strategy = new restSerializer.UserIdStrategy({
         showPresenceForTroupeId: troupeId,

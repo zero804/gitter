@@ -1,9 +1,9 @@
 "use strict";
 
-var env = require('gitter-web-env');
-var stats = env.stats;
+var env    = require('gitter-web-env');
+var stats  = env.stats;
 var logger = env.logger;
-var debug = require('debug')('gitter:enforce-csrf-middleware');
+var debug  = require('debug')('gitter:enforce-csrf-middleware');
 
 var escapeRegExp = require('../../utils/escape-regexp');
 
@@ -14,9 +14,13 @@ var WHITELIST = [
 '/api/v1/apn',
 '/login/oauth/token',
 '/login/oauth/authorize/decision',
-'/api/private/subscription/',
-'/faye'
+'/api/private/subscription/'
 ];
+
+if (env.config.get('ws:startFayeInPrimaryApp')) {
+  WHITELIST.push('/faye');
+  WHITELIST.push('/bayeux');
+}
 
 var WHITELIST_REGEXP = new RegExp('^(' + WHITELIST.map(escapeRegExp).join('|') + ')');
 

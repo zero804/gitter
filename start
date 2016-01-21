@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 # This may be set for node debug, but those
 # values will break python scripts
@@ -8,18 +8,22 @@ set -e
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 DOCKER_MACHINE_NAME=${DOCKER_MACHINE_NAME-default}
-HAS_DOCKER_MACHINE=$(which docker-machine)
 
 function get_ip {
-  if [ HAS_DOCKER_MACHINE ]; then
+  if [[ "$OSTYPE" != "linux-gnu" ]]; then
     echo "$(docker-machine ip $DOCKER_MACHINE_NAME)"
   else
-    echo "$(ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}')"
+    ip route get 8.8.8.8 | head -1 | cut -d' ' -f8
   fi
 }
 
 function startDockerMachine {
-  if [[ "$(docker-machine ls -q|grep "$DOCKER_MACHINE_NAME")" != "$DOCKER_MACHINE_NAME" ]]; then
+  if [[ $(docker-machine ls -q --filter "name=$DOCKER_MACHINE_NAME" --filter state=Error) = "$DOCKER_MACHINE_NAME" ]]; then
+    echo "-- Docker machine [$DOCKER_MACHINE_NAME] is in an error state. Deleting."
+    docker-machine rm -f "$DOCKER_MACHINE_NAME"
+  fi
+  if [[ -z "$(docker-machine ls -q --filter "name=$DOCKER_MACHINE_NAME")" ]]; then
+    echo "-- Docker machine $DOCKER_MACHINE_NAME does not exist. Creating."
     # Maybe one day --virtualbox-boot2docker-url https://github.com/rancher/os/releases/download/v0.3.3/machine-rancheros.iso
     # but it doesn't support shared volumes right now
     docker-machine create \
@@ -31,8 +35,12 @@ function startDockerMachine {
       $DOCKER_MACHINE_NAME
   else
     ## Start the box if it's stopped
-    if [[ $(docker-machine ls --filter state=Stopped -q|grep "$DOCKER_MACHINE_NAME") = "$DOCKER_MACHINE_NAME" ]]; then
+    if [[ "$(docker-machine ls -q --filter \"name=$DOCKER_MACHINE_NAME\" --filter state=Stopped)" = "$DOCKER_MACHINE_NAME" ]]; then
+      echo "-- Docker machine $DOCKER_MACHINE_NAME is not running. Starting."
+
       docker-machine start $DOCKER_MACHINE_NAME
+    else
+      echo "-- Docker machine $DOCKER_MACHINE_NAME is running."
     fi
   fi
   eval "$(docker-machine env $DOCKER_MACHINE_NAME)"
@@ -60,6 +68,7 @@ function setupHostAlias {
 }
 
 function startDockerServices {
+  echo "-- Starting services using docker-compose"
   docker-compose up -d --no-recreate
 }
 
@@ -128,7 +137,7 @@ EOF
 EOF
 }
 
-if [ HAS_DOCKER_MACHINE ]; then
+if [[ "$OSTYPE" != "linux-gnu" ]]; then
   startDockerMachine
 fi
 

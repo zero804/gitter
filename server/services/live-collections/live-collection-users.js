@@ -18,7 +18,7 @@ function serializeUserToRooms(troupeIds, operation, user) {
 
       troupeIds.forEach(function(troupeId) {
         var url = "/rooms/" + troupeId + "/users";
-        appEvents.dataChange2(url, "update", serializedUser);
+        appEvents.dataChange2(url, "update", serializedUser, 'user');
       });
 
     });
@@ -50,7 +50,7 @@ module.exports = {
 
         troupeIds.forEach(function(troupeId) {
           var url = "/rooms/" + troupeId + "/users";
-          appEvents.dataChange2(url, "patch", patchMessage);
+          appEvents.dataChange2(url, "patch", patchMessage, 'user');
         });
       });
   },

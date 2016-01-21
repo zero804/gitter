@@ -25,15 +25,15 @@ module.exports = (function() {
         var removeMessages = !!userMatch[3];
 
         apiClient.room.post('/bans', { username: user, removeMessages: removeMessages })
-          .fail(function(xhr) {
+          .catch(function(e) {
             var errorMessage;
-            switch(xhr.status) {
+            switch(e.status) {
               case 403:
                 errorMessage = 'You do not have permission to ban people.';
                 break;
 
               case 400:
-                errorMessage = xhr.responseJSON.error;
+                errorMessage = e.friendlyMessage || "Ban failed";
                 break;
 
               case 404:
@@ -223,15 +223,15 @@ module.exports = (function() {
         var user = userMatch[1];
 
         apiClient.room.delete('/bans/' + user, { })
-          .fail(function(xhr) {
+          .catch(function(e) {
             var errorMessage;
-            switch(xhr.status) {
+            switch(e.status) {
               case 403:
                 errorMessage = 'You do not have permission to unban people.';
                 break;
 
               case 400:
-                errorMessage = xhr.responseJSON.error;
+                errorMessage = e.friendlyMessage || "Unban failed";
                 break;
 
               case 404:
