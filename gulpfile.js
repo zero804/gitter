@@ -81,7 +81,7 @@ gulp.task('validate-client-source', function() {
     .pipe(jshint({
       browser: true,
       devel: false,
-      globalstrict: true,
+      strict: "global",
       unused: false,
       laxbreak: true,
       laxcomma: true,
