@@ -81,8 +81,10 @@ var View = Marionette.ItemView.extend({
       url: this.getShareUrl(),
       badgeUrl: this.getBadgeUrl(),
       badgeMD: this.getBadgeMD(),
-      twitterUrl: social.generateTwitterShareUrl(),
-      facebookUrl: social.generateFacebookShareUrl()
+      twitterUrl: social.generateTwitterShareUrl(room.uri),
+      facebookUrl: social.generateFacebookShareUrl(room.uri),
+      linkedinLink: social.generateLinkedinShareUrl(room.uri),
+      googlePlusLink: social.generateGooglePlusShareUrl(room.uri)
     };
   },
 
@@ -106,7 +108,7 @@ var View = Marionette.ItemView.extend({
       .then(function() {
         $btn.text('Pull Request sent!');
       })
-      .fail(function() {
+      .catch(function() {
         $btn.text('Failed. Try again?');
         btn.disabled = false;
       });

@@ -1,4 +1,3 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var troupeDao   = require('./daos/troupe-dao').lean;
@@ -18,7 +17,7 @@ function repoPremiumStatusNotifier(userOrOrg, premiumStatus) {
         appEvents.dataChange2("/user/" + user._id, 'patch', {
           id: "" + user._id,
           premium: premiumStatus
-        });
+        }, 'user');
       }
 
       debug('Searching for all rooms owned by: %s', userOrOrg);
@@ -49,14 +48,14 @@ function repoPremiumStatusNotifier(userOrOrg, premiumStatus) {
                   appEvents.dataChange2("/user/" + userId + "/orgs", 'patch', {
                     name: userOrOrg, // Id for org is the name
                     premium: premiumStatus
-                  });
+                  }, 'user');
                 }
               }
 
               appEvents.dataChange2("/user/" + userId + "/rooms", 'patch', {
                 id: "" + troupeId,
                 premium: premiumStatus
-              });
+              }, 'room');
 
             });
           });

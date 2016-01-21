@@ -1,4 +1,3 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var _              = require('underscore');
@@ -10,7 +9,7 @@ function serializeChatToRoom(operation, chat) {
 
   return restSerializer.serializeModel(chat)
     .then(function(serializedChat) {
-      appEvents.dataChange2(url, operation, serializedChat);
+      appEvents.dataChange2(url, operation, serializedChat, 'chatMessage');
       appEvents.chat('create', chat.toTroupeId, serializedChat);
     });
 }
@@ -27,7 +26,7 @@ module.exports = {
   patch: function(chatId, troupeId, patch) {
     var url = "/rooms/" + troupeId + "/chatMessages";
     var patchMessage = _.extend({ }, patch, { id: chatId });
-    appEvents.dataChange2(url, "patch", patchMessage);
+    appEvents.dataChange2(url, "patch", patchMessage, 'chatMessage');
     appEvents.chat('patch', troupeId, patchMessage);
   },
 
@@ -37,7 +36,7 @@ module.exports = {
 
   removeId: function(chatId, troupeId) {
     var url = "/rooms/" + troupeId + "/chatMessages";
-    appEvents.dataChange2(url, "remove", { id: chatId });
+    appEvents.dataChange2(url, "remove", { id: chatId }, 'chatMessage');
     appEvents.chat('remove', troupeId, { id: chatId });
   },
 

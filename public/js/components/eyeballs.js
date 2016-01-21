@@ -33,8 +33,8 @@ module.exports = (function() {
         async: !synchronous,
         global: false
       })
-      .fail(function(xhr) {
-        if(xhr.status !== 400) {
+      .catch(function(err) {
+        if(err.status !== 400) {
           debug('An error occurred while communicating eyeballs');
         } else {
           // The connection is gone...

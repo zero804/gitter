@@ -1,4 +1,3 @@
-/*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
 // var roomService = require('../../services/room-service');

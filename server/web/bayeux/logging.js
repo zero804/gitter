@@ -1,8 +1,9 @@
-/*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
 var env               = require('gitter-web-env');
 var stats             = env.stats;
+var nconf             = env.config;
+var statsd            = env.createStatsClient({ prefix: nconf.get('stats:statsd:prefix')});
 var debug             = require('debug')('gitter:faye-logging');
 
 function getClientIp(req) {
@@ -28,7 +29,11 @@ module.exports = {
         break;
 
       case '/meta/connect':
-        stats.eventHF('bayeux.connect');
+        var tags = [];
+        if (message.connectionType) {
+          tags.push('connectionType:' + message.connectionType);
+        }
+        statsd.increment('bayeux.connect', 1, 0.25, tags);
         break;
 
       case '/meta/subscribe':

@@ -1,4 +1,3 @@
-/*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
 var Mirror      = require('gitter-web-github').GitHubMirrorService('user');

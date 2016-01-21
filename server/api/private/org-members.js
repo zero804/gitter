@@ -1,4 +1,3 @@
-/*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
 var GitHubMeService   = require('gitter-web-github').GitHubMeService;

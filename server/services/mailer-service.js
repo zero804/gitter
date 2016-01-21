@@ -1,4 +1,3 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var env            = require('gitter-web-env');
@@ -75,6 +74,7 @@ function unreadNoticationMapping(data) {
     ROOMURL:    data.roomUrl,
     UNSUB:      data.unsubscribeUrl,
     HTML:       applyTemplate("emails/unread_notification_html", data),
+    MICRODATA:  applyTemplate("emails/unread_notification_microdata", data),
     PLAINTEXT:  applyTemplate("emails/unread_notification", data),
     LOGOURL:    cdn('images/logo-text-blue-pink.png', {email: true})
   };
@@ -97,4 +97,3 @@ function createdRoomMapping(data) {
     LOGOURL:     cdn('images/logo-text-blue-pink.png', {email: true})
   };
 }
-
