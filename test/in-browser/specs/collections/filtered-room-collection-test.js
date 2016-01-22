@@ -46,7 +46,6 @@ describe('FilteredRoomCollection()', function() {
       filteredRoomCollection.models.forEach(function(model) {
         assert(model.get('favourite'));
       });
-
       done();
     });
   });
