@@ -46,7 +46,7 @@ module.exports = (function() {
     'click .js-chat-item-collapse':   'toggleCollapse',
     'click .js-chat-item-readby':     'showReadBy',
     'click .js-chat-item-from':       'mentionUser',
-    'click .js-chat-item-time':       'permalink',
+    'click .js-timeago-widget':       'permalink',
     'mouseover .js-chat-item-readby': 'showReadByIntent',
     'click .webhook':                 'expandActivity',
     'click':                          'onClick',
@@ -139,6 +139,9 @@ module.exports = (function() {
 
     serializeData: function() {
       var data = _.clone(this.model.attributes);
+      data.model = this.model;
+
+      data.roomName = context.troupe().get('uri');
 
       if (data.fromUser) {
         data.username = data.fromUser.username;
@@ -154,6 +157,7 @@ module.exports = (function() {
         data.html = _.escape(data.text);
       }
       data.isPermalinkable = this.isPermalinkable;
+
       return data;
     },
 
@@ -592,8 +596,10 @@ module.exports = (function() {
     permalink: function(e) {
       if(!this.isPermalinkable) return;
 
-      /* Holding the Alt key down while clicking adds the permalink to the chat input */
+      // Holding the Alt key down while clicking adds the permalink to the chat input
       appEvents.trigger('permalink.requested', 'chat', this.model, { appendInput: !!e.altKey });
+
+      e.preventDefault();
     },
 
     highlight: function() {
