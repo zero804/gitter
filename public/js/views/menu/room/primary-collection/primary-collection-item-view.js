@@ -33,8 +33,10 @@ module.exports = Marionette.ItemView.extend({
   },
 
   modelEvents: {
-    'change:selected': 'onSelectedChange',
-    'change:focus': 'onItemFocused',
+    'change:selected':    'onSelectedChange',
+    'change:focus':       'onItemFocused',
+    'change:unreadItems': 'render',
+    'change:mentions':    'render',
   },
 
   triggers: {
