@@ -1,4 +1,3 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var env                = require('gitter-web-env');
@@ -942,7 +941,7 @@ exports.createCustomChildRoom = createCustomChildRoom;
  */
 function notifyInvitedUser(fromUser, invitedUser, room/*, isNewUser*/) {
   // get the email address
-  return emailAddressService(invitedUser)
+  return emailAddressService(invitedUser, { attemptDiscovery: true })
     .then(function (emailAddress) {
       var notification;
 
@@ -989,7 +988,8 @@ function updateUserDateAdded(userId, roomId, date) {
 exports.testOnly.updateUserDateAdded = updateUserDateAdded;
 
 /* When a user wants to join a room */
-function joinRoom(roomId, user) {
+function joinRoom(roomId, user, options) {
+  options = options || {};
   return troupeService.findById(roomId)
     .then(function(room) {
       return roomPermissionsModel(user, 'join', room)
@@ -1006,6 +1006,9 @@ function joinRoom(roomId, user) {
         })
         .then(function() {
           return roomMembershipService.addRoomMember(room._id, user._id);
+        })
+        .then(function() {
+          sendJoinStats(user, room, options.tracking);
         });
     });
 }
