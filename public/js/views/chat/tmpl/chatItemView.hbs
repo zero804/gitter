@@ -24,7 +24,7 @@
       <div class='chat-item__from js-chat-item-from'>{{username}}</div>
       {{#if isPermalinkable}}
       <div class='chat-item__time js-chat-item-time chat-item__time--permalinkable'>
-        {{widget "timeago" time=sent lang=lang locale=locale tooltipFormat='LLL [<br>(Alt-click to quote)]'}}
+        {{widget "timeago" chatItemModel=model roomName=roomName time=sent lang=lang locale=locale tooltipFormat='LLL [<br>(Alt-click to quote)]'}}
       </div>
       {{else}}
       <div class='chat-item__time js-chat-item-time'>

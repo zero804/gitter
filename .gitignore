@@ -86,3 +86,5 @@ test/in-browser/fixtures/build/*
 test/in-browser/browserstack-run.pid
 drop-dev-database.sh
 test/in-browser/fixtures/coverage/*
+node_modules_old
+config.dev.user-overrides.json

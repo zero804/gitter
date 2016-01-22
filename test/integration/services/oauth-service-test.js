@@ -45,7 +45,6 @@ describe('oauth-service', function() {
         var tokens = results.map(function(x) {
           return x[0];
         });
-        console.log(tokens);
 
         var firstToken = tokens[0];
         assert(firstToken);
