@@ -250,6 +250,11 @@ function renderMainFrame(req, res, next, frame) {
         roomMenuIsPinned: true,
       });
 
+      var orgs = suggestedOrgsFromRoomList(rooms);
+      //TODO REMOVE THESE JP 22/1/16
+      troupeContext.orgs = orgs;
+      troupeContext.rooms = rooms;
+
       res.render(template, {
         socialMetadata: socialMetadata,
         bootScriptName: bootScriptName,
@@ -268,17 +273,7 @@ function renderMainFrame(req, res, next, frame) {
         showUnreadTab: true,
         menuHeaderExpanded: false,
         user: user,
-        //TODO TIDY THIS AS IT IS NO LONGER NEEDED FOR THE PRE RENDER
-        //JP 8/12/15
-        rooms: {
-          favourites: rooms
-            .filter(roomSort.favourites.filter)
-            .sort(roomSort.favourites.sort),
-          recents: rooms
-            .filter(roomSort.recents.filter)
-            .sort(roomSort.recents.sort)
-        },
-        orgs: suggestedOrgsFromRoomList(rooms),
+        orgs: orgs
       });
     })
     .catch(next);
