@@ -5,7 +5,6 @@
 .profile-menu {
   margin-left: 0;
   margin-bottom: 0;
-  background: @profile-menu-bg;
 
   max-height: 0;
   transition: all .2s linear;
@@ -20,7 +19,8 @@
   height: @menu-item-height;
 
   .desktop & {
-    padding-left: @desktop-menu-left-padding;
+    padding-left: @desktop-menu-left-padding / 2;
+    margin-left: @desktop-menu-left-padding / 2;
   }
 
   .mobile {
