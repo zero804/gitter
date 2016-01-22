@@ -11,6 +11,7 @@ module.exports = Backbone.FilteredCollection.extend({
 
     this.roomModel = options.roomModel;
     this.listenTo(this.roomModel, 'change:state', this.onModelChangeState, this);
+    this.listenTo(this.roomModel, 'change:selectedOrgName', this.onOrgNameChange, this);
 
     if (!options || !options.collection) {
       throw new Error('A valid RoomCollection must be passed to a new instance of FilteredRoomCollection');
@@ -39,6 +40,10 @@ module.exports = Backbone.FilteredCollection.extend({
         this.setFilter(false);
         break;
     }
+  },
+
+  onOrgNameChange: function (){
+    this.setFilter();
   },
 
   filterFavourite: function (model){
