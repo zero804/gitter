@@ -8,18 +8,18 @@ var suggestedOrgsFromRoomList = require('../../../../shared/orgs/suggested-orgs-
 describe('suggestedOrgsFromRoomList', function() {
 
   var rooms = [
-    { name: 'gitterHQ', githubType: 'ORG', favourite: 1 },
-    { name: 'troupe', githubType: 'ORG' },
-    { name: 'gitterHQ/test1', githubType: 'ORG_CHANNEL', favourite: 2 },
-    { name: 'gitterHQ/test2', githubType: 'ORG_CHANNEL' },
-    { name: 'troupe/test1', githubType: 'ORG_CHANNEL', favourite: 3 },
-    { name: 'troupe/test2', githubType: 'ORG_CHANNEL' },
-    { name: 'troupe/test2', githubType: 'ORG_CHANNEL' },
-    { name: 'troupe/test2', githubType: 'ORG_CHANNEL' },
-    { name: 'someusername', githubType: 'ONETOONE' },
-    { name: 'someotherusername', githubType: 'ONETOONE', favourite: 4 },
-    { name: 'username', githubType: 'ONETOONE' },
-    { name: 'someorg/somerepo', githubType: 'REPO' },
+    { url: 'gitterHQ', githubType: 'ORG', favourite: 1 },
+    { url: 'troupe', githubType: 'ORG' },
+    { url: 'gitterHQ/test1', githubType: 'ORG_CHANNEL', favourite: 2 },
+    { url: 'gitterHQ/test2', githubType: 'ORG_CHANNEL' },
+    { url: 'troupe/test1', githubType: 'ORG_CHANNEL', favourite: 3 },
+    { url: 'troupe/test2', githubType: 'ORG_CHANNEL' },
+    { url: 'troupe/test2', githubType: 'ORG_CHANNEL' },
+    { url: 'troupe/test2', githubType: 'ORG_CHANNEL' },
+    { url: 'someuserurl', githubType: 'ONETOONE' },
+    { url: 'someotheruserurl', githubType: 'ONETOONE', favourite: 4 },
+    { url: 'userurl', githubType: 'ONETOONE' },
+    { url: 'someorg/somerepo', githubType: 'REPO' },
   ];
 
   it('should contain no one-to-one rooms', function(){

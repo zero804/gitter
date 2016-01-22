@@ -18,8 +18,10 @@ describe('PanelHeaderView', function() {
       state:                'all',
       profileMenuOpenState: false,
       panelOpenState:       true,
-      roomMenuIsPinned:     false
+      roomMenuIsPinned:     false,
     });
+    model.primaryCollection = [];
+
     userModel       = model.userModel = new Backbone.Model();
     el              = document.createElement('div');
     panelHeaderView = new PanelHeaderView({ el: el, model: model });

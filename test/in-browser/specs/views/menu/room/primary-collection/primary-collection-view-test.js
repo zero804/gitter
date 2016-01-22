@@ -25,10 +25,10 @@ describe('PrimaryCollectionView', function() {
     el = document.createElement('div');
     model = new Backbone.Model({ state: 'all', panelOpenState: true, selectedOrgName: 'gitterHQ' });
     collection = new Backbone.Collection([
-      { name:  '1', id: 1, favourite: 1, uri: '1/1' },
-      { name:  '2', id: 2, uri: '2/2' },
-      { name:  '3', id: 3, uri: '3/3' },
-      { name:  '4', id: 4, uri: '4/4' },
+      { name:  '1', id: 1, favourite: 1, uri: '1/1', url: '1/1' },
+      { name:  '2', id: 2, uri: '2/2', url: '2/2'   },
+      { name:  '3', id: 3, uri: '3/3', url: '3/3' },
+      { name:  '4', id: 4, uri: '4/4', url: '4/4' },
     ]);
     sinon.stub(collection.models[1], 'save');
 

@@ -20,6 +20,7 @@ describe('PrimaryCollectionItemView()', function() {
       index: 1,
       model: new Backbone.Model({
         name: 'gitterHQ',
+        url: 'gitterHQ/gitter'
       }),
       el: el,
     });
