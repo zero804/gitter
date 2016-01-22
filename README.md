@@ -48,6 +48,8 @@ If you want to run against production, ssh into app-00X and run with the `NODE_E
 
 e.g `NODE_ENV=prod /opt/gitter/gitter-webapp/scripts/utils/unread.js trevorah`
 
+Also see https://github.com/gitterHQ/wiki/wiki/Support---Data-Maintenance
+
 ### online-state.js
 Prints the current online state for a user. Requires a username.
 
