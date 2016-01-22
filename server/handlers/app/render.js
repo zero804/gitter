@@ -136,12 +136,6 @@ function renderHomePage(req, res, next) {
       var showWindowsApp = !isLinux && !isOsx;
       var showLinuxApp = !isOsx && !isWindows;
 
-      var jsRoot;
-      // Feature toggle
-      if (req.fflip && req.fflip.has('halley')) {
-        jsRoot = "js/halley";
-      }
-
       res.render(page, {
         welcomeMessage: WELCOME_MESSAGES[Math.floor(Math.random() * WELCOME_MESSAGES.length)],
         showOsxApp: showOsxApp,
@@ -149,8 +143,7 @@ function renderHomePage(req, res, next) {
         showLinuxApp: showLinuxApp,
         troupeContext: troupeContext,
         isNativeDesktopApp: troupeContext.isNativeDesktopApp,
-        billingBaseUrl: nconf.get('web:billingBaseUrl'),
-        jsRoot: jsRoot
+        billingBaseUrl: nconf.get('web:billingBaseUrl')
       });
     })
     .catch(next);
@@ -212,17 +205,10 @@ function renderMainFrame(req, res, next, frame) {
       });
 
       var template, bootScriptName;
-      var jsRoot;
 
       if (req.user) {
         template = 'app-template';
         bootScriptName = 'router-app';
-
-        // Feature toggle
-        if (req.fflip && req.fflip.has('halley')) {
-          jsRoot = "js/halley";
-        }
-
       } else {
         template = 'app-nli-template';
         bootScriptName = 'router-nli-app';
@@ -253,7 +239,6 @@ function renderMainFrame(req, res, next, frame) {
       res.render(template, {
         socialMetadata: socialMetadata,
         bootScriptName: bootScriptName,
-        jsRoot: jsRoot,
         cssFileName: "styles/" + bootScriptName + ".css",
         troupeName: req.uriContext.uri,
         troupeContext: troupeContext,
@@ -280,12 +265,6 @@ function renderChat(req, res, options, next) {
   var script = options.script;
   var user = req.user;
   var userId = user && user.id;
-  var jsRoot;
-
-  // Feature toggle
-  if (req.fflip && req.fflip.has('halley')) {
-    jsRoot = "js/halley";
-  }
 
   // It's ok if there's no user (logged out), unreadItems will be 0
   return unreadItemService.getUnreadItemsForUser(userId, troupe.id)
@@ -351,7 +330,6 @@ function renderChat(req, res, options, next) {
         var renderOptions = _.extend({
             isRepo: troupe.githubType === 'REPO',
             bootScriptName: script,
-            jsRoot: jsRoot,
             cssFileName: cssFileName,
             githubLink: githubLink,
             troupeName: req.uriContext.uri,
@@ -391,17 +369,10 @@ function renderChat(req, res, options, next) {
 
 function renderChatPage(req, res, next) {
   var scriptName = 'router-chat';
-  var jsRoot;
-
-  // Feature toggle
-  if (req.fflip.has('halley')) {
-    jsRoot = "js/halley";
-  }
 
   return renderChat(req, res, {
     template: 'chat-template',
-    script: scriptName,
-    jsRoot: jsRoot
+    script: scriptName
   }, next);
 }
 

@@ -124,10 +124,7 @@ var webpackConfig = {
   },
   plugins: [
     new CommonsChunkPlugin("vendor", "[name].js"),
-    new ContextReplacementPlugin(/moment\/locale$/, /ar|cs|da|de|en-gb|es|fr|it|ja|ko|nl|pl|pt|ru|sv|zh-cn/),
-    new DefinePlugin({
-      USE_HALLEY: JSON.stringify(false)
-    })
+    new ContextReplacementPlugin(/moment\/locale$/, /ar|cs|da|de|en-gb|es|fr|it|ja|ko|nl|pl|pt|ru|sv|zh-cn/)
   ],
   bail: true,
   recordsPath: '/tmp/records.json',
