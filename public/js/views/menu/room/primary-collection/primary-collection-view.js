@@ -85,8 +85,8 @@ var PrimaryCollectionView = Marionette.CollectionView.extend({
     var viewModel = view.model;
 
     //DRY
-    var name = viewModel.get('uri');
-    var url = '/' + name;
+    var name = (viewModel.get('uri') || viewModel.get('url'));
+    var url  = (name[0] !== '/') ?  '/' + name : name;
 
     //If the room menu is pinned dont try to close the pannel
     if (!this.model.get('roomMenuIsPinned')) {

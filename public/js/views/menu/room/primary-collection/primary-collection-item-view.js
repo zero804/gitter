@@ -27,9 +27,9 @@ module.exports = Marionette.ItemView.extend({
 
   events: {
     'click [data-component=room-item-options-toggle]': 'onOptionsClicked',
-    'click [data-component="room-item-hide"]': 'onHideClicked',
-    'click [data-component="room-item-leave"]': 'onLeaveClicked',
-    'mouseleave': 'onMouseOut',
+    'click [data-component="room-item-hide"]':         'onHideClicked',
+    'click [data-component="room-item-leave"]':        'onLeaveClicked',
+    'mouseleave':                                      'onMouseOut',
   },
 
   modelEvents: {
@@ -54,7 +54,7 @@ module.exports = Marionette.ItemView.extend({
   serializeData: function() {
     var data = this.model.toJSON();
     return _.extend({}, data, {
-      roomAvatarUrl: getRoomAvatar(data.name),
+      roomAvatarUrl: getRoomAvatar(data.url.substring(1)),
       isNotOneToOne: (data.githubType !== 'ONETOONE'),
       name:          roomNameShortener(data.name),
     });
