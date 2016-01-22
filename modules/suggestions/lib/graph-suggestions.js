@@ -92,8 +92,8 @@ function getSuggestionsForRooms(rooms) {
   var qry = 'MATCH (r:Room)-[:MEMBER]-(u:User) '+
     'WHERE r.roomId IN {roomIds} ' +
     'WITH u LIMIT 1000 ' +
-    'MATCH (u)-[:MEMBER]-(r2:Room)' +
-    'WHERE NOT r2.roomId IN {roomIds} ' +
+    'MATCH (u)-[:MEMBER]-(r2:Room) ' +
+    'WHERE NOT r2.roomId IN {roomIds} AND r2.security <> "PRIVATE" ' +
     'RETURN r2.roomId AS roomId, count(r2) AS c ' +
     'ORDER BY c DESC ' +
     'LIMIT 10';

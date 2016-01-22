@@ -31,11 +31,11 @@ function getRooms() {
       })
       .then(function(roomIds) {
         // cap it just in case
-        roomIds = roomIds.slice(0, 10);
+        // roomIds = roomIds.slice(0, 10);
 
         // NOTE: this isn't needed in a script to just find suggestions, but
         // I'm debugging the input rooms
-        return troupeService.findByIdsLean(roomIds, {uri: 1, url: 1, name: 1});
+        return troupeService.findByIdsLean(roomIds, { uri: 1, url: 1, name: 1, userCount: 1});
       });
   } else {
     throw new Error('uri or username required');
@@ -44,7 +44,10 @@ function getRooms() {
 
 getRooms()
   .then(function(rooms) {
-    console.log("input", rooms);
+    rooms.sort(function(a, b) {
+      return a.userCount - b.userCount;
+    });
+    console.log("input", rooms);    
     return suggestions.getSuggestionsForRooms(rooms);
   })
   .then(function(suggestions) {
