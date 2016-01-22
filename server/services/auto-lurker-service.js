@@ -1,7 +1,7 @@
 "use strict";
 var env                       = require('gitter-web-env');
 var stats                     = env.stats;
-var recentRoomService         = require('./recent-room-service');
+var recentRoomCore            = require('./core/recent-room-core');
 var userTroupeSettingsService = require('./user-troupe-settings-service');
 var unreadItemService         = require('./unread-item-service');
 var Q                         = require('q');
@@ -20,7 +20,7 @@ function findLurkCandidates(troupe, options) {
       var userIds = Object.keys(lurkStatus);
       var minTimeInDays = (options.minTimeInDays || 14);
 
-      return recentRoomService.findLastAccessTimesForUsersInRoom(troupeId, userIds)
+      return recentRoomCore.findLastAccessTimesForUsersInRoom(troupeId, userIds)
         .then(function(lastAccessDates) {
           var cutoff = Date.now() - minTimeInDays * 86400000;
 

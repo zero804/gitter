@@ -37,6 +37,7 @@ var testModules = {
   'integration': ['./test/integration/**/*.js', './test/public-js/**/*.js'],
   'cache-wrapper': ['./modules/cache-wrapper/test/*.js'],
   'github': ['./modules/github/test/*.js'],
+  'github-backend': ['./modules/github-backend/test/*.js'],
   'push-notification-filter': ['./modules/push-notification-filter/test/*.js'],
   'split-tests': ['./modules/split-tests/test/*.js'],
   'presence': ['./modules/presence/test/*.js'],
@@ -80,7 +81,7 @@ gulp.task('validate-client-source', function() {
     .pipe(jshint({
       browser: true,
       devel: false,
-      globalstrict: true,
+      strict: "global",
       unused: false,
       laxbreak: true,
       laxcomma: true,
@@ -99,9 +100,9 @@ gulp.task('validate-server-source', function() {
   return gulp.src(['server/**/*.js', 'shared/**/*.js', 'modules/*/lib/**/*.js'])
     .pipe(jshint({
       node: true,
-      // globalstrict: true, // ENABLE
       devel: false,
       unused: false,
+      strict: "global",
       "-W064": "", // Missing 'new' prefix when invoking a constructor
       "-W069": "", // [..] is better written in dot notation.
       "-W033": "", // Missing semicolon.
