@@ -1,5 +1,5 @@
+/* jshint unused:strict, browser:true, strict:true, -W097 */
 "use strict";
-/* jshint unused:strict, browser:true, strict:true */
 var $ = require('jquery');
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');

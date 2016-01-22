@@ -1,4 +1,3 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 /* Listen for SIGUSR1 signals to start/stop profiling */

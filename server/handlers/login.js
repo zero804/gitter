@@ -16,6 +16,8 @@ var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avata
 
 var github = require('./auth-providers/github');
 var google = require('./auth-providers/google');
+var twitter = require('./auth-providers/twitter');
+var linkedin = require('./auth-providers/linkedin');
 
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
@@ -71,6 +73,20 @@ router.get('/upgrade', github.upgrade);
 
 router.get('/google', google.login);
 router.get('/google/callback', google.callback);
+
+// ----------------------------------------------------------
+// Twitter
+// ----------------------------------------------------------
+
+router.get('/twitter', twitter.login);
+router.get('/twitter/callback', twitter.callback);
+
+// ----------------------------------------------------------
+// LinkedIn
+// ----------------------------------------------------------
+
+router.get('/linkedin', linkedin.login);
+router.get('/linkedin/callback', linkedin.callback);
 
 // ----------------------------------------------------------
 // OAuth for our own clients

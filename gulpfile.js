@@ -81,7 +81,7 @@ gulp.task('validate-client-source', function() {
     .pipe(jshint({
       browser: true,
       devel: false,
-      globalstrict: true,
+      strict: "global",
       unused: false,
       laxbreak: true,
       laxcomma: true,
@@ -100,9 +100,9 @@ gulp.task('validate-server-source', function() {
   return gulp.src(['server/**/*.js', 'shared/**/*.js', 'modules/*/lib/**/*.js'])
     .pipe(jshint({
       node: true,
-      // globalstrict: true, // ENABLE
       devel: false,
       unused: false,
+      strict: "global",
       "-W064": "", // Missing 'new' prefix when invoking a constructor
       "-W069": "", // [..] is better written in dot notation.
       "-W033": "", // Missing semicolon.
