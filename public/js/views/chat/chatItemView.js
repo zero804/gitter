@@ -1,6 +1,7 @@
 "use strict";
 var $ = require('jquery');
 var _ = require('underscore');
+var classnames = require('classnames');
 var context = require('utils/context');
 var chatModels = require('collections/chat');
 var AvatarView = require('views/widgets/avatar');
@@ -30,6 +31,10 @@ require('views/behaviors/last-message-seen');
 module.exports = (function() {
 
 
+  var getModelIdClass = function(id) {
+    return 'model-id-' + id;
+  };
+
   /* @const */
   var MAX_HEIGHT = 640; /* This value also in chatItemView.less */
   // This needs to be adjusted in chatInputView as well as chat-server on the server
@@ -55,8 +60,19 @@ module.exports = (function() {
   };
 
   var ChatItemView = Marionette.ItemView.extend({
-    attributes: {
-      class: 'chat-item'
+    attributes: function() {
+      var classMap = {
+        'chat-item': true
+      };
+
+      var id = this.model.get('id');
+      if(id) {
+        classMap[getModelIdClass(id)] = true;
+      }
+
+      return {
+        class: classnames(classMap)
+      };
     },
     ui: {
       actions: '.js-chat-item-actions',
@@ -207,7 +223,7 @@ module.exports = (function() {
       // this.$el.toggleClass('cantEdit', !canEdit);
     },
 
-    /* jshint maxcomplexity: 23 */
+    /* jshint maxcomplexity: 24 */
     updateRender: function(changes) {
       /* NB: `unread` updates occur in the behaviour */
       var model = this.model;
@@ -225,6 +241,11 @@ module.exports = (function() {
 
       if (!changes || 'html' in changes || 'text' in changes) {
         this.renderText();
+      }
+
+      if(changes && 'id' in changes) {
+        var id = model.get('id');
+        toggleClass(getModelIdClass(id), true);
       }
 
       if(!changes || 'mentioned' in changes) {
