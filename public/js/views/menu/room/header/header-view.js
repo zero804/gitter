@@ -33,6 +33,10 @@ module.exports = Marionette.ItemView.extend({
     };
   },
 
+  initialize: function (){
+    this.listenTo(this.model.primaryCollection, 'add reset snapshot', this.render, this);
+  },
+
   updateActiveElement: function(model, state) { //jshint unused: true
     //This can be called after render so we need to add a small delay to get the transitions working
     //jp 6/12/16
