@@ -13,6 +13,7 @@ converter-service/converter/.project
 converter-service/converter/.settings
 converter-service/converter/target
 config.user-overrides.json
+config/config.dev.user-overrides.json
 scripts/mongo-backup-*
 public-processed/
 scripts/dataupgrades/004-reverse-geocoder/data
