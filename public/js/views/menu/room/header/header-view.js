@@ -28,8 +28,8 @@ module.exports = Marionette.ItemView.extend({
 
   serializeData: function() {
     return {
-      user:    this.model.userModel.toJSON(),
       orgName: this.model.get('selectedOrgName'),
+      numOfRooms: this.model.primaryCollection.length,
     };
   },
 

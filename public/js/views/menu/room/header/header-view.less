@@ -39,6 +39,11 @@
   }
 }
 
+.panel-header__title--all {
+  .panel-header__title;
+  color: white;
+}
+
 .panel-header__title--search  {
   .panel-header__title;
   color:       @jaffa;
@@ -58,6 +63,7 @@
   .panel-header__title;
   color:       @org-bg;
 }
+
 
 .panel-header__container {
   width:       100%;
@@ -80,7 +86,7 @@
   display:     flex;
   align-items: center;
   width:       100%;
-  background:  @ruby;
+
 
   &:hover {
     cursor: pointer;
@@ -88,7 +94,6 @@
 
   .desktop & {
     height:       @desktop-header-height;
-    padding-left: @desktop-menu-left-padding;
   }
 
   .mobile & {
