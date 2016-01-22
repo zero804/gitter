@@ -4,6 +4,7 @@ var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 var template = require('./tmpl/chatConnectivityIndicator.hbs');
 var appEvents = require('utils/appevents');
+require('views/behaviors/tooltip');
 
 module.exports = Marionette.ItemView.extend({
 
@@ -13,7 +14,11 @@ module.exports = Marionette.ItemView.extend({
   ui: {
     indicator: '.chat-connectivity-indicator'
   },
-
+  behaviors: {
+    Tooltip: {
+      '#connectivity-icon': { title: 'Realtime connection lost. Reconnecting...', placement: 'bottom' },
+    }
+  },
   modelEvents: {
     'change': 'onConnectivityChange'
   },
