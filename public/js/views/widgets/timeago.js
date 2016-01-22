@@ -1,10 +1,12 @@
 "use strict";
 var Marionette = require('backbone.marionette');
+var _ = require('underscore');
 var moment = require('moment');
 var context = require('utils/context');
 var widgets = require('views/behaviors/widgets');
 var FastAttachMixin = require('views/fast-attach-mixin');
 var timeFormat = require('gitter-web-shared/time/time-format');
+var template = require('./tmpl/timeago.hbs');
 
 require('views/behaviors/tooltip');
 
@@ -12,23 +14,49 @@ var ONEDAY = 86400000;
 
 module.exports = (function() {
 
+  var getPermalinkForChatItem = function(id, roomName) {
+    return context.env('basePath') + '/' + roomName + '?at=' + id;
+  };
+
+  var serializeData = function(model, options) {
+    var messageId = options.chatItemModel.get('id');
+    var roomName = options.roomName;
+
+    var data = {
+      widgetId: options.widgetId,
+      permalinkUrl: getPermalinkForChatItem(messageId, roomName)
+    };
+
+    return data;
+  };
+
   var lang = context.lang();
 
   var TimeagoWidget = Marionette.ItemView.extend({
-    tagName: 'span',
-    template: false,
+    tagName: 'a',
+    template: template,
+
+    modelEvents: {
+      'change': 'onChange'
+    },
     behaviors: {
       Tooltip: {
         '': { titleFn: 'getTooltip', positionFn: 'getTooltipPosition', html: true },
       }
     },
     initialize: function(options) {
+      this.roomName = options.roomName;
+      this.chatItemModel = options.chatItemModel;
+      this.messageId = this.chatItemModel.get('id');
+
       this.time = moment(options.time).locale(lang);
       this.compact = options.compact;
       this.position = options.position || "top";
       this.tooltipFormat = options.tooltipFormat || 'LLL';
 
       this.calculateNextTimeout();
+
+      this.listenTo(this.chatItemModel, 'change', this.onChatItemModelChange);
     },
 
     onDestroy: function() {
@@ -63,6 +91,19 @@ module.exports = (function() {
       this.timer = window.setTimeout(this.rerenderOnTimeout.bind(this), secondsToRefresh * 1000);
     },
 
+    onChatItemModelChange: function(changes) {
+      if(changes && 'id' in changes) {
+        this.messageId = this.chatItemModel.get('id');
+        this.render();
+      }
+    },
+
+    serializeData: function() {
+      var options = this.options || {};
+      var model = this.model && this.model.toJSON();
+      return serializeData(model, options);
+    },
+
     rerenderOnTimeout: function() {
       this.calculateNextTimeout();
       this.render();
@@ -74,14 +115,20 @@ module.exports = (function() {
       var longFormat = this.time.format("LLL");
       this.el.setAttribute('title', longFormat);
 
+      this.el.setAttribute('href', getPermalinkForChatItem(this.messageId, this.roomName));
+
       this.triggerMethod("render", this);
     },
+
 
     attachElContent: FastAttachMixin.attachElContent
   });
 
-  TimeagoWidget.getPrerendered = function(model, id) { // jshint unused:true
-    return "<span class='widget' data-widget-id='" + id + "'></span>";
+  TimeagoWidget.getPrerendered = function(model, id) {
+    this.widgetId = id;
+    return template(serializeData(null, _.extend(model, {
+      widgetId: id
+    })));
   };
 
   widgets.register({ timeago: TimeagoWidget });
