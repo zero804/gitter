@@ -250,11 +250,6 @@ function renderMainFrame(req, res, next, frame) {
         roomMenuIsPinned: true,
       });
 
-      var orgs = suggestedOrgsFromRoomList(rooms);
-      //TODO REMOVE THESE JP 22/1/16
-      troupeContext.orgs = orgs;
-      troupeContext.rooms = rooms;
-
       res.render(template, {
         socialMetadata: socialMetadata,
         bootScriptName: bootScriptName,
@@ -273,7 +268,7 @@ function renderMainFrame(req, res, next, frame) {
         showUnreadTab: true,
         menuHeaderExpanded: false,
         user: user,
-        orgs: orgs
+        orgs: suggestedOrgsFromRoomList(rooms),
       });
     })
     .catch(next);
