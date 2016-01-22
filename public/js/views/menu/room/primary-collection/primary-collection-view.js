@@ -52,6 +52,7 @@ var PrimaryCollectionView = Marionette.CollectionView.extend({
     this.listenTo(this.model, 'change:state', this.onModelStateChange, this);
     this.listenTo(this.model, 'change:selectedOrgName', this.onModelStateChange, this);
     this.listenTo(context.troupe(), 'change:id', this.updateSelectedModel, this);
+    this.listenTo(this.collection, 'add', this.render, this);
 
     this.updateSelectedModel();
   },
