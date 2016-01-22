@@ -11,8 +11,6 @@ var Q = require('q');
 var fixtureLoader = require('../test-fixtures');
 var fixture = {};
 
-
-
 describe('oauth-service', function() {
   before(fixtureLoader(fixture, {
     user1: { }
@@ -33,20 +31,31 @@ describe('oauth-service', function() {
       .nodeify(done);
   });
 
-  it('should create tokens atomically', function(done) {
+  it('should create tokens atomically', function() {
+
     var userId = mongoUtils.getNewObjectIdString();
     return Q.all([
       oauthService.findOrGenerateWebToken(userId),
-      oauthService.findOrGenerateWebToken(userId)
+      oauthService.findOrGenerateWebToken(userId),
+      oauthService.findOrGenerateWebToken(userId),
+      oauthService.findOrGenerateWebToken(userId),
+      oauthService.findOrGenerateWebToken(userId),
       ])
-      .spread(function(r1, r2) {
-        var token1 = r1[0];
-        var token2 = r2[0];
-        assert(token1);
-        assert(token2);
-        assert.equal(token1, token2);
-      })
-      .nodeify(done);
+      .then(function(results) {
+        var tokens = results.map(function(x) {
+          return x[0];
+        });
+        console.log(tokens);
+
+        var firstToken = tokens[0];
+        assert(firstToken);
+
+        if (!tokens.every(function(token) {
+          return token === firstToken;
+        })) {
+          assert(false, 'The tokens: ' + JSON.stringify(tokens) + ' tokens do not match');
+        }
+      });
   });
 
   it('should use cached tokens', function(done) {

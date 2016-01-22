@@ -2,18 +2,14 @@
 
 var env             = require('gitter-web-env');
 var logger          = env.logger;
-var config          = env.config;
 var RedisBatcher    = require('../utils/redis-batcher').RedisBatcher;
 var ChatMessage     = require('./persistence-service').ChatMessage;
 var assert          = require('assert');
-var appEvents       = require('gitter-web-appevents');
 var mongoUtils      = require('../utils/mongo-utils');
 var Q               = require('q');
 var liveCollections = require('./live-collections');
 
 var batcher = new RedisBatcher('readby2', 600, batchUpdateReadbyBatch);
-
-var enableLiveUpdateReadByCollections = !!config.get('enableLiveUpdateReadByCollections');
 
 /**
  * Record items as having been read
@@ -38,9 +34,8 @@ exports.recordItemsAsRead = function(userId, troupeId, items, callback) {
   .nodeify(callback);
 };
 
-function batchUpdateReadbyBatch(troupeIdString, userChatIds, done) {
+  function batchUpdateReadbyBatch(troupeIdString, userChatIds, done) {
   var troupeId = mongoUtils.asObjectID(troupeIdString);
-
   var userChatHash = {};
 
   userChatIds.forEach(function(userChatId) {
@@ -68,7 +63,8 @@ function batchUpdateReadbyBatch(troupeIdString, userChatIds, done) {
       lean: true
     })
     // Great candidate for readConcern: major in future
-    .exec(function(unreadChats) {
+    .exec()
+    .then(function(unreadChats) {
       var bulk = ChatMessage.collection.initializeUnorderedBulkOp();
 
       chatIds.forEach(function(chatIdString, index) {
@@ -83,11 +79,13 @@ function batchUpdateReadbyBatch(troupeIdString, userChatIds, done) {
           });
       });
 
-      var d = Q.defer();
-      bulk.execute(d.makeNodeResolver());
+      return Q.Promise(function(resolve, reject) {
+        bulk.execute(function(err) {
+          if (err) return reject(err);
+          resolve(unreadChats);
+        });
+      });
 
-      return d.promise
-        .thenResolve(unreadChats);
     })
     .then(function(unreadChats) {
       // If the message was previously not read, send out a
@@ -99,22 +97,6 @@ function batchUpdateReadbyBatch(troupeIdString, userChatIds, done) {
         liveCollections.chats.emit('patch', chatIdString, troupeId, {
           readBy: userIdsReadChat.length,
           v: chat._tv ? 0 + chat._tv : undefined
-        });
-      });
-
-      // Allow operators to turn live collection updates on
-      // for readBy items
-      if (enableLiveUpdateReadByCollections) return;
-
-      chatIds.forEach(function(chatIdString) {
-        var userIdsReadChat = userChatHash[chatIdString];
-
-        // Its too operationally expensive to serialise the full user object
-        // TODO: move this across to live-collections
-        userIdsReadChat.forEach(function(userId) {
-          appEvents.dataChange2("/rooms/" + troupeIdString + "/chatMessages/" + chatIdString + '/readBy', 'create', {
-            id: userId
-          }, 'readBy');
         });
       });
 

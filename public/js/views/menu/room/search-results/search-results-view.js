@@ -261,15 +261,12 @@ module.exports = (function() {
         .bind(this)
         .spread(function (users, repos, publicRepos) {
           // assuring that object are uniform since repos have a boolean (exists)
+          users.results.map(function (i) { i.exists = true; });
+          publicRepos.results.map(function (i) { i.exists = true; });
 
-          users.results.map(function(i) { i.exists = true; });
-          publicRepos.results.map(function(i) { i.exists = true; });
-
-
-          var results = [users, repos, publicRepos]
-            .map(function(data) { return data.results; })
-            .reduce(function(fold, arr) { return fold.concat(arr); }, [])
-            .map(function(r) {
+          var results = [users.results, repos.results, publicRepos.results]
+            .reduce(function (fold, arr) { return fold.concat(arr); }, [])
+            .map(function (r) {
               if (!r) return;
               if (r.room) r.id = r.room.id; // use the room id as model id for repos
               r.url = r.url || '/' + r.uri;

@@ -136,7 +136,6 @@ var MiniBarView = Marionette.ItemView.extend({
 
   //TODO this feals too much like the above function, start extracting the functionality
   onKeypressFocus: function(e, handler) {//jshint unused: true
-    console.log('this is wokring');
     var index = handler.key.split('+').slice(-1)[0];
     index = parseInt(index, 10) - 1;
     var nextActiveModel = this.roomMenuItemModels.at(index);

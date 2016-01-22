@@ -1,6 +1,7 @@
 'use strict';
 
 var persistenceService = require("../persistence-service");
+var mongoUtils = require("../../utils/mongo-utils");
 var random = require('../../utils/random');
 
 module.exports = {
@@ -26,10 +27,15 @@ module.exports = {
         /* Generate a token and attempt an upsert */
         return random.generateToken()
           .then(function(token) {
+            userId = mongoUtils.asObjectID(userId);
+            clientId = mongoUtils.asObjectID(clientId);
+
             return persistenceService.OAuthAccessToken.findOneAndUpdate(
                 { userId: userId, clientId: clientId },
                 {
                   $setOnInsert: {
+                    userId: userId,
+                    clientId: clientId,
                     token: token
                   }
                 },
