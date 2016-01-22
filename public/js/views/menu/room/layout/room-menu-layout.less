@@ -37,7 +37,18 @@
   width:      100%;
   height:     100%;
   z-index:    1;
-  background: @menu-bg;
+
+  &:before {
+    content:    ' ';
+    display:    inline-block;
+    position:   absolute;
+    top:        0;
+    left:       0;
+    width:      100%;
+    height:     100%;
+    background: @menu-panel-bg;
+    opacity:    .4;
+  }
 }
 
 .room-menu__panel {
@@ -47,16 +58,27 @@
   left:         0;
   height:       100%;
   padding-left: 100%;
-  background:   @menu-panel-bg;
-  transform:    translateX(-100%);
-  transition:   all .2s linear .1s;
+  border-right: 10px solid transparent;
+
+  background-image:    url('../images/left-menu-background.jpg');
+  background-position: bottom left;
+  background-repeat:   no-repeat;
+  background-size:     cover;
+
+  //TODO Check how this works on other monitor sizes
+  transform:    translateX(-78%);
+  transition:   all .2s linear .1s, border-color .2s linear .1s;
+
+  //TODO not so sure about this JP 22/1/16
+  & > * { opacity: 0; }
 
   &.active {
     transform: translateX(0);
+    border-color: rgba(255,255,255,.1);
+    & > * { opacity: 1; }
   }
 
   &:after {
-
     content:         ' ';
     display:         flex;
     justify-content: center;
@@ -66,12 +88,10 @@
     left:            0;
     width:           100%;
     height:          100%;
-    background:      @menu-panel-bg;
     color:           @menu-item-color;
     pointer-events:  none;
     transition:      opacity .2s ease-in-out;
     opacity:         0;
-
   }
 
   &.loading {
@@ -172,7 +192,7 @@
 
 .room-menu-options__item--home {
   .room-menu-options__item();
-  background: black;
+  background: rgba(0, 0, 0, .4);
 
   &.active {
     background: @ruby;
@@ -185,7 +205,7 @@
 
 .room-menu-options__item--search {
   .room-menu-options__item();
-  background: #131314;
+  background: rgba(0, 0, 0, .3);
 
   &.active {
     background: @jaffa;
@@ -198,7 +218,7 @@
 
 .room-menu-options__item--people {
   .room-menu-options__item();
-  background: #1f1f1f;
+  background: rgba(0, 0, 0, .1);
 
   &.active {
     background: @people-bg;
@@ -211,7 +231,7 @@
 
 .room-menu-options__item--favourite {
   .room-menu-options__item();
-  background: #1a191b;
+  background: rgba(0, 0, 0, .2);
 
   //Replace with class
   & img {
@@ -296,7 +316,7 @@
   position:   absolute;
   width:      100%;
   height:     50%;
-  background: @ruby;
+  background: white;
   transition: transform .2s linear;
 }
 
