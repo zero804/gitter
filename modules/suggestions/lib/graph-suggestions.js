@@ -89,9 +89,9 @@ function getSuggestionsForRooms(rooms) {
     'ORDER BY linkcount DESC '+
     'LIMIT 10';
   */
-  var qry = 'MATCH (r:Room)-[:MEMBER]-(u:User) '+
+  var qry = 'MATCH (r:Room)-[m:MEMBER]-(u:User) '+
     'WHERE r.roomId IN {roomIds} ' +
-    'WITH u LIMIT 1000 ' +
+    'WITH u ORDER BY m.weight LIMIT 1000 ' +
     'MATCH (u)-[:MEMBER]-(r2:Room) ' +
     'WHERE NOT r2.roomId IN {roomIds} AND r2.security <> "PRIVATE" ' +
     'RETURN r2.roomId AS roomId, count(r2) AS c ' +
