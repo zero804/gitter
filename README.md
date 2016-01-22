@@ -100,6 +100,14 @@ username     username to hellban e.g trevorah
 Options:
    -u, --unban   unban user from hell
 
+
+### start-new-feature
+
+Create a feature branch and a matching pull request. This also does some nicety stuff so we can properly see test coverage from Coveralls.
+
+`./start-new-feature my-new-feature-branch`
+
+
 Upgrading gitter-services to add support for more services
 ----------------------------------------------------------
 Recently merged a pull request for [gitter-services](https://github.com/gitterHQ/services)? then read on…
