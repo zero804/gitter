@@ -5,6 +5,7 @@ var stats = env.stats;
 var cypher = require("cypher-promise");
 var neo4jClient = cypher(env.config.get('neo4j:endpoint'));
 var debug = require('debug')('gitter:graph-suggestions');
+var _ = require('lodash');
 
 function query(text, params) {
   debug("neo4j query: %s %j", text, params);
@@ -75,3 +76,34 @@ function getSuggestionsForUser(user /*, locale */) {
     });
 }
 exports.getSuggestionsForUser = getSuggestionsForUser;
+
+
+function getSuggestionsForRooms(rooms) {
+  var roomIds = _.pluck(rooms, 'id');
+  // original, breaks prod:
+  /*
+  var qry = 'MATCH (r:Room)-[:MEMBER]-(u:User)-[:MEMBER]-(s:Room) ' +
+    'WHERE r.roomId IN {roomIds} '+
+    'AND (NOT s.roomId IN {roomIds}) AND s.security <> "PRIVATE" '+
+    'RETURN s.roomId, count(*) AS linkcount '+
+    'ORDER BY linkcount DESC '+
+    'LIMIT 10';
+  */
+  var qry = 'MATCH (r:Room)-[:MEMBER]-(u:User) '+
+    'WHERE r.roomId IN {roomIds} ' +
+    'WITH u LIMIT 1000 ' +
+    'MATCH (u)-[:MEMBER]-(r2:Room)' +
+    'WHERE NOT r2.roomId IN {roomIds} ' +
+    'RETURN r2.roomId AS roomId, count(r2) AS c ' +
+    'ORDER BY c DESC ' +
+    'LIMIT 10';
+
+  var attrs = {roomIds: roomIds};
+  return query(qry, attrs)
+    .then(function(results) {
+      return results.data.map(function(f) {
+        return { roomId: f[0] };
+      });
+    });
+}
+exports.getSuggestionsForRooms = getSuggestionsForRooms;
