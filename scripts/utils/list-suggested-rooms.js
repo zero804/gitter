@@ -54,6 +54,8 @@ function mostPopularItem(strings) {
 
 function pickLanguageFromRooms(rooms) {
   // languages that aren't null or undefined
+  // NOTE: only public rooms will have their languages filled in, at least
+  // eventually.
   var languages = _(rooms).pluck('lang').filter().value();
 
   // try the most popular non-english one
@@ -72,10 +74,17 @@ function pickLanguageFromRooms(rooms) {
 }
 
 getRooms()
-  .then(function(rooms) {
+  .then(function(roomsIncluding1to1s) {
+    // 1to1 rooms aren't included in the graph anyway
+    var rooms = _.filter(roomsIncluding1to1s, function(room) {
+      return room.oneToOne != true;
+    });
+
+    // smallest first
     rooms.sort(function(a, b) {
       return a.userCount - b.userCount;
     });
+
     console.log("input", rooms);
     var lang = pickLanguageFromRooms(rooms);
     console.log("lang", lang)
