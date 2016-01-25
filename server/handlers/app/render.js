@@ -236,6 +236,23 @@ function renderMainFrame(req, res, next, frame) {
         roomMenuIsPinned: true,
       });
 
+      //If we are in any kind of org room && that org exists in out suggested org list
+      //set the menu state to org and the selectedOrg to the given org
+      //JP 25/1/16
+      //TODO Test this with an e2e runner
+      var orgs = suggestedOrgsFromRoomList(rooms);
+      var currentlySelectedOrg = req.uriContext.uri.split('/')[0];
+      if(_.findWhere(orgs), { name: currentlySelectedOrg }) {
+        troupeContext.leftRoomMenuState = _.extend({}, troupeContext.leftRoomMenuState, {
+          state: 'org',
+          selectedOrgName: currentlySelectedOrg,
+        });
+      }
+
+      console.log('-----------------------');
+      console.log(orgs, req.uriContext.uri);
+      console.log('-----------------------');
+
       res.render(template, {
         socialMetadata: socialMetadata,
         bootScriptName: bootScriptName,
@@ -253,7 +270,7 @@ function renderMainFrame(req, res, next, frame) {
         showUnreadTab: true,
         menuHeaderExpanded: false,
         user: user,
-        orgs: suggestedOrgsFromRoomList(rooms),
+        orgs: orgs
       });
     })
     .catch(next);
