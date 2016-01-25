@@ -145,18 +145,41 @@ body:not(.mobile) .chat-item:hover {
 .chat-item__actions {
   float: right;
   text-align: right;
-  opacity: 0;
   width: 40px;
+}
+
+@chat-item__action-item__color: rgba(170, 170, 170, 1);
+
+.chat-item__action-item-visible(@alpha: 100%) {
+  visibility: visible;
+  color: fade(@chat-item__action-item__color, @alpha);
+
+  transition:
+    visibility .2s ease,
+    color .2s ease;
+
+  .chat-item:hover & {
+    color: fade(@chat-item__action-item__color, 100%);
+  }
+}
+
+.chat-item__action-item() {
+  visibility: hidden;
+  color: transparent;
+  transition:
+    visibility .2s ease,
+    color .2s ease;
+
+  .chat-item:hover & {
+    .chat-item__action-item-visible();
+  }
 }
 
 body.mobile .chat-item__actions {
   display: none;
 }
 
-.chat-item:hover .chat-item__actions, .chat-item:hover .chat-item__time {
-  opacity: 1;
-  transition: 0.2s opacity linear;
-}
+
 
 .chat-item__action, .chat-item__action-disabled {
   border-radius: 4px;
@@ -215,10 +238,10 @@ body.mobile .chat-item__container {
 .chat-item__time {
   vertical-align: middle;
   display: inline-block;
-  color: #aaa;
   float: right;
   margin-top: 2px;
-  opacity: 0.7;
+
+  .chat-item__action-item-visible(70%);
 }
 
 .chat-item__time--permalinkable {
@@ -226,37 +249,25 @@ body.mobile .chat-item__container {
 }
 
 .chat-item__icon {
+  .chat-item__action-item();
   cursor: pointer;
-  color: #aaa;
-  transition: opacity 0.3s linear, color 0.3s linear;
-}
 
-.chat-item__icon:hover {
-  color: @blue;
+  &:hover {
+    &,
+    .chat-item:hover & {
+      color: @blue;
+    }
+  }
 }
 
 .chat-item__icon--read {
-  visibility: hidden;
-  opacity: 0;
-
   float: left;
   font-size: 0.7em;
   margin-top: 3px;
-
-  .isViewers & {
-    opacity: 1;
-  }
 }
 
 body.mobile .chat-item__icon--read {
   display: none;
-}
-
-.chat-item__icon--read-by-some {
-  .chat-item:hover & {
-    visibility: visible;
-    opacity: 1;
-  }
 }
 
 .chat-item__icon--collapse {
@@ -264,11 +275,6 @@ body.mobile .chat-item__icon--read {
   height: auto;
   font-size: 14px;
   background-image: none;
-
-  .chat-item:hover & {
-    visibility: visible;
-    opacity: 1;
-  }
 }
 
 .chat-item__icon--expand {
@@ -277,11 +283,6 @@ body.mobile .chat-item__icon--read {
   height: auto;
   font-size: 14px;
   background-image: none;
-
-  .chat-item:hover & {
-    visibility: visible;
-    opacity: 1;
-  }
 }
 
 .chat-item__text {
