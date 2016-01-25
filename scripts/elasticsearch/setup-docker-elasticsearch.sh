@@ -20,7 +20,7 @@ export CHAT_RIVER=gitterChatRiver${INDEX_VERSION}
 export ROOM_RIVER=gitterRoomRiver${INDEX_VERSION}
 export ES_URL=http://$ELASTICSEARCH:9200
 
-while ! curl --fail http://gitter-es-dev:9200/; do sleep 1; done
+while ! curl --fail "${ES_URL}"; do sleep 1; done
 
 export MONGO_HOST_1=$MONGODB1
 export MONGO_PORT_1=27017
