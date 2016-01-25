@@ -21,7 +21,7 @@
   }
 
   .desktop & {
-    width: @desktop-menu-width;;
+    width: @desktop-menu-width;
   }
 
 }
@@ -58,7 +58,7 @@
   left:         0;
   height:       100%;
   padding-left: 100%;
-  border-right: 10px solid transparent;
+  border-right: (@desktop-menu-left-padding / 2) solid transparent;
 
   background-image:    url('../images/left-menu-background.jpg');
   background-position: bottom left;
@@ -75,6 +75,7 @@
   &.active {
     transform: translateX(0);
     border-color: rgba(255,255,255,.1);
+    //Ouch @MadLittleMods may pwn me for this ;) JP 25/1/16
     & > * { opacity: 1; }
   }
 
