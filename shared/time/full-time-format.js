@@ -15,8 +15,8 @@ module.exports = function timeFormat(time, options) {
   time = moment(time);
   if (lang) {
     time.locale(lang === 'en' ? 'en-gb' : lang);
-  } else {
-    time.locale('en-gb');
+  // } else {
+  //   time.locale('en-gb');
   }
 
   if (tzOffset !== undefined) {
