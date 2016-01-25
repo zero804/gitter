@@ -242,7 +242,7 @@ function renderMainFrame(req, res, next, frame) {
       //TODO Test this with an e2e runner
       var orgs = suggestedOrgsFromRoomList(rooms);
       var currentlySelectedOrg = req.uriContext.uri.split('/')[0];
-      if(_.findWhere(orgs), { name: currentlySelectedOrg }) {
+      if(_.findWhere(orgs, { name: currentlySelectedOrg })) {
         troupeContext.leftRoomMenuState = _.extend({}, troupeContext.leftRoomMenuState, {
           state: 'org',
           selectedOrgName: currentlySelectedOrg,
