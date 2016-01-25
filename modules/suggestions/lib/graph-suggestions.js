@@ -78,27 +78,20 @@ function getSuggestionsForUser(user /*, locale */) {
 exports.getSuggestionsForUser = getSuggestionsForUser;
 
 
-function getSuggestionsForRooms(rooms) {
+function getSuggestionsForRooms(rooms, lang) {
+  lang = lang || 'en';
   var roomIds = _.pluck(rooms, 'id');
-  // original, breaks prod:
-  /*
-  var qry = 'MATCH (r:Room)-[:MEMBER]-(u:User)-[:MEMBER]-(s:Room) ' +
-    'WHERE r.roomId IN {roomIds} '+
-    'AND (NOT s.roomId IN {roomIds}) AND s.security <> "PRIVATE" '+
-    'RETURN s.roomId, count(*) AS linkcount '+
-    'ORDER BY linkcount DESC '+
-    'LIMIT 10';
-  */
+
   var qry = 'MATCH (r:Room)-[m:MEMBER]-(u:User) '+
     'WHERE r.roomId IN {roomIds} ' +
     'WITH u ORDER BY m.weight LIMIT 1000 ' +
     'MATCH (u)-[:MEMBER]-(r2:Room) ' +
-    'WHERE NOT r2.roomId IN {roomIds} AND r2.security <> "PRIVATE" ' +
+    'WHERE r2.lang = "en" OR r2.lang = {lang} AND NOT r2.roomId IN {roomIds} AND r2.security <> "PRIVATE" ' +
     'RETURN r2.roomId AS roomId, count(r2) AS c ' +
     'ORDER BY c DESC ' +
     'LIMIT 10';
 
-  var attrs = {roomIds: roomIds};
+  var attrs = {roomIds: roomIds, lang: lang};
   return query(qry, attrs)
     .then(function(results) {
       return results.data.map(function(f) {
