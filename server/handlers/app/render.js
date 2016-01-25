@@ -249,10 +249,6 @@ function renderMainFrame(req, res, next, frame) {
         });
       }
 
-      console.log('-----------------------');
-      console.log(orgs, req.uriContext.uri);
-      console.log('-----------------------');
-
       res.render(template, {
         socialMetadata: socialMetadata,
         bootScriptName: bootScriptName,
