@@ -10,10 +10,26 @@ var roomNameShortener     = require('../../../../utils/room-menu-name-shortener'
 
 var ItemView = Marionette.ItemView.extend({
   template: itemTemplate,
-  className: 'room-item--secondary',
+  className: 'room-item',
+
+  //TODO this is used in primary-collection-item-view
+  //centralize it JP 22/1/16
+  attributes: function (){
+    var delay = (0.003125 * this.index);
+    return {
+      'style': 'transition-delay: ' + delay + 's',
+    }
+  },
+
   triggers: {
     'click': 'item:clicked',
   },
+
+  constructor: function (attrs){
+    this.index = attrs.index;
+    Marionette.ItemView.prototype.constructor.apply(this, arguments);
+  },
+
   serializeData: function() {
     var data = this.model.toJSON();
     return _.extend({}, data, {
@@ -21,6 +37,7 @@ var ItemView = Marionette.ItemView.extend({
       name: roomNameShortener((data.name || data.uri)),
     });
   },
+
 });
 
 module.exports = Marionette.CompositeView.extend({
@@ -36,6 +53,15 @@ module.exports = Marionette.CompositeView.extend({
 
   childEvents: {
     'item:clicked': 'onItemClicked',
+  },
+
+  buildChildView: function (model, ItemView, attrs){
+    var index     = this.collection.indexOf(model);
+    var viewIndex = (index + this.model.primaryCollection.length);
+    return new ItemView(_.extend({}, attrs, {
+      model: model,
+      index: viewIndex,
+    }))
   },
 
   serializeData: function() {
@@ -74,6 +100,21 @@ module.exports = Marionette.CompositeView.extend({
   onSearchTermChange: function(model, val) { //jshint unused: true
     if(model.get('state') !== 'search') { return }
     this.$el.toggleClass('active', !val);
+  },
+
+
+  onBeforeRender: function (){
+    RAF(function(){
+      this.$el.removeClass('loaded');
+    }.bind(this));
+  },
+
+  onRender: function (){
+    setTimeout(function(){
+      RAF(function(){
+        this.$el.addClass('loaded');
+      }.bind(this));
+    }.bind(this), 10);
   },
 
 });
