@@ -20,19 +20,17 @@ describe('SecondaryCollectionView', function() {
     });
   });
 
-  it('should assign an active class if the model is in the search || org state', function() {
+  it('should assign an active class when the secondaryCollectionActive is true', function() {
+    model.set('secondaryCollectionActive', false);
     assert.ok(!secondaryCollectionView.el.classList.contains('active'));
-    model.set('state', 'search');
-    assert.ok(secondaryCollectionView.el.classList.contains('active'));
-    model.set('state', 'all');
-    assert.ok(!secondaryCollectionView.el.classList.contains('active'));
-    model.set('state', 'org');
+    model.set('secondaryCollectionActive', true);
     assert.ok(secondaryCollectionView.el.classList.contains('active'));
   });
 
   it('should remove the active class with a valid searchTerm in the search state', function(){
     assert.ok(!secondaryCollectionView.el.classList.contains('active'));
     model.set('state', 'search');
+    model.set('secondaryCollectionActive', true);
     assert.ok(secondaryCollectionView.el.classList.contains('active'));
     model.set('searchTerm', '1');
     assert.ok(!secondaryCollectionView.el.classList.contains('active'));
@@ -41,6 +39,7 @@ describe('SecondaryCollectionView', function() {
   it('should add the active class when an empty search term is passed', function(){
     assert.ok(!secondaryCollectionView.el.classList.contains('active'));
     model.set('state', 'search');
+    model.set('secondaryCollectionActive', true);
     assert.ok(secondaryCollectionView.el.classList.contains('active'));
     model.set('searchTerm', '1');
     assert.ok(!secondaryCollectionView.el.classList.contains('active'));

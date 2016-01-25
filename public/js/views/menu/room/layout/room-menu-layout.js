@@ -57,6 +57,7 @@ module.exports = Marionette.LayoutView.extend({
     }
 
     this.roomCollection = attrs.roomCollection;
+    this.orgCollection = attrs.orgCollection;
 
     //Menu Hide Delay
     this.delay = MENU_HIDE_DELAY;
@@ -65,6 +66,7 @@ module.exports = Marionette.LayoutView.extend({
     this.model = window.model = new RoomMenuModel({
       bus:              this.bus,
       roomCollection:   this.roomCollection,
+      orgCollection:    this.orgCollection,
       userModel:        context.user(),
       //TODO id this the best way to do this? JP 12/1/16
       isMobile:         $('body').hasClass('mobile'),

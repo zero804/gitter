@@ -158,7 +158,9 @@ onready(function() {
   var appLayout = new AppLayout({
     template: false,
     el: 'body',
-    roomCollection: troupeCollections.troupes
+    roomCollection: troupeCollections.troupes,
+    //TODO ADD THIS TO MOBILE JP 25/1/16
+    orgCollection: troupeCollections.orgs
   });
   appLayout.render();
 

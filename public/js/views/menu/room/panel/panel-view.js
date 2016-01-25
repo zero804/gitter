@@ -88,6 +88,7 @@ module.exports = Marionette.LayoutView.extend({
     this.listenTo(this.bus, 'ui:swipeleft', this.onSwipeLeft, this);
     this.listenTo(this.bus, 'focus.request.chat', this.onSearchItemSelected, this);
     this.listenTo(this.bus, 'room-menu:keyboard:change-focus', this.onFocusChangeRequested, this);
+    this.$el.find('#search-results').show();
   },
 
   onChildViewRender: _.debounce(function() {

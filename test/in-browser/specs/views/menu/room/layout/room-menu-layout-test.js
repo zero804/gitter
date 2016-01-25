@@ -19,6 +19,7 @@ describe('MenuLayout', function() {
     el = document.createElement('div');
     roomCollection = new MockRoomCollection();
 
+    //TODO TEST WITH MOCK ORG COLLECTION JP 25/1/16
     menuLayout = new MenuLayout({
       bus:            Backbone.Events,
       roomCollection: roomCollection,
