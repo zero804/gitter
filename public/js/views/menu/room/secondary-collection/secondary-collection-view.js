@@ -7,6 +7,7 @@ var itemTemplate          = require('./secondary-collection-item-view.hbs');
 var RAF                   = require('utils/raf');
 var PrimaryCollectionView = require('../primary-collection/primary-collection-view');
 var roomNameShortener     = require('../../../../utils/room-menu-name-shortener');
+var getRoomAvatar         = require('utils/get-room-avatar');
 
 var ItemView = Marionette.ItemView.extend({
   template: itemTemplate,
@@ -14,26 +15,33 @@ var ItemView = Marionette.ItemView.extend({
 
   //TODO this is used in primary-collection-item-view
   //centralize it JP 22/1/16
-  attributes: function (){
+  attributes: function() {
     var delay = (0.003125 * this.index);
     return {
       'style': 'transition-delay: ' + delay + 's',
-    }
+    };
   },
 
   triggers: {
     'click': 'item:clicked',
   },
 
-  constructor: function (attrs){
+  constructor: function(attrs) {
     this.index = attrs.index;
     Marionette.ItemView.prototype.constructor.apply(this, arguments);
   },
 
   serializeData: function() {
     var data = this.model.toJSON();
+
+    //When recent searches are rendered the models have an avatarUrl of null,
+    //this is because we want to hide the avatar image ONLY in this case
+    //as such we have this check here jp 25/1/16
+    if(data.avatarUrl !== null){
+      data.avatarUrl = (data.avatarUrl || getRoomAvatar(data.name || data.uri || ' '));
+    }
+
     return _.extend({}, data, {
-      //TODO trim this if its too long JP 8/1/16
       name: roomNameShortener((data.name || data.uri)),
     });
   },
@@ -47,21 +55,23 @@ module.exports = Marionette.CompositeView.extend({
   className: 'secondary-collection',
 
   modelEvents: {
-    'change:state': 'onModelChangeState',
-    'change:searchTerm': 'onSearchTermChange',
+    'change:secondaryCollectionActive': 'onModelChangeSecondaryActiveState',
+    'change:searchTerm':                'onSearchTermChange',
+    'change:secondaryCollectionHeader': 'render',
+    'change:state':                     'render'
   },
 
   childEvents: {
     'item:clicked': 'onItemClicked',
   },
 
-  buildChildView: function (model, ItemView, attrs){
+  buildChildView: function(model, ItemView, attrs) {
     var index     = this.collection.indexOf(model);
     var viewIndex = (index + this.model.primaryCollection.length);
     return new ItemView(_.extend({}, attrs, {
       model: model,
       index: viewIndex,
-    }))
+    }));
   },
 
   serializeData: function() {
@@ -80,10 +90,10 @@ module.exports = Marionette.CompositeView.extend({
     return (index <= 10);
   },
 
-  onModelChangeState: function(model, val) { /*jshint unused: true*/
+  onModelChangeSecondaryActiveState: function(model, val) { /*jshint unused: true*/
     this.render();
     RAF(function() {
-      this.$el.toggleClass('active', (val === 'search' || val === 'org'));
+      this.$el.toggleClass('active', val);
     }.bind(this));
   },
 
@@ -98,20 +108,20 @@ module.exports = Marionette.CompositeView.extend({
   },
 
   onSearchTermChange: function(model, val) { //jshint unused: true
-    if(model.get('state') !== 'search') { return }
+    if (model.get('state') !== 'search') { return; }
+
     this.$el.toggleClass('active', !val);
   },
 
-
-  onBeforeRender: function (){
-    RAF(function(){
+  onBeforeRender: function() {
+    RAF(function() {
       this.$el.removeClass('loaded');
     }.bind(this));
   },
 
-  onRender: function (){
-    setTimeout(function(){
-      RAF(function(){
+  onRender: function() {
+    setTimeout(function() {
+      RAF(function() {
         this.$el.addClass('loaded');
       }.bind(this));
     }.bind(this), 10);

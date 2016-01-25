@@ -213,6 +213,8 @@ describe('RoomMenuModel', function() {
           assert.equal('Recent Searches', roomMenuModel.get('secondaryCollectionHeader'));
           roomMenuModel.setState('org');
           assert.equal('All Rooms', roomMenuModel.get('secondaryCollectionHeader'));
+          roomMenuModel.setState('all');
+          assert.equal('Your Organisations', roomMenuModel.get('secondaryCollectionHeader'));
         });
       });
 

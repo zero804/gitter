@@ -27,13 +27,15 @@ module.exports = (function () {
 
     initialize: function (options) {
       this.roomCollection = options.roomCollection;
-      this.dialogRegion = modalRegion;
+      this.orgCollection  = options.orgCollection;
+      this.dialogRegion   = modalRegion;
     },
 
     initMenuRegion: function (optionsForRegion){
       return new RoomMenuLayout(optionsForRegion({
         bus: appEvents,
-        roomCollection: this.roomCollection
+        roomCollection: this.roomCollection,
+        orgCollection:  this.orgCollection,
       }));
     },
 

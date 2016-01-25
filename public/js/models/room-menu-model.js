@@ -52,6 +52,9 @@ module.exports = Backbone.Model.extend({
     this._roomCollection = attrs.roomCollection;
     delete attrs.roomCollection;
 
+    //TODO TEST THIS & THROW ERROR JP 25/1/16
+    this._orgCollection = attrs.orgCollection;
+
     this._detailCollection = (attrs.detailCollection || new Backbone.Collection());
     delete attrs.detailCollection;
 
@@ -114,6 +117,13 @@ module.exports = Backbone.Model.extend({
         this.secondaryCollection.switchCollection(this.suggestedOrgs);
         this.set({
           secondaryCollectionHeader: 'All Rooms',
+          secondaryCollectionActive: true,
+        });
+        break;
+      case 'all':
+        this.secondaryCollection.switchCollection(this._orgCollection);
+        this.set({
+          secondaryCollectionHeader: 'Your Organisations',
           secondaryCollectionActive: true,
         });
         break;

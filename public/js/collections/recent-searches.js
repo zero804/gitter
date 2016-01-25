@@ -4,7 +4,7 @@ var Backbone = require('backbone');
 var localStorageSync = require('../utils/local-storage-sync');
 
 var Model = Backbone.Model.extend({
-  defaults: { name: '' }
+  defaults: { name: '', avatarUrl: null }
 });
 
 module.exports = Backbone.Collection.extend({
