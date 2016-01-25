@@ -97,6 +97,17 @@ onready(function() {
         appEvents.trigger('focus.request.' + message.focus, message.event);
       break;
 
+      case 'permalink.navigate':
+        var query = message.query;
+        /* Only supports at for now..... */
+        var aroundId = query && query.at;
+
+        if (aroundId) {
+          appEvents.trigger('chatCollectionView:permalinkHighlight', aroundId);
+        }
+
+      break;
+
       case 'change:room':
         perfTiming.start('room-switch.render');
 
