@@ -2,6 +2,7 @@
 
 var Backbone            = require('backbone');
 var backboneUrlResolver = require('backbone-url-resolver');
+var SyncMixin           = require('./sync-mixin');
 
 module.exports = Backbone.Collection.extend({
   initialize: function(models, attrs) {//jshint unused: true
@@ -11,7 +12,7 @@ module.exports = Backbone.Collection.extend({
     }
 
     this.contextModel = attrs.contextModel;
-    this.urlModel = backboneUrlResolver('/api/v1/orgs/:selectedOrgName/suggestedRooms', this.contextModel);
+    this.urlModel = backboneUrlResolver('/v1/orgs/:selectedOrgName/suggestedRooms', this.contextModel);
     this.listenTo(this.contextModel, 'change:selectedOrgName', this.onOrgNameUpdate, this);
   },
 
@@ -23,4 +24,6 @@ module.exports = Backbone.Collection.extend({
     if (!val || val  === '') return;
     this.fetch({ reset: true });
   },
+
+  sync: SyncMixin.sync,
 });
