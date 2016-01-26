@@ -617,6 +617,9 @@ module.exports = (function() {
     permalink: function(e) {
       if(!this.isPermalinkable) return;
 
+      // Can't permalink a chat which hasn't been saved to the server yet
+      if (!this.model.id) return;
+
       // Holding the Alt key down while clicking adds the permalink to the chat input
       appEvents.trigger('permalink.requested', 'chat', this.model, { appendInput: !!e.altKey });
 
