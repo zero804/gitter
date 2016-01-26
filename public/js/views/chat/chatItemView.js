@@ -262,7 +262,10 @@ module.exports = (function() {
       }
 
       if (changes && 'id' in changes) {
-        this.ui.sent[0].setAttribute('href', this.getPermalinkUrl());
+        var permalinkUrl = this.getPermalinkUrl();
+        if(permalinkUrl.length) {
+          this.ui.sent[0].setAttribute('href', permalinkUrl);
+        }
       }
 
       if (changes && 'sent' in changes) {
