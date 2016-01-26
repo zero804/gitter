@@ -12,24 +12,38 @@ var chatWrapper = compileTemplate.compileString('<div class="chat-item model-id-
 
 var chatItemTemplate = compileTemplate('/js/views/chat/tmpl/chatItemView.hbs');
 var statusItemTemplate = compileTemplate('/js/views/chat/tmpl/statusItemView.hbs');
+var timeFormat = require('gitter-web-shared/time/time-format');
+// var fullTimeFormat = require('gitter-web-shared/time/full-time-format');
 
+function getFormattedTime(model, lang, tz, tzOffset, showDatesWithoutTimezone) {
+  /* In the chat environment, we don't want to prerender the time
+   * when we don't know what timezone the user is in: we'll just wait
+   * until the javascript kicks in and render it then.
+   *
+   * However, in the archive environment, we don't want to do this
+   * for SEO and also because the chats are not re-rendered, so no
+   * times will be shown.
+   */
+  if (!tz && !showDatesWithoutTimezone) {
+    return '';
+  }
+
+  return timeFormat(model.sent, { lang: lang, tzOffset: tzOffset });
+}
 
 module.exports = exports = function(model, params) {
-  var hash = params.hash;
-  var lang = hash && hash.lang;
-  var locale = hash && hash.locale;
   var displayName;
   var username;
   var deletedClass;
 
   var root = params.data.root;
 
+  var lang = root.lang;
+  var locale = root.locale;
   var tz = root.tz;
   var tzOffset = root.tzOffset;
   var showDatesWithoutTimezone = root.showDatesWithoutTimezone;
 
-  //data.readByText = this.getReadByText(data.readBy);
-  //
   var text = model.text;
   var html = model.html || model.text;
 
@@ -39,9 +53,13 @@ module.exports = exports = function(model, params) {
     deletedClass = 'deleted';
   }
 
+  var sentTimeFormatted = getFormattedTime(model, lang, tz, tzOffset, showDatesWithoutTimezone);
+  // TODO: add permalinkUrl and sentTimeFull
+
   var m = _.extend({}, model, {
     displayName: displayName = model.fromUser && model.fromUser.displayName,
     username: username = model.fromUser && model.fromUser.username,
+    sentTimeFormatted: sentTimeFormatted,
     text: text,
     html: html,
     lang: lang,

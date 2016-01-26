@@ -4,7 +4,7 @@ var winston    = require('../../utils/winston');
 var compileTemplate = require('../compile-web-template');
 var safeTemplateWrapper = require('../safe-template-wrapper');
 
-var widgetHelpers = ['avatar','timeago'].reduce(function(memo, v) {
+var widgetHelpers = ['avatar'].reduce(function(memo, v) {
   var widgetTemplate;
   var handlerConstructor = require('./' + v);
   var handler;
