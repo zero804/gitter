@@ -635,9 +635,21 @@ module.exports = (function() {
         self.$el.removeClass('chat-item__highlighted');
       }, 5000);
     },
+
     onTouchClick: function() {
-      // this calls onSelected
-      this.triggerMethod('selected', this.model);
+      if (this.dblClickTimer) {
+        clearTimeout(this.dblClickTimer);
+        this.dblClickTimer = null;
+
+        this.toggleEdit();
+      } else {
+        var self = this;
+        this.dblClickTimer = setTimeout(function () {
+          self.dblClickTimer = null;
+        }, 350);
+
+        this.triggerMethod('selected', this.model); 
+      }
     },
 
     onClick: function() {
