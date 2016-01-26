@@ -32,7 +32,7 @@ describe('worker-queue-redis', function() {
     queue.invoke(data, { delay: 0 });
   });
 
-  it('should callback when invoked', function(done) {
+  it('should callback when invoked #slow', function(done) {
     var data = 'test data ' + uuid.v4();
 
     var queue = workerQueue.queue('worker-queue-redis-test-2', {}, function() {
