@@ -7,7 +7,7 @@ var chatModels = require('collections/chat');
 var AvatarView = require('views/widgets/avatar');
 var Marionette = require('backbone.marionette');
 var moment = require('moment');
-var uiVars = require('views/app/uiVars');
+var isMobile = require('utils/is-mobile');
 var Popover = require('views/popover');
 var chatItemTemplate = require('./tmpl/chatItemView.hbs');
 var statusItemTemplate = require('./tmpl/statusItemView.hbs');
@@ -105,7 +105,9 @@ module.exports = (function() {
 
     isEditing: false,
 
-    events: uiVars.isMobile ? touchEvents : mouseEvents,
+    events: function() {
+      return isMobile() ? touchEvents : mouseEvents;
+    },
 
     keyboardEvents: {
       'chat.edit.escape': 'onKeyEscape',
