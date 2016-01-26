@@ -86,7 +86,7 @@ module.exports = (function() {
       Tooltip: {
         '#time': {
           titleFn: 'getTimeTooltip',
-          position: 'left'
+          placement: 'left'
         },
       }
     },
