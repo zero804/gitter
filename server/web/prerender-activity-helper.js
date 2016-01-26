@@ -70,7 +70,7 @@ function renderItem(model, lang, tzOffset) {
   var inner = template(templateData);
 
   return prerenderWrapper({
-    className: "model-id-" + model.id,
+    className: "activity-item model-id-" + model.id,
     wrap: "li",
     inner: inner
   });

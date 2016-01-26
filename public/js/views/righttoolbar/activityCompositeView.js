@@ -84,7 +84,10 @@ module.exports = (function() {
         el: '#time'
       },
       Tooltip: {
-        '#time': { titleFn: 'getTimeTooltip', position: 'left' },
+        '#time': {
+          titleFn: 'getTimeTooltip',
+          position: 'left'
+        },
       }
     },
 

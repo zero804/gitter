@@ -90,6 +90,7 @@ var Behavior = Marionette.Behavior.extend({
       html: tooltipOptions.html,
       title: title,
       placement : tooltipOptions.placement,
+      position: tooltipOptions.position,
       container: tooltipOptions.container || 'body'
     });
 
