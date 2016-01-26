@@ -19,6 +19,8 @@ var chatCollapse = require('utils/collapsed-item-client');
 var KeyboardEventMixins = require('views/keyboard-events-mixin');
 var LoadingCollectionMixin = require('views/loading-mixin');
 var FastAttachMixin = require('views/fast-attach-mixin');
+var timeFormat = require('gitter-web-shared/time/time-format');
+var fullTimeFormat = require('gitter-web-shared/time/full-time-format');
 
 var RAF = require('utils/raf');
 var toggle = require('utils/toggle');
@@ -26,7 +28,8 @@ require('views/behaviors/unread-items');
 require('views/behaviors/widgets');
 require('views/behaviors/highlight');
 require('views/behaviors/last-message-seen');
-
+require('views/behaviors/timeago');
+require('views/behaviors/tooltip');
 
 module.exports = (function() {
 
@@ -46,7 +49,7 @@ module.exports = (function() {
     'click .js-chat-item-collapse':   'toggleCollapse',
     'click .js-chat-item-readby':     'showReadBy',
     'click .js-chat-item-from':       'mentionUser',
-    'click .js-timeago-widget':       'permalink',
+    'click .js-chat-time':            'permalink',
     'mouseover .js-chat-item-readby': 'showReadByIntent',
     'click .webhook':                 'expandActivity',
     'click':                          'onClick',
@@ -77,14 +80,22 @@ module.exports = (function() {
     ui: {
       actions: '.js-chat-item-actions',
       collapse: '.js-chat-item-collapse',
-      text: '.js-chat-item-text'
+      text: '.js-chat-item-text',
+      sent: '.js-chat-time'
     },
 
     behaviors: {
       Widgets: {},
       UnreadItems: { },
       Highlight: {},
-      LastMessageSeen: {}
+      LastMessageSeen: {},
+      TimeAgo: {
+        modelAttribute: 'sent',
+        el: '.js-chat-time'
+      },
+      Tooltip: {
+        '.js-chat-time': { titleFn: 'getSentTimeTooltip', html: true },
+      }
     },
 
     modelEvents: {
@@ -152,12 +163,15 @@ module.exports = (function() {
         data.sent = moment();
       }
 
+      data.sentTimeFormatted = timeFormat(data.sent);
+      data.permalinkUrl = this.getPermalinkUrl();
+      data.sentTimeFormattedFull = fullTimeFormat(data.sent);
+
       data.readByText = this.getReadByText(data.readBy);
       if(!data.html) {
         data.html = _.escape(data.text);
       }
       data.isPermalinkable = this.isPermalinkable;
-
       return data;
     },
 
@@ -227,7 +241,7 @@ module.exports = (function() {
       // this.$el.toggleClass('cantEdit', !canEdit);
     },
 
-    /* jshint maxcomplexity: 24 */
+    /* jshint maxcomplexity: 26 */
     updateRender: function(changes) {
       /* NB: `unread` updates occur in the behaviour */
       var model = this.model;
@@ -247,9 +261,16 @@ module.exports = (function() {
         this.renderText();
       }
 
-      if(changes && 'id' in changes) {
-        var id = model.get('id');
-        toggleClass(getModelIdClass(id), true);
+      if (changes && 'id' in changes) {
+        this.ui.sent[0].setAttribute('href', this.getPermalinkUrl());
+      }
+
+      if (changes && 'sent' in changes) {
+        var time = this.model.get('sent');
+        if (time) {
+          var formattedTime = fullTimeFormat(time);
+          this.ui.sent[0].setAttribute('title', formattedTime);
+        }
       }
 
       if(!changes || 'mentioned' in changes) {
@@ -642,6 +663,29 @@ module.exports = (function() {
         .toggleClass('synced', newState == 'synced')
         .toggleClass('syncing', newState == 'syncing')
         .toggleClass('syncerror', newState == 'syncerror');
+    },
+
+    getPermalinkUrl: function() {
+      if(!this.isPermalinkable) return '';
+
+      var modelId = this.model.id;
+      if (!modelId) return '';
+
+      var uri = context.troupe().get('uri');
+      if (!uri) return '';
+
+      return context.env('basePath') + '/' + uri + '?at=' + modelId;
+    },
+
+    getSentTimeTooltip: function() {
+      var time = this.model.get('sent');
+      if (!time) return '';
+      var formatted = time.format('LLL');
+      if (this.isPermalinkable && formatted) {
+        formatted += '  <br>(Alt-click to quote)';
+      }
+
+      return formatted;
     },
 
     attachElContent: FastAttachMixin.attachElContent

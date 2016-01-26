@@ -1,19 +1,17 @@
 'use strict';
 
 var moment = require('moment');
-var ONE_DAY = 86400000;
 
 /**
- * For now, this simply looks for dates older than one day,
- * but it should really switch over when the date has changed
- * (in your local timezone)
+ * Returns an abbreviated time format.
+ *
+ * * If the date is today, returns the time
+ * * If the date is this year, returns the full date without a year
+ * * Otherwise returns the full
  */
-function pastThrehold(date, now) {
-  if (!now) now = Date.now();
-  return (now - date) > ONE_DAY;
-}
-
 module.exports = function timeFormat(time, options) {
+  if (!time) return '';
+
   var lang, tzOffset, compact, now;
   if (options) {
     lang = options.lang;
@@ -22,20 +20,28 @@ module.exports = function timeFormat(time, options) {
     now = options.now; // Makes testing easier
   }
 
-  if (!time) return '';
-
   time = moment(time);
   if (lang) {
-    time.locale(lang);
+    time.locale(lang === 'en' ? 'en-gb' : lang);
   }
 
   if (tzOffset !== undefined) {
     time.utcOffset(-tzOffset);
   }
 
-  if (pastThrehold(time.valueOf(), now)) {
-    return compact ? time.format("MMM DD") : time.format("MMM DD HH:mm");
+  var today = moment(now).utcOffset(time.utcOffset());
+
+  if (time.date() === today.date() &&
+      time.month() === today.month() &&
+      time.year() === today.year()) {
+
+    // TODO: deal with american `10:20 PM`
+    return time.format("HH:mm");
   }
 
-  return time.format("HH:mm");
+  if (time.year() === today.year()) {
+    return time.format(compact ? "MMM DD" : "MMM DD HH:mm");
+  }
+
+  return time.format(compact ? "MMM DD YYYY" : "MMM DD YYYY HH:mm");
 };
