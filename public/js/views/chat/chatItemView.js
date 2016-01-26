@@ -49,7 +49,7 @@ module.exports = (function() {
     'click .js-chat-item-collapse':   'toggleCollapse',
     'click .js-chat-item-readby':     'showReadBy',
     'click .js-chat-item-from':       'mentionUser',
-    'click #chat-time':               'permalink',
+    'click .js-chat-time':            'permalink',
     'mouseover .js-chat-item-readby': 'showReadByIntent',
     'click .webhook':                 'expandActivity',
     'click':                          'onClick',
@@ -81,7 +81,7 @@ module.exports = (function() {
       actions: '.js-chat-item-actions',
       collapse: '.js-chat-item-collapse',
       text: '.js-chat-item-text',
-      sent: '#chat-time'
+      sent: '.js-chat-time'
     },
 
     behaviors: {
@@ -91,10 +91,10 @@ module.exports = (function() {
       LastMessageSeen: {},
       TimeAgo: {
         modelAttribute: 'sent',
-        el: '#chat-time'
+        el: '.js-chat-time'
       },
       Tooltip: {
-        '#chat-time': { titleFn: 'getSentTimeTooltip', /*positionFn: 'getTooltipPosition', */html: true },
+        '.js-chat-time': { titleFn: 'getSentTimeTooltip', html: true },
       }
     },
 
