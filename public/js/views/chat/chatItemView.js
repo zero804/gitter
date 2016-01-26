@@ -21,6 +21,7 @@ var LoadingCollectionMixin = require('views/loading-mixin');
 var FastAttachMixin = require('views/fast-attach-mixin');
 var timeFormat = require('gitter-web-shared/time/time-format');
 var fullTimeFormat = require('gitter-web-shared/time/full-time-format');
+var dataset = require('utils/dataset-shim');
 
 var RAF = require('utils/raf');
 var toggle = require('utils/toggle');
@@ -81,7 +82,8 @@ module.exports = (function() {
       actions: '.js-chat-item-actions',
       collapse: '.js-chat-item-collapse',
       text: '.js-chat-item-text',
-      sent: '.js-chat-time'
+      sent: '.js-chat-time',
+      timestampLink: '.js-chat-time'
     },
 
     behaviors: {
@@ -229,6 +231,14 @@ module.exports = (function() {
       }, this);
     },
 
+    onShow: function() {
+      // We do this so we don't `appEvents.trigger('navigation')` down the line
+      // See `link-handler.js -> installLinkHandler`
+      // That event would cause a `router-app.js -> postMessage('permalink.navigate')` to the chat frame and
+      // highlight the message, see `router-chat.js -> case 'permalink.navigate'`
+      dataset.set(this.ui.timestampLink[0], 'disableRouting', true);
+    },
+
     onRender: function () {
       this.updateRender();
       this.timeChange();
@@ -241,7 +251,7 @@ module.exports = (function() {
       // this.$el.toggleClass('cantEdit', !canEdit);
     },
 
-    /* jshint maxcomplexity: 26 */
+    /* jshint maxcomplexity: 27 */
     updateRender: function(changes) {
       /* NB: `unread` updates occur in the behaviour */
       var model = this.model;
