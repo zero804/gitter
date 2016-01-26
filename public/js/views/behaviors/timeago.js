@@ -4,6 +4,11 @@ var Marionette = require('backbone.marionette');
 var behaviourLookup = require('./lookup');
 var timeFormat = require('gitter-web-shared/time/time-format');
 
+var MS_IN_HOUR = 3600000;
+var MS_IN_MINUTE = 60000;
+var MS_IN_SECOND = 1000;
+var MS_IN_DAY = 24 * MS_IN_HOUR;
+
 /**
  * If the supplied time is 'today' from the persepective of the
  * user's local timezone, returns the number of milliseconds until
@@ -18,36 +23,34 @@ var timeFormat = require('gitter-web-shared/time/time-format');
  * Currently, does not handle daylight savings changeover days.
  */
 function timeRemainingTodayLocalTZ(time) {
-  if (!time) return;
+  if (!time) return 0;
 
   var now = new Date();
-  var msIntoDay;
+  var nowYear = now.getFullYear();
+  var nowMonth = now.getMonth();
+  var nowDay = now.getDate();
 
   if (time instanceof Date) {
-    if (time.getDate() === now.getDate() &&
-        time.getMonth() === now.getMonth() &&
-        time.getFullYear() === now.getFullYear()) {
-      msIntoDay = time.getHours() * 3600000 /* ms in hour */ +
-                      time.getMinutes() * 60000 /* ms in minute */ +
-                      time.getSeconds() * 1000  /* ms in second */ +
+    if (time.getDate() === nowDay &&
+        time.getMonth() === nowMonth &&
+        time.getFullYear() === nowYear) {
+      return MS_IN_DAY - time.getHours() * MS_IN_HOUR +
+                      time.getMinutes() * MS_IN_MINUTE +
+                      time.getSeconds() * MS_IN_SECOND +
                       time.getMilliseconds();
-
-      return 86400000 - msIntoDay;
     }
   }
 
   // Deal with moment dates
   if (time.date) {
-    if (time.date() === now.getDate() &&
-        time.month() === now.getMonth() &&
-        time.year() === now.getFullYear()) {
+    if (time.date() === nowDay &&
+        time.month() === nowMonth &&
+        time.year() === nowYear) {
 
-      msIntoDay = time.hour() * 3600000 /* ms in hour */ +
-                      time.minute() * 60000 /* ms in minute */ +
-                      time.second() * 1000  /* ms in second */ +
+      return MS_IN_DAY - time.hour() * MS_IN_HOUR +
+                      time.minute() * MS_IN_MINUTE +
+                      time.second() * MS_IN_SECOND +
                       time.millisecond();
-
-      return 86400000 - msIntoDay;
     }
   }
 
