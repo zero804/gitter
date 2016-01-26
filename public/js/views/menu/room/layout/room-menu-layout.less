@@ -52,31 +52,45 @@
 }
 
 .room-menu__panel {
+
+  @panel-border-width: (@desktop-menu-left-padding / 2);
+
   box-sizing:   border-box;
   position:     absolute;
   top:          0;
   left:         0;
   height:       100%;
   padding-left: 100%;
-  border-right: (@desktop-menu-left-padding / 2) solid transparent;
 
   background-image:    url('../images/left-menu-background.jpg');
-  background-position: bottom left;
+  background-position: bottom right;
   background-repeat:   no-repeat;
   background-size:     cover;
 
   //TODO Check how this works on other monitor sizes
   transform:    translateX(-78%);
-  transition:   all .2s linear .1s, border-color .2s linear .1s;
+  transition:   all .2s linear .1s;
 
   //TODO not so sure about this JP 22/1/16
   & > * { opacity: 0; }
 
   &.active {
     transform: translateX(0);
-    border-color: rgba(255,255,255,.1);
+    &:before { background-color: rgba(255,255,255,.1); }
     //Ouch @MadLittleMods may pwn me for this ;) JP 25/1/16
     & > * { opacity: 1; }
+  }
+
+  &:before {
+    content:  ' ';
+    display:  inline-block;
+    position: absolute;
+    top:      0;
+    right:    0;
+    width:    @panel-border-width;
+    height:   100%;
+    background-color: transparent;
+    transition: background-color .2s liner;
   }
 
   &:after {
