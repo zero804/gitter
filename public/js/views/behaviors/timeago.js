@@ -4,9 +4,9 @@ var Marionette = require('backbone.marionette');
 var behaviourLookup = require('./lookup');
 var timeFormat = require('gitter-web-shared/time/time-format');
 
-var MS_IN_HOUR = 3600000;
-var MS_IN_MINUTE = 60000;
 var MS_IN_SECOND = 1000;
+var MS_IN_MINUTE = 60 * MS_IN_SECOND;
+var MS_IN_HOUR = 60 * MS_IN_MINUTE;
 var MS_IN_DAY = 24 * MS_IN_HOUR;
 
 /**
