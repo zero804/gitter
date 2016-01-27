@@ -32,4 +32,5 @@ module.exports =  Marionette.CompositeView.extend({
   onModelActiveStateChange: function (model, val){//jshint unused: true
     this.$el.toggleClass('active', !!val);
   },
+
 });

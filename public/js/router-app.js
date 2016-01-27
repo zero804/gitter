@@ -2,25 +2,27 @@
 'use strict';
 require('utils/initial-setup');
 
-var $                     = require('jquery');
-var appEvents             = require('utils/appevents');
-var context               = require('utils/context');
-var Backbone              = require('backbone');
-var _                     = require('underscore');
-var AppLayout             = require('views/layouts/app-layout');
-var LoadingView           = require('views/app/loading-view');
-var troupeCollections     = require('collections/instances/troupes');
-var TitlebarUpdater       = require('components/titlebar');
-var realtime              = require('components/realtime');
-var onready               = require('./utils/onready');
-var urlParser             = require('utils/url-parser');
-var RAF                   = require('utils/raf');
-var RoomCollectionTracker = require('components/room-collection-tracker');
-var SPARoomSwitcher       = require('components/spa-room-switcher');
-var debug                 = require('debug-proxy')('app:router-app');
-var urlParser             = require('./utils/url-parser');
-var linkHandler           = require('./components/link-handler');
-var roomListGenerator     = require('./components/chat-cache/room-list-generator');
+var $                                 = require('jquery');
+var appEvents                         = require('utils/appevents');
+var context                           = require('utils/context');
+var Backbone                          = require('backbone');
+var _                                 = require('underscore');
+var AppLayout                         = require('views/layouts/app-layout');
+var LoadingView                       = require('views/app/loading-view');
+var troupeCollections                 = require('collections/instances/troupes');
+var TitlebarUpdater                   = require('components/titlebar');
+var realtime                          = require('components/realtime');
+var onready                           = require('./utils/onready');
+var urlParser                         = require('utils/url-parser');
+var RAF                               = require('utils/raf');
+var RoomCollectionTracker             = require('components/room-collection-tracker');
+var SPARoomSwitcher                   = require('components/spa-room-switcher');
+var debug                             = require('debug-proxy')('app:router-app');
+var urlParser                         = require('./utils/url-parser');
+var linkHandler                       = require('./components/link-handler');
+var roomListGenerator                 = require('./components/chat-cache/room-list-generator');
+var FilteredSuggestedRoomsCollections = require('./collections/suggested-rooms').Filtered;
+
 
 
 require('components/statsc');
@@ -160,7 +162,11 @@ onready(function() {
     el: 'body',
     roomCollection: troupeCollections.troupes,
     //TODO ADD THIS TO MOBILE JP 25/1/16
-    orgCollection: troupeCollections.orgs
+    orgCollection: troupeCollections.orgs,
+    suggestedRoomCollection: new FilteredSuggestedRoomsCollections(null, {
+      //This seems a bit messy JP 27/1/16
+      roomsCollection: troupeCollections.troupes
+    })
   });
   appLayout.render();
 

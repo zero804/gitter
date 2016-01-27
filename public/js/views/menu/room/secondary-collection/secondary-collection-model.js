@@ -33,7 +33,7 @@ module.exports = Backbone.Model.extend({
         break;
       case 'all':
         this.set({
-          secondaryCollectionHeader: 'Your Organisations',
+          secondaryCollectionHeader: 'Your Suggestions',
           secondaryCollectionActive: true
         });
         break;
