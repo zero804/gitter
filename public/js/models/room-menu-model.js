@@ -26,8 +26,6 @@ module.exports = Backbone.Model.extend({
     state:                     '',
     searchTerm:                '',
     panelOpenState:            true,
-    secondaryCollectionActive: false,
-    secondaryCollectionHeader: '',
     roomMenuIsPinned:          true,
     selectedOrgName:           '',
   },
