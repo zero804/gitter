@@ -7,7 +7,8 @@ var chatModels = require('collections/chat');
 var AvatarView = require('views/widgets/avatar');
 var Marionette = require('backbone.marionette');
 var moment = require('moment');
-var uiVars = require('views/app/uiVars');
+var isMobile = require('utils/is-mobile');
+var DoubleTapper = require('utils/double-tapper');
 var Popover = require('views/popover');
 var chatItemTemplate = require('./tmpl/chatItemView.hbs');
 var statusItemTemplate = require('./tmpl/statusItemView.hbs');
@@ -54,7 +55,6 @@ module.exports = (function() {
     'mouseover .js-chat-item-readby': 'showReadByIntent',
     'click .webhook':                 'expandActivity',
     'click':                          'onClick',
-    'dblclick':                       'onDblClick',
     'click .js-chat-item-actions':    'showActions'
   };
 
@@ -107,7 +107,9 @@ module.exports = (function() {
 
     isEditing: false,
 
-    events: uiVars.isMobile ? touchEvents : mouseEvents,
+    events: function() {
+      return isMobile() ? touchEvents : mouseEvents;
+    },
 
     keyboardEvents: {
       'chat.edit.escape': 'onKeyEscape',
@@ -127,6 +129,9 @@ module.exports = (function() {
       this.userCollection = options.userCollection;
 
       this.decorated = false;
+
+      // fastclick destroys double tap events
+      this.doubleTapper = new DoubleTapper();
 
       if (this.isInEditablePeriod()) {
         // update once the message is not editable
@@ -646,29 +651,43 @@ module.exports = (function() {
         self.$el.removeClass('chat-item__highlighted');
       }, 5000);
     },
+
     onTouchClick: function() {
-      // this calls onSelected
-      this.triggerMethod('selected', this.model);
-    },
+      this.doubleTapper.registerTap();
 
-    onClick: function() {
-      // this calls onSelected
-      this.triggerMethod('selected', this.model);
-
-      if (!window.getSelection) return;
-      if (this.dblClickTimer) {
-        clearTimeout(this.dblClickTimer);
-        this.dblClickTimer = null;
-        window.getSelection().selectAllChildren(this.el);
+      switch (this.doubleTapper.tapCount) {
+        case 1:
+          // single click
+          // this calls onSelected
+          this.triggerMethod('selected', this.model);
+          break;
+        case 2:
+          // double click
+          this.toggleEdit();
+          break;
       }
     },
 
-    onDblClick: function() {
-      if (!window.getSelection) return;
-      var self = this;
-      self.dblClickTimer = setTimeout(function () {
-        self.dblClickTimer = null;
-      }, 200);
+    onClick: function(jqueryEvent) {
+      var event = jqueryEvent.originalEvent;
+
+      switch (event.detail) {
+        case 1:
+          // single click
+          // this calls onSelected
+          this.triggerMethod('selected', this.model);
+          break;
+        case 2:
+          // double click!
+          break;
+        case 3:
+          // m-m-m-monster click!
+          if (window.getSelection) {
+            // used for html copy
+            window.getSelection().selectAllChildren(this.el);
+          }
+          break;
+      }
     },
 
     onSyncStatusChange: function(newState) {
