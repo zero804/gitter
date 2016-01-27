@@ -53,7 +53,6 @@ module.exports = (function() {
     'mouseover .js-chat-item-readby': 'showReadByIntent',
     'click .webhook':                 'expandActivity',
     'click':                          'onClick',
-    'dblclick':                       'onDblClick',
     'click .js-chat-item-actions':    'showActions'
   };
 
@@ -652,24 +651,26 @@ module.exports = (function() {
       }
     },
 
-    onClick: function() {
-      // this calls onSelected
-      this.triggerMethod('selected', this.model);
+    onClick: function(jqueryEvent) {
+      var event = jqueryEvent.originalEvent;
 
-      if (!window.getSelection) return;
-      if (this.dblClickTimer) {
-        clearTimeout(this.dblClickTimer);
-        this.dblClickTimer = null;
-        window.getSelection().selectAllChildren(this.el);
+      switch (event.detail) {
+        case 1:
+          // single click
+          // this calls onSelected
+          this.triggerMethod('selected', this.model);
+          break;
+        case 2:
+          // double click!
+          break;
+        case 3:
+          // m-m-m-monster click!
+          if (window.getSelection) {
+            // used for html copy
+            window.getSelection().selectAllChildren(this.el);
+          }
+          break;
       }
-    },
-
-    onDblClick: function() {
-      if (!window.getSelection) return;
-      var self = this;
-      self.dblClickTimer = setTimeout(function () {
-        self.dblClickTimer = null;
-      }, 200);
     },
 
     onSyncStatusChange: function(newState) {
