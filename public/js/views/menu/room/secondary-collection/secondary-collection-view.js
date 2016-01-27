@@ -3,50 +3,9 @@
 var Marionette            = require('backbone.marionette');
 var _                     = require('underscore');
 var template              = require('./secondary-collection-view.hbs');
-var itemTemplate          = require('./secondary-collection-item-view.hbs');
 var RAF                   = require('utils/raf');
 var PrimaryCollectionView = require('../primary-collection/primary-collection-view');
-var roomNameShortener     = require('../../../../utils/room-menu-name-shortener');
-var getRoomAvatar         = require('utils/get-room-avatar');
-
-var ItemView = Marionette.ItemView.extend({
-  template: itemTemplate,
-  className: 'room-item',
-
-  //TODO this is used in primary-collection-item-view
-  //centralize it JP 22/1/16
-  attributes: function() {
-    var delay = (0.003125 * this.index);
-    return {
-      'style': 'transition-delay: ' + delay + 's',
-    };
-  },
-
-  triggers: {
-    'click': 'item:clicked',
-  },
-
-  constructor: function(attrs) {
-    this.index = attrs.index;
-    Marionette.ItemView.prototype.constructor.apply(this, arguments);
-  },
-
-  serializeData: function() {
-    var data = this.model.toJSON();
-
-    //When recent searches are rendered the models have an avatarUrl of null,
-    //this is because we want to hide the avatar image ONLY in this case
-    //as such we have this check here jp 25/1/16
-    if(data.avatarUrl !== null){
-      data.avatarUrl = (data.avatarUrl || getRoomAvatar(data.name || data.uri || ' '));
-    }
-
-    return _.extend({}, data, {
-      name: roomNameShortener((data.name || data.uri)),
-    });
-  },
-
-});
+var ItemView              = require('./secondary-collection-item-view.js');
 
 module.exports = Marionette.CompositeView.extend({
   childView: ItemView,
