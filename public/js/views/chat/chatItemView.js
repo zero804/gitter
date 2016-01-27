@@ -653,9 +653,9 @@ module.exports = (function() {
     },
 
     onTouchClick: function() {
-      this.doubleTapper.registerTap();
+      var tapCount = this.doubleTapper.registerTap();
 
-      switch (this.doubleTapper.tapCount) {
+      switch (tapCount) {
         case 1:
           // single click
           // this calls onSelected
