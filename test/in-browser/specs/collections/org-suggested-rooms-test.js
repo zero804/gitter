@@ -30,9 +30,9 @@ describe('SuggestedOrgCollection()', function() {
   });
 
   it('should change its url when the model changes', function() {
-    assert.equal('/api/v1/orgs/test/suggestedRooms', suggestedOrgCollection.url());
+    assert.equal('/v1/orgs/test/suggestedRooms', suggestedOrgCollection.url());
     model.set('selectedOrgName', 'thisisatest');
-    assert.equal('/api/v1/orgs/thisisatest/suggestedRooms', suggestedOrgCollection.url());
+    assert.equal('/v1/orgs/thisisatest/suggestedRooms', suggestedOrgCollection.url());
   });
 
   it('should fetch when the models selectedOrgName is changed', function() {
