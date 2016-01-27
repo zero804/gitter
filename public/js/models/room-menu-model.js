@@ -67,10 +67,11 @@ module.exports = Backbone.Model.extend({
 
     this.primaryCollection   = new FilteredRoomCollection(null, {
       roomModel: this,
-      collection: this._roomCollection
+      collection: this._roomCollection,
     });
 
     this.secondaryCollection = new ProxyCollection({ collection: this.searchTerms });
+    this.tertiaryCollection = new ProxyCollection({ collection: this._orgCollection });
 
     this.listenTo(this.primaryCollection, 'snapshot', this.onPrimaryCollectionSnapshot, this);
 
@@ -146,8 +147,8 @@ module.exports = Backbone.Model.extend({
     if (method === 'create' || method === 'update' || method === 'patch') {
       attrs = JSON.stringify(this);
       return apiClient.user.put('/settings/leftRoomMenu', this.toJSON())
-        .then(function() { if (options.success) options.success.apply(self, arguments) })
-        .catch(function(err) { if (options.error) options.error(err) });
+        .then(function() { if (options.success) options.success.apply(self, arguments); })
+        .catch(function(err) { if (options.error) options.error(err); });
     }
 
     //if we are in a mobile environment then the menu will never be pinned
@@ -155,7 +156,7 @@ module.exports = Backbone.Model.extend({
       window.troupeContext = {
         leftRoomMenuState: {
           roomMenuIsPinned: false,
-          panelOpenState:   false
+          panelOpenState:   false,
         },
       };
     }

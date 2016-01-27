@@ -7,6 +7,8 @@ var PanelFooterView          = require('../footer/footer-view');
 var PrimaryCollectionView    = require('../primary-collection/primary-collection-view');
 var SecondaryCollectionView  = require('../secondary-collection/secondary-collection-view');
 var SecondaryCollectionModel = require('../secondary-collection/secondary-collection-model');
+var TertiaryCollectionView   = require('../tertiary-collection/tertiary-collection-view');
+var TertiaryCollectionModel  = require('../tertiary-collection/tertiary-collection-model');
 var ProfileMenuView          = require('../profile/profile-menu-view');
 var RAF                      = require('utils/raf');
 
@@ -20,13 +22,14 @@ module.exports = Marionette.LayoutView.extend({
 
   behaviors: {
     Isomorphic: {
-      header:              { el: '#panel-header', init: 'initHeader'},
-      profile:             { el: '#profile-menu', init: 'initProfileMenu'},
+      header:              { el: '#panel-header', init: 'initHeader' },
+      profile:             { el: '#profile-menu', init: 'initProfileMenu' },
       primaryCollection:   { el: '#primary-collection', init: 'initPrimaryCollection' },
       secondaryCollection: { el: '#secondary-collection', init: 'initSecondaryCollection' },
+      teritaryCollection:  { el: '#tertiary-collection', init: 'initTertiaryCollection' },
       searchInput:         { el: '#search-input', init: 'initSearchInput' },
       search:              { el: '#search-results', init: 'initSearch' },
-      footer:              { el: '#panel-footer', init: 'initFooter'},
+      footer:              { el: '#panel-footer', init: 'initFooter' },
     },
   },
 
@@ -63,6 +66,13 @@ module.exports = Marionette.LayoutView.extend({
       model:             new SecondaryCollectionModel({}, { model: this.model }),
       primaryCollection: this.model.primaryCollection,
       bus:               this.bus,
+    }));
+  },
+
+  initTertiaryCollection: function(optionsForRegion) {
+    return new TertiaryCollectionView(optionsForRegion({
+      model: new TertiaryCollectionModel({}, { model: this.model }),
+      collection: this.model.tertiaryCollection,
     }));
   },
 
@@ -139,7 +149,7 @@ module.exports = Marionette.LayoutView.extend({
   onFocusChangeRequested: function(offset, type) { //jshint unused: true
     if (type) { return this._initNano({ scroll: type }); }
 
-    this._initNano({ scrollTo: '[data-collection-index=' + offset + ']'});
+    this._initNano({ scrollTo: '[data-collection-index=' + offset + ']' });
   },
 
 });
