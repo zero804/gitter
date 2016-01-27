@@ -8,12 +8,12 @@ var getRoomAvatar = require('utils/get-room-avatar');
 
 var ItemView = Marionette.ItemView.extend({
   template: itemTemplate,
-  serializeData: function(){
+  serializeData: function() {
     var data = this.model.toJSON();
     return _.extend({}, data, {
       avatarUrl: getRoomAvatar(data.name || ' '),
     });
-  }
+  },
 });
 
 module.exports =  Marionette.CompositeView.extend({
@@ -25,12 +25,20 @@ module.exports =  Marionette.CompositeView.extend({
     'change:tertiaryCollectionActive': 'onModelActiveStateChange',
   },
 
-  initialize: function (){
+  initialize: function() {
     this.onModelActiveStateChange(this.model, this.model.get('tertiaryCollectionActive'));
   },
 
-  onModelActiveStateChange: function (model, val){//jshint unused: true
-    this.$el.toggleClass('active', !!val);
+  onModelActiveStateChange: function() {
+    this.$el.toggleClass('active', this.model.get('tertiaryCollectionActive'));
   },
+
+  onBeforeRender: function(){
+    if(this.collection.length <= 0) {
+      return this.$el.removeClass('active');
+    }
+    Marionette.CompositeView.prototype.render.apply(this, arguments);
+    this.onModelActiveStateChange();
+  }
 
 });

@@ -53,7 +53,7 @@ module.exports = Marionette.CompositeView.extend({
   onModelChangeSecondaryActiveState: function(model, val) { /*jshint unused: true*/
     this.render();
     RAF(function() {
-      this.$el.toggleClass('active', val);
+      this.$el.toggleClass('active', !!this.collection.length && val);
     }.bind(this));
   },
 
