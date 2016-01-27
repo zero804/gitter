@@ -70,6 +70,7 @@ module.exports = Marionette.LayoutView.extend({
       orgCollection:           this.orgCollection,
       userModel:               context.user(),
       suggestedRoomCollection: this.suggestedRoomCollection,
+
       //TODO id this the best way to do this? JP 12/1/16
       isMobile:                $('body').hasClass('mobile'),
     });
@@ -98,19 +99,23 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   openPanel: function() {
-    if (this.model.get('roomMenuIsPinned')) { return }
+    if (this.model.get('roomMenuIsPinned')) { return; }
 
     this.model.set('panelOpenState', true);
     if (this.timeout) { clearTimeout(this.timeout); }
   },
 
   closePanel: function() {
-    if (this.model.get('roomMenuIsPinned')) { return }
+    if (this.model.get('roomMenuIsPinned')) { return; }
 
     this.timeout = setTimeout(function() {
       this.model.set('panelOpenState', false);
     }.bind(this), this.delay);
 
+  },
+
+  onDestroy: function() {
+    this.stopListening(this.dndCtrl);
   },
 
 });

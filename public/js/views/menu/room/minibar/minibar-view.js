@@ -150,14 +150,12 @@ var MiniBarView = Marionette.ItemView.extend({
     return this.roomMenuItemModels.where({ active: true })[0];
   },
 
-  destroy: function() {
+  onDestroy: function() {
     //unbind all child views
     this.roomMenuItems.forEach(function(v) {
       this.stopListening(v);
     }.bind(this));
-
-    //call super
-    Marionette.ItemView.prototype.destroy.apply(this, arguments);
+    this.stopListening(this.model);
   },
 
 });
