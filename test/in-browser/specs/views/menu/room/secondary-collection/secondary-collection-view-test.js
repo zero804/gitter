@@ -8,16 +8,18 @@ var SecondaryCollectionView = require('public/js/views/menu/room/secondary-colle
 describe('SecondaryCollectionView', function() {
 
   var model;
+  var collection;
   var el;
   var secondaryCollectionView;
 
   beforeEach(function() {
     model = new Backbone.Model({ state: 'all' });
+    collection = new Backbone.Collection({});
     el = document.createElement('div');
     secondaryCollectionView = new SecondaryCollectionView({
       el:                el,
       model:             model,
-      collection:        new Backbone.Collection({}),
+      collection:        collection,
       primaryCollection: new Backbone.Collection({}),
     });
   });
@@ -49,17 +51,12 @@ describe('SecondaryCollectionView', function() {
     assert.ok(secondaryCollectionView.el.classList.contains('active'));
   });
 
-  it('should not add an active class when the secondaryCollectionActive state is changed if the colleciton length is 0', function() {
-    secondaryCollectionView = new SecondaryCollectionView({
-      el:                el,
-      model:             model,
-      collection:        new Backbone.Collection(),
-      primaryCollection: new Backbone.Collection({}),
-    });
-    model.set('secondaryCollectionActive', false);
-    assert.ok(!secondaryCollectionView.el.classList.contains('active'));
-    model.set('secondaryCollectionActive', true);
-    assert.ok(!secondaryCollectionView.el.classList.contains('active'));
+  it.only('should toggle an empty class when the collection is empty', function(){
+    assert.ok(!secondaryCollectionView.el.classList.contains('empty'));
+    collection.reset();
+    assert.ok(secondaryCollectionView.el.classList.contains('empty'));
+    collection.add({});
+    assert.ok(!secondaryCollectionView.el.classList.contains('empty'));
   });
 
 });
