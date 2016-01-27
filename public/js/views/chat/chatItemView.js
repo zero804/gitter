@@ -8,6 +8,7 @@ var AvatarView = require('views/widgets/avatar');
 var Marionette = require('backbone.marionette');
 var moment = require('moment');
 var isMobile = require('utils/is-mobile');
+var DoubleTapper = require('utils/double-tapper');
 var Popover = require('views/popover');
 var chatItemTemplate = require('./tmpl/chatItemView.hbs');
 var statusItemTemplate = require('./tmpl/statusItemView.hbs');
@@ -126,6 +127,9 @@ module.exports = (function() {
       this.userCollection = options.userCollection;
 
       this.decorated = false;
+
+      // fastclick destroys double tap events
+      this.doubleTapper = new DoubleTapper();
 
       if (this.isInEditablePeriod()) {
         // update once the message is not editable
@@ -636,18 +640,18 @@ module.exports = (function() {
     },
 
     onTouchClick: function() {
-      if (this.dblClickTimer) {
-        clearTimeout(this.dblClickTimer);
-        this.dblClickTimer = null;
+      this.doubleTapper.registerTap();
 
-        this.toggleEdit();
-      } else {
-        var self = this;
-        this.dblClickTimer = setTimeout(function () {
-          self.dblClickTimer = null;
-        }, 350);
-
-        this.triggerMethod('selected', this.model); 
+      switch (this.doubleTapper.tapCount) {
+        case 1:
+          // single click
+          // this calls onSelected
+          this.triggerMethod('selected', this.model);
+          break;
+        case 2:
+          // double click
+          this.toggleEdit();
+          break;
       }
     },
 
