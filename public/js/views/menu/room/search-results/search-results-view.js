@@ -12,7 +12,7 @@ var Rollers               = require('utils/rollers');
 var appEvents = require('utils/appevents');
 
 //OOPS TODO use this lovely thing @leroux made.
-var resolveRoomAvatarUrl  = require('gitter-web-shared/avatars/resolve-room-avatar-url');
+//var resolveRoomAvatarUrl  = require('gitter-web-shared/avatars/resolve-room-avatar-url');
 var getRoomAvatar = require('utils/get-room-avatar');
 
 var textFilter            = require('utils/text-filter');
@@ -22,13 +22,17 @@ var ChatSearchModels      = require('collections/chat-search');
 var resultTemplate        = require('./search-results-item.hbs');
 var noResultsTemplate     = require('./search-results-empty.hbs');
 var noRoomResultsTemplate = require('./search-results-rooms-empty.hbs');
-var textFilter            = require('utils/text-filter');
 var KeyboardEventsMixin   = require('views/keyboard-events-mixin');
 var Promise               = require('bluebird');
+
+var timeFormat = require('gitter-web-shared/time/time-format');
+var fullTimeFormat = require('gitter-web-shared/time/full-time-format');
 
 require('views/behaviors/widgets');
 require('views/behaviors/highlight');
 require('views/behaviors/isomorphic');
+require('views/behaviors/timeago');
+require('views/behaviors/tooltip');
 
 module.exports = (function() {
 
@@ -110,28 +114,28 @@ module.exports = (function() {
     behaviors: {
       Widgets: {},
       Highlight: {},
+      TimeAgo: {
+        modelAttribute: 'sent',
+        el: '#time',
+      },
+      Tooltip: {
+        '#time': { titleFn: 'getSentTooltip', position: 'left' },
+      },
     },
 
     serializeData: function() {
       var model = this.model;
       var fromUser = model.get('fromUser');
-      var username = fromUser && fromUser.username || '';
-
-      //var sent = model.get('sent');
-
-      /*
+      var username = fromUser && fromUser.username || "";
+      var sent = model.get('sent');
+      var sentFormatted = timeFormat(sent, { compact: true });
       return {
         selected: model.get('selected'),
         detail: username,
         sent: sent,
+        sentFormatted: sentFormatted,
         text: model.get('text'),
         avatarUrl: fromUser && fromUser.avatarUrlSmall
-      };
-      */
-
-      return {
-        name: model.get('text'),
-        roomAvatarUrl: getRoomAvatar(username || ' '),
       };
     },
 
@@ -139,6 +143,10 @@ module.exports = (function() {
     selectItem: function() {
       var id = this.model.get('id');
       appEvents.trigger('chatCollectionView:loadAndHighlight', id, { highlights: this.model.get('highlights') });
+    },
+
+    getSentTooltip: function() {
+      return fullTimeFormat(this.model.get('sent'));
     },
   });
 
@@ -217,28 +225,28 @@ module.exports = (function() {
       };
     },
 
-    fetchLocalRooms: function () {
+    fetchLocalRooms: function() {
       return new Promise(function(resolve) {
         appEvents.triggerParent('troupeRequest', { }); // request troupe from parent frame
         appEvents.once('troupesResponse', resolve);
       });
     },
 
-    fetchMessages: function (args) {
+    fetchMessages: function(args) {
       var messages = this.messages;
       var query = args.query;
       var self = this;
 
       messages.reset(); // we must clear the collection before fetching more
       return new Promise(function(resolve, reject) {
-        messages.fetchSearch(query, function (err) {
+        messages.fetchSearch(query, function(err) {
           if (err) {
             appEvents.trigger('track-event', 'search_messages_failed');
             return reject(err);
           }
 
           var results = messages.models
-            .map(function (item) {
+            .map(function(item) {
               item.set('priority', 3); // this ensures that messages are added at the bottom
               return item;
             });
@@ -249,24 +257,25 @@ module.exports = (function() {
       });
     },
 
-    fetchRooms: function (args) {
+    fetchRooms: function(args) {
       var query = args.query;
       var limit = typeof args.limit === 'undefined' ? 3 : args.limit;
 
       return Promise.all([
           apiClient.get('/v1/user', { q: query, limit: limit, type: 'gitter' }),
           apiClient.user.get('/repos', { q: query, limit: limit }),
-          apiClient.get('/v1/rooms', { q: query, limit: limit })
+          apiClient.get('/v1/rooms', { q: query, limit: limit }),
         ])
         .bind(this)
-        .spread(function (users, repos, publicRepos) {
+        .spread(function(users, repos, publicRepos) {
           // assuring that object are uniform since repos have a boolean (exists)
-          users.results.map(function (i) { i.exists = true; });
-          publicRepos.results.map(function (i) { i.exists = true; });
+          users.results.map(function(i) { i.exists = true; });
+
+          publicRepos.results.map(function(i) { i.exists = true; });
 
           var results = [users.results, repos.results, publicRepos.results]
-            .reduce(function (fold, arr) { return fold.concat(arr); }, [])
-            .map(function (r) {
+            .reduce(function(fold, arr) { return fold.concat(arr); }, [])
+            .map(function(r) {
               if (!r) return;
               if (r.room) r.id = r.room.id; // use the room id as model id for repos
               r.url = r.url || '/' + r.uri;
@@ -279,7 +288,7 @@ module.exports = (function() {
           this.trigger('loaded:rooms', results, query);
           return results;
         })
-        .catch(function (err) {
+        .catch(function(err) {
           appEvents.trigger('track-event', 'search_rooms_failed');
           throw err;
         });
@@ -310,7 +319,7 @@ module.exports = (function() {
       this.trigger('cache:clear', {});
     },
 
-    getLocalRooms: function () {
+    getLocalRooms: function() {
       var cache = this.cache;
 
       if (_.isEmpty(cache.models)) {
@@ -321,14 +330,14 @@ module.exports = (function() {
       return Promise.resolve(cache);
     },
 
-    local: function (query) {
+    local: function(query) {
       if (!query) {
         return Promise.resolve(); // to avoid fetching empty queries
       }
 
       return this.getLocalRooms()
         .bind(this)
-        .then(function (rooms) {
+        .then(function(rooms) {
           var filter = textFilter({ query: query, fields: ['url', 'name'] });
           rooms = rooms.filter(filter).slice(0, 3).map(function(item) {
             item.set('query', query);
@@ -339,16 +348,16 @@ module.exports = (function() {
         });
     },
 
-    remote: function (query) {
+    remote: function(query) {
       if (!query) {
         return Promise.resolve(); // to avoid fetching empty queries
       }
 
       return Promise.all([
         this.fetchMessages({ query: query }),
-        this.fetchRooms({ query: query })
+        this.fetchRooms({ query: query }),
       ]);
-    }
+    },
   });
 
   var SearchView = Marionette.LayoutView.extend({
@@ -493,7 +502,7 @@ module.exports = (function() {
 
       Promise.all([
         this.search.local(searchTerm),
-        this.search.remote(searchTerm)
+        this.search.remote(searchTerm),
       ])
       .bind(this)
       .finally(function() {

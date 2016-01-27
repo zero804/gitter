@@ -22,6 +22,7 @@ test/end-to-end/casper/*.png
 mongo-backup-*/
 GIT_COMMIT
 VERSION
+git_hooks/*.sample
 ghostdriver.log
 finished.png
 chromedriver
