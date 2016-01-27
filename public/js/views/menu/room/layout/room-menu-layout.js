@@ -56,20 +56,22 @@ module.exports = Marionette.LayoutView.extend({
       throw new Error('A valid room collection needs to be passed to a new instance of RoomMenyLayout');
     }
 
-    this.roomCollection = attrs.roomCollection;
-    this.orgCollection = attrs.orgCollection;
+    this.roomCollection          = attrs.roomCollection;
+    this.orgCollection           = attrs.orgCollection;
+    this.suggestedRoomCollection = attrs.suggestedRoomCollection;
 
     //Menu Hide Delay
     this.delay = MENU_HIDE_DELAY;
 
     //Make a new model
-    this.model = window.model = new RoomMenuModel({
-      bus:              this.bus,
-      roomCollection:   this.roomCollection,
-      orgCollection:    this.orgCollection,
-      userModel:        context.user(),
+    this.model =  new RoomMenuModel({
+      bus:                     this.bus,
+      roomCollection:          this.roomCollection,
+      orgCollection:           this.orgCollection,
+      userModel:               context.user(),
+      suggestedRoomCollection: this.suggestedRoomCollection,
       //TODO id this the best way to do this? JP 12/1/16
-      isMobile:         $('body').hasClass('mobile'),
+      isMobile:                $('body').hasClass('mobile'),
     });
 
     //Make a new drag & drop control

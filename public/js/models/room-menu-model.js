@@ -32,6 +32,9 @@ module.exports = Backbone.Model.extend({
     selectedOrgName:           '',
   },
 
+  //TODO Remove all these delete statements and pass the object with the options hash
+  //not the attrs
+  //JP 27/1/16
   initialize: function(attrs) {
 
     if (!attrs || !attrs.bus) {
@@ -49,8 +52,11 @@ module.exports = Backbone.Model.extend({
     this.searchInterval = SEARCH_DEBOUNCE_INTERVAL;
 
     //assign internal collections
-    this._roomCollection = attrs.roomCollection;
+    this._roomCollection          = attrs.roomCollection;
     delete attrs.roomCollection;
+
+    this._suggestedRoomCollection = attrs.suggestedRoomCollection;
+    delete attrs.suggestedRoomCollection;
 
     //TODO TEST THIS & THROW ERROR JP 25/1/16
     this._orgCollection = attrs.orgCollection;
@@ -113,7 +119,8 @@ module.exports = Backbone.Model.extend({
         this.secondaryCollection.switchCollection(this.suggestedOrgs);
         break;
       case 'all':
-        this.secondaryCollection.switchCollection(this._orgCollection);
+        this._suggestedRoomCollection.fetchForUser();
+        this.secondaryCollection.switchCollection(this._suggestedRoomCollection);
         break;
     }
   },
