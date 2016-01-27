@@ -117,7 +117,7 @@ module.exports = Backbone.Model.extend({
         this.secondaryCollection.switchCollection(this.suggestedOrgs);
         break;
       case 'all':
-        this._suggestedRoomCollection.fetchForUser();
+        this._suggestedRoomCollection.fetchForRoom();
         this.secondaryCollection.switchCollection(this._suggestedRoomCollection);
         break;
     }
