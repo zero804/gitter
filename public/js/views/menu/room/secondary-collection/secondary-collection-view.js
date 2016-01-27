@@ -17,7 +17,6 @@ module.exports = Marionette.CompositeView.extend({
     'change:secondaryCollectionActive': 'onModelChangeSecondaryActiveState',
     'change:searchTerm':                'onSearchTermChange',
     'change:secondaryCollectionHeader': 'render',
-    'change:state':                     'render'
   },
 
   childEvents: {
@@ -44,6 +43,7 @@ module.exports = Marionette.CompositeView.extend({
     //TODO test this JP 8/1/16
     this.bus = attrs.bus;
     this.primaryCollection = attrs.primaryCollection;
+    this.listenTo(this.collection, 'add reset remove update', this.onCollectionUpdate, this);
   },
 
   filter: function(model, index) {//jshint unused: true
@@ -53,8 +53,12 @@ module.exports = Marionette.CompositeView.extend({
   onModelChangeSecondaryActiveState: function(model, val) { /*jshint unused: true*/
     this.render();
     RAF(function() {
-      this.$el.toggleClass('active', !!this.collection.length && val);
+      this.$el.toggleClass('active', val);
     }.bind(this));
+  },
+
+  onCollectionUpdate: function (){
+    this.$el.toggleClass('empty', !this.collection.length);
   },
 
   onItemClicked: function(view) {

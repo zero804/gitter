@@ -41,7 +41,7 @@ module.exports = Marionette.ItemView.extend({
     return _.extend({}, data, {
       name: roomNameShortener((data.name || data.uri)),
     });
-  },
+  }
 
 });
 

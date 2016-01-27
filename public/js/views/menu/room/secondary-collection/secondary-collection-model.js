@@ -16,9 +16,8 @@ module.exports = Backbone.Model.extend({
     Backbone.Model.prototype.constructor.apply(this, arguments);
   },
 
-  onModelChangeState: function(model, val) { //jshint unused: true
-    switch (val) {
-
+  onModelChangeState: function() {
+    switch (this.model.get('state')) {
       case 'search' :
         this.set({
           secondaryCollectionHeader: 'Recent Searches',
@@ -28,17 +27,20 @@ module.exports = Backbone.Model.extend({
       case 'org':
         this.set({
           secondaryCollectionHeader: 'All Rooms',
-          secondaryCollectionActive: true
+          secondaryCollectionActive: true,
         });
         break;
       case 'all':
         this.set({
           secondaryCollectionHeader: 'Your Suggestions',
-          secondaryCollectionActive: true
+          secondaryCollectionActive: true,
         });
         break;
       default:
-        this.set('secondaryCollectionActive', false);
+        this.set({
+          secondaryCollectionHeader: '',
+          secondaryCollectionActive: false,
+        });
 
     }
   },
