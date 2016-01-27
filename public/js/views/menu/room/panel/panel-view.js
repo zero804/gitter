@@ -1,13 +1,14 @@
 'use strict';
 
-var _                       = require('underscore');
-var Marionette              = require('backbone.marionette');
-var PanelHeaderView         = require('../header/header-view');
-var PanelFooterView         = require('../footer/footer-view');
-var PrimaryCollectionView   = require('../primary-collection/primary-collection-view');
-var SecondaryCollectionView = require('../secondary-collection/secondary-collection-view');
-var ProfileMenuView         = require('../profile/profile-menu-view');
-var RAF                     = require('utils/raf');
+var _                        = require('underscore');
+var Marionette               = require('backbone.marionette');
+var PanelHeaderView          = require('../header/header-view');
+var PanelFooterView          = require('../footer/footer-view');
+var PrimaryCollectionView    = require('../primary-collection/primary-collection-view');
+var SecondaryCollectionView  = require('../secondary-collection/secondary-collection-view');
+var SecondaryCollectionModel = require('../secondary-collection/secondary-collection-model');
+var ProfileMenuView          = require('../profile/profile-menu-view');
+var RAF                      = require('utils/raf');
 
 var SearchView            = require('views/menu/room/search-results/search-results-view');
 var SearchInputView       = require('views/menu/room/search-input/search-input-view');
@@ -58,9 +59,10 @@ module.exports = Marionette.LayoutView.extend({
 
   initSecondaryCollection: function(optionsForRegion) {
     return new SecondaryCollectionView(optionsForRegion({
-      collection: this.model.secondaryCollection,
-      model:      this.model,
-      bus:        this.bus,
+      collection:        this.model.secondaryCollection,
+      model:             new SecondaryCollectionModel({}, { model: this.model }),
+      primaryCollection: this.model.primaryCollection,
+      bus:               this.bus,
     }));
   },
 

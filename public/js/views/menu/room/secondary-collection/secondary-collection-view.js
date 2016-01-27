@@ -67,7 +67,7 @@ module.exports = Marionette.CompositeView.extend({
 
   buildChildView: function(model, ItemView, attrs) {
     var index     = this.collection.indexOf(model);
-    var viewIndex = (index + this.model.primaryCollection.length);
+    var viewIndex = (index + this.primaryCollection.length);
     return new ItemView(_.extend({}, attrs, {
       model: model,
       index: viewIndex,
@@ -84,6 +84,7 @@ module.exports = Marionette.CompositeView.extend({
   initialize: function(attrs) {
     //TODO test this JP 8/1/16
     this.bus = attrs.bus;
+    this.primaryCollection = attrs.primaryCollection;
   },
 
   filter: function(model, index) {//jshint unused: true

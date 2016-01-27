@@ -169,7 +169,7 @@ describe('RoomMenuModel', function() {
 
   });
 
-  describe.skip('child collections', function() {
+  describe('child collections', function() {
 
     it('should be instantiated with two child collections', function() {
 
@@ -178,47 +178,13 @@ describe('RoomMenuModel', function() {
 
     });
 
-    describe('primaryCollection', function() {
-      it('should not sort the primary collection', function(done) {
-
-        roomMenuModel.on('primary-collection:snapshot', function() {
-          mockRoomCollection.forEach(function(model, index) {
-            assert.equal(model, roomMenuModel.primaryCollection.at(index));
-          });
-
-          done();
+    it('should not sort the primary collection', function(done) {
+      roomMenuModel.on('primary-collection:snapshot', function() {
+        mockRoomCollection.forEach(function(model, index) {
+          assert.equal(model, roomMenuModel.primaryCollection.at(index));
         });
-
+        done();
       });
-    });
-
-    describe('SecondaryCollection', function() {
-
-      it('should set secondaryCollectionActive only for appropriate states', function(done) {
-        roomMenuModel.on('primary-collection:snapshot', function() {
-            assert.ok(!roomMenuModel.get('secondaryCollectionActive'));
-            roomMenuModel.setState('search');
-            assert.ok(roomMenuModel.get('secondaryCollectionActive'));
-            roomMenuModel.setState('all');
-            assert.ok(!roomMenuModel.get('secondaryCollectionActive'));
-            roomMenuModel.setState('org');
-            assert.ok(roomMenuModel.get('secondaryCollectionActive'));
-            done();
-          });
-      });
-
-      it('should set the secondary header title on appropriate states', function() {
-        roomMenuModel.on('primary-collection:snapshot', function() {
-          assert.equal('', roomMenuModel.get('secondaryCollectionHeader'));
-          roomMenuModel.setState('search');
-          assert.equal('Recent Searches', roomMenuModel.get('secondaryCollectionHeader'));
-          roomMenuModel.setState('org');
-          assert.equal('All Rooms', roomMenuModel.get('secondaryCollectionHeader'));
-          roomMenuModel.setState('all');
-          assert.equal('Your Organisations', roomMenuModel.get('secondaryCollectionHeader'));
-        });
-      });
-
     });
 
     it('should set the roomMenuIsPinned to false if isMobile is true', function(done) {

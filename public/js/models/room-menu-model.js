@@ -103,32 +103,17 @@ module.exports = Backbone.Model.extend({
 
   onSwitchState: function(model, val) {/*jshint unused: true */
 
-    //TODO these should prbably be moved into the secondary collection
-    //jp 7/1/16
+    //TODO Test this JP 27/1/15
     switch (val) {
       case 'search':
         this.secondaryCollection.switchCollection(this.searchTerms);
-        this.set({
-          secondaryCollectionHeader: 'Recent Searches',
-          secondaryCollectionActive: true,
-        });
         break;
       case 'org':
         this.secondaryCollection.switchCollection(this.suggestedOrgs);
-        this.set({
-          secondaryCollectionHeader: 'All Rooms',
-          secondaryCollectionActive: true,
-        });
         break;
       case 'all':
         this.secondaryCollection.switchCollection(this._orgCollection);
-        this.set({
-          secondaryCollectionHeader: 'Your Organisations',
-          secondaryCollectionActive: true,
-        });
         break;
-      default:
-        this.set('secondaryCollectionActive', false);
     }
   },
 
