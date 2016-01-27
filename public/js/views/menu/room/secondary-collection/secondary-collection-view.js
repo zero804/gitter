@@ -91,4 +91,8 @@ module.exports = Marionette.CompositeView.extend({
     }.bind(this), 10);
   },
 
+  onDestroy: function (){
+    this.stopListening(this.collection);
+  },
+
 });

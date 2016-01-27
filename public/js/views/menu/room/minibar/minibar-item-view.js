@@ -131,4 +131,11 @@ module.exports = Marionette.ItemView.extend({
       this.$el.toggleClass('active', val);
     }.bind(this));
   },
+
+
+  onDestroy: function (){
+    this.stopListening(this.dndCtrl);
+    this.stopListening(this.menuModel);
+    this.stopListening(this.bus);
+  },
 });

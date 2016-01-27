@@ -212,6 +212,14 @@ var PrimaryCollectionView = Marionette.CollectionView.extend({
     }.bind(this));
   },
 
+  onDestroy: function (){
+    this.stopListening(this.bus);
+    this.stopListening(this.model);
+    this.stopListening(this.dndCtrl);
+    this.stopListening(this.collection);
+    this.stopListening(context.troupe());
+  },
+
 });
 
 cocktail.mixin(PrimaryCollectionView, KeyboardEventsMixin);

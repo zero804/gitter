@@ -152,4 +152,8 @@ module.exports = Marionette.LayoutView.extend({
     this._initNano({ scrollTo: '[data-collection-index=' + offset + ']' });
   },
 
+  onDestroy: function (){
+    this.stopListening(this.bus);
+  },
+
 });

@@ -102,4 +102,8 @@ module.exports = Marionette.ItemView.extend({
   onItemFocused: function(model, val) {//jshint unused: true
     this.$el.children(':first').toggleClass('focus', !!val);
   },
+
+  onDestroy: function (){
+    this.stopListening(this.uiModel);
+  },
 });

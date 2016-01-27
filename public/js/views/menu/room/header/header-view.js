@@ -70,5 +70,9 @@ module.exports = Marionette.ItemView.extend({
     });
   },
 
+  onDestroy: function(){
+    this.stopListening(this.model.primaryCollection);
+  }
+
 
 });
