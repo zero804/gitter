@@ -16,21 +16,31 @@
     display: none;
   }
 
-  li {
-    position: relative;
-    border-bottom: 1px dotted rgba(100,100,100,0.1);
-    padding: 7px 7px 7px 15px;
-    line-height: 24px;
-    cursor: default;
-    user-select: text;
+  .activity-commit {
+    margin: 0;
   }
 
-  li i {
-    position: absolute;
-    top: 10px;
+  .activity-time {
+    order: 3;
+
+    color: rgba(100,100,100,.4);
   }
 
-  li:hover {
+  .activity-item__icon {
+    float: left;
+  }
+
+}
+
+.activity-item {
+  position: relative;
+  border-bottom: 1px dotted rgba(100,100,100,0.1);
+  padding: 7px 7px 7px 15px;
+  line-height: 24px;
+  cursor: default;
+  user-select: text;
+
+  &:hover {
     background-color: fade(@light,40%);
     color: black;
 
@@ -40,22 +50,18 @@
     }
   }
 
-  .activity-commit {
-    margin: 0;
-  }
-
-  .activity-time {
-    opacity: 1;
-    float: right;
-    color: rgba(100,100,100,0.4);
-    z-index: 100;
-  }
-
-  .activity-item__icon {
-    float: left;
+  & i {
+    position: absolute;
+    top: 10px;
   }
 
 }
+
+.activity-item-inner {
+  display: flex;
+  align-items: flex-start;
+}
+
 
 .gtrActivityItemText {
   vertical-align: middle;

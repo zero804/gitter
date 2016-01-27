@@ -20,7 +20,6 @@ require('components/timezone-cookie');
 
 // Preload widgets
 require('views/widgets/avatar');
-require('views/widgets/timeago');
 require('components/ping');
 require('template/helpers/all');
 require('utils/gesture-controller');

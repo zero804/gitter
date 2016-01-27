@@ -27,9 +27,11 @@ var activityTemplate = require('./tmpl/activity-composite.hbs');
 var activityEmptyTemplate = require('./tmpl/activity-empty.hbs');
 var activityDecorators = require('gitter-web-shared/activity/activity-decorators');
 var context = require('utils/context');
+var timeFormat = require('gitter-web-shared/time/time-format');
+var fullTimeFormat = require('gitter-web-shared/time/full-time-format');
 
-require('views/widgets/timeago');
-require('views/behaviors/widgets');
+require('views/behaviors/timeago');
+require('views/behaviors/tooltip');
 
 module.exports = (function() {
 
@@ -55,6 +57,21 @@ module.exports = (function() {
     watch:          githubWatchTemplate
   };
 
+  function getTemplateForModel(model) {
+    var meta = model.get('meta');
+    var service = meta.service;
+
+    if (service == 'github') {
+      var event = meta.event;
+      return githubTemplates[event];
+    }
+
+    if(meta.prerendered) {
+      return prerenderedTemplate;
+    }
+
+    return serviceTemplates[service];
+  }
 
   var ActivityItemView = Marionette.ItemView.extend({
     tagName: 'li',
@@ -62,22 +79,20 @@ module.exports = (function() {
       change: 'render'
     },
     behaviors: {
-      Widgets: {}
-    },
-    initialize: function() {
-      var meta = this.model.get('meta');
-      var service = meta.service;
-
-      if (service == 'github') {
-        var event = meta.event;
-        this.template = githubTemplates[event];
-      } else {
-        if(!meta.prerendered) {
-          this.template = serviceTemplates[service];
-        } else {
-          this.template = prerenderedTemplate;
-        }
+      TimeAgo: {
+        modelAttribute: 'sent',
+        el: '#time'
+      },
+      Tooltip: {
+        '#time': {
+          titleFn: 'getTimeTooltip',
+          placement: 'left'
+        },
       }
+    },
+
+    initialize: function() {
+      this.template = getTemplateForModel(this.model);
     },
 
     serializeData: function() {
@@ -86,16 +101,19 @@ module.exports = (function() {
         var payload = this.model.get('payload');
         var sent    = this.model.get('sent');
         var html    = this.model.get('html');
+        var sentFormatted = timeFormat(sent, { compact: true });
 
         var core = {
           meta: meta,
           payload: payload,
           sent: sent,
+          sentFormatted: sentFormatted,
           html: html
         };
 
         var extra = meta.prerendered ? {} : activityDecorators(meta, payload);
-        return _.extend(core, extra);
+        var result = _.extend(core, extra);
+        return result;
       } catch (e) {
         var modelData = this.model && this.model.attributes;
         appEvents.trigger('bugreport', e, { extra: modelData });
@@ -108,6 +126,11 @@ module.exports = (function() {
       issueDecorator.decorate(this);
       commitDecorator.decorate(this);
       mentionDecorator.decorate(this);
+    },
+
+    getTimeTooltip: function() {
+      var sent = this.model.get('sent');
+      return fullTimeFormat(sent);
     }
   });
 
