@@ -14,10 +14,12 @@ var intercomOptions = {
 
 var opts = require("nomnom")
    .option('id', {
-      required: false
+      required: false,
+      help: 'Intercom user id'
    })
    .option('user_id', {
-      required: false
+      required: false,
+      help: 'Mongo user id'
    })
    .option('email', {
       required: false
