@@ -77,11 +77,47 @@ function getSuggestionsForUser(user /*, locale */) {
 }
 exports.getSuggestionsForUser = getSuggestionsForUser;
 
+function mostPopularItem(strings) {
+  if (strings.length == 0) return undefined;
+  /*
+  var map = _.countBy(strings);
+  var pairs = _.pairs(map);
+  var max = _.max(pairs, _.last);
+  return max[0];
+  */
+  return _.chain(strings).countBy().pairs().max(_.last).head().value();
+}
 
-function getSuggestionsForRooms(rooms, lang) {
-  lang = lang || 'en';
+function pickLanguageFromRooms(rooms) {
+  // languages that aren't null or undefined
+  // NOTE: only public rooms will have their languages filled in, at least
+  // eventually.
+  var languages = _(rooms).pluck('lang').filter().value();
+
+  // try the most popular non-english one
+  // (or is it better to go with just the most popular one?)
+  var nonEnglish = _.filter(languages, function(lang) { return lang != 'en'; });
+  var mostPopular;
+  if (nonEnglish) {
+    mostPopular = mostPopularItem(nonEnglish);
+    if (mostPopular) {
+      return mostPopular;
+    }
+  }
+
+  // then fall back to english
+  return 'en';
+}
+
+function getSuggestionsForRooms(rooms) {
+  // NOTE: should we just use all the languages?
+  var lang = pickLanguageFromRooms(rooms);
+  console.log(lang);
+
   var roomIds = _.pluck(rooms, 'id');
 
+  // NOTE: include way more than what we'll use, because we're only sampling
+  // the input rooms and we'll be heavily filtering this list later.
   var qry = 'MATCH (r:Room)-[m:MEMBER]-(u:User) '+
     'WHERE r.roomId IN {roomIds} ' +
     'WITH u ORDER BY m.weight LIMIT 1000 ' +
@@ -89,7 +125,7 @@ function getSuggestionsForRooms(rooms, lang) {
     'WHERE r2.lang = "en" OR r2.lang = {lang} AND NOT r2.roomId IN {roomIds} AND r2.security <> "PRIVATE" ' +
     'RETURN r2.roomId AS roomId, count(r2) AS c ' +
     'ORDER BY c DESC ' +
-    'LIMIT 10';
+    'LIMIT 20';
 
   var attrs = {roomIds: roomIds, lang: lang};
   return query(qry, attrs)
