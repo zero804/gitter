@@ -68,29 +68,24 @@ Q.all([
       throw new Error(getMessageFromRoomResult(fromRoomInput, fromRoom) + ' ' + getMessageFromRoomResult(toRoomInput, toRoom));
     }
 
-    /* */
     return confirm()
       .then(function() {
+        // Signify the redirect
         toRoom.renamedLcUris.addToSet(fromRoom.lcUri);
 
         // Move any `renamedLcUris` from the fromRoom to the toRoom
+        // Note: This probably doesn't apply to many situations
         [].concat(fromRoom.renamedLcUris).forEach(function(renamedLcUri) {
           toRoom.renamedLcUris.addToSet(renamedLcUri);
         });
         return toRoom.save();
       })
       .then(function() {
-        console.log('saved toRoom stuff from above');
         return uriLookupService.removeBadUri(fromRoom.lcUri);
       })
       .then(function() {
-        console.log('removed bad URI stuff above');
         return roomService.deleteRoom(fromRoom);
-      })
-      .then(function() {
-        console.log('removed the fromRoom');
       });
-    /* */
   })
   .then(function() {
     console.log('DONE: Shutting down');
