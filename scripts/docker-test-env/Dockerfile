@@ -45,5 +45,6 @@ RUN mkdir -p /data/db/2
 
 COPY ./sentinel.conf /etc/sentinel.conf
 COPY ./run-with-supervisor /usr/bin/run-with-supervisor
+COPY ./setup-gitter-webapp-test-env /usr/bin/setup-gitter-webapp-test-env
 
 ENTRYPOINT ["/usr/bin/run-with-supervisor"]
