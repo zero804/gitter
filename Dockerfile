@@ -45,6 +45,7 @@ RUN mkdir -p /data/db/2
 
 COPY scripts/docker-test-env/sentinel.conf /etc/sentinel.conf
 COPY scripts/docker-test-env/run-with-supervisor /usr/bin/run-with-supervisor
+COPY scripts/docker-test-env/setup-gitter-webapp-test-env /usr/bin/setup-gitter-webapp-test-env
 
 RUN npm install -g npm@latest-2
 RUN npm install -g node-gyp
@@ -52,13 +53,13 @@ RUN npm install -g node-gyp
 RUN mkdir /src
 
 WORKDIR /src
-COPY package.json package.json
-COPY npm-shrinkwrap.json npm-shrinkwrap.json
-COPY modules/ modules/
-COPY shared/ shared/
+#COPY package.json package.json
+#COPY npm-shrinkwrap.json npm-shrinkwrap.json
+#COPY modules/ modules/
+#COPY shared/ shared/
 
-RUN sed 's#http://beta-internal:4873/#http://10.0.0.140:4873/#g' -ibak npm-shrinkwrap.json
-RUN npm install --registry http://10.0.0.140:4873/
+#RUN sed 's#http://beta-internal:4873/#http://10.0.0.140:4873/#g' -ibak npm-shrinkwrap.json
+#RUN npm install --registry http://10.0.0.140:4873/
 
 COPY . .
 
