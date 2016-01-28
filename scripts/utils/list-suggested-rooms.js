@@ -17,7 +17,6 @@ var opts = require("nomnom")
   })
   .parse();
 
-
 function getRooms() {
   var lang = opts.lang || 'en';
   if (opts.uri) {
@@ -39,38 +38,13 @@ function getRooms() {
           uri: 1,
           lang: 1,
           name: 1,
-          userCount: 1
+          userCount: 1,
+          oneToOne: 1
         });
       });
   } else {
     throw new Error('uri or username required');
   }
-}
-
-function mostPopularItem(strings) {
-  if (strings.length == 0) return undefined;
-  return _(strings).countBy().toPairs().max(_.last).head().value();
-}
-
-function pickLanguageFromRooms(rooms) {
-  // languages that aren't null or undefined
-  // NOTE: only public rooms will have their languages filled in, at least
-  // eventually.
-  var languages = _(rooms).pluck('lang').filter().value();
-
-  // try the most popular non-english one
-  // (or is it better to go with just the most popular one?)
-  var nonEnglish = _.filter(languages, function(lang) { return lang != 'en'; });
-  var mostPopular;
-  if (nonEnglish) {
-    mostPopular = mostPopularItem(nonEnglish);
-    if (mostPopular) {
-      return mostPopular;
-    }
-  }
-
-  // then fall back to english
-  return 'en';
 }
 
 getRooms()
@@ -86,9 +60,7 @@ getRooms()
     });
 
     console.log("input", rooms);
-    var lang = pickLanguageFromRooms(rooms);
-    console.log("lang", lang)
-    return suggestions.getSuggestionsForRooms(rooms, lang);
+    return suggestions.getSuggestionsForRooms(rooms);
   })
   .then(function(suggestions) {
     var roomIds = _.pluck(suggestions, 'roomId');
