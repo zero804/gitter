@@ -10,10 +10,9 @@ var shutdown = require('shutdown');
 var userService = require('../../server/services/user-service');
 var troupeService = require('../../server/services/troupe-service');
 var roomMembershipService = require('../../server/services/room-membership-service');
-var chatService = require('../../server/services/chat-service');
+var suggestionsService = require('../../server/services/suggestions-service');
 
 var suggestions = require('gitter-web-suggestions');
-var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
 
 var Intercom = require('intercom-client');
 var intercomOptions = {
@@ -57,65 +56,13 @@ function getRoomsForUser(user) {
       // order to get the suggestions. The rest is just for debugging.
       return troupeService.findByIdsLean(roomIds, {
         uri: 1,
+        lcOwner: 1,
         lang: 1,
         name: 1,
         userCount: 1,
         oneToOne: 1
       });
     });
-}
-
-function getSuggestedRoomsForRooms(rooms) {
-  // TODO: replace this with the waterfall method
-
-  // 1to1 rooms aren't included in the graph anyway, so filter them out
-  rooms = _.filter(rooms, function(room) {
-    return room.oneToOne != true;
-  });
-
-  // Cap it, because a user that's in a lot of rooms (like mydigitalself)
-  // can really grind neo4j to a halt.
-  // (ideally we should have capped the ids before loading the rooms in, but we
-  // have to load the rooms in order to filter out oneToOnes first..)
-  rooms = rooms.slice(0, 10);
-
-  return suggestions.getSuggestionsForRooms(rooms)
-    .then(function(suggestions) {
-      console.log(suggestions);
-      var roomIds = _.pluck(suggestions, 'roomId');
-      return troupeService.findByIdsLean(roomIds, {
-        uri: 1,
-        name: 1, // for debugging only
-        topic: 1, // used as description
-        userCount: 1
-      });
-    })
-    .then(function(rooms) {
-      // pre-fill the extra values we'll need
-      return Q.all(rooms.map(function(room) {
-        room.avatarUrl = resolveRoomAvatarUrl(room, 80);
-        return chatService.getRoughMessageCount(room.id)
-          .then(function(messageCount) {
-            room.messageCount = messageCount;
-          });
-      }))
-      .then(function() {
-        return rooms;
-      });
-    });
-}
-
-function suggestionsToAttributes(suggestions) {
-  suggestions = suggestions.slice(0, 5);
-  var attrs = {};
-  suggestions.forEach(function(suggestion, index) {
-    attrs['suggestion'+index+'_uri'] = suggestion.uri;
-    attrs['suggestion'+index+'_avatar'] = suggestion.avatarUrl;
-    attrs['suggestion'+index+'_description'] = suggestion.topic;
-    attrs['suggestion'+index+'_users'] = suggestion.userCount;
-    attrs['suggestion'+index+'_messages'] = suggestion.messageCount;
-  });
-  return attrs;
 }
 
 var user;
@@ -127,24 +74,25 @@ getUserFromMongo(opts)
   })
   .then(function(_rooms) {
     rooms = _rooms;
-    return getSuggestedRoomsForRooms(rooms);
+    return suggestionsService.findSuggestionsForRooms(rooms);
   })
   .then(function(suggestions) {
     //console.log(user);
     // email (and user_id?) should be enough to uniquely identify the user.
     // Create against an existing user acts as an update.
     // All fields that you're not changing remain set as is.
+    console.log(_.pluck(suggestions, 'uri'));
     var profile = {
       email: user.email,
       user_id: user._id,
-      custom_attributes: suggestionsToAttributes(suggestions)
+      custom_attributes: suggestionsService.suggestionsToAttributes(suggestions)
     };
     //console.log(profile);
     var client = new Intercom.Client(intercomOptions).usePromises();
     return client.users.create(profile);
   })
   .then(function(intercomUser) {
-    console.log(intercomUser);
+    console.log(intercomUser.body);
   })
   .then(function() {
     shutdown.shutdownGracefully();
