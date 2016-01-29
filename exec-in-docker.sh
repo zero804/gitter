@@ -16,4 +16,4 @@ function finish {
 trap finish EXIT
 
 docker-compose -p "webapp-${ISOLATED_UNIQ_ID}" -f docker-compose.internal.yml run -d mongosetup
-docker-compose -p "webapp-${ISOLATED_UNIQ_ID}" -f docker-compose.internal.yml run --rm --entrypoint "$(join ' ' "$@")" --no-recreate internal-min
+docker-compose -p "webapp-${ISOLATED_UNIQ_ID}" -f docker-compose.internal.yml run --rm --entrypoint "$(join ' ' "$@")" internal-min
