@@ -95,6 +95,14 @@ Migrates all chat messages from one room to another. Requires two rooms.
 
 e.g `./scripts/utils/migrate-messages.js --from trevorah/oldroom --to trevorah/newroom`
 
+
+### redirect-room.js
+
+Redirect `roomA` to `roomB`. *note:* this will delete `roomA`
+
+e.g `./scripts/utils/redirect-room.js -f fromroom -t toroom`
+
+
 ### node hellban.js <username> [options]
 
 username     username to hellban e.g trevorah
