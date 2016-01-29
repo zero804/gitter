@@ -6,7 +6,7 @@ redis1:
   restart: always
   ports:
     - "6379:6379"
-  entrypoint: [ "/usr/local/bin/redis-server", "--bind", "0.0.0.0", "--port", "6379", "--maxclients", "200"]
+  entrypoint: [ "/usr/local/bin/redis-server", "--bind", "0.0.0.0", "--port", "6379", "--maxclients", "200", "--dir", "/tmp", "--save", ""]
 
 redis2:
   image: redis:3.0.3
@@ -17,7 +17,7 @@ redis2:
     - redis1
   extra_hosts:
      - gitter-redis-dev:${DOCKER_HOST_IP}
-  entrypoint: [ "/usr/local/bin/redis-server", "--bind", "0.0.0.0",  "--port", "6380", "--slaveof", "gitter-redis-dev", "6379", "--maxclients", "200"]
+  entrypoint: [ "/usr/local/bin/redis-server", "--bind", "0.0.0.0",  "--port", "6380", "--slaveof", "gitter-redis-dev", "6379", "--maxclients", "200", "--dir", "/tmp", "--save", ""]
 
 sentinel1:
   image: redis:3.0.3
