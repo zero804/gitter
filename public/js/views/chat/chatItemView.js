@@ -241,7 +241,10 @@ module.exports = (function() {
       // See `link-handler.js -> installLinkHandler`
       // That event would cause a `router-app.js -> postMessage('permalink.navigate')` to the chat frame and
       // highlight the message, see `router-chat.js -> case 'permalink.navigate'`
-      dataset.set(this.ui.timestampLink[0], 'disableRouting', true);
+      var timestampLinkElement = this.ui.timestampLink[0];
+      if(timestampLinkElement) {
+        dataset.set(timestampLinkElement, 'disableRouting', true);
+      }
     },
 
     onRender: function () {
@@ -256,11 +259,12 @@ module.exports = (function() {
       // this.$el.toggleClass('cantEdit', !canEdit);
     },
 
-    /* jshint maxcomplexity: 27 */
+    /* jshint maxcomplexity: 29 */
     updateRender: function(changes) {
       /* NB: `unread` updates occur in the behaviour */
       var model = this.model;
       var $el = this.$el;
+      var sentElement = this.ui.sent[0];
       var classList = this.el.classList;
 
 
@@ -277,17 +281,21 @@ module.exports = (function() {
       }
 
       if (changes && 'id' in changes) {
-        var permalinkUrl = this.getPermalinkUrl();
-        if(permalinkUrl.length) {
-          this.ui.sent[0].setAttribute('href', permalinkUrl);
+        if(sentElement) {
+          var permalinkUrl = this.getPermalinkUrl();
+          if (permalinkUrl.length) {
+            sentElement.setAttribute('href', permalinkUrl);
+          }
         }
       }
 
       if (changes && 'sent' in changes) {
-        var time = this.model.get('sent');
-        if (time) {
-          var formattedTime = fullTimeFormat(time);
-          this.ui.sent[0].setAttribute('title', formattedTime);
+        if(sentElement) {
+          var time = this.model.get('sent');
+          if (time) {
+            var formattedTime = fullTimeFormat(time);
+            sentElement.setAttribute('title', formattedTime);
+          }
         }
       }
 
