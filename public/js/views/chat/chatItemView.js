@@ -256,7 +256,7 @@ module.exports = (function() {
       // this.$el.toggleClass('cantEdit', !canEdit);
     },
 
-    /* jshint maxcomplexity: 27 */
+    /* jshint maxcomplexity: 28 */
     updateRender: function(changes) {
       /* NB: `unread` updates occur in the behaviour */
       var model = this.model;
@@ -292,7 +292,12 @@ module.exports = (function() {
       }
 
       if(!changes || 'mentioned' in changes) {
-        toggleClass('mentioned', model.get('mentioned'));
+        var wasMentioned = model.get('mentioned');
+        toggleClass('mentioned', wasMentioned);
+        if(wasMentioned) {
+          this.el.setAttribute('aria-live', 'assertive');
+          this.el.setAttribute('role', 'alert');
+        }
       }
 
       if(!changes || 'fromUser' in changes) {
