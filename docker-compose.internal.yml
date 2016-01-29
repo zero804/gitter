@@ -102,10 +102,10 @@ internal-min:
   links:
     - redis1
     - redis2
-    - mongo1:gitter-mongo-dev
+    - mongo1
     - mongo2
     - mongo3
-    - sentinel1:gitter-redis-dev
+    - sentinel1
   volumes:
    - ${WORKSPACE}:/src
   working_dir: /src
@@ -116,12 +116,12 @@ internal:
   links:
     - redis1
     - redis2
-    - neo4j:gitter-neo4j-dev
-    - mongo1:gitter-mongo-dev
+    - neo4j
+    - mongo1
     - mongo2
     - mongo3
-    - elasticsearch:gitter-es-dev
-    - sentinel1:gitter-redis-dev
+    - elasticsearch
+    - sentinel1
   volumes:
    - ${WORKSPACE}:/src
   working_dir: /src
