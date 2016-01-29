@@ -78,7 +78,7 @@ function getSuggestionsForUser(user /*, locale */) {
 exports.getSuggestionsForUser = getSuggestionsForUser;
 
 function mostPopularItem(strings) {
-  if (strings.length == 0) return undefined;
+  if (strings.length === 0) return undefined;
   /*
   var map = _.countBy(strings);
   var pairs = _.pairs(map);
