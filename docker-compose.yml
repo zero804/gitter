@@ -4,7 +4,6 @@
 redis1:
   image: redis:3.0.3
   restart: always
-  hostname: redis1
   ports:
     - "6379:6379"
   entrypoint: [ "/usr/local/bin/redis-server", "--bind", "0.0.0.0", "--port", "6379", "--maxclients", "200"]
@@ -12,7 +11,6 @@ redis1:
 redis2:
   image: redis:3.0.3
   restart: always
-  hostname: redis2
   ports:
     - "6380:6380"
   links:
@@ -24,7 +22,6 @@ redis2:
 sentinel1:
   image: redis:3.0.3
   restart: 'on-failure:5'
-  hostname: sentinel1
   links:
     - redis1
     - redis2
@@ -38,7 +35,6 @@ sentinel1:
 # Mongo
 #
 mongo2:
-  hostname: mongo2
   image: mongo:3.0
   restart: always
   entrypoint: [ "/usr/bin/mongod", "--replSet", "troupeSet", "--journal", "--smallfiles", "--storageEngine=wiredTiger", "--oplogSize=20", "--port=27018" ]
@@ -46,7 +42,6 @@ mongo2:
     - "27018:27018"
 
 mongo3:
-  hostname: mongo3
   image: mongo:3.0
   restart: always
   entrypoint: [ "/usr/bin/mongod", "--replSet", "troupeSet", "--journal", "--smallfiles", "--storageEngine=wiredTiger", "--oplogSize=20", "--port=27019" ]
@@ -54,7 +49,6 @@ mongo3:
     - "27019:27019"
 
 mongo1:
-  hostname: mongo1
   image: mongo:3.0
   restart: always
   entrypoint: [ "/usr/bin/mongod", "--replSet", "troupeSet", "--journal", "--smallfiles", "--storageEngine=wiredTiger", "--oplogSize=20" ]

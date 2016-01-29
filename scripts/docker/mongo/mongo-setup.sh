@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eo pipefail
+set -e
 set -x
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -21,11 +21,9 @@ done
 if [[ "$(mongoeval 'rs.status().ok')" != "1" ]]; then
 	echo Replicaset not initialised. Initialising
 
-  if [[ -n "$RESOLVE_IPS" ]]; then
-    ANNOUNCE_MONGO1_HOST=$(resolve "${ANNOUNCE_MONGO1_HOST}")
-    ANNOUNCE_MONGO2_HOST=$(resolve "${ANNOUNCE_MONGO2_HOST}")
-    ANNOUNCE_MONGO3_HOST=$(resolve "${ANNOUNCE_MONGO3_HOST}")
-  fi
+  ANNOUNCE_MONGO1_HOST=$(resolve "mongo1")
+  ANNOUNCE_MONGO2_HOST=$(resolve "mongo2")
+  ANNOUNCE_MONGO3_HOST=$(resolve "mongo3")
 
 	mongo mongo1:27017/admin <<-DELIM
 		rs.initiate({_id: 'troupeSet', members: [
