@@ -4,14 +4,14 @@
 redis1:
   image: redis:3.0.3
   restart: always
-  entrypoint: [ "/usr/local/bin/redis-server", "--bind", "0.0.0.0", "--port", "6379", "--maxclients", "200"]
+  entrypoint: [ "/usr/local/bin/redis-server", "--bind", "0.0.0.0", "--port", "6379", "--maxclients", "200", "--dir", "/tmp", "--save", ""]
 
 redis2:
   image: redis:3.0.3
   restart: always
   links:
     - redis1
-  entrypoint: [ "/usr/local/bin/redis-server", "--bind", "0.0.0.0",  "--port", "6380", "--slaveof", "redis1", "6379", "--maxclients", "200"]
+  entrypoint: [ "/usr/local/bin/redis-server", "--bind", "0.0.0.0",  "--port", "6380", "--slaveof", "redis1", "6379", "--maxclients", "200", "--dir", "/tmp", "--save", ""]
 
 sentinel1:
   image: redis:3.0.3

@@ -42,4 +42,4 @@ if [[ "$(mongoeval 'rs.status().ok')" != "1" ]]; then
 	done
 fi
 
-${SCRIPT_DIR}/../../upgrade-data.sh mongo1 gitter
+SKIP_BACKUP=yes ${SCRIPT_DIR}/../../upgrade-data.sh mongo1 gitter
