@@ -106,6 +106,9 @@ internal-min:
     - mongo2
     - mongo3
     - sentinel1
+  environment:
+    SU_TO_USER: ${SU_TO_USER}
+    SU_TO_UID: ${SU_TO_UID}
   volumes:
    - ${WORKSPACE}:/src
   working_dir: /src
