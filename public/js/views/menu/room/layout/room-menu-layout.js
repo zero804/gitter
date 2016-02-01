@@ -57,6 +57,9 @@ module.exports = Marionette.LayoutView.extend({
     }
 
     this.roomCollection          = attrs.roomCollection;
+
+    //TODO TEST THIS & FIGURE OUT IF THEY ARE REQUIRED FOR MOBILE?
+    //JP 28/1/16
     this.orgCollection           = attrs.orgCollection;
     this.suggestedRoomCollection = attrs.suggestedRoomCollection;
 

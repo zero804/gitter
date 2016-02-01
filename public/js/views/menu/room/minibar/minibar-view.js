@@ -10,6 +10,8 @@ require('nanoscroller');
 
 var MiniBarView = Marionette.ItemView.extend({
 
+  //TODO JP 28/1/16
+  //Move keyboard events out into keyboard ctrl singleton
   keyboardEvents: {
      'room.1 room.2 room.3 room.4 room.5 room.6 room.7 room.8 room.9': 'onKeypressFocus',
   },
@@ -34,6 +36,7 @@ var MiniBarView = Marionette.ItemView.extend({
     //Feels icky to pull this out of the dom
     //but we have to because it's pre rendered
     //and not stored in the context
+    //JP 28/1/16
     var _roomMenuItems = Array.prototype.slice.apply(this.$el.find('[data-state-change]'));
     _roomMenuItems.forEach(function(el, index) {
 
@@ -137,7 +140,7 @@ var MiniBarView = Marionette.ItemView.extend({
   //TODO this feals too much like the above function, start extracting the functionality
   onKeypressFocus: function(e, handler) {//jshint unused: true
     var index = handler.key.split('+').slice(-1)[0];
-    index = parseInt(index, 10) - 1;
+    index     = parseInt(index, 10) - 1;
     var nextActiveModel = this.roomMenuItemModels.at(index);
     if (!nextActiveModel) { return }
 

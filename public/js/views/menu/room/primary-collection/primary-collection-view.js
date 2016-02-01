@@ -67,10 +67,10 @@ var PrimaryCollectionView = Marionette.CollectionView.extend({
   onModelStateChange: function(model, val) { /*jshint unused: true*/
 
     if (model.get('state') === 'favourite') {
-      //This feels gross
+      //TODO This feels gross
       this.collection.comparator = this.sortFavourites;
 
-      //a sort will trigger a render so we can skip out on the render part
+      //TODO a sort will trigger a render so we can skip out on the render part
       this.collection.sort();
     } else {
       this.collection.comparator = null;
@@ -85,7 +85,7 @@ var PrimaryCollectionView = Marionette.CollectionView.extend({
   onItemClicked: function(view) {
     var viewModel = view.model;
 
-    //DRY
+    //TODO This could be alot more DRY JP 27/1/16
     var name = (viewModel.get('uri') || viewModel.get('url'));
     var url  = (name[0] !== '/') ?  '/' + name : name;
 
@@ -95,6 +95,7 @@ var PrimaryCollectionView = Marionette.CollectionView.extend({
     }
 
     //reset any models that have keyboard focus
+    //TODO ABSTRACT THIS TO KEYBOARD CTRL
     var focusedModels = this.collection.where({ focus: true });
     focusedModels.forEach(function(model) { model.set('focus', false)});
 
@@ -104,7 +105,7 @@ var PrimaryCollectionView = Marionette.CollectionView.extend({
     }.bind(this), 250);
   },
 
-  //TODO The filter should be resued within the view filter method?
+  //TODO The filter should be reused within the view filter method?
   onFavouriteAdded: function(id) {
     var newFavModel = this.collection.get(id);
     var favIndex    = this.collection

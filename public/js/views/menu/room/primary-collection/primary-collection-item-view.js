@@ -19,8 +19,8 @@ module.exports = Marionette.ItemView.extend({
   attributes: function() {
     var delay = (0.003125 * this.index);
     return {
-      'data-room-id': this.model.get('id'),
-      'style': 'transition-delay: ' + delay + 's',
+      'data-room-id':          this.model.get('id'),
+      'style':                 'transition-delay: ' + delay + 's',
       'data-collection-index': this.index,
     };
   },
@@ -103,7 +103,7 @@ module.exports = Marionette.ItemView.extend({
     this.$el.children(':first').toggleClass('focus', !!val);
   },
 
-  onDestroy: function (){
+  onDestroy: function() {
     this.stopListening(this.uiModel);
   },
 });
