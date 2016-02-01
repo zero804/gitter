@@ -98,8 +98,11 @@ var Behavior = Marionette.Behavior.extend({
   },
 
   renderTime: function(time) {
-    var text = timeFormat(time, { compact: this.options.compact });
-    this.ui.time[0].textContent = text;
+    var timeElement = this.ui.time[0];
+    if(timeElement) {
+      var text = timeFormat(time, { compact: this.options.compact });
+      timeElement.textContent = text;
+    }
   },
 
   onDestroy: function() {
