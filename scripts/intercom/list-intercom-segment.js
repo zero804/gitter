@@ -5,14 +5,14 @@ var config = env.config;
 
 var _ = require('lodash');
 var shutdown = require('shutdown');
-
 var Intercom = require('intercom-client');
+var IntercomStream = require('../../server/utils/intercom-stream');
+
 var intercomOptions = {
   appId: config.get("stats:intercom:app_id"),
   appApiKey: config.get("stats:intercom:key")
 };
 
-var IntercomStream = require('../../server/utils/intercom-stream');
 
 var opts = require("nomnom")
    .option('segment', {
