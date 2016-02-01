@@ -510,6 +510,15 @@ gulp.task('uglify', ['webpack'], function() {
     .pipe(gulp.dest('output/assets/js'));
 });
 
+gulp.task('embedded-uglify', ['embedded-webpack'], function() {
+  var sourceMapOpts = getSourceMapOptions();
+  return gulp.src('output/assets/js/*.js')
+    .pipe(sourcemaps.init({ /* loadMaps: true */ }))
+    .pipe(uglify(getUglifyOptions()))
+    .pipe(sourcemaps.write(sourceMapOpts.dest, sourceMapOpts.options))
+    .pipe(gulp.dest('output/assets/js'));
+});
+
 gulp.task('build-assets', ['copy-asset-files', 'css', 'webpack', 'uglify']);
 
 gulp.task('compress-assets', ['build-assets'], function() {
@@ -584,4 +593,4 @@ gulp.task('embedded-copy-asset-files', function() {
 });
 
 
-gulp.task('embedded-package', ['embedded-webpack', 'css-ios', 'embedded-copy-asset-files']);
+gulp.task('embedded-package', ['embedded-uglify', 'css-ios', 'embedded-copy-asset-files']);
