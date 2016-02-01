@@ -72,7 +72,7 @@ module.exports = Marionette.LayoutView.extend({
       roomCollection:          this.roomCollection,
       orgCollection:           this.orgCollection,
       userModel:               context.user(),
-      suggestedRoomCollection: this.suggestedRoomCollection,
+      troupeModel:             context.troupe(),
 
       //TODO id this the best way to do this? JP 12/1/16
       isMobile:                $('body').hasClass('mobile'),

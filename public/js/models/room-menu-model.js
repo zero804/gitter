@@ -1,12 +1,13 @@
 'use strict';
 
-var Backbone                 = require('backbone');
-var _                        = require('underscore');
-var ProxyCollection          = require('backbone-proxy-collection');
-var RecentSearchesCollection = require('../collections/recent-searches');
-var SuggestedOrgCollection   = require('../collections/org-suggested-rooms');
-var apiClient                = require('components/apiClient');
-var FilteredRoomCollection   = require('../collections/filtered-room-collection.js');
+var Backbone                       = require('backbone');
+var _                              = require('underscore');
+var ProxyCollection                = require('backbone-proxy-collection');
+var RecentSearchesCollection       = require('../collections/recent-searches');
+var SuggestedOrgCollection         = require('../collections/org-suggested-rooms');
+var apiClient                      = require('components/apiClient');
+var FilteredRoomCollection         = require('../collections/filtered-room-collection.js');
+var SuggestedRoomsByRoomCollection = require('../collections/left-menu-suggested-by-room');
 
 var states = [
   'all',
@@ -53,8 +54,13 @@ module.exports = Backbone.Model.extend({
     this._roomCollection          = attrs.roomCollection;
     delete attrs.roomCollection;
 
-    this._suggestedRoomCollection = attrs.suggestedRoomCollection;
-    delete attrs.suggestedRoomCollection;
+    this._troupeModel = attrs.troupeModel;
+    delete attrs.troupeModel;
+
+    this._suggestedRoomCollection = new SuggestedRoomsByRoomCollection(null, {
+      roomMenuModel: this,
+      troupeModel:   this._troupeModel,
+    });
 
     //TODO TEST THIS & THROW ERROR JP 25/1/16
     this._orgCollection = attrs.orgCollection;
@@ -70,7 +76,7 @@ module.exports = Backbone.Model.extend({
     this.suggestedOrgs       = new SuggestedOrgCollection([], { contextModel: this });
 
     this.primaryCollection   = new FilteredRoomCollection(null, {
-      roomModel: this,
+      roomModel:  this,
       collection: this._roomCollection,
     });
 
@@ -117,7 +123,6 @@ module.exports = Backbone.Model.extend({
         this.secondaryCollection.switchCollection(this.suggestedOrgs);
         break;
       case 'all':
-        this._suggestedRoomCollection.fetchForRoom();
         this.secondaryCollection.switchCollection(this._suggestedRoomCollection);
         break;
     }

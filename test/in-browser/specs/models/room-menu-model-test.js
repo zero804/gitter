@@ -27,6 +27,7 @@ describe('RoomMenuModel', function() {
       roomCollection: mockRoomCollection,
       userModel:      new Backbone.Model(),
       orgCollection:  new Backbone.Collection(null),
+      troupeModel:    new Backbone.Model(),
     });
 
   });

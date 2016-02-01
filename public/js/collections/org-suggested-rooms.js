@@ -12,7 +12,7 @@ module.exports = Backbone.Collection.extend({
     }
 
     this.contextModel = attrs.contextModel;
-    this.urlModel = backboneUrlResolver('/v1/orgs/:selectedOrgName/suggestedRooms', this.contextModel);
+    this.urlModel     = backboneUrlResolver('/v1/orgs/:selectedOrgName/suggestedRooms', this.contextModel);
     this.listenTo(this.contextModel, 'change:selectedOrgName', this.onOrgNameUpdate, this);
   },
 

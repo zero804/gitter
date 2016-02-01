@@ -29,15 +29,13 @@ module.exports = (function () {
       this.roomCollection          = options.roomCollection;
       this.orgCollection           = options.orgCollection;
       this.dialogRegion            = modalRegion;
-      this.suggestedRoomCollection = options.suggestedRoomCollection;
     },
 
     initMenuRegion: function (optionsForRegion){
       return new RoomMenuLayout(optionsForRegion({
         bus:                     appEvents,
         roomCollection:          this.roomCollection,
-        orgCollection:           this.orgCollection,
-        suggestedRoomCollection: this.suggestedRoomCollection,
+        orgCollection:           this.orgCollection
       }));
     },
 

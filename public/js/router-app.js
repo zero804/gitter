@@ -21,7 +21,6 @@ var debug                             = require('debug-proxy')('app:router-app')
 var urlParser                         = require('./utils/url-parser');
 var linkHandler                       = require('./components/link-handler');
 var roomListGenerator                 = require('./components/chat-cache/room-list-generator');
-var FilteredSuggestedRoomsCollections = require('./collections/suggested-rooms').Filtered;
 
 
 require('components/statsc');
@@ -162,10 +161,6 @@ onready(function() {
     roomCollection: troupeCollections.troupes,
     //TODO ADD THIS TO MOBILE JP 25/1/16
     orgCollection: troupeCollections.orgs,
-    suggestedRoomCollection: new FilteredSuggestedRoomsCollections(null, {
-      //This seems a bit messy JP 27/1/16
-      roomsCollection: troupeCollections.troupes
-    })
   });
   appLayout.render();
 
