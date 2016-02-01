@@ -24,7 +24,6 @@ var roomListGenerator                 = require('./components/chat-cache/room-li
 var FilteredSuggestedRoomsCollections = require('./collections/suggested-rooms').Filtered;
 
 
-
 require('components/statsc');
 require('views/widgets/preload');
 require('components/webNotifications');
@@ -449,7 +448,7 @@ onready(function() {
         });
       }
 
-      getParentRoomUri(function(err, parentUri) {
+      getParentRoomUri(function(err, parentUri) {//jshint unused: true
         //if (err) {
         // ignore, carry on regardless
         //}
