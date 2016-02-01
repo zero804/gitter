@@ -1,4 +1,3 @@
-/*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
 exports.install = function(app) {
@@ -19,19 +18,6 @@ exports.install = function(app) {
         aggregateTimeout: 400
       },
       publicPath: "/_s/l/js/",
-      stats: {
-          colors: true
-      }
-  }));
-
-  app.use(webpackMiddleware(webpack(require('../../public/js/webpack-halley.config')), {
-      noInfo: false,
-      quiet: false,
-      lazy: true,
-      watchOptions: {
-        aggregateTimeout: 400
-      },
-      publicPath: "/_s/l/js/halley",
       stats: {
           colors: true
       }

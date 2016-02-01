@@ -48,7 +48,10 @@ var Behavior = Marionette.Behavior.extend({
 
       var $el = selector === '' ? self.$el : self.$el.find(selector);
       var el = $el[0];
-      if (!el) return; // Cannot find element? Don't continue
+      if (!el) {
+        // Cannot find element? Don't continue
+        return;
+      }
 
       var handler = self.createHandler($el, el, selector);
       el.addEventListener('mouseover', handler, false);

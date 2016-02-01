@@ -32,7 +32,7 @@
       <div class="right-toolbar" style="overflow: auto">
         <div class="gtrArchiveToolbarWrapper">
           {{#if isHomePage}}
-            <div class="gtrArchiveInfoContainer" style="height: 325px;">
+            <div class="gtrArchiveInfoContainer">
                 <div class="gtrArchiveLogo">
                   <div class="logo-container"></div>
                 </div>
@@ -78,9 +78,9 @@
               {{/user}}
             {{/if}}
           <div id="archive-navigation" class="gtrArchiveNavigationWrapper">
-            {{#if archiveChats}}
+            {{~#if archiveChats~}}
               {{{ prerenderView "js/views/archive/tmpl/archive-navigation-view" }}}
-            {{/if}}
+            {{~/if~}}
           </div>
           {{#unless isHomePage}}
             {{#if user}}

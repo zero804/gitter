@@ -18,7 +18,10 @@ require('components/ping');
 
 // Preload widgets
 require('views/widgets/avatar');
-require('views/widgets/timeago');
+
+require('gitter-styleguide/css/components/buttons.css');
+
+
 
 onready(function() {
 
@@ -69,5 +72,7 @@ onready(function() {
   } catch (err) {
     // TODO: Handle the error? WC.
   }
+
+
 
 });

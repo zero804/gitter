@@ -22,6 +22,14 @@ describe('user avatar url generator', function() {
       var result = resolveUserAvatarUrl(user, 40)
       assert.equal(result, user.gravatarImageUrl+'?sz=40');
     });
+
+    it('should return a twitter url for a twitter gravatarImageUrl', function() {
+      var user = {
+        gravatarImageUrl: 'https://pbs.twimg.com/profile_images/378800000308609669/c5cc5261cc55da2dbca442eaf60920cc_normal.jpeg'
+      };
+      var result = resolveUserAvatarUrl(user, 60)
+      assert.equal(result, 'https://pbs.twimg.com/profile_images/378800000308609669/c5cc5261cc55da2dbca442eaf60920cc_bigger.jpeg');
+    });
   });
 
   describe('when passed a serialized user', function() {

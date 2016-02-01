@@ -1,6 +1,6 @@
 .service-sprite {
   background: url( 'services.png' ) no-repeat;
-  background-size: 112px 98px;
+  background-size: 128px 98px;
 }
 
 .service-sprite.codecov-logo {
@@ -9,7 +9,7 @@
   background-position: 0 0;
 }
 
-.service-sprite.drone-smile {
+.service-sprite.gitbook-logo {
   width: 16px;
   height: 16px;
   background-position: -16px 0;
@@ -129,13 +129,13 @@
   background-position: -80px 0;
 }
 
-.service-sprite.appveyor-logo {
+.service-sprite.drone-smile {
   width: 16px;
   height: 16px;
   background-position: -80px -16px;
 }
 
-.service-sprite.gitbook-logo {
+.service-sprite.appveyor-logo {
   width: 16px;
   height: 16px;
   background-position: -80px -32px;
@@ -231,28 +231,40 @@
   background-position: -32px -82px;
 }
 
-.service-sprite.travis-frown {
+.service-sprite.trackjs-error {
   width: 16px;
   height: 16px;
   background-position: -48px -82px;
 }
 
-.service-sprite.travis-logo {
+.service-sprite.trackjs-logo {
   width: 16px;
   height: 16px;
   background-position: -64px -82px;
 }
 
-.service-sprite.travis-meh {
+.service-sprite.travis-frown {
   width: 16px;
   height: 16px;
   background-position: -80px -82px;
 }
 
-.service-sprite.travis-smile {
+.service-sprite.travis-logo {
   width: 16px;
   height: 16px;
   background-position: -96px -82px;
+}
+
+.service-sprite.travis-meh {
+  width: 16px;
+  height: 16px;
+  background-position: -112px 0;
+}
+
+.service-sprite.travis-smile {
+  width: 16px;
+  height: 16px;
+  background-position: -112px -16px;
 }
 
 
@@ -263,7 +275,7 @@
 (min-device-pixel-ratio: 2) {
 .service-sprite {
   background: url( 'services@2x.png' ) no-repeat;
-  background-size: 112px 97.5px;
+  background-size: 128px 97.5px;
 }
 
 }

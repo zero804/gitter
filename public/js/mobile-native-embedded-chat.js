@@ -17,7 +17,6 @@ require('components/ping');
 
 // Preload widgets
 require('views/widgets/avatar');
-require('views/widgets/timeago');
 require('template/helpers/all');
 
 onready(function() {

@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 require('../server/services/persistence-service');
