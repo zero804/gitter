@@ -1,7 +1,7 @@
 "use strict";
 
 var StatusError = require('statuserror');
-var Q = require('Q');
+var Q = require('q');
 
 /* Ensure that the last promise has returned a value */
 exports.required = function(value) {
