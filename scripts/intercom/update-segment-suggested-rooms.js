@@ -1,26 +1,17 @@
 "use strict";
 
-var env = require('gitter-web-env');
-var config = env.config;
-
 var Q = require('q');
 var _ = require('lodash');
 var shutdown = require('shutdown');
 var through2Concurrent = require('through2-concurrent');
-
 var userService = require('../../server/services/user-service');
 var troupeService = require('../../server/services/troupe-service');
 var roomMembershipService = require('../../server/services/room-membership-service');
 var suggestionsService = require('../../server/services/suggestions-service');
-
 var suggestions = require('gitter-web-suggestions');
-var Intercom = require('intercom-client');
+var intercom = require('gitter-web-intercom');
 var IntercomStream = require('../../server/utils/intercom-stream');
 
-var intercomOptions = {
-  appId: config.get("stats:intercom:app_id"),
-  appApiKey: config.get("stats:intercom:key")
-};
 
 var opts = require("nomnom")
    .option('segment', {
@@ -30,12 +21,10 @@ var opts = require("nomnom")
    })
    .parse();
 
-var client = new Intercom.Client(intercomOptions).usePromises();
-var stream = new IntercomStream({ client: client, key: 'users'}, function() {
-  return client.users.listBy({segment_id: opts.segment});
+var stream = new IntercomStream({ client: intercom.client, key: 'users'}, function() {
+  return intercom.client.users.listBy({segment_id: opts.segment});
 });
 
-// TODO: move somewhere reusable
 function getRoomsForUserId(userId) {
   return roomMembershipService.findRoomIdsForUser(userId)
     .then(function(roomIds) {
@@ -66,14 +55,13 @@ stream
         var suggestionsString = _.pluck(suggestions, 'uri').join(', ');
         console.log("Suggestions for", username + ':', suggestionsString);
 
-        var attrs = suggestionsService.suggestionsToAttributes(suggestions);
         var profile = {
           email: intercomUser.email,
           user_id: intercomUser.user_id,
-          custom_attributes: attrs
+          custom_attributes: intercom.suggestionsToAttributes(suggestions)
         };
 
-        return client.users.create(profile);
+        return intercom.client.users.create(profile);
       })
       .then(function(result) {
         console.log('Done with', username);

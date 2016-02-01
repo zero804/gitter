@@ -1,22 +1,12 @@
 "use strict";
 
-var env = require('gitter-web-env');
-var config = env.config;
-
 var _ = require('lodash');
 var shutdown = require('shutdown');
-
-var Intercom = require('intercom-client');
-var intercomOptions = {
-  appId: config.get("stats:intercom:app_id"),
-  appApiKey: config.get("stats:intercom:key")
-};
-
+var intercom = require('gitter-web-intercom');
 var IntercomStream = require('../../server/utils/intercom-stream');
 
-var client = new Intercom.Client(intercomOptions).usePromises();
-var stream = new IntercomStream({ client: client, key: 'segments'}, function() {
-  return client.segments.list()
+var stream = new IntercomStream({ client: intercom.client, key: 'segments'}, function() {
+  return intercom.client.segments.list()
 });
 
 stream
