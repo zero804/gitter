@@ -1,16 +1,9 @@
 "use strict";
 
-var env = require('gitter-web-env');
-var config = env.config;
-
 var _ = require('lodash');
 var shutdown = require('shutdown');
+var intercom = require('gitter-web-intercom');
 
-var Intercom = require('intercom-client');
-var intercomOptions = {
-  appId: config.get("stats:intercom:app_id"),
-  appApiKey: config.get("stats:intercom:key")
-};
 
 var opts = require("nomnom")
    .option('id', {
@@ -26,13 +19,11 @@ var opts = require("nomnom")
    })
    .parse();
 
-var client = new Intercom.Client(intercomOptions).usePromises();
-
 if (!opts.id && !opts.user_id && !opts.email) {
   throw new Error("id, user_id or email required.");
 }
 
-client.users.find(opts)
+intercom.client.users.find(opts)
   .then(function(response) {
     var user = response.body;
     console.log(user);

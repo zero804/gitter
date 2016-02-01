@@ -1,24 +1,14 @@
 "use strict";
 
-var env = require('gitter-web-env');
-var config = env.config;
-
 var Q = require('q');
 var _ = require('lodash');
 var shutdown = require('shutdown');
-
 var userService = require('../../server/services/user-service');
 var troupeService = require('../../server/services/troupe-service');
 var roomMembershipService = require('../../server/services/room-membership-service');
 var suggestionsService = require('../../server/services/suggestions-service');
-
+var intercom = require('gitter-web-intercom');
 var suggestions = require('gitter-web-suggestions');
-
-var Intercom = require('intercom-client');
-var intercomOptions = {
-  appId: config.get("stats:intercom:app_id"),
-  appApiKey: config.get("stats:intercom:key")
-};
 
 var opts = require("nomnom")
    .option('id', {
@@ -49,7 +39,6 @@ function getUserFromMongo(opts) {
   }
 }
 
-// TODO: move somewhere reusable
 function getRoomsForUserId(userId) {
   return roomMembershipService.findRoomIdsForUser(userId)
     .then(function(roomIds) {
@@ -84,11 +73,10 @@ getUserFromMongo(opts)
     var profile = {
       email: user.email,
       user_id: user._id,
-      custom_attributes: suggestionsService.suggestionsToAttributes(suggestions)
+      custom_attributes: intercom.suggestionsToAttributes(suggestions)
     };
     //console.log(profile);
-    var client = new Intercom.Client(intercomOptions).usePromises();
-    return client.users.create(profile);
+    return intercom.client.users.create(profile);
   })
   .then(function(intercomUser) {
     console.log(intercomUser.body);
