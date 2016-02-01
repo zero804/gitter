@@ -25,6 +25,7 @@ PATH := ./node_modules/.bin:$(PATH)
 
 build: clean npm
 	gulp validate
+	mkdir -p output/
 	./exec-in-docker ./node_modules/.bin/gulp test-docker
 	gulp package
 
