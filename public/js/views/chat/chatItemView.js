@@ -7,7 +7,8 @@ var chatModels = require('collections/chat');
 var AvatarView = require('views/widgets/avatar');
 var Marionette = require('backbone.marionette');
 var moment = require('moment');
-var uiVars = require('views/app/uiVars');
+var isMobile = require('utils/is-mobile');
+var DoubleTapper = require('utils/double-tapper');
 var Popover = require('views/popover');
 var chatItemTemplate = require('./tmpl/chatItemView.hbs');
 var statusItemTemplate = require('./tmpl/statusItemView.hbs');
@@ -21,6 +22,7 @@ var LoadingCollectionMixin = require('views/loading-mixin');
 var FastAttachMixin = require('views/fast-attach-mixin');
 var timeFormat = require('gitter-web-shared/time/time-format');
 var fullTimeFormat = require('gitter-web-shared/time/full-time-format');
+var dataset = require('utils/dataset-shim');
 
 var RAF = require('utils/raf');
 var toggle = require('utils/toggle');
@@ -53,7 +55,6 @@ module.exports = (function() {
     'mouseover .js-chat-item-readby': 'showReadByIntent',
     'click .webhook':                 'expandActivity',
     'click':                          'onClick',
-    'dblclick':                       'onDblClick',
     'click .js-chat-item-actions':    'showActions'
   };
 
@@ -81,7 +82,8 @@ module.exports = (function() {
       actions: '.js-chat-item-actions',
       collapse: '.js-chat-item-collapse',
       text: '.js-chat-item-text',
-      sent: '.js-chat-time'
+      sent: '.js-chat-time',
+      timestampLink: '.js-chat-time'
     },
 
     behaviors: {
@@ -105,7 +107,9 @@ module.exports = (function() {
 
     isEditing: false,
 
-    events: uiVars.isMobile ? touchEvents : mouseEvents,
+    events: function() {
+      return isMobile() ? touchEvents : mouseEvents;
+    },
 
     keyboardEvents: {
       'chat.edit.escape': 'onKeyEscape',
@@ -125,6 +129,9 @@ module.exports = (function() {
       this.userCollection = options.userCollection;
 
       this.decorated = false;
+
+      // fastclick destroys double tap events
+      this.doubleTapper = new DoubleTapper();
 
       if (this.isInEditablePeriod()) {
         // update once the message is not editable
@@ -229,6 +236,17 @@ module.exports = (function() {
       }, this);
     },
 
+    onShow: function() {
+      // We do this so we don't `appEvents.trigger('navigation')` down the line
+      // See `link-handler.js -> installLinkHandler`
+      // That event would cause a `router-app.js -> postMessage('permalink.navigate')` to the chat frame and
+      // highlight the message, see `router-chat.js -> case 'permalink.navigate'`
+      var timestampLinkElement = this.ui.timestampLink[0];
+      if(timestampLinkElement) {
+        dataset.set(timestampLinkElement, 'disableRouting', true);
+      }
+    },
+
     onRender: function () {
       this.updateRender();
       this.timeChange();
@@ -241,11 +259,12 @@ module.exports = (function() {
       // this.$el.toggleClass('cantEdit', !canEdit);
     },
 
-    /* jshint maxcomplexity: 26 */
+    /* jshint maxcomplexity: 29 */
     updateRender: function(changes) {
       /* NB: `unread` updates occur in the behaviour */
       var model = this.model;
       var $el = this.$el;
+      var sentElement = this.ui.sent[0];
       var classList = this.el.classList;
 
 
@@ -262,14 +281,21 @@ module.exports = (function() {
       }
 
       if (changes && 'id' in changes) {
-        this.ui.sent[0].setAttribute('href', this.getPermalinkUrl());
+        if(sentElement) {
+          var permalinkUrl = this.getPermalinkUrl();
+          if (permalinkUrl.length) {
+            sentElement.setAttribute('href', permalinkUrl);
+          }
+        }
       }
 
       if (changes && 'sent' in changes) {
-        var time = this.model.get('sent');
-        if (time) {
-          var formattedTime = fullTimeFormat(time);
-          this.ui.sent[0].setAttribute('title', formattedTime);
+        if(sentElement) {
+          var time = this.model.get('sent');
+          if (time) {
+            var formattedTime = fullTimeFormat(time);
+            sentElement.setAttribute('title', formattedTime);
+          }
         }
       }
 
@@ -633,29 +659,43 @@ module.exports = (function() {
         self.$el.removeClass('chat-item__highlighted');
       }, 5000);
     },
+
     onTouchClick: function() {
-      // this calls onSelected
-      this.triggerMethod('selected', this.model);
-    },
+      var tapCount = this.doubleTapper.registerTap();
 
-    onClick: function() {
-      // this calls onSelected
-      this.triggerMethod('selected', this.model);
-
-      if (!window.getSelection) return;
-      if (this.dblClickTimer) {
-        clearTimeout(this.dblClickTimer);
-        this.dblClickTimer = null;
-        window.getSelection().selectAllChildren(this.el);
+      switch (tapCount) {
+        case 1:
+          // single click
+          // this calls onSelected
+          this.triggerMethod('selected', this.model);
+          break;
+        case 2:
+          // double click
+          this.toggleEdit();
+          break;
       }
     },
 
-    onDblClick: function() {
-      if (!window.getSelection) return;
-      var self = this;
-      self.dblClickTimer = setTimeout(function () {
-        self.dblClickTimer = null;
-      }, 200);
+    onClick: function(jqueryEvent) {
+      var event = jqueryEvent.originalEvent;
+
+      switch (event.detail) {
+        case 1:
+          // single click
+          // this calls onSelected
+          this.triggerMethod('selected', this.model);
+          break;
+        case 2:
+          // double click!
+          break;
+        case 3:
+          // m-m-m-monster click!
+          if (window.getSelection) {
+            // used for html copy
+            window.getSelection().selectAllChildren(this.el);
+          }
+          break;
+      }
     },
 
     onSyncStatusChange: function(newState) {

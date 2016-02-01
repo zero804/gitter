@@ -12,8 +12,6 @@ var LiveCollection          = require('gitter-realtime-client').LiveCollection;
 var realtime                = require('components/realtime');
 var SyncMixin               = require('./sync-mixin');
 
-var userId = context.getUserId();
-
 var ChatModel = Backbone.Model.extend({
   idAttribute: 'id',
   initialize: function() {
@@ -52,7 +50,7 @@ var ChatModel = Backbone.Model.extend({
 
     // Check for the special case of messages from the current user
     if (message.unread && message.fromUser) {
-      if (message.fromUser.id === userId) {
+      if (message.fromUser.id === context.getUserId()) {
         message.unread = false;
       }
     }

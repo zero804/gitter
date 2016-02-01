@@ -24,6 +24,7 @@
     order: 3;
 
     color: rgba(100,100,100,.4);
+    white-space: nowrap;
   }
 
   .activity-item__icon {
@@ -32,7 +33,8 @@
 
 }
 
-.activity-item {
+.activity-item,
+.activity-tip {
   position: relative;
   border-bottom: 1px dotted rgba(100,100,100,0.1);
   padding: 7px 7px 7px 15px;
@@ -64,6 +66,10 @@
 
 
 .gtrActivityItemText {
+  flex: 1;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+
   vertical-align: middle;
   opacity: 0.8;
   margin-left: 23px;

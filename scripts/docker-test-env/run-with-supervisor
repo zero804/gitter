@@ -1,0 +1,7 @@
+#!/bin/bash
+
+/usr/bin/supervisord &
+
+$@
+
+kill %1

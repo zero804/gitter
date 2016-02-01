@@ -1,6 +1,7 @@
 "use strict";
 var _ = require('underscore');
 var Marionette = require('backbone.marionette');
+var classnames = require('classnames');
 var appEvents = require('utils/appevents');
 var issueDecorator = require('views/chat/decorators/issueDecorator');
 var commitDecorator = require('views/chat/decorators/commitDecorator');
@@ -75,6 +76,14 @@ module.exports = (function() {
 
   var ActivityItemView = Marionette.ItemView.extend({
     tagName: 'li',
+    attributes: function() {
+      var classMap = {
+        'activity-item': true
+      };
+      return {
+        class: classnames(classMap)
+      };
+    },
     modelEvents: {
       change: 'render'
     },
