@@ -9,6 +9,7 @@ var profileCollection = new Backbone.Collection([
   { name: 'Home', url: '/home' },
   { name: 'Billing', url: 'http://billing.gitter.im/accounts'},
   { name: 'Get Gitter Apps', url: '/apps'},
+  //TODO Logout does not work JP 27/1/16
   { name: 'Sign Out', url: '/logout' }
 ]);
 

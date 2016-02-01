@@ -9,12 +9,12 @@ module.exports = Marionette.ItemView.extend({
   template: template,
 
   modelEvents: {
-    'change:state': 'updateActiveElement',
+    'change:state':           'updateActiveElement',
     'change:selectedOrgName': 'render'
   },
 
   events: {
-    'click': 'onClick',
+    'click':                          'onClick',
     'click #menu-panel-header-close': 'onCloseClicked',
   },
 
@@ -28,7 +28,7 @@ module.exports = Marionette.ItemView.extend({
 
   serializeData: function() {
     return {
-      orgName: this.model.get('selectedOrgName'),
+      orgName:    this.model.get('selectedOrgName'),
       numOfRooms: this.model.primaryCollection.length,
     };
   },
@@ -56,11 +56,13 @@ module.exports = Marionette.ItemView.extend({
   },
 
   onClick: function() {
+    //Open the profile menu ONLY when in the all channels state
     if(this.model.get('state') === 'all') {
       this.model.set('profileMenuOpenState', !this.model.get('profileMenuOpenState'));
     }
   },
 
+  //TODO CHECK IF THIS CAN BE REMOVED JP 27/1/16
   onCloseClicked: function(e) {
     if (this.model.get('roomMenuIsPinned')) return;
     e.stopPropagation();
@@ -73,6 +75,5 @@ module.exports = Marionette.ItemView.extend({
   onDestroy: function(){
     this.stopListening(this.model.primaryCollection);
   }
-
 
 });
