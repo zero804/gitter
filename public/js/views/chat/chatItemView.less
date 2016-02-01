@@ -13,6 +13,8 @@
 @import (reference) "../../../less/colors.less";
 
 @chat-spacing: 0.2em;
+@chat-item__action-item__color: rgba(170, 170, 170, 1);
+
 
 .trpChatContainer .isViewers:last-child .chat-item__details {
   visibility: visible;
@@ -148,33 +150,6 @@ body:not(.mobile) .chat-item:hover {
   width: 40px;
 }
 
-@chat-item__action-item__color: rgba(170, 170, 170, 1);
-
-.chat-item__action-item-visible(@alpha: 100%) {
-  visibility: visible;
-  color: fade(@chat-item__action-item__color, @alpha);
-
-  transition:
-    visibility .2s ease,
-    color .2s ease;
-
-  .chat-item:hover & {
-    color: fade(@chat-item__action-item__color, 100%);
-  }
-}
-
-.chat-item__action-item() {
-  visibility: hidden;
-  color: transparent;
-  transition:
-    visibility .2s ease,
-    color .2s ease;
-
-  .chat-item:hover & {
-    .chat-item__action-item-visible();
-  }
-}
-
 body.mobile .chat-item__actions {
   display: none;
 }
@@ -241,16 +216,26 @@ body.mobile .chat-item__container {
   float: right;
   margin-top: 2px;
 
-  .chat-item__action-item-visible(70%);
+  color: fade(@chat-item__action-item__color, 70%);
 
   &, &:hover {
     text-decoration: none;
   }
+
+  .chat-item:hover & {
+    color: @chat-item__action-item__color;
+  }
 }
 
 .chat-item__icon {
-  .chat-item__action-item();
+  visibility: hidden;
+  color: transparent;
+
   cursor: pointer;
+
+  transition:
+    visibility .2s ease,
+    color .2s ease;
 
   &:hover {
     &,
@@ -258,13 +243,32 @@ body.mobile .chat-item__container {
       color: @blue;
     }
   }
+
+  .chat-item:hover & {
+    visibility: visible;
+    color: @chat-item__action-item__color;
+  }
 }
 
 .chat-item__icon--read {
   float: left;
   font-size: 0.7em;
   margin-top: 3px;
+
+  &,
+  .chat-item:hover & {
+    visibility: hidden;
+    color: transparent;
+  }
 }
+
+.chat-item__icon--read-by-some {
+  .chat-item:hover & {
+    visibility: visible;
+    color: @chat-item__action-item__color;
+  }
+}
+
 
 body.mobile .chat-item__icon--read {
   display: none;
