@@ -24,7 +24,10 @@ PATH := ./node_modules/.bin:$(PATH)
 .PHONY: build clean test npm sprites npm-quick npm-full performance-tests
 
 build: clean npm
-	gulp
+	gulp validate
+	mkdir -p output/
+	./exec-in-docker ./node_modules/.bin/gulp test-docker
+	gulp package
 
 clean:
 	rm -rf output
