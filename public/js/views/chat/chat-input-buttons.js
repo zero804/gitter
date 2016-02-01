@@ -65,6 +65,7 @@ var ChatInputButtons = Marionette.ItemView.extend({
     var data = this.model.toJSON();
 
     data.composeModeMessage = this.getComposeModeTitle();
+    data.markdownHelpMessage = this.getShowMarkdownTitle();
 
     return data;
   }
