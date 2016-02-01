@@ -17,7 +17,6 @@ require('components/ping');
 
 // Preload widgets
 require('views/widgets/avatar');
-require('views/widgets/timeago');
 
 var chatCollection = new chatModels.ChatCollection(null, { listen: true });
 chatCollection.on('add', function (item) {

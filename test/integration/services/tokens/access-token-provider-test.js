@@ -12,7 +12,10 @@ describe('access-token-provider', function() {
 
   describe('idempotency #slow', function() {
 
-    it('should be idempotent', function() {
+    // Set to skip until this problematic test can be
+    // sorted out. See https://github.com/troupe/gitter-webapp/issues/882
+    // AN 25 Jan 2016
+    it.skip('should be idempotent', function() {
       var userId = mongoUtils.getNewObjectIdString();
       var clientId = mongoUtils.getNewObjectIdString();
 
@@ -24,7 +27,7 @@ describe('access-token-provider', function() {
         accessTokenProvider.getToken(userId, clientId)
       ]).then(function(items) {
         var firstToken = items[0];
-        
+
         assert(items.every(function(token) {
           return token === firstToken;
         }));
