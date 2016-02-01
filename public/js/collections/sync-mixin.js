@@ -1,6 +1,7 @@
 'use strict';
 
-var _ = require('underscore');
+var _         = require('underscore');
+var Backbone  = require('backbone');
 var apiClient = require('components/apiClient');
 
 var methodMap = {
