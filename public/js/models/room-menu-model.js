@@ -8,6 +8,7 @@ var SuggestedOrgCollection         = require('../collections/org-suggested-rooms
 var apiClient                      = require('components/apiClient');
 var FilteredRoomCollection         = require('../collections/filtered-room-collection.js');
 var SuggestedRoomsByRoomCollection = require('../collections/left-menu-suggested-by-room');
+var SearchRoomPeopleCollection     = require('../collections/left-menu-search-rooms-and-people');
 
 var states = [
   'all',
@@ -73,6 +74,7 @@ module.exports = Backbone.Model.extend({
 
     //expose the public collection
     this.searchTerms         = new RecentSearchesCollection();
+    this.searchRoomAndPeople = new SearchRoomPeopleCollection(null, { roomMenuModel: this });
     this.suggestedOrgs       = new SuggestedOrgCollection([], { contextModel: this });
 
     this.primaryCollection   = new FilteredRoomCollection(null, {
@@ -117,7 +119,8 @@ module.exports = Backbone.Model.extend({
     //TODO Test this JP 27/1/15
     switch (val) {
       case 'search':
-        this.secondaryCollection.switchCollection(this.searchTerms);
+        this.secondaryCollection.switchCollection(this.searchRoomAndPeople);
+        this.tertiaryCollection.switchCollection(this.searchTerms);
         break;
       case 'org':
         this.secondaryCollection.switchCollection(this.suggestedOrgs);

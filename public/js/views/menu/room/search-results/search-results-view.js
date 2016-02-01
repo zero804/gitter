@@ -258,6 +258,7 @@ module.exports = (function() {
     },
 
     fetchRooms: function(args) {
+      /*
       var query = args.query;
       var limit = typeof args.limit === 'undefined' ? 3 : args.limit;
 
@@ -292,6 +293,7 @@ module.exports = (function() {
           appEvents.trigger('track-event', 'search_rooms_failed');
           throw err;
         });
+        */
     },
 
     notCurrentRoom: function(room) {
@@ -364,8 +366,8 @@ module.exports = (function() {
     // template: searchTemplate, SearchView is prerendered
     behaviors: {
       Isomorphic: {
-        roomsRegion: { el: '.js-search-rooms', init: 'initRoomsRegion' },
-        messagesRegion: { el: '.js-search-messages', init: 'initMessagesRegion' },
+        //roomsRegion: { el: '.js-search-rooms', init: 'initRoomsRegion' },
+        //messagesRegion: { el: '.js-search-messages', init: 'initMessagesRegion' },
       },
     },
 
@@ -462,11 +464,11 @@ module.exports = (function() {
     },
 
     initRoomsRegion: function(optionsForRegion) {
-      return new RoomsCollectionView(optionsForRegion({ collection: this.rooms }));
+      //return new RoomsCollectionView(optionsForRegion({ collection: this.rooms }));
     },
 
     initMessagesRegion: function(optionsForRegion) {
-      return new MessagesCollectionView(optionsForRegion({ collection: this.chats }));
+      //return new MessagesCollectionView(optionsForRegion({ collection: this.chats }));
     },
 
     isSearchTermEmpty: function() {
@@ -495,6 +497,7 @@ module.exports = (function() {
     },
 
     run: function(/*model, searchTerm*/) {
+      /*
       if (this.isSearchTermEmpty()) return this.hide();
 
       var searchTerm = this.model.get('searchTerm');
@@ -511,6 +514,7 @@ module.exports = (function() {
       });
 
       this.triggerMethod('search:show'); // hide top toolbar content
+      */
     },
 
     handlePrev: function(e) {

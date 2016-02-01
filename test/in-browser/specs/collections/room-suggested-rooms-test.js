@@ -16,16 +16,6 @@ describe('SuggestedRoomsByRoomCollection()', function() {
     });
   });
 
-  it('should throw an error if not instantiated with a context model', function(done) {
-    try {
-      new SuggestedRoomsByRoomCollection(null, {});
-    }
-    catch (e) {
-      assert.equal(e.message, 'A valid context model has to be passed to a new instance of SuggestedRoomsByRoomCollection');
-      done();
-    }
-  });
-
   it('should create a url model when initialized with a model', function() {
     assert.ok(suggestedCollection.urlModel);
   });

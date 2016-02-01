@@ -5,7 +5,7 @@ var assert             = require('assert');
 var MinibarCollection  = require('public/js/views/menu/room/minibar/minibar-collection');
 var MockRoomCollection = require('fixtures/helpers/room-collection');
 
-describe.only('MinibarCollection()', function() {
+describe('MinibarCollection()', function() {
 
   var roomCollection;
   var collection;
