@@ -34,6 +34,10 @@ function waterfall(makers, args, filter, limit) {
   will resolve to the first `limit` results. If the end is reached, it will
   just resolve to the results that were obtained.
   */
+
+  // don't modify the calling code..
+  var makers = makers.slice();
+
   var allResults = [];
   var deferred = Q.defer();
 
