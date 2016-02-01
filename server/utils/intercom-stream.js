@@ -58,7 +58,7 @@ IntercomStream.prototype._nextPromise = function() {
       });
     }
 
-    if (result.body.pages) {
+    if (result.body.pages && result.body.pages.next) {
       stream.makePromise = function() {
         return stream.client.nextPage(result.body.pages);
       };
