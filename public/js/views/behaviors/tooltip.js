@@ -43,7 +43,7 @@ var Behavior = Marionette.Behavior.extend({
 
     var self = this;
 
-    Object.keys(this.options).forEach(function(selector) {
+        Object.keys(this.options).forEach(function(selector) {
       if (self.handlers[selector]) return; // Already listening
 
       var $el = selector === '' ? self.$el : self.$el.find(selector);
@@ -93,8 +93,15 @@ var Behavior = Marionette.Behavior.extend({
       container: tooltipOptions.container || 'body'
     });
 
+
+    var customUpdateEventName = tooltipOptions.customUpdateEvent;
+    if(customUpdateEventName) {
+      this.view.on(customUpdateEventName, this.updateTooltip.bind(this, $el));
+    }
+
     triggerMouseoverForHover(el);
   },
+
 
   onDestroy: function() {
     this.destroyHandlers();
@@ -124,6 +131,12 @@ var Behavior = Marionette.Behavior.extend({
       var $el = tooltips[selector];
       $el.tooltip('destroy');
     });
+  },
+
+  // This will update the tooltip text if it is already shown
+  updateTooltip: function($el) {
+    $el.tooltip('hide');
+    $el.tooltip('show');
   }
 
 });
