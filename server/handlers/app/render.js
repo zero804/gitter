@@ -239,8 +239,11 @@ function renderMainFrame(req, res, next, frame) {
       //If we are in any kind of org room && that org exists in out suggested org list
       //set the menu state to org and the selectedOrg to the given org
       //JP 25/1/16
+
       //TODO Test this with an e2e runner
       var orgs = suggestedOrgsFromRoomList(rooms);
+
+      //TODO Is this ever going to break? JP 1/2/16
       var currentlySelectedOrg = req.uriContext.uri.split('/')[0];
       if(_.findWhere(orgs, { name: currentlySelectedOrg })) {
         troupeContext.leftRoomMenuState = _.extend({}, troupeContext.leftRoomMenuState, {
