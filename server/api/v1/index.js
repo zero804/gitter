@@ -10,7 +10,7 @@ var router = express.Router({ caseSensitive: true, mergeParams: true });
 router.use('/user', authMiddleware);
 router.use('/rooms', authMiddleware);
 router.use('/users', authMiddleware);
-router.use('/org', authMiddleware);
+router.use('/orgs', authMiddleware);
 
 var userResources = resourceRoute('api-user', require('./user'));
 var roomsResources = resourceRoute('api-rooms', require('./rooms'));
