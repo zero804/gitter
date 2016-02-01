@@ -51,7 +51,7 @@ describe('SecondaryCollectionView', function() {
     assert.ok(secondaryCollectionView.el.classList.contains('active'));
   });
 
-  it.only('should toggle an empty class when the collection is empty', function(){
+  it('should toggle an empty class when the collection is empty', function(){
     assert.ok(!secondaryCollectionView.el.classList.contains('empty'));
     collection.reset();
     assert.ok(secondaryCollectionView.el.classList.contains('empty'));
