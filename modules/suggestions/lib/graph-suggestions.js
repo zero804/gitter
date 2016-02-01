@@ -82,6 +82,7 @@ function getSuggestionsForOrg(orgName, userId) {
                "WHERE r.lcOwner = {orgName} " +
                 "AND u.userId = {userId}"  +
                 "AND NOT (u-[:MEMBER]-r)" +
+                "AND r.security = 'PUBLIC'" +
                "RETURN r.roomId, count(*) * r.weight as occurrence " +
                "ORDER BY occurrence DESC " +
                "LIMIT 6",
