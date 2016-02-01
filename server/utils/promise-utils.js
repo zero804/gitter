@@ -36,7 +36,7 @@ function waterfall(makers, args, filter, limit) {
   */
 
   // don't modify the calling code..
-  var makers = makers.slice();
+  makers = makers.slice();
 
   var allResults = [];
   var deferred = Q.defer();
