@@ -24,7 +24,11 @@ module.exports = {
     var troupeId = req.body && req.body.id && "" + req.body.id;
     if(!troupeId || !mongoUtils.isLikeObjectId(troupeId)) throw new StatusError(400);
 
-    return roomService.joinRoom(troupeId, req.user)
+    var options = {
+      tracking: { source: req.body.source }
+    };
+
+    return roomService.joinRoom(troupeId, req.user, options)
       .then(function() {
         var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: req.user.id });
 

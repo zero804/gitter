@@ -1,4 +1,3 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var Q              = require('q');
@@ -33,10 +32,10 @@ function serializeRoomToUsers(userIds, operation, troupe) {
 
   return restSerializer.serializeModel(troupe)
     .then(function(serializedTroupe) {
-      appEvents.dataChange2('/rooms/' + troupe._id, operation, serializedTroupe);
+      appEvents.dataChange2('/rooms/' + troupe._id, operation, serializedTroupe, 'room');
 
       userIds.forEach(function(userId) {
-        appEvents.dataChange2('/user/' + userId + '/rooms', operation, serializedTroupe);
+        appEvents.dataChange2('/user/' + userId + '/rooms', operation, serializedTroupe, 'room');
       });
 
     });
@@ -51,7 +50,7 @@ function serializeOneToOneRoomToUsers(userIds, operation, troupe) {
 
     return restSerializer.serialize(troupe, strategy)
       .then(function(serializedTroupe) {
-        appEvents.dataChange2('/user/' + userId + '/rooms', operation, serializedTroupe);
+        appEvents.dataChange2('/user/' + userId + '/rooms', operation, serializedTroupe, 'room');
       });
   }));
 }
@@ -81,7 +80,7 @@ module.exports = {
 
   patch: function(troupeId, patch) {
     var patchMessage = _.extend({ }, patch, { id: troupeId });
-    appEvents.dataChange2('/rooms/' + troupeId, "patch", patchMessage);
+    appEvents.dataChange2('/rooms/' + troupeId, "patch", patchMessage, 'room');
 
     return getUserDistribution(troupeId)
       .then(function(userIds) {
@@ -89,7 +88,7 @@ module.exports = {
 
         userIds.forEach(function(userId) {
           var url = '/user/' + userId + '/rooms';
-          appEvents.dataChange2(url, "patch", patchMessage);
+          appEvents.dataChange2(url, "patch", patchMessage, 'room');
         });
       });
   },
@@ -99,7 +98,7 @@ module.exports = {
   },
 
   removeId: function(troupeId) {
-    appEvents.dataChange2('/rooms/' + troupeId, "remove", { id: troupeId });
+    appEvents.dataChange2('/rooms/' + troupeId, "remove", { id: troupeId }, 'room');
 
     return getUserDistribution(troupeId)
       .then(function(userIds) {
@@ -107,7 +106,7 @@ module.exports = {
 
         userIds.forEach(function(userId) {
           var url = '/user/' + userId + '/rooms';
-          appEvents.dataChange2(url, "remove", { id: troupeId });
+          appEvents.dataChange2(url, "remove", { id: troupeId }, 'room');
         });
       });
   }

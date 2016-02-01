@@ -1,6 +1,5 @@
 "use strict";
 
-var $ = require('jquery');
 var apiClient = require('components/apiClient');
 var context = require('utils/context');
 var appEvents = require('utils/appevents');
@@ -17,10 +16,14 @@ var noRoomResultsTemplate = require('./tmpl/no-room-results.hbs');
 var textFilter = require('utils/text-filter');
 var KeyboardEventsMixin = require('views/keyboard-events-mixin');
 var Promise = require('bluebird');
+var timeFormat = require('gitter-web-shared/time/time-format');
+var fullTimeFormat = require('gitter-web-shared/time/full-time-format');
 
 require('views/behaviors/widgets');
 require('views/behaviors/highlight');
 require('views/behaviors/isomorphic');
+require('views/behaviors/timeago');
+require('views/behaviors/tooltip');
 
 module.exports = (function() {
 
@@ -98,7 +101,14 @@ module.exports = (function() {
 
     behaviors: {
       Widgets: {},
-      Highlight: {}
+      Highlight: {},
+      TimeAgo: {
+        modelAttribute: 'sent',
+        el: '#time'
+      },
+      Tooltip: {
+        '#time': { titleFn: 'getSentTooltip', position: 'left' },
+      }
     },
 
     serializeData: function () {
@@ -106,11 +116,13 @@ module.exports = (function() {
       var fromUser = model.get('fromUser');
       var username = fromUser && fromUser.username || "";
       var sent = model.get('sent');
+      var sentFormatted = timeFormat(sent, { compact: true });
 
       return {
         selected: model.get('selected'),
         detail: username,
         sent: sent,
+        sentFormatted: sentFormatted,
         text: model.get('text'),
         avatarUrl: fromUser && fromUser.avatarUrlSmall
       };
@@ -120,6 +132,10 @@ module.exports = (function() {
       var id = this.model.get('id');
 
       appEvents.trigger('chatCollectionView:loadAndHighlight', id, { highlights: this.model.get('highlights') });
+    },
+
+    getSentTooltip: function() {
+      return fullTimeFormat(this.model.get('sent'));
     }
   });
 
@@ -242,11 +258,10 @@ module.exports = (function() {
         .bind(this)
         .spread(function (users, repos, publicRepos) {
           // assuring that object are uniform since repos have a boolean (exists)
-          users[0].results.map(function (i) { i.exists = true; });
-          publicRepos[0].results.map(function (i) { i.exists = true; });
+          users.results.map(function (i) { i.exists = true; });
+          publicRepos.results.map(function (i) { i.exists = true; });
 
-          var results = [users, repos, publicRepos]
-            .map(function (data) { return data[0].results; })
+          var results = [users.results, repos.results, publicRepos.results]
             .reduce(function (fold, arr) { return fold.concat(arr); }, [])
             .map(function (r) {
               if (!r) return;
@@ -297,7 +312,7 @@ module.exports = (function() {
 
       if (_.isEmpty(cache.models)) {
         return this.fetchLocalRooms()
-          .then(this.cacheRooms.bind(this))
+          .then(this.cacheRooms.bind(this));
       }
 
       return Promise.resolve(cache);

@@ -13,6 +13,7 @@ converter-service/converter/.project
 converter-service/converter/.settings
 converter-service/converter/target
 config.user-overrides.json
+config/config.dev.user-overrides.json
 scripts/mongo-backup-*
 public-processed/
 scripts/dataupgrades/004-reverse-geocoder/data
@@ -21,6 +22,7 @@ test/end-to-end/casper/*.png
 mongo-backup-*/
 GIT_COMMIT
 VERSION
+git_hooks/*.sample
 ghostdriver.log
 finished.png
 chromedriver
@@ -84,3 +86,5 @@ docker_node_modules
 test/in-browser/fixtures/build/*
 test/in-browser/browserstack-run.pid
 drop-dev-database.sh
+node_modules_old
+config.dev.user-overrides.json
