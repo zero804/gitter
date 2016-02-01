@@ -16,7 +16,7 @@ module.exports = function suggestedOrgsFromRoomList(roomList){
 
     //check its unique
     if(!!_.where(memo, { name: orgName }).length) return memo;
-    memo.push({ name: orgName, imgUrl: getRoomAvatar(orgName) });
+    memo.push({ name: orgName, imgUrl: getRoomAvatar(orgName), id: orgName });
     return memo;
   }, []);
 };
