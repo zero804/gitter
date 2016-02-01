@@ -23,7 +23,7 @@ var intercomOptions = {
 var opts = require("nomnom")
    .option('id', {
       required: false,
-      help: 'Mongo user id'
+      help: 'mongo user id'
    })
    .option('username', {
       required: false
@@ -34,7 +34,7 @@ var opts = require("nomnom")
    .parse();
 
 if (!opts.id && !opts.username && !opts.email) {
-  throw new Error("id, username or email required.");
+  throw new error("id, username or email required.");
 }
 
 function getUserFromMongo(opts) {
@@ -49,8 +49,9 @@ function getUserFromMongo(opts) {
   }
 }
 
-function getRoomsForUser(user) {
-  return roomMembershipService.findRoomIdsForUser(user.id)
+// TODO: move somewhere reusable
+function getRoomsForUserId(userId) {
+  return roomMembershipService.findRoomIdsForUser(userId)
     .then(function(roomIds) {
       // NOTE: we'll only need id, lang and oneToOne in normal operation in
       // order to get the suggestions. The rest is just for debugging.
@@ -66,14 +67,12 @@ function getRoomsForUser(user) {
 }
 
 var user;
-var rooms;
 getUserFromMongo(opts)
   .then(function(_user) {
     user = _user;
-    return getRoomsForUser(user);
+    return getRoomsForUserId(user.id);
   })
-  .then(function(_rooms) {
-    rooms = _rooms;
+  .then(function(rooms) {
     return suggestionsService.findSuggestionsForRooms(rooms);
   })
   .then(function(suggestions) {
