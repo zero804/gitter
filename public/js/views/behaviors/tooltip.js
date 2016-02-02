@@ -133,7 +133,9 @@ var Behavior = Marionette.Behavior.extend({
     });
   },
 
-  // This will update the tooltip text if it is already shown
+  // Limitation of bootstrap tooltip library
+  // We do this so that when you click a toggle for example,
+  // the tooltip text is properly updated to show the inverse hint
   updateTooltip: function($el) {
     $el.tooltip('hide');
     $el.tooltip('show');
