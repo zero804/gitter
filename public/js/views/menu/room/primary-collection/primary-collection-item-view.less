@@ -93,6 +93,10 @@
     margin-left:  @desktop-menu-left-padding / 2;
   }
 
+  & *:last-child {
+    margin-right:  @desktop-menu-left-padding / 2;
+  }
+
 }
 
 .room-item__avatar {
@@ -104,17 +108,31 @@
 
 }
 
-.room-item__unread {
-  background:    black;
+.notification (){
   border-radius: 100%;
   height:        @menu-unread-badge-size;
   width:         @menu-unread-badge-size;
   min-width:     @menu-unread-badge-size;
   margin-left:   1rem;
   font-size:     1.1rem;
-  line-height:   @menu-unread-badge-size;
+
+  //TODO Figure out why this is needed jp 2/2/16
+  line-height:   .3rem;
+
   text-align:    center;
   color:         white;
+}
+
+.room-item__unreads {
+  .notification();
+  background:    @caribbean;
+  text-indent:    -.05rem;
+}
+
+.room-item__mentions {
+  .notification();
+  background:    @jaffa;
+  text-indent:    -.3rem;
 }
 
 .room-item__options {
