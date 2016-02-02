@@ -138,6 +138,11 @@ module.exports = Backbone.Model.extend({
         this.secondaryCollection.switchCollection(this._suggestedRoomCollection);
         this.tertiaryCollection.switchCollection(this._orgCollection);
         break;
+      default:
+        this.primaryCollection.switchCollection(this.activeRoomCollection);
+        this.secondaryCollection.switchCollection(new Backbone.Collection(null));
+        this.tertiaryCollection.switchCollection(new Backbone.Collection(null));
+        break;
     }
   },
 

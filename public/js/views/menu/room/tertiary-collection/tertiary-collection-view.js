@@ -23,6 +23,7 @@ module.exports =  Marionette.CompositeView.extend({
   className:          'tertiary-collection',
   modelEvents: {
     'change:tertiaryCollectionActive': 'onModelActiveStateChange',
+    'change:tertiaryCollectionHeader': 'render'
   },
 
   initialize: function() {
