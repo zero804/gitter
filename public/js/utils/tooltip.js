@@ -2,7 +2,7 @@
 "use strict";
 
 var jQuery = require('jquery');
-var uiVars = require('views/app/uiVars');
+var isMobile = require('utils/is-mobile');
 var detectCompact = require('utils/detect-compact');
 
 module.exports = (function() {
@@ -30,7 +30,7 @@ module.exports = (function() {
 /*
 
   HEY TROUPER! This is an exact copy of the original Bootstrap tooltip but
-  is disabled by default if you're on a mobile device. Check uiVars.
+  is disabled by default if you're on a mobile device.
 
 */
 
@@ -57,7 +57,7 @@ module.exports = (function() {
       this.type = type
       this.$element = $(element)
       this.options = this.getOptions(options)
-      this.enabled = !uiVars.isMobile
+      this.enabled = !isMobile()
 
       triggers = this.options.trigger.split(' ')
 

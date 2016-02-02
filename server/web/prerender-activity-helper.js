@@ -1,9 +1,10 @@
 "use strict";
 
-var _                   = require('underscore');
-var compileTemplate     = require('./compile-web-template');
-var activityDecorators  = require('gitter-web-shared/activity/activity-decorators');
-var prerenderWrapper    = require('./prerender-wrapper');
+var _                  = require('underscore');
+var compileTemplate    = require('./compile-web-template');
+var activityDecorators = require('gitter-web-shared/activity/activity-decorators');
+var prerenderWrapper   = require('./prerender-wrapper');
+var timeFormat         = require('gitter-web-shared/time/time-format');
 
 function compile(template) {
   return compileTemplate('/js/views/righttoolbar/tmpl/' + template + '.hbs');
@@ -34,7 +35,7 @@ var githubTemplates = {
   watch:          compile('githubWatch')
 };
 
-function renderItem(model) {
+function renderItem(model, lang, tzOffset) {
   var meta = model.meta;
   var service = meta.service;
   var template;
@@ -49,11 +50,14 @@ function renderItem(model) {
 
   if (!template) template = prerenderedTemplate;
 
+  var sentFormatted = timeFormat(model.sent, { lang: lang, tzOffset: tzOffset });
+
   // template data
   var templateData = {
     meta: meta,
     payload: model.payload,
     sent: model.sent,
+    sentFormatted: sentFormatted,
     html: model.html
   };
 
@@ -66,14 +70,14 @@ function renderItem(model) {
   var inner = template(templateData);
 
   return prerenderWrapper({
-    className: "model-id-" + model.id,
+    className: "activity-item model-id-" + model.id,
     wrap: "li",
     inner: inner
   });
 }
 
-function wrapContent(inner, options) {
-  var hash = options.hash;
+function wrapContent(inner, params) {
+  var hash = params.hash;
 
   var wrap = hash.wrap;
   if (!wrap) return inner;
@@ -89,10 +93,17 @@ function wrapContent(inner, options) {
   });
 }
 
-module.exports = function renderCollection(collection, options) {
-  var innerContent = collection ? collection.map(renderItem).join('') : '';
+module.exports = function renderCollection(collection, params) {
+  var root = params.data.root;
+
+  var lang = root.lang;
+  var tzOffset = root.tzOffset;
+
+  var innerContent = collection ? collection.map(function(item) {
+    return renderItem(item, lang, tzOffset);
+  }).join('') : '';
 
   return wrapContent(compositeTemplate({
     _prerender_inner: innerContent
-  }), options);
+  }), params);
 };
