@@ -21,7 +21,6 @@ require('components/ping');
 
 // Preload widgets
 require('views/widgets/avatar');
-require('views/widgets/timeago');
 
 onready(function() {
   var Router = Backbone.Router.extend({
