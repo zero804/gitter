@@ -5,25 +5,20 @@ set -x
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-function mongoeval {
-  mongo --host mongo1 --quiet --eval $1
-}
-
 function resolve {
-  ping -c 1 $1 | head -1  | cut -d "(" -f 2 | cut -d ")" -f 1
+  ping -c 1 "$1" | head -1  | cut -d "(" -f 2 | cut -d ")" -f 1
 }
 
-while [[ "$(mongoeval 'db.serverStatus().ok') || echo 0" = "0" ]]; do
-	echo Waiting for replicaset to come online
-	sleep 0.5
-done
+ANNOUNCE_MONGO1_HOST=${ANNOUNCE_MONGO1_HOST:-$(resolve "mongo1")}
+ANNOUNCE_MONGO2_HOST=${ANNOUNCE_MONGO2_HOST:-$(resolve "mongo2")}
+ANNOUNCE_MONGO3_HOST=${ANNOUNCE_MONGO3_HOST:-$(resolve "mongo3")}
 
-if [[ "$(mongoeval 'rs.status().ok')" != "1" ]]; then
+function mongoeval {
+  mongo --host "${ANNOUNCE_MONGO1_HOST}" --quiet --eval "$1"
+}
+
+if [[ -z "$(mongoeval 'rs.isMaster().setname')" ]]; then
 	echo Replicaset not initialised. Initialising
-
-  ANNOUNCE_MONGO1_HOST=${ANNOUNCE_MONGO1_HOST:-$(resolve "mongo1")}
-  ANNOUNCE_MONGO2_HOST=${ANNOUNCE_MONGO2_HOST:-$(resolve "mongo2")}
-  ANNOUNCE_MONGO3_HOST=${ANNOUNCE_MONGO3_HOST:-$(resolve "mongo3")}
 
 	mongo mongo1:27017/admin <<-DELIM
 		rs.initiate({_id: 'troupeSet', members: [
@@ -32,11 +27,11 @@ if [[ "$(mongoeval 'rs.status().ok')" != "1" ]]; then
                          {_id: 2, host: '${ANNOUNCE_MONGO3_HOST}:27019', arbiterOnly: true },
                 ]});
 	DELIM
-
-	while [[ "$(mongoeval 'rs.status().myState')" != "1" ]]; do
-		echo Waiting for replicaset to come online
-		sleep 0.5
-	done
 fi
 
-SKIP_BACKUP=yes ${SCRIPT_DIR}/../../upgrade-data.sh mongo1 gitter
+while [[ "$(mongoeval 'rs.isMaster().ismaster')" != "true" ]]; do
+	echo Waiting for replicaset to come online
+	sleep 0.5
+done
+
+SKIP_BACKUP=yes ${SCRIPT_DIR}/../../upgrade-data.sh "${ANNOUNCE_MONGO1_HOST}:27017" gitter
