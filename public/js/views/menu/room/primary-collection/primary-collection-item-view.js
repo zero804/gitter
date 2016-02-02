@@ -61,6 +61,7 @@ module.exports = Marionette.ItemView.extend({
       roomAvatarUrl: getRoomAvatar(data.url.substring(1)),
       isNotOneToOne: (data.githubType !== 'ONETOONE'),
       name:          roomNameShortener(data.name),
+      unreadItems:   !!data.mentions ? null : data.unreadItems,
     });
   },
 

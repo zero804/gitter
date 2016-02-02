@@ -89,6 +89,7 @@ module.exports = Marionette.CollectionView.extend({
 
     //construct the default options
     var viewOptions = _.extend({}, options, { model: model });
+    //construct specialist view for close button
     switch (model.get('type')) {
       case 'close':
         return new CloseItemView(viewOptions);
