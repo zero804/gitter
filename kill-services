@@ -1,0 +1,59 @@
+#!/bin/bash
+
+# This may be set for node debug, but those
+# values will break python scripts
+export DEBUG=
+
+set -euo pipefail
+
+DOCKER_MACHINE_NAME=${DOCKER_MACHINE_NAME-default}
+
+function get_ip {
+  if [[ "$OSTYPE" != "linux-gnu" ]]; then
+    echo "$(docker-machine ip $DOCKER_MACHINE_NAME)"
+  else
+    ip route get 8.8.8.8 | head -1 | cut -d' ' -f8
+  fi
+}
+
+function docker_machine_query {
+  docker-machine ls -q --filter name=$DOCKER_MACHINE_NAME "$@"|grep -q "^${DOCKER_MACHINE_NAME}$"
+}
+
+function stopDockerMachine {
+  if docker_machine_query --filter state=Error; then
+    echo "-- Docker machine [$DOCKER_MACHINE_NAME] is in an error state. Deleting."
+    docker-machine rm -f "$DOCKER_MACHINE_NAME"
+  fi
+
+  if docker_machine_query; then
+    ## Start the box if it's stopped
+    if ! docker_machine_query --filter state=Stopped; then
+      echo "-- Stopping docker machine $DOCKER_MACHINE_NAME."
+      docker-machine stop $DOCKER_MACHINE_NAME
+    fi
+  fi
+
+}
+
+function stopDockerServices {
+  eval "$(docker-machine env $DOCKER_MACHINE_NAME)"
+
+  echo "-- Stop services using docker-compose"
+  docker-compose stop
+  docker-compose rm -f
+}
+
+
+if [[ "$OSTYPE" != "linux-gnu" ]]; then
+  eval "$(docker-machine env $DOCKER_MACHINE_NAME)"
+fi
+
+DOCKER_HOST_IP="$(get_ip)"
+export DOCKER_HOST_IP
+
+WORKSPACE="$(pwd)"
+export WORKSPACE
+
+stopDockerServices
+stopDockerMachine

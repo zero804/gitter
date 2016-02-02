@@ -6,34 +6,25 @@ var log = require('utils/log');
 var logout = require('utils/logout');
 var RealtimeClient = require('gitter-realtime-client').RealtimeClient;
 var debug = require('debug-proxy')('app:realtime');
+var isMobile = require('../utils/is-mobile');
+var realtimePresenceTracker = require('./realtime-presence-tracking');
+var _ = require('underscore');
 
 var PING_INTERVAL = 30000;
 var ENABLE_APP_LAYER_PINGS = true;
-
-function isMobile() {
-  return navigator.userAgent.toLowerCase().indexOf('mobile') >= 0;
-}
-
-var eyeballState = true;
-
-appEvents.on('eyeballStateChange', function (state) {
-  debug('Switching eyeball state to %s', state);
-  eyeballState = state;
-});
 
 function authProvider(callback) {
   context.getAccessToken()
     .then(function(accessToken) {
       var mobile = isMobile();
-
-      return callback({
+      var presenceDetails = realtimePresenceTracker.getAuthDetails();
+      var authMessage = _.extend({
         token: accessToken,
         version: context.env('version'),
-        troupeId: context.getTroupeId(),
         connType: mobile ? 'mobile' : 'online',
         client: mobile ? 'mobweb' : 'web',
-        eyeballs: eyeballState ? 1 : 0
-      });
+      }, presenceDetails);
+      return callback(authMessage);
 
     });
 }

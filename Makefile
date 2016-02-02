@@ -28,7 +28,7 @@ build: clean npm
 	mkdir -p output/
 	./exec-in-docker ./node_modules/.bin/gulp test-docker
 	gulp test-redis-lua
-	gulp submit-coveralls
+	gulp submit-coveralls-post-tests
 	gulp package
 
 clean:
