@@ -1,5 +1,7 @@
 'use strict';
 
+//TODO This has basically turned into a controller, refactor it JP 2/2/16
+
 var Backbone                       = require('backbone');
 var _                              = require('underscore');
 var ProxyCollection                = require('backbone-proxy-collection');
@@ -9,6 +11,7 @@ var apiClient                      = require('components/apiClient');
 var FilteredRoomCollection         = require('../collections/filtered-room-collection.js');
 var SuggestedRoomsByRoomCollection = require('../collections/left-menu-suggested-by-room');
 var SearchRoomPeopleCollection     = require('../collections/left-menu-search-rooms-and-people');
+var SearchChatMessages             = require('../collections/search-chat-messages');
 
 var states = [
   'all',
@@ -75,15 +78,17 @@ module.exports = Backbone.Model.extend({
     //expose the public collection
     this.searchTerms         = new RecentSearchesCollection();
     this.searchRoomAndPeople = new SearchRoomPeopleCollection(null, { roomMenuModel: this });
+    this.searchChatMessages  = new SearchChatMessages(null, { roomMenuModel: this, roomModel: this._troupeModel });
     this.suggestedOrgs       = new SuggestedOrgCollection([], { contextModel: this });
 
-    this.primaryCollection   = new FilteredRoomCollection(null, {
+    this.activeRoomCollection   = new FilteredRoomCollection(null, {
       roomModel:  this,
       collection: this._roomCollection,
     });
 
+    this.primaryCollection   = new ProxyCollection({ collection: this.activeRoomCollection });
     this.secondaryCollection = new ProxyCollection({ collection: this.searchTerms });
-    this.tertiaryCollection = new ProxyCollection({ collection: this._orgCollection });
+    this.tertiaryCollection  = new ProxyCollection({ collection: this._orgCollection });
 
     this.listenTo(this.primaryCollection, 'snapshot', this.onPrimaryCollectionSnapshot, this);
 
@@ -119,7 +124,8 @@ module.exports = Backbone.Model.extend({
     //TODO Test this JP 27/1/15
     switch (val) {
       case 'search':
-        this.secondaryCollection.switchCollection(this.searchRoomAndPeople);
+        this.primaryCollection.switchCollection(this.searchRoomAndPeople);
+        this.secondaryCollection.switchCollection(this.searchChatMessages);
         this.tertiaryCollection.switchCollection(this.searchTerms);
         break;
       case 'org':

@@ -33,12 +33,16 @@ module.exports =  Marionette.CompositeView.extend({
     this.$el.toggleClass('active', this.model.get('tertiaryCollectionActive'));
   },
 
+  //TODO This is meant to hide the empty collection but causes recursion
+  //refactor it to use an empty view that hides the DOM element
+  //jp 2/2/16
   onBeforeRender: function(){
-    if(this.collection.length <= 0) {
-      return this.$el.removeClass('active');
-    }
-    Marionette.CompositeView.prototype.render.apply(this, arguments);
-    this.onModelActiveStateChange();
+    this.$el.addClass('active');
+    //if(this.collection.length <= 0) {
+      //return this.$el.removeClass('active');
+    //}
+    //Marionette.CompositeView.prototype.render.apply(this, arguments);
+    //this.onModelActiveStateChange();
   }
 
 });

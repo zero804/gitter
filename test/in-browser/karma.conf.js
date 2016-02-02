@@ -157,7 +157,6 @@ module.exports = function(config) {
       type: 'html',
       dir: path.resolve(__dirname, './fixtures/coverage'),
     },
-
   };
 
   // If in production mode, move the testing to browserstack
@@ -170,7 +169,7 @@ module.exports = function(config) {
   //
   else if (process.env.NODE_ENV === 'debug') {
     karmaConfig.plugins.push(require('karma-chrome-launcher'));
-    karmaConfig.plugins.push(require('karma-webpack'));
+    karmaConfig.plugins.push(require('karma-webpack-with-fast-source-maps'));
     karmaConfig = _.extend(karmaConfig, chromeKarmaConfig);
   }
 

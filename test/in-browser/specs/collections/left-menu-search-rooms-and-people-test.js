@@ -6,7 +6,7 @@ var sinon                                  = require('sinon');
 var Backbone                               = require('backbone');
 var LeftMenuSearchRoomsAndPeopleCollection = require('public/js/collections/left-menu-search-rooms-and-people.js');
 
-describe.only('LeftMenuSearchRoomsAndPeopleCollection', function(){
+describe('LeftMenuSearchRoomsAndPeopleCollection', function(){
 
   var collection;
   var model;
