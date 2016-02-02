@@ -59,10 +59,9 @@ mongosetup:
   volumes:
    - ${WORKSPACE}:/src
   environment:
-    ANNOUNCE_MONGO1_HOST: mongo1
-    ANNOUNCE_MONGO2_HOST: mongo2
-    ANNOUNCE_MONGO3_HOST: mongo3
-    RESOLVE_IPS: 1
+    ANNOUNCE_MONGO1_HOST: ""
+    ANNOUNCE_MONGO2_HOST: ""
+    ANNOUNCE_MONGO3_HOST: ""
   working_dir: /src
   entrypoint: [ "/src/scripts/docker/mongo/mongo-setup.sh" ]
 

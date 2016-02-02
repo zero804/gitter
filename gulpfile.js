@@ -167,14 +167,14 @@ gulp.task('test-redis-lua', shell.task([
   './test/redis-lua/run-tests'
 ]));
 
-gulp.task('merge-lcov', ['test-mocha', 'test-redis-lua'], function() {
+gulp.task('merge-lcov', function() {
   return gulp.src('output/coverage-reports/**/lcov.info')
     .pipe(using())
     .pipe(lcovMerger())
     .pipe(gulp.dest('output/coverage-reports/merged/'));
 });
 
-gulp.task('submit-coveralls', ['test-mocha', 'test-redis-lua', 'merge-lcov'], function() {
+gulp.task('submit-coveralls-post-tests', ['merge-lcov'], function() {
   var GIT_BRANCH = process.env.GIT_BRANCH;
   if (GIT_BRANCH) {
     // Make coveralls play nice with Jenkins (lame)
@@ -186,6 +186,10 @@ gulp.task('submit-coveralls', ['test-mocha', 'test-redis-lua', 'merge-lcov'], fu
     .on('end', function() {
       process.env.GIT_BRANCH = GIT_BRANCH;
     });
+});
+
+gulp.task('submit-coveralls', ['test-mocha', 'test-redis-lua'], function(callback) {
+  runSequence('submit-coveralls-post-tests', callback);
 });
 
 gulp.task('test', ['test-mocha', 'test-redis-lua', 'submit-coveralls']);
