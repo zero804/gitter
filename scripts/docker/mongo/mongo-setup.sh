@@ -15,7 +15,7 @@ function resolve {
 
 while [[ "$(mongoeval 'db.serverStatus().ok') || echo 0" = "0" ]]; do
 	echo Waiting for replicaset to come online
-	sleep 1
+	sleep 0.5
 done
 
 if [[ "$(mongoeval 'rs.status().ok')" != "1" ]]; then
@@ -33,12 +33,9 @@ if [[ "$(mongoeval 'rs.status().ok')" != "1" ]]; then
                 ]});
 	DELIM
 
-	mongoeval 'printjson(rs.status())';
-
 	while [[ "$(mongoeval 'rs.status().myState')" != "1" ]]; do
 		echo Waiting for replicaset to come online
-		mongoeval 'printjson(rs.status())';
-		sleep 1
+		sleep 0.5
 	done
 fi
 
