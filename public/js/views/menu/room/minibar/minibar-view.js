@@ -103,7 +103,7 @@ module.exports = Marionette.CollectionView.extend({
     this.shouldRender = false;
     this.bus          = attrs.bus;
     this.listenTo(this.collection, 'snapshot', this.onCollectionSnapshot, this);
-    this.listenTo(this.model, 'change:state', this.onMenuStateUpdate, this);
+    this.listenTo(this.model, 'change:state change:selectedOrgName', this.onMenuStateUpdate, this);
   },
 
   render: function() {
@@ -127,13 +127,17 @@ module.exports = Marionette.CollectionView.extend({
     });
   },
 
-  onMenuStateUpdate: function(model, val) { //jshint unused: true
+  onMenuStateUpdate: function() {
     //reset the currently active model
     var activeModel = this.collection.findWhere({ active: true });
     if (activeModel) { activeModel.set('active', false); }
 
     //activate the new model
-    var nextActiveModel = this.collection.findWhere({ type: val });
+    var currentState = this.model.get('state');
+    var nextActiveModel = (currentState !== 'org') ?
+      this.collection.findWhere({ type: currentState }) :
+      this.collection.findWhere({ name: this.model.get('selectedOrgName') });
+
     if (nextActiveModel) { nextActiveModel.set('active', true);}
   },
 
