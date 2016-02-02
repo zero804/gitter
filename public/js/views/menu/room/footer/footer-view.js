@@ -11,11 +11,12 @@ module.exports = Marionette.ItemView.extend({
 
   modelEvents: {
     'change:state': 'onModelChange',
+    'change:searchTerm': 'onModelChange',
   },
 
   ui: {
     searchFooter: '#panel-footer--search',
-    allFooter: '#panel-footer--all'
+    allFooter: '#panel-footer--all',
   },
 
   initialize: function(attrs) {
@@ -26,11 +27,16 @@ module.exports = Marionette.ItemView.extend({
     this.bus = attrs.bus;
   },
 
-  onModelChange: function(model, val) {//jshint unused: true
-    RAF(function(){
-      this.ui.searchFooter.toggleClass('active', (val === 'search'));
-      this.ui.allFooter.toggleClass('active', (val !== 'search'));
+  onModelChange: function() {
+    RAF(function() {
+      var shouldShowSearchFooter = ((this.model.get('state') === 'search') && !this.model.get('searchTerm'));
+      this.ui.searchFooter.toggleClass('active', shouldShowSearchFooter);
+      this.ui.allFooter.toggleClass('active', (this.model.get('state') !== 'search'));
     }.bind(this));
+  },
+
+  onModelChangeSearchTerm: function(mode, val) { //jshint unused: true
+    this.ui.searchFooter.toggleClass('active', !!val);
   },
 
 });

@@ -20,7 +20,7 @@ module.exports = Backbone.Model.extend({
     switch (this.model.get('state')) {
       case 'search' :
         this.set({
-          secondaryCollectionHeader: 'Recent Searches',
+          secondaryCollectionHeader: 'Chat Messages',
           secondaryCollectionActive: true,
         });
         break;

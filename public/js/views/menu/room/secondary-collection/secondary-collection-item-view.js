@@ -30,22 +30,24 @@ module.exports = Marionette.ItemView.extend({
 
   serializeData: function() {
     var data = this.model.toJSON();
-    //console.log('-----------------------');
-    //console.log(data);
-    //console.log('-----------------------');
+
+    if (data.fromUser) {
+      return _.extend({}, data, {
+        name: data.html,
+        avatarUrl: data.fromUser.avatarUrlSmall,
+      });
+    }
 
     //When recent searches are rendered the models have an avatarUrl of null,
     //this is because we want to hide the avatar image ONLY in this case
     //as such we have this check here jp 25/1/16
-    if(data.avatarUrl !== null){
+    if (data.avatarUrl !== null) {
       data.avatarUrl = (data.avatarUrl || getRoomAvatar(data.name || data.uri || ' '));
     }
 
     return _.extend({}, data, {
       name: roomNameShortener((data.name || data.uri)),
     });
-  }
+  },
 
 });
-
-

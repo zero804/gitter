@@ -18,7 +18,26 @@ module.exports = Backbone.Model.extend({
   },
 
   onModelChangeState: function(model, val) { //jshint unused: true
-    this.set('tertiaryCollectionActive', val === 'all');
+    switch (val) {
+      case 'all':
+        this.set({
+          tertiaryCollectionHeader: 'Your Organisations',
+          tertiaryCollectionActive: true,
+        });
+        break;
+      case 'search':
+        this.set({
+          tertiaryCollectionHeader: 'Recent Searches',
+          tertiaryCollectionActive: true,
+        });
+        break;
+      default:
+        this.set({
+          tertiaryCollectionHeader: ' ',
+          tertiaryCollectionActive: false,
+        });
+        break;
+    }
   },
 
 });
