@@ -1,26 +1,26 @@
 /* jshint maxcomplexity:20 */
 "use strict";
 
-var env              = require('gitter-web-env');
-var logger           = env.logger;
-var errorReporter    = env.errorReporter;
-var engine           = require('./unread-item-service-engine');
-var readByService    = require("./readby-service");
-var userService      = require("./user-service");
-var roomPermissionsModel = require('./room-permissions-model');
-var appEvents        = require('gitter-web-appevents');
+var env                   = require('gitter-web-env');
+var logger                = env.logger;
+var errorReporter         = env.errorReporter;
+var engine                = require('./unread-item-service-engine');
+var readByService         = require("./readby-service");
+var userService           = require("./user-service");
+var roomPermissionsModel  = require('./room-permissions-model');
+var appEvents             = require('gitter-web-appevents');
 var categoriseUserInRoom  = require("./categorise-users-in-room");
-var _                = require("lodash");
-var mongoUtils       = require('../utils/mongo-utils');
-var RedisBatcher     = require('../utils/redis-batcher').RedisBatcher;
-var collections      = require('../utils/collections');
-var Q                = require('q');
+var _                     = require("lodash");
+var mongoUtils            = require('../utils/mongo-utils');
+var RedisBatcher          = require('../utils/redis-batcher').RedisBatcher;
+var collections           = require('../utils/collections');
+var Q                     = require('q');
 var roomMembershipService = require('./room-membership-service');
-var uniqueIds        = require('mongodb-unique-ids');
-var debug            = require('debug')('gitter:unread-item-service');
-var recentRoomCore   = require('./core/recent-room-core');
-var badgeBatcher     = new RedisBatcher('badge', 1000, batchBadgeUpdates);
-var Q                = require('q');
+var uniqueIds             = require('mongodb-unique-ids');
+var debug                 = require('debug')('gitter:unread-item-service');
+var recentRoomCore        = require('./core/recent-room-core');
+var badgeBatcher          = new RedisBatcher('badge', 1000, batchBadgeUpdates);
+var Q                     = require('q');
 
 /* Handles batching badge updates to users */
 function batchBadgeUpdates(key, userIds, done) {
@@ -737,5 +737,6 @@ exports.testOnly = {
   getTroupeIdsCausingBadgeCount: getTroupeIdsCausingBadgeCount,
   parseChat: parseChat,
   generateMentionDeltaSet: generateMentionDeltaSet,
-  findNonMembersWithAccess: findNonMembersWithAccess
+  findNonMembersWithAccess: findNonMembersWithAccess,
+  processResultsForNewItemWithMentions: processResultsForNewItemWithMentions
 };
