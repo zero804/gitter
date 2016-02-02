@@ -1,5 +1,7 @@
 'use strict';
 
+//TODO This is too specialised, abstract jp 2/2/16
+
 var Backbone               = require('backbone');
 var BaseResolverCollection = require('./base-resolver-collection.js');
 
@@ -60,8 +62,8 @@ module.exports = BaseResolverCollection.extend({
     BaseResolverCollection.prototype.initialize.apply(this, arguments);
   },
 
-  onModelUpdateActive: function() {
-    this.fetch();
+  onModelUpdateActive: function(model, val) { //jshint unused: true
+    return (!val) ? this.reset() : this.fetch();
   },
 
 });

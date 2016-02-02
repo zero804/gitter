@@ -65,7 +65,7 @@ describe('SearchChatMessages', function() {
     assert.equal(0, collection.fetch.callCount);
   });
 
-  it.only('should contain the right url when it fetches', function() {
+  it('should contain the right url when it fetches', function() {
     room.set('id', 123456);
     model.set({ state: 'search', searchTerm: 'sometestsearch' });
     console.log(collection.url());
