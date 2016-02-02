@@ -1,14 +1,14 @@
 #!/bin/bash -xe
 
-set -e
+set -euo pipefail
 set -x
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # source $SCRIPT_DIR/vars
 
-if ! curl --fail -vi -XGET "$ES_URL/$INDEX_NAME/_settings"; then
-  curl --fail -vi -XPUT "$ES_URL/$INDEX_NAME?pretty=true" -d @- << EOD
+if ! curl -q --fail -vi -XGET "$ES_URL/$INDEX_NAME/_settings"; then
+  curl -q --fail -vi -XPUT "$ES_URL/$INDEX_NAME?pretty=true" -d @- << EOD
   {
     "settings": {
       "number_of_shards": 4,
@@ -24,15 +24,15 @@ fi
 sleep 10
 
 ## Update the language analyzers
-curl -XPOST "$ES_URL/$INDEX_NAME/_close"
+curl -q -XPOST "$ES_URL/$INDEX_NAME/_close"
 
 for l in $SCRIPT_DIR/languages/*.json; do
-  curl --fail -vi -XPUT "$ES_URL/$INDEX_NAME/_settings?pretty=true" -d @$l
+  curl -q --fail -vi -XPUT "$ES_URL/$INDEX_NAME/_settings?pretty=true" -d @$l
 done
 
-curl -XPOST "$ES_URL/$INDEX_NAME/_open"
+curl -q -XPOST "$ES_URL/$INDEX_NAME/_open"
 
-curl --fail -vi -XPUT "$ES_URL/$INDEX_NAME/_mapping/user?pretty=true" -d @- << EOD
+curl -q --fail -vi -XPUT "$ES_URL/$INDEX_NAME/_mapping/user?pretty=true" -d @- << EOD
 {
   "user": {
     "dynamic" : "strict",
@@ -54,7 +54,7 @@ curl --fail -vi -XPUT "$ES_URL/$INDEX_NAME/_mapping/user?pretty=true" -d @- << E
 }
 EOD
 
-curl --fail -vi -XPUT "$ES_URL/$INDEX_NAME/_mapping/chat?pretty=true" -d @- << EOD
+curl -q --fail -vi -XPUT "$ES_URL/$INDEX_NAME/_mapping/chat?pretty=true" -d @- << EOD
 {
   "chat": {
     "_parent": {
@@ -98,7 +98,7 @@ curl --fail -vi -XPUT "$ES_URL/$INDEX_NAME/_mapping/chat?pretty=true" -d @- << E
 }
 EOD
 
-curl --fail -vi -XPUT "$ES_URL/$INDEX_NAME/_mapping/room?pretty=true" -d @- << EOD
+curl -q --fail -vi -XPUT "$ES_URL/$INDEX_NAME/_mapping/room?pretty=true" -d @- << EOD
 {
   "room": {
     "dynamic" : "strict",

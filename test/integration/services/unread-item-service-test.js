@@ -14,6 +14,8 @@ var once = times(1);
 var allOf = hamcrest.Matchers.allOf;
 var anything = hamcrest.Matchers.anything;
 var hasMember = hamcrest.Matchers.hasMember;
+var equivalentMap = hamcrest.Matchers.equivalentMap;
+var equivalentArray = hamcrest.Matchers.equivalentArray;
 
 function makeHash() {
   var hash = [];
@@ -1022,6 +1024,384 @@ describe('unread-item-service', function() {
         })
         .nodeify(done);
     });
+
+  });
+
+  describe('processResultsForNewItemWithMentions', function() {
+    var unreadItemService, categoriseUserInRoom, appEvents,
+      mockRedisBatcher, processResultsForNewItemWithMentions,
+      troupeId, chatId;
+
+    var userId1 = 'USERID1';
+    var mongoUtils = testRequire('./utils/mongo-utils');
+    var testGenerator = require('../test-generator');
+
+    beforeEach(function() {
+      var MockBadgeBatcherController = require('../utils/mock-redis-batcher');
+      mockRedisBatcher = new MockBadgeBatcherController();
+      categoriseUserInRoom = mockito.mockFunction();
+      appEvents = mockito.mock(require('gitter-web-appevents'));
+      troupeId = mongoUtils.getNewObjectIdString();
+      chatId = mongoUtils.getNewObjectIdString();
+
+      unreadItemService = testRequire.withProxies("./services/unread-item-service", {
+        'gitter-web-appevents': appEvents,
+        '../utils/redis-batcher': mockRedisBatcher,
+        './categorise-users-in-room' : categoriseUserInRoom
+      });
+
+      processResultsForNewItemWithMentions = unreadItemService.testOnly.processResultsForNewItemWithMentions;
+    });
+
+
+    var FIXTURES = [{
+      name: 'processResultsForNewItemWithMentions',
+      meta: {
+        notifyUserIds: [],
+        notifyNewRoomUserIds: [],
+        activityOnlyUserIds: [],
+        mentionUserIds: [],
+
+        isEdit: false,
+
+        results: [],
+
+        inroom: [],
+        online: [],
+        mobile: [],
+        push: [],
+        push_connected: [],
+        push_notified: [],
+        push_notified_connected: [],
+
+        expectUserMentionedInNonMemberRoom: [],
+        expectNewUnreadNoMention: [],
+        expectNewUnreadWithMention: [],
+        expectNewOnlineNotificationNoMention: [],
+        expectNewOnlineNotificationWithMention: [],
+        expectNewPushCandidatesNoMention: [],
+        expectNewPushCandidatesWithMention: [],
+        expectTroupeUnreadCountsChange: [],
+        expectLurkActivity: [],
+        expectBadgeUpdateUserIds: []
+      },
+      tests: [{
+        name: 'Chat, no mention, single user',
+        meta: {
+          notifyUserIds: [userId1],
+          results: [{ userId: userId1, unreadCount: 1, mentionCount: 0, badgeUpdate: true }],
+        },
+        tests: [ {
+          name: 'In room',
+          inroom: [userId1],
+          expectNewUnreadNoMention: [userId1],
+          expectTroupeUnreadCountsChange: [{
+            userId: userId1,
+            unreadCount: 1,
+            mentionCount: 0
+          }],
+          expectBadgeUpdateUserIds: [userId1]
+        }, {
+          name: 'Online',
+          online: [userId1],
+          expectNewUnreadNoMention: [userId1],
+          expectNewOnlineNotificationNoMention: [userId1],
+          expectTroupeUnreadCountsChange: [{
+            userId: userId1,
+            unreadCount: 1,
+            mentionCount: 0
+          }],
+          expectBadgeUpdateUserIds: [userId1]
+        }, {
+          name: 'Mobile',
+          mobile: [userId1],
+          expectNewUnreadNoMention: [userId1],
+          expectTroupeUnreadCountsChange: [{
+            userId: userId1,
+            unreadCount: 1,
+            mentionCount: 0
+          }],
+          expectBadgeUpdateUserIds: [userId1]
+        }, {
+          name: 'Push',
+          push: [userId1],
+
+          expectBadgeUpdateUserIds: [userId1],
+          expectNewPushCandidatesNoMention: [userId1]
+        }, {
+          name: 'Push Connected',
+          push_connected: [userId1],
+
+          expectNewUnreadNoMention: [userId1],
+          expectTroupeUnreadCountsChange: [{
+            userId: userId1,
+            unreadCount: 1,
+            mentionCount: 0
+          }],
+
+          expectBadgeUpdateUserIds: [userId1],
+          expectNewPushCandidatesNoMention: [userId1]
+        }, {
+          name: 'Push Notified',
+          push_notified: [userId1],
+          expectBadgeUpdateUserIds: [userId1]
+        }, {
+          name: 'Push Notified Connected',
+          push_notified_connected: [userId1],
+          expectNewUnreadNoMention: [userId1],
+          expectTroupeUnreadCountsChange: [{
+            userId: userId1,
+            unreadCount: 1,
+            mentionCount: 0
+          }],
+          expectBadgeUpdateUserIds: [userId1]
+        }]
+      }, {
+        name: 'Chat, mention, single user',
+        meta: {
+          notifyUserIds: [userId1],
+          mentionUserIds: [userId1],
+          results: [{ userId: userId1, unreadCount: 1, mentionCount: 1, badgeUpdate: true }],
+        },
+        tests: [{
+          name: 'In room',
+          inroom: [userId1],
+          expectNewUnreadWithMention: [userId1],
+          expectTroupeUnreadCountsChange: [{
+            userId: userId1,
+            unreadCount: 1,
+            mentionCount: 1
+          }],
+          expectBadgeUpdateUserIds: [userId1]
+        }, {
+          name: 'Online',
+          online: [userId1],
+          expectNewUnreadWithMention: [userId1],
+          expectNewOnlineNotificationWithMention: [userId1],
+          expectTroupeUnreadCountsChange: [{
+            userId: userId1,
+            unreadCount: 1,
+            mentionCount: 1
+          }],
+          expectBadgeUpdateUserIds: [userId1]
+        }, {
+          name: 'Mobile',
+          mobile: [userId1],
+          expectNewUnreadWithMention: [userId1],
+          expectTroupeUnreadCountsChange: [{
+            userId: userId1,
+            unreadCount: 1,
+            mentionCount: 1
+          }],
+          expectBadgeUpdateUserIds: [userId1]
+        }, {
+          name: 'Push',
+          push: [userId1],
+
+          expectBadgeUpdateUserIds: [userId1],
+          expectNewPushCandidatesWithMention: [userId1]
+        }, {
+          name: 'Push Connected',
+          push_connected: [userId1],
+
+          expectNewUnreadWithMention: [userId1],
+          expectTroupeUnreadCountsChange: [{
+            userId: userId1,
+            unreadCount: 1,
+            mentionCount: 1
+          }],
+
+          expectBadgeUpdateUserIds: [userId1],
+          expectNewPushCandidatesWithMention: [userId1]
+        }, {
+          name: 'Push Notified',
+          push_notified: [userId1],
+          expectNewPushCandidatesWithMention: [userId1],
+          expectBadgeUpdateUserIds: [userId1]
+        }, {
+          name: 'Push Notified Connected',
+          push_notified_connected: [userId1],
+          expectNewUnreadWithMention: [userId1],
+          expectNewPushCandidatesWithMention: [userId1],
+          expectTroupeUnreadCountsChange: [{
+            userId: userId1,
+            unreadCount: 1,
+            mentionCount: 1
+          }],
+          expectBadgeUpdateUserIds: [userId1]
+        }]
+      }, {
+        name: 'Lurking user',
+        meta: {
+          activityOnlyUserIds: [userId1]
+        },
+        tests: [{
+          name: 'In room',
+          inroom: [userId1],
+          expectLurkActivity: [userId1]
+        }, {
+          name: 'Online',
+          online: [userId1],
+          expectLurkActivity: [userId1]
+        }, {
+          name: 'Mobile',
+          mobile: [userId1],
+          expectLurkActivity: [userId1]
+        }, {
+          name: 'Push',
+          push: [userId1],
+        }, {
+          name: 'Push Connected',
+          push_connected: [userId1],
+          expectLurkActivity: [userId1]
+        }, {
+          name: 'Push Notified',
+          push_notified: [userId1],
+        }, {
+          name: 'Push Notified Connected',
+          push_notified_connected: [userId1],
+          expectLurkActivity: [userId1]
+        }]
+      }, {
+        name: 'notifyNewRoomUserIds',
+        notifyNewRoomUserIds: [userId1],
+        expectUserMentionedInNonMemberRoom: [userId1]
+      }]
+    }];
+
+
+    testGenerator(FIXTURES, function(name, meta) {
+      it(name, function() {
+        var parsed = {
+          notifyUserIds: meta.notifyUserIds,
+          notifyNewRoomUserIds: meta.notifyNewRoomUserIds,
+          activityOnlyUserIds: meta.activityOnlyUserIds,
+          mentionUserIds: meta.mentionUserIds,
+        };
+
+        var results = meta.results.reduce(function(memo, result) {
+          memo[result.userId] = result;
+          return memo;
+        }, {});
+
+        var isEdit = meta.isEdit;
+
+        mockito.when(categoriseUserInRoom)().then(function(pTroupeId, userIds) {
+          assert.strictEqual(pTroupeId, troupeId);
+
+          var userIdsSorted = userIds.slice();
+          userIdsSorted.sort();
+          var expectedUserIds = parsed.notifyUserIds.concat(parsed.activityOnlyUserIds);
+          expectedUserIds.sort();
+          assert.deepEqual(userIdsSorted, expectedUserIds);
+
+          var result = userIds.reduce(function(memo, userId) {
+
+            if (meta.inroom.indexOf(userId) >= 0) {
+              memo[userId] = 'inroom';
+            } else if (meta.online.indexOf(userId) >= 0) {
+              memo[userId] = 'online';
+            } else if (meta.mobile.indexOf(userId) >= 0) {
+              memo[userId] = 'mobile';
+            } else if (meta.push.indexOf(userId) >= 0) {
+              memo[userId] = 'push';
+            } else if (meta.push_connected.indexOf(userId) >= 0) {
+              memo[userId] = 'push_connected';
+            } else if (meta.push_notified.indexOf(userId) >= 0) {
+              memo[userId] = 'push_notified';
+            } else if (meta.push_notified_connected.indexOf(userId) >= 0) {
+              memo[userId] = 'push_notified_connected';
+            }
+
+            return memo;
+          }, {});
+          return Q.resolve(result);
+        });
+
+        return processResultsForNewItemWithMentions(troupeId, chatId, parsed, results, isEdit)
+          .then(function() {
+            if (meta.expectUserMentionedInNonMemberRoom.length) {
+              meta.expectUserMentionedInNonMemberRoom.forEach(function(userId) {
+                mockito.verify(appEvents, once).userMentionedInNonMemberRoom(equivalentMap({ userId: userId, troupeId: troupeId }));
+              });
+            } else {
+              mockito.verify(appEvents, never()).userMentionedInNonMemberRoom();
+            }
+
+            // newUnreadItem
+            if (meta.expectNewUnreadNoMention.length || meta.expectNewUnreadWithMention.length) {
+              meta.expectNewUnreadNoMention.forEach(function(userId) {
+                mockito.verify(appEvents, once).newUnreadItem(userId, troupeId, equivalentMap({ chat: [chatId] }), true);
+              });
+
+              meta.expectNewUnreadWithMention.forEach(function(userId) {
+                mockito.verify(appEvents, once).newUnreadItem(userId, troupeId, equivalentMap({ chat: [chatId], mention: [chatId] }), true);
+              });
+            } else {
+              mockito.verify(appEvents, never()).newUnreadItem();
+            }
+
+            // newOnlineNotification
+            if (meta.expectNewOnlineNotificationNoMention.length || meta.expectNewOnlineNotificationWithMention.length) {
+              if (meta.expectNewOnlineNotificationNoMention.length) {
+                mockito.verify(appEvents, once).newOnlineNotification(troupeId, chatId, equivalentArray(meta.expectNewOnlineNotificationNoMention), false);
+              } else {
+                mockito.verify(appEvents, never()).newOnlineNotification(anything(), anything(), anything(), false);
+              }
+
+              if (meta.expectNewOnlineNotificationWithMention.length) {
+                mockito.verify(appEvents, once).newOnlineNotification(troupeId, chatId, equivalentArray(meta.expectNewOnlineNotificationWithMention), true);
+              } else {
+                mockito.verify(appEvents, never()).newOnlineNotification(anything(), anything(), anything(), true);
+              }
+            } else {
+              mockito.verify(appEvents, never()).newOnlineNotification();
+            }
+
+            if (meta.expectNewPushCandidatesWithMention.length) {
+              mockito.verify(appEvents, once).newPushNotificationForChat(troupeId, chatId, equivalentArray(meta.expectNewPushCandidatesWithMention), true);
+            } else {
+              mockito.verify(appEvents, never()).newPushNotificationForChat(anything(), anything(), anything(), true);
+            }
+
+            if (meta.expectNewPushCandidatesNoMention.length) {
+              mockito.verify(appEvents, once).newPushNotificationForChat(troupeId, chatId, equivalentArray(meta.expectNewPushCandidatesNoMention), false);
+            } else {
+              mockito.verify(appEvents, never()).newPushNotificationForChat(anything(), anything(), anything(), false);
+            }
+
+            if (meta.expectTroupeUnreadCountsChange.length) {
+              meta.expectTroupeUnreadCountsChange.forEach(function(expectTroupeUnreadCountsChange) {
+                mockito.verify(appEvents, once).troupeUnreadCountsChange(equivalentMap({
+                  userId: expectTroupeUnreadCountsChange.userId,
+                  troupeId: troupeId,
+                  total: expectTroupeUnreadCountsChange.unreadCount,
+                  mentions: expectTroupeUnreadCountsChange.mentionCount
+                }));
+              });
+            } else {
+              mockito.verify(appEvents, never()).troupeUnreadCountsChange();
+            }
+
+            if (meta.expectLurkActivity.length) {
+              meta.expectLurkActivity.forEach(function(userId) {
+                mockito.verify(appEvents, once).newLurkActivity(equivalentMap({
+                  userId: userId,
+                  troupeId: troupeId
+                }));
+              });
+
+            } else {
+              mockito.verify(appEvents, never()).newLurkActivity();
+            }
+
+            var mockBatcher = mockRedisBatcher.getMock('badge');
+            var items = mockBatcher.getItems('queue');
+            assert.deepEqual(items, meta.expectBadgeUpdateUserIds);
+          });
+      });
+    });
+
 
   });
 
