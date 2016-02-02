@@ -129,10 +129,14 @@ module.exports = Backbone.Model.extend({
         this.tertiaryCollection.switchCollection(this.searchTerms);
         break;
       case 'org':
+        this.primaryCollection.switchCollection(this.activeRoomCollection);
         this.secondaryCollection.switchCollection(this.suggestedOrgs);
+        this.tertiaryCollection.switchCollection(new Backbone.Collection(null));
         break;
       case 'all':
+        this.primaryCollection.switchCollection(this.activeRoomCollection);
         this.secondaryCollection.switchCollection(this._suggestedRoomCollection);
+        this.tertiaryCollection.switchCollection(this._orgCollection);
         break;
     }
   },

@@ -12,7 +12,6 @@ var TertiaryCollectionModel  = require('../tertiary-collection/tertiary-collecti
 var ProfileMenuView          = require('../profile/profile-menu-view');
 var RAF                      = require('utils/raf');
 
-var SearchView            = require('views/menu/room/search-results/search-results-view');
 var SearchInputView       = require('views/menu/room/search-input/search-input-view');
 
 require('views/behaviors/isomorphic');
@@ -28,7 +27,6 @@ module.exports = Marionette.LayoutView.extend({
       secondaryCollection: { el: '#secondary-collection', init: 'initSecondaryCollection' },
       teritaryCollection:  { el: '#tertiary-collection', init: 'initTertiaryCollection' },
       searchInput:         { el: '#search-input', init: 'initSearchInput' },
-      search:              { el: '#search-results', init: 'initSearch' },
       footer:              { el: '#panel-footer', init: 'initFooter' },
     },
   },
@@ -74,10 +72,6 @@ module.exports = Marionette.LayoutView.extend({
       model: new TertiaryCollectionModel({}, { model: this.model }),
       collection: this.model.tertiaryCollection,
     }));
-  },
-
-  initSearch: function(optionsForRegion) {
-    return new SearchView(optionsForRegion({ model: this.model }));
   },
 
   initSearchInput: function(optionsForRegion) {
