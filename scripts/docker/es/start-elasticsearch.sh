@@ -8,8 +8,8 @@ set -x
 /usr/share/elasticsearch/bin/plugin --install mobz/elasticsearch-head || true
 /usr/share/elasticsearch/bin/plugin --install royrusso/elasticsearch-HQ || true
 
-if [[ -z "${ES_ANNOUNCE_HOST}" ]]; then
+if [[ -z "${ANNOUNCE_ES_HOST}" ]]; then
   exec /usr/share/elasticsearch/bin/elasticsearch
 else
-  exec /usr/share/elasticsearch/bin/elasticsearch --network.publish_host="${ES_ANNOUNCE_HOST}"
+  exec /usr/share/elasticsearch/bin/elasticsearch --network.publish_host="${ANNOUNCE_ES_HOST}"
 fi
