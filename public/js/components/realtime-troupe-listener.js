@@ -3,6 +3,7 @@
 var context = require('utils/context');
 var realtime = require('./realtime');
 var appEvents = require('utils/appevents');
+var realtimePresenceTracking = require('./realtime-presence-tracking');
 
 var subscribeCount = 0;
 
@@ -38,7 +39,7 @@ var templateSubscription = realtime.getClient().subscribeTemplate({
 
     return {
       reassociate: {
-        eyeballs: 1 /* TODO: use real eyeballs state */
+        eyeballs: realtimePresenceTracking.getEyeballs()
       }
     };
   }
