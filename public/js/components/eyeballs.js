@@ -3,9 +3,13 @@ var context = require('utils/context');
 var apiClient = require('components/apiClient');
 var localStore = require('./local-store');
 var realtime = require('./realtime');
+var realtimePresenceTracking = require('./realtime-presence-tracking');
 var appEvents = require('utils/appevents');
 var _ = require('underscore');
 var debug = require('debug-proxy')('app:eyeballs');
+
+// Tell realtime signals to report on presence
+realtimePresenceTracking.track();
 
 module.exports = (function() {
 

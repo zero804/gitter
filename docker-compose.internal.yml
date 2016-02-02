@@ -4,20 +4,14 @@
 redis1:
   image: redis:3.0.3
   restart: always
-  ports:
-    - "6379:6379"
   entrypoint: [ "/usr/local/bin/redis-server", "--bind", "0.0.0.0", "--port", "6379", "--maxclients", "200", "--dir", "/tmp", "--save", ""]
 
 redis2:
   image: redis:3.0.3
   restart: always
-  ports:
-    - "6380:6380"
   links:
     - redis1
-  extra_hosts:
-     - gitter-redis-dev:${DOCKER_HOST_IP}
-  entrypoint: [ "/usr/local/bin/redis-server", "--bind", "0.0.0.0",  "--port", "6380", "--slaveof", "gitter-redis-dev", "6379", "--maxclients", "200", "--dir", "/tmp", "--save", ""]
+  entrypoint: [ "/usr/local/bin/redis-server", "--bind", "0.0.0.0",  "--port", "6380", "--slaveof", "redis1", "6379", "--maxclients", "200", "--dir", "/tmp", "--save", ""]
 
 sentinel1:
   image: redis:3.0.3
@@ -26,37 +20,34 @@ sentinel1:
     - redis1
     - redis2
   ports:
-    - "26379:26379"
-  extra_hosts:
-     - gitter-redis-dev:${DOCKER_HOST_IP}
-  entrypoint: [ "/bin/bash", "-c", "echo 'sentinel monitor gitter-master-dev gitter-redis-dev 6379 1' > /redis-sentinel.conf && exec /usr/local/bin/redis-server /redis-sentinel.conf --sentinel --bind 0.0.0.0 --maxclients 200"]
+    - 26379
+  entrypoint:
+    - /bin/bash
+    - -c
+    - |
+      echo 'sentinel monitor gitter-master-dev redis1 6379 1' > /redis-sentinel.conf &&
+      exec /usr/local/bin/redis-server /redis-sentinel.conf --sentinel --bind 0.0.0.0 --maxclients 200
 
 #
 # Mongo
 #
+mongo1:
+  image: mongo:3.0
+  restart: always
+  links:
+    - mongo2
+    - mongo3
+  entrypoint: [ "/usr/bin/mongod", "--replSet", "troupeSet", "--journal", "--smallfiles", "--storageEngine=wiredTiger", "--oplogSize=20", "--port=27017" ]
+
 mongo2:
   image: mongo:3.0
   restart: always
   entrypoint: [ "/usr/bin/mongod", "--replSet", "troupeSet", "--journal", "--smallfiles", "--storageEngine=wiredTiger", "--oplogSize=20", "--port=27018" ]
-  ports:
-    - "27018:27018"
 
 mongo3:
   image: mongo:3.0
   restart: always
   entrypoint: [ "/usr/bin/mongod", "--replSet", "troupeSet", "--journal", "--smallfiles", "--storageEngine=wiredTiger", "--oplogSize=20", "--port=27019" ]
-  ports:
-    - "27019:27019"
-
-mongo1:
-  image: mongo:3.0
-  restart: always
-  entrypoint: [ "/usr/bin/mongod", "--replSet", "troupeSet", "--journal", "--smallfiles", "--storageEngine=wiredTiger", "--oplogSize=20" ]
-  ports:
-    - "27017:27017"
-  links:
-    - mongo2
-    - mongo3
 
 mongosetup:
   image: mongo:3.0
@@ -68,25 +59,18 @@ mongosetup:
   volumes:
    - ${WORKSPACE}:/src
   environment:
-    ANNOUNCE_MONGO1_HOST: ${DOCKER_HOST_IP}
-    ANNOUNCE_MONGO2_HOST: ${DOCKER_HOST_IP}
-    ANNOUNCE_MONGO3_HOST: ${DOCKER_HOST_IP}
+    ANNOUNCE_MONGO1_HOST: ""
+    ANNOUNCE_MONGO2_HOST: ""
+    ANNOUNCE_MONGO3_HOST: ""
   working_dir: /src
   entrypoint: [ "/src/scripts/docker/mongo/mongo-setup.sh" ]
 
 neo4j:
   image: kbastani/docker-neo4j
   restart: always
-  ports:
-    - "7474:7474"
 
-# The official elasticsearch:1.4.2 image with mapper-attachments and river-mongodb plugins
-# https://github.com/soldotno/elasticsearch-river-mongodb/blob/master/Dockerfile
 elasticsearch:
   image: elasticsearch:1.4.2
-  ports:
-    - "9200:9200"
-    - "9300:9300"
   links:
     - mongo1
     - mongo2
@@ -94,7 +78,7 @@ elasticsearch:
   volumes:
    - ${WORKSPACE}:/src
   environment:
-    ANNOUNCE_ES_HOST: ${DOCKER_HOST_IP}
+    ANNOUNCE_ES_HOST:
   working_dir: /src
   entrypoint: [ "/src/scripts/docker/es/start-elasticsearch.sh" ]
 
@@ -105,8 +89,41 @@ elasticsearchsetup:
     - mongo1
     - mongo2
     - mongo3
-    - elasticsearch:elasticsearch
+    - elasticsearch
   volumes:
    - ${WORKSPACE}:/src
   working_dir: /src
   entrypoint: [ "/src/scripts/docker/es/setup-elasticsearch.sh" ]
+
+internal-min:
+  image: node:0.10
+  restart: 'no'
+  links:
+    - redis1
+    - redis2
+    - mongo1
+    - mongo2
+    - mongo3
+    - sentinel1
+  environment:
+    SU_TO_USER: ${SU_TO_USER}
+    SU_TO_UID: ${SU_TO_UID}
+  volumes:
+   - ${WORKSPACE}:${WORKSPACE}
+  working_dir: ${WORKSPACE}
+
+internal:
+  image: node:0.10
+  restart: 'no'
+  links:
+    - redis1
+    - redis2
+    - neo4j
+    - mongo1
+    - mongo2
+    - mongo3
+    - elasticsearch
+    - sentinel1
+  volumes:
+   - ${WORKSPACE}:/src
+  working_dir: /src
