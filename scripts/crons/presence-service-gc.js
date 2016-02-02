@@ -4,10 +4,12 @@
 
 var winston = require('../../server/utils/winston');
 var presenceService = require('gitter-web-presence');
-var bayeux = require('../../server/web/bayeux');
+var BayeuxCluster = require('../../server/web/bayeux/cluster');
 var shutdown = require('shutdown');
 
 var start = Date.now();
+
+var bayeux = new BayeuxCluster(true); // Lightweight bayeux cluster
 
 presenceService.collectGarbage(bayeux, function(err) {
   if(err) {
