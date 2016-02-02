@@ -1,12 +1,13 @@
 'use strict';
 
-var $             = require('jquery');
-var Marionette    = require('backbone.marionette');
-var RoomMenuModel = require('../../../../models/room-menu-model');
-var MiniBarView   = require('../minibar/minibar-view');
-var PanelView     = require('../panel/panel-view');
-var context       = require('utils/context');
-var DNDCtrl       = require('../../../../components/menu/room/dnd-controller');
+var $                 = require('jquery');
+var Marionette        = require('backbone.marionette');
+var RoomMenuModel     = require('../../../../models/room-menu-model');
+var MiniBarView       = require('../minibar/minibar-view');
+var PanelView         = require('../panel/panel-view');
+var context           = require('utils/context');
+var DNDCtrl           = require('../../../../components/menu/room/dnd-controller');
+var MinibarCollection = require('../minibar/minibar-collection');
 
 var MENU_HIDE_DELAY = 200;
 
@@ -23,16 +24,17 @@ module.exports = Marionette.LayoutView.extend({
 
   initMiniBar: function(optionsForRegion) {
     return new MiniBarView(optionsForRegion({
-      model: this.model,
-      bus: this.bus,
-      dndCtrl: this.dndCtrl,
+      model:      this.model,
+      collection: new MinibarCollection(null, { roomCollection: this.roomCollection }),
+      bus:        this.bus,
+      dndCtrl:    this.dndCtrl,
     }));
   },
 
   initMenuPanel: function(optionsForRegion) {
     return new PanelView(optionsForRegion({
-      model: this.model,
-      bus: this.bus,
+      model:   this.model,
+      bus:     this.bus,
       dndCtrl: this.dndCtrl,
     }));
   },
@@ -67,7 +69,7 @@ module.exports = Marionette.LayoutView.extend({
     this.delay = MENU_HIDE_DELAY;
 
     //Make a new model
-    this.model =  new RoomMenuModel({
+    this.model = window.model = new RoomMenuModel({
       bus:                     this.bus,
       roomCollection:          this.roomCollection,
       orgCollection:           this.orgCollection,

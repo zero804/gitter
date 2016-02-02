@@ -2,10 +2,10 @@
 var _ = require('lodash');
 var getRoomAvatar = require('../../public/js/utils/get-room-avatar');
 
-module.exports = function suggestedOrgsFromRoomList(roomList){
-  return roomList.reduce(function(memo, room){
+module.exports = function suggestedOrgsFromRoomList(roomList) {
+  return roomList.reduce(function(memo, room) {
     //remove on-to-one conversations
-    if(room.githubType === 'ONETOONE') { return memo }
+    if (room.githubType === 'ONETOONE') { return memo; }
 
     //clean the prepending / from the url
     room.url = (room.url || '');
@@ -15,8 +15,21 @@ module.exports = function suggestedOrgsFromRoomList(roomList){
     var orgName = url.split('/')[0];
 
     //check its unique
-    if(!!_.where(memo, { name: orgName }).length) return memo;
-    memo.push({ name: orgName, imgUrl: getRoomAvatar(orgName), id: orgName });
+    var existingEntry = _.where(memo, { name: orgName })[0];
+    if (!!existingEntry) {
+      var index = memo.indexOf(existingEntry);
+      memo[index].unreadItems = ((existingEntry.unreadItems || 0) + (room.unreadItems || 0));
+      memo[index].mentions    = ((existingEntry.mentions || 0) + (room.mentions || 0));
+      return memo;
+    }
+
+    memo.push({
+      name:        orgName,
+      imgUrl:      getRoomAvatar(orgName),
+      id:          orgName,
+      unreadItems: (room.unreadItems || 0),
+      mentions:    (room.mentions || 0),
+    });
     return memo;
   }, []);
 };

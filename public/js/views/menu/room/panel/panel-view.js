@@ -69,7 +69,7 @@ module.exports = Marionette.LayoutView.extend({
 
   initTertiaryCollection: function(optionsForRegion) {
     return new TertiaryCollectionView(optionsForRegion({
-      model: new TertiaryCollectionModel({}, { model: this.model }),
+      model:      new TertiaryCollectionModel({}, { model: this.model }),
       collection: this.model.tertiaryCollection,
     }));
   },

@@ -212,6 +212,33 @@
   }
 }
 
+.base-notification-icon (@size) {
+  position:      absolute;
+  top:           50%;
+  left:          0;
+  width:         @size;
+  height:        @size;
+  transform:     translateY(-50%) translateX(-50%);
+  border:        1px solid @caribbean;
+  border-radius: 100%;
+  color:         transparent;
+}
+
+@icon-size:    1rem;
+.room-menu-options__item__unread-items {
+  .base-notification-icon(@icon-size);
+  background: transparent;
+  z-index:    1;
+}
+
+.room-menu-options__item__mentions {
+  .base-notification-icon(@icon-size);
+  background:   @jaffa;
+  border-color: @jaffa;
+  z-index:      2;
+}
+
+
 .half-stay(){
   content:    ' ';
   display:    inline-block;
