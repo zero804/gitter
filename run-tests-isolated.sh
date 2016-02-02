@@ -10,4 +10,4 @@ function finish {
 trap finish EXIT
 
 docker-compose -p "webapp-${ISOLATED_UNIQ_ID}" -f docker-compose.test.yml build mongo1 sentineltest1 "${JOB}"
-docker-compose -p "webapp-${ISOLATED_UNIQ_ID}" -f docker-compose.test.yml run "${JOB}"
+docker-compose -p "webapp-${ISOLATED_UNIQ_ID}" -f docker-compose.test.yml run --rm "${JOB}"
