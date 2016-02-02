@@ -1,0 +1,21 @@
+{{#if isHome}}
+  <a><img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/logo.svg"}}' /></a>
+{{/if}}
+
+{{#if isSearch}}
+  <a><img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/search.svg"}}' /></a>
+{{/if}}
+
+{{#if isFavourite}}
+  <a><img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/favourites.svg"}}' /></a>
+{{/if}}
+
+{{#if isPeople}}
+  <a><img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/people.svg"}}' /></a>
+{{/if}}
+
+{{#if isOrg}}
+  {{#if mentions}}<span class="room-menu-options__item__mentions">{{mentions}}</span>{{/if}}
+  {{#if unreadItems}}<span class="room-menu-options__item__unread-items">{{unreadItems}}</span>{{/if}}
+  <a><img class="room-menu-options__item__avatar" src='{{avatarUrl}}' /></a>
+{{/if}}

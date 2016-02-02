@@ -6,7 +6,7 @@ var Backbone    = require('backbone');
 var MiniBarView = require('public/js/views/menu/room/minibar/minibar-view');
 var appEvents   = require('utils/appevents');
 
-describe('MinibarView', function() {
+describe.skip('MinibarView', function() {
 
   var miniBar;
   var el;

@@ -61,4 +61,18 @@ describe('MinibarCollection()', function() {
     });
   });
 
+  it('should always have a pin model as the last item', function() {
+    roomCollection.on('snapshot', function() {
+      roomCollection.add({ name: 'cutandpastey', githubType: 'ORG', url: '/cutandpastey' });
+      assert.equal('pin', collection.pop().get('type'));
+    });
+  });
+
+  it('should fire a snapshot event', function(done) {
+    collection.on('snapshot', function() {
+      assert(true);
+      done();
+    });
+  });
+
 });

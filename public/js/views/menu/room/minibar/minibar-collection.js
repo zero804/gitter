@@ -10,6 +10,10 @@ var defaultModels = [
   { name: 'people', type: 'people', id: 3 },
 ];
 
+var tailDefaults = [
+  { name: 'close', type: 'close', id: 4 }
+];
+
 var MinibarItemModel = Backbone.Model.extend({
   defaults: {
     name: ' ',
@@ -27,19 +31,28 @@ module.exports = Backbone.Collection.extend({
     }
 
     this.roomCollection = attrs.roomCollection;
-    this.listenTo(this.roomCollection, 'snapshot add sync', this.onCollectionUpdate, this);
-    this.listenTo(this.roomCollection, 'remove', this.onItemRemoved, this);
+    this.listenTo(this.roomCollection, 'snapshot', this.onCollectionSnapshot, this);
+    this.listenTo(this.roomCollection, 'sync change', this.onCollectionUpdate, this);
+    this.listenTo(this.roomCollection, 'remove reset', this.onItemRemoved, this);
 
-    models = defaultModels.concat(models || []);
+    models = defaultModels.concat(models || []).concat(tailDefaults);
     Backbone.Collection.prototype.constructor.call(this, models, attrs, options);
   },
 
   onCollectionUpdate: function() {
-    this.add(defaultModels.concat(getSuggestedOrgsFromRoomList(this.roomCollection.toJSON())), { merge: true });
+    this.set(this.getNewCollection(), { merge: true });
   },
 
   onItemRemoved: function() {
-    this.reset(defaultModels.concat(getSuggestedOrgsFromRoomList(this.roomCollection.toJSON())));
+    this.reset(this.getNewCollection());
+  },
+
+  onCollectionSnapshot: function (){
+    this.trigger('snapshot');
+  },
+
+  getNewCollection: function (){
+    return defaultModels.concat(getSuggestedOrgsFromRoomList(this.roomCollection.toJSON())).concat(tailDefaults);
   },
 
 });

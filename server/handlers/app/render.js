@@ -234,6 +234,7 @@ function renderMainFrame(req, res, next, frame) {
       //JP 12/1/16
       troupeContext.leftRoomMenuState = (troupeContext.leftRoomMenuState || {
         roomMenuIsPinned: true,
+        state:            'all',
       });
 
       //If we are in any kind of org room && that org exists in out suggested org list

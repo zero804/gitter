@@ -1,12 +1,181 @@
 'use strict';
 
-var Marionette          = require('backbone.marionette');
+var _             = require('underscore');
+var Marionette    = require('backbone.marionette');
+var itemTemplate  = require('./minibar-item-view.hbs');
+var closeTemplate = require('./minibar-close-item-view.hbs');
+var RAF           = require('utils/raf');
+var getRoomAvatar = require('utils/get-room-avatar');
+
+var ItemView = Marionette.ItemView.extend({
+  tagName:      'li',
+  template:     itemTemplate,
+  modelEvents: {
+    'change:unreadItems change:mentions': 'render',
+    'change:active': 'onActiveStateUpdate',
+  },
+  events: {
+    'click': 'onItemClicked',
+  },
+  attributes: function() {
+    var type = this.model.get('type');
+
+    //account for initial render
+    var className = 'room-menu-options__item--' + type;
+    if (this.model.get('active')) { className = className += ' active'; }
+
+    return {
+      'class':             className,
+      'data-state-change': type,
+    };
+  },
+
+  serializeData: function() {
+    var data = this.model.toJSON();
+    return _.extend({}, data, {
+      isHome:      (data.type === 'all'),
+      isSearch:    (data.type === 'search'),
+      isFavourite: (data.type === 'favourite'),
+      isPeople:    (data.type === 'people'),
+      isOrg:       (data.type === 'org'),
+      avatarUrl:   getRoomAvatar(data.name),
+    });
+  },
+
+  onItemClicked: function() {
+    this.trigger('minibar-item:clicked', this.model);
+  },
+
+  onActiveStateUpdate: function(model, val) { //jshint unused: true
+    this.$el.toggleClass('active', !!val);
+  },
+
+  onRender: function() {
+    this.$el.toggleClass('active', !!this.model.get('active'));
+  },
+
+});
+
+var CloseItemView = ItemView.extend({
+  template: closeTemplate,
+  onItemClicked: function() {
+    this.trigger('minibar-item:close');
+  },
+});
+
+//TODO TEST ALL THE THINGS JP 2/2/16
+module.exports = Marionette.CollectionView.extend({
+  tagName:   'ul',
+  id:        'minibar-list',
+  childView: ItemView,
+  childEvents: {
+    'minibar-item:clicked': 'onItemClicked',
+    'minibar-item:close':   'onCloseClicked',
+  },
+
+  //if an element exists in the dom pass that as the el prop
+  childViewOptions: function(model, index) {
+    //
+    //use different selectors for orgs
+    var selector = (model.get('type') === 'org') ?
+      '[data-org-name=' + model.get('name')  + ']' :
+      '[data-state-change=' + model.get('type') + ']';
+
+    var element = this.$el.find(selector);
+    return !!element ? { el: element, index: index } : { index: index };
+  },
+
+  buildChildView: function(model, ViewClass, options) {
+
+    //construct the default options
+    var viewOptions = _.extend({}, options, { model: model });
+    switch (model.get('type')) {
+      case 'close':
+        return new CloseItemView(viewOptions);
+      default:
+        return new ViewClass(viewOptions);
+    }
+
+  },
+
+  initialize: function(attrs) {
+    this.shouldRender = false;
+    this.bus          = attrs.bus;
+    this.listenTo(this.collection, 'snapshot', this.onCollectionSnapshot, this);
+    this.listenTo(this.model, 'change:state', this.onMenuStateUpdate, this);
+  },
+
+  render: function() {
+    return this.shouldRender ? Marionette.CollectionView.prototype.render.apply(this, arguments) : null;
+  },
+
+  onCollectionSnapshot: function() {
+    //Only render after a snapshot
+    this.shouldRender = true;
+    RAF(function() {
+      this.render();
+    }.bind(this));
+  },
+
+  onItemClicked: function(view, model) { //jshint unused: true
+    this.model.set({
+      panelOpenState:       true,
+      state:                model.get('type'),
+      profileMenuOpenState: false,
+      selectedOrgName:      model.get('name'),
+    });
+  },
+
+  onMenuStateUpdate: function(model, val) { //jshint unused: true
+    //reset the currently active model
+    var activeModel = this.collection.findWhere({ active: true });
+    if (activeModel) { activeModel.set('active', false); }
+
+    //activate the new model
+    var nextActiveModel = this.collection.findWhere({ type: val });
+    if (nextActiveModel) { nextActiveModel.set('active', true);}
+  },
+
+  onCloseClicked: function() {
+    var newVal = !this.model.get('roomMenuIsPinned');
+    var ANIMATION_TIME = 300;
+
+    //if we are opening the panel
+    if (newVal === true) {
+      if (this.model.get('panelOpenState') === true) {
+        this.model.set({ roomMenuIsPinned: newVal });
+        this.bus.trigger('room-menu:pin', newVal);
+      } else {
+        setTimeout(function() {
+            this.model.set({ roomMenuIsPinned: newVal });
+            this.bus.trigger('room-menu:pin', newVal);
+          }.bind(this), ANIMATION_TIME);
+      }
+
+      this.model.set({ panelOpenState: newVal });
+    }
+
+    //
+    else {
+      this.model.set({ roomMenuIsPinned: newVal });
+      this.bus.trigger('room-menu:pin', newVal);
+      setTimeout(function() {
+        this.model.set({ panelOpenState: newVal });
+      }.bind(this), ANIMATION_TIME);
+    }
+
+  },
+
+});
+
+/*
 var Backbone            = require('backbone');
 var RoomMenuItemView    = require('./minibar-item-view');
 var cocktail            = require('cocktail');
 var KeyboardEventsMixin = require('views/keyboard-events-mixin');
 
 require('nanoscroller');
+
 
 var MiniBarView = Marionette.ItemView.extend({
 
@@ -111,7 +280,7 @@ var MiniBarView = Marionette.ItemView.extend({
     });
   },
 
-  onPanelStateChange: function(model, state) {/*jshint unused:true */
+  onPanelStateChange: function(model, state) { //jshint unused: true
     this.$el.find('#menu-close-button').toggleClass('active', state);
     if (!state) {
       var currentActiveModel = this._getCurrentlyActiveChildModel();
@@ -166,3 +335,4 @@ var MiniBarView = Marionette.ItemView.extend({
 cocktail.mixin(MiniBarView, KeyboardEventsMixin);
 
 module.exports = MiniBarView;
+*/
