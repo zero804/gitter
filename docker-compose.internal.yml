@@ -109,8 +109,8 @@ internal-min:
     SU_TO_USER: ${SU_TO_USER}
     SU_TO_UID: ${SU_TO_UID}
   volumes:
-   - ${WORKSPACE}:/src
-  working_dir: /src
+   - ${WORKSPACE}:${WORKSPACE}
+  working_dir: ${WORKSPACE}
 
 internal:
   image: node:0.10
