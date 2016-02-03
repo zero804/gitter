@@ -16,11 +16,6 @@ function suggestionsToAttributes(suggestions) {
   suggestions.forEach(function(suggestion, index) {
     attrs['suggestion'+index+'_uri'] = suggestion.uri;
     attrs['suggestion'+index+'_avatar'] = suggestion.avatarUrl;
-    // HACK: intercom complains about long attributes. It probably needs some
-    // ellipses or something.
-    var topic = suggestion.topic || '';
-    var desc = topic.slice(0, 255)
-    attrs['suggestion'+index+'_description'] = desc;
     attrs['suggestion'+index+'_users'] = suggestion.userCount;
     attrs['suggestion'+index+'_messages'] = suggestion.messageCount;
   });
