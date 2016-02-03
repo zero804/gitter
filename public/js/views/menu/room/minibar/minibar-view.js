@@ -89,6 +89,45 @@ var CloseItemView = ItemView.extend({
     }
   }, 200),
 
+  onDestroy: function() {
+    this.stopListening(this.roomModel);
+  },
+
+});
+
+var FavouriteView = ItemView.extend({
+  initialize: function(attrs) {
+    this.dndCtrl = attrs.dndCtrl;
+    this.dndCtrl.pushContainer(this.el);
+    this.listenTo(this.dndCtrl, 'dnd:start-drag', this.onDragStart, this);
+    this.listenTo(this.dndCtrl, 'dnd:end-drag', this.onDragStop, this);
+    this.listenTo(this.dndCtrl, 'room-menu:add-favourite', this.onFavourite, this);
+  },
+
+  onDragStart: function() {
+    this.$el.addClass('active');
+  },
+
+  onDragStop: function() {
+    this.$el.removeClass('active');
+  },
+
+  onFavourite: function() {
+    this.$el.addClass('dropped');
+    setTimeout(function() {
+      this.$el.removeClass('dropped');
+
+      //Dragula places dropped items into the drop container
+      //This needs to be fixed upstream
+      //util that date just remove the dropped container manually
+      //https://github.com/bevacqua/dragula/issues/188
+      this.$el.find('.room-item').remove();
+    }.bind(this), 200);
+  },
+
+  onDestroy: function() {
+    this.stopListening(this.dndCtrl);
+  },
 });
 
 //TODO TEST ALL THE THINGS JP 2/2/16
@@ -117,11 +156,15 @@ module.exports = Marionette.CollectionView.extend({
 
     //construct the default options
     var viewOptions = _.extend({}, options, { model: model });
+
     //construct specialist view for close button
     switch (model.get('type')) {
       case 'close':
         viewOptions = _.extend(viewOptions, { roomModel: this.model });
         return new CloseItemView(viewOptions);
+      case 'favourite':
+        viewOptions = _.extend(viewOptions, { dndCtrl: this.dndCtrl });
+        return new FavouriteView(viewOptions);
       default:
         return new ViewClass(viewOptions);
     }
@@ -131,6 +174,7 @@ module.exports = Marionette.CollectionView.extend({
   initialize: function(attrs) {
     this.shouldRender = false;
     this.bus          = attrs.bus;
+    this.dndCtrl      = attrs.dndCtrl;
     this.model        = attrs.model;
     this.listenTo(this.collection, 'snapshot', this.onCollectionSnapshot, this);
     this.listenTo(this.model, 'change:state change:selectedOrgName', this.onMenuStateUpdate, this);
