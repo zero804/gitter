@@ -20,16 +20,19 @@
 
   .desktop & {
     padding-left: @desktop-menu-left-padding / 2;
-    margin-left: @desktop-menu-left-padding / 2;
+    margin-left:  @desktop-menu-left-padding / 2;
+    margin-right: @desktop-menu-left-padding / 2;
   }
 
   .mobile {
     padding-left: @mobile-menu-left-padding;
   }
 
-  &:hover {
-    background-color: rgba(255, 255, 255, .1);
-  }
+  &:nth-child(0n + 1) { background-color: rgba(255, 255, 255, .5); }
+  &:nth-child(0n + 2) { background-color: rgba(255, 255, 255, .4); }
+  &:nth-child(0n + 3) { background-color: rgba(255, 255, 255, .3); }
+  &:nth-child(0n + 4) { background-color: rgba(255, 255, 255, .2); }
+
 }
 
 .profile-menu__item__title {
