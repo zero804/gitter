@@ -103,6 +103,11 @@ module.exports = (function() {
     sync: SyncMixin.sync
   });
 
+
+
+
+
+
   var decorator = {
 
     decorate: function(view) {
@@ -115,9 +120,23 @@ module.exports = (function() {
         var issueNumber = $issue.data('issue');
 
         addIssue(repo, issueNumber, function(state) {
-          // dont change the issue state colouring for the activity feed
-          if(!$issue.hasClass('open') && !$issue.hasClass('closed')) {
-            $issue.addClass(state);
+          if(state) {
+            // We depend on this to style the issue after making sure it is an issue
+            $issue.addClass('is-existent');
+
+            // dont change the issue state colouring for the activity feed
+            if(!$issue.hasClass('open') && !$issue.hasClass('closed')) {
+              $issue.addClass(state);
+            }
+
+            // Hook up all of the listeners
+            $issue.on('click', showPopover);
+            $issue.on('mouseover', showPopoverLater);
+
+            view.once('destroy', function() {
+              $issue.off('click', showPopover);
+              $issue.off('mouseover', showPopoverLater);
+            });
           }
         });
 
@@ -152,13 +171,6 @@ module.exports = (function() {
           });
         }
 
-        $issue.on('click', showPopover);
-        $issue.on('mouseover', showPopoverLater);
-
-        view.once('destroy', function() {
-          $issue.off('click', showPopover);
-          $issue.off('mouseover', showPopoverLater);
-        });
       });
     }
   };
