@@ -53,7 +53,6 @@ function graphRooms(existingRooms, language) {
       return troupeService.findByIdsLean(roomIds, {
         uri: 1,
         lcOwner: 1,
-        topic: 1,
         userCount: 1
       });
     })
@@ -166,7 +165,7 @@ function findSuggestionsForRooms(existingRooms) {
     .then(function(suggestedRooms) {
       // pre-fill the extra values we'll need
       return Q.all(suggestedRooms.map(function(room) {
-        room.avatarUrl = resolveRoomAvatarUrl(room, 80);
+        room.avatarUrl = resolveRoomAvatarUrl(room, 160);
         return chatService.getRoughMessageCount(room.id)
           .then(function(messageCount) {
             room.messageCount = messageCount;
