@@ -23,7 +23,7 @@ describe('TeritaryCollectionModel', function(){
     }
   });
 
-  it('should change its active state when its model is in the correct states', function(){
+  it.skip('should change its active state when its model is in the correct states', function(){
     assert(!collectionModel.get('tertiaryCollectionActive'));
     model.set('state', 'all');
     assert(collectionModel.get('tertiaryCollectionActive'));
