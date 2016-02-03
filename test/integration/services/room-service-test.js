@@ -1149,6 +1149,42 @@ describe('room-service', function() {
           .nodeify(done);
       });
 
+
+
+      it('should be able to delete rooms #slow', function(done) {
+        var permissionsModelMock = mockito.mockFunction();
+        var troupeService = testRequire('./services/troupe-service');
+        var roomService = testRequire.withProxies('./services/room-service', {
+          './permissions-model': permissionsModelMock
+        });
+
+        mockito.when(permissionsModelMock)().then(function(user, perm, uri, githubType, security) {
+          assert.equal(user.id, fixture.user1.id);
+          assert.equal(perm, 'create');
+          assert.equal(uri, fixture.user1.username + '/tobedeleted');
+          assert.equal(githubType, 'USER_CHANNEL');
+          assert.equal(security, 'PUBLIC');
+          return Q.resolve(true);
+        });
+
+        return roomService.createCustomChildRoom(null, fixture.user1, { name: 'tobedeleted', security: 'PUBLIC' })
+          .then(function(room) {
+            mockito.verify(permissionsModelMock, once)();
+            return room;
+          })
+          .then(function(room) {
+            return roomService.deleteRoom(room)
+              .thenResolve(room.lcUri);
+          })
+          .then(function(roomUri) {
+            return troupeService.findByUri(roomUri);
+          })
+          .then(function(room) {
+            assert(room === null, 'Expected room to be null after deletion');
+          })
+          .nodeify(done);
+      });
+
     });
 
   });

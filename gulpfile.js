@@ -128,14 +128,13 @@ makeTestTasks('test-mocha', function(name, files) {
 
   return gulp.src(files, { read: false })
     .pipe(mocha({
-      reporter: 'xunit-file',
+      reporter: 'mocha-multi',
       timeout: 10000,
       istanbul: {
         dir: 'output/coverage-reports/' + name
       },
       env: {
-        TAP_FILE: 'output/test-reports/' + name + '.tap',
-        XUNIT_FILE: 'output/test-reports/' + name + '.xml',
+        multi: 'spec=- xunit=output/test-reports/' + name + '.xml',
         NODE_ENV: 'test',
         Q_DEBUG: 1,
       }
@@ -148,14 +147,13 @@ makeTestTasks('test-docker', function(name, files) {
 
   return gulp.src(files, { read: false })
     .pipe(mocha({
-      reporter: 'xunit-file',
+      reporter: 'mocha-multi',
       timeout: 10000,
       istanbul: {
         dir: 'output/coverage-reports/' + name
       },
       env: {
-        TAP_FILE: 'output/test-reports/' + name + '.tap',
-        XUNIT_FILE: 'output/test-reports/' + name + '.xml',
+        multi: 'spec=- xunit=output/test-reports/' + name + '.xml',
         NODE_ENV: 'test-docker',
         Q_DEBUG: 1,
         BLUEBIRD_DEBUG: 1
