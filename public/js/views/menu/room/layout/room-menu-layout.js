@@ -24,10 +24,11 @@ module.exports = Marionette.LayoutView.extend({
 
   initMiniBar: function(optionsForRegion) {
     return new MiniBarView(optionsForRegion({
-      model:      this.model,
-      collection: new MinibarCollection(null, { roomCollection: this.roomCollection }),
-      bus:        this.bus,
-      dndCtrl:    this.dndCtrl,
+      model:          this.model,
+      collection:     new MinibarCollection(null, { roomCollection: this.roomCollection }),
+      bus:            this.bus,
+      dndCtrl:        this.dndCtrl,
+      roomCollection: this.model._roomCollection,
     }));
   },
 
