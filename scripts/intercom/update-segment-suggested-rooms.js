@@ -1,5 +1,7 @@
 "use strict";
 
+var env = require('gitter-web-env');
+var stats = env.stats;
 var Q = require('q');
 var _ = require('lodash');
 var shutdown = require('shutdown');
@@ -44,7 +46,9 @@ function getRoomsForUserId(userId) {
 stream
   .pipe(through2Concurrent.obj({maxConcurrency: 10},
   function(intercomUser, enc, callback) {
+    var userId = intercomUser.user_id;
     var username = intercomUser.custom_attributes.username;
+    var email = intercomUser.email;
     console.log("Starting "+ username);
 
     getRoomsForUserId(intercomUser.user_id)
@@ -55,9 +59,18 @@ stream
         var suggestionsString = _.pluck(suggestions, 'uri').join(', ');
         console.log("Suggestions for", username + ':', suggestionsString);
 
+        suggestions.forEach(function(room) {
+          stats.event("suggest_room", {
+            userId: userId,
+            username: username,
+            roomId: room._id,
+            roomUri: room.uri
+          });
+        });
+
         var profile = {
-          email: intercomUser.email,
-          user_id: intercomUser.user_id,
+          email: email,
+          user_id: userId,
           custom_attributes: intercom.suggestionsToAttributes(suggestions)
         };
 
