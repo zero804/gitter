@@ -1,23 +1,14 @@
 'use strict';
 
-var Marionette            = require('backbone.marionette');
 var _                     = require('underscore');
-var template              = require('./secondary-collection-view.hbs');
-var RAF                   = require('utils/raf');
 var PrimaryCollectionView = require('../primary-collection/primary-collection-view');
 var ItemView              = require('./secondary-collection-item-view.js');
 
-module.exports = Marionette.CompositeView.extend({
-  childView: ItemView,
-  childViewContainer: '#secondary-collection-list',
-  template: template,
-  className: 'secondary-collection',
+var BaseCollectionView = require('../base-collection/base-collection-view');
 
-  modelEvents: {
-    'change:secondaryCollectionActive': 'onModelChangeSecondaryActiveState',
-    'change:searchTerm':                'onSearchTermChange',
-    'change:secondaryCollectionHeader': 'render',
-  },
+module.exports = BaseCollectionView.extend({
+  childView: ItemView,
+  className: 'secondary-collection',
 
   childEvents: {
     'item:clicked': 'onItemClicked',
@@ -41,24 +32,12 @@ module.exports = Marionette.CompositeView.extend({
 
   initialize: function(attrs) {
     //TODO test this JP 8/1/16
-    this.bus = attrs.bus;
     this.primaryCollection = attrs.primaryCollection;
-    this.listenTo(this.collection, 'add reset remove update', this.onCollectionUpdate, this);
+    this.listenTo(this.model, 'change:searchTerm', this.onSearchTermChange, this);
   },
 
   filter: function(model, index) {//jshint unused: true
     return (index <= 10);
-  },
-
-  onModelChangeSecondaryActiveState: function(model, val) { /*jshint unused: true*/
-    this.render();
-    RAF(function() {
-      this.$el.toggleClass('active', val);
-    }.bind(this));
-  },
-
-  onCollectionUpdate: function (){
-    this.$el.toggleClass('empty', !this.collection.length);
   },
 
   onItemClicked: function(view) {
@@ -73,26 +52,7 @@ module.exports = Marionette.CompositeView.extend({
 
   onSearchTermChange: function(model, val) { //jshint unused: true
     if (model.get('state') !== 'search') { return; }
-
     this.$el.toggleClass('active', !val);
-  },
-
-  onBeforeRender: function() {
-    RAF(function() {
-      this.$el.removeClass('loaded');
-    }.bind(this));
-  },
-
-  onRender: function() {
-    setTimeout(function() {
-      RAF(function() {
-        this.$el.addClass('loaded');
-      }.bind(this));
-    }.bind(this), 10);
-  },
-
-  onDestroy: function (){
-    this.stopListening(this.collection);
   },
 
 });

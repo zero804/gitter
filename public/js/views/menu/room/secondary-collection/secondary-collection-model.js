@@ -1,48 +1,34 @@
 'use strict';
 
-var Backbone = require('backbone');
+var BaseCollectionModel = require('../base-collection/base-collection-model');
 
-module.exports = Backbone.Model.extend({
-  //TODO Make sure all objects are passed to all menu models as options not attrs.
-  //JP 27/1/16
-  constructor: function(attrs, options) {//jshint unused: true
+module.exports = BaseCollectionModel.extend({
 
-    if (!options || !options.model) {
-      throw new Error('A valid instance of the roomMenuModel should be passed to a new instance of SecondaryCollectionModel');
-    }
-
-    this.model = options.model;
-    this.listenTo(this.model, 'change:state', this.onModelChangeState, this);
-    Backbone.Model.prototype.constructor.apply(this, arguments);
+  onAll: function() {
+    this.set({
+      header: 'Your Suggestions',
+      active: true,
+    });
   },
 
-  onModelChangeState: function() {
-    switch (this.model.get('state')) {
-      case 'search' :
-        this.set({
-          secondaryCollectionHeader: 'Chat Messages',
-          secondaryCollectionActive: true,
-        });
-        break;
-      case 'org':
-        this.set({
-          secondaryCollectionHeader: 'All Rooms',
-          secondaryCollectionActive: true,
-        });
-        break;
-      case 'all':
-        this.set({
-          secondaryCollectionHeader: 'Your Suggestions',
-          secondaryCollectionActive: true,
-        });
-        break;
-      default:
-        this.set({
-          secondaryCollectionHeader: '',
-          secondaryCollectionActive: false,
-        });
-
-    }
+  onSearch: function() {
+    this.set({
+      header: 'Chat Messages',
+      active: true,
+    });
   },
 
+  onOrg: function() {
+    this.set({
+      header: 'All Rooms',
+      active: true,
+    });
+  },
+
+  onDefault: function() {
+    this.set({
+      header: ' ',
+      active: false,
+    });
+  },
 });
