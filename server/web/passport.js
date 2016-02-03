@@ -11,6 +11,8 @@ var oauthService           = require('../services/oauth-service');
 var githubUserStrategy     = require('./strategies/github-user');
 var githubUpgradeStrategy  = require('./strategies/github-upgrade');
 var googleStrategy         = require('./strategies/google');
+var twitterStrategy        = require('./strategies/twitter');
+var linkedinStrategy        = require('./strategies/linkedin');
 
 
 function installApi() {
@@ -108,6 +110,8 @@ function install() {
   passport.use(githubUserStrategy);
   passport.use(githubUpgradeStrategy);
   passport.use(googleStrategy);
+  passport.use(twitterStrategy);
+  passport.use(linkedinStrategy);
 }
 
 module.exports = {

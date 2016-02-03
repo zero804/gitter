@@ -9,6 +9,9 @@
 .icon-windows:before { content: '\e807'; } /* '' */
 .icon-linux:before { content: '\e808'; } /* '' */
 .icon-twitter:before { content: '\e809'; } /* '' */
+.icon-gplus:before { content: '\e80a'; } /* '' */
+.icon-linkedin:before { content: '\e80b'; } /* '' */
+.icon-facebook-official:before { content: '\e80c'; } /* '' */
 .icon-cancel-circle:before { content: '\e8b1'; } /* '' */
 .icon-logout:before { content: '\e8b2'; } /* '' */
 .icon-star-1:before { content: '\e8b3'; } /* '' */

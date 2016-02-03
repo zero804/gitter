@@ -7,12 +7,11 @@ sleep 30
 set -e
 set -x
 
-set
+
 
 MONGODB1=`ping -c 1 mongo1 | head -1  | cut -d "(" -f 2 | cut -d ")" -f 1`
 MONGODB2=`ping -c 1 mongo2 | head -1  | cut -d "(" -f 2 | cut -d ")" -f 1`
 ELASTICSEARCH=`ping -c 1 elasticsearch | head -1  | cut -d "(" -f 2 | cut -d ")" -f 1`
-# MONGODB3=`ping -c 1 mongo3 | head -1  | cut -d "(" -f 2 | cut -d ")" -f 1`
 
 export INDEX_VERSION=01
 export INDEX_NAME=gitter${INDEX_VERSION}
@@ -20,6 +19,8 @@ export USER_RIVER=gitterUserRiver${INDEX_VERSION}
 export CHAT_RIVER=gitterChatRiver${INDEX_VERSION}
 export ROOM_RIVER=gitterRoomRiver${INDEX_VERSION}
 export ES_URL=http://$ELASTICSEARCH:9200
+
+while ! curl --fail "${ES_URL}"; do sleep 1; done
 
 export MONGO_HOST_1=$MONGODB1
 export MONGO_PORT_1=27017

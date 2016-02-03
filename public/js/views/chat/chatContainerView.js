@@ -3,6 +3,7 @@
 var Marionette = require('backbone.marionette');
 var hasScrollBars = require('utils/scrollbar-detect');
 var ChatCollectionView = require('views/chat/chatCollectionView');
+var ChatConnectionIndicatorView = require('views/chat/chatConnectivityIndicatorView');
 var context = require('utils/context');
 var unreadItemsClient = require('components/unread-items-client');
 
@@ -25,9 +26,20 @@ module.exports = Marionette.LayoutView.extend({
 
           return chatCollectionView;
         }
+      },
+      connectivityIndicator: {
+        el: '.chat-connectivity-indicator-wrapper',
+        init: 'initConnectivityIndicatorView'
       }
     }
   },
+
+  initConnectivityIndicatorView: function(optionsForRegion) {
+    if(context.hasFeature('connectivity-indicator')) {
+      return new ChatConnectionIndicatorView(optionsForRegion({ }));
+    }
+  },
+
 
   ui: {
     primaryScroll: '.primary-scroll',

@@ -18,7 +18,6 @@ require('components/ping');
 
 // Preload widgets
 require('views/widgets/avatar');
-require('views/widgets/timeago');
 
 require('gitter-styleguide/css/components/buttons.css');
 

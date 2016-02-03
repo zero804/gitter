@@ -55,11 +55,13 @@ function setupHostAlias {
     read -p "Would you like to update your hostfile? Requires sudo [yN] " -r
     echo
     if [[ "$REPLY" =~ ^[Yy]$ ]]; then
-      if [[ -z "$CURRENT_ALIAS" ]]; then
-        sudo /bin/sh -c "echo \"$IP $HOSTNAME\" >> /etc/hosts"
-      else
-        sudo /bin/sh -c "sed -i.bak \"s/.* $HOSTNAME */$IP $HOSTNAME/\" /etc/hosts"
-      fi
+      TMP_HOSTS_FILE="/tmp/hosts.start.$RANDOM"
+      sudo /bin/sh -c "
+        grep -v \" $HOSTNAME *$\" /etc/hosts > \"$TMP_HOSTS_FILE\" &&
+        echo \"$IP $HOSTNAME\" >> \"$TMP_HOSTS_FILE\" &&
+        cat \"$TMP_HOSTS_FILE\" > /etc/hosts &&
+        rm -f \"$TMP_HOSTS_FILE\"
+      "
     else
       echo Remember to add \'"$IP" "$HOSTNAME"\' to your /etc/hosts file
     fi

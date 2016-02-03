@@ -23,7 +23,7 @@ describe('bayeux', function() {
   });
 
   describe('clientExists', function() {
-    it('should check client existence', function(done) {
+    it('should check client existence #slow', function(done) {
       bayeux.clientExists('abc456', function(exists) {
         assert.strictEqual(exists, false);
         done();

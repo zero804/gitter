@@ -14,6 +14,7 @@ var perfTiming             = require('./components/perf-timing');
 var frameUtils             = require('./utils/frame-utils');
 var itemCollections        = require('collections/instances/integrated-items');
 var chatCollection         = require('collections/instances/chats-cached');
+var fullTimeFormat         = require('gitter-web-shared/time/full-time-format');
 
 /* Set the timezone cookie */
 require('components/timezone-cookie');
@@ -149,7 +150,7 @@ onready(function() {
 
     if (options && options.appendInput) {
       var fullUrl = context.env('basePath') + url + '?at=' + id;
-      var formattedDate = chat.get('sent') && chat.get('sent').format('LLL');
+      var formattedDate = fullTimeFormat(chat.get('sent'));
       appEvents.trigger('input.append', ':point_up: [' + formattedDate + '](' + fullUrl + ')');
     }
 
