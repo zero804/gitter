@@ -97,6 +97,11 @@
     margin-right:  @desktop-menu-left-padding / 2;
   }
 
+  //this sucks so so much.
+  & .room-item__lurk:last-child {
+    margin-right: 2.1rem;
+  }
+
 }
 
 .room-item__avatar {
@@ -108,31 +113,37 @@
 
 }
 
-.notification (){
+.notification (@size){
   border-radius: 100%;
-  height:        @menu-unread-badge-size;
-  width:         @menu-unread-badge-size;
-  min-width:     @menu-unread-badge-size;
+  border:        1px solid transparent;
+  height:        @size;
+  width:         @size;
+  min-width:     @size;
   margin-left:   1rem;
   font-size:     1.1rem;
 
   //TODO Figure out why this is needed jp 2/2/16
-  line-height:   .3rem;
+  line-height:   @size;
 
   text-align:    center;
   color:         white;
 }
 
 .room-item__unreads {
-  .notification();
+  .notification(@menu-unread-badge-size);
   background:    @caribbean;
   text-indent:    -.05rem;
 }
 
 .room-item__mentions {
-  .notification();
+  .notification(@menu-unread-badge-size);
   background:    @jaffa;
   text-indent:    -.3rem;
+}
+
+.room-item__lurk {
+  .notification(@menu-unread-badge-size / 4);
+  background: @caribbean;
 }
 
 .room-item__options {

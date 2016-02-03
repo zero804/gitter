@@ -17,5 +17,6 @@
 {{#if isOrg}}
   {{#if mentions}}<span class="room-menu-options__item__mentions">{{mentions}}</span>{{/if}}
   {{#if unreadItems}}<span class="room-menu-options__item__unread-items">{{unreadItems}}</span>{{/if}}
+  {{#if activity}}<span class="room-menu-options__item__activity">&nbsp;</span>{{/if}}
   <a><img class="room-menu-options__item__avatar" src='{{avatarUrl}}' /></a>
 {{/if}}

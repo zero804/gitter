@@ -20,6 +20,7 @@ module.exports = function suggestedOrgsFromRoomList(roomList) {
       var index = memo.indexOf(existingEntry);
       memo[index].unreadItems = ((existingEntry.unreadItems || 0) + (room.unreadItems || 0));
       memo[index].mentions    = ((existingEntry.mentions || 0) + (room.mentions || 0));
+      memo[index].activity    = (!!memo[index].activity || (room.lurk && room.activity));
       return memo;
     }
 
@@ -29,6 +30,7 @@ module.exports = function suggestedOrgsFromRoomList(roomList) {
       id:          orgName,
       unreadItems: (room.unreadItems || 0),
       mentions:    (room.mentions || 0),
+      activity:    (!!room.lurk && room.activity)
     });
     return memo;
   }, []);

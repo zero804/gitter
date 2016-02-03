@@ -32,6 +32,7 @@ var ItemView = Marionette.ItemView.extend({
 
   serializeData: function() {
     var data = this.model.toJSON();
+    var activity = (data.mentions || data.unreadItems) ? false : data.activity;
     return _.extend({}, data, {
       isHome:      (data.type === 'all'),
       isSearch:    (data.type === 'search'),
@@ -39,6 +40,7 @@ var ItemView = Marionette.ItemView.extend({
       isPeople:    (data.type === 'people'),
       isOrg:       (data.type === 'org'),
       avatarUrl:   getRoomAvatar(data.name),
+      activity:    activity,
     });
   },
 
