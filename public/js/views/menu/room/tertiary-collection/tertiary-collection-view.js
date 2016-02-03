@@ -8,10 +8,14 @@ var getRoomAvatar = require('utils/get-room-avatar');
 
 var ItemView = Marionette.ItemView.extend({
   template: itemTemplate,
+  initialize: function(attrs) {
+    this.roomModel = attrs.roomModel;
+  },
   serializeData: function() {
     var data = this.model.toJSON();
+    var avatarURL = (this.roomModel.get('state') === 'search') ? null : getRoomAvatar(data.name || ' ');
     return _.extend({}, data, {
-      avatarUrl: getRoomAvatar(data.name || ' '),
+      avatarUrl: avatarURL
     });
   },
 });
@@ -26,7 +30,12 @@ module.exports =  Marionette.CompositeView.extend({
     'change:tertiaryCollectionHeader': 'render'
   },
 
-  initialize: function() {
+  childViewOptions: function (model){
+    return { model: model, roomModel: this.roomModel };
+  },
+
+  initialize: function(attrs) {
+    this.roomModel = attrs.roomModel;
     this.onModelActiveStateChange(this.model, this.model.get('tertiaryCollectionActive'));
   },
 

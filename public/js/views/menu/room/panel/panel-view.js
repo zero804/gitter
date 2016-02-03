@@ -71,6 +71,7 @@ module.exports = Marionette.LayoutView.extend({
     return new TertiaryCollectionView(optionsForRegion({
       model:      new TertiaryCollectionModel({}, { model: this.model }),
       collection: this.model.tertiaryCollection,
+      roomModel:  this.model,
     }));
   },
 
