@@ -57,11 +57,15 @@ module.exports = Marionette.ItemView.extend({
     var data = this.model.toJSON();
     data.url = (data.url || '');
     data.name = (data.name || '');
+
+    var hasLurkActiveity = data.lurk && !!data.activity;
+
     return _.extend({}, data, {
       roomAvatarUrl: getRoomAvatar(data.url.substring(1)),
       isNotOneToOne: (data.githubType !== 'ONETOONE'),
       name:          roomNameShortener(data.name),
-      unreadItems:   !!data.mentions ? null : data.unreadItems,
+      unreadItems:   (!!data.mentions && !hasLurkActiveity) ? null : data.unreadItems,
+      lurkActivity:  hasLurkActiveity,
     });
   },
 
