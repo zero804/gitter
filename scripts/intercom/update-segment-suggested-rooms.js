@@ -10,6 +10,7 @@ var userService = require('../../server/services/user-service');
 var troupeService = require('../../server/services/troupe-service');
 var roomMembershipService = require('../../server/services/room-membership-service');
 var suggestionsService = require('../../server/services/suggestions-service');
+var userSettingsService = require('../../server/services/user-settings-service');
 var suggestions = require('gitter-web-suggestions');
 var intercom = require('gitter-web-intercom');
 var IntercomStream = require('../../server/utils/intercom-stream');
@@ -51,9 +52,13 @@ stream
     var email = intercomUser.email;
     console.log("Starting "+ username);
 
-    getRoomsForUserId(intercomUser.user_id)
-      .then(function(rooms) {
-        return suggestionsService.findSuggestionsForRooms(rooms);
+    var promises = [
+      getRoomsForUserId(userId),
+      userSettingsService.getUserSettings(userId, 'lang')
+    ];
+    Q.all(promises)
+      .spread(function(rooms, language) {
+        return suggestionsService.findSuggestionsForRooms(rooms, language);
       })
       .then(function(suggestions) {
         var suggestionsString = _.pluck(suggestions, 'uri').join(', ');

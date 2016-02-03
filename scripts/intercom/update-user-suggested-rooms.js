@@ -7,6 +7,7 @@ var userService = require('../../server/services/user-service');
 var troupeService = require('../../server/services/troupe-service');
 var roomMembershipService = require('../../server/services/room-membership-service');
 var suggestionsService = require('../../server/services/suggestions-service');
+var userSettingsService = require('../../server/services/user-settings-service');
 var intercom = require('gitter-web-intercom');
 var suggestions = require('gitter-web-suggestions');
 
@@ -59,10 +60,13 @@ var user;
 getUserFromMongo(opts)
   .then(function(_user) {
     user = _user;
-    return getRoomsForUserId(user.id);
+    return Q.all([
+      getRoomsForUserId(user.id),
+      userSettingsService.getUserSettings(user.id, 'lang')
+    ]);
   })
-  .then(function(rooms) {
-    return suggestionsService.findSuggestionsForRooms(rooms);
+  .spread(function(rooms, language) {
+    return suggestionsService.findSuggestionsForRooms(rooms, language);
   })
   .then(function(suggestions) {
     //console.log(user);
