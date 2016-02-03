@@ -1,9 +1,19 @@
-.issue {
+.issue.is-existent {
   border-bottom: 1px dotted;
   cursor: pointer;
   padding: 0 2px;
   border-radius: 2px;
+
+  &.open {
+    color: @trpGreen;
+    background-color: lighten(@trpGreen, 45%);
+  }
+  &.closed {
+    color: @trpRed;
+    background-color: lighten(@trpRed, 35%);
+  }
 }
+
 
 .commit {
   border-bottom: 1px dotted;
@@ -22,19 +32,6 @@
   }
 }
 
-a.issue:hover {
-  text-decoration: none;
-}
-
-.issue.open {
-  color: @trpGreen;
-  background-color: lighten(@trpGreen, 45%);
-}
-
-.issue.closed {
-  color: @trpRed;
-  background-color: lighten(@trpRed, 35%);
-}
 
 .trpChatContainer {
   box-sizing: border-box;
@@ -109,5 +106,3 @@ blockquote {
 .frame-chat {
   position: relative; // required for scroll calculations
 }
-
-
