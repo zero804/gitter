@@ -58,9 +58,37 @@ var ItemView = Marionette.ItemView.extend({
 
 var CloseItemView = ItemView.extend({
   template: closeTemplate,
+
+  initialize: function(attrs) {
+    this.roomModel = attrs.roomModel;
+    this.listenTo(this.roomModel, 'change:panelOpenState change:roomMenuIsPinned', this.onPanelOpenChange, this);
+  },
+
   onItemClicked: function() {
     this.trigger('minibar-item:close');
   },
+
+  onPanelOpenChange: _.debounce(function() { //jshint unused: true
+    var pinState  = this.roomModel.get('roomMenuIsPinned');
+    var openState = this.roomModel.get('panelOpenState');
+
+    //if the menu is open && pinned
+    if (!!openState && !!pinState) {
+      this.$el.addClass('left');
+      this.$el.removeClass('right');
+    }
+
+    if (!!openState && !pinState) {
+      this.$el.addClass('right');
+      this.$el.removeClass('left');
+    }
+
+    if (!openState) {
+      this.$el.removeClass('left');
+      this.$el.removeClass('right');
+    }
+  }, 200),
+
 });
 
 //TODO TEST ALL THE THINGS JP 2/2/16
@@ -92,6 +120,7 @@ module.exports = Marionette.CollectionView.extend({
     //construct specialist view for close button
     switch (model.get('type')) {
       case 'close':
+        viewOptions = _.extend(viewOptions, { roomModel: this.model });
         return new CloseItemView(viewOptions);
       default:
         return new ViewClass(viewOptions);
@@ -102,6 +131,7 @@ module.exports = Marionette.CollectionView.extend({
   initialize: function(attrs) {
     this.shouldRender = false;
     this.bus          = attrs.bus;
+    this.model        = attrs.model;
     this.listenTo(this.collection, 'snapshot', this.onCollectionSnapshot, this);
     this.listenTo(this.model, 'change:state change:selectedOrgName', this.onMenuStateUpdate, this);
   },
