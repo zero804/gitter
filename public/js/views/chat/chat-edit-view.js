@@ -9,6 +9,8 @@ var RAF = require('utils/raf');
 
 var ChatEditView = Marionette.ItemView.extend({
 
+  template: false,
+
   events: {
     'input': 'onInput',
     'blur': 'onBlur'
@@ -19,7 +21,7 @@ var ChatEditView = Marionette.ItemView.extend({
     'chat.edit.send': 'onKeySend'
   },
 
-  render: function() {
+  onRender: function() {
     if(hasScrollBars()) {
       this.$el.addClass('scroller');
     }
