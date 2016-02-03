@@ -97,30 +97,6 @@ function hilightedRooms(existingRooms, language) {
   }));
 }
 
-function mostPopularItem(strings) {
-  if (strings.length === 0) return undefined;
-  return _.chain(strings).countBy().pairs().max(_.last).head().value();
-}
-
-function pickLanguageFromRooms(rooms) {
-  // try the most popular non-english one
-  var nonEnglish = _.chain(rooms).pluck('lang').filter(function(lang) {
-    // NOTE: only public rooms will have their languages filled in, at least
-    // eventually.
-    return lang && lang != 'en';
-  }).value();
-  var mostPopular;
-  if (nonEnglish) {
-    mostPopular = mostPopularItem(nonEnglish);
-    if (mostPopular) {
-      return mostPopular;
-    }
-  }
-
-  // then fall back to english
-  return 'en';
-}
-
 function filterRooms(suggested, existing) {
   // remove all the nulls/undefineds from things that didn't exist
   filtered = _.filter(suggested);
@@ -151,13 +127,14 @@ var recommenders = [
   hilightedRooms
 ];
 
-function findSuggestionsForRooms(existingRooms) {
+function findSuggestionsForRooms(existingRooms, language) {
+  language = language || 'en';
+
   // 1to1 rooms aren't included in the graph anyway, so filter them out first
   existingRooms = _.filter(existingRooms, function(room) {
     return room.oneToOne !== true;
   });
 
-  var language = pickLanguageFromRooms(existingRooms);
   var filterSuggestions = function(results) {
     return filterRooms(results, existingRooms);
   };
