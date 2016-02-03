@@ -26,7 +26,7 @@ describe('SecondaryCollectionModel', function(){
 
   it('should set the correct variables when the model is in the search state', function(){
     model.set('state', 'search');
-    assert.equal('Recent Searches', collectionModel.get('secondaryCollectionHeader'));
+    assert.equal('Chat Messages', collectionModel.get('secondaryCollectionHeader'));
     assert(collectionModel.get('secondaryCollectionActive'));
   });
 
