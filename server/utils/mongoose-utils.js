@@ -83,8 +83,8 @@ exports.attachNotificationListenersToSchema = function (schema, options) {
   }
 
   if(options.onRemove) {
-    schema.post('remove', function(model, numAffected) {
-      options.onRemove(model, numAffected);
+    schema.post('remove', function(model) {
+      options.onRemove(model);
     });
   }
 

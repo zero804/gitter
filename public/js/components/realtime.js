@@ -6,12 +6,18 @@ var log = require('utils/log');
 var logout = require('utils/logout');
 var RealtimeClient = require('gitter-realtime-client').RealtimeClient;
 var debug = require('debug-proxy')('app:realtime');
-var isMobile = require('../utils/is-mobile');
 var realtimePresenceTracker = require('./realtime-presence-tracking');
 var _ = require('underscore');
 
 var PING_INTERVAL = 30000;
 var ENABLE_APP_LAYER_PINGS = true;
+
+// The reason we use this instead of the `utils/is-mobile` module is that
+// this is called before contentready and `utils/is-mobile` needs
+// contentready before it works
+function isMobile() {
+  return navigator.userAgent.toLowerCase().indexOf('mobile') >= 0;
+}
 
 function authProvider(callback) {
   context.getAccessToken()
