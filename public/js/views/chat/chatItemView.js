@@ -59,8 +59,10 @@ module.exports = (function() {
   };
 
   var touchEvents = {
-    'click .js-chat-item-edit':       'toggleEdit',
-    "click":                          'onTouchClick'
+    'touchstart':                     'onTouchstart',
+    'touchmove':                      'onTouchmove',
+    'touchend':                       'onTouchend',
+    'blur @ui.text':                  'onTouchEditBlur'
   };
 
   var ChatItemView = Marionette.ItemView.extend({
@@ -373,7 +375,9 @@ module.exports = (function() {
           this.model.set('html', null);
           this.model.save();
         }
-        this.focusInput();
+        if (!isMobile()) {
+          this.focusInput();
+        }
         this.toggleEdit();
       }
     },
@@ -660,7 +664,25 @@ module.exports = (function() {
       }, 5000);
     },
 
-    onTouchClick: function() {
+    onTouchstart: function() {
+      this.isDragging = false;
+    },
+
+    onTouchmove: function() {
+      this.isDragging = true;
+    },
+
+    onTouchend: function() {
+      if (!this.isDragging) {
+        // its a tap!
+        this.onTap();
+      } else {
+        // just a drag finishing. not a tap.
+        this.isDragging = false;
+      }
+    },
+
+    onTap: function() {
       var tapCount = this.doubleTapper.registerTap();
 
       switch (tapCount) {
@@ -673,6 +695,12 @@ module.exports = (function() {
           // double click
           this.toggleEdit();
           break;
+      }
+    },
+
+    onTouchEditBlur: function() {
+      if(this.inputBox) {
+        this.toggleEdit();
       }
     },
 
