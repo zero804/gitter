@@ -19,12 +19,13 @@ var ChatEditView = Marionette.ItemView.extend({
     'chat.edit.send': 'onKeySend'
   },
 
-  initialize: function() {
+  render: function() {
     if(hasScrollBars()) {
       this.$el.addClass('scroller');
     }
 
     this.onInput();
+    return this;
   },
 
   onInput: function() {

@@ -570,7 +570,7 @@ module.exports = (function() {
         textarea.val("").val(unsafeText);
       });
 
-      this.inputBox = new ChatEditView({ el: textarea });
+      this.inputBox = new ChatEditView({ el: textarea }).render();
       this.listenTo(this.inputBox, 'cancel', this.onEditCancel);
       this.listenTo(this.inputBox, 'save', this.onEditSave);
     },
