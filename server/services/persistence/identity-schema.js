@@ -13,7 +13,10 @@ var IdentitySchema = new Schema({
   displayName: { type: String },
   email: { type: String },
   accessToken: { type: String },
+  // example: google oauth2
   refreshToken: { type: String },
+  // example: twitter oauth1
+  accessTokenSecret: { type: String },
   avatar: { type: String }
 });
 

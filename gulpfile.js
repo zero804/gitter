@@ -491,13 +491,6 @@ gulp.task('webpack', function() {
     .pipe(gulp.dest('output/assets/js'));
 });
 
-/* Generate embedded native */
-gulp.task('halley-webpack', function() {
-  return gulp.src('./public/js/webpack-halley.config')
-    .pipe(webpack(require('./public/js/webpack-halley.config')))
-    .pipe(gulp.dest('output/assets/js/halley'));
-});
-
 function getUglifyOptions() {
   if (process.env.FAST_UGLIFY && JSON.parse(process.env.FAST_UGLIFY)) {
     gutil.log('Using fast uglify. The resulting javascript artifacts will be much bigger');
@@ -517,16 +510,16 @@ gulp.task('uglify', ['webpack'], function() {
     .pipe(gulp.dest('output/assets/js'));
 });
 
-gulp.task('halley-uglify', ['halley-webpack'], function() {
-  var sourceMapOpts = getSourceMapOptions('halley');
-  return gulp.src('output/assets/js/halley/*.js')
+gulp.task('embedded-uglify', ['embedded-webpack'], function() {
+  var sourceMapOpts = getSourceMapOptions();
+  return gulp.src('output/assets/js/*.js')
     .pipe(sourcemaps.init({ /* loadMaps: true */ }))
     .pipe(uglify(getUglifyOptions()))
     .pipe(sourcemaps.write(sourceMapOpts.dest, sourceMapOpts.options))
-    .pipe(gulp.dest('output/assets/js/halley'));
+    .pipe(gulp.dest('output/assets/js'));
 });
 
-gulp.task('build-assets', ['copy-asset-files', 'css', 'webpack', 'uglify', 'halley-webpack', 'halley-uglify']);
+gulp.task('build-assets', ['copy-asset-files', 'css', 'webpack', 'uglify']);
 
 gulp.task('compress-assets', ['build-assets'], function() {
   return gulp.src(['output/assets/**/*.{css,js,ttf,svg}', '!**/*.map'], { base: 'output/assets/' })
@@ -600,4 +593,4 @@ gulp.task('embedded-copy-asset-files', function() {
 });
 
 
-gulp.task('embedded-package', ['embedded-webpack', 'css-ios', 'embedded-copy-asset-files']);
+gulp.task('embedded-package', ['embedded-uglify', 'css-ios', 'embedded-copy-asset-files']);
