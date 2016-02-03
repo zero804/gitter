@@ -227,6 +227,7 @@
     "mkdirp": "^0.5.1",
     "mocha": "^2.2.5",
     "mocha-istanbul": "0.2.0",
+    "mocha-multi": "^0.7.2",
     "ms": "^0.7.1",
     "mutantjs": "^0.2.0",
     "nanoscroller": "^0.8.7",
@@ -261,7 +262,6 @@
     "vinyl-paths": "^2.0.0",
     "webpack": "^1.12.10",
     "webpack-dev-middleware": "^1.0.11",
-    "xunit-file": "0.0.9",
     "zip-stream": "^0.5.1"
   },
   "engines": {
