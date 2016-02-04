@@ -5,29 +5,9 @@ var _                 = require('underscore');
 var itemTemplate      = require('./secondary-collection-item-view.hbs');
 var roomNameShortener = require('../../../../utils/room-menu-name-shortener');
 var getRoomAvatar     = require('utils/get-room-avatar');
+var BaseCollectionItemView = require('../base-collection/base-collection-item-view');
 
-module.exports = Marionette.ItemView.extend({
-  template: itemTemplate,
-  className: 'room-item',
-
-  //TODO this is used in primary-collection-item-view
-  //centralize it JP 22/1/16
-  attributes: function() {
-    var delay = (0.003125 * this.index);
-    return {
-      'style': 'transition-delay: ' + delay + 's',
-    };
-  },
-
-  triggers: {
-    'click': 'item:clicked',
-  },
-
-  constructor: function(attrs) {
-    this.index = attrs.index;
-    Marionette.ItemView.prototype.constructor.apply(this, arguments);
-  },
-
+module.exports = BaseCollectionItemView.extend({
   serializeData: function() {
     var data = this.model.toJSON();
 
@@ -48,6 +28,5 @@ module.exports = Marionette.ItemView.extend({
     return _.extend({}, data, {
       name: roomNameShortener((data.name || data.uri)),
     });
-  },
-
+  }
 });
