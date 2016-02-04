@@ -9,7 +9,6 @@ var ALLOWED_SECURITY_VALUES = {
   INHERITED: 1
 };
 
-
 /**
  * COMMON_ORG_REPO_CHANNEL permissions model
  *

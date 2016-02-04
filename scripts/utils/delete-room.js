@@ -24,7 +24,7 @@ var rl = readline.createInterface({
   output: process.stdout
 });
 
-return troupeService.findByUri(opts.uri)
+troupeService.findByUri(opts.uri)
   .then(function(room) {
     return new Promise(function(resolve, reject) {
       rl.question("Are you sure you want to delete " + room.uri + " with " + room.userCount + " users in it? (yes/no)", function(answer) {
