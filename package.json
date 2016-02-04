@@ -57,6 +57,8 @@
     "i18n-2": "^0.4.6",
     "intercom.io": "~0.0.8",
     "ioredis": "^1.10.0",
+    "jshamcrest": "^0.6.7",
+    "jsmockito": "^1.0.5",
     "jwt-simple": "~0.1.0",
     "keyword-extractor": "0.0.9",
     "langs": "^1.0.1",
