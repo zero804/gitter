@@ -35,7 +35,7 @@ function confirm() {
     output: process.stdout
   });
 
-  return Promise(function(resolve, reject) {
+  return new Promise(function(resolve, reject) {
     rl.question('Are you sure you want to perform these redirects? ' + fromRoomInput + ' -> ' + toRoomInput + '\nType "yes"?', function(answer) {
       rl.close();
 

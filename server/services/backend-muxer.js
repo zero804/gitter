@@ -1,6 +1,6 @@
 'use strict';
 
-var Q = require('bluebird-q');
+var Promise = require('bluebird');
 var userScopes = require('../utils/models/user-scopes');
 var identityService = require('./identity-service');
 
@@ -26,16 +26,19 @@ function resolveUserBackends(user) {
     })
     .then(function(identityMap) {
       var userBackends = [];
+
       if (userScopes.isGitHubUser(user)) {
         var Backend = resolveBackendForProvider('github');
-        userBackends.push(new Backend(user, identityMap['github']));
+        userBackends.push(new Backend(user, identityMap.github));
       }
+
       if (user.identities) {
         user.identities.forEach(function(identity) {
           var Backend = resolveBackendForProvider(identity.provider);
           userBackends.push(new Backend(user, identityMap[identity.provider]));
         });
       }
+
       return userBackends;
     });
 }
@@ -54,8 +57,9 @@ BackendMuxer.prototype.findResults = function(method, args) {
       var promises = userBackends.map(function(backend) {
         return backend[method].apply(backend, args);
       });
-      return Q.all(promises);
-    })
+
+      return Promise.all(promises);
+    });
 };
 
 // Use this when each backend returns an array and you want to concatenate them
@@ -74,30 +78,20 @@ BackendMuxer.prototype.getFirstResult = function(method, args) {
 
   return resolveUserBackends(this.user)
     .then(function(userBackends) {
-      var deferred = Q.defer();
 
       function tryNext() {
         var nextBackend = userBackends.shift();
-        if (nextBackend) {
-          nextBackend[method].apply(nextBackend, args)
-            .then(function(result) {
-              if (result) {
-                deferred.resolve(result);
-              } else {
-                tryNext();
-              }
-            })
-            .catch(function(err) {
-              deferred.reject(err);
-            });
-        } else {
-          deferred.resolve(); // with an empty value
-        }
+        if (!nextBackend) return Promise.resolve(); // with an empty value
+
+        return nextBackend[method].apply(nextBackend, args)
+          .then(function(result) {
+            if (result) return result;
+
+            return tryNext();
+          });
       }
 
-      tryNext();
-
-      return deferred.promise;
+      return tryNext();
     });
 };
 
