@@ -9,7 +9,7 @@ module.exports =  Marionette.ItemView.extend({
   tagName:      'li',
   template:     itemTemplate,
   modelEvents: {
-    'change:unreadItems change:mentions': 'render',
+    'change:unreadItems change:mentions change:activity': 'render',
     'change:active': 'onActiveStateUpdate',
   },
   events: {
