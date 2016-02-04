@@ -20,7 +20,8 @@ module.exports = Backbone.Model.extend({
     Backbone.Model.prototype.constructor.apply(this, arguments);
   },
 
-  onModelChangeState: function() {
+  onModelChangeState: function(model, val) { //jshint unused: true
+    this.set('state', val);
     switch (this.roomMenuModel.get('state')) {
       case 'all':
         this.onAll();

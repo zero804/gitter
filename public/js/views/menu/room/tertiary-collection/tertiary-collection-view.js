@@ -32,6 +32,10 @@ module.exports =  BaseCollectionView.extend({
     this.listenTo(this.roomMenuModel, 'change:searchTerm', this.onSearchUpdate, this);
   },
 
+  filter: function (model, index){ //jshint unused: true
+    return (index <= 10);
+  },
+
   onSearchUpdate: function (){
     if(this.roomMenuModel.get('state') !== 'search') { return  }
     this.$el.toggleClass('active', !this.roomMenuModel.get('searchTerm'));

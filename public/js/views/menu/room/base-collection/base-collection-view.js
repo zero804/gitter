@@ -18,7 +18,7 @@ module.exports = Marionette.CompositeView.extend({
   },
 
   constructor: function(attrs) {
-    this.bus = attrs.bus;
+    this.bus        = attrs.bus;
     this.collection = attrs.collection;
     Marionette.CompositeView.prototype.constructor.apply(this, arguments);
   },
