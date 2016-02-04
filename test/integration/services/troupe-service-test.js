@@ -15,8 +15,6 @@ var once          = times(1);
 var times         = mockito.Verifiers.times;
 var fixture       = {};
 
-Q.longStackSupport = true;
-
 function findUserIdPredicate(userId) {
   return function(x) {
     return "" + x === "" + userId;

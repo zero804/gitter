@@ -4,8 +4,6 @@ var Q = require('bluebird-q');
 var assert = require('assert');
 var collapsedChatService = require('../../../server/services/collapsed-chats-service');
 
-Q.longStackSupport = true;
-
 describe('collapsed-chats-service', function() {
 
   var blockTimer = require('../block-timer');
