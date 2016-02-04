@@ -363,7 +363,7 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
 
         if (skip) {
           if (skip > 1000) {
-            logger.warn('chat-service: Client requested large skip value on chat message collection query', { troupeId: troupeId, skip: skip })
+            logger.warn('chat-service: Client requested large skip value on chat message collection query', { troupeId: troupeId, skip: skip });
           }
 
           q = q.skip(skip)
