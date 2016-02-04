@@ -1,6 +1,6 @@
 "use strict";
 
-var Q                       = require('bluebird-q');
+var Promise                 = require('bluebird');
 var lazy                    = require('lazy.js');
 var persistence             = require('../persistence-service');
 var _                       = require('underscore');
@@ -200,7 +200,7 @@ function getTroupeLastAccessTimesForUser(userId) {
  * as a default ~1 July 2015.
  */
 function findLastAccessTimesForUsersInRoom(roomId, userIds) {
-  if (!userIds.length) return Q.resolve({});
+  if (!userIds.length) return Promise.resolve({});
 
   var troupesKey = 'troupes.' +  roomId;
   var lastKey = 'last.' +  roomId;
