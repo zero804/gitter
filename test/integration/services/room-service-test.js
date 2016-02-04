@@ -649,7 +649,7 @@ describe('room-service', function() {
               .then(function() {
                 mockito.verify(permissionsModelMock, once)();
               })
-              .thenResolve(room);
+              .thenReturn(room);
           })
           .then(function(room) {
             var roomMembershipService = testRequire('./services/room-membership-service');
@@ -700,7 +700,7 @@ describe('room-service', function() {
               .then(function() {
                 mockito.verify(roomPermissionsModelMock, once)();
               })
-              .thenResolve(room);
+              .thenReturn(room);
           })
           .then(function(room) {
             var roomMembershipService = testRequire('./services/room-membership-service');
@@ -752,7 +752,7 @@ describe('room-service', function() {
               .then(function() {
                 mockito.verify(roomPermissionsModelMock, once)();
               })
-              .thenResolve(room);
+              .thenReturn(room);
           })
           .then(function(room) {
             var roomMembershipService = testRequire('./services/room-membership-service');
@@ -804,7 +804,7 @@ describe('room-service', function() {
               .then(function() {
                 mockito.verify(roomPermissionsModelMock, once)();
               })
-              .thenResolve(room);
+              .thenReturn(room);
           })
           .then(function(room) {
             var roomMembershipService = testRequire('./services/room-membership-service');
@@ -858,7 +858,7 @@ describe('room-service', function() {
               .then(function() {
                 mockito.verify(roomPermissionsModelMock, once)();
               })
-              .thenResolve(room);
+              .thenReturn(room);
           })
           .then(function(room) {
             var roomMembershipService = testRequire('./services/room-membership-service');
@@ -910,7 +910,7 @@ describe('room-service', function() {
               .then(function() {
                 mockito.verify(roomPermissionsModelMock, once)();
               })
-              .thenResolve(room);
+              .thenReturn(room);
           })
           .then(function(room) {
             var roomMembershipService = testRequire('./services/room-membership-service');
@@ -962,7 +962,7 @@ describe('room-service', function() {
               .then(function() {
                 mockito.verify(permissionsModelMock, once)();
               })
-              .thenResolve(room);
+              .thenReturn(room);
           })
           .then(function(room) {
             var roomMembershipService = testRequire('./services/room-membership-service');
@@ -1016,7 +1016,7 @@ describe('room-service', function() {
               .then(function() {
                 mockito.verify(roomPermissionsModelMock, once)();
               })
-              .thenResolve(room);
+              .thenReturn(room);
           })
           .then(function(room) {
             var roomMembershipService = testRequire('./services/room-membership-service');
@@ -1068,7 +1068,7 @@ describe('room-service', function() {
               .then(function() {
                 mockito.verify(roomPermissionsModelMock, once)();
               })
-              .thenResolve(room);
+              .thenReturn(room);
           })
           .then(function(room) {
             var roomMembershipService = testRequire('./services/room-membership-service');
@@ -1119,7 +1119,7 @@ describe('room-service', function() {
               .then(function() {
                 mockito.verify(roomPermissionsModelMock, once)();
               })
-              .thenResolve(room);
+              .thenReturn(room);
           })
           .then(function(room) {
             var roomMembershipService = testRequire('./services/room-membership-service');
@@ -1173,8 +1173,7 @@ describe('room-service', function() {
             return room;
           })
           .then(function(room) {
-            return roomService.deleteRoom(room)
-              .thenResolve(room.lcUri);
+            return roomService.deleteRoom(room).thenReturn(room.lcUri);
           })
           .then(function(roomUri) {
             return troupeService.findByUri(roomUri);

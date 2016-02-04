@@ -85,9 +85,9 @@ function getCollaboratorsForUser(user) {
 
   return ghMe.getOrgs()
     .then(function(orgs) {
-      var promises = orgs.map(function(o) { return Q.resolve(ghOrg.someMembers(o.login)); });
+      var promises = orgs.map(function(o) { return Promise.resolve(ghOrg.someMembers(o.login)); });
 
-      return Q.all(promises.map(function(promise) {
+      return Promise.all(promises.map(function(promise) {
         return promise.reflect();
       }));
     })
@@ -138,7 +138,7 @@ module.exports = function getCollaboratorForRoom(room, user) {
         .then(deduplicate);
 
     default:
-      return Q.resolve([]);
+      return Promise.resolve([]);
   }
 
 

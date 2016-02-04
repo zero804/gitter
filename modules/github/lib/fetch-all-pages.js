@@ -30,7 +30,7 @@ function updatePerPage(options) {
 module.exports = exports = function(options, callback, request) {
   function subrequest(options) {
 
-    return Promise(function(resolve, reject) {
+    return new Promise(function(resolve, reject) {
       request(options, function (error, response, body) {
         if(error) return reject(error);
 
@@ -53,7 +53,8 @@ module.exports = exports = function(options, callback, request) {
 
   /* Allow clients to disable this */
   if (options.firstPageOnly) {
-    return request(options, callback);
+    request(options, callback);
+    return;
   }
 
   /* Always fetch 100 items per page */

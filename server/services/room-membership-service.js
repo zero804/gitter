@@ -192,7 +192,7 @@ function addRoomMember(troupeId, userId) {
 
           return incrementTroupeUserCount(troupeId, 1);
         })
-        .thenResolve(added);
+        .thenReturn(added);
     });
 
 }
@@ -237,7 +237,7 @@ function addRoomMembers(troupeId, userIds) {
     roomMembershipEvents.emit("members.added", troupeId, addedUserIds);
 
     return incrementTroupeUserCount(troupeId, addedUserIds.length)
-      .thenResolve(addedUserIds);
+      .thenReturn(addedUserIds);
   });
 }
 
@@ -264,7 +264,7 @@ function removeRoomMember(troupeId, userId) {
 
       roomMembershipEvents.emit("members.removed", troupeId, [userId]);
       return incrementTroupeUserCount(troupeId, -1)
-        .thenResolve(true);
+        .thenReturn(true);
     });
 }
 

@@ -230,7 +230,7 @@ exports.updateChatMessage = function(troupe, chatMessage, user, newText, callbac
             username: user.username
           });
         })
-        .thenResolve(chatMessage);
+        .thenReturn(chatMessage);
     })
     .nodeify(callback);
 };

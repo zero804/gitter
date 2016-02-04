@@ -88,7 +88,7 @@ function autoRemoveInactiveUsers(roomId, options) {
         });
 
       return bulkRemoveUsersFromRoom(roomId, usersToLurk)
-        .thenResolve(candidates);
+        .thenReturn(candidates);
     });
 }
 exports.autoRemoveInactiveUsers = autoRemoveInactiveUsers;

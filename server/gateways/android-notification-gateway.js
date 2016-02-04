@@ -30,10 +30,10 @@ var sendNotificationToDevice = function(notification, badge, device) {
     if (body.canonical_ids) {
       // this registration id/token is an old duplicate which has been superceded by a canonical id,
       // and we've probably just sent two identical messages to the same phone.
-      return pushNotificationService.deregisterAndroidDevice(device.androidToken).thenResolve(body);
+      return pushNotificationService.deregisterAndroidDevice(device.androidToken).thenReturn(body);
     } else if (body.failure && body.results[0] && body.results[0].error === "NotRegistered") {
       // app has been uninstalled / token revoked
-      return pushNotificationService.deregisterAndroidDevice(device.androidToken).thenResolve(body);
+      return pushNotificationService.deregisterAndroidDevice(device.androidToken).thenReturn(body);
     } else {
       return body;
     }
