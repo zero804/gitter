@@ -131,7 +131,7 @@ module.exports = Backbone.Model.extend({
       case 'org':
         this.primaryCollection.switchCollection(this.activeRoomCollection);
         this.secondaryCollection.switchCollection(this.suggestedOrgs);
-        this.tertiaryCollection.switchCollection(new Backbone.Collection(null));
+        this.tertiaryCollection.switchCollection(this._suggestedRoomCollection);
         break;
       case 'all':
         this.primaryCollection.switchCollection(this.activeRoomCollection);

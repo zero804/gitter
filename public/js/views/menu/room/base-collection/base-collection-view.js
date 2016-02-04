@@ -31,6 +31,7 @@ module.exports = Marionette.CompositeView.extend({
 
   collectionEvents: {
     'reset': 'onCollectionUpdate',
+    'sync':  'render'
   },
 
   childEvents: {
@@ -71,9 +72,7 @@ module.exports = Marionette.CompositeView.extend({
   },
 
   onBeforeRender: function() {
-    RAF(function() {
-      this.$el.removeClass('loaded');
-    }.bind(this));
+    this.$el.removeClass('loaded');
   },
 
   onRender: function() {

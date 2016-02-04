@@ -33,7 +33,7 @@ module.exports = BaseCollectionItemView.extend({
 
     var hasMentions  = !!data.mentions && data.mentions;
     var unreadItems  = !hasMentions && data.unreadItems;
-    var lurkActivity = (!hasMentions && !unreadItems) && !!data.activity;
+    var lurkActivity = data.lurk && (!hasMentions && !unreadItems) && !!data.activity;
 
     return _.extend({}, data, {
       avatarUrl: getRoomAvatar(data.url.substring(1)),

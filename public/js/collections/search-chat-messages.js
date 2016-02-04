@@ -3,6 +3,7 @@
 //TODO This is too specialised, abstract jp 2/2/16
 
 var Backbone               = require('backbone');
+var _                      = require('underscore');
 var BaseResolverCollection = require('./base-resolver-collection.js');
 
 var ContextModel = Backbone.Model.extend({
@@ -19,12 +20,12 @@ var ContextModel = Backbone.Model.extend({
   },
 
   onModelUpdate: function() {
+    console.log('update');
     if (this.roomMenuModel.get('state') !== 'search') { return this.set('active', false); }
 
     if (!this.roomMenuModel.get('searchTerm')) { return this.set('active', false); }
 
     if (!this.roomModel.get('id')) { return this.set('active', false); }
-
     this.set({
       roomId:     this.roomModel.get('id'),
       searchTerm: this.roomMenuModel.get('searchTerm'),
@@ -58,6 +59,7 @@ module.exports = BaseResolverCollection.extend({
     this.contextModel = new ContextModel(null, { roomMenuModel: this.roomMenuModel, roomModel: this.roomModel });
 
     this.listenTo(this.contextModel, 'change:active', this.onModelUpdateActive, this);
+    this.listenTo(this.roomMenuModel, 'change:searchTerm', this.onSearchTermUpdate, this);
 
     BaseResolverCollection.prototype.initialize.apply(this, arguments);
   },
@@ -65,5 +67,12 @@ module.exports = BaseResolverCollection.extend({
   onModelUpdateActive: function(model, val) { //jshint unused: true
     return (!val) ? this.reset() : this.fetch();
   },
+
+  onSearchTermUpdate: _.debounce(function (model, val){ //jshint unused: true
+    console.log('fetch');
+    if(!this.contextModel.get('active')) { return }
+    if(!val) { return }
+    this.fetch();
+  }, 150),
 
 });
