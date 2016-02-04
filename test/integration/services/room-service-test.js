@@ -5,7 +5,7 @@
 var testRequire = require('../test-require');
 var assert = require('assert');
 var fixtureLoader = require('../test-fixtures');
-var Q = require('q');
+var Q = require('bluebird-q');
 var ObjectID = require('mongodb').ObjectID;
 var fixture = {};
 

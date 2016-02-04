@@ -1,6 +1,6 @@
 'use strict';
 
-var Q = require('q');
+var Q = require('bluebird-q');
 var presenceService = require('gitter-web-presence');
 var collections = require('../utils/collections');
 var pushNotificationService = require('./push-notification-service');

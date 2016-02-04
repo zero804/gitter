@@ -6,7 +6,7 @@ var testRequire = require('../../test-require');
 var assert = require('assert');
 var mockito = require('jsmockito').JsMockito;
 var testGenerator = require('../../test-generator');
-var Q = require('q');
+var Q = require('bluebird-q');
 
 // var FIXTURE = {
 //   join: true,

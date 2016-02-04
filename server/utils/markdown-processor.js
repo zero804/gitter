@@ -6,7 +6,7 @@ var errorReporter = env.errorReporter;
 var stats         = env.stats;
 var Processor     = require('gitter-markdown-processor');
 var shutdown      = require('shutdown');
-var Q             = require('q');
+var Q             = require('bluebird-q');
 
 // processor starts its own process, so lazy load it
 var processor;

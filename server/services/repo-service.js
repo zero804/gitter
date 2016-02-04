@@ -2,7 +2,7 @@
 
 var GithubRepo      = require('gitter-web-github').GitHubRepoService;
 var persistence     = require('./persistence-service');
-var Q               = require('q');
+var Q               = require('bluebird-q');
 var winston         = require('../utils/winston');
 
 function applyFilters(array, filters) {

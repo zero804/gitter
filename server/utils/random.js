@@ -1,7 +1,7 @@
 "use strict";
 
 var crypto = require('crypto');
-var Q = require('q');
+var Q = require('bluebird-q');
 
 // Token length in bytes. 20 byts == 40 hex chars
 var tokenLength = 20;

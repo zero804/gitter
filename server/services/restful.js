@@ -3,7 +3,7 @@
 var env                   = require('gitter-web-env');
 var logger                = env.logger;
 
-var Q                     = require('q');
+var Q                     = require('bluebird-q');
 var StatusError           = require('statuserror');
 var _                     = require('underscore');
 var gitHubProfileService  = require('gitter-web-github-backend/lib/github-profile-service');

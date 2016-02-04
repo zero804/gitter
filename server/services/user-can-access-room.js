@@ -6,7 +6,7 @@ var errorReporter         = env.errorReporter;
 
 var persistence           = require('./persistence-service');
 var dolph                 = require('dolph');
-var Q                     = require('q');
+var Q                     = require('bluebird-q');
 var userService           = require('./user-service');
 var troupeService         = require('./troupe-service');
 var roomPermissionsModel  = require('./room-permissions-model');

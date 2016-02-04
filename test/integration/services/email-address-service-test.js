@@ -2,7 +2,7 @@
 "use strict";
 
 var testRequire = require('./../test-require');
-var Q = require('q');
+var Q = require('bluebird-q');
 var assert = require('assert');
 
 

@@ -3,7 +3,7 @@
 var env                    = require('gitter-web-env');
 var stats                  = env.stats;
 
-var Q                      = require('q');
+var Q                      = require('bluebird-q');
 var _                      = require('underscore');
 var languageDetector       = require('../utils/language-detector');
 var languageAnalyzerMapper = require('../utils/language-analyzer-mapper');

@@ -1,7 +1,7 @@
 "use strict";
 
 var githubMembers = require('gitter-web-github').GitHubMembers;
-var Q = require('q');
+var Q = require('bluebird-q');
 
 function canUserBeInvitedToJoinRoom(usernameToBeInvited, troupe, instigatingUser) {
   if(troupe.security === 'PUBLIC') {

@@ -7,7 +7,7 @@
  */
 
 var persistence = require("./persistence-service");
-var Q           = require('q');
+var Q           = require('bluebird-q');
 var mongoUtils  = require('../utils/mongo-utils');
 var debug       = require('debug')('gitter:uri-lookup-service');
 

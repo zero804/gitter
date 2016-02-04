@@ -4,7 +4,7 @@
 var makeBenchmark = require('../make-benchmark');
 var testRequire = require('../integration/test-require');
 var _ = require('lodash');
-var Q = require('q');
+var Q = require('bluebird-q');
 
 var mongoUtils = testRequire('./utils/mongo-utils');
 var unreadItemsServiceEngine = testRequire('./services/unread-item-service-engine');

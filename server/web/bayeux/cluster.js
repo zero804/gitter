@@ -12,7 +12,7 @@ var presenceService   = require('gitter-web-presence');
 var shutdown          = require('shutdown');
 var zlib              = require('zlib');
 var debug             = require('debug')('gitter:bayeux');
-var Q                 = require('q');
+var Q                 = require('bluebird-q');
 
 /* Disabled after the outage 8 April 2015 XXX investigate further */
 // var createDoormanExtension = require('./doorman');

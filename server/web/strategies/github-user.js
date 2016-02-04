@@ -6,7 +6,7 @@ var errorReporter = env.errorReporter;
 var stats = env.stats;
 var logger = env.logger;
 
-var Q = require('q');
+var Q = require('bluebird-q');
 var moment = require('moment');
 var GitHubStrategy = require('gitter-passport-github').Strategy;
 var TokenStateProvider = require('gitter-passport-oauth2').TokenStateProvider;

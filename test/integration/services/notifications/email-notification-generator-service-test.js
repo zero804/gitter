@@ -6,7 +6,7 @@
 var testRequire         = require('../../test-require');
 var assert              = require("assert");
 var mockito             = require('jsmockito').JsMockito;
-var Q                   = require('q');
+var Q                   = require('bluebird-q');
 // var chatService         = testRequire('./services/chat-service');
 var userSettingsService = testRequire('./services/user-settings-service');
 var userTroupeSettingsService = testRequire('./services/user-troupe-settings-service');

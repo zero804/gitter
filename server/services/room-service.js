@@ -7,7 +7,7 @@ var stats              = env.stats;
 var errorReporter      = env.errorReporter;
 
 var appEvents          = require('gitter-web-appevents');
-var Q                  = require('q');
+var Q                  = require('bluebird-q');
 var request            = require('request');
 var _                  = require('lodash');
 var xregexp            = require('xregexp').XRegExp;

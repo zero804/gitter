@@ -1,4 +1,3 @@
-#!/usr/bin/env mocha --ignore-leaks
 
 /*jslint node:true, unused:true*/
 /*global describe:true, it:true, before:true, after: true */

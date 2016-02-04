@@ -6,7 +6,7 @@ var serializer                   = require("../../serializers/notification-seria
 var notificationMessageGenerator = require('./notification-message-generator');
 var unreadItemService            = require('../unread-item-service');
 var debug                        = require('debug')('gitter:push-notification-generator');
-var Q                            = require('q');
+var Q                            = require('bluebird-q');
 var _                            = require('lodash');
 
 var MAX_MESSAGES_FOR_NOTIFICATION = 3;

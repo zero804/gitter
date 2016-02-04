@@ -3,7 +3,7 @@
 
 var troupeService     = require("../../services/troupe-service");
 var presenceService   = require("gitter-web-presence");
-var Q                 = require("q");
+var Q                 = require('bluebird-q');
 var winston           = require('../../utils/winston');
 var collections       = require("../../utils/collections");
 var GithubContributorService = require('gitter-web-github').GitHubContributorService;

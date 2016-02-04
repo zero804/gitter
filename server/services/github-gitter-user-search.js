@@ -8,7 +8,7 @@ var userService            = require("./user-service");
 var githubSearchService    = require('gitter-web-github').GitHubFastSearch;
 var extractGravatarVersion = require('../utils/extract-gravatar-version');
 
-var Q = require('q');
+var Q = require('bluebird-q');
 var _ = require('underscore');
 
 function cleanQuery(query) {

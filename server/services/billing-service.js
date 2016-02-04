@@ -2,7 +2,7 @@
 
 var persistence = require('./persistence-service');
 var mongoUtils = require('../utils/mongo-utils');
-var Q = require('q');
+var Q = require('bluebird-q');
 
 function toLowerCase(value) {
   return value && value.toLowerCase();

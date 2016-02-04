@@ -1,8 +1,7 @@
-#!/usr/bin/env mocha --ignore-leaks
 "use strict";
 
 var testRequire   = require('../test-require');
-var Q             = require('q');
+var Q             = require('bluebird-q');
 var assert        = require('assert');
 var i18nFactory   = testRequire('./utils/i18n-factory');
 

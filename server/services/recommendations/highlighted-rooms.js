@@ -1,7 +1,7 @@
 'use strict';
 
 var _ = require('underscore');
-var Q = require('q');
+var Q = require('bluebird-q');
 
 var HIGHLIGHTED_ROOMS = [
   {

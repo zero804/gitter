@@ -14,13 +14,13 @@ var _                     = require("lodash");
 var mongoUtils            = require('../utils/mongo-utils');
 var RedisBatcher          = require('../utils/redis-batcher').RedisBatcher;
 var collections           = require('../utils/collections');
-var Q                     = require('q');
+var Q                     = require('bluebird-q');
 var roomMembershipService = require('./room-membership-service');
 var uniqueIds             = require('mongodb-unique-ids');
 var debug                 = require('debug')('gitter:unread-item-service');
 var recentRoomCore        = require('./core/recent-room-core');
 var badgeBatcher          = new RedisBatcher('badge', 1000, batchBadgeUpdates);
-var Q                     = require('q');
+var Q                     = require('bluebird-q');
 
 /* Handles batching badge updates to users */
 function batchBadgeUpdates(key, userIds, done) {

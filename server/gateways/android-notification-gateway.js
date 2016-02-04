@@ -1,7 +1,7 @@
 "use strict";
 
 var gcm = require('node-gcm');
-var Q = require('q');
+var Q = require('bluebird-q');
 var nconf = require('../utils/config');
 var pushNotificationService = require('../services/push-notification-service');
 

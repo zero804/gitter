@@ -7,7 +7,7 @@ var workerQueue               = require('../../utils/worker-queue-redis');
 var userTroupeSettingsService = require('../user-troupe-settings-service');
 var debug                     = require('debug')('gitter:push-notification-postbox');
 var mongoUtils                = require('../../utils/mongo-utils');
-var Q                         = require('q');
+var Q                         = require('bluebird-q');
 var errorReporter             = require('gitter-web-env').errorReporter;
 
 var notificationWindowPeriods = [

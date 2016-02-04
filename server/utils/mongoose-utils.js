@@ -1,6 +1,6 @@
 "use strict";
 
-var Q           = require('q');
+var Q           = require('bluebird-q');
 var _           = require('underscore');
 var collections = require('./collections');
 var mongoUtils  = require('./mongo-utils');

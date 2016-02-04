@@ -4,7 +4,7 @@
 var testRequire        = require('./../test-require');
 var fixtureLoader      = require('../test-fixtures');
 var assert             = testRequire("assert");
-var Q                  = require('q');
+var Q                  = require('bluebird-q');
 var fixture2 = {};
 
 describe("User Service", function() {

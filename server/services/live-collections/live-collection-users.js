@@ -1,7 +1,7 @@
 'use strict';
 
 var _              = require('underscore');
-var Q              = require('q');
+var Q              = require('bluebird-q');
 var appEvents      = require('gitter-web-appevents');
 var restSerializer = require("../../serializers/rest-serializer");
 var roomMembershipService = require('../room-membership-service');

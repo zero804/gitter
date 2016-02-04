@@ -6,7 +6,7 @@ var userAgentTags       = require('../../../utils/user-agent-tagger');
 var _                   = require('underscore');
 var StatusError         = require('statuserror');
 var loadTroupeFromParam = require('./load-troupe-param');
-var Q                   = require('q');
+var Q                   = require('bluebird-q');
 
 module.exports = {
   id: 'chatMessageId',

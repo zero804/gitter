@@ -4,7 +4,7 @@ var env            = require('gitter-web-env');
 var mailer         = env.mailer;
 
 var troupeTemplate = require('../utils/troupe-template');
-var Q              = require('q');
+var Q              = require('bluebird-q');
 var cdn            = require('../web/cdn');
 
 

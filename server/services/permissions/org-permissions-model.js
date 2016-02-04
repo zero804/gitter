@@ -5,7 +5,7 @@ var logger               = env.logger;
 
 var GitHubOrgService     = require('gitter-web-github').GitHubOrgService;
 var userIsInRoom         = require('../user-in-room');
-var Q                    = require('q');
+var Q                    = require('bluebird-q');
 
 /**
  * ORG permissions model

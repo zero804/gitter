@@ -1,7 +1,7 @@
 /* jshint maxcomplexity:16 */
 "use strict";
 
-var Q                     = require('q');
+var Q                     = require('bluebird-q');
 var userIsInRoom          = require('../user-in-room');
 
 var ALLOWED_USER_CHANNEL_SECURITY_VALUES = {

@@ -4,7 +4,7 @@ var userService = require('./user-service');
 var troupeService = require('./troupe-service');
 var roomService = require('./room-service');
 var roomMembershipService = require('./room-membership-service');
-var Q = require('q');
+var Q = require('bluebird-q');
 var debug = require('debug')('gitter:user-removal-service');
 
 exports.removeByUsername = function(username, options) {

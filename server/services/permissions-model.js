@@ -1,7 +1,7 @@
 "use strict";
 
 var winston              = require('../utils/winston');
-var Q                    = require('q');
+var Q                    = require('bluebird-q');
 var userIsBannedFromRoom = require('./user-banned-from-room');
 
 var repoPermissionsModel        = require('./permissions/repo-permissions-model');

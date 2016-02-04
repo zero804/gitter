@@ -3,7 +3,7 @@
 "use strict";
 
 var assert = require('assert');
-var Q = require('q');
+var Q = require('bluebird-q');
 var testRequire = require('../test-require');
 var redisLockPromise = testRequire('./utils/redis-lock-promise');
 

@@ -3,7 +3,7 @@
 var env = require('gitter-web-env');
 var config = env.config;
 
-var Q = require('q');
+var Q = require('bluebird-q');
 var TwitterStrategy = require('passport-twitter');
 var userService = require('../../services/user-service');
 var trackSignupOrLogin = require('../../utils/track-signup-or-login');

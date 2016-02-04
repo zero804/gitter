@@ -1,7 +1,7 @@
 "use strict";
 
 var testRequire = require('../test-require');
-var Q = require('q');
+var Q = require('bluebird-q');
 var assert = require('assert');
 var FAKE_USER = { id: 'superfake' };
 

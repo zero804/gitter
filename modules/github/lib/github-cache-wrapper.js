@@ -9,7 +9,7 @@
 
 
 var SnappyCache = require('snappy-cache');
-var Q = require('q');
+var Q = require('bluebird-q');
 var env = require('gitter-web-env');
 var config = env.config;
 var _ = require('underscore');

@@ -2,7 +2,7 @@
 
 var assert                    = require('assert');
 var _                         = require('underscore');
-var Q                         = require('q');
+var Q                         = require('bluebird-q');
 var githubUserService         = require('gitter-web-github').GitHubUserService;
 var persistence               = require("./persistence-service");
 var uriLookupService          = require('./uri-lookup-service');

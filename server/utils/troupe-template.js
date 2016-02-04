@@ -5,7 +5,7 @@ var handlebars  = require('handlebars');
 var i18nFactory = require('./i18n-factory');
 var _           = require('underscore');
 var hbsHelpers  = require('../web/hbs-helpers');
-var Q           = require('q');
+var Q           = require('bluebird-q');
 
 // TODO: add caching!
 handlebars.registerHelper('cdn', hbsHelpers.cdn);

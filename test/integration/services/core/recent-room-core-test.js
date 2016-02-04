@@ -2,7 +2,7 @@
 
 var testRequire   = require('../../test-require');
 var assert        = require('assert');
-var Q             = require('q');
+var Q             = require('bluebird-q');
 var fixtureLoader = require('../../test-fixtures');
 
 var recentRoomCore = testRequire("./services/core/recent-room-core");

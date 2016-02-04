@@ -6,7 +6,7 @@ var testRequire = require('../test-require');
 var assert = require('assert');
 var mongoUtils = testRequire('./utils/mongo-utils');
 var oauthService = testRequire("./services/oauth-service");
-var Q = require('q');
+var Q = require('bluebird-q');
 
 var fixtureLoader = require('../test-fixtures');
 var fixture = {};

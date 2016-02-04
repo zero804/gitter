@@ -1,6 +1,6 @@
 'use strict';
 
-var Q = require('q');
+var Q = require('bluebird-q');
 var userScopes = require('../utils/models/user-scopes');
 var identityService = require('./identity-service');
 

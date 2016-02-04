@@ -1,6 +1,6 @@
 "use strict";
 
-var Q                       = require('q');
+var Q                       = require('bluebird-q');
 var troupeUriMapper         = require('./troupe-uri-mapper');
 var mongoUtils              = require('../utils/mongo-utils');
 var persistence             = require('./persistence-service');

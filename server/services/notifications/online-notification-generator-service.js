@@ -1,6 +1,6 @@
 "use strict";
 
-var Q                         = require('q');
+var Q                         = require('bluebird-q');
 var userTroupeSettingsService = require('../user-troupe-settings-service');
 var appEvents                 = require('gitter-web-appevents');
 var resolveUserAvatarUrl          = require('gitter-web-shared/avatars/resolve-user-avatar-url');

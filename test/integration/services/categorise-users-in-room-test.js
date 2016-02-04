@@ -2,7 +2,7 @@
 
 var testRequire = require('../test-require');
 var assert = require('assert');
-var Q = require('q');
+var Q = require('bluebird-q');
 
 describe('categorise-users-in-room', function() {
   var categoriseUsersInRoom, presenceMock, pushNotificationServiceMock, pushNotificationFilterMock;

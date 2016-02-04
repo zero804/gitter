@@ -1,6 +1,6 @@
 var userService = require('../../server/services/user-service');
 var troupeService = require('../../server/services/troupe-service');
-var Q = require('q');
+var Q = require('bluebird-q');
 var qlimit = require('qlimit');
 var chatService = require('../../server/services/chat-service');
 var loremIpsum = require('lorem-ipsum');

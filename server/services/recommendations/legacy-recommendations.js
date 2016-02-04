@@ -3,7 +3,7 @@
 /* This should go once A/B testing has proven that the new method is better */
 
 var persistence     = require('../persistence-service');
-var Q               = require('q');
+var Q               = require('bluebird-q');
 var _               = require('underscore');
 var collections     = require('../../utils/collections');
 var recommendations = require('./index');
