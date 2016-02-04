@@ -7,7 +7,7 @@ var stats              = env.stats;
 var errorReporter      = env.errorReporter;
 
 var appEvents          = require('gitter-web-appevents');
-var Q                  = require('bluebird-q');
+var Promise            = require('bluebird');
 var request            = require('request');
 var _                  = require('lodash');
 var xregexp            = require('xregexp').XRegExp;
@@ -72,25 +72,24 @@ function applyAutoHooksForRepoRoom(user, troupe) {
 
   logger.info("Requesting autoconfigured integrations");
 
-  var d = Q.defer();
-
-  request.post({
-    url: nconf.get('webhooks:basepath') + '/troupes/' + troupe.id + '/hooks',
-    json: {
-      service: 'github',
-      endpoint: 'gitter',
-      githubToken: user.githubToken || user.githubUserToken,
-      autoconfigure: 1,
-      repo: troupe.uri /* The URI is also the repo name */
-    }
-  },
-  function(err, resp, body) {
-    logger.info("Autoconfiguration of webhooks completed. Success? " + !err);
-    if(err) return d.reject(err);
-    d.resolve(body);
+  return new Promise(function(resolve, reject) {
+    request.post({
+      url: nconf.get('webhooks:basepath') + '/troupes/' + troupe.id + '/hooks',
+      json: {
+        service: 'github',
+        endpoint: 'gitter',
+        githubToken: user.githubToken || user.githubUserToken,
+        autoconfigure: 1,
+        repo: troupe.uri /* The URI is also the repo name */
+      }
+    },
+    function(err, resp, body) {
+      logger.info("Autoconfiguration of webhooks completed. Success? " + !err);
+      if(err) return reject(err);
+      resolve(body);
+    });
   });
 
-  return d.promise;
 }
 exports.applyAutoHooksForRepoRoom = applyAutoHooksForRepoRoom;
 
@@ -337,7 +336,7 @@ function ensureAccessControl(user, troupe, access) {
     }
   }
 
-  return Q.resolve(null);
+  return Promise.resolve(null);
 }
 
 /**
@@ -346,7 +345,7 @@ function ensureAccessControl(user, troupe, access) {
  * the list of rooms where the user is not a member but has been mentioned.
  */
 function findAllRoomsIdsForUserIncludingMentions(userId, callback) {
-  return Q.all([
+  return Promise.all([
       unreadItemService.getRoomIdsMentioningUser(userId),
       roomMembershipService.findRoomIdsForUser(userId)
     ])
@@ -375,7 +374,7 @@ function updateRoomWithGithubId(user, troupe) {
     promise = new GitHubOrgService(user).getOrg(troupe.uri);
   }
 
-  if (promise) return Q.resolve();
+  if (promise) return Promise.resolve();
 
   return promise.then(function(underlying) {
       if (!underlying) throw new StatusError(404, 'Unable to find ' + troupe.uri + ' on GitHub.');
@@ -409,9 +408,9 @@ function updateRoomWithGithubIdIfRequired(user, troupe) {
  * no emails are sent, noone is added
  * used to silently create owner rooms for org channels
  */
-function createGithubRoom(user, uri) {
-  if(!user) return Q.reject(new StatusError(400, 'user required'));
-  if(!uri) return Q.reject(new StatusError(400, 'uri required'));
+var createGithubRoom = Promise.method(function(user, uri) {
+  if(!user) throw new StatusError(400, 'user required');
+  if(!uri) throw new StatusError(400, 'uri required');
 
   return validateUri(user, uri)
     .then(function(githubInfo) {
@@ -485,7 +484,7 @@ function createGithubRoom(user, uri) {
             });
         });
     });
-}
+});
 
 exports.createGithubRoom = createGithubRoom;
 
@@ -809,7 +808,7 @@ function ensureNoExistingChannelNameClash(uri) {
 }
 
 function createCustomChildRoom(parentTroupe, user, options, callback) {
-  return Q.fcall(function() {
+  return Promise.try(function() {
     validate.expect(user, 'user is expected');
     validate.expect(options, 'options is expected');
 
@@ -1018,7 +1017,7 @@ exports.joinRoom = joinRoom;
  * Somebody adds another user to a room
  */
 function addUserToRoom(room, instigatingUser, usernameToAdd) {
-  return Q.all([
+  return Promise.all([
     roomPermissionsModel(instigatingUser, 'adduser', room),
     canUserBeInvitedToJoinRoom(usernameToAdd, room, instigatingUser)
   ]).spread(function (canInvite, canJoin) {
@@ -1046,7 +1045,7 @@ function addUserToRoom(room, instigatingUser, usernameToAdd) {
         .then(function(wasAdded) {
           if (!wasAdded) return addedUser;
 
-          return Q.all([
+          return Promise.all([
             notifyInvitedUser(instigatingUser, addedUser, room, isNewUser),
             updateUserDateAdded(addedUser.id, room.id)
           ])
@@ -1062,7 +1061,7 @@ exports.addUserToRoom = addUserToRoom;
 function revalidatePermissionsForUsers(room) {
   return roomMembershipService.findMembersForRoom(room._id)
     .then(function(userIds) {
-        if(!userIds.length) return Q.resolve();
+        if(!userIds.length) return [userIds, []];
 
         return [userIds, userService.findByIds(userIds)];
     })
@@ -1072,7 +1071,7 @@ function revalidatePermissionsForUsers(room) {
       var removalUserIds = [];
 
       /** TODO: warning: this may run 10000 promises in parallel */
-      return Q.all(userIds.map(function(userId) {
+      return Promise.all(userIds.map(function(userId) {
         var user = usersHash[userId];
         if(!user) {
           // Can't find the user?, remove them
@@ -1103,7 +1102,7 @@ exports.revalidatePermissionsForUsers = revalidatePermissionsForUsers;
  */
 function ensureRepoRoomSecurity(uri, security) {
   if(security !== 'PRIVATE' && security != 'PUBLIC') {
-    return Q.reject(new Error("Unknown security type: " + security));
+    return Promise.reject(new Error("Unknown security type: " + security));
   }
 
   return troupeService.findByUri(uri)
@@ -1156,7 +1155,7 @@ function findByIdForReadOnlyAccess(user, roomId) {
 exports.findByIdForReadOnlyAccess = findByIdForReadOnlyAccess;
 
 function validateRoomForReadOnlyAccess(user, room) {
-  if(!room) return Q.reject(404); // Mandatory
+  if(!room) return Promise.reject(new StatusError(404)); // Mandatory
 
   return roomPermissionsModel(user, 'view', room)
     .then(function(access) {
@@ -1168,28 +1167,24 @@ function validateRoomForReadOnlyAccess(user, room) {
 exports.validateRoomForReadOnlyAccess = validateRoomForReadOnlyAccess;
 
 function checkInstigatingUserPermissionForRemoveUser(room, user, requestingUser) {
-  return Q.fcall(function() {
-    // User is requesting user -> leave
-    if(user.id === requestingUser.id) return true;
+  // User is requesting user -> leave
+  if(user.id === requestingUser.id) return Promise.resolve(true);
 
-    // Check if not in one-to-one room and requesting user is admin
-    return roomPermissionsModel(requestingUser, 'admin', room);
-  });
+  // Check if not in one-to-one room and requesting user is admin
+  return roomPermissionsModel(requestingUser, 'admin', room);
 }
 
 /**
  * Remove user from room
  * If the user to be removed is not the one requesting, check permissions
  */
-function removeUserFromRoom(room, user, requestingUser) {
-  return Q.fcall(function() {
-      if (!room) throw new StatusError(400, 'Room required');
-      if (!user) throw new StatusError(400, 'User required');
-      if (!requestingUser) throw new StatusError(401, 'Not authenticated');
-      if (room.githubType === 'ONETOONE') throw new StatusError(400, 'This room does not support removing.');
+var removeUserFromRoom = Promise.method(function (room, user, requestingUser) {
+  if (!room) throw new StatusError(400, 'Room required');
+  if (!user) throw new StatusError(400, 'User required');
+  if (!requestingUser) throw new StatusError(401, 'Not authenticated');
+  if (room.githubType === 'ONETOONE') throw new StatusError(400, 'This room does not support removing.');
 
-      return checkInstigatingUserPermissionForRemoveUser(room, user, requestingUser);
-    })
+  return checkInstigatingUserPermissionForRemoveUser(room, user, requestingUser)
     .then(function(access) {
       if(!access) throw new StatusError(403, 'You do not have permission to remove people. Admin permission is needed.');
 
@@ -1199,7 +1194,7 @@ function removeUserFromRoom(room, user, requestingUser) {
       // Remove favorites, unread items and last access times
       return recentRoomService.removeRecentRoomForUser(user._id, room._id);
     });
-}
+});
 exports.removeUserFromRoom = removeUserFromRoom;
 
 /**
@@ -1236,14 +1231,16 @@ function canBanInRoom(room) {
 }
 
 function banUserFromRoom(room, username, requestingUser, options, callback) {
-  if(!room) return Q.reject(new StatusError(400, 'Room required')).nodeify(callback);
-  if(!username) return Q.reject(new StatusError(400, 'Username required')).nodeify(callback);
-  if(!requestingUser) return Q.reject(new StatusError(401, 'Not authenticated')).nodeify(callback);
-  if(requestingUser.username === username) return Q.reject(new StatusError(400, 'You cannot ban yourself')).nodeify(callback);
-  if(!canBanInRoom(room)) return Q.reject(new StatusError(400, 'This room does not support banning.')).nodeify(callback);
+  return Promise.try(function() {
+      if(!room) throw new StatusError(400, 'Room required');
+      if(!username) throw new StatusError(400, 'Username required');
+      if(!requestingUser) throw new StatusError(401, 'Not authenticated');
+      if(requestingUser.username === username) throw new StatusError(400, 'You cannot ban yourself');
+      if(!canBanInRoom(room)) throw new StatusError(400, 'This room does not support banning.');
 
-  /* Does the requesting user have admin rights to this room? */
-  return roomPermissionsModel(requestingUser, 'admin', room)
+      /* Does the requesting user have admin rights to this room? */
+      return roomPermissionsModel(requestingUser, 'admin', room);
+    })
     .then(function(access) {
       if(!access) throw new StatusError(403, 'You do not have permission to ban people. Admin permission is needed.');
 
@@ -1270,7 +1267,7 @@ function banUserFromRoom(room, username, requestingUser, options, callback) {
               bannedBy: requestingUser.id
             });
 
-            return Q.all([
+            return Promise.all([
                 roomForUpdate.save(),
                 roomMembershipService.removeRoomMember(roomForUpdate._id, user._id)
               ])
@@ -1280,7 +1277,7 @@ function banUserFromRoom(room, username, requestingUser, options, callback) {
                   return persistence.ChatMessage.find({ toTroupeId: roomForUpdate.id, fromUserId: user.id })
                     .exec()
                     .then(function(messages) {
-                      return Q.all(messages.map(function(message) {
+                      return Promise.all(messages.map(function(message) {
                         return message.remove();
                       }));
                     });
@@ -1312,18 +1309,17 @@ function banUserFromRoom(room, username, requestingUser, options, callback) {
 exports.banUserFromRoom = banUserFromRoom;
 
 function unbanUserFromRoom(room, troupeBan, username, requestingUser, callback) {
-  if(!room) return Q.reject(new StatusError(400, 'Room required')).nodeify(callback);
-  if(!troupeBan) return Q.reject(new StatusError(400, 'Username required')).nodeify(callback);
-  if(!requestingUser) return Q.reject(new StatusError(401, 'Not authenticated')).nodeify(callback);
+  return Promise.try(function() {
+      if(!room) throw new StatusError(400, 'Room required');
+      if(!troupeBan) throw new StatusError(400, 'Username required');
+      if(!requestingUser) throw new StatusError(401, 'Not authenticated');
 
-  if(!canBanInRoom(room)) return Q.reject(new StatusError(400, 'This room does not support bans')).nodeify(callback);
+      if(!canBanInRoom(room)) throw new StatusError(400, 'This room does not support bans');
 
-
-  var troupeId = room.id;
-
-  /* Does the requesting user have admin rights to this room? */
-  return roomPermissionsModel(requestingUser, 'admin', room)
-    .then(function(access) {
+      /* Does the requesting user have admin rights to this room? */
+      return [room.id, roomPermissionsModel(requestingUser, 'admin', room)];
+    })
+    .spread(function(troupeId, access) {
       if(!access) throw new StatusError(403, 'You do not have permission to unban people. Admin permission is needed.');
 
       return persistence.Troupe.update({
@@ -1429,7 +1425,7 @@ exports.searchRooms = searchRooms;
  * Rename a REPO room to a new URI.
  */
 function renameRepo(oldUri, newUri) {
-  if (oldUri === newUri) return Q.resolve();
+  if (oldUri === newUri) return Promise.resolve();
 
   return redisLockPromise("lock:rename:" + oldUri, function() {
     return troupeService.findByUri(oldUri)
@@ -1462,7 +1458,7 @@ function renameRepo(oldUri, newUri) {
             return persistence.Troupe.find({ parentId: room._id }).exec();
           })
           .then(function(channels) {
-            return Q.all(channels.map(function(channel) {
+            return Promise.all(channels.map(function(channel) {
               var originalLcUri = channel.lcUri;
               var newChannelUri = newUri + '/' + channel.uri.split('/')[2];
               var newChannelLcUri = newChannelUri.toLowerCase();
@@ -1495,14 +1491,14 @@ exports.renameRepo = renameRepo;
 function deleteRoom(troupe) {
   var userListPromise;
   if (troupe.oneToOne) {
-    userListPromise = Q.resolve(troupe.oneToOneUsers.map(function(t) { return t.userId; }));
+    userListPromise = Promise.resolve(troupe.oneToOneUsers.map(function(t) { return t.userId; }));
   } else {
     userListPromise = roomMembershipService.findMembersForRoom(troupe._id);
   }
 
   return userListPromise
     .then(function(userIds) {
-      return Q.all(userIds.map(function(userId) {
+      return Promise.all(userIds.map(function(userId) {
           // Remove favorites, unread items and last access times
           return recentRoomService.removeRecentRoomForUser(userId, troupe._id);
         }))
@@ -1516,7 +1512,7 @@ function deleteRoom(troupe) {
     })
     .then(function() {
       // TODO: NB: remove channel reference from parent room if this is a channel
-      return Q.all([
+      return Promise.all([
           persistence.ChatMessage.remove({ toTroupeId: troupe._id }).exec(),
           persistence.Event.remove({ toTroupeId: troupe._id }).exec(),
           // TODO: webhooks
