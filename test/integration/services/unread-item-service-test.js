@@ -18,9 +18,6 @@ var hamcrest = getHamcrest();
 var Q = require('q');
 var assert = require('assert');
 
-console.dir(hamcrest);
-process.exit();
-
 var times = mockito.Verifiers.times;
 var never = mockito.Verifiers.never;
 var once = times(1);
