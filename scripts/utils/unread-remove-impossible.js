@@ -1,9 +1,11 @@
+'use strict';
+
 var redis = require('../../server/utils/redis');
 var userService = require('../../server/services/user-service');
 var roomService = require('../../server/services/room-service');
 var troupeService = require('../../server/services/troupe-service');
 var unreadService = require('../../server/services/unread-item-service');
-var Q = require('q');
+var Promise = require('bluebird');
 var shutdown = require('shutdown');
 var _ = require('underscore');
 
@@ -12,7 +14,10 @@ process.exit();
 
 function getKeys() {
   var redisClient = redis.getClient();
-  return Q.ninvoke(redisClient, 'keys', 'unread:chat:*');
+
+  return Promise.fromCallback(function(callback) {
+    return redisClient.keys('unread:chat:*', callback);
+  });
 }
 
 function convertToHash(unreadKeys) {
