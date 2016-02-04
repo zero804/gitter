@@ -39,7 +39,7 @@ var equivalentMap = function(expected) {
   return allOf(Object.keys(expected).map(function(key) {
     return hasMember(key, equalTo(expected[key]));
   }));
-}
+};
 
 function makeHash() {
   var hash = [];
@@ -57,8 +57,6 @@ function deep(object) {
 
   return allOf.apply(null, items);
 }
-
-Q.longStackSupport = true;
 
 describe('unread-item-service', function() {
   var unreadItemService, mongoUtils;
