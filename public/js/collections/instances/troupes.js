@@ -55,7 +55,6 @@ module.exports = (function() {
   //Reset lurk activity for the current room JP 4/2/16
   context.troupe().on('change:id', function(troupe, val){ //jshint unused: true
     var activeRoom = troupeCollection.get(val);
-    console.log('got it', activeRoom.get('activity'));
     activeRoom.set('activity', false);
   });
 
