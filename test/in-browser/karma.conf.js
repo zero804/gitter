@@ -160,9 +160,6 @@ module.exports = function(config) {
   };
 
   // If in production mode, move the testing to browserstack
-  console.log('-----------------------');
-  console.log(process.env.USE_BROWSERSTACK);
-  console.log('-----------------------');
   if (process.env.USE_BROWSERSTACK === 'true') {
     karmaConfig.plugins.push(require('karma-browserstack-launcher'));
     karmaConfig.plugins.push(require('karma-webpack'));
