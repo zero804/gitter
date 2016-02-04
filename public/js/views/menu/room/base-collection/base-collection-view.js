@@ -8,7 +8,8 @@ var context            = require('utils/context');
 
 module.exports = Marionette.CompositeView.extend({
 
-  template: template,
+  template:           template,
+  className:          'collection',
   childViewContainer: '.js-collection-list',
 
   childViewOptions: function(model) {
@@ -60,6 +61,13 @@ module.exports = Marionette.CompositeView.extend({
 
     if (selectedModel) selectedModel.set('selected', false);
     if (newlySelectedModel) newlySelectedModel.set('selected', true);
+  },
+
+  onItemClicked: function (view){
+    var model = view.model;
+    var name = (model.get('uri') || model.get('url') || model.get('name'));
+    var url  = (name[0] !== '/') ?  '/' + name : name;
+    this.bus.trigger('navigation', url, 'chat', name);
   },
 
   onBeforeRender: function() {

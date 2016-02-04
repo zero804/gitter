@@ -1,8 +1,6 @@
 'use strict';
 
-var Marionette        = require('backbone.marionette');
 var _                 = require('underscore');
-var itemTemplate      = require('./secondary-collection-item-view.hbs');
 var roomNameShortener = require('../../../../utils/room-menu-name-shortener');
 var getRoomAvatar     = require('utils/get-room-avatar');
 var BaseCollectionItemView = require('../base-collection/base-collection-item-view');

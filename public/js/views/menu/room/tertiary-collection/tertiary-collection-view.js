@@ -1,8 +1,8 @@
 'use strict';
 
-var _                  = require('underscore');
-var getRoomAvatar      = require('utils/get-room-avatar');
-var BaseCollectionView = require('../base-collection/base-collection-view');
+var _                      = require('underscore');
+var getRoomAvatar          = require('utils/get-room-avatar');
+var BaseCollectionView     = require('../base-collection/base-collection-view');
 var BaseCollectionItemView = require('../base-collection/base-collection-item-view');
 
 var ItemView = BaseCollectionItemView.extend({

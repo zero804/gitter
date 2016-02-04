@@ -24,10 +24,10 @@ module.exports = Marionette.LayoutView.extend({
     Isomorphic: {
       header:              { el: '#panel-header', init: 'initHeader' },
       profile:             { el: '#profile-menu', init: 'initProfileMenu' },
+      searchInput:         { el: '#search-input', init: 'initSearchInput' },
       primaryCollection:   { el: '#primary-collection', init: 'initPrimaryCollection' },
       secondaryCollection: { el: '#secondary-collection', init: 'initSecondaryCollection' },
       teritaryCollection:  { el: '#tertiary-collection', init: 'initTertiaryCollection' },
-      searchInput:         { el: '#search-input', init: 'initSearchInput' },
       footer:              { el: '#panel-footer', init: 'initFooter' },
     },
   },
@@ -39,15 +39,12 @@ module.exports = Marionette.LayoutView.extend({
     }));
   },
 
-  initFooter: function(optionsForRegion) {
-    return new PanelFooterView(optionsForRegion({
-      model: this.model,
-      bus:   this.bus,
-    }));
-  },
-
   initProfileMenu: function(optionsForRegion) {
     return new ProfileMenuView(optionsForRegion({ model: this.model }));
+  },
+
+  initSearchInput: function(optionsForRegion) {
+    return new SearchInputView(optionsForRegion({ model: this.model }));
   },
 
   initPrimaryCollection: function(optionsForRegion) {
@@ -73,11 +70,15 @@ module.exports = Marionette.LayoutView.extend({
       model:         new TertiaryCollectionModel({}, { roomMenuModel: this.model }),
       collection:    this.model.tertiaryCollection,
       roomMenuModel: this.model,
+      bus:           this.bus,
     }));
   },
 
-  initSearchInput: function(optionsForRegion) {
-    return new SearchInputView(optionsForRegion({ model: this.model }));
+  initFooter: function(optionsForRegion) {
+    return new PanelFooterView(optionsForRegion({
+      model: this.model,
+      bus:   this.bus,
+    }));
   },
 
   modelEvents: {
@@ -123,9 +124,6 @@ module.exports = Marionette.LayoutView.extend({
     }
   },
 
-  //when the primary collection's snapshot is received
-  //fetch the model data from local storage
-  //remove the loading class that obscures the menu
   onPrimaryCollectionSnapshot: function() {
     var self = this;
 
@@ -148,7 +146,7 @@ module.exports = Marionette.LayoutView.extend({
     this._initNano({ scrollTo: '[data-collection-index=' + offset + ']' });
   },
 
-  onDestroy: function (){
+  onDestroy: function() {
     this.stopListening(this.bus);
   },
 

@@ -1,7 +1,6 @@
 'use strict';
 
 var Backbone           = require('backbone');
-var RAF                = require('utils/raf');
 var ItemView           = require('./primary-collection-item-view');
 var BaseCollectionView = require('../base-collection/base-collection-view');
 
@@ -31,35 +30,6 @@ var PrimaryCollectionView = BaseCollectionView.extend({
 
   filter: function (model, index){ //jshint unused: true
     return (this.model.get('search') === 'search') ? (index <= 5) : true;
-  },
-
-  onModelStateChange: function(model, val) { /*jshint unused: true*/
-    RAF(function() {
-      this.$el.toggleClass('active', (val !== 'search'));
-    }.bind(this));
-  },
-
-  onItemClicked: function(view) {
-    var viewModel = view.model;
-
-    //TODO This could be alot more DRY JP 27/1/16
-    var name = (viewModel.get('uri') || viewModel.get('url'));
-    var url  = (name[0] !== '/') ?  '/' + name : name;
-
-    //If the room menu is pinned dont try to close the pannel
-    if (!this.model.get('roomMenuIsPinned')) {
-      this.model.set('panelOpenState', false);
-    }
-
-    //reset any models that have keyboard focus
-    //TODO ABSTRACT THIS TO KEYBOARD CTRL
-    var focusedModels = this.collection.where({ focus: true });
-    focusedModels.forEach(function(model) { model.set('focus', false)});
-
-    //TODO The timeout is only needed if the room menu is not pinned
-    setTimeout(function() {
-      this.bus.trigger('navigation', url, 'chat', name);
-    }.bind(this), 250);
   },
 
   //TODO The filter should be reused within the view filter method?
