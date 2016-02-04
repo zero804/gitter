@@ -201,7 +201,7 @@ exports.updateChatMessage = function(troupe, chatMessage, user, newText, callbac
       return processChat(newText);
     })
     .then(function(parsedMessage) {
-      return [parsedMessage, resolveMentions(troupe, user, parsedMessage)];
+      return Promise.all([parsedMessage, resolveMentions(troupe, user, parsedMessage)]);
     })
     .spread(function(parsedMessage, mentions) {
       chatMessage.html      = parsedMessage.html;

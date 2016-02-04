@@ -34,7 +34,7 @@ exports.recordItemsAsRead = function(userId, troupeId, items, callback) {
   .nodeify(callback);
 };
 
-  function batchUpdateReadbyBatch(troupeIdString, userChatIds, done) {
+function batchUpdateReadbyBatch(troupeIdString, userChatIds, done) {
   var troupeId = mongoUtils.asObjectID(troupeIdString);
   var userChatHash = {};
 

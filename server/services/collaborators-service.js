@@ -5,7 +5,6 @@ var RepoService         = require('gitter-web-github').GitHubRepoService;
 var OrgService          = require('gitter-web-github').GitHubOrgService;
 var ContributorService  = require('gitter-web-github').GitHubContributorService;
 var MeService           = require('gitter-web-github').GitHubMeService;
-var Q                   = require('bluebird-q');
 var Promise             = require('bluebird');
 
 function withoutCurrentUser(users, user) {
@@ -52,7 +51,7 @@ function getStargazers(uri, user) {
 
 function getCollaboratorsForRepo(repoUri, security, user) {
   if (security === 'PUBLIC') {
-    return Q.all([
+    return Promise.all([
         getContributors(repoUri, user),   // for public repos
         getCollaborators(repoUri, user),  // for private repos
         getStargazers(repoUri, user)
