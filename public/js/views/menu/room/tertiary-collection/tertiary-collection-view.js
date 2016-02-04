@@ -1,17 +1,11 @@
 'use strict';
 
-var Marionette         = require('backbone.marionette');
 var _                  = require('underscore');
-var itemTemplate       = require('./tertiary-collection-item-view.hbs');
 var getRoomAvatar      = require('utils/get-room-avatar');
 var BaseCollectionView = require('../base-collection/base-collection-view');
+var BaseCollectionItemView = require('../base-collection/base-collection-item-view');
 
-var ItemView = Marionette.ItemView.extend({
-  template: itemTemplate,
-  initialize: function(attrs) {
-    this.roomMenuModel = attrs.roomMenuModel;
-  },
-
+var ItemView = BaseCollectionItemView.extend({
   serializeData: function() {
     var data = this.model.toJSON();
     var avatarURL = (this.roomMenuModel.get('state') === 'search') ? null : getRoomAvatar(data.name || ' ');
@@ -24,9 +18,6 @@ var ItemView = Marionette.ItemView.extend({
 module.exports =  BaseCollectionView.extend({
   childView:          ItemView,
   className:          'tertiary-collection',
-  childViewOptions: function (model){
-    return { model: model, roomMenuModel: this.roomMenuModel };
-  },
 
   initialize: function(attrs) {
     this.roomMenuModel = attrs.roomMenuModel;
