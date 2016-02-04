@@ -1,8 +1,19 @@
 "use strict";
 
+// Lets get rid of hamcrest. Until we do, we'll have to do this
+// its nasty, but if jsmockito uses a different instance of the library
+// it won't work correctly
+function getHamcrest() {
+  try {
+    return require('jsmockito/node_modules/jshamcrest').JsHamcrest;
+  } catch(e) {
+    return require('jsmockito').JsHamcrest;
+  }
+}
+
 var testRequire = require('../test-require');
 var mockito = require('jsmockito').JsMockito;
-var hamcrest = require('jshamcrest').JsHamcrest;
+var hamcrest = getHamcrest();
 
 var Q = require('bluebird-q');
 var assert = require('assert');
@@ -12,10 +23,23 @@ var never = mockito.Verifiers.never;
 var once = times(1);
 
 var allOf = hamcrest.Matchers.allOf;
+var equalTo = hamcrest.Matchers.equalTo;
 var anything = hamcrest.Matchers.anything;
 var hasMember = hamcrest.Matchers.hasMember;
-var equivalentMap = hamcrest.Matchers.equivalentMap;
-var equivalentArray = hamcrest.Matchers.equivalentArray;
+var hasItem = hamcrest.Matchers.hasItem;
+var hasSize = hamcrest.Matchers.hasSize;
+
+var equivalentArray = function(expected) {
+  return allOf(expected.map(function(expectedItem) {
+    return hasItem(expectedItem);
+  }).concat(hasSize(expected.length)));
+};
+
+var equivalentMap = function(expected) {
+  return allOf(Object.keys(expected).map(function(key) {
+    return hasMember(key, equalTo(expected[key]));
+  }));
+}
 
 function makeHash() {
   var hash = [];
