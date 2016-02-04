@@ -19,7 +19,6 @@ function waterfall(makers, args, filter, limit, allResults) {
 
   var nextMaker = makers.shift();
   if (nextMaker) {
-    console.log("trying nextMaker", nextMaker);
     return nextMaker.apply(nextMaker, args)
       .then(function(newResults) {
         allResults = filter(allResults.concat(newResults));
