@@ -6,7 +6,7 @@ var errorReporter = env.errorReporter;
 var stats = env.stats;
 var logger = env.logger;
 
-var Q = require('bluebird-q');
+var Promise = require('bluebird');
 var moment = require('moment');
 var GitHubStrategy = require('gitter-passport-github').Strategy;
 var TokenStateProvider = require('gitter-passport-oauth2').TokenStateProvider;
@@ -71,15 +71,9 @@ function updateUser(req, accessToken, user, githubUserProfile) {
 
       updateUserLocale(req, user);
 
-      var deferred = Q.defer();
-      req.logIn(user, function(err) {
-        if (err) {
-          deferred.reject(err);
-        } else {
-          deferred.resolve();
-        }
+      return Promise.fromCallback(function(callback) {
+        req.logIn(user, callback);
       });
-      return deferred.promise;
     })
     .then(function() {
       // Remove the old token for this user
@@ -128,15 +122,9 @@ function addUser(req, accessToken, githubUserProfile) {
         }
       });
 
-      var deferred = Q.defer();
-      req.logIn(user, function(err) {
-        if (err) {
-          deferred.reject(err);
-        } else {
-          deferred.resolve();
-        }
+      return Promise.fromCallback(function(callback) {
+        req.logIn(user, callback);
       });
-      return deferred.promise;
     })
     .then(function() {
       return user;

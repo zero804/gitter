@@ -14,7 +14,7 @@ var _                     = require("lodash");
 var mongoUtils            = require('../utils/mongo-utils');
 var RedisBatcher          = require('../utils/redis-batcher').RedisBatcher;
 var collections           = require('../utils/collections');
-var Q                     = require('bluebird-q');
+var Promise               = require('bluebird');
 var roomMembershipService = require('./room-membership-service');
 var uniqueIds             = require('mongodb-unique-ids');
 var debug                 = require('debug')('gitter:unread-item-service');
@@ -44,7 +44,7 @@ function sinceFilter(since) {
 
 function reject(msg) {
   logger.error(msg);
-  return Q.reject(new Error(msg));
+  return Promise.reject(new Error(msg));
 }
 
 /**
