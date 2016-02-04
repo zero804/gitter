@@ -17,7 +17,7 @@ describe('badger-service #slow', function() {
     return badgerService.sendBadgePullRequest('gittertestbot/does-not-have-a-master-branch', USER)
       .finally(function() {
         return client.del('/repos/gitter-badger/does-not-have-a-master-branch', { })
-          .fail(function() {});
+          .catch(function() {});
       })
       .nodeify(done);
   });
@@ -28,7 +28,7 @@ describe('badger-service #slow', function() {
       })
       .finally(function() {
         return client.del('/repos/gitter-badger/no-readme-markdown-file-2', { })
-          .fail(function() {});
+          .catch(function() {});
       })
       .nodeify(done);
   });
@@ -39,7 +39,7 @@ describe('badger-service #slow', function() {
       })
       .finally(function() {
         return client.del('/repos/gitter-badger/readme-dot-markdown', { })
-          .fail(function() {});
+          .catch(function() {});
       })
       .nodeify(done);
   });
@@ -50,7 +50,7 @@ describe('badger-service #slow', function() {
       })
       .finally(function() {
         return client.del('/repos/gitter-badger/readme-dot-textile', { })
-          .fail(function() {});
+          .catch(function() {});
       })
       .nodeify(done);
   });
@@ -61,7 +61,7 @@ describe('badger-service #slow', function() {
       })
       .finally(function() {
         return client.del('/repos/gitter-badger/readme-dot-rst', { })
-          .fail(function() {});
+          .catch(function() {});
       })
       .nodeify(done);
   });
@@ -72,7 +72,7 @@ describe('badger-service #slow', function() {
       })
       .finally(function() {
         return client.del('/repos/gitter-badger/readme-dot-txt', { })
-          .fail(function() {});
+          .catch(function() {});
       })
       .nodeify(done);
   });

@@ -21,7 +21,7 @@ var redisClient_set      = Promise.promisify(redisClient.set, { context: redisCl
 var redisClient_mget     = Promise.promisify(redisClient.mget, { context: redisClient });
 var redisClient_hscan    = Promise.promisify(redisClient.hscan, { context: redisClient });
 var redisClient_del      = Promise.promisify(redisClient.del, { context: redisClient });
-var redisClient_zrange      = Promise.promisify(redisClient.zrange, { context: redisClient });
+var redisClient_zrange   = Promise.promisify(redisClient.zrange, { context: redisClient });
 
 var UNREAD_BATCH_SIZE = 100;
 var PRECONVERT_OBJECTID_TO_STRING_THRESHOLD = 1000;

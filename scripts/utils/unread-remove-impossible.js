@@ -7,6 +7,9 @@ var Q = require('q');
 var shutdown = require('shutdown');
 var _ = require('underscore');
 
+/** THIS SCRIPT WILL TRASH OUR REDIS ENVIRONMENT */
+process.exit();
+
 function getKeys() {
   var redisClient = redis.getClient();
   return Q.ninvoke(redisClient, 'keys', 'unread:chat:*');

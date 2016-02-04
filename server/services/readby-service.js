@@ -6,7 +6,7 @@ var RedisBatcher    = require('../utils/redis-batcher').RedisBatcher;
 var ChatMessage     = require('./persistence-service').ChatMessage;
 var assert          = require('assert');
 var mongoUtils      = require('../utils/mongo-utils');
-var Q               = require('bluebird-q');
+var Promise         = require('bluebird');
 var liveCollections = require('./live-collections');
 
 var batcher = new RedisBatcher('readby2', 600, batchUpdateReadbyBatch);
@@ -16,7 +16,7 @@ var batcher = new RedisBatcher('readby2', 600, batchUpdateReadbyBatch);
  * @return promise of nothing
  */
 exports.recordItemsAsRead = function(userId, troupeId, items, callback) {
-  return Q.fcall(function() {
+  return Promise.try(function() {
     assert(userId, 'userId expected');
     assert(items, 'items expected');
     var itemIds = items.chat;
@@ -27,9 +27,9 @@ exports.recordItemsAsRead = function(userId, troupeId, items, callback) {
       return userIdSerialized + ":" + chatId;
     });
 
-    var d = Q.defer();
-    batcher.add(troupeId, userChatIds, d.makeNodeResolver());
-    return d.promise;
+    return Promise.fromCallback(function(callback) {
+      batcher.add(troupeId, userChatIds, callback);
+    });
   })
   .nodeify(callback);
 };
@@ -79,7 +79,7 @@ exports.recordItemsAsRead = function(userId, troupeId, items, callback) {
           });
       });
 
-      return Q.Promise(function(resolve, reject) {
+      return new Promise(function(resolve, reject) {
         bulk.execute(function(err) {
           if (err) return reject(err);
           resolve(unreadChats);

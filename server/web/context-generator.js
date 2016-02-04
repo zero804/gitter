@@ -95,7 +95,7 @@ function determineDesktopNotifications(user, req) {
   }
 
   if(clientType) {
-    return Q.nfcall(presenceService.isUserConnectedWithClientType, user.id, clientType)
+    return presenceService.isUserConnectedWithClientType(user.id, clientType)
       .then(function(result) {
         return !result;
       });
