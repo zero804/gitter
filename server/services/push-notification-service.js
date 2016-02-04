@@ -2,7 +2,7 @@
 
 var PushNotificationDevice = require("./persistence-service").PushNotificationDevice;
 var crypto                 = require('crypto');
-var Q                      = require('q');
+var Q                      = require('bluebird-q');
 var mongoUtils             = require('../utils/mongo-utils');
 var debug                  = require('debug')('gitter:push-notification-service');
 var uniqueIds              = require('mongodb-unique-ids');

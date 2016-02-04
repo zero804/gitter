@@ -4,7 +4,7 @@
 
 var testRequire = require('../test-require');
 var assert = require("assert");
-var Q = require('q');
+var Q = require('bluebird-q');
 
 var fakeUser = { username: 'fake-user', id: 'abc123' };
 

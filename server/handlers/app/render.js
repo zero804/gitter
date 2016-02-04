@@ -2,7 +2,7 @@
 
 var winston                  = require('../../utils/winston');
 var nconf                    = require('../../utils/config');
-var Q                        = require('q');
+var Q                        = require('bluebird-q');
 var contextGenerator         = require('../../web/context-generator');
 var restful                  = require('../../services/restful');
 var userService              = require('../../services/user-service');

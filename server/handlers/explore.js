@@ -3,7 +3,7 @@
 var express = require('express');
 var exploreService = require('../services/explore-service');
 var getRoughMessageCount = require('../services/chat-service').getRoughMessageCount;
-var Q = require('q');
+var Q = require('bluebird-q');
 var langs = require('langs');
 var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
 

@@ -4,7 +4,7 @@ var persistence              = require("./persistence-service");
 var userService              = require("./user-service");
 var collections              = require("../utils/collections");
 var mongoUtils               = require("../utils/mongo-utils");
-var Q                        = require("q");
+var Q                        = require('bluebird-q');
 var roomMembershipService    = require('./room-membership-service');
 
 /**

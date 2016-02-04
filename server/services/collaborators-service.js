@@ -5,7 +5,8 @@ var RepoService         = require('gitter-web-github').GitHubRepoService;
 var OrgService          = require('gitter-web-github').GitHubOrgService;
 var ContributorService  = require('gitter-web-github').GitHubContributorService;
 var MeService           = require('gitter-web-github').GitHubMeService;
-var Q                   = require('q');
+var Q                   = require('bluebird-q');
+var Promise             = require('bluebird');
 
 function withoutCurrentUser(users, user) {
   if (!users || !users.length) return [];
@@ -84,15 +85,20 @@ function getCollaboratorsForUser(user) {
 
   return ghMe.getOrgs()
     .then(function(orgs) {
-      var promises = orgs.map(function(o) { return ghOrg.someMembers(o.login); });
-      return Q.allSettled(promises);
+      var promises = orgs.map(function(o) { return Q.resolve(ghOrg.someMembers(o.login)); });
+
+      return Q.all(promises.map(function(promise) {
+        return promise.reflect();
+      }));
     })
     .then(function (results) {
-      var users = [];
-
-      results.forEach(function (result) {
-        if (result.state === "fulfilled") users = users.concat(result.value);
-      });
+      var users = results
+        .filter(function(inspection) {
+          return inspection.isFulfilled();
+        })
+        .map(function(inspection) {
+          return inspection.value();
+        });
 
       return withoutCurrentUser(users, user);
     });

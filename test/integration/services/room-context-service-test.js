@@ -3,7 +3,7 @@
 var testRequire = require('../test-require');
 var assert = require('assert');
 var mockito = require('jsmockito').JsMockito;
-var Q = require('q');
+var Q = require('bluebird-q');
 
 var permissionsModelMock = mockito.mockFunction();
 var roomPermissionsModelMock = mockito.mockFunction();

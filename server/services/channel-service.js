@@ -1,7 +1,7 @@
 "use strict";
 
 var persistence     = require("./persistence-service");
-var Q               = require('q');
+var Q               = require('bluebird-q');
 var roomMembershipService = require('./room-membership-service');
 
 function createRegExpsForQuery(queryText) {

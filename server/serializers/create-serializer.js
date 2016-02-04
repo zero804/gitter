@@ -6,7 +6,7 @@ var nconf  = env.config;
 var stats  = env.stats;
 var statsd = env.createStatsClient({ prefix: nconf.get('stats:statsd:prefix') + 'serializer.' });
 
-var Q       = require("q");
+var Q       = require('bluebird-q');
 var winston = require('../utils/winston');
 var fs      = require('fs');
 var path    = require('path');

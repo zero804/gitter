@@ -3,7 +3,7 @@
 var persistence = require('./persistence-service');
 var mongoUtils = require('../utils/mongo-utils');
 var assert = require('assert');
-var Q = require('q');
+var Q = require('bluebird-q');
 
 exports.getUserSettings = function(userId, settingsKey) {
   /* Not sure why mongoose isn't converting these */

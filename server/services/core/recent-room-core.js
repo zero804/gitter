@@ -1,6 +1,6 @@
 "use strict";
 
-var Q                       = require('q');
+var Q                       = require('bluebird-q');
 var lazy                    = require('lazy.js');
 var persistence             = require('../persistence-service');
 var _                       = require('underscore');

@@ -1,6 +1,6 @@
 'use strict';
 
-var Q = require('q');
+var Q = require('bluebird-q');
 var _ = require('underscore');
 var highlightedRoomCache = require('./highlighted-room-cache');
 var collections = require('../../utils/collections');

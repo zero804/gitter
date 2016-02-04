@@ -1,7 +1,7 @@
 "use strict";
 
 var persistence   = require("./persistence-service");
-var Q             = require('q');
+var Q             = require('bluebird-q');
 var client        = require('../utils/elasticsearch-client');
 var collections   = require('../utils/collections');
 var _             = require('underscore');

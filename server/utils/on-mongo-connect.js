@@ -1,7 +1,7 @@
 "use strict";
 
 var mongoose = require('mongoose');
-var Q = require('q');
+var Q = require('bluebird-q');
 var debug = require('debug')('gitter:on-mongo-connect');
 
 module.exports = function onMongoConnect(callback) {

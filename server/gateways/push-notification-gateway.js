@@ -1,7 +1,7 @@
 "use strict";
 
 var env = require('gitter-web-env');
-var Q = require('q');
+var Q = require('bluebird-q');
 var logger = env.logger;
 var stats = env.stats;
 var pushNotificationService = require("../services/push-notification-service");

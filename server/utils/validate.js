@@ -1,6 +1,6 @@
 "use strict";
 
-var Q = require('q');
+var Q = require('bluebird-q');
 var winston = require('./winston');
 var StatusError = require('statuserror');
 

@@ -6,7 +6,7 @@ var nconf  = env.config;
 var logger = env.logger;
 
 var persistenceService = require("./persistence-service");
-var Q                  = require('q');
+var Q                  = require('bluebird-q');
 var userService        = require('./user-service');
 var tokenProvider      = require('./tokens/');
 var MongooseCachedLookup = require('../utils/mongoose-cached-lookup');

@@ -5,7 +5,7 @@ var troupeService = require('./troupe-service');
 var persistence = require('./persistence-service');
 var nconf = require('../utils/config');
 var debug = require('debug')('gitter:assert-room-limit');
-var Q = require('q');
+var Q = require('bluebird-q');
 var roomMembershipService = require('./room-membership-service');
 
 var maxFreeOrgRoomMembers = nconf.get('maxFreeOrgRoomMembers');

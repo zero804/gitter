@@ -1,7 +1,7 @@
 "use strict";
 
 var assert = require('assert');
-var Q = require('q');
+var Q = require('bluebird-q');
 var proxyquireNoCallThru = require("proxyquire").noCallThru();
 
 function getWrapper(lookupFunc) {

@@ -3,7 +3,7 @@
 // var winston = require('../utils/winston');
 var collections = require("../utils/collections");
 var execPreloads = require('./exec-preloads');
-var Q = require('q');
+var Q = require('bluebird-q');
 var debug = require('debug')('gitter:serializer:id-loader');
 
 function idStrategyGenerator(name, FullObjectStrategy, loaderFunction) {

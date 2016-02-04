@@ -3,7 +3,7 @@
 
 var testRequire   = require('../test-require');
 var fixtureLoader = require('../test-fixtures');
-var Q             = require("q");
+var Q             = require('bluebird-q');
 var assert        = require("assert");
 var fixture       = {};
 

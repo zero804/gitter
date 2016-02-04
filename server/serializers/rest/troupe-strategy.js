@@ -18,7 +18,7 @@ var debug                 = require('debug')('gitter:troupe-strategy');
 var execPreloads          = require('../exec-preloads');
 var getVersion            = require('../get-model-version');
 var UserIdStrategy        = require('./user-id-strategy');
-var Q                     = require('q');
+var Q                     = require('bluebird-q');
 
 /**
  *

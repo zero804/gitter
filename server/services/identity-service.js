@@ -1,6 +1,6 @@
 'use strict';
 
-var Q = require('q');
+var Q = require('bluebird-q');
 var persistence = require("./persistence-service");
 var mongooseUtils = require('../utils/mongoose-utils');
 

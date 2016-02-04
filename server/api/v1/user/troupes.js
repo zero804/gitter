@@ -5,7 +5,7 @@ var restful              = require("../../../services/restful");
 var restSerializer       = require("../../../serializers/rest-serializer");
 var recentRoomService    = require('../../../services/recent-room-service');
 var roomService          = require('../../../services/room-service');
-var Q                    = require('q');
+var Q                    = require('bluebird-q');
 var mongoUtils           = require('../../../utils/mongo-utils');
 var StatusError          = require('statuserror');
 

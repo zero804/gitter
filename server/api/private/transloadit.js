@@ -4,7 +4,7 @@ var userService   = require('../../services/user-service');
 var troupeService = require('../../services/troupe-service');
 var chatService   = require('../../services/chat-service');
 var nconf         = require('../../utils/config');
-var Q             = require('q');
+var Q             = require('bluebird-q');
 var StatusError   = require('statuserror');
 
 var env           = require('gitter-web-env');

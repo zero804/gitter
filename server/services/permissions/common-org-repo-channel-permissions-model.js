@@ -1,7 +1,7 @@
 /* jshint maxcomplexity:18 */
 "use strict";
 
-var Q = require('q');
+var Q = require('bluebird-q');
 
 var ALLOWED_SECURITY_VALUES = {
   PRIVATE: 1,

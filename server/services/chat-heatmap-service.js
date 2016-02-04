@@ -1,7 +1,7 @@
 "use strict";
 
 var client = require('../utils/elasticsearch-client');
-var Q = require('q');
+var Q = require('bluebird-q');
 var assert = require('assert');
 
 /**

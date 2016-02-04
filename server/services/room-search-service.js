@@ -1,6 +1,6 @@
 "use strict";
 
-var Q             = require('q');
+var Q             = require('bluebird-q');
 var client        = require('../utils/elasticsearch-client');
 var _             = require('underscore');
 

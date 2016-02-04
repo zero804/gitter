@@ -1,6 +1,6 @@
 "use strict";
 
-var Q = require("q");
+var Q = require('bluebird-q');
 var createSerializer = require('./create-serializer');
 
 function getStrategy(modelName) {

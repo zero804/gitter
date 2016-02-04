@@ -3,7 +3,7 @@
 var persistence   = require("./persistence-service");
 var processChat   = require('../utils/markdown-processor');
 var ObjectID      = require('mongodb').ObjectID;
-var Q             = require('q');
+var Q             = require('bluebird-q');
 var StatusError   = require('statuserror');
 
 exports.newEventToTroupe = function(troupe, user, text, meta, payload, callback) {

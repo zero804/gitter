@@ -1,7 +1,7 @@
 'use strict';
 
 var BackendMuxer = require('./backend-muxer');
-var Q = require('q');
+var Q = require('bluebird-q');
 
 var env = require('gitter-web-env');
 var config = env.config;

@@ -68,6 +68,11 @@
       "from": "bluebird@>=3.1.1 <4.0.0",
       "resolved": "http://beta-internal:4873/bluebird/-/bluebird-3.2.1.tgz"
     },
+    "bluebird-q": {
+      "version": "1.0.3",
+      "from": "git+https://github.com/suprememoocow/bluebird-q.git#4951f27927bbfe889140dc4448dac549826b944f",
+      "resolved": "git+https://github.com/suprememoocow/bluebird-q.git#4951f27927bbfe889140dc4448dac549826b944f"
+    },
     "body-parser": {
       "version": "1.14.2",
       "from": "body-parser@>=1.13.2 <2.0.0",
@@ -922,7 +927,7 @@
                 "minimist": {
                   "version": "0.0.8",
                   "from": "minimist@0.0.8",
-                  "resolved": "http://beta-internal:4873/minimist/-/minimist-0.0.8.tgz"
+                  "resolved": "https://registry.npmjs.org/minimist/-/minimist-0.0.8.tgz"
                 }
               }
             },
@@ -1210,7 +1215,7 @@
                 "diff": {
                   "version": "1.0.8",
                   "from": "diff@>=1.0.3 <1.1.0",
-                  "resolved": "http://beta-internal:4873/diff/-/diff-1.0.8.tgz"
+                  "resolved": "https://registry.npmjs.org/diff/-/diff-1.0.8.tgz"
                 }
               }
             },
@@ -2019,7 +2024,7 @@
             "minimist": {
               "version": "0.0.8",
               "from": "minimist@0.0.8",
-              "resolved": "http://beta-internal:4873/minimist/-/minimist-0.0.8.tgz"
+              "resolved": "https://registry.npmjs.org/minimist/-/minimist-0.0.8.tgz"
             }
           }
         },
@@ -2162,9 +2167,9 @@
       "resolved": "http://beta-internal:4873/mixpanel/-/mixpanel-0.0.20.tgz"
     },
     "moment": {
-      "version": "2.11.1",
+      "version": "2.11.2",
       "from": "moment@>=2.10.3 <3.0.0",
-      "resolved": "http://beta-internal:4873/moment/-/moment-2.11.1.tgz"
+      "resolved": "http://beta-internal:4873/moment/-/moment-2.11.2.tgz"
     },
     "mongodb": {
       "version": "2.1.4",
@@ -2694,7 +2699,7 @@
         },
         "utils-merge": {
           "version": "1.0.0",
-          "from": "utils-merge@>=1.0.0 <2.0.0",
+          "from": "utils-merge@1.0.0",
           "resolved": "http://beta-internal:4873/utils-merge/-/utils-merge-1.0.0.tgz"
         },
         "debug": {
@@ -3215,9 +3220,9 @@
               "resolved": "http://beta-internal:4873/aws4/-/aws4-1.2.1.tgz"
             },
             "bl": {
-              "version": "1.0.1",
+              "version": "1.0.2",
               "from": "bl@>=1.0.0 <1.1.0",
-              "resolved": "http://beta-internal:4873/bl/-/bl-1.0.1.tgz",
+              "resolved": "http://beta-internal:4873/bl/-/bl-1.0.2.tgz",
               "dependencies": {
                 "readable-stream": {
                   "version": "2.0.5",
@@ -3560,7 +3565,7 @@
             },
             "tunnel-agent": {
               "version": "0.4.2",
-              "from": "tunnel-agent@>=0.4.0 <0.5.0",
+              "from": "tunnel-agent@>=0.4.1 <0.5.0",
               "resolved": "http://beta-internal:4873/tunnel-agent/-/tunnel-agent-0.4.2.tgz"
             }
           }
@@ -3717,9 +3722,9 @@
       "resolved": "http://beta-internal:4873/temp/-/temp-0.4.0.tgz"
     },
     "tentacles": {
-      "version": "0.2.9",
-      "from": "tentacles@>=0.2.7 <0.3.0",
-      "resolved": "http://beta-internal:4873/tentacles/-/tentacles-0.2.9.tgz",
+      "version": "0.3.0",
+      "from": "tentacles@>=0.3.0 <0.4.0",
+      "resolved": "http://beta-internal:4873/tentacles/-/tentacles-0.3.0.tgz",
       "dependencies": {
         "create-error": {
           "version": "0.3.1",
@@ -3730,11 +3735,6 @@
           "version": "3.10.1",
           "from": "lodash@>=3.3.0 <4.0.0",
           "resolved": "http://beta-internal:4873/lodash/-/lodash-3.10.1.tgz"
-        },
-        "q": {
-          "version": "1.4.1",
-          "from": "q@>=1.2.0 <2.0.0",
-          "resolved": "http://beta-internal:4873/q/-/q-1.4.1.tgz"
         },
         "request": {
           "version": "2.69.0",
@@ -3752,9 +3752,9 @@
               "resolved": "http://beta-internal:4873/aws4/-/aws4-1.2.1.tgz"
             },
             "bl": {
-              "version": "1.0.1",
+              "version": "1.0.2",
               "from": "bl@>=1.0.0 <1.1.0",
-              "resolved": "http://beta-internal:4873/bl/-/bl-1.0.1.tgz",
+              "resolved": "http://beta-internal:4873/bl/-/bl-1.0.2.tgz",
               "dependencies": {
                 "readable-stream": {
                   "version": "2.0.5",

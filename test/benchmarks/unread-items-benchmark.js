@@ -5,7 +5,7 @@ var makeBenchmark = require('../make-benchmark');
 var testRequire = require('../integration/test-require');
 var mockito = require('jsmockito').JsMockito;
 
-var Q = require('q');
+var Q = require('bluebird-q');
 var mongoUtils = testRequire('./utils/mongo-utils');
 
 var TOTAL_USERS = 10000;

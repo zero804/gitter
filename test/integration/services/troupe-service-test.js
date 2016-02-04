@@ -1,4 +1,3 @@
-#!/usr/bin/env mocha --ignore-leaks
 /*jslint node:true, unused:true*/
 /*global describe:true, it:true, before:true, after:false */
 "use strict";
@@ -6,7 +5,7 @@
 
 var testRequire   = require('../test-require');
 var fixtureLoader = require('../test-fixtures');
-var Q             = require("q");
+var Q             = require('bluebird-q');
 var _             = require('underscore');
 var assert        = require("assert");
 var mockito       = require('jsmockito').JsMockito;

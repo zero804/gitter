@@ -3,7 +3,7 @@
 
 var GitHubRepoService    = require('gitter-web-github').GitHubRepoService;
 var winston              = require('../../utils/winston');
-var Q                    = require('q');
+var Q                    = require('bluebird-q');
 var appEvents            = require('gitter-web-appevents');
 var userIsInRoom         = require('../user-in-room');
 

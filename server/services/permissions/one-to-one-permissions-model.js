@@ -1,6 +1,6 @@
 "use strict";
 
-var Q               = require('q');
+var Q               = require('bluebird-q');
 var userHasSignedUp = require('../user-has-signed-up');
 var StatusError     = require('statuserror');
 

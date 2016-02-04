@@ -11,7 +11,7 @@ var emailAddressService = require('./email-address-service');
 var roomNameTrimmer     = require('../../public/js/utils/room-name-trimmer');
 var mongoUtils          = require('../utils/mongo-utils');
 var moment              = require('moment');
-var Q                   = require('q');
+var Q                   = require('bluebird-q');
 var i18nFactory         = require('../utils/i18n-factory');
 
 /*

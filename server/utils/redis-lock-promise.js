@@ -2,7 +2,7 @@
 
 var env       = require('gitter-web-env');
 var redisLock = require("redis-lock")(env.redis.getClient());
-var Q         = require("q");
+var Q         = require('bluebird-q');
 
 module.exports = function lock(key, promiseFn) {
   var d = Q.defer();

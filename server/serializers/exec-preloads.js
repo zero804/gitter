@@ -1,6 +1,6 @@
 'use strict';
 
-var Q      = require("q");
+var Q      = require('bluebird-q');
 
 function execPreloads(preloads, callback) {
   if(!preloads) return Q.resolve().nodeify(callback);

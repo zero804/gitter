@@ -6,7 +6,7 @@ var RedisBatcher    = require('../utils/redis-batcher').RedisBatcher;
 var ChatMessage     = require('./persistence-service').ChatMessage;
 var assert          = require('assert');
 var mongoUtils      = require('../utils/mongo-utils');
-var Q               = require('q');
+var Q               = require('bluebird-q');
 var liveCollections = require('./live-collections');
 
 var batcher = new RedisBatcher('readby2', 600, batchUpdateReadbyBatch);

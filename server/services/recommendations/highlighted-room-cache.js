@@ -1,7 +1,7 @@
 'use strict';
 
 var LRU             = require("lru-cache");
-var Q               = require('q');
+var Q               = require('bluebird-q');
 var GithubRepo      = require('gitter-web-github').GitHubRepoService;
 var MAX_TOKEN_AGE   = 10 * 60000; // 2 minutes
 var debug           = require('debug')('gitter:legacy-recommendations');

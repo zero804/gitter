@@ -5,7 +5,7 @@
 var testRequire = require('../../test-require');
 var assert = require('assert');
 var _ = require('underscore');
-var Q = require('q');
+var Q = require('bluebird-q');
 var testGenerator = require('../../test-generator');
 var mockito = require('jsmockito').JsMockito;
 

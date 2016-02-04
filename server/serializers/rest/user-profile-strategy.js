@@ -2,7 +2,7 @@
 
 var identityService = require("../../services/identity-service");
 var _ = require('lodash');
-var Q = require('q');
+var Q = require('bluebird-q');
 var qlimit = require('qlimit');
 var limit = qlimit(2); // ?
 

@@ -6,7 +6,7 @@ var testRequire = require('../test-require');
 var assert = require('assert');
 var underTest = testRequire('./utils/mongo-utils');
 var ObjectID = require('mongodb').ObjectID;
-var Q = require('q');
+var Q = require('bluebird-q');
 
 describe('mongo-utils', function() {
 

@@ -3,7 +3,7 @@
 "use strict";
 
 var testRequire = require('../../test-require');
-var Q = require('q');
+var Q = require('bluebird-q');
 var mockito = require('jsmockito').JsMockito;
 var assert = require('assert');
 

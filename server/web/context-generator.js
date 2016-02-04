@@ -8,7 +8,7 @@ var userSettingsService = require('../services/user-settings-service');
 var isNative         = require('../../public/js/utils/is-native');
 
 var assert           = require("assert");
-var Q                = require('q');
+var Q                = require('bluebird-q');
 var _                = require('underscore');
 
 /**

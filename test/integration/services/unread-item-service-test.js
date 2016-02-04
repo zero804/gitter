@@ -4,7 +4,7 @@ var testRequire = require('../test-require');
 var mockito = require('jsmockito').JsMockito;
 var hamcrest = require('jshamcrest').JsHamcrest;
 
-var Q = require('q');
+var Q = require('bluebird-q');
 var assert = require('assert');
 
 var times = mockito.Verifiers.times;

@@ -3,7 +3,7 @@
 var testRequire = require('../../test-require');
 var accessTokenProvider = testRequire('./services/tokens/access-token-provider');
 var mongoUtils = testRequire('./utils/mongo-utils');
-var Q = require('q');
+var Q = require('bluebird-q');
 var assert = require('assert');
 
 describe('access-token-provider', function() {
