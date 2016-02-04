@@ -11,6 +11,7 @@ var ItemView = Marionette.ItemView.extend({
   initialize: function(attrs) {
     this.roomMenuModel = attrs.roomMenuModel;
   },
+
   serializeData: function() {
     var data = this.model.toJSON();
     var avatarURL = (this.roomMenuModel.get('state') === 'search') ? null : getRoomAvatar(data.name || ' ');

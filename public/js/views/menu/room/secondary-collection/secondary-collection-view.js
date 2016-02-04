@@ -14,15 +14,6 @@ module.exports = BaseCollectionView.extend({
     'item:clicked': 'onItemClicked',
   },
 
-  buildChildView: function(model, ItemView, attrs) {
-    var index     = this.collection.indexOf(model);
-    var viewIndex = (index + this.primaryCollection.length);
-    return new ItemView(_.extend({}, attrs, {
-      model: model,
-      index: viewIndex,
-    }));
-  },
-
   serializeData: function() {
     var data = this.model.toJSON();
     return _.extend({}, data, {
@@ -53,6 +44,10 @@ module.exports = BaseCollectionView.extend({
   onSearchTermChange: function(model, val) { //jshint unused: true
     if (model.get('state') !== 'search') { return; }
     this.$el.toggleClass('active', !val);
+  },
+
+  onDestroy: function (){
+    this.stopListening(this.model);
   },
 
 });

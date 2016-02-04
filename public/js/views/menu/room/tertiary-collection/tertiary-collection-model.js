@@ -19,7 +19,7 @@ module.exports = BaseCollectionModel.extend({
 
   onDefault: function() {
     this.set({
-      header: ' ',
+      header: false,
       active: false,
     });
   },

@@ -1,34 +1,14 @@
 'use strict';
 
-var _                   = require('underscore');
-var Backbone            = require('backbone');
-var Marionette          = require('backbone.marionette');
-var RAF                 = require('utils/raf');
-var ItemView            = require('./primary-collection-item-view');
-var context             = require('utils/context');
-var cocktail            = require('cocktail');
-var KeyboardEventsMixin = require('../../../keyboard-events-mixin.js');
+var Backbone           = require('backbone');
+var RAF                = require('utils/raf');
+var ItemView           = require('./primary-collection-item-view');
+var BaseCollectionView = require('../base-collection/base-collection-view');
 
-var PrimaryCollectionView = Marionette.CollectionView.extend({
+var PrimaryCollectionView = BaseCollectionView.extend({
 
-  childEvents: {
-    'item:clicked': 'onItemClicked',
-  },
   childView: ItemView,
-
-  buildChildView: function(model, ItemView, attrs) {
-    var index = this.collection.indexOf(model);
-    return new ItemView(_.extend({}, attrs, {
-      model: model,
-      index: index,
-    }));
-  },
-
-  keyboardEvents: {
-    'room.up': 'onKeyboardUpPressed',
-    'room.down': 'onKeyboardDownPressed',
-    'room.enter': 'onKeyboardEnterPressed',
-  },
+  className: 'primary-collection',
 
   initialize: function(options) {
 
@@ -47,40 +27,13 @@ var PrimaryCollectionView = Marionette.CollectionView.extend({
       this.listenTo(this.dndCtrl, 'room-menu:add-favourite', this.onFavouriteAdded, this);
       this.listenTo(this.dndCtrl, 'room-menu:sort-favourite', this.onFavouritesSorted, this);
     }
-
-    this.listenTo(this.bus, 'room-menu:keyboard:focus', this.onKeyboardFocus, this);
-    this.listenTo(this.model, 'change:state', this.onModelStateChange, this);
-    this.listenTo(this.model, 'change:selectedOrgName', this.onModelStateChange, this);
-    this.listenTo(context.troupe(), 'change:id', this.updateSelectedModel, this);
-    this.listenTo(this.collection, 'add', this.render, this);
-
-    this.updateSelectedModel();
   },
 
   filter: function (model, index){ //jshint unused: true
-    return (this.model.get('search') === 'searc') ? (index <= 5) : true;
-  },
-
-  //WHERE SHOULD THIS GO? IT ALSO NEEDS TO BE TESTED
-  sortFavourites: function(a, b) {
-    if (!a.get('favourite')) return -1;
-    if (!b.get('favourite')) return 1;
-    return (a.get('favourite') < b.get('favourite')) ? -1 : 1;
+    return (this.model.get('search') === 'search') ? (index <= 5) : true;
   },
 
   onModelStateChange: function(model, val) { /*jshint unused: true*/
-
-    if (model.get('state') === 'favourite') {
-      //TODO This feels gross
-      this.collection.comparator = this.sortFavourites;
-
-      //TODO a sort will trigger a render so we can skip out on the render part
-      this.collection.sort();
-    } else {
-      this.collection.comparator = null;
-      this.render();
-    }
-
     RAF(function() {
       this.$el.toggleClass('active', (val !== 'search'));
     }.bind(this));
@@ -131,102 +84,14 @@ var PrimaryCollectionView = Marionette.CollectionView.extend({
     }.bind(this));
   },
 
-  updateSelectedModel: function() {
-    var selectedModel      = this.collection.findWhere({ selected: true });
-    var newlySelectedModel = this.collection.findWhere({ id: context.troupe().get('id') });
-
-    if (selectedModel) selectedModel.set('selected', false);
-    if (newlySelectedModel) newlySelectedModel.set('selected', true);
-  },
-
-  onKeyboardFocus: function() {
-    if (!this.collection.findWhere({ focus: true })) {
-      var firstModel = this.collection.at(0);
-      if (firstModel) firstModel.set('focus', true);
-    }
-
-    this.uiModel.set('isFocused', true);
-  },
-
-  onKeyboardEnterPressed: function() {
-    if (!this.uiModel.get('isFocused')) { return }
-
-    var focusedModel = this.collection.findWhere({ focus: true });
-    if (!focusedModel) { return }
-
-    var name = focusedModel.get('uri');
-    var url  = '/' + name;
-
-    this.bus.trigger('navigation', url, 'chat', name);
-  },
-
-  onKeyboardUpPressed: function() {
-    this._onKeyboardMovement(-1);
-  },
-
-  onKeyboardDownPressed: function() {
-    this._onKeyboardMovement(1);
-  },
-
-  //TODO, some of this logic is crazy so test it.
-  //JP 15/1/16
-  _onKeyboardMovement: function(indexMod) {
-    var currentlyFocusedModel = this.collection.findWhere({ focus: true });
-    var index = this.collection.indexOf(currentlyFocusedModel) + indexMod;
-
-    //cycle if we need to
-    if (index >= this.collection.length) { index = 0 }
-
-    var newlyFocusedModel = this.collection.at(index);
-
-    if (currentlyFocusedModel) currentlyFocusedModel.set('focus', false);
-    if (newlyFocusedModel) newlyFocusedModel.set('focus', true);
-
-    //Scrolling Logic
-    //Scrolling to the top pushes the first item
-    //right to the top of the container and moves any padded area
-    //as such we need to use an offset to maintain the visual space
-    //at the top of the primary collection
-    //sadly adding padding-bottom/margin-bottom to an element
-    //above .nano causes many layout issues - nanoScroller is crazy
-    //JP 15/1/16
-    var scrollOffset = index - 10;
-    var scrollType;
-
-    //TODO TEST
-    if (scrollOffset < 0) { scrollOffset = 0; }
-
-    if (scrollOffset <= 10) { scrollType = 'top'; }
-
-    if (index === (this.collection.length - 1) || index === -1) {
-      //TODO pass focus to secondary collection
-      scrollOffset = index;
-      scrollType = 'bottom';
-    }
-
-    this.bus.trigger('room-menu:keyboard:change-focus', scrollOffset, scrollType);
-  },
-
-  render: function() {
-    this.$el.removeClass('loaded');
-    RAF(function() {
-      Marionette.CollectionView.prototype.render.apply(this, arguments);
-      RAF(function() {
-        this.$el.addClass('loaded');
-      }.bind(this));
-    }.bind(this));
-  },
-
   onDestroy: function (){
     this.stopListening(this.bus);
     this.stopListening(this.model);
     this.stopListening(this.dndCtrl);
     this.stopListening(this.collection);
-    this.stopListening(context.troupe());
   },
 
 });
 
-cocktail.mixin(PrimaryCollectionView, KeyboardEventsMixin);
 
 module.exports = PrimaryCollectionView;
