@@ -5,7 +5,7 @@
 
 var testRequire   = require('../test-require');
 var fixtureLoader = require('../test-fixtures');
-var Q             = require('bluebird-q');
+var Promise       = require('bluebird');
 var _             = require('underscore');
 var assert        = require("assert");
 var mongoUtils    = testRequire("./utils/mongo-utils");
@@ -20,7 +20,7 @@ describe('troupe-service', function() {
 
   describe('update actions', function() {
     var troupeService = testRequire.withProxies('./services/troupe-service', {
-      './room-permissions-model': function() { return Q.resolve(true); }
+      './room-permissions-model': function() { return Promise.resolve(true); }
     });
 
     it('should update tags', function(done) {
@@ -59,7 +59,7 @@ describe('troupe-service', function() {
     });
 
     it('should handle the creation of a oneToOneTroupe atomicly', function(done) {
-      Q.all([
+      Promise.all([
           troupeService.findOrCreateOneToOneTroupeIfPossible(fixture.user2.id, fixture.user3.id),
           troupeService.findOrCreateOneToOneTroupeIfPossible(fixture.user3.id, fixture.user2.id)
         ])
