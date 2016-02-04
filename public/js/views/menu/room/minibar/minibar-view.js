@@ -28,7 +28,7 @@ module.exports = Marionette.CollectionView.extend({
       '[data-state-change=' + model.get('type') + ']';
 
     var element = this.$el.find(selector);
-    return !!element ? { el: element, index: index, model: model } : { index: index, model: model };
+    return !!element.length ? { el: element, index: index, model: model } : { index: index, model: model };
   },
 
   buildChildView: function(model, ViewClass, options) {
