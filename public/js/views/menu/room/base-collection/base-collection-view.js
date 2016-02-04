@@ -4,7 +4,7 @@ var _          = require('underscore');
 var Marionette = require('backbone.marionette');
 var RAF        = require('utils/raf');
 var template   = require('./base-collection-view.hbs');
-var context            = require('utils/context');
+var context    = require('utils/context');
 
 module.exports = Marionette.CompositeView.extend({
 
@@ -47,6 +47,7 @@ module.exports = Marionette.CompositeView.extend({
   onModelChangeActiveState: function(model, val) { /*jshint unused: true*/
     this.render();
     RAF(function() {
+      console.log('active', val);
       this.$el.toggleClass('active', val);
     }.bind(this));
   },
