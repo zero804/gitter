@@ -192,7 +192,7 @@ function createExpectedFixtures(expected, done) {
       .then(function(troupe) {
         if (!f.userIds || !f.userIds.length) return troupe;
         return bulkInsertTroupeUsers(troupe._id, f.userIds)
-          .thenResolve(troupe);
+          .thenReturn(troupe);
       });
   }
 
@@ -345,7 +345,8 @@ function createExpectedFixtures(expected, done) {
 
         return null;
       });
-    return Q.all(promises).thenResolve(fixture);
+    return Q.all(promises)
+      .thenReturn(fixture);
   }
 
   function createMessages(fixture) {

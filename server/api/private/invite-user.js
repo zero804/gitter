@@ -37,7 +37,7 @@ module.exports =  function (req, res, next) {
         .then(function() {
           return emailService.sendManualInvitation(req.user, user, room, email);
         })
-        .thenResolve([user, room]);
+        .thenReturn([user, room]);
     })
     .spread(function (user, room) {
       stats.event('manual-invite', { from: req.user.username, to: user.username, room: room.uri });

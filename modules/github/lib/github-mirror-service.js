@@ -2,7 +2,7 @@
 
 var url = require('url');
 var StatusError = require('statuserror');
-var Q = require('bluebird-q');
+
 var Promise = require('bluebird');
 var wrap = require('./github-cache-wrapper');
 var badCredentialsCheck = require('./bad-credentials-check');
@@ -60,9 +60,9 @@ module.exports = function(tokenPriority) {
 
         if(response.statusCode !== 200) {
           /* This is pretty dodgy.... */
-          return response.statusCode;
+          return resolve(response.statusCode);
         } else {
-          return body;
+          return resolve(body);
         }
       });
     })

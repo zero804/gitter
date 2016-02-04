@@ -898,7 +898,7 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
             if (!user) return [newRoom, updatedExisting];
 
             return roomMembershipService.addRoomMember(newRoom._id, user._id)
-              .thenResolve([newRoom, updatedExisting]);
+              .thenReturn([newRoom, updatedExisting]);
           })
           .spread(function(newRoom, updatedExisting) {
             emailNotificationService.createdRoomNotification(user, newRoom); // send an email to the room's owner
@@ -919,7 +919,7 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
               roomType: "channel"
             });
             return uriLookupService.reserveUriForTroupeId(newRoom._id, uri)
-              .thenResolve(newRoom);
+              .thenReturn(newRoom);
 
           });
       });
@@ -971,7 +971,7 @@ function notifyInvitedUser(fromUser, invitedUser, room/*, isNewUser*/) {
 
       stats.event('user_added_someone', _.extend(metrics, { userId: fromUser.id }));
     })
-    .thenResolve(invitedUser);
+    .thenReturn(invitedUser);
 }
 
 function updateUserDateAdded(userId, roomId, date) {
@@ -1050,7 +1050,7 @@ function addUserToRoom(room, instigatingUser, usernameToAdd) {
             notifyInvitedUser(instigatingUser, addedUser, room, isNewUser),
             updateUserDateAdded(addedUser.id, room.id)
           ])
-          .thenResolve(addedUser);
+          .thenReturn(addedUser);
         });
     });
 
@@ -1133,8 +1133,7 @@ function ensureRepoRoomSecurity(uri, security) {
            * multiple events will be generated */
 
           return revalidatePermissionsForUsers(troupe);
-        })
-        .thenResolve(troupe);
+        }).thenReturn(troupe);
 
     });
 }
@@ -1302,8 +1301,7 @@ function banUserFromRoom(room, username, requestingUser, options, callback) {
 
                   if(err) logger.error("Unable to create an event in troupe: " + err, { exception: err });
                 });
-              })
-              .thenResolve(ban);
+              }).thenReturn(ban);
           }
 
         });

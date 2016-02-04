@@ -56,7 +56,7 @@ function newUser(options) {
       //  .then(function(email) {
       //    stats.userUpdate(_.extend({ email: email, mixpanelId : options.mixpanelId }, user.toJSON()));
       //  })
-      //  .thenResolve(user);
+      //  .thenReturn(user);
 
       return user;
     })
@@ -64,7 +64,7 @@ function newUser(options) {
       // Reserve the URI for the user so that we don't need to figure it out
       // manually later (which will involve dodgy calls to github)
       return uriLookupService.reserveUriForUsername(user._id, user.username)
-        .thenResolve(user);
+        .thenReturn(user);
     });
 }
 

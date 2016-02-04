@@ -131,7 +131,7 @@ function autoLurkInactiveUsers(troupe, options) {
       return Q.all([
         usersToChangeSettings.length && userTroupeSettingsService.setUserSettingsForUsersInTroupe(troupe.id, usersToChangeSettings, 'notifications', { push: 'mention' }),
         usersToLurk.length && bulkLurkUsers(troupe.id, usersToLurk)
-      ]).thenResolve(candidates);
+      ]).thenReturn(candidates);
     });
 }
 exports.autoLurkInactiveUsers = autoLurkInactiveUsers;
