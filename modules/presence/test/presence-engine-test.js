@@ -653,7 +653,6 @@ describe('presenceService', function() {
             assert.equal(c.offline[0].troupeId, troupeId);
 
           } catch(e) {
-            console.error(e);
             throw e;
           }
 
@@ -890,7 +889,6 @@ describe('presenceService', function() {
             return presenceService.getSocket(socketId);
           })
           .then(function(socket) {
-            console.log(socket);
             assert.strictEqual(socket.userId, userId);
             assert.strictEqual(socket.troupeId, null);
             assert.strictEqual(socket.eyeballs, false);
@@ -997,7 +995,6 @@ describe('presenceService', function() {
             return presenceService.getSocket(socketId);
           })
           .then(function(socket) {
-            console.log(socket);
             assert.strictEqual(socket.userId, null);
             assert.strictEqual(socket.troupeId, null);
             assert.strictEqual(socket.eyeballs, false);

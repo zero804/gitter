@@ -8,17 +8,13 @@ var fixtureLoader = require('../test-fixtures');
 var Q             = require('bluebird-q');
 var _             = require('underscore');
 var assert        = require("assert");
-var mockito       = require('jsmockito').JsMockito;
 var mongoUtils    = testRequire("./utils/mongo-utils");
-var times         = mockito.Verifiers.times;
-var once          = times(1);
-var times         = mockito.Verifiers.times;
 var fixture       = {};
 
 function findUserIdPredicate(userId) {
   return function(x) {
     return "" + x === "" + userId;
-  }
+  };
 }
 describe('troupe-service', function() {
 
