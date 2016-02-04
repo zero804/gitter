@@ -8,11 +8,21 @@ module.exports = Marionette.ItemView.extend({
   className: 'room-item',
   template:  template,
 
-  trigger: {
+  triggers: {
     'click': 'item:clicked',
   },
 
-  constructor: function (attrs){
+  modelEvents: {
+    'change:selected': 'onSelectedChange',
+    'change:focus':    'onItemFocused',
+    'change:unreadItems change:mentions change:activity': 'render',
+  },
+
+  ui: {
+    container: '.room-item__container'
+  },
+
+  constructor: function(attrs) {
     this.roomMenuModel = attrs.roomMenuModel;
     this.index         = attrs.index;
     Marionette.ItemView.prototype.constructor.apply(this, arguments);
@@ -25,7 +35,15 @@ module.exports = Marionette.ItemView.extend({
     };
   },
 
-  onDestroy: function (){
+  onSelectedChange: function(model, val) { //jshint unused: true
+    this.ui.container.toggleClass('selected', !!val);
+  },
+
+  onItemFocused: function(model, val) {//jshint unused: true
+    this.ui.container.toggleClass('focus', !!val);
+  },
+
+  onDestroy: function() {
     delete this.roomMenuModel;
     delete this.index;
   },

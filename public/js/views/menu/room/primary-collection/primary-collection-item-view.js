@@ -2,7 +2,6 @@
 
 var _                 = require('underscore');
 var Backbone          = require('backbone');
-var Marionette        = require('backbone.marionette');
 var getRoomAvatar     = require('utils/get-room-avatar');
 var itemTemplate      = require('./primary-collection-view.hbs');
 var roomNameShortener = require('../../../../utils/room-menu-name-shortener');
@@ -10,21 +9,11 @@ var apiClient         = require('components/apiClient');
 var context           = require('utils/context');
 var appEvents         = require('utils/appevents');
 
-module.exports = Marionette.ItemView.extend({
+var BaseCollectionItemView = require('../base-collection/base-collection-item-view');
 
-  className: 'room-item',
+module.exports = BaseCollectionItemView.extend({
 
   template: itemTemplate,
-
-  attributes: function() {
-    var delay = (0.003125 * this.index);
-    return {
-      'data-room-id':          this.model.get('id'),
-      'style':                 'transition-delay: ' + delay + 's',
-      'data-collection-index': this.index,
-    };
-  },
-
   events: {
     'click [data-component=room-item-options-toggle]': 'onOptionsClicked',
     'click [data-component="room-item-hide"]':         'onHideClicked',
@@ -32,23 +21,8 @@ module.exports = Marionette.ItemView.extend({
     'mouseleave':                                      'onMouseOut',
   },
 
-  modelEvents: {
-    'change:selected':    'onSelectedChange',
-    'change:focus':       'onItemFocused',
-    'change:unreadItems change:mentions change:activity': 'render',
-  },
-
-  triggers: {
-    'click': 'item:clicked',
-  },
-
-  constructor: function(attrs) {
-    this.index = attrs.index;
-    this.uiModel = new Backbone.Model({ menuIsOpen: false });
-    Marionette.ItemView.prototype.constructor.apply(this, arguments);
-  },
-
   initialize: function() {
+    this.uiModel = new Backbone.Model({ menuIsOpen: false });
     this.listenTo(this.uiModel, 'change:menuIsOpen', this.onModelToggleMenu, this);
   },
 
@@ -62,7 +36,7 @@ module.exports = Marionette.ItemView.extend({
     var lurkActivity = (!hasMentions && !unreadItems) && !!data.activity;
 
     return _.extend({}, data, {
-      roomAvatarUrl: getRoomAvatar(data.url.substring(1)),
+      avatarUrl: getRoomAvatar(data.url.substring(1)),
       isNotOneToOne: (data.githubType !== 'ONETOONE'),
       name:          roomNameShortener(data.name),
       mentions:      hasMentions,
@@ -100,14 +74,6 @@ module.exports = Marionette.ItemView.extend({
       .then(function() {
         appEvents.trigger('navigation', '/home', 'home', '');
       });
-  },
-
-  onSelectedChange: function(model, val) { //jshint unused: true
-    this.$el.children(':first').toggleClass('selected', !!val);
-  },
-
-  onItemFocused: function(model, val) {//jshint unused: true
-    this.$el.children(':first').toggleClass('focus', !!val);
   },
 
   onDestroy: function() {

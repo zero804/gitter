@@ -1,30 +1,6 @@
-//TODO THIS IS BASICALLY A CUT&PASTE OF secondary-collection-view.less
-//SORT IT OUT WITH MIXINS ETC JP 27/1/16
-
 @import "../../../../../less/components/menu/room/menu-text";
+@import "../../../../../less/components/menu/room/collection";
 
 .tertiary-collection {
-  display: none;
-  transition: opacity .2s ease-in-out;
-
-  &.active {
-    display: block;
-  }
-}
-
-.tertiary-collection__title {
-  .room-menu-text();
-  box-sizing:     border-box;
-  padding-left:   @desktop-menu-left-padding;
-  color:          @org-bg;
-  text-transform: uppercase;
-  margin-top: 1.6rem;
-
-  &.search {
-    color: @jaffa;
-  }
-}
-
-.tertiary-collection-list {
-  margin-left: 0;
+  .m-collection();
 }
