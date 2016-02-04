@@ -1,10 +1,21 @@
 "use strict";
 
+// Lets get rid of hamcrest. Until we do, we'll have to do this
+// its nasty, but if jsmockito uses a different instance of the library
+// it won't work correctly
+function getHamcrest() {
+  try {
+    return require('jsmockito/node_modules/jshamcrest').JsHamcrest;
+  } catch(e) {
+    return require('jsmockito').JsHamcrest;
+  }
+}
+
 var assert          = require('assert');
 var presenceService = require('..');
 var mockito         = require('jsmockito').JsMockito;
 var never           = mockito.Verifiers.never;
-var hamcrest        = require('jshamcrest').JsHamcrest;
+var hamcrest        = getHamcrest();
 var anything        = hamcrest.Matchers.anything;
 
 var fakeEngine = {
