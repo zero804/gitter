@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 var _             = require('underscore');
 var closeTemplate = require('./minibar-close-item-view.hbs');
