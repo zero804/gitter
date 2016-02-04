@@ -3,6 +3,7 @@
 
 var env = require('gitter-web-env');
 var stats = env.stats;
+var config = env.config;
 var Q = require('q');
 var _ = require('lodash');
 var shutdown = require('shutdown');
@@ -20,10 +21,20 @@ var IntercomStream = require('../../server/utils/intercom-stream');
 var opts = require("nomnom")
    .option('segment', {
       abbr: 's',
-      required: true,
       help: 'Id of the segment to list'
    })
    .parse();
+
+if (!opts.segment) {
+  // this just makes running the production (or beta) script much easier
+  var defaultSegment = config.get('stats:intercom:suggestedRoomSegmentId');
+  if (defaultSegment) {
+    console.log("Using default segment", defaultSegment);
+    opts.segment = defaultSegment;
+  } else {
+    throw new Error('Segment required.');
+  }
+}
 
 var stream = new IntercomStream({ client: intercom.client, key: 'users'}, function() {
   return intercom.client.users.listBy({segment_id: opts.segment});
