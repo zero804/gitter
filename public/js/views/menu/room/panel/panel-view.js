@@ -5,6 +5,7 @@ var Marionette               = require('backbone.marionette');
 var PanelHeaderView          = require('../header/header-view');
 var PanelFooterView          = require('../footer/footer-view');
 var PrimaryCollectionView    = require('../primary-collection/primary-collection-view');
+var PrimaryCollectionModel   = require('../primary-collection/primary-collection-model');
 var SecondaryCollectionView  = require('../secondary-collection/secondary-collection-view');
 var SecondaryCollectionModel = require('../secondary-collection/secondary-collection-model');
 var TertiaryCollectionView   = require('../tertiary-collection/tertiary-collection-view');
@@ -52,7 +53,7 @@ module.exports = Marionette.LayoutView.extend({
   initPrimaryCollection: function(optionsForRegion) {
     return new PrimaryCollectionView(optionsForRegion({
       collection: this.model.primaryCollection,
-      model:      this.model,
+      model:      new PrimaryCollectionModel(null, { roomMenuModel: this.model }),
       bus:        this.bus,
       dndCtrl:    this.dndCtrl,
     }));

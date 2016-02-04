@@ -16,57 +16,70 @@ module.exports = Backbone.FilteredCollection.extend({
     if (!options || !options.collection) {
       throw new Error('A valid RoomCollection must be passed to a new instance of FilteredRoomCollection');
     }
+
     this.roomCollection = options.collection;
     this.listenTo(this.roomCollection, 'snapshot', this.onRoomCollectionSnapshot, this);
 
     BackboneFilteredCollection.prototype.initialize.apply(this, arguments);
   },
 
-  onModelChangeState: function (model, val){//jshint unused: true
-    switch(val) {
+  onModelChangeState: function(model, val) {//jshint unused: true
+    switch (val) {
       case 'favourite' :
         this.setFilter(this.filterFavourite);
+        this.comparator = this.sortFavourites;
+        this.sort();
         break;
       case 'people' :
+        this.comparator = null;
         this.setFilter(this.filterOneToOnes);
         break;
       case 'search' :
+        this.comparator = null;
         this.setFilter(this.filterSearches);
         break;
       case 'org' :
+        this.comparator = null;
         this.setFilter(this.filterOrgRooms.bind(this));
         break;
       default:
+        this.comparator = null;
         this.setFilter(false);
         break;
     }
   },
 
-  onOrgNameChange: function (){
+  onOrgNameChange: function() {
     this.setFilter();
   },
 
-  filterFavourite: function (model){
+  filterFavourite: function(model) {
     return !!model.get('favourite');
   },
 
-  filterOneToOnes: function (model){
+  filterOneToOnes: function(model) {
     return model.get('githubType') === 'ONETOONE';
   },
 
-  filterSearches: function(){
+  filterSearches: function() {
     return false;
   },
 
-  filterOrgRooms: function (model){
+  filterOrgRooms: function(model) {
     var orgName = this.roomModel.get('selectedOrgName');
     var name    = model.get('name').split('/')[0];
     return (name === orgName) && !!model.get('roomMember');
   },
 
-  onRoomCollectionSnapshot: function (){
+  onRoomCollectionSnapshot: function() {
     var args = Array.prototype.slice.call(arguments);
     this.trigger.apply(this, ['snapshot'].concat(args));
+  },
+
+  sortFavourites: function(a, b) {
+    if (!a.get('favourite')) return -1;
+    if (!b.get('favourite')) return 1;
+    return (a.get('favourite') < b.get('favourite')) ? -1 : 1;
   },
 
 });
