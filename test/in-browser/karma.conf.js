@@ -167,14 +167,14 @@ module.exports = function(config) {
   }
 
   //
-  else if (process.env.NODE_ENV === 'debug') {
+  else if (!process.env.USE_BROWSERSTACK && process.env.NODE_ENV === 'debug') {
     karmaConfig.plugins.push(require('karma-chrome-launcher'));
     karmaConfig.plugins.push(require('karma-webpack-with-fast-source-maps'));
     karmaConfig = _.extend(karmaConfig, chromeKarmaConfig);
   }
 
   //
-  else {
+  else if(!process.env.USE_BROWSERSTACK){
     karmaConfig.plugins.push(require('karma-phantomjs-launcher'));
     karmaConfig.plugins.push(require('karma-webpack-with-fast-source-maps'));
     karmaConfig = _.extend(karmaConfig, phantomKarmaConfig);
