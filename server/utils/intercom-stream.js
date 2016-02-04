@@ -1,7 +1,7 @@
 "use strict";
 
 var util = require('util');
-var debug = require('debug')('gitter::intercom-stream');
+var debug = require('debug')('gitter:intercom-stream');
 
 var Readable = require('stream').Readable;
 util.inherits(IntercomStream, Readable);
