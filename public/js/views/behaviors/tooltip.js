@@ -43,7 +43,7 @@ var Behavior = Marionette.Behavior.extend({
 
     var self = this;
 
-        Object.keys(this.options).forEach(function(selector) {
+    Object.keys(this.options).forEach(function(selector) {
       if (self.handlers[selector]) return; // Already listening
 
       var $el = selector === '' ? self.$el : self.$el.find(selector);
