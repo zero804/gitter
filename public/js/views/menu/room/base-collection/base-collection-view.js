@@ -30,7 +30,7 @@ module.exports = Marionette.CompositeView.extend({
   },
 
   collectionEvents: {
-    'add reset remove update': 'onCollectionUpdate',
+    'reset': 'onCollectionUpdate',
   },
 
   childEvents: {
@@ -47,14 +47,13 @@ module.exports = Marionette.CompositeView.extend({
   onModelChangeActiveState: function(model, val) { /*jshint unused: true*/
     this.render();
     RAF(function() {
-      console.log('active', val);
       this.$el.toggleClass('active', val);
     }.bind(this));
   },
 
-  onCollectionUpdate: function() {
+  onCollectionUpdate: _.throttle(function() {
     this.$el.toggleClass('empty', !this.collection.length);
-  },
+  }, 0),
 
   updateSelectedModel: function() {
     var selectedModel      = this.collection.findWhere({ selected: true });
