@@ -57,6 +57,10 @@ var PrimaryCollectionView = Marionette.CollectionView.extend({
     this.updateSelectedModel();
   },
 
+  filter: function (model, index){ //jshint unused: true
+    return (this.model.get('search') === 'searc') ? (index <= 5) : true;
+  },
+
   //WHERE SHOULD THIS GO? IT ALSO NEEDS TO BE TESTED
   sortFavourites: function(a, b) {
     if (!a.get('favourite')) return -1;
