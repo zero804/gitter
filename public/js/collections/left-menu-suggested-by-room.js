@@ -51,7 +51,6 @@ module.exports = SuggestedRoomsByRoomCollection.extend({
     //If we have not changed room dont fetch
     if(!this.contextModel.changed.roomId) { return }
 
-    console.log('fetch');
     this.fetch();
   },
 
