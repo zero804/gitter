@@ -54,11 +54,9 @@ BackendMuxer.prototype.findResults = function(method, args) {
 
   return resolveUserBackends(this.user)
     .then(function(userBackends) {
-      var promises = userBackends.map(function(backend) {
+      return Promise.map(userBackends, function(backend) {
         return backend[method].apply(backend, args);
       });
-
-      return Promise.all(promises);
     });
 };
 

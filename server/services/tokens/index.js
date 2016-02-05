@@ -63,11 +63,11 @@ exports.validateToken = function(token, callback) {
  */
 exports.deleteToken = function(token, callback) {
   /* Delete the token from all caches simultaneously */
-  return Promise.all(PROVIDERS.map(function(provider) {
+  return Promise.map(PROVIDERS, function(provider) {
       return Promise.fromCallback(function(callback) {
         provider.deleteToken(token, callback);
       });
-    }))
+    })
     .nodeify(callback);
 };
 
@@ -75,10 +75,10 @@ exports.deleteToken = function(token, callback) {
 exports.testOnly = {
   invalidateCache: function() {
     /* Invalidate all caches simultaneously */
-    return Promise.all(PROVIDERS.map(function(provider) {
+    return Promise.map(PROVIDERS, function(provider) {
       return Promise.fromCallback(function(callback) {
         provider.invalidateCache(callback);
       });
-    }));
+    });
   }
 };
