@@ -6,7 +6,7 @@
 function getHamcrest() {
   try {
     return require('jsmockito/node_modules/jshamcrest').JsHamcrest;
-  } catch(e) {
+  } catch (e) {
     return require('jsmockito').JsHamcrest;
   }
 }
@@ -504,32 +504,30 @@ describe('presenceService', function () {
     var userId = 'TESTUSER4' + Date.now();
     var socketId = 'TESTSOCKET5' + Date.now();
 
+    var redisClient = presenceService.testOnly.redisClient;
+    redisClient = Promise.promisifyAll(redisClient);
+
     return presenceService.userSocketConnected(userId, socketId, 'online', 'test', 'faye', null, null, null, null)
       .then(function () {
-
-        var redisClient = presenceService.testOnly.redisClient;
-        redisClient = Promise.promisifyAll(redisClient);
-
         // now mess things up intentionally
-        return redisClient.zincrbyAsync(presenceService.testOnly.ACTIVE_USERS_KEY, 1, userId)
-          .then(function () {
-            presenceService.testOnly.forceDelay = true;
-            presenceService.testOnly.onAfterDelay = function () {
-              return presenceService.socketDisconnected(socketId);
-            };
+        return redisClient.zincrbyAsync(presenceService.testOnly.ACTIVE_USERS_KEY, 1, userId);
+      })
+      .then(function () {
+        presenceService.testOnly.forceDelay = true;
+        presenceService.testOnly.onAfterDelay = function () {
+          return presenceService.socketDisconnected(socketId);
+        };
 
-            return presenceService.testOnly.validateUsersSubset([userId]);
-          })
-          .then(function () {
-            assert.ok(false, 'Expected an error');
-          }, function (err) {
-            assert(err.rollback, 'Expected a transaction rollback');
-          })
-          .finally(function () {
-            presenceService.testOnly.forceDelay = false;
-            presenceService.testOnly.onAfterDelay = null;
-          });
-
+        return presenceService.testOnly.validateUsersSubset([userId]);
+      })
+      .then(function () {
+        assert.ok(false, 'Expected an error');
+      }, function (err) {
+        assert(err.rollback, 'Expected a transaction rollback');
+      })
+      .finally(function () {
+        presenceService.testOnly.forceDelay = false;
+        presenceService.testOnly.onAfterDelay = null;
       });
 
   });
