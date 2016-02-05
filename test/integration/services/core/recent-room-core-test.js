@@ -2,7 +2,7 @@
 
 var testRequire   = require('../../test-require');
 var assert        = require('assert');
-var Q             = require('q');
+var Promise       = require('bluebird');
 var fixtureLoader = require('../../test-fixtures');
 
 var recentRoomCore = testRequire("./services/core/recent-room-core");
@@ -158,7 +158,7 @@ describe('recent-room-core', function() {
     });
 
     it('should handle non default values', function(done) {
-      return Q.all([
+      return Promise.all([
           recentRoomCore.saveUserTroupeLastAccess(fixture.user1.id, fixture.troupe1.id),
           recentRoomCore.saveUserTroupeLastAccess(fixture.user2.id, fixture.troupe1.id)
         ])

@@ -5,7 +5,7 @@ var troupeService = require('./troupe-service');
 var persistence = require('./persistence-service');
 var nconf = require('../utils/config');
 var debug = require('debug')('gitter:assert-room-limit');
-var Q = require('q');
+var Promise = require('bluebird');
 var roomMembershipService = require('./room-membership-service');
 
 var maxFreeOrgRoomMembers = nconf.get('maxFreeOrgRoomMembers');
@@ -16,7 +16,7 @@ function assertMemberLimit(room, user) {
 
   if (room.security === 'PUBLIC') {
     debug('%s is a public room. you dont need to pay.', uri);
-    return Q.resolve();
+    return Promise.resolve();
   }
 
   return checkUserInRoom(user, room)
@@ -63,7 +63,7 @@ function assertMemberLimit(room, user) {
 }
 
 function checkUserInRoom(user, room) {
-  if (!user) return Q.resolve(false);
+  if (!user) return Promise.resolve(false);
   return roomMembershipService.checkRoomMembership(room._id, user._id);
 }
 

@@ -4,7 +4,7 @@ var userService   = require('../../services/user-service');
 var troupeService = require('../../services/troupe-service');
 var chatService   = require('../../services/chat-service');
 var nconf         = require('../../utils/config');
-var Q             = require('q');
+var Promise       = require('bluebird');
 var StatusError   = require('statuserror');
 
 var env           = require('gitter-web-env');
@@ -98,7 +98,7 @@ module.exports = function (req, res, next) {
               return chatService.newChatMessageToTroupe(room, user, { text: text });
             });
 
-            return Q.all(promises);
+            return Promise.all(promises);
           });
       })
       .then(function () {

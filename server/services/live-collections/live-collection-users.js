@@ -1,9 +1,9 @@
 'use strict';
 
-var _              = require('underscore');
-var Q              = require('q');
-var appEvents      = require('gitter-web-appevents');
-var restSerializer = require("../../serializers/rest-serializer");
+var _                     = require('lodash');
+var Promise               = require('bluebird');
+var appEvents             = require('gitter-web-appevents');
+var restSerializer        = require("../../serializers/rest-serializer");
 var roomMembershipService = require('../room-membership-service');
 
 function getRoomDistribution(userId) {
@@ -11,7 +11,7 @@ function getRoomDistribution(userId) {
 }
 
 function serializeUserToRooms(troupeIds, operation, user) {
-  if (!troupeIds.length) return Q.resolve();
+  if (!troupeIds.length) return Promise.resolve();
 
   return restSerializer.serializeModel(user)
     .then(function(serializedUser) {
@@ -57,11 +57,11 @@ module.exports = {
 
   remove: function(/*userId*/) {
     // Not yet implemented
-    return Q.resolve();
+    return Promise.resolve();
   },
 
   removeId: function(/*userId*/) {
     // Not yet implemented
-    return Q.resolve();
+    return Promise.resolve();
   }
 };

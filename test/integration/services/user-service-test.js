@@ -1,10 +1,12 @@
 /*global describe:true, it:true, before:true, after:true */
 "use strict";
 
-var testRequire        = require('./../test-require');
-var fixtureLoader      = require('../test-fixtures');
-var assert             = testRequire("assert");
-var Q                  = require('q');
+var testRequire   = require('./../test-require');
+var fixtureLoader = require('../test-fixtures');
+var assert        = testRequire("assert");
+var Promise       = require('bluebird');
+
+
 var fixture2 = {};
 
 describe("User Service", function() {
@@ -19,7 +21,7 @@ describe("User Service", function() {
     var userService = testRequire("./services/user-service");
 
     var githubId = fixture2.generateGithubId();
-    Q.all([
+    Promise.all([
       userService.findOrCreateUserForGithubId({ githubId: githubId, username: fixture2.generateUsername(), githubToken: fixture2.generateGithubToken() }),
       userService.findOrCreateUserForGithubId({ githubId: githubId, username: fixture2.generateUsername(), githubToken: fixture2.generateGithubToken() })
       ])

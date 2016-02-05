@@ -15,9 +15,9 @@ describe('badger-service #slow', function() {
   this.timeout(100000);
   it('should create pull requests for repos that do not have a master branch', function(done) {
     return badgerService.sendBadgePullRequest('gittertestbot/does-not-have-a-master-branch', USER)
-      .fin(function() {
+      .finally(function() {
         return client.del('/repos/gitter-badger/does-not-have-a-master-branch', { })
-          .fail(function() {});
+          .catch(function() {});
       })
       .nodeify(done);
   });
@@ -26,9 +26,9 @@ describe('badger-service #slow', function() {
     return badgerService.sendBadgePullRequest('gittertestbot/no-readme-markdown-file-2', USER)
       .then(function() {
       })
-      .fin(function() {
+      .finally(function() {
         return client.del('/repos/gitter-badger/no-readme-markdown-file-2', { })
-          .fail(function() {});
+          .catch(function() {});
       })
       .nodeify(done);
   });
@@ -37,9 +37,9 @@ describe('badger-service #slow', function() {
     return badgerService.sendBadgePullRequest('gittertestbot/readme-dot-markdown', USER)
       .then(function() {
       })
-      .fin(function() {
+      .finally(function() {
         return client.del('/repos/gitter-badger/readme-dot-markdown', { })
-          .fail(function() {});
+          .catch(function() {});
       })
       .nodeify(done);
   });
@@ -48,9 +48,9 @@ describe('badger-service #slow', function() {
     return badgerService.sendBadgePullRequest('gittertestbot/readme-dot-textile', USER)
       .then(function() {
       })
-      .fin(function() {
+      .finally(function() {
         return client.del('/repos/gitter-badger/readme-dot-textile', { })
-          .fail(function() {});
+          .catch(function() {});
       })
       .nodeify(done);
   });
@@ -59,9 +59,9 @@ describe('badger-service #slow', function() {
     return badgerService.sendBadgePullRequest('gittertestbot/readme-dot-rst', USER)
       .then(function() {
       })
-      .fin(function() {
+      .finally(function() {
         return client.del('/repos/gitter-badger/readme-dot-rst', { })
-          .fail(function() {});
+          .catch(function() {});
       })
       .nodeify(done);
   });
@@ -70,9 +70,9 @@ describe('badger-service #slow', function() {
     return badgerService.sendBadgePullRequest('gittertestbot/readme-dot-txt', USER)
       .then(function() {
       })
-      .fin(function() {
+      .finally(function() {
         return client.del('/repos/gitter-badger/readme-dot-txt', { })
-          .fail(function() {});
+          .catch(function() {});
       })
       .nodeify(done);
   });
