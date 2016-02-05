@@ -3,26 +3,18 @@
 
 "use strict";
 
-var testRequire         = require('../../test-require');
-var assert              = require("assert");
-var mockito             = require('jsmockito').JsMockito;
-var Q                   = require('q');
-// var chatService         = testRequire('./services/chat-service');
+var testRequire = require('../../test-require');
+var assert      = require("assert");
+var mockito     = require('jsmockito').JsMockito;
+var Promise     = require('bluebird');
+
 var userSettingsService = testRequire('./services/user-settings-service');
 var userTroupeSettingsService = testRequire('./services/user-troupe-settings-service');
 var fixtureLoader       = require('../../test-fixtures');
 var underlyingUnreadItemService = testRequire('./services/unread-item-service');
 var mongoUtils = testRequire('./utils/mongo-utils');
 
-var times  = mockito.Verifiers.times;
-var never  = mockito.Verifiers.never();
-var once   = times(1);
-var twice  = times(2);
-var thrice = times(3);
-
-
 var unreadItemServiceMock = mockito.spy(underlyingUnreadItemService);
-// unreadItemServiceMock.install();
 
 describe('email-notification-generator-service', function() {
   this.timeout(5000);
@@ -46,8 +38,6 @@ describe('email-notification-generator-service', function() {
     });
 
     var itemId1 = mongoUtils.getNewObjectIdString();
-    var itemId2 = mongoUtils.getNewObjectIdString();
-    var itemId3 = mongoUtils.getNewObjectIdString();
     var troupeId = fixture.troupe1.id;
 
     var u = 0, v = 0;
@@ -66,10 +56,10 @@ describe('email-notification-generator-service', function() {
         assert.equal(troupeWithCounts[0].troupe.id, troupeId);
       }
 
-      return Q.resolve();
+      return Promise.resolve();
     });
 
-    Q.all([
+    Promise.all([
       userSettingsService.setUserSettings(fixture.user2.id, 'unread_notifications_optout', false),
       ])
       .then(function() {
@@ -96,8 +86,6 @@ describe('email-notification-generator-service', function() {
     });
 
     var itemId1 = mongoUtils.getNewObjectIdString();
-    var itemId2 = mongoUtils.getNewObjectIdString();
-    var itemId3 = mongoUtils.getNewObjectIdString();
     var troupeId = fixture.troupe1.id;
 
     var v = 0;
@@ -111,10 +99,10 @@ describe('email-notification-generator-service', function() {
         assert.equal(troupeWithCounts[0].troupe.id, fixture.troupe1.id);
       }
 
-      return Q.resolve();
+      return Promise.resolve();
     });
 
-    Q.all([
+    Promise.all([
       userSettingsService.setUserSettings(fixture.user2.id, 'unread_notifications_optout', true),
       ])
       .then(function() {
@@ -143,7 +131,7 @@ describe('email-notification-generator-service', function() {
 
     var itemId1 = mongoUtils.getNewObjectIdString();
     var itemId2 = mongoUtils.getNewObjectIdString();
-    var itemId3 = mongoUtils.getNewObjectIdString();
+
     var troupeId = fixture.troupe1.id;
 
     var v = 0;
@@ -157,11 +145,11 @@ describe('email-notification-generator-service', function() {
         assert.equal(troupeWithCounts[0].troupe.id, fixture.troupe1.id);
       }
 
-      return Q.resolve();
+      return Promise.resolve();
     });
 
 
-    return Q.all([
+    return Promise.all([
         userSettingsService.setUserSettings(fixture.user2.id, 'unread_notifications_optout', true),
         userTroupeSettingsService.setUserSettings(fixture.user2.id, troupeId, 'notification', { push:  "all" }), // <-- NB
       ])
@@ -169,7 +157,7 @@ describe('email-notification-generator-service', function() {
         return unreadEngine.newItemWithMentions(troupeId, itemId1, [fixture.user2.id, fixture.user3.id], []);
       })
       .then(function() {
-        return Q.all([
+        return Promise.all([
           underlyingUnreadItemService.markAllChatsRead(fixture.user1.id, fixture.troupe1.id),
           underlyingUnreadItemService.markAllChatsRead(fixture.user3.id, fixture.troupe1.id)
         ]);
@@ -199,8 +187,6 @@ it('SHOULD NOT email somebody who has opted out of notifications set to mention 
 
   var v = 0;
   var itemId1 = mongoUtils.getNewObjectIdString();
-  var itemId2 = mongoUtils.getNewObjectIdString();
-  var itemId3 = mongoUtils.getNewObjectIdString();
   var troupeId = fixture.troupe1.id;
 
   mockito.when(emailNotificationServiceMock).sendUnreadItemsNotification().then(function(user, troupeWithCounts) {
@@ -213,10 +199,10 @@ it('SHOULD NOT email somebody who has opted out of notifications set to mention 
       assert.equal(troupeWithCounts[0].troupe.id, fixture.troupe1.id);
     }
 
-    return Q.resolve();
+    return Promise.resolve();
   });
 
-  return Q.all([
+  return Promise.all([
       underlyingUnreadItemService.markAllChatsRead(fixture.user2.id, fixture.troupe1.id),
       userSettingsService.setUserSettings(fixture.user2.id, 'unread_notifications_optout', false),
       userTroupeSettingsService.setUserSettings(fixture.user2.id, fixture.troupe1.id, 'notifications', { push: "mentions" } ), // <-- NB
@@ -262,10 +248,10 @@ it('SHOULD NOT email somebody who has opted out of notifications set to mention 
         assert.equal(troupeWithCounts.length, 1);
         assert.equal(troupeWithCounts[0].troupe.id, fixture.troupe1.id);
       }
-      return Q.resolve();
+      return Promise.resolve();
     });
 
-    Q.all([
+    Promise.all([
       userSettingsService.setUserSettings(fixture.user2.id, 'unread_notifications_optout', false),
       userTroupeSettingsService.setUserSettings(fixture.user2.id, fixture.troupe1.id, 'notifications', { push: "all" } ), // <-- NB
       unreadEngine.newItemWithMentions(troupeId, itemId1, [fixture.user2.id, fixture.user3.id], [])

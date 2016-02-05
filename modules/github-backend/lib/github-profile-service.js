@@ -2,6 +2,8 @@
 
 var Mirror = require('gitter-web-github').GitHubMirrorService('user');
 
+// TODO: why on earth is this using the mirror service and
+// not the user service? @lerouxb
 
 module.exports = function gitHubProfileService(gitHubUser, options) {
   options = options || {};

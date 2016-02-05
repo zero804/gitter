@@ -3,7 +3,7 @@
 
 var troupeService     = require("../../services/troupe-service");
 var presenceService   = require("gitter-web-presence");
-var Q                 = require("q");
+var Promise           = require('bluebird');
 var winston           = require('../../utils/winston');
 var collections       = require("../../utils/collections");
 var GithubContributorService = require('gitter-web-github').GitHubContributorService;
@@ -42,7 +42,7 @@ function UserRoleInTroupeStrategy(options) {
   var ownerLogin;
 
   this.preload = function(unused, callback) {
-    return Q.fcall(function() {
+    return Promise.try(function() {
         if(options.includeRolesForTroupe) return options.includeRolesForTroupe;
 
         if(options.includeRolesForTroupeId) {
@@ -55,8 +55,9 @@ function UserRoleInTroupeStrategy(options) {
         if(troupe.githubType !== 'REPO') return;
         var userPromise;
 
-        if(options.currentUser) userPromise = Q.resolve(options.currentUser);
-        if(options.currentUserId) {
+        if(options.currentUser) {
+          userPromise = Promise.resolve(options.currentUser);
+        } else if(options.currentUserId) {
           userPromise = leanUserDao.findById(options.currentUserId);
         }
 

@@ -1,23 +1,23 @@
 'use strict';
 
-var Q = require('q');
+var Promise = require('bluebird');
 
 function GoogleBackend(user, identity) {
   this.user = user;
   this.identity = identity;
 }
 
-GoogleBackend.prototype.getEmailAddress = function(options) {
-  return Q.resolve(this.identity.email);
-};
+GoogleBackend.prototype.getEmailAddress = Promise.method(function(options) {
+  return this.identity.email;
+});
 
-GoogleBackend.prototype.findOrgs = function() {
-  return Q.resolve([]);
-};
+GoogleBackend.prototype.findOrgs = Promise.method(function() {
+  return [];
+});
 
-GoogleBackend.prototype.getProfile = function() {
+GoogleBackend.prototype.getProfile = Promise.method(function() {
   // TODO: gravatar or fullcontact?
-  return Q.resolve({provider: 'google'});
-};
+  return { provider: 'google' };
+});
 
 module.exports = GoogleBackend;

@@ -1,19 +1,19 @@
 /* jshint node:true */
 "use strict";
 
-var format               = require('util').format;
-var github               = require('octonode');
-var _                    = require('underscore');
-var Q                    = require('q');
-var conf                 = require('../utils/config');
-var troupeTemplate       = require('../utils/troupe-template');
-var templatePromise      = troupeTemplate.compile('github-pull-request-body');
-var env                  = require('gitter-web-env');
-var logger               = env.logger;
-var stats                = env.stats;
-var StatusError          = require('statuserror');
-var badger               = require('readme-badger');
-var path                 = require('path');
+var format          = require('util').format;
+var github          = require('octonode');
+var _               = require('underscore');
+var Promise         = require('bluebird');
+var conf            = require('../utils/config');
+var troupeTemplate  = require('../utils/troupe-template');
+var templatePromise = troupeTemplate.compile('github-pull-request-body');
+var env             = require('gitter-web-env');
+var logger          = env.logger;
+var stats           = env.stats;
+var StatusError     = require('statuserror');
+var badger          = require('readme-badger');
+var path            = require('path');
 
 function insertBadge(repo, content, fileExt, user) {
   var imageUrl = conf.get('web:badgeBaseUrl') + '/' + repo + '.svg';
@@ -33,15 +33,14 @@ function Client(token) {
   var self = this;
   ['get', 'post', 'patch', 'put', 'del'].forEach(function(operation) {
     self[operation] = function(url, options) {
-      var d = Q.defer();
-      client[operation](url, options, function(err, status, body) {
-        if(err) return d.reject(err);
+      return new Promise(function(resolve, reject) {
+        client[operation](url, options, function(err, status, body) {
+          if(err) return reject(err);
 
-        if(status >= 400) return d.reject(new StatusError(status, body && body.message || 'HTTP ' + status));
-        d.resolve(body);
+          if(status >= 400) return reject(new StatusError(status, body && body.message || 'HTTP ' + status));
+          resolve(body);
+        });
       });
-
-      return d.promise;
     };
   });
 }
@@ -105,7 +104,7 @@ function ReadmeUpdater(context) {
     function get() {
       var timeTaken = (Date.now() - start) / 1000;
       if(timeTaken > 300 /* 5 minutes */) {
-        return Q.reject(new Error('Timeout awaiting git data for ' + repo + ' after ' + timeTaken + 's'));
+        return Promise.reject(new Error('Timeout awaiting git data for ' + repo + ' after ' + timeTaken + 's'));
       }
 
       // Exponential backoff
@@ -114,13 +113,13 @@ function ReadmeUpdater(context) {
       return client.get(url, {}).
         then(function(refs) {
           if(!refs || !Array.isArray(refs) || !refs.length) {
-            return Q.delay(delay).then(get);
+            return Promise.delay(delay).then(get);
           }
 
           return refs;
         }, function(err) {
           logger.info('Ignoring failed GitHub request to ' + url + ' failed: ' + err);
-          return Q.delay(delay).then(get);
+          return Promise.delay(delay).then(get);
         });
     }
 
@@ -194,7 +193,7 @@ function ReadmeUpdater(context) {
   }
 
   function updateReadme(treeUrl) {
-    return Q.all([client.get(treeUrl, {}), getExistingReadme()])
+    return Promise.all([client.get(treeUrl, {}), getExistingReadme()])
       .spread(function(tree, readme) {
         var existingReadme = findReadme(tree.tree, readme && readme.path);
 

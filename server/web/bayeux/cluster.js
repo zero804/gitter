@@ -12,7 +12,8 @@ var presenceService   = require('gitter-web-presence');
 var shutdown          = require('shutdown');
 var zlib              = require('zlib');
 var debug             = require('debug')('gitter:bayeux');
-var Q                 = require('q');
+var Promise           = require('bluebird');
+
 
 /* Disabled after the outage 8 April 2015 XXX investigate further */
 // var createDoormanExtension = require('./doorman');
@@ -243,15 +244,15 @@ BayeuxCluster.prototype.destroyClient = function(clientId, callback) {
 
   logger.info('bayeux: client ' + clientId + ' intentionally destroyed.');
 
-  var p1 = new Q.Promise(function(resolve) {
+  var p1 = new Promise(function(resolve) {
     engineNew.destroyClient(clientId, resolve);
   });
 
-  var p2 = new Q.Promise(function(resolve) {
+  var p2 = new Promise(function(resolve) {
     engineLegacy.destroyClient(clientId, resolve);
   });
 
-  return Q.all([p1, p2]).nodeify(callback);
+  return Promise.all([p1, p2]).nodeify(callback);
 };
 
 /**

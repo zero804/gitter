@@ -1,14 +1,14 @@
 "use strict";
 
-var Q              = require('q');
+var Promise        = require('bluebird');
 var appEvents      = require('gitter-web-appevents');
 var restSerializer = require("../../serializers/rest-serializer");
 var troupeService  = require('../troupe-service');
-var debug           = require('debug')('gitter:live-collection-room-members');
+var debug          = require('debug')('gitter:live-collection-room-members');
 
 function notifyGroupRoomOfAddedUsers(room, userIds) {
   /* No point in notifing large rooms */
-  if (room.userCount > 100) return Q.resolve();
+  if (room.userCount > 100) return Promise.resolve();
 
   debug("Notifying room %s of new users having been added", room._id);
 
@@ -38,14 +38,14 @@ function notifyUsersOfAddedGroupRooms(room, userIds) {
 }
 
 function notifyUsersOfAddedOneToOneRooms(room, userIds) {
-  return Q.all(userIds.map(function(userId) {
+  return Promise.map(userIds, function(userId) {
     var strategy = new restSerializer.TroupeStrategy({ currentUserId: userId, isRoomMember: true });
 
     return restSerializer.serialize(room, strategy)
       .then(function(serializedRoom) {
         appEvents.dataChange2('/user/' + userId + '/rooms', "create", serializedRoom, 'room');
       });
-  }));
+  });
 }
 
 module.exports = {
@@ -57,7 +57,7 @@ module.exports = {
           return notifyUsersOfAddedOneToOneRooms(room, userIds);
         }
 
-        return Q.all([
+        return Promise.all([
           notifyGroupRoomOfAddedUsers(room, userIds),
           notifyUsersOfAddedGroupRooms(room, userIds)
         ]);
@@ -74,7 +74,7 @@ module.exports = {
       appEvents.userRemovedFromTroupe({ troupeId: troupeId, userId: userId });
     });
 
-    return Q.resolve();
+    return Promise.resolve();
   },
 
   lurkChange: function(troupeId, userIds, lurk) {
@@ -85,7 +85,7 @@ module.exports = {
       appEvents.dataChange2('/user/' + userId + '/rooms', 'patch', { id: troupeId, lurk: lurk }, 'room');
     });
 
-    return Q.resolve();
+    return Promise.resolve();
   }
 
 };

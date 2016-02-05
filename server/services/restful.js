@@ -3,7 +3,7 @@
 var env                   = require('gitter-web-env');
 var logger                = env.logger;
 
-var Q                     = require('q');
+var Promise               = require('bluebird');
 var StatusError           = require('statuserror');
 var _                     = require('underscore');
 var gitHubProfileService  = require('gitter-web-github-backend/lib/github-profile-service');
@@ -30,7 +30,7 @@ var DEFAULT_USERS_LIMIT = 30;
 var MAX_USERS_LIMIT = 100;
 
 exports.serializeTroupesForUser = function(userId, callback) {
-  if(!userId) return Q.resolve([]);
+  if(!userId) return Promise.resolve([]);
 
   return roomService.findAllRoomsIdsForUserIncludingMentions(userId)
     .spread(function(allTroupeIds, nonMemberTroupeIds) {
@@ -90,7 +90,7 @@ exports.serializeUsersForTroupe = function(troupeId, userId, options) {
 
   if(searchTerm) {
     if (survivalMode) {
-      return Q.resolve([]);
+      return Promise.resolve([]);
     }
 
     return userSearchService.searchForUsersInRoom(searchTerm, troupeId, { limit: limit })
@@ -116,7 +116,7 @@ exports.serializeUsersForTroupe = function(troupeId, userId, options) {
 
 
 exports.serializeUnreadItemsForTroupe = function(troupeId, userId, callback) {
-  return Q.all([
+  return Promise.all([
       roomMembershipService.getMemberLurkStatus(troupeId, userId),
       unreadItemService.getUnreadItemsForUser(userId, troupeId)
     ])
