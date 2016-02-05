@@ -2,17 +2,17 @@
 
   @panel-border-width: (@desktop-menu-left-padding / 2);
 
-  box-sizing:   border-box;
-  position:     absolute;
-  top:          0;
-  left:         0;
-  height:       100%;
-  padding-left: 100%;
-
-  background-image:    url('../images/left-menu-background.jpg');
-  background-position: bottom right;
-  background-repeat:   no-repeat;
-  background-size:     cover;
+  box-sizing:       border-box;
+  position:         absolute;
+  top:              0;
+  left:             0;
+  height:           100%;
+  padding-left:     100%;
+  background-image: linear-gradient(
+    #442b86 40%,
+    #ba65ad 80%,
+    #d54160
+  );
 
   //TODO Check how this works on other monitor sizes
   transform:    translateX(-78%);
@@ -23,13 +23,13 @@
 
   &.active {
     transform: translateX(0);
-    &:before { background-color: rgba(255,255,255,.1); }
+    &:after { background-color: rgba(255,255,255,.1); }
     //Ouch @MadLittleMods may pwn me for this ;) JP 25/1/16
     & > * { opacity: 1; }
   }
 
   //Right hand border
-  &:before {
+  &:after {
     content:  ' ';
     display:  inline-block;
     position: absolute;
@@ -41,26 +41,19 @@
     transition: background-color .2s liner;
   }
 
-  &:after {
-    content:         ' ';
-    display:         flex;
-    justify-content: center;
-    align-items:     center;
-    position:        absolute;
-    top:             0;
-    left:            0;
-    width:           100%;
-    height:          100%;
-    color:           @menu-item-color;
-    pointer-events:  none;
-    transition:      opacity .2s ease-in-out;
-    opacity:         0;
-  }
-
-  &.loading {
-    &:after {
-      opacity: 1;
-    }
+  //image background
+  &:before {
+    content:             ' ';
+    display:             inline-block;
+    position:            absolute;
+    top:                 0;
+    left:                0;
+    width:               100%;
+    height:              100%;
+    background-image:    url('../images/left-menu-background.jpg');
+    background-position: bottom right;
+    background-repeat:   no-repeat;
+    background-size:     cover;
   }
 
   .mobile & {
