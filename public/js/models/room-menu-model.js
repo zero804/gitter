@@ -123,21 +123,29 @@ module.exports = Backbone.Model.extend({
 
     //TODO Test this JP 27/1/15
     switch (val) {
-      case 'search':
-        this.primaryCollection.switchCollection(this.searchRoomAndPeople);
-        this.secondaryCollection.switchCollection(this.searchChatMessages);
-        this.tertiaryCollection.switchCollection(this.searchTerms);
-        break;
-      case 'org':
-        this.primaryCollection.switchCollection(this.activeRoomCollection);
-        this.secondaryCollection.switchCollection(this.suggestedOrgs);
-        this.tertiaryCollection.switchCollection(this._suggestedRoomCollection);
-        break;
       case 'all':
         this.primaryCollection.switchCollection(this.activeRoomCollection);
         this.secondaryCollection.switchCollection(this._suggestedRoomCollection);
         this.tertiaryCollection.switchCollection(this._orgCollection);
         break;
+
+      case 'search':
+        this.primaryCollection.switchCollection(this.searchRoomAndPeople);
+        this.secondaryCollection.switchCollection(this.searchChatMessages);
+        this.tertiaryCollection.switchCollection(this.searchTerms);
+        break;
+
+      case 'favourite':
+        this.primaryCollection.switchCollection(this.activeRoomCollection);
+        this.secondaryCollection.switchCollection(this._suggestedRoomCollection);
+        break;
+
+      case 'org':
+        this.primaryCollection.switchCollection(this.activeRoomCollection);
+        this.secondaryCollection.switchCollection(this.suggestedOrgs);
+        this.tertiaryCollection.switchCollection(this._suggestedRoomCollection);
+        break;
+
       default:
         this.primaryCollection.switchCollection(this.activeRoomCollection);
         this.secondaryCollection.switchCollection(new Backbone.Collection(null));
