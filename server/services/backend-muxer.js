@@ -69,28 +69,34 @@ BackendMuxer.prototype.findAllResults = function(method, args) {
     });
 };
 
+function getFirstResultForBackends(method, args) {
+  return function(backends) {
+    if (!backends.length) return Promise.resolve();
+
+    var i = 0;
+
+    function tryNext() {
+      if (i >= backends.length) return Promise.resolve();
+
+      var nextBackend = backends[i];
+      return nextBackend[method].apply(nextBackend, args)
+        .then(function(result) {
+          if (result) return result;
+
+          i++;
+          return tryNext();
+        });
+    }
+
+    return tryNext();
+  };
+}
+
 // Try the backends one by one and return the first one that returns a result's
 // result.
 BackendMuxer.prototype.getFirstResult = function(method, args) {
-  args = args || [];
-
   return resolveUserBackends(this.user)
-    .then(function(userBackends) {
-
-      function tryNext() {
-        var nextBackend = userBackends.shift();
-        if (!nextBackend) return Promise.resolve(); // with an empty value
-
-        return nextBackend[method].apply(nextBackend, args)
-          .then(function(result) {
-            if (result) return result;
-
-            return tryNext();
-          });
-      }
-
-      return tryNext();
-    });
+    .then(getFirstResultForBackends(method, args || []));
 };
 
 BackendMuxer.prototype.getEmailAddress = function(preferStoredEmail) {
@@ -103,6 +109,10 @@ BackendMuxer.prototype.findOrgs = function() {
 
 BackendMuxer.prototype.findProfiles = function() {
   return this.findResults('getProfile');
+};
+
+BackendMuxer.testOnly = {
+  getFirstResultForBackends: getFirstResultForBackends
 };
 
 module.exports = BackendMuxer;
