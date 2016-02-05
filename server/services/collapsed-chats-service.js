@@ -8,33 +8,9 @@ var Scripto     = require('gitter-redis-scripto');
 var scriptManager    = new Scripto(redisClient);
 scriptManager.loadFromDir(__dirname + '/../../redis-lua/collapsed');
 
-function runScript(script, keys, values) {
-  return new Promise(function(resolve, reject) {
-    scriptManager.run(script, keys, values, function(err, result) {
-      if (err) return reject(err);
-
-      resolve(result);
-    });
-  });
-}
-
-function redisClient_zrange(key, start, stop) {
-  return new Promise(function(resolve, reject) {
-    redisClient.zrange(key, start, stop, function(err, result) {
-      if (err) return reject(err);
-      resolve(result);
-    });
-  });
-}
-
-function redisClient_del(key) {
-  return new Promise(function(resolve, reject) {
-    redisClient.del(key, function(err, result) {
-      if (err) return reject(err);
-      resolve(result);
-    });
-  });
-}
+var runScript = Promise.promisify(scriptManager.run, { context: scriptManager });
+var redisClient_zrange = Promise.promisify(redisClient.zrange, { context: redisClient });
+var redisClient_del = Promise.promisify(redisClient.del, { context: redisClient });
 
 /*
 
