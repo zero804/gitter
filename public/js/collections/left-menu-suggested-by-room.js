@@ -37,7 +37,9 @@ module.exports = SuggestedRoomsByRoomCollection.extend({
   onDataUpdate: function () {
     //check the menu state
     var currentMenuState = this.roomMenuModel.get('state');
-    if(currentMenuState !== 'all') { return }
+    if(currentMenuState !== 'all' &&
+       currentMenuState !== 'favourite'  &&
+       currentMenuState !== 'org') { return }
 
     //check the current state of the room
     var currentRoomId = this.troupeModel.get('id');
@@ -45,6 +47,11 @@ module.exports = SuggestedRoomsByRoomCollection.extend({
 
     //update url and get data
     this.contextModel.set('roomId', currentRoomId);
+
+    //If we have not changed room dont fetch
+    if(!this.contextModel.changed.roomId) { return }
+
+    console.log('fetch');
     this.fetch();
   },
 
