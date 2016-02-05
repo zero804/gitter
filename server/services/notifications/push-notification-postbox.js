@@ -71,7 +71,7 @@ function filterNotificationsForPush(troupeId, chatId, userIds, mentioned) {
   // may well be much faster
   return userTroupeSettingsService.getUserTroupeSettingsForUsersInTroupe(troupeId, 'notifications', userIds)
     .then(function(settings) {
-      return Promise.all(userIds.map(function(userId) {
+      return Promise.map(userIds, function(userId) {
         var notificationSettings = settings[userId];
         var pushNotificationSetting = notificationSettings && notificationSettings.push || 'all';
 
@@ -116,7 +116,7 @@ function filterNotificationsForPush(troupeId, chatId, userIds, mentioned) {
             }, { delay: delay });
 
           });
-      }));
+      });
     });
 }
 
