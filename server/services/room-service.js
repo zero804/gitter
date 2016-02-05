@@ -1091,7 +1091,7 @@ function revalidatePermissionsForUsers(room) {
               if (!removalUserIds.length) return;
               return roomMembershipService.removeRoomMembers(room._id, removalUserIds);
             });
-          })
+          });
     });
 
 }
