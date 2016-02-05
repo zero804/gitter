@@ -633,32 +633,21 @@ describe('presenceService', function() {
             {userId: userId1, troupeId: troupeId },
             {userId: userId2, troupeId: troupeId },
             {userId: userId3, troupeId: troupeId }
-            ], function(err, c) {
+        ])
+        .then(function(c) {
+          assert.equal(c.inTroupe.length, 1);
+          assert.equal(c.inTroupe[0].userId, userId1);
+          assert.equal(c.inTroupe[0].troupeId, troupeId);
 
-          if(err) return done(err);
+          assert.equal(c.online.length, 1);
+          assert.equal(c.online[0].userId, userId2);
+          assert.equal(c.online[0].troupeId, troupeId);
 
-          try {
-
-            assert.equal(c.inTroupe.length, 1);
-            assert.equal(c.inTroupe[0].userId, userId1);
-            assert.equal(c.inTroupe[0].troupeId, troupeId);
-
-            assert.equal(c.online.length, 1);
-            assert.equal(c.online[0].userId, userId2);
-            assert.equal(c.online[0].troupeId, troupeId);
-
-
-            assert.equal(c.offline.length, 1);
-            assert.equal(c.offline[0].userId, userId3);
-            assert.equal(c.offline[0].troupeId, troupeId);
-
-          } catch(e) {
-            throw e;
-          }
-
-          done();
-        });
-
+          assert.equal(c.offline.length, 1);
+          assert.equal(c.offline[0].userId, userId3);
+          assert.equal(c.offline[0].troupeId, troupeId);
+        })
+        .nodeify(done);
 
       });
     });
