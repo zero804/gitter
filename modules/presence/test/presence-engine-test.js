@@ -288,6 +288,8 @@ describe('presenceService', function() {
         var signal = signals.shift();
 
         presenceService.clientEyeballSignal(userId, socketId, signal, function(err) {
+          if (err) return done(err);
+
           assertUserTroupeStatus(signal, function(err, done) {
             if(err) return done(err);
             doNext();
@@ -514,6 +516,8 @@ describe('presenceService', function() {
     var socketId2 = 'TESTSOCKET2' + Date.now();
 
     presenceService.userSocketConnected(userId1, socketId1, 'online', 'test', 'faye', null, null, null, null, function(err) {
+      if (err) return done(err);
+      
       presenceService.userSocketConnected(userId2, socketId2, 'mobile', 'test', 'faye', null, null, null, null, function(err) {
         if(err) return done(err);
 
