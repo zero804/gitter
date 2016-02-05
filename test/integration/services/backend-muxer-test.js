@@ -9,7 +9,7 @@ describe('backend-muxer', function() {
 
   describe('getFirstResultForBackends', function() {
     var getFirstResultForBackends = BackendMuxer.testOnly.getFirstResultForBackends;
-    var backend1, backend2, backend3, results;
+    var backend1, backend2, results;
 
     beforeEach(function() {
       results = [];
@@ -18,9 +18,6 @@ describe('backend-muxer', function() {
       };
       backend2 = {
         backendFn: function() { return Promise.resolve(results[1]); }
-      };
-      backend3 = {
-        backendFn: function() { return Promise.resolve(results[2]); }
       };
     });
 
