@@ -20,7 +20,6 @@ var ContextModel = Backbone.Model.extend({
   },
 
   onModelUpdate: function() {
-    console.log('update');
     if (this.roomMenuModel.get('state') !== 'search') { return this.set('active', false); }
 
     if (!this.roomMenuModel.get('searchTerm')) { return this.set('active', false); }
@@ -69,7 +68,6 @@ module.exports = BaseResolverCollection.extend({
   },
 
   onSearchTermUpdate: _.debounce(function (model, val){ //jshint unused: true
-    console.log('fetch');
     if(!this.contextModel.get('active')) { return }
     if(!val) { return }
     this.fetch();
