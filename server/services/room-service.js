@@ -1061,37 +1061,37 @@ exports.addUserToRoom = addUserToRoom;
 function revalidatePermissionsForUsers(room) {
   return roomMembershipService.findMembersForRoom(room._id)
     .then(function(userIds) {
-        if(!userIds.length) return [userIds, []];
+        if(!userIds.length) return;
 
-        return [userIds, userService.findByIds(userIds)];
-    })
-    .spread(function(userIds, users) {
-      var usersHash = collections.indexById(users);
+        return userService.findByIds(userIds)
+          .then(function(users) {
+            var usersHash = collections.indexById(users);
 
-      var removalUserIds = [];
+            var removalUserIds = [];
 
-      /** TODO: warning: this may run 10000 promises in parallel */
-      return Promise.all(userIds.map(function(userId) {
-        var user = usersHash[userId];
-        if(!user) {
-          // Can't find the user?, remove them
-          logger.warn('Unable to find user, removing from troupe', { userId: userId, troupeId: room.id });
-          removalUserIds.push(userId);
-          return;
-        }
+            /** TODO: warning: this may run 10000 promises in parallel */
+            return Promise.map(userIds, function(userId) {
+              var user = usersHash[userId];
+              if(!user) {
+                // Can't find the user?, remove them
+                logger.warn('Unable to find user, removing from troupe', { userId: userId, troupeId: room.id });
+                removalUserIds.push(userId);
+                return;
+              }
 
-        return roomPermissionsModel(user, 'join', room)
-          .then(function(access) {
-            if(!access) {
-              logger.warn('User no longer has access to room', { userId: userId, troupeId: room.id });
-              removalUserIds.push(userId);
-            }
-          });
-      }))
-      .then(function() {
-        if (!removalUserIds.length) return;
-        return roomMembershipService.removeRoomMembers(room._id, removalUserIds);
-      });
+              return roomPermissionsModel(user, 'join', room)
+                .then(function(access) {
+                  if(!access) {
+                    logger.warn('User no longer has access to room', { userId: userId, troupeId: room.id });
+                    removalUserIds.push(userId);
+                  }
+                });
+            })
+            .then(function() {
+              if (!removalUserIds.length) return;
+              return roomMembershipService.removeRoomMembers(room._id, removalUserIds);
+            });
+          })
     });
 
 }
