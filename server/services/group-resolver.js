@@ -35,16 +35,15 @@ module.exports = Promise.method(function resolve(room, user, groupNames) {
 
   if(!groupNames.length) return {}; // No point in continuing
 
-  return Promise.all(groupNames.map(function(groupName) {
+  return Promise.map(groupNames, function(groupName) {
       return resolveTeam(room, user, groupName);
-    }))
-    .then(function(arraysOfIserIds) {
+    })
+    .then(function(arraysOfUserIds) {
       // Turn the array of arrays into a hash
-      return arraysOfIserIds.reduce(function(memo, userIds, i) {
+      return arraysOfUserIds.reduce(function(memo, userIds, i) {
         var groupName = groupNames[i];
         memo[groupName] = userIds;
         return memo;
       }, {});
-
     });
 });
