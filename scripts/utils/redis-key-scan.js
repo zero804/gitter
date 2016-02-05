@@ -14,7 +14,7 @@ var redisClient = env.redis.getClient();
 function scanEmailNotifications() {
   var cursor = '0';
   function iter() {
-    return Promise.asCallback(function(callback) {
+    return Promise.fromCallback(function(callback) {
         redisClient.scan(cursor, 'COUNT', 10000, 'MATCH', 'resque:*', callback);
       })
       .spread(function(nextCursor, result) {
