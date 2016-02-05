@@ -32,15 +32,14 @@ describe("User Service", function() {
       .nodeify(done);
   });
 
-  it('should be able to create a \'ghost\' user using his username #slow', function(done) {
+  it('should be able to create a \'ghost\' user using his username #slow', function() {
     var userService = testRequire("./services/user-service");
 
-    userService.createInvitedUser('node-gitter')
-    .then(function(user) {
-      assert.equal(user.username,'node-gitter');
-      assert.equal(user.state, 'INVITED');
-    })
-    .nodeify(done);
+    return userService.createInvitedUser('node-gitter')
+      .then(function(user) {
+        assert.equal(user.username,'node-gitter');
+        assert.equal(user.state, 'INVITED');
+      });
   });
 
   it('should create new users', function(done) {
