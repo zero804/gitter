@@ -30,8 +30,8 @@ module.exports = Marionette.CompositeView.extend({
   },
 
   collectionEvents: {
-    'reset': 'onCollectionUpdate',
-    'sync':  'render'
+    'sync': 'render',
+    'filter-complete add remove reset': 'onFilterComplete'
   },
 
   childEvents: {
@@ -52,10 +52,6 @@ module.exports = Marionette.CompositeView.extend({
     }.bind(this));
   },
 
-  onCollectionUpdate: _.throttle(function() {
-    this.$el.toggleClass('empty', !this.collection.length);
-  }, 0),
-
   updateSelectedModel: function() {
     var selectedModel      = this.collection.findWhere({ selected: true });
     var newlySelectedModel = this.collection.findWhere({ id: context.troupe().get('id') });
@@ -71,20 +67,25 @@ module.exports = Marionette.CompositeView.extend({
     this.bus.trigger('navigation', url, 'chat', name);
   },
 
+  onFilterComplete: function (){
+    this.$el.toggleClass('empty', !this.collection.length);
+  },
+
   onBeforeRender: function() {
     this.$el.removeClass('loaded');
   },
 
   onRender: function() {
-    setTimeout(function() {
-      RAF(function() {
-        this.$el.addClass('loaded');
-      }.bind(this));
-    }.bind(this), 10);
+    this.$el.addClass('loaded');
+    this.$el.toggleClass('empty', !this.collection.length);
   },
 
   onDestroy: function() {
     this.stopListening(context.troupe());
+  },
+
+  render: function (){
+    Marionette.CompositeView.prototype.render.apply(this, arguments);
   },
 
 });

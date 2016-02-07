@@ -76,6 +76,12 @@ module.exports = BaseCollectionItemView.extend({
       });
   },
 
+  render: function (){
+    //TODO Figure out why there is soooo much rendering JP 5/2/16
+    if(!Object.keys(this.model.changed)) { return }
+    BaseCollectionItemView.prototype.render.apply(this, arguments);
+  },
+
   onDestroy: function() {
     this.stopListening(this.uiModel);
   },
