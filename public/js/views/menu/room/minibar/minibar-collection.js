@@ -1,6 +1,7 @@
 'use strict';
 
 var Backbone                     = require('backbone');
+//just use shared/
 var getSuggestedOrgsFromRoomList = require('../../../../../../shared/orgs/suggested-orgs-from-room-list');
 
 var defaultModels = [
@@ -32,6 +33,7 @@ module.exports = Backbone.Collection.extend({
 
     this.roomCollection = attrs.roomCollection;
     this.listenTo(this.roomCollection, 'snapshot', this.onCollectionSnapshot, this);
+    //TODO 'add remove events'
     this.listenTo(this.roomCollection, 'sync change', this.onCollectionUpdate, this);
     this.listenTo(this.roomCollection, 'remove reset', this.onItemRemoved, this);
 

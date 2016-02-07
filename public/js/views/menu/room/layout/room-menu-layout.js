@@ -87,7 +87,7 @@ module.exports = Marionette.LayoutView.extend({
     this.listenTo(this.dndCtrl, 'dnd:start-drag', this.onDragStart.bind(this));
     this.listenTo(this.dndCtrl, 'dnd:end-drag', this.onDragEnd.bind(this));
 
-    this.$el.find('#searc-results').show();
+    //this.$el.find('#searc-results').show();
   },
 
   onDragStart: function() {

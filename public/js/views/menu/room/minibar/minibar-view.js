@@ -62,6 +62,7 @@ module.exports = Marionette.CollectionView.extend({
     this.roomCollection = attrs.roomCollection;
 
     this.listenTo(this.roomCollection, 'add remove', this.render, this);
+    //collectionEVents
     this.listenTo(this.collection, 'snapshot', this.onCollectionSnapshot, this);
     this.listenTo(this.model, 'change:state change:selectedOrgName', this.onMenuStateUpdate, this);
   },

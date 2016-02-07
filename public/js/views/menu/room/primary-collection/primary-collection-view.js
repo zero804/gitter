@@ -26,6 +26,14 @@ var PrimaryCollectionView = BaseCollectionView.extend({
       this.listenTo(this.dndCtrl, 'room-menu:add-favourite', this.onFavouriteAdded, this);
       this.listenTo(this.dndCtrl, 'room-menu:sort-favourite', this.onFavouritesSorted, this);
     }
+
+    this.collection.on('all', function(type){
+      console.log('type', type);
+      if(type === 'sunc') {
+        console.log('--- SYNC ---');
+      }
+    });
+
   },
 
   filter: function (model, index){ //jshint unused: true
