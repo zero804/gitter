@@ -1,11 +1,12 @@
 "use strict";
-var env                       = require('gitter-web-env');
-var stats                     = env.stats;
-var recentRoomCore            = require('./core/recent-room-core');
-var userTroupeSettingsService = require('./user-troupe-settings-service');
-var unreadItemService         = require('./unread-item-service');
-var Promise                   = require('bluebird');
-var roomMembershipService     = require('./room-membership-service');
+
+var env                         = require('gitter-web-env');
+var stats                       = env.stats;
+var recentRoomCore              = require('./core/recent-room-core');
+var userRoomNotificationService = require('./user-room-notification-service');
+var unreadItemService           = require('./unread-item-service');
+var Promise                     = require('bluebird');
+var roomMembershipService       = require('./room-membership-service');
 
 /**
  * Returns a list of users who could be lurked
@@ -36,7 +37,7 @@ function findLurkCandidates(troupe, options) {
           return [
             oldUserIds,
             lurkStatus,
-            userTroupeSettingsService.getUserTroupeSettingsForUsersInTroupe(troupeId, 'notifications', oldUserIds),
+            userRoomNotificationService.findNotifySettingsForUsersInRoom(troupeId, oldUserIds),
             lastAccessDates
           ];
         });
@@ -46,10 +47,9 @@ function findLurkCandidates(troupe, options) {
       return oldUsersIds
         .filter(function(userId) {
           var notificationSettings = settings[userId];
-          var push = notificationSettings && notificationSettings.push;
           var isLurking = lurkStatus[userId];
 
-          return !isLurking || (push !== 'mute' && push !== 'mention');
+          return !isLurking || (notificationSettings !== 'mute' && notificationSettings !== 'mention');
         })
         .map(function(userId) {
           var notificationSettings = settings[userId];
@@ -57,7 +57,7 @@ function findLurkCandidates(troupe, options) {
 
           return {
             userId: userId,
-            notificationSettings: notificationSettings && notificationSettings.push,
+            notificationSettings: notificationSettings,
             lurk: isLurking,
             lastAccessTime: lastAccessDates[userId]
           };
@@ -125,10 +125,12 @@ function autoLurkInactiveUsers(troupe, options) {
           return candidate.userId;
         });
 
-      return Promise.all([
-        usersToChangeSettings.length && userTroupeSettingsService.setUserSettingsForUsersInTroupe(troupe.id, usersToChangeSettings, 'notifications', { push: 'mention' }),
-        usersToLurk.length && bulkLurkUsers(troupe.id, usersToLurk)
-      ]).thenReturn(candidates);
+      return Promise.join(
+        userRoomNotificationService.updateNotifySettingsForUsersInRoom(troupe._id, usersToChangeSettings, 'mention'),
+        usersToLurk.length && bulkLurkUsers(troupe.id, usersToLurk),
+        function() {
+          return candidates;
+        });
     });
 }
 exports.autoLurkInactiveUsers = autoLurkInactiveUsers;

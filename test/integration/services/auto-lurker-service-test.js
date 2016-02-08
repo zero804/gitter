@@ -10,7 +10,6 @@ var autoLurkerService = testRequire("./services/auto-lurker-service");
 var recentRoomService = testRequire("./services/recent-room-service");
 var roomMembershipService = testRequire("./services/room-membership-service");
 var roomService = testRequire("./services/room-service");
-var persistence = testRequire("./services/persistence-service");
 var userTroupeSettingsService = testRequire("./services/user-troupe-settings-service");
 
 describe('auto-lurker-service', function() {
@@ -28,7 +27,7 @@ describe('auto-lurker-service', function() {
       fixture.cleanup();
     });
 
-    it('#01 should return a lurk candidate',function(done) {
+    it('#01 should return a lurk candidate',function() {
       var tenDaysAgo = new Date(Date.now() - 86400000 * 10);
       return recentRoomService.saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupe1.id, { lastAccessTime: tenDaysAgo })
         .then(function() {
@@ -39,13 +38,12 @@ describe('auto-lurker-service', function() {
 
           assert.equal(candidates[0].userId, fixture.user1.id);
           assert(!candidates[0].lurk);
-          assert(!candidates[0].notificationSettings);
+          assert.strictEqual(candidates[0].notificationSettings, 'all');
           assert.equal(candidates[0].lastAccessTime.valueOf(), tenDaysAgo.valueOf());
-        })
-        .nodeify(done);
+        });
     });
 
-    it('#02 should return a lurk candidate with notify settings',function(done) {
+    it('#02 should return a lurk candidate with notify settings',function() {
       var tenDaysAgo = new Date(Date.now() - 86400000 * 10);
       return userTroupeSettingsService.setUserSettings(fixture.user1.id, fixture.troupe1.id, 'notifications', { push: 'mention' })
         .then(function() {
@@ -61,11 +59,10 @@ describe('auto-lurker-service', function() {
           assert(!candidates[0].lurk);
           assert.equal(candidates[0].notificationSettings, 'mention');
           assert.equal(candidates[0].lastAccessTime.valueOf(), tenDaysAgo.valueOf());
-        })
-        .nodeify(done);
+        });
     });
 
-    it('#03 should return a lurk candidate with notify settings',function(done) {
+    it('#03 should return a lurk candidate with notify settings',function() {
       var tenDaysAgo = new Date(Date.now() - 86400000 * 10);
       return userTroupeSettingsService.setUserSettings(fixture.user1.id, fixture.troupe1.id, 'notifications', { })
         .then(function() {
@@ -82,13 +79,12 @@ describe('auto-lurker-service', function() {
 
           assert.equal(candidates[0].userId, fixture.user1.id);
           assert(candidates[0].lurk);
-          assert(!candidates[0].notificationSettings);
+          assert.strictEqual(candidates[0].notificationSettings, 'all');
           assert.equal(candidates[0].lastAccessTime.valueOf(), tenDaysAgo.valueOf());
-        })
-        .nodeify(done);
+        });
     });
 
-    it('#04 should not return fully lurked candidates',function(done) {
+    it('#04 should not return fully lurked candidates',function() {
       var tenDaysAgo = new Date(Date.now() - 86400000 * 10);
       return userTroupeSettingsService.setUserSettings(fixture.user1.id, fixture.troupe1.id, 'notifications', { push: 'mention' })
         .then(function() {
@@ -102,11 +98,10 @@ describe('auto-lurker-service', function() {
         })
         .then(function(candidates) {
           assert(candidates.length === 0);
-          })
-        .nodeify(done);
+        });
     });
 
-    it('#05 should identify users for lurk based on the date they were added to the room if they have not logged in',function(done) {
+    it('#05 should identify users for lurk based on the date they were added to the room if they have not logged in',function() {
       var tenDaysAgo = new Date(Date.now() - 86400000 * 10);
       return roomService.testOnly.updateUserDateAdded(fixture.user1.id, fixture.troupe2.id, tenDaysAgo)
         .then(function() {
@@ -116,11 +111,10 @@ describe('auto-lurker-service', function() {
           assert.strictEqual(candidates.length, 1);
           assert.equal(candidates[0].userId, fixture.user1.id);
           assert.strictEqual(candidates[0].lastAccessTime.valueOf(), tenDaysAgo.valueOf());
-          })
-        .nodeify(done);
+        });
     });
 
-    it('#06 should ignore date added if the user has accessed the room since then',function(done) {
+    it('#06 should ignore date added if the user has accessed the room since then',function() {
       var tenDaysAgo = new Date(Date.now() - 86400000 * 10);
       var twoDaysAgo = new Date(Date.now() - 86400000 * 2);
 
@@ -135,8 +129,7 @@ describe('auto-lurker-service', function() {
           assert.strictEqual(candidates.length, 1);
           assert.equal(candidates[0].userId, fixture.user1.id);
           assert.strictEqual(candidates[0].lastAccessTime.valueOf(), twoDaysAgo.valueOf());
-          })
-        .nodeify(done);
+        });
     });
 
   });
@@ -153,7 +146,7 @@ describe('auto-lurker-service', function() {
       fixture.cleanup();
     });
 
-    it('#01 should return a lurk candidate',function(done) {
+    it('#01 should return a lurk candidate',function() {
       var tenDaysAgo = new Date(Date.now() - 86400000 * 10);
       return recentRoomService.saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupe1.id, { lastAccessTime: tenDaysAgo })
         .then(function() {
@@ -168,11 +161,10 @@ describe('auto-lurker-service', function() {
         .spread(function(settings, lurkStatus) {
           assert.strictEqual(settings.push, 'mention');
           assert.strictEqual(true, lurkStatus);
-        })
-        .nodeify(done);
+        });
     });
 
-    it('#02 should return a lurk candidate with notify settings',function(done) {
+    it('#02 should return a lurk candidate with notify settings',function() {
       var tenDaysAgo = new Date(Date.now() - 86400000 * 10);
       return userTroupeSettingsService.setUserSettings(fixture.user1.id, fixture.troupe1.id, 'notifications', { push: 'mention' })
         .then(function() {
@@ -190,11 +182,10 @@ describe('auto-lurker-service', function() {
         .spread(function(settings, lurkStatus) {
           assert.strictEqual(settings.push, 'mention');
           assert.strictEqual(true, lurkStatus);
-        })
-        .nodeify(done);
+        });
     });
 
-    it('#03 should return a lurk candidate with notify settings',function(done) {
+    it('#03 should return a lurk candidate with notify settings',function() {
       var tenDaysAgo = new Date(Date.now() - 86400000 * 10);
       return userTroupeSettingsService.setUserSettings(fixture.user1.id, fixture.troupe1.id, 'notifications', { push: 'mute' })
         .then(function() {
@@ -215,8 +206,7 @@ describe('auto-lurker-service', function() {
         .spread(function(settings, lurkStatus) {
           assert.strictEqual(settings.push, 'mute');
           assert.strictEqual(true, lurkStatus);
-        })
-        .nodeify(done);
+        });
     });
 
 
