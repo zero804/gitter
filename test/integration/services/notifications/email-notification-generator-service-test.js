@@ -190,7 +190,7 @@ it('SHOULD NOT email somebody who has opted out of notifications set to mention 
   var troupeId = fixture.troupe1.id;
 
   mockito.when(emailNotificationServiceMock).sendUnreadItemsNotification().then(function(user, troupeWithCounts) {
-    assert(user.id !== fixture.user2.id);
+    assert.notEqual(user.id, fixture.user2.id);
 
     if(user.id == fixture.user3.id) {
       v++;
