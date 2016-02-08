@@ -1,7 +1,7 @@
 "use strict";
 
 var ObjectID = require('mongodb').ObjectID;
-var _ = require('underscore');
+var _        = require('lodash');
 
 function stringToObjectID(string) {
   try {
@@ -126,6 +126,66 @@ function setIds(array) {
   });
   return array;
 }
+
+function conjunctionIds(terms, termIdentifiers) {
+  if (!terms.length) return { $or: terms };
+  if (terms.length < 3) return { $or: terms };
+
+  if (termIdentifiers.length !== 2) return { $or: terms };
+
+  var t1Identifier = termIdentifiers[0];
+  var t2Identifier = termIdentifiers[1];
+
+  var t1UniqueValue = terms[0][t1Identifier];
+  var t1Unique = true;
+  var t2UniqueValue = terms[0][t2Identifier];
+  var t2Unique = true;
+
+  for (var i = 1; i < terms.length; i++) {
+    var t1 = terms[i][t1Identifier];
+    var t2 = terms[i][t2Identifier];
+
+    if (t1UniqueValue != t1) t1Unique = false;
+    if (t2UniqueValue != t2) t2Unique = false;
+
+    if (!t1Unique && !t2Unique) break;
+  }
+
+  // Everything is the same. Duh
+  if (t1Unique && t2Unique) return terms[0];
+
+  if (t1Unique) {
+    var t1UniqueQuery = {};
+    t1UniqueQuery[t1Identifier] = terms[0][t1Identifier];
+
+    var t2MultiQuery = {};
+    t2MultiQuery[t2Identifier] = {
+      $in: _.map(terms, function(term) {
+              return term[t2Identifier];
+            })
+    };
+
+    return { $and: [ t1UniqueQuery, t2MultiQuery] };
+  }
+
+  if (t2Unique) {
+    var t2UniqueQuery = {};
+    t2UniqueQuery[t2Identifier] = terms[0][t2Identifier];
+
+    var t1MultiQuery = {};
+    t1MultiQuery[t1Identifier] = {
+      $in: _.map(terms, function(term) {
+              return term[t1Identifier];
+            })
+    };
+
+    return { $and: [ t2UniqueQuery, t1MultiQuery] };
+  }
+
+  return { $or: terms };
+}
+exports.conjunctionIds = conjunctionIds;
+
 exports.setIds = setIds;
 
 exports.isLikeObjectId = isLikeObjectId;
