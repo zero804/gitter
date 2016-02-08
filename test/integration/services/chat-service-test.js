@@ -90,7 +90,7 @@ describe('chatService', function() {
   describe('Finding messages', function() {
     var chat1, chat2, chat3;
 
-    beforeEach(function(done) {
+    beforeEach(function() {
       return chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, { text: 'A' })
         .then(function(chat) {
           chat1 = chat.id;
@@ -102,10 +102,7 @@ describe('chatService', function() {
         })
         .then(function(chat) {
           chat3 = chat.id;
-
-          return chatService.findChatMessagesForTroupe(fixture.troupe1.id, { aroundId: chat2 });
-        })
-        .nodeify(done);
+        });
     });
 
     it('should find messages using aroundId', function(done) {
