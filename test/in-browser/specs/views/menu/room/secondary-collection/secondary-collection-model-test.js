@@ -5,7 +5,7 @@ var assert                   = require('assert');
 var Backbone                 = require('backbone');
 var SecondaryCollectionModel = require('../../../../../../../public/js/views/menu/room/secondary-collection/secondary-collection-model');
 
-describe('SecondaryCollectionModel', function(){
+describe.skip('SecondaryCollectionModel', function(){
 
   var model;
   var collectionModel;
