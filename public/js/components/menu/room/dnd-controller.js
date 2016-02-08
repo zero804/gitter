@@ -36,16 +36,23 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
     this.drag.containers.push(el);
   },
 
+  //TODO TEST THIS
+  removeContainer: function (el){
+    var index = this.drag.containers.indexOf(el);
+    if(index === -1 ){ return }
+    this.drag.containers.splice(index, 1);
+  },
+
   onItemDropped: function(el, target){//jshint unused: true
     //guard against no drop target
     if(!target || !target.dataset) { return }
 
     if (this.model.get('state') !== 'favourite' &&
         target.dataset.stateChange === 'favourite') {
-      this.trigger('room-menu:add-favourite', el.dataset.roomId);
+      this.trigger('room-menu:add-favourite', el.dataset.id);
     }
     else {
-      this.trigger('room-menu:sort-favourite', el.dataset.roomId);
+      this.trigger('room-menu:sort-favourite', el.dataset.id);
     }
 
   },

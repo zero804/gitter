@@ -8,6 +8,9 @@ var PrimaryCollectionView = BaseCollectionView.extend({
 
   childView: ItemView,
   className: 'primary-collection',
+  ui: {
+    collection: '.js-collection-list'
+  },
 
   initialize: function(options) {
 
@@ -21,11 +24,8 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     this.uiModel = new Backbone.Model({ isFocused: false });
 
     //TODO turn this into an error if there is a dndCtrl
-    if (this.dndCtrl) {
-      this.dndCtrl.pushContainer(this.el);
-      this.listenTo(this.dndCtrl, 'room-menu:add-favourite', this.onFavouriteAdded, this);
-      this.listenTo(this.dndCtrl, 'room-menu:sort-favourite', this.onFavouritesSorted, this);
-    }
+    this.listenTo(this.dndCtrl, 'room-menu:add-favourite', this.onFavouriteAdded, this);
+    this.listenTo(this.dndCtrl, 'room-menu:sort-favourite', this.onFavouritesSorted, this);
   },
 
   filter: function (model, index){ //jshint unused: true
@@ -52,6 +52,17 @@ var PrimaryCollectionView = BaseCollectionView.extend({
       model.set('favourite', (index + 1));
       model.save();
     }.bind(this));
+  },
+
+  //Before we render we remove the collection container from the drag & drop instance
+  onBeforeRender: function (){
+    this.dndCtrl.removeContainer(this.ui.collection[0]);
+  },
+
+  //Once we have rendered we re-add the container to dnd
+  onRender: function (){
+    this.dndCtrl.pushContainer(this.ui.collection[0]);
+    BaseCollectionView.prototype.onRender.apply(this, arguments);
   },
 
   onDestroy: function (){
