@@ -3,13 +3,13 @@
 var testRequire = require('../test-require');
 var assert = require('assert');
 var mockito = require('jsmockito').JsMockito;
-var Q = require('q');
+var Promise = require('bluebird');
 
 var permissionsModelMock = mockito.mockFunction();
 var roomPermissionsModelMock = mockito.mockFunction();
 
-mockito.when(permissionsModelMock)().thenReturn(Q.resolve(true));
-mockito.when(roomPermissionsModelMock)().thenReturn(Q.resolve(true));
+mockito.when(permissionsModelMock)().thenReturn(Promise.resolve(true));
+mockito.when(roomPermissionsModelMock)().thenReturn(Promise.resolve(true));
 
 var roomContextService = testRequire.withProxies("./services/room-context-service", {
   './permissions-model': permissionsModelMock,
@@ -47,7 +47,7 @@ describe('room-context-service', function() {
   });
 
   it('should throw for users without access to the room', function(done) {
-    mockito.when(roomPermissionsModelMock)().thenReturn(Q.resolve(false));
+    mockito.when(roomPermissionsModelMock)().thenReturn(Promise.resolve(false));
 
     return roomContextService.findContextForUri(fixture.user1, fixture.troupe2.uri, {})
     .then(function(/*roomContext*/) {
@@ -59,7 +59,7 @@ describe('room-context-service', function() {
   });
 
   it('should generate context for 1:1', function(done) {
-    mockito.when(roomPermissionsModelMock)().thenReturn(Q.resolve(false));
+    mockito.when(roomPermissionsModelMock)().thenReturn(Promise.resolve(false));
 
     return roomContextService.findContextForUri(fixture.user1, fixture.user2.username, {})
     .then(function(roomContext) {

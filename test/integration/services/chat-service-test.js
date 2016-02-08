@@ -7,7 +7,7 @@ var testRequire = require('../test-require');
 var chatService = testRequire('./services/chat-service');
 var fixtureLoader = require('../test-fixtures');
 var assert = require('assert');
-
+var Promise = require('bluebird');
 
 describe('chatService', function() {
 
@@ -90,7 +90,7 @@ describe('chatService', function() {
   describe('Finding messages', function() {
     var chat1, chat2, chat3;
 
-    before(function(done) {
+    beforeEach(function(done) {
       return chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, { text: 'A' })
         .then(function(chat) {
           chat1 = chat.id;
@@ -119,16 +119,24 @@ describe('chatService', function() {
         .nodeify(done);
     });
 
-    it('should find messages with skip', function(done) {
-      return chatService.findChatMessagesForTroupe(fixture.troupe1.id, { skip: 1 })
-        .then(function(chats) {
-          assert.strictEqual(chats.filter(function(f) { return f.id == chat1; }).length, 1);
-          assert.strictEqual(chats.filter(function(f) { return f.id == chat2; }).length, 1);
+    it('should find messages with skip', function() {
+      return Promise.join(
+        chatService.findChatMessagesForTroupe(fixture.troupe1.id, { skip: 1 }),
+        chatService.findChatMessagesForTroupe(fixture.troupe1.id, { }),
+        function(withSkip, withoutSkip) {
+          assert(withSkip.length > 2);
+          assert(withoutSkip.length > 2);
 
-          // This message should not be there
-          assert.strictEqual(chats.filter(function(f) { return f.id == chat3; }).length, 0);
-        })
-        .nodeify(done);
+          var lastItemWithoutSkip = withoutSkip[withoutSkip.length - 1];
+          var secondLastItemWithoutSkip = withoutSkip[withoutSkip.length - 2];
+
+          var lastItemWithSkip = withSkip[withSkip.length - 1];
+
+          // Last item without skip does not exist in with skip...
+          assert.strictEqual(withSkip.filter(function(f) { return f.id == lastItemWithoutSkip.id; }).length, 0);
+
+          assert.strictEqual(secondLastItemWithoutSkip.id, lastItemWithSkip.id);
+        });
     });
 
     it('should not allow skip greater than 5000', function(done) {

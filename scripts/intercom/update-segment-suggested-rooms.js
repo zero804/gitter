@@ -4,7 +4,7 @@
 var env = require('gitter-web-env');
 var stats = env.stats;
 var config = env.config;
-var Q = require('q');
+var Promise = require('bluebird');
 var _ = require('lodash');
 var shutdown = require('shutdown');
 var through2Concurrent = require('through2-concurrent');
@@ -68,7 +68,7 @@ stream
       getRoomsForUserId(userId),
       userSettingsService.getUserSettings(userId, 'lang')
     ];
-    Q.all(promises)
+    Promise.all(promises)
       .spread(function(rooms, language) {
         return suggestionsService.findSuggestionsForRooms(rooms, language);
       })

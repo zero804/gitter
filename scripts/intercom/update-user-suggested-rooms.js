@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 "use strict";
 
-var Q = require('q');
 var _ = require('lodash');
+var Promise = require('bluebird');
 var shutdown = require('shutdown');
 var userService = require('../../server/services/user-service');
 var troupeService = require('../../server/services/troupe-service');
@@ -61,7 +61,7 @@ var user;
 getUserFromMongo(opts)
   .then(function(_user) {
     user = _user;
-    return Q.all([
+    return Promise.all([
       getRoomsForUserId(user.id),
       userSettingsService.getUserSettings(user.id, 'lang')
     ]);

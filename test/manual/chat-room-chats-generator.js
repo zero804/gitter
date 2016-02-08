@@ -1,7 +1,8 @@
+'use strict';
+
 var userService = require('../../server/services/user-service');
 var troupeService = require('../../server/services/troupe-service');
-var Q = require('q');
-var qlimit = require('qlimit');
+var Promise = require('bluebird');
 var chatService = require('../../server/services/chat-service');
 var loremIpsum = require('lorem-ipsum');
 var dictionary = require('lorem-ipsum/lib/dictionary').words;
@@ -24,9 +25,7 @@ var opts = require("nomnom")
 })
 .parse();
 
-var limit = qlimit(2);
-
-Q.all([
+Promise.all([
   userService.findByUsernames(opts.users),
   troupeService.findByUri(opts.room)
   ])
@@ -36,7 +35,7 @@ Q.all([
       a.push(i);
     }
 
-    return Q.all(a.map(limit(function(i) {
+    return Promise.map(a, function(i) {
       var user = users[Math.floor(Math.random() * users.length)];
       return chatService.newChatMessageToTroupe(room, user, { text: loremIpsum({
             count: Math.round(Math.random() * 5) + 1,
@@ -56,7 +55,7 @@ Q.all([
         .then(function() {
           if(i % 10 === 0) console.log(i);
         });
-    })));
+    }, { concurrency: 2 });
   })
   .delay(10000)
   .then(function() {

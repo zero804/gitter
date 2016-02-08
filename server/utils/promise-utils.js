@@ -1,7 +1,7 @@
 "use strict";
 
 var StatusError = require('statuserror');
-var Q = require('q');
+var Promise = require('bluebird');
 
 /* Ensure that the last promise has returned a value */
 exports.required = function(value) {
@@ -36,7 +36,7 @@ function waterfall(makers, args, filter, limit, allResults) {
 
   } else {
     // the end was reached, so return what we have so far
-    return Q.resolve(allResults);
+    return Promise.resolve(allResults);
   }
 }
 exports.waterfall = waterfall;

@@ -1,6 +1,6 @@
 'use strict';
 
-var Q = require('q');
+var Promise = require('bluebird');
 var _ = require('lodash');
 var collections = require('../utils/collections');
 var promiseUtils = require('../utils/promise-utils');
@@ -75,7 +75,7 @@ function graphRooms(existingRooms, language) {
 
 function siblingRooms(existingRooms, language) {
   var orgNames = _.uniq(_.pluck(existingRooms, 'lcOwner'));
-  return Q.all(_.map(orgNames, function(orgName) {
+  return Promise.all(_.map(orgNames, function(orgName) {
       // TODO: include private/inherited rooms for orgs you're in. Requires
       // render.js to be refactored a bit so we can reuse the same logic.
       // We should also probably limit the number of results and also the
@@ -92,7 +92,7 @@ function hilightedRooms(existingRooms, language) {
     var roomLang = roomInfo.localeLanguage;
     return (roomLang == 'en' || roomLang == 'language');
   });
-  return Q.all(_.map(filtered, function(roomInfo) {
+  return Promise.all(_.map(filtered, function(roomInfo) {
     return troupeService.findByUri(roomInfo.uri);
   }));
 }
@@ -141,7 +141,7 @@ function findSuggestionsForRooms(existingRooms, language) {
   return promiseUtils.waterfall(recommenders, [existingRooms, language], filterSuggestions, NUM_SUGGESTIONS)
     .then(function(suggestedRooms) {
       // pre-fill the extra values we'll need
-      return Q.all(suggestedRooms.map(function(room) {
+      return Promise.all(suggestedRooms.map(function(room) {
         room.avatarUrl = resolveRoomAvatarUrl(room, 160);
         return chatService.getRoughMessageCount(room.id)
           .then(function(messageCount) {

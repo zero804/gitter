@@ -2,7 +2,7 @@
 /*jslint node: true, unused:true */
 "use strict";
 
-var Q = require('q');
+var Promise = require('bluebird');
 var env = require('gitter-web-env');
 
 var redisClient = env.redis.getClient();
@@ -14,7 +14,9 @@ var redisClient = env.redis.getClient();
 function scanEmailNotifications() {
   var cursor = '0';
   function iter() {
-    return Q.ninvoke(redisClient, "scan", cursor, 'COUNT', 10000, 'MATCH', 'resque:*')
+    return Promise.fromCallback(function(callback) {
+        redisClient.scan(cursor, 'COUNT', 10000, 'MATCH', 'resque:*', callback);
+      })
       .spread(function(nextCursor, result) {
         if (result) {
           result.forEach(function(key) {

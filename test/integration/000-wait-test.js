@@ -4,29 +4,24 @@ var testRequire = require('./test-require');
 /* Force a connection */
 testRequire('./services/persistence-service');
 var env = testRequire('gitter-web-env');
-
+var Promise = require('bluebird');
 var onMongoConnect = testRequire('./utils/on-mongo-connect');
 
 describe('start', function() {
   this.timeout(30000);
 
-  before(function(done) {
-    onMongoConnect(function(err) {
-      if (err) return done(err);
+  before(function() {
+    return onMongoConnect()
+      .then(function() {
+        var redis = env.redis.getClient();
+        var noPersistRedis = env.redis.createClient(process.env.REDIS_NOPERSIST_CONNECTION_STRING || env.config.get("redis_nopersist"));
 
-      var redis = env.redis.getClient();
-      var noPersistRedis = env.redis.createClient(process.env.REDIS_NOPERSIST_CONNECTION_STRING || env.config.get("redis_nopersist"));
-
-      redis.info(function(err) {
-        if(err) return done(err);
-
-        noPersistRedis.info(done);
+        return Promise.map([redis, noPersistRedis], function(r) {
+          return Promise.fromCallback(function(callback) {
+            r.info(callback);
+          });
+        });
       });
-    });
-
-  });
-
-  it('should have a valid mongoose and redis connection', function() {
   });
 
 });

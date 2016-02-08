@@ -1,11 +1,10 @@
 "use strict";
 
-var env                  = require('gitter-web-env');
-var logger               = env.logger;
-
-var GitHubOrgService     = require('gitter-web-github').GitHubOrgService;
-var userIsInRoom         = require('../user-in-room');
-var Q                    = require('q');
+var env              = require('gitter-web-env');
+var logger           = env.logger;
+var GitHubOrgService = require('gitter-web-github').GitHubOrgService;
+var userIsInRoom     = require('../user-in-room');
+var Promise          = require('bluebird');
 
 /**
  * ORG permissions model
@@ -13,11 +12,11 @@ var Q                    = require('q');
 module.exports = function orgPermissionsModel(user, right, uri, security) {
   // Security is only for child rooms
   if(security) {
-    return Q.reject(new Error('orgs do not have security'));
+    return Promise.reject(new Error('orgs do not have security'));
   }
 
   // For now, only authenticated users can be members of orgs
-  if(!user) return Q.resolve(false);
+  if(!user) return Promise.resolve(false);
 
   var ghOrg = new GitHubOrgService(user);
   return ghOrg.member(uri, user.username)

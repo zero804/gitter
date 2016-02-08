@@ -128,14 +128,13 @@ makeTestTasks('test-mocha', function(name, files) {
 
   return gulp.src(files, { read: false })
     .pipe(mocha({
-      reporter: 'xunit-file',
+      reporter: 'mocha-multi',
       timeout: 10000,
       istanbul: {
         dir: 'output/coverage-reports/' + name
       },
       env: {
-        TAP_FILE: 'output/test-reports/' + name + '.tap',
-        XUNIT_FILE: 'output/test-reports/' + name + '.xml',
+        multi: 'spec=- xunit=output/test-reports/' + name + '.xml',
         NODE_ENV: 'test',
         Q_DEBUG: 1,
       }
@@ -148,14 +147,13 @@ makeTestTasks('test-docker', function(name, files) {
 
   return gulp.src(files, { read: false })
     .pipe(mocha({
-      reporter: 'xunit-file',
+      reporter: 'mocha-multi',
       timeout: 10000,
       istanbul: {
         dir: 'output/coverage-reports/' + name
       },
       env: {
-        TAP_FILE: 'output/test-reports/' + name + '.tap',
-        XUNIT_FILE: 'output/test-reports/' + name + '.xml',
+        multi: 'spec=- xunit=output/test-reports/' + name + '.xml',
         NODE_ENV: 'test-docker',
         Q_DEBUG: 1,
         BLUEBIRD_DEBUG: 1
@@ -167,14 +165,14 @@ gulp.task('test-redis-lua', shell.task([
   './test/redis-lua/run-tests'
 ]));
 
-gulp.task('merge-lcov', ['test-mocha', 'test-redis-lua'], function() {
+gulp.task('merge-lcov', function() {
   return gulp.src('output/coverage-reports/**/lcov.info')
     .pipe(using())
     .pipe(lcovMerger())
     .pipe(gulp.dest('output/coverage-reports/merged/'));
 });
 
-gulp.task('submit-coveralls', ['test-mocha', 'test-redis-lua', 'merge-lcov'], function() {
+gulp.task('submit-coveralls-post-tests', ['merge-lcov'], function() {
   var GIT_BRANCH = process.env.GIT_BRANCH;
   if (GIT_BRANCH) {
     // Make coveralls play nice with Jenkins (lame)
@@ -183,9 +181,17 @@ gulp.task('submit-coveralls', ['test-mocha', 'test-redis-lua', 'merge-lcov'], fu
 
   return gulp.src('output/coverage-reports/merged/lcov.info')
     .pipe(coveralls())
+    .on('error', function(err) {
+      gutil.log(err);
+      process.env.GIT_BRANCH = GIT_BRANCH;
+    })
     .on('end', function() {
       process.env.GIT_BRANCH = GIT_BRANCH;
     });
+});
+
+gulp.task('submit-coveralls', ['test-mocha', 'test-redis-lua'], function(callback) {
+  runSequence('submit-coveralls-post-tests', callback);
 });
 
 gulp.task('test', ['test-mocha', 'test-redis-lua', 'submit-coveralls']);
