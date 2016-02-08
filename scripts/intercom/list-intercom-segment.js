@@ -4,7 +4,7 @@
 var _ = require('lodash');
 var shutdown = require('shutdown');
 var intercom = require('gitter-web-intercom');
-var IntercomStream = require('../../server/utils/intercom-stream');
+var getIntercomStream = require('intercom-stream');
 
 
 var opts = require("nomnom")
@@ -15,7 +15,7 @@ var opts = require("nomnom")
    })
    .parse();
 
-var stream = new IntercomStream({ client: intercom.client, key: 'users'}, function() {
+var stream = getIntercomStream({ client: intercom.client, key: 'users'}, function() {
   return intercom.client.users.listBy({segment_id: opts.segment});
 });
 
