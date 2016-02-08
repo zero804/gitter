@@ -25,8 +25,9 @@ module.exports = Backbone.Collection.extend({
       this.searchRoomCollection.reset();
       return this.searchPeopleCollection.reset();
     }
-    this.searchRoomCollection.fetch();
-    this.searchPeopleCollection.fetch();
+    var query = { data: { q: this.roomMenuModel.get('searchTerm'), limit: 3, type: 'gitter' } };
+    this.searchRoomCollection.fetch(query);
+    this.searchPeopleCollection.fetch(query);
   },
 
   onCollectionChange: function (){

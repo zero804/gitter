@@ -69,7 +69,7 @@ describe('SearchChatMessages', function() {
     room.set('id', 123456);
     model.set({ state: 'search', searchTerm: 'sometestsearch' });
     console.log(collection.url());
-    assert.equal('/v1/rooms/123456/chatMessages?q=sometestsearch&lang=en&limit=45', collection.url());
+    assert.equal('/v1/rooms/123456/chatMessages', collection.url());
   });
 
 });
