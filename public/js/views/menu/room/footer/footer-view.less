@@ -31,6 +31,13 @@
   box-sizing:     border-box;
   padding-bottom: 4rem;
   text-align:     center;
+
+  &.active {
+    @media screen and (max-height: 580px) {
+      transform:  translateY(100%);
+    }
+  }
+
 }
 
 .panel-footer__item--all {
