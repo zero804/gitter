@@ -35,6 +35,46 @@ exports.setMembersLurkStatus        = setMembersLurkStatus;
 /* Event emitter */
 exports.events                      = roomMembershipEvents;
 
+/* Note, these can not change! */
+/* -----8<---- */
+var FLAG_POS_NOTIFY_UNREAD        = 0;
+var FLAG_POS_NOTIFY_ACTIVITY      = 1;
+var FLAG_POS_NOTIFY_MENTIONS      = 2;
+var FLAG_POS_NOTIFY_ANNOUNCEMENTS = 3;
+/* -----8<---- */
+
+var BITMASK_INVERT = 0xFFFFFFFF;
+
+var BITMASK_NOTIFY_UNREAD           = 1 << FLAG_POS_NOTIFY_UNREAD;
+var BITMASK_NO_NOTIFY_UNREAD        = BITMASK_INVERT & ~BITMASK_NOTIFY_UNREAD;
+var BITMASK_NOTIFY_ACTIVITY         = 1 << FLAG_POS_NOTIFY_ACTIVITY;
+var BITMASK_NO_NOTIFY_ACTIVITY      = BITMASK_INVERT & ~FLAG_POS_NOTIFY_ACTIVITY;
+var BITMASK_NOTIFY_MENTIONS         = 1 << FLAG_POS_NOTIFY_UNREAD;
+var BITMASK_NO_NOTIFY_MENTIONS      = BITMASK_INVERT & ~BITMASK_NOTIFY_MENTIONS;
+var BITMASK_NOTIFY_ANNOUNCEMENTS    = 1 << FLAG_POS_NOTIFY_ANNOUNCEMENTS;
+var BITMASK_NO_NOTIFY_ANNOUNCEMENTS = BITMASK_INVERT & ~BITMASK_NOTIFY_MENTIONS;
+
+/* Mode: all: unread + no activity + mentions + announcements */
+var BITMASK_MODE_ALL_SET = BITMASK_NOTIFY_UNREAD |
+                            BITMASK_NOTIFY_MENTIONS |
+                            BITMASK_NOTIFY_ANNOUNCEMENTS;
+var BITMASK_MODE_ALL_CLEAR = BITMASK_INVERT &
+                            BITMASK_NO_NOTIFY_ACTIVITY;
+
+/* Mode: announcements: no unread + activity + mentions + announcements */
+var BITMASK_MODE_ANNOUNCEMENTS_SET = BITMASK_NOTIFY_ACTIVITY |
+                            BITMASK_NOTIFY_MENTIONS |
+                            BITMASK_NOTIFY_ANNOUNCEMENTS;
+var BITMASK_MODE_ANNOUNCEMENTS_CLEAR = BITMASK_INVERT &
+                            BITMASK_NO_NOTIFY_UNREAD;
+
+/* Mode: mute: no unread + no activity + mentions + no announcements */
+var BITMASK_MODE_MUTE_SET = BITMASK_NOTIFY_MENTIONS;
+var BITMASK_MODE_MUTE_CLEAR = BITMASK_INVERT &
+                                BITMASK_NO_NOTIFY_UNREAD &
+                                BITMASK_NO_NOTIFY_ACTIVITY &
+                                BITMASK_NO_NOTIFY_ANNOUNCEMENTS;
+                                
 /**
  * Returns the rooms the user is in
  */
@@ -46,6 +86,17 @@ function findRoomIdsForUser(userId) {
     .exec();
 }
 
+function getLurkFromTroupeUser(troupeUser) {
+  if (troupeUser.flags === undefined) {
+    // The old way...
+    // TODO: remove this: https://github.com/troupe/gitter-webapp/issues/954
+    return !!troupeUser.lurk;
+  } else {
+    // The new way...
+    return !(troupeUser.flags & BITMASK_NOTIFY_UNREAD);
+  }
+}
+
 /**
  * Returns the rooms the user is in, with lurk status
  */
@@ -54,11 +105,11 @@ function findRoomIdsForUserWithLurk(userId) {
 
   assert(userId);
 
-  return TroupeUser.find({ 'userId': userId }, { _id: 0, troupeId: 1, lurk: 1 }, { lean: true })
+  return TroupeUser.find({ 'userId': userId }, { _id: 0, troupeId: 1, lurk: 1, flags: 1 }, { lean: true })
     .exec()
     .then(function(results) {
       return results.reduce(function(memo, troupeUser) {
-        memo[troupeUser.troupeId] = !!troupeUser.lurk;
+        memo[troupeUser.troupeId] = getLurkFromTroupeUser(troupeUser);
         return memo;
       }, {});
     });
@@ -120,6 +171,7 @@ function findMembersForRoom(troupeId, options) {
   if (options && options.skip) {
     query.skip(options.skip);
   }
+
   if (options && options.limit) {
     query.limit(options.limit);
   }
@@ -145,11 +197,11 @@ function countMembersInRoom(troupeId) {
 function findMembersForRoomWithLurk(troupeId) {
   assert(troupeId);
 
-  return TroupeUser.find({ troupeId: troupeId }, { _id: 0, userId: 1, lurk: 1 }, { lean: true })
+  return TroupeUser.find({ troupeId: troupeId }, { _id: 0, userId: 1, lurk: 1, flags: 1 }, { lean: true })
     .exec()
     .then(function(results) {
       return results.reduce(function(memo, v) {
-        memo[v.userId] = !!v.lurk;
+        memo[v.userId] = getLurkFromTroupeUser(v);
         return memo;
       }, {});
     });
@@ -345,11 +397,11 @@ function findMembersForRoomMulti(troupeIds) {
  * Returns true when lurking, false when not, null when user is not found
  */
 function getMemberLurkStatus(troupeId, userId) {
-  return TroupeUser.findOne({ troupeId: troupeId, userId: userId }, { lurk: 1, _id: 0 }, { lean: true })
+  return TroupeUser.findOne({ troupeId: troupeId, userId: userId }, { lurk: 1, flags: 1, _id: 0 }, { lean: true })
     .exec()
     .then(function(troupeUser) {
        if (!troupeUser) return null;
-       return !!troupeUser.lurk;
+       return getLurkFromTroupeUser(troupeUser);
     });
 }
 
@@ -360,11 +412,21 @@ function getMemberLurkStatus(troupeId, userId) {
 function setMemberLurkStatus(troupeId, userId, lurk) {
   lurk = !!lurk; // Force boolean
 
-  return TroupeUser.findOneAndUpdate({ troupeId: troupeId, userId: userId }, { $set: { lurk: lurk } })
+  var bitOp = lurk ? { and: BITMASK_NO_NOTIFY_UNREAD } : { or: BITMASK_NOTIFY_UNREAD };
+
+  return TroupeUser.findOneAndUpdate({
+      troupeId: troupeId,
+      userId: userId
+    }, {
+      $set: { lurk: lurk },
+      $bit: { flags: bitOp }
+    }, {
+      new: false
+    })
     .exec()
     .then(function(oldTroupeUser) {
        if (!oldTroupeUser) return false;
-       var changed = oldTroupeUser.lurk !== lurk;
+       var changed = getLurkFromTroupeUser(oldTroupeUser) !== lurk;
 
        if (changed) {
          roomMembershipEvents.emit("members.lurk.change", troupeId, [userId], lurk);
@@ -380,13 +442,23 @@ function setMemberLurkStatus(troupeId, userId, lurk) {
 function setMembersLurkStatus(troupeId, userIds, lurk) {
  lurk = !!lurk; // Force boolean
 
- return TroupeUser.update({ troupeId: troupeId, userId: { $in: mongoUtils.asObjectIDs(userIds) } }, { $set: { lurk: lurk } }, { multi: true })
+ var bitOp = lurk ? { and: BITMASK_NO_NOTIFY_UNREAD } : { or: BITMASK_NOTIFY_UNREAD };
+
+ return TroupeUser.update({
+     troupeId: troupeId,
+     userId: { $in: mongoUtils.asObjectIDs(userIds) }
+   }, {
+     $set: { lurk: lurk },
+     $bit: { flags: bitOp }
+   }, {
+     multi: true
+   })
   .exec()
   .then(function() {
     // Unfortunately we have no way of knowing which of the users
     // were actually removed and which were already out of the collection
     // as we have no transactions.
-    //
+
     roomMembershipEvents.emit("members.lurk.change", troupeId, userIds, lurk);
   });
 }
