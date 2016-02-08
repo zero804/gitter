@@ -31,6 +31,11 @@ module.exports = BaseCollectionItemView.extend({
     data.url = (data.url || '');
     data.name = (data.name || '');
 
+    //For user results
+    if(data.displayName) {
+      return _.extend({}, { name: data.displayName, avatarUrl: data.avatarUrlSmall });
+    }
+
     var hasMentions  = !!data.mentions && data.mentions;
     var unreadItems  = !hasMentions && data.unreadItems;
     var lurkActivity = data.lurk && (!hasMentions && !unreadItems) && !!data.activity;
