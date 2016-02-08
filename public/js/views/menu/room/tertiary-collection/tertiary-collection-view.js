@@ -28,7 +28,7 @@ module.exports =  BaseCollectionView.extend({
   },
 
   filter: function(model, index) { //jshint unused: true
-    return (this.roomMenuModel.get('state') === 'search') ? (index < 5) : true;
+    return (this.roomMenuModel.get('state') === 'search') ? (index <= 5) : false;
   },
 
   onSearchUpdate: function() {
@@ -42,17 +42,20 @@ module.exports =  BaseCollectionView.extend({
   },
 
   onItemClicked: function() {
-      switch(this.roomMenuModel.get('state')) {
-        case 'all':
-          return this.onOrgItemClicked.apply(this, arguments);
-        default:
-          return proto.onItemClicked.apply(this, arguments);
-      }
+    switch (this.roomMenuModel.get('state')) {
+      case 'all':
+        return this.onOrgItemClicked.apply(this, arguments);
+      default:
+        return proto.onItemClicked.apply(this, arguments);
+    }
   },
 
   onOrgItemClicked: function(view) {
     var existingRoom = this.roomCollection.findWhere({ name: view.model.get('name') });
-    if(!existingRoom) { window.location.hash = '#confirm/' + view.model.get('name'); return; }
+    if (!existingRoom) {
+      window.location.hash = '#confirm/' + view.model.get('name'); return;
+    }
+
     proto.onItemClicked.apply(this, arguments);
   },
 
