@@ -45,6 +45,8 @@ module.exports =  BaseCollectionView.extend({
     switch (this.roomMenuModel.get('state')) {
       case 'all':
         return this.onOrgItemClicked.apply(this, arguments);
+      case 'search':
+        return this.onSearchItemClicked.apply(this, arguments);
       default:
         return proto.onItemClicked.apply(this, arguments);
     }
@@ -57,6 +59,10 @@ module.exports =  BaseCollectionView.extend({
     }
 
     proto.onItemClicked.apply(this, arguments);
+  },
+
+  onSearchItemClicked: function (view){
+    this.roomMenuModel.set('searchTerm', view.model.get('name'));
   },
 
 });
