@@ -323,7 +323,7 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
   }
 
   return findMarker
-    .then(function(markerId) {   // jshint maxcomplexity:13
+    .then(function(markerId) {   // jshint maxcomplexity:14
       if(!markerId && !options.aroundId) {
         var q = ChatMessage
           .where('toTroupeId', troupeId);
