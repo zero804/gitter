@@ -15,6 +15,7 @@ module.exports = {
 
     //read
     attrs = store.get(this.cid);
+    if(!attrs ) { return }
     attrs = (attrs  || '{}');
     attrs = JSON.parse(attrs);
 
