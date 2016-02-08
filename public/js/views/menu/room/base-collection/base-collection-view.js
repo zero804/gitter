@@ -39,8 +39,9 @@ module.exports = Marionette.CompositeView.extend({
   },
 
   constructor: function(attrs) {
-    this.bus        = attrs.bus;
-    this.collection = attrs.collection;
+    this.bus           = attrs.bus;
+    this.collection    = attrs.collection;
+    this.roomMenuModel = attrs.roomMenuModel;
     this.listenTo(context.troupe(), 'change:id', this.updateSelectedModel, this);
     Marionette.CompositeView.prototype.constructor.apply(this, arguments);
   },

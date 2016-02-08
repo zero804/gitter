@@ -21,7 +21,7 @@ var states = [
   'org',
 ];
 
-var SEARCH_DEBOUNCE_INTERVAL = 400;
+var SEARCH_DEBOUNCE_INTERVAL = 1000;
 
 module.exports = Backbone.Model.extend({
 
@@ -76,7 +76,7 @@ module.exports = Backbone.Model.extend({
     delete attrs.userModel;
 
     //expose the public collection
-    this.searchTerms         = new RecentSearchesCollection();
+    this.searchTerms         = new RecentSearchesCollection(null);
     this.searchRoomAndPeople = new SearchRoomPeopleCollection(null, { roomMenuModel: this });
     this.searchChatMessages  = new SearchChatMessages(null, { roomMenuModel: this, roomModel: this._troupeModel });
     this.suggestedOrgs       = new SuggestedOrgCollection([], { contextModel: this });

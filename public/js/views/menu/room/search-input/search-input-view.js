@@ -1,7 +1,8 @@
 'use strict';
 
 var Marionette = require('backbone.marionette');
-var template = require('./search-input-view.hbs');
+var _          = require('underscore');
+var template   = require('./search-input-view.hbs');
 
 var SearchInputView = Marionette.ItemView.extend({
 
@@ -54,10 +55,10 @@ var SearchInputView = Marionette.ItemView.extend({
     this.ui.input.focus();
   },
 
-  handleChange: function(e) {
+  handleChange: _.debounce(function(e) {
     var val = e.target.value.trim();
     this.model.set('searchTerm', val);
-  },
+  }, 300),
 
   onResultsLoading: function(model, isLoading) { // jshint unused:true
     this.ui.searchIcon.toggleClass('fetching', isLoading);

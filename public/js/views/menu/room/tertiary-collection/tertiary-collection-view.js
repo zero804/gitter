@@ -28,7 +28,7 @@ module.exports =  BaseCollectionView.extend({
   },
 
   filter: function(model, index) { //jshint unused: true
-    return (index <= 10);
+    return (this.roomMenuModel.get('state') === 'search') ? (index < 5) : true;
   },
 
   onSearchUpdate: function() {
