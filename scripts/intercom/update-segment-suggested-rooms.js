@@ -15,7 +15,7 @@ var suggestionsService = require('../../server/services/suggestions-service');
 var userSettingsService = require('../../server/services/user-settings-service');
 var suggestions = require('gitter-web-suggestions');
 var intercom = require('gitter-web-intercom');
-var IntercomStream = require('../../server/utils/intercom-stream');
+var getIntercomStream = require('intercom-stream');
 
 
 var opts = require("nomnom")
@@ -36,7 +36,7 @@ if (!opts.segment) {
   }
 }
 
-var stream = new IntercomStream({ client: intercom.client, key: 'users'}, function() {
+var stream = getIntercomStream({ client: intercom.client, key: 'users'}, function() {
   return intercom.client.users.listBy({segment_id: opts.segment});
 });
 
