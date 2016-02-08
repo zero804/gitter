@@ -106,7 +106,7 @@ function sendEmailNotifications(since) {
           });
       });
 
-      return userRoomNotificationService.findNotifySettingsForMultiUserRooms(userTroupes)
+      return userRoomNotificationService.findSettingsForMultiUserRooms(userTroupes)
         .then(function(notificationSettings) {
           Object.keys(userTroupeUnreadHash).forEach(function(userId) {
               var troupeIds = Object.keys(userTroupeUnreadHash[userId]);

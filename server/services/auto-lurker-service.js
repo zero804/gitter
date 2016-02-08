@@ -37,7 +37,7 @@ function findLurkCandidates(troupe, options) {
           return [
             oldUserIds,
             lurkStatus,
-            userRoomNotificationService.findNotifySettingsForUsersInRoom(troupeId, oldUserIds),
+            userRoomNotificationService.findSettingsForUsersInRoom(troupeId, oldUserIds),
             lastAccessDates
           ];
         });
@@ -126,7 +126,7 @@ function autoLurkInactiveUsers(troupe, options) {
         });
 
       return Promise.join(
-        userRoomNotificationService.updateNotifySettingsForUsersInRoom(troupe._id, usersToChangeSettings, 'mention'),
+        userRoomNotificationService.updateSettingsForUsersInRoom(troupe._id, usersToChangeSettings, 'mention'),
         usersToLurk.length && bulkLurkUsers(troupe.id, usersToLurk),
         function() {
           return candidates;

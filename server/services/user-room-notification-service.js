@@ -7,12 +7,28 @@ var StatusError               = require('statuserror');
 
 var DEFAULT_NOTIFICATION_SETTING = 'all';
 
+/* Exports */
+module.exports = {
+  findSettingForUserRoom:        Promise.method(findSettingForUserRoom),
+  findSettingsForUsersInRoom:    Promise.method(findSettingsForUsersInRoom),
+  findSettingsForMultiUserRooms: Promise.method(findSettingsForMultiUserRooms),
+  updateSettingForUserRoom:      Promise.method(updateSettingForUserRoom),
+  updateSettingsForUsersInRoom:  Promise.method(updateSettingsForUsersInRoom),
+  updateSettingsForUserRoom:     Promise.method(updateSettingsForUserRoom),
+};
+
+function findSettingForUserRoom(userId, roomId) {
+  return userTroupeSettingsService.getUserSettings(userId, roomId, 'notifications')
+    .then(function(notificationSetting) {
+      return notificationSetting && notificationSetting.push || DEFAULT_NOTIFICATION_SETTING;
+    });
+}
 
 /**
  * Returns the notification settings for users in a room.
  * Hash looks like { userId: 'notification_setting' }
  */
-var findNotifySettingsForUsersInRoom = Promise.method(function(roomId, userIds) {
+function findSettingsForUsersInRoom(roomId, userIds) {
   if (!userIds || !userIds.length) return {};
 
   return userTroupeSettingsService.getUserTroupeSettingsForUsersInTroupe(roomId, 'notifications', userIds)
@@ -26,13 +42,13 @@ var findNotifySettingsForUsersInRoom = Promise.method(function(roomId, userIds) 
 
       return result;
     });
-});
+}
 
 /**
  * Returns the userTroupe setting for a bunch of users
  * Returns a hash of { [userId:troupeId]: setting}
  */
-var findNotifySettingsForMultiUserRooms = Promise.method(function(userRooms) {
+function findSettingsForMultiUserRooms(userRooms) {
   if (!userRooms || !userRooms.length) return {};
 
   return userTroupeSettingsService.getMultiUserTroupeSettings(userRooms, 'notifications')
@@ -48,12 +64,20 @@ var findNotifySettingsForMultiUserRooms = Promise.method(function(userRooms) {
 
       return result;
     });
-});
+}
+
+function updateSettingForUserRoom(userId, roomId, value) {
+  if (value !== 'mention' && value !== 'all' && value !== 'mute') {
+    throw new StatusError(400, 'Invalid notification setting ' + value);
+  }
+
+  return userTroupeSettingsService.setUserSettings(userId, roomId, 'notifications', { push: value });
+}
 
 /**
  * Update the settings for many users in a room
  */
-var updateNotifySettingsForUsersInRoom = Promise.method(function(roomId, userIds, value) {
+function updateSettingsForUsersInRoom(roomId, userIds, value) {
   if (value !== 'mention' && value !== 'all' && value !== 'mute') {
     throw new StatusError(400, 'Invalid notification setting ' + value);
   }
@@ -61,12 +85,15 @@ var updateNotifySettingsForUsersInRoom = Promise.method(function(roomId, userIds
   if (!userIds) return;
 
   return userTroupeSettingsService.setUserSettingsForUsersInTroupe(roomId, userIds, 'notifications', { push: value });
-});
+}
 
+/**
+ * Update the notification setting for a single user in a room
+ */
+function updateSettingsForUserRoom(userId, roomId, value) {
+  if (value !== 'mention' && value !== 'all' && value !== 'mute') {
+    throw new StatusError(400, 'Invalid notification setting ' + value);
+  }
 
-/* Exports */
-module.exports = {
-  findNotifySettingsForUsersInRoom:    findNotifySettingsForUsersInRoom,
-  findNotifySettingsForMultiUserRooms: findNotifySettingsForMultiUserRooms,
-  updateNotifySettingsForUsersInRoom:  updateNotifySettingsForUsersInRoom
-};
+  return userTroupeSettingsService.setUserSettings(userId, roomId, 'notifications', { push: value });
+}
