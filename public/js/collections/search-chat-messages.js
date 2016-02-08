@@ -39,7 +39,7 @@ var ContextModel = Backbone.Model.extend({
 
 module.exports = BaseResolverCollection.extend({
   //TODO how do we set lang?
-  template: '/v1/rooms/:roomId/chatMessages?q=:searchTerm&lang=en&limit=45',
+  template: '/v1/rooms/:roomId/chatMessages',
 
   initialize: function(models, attrs) {//jshint unused: true
 
@@ -64,13 +64,23 @@ module.exports = BaseResolverCollection.extend({
   },
 
   onModelUpdateActive: function(model, val) { //jshint unused: true
-    return (!val) ? this.reset() : this.fetch();
+    return (!val) ? this.reset() : this.fetchResults();
   },
 
-  onSearchTermUpdate: _.debounce(function (model, val){ //jshint unused: true
+  onSearchTermUpdate: function (model, val){ //jshint unused: true
     if(!this.contextModel.get('active')) { return }
-    if(!val) { return }
-    this.fetch();
-  }, 150),
+    if(!val) { return this.reset(); }
+    this.fetchResults();
+  },
+
+  fetchResults: _.debounce(function (){
+    this.fetch({
+      data: {
+        q:     this.roomMenuModel.get('searchTerm'),
+        lang:  'en',
+        limit: 45
+      }
+    });
+  }, 50),
 
 });

@@ -5,7 +5,7 @@ var assert           = require('assert');
 var Backbone         = require('backbone');
 var localStorageSync = require('public/js/utils/local-storage-sync');
 
-describe.only('LocalStorageSync', function() {
+describe('LocalStorageSync', function() {
 
   var model;
 
