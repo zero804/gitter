@@ -3,7 +3,7 @@
 // var winston = require('../utils/winston');
 var collections = require("../utils/collections");
 var execPreloads = require('./exec-preloads');
-var Q = require('q');
+var Promise = require('bluebird');
 var debug = require('debug')('gitter:serializer:id-loader');
 
 function idStrategyGenerator(name, FullObjectStrategy, loaderFunction) {
@@ -12,7 +12,7 @@ function idStrategyGenerator(name, FullObjectStrategy, loaderFunction) {
     var objectHash;
 
     this.preload = function(ids, callback) {
-      if (!ids.length) return Q.resolve([]).nodeify(callback);
+      if (!ids.length) return Promise.resolve([]).nodeify(callback);
 
       var time = debug.enabled && Date.now();
       return loaderFunction(ids)

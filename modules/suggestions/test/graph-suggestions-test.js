@@ -1,7 +1,6 @@
 "use strict";
 
 var assert = require('assert');
-var Q = require('q');
 var suggestions = require('..');
 
 describe('graph-suggestions', function() {

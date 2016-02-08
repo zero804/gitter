@@ -17,7 +17,6 @@ var ChatEditView = require('views/chat/chat-edit-view');
 var appEvents = require('utils/appevents');
 var cocktail = require('cocktail');
 var chatCollapse = require('utils/collapsed-item-client');
-var KeyboardEventMixins = require('views/keyboard-events-mixin');
 var LoadingCollectionMixin = require('views/loading-mixin');
 var FastAttachMixin = require('views/fast-attach-mixin');
 var timeFormat = require('gitter-web-shared/time/time-format');
@@ -59,8 +58,9 @@ module.exports = (function() {
   };
 
   var touchEvents = {
-    'click .js-chat-item-edit':       'toggleEdit',
-    "click":                          'onTouchClick'
+    'touchstart':                     'onTouchstart',
+    'touchmove':                      'onTouchmove',
+    'touchend':                       'onTouchend'
   };
 
   var ChatItemView = Marionette.ItemView.extend({
@@ -109,11 +109,6 @@ module.exports = (function() {
 
     events: function() {
       return isMobile() ? touchEvents : mouseEvents;
-    },
-
-    keyboardEvents: {
-      'chat.edit.escape': 'onKeyEscape',
-      'chat.edit.send': 'onKeySend'
     },
 
     expandActivity: function() {
@@ -191,20 +186,6 @@ module.exports = (function() {
 
     onChange: function() {
       this.updateRender(this.model.changed);
-    },
-
-    onKeyEscape: function() {
-      if(this.inputBox) {
-        this.toggleEdit();
-        this.focusInput();
-      }
-    },
-
-    onKeySend: function(event) {
-      if(this.inputBox) {
-        this.inputBox.processInput();
-      }
-      event.preventDefault();
     },
 
     renderText: function() {
@@ -366,14 +347,23 @@ module.exports = (function() {
       $("#chat-input-textarea").focus();
     },
 
-    saveChat: function(newText) {
+    onEditCancel: function() {
+      if (!isMobile()) {
+        this.focusInput();
+      }
+      this.toggleEdit();
+    },
+
+    onEditSave: function(newText) {
       if (this.isEditing) {
         if (this.canEdit() && newText != this.model.get('text')) {
           this.model.set('text', newText);
           this.model.set('html', null);
           this.model.save();
         }
-        this.focusInput();
+        if (!isMobile()) {
+          this.focusInput();
+        }
         this.toggleEdit();
       }
     },
@@ -555,13 +545,13 @@ module.exports = (function() {
     },
 
     showText: function() {
-      this.renderText();
-
       if (this.inputBox) {
         this.stopListening(this.inputBox);
         this.inputBox.remove();
         delete this.inputBox;
       }
+
+      this.renderText();
     },
 
     showInput: function() {
@@ -580,8 +570,9 @@ module.exports = (function() {
         textarea.val("").val(unsafeText);
       });
 
-      this.inputBox = new ChatEditView({ el: textarea });
-      this.listenTo(this.inputBox, 'save', this.saveChat);
+      this.inputBox = new ChatEditView({ el: textarea }).render();
+      this.listenTo(this.inputBox, 'cancel', this.onEditCancel);
+      this.listenTo(this.inputBox, 'save', this.onEditSave);
     },
 
     showReadByIntent: function(e) {
@@ -660,7 +651,25 @@ module.exports = (function() {
       }, 5000);
     },
 
-    onTouchClick: function() {
+    onTouchstart: function() {
+      this.isDragging = false;
+    },
+
+    onTouchmove: function() {
+      this.isDragging = true;
+    },
+
+    onTouchend: function() {
+      if (!this.isDragging) {
+        // its a tap!
+        this.onTap();
+      } else {
+        // just a drag finishing. not a tap.
+        this.isDragging = false;
+      }
+    },
+
+    onTap: function() {
       var tapCount = this.doubleTapper.registerTap();
 
       switch (tapCount) {
@@ -673,6 +682,12 @@ module.exports = (function() {
           // double click
           this.toggleEdit();
           break;
+      }
+    },
+
+    onTouchEditBlur: function() {
+      if(this.inputBox) {
+        this.toggleEdit();
       }
     },
 
@@ -730,8 +745,6 @@ module.exports = (function() {
 
     attachElContent: FastAttachMixin.attachElContent
   });
-
-  cocktail.mixin(ChatItemView, KeyboardEventMixins);
 
   var ReadByView = Marionette.CollectionView.extend({
     childView: AvatarView,

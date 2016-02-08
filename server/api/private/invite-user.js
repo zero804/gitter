@@ -1,13 +1,13 @@
 "use strict";
 
-var troupeService   = require('../../services/troupe-service');
-var userService     = require('../../services/user-service');
-var emailService    = require('../../services/email-notification-service');
-var env             = require('gitter-web-env');
-var Q               = require('q');
-var StatusError     = require('statuserror');
-var emailValidator  = require('email-validator');
-var stats           = env.stats;
+var troupeService  = require('../../services/troupe-service');
+var userService    = require('../../services/user-service');
+var emailService   = require('../../services/email-notification-service');
+var env            = require('gitter-web-env');
+var Promise        = require('bluebird');
+var StatusError    = require('statuserror');
+var emailValidator = require('email-validator');
+var stats          = env.stats;
 
 module.exports =  function (req, res, next) {
 
@@ -25,7 +25,7 @@ module.exports =  function (req, res, next) {
     return next(new StatusError(400, 'Invalid email address'));
   }
 
-  return Q.all([
+  return Promise.all([
       username ? userService.findByUsername(username) : userService.findById(userId),
       troupeService.findById(roomId)
     ])
@@ -37,7 +37,7 @@ module.exports =  function (req, res, next) {
         .then(function() {
           return emailService.sendManualInvitation(req.user, user, room, email);
         })
-        .thenResolve([user, room]);
+        .thenReturn([user, room]);
     })
     .spread(function (user, room) {
       stats.event('manual-invite', { from: req.user.username, to: user.username, room: room.uri });

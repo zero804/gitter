@@ -2,7 +2,8 @@
 
 var url = require('url');
 var StatusError = require('statuserror');
-var Q = require('q');
+
+var Promise = require('bluebird');
 var wrap = require('./github-cache-wrapper');
 var badCredentialsCheck = require('./bad-credentials-check');
 var request = require('./request-wrapper');
@@ -31,8 +32,6 @@ module.exports = function(tokenPriority) {
 
 
   Mirror.prototype.get = function(uri) {
-    var d = Q.defer();
-
     var u = url.parse(uri, true);
 
     u.protocol = 'https';
@@ -51,20 +50,23 @@ module.exports = function(tokenPriority) {
       options.headers.Authorization = 'token ' + this.token;
     }
 
-    request(options, d.makeNodeResolver());
+    return new Promise(function(resolve, reject) {
+      request(options, function(err, response, body) {
+        if (err) return reject(err);
 
-    return d.promise.spread(function(response, body) {
-      if(response.statusCode >= 400) {
-        throw new StatusError(response.statusCode, body && body.message);
-      }
+        if(response.statusCode >= 400) {
+          return reject(new StatusError(response.statusCode, body && body.message));
+        }
 
-      if(response.statusCode !== 200) {
-        /* This is pretty dodgy.... */
-        return response.statusCode;
-      } else {
-        return body;
-      }
-    }).catch(badCredentialsCheck);
+        if(response.statusCode !== 200) {
+          /* This is pretty dodgy.... */
+          return resolve(response.statusCode);
+        } else {
+          return resolve(body);
+        }
+      });
+    })
+    .catch(badCredentialsCheck);
   };
 
   // return Mirror;

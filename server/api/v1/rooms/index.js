@@ -4,7 +4,7 @@ var troupeService        = require("../../../services/troupe-service");
 var roomService          = require("../../../services/room-service");
 var restful              = require("../../../services/restful");
 var restSerializer       = require("../../../serializers/rest-serializer");
-var Q                    = require('q');
+var Promise              = require('bluebird');
 var StatusError          = require('statuserror');
 var roomPermissionsModel = require('../../../services/room-permissions-model');
 var userCanAccessRoom    = require('../../../services/user-can-access-room');
@@ -98,7 +98,7 @@ module.exports = {
           promises.push(troupeService.updateTags(req.user, troupe, updatedTroupe.tags));
         }
 
-        return Q.all(promises);
+        return Promise.all(promises);
       })
       .then(function() {
         var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: req.user.id });

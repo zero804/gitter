@@ -4,8 +4,7 @@ var env                       = require('gitter-web-env');
 var stats                     = env.stats;
 var recentRoomCore            = require('./core/recent-room-core');
 var unreadItemService         = require('./unread-item-service');
-var Q                         = require('q');
-var qlimit                    = require('qlimit');
+var Promise                   = require('bluebird');
 var roomMembershipService     = require('./room-membership-service');
 
 /**
@@ -48,18 +47,16 @@ function findRemovalCandidates(roomId, options) {
 }
 exports.findRemovalCandidates = findRemovalCandidates;
 
-var bulkUnreadItemLimit = qlimit(5);
-
 function bulkRemoveUsersFromRoom(roomId, userIds) {
 
-  if (!userIds.length) return Q.resolve();
+  if (!userIds.length) return Promise.resolve();
   console.log('Removing ', userIds.length, ' users from ', roomId);
   return roomMembershipService.removeRoomMembers(roomId, userIds)
     .then(function() {
       console.log('Marking items as read');
-      return Q.all(userIds.map(bulkUnreadItemLimit(function(userId) {
+      return Promise.map(userIds, function(userId) {
         return unreadItemService.ensureAllItemsRead(userId, roomId);
-      })));
+      }, { concurrency: 5 });
     })
     .then(function() {
       userIds.forEach(function(userId) {
@@ -88,7 +85,7 @@ function autoRemoveInactiveUsers(roomId, options) {
         });
 
       return bulkRemoveUsersFromRoom(roomId, usersToLurk)
-        .thenResolve(candidates);
+        .thenReturn(candidates);
     });
 }
 exports.autoRemoveInactiveUsers = autoRemoveInactiveUsers;

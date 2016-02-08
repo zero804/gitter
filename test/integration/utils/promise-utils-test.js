@@ -5,14 +5,14 @@ var assert = require('assert');
 var sinon = require('sinon');
 var promiseUtils = testRequire('./utils/promise-utils');
 var waterfall = promiseUtils.waterfall;
-var Q = require('q');
+var Promise = require('bluebird');
 
 function fakeFilter(array) {
   return array.slice();
 }
 
 function fakePromiseMaker(foo) {
-  return new Q.resolve([1, 2]);
+  return new Promise.resolve([1, 2]);
 }
 
 describe('promise-utils', function() {

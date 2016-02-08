@@ -1,9 +1,9 @@
 "use strict";
 
-var Q                         = require('q');
+var Promise                   = require('bluebird');
 var userTroupeSettingsService = require('../user-troupe-settings-service');
 var appEvents                 = require('gitter-web-appevents');
-var resolveUserAvatarUrl          = require('gitter-web-shared/avatars/resolve-user-avatar-url');
+var resolveUserAvatarUrl      = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 var troupeDao                 = require('../daos/troupe-dao').lean;
 var userDao                   = require('../daos/user-dao').lean;
 var chatService               = require('../chat-service');
@@ -11,7 +11,7 @@ var _                         = require('lodash');
 var debug                     = require('debug')('gitter:online-notification-generator');
 
 function generateChatMessageNotification(troupeId, chatId) {
-  return Q.all([
+  return Promise.all([
       chatService.findByIdLean(chatId, { fromUserId: 1, text: 1 }),
       troupeDao.findByIdRequired(troupeId, { uri: 1, oneToOne: true })
     ])

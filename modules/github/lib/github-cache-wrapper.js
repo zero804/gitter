@@ -9,12 +9,11 @@
 
 
 var SnappyCache = require('snappy-cache');
-var Q = require('q');
 var env = require('gitter-web-env');
 var config = env.config;
 var _ = require('underscore');
 var util = require("util");
-
+var Promise = require('bluebird');
 var redisClient;
 
 function getRedisCachingClient() {
@@ -76,13 +75,13 @@ function wrap(Service, contextFunction, options) {
       var contextValues = contextFunction ? contextFunction.apply(self) : [];
 
       var key = getKeys(value, contextValues, args);
-      var d = Q.defer();
-      sc.lookup(key, function(cb) {
-        var promise = method.apply(self, args);
-        promise.nodeify(cb);
-      }, d.makeNodeResolver());
 
-      return d.promise;
+      return Promise.fromCallback(function(callback) {
+        sc.lookup(key, function(cb) {
+          var promise = method.apply(self, args);
+          promise.nodeify(cb);
+        }, callback);
+      });
     };
 
     ServiceWrapper.prototype[value] = wrapped;

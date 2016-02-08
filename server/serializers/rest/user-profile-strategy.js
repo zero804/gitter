@@ -2,9 +2,7 @@
 
 var identityService = require("../../services/identity-service");
 var _ = require('lodash');
-var Q = require('q');
-var qlimit = require('qlimit');
-var limit = qlimit(2); // ?
+var Promise = require('bluebird');
 
 var BackendMuxer = require('../../services/backend-muxer');
 
@@ -18,7 +16,7 @@ function UserProfileStrategy(options) {
     // pre-fill the cache
     return identityService.preloadForUsers(users)
       .then(function() {
-        return Q.all(users.map(limit(function(user) {
+        return Promise.map(users, function(user) {
           var backendMuxer = new BackendMuxer(user);
           return backendMuxer.findProfiles()
             .then(function(profiles) {
@@ -26,10 +24,10 @@ function UserProfileStrategy(options) {
               // (is this the best variable name?)
               user.profiles = profiles;
             });
-        })));
+        }, { concurrency: 2 });
       })
       .nodeify(callback);
-  }
+  };
 
   this.map = function(user) {
     var profile = {

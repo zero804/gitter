@@ -6,7 +6,7 @@ var userAgentTags       = require('../../../utils/user-agent-tagger');
 var _                   = require('underscore');
 var StatusError         = require('statuserror');
 var loadTroupeFromParam = require('./load-troupe-param');
-var Q                   = require('q');
+var Promise             = require('bluebird');
 
 module.exports = {
   id: 'chatMessageId',
@@ -82,7 +82,7 @@ module.exports = {
   },
 
   update: function(req) {
-    return Q.all([loadTroupeFromParam(req), chatService.findById(req.params.chatMessageId)])
+    return Promise.all([loadTroupeFromParam(req), chatService.findById(req.params.chatMessageId)])
       .spread(function(troupe, chatMessage) {
         if (!chatMessage) throw new StatusError(404);
         return chatService.updateChatMessage(troupe, chatMessage, req.user, req.body.text);

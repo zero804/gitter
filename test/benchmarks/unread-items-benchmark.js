@@ -4,8 +4,7 @@
 var makeBenchmark = require('../make-benchmark');
 var testRequire = require('../integration/test-require');
 var mockito = require('jsmockito').JsMockito;
-
-var Q = require('q');
+var Promise = require('bluebird');
 var mongoUtils = testRequire('./utils/mongo-utils');
 
 var TOTAL_USERS = 10000;
@@ -51,7 +50,7 @@ makeBenchmark({
     appEvents = mockito.mock(testRequire('gitter-web-appevents'));
     roomPermissionsModel = mockito.mockFunction();
 
-    mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId).thenReturn(Q.resolve(troupeLurkersUserHash));
+    mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId).thenReturn(Promise.resolve(troupeLurkersUserHash));
 
     unreadItemService = testRequire.withProxies("./services/unread-item-service", {
       './room-membership-service': roomMembershipService,
