@@ -51,7 +51,7 @@ module.exports =  BaseCollectionView.extend({
   },
 
   onOrgItemClicked: function(view) {
-    var existingRoom = this.roomCollection.findWhere({ name: view.model.get('uri') });
+    var existingRoom = this.roomCollection.findWhere({ name: view.model.get('name') });
     if(!existingRoom) { window.location.hash = '#confirm/' + view.model.get('name'); return; }
     proto.onItemClicked.apply(this, arguments);
   },
