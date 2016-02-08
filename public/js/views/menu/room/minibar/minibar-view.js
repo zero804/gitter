@@ -55,11 +55,12 @@ module.exports = Marionette.CollectionView.extend({
 
   initialize: function(attrs) {
 
-    this.shouldRender   = false;
     this.bus            = attrs.bus;
     this.dndCtrl        = attrs.dndCtrl;
     this.model          = attrs.model;
     this.roomCollection = attrs.roomCollection;
+
+    this.shouldRender   = false;
 
     this.listenTo(this.roomCollection, 'add remove', this.render, this);
     //collectionEVents

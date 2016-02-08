@@ -12,7 +12,7 @@ var Backbone              = require('backbone');
 var PrimaryCollectionView = require('public/js/views/menu/room/primary-collection/primary-collection-view');
 var context               = require('utils/context');
 
-describe('PrimaryCollectionView', function() {
+describe.skip('PrimaryCollectionView', function() {
 
   var collection;
   var model;

@@ -5,7 +5,7 @@ var assert                  = require('assert');
 var Backbone                = require('backbone');
 var SecondaryCollectionView = require('public/js/views/menu/room/secondary-collection/secondary-collection-view.js');
 
-describe('SecondaryCollectionView', function() {
+describe.skip('SecondaryCollectionView', function() {
 
   var model;
   var collection;
