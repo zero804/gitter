@@ -11,7 +11,7 @@ module.exports = BaseCollectionItemView.extend({
 
     if (data.fromUser) {
       return _.extend({}, data, {
-        name: data.html,
+        name: data.text,
         avatarUrl: data.fromUser.avatarUrlSmall,
       });
     }
