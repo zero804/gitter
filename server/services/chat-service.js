@@ -366,8 +366,11 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
             logger.warn('chat-service: Client requested large skip value on chat message collection query', { troupeId: troupeId, skip: skip });
           }
 
-          q = q.skip(skip)
-            .read('secondaryPreferred');
+          if (skip > 3) {
+            // Only use the secondary if we're skipping more than three messages
+            q = q.skip(skip)
+              .read('secondaryPreferred');
+          }
         }
 
         return q.lean()
