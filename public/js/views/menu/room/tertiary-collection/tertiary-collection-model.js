@@ -17,6 +17,13 @@ module.exports = BaseCollectionModel.extend({
     });
   },
 
+  onOrg: function (){
+    this.set({
+      header: 'Your Suggestions',
+      active: true
+    });
+  },
+
   onDefault: function() {
     this.set({
       header: false,
