@@ -30,8 +30,8 @@ module.exports = Marionette.CompositeView.extend({
   },
 
   collectionEvents: {
-    'sync': 'render',
-    'filter-complete add remove reset': 'onFilterComplete'
+    'filter-complete sync': 'render',
+    'add remove reset': 'onFilterComplete'
   },
 
   childEvents: {

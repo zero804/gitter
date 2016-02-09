@@ -1,12 +1,14 @@
 'use strict';
 
 var Backbone                       = require('backbone');
+var _                              = require('underscore');
+var FilteredCollection             = require('filtered-collection');
 var SuggestedRoomsByRoomCollection = require('./room-suggested-rooms.js');
 var SyncMixin                      = require('./sync-mixin');
 
 var SuggestionsContextModel = Backbone.Model.extend({});
 
-module.exports = SuggestedRoomsByRoomCollection.extend({
+var SuggestedCollection = SuggestedRoomsByRoomCollection.extend({
 
   initialize: function(models, attrs, options) {
 
@@ -55,4 +57,29 @@ module.exports = SuggestedRoomsByRoomCollection.extend({
   },
 
   sync: SyncMixin.sync,
+});
+
+module.exports = Backbone.FilteredCollection.extend({
+
+  constructor: function(models, attrs) {
+
+    this.collection             = window.collection = new SuggestedCollection(models, attrs);
+    this.roomCollection         = attrs.roomCollection;
+    this.suggestedOrgCollection = attrs.suggestedOrgsCollection;
+    this.collectionFilter       = this.collectionFilter.bind(this);
+    var options                 = _.extend({}, attrs, { collection: this.collection });
+
+    this.listenTo(this.roomCollection, 'update', this.onCollectionSync, this);
+
+    Backbone.FilteredCollection.prototype.constructor.call(this, null, options);
+  },
+
+  collectionFilter: function (model){
+    return !this.roomCollection.get(model.get('id'));
+  },
+
+  onCollectionSync: function (){
+    this.setFilter();
+  },
+
 });

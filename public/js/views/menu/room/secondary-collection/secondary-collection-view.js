@@ -50,4 +50,8 @@ module.exports = BaseCollectionView.extend({
     this.stopListening(this.model);
   },
 
+  render: function (){
+    BaseCollectionView.prototype.render.apply(this, arguments);
+  },
+
 });
