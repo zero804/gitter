@@ -25,6 +25,7 @@ module.exports =  BaseCollectionView.extend({
     this.roomMenuModel  = attrs.roomMenuModel;
     this.roomCollection = attrs.roomCollection;
     this.listenTo(this.roomMenuModel, 'change:searchTerm', this.onSearchUpdate, this);
+    this.listenTo(this.collection, 'filter-complete', this.render, this);
   },
 
   filter: function(model, index) { //jshint unused: true
@@ -38,7 +39,7 @@ module.exports =  BaseCollectionView.extend({
   },
 
   onDestroy: function() {
-    this.stopListening(this.roomMenuModel);
+    this.stopListening();
   },
 
   onItemClicked: function() {
