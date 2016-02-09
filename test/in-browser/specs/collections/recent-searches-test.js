@@ -4,7 +4,7 @@
 var assert = require('assert');
 var RecentSearchesCollection = require('../../../../public/js/collections/recent-searches.js');
 
-describe.only('RecentSearchesCollection', function() {
+describe('RecentSearchesCollection', function() {
 
   var recentSearchesCollection;
   beforeEach(function() {
