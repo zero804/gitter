@@ -68,7 +68,7 @@ post-test-maintain-data:
 	MODIFY=true ./scripts/datamaintenance/execute.sh || true
 
 send-to-sonar:
-	(gulp sonar | grep -v DEBUG)|| true
+	(gulp sonar | grep -v DEBUG | grep -v '^\s*$')|| true
 
 continuous-integration: build send-to-sonar
 
