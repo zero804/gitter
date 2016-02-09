@@ -4,13 +4,15 @@ var _                      = require('underscore');
 var getRoomAvatar          = require('utils/get-room-avatar');
 var BaseCollectionView     = require('../base-collection/base-collection-view');
 var BaseCollectionItemView = require('../base-collection/base-collection-item-view');
+var roomNameShortener      = require('../../../../utils/room-menu-name-shortener');
 
 var proto = BaseCollectionView.prototype;
 
 var ItemView = BaseCollectionItemView.extend({
   serializeData: function() {
     var data = this.model.toJSON();
-    var avatarURL = (this.roomMenuModel.get('state') === 'search') ? null : getRoomAvatar(data.name || ' ');
+    var avatarURL = (this.roomMenuModel.get('state') === 'search') ? null : getRoomAvatar(data.name || data.uri  || ' ');
+    data.name = roomNameShortener(data.name || data.uri);
     return _.extend({}, data, {
       avatarUrl: avatarURL,
     });
