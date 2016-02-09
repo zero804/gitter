@@ -179,6 +179,7 @@
     "gulp-replace": "^0.5.4",
     "gulp-shell": "^0.4.1",
     "gulp-shrinkwrap": "^1.0.1",
+    "gulp-sonar": "^2.0.0",
     "gulp-sourcemaps": "^1.6.0",
     "gulp-spawn-mocha": "^2.0.1",
     "gulp-tar": "^1.5.0",
