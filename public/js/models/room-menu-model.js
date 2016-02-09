@@ -138,6 +138,7 @@ module.exports = Backbone.Model.extend({
       case 'favourite':
         this.primaryCollection.switchCollection(this.activeRoomCollection);
         this.secondaryCollection.switchCollection(this._suggestedRoomCollection);
+        this.tertiaryCollection.switchCollection(this._suggestedRoomCollection);
         break;
 
       case 'org':
