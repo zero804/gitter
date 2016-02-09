@@ -620,6 +620,9 @@ gulp.task('sonar', function () {
                   reportPath: 'output/coverage-reports/merged/lcov.info'
               }
           },
+          analysis: {
+            mode: 'issues'
+          },
           github: {
             pullRequest: process.env.ghprbPullId,
             repository: 'troupe/gitter-webapp',
