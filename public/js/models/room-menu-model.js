@@ -100,7 +100,7 @@ module.exports = Backbone.Model.extend({
     this.listenTo(this.bus, 'room-menu:change:state', this.onStateChangeCalled, this);
     this.listenTo(this, 'change:searchTerm', this.onSearchTermChange, this);
     this.listenTo(this, 'change:state', this.onSwitchState, this);
-    this.listenTo(this, 'change', _.debounce(this.save.bind(this), 150));
+    this.listenTo(this, 'change', _.debounce(this.save.bind(this), 500));
   },
 
   onStateChangeCalled: function(newState) {
