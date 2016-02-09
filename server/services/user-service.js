@@ -1,14 +1,14 @@
 "use strict";
 
-var assert                    = require('assert');
-var _                         = require('underscore');
-var Q                         = require('q');
-var githubUserService         = require('gitter-web-github').GitHubUserService;
-var persistence               = require("./persistence-service");
-var uriLookupService          = require('./uri-lookup-service');
-var winston                   = require('../utils/winston');
-var mongooseUtils             = require('../utils/mongoose-utils');
-var extractGravatarVersion    = require('../utils/extract-gravatar-version');
+var assert                 = require('assert');
+var _                      = require('underscore');
+var Promise                = require('bluebird');
+var githubUserService      = require('gitter-web-github').GitHubUserService;
+var persistence            = require("./persistence-service");
+var uriLookupService       = require('./uri-lookup-service');
+var winston                = require('../utils/winston');
+var mongooseUtils          = require('../utils/mongoose-utils');
+var extractGravatarVersion = require('../utils/extract-gravatar-version');
 
 /** FIXME: the insert fields should simply extend from options or a key in options.
  * Creates a new user
@@ -56,7 +56,7 @@ function newUser(options) {
       //  .then(function(email) {
       //    stats.userUpdate(_.extend({ email: email, mixpanelId : options.mixpanelId }, user.toJSON()));
       //  })
-      //  .thenResolve(user);
+      //  .thenReturn(user);
 
       return user;
     })
@@ -64,7 +64,7 @@ function newUser(options) {
       // Reserve the URI for the user so that we don't need to figure it out
       // manually later (which will involve dodgy calls to github)
       return uriLookupService.reserveUriForUsername(user._id, user.username)
-        .thenResolve(user);
+        .thenReturn(user);
     });
 }
 
@@ -110,20 +110,20 @@ var userService = {
   },
 
   inviteByUsernames: function(usernames, user, callback) {
-    var promises = usernames.map(function(username) {
-      return userService.inviteByUsername(username, user);
-    });
+    return Promise.map(usernames, function(username) {
+        return userService.inviteByUsername(username, user).reflect();
+      })
+      .then(function(inspections) {
+        var invitedUsers = inspections.reduce(function(memo, inspection) {
+          if (inspection.isFulfilled()) {
+            memo.push(inspection.value());
+          }
+          return memo;
+        }, []);
 
-    return Q.allSettled(promises)
-    .then(function (results) {
-      var invitedUsers = results.reduce(function (accum, result) {
-        if (result.state === "fulfilled") accum.push(result.value);
-        return accum;
-      }, []);
-
-      return invitedUsers;
-    })
-    .nodeify(callback);
+        return invitedUsers;
+      })
+      .nodeify(callback);
   },
 
   findOrCreateUserForGithubId: function(options, callback) {
@@ -194,7 +194,7 @@ var userService = {
         });
       })
       .spread(function() {
-        return uriLookupService.reserveUriForUsername(user._id, user.username)
+        return uriLookupService.reserveUriForUsername(user._id, user.username);
       })
       .then(function() {
         return [user, isNewUser];
@@ -285,7 +285,7 @@ var userService = {
 
   findByIdsAndSearchTerm: function(ids, searchTerm, limit, callback) {
     if(!ids || !ids.length || !searchTerm || !searchTerm.length) {
-      return Q.resolve([]).nodeify(callback);
+      return Promise.resolve([]).nodeify(callback);
     }
 
     var searchPattern = '^' + sanitiseUserSearchTerm(searchTerm);
@@ -301,7 +301,7 @@ var userService = {
   },
 
   findByUsernames: function(usernames, callback) {
-    if(!usernames || !usernames.length) return Q.resolve([]).nodeify(callback);
+    if(!usernames || !usernames.length) return Promise.resolve([]).nodeify(callback);
 
     return persistence.User.where('username')['in'](usernames)
       .exec()

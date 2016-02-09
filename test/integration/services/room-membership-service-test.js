@@ -1,13 +1,9 @@
 "use strict";
 
-
 var testRequire   = require('../test-require');
 var fixtureLoader = require('../test-fixtures');
-var Q             = require("q");
 var assert        = require("assert");
 var fixture       = {};
-
-Q.longStackSupport = true;
 
 describe('room-membership-service', function() {
 

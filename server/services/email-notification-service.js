@@ -11,7 +11,7 @@ var emailAddressService = require('./email-address-service');
 var roomNameTrimmer     = require('../../public/js/utils/room-name-trimmer');
 var mongoUtils          = require('../utils/mongo-utils');
 var moment              = require('moment');
-var Q                   = require('q');
+var Promise             = require('bluebird');
 var i18nFactory         = require('../utils/i18n-factory');
 
 /*
@@ -92,7 +92,7 @@ module.exports = {
 
     if (user.state) {
       logger.info('Skipping email notification for ' + user.username + ', not active state.');
-      return Q.resolve();
+      return Promise.resolve();
     }
 
     // Re-enable all #lang!!

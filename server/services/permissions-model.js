@@ -1,7 +1,7 @@
 "use strict";
 
 var winston              = require('../utils/winston');
-var Q                    = require('q');
+var Promise              = require('bluebird');
 var userIsBannedFromRoom = require('./user-banned-from-room');
 
 var repoPermissionsModel        = require('./permissions/repo-permissions-model');
@@ -15,8 +15,8 @@ var debug                       = require('debug')('gitter:permissions-model');
 var userService                 = require('./user-service');
 
 function checkBan(user, uri) {
-  if(!user) return Q.resolve(false);
-  if(!uri) return Q.resolve(false);
+  if(!user) return Promise.resolve(false);
+  if(!uri) return Promise.resolve(false);
 
   return userIsBannedFromRoom(uri, user);
 }
@@ -38,13 +38,13 @@ function permissionsModel(user, right, uri, roomType, security) {
     return x;
   }
 
-  if(!right) return Q.reject(new Error('right required'));
+  if(!right) return Promise.reject(new Error('right required'));
 
   if(!ALL_RIGHTS.hasOwnProperty(right)) {
-    return Q.reject(new Error('Invalid right:' + right));
+    return Promise.reject(new Error('Invalid right:' + right));
   }
 
-  if(!roomType) return Q.reject(new Error('roomType required'));
+  if(!roomType) return Promise.reject(new Error('roomType required'));
 
   var submodel = {
     'REPO': repoPermissionsModel,
@@ -56,14 +56,14 @@ function permissionsModel(user, right, uri, roomType, security) {
   }[roomType];
 
   if(!submodel) {
-    return Q.reject(new Error('Invalid roomType ' + roomType));
+    return Promise.reject(new Error('Invalid roomType ' + roomType));
   }
 
   if(roomType !== 'ONETOONE' && !uri) {
     // For now uri can be null for one to one
     // This will need to be fixed before we handle
     // more fine grained permissions
-    return Q.reject(new Error('uri required'));
+    return Promise.reject(new Error('uri required'));
   }
 
   return checkBan(user, uri)
@@ -76,8 +76,8 @@ function permissionsModel(user, right, uri, roomType, security) {
           if(err && err.gitterAction === 'logout_destroy_user_tokens') {
             winston.warn('User tokens have been revoked. Destroying tokens');
 
-            userService.destroyTokensForUserId(user._id)
-              .thenReject(err);
+            return userService.destroyTokensForUserId(user._id)
+              .thenThrow(err);
           }
 
           throw err;

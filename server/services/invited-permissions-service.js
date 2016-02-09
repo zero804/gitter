@@ -1,12 +1,13 @@
 "use strict";
 
 var githubMembers = require('gitter-web-github').GitHubMembers;
-var Q = require('q');
+var Promise = require('bluebird');
+var StatusError = require('statuserror');
 
-function canUserBeInvitedToJoinRoom(usernameToBeInvited, troupe, instigatingUser) {
+var canUserBeInvitedToJoinRoom = Promise.method(function (usernameToBeInvited, troupe, instigatingUser) {
   if(troupe.security === 'PUBLIC') {
     // anyone can join public rooms
-    return Q.resolve(true);
+    return true;
   }
 
   switch(troupe.githubType) {
@@ -18,14 +19,14 @@ function canUserBeInvitedToJoinRoom(usernameToBeInvited, troupe, instigatingUser
 
     case 'ONETOONE':
       /* Nobody can be added */
-      return Q.resolve(false);
+      return false;
 
     case 'REPO_CHANNEL':
     case 'ORG_CHANNEL':
       switch(troupe.security) {
         case 'PRIVATE':
           /* Anyone can be added */
-          return Q.resolve(true);
+          return true;
 
         case 'INHERITED':
           var parentUri = troupe.uri.split('/').slice(0, -1).join('/');
@@ -35,18 +36,18 @@ function canUserBeInvitedToJoinRoom(usernameToBeInvited, troupe, instigatingUser
 
         default:
           /* Dont know what kind of permission this is */
-          return Q.reject(400);
+          throw new StatusError(400);
       }
       break;
 
     case 'USER_CHANNEL':
       /* Anyone can be added, whether its PUBLIC or PRIVATE */
-      return Q.resolve(true);
+      return true;
 
     default:
       /* Dont know what kind of room this is */
-      return Q.reject(400);
+      throw new StatusError(400);
   }
-}
+});
 
 module.exports = canUserBeInvitedToJoinRoom;

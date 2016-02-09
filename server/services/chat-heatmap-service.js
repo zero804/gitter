@@ -1,7 +1,7 @@
 "use strict";
 
 var client = require('../utils/elasticsearch-client');
-var Q = require('q');
+var Promise = require('bluebird');
 var assert = require('assert');
 
 /**
@@ -62,12 +62,13 @@ exports.getHeatmapForRoom = function(roomId, startMonth, endMonth, tz) {
     }
   };
 
-  return Q(client.search(queryRequest)).then(function(result) {
-    return result.aggregations.messages_per_day.buckets.reduce(function(memo, bucket) {
-      var unixTime = (bucket.key / 1000).toFixed(0);
+  return Promise.resolve(client.search(queryRequest))
+    .then(function(result) {
+      return result.aggregations.messages_per_day.buckets.reduce(function(memo, bucket) {
+        var unixTime = (bucket.key / 1000).toFixed(0);
 
-      memo[unixTime] = bucket.doc_count;
-      return memo;
-    }, {});
-  });
+        memo[unixTime] = bucket.doc_count;
+        return memo;
+      }, {});
+    });
 };

@@ -6,7 +6,8 @@ var testRequire = require('../../test-require');
 var assert = require('assert');
 var mockito = require('jsmockito').JsMockito;
 var testGenerator = require('../../test-generator');
-var Q = require('q');
+var Promise = require('bluebird');
+
 
 // var FIXTURE = {
 //   join: true,
@@ -66,7 +67,7 @@ var FIXTURES = [{
 
     it('should ' + (EXPECTED ? 'allow' : 'deny') + ' ' + RIGHT, function(done) {
       mockito.when(userHasSignedUpMock)().then(function() {
-        return Q.resolve(HAS_SIGNED_UP);
+        return Promise.resolve(HAS_SIGNED_UP);
       });
 
       permissionsModel(USER, RIGHT, URI, SECURITY)

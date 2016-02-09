@@ -1,6 +1,6 @@
 "use strict";
 
-var Q                       = require('q');
+var Promise                 = require('bluebird');
 var lazy                    = require('lazy.js');
 var persistence             = require('../persistence-service');
 var _                       = require('underscore');
@@ -38,7 +38,7 @@ function addTroupeAsFavouriteInLastPosition(userId, troupeId) {
         { $set: setOp },
         { upsert: true, new: true })
         .exec()
-        .thenResolve(lastPosition);
+        .thenReturn(lastPosition);
     });
 }
 
@@ -88,7 +88,7 @@ function addTroupeAsFavouriteInPosition(userId, troupeId, position) {
         update,
         { upsert: true, new: true })
         .exec()
-        .thenResolve(position);
+        .thenReturn(position);
     });
 
 }
@@ -102,7 +102,7 @@ function clearFavourite(userId, troupeId) {
     { $unset: setOp },
     { })
     .exec()
-    .thenResolve(null);
+    .thenReturn(null);
 }
 
 function updateFavourite(userId, troupeId, favouritePosition) {
@@ -200,7 +200,7 @@ function getTroupeLastAccessTimesForUser(userId) {
  * as a default ~1 July 2015.
  */
 function findLastAccessTimesForUsersInRoom(roomId, userIds) {
-  if (!userIds.length) return Q.resolve({});
+  if (!userIds.length) return Promise.resolve({});
 
   var troupesKey = 'troupes.' +  roomId;
   var lastKey = 'last.' +  roomId;

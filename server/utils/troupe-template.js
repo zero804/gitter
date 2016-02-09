@@ -5,7 +5,7 @@ var handlebars  = require('handlebars');
 var i18nFactory = require('./i18n-factory');
 var _           = require('underscore');
 var hbsHelpers  = require('../web/hbs-helpers');
-var Q           = require('q');
+var Promise     = require('bluebird');
 
 // TODO: add caching!
 handlebars.registerHelper('cdn', hbsHelpers.cdn);
@@ -28,12 +28,13 @@ handlebars.registerHelper('__n', function() {
 });
 
 module.exports = {
-  compile : function(sourceFile, callback) {
-    var d = Q.defer();
+  compile: function(sourceFile, callback) {
     var sourceFileName = __dirname + '/../../public/templates/' + sourceFile + '.hbs';
 
-    fs.readFile(sourceFileName, 'utf-8', function (err, source) {
-      if (err) return d.reject(err);
+    return Promise.fromCallback(function(callback) {
+      fs.readFile(sourceFileName, 'utf-8', callback);
+    })
+    .then(function(source) {
       var template = handlebars.compile(source);
       var templateWith18n = function(options) {
 
@@ -47,9 +48,9 @@ module.exports = {
 
         return template(_.extend({}, options, { i18n: i18n }));
       };
-      d.resolve(templateWith18n);
-    });
 
-    return d.promise.nodeify(callback);
+      return templateWith18n;
+    })
+    .nodeify(callback);
   }
 };

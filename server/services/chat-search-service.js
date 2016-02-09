@@ -3,7 +3,7 @@
 var env                    = require('gitter-web-env');
 var stats                  = env.stats;
 
-var Q                      = require('q');
+var Promise                = require('bluebird');
 var _                      = require('underscore');
 var languageDetector       = require('../utils/language-detector');
 var languageAnalyzerMapper = require('../utils/language-analyzer-mapper');
@@ -25,45 +25,42 @@ function extractHighlights(text) {
   return results.filter(function(f) { return !!f; });
 }
 
-function parseQuery(textQuery, userLang) {
-  return Q.fcall(function() {
-    /* Horrible hack - rip a from:xyz field out of the textQuery */
-    var fromUser;
-    textQuery = textQuery.replace(/\bfrom:('[^']*'|"[^"]*"|[^'"]\w*)/g, function(wholeMatch, fromField) {
-      fromUser = fromField;
-      return "";
-    });
-
-    if(!textQuery) {
-      return {
-        queryString: "",
-        fromUser: fromUser,
-        analyzers: ["default"]
-      };
-    }
-
-    return languageDetector(textQuery)
-      .then(function(detectedLanguage) {
-        var analyzers = { "default": true };
-
-        if(userLang) {
-          analyzers[languageAnalyzerMapper(userLang)] = true;
-        }
-
-        if(detectedLanguage) {
-          analyzers[languageAnalyzerMapper(detectedLanguage)] = true;
-        }
-
-        return {
-          queryString: textQuery,
-          fromUser: fromUser,
-          analyzers: Object.keys(analyzers)
-        };
-
-      });
-
+var parseQuery = Promise.method(function (textQuery, userLang) {
+  /* Horrible hack - rip a from:xyz field out of the textQuery */
+  var fromUser;
+  textQuery = textQuery.replace(/\bfrom:('[^']*'|"[^"]*"|[^'"]\w*)/g, function(wholeMatch, fromField) {
+    fromUser = fromField;
+    return "";
   });
-}
+
+  if(!textQuery) {
+    return {
+      queryString: "",
+      fromUser: fromUser,
+      analyzers: ["default"]
+    };
+  }
+
+  return languageDetector(textQuery)
+    .then(function(detectedLanguage) {
+      var analyzers = { "default": true };
+
+      if(userLang) {
+        analyzers[languageAnalyzerMapper(userLang)] = true;
+      }
+
+      if(detectedLanguage) {
+        analyzers[languageAnalyzerMapper(detectedLanguage)] = true;
+      }
+
+      return {
+        queryString: textQuery,
+        fromUser: fromUser,
+        analyzers: Object.keys(analyzers)
+      };
+
+    });
+});
 
 function getElasticSearchQuery(troupeId, parsedQuery) {
   var query = {
@@ -139,7 +136,7 @@ function performQuery(troupeId, parsedQuery, options) {
 
   var startTime = Date.now();
 
-  return Q(client.search(queryRequest))
+  return Promise.resolve(client.search(queryRequest))
     .then(function(response) {
       stats.responseTime('chat.search.exec', Date.now() - startTime);
 
@@ -153,7 +150,7 @@ function performQuery(troupeId, parsedQuery, options) {
     .catch(function(err) {
       stats.event('chat.search.error');
       throw err;
-    })
+    });
 }
 
 /**
