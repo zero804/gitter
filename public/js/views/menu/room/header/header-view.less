@@ -24,9 +24,14 @@
 }
 
 .panel-header__title {
-  margin:      0;
-  font-weight: 300;
-  font-size:   2.5rem;
+  box-sizing:    border-box;
+  max-width:     80%;
+  margin:        0;
+  overflow:      hidden;
+  font-weight:   300;
+  font-size:     2.5rem;
+  white-space:   nowrap;
+  text-overflow: ellipsis;
 
   .desktop & {
     padding:     0 0 0 @desktop-menu-left-padding;
