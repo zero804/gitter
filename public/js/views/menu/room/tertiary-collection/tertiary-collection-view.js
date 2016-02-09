@@ -28,10 +28,6 @@ module.exports =  BaseCollectionView.extend({
     this.listenTo(this.collection, 'filter-complete', this.render, this);
   },
 
-  filter: function(model, index) { //jshint unused: true
-    return (this.roomMenuModel.get('state') === 'search') ? (index <= 5) : false;
-  },
-
   onSearchUpdate: function() {
     if (this.roomMenuModel.get('state') !== 'search') { return; }
 
