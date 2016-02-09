@@ -628,7 +628,7 @@ gulp.task('sonar', function () {
         }
       },
       analysis: {
-        mode: 'publish'
+        mode: 'preview'
       },
       github: {
         pullRequest: process.env.ghprbPullId,
