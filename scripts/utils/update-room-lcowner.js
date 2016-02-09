@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 'use strict';
 
-var Q = require('q');
 var persistence = require('../../server/services/persistence-service');
 var assert = require('assert');
 var shutdown = require('shutdown');

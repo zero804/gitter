@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 'use strict';
 
-var Q = require('q');
 var persistence = require('../../server/services/persistence-service');
 var GitHubService = require('../../server/services/github/github-repo-service');
 var assert = require('assert');
