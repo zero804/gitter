@@ -6,7 +6,7 @@ var serializer                   = require("../../serializers/notification-seria
 var notificationMessageGenerator = require('./notification-message-generator');
 var unreadItemService            = require('../unread-item-service');
 var debug                        = require('debug')('gitter:push-notification-generator');
-var Q                            = require('q');
+var Promise                      = require('bluebird');
 var _                            = require('lodash');
 
 var MAX_MESSAGES_FOR_NOTIFICATION = 3;
@@ -15,7 +15,7 @@ function serializeItems(troupeId, recipientUserId, chatIds) {
   var troupeStrategy = new serializer.TroupeIdStrategy({ recipientUserId: recipientUserId });
   var chatStrategy = new serializer.ChatIdStrategy({ includeTroupe: false, recipientUserId: recipientUserId });
 
-  return Q.all([
+  return Promise.all([
     serializer.serialize(troupeId, troupeStrategy),
     serializer.serialize(chatIds, chatStrategy),
   ]);

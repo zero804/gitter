@@ -181,6 +181,10 @@ gulp.task('submit-coveralls-post-tests', ['merge-lcov'], function() {
 
   return gulp.src('output/coverage-reports/merged/lcov.info')
     .pipe(coveralls())
+    .on('error', function(err) {
+      gutil.log(err);
+      process.env.GIT_BRANCH = GIT_BRANCH;
+    })
     .on('end', function() {
       process.env.GIT_BRANCH = GIT_BRANCH;
     });

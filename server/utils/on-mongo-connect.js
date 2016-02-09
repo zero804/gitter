@@ -1,7 +1,7 @@
 "use strict";
 
 var mongoose = require('mongoose');
-var Q = require('q');
+var Promise = require('bluebird');
 var debug = require('debug')('gitter:on-mongo-connect');
 
 module.exports = function onMongoConnect(callback) {
@@ -9,16 +9,18 @@ module.exports = function onMongoConnect(callback) {
 
   if(mongoose.connection.readyState === 1) {
     debug('Mongo already ready, continuing immediately');
-    promise = Q.resolve();
+
+    promise = Promise.resolve();
   } else {
     debug('Awaiting mongo connection');
-    var d = Q.defer();
-    promise = d.promise;
 
-    mongoose.connection.once('open', function() {
-      debug('Mongo connection ready');
-      d.resolve();
+    promise = new Promise(function(resolve) {
+      mongoose.connection.once('open', function() {
+        debug('Mongo connection ready');
+        resolve();
+      });
     });
+
   }
 
   return promise.nodeify(callback);

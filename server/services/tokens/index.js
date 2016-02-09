@@ -1,6 +1,6 @@
 'use strict';
 
-var Q      = require('q');
+var Promise = require('bluebird');
 var UpAndDown = require('./up-and-down');
 
 var PROVIDERS = [
@@ -22,9 +22,9 @@ var iterator = new UpAndDown(PROVIDERS);
  * Returns the result from the matching downstream provider
  */
 function iterateProviders(downstream, upstream) {
-  var d = Q.defer();
-  iterator.iterate(downstream, upstream, d.makeNodeResolver());
-  return d.promise;
+  return Promise.fromCallback(function(callback) {
+    iterator.iterate(downstream, upstream, callback);
+  });
 }
 
 /**
@@ -63,11 +63,11 @@ exports.validateToken = function(token, callback) {
  */
 exports.deleteToken = function(token, callback) {
   /* Delete the token from all caches simultaneously */
-  return Q.all(PROVIDERS.map(function(provider) {
-      var d = Q.defer();
-      provider.deleteToken(token, d.makeNodeResolver());
-      return d.promise;
-    }))
+  return Promise.map(PROVIDERS, function(provider) {
+      return Promise.fromCallback(function(callback) {
+        provider.deleteToken(token, callback);
+      });
+    })
     .nodeify(callback);
 };
 
@@ -75,10 +75,10 @@ exports.deleteToken = function(token, callback) {
 exports.testOnly = {
   invalidateCache: function() {
     /* Invalidate all caches simultaneously */
-    return Q.all(PROVIDERS.map(function(provider) {
-      var d = Q.defer();
-      provider.invalidateCache(d.makeNodeResolver());
-      return d.promise;
-    }));
+    return Promise.map(PROVIDERS, function(provider) {
+      return Promise.fromCallback(function(callback) {
+        provider.invalidateCache(callback);
+      });
+    });
   }
 };

@@ -5,7 +5,6 @@
 var userService = require('../../server/services/user-service');
 var pushNotificationGateway = require('../../server/gateways/push-notification-gateway');
 var shutdown = require('shutdown');
-var Q = require('q');
 var onMongoConnect = require('../../server/utils/on-mongo-connect');
 
 var opts = require("nomnom")
