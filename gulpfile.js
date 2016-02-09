@@ -627,7 +627,7 @@ gulp.task('sonar', function () {
         }
       },
       analysis: {
-        mode: 'issues'
+        mode: 'publish'
       },
       github: {
         pullRequest: process.env.ghprbPullId,
@@ -641,7 +641,7 @@ gulp.task('sonar', function () {
       }
     }
   };
-  
+
   // gulp source doesn't matter, all files are referenced in options object above
   return gulp.src('gulpfile.js', { read: false })
       .pipe(sonar(options))
