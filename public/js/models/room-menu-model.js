@@ -61,10 +61,6 @@ module.exports = Backbone.Model.extend({
     this._troupeModel = attrs.troupeModel;
     delete attrs.troupeModel;
 
-    this._suggestedRoomCollection = new SuggestedRoomsByRoomCollection(null, {
-      roomMenuModel: this,
-      troupeModel:   this._troupeModel,
-    });
 
     //TODO TEST THIS & THROW ERROR JP 25/1/16
     this._orgCollection = attrs.orgCollection;
@@ -76,10 +72,17 @@ module.exports = Backbone.Model.extend({
     delete attrs.userModel;
 
     //expose the public collection
-    this.searchTerms         = new RecentSearchesCollection(null);
-    this.searchRoomAndPeople = new SearchRoomPeopleCollection(null, { roomMenuModel: this });
-    this.searchChatMessages  = new SearchChatMessages(null, { roomMenuModel: this, roomModel: this._troupeModel });
-    this.suggestedOrgs       = new SuggestedOrgCollection([], { contextModel: this });
+    this.searchTerms              = new RecentSearchesCollection(null);
+    this.searchRoomAndPeople      = new SearchRoomPeopleCollection(null, { roomMenuModel: this });
+    this.searchChatMessages       = new SearchChatMessages(null, { roomMenuModel: this, roomModel: this._troupeModel });
+    this.suggestedOrgs            = new SuggestedOrgCollection([], { contextModel: this, roomCollection: this._roomCollection });
+    this._suggestedRoomCollection = new SuggestedRoomsByRoomCollection(null, {
+      roomMenuModel:           this,
+      troupeModel:             this._troupeModel,
+      roomCollection:          this._roomCollection,
+      suggestedOrgsCollection: this.suggestedOrgs,
+    });
+
 
     this.activeRoomCollection   = new FilteredRoomCollection(null, {
       roomModel:  this,
