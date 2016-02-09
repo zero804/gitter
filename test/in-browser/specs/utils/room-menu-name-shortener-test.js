@@ -12,9 +12,15 @@ describe('roomNameShortener()', function() {
     assert.equal(expected, result);
   });
 
-  it('should not shorten strings shorter than 19 characters', function(){
+  it('should not shorten strings shorter than 19 characters', function() {
     var result = roomNameShortener('gitterHQ/test');
     var expected = 'gitterHQ/test';
+    assert.equal(expected, result);
+  });
+
+  it('should treat strings with extra /\'s differently ', function() {
+    var result = roomNameShortener('gitterHQ/repo/channel');
+    var expected = 'repo/channel';
     assert.equal(expected, result);
   });
 
