@@ -27,14 +27,14 @@ describe('auto-lurker-service', function() {
       fixture.cleanup();
     });
 
-    it('#01 should return a lurk candidate',function() {
+    it('should return a lurk candidate',function() {
       var tenDaysAgo = new Date(Date.now() - 86400000 * 10);
       return recentRoomService.saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupe1.id, { lastAccessTime: tenDaysAgo })
         .then(function() {
           return autoLurkerService.findLurkCandidates(fixture.troupe1, { minTimeInDays: 1 });
         })
         .then(function(candidates) {
-          assert(candidates.length === 1);
+          assert.strictEqual(candidates.length, 1);
 
           assert.equal(candidates[0].userId, fixture.user1.id);
           assert(!candidates[0].lurk);
@@ -43,9 +43,9 @@ describe('auto-lurker-service', function() {
         });
     });
 
-    it('#02 should return a lurk candidate with notify settings',function() {
+    it('should return a lurk candidate with notify settings',function() {
       var tenDaysAgo = new Date(Date.now() - 86400000 * 10);
-      return userRoomNotificationService.updateSettingForUserRoom(fixture.user1.id, fixture.troupe1.id, 'mention')
+      return userRoomNotificationService.updateSettingForUserRoom(fixture.user1.id, fixture.troupe1.id, 'all')
         .then(function() {
           return recentRoomService.saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupe1.id, { lastAccessTime: tenDaysAgo });
         })
@@ -57,12 +57,12 @@ describe('auto-lurker-service', function() {
 
           assert.equal(candidates[0].userId, fixture.user1.id);
           assert(!candidates[0].lurk);
-          assert.equal(candidates[0].notificationSettings, 'mention');
+          assert.equal(candidates[0].notificationSettings, 'all');
           assert.equal(candidates[0].lastAccessTime.valueOf(), tenDaysAgo.valueOf());
         });
     });
 
-    it('#03 should return a lurk candidate with notify settings',function() {
+    it('should return a lurk candidate with notify settings',function() {
       var tenDaysAgo = new Date(Date.now() - 86400000 * 10);
       return userRoomNotificationService.updateSettingForUserRoom(fixture.user1.id, fixture.troupe1.id, 'all')
         .then(function() {
@@ -84,7 +84,7 @@ describe('auto-lurker-service', function() {
         });
     });
 
-    it('#04 should not return fully lurked candidates',function() {
+    it('should not return fully lurked candidates',function() {
       var tenDaysAgo = new Date(Date.now() - 86400000 * 10);
       return userRoomNotificationService.updateSettingForUserRoom(fixture.user1.id, fixture.troupe1.id, 'mention')
         .then(function() {
@@ -101,7 +101,7 @@ describe('auto-lurker-service', function() {
         });
     });
 
-    it('#05 should identify users for lurk based on the date they were added to the room if they have not logged in',function() {
+    it('should identify users for lurk based on the date they were added to the room if they have not logged in',function() {
       var tenDaysAgo = new Date(Date.now() - 86400000 * 10);
       return roomService.testOnly.updateUserDateAdded(fixture.user1.id, fixture.troupe2.id, tenDaysAgo)
         .then(function() {
@@ -114,7 +114,7 @@ describe('auto-lurker-service', function() {
         });
     });
 
-    it('#06 should ignore date added if the user has accessed the room since then',function() {
+    it('should ignore date added if the user has accessed the room since then',function() {
       var tenDaysAgo = new Date(Date.now() - 86400000 * 10);
       var twoDaysAgo = new Date(Date.now() - 86400000 * 2);
 
@@ -146,7 +146,7 @@ describe('auto-lurker-service', function() {
       fixture.cleanup();
     });
 
-    it('#01 should return a lurk candidate',function() {
+    it('should return a lurk candidate',function() {
       var tenDaysAgo = new Date(Date.now() - 86400000 * 10);
       return recentRoomService.saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupe1.id, { lastAccessTime: tenDaysAgo })
         .then(function() {
@@ -164,7 +164,7 @@ describe('auto-lurker-service', function() {
         });
     });
 
-    it('#02 should return a lurk candidate with notify settings',function() {
+    it('should return a lurk candidate with notify settings',function() {
       var tenDaysAgo = new Date(Date.now() - 86400000 * 10);
       return userRoomNotificationService.updateSettingForUserRoom(fixture.user1.id, fixture.troupe1.id, 'mention')
         .then(function() {
@@ -185,7 +185,7 @@ describe('auto-lurker-service', function() {
         });
     });
 
-    it('#03 should return a lurk candidate with notify settings',function() {
+    it('should return a lurk candidate with notify settings',function() {
       var tenDaysAgo = new Date(Date.now() - 86400000 * 10);
       return userRoomNotificationService.updateSettingForUserRoom(fixture.user1.id, fixture.troupe1.id, 'mute')
         .then(function() {
