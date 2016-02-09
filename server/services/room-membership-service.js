@@ -9,31 +9,9 @@ var EventEmitter         = require('events').EventEmitter;
 var assert               = require('assert');
 var debug                = require('debug')('gitter:room-membership-service');
 var recentRoomCore       = require('./core/recent-room-core');
+var util                 = require('util');
+var StatusError          = require('statuserror');
 var roomMembershipEvents = new EventEmitter();
-
-/* Exports */
-exports.findRoomIdsForUser          = findRoomIdsForUser;
-exports.findRoomIdsForUserWithLurk  = findRoomIdsForUserWithLurk;
-exports.checkRoomMembership         = checkRoomMembership;
-exports.findUserMembershipInRooms   = findUserMembershipInRooms;
-exports.findMembershipForUsersInRoom = findMembershipForUsersInRoom;
-
-exports.findMembersForRoom          = findMembersForRoom;
-exports.countMembersInRoom          = countMembersInRoom;
-exports.findMembersForRoomWithLurk  = findMembersForRoomWithLurk;
-exports.addRoomMember               = addRoomMember;
-exports.addRoomMembers              = addRoomMembers;
-exports.removeRoomMember            = removeRoomMember;
-exports.removeRoomMembers           = removeRoomMembers;
-exports.findAllMembersForRooms      = findAllMembersForRooms;
-exports.findMembersForRoomMulti     = findMembersForRoomMulti;
-
-exports.getMemberLurkStatus         = getMemberLurkStatus;
-exports.setMemberLurkStatus         = setMemberLurkStatus;
-exports.setMembersLurkStatus        = setMembersLurkStatus;
-
-/* Event emitter */
-exports.events                      = roomMembershipEvents;
 
 /* Note, these can not change! */
 /* -----8<---- */
@@ -43,38 +21,34 @@ var FLAG_POS_NOTIFY_MENTIONS      = 2;
 var FLAG_POS_NOTIFY_ANNOUNCEMENTS = 3;
 /* -----8<---- */
 
-var BITMASK_INVERT = 0xFFFFFFFF;
+var BITMASK_INVERT = 0x0FFFFFFF;
+var BITMASK_MODE = 1 << FLAG_POS_NOTIFY_UNREAD |
+                   1 << FLAG_POS_NOTIFY_ACTIVITY |
+                   1 << FLAG_POS_NOTIFY_MENTIONS |
+                   1 << FLAG_POS_NOTIFY_ANNOUNCEMENTS;
+
+var BITMASK_INVERT_MODE = BITMASK_INVERT & ~BITMASK_MODE;
 
 var BITMASK_NOTIFY_UNREAD           = 1 << FLAG_POS_NOTIFY_UNREAD;
 var BITMASK_NO_NOTIFY_UNREAD        = BITMASK_INVERT & ~BITMASK_NOTIFY_UNREAD;
 var BITMASK_NOTIFY_ACTIVITY         = 1 << FLAG_POS_NOTIFY_ACTIVITY;
-var BITMASK_NO_NOTIFY_ACTIVITY      = BITMASK_INVERT & ~FLAG_POS_NOTIFY_ACTIVITY;
-var BITMASK_NOTIFY_MENTIONS         = 1 << FLAG_POS_NOTIFY_UNREAD;
-var BITMASK_NO_NOTIFY_MENTIONS      = BITMASK_INVERT & ~BITMASK_NOTIFY_MENTIONS;
+var BITMASK_NOTIFY_MENTIONS         = 1 << FLAG_POS_NOTIFY_MENTIONS;
 var BITMASK_NOTIFY_ANNOUNCEMENTS    = 1 << FLAG_POS_NOTIFY_ANNOUNCEMENTS;
-var BITMASK_NO_NOTIFY_ANNOUNCEMENTS = BITMASK_INVERT & ~BITMASK_NOTIFY_MENTIONS;
 
-/* Mode: all: unread + no activity + mentions + announcements */
-var BITMASK_MODE_ALL_SET = BITMASK_NOTIFY_UNREAD |
-                            BITMASK_NOTIFY_MENTIONS |
-                            BITMASK_NOTIFY_ANNOUNCEMENTS;
-var BITMASK_MODE_ALL_CLEAR = BITMASK_INVERT &
-                            BITMASK_NO_NOTIFY_ACTIVITY;
+var MODES = {
+  /* Mode: all: unread + no activity + mentions + announcements */
+  all: BITMASK_NOTIFY_UNREAD | BITMASK_NOTIFY_MENTIONS | BITMASK_NOTIFY_ANNOUNCEMENTS,
 
-/* Mode: announcements: no unread + activity + mentions + announcements */
-var BITMASK_MODE_ANNOUNCEMENTS_SET = BITMASK_NOTIFY_ACTIVITY |
-                            BITMASK_NOTIFY_MENTIONS |
-                            BITMASK_NOTIFY_ANNOUNCEMENTS;
-var BITMASK_MODE_ANNOUNCEMENTS_CLEAR = BITMASK_INVERT &
-                            BITMASK_NO_NOTIFY_UNREAD;
+  /* Mode: announcements: no unread + activity + mentions + announcements */
+  announcements: BITMASK_NOTIFY_ACTIVITY | BITMASK_NOTIFY_MENTIONS | BITMASK_NOTIFY_ANNOUNCEMENTS,
 
-/* Mode: mute: no unread + no activity + mentions + no announcements */
-var BITMASK_MODE_MUTE_SET = BITMASK_NOTIFY_MENTIONS;
-var BITMASK_MODE_MUTE_CLEAR = BITMASK_INVERT &
-                                BITMASK_NO_NOTIFY_UNREAD &
-                                BITMASK_NO_NOTIFY_ACTIVITY &
-                                BITMASK_NO_NOTIFY_ANNOUNCEMENTS;
-                                
+  /* Mode: mute: no unread + no activity + mentions + no announcements */
+  mute: BITMASK_NOTIFY_MENTIONS,
+};
+
+/* Alias modes */
+MODES.mention = MODES.announcements;
+
 /**
  * Returns the rooms the user is in
  */
@@ -365,7 +339,7 @@ function findAllMembersForRooms(troupeIds) {
 
 /**
  * Fetch the membership of multiple rooms, returns
- * a hash keyed by the roomId, with a userId array
+ * a hash keyed by the troupeId, with a userId array
  * as the value
  */
 function findMembersForRoomMulti(troupeIds) {
@@ -400,8 +374,8 @@ function getMemberLurkStatus(troupeId, userId) {
   return TroupeUser.findOne({ troupeId: troupeId, userId: userId }, { lurk: 1, flags: 1, _id: 0 }, { lean: true })
     .exec()
     .then(function(troupeUser) {
-       if (!troupeUser) return null;
-       return getLurkFromTroupeUser(troupeUser);
+      if (!troupeUser) return null;
+      return getLurkFromTroupeUser(troupeUser);
     });
 }
 
@@ -409,7 +383,7 @@ function getMemberLurkStatus(troupeId, userId) {
  * Sets a member to be lurking or not lurking.
  * Returns true when things changed
  */
-function setMemberLurkStatus(troupeId, userId, lurk) {
+var setMemberLurkStatus = util.deprecate(function(troupeId, userId, lurk) {
   lurk = !!lurk; // Force boolean
 
   var bitOp = lurk ? { and: BITMASK_NO_NOTIFY_UNREAD } : { or: BITMASK_NOTIFY_UNREAD };
@@ -434,12 +408,12 @@ function setMemberLurkStatus(troupeId, userId, lurk) {
 
        return changed;
     });
-}
+}, 'roomMembershipService.setMemberLurkStatus is deprecated');
 
 /**
  * Sets a group of multiple members lurk status.
  */
-function setMembersLurkStatus(troupeId, userIds, lurk) {
+var setMembersLurkStatus = util.deprecate(function(troupeId, userIds, lurk) {
  lurk = !!lurk; // Force boolean
 
  var bitOp = lurk ? { and: BITMASK_NO_NOTIFY_UNREAD } : { or: BITMASK_NOTIFY_UNREAD };
@@ -461,7 +435,7 @@ function setMembersLurkStatus(troupeId, userIds, lurk) {
 
     roomMembershipEvents.emit("members.lurk.change", troupeId, userIds, lurk);
   });
-}
+}, 'roomMembershipService.setMembersLurkStatus is deprecated');
 
 /**
  * Update the userCount value for a room
@@ -478,3 +452,121 @@ function resetTroupeUserCount(troupeId) {
         .exec();
     });
 }
+
+function getModeFromFlags(flags) {
+  switch(flags & BITMASK_MODE) {
+    case MODES.all:
+      return 'all';
+    case MODES.announcements:
+      return 'announcements';
+    case MODES.mute:
+      return 'mute';
+  }
+
+  // TODO: deal with 'unknown' modes better
+  return null;
+}
+
+function getUpdateForMode(mode) {
+  if (!MODES.hasOwnProperty(mode)) {
+    throw new StatusError(400, 'Invalid mode ' + mode);
+  }
+
+  var setBits = MODES[mode];
+  var clearBits = BITMASK_INVERT_MODE | setBits;
+
+  var lurk = !!(setBits & BITMASK_NOTIFY_UNREAD);
+
+  return {
+    $set: { lurk: lurk },
+    $bit: { flags: { or: setBits, and: clearBits } }
+  };
+}
+
+function getLurkForMode(mode) {
+  if (!MODES.hasOwnProperty(mode)) {
+    throw new StatusError(400, 'Invalid mode ' + mode);
+  }
+
+  return !!(MODES[mode] & BITMASK_NOTIFY_UNREAD);
+}
+
+var getMembershipMode = Promise.method(function (userId, troupeId) {
+  return TroupeUser.findOne({ troupeId: troupeId, userId: userId }, { flags: 1, _id: 0 }, { lean: true })
+    .exec()
+    .then(function(troupeUser) {
+       if (!troupeUser) return null;
+       return getModeFromFlags(troupeUser.flags);
+    });
+});
+
+var setMembershipMode = Promise.method(function (userId, troupeId, value) {
+
+
+  return TroupeUser.findOneAndUpdate({
+      troupeId: troupeId,
+      userId: userId
+    }, getUpdateForMode(value), {
+      new: false
+    })
+    .exec()
+    .then(function(oldTroupeUser) {
+       if (!oldTroupeUser) return false;
+       var valueIsLurking = getLurkForMode(value);
+       var changed = getLurkFromTroupeUser(oldTroupeUser) !== valueIsLurking;
+
+       if (changed) {
+         roomMembershipEvents.emit("members.lurk.change", troupeId, [userId], valueIsLurking);
+       }
+
+       return changed;
+    });
+});
+
+var setMembershipModeForUsersInRoom = Promise.method(function setMembershipModeForUsersInRoom(troupeId, userIds, value) {
+
+  return TroupeUser.update({
+      troupeId: troupeId,
+      userId: { $in: mongoUtils.asObjectIDs(userIds) }
+    }, getUpdateForMode(value), {
+      multi: true
+    })
+    .exec()
+    .then(function() {
+      var valueIsLurking = getLurkForMode(value);
+
+      // Unfortunately we have no way of knowing which of the users
+      // were actually removed and which were already out of the collection
+      // as we have no transactions.
+
+      roomMembershipEvents.emit("members.lurk.change", troupeId, userIds, valueIsLurking);
+    });
+});
+
+/* Exports */
+exports.findRoomIdsForUser          = findRoomIdsForUser;
+exports.findRoomIdsForUserWithLurk  = findRoomIdsForUserWithLurk;
+exports.checkRoomMembership         = checkRoomMembership;
+exports.findUserMembershipInRooms   = findUserMembershipInRooms;
+exports.findMembershipForUsersInRoom = findMembershipForUsersInRoom;
+
+exports.findMembersForRoom          = findMembersForRoom;
+exports.countMembersInRoom          = countMembersInRoom;
+exports.findMembersForRoomWithLurk  = findMembersForRoomWithLurk;
+exports.addRoomMember               = addRoomMember;
+exports.addRoomMembers              = addRoomMembers;
+exports.removeRoomMember            = removeRoomMember;
+exports.removeRoomMembers           = removeRoomMembers;
+exports.findAllMembersForRooms      = findAllMembersForRooms;
+exports.findMembersForRoomMulti     = findMembersForRoomMulti;
+
+exports.getMemberLurkStatus         = getMemberLurkStatus;
+exports.setMemberLurkStatus         = setMemberLurkStatus;
+exports.setMembersLurkStatus        = setMembersLurkStatus;
+
+exports.getMembershipMode           = getMembershipMode;
+exports.setMembershipMode           = setMembershipMode;
+exports.setMembershipModeForUsersInRoom = setMembershipModeForUsersInRoom;
+
+/* Event emitter */
+exports.events                      = roomMembershipEvents;

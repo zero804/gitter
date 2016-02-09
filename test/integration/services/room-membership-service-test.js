@@ -30,8 +30,8 @@ describe('room-membership-service', function() {
 
     after(function() { fixture.cleanup(); });
 
-    it('should allow users to be added to a room', function(done) {
-      roomMembershipService.addRoomMembers(fixture.troupe1.id, [fixture.user1.id])
+    it('should allow users to be added to a room', function() {
+      return roomMembershipService.addRoomMembers(fixture.troupe1.id, [fixture.user1.id])
         .then(function(userIds) {
           assert.strictEqual(userIds.length, 1);
           assert.strictEqual(userIds[0], fixture.user1.id);
@@ -39,7 +39,7 @@ describe('room-membership-service', function() {
         })
         .then(function(count) {
           assert.strictEqual(count, 1);
-          return roomMembershipService.checkRoomMembership(fixture.troupe1.id, fixture.user1.id)
+          return roomMembershipService.checkRoomMembership(fixture.troupe1.id, fixture.user1.id);
         })
         .then(function(member) {
           assert(member);
@@ -47,17 +47,15 @@ describe('room-membership-service', function() {
         })
         .then(function(troupe) {
           assert.strictEqual(troupe.userCount, 1);
-          return roomMembershipService.checkRoomMembership(fixture.troupe1.id, fixture.user2.id)
+          return roomMembershipService.checkRoomMembership(fixture.troupe1.id, fixture.user2.id);
         })
         .then(function(member) {
           assert(!member);
-        })
-
-        .nodeify(done);
+        });
     });
 
-    it('should allow users to be removed from a room', function(done) {
-      roomMembershipService.addRoomMembers(fixture.troupe2.id, [fixture.user1.id, fixture.user2.id])
+    it('should allow users to be removed from a room', function() {
+      return roomMembershipService.addRoomMembers(fixture.troupe2.id, [fixture.user1.id, fixture.user2.id])
         .then(function() {
           return persistence.Troupe.findById(fixture.troupe2.id).exec();
         })
@@ -83,9 +81,60 @@ describe('room-membership-service', function() {
         })
         .then(function(member) {
           assert(!member);
-        })
+        });
+    });
 
-        .nodeify(done);
+    describe('membership modes', function() {
+      it('should handle lurk status alongside membership mode mute', function() {
+        return roomMembershipService.addRoomMembers(fixture.troupe2.id, [fixture.user1.id])
+          .then(function() {
+            return roomMembershipService.setMembershipMode(fixture.user1.id, fixture.troupe2.id, 'mute');
+          })
+          .then(function() {
+            return roomMembershipService.getMembershipMode(fixture.user1.id, fixture.troupe2.id);
+          })
+          .then(function(mode) {
+            assert.strictEqual(mode, 'mute');
+            return roomMembershipService.getMemberLurkStatus(fixture.troupe2.id, fixture.user1.id);
+          })
+          .then(function(lurking) {
+            assert.strictEqual(lurking, true);
+          });
+      });
+
+      it('should handle lurk status alongside membership mode announcements', function() {
+        return roomMembershipService.addRoomMembers(fixture.troupe2.id, [fixture.user1.id])
+          .then(function() {
+            return roomMembershipService.setMembershipMode(fixture.user1.id, fixture.troupe2.id, 'announcements');
+          })
+          .then(function() {
+            return roomMembershipService.getMembershipMode(fixture.user1.id, fixture.troupe2.id);
+          })
+          .then(function(mode) {
+            assert.strictEqual(mode, 'announcements');
+            return roomMembershipService.getMemberLurkStatus(fixture.troupe2.id, fixture.user1.id);
+          })
+          .then(function(lurking) {
+            assert.strictEqual(lurking, true);
+          });
+      });
+
+      it('should handle lurk status alongside membership mode all', function() {
+        return roomMembershipService.addRoomMembers(fixture.troupe2.id, [fixture.user1.id])
+          .then(function() {
+            return roomMembershipService.setMembershipMode(fixture.user1.id, fixture.troupe2.id, 'all');
+          })
+          .then(function() {
+            return roomMembershipService.getMembershipMode(fixture.user1.id, fixture.troupe2.id);
+          })
+          .then(function(mode) {
+            assert.strictEqual(mode, 'all');
+            return roomMembershipService.getMemberLurkStatus(fixture.troupe2.id, fixture.user1.id);
+          })
+          .then(function(lurking) {
+            assert.strictEqual(lurking, false);
+          });
+      });
     });
 
   });

@@ -2,6 +2,7 @@
 
 var Promise                   = require('bluebird');
 var userTroupeSettingsService = require('./user-troupe-settings-service');
+var roomMembershipService     = require('./room-membership-service');
 var _                         = require('lodash');
 var StatusError               = require('statuserror');
 
@@ -14,7 +15,6 @@ module.exports = {
   findSettingsForMultiUserRooms: Promise.method(findSettingsForMultiUserRooms),
   updateSettingForUserRoom:      Promise.method(updateSettingForUserRoom),
   updateSettingsForUsersInRoom:  Promise.method(updateSettingsForUsersInRoom),
-  updateSettingsForUserRoom:     Promise.method(updateSettingsForUserRoom),
 };
 
 function findSettingForUserRoom(userId, roomId) {
@@ -66,12 +66,20 @@ function findSettingsForMultiUserRooms(userRooms) {
     });
 }
 
+/**
+ * Update the notification setting for a single user in a room
+ */
 function updateSettingForUserRoom(userId, roomId, value) {
   if (value !== 'mention' && value !== 'all' && value !== 'mute') {
     throw new StatusError(400, 'Invalid notification setting ' + value);
   }
 
-  return userTroupeSettingsService.setUserSettings(userId, roomId, 'notifications', { push: value });
+  return Promise.join(
+    userTroupeSettingsService.setUserSettings(userId, roomId, 'notifications', { push: value }),
+    roomMembershipService.setMembershipMode(userId, roomId, value),
+    function() {
+      return;
+    });
 }
 
 /**
@@ -82,18 +90,12 @@ function updateSettingsForUsersInRoom(roomId, userIds, value) {
     throw new StatusError(400, 'Invalid notification setting ' + value);
   }
 
-  if (!userIds) return;
+  if (!userIds || !userIds.length) return;
 
-  return userTroupeSettingsService.setUserSettingsForUsersInTroupe(roomId, userIds, 'notifications', { push: value });
-}
-
-/**
- * Update the notification setting for a single user in a room
- */
-function updateSettingsForUserRoom(userId, roomId, value) {
-  if (value !== 'mention' && value !== 'all' && value !== 'mute') {
-    throw new StatusError(400, 'Invalid notification setting ' + value);
-  }
-
-  return userTroupeSettingsService.setUserSettings(userId, roomId, 'notifications', { push: value });
+  return Promise.join(
+    userTroupeSettingsService.setUserSettingsForUsersInTroupe(roomId, userIds, 'notifications', { push: value }),
+    roomMembershipService.setMembershipModeForUsersInRoom(roomId, userIds, value),
+    function() {
+      return;
+    });
 }

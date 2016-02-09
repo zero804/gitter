@@ -53,7 +53,7 @@ describe('auto-lurker-service', function() {
           return autoLurkerService.findLurkCandidates(fixture.troupe1, { minTimeInDays: 1 });
         })
         .then(function(candidates) {
-          assert(candidates.length === 1);
+          assert.strictEqual(candidates.length, 1);
 
           assert.equal(candidates[0].userId, fixture.user1.id);
           assert(!candidates[0].lurk);
@@ -75,7 +75,7 @@ describe('auto-lurker-service', function() {
           return autoLurkerService.findLurkCandidates(fixture.troupe1, { minTimeInDays: 1 });
         })
         .then(function(candidates) {
-          assert(candidates.length === 1);
+          assert.strictEqual(candidates.length, 1);
 
           assert.equal(candidates[0].userId, fixture.user1.id);
           assert(candidates[0].lurk);
