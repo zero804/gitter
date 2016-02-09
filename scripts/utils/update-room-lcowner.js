@@ -6,6 +6,7 @@ var assert = require('assert');
 var shutdown = require('shutdown');
 var BatchStream = require('batch-stream');
 var StatusError = require('statuserror');
+var Promise = require('bluebird');
 
 // @const
 var BATCH_SIZE = 20;
@@ -62,7 +63,7 @@ batch.on('end', function () {
 });
 
 var updateOwner = function (rooms) {
-  return Q.all(
+  return Promise.all(
     rooms.map(function(room) {
       console.log('room: ', room.uri, room.githubType);
       room.lcOwner = room.uri ? room.uri.split('/')[0].toLowerCase() : null;
@@ -74,7 +75,7 @@ var updateOwner = function (rooms) {
 // iterates to the rooms and saves them
 var saveRooms = function (rooms) {
 
-  return Q.all(
+  return Promise.all(
     rooms.map(function (room) {
       return room.save()
         .then(function () {
