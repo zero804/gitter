@@ -87,10 +87,10 @@ describe('chatService', function() {
     });
   });
 
-  describe('Finding messages', function() {
+  describe('Finding messages #slow', function() {
     var chat1, chat2, chat3;
 
-    beforeEach(function(done) {
+    before(function() {
       return chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, { text: 'A' })
         .then(function(chat) {
           chat1 = chat.id;
@@ -102,10 +102,7 @@ describe('chatService', function() {
         })
         .then(function(chat) {
           chat3 = chat.id;
-
-          return chatService.findChatMessagesForTroupe(fixture.troupe1.id, { aroundId: chat2 });
-        })
-        .nodeify(done);
+        });
     });
 
     it('should find messages using aroundId', function(done) {
@@ -121,7 +118,7 @@ describe('chatService', function() {
 
     it('should find messages with skip', function() {
       return Promise.join(
-        chatService.findChatMessagesForTroupe(fixture.troupe1.id, { skip: 1 }),
+        chatService.findChatMessagesForTroupe(fixture.troupe1.id, { skip: 1, readPreference: 'primaryPreferred' }),
         chatService.findChatMessagesForTroupe(fixture.troupe1.id, { }),
         function(withSkip, withoutSkip) {
           assert(withSkip.length > 2);
@@ -131,9 +128,8 @@ describe('chatService', function() {
           var secondLastItemWithoutSkip = withoutSkip[withoutSkip.length - 2];
 
           var lastItemWithSkip = withSkip[withSkip.length - 1];
-
           // Last item without skip does not exist in with skip...
-          assert.strictEqual(withSkip.filter(function(f) { return f.id == lastItemWithoutSkip.id; }).length, 0);
+          assert.deepEqual(withSkip.filter(function(f) { return f.id == lastItemWithoutSkip.id; }), []);
 
           assert.strictEqual(secondLastItemWithoutSkip.id, lastItemWithSkip.id);
         });
