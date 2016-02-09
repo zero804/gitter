@@ -41,6 +41,7 @@ var liveCollections    = require('./live-collections');
 var recentRoomService  = require('./recent-room-service');
 var badgerEnabled      = nconf.get('autoPullRequest:enabled');
 var uriResolver        = require('./uri-resolver');
+var util               = require('util');
 
 exports.testOnly = {};
 
@@ -1375,20 +1376,48 @@ function findBanByUsername(troupeId, bannedUsername) {
 }
 exports.findBanByUsername = findBanByUsername;
 
+var updateTroupeLurkForUserId = util.deprecate(function (userId, troupeId, lurk) {
+  lurk = !!lurk;
 
-function updateTroupeLurkForUserId(userId, troupeId, lurk) {
-  lurk = !!lurk; // Force boolean
-  return roomMembershipService.setMemberLurkStatus(troupeId, userId, lurk)
-    .then(function(changed) {
-      // Did a change did not occur?
-      if(!changed) return;
+  return roomMembershipService.getMembershipMode(troupeId, userId)
+    .then(function(mode) {
+      var newMode;
 
-      if(lurk) {
-        // Delete all the chats in Redis for this person too
-        return unreadItemService.markAllChatsRead(userId, troupeId, { member: true });
+      switch(mode) {
+        case 'all':
+          if (lurk) {
+            newMode = 'announcements';
+          }
+          break;
+
+        case 'announcements':
+          if (!lurk) {
+            newMode = 'all';
+          }
+
+          break;
+
+        case 'mute':
+          if (!lurk) {
+            newMode = 'all'
+          }
+          break;
       }
+
+      if (!newMode) return;
+
+      return roomMembershipService.setMembershipMode(troupeId, userId, newMode)
+        .then(function() {
+          if(newMode === 'mute' || newMode === 'announcements') {
+            // Delete all the chats in Redis for this person too
+            return unreadItemService.markAllChatsRead(userId, troupeId, { member: true });
+          }
+        });
+
     });
-}
+
+}, 'roomService.updateTroupeLurkForUserId is deprecated');
+
 exports.updateTroupeLurkForUserId = updateTroupeLurkForUserId;
 
 function searchRooms(userId, queryText, options) {
