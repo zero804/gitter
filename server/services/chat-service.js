@@ -323,7 +323,7 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
   }
 
   return findMarker
-    .then(function(markerId) {
+    .then(function(markerId) {   // jshint maxcomplexity:14
       if(!markerId && !options.aroundId) {
         var q = ChatMessage
           .where('toTroupeId', troupeId);
@@ -366,8 +366,15 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
             logger.warn('chat-service: Client requested large skip value on chat message collection query', { troupeId: troupeId, skip: skip });
           }
 
-          q = q.skip(skip)
-            .read('secondaryPreferred');
+          q = q.skip(skip);
+
+          if (!options.readPreference) {
+            q = q.read('secondaryPreferred');
+          }
+        }
+
+        if (options.readPreference) {
+          q = q.read(options.readPreference);
         }
 
         return q.lean()
