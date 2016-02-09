@@ -43,7 +43,6 @@ function findLurkCandidates(troupe, options) {
         });
     })
     .spread(function(oldUsersIds, lurkStatus, settings, lastAccessDates) {
-
       return oldUsersIds
         .filter(function(userId) {
           var notificationSettings = settings[userId];
