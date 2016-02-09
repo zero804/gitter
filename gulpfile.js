@@ -620,6 +620,11 @@ gulp.task('sonar', function () {
                   reportPath: 'output/coverage-reports/merged/lcov.info'
               }
           },
+          github: {
+            pullRequest: process.env.ghprbPullId,
+            repository: 'troupe/gitter-webapp',
+            oauth: process.env.SONARQUBE_GITHUB_ACCESS_TOKEN
+          },
           exec: {
               // All these properties will be send to the child_process.exec method (see: https://nodejs.org/api/child_process.html#child_process_child_process_exec_command_options_callback )
               // Increase the amount of data allowed on stdout or stderr (if this value is exceeded then the child process is killed, and the gulp-sonar will fail).
