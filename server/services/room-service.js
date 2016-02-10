@@ -1376,50 +1376,6 @@ function findBanByUsername(troupeId, bannedUsername) {
 }
 exports.findBanByUsername = findBanByUsername;
 
-var updateTroupeLurkForUserId = util.deprecate(function (userId, troupeId, lurk) {
-  lurk = !!lurk;
-
-  return roomMembershipService.getMembershipMode(troupeId, userId)
-    .then(function(mode) {
-      var newMode;
-
-      switch(mode) {
-        case 'all':
-          if (lurk) {
-            newMode = 'announcements';
-          }
-          break;
-
-        case 'announcements':
-          if (!lurk) {
-            newMode = 'all';
-          }
-
-          break;
-
-        case 'mute':
-          if (!lurk) {
-            newMode = 'all'
-          }
-          break;
-      }
-
-      if (!newMode) return;
-
-      return roomMembershipService.setMembershipMode(troupeId, userId, newMode)
-        .then(function() {
-          if(newMode === 'mute' || newMode === 'announcements') {
-            // Delete all the chats in Redis for this person too
-            return unreadItemService.markAllChatsRead(userId, troupeId, { member: true });
-          }
-        });
-
-    });
-
-}, 'roomService.updateTroupeLurkForUserId is deprecated');
-
-exports.updateTroupeLurkForUserId = updateTroupeLurkForUserId;
-
 function searchRooms(userId, queryText, options) {
 
   return persistence.Troupe
