@@ -154,7 +154,7 @@ describe.skip('auto-lurker-service', function() {
         })
         .then(function() {
           return [
-            userRoomNotificationService.findSettingForUserRoom(fixture.user1.id, fixture.troupe1.id),
+            userRoomNotificationService.getSettingForUserRoom(fixture.user1.id, fixture.troupe1.id),
             roomMembershipService.getMemberLurkStatus(fixture.troupe1.id, fixture.user1.id)
           ];
         })
@@ -175,7 +175,7 @@ describe.skip('auto-lurker-service', function() {
         })
         .then(function() {
           return [
-            userRoomNotificationService.findSettingForUserRoom(fixture.user1.id, fixture.troupe1.id),
+            userRoomNotificationService.getSettingForUserRoom(fixture.user1.id, fixture.troupe1.id),
             roomMembershipService.getMemberLurkStatus(fixture.troupe1.id, fixture.user1.id)
           ];
         })
@@ -199,7 +199,7 @@ describe.skip('auto-lurker-service', function() {
         })
         .then(function() {
           return [
-            userRoomNotificationService.findSettingForUserRoom(fixture.user1.id, fixture.troupe1.id),
+            userRoomNotificationService.getSettingForUserRoom(fixture.user1.id, fixture.troupe1.id),
             roomMembershipService.getMemberLurkStatus(fixture.troupe1.id, fixture.user1.id)
           ];
         })

@@ -1,40 +1,25 @@
 "use strict";
 
-var userTroupeSettingsService = require("../../../services/user-troupe-settings-service");
 var userRoomNotificationService = require("../../../services/user-room-notification-service");
+var StatusError = require('statuserror');
 
 module.exports = {
   id: 'setting',
-  index: function(req) {
-    var userId = req.resourceUser.id;
-    var troupeId = req.params.userTroupeId;
-
-    /* TODO: deprecate? */
-    return userTroupeSettingsService.getAllUserSettings(userId, troupeId)
-      .then(function(settings) {
-        return settings || {};
-      });
-  },
 
   show: function(req) {
     var userId = req.resourceUser.id;
     var troupeId = req.params.userTroupeId;
     var setting = req.params.setting;
 
-    if (setting === 'notifications') {
-      return userRoomNotificationService.getSettingForUserRoom(userId, troupeId)
-        .then(function(notificationSetting) {
-          return {
-            push: notificationSetting
-          };
-        });
-    }
+    if (setting !== 'notifications') throw new StatusError(404);
 
-    // TODO: should we handle this?
-    return userTroupeSettingsService.getUserSettings(userId, troupeId, setting)
-      .then(function(f) {
-        return f || {};
+    return userRoomNotificationService.getSettingForUserRoom(userId, troupeId)
+      .then(function(notificationSetting) {
+        return {
+          push: notificationSetting
+        };
       });
+
   },
 
   update: function(req) {
@@ -44,11 +29,10 @@ module.exports = {
 
     var settings = req.body;
 
-    if (setting === 'notifications') {
-      return userRoomNotificationService.updateSettingForUserRoom(userId, troupeId, settings && settings.push);
-    }
+    if (setting !== 'notifications') throw new StatusError(404);
 
-    return userTroupeSettingsService.setUserSettings(userId, troupeId, setting, settings);
+    return userRoomNotificationService.updateSettingForUserRoom(userId, troupeId, settings && settings.push)
+      .thenReturn({ success: true });
   }
 
 };
