@@ -14,13 +14,12 @@ var _                     = require("lodash");
 var mongoUtils            = require('../utils/mongo-utils');
 var RedisBatcher          = require('../utils/redis-batcher').RedisBatcher;
 var collections           = require('../utils/collections');
-var Q                     = require('q');
+var Promise               = require('bluebird');
 var roomMembershipService = require('./room-membership-service');
 var uniqueIds             = require('mongodb-unique-ids');
 var debug                 = require('debug')('gitter:unread-item-service');
 var recentRoomCore        = require('./core/recent-room-core');
 var badgeBatcher          = new RedisBatcher('badge', 1000, batchBadgeUpdates);
-var Q                     = require('q');
 
 /* Handles batching badge updates to users */
 function batchBadgeUpdates(key, userIds, done) {
@@ -44,7 +43,7 @@ function sinceFilter(since) {
 
 function reject(msg) {
   logger.error(msg);
-  return Q.reject(new Error(msg));
+  return Promise.reject(new Error(msg));
 }
 
 /**
@@ -273,17 +272,17 @@ function getTroupeIdsCausingBadgeCount(userId) {
 function findNonMembersWithAccess(troupe, userIds) {
   if (!userIds.length || troupe.oneToOne || troupe.security === 'PRIVATE') {
     // Trivial case, and the case where only members have access to the room type
-    return Q.resolve([]);
+    return Promise.resolve([]);
   }
 
   // Everyone can always access a public room
-  if (troupe.security === 'PUBLIC') return Q.resolve(userIds);
+  if (troupe.security === 'PUBLIC') return Promise.resolve(userIds);
 
   return userService.findByIds(userIds)
     .then(function(users) {
       var result = [];
 
-      return Q.all(users.map(function(user) {
+      return Promise.map(users, function(user) {
         /* TODO: some sort of bulk service here */
         return roomPermissionsModel(user, 'join', troupe)
           .then(function(access) {
@@ -295,7 +294,7 @@ function findNonMembersWithAccess(troupe, userIds) {
             // Swallow errors here. If the call fails, the chat should not fail
             errorReporter(e, { username: user.username, operation: 'findNonMembersWithAccess' }, { module: 'unread-items' });
           });
-      }))
+      })
       .then(function() {
         return result;
       });
@@ -339,7 +338,7 @@ function parseMentions(fromUserId, troupe, userIdsWithLurk, mentions) {
 
   // Skip checking if there are no non-members
   if(!nonMemberUserIds.length) {
-    return Q.resolve({
+    return Promise.resolve({
       memberUserIds: memberUserIds,
       nonMemberUserIds: [],
       mentionUserIds: memberUserIds
@@ -381,7 +380,7 @@ function parseChat(fromUserId, troupe, mentions) {
       });
 
       if(!mentions || !mentions.length) {
-        return Q.resolve({
+        return Promise.resolve({
           notifyUserIds: active,
           mentionUserIds: [],
           activityOnlyUserIds: nonActive,
@@ -693,12 +692,10 @@ function queueBadgeUpdateForUser(userIds) {
 
 exports.getActivityIndicatorForTroupeIds = function(troupeIds, userId) {
 
-  return Q.all([
+  return Promise.join(
     recentRoomCore.getTroupeLastAccessTimesForUser(userId),
-    engine.getLastChatTimestamps(troupeIds)
-  ])
-    .spread(function(allLastAccessTimes, rawLastMsgTimes) {
-
+    engine.getLastChatTimestamps(troupeIds),
+    function(allLastAccessTimes, rawLastMsgTimes) {
       var lastAccessTimes = troupeIds.reduce(function(accum, troupeId) {
         accum[troupeId] = allLastAccessTimes[troupeId];
         return accum;

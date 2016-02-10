@@ -40,7 +40,7 @@ function executeBatch(urlBase) {
     'USING PERIODIC COMMIT LOAD CSV WITH HEADERS FROM "' + urlBase + '/users.csv" AS row MERGE (user:User {userId: row.userId }) SET user.username = row.username;',
 
     /* Load rooms */
-    'USING PERIODIC COMMIT LOAD CSV WITH HEADERS FROM "' + urlBase + '/rooms.csv" AS row MERGE (room:Room {roomId: row.roomId }) SET room.security = row.security, room.weight = toFloat(row.weight)',
+    'USING PERIODIC COMMIT LOAD CSV WITH HEADERS FROM "' + urlBase + '/rooms.csv" AS row MERGE (room:Room {roomId: row.roomId }) SET room.security = row.security, room.weight = toFloat(row.weight), room.lang = row.lang',
 
     /* Setup MEMBER relationship */
     'USING PERIODIC COMMIT LOAD CSV WITH HEADERS FROM "' + urlBase + '/membership.csv" AS row ' +

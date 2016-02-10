@@ -1,6 +1,6 @@
 "use strict";
 
-var Q = require('q');
+var Promise = require('bluebird');
 var winston = require('../../utils/winston');
 var GithubIssueStateService = require('gitter-web-github').GitHubIssueStateService;
 
@@ -14,7 +14,7 @@ module.exports =  function(req, res, next) {
 
   var service = new GithubIssueStateService(req.user);
 
-  Q.all(issues.map(function(issue) {
+  Promise.all(issues.map(function(issue) {
     var parts = issue.split('/');
     if(parts.length !== 3) return '';
 

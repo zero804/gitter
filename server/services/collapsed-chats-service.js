@@ -1,16 +1,16 @@
 "use strict";
 
-var Q                = require('q');
-var redis            = require("../utils/redis");
-var redisClient      = redis.getClient();
-var Scripto          = require('gitter-redis-scripto');
+var Promise     = require('bluebird');
+var redis       = require("../utils/redis");
+var redisClient = redis.getClient();
+var Scripto     = require('gitter-redis-scripto');
 
 var scriptManager    = new Scripto(redisClient);
 scriptManager.loadFromDir(__dirname + '/../../redis-lua/collapsed');
 
-var runScript = Q.nbind(scriptManager.run, scriptManager);
-var redisClient_zrange = Q.nbind(redisClient.zrange, redisClient);
-var redisClient_del = Q.nbind(redisClient.del, redisClient);
+var runScript = Promise.promisify(scriptManager.run, { context: scriptManager });
+var redisClient_zrange = Promise.promisify(redisClient.zrange, { context: redisClient });
+var redisClient_del = Promise.promisify(redisClient.del, { context: redisClient });
 
 /*
 

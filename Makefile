@@ -28,7 +28,7 @@ build: clean npm
 	mkdir -p output/
 	./exec-in-docker ./node_modules/.bin/gulp test-docker
 	gulp test-redis-lua
-	gulp submit-coveralls
+	gulp submit-coveralls-post-tests
 	gulp package
 
 clean:
@@ -67,7 +67,10 @@ maintain-data:
 post-test-maintain-data:
 	MODIFY=true ./scripts/datamaintenance/execute.sh || true
 
-continuous-integration: build
+send-to-sonar:
+	( gulp sonar | grep -v DEBUG | grep -v '^\s*$$' ) || true
+
+continuous-integration: build send-to-sonar
 
 performance-tests: clean npm
 	gulp test-perf

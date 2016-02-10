@@ -359,16 +359,6 @@ onready(function() {
     postMessage(message);
   });
 
-  function reallyOnce(emitter, name, callback, context) {
-    var once = _.once(function() {
-      emitter.off(name, once);
-      callback.apply(context, arguments);
-    });
-
-    once._callback = callback;
-    return emitter.once(name, once);
-  }
-
   var Router = Backbone.Router.extend({
     routes: {
       // TODO: get rid of the pipes
@@ -393,62 +383,46 @@ onready(function() {
 
     createcustomroom: function(name) {
 
-      /* Figure out who's the daddy */
-      function getParentRoomUri(cb) {
+      function getSuitableParentRoomUri() {
         var currentRoomUri = window.location.pathname.split('/').slice(1).join('/');
 
         if (currentRoomUri === 'home') {
-          // currently in the userhome, not really a room but whatevs
-          return cb(null, 'home');
+          // no suitable parent
+          return;
         }
 
-        // current room metadata isnt in the app router context
-        getCurrentRoom(function(err, room) {
-          if (err || !room) return cb(null, null);
-
-          if (room.get('oneToOne')) {
-            return cb(null, 'home');
-          }
-
-          if (room.get('githubType') === 'REPO' || room.get('githubType') === 'ORG') {
-            return cb(null, room.get('uri'));
-          }
-
-          return cb(null, room.get('uri').split('/').slice(0, -1).join('/'));
-        });
-      }
-
-      function getCurrentRoom(cb) {
         var currentRoom = allRoomsCollection.findWhere({
-          url: window.location.pathname,
+          id: context.getTroupeId()
         });
 
-        // room collection is in sync, so thats nice
-        if (currentRoom) return cb(null, currentRoom);
+        if (!currentRoom) {
+          // not a member or collection hasnt synced yet
+          return;
+        }
 
-        // room collection has not synced yet, lets wait
-        reallyOnce(allRoomsCollection, 'reset sync', function() {
-          currentRoom = allRoomsCollection.findWhere({
-            url: window.location.pathname,
-          });
-          return cb(null, currentRoom);
-        });
+        if (currentRoom.get('oneToOne')) {
+          // no suitable parent
+          return;
+        }
+
+        if (currentRoom.get('githubType') === 'REPO' || currentRoom.get('githubType') === 'ORG') {
+          // assume user wants to create an org/repo channel
+          return currentRoom.get('uri');
+        }
+
+        // assume user want to create a room based off the same parent
+        var parentUri = currentRoom.get('uri').split('/').slice(0, -1).join('/');
+        return parentUri;
       }
 
-      getParentRoomUri(function(err, parentUri) {
-        //if (err) {
-        // ignore, carry on regardless
-        //}
-
-        require.ensure(['views/modals/create-room-view'], function(require) {
-          var createRoomView = require('views/modals/create-room-view');
-          var modal = new createRoomView.Modal({
-            initialParent: parentUri,
-            roomName: name,
-          });
-
-          appLayout.dialogRegion.show(modal);
+      require.ensure(['views/modals/create-room-view'], function(require) {
+        var createRoomView = require('views/modals/create-room-view');
+        var modal = new createRoomView.Modal({
+          initialParent: getSuitableParentRoomUri(),
+          roomName: name,
         });
+
+        appLayout.dialogRegion.show(modal);
       });
     },
 

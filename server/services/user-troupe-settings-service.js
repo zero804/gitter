@@ -4,7 +4,7 @@ var persistence = require('./persistence-service');
 var mongoUtils = require('../utils/mongo-utils');
 var onMongoConnect = require('../utils/on-mongo-connect');
 var assert = require('assert');
-var Q = require('q');
+var Promise = require('bluebird');
 
 exports.getUserSettings = function(userId, troupeId, settingsKey) {
   /* Not sure why mongoose isn't converting these */
@@ -25,7 +25,7 @@ exports.getUserSettings = function(userId, troupeId, settingsKey) {
 
 
 exports.getMultiUserTroupeSettings = function(userTroupes, settingsKey) {
-  if(!userTroupes.length) return Q.resolve({});
+  if(!userTroupes.length) return Promise.resolve({});
 
   var terms = userTroupes.map(function(userTroupe) {
     if(!mongoUtils.isLikeObjectId(userTroupe.userId) || !mongoUtils.isLikeObjectId(userTroupe.troupeId)) return;
@@ -53,7 +53,7 @@ exports.getMultiUserTroupeSettings = function(userTroupes, settingsKey) {
 };
 
 exports.getUserTroupeSettingsForUsersInTroupe = function(troupeId, settingsKey, userIds) {
-  if(!userIds.length) return Q.resolve({});
+  if(!userIds.length) return Promise.resolve({});
 
   return persistence.UserTroupeSettings.find({
       $and: [{
@@ -101,18 +101,18 @@ exports.setUserSettings = function(userId, troupeId, settingsKey, settings) {
 
   var setOperation = { $set: { } };
   setOperation.$set['settings.' + settingsKey] = settings;
-  var d = Q.defer();
 
-  persistence.UserTroupeSettings.collection.update(
-      { userId: userId, troupeId: troupeId },
-      setOperation,
-      { upsert: true }, d.makeNodeResolver());
+  return Promise.fromCallback(function(callback) {
+    persistence.UserTroupeSettings.collection.update(
+        { userId: userId, troupeId: troupeId },
+        setOperation,
+        { upsert: true }, callback);
 
-  return d.promise;
+  });
 };
 
 exports.setUserSettingsForUsersInTroupe = function(troupeId, userIds, settingsKey, settings) {
-  if (!userIds.length) return Q.resolve();
+  if (!userIds.length) return Promise.resolve();
 
   return onMongoConnect()
     .then(function() {
@@ -128,9 +128,9 @@ exports.setUserSettingsForUsersInTroupe = function(troupeId, userIds, settingsKe
         bulk.find({ userId: userId, troupeId: troupeId }).upsert().updateOne(setOperation);
       });
 
-      var d = Q.defer();
-      bulk.execute(d.makeNodeResolver());
-      return d.promise;
+      return Promise.fromCallback(function(callback) {
+        bulk.execute(callback);
+      });
     });
 };
 

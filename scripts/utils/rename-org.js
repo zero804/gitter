@@ -8,10 +8,7 @@ var persistence = require('../../server/services/persistence-service');
 var uriLookupService   = require("../../server/services/uri-lookup-service");
 
 var readline = require('readline');
-var Q = require('q');
-
-var qlimit = require('qlimit');
-var limit = qlimit(1);
+var Promise = require('bluebird');
 
 require('../../server/event-listeners').install();
 
@@ -50,18 +47,16 @@ function confirm() {
     output: process.stdout
   });
 
-  var d = Q.defer();
+  return new Promise(function(resolve, reject) {
+    rl.question("Are you sure you want to perform these renames? Type 'yes'? ", function(answer) {
+      rl.close();
 
-  rl.question("Are you sure you want to perform these renames? Type 'yes'? ", function(answer) {
-    rl.close();
-
-    if (answer === 'yes') return d.resolve();
-    d.reject(new Error('no'));
+      if (answer === 'yes') return resolve();
+      reject(new Error('no'));
+    });
   });
-
-  return d.promise;
-
 }
+
 persistence.Troupe.find({ $or: [{ lcUri: lcOld }, { lcOwner: lcOld }] })
   .exec()
   .then(function(rooms) {
@@ -83,7 +78,7 @@ persistence.Troupe.find({ $or: [{ lcUri: lcOld }, { lcOwner: lcOld }] })
         return confirm();
       })
       .then(function() {
-        return Q.all(rooms.map(limit(function(room) {
+        return Promise.map(rooms, function(room) {
           var newName = mapUri(room.uri, opts.old, opts.new);
           var lcNewName = newName.toLowerCase();
           var oldName = room.uri;
@@ -110,7 +105,7 @@ persistence.Troupe.find({ $or: [{ lcUri: lcOld }, { lcOwner: lcOld }] })
               return uriLookupService.reserveUriForTroupeId(room.id, lcNewName);
             });
 
-        })));
+        }, { concurrency: 1 })
       });
 
   })

@@ -5,10 +5,10 @@ var env    = require('gitter-web-env');
 var nconf  = env.config;
 var logger = env.logger;
 
-var persistenceService = require("./persistence-service");
-var Q                  = require('q');
-var userService        = require('./user-service');
-var tokenProvider      = require('./tokens/');
+var persistenceService   = require("./persistence-service");
+var Promise              = require('bluebird');
+var userService          = require('./user-service');
+var tokenProvider        = require('./tokens/');
 var MongooseCachedLookup = require('../utils/mongoose-cached-lookup');
 
 var ircClientId;
@@ -80,11 +80,10 @@ exports.validateAccessTokenAndClient = function(token, callback) {
       }
 
       // TODO: cache this stuff
-      return Q.all([
-          cachedClientLookup.get(clientId),
-          userId && userService.findById(userId)
-        ])
-        .spread(function (client, user) {
+      return Promise.join(
+        cachedClientLookup.get(clientId),
+        userId && userService.findById(userId),
+        function (client, user) {
           if(!client) {
             logger.warn('Invalid token presented (client not found): ', { token: token, clientId: clientId });
             return null;
@@ -113,7 +112,7 @@ exports.findClientByClientKey = function(clientKey, callback) {
 };
 
 function findOrCreateToken(userId, clientId, callback) {
-  if(!clientId) return Q.reject('clientId required').nodeify(callback);
+  if(!clientId) return Promise.reject(new Error('clientId required')).nodeify(callback);
 
   return tokenProvider.getToken(userId, clientId)
     .nodeify(callback);

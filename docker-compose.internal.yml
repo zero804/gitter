@@ -59,10 +59,9 @@ mongosetup:
   volumes:
    - ${WORKSPACE}:/src
   environment:
-    ANNOUNCE_MONGO1_HOST: mongo1
-    ANNOUNCE_MONGO2_HOST: mongo2
-    ANNOUNCE_MONGO3_HOST: mongo3
-    RESOLVE_IPS: 1
+    ANNOUNCE_MONGO1_HOST: ""
+    ANNOUNCE_MONGO2_HOST: ""
+    ANNOUNCE_MONGO3_HOST: ""
   working_dir: /src
   entrypoint: [ "/src/scripts/docker/mongo/mongo-setup.sh" ]
 
@@ -110,8 +109,27 @@ internal-min:
     SU_TO_USER: ${SU_TO_USER}
     SU_TO_UID: ${SU_TO_UID}
   volumes:
-   - ${WORKSPACE}:/src
-  working_dir: /src
+   - ${WORKSPACE}:${WORKSPACE}
+  extra_hosts:
+    beta-internal: 10.0.0.140
+  working_dir: ${WORKSPACE}
+
+internal-mac:
+  image: node:0.10
+  restart: 'no'
+  links:
+    - redis1
+    - redis2
+    - mongo1
+    - mongo2
+    - mongo3
+    - sentinel1
+  volumes:
+   - ${WORKSPACE}:${WORKSPACE}
+   - ${WORKSPACE}/node_modules_linux:${WORKSPACE}/node_modules/
+  extra_hosts:
+    beta-internal: 10.0.0.140
+  working_dir: ${WORKSPACE}
 
 internal:
   image: node:0.10

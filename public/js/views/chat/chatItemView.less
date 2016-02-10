@@ -13,6 +13,8 @@
 @import (reference) "../../../less/colors.less";
 
 @chat-spacing: 0.2em;
+@chat-item__action-item__color: rgba(170, 170, 170, 1);
+
 
 .trpChatContainer .isViewers:last-child .chat-item__details {
   visibility: visible;
@@ -145,7 +147,6 @@ body:not(.mobile) .chat-item:hover {
 .chat-item__actions {
   float: right;
   text-align: right;
-  opacity: 0;
   width: 40px;
 }
 
@@ -153,10 +154,7 @@ body.mobile .chat-item__actions {
   display: none;
 }
 
-.chat-item:hover .chat-item__actions, .chat-item:hover .chat-item__time {
-  opacity: 1;
-  transition: 0.2s opacity linear;
-}
+
 
 .chat-item__action, .chat-item__action-disabled {
   border-radius: 4px;
@@ -215,48 +213,65 @@ body.mobile .chat-item__container {
 .chat-item__time {
   vertical-align: middle;
   display: inline-block;
-  color: #aaa;
   float: right;
   margin-top: 2px;
-  opacity: 0.7;
+
+  color: fade(@chat-item__action-item__color, 70%);
 
   &, &:hover {
     text-decoration: none;
   }
+
+  .chat-item:hover & {
+    color: @chat-item__action-item__color;
+  }
 }
 
 .chat-item__icon {
-  cursor: pointer;
-  color: #aaa;
-  transition: opacity 0.3s linear, color 0.3s linear;
-}
+  visibility: hidden;
+  color: transparent;
 
-.chat-item__icon:hover {
-  color: @blue;
+  cursor: pointer;
+
+  transition:
+    visibility .2s ease,
+    color .2s ease;
+
+  &:hover {
+    &,
+    .chat-item:hover & {
+      color: @blue;
+    }
+  }
+
+  .chat-item:hover & {
+    visibility: visible;
+    color: @chat-item__action-item__color;
+  }
 }
 
 .chat-item__icon--read {
-  visibility: hidden;
-  opacity: 0;
-
   float: left;
   font-size: 0.7em;
   margin-top: 3px;
 
-  .isViewers & {
-    opacity: 1;
+  &,
+  .chat-item:hover & {
+    visibility: hidden;
+    color: transparent;
   }
-}
-
-body.mobile .chat-item__icon--read {
-  display: none;
 }
 
 .chat-item__icon--read-by-some {
   .chat-item:hover & {
     visibility: visible;
-    opacity: 1;
+    color: @chat-item__action-item__color;
   }
+}
+
+
+body.mobile .chat-item__icon--read {
+  display: none;
 }
 
 .chat-item__icon--collapse {
@@ -264,11 +279,6 @@ body.mobile .chat-item__icon--read {
   height: auto;
   font-size: 14px;
   background-image: none;
-
-  .chat-item:hover & {
-    visibility: visible;
-    opacity: 1;
-  }
 }
 
 .chat-item__icon--expand {
@@ -277,11 +287,6 @@ body.mobile .chat-item__icon--read {
   height: auto;
   font-size: 14px;
   background-image: none;
-
-  .chat-item:hover & {
-    visibility: visible;
-    opacity: 1;
-  }
 }
 
 .chat-item__text {

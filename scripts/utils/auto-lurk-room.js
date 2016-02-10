@@ -7,7 +7,7 @@ var autoLurkerService = require('../../server/services/auto-lurker-service');
 var troupeService = require('../../server/services/troupe-service');
 var persistence = require('../../server/services/persistence-service');
 var collections = require('../../server/utils/collections');
-var Q = require('q');
+var Promise = require('bluebird');
 var shutdown = require('shutdown');
 var es = require('event-stream');
 
@@ -38,7 +38,7 @@ var members = parseInt(opts.members, 10);
 function run() {
   if (opts.room) return handleSingleRoom();
   if (members) return handleMultipleRooms();
-  return Q.reject(new Error('invalid usage'));
+  return Promise.reject(new Error('invalid usage'));
 }
 
 function handleRoom(troupe) {
@@ -74,34 +74,33 @@ function handleSingleRoom() {
 }
 
 function handleMultipleRooms() {
-  var d = Q.defer();
+  return new Promise(function(resolve, reject) {
+    persistence.Troupe
+      .find({ userCount: { $gt: members } })
+      .sort({ userCount: -1 })
+      .limit(10)
+      .stream()
+      .pipe(es.through(function(room) {
+        this.pause();
 
-  persistence.Troupe
-    .find({ userCount: { $gt: members } })
-    .sort({ userCount: -1 })
-    .limit(10)
-    .stream()
-    .pipe(es.through(function(room) {
-      this.pause();
+        var self = this;
+        return handleRoom(room)
+          .catch(function(err) {
+            self.emit('error', err);
+          })
+          .finally(function() {
+            self.resume();
+          })
+          .done();
+      }))
+      .on('end', function() {
+        resolve();
+      })
+      .on('error', function(err) {
+        reject(err);
+      });
 
-      var self = this;
-      return handleRoom(room)
-        .catch(function(err) {
-          self.emit('error', err);
-        })
-        .finally(function() {
-          self.resume();
-        })
-        .done();
-    }))
-    .on('end', function() {
-      d.resolve();
-    })
-    .on('error', function(err) {
-      d.reject(err);
-    });
-
-  return d.promise;
+  });
 }
 
 run()
