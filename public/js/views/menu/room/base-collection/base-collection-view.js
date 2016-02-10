@@ -22,6 +22,7 @@ module.exports = Marionette.CompositeView.extend({
     };
   },
 
+
   modelEvents: {
     'change:active': 'onModelChangeActiveState',
     'change:header': 'render',
