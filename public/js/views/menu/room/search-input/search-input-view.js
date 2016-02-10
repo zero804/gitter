@@ -1,84 +1,53 @@
+//TODO TEST THIS JP 10/2/16
 'use strict';
 
 var Marionette = require('backbone.marionette');
 var _          = require('underscore');
 var template   = require('./search-input-view.hbs');
 
-var SearchInputView = Marionette.ItemView.extend({
+module.exports = Marionette.ItemView.extend({
 
   template: template,
-  className: 'search-input-container',
+  className: 'left-menu-search empty',
 
   ui: {
-    input: '.js-search-input',
-    clearIcon: '.js-search-clear-icon',
-    searchIcon: '.js-search-icon',
+    clear: '.js-search-clear',
+    input: 'input'
   },
 
   events: {
-    //'click .js-activate-search': 'activate',
-    'click @ui.clearIcon': 'clearSearchTerm',
-    'click @ui.input': 'activate',
-
-    //'blur @ui.input': 'onBlur',
-    'change @ui.input': 'handleChange',
-    'input @ui.input': 'handleChange',
+    'change':          'onInputChange',
+    'input':           'onInputChange',
+    'click @ui.clear': 'onClearClicked'
   },
 
   modelEvents: {
-    //'change:isLoading': 'onResultsLoading',
-    //'change:active': 'onActiveChange'
-    'change:state': 'onModelStateChange',
-    'change:searchTerm': 'onModelSearchTermChange',
+    'change:state':      'onModelChangeState',
+    'change:searchTerm': 'onModelChangeSearchTerm'
   },
 
-  onModelStateChange: function(model, val) { /*jshint unused: true*/
-    this.$el.toggleClass('active', (val === 'search'));
-    if (val === 'search') {
-      this.ui.input.focus();
-    }
-  },
-
-  activate: function() {
-    this.model.set('active', true);
-  },
-
-  onBlur: function() {
-    if (!this.ui.input.val()) {
-      this.model.set('active', false);
-    }
-  },
-
-  clearSearchTerm: function() {
-    this.model.set('searchTerm', '');
-    this.ui.input.val('');
-    this.ui.input.focus();
-  },
-
-  handleChange: _.debounce(function(e) {
+  onInputChange: _.debounce(function(e) {
+    e.preventDefault();
     var val = e.target.value.trim();
+    //This is here and not in a model change event because of the debounce
+    //Obviously the styles need to change more quickly to give a responsive feel to thr ui
+    //JP 10/2/16
+    this.$el.toggleClass('empty', !val);
     this.model.set('searchTerm', val);
-  }, 500),
+  }, 100),
 
-  onResultsLoading: function(model, isLoading) { // jshint unused:true
-    this.ui.searchIcon.toggleClass('fetching', isLoading);
+  onModelChangeState: function (model, val){ //jshint unused: true
+    this.$el.toggleClass('active', (val === 'search'));
   },
 
-  onActiveChange: function(model, isActive) { // jshint unused:true
-    this.$el.toggleClass('active', isActive);
-
-    var $input = this.ui.input;
-
-    if (isActive && !$input.is(':focus')) {
-      $input.focus();
-    } else {
-      $input.val('');
-    }
-  },
-
-  onModelSearchTermChange: function(model, val) {//jshint unused: true
+  onModelChangeSearchTerm: function (model, val) { //jshint unused: true
     this.ui.input.val(val);
+    this.$el.toggleClass('empty', !val);
   },
-});
 
-module.exports = SearchInputView;
+  onClearClicked: function (e){
+    e.preventDefault();
+    this.model.set('searchTerm', '');
+  },
+
+});
