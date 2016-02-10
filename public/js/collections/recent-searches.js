@@ -27,11 +27,8 @@ var RecentSearchesCollection = Backbone.Collection.extend({
   },
 
   add: function(model) {
-    console.log(model, this.toJSON());
     var prev = this.findWhere({ name: model.name });
-    if (prev) {
-      console.log('in check');
-      return prev.set('time', +new Date());}
+    if (prev) { return prev.set('time', +new Date());}
 
     if (!model.name) { return; }
 
