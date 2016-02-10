@@ -7,7 +7,7 @@ var recentRoomService = require('../../../services/recent-room-service');
 var roomService       = require('../../../services/room-service');
 var Promise           = require('bluebird');
 var mongoUtils        = require('../../../utils/mongo-utils');
-var userRoomNotificationService = require('../../../user-room-notification-service');
+var userRoomNotificationService = require('../../../services/user-room-notification-service');
 var StatusError       = require('statuserror');
 
 module.exports = {

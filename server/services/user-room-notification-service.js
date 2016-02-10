@@ -8,7 +8,7 @@ var StatusError               = require('statuserror');
 
 var DEFAULT_NOTIFICATION_SETTING = 'all';
 
-var findSettingForUserRoom = Promise.method(function (userId, roomId) {
+var getSettingForUserRoom = Promise.method(function (userId, roomId) {
   return userTroupeSettingsService.getUserSettings(userId, roomId, 'notifications')
     .then(function(notificationSetting) {
       return notificationSetting && notificationSetting.push || DEFAULT_NOTIFICATION_SETTING;
@@ -94,7 +94,7 @@ var updateSettingsForUsersInRoom = Promise.method(function (roomId, userIds, val
 
 /* Exports */
 module.exports = {
-  findSettingForUserRoom:        findSettingForUserRoom,
+  getSettingForUserRoom:        getSettingForUserRoom,
   findSettingsForUsersInRoom:    findSettingsForUsersInRoom,
   findSettingsForMultiUserRooms: findSettingsForMultiUserRooms,
   updateSettingForUserRoom:      updateSettingForUserRoom,
