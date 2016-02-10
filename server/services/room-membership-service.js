@@ -12,6 +12,7 @@ var recentRoomCore       = require('./core/recent-room-core');
 var util                 = require('util');
 var StatusError          = require('statuserror');
 var roomMembershipEvents = new EventEmitter();
+var _                    = require('lodash');
 
 /* Note, these can not change! */
 /* -----8<---- */
@@ -82,7 +83,7 @@ function findRoomIdsForUserWithLurk(userId) {
   return TroupeUser.find({ 'userId': userId }, { _id: 0, troupeId: 1, lurk: 1, flags: 1 }, { lean: true })
     .exec()
     .then(function(results) {
-      return results.reduce(function(memo, troupeUser) {
+      return _.reduce(results, function(memo, troupeUser) {
         memo[troupeUser.troupeId] = getLurkFromTroupeUser(troupeUser);
         return memo;
       }, {});
@@ -141,6 +142,15 @@ function findMembershipForUsersInRoom(troupeId, userIds) {
 function findMembersForRoom(troupeId, options) {
   assert(troupeId);
 
+  var skip = options && options.skip;
+  var limit = options && options.limit;
+
+  if (!skip && !limit) {
+    // Short-cut if we don't want to use skip and limit
+    return TroupeUser.distinct("userId", { 'troupeId': troupeId })
+      .exec();
+  }
+
   var query = TroupeUser.find({ troupeId: troupeId }, { _id: 0, userId: 1 }, { lean: true });
   if (options && options.skip) {
     query.skip(options.skip);
@@ -152,7 +162,7 @@ function findMembersForRoom(troupeId, options) {
 
   return query.exec()
     .then(function(results) {
-      return results.map(function(troupeUser) { return troupeUser.userId; });
+      return _.map(results, function(troupeUser) { return troupeUser.userId; });
     });
 }
 
@@ -174,7 +184,7 @@ function findMembersForRoomWithLurk(troupeId) {
   return TroupeUser.find({ troupeId: troupeId }, { _id: 0, userId: 1, lurk: 1, flags: 1 }, { lean: true })
     .exec()
     .then(function(results) {
-      return results.reduce(function(memo, v) {
+      return _.reduce(results, function(memo, v) {
         memo[v.userId] = getLurkFromTroupeUser(v);
         return memo;
       }, {});
@@ -255,7 +265,7 @@ function addRoomMembers(troupeId, userIds) {
     .then(function(bulkResult) {
       var upserted = bulkResult.getUpsertedIds();
 
-      var addedUserIds = upserted.map(function(upsertedDoc) {
+      var addedUserIds = _.map(upserted, function(upsertedDoc) {
         return userIds[upsertedDoc.index];
       });
 
@@ -351,7 +361,7 @@ function findMembersForRoomMulti(troupeIds) {
   return TroupeUser.find({ troupeId: { $in: mongoUtils.asObjectIDs(troupeIds) } }, { _id: 0, troupeId: 1, userId: 1 })
     .exec()
     .then(function(troupeUsers) {
-      return troupeUsers.reduce(function(memo, troupeUser) {
+      return _.reduce(troupeUsers, function(memo, troupeUser) {
         var troupeId = troupeUser.troupeId;
         var userId = troupeUser.userId;
 

@@ -41,7 +41,6 @@ var liveCollections    = require('./live-collections');
 var recentRoomService  = require('./recent-room-service');
 var badgerEnabled      = nconf.get('autoPullRequest:enabled');
 var uriResolver        = require('./uri-resolver');
-var util               = require('util');
 
 exports.testOnly = {};
 
