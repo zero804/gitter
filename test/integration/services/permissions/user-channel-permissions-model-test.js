@@ -2,11 +2,10 @@
 /*global describe:true, it:true */
 "use strict";
 
-var testRequire = require('../../test-require');
-var assert = require('assert');
-var Q = require('q');
+var testRequire   = require('../../test-require');
+var assert        = require('assert');
+var Promise       = require('bluebird');
 var testGenerator = require('../../test-generator');
-var StatusError = require('statuserror');
 
 var mockito = require('jsmockito').JsMockito;
 
@@ -138,7 +137,7 @@ describe('user-channel-permissions', function() {
       mockito.when(userIsInRoomMock)().then(function(uri, user) {
         assert.strictEqual(uri, URI);
         assert.strictEqual(user, USER);
-        return Q.resolve(!!meta.userIsInRoom);
+        return Promise.resolve(!!meta.userIsInRoom);
       });
 
       permissionsModel(USER, RIGHT, URI, SECURITY)
@@ -159,4 +158,3 @@ describe('user-channel-permissions', function() {
 
   });
 });
-

@@ -1,12 +1,11 @@
 ```
 "use strict";
 
-var Q = require('q');
 var processChat = require('./process-chat');
 var detectLang = require('./detect-lang');
 
 module.exports = exports = function processChatAsync(text, callback) {
-  return Q.fcall(function() {
+  return doIt(function() {
       console.time("processChat");
       return processChat(text);
     })

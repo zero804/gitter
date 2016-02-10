@@ -2,9 +2,8 @@
 "use strict";
 
 var testRequire = require('./../test-require');
-var Q = require('q');
+var Promise = require('bluebird');
 var assert = require('assert');
-
 
 describe("email-address-service", function() {
   beforeEach(function() {
@@ -23,7 +22,7 @@ describe("email-address-service", function() {
     function FakeMuxer(user) {
       assert.strictEqual(user, self.user);
       this.getEmailAddress = function() {
-        return Q.resolve('x@y.com');
+        return Promise.resolve('x@y.com');
       };
     }
 

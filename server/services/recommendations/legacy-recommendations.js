@@ -2,13 +2,13 @@
 
 /* This should go once A/B testing has proven that the new method is better */
 
-var persistence     = require('../persistence-service');
-var Q               = require('q');
-var _               = require('underscore');
-var collections     = require('../../utils/collections');
-var recommendations = require('./index');
+var persistence           = require('../persistence-service');
+var Promise               = require('bluebird');
+var _                     = require('underscore');
+var collections           = require('../../utils/collections');
+var recommendations       = require('./index');
 var roomMembershipService = require('../room-membership-service');
-var debug           = require('debug')('gitter:legacy-recommendations');
+var debug                 = require('debug')('gitter:legacy-recommendations');
 
 var MAX_RECOMMENDATIONS = 20;
 
@@ -147,7 +147,7 @@ function getPreferredComputerLanguages(suggestions) {
  *   -> Otherwise true
  */
 function filterRecommendations(recommendations, userId) {
-  if(recommendations.length === 0) return Q.resolve([]);
+  if(recommendations.length === 0) return Promise.resolve([]);
 
   return roomMembershipService.findRoomIdsForUser(userId)
     .then(function(existingMemberships) {

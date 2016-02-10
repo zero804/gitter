@@ -3,7 +3,7 @@
 var persistence = require('./persistence-service');
 var mongoUtils = require('../utils/mongo-utils');
 var assert = require('assert');
-var Q = require('q');
+var Promise = require('bluebird');
 
 exports.getUserSettings = function(userId, settingsKey) {
   /* Not sure why mongoose isn't converting these */
@@ -62,11 +62,10 @@ exports.setUserSettings = function (userId, settingsKey, settings) {
 
   var setOperation = { $set: { } };
   setOperation.$set['settings.' + settingsKey] = settings;
-  var d = Q.defer();
 
-  persistence.UserSettings.collection.update({ userId: userId }, setOperation, { upsert: true, new: true }, d.makeNodeResolver());
-
-  return d.promise;
+  return Promise.fromCallback(function(callback) {
+    persistence.UserSettings.collection.update({ userId: userId }, setOperation, { upsert: true, new: true }, callback);
+  });
 };
 
 

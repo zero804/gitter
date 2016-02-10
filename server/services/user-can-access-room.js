@@ -6,7 +6,7 @@ var errorReporter         = env.errorReporter;
 
 var persistence           = require('./persistence-service');
 var dolph                 = require('dolph');
-var Q                     = require('q');
+var Promise               = require('bluebird');
 var userService           = require('./user-service');
 var troupeService         = require('./troupe-service');
 var roomPermissionsModel  = require('./room-permissions-model');
@@ -25,14 +25,12 @@ var RATE = 600; // Every 10 minutes do a full access check against GitHub
  * only use if permission has already been granted
  */
 function goodFaithPermCheck(userId, roomId, permission) {
-  var d = Q.defer();
-  rateLimiter(userId + ':' + roomId, RATE, function(err, count/*, ttl*/) {
-    if (err) return d.reject(err);
-    d.resolve(count === 1);
-  });
+  return Promise.fromCallback(function(callback) {
+      rateLimiter(userId + ':' + roomId, RATE, callback);
+    })
+    .then(function(count) {
+      var checkRequired = count === 1;
 
-  return d.promise
-    .then(function(checkRequired) {
       // No check required this time, user can stay
       if (!checkRequired) return true;
 
@@ -46,11 +44,10 @@ function goodFaithPermCheck(userId, roomId, permission) {
 }
 
 function permCheck(userId, roomId, permission) {
-  return Q.all([
-      userService.findById(userId),
-      troupeService.findById(roomId)
-    ])
-    .spread(function(user, room) {
+  return Promise.join(
+    userService.findById(userId),
+    troupeService.findById(roomId),
+    function(user, room) {
       if (!user || !room) return false;
 
       return roomPermissionsModel(user, permission, room);
@@ -104,7 +101,7 @@ function checkIfBanned(leanRoom) {
 }
 
 function permissionToRead(userId, roomId) {
-  if(!mongoUtils.isLikeObjectId(roomId)) return Q.resolve(false);
+  if(!mongoUtils.isLikeObjectId(roomId)) return Promise.resolve(false);
 
   userId = mongoUtils.asObjectID(userId);
   roomId = mongoUtils.asObjectID(roomId);
@@ -134,12 +131,12 @@ function permissionToRead(userId, roomId) {
 }
 
 function permissionToWrite(userId, roomId) {
-  if(!mongoUtils.isLikeObjectId(roomId)) return Q.resolve(false);
+  if(!mongoUtils.isLikeObjectId(roomId)) return Promise.resolve(false);
 
   userId = mongoUtils.asObjectID(userId);
   roomId = mongoUtils.asObjectID(roomId);
 
-  if (!userId) return Q.resolve(false);
+  if (!userId) return Promise.resolve(false);
 
   return getLeanRoom(roomId, userId)
     .then(function(leanRoom) {

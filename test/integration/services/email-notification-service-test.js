@@ -1,10 +1,9 @@
-#!/usr/bin/env mocha --ignore-leaks
 "use strict";
 
-var testRequire   = require('../test-require');
-var Q             = require('q');
-var assert        = require('assert');
-var i18nFactory   = testRequire('./utils/i18n-factory');
+var testRequire = require('../test-require');
+var Promise     = require('bluebird');
+var assert      = require('assert');
+var i18nFactory = testRequire('./utils/i18n-factory');
 
 var EMAIL_DATA = [
   {
@@ -114,13 +113,13 @@ describe('email-notification-service', function() {
   beforeEach(function() {
     emailNotificationService = testRequire.withProxies("./services/email-notification-service", {
       './email-address-service': function() {
-        return Q.resolve('mike.bartlett@gmail.com');
+        return Promise.resolve('mike.bartlett@gmail.com');
       },
       './user-settings-service': {
         getUserSettings: function(userId, key) {
           assert(userId);
           assert.strictEqual(key, 'lang');
-          return Q.resolve(lang);
+          return Promise.resolve(lang);
         }
       }
     });

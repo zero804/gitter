@@ -4,7 +4,7 @@
 
 var testRequire = require('../test-require');
 var assert = require('assert');
-var Q = require('q');
+var Promise = require('bluebird');
 
 var mockito = require('jsmockito').JsMockito;
 var times = mockito.Verifiers.times;
@@ -60,7 +60,7 @@ describe('permissions-model', function() {
 
     userServiceMock = {
       destroyTokensForUserId: destroyTokensForUserIdMock
-    }
+    };
 
     permissionsModel = testRequire.withProxies("./services/permissions-model", {
       './user-banned-from-room': userBannedFromRoomMock,
@@ -83,12 +83,12 @@ describe('permissions-model', function() {
 
   describe('token rejection', function() {
     beforeEach(function() {
-      mockito.when(userBannedFromRoomMock)().then(function() { return Q.resolve(false); });
-      mockito.when(destroyTokensForUserIdMock)().then(function() { return Q.resolve(); });
+      mockito.when(userBannedFromRoomMock)().then(function() { return Promise.resolve(false); });
+      mockito.when(destroyTokensForUserIdMock)().then(function() { return Promise.resolve(); });
       mockito.when(orgPermissionsModelMock)().then(function() {
         var error = new Error();
         error.gitterAction = 'logout_destroy_user_tokens';
-        return Q.reject(error);
+        return Promise.reject(error);
       });
     });
 
@@ -160,7 +160,7 @@ function setupRoomTypeTests(roomType) {
         assert.strictEqual(uri, URI);
         assert.strictEqual(user, USER);
 
-        return Q.resolve(false);
+        return Promise.resolve(false);
       });
     });
 
@@ -176,7 +176,7 @@ function setupRoomTypeTests(roomType) {
               assert.strictEqual(iRight, right);
               assert.strictEqual(security, SECURITY);
 
-              return Q.resolve(allowAccess);
+              return Promise.resolve(allowAccess);
             });
 
             permissionsModel(USER, right, URI, roomType, SECURITY)
@@ -208,7 +208,7 @@ function setupRoomTypeTests(roomType) {
         assert.strictEqual(uri, URI);
         assert.strictEqual(user, USER);
 
-        return Q.resolve(true);
+        return Promise.resolve(true);
       });
 
     });

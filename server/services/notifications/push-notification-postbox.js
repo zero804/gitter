@@ -1,13 +1,13 @@
 "use strict";
 
 var winston                   = require('../../utils/winston');
-var pushNotificationFilter   = require("gitter-web-push-notification-filter");
+var pushNotificationFilter    = require("gitter-web-push-notification-filter");
 var nconf                     = require('../../utils/config');
 var workerQueue               = require('../../utils/worker-queue-redis');
 var userTroupeSettingsService = require('../user-troupe-settings-service');
 var debug                     = require('debug')('gitter:push-notification-postbox');
 var mongoUtils                = require('../../utils/mongo-utils');
-var Q                         = require('q');
+var Promise                   = require('bluebird');
 var errorReporter             = require('gitter-web-env').errorReporter;
 
 var notificationWindowPeriods = [
@@ -71,7 +71,7 @@ function filterNotificationsForPush(troupeId, chatId, userIds, mentioned) {
   // may well be much faster
   return userTroupeSettingsService.getUserTroupeSettingsForUsersInTroupe(troupeId, 'notifications', userIds)
     .then(function(settings) {
-      return Q.all(userIds.map(function(userId) {
+      return Promise.map(userIds, function(userId) {
         var notificationSettings = settings[userId];
         var pushNotificationSetting = notificationSettings && notificationSettings.push || 'all';
 
@@ -116,7 +116,7 @@ function filterNotificationsForPush(troupeId, chatId, userIds, mentioned) {
             }, { delay: delay });
 
           });
-      }));
+      });
     });
 }
 

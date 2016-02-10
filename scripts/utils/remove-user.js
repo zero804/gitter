@@ -17,7 +17,7 @@ var opts = require("nomnom")
    })
    .parse();
 
-return userRemovalService.removeByUsername(opts.username)
+userRemovalService.removeByUsername(opts.username)
   .delay(5000)
   .then(function() {
     shutdown.shutdownGracefully();
