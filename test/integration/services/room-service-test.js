@@ -15,6 +15,7 @@ var once = times(1);
 
 var persistence = testRequire("./services/persistence-service");
 var mongoUtils = testRequire("./utils/mongo-utils");
+var userRoomNotificationService = testRequire('./services/user-room-notification-service');
 
 describe('room-service', function() {
   before(fixtureLoader(fixture, {
@@ -1443,7 +1444,7 @@ describe('room-service', function() {
           createFav().nodeify(done);
         });
 
-        it('should remove favourite', function(done) {
+        it('should remove favourite', function() {
           var checkEvent = addListenner({
             url: '/user/' + fixture.userFavourite.id + '/rooms',
             operation: 'patch',
@@ -1470,7 +1471,7 @@ describe('room-service', function() {
 
         it('should remove user from the room if lurking', function() {
           // Set user as lurking
-          return roomService.updateTroupeLurkForUserId(fixture.userFavourite.id, fixture.troupeCanRemove.id, true)
+          return userRoomNotificationService.updateSettingForUserRoom(fixture.userFavourite.id, fixture.troupeCanRemove.id, 'mention')
             .then(function() { // Get updated troupe
               return troupeService.findById(fixture.troupeCanRemove.id);
             })
