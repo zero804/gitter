@@ -1,79 +1,82 @@
+#
+# Redis
+#
 redis1:
   image: redis:3.0.3
-  restart: 'always'
-  hostname: redis1
+  restart: always
   ports:
     - "6379:6379"
-  entrypoint: [ "/usr/local/bin/redis-server", "--bind", "0.0.0.0", "--port", "6379", "--maxclients", "200"]
+  entrypoint: [ "/usr/local/bin/redis-server", "--bind", "0.0.0.0", "--port", "6379", "--maxclients", "200", "--dir", "/tmp", "--save", ""]
 
 redis2:
   image: redis:3.0.3
-  restart: 'always'
-  hostname: redis2
+  restart: always
   ports:
     - "6380:6380"
   links:
     - redis1
-  env_file:
-    - ./config/docker/redis-slave.env
-  entrypoint: [ "/bin/bash", "-c", "exec /usr/local/bin/redis-server --bind 0.0.0.0 --port 6380 --slaveof $$REDIS_MASTER_IP 6379 --maxclients 200"]
-
+  extra_hosts:
+     - gitter-redis-dev:${DOCKER_HOST_IP}
+  entrypoint: [ "/usr/local/bin/redis-server", "--bind", "0.0.0.0",  "--port", "6380", "--slaveof", "gitter-redis-dev", "6379", "--maxclients", "200", "--dir", "/tmp", "--save", ""]
 
 sentinel1:
   image: redis:3.0.3
   restart: 'on-failure:5'
-  hostname: sentinel1
   links:
     - redis1
     - redis2
   ports:
     - "26379:26379"
-  env_file:
-    - ./config/docker/sentinel.env
-  entrypoint: [ "/bin/bash", "-c", "echo $$SENTINEL_CONF > /redis-sentinel.conf && exec /usr/local/bin/redis-server /redis-sentinel.conf --sentinel --bind 0.0.0.0 --maxclients 200"]
+  extra_hosts:
+     - gitter-redis-dev:${DOCKER_HOST_IP}
+  entrypoint: [ "/bin/bash", "-c", "echo 'sentinel monitor gitter-master-dev gitter-redis-dev 6379 1' > /redis-sentinel.conf && exec /usr/local/bin/redis-server /redis-sentinel.conf --sentinel --bind 0.0.0.0 --maxclients 200"]
 
+#
+# Mongo
+#
 mongo2:
-  hostname: mongo2
   image: mongo:3.0
-  restart: 'always'
-  entrypoint: [ "/usr/bin/mongod", "--replSet", "troupeSet", "--journal", "--smallfiles", "--storageEngine=wiredTiger", "--oplogSize=20" ]
+  restart: always
+  entrypoint: [ "/usr/bin/mongod", "--replSet", "troupeSet", "--journal", "--smallfiles", "--storageEngine=wiredTiger", "--oplogSize=20", "--port=27018" ]
   ports:
-    - "27018:27017"
+    - "27018:27018"
 
 mongo3:
-  hostname: mongo3
   image: mongo:3.0
-  restart: 'always'
-  entrypoint: [ "/usr/bin/mongod", "--replSet", "troupeSet", "--journal", "--smallfiles", "--storageEngine=wiredTiger", "--oplogSize=20" ]
+  restart: always
+  entrypoint: [ "/usr/bin/mongod", "--replSet", "troupeSet", "--journal", "--smallfiles", "--storageEngine=wiredTiger", "--oplogSize=20", "--port=27019" ]
   ports:
-    - "27019:27017"
+    - "27019:27019"
 
 mongo1:
-  hostname: mongo1
   image: mongo:3.0
-  restart: 'always'
+  restart: always
   entrypoint: [ "/usr/bin/mongod", "--replSet", "troupeSet", "--journal", "--smallfiles", "--storageEngine=wiredTiger", "--oplogSize=20" ]
   ports:
     - "27017:27017"
   links:
-    - mongo2:mongo2
-    - mongo3:mongo3
+    - mongo2
+    - mongo3
 
 mongosetup:
   image: mongo:3.0
   restart: 'no'
   links:
-    - mongo1:mongo1
-    - mongo2:mongo2
-    - mongo3:mongo3
+    - mongo1
+    - mongo2
+    - mongo3
   volumes:
-    - ./config/mongo-docker:/mongo-docker
-    - ./scripts:/scripts
-  entrypoint: [ "/bin/bash", "/mongo-docker/init-mongo.sh" ]
+   - ${WORKSPACE}:/src
+  environment:
+    ANNOUNCE_MONGO1_HOST: ${DOCKER_HOST_IP}
+    ANNOUNCE_MONGO2_HOST: ${DOCKER_HOST_IP}
+    ANNOUNCE_MONGO3_HOST: ${DOCKER_HOST_IP}
+  working_dir: /src
+  entrypoint: [ "/src/scripts/docker/mongo/mongo-setup.sh" ]
 
 neo4j:
   image: kbastani/docker-neo4j
-  restart: 'always'
+  restart: always
   ports:
     - "7474:7474"
 
@@ -85,44 +88,25 @@ elasticsearch:
     - "9200:9200"
     - "9300:9300"
   links:
-    - mongo1:mongo1
-    - mongo2:mongo2
-    - mongo3:mongo3
+    - mongo1
+    - mongo2
+    - mongo3
   volumes:
-    - ./scripts:/scripts
-  env_file:
-    - ./config/docker/elasticsearch.env
-  entrypoint: [ "/scripts/elasticsearch/docker-elasticsearch.sh" ]
+   - ${WORKSPACE}:/src
+  environment:
+    ANNOUNCE_ES_HOST: ${DOCKER_HOST_IP}
+  working_dir: /src
+  entrypoint: [ "/src/scripts/docker/es/start-elasticsearch.sh" ]
 
 elasticsearchsetup:
-  image: node:0.10.39
+  image: node:0.10
   restart: 'no'
   links:
-    - mongo1:mongo1
-    - mongo2:mongo2
-    - mongo3:mongo3
+    - mongo1
+    - mongo2
+    - mongo3
     - elasticsearch:elasticsearch
   volumes:
-    - ./scripts:/scripts
-  entrypoint: [ "/scripts/elasticsearch/setup-docker-elasticsearch.sh" ]
-
-# For when we want to run the app in docker in future
-# app:
-#   build: .
-#   links:
-#     - mongo1
-#     - mongo2
-#     - mongo3
-#     - redis1
-#     - redis2
-#     - sentinel1
-#     - elasticsearch:gitter-es-dev
-#     - neo4j:gitter-neo4j-dev
-#   extra_hosts:
-#    - "gitter-redis-dev:192.168.99.100"
-#    - "gitter-mongo-dev:192.168.99.100"
-#   ports:
-#     - "5000:5000"
-#   environment:
-#     DEBUG: "gitter:*"
-#   entrypoint: [ "node", "web" ]
+   - ${WORKSPACE}:/src
+  working_dir: /src
+  entrypoint: [ "/src/scripts/docker/es/setup-elasticsearch.sh" ]
