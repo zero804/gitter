@@ -43,7 +43,7 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
     this.drag.containers.splice(index, 1);
   },
 
-  onItemDropped: function(el, target){//jshint unused: true
+  onItemDropped: function(el, target, source, sibling){//jshint unused: true
     //guard against no drop target
     if(!target || !target.dataset) { return }
 
@@ -52,7 +52,8 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
       this.trigger('room-menu:add-favourite', el.dataset.id);
     }
     else {
-      this.trigger('room-menu:sort-favourite', el.dataset.id);
+      var siblingID = !!sibling && sibling.dataset.id;
+      this.trigger('room-menu:sort-favourite', el.dataset.id, siblingID);
     }
 
   },
