@@ -49,10 +49,11 @@ module.exports = Marionette.LayoutView.extend({
 
   initPrimaryCollection: function(optionsForRegion) {
     return new PrimaryCollectionView(optionsForRegion({
-      collection: this.model.primaryCollection,
-      model:      new PrimaryCollectionModel(null, { roomMenuModel: this.model }),
-      bus:        this.bus,
-      dndCtrl:    this.dndCtrl,
+      collection:    this.model.primaryCollection,
+      model:         new PrimaryCollectionModel(null, { roomMenuModel: this.model }),
+      roomMenuModel: this.model,
+      bus:           this.bus,
+      dndCtrl:       this.dndCtrl,
     }));
   },
 
@@ -60,6 +61,7 @@ module.exports = Marionette.LayoutView.extend({
     return new SecondaryCollectionView(optionsForRegion({
       collection:        this.model.secondaryCollection,
       model:             new SecondaryCollectionModel({}, { roomMenuModel: this.model }),
+      roomMenuModel:     this.model,
       primaryCollection: this.model.primaryCollection,
       bus:               this.bus,
     }));

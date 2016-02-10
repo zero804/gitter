@@ -3,8 +3,8 @@
 var _                     = require('underscore');
 var PrimaryCollectionView = require('../primary-collection/primary-collection-view');
 var ItemView              = require('./secondary-collection-item-view.js');
-
-var BaseCollectionView = require('../base-collection/base-collection-view');
+var SearchItemView        = require('./secondary-collection-item-search-view.js');
+var BaseCollectionView    = require('../base-collection/base-collection-view');
 
 module.exports = BaseCollectionView.extend({
   childView: ItemView,
@@ -12,6 +12,15 @@ module.exports = BaseCollectionView.extend({
 
   childEvents: {
     'item:clicked': 'onItemClicked',
+  },
+
+  buildChildView: function(model, ItemView, attrs) {
+    switch (this.roomMenuModel.get('state')){
+      case 'search':
+        return new SearchItemView(_.extend({}, attrs, { model: model }));
+      default:
+        return new ItemView(_.extend({}, attrs, { model: model }));
+    }
   },
 
   serializeData: function() {
@@ -28,7 +37,12 @@ module.exports = BaseCollectionView.extend({
   },
 
   filter: function(model, index) {//jshint unused: true
-    return (index <= 10);
+    switch (this.roomMenuModel.get('state')) {
+      case 'search':
+        return true;
+      default:
+        return (index <= 10);
+    }
   },
 
   onItemClicked: function(view) {
@@ -43,14 +57,15 @@ module.exports = BaseCollectionView.extend({
 
   onSearchTermChange: function(model, val) { //jshint unused: true
     if (model.get('state') !== 'search') { return; }
+
     this.$el.toggleClass('active', !val);
   },
 
-  onDestroy: function (){
+  onDestroy: function() {
     this.stopListening(this.model);
   },
 
-  render: function (){
+  render: function() {
     BaseCollectionView.prototype.render.apply(this, arguments);
   },
 
