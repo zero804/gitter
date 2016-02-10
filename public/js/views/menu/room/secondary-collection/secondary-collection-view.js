@@ -74,8 +74,7 @@ module.exports = BaseCollectionView.extend({
 
   onRender: function(){
     this.$el.addClass('loaded');
-    if(this.roomMenuModel.get('state') === 'search') {
-      console.log('removing');
+    if(this.roomMenuModel.get('state') === 'search' && !!this.roomMenuModel.get('searchTerm')) {
       this.$el.removeClass('empty');
     }
   },
