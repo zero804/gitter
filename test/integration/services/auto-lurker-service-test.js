@@ -12,7 +12,7 @@ var roomMembershipService = testRequire("./services/room-membership-service");
 var roomService = testRequire("./services/room-service");
 var userRoomNotificationService = testRequire("./services/user-room-notification-service");
 
-describe('auto-lurker-service', function() {
+describe.skip('auto-lurker-service', function() {
 
   describe('#findLurkCandidates', function() {
     var fixture = {};

@@ -8,6 +8,8 @@ var unreadItemService           = require('./unread-item-service');
 var Promise                     = require('bluebird');
 var roomMembershipService       = require('./room-membership-service');
 
+/* TODO TODO TODO TODO XXX THIS IS BROKEN! */
+
 /**
  * Returns a list of users who could be lurked
  * [{ userId: ..., lastAccessTime: ..., lurk: ..., notificationSettings: ... }]

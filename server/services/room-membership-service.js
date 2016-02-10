@@ -421,33 +421,6 @@ var setMemberLurkStatus = util.deprecate(function(troupeId, userId, lurk) {
 }, 'roomMembershipService.setMemberLurkStatus is deprecated');
 
 /**
- * Sets a group of multiple members lurk status.
- */
-var setMembersLurkStatus = util.deprecate(function(troupeId, userIds, lurk) {
- lurk = !!lurk; // Force boolean
-
- var bitOp = lurk ? { and: BITMASK_NO_NOTIFY_UNREAD } : { or: BITMASK_NOTIFY_UNREAD };
-
- return TroupeUser.update({
-     troupeId: troupeId,
-     userId: { $in: mongoUtils.asObjectIDs(userIds) }
-   }, {
-     $set: { lurk: lurk },
-     $bit: { flags: bitOp }
-   }, {
-     multi: true
-   })
-  .exec()
-  .then(function() {
-    // Unfortunately we have no way of knowing which of the users
-    // were actually removed and which were already out of the collection
-    // as we have no transactions.
-
-    roomMembershipEvents.emit("members.lurk.change", troupeId, userIds, lurk);
-  });
-}, 'roomMembershipService.setMembersLurkStatus is deprecated');
-
-/**
  * Update the userCount value for a room
  */
 function incrementTroupeUserCount(troupeId, incrementValue) {
@@ -572,7 +545,6 @@ exports.findMembersForRoomMulti     = findMembersForRoomMulti;
 
 exports.getMemberLurkStatus         = getMemberLurkStatus;
 exports.setMemberLurkStatus         = setMemberLurkStatus;
-exports.setMembersLurkStatus        = setMembersLurkStatus;
 
 exports.getMembershipMode           = getMembershipMode;
 exports.setMembershipMode           = setMembershipMode;
