@@ -13,15 +13,13 @@ module.exports = Marionette.CompositeView.extend({
   childViewContainer: '.js-collection-list',
 
   childViewOptions: function(model) {
-    return { model: model, roomMenuModel: this.roomMenuModel };
-  },
-
-  buildChildView: function(model, ItemView, attrs) {
     var index = this.collection.indexOf(model);
-    return new ItemView(_.extend({}, attrs, {
-      model: model,
-      index: index,
-    }));
+    return {
+      model:     model,
+      index:     index,
+      menuState: this.roomMenuModel.get('state'),
+      roomMenuModel: this.roomMenuModel,
+    };
   },
 
   modelEvents: {
@@ -31,7 +29,7 @@ module.exports = Marionette.CompositeView.extend({
 
   collectionEvents: {
     'filter-complete sync': 'render',
-    'add remove reset': 'onFilterComplete'
+    'add remove reset': 'onFilterComplete',
   },
 
   childEvents: {
@@ -61,14 +59,14 @@ module.exports = Marionette.CompositeView.extend({
     if (newlySelectedModel) newlySelectedModel.set('selected', true);
   },
 
-  onItemClicked: function (view){
+  onItemClicked: function(view) {
     var model = view.model;
     var name = (model.get('uri') || model.get('url') || model.get('name'));
     var url  = (name[0] !== '/') ?  '/' + name : name;
     this.bus.trigger('navigation', url, 'chat', name);
   },
 
-  onFilterComplete: function (){
+  onFilterComplete: function() {
     this.$el.toggleClass('empty', !this.collection.length);
   },
 
@@ -85,7 +83,7 @@ module.exports = Marionette.CompositeView.extend({
     this.stopListening(context.troupe());
   },
 
-  render: function (){
+  render: function() {
     Marionette.CompositeView.prototype.render.apply(this, arguments);
   },
 
