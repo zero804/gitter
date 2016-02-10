@@ -3,13 +3,13 @@
 var persistence   = require("./persistence-service");
 var processChat   = require('../utils/markdown-processor');
 var ObjectID      = require('mongodb').ObjectID;
-var Q             = require('q');
+var Promise       = require('bluebird');
 var StatusError   = require('statuserror');
 
 exports.newEventToTroupe = function(troupe, user, text, meta, payload, callback) {
   text = text ? "" + text : "";
 
-  return Q.fcall(function() {
+  return Promise.try(function() {
       if(!troupe) throw new StatusError(500, "Invalid troupe");
       if(!text) throw new StatusError(400, "Text required");
 

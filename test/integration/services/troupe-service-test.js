@@ -1,4 +1,3 @@
-#!/usr/bin/env mocha --ignore-leaks
 /*jslint node:true, unused:true*/
 /*global describe:true, it:true, before:true, after:false */
 "use strict";
@@ -6,28 +5,22 @@
 
 var testRequire   = require('../test-require');
 var fixtureLoader = require('../test-fixtures');
-var Q             = require("q");
+var Promise       = require('bluebird');
 var _             = require('underscore');
 var assert        = require("assert");
-var mockito       = require('jsmockito').JsMockito;
 var mongoUtils    = testRequire("./utils/mongo-utils");
-var times         = mockito.Verifiers.times;
-var once          = times(1);
-var times         = mockito.Verifiers.times;
 var fixture       = {};
-
-Q.longStackSupport = true;
 
 function findUserIdPredicate(userId) {
   return function(x) {
     return "" + x === "" + userId;
-  }
+  };
 }
 describe('troupe-service', function() {
 
   describe('update actions', function() {
     var troupeService = testRequire.withProxies('./services/troupe-service', {
-      './room-permissions-model': function() { return Q.resolve(true); }
+      './room-permissions-model': function() { return Promise.resolve(true); }
     });
 
     it('should update tags', function(done) {
@@ -66,7 +59,7 @@ describe('troupe-service', function() {
     });
 
     it('should handle the creation of a oneToOneTroupe atomicly', function(done) {
-      Q.all([
+      Promise.all([
           troupeService.findOrCreateOneToOneTroupeIfPossible(fixture.user2.id, fixture.user3.id),
           troupeService.findOrCreateOneToOneTroupeIfPossible(fixture.user3.id, fixture.user2.id)
         ])

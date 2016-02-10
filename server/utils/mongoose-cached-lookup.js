@@ -1,7 +1,7 @@
 'use strict';
 
 var LRU = require("lru-cache");
-var Q = require("q");
+var Promise = require('bluebird');
 var mongoUtils = require('./mongo-utils');
 var _ = require('underscore');
 
@@ -15,10 +15,10 @@ function MongooseCachedLookup(options) {
   this.get = function(id) {
     /* Ensure the ID is a string */
     id = mongoUtils.serializeObjectId(id);
-    if(!id) return Q.resolve();
+    if(!id) return Promise.resolve();
 
     var cached = cache.get(id);
-    if (cached) return Q.resolve(_.clone(cached)); // Shallow clone only!
+    if (cached) return Promise.resolve(_.clone(cached)); // Shallow clone only!
 
     return model.findById(id, undefined, { lean: true })
       .exec()

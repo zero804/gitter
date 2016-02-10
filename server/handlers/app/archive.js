@@ -6,7 +6,7 @@ var chatService             = require('../../services/chat-service');
 var heatmapService          = require('../../services/chat-heatmap-service');
 var restSerializer          = require('../../serializers/rest-serializer');
 var contextGenerator        = require('../../web/context-generator');
-var Q                       = require('q');
+var Promise                 = require('bluebird');
 var roomService             = require('../../services/room-service');
 var env                     = require('gitter-web-env');
 var burstCalculator         = require('../../utils/burst-calculator');
@@ -224,7 +224,7 @@ exports.chatArchive = [
               troupeId: troupeId
             });
 
-            return Q.all([
+            return Promise.all([
                 contextGenerator.generateTroupeContext(req),
                 restSerializer.serialize(chatMessages, strategy)
               ]);

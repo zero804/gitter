@@ -1,6 +1,6 @@
 "use strict";
 
-var Q = require('q');
+var Promise = require('bluebird');
 var persistence = require('../persistence-service');
 var promiseUtils = require('../../utils/promise-utils');
 
@@ -13,18 +13,16 @@ function create(lean) {
       .then(promiseUtils.required);
   };
 
-  module.findByUris = function(uris) {
-    return Q.fcall(function() {
-      if(!uris || !uris.length) return [];
+  module.findByUris = Promise.method(function(uris) {
+    if(!uris || !uris.length) return [];
 
-      var lcUris = uris.map(function(f) { return f.toLowerCase(); });
+    var lcUris = uris.map(function(f) { return f.toLowerCase(); });
 
-      return persistence.Troupe
-                .where('lcUri').in(lcUris)
-                .lean(lean)
-                .exec();
-    });
-  };
+    return persistence.Troupe
+              .where('lcUri').in(lcUris)
+              .lean(lean)
+              .exec();
+  });
 
   module.findByOwnerUri = function(userOrOrg, fields) {
     var lcUserOrOrg = userOrOrg.toLowerCase();
@@ -36,7 +34,6 @@ function create(lean) {
   };
 
   return module;
-
 }
 
 

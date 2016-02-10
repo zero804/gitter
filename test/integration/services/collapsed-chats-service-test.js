@@ -1,10 +1,8 @@
 "use strict";
 
-var Q = require('q');
+var Promise = require('bluebird');
 var assert = require('assert');
 var collapsedChatService = require('../../../server/services/collapsed-chats-service');
-
-Q.longStackSupport = true;
 
 describe('collapsed-chats-service', function() {
 
@@ -27,7 +25,7 @@ describe('collapsed-chats-service', function() {
     for (var i = 0; i < n; i++) {
       seq.push(collapsedChatService.update(USER, ROOM, i, true));
     }
-    return Q.all(seq);
+    return Promise.all(seq);
   }
 
   it('should generate correct UserRoom keys', function () {

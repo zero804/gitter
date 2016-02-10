@@ -48,6 +48,8 @@ If you want to run against production, ssh into app-00X and run with the `NODE_E
 
 e.g `NODE_ENV=prod /opt/gitter/gitter-webapp/scripts/utils/unread.js trevorah`
 
+Also see https://github.com/gitterHQ/wiki/wiki/Support---Data-Maintenance
+
 ### online-state.js
 Prints the current online state for a user. Requires a username.
 
@@ -93,12 +95,28 @@ Migrates all chat messages from one room to another. Requires two rooms.
 
 e.g `./scripts/utils/migrate-messages.js --from trevorah/oldroom --to trevorah/newroom`
 
+
+### redirect-room.js
+
+Redirect `roomA` to `roomB`. *note:* this will delete `roomA`
+
+e.g `./scripts/utils/redirect-room.js -f fromroom -t toroom`
+
+
 ### node hellban.js <username> [options]
 
 username     username to hellban e.g trevorah
 
 Options:
    -u, --unban   unban user from hell
+
+
+### start-new-feature
+
+Create a feature branch and a matching pull request. This also does some nicety stuff so we can properly see test coverage from Coveralls.
+
+`./start-new-feature my-new-feature-branch`
+
 
 Upgrading gitter-services to add support for more services
 ----------------------------------------------------------

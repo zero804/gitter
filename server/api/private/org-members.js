@@ -1,11 +1,11 @@
 "use strict";
 
-var GitHubMeService   = require('gitter-web-github').GitHubMeService;
-var GitHubOrgService   = require('gitter-web-github').GitHubOrgService;
-var restSerializer     = require("../../serializers/rest-serializer");
-var userService        = require('../../services/user-service');
-var StatusError        = require('statuserror');
-var Q                  = require('q');
+var GitHubMeService  = require('gitter-web-github').GitHubMeService;
+var GitHubOrgService = require('gitter-web-github').GitHubOrgService;
+var restSerializer   = require("../../serializers/rest-serializer");
+var userService      = require('../../services/user-service');
+var StatusError      = require('statuserror');
+var Promise          = require('bluebird');
 
 function listOrgMembers(user, uri) {
   var ghMe = new GitHubMeService(user);
@@ -23,7 +23,7 @@ module.exports = function(req, res, next) {
   var uri = req.params.orgUri;
   var user = req.user;
 
-  return Q.fcall(function() {
+  return Promise.try(function() {
       if(!user) throw new StatusError(401);
 
       if(req.query.on_behalf_of) {

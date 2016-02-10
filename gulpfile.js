@@ -29,6 +29,8 @@ var coveralls = require('gulp-coveralls');
 var lcovMerger = require ('lcov-result-merger');
 var gutil = require('gulp-util');
 var path = require('path');
+var sonar = require('gulp-sonar');
+var glob = require('glob');
 
 /* Don't do clean in gulp, use make */
 var RUN_TESTS_IN_PARALLEL = false;
@@ -128,14 +130,13 @@ makeTestTasks('test-mocha', function(name, files) {
 
   return gulp.src(files, { read: false })
     .pipe(mocha({
-      reporter: 'xunit-file',
+      reporter: 'mocha-multi',
       timeout: 10000,
       istanbul: {
         dir: 'output/coverage-reports/' + name
       },
       env: {
-        TAP_FILE: 'output/test-reports/' + name + '.tap',
-        XUNIT_FILE: 'output/test-reports/' + name + '.xml',
+        multi: 'spec=- xunit=output/test-reports/' + name + '.xml',
         NODE_ENV: 'test',
         Q_DEBUG: 1,
       }
@@ -148,14 +149,13 @@ makeTestTasks('test-docker', function(name, files) {
 
   return gulp.src(files, { read: false })
     .pipe(mocha({
-      reporter: 'xunit-file',
+      reporter: 'mocha-multi',
       timeout: 10000,
       istanbul: {
         dir: 'output/coverage-reports/' + name
       },
       env: {
-        TAP_FILE: 'output/test-reports/' + name + '.tap',
-        XUNIT_FILE: 'output/test-reports/' + name + '.xml',
+        multi: 'spec=- xunit=output/test-reports/' + name + '.xml',
         NODE_ENV: 'test-docker',
         Q_DEBUG: 1,
         BLUEBIRD_DEBUG: 1
@@ -167,14 +167,14 @@ gulp.task('test-redis-lua', shell.task([
   './test/redis-lua/run-tests'
 ]));
 
-gulp.task('merge-lcov', ['test-mocha', 'test-redis-lua'], function() {
+gulp.task('merge-lcov', function() {
   return gulp.src('output/coverage-reports/**/lcov.info')
     .pipe(using())
     .pipe(lcovMerger())
     .pipe(gulp.dest('output/coverage-reports/merged/'));
 });
 
-gulp.task('submit-coveralls', ['test-mocha', 'test-redis-lua', 'merge-lcov'], function() {
+gulp.task('submit-coveralls-post-tests', ['merge-lcov'], function() {
   var GIT_BRANCH = process.env.GIT_BRANCH;
   if (GIT_BRANCH) {
     // Make coveralls play nice with Jenkins (lame)
@@ -183,9 +183,17 @@ gulp.task('submit-coveralls', ['test-mocha', 'test-redis-lua', 'merge-lcov'], fu
 
   return gulp.src('output/coverage-reports/merged/lcov.info')
     .pipe(coveralls())
+    .on('error', function(err) {
+      gutil.log(err);
+      process.env.GIT_BRANCH = GIT_BRANCH;
+    })
     .on('end', function() {
       process.env.GIT_BRANCH = GIT_BRANCH;
     });
+});
+
+gulp.task('submit-coveralls', ['test-mocha', 'test-redis-lua'], function(callback) {
+  runSequence('submit-coveralls-post-tests', callback);
 });
 
 gulp.task('test', ['test-mocha', 'test-redis-lua', 'submit-coveralls']);
@@ -592,5 +600,52 @@ gulp.task('embedded-copy-asset-files', function() {
     .pipe(gulp.dest('output/assets'));
 });
 
-
 gulp.task('embedded-package', ['embedded-uglify', 'css-ios', 'embedded-copy-asset-files']);
+
+
+gulp.task('sonar', function () {
+  var sourceDirectories = [
+    'server/',
+    'public/js/',
+    'shared/'
+  ].concat(glob.sync('modules/*/lib'))
+
+  var options = {
+    sonar: {
+      host: {
+        url: 'http://beta-internal:9000'
+      },
+      projectKey: 'sonar:gitter-webapp:1.0.0',
+      projectName: 'Gitter Webapp',
+      projectVersion: '1.0.0',
+      sources: sourceDirectories.join(','),
+      language: 'js',
+      sourceEncoding: 'UTF-8',
+      javascript: {
+        lcov: {
+          reportPath: 'output/coverage-reports/merged/lcov.info'
+        }
+      },
+      analysis: {
+        mode: 'publish'
+      },
+      github: {
+        pullRequest: process.env.ghprbPullId,
+        repository: 'troupe/gitter-webapp',
+        oauth: process.env.SONARQUBE_GITHUB_ACCESS_TOKEN
+      },
+      exec: {
+          // All these properties will be send to the child_process.exec method (see: https://nodejs.org/api/child_process.html#child_process_child_process_exec_command_options_callback )
+          // Increase the amount of data allowed on stdout or stderr (if this value is exceeded then the child process is killed, and the gulp-sonar will fail).
+          maxBuffer : 1024*1024
+      }
+    }
+  };
+
+  // gulp source doesn't matter, all files are referenced in options object above
+  return gulp.src('gulpfile.js', { read: false })
+      .pipe(sonar(options))
+      .on('error', function(err) {
+        gutil.log(err);
+      });
+});

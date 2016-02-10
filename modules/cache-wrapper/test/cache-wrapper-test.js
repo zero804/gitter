@@ -1,7 +1,7 @@
 "use strict";
 
 var assert = require('assert');
-var Q = require('q');
+var Promise = require('bluebird');
 var proxyquireNoCallThru = require("proxyquire").noCallThru();
 
 function getWrapper(lookupFunc) {
@@ -17,7 +17,7 @@ describe('cache-wrapper', function() {
   describe('wrapping single function modules', function() {
 
     var module = function(name) {
-      return Q.resolve('hello ' + name);
+      return Promise.resolve('hello ' + name);
     };
 
     it('looks up correct key', function(done) {
@@ -58,7 +58,7 @@ describe('cache-wrapper', function() {
 
     var module = {
       addPrefix: function(name) {
-        return Q.resolve('hello ' + name);
+        return Promise.resolve('hello ' + name);
       }
     };
 
@@ -92,7 +92,7 @@ describe('cache-wrapper', function() {
       this.prefix = prefix;
     };
     Klass.prototype.addPrefix = function(name) {
-      return Q.resolve(this.prefix + ' ' + name);
+      return Promise.resolve(this.prefix + ' ' + name);
     };
 
     it('looks up correct key', function(done) {

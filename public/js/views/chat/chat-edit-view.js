@@ -2,32 +2,64 @@
 var Marionette = require('backbone.marionette');
 var appEvents = require('utils/appevents');
 var hasScrollBars = require('utils/scrollbar-detect');
+var KeyboardEventMixin = require('views/keyboard-events-mixin');
+var cocktail = require('cocktail');
+var isMobile = require('utils/is-mobile');
+var RAF = require('utils/raf');
 
 var ChatEditView = Marionette.ItemView.extend({
 
+  template: false,
+
   events: {
-    'input': 'onTextChange',
-    'blur': 'resetTextareaSize',
+    'input': 'onInput',
+    'blur': 'onBlur'
   },
 
-  initialize: function() {
+  keyboardEvents: {
+    'chat.edit.escape': 'onKeyEscape',
+    'chat.edit.send': 'onKeySend'
+  },
+
+  onRender: function() {
     if(hasScrollBars()) {
       this.$el.addClass('scroller');
     }
 
-    this.onTextChange();
+    this.onInput();
+    return this;
   },
 
-  processInput: function() {
-    this.trigger('save', this.$el.val());
-  },
-
-  onTextChange: function() {
+  onInput: function() {
     if (this.$el.val()) {
       this.expandTextareaIfNeeded();
     } else {
       this.shrinkTextarea();
     }
+  },
+
+  onBlur: function() {
+    var self = this;
+
+    if (isMobile()) {
+      // if any listener does anthing to this.$el during the blur event,
+      // then the dom node will throw a NotFoundError. So we delay until
+      // the next event loop.
+      RAF(function() {
+        self.trigger('cancel');
+      });
+    } else {
+      this.resetTextareaSize();
+    }
+  },
+
+  onKeyEscape: function() {
+    this.trigger('cancel');
+  },
+
+  onKeySend: function(event) {
+    this.trigger('save', this.$el.val());
+    event.preventDefault();
   },
 
   resetTextareaSize: function() {
@@ -56,5 +88,7 @@ var ChatEditView = Marionette.ItemView.extend({
   },
 
 });
+
+cocktail.mixin(ChatEditView, KeyboardEventMixin);
 
 module.exports = ChatEditView;
