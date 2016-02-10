@@ -559,7 +559,7 @@ module.exports = (function() {
       var chatInputText = this.ui.text;
 
       // create inputview
-      chatInputText.html("<textarea class='trpChatInput'></textarea>");
+      chatInputText.html("<textarea class='trpChatInput' autofocus></textarea>");
 
       var unsafeText = this.model.get('text');
 

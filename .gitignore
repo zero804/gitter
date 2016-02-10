@@ -1,6 +1,7 @@
 /target
 node_modules
 .DS_Store
+.com.apple.timemachine.supported
 /.project
 /npm-debug.log
 /nodemon.log
@@ -90,3 +91,4 @@ test/in-browser/fixtures/coverage/*
 node_modules_old
 config.dev.user-overrides.json
 node_modules_linux
+.sonar

@@ -41,6 +41,7 @@ var liveCollections    = require('./live-collections');
 var recentRoomService  = require('./recent-room-service');
 var badgerEnabled      = nconf.get('autoPullRequest:enabled');
 var uriResolver        = require('./uri-resolver');
+var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 
 exports.testOnly = {};
 
@@ -55,7 +56,9 @@ function sendJoinStats(user, room, tracking) {
   stats.event("join_room", {
     userId: user.id,
     source: tracking && tracking.source,
-    room_uri: room.uri
+    room_uri: room.uri,
+    owner: getOrgNameFromTroupeName(room.uri),
+    troupeId: room.id
   });
 }
 

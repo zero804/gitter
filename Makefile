@@ -67,7 +67,10 @@ maintain-data:
 post-test-maintain-data:
 	MODIFY=true ./scripts/datamaintenance/execute.sh || true
 
-continuous-integration: build
+send-to-sonar:
+	( gulp sonar | grep -v DEBUG | grep -v '^\s*$$' ) || true
+
+continuous-integration: build send-to-sonar
 
 performance-tests: clean npm
 	gulp test-perf

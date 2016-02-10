@@ -29,6 +29,8 @@ var coveralls = require('gulp-coveralls');
 var lcovMerger = require ('lcov-result-merger');
 var gutil = require('gulp-util');
 var path = require('path');
+var sonar = require('gulp-sonar');
+var glob = require('glob');
 
 /* Don't do clean in gulp, use make */
 var RUN_TESTS_IN_PARALLEL = false;
@@ -598,5 +600,52 @@ gulp.task('embedded-copy-asset-files', function() {
     .pipe(gulp.dest('output/assets'));
 });
 
-
 gulp.task('embedded-package', ['embedded-uglify', 'css-ios', 'embedded-copy-asset-files']);
+
+
+gulp.task('sonar', function () {
+  var sourceDirectories = [
+    'server/',
+    'public/js/',
+    'shared/'
+  ].concat(glob.sync('modules/*/lib'))
+
+  var options = {
+    sonar: {
+      host: {
+        url: 'http://beta-internal:9000'
+      },
+      projectKey: 'sonar:gitter-webapp:1.0.0',
+      projectName: 'Gitter Webapp',
+      projectVersion: '1.0.0',
+      sources: sourceDirectories.join(','),
+      language: 'js',
+      sourceEncoding: 'UTF-8',
+      javascript: {
+        lcov: {
+          reportPath: 'output/coverage-reports/merged/lcov.info'
+        }
+      },
+      analysis: {
+        mode: 'publish'
+      },
+      github: {
+        pullRequest: process.env.ghprbPullId,
+        repository: 'troupe/gitter-webapp',
+        oauth: process.env.SONARQUBE_GITHUB_ACCESS_TOKEN
+      },
+      exec: {
+          // All these properties will be send to the child_process.exec method (see: https://nodejs.org/api/child_process.html#child_process_child_process_exec_command_options_callback )
+          // Increase the amount of data allowed on stdout or stderr (if this value is exceeded then the child process is killed, and the gulp-sonar will fail).
+          maxBuffer : 1024*1024
+      }
+    }
+  };
+
+  // gulp source doesn't matter, all files are referenced in options object above
+  return gulp.src('gulpfile.js', { read: false })
+      .pipe(sonar(options))
+      .on('error', function(err) {
+        gutil.log(err);
+      });
+});

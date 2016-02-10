@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 'use strict';
 
-var Q = require('Q');
 var persistence = require('../../server/services/persistence-service');
 var GitHubService = require('../../server/services/github/github-repo-service');
 var assert = require('assert');
 var shutdown = require('shutdown');
 var BatchStream = require('batch-stream');
 var StatusError = require('statuserror');
+var Promise = require('bluebird');
 
 var roomTagger = require('../../server/utils/room-tagger');
 
@@ -96,7 +96,7 @@ var attachRepoInfoForRepoRoom = function (room) {
 };
 
 var attachRepoInfoToRooms = function (rooms) {
-  return Q.all(
+  return Promise.all(
     rooms.map(function (room) {
       if (room.githubType === 'REPO') {
         return attachRepoInfoForRepoRoom(room);
@@ -132,7 +132,7 @@ var tagRooms = function (roomContainers) {
 // iterates to the now tagged rooms and saves them
 var saveRooms = function (rooms) {
 
-  return Q.all(
+  return Promise.all(
     rooms.map(function (room) {
       return room.save()
         .then(function () {
