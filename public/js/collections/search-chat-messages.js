@@ -5,6 +5,7 @@
 var Backbone               = require('backbone');
 var _                      = require('underscore');
 var BaseResolverCollection = require('./base-resolver-collection.js');
+var context                = require('utils/context');
 
 var ContextModel = Backbone.Model.extend({
   defaults: {
@@ -77,7 +78,7 @@ module.exports = BaseResolverCollection.extend({
     this.fetch({
       data: {
         q:     this.roomMenuModel.get('searchTerm'),
-        lang:  'en',
+        lang:  context.lang(),
         limit: 45
       }
     });
