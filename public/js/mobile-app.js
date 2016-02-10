@@ -21,6 +21,7 @@ require('components/timezone-cookie');
 // Preload widgets
 require('views/widgets/avatar');
 require('components/ping');
+require('components/eyeballs');
 require('template/helpers/all');
 
 onready(function() {

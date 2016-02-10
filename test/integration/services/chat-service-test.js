@@ -90,7 +90,7 @@ describe('chatService', function() {
   describe('Finding messages', function() {
     var chat1, chat2, chat3;
 
-    before(function(done) {
+    beforeEach(function(done) {
       return chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, { text: 'A' })
         .then(function(chat) {
           chat1 = chat.id;
