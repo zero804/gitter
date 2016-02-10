@@ -1,12 +1,18 @@
 {
+  "ecmaVersion": 5,
   "libs": [
     "browser",
-    "ecma5",
     "jquery"
+  ],
+  "dontLoad": [
+    "public/repo/*.js"
   ],
   "plugins": {
     "complete_strings": {},
     "node": {},
+    "lint": {},
+    "modules": {},
+    "es_modules": {},
     "doc_comment": {
       "fullDocs": true
     }
