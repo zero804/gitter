@@ -63,7 +63,6 @@ module.exports = Marionette.CollectionView.extend({
     this.shouldRender   = false;
 
     this.listenTo(this.roomCollection, 'add remove', this.render, this);
-    //collectionEVents
     this.listenTo(this.collection, 'snapshot', this.onCollectionSnapshot, this);
     this.listenTo(this.model, 'change:state change:selectedOrgName', this.onMenuStateUpdate, this);
   },

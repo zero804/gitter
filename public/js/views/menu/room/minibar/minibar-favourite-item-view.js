@@ -12,11 +12,11 @@ module.exports = ItemView.extend({
   },
 
   onDragStart: function() {
-    this.$el.addClass('active');
+    this.$el.addClass('dragging');
   },
 
   onDragStop: function() {
-    this.$el.removeClass('active');
+    this.$el.removeClass('dragging');
   },
 
   onFavourite: function() {

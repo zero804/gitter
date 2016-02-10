@@ -20,6 +20,8 @@ module.exports = Backbone.FilteredCollection.extend({
     this.roomCollection = options.collection;
     this.listenTo(this.roomCollection, 'snapshot', this.onRoomCollectionSnapshot, this);
 
+    this.listenTo(this, 'sync', this.onSync, this);
+
     BackboneFilteredCollection.prototype.initialize.apply(this, arguments);
   },
 
@@ -77,9 +79,11 @@ module.exports = Backbone.FilteredCollection.extend({
   },
 
   sortFavourites: function(a, b) {
-    if (!a.get('favourite')) return -1;
-    if (!b.get('favourite')) return 1;
     return (a.get('favourite') < b.get('favourite')) ? -1 : 1;
+  },
+
+  onSync: function (){
+    if(this.comparator) { this.sort() }
   },
 
 });
