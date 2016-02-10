@@ -30,6 +30,10 @@ module.exports = Marionette.CollectionView.extend({
     Marionette.CollectionView.prototype.constructor.apply(this, arguments);
   },
 
+  events: {
+    'mouseleave': 'onMouseLeave'
+  },
+
   modelEvents: {
     'change:profileMenuOpenState': 'onOpenStateChange',
   },
@@ -39,4 +43,9 @@ module.exports = Marionette.CollectionView.extend({
       this.$el.toggleClass('active', !!val);
     }.bind(this));
   },
+
+  onMouseLeave: function (){
+    this.model.set('profileMenuOpenState', false);
+  },
+
 });

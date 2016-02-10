@@ -9,8 +9,9 @@ module.exports = Marionette.ItemView.extend({
   template: template,
 
   modelEvents: {
-    'change:state':           'updateActiveElement',
-    'change:selectedOrgName': 'render'
+    'change:state':                'updateActiveElement',
+    'change:selectedOrgName':      'render',
+    'change:profileMenuOpenState': 'onProfileToggle',
   },
 
   events: {
@@ -24,6 +25,7 @@ module.exports = Marionette.ItemView.extend({
     headerFavourite: '#panel-header-favourite',
     headerPeople:    '#panel-header-people',
     headerOrg:       '#panel-header-org',
+    profileToggle:   '#panel-header-profile-toggle',
   },
 
   serializeData: function() {
@@ -53,7 +55,7 @@ module.exports = Marionette.ItemView.extend({
 
   onClick: function() {
     //Open the profile menu ONLY when in the all channels state
-    if(this.model.get('state') === 'all') {
+    if (this.model.get('state') === 'all') {
       this.model.set('profileMenuOpenState', !this.model.get('profileMenuOpenState'));
     }
   },
@@ -68,8 +70,12 @@ module.exports = Marionette.ItemView.extend({
     });
   },
 
-  onDestroy: function(){
+  onProfileToggle: function(model, val) { //jshint unused: true
+    this.ui.profileToggle.toggleClass('active', !!val);
+  },
+
+  onDestroy: function() {
     this.stopListening(this.model.primaryCollection);
-  }
+  },
 
 });
