@@ -1,19 +1,16 @@
 'use strict';
 
-var Q      = require("q");
+var Promise = require('bluebird');
 
 function execPreloads(preloads, callback) {
-  if(!preloads) return Q.resolve().nodeify(callback);
+  if(!preloads) return Promise.resolve().nodeify(callback);
 
-  var promises = preloads.map(function(i) {
-    var deferred = Q.defer();
-    i.strategy.preload(i.data, deferred.makeNodeResolver());
-    return deferred.promise;
-  });
-
-  return Q.all(promises)
-      .nodeify(callback);
+  return Promise.map(preloads, function(i) {
+    return Promise.fromCallback(function(callback) {
+      i.strategy.preload(i.data, callback);
+    });
+  })
+  .nodeify(callback);
 }
-
 
 module.exports = execPreloads;

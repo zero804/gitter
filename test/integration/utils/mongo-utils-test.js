@@ -1,12 +1,11 @@
 /*jslint node: true */
-/*global describe:true, it: true, beforeEach:true, afterEach:true */
 "use strict";
 
 var testRequire = require('../test-require');
 var assert = require('assert');
 var underTest = testRequire('./utils/mongo-utils');
 var ObjectID = require('mongodb').ObjectID;
-var Q = require('q');
+var Promise = require('bluebird');
 
 describe('mongo-utils', function() {
 
@@ -15,19 +14,11 @@ describe('mongo-utils', function() {
   it('should return the right time, no matter what the current time #slow', function(done) {
 
     function doLater(i) {
-      var d = Q.defer();
-      setTimeout(function() {
-        try {
+      return Promise.delay(i * 10)
+        .then(function() {
           var t = underTest.getDateFromObjectId('51adcd412aefe1576f000005');
           assert.equal(t.getTime(), 1370344769000);
-          d.resolve();
-        } catch(e) {
-          d.reject(e);
-        }
-
-      }, i * 10);
-
-      return d.promise;
+        });
     }
 
     var promises = [];
@@ -35,7 +26,7 @@ describe('mongo-utils', function() {
       promises.push(doLater(i));
     }
 
-    Q.all(promises).then(function() { done(); }, done);
+    Promise.all(promises).then(function() { done(); }, done);
 
   });
 
@@ -47,18 +38,11 @@ describe('mongo-utils', function() {
     var t = id.getTimestamp().getTime();
 
     function doLater(i) {
-      var d = Q.defer();
-      setTimeout(function() {
-        try {
+      return Promise.delay(i * 10)
+        .then(function() {
           assert.equal(id.getTimestamp().getTime(), t);
-          d.resolve();
-        } catch(e) {
-          d.reject(e);
-        }
 
-      }, i * 10);
-
-      return d.promise;
+        });
     }
 
     var promises = [];
@@ -66,7 +50,7 @@ describe('mongo-utils', function() {
       promises.push(doLater(i));
     }
 
-    Q.all(promises).then(function() { done(); }, done);
+    Promise.all(promises).then(function() { done(); }, done);
 
   });
 

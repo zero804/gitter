@@ -4,7 +4,7 @@ var env            = require('gitter-web-env');
 var mailer         = env.mailer;
 
 var troupeTemplate = require('../utils/troupe-template');
-var Q              = require('q');
+var Promise        = require('bluebird');
 var cdn            = require('../web/cdn');
 
 
@@ -34,7 +34,7 @@ exports.sendEmail = function(options) {
   var mandrillTemplateName = options.templateFile.replace(/\_/g,'-');
 
   var mapper = VALID_TEMPLATES[mandrillTemplateName];
-  if(!mapper) return Q.reject('Unknown mandrill template: ' + mandrillTemplateName);
+  if(!mapper) return Promise.reject('Unknown mandrill template: ' + mandrillTemplateName);
 
   options.templateName = mandrillTemplateName;
   options.data = mapper(options.data);

@@ -3,7 +3,7 @@
 var env = require('gitter-web-env');
 var config = env.config;
 
-var Q = require('q');
+var Promise = require('bluebird');
 var GoogleStrategy = require('passport-google-oauth2').Strategy;
 var userService = require('../../services/user-service');
 var trackSignupOrLogin = require('../../utils/track-signup-or-login');
@@ -37,16 +37,9 @@ function googleOauth2Callback(req, accessToken, refreshToken, params, profile, d
       trackSignupOrLogin(req, user, isNewUser);
       updateUserLocale(req, user);
 
-      // blegh
-      var deferred = Q.defer();
-      req.logIn(user, function(err) {
-        if (err) {
-          deferred.reject(err);
-        } else {
-          deferred.resolve();
-        }
+      return Promise.fromCallback(function(callback) {
+        req.logIn(user, callback);
       });
-      return deferred.promise;
     })
     .then(function() {
       done(null, user);

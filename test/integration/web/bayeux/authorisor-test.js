@@ -2,7 +2,7 @@
 
 var testRequire = require('../../test-require');
 var assert = require('assert');
-var Q = require('q');
+var Promise = require('bluebird');
 var testGenerator = require('../../test-generator');
 
 var mockito = require('jsmockito').JsMockito;
@@ -76,9 +76,9 @@ describe('authorisor', function() {
         mockito.when(presenceServiceMock).lookupUserIdForSocket()
           .then(function(clientId) {
             assert.equal(clientId, meta.clientId);
-            if(!meta.socketExists) return Q.resolve([null, false]);
+            if(!meta.socketExists) return Promise.resolve([null, false]);
 
-            return Q.resolve([meta.userId, true]);
+            return Promise.resolve([meta.userId, true]);
           });
 
         mockito.when(userCanAccessRoomMock)()
@@ -89,7 +89,7 @@ describe('authorisor', function() {
 
             assert.equal(userId, meta.userId);
             assert.equal(troupeId, meta.troupeId);
-            return Q.resolve(!!meta.canAccessRoom);
+            return Promise.resolve(!!meta.canAccessRoom);
           });
 
         authorisor.incoming(message, null, function(message) {
