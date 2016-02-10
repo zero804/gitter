@@ -57,7 +57,7 @@ body.mobile .chat-input__container {
 
 .chat-input__buttons {
   position: absolute;
-  right: 10px;
+  right: 0;
   top: 0;
   height: 50px;
   user-select: none;
@@ -67,18 +67,38 @@ body.mobile .chat-input__buttons {
   display: none;
 }
 
-body.embedded .chat-input__button-markdown {
-  display: none;
-}
-
-.chat-input__buttons a {
+.chat-input__button {
   display: block;
   height: 25px;
+  padding: 0 10px;
+  background-color: transparent;
+  border: none;
+
+  font-size: inherit;
   line-height: 25px;
   cursor: pointer;
+
+  transition: background-color 0.2s ease;
+
+  &:hover,
+  &:focus {
+    background-color: rgba(0, 0, 0, 0.05);
+    outline: none;
+  }
+
+  &[data-compose-mode="true"] {
+    & > .chat-input__button-icon--chat {
+      display: none;
+    }
+  }
+  &[data-compose-mode="false"] {
+    & > .chat-input__button-icon--compose {
+      display: none;
+    }
+  }
 }
 
-.chat-input__buttons i {
+.chat-input__button-icon {
   line-height: 1.2;
   opacity: 0.5;
   transition: opacity 0.3s;
@@ -89,21 +109,24 @@ body.embedded .chat-input__button-markdown {
     opacity: 0.4;
   }
 
-  &:hover {
+  &:hover,
+  &:focus {
     opacity: 0.9;
+  }
+
+  &:before {
+    margin: 0;
+    width: 21px;
+    font-size: 21px;
   }
 }
 
-.chat-input__buttons i:not(.icon-chat-alt):before {
+.chat-input__button-icon--chat:before {
   // .icon-chat-alt is a wide-ass 21px by default, this
   // makes all the other icons wide-ass too
-  font-size: 21px;
+  font-size: inherit;
 }
 
-.chat-input__buttons i:before {
-  margin: 0;
-  width: 21px;
-}
 
 .chat-input__avatar {
   float: left;
