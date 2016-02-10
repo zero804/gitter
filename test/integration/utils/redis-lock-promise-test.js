@@ -3,7 +3,7 @@
 "use strict";
 
 var assert = require('assert');
-var Q = require('q');
+var Promise = require('bluebird');
 var testRequire = require('../test-require');
 var redisLockPromise = testRequire('./utils/redis-lock-promise');
 
@@ -14,14 +14,14 @@ describe('redis-lock-promise', function() {
     function insideMutex() {
       assert.strictEqual(count, 0);
       count++;
-      return Q.delay(10)
+      return Promise.delay(10)
         .then(function() {
           assert.strictEqual(count, 1);
           count--;
         });
     }
 
-    return Q.all([
+    return Promise.all([
       redisLockPromise('x', insideMutex),
       redisLockPromise('x', insideMutex),
       redisLockPromise('x', insideMutex)])
@@ -35,7 +35,7 @@ describe('redis-lock-promise', function() {
     function insideMutex() {
       assert.strictEqual(count, 0);
       count++;
-      return Q.delay(10)
+      return Promise.delay(10)
         .then(function() {
           assert.strictEqual(count, 1);
           count--;
@@ -43,7 +43,7 @@ describe('redis-lock-promise', function() {
         });
     }
 
-    return Q.all([
+    return Promise.all([
       redisLockPromise('x', insideMutex),
       redisLockPromise('x', insideMutex),
       redisLockPromise('x', insideMutex)])

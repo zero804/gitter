@@ -3,7 +3,7 @@
 "use strict";
 
 var shutdown = require('shutdown');
-var Q = require('q');
+var Promise = require('bluebird');
 var env = require('gitter-web-env');
 var userService = require('../../server/services/user-service');
 var emailService = require('../../server/services/email-address-service');
@@ -41,7 +41,7 @@ function attachEmailAdresses(users) {
       });
   });
 
-  return Q.all(promises);
+  return Promise.all(promises);
 }
 
 function printResults(users) {

@@ -1,7 +1,7 @@
 'use strict';
 
 var _ = require('underscore');
-var Q = require('q');
+var Promise = require('bluebird');
 
 var HIGHLIGHTED_ROOMS = [
   {
@@ -63,7 +63,7 @@ var HIGHLIGHTED_ROOMS = [
 ];
 
 module.exports = function (userId, currentRoomUri) {
-  return Q.all(HIGHLIGHTED_ROOMS.map(function(recommendation) {
+  return Promise.all(HIGHLIGHTED_ROOMS.map(function(recommendation) {
     // if (recommendation.githubType === 'REPO') {
     //   return highlightedRoomCache(null, recommendation.uri)
     //     .then(function(repo) {

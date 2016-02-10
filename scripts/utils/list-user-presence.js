@@ -11,15 +11,17 @@ var _ = require('lodash');
 var shutdown = require('shutdown');
 
 var opts = require("nomnom")
-  .option('userId', {
-    position: 0,
+  .option('username', {
     required: true,
-    help: "userId of user to list presence for"
+    help: "username of user to list presence for"
   })
   .parse();
 
 var sockets;
-presence.listAllSocketsForUser(opts.userId)
+userService.findByUsername(opts.username)
+  .then(function(user) {
+    return presence.listAllSocketsForUser(user.id);    
+  })
   .then(function(socketIds) {
     return presence.getSockets(socketIds);
   })

@@ -4,8 +4,6 @@ var testRequire = require('../test-require');
 var assert = require('assert');
 var mongooseUtils = testRequire('./utils/mongoose-utils');
 var persistence = testRequire('./services/persistence-service');
-var ObjectID = require('mongodb').ObjectID;
-var Q = require('q');
 
 describe('mongoose-utils', function() {
 

@@ -3,6 +3,8 @@
 var express = require('express');
 var authMiddleware = require('../../web/middlewares/auth-api');
 var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
+var skipTokenErrorHandler = require('../../web/middlewares/skip-token-error-handler')
+
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
@@ -63,6 +65,7 @@ router.get('/chat-heatmap/:roomId',
 
 router.get('/orgs/:orgUri/members',
   authMiddleware,
+  skipTokenErrorHandler,
   identifyRoute('api-private-org-members'),
   require('./org-members'));
 

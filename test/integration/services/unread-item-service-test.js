@@ -1,10 +1,21 @@
 "use strict";
 
+// Lets get rid of hamcrest. Until we do, we'll have to do this
+// its nasty, but if jsmockito uses a different instance of the library
+// it won't work correctly
+function getHamcrest() {
+  try {
+    return require('jsmockito/node_modules/jshamcrest').JsHamcrest;
+  } catch(e) {
+    return require('jsmockito').JsHamcrest;
+  }
+}
+
 var testRequire = require('../test-require');
 var mockito = require('jsmockito').JsMockito;
-var hamcrest = require('jshamcrest').JsHamcrest;
+var hamcrest = getHamcrest();
 
-var Q = require('q');
+var Promise = require('bluebird');
 var assert = require('assert');
 
 var times = mockito.Verifiers.times;
@@ -12,8 +23,23 @@ var never = mockito.Verifiers.never;
 var once = times(1);
 
 var allOf = hamcrest.Matchers.allOf;
+var equalTo = hamcrest.Matchers.equalTo;
 var anything = hamcrest.Matchers.anything;
 var hasMember = hamcrest.Matchers.hasMember;
+var hasItem = hamcrest.Matchers.hasItem;
+var hasSize = hamcrest.Matchers.hasSize;
+
+var equivalentArray = function(expected) {
+  return allOf(expected.map(function(expectedItem) {
+    return hasItem(expectedItem);
+  }).concat(hasSize(expected.length)));
+};
+
+var equivalentMap = function(expected) {
+  return allOf(Object.keys(expected).map(function(key) {
+    return hasMember(key, equalTo(expected[key]));
+  }));
+};
 
 function makeHash() {
   var hash = [];
@@ -31,8 +57,6 @@ function deep(object) {
 
   return allOf.apply(null, items);
 }
-
-Q.longStackSupport = true;
 
 describe('unread-item-service', function() {
   var unreadItemService, mongoUtils;
@@ -129,13 +153,13 @@ describe('unread-item-service', function() {
         ];
 
         mockito.when(recentRoomCore).getTroupeLastAccessTimesForUser(userId1)
-        .thenReturn(Q.resolve(lastAccessTimes));
+        .thenReturn(Promise.resolve(lastAccessTimes));
 
         mockito.when(engine).getLastChatTimestamps([troupeId1, troupeId2, troupeId3])
-        .thenReturn(Q.resolve(lastChatTimes));
+        .thenReturn(Promise.resolve(lastChatTimes));
 
         mockito.when(engine).getLastChatTimestamps([])
-        .thenReturn(Q.resolve({}));
+        .thenReturn(Promise.resolve({}));
 
         unreadItemService = testRequire.withProxies("./services/unread-item-service", {
           './core/recent-room-core': recentRoomCore,
@@ -237,9 +261,9 @@ describe('unread-item-service', function() {
         userService = mockito.mock(testRequire('./services/user-service'));
         roomPermissionsModel = mockito.mockFunction();
 
-        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId).thenReturn(Q.resolve(troupeNoLurkersUserHash));
-        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId2).thenReturn(Q.resolve(troupeSomeLurkersUserHash));
-        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId3).thenReturn(Q.resolve(troupeAllLurkersUserHash));
+        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId).thenReturn(Promise.resolve(troupeNoLurkersUserHash));
+        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId2).thenReturn(Promise.resolve(troupeSomeLurkersUserHash));
+        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId3).thenReturn(Promise.resolve(troupeAllLurkersUserHash));
 
         unreadItemService = testRequire.withProxies("./services/unread-item-service", {
           './room-membership-service': roomMembershipService,
@@ -338,10 +362,10 @@ describe('unread-item-service', function() {
 
       it('should parse messages with mentions to non members who are allowed in the room', function(done) {
         mockito.when(userService).findByIds([userId3])
-          .thenReturn(Q.resolve([user3]));
+          .thenReturn(Promise.resolve([user3]));
 
         mockito.when(roomPermissionsModel)(user3, 'join', troupeSomeLurkers)
-          .thenReturn(Q.resolve(true));
+          .thenReturn(Promise.resolve(true));
 
         unreadItemService.testOnly.parseChat(fromUserId, troupeSomeLurkers, nonMemberMention)
           .then(function(result) {
@@ -355,10 +379,10 @@ describe('unread-item-service', function() {
 
       it('should parse messages with mentions to non members who are not allowed in the room', function(done) {
         mockito.when(userService).findByIds([userId3])
-          .thenReturn(Q.resolve([user3]));
+          .thenReturn(Promise.resolve([user3]));
 
         mockito.when(roomPermissionsModel)(user3, 'join', troupeSomeLurkers)
-          .thenReturn(Q.resolve(false));
+          .thenReturn(Promise.resolve(false));
 
         unreadItemService.testOnly.parseChat(fromUserId, troupeSomeLurkers, nonMemberMention)
           .then(function(result) {
@@ -372,7 +396,7 @@ describe('unread-item-service', function() {
 
       it('should parse messages with mentions to non members who are not on gitter', function(done) {
         mockito.when(userService).findByIds([userId3])
-          .thenReturn(Q.resolve([]));
+          .thenReturn(Promise.resolve([]));
 
         unreadItemService.testOnly.parseChat(fromUserId, troupeSomeLurkers, nonMemberMention)
           .then(function(result) {
@@ -408,7 +432,7 @@ describe('unread-item-service', function() {
         usersWithLurkHash[userId2] = false;
         usersWithLurkHash[userId3] = false;
 
-        mockito.when(roomMembershipServiceMock).findMembersForRoomWithLurk(troupeId1).thenReturn(Q.resolve(usersWithLurkHash));
+        mockito.when(roomMembershipServiceMock).findMembersForRoomWithLurk(troupeId1).thenReturn(Promise.resolve(usersWithLurkHash));
 
         unreadItemService.testOnly.removeItem(troupeId1, chatId)
           .then(function() {
@@ -529,16 +553,16 @@ describe('unread-item-service', function() {
 
         mockito.when(categoriseUserInRoom)().then(function(roomId, userIds) {
           /* Always return all users as online */
-          return Q.resolve(userIds.reduce(function(memo, userId) {
+          return Promise.resolve(userIds.reduce(function(memo, userId) {
             // TODO: test with some users inroom,push etc
             memo[userId] = 'online';
             return memo;
           }, {}));
         });
 
-        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId).thenReturn(Q.resolve(troupeNoLurkersUserHash));
-        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId2).thenReturn(Q.resolve(troupeSomeLurkersUserHash));
-        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId3).thenReturn(Q.resolve(troupeAllLurkersUserHash));
+        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId).thenReturn(Promise.resolve(troupeNoLurkersUserHash));
+        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId2).thenReturn(Promise.resolve(troupeSomeLurkersUserHash));
+        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId3).thenReturn(Promise.resolve(troupeAllLurkersUserHash));
 
         unreadItemService = testRequire.withProxies("./services/unread-item-service", {
           './room-membership-service': roomMembershipService,
@@ -749,16 +773,16 @@ describe('unread-item-service', function() {
 
         mockito.when(categoriseUserInRoom)().then(function(roomId, userIds) {
           /* Always return all users as online */
-          return Q.resolve(userIds.reduce(function(memo, userId) {
+          return Promise.resolve(userIds.reduce(function(memo, userId) {
             // TODO: test with some users inroom,push etc
             memo[userId] = 'online';
             return memo;
           }, {}));
         });
 
-        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId).thenReturn(Q.resolve(troupeNoLurkersUserHash));
-        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId2).thenReturn(Q.resolve(troupeSomeLurkersUserHash));
-        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId3).thenReturn(Q.resolve(troupeAllLurkersUserHash));
+        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId).thenReturn(Promise.resolve(troupeNoLurkersUserHash));
+        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId2).thenReturn(Promise.resolve(troupeSomeLurkersUserHash));
+        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId3).thenReturn(Promise.resolve(troupeAllLurkersUserHash));
 
         unreadItemService = testRequire.withProxies("./services/unread-item-service", {
           './room-membership-service': roomMembershipService,
@@ -1002,7 +1026,7 @@ describe('unread-item-service', function() {
       var troupe = {};
       mockito.when(userService).findByIds().then(function(userIds) {
         assert.deepEqual(userIds, ['1','2','3']);
-        return Q.resolve(userIds.map(function(userId) {
+        return Promise.resolve(userIds.map(function(userId) {
           return {
             _id: userId,
             id: userId
@@ -1013,7 +1037,7 @@ describe('unread-item-service', function() {
       mockito.when(roomPermissionsModel)().then(function(user, operation, pTroupe) {
         assert(pTroupe === troupe);
         assert.strictEqual(operation, 'join');
-        return Q.resolve(user.id !== '3');
+        return Promise.resolve(user.id !== '3');
       });
 
       unreadItemService.testOnly.findNonMembersWithAccess(troupe, ['1','2','3'])
@@ -1022,6 +1046,384 @@ describe('unread-item-service', function() {
         })
         .nodeify(done);
     });
+
+  });
+
+  describe('processResultsForNewItemWithMentions', function() {
+    var unreadItemService, categoriseUserInRoom, appEvents,
+      mockRedisBatcher, processResultsForNewItemWithMentions,
+      troupeId, chatId;
+
+    var userId1 = 'USERID1';
+    var mongoUtils = testRequire('./utils/mongo-utils');
+    var testGenerator = require('../test-generator');
+
+    beforeEach(function() {
+      var MockBadgeBatcherController = require('../utils/mock-redis-batcher');
+      mockRedisBatcher = new MockBadgeBatcherController();
+      categoriseUserInRoom = mockito.mockFunction();
+      appEvents = mockito.mock(require('gitter-web-appevents'));
+      troupeId = mongoUtils.getNewObjectIdString();
+      chatId = mongoUtils.getNewObjectIdString();
+
+      unreadItemService = testRequire.withProxies("./services/unread-item-service", {
+        'gitter-web-appevents': appEvents,
+        '../utils/redis-batcher': mockRedisBatcher,
+        './categorise-users-in-room' : categoriseUserInRoom
+      });
+
+      processResultsForNewItemWithMentions = unreadItemService.testOnly.processResultsForNewItemWithMentions;
+    });
+
+
+    var FIXTURES = [{
+      name: 'processResultsForNewItemWithMentions',
+      meta: {
+        notifyUserIds: [],
+        notifyNewRoomUserIds: [],
+        activityOnlyUserIds: [],
+        mentionUserIds: [],
+
+        isEdit: false,
+
+        results: [],
+
+        inroom: [],
+        online: [],
+        mobile: [],
+        push: [],
+        push_connected: [],
+        push_notified: [],
+        push_notified_connected: [],
+
+        expectUserMentionedInNonMemberRoom: [],
+        expectNewUnreadNoMention: [],
+        expectNewUnreadWithMention: [],
+        expectNewOnlineNotificationNoMention: [],
+        expectNewOnlineNotificationWithMention: [],
+        expectNewPushCandidatesNoMention: [],
+        expectNewPushCandidatesWithMention: [],
+        expectTroupeUnreadCountsChange: [],
+        expectLurkActivity: [],
+        expectBadgeUpdateUserIds: []
+      },
+      tests: [{
+        name: 'Chat, no mention, single user',
+        meta: {
+          notifyUserIds: [userId1],
+          results: [{ userId: userId1, unreadCount: 1, mentionCount: 0, badgeUpdate: true }],
+        },
+        tests: [ {
+          name: 'In room',
+          inroom: [userId1],
+          expectNewUnreadNoMention: [userId1],
+          expectTroupeUnreadCountsChange: [{
+            userId: userId1,
+            unreadCount: 1,
+            mentionCount: 0
+          }],
+          expectBadgeUpdateUserIds: [userId1]
+        }, {
+          name: 'Online',
+          online: [userId1],
+          expectNewUnreadNoMention: [userId1],
+          expectNewOnlineNotificationNoMention: [userId1],
+          expectTroupeUnreadCountsChange: [{
+            userId: userId1,
+            unreadCount: 1,
+            mentionCount: 0
+          }],
+          expectBadgeUpdateUserIds: [userId1]
+        }, {
+          name: 'Mobile',
+          mobile: [userId1],
+          expectNewUnreadNoMention: [userId1],
+          expectTroupeUnreadCountsChange: [{
+            userId: userId1,
+            unreadCount: 1,
+            mentionCount: 0
+          }],
+          expectBadgeUpdateUserIds: [userId1]
+        }, {
+          name: 'Push',
+          push: [userId1],
+
+          expectBadgeUpdateUserIds: [userId1],
+          expectNewPushCandidatesNoMention: [userId1]
+        }, {
+          name: 'Push Connected',
+          push_connected: [userId1],
+
+          expectNewUnreadNoMention: [userId1],
+          expectTroupeUnreadCountsChange: [{
+            userId: userId1,
+            unreadCount: 1,
+            mentionCount: 0
+          }],
+
+          expectBadgeUpdateUserIds: [userId1],
+          expectNewPushCandidatesNoMention: [userId1]
+        }, {
+          name: 'Push Notified',
+          push_notified: [userId1],
+          expectBadgeUpdateUserIds: [userId1]
+        }, {
+          name: 'Push Notified Connected',
+          push_notified_connected: [userId1],
+          expectNewUnreadNoMention: [userId1],
+          expectTroupeUnreadCountsChange: [{
+            userId: userId1,
+            unreadCount: 1,
+            mentionCount: 0
+          }],
+          expectBadgeUpdateUserIds: [userId1]
+        }]
+      }, {
+        name: 'Chat, mention, single user',
+        meta: {
+          notifyUserIds: [userId1],
+          mentionUserIds: [userId1],
+          results: [{ userId: userId1, unreadCount: 1, mentionCount: 1, badgeUpdate: true }],
+        },
+        tests: [{
+          name: 'In room',
+          inroom: [userId1],
+          expectNewUnreadWithMention: [userId1],
+          expectTroupeUnreadCountsChange: [{
+            userId: userId1,
+            unreadCount: 1,
+            mentionCount: 1
+          }],
+          expectBadgeUpdateUserIds: [userId1]
+        }, {
+          name: 'Online',
+          online: [userId1],
+          expectNewUnreadWithMention: [userId1],
+          expectNewOnlineNotificationWithMention: [userId1],
+          expectTroupeUnreadCountsChange: [{
+            userId: userId1,
+            unreadCount: 1,
+            mentionCount: 1
+          }],
+          expectBadgeUpdateUserIds: [userId1]
+        }, {
+          name: 'Mobile',
+          mobile: [userId1],
+          expectNewUnreadWithMention: [userId1],
+          expectTroupeUnreadCountsChange: [{
+            userId: userId1,
+            unreadCount: 1,
+            mentionCount: 1
+          }],
+          expectBadgeUpdateUserIds: [userId1]
+        }, {
+          name: 'Push',
+          push: [userId1],
+
+          expectBadgeUpdateUserIds: [userId1],
+          expectNewPushCandidatesWithMention: [userId1]
+        }, {
+          name: 'Push Connected',
+          push_connected: [userId1],
+
+          expectNewUnreadWithMention: [userId1],
+          expectTroupeUnreadCountsChange: [{
+            userId: userId1,
+            unreadCount: 1,
+            mentionCount: 1
+          }],
+
+          expectBadgeUpdateUserIds: [userId1],
+          expectNewPushCandidatesWithMention: [userId1]
+        }, {
+          name: 'Push Notified',
+          push_notified: [userId1],
+          expectNewPushCandidatesWithMention: [userId1],
+          expectBadgeUpdateUserIds: [userId1]
+        }, {
+          name: 'Push Notified Connected',
+          push_notified_connected: [userId1],
+          expectNewUnreadWithMention: [userId1],
+          expectNewPushCandidatesWithMention: [userId1],
+          expectTroupeUnreadCountsChange: [{
+            userId: userId1,
+            unreadCount: 1,
+            mentionCount: 1
+          }],
+          expectBadgeUpdateUserIds: [userId1]
+        }]
+      }, {
+        name: 'Lurking user',
+        meta: {
+          activityOnlyUserIds: [userId1]
+        },
+        tests: [{
+          name: 'In room',
+          inroom: [userId1],
+          expectLurkActivity: [userId1]
+        }, {
+          name: 'Online',
+          online: [userId1],
+          expectLurkActivity: [userId1]
+        }, {
+          name: 'Mobile',
+          mobile: [userId1],
+          expectLurkActivity: [userId1]
+        }, {
+          name: 'Push',
+          push: [userId1],
+        }, {
+          name: 'Push Connected',
+          push_connected: [userId1],
+          expectLurkActivity: [userId1]
+        }, {
+          name: 'Push Notified',
+          push_notified: [userId1],
+        }, {
+          name: 'Push Notified Connected',
+          push_notified_connected: [userId1],
+          expectLurkActivity: [userId1]
+        }]
+      }, {
+        name: 'notifyNewRoomUserIds',
+        notifyNewRoomUserIds: [userId1],
+        expectUserMentionedInNonMemberRoom: [userId1]
+      }]
+    }];
+
+
+    testGenerator(FIXTURES, function(name, meta) {
+      it(name, function() {
+        var parsed = {
+          notifyUserIds: meta.notifyUserIds,
+          notifyNewRoomUserIds: meta.notifyNewRoomUserIds,
+          activityOnlyUserIds: meta.activityOnlyUserIds,
+          mentionUserIds: meta.mentionUserIds,
+        };
+
+        var results = meta.results.reduce(function(memo, result) {
+          memo[result.userId] = result;
+          return memo;
+        }, {});
+
+        var isEdit = meta.isEdit;
+
+        mockito.when(categoriseUserInRoom)().then(function(pTroupeId, userIds) {
+          assert.strictEqual(pTroupeId, troupeId);
+
+          var userIdsSorted = userIds.slice();
+          userIdsSorted.sort();
+          var expectedUserIds = parsed.notifyUserIds.concat(parsed.activityOnlyUserIds);
+          expectedUserIds.sort();
+          assert.deepEqual(userIdsSorted, expectedUserIds);
+
+          var result = userIds.reduce(function(memo, userId) {
+
+            if (meta.inroom.indexOf(userId) >= 0) {
+              memo[userId] = 'inroom';
+            } else if (meta.online.indexOf(userId) >= 0) {
+              memo[userId] = 'online';
+            } else if (meta.mobile.indexOf(userId) >= 0) {
+              memo[userId] = 'mobile';
+            } else if (meta.push.indexOf(userId) >= 0) {
+              memo[userId] = 'push';
+            } else if (meta.push_connected.indexOf(userId) >= 0) {
+              memo[userId] = 'push_connected';
+            } else if (meta.push_notified.indexOf(userId) >= 0) {
+              memo[userId] = 'push_notified';
+            } else if (meta.push_notified_connected.indexOf(userId) >= 0) {
+              memo[userId] = 'push_notified_connected';
+            }
+
+            return memo;
+          }, {});
+          return Promise.resolve(result);
+        });
+
+        return processResultsForNewItemWithMentions(troupeId, chatId, parsed, results, isEdit)
+          .then(function() {
+            if (meta.expectUserMentionedInNonMemberRoom.length) {
+              meta.expectUserMentionedInNonMemberRoom.forEach(function(userId) {
+                mockito.verify(appEvents, once).userMentionedInNonMemberRoom(equivalentMap({ userId: userId, troupeId: troupeId }));
+              });
+            } else {
+              mockito.verify(appEvents, never()).userMentionedInNonMemberRoom();
+            }
+
+            // newUnreadItem
+            if (meta.expectNewUnreadNoMention.length || meta.expectNewUnreadWithMention.length) {
+              meta.expectNewUnreadNoMention.forEach(function(userId) {
+                mockito.verify(appEvents, once).newUnreadItem(userId, troupeId, equivalentMap({ chat: [chatId] }), true);
+              });
+
+              meta.expectNewUnreadWithMention.forEach(function(userId) {
+                mockito.verify(appEvents, once).newUnreadItem(userId, troupeId, equivalentMap({ chat: [chatId], mention: [chatId] }), true);
+              });
+            } else {
+              mockito.verify(appEvents, never()).newUnreadItem();
+            }
+
+            // newOnlineNotification
+            if (meta.expectNewOnlineNotificationNoMention.length || meta.expectNewOnlineNotificationWithMention.length) {
+              if (meta.expectNewOnlineNotificationNoMention.length) {
+                mockito.verify(appEvents, once).newOnlineNotification(troupeId, chatId, equivalentArray(meta.expectNewOnlineNotificationNoMention), false);
+              } else {
+                mockito.verify(appEvents, never()).newOnlineNotification(anything(), anything(), anything(), false);
+              }
+
+              if (meta.expectNewOnlineNotificationWithMention.length) {
+                mockito.verify(appEvents, once).newOnlineNotification(troupeId, chatId, equivalentArray(meta.expectNewOnlineNotificationWithMention), true);
+              } else {
+                mockito.verify(appEvents, never()).newOnlineNotification(anything(), anything(), anything(), true);
+              }
+            } else {
+              mockito.verify(appEvents, never()).newOnlineNotification();
+            }
+
+            if (meta.expectNewPushCandidatesWithMention.length) {
+              mockito.verify(appEvents, once).newPushNotificationForChat(troupeId, chatId, equivalentArray(meta.expectNewPushCandidatesWithMention), true);
+            } else {
+              mockito.verify(appEvents, never()).newPushNotificationForChat(anything(), anything(), anything(), true);
+            }
+
+            if (meta.expectNewPushCandidatesNoMention.length) {
+              mockito.verify(appEvents, once).newPushNotificationForChat(troupeId, chatId, equivalentArray(meta.expectNewPushCandidatesNoMention), false);
+            } else {
+              mockito.verify(appEvents, never()).newPushNotificationForChat(anything(), anything(), anything(), false);
+            }
+
+            if (meta.expectTroupeUnreadCountsChange.length) {
+              meta.expectTroupeUnreadCountsChange.forEach(function(expectTroupeUnreadCountsChange) {
+                mockito.verify(appEvents, once).troupeUnreadCountsChange(equivalentMap({
+                  userId: expectTroupeUnreadCountsChange.userId,
+                  troupeId: troupeId,
+                  total: expectTroupeUnreadCountsChange.unreadCount,
+                  mentions: expectTroupeUnreadCountsChange.mentionCount
+                }));
+              });
+            } else {
+              mockito.verify(appEvents, never()).troupeUnreadCountsChange();
+            }
+
+            if (meta.expectLurkActivity.length) {
+              meta.expectLurkActivity.forEach(function(userId) {
+                mockito.verify(appEvents, once).newLurkActivity(equivalentMap({
+                  userId: userId,
+                  troupeId: troupeId
+                }));
+              });
+
+            } else {
+              mockito.verify(appEvents, never()).newLurkActivity();
+            }
+
+            var mockBatcher = mockRedisBatcher.getMock('badge');
+            var items = mockBatcher.getItems('queue');
+            assert.deepEqual(items, meta.expectBadgeUpdateUserIds);
+          });
+      });
+    });
+
 
   });
 

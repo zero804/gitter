@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 
-var Q = require('q');
+var Promise = require('bluebird');
 var persistence = require('../../server/services/persistence-service');
 var shutdown = require('shutdown');
 var BatchStream = require('batch-stream');
@@ -54,7 +54,7 @@ batch.on('data', function (chatMessages) {
 });
 
 function batchProcessingComplete() {
-  return Q.delay(1000)
+  return Promise.delay(1000)
     .then(function() {
       logProgress();
       console.log('[FINISHED]\tquitting...');
@@ -84,7 +84,7 @@ function run(chatMessages) {
 
   if (runCalled % BATCH_SIZE === 0) logProgress();
 
-  return Q.all(chatMessages.map(function(chat) {
+  return Promise.all(chatMessages.map(function(chat) {
     return markdownProcessor(chat.text)
       .then(function(result) {
         totalProcessed += 1;

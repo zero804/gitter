@@ -7,7 +7,7 @@ var persistenceService = require('../../server/services/persistence-service');
 var userService = require('../../server/services/user-service');
 var troupeService = require('../../server/services/troupe-service');
 var emailNotificationService = require('../../server/services/email-notification-service');
-var Q = require('q');
+var Promise = require('bluebird');
 
 var logger = require('gitter-web-env').logger;
 
@@ -36,7 +36,7 @@ function mapInviteesAndRooms(users) {
 
 // fetches the invitees and rooms from database
 function populate(users, invitees, rooms) {
-  return Q.all([
+  return Promise.all([
     users,
     userService.findByIds(invitees),
     troupeService.findByIds(rooms)
@@ -60,7 +60,7 @@ persistenceService.User
     invitees = collections.indexById(invitees);
     rooms = collections.indexById(rooms);
 
-    return Q.all(users.map(function (user) {
+    return Promise.all(users.map(function (user) {
       var fromUser = invitees[user.invitedByUser];
       var room = rooms[user.invitedToRoom];
       return emailNotificationService.sendInvitationReminder(fromUser, user, room)

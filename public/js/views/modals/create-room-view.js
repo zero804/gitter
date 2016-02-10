@@ -295,7 +295,9 @@ var View = Marionette.LayoutView.extend({
         .catch(function () {
           return false;
         })
-        .asCallback(cb);
+        .then(function(result) {
+          cb(result);
+        });
     }
 
     function applyShowHides() {

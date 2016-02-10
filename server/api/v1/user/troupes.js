@@ -1,13 +1,13 @@
 "use strict";
 
-var troupeService        = require("../../../services/troupe-service");
-var restful              = require("../../../services/restful");
-var restSerializer       = require("../../../serializers/rest-serializer");
-var recentRoomService    = require('../../../services/recent-room-service');
-var roomService          = require('../../../services/room-service');
-var Q                    = require('q');
-var mongoUtils           = require('../../../utils/mongo-utils');
-var StatusError          = require('statuserror');
+var troupeService     = require("../../../services/troupe-service");
+var restful           = require("../../../services/restful");
+var restSerializer    = require("../../../serializers/rest-serializer");
+var recentRoomService = require('../../../services/recent-room-service');
+var roomService       = require('../../../services/room-service');
+var Promise           = require('bluebird');
+var mongoUtils        = require('../../../utils/mongo-utils');
+var StatusError       = require('statuserror');
 
 module.exports = {
   id: 'userTroupeId',
@@ -76,7 +76,7 @@ module.exports = {
           promises.push(recentRoomService.saveLastVisitedTroupeforUserId(userId, troupeId));
         }
 
-        return Q.all(promises);
+        return Promise.all(promises);
       })
       .then(function() {
         var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: userId });
