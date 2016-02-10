@@ -20,6 +20,7 @@ var groupResolver        = require('./group-resolver');
 var chatSearchService    = require('./chat-search-service');
 var unreadItemService    = require('./unread-item-service');
 var markdownMajorVersion = require('gitter-markdown-processor').version.split('.')[0];
+var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 
 var useHints = true;
 
@@ -155,7 +156,9 @@ exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
         var statMetadata = _.extend({
           userId: user.id,
           troupeId: troupe.id,
-          username: user.username
+          username: user.username,
+          room_uri: troupe.uri,
+          owner: getOrgNameFromTroupeName(troupe.uri)
         }, data.stats);
 
         stats.event("new_chat", statMetadata);
