@@ -1,13 +1,13 @@
 'use strict';
 
-var Q = require('q');
+var Promise = require('bluebird');
 var persistence = require("./persistence-service");
 var mongooseUtils = require('../utils/mongoose-utils');
 
 var identityService = {
   findForUser: function(user) {
     if (user._cachedIdentities) {
-      return Q.resolve(user._cachedIdentities);
+      return Promise.resolve(user._cachedIdentities);
     }
 
     return persistence.Identity.find({userId: user._id})

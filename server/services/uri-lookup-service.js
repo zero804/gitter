@@ -7,7 +7,7 @@
  */
 
 var persistence = require("./persistence-service");
-var Q           = require('q');
+var Promise     = require('bluebird');
 var mongoUtils  = require('../utils/mongo-utils');
 var debug       = require('debug')('gitter:uri-lookup-service');
 
@@ -34,7 +34,7 @@ function lookupUri(uri) {
       // Double-check the troupe and user tables to find this uri
       var repoStyle = uri.indexOf('/') >= 0;
 
-      return Q.all([
+      return Promise.all([
         repoStyle ? null : persistence.User.findOne({ username: uri }, 'username', { lean: true }).exec(),
         persistence.Troupe.findOne({ lcUri: lcUri }, 'uri', { lean: true }).exec()
       ]).spread(function(user, troupe) {

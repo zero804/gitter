@@ -5,6 +5,7 @@ var stats = env.stats;
 var cypher = require("cypher-promise");
 var neo4jClient = cypher(env.config.get('neo4j:endpoint'));
 var debug = require('debug')('gitter:graph-suggestions');
+var _ = require('lodash');
 
 function query(text, params) {
   debug("neo4j query: %s %j", text, params);
@@ -76,7 +77,30 @@ function getSuggestionsForUser(user /*, locale */) {
 }
 exports.getSuggestionsForUser = getSuggestionsForUser;
 
-//TODO Test this JP 21/12/15
+function getSuggestionsForRooms(rooms, localeLanguage) {
+  var roomIds = _.pluck(rooms, 'id');
+
+  // NOTE: include way more than what we'll use, because we're only sampling
+  // the input rooms and we'll be heavily filtering this list later.
+  var qry = 'MATCH (r:Room)-[m:MEMBER]-(u:User) '+
+    'WHERE r.roomId IN {roomIds} ' +
+    'WITH u ORDER BY m.weight LIMIT 1000 ' +
+    'MATCH (u)-[:MEMBER]-(r2:Room) ' +
+    'WHERE r2.lang = "en" OR r2.lang = {lang} AND NOT r2.roomId IN {roomIds} AND r2.security <> "PRIVATE" ' +
+    'RETURN r2.roomId AS roomId, count(r2) AS c ' +
+    'ORDER BY c DESC ' +
+    'LIMIT 20';
+
+  var attrs = {roomIds: roomIds, lang: localeLanguage};
+  return query(qry, attrs)
+    .then(function(results) {
+      return results.data.map(function(f) {
+        return { roomId: f[0] };
+      });
+    });
+}
+exports.getSuggestionsForRooms = getSuggestionsForRooms;
+
 function getSuggestionsForOrg(orgName, userId) {
   return query("MATCH (u:User), (r:Room)" +
                "WHERE r.lcOwner = {orgName} " +

@@ -21,7 +21,9 @@ module.exports = function() {
         .catch(function() {
           return [];
         })
-        .asCallback(callback);
+        .then(function(data) {
+          callback(data);
+        });
     },
     template: function(issue) {
       return template({

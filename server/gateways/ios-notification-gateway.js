@@ -3,7 +3,7 @@
 var apn = require('apn');
 var debug = require('debug')('gitter:ios-notification-gateway');
 var env = require('gitter-web-env');
-var Q = require('q');
+var Promise = require('bluebird');
 var logger = env.logger;
 var config = env.config;
 var errorReporter = env.errorReporter;
@@ -54,19 +54,14 @@ function sendNotificationToDevice(notification, badge, device) {
 
   var connection = connections[device.deviceType];
 
-  if (!connection) return Q.reject(new Error('unknown device type: ' + device.deviceType));
+  if (!connection) return Promise.reject(new Error('unknown device type: ' + device.deviceType));
 
   connection.pushNotification(appleNotification, deviceToken);
 
-  var deferred = Q.defer();
   // timout needed to ensure that the push notification packet is sent.
   // if we dont, SIGINT will kill notifications before they have left.
   // until apn uses proper callbacks, we have to guess that it takes a second.
-  setTimeout(function() {
-    deferred.resolve();
-  }, 1000);
-
-  return deferred.promise;
+  return Promise.delay(1000);
 }
 
 function createConnection(suffix, isProduction) {

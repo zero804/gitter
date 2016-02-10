@@ -2,7 +2,7 @@
 
 var winston                  = require('../../utils/winston');
 var nconf                    = require('../../utils/config');
-var Q                        = require('q');
+var Promise                  = require('bluebird');
 var contextGenerator         = require('../../web/context-generator');
 var restful                  = require('../../services/restful');
 var userService              = require('../../services/user-service');
@@ -149,7 +149,7 @@ function renderHomePage(req, res, next) {
 }
 
 function getPermalinkChatForRoom(troupe, chatId) {
-  if (!troupe || troupe.security !== 'PUBLIC') return Q.resolve();
+  if (!troupe || troupe.security !== 'PUBLIC') return Promise.resolve();
 
   return chatService.findByIdInRoom(troupe.id, chatId)
     .then(function(chat) {
@@ -186,7 +186,7 @@ function renderMainFrame(req, res, next, frame) {
 
   var selectedRoomId = req.troupe && req.troupe.id;
 
-  Q.all([
+  Promise.all([
       contextGenerator.generateNonChatContext(req),
       restful.serializeTroupesForUser(userId),
       restful.serializeOrgsForUserId(userId).catch(function(err) {
@@ -291,7 +291,7 @@ function renderChat(req, res, options, next) {
       limit: ROSTER_SIZE
     }, snapshotOptions);
 
-    return Q.all([
+    return Promise.all([
         options.generateContext === false ? null : contextGenerator.generateTroupeContext(req, { snapshots: { chat: snapshotOptions }, permalinkChatId: aroundId }),
         restful.serializeChatsForTroupe(troupe.id, userId, chatSerializerOptions),
         options.fetchEvents === false ? null : restful.serializeEventsForTroupe(troupe.id, userId),
@@ -443,7 +443,7 @@ function renderOrgPage(req, res, next) {
 
   var ghOrgService = new GitHubOrgService(req.user);
 
-  return Q.all([
+  return Promise.all([
     ghOrgService.getOrg(org).catch(function() { return {login: org}; }),
     troupeService.findChildRoomsForOrg(org, opts),
     contextGenerator.generateNonChatContext(req),
@@ -482,7 +482,7 @@ function renderOrgPage(req, res, next) {
     });
 
     // Get memberships and then users for the rooms in this page
-    return Q.all(getMembers)
+    return Promise.all(getMembers)
     .then(function(values) {
       rooms.forEach(function(room, index) {
         room.userIds = values[index];
@@ -492,7 +492,7 @@ function renderOrgPage(req, res, next) {
         return userService.findByIds(room.userIds);
       });
 
-      return Q.all(populateUsers);
+      return Promise.all(populateUsers);
     })
     .then(function(values) {
        rooms.forEach(function(room, index) {

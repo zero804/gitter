@@ -6,7 +6,7 @@ var errorReporter = env.errorReporter;
 var stats = env.stats;
 var logger = env.logger;
 
-var Q = require('q');
+var Promise = require('bluebird');
 var moment = require('moment');
 var GitHubStrategy = require('gitter-passport-github').Strategy;
 var TokenStateProvider = require('gitter-passport-oauth2').TokenStateProvider;
@@ -20,8 +20,6 @@ var trackUserLogin = require('../../utils/track-user-login');
 var updateUserLocale = require('../../utils/update-user-locale');
 var debug = require('debug')('gitter:passport');
 var obfuscateToken = require('gitter-web-github').obfuscateToken;
-
-
 
 // Move this out once we use it multiple times. We're only interested in
 // account age for github users at this stage.
@@ -71,15 +69,9 @@ function updateUser(req, accessToken, user, githubUserProfile) {
 
       updateUserLocale(req, user);
 
-      var deferred = Q.defer();
-      req.logIn(user, function(err) {
-        if (err) {
-          deferred.reject(err);
-        } else {
-          deferred.resolve();
-        }
+      return Promise.fromCallback(function(callback) {
+        req.logIn(user, callback);
       });
-      return deferred.promise;
     })
     .then(function() {
       // Remove the old token for this user
@@ -128,15 +120,9 @@ function addUser(req, accessToken, githubUserProfile) {
         }
       });
 
-      var deferred = Q.defer();
-      req.logIn(user, function(err) {
-        if (err) {
-          deferred.reject(err);
-        } else {
-          deferred.resolve();
-        }
+      return Promise.fromCallback(function(callback) {
+        req.logIn(user, callback);
       });
-      return deferred.promise;
     })
     .then(function() {
       return user;

@@ -2,19 +2,20 @@
 "use strict";
 
 var cld = require('cld');
-var Q = require('q');
+var Promise = require('bluebird');
 
 module.exports = exports = function languageDetector(text) {
-  var d = Q.defer();
 
-  cld.detect(text, function(err, result) {
-    if(err) return d.resolve(); // Ignore errors
+  return Promise.fromCallback(function(callback) {
+      cld.detect(text, callback);
+    })
+    .catch(function() {
+      return;
+    })
+    .then(function(result) {
+      if(!result || !result.languages || !result.languages.length) return;
 
-    if(!result || !result.languages || !result.languages.length) return d.resolve();
-
-    var primary = result.languages[0];
-    return d.resolve(primary.code);
-  });
-
-  return d.promise;
+      var primary = result.languages[0];
+      return primary.code;
+    });
 };

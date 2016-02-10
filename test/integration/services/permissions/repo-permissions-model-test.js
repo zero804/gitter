@@ -2,7 +2,7 @@
 
 var testRequire = require('../../test-require');
 var assert = require('assert');
-var Q = require('q');
+var Promise = require('bluebird');
 var testGenerator = require('../../test-generator');
 var mockito = require('jsmockito').JsMockito;
 
@@ -251,7 +251,7 @@ describe('repo-permissions', function() {
 
       mockito.when(userIsInRoomMock)().then(function(uri, user) {
         if(USER_IS_IN_ROOM === true || USER_IS_IN_ROOM === false) {
-          return Q.resolve(USER_IS_IN_ROOM);
+          return Promise.resolve(USER_IS_IN_ROOM);
         }
 
         assert(false, 'Unexpected call to userIsInRoom: ' + uri + ', ' + user);
@@ -263,10 +263,10 @@ describe('repo-permissions', function() {
         if(GITHUB_API_CALL_FAILURE) {
           var e = new Error('Github is down');
           e.statusCode = 502;
-          return Q.reject(e);
+          return Promise.reject(e);
         }
 
-        return Q.resolve(meta.repo);
+        return Promise.resolve(meta.repo);
       });
 
       permissionsModel(USER, RIGHT, URI, SECURITY)

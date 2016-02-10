@@ -1,7 +1,7 @@
 "use strict";
 
-var persistence     = require("./persistence-service");
-var Q               = require('q');
+var persistence           = require("./persistence-service");
+var Promise               = require('bluebird');
 var roomMembershipService = require('./room-membership-service');
 
 function createRegExpsForQuery(queryText) {
@@ -19,7 +19,7 @@ function createRegExpsForQuery(queryText) {
 function findPublicChannels(user, query, options) {
 
   var filters = createRegExpsForQuery(query);
-  if(!filters.length) return Q.resolve([]);
+  if(!filters.length) return Promise.resolve([]);
 
   var filterQueries = filters.map(function(re) {
     return { lcUri: re };
@@ -34,15 +34,15 @@ function findPublicChannels(user, query, options) {
     .limit(options.limit || 20)
     .exec()
     .then(function(troupes) {
-      return Q.all(troupes.filter(function(troupe) {
+      return troupes.filter(function(troupe) {
         return troupe.security === 'PUBLIC' || !troupe.security;
-      }));
+      });
     });
 }
 
 function findPrivateChannelsWithUser(user, query, options) {
   var filters = createRegExpsForQuery(query);
-  if(!filters.length) return Q.resolve([]);
+  if(!filters.length) return Promise.resolve([]);
 
   return roomMembershipService.findRoomIdsForUser(user._id)
     .then(function(membershipTroupeIds) {
@@ -66,13 +66,13 @@ function findPrivateChannelsWithUser(user, query, options) {
 
 function findChannels(user, query, options) {
   options = options || {};
-  return Q.all([
+
+  return Promise.join(
     findPublicChannels(user, query, options),
-    findPrivateChannelsWithUser(user, query, options)
-  ])
-  .spread(function(publicChannels, privateChannels) {
-    return publicChannels.concat(privateChannels);
-  });
+    findPrivateChannelsWithUser(user, query, options),
+    function(publicChannels, privateChannels) {
+      return publicChannels.concat(privateChannels);
+    });
 }
 
 exports.findChannels = findChannels;

@@ -3,18 +3,18 @@
 var env                      = require('gitter-web-env');
 var stats                    = env.stats;
 
-var userService              = require('./user-service');
-var persistence              = require('./persistence-service');
-var assert                   = require("assert");
-var mongoUtils               = require("../utils/mongo-utils");
-var Q                        = require("q");
-var ObjectID                 = require('mongodb').ObjectID;
-var assert                   = require('assert');
-var roomPermissionsModel     = require('./room-permissions-model');
-var mongooseUtils            = require('../utils/mongoose-utils');
-var StatusError              = require('statuserror');
-var roomMembershipService    = require('./room-membership-service');
-var debug                    = require('debug')('gitter:troupe-service');
+var userService           = require('./user-service');
+var persistence           = require('./persistence-service');
+var assert                = require("assert");
+var mongoUtils            = require("../utils/mongo-utils");
+var Promise               = require('bluebird');
+var ObjectID              = require('mongodb').ObjectID;
+var assert                = require('assert');
+var roomPermissionsModel  = require('./room-permissions-model');
+var mongooseUtils         = require('../utils/mongoose-utils');
+var StatusError           = require('statuserror');
+var roomMembershipService = require('./room-membership-service');
+var debug                 = require('debug')('gitter:troupe-service');
 
 var MAX_RAW_TAGS_LENGTH = 100;
 var MAX_TAG_LENGTH = 20;
@@ -59,15 +59,14 @@ function checkIdExists(id) {
 function findByIdLeanWithAccess(troupeId, userId) {
   troupeId = mongoUtils.asObjectID(troupeId);
   if (userId) {
-    return Q.all([
+    return Promise.join(
       persistence.Troupe.findOne({ _id: troupeId }, { }, { lean: true }).exec(),
-      roomMembershipService.checkRoomMembership(troupeId, userId)
-    ])
-    .spread(function(leanTroupe, access) {
-      if (!leanTroupe) return [null, false];
-      leanTroupe.id = mongoUtils.serializeObjectId(leanTroupe._id);
-      return [leanTroupe, access];
-    });
+      roomMembershipService.checkRoomMembership(troupeId, userId),
+      function(leanTroupe, access) {
+        if (!leanTroupe) return [null, false];
+        leanTroupe.id = mongoUtils.serializeObjectId(leanTroupe._id);
+        return [leanTroupe, access];
+      });
   }
 
   // Query without userId
@@ -202,17 +201,16 @@ function findOrCreateOneToOneTroupeIfPossible(fromUserId, toUserId) {
 
   if("" + fromUserId === "" + toUserId) throw new StatusError(417); // You cannot be in a troupe with yourself.
 
-  return Q.all([
-      userService.findById(toUserId),
-      persistence.Troupe.findOne({
-        $and: [
-          { oneToOne: true },
-          { 'oneToOneUsers.userId': fromUserId },
-          { 'oneToOneUsers.userId': toUserId }
-        ]
-      }).exec()
-    ])
-    .spread(function(toUser, troupe) {
+  return Promise.join(
+    userService.findById(toUserId),
+    persistence.Troupe.findOne({
+      $and: [
+        { oneToOne: true },
+        { 'oneToOneUsers.userId': fromUserId },
+        { 'oneToOneUsers.userId': toUserId }
+      ]
+    }).exec(),
+    function(toUser, troupe) {
       if(!toUser) throw new StatusError(404, "User does not exist");
 
       // Found the troupe? Perfect!
@@ -283,7 +281,7 @@ function updateTags(user, troupe, tags) {
 
 
 function findChildRoomsForOrg(org, opts) {
-  if (!org) return Q.resolve([]);
+  if (!org) return Promise.resolve([]);
   opts = opts || {};
 
   var query = { lcOwner: org.toLowerCase() };

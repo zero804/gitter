@@ -1,10 +1,12 @@
 /*global describe:true, it:true, before:true, after:true */
 "use strict";
 
-var testRequire        = require('./../test-require');
-var fixtureLoader      = require('../test-fixtures');
-var assert             = testRequire("assert");
-var Q                  = require('q');
+var testRequire   = require('./../test-require');
+var fixtureLoader = require('../test-fixtures');
+var assert        = testRequire("assert");
+var Promise       = require('bluebird');
+
+
 var fixture2 = {};
 
 describe("User Service", function() {
@@ -19,7 +21,7 @@ describe("User Service", function() {
     var userService = testRequire("./services/user-service");
 
     var githubId = fixture2.generateGithubId();
-    Q.all([
+    Promise.all([
       userService.findOrCreateUserForGithubId({ githubId: githubId, username: fixture2.generateUsername(), githubToken: fixture2.generateGithubToken() }),
       userService.findOrCreateUserForGithubId({ githubId: githubId, username: fixture2.generateUsername(), githubToken: fixture2.generateGithubToken() })
       ])
@@ -30,15 +32,14 @@ describe("User Service", function() {
       .nodeify(done);
   });
 
-  it('should be able to create a \'ghost\' user using his username #slow', function(done) {
+  it('should be able to create a \'ghost\' user using his username #slow', function() {
     var userService = testRequire("./services/user-service");
 
-    userService.createInvitedUser('node-gitter')
-    .then(function(user) {
-      assert.equal(user.username,'node-gitter');
-      assert.equal(user.state, 'INVITED');
-    })
-    .nodeify(done);
+    return userService.createInvitedUser('node-gitter')
+      .then(function(user) {
+        assert.equal(user.username,'node-gitter');
+        assert.equal(user.state, 'INVITED');
+      });
   });
 
   it('should create new users', function(done) {

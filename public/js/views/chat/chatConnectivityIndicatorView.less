@@ -18,9 +18,11 @@
   top: 0;
   left: 50%;
 
+  display: inline-block;
+
   transform: translateX(-50%);
 
-  padding: 1rem;
+  padding: 1rem 2rem;
 
   background-color: rgba(255, 255, 255, 0.97);
   border-left: 1px solid rgba(0,0,0,0.05);
@@ -35,5 +37,6 @@
 
   &.is-hidden {
     opacity: 0;
+    pointer-events: none;
   }
 }
