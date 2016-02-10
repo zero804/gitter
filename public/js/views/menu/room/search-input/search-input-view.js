@@ -48,6 +48,7 @@ module.exports = Marionette.ItemView.extend({
   onClearClicked: function (e){
     e.preventDefault();
     this.model.set('searchTerm', '');
+    this.ui.input.focus();
   },
 
 });
