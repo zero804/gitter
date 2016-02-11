@@ -196,27 +196,46 @@ JP 11/2/16
 }
 
 .room-item__options-menu {
-  margin-left:  0;
-  padding-left: @desktop-menu-left-padding;
-  list-style:   disc inside;
-  color:        @ruby;
+  width:            ~"calc(100% - 2.6rem)";
+  margin-left:      0;
+  margin-left:      @desktop-menu-left-padding / 2;
+  background-image: linear-gradient(rgba(255, 255, 255, .1), transparent);
+  list-style:       none;
+  color:            @ruby;
 }
 
 .room-item__options-menu__item {
   .room-item();
+  position: relative;
   padding-left: 0;
   padding-right: 0;
 
+  &:before {
+    content:          ' ';
+    display:          inline-block;
+    position:         absolute;
+    top:              0;
+    left:             0;
+    width:            100%;
+    height:           100%;
+    background-image: linear-gradient(transparent, rgba(255, 255, 255, .1));
+    transform: translateY(100%);
+    transition:       transform .2s ease-in;
+  }
+
   &:hover {
-    background-color: inherit;
+    &:before {
+      transform: translateY(0);
+      cursor:  pointer;
+    }
   }
 
   & a {
     .room-menu-text();
-    display: block;
+    display:      block;
+    padding-left: 4.5rem;
     &:hover {
       text-decoration: none;
-      color:           @ruby;
     }
   }
 
