@@ -4,7 +4,7 @@ var Backbone           = require('backbone');
 var _                  = require('underscore');
 var ItemView           = require('./primary-collection-item-view');
 var BaseCollectionView = require('../base-collection/base-collection-view');
-var EmptySearchView    = require('../secondary-collection/secondary-collection-item-search-empty-view');
+var EmptySearchView    = require('./primary-collection-item-search-empty-view.js');
 
 var PrimaryCollectionView = BaseCollectionView.extend({
 
