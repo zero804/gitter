@@ -65,7 +65,6 @@ module.exports = BaseCollectionView.extend({
   onSearchTermChange: function(model, val) { //jshint unused: true
     if (model.get('state') !== 'search') { return; }
 
-    console.log('second search update', val, !!val);
     this.$el.toggleClass('active', !!val);
     this.$el.toggleClass('empty', !val);
   },
