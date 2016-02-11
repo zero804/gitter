@@ -4,7 +4,6 @@ var BaseCollectionModel = require('../base-collection/base-collection-model');
 
 module.exports = BaseCollectionModel.extend({
   onAll: function() {
-    console.log('setting your orgs');
     this.set({
       header: 'Your Organisations',
       active: true,
