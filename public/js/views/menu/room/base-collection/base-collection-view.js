@@ -1,6 +1,5 @@
 'use strict';
 
-var _          = require('underscore');
 var Marionette = require('backbone.marionette');
 var RAF        = require('utils/raf');
 var template   = require('./base-collection-view.hbs');
@@ -22,9 +21,7 @@ module.exports = Marionette.CompositeView.extend({
     };
   },
 
-
   modelEvents: {
-    'change:active': 'onModelChangeActiveState',
     'change:header': 'render',
   },
 
@@ -45,13 +42,6 @@ module.exports = Marionette.CompositeView.extend({
     Marionette.CompositeView.prototype.constructor.apply(this, arguments);
   },
 
-  onModelChangeActiveState: function(model, val) { /*jshint unused: true*/
-    this.render();
-    RAF(function() {
-      this.$el.toggleClass('active', val);
-    }.bind(this));
-  },
-
   updateSelectedModel: function() {
     var selectedModel      = this.collection.findWhere({ selected: true });
     var newlySelectedModel = this.collection.findWhere({ id: context.troupe().get('id') });
@@ -68,16 +58,32 @@ module.exports = Marionette.CompositeView.extend({
   },
 
   onFilterComplete: function() {
-    this.$el.toggleClass('empty', !this.collection.length);
+    this.setEmpty();
   },
 
   onBeforeRender: function() {
-    this.$el.removeClass('loaded');
+    this.setLoaded(false);
   },
 
   onRender: function() {
-    this.$el.addClass('loaded');
+    RAF(function() {
+      this.setActive();
+      this.setEmpty();
+      this.setLoaded();
+    }.bind(this));
+  },
+
+  setActive: function (){
+    this.$el.toggleClass('active', this.model.get('active'));
+  },
+
+  setEmpty: function (){
     this.$el.toggleClass('empty', !this.collection.length);
+  },
+
+  setLoaded: function (val){
+    val = (val || true);
+    this.$el.toggleClass('loaded', val);
   },
 
   onDestroy: function() {

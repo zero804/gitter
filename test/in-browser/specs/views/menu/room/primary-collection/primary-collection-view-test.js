@@ -32,8 +32,9 @@ describe.skip('PrimaryCollectionView', function() {
     ]);
     sinon.stub(collection.models[1], 'save');
 
-    dndCtrl = new Backbone.View();
-    dndCtrl.pushContainer = function() {};
+    dndCtrl                 = new Backbone.View();
+    dndCtrl.pushContainer   = function() {};
+    dndCtrl.removeContainer = function() {};
 
     primaryCollectionView = new PrimaryCollectionView({
       el:         el,
@@ -228,6 +229,82 @@ describe.skip('PrimaryCollectionView', function() {
     assert(primaryCollectionView.collection.findWhere({ focus: true }));
     $(el.firstChild).click();
     assert(!primaryCollectionView.collection.findWhere({ focus: true }));
+  });
+
+});
+
+
+
+describe.only('PrimaryCollectionView2', function(){
+
+  var collection;
+  var roomMenuModel;
+  var model;
+  var el;
+  var primaryCollectionView;
+  var dndCtrl;
+
+  beforeEach(function() {
+    context.troupe().set('id', 1);
+    el            = document.createElement('div');
+    model         = new Backbone.Model();
+    roomMenuModel = new Backbone.Model({ state: 'all', panelOpenState: true, selectedOrgName: 'gitterHQ' });
+    collection    = new Backbone.Collection([
+      { name:  '1', id: 1, favourite: 1, uri: '1/1', url: '1/1' },
+      { name:  '2', id: 2, uri: '2/2', url: '2/2'   },
+      { name:  '3', id: 3, uri: '3/3', url: '3/3' },
+      { name:  '4', id: 4, uri: '4/4', url: '4/4' },
+    ]);
+    sinon.stub(collection.models[1], 'save');
+
+    dndCtrl                 = new Backbone.View();
+    dndCtrl.pushContainer   = function() {};
+    dndCtrl.removeContainer = function() {};
+
+    primaryCollectionView = new PrimaryCollectionView({
+      el:            el,
+      model:         model,
+      roomMenuModel: roomMenuModel,
+      collection:    collection,
+      bus:           Backbone.Events,
+      dndCtrl:       dndCtrl,
+    });
+  });
+
+  it('should set an active class when the roomMenuModel is in the all state', function(){
+    roomMenuModel.set('state', 'all');
+    primaryCollectionView.render();
+    assert(primaryCollectionView.el.classList.contains('active'));
+  });
+
+  it('should remove the active class when the roomMenuModel is in the search state with no search term', function(){
+    roomMenuModel.set({ state: 'search', searchTerm: '' });
+    primaryCollectionView.render();
+    assert(!primaryCollectionView.el.classList.contains('active'));
+  });
+
+  it('should add the active class when the roomMenuModel is in the search state with a search term', function(){
+    roomMenuModel.set({ state: 'search', searchTerm: 'thisisasearchterm' });
+    primaryCollectionView.render();
+    assert(primaryCollectionView.el.classList.contains('active'));
+  });
+
+  it('should set an active class when the roomMenuModel is in the favourite state', function(){
+    roomMenuModel.set('state', 'favourite');
+    primaryCollectionView.render();
+    assert(primaryCollectionView.el.classList.contains('active'));
+  });
+
+  it('should set an active class when the roomMenuModel is in the people state', function(){
+    roomMenuModel.set('state', 'people');
+    primaryCollectionView.render();
+    assert(primaryCollectionView.el.classList.contains('active'));
+  });
+
+  it('should set an active class when the roomMenuModel is in the org state', function(){
+    roomMenuModel.set('state', 'org');
+    primaryCollectionView.render();
+    assert(primaryCollectionView.el.classList.contains('active'));
   });
 
 });

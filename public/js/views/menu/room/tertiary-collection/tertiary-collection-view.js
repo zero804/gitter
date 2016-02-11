@@ -26,18 +26,22 @@ module.exports =  BaseCollectionView.extend({
   initialize: function(attrs) {
     this.roomMenuModel  = attrs.roomMenuModel;
     this.roomCollection = attrs.roomCollection;
-    this.listenTo(this.roomMenuModel, 'change:searchTerm', this.onSearchUpdate, this);
+    this.listenTo(this.roomMenuModel, 'change:searchTerm', this.setActive, this);
     this.listenTo(this.collection, 'filter-complete', this.render, this);
   },
 
-  onSearchUpdate: function() {
-    if (this.roomMenuModel.get('state') !== 'search') { return; }
+  setActive: function() {
+    switch (this.roomMenuModel.get('state')) {
+      case 'search':
+        return (!this.roomMenuModel.get('searchTerm')) ?
+          proto.setActive.apply(this, arguments) :
+          this.$el.removeClass('active');
 
-    this.$el.toggleClass('active', !this.roomMenuModel.get('searchTerm'));
-  },
-
-  onDestroy: function() {
-    this.stopListening();
+      default:
+        return !!this.collection.length ?
+          proto.setActive.apply(this, arguments) :
+          this.$el.removeClass('active');
+    }
   },
 
   onItemClicked: function() {
@@ -60,8 +64,12 @@ module.exports =  BaseCollectionView.extend({
     proto.onItemClicked.apply(this, arguments);
   },
 
-  onSearchItemClicked: function (view){
+  onSearchItemClicked: function(view) {
     this.roomMenuModel.set('searchTerm', view.model.get('name'));
+  },
+
+  onDestroy: function() {
+    this.stopListening();
   },
 
 });
