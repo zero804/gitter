@@ -2,6 +2,7 @@
 'use strict';
 
 var assert                  = require('assert');
+var _                       = require('underscore');
 var Backbone                = require('backbone');
 var SecondaryCollectionView = require('public/js/views/menu/room/secondary-collection/secondary-collection-view.js');
 
@@ -12,18 +13,20 @@ describe('SecondaryCollectionView', function() {
   var collection;
   var el;
   var secondaryCollectionView;
+  var primaryCollection;
 
   beforeEach(function() {
     roomMenuModel           = new Backbone.Model({ state: 'all' });
     collection              = new Backbone.Collection(null);
     el                      = document.createElement('div');
     model                   = new Backbone.Model({ active: true });
+    primaryCollection       = new Backbone.Collection();
     secondaryCollectionView = new SecondaryCollectionView({
       el:                el,
       model:             model,
       roomMenuModel:     roomMenuModel,
       collection:        collection,
-      primaryCollection: new Backbone.Collection({}),
+      primaryCollection: primaryCollection,
     });
   });
 
@@ -38,6 +41,25 @@ describe('SecondaryCollectionView', function() {
     collection.add({});
     secondaryCollectionView.render();
     assert(el.classList.contains('active'));
+  });
+
+  it('should remove an active class if the primary collection has more than 10 items', function(){
+
+    roomMenuModel.set('state', 'all');
+
+    primaryCollection.add({ id: 1 });
+    primaryCollection.add({ id: 2 });
+    primaryCollection.add({ id: 3 });
+    primaryCollection.add({ id: 4 });
+    primaryCollection.add({ id: 5 });
+    primaryCollection.add({ id: 6 });
+    primaryCollection.add({ id: 7 });
+    primaryCollection.add({ id: 8 });
+    primaryCollection.add({ id: 9 });
+    primaryCollection.add({ id: 10 });
+
+    secondaryCollectionView.render();
+    assert(!el.classList.contains('active'));
   });
 
   it('should remove an active class in the search state with no search term', function(){
