@@ -30,12 +30,6 @@ describe('BaseCollectionView', function(){
     assert.equal(1, collectionView.setActive.callCount);
   });
 
-  it('Should call setEmpty after render', function(){
-    collectionView.setEmpty = sinon.spy();
-    collectionView.render();
-    assert.equal(1, collectionView.setEmpty.callCount);
-  });
-
   it('Should call setLoaded before & after render', function(){
     collectionView.setLoaded = sinon.spy();
     collectionView.render();
