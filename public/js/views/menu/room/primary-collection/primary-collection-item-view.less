@@ -82,6 +82,10 @@ JP 11/2/16
   margin-right:   (@desktop-menu-left-padding / 2);
   transition:     background-color .2s ease-out;
 
+  .room-item.active & {
+    .room-item-selected();
+  }
+
   .desktop & {
     margin-left:   (@desktop-menu-left-padding / 2);
   }
