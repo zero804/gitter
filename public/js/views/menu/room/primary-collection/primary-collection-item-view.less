@@ -3,6 +3,11 @@
 @import "../../../../../less/components/menu/room/menu-text.less";
 @import (inline) "../../../../../../node_modules/dragula/dist/dragula.css";
 
+/*
+TODO Seperate this better, its currently a bit of a monolith
+JP 11/2/16
+*/
+
 .room-item-selected() {
   cursor: pointer;
   background-color: rgba(255, 255, 255, .1);
@@ -15,8 +20,8 @@
   max-height: @menu-item-height;
   opacity:    0;
   transition:
-    opacity .2s ease-in,
-    max-height .2s ease-in;
+  opacity .2s ease-in,
+  max-height .2s ease-in;
   overflow:   hidden;
 
   &.active {
@@ -215,4 +220,31 @@
     }
   }
 
+}
+
+.search-message-empty-container {
+  display:         flex;
+  flex-direction:  column;
+  align-items:     center;
+  justify-content: center;
+}
+
+.search-message-empty-decal {
+  color:     @search-message-detail-color;
+  transform: rotate(90deg);
+  font-size: 10rem;
+}
+
+.search-message-empty-heading {
+  .room-menu-text();
+  height:     auto;
+  max-height: initial;
+  line-height: 2rem;
+}
+
+.search-message-empty-link {
+  .room-menu-text();
+  height:     auto;
+  max-height: initial;
+  color:      @search-message-detail-color;
 }
