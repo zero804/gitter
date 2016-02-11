@@ -21,6 +21,14 @@ module.exports = BaseCollectionItemView.extend({
     'mouseleave':                                      'onMouseOut',
   },
 
+  attributes: function (){
+    _.extend({}, BaseCollectionItemView.prototype.attributes.apply(this, arguments), {
+      class: (this.model.get('githubType') === 'ONETOONE') ?
+        'room-item--one2one' :
+        'room-item'
+    });
+  },
+
   initialize: function() {
     this.uiModel = new Backbone.Model({ menuIsOpen: false });
     this.listenTo(this.uiModel, 'change:menuIsOpen', this.onModelToggleMenu, this);
