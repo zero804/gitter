@@ -6,6 +6,8 @@ var ItemView           = require('./primary-collection-item-view');
 var BaseCollectionView = require('../base-collection/base-collection-view');
 var EmptySearchView    = require('./primary-collection-item-search-empty-view.js');
 
+var proto = BaseCollectionView.prototype;
+
 var PrimaryCollectionView = BaseCollectionView.extend({
 
   childView: ItemView,
@@ -43,7 +45,19 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     //TODO turn this into an error if there is a dndCtrl
     this.listenTo(this.dndCtrl, 'room-menu:add-favourite', this.onFavouriteAdded, this);
     this.listenTo(this.dndCtrl, 'room-menu:sort-favourite', this.onFavouritesSorted, this);
-    this.listenTo(this.roomMenuModel, 'change:searchTerm', this.onSearchTermChange, this);
+    this.listenTo(this.roomMenuModel, 'change:searchTerm', this.setActive, this);
+  },
+
+  setActive: function() {
+    switch (this.roomMenuModel.get('state')){
+      case 'search':
+        this.$el.toggleClass('active', !!this.roomMenuModel.get('searchTerm'));
+        break;
+      default:
+        proto.setActive.apply(this, arguments);
+        break;
+
+    }
   },
 
   filter: function(model, index) { //jshint unused: true
@@ -82,13 +96,6 @@ var PrimaryCollectionView = BaseCollectionView.extend({
   //Before we render we remove the collection container from the drag & drop instance
   onBeforeRender: function() {
     this.dndCtrl.removeContainer(this.ui.collection[0]);
-  },
-
-  onSearchTermChange: function(model, val) { //jshint unused: true
-    if (model.get('state') !== 'search') { return; }
-
-    this.$el.toggleClass('active', !!val);
-    this.$el.toggleClass('empty', !val);
   },
 
   onDestroy: function() {

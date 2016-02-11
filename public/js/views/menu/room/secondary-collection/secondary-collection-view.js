@@ -7,6 +7,8 @@ var SearchItemView        = require('./secondary-collection-item-search-view');
 var BaseCollectionView    = require('../base-collection/base-collection-view');
 var EmptySearchView       = require('./secondary-collection-item-search-empty-view');
 
+var proto = BaseCollectionView.prototype;
+
 module.exports = BaseCollectionView.extend({
   childView: ItemView,
   className: 'secondary-collection',
@@ -40,7 +42,21 @@ module.exports = BaseCollectionView.extend({
   initialize: function(attrs) {
     //TODO test this JP 8/1/16
     this.primaryCollection = attrs.primaryCollection;
-    this.listenTo(this.roomMenuModel, 'change:searchTerm', this.onSearchTermChange, this);
+    this.listenTo(this.roomMenuModel, 'change:searchTerm', this.setActive, this);
+  },
+
+  setActive: function() {
+    switch (this.roomMenuModel.get('state')){
+      case 'search':
+        return !!this.roomMenuModel.get('searchTerm') ?
+          proto.setActive.apply(this, arguments) :
+          this.$el.removeClass('active');
+
+      default:
+        return !!this.collection.length ?
+          proto.setActive.apply(this, arguments) :
+          this.$el.removeClass('active');
+    }
   },
 
   filter: function(model, index) {//jshint unused: true
@@ -62,28 +78,8 @@ module.exports = BaseCollectionView.extend({
     PrimaryCollectionView.prototype.onItemClicked.apply(this, arguments);
   },
 
-  onSearchTermChange: function(model, val) { //jshint unused: true
-    if (model.get('state') !== 'search') { return; }
-
-    this.$el.toggleClass('active', !!val);
-    this.$el.toggleClass('empty', !val);
-  },
-
   onDestroy: function() {
     this.stopListening(this.model);
-  },
-
-  onRender: function() {
-    this.$el.addClass('loaded');
-    if (this.roomMenuModel.get('state') === 'search' && !!this.roomMenuModel.get('searchTerm')) {
-      this.$el.removeClass('empty');
-    } else {
-      BaseCollectionView.prototype.onRender.apply(this, arguments);
-    }
-  },
-
-  render: function() {
-    BaseCollectionView.prototype.render.apply(this, arguments);
   },
 
 });
