@@ -1,8 +1,10 @@
 'use strict';
 
 var Backbone           = require('backbone');
+var _                  = require('underscore');
 var ItemView           = require('./primary-collection-item-view');
 var BaseCollectionView = require('../base-collection/base-collection-view');
+var EmptySearchView    = require('../secondary-collection/secondary-collection-item-search-empty-view');
 
 var PrimaryCollectionView = BaseCollectionView.extend({
 
@@ -10,6 +12,21 @@ var PrimaryCollectionView = BaseCollectionView.extend({
   className: 'primary-collection',
   ui: {
     collection: '.js-collection-list',
+  },
+
+  emptyView: EmptySearchView,
+  isEmpty: function() {
+    return ((this.roomMenuModel.get('state') === 'search') && !this.collection.length);
+  },
+
+  buildChildView: function(model, ItemView, attrs) {
+    switch (this.roomMenuModel.get('state')){
+      case 'search':
+        var opts = _.extend({}, attrs, { model: model });
+        return (!!this.collection.length) ? new ItemView(opts) : new EmptySearchView(opts);
+      default:
+        return new ItemView(_.extend({}, attrs, { model: model }));
+    }
   },
 
   initialize: function(options) {
@@ -26,6 +43,7 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     //TODO turn this into an error if there is a dndCtrl
     this.listenTo(this.dndCtrl, 'room-menu:add-favourite', this.onFavouriteAdded, this);
     this.listenTo(this.dndCtrl, 'room-menu:sort-favourite', this.onFavouritesSorted, this);
+    this.listenTo(this.roomMenuModel, 'change:searchTerm', this.onSearchTermChange, this);
   },
 
   filter: function(model, index) { //jshint unused: true
@@ -66,10 +84,11 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     this.dndCtrl.removeContainer(this.ui.collection[0]);
   },
 
-  //Once we have rendered we re-add the container to dnd
-  onRender: function() {
-    this.dndCtrl.pushContainer(this.ui.collection[0]);
-    BaseCollectionView.prototype.onRender.apply(this, arguments);
+  onSearchTermChange: function(model, val) { //jshint unused: true
+    if (model.get('state') !== 'search') { return; }
+
+    this.$el.toggleClass('active', !!val);
+    this.$el.toggleClass('empty', !val);
   },
 
   onDestroy: function() {

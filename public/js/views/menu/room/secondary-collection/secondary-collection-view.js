@@ -33,14 +33,14 @@ module.exports = BaseCollectionView.extend({
   },
 
   emptyView: EmptySearchView,
-  isEmpty: function (){
+  isEmpty: function() {
     return ((this.roomMenuModel.get('state') === 'search') && !this.collection.length);
   },
 
   initialize: function(attrs) {
     //TODO test this JP 8/1/16
     this.primaryCollection = attrs.primaryCollection;
-    this.listenTo(this.model, 'change:searchTerm', this.onSearchTermChange, this);
+    this.listenTo(this.roomMenuModel, 'change:searchTerm', this.onSearchTermChange, this);
   },
 
   filter: function(model, index) {//jshint unused: true
@@ -65,17 +65,21 @@ module.exports = BaseCollectionView.extend({
   onSearchTermChange: function(model, val) { //jshint unused: true
     if (model.get('state') !== 'search') { return; }
 
-    this.$el.toggleClass('active', !val);
+    console.log('second search update', val, !!val);
+    this.$el.toggleClass('active', !!val);
+    this.$el.toggleClass('empty', !val);
   },
 
   onDestroy: function() {
     this.stopListening(this.model);
   },
 
-  onRender: function(){
+  onRender: function() {
     this.$el.addClass('loaded');
-    if(this.roomMenuModel.get('state') === 'search' && !!this.roomMenuModel.get('searchTerm')) {
+    if (this.roomMenuModel.get('state') === 'search' && !!this.roomMenuModel.get('searchTerm')) {
       this.$el.removeClass('empty');
+    } else {
+      BaseCollectionView.prototype.onRender.apply(this, arguments);
     }
   },
 
