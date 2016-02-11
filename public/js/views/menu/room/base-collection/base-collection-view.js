@@ -58,7 +58,7 @@ module.exports = Marionette.CompositeView.extend({
   },
 
   onFilterComplete: function() {
-    this.setEmpty();
+    this.setActive();
   },
 
   onBeforeRender: function() {
@@ -68,7 +68,6 @@ module.exports = Marionette.CompositeView.extend({
   onRender: function() {
     RAF(function() {
       this.setActive();
-      this.setEmpty();
       this.setLoaded();
     }.bind(this));
   },
@@ -77,9 +76,6 @@ module.exports = Marionette.CompositeView.extend({
     this.$el.toggleClass('active', this.model.get('active'));
   },
 
-  setEmpty: function (){
-    this.$el.toggleClass('empty', !this.collection.length);
-  },
 
   setLoaded: function (val){
     val = (val || true);
