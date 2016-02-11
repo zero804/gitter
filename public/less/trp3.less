@@ -338,38 +338,10 @@ ul.roster {
   }
 }
 
-.trpMoreBadge {
-  clear: both;
-  color: #333;
-  border: 1px solid rgba(100,100,100,0.5);
-  display: inline-block;
-  border-radius: 4px;
-  border: 1px solid fade(@trpLightBlue, 20%);
-  background-color: fade(@trpLightBlue, 20%);
-  border-radius: 2px;
-  padding: 0 5px;
-  margin-right: 4px;
-  font-size: 11px;
-  transition: background-color 300ms ease-in-out;
-  margin-bottom: 12px;
-
-  @media @mid {
-    margin-left: -4px;
-    margin-right: -2px;
-    padding: 0 2px;
-  }
-
+.remaining-region {
+  margin-top: 1rem;
 }
 
-.trpAddBadge {
-  .trpMoreBadge;
-  border: 1px solid fade(@green, 15%);
-  background-color: fade(@green, 20%);
-}
-
-.trpMoreBadge:hover {
-  background-color: fade(@trpLightBlue, 30%);
-}
 
 .build-failure, .build-failing, .build-broken, .build-failed {
   color: @trpRed;
