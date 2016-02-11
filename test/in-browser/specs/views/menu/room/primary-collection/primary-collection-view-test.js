@@ -235,7 +235,7 @@ describe.skip('PrimaryCollectionView', function() {
 
 
 
-describe.only('PrimaryCollectionView2', function(){
+describe('PrimaryCollectionView2', function(){
 
   var collection;
   var roomMenuModel;
