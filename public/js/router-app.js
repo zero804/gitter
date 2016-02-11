@@ -432,7 +432,16 @@ onready(function() {
 
         appLayout.dialogRegion.show(modal);
       });
-    }
+    },
+
+    confirmRoom: function(uri) {
+      require.ensure(['views/modals/confirm-repo-room-view'], function(require) {
+        var confirmRepoRoomView = require('views/modals/confirm-repo-room-view');
+        appLayout.dialogRegion.show(new confirmRepoRoomView.Modal({
+          uri: uri,
+        }));
+      });
+    },
   });
 
   new Router();

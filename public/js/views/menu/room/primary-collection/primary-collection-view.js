@@ -98,6 +98,12 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     this.dndCtrl.removeContainer(this.ui.collection[0]);
   },
 
+  //Once we have rendered we re-add the container to dnd
+  onRender: function (){
+    this.dndCtrl.pushContainer(this.ui.collection[0]);
+    BaseCollectionView.prototype.onRender.apply(this, arguments);
+  },
+
   onDestroy: function() {
     this.stopListening(this.bus);
     this.stopListening(this.model);

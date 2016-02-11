@@ -86,4 +86,9 @@ module.exports = Backbone.FilteredCollection.extend({
     if(this.comparator) { this.sort() }
   },
 
+  sort: function (){
+    if(!this.comparator) { return }
+    Backbone.FilteredCollection.prototype.sort.apply(this, arguments);
+  },
+
 });
