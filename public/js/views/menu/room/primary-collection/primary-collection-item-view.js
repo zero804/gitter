@@ -46,12 +46,14 @@ module.exports = BaseCollectionItemView.extend({
       name:          roomNameShortener(data.name),
       mentions:      hasMentions,
       unreadItems:   unreadItems,
-      lurkActivity:  lurkActivity
+      lurkActivity:  lurkActivity,
+      isSearch:      (this.roomMenuModel.get('state') === 'search'),
     });
   },
 
   onOptionsClicked: function(e) {
     e.stopPropagation();
+    if(this.roomMenuModel.get('state') === 'search') { return }
     this.uiModel.set('menuIsOpen', !this.uiModel.get('menuIsOpen'));
   },
 
