@@ -15,7 +15,7 @@ module.exports = BaseCollectionView.extend({
 
   childEvents: {
     'item:clicked':      'onItemClicked',
-    'user:item:clicked': 'onUserLinkClicked'
+    'user:item:clicked': 'onUserLinkClicked',
   },
 
   buildChildView: function(model, ItemView, attrs) {
@@ -44,6 +44,8 @@ module.exports = BaseCollectionView.extend({
     //TODO test this JP 8/1/16
     this.primaryCollection = attrs.primaryCollection;
     this.userModel         = attrs.userModel;
+    this.troupeModel       = attrs.troupeModel;
+    this.roomCollection    = attrs.roomCollection;
     this.listenTo(this.roomMenuModel, 'change:searchTerm', this.setActive, this);
   },
 
@@ -79,11 +81,36 @@ module.exports = BaseCollectionView.extend({
     this.stopListening(this.model);
   },
 
-  onUserLinkClicked: function (view){
+  onItemClicked: function(view) {
+    return (this.roomMenuModel.get('state') === 'search') ?
+      this.redirectToPermalink(view) :
+      proto.onItemClicked.apply(this, arguments);
+  },
+
+  //TODO this assumes the room you are viewing is in the room collection
+  //if not we should perform a API request to get the details JP 12/2/16
+  redirectToPermalink: function(view) {
+    var roomId = this.troupeModel.get('id');
+    var room   = this.roomCollection.findWhere({ id: roomId });
+
+    //TODO FIX THIS
+    if (!room) { throw new Error('ROOM NOT IN ROOM LIST AGHHHHHHHHH .....'); }
+
+    //Format URL
+    var url  = room.get('uri');
+    if (url[0] !== '/') { url = '/' + url }
+    url      = url + '?at=' + view.model.get('id');
+
+    var name = room.get('name');
+    this._triggerNavigation(url, 'chat', name);
+  },
+
+  onUserLinkClicked: function(view) {
     var model = view.model.get('fromUser');
     var user = this.userModel;
-    if(model.id === user.get('id')) { return }
-    this.onItemClicked.apply(this, arguments);
+    if (model.id === user.get('id')) { return; }
+
+    proto.onItemClicked.apply(this, arguments);
   },
 
 });

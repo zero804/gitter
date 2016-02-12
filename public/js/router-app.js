@@ -189,7 +189,7 @@ onready(function() {
 
   appEvents.on('navigation', function(url, type, title) {
     debug('navigation: %s', url);
-    var parsed = urlParser.parse(url);
+    var parsed   = urlParser.parse(url);
     var frameUrl = parsed.pathname + '/~' + type + parsed.search;
 
     if (parsed.pathname === window.location.pathname) {
