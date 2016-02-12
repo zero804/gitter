@@ -185,11 +185,342 @@ describe('room-membership-service', function() {
               assert(find1.some(mongoIdEqualPredicate(userId1)) || find2.some(mongoIdEqualPredicate(userId1)));
               assert(find1.some(mongoIdEqualPredicate(userId2)) || find2.some(mongoIdEqualPredicate(userId2)));
             });
-        })
+        });
 
-    })
+    });
+
+    describe('findRoomIdsForUserWithLurk', function() {
+      it('should return the correct values', function() {
+        var troupeId2 = fixture.troupe2.id;
+        var userId1 = fixture.user1.id;
+        var userId2 = fixture.user2.id;
+
+        return roomMembershipService.addRoomMembers(troupeId2, [userId1, userId2])
+          .then(function() {
+            return [
+              roomMembershipService.setMembershipMode(userId1, troupeId2, 'all'),
+              roomMembershipService.setMembershipMode(userId2, troupeId2, 'mention')
+            ];
+          })
+          .spread(function() {
+            return roomMembershipService.findRoomIdsForUserWithLurk(userId1);
+          })
+          .then(function(result) {
+            assert(typeof result === 'object');
+            assert(!!result);
+            assert(result.hasOwnProperty(troupeId2));
+            assert.strictEqual(result[troupeId2], false);
+
+            return roomMembershipService.findRoomIdsForUserWithLurk(userId2);
+          })
+          .then(function(result) {
+            assert(typeof result === 'object');
+            assert(!!result);
+            assert(result.hasOwnProperty(troupeId2));
+            assert.strictEqual(result[troupeId2], true);
+          });
+
+      });
+
+    });
+
+    describe('addRoomMember', function() {
+      it('should add a new member to a room', function() {
+        var troupeId = fixture.troupe2.id;
+        var userId = fixture.user1.id;
+
+        var called = 0;
+        function listener(pTroupeId, members) {
+          assert.strictEqual(pTroupeId, troupeId);
+          assert.deepEqual(members, [userId]);
+          called++;
+        }
+
+        return roomMembershipService.removeRoomMember(troupeId, userId)
+          .then(function() {
+            roomMembershipService.events.on('members.added', listener);
+            return roomMembershipService.addRoomMember(troupeId, userId);
+          })
+          .then(function(result) {
+            assert.strictEqual(result, true);
+            assert.strictEqual(called, 1);
+          })
+          .finally(function() {
+            roomMembershipService.events.removeListener('members.added', listener);
+          });
+
+      });
+
+      it('should be idempotent', function() {
+        var troupeId = fixture.troupe2.id;
+        var userId = fixture.user1.id;
+
+        var called = 0;
+        function listener() {
+          called++;
+        }
+
+        return roomMembershipService.addRoomMember(troupeId, userId)
+          .then(function() {
+            roomMembershipService.events.on('members.added', listener);
+            return roomMembershipService.addRoomMember(troupeId, userId);
+          })
+          .then(function(result) {
+            assert.strictEqual(result, false);
+            assert.strictEqual(called, 0);
+          })
+          .finally(function() {
+            roomMembershipService.events.removeListener('members.added', listener);
+          });
+
+      });
+    });
+
+    describe('findUserMembershipInRooms', function() {
+      it('should return some users', function() {
+        var troupeId1 = fixture.troupe1.id;
+        var troupeId2 = fixture.troupe2.id;
+        var userId = fixture.user1.id;
+
+        return Promise.join(
+            roomMembershipService.removeRoomMember(troupeId1, userId),
+            roomMembershipService.addRoomMember(troupeId2, userId),
+            function() {
+              return roomMembershipService.findUserMembershipInRooms(userId, [troupeId1, troupeId2]);
+            })
+            .then(function(result) {
+              assert.strictEqual(result.length, 1);
+              assert.equal(result[0], troupeId2);
+            });
+      });
+
+    });
+
+    describe('findMembershipForUsersInRoom', function() {
+      it('should return some users', function() {
+        var troupeId = fixture.troupe1.id;
+        var userId1 = fixture.user1.id;
+        var userId2 = fixture.user2.id;
+
+        return Promise.join(
+            roomMembershipService.removeRoomMember(troupeId, userId1),
+            roomMembershipService.addRoomMember(troupeId, userId2),
+            function() {
+              return roomMembershipService.findMembershipForUsersInRoom(troupeId, [userId1, userId2]);
+            })
+            .then(function(result) {
+              assert.strictEqual(result.length, 1);
+              assert.equal(result[0], userId2);
+            });
+      });
+
+    });
+
+    describe('findMembersForRoomWithLurk', function() {
+      it('should return some users with lurk', function() {
+        var troupeId = fixture.troupe1.id;
+        var userId1 = fixture.user1.id;
+        var userId2 = fixture.user2.id;
+        var userId3 = fixture.user3.id;
+
+        return Promise.join(
+            roomMembershipService.removeRoomMember(troupeId, userId1),
+            roomMembershipService.addRoomMember(troupeId, userId2),
+            roomMembershipService.addRoomMember(troupeId, userId3),
+            function() {
+              return [
+                roomMembershipService.setMembershipMode(userId2, troupeId, 'all'),
+                roomMembershipService.setMembershipMode(userId3, troupeId, 'mention')
+              ];
+            })
+            .spread(function() {
+              return roomMembershipService.findMembersForRoomWithLurk(troupeId, [userId1, userId2, userId3]);
+            })
+            .then(function(result) {
+              var expected = {};
+              expected[userId2] = false;
+              expected[userId3] = true;
+              assert.deepEqual(result, expected);
+            });
+      });
+    });
+
+
+    describe('removeRoomMember', function() {
+      it('should remove a member from a room', function() {
+        var troupeId = fixture.troupe2.id;
+        var userId = fixture.user1.id;
+
+        var called = 0;
+        function listener(pTroupeId, members) {
+          assert.strictEqual(pTroupeId, troupeId);
+          assert.deepEqual(members, [userId]);
+          called++;
+        }
+
+        return roomMembershipService.addRoomMember(troupeId, userId)
+          .then(function() {
+            roomMembershipService.events.on('members.removed', listener);
+
+            return roomMembershipService.removeRoomMember(troupeId, userId);
+          })
+          .then(function(result) {
+            assert.strictEqual(result, true);
+            assert.strictEqual(called, 1);
+          })
+          .finally(function() {
+            roomMembershipService.events.removeListener('members.removed', listener);
+          });
+
+      });
+
+      it('should be idempotent', function() {
+        var troupeId = fixture.troupe2.id;
+        var userId = fixture.user1.id;
+
+        var called = 0;
+        function listener() {
+          called++;
+        }
+
+        return roomMembershipService.removeRoomMember(troupeId, userId)
+          .then(function() {
+            roomMembershipService.events.on('members.removed', listener);
+            return roomMembershipService.removeRoomMember(troupeId, userId);
+          })
+          .then(function(result) {
+            assert.strictEqual(result, false);
+            assert.strictEqual(called, 0);
+          })
+          .finally(function() {
+            roomMembershipService.events.removeListener('members.removed', listener);
+          });
+
+      });
+
+    });
+
+    describe('findAllMembersForRooms', function() {
+      it('should return some users', function() {
+        var troupeId1 = fixture.troupe1.id;
+        var troupeId2 = fixture.troupe2.id;
+        var userId1 = fixture.user1.id;
+        var userId2 = fixture.user2.id;
+        var userId3 = fixture.user3.id;
+
+        return Promise.join(
+            roomMembershipService.removeRoomMember(troupeId1, userId3),
+            roomMembershipService.removeRoomMember(troupeId2, userId3),
+            roomMembershipService.addRoomMember(troupeId1, userId1),
+            roomMembershipService.addRoomMember(troupeId1, userId2),
+            roomMembershipService.addRoomMember(troupeId2, userId1),
+            function() {
+              return roomMembershipService.findAllMembersForRooms([troupeId1, troupeId2]);
+            })
+            .then(function(result) {
+              assert.strictEqual(result.length, 2);
+              assert(result.some(mongoIdEqualPredicate(userId1)));
+              assert(result.some(mongoIdEqualPredicate(userId2)));
+              assert(!result.some(mongoIdEqualPredicate(userId3)));
+            });
+      });
+    });
+
+    describe('findMembersForRoomMulti', function() {
+      it('should return some users', function() {
+        var troupeId1 = fixture.troupe1.id;
+        var troupeId2 = fixture.troupe2.id;
+        var userId1 = fixture.user1.id;
+        var userId2 = fixture.user2.id;
+        var userId3 = fixture.user3.id;
+
+        return Promise.join(
+            roomMembershipService.removeRoomMember(troupeId1, userId3),
+            roomMembershipService.removeRoomMember(troupeId2, userId3),
+            roomMembershipService.addRoomMember(troupeId1, userId1),
+            roomMembershipService.addRoomMember(troupeId1, userId2),
+            roomMembershipService.addRoomMember(troupeId2, userId1),
+            roomMembershipService.removeRoomMember(troupeId2, userId2),
+            function() {
+              return roomMembershipService.findMembersForRoomMulti([troupeId1, troupeId2]);
+            })
+            .then(function(result) {
+              assert.strictEqual(Object.keys(result).length, 2);
+              var t1 = result[troupeId1];
+              var t2 = result[troupeId2];
+              assert(Array.isArray(t1));
+              assert(Array.isArray(t2));
+
+              assert(t1.some(mongoIdEqualPredicate(userId1)));
+              assert(t1.some(mongoIdEqualPredicate(userId2)));
+              assert(!t1.some(mongoIdEqualPredicate(userId3)));
+
+              assert(t2.some(mongoIdEqualPredicate(userId1)));
+              assert(!t2.some(mongoIdEqualPredicate(userId2)));
+              assert(!t2.some(mongoIdEqualPredicate(userId3)));
+            });
+      });
+
+    });
+
+    describe('setMembershipModeForUsersInRoom', function() {
+      it('should return some users', function() {
+        var troupeId1 = fixture.troupe1.id;
+        var userId1 = fixture.user1.id;
+        var userId2 = fixture.user2.id;
+
+        return Promise.join(
+            roomMembershipService.addRoomMember(troupeId1, userId1),
+            roomMembershipService.addRoomMember(troupeId1, userId2),
+            function() {
+              return roomMembershipService.setMembershipModeForUsersInRoom(troupeId1, [userId1, userId2], 'all');
+            })
+            .then(function() {
+              return roomMembershipService.findMembershipModeForUsersInRoom(troupeId1, [userId1, userId2]);
+            })
+            .then(function(result) {
+              var expected = {};
+              expected[userId1] = 'all';
+              expected[userId2] = 'all';
+              assert.deepEqual(result, expected);
+
+              return roomMembershipService.setMembershipModeForUsersInRoom(troupeId1, [userId1], 'announcements');
+            })
+            .then(function() {
+              return roomMembershipService.findMembershipModeForUsersInRoom(troupeId1, [userId1, userId2]);
+            })
+            .then(function(result) {
+              var expected = {};
+              expected[userId1] = 'announcements';
+              expected[userId2] = 'all';
+              assert.deepEqual(result, expected);
+
+              return roomMembershipService.setMembershipModeForUsersInRoom(troupeId1, [userId2], 'mute');
+            })
+            .then(function() {
+              return roomMembershipService.findMembershipModeForUsersInRoom(troupeId1, [userId1, userId2]);
+            })
+            .then(function(result) {
+              var expected = {};
+              expected[userId1] = 'announcements';
+              expected[userId2] = 'mute';
+              assert.deepEqual(result, expected);
+
+              return roomMembershipService.setMembershipModeForUsersInRoom(troupeId1, [userId1, userId2], 'all');
+            })
+            .then(function() {
+              return roomMembershipService.findMembershipModeForUsersInRoom(troupeId1, [userId1, userId2]);
+            })
+            .then(function(result) {
+              var expected = {};
+              expected[userId1] = 'all';
+              expected[userId2] = 'all';
+              assert.deepEqual(result, expected);
+            });
+
+      });
+    });
 
   });
-
 
 });
