@@ -65,6 +65,8 @@ module.exports = Marionette.LayoutView.extend({
       primaryCollection: this.model.primaryCollection,
       bus:               this.bus,
       userModel:         this.model.userModel,
+      troupeModel:       this.model._troupeModel,
+      roomCollection:    this.model._roomCollection,
     }));
   },
 
