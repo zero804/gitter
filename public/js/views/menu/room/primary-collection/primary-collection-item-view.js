@@ -21,12 +21,12 @@ module.exports = BaseCollectionItemView.extend({
     'mouseleave':                                      'onMouseOut',
   },
 
-  attributes: function (){
-    _.extend({}, BaseCollectionItemView.prototype.attributes.apply(this, arguments), {
-      class: (this.model.get('githubType') === 'ONETOONE') ?
-        'room-item--one2one' :
-        'room-item'
-    });
+  className: null,
+  attributes: function() {
+    return {
+      class:     (this.model.get('githubType') === 'ONETOONE') ? 'room-item--one2one' : 'room-item',
+      'data-id': this.model.get('id'),
+    };
   },
 
   initialize: function() {
@@ -40,7 +40,7 @@ module.exports = BaseCollectionItemView.extend({
     data.name = (data.name || '');
 
     //For user results
-    if(data.displayName) {
+    if (data.displayName) {
       return _.extend({}, { name: data.displayName, avatarUrl: data.avatarUrlSmall });
     }
 
@@ -61,7 +61,8 @@ module.exports = BaseCollectionItemView.extend({
 
   onOptionsClicked: function(e) {
     e.stopPropagation();
-    if(this.roomMenuModel.get('state') === 'search') { return }
+    if (this.roomMenuModel.get('state') === 'search') { return; }
+
     this.uiModel.set('menuIsOpen', !this.uiModel.get('menuIsOpen'));
   },
 
@@ -91,9 +92,10 @@ module.exports = BaseCollectionItemView.extend({
       });
   },
 
-  render: function (){
+  render: function() {
     //TODO Figure out why there is soooo much rendering JP 5/2/16
-    if(!Object.keys(this.model.changed)) { return }
+    if (!Object.keys(this.model.changed)) { return; }
+
     BaseCollectionItemView.prototype.render.apply(this, arguments);
   },
 
