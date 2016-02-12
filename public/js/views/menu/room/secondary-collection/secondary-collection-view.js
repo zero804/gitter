@@ -14,7 +14,8 @@ module.exports = BaseCollectionView.extend({
   className: 'secondary-collection',
 
   childEvents: {
-    'item:clicked': 'onItemClicked',
+    'item:clicked':      'onItemClicked',
+    'user:item:clicked': 'onUserLinkClicked'
   },
 
   buildChildView: function(model, ItemView, attrs) {
@@ -42,6 +43,7 @@ module.exports = BaseCollectionView.extend({
   initialize: function(attrs) {
     //TODO test this JP 8/1/16
     this.primaryCollection = attrs.primaryCollection;
+    this.userModel         = attrs.userModel;
     this.listenTo(this.roomMenuModel, 'change:searchTerm', this.setActive, this);
   },
 
@@ -73,18 +75,15 @@ module.exports = BaseCollectionView.extend({
     }
   },
 
-  onItemClicked: function(view) {
-    if (this.model.get('state') === 'search') {
-      return this.model.set('searchTerm', view.model.get('name'));
-    }
-
-    //TODO this seems kinda sucky, is there a better way to do this?
-    //JP 8/1/16
-    PrimaryCollectionView.prototype.onItemClicked.apply(this, arguments);
-  },
-
   onDestroy: function() {
     this.stopListening(this.model);
+  },
+
+  onUserLinkClicked: function (view){
+    var model = view.model.get('fromUser');
+    var user = this.userModel;
+    if(model.id === user.get('id')) { return }
+    this.onItemClicked.apply(this, arguments);
   },
 
 });

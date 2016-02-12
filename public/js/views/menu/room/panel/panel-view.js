@@ -64,6 +64,7 @@ module.exports = Marionette.LayoutView.extend({
       roomMenuModel:     this.model,
       primaryCollection: this.model.primaryCollection,
       bus:               this.bus,
+      userModel:         this.model.userModel,
     }));
   },
 

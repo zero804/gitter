@@ -52,7 +52,7 @@ module.exports = Marionette.CompositeView.extend({
 
   onItemClicked: function(view) {
     var model = view.model;
-    var name = (model.get('uri') || model.get('url') || model.get('name'));
+    var name = (model.get('uri') || model.get('url') || model.get('name') || model.get('fromUser').username);
     var url  = (name[0] !== '/') ?  '/' + name : name;
     this.bus.trigger('navigation', url, 'chat', name);
   },

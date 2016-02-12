@@ -43,9 +43,4 @@ module.exports = Marionette.ItemView.extend({
     this.ui.container.toggleClass('focus', !!val);
   },
 
-  onDestroy: function() {
-    delete this.roomMenuModel;
-    delete this.index;
-  },
-
 });
