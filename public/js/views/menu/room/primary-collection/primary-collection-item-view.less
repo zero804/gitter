@@ -68,7 +68,13 @@ JP 11/2/16
 
 .room-item--one2one {
   .room-item();
-  max-height: @menu-item-height * 2;
+
+  &.active {
+    max-height: @menu-item-height * 2;
+    .room-item__container {
+      background: rgba(255, 255, 255, .1);
+    }
+  }
 }
 
 .room-item--search {
