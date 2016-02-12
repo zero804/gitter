@@ -7,7 +7,8 @@ var SecondaryCollectionItemView = require('./secondary-collection-item-view');
 module.exports = SecondaryCollectionItemView.extend({
   className: 'room-item--search-message',
   triggers: {
-    'item:clicked': 'onItemClicked',
+    'click #user-link': 'user:item:clicked',
+    'click':            'item:clicked',
   },
   template: searchTemplate,
   serializeData: function() {
