@@ -4,6 +4,9 @@
     "browser",
     "jquery"
   ],
+  "loadEagerly": [
+    "server/services/**/*.js"
+  ],
   "dontLoad": [
     "public/repo/*.js"
   ],
