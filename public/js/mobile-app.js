@@ -5,7 +5,6 @@ var $ = require('jquery');
 var appEvents = require('utils/appevents');
 var chatModels = require('collections/chat');
 var Backbone = require('backbone');
-var TroupeSettingsView = require('views/modals/room-settings-view');
 var onready = require('./utils/onready');
 var MobileLayout = require('views/layouts/mobile');
 var FastClick = require('fastclick');
@@ -45,11 +44,8 @@ onready(function() {
 
   var Router = Backbone.Router.extend({
     routes: {
-      // TODO: get rid of the pipes
-      "!": "hideModal",                  // TODO: remove this soon
       "": "hideModal",
-      "notifications": "notifications",
-      "|notifications": "notifications", // TODO: remove this soon
+      "notifications": "notifications"
     },
 
     hideModal: function() {
@@ -57,7 +53,10 @@ onready(function() {
     },
 
     notifications: function() {
-      appView.dialogRegion.show(new TroupeSettingsView({}));
+      require.ensure(['views/modals/room-settings-view'], function(require) {
+        var TroupeSettingsView = require('views/modals/room-settings-view');
+        appView.dialogRegion.show(new TroupeSettingsView({}));
+      });
     }
   });
 
