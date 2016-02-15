@@ -16,6 +16,7 @@ require('filtered-collection');
 module.exports = (function() {
   var orgsCollection = new orgModels.OrgCollection(null, { listen: true });
   var troupeCollection = new troupeModels.TroupeCollection(null, { listen: true });
+
   orgsCollection.on('error', errorHandle.bind(null, 'org-collection'));
 
   unreadItemsClient.installTroupeListener(troupeCollection);
