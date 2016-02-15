@@ -23,7 +23,6 @@ function getNotificationSetting(value) {
 var View = Marionette.ItemView.extend({
   template: troupeSettingsTemplate,
   events: {
-    'click #save-troupe-settings': 'saveSettings',
     'click #close-settings' : 'destroySettings',
     'change #notification-options' : 'formChange'
   },
@@ -49,8 +48,11 @@ var View = Marionette.ItemView.extend({
     }
   },
 
-  formChange: function() {
-    this.saveSettings();
+  formChange: function(e) {
+    if(e) e.preventDefault();
+
+    var mode = this.ui.options.val();
+    apiClient.userRoom.put('/settings/notifications', { mode: mode });
   },
 
   destroySettings : function () {
@@ -65,14 +67,8 @@ var View = Marionette.ItemView.extend({
         isNativeDesktopApp: context().isNativeDesktopApp,
         troupeUrl: '//' + window.location.host + window.location.pathname
       });
-  },
-
-  saveSettings: function(e) {
-    if(e) e.preventDefault();
-
-    var push = this.ui.options.val();
-    apiClient.userRoom.put('/settings/notifications', { push: push });
   }
+
 });
 
 module.exports = ModalView.extend({
