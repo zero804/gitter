@@ -1,0 +1,52 @@
+<div class="menu-header__profile">
+  <div class='menu-header__avatar'>
+    {{ widget "avatar" user=user size='s' }}
+  </div>
+  <div class="menu-header__name u-font-larger">
+    {{ user.displayName }}
+  </div>
+  {{#unless isMobile}}
+    <div class="menu-header__state">
+      <i class="octicon octicon-chevron-up"></i>
+      <i class="octicon octicon-chevron-down"></i>
+    </div>
+  {{/unless}}
+</div>
+<ul id="profile-menu" class="profile-menu">
+  <li id="link-home" class="profile-menu__item profile-menu__link">
+    <div class='profile-menu__icon'>
+      <i class='octicon octicon-home'></i>
+    </div>
+    <span>Home</span>
+  </li>
+  {{#if showBilling}}
+  <li class="profile-menu__item">
+    <a href="{{billingUrl}}/accounts" target="_blank" class="profile-menu__link" data-disable-routing="1">
+      <div class='profile-menu__icon'>
+        <i class='octicon octicon-credit-card'></i>
+      </div>
+      <span>Billing</span>
+    </a>
+  </li>
+  {{/if}}
+  {{#if showGetApps}}
+  <li class="profile-menu__item">
+    <a href="/apps" target="_blank" class="profile-menu__link">
+      <div class='profile-menu__icon'>
+        <i class='icon-download'></i>
+      </div>
+      <span>Get Gitter Apps</span>
+    </a>
+  </li>
+  {{/if}}
+  {{#if showSignout}}
+  <li class="profile-menu__item">
+    <a id="link-logout" href="/logout" class="profile-menu__link">
+      <div class='profile-menu__icon'>
+        <i class='icon-logout'></i>
+      </div>
+      <span>Sign out</span>
+    </a>
+  </li>
+  {{/if}}
+</ul>
