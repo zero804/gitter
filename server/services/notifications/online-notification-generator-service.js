@@ -43,7 +43,7 @@ function generateChatMessageNotification(troupeId, chatId) {
 }
 
 function filterUsersByNotificationSettings(troupeId, userIds, mentioned) {
-  return userRoomNotificationService.findNotifySettingForUsersInRoom(troupeId, userIds)
+  return userRoomNotificationService.findSettingsForUsersInRoom(troupeId, userIds)
     .then(function(notificationSettings) {
       return _.filter(userIds, function(userId) {
         var notificationSetting = notificationSettings[userId];
