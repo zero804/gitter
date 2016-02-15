@@ -112,7 +112,7 @@ function resolveMentions(troupe, user, parsedMessage) {
  * NB: it is the callers responsibility to ensure that the user has permission
  * to chat in the room
  */
-exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
+exports.newChatMessageToTroupe = function(troupe, user, data) {
 
   // Keep this up here, set sent time asap to ensure order
   var sentAt = new Date();
@@ -155,7 +155,8 @@ exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
         unreadItemService.createChatUnreadItems(user.id, troupe, chatMessage)
           .catch(function(err) {
             errorReporter(err, { operation: 'unreadItemService.createChatUnreadItems', chat: chatMessage }, { module: 'chat-service' });
-          });
+          })
+          .done();
 
         var statMetadata = _.extend({
           userId: user.id,
@@ -169,8 +170,7 @@ exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
 
         return chatMessage;
       });
-  })
-  .nodeify(callback);
+  });
 };
 
 // Returns some recent public chats
