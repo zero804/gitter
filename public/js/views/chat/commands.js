@@ -245,15 +245,17 @@ var commandsList = [
     }
   },
   {
-    command: 'notify-announcements',
+    // TODO: CODEDEBT: https://github.com/troupe/gitter-webapp/issues/988
+    // rename this to 'announcements'
+    command: 'notify-mentions',
     description: 'Get notified on mentions and group messages',
-    completion: 'notify-announcements',
-    regexp: /^\/notify-announcements\s*$/,
+    completion: 'notify-mentions',
+    regexp: /^\/notify-mentions\s*$/,
     criteria: function() {
       return !context.inOneToOneTroupeContext();
     },
     action: function() {
-      updateNotifications('announcements');
+      updateNotifications('mention');
     }
   },
   {
@@ -262,7 +264,7 @@ var commandsList = [
     completion: 'notify-mute',
     regexp: /^\/notify-mute\s*$/,
     criteria: function() {
-      return !context.inOneToOneTroupeContext();
+      return false; // TODO: CODEDEBT: https://github.com/troupe/gitter-webapp/issues/988
     },
     action: function() {
       updateNotifications('mute');
