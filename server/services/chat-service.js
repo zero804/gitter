@@ -64,11 +64,15 @@ function resolveMentions(troupe, user, parsedMessage) {
       return mention.screenName;
     });
 
-  return Promise.all([
-      mentionUserNames.length ? userService.findByUsernames(mentionUserNames) : [],
-      mentionGroupNames.length ? groupResolver(troupe, user, mentionGroupNames) : []
-    ])
-    .spread(function(users, groups) {
+  var userLookup = mentionUserNames.length ?
+                    userService.findByUsernames(mentionUserNames) :
+                    [];
+
+  var groupLookup = mentionGroupNames.length ?
+                      groupResolver(troupe, user, mentionGroupNames) :
+                      [];
+
+  return Promise.join(userLookup, groupLookup, function(users, groups) {
       var notCurrentUserPredicate = excludingUserId(user.id);
 
       var usersIndexed = collections.indexByProperty(users, 'username');
