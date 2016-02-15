@@ -389,6 +389,13 @@ onready(function() {
       });
     },
 
+    createreporoom: function() {
+      require.ensure(['views/modals/create-repo-room'], function(require) {
+         var createRepoRoomView = require('views/modals/create-repo-room');
+         appLayout.dialogRegion.show(new createRepoRoomView.Modal());
+       });
+    },
+
     createcustomroom: function(name) {
 
       function getSuitableParentRoomUri() {
