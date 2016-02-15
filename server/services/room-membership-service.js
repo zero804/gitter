@@ -9,45 +9,9 @@ var EventEmitter         = require('events').EventEmitter;
 var assert               = require('assert');
 var debug                = require('debug')('gitter:room-membership-service');
 var recentRoomCore       = require('./core/recent-room-core');
-var StatusError          = require('statuserror');
 var roomMembershipEvents = new EventEmitter();
 var _                    = require('lodash');
-
-/* Note, these can not change! */
-/* -----8<---- */
-var FLAG_POS_NOTIFY_UNREAD        = 0;
-var FLAG_POS_NOTIFY_ACTIVITY      = 1;
-var FLAG_POS_NOTIFY_MENTIONS      = 2;
-var FLAG_POS_NOTIFY_ANNOUNCEMENTS = 3;
-/* -----8<---- */
-
-var BITMASK_INVERT = 0x0FFFFFFF;
-var BITMASK_MODE = 1 << FLAG_POS_NOTIFY_UNREAD |
-                   1 << FLAG_POS_NOTIFY_ACTIVITY |
-                   1 << FLAG_POS_NOTIFY_MENTIONS |
-                   1 << FLAG_POS_NOTIFY_ANNOUNCEMENTS;
-
-var BITMASK_INVERT_MODE = BITMASK_INVERT & ~BITMASK_MODE;
-
-var BITMASK_NOTIFY_UNREAD           = 1 << FLAG_POS_NOTIFY_UNREAD;
-var BITMASK_NO_NOTIFY_UNREAD        = BITMASK_INVERT & ~BITMASK_NOTIFY_UNREAD;
-var BITMASK_NOTIFY_ACTIVITY         = 1 << FLAG_POS_NOTIFY_ACTIVITY;
-var BITMASK_NOTIFY_MENTIONS         = 1 << FLAG_POS_NOTIFY_MENTIONS;
-var BITMASK_NOTIFY_ANNOUNCEMENTS    = 1 << FLAG_POS_NOTIFY_ANNOUNCEMENTS;
-
-var MODES = {
-  /* Mode: all: unread + no activity + mentions + announcements */
-  all: BITMASK_NOTIFY_UNREAD | BITMASK_NOTIFY_MENTIONS | BITMASK_NOTIFY_ANNOUNCEMENTS,
-
-  /* Mode: announcements: no unread + activity + mentions + announcements */
-  announcements: BITMASK_NOTIFY_ACTIVITY | BITMASK_NOTIFY_MENTIONS | BITMASK_NOTIFY_ANNOUNCEMENTS,
-
-  /* Mode: mute: no unread + no activity + mentions + no announcements */
-  mute: BITMASK_NOTIFY_MENTIONS,
-};
-
-/* Alias modes */
-MODES.mention = MODES.announcements;
+var roomMembershipFlags  = require('./room-membership-flags');
 
 /**
  * Returns the rooms the user is in
@@ -67,7 +31,7 @@ function getLurkFromTroupeUser(troupeUser) {
     return !!troupeUser.lurk;
   } else {
     // The new way...
-    return !(troupeUser.flags & BITMASK_NOTIFY_UNREAD);
+    return roomMembershipFlags.getLurkForFlags(troupeUser.flags);
   }
 }
 
@@ -404,50 +368,12 @@ function resetTroupeUserCount(troupeId) {
     });
 }
 
-function getModeFromFlags(flags) {
-  switch(flags & BITMASK_MODE) {
-    case MODES.all:
-      return 'all';
-    case MODES.announcements:
-      return 'announcements';
-    case MODES.mute:
-      return 'mute';
-  }
-
-  // TODO: deal with 'unknown' modes better
-  return null;
-}
-
-function getUpdateForMode(mode) {
-  if (!MODES.hasOwnProperty(mode)) {
-    throw new StatusError(400, 'Invalid mode ' + mode);
-  }
-
-  var setBits = MODES[mode];
-  var clearBits = BITMASK_INVERT_MODE | setBits;
-
-  var lurk = !(setBits & BITMASK_NOTIFY_UNREAD);
-
-  return {
-    $set: { lurk: lurk },
-    $bit: { flags: { or: setBits, and: clearBits } }
-  };
-}
-
-function getLurkForMode(mode) {
-  if (!MODES.hasOwnProperty(mode)) {
-    throw new StatusError(400, 'Invalid mode ' + mode);
-  }
-
-  return !(MODES[mode] & BITMASK_NOTIFY_UNREAD);
-}
-
 var getMembershipMode = Promise.method(function (userId, troupeId) {
   return TroupeUser.findOne({ troupeId: troupeId, userId: userId }, { flags: 1, _id: 0 }, { lean: true })
     .exec()
     .then(function(troupeUser) {
        if (!troupeUser) return null;
-       return getModeFromFlags(troupeUser.flags);
+       return roomMembershipFlags.getModeFromFlags(troupeUser.flags);
     });
 });
 
@@ -456,14 +382,14 @@ var setMembershipMode = Promise.method(function (userId, troupeId, value) {
   return TroupeUser.findOneAndUpdate({
       troupeId: troupeId,
       userId: userId
-    }, getUpdateForMode(value), {
+    }, roomMembershipFlags.getUpdateForMode(value), {
       new: false
     })
     .exec()
     .then(function(oldTroupeUser) {
        if (!oldTroupeUser) return false;
 
-       var valueIsLurking = getLurkForMode(value);
+       var valueIsLurking = roomMembershipFlags.getLurkForMode(value);
        var changed = getLurkFromTroupeUser(oldTroupeUser) !== valueIsLurking;
 
        if (changed) {
@@ -478,12 +404,12 @@ var setMembershipModeForUsersInRoom = Promise.method(function(troupeId, userIds,
   return TroupeUser.update({
       troupeId: troupeId,
       userId: { $in: mongoUtils.asObjectIDs(userIds) }
-    }, getUpdateForMode(value), {
+    }, roomMembershipFlags.getUpdateForMode(value), {
       multi: true
     })
     .exec()
     .then(function() {
-      var valueIsLurking = getLurkForMode(value);
+      var valueIsLurking = roomMembershipFlags.getLurkForMode(value);
 
       // Unfortunately we have no way of knowing which of the users
       // were actually removed and which were already out of the collection
@@ -507,7 +433,7 @@ var findMembershipModeForUsersInRoom = Promise.method(function(troupeId, userIds
     .exec()
     .then(function(troupeUsers) {
       return _.reduce(troupeUsers, function(memo, troupeUser) {
-        memo[troupeUser.userId] = getModeFromFlags(troupeUser.flags);
+        memo[troupeUser.userId] = roomMembershipFlags.getModeFromFlags(troupeUser.flags);
         return memo;
       }, {});
     });
