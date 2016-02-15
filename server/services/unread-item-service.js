@@ -304,14 +304,22 @@ function findNonMembersWithAccess(troupe, userIds) {
 function parseMentions(fromUserId, troupe, userIdsWithLurk, mentions) {
   var creatorUserId = fromUserId && "" + fromUserId;
 
+  var announcement = false;
   var uniqueUserIds = {};
-  mentions.forEach(function(mention) {
+  _.each(mentions, function(mention) {
     if(mention.group) {
-      if(mention.userIds) {
-        mention.userIds.forEach(function(userId) {
+      if (mention.announcement) {
+        announcement = true;
+      }
+
+      // Note: in future, annoucements won't have userIds for
+      // the `all` group
+      if (mention.userIds) {
+        _.each(mention.userIds, function(userId) {
           uniqueUserIds[userId] = true;
         });
       }
+
     } else {
       if(mention.userId) {
         uniqueUserIds[mention.userId] = true;
@@ -322,7 +330,8 @@ function parseMentions(fromUserId, troupe, userIdsWithLurk, mentions) {
   var memberUserIds = [];
   var nonMemberUserIds = [];
 
-  Object.keys(uniqueUserIds).forEach(function(userId) {
+  var userIds = Object.keys(uniqueUserIds);
+  _.each(userIds, function(userId) {
     /* Don't be mentioning yourself yo */
     if(userId == creatorUserId) return;
 
@@ -341,7 +350,8 @@ function parseMentions(fromUserId, troupe, userIdsWithLurk, mentions) {
     return Promise.resolve({
       memberUserIds: memberUserIds,
       nonMemberUserIds: [],
-      mentionUserIds: memberUserIds
+      mentionUserIds: memberUserIds,
+      announcement: announcement
     });
   }
 
@@ -354,7 +364,8 @@ function parseMentions(fromUserId, troupe, userIdsWithLurk, mentions) {
       return {
         memberUserIds: memberUserIds,
         nonMemberUserIds: nonMemberUserIdsFiltered,
-        mentionUserIds: mentionUserIds
+        mentionUserIds: mentionUserIds,
+        announcement: announcement
       };
     });
 }
@@ -367,7 +378,9 @@ function parseChat(fromUserId, troupe, mentions) {
       var nonActive = [];
       var active = [];
 
-      Object.keys(userIdsWithLurk).forEach(function(userId) {
+      var userIds = Object.keys(userIdsWithLurk);
+
+      _.each(userIds, function(userId) {
         if (creatorUserId && userId === creatorUserId) return;
 
         var lurk = userIdsWithLurk[userId];
@@ -380,22 +393,23 @@ function parseChat(fromUserId, troupe, mentions) {
       });
 
       if(!mentions || !mentions.length) {
-        return Promise.resolve({
+        return {
           notifyUserIds: active,
           mentionUserIds: [],
           activityOnlyUserIds: nonActive,
-          notifyNewRoomUserIds: []
-        });
+          notifyNewRoomUserIds: [],
+          announcement: false
+        };
       }
 
       /* Add the mentions into the mix */
       return parseMentions(fromUserId, troupe, userIdsWithLurk, mentions)
         .then(function(parsedMentions) {
           var notifyUserIdsHash = {};
-          active.forEach(function(userId) { notifyUserIdsHash[userId] = 1; });
-          parsedMentions.mentionUserIds.forEach(function(userId) { notifyUserIdsHash[userId] = 1; });
+          _.each(active, function(userId) { notifyUserIdsHash[userId] = 1; });
+          _.each(parsedMentions.mentionUserIds, function(userId) { notifyUserIdsHash[userId] = 1; });
 
-          var nonActiveLessMentions = nonActive.filter(function(userId) {
+          var nonActiveLessMentions = _.filter(nonActive, function(userId) {
             return !notifyUserIdsHash[userId];
           });
 
@@ -403,7 +417,8 @@ function parseChat(fromUserId, troupe, mentions) {
             notifyUserIds: Object.keys(notifyUserIdsHash),
             mentionUserIds: parsedMentions.mentionUserIds,
             activityOnlyUserIds: nonActiveLessMentions,
-            notifyNewRoomUserIds: parsedMentions.nonMemberUserIds
+            notifyNewRoomUserIds: parsedMentions.nonMemberUserIds,
+            announcement: parsedMentions.announcement
           };
         });
 
@@ -414,12 +429,13 @@ function processResultsForNewItemWithMentions(troupeId, chatId, parsed, results,
   debug("distributing chat notification to users");
   var allUserIds = parsed.notifyUserIds.concat(parsed.activityOnlyUserIds);
 
+  // In future, this should take into account announcements
   return categoriseUserInRoom(troupeId, allUserIds)
     .then(function(presenceStatus) {
       var mentionsHash = collections.hashArray(parsed.mentionUserIds);
 
       // Firstly, notify all the notifyNewRoomUserIds with room creation messages
-      parsed.notifyNewRoomUserIds.forEach(function(userId) {
+      _.each(parsed.notifyNewRoomUserIds, function(userId) {
         appEvents.userMentionedInNonMemberRoom({ troupeId: troupeId, userId: userId });
       });
 
@@ -434,7 +450,7 @@ function processResultsForNewItemWithMentions(troupeId, chatId, parsed, results,
       var badgeUpdateUserIds = [];
 
       // Next, notify all the users with unread count changes
-      parsed.notifyUserIds.forEach(function(userId) {
+      _.each(parsed.notifyUserIds, function(userId) {
 
         var onlineStatus = presenceStatus[userId];
         var hasMention = mentionsHash[userId];
