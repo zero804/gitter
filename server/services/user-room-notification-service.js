@@ -58,7 +58,8 @@ var findSettingsForMultiUserRooms = Promise.method(function (userRooms) {
 });
 
 /**
- * Update the notification setting for a single user in a room
+ * Update the notification setting for a single user in a room.
+ * Returns the new mode for the user
  */
 var updateSettingForUserRoom = Promise.method(function (userId, roomId, value) {
   if (value !== 'mention' && value !== 'all' && value !== 'mute') {
@@ -69,12 +70,13 @@ var updateSettingForUserRoom = Promise.method(function (userId, roomId, value) {
     userTroupeSettingsService.setUserSettings(userId, roomId, 'notifications', { push: value }),
     roomMembershipService.setMembershipMode(userId, roomId, value),
     function() {
-      return;
+      return value;
     });
 });
 
 /**
- * Update the settings for many users in a room
+ * Update the settings for many users in a room. Return the new mode for the
+ * users
  */
 var updateSettingsForUsersInRoom = Promise.method(function (roomId, userIds, value) {
   if (value !== 'mention' && value !== 'all' && value !== 'mute' && value !== 'announcements') {
@@ -92,7 +94,7 @@ var updateSettingsForUsersInRoom = Promise.method(function (roomId, userIds, val
     roomMembershipService.setMembershipModeForUsersInRoom(roomId, userIds, value),
     userTroupeSettingsService.setUserSettingsForUsersInTroupe(roomId, userIds, 'notifications', { push: value }),
     function() {
-      return;
+      return value;
     });
 });
 
