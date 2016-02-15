@@ -1,0 +1,7 @@
+<div class="room-list-item__icon">
+  {{#if favourite}}<i class="icon-star-1 room-list-item__icon--favourite"></i>{{/if}}
+  <img src='{{roomAvatarSrcSet.src}}' srcset='{{roomAvatarSrcSet.srcset}}' height='{{roomAvatarSrcSet.size}}' width='{{roomAvatarSrcSet.size}}'>
+</div>
+<span id="room-name" class="room-list-item__name" title="{{title}}">{{ name }}</span>
+<i class="room-list-item__action js-close-button icon-cancel-circle" data-id="{{ id }}"></i>
+<span id="unread-badge" class="room-list-item__unread-badge" style="display:none">{{ unreadItems }}</span>

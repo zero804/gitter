@@ -1,0 +1,160 @@
+@import (reference) "../../../less/colors.less";
+
+@keyframes pulse_animation {
+  0% { box-shadow: 0 0 0px #1bee82; color: #1bee82; }
+  50% { box-shadow: 0 0 8px #1bee82; color: @trpGreen; }
+  100% { box-shadow: 0 0 0px #1bee82; color: #1bee82;  }
+}
+
+@room-list-item-height: 34px;
+
+.room-list-item {
+  align-items: center;
+  display: flex;
+  flex-grow: 1;
+  list-style: none;
+  cursor: pointer;
+  line-height: @room-list-item-height;
+  padding: 0 0 0 4px;
+  color: rgba(255,255,255,0.9);
+  line-height: 20px;
+  margin-bottom: 5px;
+}
+
+.room-list-item__icon {
+  flex-grow: 0;
+  flex-shrink: 0;
+  text-align: center;
+  align-self: flex-start;
+  margin: 8px 10px 5px 5px;
+  border-radius: 4px;
+  width: 16px;
+  height: 16px;
+  img {
+    display: block;
+    border-radius: 2px;
+    // stop avatars with alpha showing the dark background
+    background-color: white;
+  }
+  position: relative;
+  z-index: 0;
+}
+
+.room-list-item__icon--favourite {
+  color: #526b75;
+  position: absolute;
+  z-index: -1;
+  margin-top: -9px;
+  margin-left: -4px;
+}
+
+.room-list-item__name {
+  display: inline-block;
+  padding: 0 10px 0 0;
+  flex-grow: 1;
+  line-height: @room-list-item-height;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  display: block;
+  overflow: hidden;
+}
+
+.room-list-item__action {
+  display: none;
+  align-self: flex-end;
+  flex-shrink: 0;
+  line-height: @room-list-item-height;
+  text-align: right;
+  opacity: 0.6;
+  transition: opacity 0.3s;
+}
+
+.room-list-item__action:hover {
+  opacity: 1;
+}
+
+.room-list-item .room-list-item__action:last-of-type {
+  padding-right: 0.625/2em;
+}
+
+body.hover .room-list-item:hover .room-list-item__action {
+  display: inline-block;
+}
+
+body.hover .room-list-item:hover:not(.room-list-item--current-room),
+.room-list-item.selected:not(.room-list-item--current-room) {
+  border-radius: 4px 0 0 4px;
+  background-color: rgba(255,255,255,0.2);
+  color: rgba(255,255,255,1);
+
+  &.chatting:after {
+    display: none;
+  }
+}
+
+.room-list-item__unread-badge {
+  flex-shrink: 0;
+  display: none;
+  border-radius: 4px;
+  display: block;
+  padding: 0 4px;
+  font-size: 10px;
+  height: 15px;
+  line-height: 15px;
+  font-weight: 700;
+  color: white;
+  white-space: nowrap;
+  background-color: @trpGreen;
+  margin-right: 0.8em;
+}
+
+.room-list-item__unread-badge.shown {
+  display: inline;
+}
+
+.room-list-item__unread-badge.mention {
+  background-color: @orange;
+  font-weight: 300;
+}
+
+.room-list-item--current-room {
+  border-radius: 4px 0 0 4px;
+  background-color: white;
+  color: lighten(@trpDarkBlue, 5%);
+}
+
+.room-list-item.chatting:after {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50em;
+  background-color: #1dce73;
+  position: relative;
+  right: 10px;
+  content: ' ';
+}
+
+.room-list-item.chatting.chatting-now:after {
+  animation-name: 'pulse_animation';
+  animation-duration: 800ms;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+.dragged .room-list-item__close,
+#list-search .room-list-item__close {
+  display: none;
+}
+
+.popover-button {
+  display: block;
+  padding: 0px 5px;
+  cursor: pointer;
+}
+
+.popover-button:hover {
+  text-decoration: none;
+  color: white;
+  background-color: @blue;
+  border-radius: 4px;
+}
