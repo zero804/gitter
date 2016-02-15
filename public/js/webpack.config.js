@@ -77,8 +77,11 @@ var webpackConfig = {
         test: /\.hbs$/,
         loader: "handlebars-loader", // disable minify for now + path.resolve(path.join(__dirname, "../../build-scripts/html-min-loader"))
         query: {
-          'helperDirs[]': [
+          'helperDirs': [
             path.resolve(__dirname, '../../shared/handlebars/helpers')
+          ],
+          'knownHelpers': [
+            'cdn'
           ]
         }
       },

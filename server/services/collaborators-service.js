@@ -51,19 +51,18 @@ function getStargazers(uri, user) {
 
 function getCollaboratorsForRepo(repoUri, security, user) {
   if (security === 'PUBLIC') {
-    return Promise.all([
+    return Promise.join(
         getContributors(repoUri, user),   // for public repos
         getCollaborators(repoUri, user),  // for private repos
-        getStargazers(repoUri, user)
-      ])
-      .spread(function(contributors, collaborators, stargazers) {
-        var related = contributors.concat(collaborators).concat(stargazers);
-        if (related.length) {
-          return related;
-        }
+        getStargazers(repoUri, user),
+        function(contributors, collaborators, stargazers) {
+          var related = contributors.concat(collaborators).concat(stargazers);
+          if (related.length) {
+            return related;
+          }
 
-        return getCollaboratorsForUser(user);
-      });
+          return getCollaboratorsForUser(user);
+        });
   }
 
   /* INHERITED and PRIVATE rooms */
@@ -84,20 +83,19 @@ function getCollaboratorsForUser(user) {
 
   return ghMe.getOrgs()
     .then(function(orgs) {
-      var promises = orgs.map(function(o) { return Promise.resolve(ghOrg.someMembers(o.login)); });
-
-      return Promise.all(promises.map(function(promise) {
-        return promise.reflect();
-      }));
+      return Promise.map(orgs, function(org) {
+        return ghOrg.someMembers(org.login).reflect();
+      });
     })
     .then(function (results) {
       var users = results
         .filter(function(inspection) {
           return inspection.isFulfilled();
         })
-        .map(function(inspection) {
-          return inspection.value();
-        });
+        .reduce(function(memo, inspection) {
+          memo = memo.concat(inspection.value());
+          return memo;
+        },[]);
 
       return withoutCurrentUser(users, user);
     });

@@ -1,10 +1,7 @@
-<a class="js-toggle-compose-mode">
-  {{#if isComposeModeEnabled}}
-  <i class="icon-keyboard-1"></i>
-  {{else}}
-  <i class="icon-chat-alt"></i>
-  {{/if}}
-</a>
-<a href="#markdown" class="js-markdown-help chat-input__button-markdown">
-  <i class="octicon octicon-markdown"></i>
+<button class="chat-input__button js-toggle-compose-mode" data-compose-mode="{{when isComposeModeEnabled 'true' 'false'}}" aria-label="{{composeModeMessage}}">
+  <i class="chat-input__button-icon chat-input__button-icon--compose icon-keyboard-1" aria-hidden="true"></i>
+  <i class="chat-input__button-icon chat-input__button-icon--chat icon-chat-alt" aria-hidden="true"></i>
+</button>
+<a href="#markdown" class="chat-input__button js-markdown-help" aria-label="{{markdownHelpMessage}}">
+  <i class="chat-input__button-icon octicon octicon-markdown" aria-hidden="true"></i>
 </a>

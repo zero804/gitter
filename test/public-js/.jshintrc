@@ -1,0 +1,14 @@
+{
+  "undef": true,
+  "node": true,
+  "browser": true,
+  "unused": true,
+  "predef": [
+      "describe",
+      "it",
+      "before",
+      "after",
+      "beforeEach",
+      "afterEach"
+  ]
+}

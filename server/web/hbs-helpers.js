@@ -110,6 +110,7 @@ exports.generateTroupeContext = function(troupeContext, parameters) {
 };
 
 exports.pluralize = require('../../shared/handlebars/helpers/pluralize');
+exports.when = require('../../shared/handlebars/helpers/when');
 
   exports.toLowerCase = function (str) {
   return str.toLowerCase();
