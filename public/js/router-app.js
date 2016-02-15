@@ -22,10 +22,6 @@ var urlParser                         = require('./utils/url-parser');
 var linkHandler                       = require('./components/link-handler');
 var roomListGenerator                 = require('./components/chat-cache/room-list-generator');
 
-console.log('-----------------------');
-console.log('this is working');
-console.log('-----------------------');
-
 require('components/statsc');
 require('views/widgets/preload');
 require('components/webNotifications');
