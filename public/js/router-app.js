@@ -5,7 +5,6 @@ require('utils/initial-setup');
 var appEvents             = require('utils/appevents');
 var context               = require('utils/context');
 var Backbone              = require('backbone');
-var _                     = require('underscore');
 var AppLayout             = require('views/layouts/app-layout');
 var LoadingView           = require('views/app/loading-view');
 var troupeCollections     = require('collections/instances/troupes');
@@ -24,8 +23,7 @@ var roomListGenerator     = require('./components/chat-cache/room-list-generator
 
 require('components/statsc');
 require('views/widgets/preload');
-require('components/webNotifications');
-require('components/desktopNotifications');
+require('components/user-notifications');
 require('template/helpers/all');
 require('components/bug-reporting');
 require('components/focus-events');

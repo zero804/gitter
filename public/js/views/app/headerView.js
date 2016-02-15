@@ -5,7 +5,7 @@ var apiClient                = require('components/apiClient');
 var Marionette               = require('backbone.marionette');
 var Backbone                 = require('backbone');
 var autolink                 = require('autolink');
-var notifications            = require('components/notifications');
+var userNotifications        = require('components/user-notifications');
 var Dropdown                 = require('views/controls/dropdown');
 var appEvents                = require('utils/appevents');
 var headerViewTemplate       = require('./tmpl/headerViewTemplate.hbs');
@@ -291,9 +291,7 @@ module.exports = Marionette.ItemView.extend({
   },
 
   requestBrowserNotificationsPermission: function() {
-    if(notifications.hasNotBeenSetup() && context().desktopNotifications){
-      notifications.enable();
-    }
+    userNotifications.requestAccess();
   },
 
   // Look at the attributes that have changed
