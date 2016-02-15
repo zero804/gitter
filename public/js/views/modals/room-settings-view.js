@@ -7,7 +7,7 @@ var apiClient              = require('components/apiClient');
 var ModalView              = require('./modal');
 var troupeSettingsTemplate = require('./tmpl/room-settings-view.hbs');
 var log                    = require('utils/log');
-var notifications          = require('components/notifications');
+var userNotifications      = require('components/user-notifications');
 
 
 var View = Marionette.ItemView.extend({
@@ -89,7 +89,7 @@ var View = Marionette.ItemView.extend({
     return _.extend({},
       context.getTroupe(), {
         lurk: context.troupe().get('lurk'),
-        notificationsBlocked: notifications.hasBeenDenied(),
+        notificationsBlocked: userNotifications.isAccessDenied(),
         isNativeDesktopApp: context().isNativeDesktopApp,
         troupeUrl: '//' + window.location.host + window.location.pathname
       });
