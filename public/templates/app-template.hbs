@@ -25,19 +25,7 @@
   </head>
   <body class='hover desktop application-container'>
     {{> staging_marker}}
-
-    {{{ prerenderView "js/views/menu/room/layout/room-menu-layout" desktop=true }}}
-    <div class="app-layout {{#if roomMenuIsPinned}}pinned{{/if}}">
-
-      <div id="iframe-region" class="iframe-region">
-        <iframe id="content-frame" src="{{ chatAppLocation }}" style="display: block; width: 100%; height: 100%; border: 0;" frameBorder="0"></iframe>
-        <div id="loading-frame" class="loading-frame hide">
-          <div class="loader"></div>
-        </div>
-      </div>
-
-    </div>
-
+    {{>switch_app_template_old}}
     {{{ generateTroupeContext troupeContext }}}
     {{{ bootScript bootScriptName jsRoot=jsRoot }}}
     {{> live_reload}}
