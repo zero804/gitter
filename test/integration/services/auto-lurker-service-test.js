@@ -12,6 +12,11 @@ var roomMembershipService = testRequire("./services/room-membership-service");
 var roomService = testRequire("./services/room-service");
 var userRoomNotificationService = testRequire("./services/user-room-notification-service");
 
+/**
+ * TODO: CODEDEBT: https://github.com/troupe/gitter-webapp/issues/991
+ *
+ * Renable these tests
+ */
 describe.skip('auto-lurker-service', function() {
 
   describe('#findLurkCandidates', function() {
