@@ -1,6 +1,7 @@
 /target
 node_modules
 .DS_Store
+.com.apple.timemachine.supported
 /.project
 /npm-debug.log
 /nodemon.log

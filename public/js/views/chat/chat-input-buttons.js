@@ -8,12 +8,17 @@ var KeyboardEventsMixin = require('views/keyboard-events-mixin');
 var isMobile = require('utils/is-mobile');
 require('views/behaviors/tooltip');
 
+
 var ChatInputButtons = Marionette.ItemView.extend({
   template: template,
 
   behaviors: {
     Tooltip: {
-      '.js-toggle-compose-mode': { titleFn: 'getComposeModeTitle', placement: 'left' },
+      '.js-toggle-compose-mode': {
+        titleFn: 'getComposeModeTitle',
+        placement: 'left',
+        customUpdateEvent: 'updateComposeTooltipText'
+      },
       '.js-markdown-help': { titleFn: 'getShowMarkdownTitle', placement: 'left'}
     }
   },
@@ -22,19 +27,12 @@ var ChatInputButtons = Marionette.ItemView.extend({
     composeToggle: '.js-toggle-compose-mode'
   },
 
-  onRender: function() {
-    // this.options.template is false for first render as it just
-    // binds to the existing server-side rendered html.
-    // this ensures that the next render will have a template.
-    this.options.template = template;
-  },
-
   events: {
     'click .js-toggle-compose-mode': 'toggleComposeMode',
   },
 
   modelEvents: {
-    'change:isComposeModeEnabled': 'render'
+    'change:isComposeModeEnabled': 'composeModeChanged'
   },
 
   keyboardEvents: {
@@ -55,6 +53,21 @@ var ChatInputButtons = Marionette.ItemView.extend({
     if (isMobile()) return;
 
     this.model.set('isComposeModeEnabled', !this.model.get('isComposeModeEnabled'));
+  },
+
+  composeModeChanged: function() {
+    this.ui.composeToggle[0].setAttribute('data-compose-mode', this.model.get('isComposeModeEnabled'));
+    this.ui.composeToggle[0].setAttribute('aria-label', this.getComposeModeTitle());
+    this.trigger('updateComposeTooltipText');
+  },
+
+  serializeData: function() {
+    var data = this.model.toJSON();
+
+    data.composeModeMessage = this.getComposeModeTitle();
+    data.markdownHelpMessage = this.getShowMarkdownTitle();
+
+    return data;
   }
 
 });

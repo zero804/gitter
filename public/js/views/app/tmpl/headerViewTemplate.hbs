@@ -6,18 +6,18 @@
 
   {{#if ownerIsOrg}}
     <div class="js-org-page chat-header__org-page">
-      <a href="{{orgPageHref}}" title="Navigate to {{orgName}}'s page"  class="org-page-link octicon octicon-globe js-org-page"></a>
+      <a href="{{orgPageHref}}" class="org-page-link octicon octicon-globe js-org-page" title="Navigate to {{orgName}}'s page" aria-label="Navigate to {{orgName}}'s page"></a>
     </div>
   {{/if}}
 
   {{#unless archives}}
     {{#if user}}
-      <div class="chat-header__favourite">
-        <i class="js-favourite-button icon-star-1 {{#if troupeFavourite}}favourite{{/if}}"></i>
-      </div>
-      <div class="chat-header__settings">
-        <i class="js-chat-settings octicon octicon-tools" data-toggle="dropdown"></i>
-      </div>
+      <button class="js-favourite-button chat-header__favourite" aria-label="Favourite {{troupeName}}">
+        <i class="icon-star-1 {{#if troupeFavourite}}favourite{{/if}}" aria-hidden="true"></i>
+      </button>
+        <button class="js-chat-settings chat-header__settings" aria-label="Open room settings dropdown">
+          <i class="octicon octicon-tools" data-toggle="dropdown" aria-hidden="true"></i>
+        </button>
     {{/if}}
   {{/unless}}
 
