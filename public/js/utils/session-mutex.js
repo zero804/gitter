@@ -12,11 +12,12 @@ function garbageCollection() {
   for (var i = storage.length; i >= 0; i--) {
     var key = storage.key(i);
     if (key && key.indexOf('lock:') === 0) {
-      var value = key.getItem(key);
+      var value = storage.getItem(key);
       if (value) {
         var pair = value.split('-');
         var lockDate =  parseInt(pair[0], 10);
-        if (now - lockDate > TIMEOUT) {
+
+        if (lockDate && (now - lockDate > TIMEOUT)) {
           storage.removeItem(key);
         }
       }
