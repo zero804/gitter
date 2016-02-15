@@ -426,7 +426,7 @@ function getUpdateForMode(mode) {
   var setBits = MODES[mode];
   var clearBits = BITMASK_INVERT_MODE | setBits;
 
-  var lurk = !!(setBits & BITMASK_NOTIFY_UNREAD);
+  var lurk = !(setBits & BITMASK_NOTIFY_UNREAD);
 
   return {
     $set: { lurk: lurk },
@@ -439,7 +439,7 @@ function getLurkForMode(mode) {
     throw new StatusError(400, 'Invalid mode ' + mode);
   }
 
-  return !!(MODES[mode] & BITMASK_NOTIFY_UNREAD);
+  return !(MODES[mode] & BITMASK_NOTIFY_UNREAD);
 }
 
 var getMembershipMode = Promise.method(function (userId, troupeId) {
@@ -452,7 +452,7 @@ var getMembershipMode = Promise.method(function (userId, troupeId) {
 });
 
 var setMembershipMode = Promise.method(function (userId, troupeId, value) {
-
+  debug('setMembershipMode userId=%s, troupeId=%s, value=%s', userId, troupeId, value);
   return TroupeUser.findOneAndUpdate({
       troupeId: troupeId,
       userId: userId
@@ -462,6 +462,7 @@ var setMembershipMode = Promise.method(function (userId, troupeId, value) {
     .exec()
     .then(function(oldTroupeUser) {
        if (!oldTroupeUser) return false;
+
        var valueIsLurking = getLurkForMode(value);
        var changed = getLurkFromTroupeUser(oldTroupeUser) !== valueIsLurking;
 

@@ -69,7 +69,7 @@ function filterNotificationsForPush(troupeId, chatId, userIds, mentioned) {
   // TODO: consider asking Redis whether its possible to send to this user BEFORE
   // going to mongo to get notification settings as reversing these two operations
   // may well be much faster
-  return userRoomNotificationService.findNotifySettingForUsersInRoom(troupeId, userIds)
+  return userRoomNotificationService.findSettingsForUsersInRoom(troupeId, userIds)
     .then(function(settings) {
       return Promise.map(userIds, function(userId) {
         var pushNotificationSetting = settings[userId];
