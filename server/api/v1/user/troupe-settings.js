@@ -16,7 +16,8 @@ module.exports = {
     return userRoomNotificationService.getSettingForUserRoom(userId, troupeId)
       .then(function(notificationSetting) {
         return {
-          push: notificationSetting
+          push: notificationSetting, // TODO: remove this once all clients understand 'mode'
+          mode: notificationSetting
         };
       });
 
@@ -27,11 +28,14 @@ module.exports = {
     var troupeId = req.params.userTroupeId;
     var setting = req.params.setting;
 
-    var settings = req.body;
-
     if (setting !== 'notifications') throw new StatusError(404);
 
-    return userRoomNotificationService.updateSettingForUserRoom(userId, troupeId, settings && settings.push)
+    var settings = req.body;
+    var mode = settings && (settings.mode || settings.push);
+
+    if (!mode) throw new StatusError(400, 'Illegal notifications mode');
+
+    return userRoomNotificationService.updateSettingForUserRoom(userId, troupeId, mode)
       .thenReturn({ success: true });
   }
 
