@@ -1,9 +1,9 @@
 "use strict";
+
 var _ = require('underscore');
 var context = require('utils/context');
 var appEvents = require('utils/appevents');
 var apiClient = require('components/apiClient');
-
 
 function updateNotifications(mode) {
   apiClient.userRoom.put('/settings/notifications', { mode: mode })
@@ -253,14 +253,14 @@ var commandsList = [
       return !context.inOneToOneTroupeContext();
     },
     action: function() {
-      updateNotifications('mention');
+      updateNotifications('announcements');
     }
   },
   {
-    command: 'notify-none',
-    description: 'Mute all notifications for this room',
-    completion: 'notify-none',
-    regexp: /^\/notify-none\s*$/,
+    command: 'notify-mute',
+    description: 'Mute all notifications, except mentions',
+    completion: 'notify-mute',
+    regexp: /^\/notify-mute\s*$/,
     criteria: function() {
       return !context.inOneToOneTroupeContext();
     },

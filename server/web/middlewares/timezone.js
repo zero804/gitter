@@ -34,13 +34,15 @@ function parseTimezoneCookie(value) {
   return { offset: offset, abbr: abbr, iana: iana };
 }
 
+/* Note, does not return a promise */
 function updateUserTzInfo(user, timezoneInfo) {
   debug("Saving timezone information for user %s: %j", user.username, timezoneInfo);
   userService.updateTzInfo(user._id, timezoneInfo)
     .catch(function(err) {
       logger.error("Unable to save timezone info for user", { exception: err });
       errorReporter(err, { user: user.username }, { module: 'timezone-middleware'});
-    });
+    })
+    .done();
 }
 
 module.exports = function(req, res, next) {
