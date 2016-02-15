@@ -8,10 +8,6 @@ set -euo pipefail
 
 DOCKER_MACHINE_NAME=${DOCKER_MACHINE_NAME-default}
 
-echo  '---------------------------------'
-echo HAS_DOCKER_MACHINE;
-echo  '---------------------------------'
-
 function get_ip {
   if [[ "$OSTYPE" != "linux-gnu" ]]; then
     echo "$(docker-machine ip $DOCKER_MACHINE_NAME)"
