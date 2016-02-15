@@ -237,9 +237,6 @@ var commandsList = [
     description: 'Get notified on all messages',
     completion: 'notify-all',
     regexp: /^\/notify-all\s*$/,
-    criteria: function() {
-      return !context.inOneToOneTroupeContext();
-    },
     action: function() {
       updateNotifications('all');
     }
@@ -251,9 +248,6 @@ var commandsList = [
     description: 'Get notified on mentions and group messages',
     completion: 'notify-mentions',
     regexp: /^\/notify-mentions\s*$/,
-    criteria: function() {
-      return !context.inOneToOneTroupeContext();
-    },
     action: function() {
       updateNotifications('mention');
     }
