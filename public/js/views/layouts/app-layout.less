@@ -3,15 +3,19 @@
   position: absolute;
   right: 0;
   height: 100%;
-  width: ~"calc(100% -" @desktop-menu-width ~")";
+  width: 100%;
   transition: width .2s ease-in;
 
-  &.pinned {
-    width: ~"calc(100% - (" @menu-panel-desktop-width ~"))";
-  }
 
   .logged-out & {
     right: auto;
+  }
+}
+
+.app-layout--left-menu {
+  width: ~"calc(100% -" @desktop-menu-width ~")";
+  &.pinned {
+    width: ~"calc(100% - (" @menu-panel-desktop-width ~"))";
   }
 }
 
