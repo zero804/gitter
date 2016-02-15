@@ -6,9 +6,19 @@ var context                = require('utils/context');
 var apiClient              = require('components/apiClient');
 var ModalView              = require('./modal');
 var troupeSettingsTemplate = require('./tmpl/room-settings-view.hbs');
-var log                    = require('utils/log');
 var notifications          = require('components/notifications');
 
+function getNotificationSetting(value) {
+  switch(value) {
+    case 'all': return 'all';
+    case 'annoucements': return 'mention';
+    case 'mention': return 'mention';
+    // TODO: CODEDEBT: https://github.com/troupe/gitter-webapp/issues/988
+    case 'mute': return 'mention';
+    default:
+      return 'mention';
+  }
+}
 
 var View = Marionette.ItemView.extend({
   template: troupeSettingsTemplate,
@@ -33,7 +43,7 @@ var View = Marionette.ItemView.extend({
       apiClient.userRoom.get('/settings/notifications')
         .bind(this)
         .then(function(settings) {
-          this.settings = settings && settings.push || "all";
+          this.settings = getNotificationSetting(settings && settings.mode);
           this.ui.options.val(this.settings);
         });
     }
