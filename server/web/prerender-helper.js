@@ -4,7 +4,15 @@ var compileTemplate = require('./compile-web-template');
 var prerenderWrapper = require('./prerender-wrapper');
 
 var PRERENDERED_VIEWS = [
+  //NEW LEFT MENU
   "js/views/menu/room/layout/room-menu-layout",
+  "js/views/menu/room/search-input/search-input-view",
+
+  //OLD MENU
+  "js/views/menu/old/tmpl/troupeMenu",
+  "js/views/menu/old/tmpl/profile",
+  "js/views/menu/old/tmpl/org-list-item",
+
   "js/views/archive/tmpl/archive-navigation-view",
   "js/views/app/tmpl/headerViewTemplate",
   "js/views/app/tmpl/headerViewTemplate",
@@ -12,7 +20,6 @@ var PRERENDERED_VIEWS = [
   "js/views/chat/tmpl/chat-input-box",
   "js/views/chat/tmpl/chat-input-buttons",
   "js/views/chat/tmpl/join-room-view",
-  "js/views/menu/room/search-input/search-input-view",
   'js/views/people/tmpl/peopleCollectionView',
   /* new */
 ].reduce(function(memo, v) {
