@@ -3,6 +3,7 @@
 
 var assert                 = require('assert');
 var Backbone               = require('backbone');
+var moment                 = require('moment');
 var FilteredRoomCollection = require('public/js/collections/filtered-room-collection');
 var MockRoomCollection     = require('fixtures/helpers/room-collection');
 
@@ -88,6 +89,16 @@ describe('FilteredRoomCollection()', function() {
       done();
     });
 
+  });
+
+  it('should sort first by mentions', function(){
+    roomCollection.on('snapshot', function(){
+      var first = roomCollection.get(8);  first.set('mentions', true);
+      var second = roomCollection.get(7); second.set('mentions', true);
+      filteredRoomCollection.sort();
+      assert(filteredRoomCollection.models[0].get('id') === 7);
+      assert(filteredRoomCollection.models[1].get('id') === 8);
+    });
   });
 
 });

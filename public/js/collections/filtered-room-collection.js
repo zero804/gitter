@@ -3,7 +3,7 @@
 var Backbone = require('backbone');
 var BackboneFilteredCollection = require('filtered-collection');
 
-module.exports = Backbone.FilteredCollection.extend({
+var FilteredRoomCollection = Backbone.FilteredCollection.extend({
   initialize: function(collection, options) {//jshint unused: true
     if (!options || !options.roomModel) {
       throw new Error('A valid RoomMenuModel must be passed to a new instance of FilteredRoomCollection');
@@ -25,6 +25,28 @@ module.exports = Backbone.FilteredCollection.extend({
     BackboneFilteredCollection.prototype.initialize.apply(this, arguments);
   },
 
+  comparator: function(a, b) {
+    var aMentions   = a.get('mentions');
+    var bMentions   = b.get('mentions');
+    if (!!aMentions) { return -1; }
+    if (!!bMentions) { return 1; }
+
+    var aUnread = !!a.get('unreadItems');
+    var bUnread = !!b.get('unreadItems');
+
+    if (!!aUnread) { return -1; }
+    if (!!bUnread) { return 1;}
+
+    var aLastAccess = a.get('lastAccessTime');
+    var bLastAccess = b.get('lastAccessTime');
+
+    if(!aLastAccess || !aLastAccess.valueOf) { return 1 }
+    if(!bLastAccess || !bLastAccess.valueOf) { return -1 }
+
+    return aLastAccess < bLastAccess ? 1 : -1;
+
+  },
+
   onModelChangeState: function(model, val) {//jshint unused: true
     switch (val) {
       case 'favourite' :
@@ -33,20 +55,24 @@ module.exports = Backbone.FilteredCollection.extend({
         this.sort();
         break;
       case 'people' :
-        this.comparator = null;
         this.setFilter(this.filterOneToOnes);
+        this.comparator = FilteredRoomCollection.prototype.comparator;
+        this.sort();
         break;
       case 'search' :
-        this.comparator = null;
         this.setFilter(this.filterSearches);
+        this.comparator = FilteredRoomCollection.prototype.comparator;
+        this.sort();
         break;
       case 'org' :
-        this.comparator = null;
         this.setFilter(this.filterOrgRooms.bind(this));
+        this.comparator = FilteredRoomCollection.prototype.comparator;
+        this.sort();
         break;
       default:
-        this.comparator = null;
         this.setFilter(false);
+        this.comparator = FilteredRoomCollection.prototype.comparator;
+        this.sort();
         break;
     }
   },
@@ -82,13 +108,16 @@ module.exports = Backbone.FilteredCollection.extend({
     return (a.get('favourite') < b.get('favourite')) ? -1 : 1;
   },
 
-  onSync: function (){
-    if(this.comparator) { this.sort() }
+  onSync: function() {
+    if (this.comparator) { this.sort(); }
   },
 
-  sort: function (){
-    if(!this.comparator) { return }
+  sort: function() {
+    if (!this.comparator) { return; }
+
     Backbone.FilteredCollection.prototype.sort.apply(this, arguments);
   },
 
 });
+
+module.exports = FilteredRoomCollection;
