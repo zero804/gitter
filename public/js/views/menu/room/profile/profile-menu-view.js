@@ -15,14 +15,14 @@ var profileCollection = new Backbone.Collection([
 
 var ItemView = Marionette.ItemView.extend({
   tagName: 'li',
-  className: 'profile-menu__item',
+  className: 'lm-profile-menu__item',
   template: itemTemplate
 });
 
 module.exports = Marionette.CollectionView.extend({
 
   tagName: 'ul',
-  className: 'profile-menu',
+  className: 'lm-profile-menu',
   childView: ItemView,
 
   constructor: function (){
