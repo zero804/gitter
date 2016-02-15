@@ -11,7 +11,12 @@ var MobileLayout          = require('views/layouts/mobile');
 var RoomCollectionTracker = require('components/room-collection-tracker');
 var troupeCollections     = require('collections/instances/troupes');
 var unreadItemsClient     = require('components/unread-items-client');
-var gestures              = require('utils/gesture-controller');
+
+//Remove when left menu is in place
+var FastClick = require('fastclick');
+
+//Left Menu Additions
+//var gestures              = require('utils/gesture-controller');
 
 require('utils/tracking');
 
@@ -27,7 +32,12 @@ require('utils/gesture-controller');
 
 onready(function() {
 
-  gestures.init();
+  //Ledt Menu Additions
+  //gestures.init();
+
+
+  //Remove when left menu is in place
+  FastClick.attach(document.body);
 
   require('components/link-handler').installLinkHandler();
   appEvents.on('navigation', function(url) {
@@ -47,7 +57,8 @@ onready(function() {
     template: false,
     el: 'body',
     chatCollection: chatCollection,
-    roomCollection: troupeCollections.troupes
+    //Left Menu Additions
+    //roomCollection: troupeCollections.troupes
   });
   appView.render();
 

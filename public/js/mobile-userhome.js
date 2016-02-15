@@ -6,7 +6,12 @@ var confirmRepoRoomView  = require('views/modals/confirm-repo-room-view.js');
 var modalRegion          = require('components/modal-region');
 var onready              = require('./utils/onready');
 var MobileUserhomeLayout = require('views/layouts/mobile-userhome');
-var gestures             = require('utils/gesture-controller');
+
+//Left Menu Additions
+//var gestures             = require('utils/gesture-controller');
+
+//Remove when Lef Menu is in
+var FastClick = require('fastclick');
 
 require('utils/tracking');
 
@@ -17,7 +22,11 @@ require('template/helpers/all');
 
 onready(function() {
 
-  gestures.init();
+  //Left Menu Additions
+  //gestures.init();
+
+  //Remove for Left Menu
+  FastClick.attach(document.body);
 
   require('components/link-handler').installLinkHandler();
   appEvents.on('navigation', function(url) {
