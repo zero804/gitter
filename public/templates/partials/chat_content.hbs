@@ -5,16 +5,16 @@
       <div id="unread-banner" style="display:none"></div>
       <div id="bottom-unread-banner" style="display:none"></div>
 
-      <div class="trpChatContainer primary-scroll chat-container" id="content-frame">
+      <div id="content-frame" class="trpChatContainer primary-scroll chat-container" role="log" aria-live="polite" aria-atomic="false" aria-relevant="additions text">
         <div id="chat-container">
           {{#if oneToOneInvited}}
             {{> chat_invited}}
           {{else}}
             <div>
-            {{#each chats}}
-              {{{ chatItemPrerender this }}}
-            {{/each}}
-          </div>
+              {{#each chats}}
+                {{{ chatItemPrerender this }}}
+              {{/each}}
+            </div>
           {{/if}}
         </div>
         {{#if initialBottom}}
