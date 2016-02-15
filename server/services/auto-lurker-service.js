@@ -8,7 +8,7 @@ var unreadItemService           = require('./unread-item-service');
 var Promise                     = require('bluebird');
 var roomMembershipService       = require('./room-membership-service');
 
-/* TODO TODO TODO TODO XXX THIS IS BROKEN! */
+/* CODEDEBT: https://github.com/troupe/gitter-webapp/issues/991 */
 
 /**
  * Returns a list of users who could be lurked
