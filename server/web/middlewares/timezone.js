@@ -34,7 +34,10 @@ function parseTimezoneCookie(value) {
   return { offset: offset, abbr: abbr, iana: iana };
 }
 
-/* Note, does not return a promise */
+/**
+ * Note, does not return a promise as it's indented to be
+ * called outside of the promise-chain.
+ */
 function updateUserTzInfo(user, timezoneInfo) {
   debug("Saving timezone information for user %s: %j", user.username, timezoneInfo);
   userService.updateTzInfo(user._id, timezoneInfo)
