@@ -34,8 +34,9 @@ describe("User Service", function() {
 
   it('should be able to create a \'ghost\' user using his username #slow', function() {
     var userService = testRequire("./services/user-service");
+    var FAKE_USER = { username: 'gittertestbot', githubToken: '***REMOVED***'};
 
-    return userService.createInvitedUser('node-gitter')
+    return userService.createInvitedUser('node-gitter', FAKE_USER)
       .then(function(user) {
         assert.equal(user.username,'node-gitter');
         assert.equal(user.state, 'INVITED');
