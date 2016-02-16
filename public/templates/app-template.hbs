@@ -25,7 +25,14 @@
   </head>
   <body class='hover desktop application-container'>
     {{> staging_marker}}
-    {{>switch_app_template_old}}
+
+    {{! feature switch left-menu }}
+    {{#if hasNewLeftMenu}}
+      {{>switch_app_template_new}}
+    {{else}}
+      {{>switch_app_template_old}}
+    {{/if}}
+
     {{{ generateTroupeContext troupeContext }}}
     {{{ bootScript bootScriptName jsRoot=jsRoot }}}
     {{> live_reload}}

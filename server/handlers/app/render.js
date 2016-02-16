@@ -195,13 +195,11 @@ function renderMainFrame(req, res, next, frame) {
     .spread(function (troupeContext, rooms, permalinkChat) {
 
       var chatAppQuery = {};
-      if (aroundId) {
-        chatAppQuery.at = aroundId;
-      }
+      if (aroundId) { chatAppQuery.at = aroundId; }
       var chatAppLocation = url.format({
         pathname: '/' + req.uriContext.uri + '/~' + frame,
-        query: chatAppQuery,
-        hash: '#initial'
+        query:    chatAppQuery,
+        hash:     '#initial'
       });
 
       var template, bootScriptName;
@@ -237,6 +235,8 @@ function renderMainFrame(req, res, next, frame) {
         state:            'all',
       });
 
+      var hasNewLeftMenu = req.fflip && req.fflip.has('left-menu');
+
       //If we are in any kind of org room && that org exists in out suggested org list
       //set the menu state to org and the selectedOrg to the given org
       //JP 25/1/16
@@ -254,23 +254,34 @@ function renderMainFrame(req, res, next, frame) {
       }
 
       res.render(template, {
-        socialMetadata: socialMetadata,
-        bootScriptName: bootScriptName,
-        cssFileName: "styles/" + bootScriptName + ".css",
-        troupeName: req.uriContext.uri,
-        troupeContext: troupeContext,
-        roomMenuIsPinned: troupeContext.leftRoomMenuState.roomMenuIsPinned,
-        chatAppLocation: chatAppLocation,
-        agent: req.headers['user-agent'],
-        stagingText: stagingText,
-        stagingLink: stagingLink,
-        dnsPrefetch: dnsPrefetch,
-        subresources: getSubResources(bootScriptName),
-        showFooterButtons: true,
-        showUnreadTab: true,
+        socialMetadata:     socialMetadata,
+        bootScriptName:     bootScriptName,
+        cssFileName:        "styles/" + bootScriptName + ".css",
+        troupeName:         req.uriContext.uri,
+        troupeContext:      troupeContext,
+        roomMenuIsPinned:   troupeContext.leftRoomMenuState.roomMenuIsPinned,
+        chatAppLocation:    chatAppLocation,
+        agent:              req.headers['user-agent'],
+        stagingText:        stagingText,
+        stagingLink:        stagingLink,
+        dnsPrefetch:        dnsPrefetch,
+        subresources:       getSubResources(bootScriptName),
+        showFooterButtons:  true,
+        showUnreadTab:      true,
         menuHeaderExpanded: false,
-        user: user,
-        orgs: orgs
+        user:               user,
+        orgs:               orgs,
+        hasNewLeftMenu:     hasNewLeftMenu,
+        rooms: {
+          favourites: rooms
+            .filter(roomSort.favourites.filter)
+            .sort(roomSort.favourites.sort),
+          recents: rooms
+            .filter(roomSort.recents.filter)
+            .sort(roomSort.recents.sort)
+        },
+        userHasNoOrgs: !orgs || !orgs.length
+
       });
     })
     .catch(next);
