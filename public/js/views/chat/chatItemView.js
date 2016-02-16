@@ -240,22 +240,11 @@ module.exports = (function() {
       // this.$el.toggleClass('cantEdit', !canEdit);
     },
 
-    /* jshint maxcomplexity: 29 */
     updateRender: function(changes) {
       /* NB: `unread` updates occur in the behaviour */
       var model = this.model;
       var $el = this.$el;
       var sentElement = this.ui.sent[0];
-      var classList = this.el.classList;
-
-
-      function toggleClass(className, state) {
-        if(state) {
-          classList.add(className);
-        } else {
-          classList.remove(className);
-        }
-      }
 
       if (!changes || 'html' in changes || 'text' in changes) {
         this.renderText();
@@ -280,34 +269,52 @@ module.exports = (function() {
         }
       }
 
+      this.handleUpdateMentionChanges(changes);
+      this.handleUpdateMessageStateChanges(changes);
+      this.handleUpdateReadbyStateChanges(changes);
+      this.handleUpdateCollapseStateChanges(changes);
+
+      if (!context.isLoggedIn()) this.ui.actions.hide();
+    },
+    handleUpdateMentionChanges: function(changes) {
       if(!changes || 'mentioned' in changes) {
-        toggleClass('mentioned', model.get('mentioned'));
+        var wasMentioned = this.model.get('mentioned');
+        this.el.classList.toggle('mentioned', wasMentioned);
+        if(wasMentioned) {
+          this.el.setAttribute('aria-live', 'assertive');
+          this.el.setAttribute('role', 'alert');
+        }
       }
+    },
+    handleUpdateMessageStateChanges: function(changes) {
+      var model = this.model;
 
       if(!changes || 'fromUser' in changes) {
-        toggleClass('isViewers', this.isOwnMessage());
+        this.el.classList.toggle('isViewers', this.isOwnMessage());
       }
 
       if(!changes || 'editedAt' in changes) {
-        toggleClass('hasBeenEdited', this.hasBeenEdited());
+        this.el.classList.toggle('hasBeenEdited', this.hasBeenEdited());
       }
 
       if(!changes || 'burstStart' in changes) {
-        toggleClass('burstStart', !!model.get('burstStart'));
-        toggleClass('burstContinued', !model.get('burstStart'));
+        this.el.classList.toggle('burstStart', !!model.get('burstStart'));
+        this.el.classList.toggle('burstContinued', !model.get('burstStart'));
       }
 
       if (!changes || 'burstFinal' in changes) {
-        toggleClass('burstFinal', !!model.get('burstFinal'));
+        this.el.classList.toggle('burstFinal', !!model.get('burstFinal'));
       }
-
+    },
+    handleUpdateReadbyStateChanges: function(changes) {
       /* Don't run on the initial (changed=undefined) as its done in the template */
       // FIXME this is whole thing is pretty ugly, could do with a refactor
       // First iteration: we're not appending the read icon here, just adding a class to display it
       if (changes && 'readBy' in changes) {
+        var model = this.model;
         var readByCount = model.get('readBy');
         var oldValue = model.previous('readBy');
-        var readByLabel = $el.find('.js-chat-item-readby');
+        var readByLabel = this.$el.find('.js-chat-item-readby');
         var className = "chat-item__icon--read-by-some";
 
         if(readByLabel.length === 0) {
@@ -323,9 +330,10 @@ module.exports = (function() {
           }
         }
       }
-
+    },
+    handleUpdateCollapseStateChanges: function(changes) {
       if(changes && 'collapsed' in changes) {
-        var collapsed = model.get('collapsed');
+        var collapsed = this.model.get('collapsed');
         if(collapsed) {
           this.collapseEmbeds();
         } else {
@@ -335,12 +343,10 @@ module.exports = (function() {
       }
 
       if(!changes || 'isCollapsible' in changes) {
-        var isCollapsible = !!model.get('isCollapsible');
+        var isCollapsible = !!this.model.get('isCollapsible');
         var $collapse = this.ui.collapse;
         toggle($collapse[0], isCollapsible);
       }
-
-      if (!context.isLoggedIn()) this.ui.actions.hide();
     },
 
     focusInput: function() {

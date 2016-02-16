@@ -1,5 +1,4 @@
-/*jslint node:true, unused:true*/
-/*global describe:true, it:true, beforeEach:true */
+'use strict';
 
 var UnreadItemsStore = require('../../../public/js/components/unread-items-client-store');
 var assert = require('assert');
