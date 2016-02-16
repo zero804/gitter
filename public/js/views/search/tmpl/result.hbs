@@ -1,0 +1,10 @@
+{{!-- wrapped by div.result --}}
+<div class='result-avatar'>
+  <img src="{{ avatarUrl }}">
+</div>
+<div class='result-content {{^sent}} result-room {{/sent}} {{#sent}} result-message {{/sent}}'>
+  {{#if sentFormatted}}
+    <p class="result-detail"><small>{{ detail }}  &bull; <span id="time">{{ sentFormatted }}</span></small></p>
+  {{/if}}
+  {{ text }}
+</div>

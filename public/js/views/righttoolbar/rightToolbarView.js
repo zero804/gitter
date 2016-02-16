@@ -7,6 +7,10 @@ var PeopleCollectionView  = require('views/people/peopleCollectionView');
 var RepoInfoView          = require('./repoInfo');
 var ActivityCompositeView = require('./activityCompositeView');
 var hasScrollBars         = require('utils/scrollbar-detect');
+
+var SearchView            = require('views/search/searchView');
+var SearchInputView       = require('views/search/search-input-view');
+
 require('views/behaviors/isomorphic');
 
 module.exports = (function() {
@@ -15,6 +19,8 @@ module.exports = (function() {
     className: 'right-toolbar right-toolbar--collapsible',
     behaviors: {
       Isomorphic: {
+        search:    { el: '#search-results', init: 'initSearchRegion' },
+        header:    { el: '#right-toolbar-header-region', init: 'initSearchInputRegion' },
         repo_info: { el: '#repo-info', init: 'initRepo_infoRegion' },
         activity:  { el: '#activity-region', init: 'initActivityRegion' },
         roster:    { el: '#people-roster', init: 'initRosterRegion' },
@@ -86,6 +92,14 @@ module.exports = (function() {
       return new PeopleCollectionView.ExpandableRosterView(optionsForRegion({
         rosterCollection: itemCollections.roster
       }));
+    },
+
+    initSearchRegion: function(optionsForRegion) {
+      return new SearchView(optionsForRegion({ model: this.searchState }));
+    },
+
+    initSearchInputRegion: function(optionsForRegion) {
+      return new SearchInputView(optionsForRegion({ model: this.searchState }));
     },
 
     expandSearch: function() {
