@@ -95,11 +95,11 @@ module.exports = (function() {
     },
 
     initSearchRegion: function(optionsForRegion) {
-      return new SearchView(optionsForRegion({ model: this.searchState }));
+      if(!context.hasFeature('left-menu')) { return new SearchView(optionsForRegion({ model: this.searchState })); }
     },
 
     initSearchInputRegion: function(optionsForRegion) {
-      return new SearchInputView(optionsForRegion({ model: this.searchState }));
+      if(!context.hasFeature('left-menu')) { return new SearchInputView(optionsForRegion({ model: this.searchState })); }
     },
 
     expandSearch: function() {
