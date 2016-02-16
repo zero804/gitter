@@ -32,24 +32,23 @@
 .search.active .search-input__clear { display: block; }
 
 .search__toggle {
+  display: none;
   padding: 8px;
   background-color: transparent;
   border: none;
+
+  @media @mid {
+    display: block;
+  }
 }
 
 .search__toggle-icon {
   font-size: 18px;
-  display: none;
   opacity: 0.4;
-  cursor: pointer;
   transition: opacity 0.2s ease-in-out;
 
   &:hover {
     opacity: 1;
-  }
-
-  @media @mid {
-    display: block;
   }
 }
 
