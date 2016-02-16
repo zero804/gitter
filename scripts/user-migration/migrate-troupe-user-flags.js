@@ -10,7 +10,6 @@ var roomMembershipFlags = require('../../server/services/room-membership-flags')
 var onMongoConnect = require('../../server/utils/on-mongo-connect');
 var through2Concurrent = require('through2-concurrent');
 var BatchStream = require('batch-stream');
-var ObjectID = require('mongodb').ObjectID;
 var _ = require('lodash');
 var Promise = require('bluebird');
 
@@ -49,7 +48,7 @@ function getModeFromLurkAndSettings(lurk, notificationSetting) {
   switch(notificationSetting || "none") {
     case "all":
       if (lurk) {
-        return { mode: "announcement", warning: 1 };
+        return { mode: "mention", warning: 1 };
       } else {
         return { mode: "all" };
       }
