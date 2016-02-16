@@ -12,6 +12,7 @@ var ChatEditView = Marionette.ItemView.extend({
   template: false,
 
   events: {
+    'textInput': 'onTextInput',
     'input': 'onInput',
     'blur': 'onBlur'
   },
@@ -55,6 +56,18 @@ var ChatEditView = Marionette.ItemView.extend({
 
   onKeyEscape: function() {
     this.trigger('cancel');
+  },
+
+  onTextInput: function($event) {
+    var event = $event.originalEvent;
+    var key = event.data;
+    if (isMobile() && '\n' === key) {
+      // google keyboard v4.1 on android doesnt actually send the correct
+      // keyup/down events for the return key (code 13). This means that our
+      // keyboardEvents dont fire, but we do have a "textInput" event that
+      // we can fake it with.
+      return this.onKeySend(event);
+    }
   },
 
   onKeySend: function(event) {
