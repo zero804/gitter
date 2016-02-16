@@ -5,6 +5,7 @@ var appEvents   = require('utils/appevents');
 
 //OLD LEFT MENU
 var TroupeMenu = require('views/menu/old/troupeMenu');
+var context    = require('utils/context');
 
 //NEW LEFT MENU
 var RoomMenuLayout    = require('../menu/room/layout/room-menu-layout');
@@ -25,11 +26,17 @@ module.exports = (function () {
     template: false,
     el: 'body',
 
-    behaviors: {
-      Isomorphic: {
-        menu: { el: "#menu-region", init: 'initMenuRegion' }
-        //RoomMenuLayout: { el: '#room-menu-container', init: 'initNewMenuRegion' }
-      },
+    behaviors: function(){
+      if(!context.hasFeature('left-menu')) {
+        return { Isomorphic: {
+          menu: { el: "#menu-region", init: 'initMenuRegion' }
+        }};
+      }
+      else {
+        return { Isomorphic: {
+          RoomMenuLayout: { el: '#room-menu-container', init: 'initNewMenuRegion' }
+        }};
+      }
     },
 
     events: {
@@ -43,7 +50,6 @@ module.exports = (function () {
     },
 
     initMenuRegion: function (optionsForRegion){
-      console.log('returning new troupe menu');
       return new TroupeMenu(optionsForRegion());
     },
 
