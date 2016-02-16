@@ -6,8 +6,6 @@ var userService = testRequire('./services/user-service');
 var fixtureLoader = require('../test-fixtures');
 var assert = require('assert');
 
-var restSerializer = testRequire("./serializers/rest-serializer");
-
 var counter = 0;
 
 // identities need providerKey and it has to be unique
@@ -70,7 +68,7 @@ describe('restful', function() {
   it('returns a github-backed profile #slow', function(done) {
     return ensureGitHubUser(hardcodedGitHubUser)
       .then(function() {
-        return restful.serializeProfileForUsername(hardcodedGitHubUser.username)
+        return restful.serializeProfileForUsername(hardcodedGitHubUser.username);
       })
       .then(function(profile) {
         assert(profile.id);

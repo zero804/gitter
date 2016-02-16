@@ -4,7 +4,7 @@
 var makeBenchmark = require('../make-benchmark');
 var testRequire = require('../integration/test-require');
 var _ = require('lodash');
-var Q = require('q');
+var Promise = require('bluebird');
 
 var mongoUtils = testRequire('./utils/mongo-utils');
 var unreadItemsServiceEngine = testRequire('./services/unread-item-service-engine');
@@ -45,7 +45,7 @@ makeBenchmark({
   before: function(done) {
     unreadItemsServiceEngine.newItemWithMentions(troupeId, mongoUtils.getNewObjectIdString(), [userIdWithSet], [])
       .then(function() {
-        return Q.all(_.range(120).map(function() {
+        return Promise.all(_.range(120).map(function() {
           unreadItemsServiceEngine.newItemWithMentions(troupeId, mongoUtils.getNewObjectIdString(), [userIdWithSortedSet], []);
         }));
       })

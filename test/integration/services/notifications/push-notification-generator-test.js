@@ -3,24 +3,23 @@
 "use strict";
 
 var testRequire = require('../../test-require');
-var Q = require('q');
+var Promise = require('bluebird');
 var mockito = require('jsmockito').JsMockito;
 var assert = require('assert');
 
 var times = mockito.Verifiers.times;
-var never = times(0);
 var once = times(1);
 
 var userTroupeSettingsServiceStub = {
   '../user-troupe-settings-service': {
     getMultiUserTroupeSettings: function() {
-      return Q.fcall(function() { return {}; });
+      return Promise.try(function() { return {}; });
     }
   }
 };
 
 var pushNotificationFilterStub = {
-  canUnlockForNotification: function() { return Q.resolve(Date.now()); }
+  canUnlockForNotification: function() { return Promise.resolve(Date.now()); }
 };
 
 var userServiceStub = {
@@ -28,8 +27,8 @@ var userServiceStub = {
 };
 
 var unreadItemServiceStub = {
-  getUnreadItemsForUserTroupeSince: function(x, y, z) {
-    return Q.resolve([['chat1234567890'], []]);
+  getUnreadItemsForUserTroupeSince: function() {
+    return Promise.resolve([['chat1234567890'], []]);
   }
 };
 
@@ -42,7 +41,7 @@ var notificationSerializerStub = {
     };
   },
   serialize: function(item, strategy) {
-    return Q.fcall(function() {
+    return Promise.try(function() {
       if(strategy.name === 'troupeId') {
         return {id: 'serializedId', name: 'serializedName', url: 'serializedUrl'};
       } else if(strategy.name === 'chatId') {
@@ -56,7 +55,7 @@ describe('push notification generator service', function() {
 
   it('should send a notification', function(done) {
     var mockSendUserNotification = mockito.mockFunction();
-    mockito.when(mockSendUserNotification)().then(function() { return Q.resolve(); });
+    mockito.when(mockSendUserNotification)().then(function() { return Promise.resolve(); });
 
     var service = testRequire.withProxies('./services/notifications/push-notification-generator', {
       '../user-troupe-settings-service': userTroupeSettingsServiceStub,
@@ -84,7 +83,7 @@ describe('push notification generator service', function() {
       assert.equal(notification.roomName, "serializedName");
       assert(notification.message);
       assert(notification.message.indexOf('serializedFromUser') >= 0, 'serialized unread chat data not found');
-      return Q.resolve();
+      return Promise.resolve();
     };
 
     var service = testRequire.withProxies('./services/notifications/push-notification-generator', {

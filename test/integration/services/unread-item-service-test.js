@@ -15,7 +15,7 @@ var testRequire = require('../test-require');
 var mockito = require('jsmockito').JsMockito;
 var hamcrest = getHamcrest();
 
-var Q = require('q');
+var Promise = require('bluebird');
 var assert = require('assert');
 
 var times = mockito.Verifiers.times;
@@ -39,7 +39,7 @@ var equivalentMap = function(expected) {
   return allOf(Object.keys(expected).map(function(key) {
     return hasMember(key, equalTo(expected[key]));
   }));
-}
+};
 
 function makeHash() {
   var hash = [];
@@ -57,8 +57,6 @@ function deep(object) {
 
   return allOf.apply(null, items);
 }
-
-Q.longStackSupport = true;
 
 describe('unread-item-service', function() {
   var unreadItemService, mongoUtils;
@@ -155,13 +153,13 @@ describe('unread-item-service', function() {
         ];
 
         mockito.when(recentRoomCore).getTroupeLastAccessTimesForUser(userId1)
-        .thenReturn(Q.resolve(lastAccessTimes));
+        .thenReturn(Promise.resolve(lastAccessTimes));
 
         mockito.when(engine).getLastChatTimestamps([troupeId1, troupeId2, troupeId3])
-        .thenReturn(Q.resolve(lastChatTimes));
+        .thenReturn(Promise.resolve(lastChatTimes));
 
         mockito.when(engine).getLastChatTimestamps([])
-        .thenReturn(Q.resolve({}));
+        .thenReturn(Promise.resolve({}));
 
         unreadItemService = testRequire.withProxies("./services/unread-item-service", {
           './core/recent-room-core': recentRoomCore,
@@ -263,9 +261,9 @@ describe('unread-item-service', function() {
         userService = mockito.mock(testRequire('./services/user-service'));
         roomPermissionsModel = mockito.mockFunction();
 
-        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId).thenReturn(Q.resolve(troupeNoLurkersUserHash));
-        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId2).thenReturn(Q.resolve(troupeSomeLurkersUserHash));
-        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId3).thenReturn(Q.resolve(troupeAllLurkersUserHash));
+        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId).thenReturn(Promise.resolve(troupeNoLurkersUserHash));
+        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId2).thenReturn(Promise.resolve(troupeSomeLurkersUserHash));
+        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId3).thenReturn(Promise.resolve(troupeAllLurkersUserHash));
 
         unreadItemService = testRequire.withProxies("./services/unread-item-service", {
           './room-membership-service': roomMembershipService,
@@ -364,10 +362,10 @@ describe('unread-item-service', function() {
 
       it('should parse messages with mentions to non members who are allowed in the room', function(done) {
         mockito.when(userService).findByIds([userId3])
-          .thenReturn(Q.resolve([user3]));
+          .thenReturn(Promise.resolve([user3]));
 
         mockito.when(roomPermissionsModel)(user3, 'join', troupeSomeLurkers)
-          .thenReturn(Q.resolve(true));
+          .thenReturn(Promise.resolve(true));
 
         unreadItemService.testOnly.parseChat(fromUserId, troupeSomeLurkers, nonMemberMention)
           .then(function(result) {
@@ -381,10 +379,10 @@ describe('unread-item-service', function() {
 
       it('should parse messages with mentions to non members who are not allowed in the room', function(done) {
         mockito.when(userService).findByIds([userId3])
-          .thenReturn(Q.resolve([user3]));
+          .thenReturn(Promise.resolve([user3]));
 
         mockito.when(roomPermissionsModel)(user3, 'join', troupeSomeLurkers)
-          .thenReturn(Q.resolve(false));
+          .thenReturn(Promise.resolve(false));
 
         unreadItemService.testOnly.parseChat(fromUserId, troupeSomeLurkers, nonMemberMention)
           .then(function(result) {
@@ -398,7 +396,7 @@ describe('unread-item-service', function() {
 
       it('should parse messages with mentions to non members who are not on gitter', function(done) {
         mockito.when(userService).findByIds([userId3])
-          .thenReturn(Q.resolve([]));
+          .thenReturn(Promise.resolve([]));
 
         unreadItemService.testOnly.parseChat(fromUserId, troupeSomeLurkers, nonMemberMention)
           .then(function(result) {
@@ -434,7 +432,7 @@ describe('unread-item-service', function() {
         usersWithLurkHash[userId2] = false;
         usersWithLurkHash[userId3] = false;
 
-        mockito.when(roomMembershipServiceMock).findMembersForRoomWithLurk(troupeId1).thenReturn(Q.resolve(usersWithLurkHash));
+        mockito.when(roomMembershipServiceMock).findMembersForRoomWithLurk(troupeId1).thenReturn(Promise.resolve(usersWithLurkHash));
 
         unreadItemService.testOnly.removeItem(troupeId1, chatId)
           .then(function() {
@@ -555,16 +553,16 @@ describe('unread-item-service', function() {
 
         mockito.when(categoriseUserInRoom)().then(function(roomId, userIds) {
           /* Always return all users as online */
-          return Q.resolve(userIds.reduce(function(memo, userId) {
+          return Promise.resolve(userIds.reduce(function(memo, userId) {
             // TODO: test with some users inroom,push etc
             memo[userId] = 'online';
             return memo;
           }, {}));
         });
 
-        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId).thenReturn(Q.resolve(troupeNoLurkersUserHash));
-        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId2).thenReturn(Q.resolve(troupeSomeLurkersUserHash));
-        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId3).thenReturn(Q.resolve(troupeAllLurkersUserHash));
+        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId).thenReturn(Promise.resolve(troupeNoLurkersUserHash));
+        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId2).thenReturn(Promise.resolve(troupeSomeLurkersUserHash));
+        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId3).thenReturn(Promise.resolve(troupeAllLurkersUserHash));
 
         unreadItemService = testRequire.withProxies("./services/unread-item-service", {
           './room-membership-service': roomMembershipService,
@@ -775,16 +773,16 @@ describe('unread-item-service', function() {
 
         mockito.when(categoriseUserInRoom)().then(function(roomId, userIds) {
           /* Always return all users as online */
-          return Q.resolve(userIds.reduce(function(memo, userId) {
+          return Promise.resolve(userIds.reduce(function(memo, userId) {
             // TODO: test with some users inroom,push etc
             memo[userId] = 'online';
             return memo;
           }, {}));
         });
 
-        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId).thenReturn(Q.resolve(troupeNoLurkersUserHash));
-        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId2).thenReturn(Q.resolve(troupeSomeLurkersUserHash));
-        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId3).thenReturn(Q.resolve(troupeAllLurkersUserHash));
+        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId).thenReturn(Promise.resolve(troupeNoLurkersUserHash));
+        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId2).thenReturn(Promise.resolve(troupeSomeLurkersUserHash));
+        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId3).thenReturn(Promise.resolve(troupeAllLurkersUserHash));
 
         unreadItemService = testRequire.withProxies("./services/unread-item-service", {
           './room-membership-service': roomMembershipService,
@@ -1028,7 +1026,7 @@ describe('unread-item-service', function() {
       var troupe = {};
       mockito.when(userService).findByIds().then(function(userIds) {
         assert.deepEqual(userIds, ['1','2','3']);
-        return Q.resolve(userIds.map(function(userId) {
+        return Promise.resolve(userIds.map(function(userId) {
           return {
             _id: userId,
             id: userId
@@ -1039,7 +1037,7 @@ describe('unread-item-service', function() {
       mockito.when(roomPermissionsModel)().then(function(user, operation, pTroupe) {
         assert(pTroupe === troupe);
         assert.strictEqual(operation, 'join');
-        return Q.resolve(user.id !== '3');
+        return Promise.resolve(user.id !== '3');
       });
 
       unreadItemService.testOnly.findNonMembersWithAccess(troupe, ['1','2','3'])
@@ -1339,7 +1337,7 @@ describe('unread-item-service', function() {
 
             return memo;
           }, {});
-          return Q.resolve(result);
+          return Promise.resolve(result);
         });
 
         return processResultsForNewItemWithMentions(troupeId, chatId, parsed, results, isEdit)

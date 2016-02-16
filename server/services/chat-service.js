@@ -10,7 +10,7 @@ var ChatMessage          = require("./persistence-service").ChatMessage;
 var collections          = require("../utils/collections");
 var userService          = require("./user-service");
 var processChat          = require('../utils/markdown-processor');
-var Q                    = require('q');
+var Promise              = require('bluebird');
 var StatusError          = require('statuserror');
 var unreadItemService    = require('./unread-item-service');
 var _                    = require('underscore');
@@ -20,6 +20,7 @@ var groupResolver        = require('./group-resolver');
 var chatSearchService    = require('./chat-search-service');
 var unreadItemService    = require('./unread-item-service');
 var markdownMajorVersion = require('gitter-markdown-processor').version.split('.')[0];
+var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 
 var useHints = true;
 
@@ -44,7 +45,7 @@ function excludingUserId(userId) {
 /* Resolve userIds for mentions */
 function resolveMentions(troupe, user, parsedMessage) {
   if (!parsedMessage.mentions || !parsedMessage.mentions.length) {
-    return Q.resolve([]);
+    return Promise.resolve([]);
   }
 
   /* Look through the mentions and attempt to tie the mentions to userIds */
@@ -64,7 +65,7 @@ function resolveMentions(troupe, user, parsedMessage) {
       return mention.screenName;
     });
 
-  return Q.all([
+  return Promise.all([
       mentionUserNames.length ? userService.findByUsernames(mentionUserNames) : [],
       mentionGroupNames.length ? groupResolver(troupe, user, mentionGroupNames) : []
     ])
@@ -112,7 +113,7 @@ exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
   // Keep this up here, set sent time asap to ensure order
   var sentAt = new Date();
 
-  return Q.fcall(function() {
+  return Promise.try(function() {
     if(!troupe) throw new StatusError(404, 'Unknown room');
 
     /* You have to have text */
@@ -155,7 +156,9 @@ exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
         var statMetadata = _.extend({
           userId: user.id,
           troupeId: troupe.id,
-          username: user.username
+          username: user.username,
+          room_uri: troupe.uri,
+          owner: getOrgNameFromTroupeName(troupe.uri)
         }, data.stats);
 
         stats.event("new_chat", statMetadata);
@@ -183,7 +186,7 @@ exports.getRecentPublicChats = function() {
  * NB: It is the callers responsibility to ensure that the user has access to the room!
  */
 exports.updateChatMessage = function(troupe, chatMessage, user, newText, callback) {
-  return Q.fcall(function() {
+  return Promise.try(function() {
       var age = (Date.now() - chatMessage.sent.valueOf()) / 1000;
       if(age > MAX_CHAT_EDIT_AGE_SECONDS) {
         throw new StatusError(400, "You can no longer edit this message");
@@ -201,7 +204,7 @@ exports.updateChatMessage = function(troupe, chatMessage, user, newText, callbac
       return processChat(newText);
     })
     .then(function(parsedMessage) {
-      return [parsedMessage, resolveMentions(troupe, user, parsedMessage)];
+      return Promise.all([parsedMessage, resolveMentions(troupe, user, parsedMessage)]);
     })
     .spread(function(parsedMessage, mentions) {
       chatMessage.html      = parsedMessage.html;
@@ -230,7 +233,7 @@ exports.updateChatMessage = function(troupe, chatMessage, user, newText, callbac
             username: user.username
           });
         })
-        .thenResolve(chatMessage);
+        .thenReturn(chatMessage);
     })
     .nodeify(callback);
 };
@@ -312,18 +315,18 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
   var skip = options.skip || 0;
 
   if (skip > 5000) {
-    return Q.reject(new StatusError(400, 'Skip is limited to 5000 items. Please use beforeId rather than skip. See https://developer.gitter.im'));
+    return Promise.reject(new StatusError(400, 'Skip is limited to 5000 items. Please use beforeId rather than skip. See https://developer.gitter.im'));
   }
 
   var findMarker;
   if(options.marker === 'first-unread' && options.userId) {
     findMarker = findFirstUnreadMessageId(troupeId, options.userId);
   } else {
-    findMarker = Q.resolve(null);
+    findMarker = Promise.resolve(null);
   }
 
   return findMarker
-    .then(function(markerId) {
+    .then(function(markerId) {   // jshint maxcomplexity:14
       if(!markerId && !options.aroundId) {
         var q = ChatMessage
           .where('toTroupeId', troupeId);
@@ -363,11 +366,18 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
 
         if (skip) {
           if (skip > 1000) {
-            logger.warn('chat-service: Client requested large skip value on chat message collection query', { troupeId: troupeId, skip: skip })
+            logger.warn('chat-service: Client requested large skip value on chat message collection query', { troupeId: troupeId, skip: skip });
           }
 
-          q = q.skip(skip)
-            .read('secondaryPreferred');
+          q = q.skip(skip);
+
+          if (!options.readPreference) {
+            q = q.read('secondaryPreferred');
+          }
+        }
+
+        if (options.readPreference) {
+          q = q.read(options.readPreference);
         }
 
         return q.lean()
@@ -410,7 +420,7 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
 
 
       /* Around case */
-      return Q.all([
+      return Promise.all([
         q1.exec(),
         q2.exec(),
         ])

@@ -9,7 +9,6 @@ var roomMembershipService = require('../../services/room-membership-service');
 var billingService        = require('../../services/billing-service');
 var roomPermissionsModel  = require('../../services/room-permissions-model');
 var troupeService         = require('../../services/troupe-service');
-
 var _                     = require("lodash");
 var uniqueIds             = require('mongodb-unique-ids');
 var winston               = require('../../utils/winston');
@@ -18,7 +17,7 @@ var debug                 = require('debug')('gitter:troupe-strategy');
 var execPreloads          = require('../exec-preloads');
 var getVersion            = require('../get-model-version');
 var UserIdStrategy        = require('./user-id-strategy');
-var Q                     = require('q');
+var Promise               = require('bluebird');
 
 /**
  *
@@ -209,7 +208,7 @@ function TroupePermissionsStrategy(options) {
   var isAdmin = {};
 
   function getUser() {
-    if (options.currentUser) return Q.resolve(options.currentUser);
+    if (options.currentUser) return Promise.resolve(options.currentUser);
     return userService.findById(options.currentUserId);
   }
 
@@ -218,7 +217,7 @@ function TroupePermissionsStrategy(options) {
       .then(function(user) {
         if (!user) return;
 
-        return Q.all(troupes.map(function(troupe) {
+        return Promise.map(troupes, function(troupe) {
           return roomPermissionsModel(user, 'admin', troupe)
             .then(function(admin) {
               isAdmin[troupe.id] = admin;
@@ -228,7 +227,7 @@ function TroupePermissionsStrategy(options) {
               logger.error('Unable to obtain admin permissions', { exception: err });
               isAdmin[troupe.id] = false;
             });
-        }));
+        });
       })
       .nodeify(callback);
   };
@@ -248,7 +247,7 @@ var TroupeOwnerIsOrgStrategy = function (){
 
   var ownerIsOrg = {};
 
-  this.preload = function (troupes, callback){
+  this.preload = function(troupes, callback) {
     // Use uniq as the list of items will probably be much smaller than the original set,
     // this means way fewer queries to mongodb
     var ownersForQuery = _.uniq(troupes.map(function(troupe){
@@ -257,14 +256,10 @@ var TroupeOwnerIsOrgStrategy = function (){
       return !!t;
     }));
 
-    return Q.all(ownersForQuery.map(function(lcOwner){
-      //sadly Q does not want to resolve the promise if you pass through the
-      //troupe as part of an array
-      //eg `return [ troupe, troupeService... ]`
+    return Promise.map(ownersForQuery, function(lcOwner){
       return troupeService.checkGitHubTypeForUri(lcOwner || '', 'ORG');
-    }))
-    .then(function(results){
-
+    })
+    .then(function(results) {
       var hashed = ownersForQuery.reduce(function(memo, lcOwnerId, index){
         memo[lcOwnerId] = results[index];
         return memo;
@@ -275,9 +270,8 @@ var TroupeOwnerIsOrgStrategy = function (){
         var troupe = troupes[index];
         ownerIsOrg[troupe.id] = troupe.lcOwner && hashed[troupe.lcOwner];
       });
-
-      callback();
-    });
+    })
+    .nodeify(callback);
   };
 
   this.map = function (troupe){

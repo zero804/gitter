@@ -1,10 +1,10 @@
 "use strict";
 
 var testRequire = require('./test-require');
-var Q           = require("q");
+var Promise     = require('bluebird');
 var persistence = testRequire("./services/persistence-service");
 var debug       = require('debug')('gitter:test-fixtures');
-var counter = 0;
+var counter     = 0;
 
 function generateEmail() {
   return 'testuser' + (++counter) + Date.now() + '@troupetest.local';
@@ -49,7 +49,7 @@ function createBaseFixture() {
 
       var count = 0;
 
-      return Q.all(Object.keys(this).map(function(key) {
+      return Promise.all(Object.keys(this).map(function(key) {
           var o = self[key];
           if(typeof o.remove === 'function') {
             count++;
@@ -150,9 +150,9 @@ function createExpectedFixtures(expected, done) {
         });
       });
 
-      var d = Q.defer();
-      bulk.execute(d.makeNodeResolver());
-      return d.promise;
+      return Promise.fromCallback(function(callback) {
+        bulk.execute(callback);
+      });
   }
 
   function createTroupe(fixtureName, f) {
@@ -192,7 +192,7 @@ function createExpectedFixtures(expected, done) {
       .then(function(troupe) {
         if (!f.userIds || !f.userIds.length) return troupe;
         return bulkInsertTroupeUsers(troupe._id, f.userIds)
-          .thenResolve(troupe);
+          .thenReturn(troupe);
       });
   }
 
@@ -248,7 +248,7 @@ function createExpectedFixtures(expected, done) {
             t.users = [t.users];
           }
 
-          return Q.all(t.users.map(function(user, index) {
+          return Promise.all(t.users.map(function(user, index) {
               if(typeof user == 'string') {
                 if(expected[user]) return; // Already specified at the top level
                 expected[user] = {};
@@ -273,7 +273,7 @@ function createExpectedFixtures(expected, done) {
       return null;
     });
 
-    return Q.all(promises).then(function() { return fixture; });
+    return Promise.all(promises).then(function() { return fixture; });
   }
 
   function createIdentities(fixture) {
@@ -292,7 +292,7 @@ function createExpectedFixtures(expected, done) {
       return null;
     });
 
-    return Q.all(promises).then(function() { return fixture; });
+    return Promise.all(promises).then(function() { return fixture; });
   }
 
   function createTroupes(fixture) {
@@ -316,7 +316,7 @@ function createExpectedFixtures(expected, done) {
       return null;
     });
 
-    return Q.all(promises).then(function() { return fixture; });
+    return Promise.all(promises).then(function() { return fixture; });
   }
 
 
@@ -345,7 +345,8 @@ function createExpectedFixtures(expected, done) {
 
         return null;
       });
-    return Q.all(promises).thenResolve(fixture);
+    return Promise.all(promises)
+      .thenReturn(fixture);
   }
 
   function createMessages(fixture) {
@@ -365,7 +366,7 @@ function createExpectedFixtures(expected, done) {
       return null;
     });
 
-    return Q.all(promises).then(function() { return fixture; });
+    return Promise.all(promises).then(function() { return fixture; });
   }
 
   return createUsers(createBaseFixture())

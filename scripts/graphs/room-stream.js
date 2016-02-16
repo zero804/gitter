@@ -39,14 +39,15 @@ module.exports = function roomStream() {
   return persistence.Troupe
     .find({ oneToOne: { $ne: true }})
     .lean()
-    .select('oneToOne githubType security uri userCount')
+    .select('oneToOne githubType security uri userCount lang')
     .stream()
     .pipe(es.map(function (room, callback) {
       var weight = getWeightForUserCount(room.userCount);
       callback(null, {
         roomId: '' + room._id,
         security: room.security,
-        weight: weight
+        weight: weight,
+        lang: room.lang || 'en'
       });
     }))
     .pipe(csv.createWriteStream({ headers: true }));

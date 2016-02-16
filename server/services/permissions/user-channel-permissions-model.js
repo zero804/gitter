@@ -1,8 +1,8 @@
 /* jshint maxcomplexity:16 */
 "use strict";
 
-var Q                     = require('q');
-var userIsInRoom          = require('../user-in-room');
+var Promise      = require('bluebird');
+var userIsInRoom = require('../user-in-room');
 
 var ALLOWED_USER_CHANNEL_SECURITY_VALUES = {
   PRIVATE: 1,
@@ -12,33 +12,32 @@ var ALLOWED_USER_CHANNEL_SECURITY_VALUES = {
 /**
  * USER_CHANNEL permissions model
  */
-module.exports = function userChannelPermissionsModel(user, right, uri, security) {
+module.exports = Promise.method(function userChannelPermissionsModel(user, right, uri, security) {
   if(!ALLOWED_USER_CHANNEL_SECURITY_VALUES.hasOwnProperty(security)) {
-    return Q.reject(new Error('Invalid security type:' + security));
+    throw new Error('Invalid security type:' + security);
   }
 
   // Anyone can view a public repo channel
   if(right === 'view' && security === 'PUBLIC') {
-    return Q.resolve(true);
+    return true;
   }
 
   // No unauthenticated past this point
-  if(!user) return Q.resolve(false);
+  if(!user) return false;
 
   var userUri = uri.split('/').slice(0, -1).join('/');
-
 
   switch(right) {
     case 'join':
 
     case 'view':
       switch(security) {
-        case 'PUBLIC': return Q.resolve(true);
+        case 'PUBLIC': return true;
         case 'PRIVATE':
           return userIsInRoom(uri, user).then(function(inRoom) {
-            if (!inRoom) return Q.resolve(false);
+            if (!inRoom) return false;
 
-            return Q.resolve(true);
+            return true;
           });
 
         /* No inherited security for user channels */
@@ -48,25 +47,25 @@ module.exports = function userChannelPermissionsModel(user, right, uri, security
       break;
 
     case 'adduser':
-      if(security === 'PUBLIC') return Q.resolve(true);
+      if(security === 'PUBLIC') return true;
 
       if(userUri === user.username) {
-        return Q.resolve(true);
+        return true;
       }
 
       return userIsInRoom(uri, user);
 
     case 'create':
       if(userUri !== user.username) {
-        return Q.resolve(false);
+        return false;
       }
 
       switch(security) {
         case 'PUBLIC':
-          return Q.resolve(true);
+          return true;
 
         case 'PRIVATE':
-          return Q.resolve(true);
+          return true;
 
         default:
           throw new Error('Illegal state');
@@ -74,10 +73,10 @@ module.exports = function userChannelPermissionsModel(user, right, uri, security
       break;
 
     case 'admin':
-      return Q.resolve(userUri === user.username);
+      return userUri === user.username;
 
     default:
       throw 'Unknown right ' + right;
   }
 
-};
+});

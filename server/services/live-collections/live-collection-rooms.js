@@ -1,11 +1,11 @@
 "use strict";
 
-var Q              = require('q');
-var appEvents      = require('gitter-web-appevents');
-var restSerializer = require("../../serializers/rest-serializer");
+var Promise               = require('bluebird');
+var appEvents             = require('gitter-web-appevents');
+var restSerializer        = require("../../serializers/rest-serializer");
 var roomMembershipService = require('../room-membership-service');
-var presenceService = require('gitter-web-presence');
-var _              = require('underscore');
+var presenceService       = require('gitter-web-presence');
+var _                     = require('lodash');
 
 function getUserDistribution(troupeId) {
   return roomMembershipService.findMembersForRoom(troupeId)
@@ -22,7 +22,7 @@ function getUserDistribution(troupeId) {
 }
 
 function serializeRoomToUsers(userIds, operation, troupe) {
-  if (!userIds.length) return Q.resolve();
+  if (!userIds.length) return Promise.resolve();
 
   if(troupe.oneToOne) {
     // Because the troupe needs customized per-user....
@@ -45,14 +45,14 @@ function serializeRoomToUsers(userIds, operation, troupe) {
 function serializeOneToOneRoomToUsers(userIds, operation, troupe) {
   /* Perform the serialization for each user */
 
-  return Q.all(userIds.map(function(userId) {
+  return Promise.map(userIds, function(userId) {
     var strategy = new restSerializer.TroupeStrategy({ currentUserId: userId });
 
     return restSerializer.serialize(troupe, strategy)
       .then(function(serializedTroupe) {
         appEvents.dataChange2('/user/' + userId + '/rooms', operation, serializedTroupe, 'room');
       });
-  }));
+  });
 }
 
 

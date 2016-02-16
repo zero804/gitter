@@ -4,8 +4,7 @@ var stats                     = env.stats;
 var recentRoomCore            = require('./core/recent-room-core');
 var userTroupeSettingsService = require('./user-troupe-settings-service');
 var unreadItemService         = require('./unread-item-service');
-var Q                         = require('q');
-var qlimit                    = require('qlimit');
+var Promise                   = require('bluebird');
 var roomMembershipService     = require('./room-membership-service');
 
 /**
@@ -68,17 +67,15 @@ function findLurkCandidates(troupe, options) {
 
 exports.findLurkCandidates = findLurkCandidates;
 
-
-var bulkUnreadItemLimit = qlimit(5);
 /**
  * Bulk lurk users without putting undue strain on mongodb
  */
 function bulkLurkUsers(troupeId, userIds) {
   return roomMembershipService.setMembersLurkStatus(troupeId, userIds, true)
     .then(function() {
-      return Q.all(userIds.map(bulkUnreadItemLimit(function(userId) {
+      return Promise.map(userIds, function(userId) {
         return unreadItemService.ensureAllItemsRead(userId, troupeId);
-      })));
+      }, { concurrency: 5 });
     })
     .then(function() {
       userIds.forEach(function(userId) {
@@ -128,10 +125,10 @@ function autoLurkInactiveUsers(troupe, options) {
           return candidate.userId;
         });
 
-      return Q.all([
+      return Promise.all([
         usersToChangeSettings.length && userTroupeSettingsService.setUserSettingsForUsersInTroupe(troupe.id, usersToChangeSettings, 'notifications', { push: 'mention' }),
         usersToLurk.length && bulkLurkUsers(troupe.id, usersToLurk)
-      ]).thenResolve(candidates);
+      ]).thenReturn(candidates);
     });
 }
 exports.autoLurkInactiveUsers = autoLurkInactiveUsers;

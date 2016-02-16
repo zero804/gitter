@@ -1,10 +1,9 @@
 /*jslint node:true, unused:true*/
-/*global describe:true, it:true, beforeEach */
 "use strict";
 
 var testRequire = require('../../test-require');
 var assert = require('assert');
-var Q = require('q');
+var Promise = require('bluebird');
 
 var mockito = require('jsmockito').JsMockito;
 
@@ -80,7 +79,7 @@ describe('ORG_CHANNEL', function() {
 
             mockito.when(orgPermissionsMock)().then(function(user, right, org) {
               assert.equal(org, parentUri);
-              return Q.resolve(m[usergroup]);
+              return Promise.resolve(m[usergroup]);
             });
 
             return permissionsModel(user, right, uri, security)
@@ -96,7 +95,7 @@ describe('ORG_CHANNEL', function() {
 
             mockito.when(orgPermissionsMock)().then(function(user, right, org) {
               assert.equal(org, parentUri);
-              return Q.resolve(m[usergroup]);
+              return Promise.resolve(m[usergroup]);
             });
 
             return permissionsModel(user, right, uri, security)
@@ -146,7 +145,7 @@ describe('ORG_CHANNEL', function() {
     //  it('should allow for org members', function(done) {
     //    mockito.when(orgPermissionsMock)().then(function(user, right, org) {
     //      assert.equal(org, parentUri);
-    //      return Q.resolve(true);
+    //      return Promise.resolve(true);
     //    });
 
     //    return permissionsModel(user, right, uri, security)
@@ -159,7 +158,7 @@ describe('ORG_CHANNEL', function() {
     //  it('should deny for non org members', function(done) {
     //    mockito.when(orgPermissionsMock)().then(function(user, right, org) {
     //      assert.equal(org, parentUri);
-    //      return Q.resolve(false);
+    //      return Promise.resolve(false);
     //    });
 
     //    return permissionsModel(user, right, uri, security)
@@ -177,7 +176,7 @@ describe('ORG_CHANNEL', function() {
     //  it('should allow', function(done) {
     //    mockito.when(orgPermissionsMock)().then(function(user, right, org) {
     //      assert.equal(org, parentUri);
-    //      return Q.resolve(true);
+    //      return Promise.resolve(true);
     //    });
 
     //    return permissionsModel(user, right, uri, security)
@@ -190,7 +189,7 @@ describe('ORG_CHANNEL', function() {
     //  it('should deny', function(done) {
     //    mockito.when(orgPermissionsMock)().then(function(user, right, org) {
     //      assert.equal(org, parentUri);
-    //      return Q.resolve(false);
+    //      return Promise.resolve(false);
     //    });
 
     //    return permissionsModel(user, right, uri, security)
@@ -216,7 +215,7 @@ describe('ORG_CHANNEL', function() {
         mockito.when(userIsInRoomMock)().then(function(pUri, pUser) {
           assert.equal(pUri, uri);
           assert.equal(pUser, user);
-          return Q.resolve(true);
+          return Promise.resolve(true);
         });
 
         return permissionsModel(user, right, uri, security)
@@ -230,7 +229,7 @@ describe('ORG_CHANNEL', function() {
         mockito.when(userIsInRoomMock)().then(function(pUri, pUser) {
           assert.equal(pUri, uri);
           assert.equal(pUser, user);
-          return Q.resolve(false);
+          return Promise.resolve(false);
         });
 
         return permissionsModel(user, right, uri, security)
@@ -249,12 +248,12 @@ describe('ORG_CHANNEL', function() {
         mockito.when(userIsInRoomMock)().then(function(pUri, pUser) {
           assert.equal(pUri, uri);
           assert.equal(pUser, user);
-          return Q.resolve(true);
+          return Promise.resolve(true);
         });
 
         mockito.when(orgPermissionsMock)().then(function(user, right, org) {
           assert.equal(org, parentUri);
-          return Q.resolve(true);
+          return Promise.resolve(true);
         });
 
         return permissionsModel(user, right, uri, security)
@@ -268,12 +267,12 @@ describe('ORG_CHANNEL', function() {
         mockito.when(userIsInRoomMock)().then(function(pUri, pUser) {
           assert.equal(pUri, uri);
           assert.equal(pUser, user);
-          return Q.resolve(false);
+          return Promise.resolve(false);
         });
 
         mockito.when(orgPermissionsMock)().then(function(user, right, org) {
           assert.equal(org, parentUri);
-          return Q.resolve(true);
+          return Promise.resolve(true);
         });
 
         return permissionsModel(user, right, uri, security)
@@ -288,7 +287,7 @@ describe('ORG_CHANNEL', function() {
 
         mockito.when(orgPermissionsMock)().then(function(user, right, org) {
           assert.equal(org, parentUri);
-          return Q.resolve(false);
+          return Promise.resolve(false);
         });
 
         return permissionsModel(user, right, uri, security)
@@ -306,7 +305,7 @@ describe('ORG_CHANNEL', function() {
       it('should allow for org members', function(done) {
         mockito.when(orgPermissionsMock)().then(function(user, right, org) {
           assert.equal(org, parentUri);
-          return Q.resolve(true);
+          return Promise.resolve(true);
         });
 
         return permissionsModel(user, right, uri, security)
@@ -319,7 +318,7 @@ describe('ORG_CHANNEL', function() {
       it('should deny for non org members', function(done) {
         mockito.when(orgPermissionsMock)().then(function(user, right, org) {
           assert.equal(org, parentUri);
-          return Q.resolve(false);
+          return Promise.resolve(false);
         });
 
         return permissionsModel(user, right, uri, security)
@@ -337,7 +336,7 @@ describe('ORG_CHANNEL', function() {
       it('should allow org members', function(done) {
         mockito.when(orgPermissionsMock)().then(function(user, right, org) {
           assert.equal(org, parentUri);
-          return Q.resolve(true);
+          return Promise.resolve(true);
         });
 
         return permissionsModel(user, right, uri, security)
@@ -350,7 +349,7 @@ describe('ORG_CHANNEL', function() {
       it('should deny non org members', function(done) {
         mockito.when(orgPermissionsMock)().then(function(user, right, org) {
           assert.equal(org, parentUri);
-          return Q.resolve(false);
+          return Promise.resolve(false);
         });
 
         return permissionsModel(user, right, uri, security)
@@ -374,7 +373,7 @@ describe('ORG_CHANNEL', function() {
       it('should allow org members', function(done) {
         mockito.when(orgPermissionsMock)().then(function(user, right, org) {
           assert.equal(org, parentUri);
-          return Q.resolve(true);
+          return Promise.resolve(true);
         });
 
         return permissionsModel(user, right, uri, security)
@@ -387,7 +386,7 @@ describe('ORG_CHANNEL', function() {
       it('should deny non org members', function(done) {
         mockito.when(orgPermissionsMock)().then(function(user, right, org) {
           assert.equal(org, parentUri);
-          return Q.resolve(false);
+          return Promise.resolve(false);
         });
 
         return permissionsModel(user, right, uri, security)
@@ -405,7 +404,7 @@ describe('ORG_CHANNEL', function() {
       it('should allow org members to add', function(done) {
         mockito.when(orgPermissionsMock)().then(function(user, right, org) {
           assert.equal(org, parentUri);
-          return Q.resolve(true);
+          return Promise.resolve(true);
         });
 
         return permissionsModel(user, right, uri, security)
@@ -419,7 +418,7 @@ describe('ORG_CHANNEL', function() {
       it('should deny non org members add', function(done) {
         mockito.when(orgPermissionsMock)().then(function(user, right, org) {
           assert.equal(org, parentUri);
-          return Q.resolve(false);
+          return Promise.resolve(false);
         });
 
         return permissionsModel(user, right, uri, security)
@@ -437,7 +436,7 @@ describe('ORG_CHANNEL', function() {
       it('should allow for org members', function(done) {
         mockito.when(orgPermissionsMock)().then(function(user, right, org) {
           assert.equal(org, parentUri);
-          return Q.resolve(true);
+          return Promise.resolve(true);
         });
 
         return permissionsModel(user, right, uri, security)
@@ -450,7 +449,7 @@ describe('ORG_CHANNEL', function() {
       it('should deny for non org members', function(done) {
         mockito.when(orgPermissionsMock)().then(function(user, right, org) {
           assert.equal(org, parentUri);
-          return Q.resolve(false);
+          return Promise.resolve(false);
         });
 
         return permissionsModel(user, right, uri, security)
@@ -468,7 +467,7 @@ describe('ORG_CHANNEL', function() {
       it('should allow org members', function(done) {
         mockito.when(orgPermissionsMock)().then(function(user, right, org) {
           assert.equal(org, parentUri);
-          return Q.resolve(true);
+          return Promise.resolve(true);
         });
 
         return permissionsModel(user, right, uri, security)
@@ -481,7 +480,7 @@ describe('ORG_CHANNEL', function() {
       it('should deny non org members', function(done) {
         mockito.when(orgPermissionsMock)().then(function(user, right, org) {
           assert.equal(org, parentUri);
-          return Q.resolve(false);
+          return Promise.resolve(false);
         });
 
         return permissionsModel(user, right, uri, security)

@@ -8,7 +8,7 @@ var userSettingsService = require('../services/user-settings-service');
 var isNative         = require('../../public/js/utils/is-native');
 
 var assert           = require("assert");
-var Q                = require('q');
+var Promise          = require('bluebird');
 var _                = require('underscore');
 
 /**
@@ -17,7 +17,7 @@ var _                = require('underscore');
 exports.generateNonChatContext = function(req) {
   var user = req.user;
 
-  return Q.all([
+  return Promise.all([
       user ? serializeUser(user) : null,
       user ? determineDesktopNotifications(user, req) : false,
       user ? userSettingsService.getUserSettings(user.id, 'suggestedRoomsHidden') : false,
@@ -33,7 +33,7 @@ exports.generateNonChatContext = function(req) {
 
 exports.generateSocketContext = function(userId, troupeId) {
   function getUser() {
-    if (!userId) return Q.resolve(null);
+    if (!userId) return Promise.resolve(null);
     return userService.findById(userId);
   }
 
@@ -59,7 +59,7 @@ exports.generateTroupeContext = function(req, extras) {
 
   var troupe = req.uriContext.troupe;
 
-  return Q.all([
+  return Promise.all([
     user ? serializeUser(user) : null,
     troupe ? serializeTroupe(troupe, user) : undefined,
     determineDesktopNotifications(user, req)
@@ -95,7 +95,7 @@ function determineDesktopNotifications(user, req) {
   }
 
   if(clientType) {
-    return Q.nfcall(presenceService.isUserConnectedWithClientType, user.id, clientType)
+    return presenceService.isUserConnectedWithClientType(user.id, clientType)
       .then(function(result) {
         return !result;
       });

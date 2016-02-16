@@ -6,7 +6,7 @@ var persistence = require('../../server/services/persistence-service');
 var onMongoConnect = require('../../server/utils/on-mongo-connect');
 var through2Concurrent = require('through2-concurrent');
 var BatchStream = require('batch-stream');
-var Q = require('q');
+var Promise = require('bluebird');
 
 function anonymousTokenStream() {
   return persistence.OAuthAccessToken.find({ userId: null }, { _id: 1 })
@@ -21,45 +21,44 @@ function removeTokensByIds(ids) {
     bulk.find({ _id: id }).removeOne();
   });
 
-  var d = Q.defer();
-  bulk.execute(d.makeNodeResolver());
-  return d.promise;
+  return Promise.fromCallback(function(callback) {
+    bulk.execute(callback);
+  });
 }
 
 function performDeletion() {
-  var d = Q.defer();
-  var count = 0;
-  anonymousTokenStream()
-    .pipe(new BatchStream({ size : 1000 }))
-    .pipe(through2Concurrent.obj({ maxConcurrency: 1 },
-      function (docs, enc, callback) {
-        var ids = docs.map(function(d) {
-          return d._id;
-        });
+  return new Promise(function(resolve) {
+    var count = 0;
+    anonymousTokenStream()
+      .pipe(new BatchStream({ size : 1000 }))
+      .pipe(through2Concurrent.obj({ maxConcurrency: 1 },
+        function (docs, enc, callback) {
+          var ids = docs.map(function(d) {
+            return d._id;
+          });
 
-        var start = Date.now();
+          var start = Date.now();
 
-        return removeTokensByIds(ids)
-          .then(function(result) {
-            var timePerDocument = docs.length / (Date.now() - start + 1000);
-            var estimated = 19e6 / timePerDocument;
-            console.log('Estimated time is ', Math.round(estimated / 60000), 'minutes');
-          })
-          .delay(1000)
-          .nodeify(callback);
-    }))
-    .on('data', function() {
-      count++;
-      if (count % 100 === 0) {
-        console.log('Completed ', count);
-      }
-    })
-    .on('end', function () {
-      console.log('DONE');
-      d.resolve();
-    });
-
-  return d.promise;
+          return removeTokensByIds(ids)
+            .then(function() {
+              var timePerDocument = docs.length / (Date.now() - start + 1000);
+              var estimated = 19e6 / timePerDocument;
+              console.log('Estimated time is ', Math.round(estimated / 60000), 'minutes');
+            })
+            .delay(1000)
+            .nodeify(callback);
+      }))
+      .on('data', function() {
+        count++;
+        if (count % 100 === 0) {
+          console.log('Completed ', count);
+        }
+      })
+      .on('end', function () {
+        console.log('DONE');
+        resolve();
+      });
+  });
 }
 
 onMongoConnect()

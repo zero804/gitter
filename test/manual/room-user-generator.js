@@ -1,10 +1,8 @@
-#!/usr/bin/env node
 'use strict';
 
 var userService = require('../../server/services/user-service');
 var troupeService = require('../../server/services/troupe-service');
-var Q = require('q');
-var qlimit = require('qlimit');
+var Promise = require('bluebird');
 var chatService = require('../../server/services/chat-service');
 var mongooseUtils = require('../../server/utils/mongoose-utils');
 var persistence = require('../../server/services/persistence-service');
@@ -27,8 +25,7 @@ var opts = require("nomnom")
 })
 .parse();
 
-var limit = qlimit(2);
-Q.all([
+Promise.all([
     troupeService.findByUri(opts.room),
     userService.findByUsername(opts.user)
   ])
@@ -40,8 +37,7 @@ Q.all([
       a.push({ username: username, displayName: displayName });
     }
 
-    return Q.all(a.map(limit(function(userInfo, i) {
-
+    return Promise.map(a, function(userInfo, i) {
         var newUser = new persistence.User({
           username:           userInfo.username,
           invitedByUser:      user.id,
@@ -56,7 +52,7 @@ Q.all([
             return newUser._id;
           });
 
-      })))
+      }, { concurrency: 2 })
       .then(function(userIds) {
         return roomMembershipService.addRoomMembers(room._id, userIds);
       });

@@ -1,23 +1,23 @@
 'use strict';
 
-var Q = require('q');
+var Promise = require('bluebird');
 
 function LinkedInBackend(user, identity) {
   this.user = user;
   this.identity = identity;
 }
 
-LinkedInBackend.prototype.getEmailAddress = function(preferStoredEmail) {
-  return Q.resolve(this.identity.email);
-};
+LinkedInBackend.prototype.getEmailAddress = Promise.method(function(preferStoredEmail) {
+  return this.identity.email;
+});
 
-LinkedInBackend.prototype.findOrgs = function() {
-  return Q.resolve([]);
-};
+LinkedInBackend.prototype.findOrgs = Promise.method(function() {
+  return [];
+});
 
-LinkedInBackend.prototype.getProfile = function() {
+LinkedInBackend.prototype.getProfile = Promise.method(function() {
   // TODO: gravatar or fullcontact?
-  return Q.resolve({provider: 'linkedin'});
-};
+  return { provider: 'linkedin' };
+});
 
 module.exports = LinkedInBackend;

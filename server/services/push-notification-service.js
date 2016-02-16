@@ -2,7 +2,7 @@
 
 var PushNotificationDevice = require("./persistence-service").PushNotificationDevice;
 var crypto                 = require('crypto');
-var Q                      = require('q');
+var Promise                = require('bluebird');
 var mongoUtils             = require('../utils/mongo-utils');
 var debug                  = require('debug')('gitter:push-notification-service');
 var uniqueIds              = require('mongodb-unique-ids');
@@ -39,10 +39,10 @@ function findAndRemoveDevicesWithDuplicateTokens(deviceId, deviceType, deviceTok
         return true;
       });
 
-      return Q.all(devicesToRemove.map(function(device) {
+      return Promise.map(devicesToRemove, function(device) {
         debug('Removing unused device %s', device.deviceId);
         return device.remove();
-      }));
+      });
     });
 }
 
@@ -69,7 +69,7 @@ exports.registerDevice = function(deviceId, deviceType, deviceToken, deviceName,
       // After we've update the device, look for other devices that have given us the same token
       // these are probably phones that have been reset etc, so we need to prune them
       return findAndRemoveDevicesWithDuplicateTokens(deviceId, deviceType, deviceToken, tokenHash)
-        .thenResolve(device);
+        .thenReturn(device);
     })
     .nodeify(callback);
 };
@@ -97,7 +97,7 @@ exports.registerAndroidDevice = function(deviceId, deviceName, registrationId, a
       // After we've update the device, look for other devices that have given us the same token
       // these are probably phones that have been reset etc, so we need to prune them
       return findAndRemoveDevicesWithDuplicateTokens(deviceId, 'ANDROID', registrationId, tokenHash)
-        .thenResolve(device);
+        .thenReturn(device);
     })
     .nodeify(callback);
 };
@@ -118,7 +118,7 @@ exports.registerUser = function(deviceId, userId, callback) {
 var usersWithDevicesCache = null;
 function getCachedUsersWithDevices() {
   if (usersWithDevicesCache) {
-    return Q.resolve(usersWithDevicesCache);
+    return Promise.resolve(usersWithDevicesCache);
   }
 
   return PushNotificationDevice.distinct('userId')

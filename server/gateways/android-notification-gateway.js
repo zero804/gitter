@@ -1,7 +1,7 @@
 "use strict";
 
 var gcm = require('node-gcm');
-var Q = require('q');
+var Promise = require('bluebird');
 var nconf = require('../utils/config');
 var pushNotificationService = require('../services/push-notification-service');
 
@@ -12,7 +12,7 @@ var sender = new gcm.Sender(nconf.get('gcm:apiKey'));
 var sendNotificationToDevice = function(notification, badge, device) {
   if(!notification) {
     // badge only notifications are pointless for android as the apps dont have badges
-    return Q.resolve();
+    return Promise.resolve();
   }
 
   var message = new gcm.Message({
@@ -23,17 +23,17 @@ var sendNotificationToDevice = function(notification, badge, device) {
     }
   });
 
-  var deferred = Q.defer();
-  sender.send(message, [device.androidToken], MAX_RETRIES, deferred.makeNodeResolver());
-
-  return deferred.promise.then(function(body) {
+  return Promise.fromCallback(function(callback) {
+    sender.send(message, [device.androidToken], MAX_RETRIES, callback);
+  })
+  .then(function(body) {
     if (body.canonical_ids) {
       // this registration id/token is an old duplicate which has been superceded by a canonical id,
       // and we've probably just sent two identical messages to the same phone.
-      return pushNotificationService.deregisterAndroidDevice(device.androidToken).thenResolve(body);
+      return pushNotificationService.deregisterAndroidDevice(device.androidToken).thenReturn(body);
     } else if (body.failure && body.results[0] && body.results[0].error === "NotRegistered") {
       // app has been uninstalled / token revoked
-      return pushNotificationService.deregisterAndroidDevice(device.androidToken).thenResolve(body);
+      return pushNotificationService.deregisterAndroidDevice(device.androidToken).thenReturn(body);
     } else {
       return body;
     }

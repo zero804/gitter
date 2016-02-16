@@ -1,29 +1,28 @@
 /* jshint maxcomplexity:18 */
 "use strict";
 
-var GitHubRepoService    = require('gitter-web-github').GitHubRepoService;
-var winston              = require('../../utils/winston');
-var Q                    = require('q');
-var appEvents            = require('gitter-web-appevents');
-var userIsInRoom         = require('../user-in-room');
-
+var GitHubRepoService = require('gitter-web-github').GitHubRepoService;
+var winston           = require('../../utils/winston');
+var Promise           = require('bluebird');
+var appEvents         = require('gitter-web-appevents');
+var userIsInRoom      = require('../user-in-room');
 
 function githubFailurePermissionsModel(user, right, uri, security) {
   if(right === 'admin') {
     winston.warn('Disable admin permissions while offline');
-    return Q.resolve(false);
+    return Promise.resolve(false);
   }
 
   // We can't help out. Send the original error out
-  if(right !== 'view' && right !== 'join') return Q.reject(new Error("Permission " + right + " not available offline"));
+  if(right !== 'view' && right !== 'join') return Promise.reject(new Error("Permission " + right + " not available offline"));
 
   // Public room? Let them in
-  if(security === 'PUBLIC') return Q.resolve(true);
+  if(security === 'PUBLIC') return Promise.resolve(true);
 
   // Private room? Let the user in if they're already in the room.
   if(security === 'PRIVATE') return userIsInRoom(uri, user);
 
-  return Q.reject(new Error("Unable to process permissions offline"));
+  return Promise.reject(new Error("Unable to process permissions offline"));
 }
 
 function checkAndNotifyPrivicyMismatch(isPrivateRepo, roomPrivicy, uri) {
@@ -42,16 +41,16 @@ function checkAndNotifyPrivicyMismatch(isPrivateRepo, roomPrivicy, uri) {
 module.exports = function repoPermissionsModel(user, right, uri, security) {
   // Security can be null for old repos
   if(security && (security !== 'PRIVATE' && security !== 'PUBLIC')) {
-    return Q.reject(new Error('Unknown repo security: ' + security));
+    return Promise.reject(new Error('Unknown repo security: ' + security));
   }
 
   // Anyone can view a public repo
   if(right === 'view' && security === 'PUBLIC') {
-    return Q.resolve(true);
+    return Promise.resolve(true);
   }
 
   // The only thing an unloggedin user can do is view a public repo
-  if(!user) return Q.resolve(false);
+  if(!user) return Promise.resolve(false);
 
   var repoService = new GitHubRepoService(user);
   return repoService.getRepo(uri)

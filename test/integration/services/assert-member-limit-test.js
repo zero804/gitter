@@ -1,7 +1,7 @@
 "use strict";
 
 var testRequire = require('../test-require');
-var Q = require('q');
+var Promise = require('bluebird');
 var assert = require('assert');
 var FAKE_USER = { id: 'superfake' };
 
@@ -11,24 +11,24 @@ var assertMemberLimit = testRequire.withProxies('./services/assert-member-limit'
   './troupe-service': {
     checkGitHubTypeForUri: function(uri, githubType) {
       if (uri === 'org') {
-        return Q.resolve(githubType == 'ORG');
+        return Promise.resolve(githubType == 'ORG');
       } else if (uri === 'user') {
-        return Q.resolve(githubType == 'NOT_ORG');
+        return Promise.resolve(githubType == 'NOT_ORG');
       } else {
-        return Q.resolve(false);
+        return Promise.resolve(false);
       }
     }
   },
   './room-membership-service': {
     checkRoomMembership: function(/*troupeId, userId*/) {
-      return Q.resolve(checkRoomMembershipResult);
+      return Promise.resolve(checkRoomMembershipResult);
     },
     countMembersInRoom: function(/*troupeId*/) {
-      return Q.resolve(countUsersInRoomResult);
+      return Promise.resolve(countUsersInRoomResult);
     }
   },
   './persistence-service': {
-    Subscription: { findOne: function() { return { exec: function() { return Q.resolve(subscritionFindResult); } }; } }
+    Subscription: { findOne: function() { return { exec: function() { return Promise.resolve(subscritionFindResult); } }; } }
   }
 });
 

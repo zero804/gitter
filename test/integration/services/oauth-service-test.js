@@ -6,7 +6,7 @@ var testRequire = require('../test-require');
 var assert = require('assert');
 var mongoUtils = testRequire('./utils/mongo-utils');
 var oauthService = testRequire("./services/oauth-service");
-var Q = require('q');
+var Promise = require('bluebird');
 
 var fixtureLoader = require('../test-fixtures');
 var fixture = {};
@@ -37,7 +37,7 @@ describe('oauth-service', function() {
   it.skip('should create tokens atomically', function() {
 
     var userId = mongoUtils.getNewObjectIdString();
-    return Q.all([
+    return Promise.all([
       oauthService.findOrGenerateWebToken(userId),
       oauthService.findOrGenerateWebToken(userId),
       oauthService.findOrGenerateWebToken(userId),
@@ -86,7 +86,7 @@ describe('oauth-service', function() {
 
 
     function nextClient(userId, tokens, i) {
-      if(!i) return Q.resolve();
+      if(!i) return Promise.resolve();
       i--;
 
       var clientId = clients[i];
@@ -100,7 +100,7 @@ describe('oauth-service', function() {
     }
 
     function nextUser(tokens, i) {
-      if(!i) return Q.resolve();
+      if(!i) return Promise.resolve();
       i--;
       var userId = users[i];
 

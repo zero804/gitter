@@ -7,8 +7,7 @@ var troupeService = require('../../server/services/troupe-service');
 var chatService = require('../../server/services/chat-service');
 
 require('../../server/event-listeners').install();
-
-var Q = require('q');
+var Promise = require('bluebird');
 
 var shutdown = require('shutdown');
 
@@ -29,7 +28,7 @@ function getTroupe(fromUser) {
     return troupeService.findByUri(opts.uri);
 
   if (!opts.toUser) {
-    return Q.reject('Please specify either a uri or a fromUser and toUser');
+    return Promise.reject(new Error('Please specify either a uri or a fromUser and toUser'));
   }
 
   return userService.findByUsername(opts.toUser)

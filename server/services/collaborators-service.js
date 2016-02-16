@@ -5,7 +5,7 @@ var RepoService         = require('gitter-web-github').GitHubRepoService;
 var OrgService          = require('gitter-web-github').GitHubOrgService;
 var ContributorService  = require('gitter-web-github').GitHubContributorService;
 var MeService           = require('gitter-web-github').GitHubMeService;
-var Q                   = require('q');
+var Promise             = require('bluebird');
 
 function withoutCurrentUser(users, user) {
   if (!users || !users.length) return [];
@@ -51,19 +51,18 @@ function getStargazers(uri, user) {
 
 function getCollaboratorsForRepo(repoUri, security, user) {
   if (security === 'PUBLIC') {
-    return Q.all([
+    return Promise.join(
         getContributors(repoUri, user),   // for public repos
         getCollaborators(repoUri, user),  // for private repos
-        getStargazers(repoUri, user)
-      ])
-      .spread(function(contributors, collaborators, stargazers) {
-        var related = contributors.concat(collaborators).concat(stargazers);
-        if (related.length) {
-          return related;
-        }
+        getStargazers(repoUri, user),
+        function(contributors, collaborators, stargazers) {
+          var related = contributors.concat(collaborators).concat(stargazers);
+          if (related.length) {
+            return related;
+          }
 
-        return getCollaboratorsForUser(user);
-      });
+          return getCollaboratorsForUser(user);
+        });
   }
 
   /* INHERITED and PRIVATE rooms */
@@ -84,15 +83,19 @@ function getCollaboratorsForUser(user) {
 
   return ghMe.getOrgs()
     .then(function(orgs) {
-      var promises = orgs.map(function(o) { return ghOrg.someMembers(o.login); });
-      return Q.allSettled(promises);
+      return Promise.map(orgs, function(org) {
+        return ghOrg.someMembers(org.login).reflect();
+      });
     })
     .then(function (results) {
-      var users = [];
-
-      results.forEach(function (result) {
-        if (result.state === "fulfilled") users = users.concat(result.value);
-      });
+      var users = results
+        .filter(function(inspection) {
+          return inspection.isFulfilled();
+        })
+        .reduce(function(memo, inspection) {
+          memo = memo.concat(inspection.value());
+          return memo;
+        },[]);
 
       return withoutCurrentUser(users, user);
     });
@@ -132,7 +135,7 @@ module.exports = function getCollaboratorForRoom(room, user) {
         .then(deduplicate);
 
     default:
-      return Q.resolve([]);
+      return Promise.resolve([]);
   }
 
 

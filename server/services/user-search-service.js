@@ -1,7 +1,7 @@
 "use strict";
 
 var persistence   = require("./persistence-service");
-var Q             = require('q');
+var Promise       = require('bluebird');
 var client        = require('../utils/elasticsearch-client');
 var collections   = require('../utils/collections');
 var _             = require('underscore');
@@ -16,7 +16,7 @@ function createRegExpsForQuery(queryText) {
                         .filter(function(s) { return !!s; })
                         .filter(function(s, index) { return index < 10; } );
 
-  return Q.resolve(parts.map(function(i) {
+  return Promise.resolve(parts.map(function(i) {
     return new RegExp("\\b" + i, "i");
   }));
 }
@@ -100,7 +100,7 @@ function performQuery(queryText, options) {
     }
   };
 
-  return Q(client.search(queryRequest)).then(elasticResponseToUserIds);
+  return Promise.resolve(client.search(queryRequest)).then(elasticResponseToUserIds);
 }
 
 function elasticsearchUserTypeahead(queryText, options) {
@@ -150,7 +150,7 @@ function elasticsearchUserTypeahead(queryText, options) {
     }
   };
 
-  return Q(client.search(queryRequest)).then(elasticResponseToUserIds);
+  return Promise.resolve(client.search(queryRequest)).then(elasticResponseToUserIds);
 }
 
 function elasticResponseToUserIds(response) {

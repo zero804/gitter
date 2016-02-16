@@ -3,7 +3,7 @@
 var env = require('gitter-web-env');
 var stats  = env.stats;
 
-var Q = require('q');
+var Promise = require('bluebird');
 var github = require('gitter-web-github');
 var GitHubMeService = github.GitHubMeService;
 var GitHubUserService = github.GitHubUserService;
@@ -49,12 +49,12 @@ function getEmailFromCommit(user) {
   });
 }
 
-module.exports = function gitHubEmailAddressService(user, options) {
+module.exports = Promise.method(function gitHubEmailAddressService(user, options) {
   if (user.githubUserToken || user.githubToken) {
     return getPrivateEmailAddress(user);
   }
 
-  if (!options || !options.attemptDiscovery) return Q.resolve(null);
+  if (!options || !options.attemptDiscovery) return null;
 
   // attempt to get a public email address
   return getValidPublicEmailAddress(user.username)
@@ -71,4 +71,4 @@ module.exports = function gitHubEmailAddressService(user, options) {
       stats.event('github.email.discovery.failed', { username: user.username }); // sadpanda
       return null;
     });
-};
+});

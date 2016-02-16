@@ -1,6 +1,6 @@
 'use strict';
 
-var Q = require('q');
+var Promise = require('bluebird');
 var userScopes = require('../utils/models/user-scopes');
 var identityService = require('./identity-service');
 
@@ -26,16 +26,19 @@ function resolveUserBackends(user) {
     })
     .then(function(identityMap) {
       var userBackends = [];
+
       if (userScopes.isGitHubUser(user)) {
         var Backend = resolveBackendForProvider('github');
-        userBackends.push(new Backend(user, identityMap['github']));
+        userBackends.push(new Backend(user, identityMap.github));
       }
+
       if (user.identities) {
         user.identities.forEach(function(identity) {
           var Backend = resolveBackendForProvider(identity.provider);
           userBackends.push(new Backend(user, identityMap[identity.provider]));
         });
       }
+
       return userBackends;
     });
 }
@@ -51,11 +54,10 @@ BackendMuxer.prototype.findResults = function(method, args) {
 
   return resolveUserBackends(this.user)
     .then(function(userBackends) {
-      var promises = userBackends.map(function(backend) {
+      return Promise.map(userBackends, function(backend) {
         return backend[method].apply(backend, args);
       });
-      return Q.all(promises);
-    })
+    });
 };
 
 // Use this when each backend returns an array and you want to concatenate them
@@ -67,38 +69,34 @@ BackendMuxer.prototype.findAllResults = function(method, args) {
     });
 };
 
+function getFirstResultForBackends(method, args) {
+  return function(backends) {
+    if (!backends.length) return Promise.resolve();
+
+    var i = 0;
+
+    function tryNext() {
+      if (i >= backends.length) return Promise.resolve();
+
+      var nextBackend = backends[i];
+      return nextBackend[method].apply(nextBackend, args)
+        .then(function(result) {
+          if (result) return result;
+
+          i++;
+          return tryNext();
+        });
+    }
+
+    return tryNext();
+  };
+}
+
 // Try the backends one by one and return the first one that returns a result's
 // result.
 BackendMuxer.prototype.getFirstResult = function(method, args) {
-  args = args || [];
-
   return resolveUserBackends(this.user)
-    .then(function(userBackends) {
-      var deferred = Q.defer();
-
-      function tryNext() {
-        var nextBackend = userBackends.shift();
-        if (nextBackend) {
-          nextBackend[method].apply(nextBackend, args)
-            .then(function(result) {
-              if (result) {
-                deferred.resolve(result);
-              } else {
-                tryNext();
-              }
-            })
-            .catch(function(err) {
-              deferred.reject(err);
-            });
-        } else {
-          deferred.resolve(); // with an empty value
-        }
-      }
-
-      tryNext();
-
-      return deferred.promise;
-    });
+    .then(getFirstResultForBackends(method, args || []));
 };
 
 BackendMuxer.prototype.getEmailAddress = function(preferStoredEmail) {
@@ -111,6 +109,10 @@ BackendMuxer.prototype.findOrgs = function() {
 
 BackendMuxer.prototype.findProfiles = function() {
   return this.findResults('getProfile');
+};
+
+BackendMuxer.testOnly = {
+  getFirstResultForBackends: getFirstResultForBackends
 };
 
 module.exports = BackendMuxer;

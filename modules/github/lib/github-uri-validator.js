@@ -2,7 +2,7 @@
 
 var GitHubOrgService  = require('./github-org-service');
 var GitHubRepoService = require('./github-repo-service');
-var Q                 = require('q');
+var Promise           = require('bluebird');
 var debug             = require('debug')('gitter:github-uri-validator');
 
 function validateOrgUri(user, uri) {
@@ -44,7 +44,7 @@ function validateRepoUri(user, uri) {
  * Given a uri, is it a valid repo or valid org?
  * @returns promise of ORG / REPO or null
  */
-function validateUri(user, uri) {
+module.exports = Promise.method(function validateUri(user, uri) {
   debug("validateUri: %s", uri);
 
   var parts = uri.split('/');
@@ -66,7 +66,5 @@ function validateUri(user, uri) {
     }
   }
 
-  return Q.resolve();
-}
-
-module.exports = validateUri;
+  return;
+});

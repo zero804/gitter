@@ -4,7 +4,7 @@
 
 var troupeService = require('../../server/services/troupe-service');
 var persistance = require('../../server/services/persistence-service');
-var Q = require('q');
+var Promise = require('bluebird');
 var assert = require('assert');
 var shutdown = require('shutdown');
 
@@ -21,7 +21,7 @@ var opts = require("nomnom")
   })
   .parse();
 
-Q.all([
+Promise.all([
   troupeService.findByUri(opts.from),
   troupeService.findByUri(opts.to)
 ])

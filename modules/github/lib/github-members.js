@@ -3,7 +3,7 @@
 var GithubRepoService = require('./github-repo-service');
 var GithubMeService   = require('./github-me-service');
 var GithubOrgService  = require('./github-org-service');
-var Q = require('q');
+var Promise           = require('bluebird');
 
 function getRepoMembers(uri, instigatingUser) {
   var repo = new GithubRepoService(instigatingUser);
@@ -25,19 +25,17 @@ function getOrgMembers(uri, instigatingUser) {
     });
 }
 
-function getMembers(uri, githubType, instigatingUser) {
+module.exports.getMembers = Promise.method(function getMembers(uri, githubType, instigatingUser) {
   if(githubType === 'REPO') {
     return getRepoMembers(uri, instigatingUser);
   } else if(githubType === 'ORG') {
     return getOrgMembers(uri, instigatingUser);
   } else {
-    return Q.reject(new Error('unknown githubType "'+githubType+'"'));
+    throw new Error('unknown githubType "'+githubType+'"');
   }
-}
+});
 
-module.exports.getMembers = getMembers;
-
-function isMember(username, uri, githubType, instigatingUser) {
+module.exports.isMember = Promise.method(function isMember(username, uri, githubType, instigatingUser) {
   if(githubType === 'REPO') {
     /* Is the user a collaborator on the repo? */
     var ghRepo = new GithubRepoService(instigatingUser);
@@ -54,8 +52,6 @@ function isMember(username, uri, githubType, instigatingUser) {
       return ghOrg.member(uri, username);
     }
   } else {
-    return Q.reject(new Error('unknown githubType "'+githubType+'"'));
+    throw new Error('unknown githubType "'+githubType+'"');
   }
-}
-
-module.exports.isMember = isMember;
+});

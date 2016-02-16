@@ -7,7 +7,7 @@ var onMongoConnect = require('../../server/utils/on-mongo-connect');
 var through2Concurrent = require('through2-concurrent');
 var ObjectID = require('mongodb').ObjectID;
 var _ = require('underscore');
-var Q = require('q');
+var Promise = require('bluebird');
 
 function membershipStream() {
   return persistence.Troupe.find()
@@ -16,7 +16,7 @@ function membershipStream() {
 }
 
 function createTroupeUsers(room) {
-  if (!room.users || !room.users.length) return Q.resolve();
+  if (!room.users || !room.users.length) return Promise.resolve();
   var bulk = persistence.TroupeUser.collection.initializeUnorderedBulkOp();
 
   room.users.forEach(function(troupeUser) {
@@ -25,11 +25,12 @@ function createTroupeUsers(room) {
     });
   });
 
-  var d = Q.defer();
-  bulk.execute(d.makeNodeResolver());
-  return d.promise.then(function() {
-    return persistence.Troupe.update({ _id: room._id }, { $set: { userCount: room.users.length } })
-            .exec();
+  return Promise.fromCallback(function(callback) {
+      bulk.execute(callback);
+    })
+    .then(function() {
+      return persistence.Troupe.update({ _id: room._id }, { $set: { userCount: room.users.length } })
+              .exec();
   });
 }
 
@@ -52,31 +53,31 @@ function migrateRoom(room) {
 }
 
 function performMigration() {
-  var d = Q.defer();
-  var count = 0;
-  membershipStream()
-    .pipe(through2Concurrent.obj({ maxConcurrency: 24 },
-      function (room, enc, callback) {
-        var self = this;
-        return migrateRoom(room)
-          .then(function() {
-            self.emit(room.name);
-          })
-          .nodeify(callback);
+  return new Promise(function(resolve) {
+    var count = 0;
+    membershipStream()
+      .pipe(through2Concurrent.obj({ maxConcurrency: 24 },
+        function (room, enc, callback) {
+          var self = this;
+          return migrateRoom(room)
+            .then(function() {
+              self.emit(room.name);
+            })
+            .nodeify(callback);
 
-    }))
-    .on('data', function() {
-      count++;
-      if (count % 100 === 0) {
-        console.log('Completed ', count);
-      }
-    })
-    .on('end', function () {
-      console.log('DONE');
-      d.resolve();
-    });
+      }))
+      .on('data', function() {
+        count++;
+        if (count % 100 === 0) {
+          console.log('Completed ', count);
+        }
+      })
+      .on('end', function () {
+        console.log('DONE');
+        resolve();
+      });
 
-  return d.promise;
+  });
 }
 
 onMongoConnect()

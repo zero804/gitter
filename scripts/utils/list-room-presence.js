@@ -7,7 +7,7 @@ var troupeService = require('../../server/services/troupe-service');
 var categoriseUsersInRoom = require('../../server/services/categorise-users-in-room');
 var roomMembershipService = require('../../server/services/room-membership-service');
 var collections = require('../../server/utils/collections');
-var Q = require('q');
+var Promise = require('bluebird');
 
 var shutdown = require('shutdown');
 
@@ -36,10 +36,10 @@ function getTroupe() {
     return troupeService.findByUri(opts.uri);
 
   if (!opts.fromUser || !opts.toUser) {
-    return Q.reject('Please specify either a uri or a fromUser and toUser');
+    return Promise.reject('Please specify either a uri or a fromUser and toUser');
   }
 
-  return Q.all([
+  return Promise.all([
     userService.findByUsername(opts.fromUser),
     userService.findByUsername(opts.toUser),
   ])
@@ -68,7 +68,7 @@ getTroupe()
     Object.keys(result).forEach(function(userId) {
       var user = usersHash[userId];
       console.log(pad(user && user.username, 30), ' ', result[userId]);
-    })
+    });
   })
   .catch(function(err) {
     console.error(err.stack);

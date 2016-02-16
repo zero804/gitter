@@ -5,7 +5,7 @@
 var persistence = require('../server/services/persistence-service');
 var checkRepoPrivacy = require('../server/services/check-repo-privacy');
 
-var Q = require('q');
+var Promise = require('bluebird');
 
 var opts = require("nomnom")
   .option('max', {
@@ -29,7 +29,7 @@ persistence.Troupe
   .limit(opts.max)
   .exec()
   .then(function(repos) {
-    return Q.all(repos.map(function(repo) {
+    return Promise.all(repos.map(function(repo) {
       return checkRepoPrivacy(repo.uri);
     }));
   })

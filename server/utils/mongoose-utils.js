@@ -1,6 +1,6 @@
 "use strict";
 
-var Q           = require('q');
+var Promise     = require('bluebird');
 var _           = require('underscore');
 var collections = require('./collections');
 var mongoUtils  = require('./mongo-utils');
@@ -16,6 +16,7 @@ function hashList(list) {
     return memo;
   }, {});
 }
+
 exports.attachNotificationListenersToSchema = function (schema, options) {
   var blacklistHash = hashList(options.ignoredPaths);
   var whitelistHash = hashList(options.listenPaths);
@@ -105,7 +106,7 @@ exports.upsert = function(schema, query, setOperation) {
     .exec()
     .then(function(doc) {
       // If doc is null then an insert occurred
-      return Q.all([schema.findOne(query).exec(), !!doc]);
+      return Promise.all([schema.findOne(query).exec(), !!doc]);
     });
 };
 
@@ -113,7 +114,7 @@ exports.upsert = function(schema, query, setOperation) {
  * Returns a promise of documents
  */
 exports.findByIds = function(Model, ids, callback) {
-  return Q.fcall(function() {
+  return Promise.try(function() {
     if (!ids || !ids.length) return [];
 
     /* Special case for a single ID */
@@ -135,7 +136,7 @@ exports.findByIds = function(Model, ids, callback) {
  * Returns a promise of lean documents
  */
 exports.findByIdsLean = function(Model, ids, select) {
-  return Q.fcall(function() {
+  return Promise.try(function() {
     if (!ids || !ids.length) return [];
 
     /* Special case for a single ID */
@@ -160,7 +161,7 @@ exports.findByIdsLean = function(Model, ids, select) {
 };
 
 exports.findByFieldInValue = function(Model, field, values, callback) {
-  return Q.fcall(function() {
+  return Promise.try(function() {
     if (!values || !values.length) return [];
 
     /* Special case for a single value */

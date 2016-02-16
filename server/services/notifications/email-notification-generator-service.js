@@ -11,7 +11,7 @@ var userService               = require("../user-service");
 var unreadItemService         = require("../unread-item-service");
 var serializer                = require('../../serializers/notification-serializer');
 var moment                    = require('moment');
-var Q                         = require('q');
+var Promise                   = require('bluebird');
 var collections               = require('../../utils/collections');
 var mongoUtils                = require('../../utils/mongo-utils');
 var emailNotificationService  = require('../email-notification-service');
@@ -20,9 +20,6 @@ var userTroupeSettingsService = require('../user-troupe-settings-service');
 var debug                     = require('debug')('gitter:email-notification-generator-service');
 
 var filterTestValues = config.get('notifications:filterTestValues');
-
-var qlimit = require('qlimit');
-var limit = qlimit(10);
 
 var timeBeforeNextEmailNotificationS = config.get('notifications:timeBeforeNextEmailNotificationMins') * 60;
 var emailNotificationsAfterMins = config.get('notifications:emailNotificationsAfterMins');
@@ -145,7 +142,7 @@ function sendEmailNotifications(since) {
         return Object.keys(userTroupeUnreadHash[userId]);
       }));
 
-      return Q.all([
+      return Promise.all([
           userIds,
           userService.findByIds(userIds),
           troupeService.findByIds(troupeIds),
@@ -178,7 +175,7 @@ function sendEmailNotifications(since) {
       var count = 0;
 
       // Limit the loop to 10 simultaneous sends
-      return Q.all(userIds.map(limit(function(userId) {
+      return Promise.map(userIds, function(userId) {
         var user = userHash[userId];
         if(!user) return;
 
@@ -242,8 +239,7 @@ function sendEmailNotifications(since) {
 
               });
           });
-
-        })))
+        }, { concurrency: 10 })
         .then(function() {
           var time = Date.now() - start;
           logger.info("Sent unread notification emails to " + count + " users in " + time + "ms");

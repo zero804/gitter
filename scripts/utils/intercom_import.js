@@ -7,7 +7,7 @@ var persistence         = require("../../server/services/persistence-service");
 var shutdown            = require('shutdown');
 var async               = require('async');
 var emailAddressService = require('../../server/services/email-address-service');
-var Q                   = require('q');
+var Promise             = require('bluebird'); 
 
 function getAllUsers(callback) {
   persistence.User.find(function (err, users) {
@@ -79,6 +79,3 @@ getAllUsers(function(err, users) {
     );
   }
 });
-
-
-

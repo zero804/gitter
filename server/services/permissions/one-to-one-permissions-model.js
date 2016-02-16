@@ -1,6 +1,6 @@
 "use strict";
 
-var Q               = require('q');
+var Promise         = require('bluebird');
 var userHasSignedUp = require('../user-has-signed-up');
 var StatusError     = require('statuserror');
 
@@ -22,11 +22,11 @@ function ensureUserHasSignedUp(uri) {
 module.exports = function oneToOnePermissionsModel(user, right, uri, security) {
   // Security is only for child rooms
   if (security) {
-    return Q.reject(new Error('oneToOnes do not have security'));
+    return Promise.reject(new Error('oneToOnes do not have security'));
   }
 
   // For now, only authenticated users can be in onetoones
-  if (!user) return Q.resolve(false);
+  if (!user) return Promise.resolve(false);
 
   switch (right) {
     case 'create':
@@ -36,7 +36,7 @@ module.exports = function oneToOnePermissionsModel(user, right, uri, security) {
 
     case 'adduser':
     case 'admin':
-      return Q.resolve(false);
+      return Promise.resolve(false);
 
     default:
       throw 'Unknown right ' + right;

@@ -4,8 +4,7 @@
 
 var testRequire = require('../test-require');
 var assert = require("assert");
-var Q = require('q');
-
+var Promise = require('bluebird');
 var username = 'test-user';
 
 function createServiceWithStubData(callback) {
@@ -13,7 +12,7 @@ function createServiceWithStubData(callback) {
     'gitter-web-github': {
       GitHubMembers: {
         isMember: function(username, uri, githubType) {
-          return Q.fcall(function() {
+          return Promise.try(function() {
             return callback(username, uri, githubType);
           });
         }
@@ -92,7 +91,7 @@ describe('invited-permissions-service', function() {
           done();
         });
 
-        service(username, room).fail(done);
+        service(username, room).catch(done);
       });
 
     });
@@ -134,7 +133,7 @@ describe('invited-permissions-service', function() {
         done();
       });
 
-      service(username, room).fail(done);
+      service(username, room).catch(done);
     });
 
   });
@@ -252,7 +251,7 @@ describe('invited-permissions-service', function() {
         done();
       });
 
-      service(username, room).fail(done);
+      service(username, room).catch(done);
     });
 
   });
@@ -340,7 +339,7 @@ describe('invited-permissions-service', function() {
         done();
       });
 
-      service(username, room).fail(done);
+      service(username, room).catch(done);
     });
 
   });

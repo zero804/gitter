@@ -4,18 +4,24 @@ var redis            = require("../utils/redis");
 var winston          = require('../utils/winston');
 var mongoUtils       = require('../utils/mongo-utils');
 var Scripto          = require('gitter-redis-scripto');
-var Q                = require('q');
 var assert           = require('assert');
 var debug            = require('debug')('gitter:unread-items-engine');
 var redisClient      = redis.getClient();
 var scriptManager    = new Scripto(redisClient);
 var _                = require('lodash');
+var Promise          = require('bluebird');
 
 scriptManager.loadFromDir(__dirname + '/../../redis-lua/unread');
 var EMAIL_NOTIFICATION_HASH_KEY = "unread:email_notify";
 
-var runScript = Q.nbind(scriptManager.run, scriptManager);
-var redisClient_smembers = Q.nbind(redisClient.smembers, redisClient);
+var runScript = Promise.promisify(scriptManager.run, { context: scriptManager });
+
+var redisClient_smembers = Promise.promisify(redisClient.smembers, { context: redisClient });
+var redisClient_set      = Promise.promisify(redisClient.set, { context: redisClient });
+var redisClient_mget     = Promise.promisify(redisClient.mget, { context: redisClient });
+var redisClient_hscan    = Promise.promisify(redisClient.hscan, { context: redisClient });
+var redisClient_del      = Promise.promisify(redisClient.del, { context: redisClient });
+var redisClient_zrange   = Promise.promisify(redisClient.zrange, { context: redisClient });
 
 var UNREAD_BATCH_SIZE = 100;
 var PRECONVERT_OBJECTID_TO_STRING_THRESHOLD = 1000;
@@ -66,7 +72,7 @@ function newItemWithMentions(troupeId, itemId, userIds, mentionUserIds) {
   return setLastChatTimestamp(troupeId, timestamp)
     .then(function() {
 
-    if(!userIds.length) return Q.resolve({});
+    if(!userIds.length) return {};
 
     // Working in strings saves a stack of time
     troupeId = mongoUtils.serializeObjectId(troupeId);
@@ -87,7 +93,7 @@ function newItemWithMentions(troupeId, itemId, userIds, mentionUserIds) {
 
     var batches = getNewItemBatches(userIds, mentionUserIds);
 
-    return Q.all(_.map(batches, function(batch) {
+    return Promise.all(_.map(batches, function(batch) {
         var batchUserIds = batch.userIds;
         var batchMentionIds = batch.mentionUserIds;
 
@@ -155,19 +161,19 @@ function newItemWithMentions(troupeId, itemId, userIds, mentionUserIds) {
 
 
 function setLastChatTimestamp(troupeId, timestamp) {
-  return Q.ninvoke(redisClient, "set", "lmts:" + troupeId, timestamp);
+  return redisClient_set("lmts:" + troupeId, timestamp);
 }
 
 function getLastChatTimestamps(troupeIds) {
   if (!troupeIds || !troupeIds.length) {
-    return Q.resolve([]);
+    return Promise.resolve([]);
   }
 
   var tsCacheKeys = troupeIds.map(function(troupeId) {
     return "lmts:" + troupeId;
   });
 
-  return Q.ninvoke(redisClient, "mget", tsCacheKeys);
+  return redisClient_mget(tsCacheKeys);
 }
 
 /**
@@ -363,7 +369,7 @@ function scanEmailNotifications() {
   var cursor = '0';
   var hashValues = {};
   function iter() {
-    return Q.ninvoke(redisClient, "hscan", EMAIL_NOTIFICATION_HASH_KEY, cursor, 'COUNT', 1000)
+    return redisClient_hscan(EMAIL_NOTIFICATION_HASH_KEY, cursor, 'COUNT', 1000)
       .spread(function(nextCursor, result) {
         /* Turn the results into a hash */
         if (result) {
@@ -443,7 +449,7 @@ function listTroupeUsersForEmailNotifications(horizonTime, emailLatchExpiryTimeS
 }
 
 function removeAllEmailNotifications() {
-  return Q.ninvoke(redisClient, "del", EMAIL_NOTIFICATION_HASH_KEY);
+  return redisClient_del(EMAIL_NOTIFICATION_HASH_KEY);
 }
 
 /**
@@ -545,7 +551,7 @@ function getUnreadItemsForUserTroupes(userTroupes) {
 function getAllUnreadItemCounts(userId) {
   // This requires two separate calls, doesnt work as a lua script
   // as we can't predict the keys before the first call...
-  return Q.ninvoke(redisClient, "zrange", "ub:" + userId, 0, -1)
+  return redisClient_zrange("ub:" + userId, 0, -1)
     .then(function(troupeIds) {
       if(!troupeIds || !troupeIds.length) return [];
 
@@ -587,23 +593,24 @@ function getBadgeCountsForUserIds(userIds) {
     multi.zcard("ub:" + userId);
   });
 
-  var d = Q.defer();
-  multi.exec(d.makeNodeResolver());
-  return d.promise.then(function(replies) {
-    var result = {};
+  return Promise.fromCallback(function(callback) {
+      multi.exec(callback);
+    })
+    .then(function(replies) {
+      var result = {};
 
-    userIds.forEach(function(userId, index) {
-      var reply = replies[index];
-      result[userId] = reply;
+      userIds.forEach(function(userId, index) {
+        var reply = replies[index];
+        result[userId] = reply;
+      });
+
+      return result;
     });
-
-    return result;
-  });
 }
 
 
 function getRoomsCausingBadgeCount(userId) {
-  return Q.ninvoke(redisClient, "zrange", ["ub:" + userId, 0, -1]);
+  return redisClient_zrange(["ub:" + userId, 0, -1]);
 }
 
 /**

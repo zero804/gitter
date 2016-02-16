@@ -4,16 +4,12 @@
 "use strict";
 
 var shutdown = require('shutdown');
-var persistence = require('../../server/services/persistence-service');
 var uriLookupService   = require('../../server/services/uri-lookup-service');
 var roomService = require('../../server/services/room-service');
 var troupeService = require('../../server/services/troupe-service');
 
 var readline = require('readline');
-var Q = require('q');
-
-var qlimit = require('qlimit');
-var limit = qlimit(1);
+var Promise = require('bluebird');
 
 require('../../server/event-listeners').install();
 
@@ -39,7 +35,7 @@ function confirm() {
     output: process.stdout
   });
 
-  return Q.Promise(function(resolve, reject) {
+  return new Promise(function(resolve, reject) {
     rl.question('Are you sure you want to perform these redirects? ' + fromRoomInput + ' -> ' + toRoomInput + '\nType "yes"?', function(answer) {
       rl.close();
 
@@ -56,9 +52,9 @@ var getMessageFromRoomResult = function(roomName, test) {
   }
 
   return '';
-}
+};
 
-Q.all([
+Promise.all([
     troupeService.findByUri(fromRoomInput),
     troupeService.findByUri(toRoomInput),
   ])

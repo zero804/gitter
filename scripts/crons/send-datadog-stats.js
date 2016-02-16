@@ -5,9 +5,9 @@
 var persistence = require('../../server/services/persistence-service');
 var config      = require('gitter-web-env');
 var stats       = config.stats;
-var Q           = require('q');
+var Promise     = require('bluebird');
 
-Q.all([
+Promise.all([
   persistence.User.count().exec(),
   persistence.ChatMessage.count().exec(),
   persistence.Troupe.count({security: 'PUBLIC'}).exec(),

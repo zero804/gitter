@@ -6,7 +6,7 @@ var nconf  = env.config;
 var stats  = env.stats;
 var statsd = env.createStatsClient({ prefix: nconf.get('stats:statsd:prefix') + 'serializer.' });
 
-var Q       = require("q");
+var Promise = require('bluebird');
 var winston = require('../utils/winston');
 var fs      = require('fs');
 var path    = require('path');
@@ -19,7 +19,7 @@ var maxSerializerTime = nconf.get('serializer:warning-period');
  */
 function serialize(items, strat, callback) {
   if(items === null || items === undefined) {
-    return Q.resolve(items).nodeify(callback);
+    return Promise.resolve(items).nodeify(callback);
   }
 
   var statsPrefix = strat.strategyType ?
@@ -30,7 +30,7 @@ function serialize(items, strat, callback) {
   if (Array.isArray(items)) {
     /** Array with zero items, shortcut */
     if (!items.length) {
-      return Q.resolve([]).nodeify(callback);
+      return Promise.resolve([]).nodeify(callback);
     }
 
     statsd.histogram(statsPrefix + '.size', items.length, 0.1);
@@ -41,40 +41,42 @@ function serialize(items, strat, callback) {
     items = [ items ];
   }
 
-  var d = Q.defer();
   var start = Date.now();
-  strat.preload(items, function(err) {
 
-    if(err) {
-      winston.error("Error during preload", { exception: err });
-      return d.reject(err);
-    }
+  return new Promise(function(resolve, reject) {
+    strat.preload(items, function(err) {
 
-    var time = Date.now() - start;
-    debug('strategy %s with %s items took %sms to complete', strat.name, items.length, time);
-    statsd.timing(statsPrefix + '.timing', time, 0.1);
+      if(err) {
+        winston.error("Error during preload", { exception: err });
+        return reject(err);
+      }
 
-    if(time > maxSerializerTime) {
-      stats.responseTime('serializer.slow.preload', time);
-    }
+      var time = Date.now() - start;
+      debug('strategy %s with %s items took %sms to complete', strat.name, items.length, time);
+      statsd.timing(statsPrefix + '.timing', time, 0.1);
 
-    var serialized = items.map(strat.map)
-      .filter(function(f) {
-        return f !== undefined;
-      });
+      if(time > maxSerializerTime) {
+        stats.responseTime('serializer.slow.preload', time);
+      }
 
-    if(strat.post) {
-      serialized = strat.post(serialized);
-    }
+      var serialized = items.map(strat.map)
+        .filter(function(f) {
+          return f !== undefined;
+        });
 
-    if (single) {
-      return d.resolve(serialized[0]);
-    } else {
-      return d.resolve(serialized);
-    }
-  });
+      if(strat.post) {
+        serialized = strat.post(serialized);
+      }
 
-  return d.promise.nodeify(callback);
+      if (single) {
+        return resolve(serialized[0]);
+      } else {
+        return resolve(serialized);
+      }
+    });
+
+  })
+  .nodeify(callback);
 
 }
 

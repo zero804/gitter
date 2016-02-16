@@ -1,7 +1,7 @@
 "use strict";
 
 var testRequire = require('../test-require');
-var Q = require('q');
+var Promise = require('bluebird');
 var assert = require('assert');
 var mongoUtils = testRequire('./utils/mongo-utils');
 var randomSeed = require('random-seed');
@@ -238,7 +238,7 @@ describe('unread-item-service-engine-combined #slow', function() {
           function markAllItemsRead() {
 
             /* Only perform this operation one time in 3 */
-            if(rand(3) !== 0) return Q.resolve();
+            if(rand(3) !== 0) return Promise.resolve();
 
             debug('Operation %s: markAllItemsRead', count);
 

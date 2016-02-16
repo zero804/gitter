@@ -1,11 +1,11 @@
 "use strict";
 
-var persistence              = require("./persistence-service");
-var userService              = require("./user-service");
-var collections              = require("../utils/collections");
-var mongoUtils               = require("../utils/mongo-utils");
-var Q                        = require("q");
-var roomMembershipService    = require('./room-membership-service');
+var persistence           = require("./persistence-service");
+var userService           = require("./user-service");
+var collections           = require("../utils/collections");
+var mongoUtils            = require("../utils/mongo-utils");
+var Promise               = require('bluebird');
+var roomMembershipService = require('./room-membership-service');
 
 /**
  * Returns the URL a particular user would see if they wish to view a URL.
@@ -14,14 +14,14 @@ var roomMembershipService    = require('./room-membership-service');
  */
 function getUrlForTroupeForUserId(troupe, userId) {
   if(!troupe.oneToOne) {
-    return Q.resolve("/" + troupe.uri);
+    return Promise.resolve("/" + troupe.uri);
   }
 
   var otherTroupeUser = troupe.oneToOneUsers.filter(function(troupeUser) {
     return troupeUser.userId != userId;
   })[0];
 
-  if(!otherTroupeUser) return Q.reject(new Error("Unable to determine other user for troupe#" + troupe.id));
+  if(!otherTroupeUser) return Promise.reject(new Error("Unable to determine other user for troupe#" + troupe.id));
 
   return userService.findUsernameForUserId(otherTroupeUser.userId)
     .then(function(username) {
@@ -33,7 +33,8 @@ function getUrlForTroupeForUserId(troupe, userId) {
 exports.getUrlForTroupeForUserId = getUrlForTroupeForUserId;
 
 function getUrlOfFirstAccessibleRoom(troupeIds, userId) {
-  if (!troupeIds.length) return Q.resolve(null);
+  if (!troupeIds.length) return Promise.resolve(null);
+  
   return roomMembershipService.findUserMembershipInRooms(userId, troupeIds)
     .then(function(memberTroupeIds) {
       return persistence.Troupe.find({

@@ -8,7 +8,7 @@ var userService            = require("./user-service");
 var githubSearchService    = require('gitter-web-github').GitHubFastSearch;
 var extractGravatarVersion = require('../utils/extract-gravatar-version');
 
-var Q = require('q');
+var Promise = require('bluebird');
 var _ = require('underscore');
 
 function cleanQuery(query) {
@@ -73,7 +73,7 @@ function addGitterDataToGithubUsers(githubUsers) {
 module.exports = function(searchQuery, user, options, callback) {
   options = options || {};
 
-  return Q([
+  return Promise.all([
     userSearchService.searchForUsers(user.id, searchQuery, options),
     searchGithubUsers(searchQuery, user).then(addGitterDataToGithubUsers)
   ])

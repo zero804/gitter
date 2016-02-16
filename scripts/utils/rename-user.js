@@ -33,6 +33,6 @@ userService.findByUsername(opts.old)
   .then(function() {
     console.log('done');
   })
-  .fin(function() {
+  .finally(function() {
     shutdown.shutdownGracefully();
   });

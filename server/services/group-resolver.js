@@ -1,6 +1,6 @@
 "use strict";
 
-var Q = require('q');
+var Promise = require('bluebird');
 var assert = require('assert');
 var roomPermissionsModel = require('./room-permissions-model');
 var roomMembershipService = require('./room-membership-service');
@@ -29,26 +29,21 @@ function resolveTeam(room, user, groupName) {
  * Given a room, a user and a list of group names,
  * returns a hash of the groupName and the users in that group
  */
-module.exports = function resolve(room, user, groupNames) {
-  return Q.fcall(function() {
-    assert(room && room.id);
-    assert(user && user.id);
+module.exports = Promise.method(function resolve(room, user, groupNames) {
+  assert(room && room.id);
+  assert(user && user.id);
 
-    if(!groupNames.length) return {}; // No point in continuing
+  if(!groupNames.length) return {}; // No point in continuing
 
-    return Q.all(groupNames.map(function(groupName) {
-        return resolveTeam(room, user, groupName);
-      }))
-      .then(function(arraysOfIserIds) {
-        // Turn the array of arrays into a hash
-        return arraysOfIserIds.reduce(function(memo, userIds, i) {
-          var groupName = groupNames[i];
-          memo[groupName] = userIds;
-          return memo;
-        }, {});
-
-      });
-
-  });
-
-};
+  return Promise.map(groupNames, function(groupName) {
+      return resolveTeam(room, user, groupName);
+    })
+    .then(function(arraysOfUserIds) {
+      // Turn the array of arrays into a hash
+      return arraysOfUserIds.reduce(function(memo, userIds, i) {
+        var groupName = groupNames[i];
+        memo[groupName] = userIds;
+        return memo;
+      }, {});
+    });
+});

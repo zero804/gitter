@@ -4,7 +4,7 @@ var env         = require('gitter-web-env');
 var config      = env.config;
 var _           = require('lodash');
 var SnappyCache = require('snappy-cache');
-var Q           = require('q');
+var Promise     = require('bluebird');
 var assert      = require('assert');
 
 var redisClient;
@@ -45,13 +45,16 @@ function wrapFunction(cache, moduleName, func, funcName, getInstanceIdFunc) {
     var instanceId = getInstanceIdFunc ? getInstanceIdFunc(this) : '';
     var key = generateKey(moduleName, instanceId, funcName, args);
 
-    var d = Q.defer();
-    cache.lookup(key, function(cb) {
-      func.apply(self, args).nodeify(cb);
-    }, d.makeNodeResolver());
+    return new Promise(function(resolve, reject) {
+      cache.lookup(key, function(cb) {
+        func.apply(self, args).nodeify(cb);
+      }, function(err, result) {
+        if (err) return reject(err);
+        resolve(result);
+      });
 
-    // assuming that the original function returns a promise
-    return d.promise;
+    });
+
   };
 }
 

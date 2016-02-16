@@ -3,7 +3,7 @@
 "use strict";
 
 var assert = require('assert');
-var Q = require('q');
+var Promise = require('bluebird');
 var proxyquireNoCallThru = require("proxyquire").noCallThru();
 
 describe('github-members', function() {
@@ -24,11 +24,11 @@ describe('github-members', function() {
 
       var FakeRepoService = function() {};
       FakeRepoService.prototype.getCollaborators = function() {
-        return Q.resolve([{ login: 'alice' }, { login: 'bob' }]);
+        return Promise.resolve([{ login: 'alice' }, { login: 'bob' }]);
       };
       FakeRepoService.prototype.isCollaborator = function(uri) {
         assert.strictEqual('gitterHQ/gitter', uri);
-        return Q.resolve(true);
+        return Promise.resolve(true);
       };
 
       var githubMembers = proxyquireNoCallThru('../lib/github-members', {
@@ -59,17 +59,17 @@ describe('github-members', function() {
       FakeOrgService.prototype.member = function(uri, username) {
         assert.strictEqual(uri, 'gitterHQ');
         assert.strictEqual('alice', username);
-        return Q.resolve(true);
+        return Promise.resolve(true);
       };
       FakeOrgService.prototype.members = function(uri) {
         assert.strictEqual(uri, 'gitterHQ');
-        return Q.resolve([{ login: 'alice' }, { login: 'bob' }]);
+        return Promise.resolve([{ login: 'alice' }, { login: 'bob' }]);
       };
 
       var FakeMeService = function() {};
       FakeMeService.prototype.isOrgMember = function(uri) {
         assert.strictEqual('gitterHQ', uri);
-        return Q.resolve(true);
+        return Promise.resolve(true);
       };
 
       var githubMembers =  proxyquireNoCallThru('../lib/github-members', {

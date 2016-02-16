@@ -7,19 +7,11 @@ var troupeService = require('../../server/services/troupe-service');
 var unreadItemService = require('../../server/services/unread-item-service');
 var collections = require('../../server/utils/collections');
 var categoriseUsersInRoom = require('../../server/services/categorise-users-in-room');
-
-var Q = require('q');
+var Promise = require('bluebird');
 
 var shutdown = require('shutdown');
 
-function pad(string, length) {
-  if (!string) string = '';
 
-  while(string.length < length) {
-    string = string + ' ';
-  }
-  return string;
-}
 var opts = require("nomnom")
   .option('uri', {
     help: "uri of room to list presence for"
@@ -37,10 +29,10 @@ function getTroupe() {
     return troupeService.findByUri(opts.uri);
 
   if (!opts.fromUser || !opts.toUser) {
-    return Q.reject('Please specify either a uri or a fromUser and toUser');
+    return Promise.reject('Please specify either a uri or a fromUser and toUser');
   }
 
-  return Q.all([
+  return Promise.all([
     userService.findByUsername(opts.fromUser),
     userService.findByUsername(opts.toUser),
   ])

@@ -6,7 +6,7 @@ var troupeService        = require('./troupe-service');
 var debug                = require('debug')('gitter:room-context-service');
 var roomPermissionsModel = require('./room-permissions-model');
 var permissionsModel     = require('./permissions-model');
-var Q                    = require('q');
+var Promise              = require('bluebird');
 
 /**
  * Given a user and a URI returns (promise of) a context object.
@@ -30,7 +30,7 @@ function findContextForUri(user, uri, options) {
 
   var userId = user && user.id;
 
-  if (!uri) return Q.reject(new StatusError(400, 'uri required'));
+  if (!uri) return Promise.reject(new StatusError(400, 'uri required'));
 
   /* First off, try use local data to figure out what this url is for */
   return uriResolver(user && user.id, uri, options)

@@ -4,7 +4,7 @@
 
 var testRequire = require('../../test-require');
 var assert = require('assert');
-var Q = require('q');
+var Promise = require('bluebird');
 var testGenerator = require('../../test-generator');
 
 var mockito = require('jsmockito').JsMockito;
@@ -97,7 +97,7 @@ describe('org room permissions', function() {
         .then(function(uri, user) {
 
           if(USER_IS_IN_ROOM === true || USER_IS_IN_ROOM === false) {
-            return Q.resolve(USER_IS_IN_ROOM);
+            return Promise.resolve(USER_IS_IN_ROOM);
           }
 
           assert(false, 'Unexpected call to userIsInRoom: ' + uri + ', ' + user);
@@ -107,10 +107,10 @@ describe('org room permissions', function() {
         if(GITHUB_API_CALL_FAILURE) {
           var e = new Error('Github is down');
           e.statusCode = 502;
-          return Q.reject(e);
+          return Promise.reject(e);
         }
 
-        return Q.resolve(!!meta.org);
+        return Promise.resolve(!!meta.org);
       });
 
       permissionsModel(USER, RIGHT, URI, SECURITY)
@@ -121,7 +121,7 @@ describe('org room permissions', function() {
 
           assert.strictEqual(result, EXPECTED);
         })
-        .fail(function(err) {
+        .catch(function(err) {
           if(EXPECTED !== 'throw') {
             throw err;
           }

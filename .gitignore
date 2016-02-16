@@ -89,3 +89,4 @@ drop-dev-database.sh
 node_modules_old
 config.dev.user-overrides.json
 node_modules_linux
+.sonar

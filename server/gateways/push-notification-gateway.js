@@ -1,7 +1,7 @@
 "use strict";
 
 var env = require('gitter-web-env');
-var Q = require('q');
+var Promise = require('bluebird');
 var logger = env.logger;
 var stats = env.stats;
 var pushNotificationService = require("../services/push-notification-service");
@@ -16,7 +16,7 @@ function sendNotificationToDevice(notification, badge, device) {
 
   if (!device.deviceType) {
     logger.warn('Unknown device type: ' + device.deviceType);
-    return Q.resolve();
+    return Promise.resolve();
   }
 
   if (device.deviceType.indexOf('APPLE') === 0 && device.appleToken) {
@@ -28,7 +28,7 @@ function sendNotificationToDevice(notification, badge, device) {
       });
   } else {
     logger.warn('Unknown device type: ' + device.deviceType);
-    return Q.resolve();
+    return Promise.resolve();
   }
 
   return notificationPromise.then(function() {
@@ -49,9 +49,9 @@ exports.sendUserNotification = function(userId, notification) {
 
         var badge = counts[userId] || 0;
 
-        return Q.all(devices.map(function(device) {
+        return Promise.map(devices, function(device) {
           return sendNotificationToDevice(notification, badge, device);
-        }));
+        });
     });
 
   });
@@ -79,11 +79,10 @@ exports.sendUsersBadgeUpdates = function(userIds) {
 
       return unreadItemService.getBadgeCountsForUserIds(iosUsers)
         .then(function(counts) {
-          return Q.all(iosDevices.map(function(device) {
-
+          return Promise.map(iosDevices, function(device) {
             var badge = counts[device.userId] || 0;
             return sendNotificationToDevice(null, badge, device);
-          }));
+          });
         });
 
     });

@@ -1,12 +1,11 @@
 "use strict";
 
 var testRequire = require('../test-require');
-var Q = require('q');
+var Promise = require('bluebird');
 var assert = require('assert');
 var mongoUtils = testRequire('./utils/mongo-utils');
 var _ = require('lodash');
 
-Q.longStackSupport = true;
 
 describe('unread-item-service', function() {
 
@@ -50,7 +49,9 @@ describe('unread-item-service', function() {
         var ts = mongoUtils.getTimestampFromObjectId(itemId1);
         return unreadItemServiceEngine.testOnly.setLastChatTimestamp(troupeId1, ts)
           .then(function() {
-            return Q.ninvoke(unreadItemServiceEngine.testOnly.redisClient, 'get', 'lmts:' + troupeId1);
+            return Promise.fromCallback(function(callback) {
+              unreadItemServiceEngine.testOnly.redisClient.get('lmts:' + troupeId1, callback);
+            });
           })
           .then(function(storedTs) {
             assert.deepEqual(ts, storedTs);
@@ -265,7 +266,7 @@ describe('unread-item-service', function() {
       });
 
       it('should handle some unread mentions for users', function(done) {
-        Q.all([
+        Promise.all([
           unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, [userId1], [userId1]),
           unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId2, [userId1], [userId1])
           ])
@@ -329,7 +330,7 @@ describe('unread-item-service', function() {
         it('should let you know who needs to be notified by email', function(done) {
           this.timeout(10000);
 
-          return Q.all([
+          return Promise.all([
               unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, [userId1], []),
               unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId2, [userId1], []),
               unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId3, [userId1], []),
@@ -349,7 +350,7 @@ describe('unread-item-service', function() {
         });
 
         it('should not find someone who has been notified', function(done) {
-          return Q.all([
+          return Promise.all([
               unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, [userId1], []),
               unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId2, [userId1], []),
               unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId3, [userId1], []),
@@ -367,13 +368,13 @@ describe('unread-item-service', function() {
         });
 
         it('should not notify someone who has read their messages', function(done) {
-          return Q.all([
+          return Promise.all([
               unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, [userId1], []),
               unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId2, [userId1], []),
               unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId3, [userId1], []),
             ])
             .then(function() {
-              unreadItemServiceEngine.markItemsRead(userId1, troupeId1, [itemId1, itemId2, itemId3]);
+              return unreadItemServiceEngine.markItemsRead(userId1, troupeId1, [itemId1, itemId2, itemId3]);
             })
             .then(function() {
               return unreadItemServiceEngine.listTroupeUsersForEmailNotifications(Date.now(), 5);
@@ -387,7 +388,7 @@ describe('unread-item-service', function() {
 
         it('should not find messages newer than the cutoff', function(done) {
           blockTimer.reset();
-          return Q.all([
+          return Promise.all([
               unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, [userId1], []),
               unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId2, [userId1], []),
               unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId3, [userId1], []),
@@ -738,7 +739,7 @@ describe('unread-item-service', function() {
         }
 
         blockTimer.reset();
-        return Q.all(adds)
+        return Promise.all(adds)
           .then(function() {
             blockTimer.reset();
 
@@ -769,9 +770,10 @@ describe('unread-item-service', function() {
             // doing it's job, we pull the items with the scores and
             // confirm that they're correct
 
-            var d = Q.defer();
-            unreadItemServiceEngine.testOnly.redisClient.zrange('unread:chat:' + userId1 + ':' + troupeId1, 0, -1, 'WITHSCORES', d.makeNodeResolver());
-            return d.promise;
+            return Promise.fromCallback(function(callback) {
+              unreadItemServiceEngine.testOnly.redisClient.zrange('unread:chat:' + userId1 + ':' + troupeId1, 0, -1, 'WITHSCORES', callback);
+            });
+
           })
           .then(function(unreadItemsWithScores) {
             // Ensure that the timestamp upgrade works correctly
@@ -1146,7 +1148,7 @@ describe('unread-item-service', function() {
 
       return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, userIds, [userId1])
         .then(function() {
-          return Q.all(chatIds.map(function(chatId) {
+          return Promise.all(chatIds.map(function(chatId) {
             return unreadItemServiceEngine.newItemWithMentions(troupeId1, chatId, userIds, []);
           }));
         })

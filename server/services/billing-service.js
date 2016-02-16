@@ -2,14 +2,14 @@
 
 var persistence = require('./persistence-service');
 var mongoUtils = require('../utils/mongo-utils');
-var Q = require('q');
+var Promise = require('bluebird');
 
 function toLowerCase(value) {
   return value && value.toLowerCase();
 }
 
 exports.findActivePersonalPlansForUsers = function(userIds) {
-  if(!userIds || !userIds.length) return Q.resolve([]);
+  if(!userIds || !userIds.length) return Promise.resolve([]);
 
   var query = mongoUtils.fieldInPredicate('userId', userIds.map(mongoUtils.asObjectID), {
     subscriptionType: 'USER',
@@ -21,7 +21,7 @@ exports.findActivePersonalPlansForUsers = function(userIds) {
 };
 
 exports.findActiveOrgPlans = function(orgUris) {
-  if(!orgUris || !orgUris.length) return Q.resolve([]);
+  if(!orgUris || !orgUris.length) return Promise.resolve([]);
 
   var query = mongoUtils.fieldInPredicate('lcUri', orgUris.map(toLowerCase), {
     subscriptionType: 'ORG',
@@ -43,7 +43,7 @@ exports.findActivePlan = function(uri) {
 };
 
 exports.findActivePlans = function(uris) {
-  if(!uris || !uris.length) return Q.resolve([]);
+  if(!uris || !uris.length) return Promise.resolve([]);
 
   var query = mongoUtils.fieldInPredicate('lcUri', uris.map(toLowerCase), {
     status: 'CURRENT'

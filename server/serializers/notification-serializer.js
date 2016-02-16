@@ -1,6 +1,6 @@
 "use strict";
 
-var Q = require("q");
+var Promise = require('bluebird');
 var createSerializer = require('./create-serializer');
 
 function getStrategy(modelName) {
@@ -15,7 +15,7 @@ function getStrategy(modelName) {
 }
 
 function serializeModel(model, callback) {
-  return Q.fcall(function() {
+  return Promise.try(function() {
     if (model === null) return;
     var schema = model.schema;
     if (!schema) throw new Error("Model does not have a schema");
@@ -50,4 +50,3 @@ var serializer = createSerializer('notifications', {
 });
 
 module.exports = serializer;
-

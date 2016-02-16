@@ -5,7 +5,7 @@
 var persistence = require('../../server/services/persistence-service');
 var onMongoConnect = require('../../server/utils/on-mongo-connect');
 var through2Concurrent = require('through2-concurrent');
-var Q = require('q');
+var Promise = require('bluebird');
 var GitHubOrgService = require('gitter-web-github').GitHubOrgService;
 
 function orgStream() {
@@ -16,7 +16,7 @@ function orgStream() {
 
 var orgService = new GitHubOrgService();
 function updateOrgRoom(room) {
-  if (room.uri.indexOf('_test_') === 0) return Q.resolve();
+  if (room.uri.indexOf('_test_') === 0) return Promise.resolve();
 
   return orgService.getOrg(room.uri)
     .then(function(org) {
@@ -28,34 +28,34 @@ function updateOrgRoom(room) {
 }
 
 function performMigration() {
-  var d = Q.defer();
-  var count = 0;
-  orgStream()
-    .pipe(through2Concurrent.obj({ maxConcurrency: 6 },
-      function (room, enc, callback) {
-        var self = this;
-        return updateOrgRoom(room)
-          .then(function() {
-            self.emit(room.uri);
-          })
-          .catch(function(err) {
-            console.log(err);
-          })
-          .nodeify(callback);
+  return new Promise(function(resolve) {
+    var count = 0;
+    orgStream()
+      .pipe(through2Concurrent.obj({ maxConcurrency: 6 },
+        function (room, enc, callback) {
+          var self = this;
+          return updateOrgRoom(room)
+            .then(function() {
+              self.emit(room.uri);
+            })
+            .catch(function(err) {
+              console.log(err);
+            })
+            .nodeify(callback);
 
-    }))
-    .on('data', function() {
-      count++;
-      if (count % 100 === 0) {
-        console.log('Completed ', count);
-      }
-    })
-    .on('end', function () {
-      console.log('DONE');
-      d.resolve();
-    });
+      }))
+      .on('data', function() {
+        count++;
+        if (count % 100 === 0) {
+          console.log('Completed ', count);
+        }
+      })
+      .on('end', function () {
+        console.log('DONE');
+        resolve();
+      });
 
-  return d.promise;
+  });
 }
 
 onMongoConnect()

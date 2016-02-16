@@ -7,7 +7,7 @@ var onMongoConnect = require('../../server/utils/on-mongo-connect');
 var roomMembershipService = require('../../server/services/room-membership-service');
 var userService = require('../../server/services/user-service');
 var through2Concurrent = require('through2-concurrent');
-var Q = require('q');
+var Promise = require('bluebird');
 var GitHubRepoService = require('gitter-web-github').GitHubRepoService;
 
 function orgStream() {
@@ -24,9 +24,9 @@ function orgStream() {
 }
 
 function updateOrgRoom(room) {
-  if (room.uri.indexOf('_test_') === 0) return Q.resolve();
+  if (room.uri.indexOf('_test_') === 0) return Promise.resolve();
 
-  return Q.fcall(function() {
+  return Promise.try(function() {
       if (room.security === 'PUBLIC') {
         return null;
       }
@@ -50,34 +50,33 @@ function updateOrgRoom(room) {
 }
 
 function performMigration() {
-  var d = Q.defer();
-  var count = 0;
-  orgStream()
-    .pipe(through2Concurrent.obj({ maxConcurrency: 6 },
-      function (room, enc, callback) {
-        var self = this;
-        return updateOrgRoom(room)
-          .then(function() {
-            self.emit(room.uri);
-          })
-          .catch(function(err) {
-            console.log(err);
-          })
-          .nodeify(callback);
+  return new Promise(function(resolve) {
+    var count = 0;
+    orgStream()
+      .pipe(through2Concurrent.obj({ maxConcurrency: 6 },
+        function (room, enc, callback) {
+          var self = this;
+          return updateOrgRoom(room)
+            .then(function() {
+              self.emit(room.uri);
+            })
+            .catch(function(err) {
+              console.log(err);
+            })
+            .nodeify(callback);
 
-    }))
-    .on('data', function() {
-      count++;
-      if (count % 100 === 0) {
-        console.log('Completed ', count);
-      }
-    })
-    .on('end', function () {
-      console.log('DONE');
-      d.resolve();
-    });
-
-  return d.promise;
+      }))
+      .on('data', function() {
+        count++;
+        if (count % 100 === 0) {
+          console.log('Completed ', count);
+        }
+      })
+      .on('end', function () {
+        console.log('DONE');
+        resolve();
+      });
+  });
 }
 
 onMongoConnect()

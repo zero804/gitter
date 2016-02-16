@@ -10,7 +10,7 @@ var restSerializer    = require("../../serializers/rest-serializer");
 var mongoUtils        = require('../../utils/mongo-utils');
 var StatusError       = require('statuserror');
 var bayeuxExtension   = require('./extension');
-var Q                 = require('q');
+var Promise           = require('bluebird');
 var userCanAccessRoom = require('../../services/user-can-access-room');
 var debug             = require('debug')('gitter:bayeux-authorisor');
 var recentRoomService = require('../../services/recent-room-service');
@@ -64,7 +64,7 @@ function validateUserForSubTroupeSubscription(options) {
   var troupeId = match[1];
 
   if(!mongoUtils.isLikeObjectId(troupeId)) {
-    return Q.reject(new StatusError(400, 'Invalid ID: ' + troupeId));
+    return Promise.reject(new StatusError(400, 'Invalid ID: ' + troupeId));
   }
 
   var promise = userCanAccessRoom.permissionToRead(userId, troupeId);
@@ -91,7 +91,7 @@ function validateUserForSubTroupeSubscription(options) {
 // This is only used by the native client. The web client publishes to
 // the url
 function validateUserForPingSubscription(/* options */) {
-  return Q.resolve(true);
+  return Promise.resolve(true);
 }
 
 // This strategy ensures that a user can access a URL under a /user/ URL
@@ -101,15 +101,15 @@ function validateUserForUserSubscription(options) {
   var subscribeUserId = match[1];
 
   // All /user/ subscriptions need to be authenticated
-  if(!userId) return Q.resolve(false);
+  if(!userId) return Promise.resolve(false);
 
   if(!mongoUtils.isLikeObjectId(userId)) {
-    return Q.reject(new StatusError(400, 'Invalid ID: ' + userId));
+    return Promise.reject(new StatusError(400, 'Invalid ID: ' + userId));
   }
 
   var result = userId == subscribeUserId;
 
-  return Q.resolve(result);
+  return Promise.resolve(result);
 }
 
 function dataToSnapshot(type) {
@@ -125,7 +125,7 @@ function populateSubUserCollection(options) {
   var collection = match[2];
 
   if(!userId || userId != subscribeUserId) {
-    return Q.resolve();
+    return Promise.resolve();
   }
 
   switch(collection) {
@@ -142,7 +142,7 @@ function populateSubUserCollection(options) {
       logger.error('Unable to provide snapshot for ' + collection);
   }
 
-  return Q.resolve();
+  return Promise.resolve();
 }
 
 function populateTroupe(options) {
@@ -156,7 +156,7 @@ function populateTroupe(options) {
    * then we return the current troupe to the user
    */
 
-  if (!snapshotOptions) return Q.resolve();
+  if (!snapshotOptions) return Promise.resolve();
 
   var strategy = new restSerializer.TroupeIdStrategy({
     currentUserId: userId,
@@ -177,7 +177,7 @@ function populateSubTroupeCollection(options) {
   switch(collection) {
     case "chatMessages":
       if (survivalMode) {
-        return Q.resolve(dataToSnapshot('room.events')([]));
+        return Promise.resolve(dataToSnapshot('room.events')([]));
       }
 
       return restful.serializeChatsForTroupe(troupeId, userId, snapshotOptions)
@@ -185,7 +185,7 @@ function populateSubTroupeCollection(options) {
 
     case "users":
       if (survivalMode) {
-        return Q.resolve(dataToSnapshot('room.events')([]));
+        return Promise.resolve(dataToSnapshot('room.events')([]));
       }
 
       return restful.serializeUsersForTroupe(troupeId, userId, snapshotOptions)
@@ -193,7 +193,7 @@ function populateSubTroupeCollection(options) {
 
     case "events":
       if (survivalMode) {
-        return Q.resolve(dataToSnapshot('room.events')([]));
+        return Promise.resolve(dataToSnapshot('room.events')([]));
       }
 
       return restful.serializeEventsForTroupe(troupeId, userId)
@@ -203,7 +203,7 @@ function populateSubTroupeCollection(options) {
       logger.error('Unable to provide snapshot for ' + collection);
   }
 
-  return Q.resolve();
+  return Promise.resolve();
 }
 
 function populateSubSubTroupeCollection(options) {
@@ -223,7 +223,7 @@ function populateSubSubTroupeCollection(options) {
       logger.error('Unable to provide snapshot for ' + collection);
   }
 
-  return Q.resolve();
+  return Promise.resolve();
 }
 
 function populateUserUnreadItemsCollection(options) {
@@ -233,7 +233,7 @@ function populateUserUnreadItemsCollection(options) {
   var troupeId = match[2];
 
   if(!userId || userId !== subscriptionUserId) {
-    return Q.resolve();
+    return Promise.resolve();
   }
 
   return restful.serializeUnreadItemsForTroupe(troupeId, userId)

@@ -1,6 +1,6 @@
 "use strict";
 
-var Q                = require("q");
+var Promise          = require('bluebird');
 var createSerializer = require('./create-serializer');
 
 // TODO: deprecate this....
@@ -20,7 +20,7 @@ function getStrategy(modelName) {
 }
 
 function serializeModel(model, callback) {
-  return Q.fcall(function() {
+  return Promise.try(function() {
       if(model === null) return;
 
       var schema = model.schema;

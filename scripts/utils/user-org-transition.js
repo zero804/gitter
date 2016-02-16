@@ -3,7 +3,7 @@
 "use strict";
 
 var shutdown = require('shutdown');
-var Q = require('q');
+var Promise = require('bluebird');
 var userRemovalService = require('../../server/services/user-removal-service');
 var roomService = require('../../server/services/room-service');
 var userService = require('../../server/services/user-service');
@@ -35,7 +35,7 @@ function performUserToOrgTransition(usernameForConversion, firstUserUsername, dr
   var context = {};
 
   /* Find the old user and the new org */
-  return Q.all([userService.findByUsername(usernameForConversion), userService.findByUsername(firstUserUsername)])
+  return Promise.all([userService.findByUsername(usernameForConversion), userService.findByUsername(firstUserUsername)])
     .spread(function(userForConversion, firstUser) {
       if (!firstUser) throw new Error('Not found: ' + firstUserUsername);
       context.userForConversion = userForConversion;
@@ -88,7 +88,7 @@ function performUserToOrgTransition(usernameForConversion, firstUserUsername, dr
         }
       });
 
-      return Q.all(troupesForUpdate.map(function(t) {
+      return Promise.all(troupesForUpdate.map(function(t) {
         t.githubType = 'ORG_CHANNEL';
         console.log(t.uri);
 

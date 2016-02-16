@@ -1,15 +1,15 @@
 "use strict";
 
-var persistence              = require('./persistence-service');
-var TroupeUser               = persistence.TroupeUser;
-var Troupe                   = persistence.Troupe;
-var mongoUtils               = require("../utils/mongo-utils");
-var Q                        = require("q");
-var EventEmitter             = require('events').EventEmitter;
-var assert                   = require('assert');
-var debug                    = require('debug')('gitter:room-membership-service');
-var recentRoomCore           = require('./core/recent-room-core');
-var roomMembershipEvents     = new EventEmitter();
+var persistence          = require('./persistence-service');
+var TroupeUser           = persistence.TroupeUser;
+var Troupe               = persistence.Troupe;
+var mongoUtils           = require("../utils/mongo-utils");
+var Promise              = require('bluebird');
+var EventEmitter         = require('events').EventEmitter;
+var assert               = require('assert');
+var debug                = require('debug')('gitter:room-membership-service');
+var recentRoomCore       = require('./core/recent-room-core');
+var roomMembershipEvents = new EventEmitter();
 
 /* Exports */
 exports.findRoomIdsForUser          = findRoomIdsForUser;
@@ -84,7 +84,7 @@ function checkRoomMembership(troupeId, userId) {
  */
 function findUserMembershipInRooms(userId, troupeIds) {
   assert(userId);
-  if (!troupeIds.length) return Q.resolve([]);
+  if (!troupeIds.length) return Promise.resolve([]);
 
   if (troupeIds.length === 1) {
     // Optimise for single troupeIds, which happens a lot
@@ -104,7 +104,7 @@ function findUserMembershipInRooms(userId, troupeIds) {
  */
 function findMembershipForUsersInRoom(troupeId, userIds) {
   assert(troupeId);
-  if (!userIds.length) return Q.resolve([]);
+  if (!userIds.length) return Promise.resolve([]);
 
   return TroupeUser.distinct("userId", { userId: { $in: mongoUtils.asObjectIDs(userIds) }, troupeId: troupeId })
     .exec();
@@ -192,7 +192,7 @@ function addRoomMember(troupeId, userId) {
 
           return incrementTroupeUserCount(troupeId, 1);
         })
-        .thenResolve(added);
+        .thenReturn(added);
     });
 
 }
@@ -206,7 +206,7 @@ function addRoomMembers(troupeId, userIds) {
   debug('Adding %s members to room %s', userIds.length, troupeId);
 
   assert(troupeId);
-  if (!userIds.length) return Q.resolve();
+  if (!userIds.length) return Promise.resolve();
   userIds.forEach(function(userId) {
     assert(userId);
   });
@@ -223,22 +223,23 @@ function addRoomMembers(troupeId, userIds) {
       .updateOne({ $setOnInsert: { troupeId: troupeId, userId:userId } });
   });
 
-  var d = Q.defer();
-  bulk.execute(d.makeNodeResolver());
-  return d.promise.then(function(bulkResult) {
-    var upserted = bulkResult.getUpsertedIds();
+  return Promise.fromCallback(function(callback) {
+      bulk.execute(callback);
+    })
+    .then(function(bulkResult) {
+      var upserted = bulkResult.getUpsertedIds();
 
-    var addedUserIds = upserted.map(function(upsertedDoc) {
-      return userIds[upsertedDoc.index];
+      var addedUserIds = upserted.map(function(upsertedDoc) {
+        return userIds[upsertedDoc.index];
+      });
+
+      if (!addedUserIds.length) return addedUserIds;
+
+      roomMembershipEvents.emit("members.added", troupeId, addedUserIds);
+
+      return incrementTroupeUserCount(troupeId, addedUserIds.length)
+        .thenReturn(addedUserIds);
     });
-
-    if (!addedUserIds.length) return addedUserIds;
-
-    roomMembershipEvents.emit("members.added", troupeId, addedUserIds);
-
-    return incrementTroupeUserCount(troupeId, addedUserIds.length)
-      .thenResolve(addedUserIds);
-  });
 }
 
 /**
@@ -264,7 +265,7 @@ function removeRoomMember(troupeId, userId) {
 
       roomMembershipEvents.emit("members.removed", troupeId, [userId]);
       return incrementTroupeUserCount(troupeId, -1)
-        .thenResolve(true);
+        .thenReturn(true);
     });
 }
 
@@ -275,7 +276,7 @@ function removeRoomMembers(troupeId, userIds) {
   debug('Removing %s members from room %s', userIds.length, troupeId);
 
   assert(troupeId);
-  if (!userIds.length) return Q.resolve();
+  if (!userIds.length) return Promise.resolve();
 
   userIds.forEach(function(userId) {
     assert(userId);
@@ -301,7 +302,7 @@ function removeRoomMembers(troupeId, userIds) {
  * Returns a list of all room members for an array of rooms
  */
 function findAllMembersForRooms(troupeIds) {
-  if(!troupeIds.length) return Q.resolve([]);
+  if(!troupeIds.length) return Promise.resolve([]);
   troupeIds.forEach(function(troupeIds) {
     assert(troupeIds);
   });
@@ -316,7 +317,7 @@ function findAllMembersForRooms(troupeIds) {
  * as the value
  */
 function findMembersForRoomMulti(troupeIds) {
-  if(!troupeIds.length) return Q.resolve({});
+  if(!troupeIds.length) return Promise.resolve({});
   troupeIds.forEach(function(troupeIds) {
     assert(troupeIds);
   });

@@ -1,11 +1,10 @@
 /*jslint node:true, unused:true*/
-/*global describe:true, it:true, beforeEach */
 "use strict";
 
 var testRequire = require('../../test-require');
 var assert = require('assert');
 var _ = require('underscore');
-var Q = require('q');
+var Promise = require('bluebird');
 var testGenerator = require('../../test-generator');
 var mockito = require('jsmockito').JsMockito;
 
@@ -17,14 +16,14 @@ var resolveUserInRoom = function(res) {
   return function(uri, user) {
     assert.equal(uri, URI);
     assert.equal(user, USER);
-    return Q.resolve(res);
+    return Promise.resolve(res);
   };
 };
 
 var resolvePermission = function(res) {
   return function(user, right, repo) {
     assert.equal(repo, PARENT_URI);
-    return Q.resolve(res);
+    return Promise.resolve(res);
   };
 };
 

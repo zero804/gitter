@@ -3,7 +3,7 @@
 var express = require('express');
 var exploreService = require('../services/explore-service');
 var getRoughMessageCount = require('../services/chat-service').getRoughMessageCount;
-var Q = require('q');
+var Promise = require('bluebird');
 var langs = require('langs');
 var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
 
@@ -30,7 +30,7 @@ function getRoomRenderData(room) {
 }
 
 function processTagResult(rooms) {
-  return Q.all(rooms.map(getRoomRenderData));
+  return Promise.all(rooms.map(getRoomRenderData));
 }
 
 function getSearchName(tags) {

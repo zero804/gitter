@@ -2,7 +2,7 @@
 
 var testRequire = require('../test-require');
 var assert = require('assert');
-var Q = require('q');
+var Promise = require('bluebird');
 var testGenerator = require('../test-generator');
 
 // All of our fixtures
@@ -319,7 +319,7 @@ describe('user-can-access-room', function() {
           findById: function() {
             return {
               exec: function() {
-                return Q.resolve({
+                return Promise.resolve({
                   _id: troupeId,
                   security: roomSecurity,
                   githubType: roomGithubType,
@@ -346,13 +346,13 @@ describe('user-can-access-room', function() {
       var userService = {
         findById: function() {
           assert(!anonymous);
-          return Q.resolve({ _id: userId });
+          return Promise.resolve({ _id: userId });
         }
       };
 
       var troupeService = {
         findById: function() {
-          return Q.resolve({ _id: troupeId });
+          return Promise.resolve({ _id: troupeId });
         }
       };
 
@@ -366,21 +366,21 @@ describe('user-can-access-room', function() {
         }
 
         if (roomPermissionsGrantsAccess === "throw") {
-          return Q.reject(new Error('Backend is down'));
+          return Promise.reject(new Error('Backend is down'));
         }
 
-        return Q.resolve(roomPermissionsGrantsAccess);
+        return Promise.resolve(roomPermissionsGrantsAccess);
       };
 
       var roomMembershipService = {
         checkRoomMembership: function() {
           assert(!anonymous);
-          return Q.resolve(inRoom);
+          return Promise.resolve(inRoom);
         },
         removeRoomMember: function() {
           assert(expectRemoveRoomMember);
           removeRoomMemberCount++;
-          return Q.resolve();
+          return Promise.resolve();
         }
       };
 

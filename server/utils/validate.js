@@ -1,6 +1,5 @@
 "use strict";
 
-var Q = require('q');
 var winston = require('./winston');
 var StatusError = require('statuserror');
 
@@ -17,9 +16,5 @@ var m = {
     throw new StatusError(400, message);
   },
 };
-
-Object.keys(m).forEach(function(key) {
-  m[key + 'Q'] = Q.denodeify(m[key]);
-});
 
 module.exports = m;

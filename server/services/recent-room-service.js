@@ -1,15 +1,15 @@
 "use strict";
 
-var Q                       = require('q');
-var troupeUriMapper         = require('./troupe-uri-mapper');
-var mongoUtils              = require('../utils/mongo-utils');
-var persistence             = require('./persistence-service');
-var assert                  = require('assert');
-var appEvents               = require('gitter-web-appevents');
-var moment                  = require('moment');
-var unreadItemsService      = require('./unread-item-service');
-var recentRoomCore          = require('./core/recent-room-core');
-var debug                   = require('debug')('gitter:recent-room-service');
+var Promise            = require('bluebird');
+var troupeUriMapper    = require('./troupe-uri-mapper');
+var mongoUtils         = require('../utils/mongo-utils');
+var persistence        = require('./persistence-service');
+var assert             = require('assert');
+var appEvents          = require('gitter-web-appevents');
+var moment             = require('moment');
+var unreadItemsService = require('./unread-item-service');
+var recentRoomCore     = require('./core/recent-room-core');
+var debug              = require('debug')('gitter:recent-room-service');
 
 exports.removeRecentRoomForUser                        = removeRecentRoomForUser;
 exports.saveLastVisitedTroupeforUserId                 = saveLastVisitedTroupeforUserId;
@@ -23,7 +23,7 @@ function removeRecentRoomForUser(userId, roomId) {
   assert(mongoUtils.isLikeObjectId(userId));
   assert(mongoUtils.isLikeObjectId(roomId));
 
-  return Q.all([
+  return Promise.all([
       recentRoomCore.clearFavourite(userId, roomId),
       recentRoomCore.clearLastVisitedTroupeforUserId(userId, roomId),
       unreadItemsService.markAllChatsRead(userId, roomId)
@@ -38,12 +38,10 @@ function saveLastVisitedTroupeforUserId(userId, troupeId, options) {
   debug('saveLastVisitedTroupeforUserId: userId=%s, troupeId=%s, options=%j', userId, troupeId, options);
   var lastAccessTime = options && options.lastAccessTime || new Date();
 
-  return Q.all([
-      recentRoomCore.saveUserTroupeLastAccess(userId, troupeId, lastAccessTime),
-      // Update User
-      persistence.User.update({ _id: userId }, { $set: { lastTroupe: troupeId }}).exec()
-    ])
-    .then(function() {
+  return Promise.join(
+    recentRoomCore.saveUserTroupeLastAccess(userId, troupeId, lastAccessTime),
+    persistence.User.update({ _id: userId }, { $set: { lastTroupe: troupeId }}).exec(), // Update User
+    function() {
       // XXX: lastAccessTime should be a date but for some bizarre reason it's not
       // serializing properly
       if (!options || !options.skipFayeUpdate) {

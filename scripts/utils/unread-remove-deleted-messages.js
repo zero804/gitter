@@ -7,11 +7,8 @@ var unreadItemService = require('../../server/services/unread-item-service');
 var roomMembershipService = require("../../server/services/room-membership-service");
 var persistence = require('../../server/services/persistence-service');
 var mongoUtils = require('../../server/utils/mongo-utils');
-var qlimit = require('qlimit');
-var limit5 = qlimit(5);
-var limit1 = qlimit(1);
 var shutdown = require('shutdown');
-var Q = require('q');
+var Promise = require('bluebird');
 
 // require('../../server/event-listeners').install();
 
@@ -35,14 +32,15 @@ function main(uri, dryRun) {
     .spread(function(room, userIds) {
       console.log('QUERYING unread items for ', userIds.length, 'users');
       var allUnread = {};
-      return Q.all(userIds.map(limit5(function(userId) {
+
+      return Promise.map(userIds, function(userId) {
         return unreadItemService.getUnreadItems(userId, room._id)
           .then(function(items) {
             items.forEach(function(chatId) {
               allUnread[chatId] = true;
             });
           })
-      })))
+      }, { concurrency: 5 })
       .then(function() {
         return [room, allUnread];
       });
@@ -62,12 +60,12 @@ function main(uri, dryRun) {
 
           if (dryRun || !missingIds.length) return;
 
-          return Q.all(missingIds.map(limit1(function(itemId) {
+          return Promise.map(missingIds, function(itemId) {
             console.log('REMOVING ', itemId);
             // Remove the items, slowly
             return unreadItemService.testOnly.removeItem(room.id, itemId)
               .delay(10);
-          })));
+          }, { concurrency: 1 });
         });
     });
 

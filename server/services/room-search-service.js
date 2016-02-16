@@ -1,6 +1,6 @@
 "use strict";
 
-var Q             = require('q');
+var Promise       = require('bluebird');
 var client        = require('../utils/elasticsearch-client');
 var _             = require('underscore');
 
@@ -88,7 +88,7 @@ exports.searchRooms = function(queryText, userId, privateRoomIds, options) {
     }
   };
 
-  return Q(client.search(queryRequest))
+  return Promise.resolve(client.search(queryRequest))
     .then(function(response) {
       return response.hits.hits.map(function(hit) {
         return hit._id;

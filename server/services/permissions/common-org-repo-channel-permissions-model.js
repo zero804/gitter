@@ -1,14 +1,13 @@
 /* jshint maxcomplexity:18 */
 "use strict";
 
-var Q = require('q');
+var Promise = require('bluebird');
 
 var ALLOWED_SECURITY_VALUES = {
   PRIVATE: 1,
   PUBLIC: 1,
   INHERITED: 1
 };
-
 
 /**
  * COMMON_ORG_REPO_CHANNEL permissions model
@@ -20,18 +19,18 @@ var ALLOWED_SECURITY_VALUES = {
  */
 module.exports = function(delegatePermissionsModel, userIsInRoom) {
 
-  return function commonChannelPermissionsModel(user, right, uri, security) {
+  return Promise.method(function commonChannelPermissionsModel(user, right, uri, security) {
     if(!ALLOWED_SECURITY_VALUES.hasOwnProperty(security)) {
-      return Q.reject(new Error('Unknown security: ' + security));
+      throw new Error('Unknown security: ' + security);
     }
 
     // Anyone can view a public ORG or REPO channel
     if(right === 'view' && security === 'PUBLIC') {
-      return Q.resolve(true);
+      return true;
     }
 
     // No unauthenticated past this point
-    if(!user) return Q.resolve(false);
+    if(!user) return false;
 
     var uriParts = uri.split('/');
     var uriLastPart = uriParts.slice(0, -1).join('/');
@@ -41,7 +40,7 @@ module.exports = function(delegatePermissionsModel, userIsInRoom) {
       case 'join':
       case 'view':
         switch(security) {
-          case 'PUBLIC': return Q.resolve(true);
+          case 'PUBLIC': return true;
           case 'PRIVATE':
             return userIsInRoom(uri, user)
               .then(function(inRoom) {
@@ -60,10 +59,10 @@ module.exports = function(delegatePermissionsModel, userIsInRoom) {
       case 'adduser':
         switch(security) {
           case 'PUBLIC':
-            return Q.resolve(true);
+            return true;
 
           case 'PRIVATE':
-            return Q.all([
+            return Promise.all([
                       userIsInRoom(uri, user),
                       delegatePermissionsModel(user, right, uriLastPart)
                     ])
@@ -106,5 +105,5 @@ module.exports = function(delegatePermissionsModel, userIsInRoom) {
       default:
         throw new Error('Unknown right: ' + right);
     }
-  };
+  });
 };

@@ -1,4 +1,3 @@
-#!/usr/bin/env mocha --ignore-leaks
 
 /*jslint node:true, unused:true*/
 /*global describe:true, it:true, before:true, after: true */
@@ -33,7 +32,7 @@ describe('uri-lookup-service', function() {
       .then(function(uriLookup) {
         assert.equal(uriLookup.userId, fixture.user2.id);
       })
-      .fin(function() {
+      .finally(function() {
         return uriLookupService.removeUsernameForUserId(fixture.user2.id);
       })
       .nodeify(done);

@@ -1,9 +1,9 @@
 "use strict";
 
-var GithubRepo      = require('gitter-web-github').GitHubRepoService;
-var persistence     = require('./persistence-service');
-var Q               = require('q');
-var winston         = require('../utils/winston');
+var GithubRepo  = require('gitter-web-github').GitHubRepoService;
+var persistence = require('./persistence-service');
+var Promise     = require('bluebird');
+var winston     = require('../utils/winston');
 
 function applyFilters(array, filters) {
   // Filter out what needs filtering out
@@ -57,7 +57,7 @@ function findPublicReposWithRoom(user, query, options) {
   var ghRepo  = new GithubRepo(user);
 
   var filters = createRegExpsForQuery(query);
-  if(!filters.length) return Q.resolve([]);
+  if(!filters.length) return Promise.resolve([]);
 
   return persistence.Troupe
     .find({
@@ -70,7 +70,7 @@ function findPublicReposWithRoom(user, query, options) {
     .limit(options.limit || 20)
     .exec()
     .then(function(troupes) {
-      return Q.all(troupes.map(function(troupe) {
+      return Promise.map(troupes, function(troupe) {
         if(troupe.security === 'PUBLIC') {
           return troupe;
         }
@@ -86,7 +86,7 @@ function findPublicReposWithRoom(user, query, options) {
 
             return troupe;
           });
-      }));
+      });
     })
     .then(function(troupes) {
       return troupes.filter(function(f) { return !!f; });
@@ -97,7 +97,7 @@ exports.findPublicReposWithRoom = findPublicReposWithRoom;
 
 
 function findReposByUris(uris) {
-  if(uris.length === 0) return Q.resolve([]);
+  if(uris.length === 0) return Promise.resolve([]);
 
   uris = uris.map(function(r) {
     return r && r.toLowerCase();

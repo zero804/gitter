@@ -1,10 +1,10 @@
 'use strict';
 
-var LRU             = require("lru-cache");
-var Q               = require('q');
-var GithubRepo      = require('gitter-web-github').GitHubRepoService;
-var MAX_TOKEN_AGE   = 10 * 60000; // 2 minutes
-var debug           = require('debug')('gitter:legacy-recommendations');
+var LRU           = require("lru-cache");
+var Promise       = require('bluebird');
+var GithubRepo    = require('gitter-web-github').GitHubRepoService;
+var MAX_TOKEN_AGE = 10 * 60000; // 2 minutes
+var debug         = require('debug')('gitter:legacy-recommendations');
 
 var publicRoomCache = LRU({
   max: 20,
@@ -15,7 +15,7 @@ var publicRoomCache = LRU({
 module.exports = function getCachedRepo(user, uri) {
   var room = publicRoomCache.get(uri);
   if (room) {
-    return Q.resolve(room);
+    return Promise.resolve(room);
   }
 
   debug('Room %s not in cache, fetching from Github', uri);
