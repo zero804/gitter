@@ -52,6 +52,7 @@ module.exports = function resourceRoute(routeIdentifier, resource) {
   mount('get',    '/:' + idParam,            'show');
   mount('get',    '/:' + idParam + '/edit',  'edit');
   mount('put',    '/:' + idParam,            'update');
+  mount('patch',  '/:' + idParam,            'patch');
   mount('delete', '/:' + idParam,            'destroy');
 
   if (resource.subresources) {
