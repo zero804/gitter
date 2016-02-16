@@ -170,14 +170,13 @@ function displayWarningsForUpdates(warnings) {
     userService.findByIdsLean(uniqueUserIds, { username: 1 }),
     troupeService.findByIdsLean(uniqueTroupeIds, { uri: 1 }),
     function(users, troupes) {
-      console.log(users, troupes);
       var usersHashed = collections.indexById(users);
       var troupesHashed = collections.indexById(troupes);
 
       _.each(warnings, function(warning) {
         var user = usersHashed[warning.userId];
         var troupe = troupesHashed[warning.troupeId];
-        console.log(user, troupe, warning);
+        console.log(user && user.username, troupe && troupe.uri, warning.update);
       });
     });
 }
