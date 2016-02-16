@@ -43,6 +43,7 @@ var ChatInputBoxView = Marionette.ItemView.extend({
   },
 
   events: {
+    'textInput textarea': 'onTextInput',
     'input textarea': 'onTextChange',
     'paste textarea': 'onPaste',
     'keydown textarea': 'onKeydown',
@@ -108,6 +109,19 @@ var ChatInputBoxView = Marionette.ItemView.extend({
     }
 
     this.ui.textarea.attr('placeholder', placeholder);
+  },
+
+  onTextInput: function($event) {
+    var event = $event.originalEvent;
+    var key = event.data;
+    if (isMobile() && '\n' === key) {
+      // google keyboard v4.1 on android doesnt actually send the correct
+      // keyup/down events for the return key (code 13). This means that our
+      // keyboardEvents dont fire, but we do have a "textInput" event that
+      // we can fake it with as long as compose mode isnt enabled (which it
+      // isnt on mobile).
+      return this.onKeySend(event, { mods: [] });
+    }
   },
 
   onTextChange: function() {
@@ -193,7 +207,7 @@ var ChatInputBoxView = Marionette.ItemView.extend({
     var isComposeModeEnabled = this.composeMode.get('isComposeModeEnabled');
     // Has a modifier or not in compose mode
     var shouldHandle = handler.mods.length || !isComposeModeEnabled;
-    // Need to test behaviour with typeahead
+
     if(!this.isTypeaheadShowing() && shouldHandle) {
       this.processInput();
       event.preventDefault();
