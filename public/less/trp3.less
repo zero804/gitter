@@ -345,6 +345,24 @@ ul.roster {
   margin-top: 1rem;
 }
 
+.remaining-view {
+
+  @media @mid {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.remaining-view-button {
+  @media @mid {
+    padding: 0;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+}
+
+
 
 .build-failure, .build-failing, .build-broken, .build-failed {
   color: @trpRed;
@@ -475,7 +493,7 @@ ul.roster {
   display: inline-block;
   vertical-align: middle;
   margin-top: -4px;
-  
+
   @media @mid {
     display: none;
   }
