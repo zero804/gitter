@@ -10,6 +10,56 @@ var mongoUtils        = require('../../../utils/mongo-utils');
 var userRoomNotificationService = require('../../../services/user-room-notification-service');
 var StatusError       = require('statuserror');
 
+function performUpdateToUserRoom(req) {
+  var userId = req.user.id;
+  var troupeId = req.params.userTroupeId;
+
+  return troupeService.findByIdLeanWithAccess(troupeId, req.user && req.user._id)
+    .spread(function(troupe, isMember) {
+
+      var updatedTroupe = req.body;
+      var promises = [];
+
+      if('favourite' in updatedTroupe) {
+        var fav = updatedTroupe.favourite;
+
+        if(!fav || isMember) {
+          promises.push(recentRoomService.updateFavourite(userId, troupeId, fav));
+        } else {
+          // The user has added a favourite that they don't belong to
+          // Add them to the room first
+          if (!troupe.oneToOne) {
+            /* Ignore one-to-one rooms */
+            promises.push(
+              roomService.findOrCreateRoom(req.resourceUser, troupe.uri)
+                .then(function() {
+                  return recentRoomService.updateFavourite(userId, troupeId, updatedTroupe.favourite);
+                })
+              );
+          }
+        }
+      }
+
+      // TODO: deprecate this....
+      if('lurk' in updatedTroupe) {
+        if (isMember) {
+          promises.push(userRoomNotificationService.updateSettingForUserRoom(userId, troupeId, updatedTroupe.lurk ? 'mention' : 'all'));
+        }
+      }
+
+      if('updateLastAccess' in updatedTroupe) {
+        promises.push(recentRoomService.saveLastVisitedTroupeforUserId(userId, troupeId));
+      }
+
+      return Promise.all(promises);
+    })
+    .then(function() {
+      var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: userId });
+
+      return restSerializer.serialize(req.params.userTroupeId, strategy);
+    });
+
+}
 module.exports = {
   id: 'userTroupeId',
   index: function(req) {
@@ -38,52 +88,12 @@ module.exports = {
   },
 
   update: function(req) {
-    var userId = req.user.id;
-    var troupeId = req.params.userTroupeId;
+    // This route is deprecated
+    return performUpdateToUserRoom(req);
+  },
 
-    return troupeService.findByIdLeanWithAccess(troupeId, req.user && req.user._id)
-      .spread(function(troupe, isMember) {
-
-        var updatedTroupe = req.body;
-        var promises = [];
-
-        if('favourite' in updatedTroupe) {
-          var fav = updatedTroupe.favourite;
-
-          if(!fav || isMember) {
-            promises.push(recentRoomService.updateFavourite(userId, troupeId, fav));
-          } else {
-            // The user has added a favourite that they don't belong to
-            // Add them to the room first
-            if (!troupe.oneToOne) {
-              /* Ignore one-to-one rooms */
-              promises.push(
-                roomService.findOrCreateRoom(req.resourceUser, troupe.uri)
-                  .then(function() {
-                    return recentRoomService.updateFavourite(userId, troupeId, updatedTroupe.favourite);
-                  })
-                );
-            }
-          }
-        }
-
-        if('lurk' in updatedTroupe) {
-          if (isMember && !troupe.oneToOne) {
-            promises.push(userRoomNotificationService.updateSettingForUserRoom(userId, troupeId, updatedTroupe.lurk ? 'mention' : 'all'));
-          }
-        }
-
-        if('updateLastAccess' in updatedTroupe) {
-          promises.push(recentRoomService.saveLastVisitedTroupeforUserId(userId, troupeId));
-        }
-
-        return Promise.all(promises);
-      })
-      .then(function() {
-        var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: userId });
-
-        return restSerializer.serialize(req.params.userTroupeId, strategy);
-      });
+  patch: function(req) {
+    return performUpdateToUserRoom(req);
   },
 
   /**
