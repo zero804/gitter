@@ -36,7 +36,10 @@ module.exports = {
     if (!mode) throw new StatusError(400, 'Illegal notifications mode');
 
     return userRoomNotificationService.updateSettingForUserRoom(userId, troupeId, mode)
-      .thenReturn({ success: true });
+      .thenReturn({
+        push: mode, // TODO: remove this once all clients understand 'mode'
+        mode: mode
+      });
   }
 
 };

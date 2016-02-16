@@ -4,47 +4,47 @@ var StatusError = require('statuserror');
 
 /* Note, these can not change! */
 /* -----8<---- */
-var FLAG_POS_NOTIFY_UNREAD        = 0;
-var FLAG_POS_NOTIFY_ACTIVITY      = 1;
-var FLAG_POS_NOTIFY_MENTIONS      = 2;
-var FLAG_POS_NOTIFY_ANNOUNCEMENTS = 3;
+var FLAG_POS_NOTIFY_UNREAD       = 0;
+var FLAG_POS_NOTIFY_ACTIVITY     = 1;
+var FLAG_POS_NOTIFY_MENTION      = 2;
+var FLAG_POS_NOTIFY_ANNOUNCEMENT = 3;
 /* -----8<---- */
 
 var BITMASK_INVERT = 0x0FFFFFFF;
 var BITMASK_MODE = 1 << FLAG_POS_NOTIFY_UNREAD |
                    1 << FLAG_POS_NOTIFY_ACTIVITY |
-                   1 << FLAG_POS_NOTIFY_MENTIONS |
-                   1 << FLAG_POS_NOTIFY_ANNOUNCEMENTS;
+                   1 << FLAG_POS_NOTIFY_MENTION |
+                   1 << FLAG_POS_NOTIFY_ANNOUNCEMENT;
 
 var BITMASK_INVERT_MODE = BITMASK_INVERT & ~BITMASK_MODE;
 
-var BITMASK_NOTIFY_UNREAD           = 1 << FLAG_POS_NOTIFY_UNREAD;
-var BITMASK_NO_NOTIFY_UNREAD        = BITMASK_INVERT & ~BITMASK_NOTIFY_UNREAD;
-var BITMASK_NOTIFY_ACTIVITY         = 1 << FLAG_POS_NOTIFY_ACTIVITY;
-var BITMASK_NOTIFY_MENTIONS         = 1 << FLAG_POS_NOTIFY_MENTIONS;
-var BITMASK_NOTIFY_ANNOUNCEMENTS    = 1 << FLAG_POS_NOTIFY_ANNOUNCEMENTS;
+var BITMASK_NOTIFY_UNREAD       = 1 << FLAG_POS_NOTIFY_UNREAD;
+var BITMASK_NO_NOTIFY_UNREAD    = BITMASK_INVERT & ~BITMASK_NOTIFY_UNREAD;
+var BITMASK_NOTIFY_ACTIVITY     = 1 << FLAG_POS_NOTIFY_ACTIVITY;
+var BITMASK_NOTIFY_MENTIONS     = 1 << FLAG_POS_NOTIFY_MENTION;
+var BITMASK_NOTIFY_ANNOUNCEMENT = 1 << FLAG_POS_NOTIFY_ANNOUNCEMENT;
 
 var MODES = {
   /* Mode: all: unread + no activity + mentions + announcements */
-  all: BITMASK_NOTIFY_UNREAD | BITMASK_NOTIFY_MENTIONS | BITMASK_NOTIFY_ANNOUNCEMENTS,
+  all: BITMASK_NOTIFY_UNREAD | BITMASK_NOTIFY_MENTIONS | BITMASK_NOTIFY_ANNOUNCEMENT,
 
-  /* Mode: announcements: no unread + activity + mentions + announcements */
-  announcements: BITMASK_NOTIFY_ACTIVITY | BITMASK_NOTIFY_MENTIONS | BITMASK_NOTIFY_ANNOUNCEMENTS,
+  /* Mode: announcement: no unread + activity + mentions + announcements */
+  announcement: BITMASK_NOTIFY_ACTIVITY | BITMASK_NOTIFY_MENTIONS | BITMASK_NOTIFY_ANNOUNCEMENT,
 
   /* Mode: mute: no unread + no activity + mentions + no announcements */
   mute: BITMASK_NOTIFY_MENTIONS,
 };
 
 /* Alias modes */
-MODES.mention = MODES.announcements;
+MODES.mention = MODES.announcement;
 
 
 function getModeFromFlags(flags) {
   switch(flags & BITMASK_MODE) {
     case MODES.all:
       return 'all';
-    case MODES.announcements:
-      return 'announcements';
+    case MODES.announcement:
+      return 'mention'; // TODO: rename this to announcement
     case MODES.mute:
       return 'mute';
   }

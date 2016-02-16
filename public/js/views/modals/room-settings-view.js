@@ -13,8 +13,7 @@ function getNotificationSetting(value) {
     case 'all': return 'all';
     case 'annoucements': return 'mention';
     case 'mention': return 'mention';
-    // TODO: CODEDEBT: https://github.com/troupe/gitter-webapp/issues/988
-    case 'mute': return 'mention';
+    case 'mute': return 'mute';
     default:
       return 'mention';
   }
@@ -42,7 +41,7 @@ var View = Marionette.ItemView.extend({
       apiClient.userRoom.get('/settings/notifications')
         .bind(this)
         .then(function(settings) {
-          this.settings = getNotificationSetting(settings && settings.mode);
+          this.settings = getNotificationSetting(settings && settings.mode || settings.push);
           this.ui.options.val(this.settings);
         });
     }

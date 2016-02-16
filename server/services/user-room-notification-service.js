@@ -79,12 +79,12 @@ var updateSettingForUserRoom = Promise.method(function (userId, roomId, value) {
  * users
  */
 var updateSettingsForUsersInRoom = Promise.method(function (roomId, userIds, value) {
-  if (value !== 'mention' && value !== 'all' && value !== 'mute' && value !== 'announcements') {
+  if (value !== 'mention' && value !== 'all' && value !== 'mute' && value !== 'announcement') {
     throw new StatusError(400, 'Invalid notification setting ' + value);
   }
 
   // CODEDEBT: remove the mention option
-  if (value === 'announcements') {
+  if (value === 'announcement') {
     value = 'mention';
   }
 

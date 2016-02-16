@@ -49,15 +49,14 @@ function getModeFromLurkAndSettings(lurk, notificationSetting) {
   switch(notificationSetting || "none") {
     case "all":
       if (lurk) {
-        return { mode: "announcements", warning: 1 };
+        return { mode: "announcement", warning: 1 };
       } else {
         return { mode: "all" };
       }
       break;
 
     case "mention":
-    case "mentions":
-    case "announcements":
+    case "announcement":
       if (lurk) {
         return { mode: "mention" };
       } else {
