@@ -1,6 +1,7 @@
 "use strict";
 
 var Marionette       = require('backbone.marionette');
+var appEvents        = require('../../utils/appevents');
 var platformKeys     = require('utils/platform-keys');
 var ModalView        = require('./modal');
 var markdownTemplate = require('./tmpl/markdown-view.hbs');
@@ -31,6 +32,9 @@ module.exports =  ModalView.extend({
       options.title = "Markdown Help";
       ModalView.prototype.initialize.apply(this, arguments);
       this.view = new View({ });
+      this.listenTo(this, 'hide', function() {
+        appEvents.trigger('help.close');
+      });
     },
     menuItems: [
       {
