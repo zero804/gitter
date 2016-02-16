@@ -2,11 +2,11 @@
 
 var chatService = require('./chat-service');
 var restSerializer = require('../serializers/rest-serializer');
-var Q = require('q');
+var Promise = require('bluebird');
 
 var cachedSamples = null;
 function getSamples() {
-  if(cachedSamples) return Q.resolve(cachedSamples);
+  if(cachedSamples) return Promise.resolve(cachedSamples);
 
   return chatService.getRecentPublicChats()
     .then(function(chatMessage) {

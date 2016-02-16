@@ -4,7 +4,7 @@ var userService = require('./user-service');
 var troupeService = require('./troupe-service');
 var roomService = require('./room-service');
 var roomMembershipService = require('./room-membership-service');
-var Q = require('q');
+var Promise = require('bluebird');
 var debug = require('debug')('gitter:user-removal-service');
 
 exports.removeByUsername = function(username, options) {
@@ -20,7 +20,7 @@ exports.removeByUsername = function(username, options) {
           return troupeService.findByIds(troupeIds);
         })
         .then(function(troupes) {
-          return Q.all(troupes.map(function(troupe) {
+          return Promise.all(troupes.map(function(troupe) {
             if (troupe.oneToOne) {
               return roomService.deleteRoom(troupe);
             } else {

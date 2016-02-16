@@ -5,7 +5,7 @@
 var shutdown = require('shutdown');
 var roomService = require('../../server/services/room-service');
 var troupeService = require('../../server/services/troupe-service');
-var Q = require('q');
+var Promise = require('bluebird');
 
 require('../../server/event-listeners').install();
 
@@ -24,21 +24,21 @@ var rl = readline.createInterface({
   output: process.stdout
 });
 
-return troupeService.findByUri(opts.uri)
+troupeService.findByUri(opts.uri)
   .then(function(room) {
-    var d = Q.defer();
-    rl.question("Are you sure you want to delete " + room.uri + " with " + room.userCount + " users in it? (yes/no)", function(answer) {
-      rl.close();
-      console.dir(answer);
+    return new Promise(function(resolve, reject) {
+      rl.question("Are you sure you want to delete " + room.uri + " with " + room.userCount + " users in it? (yes/no)", function(answer) {
+        rl.close();
+        console.dir(answer);
 
-      if(answer === 'yes') {
-        d.resolve(room);
-      } else {
-        d.reject(new Error("Answered no"));
-      }
+        if(answer === 'yes') {
+          resolve(room);
+        } else {
+          reject(new Error("Answered no"));
+        }
+      });
+
     });
-
-    return d.promise;
   })
   .then(function(room) {
     return roomService.deleteRoom(room);

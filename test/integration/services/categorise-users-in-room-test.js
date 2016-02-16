@@ -2,7 +2,7 @@
 
 var testRequire = require('../test-require');
 var assert = require('assert');
-var Q = require('q');
+var Promise = require('bluebird');
 
 describe('categorise-users-in-room', function() {
   var categoriseUsersInRoom, presenceMock, pushNotificationServiceMock, pushNotificationFilterMock;
@@ -11,22 +11,22 @@ describe('categorise-users-in-room', function() {
   beforeEach(function() {
     presenceMock = {
       findOnlineUsersForTroupe: function() {
-        return Q.resolve(onlineUsers);
+        return Promise.resolve(onlineUsers);
       },
       categorizeUsersByOnlineStatus: function() {
-        return Q.resolve(userCategories);
+        return Promise.resolve(userCategories);
       }
     };
 
     pushNotificationServiceMock = {
       findUsersWithDevices: function() {
-        return Q.resolve(devices);
+        return Promise.resolve(devices);
       },
-    }
+    };
 
     pushNotificationFilterMock = {
-      findUsersInRoomAcceptingNotifications: function(roomId, withDevices) {
-        return Q.resolve(usersAcceptingNotifications);
+      findUsersInRoomAcceptingNotifications: function() {
+        return Promise.resolve(usersAcceptingNotifications);
       }
     };
 

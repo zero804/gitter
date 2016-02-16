@@ -4,7 +4,7 @@
 
 var testRequire = require('../test-require');
 var assert = require("assert");
-var Q = require('q');
+var Promise = require('bluebird');
 
 var fakeUser = { username: 'fake-user', id: 'abc123' };
 
@@ -149,7 +149,7 @@ function createSearchWithStubData(data) {
 function createFakeGitterSearch(users) {
   return {
     searchForUsers: function() {
-      return Q.resolve({ results: users });
+      return Promise.resolve({ results: users });
     }
   };
 }
@@ -157,7 +157,7 @@ function createFakeGitterSearch(users) {
 function createFakeGithubSearch(users) {
   var FakeGithubSearch = function() {};
   FakeGithubSearch.prototype.findUsers = function() {
-    return Q.resolve(users);
+    return Promise.resolve(users);
   };
   return FakeGithubSearch;
 }
@@ -165,10 +165,10 @@ function createFakeGithubSearch(users) {
 function createFakeUserService(usermap) {
   return {
     githubUsersExists: function() {
-      return Q.resolve(usermap);
+      return Promise.resolve(usermap);
     },
     findByUsernames: function(usernames) {
-      return Q.fcall(function() {
+      return Promise.try(function() {
         return usernames.map(function(username) {
           return {
             id: usermap[username],

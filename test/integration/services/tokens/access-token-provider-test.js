@@ -3,7 +3,7 @@
 var testRequire = require('../../test-require');
 var accessTokenProvider = testRequire('./services/tokens/access-token-provider');
 var mongoUtils = testRequire('./utils/mongo-utils');
-var Q = require('q');
+var Promise = require('bluebird');
 var assert = require('assert');
 
 describe('access-token-provider', function() {
@@ -19,7 +19,7 @@ describe('access-token-provider', function() {
       var userId = mongoUtils.getNewObjectIdString();
       var clientId = mongoUtils.getNewObjectIdString();
 
-      return Q.all([
+      return Promise.all([
         accessTokenProvider.getToken(userId, clientId),
         accessTokenProvider.getToken(userId, clientId),
         accessTokenProvider.getToken(userId, clientId),
