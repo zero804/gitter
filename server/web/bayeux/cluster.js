@@ -21,6 +21,7 @@ var createPingResponderExtension = require('./ping-responder');
 var superClientExtension = require('./super-client');
 
 var fayeLoggingLevel = nconf.get('ws:fayeLogging');
+var disableLegacyEndpoint = !!nconf.get('ws:disableLegacyEndpoint');
 
 var STATS_FREQUENCY = 0.01;
 
@@ -266,4 +267,68 @@ BayeuxCluster.prototype.attach = function(httpServer) {
   this.serverLegacy.attach(httpServer);
 };
 
-module.exports = BayeuxCluster;
+/** Singleton server */
+function BayeuxSingleton(lightweight) {
+  console.log('SINGLETON!!!');
+  this.lightweight = lightweight;
+
+  /**
+   * Create the servers
+   */
+  var server = this.server = makeServer({
+    endpoint: '/bayeux',
+    redisClient: env.redis.createClient(nconf.get("redis_faye")),
+    redisSubscribeClient: env.redis.createClient(nconf.get("redis_faye")),
+    timeout: nconf.get('ws:fayeTimeout'),
+    lightweight: lightweight
+  });
+
+  /**
+   * Create the clients
+   */
+  var client = this.client = server.getClient();
+  client.addExtension(superClientExtension);
+}
+
+
+/** Returns callback(exists) to match faye */
+BayeuxSingleton.prototype.clientExists = function(clientId, callback) {
+  var engine = this.server._server._engine;
+
+  engine.clientExists(clientId, callback);
+};
+
+/**
+ * Publish a message on Faye
+ */
+BayeuxSingleton.prototype.publish = function(channel, message) {
+  this.client.publish(channel, message);
+};
+
+/**
+ * Destroy a client
+ */
+BayeuxSingleton.prototype.destroyClient = function(clientId, callback) {
+  if (!clientId) return;
+
+  logger.info('bayeux: client ' + clientId + ' intentionally destroyed.');
+
+  var engine = this.server._server._engine;
+  engine.destroyClient(clientId, callback);
+};
+
+/**
+ * Attach the faye instance to the server
+ */
+BayeuxSingleton.prototype.attach = function(httpServer) {
+  if (this.lightweight) {
+    throw new Error('A lightweight bayeux cluster cannot be attached');
+  }
+  this.server.attach(httpServer);
+};
+
+if (disableLegacyEndpoint) {
+  module.exports = BayeuxSingleton;
+} else {
+  module.exports = BayeuxCluster;
+}
