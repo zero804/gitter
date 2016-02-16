@@ -6,8 +6,10 @@
 @import "../controls/dropdown";
 
 @chat-header-height: 75px;
-@chat-header-header-font-size: 24px;
-@chat-header-header-line-height: 40px;
+@chat-header-heading-font-size: 24px;
+@chat-header-heading-line-height: 40px;
+@chat-header-topic-font-size: 1em;
+@chat-header-topic-line-height: 25px;
 
 .chat-header {
 
@@ -39,23 +41,19 @@
   align-items: flex-start;
 }
 
-.chat-header__header-text-styles() {
-  color: #333;
-  font-size: @chat-header-header-font-size;
-  line-height: @chat-header-header-line-height;
-  font-weight: 600;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.chat-header__header {
+.chat-header__heading {
   display: inline;
   margin-top: 0;
   margin-left: 18px;
   margin-bottom: 0;
   margin-right: 20px;
 
-  .chat-header__header-text-styles();
+  color: #333;
+  font-size: @chat-header-heading-font-size;
+  line-height: @chat-header-heading-line-height;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 
   a {
     color: inherit;
@@ -85,46 +83,31 @@
   align-self: flex-start;
   width: 100%;
   white-space: nowrap;
-  margin-top: calc((@chat-header-height - @chat-header-header-line-height) / 2);
 
-  &:hover {
-    // TODO: adjust margin
-  }
-
-  /* Just an aligner to make it on the same baseline as the main heading */
-  &:before {
-    content: '0';
-
-    display: inline-block;
-    vertical-align: baseline;
-
-    font-style: normal;
-    .chat-header__header-text-styles();
-
-    /* Hide it out of view */
-    margin-left: -1ch;
-  }
+  @space-to-chat-header: (@chat-header-height - @chat-header-heading-line-height) / 2;
+  @chat-header-font-vertical-padding: (@chat-header-heading-line-height - @chat-header-heading-font-size) / 2;
+  @vert-diff-baseline-offset-between-header-and-topic: @chat-header-font-vertical-padding ~"+" @chat-header-heading-font-size ~"-" @chat-header-topic-line-height;
+  // The extra `.125` is for account for desenders to match baseline
+  margin-top: calc(@space-to-chat-header ~"+" @vert-diff-baseline-offset-between-header-and-topic ~"-" .125em);
 }
 
 .chat-header__topic {
-  @chat-header-topic-line-height: 25px;
 
   box-sizing: border-box;
   overflow: hidden;
   display: inline-block;
   vertical-align: baseline;
-  // Account for descender height to baseline align with an inline-block;
-  transform: translateY(.125em);
   width: 100%;
   // min height so that an empty topic can be double clicked to edit
-  min-height: 1em;
+  min-height: @chat-header-topic-line-height;
   // max height to allow height animations
-  max-height: 1em;
+  max-height: @chat-header-topic-line-height;
   margin: 0;
   padding-right: 2em;
 
   color: #777;
-  line-height: 1;
+  font-size: @chat-header-topic-font-size;
+  line-height: @chat-header-topic-line-height;
   font-style: italic;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -135,7 +118,6 @@
     // pleanty of room to auto expand into
     max-height: 800px;
 
-    line-height: @chat-header-topic-line-height;
     white-space: normal;
     word-wrap: break-word;
   }
