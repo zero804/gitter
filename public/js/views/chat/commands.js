@@ -257,9 +257,6 @@ var commandsList = [
     description: 'Mute all notifications, except mentions',
     completion: 'notify-mute',
     regexp: /^\/notify-mute\s*$/,
-    criteria: function() {
-      return false; // TODO: CODEDEBT: https://github.com/troupe/gitter-webapp/issues/988
-    },
     action: function() {
       updateNotifications('mute');
     }
