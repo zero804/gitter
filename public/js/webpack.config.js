@@ -87,7 +87,7 @@ var webpackConfig = {
       },
       {
         test:    /.css$/,
-        loader:  'style-loader!css-loader!postcss-loader',
+        loader:  'style-loader?insertAt=top!css-loader!postcss-loader',
       },
     ]
   },
