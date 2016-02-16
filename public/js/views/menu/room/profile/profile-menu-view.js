@@ -6,11 +6,11 @@ var itemTemplate = require('./profile-menu-item-view.hbs');
 var RAF          = require('utils/raf');
 
 var profileCollection = new Backbone.Collection([
-  { name: 'Home', url: '/home' },
-  { name: 'Billing', url: 'http://billing.gitter.im/accounts'},
-  { name: 'Get Gitter Apps', url: '/apps'},
+  { name: 'Home', stub: '/home' },
+  { name: 'Billing', stub: 'http://billing.gitter.im/accounts'},
+  { name: 'Get Gitter Apps', stub: '/apps'},
   //TODO Logout does not work JP 27/1/16
-  { name: 'Sign Out', url: '/logout' }
+  { name: 'Sign Out', stub: '/logout' }
 ]);
 
 var ItemView = Marionette.ItemView.extend({
