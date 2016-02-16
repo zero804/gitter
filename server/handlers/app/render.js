@@ -379,7 +379,11 @@ function renderChat(req, res, options, next) {
             isMobile: options.isMobile,
             ownerIsOrg: ownerIsOrg,
             orgPageHref: orgPageHref,
-            roomMember: req.uriContext.roomMember
+            roomMember: req.uriContext.roomMember,
+
+            //Feature Switch Left Menu
+            hasNewLeftMenu: req.fflip && req.fflip.has('left-menu'),
+
           }, troupeContext && {
             troupeTopic: troupeContext.troupe.topic,
             premium: troupeContext.troupe.premium,
