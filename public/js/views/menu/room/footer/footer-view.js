@@ -16,7 +16,8 @@ module.exports = Marionette.ItemView.extend({
 
   ui: {
     searchFooter: '#panel-footer--search',
-    allFooter: '#panel-footer--all',
+    allFooter:    '#panel-footer--all',
+    exploreLink:  '#panel-footer__link'
   },
 
   initialize: function(attrs) {
