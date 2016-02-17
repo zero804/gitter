@@ -74,14 +74,16 @@ module.exports = BaseCollectionItemView.extend({
     this.uiModel.set('menuIsOpen', false);
   },
 
-  onHideClicked: function() {
+  onHideClicked: function(e) {
+    e.stopPropagation();
     //TODO figure out why this throws an error.
     //implementation is exactly the same as on develop?
     //JP 13/1/16
     apiClient.user.delete('/rooms/' + this.model.id);
   },
 
-  onLeaveClicked: function() {
+  onLeaveClicked: function(e) {
+    e.stopPropagation();
     if (this.model.get('id') === context.getTroupeId()) {
       appEvents.trigger('about.to.leave.current.room');
     }
