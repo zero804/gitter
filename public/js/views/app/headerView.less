@@ -5,82 +5,80 @@
 
 @import "../controls/dropdown";
 
-.chat-header-wrapper {
-  display: flex;
-  flex-direction: column;
-}
+@chat-header-height: 75px;
+@chat-header-heading-font-size: 24px;
+@chat-header-heading-line-height: 40px;
+@chat-header-topic-font-size: 1em;
+@chat-header-topic-line-height: 25px;
 
 .chat-header {
 
   box-sizing: border-box;
 
-  z-index: 101;
+  z-index: @l1;
   position: absolute;
+  display: flex;
   width: 100%;
-  // header can expand to fit long topics when hovered over
-  min-height: @desktop-header-height;
 
-  padding: 10px 26px 2px @desktop-menu-left-padding;
+  padding-left: @desktop-menu-left-padding;
+  padding-right: @desktop-menu-left-padding;
 
-  background-color: @header-bg;
+  background-color: rgba(255, 255, 255, 0.97);
   border-bottom: 1px solid rgba(0,0,0,0.05);
 }
 
-.chat-header__org-page {
-  display: inline-block;
-  text-align: center;
-  line-height: 49px;
-  margin: 0px 0px 0px 10px;
-  .octicon {
-    font-size: 1.4em;
-    color: #333;
-    opacity: 0.4;
-    cursor: pointer;
-  }
-  .octicon:hover {
-    opacity: 1;
-  }
+.chat-header-inner {
+  overflow: hidden;
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
 }
 
-.chat-header__favourite {
-  display: inline-block;
-  text-align: center;
-  line-height: 49px;
-  margin: 0px 0px 0px 10px;
-  // padding: 0px 25px 0px 0px;
-  padding: 0;
-
-  background-color: transparent;
-  border: none;
-
-  i {
-    cursor: pointer;
-    opacity: 0.4;
-    transition: opacity .2s ease-in-out;
-    font-size: 20px;
-    font-style: normal;
-  }
-
-  i:hover {
-    opacity: 1;
-  }
-
-  .favourite {
-    opacity: 1;
-    color: #f1c40f;
-  }
-}
-
-
-.chat-header__content {
-  display:    flex;
-  box-sizing: border-box;
-  overflow:   hidden;
-  width:      auto;
-  margin:     0 38px 0 48px;
+.chat-header__main-grouping {
+  display: flex;
   align-items: center;
+  // header can expand to fit long topics when hovered over
+  min-height: @chat-header-height;
+}
 
-  .topic-input {
+
+.chat-header_header-grouping {
+  overflow: hidden;
+}
+
+.chat-header__heading {
+  box-sizing: border-box;
+  max-width: 100%;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-left: 18px;
+  padding-right: 20px;
+
+  white-space: nowrap;
+}
+
+.chat-header__title {
+  overflow: hidden;
+  display: inline-block;
+  max-width: 100%;
+
+  color: #333;
+  font-size: @chat-header-heading-font-size;
+  line-height: @chat-header-heading-line-height;
+  font-weight: 600;
+  text-overflow: ellipsis;
+
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+.chat-header__topic-grouping {
+  overflow: hidden;
+  position: relative;
+  flex: 1;
+
+  & .topic-input {
     width: 95%;
     resize: none;
     height: 20px;
@@ -90,42 +88,44 @@
 
 }
 
-.chat-header__header {
-  display: inline;
-  padding-right: 10px;
-  margin: 0;
-  margin-right: 10px;
-  color: #333;
-  line-height: 40px;
+.chat-header__topic-wrapper {
+  align-self: flex-start;
+  width: 100%;
   white-space: nowrap;
-  text-overflow: ellipsis;
 
-  a {
-    color: white;
-  }
-
-  a:hover {
-    text-decoration: none;
-  }
+  @space-to-chat-header: (@chat-header-height - @chat-header-heading-line-height) / 2;
+  @chat-header-font-vertical-padding: (@chat-header-heading-line-height - @chat-header-heading-font-size) / 2;
+  @vert-diff-baseline-offset-between-header-and-topic: @chat-header-font-vertical-padding ~"+" @chat-header-heading-font-size ~"-" @chat-header-topic-line-height;
+  // The extra `.125` is for account for desenders to match baseline
+  margin-top: calc(@space-to-chat-header ~"+" @vert-diff-baseline-offset-between-header-and-topic ~"+" .125em);
 }
 
 .chat-header__topic {
-  color: #777;
-  // min height so that an empty topic can be double clicked to edit
-  min-height: 20px;
-  // max height to allow height animations
-  max-height: 30px;
-  line-height: 25px;
-  margin: 5px 0 0 0;
+  box-sizing: border-box;
   overflow: hidden;
+  display: inline-block;
+  vertical-align: baseline;
+  width: 100%;
+  // min height so that an empty topic can be double clicked to edit
+  min-height: @chat-header-topic-line-height;
+  // max height to allow height animations
+  max-height: @chat-header-topic-line-height;
+  margin: 0;
+  padding-right: 2em;
+
+  color: #777;
+  font-size: @chat-header-topic-font-size;
+  line-height: @chat-header-topic-line-height;
+  font-style: italic;
   text-overflow: ellipsis;
   white-space: nowrap;
+
   transition: max-height .5s ease-in-out;
 
-  &:hover {
+  .chat-header__topic-wrapper:hover & {
     // pleanty of room to auto expand into
     max-height: 800px;
-    overflow: visible;
+
     white-space: normal;
     word-wrap: break-word;
   }
@@ -156,39 +156,60 @@
 }
 
 
-.chat-header__buttons {
-  float: right;
-  user-select: none;
-}
 
+
+
+
+
+.chat-header__org-page,
+.chat-header__favourite,
 .chat-header__settings {
   body.embedded & { visibility: hidden; }
   display: inline-block;
+  margin-left: 2px;
+
+  font-size: 26px;
+  line-height: 1;
+  color: rgba(51, 51, 51, 0.4);
   text-align: center;
-  line-height: 49px;
-  margin: 0px 0px 0px 10px;
-  padding: 0;
+  cursor: pointer;
 
-  background-color: transparent;
-  border: none;
+  transition: color .2s ease-in-out;
 
-  i {
-    cursor: pointer;
-    opacity: 0.4;
-    transition: opacity .2s ease-in-out;
+  &:hover {
+    color: rgba(51, 51, 51, 1);
   }
 
-  i:hover {
-    opacity: 1;
+
+  & > .chat-header__action-icon {
+    color: inherit;
   }
 }
 
+.chat-header__org-page {
+  .chat-header__action-icon {
+    /* To make the icon equal with the other font-icons */
+    margin-left: 0.18em;
+    margin-right: 0.18em;
+  }
+}
+
+.chat-header__favourite {
+  &.favourite {
+    color: #f1c40f;
+  }
+}
+
+.chat-header__avatar-grouping {
+  flex-shrink: 0;
+}
+
 .chat-header__avatar {
-  @side: 38px;
+  @side: 48px;
   height: @side;
   float: left;
   box-sizing: border-box;
-  background-color: @header-bg;
+  background-color: white;
   position: relative;
   user-select: none;
 
@@ -217,5 +238,5 @@
 
 // stop the header from covering the first chat message
 .collaborators-container {
-  margin-top: 65px;
+  margin-top: 72px;
 }

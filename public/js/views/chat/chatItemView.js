@@ -571,14 +571,19 @@ module.exports = (function() {
 
       var textarea = chatInputText.find('textarea').val(unsafeText);
 
-      RAF(function() {
-        textarea.focus();
-        textarea.val("").val(unsafeText);
-      });
-
       this.inputBox = new ChatEditView({ el: textarea }).render();
       this.listenTo(this.inputBox, 'cancel', this.onEditCancel);
       this.listenTo(this.inputBox, 'save', this.onEditSave);
+
+      // chrome 48 android sends blur events and generally freaks out if you do this
+      // in the same event loop or in a requestAnimationFrame
+      setTimeout(function() {
+        // chrome 48 desktop requires an explicit focus event as `autofocus` is not enough.
+        // chrome 48 android requires the same, but the first textarea autofocus is fine.
+        textarea.focus();
+        // iOS 9 doesnt put the carat at the end of the text
+        textarea.val("").val(unsafeText);
+      }, 0);
     },
 
     showReadByIntent: function(e) {

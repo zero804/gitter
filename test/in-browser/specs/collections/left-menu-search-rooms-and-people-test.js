@@ -62,7 +62,6 @@ describe('LeftMenuSearchRoomsAndPeopleCollection', function(){
   it('should merge its models when the collections update', function(){
     collection.searchRoomCollection.add([ {name: 'test1', id: 1 }, { name:'test2', id: 2} ]);
     collection.searchPeopleCollection.add([ {name: 'test1', id: 3 }, { name:'test2', id: 4} ]);
-    console.log(collection.toJSON());
     assert.equal(4, collection.length);
   });
 

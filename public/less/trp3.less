@@ -192,8 +192,11 @@ a:hover {
 
 .trpToolbarHeaderItem {
   display: inline-block;
-  opacity: 0.5;
-  transition: opacity 300ms ease-in-out;
+  color: rgba(51, 51, 51, 0.5);
+  font-size: 2.5rem;
+  font-weight: 300;
+  text-transform: none;
+  transition: color 300ms ease-in-out;
 
   &.hidden {
     display: none;
@@ -201,7 +204,7 @@ a:hover {
 }
 
 .trpToolbarHeaderItem:hover {
-  opacity: 1;
+color: rgba(51, 51, 51, 1);
 }
 
 .trpToolbarHeaderItem:first-child {
@@ -209,7 +212,7 @@ a:hover {
 }
 
 .trpToolbarHeaderItem.selected {
-  opacity: 1;
+color: rgba(51, 51, 51, 1);
 }
 
 .selected {
@@ -338,38 +341,28 @@ ul.roster {
   }
 }
 
-.trpMoreBadge {
-  clear: both;
-  color: #333;
-  border: 1px solid rgba(100,100,100,0.5);
-  display: inline-block;
-  border-radius: 4px;
-  border: 1px solid fade(@trpLightBlue, 20%);
-  background-color: fade(@trpLightBlue, 20%);
-  border-radius: 2px;
-  padding: 0 5px;
-  margin-right: 4px;
-  font-size: 11px;
-  transition: background-color 300ms ease-in-out;
-  margin-bottom: 12px;
+.remaining-region {
+  margin-top: 1rem;
+}
+
+.remaining-view {
 
   @media @mid {
-    margin-left: -4px;
-    margin-right: -2px;
-    padding: 0 2px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
   }
-
 }
 
-.trpAddBadge {
-  .trpMoreBadge;
-  border: 1px solid fade(@green, 15%);
-  background-color: fade(@green, 20%);
+.remaining-view-button {
+  @media @mid {
+    padding: 0;
+    letter-spacing: 0;
+    text-transform: none;
+  }
 }
 
-.trpMoreBadge:hover {
-  background-color: fade(@trpLightBlue, 30%);
-}
+
 
 .build-failure, .build-failing, .build-broken, .build-failed {
   color: @trpRed;
@@ -524,7 +517,7 @@ ul.roster {
   display: inline-block;
   vertical-align: middle;
   margin-top: -4px;
-  
+
   @media @mid {
     display: none;
   }

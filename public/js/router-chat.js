@@ -359,6 +359,13 @@ onready(function() {
     showingHelp = false;
   };
 
+  // The help can be exited from the modal itself so keep our variable up to date.
+  // Instead of this, there should be a way to check if a help modal is open
+  // which would be cleaner than this variable maintenance
+  appEvents.on('help.close', function() {
+    showingHelp = false;
+  });
+
   appEvents.on('keyboard.help.markdown', function(event) {
     if (showingHelp === 'markdown') hideHelp();
     else {

@@ -1,6 +1,6 @@
 
 .icon-paper-plane:before { content: '\e800'; } /* '' */
-.icon-globe:before { content: '\e801'; } /* '' */
+.icon-globe-1:before { content: '\e801'; } /* '' */
 .icon-graduation-cap:before { content: '\e802'; } /* '' */
 .icon-laptop:before { content: '\e803'; } /* '' */
 .icon-mobile:before { content: '\e804'; } /* '' */
@@ -12,6 +12,9 @@
 .icon-gplus:before { content: '\e80a'; } /* '' */
 .icon-linkedin:before { content: '\e80b'; } /* '' */
 .icon-facebook-official:before { content: '\e80c'; } /* '' */
+.icon-star-empty:before { content: '\e80d'; } /* '' */
+.icon-slider-vertical:before { content: '\e80e'; } /* '' */
+.icon-globe:before { content: '\e80f'; } /* '' */
 .icon-cancel-circle:before { content: '\e8b1'; } /* '' */
 .icon-logout:before { content: '\e8b2'; } /* '' */
 .icon-star-1:before { content: '\e8b3'; } /* '' */
