@@ -6,10 +6,10 @@
 
 /**
  * GITTER.IM Styles <3
- * 
+ *
  * Contents
  * =========
- * 
+ *
  * Notes                Read'em.
  * App Structure        A hierarchical view of the application.
  * Imports              All the libraries and other stylesheet files.
@@ -60,17 +60,6 @@
 @import 'reset.css'; // Eric Meyer's Reset CSS v2.0 - http://cssreset.com
 *, *:before, *:after { box-sizing: border-box; } // Paul Irish's Box Sizing Tip - http://www.paulirish.com/2012/box-sizing-border-box-ftw/
 
-/* UI Levels */
-@l1:  100;   /* deep -> Root UI Components */ 
-@l2:  200;
-@l3:  300;
-@l4:  400;
-@l5:  500;
-@l6:  600;
-@l7:  700;
-@l8:  800;
-@l9:  900;
-@l10: 1000;   /* shallow -> Popups and others */
 
 /* Type */
 @type: 'Open Sans', 'HelveticaNeue', sans-serif;
@@ -81,12 +70,12 @@
 @type_dark: darken(@type_base, 10%);
 
 /* Color */
-// @base = 
+// @base =
 // @primary =
 // @secondary =
 // @warning =
-// @danger = 
-// @success = 
+// @danger =
+// @success =
 
 /* Elements */
 @import 'menu.less';
