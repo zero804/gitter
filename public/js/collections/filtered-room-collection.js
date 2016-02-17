@@ -52,29 +52,25 @@ var FilteredRoomCollection = Backbone.FilteredCollection.extend({
       case 'favourite' :
         this.setFilter(this.filterFavourite);
         this.comparator = this.sortFavourites;
-        this.sort();
         break;
       case 'people' :
         this.setFilter(this.filterOneToOnes);
         this.comparator = FilteredRoomCollection.prototype.comparator;
-        this.sort();
         break;
       case 'search' :
         this.setFilter(this.filterSearches);
         this.comparator = FilteredRoomCollection.prototype.comparator;
-        this.sort();
         break;
       case 'org' :
         this.setFilter(this.filterOrgRooms.bind(this));
         this.comparator = FilteredRoomCollection.prototype.comparator;
-        this.sort();
         break;
       default:
         this.setFilter(false);
         this.comparator = FilteredRoomCollection.prototype.comparator;
-        this.sort();
         break;
     }
+    this.sort();
   },
 
   onOrgNameChange: function() {
