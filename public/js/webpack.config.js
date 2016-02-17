@@ -10,7 +10,7 @@ var OccurrenceOrderPlugin    = require('webpack/lib/optimize/OccurrenceOrderPlug
 var UglifyJsPlugin           = require('webpack/lib/optimize/UglifyJsPlugin');
 
 //POSTCSS
-var mixins       = require('postcss-sassy-mixins');
+var mixins       = require('postcss-mixins');
 var atImport     = require('postcss-import');
 var simpleVars   = require('postcss-simple-vars');
 var forLoops     = require('postcss-for-var');
@@ -87,7 +87,7 @@ var webpackConfig = {
       },
       {
         test:    /.css$/,
-        loader:  'style-loader!css-loader!postcss-loader',
+        loader:  'style-loader?insertAt=top!css-loader!postcss-loader',
       },
     ]
   },
