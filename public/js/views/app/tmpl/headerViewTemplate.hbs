@@ -30,7 +30,9 @@
 <div class="chat-header__main-grouping">
   {{#if ownerIsOrg}}
     <div class="js-org-page chat-header__org-page">
-      <a href="{{orgPageHref}}" title="Navigate to {{orgName}}'s page"  class="chat-header__action-icon org-page-link js-org-page">🌐</a>
+      <a href="{{orgPageHref}}" title="Navigate to {{orgName}}'s page"  class="chat-header__action-icon org-page-link js-org-page">
+        <i class="chat-header__action-icon icon-globe"></i>
+      </a>
     </div>
   {{/if}}
 
@@ -40,8 +42,8 @@
         <i class="chat-header__action-icon icon-star-empty {{#if troupeFavourite}}favourite{{/if}}"></i>
       </div>
         {{#unless oneToOne}}
-          <div class="chat-header__settings js-chat-settings">
-            <i class="chat-header__action-icon icon-slider-vertical" data-toggle="dropdown"></i>
+          <div class="chat-header__settings js-chat-settings" data-toggle="dropdown">
+            <i class="chat-header__action-icon icon-slider-vertical"></i>
           </div>
         {{/unless}}
     {{/if}}
