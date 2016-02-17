@@ -48,6 +48,7 @@ var FilteredRoomCollection = Backbone.FilteredCollection.extend({
   },
 
   onModelChangeState: function(model, val) {//jshint unused: true
+    this.comparator = FilteredRoomCollection.prototype.comparator;
     switch (val) {
       case 'favourite' :
         this.setFilter(this.filterFavourite);
@@ -55,19 +56,15 @@ var FilteredRoomCollection = Backbone.FilteredCollection.extend({
         break;
       case 'people' :
         this.setFilter(this.filterOneToOnes);
-        this.comparator = FilteredRoomCollection.prototype.comparator;
         break;
       case 'search' :
         this.setFilter(this.filterSearches);
-        this.comparator = FilteredRoomCollection.prototype.comparator;
         break;
       case 'org' :
         this.setFilter(this.filterOrgRooms.bind(this));
-        this.comparator = FilteredRoomCollection.prototype.comparator;
         break;
       default:
         this.setFilter(false);
-        this.comparator = FilteredRoomCollection.prototype.comparator;
         break;
     }
     this.sort();
