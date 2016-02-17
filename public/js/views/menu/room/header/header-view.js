@@ -31,7 +31,6 @@ module.exports = Marionette.ItemView.extend({
   serializeData: function() {
     return {
       orgName:    this.model.get('selectedOrgName'),
-      numOfRooms: this.model.primaryCollection.length,
     };
   },
 
