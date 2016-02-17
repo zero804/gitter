@@ -27,13 +27,6 @@
   border-bottom: 1px solid rgba(0,0,0,0.05);
 }
 
-.chat-header__main-grouping {
-  display: flex;
-  align-items: center;
-  // header can expand to fit long topics when hovered over
-  min-height: @chat-header-height;
-}
-
 .chat-header-inner {
   overflow: hidden;
   flex: 1;
@@ -41,25 +34,41 @@
   align-items: flex-start;
 }
 
+.chat-header__main-grouping {
+  display: flex;
+  align-items: center;
+  // header can expand to fit long topics when hovered over
+  min-height: @chat-header-height;
+}
+
+
+.chat-header_header-grouping {
+  overflow: hidden;
+}
+
 .chat-header__heading {
-  display: inline;
+  box-sizing: border-box;
+  max-width: 100%;
   margin-top: 0;
-  margin-left: 18px;
   margin-bottom: 0;
-  margin-right: 20px;
+  padding-left: 18px;
+  padding-right: 20px;
+
+  white-space: nowrap;
+}
+
+.chat-header__title {
+  overflow: hidden;
+  display: inline-block;
+  max-width: 100%;
 
   color: #333;
   font-size: @chat-header-heading-font-size;
   line-height: @chat-header-heading-line-height;
   font-weight: 600;
-  white-space: nowrap;
   text-overflow: ellipsis;
 
-  a {
-    color: inherit;
-  }
-
-  a:hover {
+  &:hover {
     text-decoration: none;
   }
 }
@@ -88,11 +97,10 @@
   @chat-header-font-vertical-padding: (@chat-header-heading-line-height - @chat-header-heading-font-size) / 2;
   @vert-diff-baseline-offset-between-header-and-topic: @chat-header-font-vertical-padding ~"+" @chat-header-heading-font-size ~"-" @chat-header-topic-line-height;
   // The extra `.125` is for account for desenders to match baseline
-  margin-top: calc(@space-to-chat-header ~"+" @vert-diff-baseline-offset-between-header-and-topic ~"-" .125em);
+  margin-top: calc(@space-to-chat-header ~"+" @vert-diff-baseline-offset-between-header-and-topic ~"+" .125em);
 }
 
 .chat-header__topic {
-
   box-sizing: border-box;
   overflow: hidden;
   display: inline-block;
@@ -192,7 +200,9 @@
   }
 }
 
-
+.chat-header__avatar-grouping {
+  flex-shrink: 0;
+}
 
 .chat-header__avatar {
   @side: 48px;
