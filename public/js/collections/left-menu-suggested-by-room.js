@@ -63,7 +63,7 @@ module.exports = Backbone.FilteredCollection.extend({
 
   constructor: function(models, attrs) {
 
-    this.collection             = window.collection = new SuggestedCollection(models, attrs);
+    this.collection             = new SuggestedCollection(models, attrs);
     this.roomCollection         = attrs.roomCollection;
     this.suggestedOrgCollection = attrs.suggestedOrgsCollection;
     this.collectionFilter       = this.collectionFilter.bind(this);
