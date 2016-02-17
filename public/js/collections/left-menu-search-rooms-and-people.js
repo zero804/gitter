@@ -20,7 +20,6 @@ module.exports = Backbone.Collection.extend({
   },
 
   onSearchUpdate: function (){
-    if(this.roomMenuModel.get('state') !== 'search') { return }
     if(!this.roomMenuModel.get('searchTerm')) {
       this.searchRoomCollection.reset();
       return this.searchPeopleCollection.reset();
