@@ -28,14 +28,14 @@ var FilteredRoomCollection = Backbone.FilteredCollection.extend({
   comparator: function(a, b) {
     var aMentions   = a.get('mentions');
     var bMentions   = b.get('mentions');
-    if (!!aMentions) { return -1; }
-    if (!!bMentions) { return 1; }
+    if (aMentions) { return -1; }
+    if (bMentions) { return 1; }
 
     var aUnread = !!a.get('unreadItems');
     var bUnread = !!b.get('unreadItems');
 
-    if (!!aUnread) { return -1; }
-    if (!!bUnread) { return 1;}
+    if (aUnread) { return -1; }
+    if (bUnread) { return 1;}
 
     var aLastAccess = a.get('lastAccessTime');
     var bLastAccess = b.get('lastAccessTime');
