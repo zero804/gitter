@@ -52,7 +52,8 @@ module.exports = (function() {
     }
   });
 
-  //Reset lurk activity for the current room JP 4/2/16
+  //We never post activity changes back to the server so
+  //reset lurk activity for the current room JP 4/2/16
   context.troupe().on('change:id', function(troupe, val){ //jshint unused: true
     var activeRoom = troupeCollection.get(val);
     if(activeRoom) { activeRoom.set('activity', false); }
