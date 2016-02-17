@@ -1,45 +1,48 @@
-<div class="chat-header__avatar {{#if premium}}chat-header__avatar--pro{{/if}}">
-  <img src='{{avatarSrcSet.src}}' srcset='{{avatarSrcSet.srcset}}' height='{{avatarSrcSet.size}}' width='{{avatarSrcSet.size}}'>
+<div class="chat-header__main-grouping chat-header__avatar-grouping">
+  <div class="chat-header__avatar {{#if premium}}chat-header__avatar--pro{{/if}}">
+    <img src='{{avatarSrcSet.src}}' srcset='{{avatarSrcSet.srcset}}' height='{{avatarSrcSet.size}}' width='{{avatarSrcSet.size}}'>
+  </div>
 </div>
 
-<div class="chat-header__buttons">
+<div class="chat-header__main-grouping chat-header_header-grouping">
+  <h1 class='js-chat-name chat-header__heading' title="{{ lockTooltip }}">
+    <a {{#if githubLink}}href="{{ githubLink }}"{{/if}} class="chat-header__title" target="_blank">{{ troupeName }}</a>
 
+    {{#if isPrivate}}
+      <i class='octicon octicon-lock chat-header__permission-icon'></i>
+    {{/if}}
+  </h1>
+</div>
+
+
+{{#unless oneToOne}}
+<div class="chat-header__main-grouping chat-header__topic-grouping">
+  <div class="chat-header__topic-wrapper">
+    <p class="js-chat-topic chat-header__topic">{{troupeTopic}}</p>
+  </div>
+</div>
+{{/unless}}
+
+
+<div class="chat-header__main-grouping">
   {{#if ownerIsOrg}}
     <div class="js-org-page chat-header__org-page">
-      <a href="{{orgPageHref}}" class="org-page-link octicon octicon-globe js-org-page" title="Navigate to {{orgName}}'s page" aria-label="Navigate to {{orgName}}'s page"></a>
+      <a href="{{orgPageHref}}" title="Navigate to {{orgName}}'s page"  class="chat-header__action-icon org-page-link js-org-page">
+        <i class="chat-header__action-icon icon-globe"></i>
+      </a>
     </div>
   {{/if}}
 
   {{#unless archives}}
     {{#if user}}
-      <button class="js-favourite-button chat-header__favourite" aria-label="Favourite {{troupeName}}">
-        <i class="icon-star-1 {{#if troupeFavourite}}favourite{{/if}}" aria-hidden="true"></i>
-      </button>
-      {{#unless oneToOne}}
-        <button class="js-chat-settings chat-header__settings" aria-label="Open room settings dropdown">
-          <i class="octicon octicon-tools" data-toggle="dropdown" aria-hidden="true"></i>
-        </button>
-      {{/unless}}
+      <div class="chat-header__favourite js-favourite-button">
+        <i class="chat-header__action-icon icon-star-empty {{#if troupeFavourite}}favourite{{/if}}"></i>
+      </div>
+        {{#unless oneToOne}}
+          <div class="chat-header__settings js-chat-settings" data-toggle="dropdown">
+            <i class="chat-header__action-icon icon-slider-vertical"></i>
+          </div>
+        {{/unless}}
     {{/if}}
   {{/unless}}
-
-</div>
-
-<div class="chat-header__content">
-
-  <h1 class='js-chat-name chat-header__header' title="{{ lockTooltip }}">
-    {{#if githubLink}}
-      <a href="{{ githubLink }}" class="chat-header__title" target="_blank">{{ troupeName }}</a>
-    {{else}}
-      {{ troupeName }}
-    {{/if}}
-    {{#if isPrivate}}
-      <i class='octicon octicon-lock chat-header__permission-icon'></i>
-    {{/if}}
-  </h1>
-
-  {{#unless oneToOne}}
-  <p class="js-chat-topic chat-header__topic">{{troupeTopic}}</p>
-  {{/unless}}
-
 </div>
