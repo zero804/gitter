@@ -51,20 +51,20 @@ var FilteredRoomCollection = Backbone.FilteredCollection.extend({
     this.comparator = FilteredRoomCollection.prototype.comparator;
     switch (val) {
       case 'favourite' :
-        this.setFilter(this.filterFavourite);
+        this.setFilter(this.filterFavourite.bind(this));
         this.comparator = this.sortFavourites;
         break;
       case 'people' :
-        this.setFilter(this.filterOneToOnes);
+        this.setFilter(this.filterOneToOnes.bind(this));
         break;
       case 'search' :
-        this.setFilter(this.filterSearches);
+        this.setFilter(this.filterSearches.bind(this));
         break;
       case 'org' :
         this.setFilter(this.filterOrgRooms.bind(this));
         break;
       default:
-        this.setFilter(false);
+        this.setFilter(this.filterDefault);
         break;
     }
     this.sort();
@@ -75,21 +75,25 @@ var FilteredRoomCollection = Backbone.FilteredCollection.extend({
   },
 
   filterFavourite: function(model) {
-    return !!model.get('favourite');
+    return this.filterDefault(model) && !!model.get('favourite');
   },
 
   filterOneToOnes: function(model) {
-    return model.get('githubType') === 'ONETOONE';
+    return this.filterDefault(model) && model.get('githubType') === 'ONETOONE';
   },
 
   filterSearches: function() {
     return false;
   },
 
+  filterDefault: function (model){
+    return !!model.get('lastAccessTime');
+  },
+
   filterOrgRooms: function(model) {
     var orgName = this.roomModel.get('selectedOrgName');
     var name    = model.get('name').split('/')[0];
-    return (name === orgName) && !!model.get('roomMember');
+    return (name === orgName) && this.filterDefault(model) && !!model.get('roomMember');
   },
 
   onRoomCollectionSnapshot: function() {
