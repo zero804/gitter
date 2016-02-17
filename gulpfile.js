@@ -474,6 +474,8 @@ gulp.task('css-web', function () {
       globalVars: {
         "target-env": '"web"'
       }
+    }).on('error', function(err){
+      console.log(err);
     }))
     .pipe(postcss([
       autoprefixer({
@@ -489,6 +491,8 @@ gulp.task('css-web', function () {
     ]))
     .pipe(sourcemaps.write(sourceMapOpts.dest, sourceMapOpts.options))
     .pipe(gulp.dest('output/assets/styles'));
+
+    return stream;
 });
 
 gulp.task('css', ['css-web', 'css-mobile', 'css-ios']);
