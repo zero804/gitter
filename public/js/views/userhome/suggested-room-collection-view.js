@@ -20,7 +20,8 @@ var SuggestedRoomItemView = Marionette.ItemView.extend({
     var suggestion = this.model.toJSON();
 
     return {
-      url: appendToUrl('/' + suggestion.uri, 'source=suggested'),
+    // FIXME: This used to be named `url` but we ran into https://github.com/altano/handlebars-loader/issues/75
+      stub: appendToUrl('/' + suggestion.uri, 'source=suggested'),
       avatarUrl: appendToUrl(suggestion.avatarUrl, 's=48'),
       name: suggestion.uri,
       description: suggestion.description,
