@@ -33,7 +33,7 @@
   display: flex;
   align-items: center;
   // header can expand to fit long topics when hovered over
-  min-height: @desktop-header-height;
+  min-height: @chat-frame-desktop-header-height;
 }
 
 
@@ -88,7 +88,7 @@
   width: 100%;
   white-space: nowrap;
 
-  @space-to-chat-header: (@desktop-header-height - @chat-header-heading-line-height) / 2;
+  @space-to-chat-header: (@chat-frame-desktop-header-height - @chat-header-heading-line-height) / 2;
   @chat-header-font-vertical-padding: (@chat-header-heading-line-height - @chat-header-heading-font-size) / 2;
   @vert-diff-baseline-offset-between-header-and-topic: @chat-header-font-vertical-padding ~"+" @chat-header-heading-font-size ~"-" @chat-header-topic-line-height;
   // The extra `.125` is for account for desenders to match baseline
