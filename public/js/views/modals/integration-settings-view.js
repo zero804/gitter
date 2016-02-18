@@ -9,7 +9,10 @@ var View = Marionette.ItemView.extend({
   template: template,
 
   serializeData: function() {
-    return context.getTroupe();
+    var data = context.getTroupe();
+    // FIXME: Just rename it so it doesn't include the `url` module: https://github.com/altano/handlebars-loader/issues/75
+    data.stub = data.url;
+    return data;
   }
 });
 
