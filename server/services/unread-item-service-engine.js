@@ -302,6 +302,7 @@ function selectTroupeUserBatchForEmails(troupeUserHash, horizonTime) {
 
     var value = troupeUserHash[troupeUserKey];
     if(value === 'null' && !value) return;
+    if (value === 'null' || !value) return;
 
     var oldest = parseInt(value, 10);
     if (oldest <= horizonTime) {
