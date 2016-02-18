@@ -10,6 +10,7 @@ var redisClient      = redis.getClient();
 var scriptManager    = new Scripto(redisClient);
 var _                = require('lodash');
 var Promise          = require('bluebird');
+var moment           = require('moment');
 
 scriptManager.loadFromDir(__dirname + '/../../redis-lua/unread');
 var EMAIL_NOTIFICATION_HASH_KEY = "unread:email_notify";
@@ -295,13 +296,17 @@ function selectTroupeUserBatchForEmails(troupeUserHash, horizonTime) {
 
   var result = {};
 
+  var troupeIdsMap = {};
+  var userIdsMap = {};
+  var lackingValueCount = 0;
+  var oldestValue = Infinity;
+
   /* Filter out values which are too recent */
   troupeUserHashKeys.forEach(function(troupeUserKey) {
     // Don't bother if the total exceeds the maximum number of users in a single batch
     if (distinctUserCount >= MAXIMUM_USERS_PER_UNREAD_NOTIFICATION_BATCH) return;
 
     var value = troupeUserHash[troupeUserKey];
-    if(value === 'null' && !value) return;
     if (value === 'null' || !value) return;
 
     var oldest = parseInt(value, 10);
@@ -323,12 +328,33 @@ function selectTroupeUserBatchForEmails(troupeUserHash, horizonTime) {
   /* Filter out values which are too recent */
   troupeUserHashKeys.forEach(function(key) {
     var troupeUserId = key.split(':');
+    var troupeId = troupeUserId[0];
     var userId = troupeUserId[1];
+
+    troupeIdsMap[troupeId] = true;
+    userIdsMap[userId] = true;
+
+    var value = troupeUserHash[key];
+    if (value === 'null' || !value) {
+      lackingValueCount++;
+    } else {
+      var time = parseInt(value, 10);
+      if (time < oldestValue) {
+        oldestValue = time;
+      }
+    }
 
     if (distinctUserIds[userId]) {
       result[key] = true;
     }
   });
+
+  var seconds = (moment().format('x')-oldestValue)/1000;
+
+  debug('distinct troupes with pending emails', Object.keys(troupeIdsMap).length);
+  debug('distinct users with pending emails', Object.keys(userIdsMap).length);
+  //debug('keys without valid values', lackingValueCount);
+  debug('oldest value in seconds', seconds);
 
   return result;
 }
