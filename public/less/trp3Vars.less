@@ -1,29 +1,40 @@
 @import "colors.less";
 
+
+/*
+TODO --> JP 18/2/16
+  We need to add some conventions here so it becomes easier to understand
+  for example:
+    variables should probably be
+    @{feature}-{device}-{element}-{property}
+    or something ...
+*/
+
 /* MEDIA QUERY DEFINITIONS*/
-@mid:     ~"(max-width: 880px)";
-@mid-min: ~"(min-width: 681px)";
-@small:   ~"(max-width: 680px)";
-@retina:  ~"(min-device-pixel-ratio: 2)";
+@mid:                                ~"(max-width: 880px)";
+@mid-min:                            ~"(min-width: 681px)";
+@small:                              ~"(max-width: 680px)";
+@retina:                             ~"(min-device-pixel-ratio: 2)";
+// See `./archive-heatmap-utils.js->breakpointList` and `trp3Vars.less->@archive-mid`
+@archive-mid:                        ~"(max-width: 960px)";
 
-@mobile-header-height:  50px;
-@desktop-header-height: 65px;
-@menu-footer-height:    @desktop-header-height;
 
-@menu-panel-mobile-width:  100vw;
-@menu-panel-desktop-width: 34rem;
+@mobile-header-height:               50px;
+@desktop-header-height:              75px;
+@menu-footer-height:                 @desktop-header-height;
+@menu-item-height:                   3.8rem;
+
+@menu-panel-mobile-width:            100vw;
+@menu-panel-desktop-width:           34rem;
 
 /* ROOM MENU */
-@menu-item-height:      3.8rem;
-@mobile-menu-width:     15%;
-@desktop-menu-width:    7.5rem;
-@mobile-chat-app-width: 100% - @mobile-menu-width;
+@mobile-menu-width:                  15%;
+@desktop-menu-width:                 7.5rem;
+@mobile-chat-app-width:              100% - @mobile-menu-width;
 
 @mobile-menu-left-padding:           .5rem;
 @desktop-menu-left-padding:          2.6rem;
 @menu-left-padding:                  1.5rem;
+
 @menu-unread-badge-size:             2rem;
 @menu-search-headers-padding-bottom: 1.8rem;
-
-// See `./archive-heatmap-utils.js->breakpointList` and `trp3Vars.less->@archive-mid`
-@archive-mid: ~"(max-width: 960px)";
