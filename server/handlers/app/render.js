@@ -1,6 +1,5 @@
 "use strict";
 
-var winston                  = require('../../utils/winston');
 var nconf                    = require('../../utils/config');
 var Promise                  = require('bluebird');
 var contextGenerator         = require('../../web/context-generator');
@@ -30,6 +29,9 @@ var orgPermissionModel       = require('../../services/permissions/org-permissio
 var resolveUserAvatarUrl     = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 var resolveRoomAvatarSrcSet  = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
+//TODO this has a dependency on something in the public folder so gitter-web-shared
+//will not work. FIXME JP 17/2/16
+var suggestedOrgsFromRoomList= require('../../../shared/orgs/suggested-orgs-from-room-list');
 
 /* How many chats to send back */
 var INITIAL_CHAT_COUNT = 50;
@@ -189,22 +191,16 @@ function renderMainFrame(req, res, next, frame) {
   Promise.all([
       contextGenerator.generateNonChatContext(req),
       restful.serializeTroupesForUser(userId),
-      restful.serializeOrgsForUserId(userId).catch(function(err) {
-        // Workaround for GitHub outage
-        winston.error('Failed to serialize orgs:' + err, { exception: err });
-        return [];
-      }),
       aroundId && getPermalinkChatForRoom(req.troupe, aroundId)
     ])
-    .spread(function (troupeContext, rooms, orgs, permalinkChat) {
+    .spread(function (troupeContext, rooms, permalinkChat) {
+
       var chatAppQuery = {};
-      if (aroundId) {
-        chatAppQuery.at = aroundId;
-      }
+      if (aroundId) { chatAppQuery.at = aroundId; }
       var chatAppLocation = url.format({
         pathname: '/' + req.uriContext.uri + '/~' + frame,
-        query: chatAppQuery,
-        hash: '#initial'
+        query:    chatAppQuery,
+        hash:     '#initial'
       });
 
       var template, bootScriptName;
@@ -233,22 +229,50 @@ function renderMainFrame(req, res, next, frame) {
         social.getMetadataForChatPermalink({ room: req.troupe, chat: permalinkChat  }) :
         social.getMetadata({ room: req.troupe  });
 
+      //guard against new users who have no previous leftRoomMenuState
+      //JP 12/1/16
+      troupeContext.leftRoomMenuState = (troupeContext.leftRoomMenuState || {
+        roomMenuIsPinned: true,
+        state:            'all',
+      });
+
+      var hasNewLeftMenu = req.fflip && req.fflip.has('left-menu');
+
+      //If we are in any kind of org room && that org exists in out suggested org list
+      //set the menu state to org and the selectedOrg to the given org
+      //JP 25/1/16
+
+      //TODO Test this with an e2e runner
+      var orgs = suggestedOrgsFromRoomList(rooms);
+
+      //TODO Is this ever going to break? JP 1/2/16
+      var currentlySelectedOrg = req.uriContext.uri.split('/')[0];
+      if(_.findWhere(orgs, { name: currentlySelectedOrg })) {
+        troupeContext.leftRoomMenuState = _.extend({}, troupeContext.leftRoomMenuState, {
+          state: 'org',
+          selectedOrgName: currentlySelectedOrg,
+        });
+      }
+
       res.render(template, {
-        socialMetadata: socialMetadata,
-        bootScriptName: bootScriptName,
-        cssFileName: "styles/" + bootScriptName + ".css",
-        troupeName: req.uriContext.uri,
-        troupeContext: troupeContext,
-        chatAppLocation: chatAppLocation,
-        agent: req.headers['user-agent'],
-        stagingText: stagingText,
-        stagingLink: stagingLink,
-        dnsPrefetch: dnsPrefetch,
-        subresources: getSubResources(bootScriptName),
-        showFooterButtons: true,
-        showUnreadTab: true,
+        socialMetadata:     socialMetadata,
+        bootScriptName:     bootScriptName,
+        cssFileName:        "styles/" + bootScriptName + ".css",
+        troupeName:         req.uriContext.uri,
+        troupeContext:      troupeContext,
+        roomMenuIsPinned:   troupeContext.leftRoomMenuState.roomMenuIsPinned,
+        chatAppLocation:    chatAppLocation,
+        agent:              req.headers['user-agent'],
+        stagingText:        stagingText,
+        stagingLink:        stagingLink,
+        dnsPrefetch:        dnsPrefetch,
+        subresources:       getSubResources(bootScriptName),
+        showFooterButtons:  true,
+        showUnreadTab:      true,
         menuHeaderExpanded: false,
-        user: user,
+        user:               user,
+        orgs:               orgs,
+        hasNewLeftMenu:     hasNewLeftMenu,
         rooms: {
           favourites: rooms
             .filter(roomSort.favourites.filter)
@@ -257,8 +281,8 @@ function renderMainFrame(req, res, next, frame) {
             .filter(roomSort.recents.filter)
             .sort(roomSort.recents.sort)
         },
-        orgs: orgs,
         userHasNoOrgs: !orgs || !orgs.length
+
       });
     })
     .catch(next);
@@ -296,7 +320,6 @@ function renderChat(req, res, options, next) {
         restful.serializeChatsForTroupe(troupe.id, userId, chatSerializerOptions),
         options.fetchEvents === false ? null : restful.serializeEventsForTroupe(troupe.id, userId),
         options.fetchUsers === false ? null :restful.serializeUsersForTroupe(troupe.id, userId, userSerializerOptions),
-        troupeService.checkGitHubTypeForUri(troupe.lcOwner || '', 'ORG')
       ]).spread(function (troupeContext, chats, activityEvents, users, ownerIsOrg) {
         var initialChat = _.find(chats, function(chat) { return chat.initial; });
         var initialBottom = !initialChat;
@@ -357,7 +380,11 @@ function renderChat(req, res, options, next) {
             isMobile: options.isMobile,
             ownerIsOrg: ownerIsOrg,
             orgPageHref: orgPageHref,
-            roomMember: req.uriContext.roomMember
+            roomMember: req.uriContext.roomMember,
+
+            //Feature Switch Left Menu
+            hasNewLeftMenu: req.fflip && req.fflip.has('left-menu'),
+
           }, troupeContext && {
             troupeTopic: troupeContext.troupe.topic,
             premium: troupeContext.troupe.premium,
@@ -384,16 +411,16 @@ function renderChatPage(req, res, next) {
 
 function renderMobileUserHome(req, res, next) {
   contextGenerator.generateNonChatContext(req)
-    .then(function(troupeContext) {
-      res.render('mobile/mobile-userhome', {
-        troupeName: req.uriContext.uri,
-        troupeContext: troupeContext,
-        agent: req.headers['user-agent'],
-        user: req.user,
-        dnsPrefetch: dnsPrefetch
-      });
-    })
-    .catch(next);
+  .then(function(troupeContext) {
+    res.render('mobile/mobile-userhome', {
+      troupeName: req.uriContext.uri,
+      troupeContext: troupeContext,
+      agent: req.headers['user-agent'],
+      user: req.user,
+      dnsPrefetch: dnsPrefetch
+    });
+  })
+  .catch(next);
 }
 
 function renderMobileChat(req, res, next) {

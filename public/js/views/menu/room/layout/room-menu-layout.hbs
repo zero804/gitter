@@ -1,0 +1,60 @@
+<aside id="room-menu-container" class="room-menu-container">
+  <section class="room-menu">
+    <nav id="minibar" class="minibar nano">
+      <ul id="minibar-list" class="room-menu-options nano-content">
+
+        <li data-state-change="all" class="room-menu-options__item--all">
+          <a><img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/logo.svg"}}' /></a>
+        </li>
+
+        <li data-state-change="search" class="room-menu-options__item--search">
+          <a><img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/search.svg"}}' /></a>
+        </li>
+
+        <li data-state-change="favourite" class="room-menu-options__item--favourite">
+          <a><img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/favourites.svg"}}' /></a>
+        </li>
+
+        <li data-state-change="people" class="room-menu-options__item--people">
+          <a><img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/people.svg"}}' /></a>
+        </li>
+
+        {{#each orgs}} {{! JP 9/12/15 }} {{! TODO SHOULD THIS BE MOVED INTO A PARTIAL TO BE SHARED AROUND }}
+        <li data-state-change="org" data-org-name="{{name}}" class="room-menu-options__item--org">
+          {{#if mentions}}<span class="room-menu-options__item__mentions">{{mentions}}</span>{{/if}}
+          {{#if unreadItems}}<span class="room-menu-options__item__unread-items">{{unreadItems}}</span>{{/if}}
+          <a><img class="room-menu-options__item__avatar" src="{{imgUrl}}" /></a>
+        </li>
+        {{/each}}
+
+        <li data-state-change="close" class="room-menu-options__item--close {{#if roomMenuIsPinned}}left{{/if}}">
+          <a id="menu-close-button" class="menu-close-button">
+            <div class="close-icon">
+              <div class="close-icon-stay"></div>
+              <div class="close-icon-stay"></div>
+              <div class="close-icon-stay"></div>
+            </div>
+          </a>
+        </li>
+
+      </ul>
+    </nav>
+    <div id="room-menu__panel">
+      <section class="room-menu__panel {{#if roomMenuIsPinned}}active loading{{/if}}">
+        <header class="panel-header" id="panel-header"></header>
+        <div id="profile-menu"></div>
+        <div class="nano">
+          {{! JP 5/1/15
+              NANO SCROLLER DOES SUPER WEIRD THINGS WITH Z-INDEXES SO THE FOOTER COMES FIRST }}
+          <footer id="panel-footer" class="panel-footer-container"></footer>
+          <div class="nano-content panel-content">
+            <div id="search-input"></div>
+            <section id="primary-collection"></section>
+            <section id="secondary-collection"></section>
+            <section id="tertiary-collection"></section>
+          </div>
+        </div>
+      </section>
+    </div>
+  </section>
+</aside>

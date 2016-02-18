@@ -14,7 +14,7 @@
 @media screen and (-webkit-min-device-pixel-ratio:0) {
   @font-face {
     font-family: 'fontello';
-    src: url('../fonts/fontello/font/fontello.svg?29655729#fontello') format('svg');
+    src: url('../font/fontello.svg?29655729#fontello') format('svg');
   }
 }
 */

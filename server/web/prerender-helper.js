@@ -4,21 +4,27 @@ var compileTemplate = require('./compile-web-template');
 var prerenderWrapper = require('./prerender-wrapper');
 
 var PRERENDERED_VIEWS = [
+  //NEW LEFT MENU
+  "js/views/menu/room/layout/room-menu-layout",
+
+  //OLD SEARCH
+  "js/views/search/tmpl/search-input",
+  "js/views/search/tmpl/search",
+
+  //OLD MENU
+  "js/views/menu/old/tmpl/troupeMenu",
+  "js/views/menu/old/tmpl/profile",
+  "js/views/menu/old/tmpl/org-list-item",
+
   "js/views/archive/tmpl/archive-navigation-view",
   "js/views/app/tmpl/headerViewTemplate",
-  "js/views/menu/tmpl/troupeMenu",
-  "js/views/menu/tmpl/troupeMenu",
   "js/views/app/tmpl/headerViewTemplate",
   "js/views/chat/tmpl/chatInputView",
   "js/views/chat/tmpl/chat-input-box",
   "js/views/chat/tmpl/chat-input-buttons",
   "js/views/chat/tmpl/join-room-view",
-  "js/views/search/tmpl/search-input",
-  "js/views/search/tmpl/search",
   'js/views/people/tmpl/peopleCollectionView',
   /* new */
-  "js/views/menu/tmpl/profile",
-  "js/views/menu/tmpl/org-list-item"
 ].reduce(function(memo, v) {
   memo[v] = compileTemplate(v + ".hbs");
   return memo;
@@ -29,6 +35,11 @@ module.exports = exports = function (templateFile, options) {
 
   var template = PRERENDERED_VIEWS[templateFile];
   if (!template) throw new Error('Template ' + templateFile + ' has not been precompiled.');
+
+  //assign the desktop prop here so it can be passed
+  //down to the child template
+  //jp 15/12/15
+  this.desktop = hash.desktop;
 
   var inner = template(this);
   var wrap = hash.wrap;

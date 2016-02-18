@@ -3,22 +3,27 @@
 
 // Required views
 @import "../people/peopleCollectionView";
+
 @import "../search/searchView";
+
 @import "activity.less";
 
 .right-toolbar-region {
+  z-index: 100;
   position: relative;
-  color: #333;
-  display: inline-block;
-  flex-shrink: 0;
-  order: 2;
-  height: 100%;
-  text-align: left;
-  vertical-align: top;
-  right: 0;
   top: 0;
   bottom: 0;
-  z-index: 100;
+  right: 0;
+
+  order: 2;
+  flex-shrink: 0;
+  display: inline-block;
+  vertical-align: top;
+  height: calc(100vh ~"-" @chat-frame-desktop-header-height);
+  margin-top: @chat-frame-desktop-header-height;
+
+  color: #333;
+  text-align: left;
 
   & > .right-toolbar {
     position: relative;

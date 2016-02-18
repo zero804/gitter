@@ -1,13 +1,9 @@
 <div class="right-toolbar-region" id="right-toolbar-layout">
   <div class="right-toolbar right-toolbar--collapsible">
-    <header id="right-toolbar-header-region" class="right-toolbar__header">
-      <div class="search js-search">
-        {{{ prerenderView "js/views/search/tmpl/search-input" }}}
-      </div>
-    </header>
-    <div id="search-results" class="right-toolbar__body search-results" style="display: none;">
-       {{{ prerenderView "js/views/search/tmpl/search" wrap="div" }}}
-    </div>
+
+
+    {{#unless hasNewLeftMenu}} {{> switch_app_search_old}} {{/unless}}
+
     <div id="toolbar-top-content" class="right-toolbar__body">
       <div id="people-list">
         <div class="trpToolbarHeader" id="top-header">

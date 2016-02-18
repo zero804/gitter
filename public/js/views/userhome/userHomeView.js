@@ -47,7 +47,7 @@ module.exports = (function() {
 
     serializeData: function() {
       var user = context.getUser();
-      var hasPrivateRepoScope = !!user.scopes.private_repo;
+      var hasPrivateRepoScope = !!user && !!user.scopes && !!user.scopes.private_repo;
 
       return {
         basePath: context.env('basePath'),

@@ -77,7 +77,6 @@ function getSuggestionsForUser(user /*, locale */) {
 }
 exports.getSuggestionsForUser = getSuggestionsForUser;
 
-
 function getSuggestionsForRooms(rooms, localeLanguage) {
   var roomIds = _.pluck(rooms, 'id');
 
@@ -101,3 +100,24 @@ function getSuggestionsForRooms(rooms, localeLanguage) {
     });
 }
 exports.getSuggestionsForRooms = getSuggestionsForRooms;
+
+function getSuggestionsForOrg(orgName, userId) {
+  return query("MATCH (u:User), (r:Room)" +
+               "WHERE r.lcOwner = {orgName} " +
+                "AND u.userId = {userId}"  +
+                "AND NOT (u-[:MEMBER]-r)" +
+                "AND r.security = 'PUBLIC'" +
+               "RETURN r.roomId, count(*) * r.weight as occurrence " +
+               "ORDER BY occurrence DESC " +
+               "LIMIT 6",
+        {
+          orgName: orgName,
+          userId:  userId
+        })
+    .then(function(results){
+      return results.data.map(function(f){
+        return { roomId: f[0] };
+      });
+    });
+}
+exports.getSuggestionsForOrg = getSuggestionsForOrg;

@@ -2,25 +2,25 @@
 'use strict';
 require('utils/initial-setup');
 
-var appEvents             = require('utils/appevents');
-var context               = require('utils/context');
-var Backbone              = require('backbone');
-var _                     = require('underscore');
-var AppLayout             = require('views/layouts/app-layout');
-var LoadingView           = require('views/app/loading-view');
-var troupeCollections     = require('collections/instances/troupes');
-var TitlebarUpdater       = require('components/titlebar');
-var realtime              = require('components/realtime');
-var onready               = require('./utils/onready');
-var urlParser             = require('utils/url-parser');
-var RAF                   = require('utils/raf');
-var RoomCollectionTracker = require('components/room-collection-tracker');
-var SPARoomSwitcher       = require('components/spa-room-switcher');
-var debug                 = require('debug-proxy')('app:router-app');
-var urlParser             = require('./utils/url-parser');
-var linkHandler           = require('./components/link-handler');
-var roomListGenerator     = require('./components/chat-cache/room-list-generator');
-
+var $                                 = require('jquery');
+var appEvents                         = require('utils/appevents');
+var context                           = require('utils/context');
+var Backbone                          = require('backbone');
+var _                                 = require('underscore');
+var AppLayout                         = require('views/layouts/app-layout');
+var LoadingView                       = require('views/app/loading-view');
+var troupeCollections                 = require('collections/instances/troupes');
+var TitlebarUpdater                   = require('components/titlebar');
+var realtime                          = require('components/realtime');
+var onready                           = require('./utils/onready');
+var urlParser                         = require('utils/url-parser');
+var RAF                               = require('utils/raf');
+var RoomCollectionTracker             = require('components/room-collection-tracker');
+var SPARoomSwitcher                   = require('components/spa-room-switcher');
+var debug                             = require('debug-proxy')('app:router-app');
+var urlParser                         = require('./utils/url-parser');
+var linkHandler                       = require('./components/link-handler');
+var roomListGenerator                 = require('./components/chat-cache/room-list-generator');
 
 require('components/statsc');
 require('views/widgets/preload');
@@ -157,6 +157,9 @@ onready(function() {
   var appLayout = new AppLayout({
     template: false,
     el: 'body',
+    roomCollection: troupeCollections.troupes,
+    //TODO ADD THIS TO MOBILE JP 25/1/16
+    orgCollection: troupeCollections.orgs,
   });
   appLayout.render();
 
@@ -185,7 +188,7 @@ onready(function() {
 
   appEvents.on('navigation', function(url, type, title) {
     debug('navigation: %s', url);
-    var parsed = urlParser.parse(url);
+    var parsed   = urlParser.parse(url);
     var frameUrl = parsed.pathname + '/~' + type + parsed.search;
 
     if (parsed.pathname === window.location.pathname) {
@@ -341,6 +344,10 @@ onready(function() {
     });
   });
 
+  appEvents.on('room-menu:pin', function(val) {
+    $('.app-layout').toggleClass('pinned', val);
+  });
+
   // Sent keyboard events to chat frame
   appEvents.on('keyboard.all', function(name, event, handler) {
     // Don't send back events coming from the chat frame
@@ -379,6 +386,13 @@ onready(function() {
         var chooseRoomView = require('views/modals/choose-room-view');
         appLayout.dialogRegion.show(new chooseRoomView.Modal());
       });
+    },
+
+    createreporoom: function() {
+      require.ensure(['views/modals/create-repo-room'], function(require) {
+         var createRepoRoomView = require('views/modals/create-repo-room');
+         appLayout.dialogRegion.show(new createRepoRoomView.Modal());
+       });
     },
 
     createcustomroom: function(name) {
@@ -423,13 +437,6 @@ onready(function() {
         });
 
         appLayout.dialogRegion.show(modal);
-      });
-    },
-
-    createreporoom: function() {
-      require.ensure(['views/modals/create-repo-room'], function(require) {
-        var createRepoRoomView = require('views/modals/create-repo-room');
-        appLayout.dialogRegion.show(new createRepoRoomView.Modal());
       });
     },
 
