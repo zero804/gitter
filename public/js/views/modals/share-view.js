@@ -78,7 +78,8 @@ var View = Marionette.ItemView.extend({
       isPublic: room.security === 'PUBLIC',
       allowBadgePR: room.security === 'PUBLIC' && isAdmin,
       hasFlash: this.detectFlash(),
-      url: this.getShareUrl(),
+      // FIXME: This used to be named `url` but we ran into https://github.com/altano/handlebars-loader/issues/75
+      stub: this.getShareUrl(),
       badgeUrl: this.getBadgeUrl(),
       badgeMD: this.getBadgeMD(),
       twitterUrl: social.generateTwitterShareUrl(room.uri),

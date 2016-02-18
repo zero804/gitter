@@ -133,6 +133,9 @@ module.exports = (function() {
 
     serializeData: function() {
       var data = this.model.toJSON();
+      // FIXME: Just rename it so it doesn't include the `url` module: https://github.com/altano/handlebars-loader/issues/75
+      data.stub = data.url;
+
       if (data.githubType === 'ORG') {
         data.showOrgMessage = true;
       }
