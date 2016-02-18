@@ -1,20 +1,20 @@
-<div id="remaining-view" class="remaining">
+<div id="remaining-view" class="remaining-view">
 
   {{#if showAddButton}}
-  <a href="#add" class="trpAddBadge" style="text-decoration: none">
-    <div style="text-align: center;">&#10011; Add</div>
+  <a href="#add" class="remaining-view-button button-caribbean--xsmall">
+    Add
   </a>
   {{/if}}
 
   {{#if showPeopleButton}}
   {{#if hasHiddenMembers}}
-  <a href="#people" class="trpMoreBadge" style="text-decoration: none">
-    <div style="text-align: center;">See All</div>
+  <a href="#people" class="remaining-view-button secondary-button-caribbean--xsmall">
+    See All
   </a>
   <small>({{userCount}} members)</small>
   {{else}}
-  <a href="#people" class="trpMoreBadge" style="text-decoration: none">
-    <div style="text-align: center;">Details</div>
+  <a href="#people" class="remaining-view-button secondary-button-caribbean--xsmall">
+    Details
   </a>
   {{/if}}
   {{/if}}

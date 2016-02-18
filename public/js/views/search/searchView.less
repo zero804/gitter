@@ -31,21 +31,28 @@
 .search.active .search-input { display: block; }
 .search.active .search-input__clear { display: block; }
 
-i.search__toggle {
-  font-size: 18px;
+.search__toggle {
   display: none;
-  opacity: 0.4;
-  cursor: pointer;
-  transition: opacity 0.2s ease-in-out;
+  padding: 8px;
+  background-color: transparent;
+  border: none;
 
   @media @mid {
     display: block;
   }
 }
 
-.search__toggle:hover {
-  opacity: 1;
+.search__toggle-icon {
+  font-size: 18px;
+  opacity: 0.4;
+  transition: opacity 0.2s ease-in-out;
+
+  &:hover {
+    opacity: 1;
+  }
 }
+
+
 
 .search-input {
   position: relative;
