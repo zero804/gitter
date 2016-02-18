@@ -9,19 +9,21 @@
 @import "activity.less";
 
 .right-toolbar-region {
+  z-index: 100;
   position: relative;
-  color: #333;
-  display: inline-block;
-  flex-shrink: 0;
-  order: 2;
-  height: ~"calc(100vh - 65px)";
-  text-align: left;
-  vertical-align: top;
-  right: 0;
   top: 0;
   bottom: 0;
-  z-index: 100;
-  margin-top: 65px;
+  right: 0;
+
+  order: 2;
+  flex-shrink: 0;
+  display: inline-block;
+  vertical-align: top;
+  height: calc(100vh ~"-" @desktop-header-height);
+  margin-top: @desktop-header-height;
+  
+  color: #333;
+  text-align: left;
 
   & > .right-toolbar {
     position: relative;
