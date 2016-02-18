@@ -1,5 +1,7 @@
 "use strict";
 
+var config      = require('gitter-web-env');
+var stats       = config.stats;
 var redis            = require("../utils/redis");
 var winston          = require('../utils/winston');
 var mongoUtils       = require('../utils/mongo-utils');
@@ -291,6 +293,7 @@ function selectTroupeUserBatchForEmails(troupeUserHash, horizonTime) {
   var troupeUserHashKeys = Object.keys(troupeUserHash);
 
   debug('%s distinct usertroupes with pending emails', troupeUserHashKeys.length);
+  stats.gaugeHF('unread_email_notifications.pending_usertroupes', troupeUserHashKeys.length, 1);
 
   if (!troupeUserHashKeys.length) return {};
 
@@ -349,12 +352,18 @@ function selectTroupeUserBatchForEmails(troupeUserHash, horizonTime) {
     }
   });
 
-  var seconds = (moment().format('x')-oldestValue)/1000;
 
-  debug('distinct troupes with pending emails', Object.keys(troupeIdsMap).length);
-  debug('distinct users with pending emails', Object.keys(userIdsMap).length);
-  //debug('keys without valid values', lackingValueCount);
+  var distinctTroupes = Object.keys(troupeIdsMap).length;
+  debug('distinct troupes with pending emails', distinctTroupes);
+  stats.gaugeHF('unread_email_notifications.distinct_troupeIds', distinctTroupes, 1);
+
+  var distinctUsers = Object.keys(userIdsMap).length;
+  debug('distinct users with pending emails', distinctUsers);
+  stats.gaugeHF('unread_email_notifications.distinct_userIds', distinctUsers, 1);
+
+  var seconds = (moment().format('x')-oldestValue)/1000;
   debug('oldest value in seconds', seconds);
+  stats.gaugeHF('unread_email_notifications.oldest', troupeUserHashKeys.length, 1);
 
   return result;
 }
@@ -433,6 +442,7 @@ function listTroupeUsersForEmailNotifications(horizonTime, emailLatchExpiryTimeS
 
       var filteredKeys = Object.keys(userTroupesForNotification);
       debug('Attempting to send email notifications to %s usertroupes', filteredKeys.length);
+      stats.gaugeHF('unread_email_notifications.attempted_usertroupes', filteredKeys.length, 1);
 
       var keys = [EMAIL_NOTIFICATION_HASH_KEY].concat(filteredKeys.map(function(troupeUserKey) {
         return 'uel:' + troupeUserKey;
