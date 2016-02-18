@@ -5,7 +5,6 @@
 @import "trpButtons";
 @import "trp3Vars";
 // @import "nanoScroller";
-@import "base-zindex-levels";
 
 /* new stuff */
 // @import "menu";
@@ -56,6 +55,15 @@ h2 {
   padding: 3px 5px;
 }
 
+#mainPage {
+  box-shadow: 0 0 15px black;
+  .animation(cubic-bezier(0.6, -0.28, 0.735, 0.045));
+}
+
+#mainPage.partiallyOffScreen {
+  left: 260px;
+  .animation(linear);
+}
 
 #showUserhomeButton {
   position: absolute;

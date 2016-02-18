@@ -12,25 +12,21 @@
 @chat-header-topic-line-height: 25px;
 
 .chat-header {
-
-  box-sizing: border-box;
-
-  z-index: @l1;
-  position: absolute;
-  display: flex;
-  width: 100%;
-
-  padding-left: @desktop-menu-left-padding;
-  padding-right: @desktop-menu-left-padding;
-
+  box-sizing:       border-box;
+  position:         absolute;
+  display:          flex;
+  width:            100%;
+  padding-left:     @desktop-menu-left-padding;
+  padding-right:    @desktop-menu-left-padding;
   background-color: rgba(255, 255, 255, 0.97);
-  border-bottom: 1px solid rgba(0,0,0,0.05);
+  border-bottom:    1px solid rgba(0,0,0,0.05);
+  z-index:          @zindexChatHeader;
 }
 
 .chat-header-inner {
-  overflow: hidden;
-  flex: 1;
-  display: flex;
+  overflow:    hidden;
+  flex:        1;
+  display:     flex;
   align-items: flex-start;
 }
 

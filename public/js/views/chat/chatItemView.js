@@ -8,6 +8,7 @@ var AvatarView = require('views/widgets/avatar');
 var Marionette = require('backbone.marionette');
 var moment = require('moment');
 var isMobile = require('utils/is-mobile');
+var isAndroid = require('utils/is-android');
 var DoubleTapper = require('utils/double-tapper');
 var Popover = require('views/popover');
 var chatItemTemplate = require('./tmpl/chatItemView.hbs');
@@ -58,9 +59,16 @@ module.exports = (function() {
   };
 
   var touchEvents = {
+    // click events are delayed in horrible ways for <iOS 9.3
     'touchstart':                     'onTouchstart',
     'touchmove':                      'onTouchmove',
     'touchend':                       'onTouchend'
+  };
+
+  var androidTouchEvents = {
+    // WebViews in android will only show the keyboard for a focus() if
+    // it happens via a click event, but not for a touch event
+    'click':                           'onTap'
   };
 
   var ChatItemView = Marionette.ItemView.extend({
@@ -108,7 +116,11 @@ module.exports = (function() {
     isEditing: false,
 
     events: function() {
-      return isMobile() ? touchEvents : mouseEvents;
+      if (isMobile()) {
+        return isAndroid() ? androidTouchEvents : touchEvents;
+      } else {
+        return mouseEvents;
+      }
     },
 
     expandActivity: function() {
@@ -561,10 +573,8 @@ module.exports = (function() {
     },
 
     showInput: function() {
-      //var isAtBottom = this.scrollDelegate.isAtBottom();
       var chatInputText = this.ui.text;
 
-      // create inputview
       chatInputText.html("<textarea class='trpChatInput' autofocus></textarea>");
 
       var unsafeText = this.model.get('text');
@@ -572,7 +582,13 @@ module.exports = (function() {
       var textarea = chatInputText.find('textarea').val(unsafeText);
 
       this.inputBox = new ChatEditView({ el: textarea }).render();
-      this.listenTo(this.inputBox, 'cancel', this.onEditCancel);
+
+      // chrome 48 desktop requires an explicit focus event as `autofocus` is not enough
+      // chrome 48 android requires the same, but the first textarea autofocus is fine
+      textarea.focus();
+      // iOS 9 doesnt put the carat at the end of the text
+      textarea.val("").val(unsafeText);
+
       this.listenTo(this.inputBox, 'save', this.onEditSave);
 
       // chrome 48 android sends blur events and generally freaks out if you do this
@@ -584,6 +600,8 @@ module.exports = (function() {
         // iOS 9 doesnt put the carat at the end of the text
         textarea.val("").val(unsafeText);
       }, 0);
+
+      this.listenTo(this.inputBox, 'cancel', this.onEditCancel);
     },
 
     showReadByIntent: function(e) {

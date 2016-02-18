@@ -269,7 +269,6 @@ BayeuxCluster.prototype.attach = function(httpServer) {
 
 /** Singleton server */
 function BayeuxSingleton(lightweight) {
-  console.log('SINGLETON!!!');
   this.lightweight = lightweight;
 
   /**
