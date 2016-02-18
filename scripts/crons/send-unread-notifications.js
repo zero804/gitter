@@ -38,6 +38,7 @@ run()
     shutdown.shutdownGracefully();
   })
   .catch(function(err) {
+    console.log(err);
     console.log(err.stack);
     winston.error('send-unread-notifications failed: ' + err, { exception: err });
     shutdown.shutdownGracefully(1);
