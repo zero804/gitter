@@ -1222,14 +1222,14 @@ describe('unread-item-service', function() {
       selectTroupeUserBatchForEmails = testRequire('./services/unread-item-service-engine').testOnly.selectTroupeUserBatchForEmails;
     });
 
-    it('should limit the maximum number of users in an email batch to 1000', function() {
+    it('should limit the maximum number of users in an email batch to 3000', function() {
       var horizonTime = 1;
       var batch = {};
       var expected = {};
       _.range(2000).forEach(function(userId) {
         _.range(3).forEach(function(troupeId, index) {
           batch[troupeId + ':' + userId] = index;
-          if (userId < 1000) {
+          if (userId < 3000) {
             expected[troupeId + ':' + userId] = true;
           }
         });

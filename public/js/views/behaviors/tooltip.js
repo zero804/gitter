@@ -93,8 +93,15 @@ var Behavior = Marionette.Behavior.extend({
       container: tooltipOptions.container || 'body'
     });
 
+
+    var customUpdateEventName = tooltipOptions.customUpdateEvent;
+    if(customUpdateEventName) {
+      this.view.on(customUpdateEventName, this.updateTooltip.bind(this, $el));
+    }
+
     triggerMouseoverForHover(el);
   },
+
 
   onDestroy: function() {
     this.destroyHandlers();
@@ -124,6 +131,14 @@ var Behavior = Marionette.Behavior.extend({
       var $el = tooltips[selector];
       $el.tooltip('destroy');
     });
+  },
+
+  // Limitation of bootstrap tooltip library
+  // We do this so that when you click a toggle for example,
+  // the tooltip text is properly updated to show the inverse hint
+  updateTooltip: function($el) {
+    $el.tooltip('hide');
+    $el.tooltip('show');
   }
 
 });
