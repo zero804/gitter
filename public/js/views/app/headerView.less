@@ -5,7 +5,6 @@
 
 @import "../controls/dropdown";
 
-@chat-header-height: 75px;
 @chat-header-heading-font-size: 24px;
 @chat-header-heading-line-height: 40px;
 @chat-header-topic-font-size: 1em;
@@ -34,7 +33,7 @@
   display: flex;
   align-items: center;
   // header can expand to fit long topics when hovered over
-  min-height: @chat-header-height;
+  min-height: @desktop-header-height;
 }
 
 
@@ -89,7 +88,7 @@
   width: 100%;
   white-space: nowrap;
 
-  @space-to-chat-header: (@chat-header-height - @chat-header-heading-line-height) / 2;
+  @space-to-chat-header: (@desktop-header-height - @chat-header-heading-line-height) / 2;
   @chat-header-font-vertical-padding: (@chat-header-heading-line-height - @chat-header-heading-font-size) / 2;
   @vert-diff-baseline-offset-between-header-and-topic: @chat-header-font-vertical-padding ~"+" @chat-header-heading-font-size ~"-" @chat-header-topic-line-height;
   // The extra `.125` is for account for desenders to match baseline
