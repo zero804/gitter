@@ -186,6 +186,7 @@ gulp.task('submit-coveralls-post-tests', ['merge-lcov'], function() {
     .on('error', function(err) {
       gutil.log(err);
       process.env.GIT_BRANCH = GIT_BRANCH;
+      this.emit('end');
     })
     .on('end', function() {
       process.env.GIT_BRANCH = GIT_BRANCH;
