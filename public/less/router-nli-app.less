@@ -1,7 +1,111 @@
 @import "base-web.less";
 @import "typography.less";
 
-@import "../js/views/menu/troupeMenu";
 @import "../js/views/layouts/app-layout";
 @import "../js/views/widgets/preload";
 @import "staging-indicator";
+
+
+.nli-menu {
+    &, & * {
+    box-sizing: border-box;
+  }
+
+  display: flex;
+  flex-grow: 0;
+  flex-shrink: 0;
+
+  height: 100%;
+  width: 350px;
+  padding: 20px;
+
+  overflow-y: auto;
+
+  background-color: lighten(@trpDarkBlue, 5%);
+  color: white;
+
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+
+  background: url('../images/home/banner.jpg') no-repeat center center;
+  background-size: cover;
+  // Give a dark colour for the background to fade into
+  background-color: #512e92;
+
+  // Not so BEM but it's inherited from the Homepage
+  .logo-holder {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    top: 0px;
+    left: 15px;
+  }
+}
+
+.nli-menu__logo {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  position: absolute;
+  top: 25px;
+  left: 35px;
+}
+
+.nli-menu__logo-text {
+  position: relative;
+  width: 76px;
+  top: 7px;
+  left: 12px;
+}
+
+
+.nli-menu__header {
+  font-family: "source-sans-pro";
+  font-weight: 200;
+  font-size: 47px;
+  line-height: 43px;
+  margin: 10vh 0px 5vh 15px;
+  width: 100%;
+}
+
+.nli-menu__features-header {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 300;
+  margin-left: 15px;
+}
+
+.nli-menu__price {
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 30px;
+  margin-left: 15px;
+}
+
+.nli-menu__features {
+  background-color: rgba(255,255,255, 0.1);
+  font-size: 10px;
+  padding: 1vh 15px;
+  margin: 1vh 0px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  width: 100%;
+}
+
+.nli-menu__footer {
+  display: block;
+  position: absolute;
+  bottom: 25px;
+  margin-left: 15px;
+  a {
+    color: #FFF;
+    border-bottom: 1px dotted #FFF;
+  }
+  a:hover {
+    text-decoration: none;
+  }
+}

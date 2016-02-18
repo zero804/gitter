@@ -1,0 +1,23 @@
+@import "../../../../../less/components/menu/room/menu-text";
+@import "../../../../../less/components/menu/room/collection";
+
+.collection {
+  .m-collection();
+}
+
+.collection__title {
+  .room-menu-text();
+  box-sizing:     border-box;
+  padding-left:   @desktop-menu-left-padding;
+  color:          rgba(255,255,255,0.6);
+  text-transform: uppercase;
+  margin-top: 1.6rem;
+
+  &.search {
+    color: @jaffa;
+  }
+}
+
+.collection-list {
+  margin-left: 0;
+}

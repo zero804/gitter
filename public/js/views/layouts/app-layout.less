@@ -1,8 +1,22 @@
 .app-layout {
   display: flex;
   position: absolute;
+  right: 0;
   height: 100%;
   width: 100%;
+  transition: width .2s ease-in;
+
+
+  .logged-out & {
+    right: auto;
+  }
+}
+
+.app-layout--left-menu {
+  width: ~"calc(100% -" @desktop-menu-width ~")";
+  &.pinned {
+    width: ~"calc(100% - (" @menu-panel-desktop-width ~"))";
+  }
 }
 
 .menu-region {

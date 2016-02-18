@@ -1,7 +1,7 @@
 'use strict';
 
 var _                       = require('lodash');
-var template                = require('./compile-web-template')('/js/views/menu/tmpl/org-list-item');
+var template                = require('./compile-web-template')('/js/views/menu/old/tmpl/org-list-item');
 var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 var prerenderWrapper        = require('./prerender-wrapper');
 

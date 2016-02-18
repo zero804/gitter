@@ -5,32 +5,27 @@
 
 @import "../controls/dropdown";
 
-@chat-header-height: 75px;
 @chat-header-heading-font-size: 24px;
 @chat-header-heading-line-height: 40px;
 @chat-header-topic-font-size: 1em;
 @chat-header-topic-line-height: 25px;
 
 .chat-header {
-
-  box-sizing: border-box;
-
-  z-index: @zindexChatHeader;
-  position: absolute;
-  display: flex;
-  width: 100%;
-
-  padding-left: 3.5rem;
-  padding-right: 4rem;
-
+  box-sizing:       border-box;
+  position:         absolute;
+  display:          flex;
+  width:            100%;
+  padding-left:     @desktop-menu-left-padding;
+  padding-right:    @desktop-menu-left-padding;
   background-color: rgba(255, 255, 255, 0.97);
-  border-bottom: 1px solid rgba(0,0,0,0.05);
+  border-bottom:    1px solid rgba(0,0,0,0.05);
+  z-index:          @zindexChatHeader;
 }
 
 .chat-header-inner {
-  overflow: hidden;
-  flex: 1;
-  display: flex;
+  overflow:    hidden;
+  flex:        1;
+  display:     flex;
   align-items: flex-start;
 }
 
@@ -38,7 +33,7 @@
   display: flex;
   align-items: center;
   // header can expand to fit long topics when hovered over
-  min-height: @chat-header-height;
+  min-height: @chat-frame-desktop-header-height;
 }
 
 
@@ -93,7 +88,7 @@
   width: 100%;
   white-space: nowrap;
 
-  @space-to-chat-header: (@chat-header-height - @chat-header-heading-line-height) / 2;
+  @space-to-chat-header: (@chat-frame-desktop-header-height - @chat-header-heading-line-height) / 2;
   @chat-header-font-vertical-padding: (@chat-header-heading-line-height - @chat-header-heading-font-size) / 2;
   @vert-diff-baseline-offset-between-header-and-topic: @chat-header-font-vertical-padding ~"+" @chat-header-heading-font-size ~"-" @chat-header-topic-line-height;
   // The extra `.125` is for account for desenders to match baseline
@@ -183,6 +178,14 @@
 
   & > .chat-header__action-icon {
     color: inherit;
+  }
+}
+
+.chat-header__org-page {
+  .chat-header__action-icon {
+    /* To make the icon equal with the other font-icons */
+    margin-left: 0.18em;
+    margin-right: 0.18em;
   }
 }
 
