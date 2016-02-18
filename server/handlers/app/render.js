@@ -29,7 +29,8 @@ var orgPermissionModel       = require('../../services/permissions/org-permissio
 var resolveUserAvatarUrl     = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 var resolveRoomAvatarSrcSet  = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
-//TODO figure out why 'gtter-web-shared' does not work
+//TODO this has a dependency on something in the public folder so gitter-web-shared
+//will not work. FIXME JP 17/2/16
 var suggestedOrgsFromRoomList= require('../../../shared/orgs/suggested-orgs-from-room-list');
 
 /* How many chats to send back */
