@@ -19,7 +19,7 @@
           <a><img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/people.svg"}}' /></a>
         </li>
 
-        {{#each orgs}} {{! JP 9/12/15 }} {{! TODO SHOULD THIS BE MOVED INTO A PARTIAL TO BE SHARED AROUND }}
+        {{#each leftMenuOrgs}} {{! JP 9/12/15 }} {{! TODO SHOULD THIS BE MOVED INTO A PARTIAL TO BE SHARED AROUND }}
         <li data-state-change="org" data-org-name="{{name}}" class="room-menu-options__item--org">
           {{#if mentions}}<span class="room-menu-options__item__mentions">{{mentions}}</span>{{/if}}
           {{#if unreadItems}}<span class="room-menu-options__item__unread-items">{{unreadItems}}</span>{{/if}}
