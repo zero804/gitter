@@ -4,9 +4,6 @@
   height:     100%;
   z-index:    1;
 
-
-  padding-top:        @desktop-header-height;
-
   &:before {
     content:    ' ';
     display:    inline-block;
@@ -24,7 +21,6 @@
   position:   relative;
   height:     100%;
   background: @menu-bg;
-  //TODO replace with z-index tool
   z-index:    101;
 
   .mobile & {
@@ -49,8 +45,6 @@
   flex-direction: column;
   list-style: none;
   margin-left: 0;
-  margin-top:    @desktop-header-height * 4;
-  margin-bottom: @desktop-header-height;
 }
 
 .sudo-panel() {
@@ -70,7 +64,6 @@
   position:   relative;
   color:      white;
   text-align: center;
-  width:      @desktop-menu-width;
 
   &:hover {
     cursor: pointer;
@@ -130,9 +123,7 @@
 .room-menu-options__item--all {
   .room-menu-options__item();
   background: rgba(0, 0, 0, .4);
-  position:   fixed;
-  top:        0;
-  left:       0;
+
 
   &:before {
     background: @ruby;
@@ -142,9 +133,6 @@
 .room-menu-options__item--search {
   .room-menu-options__item();
   background: rgba(0, 0, 0, .3);
-  position:   fixed;
-  top:        @desktop-header-height;
-  left:       0;
 
   &:before {
     background: @jaffa;
@@ -154,9 +142,6 @@
 .room-menu-options__item--people {
   .room-menu-options__item();
   background: rgba(0, 0, 0, .1);
-  position:   fixed;
-  top:        @desktop-header-height * 2;
-  left:       0;
 
   &:before {
     background: @people-bg;
@@ -166,9 +151,6 @@
 .room-menu-options__item--favourite {
   .room-menu-options__item();
   background: rgba(0, 0, 0, .2);
-  position:   fixed;
-  top:        @desktop-header-height * 3;
-  left:       0;
 
   //Replace with class
   & img {
@@ -218,9 +200,6 @@
 .room-menu-options__item--close {
   .room-menu-options__item();
   margin-top: auto;
-  position:   fixed;
-  bottom:     0;
-  left:       0;
 }
 
 .room-menu-options__item__avatar  {
@@ -318,4 +297,3 @@
   }
 
 }
-
