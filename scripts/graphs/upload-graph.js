@@ -12,22 +12,59 @@ var cypher = require("cypher-promise");
 var env   = require('gitter-web-env');
 var neo4jClient = cypher(env.config.get('neo4j:endpoint'));
 
+
+function wrapStream(stream) {
+  var lineCount = 0;
+  stream.on('data', function() {
+    lineCount++;
+    if (lineCount % 1000 == 0) {
+      console.log(lineCount);
+    }
+  });
+  stream.on('error', function(err) {
+    console.error('Stream error:');
+    console.error(err);
+    console.error(err.stack);
+    process.exit(1);
+  });
+  stream.on('close', function() {
+    console.log("Stream closed after", lineCount, "lines.");
+  });
+  stream.on('end', function() {
+    console.log("Stream ended after", lineCount, "lines.");
+  });
+  return stream;
+}
+
 app.get('/users.csv', function(req, res){
   res.set('Content-Type', 'text/csv');
-  userStream().pipe(res);
+  wrapStream(userStream()).pipe(res);
+  req.on('close', function() {
+    console.log("req /users.csv closed.");
+  });
 });
 
 app.get('/rooms.csv', function(req, res){
   res.set('Content-Type', 'text/csv');
-  roomStream().pipe(res);
+  wrapStream(roomStream()).pipe(res);
+  req.on('close', function() {
+    console.log("req /rooms.csv closed.");
+  });
 });
 
 app.get('/membership.csv', function(req, res) {
   res.set('Content-Type', 'text/csv');
-  membershipStream().pipe(res);
+  wrapStream(membershipStream()).pipe(res);
+  req.on('close', function() {
+    console.log("req /rooms.csv closed.");
+  });
 });
 
 var server = http.createServer(app);
+
+server.setTimeout(1000*60*10, function() {
+  console.log("server timeout reached");
+});
 
 function executeBatch(urlBase) {
   var now = Date.now();
