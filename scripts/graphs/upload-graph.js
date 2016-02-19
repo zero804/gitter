@@ -44,7 +44,7 @@ function executeBatch(urlBase) {
     'USING PERIODIC COMMIT LOAD CSV WITH HEADERS FROM "' + urlBase + '/rooms.csv" AS row MERGE (room:Room {roomId: row.roomId }) SET room.security = row.security, room.weight = toFloat(row.weight), room.lcOwner = row.lcOwner, room.lang = row.lang;',
 
     /* Setup MEMBER relationship */
-    'USING PERIODIC COMMIT LOAD CSV WITH HEADERS FROM "' + urlBase + '/membership.csv" AS row ' +
+    'USING PERIODIC COMMIT 500 LOAD CSV WITH HEADERS FROM "' + urlBase + '/membership.csv" AS row ' +
       'MATCH (u:User { userId: row.userId }), (r:Room { roomId: row.roomId }) ' +
       'MERGE (u)-[m:MEMBER]->(r) SET m.batch=' + now,
 
