@@ -22,11 +22,11 @@ module.exports = Marionette.CompositeView.extend({
   },
 
   modelEvents: {
-    'change:header': 'render',
+    'change:state:post change:header': 'render',
   },
 
   collectionEvents: {
-    'filter-complete sync': 'render',
+    'change:mentions change:unreadMessages change:lastAccessTime': 'render',
     'add remove reset': 'onFilterComplete',
   },
 
