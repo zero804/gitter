@@ -92,6 +92,7 @@
     "nomnom": "~1.6.2",
     "oauth2orize": "~1.0.0",
     "octonode": "^0.6.8",
+    "on-headers": "^1.0.1",
     "parse-links": "~0.1.0",
     "passport": "^0.2.2",
     "passport-google-oauth2": "^0.1.6",

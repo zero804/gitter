@@ -56,6 +56,7 @@ module.exports = {
 
     app.use(cookieParser());
     app.use(methodOverride());
+    app.use(require('./middlewares/pending-request'));
     app.use(require('./middlewares/ie6-post-caching'));
     app.use(require('./middlewares/i18n'));
 
@@ -108,6 +109,7 @@ module.exports = {
     app.use(bodyParser.urlencoded({ extended: false }));
     app.use(methodOverride());
 
+    app.use(require('./middlewares/pending-request'));
     app.use(require('./middlewares/ie6-post-caching'));
     app.use(require('./middlewares/i18n'));
 
