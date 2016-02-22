@@ -131,34 +131,7 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   onPrimaryCollectionSnapshot: function() {
-    var self = this;
-
-    var hasLoaded = false;
-
-    //fetch the model data
-    this.model.fetch({
-      timeout: 1,
-      success: function() {
-        //ask for the next free frame
-        RAF(function() {
-          //show the menu
-          if (hasLoaded) { return; }
-
-          hasLoaded = true;
-          self.$el.removeClass('loading');
-        });
-      },
-    });
-
-    var t = setTimeout(function() {
-      clearTimeout(t);
-      if (hasLoaded) { return; }
-
-      hasLoaded = true;
-      self.$el.removeClass('loading');
-      this.model.set('state', 'all');
-    }.bind(this), 3000);
-
+    this.$el.removeClass('loading');
   },
 
   onFocusChangeRequested: function(offset, type) { //jshint unused: true

@@ -15,10 +15,10 @@ module.exports = BaseCollectionItemView.extend({
 
   template: itemTemplate,
   events: {
-    'click [data-component=room-item-options-toggle]': 'onOptionsClicked',
-    'click [data-component="room-item-hide"]':         'onHideClicked',
-    'click [data-component="room-item-leave"]':        'onLeaveClicked',
-    'mouseleave':                                      'onMouseOut',
+    'click #room-item-options-toggle': 'onOptionsClicked',
+    'click #room-item-hide':           'onHideClicked',
+    'click #room-item-leave':          'onLeaveClicked',
+    'mouseleave':                      'onMouseOut',
   },
 
   className: null,
