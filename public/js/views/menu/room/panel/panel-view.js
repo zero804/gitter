@@ -116,7 +116,7 @@ module.exports = Marionette.LayoutView.extend({
 
   onPanelOpenStateChange: function(model, val) { /*jshint unused: true */
     RAF(function() {
-      this.$el.toggleClass('active', val);
+      this.el.classList.toggle('active', val);
     }.bind(this));
   },
 
@@ -131,7 +131,7 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   onPrimaryCollectionSnapshot: function() {
-    this.$el.removeClass('loading');
+    this.el.classList.add('loading');
   },
 
   onFocusChangeRequested: function(offset, type) { //jshint unused: true
