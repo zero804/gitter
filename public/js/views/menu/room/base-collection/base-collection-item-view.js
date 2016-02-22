@@ -36,11 +36,11 @@ module.exports = Marionette.ItemView.extend({
   },
 
   onSelectedChange: function(model, val) { //jshint unused: true
-    this.ui.container.toggleClass('selected', !!val);
+    this.ui.container[0].classList.toggle('selected', !!val);
   },
 
   onItemFocused: function(model, val) {//jshint unused: true
-    this.ui.container.toggleClass('focus', !!val);
+    this.ui.container[0].classList.toggle('focus', !!val);
   },
 
 });

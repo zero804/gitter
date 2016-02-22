@@ -47,11 +47,11 @@ module.exports =  Marionette.ItemView.extend({
   },
 
   onActiveStateUpdate: function(model, val) { //jshint unused: true
-    this.$el.toggleClass('active', !!val);
+    this.el.classList.toggle('active', !!val);
   },
 
   onRender: function() {
-    this.$el.toggleClass('active', !!this.model.get('active'));
+    this.el.classList.toggle('active', !!this.model.get('active'));
   },
 
 });

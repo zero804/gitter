@@ -77,13 +77,13 @@ module.exports = Marionette.CompositeView.extend({
   },
 
   setActive: function (){
-    this.$el.toggleClass('active', this.model.get('active'));
+    this.el.classList.toggle('active', this.model.get('active'));
   },
 
 
   setLoaded: function (val){
     val = (val || true);
-    this.$el.toggleClass('loaded', val);
+    this.el.classList.toggle('loaded', val);
   },
 
   onDestroy: function() {

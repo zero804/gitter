@@ -67,7 +67,7 @@ module.exports = BaseCollectionItemView.extend({
   },
 
   onModelToggleMenu: function(model, val) {// jshint unused: true
-    this.$el.toggleClass('active', val);
+    this.el.classList.toggle('active', val);
   },
 
   onMouseOut: function() {
