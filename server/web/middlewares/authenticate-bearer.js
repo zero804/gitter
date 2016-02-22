@@ -67,6 +67,7 @@ module.exports = function(req, res, next) {
 
         req.authInfo = { client: client, accessToken: accessToken };
         next();
+        return null;
       });
     })
     .catch(next);
