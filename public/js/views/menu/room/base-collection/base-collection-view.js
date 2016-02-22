@@ -9,7 +9,7 @@ module.exports = Marionette.CompositeView.extend({
 
   template:           template,
   className:          'collection',
-  childViewContainer: '.js-collection-list',
+  childViewContainer: '#collection-list',
 
   childViewOptions: function(model) {
     var index = this.collection.indexOf(model);

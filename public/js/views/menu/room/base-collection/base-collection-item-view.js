@@ -19,7 +19,7 @@ module.exports = Marionette.ItemView.extend({
   },
 
   ui: {
-    container: '.room-item__container'
+    container: '#room-item-container'
   },
 
   constructor: function(attrs) {
