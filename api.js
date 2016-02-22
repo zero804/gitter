@@ -4,6 +4,4 @@
 var env = require('gitter-web-env');
 env.installUncaughtExceptionHandler();
 
-env.domainWrap(function() {
-  require('./server/api.js');
-});
+require('./server/api.js');
