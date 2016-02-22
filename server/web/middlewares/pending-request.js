@@ -59,14 +59,15 @@ module.exports = function(req, res, next) {
       userId: userId,
       clientId: clientId,
       method: method,
-      path: req.originalUrl
+      path: req.originalUrl,
+      body: req.body
     });
 
     var tags = ['method:' + method];
     if (routeTag) {
       tags.push('route:' + routeTag);
     }
-    
+
     statsd.increment('http.request.pending', 1, tags);
   }
 
