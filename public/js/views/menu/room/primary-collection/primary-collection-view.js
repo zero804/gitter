@@ -13,7 +13,7 @@ var PrimaryCollectionView = BaseCollectionView.extend({
   childView: ItemView,
   className: 'primary-collection',
   ui: {
-    collection: '.js-collection-list',
+    collection: '#collection-list',
   },
 
   emptyView: EmptySearchView,
