@@ -7,7 +7,6 @@ var nconf      = require('./utils/config');
 var winston    = require('./utils/winston');
 var bayeux     = require('./web/bayeux');
 var appVersion = require('./web/appVersion');
-var domainWrapper = require('./utils/domain-wrapper');
 var http          = require('http');
 var shutdown      = require('shutdown');
 var serverStats   = require('./utils/server-stats');
@@ -16,7 +15,7 @@ var onMongoConnect = require('./utils/on-mongo-connect');
 winston.info("Starting http/ws service");
 
 var app = express();
-var server = http.createServer(domainWrapper(app));
+var server = http.createServer(app);
 
 require('./web/graceful-shutdown').install(server, app);
 
