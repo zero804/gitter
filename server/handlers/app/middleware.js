@@ -51,6 +51,7 @@ function uriContextResolverMiddleware(options) {
 
         req.uriContext = uriContext;
         next();
+        return null;
       })
       .catch(function(e) {
         if (!(e instanceof StatusError)) throw e;
