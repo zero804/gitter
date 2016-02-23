@@ -2,6 +2,7 @@
 
 var Backbone = require('backbone');
 var BackboneFilteredCollection = require('filtered-collection');
+var defaultFilter = require('gitter-web-shared/filters/left-menu-primary-default');
 
 var FilteredRoomCollection = Backbone.FilteredCollection.extend({
   initialize: function(collection, options) {//jshint unused: true
@@ -87,7 +88,7 @@ var FilteredRoomCollection = Backbone.FilteredCollection.extend({
   },
 
   filterDefault: function (model){
-    return !!model.get('lastAccessTime');
+    return defaultFilter(model.toJSON());
   },
 
   filterOrgRooms: function(model) {
