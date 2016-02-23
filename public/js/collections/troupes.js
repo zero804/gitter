@@ -19,7 +19,7 @@ var TroupeCollection = gitterRealtimeClient.RoomCollection.extend({
   constructor: function (models, attrs, options){
     //Pull the initial room list out of the window.troupeContext
     //we have to parse the times into moment objects JP 17/2/16
-    models = window.troupeContext.roomList
+    models = window.troupeContext.leftRoomMenuState.roomList
       .map(function(data){
         return _.extend(data, { lastAccessTime: moment(data.lastAccessTime) });
       });
