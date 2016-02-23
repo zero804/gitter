@@ -25,7 +25,7 @@ module.exports = Marionette.LayoutView.extend({
       header:              { el: '#panel-header', init: 'initHeader' },
       profile:             { el: '#profile-menu', init: 'initProfileMenu' },
       searchInput:         { el: '#search-input', init: 'initSearchInput' },
-      //primaryCollection:   { el: '#primary-collection', init: 'initPrimaryCollection' },
+      primaryCollection:   { el: '#primary-collection', init: 'initPrimaryCollection' },
       secondaryCollection: { el: '#secondary-collection', init: 'initSecondaryCollection' },
       teritaryCollection:  { el: '#tertiary-collection', init: 'initTertiaryCollection' },
       footer:              { el: '#panel-footer', init: 'initFooter' },
