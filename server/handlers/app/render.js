@@ -243,6 +243,10 @@ function renderMainFrame(req, res, next, frame) {
         state:            'all',
       });
 
+      //throw the room list into the troupe context so we can parse it into a
+      //collection on the client JP 17/7/16
+      troupeContext.roomList = rooms;
+
       var hasNewLeftMenu = req.fflip && req.fflip.has('left-menu');
 
       //If we are in any kind of org room && that org exists in out suggested org list
@@ -278,9 +282,10 @@ function renderMainFrame(req, res, next, frame) {
         showUnreadTab:      true,
         menuHeaderExpanded: false,
         user:               user,
-        leftMenuOrgs:       leftMenuOrgs,
         orgs:               orgs,
+        leftMenuOrgs:       leftMenuOrgs,
         hasNewLeftMenu:     hasNewLeftMenu,
+        //TODO Remove this when left-menu switch goes away JP 23/2/16
         rooms: {
           favourites: rooms
             .filter(roomSort.favourites.filter)
