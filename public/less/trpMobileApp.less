@@ -48,6 +48,25 @@ h2 {
   }
 }
 
+@header-height: 50px;
+
+header {
+  flex-shrink: 0;
+  width: 100%;
+  z-index: 1;
+  background-color: @trpDarkBlue;
+  line-height: @header-height;
+  text-align: center;
+  height: @header-height;
+  .trpTitle {
+    display: inline-block;
+    vertical-align: middle;
+    line-height: normal;
+    color: white;
+    .trpH2;
+  }
+}
+
 #showTroupesButton {
   position: absolute;
   left: 0;
