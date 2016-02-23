@@ -13,7 +13,7 @@ var PrimaryCollectionView = BaseCollectionView.extend({
   childView: ItemView,
   className: 'primary-collection',
   ui: {
-    collection: '.js-collection-list',
+    collection: '#collection-list',
   },
 
   emptyView: EmptySearchView,
@@ -51,7 +51,7 @@ var PrimaryCollectionView = BaseCollectionView.extend({
   setActive: function() {
     switch (this.roomMenuModel.get('state')){
       case 'search':
-        this.$el.toggleClass('active', !!this.roomMenuModel.get('searchTerm'));
+        this.el.classList.toggle('active', !!this.roomMenuModel.get('searchTerm'));
         break;
       default:
         proto.setActive.apply(this, arguments);

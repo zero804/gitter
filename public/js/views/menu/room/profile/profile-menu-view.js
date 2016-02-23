@@ -40,7 +40,7 @@ module.exports = Marionette.CollectionView.extend({
 
   onOpenStateChange: function(model, val) {/*jshint unused:true */
     RAF(function(){
-      this.$el.toggleClass('active', !!val);
+      this.el.classList.toggle('active', !!val);
     }.bind(this));
   },
 
