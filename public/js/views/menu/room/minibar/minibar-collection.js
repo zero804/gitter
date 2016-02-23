@@ -2,7 +2,7 @@
 
 var Backbone                     = require('backbone');
 //just use shared/
-var getSuggestedOrgsFromRoomList = require('../../../../../../shared/orgs/suggested-orgs-from-room-list');
+var getSuggestedOrgsFromRoomList = require('gitter-web-shared/orgs/suggested-orgs-from-room-list');
 
 var defaultModels = [
   { name: 'all', type: 'all', id: 0 },
@@ -39,6 +39,9 @@ module.exports = Backbone.Collection.extend({
 
     models = defaultModels.concat(window.troupeContext.leftRoomMenuState.orgList || []).concat(tailDefaults);
     Backbone.Collection.prototype.constructor.call(this, models, attrs, options);
+
+    //Clean Up
+    delete window.troupeContext.leftRoomMenuState.orgList;
   },
 
   onCollectionUpdate: function() {
