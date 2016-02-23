@@ -32,16 +32,18 @@ var FilteredRoomCollection = Backbone.FilteredCollection.extend({
 
     this.listenTo(this, 'sync', this.onSync, this);
 
+
     BackboneFilteredCollection.prototype.initialize.apply(this, arguments);
+    this.onModelChangeState();
   },
 
   comparator: function(a, b) {
     return defaultSort(a.toJSON(), b.toJSON());
   },
 
-  onModelChangeState: function(model, val) {//jshint unused: true
+  onModelChangeState: function() {//jshint unused: true
     this.comparator = FilteredRoomCollection.prototype.comparator;
-    switch (val) {
+    switch (this.roomModel.get('state')) {
       case 'favourite' :
         this.setFilter(this.filterFavourite.bind(this));
         this.comparator = this.sortFavourites;

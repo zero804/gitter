@@ -90,8 +90,4 @@ module.exports = Marionette.CompositeView.extend({
     this.stopListening(context.troupe());
   },
 
-  render: function() {
-    Marionette.CompositeView.prototype.render.apply(this, arguments);
-  },
-
 });

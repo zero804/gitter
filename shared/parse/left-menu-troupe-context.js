@@ -12,10 +12,10 @@ module.exports = function parseLeftMenuTroupeContext(req, troupeContext, orgs, r
   if(currentRoomIsInRoomList) { currentLeftMenuState.state = 'org'}
 
   return {
-    roomMenuIsPinned: true,
-    state:           (currentLeftMenuState.state || 'all'),
-    roomList:        (rooms || []),
-    selectedOrgName: (currentlySelectedOrg || ''),
-    orgList:         (suggestedOrgsFromRoomList(rooms) || []),
+    roomMenuIsPinned:    true,
+    state:               (currentLeftMenuState.state || 'all'),
+    preRenderedRoomList: (rooms || []),
+    selectedOrgName:     (currentLeftMenuState.selectedOrgName || currentlySelectedOrg || ''),
+    orgList:             (suggestedOrgsFromRoomList(rooms) || []),
   };
 };
