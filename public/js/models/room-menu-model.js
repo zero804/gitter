@@ -12,6 +12,7 @@ var FilteredRoomCollection         = require('../collections/filtered-room-colle
 var SuggestedRoomsByRoomCollection = require('../collections/left-menu-suggested-by-room');
 var SearchRoomPeopleCollection     = require('../collections/left-menu-search-rooms-and-people');
 var SearchChatMessages             = require('../collections/search-chat-messages');
+var perfTiming                     = require('components/perf-timing');
 
 var states = [
   'all',
@@ -44,6 +45,8 @@ module.exports = Backbone.Model.extend({
   //not the attrs
   //JP 27/1/16
   initialize: function(attrs) {
+
+    perfTiming.start('left-menu-init');
 
     if (!attrs || !attrs.bus) {
       throw new Error('A valid message bus must be passed when creating a new RoomMenuModel');
@@ -120,9 +123,12 @@ module.exports = Backbone.Model.extend({
       throw new Error('Please only pass a valid state to roomMenuModel change state, you passed:' + newState);
     }
 
+
+    perfTiming.start('left-menu-change');
     this.trigger('change:state:pre', this.get('state'), newState);
     this.set('state', newState);
     this.trigger('change:state:post', this.get('state'));
+    perfTiming.end('left-menu-change');
   },
 
   //This may be redundant

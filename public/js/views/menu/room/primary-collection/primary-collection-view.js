@@ -5,6 +5,7 @@ var _                  = require('underscore');
 var ItemView           = require('./primary-collection-item-view');
 var BaseCollectionView = require('../base-collection/base-collection-view');
 var EmptySearchView    = require('./primary-collection-item-search-empty-view.js');
+var perfTiming         = require('components/perf-timing');
 
 var proto = BaseCollectionView.prototype;
 
@@ -16,6 +17,7 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     collection: '#collection-list',
   },
 
+  hasInit: false,
   emptyView: EmptySearchView,
   isEmpty: function() {
     return ((this.roomMenuModel.get('state') === 'search') && !this.collection.length);
@@ -100,6 +102,10 @@ var PrimaryCollectionView = BaseCollectionView.extend({
 
   //Once we have rendered we re-add the container to dnd
   onRender: function (){
+    if(!this.hasInit && this.collection.length > 0) {
+      this.hasInit = true;
+      perfTiming.end('left-menu-init');
+    }
     this.dndCtrl.pushContainer(this.ui.collection[0]);
     BaseCollectionView.prototype.onRender.apply(this, arguments);
   },
