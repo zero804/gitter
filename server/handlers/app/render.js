@@ -258,9 +258,9 @@ function renderMainFrame(req, res, next, frame) {
         menuHeaderExpanded: false,
         user:               user,
         orgs:               orgs,
-        leftMenuOrgs:       troupeContext.leftRoomMenuState.orgList,
-        leftmenuRooms:      leftMenuRoomList,
         hasNewLeftMenu:     hasNewLeftMenu,
+        leftMenuOrgs:       troupeContext.leftRoomMenuState.orgList,
+        leftMenuRooms:      leftMenuRoomList,
         //TODO Remove this when left-menu switch goes away JP 23/2/16
         rooms: {
           favourites: rooms

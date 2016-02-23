@@ -20,7 +20,7 @@ module.exports = function(state, rooms, selectedOrgName){
       return rooms.filter(one2oneFilter).sort(defaultSort).map(parseToTemplateItem);
     case 'org':
       return rooms
-        .fliter(function(model){ return orgFilter(model, selectedOrgName); })
+        .filter(function(model){ return orgFilter(model, selectedOrgName); })
         .sort(defaultSort)
         .map(parseToTemplateItem);
     default:

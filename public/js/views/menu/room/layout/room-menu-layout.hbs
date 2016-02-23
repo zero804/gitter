@@ -49,7 +49,15 @@
           <footer id="panel-footer" class="panel-footer-container"></footer>
           <div class="nano-content panel-content">
             <div id="search-input"></div>
-            <section id="primary-collection"></section>
+            <section id="primary-collection">
+              <div class="primary-collection loaded active">
+              {{#each leftMenuRooms}}
+                <div class="room-item" data-id="{{id}}">
+                  {{{ prerenderView "js/views/menu/room/primary-collection/primary-collection-view" }}}
+                </div>
+              {{/each}}
+              </div>
+            </section>
             <section id="secondary-collection"></section>
             <section id="tertiary-collection"></section>
           </div>
