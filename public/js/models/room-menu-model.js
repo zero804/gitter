@@ -35,6 +35,11 @@ module.exports = Backbone.Model.extend({
     selectedOrgName:           '',
   },
 
+  constructor: function (attrs, options){
+    attrs = _.extend(attrs, window.troupeContext.leftRoomMenuState);
+    Backbone.Model.prototype.constructor.call(this, attrs, options);
+  },
+
   //TODO Remove all these delete statements and pass the object with the options hash
   //not the attrs
   //JP 27/1/16
@@ -94,6 +99,9 @@ module.exports = Backbone.Model.extend({
     this.tertiaryCollection  = new ProxyCollection({ collection: this._orgCollection });
 
     this.listenTo(this.primaryCollection, 'snapshot', this.onPrimaryCollectionSnapshot, this);
+    this.snapshotTimeout = setTimeout(function(){
+      this.onPrimaryCollectionSnapshot();
+    }.bind(this), 1000);
 
     //TODO have added setState so this can be removed
     //tests must be migrated
@@ -162,7 +170,9 @@ module.exports = Backbone.Model.extend({
   }, SEARCH_DEBOUNCE_INTERVAL),
 
   onPrimaryCollectionSnapshot: function() {
+    clearTimeout(this.snapshotTimeout);
     this.trigger('primary-collection:snapshot');
+    this.trigger('change:state', this, this.get('state'));
   },
 
   toJSON: function() {

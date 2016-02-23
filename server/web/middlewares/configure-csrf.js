@@ -30,6 +30,7 @@ module.exports = function(req, res, next) {
       return oauthService.findOrGenerateWebToken(req.user.id)
         .spread(function(serverToken/*, client */) {
           setAccessToken(req, userId, serverToken);
+          return null;
         });
     }
 
@@ -40,6 +41,7 @@ module.exports = function(req, res, next) {
     return oauthService.generateAnonWebToken()
       .spread(function(token /*, client */) {
         setAccessToken(req, null, token);
+        return null;
       });
   }
 

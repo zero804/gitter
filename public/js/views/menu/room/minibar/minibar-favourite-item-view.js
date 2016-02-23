@@ -12,17 +12,17 @@ module.exports = ItemView.extend({
   },
 
   onDragStart: function() {
-    this.$el.addClass('dragging');
+    this.el.classList.add('dragging');
   },
 
   onDragStop: function() {
-    this.$el.removeClass('dragging');
+    this.el.classList.remove('dragging');
   },
 
   onFavourite: function() {
-    this.$el.addClass('dropped');
+    this.el.classList.add('dropped');
     setTimeout(function() {
-      this.$el.removeClass('dropped');
+      this.el.classList.remove('dropped');
 
       //Dragula places dropped items into the drop container
       //This needs to be fixed upstream

@@ -53,18 +53,18 @@ module.exports = BaseCollectionView.extend({
     switch (this.roomMenuModel.get('state')){
       case 'all':
         return (this.primaryCollection.length >= 10) ?
-          this.$el.removeClass('active') :
+          this.el.classList.remove('active') :
           proto.setActive.apply(this, arguments);
 
       case 'search':
         return !!this.roomMenuModel.get('searchTerm') ?
           proto.setActive.apply(this, arguments) :
-          this.$el.removeClass('active');
+          this.el.classList.remove('active');
 
       default:
         return !!this.collection.length ?
           proto.setActive.apply(this, arguments) :
-          this.$el.removeClass('active');
+          this.el.classList.remove('active');
     }
   },
 
