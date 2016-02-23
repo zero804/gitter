@@ -51,11 +51,13 @@
             <div id="search-input"></div>
             <section id="primary-collection">
               <div class="primary-collection loaded active">
-              {{#each leftMenuRooms}}
-                <div class="room-item" data-id="{{id}}">
-                  {{{ prerenderView "js/views/menu/room/primary-collection/primary-collection-view" }}}
+                <div id="collection-list">
+                  {{#each leftMenuRooms}}
+                    <div class="room-item" data-id="{{id}}">
+                      {{{ prerenderView "js/views/menu/room/primary-collection/primary-collection-view" }}}
+                    </div>
+                  {{/each}}
                 </div>
-              {{/each}}
               </div>
             </section>
             <section id="secondary-collection"></section>

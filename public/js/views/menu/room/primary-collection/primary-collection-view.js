@@ -1,16 +1,19 @@
 'use strict';
 
-var Backbone           = require('backbone');
-var _                  = require('underscore');
-var ItemView           = require('./primary-collection-item-view');
-var BaseCollectionView = require('../base-collection/base-collection-view');
-var EmptySearchView    = require('./primary-collection-item-search-empty-view.js');
-var perfTiming         = require('components/perf-timing');
+var Backbone                    = require('backbone');
+var _                           = require('underscore');
+var ItemView                    = require('./primary-collection-item-view');
+var BaseCollectionView          = require('../base-collection/base-collection-view');
+var EmptySearchView             = require('./primary-collection-item-search-empty-view.js');
+var perfTiming                  = require('components/perf-timing');
+var compositeViewRenderTemplate = require('utils/composite-view-render-template');
 
 var proto = BaseCollectionView.prototype;
 
 var PrimaryCollectionView = BaseCollectionView.extend({
 
+  //Ugh, Marionette, get your game together JP 17/2/16
+  _renderTemplate: compositeViewRenderTemplate,
   childView: ItemView,
   className: 'primary-collection',
   ui: {
@@ -22,6 +25,15 @@ var PrimaryCollectionView = BaseCollectionView.extend({
   isEmpty: function() {
     return ((this.roomMenuModel.get('state') === 'search') && !this.collection.length);
   },
+
+  childViewOptions: function (model){
+    var baseOptions   = BaseCollectionView.prototype.childViewOptions.apply(this, arguments);
+    baseOptions.model = model;
+    var selector      = '[data-id=' + model.get('id') + ']';
+    var element       = this.$el.find(selector);
+    return !!element.length ? _.extend(baseOptions, { el: element }) : baseOptions;
+  },
+
 
   buildChildView: function(model, ItemView, attrs) {
     switch (this.roomMenuModel.get('state')){
