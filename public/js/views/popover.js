@@ -25,6 +25,27 @@ module.exports = (function() {
     minHeight: ''
   };
 
+  function findMaxZIndex(element) {
+    var max = 0;
+    while(element && element != document) {
+      var style = window.getComputedStyle(element, null);
+
+      if(style) {
+        var zIndex = style.getPropertyValue('z-index');
+        if(zIndex && zIndex !== 'auto') {
+          zIndex = parseInt(zIndex, 10);
+          if(zIndex > max) {
+            max = zIndex;
+          }
+        }
+      }
+
+      element = element.parentNode;
+    }
+
+    return max;
+  }
+
   var Popover = Marionette.ItemView.extend({
     template: popoverTemplate,
     className: "popover",
@@ -45,6 +66,8 @@ module.exports = (function() {
       this.targetElement = this.options.targetElement;
       this.$targetElement = $(this.targetElement);
 
+      this.zIndex = findMaxZIndex(this.targetElement);
+
       this.$targetElement.on('mouseenter', this.enter);
       this.$targetElement.on('mouseleave', this.leave);
       this.once('destroy', function() {
@@ -60,6 +83,10 @@ module.exports = (function() {
       var $e = this.$el;
 
       this.view.parentPopover = this;
+
+      if(this.zIndex) {
+        this.el.style.zIndex = this.zIndex + 1;
+      }
 
       if(this.titleView) {
         $e.find('.popover-title').append(this.titleView.render().el);
