@@ -37,7 +37,7 @@ module.exports = Backbone.Collection.extend({
     this.listenTo(this.roomCollection, 'sync change', this.onCollectionUpdate, this);
     this.listenTo(this.roomCollection, 'remove reset', this.onItemRemoved, this);
 
-    models = defaultModels.concat(models || []).concat(tailDefaults);
+    models = defaultModels.concat(window.troupeContext.leftRoomMenuState.orgList || []).concat(tailDefaults);
     Backbone.Collection.prototype.constructor.call(this, models, attrs, options);
   },
 
