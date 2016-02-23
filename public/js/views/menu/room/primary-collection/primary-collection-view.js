@@ -26,14 +26,13 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     return ((this.roomMenuModel.get('state') === 'search') && !this.collection.length);
   },
 
-  childViewOptions: function (model){
+  childViewOptions: function(model) {
     var baseOptions   = BaseCollectionView.prototype.childViewOptions.apply(this, arguments);
     baseOptions.model = model;
     var selector      = '[data-id=' + model.get('id') + ']';
     var element       = this.$el.find(selector);
     return !!element.length ? _.extend(baseOptions, { el: element }) : baseOptions;
   },
-
 
   buildChildView: function(model, ItemView, attrs) {
     switch (this.roomMenuModel.get('state')){
@@ -55,6 +54,8 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     this.model   = options.model;
     this.dndCtrl = options.dndCtrl;
     this.uiModel = new Backbone.Model({ isFocused: false });
+
+    this.model.set('active', this.roomMenuModel.get('state') !== 'search');
 
     //TODO turn this into an error if there is a dndCtrl
     this.listenTo(this.dndCtrl, 'room-menu:add-favourite', this.onFavouriteAdded, this);
@@ -113,11 +114,12 @@ var PrimaryCollectionView = BaseCollectionView.extend({
   },
 
   //Once we have rendered we re-add the container to dnd
-  onRender: function (){
-    if(!this.hasInit && this.collection.length > 0) {
+  onRender: function() {
+    if (!this.hasInit && this.collection.length > 0) {
       this.hasInit = true;
       perfTiming.end('left-menu-init');
     }
+
     this.dndCtrl.pushContainer(this.ui.collection[0]);
     BaseCollectionView.prototype.onRender.apply(this, arguments);
   },
