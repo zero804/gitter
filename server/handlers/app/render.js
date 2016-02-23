@@ -32,7 +32,8 @@ var resolveRoomAvatarSrcSet  = require('gitter-web-shared/avatars/resolve-room-a
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 //TODO this has a dependency on something in the public folder so gitter-web-shared
 //will not work. FIXME JP 17/2/16
-var suggestedOrgsFromRoomList= require('../../../shared/orgs/suggested-orgs-from-room-list');
+var suggestedOrgsFromRoomList  = require('gitter-web-shared/orgs/suggested-orgs-from-room-list');
+var parseLeftMenuTroupeContext = require('gitter-web-shared/parse/left-menu-troupe-context');
 
 /* How many chats to send back */
 var INITIAL_CHAT_COUNT = 50;
@@ -236,34 +237,10 @@ function renderMainFrame(req, res, next, frame) {
         social.getMetadataForChatPermalink({ room: req.troupe, chat: permalinkChat  }) :
         social.getMetadata({ room: req.troupe  });
 
-      //guard against new users who have no previous leftRoomMenuState
-      //JP 12/1/16
-      troupeContext.leftRoomMenuState = (troupeContext.leftRoomMenuState || {
-        roomMenuIsPinned: true,
-        state:            'all',
-      });
-
-      //throw the room list into the troupe context so we can parse it into a
-      //collection on the client JP 17/7/16
-      troupeContext.roomList = rooms;
-
-      var hasNewLeftMenu = req.fflip && req.fflip.has('left-menu');
-
-      //If we are in any kind of org room && that org exists in out suggested org list
-      //set the menu state to org and the selectedOrg to the given org
-      //JP 25/1/16
-
-      //TODO Test this with an e2e runner
-      var leftMenuOrgs = suggestedOrgsFromRoomList(rooms);
-
-      //TODO Is this ever going to break? JP 1/2/16
-      var currentlySelectedOrg = req.uriContext.uri.split('/')[0];
-      if(_.findWhere(orgs, { name: currentlySelectedOrg })) {
-        troupeContext.leftRoomMenuState = _.extend({}, troupeContext.leftRoomMenuState, {
-          state: 'org',
-          selectedOrgName: currentlySelectedOrg,
-        });
-      }
+      //TODO Pass this to MINIBAR?? JP 17/2/16
+      var leftMenuOrgs                = suggestedOrgsFromRoomList(rooms);
+      var hasNewLeftMenu              = req.fflip && req.fflip.has('left-menu');
+      troupeContext.leftRoomMenuState = parseLeftMenuTroupeContext(req, troupeContext, orgs, rooms);
 
       res.render(template, {
         socialMetadata:     socialMetadata,
