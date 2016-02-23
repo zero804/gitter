@@ -39,11 +39,11 @@ module.exports = Marionette.ItemView.extend({
     //jp 6/12/16
     setTimeout(function() {
       RAF(function() {
-        this.ui.headerAll.toggleClass('active', state === 'all');
-        this.ui.headerSearch.toggleClass('active', state === 'search');
-        this.ui.headerFavourite.toggleClass('active', state === 'favourite');
-        this.ui.headerPeople.toggleClass('active', state === 'people');
-        this.ui.headerOrg.toggleClass('active', state === 'org');
+        this.ui.headerAll[0].classList.toggle('active', state === 'all');
+        this.ui.headerSearch[0].classList.toggle('active', state === 'search');
+        this.ui.headerFavourite[0].classList.toggle('active', state === 'favourite');
+        this.ui.headerPeople[0].classList.toggle('active', state === 'people');
+        this.ui.headerOrg[0].classList.toggle('active', state === 'org');
       }.bind(this));
     }.bind(this));
   },
@@ -70,7 +70,7 @@ module.exports = Marionette.ItemView.extend({
   },
 
   onProfileToggle: function(model, val) { //jshint unused: true
-    this.ui.profileToggle.toggleClass('active', !!val);
+    this.ui.profileToggle[0].classList.toggle('active', !!val);
   },
 
   onDestroy: function() {

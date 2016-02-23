@@ -32,17 +32,17 @@ module.exports = Marionette.ItemView.extend({
     //This is here and not in a model change event because of the debounce
     //Obviously the styles need to change more quickly to give a responsive feel to thr ui
     //JP 10/2/16
-    this.$el.toggleClass('empty', !val);
+    this.el.classList.toggle('empty', !val);
     this.model.set('searchTerm', val);
   }, 100),
 
   onModelChangeState: function (model, val){ //jshint unused: true
-    this.$el.toggleClass('active', (val === 'search'));
+    this.el.classList.toggle('active', (val === 'search'));
   },
 
   onModelChangeSearchTerm: function (model, val) { //jshint unused: true
     this.ui.input.val(val);
-    this.$el.toggleClass('empty', !val);
+    this.el.classList.toggle('empty', !val);
   },
 
   onClearClicked: function (e){

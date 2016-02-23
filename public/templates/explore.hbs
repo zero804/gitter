@@ -59,9 +59,9 @@
         {{#if rooms}}
           <div class="page-content__room-list">
             {{#each rooms}}
-              <a class='room-item  js-room-item' href="/{{ room.uri }}?source=explore" target="_parent">
+              <a class='explore-room-item  js-room-item' href="/{{ room.uri }}?source=explore" target="_parent">
                 <header>
-                  <img class="room-item__avatar" src="https://avatars.githubusercontent.com/{{ owner }}?s=80">
+                  <img class="explore-room-item__avatar" src="https://avatars.githubusercontent.com/{{ owner }}?s=80">
                   <h3 class="repo-name">
                   {{#each roomNameParts}}
                     {{!-- if index is greater than 0, add a slash --}}
@@ -72,10 +72,10 @@
                   {{/each}}
                   </h3>
                 </header>
-                <section class='room-item__description'>
+                <section class='explore-room-item__description'>
                   <small>{{ description }}</small>
                 </section>
-                <section class='room-item__content'>
+                <section class='explore-room-item__content'>
                   {{!-- <p>Some content, content about something.</p> --}}
                 </section>
                 <footer>

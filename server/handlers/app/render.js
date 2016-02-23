@@ -1,5 +1,6 @@
 "use strict";
 
+var winston                  = require('../../utils/winston');
 var nconf                    = require('../../utils/config');
 var Promise                  = require('bluebird');
 var contextGenerator         = require('../../web/context-generator');
@@ -191,9 +192,15 @@ function renderMainFrame(req, res, next, frame) {
   Promise.all([
       contextGenerator.generateNonChatContext(req),
       restful.serializeTroupesForUser(userId),
-      aroundId && getPermalinkChatForRoom(req.troupe, aroundId)
+      aroundId && getPermalinkChatForRoom(req.troupe, aroundId),
+      restful.serializeOrgsForUserId(userId).catch(function(err) {
+        // Workaround for GitHub outage
+        winston.error('Failed to serialize orgs:' + err, { exception: err });
+        return [];
+      }),
+
     ])
-    .spread(function (troupeContext, rooms, permalinkChat) {
+    .spread(function (troupeContext, rooms, permalinkChat, orgs) {
 
       var chatAppQuery = {};
       if (aroundId) { chatAppQuery.at = aroundId; }
@@ -243,7 +250,7 @@ function renderMainFrame(req, res, next, frame) {
       //JP 25/1/16
 
       //TODO Test this with an e2e runner
-      var orgs = suggestedOrgsFromRoomList(rooms);
+      var leftMenuOrgs = suggestedOrgsFromRoomList(rooms);
 
       //TODO Is this ever going to break? JP 1/2/16
       var currentlySelectedOrg = req.uriContext.uri.split('/')[0];
@@ -271,6 +278,7 @@ function renderMainFrame(req, res, next, frame) {
         showUnreadTab:      true,
         menuHeaderExpanded: false,
         user:               user,
+        leftMenuOrgs:       leftMenuOrgs,
         orgs:               orgs,
         hasNewLeftMenu:     hasNewLeftMenu,
         rooms: {
