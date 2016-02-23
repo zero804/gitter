@@ -9,7 +9,7 @@ module.exports = Marionette.CompositeView.extend({
 
   template:           template,
   className:          'collection',
-  childViewContainer: '.js-collection-list',
+  childViewContainer: '#collection-list',
 
   childViewOptions: function(model) {
     var index = this.collection.indexOf(model);
@@ -22,11 +22,11 @@ module.exports = Marionette.CompositeView.extend({
   },
 
   modelEvents: {
-    'change:header': 'render',
+    'change:state:post change:header': 'render',
   },
 
   collectionEvents: {
-    'filter-complete sync': 'render',
+    'change:mentions change:unreadMessages change:lastAccessTime': 'render',
     'add remove reset': 'onFilterComplete',
   },
 
@@ -77,13 +77,13 @@ module.exports = Marionette.CompositeView.extend({
   },
 
   setActive: function (){
-    this.$el.toggleClass('active', this.model.get('active'));
+    this.el.classList.toggle('active', this.model.get('active'));
   },
 
 
   setLoaded: function (val){
     val = (val || true);
-    this.$el.toggleClass('loaded', val);
+    this.el.classList.toggle('loaded', val);
   },
 
   onDestroy: function() {

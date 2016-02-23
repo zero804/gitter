@@ -35,12 +35,12 @@ module.exports =  BaseCollectionView.extend({
       case 'search':
         return (!this.roomMenuModel.get('searchTerm')) ?
           proto.setActive.apply(this, arguments) :
-          this.$el.removeClass('active');
+          this.el.classList.remove('active');
 
       default:
         return !!this.collection.length ?
           proto.setActive.apply(this, arguments) :
-          this.$el.removeClass('active');
+          this.el.classList.remove('active');
     }
   },
 

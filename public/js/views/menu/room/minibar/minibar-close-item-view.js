@@ -22,18 +22,18 @@ module.exports = ItemView.extend({
 
     //if the menu is open && pinned
     if (!!openState && !!pinState) {
-      this.$el.addClass('left');
-      this.$el.removeClass('right');
+      this.el.classList.add('left');
+      this.el.classList.remove('right');
     }
 
     if (!!openState && !pinState) {
-      this.$el.addClass('right');
-      this.$el.removeClass('left');
+      this.el.classList.add('right');
+      this.el.classList.remove('left');
     }
 
     if (!openState) {
-      this.$el.removeClass('left');
-      this.$el.removeClass('right');
+      this.el.classList.add('left');
+      this.el.classList.remove('right');
     }
   }, 200),
 

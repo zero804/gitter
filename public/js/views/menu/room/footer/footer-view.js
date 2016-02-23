@@ -30,13 +30,13 @@ module.exports = Marionette.ItemView.extend({
   onModelChange: function() {
     RAF(function() {
       var shouldShowSearchFooter = ((this.model.get('state') === 'search') && !this.model.get('searchTerm'));
-      this.ui.searchFooter.toggleClass('active', shouldShowSearchFooter);
-      this.ui.allFooter.toggleClass('active', (this.model.get('state') !== 'search'));
+      this.ui.searchFooter[0].classList.toggle('active', shouldShowSearchFooter);
+      this.ui.allFooter[0].classList.toggle('active', (this.model.get('state') !== 'search'));
     }.bind(this));
   },
 
   onModelChangeSearchTerm: function(mode, val) { //jshint unused: true
-    this.ui.searchFooter.toggleClass('active', !!val);
+    this.ui.searchFooter[0].classList.toggle('active', !!val);
   },
 
 });

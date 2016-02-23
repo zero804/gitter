@@ -15,10 +15,10 @@ module.exports = BaseCollectionItemView.extend({
 
   template: itemTemplate,
   events: {
-    'click [data-component=room-item-options-toggle]': 'onOptionsClicked',
-    'click [data-component="room-item-hide"]':         'onHideClicked',
-    'click [data-component="room-item-leave"]':        'onLeaveClicked',
-    'mouseleave':                                      'onMouseOut',
+    'click #room-item-options-toggle': 'onOptionsClicked',
+    'click #room-item-hide':           'onHideClicked',
+    'click #room-item-leave':          'onLeaveClicked',
+    'mouseleave':                      'onMouseOut',
   },
 
   className: null,
@@ -67,7 +67,7 @@ module.exports = BaseCollectionItemView.extend({
   },
 
   onModelToggleMenu: function(model, val) {// jshint unused: true
-    this.$el.toggleClass('active', val);
+    this.el.classList.toggle('active', val);
   },
 
   onMouseOut: function() {
