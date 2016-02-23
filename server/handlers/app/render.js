@@ -1,39 +1,37 @@
 "use strict";
 
-var winston                  = require('../../utils/winston');
-var nconf                    = require('../../utils/config');
-var Promise                  = require('bluebird');
-var contextGenerator         = require('../../web/context-generator');
-var restful                  = require('../../services/restful');
-var userService              = require('../../services/user-service');
-var chatService              = require('../../services/chat-service');
-var appVersion               = require('../../web/appVersion');
-var social                   = require('../social-metadata');
-var restSerializer           = require("../../serializers/rest-serializer");
-var burstCalculator          = require('../../utils/burst-calculator');
-var userSort                 = require('../../../public/js/utils/user-sort');
-var roomSort                 = require('gitter-realtime-client/lib/sorts-filters').pojo; /* <-- Don't use the default export
+var winston                        = require('../../utils/winston');
+var nconf                          = require('../../utils/config');
+var Promise                        = require('bluebird');
+var contextGenerator               = require('../../web/context-generator');
+var restful                        = require('../../services/restful');
+var userService                    = require('../../services/user-service');
+var chatService                    = require('../../services/chat-service');
+var appVersion                     = require('../../web/appVersion');
+var social                         = require('../social-metadata');
+var restSerializer                 = require("../../serializers/rest-serializer");
+var burstCalculator                = require('../../utils/burst-calculator');
+var userSort                       = require('../../../public/js/utils/user-sort');
+var roomSort                       = require('gitter-realtime-client/lib/sorts-filters').pojo; /* <-- Don't use the default export
                                                                                           will bring in tons of client-side
                                                                                           libraries that we don't need */
-var roomNameTrimmer          = require('../../../public/js/utils/room-name-trimmer');
-var isolateBurst             = require('gitter-web-shared/burst/isolate-burst-array');
-var unreadItemService        = require('../../services/unread-item-service');
-var mongoUtils               = require('../../utils/mongo-utils');
-var url                      = require('url');
-var cdn                      = require("../../web/cdn");
-var roomMembershipService    = require('../../services/room-membership-service');
-var troupeService            = require('../../services/troupe-service');
-var useragent                = require('useragent');
-var _                        = require('lodash');
-var GitHubOrgService         = require('gitter-web-github').GitHubOrgService;
-var orgPermissionModel       = require('../../services/permissions/org-permissions-model');
-var resolveUserAvatarUrl     = require('gitter-web-shared/avatars/resolve-user-avatar-url');
-var resolveRoomAvatarSrcSet  = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
-var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
-//TODO this has a dependency on something in the public folder so gitter-web-shared
-//will not work. FIXME JP 17/2/16
-var suggestedOrgsFromRoomList  = require('gitter-web-shared/orgs/suggested-orgs-from-room-list');
-var parseLeftMenuTroupeContext = require('gitter-web-shared/parse/left-menu-troupe-context');
+var roomNameTrimmer                = require('../../../public/js/utils/room-name-trimmer');
+var isolateBurst                   = require('gitter-web-shared/burst/isolate-burst-array');
+var unreadItemService              = require('../../services/unread-item-service');
+var mongoUtils                     = require('../../utils/mongo-utils');
+var url                            = require('url');
+var cdn                            = require("../../web/cdn");
+var roomMembershipService          = require('../../services/room-membership-service');
+var troupeService                  = require('../../services/troupe-service');
+var useragent                      = require('useragent');
+var _                              = require('lodash');
+var GitHubOrgService               = require('gitter-web-github').GitHubOrgService;
+var orgPermissionModel             = require('../../services/permissions/org-permissions-model');
+var resolveUserAvatarUrl           = require('gitter-web-shared/avatars/resolve-user-avatar-url');
+var resolveRoomAvatarSrcSet        = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
+var getOrgNameFromTroupeName       = require('gitter-web-shared/get-org-name-from-troupe-name');
+var parseLeftMenuTroupeContext     = require('gitter-web-shared/parse/left-menu-troupe-context');
+var parseRoomsIntoLeftMenuRoomList = require('gitter-web-shared/rooms/left-menu-room-list.js');
 
 /* How many chats to send back */
 var INITIAL_CHAT_COUNT = 50;
@@ -240,6 +238,7 @@ function renderMainFrame(req, res, next, frame) {
       //TODO Pass this to MINIBAR?? JP 17/2/16
       var hasNewLeftMenu              = req.fflip && req.fflip.has('left-menu');
       troupeContext.leftRoomMenuState = parseLeftMenuTroupeContext(req, troupeContext, orgs, rooms);
+      var leftMenuRoomList = parseRoomsIntoLeftMenuRoomList(troupeContext.leftRoomMenuState.state, rooms, troupeContext.leftRoomMenuState.selectedOrgName);
 
       res.render(template, {
         socialMetadata:     socialMetadata,
@@ -260,6 +259,7 @@ function renderMainFrame(req, res, next, frame) {
         user:               user,
         orgs:               orgs,
         leftMenuOrgs:       troupeContext.leftRoomMenuState.orgList,
+        leftmenuRooms:      leftMenuRoomList,
         hasNewLeftMenu:     hasNewLeftMenu,
         //TODO Remove this when left-menu switch goes away JP 23/2/16
         rooms: {
