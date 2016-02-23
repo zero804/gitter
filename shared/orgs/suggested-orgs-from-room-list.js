@@ -1,6 +1,6 @@
 'use strict';
-var _ = require('lodash');
-var getRoomAvatar = require('../../public/js/utils/get-room-avatar');
+var _             = require('lodash');
+var getRoomAvatar = require('../avatars/get-room-avatar');
 
 module.exports = function suggestedOrgsFromRoomList(roomList) {
   return roomList.reduce(function(memo, room) {
