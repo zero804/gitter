@@ -36,7 +36,7 @@ var iframelyProviders = ["youtube.com",
   "dribbble.com",
   "vimeo.com",
   "www.flickr.com",
-  "www.twitch.tv", 
+  "www.twitch.tv",
   "flic.kr",
   "500px.com" /*,
   /https?:\/\/www.google\.\w{2,3}(\.\w{2,3})?\/maps/ */
@@ -52,7 +52,7 @@ var embedEnv = context.env('embed');
 $.iframely.defaults.endpoint = embedEnv.basepath+'/'+embedEnv.cacheBuster+'/iframely';
 
 function fetchAndRenderIframely(url, cb) {
-  $.iframely.getPageData(url, function(error, data) {
+  $.iframely.getPageData(url, { lazy: 1, autoplay: false, ssl: true, iframe: true, html5: true }, function(error, data) {
     if(error) return cb(null);
 
     renderBestContent(data, cb);
