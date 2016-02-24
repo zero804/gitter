@@ -409,6 +409,10 @@ ul.roster {
 	top: 100px;
 	z-index: 900;
   left: 0px;
+  pointer-events: none;
+  & > * {
+    pointer-events: auto;
+  }
 
   @media @small {
     display: none;
