@@ -37,7 +37,7 @@ require('views/behaviors/tooltip');
 // Can't use `classList.toggle` with the second parameter (force)
 // Because IE11 does not support it
 var toggleClass = function(element, class1, force) {
-  if(force !== undefined) {
+  if(arguments.length === 3) {
     if(force) {
       element.classList.add(class1);
     }
