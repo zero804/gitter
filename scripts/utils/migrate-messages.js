@@ -8,18 +8,18 @@ var Promise = require('bluebird');
 var assert = require('assert');
 var shutdown = require('shutdown');
 
-var opts = require("nomnom")
+var opts = require('yargs')
   .option('from', {
-    abbr: 'f',
+    alias: 'f',
     required: true,
-    help: 'Room to take messages from'
+    description: 'Room to take messages from'
   })
   .option('to', {
-    abbr: 't',
+    alias: 't',
     required: true,
-    help: 'Room to migrate messages to'
+    description: 'Room to migrate messages to'
   })
-  .parse();
+  .argv;
 
 Promise.all([
   troupeService.findByUri(opts.from),

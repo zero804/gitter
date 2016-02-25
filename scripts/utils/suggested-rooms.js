@@ -2,37 +2,40 @@
 /*jslint node:true, unused:true */
 'use strict';
 
+var yargs = require('yargs');
 var _ = require('lodash');
 var userService = require('../../server/services/user-service');
 var troupeService = require('../../server/services/troupe-service');
 var restSerializer = require('../../server/serializers/rest-serializer');
 var legacyRecommendations = require('../../server/services/recommendations/legacy-recommendations');
 var shutdown = require('shutdown');
+var shimPositionOption = require('../yargs-shim-position-option');
 
 var suggestions  = require('gitter-web-suggestions');
 
-var initalOpts = require('nomnom').parse();
-console.log(initalOpts);
-var opts = require('nomnom')
-  .option('username', {
+
+var argv = yargs.argv;
+var opts = yargs
+  .option('username', shimPositionOption({
     position: 0,
-    required: !initalOpts.uri,
-    help: 'username to look up e.g trevorah'
-  })
+    required: !argv.uri,
+    description: 'username to look up e.g trevorah'
+  }))
   .option('uri', {
-    list: true,
-    required: !initalOpts.username,
-    help: 'room(s) in which to do the lookup'
+    type: 'array',
+    required: !argv.username,
+    description: 'room(s) in which to do the lookup'
   })
   .option('max-uri', {
     default: 10,
-    help: 'Number of room(s) we limit when using `getSuggestionsForRooms`. This should be limited to 10 but we are leaving it flexible in case you need it.'
+    description: 'Number of room(s) we limit to when providing multiple room uri in `--uri`',
+    defaultDescription: 'This should be limited to 10 for performance with `getSuggestionsForRooms` but we are leaving it flexible in case you need it.'
   })
   .option('language', {
     default: 'en',
-    help: 'human language'
+    description: 'human language'
   })
-  .parse();
+  .argv;
 
 
 if(!opts.username && opts.uri) {
@@ -56,7 +59,7 @@ if(!opts.username && opts.uri) {
     })
     .then(function(suggestedRooms) {
       suggestedRooms.forEach(function(suggestedRoom) {
-        console.log(suggestedRoom);
+        console.log('asdf', suggestedRoom);
       });
     });
 }

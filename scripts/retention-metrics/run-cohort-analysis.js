@@ -16,81 +16,75 @@ function die(err) {
   process.exit(1);
 }
 
-var opts = require("nomnom")
+var opts = require('yargs')
   .option('daily', {
-    abbr: 'd',
-    flag: true,
+    alias: 'd',
+    type: 'boolean',
     required: false,
-    help: 'Perform daily analysis',
+    description: 'Perform daily analysis',
     default: false
   })
   .option('verbose', {
-    abbr: 'v',
-    flag: true,
+    alias: 'v',
+    type: 'boolean',
     required: false,
-    help: 'Verbose',
+    description: 'Verbose',
     default: false
   })
   .option('start', {
-    abbr: 's',
+    alias: 's',
     required: false,
-    help: 'Start date',
-    transform: function(timestamp) {
-      return new Date(timestamp);
-    }
+    description: 'Start date'
   })
   .option('moduleName', {
-    abbr: 'm',
+    alias: 'm',
     required: false,
     default: 'user-rooms',
-    help: 'Analysis module'
+    description: 'Analysis module'
   })
   .option('end', {
-    abbr: 'e',
+    alias: 'e',
     required: false,
-    help: 'End date',
-    transform: function(timestamp) {
-      return new Date(timestamp);
-    }
+    description: 'End date'
   })
   .option('count', {
-    abbr: 'e',
+    alias: 'e',
     required: false,
-    help: 'Number of cohorts',
+    description: 'Number of cohorts',
     default: 8,
-    transform: function(num) {
-      return parseInt(num, 10);
-    }
+    type: 'number'
   })
   .option('limit', {
-    abbr: 'l',
+    alias: 'l',
     required: false,
-    help: 'Limit',
-    transform: function(limit) {
-      return parseInt(limit, 10);
-    }
+    description: 'Limit',
+    type: 'number'
   })
   .option('unit', {
-    abbr: 'u',
+    alias: 'u',
     default: 'weeks',
     choices: ['days', 'weeks', 'day', 'week'],
     required: false,
-    help: 'Unit for limit'
+    description: 'Unit for limit'
   })
   .option('percent', {
-    abbr: 'p',
-    flag: true,
+    alias: 'p',
+    type: 'boolean',
     required: false,
     default: false,
-    help: 'Output values as percentages'
+    description: 'Output values as percentages'
   })
   .option('sort-subcohorts-by-size', {
-    flag: true,
+    type: 'boolean',
     required: false,
     default: false,
-    help: 'Arrange the subcohorts in descending order of size'
+    description: 'Arrange the subcohorts in descending order of size'
   })
-  .parse();
+  .argv;
+
+opts.start = new Date(opts.start);
+opts.end = new Date(opts.end);
+
 
 function debug() {
   if (!opts.verbose) return;

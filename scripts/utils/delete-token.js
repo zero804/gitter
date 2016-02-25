@@ -5,13 +5,13 @@
 var shutdown = require('shutdown');
 var oauthService = require('../../server/services/oauth-service');
 
-var opts = require("nomnom")
+var opts = require('yargs')
    .option('token', {
-      abbr: 't',
+      alias: 't',
       required: true,
-      help: 'Token to delete'
+      description: 'Token to delete'
    })
-   .parse();
+   .argv;
 
 
 function runScript(token) {

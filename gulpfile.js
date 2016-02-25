@@ -575,7 +575,7 @@ gulp.task('watch', ['css'], function() {
 
 
 // Run gulp safe-install --package xyz@0.1.0
-var opts = require("nomnom").parse();
+var opts = require('yargs').argv;
 gulp.task('safe-install', shell.task([
   'npm run unlink',
   'npm install --production',

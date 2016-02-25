@@ -6,14 +6,15 @@ var userService = require('../../server/services/user-service');
 var pushNotificationGateway = require('../../server/gateways/push-notification-gateway');
 var shutdown = require('shutdown');
 var onMongoConnect = require('../../server/utils/on-mongo-connect');
+var shimPositionOption = require('../yargs-shim-position-option');
 
-var opts = require("nomnom")
-  .option('username', {
+var opts = require('yargs')
+  .option('username', shimPositionOption({
     position: 0,
     required: true,
-    help: "username to send badge update to"
-  })
-  .parse();
+    description: "username to send badge update to"
+  }))
+  .argv;
 
 onMongoConnect()
   .then(function() {
