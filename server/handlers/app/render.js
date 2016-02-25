@@ -33,6 +33,7 @@ var getOrgNameFromTroupeName       = require('gitter-web-shared/get-org-name-fro
 var parseLeftMenuTroupeContext     = require('gitter-web-shared/parse/left-menu-troupe-context');
 var parseRoomsIntoLeftMenuRoomList = require('gitter-web-shared/rooms/left-menu-room-list.js');
 var parseSnapshotsForPageContext   = require('gitter-web-shared/parse/snapshots');
+var safeJSON                       = require('../../utils/safe-json');
 
 /* How many chats to send back */
 var INITIAL_CHAT_COUNT = 50;
@@ -201,6 +202,11 @@ function renderMainFrame(req, res, next, frame) {
 
     ])
     .spread(function (troupeContext, rooms, permalinkChat, orgs) {
+
+      rooms = rooms.map(function(room){
+        room.topic = safeJSON(room.topic);
+        return room;
+      });
 
       var chatAppQuery = {};
       if (aroundId) { chatAppQuery.at = aroundId; }
