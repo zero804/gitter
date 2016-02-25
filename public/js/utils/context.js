@@ -7,7 +7,9 @@ var Promise = require('bluebird');
 
 module.exports = (function() {
 
-  var ctx = window.troupeContext || {};
+  var ctx         = window.troupeContext || {};
+  var leftMenuCtx = (ctx.leftRoomMenuState || {});
+  var snapshots   = (ctx.snapshots || { rooms: [], orgs: [] });
 
   function getTroupeModel() {
     var troupeModel;
@@ -293,6 +295,21 @@ module.exports = (function() {
 
   context.getFeatures = function() {
     return ctx.features || [];
+  };
+
+  context.getSnapshot = function(key) {
+    var snapshot = snapshots[key];
+
+    //cleanup
+    delete snapshots[key];
+    delete ctx.snapshots[key];
+    delete window.troupeContext.snapshots[key];
+
+    return snapshot;
+  };
+
+  context.getLeftRoomMenuContext = function(){
+    return leftMenuCtx;
   };
 
   return context;

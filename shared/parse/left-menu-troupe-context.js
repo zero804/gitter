@@ -1,9 +1,8 @@
 'use strict';
 
 var _ = require('underscore');
-var suggestedOrgsFromRoomList  = require('../orgs/suggested-orgs-from-room-list');
 
-module.exports = function parseLeftMenuTroupeContext(req, troupeContext, orgs, rooms) {
+module.exports = function parseLeftMenuTroupeContext(req, troupeContext, orgs) {
 
   var currentLeftMenuState    = (troupeContext.leftRoomMenuState || {});
   var currentlySelectedOrg    = req.uriContext.uri.split('/')[0];
@@ -14,8 +13,6 @@ module.exports = function parseLeftMenuTroupeContext(req, troupeContext, orgs, r
   return {
     roomMenuIsPinned:    true,
     state:               (currentLeftMenuState.state || 'all'),
-    preRenderedRoomList: (rooms || []),
     selectedOrgName:     (currentLeftMenuState.selectedOrgName || currentlySelectedOrg || ''),
-    orgList:             (suggestedOrgsFromRoomList(rooms) || []),
   };
 };

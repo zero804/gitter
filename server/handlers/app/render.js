@@ -32,6 +32,7 @@ var resolveRoomAvatarSrcSet        = require('gitter-web-shared/avatars/resolve-
 var getOrgNameFromTroupeName       = require('gitter-web-shared/get-org-name-from-troupe-name');
 var parseLeftMenuTroupeContext     = require('gitter-web-shared/parse/left-menu-troupe-context');
 var parseRoomsIntoLeftMenuRoomList = require('gitter-web-shared/rooms/left-menu-room-list.js');
+var parseSnapshotsForPageContext   = require('gitter-web-shared/parse/snapshots');
 
 /* How many chats to send back */
 var INITIAL_CHAT_COUNT = 50;
@@ -237,8 +238,9 @@ function renderMainFrame(req, res, next, frame) {
 
       //TODO Pass this to MINIBAR?? JP 17/2/16
       var hasNewLeftMenu              = req.fflip && req.fflip.has('left-menu');
-      troupeContext.leftRoomMenuState = parseLeftMenuTroupeContext(req, troupeContext, orgs, rooms);
+      troupeContext.leftRoomMenuState = parseLeftMenuTroupeContext(req, troupeContext, orgs);
       var leftMenuRoomList = parseRoomsIntoLeftMenuRoomList(troupeContext.leftRoomMenuState.state, rooms, troupeContext.leftRoomMenuState.selectedOrgName);
+      troupeContext.snapshots = parseSnapshotsForPageContext(rooms);
 
       res.render(template, {
         socialMetadata:     socialMetadata,
@@ -259,7 +261,7 @@ function renderMainFrame(req, res, next, frame) {
         user:               user,
         orgs:               orgs,
         hasNewLeftMenu:     hasNewLeftMenu,
-        leftMenuOrgs:       troupeContext.leftRoomMenuState.orgList,
+        leftMenuOrgs:       troupeContext.snapshots.orgs,
         leftMenuRooms:      leftMenuRoomList,
         //TODO Remove this when left-menu switch goes away JP 23/2/16
         rooms: {
