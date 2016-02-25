@@ -13,6 +13,7 @@ var SuggestedRoomsByRoomCollection = require('../collections/left-menu-suggested
 var SearchRoomPeopleCollection     = require('../collections/left-menu-search-rooms-and-people');
 var SearchChatMessages             = require('../collections/search-chat-messages');
 var perfTiming                     = require('components/perf-timing');
+var context                        = require('utils/context');
 
 var states = [
   'all',
@@ -34,11 +35,6 @@ module.exports = Backbone.Model.extend({
     panelOpenState:            true,
     roomMenuIsPinned:          true,
     selectedOrgName:           '',
-  },
-
-  constructor: function (attrs, options){
-    attrs = _.extend(attrs, window.troupeContext.leftRoomMenuState);
-    Backbone.Model.prototype.constructor.call(this, attrs, options);
   },
 
   //TODO Remove all these delete statements and pass the object with the options hash
@@ -219,7 +215,7 @@ module.exports = Backbone.Model.extend({
     //The only time we need to fetch data is on page load
     //so we can just pull it our of the troupe context
     //JP 11/1/16
-    this.set(window.troupeContext.leftRoomMenuState);
+    this.set(context.getLeftRoomMenuContext());
     if (options.success) options.success();
   },
 
