@@ -2,50 +2,52 @@
 
 'use strict';
 
-var opts = require("nomnom")
+var opts = require('yargs')
    .option('name', {
-     position: 0,
      required: true,
-     list: false,
-     help: 'Name of feature'
+     type: 'string',
+     description: 'Name of feature'
    })
    .option('description',{
      required: false,
-     list: false,
-     help: 'Description of feature'
+     type: 'string',
+     description: 'Description of feature'
    })
    .option('include-user', {
-     list: true,
-     help: 'Username of user to allow'
+     type: 'array',
+     description: 'Username of user to allow'
    })
    .option('exclude-user', {
-     list: true,
-     help: 'Username of user to exclude'
+     type: 'array'
+     description: 'Username of user to exclude'
    })
    .option('percentage', {
-     help: 'Percentage of users to allow'
+     description: 'Percentage of users to allow'
    })
    .option('percentage-off', {
-     flag: true,
-     help: 'Turn off percentage'
+     type: 'boolean',
+     description: 'Turn off percentage'
    })
    .option('disable-browser', {
-     help: 'Disable a specific browser, up to a given version. eg "Chrome:47" or "Safari:all". Browser family names come from npm package `useragent`.',
-     list: true
+     description: 'Disable a specific browser, up to a given version. eg "Chrome:47" or "Safari:all". Browser family names come from npm package `useragent`.',
+     type: 'array'
    })
    .option('disable-browser-off', {
-     help: 'Renable for a specific browser, eg "Chrome"',
-     list: true
+     description: 'Renable for a specific browser, eg "Chrome"',
+     type: 'array'
    })
    .option('enable', {
-     flag: true,
-     help: 'Enabled'
+     type: 'boolean',
+     description: 'Enabled'
    })
    .option('enable-off', {
-     flag: true,
-     help: 'Turn off enabled'
+     type: 'boolean',
+     description: 'Turn off enabled'
    })
-   .parse();
+   .argv;
+
+opts.name = opts.name || opts._[0];
+
 
  if (!opts.name) {
   console.error('Name required');

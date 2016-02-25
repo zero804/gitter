@@ -13,21 +13,21 @@ var winston = require('../../server/utils/winston');
 var validateUri = require('gitter-web-github').GitHubUriValidator;
 var permissionsModel   = require('../../server/services/permissions-model');
 
-var opts = require("nomnom")
+var opts = require('yargs')
    .option('username', {
       required: true,
-      help: 'Username of the user to make into an org'
+      description: 'Username of the user to make into an org'
    })
    .option('first-user', {
       required: true,
-      help: 'User to add to the org room'
+      description: 'User to add to the org room'
    })
    .option('dry-run', {
-     flag: true,
-     abbr: 'd',
-     help: 'Just show the users who will be affected'
+      type: 'boolean',
+      alias: 'd',
+      description: 'Just show the users who will be affected'
    })
-   .parse();
+   .argv;
 
 require('../../server/event-listeners').install();
 
