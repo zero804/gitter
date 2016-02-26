@@ -2,7 +2,7 @@
 
 var Marionette = require('backbone.marionette');
 var template   = require('./footer-view.hbs');
-var RAF        = require('utils/raf');
+var fastdom    = require('fastdom');
 
 require('gitter-styleguide/css/components/buttons.css');
 
@@ -28,7 +28,7 @@ module.exports = Marionette.ItemView.extend({
   },
 
   onModelChange: function() {
-    RAF(function() {
+    fastdom.mutate(function() {
       var shouldShowSearchFooter = ((this.model.get('state') === 'search') && !this.model.get('searchTerm'));
       this.ui.searchFooter[0].classList.toggle('active', shouldShowSearchFooter);
       this.ui.allFooter[0].classList.toggle('active', (this.model.get('state') !== 'search'));
