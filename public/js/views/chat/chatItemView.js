@@ -33,8 +33,27 @@ require('views/behaviors/last-message-seen');
 require('views/behaviors/timeago');
 require('views/behaviors/tooltip');
 
-module.exports = (function() {
 
+// Can't use `classList.toggle` with the second parameter (force)
+// Because IE11 does not support it
+var toggleClass = function(element, class1, force) {
+  if(arguments.length === 3) {
+    if(force) {
+      element.classList.add(class1);
+    }
+    else {
+      element.classList.remove(class1);
+    }
+  }
+  else {
+    element.classList.toggle(class1);
+  }
+
+  return force;
+};
+
+
+module.exports = (function() {
 
   var getModelIdClass = function(id) {
     return 'model-id-' + id;
@@ -291,7 +310,7 @@ module.exports = (function() {
     handleUpdateMentionChanges: function(changes) {
       if(!changes || 'mentioned' in changes) {
         var wasMentioned = this.model.get('mentioned');
-        this.el.classList.toggle('mentioned', wasMentioned);
+        toggleClass(this.el, 'mentioned', wasMentioned);
         if(wasMentioned) {
           this.el.setAttribute('aria-live', 'assertive');
           this.el.setAttribute('role', 'alert');
@@ -302,20 +321,20 @@ module.exports = (function() {
       var model = this.model;
 
       if(!changes || 'fromUser' in changes) {
-        this.el.classList.toggle('isViewers', this.isOwnMessage());
+        toggleClass(this.el, 'isViewers', this.isOwnMessage());
       }
 
       if(!changes || 'editedAt' in changes) {
-        this.el.classList.toggle('hasBeenEdited', this.hasBeenEdited());
+        toggleClass(this.el, 'hasBeenEdited', this.hasBeenEdited());
       }
 
       if(!changes || 'burstStart' in changes) {
-        this.el.classList.toggle('burstStart', !!model.get('burstStart'));
-        this.el.classList.toggle('burstContinued', !model.get('burstStart'));
+        toggleClass(this.el, 'burstStart', !!model.get('burstStart'));
+        toggleClass(this.el, 'burstContinued', !model.get('burstStart'));
       }
 
       if (!changes || 'burstFinal' in changes) {
-        this.el.classList.toggle('burstFinal', !!model.get('burstFinal'));
+        toggleClass(this.el, 'burstFinal', !!model.get('burstFinal'));
       }
     },
     handleUpdateReadbyStateChanges: function(changes) {
