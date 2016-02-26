@@ -49,24 +49,15 @@ var RecentSearchesCollection = Backbone.Collection.extend({
   sync: localStorageSync.sync,
 });
 
-var FilteredRecentSearchs = function() {
-  FilteredCollection.apply(this, arguments);
+var FilteredRecentSearchs = function(attrs, options) {
+  this.collection = new RecentSearchesCollection(null);
+  attrs  = _.extend({}, attrs, { collection: this.collection });
+  FilteredCollection.call(this, attrs, options);
 };
 
 FilteredRecentSearchs.prototype = _.extend(
   FilteredRecentSearchs.prototype,
   FilteredCollection.prototype, {
-
-  constructor: function(models, attrs) {
-    this.collection = new RecentSearchesCollection(models);
-    var options = _.extend({}, attrs, { collection: this.collection });
-    FilteredCollection.prototype.constructor.call(this, null, options);
-  },
-
-  initialize: function(models, attrs) { //jshint unused: true
-    var options = _.extend({}, attrs, { collection: this.collection });
-    FilteredCollection.prototype.initialize.call(this, null, options);
-  },
 
   collectionFilter: function(model, index) { //jshint unused: true
     return (index < 5);

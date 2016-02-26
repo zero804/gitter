@@ -59,20 +59,18 @@ var SuggestedCollection = SuggestedRoomsByRoomCollection.extend({
   sync: SyncMixin.sync,
 });
 
-module.exports = FilteredCollection.extend({
-
-  constructor: function(models, attrs) {
-
-    this.collection             = new SuggestedCollection(models, attrs);
+var FilteredSuggestedCollection = function(attrs, options){
+    this.collection             = new SuggestedCollection(null, attrs);
     this.roomCollection         = attrs.roomCollection;
     this.suggestedOrgCollection = attrs.suggestedOrgsCollection;
     this.collectionFilter       = this.collectionFilter.bind(this);
-    var options                 = _.extend({}, attrs, { collection: this.collection });
+    attrs                       = _.extend({}, attrs, { collection: this.collection });
 
     this.listenTo(this.roomCollection, 'update', this.onCollectionSync, this);
+    FilteredCollection.call(this, attrs, options);
+};
 
-    FilteredCollection.prototype.constructor.call(this, null, options);
-  },
+_.extend(FilteredSuggestedCollection.prototype, FilteredCollection.prototype, {
 
   collectionFilter: function (model){
     return !this.roomCollection.get(model.get('id'));
@@ -83,3 +81,5 @@ module.exports = FilteredCollection.extend({
   },
 
 });
+
+module.exports = FilteredSuggestedCollection;

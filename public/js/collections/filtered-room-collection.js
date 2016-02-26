@@ -21,7 +21,7 @@ FilteredRoomCollection.prototype = _.extend(
   FilteredRoomCollection.prototype,
   FilteredCollection.prototype, {
 
-    initialize: function(collection, options) {//jshint unused: true
+    initialize: function(options) {//jshint unused: true
       if (!options || !options.roomModel) {
         throw new Error('A valid RoomMenuModel must be passed to a new instance of FilteredRoomCollection');
       }
@@ -48,6 +48,7 @@ FilteredRoomCollection.prototype = _.extend(
   },
 
   onModelChangeState: function() {//jshint unused: true
+    console.log('state change', this.roomModel.get('state'));
     this.comparator = FilteredRoomCollection.prototype.comparator;
     switch (this.roomModel.get('state')) {
       case 'favourite' :
@@ -55,6 +56,7 @@ FilteredRoomCollection.prototype = _.extend(
         this.comparator = this.sortFavourites;
         break;
       case 'people' :
+        console.log('peoplr', this.filterOneToOnes, this);
         this.setFilter(this.filterOneToOnes.bind(this));
         break;
       case 'search' :
@@ -67,10 +69,11 @@ FilteredRoomCollection.prototype = _.extend(
         this.setFilter(this.filterDefault);
         break;
     }
-    this.sort();
+    this.sort({ silent: true });
   },
 
-  onOrgNameChange: function() {
+  onOrgNameChange: function(model, val) {
+    console.log('org name change', val);
     this.setFilter();
   },
 
