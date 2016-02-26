@@ -1,19 +1,18 @@
 'use strict';
 
-var Backbone          = require('backbone');
-var roomSort          = require('gitter-realtime-client').sortsFilters.model;
-var troupeModels      = require('../troupes');
-var orgModels         = require('../orgs');
-var unreadItemsClient = require('components/unread-items-frame-client');
-var appEvents         = require('utils/appevents');
-var Sorted            = require('backbone-sorted-collection');
-var errorHandle       = require('utils/live-collection-error-handle');
-var context           = require('utils/context');
-var moment            = require('moment');
-var _                 = require('underscore');
+var Backbone           = require('backbone');
+var roomSort           = require('gitter-realtime-client').sortsFilters.model;
+var troupeModels       = require('../troupes');
+var orgModels          = require('../orgs');
+var unreadItemsClient  = require('components/unread-items-frame-client');
+var appEvents          = require('utils/appevents');
+var Sorted             = require('backbone-sorted-collection');
+var errorHandle        = require('utils/live-collection-error-handle');
+var context            = require('utils/context');
+var moment             = require('moment');
+var _                  = require('underscore');
+var FilteredCollection = require('backbone-filtered-collection');
 
-
-require('filtered-collection');
 
 module.exports = (function() {
   var orgsCollection = new orgModels.OrgCollection(null, { listen: true });
@@ -27,7 +26,7 @@ module.exports = (function() {
   unreadItemsClient.installTroupeListener(troupeCollection);
 
   function filterTroupeCollection(filter) {
-    var c = new Backbone.FilteredCollection(null, { model: troupeModels.TroupeModel, collection: troupeCollection });
+    var c = new FilteredCollection(null, { model: troupeModels.TroupeModel, collection: troupeCollection });
     c.setFilter(filter);
     var sorted = new Sorted(c);
     return sorted;

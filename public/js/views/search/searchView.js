@@ -18,6 +18,7 @@ var KeyboardEventsMixin = require('views/keyboard-events-mixin');
 var Promise = require('bluebird');
 var timeFormat = require('gitter-web-shared/time/time-format');
 var fullTimeFormat = require('gitter-web-shared/time/full-time-format');
+var FilteredCollection = require('backbone-filtered-collection');
 
 require('views/behaviors/widgets');
 require('views/behaviors/highlight');
@@ -403,8 +404,8 @@ module.exports = (function() {
       masterCollection.comparator = 'priority';
 
       // filtered collections
-      this.rooms = new Backbone.FilteredCollection(null, { model: Backbone.Model, collection: masterCollection });
-      this.chats = new Backbone.FilteredCollection(null, { model: Backbone.Model, collection: masterCollection });
+      this.rooms = new FilteredCollection(null, { model: Backbone.Model, collection: masterCollection });
+      this.chats = new FilteredCollection(null, { model: Backbone.Model, collection: masterCollection });
 
       this.rooms.setFilter(function (model) {
         return !!model.get('url');

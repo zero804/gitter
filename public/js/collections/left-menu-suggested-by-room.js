@@ -2,7 +2,7 @@
 
 var Backbone                       = require('backbone');
 var _                              = require('underscore');
-var FilteredCollection             = require('filtered-collection');
+var FilteredCollection             = require('backbone-filtered-collection');
 var SuggestedRoomsByRoomCollection = require('./room-suggested-rooms.js');
 var SyncMixin                      = require('./sync-mixin');
 
@@ -59,7 +59,7 @@ var SuggestedCollection = SuggestedRoomsByRoomCollection.extend({
   sync: SyncMixin.sync,
 });
 
-module.exports = Backbone.FilteredCollection.extend({
+module.exports = FilteredCollection.extend({
 
   constructor: function(models, attrs) {
 
@@ -71,7 +71,7 @@ module.exports = Backbone.FilteredCollection.extend({
 
     this.listenTo(this.roomCollection, 'update', this.onCollectionSync, this);
 
-    Backbone.FilteredCollection.prototype.constructor.call(this, null, options);
+    FilteredCollection.prototype.constructor.call(this, null, options);
   },
 
   collectionFilter: function (model){
