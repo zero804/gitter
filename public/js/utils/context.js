@@ -1,14 +1,13 @@
 "use strict";
-var Backbone = require('backbone');
-var qs = require('./qs');
-var _ = require('underscore');
+var Backbone   = require('backbone');
+var qs         = require('./qs');
+var _          = require('underscore');
 var localStore = require('../components/local-store');
-var Promise = require('bluebird');
+var Promise    = require('bluebird');
 
 module.exports = (function() {
 
   var ctx         = window.troupeContext || {};
-  var leftMenuCtx = (ctx.leftRoomMenuState || {});
   var snapshots   = (ctx.snapshots || { rooms: [], orgs: [] });
 
   function getTroupeModel() {
@@ -303,13 +302,8 @@ module.exports = (function() {
     //cleanup
     delete snapshots[key];
     delete ctx.snapshots[key];
-    delete window.troupeContext.snapshots[key];
 
     return snapshot;
-  };
-
-  context.getLeftRoomMenuContext = function(){
-    return leftMenuCtx;
   };
 
   return context;

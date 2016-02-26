@@ -30,10 +30,8 @@ var orgPermissionModel             = require('../../services/permissions/org-per
 var resolveUserAvatarUrl           = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 var resolveRoomAvatarSrcSet        = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 var getOrgNameFromTroupeName       = require('gitter-web-shared/get-org-name-from-troupe-name');
-var parseLeftMenuTroupeContext     = require('gitter-web-shared/parse/left-menu-troupe-context');
 var parseRoomsIntoLeftMenuRoomList = require('gitter-web-shared/rooms/left-menu-room-list.js');
 var parseSnapshotsForPageContext   = require('gitter-web-shared/parse/snapshots');
-var safeJSON                       = require('../../utils/safe-json');
 
 /* How many chats to send back */
 var INITIAL_CHAT_COUNT = 50;
@@ -203,11 +201,6 @@ function renderMainFrame(req, res, next, frame) {
     ])
     .spread(function (troupeContext, rooms, permalinkChat, orgs) {
 
-      rooms = rooms.map(function(room){
-        room.topic = safeJSON(room.topic);
-        return room;
-      });
-
       var chatAppQuery = {};
       if (aroundId) { chatAppQuery.at = aroundId; }
       var chatAppLocation = url.format({
@@ -243,10 +236,9 @@ function renderMainFrame(req, res, next, frame) {
         social.getMetadata({ room: req.troupe  });
 
       //TODO Pass this to MINIBAR?? JP 17/2/16
-      var hasNewLeftMenu              = req.fflip && req.fflip.has('left-menu');
-      troupeContext.leftRoomMenuState = parseLeftMenuTroupeContext(req, troupeContext, orgs);
-      var leftMenuRoomList = parseRoomsIntoLeftMenuRoomList(troupeContext.leftRoomMenuState.state, rooms, troupeContext.leftRoomMenuState.selectedOrgName);
-      troupeContext.snapshots = parseSnapshotsForPageContext(rooms);
+      var hasNewLeftMenu   = req.fflip && req.fflip.has('left-menu');
+      var snapshots        = troupeContext.snapshots = parseSnapshotsForPageContext(req, troupeContext, orgs, rooms);
+      var leftMenuRoomList = parseRoomsIntoLeftMenuRoomList(snapshots.leftMenu.state, snapshots.rooms, snapshots.leftMenu.selectedOrgName);
 
       res.render(template, {
         socialMetadata:     socialMetadata,
@@ -254,7 +246,7 @@ function renderMainFrame(req, res, next, frame) {
         cssFileName:        "styles/" + bootScriptName + ".css",
         troupeName:         req.uriContext.uri,
         troupeContext:      troupeContext,
-        roomMenuIsPinned:   troupeContext.leftRoomMenuState.roomMenuIsPinned,
+        roomMenuIsPinned:   snapshots.leftMenu.roomMenuIsPinned,
         chatAppLocation:    chatAppLocation,
         agent:              req.headers['user-agent'],
         stagingText:        stagingText,
