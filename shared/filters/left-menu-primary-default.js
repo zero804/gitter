@@ -3,6 +3,6 @@
 module.exports = function leftMenuDefaultFilter(room) {
   var lastAccess = (room.lastAccessTime && !!room.lastAccessTime.valueOf) ?
     room.lastAccessTime.valueOf() :
-    room.lastAccess;
+    room.lastAccessTime;
   return !!lastAccess;
 };
