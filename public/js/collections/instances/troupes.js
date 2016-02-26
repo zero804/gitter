@@ -26,7 +26,7 @@ module.exports = (function() {
   unreadItemsClient.installTroupeListener(troupeCollection);
 
   function filterTroupeCollection(filter) {
-    var c = new FilteredCollection(null, { model: troupeModels.TroupeModel, collection: troupeCollection });
+    var c = new FilteredCollection({ model: troupeModels.TroupeModel, collection: troupeCollection });
     c.setFilter(filter);
     var sorted = new Sorted(c);
     return sorted;
