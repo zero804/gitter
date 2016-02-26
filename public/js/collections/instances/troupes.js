@@ -9,13 +9,18 @@ var appEvents         = require('utils/appevents');
 var Sorted            = require('backbone-sorted-collection');
 var errorHandle       = require('utils/live-collection-error-handle');
 var context           = require('utils/context');
+var moment            = require('moment');
+var _                 = require('underscore');
 
 
 require('filtered-collection');
 
 module.exports = (function() {
   var orgsCollection = new orgModels.OrgCollection(null, { listen: true });
-  var troupeCollection = new troupeModels.TroupeCollection(null, { listen: true });
+  var existingRooms = context.getSnapshot('rooms').map(function(data){
+    return _.extend(data, { lastAccessTime: moment(data.lastAccessTime) });
+  });
+  var troupeCollection = new troupeModels.TroupeCollection(existingRooms, { listen: true });
 
   orgsCollection.on('error', errorHandle.bind(null, 'org-collection'));
 
