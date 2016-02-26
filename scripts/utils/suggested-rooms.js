@@ -37,7 +37,6 @@ var opts = yargs
   })
   .argv;
 
-
 if(!opts.username && opts.uri) {
   var maxUri = opts['max-uri'];
   var rooms = [].concat(opts.uri).map(function(uri) {
@@ -59,7 +58,7 @@ if(!opts.username && opts.uri) {
     })
     .then(function(suggestedRooms) {
       suggestedRooms.forEach(function(suggestedRoom) {
-        console.log('asdf', suggestedRoom);
+        console.log(suggestedRoom.uri, suggestedRoom);
       });
     });
 }
@@ -82,7 +81,7 @@ else {
     })
     .then(function(repos) {
       repos.forEach(function(suggestion) {
-        console.log(suggestion, suggestion.uri);
+        console.log(suggestion.uri, suggestion);
       });
     })
     .delay(1000)
