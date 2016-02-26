@@ -2,7 +2,7 @@
 
 var Backbone            = require('backbone');
 var _                   = require('underscore');
-var FilteredCollection  = require('filtered-collection');
+var FilteredCollection  = require('backbone-filtered-collection');
 var backboneUrlResolver = require('backbone-url-resolver');
 var SyncMixin           = require('./sync-mixin');
 
@@ -30,7 +30,13 @@ var SuggestedCollection = Backbone.Collection.extend({
   sync: SyncMixin.sync,
 });
 
-module.exports = Backbone.FilteredCollection.extend({
+var FilteredSuggestedCollection = function() {
+  FilteredCollection.apply(this, arguments);
+};
+
+FilteredSuggestedCollection.prototype = _.extend(
+  FilteredSuggestedCollection.prototype,
+  FilteredCollection.prototype, {
 
   constructor: function(models, attrs) {
 
@@ -41,15 +47,17 @@ module.exports = Backbone.FilteredCollection.extend({
 
     this.listenTo(this.roomCollection, 'update', this.onCollectionSync, this);
 
-    Backbone.FilteredCollection.prototype.constructor.call(this, null, options);
+    FilteredCollection.prototype.constructor.call(this, null, options);
   },
 
-  collectionFilter: function (model){
+  collectionFilter: function(model) {
     return !this.roomCollection.get(model.get('id'));
   },
 
-  onCollectionSync: function (){
+  onCollectionSync: function() {
     this.setFilter();
   },
 
 });
+
+module.exports = FilteredSuggestedCollection;
