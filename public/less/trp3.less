@@ -407,8 +407,13 @@ ul.roster {
   position: absolute;
   top: 100px;
   left: 100%;
-
+  width: 300px;
+	z-index: 900;
   pointer-events: none;
+
+  & > * {
+    pointer-events: auto;
+  }
 
   @media @small {
     display: none;
