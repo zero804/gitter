@@ -241,6 +241,7 @@ function sendEmailNotifications(since) {
         .then(function() {
           var time = Date.now() - start;
           logger.info("Sent unread notification emails to " + count + " users in " + time + "ms");
+          stats.gaugeHF('unread_email_notifications.sent_emails', count, 1);
         });
     })
     .then(function() {

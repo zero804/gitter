@@ -1,0 +1,46 @@
+<!doctype html>
+<html class="no-js loading" lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no"/>
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta charset="utf-8">
+
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <title>{{troupeName}}</title>
+
+  <link rel="stylesheet" href='{{ cdn "styles/mobile-userhome.css"}}'>
+
+  {{{ generateTroupeContext troupeContext }}}
+  {{{ bootScript "mobile-userhome" }}}
+
+  <link rel="apple-touch-icon" href='{{ cdn "images/touch-icon-iphone.png" }}'>
+  <link id="favicon" rel="shortcut icon" href='{{cdn "images/favicon-normal.ico" }}'>
+  {{#each dnsPrefetch}}
+  <link rel="dns-prefetch" href="{{ this }}">
+  {{/each}}
+  <style>
+    html.loading body {
+      background: url("{{ cdn 'images/logo-mark-grey-64.png' }}") center no-repeat;
+      height: 90%;
+    }
+    html.loading body > * { visibility: hidden; }
+  </style>
+</head>
+<body class="mobile mobile-userhome-container">
+
+  {{{ prerenderView "js/views/menu/room/layout/room-menu-layout" }}}
+
+  <div id="mainPage" class="chat-app">
+
+    <header class="mobile-header">
+      <span class="trpTitle">{{troupeName}}</span>
+    </header>
+
+    <div id="userhome-region"></div>
+
+  </div>
+  {{>live_reload}}
+</body>
+</html>

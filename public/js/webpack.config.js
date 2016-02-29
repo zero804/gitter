@@ -10,7 +10,7 @@ var OccurrenceOrderPlugin    = require('webpack/lib/optimize/OccurrenceOrderPlug
 var UglifyJsPlugin           = require('webpack/lib/optimize/UglifyJsPlugin');
 
 //POSTCSS
-var mixins       = require('postcss-sassy-mixins');
+var mixins       = require('postcss-mixins');
 var atImport     = require('postcss-import');
 var simpleVars   = require('postcss-simple-vars');
 var forLoops     = require('postcss-for-var');
@@ -72,6 +72,7 @@ var webpackConfig = {
     devtoolFallbackModuleFilenameTemplate: "[resource-path]?[hash]"
   },
   module: {
+    //JP 12/1/16 If you add a loader remember to add it to /test/in-browser/webpack.config.js
     loaders: [
       {
         test: /\.hbs$/,
@@ -87,7 +88,7 @@ var webpackConfig = {
       },
       {
         test:    /.css$/,
-        loader:  'style-loader!css-loader!postcss-loader',
+        loader:  'style-loader?insertAt=top!css-loader!postcss-loader',
       },
     ]
   },
@@ -110,7 +111,6 @@ var webpackConfig = {
       "jquery-textcomplete": path.resolve(path.join(__dirname, "../repo/jquery-textcomplete/jquery.textcomplete.js")),
       "autolink": path.resolve(path.join(__dirname, "../repo/autolink/autolink.js")),
       "transloadit": path.resolve(path.join(__dirname, "../repo/transloadit/jquery.transloadit2-v2-latest.js")),
-      "oEmbed": path.resolve(path.join(__dirname, "../repo/oEmbed/oEmbed.js")),
       "zeroclipboard": path.resolve(path.join(__dirname, "../repo/zeroclipboard/zeroclipboard.js")),
       "backbone-sorted-collection": path.resolve(path.join(__dirname, "../repo/backbone-sorted-collection/backbone-sorted-collection.js")),
       "jquery-sortable": path.resolve(path.join(__dirname, "../repo/jquery-sortable/jquery-sortable.js")),
@@ -121,7 +121,7 @@ var webpackConfig = {
       "underscore": path.resolve(path.join(__dirname, "utils/underscore-wrapper")),
       "backbone": path.resolve(path.join(__dirname, "../../node_modules/backbone")),
 
-      "bluebird": path.resolve(path.join(__dirname, "utils/bluebird-wrapper")),
+      "bluebird": path.resolve(path.join(__dirname, "utils/bluebird-wrapper"))
     },
   },
   plugins: [

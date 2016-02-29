@@ -8,6 +8,7 @@ var AvatarView = require('views/widgets/avatar');
 var Marionette = require('backbone.marionette');
 var moment = require('moment');
 var isMobile = require('utils/is-mobile');
+var isAndroid = require('utils/is-android');
 var DoubleTapper = require('utils/double-tapper');
 var Popover = require('views/popover');
 var chatItemTemplate = require('./tmpl/chatItemView.hbs');
@@ -32,8 +33,27 @@ require('views/behaviors/last-message-seen');
 require('views/behaviors/timeago');
 require('views/behaviors/tooltip');
 
-module.exports = (function() {
 
+// Can't use `classList.toggle` with the second parameter (force)
+// Because IE11 does not support it
+var toggleClass = function(element, class1, force) {
+  if(arguments.length === 3) {
+    if(force) {
+      element.classList.add(class1);
+    }
+    else {
+      element.classList.remove(class1);
+    }
+  }
+  else {
+    element.classList.toggle(class1);
+  }
+
+  return force;
+};
+
+
+module.exports = (function() {
 
   var getModelIdClass = function(id) {
     return 'model-id-' + id;
@@ -58,9 +78,16 @@ module.exports = (function() {
   };
 
   var touchEvents = {
+    // click events are delayed in horrible ways for <iOS 9.3
     'touchstart':                     'onTouchstart',
     'touchmove':                      'onTouchmove',
     'touchend':                       'onTouchend'
+  };
+
+  var androidTouchEvents = {
+    // WebViews in android will only show the keyboard for a focus() if
+    // it happens via a click event, but not for a touch event
+    'click':                           'onTap'
   };
 
   var ChatItemView = Marionette.ItemView.extend({
@@ -108,7 +135,11 @@ module.exports = (function() {
     isEditing: false,
 
     events: function() {
-      return isMobile() ? touchEvents : mouseEvents;
+      if (isMobile()) {
+        return isAndroid() ? androidTouchEvents : touchEvents;
+      } else {
+        return mouseEvents;
+      }
     },
 
     expandActivity: function() {
@@ -279,7 +310,7 @@ module.exports = (function() {
     handleUpdateMentionChanges: function(changes) {
       if(!changes || 'mentioned' in changes) {
         var wasMentioned = this.model.get('mentioned');
-        this.el.classList.toggle('mentioned', wasMentioned);
+        toggleClass(this.el, 'mentioned', wasMentioned);
         if(wasMentioned) {
           this.el.setAttribute('aria-live', 'assertive');
           this.el.setAttribute('role', 'alert');
@@ -290,20 +321,20 @@ module.exports = (function() {
       var model = this.model;
 
       if(!changes || 'fromUser' in changes) {
-        this.el.classList.toggle('isViewers', this.isOwnMessage());
+        toggleClass(this.el, 'isViewers', this.isOwnMessage());
       }
 
       if(!changes || 'editedAt' in changes) {
-        this.el.classList.toggle('hasBeenEdited', this.hasBeenEdited());
+        toggleClass(this.el, 'hasBeenEdited', this.hasBeenEdited());
       }
 
       if(!changes || 'burstStart' in changes) {
-        this.el.classList.toggle('burstStart', !!model.get('burstStart'));
-        this.el.classList.toggle('burstContinued', !model.get('burstStart'));
+        toggleClass(this.el, 'burstStart', !!model.get('burstStart'));
+        toggleClass(this.el, 'burstContinued', !model.get('burstStart'));
       }
 
       if (!changes || 'burstFinal' in changes) {
-        this.el.classList.toggle('burstFinal', !!model.get('burstFinal'));
+        toggleClass(this.el, 'burstFinal', !!model.get('burstFinal'));
       }
     },
     handleUpdateReadbyStateChanges: function(changes) {
@@ -561,24 +592,35 @@ module.exports = (function() {
     },
 
     showInput: function() {
-      //var isAtBottom = this.scrollDelegate.isAtBottom();
       var chatInputText = this.ui.text;
 
-      // create inputview
       chatInputText.html("<textarea class='trpChatInput' autofocus></textarea>");
 
       var unsafeText = this.model.get('text');
 
       var textarea = chatInputText.find('textarea').val(unsafeText);
 
-      RAF(function() {
-        textarea.focus();
-        textarea.val("").val(unsafeText);
-      });
-
       this.inputBox = new ChatEditView({ el: textarea }).render();
-      this.listenTo(this.inputBox, 'cancel', this.onEditCancel);
+
+      // chrome 48 desktop requires an explicit focus event as `autofocus` is not enough
+      // chrome 48 android requires the same, but the first textarea autofocus is fine
+      textarea.focus();
+      // iOS 9 doesnt put the carat at the end of the text
+      textarea.val("").val(unsafeText);
+
       this.listenTo(this.inputBox, 'save', this.onEditSave);
+
+      // chrome 48 android sends blur events and generally freaks out if you do this
+      // in the same event loop or in a requestAnimationFrame
+      setTimeout(function() {
+        // chrome 48 desktop requires an explicit focus event as `autofocus` is not enough.
+        // chrome 48 android requires the same, but the first textarea autofocus is fine.
+        textarea.focus();
+        // iOS 9 doesnt put the carat at the end of the text
+        textarea.val("").val(unsafeText);
+      }, 0);
+
+      this.listenTo(this.inputBox, 'cancel', this.onEditCancel);
     },
 
     showReadByIntent: function(e) {

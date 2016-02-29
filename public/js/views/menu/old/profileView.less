@@ -1,0 +1,103 @@
+.menu-header {
+  overflow: hidden;
+  width: 92%;
+  max-height: 56px;
+  margin: 10px auto;
+  padding: 1.2rem 0.3125rem;
+
+  border-radius: 4px;
+  cursor: pointer;
+
+  transition: max-height 200ms;
+
+  .trpDisplayPicture {
+    float: left;
+  }
+
+  .avatar-s {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+.menu-header--expanded {
+  // css animations dont work for height: auto,
+  // but we can use a rough max-height instead.
+  max-height: 200px;
+  transition: max-height 400ms;
+}
+
+body.hover .menu-header:hover,
+body.hover .menu-header--expanded {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+// changing toggle chevron without rerendering the whole view
+.menu-header .octicon-chevron-up { display: none; }
+.menu-header--expanded .octicon-chevron-up { display: inline-block; }
+.menu-header .octicon-chevron-down { display: inline-block; }
+.menu-header--expanded .octicon-chevron-down { display: none; }
+
+.menu-header__profile {
+  display: flex;
+  width: 100%;
+}
+
+.menu-header__name {
+  flex-grow: 1;
+  padding-left: 0.625em;
+  padding-right: 0.3125em;
+}
+
+.menu-header__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin: 2px 0 0 0;
+}
+
+.menu-header__avatar {
+  flex-shrink: 0;
+}
+
+.menu-header__state {
+  flex-shrink: 0;
+  padding: 0 0.3125em;
+  height: 32px;
+  line-height: 32px;
+  opacity: 0.6;
+}
+
+.profile-menu {
+  margin: 0;
+  overflow: hidden;
+  width: 100%;
+  margin-top: 12px;
+  color: white;
+  font-weight: 300;
+  line-height: 24px;
+}
+
+.profile-menu__item {
+  list-style: none;
+}
+
+.profile-menu__icon {
+  display: inline-block;
+  width: 20px;
+  text-align: center;
+}
+
+.profile-menu__link {
+  display: inline-block;
+  width: 100%;
+  padding-left: 5px;
+
+  color: white;
+  text-decoration: none;
+
+  body.hover &:hover {
+    border-radius: 4px;
+    background-color: rgba(255,255,255,0.2);
+  }
+}

@@ -1,5 +1,7 @@
 "use strict";
 
+var config      = require('gitter-web-env');
+var stats       = config.stats;
 var redis            = require("../utils/redis");
 var winston          = require('../utils/winston');
 var mongoUtils       = require('../utils/mongo-utils');
@@ -10,6 +12,7 @@ var redisClient      = redis.getClient();
 var scriptManager    = new Scripto(redisClient);
 var _                = require('lodash');
 var Promise          = require('bluebird');
+var moment           = require('moment');
 
 scriptManager.loadFromDir(__dirname + '/../../redis-lua/unread');
 var EMAIL_NOTIFICATION_HASH_KEY = "unread:email_notify";
@@ -25,7 +28,7 @@ var redisClient_zrange   = Promise.promisify(redisClient.zrange, { context: redi
 
 var UNREAD_BATCH_SIZE = 100;
 var PRECONVERT_OBJECTID_TO_STRING_THRESHOLD = 1000;
-var MAXIMUM_USERS_PER_UNREAD_NOTIFICATION_BATCH = 1000;
+var MAXIMUM_USERS_PER_UNREAD_NOTIFICATION_BATCH = 1000*3;
 var MAXIMUM_ROOMS_PER_USER_PER_NOTIFICATION = 15;
 
 /**
@@ -290,10 +293,16 @@ function selectTroupeUserBatchForEmails(troupeUserHash, horizonTime) {
   var troupeUserHashKeys = Object.keys(troupeUserHash);
 
   debug('%s distinct usertroupes with pending emails', troupeUserHashKeys.length);
+  stats.gaugeHF('unread_email_notifications.pending_usertroupes', troupeUserHashKeys.length, 1);
 
   if (!troupeUserHashKeys.length) return {};
 
   var result = {};
+
+  var troupeIdsMap = {};
+  var userIdsMap = {};
+  var lackingValueCount = 0;
+  var oldestValue = Infinity;
 
   /* Filter out values which are too recent */
   troupeUserHashKeys.forEach(function(troupeUserKey) {
@@ -301,7 +310,7 @@ function selectTroupeUserBatchForEmails(troupeUserHash, horizonTime) {
     if (distinctUserCount >= MAXIMUM_USERS_PER_UNREAD_NOTIFICATION_BATCH) return;
 
     var value = troupeUserHash[troupeUserKey];
-    if(value === 'null' && !value) return;
+    if (value === 'null' || !value) return;
 
     var oldest = parseInt(value, 10);
     if (oldest <= horizonTime) {
@@ -322,12 +331,39 @@ function selectTroupeUserBatchForEmails(troupeUserHash, horizonTime) {
   /* Filter out values which are too recent */
   troupeUserHashKeys.forEach(function(key) {
     var troupeUserId = key.split(':');
+    var troupeId = troupeUserId[0];
     var userId = troupeUserId[1];
+
+    troupeIdsMap[troupeId] = true;
+    userIdsMap[userId] = true;
+
+    var value = troupeUserHash[key];
+    if (value === 'null' || !value) {
+      lackingValueCount++;
+    } else {
+      var time = parseInt(value, 10);
+      if (time < oldestValue) {
+        oldestValue = time;
+      }
+    }
 
     if (distinctUserIds[userId]) {
       result[key] = true;
     }
   });
+
+
+  var distinctTroupes = Object.keys(troupeIdsMap).length;
+  debug('distinct troupes with pending emails', distinctTroupes);
+  stats.gaugeHF('unread_email_notifications.distinct_troupeIds', distinctTroupes, 1);
+
+  var distinctUsers = Object.keys(userIdsMap).length;
+  debug('distinct users with pending emails', distinctUsers);
+  stats.gaugeHF('unread_email_notifications.distinct_userIds', distinctUsers, 1);
+
+  var seconds = (moment().format('x')-oldestValue)/1000;
+  debug('oldest value in seconds', seconds);
+  stats.gaugeHF('unread_email_notifications.oldest', troupeUserHashKeys.length, 1);
 
   return result;
 }
@@ -406,6 +442,7 @@ function listTroupeUsersForEmailNotifications(horizonTime, emailLatchExpiryTimeS
 
       var filteredKeys = Object.keys(userTroupesForNotification);
       debug('Attempting to send email notifications to %s usertroupes', filteredKeys.length);
+      stats.gaugeHF('unread_email_notifications.attempted_usertroupes', filteredKeys.length, 1);
 
       var keys = [EMAIL_NOTIFICATION_HASH_KEY].concat(filteredKeys.map(function(troupeUserKey) {
         return 'uel:' + troupeUserKey;

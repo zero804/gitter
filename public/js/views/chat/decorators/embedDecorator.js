@@ -1,6 +1,7 @@
 "use strict";
+
 var $ = require('jquery-iframely');
-var oEmbed = require('oEmbed');
+var embedGenerator = require('../../../utils/embed-generator');
 
 module.exports = (function() {
 
@@ -17,7 +18,7 @@ module.exports = (function() {
       .find('a.link')
       .each(function (index, el) { // jshint unused:true
         if (el.childElementCount === 0 && (el.innerText || el.textContent) === el.href) {
-          oEmbed.parse(el.href, function (embed) {
+          embedGenerator.parse(el.href, function (embed) {
             if (embed && embed.html) {
 
               if(!isCollapsible) {
@@ -64,4 +65,3 @@ module.exports = (function() {
   return decorator;
 
 })();
-

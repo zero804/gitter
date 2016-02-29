@@ -1,18 +1,23 @@
 "use strict";
 
-var context = require('utils/context');
-var Marionette = require('backbone.marionette');
-var modalRegion = require('components/modal-region');
+var context           = require('utils/context');
+var Marionette        = require('backbone.marionette');
+var modalRegion       = require('components/modal-region');
 var ChatContainerView = require('views/chat/chatContainerView');
 
+//var RoomMenuLayout    = require('../menu/room/layout/room-menu-layout');
+//var appEvents         = require('utils/appevents');
+
 /* Decorators */
-var emojiDecorator = require('views/chat/decorators/emojiDecorator');
-var TroupeMenu = require('views/menu/troupeMenu');
+var emojiDecorator  = require('views/chat/decorators/emojiDecorator');
 var mobileDecorator = require('views/chat/decorators/mobileDecorator');
-var ChatInputView = require('views/chat/chatInputView');
-var JoinRoomView = require('views/chat/join-room-view');
+var ChatInputView   = require('views/chat/chatInputView');
+var JoinRoomView    = require('views/chat/join-room-view');
 
 var $ = require('jquery');
+
+
+var TroupeMenu = require('views/menu/old/troupeMenu');
 
 require('views/behaviors/isomorphic');
 
@@ -23,8 +28,10 @@ module.exports = Marionette.LayoutView.extend({
   behaviors: {
     Isomorphic: {
       chat: { el: '#content-wrapper', init: 'initChatRegion' },
-      menu: { el: '#menu-region', init: 'initMenuRegion' },
       input: { el: '#chat-input', init: 'initInputRegion' },
+      menu: { el: '#menu-region', init: 'initMenuRegion' },
+      //Left Menu
+      //roomMenu: { el: '#room-menu-container', init: 'initMenuRegion' }
     }
   },
 
@@ -63,6 +70,7 @@ module.exports = Marionette.LayoutView.extend({
   initialize: function(options) {
     this.chatCollection = options.chatCollection;
     this.dialogRegion = modalRegion;
+    this.roomCollection = options.roomCollection;
   },
 
   onRender: function() {
@@ -81,6 +89,12 @@ module.exports = Marionette.LayoutView.extend({
 
   initMenuRegion: function(optionsForRegion) {
     return new TroupeMenu(optionsForRegion());
+    /*
+    return new RoomMenuLayout(optionsForRegion({
+      bus: appEvents,
+      roomCollection: this.roomCollection
+    }));
+    */
   },
 
   initInputRegion: function(optionsForRegion) {
@@ -102,6 +116,7 @@ module.exports = Marionette.LayoutView.extend({
 
   hideTroupes: function() {
     this.makeAppFullScreen();
+    //TODO Remove jp 24-11-15
     this.ui.mainPage.removeClass('partiallyOffScreen');
   },
 
@@ -110,6 +125,7 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   showHideTroupes: function(e) {
+    //TODO Remove jp 24-11-15
     this.makeAppFullScreen();
     this.ui.mainPage.toggleClass('partiallyOffScreen');
     e.stopPropagation();
