@@ -2,7 +2,7 @@
 
 var Backbone                     = require('backbone');
 //just use shared/
-var getSuggestedOrgsFromRoomList = require('../../../../../../shared/orgs/suggested-orgs-from-room-list');
+var getSuggestedOrgsFromRoomList = require('gitter-web-shared/orgs/suggested-orgs-from-room-list');
 
 var defaultModels = [
   { name: 'all', type: 'all', id: 0 },
