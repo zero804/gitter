@@ -74,15 +74,21 @@ function onUserNotificationWithLock(message) {
 }
 
 function onUserNotification(message) {
+  if (getDesktopNotificationAccess() !== 'granted') {
+    // Show web notifications in each tab
+    webNotifications.show(message, onNotificationMessageClicked);
+    return;
+  }
+
   if (message.notificationKey) {
     sessionMutex(message.notificationKey)
       .then(function(lockObtained) {
         if (lockObtained) {
-          onUserNotificationWithLock(message);
+          showDesktopNotification(message, onNotificationMessageClicked);
         }
       });
   } else {
-    onUserNotificationWithLock(message);
+    showDesktopNotification(message, onNotificationMessageClicked);
   }
 
 }
