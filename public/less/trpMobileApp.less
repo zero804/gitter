@@ -5,7 +5,6 @@
 @import "trpButtons";
 @import "trp3Vars";
 // @import "nanoScroller";
-@import "base-zindex-levels";
 
 /* new stuff */
 // @import "menu";
@@ -20,6 +19,33 @@ body.with-sideMenu {
 h2 {
   font-size: 18px;
   color: @trpDarkBlue;
+}
+
+
+.mobile-header {
+
+  flex-shrink: 0;
+  width: 100%;
+  z-index: 1;
+  background-color: @header-bg;
+  text-align: left;
+  padding-left: @mobile-menu-left-padding;
+
+  .trpTitle {
+    display: inline-block;
+    vertical-align: middle;
+    line-height: normal;
+    color: white;
+    .trpH2;
+  }
+
+  .mobile & {
+    line-height: @mobile-header-height;
+  }
+
+  .desktop & {
+    line-height: @desktop-header-height;
+  }
 }
 
 @header-height: 50px;
@@ -50,7 +76,6 @@ header {
 
 #mainPage {
   box-shadow: 0 0 15px black;
-  z-index: @l10;
   .animation(cubic-bezier(0.6, -0.28, 0.735, 0.045));
 }
 

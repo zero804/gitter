@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 var $ = require('jquery');
 
 module.exports = (function() {
@@ -6,26 +6,20 @@ module.exports = (function() {
   $.prototype.notify = function(options) {
     var container = this;
     var content = options.content;
-    var timeout = options.timeout ? options.timeout : 6000;
-    var className = options.className ? options.className : '';
-    var action = options.action ? options.action : 'show';
-    var n, isNew = false;
+    var timeout = options.timeout || 6000;
+    var className = options.className || '';
+    var action = options.action || 'show';
+    var n = false;
+    var isNew = false;
 
     function show() {
-      if (n.is(':hidden')) {
-        // style
-        n.show();
-        n.css({ position: 'relative', left: -1 * n.outerWidth() });
-        n.animate({ left: 260 });
-      }
+      n.removeClass('is-hidden');
       // restart hide timeout
       n.data('notification-hide-timeout').restart();
     }
 
     function hide() {
-      n.animate({ left: 0 }, function() {
-        n.hide();
-      });
+      n.addClass('is-hidden');
     }
 
     function get() {
@@ -36,7 +30,7 @@ module.exports = (function() {
 
       if (!options.id || n.length <= 0) {
         isNew = true;
-        n = $('<div class="notification"'+((options.id) ? ' id="'+options.id+'"':'')+'></div>').hide();
+        n = $('<div class="notification"'+((options.id) ? ' id="'+options.id+'"':'')+'></div>');
         n.prependTo(container);
         // add the hide timeout for this notification
         n.data('notification-hide-timeout', new Timeout(function() {

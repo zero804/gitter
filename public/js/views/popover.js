@@ -32,7 +32,7 @@ module.exports = (function() {
 
       if(style) {
         var zIndex = style.getPropertyValue('z-index');
-        if(zIndex && zIndex !== "auto") {
+        if(zIndex && zIndex !== 'auto') {
           zIndex = parseInt(zIndex, 10);
           if(zIndex > max) {
             max = zIndex;

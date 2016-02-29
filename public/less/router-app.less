@@ -2,10 +2,21 @@
 @import "typography.less";
 @import "bootstrap/mixins";
 
-@import "../js/views/layouts/app-layout";
-@import "../js/views/menu/troupeMenu";
+@import "../js/views/layouts/app-layout.less";
 @import "../js/views/modals/create-repo-room-view.less";
-@import "../js/views/modals/choose-room-view";
+@import "../js/views/modals/choose-room-view.less";
 @import "../js/views/modals/create-room-view.less";
-@import "../js/views/widgets/preload";
-@import "staging-indicator";
+@import "../js/views/widgets/preload.less";
+@import "staging-indicator.less";
+
+
+//Left Menu
+@import "../js/views/menu/room/layout/room-menu-layout.less";
+
+@import "../js/views/menu/old/troupeMenu.less";
+
+//TODO move this out
+.application-container {
+  display: flex;
+  flex-direction: row;
+}

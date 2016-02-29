@@ -1,0 +1,58 @@
+<div id="profile-region">
+{{{ prerenderView "js/views/menu/old/tmpl/profile" wrap="div" className="menu-header" id="left-menu-profile"}}}
+</div>
+
+<div class="nano  menu-content" id="left-menu-scroll">
+  <div class="content  nano-content  menu-content__wrapper" style="outline: none">
+    <div class="menu-list" id="list-mega">
+      {{!-- `#recentTroupesList` & `#OrgsList` need to be checked for JS hooks, if so replace with `js-*` --}}
+      <div class='menu-list__item' id="recentTroupesList">
+        <div class="list-favourites menu-list__section" id="favs-region" data-drop-target="favs">
+          <ul class="room-list">
+          {{!-- put filtered favourites in here --}}
+            {{#each rooms.favourites}}
+              <li class="room-list-item  {{#if selected}}room-list-item--current-room{{/if}}" data-id="{{ this.id }}">{{{ prerenderRoomListItem this }}}</li>
+            {{/each}}
+          </ul>
+        </div>
+        <div class="list-recents  menu-list__section" id="list-recents" data-drop-target="recents">
+          {{!-- put filtered recents in here. remember also that notifications will appear in here if they aren't in favourites --}}
+          <div id="recents-region">
+          <ul class="room-list">
+            {{#each rooms.recents}}
+              <li class="room-list-item {{#if selected}}room-list-item--current-room{{/if}}" data-id="{{ this.id }}">
+              {{{ prerenderRoomListItem this }}}
+              </li>
+            {{/each}}</ul>
+          </div>
+        </div>
+      </div>
+      <div class='menu-list__item' id="suggested-region"></div>
+      <div class='menu-list__item' id="orgs-region">
+        <div {{#if userHasNoOrgs}}style="display:none"{{/if}}>
+          <div class="menu-list__header">
+            <h5>Your Organisations</h5>
+          </div>
+          <div id="list">
+            <ul class="room-list">
+              {{#each orgs}}
+              {{{ prerenderOrgListItem this }}}
+              {{/each}}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="menu-list__overflow-shadow"></div>
+</div>
+{{#if showFooterButtons}}
+<div class="menu__create-room-wrapper">
+  <a class="menu__create-room-button button-caribbean--small" href="#createroom">Create a room</a>
+</div>
+{{/if}}
+{{#if showUnreadTab}}
+<div class="menu__hotspot">
+  <div id="menu-tab-unread-count" class="menu__tab"></div>
+</div>
+{{/if}}

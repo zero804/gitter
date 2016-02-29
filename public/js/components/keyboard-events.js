@@ -119,7 +119,11 @@ module.exports = (function() {
     'q, r': {
       name: 'quote',
       scope: 'other'
-    }
+    },
+    'shift+/,?': [{
+      name: 'help.keyboard',
+      scope: 'other'
+    }],
   };
 
   // OS-specific modifier key
@@ -186,4 +190,3 @@ module.exports = (function() {
 
 
 })();
-

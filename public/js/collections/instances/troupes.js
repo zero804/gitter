@@ -8,6 +8,7 @@ var unreadItemsClient = require('components/unread-items-frame-client');
 var appEvents         = require('utils/appevents');
 var Sorted            = require('backbone-sorted-collection');
 var errorHandle       = require('utils/live-collection-error-handle');
+var context           = require('utils/context');
 
 
 require('filtered-collection');
@@ -49,6 +50,13 @@ module.exports = (function() {
     } else {
       model.set('activity', 1);
     }
+  });
+
+  //We never post activity changes back to the server so
+  //reset lurk activity for the current room JP 4/2/16
+  context.troupe().on('change:id', function(troupe, val){ //jshint unused: true
+    var activeRoom = troupeCollection.get(val);
+    if(activeRoom) { activeRoom.set('activity', false); }
   });
 
 

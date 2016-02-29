@@ -1,0 +1,355 @@
+@import (reference) "../../../../less/colors.less";
+@import (reference) "../../../../less/trp3Vars.less";
+
+@import "../../../../less/base-zindex-levels";
+@import "../../../../less/logo.less";
+
+/* Imports for child views */
+@import "./room-list";
+@import "./room-list-item";
+@import "./profileView";
+@import "./orgCollectionView";
+@import "../../../../less/nanoScroller.less";
+
+.selected {
+  opacity: 1;
+}
+
+@menuWidth: 260px;
+
+.menu {
+
+  &, & * {
+    box-sizing: border-box;
+  }
+
+  /* visibility */
+  display: flex;
+  flex-direction: column;
+
+  /* positioning */
+  position: relative;
+  // slide menu to the left
+  margin-left: -@menuWidth;
+  margin-right: 0;
+
+  /* dimensions */
+  width: @menuWidth;
+  height: 100%;
+
+  /* colors */
+  background-color: @background-grey;
+  color: white;
+
+  /* effects */
+  transition: margin 0.2s ease-in-out;
+
+  user-select: none;
+
+  .nano-pane {
+    left: 0;
+  }
+}
+
+.menu a {
+  color: inherit;
+
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+// mobile override until it uses the same left menu
+// show/hide as desktop
+.menu.menu--mobile {
+  position: absolute;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+body.hover .menu:hover {
+  // slide menu to the right
+  margin-left: 0;
+  margin-right: -@menuWidth;
+}
+
+@media @mid-min {
+  .menu:not(.menu--collapsed),
+  body.hover .menu:hover:not(.menu--collapsed) {
+    // stop menu sliding around and inline it
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
+@tabWidth: 25px;
+@tabHeight: 30px;
+
+.menu__hotspot {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: -@tabWidth;
+  width: @tabWidth;
+  overflow-x: hidden;
+
+  transition: right 0.2s ease-in-out 0.2s,
+              width 0.2s ease-in-out 0.2s;
+}
+
+body.hover .menu:hover .menu__hotspot {
+  // slide hotspot away when menu is hovered
+  right: 0;
+  width: 0;
+}
+
+@media @mid-min {
+  .menu:not(.menu--collapsed) .menu__hotspot {
+    // slide hotspot away when menu is inline
+    right: 0;
+    width: 0;
+  }
+}
+
+.menu__tab {
+  background-color: @troupe-green;
+  top: 110px;
+  right: 0;
+  position: absolute;
+  width: @tabWidth;
+  height: @tabHeight;
+
+  border-radius: 0 4px 4px 0;
+
+  line-height: @tabHeight;
+  text-align: center;
+}
+
+@keyframes fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@menu-shadow-size: 3em;
+
+.menu-content {
+  // vertically expand as much as possible
+  flex: 1;
+  height: 100%;
+
+  &.has-scrollbar {
+    max-width: 106%;
+  }
+
+  .menu-content__wrapper {
+    display: inline-block;
+    overflow-x: hidden;
+  }
+
+  .menu-list {
+
+    display: inline-block;
+    vertical-align: top;
+    width: 100%;
+    transition: 0.1s all ease-in;
+    margin-bottom: @menu-shadow-size;
+
+    .menu-list__item:not(:last-child) {
+      margin-bottom: 20px;
+    }
+
+    .menu-list__header {
+      position: relative;
+      text-transform: uppercase;
+      margin-left: 12px;
+      padding: 0 9px 0 0;
+      opacity: 0.6;
+      overflow: hidden;
+      clear: both;
+
+      & .list-toggle {
+        opacity: 0;
+        float: right;
+      }
+
+      body.hover &:hover > .list-toggle {
+        opacity: 0.8;
+      }
+
+      p {
+        margin: 0;
+        float: left;
+      }
+    }
+
+    .menu-list__section {
+      width: 100%;
+    }
+  }
+}
+
+
+.menu-list__overflow-shadow {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: @menu-shadow-size;
+  pointer-events: none;
+  background: linear-gradient(to bottom, fade(@background-grey, 0) 0%, @background-grey 100%);
+}
+
+.menu-list__header__details {
+  float: right;
+  line-height: 1.2;
+}
+
+.menu__job-button {
+  display: block;
+  margin: 1em;
+  padding: 1em;
+  background-color: rgba(100,100,100,0.1);
+  border-radius: 0.5em;
+  border: 1px solid grey;
+
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.8em;
+
+  &:hover {
+    background-color: rgba(100,100,100,0.3);
+  }
+}
+
+
+.menu__create-room-wrapper {
+  padding: 10px;
+}
+
+.menu__create-room-button {
+  width: 100%;
+}
+
+.list-favourites {
+  transition: padding 300ms ease-in-out;
+}
+
+body.dragging .list-favourites {
+  min-height: 25px;
+  background-color: rgba(255,255,255,0.1);
+  border-top: 1px dashed rgba(255,255,255,0.2);
+  border-bottom: 1px dashed rgba(255,255,255,0.2);
+  padding: 5px 0;
+  transition: padding 300ms ease-in-out;
+}
+
+body.dragging .list-favourites li.placeholder {
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
+.nli-menu {
+    &, & * {
+    box-sizing: border-box;
+  }
+
+  display: flex;
+  flex-grow: 0;
+  flex-shrink: 0;
+
+  height: 100%;
+  width: 350px;
+  padding: 20px;
+
+  overflow-y: auto;
+
+  background-color: lighten(@trpDarkBlue, 5%);
+  color: white;
+
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+
+  background: url('../images/home/banner.jpg') no-repeat center center;
+  background-size: cover;
+  // Give a dark colour for the background to fade into
+  background-color: #512e92;
+
+  // Not so BEM but it's inherited from the Homepage
+  .logo-holder {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    top: 0px;
+    left: 15px;
+  }
+}
+
+.nli-menu__logo {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  position: absolute;
+  top: 25px;
+  left: 35px;
+}
+
+.nli-menu__logo-text {
+  position: relative;
+  width: 76px;
+  top: 7px;
+  left: 12px;
+}
+
+
+.nli-menu__header {
+  font-family: "source-sans-pro";
+  font-weight: 200;
+  font-size: 47px;
+  line-height: 43px;
+  margin: 10vh 0px 5vh 15px;
+  width: 100%;
+}
+
+.nli-menu__features-header {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 300;
+  margin-left: 15px;
+}
+
+.nli-menu__price {
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 30px;
+  margin-left: 15px;
+}
+
+.nli-menu__features {
+  background-color: rgba(255,255,255, 0.1);
+  font-size: 10px;
+  padding: 1vh 15px;
+  margin: 1vh 0px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  width: 100%;
+}
+
+.nli-menu__footer {
+  display: block;
+  position: absolute;
+  bottom: 25px;
+  margin-left: 15px;
+  a {
+    color: #FFF;
+    border-bottom: 1px dotted #FFF;
+  }
+  a:hover {
+    text-decoration: none;
+  }
+}
+
+// SPLIT TEST CSS END

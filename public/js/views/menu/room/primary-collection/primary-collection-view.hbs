@@ -1,0 +1,20 @@
+<div id="room-item-container" class="room-item__container {{#if selected}}selected{{/if}} {{#if focus}}focus{{/if}}">
+  {{#if avatarUrl}}<img class="room-item__avatar" src="{{ avatarUrl }}" />{{/if}}
+  <h2 class="room-item__title">{{name}}</h2>
+  {{#unless isSearch}}
+    <img class="room-item__options" id="room-item-options-toggle" src='{{cdn "images/svg/menu/room-options.svg"}}'/>
+  {{/unless}}
+  {{#if unreadItems}}<div class="room-item__unreads">{{unreadItems}}</div>{{/if}}
+  {{#if lurkActivity}}<div class="room-item__lurk">&nbsp;</div>{{/if}}
+  {{#if mentions}}<div class="room-item__mentions">&#64;</div>{{/if}}
+</div>
+<ul class="room-item__options-menu">
+  {{#if isNotOneToOne}}
+    <li class="room-item__options-menu__item">
+      <a id="room-item-leave"  href="#">Leave</a>
+    </li>
+  {{/if}}
+  <li class="room-item__options-menu__item">
+    <a id="room-item-hide"  href="#">Hide</a>
+  </li>
+</ul>

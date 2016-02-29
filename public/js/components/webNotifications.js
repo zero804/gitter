@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 var $ = require('jquery');
 var context = require('../utils/context');
 var template = require('./tmpl/notification.hbs');
@@ -10,7 +10,7 @@ require('./notify');
 
 module.exports = (function() {
 
-  var $notifyEl = $('<div id="notification-center" class="notification-center"></div>').appendTo('body');
+  var $notifyEl = $('<div id="notification-center" class="notification-center"></div>').appendTo('.room-menu__panel');
 
   appEvents.on('user_notification', function(message) {
     if (message.troupeId && message.troupeId === context.getTroupeId()) {
@@ -56,39 +56,13 @@ module.exports = (function() {
 
 
   appEvents.on('ajaxError', function() {
-
     $notifyEl.notify({
       id: 'ajax-error',
       className: 'notification-error',
       content: "We're having problems communicating with the server at the moment...."
     });
-
   });
 
-  // // websocket $notifyEl
-  // appEvents.on('connectionFailure', function() {
-  //   $notifyEl.notify({
-  //     id: 'realtime-error',
-  //     className: 'notification-error',
-  //     content: "Unable to establish a realtime connection with the server… Retrying",
-  //     timeout: Infinity,
-  //     click: function() {
-  //       window.location.reload(true);
-  //     }
-  //   });
-  // });
-
-  // appEvents.on('connectionRestored', function() {
-  //   $notifyEl.notify({
-  //     id: 'realtime-error',
-  //     action: 'hide'
-  //   });
-  // });
-
-
-  $(window).on('beforeunload', function(){
-    $('#notification-center').hide();
-  });
 
   return {
     notify: function(options) {
