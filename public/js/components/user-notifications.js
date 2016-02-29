@@ -36,12 +36,15 @@ function showDesktopNotification(message, callback) {
 
   var notification = new WindowNotification(title, { body: text, icon: icon });
 
-  setTimeout(function() {
+  var timeout = setTimeout(function() {
     notification.onclick = null;
     notification.close();
   }, 10000);
 
   notification.onclick = function() {
+    clearTimeout(timeout);
+    notification.onclick = null;
+    notification.close();
     window.focus();
     callback(message);
   };
