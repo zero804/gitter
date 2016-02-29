@@ -15,16 +15,16 @@ var sessionMutex        = require('../utils/session-mutex');
  * Returns "granted", "denied", "default" or undefined
  */
 function getDesktopNotificationAccess() {
-  if(!WindowNotification) return;
+  if (!WindowNotification) return;
 
   // Notification.permission undefined in chrome 31 and earlier
-  if(WindowNotification.permission) {
+  if (WindowNotification.permission) {
     return WindowNotification.permission;
   } else {
-    switch(webkitNotifications.checkPermission()) {
-      case 0: return "granted";
-      case 1: return "default";
-      case 2: return "denied";
+    switch (webkitNotifications.checkPermission()) {
+      case 0: return 'granted';
+      case 1: return 'default';
+      case 2: return 'denied';
     }
   }
 }
@@ -37,6 +37,7 @@ function showDesktopNotification(message, callback) {
   var notification = new WindowNotification(title, { body: text, icon: icon });
 
   setTimeout(function() {
+    notification.onclick = null;
     notification.close();
   }, 10000);
 
@@ -72,7 +73,6 @@ function onUserNotificationWithLock(message) {
   }
 }
 
-
 function onUserNotification(message) {
   if (message.notificationKey) {
     sessionMutex(message.notificationKey)
@@ -99,7 +99,7 @@ function initUserNotifications() {
       click: function() {
         try {
           window.parent.location.reload(true);
-        } catch(e) {
+        } catch (e) {
           window.location.reload(true);
         }
       }
@@ -110,11 +110,11 @@ function initUserNotifications() {
     appEvents.trigger('user_notification', {
       notificationKey: 'ajax.error',
       title: 'Unable to communicate with Gitter',
-      text: "We're having problems communicating with the server at the moment....",
+      text: 'We\'re having problems communicating with the server at the moment....',
       click: function() {
         try {
           window.parent.location.reload(true);
-        } catch(e) {
+        } catch (e) {
           window.location.reload(true);
         }
       }
@@ -125,8 +125,8 @@ function initUserNotifications() {
 initUserNotifications();
 
 function requestDesktopNotificationAccess() {
-  if(!WindowNotification) return;
-  if (getDesktopNotificationAccess() === "granted") return;
+  if (!WindowNotification) return;
+  if (getDesktopNotificationAccess() === 'granted') return;
 
   WindowNotification.requestPermission(function() {
   });
@@ -139,6 +139,6 @@ onReady(function() {
 module.exports = {
   requestAccess: requestDesktopNotificationAccess,
   isAccessDenied: function() {
-    return getDesktopNotificationAccess() === "denied";
+    return getDesktopNotificationAccess() === 'denied';
   }
 };

@@ -39,7 +39,7 @@ var View = Marionette.ItemView.extend({
   },
 
   menuItemClicked: function (type){
-    switch(type){
+    switch (type) {
       case 'lurk':
         this.enableLurkMode();
       break;
