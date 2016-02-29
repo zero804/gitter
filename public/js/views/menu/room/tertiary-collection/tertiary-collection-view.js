@@ -1,10 +1,10 @@
 'use strict';
 
 var _                      = require('underscore');
-var getRoomAvatar          = require('utils/get-room-avatar');
+var getRoomAvatar          = require('gitter-web-shared/avatars/get-room-avatar');
 var BaseCollectionView     = require('../base-collection/base-collection-view');
 var BaseCollectionItemView = require('../base-collection/base-collection-item-view');
-var roomNameShortener      = require('../../../../utils/room-menu-name-shortener');
+var roomNameShortener      = require('gitter-web-shared/room-name-shortener');
 
 var proto = BaseCollectionView.prototype;
 
