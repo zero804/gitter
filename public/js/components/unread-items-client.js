@@ -1,12 +1,13 @@
 "use strict";
-var _ = require('underscore');
-var context = require('utils/context');
-var realtime = require('./realtime');
-var apiClient = require('./apiClient');
-var debug = require('debug-proxy')('app:unread-items-client');
-var Backbone = require('backbone');
-var appEvents = require('utils/appevents');
+var _               = require('underscore');
+var context         = require('utils/context');
+var realtime        = require('./realtime');
+var apiClient       = require('./apiClient');
+var debug           = require('debug-proxy')('app:unread-items-client');
+var Backbone        = require('backbone');
+var appEvents       = require('utils/appevents');
 var UnreadItemStore = require('./unread-items-client-store');
+var log             = require('utils/log');
 
 module.exports = (function() {
 
@@ -514,13 +515,6 @@ module.exports = (function() {
       }
     });
 
-    /*
-    // * newcountvalue: (length)
-    // * unreadItemRemoved: (itemId)
-    // * change:status: (itemId, mention)
-    // * itemMarkedRead: (itemId, mention, lurkMode)
-    // * add (itemId, mention)
-     */
     store.on('unreadItemRemoved', function(itemId) {
       debug('CollectionSync: unreadItemRemoved: %s mention=%s', itemId);
       collection.patch(itemId, { unread: false, mentioned: false }, { fast: true });
@@ -540,7 +534,25 @@ module.exports = (function() {
 
     store.on('add', function(itemId, mention) {
       debug('CollectionSync: add: %s mention=%s', itemId, mention);
-      collection.patch(itemId, { unread: true, mentioned: mention });
+
+      // See https://github.com/troupe/gitter-webapp/issues/1055
+      function patchComplete(id, found) {
+        if (found) return;
+        // Only perform this sanity check if we're at the bottom
+        // of the collection
+        if (!collection.atBottom) return;
+        if (!collection.length) return;
+        var firstItem = collection.at(0);
+        if (id < firstItem.id) return;
+
+        // At this point, we know that the patch was for an item which
+        // should be in the collection, but was not found.
+        // This is a problem
+        log.warn('An unread item does not exist in the chat collection: id=' + id);
+        appEvents.trigger('stats.event', 'missing.chat.item');
+      }
+
+      collection.patch(itemId, { unread: true, mentioned: mention }, null, patchComplete);
     });
 
     store.on('reset', function() {

@@ -6,6 +6,7 @@ var prerenderWrapper = require('./prerender-wrapper');
 var PRERENDERED_VIEWS = [
   //NEW LEFT MENU
   "js/views/menu/room/layout/room-menu-layout",
+  "js/views/menu/room/primary-collection/primary-collection-view",
 
   //OLD SEARCH
   "js/views/search/tmpl/search-input",
