@@ -6,7 +6,7 @@ var ItemView      = require('./minibar-item-view');
 var CloseItemView = require('./minibar-close-item-view');
 var FavouriteView = require('./minibar-favourite-item-view');
 var PeopleView    = require('./minibar-people-item-view.js');
-var RAF           = require('utils/raf');
+var fastdom    = require('fastdom');
 
 
 //TODO TEST ALL THE THINGS JP 2/2/16
@@ -74,7 +74,7 @@ module.exports = Marionette.CollectionView.extend({
   onCollectionSnapshot: function() {
     //Only render after a snapshot
     this.shouldRender = true;
-    RAF(function() {
+    fastdom.mutate(function() {
       this.render();
     }.bind(this));
   },

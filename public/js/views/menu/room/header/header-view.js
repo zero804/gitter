@@ -2,7 +2,7 @@
 
 var Marionette = require('backbone.marionette');
 var template   = require('./header-view.hbs');
-var RAF        = require('utils/raf');
+var fastdom    = require('fastdom');
 
 module.exports = Marionette.ItemView.extend({
 
@@ -38,7 +38,7 @@ module.exports = Marionette.ItemView.extend({
     //This can be called after render so we need to add a small delay to get the transitions working
     //jp 6/12/16
     setTimeout(function() {
-      RAF(function() {
+      fastdom.mutate(function() {
         this.ui.headerAll[0].classList.toggle('active', state === 'all');
         this.ui.headerSearch[0].classList.toggle('active', state === 'search');
         this.ui.headerFavourite[0].classList.toggle('active', state === 'favourite');

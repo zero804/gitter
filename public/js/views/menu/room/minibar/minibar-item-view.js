@@ -3,7 +3,7 @@
 var _             = require('underscore');
 var Marionette    = require('backbone.marionette');
 var itemTemplate  = require('./minibar-item-view.hbs');
-var getRoomAvatar = require('utils/get-room-avatar');
+var getRoomAvatar = require('gitter-web-shared/avatars/get-room-avatar');
 
 module.exports =  Marionette.ItemView.extend({
   tagName:      'li',

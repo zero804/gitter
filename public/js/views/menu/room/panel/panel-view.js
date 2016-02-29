@@ -11,7 +11,7 @@ var SecondaryCollectionModel = require('../secondary-collection/secondary-collec
 var TertiaryCollectionView   = require('../tertiary-collection/tertiary-collection-view');
 var TertiaryCollectionModel  = require('../tertiary-collection/tertiary-collection-model');
 var ProfileMenuView          = require('../profile/profile-menu-view');
-var RAF                      = require('utils/raf');
+var fastdom                  = require('fastdom');
 
 var SearchInputView       = require('views/menu/room/search-input/search-input-view');
 
@@ -115,7 +115,7 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   onPanelOpenStateChange: function(model, val) { /*jshint unused: true */
-    RAF(function() {
+    fastdom.mutate(function() {
       this.el.classList.toggle('active', val);
     }.bind(this));
   },
