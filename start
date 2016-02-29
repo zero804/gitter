@@ -39,7 +39,7 @@ function startDockerMachine {
       $DOCKER_MACHINE_NAME
   else
     ## Start the box if it's stopped
-    if docker_machine_query --filter state=Stopped; then
+    if (docker_machine_query --filter state=Stopped) || (docker_machine_query --filter state=Saved); then
       echo "-- Docker machine $DOCKER_MACHINE_NAME is not running. Starting."
 
       docker-machine start $DOCKER_MACHINE_NAME
