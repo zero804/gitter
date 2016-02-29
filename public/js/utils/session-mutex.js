@@ -1,48 +1,51 @@
 'use strict';
 
 var Promise = require('bluebird');
-var storage = window.localStorage;
+var localStore = require('../components/local-store');
 
 var TIMEOUT = 60000;
+var LOCK_WAIT_TIME = 16;
 var uniq = Math.floor(Math.random() * 10000000);
 
 function garbageCollection() {
   var now = Date.now();
 
-  for (var i = storage.length; i >= 0; i--) {
-    var key = storage.key(i);
-    if (key && key.indexOf('lock:') === 0) {
-      var value = storage.getItem(key);
-      if (value) {
-        var pair = value.split('-');
-        var lockDate =  parseInt(pair[0], 10);
+  var keys = localStore.getKeys()
+    .forEach(function(key) {
+      if (key.indexOf('lock:') !== 0) return;
 
-        if (lockDate && (now - lockDate > TIMEOUT)) {
-          storage.removeItem(key);
-        }
+      var value = localStore.get(key);
+      if (!value) return;
+
+      var pair = value.split('-');
+      var lockDate =  parseInt(pair[0], 10);
+
+      if (lockDate && (now - lockDate > TIMEOUT)) {
+        localStore.remove(key);
       }
-    }
-  }
+    });
 }
 
-setInterval(garbageCollection, 60000);
+setInterval(garbageCollection, TIMEOUT * 3);
 
 var sessionMutex = Promise.method(function (key) {
   var storageKey = 'lock:' + key;
 
-  var k = storage.getItem(storageKey);
+  var k = localStore.get(storageKey);
   if (k) {
     return false;
   }
 
   var value = Date.now() + ':' + uniq;
 
-  storage.setItem(storageKey, value);
-  return Promise.delay(16)
+  localStore.set(storageKey, value);
+
+  // Do we still hold the lock?
+  return Promise.delay(LOCK_WAIT_TIME)
     .then(function() {
-      if (storage.getItem(storageKey) === value) {
+      if (localStore.get(storageKey) === value) {
         Promise.delay(10000).then(function() {
-          storage.removeItem('lock:' + key);
+          localStore.remove('lock:' + key);
         });
 
         return true;
