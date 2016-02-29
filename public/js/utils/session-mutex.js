@@ -54,4 +54,3 @@ var sessionMutex = Promise.method(function (key) {
 });
 
 module.exports = sessionMutex;
-window.sessionMutex = sessionMutex;
