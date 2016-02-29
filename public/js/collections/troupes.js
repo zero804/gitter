@@ -1,9 +1,11 @@
 "use strict";
 
-var context = require('utils/context');
-var realtime = require('components/realtime');
+var _                    = require('underscore');
+var moment               = require('moment');
+var context              = require('utils/context');
+var realtime             = require('components/realtime');
 var gitterRealtimeClient = require('gitter-realtime-client');
-var SyncMixin = require('./sync-mixin');
+var SyncMixin            = require('./sync-mixin');
 
 var RoomModel = gitterRealtimeClient.RoomModel.extend({
   sync: SyncMixin.sync

@@ -1,13 +1,11 @@
 'use strict';
 
-var _                 = require('underscore');
-var Backbone          = require('backbone');
-var getRoomAvatar     = require('utils/get-room-avatar');
-var itemTemplate      = require('./primary-collection-view.hbs');
-var roomNameShortener = require('../../../../utils/room-menu-name-shortener');
-var apiClient         = require('components/apiClient');
-var context           = require('utils/context');
-var appEvents         = require('utils/appevents');
+var Backbone         = require('backbone');
+var itemTemplate     = require('./primary-collection-view.hbs');
+var apiClient        = require('components/apiClient');
+var context          = require('utils/context');
+var appEvents        = require('utils/appevents');
+var parseForTemplate = require('gitter-web-shared/parse/left-menu-primary-item');
 
 var BaseCollectionItemView = require('../base-collection/base-collection-item-view');
 
@@ -35,28 +33,7 @@ module.exports = BaseCollectionItemView.extend({
   },
 
   serializeData: function() {
-    var data = this.model.toJSON();
-    data.url = (data.url || '');
-    data.name = (data.name || '');
-
-    //For user results
-    if (data.displayName) {
-      return _.extend({}, { name: data.displayName, avatarUrl: data.avatarUrlSmall });
-    }
-
-    var hasMentions  = !!data.mentions && data.mentions;
-    var unreadItems  = !hasMentions && data.unreadItems;
-    var lurkActivity = data.lurk && (!hasMentions && !unreadItems) && !!data.activity;
-
-    return _.extend({}, data, {
-      avatarUrl: getRoomAvatar(data.url.substring(1)),
-      isNotOneToOne: (data.githubType !== 'ONETOONE'),
-      name:          roomNameShortener(data.name),
-      mentions:      hasMentions,
-      unreadItems:   unreadItems,
-      lurkActivity:  lurkActivity,
-      isSearch:      (this.roomMenuModel.get('state') === 'search'),
-    });
+    return parseForTemplate(this.model.toJSON(), this.roomMenuModel.get('state'));
   },
 
   onOptionsClicked: function(e) {
