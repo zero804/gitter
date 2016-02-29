@@ -1,5 +1,6 @@
 /* jshint unused:strict, browser:true, strict:true, -W097 */
 "use strict";
+var Promise = require('bluebird');
 var $ = require('jquery');
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
@@ -13,7 +14,42 @@ var titleTemplate = require('./tmpl/issuePopoverTitle.hbs');
 var footerTemplate = require('./tmpl/commitPopoverFooter.hbs');
 var SyncMixin = require('collections/sync-mixin');
 
+
+
+var changeElementType = function(element, newType) {
+  var $element = $(element);
+
+  var attrs = {};
+  var attrNamedNodeMap = $element[0].attributes;
+  Object.keys(attrNamedNodeMap).forEach(function(index) {
+    var attr = attrNamedNodeMap[index];
+    attrs[attr.nodeName] = attr.nodeValue;
+  });
+
+  var $newElement = $('<' + newType + '/>', attrs).append($element.contents());
+  $element.replaceWith($newElement);
+  return $newElement;
+};
+
+
 module.exports = (function() {
+
+  var localCache = {};
+  function getIssueState(repo, issueNumber) {
+    var issue = repo + '/' + issueNumber;
+    var localResult = localCache[issue];
+    if(localResult) {
+      return Promise.resolve(localResult);
+    }
+
+    return apiClient.priv.get('/issue-state', { q: issue })
+      .then(function(states) {
+        localCache[issue] = states[0];
+        setTimeout(function() { delete localCache[issue]; }, 60000);
+        return states[0];
+      });
+  }
+
 
 
   var BodyView = Marionette.ItemView.extend({
@@ -75,24 +111,6 @@ module.exports = (function() {
     });
   }
 
-  var localCache = { };
-
-  function addIssue(repo, issueNumber, callback) {
-    var issue = repo + '/' + issueNumber;
-    var localResult = localCache[issue];
-    if(localResult) {
-      setTimeout(function() { callback(localResult); }, 0);
-      return;
-    }
-
-    apiClient.priv.get('/issue-state', { q: issue })
-      .then(function(states) {
-        localCache[issue] = states[0];
-        setTimeout(function() { delete localCache[issue]; }, 60000);
-        callback(states[0]);
-      });
-
-  }
 
   var IssueModel = Backbone.Model.extend({
     idAttribute: "number",
@@ -119,26 +137,40 @@ module.exports = (function() {
         var repo = $issue.data('issueRepo') || roomRepo;
         var issueNumber = $issue.data('issue');
 
-        addIssue(repo, issueNumber, function(state) {
-          if(state) {
-            // We depend on this to style the issue after making sure it is an issue
-            $issue.addClass('is-existent');
+        var convertToLink = function() {
+          $issue = changeElementType($issue, 'a');
+          $issue.attr('href', getModel().get('html_url'));
+          $issue.attr('target', '_blank');
+        };
 
-            // dont change the issue state colouring for the activity feed
-            if(!$issue.hasClass('open') && !$issue.hasClass('closed')) {
-              $issue.addClass(state);
+        getIssueState(repo, issueNumber)
+          .then(function(state) {
+            if(state) {
+              // We depend on this to style the issue after making sure it is an issue
+              $issue.addClass('is-existent');
+
+              // dont change the issue state colouring for the activity feed
+              if(!$issue.hasClass('open') && !$issue.hasClass('closed')) {
+                $issue.addClass(state);
+              }
+
+              // Hook up all of the listeners
+              $issue.on('click', showPopover);
+              $issue.on('mouseover', showPopoverLater);
+
+              view.once('destroy', function() {
+                $issue.off('click', showPopover);
+                $issue.off('mouseover', showPopoverLater);
+              });
             }
-
-            // Hook up all of the listeners
-            $issue.on('click', showPopover);
-            $issue.on('mouseover', showPopoverLater);
-
-            view.once('destroy', function() {
-              $issue.off('click', showPopover);
-              $issue.off('mouseover', showPopoverLater);
-            });
-          }
-        });
+          })
+          .catch(function(err) {
+            // Only convert to link if we are sure the request was messed up vs
+            // a definitive doesn't exist 404
+            if(err.status < 400 && err.status > 499) {
+              convertToLink();
+            }
+          });
 
         function getModel() {
           var model = new IssueModel({
