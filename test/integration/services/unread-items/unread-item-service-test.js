@@ -11,12 +11,14 @@ function getHamcrest() {
   }
 }
 
-var testRequire = require('../test-require');
+var testRequire = require('../../test-require');
 var mockito = require('jsmockito').JsMockito;
 var hamcrest = getHamcrest();
-
+var blockTimer = require('../../block-timer');
 var Promise = require('bluebird');
 var assert = require('assert');
+var testGenerator = require('../../test-generator');
+var MockBadgeBatcherController = require('../../utils/mock-redis-batcher');
 
 var times = mockito.Verifiers.times;
 var never = mockito.Verifiers.never;
@@ -62,7 +64,7 @@ describe('unread-item-service', function() {
 
   before(function() {
     /* Don't send batches out */
-    unreadItemService = testRequire("./services/unread-item-service");
+    unreadItemService = testRequire("./services/unread-items");
     mongoUtils = testRequire('./utils/mongo-utils');
     unreadItemService.testOnly.setSendBadgeUpdates(false);
   });
@@ -70,11 +72,10 @@ describe('unread-item-service', function() {
   after(function() {
     if (process.env.DISABLE_EMAIL_NOTIFY_CLEAR_AFTER_TEST) return;
 
-    var unreadItemServiceEngine = testRequire('./services/unread-item-service-engine');
+    var unreadItemServiceEngine = testRequire('./services/unread-items/engine');
     return unreadItemServiceEngine.testOnly.removeAllEmailNotifications();
   });
 
-  var blockTimer = require('../block-timer');
   before(blockTimer.on);
   after(blockTimer.off);
 
@@ -134,7 +135,7 @@ describe('unread-item-service', function() {
         userId1   = mongoUtils.getNewObjectIdString() + "";
 
         recentRoomCore = mockito.mock(testRequire('./services/core/recent-room-core'));
-        engine = mockito.mock(testRequire('./services/unread-item-service-engine'));
+        engine = mockito.mock(testRequire('./services/unread-items/engine'));
 
         // Last access times for all the rooms userId1 has visited
         var lastAccessTimes = {};
@@ -159,9 +160,9 @@ describe('unread-item-service', function() {
         mockito.when(engine).getLastChatTimestamps([])
         .thenReturn(Promise.resolve({}));
 
-        unreadItemService = testRequire.withProxies("./services/unread-item-service", {
-          './core/recent-room-core': recentRoomCore,
-          './unread-item-service-engine': engine
+        unreadItemService = testRequire.withProxies("./services/unread-items", {
+          '../core/recent-room-core': recentRoomCore,
+          './engine': engine
         });
 
       });
@@ -195,8 +196,8 @@ describe('unread-item-service', function() {
         var roomMembershipServiceMock = mockito.mock(testRequire('./services/room-membership-service'));
         var appEvents = mockito.spy(testRequire('gitter-web-appevents'));
 
-        var unreadItemService = testRequire.withProxies("./services/unread-item-service", {
-          './room-membership-service': roomMembershipServiceMock,
+        var unreadItemService = testRequire.withProxies("./services/unread-items", {
+          '../room-membership-service': roomMembershipServiceMock,
           'gitter-web-appevents': appEvents
         });
         unreadItemService.testOnly.setSendBadgeUpdates(false);
@@ -265,8 +266,8 @@ describe('unread-item-service', function() {
           return Promise.resolve(unreadItemDistributionResponse);
         });
 
-        unreadItemService = testRequire.withProxies("./services/unread-item-service", {
-          './unread-item-distribution': unreadItemDistribution,
+        unreadItemService = testRequire.withProxies("./services/unread-items", {
+          './distribution': unreadItemDistribution,
           // './categorise-users-in-room': categoriseUserInRoom,
           'gitter-web-appevents': appEvents,
         });
@@ -444,8 +445,8 @@ describe('unread-item-service', function() {
           return Promise.resolve(unreadItemDistributionResponse);
         });
 
-        unreadItemService = testRequire.withProxies("./services/unread-item-service", {
-          './unread-item-distribution': unreadItemDistribution,
+        unreadItemService = testRequire.withProxies("./services/unread-items", {
+          './distribution': unreadItemDistribution,
           'gitter-web-appevents': appEvents,
         });
         unreadItemService.testOnly.setSendBadgeUpdates(false);
@@ -514,7 +515,7 @@ describe('unread-item-service', function() {
     var unreadItemService;
 
     beforeEach(function() {
-      unreadItemService = testRequire("./services/unread-item-service");
+      unreadItemService = testRequire("./services/unread-items");
       unreadItemService.testOnly.setSendBadgeUpdates(false);
     });
 
@@ -663,18 +664,16 @@ describe('unread-item-service', function() {
 
     var userId1 = 'USERID1';
     var mongoUtils = testRequire('./utils/mongo-utils');
-    var testGenerator = require('../test-generator');
 
     beforeEach(function() {
-      var MockBadgeBatcherController = require('../utils/mock-redis-batcher');
       mockRedisBatcher = new MockBadgeBatcherController();
       appEvents = mockito.mock(require('gitter-web-appevents'));
       troupeId = mongoUtils.getNewObjectIdString();
       chatId = mongoUtils.getNewObjectIdString();
 
-      unreadItemService = testRequire.withProxies("./services/unread-item-service", {
+      unreadItemService = testRequire.withProxies("./services/unread-items", {
         'gitter-web-appevents': appEvents,
-        '../utils/redis-batcher': mockRedisBatcher
+        '../../utils/redis-batcher': mockRedisBatcher
       });
 
       processResultsForNewItemWithMentions = unreadItemService.testOnly.processResultsForNewItemWithMentions;
@@ -937,7 +936,7 @@ describe('unread-item-service', function() {
         parsed.presence = presence;
 
         processResultsForNewItemWithMentions(troupeId, chatId, parsed, results, isEdit);
-        
+
         if (meta.expectUserMentionedInNonMemberRoom.length) {
           meta.expectUserMentionedInNonMemberRoom.forEach(function(userId) {
             mockito.verify(appEvents, once).userMentionedInNonMemberRoom(equivalentMap({ userId: userId, troupeId: troupeId }));

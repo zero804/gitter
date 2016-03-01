@@ -17,7 +17,7 @@ var roomSort                       = require('gitter-realtime-client/lib/sorts-f
                                                                                           libraries that we don't need */
 var roomNameTrimmer                = require('../../../public/js/utils/room-name-trimmer');
 var isolateBurst                   = require('gitter-web-shared/burst/isolate-burst-array');
-var unreadItemService              = require('../../services/unread-item-service');
+var unreadItemService              = require('../../services/unread-items');
 var mongoUtils                     = require('../../utils/mongo-utils');
 var url                            = require('url');
 var cdn                            = require("../../web/cdn");

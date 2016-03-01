@@ -1845,7 +1845,7 @@ describe('room-service', function() {
       getRoomIdsMentioningUserMock = mockito.mockFunction();
       findRoomIdsForUserMock = mockito.mockFunction();
       roomService = testRequire.withProxies('./services/room-service', {
-        './unread-item-service': {
+        './unread-items': {
           getRoomIdsMentioningUser: getRoomIdsMentioningUserMock
         },
         './room-membership-service': {

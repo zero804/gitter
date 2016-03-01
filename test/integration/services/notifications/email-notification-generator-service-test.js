@@ -10,7 +10,7 @@ var Promise     = require('bluebird');
 
 var userSettingsService = testRequire('./services/user-settings-service');
 var fixtureLoader       = require('../../test-fixtures');
-var underlyingUnreadItemService = testRequire('./services/unread-item-service');
+var underlyingUnreadItemService = testRequire('./services/unread-items');
 var mongoUtils = testRequire('./utils/mongo-utils');
 var userRoomNotificationService = testRequire("./services/user-room-notification-service");
 
@@ -30,11 +30,11 @@ describe('email-notification-generator-service', function() {
 
   it('should send out an email notification for a user with unread items #slow', function(done) {
     var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
-    var unreadEngine = testRequire('./services/unread-item-service-engine');
+    var unreadEngine = testRequire('./services/unread-items/engine');
 
     var sendEmailNotifications = testRequire.withProxies('./services/notifications/email-notification-generator-service', {
       '../email-notification-service': emailNotificationServiceMock,
-      '../unread-item-service': unreadItemServiceMock
+      '../unread-items': unreadItemServiceMock
     });
 
     var itemId1 = mongoUtils.getNewObjectIdString();
@@ -78,11 +78,11 @@ describe('email-notification-generator-service', function() {
 
   it('SHOULD NOT email somebody who has opted out of notifications 1 #slow', function(done) {
     var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
-    var unreadEngine = testRequire('./services/unread-item-service-engine');
+    var unreadEngine = testRequire('./services/unread-items/engine');
 
     var sendEmailNotifications = testRequire.withProxies('./services/notifications/email-notification-generator-service', {
       '../email-notification-service': emailNotificationServiceMock,
-      '../unread-item-service': unreadItemServiceMock
+      '../unread-items': unreadItemServiceMock
     });
 
     var itemId1 = mongoUtils.getNewObjectIdString();
@@ -121,11 +121,11 @@ describe('email-notification-generator-service', function() {
 
   it('SHOULD NOT email somebody who has opted out of notifications 2 #slow', function(done) {
     var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
-    var unreadEngine = testRequire('./services/unread-item-service-engine');
+    var unreadEngine = testRequire('./services/unread-items/engine');
 
     var sendEmailNotifications = testRequire.withProxies('./services/notifications/email-notification-generator-service', {
       '../email-notification-service': emailNotificationServiceMock,
-      '../unread-item-service': unreadItemServiceMock
+      '../unread-items': unreadItemServiceMock
     });
 
 
@@ -178,11 +178,11 @@ describe('email-notification-generator-service', function() {
 
 it('SHOULD NOT email somebody who has opted out of notifications set to mention only #slow', function(done) {
   var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
-  var unreadEngine = testRequire('./services/unread-item-service-engine');
+  var unreadEngine = testRequire('./services/unread-items/engine');
 
   var sendEmailNotifications = testRequire.withProxies('./services/notifications/email-notification-generator-service', {
     '../email-notification-service': emailNotificationServiceMock,
-    '../unread-item-service': unreadItemServiceMock
+    '../unread-items': unreadItemServiceMock
   });
 
   var v = 0;
@@ -223,11 +223,11 @@ it('SHOULD NOT email somebody who has opted out of notifications set to mention 
   // TODO: handle mentions
   it('SHOULD email somebody who has not opted out of notifications for a specific troupe #slow', function(done) {
     var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
-    var unreadEngine = testRequire('./services/unread-item-service-engine');
+    var unreadEngine = testRequire('./services/unread-items/engine');
 
     var sendEmailNotifications = testRequire.withProxies('./services/notifications/email-notification-generator-service', {
       '../email-notification-service': emailNotificationServiceMock,
-      '../unread-item-service': unreadItemServiceMock
+      '../unread-items': unreadItemServiceMock
     });
 
     var itemId1 = mongoUtils.getNewObjectIdString();

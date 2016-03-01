@@ -4,7 +4,7 @@
 
 var userService = require('../../server/services/user-service');
 var troupeService = require('../../server/services/troupe-service');
-var unreadItemService = require('../../server/services/unread-item-service');
+var unreadItemService = require('../../server/services/unread-items');
 var collections = require('../../server/utils/collections');
 var categoriseUsersInRoom = require('../../server/services/categorise-users-in-room');
 var Promise = require('bluebird');

@@ -1,10 +1,11 @@
 "use strict";
 
-var testRequire = require('../test-require');
+var testRequire = require('../../test-require');
 var mockito = require('jsmockito').JsMockito;
 var mongoUtils = testRequire('./utils/mongo-utils');
 var Promise = require('bluebird');
 var assert = require('assert');
+var blockTimer = require('../../block-timer');
 
 function makeHash() {
   var hash = [];
@@ -15,7 +16,6 @@ function makeHash() {
 }
 
 describe('unread-item-distribution', function() {
-  var blockTimer = require('../block-timer');
   before(blockTimer.on);
   after(blockTimer.off);
 
@@ -96,10 +96,10 @@ describe('unread-item-distribution', function() {
       mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId2).thenReturn(Promise.resolve(troupeSomeLurkersUserHash));
       mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId3).thenReturn(Promise.resolve(troupeAllLurkersUserHash));
 
-      unreadItemDistribution = testRequire.withProxies("./services/unread-item-distribution", {
-        './room-membership-service': roomMembershipService,
-        './user-service': userService,
-        './room-permissions-model': roomPermissionsModel,
+      unreadItemDistribution = testRequire.withProxies("./services/unread-items/distribution", {
+        '../room-membership-service': roomMembershipService,
+        '../user-service': userService,
+        '../room-permissions-model': roomPermissionsModel,
       });
 
     });
@@ -230,9 +230,9 @@ describe('unread-item-distribution', function() {
       userService = mockito.mock(testRequire('./services/user-service'));
       roomPermissionsModel = mockito.mockFunction();
 
-      unreadItemDistribution = testRequire.withProxies("./services/unread-item-distribution", {
-        './user-service': userService,
-        './room-permissions-model': roomPermissionsModel,
+      unreadItemDistribution = testRequire.withProxies("./services/unread-items/distribution", {
+        '../user-service': userService,
+        '../room-permissions-model': roomPermissionsModel,
       });
     });
 
