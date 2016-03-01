@@ -10,7 +10,7 @@ var uniq = Math.floor(Math.random() * 10000000);
 function garbageCollection() {
   var now = Date.now();
 
-  var keys = localStore.getKeys()
+  localStore.getKeys()
     .forEach(function(key) {
       if (key.indexOf('lock:') !== 0) return;
 
