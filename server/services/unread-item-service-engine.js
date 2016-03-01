@@ -1,18 +1,18 @@
 "use strict";
 
-var config      = require('gitter-web-env');
-var stats       = config.stats;
-var redis            = require("../utils/redis");
-var winston          = require('../utils/winston');
-var mongoUtils       = require('../utils/mongo-utils');
-var Scripto          = require('gitter-redis-scripto');
-var assert           = require('assert');
-var debug            = require('debug')('gitter:unread-items-engine');
-var redisClient      = redis.getClient();
-var scriptManager    = new Scripto(redisClient);
-var _                = require('lodash');
-var Promise          = require('bluebird');
-var moment           = require('moment');
+var config        = require('gitter-web-env');
+var stats         = config.stats;
+var redis         = require("../utils/redis");
+var winston       = require('../utils/winston');
+var mongoUtils    = require('../utils/mongo-utils');
+var Scripto       = require('gitter-redis-scripto');
+var assert        = require('assert');
+var debug         = require('debug')('gitter:unread-items-engine');
+var redisClient   = redis.getClient();
+var scriptManager = new Scripto(redisClient);
+var _             = require('lodash');
+var Promise       = require('bluebird');
+var moment        = require('moment');
 
 scriptManager.loadFromDir(__dirname + '/../../redis-lua/unread');
 var EMAIL_NOTIFICATION_HASH_KEY = "unread:email_notify";

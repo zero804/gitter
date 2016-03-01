@@ -68,12 +68,11 @@ describe('unread-item-service', function() {
     unreadItemService.testOnly.setSendBadgeUpdates(false);
   });
 
-  after(function(done) {
-    if (process.env.DISABLE_EMAIL_NOTIFY_CLEAR_AFTER_TEST) return done();
+  after(function() {
+    if (process.env.DISABLE_EMAIL_NOTIFY_CLEAR_AFTER_TEST) return;
 
     var unreadItemServiceEngine = testRequire('./services/unread-item-service-engine');
-    unreadItemServiceEngine.testOnly.removeAllEmailNotifications()
-      .nodeify(done);
+    return unreadItemServiceEngine.testOnly.removeAllEmailNotifications();
   });
 
   var blockTimer = require('../block-timer');
@@ -168,250 +167,26 @@ describe('unread-item-service', function() {
 
       });
 
-      it('should get activity for rooms with recent messages', function(done) {
-        unreadItemService.getActivityIndicatorForTroupeIds([troupeId1, troupeId2, troupeId3], userId1)
-        .then(function(activity) {
-          assert.deepEqual(Object.keys(activity).length, 2);
-          assert.deepEqual(activity[troupeId1], true); // Message more recent than the last access
-          assert.deepEqual(activity[troupeId3], false); // User visited the room after this msg
-        })
-        .nodeify(done);
+      it('should get activity for rooms with recent messages', function() {
+        return unreadItemService.getActivityIndicatorForTroupeIds([troupeId1, troupeId2, troupeId3], userId1)
+          .then(function(activity) {
+            assert.deepEqual(Object.keys(activity).length, 2);
+            assert.deepEqual(activity[troupeId1], true); // Message more recent than the last access
+            assert.deepEqual(activity[troupeId3], false); // User visited the room after this msg
+          });
       });
 
-      it('should not return any activity if no rooms provided', function(done) {
-        unreadItemService.getActivityIndicatorForTroupeIds([], userId1)
-        .then(function(activity) {
-          assert.deepEqual(Object.keys(activity).length, 0);
-        })
-        .nodeify(done);
-      });
-
-    });
-
-    describe('parseChat', function() {
-      var chatId;
-      var troupeId, troupeId2, troupeId3;
-      var fromUserId;
-      var userId1;
-      var userId2;
-      var userId3;
-      var user3;
-      var roomMembershipService;
-      var userService;
-      var roomPermissionsModel;
-      var unreadItemService;
-      var troupeNoLurkers;
-      var troupeSomeLurkers;
-      var troupeAllLurkers;
-      var singleMention;
-      var groupMention;
-      var duplicateMention;
-      var nonMemberMention;
-      var troupeNoLurkersUserHash, troupeSomeLurkersUserHash, troupeAllLurkersUserHash;
-
-      beforeEach(function() {
-        troupeId = mongoUtils.getNewObjectIdString() + "";
-        troupeId2 = mongoUtils.getNewObjectIdString() + "";
-        troupeId3 = mongoUtils.getNewObjectIdString() + "";
-        chatId = mongoUtils.getNewObjectIdString() + "";
-        fromUserId = mongoUtils.getNewObjectIdString() + "";
-        userId1 = mongoUtils.getNewObjectIdString() + "";
-        userId2 = mongoUtils.getNewObjectIdString() + "";
-        userId3 = mongoUtils.getNewObjectIdString() + "";
-        user3 = { id: userId3 };
-
-        singleMention = [{
-          userId: userId1
-        }];
-
-        groupMention = [{
-          group: true,
-          userIds: [userId1, userId2]
-        }];
-
-        duplicateMention = [{
-          userId: userId1
-        }, {
-          userId: userId1
-        }];
-
-        nonMemberMention = [{
-          userId: userId3
-        }];
-
-        troupeNoLurkers = {
-          id: troupeId,
-          _id: troupeId,
-        };
-        troupeNoLurkersUserHash = makeHash(fromUserId, false, userId1, false, userId2, false);
-
-        troupeSomeLurkers = {
-          id: troupeId2,
-          _id: troupeId2,
-        };
-        troupeSomeLurkersUserHash = makeHash(fromUserId, false, userId1, false, userId2, true);
-
-        troupeAllLurkers = {
-          id: troupeId3,
-          _id: troupeId3,
-        };
-        troupeAllLurkersUserHash = makeHash(fromUserId, true, userId1, true, userId2, true);
-
-        roomMembershipService = mockito.mock(testRequire('./services/room-membership-service'));
-        userService = mockito.mock(testRequire('./services/user-service'));
-        roomPermissionsModel = mockito.mockFunction();
-
-        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId).thenReturn(Promise.resolve(troupeNoLurkersUserHash));
-        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId2).thenReturn(Promise.resolve(troupeSomeLurkersUserHash));
-        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId3).thenReturn(Promise.resolve(troupeAllLurkersUserHash));
-
-        unreadItemService = testRequire.withProxies("./services/unread-item-service", {
-          './room-membership-service': roomMembershipService,
-          './user-service': userService,
-          './room-permissions-model': roomPermissionsModel,
-        });
-        unreadItemService.testOnly.setSendBadgeUpdates(false);
-
-      });
-
-      it('should parse messages with no mentions, no lurkers', function(done) {
-
-        unreadItemService.testOnly.parseChat(fromUserId, troupeNoLurkers, [])
-          .then(function(result) {
-            assert.deepEqual(result.notifyUserIds, [userId1, userId2]);
-            assert.deepEqual(result.mentionUserIds, []);
-            assert.deepEqual(result.activityOnlyUserIds, []);
-            assert.deepEqual(result.notifyNewRoomUserIds, []);
-
-          })
-          .nodeify(done);
-      });
-
-      it('should parse messages with no mentions, some lurkers', function(done) {
-        unreadItemService.testOnly.parseChat(fromUserId, troupeSomeLurkers, [])
-          .then(function(result) {
-            assert.deepEqual(result.notifyUserIds, [userId1]);
-            assert.deepEqual(result.mentionUserIds, []);
-            assert.deepEqual(result.activityOnlyUserIds, [userId2]);
-            assert.deepEqual(result.notifyNewRoomUserIds, []);
-
-          })
-          .nodeify(done);
-      });
-
-      it('should parse messages with no mentions, all lurkers', function(done) {
-        unreadItemService.testOnly.parseChat(fromUserId, troupeAllLurkers, [])
-          .then(function(result) {
-            assert.deepEqual(result.notifyUserIds, []);
-            assert.deepEqual(result.mentionUserIds, []);
-            assert.deepEqual(result.activityOnlyUserIds, [userId1, userId2]);
-            assert.deepEqual(result.notifyNewRoomUserIds, []);
-
-          })
-          .nodeify(done);
-      });
-
-      it('should parse messages with user mentions to non lurkers', function(done) {
-        unreadItemService.testOnly.parseChat(fromUserId, troupeNoLurkers, singleMention)
-          .then(function(result) {
-            assert.deepEqual(result.notifyUserIds, [userId1, userId2]);
-            assert.deepEqual(result.mentionUserIds, [userId1]);
-            assert.deepEqual(result.activityOnlyUserIds, []);
-            assert.deepEqual(result.notifyNewRoomUserIds, []);
-
-          })
-          .nodeify(done);
-      });
-
-      it('should parse messages with user mentions to lurkers', function(done) {
-        unreadItemService.testOnly.parseChat(fromUserId, troupeAllLurkers, singleMention)
-          .then(function(result) {
-            assert.deepEqual(result.notifyUserIds, [userId1]);
-            assert.deepEqual(result.mentionUserIds, [userId1]);
-            assert.deepEqual(result.activityOnlyUserIds, [userId2]);
-            assert.deepEqual(result.notifyNewRoomUserIds, []);
-
-          })
-          .nodeify(done);
-      });
-
-      it('should parse messages with group mentions', function(done) {
-        unreadItemService.testOnly.parseChat(fromUserId, troupeSomeLurkers, groupMention)
-          .then(function(result) {
-            assert.deepEqual(result.notifyUserIds, [userId1, userId2]);
-            assert.deepEqual(result.mentionUserIds, [userId1, userId2]);
-            assert.deepEqual(result.activityOnlyUserIds, []);
-            assert.deepEqual(result.notifyNewRoomUserIds, []);
-
-          })
-          .nodeify(done);
-      });
-
-      it('should parse messages with duplicate mentions', function(done) {
-
-        unreadItemService.testOnly.parseChat(fromUserId, troupeSomeLurkers, duplicateMention)
-          .then(function(result) {
-            assert.deepEqual(result.notifyUserIds, [userId1]);
-            assert.deepEqual(result.mentionUserIds, [userId1]);
-            assert.deepEqual(result.activityOnlyUserIds, [userId2]);
-            assert.deepEqual(result.notifyNewRoomUserIds, []);
-
-          })
-          .nodeify(done);
-      });
-
-      it('should parse messages with mentions to non members who are allowed in the room', function(done) {
-        mockito.when(userService).findByIds([userId3])
-          .thenReturn(Promise.resolve([user3]));
-
-        mockito.when(roomPermissionsModel)(user3, 'join', troupeSomeLurkers)
-          .thenReturn(Promise.resolve(true));
-
-        unreadItemService.testOnly.parseChat(fromUserId, troupeSomeLurkers, nonMemberMention)
-          .then(function(result) {
-            assert.deepEqual(result.notifyUserIds, [userId1, userId3]);
-            assert.deepEqual(result.mentionUserIds, [userId3]);
-            assert.deepEqual(result.activityOnlyUserIds, [userId2]);
-            assert.deepEqual(result.notifyNewRoomUserIds, [userId3]);
-          })
-          .nodeify(done);
-      });
-
-      it('should parse messages with mentions to non members who are not allowed in the room', function(done) {
-        mockito.when(userService).findByIds([userId3])
-          .thenReturn(Promise.resolve([user3]));
-
-        mockito.when(roomPermissionsModel)(user3, 'join', troupeSomeLurkers)
-          .thenReturn(Promise.resolve(false));
-
-        unreadItemService.testOnly.parseChat(fromUserId, troupeSomeLurkers, nonMemberMention)
-          .then(function(result) {
-            assert.deepEqual(result.notifyUserIds, [userId1]);
-            assert.deepEqual(result.mentionUserIds, []);
-            assert.deepEqual(result.activityOnlyUserIds, [userId2]);
-            assert.deepEqual(result.notifyNewRoomUserIds, []);
-          })
-          .nodeify(done);
-      });
-
-      it('should parse messages with mentions to non members who are not on gitter', function(done) {
-        mockito.when(userService).findByIds([userId3])
-          .thenReturn(Promise.resolve([]));
-
-        unreadItemService.testOnly.parseChat(fromUserId, troupeSomeLurkers, nonMemberMention)
-          .then(function(result) {
-            assert.deepEqual(result.notifyUserIds, [userId1]);
-            assert.deepEqual(result.mentionUserIds, []);
-            assert.deepEqual(result.activityOnlyUserIds, [userId2]);
-            assert.deepEqual(result.notifyNewRoomUserIds, []);
-          })
-          .nodeify(done);
+      it('should not return any activity if no rooms provided', function() {
+        return unreadItemService.getActivityIndicatorForTroupeIds([], userId1)
+          .then(function(activity) {
+            assert.deepEqual(Object.keys(activity).length, 0);
+          });
       });
 
     });
 
     describe('removeItem', function() {
-      it('should remove an item from the unread-item-store', function(done) {
+      it('should remove an item from the unread-item-store', function() {
         var troupeId1 = mongoUtils.getNewObjectIdString();
         var chatId = mongoUtils.getNewObjectIdString();
         var userId1 = mongoUtils.getNewObjectIdString();
@@ -434,122 +209,60 @@ describe('unread-item-service', function() {
 
         mockito.when(roomMembershipServiceMock).findMembersForRoomWithLurk(troupeId1).thenReturn(Promise.resolve(usersWithLurkHash));
 
-        unreadItemService.testOnly.removeItem(troupeId1, chatId)
+        return unreadItemService.testOnly.removeItem(troupeId1, chatId)
           .then(function() {
             // Two calls here, not three
             mockito.verify(appEvents, once).unreadItemsRemoved(userId1, troupeId1);
             mockito.verify(appEvents, once).unreadItemsRemoved(userId2, troupeId1);
             mockito.verify(appEvents, once).unreadItemsRemoved(userId3, troupeId1);
 
-            return unreadItemService.getBadgeCountsForUserIds([userId1, userId2, userId3])
-              .then(function(result) {
-                assert.equal(result[userId1], 0);
-                assert.equal(result[userId2], 0);
-                assert.equal(result[userId3], 0);
-              });
-
+            return unreadItemService.getBadgeCountsForUserIds([userId1, userId2, userId3]);
           })
-          .nodeify(done);
+          .then(function(result) {
+            assert.equal(result[userId1], 0);
+            assert.equal(result[userId2], 0);
+            assert.equal(result[userId3], 0);
+          });
 
       });
     });
 
     describe('createChatUnreadItems', function() {
       var chatId;
-      var troupeId, troupeId2, troupeId3;
+      var troupeId;
       var fromUserId;
       var userId1;
       var userId2;
       var userId3;
-      var user3;
-      var roomMembershipService;
       var appEvents;
-      var userService;
-      var roomPermissionsModel;
-      var unreadItemService;
       var categoriseUserInRoom;
-      var troupeNoLurkers;
-      var troupeSomeLurkers;
-      var troupeAllLurkers;
-      var chatWithNoMentions;
-      var chatWithSingleMention;
-      var chatWithGroupMention;
-      var chatWithDuplicateMention;
-      var chatWithNonMemberMention;
-      var troupeNoLurkersUserHash;
-      var troupeSomeLurkersUserHash;
-      var troupeAllLurkersUserHash;
+      var troupe;
+      var chat;
+      var unreadItemDistribution;
+      var unreadItemDistributionResponse;
 
       beforeEach(function() {
         troupeId = mongoUtils.getNewObjectIdString() + "";
-        troupeId2 = mongoUtils.getNewObjectIdString() + "";
-        troupeId3 = mongoUtils.getNewObjectIdString() + "";
         chatId = mongoUtils.getNewObjectIdString() + "";
         fromUserId = mongoUtils.getNewObjectIdString() + "";
         userId1 = mongoUtils.getNewObjectIdString() + "";
         userId2 = mongoUtils.getNewObjectIdString() + "";
         userId3 = mongoUtils.getNewObjectIdString() + "";
-        user3 = { id: userId3 };
 
-        chatWithNoMentions = {
+        chat = {
           id: chatId,
           mentions: []
         };
 
-        chatWithSingleMention = {
-          id: chatId,
-          mentions: [{
-            userId: userId1
-          }]
-        };
-
-        chatWithGroupMention = {
-          id: chatId,
-          mentions: [{
-            group: true,
-            userIds: [userId1, userId2]
-          }]
-        };
-
-        chatWithDuplicateMention = {
-          id: chatId,
-          mentions: [{
-            userId: userId1
-          }, {
-            userId: userId1
-          }]
-        };
-
-        chatWithNonMemberMention = {
-          id: chatId,
-          mentions: [{
-            userId: userId3
-          }]
-        };
-
-        troupeNoLurkers = {
+        troupe = {
           id: troupeId,
           _id: troupeId,
         };
-        troupeNoLurkersUserHash = makeHash(fromUserId, false, userId1, false, userId2, false);
 
-        troupeSomeLurkers = {
-          id: troupeId2,
-          _id: troupeId2,
-        };
-        troupeSomeLurkersUserHash = makeHash(fromUserId, false, userId1, false, userId2, true);
-
-        troupeAllLurkers = {
-          id: troupeId3,
-          _id: troupeId3,
-        };
-        troupeAllLurkersUserHash = makeHash(fromUserId, true, userId1, true, userId2, true);
-
-        roomMembershipService = mockito.mock(testRequire('./services/room-membership-service'));
-        userService = mockito.mock(testRequire('./services/user-service'));
         appEvents = mockito.mock(testRequire('gitter-web-appevents'));
-        roomPermissionsModel = mockito.mockFunction();
         categoriseUserInRoom = mockito.mockFunction();
+        unreadItemDistribution = mockito.mockFunction();
+        unreadItemDistributionResponse = null;
 
         mockito.when(categoriseUserInRoom)().then(function(roomId, userIds) {
           /* Always return all users as online */
@@ -560,23 +273,29 @@ describe('unread-item-service', function() {
           }, {}));
         });
 
-        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId).thenReturn(Promise.resolve(troupeNoLurkersUserHash));
-        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId2).thenReturn(Promise.resolve(troupeSomeLurkersUserHash));
-        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId3).thenReturn(Promise.resolve(troupeAllLurkersUserHash));
+        mockito.when(unreadItemDistribution)().then(function() {
+          return Promise.resolve(unreadItemDistributionResponse);
+        });
 
         unreadItemService = testRequire.withProxies("./services/unread-item-service", {
-          './room-membership-service': roomMembershipService,
-          './user-service': userService,
+          './unread-item-distribution': unreadItemDistribution,
           './categorise-users-in-room': categoriseUserInRoom,
           'gitter-web-appevents': appEvents,
-          './room-permissions-model': roomPermissionsModel,
         });
         unreadItemService.testOnly.setSendBadgeUpdates(false);
 
       });
 
-      it('should create messages with no mentions, no lurkers', function(done) {
-        unreadItemService.createChatUnreadItems(fromUserId, troupeNoLurkers, chatWithNoMentions)
+      it('should create messages with no mentions, no lurkers', function() {
+        unreadItemDistributionResponse = {
+          notifyUserIds: [userId1, userId2],
+          mentionUserIds: [],
+          activityOnlyUserIds: [],
+          notifyNewRoomUserIds: [],
+          announcement: false
+        };
+
+        return unreadItemService.createChatUnreadItems(fromUserId, troupe, chat)
           .then(function() {
             mockito.verify(appEvents, never()).newUnreadItem(fromUserId, anything(), anything());
             mockito.verify(appEvents).newUnreadItem(userId1, troupeId, hasMember("chat", [chatId]));
@@ -585,38 +304,58 @@ describe('unread-item-service', function() {
             mockito.verify(appEvents, never()).troupeUnreadCountsChange(hasMember('userId', fromUserId));
             mockito.verify(appEvents).troupeUnreadCountsChange(deep({userId: userId1, troupeId: troupeId, total: 1, mentions: undefined }));
             mockito.verify(appEvents).troupeUnreadCountsChange(deep({userId: userId2, troupeId: troupeId, total: 1, mentions: undefined  }));
-          })
-          .nodeify(done);
+          });
       });
 
-      it('should create messages with no mentions, some lurkers', function(done) {
-        unreadItemService.createChatUnreadItems(fromUserId, troupeSomeLurkers, chatWithNoMentions)
+      it('should create messages with no mentions, some lurkers', function() {
+        unreadItemDistributionResponse = {
+          notifyUserIds: [userId1],
+          mentionUserIds: [],
+          activityOnlyUserIds: [userId2],
+          notifyNewRoomUserIds: [],
+          announcement: false
+        };
+
+        return unreadItemService.createChatUnreadItems(fromUserId, troupe, chat)
           .then(function() {
             mockito.verify(appEvents, never()).newUnreadItem(fromUserId, anything(), anything());
-            mockito.verify(appEvents).newUnreadItem(userId1, troupeId2, hasMember("chat", [chatId]));
+            mockito.verify(appEvents).newUnreadItem(userId1, troupeId, hasMember("chat", [chatId]));
             mockito.verify(appEvents, never()).troupeUnreadCountsChange(hasMember('userId', fromUserId));
-            mockito.verify(appEvents).troupeUnreadCountsChange(deep({userId: userId1, troupeId: troupeId2, total: 1, mentions: undefined }));
+            mockito.verify(appEvents).troupeUnreadCountsChange(deep({userId: userId1, troupeId: troupeId, total: 1, mentions: undefined }));
 
-            mockito.verify(appEvents).newLurkActivity(deep({ userId: userId2, troupeId: troupeId2 }));
-          })
-          .nodeify(done);
+            mockito.verify(appEvents).newLurkActivity(deep({ userId: userId2, troupeId: troupeId }));
+          });
       });
 
-      it('should create messages with no mentions, all lurkers', function(done) {
-        unreadItemService.createChatUnreadItems(fromUserId, troupeAllLurkers, chatWithNoMentions)
+      it('should create messages with no mentions, all lurkers', function() {
+        unreadItemDistributionResponse = {
+          notifyUserIds: [],
+          mentionUserIds: [],
+          activityOnlyUserIds: [userId1, userId2],
+          notifyNewRoomUserIds: [],
+          announcement: false
+        };
+
+        return unreadItemService.createChatUnreadItems(fromUserId, troupe, chat)
           .then(function() {
             mockito.verify(appEvents, never()).newUnreadItem(anything(), anything(), anything());
             mockito.verify(appEvents, never()).troupeUnreadCountsChange(anything());
 
-            mockito.verify(appEvents).newLurkActivity(deep({ userId: userId1, troupeId: troupeId3 }));
-            mockito.verify(appEvents).newLurkActivity(deep({ userId: userId2, troupeId: troupeId3 }));
-
-          })
-          .nodeify(done);
+            mockito.verify(appEvents).newLurkActivity(deep({ userId: userId1, troupeId: troupeId }));
+            mockito.verify(appEvents).newLurkActivity(deep({ userId: userId2, troupeId: troupeId }));
+          });
       });
 
-      it('should create messages with user mentions to non lurkers', function(done) {
-        unreadItemService.createChatUnreadItems(fromUserId, troupeNoLurkers, chatWithSingleMention)
+      it('should create messages with user mentions to non lurkers', function() {
+        unreadItemDistributionResponse = {
+          notifyUserIds: [userId1, userId2],
+          mentionUserIds: [userId1],
+          activityOnlyUserIds: [],
+          notifyNewRoomUserIds: [],
+          announcement: false
+        };
+
+        return unreadItemService.createChatUnreadItems(fromUserId, troupe, chat)
           .then(function() {
             mockito.verify(appEvents, never()).newUnreadItem(fromUserId, anything(), anything());
             mockito.verify(appEvents).newUnreadItem(userId1, troupeId, hasMember("chat", [chatId]));
@@ -625,151 +364,93 @@ describe('unread-item-service', function() {
             mockito.verify(appEvents, never()).troupeUnreadCountsChange(hasMember('userId', fromUserId));
             mockito.verify(appEvents).troupeUnreadCountsChange(deep({userId: userId1, troupeId: troupeId, total: 1, mentions: 1 }));
             mockito.verify(appEvents).troupeUnreadCountsChange(deep({userId: userId2, troupeId: troupeId, total: 1  }));
-          })
-          .nodeify(done);
+          });
       });
 
-      it('should create messages with user mentions to lurkers', function(done) {
-        unreadItemService.createChatUnreadItems(fromUserId, troupeAllLurkers, chatWithSingleMention)
+      it('should create messages with user mentions to lurkers', function() {
+        unreadItemDistributionResponse = {
+          notifyUserIds: [userId1],
+          mentionUserIds: [userId1],
+          activityOnlyUserIds: [userId1, userId2],
+          notifyNewRoomUserIds: [],
+          announcement: false
+        };
+
+        return unreadItemService.createChatUnreadItems(fromUserId, troupe, chat)
           .then(function() {
             mockito.verify(appEvents, never()).newUnreadItem(fromUserId, anything(), anything());
 
-            mockito.verify(appEvents).newUnreadItem(userId1, troupeId3, hasMember("chat", [chatId]));
-            mockito.verify(appEvents).troupeUnreadCountsChange(deep({userId: userId1, troupeId: troupeId3, total: 1, mentions: 1 }));
+            mockito.verify(appEvents).newUnreadItem(userId1, troupeId, hasMember("chat", [chatId]));
+            mockito.verify(appEvents).troupeUnreadCountsChange(deep({userId: userId1, troupeId: troupeId, total: 1, mentions: 1 }));
 
-            mockito.verify(appEvents).newLurkActivity(deep({ userId: userId2, troupeId: troupeId3 }));
-          })
-          .nodeify(done);
+            mockito.verify(appEvents).newLurkActivity(deep({ userId: userId2, troupeId: troupeId }));
+          });
       });
 
-      it('should create messages with group mentions', function(done) {
-        unreadItemService.createChatUnreadItems(fromUserId, troupeSomeLurkers, chatWithGroupMention)
+      it('should create messages with group mentions', function() {
+        unreadItemDistributionResponse = {
+          notifyUserIds: [userId1, userId2],
+          mentionUserIds: [userId1, userId2],
+          activityOnlyUserIds: [userId1, userId2],
+          notifyNewRoomUserIds: [],
+          announcement: true
+        };
+
+        return unreadItemService.createChatUnreadItems(fromUserId, troupe, chat)
           .then(function() {
             mockito.verify(appEvents, never()).newUnreadItem(fromUserId, anything(), anything());
-            mockito.verify(appEvents).newUnreadItem(userId1, troupeId2, hasMember("chat", [chatId]));
-            mockito.verify(appEvents).newUnreadItem(userId2, troupeId2, hasMember("chat", [chatId]));
+            mockito.verify(appEvents).newUnreadItem(userId1, troupeId, hasMember("chat", [chatId]));
+            mockito.verify(appEvents).newUnreadItem(userId2, troupeId, hasMember("chat", [chatId]));
 
             mockito.verify(appEvents, never()).troupeUnreadCountsChange(hasMember('userId', fromUserId));
-            mockito.verify(appEvents).troupeUnreadCountsChange(deep({userId: userId1, troupeId: troupeId2, total: 1, mentions: 1 }));
-            mockito.verify(appEvents).troupeUnreadCountsChange(deep({userId: userId2, troupeId: troupeId2, total: 1, mentions: 1  }));
-
-          })
-          .nodeify(done);
-      });
-
-      it('should create messages with duplicate mentions', function(done) {
-
-        unreadItemService.createChatUnreadItems(fromUserId, troupeSomeLurkers, chatWithDuplicateMention)
-          .then(function() {
-            mockito.verify(appEvents, never()).newUnreadItem(fromUserId, anything(), anything());
-            mockito.verify(appEvents).newUnreadItem(userId1, troupeId2, hasMember("chat", [chatId]));
-            mockito.verify(appEvents, never()).newUnreadItem(userId2, troupeId2, anything());
-
-            mockito.verify(appEvents, never()).troupeUnreadCountsChange(hasMember('userId', fromUserId));
-            mockito.verify(appEvents).troupeUnreadCountsChange(deep({userId: userId1, troupeId: troupeId2, total: 1, mentions: 1 }));
-
-          })
-          .nodeify(done);
+            mockito.verify(appEvents).troupeUnreadCountsChange(deep({userId: userId1, troupeId: troupeId, total: 1, mentions: 1 }));
+            mockito.verify(appEvents).troupeUnreadCountsChange(deep({userId: userId2, troupeId: troupeId, total: 1, mentions: 1  }));
+          });
       });
 
     });
 
     describe('updateChatUnreadItems', function() {
       var chatId;
-      var troupeId, troupeId2, troupeId3;
+      var troupeId;
       var fromUserId;
       var userId1;
       var userId2;
       var userId3;
-      var user3;
-      var roomMembershipService;
       var appEvents;
-      var userService;
-      var roomPermissionsModel;
       var categoriseUserInRoom;
       var unreadItemService;
-      var troupeNoLurkers;
-      var troupeSomeLurkers;
-      var troupeAllLurkers;
-      var chatWithNoMentions;
-      var chatWithSingleMention;
-      var chatWithGroupMention;
-      var chatWithDuplicateMention;
-      var chatWithNonMemberMention;
-      var troupeNoLurkersUserHash;
-      var troupeSomeLurkersUserHash;
-      var troupeAllLurkersUserHash;
+      var troupe;
+      var chat;
+      var unreadItemDistribution;
+      var unreadItemDistributionResponse;
 
       beforeEach(function() {
         troupeId = mongoUtils.getNewObjectIdString() + "";
-        troupeId2 = mongoUtils.getNewObjectIdString() + "";
-        troupeId3 = mongoUtils.getNewObjectIdString() + "";
         chatId = mongoUtils.getNewObjectIdString() + "";
         fromUserId = mongoUtils.getNewObjectIdString() + "";
         userId1 = mongoUtils.getNewObjectIdString() + "";
         userId2 = mongoUtils.getNewObjectIdString() + "";
         userId3 = mongoUtils.getNewObjectIdString() + "";
-        user3 = { id: userId3 };
 
-        chatWithNoMentions = {
+        chat = {
           id: chatId,
           mentions: []
         };
 
-        chatWithSingleMention = {
-          id: chatId,
-          mentions: [{
-            userId: userId1
-          }]
-        };
-
-        chatWithGroupMention = {
-          id: chatId,
-          mentions: [{
-            group: true,
-            userIds: [userId1, userId2]
-          }]
-        };
-
-        chatWithDuplicateMention = {
-          id: chatId,
-          mentions: [{
-            userId: userId1
-          }, {
-            userId: userId1
-          }]
-        };
-
-        chatWithNonMemberMention = {
-          id: chatId,
-          mentions: [{
-            userId: userId3
-          }]
-        };
-
-        troupeNoLurkers = {
+        troupe = {
           _id: troupeId,
           id: troupeId,
         };
-        troupeNoLurkersUserHash = makeHash(fromUserId, false, userId1, false, userId2, false);
 
-        troupeSomeLurkers = {
-          _id: troupeId2,
-          id: troupeId2,
-        };
-        troupeSomeLurkersUserHash = makeHash(fromUserId, false, userId1, false, userId2, true);
-
-        troupeAllLurkers = {
-          id: troupeId3,
-          _id: troupeId3,
-        };
-        troupeAllLurkersUserHash = makeHash(fromUserId, true, userId1, true, userId2, true);
-
-        roomMembershipService = mockito.mock(testRequire('./services/room-membership-service'));
-        userService = mockito.mock(testRequire('./services/user-service'));
         appEvents = mockito.mock(testRequire('gitter-web-appevents'));
-        roomPermissionsModel = mockito.mockFunction();
         categoriseUserInRoom = mockito.mockFunction();
+
+        unreadItemDistribution = mockito.mockFunction();
+        unreadItemDistributionResponse = null;
+        mockito.when(unreadItemDistribution)().then(function() {
+          return Promise.resolve(unreadItemDistributionResponse);
+        });
 
         mockito.when(categoriseUserInRoom)().then(function(roomId, userIds) {
           /* Always return all users as online */
@@ -780,49 +461,66 @@ describe('unread-item-service', function() {
           }, {}));
         });
 
-        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId).thenReturn(Promise.resolve(troupeNoLurkersUserHash));
-        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId2).thenReturn(Promise.resolve(troupeSomeLurkersUserHash));
-        mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId3).thenReturn(Promise.resolve(troupeAllLurkersUserHash));
-
         unreadItemService = testRequire.withProxies("./services/unread-item-service", {
-          './room-membership-service': roomMembershipService,
-          './user-service': userService,
+          // './room-membership-service': roomMembershipService,
+          './unread-item-distribution': unreadItemDistribution,
+          // './user-service': userService,
           './categorise-users-in-room': categoriseUserInRoom,
           'gitter-web-appevents': appEvents,
-          './room-permissions-model': roomPermissionsModel,
+          // './room-permissions-model': roomPermissionsModel,
         });
         unreadItemService.testOnly.setSendBadgeUpdates(false);
 
       });
 
-      it('should handle updates that add no mentions to a message with no mentions', function(done) {
-        unreadItemService.updateChatUnreadItems(fromUserId, troupeNoLurkers, chatWithNoMentions, [])
+      it('should handle updates that add no mentions to a message with no mentions', function() {
+        unreadItemDistributionResponse = {
+          notifyUserIds: [userId1, userId2],
+          mentionUserIds: [],
+          activityOnlyUserIds: [],
+          notifyNewRoomUserIds: [],
+          announcement: false
+        };
+
+        return unreadItemService.updateChatUnreadItems(fromUserId, troupe, chat, [])
           .then(function() {
             mockito.verify(appEvents, never()).newUnreadItem();
             mockito.verify(appEvents, never()).troupeUnreadCountsChange();
-          })
-          .nodeify(done);
+          });
       });
 
-      it('should handle updates that add mentions to a message with no mentions', function(done) {
-        unreadItemService.updateChatUnreadItems(fromUserId, troupeNoLurkers, chatWithSingleMention, [])
+      it('should handle updates that add mentions to a message with no mentions', function() {
+        unreadItemDistributionResponse = {
+          notifyUserIds: [userId1, userId2],
+          mentionUserIds: [userId1],
+          activityOnlyUserIds: [],
+          notifyNewRoomUserIds: [],
+          announcement: false
+        };
+
+        return unreadItemService.updateChatUnreadItems(fromUserId, troupe, chat, [])
           .then(function() {
             mockito.verify(appEvents, never()).newUnreadItem(fromUserId, anything(), anything());
             mockito.verify(appEvents).newUnreadItem(userId1, troupeId, hasMember("chat", [chatId]));
 
             mockito.verify(appEvents, never()).troupeUnreadCountsChange(hasMember('userId', fromUserId));
             mockito.verify(appEvents).troupeUnreadCountsChange(deep({userId: userId1, troupeId: troupeId, total: 1, mentions: 1 }));
-          })
-          .nodeify(done);
+          });
       });
 
-      it('should handle updates that remove mentions from a message with mentions', function(done) {
-        unreadItemService.updateChatUnreadItems(fromUserId, troupeNoLurkers, chatWithNoMentions, [{ userId: userId1 }])
+      it('should handle updates that remove mentions from a message with mentions', function() {
+        unreadItemDistributionResponse = {
+          notifyUserIds: [userId1, userId2],
+          mentionUserIds: [],
+          activityOnlyUserIds: [],
+          notifyNewRoomUserIds: [],
+          announcement: false
+        };
+
+        return unreadItemService.updateChatUnreadItems(fromUserId, troupe, chat, [{ userId: userId1 }])
           .then(function() {
             mockito.verify(appEvents).newUnreadItem(userId1, troupeId, hasMember("chat", [chatId]));
-
-          })
-          .nodeify(done);
+          });
       });
 
       /* TODO: more tests here */
@@ -973,78 +671,6 @@ describe('unread-item-service', function() {
       assert.deepEqual(delta.addMentions, ['' + userId3]);
       assert.deepEqual(delta.remove, ['' + userId2]);
       assert.deepEqual(delta.addNewRoom, ['' + userId3]);
-    });
-
-  });
-
-  describe('findNonMembersWithAccess', function() {
-    var userService, roomPermissionsModel, unreadItemService;
-
-    beforeEach(function() {
-      userService = mockito.mock(testRequire('./services/user-service'));
-      roomPermissionsModel = mockito.mockFunction();
-
-      unreadItemService = testRequire.withProxies("./services/unread-item-service", {
-        './user-service': userService,
-        './room-permissions-model': roomPermissionsModel,
-      });
-    });
-
-    it('should handle an empty array', function(done) {
-      unreadItemService.testOnly.findNonMembersWithAccess({ }, [])
-        .then(function(userIds) {
-          assert.deepEqual(userIds, []);
-        })
-        .nodeify(done);
-    });
-
-    it('should handle one to one rooms', function(done) {
-      unreadItemService.testOnly.findNonMembersWithAccess({ oneToOne: true }, ['1','2','3'])
-        .then(function(userIds) {
-          assert.deepEqual(userIds, []);
-        })
-        .nodeify(done);
-    });
-
-    it('should handle private rooms', function(done) {
-      unreadItemService.testOnly.findNonMembersWithAccess({ security: 'PRIVATE' }, ['1','2','3'])
-        .then(function(userIds) {
-          assert.deepEqual(userIds, []);
-        })
-        .nodeify(done);
-    });
-
-    it('should handle public rooms', function(done) {
-      unreadItemService.testOnly.findNonMembersWithAccess({ security: 'PUBLIC' }, ['1','2','3'])
-        .then(function(userIds) {
-          assert.deepEqual(userIds, ['1','2','3']);
-        })
-        .nodeify(done);
-    });
-
-    it('should handle org and inherited rooms', function(done) {
-      var troupe = {};
-      mockito.when(userService).findByIds().then(function(userIds) {
-        assert.deepEqual(userIds, ['1','2','3']);
-        return Promise.resolve(userIds.map(function(userId) {
-          return {
-            _id: userId,
-            id: userId
-          };
-        }));
-      });
-
-      mockito.when(roomPermissionsModel)().then(function(user, operation, pTroupe) {
-        assert(pTroupe === troupe);
-        assert.strictEqual(operation, 'join');
-        return Promise.resolve(user.id !== '3');
-      });
-
-      unreadItemService.testOnly.findNonMembersWithAccess(troupe, ['1','2','3'])
-        .then(function(userIds) {
-          assert.deepEqual(userIds, ['1','2']); // User three should not be in the list
-        })
-        .nodeify(done);
     });
 
   });
