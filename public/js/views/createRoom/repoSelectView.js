@@ -56,7 +56,7 @@ var createCollection = function()  {
   var underlying = new repoModels.ReposCollection();
   underlying.fetch();
 
-  var c = new FilteredCollection(null, { model: repoModels.RepoModel, collection: underlying });
+  var c = new FilteredCollection({ model: repoModels.RepoModel, collection: underlying });
   // Trigger loading/loaded triggers on the filtered collection
   loadingFilteredCollection(c);
   c.setFilter(function() {

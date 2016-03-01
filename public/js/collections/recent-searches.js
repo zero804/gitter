@@ -49,14 +49,14 @@ var RecentSearchesCollection = Backbone.Collection.extend({
   sync: localStorageSync.sync,
 });
 
-var FilteredRecentSearchs = function(attrs, options) {
+var FilteredRecentSearches = function(attrs, options) {
   this.collection = new RecentSearchesCollection(null);
   attrs  = _.extend({}, attrs, { collection: this.collection });
   FilteredCollection.call(this, attrs, options);
 };
 
-FilteredRecentSearchs.prototype = _.extend(
-  FilteredRecentSearchs.prototype,
+FilteredRecentSearches.prototype = _.extend(
+  FilteredRecentSearches.prototype,
   FilteredCollection.prototype, {
 
   collectionFilter: function(model, index) { //jshint unused: true
@@ -86,4 +86,4 @@ FilteredRecentSearchs.prototype = _.extend(
   },
 });
 
-module.exports = FilteredRecentSearchs;
+module.exports = FilteredRecentSearches;

@@ -21,28 +21,27 @@ var SuggestedRoomsCollection = Backbone.Collection.extend({
 
 /* Filters out any rooms the user is already in, provided in options.roomCollection */
 
-var FilteredSuggestionsCollection = function() {
-  FilteredCollection.apply(this, arguments);
+var FilteredSuggestionsCollection = function(underlyingOptions) {
+
+  var roomsCollection = underlyingOptions.roomsCollection;
+  delete underlyingOptions.roomsCollection;
+
+  var underlyingCollection = this._underlyingCollection = new SuggestedRoomsCollection(null, underlyingOptions);
+
+  var options = {
+    collection: underlyingCollection,
+  };
+
+  FilteredCollection.call(this, options);
+
+  this.setFilter(function(model) {
+    return !roomsCollection.get(model.id);
+  });
 };
 
 FilteredSuggestionsCollection.prototype = _.extend(
 FilteredSuggestionsCollection.prototype,
 FilteredCollection.prototype, {
-  initialize: function(models, underlyingOptions) {
-    var roomsCollection = underlyingOptions.roomsCollection;
-    delete underlyingOptions.roomsCollection;
-
-    var underlyingCollection = this._underlyingCollection = new SuggestedRoomsCollection(models, underlyingOptions);
-
-    var options = {
-      collection: underlyingCollection,
-    };
-
-    FilteredCollection.prototype.initialize.call(this, null, options);
-    this.setFilter(function(model) {
-      return !roomsCollection.get(model.id);
-    });
-  },
 
   fetchForUser: function() {
     this._underlyingCollection.fetchForUser();

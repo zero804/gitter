@@ -9,6 +9,7 @@ var SyncMixin           = require('./sync-mixin');
 var SuggestedCollection = Backbone.Collection.extend({
   initialize: function(attrs) {//jshint unused: true
 
+    console.log(attrs);
     if (!attrs || !attrs.contextModel) {
       throw new Error('A valid model must be passed to SuggestedOrgCollection when initialized');
     }
@@ -24,6 +25,7 @@ var SuggestedCollection = Backbone.Collection.extend({
 
   onOrgNameUpdate: function(model, val) {//jshint unused: true
     if (!val || val  === '') return;
+    console.log('FETCHING');
     this.fetch({ reset: true });
   },
 

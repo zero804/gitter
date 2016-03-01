@@ -221,7 +221,7 @@ module.exports = (function () {
 
       var collection = this.suggestedRoomsCollection;
       if (!collection) {
-        collection = this.suggestedRoomsCollection = new FilteredSuggestedRoomCollection(null, { roomsCollection: troupeCollections.troupes });
+        collection = this.suggestedRoomsCollection = new FilteredSuggestedRoomCollection({ roomsCollection: troupeCollections.troupes });
 
         // For now, only fetch the suggested rooms once
         if (context.getTroupeId()) {
