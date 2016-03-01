@@ -16,16 +16,16 @@ var SyncMixin = require('collections/sync-mixin');
 var changeElementType = function(element, newType) {
   var resultantElement = element;
   if(element.tagName !== 'a') {
-    var attrs = {};
-    var attrNamedNodeMap = element.attributes;
-    Object.keys(attrNamedNodeMap).forEach(function(index) {
-      var attr = attrNamedNodeMap[index];
-      attrs[attr.nodeName] = attr.nodeValue;
-    });
-
     var newElement = document.createElement(newType);
     newElement.innerHTML = element.innerHTML;
     element.parentNode.replaceChild(newElement, element);
+
+    var attrNamedNodeMap = element.attributes;
+    Object.keys(attrNamedNodeMap).forEach(function(index) {
+      var attr = attrNamedNodeMap[index];
+      newElement.setAttribute(attr.nodeName, attr.nodeValue);
+    });
+
 
     resultantElement = newElement;
   }
@@ -124,7 +124,7 @@ module.exports = (function() {
     decorate: function(view) {
       var roomRepo = getRoomRepo();
 
-      view.el.querySelectorAll('*[data-link-type="issue"]').forEach(function(issueElement) {
+      Array.prototype.forEach.call(view.el.querySelectorAll('*[data-link-type="issue"]'), function(issueElement) {
         var repo = issueElement.dataset.issueRepo || roomRepo;
         var issueNumber = issueElement.dataset.issue;
 
@@ -132,7 +132,6 @@ module.exports = (function() {
         issueElement = changeElementType(issueElement, 'a');
         issueElement.setAttribute('href', getModel().get('html_url'));
         issueElement.setAttribute('target', '_blank');
-
 
         getIssueState(repo, issueNumber)
           .then(function(state) {
