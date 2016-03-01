@@ -5,8 +5,8 @@
     <img class="room-item__options" id="room-item-options-toggle" src='{{cdn "images/svg/menu/room-options.svg"}}'/>
   {{/unless}}
   {{#if unreadItems}}<div class="room-item__unreads">{{unreadItems}}</div>{{/if}}
-  {{#if lurkActivity}}<div class="room-item__lurk">&nbsp;</div>{{/if}}
-  {{#if mentions}}<div class="room-item__mentions">&#64;</div>{{/if}}
+  {{#if lurkActivity}}<div class="room-item__lurk" aria-label="Unread activity in {{name}}"></div>{{/if}}
+  {{#if mentions}}<div class="room-item__mentions" aria-label="You were mentioned in {{name}}"></div>{{/if}}
 </div>
 <ul class="room-item__options-menu">
   {{#if isNotOneToOne}}
