@@ -127,10 +127,14 @@ module.exports = (function() {
       Array.prototype.forEach.call(view.el.querySelectorAll('*[data-link-type="issue"]'), function(issueElement) {
         var repo = issueElement.dataset.issueRepo || roomRepo;
         var issueNumber = issueElement.dataset.issue;
+        var getGitHubIssueUrl = function() {
+           return 'https://github.com/' + repo + '/issues/' + issueNumber;
+        };
+
 
         // Convert to a link
         issueElement = changeElementType(issueElement, 'a');
-        issueElement.setAttribute('href', getModel().get('html_url'));
+        issueElement.setAttribute('href', getGitHubIssueUrl());
         issueElement.setAttribute('target', '_blank');
 
         getIssueState(repo, issueNumber)
@@ -159,7 +163,7 @@ module.exports = (function() {
           var model = new IssueModel({
             repo: repo,
             number: issueNumber,
-            html_url: 'https://github.com/' + repo + '/issues/' + issueNumber
+            html_url: getGitHubIssueUrl()
           });
 
           model.fetch({
