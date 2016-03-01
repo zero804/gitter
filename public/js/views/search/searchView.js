@@ -404,8 +404,8 @@ module.exports = (function() {
       masterCollection.comparator = 'priority';
 
       // filtered collections
-      this.rooms = new FilteredCollection(null, { model: Backbone.Model, collection: masterCollection });
-      this.chats = new FilteredCollection(null, { model: Backbone.Model, collection: masterCollection });
+      this.rooms = new FilteredCollection({ model: Backbone.Model, collection: masterCollection });
+      this.chats = new FilteredCollection({ model: Backbone.Model, collection: masterCollection });
 
       this.rooms.setFilter(function (model) {
         return !!model.get('url');
@@ -430,13 +430,13 @@ module.exports = (function() {
 
         masterCollection.remove(toRemove);
         masterCollection.add(data);
-        this.rooms.resetWith(masterCollection);
+        this.rooms.switchCollection(masterCollection);
       });
 
       this.listenTo(this.search, 'loaded:messages', function (data) {
         masterCollection.remove(this.chats.models); // we must remove the old chats before adding new ones
         masterCollection.set(data, { remove: false });
-        this.chats.resetWith(masterCollection);
+        this.chats.switchCollection(masterCollection);
       });
 
       this.listenTo(context.troupe(), 'change:id', function() {
