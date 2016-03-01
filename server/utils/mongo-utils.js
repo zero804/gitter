@@ -1,7 +1,7 @@
 "use strict";
 
 var ObjectID = require('mongodb').ObjectID;
-var _ = require('underscore');
+var _        = require('lodash');
 
 function stringToObjectID(string) {
   try {
@@ -126,6 +126,96 @@ function setIds(array) {
   });
   return array;
 }
+
+/**
+ * Given a set of conjunctions, attempts to return a mongo-efficient form of
+ * the query.
+ *
+ * So imagine you want to query for a set of user rooms, like
+ * userId: X1, roomId: Y1
+ * userId: X2, roomId: Y2
+ * userId: X3, roomId: Y3
+ *
+ * The default query would be
+ * `{ $or: [{ userId: X1, roomId: Y1 }, { userId: X2, roomId: Y2 }, etc ]}`
+ *
+ * Unfortunately, mongo will attempt to handle this conjunction by issuing
+ * `n` parallel queries, which is very inefficient, especially if the
+ * one of the terms in all the queries is common
+ *
+ * This method will attempt to group the terms either by the first term
+ * or the second, if it's possible to do so.
+ *
+ * For example, if all the roomId terms are equal, it is much faster to ask
+ * mongo for `{ roomId: Y1, userId: { $in: { X1, X2, X3} } }`
+ *
+ * A similar transform is possible if all the userIds are equal.
+ *
+ * While it's possible to break the query into more sets, there is a cpu cost
+ * associated with doing this, so only the trivial case is attempted.
+ *
+ */
+function conjunctionIds(terms, termIdentifiers) {
+  if (!terms.length) return { $or: terms };
+  if (terms.length < 3) return { $or: terms };
+
+  if (termIdentifiers.length !== 2) return { $or: terms };
+
+  var t1Identifier = termIdentifiers[0];
+  var t2Identifier = termIdentifiers[1];
+
+  var t1CommonValue = terms[0][t1Identifier];
+  var t1Common = true;
+  var t2CommonValue = terms[0][t2Identifier];
+  var t2Common = true;
+
+  for (var i = 1; i < terms.length; i++) {
+    var t1 = terms[i][t1Identifier];
+    var t2 = terms[i][t2Identifier];
+
+    if (t1CommonValue != t1) t1Common = false;
+    if (t2CommonValue != t2) t2Common = false;
+
+    if (!t1Common && !t2Common) break;
+  }
+
+  // Everything is the same. Just return the first term
+  if (t1Common && t2Common) return terms[0];
+
+  // If the first term is common for all conjunction terms...
+  if (t1Common) {
+    var t1CommonQuery = {};
+    t1CommonQuery[t1Identifier] = t1CommonValue;
+
+    var t2MultiQuery = {};
+    t2MultiQuery[t2Identifier] = {
+      $in: _.map(terms, function(term) {
+              return term[t2Identifier];
+            })
+    };
+
+    return { $and: [ t1CommonQuery, t2MultiQuery] };
+  }
+
+  // If the second term is common for all conjunction terms...
+  if (t2Common) {
+    var t2CommonQuery = {};
+    t2CommonQuery[t2Identifier] = t2CommonValue;
+
+    var t1MultiQuery = {};
+    t1MultiQuery[t1Identifier] = {
+      $in: _.map(terms, function(term) {
+              return term[t1Identifier];
+            })
+    };
+
+    return { $and: [ t2CommonQuery, t1MultiQuery] };
+  }
+
+  return { $or: terms };
+}
+exports.conjunctionIds = conjunctionIds;
+
 exports.setIds = setIds;
 
 exports.isLikeObjectId = isLikeObjectId;

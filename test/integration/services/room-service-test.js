@@ -15,6 +15,7 @@ var once = times(1);
 
 var persistence = testRequire("./services/persistence-service");
 var mongoUtils = testRequire("./utils/mongo-utils");
+var userRoomNotificationService = testRequire('./services/user-room-notification-service');
 
 describe('room-service', function() {
   before(fixtureLoader(fixture, {
@@ -1308,7 +1309,7 @@ describe('room-service', function() {
       }
     });
 
-    it('should prevent non-admin from removing users from rooms', function(done) {
+    it('should prevent non-admin from removing users from rooms', function() {
       return userIsInRoom(fixture.troupeCanRemove.uri, fixture.userToRemove)
         .then(function(here) {
           assert(here);
@@ -1322,11 +1323,10 @@ describe('room-service', function() {
         })
         .then(function(here) {
           assert(here);
-        })
-        .done(done);
+        });
     });
 
-    it('should prevent from removing users from one-to-one rooms', function(done) {
+    it('should prevent from removing users from one-to-one rooms', function() {
       return userIsInRoom(fixture.troupeCannotRemove.uri, fixture.userToRemove)
         .then(function(here) {
           assert(here);
@@ -1341,11 +1341,10 @@ describe('room-service', function() {
         })
         .then(function(here) {
           assert(here);
-        })
-        .done(done);
+        });
     });
 
-    it('should remove users from rooms', function(done) {
+    it('should remove users from rooms', function() {
       return userIsInRoom(fixture.troupeCanRemove.uri, fixture.userToRemove)
         .then(function(here) {
           assert(here);
@@ -1356,8 +1355,7 @@ describe('room-service', function() {
         })
         .then(function(here) {
           assert(!here);
-        })
-        .done(done);
+        });
     });
 
   });
@@ -1446,7 +1444,7 @@ describe('room-service', function() {
           createFav().nodeify(done);
         });
 
-        it('should remove favourite', function(done) {
+        it('should remove favourite', function() {
           var checkEvent = addListenner({
             url: '/user/' + fixture.userFavourite.id + '/rooms',
             operation: 'patch',
@@ -1459,59 +1457,56 @@ describe('room-service', function() {
             }
           });
 
-          roomService.hideRoomFromUser(fixture.troupeCanRemove.id, fixture.userFavourite.id)
-          .then(checkEvent) // Ensure event was emitted
-          .then(getFavs)
-          .then(function(favs) {
-            assert(!favs[fixture.troupeCanRemove.id]); // Favourite is removed
-          })
-          .then(checkHere)
-          .then(function(here) {
-            assert(here); // User is still in room
-          })
-          .done(done);
+          return roomService.hideRoomFromUser(fixture.troupeCanRemove.id, fixture.userFavourite.id)
+            .then(checkEvent) // Ensure event was emitted
+            .then(getFavs)
+            .then(function(favs) {
+              assert(!favs[fixture.troupeCanRemove.id]); // Favourite is removed
+            })
+            .then(checkHere)
+            .then(function(here) {
+              assert(here); // User is still in room
+            });
         });
 
-        it('should remove user from the room if lurking', function(done) {
+        it('should remove user from the room if lurking', function() {
           // Set user as lurking
-          roomService.updateTroupeLurkForUserId(fixture.userFavourite.id, fixture.troupeCanRemove.id, true)
-          .then(function() { // Get updated troupe
-            return troupeService.findById(fixture.troupeCanRemove.id);
-          })
-          .then(function(troupe) {
-            return roomService.hideRoomFromUser(troupe.id, fixture.userFavourite.id);
-          })
-          .then(getFavs)
-          .then(function(favs) {
-            assert(!favs[fixture.troupeCanRemove.id]); // Favourite is removed
-          })
-          .then(checkHere)
-          .then(function(here) {
-            assert(!here); // User has been removed
-          })
-          .done(done);
+          return userRoomNotificationService.updateSettingForUserRoom(fixture.userFavourite.id, fixture.troupeCanRemove.id, 'mention')
+            .then(function() { // Get updated troupe
+              return troupeService.findById(fixture.troupeCanRemove.id);
+            })
+            .then(function(troupe) {
+              return roomService.hideRoomFromUser(troupe.id, fixture.userFavourite.id);
+            })
+            .then(getFavs)
+            .then(function(favs) {
+              assert(!favs[fixture.troupeCanRemove.id]); // Favourite is removed
+            })
+            .then(checkHere)
+            .then(function(here) {
+              assert(!here); // User has been removed
+            });
         });
 
-        it('should check if the proper event is emitted when the favourite is removed', function(done) {
+        it('should check if the proper event is emitted when the favourite is removed', function() {
           var checkEvent = addListenner({
             url: '/user/' + fixture.userFavourite.id + '/rooms',
             operation: 'remove',
             model: {id: fixture.troupeEmpty.id}
           });
 
-          userIsInRoom(fixture.troupeEmpty.uri, fixture.userFavourite)
-          .then(function(here) {
-            assert(!here); // Check that user is not in the room
-          })
-          .then(function() {
-            return roomService.hideRoomFromUser(fixture.troupeEmpty.id, fixture.userFavourite.id);
-          })
-          .then(checkEvent) // Ensure event was emitted
-          .then(getFavs)
-          .then(function(favs) {
-            assert(!favs[fixture.troupeEmpty.id]); // Favourite is removed
-          })
-          .done(done);
+          return userIsInRoom(fixture.troupeEmpty.uri, fixture.userFavourite)
+            .then(function(here) {
+              assert(!here); // Check that user is not in the room
+            })
+            .then(function() {
+              return roomService.hideRoomFromUser(fixture.troupeEmpty.id, fixture.userFavourite.id);
+            })
+            .then(checkEvent) // Ensure event was emitted
+            .then(getFavs)
+            .then(function(favs) {
+              assert(!favs[fixture.troupeEmpty.id]); // Favourite is removed
+            });
         });
 
       });
@@ -1520,7 +1515,7 @@ describe('room-service', function() {
 
         var roomService = testRequire('./services/room-service');
 
-        it('should remove user from room', function(done) {
+        it('should remove user from room', function() {
           return userIsInRoom(fixture.troupeCanRemove.uri, fixture.userLeave)
             .then(function(here) {
               assert(here);
@@ -1531,8 +1526,7 @@ describe('room-service', function() {
             })
             .then(function(here) {
               assert(!here);
-            })
-            .done(done);
+            });
         });
 
       });
@@ -1556,7 +1550,7 @@ describe('room-service', function() {
           }
         });
 
-        it('should prevent non-admin from removing users from rooms', function(done) {
+        it('should prevent non-admin from removing users from rooms', function() {
           return userIsInRoom(fixture.troupeCanRemove.uri, fixture.userToRemove)
             .then(function(here) {
               assert(here);
@@ -1570,11 +1564,10 @@ describe('room-service', function() {
             })
             .then(function(here) {
               assert(here);
-            })
-            .done(done);
+            });
         });
 
-        it('should prevent from removing users from one-to-one rooms', function(done) {
+        it('should prevent from removing users from one-to-one rooms', function() {
           return userIsInRoom(fixture.troupeCannotRemove.uri, fixture.userToRemove)
             .then(function(here) {
               assert(here);
@@ -1589,11 +1582,10 @@ describe('room-service', function() {
             })
             .then(function(here) {
               assert(here);
-            })
-            .done(done);
+            });
         });
 
-        it('should remove users from rooms', function(done) {
+        it('should remove users from rooms', function() {
           return userIsInRoom(fixture.troupeCanRemove.uri, fixture.userToRemove)
             .then(function(here) {
               assert(here);
@@ -1604,8 +1596,7 @@ describe('room-service', function() {
             })
             .then(function(here) {
               assert(!here);
-            })
-            .done(done);
+            });
         });
 
       });
@@ -1615,7 +1606,7 @@ describe('room-service', function() {
   });
 
   describe('createGithubRoom #slow', function() {
-    it('should create an empty room for an organization', function(done) {
+    it('should create an empty room for an organization', function() {
       var permissionsModelMock = mockito.mockFunction();
 
       var roomService = testRequire.withProxies("./services/room-service", {
@@ -1640,8 +1631,7 @@ describe('room-service', function() {
         })
         .finally(function () {
           return persistence.Troupe.remove({ uri: 'gitterTest' }).exec();
-        })
-        .nodeify(done);
+        });
     });
   });
 
