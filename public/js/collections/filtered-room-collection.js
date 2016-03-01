@@ -48,7 +48,6 @@ FilteredRoomCollection.prototype = _.extend(
   },
 
   onModelChangeState: function() {//jshint unused: true
-    console.log('state change', this.roomModel.get('state'));
     this.comparator = FilteredRoomCollection.prototype.comparator;
     switch (this.roomModel.get('state')) {
       case 'favourite' :
@@ -56,7 +55,6 @@ FilteredRoomCollection.prototype = _.extend(
         this.comparator = this.sortFavourites;
         break;
       case 'people' :
-        console.log('peoplr', this.filterOneToOnes, this);
         this.setFilter(this.filterOneToOnes.bind(this));
         break;
       case 'search' :
@@ -72,8 +70,7 @@ FilteredRoomCollection.prototype = _.extend(
     this.sort({ silent: true });
   },
 
-  onOrgNameChange: function(model, val) {
-    console.log('org name change', val);
+  onOrgNameChange: function() {
     this.setFilter();
   },
 
