@@ -7,6 +7,10 @@ var log       = require('../utils/log');
 
 var ravenUrl  = context.env('ravenUrl');
 
+// See https://github.com/troupe/gitter-webapp/issues/1056
+// TODO: renable unhandled rejections
+var REPORT_UNHANDLED_REJECTIONS = false;
+
 function normalise(s) {
   return s.replace(/\/_s\/\w+\//, '/_s/l/');
 }
@@ -44,16 +48,19 @@ function logUnhandledError(message, filename, lineno, colno, error) {
   }
 }
 
-// Report unhandled bluebird rejections
-// See http://bluebirdjs.com/docs/api/error-management-configuration.html#global-rejection-events
-window.addEventListener("unhandledrejection", function(e) {
-    // NOTE: e.preventDefault() must be manually called to prevent the default
-    // action which is currently to log the stack trace to console.warn
-    e.preventDefault();
+if (REPORT_UNHANDLED_REJECTIONS) {
+  // Report unhandled bluebird rejections
+  // See http://bluebirdjs.com/docs/api/error-management-configuration.html#global-rejection-events
+  window.addEventListener("unhandledrejection", function(e) {
+      // NOTE: e.preventDefault() must be manually called to prevent the default
+      // action which is currently to log the stack trace to console.warn
+      e.preventDefault();
 
-    var reason = e.detail.reason;
-    appEvents.trigger('bugreport', reason);
-});
+      var reason = e.detail.reason;
+      appEvents.trigger('bugreport', reason);
+  });
+
+}
 
 if(ravenUrl) {
   Raven.config(ravenUrl, {

@@ -4,11 +4,13 @@ var Marionette            = require('backbone.marionette');
 var context               = require('utils/context');
 var itemCollections       = require('collections/instances/integrated-items');
 var PeopleCollectionView  = require('views/people/peopleCollectionView');
-var SearchView            = require('views/search/searchView');
-var SearchInputView       = require('views/search/search-input-view');
 var RepoInfoView          = require('./repoInfo');
 var ActivityCompositeView = require('./activityCompositeView');
 var hasScrollBars         = require('utils/scrollbar-detect');
+
+var SearchView            = require('views/search/searchView');
+var SearchInputView       = require('views/search/search-input-view');
+
 require('views/behaviors/isomorphic');
 
 module.exports = (function() {
@@ -71,14 +73,6 @@ module.exports = (function() {
 
     },
 
-    initSearchRegion: function(optionsForRegion) {
-      return new SearchView(optionsForRegion({ model: this.searchState }));
-    },
-
-    initSearchInputRegion: function(optionsForRegion) {
-      return new SearchInputView(optionsForRegion({ model: this.searchState }));
-    },
-
     initRepo_infoRegion: function(optionsForRegion) {
       // Repo info
       return new RepoInfoView(optionsForRegion());
@@ -98,6 +92,14 @@ module.exports = (function() {
       return new PeopleCollectionView.ExpandableRosterView(optionsForRegion({
         rosterCollection: itemCollections.roster
       }));
+    },
+
+    initSearchRegion: function(optionsForRegion) {
+      if(!context.hasFeature('left-menu')) { return new SearchView(optionsForRegion({ model: this.searchState })); }
+    },
+
+    initSearchInputRegion: function(optionsForRegion) {
+      if(!context.hasFeature('left-menu')) { return new SearchInputView(optionsForRegion({ model: this.searchState })); }
     },
 
     expandSearch: function() {

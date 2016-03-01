@@ -54,20 +54,20 @@
 }
 
 html {
-	height: 100%;
+  height: 100%;
 }
 
 body {
-	min-height: 100%;
-	height: 100%;
-	margin: 0;
-	overflow: hidden;
+  min-height: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
   background-color: white;
 }
 
 a {
-	text-decoration: none;
-	color: #333;
+  text-decoration: none;
+  color: #333;
 }
 
 p {
@@ -168,16 +168,16 @@ ul.scrollList a {
 }
 
 .trpBlankPage {
-	position: fixed;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	right: 0;
-	z-index: -1;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: -1;
 }
 
 a:hover {
-	text-decoration: underline;
+  text-decoration: underline;
 }
 
 .trpLeftMenuSignup {
@@ -216,7 +216,7 @@ color: rgba(51, 51, 51, 1);
 }
 
 .selected {
-	opacity: 1;
+  opacity: 1;
 }
 
 .disabled {
@@ -404,12 +404,13 @@ ul.roster {
 }
 
 .notification-center {
+  position: absolute;
+  top: 100px;
+  left: 100%;
   width: 300px;
-	position: fixed;
-	top: 100px;
 	z-index: 900;
-  left: 0px;
   pointer-events: none;
+
   & > * {
     pointer-events: auto;
   }
@@ -417,49 +418,73 @@ ul.roster {
   @media @small {
     display: none;
   }
+}
 
+.hide-notification() {
+  opacity: 0;
+  transform: translate(-200px);
+  pointer-events: none;
 }
 
 .notification {
-	padding: 8px;
-	background: @trpGreen;
-	color: white;
-	text-align: left;
-	margin: 1px;
-  opacity: 0.95;
-  width: 300px;
   box-sizing: border-box;
-  -moz-box-sizing: border-box;
+
+  width: 300px;
+  margin-top: 1px;
+  margin-bottom: 1px;
+  padding: 8px;
+
+  background-color: fade(@trpGreen, 95%);
+  color: white;
+  text-align: left;
+  pointer-events: auto;
+
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+  animation-name: notification-slide-in;
+  animation-duration: 0.3s;
+  animation-timing-function: ease;
+
+  &.is-hidden {
+    .hide-notification();
+  }
+}
+
+@keyframes notification-slide-in {
+  from {
+    .hide-notification();
+  }
 }
 
 
 .notification a {
-	color: inherit;
+  color: inherit;
 }
 
 .notification a:hover {
-	text-decoration: none;
+  text-decoration: none;
 }
 
 .notification-error {
-	background: #a44;
+  background: #a44;
 }
 
  .trpLoading {
-	 display: inline-block;
-	 background: url('../images/logo-mark-grey-64.png');
-	 width: 64px;
-	 height: 64px;
-	 vertical-align: text-bottom;
+   display: inline-block;
+   background: url('../images/logo-mark-grey-64.png');
+   width: 64px;
+   height: 64px;
+   vertical-align: text-bottom;
    -webkit-animation: pulsey 2s linear infinite;
    animation: pulsey 2s linear infinite;
  }
 
 .typeahead {
-	margin-top: 0;
-	border-radius: 0;
-	overflow-x: hidden;
-	overflow-y: auto;
+  margin-top: 0;
+  border-radius: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .trpTroupeRelatedContent {

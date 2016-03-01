@@ -1,6 +1,7 @@
 'use strict';
 
-var _ = require('underscore');
+var _         = require('underscore');
+var Backbone  = require('backbone');
 var apiClient = require('components/apiClient');
 
 var methodMap = {
@@ -13,6 +14,7 @@ var methodMap = {
 
 module.exports = {
   sync: function(method, model, options) {
+
     var url = options.url || _.result(model, 'url');
     if(!url) throw new Error('URL required');
 

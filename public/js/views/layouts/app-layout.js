@@ -1,7 +1,19 @@
 "use strict";
-var Marionette = require('backbone.marionette');
-var TroupeMenu = require('views/menu/troupeMenu');
+var Marionette  = require('backbone.marionette');
 var modalRegion = require('components/modal-region');
+var appEvents   = require('utils/appevents');
+
+//OLD LEFT MENU
+var TroupeMenu = require('views/menu/old/troupeMenu');
+var context    = require('utils/context');
+
+//NEW LEFT MENU
+var RoomMenuLayout    = require('../menu/room/layout/room-menu-layout');
+
+var oldIsoProps = {
+  menu: { el: "#menu-region", init: 'initMenuRegion' }
+  //RoomMenuLayout: { el: '#room-menu-container', init: 'initNewMenuRegion' }
+};
 
 require('views/behaviors/isomorphic');
 
@@ -14,9 +26,16 @@ module.exports = (function () {
     template: false,
     el: 'body',
 
-    behaviors: {
-      Isomorphic: {
-        menu: { el: "#menu-region", init: 'initMenuRegion' }
+    behaviors: function(){
+      if(!context.hasFeature('left-menu')) {
+        return { Isomorphic: {
+          menu: { el: "#menu-region", init: 'initMenuRegion' }
+        }};
+      }
+      else {
+        return { Isomorphic: {
+          RoomMenuLayout: { el: '#room-menu-container', init: 'initNewMenuRegion' }
+        }};
       }
     },
 
@@ -24,12 +43,22 @@ module.exports = (function () {
       "keydown": "onKeyDown"
     },
 
-    initialize: function () {
-      this.dialogRegion = modalRegion;
+    initialize: function (options) {
+      this.roomCollection          = options.roomCollection;
+      this.orgCollection           = options.orgCollection;
+      this.dialogRegion            = modalRegion;
     },
 
-    initMenuRegion: function(optionsForRegion) {
+    initMenuRegion: function (optionsForRegion){
       return new TroupeMenu(optionsForRegion());
+    },
+
+    initNewMenuRegion: function (optionsForRegion){
+      return new RoomMenuLayout(optionsForRegion({
+        bus:                     appEvents,
+        roomCollection:          this.roomCollection,
+        orgCollection:           this.orgCollection
+      }));
     },
 
     onKeyDown: function(e) {
