@@ -19,7 +19,7 @@ describe('unread-item-distribution', function() {
   before(blockTimer.on);
   after(blockTimer.off);
 
-  describe('unreadItemDistribution', function() {
+  describe('createDistribution', function() {
     var chatId;
     var troupeId, troupeId2, troupeId3;
     var fromUserId;
@@ -30,7 +30,7 @@ describe('unread-item-distribution', function() {
     var roomMembershipService;
     var userService;
     var roomPermissionsModel;
-    var unreadItemDistribution;
+    var createDistribution;
     var troupeNoLurkers;
     var troupeSomeLurkers;
     var troupeAllLurkers;
@@ -96,7 +96,7 @@ describe('unread-item-distribution', function() {
       mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId2).thenReturn(Promise.resolve(troupeSomeLurkersUserHash));
       mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId3).thenReturn(Promise.resolve(troupeAllLurkersUserHash));
 
-      unreadItemDistribution = testRequire.withProxies("./services/unread-items/distribution", {
+      createDistribution = testRequire.withProxies("./services/unread-items/create-distribution", {
         '../room-membership-service': roomMembershipService,
         '../user-service': userService,
         '../room-permissions-model': roomPermissionsModel,
@@ -106,7 +106,7 @@ describe('unread-item-distribution', function() {
 
     it('should parse messages with no mentions, no lurkers', function() {
 
-      return unreadItemDistribution(fromUserId, troupeNoLurkers, [])
+      return createDistribution(fromUserId, troupeNoLurkers, [])
         .then(function(result) {
           assert.deepEqual(result.notifyUserIds, [userId1, userId2]);
           assert.deepEqual(result.mentionUserIds, []);
@@ -116,7 +116,7 @@ describe('unread-item-distribution', function() {
     });
 
     it('should parse messages with no mentions, some lurkers', function() {
-      return unreadItemDistribution(fromUserId, troupeSomeLurkers, [])
+      return createDistribution(fromUserId, troupeSomeLurkers, [])
         .then(function(result) {
           assert.deepEqual(result.notifyUserIds, [userId1]);
           assert.deepEqual(result.mentionUserIds, []);
@@ -126,7 +126,7 @@ describe('unread-item-distribution', function() {
     });
 
     it('should parse messages with no mentions, all lurkers', function() {
-      return unreadItemDistribution(fromUserId, troupeAllLurkers, [])
+      return createDistribution(fromUserId, troupeAllLurkers, [])
         .then(function(result) {
           assert.deepEqual(result.notifyUserIds, []);
           assert.deepEqual(result.mentionUserIds, []);
@@ -136,7 +136,7 @@ describe('unread-item-distribution', function() {
     });
 
     it('should parse messages with user mentions to non lurkers', function() {
-      return unreadItemDistribution(fromUserId, troupeNoLurkers, singleMention)
+      return createDistribution(fromUserId, troupeNoLurkers, singleMention)
         .then(function(result) {
           assert.deepEqual(result.notifyUserIds, [userId1, userId2]);
           assert.deepEqual(result.mentionUserIds, [userId1]);
@@ -146,7 +146,7 @@ describe('unread-item-distribution', function() {
     });
 
     it('should parse messages with user mentions to lurkers', function() {
-      return unreadItemDistribution(fromUserId, troupeAllLurkers, singleMention)
+      return createDistribution(fromUserId, troupeAllLurkers, singleMention)
         .then(function(result) {
           assert.deepEqual(result.notifyUserIds, [userId1]);
           assert.deepEqual(result.mentionUserIds, [userId1]);
@@ -156,7 +156,7 @@ describe('unread-item-distribution', function() {
     });
 
     it('should parse messages with group mentions', function() {
-      return unreadItemDistribution(fromUserId, troupeSomeLurkers, groupMention)
+      return createDistribution(fromUserId, troupeSomeLurkers, groupMention)
         .then(function(result) {
           assert.deepEqual(result.notifyUserIds, [userId1, userId2]);
           assert.deepEqual(result.mentionUserIds, [userId1, userId2]);
@@ -166,7 +166,7 @@ describe('unread-item-distribution', function() {
     });
 
     it('should parse messages with duplicate mentions', function() {
-      return unreadItemDistribution(fromUserId, troupeSomeLurkers, duplicateMention)
+      return createDistribution(fromUserId, troupeSomeLurkers, duplicateMention)
         .then(function(result) {
           assert.deepEqual(result.notifyUserIds, [userId1]);
           assert.deepEqual(result.mentionUserIds, [userId1]);
@@ -182,7 +182,7 @@ describe('unread-item-distribution', function() {
       mockito.when(roomPermissionsModel)(user3, 'join', troupeSomeLurkers)
         .thenReturn(Promise.resolve(true));
 
-      return unreadItemDistribution(fromUserId, troupeSomeLurkers, nonMemberMention)
+      return createDistribution(fromUserId, troupeSomeLurkers, nonMemberMention)
         .then(function(result) {
           assert.deepEqual(result.notifyUserIds, [userId1, userId3]);
           assert.deepEqual(result.mentionUserIds, [userId3]);
@@ -198,7 +198,7 @@ describe('unread-item-distribution', function() {
       mockito.when(roomPermissionsModel)(user3, 'join', troupeSomeLurkers)
         .thenReturn(Promise.resolve(false));
 
-      return unreadItemDistribution(fromUserId, troupeSomeLurkers, nonMemberMention)
+      return createDistribution(fromUserId, troupeSomeLurkers, nonMemberMention)
         .then(function(result) {
           assert.deepEqual(result.notifyUserIds, [userId1]);
           assert.deepEqual(result.mentionUserIds, []);
@@ -211,7 +211,7 @@ describe('unread-item-distribution', function() {
       mockito.when(userService).findByIds([userId3])
         .thenReturn(Promise.resolve([]));
 
-      return unreadItemDistribution(fromUserId, troupeSomeLurkers, nonMemberMention)
+      return createDistribution(fromUserId, troupeSomeLurkers, nonMemberMention)
         .then(function(result) {
           assert.deepEqual(result.notifyUserIds, [userId1]);
           assert.deepEqual(result.mentionUserIds, []);
@@ -224,41 +224,41 @@ describe('unread-item-distribution', function() {
 
 
   describe('findNonMembersWithAccess', function() {
-    var userService, roomPermissionsModel, unreadItemDistribution;
+    var userService, roomPermissionsModel, createDistribution;
 
     beforeEach(function() {
       userService = mockito.mock(testRequire('./services/user-service'));
       roomPermissionsModel = mockito.mockFunction();
 
-      unreadItemDistribution = testRequire.withProxies("./services/unread-items/distribution", {
+      createDistribution = testRequire.withProxies("./services/unread-items/create-distribution", {
         '../user-service': userService,
         '../room-permissions-model': roomPermissionsModel,
       });
     });
 
     it('should handle an empty array', function() {
-      return unreadItemDistribution.testOnly.findNonMembersWithAccess({ }, [])
+      return createDistribution.testOnly.findNonMembersWithAccess({ }, [])
         .then(function(userIds) {
           assert.deepEqual(userIds, []);
         });
     });
 
     it('should handle one to one rooms', function() {
-      return unreadItemDistribution.testOnly.findNonMembersWithAccess({ oneToOne: true }, ['1','2','3'])
+      return createDistribution.testOnly.findNonMembersWithAccess({ oneToOne: true }, ['1','2','3'])
         .then(function(userIds) {
           assert.deepEqual(userIds, []);
         });
     });
 
     it('should handle private rooms', function() {
-      return unreadItemDistribution.testOnly.findNonMembersWithAccess({ security: 'PRIVATE' }, ['1','2','3'])
+      return createDistribution.testOnly.findNonMembersWithAccess({ security: 'PRIVATE' }, ['1','2','3'])
         .then(function(userIds) {
           assert.deepEqual(userIds, []);
         });
     });
 
     it('should handle public rooms', function() {
-      return unreadItemDistribution.testOnly.findNonMembersWithAccess({ security: 'PUBLIC' }, ['1','2','3'])
+      return createDistribution.testOnly.findNonMembersWithAccess({ security: 'PUBLIC' }, ['1','2','3'])
         .then(function(userIds) {
           assert.deepEqual(userIds, ['1','2','3']);
         });
@@ -282,7 +282,7 @@ describe('unread-item-distribution', function() {
         return Promise.resolve(user.id !== '3');
       });
 
-      return unreadItemDistribution.testOnly.findNonMembersWithAccess(troupe, ['1','2','3'])
+      return createDistribution.testOnly.findNonMembersWithAccess(troupe, ['1','2','3'])
         .then(function(userIds) {
           assert.deepEqual(userIds, ['1','2']); // User three should not be in the list
         });
