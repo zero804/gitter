@@ -10,14 +10,6 @@ var assert = require('assert');
 var times = mockito.Verifiers.times;
 var once = times(1);
 
-var userTroupeSettingsServiceStub = {
-  '../user-troupe-settings-service': {
-    getMultiUserTroupeSettings: function() {
-      return Promise.try(function() { return {}; });
-    }
-  }
-};
-
 var pushNotificationFilterStub = {
   canUnlockForNotification: function() { return Promise.resolve(Date.now()); }
 };
@@ -58,7 +50,6 @@ describe('push notification generator service', function() {
     mockito.when(mockSendUserNotification)().then(function() { return Promise.resolve(); });
 
     var service = testRequire.withProxies('./services/notifications/push-notification-generator', {
-      '../user-troupe-settings-service': userTroupeSettingsServiceStub,
       'gitter-web-push-notification-filter': pushNotificationFilterStub,
       '../user-service': userServiceStub,
       '../../gateways/push-notification-gateway': {
@@ -87,7 +78,6 @@ describe('push notification generator service', function() {
     };
 
     var service = testRequire.withProxies('./services/notifications/push-notification-generator', {
-      '../user-troupe-settings-service': userTroupeSettingsServiceStub,
       'gitter-web-push-notification-filter': pushNotificationFilterStub,
       '../user-service': userServiceStub,
       '../../gateways/push-notification-gateway': {
