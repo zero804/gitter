@@ -4,6 +4,7 @@ var env                   = require('gitter-web-env');
 var errorReporter         = env.errorReporter;
 var _                     = require('lodash');
 var Promise               = require('bluebird');
+var Distribution          = require('./distribution');
 var roomMembershipService = require('../room-membership-service');
 var userService           = require("../user-service");
 var roomPermissionsModel  = require('../room-permissions-model');
@@ -118,6 +119,7 @@ function parseMentions(fromUserId, troupe, userIdsWithLurk, mentions) {
 
 function unreadItemDistribution(fromUserId, troupe, mentions) {
   var troupeId = troupe._id;
+
   return roomMembershipService.findMembersForRoomWithLurk(troupeId)
     .then(function(userIdsWithLurk) {
       var creatorUserId = fromUserId && "" + fromUserId;
@@ -140,13 +142,13 @@ function unreadItemDistribution(fromUserId, troupe, mentions) {
       });
 
       if(!mentions || !mentions.length) {
-        return {
+        return new Distribution({
           notifyUserIds: active,
           mentionUserIds: [],
           activityOnlyUserIds: nonActive,
           notifyNewRoomUserIds: [],
           announcement: false
-        };
+        });
       }
 
       /* Add the mentions into the mix */
@@ -160,13 +162,13 @@ function unreadItemDistribution(fromUserId, troupe, mentions) {
             return !notifyUserIdsHash[userId];
           });
 
-          return {
+          return new Distribution({
             notifyUserIds: Object.keys(notifyUserIdsHash),
             mentionUserIds: parsedMentions.mentionUserIds,
             activityOnlyUserIds: nonActiveLessMentions,
             notifyNewRoomUserIds: parsedMentions.nonMemberUserIds,
             announcement: parsedMentions.announcement
-          };
+          });
         });
 
     })
