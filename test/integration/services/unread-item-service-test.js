@@ -49,7 +49,6 @@ function makeHash() {
   return hash;
 }
 
-
 function deep(object) {
   var items = Object.keys(object).map(function(key) {
     return hasMember(key, object[key]);
@@ -235,7 +234,6 @@ describe('unread-item-service', function() {
       var userId2;
       var userId3;
       var appEvents;
-      var categoriseUserInRoom;
       var troupe;
       var chat;
       var unreadItemDistribution;
@@ -260,18 +258,8 @@ describe('unread-item-service', function() {
         };
 
         appEvents = mockito.mock(testRequire('gitter-web-appevents'));
-        categoriseUserInRoom = mockito.mockFunction();
         unreadItemDistribution = mockito.mockFunction();
         unreadItemDistributionResponse = null;
-
-        mockito.when(categoriseUserInRoom)().then(function(roomId, userIds) {
-          /* Always return all users as online */
-          return Promise.resolve(userIds.reduce(function(memo, userId) {
-            // TODO: test with some users inroom,push etc
-            memo[userId] = 'online';
-            return memo;
-          }, {}));
-        });
 
         mockito.when(unreadItemDistribution)().then(function() {
           return Promise.resolve(unreadItemDistributionResponse);
@@ -279,7 +267,7 @@ describe('unread-item-service', function() {
 
         unreadItemService = testRequire.withProxies("./services/unread-item-service", {
           './unread-item-distribution': unreadItemDistribution,
-          './categorise-users-in-room': categoriseUserInRoom,
+          // './categorise-users-in-room': categoriseUserInRoom,
           'gitter-web-appevents': appEvents,
         });
         unreadItemService.testOnly.setSendBadgeUpdates(false);
@@ -292,7 +280,8 @@ describe('unread-item-service', function() {
           mentionUserIds: [],
           activityOnlyUserIds: [],
           notifyNewRoomUserIds: [],
-          announcement: false
+          announcement: false,
+          presence: makeHash(userId1, 'online', userId2, 'online')
         };
 
         return unreadItemService.createChatUnreadItems(fromUserId, troupe, chat)
@@ -313,7 +302,8 @@ describe('unread-item-service', function() {
           mentionUserIds: [],
           activityOnlyUserIds: [userId2],
           notifyNewRoomUserIds: [],
-          announcement: false
+          announcement: false,
+          presence: makeHash(userId1, 'online', userId2, 'online')
         };
 
         return unreadItemService.createChatUnreadItems(fromUserId, troupe, chat)
@@ -333,7 +323,8 @@ describe('unread-item-service', function() {
           mentionUserIds: [],
           activityOnlyUserIds: [userId1, userId2],
           notifyNewRoomUserIds: [],
-          announcement: false
+          announcement: false,
+          presence: makeHash(userId1, 'online', userId2, 'online')
         };
 
         return unreadItemService.createChatUnreadItems(fromUserId, troupe, chat)
@@ -352,7 +343,8 @@ describe('unread-item-service', function() {
           mentionUserIds: [userId1],
           activityOnlyUserIds: [],
           notifyNewRoomUserIds: [],
-          announcement: false
+          announcement: false,
+          presence: makeHash(userId1, 'online', userId2, 'online')
         };
 
         return unreadItemService.createChatUnreadItems(fromUserId, troupe, chat)
@@ -373,7 +365,8 @@ describe('unread-item-service', function() {
           mentionUserIds: [userId1],
           activityOnlyUserIds: [userId1, userId2],
           notifyNewRoomUserIds: [],
-          announcement: false
+          announcement: false,
+          presence: makeHash(userId1, 'online', userId2, 'online')
         };
 
         return unreadItemService.createChatUnreadItems(fromUserId, troupe, chat)
@@ -393,7 +386,8 @@ describe('unread-item-service', function() {
           mentionUserIds: [userId1, userId2],
           activityOnlyUserIds: [userId1, userId2],
           notifyNewRoomUserIds: [],
-          announcement: true
+          announcement: true,
+          presence: makeHash(userId1, 'online', userId2, 'online')
         };
 
         return unreadItemService.createChatUnreadItems(fromUserId, troupe, chat)
@@ -418,7 +412,6 @@ describe('unread-item-service', function() {
       var userId2;
       var userId3;
       var appEvents;
-      var categoriseUserInRoom;
       var unreadItemService;
       var troupe;
       var chat;
@@ -444,7 +437,6 @@ describe('unread-item-service', function() {
         };
 
         appEvents = mockito.mock(testRequire('gitter-web-appevents'));
-        categoriseUserInRoom = mockito.mockFunction();
 
         unreadItemDistribution = mockito.mockFunction();
         unreadItemDistributionResponse = null;
@@ -452,22 +444,9 @@ describe('unread-item-service', function() {
           return Promise.resolve(unreadItemDistributionResponse);
         });
 
-        mockito.when(categoriseUserInRoom)().then(function(roomId, userIds) {
-          /* Always return all users as online */
-          return Promise.resolve(userIds.reduce(function(memo, userId) {
-            // TODO: test with some users inroom,push etc
-            memo[userId] = 'online';
-            return memo;
-          }, {}));
-        });
-
         unreadItemService = testRequire.withProxies("./services/unread-item-service", {
-          // './room-membership-service': roomMembershipService,
           './unread-item-distribution': unreadItemDistribution,
-          // './user-service': userService,
-          './categorise-users-in-room': categoriseUserInRoom,
           'gitter-web-appevents': appEvents,
-          // './room-permissions-model': roomPermissionsModel,
         });
         unreadItemService.testOnly.setSendBadgeUpdates(false);
 
@@ -495,7 +474,8 @@ describe('unread-item-service', function() {
           mentionUserIds: [userId1],
           activityOnlyUserIds: [],
           notifyNewRoomUserIds: [],
-          announcement: false
+          announcement: false,
+          presence: makeHash(userId1, 'online', userId2, 'online')
         };
 
         return unreadItemService.updateChatUnreadItems(fromUserId, troupe, chat, [])
@@ -514,7 +494,8 @@ describe('unread-item-service', function() {
           mentionUserIds: [],
           activityOnlyUserIds: [],
           notifyNewRoomUserIds: [],
-          announcement: false
+          announcement: false,
+          presence: makeHash(userId1, 'online', userId2, 'online')
         };
 
         return unreadItemService.updateChatUnreadItems(fromUserId, troupe, chat, [{ userId: userId1 }])
@@ -676,7 +657,7 @@ describe('unread-item-service', function() {
   });
 
   describe('processResultsForNewItemWithMentions', function() {
-    var unreadItemService, categoriseUserInRoom, appEvents,
+    var unreadItemService, appEvents,
       mockRedisBatcher, processResultsForNewItemWithMentions,
       troupeId, chatId;
 
@@ -687,15 +668,13 @@ describe('unread-item-service', function() {
     beforeEach(function() {
       var MockBadgeBatcherController = require('../utils/mock-redis-batcher');
       mockRedisBatcher = new MockBadgeBatcherController();
-      categoriseUserInRoom = mockito.mockFunction();
       appEvents = mockito.mock(require('gitter-web-appevents'));
       troupeId = mongoUtils.getNewObjectIdString();
       chatId = mongoUtils.getNewObjectIdString();
 
       unreadItemService = testRequire.withProxies("./services/unread-item-service", {
         'gitter-web-appevents': appEvents,
-        '../utils/redis-batcher': mockRedisBatcher,
-        './categorise-users-in-room' : categoriseUserInRoom
+        '../utils/redis-batcher': mockRedisBatcher
       });
 
       processResultsForNewItemWithMentions = unreadItemService.testOnly.processResultsForNewItemWithMentions;
@@ -934,123 +913,110 @@ describe('unread-item-service', function() {
 
         var isEdit = meta.isEdit;
 
-        mockito.when(categoriseUserInRoom)().then(function(pTroupeId, userIds) {
-          assert.strictEqual(pTroupeId, troupeId);
 
-          var userIdsSorted = userIds.slice();
-          userIdsSorted.sort();
-          var expectedUserIds = parsed.notifyUserIds.concat(parsed.activityOnlyUserIds);
-          expectedUserIds.sort();
-          assert.deepEqual(userIdsSorted, expectedUserIds);
+        var presence = parsed.notifyUserIds.concat(parsed.activityOnlyUserIds).reduce(function(memo,userId) {
 
-          var result = userIds.reduce(function(memo, userId) {
+          if (meta.inroom.indexOf(userId) >= 0) {
+            memo[userId] = 'inroom';
+          } else if (meta.online.indexOf(userId) >= 0) {
+            memo[userId] = 'online';
+          } else if (meta.mobile.indexOf(userId) >= 0) {
+            memo[userId] = 'mobile';
+          } else if (meta.push.indexOf(userId) >= 0) {
+            memo[userId] = 'push';
+          } else if (meta.push_connected.indexOf(userId) >= 0) {
+            memo[userId] = 'push_connected';
+          } else if (meta.push_notified.indexOf(userId) >= 0) {
+            memo[userId] = 'push_notified';
+          } else if (meta.push_notified_connected.indexOf(userId) >= 0) {
+            memo[userId] = 'push_notified_connected';
+          }
 
-            if (meta.inroom.indexOf(userId) >= 0) {
-              memo[userId] = 'inroom';
-            } else if (meta.online.indexOf(userId) >= 0) {
-              memo[userId] = 'online';
-            } else if (meta.mobile.indexOf(userId) >= 0) {
-              memo[userId] = 'mobile';
-            } else if (meta.push.indexOf(userId) >= 0) {
-              memo[userId] = 'push';
-            } else if (meta.push_connected.indexOf(userId) >= 0) {
-              memo[userId] = 'push_connected';
-            } else if (meta.push_notified.indexOf(userId) >= 0) {
-              memo[userId] = 'push_notified';
-            } else if (meta.push_notified_connected.indexOf(userId) >= 0) {
-              memo[userId] = 'push_notified_connected';
-            }
+          return memo;
+        }, {});
+        parsed.presence = presence;
 
-            return memo;
-          }, {});
-          return Promise.resolve(result);
-        });
-
-        return processResultsForNewItemWithMentions(troupeId, chatId, parsed, results, isEdit)
-          .then(function() {
-            if (meta.expectUserMentionedInNonMemberRoom.length) {
-              meta.expectUserMentionedInNonMemberRoom.forEach(function(userId) {
-                mockito.verify(appEvents, once).userMentionedInNonMemberRoom(equivalentMap({ userId: userId, troupeId: troupeId }));
-              });
-            } else {
-              mockito.verify(appEvents, never()).userMentionedInNonMemberRoom();
-            }
-
-            // newUnreadItem
-            if (meta.expectNewUnreadNoMention.length || meta.expectNewUnreadWithMention.length) {
-              meta.expectNewUnreadNoMention.forEach(function(userId) {
-                mockito.verify(appEvents, once).newUnreadItem(userId, troupeId, equivalentMap({ chat: [chatId] }), true);
-              });
-
-              meta.expectNewUnreadWithMention.forEach(function(userId) {
-                mockito.verify(appEvents, once).newUnreadItem(userId, troupeId, equivalentMap({ chat: [chatId], mention: [chatId] }), true);
-              });
-            } else {
-              mockito.verify(appEvents, never()).newUnreadItem();
-            }
-
-            // newOnlineNotification
-            if (meta.expectNewOnlineNotificationNoMention.length || meta.expectNewOnlineNotificationWithMention.length) {
-              if (meta.expectNewOnlineNotificationNoMention.length) {
-                mockito.verify(appEvents, once).newOnlineNotification(troupeId, chatId, equivalentArray(meta.expectNewOnlineNotificationNoMention), false);
-              } else {
-                mockito.verify(appEvents, never()).newOnlineNotification(anything(), anything(), anything(), false);
-              }
-
-              if (meta.expectNewOnlineNotificationWithMention.length) {
-                mockito.verify(appEvents, once).newOnlineNotification(troupeId, chatId, equivalentArray(meta.expectNewOnlineNotificationWithMention), true);
-              } else {
-                mockito.verify(appEvents, never()).newOnlineNotification(anything(), anything(), anything(), true);
-              }
-            } else {
-              mockito.verify(appEvents, never()).newOnlineNotification();
-            }
-
-            if (meta.expectNewPushCandidatesWithMention.length) {
-              mockito.verify(appEvents, once).newPushNotificationForChat(troupeId, chatId, equivalentArray(meta.expectNewPushCandidatesWithMention), true);
-            } else {
-              mockito.verify(appEvents, never()).newPushNotificationForChat(anything(), anything(), anything(), true);
-            }
-
-            if (meta.expectNewPushCandidatesNoMention.length) {
-              mockito.verify(appEvents, once).newPushNotificationForChat(troupeId, chatId, equivalentArray(meta.expectNewPushCandidatesNoMention), false);
-            } else {
-              mockito.verify(appEvents, never()).newPushNotificationForChat(anything(), anything(), anything(), false);
-            }
-
-            if (meta.expectTroupeUnreadCountsChange.length) {
-              meta.expectTroupeUnreadCountsChange.forEach(function(expectTroupeUnreadCountsChange) {
-                mockito.verify(appEvents, once).troupeUnreadCountsChange(equivalentMap({
-                  userId: expectTroupeUnreadCountsChange.userId,
-                  troupeId: troupeId,
-                  total: expectTroupeUnreadCountsChange.unreadCount,
-                  mentions: expectTroupeUnreadCountsChange.mentionCount
-                }));
-              });
-            } else {
-              mockito.verify(appEvents, never()).troupeUnreadCountsChange();
-            }
-
-            if (meta.expectLurkActivity.length) {
-              meta.expectLurkActivity.forEach(function(userId) {
-                mockito.verify(appEvents, once).newLurkActivity(equivalentMap({
-                  userId: userId,
-                  troupeId: troupeId
-                }));
-              });
-
-            } else {
-              mockito.verify(appEvents, never()).newLurkActivity();
-            }
-
-            var mockBatcher = mockRedisBatcher.getMock('badge');
-            var items = mockBatcher.getItems('queue');
-            assert.deepEqual(items, meta.expectBadgeUpdateUserIds);
+        processResultsForNewItemWithMentions(troupeId, chatId, parsed, results, isEdit);
+        
+        if (meta.expectUserMentionedInNonMemberRoom.length) {
+          meta.expectUserMentionedInNonMemberRoom.forEach(function(userId) {
+            mockito.verify(appEvents, once).userMentionedInNonMemberRoom(equivalentMap({ userId: userId, troupeId: troupeId }));
           });
+        } else {
+          mockito.verify(appEvents, never()).userMentionedInNonMemberRoom();
+        }
+
+        // newUnreadItem
+        if (meta.expectNewUnreadNoMention.length || meta.expectNewUnreadWithMention.length) {
+          meta.expectNewUnreadNoMention.forEach(function(userId) {
+            mockito.verify(appEvents, once).newUnreadItem(userId, troupeId, equivalentMap({ chat: [chatId] }), true);
+          });
+
+          meta.expectNewUnreadWithMention.forEach(function(userId) {
+            mockito.verify(appEvents, once).newUnreadItem(userId, troupeId, equivalentMap({ chat: [chatId], mention: [chatId] }), true);
+          });
+        } else {
+          mockito.verify(appEvents, never()).newUnreadItem();
+        }
+
+        // newOnlineNotification
+        if (meta.expectNewOnlineNotificationNoMention.length || meta.expectNewOnlineNotificationWithMention.length) {
+          if (meta.expectNewOnlineNotificationNoMention.length) {
+            mockito.verify(appEvents, once).newOnlineNotification(troupeId, chatId, equivalentArray(meta.expectNewOnlineNotificationNoMention), false);
+          } else {
+            mockito.verify(appEvents, never()).newOnlineNotification(anything(), anything(), anything(), false);
+          }
+
+          if (meta.expectNewOnlineNotificationWithMention.length) {
+            mockito.verify(appEvents, once).newOnlineNotification(troupeId, chatId, equivalentArray(meta.expectNewOnlineNotificationWithMention), true);
+          } else {
+            mockito.verify(appEvents, never()).newOnlineNotification(anything(), anything(), anything(), true);
+          }
+        } else {
+          mockito.verify(appEvents, never()).newOnlineNotification();
+        }
+
+        if (meta.expectNewPushCandidatesWithMention.length) {
+          mockito.verify(appEvents, once).newPushNotificationForChat(troupeId, chatId, equivalentArray(meta.expectNewPushCandidatesWithMention), true);
+        } else {
+          mockito.verify(appEvents, never()).newPushNotificationForChat(anything(), anything(), anything(), true);
+        }
+
+        if (meta.expectNewPushCandidatesNoMention.length) {
+          mockito.verify(appEvents, once).newPushNotificationForChat(troupeId, chatId, equivalentArray(meta.expectNewPushCandidatesNoMention), false);
+        } else {
+          mockito.verify(appEvents, never()).newPushNotificationForChat(anything(), anything(), anything(), false);
+        }
+
+        if (meta.expectTroupeUnreadCountsChange.length) {
+          meta.expectTroupeUnreadCountsChange.forEach(function(expectTroupeUnreadCountsChange) {
+            mockito.verify(appEvents, once).troupeUnreadCountsChange(equivalentMap({
+              userId: expectTroupeUnreadCountsChange.userId,
+              troupeId: troupeId,
+              total: expectTroupeUnreadCountsChange.unreadCount,
+              mentions: expectTroupeUnreadCountsChange.mentionCount
+            }));
+          });
+        } else {
+          mockito.verify(appEvents, never()).troupeUnreadCountsChange();
+        }
+
+        if (meta.expectLurkActivity.length) {
+          meta.expectLurkActivity.forEach(function(userId) {
+            mockito.verify(appEvents, once).newLurkActivity(equivalentMap({
+              userId: userId,
+              troupeId: troupeId
+            }));
+          });
+
+        } else {
+          mockito.verify(appEvents, never()).newLurkActivity();
+        }
+
+        var mockBatcher = mockRedisBatcher.getMock('badge');
+        var items = mockBatcher.getItems('queue');
+        assert.deepEqual(items, meta.expectBadgeUpdateUserIds);
       });
     });
-
-
   });
-
 });
