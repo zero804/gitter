@@ -106,6 +106,16 @@ exports.deregisterAndroidDevice = function(registrationId) {
   return PushNotificationDevice.findOneAndRemove({ androidToken: registrationId }).exec();
 };
 
+exports.deregisterIosDevices = function(deviceTokens) {
+  if (deviceTokens.length === 0) return Promise.resolve();
+
+  var appleTokens = deviceTokens.map(function(deviceToken) {
+    return deviceToken.toString('hex');
+  });
+
+  return PushNotificationDevice.remove({ appleToken: { $in: appleTokens } }).exec();
+};
+
 exports.registerUser = function(deviceId, userId, callback) {
   return PushNotificationDevice.findOneAndUpdate(
     { deviceId: deviceId },
