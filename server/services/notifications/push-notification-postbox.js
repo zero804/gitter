@@ -1,14 +1,14 @@
 "use strict";
 
-var winston                   = require('../../utils/winston');
-var pushNotificationFilter    = require("gitter-web-push-notification-filter");
-var nconf                     = require('../../utils/config');
-var workerQueue               = require('../../utils/worker-queue-redis');
-var userTroupeSettingsService = require('../user-troupe-settings-service');
-var debug                     = require('debug')('gitter:push-notification-postbox');
-var mongoUtils                = require('../../utils/mongo-utils');
-var Promise                   = require('bluebird');
-var errorReporter             = require('gitter-web-env').errorReporter;
+var winston                     = require('../../utils/winston');
+var pushNotificationFilter      = require("gitter-web-push-notification-filter");
+var nconf                       = require('../../utils/config');
+var workerQueue                 = require('../../utils/worker-queue-redis');
+var userRoomNotificationService = require('../user-room-notification-service');
+var debug                       = require('debug')('gitter:push-notification-postbox');
+var mongoUtils                  = require('../../utils/mongo-utils');
+var Promise                     = require('bluebird');
+var errorReporter               = require('gitter-web-env').errorReporter;
 
 var notificationWindowPeriods = [
   nconf.get("notifications:notificationDelay") * 1000,
@@ -69,11 +69,10 @@ function filterNotificationsForPush(troupeId, chatId, userIds, mentioned) {
   // TODO: consider asking Redis whether its possible to send to this user BEFORE
   // going to mongo to get notification settings as reversing these two operations
   // may well be much faster
-  return userTroupeSettingsService.getUserTroupeSettingsForUsersInTroupe(troupeId, 'notifications', userIds)
+  return userRoomNotificationService.findSettingsForUsersInRoom(troupeId, userIds)
     .then(function(settings) {
       return Promise.map(userIds, function(userId) {
-        var notificationSettings = settings[userId];
-        var pushNotificationSetting = notificationSettings && notificationSettings.push || 'all';
+        var pushNotificationSetting = settings[userId];
 
         /* Mute, then don't continue */
         if (pushNotificationSetting === 'mute' || (pushNotificationSetting === 'mention' && !mentioned)) {
