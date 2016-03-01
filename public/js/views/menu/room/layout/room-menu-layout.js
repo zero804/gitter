@@ -8,6 +8,8 @@ var PanelView         = require('../panel/panel-view');
 var context           = require('utils/context');
 var DNDCtrl           = require('../../../../components/menu/room/dnd-controller');
 var MinibarCollection = require('../minibar/minibar-collection');
+var context           = require('utils/context');
+var _                 = require('underscore');
 
 var MENU_HIDE_DELAY = 200;
 
@@ -25,7 +27,7 @@ module.exports = Marionette.LayoutView.extend({
   initMiniBar: function(optionsForRegion) {
     return new MiniBarView(optionsForRegion({
       model:          this.model,
-      collection:     new MinibarCollection(null, { roomCollection: this.roomCollection }),
+      collection:     new MinibarCollection(context.getSnapshot('orgs'), { roomCollection: this.roomCollection }),
       bus:            this.bus,
       dndCtrl:        this.dndCtrl,
       roomCollection: this.model._roomCollection,
@@ -70,7 +72,7 @@ module.exports = Marionette.LayoutView.extend({
     this.delay = MENU_HIDE_DELAY;
 
     //Make a new model
-    this.model = window.model = new RoomMenuModel({
+    this.model = window.model = new RoomMenuModel(_.extend({}, context.getSnapshot('leftMenu'), {
       bus:                     this.bus,
       roomCollection:          this.roomCollection,
       orgCollection:           this.orgCollection,
@@ -79,7 +81,7 @@ module.exports = Marionette.LayoutView.extend({
 
       //TODO id this the best way to do this? JP 12/1/16
       isMobile:                $('body').hasClass('mobile'),
-    });
+    }));
 
     //Make a new drag & drop control
     this.dndCtrl = new DNDCtrl({ model: this.model });
