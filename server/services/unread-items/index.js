@@ -1,22 +1,22 @@
 /* jshint maxcomplexity:20 */
 "use strict";
 
-var env                    = require('gitter-web-env');
-var logger                 = env.logger;
-var _                      = require("lodash");
-var Promise                = require('bluebird');
-var uniqueIds              = require('mongodb-unique-ids');
-var appEvents              = require('gitter-web-appevents');
-var unreadItemDistribution = require('./distribution');
-var engine                 = require('./engine');
-var readByService          = require("../readby-service");
-var roomMembershipService  = require('../room-membership-service');
-var mongoUtils             = require('../../utils/mongo-utils');
-var RedisBatcher           = require('../../utils/redis-batcher').RedisBatcher;
-var collections            = require('../../utils/collections');
-var recentRoomCore         = require('../core/recent-room-core');
-var debug                  = require('debug')('gitter:unread-items:service');
-var badgeBatcher           = new RedisBatcher('badge', 1000, batchBadgeUpdates);
+var env                   = require('gitter-web-env');
+var logger                = env.logger;
+var _                     = require("lodash");
+var Promise               = require('bluebird');
+var uniqueIds             = require('mongodb-unique-ids');
+var appEvents             = require('gitter-web-appevents');
+var createDistribution    = require('./create-distribution');
+var engine                = require('./engine');
+var readByService         = require("../readby-service");
+var roomMembershipService = require('../room-membership-service');
+var mongoUtils            = require('../../utils/mongo-utils');
+var RedisBatcher          = require('../../utils/redis-batcher').RedisBatcher;
+var collections           = require('../../utils/collections');
+var recentRoomCore        = require('../core/recent-room-core');
+var debug                 = require('debug')('gitter:unread-items:service');
+var badgeBatcher          = new RedisBatcher('badge', 1000, batchBadgeUpdates);
 
 /* Handles batching badge updates to users */
 function batchBadgeUpdates(key, userIds, done) {
@@ -424,7 +424,7 @@ function processResultsForNewItemWithMentions(troupeId, chatId, distribution, re
 }
 
 function createChatUnreadItems(fromUserId, troupe, chat) {
-  return unreadItemDistribution(fromUserId, troupe, chat.mentions)
+  return createDistribution(fromUserId, troupe, chat.mentions)
     .then(function(distribution) {
       return engine.newItemWithMentions(troupe.id, chat.id, distribution.notifyUserIds, distribution.mentionUserIds)
         .then(function(results) {
@@ -511,7 +511,7 @@ function updateChatUnreadItems(fromUserId, troupe, chat, originalMentions) {
   var troupeId = troupe.id;
   var chatId = chat.id;
 
-  return unreadItemDistribution(fromUserId, troupe, chat.mentions)
+  return createDistribution(fromUserId, troupe, chat.mentions)
     .then(function(parsedChat) {
       var delta = generateMentionDeltaSet(parsedChat, originalMentions);
 

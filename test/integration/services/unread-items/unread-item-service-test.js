@@ -237,8 +237,8 @@ describe('unread-item-service', function() {
       var appEvents;
       var troupe;
       var chat;
-      var unreadItemDistribution;
-      var unreadItemDistributionResponse;
+      var createDistribution;
+      var createDistributionResponse;
 
       beforeEach(function() {
         troupeId = mongoUtils.getNewObjectIdString() + "";
@@ -259,16 +259,15 @@ describe('unread-item-service', function() {
         };
 
         appEvents = mockito.mock(testRequire('gitter-web-appevents'));
-        unreadItemDistribution = mockito.mockFunction();
-        unreadItemDistributionResponse = null;
+        createDistribution = mockito.mockFunction();
+        createDistributionResponse = null;
 
-        mockito.when(unreadItemDistribution)().then(function() {
-          return Promise.resolve(unreadItemDistributionResponse);
+        mockito.when(createDistribution)().then(function() {
+          return Promise.resolve(createDistributionResponse);
         });
 
         unreadItemService = testRequire.withProxies("./services/unread-items", {
-          './distribution': unreadItemDistribution,
-          // './categorise-users-in-room': categoriseUserInRoom,
+          './create-distribution': createDistribution,
           'gitter-web-appevents': appEvents,
         });
         unreadItemService.testOnly.setSendBadgeUpdates(false);
@@ -276,7 +275,7 @@ describe('unread-item-service', function() {
       });
 
       it('should create messages with no mentions, no lurkers', function() {
-        unreadItemDistributionResponse = {
+        createDistributionResponse = {
           notifyUserIds: [userId1, userId2],
           mentionUserIds: [],
           activityOnlyUserIds: [],
@@ -298,7 +297,7 @@ describe('unread-item-service', function() {
       });
 
       it('should create messages with no mentions, some lurkers', function() {
-        unreadItemDistributionResponse = {
+        createDistributionResponse = {
           notifyUserIds: [userId1],
           mentionUserIds: [],
           activityOnlyUserIds: [userId2],
@@ -319,7 +318,7 @@ describe('unread-item-service', function() {
       });
 
       it('should create messages with no mentions, all lurkers', function() {
-        unreadItemDistributionResponse = {
+        createDistributionResponse = {
           notifyUserIds: [],
           mentionUserIds: [],
           activityOnlyUserIds: [userId1, userId2],
@@ -339,7 +338,7 @@ describe('unread-item-service', function() {
       });
 
       it('should create messages with user mentions to non lurkers', function() {
-        unreadItemDistributionResponse = {
+        createDistributionResponse = {
           notifyUserIds: [userId1, userId2],
           mentionUserIds: [userId1],
           activityOnlyUserIds: [],
@@ -361,7 +360,7 @@ describe('unread-item-service', function() {
       });
 
       it('should create messages with user mentions to lurkers', function() {
-        unreadItemDistributionResponse = {
+        createDistributionResponse = {
           notifyUserIds: [userId1],
           mentionUserIds: [userId1],
           activityOnlyUserIds: [userId1, userId2],
@@ -382,7 +381,7 @@ describe('unread-item-service', function() {
       });
 
       it('should create messages with group mentions', function() {
-        unreadItemDistributionResponse = {
+        createDistributionResponse = {
           notifyUserIds: [userId1, userId2],
           mentionUserIds: [userId1, userId2],
           activityOnlyUserIds: [userId1, userId2],
@@ -416,8 +415,8 @@ describe('unread-item-service', function() {
       var unreadItemService;
       var troupe;
       var chat;
-      var unreadItemDistribution;
-      var unreadItemDistributionResponse;
+      var createDistribution;
+      var createDistributionResponse;
 
       beforeEach(function() {
         troupeId = mongoUtils.getNewObjectIdString() + "";
@@ -439,14 +438,14 @@ describe('unread-item-service', function() {
 
         appEvents = mockito.mock(testRequire('gitter-web-appevents'));
 
-        unreadItemDistribution = mockito.mockFunction();
-        unreadItemDistributionResponse = null;
-        mockito.when(unreadItemDistribution)().then(function() {
-          return Promise.resolve(unreadItemDistributionResponse);
+        createDistribution = mockito.mockFunction();
+        createDistributionResponse = null;
+        mockito.when(createDistribution)().then(function() {
+          return Promise.resolve(createDistributionResponse);
         });
 
         unreadItemService = testRequire.withProxies("./services/unread-items", {
-          './distribution': unreadItemDistribution,
+          './create-distribution': createDistribution,
           'gitter-web-appevents': appEvents,
         });
         unreadItemService.testOnly.setSendBadgeUpdates(false);
@@ -454,7 +453,7 @@ describe('unread-item-service', function() {
       });
 
       it('should handle updates that add no mentions to a message with no mentions', function() {
-        unreadItemDistributionResponse = {
+        createDistributionResponse = {
           notifyUserIds: [userId1, userId2],
           mentionUserIds: [],
           activityOnlyUserIds: [],
@@ -470,7 +469,7 @@ describe('unread-item-service', function() {
       });
 
       it('should handle updates that add mentions to a message with no mentions', function() {
-        unreadItemDistributionResponse = {
+        createDistributionResponse = {
           notifyUserIds: [userId1, userId2],
           mentionUserIds: [userId1],
           activityOnlyUserIds: [],
@@ -490,7 +489,7 @@ describe('unread-item-service', function() {
       });
 
       it('should handle updates that remove mentions from a message with mentions', function() {
-        unreadItemDistributionResponse = {
+        createDistributionResponse = {
           notifyUserIds: [userId1, userId2],
           mentionUserIds: [],
           activityOnlyUserIds: [],
