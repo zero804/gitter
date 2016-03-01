@@ -3,6 +3,7 @@
 var testRequire = require('./test-require');
 var Promise     = require('bluebird');
 var persistence = testRequire("./services/persistence-service");
+var roomMembershipFlags = testRequire("./services/room-membership-flags");
 var debug       = require('debug')('gitter:test-fixtures');
 var counter     = 0;
 
@@ -141,13 +142,27 @@ function createExpectedFixtures(expected, done) {
     });
   }
 
-  function bulkInsertTroupeUsers(troupeId, userIds) {
+  function bulkInsertTroupeUsers(troupeId, userIds, membershipStrategy) {
       var bulk = persistence.TroupeUser.collection.initializeUnorderedBulkOp();
 
-      userIds.forEach(function(userId) {
-        bulk.find({ troupeId: troupeId, userId:userId }).upsert().updateOne({
-          $setOnInsert: { troupeId: troupeId, userId:userId }
-        });
+      userIds.forEach(function(userId, index) {
+        var membership = membershipStrategy && membershipStrategy(userId, index);
+        var flags, lurk;
+
+        if (membership) {
+          flags = membership.flags;
+          lurk = membership.lurk;
+        } else {
+          flags = roomMembershipFlags.MODES.all;
+          lurk = false;
+        }
+
+        bulk.find({ troupeId: troupeId, userId:userId })
+          .upsert()
+          .updateOne({
+            $set: { flags: flags, lurk: lurk },
+            $setOnInsert: { troupeId: troupeId, userId:userId }
+          });
       });
 
       return Promise.fromCallback(function(callback) {
@@ -191,7 +206,7 @@ function createExpectedFixtures(expected, done) {
     return persistence.Troupe.create(doc)
       .then(function(troupe) {
         if (!f.userIds || !f.userIds.length) return troupe;
-        return bulkInsertTroupeUsers(troupe._id, f.userIds)
+        return bulkInsertTroupeUsers(troupe._id, f.userIds, f.membershipStrategy)
           .thenReturn(troupe);
       });
   }
