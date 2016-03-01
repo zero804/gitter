@@ -1,13 +1,14 @@
 "use strict";
-var Backbone = require('backbone');
-var qs = require('./qs');
-var _ = require('underscore');
+var Backbone   = require('backbone');
+var qs         = require('./qs');
+var _          = require('underscore');
 var localStore = require('../components/local-store');
-var Promise = require('bluebird');
+var Promise    = require('bluebird');
 
 module.exports = (function() {
 
-  var ctx = window.troupeContext || {};
+  var ctx         = window.troupeContext || {};
+  var snapshots   = (ctx.snapshots || { rooms: [], orgs: [] });
 
   function getTroupeModel() {
     var troupeModel;
@@ -293,6 +294,16 @@ module.exports = (function() {
 
   context.getFeatures = function() {
     return ctx.features || [];
+  };
+
+  context.getSnapshot = function(key) {
+    var snapshot = snapshots[key];
+
+    //cleanup
+    delete snapshots[key];
+    delete ctx.snapshots[key];
+
+    return snapshot;
   };
 
   return context;

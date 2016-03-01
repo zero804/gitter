@@ -36,11 +36,12 @@ function executeBatch(urlBase) {
     'CREATE INDEX ON :User(userId)',
     'CREATE INDEX ON :Room(roomId)',
     'CREATE INDEX ON :Room(security)',
+    'CREATE INDEX ON :Room(lcOwner)',
     /* Load users */
     'USING PERIODIC COMMIT LOAD CSV WITH HEADERS FROM "' + urlBase + '/users.csv" AS row MERGE (user:User {userId: row.userId }) SET user.username = row.username;',
 
     /* Load rooms */
-    'USING PERIODIC COMMIT LOAD CSV WITH HEADERS FROM "' + urlBase + '/rooms.csv" AS row MERGE (room:Room {roomId: row.roomId }) SET room.security = row.security, room.weight = toFloat(row.weight), room.lang = row.lang',
+    'USING PERIODIC COMMIT LOAD CSV WITH HEADERS FROM "' + urlBase + '/rooms.csv" AS row MERGE (room:Room {roomId: row.roomId }) SET room.security = row.security, room.weight = toFloat(row.weight), room.lcOwner = row.lcOwner, room.lang = row.lang;',
 
     /* Setup MEMBER relationship */
     'USING PERIODIC COMMIT LOAD CSV WITH HEADERS FROM "' + urlBase + '/membership.csv" AS row ' +

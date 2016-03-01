@@ -57,10 +57,11 @@ module.exports = function(req, res, next) {
         return oauthService.removeAllAccessTokensForUser(userId);
       })
       .catch(function(err) {
-          logger.error('Unable to remove access tokens: ' + err, { exception: err });
+        logger.error('Unable to remove access tokens: ' + err, { exception: err });
       }).
       then(function() {
-        return send(req, res, next);
+        send(req, res, next);
+        return null;
       });
   }
 };

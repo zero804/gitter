@@ -1,0 +1,24 @@
+{{#if isHome}}
+  <a title="All Conversations"><img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/logo.svg"}}' /></a>
+{{/if}}
+
+{{#if isSearch}}
+  <a title="Search Gitter"><img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/search.svg"}}' /></a>
+{{/if}}
+
+{{#if isFavourite}}
+  <a title="Your Favourite Conversations"><img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/favourites.svg"}}' /></a>
+{{/if}}
+
+{{#if isPeople}}
+  {{#if mentions}}<span class="room-menu-options__item__mentions">{{mentions}}</span>{{/if}}
+  {{#if unreadItems}}<span class="room-menu-options__item__unread-items">{{unreadItems}}</span>{{/if}}
+  <a title="Your One to One Conversations"><img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/people.svg"}}' /></a>
+{{/if}}
+
+{{#if isOrg}}
+  {{#if mentions}}<span class="room-menu-options__item__mentions">{{mentions}}</span>{{/if}}
+  {{#if unreadItems}}<span class="room-menu-options__item__unread-items">{{unreadItems}}</span>{{/if}}
+  {{#if activity}}<span class="room-menu-options__item__activity">&nbsp;</span>{{/if}}
+    <a title="{{name}}"><img class="room-menu-options__item__avatar" src='{{avatarUrl}}' /></a>
+{{/if}}

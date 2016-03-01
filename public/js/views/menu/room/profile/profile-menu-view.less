@@ -1,0 +1,44 @@
+@import 'trp3Vars';
+@import "../../../../../less/components/menu/room/avatar.less";
+@import "../../../../../less/components/menu/room/menu-text.less";
+
+.lm-profile-menu {
+  margin-left:   0;
+  margin-bottom: 0;
+  max-height:    0;
+  transition:    max-height .2s linear;
+  overflow:      hidden;
+
+  &.active {
+    max-height: 40rem;
+  }
+}
+
+.lm-profile-menu__item {
+  height: @menu-item-height;
+
+  .desktop & {
+    padding-left: @desktop-menu-left-padding / 2;
+    margin-left:  @desktop-menu-left-padding / 2;
+    margin-right: @desktop-menu-left-padding / 2;
+  }
+
+  .mobile {
+    padding-left: @mobile-menu-left-padding;
+  }
+
+  &:hover {
+    background-color: rgba(255, 255, 255, .1);
+  }
+}
+
+.lm-profile-menu__item__title {
+  .room-menu-text();
+  a {
+    display: block;
+    color: inherit;
+    &:hover {
+      text-decoration: none;
+    }
+  }
+}

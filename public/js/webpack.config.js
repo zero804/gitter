@@ -72,6 +72,7 @@ var webpackConfig = {
     devtoolFallbackModuleFilenameTemplate: "[resource-path]?[hash]"
   },
   module: {
+    //JP 12/1/16 If you add a loader remember to add it to /test/in-browser/webpack.config.js
     loaders: [
       {
         test: /\.hbs$/,
@@ -121,7 +122,7 @@ var webpackConfig = {
       "underscore": path.resolve(path.join(__dirname, "utils/underscore-wrapper")),
       "backbone": path.resolve(path.join(__dirname, "../../node_modules/backbone")),
 
-      "bluebird": path.resolve(path.join(__dirname, "utils/bluebird-wrapper")),
+      "bluebird": path.resolve(path.join(__dirname, "utils/bluebird-wrapper"))
     },
   },
   plugins: [

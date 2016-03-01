@@ -8,13 +8,19 @@ var unreadItemsClient = require('components/unread-items-frame-client');
 var appEvents         = require('utils/appevents');
 var Sorted            = require('backbone-sorted-collection');
 var errorHandle       = require('utils/live-collection-error-handle');
+var context           = require('utils/context');
+var moment            = require('moment');
+var _                 = require('underscore');
 
 
 require('filtered-collection');
 
 module.exports = (function() {
   var orgsCollection = new orgModels.OrgCollection(null, { listen: true });
-  var troupeCollection = new troupeModels.TroupeCollection(null, { listen: true });
+  var existingRooms = context.getSnapshot('rooms').map(function(data){
+    return !!data.lastAccessTime ? _.extend(data, { lastAccessTime: moment(data.lastAccessTime) }) : data;
+  });
+  var troupeCollection = new troupeModels.TroupeCollection(existingRooms, { listen: true });
 
   orgsCollection.on('error', errorHandle.bind(null, 'org-collection'));
 
@@ -49,6 +55,13 @@ module.exports = (function() {
     } else {
       model.set('activity', 1);
     }
+  });
+
+  //We never post activity changes back to the server so
+  //reset lurk activity for the current room JP 4/2/16
+  context.troupe().on('change:id', function(troupe, val){ //jshint unused: true
+    var activeRoom = troupeCollection.get(val);
+    if(activeRoom) { activeRoom.set('activity', false); }
   });
 
 
