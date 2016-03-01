@@ -204,6 +204,7 @@ makeTestTasks('localtest', function(name, files) {
     .pipe(mocha({
       reporter: 'spec',
       timeout: 10000,
+      bail: !!process.env.BAIL,
       env: {
         SKIP_BADGER_TESTS: 1,
         DISABLE_CONSOLE_LOGGING: 1,
@@ -632,7 +633,7 @@ gulp.task('sonar', function () {
         }
       },
       analysis: {
-        mode: 'publish'
+        mode: 'preview'
       },
       github: {
         pullRequest: process.env.ghprbPullId,
