@@ -7,6 +7,7 @@ var Promise               = require('bluebird');
 var roomMembershipService = require('./room-membership-service');
 var userService           = require("./user-service");
 var roomPermissionsModel  = require('./room-permissions-model');
+var categoriseUserInRoom  = require("./categorise-users-in-room");
 
 /**
  * Given an array of non-member userIds in a room,
@@ -116,7 +117,8 @@ function parseMentions(fromUserId, troupe, userIdsWithLurk, mentions) {
 }
 
 function unreadItemDistribution(fromUserId, troupe, mentions) {
-  return roomMembershipService.findMembersForRoomWithLurk(troupe._id)
+  var troupeId = troupe._id;
+  return roomMembershipService.findMembersForRoomWithLurk(troupeId)
     .then(function(userIdsWithLurk) {
       var creatorUserId = fromUserId && "" + fromUserId;
 
@@ -167,6 +169,16 @@ function unreadItemDistribution(fromUserId, troupe, mentions) {
           };
         });
 
+    })
+    .then(function(distribution) {
+      var allUserIds = distribution.notifyUserIds.concat(distribution.activityOnlyUserIds);
+
+      // In future, this should take into account announcements
+      return categoriseUserInRoom(troupeId, allUserIds)
+        .then(function(presenceStatus) {
+          distribution.presence = presenceStatus;
+          return distribution;
+        });
     });
 }
 
