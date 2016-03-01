@@ -4,6 +4,7 @@ var apn = require('apn');
 var debug = require('debug')('gitter:ios-notification-gateway');
 var env = require('gitter-web-env');
 var Promise = require('bluebird');
+var pushNotificationService = require('../services/push-notification-service');
 var logger = env.logger;
 var config = env.config;
 var errorReporter = env.errorReporter;
@@ -105,10 +106,16 @@ function createFeedbackListener(suffix, isProduction) {
       production: isProduction
     });
 
-    feedback.on('feedback', function(devices) {
-      if(devices.length) {
-        logger.warn('ios push notification feedback received (' + suffix + '). Need to remove the following devices sometime:', { deviceCount: devices.length });
-      }
+    feedback.on('feedback', function(item) {
+      var deviceTokens = item.map(function(item) {
+        return item.device.token;
+      });
+
+      return pushNotificationService.deregisterIosDevices(deviceTokens)
+        .catch(function(err) {
+          logger.error('ios push notification tokens (' + suffix + ') failed to remove after feedback', { error: err.message });
+          errorReporter(err, { apnEnv: suffix }, { module: 'ios-notification-gateway' });
+        });
     });
 
     feedback.on('error', function(err) {
