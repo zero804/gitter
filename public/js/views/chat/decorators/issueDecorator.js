@@ -13,10 +13,10 @@ var footerTemplate = require('./tmpl/commitPopoverFooter.hbs');
 var SyncMixin = require('collections/sync-mixin');
 
 
-var changeElementType = function(element, newType) {
+var convertToIssueAnchor = function(element, gitHubIssueUrl) {
   var resultantElement = element;
   if(element.tagName !== 'a') {
-    var newElement = document.createElement(newType);
+    var newElement = document.createElement('a');
     newElement.innerHTML = element.innerHTML;
     element.parentNode.replaceChild(newElement, element);
 
@@ -26,6 +26,8 @@ var changeElementType = function(element, newType) {
       newElement.setAttribute(attr.nodeName, attr.nodeValue);
     });
 
+    element.setAttribute('href', gitHubIssueUrl);
+    element.setAttribute('target', '_blank');
 
     resultantElement = newElement;
   }
@@ -127,15 +129,11 @@ module.exports = (function() {
       Array.prototype.forEach.call(view.el.querySelectorAll('*[data-link-type="issue"]'), function(issueElement) {
         var repo = issueElement.dataset.issueRepo || roomRepo;
         var issueNumber = issueElement.dataset.issue;
-        var getGitHubIssueUrl = function() {
-           return 'https://github.com/' + repo + '/issues/' + issueNumber;
-        };
+        var gitHubIssueUrl = 'https://github.com/' + repo + '/issues/' + issueNumber;
 
 
         // Convert to a link
-        issueElement = changeElementType(issueElement, 'a');
-        issueElement.setAttribute('href', getGitHubIssueUrl());
-        issueElement.setAttribute('target', '_blank');
+        issueElement = convertToIssueAnchor(issueElement, gitHubIssueUrl);
 
         getIssueState(repo, issueNumber)
           .then(function(state) {
@@ -163,7 +161,7 @@ module.exports = (function() {
           var model = new IssueModel({
             repo: repo,
             number: issueNumber,
-            html_url: getGitHubIssueUrl()
+            html_url: gitHubIssueUrl
           });
 
           model.fetch({
