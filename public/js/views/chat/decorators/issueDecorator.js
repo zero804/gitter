@@ -1,6 +1,5 @@
 /* jshint unused:strict, browser:true, strict:true, -W097 */
 "use strict";
-var $ = require('jquery');
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 var context = require('utils/context');
@@ -15,18 +14,23 @@ var SyncMixin = require('collections/sync-mixin');
 
 
 var changeElementType = function(element, newType) {
-  var $element = $(element);
+  var resultantElement = element;
+  if(element.tagName !== 'a') {
+    var attrs = {};
+    var attrNamedNodeMap = element.attributes;
+    Object.keys(attrNamedNodeMap).forEach(function(index) {
+      var attr = attrNamedNodeMap[index];
+      attrs[attr.nodeName] = attr.nodeValue;
+    });
 
-  var attrs = {};
-  var attrNamedNodeMap = $element[0].attributes;
-  Object.keys(attrNamedNodeMap).forEach(function(index) {
-    var attr = attrNamedNodeMap[index];
-    attrs[attr.nodeName] = attr.nodeValue;
-  });
+    var newElement = document.createElement(newType);
+    newElement.innerHTML = element.innerHTML;
+    element.parentNode.replaceChild(newElement, element);
 
-  var $newElement = $('<' + newType + '/>', attrs).append($element.contents());
-  $element.replaceWith($newElement);
-  return $newElement;
+    resultantElement = newElement;
+  }
+
+  return resultantElement;
 };
 
 
@@ -120,44 +124,35 @@ module.exports = (function() {
     decorate: function(view) {
       var roomRepo = getRoomRepo();
 
-      view.$el.find('*[data-link-type="issue"]').each(function() {
-        var $issue = $(this);
+      view.el.querySelectorAll('*[data-link-type="issue"]').forEach(function(issueElement) {
+        var repo = issueElement.dataset.issueRepo || roomRepo;
+        var issueNumber = issueElement.dataset.issue;
 
-        var repo = $issue.data('issueRepo') || roomRepo;
-        var issueNumber = $issue.data('issue');
+        // Convert to a link
+        issueElement = changeElementType(issueElement, 'a');
+        issueElement.setAttribute('href', getModel().get('html_url'));
+        issueElement.setAttribute('target', '_blank');
 
-        var convertToLink = function() {
-          $issue = changeElementType($issue, 'a');
-          $issue.attr('href', getModel().get('html_url'));
-          $issue.attr('target', '_blank');
-        };
 
         getIssueState(repo, issueNumber)
           .then(function(state) {
             if(state) {
               // We depend on this to style the issue after making sure it is an issue
-              $issue.addClass('is-existent');
+              issueElement.classList.add('is-existent');
 
               // dont change the issue state colouring for the activity feed
-              if(!$issue.hasClass('open') && !$issue.hasClass('closed')) {
-                $issue.addClass(state);
+              if(!issueElement.classList.contains('open') && !issueElement.classList.contains('closed')) {
+                issueElement.classList.add(state);
               }
 
               // Hook up all of the listeners
-              $issue.on('click', showPopover);
-              $issue.on('mouseover', showPopoverLater);
+              issueElement.addEventListener('click', showPopover);
+              issueElement.addEventListener('mouseover', showPopoverLater);
 
               view.once('destroy', function() {
-                $issue.off('click', showPopover);
-                $issue.off('mouseover', showPopoverLater);
+                issueElement.removeEventListener('click', showPopover);
+                issueElement.removeEventListener('mouseover', showPopoverLater);
               });
-            }
-          })
-          .catch(function(err) {
-            // Only convert to link if we are sure the request was messed up vs
-            // a definitive doesn't exist 404
-            if(err.status < 400 && err.status > 499) {
-              convertToLink();
             }
           });
 
@@ -182,6 +177,8 @@ module.exports = (function() {
           var popover = createPopover(model, e.target);
           popover.show();
           Popover.singleton(view, popover);
+
+          e.preventDefault();
         }
 
         function showPopoverLater(e) {
