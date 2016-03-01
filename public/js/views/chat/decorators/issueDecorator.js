@@ -1,6 +1,5 @@
 /* jshint unused:strict, browser:true, strict:true, -W097 */
 "use strict";
-var Promise = require('bluebird');
 var $ = require('jquery');
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
@@ -13,7 +12,6 @@ var bodyTemplate = require('./tmpl/issuePopover.hbs');
 var titleTemplate = require('./tmpl/issuePopoverTitle.hbs');
 var footerTemplate = require('./tmpl/commitPopoverFooter.hbs');
 var SyncMixin = require('collections/sync-mixin');
-
 
 
 var changeElementType = function(element, newType) {
@@ -34,22 +32,13 @@ var changeElementType = function(element, newType) {
 
 module.exports = (function() {
 
-  var localCache = {};
   function getIssueState(repo, issueNumber) {
     var issue = repo + '/' + issueNumber;
-    var localResult = localCache[issue];
-    if(localResult) {
-      return Promise.resolve(localResult);
-    }
-
     return apiClient.priv.get('/issue-state', { q: issue })
       .then(function(states) {
-        localCache[issue] = states[0];
-        setTimeout(function() { delete localCache[issue]; }, 60000);
         return states[0];
       });
   }
-
 
 
   var BodyView = Marionette.ItemView.extend({
