@@ -7,7 +7,7 @@ var persistence        = require('./persistence-service');
 var assert             = require('assert');
 var appEvents          = require('gitter-web-appevents');
 var moment             = require('moment');
-var unreadItemsService = require('./unread-item-service');
+var unreadItemsService = require('./unread-items');
 var recentRoomCore     = require('./core/recent-room-core');
 var debug              = require('debug')('gitter:recent-room-service');
 

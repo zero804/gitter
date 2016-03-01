@@ -4,10 +4,10 @@ var env                   = require('gitter-web-env');
 var errorReporter         = env.errorReporter;
 var _                     = require('lodash');
 var Promise               = require('bluebird');
-var roomMembershipService = require('./room-membership-service');
-var userService           = require("./user-service");
-var roomPermissionsModel  = require('./room-permissions-model');
-var categoriseUserInRoom  = require("./categorise-users-in-room");
+var roomMembershipService = require('../room-membership-service');
+var userService           = require("../user-service");
+var roomPermissionsModel  = require('../room-permissions-model');
+var categoriseUserInRoom  = require("../categorise-users-in-room");
 
 /**
  * Given an array of non-member userIds in a room,

@@ -3,7 +3,7 @@
 "use strict";
 
 var troupeService = require('../../server/services/troupe-service');
-var unreadItemService = require('../../server/services/unread-item-service');
+var unreadItemService = require('../../server/services/unread-items');
 var roomMembershipService = require("../../server/services/room-membership-service");
 var persistence = require('../../server/services/persistence-service');
 var mongoUtils = require('../../server/utils/mongo-utils');

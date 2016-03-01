@@ -4,7 +4,7 @@ var env                         = require('gitter-web-env');
 var stats                       = env.stats;
 var recentRoomCore              = require('./core/recent-room-core');
 var userRoomNotificationService = require('./user-room-notification-service');
-var unreadItemService           = require('./unread-item-service');
+var unreadItemService           = require('./unread-items');
 var Promise                     = require('bluebird');
 var roomMembershipService       = require('./room-membership-service');
 

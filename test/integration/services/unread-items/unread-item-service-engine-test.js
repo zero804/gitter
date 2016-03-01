@@ -1,15 +1,15 @@
 "use strict";
 
-var testRequire = require('../test-require');
+var testRequire = require('../../test-require');
 var Promise = require('bluebird');
 var assert = require('assert');
 var mongoUtils = testRequire('./utils/mongo-utils');
 var _ = require('lodash');
+var blockTimer = require('../../block-timer');
 
 
 describe('unread-item-service', function() {
 
-  var blockTimer = require('../block-timer');
   before(blockTimer.on);
   after(blockTimer.off);
 
@@ -21,7 +21,7 @@ describe('unread-item-service', function() {
   after(function(done) {
     if (process.env.DISABLE_EMAIL_NOTIFY_CLEAR_AFTER_TEST) return done();
 
-    var unreadItemServiceEngine = testRequire('./services/unread-item-service-engine');
+    var unreadItemServiceEngine = testRequire('./services/unread-items/engine');
     unreadItemServiceEngine.testOnly.removeAllEmailNotifications()
       .nodeify(done);
   });
@@ -31,7 +31,7 @@ describe('unread-item-service', function() {
     var unreadItemServiceEngine, troupeId1, itemId1, itemId2, itemId3, userId1, userId2, userIds, troupeId2;
 
     beforeEach(function() {
-      unreadItemServiceEngine = testRequire('./services/unread-item-service-engine');
+      unreadItemServiceEngine = testRequire('./services/unread-items/engine');
       troupeId1 = mongoUtils.getNewObjectIdString();
       troupeId2 = mongoUtils.getNewObjectIdString();
       userId1 = mongoUtils.getNewObjectIdString();
@@ -297,7 +297,7 @@ describe('unread-item-service', function() {
 
     describe('listTroupeUsersForEmailNotifications', function() {
       before(function(done) {
-        var unreadItemServiceEngine = testRequire('./services/unread-item-service-engine');
+        var unreadItemServiceEngine = testRequire('./services/unread-items/engine');
         unreadItemServiceEngine.testOnly.removeAllEmailNotifications()
           .nodeify(done);
       });
@@ -799,7 +799,7 @@ describe('unread-item-service', function() {
     var unreadItemServiceEngine;
     var batchSize;
     beforeEach(function() {
-      unreadItemServiceEngine = testRequire('./services/unread-item-service-engine');
+      unreadItemServiceEngine = testRequire('./services/unread-items/engine');
       batchSize = unreadItemServiceEngine.testOnly.UNREAD_BATCH_SIZE;
     });
 
@@ -885,7 +885,7 @@ describe('unread-item-service', function() {
     userId1, userId2, itemId1, itemId2, itemId3, userIds;
 
     beforeEach(function() {
-      unreadItemServiceEngine = testRequire('./services/unread-item-service-engine');
+      unreadItemServiceEngine = testRequire('./services/unread-items/engine');
 
       troupeId1 = mongoUtils.getNewObjectIdString();
       troupeId2 = mongoUtils.getNewObjectIdString();
@@ -1182,7 +1182,7 @@ describe('unread-item-service', function() {
     var mergeUnreadItemsWithMentions;
 
     before(function() {
-      mergeUnreadItemsWithMentions = testRequire('./services/unread-item-service-engine').testOnly.mergeUnreadItemsWithMentions;
+      mergeUnreadItemsWithMentions = testRequire('./services/unread-items/engine').testOnly.mergeUnreadItemsWithMentions;
     });
 
     it('should handle no items', function() {
@@ -1219,7 +1219,7 @@ describe('unread-item-service', function() {
     var selectTroupeUserBatchForEmails;
 
     before(function() {
-      selectTroupeUserBatchForEmails = testRequire('./services/unread-item-service-engine').testOnly.selectTroupeUserBatchForEmails;
+      selectTroupeUserBatchForEmails = testRequire('./services/unread-items/engine').testOnly.selectTroupeUserBatchForEmails;
     });
 
     it('should limit the maximum number of users in an email batch to 3000', function() {
@@ -1244,7 +1244,7 @@ describe('unread-item-service', function() {
     var transformUserTroupesWithLimit;
 
     before(function() {
-      transformUserTroupesWithLimit = testRequire('./services/unread-item-service-engine').testOnly.transformUserTroupesWithLimit;
+      transformUserTroupesWithLimit = testRequire('./services/unread-items/engine').testOnly.transformUserTroupesWithLimit;
     });
 
     it('should limit the maximum number of rooms a user gets notified for to 15', function() {
