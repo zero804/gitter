@@ -1,7 +1,7 @@
 'use strict';
 
 var Marionette = require('backbone.marionette');
-var RAF        = require('utils/raf');
+var fastdom    = require('fastdom');
 var template   = require('./base-collection-view.hbs');
 var context    = require('utils/context');
 
@@ -70,7 +70,7 @@ module.exports = Marionette.CompositeView.extend({
   },
 
   onRender: function() {
-    RAF(function() {
+    fastdom.mutate(function() {
       this.setActive();
       this.setLoaded();
     }.bind(this));
@@ -88,10 +88,6 @@ module.exports = Marionette.CompositeView.extend({
 
   onDestroy: function() {
     this.stopListening(context.troupe());
-  },
-
-  render: function() {
-    Marionette.CompositeView.prototype.render.apply(this, arguments);
   },
 
 });

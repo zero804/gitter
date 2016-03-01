@@ -1,7 +1,17 @@
 'use strict';
 
-var Backbone = require('backbone');
+var Backbone                   = require('backbone');
 var BackboneFilteredCollection = require('filtered-collection');
+
+//Filters
+var defaultFilter              = require('gitter-web-shared/filters/left-menu-primary-default');
+var favouriteFilter            = require('gitter-web-shared/filters/left-menu-primary-favourite');
+var one2oneFilter              = require('gitter-web-shared/filters/left-menu-primary-one2one');
+var orgFilter                  = require('gitter-web-shared/filters/left-menu-primary-org');
+
+//Sort
+var defaultSort                = require('gitter-web-shared/sorting/left-menu-primary-default');
+var favouriteSort              = require('gitter-web-shared/sorting/left-menu-primary-favourite');
 
 var FilteredRoomCollection = Backbone.FilteredCollection.extend({
   initialize: function(collection, options) {//jshint unused: true
@@ -22,34 +32,18 @@ var FilteredRoomCollection = Backbone.FilteredCollection.extend({
 
     this.listenTo(this, 'sync', this.onSync, this);
 
+
     BackboneFilteredCollection.prototype.initialize.apply(this, arguments);
+    this.onModelChangeState();
   },
 
   comparator: function(a, b) {
-    var aMentions   = a.get('mentions');
-    var bMentions   = b.get('mentions');
-    if (aMentions) { return -1; }
-    if (bMentions) { return 1; }
-
-    var aUnread = !!a.get('unreadItems');
-    var bUnread = !!b.get('unreadItems');
-
-    if (aUnread) { return -1; }
-    if (bUnread) { return 1;}
-
-    var aLastAccess = a.get('lastAccessTime');
-    var bLastAccess = b.get('lastAccessTime');
-
-    if(!aLastAccess || !aLastAccess.valueOf) { return 1 }
-    if(!bLastAccess || !bLastAccess.valueOf) { return -1 }
-
-    return aLastAccess < bLastAccess ? 1 : -1;
-
+    return defaultSort(a.toJSON(), b.toJSON());
   },
 
-  onModelChangeState: function(model, val) {//jshint unused: true
+  onModelChangeState: function() {//jshint unused: true
     this.comparator = FilteredRoomCollection.prototype.comparator;
-    switch (val) {
+    switch (this.roomModel.get('state')) {
       case 'favourite' :
         this.setFilter(this.filterFavourite.bind(this));
         this.comparator = this.sortFavourites;
@@ -75,11 +69,11 @@ var FilteredRoomCollection = Backbone.FilteredCollection.extend({
   },
 
   filterFavourite: function(model) {
-    return this.filterDefault(model) && !!model.get('favourite');
+    return favouriteFilter(model.toJSON());
   },
 
   filterOneToOnes: function(model) {
-    return this.filterDefault(model) && model.get('githubType') === 'ONETOONE';
+    return one2oneFilter(model.toJSON());
   },
 
   filterSearches: function() {
@@ -87,13 +81,12 @@ var FilteredRoomCollection = Backbone.FilteredCollection.extend({
   },
 
   filterDefault: function (model){
-    return !!model.get('lastAccessTime');
+    return defaultFilter(model.toJSON());
   },
 
   filterOrgRooms: function(model) {
     var orgName = this.roomModel.get('selectedOrgName');
-    var name    = model.get('name').split('/')[0];
-    return (name === orgName) && this.filterDefault(model) && !!model.get('roomMember');
+    return orgFilter(model.toJSON(), orgName);
   },
 
   onRoomCollectionSnapshot: function() {
@@ -102,7 +95,7 @@ var FilteredRoomCollection = Backbone.FilteredCollection.extend({
   },
 
   sortFavourites: function(a, b) {
-    return (a.get('favourite') < b.get('favourite')) ? -1 : 1;
+    return favouriteSort(a.toJSON(), b.toJSON());
   },
 
   onSync: function() {
