@@ -473,7 +473,7 @@ exports.getActivityIndicatorForTroupeIds = function(troupeIds, userId) {
 
       var lastMsgTimes = troupeIds.reduce(function(accum, troupeId, index) {
         if (!rawLastMsgTimes[index]) return accum;
-        var ts = parseInt(rawLastMsgTimes[index]);
+        var ts = parseInt(rawLastMsgTimes[index], 10);
         accum[troupeId] = new Date(ts);
         return accum;
       }, {});
