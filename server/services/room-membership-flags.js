@@ -44,7 +44,7 @@ function getModeFromFlags(flags) {
     case MODES.all:
       return 'all';
     case MODES.announcement:
-      return 'mention'; // TODO: rename this to announcement
+      return 'announcement';
     case MODES.mute:
       return 'mute';
   }
@@ -83,6 +83,12 @@ function getLurkForMode(mode) {
 
 module.exports = {
   MODES: MODES,
+
+  FLAG_POS_NOTIFY_UNREAD: FLAG_POS_NOTIFY_UNREAD,
+  FLAG_POS_NOTIFY_ACTIVITY: FLAG_POS_NOTIFY_ACTIVITY,
+  FLAG_POS_NOTIFY_MENTION: FLAG_POS_NOTIFY_MENTION,
+  FLAG_POS_NOTIFY_ANNOUNCEMENT: FLAG_POS_NOTIFY_ANNOUNCEMENT,
+
   getModeFromFlags: getModeFromFlags,
   getUpdateForMode: getUpdateForMode,
   getLurkForFlags: getLurkForFlags,

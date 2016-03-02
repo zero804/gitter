@@ -184,7 +184,7 @@ describe('room-membership-service', function() {
             return roomMembershipService.getMembershipMode(userId1, troupeId2);
           })
           .then(function(mode) {
-            assert.strictEqual(mode, 'mention');
+            assert.strictEqual(mode, 'announcement');
             return roomMembershipService.getMemberLurkStatus(troupeId2, userId1);
           })
           .then(function(lurking) {
@@ -255,7 +255,7 @@ describe('room-membership-service', function() {
             return roomMembershipService.getMembershipMode(userId1, troupeId2);
           })
           .then(function(mode) {
-            assert.strictEqual(mode, 'mention');
+            assert.strictEqual(mode, 'announcement');
             return roomMembershipService.getMemberLurkStatus(troupeId2, userId1);
           })
           .then(function(lurking) {
@@ -607,7 +607,7 @@ describe('room-membership-service', function() {
             })
             .then(function(result) {
               var expected = {};
-              expected[userId1] = 'mention';
+              expected[userId1] = 'announcement';
               expected[userId2] = 'all';
               assert.deepEqual(result, expected);
 
@@ -618,7 +618,7 @@ describe('room-membership-service', function() {
             })
             .then(function(result) {
               var expected = {};
-              expected[userId1] = 'mention';
+              expected[userId1] = 'announcement';
               expected[userId2] = 'mute';
               assert.deepEqual(result, expected);
 
@@ -637,6 +637,95 @@ describe('room-membership-service', function() {
       });
     });
 
+    describe('findMembersForRoomForNotify', function() {
+      var troupeId1, userId1, userId2, userId3;
+
+      before(function() {
+        troupeId1 = fixture.troupe1.id;
+        userId1 = fixture.user1.id;
+        userId2 = fixture.user2.id;
+        userId3 = fixture.user3.id;
+
+        return Promise.join(
+            roomMembershipService.addRoomMember(troupeId1, userId1),
+            roomMembershipService.addRoomMember(troupeId1, userId2),
+            roomMembershipService.addRoomMember(troupeId1, userId3),
+          function() {
+            return Promise.join(
+              roomMembershipService.setMembershipModeForUsersInRoom(troupeId1, [userId1], 'all'),
+              roomMembershipService.setMembershipModeForUsersInRoom(troupeId1, [userId2], 'announcement'),
+              roomMembershipService.setMembershipModeForUsersInRoom(troupeId1, [userId3], 'mute')
+            );
+          });
+      });
+
+      it('should return notify users', function() {
+        // No announcement, no
+        return roomMembershipService.findMembersForRoomForNotify(troupeId1)
+          .then(function(result) {
+            var expected = {};
+            expected[userId1] = 'all';
+
+            assert.deepEqual(result, expected);
+          });
+      });
+
+      it('should return notify users and announce users', function() {
+        return roomMembershipService.findMembersForRoomForNotify(troupeId1, true)
+          .then(function(result) {
+            var expected = {};
+            expected[userId1] = 'all';
+            expected[userId2] = 'announcement';
+
+            assert.deepEqual(result, expected);
+          });
+      });
+
+      it('should return notify users and mention users who are already notify users', function() {
+        return roomMembershipService.findMembersForRoomForNotify(troupeId1, false, [userId1])
+          .then(function(result) {
+            var expected = {};
+            expected[userId1] = 'all';
+
+            assert.deepEqual(result, expected);
+          });
+      });
+
+      it('should return notify users and mention users who are announcement users', function() {
+        return roomMembershipService.findMembersForRoomForNotify(troupeId1, false, [userId2])
+          .then(function(result) {
+            var expected = {};
+            expected[userId1] = 'all';
+            expected[userId2] = 'announcement';
+
+            assert.deepEqual(result, expected);
+          });
+      });
+
+      it('should return notify users and mention users who are announcement users', function() {
+        return roomMembershipService.findMembersForRoomForNotify(troupeId1, false, [userId3])
+          .then(function(result) {
+            var expected = {};
+            expected[userId1] = 'all';
+            expected[userId3] = 'mute';
+
+            assert.deepEqual(result, expected);
+          });
+      });
+
+      it('should return notify users and mention users who are mute users', function() {
+        return roomMembershipService.findMembersForRoomForNotify(troupeId1, true, [userId3])
+          .then(function(result) {
+            var expected = {};
+            expected[userId1] = 'all';
+            expected[userId2] = 'announcement';
+            expected[userId3] = 'mute';
+
+            assert.deepEqual(result, expected);
+          });
+      });
+
+    });
   });
 
 });

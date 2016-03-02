@@ -80,7 +80,7 @@
     "mongodb-connection-string": "^0.1.1",
     "mongodb-datadog-stats": "^0.1.2",
     "mongodb-unique-ids": "^0.1.2",
-    "mongoose": "4.1.2",
+    "mongoose": "^4.4.5",
     "mongoose-number": "^0.1.1",
     "newrelic": "^1.18.3",
     "node-gcm": "^0.9.12",

@@ -439,6 +439,57 @@ var findMembershipModeForUsersInRoom = Promise.method(function(troupeId, userIds
     });
 });
 
+/**
+ * Given a room, returns users in that should get some form of notification
+ */
+var findMembersForRoomForNotify = Promise.method(function(troupeId, isAnnouncement, mentionUserIds) {
+  var requiredBits, query;
+  var hasMentions = mentionUserIds && mentionUserIds.length;
+
+  if (isAnnouncement) {
+    requiredBits = [roomMembershipFlags.FLAG_POS_NOTIFY_UNREAD, roomMembershipFlags.FLAG_POS_NOTIFY_ANNOUNCEMENT];
+  } else {
+    requiredBits = [roomMembershipFlags.FLAG_POS_NOTIFY_UNREAD];
+  }
+
+  if (hasMentions) {
+    /* If there are mentions, we need to include mention users */
+    query = {
+      troupeId: troupeId,
+      $or: [
+        { flags: { $bitsAnySet: requiredBits } },
+        {
+          userId: { $in: mongoUtils.asObjectIDs(mentionUserIds) },
+          flags: { $bitsAnySet: [roomMembershipFlags.FLAG_POS_NOTIFY_MENTION] },
+        }
+      ],
+    };
+  } else {
+    /* No mentions? Just include the users for notify and possible also announcements */
+    query = {
+      troupeId: troupeId,
+      flags: {
+         $bitsAnySet: requiredBits
+      }
+    };
+  }
+
+  return TroupeUser.find(query, {
+      userId: 1,
+      flags: 1,
+      _id: 0
+    }, {
+      lean: true
+    })
+    .exec()
+    .then(function(troupeUsers) {
+      return _.reduce(troupeUsers, function(memo, troupeUser) {
+        memo[troupeUser.userId] = roomMembershipFlags.getModeFromFlags(troupeUser.flags);
+        return memo;
+      }, {});
+    });
+});
+
 /* Exports */
 exports.findRoomIdsForUser          = findRoomIdsForUser;
 exports.findRoomIdsForUserWithLurk  = findRoomIdsForUserWithLurk;
@@ -462,6 +513,7 @@ exports.getMembershipMode           = getMembershipMode;
 exports.setMembershipMode           = setMembershipMode;
 exports.setMembershipModeForUsersInRoom = setMembershipModeForUsersInRoom;
 exports.findMembershipModeForUsersInRoom = findMembershipModeForUsersInRoom;
+exports.findMembersForRoomForNotify = findMembersForRoomForNotify;
 
 /* Event emitter */
 exports.events                      = roomMembershipEvents;
