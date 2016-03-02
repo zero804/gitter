@@ -32,11 +32,11 @@ describe('distribution', function() {
 
   });
 
-  describe('getWebNotificationsWithoutMention', function() {
+  describe('getWebNotifications', function() {
 
     it('should handle users in various connected states', function() {
       var distribution = new Distribution({
-        notifyNoMention: ['1', '2', '3', '4', '5', '6', '7'],
+        notifyUserIds: ['1', '2', '3', '4', '5', '6', '7'],
         presence: {
           '1': 'inroom',
           '2': 'online',
@@ -47,43 +47,14 @@ describe('distribution', function() {
         }
       });
 
-      assertIteratorDeepEqual(distribution.getWebNotificationsWithoutMention(), ['2']);
+      assertIteratorDeepEqual(distribution.getWebNotifications(), ['2']);
     });
 
     it('should handle distributions without mentions', function() {
       var distribution = new Distribution({
-        notifyNoMention: []
       });
 
-      assertIteratorDeepEqual(distribution.getWebNotificationsWithoutMention(), []);
-    });
-
-  });
-
-  describe('getWebNotificationsWithMention', function() {
-
-    it('should handle users in various connected states', function() {
-      var distribution = new Distribution({
-        mentionUserIds: ['1', '2', '3', '4', '5', '6', '7'],
-        presence: {
-          '1': 'inroom',
-          '2': 'online',
-          '3': 'mobile',
-          '4': 'push',
-          '5': 'push_connected',
-          '6': 'push_notified_connected'
-        }
-      });
-
-      assertIteratorDeepEqual(distribution.getWebNotificationsWithMention(), ['2']);
-    });
-
-    it('should handle distributions without mentions', function() {
-      var distribution = new Distribution({
-        mentionUserIds: []
-      });
-
-      assertIteratorDeepEqual(distribution.getWebNotificationsWithMention(), []);
+      assertIteratorDeepEqual(distribution.getWebNotifications(), []);
     });
 
   });

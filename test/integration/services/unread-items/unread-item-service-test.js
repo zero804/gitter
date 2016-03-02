@@ -712,8 +712,7 @@ describe('unread-item-service', function() {
         expectUserMentionedInNonMemberRoom: [],
         expectNewUnreadNoMention: [],
         expectNewUnreadWithMention: [],
-        expectNewOnlineNotificationNoMention: [],
-        expectNewOnlineNotificationWithMention: [],
+        expectNewOnlineNotification: [],
         expectNewPushCandidatesNoMention: [],
         expectNewPushCandidatesWithMention: [],
         expectTroupeUnreadCountsChange: [],
@@ -741,7 +740,7 @@ describe('unread-item-service', function() {
           name: 'Online',
           online: [userId1],
           expectNewUnreadNoMention: [userId1],
-          expectNewOnlineNotificationNoMention: [userId1],
+          expectNewOnlineNotification: [userId1],
           expectTroupeUnreadCountsChange: [{
             userId: userId1,
             unreadCount: 1,
@@ -814,7 +813,7 @@ describe('unread-item-service', function() {
           name: 'Online',
           online: [userId1],
           expectNewUnreadWithMention: [userId1],
-          expectNewOnlineNotificationWithMention: [userId1],
+          expectNewOnlineNotification: [userId1],
           expectTroupeUnreadCountsChange: [{
             userId: userId1,
             unreadCount: 1,
@@ -970,18 +969,8 @@ describe('unread-item-service', function() {
         }
 
         // newOnlineNotification
-        if (meta.expectNewOnlineNotificationNoMention.length || meta.expectNewOnlineNotificationWithMention.length) {
-          if (meta.expectNewOnlineNotificationNoMention.length) {
-            mockito.verify(appEvents, once).newOnlineNotification(troupeId, chatId, equivalentArray(meta.expectNewOnlineNotificationNoMention), false);
-          } else {
-            mockito.verify(appEvents, never()).newOnlineNotification(anything(), anything(), anything(), false);
-          }
-
-          if (meta.expectNewOnlineNotificationWithMention.length) {
-            mockito.verify(appEvents, once).newOnlineNotification(troupeId, chatId, equivalentArray(meta.expectNewOnlineNotificationWithMention), true);
-          } else {
-            mockito.verify(appEvents, never()).newOnlineNotification(anything(), anything(), anything(), true);
-          }
+        if (meta.expectNewOnlineNotification.length) {
+          mockito.verify(appEvents, once).newOnlineNotification(troupeId, chatId, equivalentArray(meta.expectNewOnlineNotification));
         } else {
           mockito.verify(appEvents, never()).newOnlineNotification();
         }
