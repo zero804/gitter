@@ -442,7 +442,7 @@ var findMembershipModeForUsersInRoom = Promise.method(function(troupeId, userIds
 /**
  * Given a room, returns users in that should get some form of notification
  */
-function findMembersForRoomForNotify(troupeId, isAnnouncement, mentionUserIds) {
+function findMembersForRoomForNotify(troupeId, fromUserId, isAnnouncement, mentionUserIds) {
   var requiredBits, query;
   var hasMentions = mentionUserIds && mentionUserIds.length;
 
@@ -463,6 +463,7 @@ function findMembersForRoomForNotify(troupeId, isAnnouncement, mentionUserIds) {
     /* If there are mentions, we need to include mention users */
     query = {
       troupeId: troupeId,
+      userId: { $ne: fromUserId },
       $or: [
         { flags: { $bitsAnySet: requiredBits } },
         {
@@ -475,6 +476,7 @@ function findMembersForRoomForNotify(troupeId, isAnnouncement, mentionUserIds) {
     /* No mentions? Just include the users for notify and possible also announcements */
     query = {
       troupeId: troupeId,
+      userId: { $ne: fromUserId },
       flags: {
          $bitsAnySet: requiredBits
       }
@@ -488,13 +490,7 @@ function findMembersForRoomForNotify(troupeId, isAnnouncement, mentionUserIds) {
     }, {
       lean: true
     })
-    .exec()
-    .then(function(troupeUsers) {
-      return _.reduce(troupeUsers, function(memo, troupeUser) {
-        memo[troupeUser.userId] = troupeUser.flags;
-        return memo;
-      }, {});
-    });
+    .exec();
 }
 
 /* Exports */

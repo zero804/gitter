@@ -7,27 +7,13 @@ var Promise = require('bluebird');
 var assert = require('assert');
 var blockTimer = require('../../block-timer');
 
-function makeHash() {
-  var hash = [];
-  for(var i = 0; i < arguments.length; i = i + 2) {
-    hash[arguments[i]] = arguments[i + 1];
-  }
-  return hash;
-}
-
-function assertIteratorDeepEqual(iterator, expected) {
-  iterator.toArray().forEach(function(array) {
-    assert.deepEqual(array, expected);
-  });
-}
-
 describe('create-distribution', function() {
   before(blockTimer.on);
   after(blockTimer.off);
 
   describe('createDistribution', function() {
     var chatId;
-    var troupeId, troupeId2, troupeId3;
+    var troupeId;
     var fromUserId;
     var userId1;
     var userId2;
@@ -37,19 +23,13 @@ describe('create-distribution', function() {
     var userService;
     var roomPermissionsModel;
     var createDistribution;
-    var troupeNoLurkers;
-    var troupeSomeLurkers;
-    var troupeAllLurkers;
-    var singleMention;
-    var groupMention;
-    var duplicateMention;
-    var nonMemberMention;
-    var troupeNoLurkersUserHash, troupeSomeLurkersUserHash, troupeAllLurkersUserHash;
+    var troupe;
+    var troupeNotifyArray;
+    var MockDistribution;
+    var categoriseUserInRoom;
 
     beforeEach(function() {
       troupeId = mongoUtils.getNewObjectIdString() + "";
-      troupeId2 = mongoUtils.getNewObjectIdString() + "";
-      troupeId3 = mongoUtils.getNewObjectIdString() + "";
       chatId = mongoUtils.getNewObjectIdString() + "";
       fromUserId = mongoUtils.getNewObjectIdString() + "";
       userId1 = mongoUtils.getNewObjectIdString() + "";
@@ -57,179 +37,223 @@ describe('create-distribution', function() {
       userId3 = mongoUtils.getNewObjectIdString() + "";
       user3 = { id: userId3 };
 
-      singleMention = [{
-        userId: userId1
-      }];
-
-      groupMention = [{
-        group: true,
-        userIds: [userId1, userId2]
-      }];
-
-      duplicateMention = [{
-        userId: userId1
-      }, {
-        userId: userId1
-      }];
-
-      nonMemberMention = [{
-        userId: userId3
-      }];
-
-      troupeNoLurkers = {
+      troupe = {
         id: troupeId,
         _id: troupeId,
       };
-      troupeNoLurkersUserHash = makeHash(fromUserId, false, userId1, false, userId2, false);
-
-      troupeSomeLurkers = {
-        id: troupeId2,
-        _id: troupeId2,
-      };
-      troupeSomeLurkersUserHash = makeHash(fromUserId, false, userId1, false, userId2, true);
-
-      troupeAllLurkers = {
-        id: troupeId3,
-        _id: troupeId3,
-      };
-      troupeAllLurkersUserHash = makeHash(fromUserId, true, userId1, true, userId2, true);
+      troupeNotifyArray = [{ userId: userId1, flags: 1 }, { userId: userId2, flags: 2 }];
 
       roomMembershipService = mockito.mock(testRequire('./services/room-membership-service'));
       userService = mockito.mock(testRequire('./services/user-service'));
       roomPermissionsModel = mockito.mockFunction();
 
-      mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId).thenReturn(Promise.resolve(troupeNoLurkersUserHash));
-      mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId2).thenReturn(Promise.resolve(troupeSomeLurkersUserHash));
-      mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId3).thenReturn(Promise.resolve(troupeAllLurkersUserHash));
+      MockDistribution = function(options) {
+        this.options = options;
+      }
+
+      mockito.when(roomMembershipService).findMembersForRoomForNotify(troupeId).thenReturn(Promise.resolve(troupeNotifyArray));
+
+      categoriseUserInRoom = function(troupeId, userIds) {
+        return Promise.resolve({ troupeId: troupeId, userIds: userIds });
+      };
 
       createDistribution = testRequire.withProxies("./services/unread-items/create-distribution", {
         '../room-membership-service': roomMembershipService,
         '../user-service': userService,
+        './distribution': MockDistribution,
         '../room-permissions-model': roomPermissionsModel,
+        '../categorise-users-in-room': categoriseUserInRoom
       });
 
     });
 
-    it('should parse messages with no mentions, no lurkers', function() {
-
-      return createDistribution(fromUserId, troupeNoLurkers, [])
+    it('should create a distribution with no mentions', function() {
+      return createDistribution(fromUserId, troupe, [])
         .then(function(result) {
-          assertIteratorDeepEqual(result._notifyNoMention, [userId1, userId2]);
-          assertIteratorDeepEqual(result._notifyUserIds, [userId1, userId2]);
-          assertIteratorDeepEqual(result._mentionUserIds, []);
-          assertIteratorDeepEqual(result._activityOnlyUserIds, []);
-          assertIteratorDeepEqual(result._notifyNewRoomUserIds, []);
+          assert.deepEqual(result.options, {
+            announcement: false,
+            membersWithFlags: [{
+              flags: 1,
+              userId: userId1
+            }, {
+              flags: 2,
+              userId: userId2
+            }],
+            presence: {
+              troupeId: troupeId,
+              userIds: [userId1, userId2]
+            }
+          });
         });
     });
 
-    it('should parse messages with no mentions, some lurkers', function() {
-      return createDistribution(fromUserId, troupeSomeLurkers, [])
+    it('should create a distribution with single user mentions', function() {
+      return createDistribution(fromUserId, troupe, [{ userId: userId1 }])
         .then(function(result) {
-          assertIteratorDeepEqual(result._notifyNoMention, [userId1]);
-          assertIteratorDeepEqual(result._notifyUserIds, [userId1]);
-          assertIteratorDeepEqual(result._mentionUserIds, []);
-          assertIteratorDeepEqual(result._activityOnlyUserIds, [userId2]);
-          assertIteratorDeepEqual(result._notifyNewRoomUserIds, []);
+          assert.deepEqual(result.options, {
+            announcement: false,
+            membersWithFlags: [{
+              flags: 1,
+              userId: userId1
+            }, {
+              flags: 2,
+              userId: userId2
+            }],
+            mentions: [userId1],
+            nonMemberMentions: [],
+            presence: {
+              troupeId: troupeId,
+              userIds: [userId1, userId2]
+            }
+          });
         });
     });
 
-    it('should parse messages with no mentions, all lurkers', function() {
-      return createDistribution(fromUserId, troupeAllLurkers, [])
+    it('should create a distribution with a single group mention', function() {
+      return createDistribution(fromUserId, troupe, [{ group: true, userIds: [userId1, userId2] }])
         .then(function(result) {
-          assertIteratorDeepEqual(result._notifyNoMention, []);
-          assertIteratorDeepEqual(result._notifyUserIds, []);
-          assertIteratorDeepEqual(result._mentionUserIds, []);
-          assertIteratorDeepEqual(result._activityOnlyUserIds, [userId1, userId2]);
-          assertIteratorDeepEqual(result._notifyNewRoomUserIds, []);
+          assert.deepEqual(result.options, {
+            announcement: false,
+            membersWithFlags: [{
+              flags: 1,
+              userId: userId1
+            }, {
+              flags: 2,
+              userId: userId2
+            }],
+            mentions: [userId1, userId2],
+            nonMemberMentions: [],
+            presence: {
+              troupeId: troupeId,
+              userIds: [userId1, userId2]
+            }
+          });
         });
     });
 
-    it('should parse messages with user mentions to non lurkers', function() {
-      return createDistribution(fromUserId, troupeNoLurkers, singleMention)
+    it('should create a distribution with a single announcement mention', function() {
+      return createDistribution(fromUserId, troupe, [{ group: true, announcement: true }])
         .then(function(result) {
-          assertIteratorDeepEqual(result._notifyNoMention, [userId2]);
-          assertIteratorDeepEqual(result._notifyUserIds, [userId1, userId2]);
-          assertIteratorDeepEqual(result._mentionUserIds, [userId1]);
-          assertIteratorDeepEqual(result._activityOnlyUserIds, []);
-          assertIteratorDeepEqual(result._notifyNewRoomUserIds, []);
+          assert.deepEqual(result.options, {
+            announcement: true,
+            membersWithFlags: [{
+              flags: 1,
+              userId: userId1
+            }, {
+              flags: 2,
+              userId: userId2
+            }],
+            presence: {
+              troupeId: troupeId,
+              userIds: [userId1, userId2]
+            }
+          });
         });
     });
 
-    it('should parse messages with user mentions to lurkers', function() {
-      return createDistribution(fromUserId, troupeAllLurkers, singleMention)
+    it('should create a distribution with an announcement and a mention', function() {
+      return createDistribution(fromUserId, troupe, [{ group: true, announcement: true }, { userId: userId1 }])
         .then(function(result) {
-          assertIteratorDeepEqual(result._notifyNoMention, []);
-          assertIteratorDeepEqual(result._notifyUserIds, [userId1]);
-          assertIteratorDeepEqual(result._mentionUserIds, [userId1]);
-          assertIteratorDeepEqual(result._activityOnlyUserIds, [userId2]);
-          assertIteratorDeepEqual(result._notifyNewRoomUserIds, []);
+          assert.deepEqual(result.options, {
+            announcement: true,
+            membersWithFlags: [{
+              flags: 1,
+              userId: userId1
+            }, {
+              flags: 2,
+              userId: userId2
+            }],
+            mentions: [userId1],
+            nonMemberMentions: [],
+            presence: {
+              troupeId: troupeId,
+              userIds: [userId1, userId2]
+            }
+          });
         });
     });
 
-    it('should parse messages with group mentions', function() {
-      return createDistribution(fromUserId, troupeSomeLurkers, groupMention)
-        .then(function(result) {
-          assertIteratorDeepEqual(result._notifyNoMention, []);
-          assertIteratorDeepEqual(result._notifyUserIds, [userId1, userId2]);
-          assertIteratorDeepEqual(result._mentionUserIds, [userId1, userId2]);
-          assertIteratorDeepEqual(result._activityOnlyUserIds, []);
-          assertIteratorDeepEqual(result._notifyNewRoomUserIds, []);
-        });
-    });
-
-    it('should parse messages with duplicate mentions', function() {
-      return createDistribution(fromUserId, troupeSomeLurkers, duplicateMention)
-        .then(function(result) {
-          assertIteratorDeepEqual(result._notifyNoMention, []);
-          assertIteratorDeepEqual(result._notifyUserIds, [userId1]);
-          assertIteratorDeepEqual(result._mentionUserIds, [userId1]);
-          assertIteratorDeepEqual(result._activityOnlyUserIds, [userId2]);
-          assertIteratorDeepEqual(result._notifyNewRoomUserIds, []);
-        });
-    });
-
-    it('should parse messages with mentions to non members who are allowed in the room', function() {
+    it('should create a distribution with mentions to non members who are allowed in the room', function() {
       mockito.when(userService).findByIds([userId3])
         .thenReturn(Promise.resolve([user3]));
 
-      mockito.when(roomPermissionsModel)(user3, 'join', troupeSomeLurkers)
+      mockito.when(roomPermissionsModel)(user3, 'join', troupe)
         .thenReturn(Promise.resolve(true));
 
-      return createDistribution(fromUserId, troupeSomeLurkers, nonMemberMention)
+      return createDistribution(fromUserId, troupe, [{ userId: userId3 }])
         .then(function(result) {
-          assertIteratorDeepEqual(result._notifyUserIds, [userId1, userId3]);
-          assertIteratorDeepEqual(result._mentionUserIds, [userId3]);
-          assertIteratorDeepEqual(result._activityOnlyUserIds, [userId2]);
-          assertIteratorDeepEqual(result._notifyNewRoomUserIds, [userId3]);
+          assert.deepEqual(result.options, {
+            announcement: false,
+            membersWithFlags: [{
+              flags: 1,
+              userId: userId1
+            }, {
+              flags: 2,
+              userId: userId2
+            },{
+              flags: null,
+              userId: userId3
+            }],
+            mentions: [userId3],
+            nonMemberMentions: [userId3],
+            presence: {
+              troupeId: troupeId,
+              userIds: [userId1, userId2, userId3]
+            }
+          });
         });
     });
 
-    it('should parse messages with mentions to non members who are not allowed in the room', function() {
+    it('should create a distribution with mentions to non members who are not allowed in the room', function() {
       mockito.when(userService).findByIds([userId3])
         .thenReturn(Promise.resolve([user3]));
 
-      mockito.when(roomPermissionsModel)(user3, 'join', troupeSomeLurkers)
+      mockito.when(roomPermissionsModel)(user3, 'join', troupe)
         .thenReturn(Promise.resolve(false));
 
-      return createDistribution(fromUserId, troupeSomeLurkers, nonMemberMention)
+      return createDistribution(fromUserId, troupe, [{ userId: userId3 }])
         .then(function(result) {
-          assertIteratorDeepEqual(result._notifyUserIds, [userId1]);
-          assertIteratorDeepEqual(result._mentionUserIds, []);
-          assertIteratorDeepEqual(result._activityOnlyUserIds, [userId2]);
-          assertIteratorDeepEqual(result._notifyNewRoomUserIds, []);
+          assert.deepEqual(result.options, {
+            announcement: false,
+            membersWithFlags: [{
+              flags: 1,
+              userId: userId1
+            }, {
+              flags: 2,
+              userId: userId2
+            }],
+            mentions: [],
+            nonMemberMentions: [],
+            presence: {
+              troupeId: troupeId,
+              userIds: [userId1, userId2]
+            }
+          });
         });
     });
 
-    it('should parse messages with mentions to non members who are not on gitter', function() {
+    it('should create a distribution with mentions to non members who are not allowed on gitter', function() {
       mockito.when(userService).findByIds([userId3])
         .thenReturn(Promise.resolve([]));
 
-      return createDistribution(fromUserId, troupeSomeLurkers, nonMemberMention)
+      return createDistribution(fromUserId, troupe, [{ userId: userId3 }])
         .then(function(result) {
-          assertIteratorDeepEqual(result._notifyUserIds, [userId1]);
-          assertIteratorDeepEqual(result._mentionUserIds, []);
-          assertIteratorDeepEqual(result._activityOnlyUserIds, [userId2]);
-          assertIteratorDeepEqual(result._notifyNewRoomUserIds, []);
+          assert.deepEqual(result.options, {
+            announcement: false,
+            membersWithFlags: [{
+              flags: 1,
+              userId: userId1
+            }, {
+              flags: 2,
+              userId: userId2
+            }],
+            mentions: [],
+            nonMemberMentions: [],
+            presence: {
+              troupeId: troupeId,
+              userIds: [userId1, userId2]
+            }
+          });
         });
     });
 

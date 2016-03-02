@@ -48,140 +48,134 @@ function findNonMembersWithAccess(troupe, userIds) {
     });
 }
 
-function parseMentions(fromUserId, troupe, userIdsWithLurk, mentions) {
-  var creatorUserId = fromUserId && "" + fromUserId;
+/**
+ * Given an array of mention objects returns
+ * the userIds of the mentioned users, and
+ * whether theres been an announcement
+ */
+function extractMentionInfo(fromUserId, mentions) {
+  var fromUserIdString = fromUserId && String(fromUserId);
+
+  if (!mentions || !mentions.length) {
+    return {
+      announcement: false,
+      userIds: []
+    };
+  }
 
   var announcement = false;
-  var uniqueUserIds = {};
-  _.each(mentions, function(mention) {
+
+  var uniqueUserIds = _.reduce(mentions, function(memo, mention) {
     if(mention.group) {
       if (mention.announcement) {
         announcement = true;
+      } else {
+        // Note: in future, annoucements won't have userIds for
+        // the `all` group
+        if (mention.userIds) {
+          _.each(mention.userIds, function(userId) {
+            if (!userId) return;
+            var userIdString = String(userId);
+            if (fromUserIdString === userIdString) return;
+            memo[userId] = true;
+          });
+        }
       }
-
-      // Note: in future, annoucements won't have userIds for
-      // the `all` group
-      if (mention.userIds) {
-        _.each(mention.userIds, function(userId) {
-          uniqueUserIds[userId] = true;
-        });
-      }
-
     } else {
       if(mention.userId) {
-        uniqueUserIds[mention.userId] = true;
+        var userIdString = String(mention.userId);
+        if (fromUserIdString !== userIdString) {
+          memo[userIdString] = true;
+        }
       }
     }
-  });
-
-  var memberUserIds = [];
-  var nonMemberUserIds = [];
+    return memo;
+  }, {});
 
   var userIds = Object.keys(uniqueUserIds);
-  _.each(userIds, function(userId) {
-    /* Don't be mentioning yourself yo */
-    if(userId == creatorUserId) return;
 
-    // If the user is in the room, add them to the memberUserIds list
-    if(userIdsWithLurk.hasOwnProperty(userId)) {
-      memberUserIds.push(userId);
-      return;
-    }
+  return {
+    announcement: announcement,
+    userIds: userIds
+  };
 
-    // The user is not in the room, add them to the nonMembers list
-    nonMemberUserIds.push(userId);
+}
+
+function parseMentions(fromUserId, troupe, membersWithFlags, mentionUserIds, options) {
+  var memberHash = _.reduce(membersWithFlags, function(memo, member) {
+    memo[member.userId] = true;
+    return memo;
+  }, {});
+
+  var nonMemberUserIds = _.filter(mentionUserIds, function(userId) {
+    return !memberHash[userId];
   });
 
-  // Skip checking if there are no non-members
+  /* Shortcut if we don't need to check for non-members */
   if(!nonMemberUserIds.length) {
     return Promise.resolve({
-      memberUserIds: memberUserIds,
-      nonMemberUserIds: [],
-      mentionUserIds: memberUserIds,
-      announcement: announcement
+      membersWithFlags: membersWithFlags,
+      mentions: mentionUserIds,
+      nonMemberMentions: []
     });
   }
 
+  var delta = options && options.delta;
+
+
   /* Lookup the non-members and check if they can access the room */
-  return findNonMembersWithAccess(troupe, nonMemberUserIds)
+  return (delta ?
+            Promise.resolve(nonMemberUserIds) :
+            findNonMembersWithAccess(troupe, nonMemberUserIds))
     .then(function(nonMemberUserIdsFiltered) {
-      /* Mentions consists of members and non-members */
-      var mentionUserIds = memberUserIds.concat(nonMemberUserIdsFiltered);
+
+      var memberMentionUserIds = _.filter(mentionUserIds, function(userId) {
+        return memberHash[userId];
+      });
 
       return {
-        memberUserIds: memberUserIds,
-        nonMemberUserIds: nonMemberUserIdsFiltered,
-        mentionUserIds: mentionUserIds,
-        announcement: announcement
+        membersWithFlags: membersWithFlags.concat(nonMemberUserIdsFiltered.map(function(userId) {
+          return { userId: userId, flags: null };
+        })),
+        mentions: memberMentionUserIds.concat(nonMemberUserIdsFiltered),
+        nonMemberMentions: nonMemberUserIdsFiltered
       };
     });
 }
 
-function unreadItemDistribution(fromUserId, troupe, mentions) {
+function createDistribution(fromUserId, troupe, mentions, options) {
   var troupeId = troupe._id;
+  var mentionInfo = extractMentionInfo(fromUserId, mentions);
 
-  return roomMembershipService.findMembersForRoomWithLurk(troupeId)
-    .then(function(userIdsWithLurk) {
-      var creatorUserId = fromUserId && "" + fromUserId;
-
-      var nonActive = [];
-      var active = [];
-
-      var userIds = Object.keys(userIdsWithLurk);
-
-      _.each(userIds, function(userId) {
-        if (creatorUserId && userId === creatorUserId) return;
-
-        var lurk = userIdsWithLurk[userId];
-
-        if (lurk) {
-          nonActive.push(userId);
-        } else {
-          active.push(userId);
-        }
-      });
-
-      if(!mentions || !mentions.length) {
+  return roomMembershipService.findMembersForRoomForNotify(troupeId, fromUserId, mentionInfo.annoucement, mentionInfo.userIds)
+    .then(function(membersWithFlags) {
+      if (!mentionInfo.userIds.length) {
         return {
-          notifyNoMention: active,
-          notifyUserIds: active,
-          mentionUserIds: [],
-          activityOnlyUserIds: nonActive,
-          notifyNewRoomUserIds: [],
-          announcement: false
+          membersWithFlags: membersWithFlags,
+          announcement: mentionInfo.announcement
         };
       }
 
       /* Add the mentions into the mix */
-      return parseMentions(fromUserId, troupe, userIdsWithLurk, mentions)
+      return parseMentions(fromUserId, troupe, membersWithFlags, mentionInfo.userIds, options)
         .then(function(parsedMentions) {
-          var notifyUserIdsHash = {};
-          _.each(active, function(userId) { notifyUserIdsHash[userId] = 1; });
-          _.each(parsedMentions.mentionUserIds, function(userId) { notifyUserIdsHash[userId] = 2; });
-
-          var notifyUserIds = Object.keys(notifyUserIdsHash);
-
-          var notifyNoMention = _.filter(notifyUserIds, function(userId) {
-            return notifyUserIdsHash[userId] === 1;
-          });
-
-          var nonActiveLessMentions = _.filter(nonActive, function(userId) {
-            return !notifyUserIdsHash[userId];
-          });
 
           return {
-            notifyNoMention: notifyNoMention,
-            notifyUserIds: notifyUserIds,
-            mentionUserIds: parsedMentions.mentionUserIds,
-            activityOnlyUserIds: nonActiveLessMentions,
-            notifyNewRoomUserIds: parsedMentions.nonMemberUserIds,
-            announcement: parsedMentions.announcement
+            membersWithFlags: parsedMentions.membersWithFlags,
+            mentions: parsedMentions.mentions,
+            nonMemberMentions: parsedMentions.nonMemberMentions,
+            announcement: mentionInfo.announcement
           };
         });
 
     })
     .then(function(options) {
-      var allUserIds = options.notifyUserIds.concat(options.activityOnlyUserIds);
+      // No need for presence for deltas
+      if (options.delta) {
+        return new Distribution(options);
+      }
+
+      var allUserIds = options.membersWithFlags.map(function(member) { return member.userId; });
 
       // In future, this should take into account announcements
       return categoriseUserInRoom(troupeId, allUserIds)
@@ -192,7 +186,7 @@ function unreadItemDistribution(fromUserId, troupe, mentions) {
     });
 }
 
-module.exports = unreadItemDistribution;
+module.exports = createDistribution;
 
 module.exports.testOnly = {
   findNonMembersWithAccess: findNonMembersWithAccess,

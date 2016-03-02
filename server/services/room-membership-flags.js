@@ -21,18 +21,18 @@ var BITMASK_INVERT_MODE = BITMASK_INVERT & ~BITMASK_MODE;
 var BITMASK_NOTIFY_UNREAD       = 1 << FLAG_POS_NOTIFY_UNREAD;
 var BITMASK_NO_NOTIFY_UNREAD    = BITMASK_INVERT & ~BITMASK_NOTIFY_UNREAD;
 var BITMASK_NOTIFY_ACTIVITY     = 1 << FLAG_POS_NOTIFY_ACTIVITY;
-var BITMASK_NOTIFY_MENTIONS     = 1 << FLAG_POS_NOTIFY_MENTION;
+var BITMASK_NOTIFY_MENTION     = 1 << FLAG_POS_NOTIFY_MENTION;
 var BITMASK_NOTIFY_ANNOUNCEMENT = 1 << FLAG_POS_NOTIFY_ANNOUNCEMENT;
 
 var MODES = {
   /* Mode: all: unread + no activity + mentions + announcements */
-  all: BITMASK_NOTIFY_UNREAD | BITMASK_NOTIFY_MENTIONS | BITMASK_NOTIFY_ANNOUNCEMENT,
+  all: BITMASK_NOTIFY_UNREAD | BITMASK_NOTIFY_MENTION | BITMASK_NOTIFY_ANNOUNCEMENT,
 
   /* Mode: announcement: no unread + activity + mentions + announcements */
-  announcement: BITMASK_NOTIFY_ACTIVITY | BITMASK_NOTIFY_MENTIONS | BITMASK_NOTIFY_ANNOUNCEMENT,
+  announcement: BITMASK_NOTIFY_ACTIVITY | BITMASK_NOTIFY_MENTION | BITMASK_NOTIFY_ANNOUNCEMENT,
 
   /* Mode: mute: no unread + no activity + mentions + no announcements */
-  mute: BITMASK_NOTIFY_MENTIONS,
+  mute: BITMASK_NOTIFY_MENTION,
 };
 
 /* Alias modes */
@@ -81,6 +81,23 @@ function getLurkForMode(mode) {
   return getLurkForFlags(MODES[mode]);
 }
 
+
+function hasNotifyUnread(flags) {
+  return flags & BITMASK_NOTIFY_UNREAD;
+}
+
+function hasNotifyActivity(flags) {
+  return flags & BITMASK_NOTIFY_ACTIVITY;
+}
+
+function hasNotifyMention(flags) {
+  return flags & BITMASK_NOTIFY_MENTION;
+}
+
+function hasNotifyAnnouncement(flags) {
+  return flags & BITMASK_NOTIFY_ANNOUNCEMENT;
+}
+
 module.exports = {
   MODES: MODES,
 
@@ -92,5 +109,10 @@ module.exports = {
   getModeFromFlags: getModeFromFlags,
   getUpdateForMode: getUpdateForMode,
   getLurkForFlags: getLurkForFlags,
-  getLurkForMode: getLurkForMode
+  getLurkForMode: getLurkForMode,
+
+  hasNotifyUnread: hasNotifyUnread,
+  hasNotifyActivity: hasNotifyActivity,
+  hasNotifyMention: hasNotifyMention,
+  hasNotifyAnnouncement: hasNotifyAnnouncement,
 };

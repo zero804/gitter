@@ -20,6 +20,8 @@ var assert = require('assert');
 var testGenerator = require('../../test-generator');
 var MockBadgeBatcherController = require('../../utils/mock-redis-batcher');
 var Distribution = testRequire('./services/unread-items/distribution');
+var roomMembershipFlags = testRequire('./services/room-membership-flags');
+var MODES = roomMembershipFlags.MODES;
 var times = mockito.Verifiers.times;
 var never = mockito.Verifiers.never;
 var once = times(1);
@@ -276,12 +278,10 @@ describe('unread-item-service', function() {
 
       it('should create messages with no mentions, no lurkers', function() {
         createDistributionResponse = {
-          notifyNoMention: [userId1, userId2],
-          notifyUserIds: [userId1, userId2],
-          mentionUserIds: [],
-          activityOnlyUserIds: [],
-          notifyNewRoomUserIds: [],
-          announcement: false,
+          membersWithFlags: [
+            { userId: userId1, flags: MODES.all },
+            { userId: userId2, flags: MODES.all },
+          ],
           presence: makeHash(userId1, 'online', userId2, 'online')
         };
 
@@ -299,12 +299,10 @@ describe('unread-item-service', function() {
 
       it('should create messages with no mentions, some lurkers', function() {
         createDistributionResponse = {
-          notifyNoMention: [userId1],
-          notifyUserIds: [userId1],
-          mentionUserIds: [],
-          activityOnlyUserIds: [userId2],
-          notifyNewRoomUserIds: [],
-          announcement: false,
+          membersWithFlags: [
+            { userId: userId1, flags: MODES.all },
+            { userId: userId2, flags: MODES.mention },
+          ],
           presence: makeHash(userId1, 'online', userId2, 'online')
         };
 
@@ -321,12 +319,10 @@ describe('unread-item-service', function() {
 
       it('should create messages with no mentions, all lurkers', function() {
         createDistributionResponse = {
-          notifyNoMention: [],
-          notifyUserIds: [],
-          mentionUserIds: [],
-          activityOnlyUserIds: [userId1, userId2],
-          notifyNewRoomUserIds: [],
-          announcement: false,
+          membersWithFlags: [
+            { userId: userId1, flags: MODES.mention },
+            { userId: userId2, flags: MODES.mention },
+          ],
           presence: makeHash(userId1, 'online', userId2, 'online')
         };
 
@@ -342,12 +338,11 @@ describe('unread-item-service', function() {
 
       it('should create messages with user mentions to non lurkers', function() {
         createDistributionResponse = {
-          notifyNoMention: [userId2],
-          notifyUserIds: [userId1, userId2],
-          mentionUserIds: [userId1],
-          activityOnlyUserIds: [],
-          notifyNewRoomUserIds: [],
-          announcement: false,
+          membersWithFlags: [
+            { userId: userId1, flags: MODES.all },
+            { userId: userId2, flags: MODES.all },
+          ],
+          mentions: [userId1, userId2],
           presence: makeHash(userId1, 'online', userId2, 'online')
         };
 
@@ -365,12 +360,11 @@ describe('unread-item-service', function() {
 
       it('should create messages with user mentions to lurkers', function() {
         createDistributionResponse = {
-          notifyNoMention: [],
-          notifyUserIds: [userId1],
-          mentionUserIds: [userId1],
-          activityOnlyUserIds: [userId1, userId2],
-          notifyNewRoomUserIds: [],
-          announcement: false,
+          membersWithFlags: [
+            { userId: userId1, flags: MODES.mention },
+            { userId: userId2, flags: MODES.mention },
+          ],
+          mentions: [userId1, userId2],
           presence: makeHash(userId1, 'online', userId2, 'online')
         };
 
@@ -387,11 +381,10 @@ describe('unread-item-service', function() {
 
       it('should create messages with group mentions', function() {
         createDistributionResponse = {
-          notifyNoMention: [],
-          notifyUserIds: [userId1, userId2],
-          mentionUserIds: [userId1, userId2],
-          activityOnlyUserIds: [userId1, userId2],
-          notifyNewRoomUserIds: [],
+          membersWithFlags: [
+            { userId: userId1, flags: MODES.mention },
+            { userId: userId2, flags: MODES.mention },
+          ],
           announcement: true,
           presence: makeHash(userId1, 'online', userId2, 'online')
         };
@@ -422,7 +415,9 @@ describe('unread-item-service', function() {
       var troupe;
       var chat;
       var createDistribution;
-      var createDistributionResponse;
+      var createDistributionResponseOriginal;
+      var createDistributionResponseNew;
+      var distributionDelta;
 
       beforeEach(function() {
         troupeId = mongoUtils.getNewObjectIdString() + "";
@@ -445,13 +440,23 @@ describe('unread-item-service', function() {
         appEvents = mockito.mock(testRequire('gitter-web-appevents'));
 
         createDistribution = mockito.mockFunction();
-        createDistributionResponse = null;
-        mockito.when(createDistribution)().then(function() {
-          return Promise.resolve(new Distribution(createDistributionResponse));
+        createDistributionResponseOriginal = null;
+        createDistributionResponseNew = null;
+
+        mockito.when(createDistribution)().then(function(fromUserId, troupe, mentions, options) {
+          if (options && options.delta) {
+            return Promise.resolve(new Distribution(createDistributionResponseOriginal));
+          } else {
+            return Promise.resolve(new Distribution(createDistributionResponseNew));
+          }
         });
 
-        unreadItemService = testRequire.withProxies("./services/unread-items", {
+        distributionDelta = testRequire.withProxies('./services/unread-items/distribution-delta', {
           './create-distribution': createDistribution,
+        });
+
+        unreadItemService = testRequire.withProxies('./services/unread-items', {
+          './distribution-delta': distributionDelta,
           'gitter-web-appevents': appEvents,
         });
         unreadItemService.testOnly.setSendBadgeUpdates(false);
@@ -459,15 +464,18 @@ describe('unread-item-service', function() {
       });
 
       it('should handle updates that add no mentions to a message with no mentions', function() {
-        createDistributionResponse = {
-          notifyNoMention: [userId1, userId2],
-          notifyUserIds: [userId1, userId2],
-          mentionUserIds: [],
-          activityOnlyUserIds: [],
-          notifyNewRoomUserIds: [],
-          announcement: false
+        createDistributionResponseNew = {
+          membersWithFlags: [
+            { userId: userId1, flags: MODES.mention },
+            { userId: userId2, flags: MODES.mention },
+          ],
         };
-
+        createDistributionResponseOriginal = {
+          membersWithFlags: [
+            { userId: userId1, flags: MODES.mention },
+            { userId: userId2, flags: MODES.mention },
+          ],
+        };
         return unreadItemService.updateChatUnreadItems(fromUserId, troupe, chat, [])
           .then(function() {
             mockito.verify(appEvents, never()).newUnreadItem();
@@ -476,16 +484,22 @@ describe('unread-item-service', function() {
       });
 
       it('should handle updates that add mentions to a message with no mentions', function() {
-        createDistributionResponse = {
-          notifyNoMention: [userId2],
-          notifyUserIds: [userId1, userId2],
-          mentionUserIds: [userId1],
-          activityOnlyUserIds: [],
-          notifyNewRoomUserIds: [],
-          announcement: false,
+        createDistributionResponseNew = {
+          membersWithFlags: [
+            { userId: userId1, flags: MODES.all },
+            { userId: userId2, flags: MODES.all },
+          ],
+          mentions: [userId1],
           presence: makeHash(userId1, 'online', userId2, 'online')
         };
 
+        createDistributionResponseOriginal = {
+          membersWithFlags: [
+            { userId: userId1, flags: MODES.all },
+            { userId: userId2, flags: MODES.all },
+          ],
+          mentions: [],
+        };
         return unreadItemService.updateChatUnreadItems(fromUserId, troupe, chat, [])
           .then(function() {
             mockito.verify(appEvents, never()).newUnreadItem(fromUserId, anything(), anything());
@@ -497,14 +511,21 @@ describe('unread-item-service', function() {
       });
 
       it('should handle updates that remove mentions from a message with mentions', function() {
-        createDistributionResponse = {
-          notifyNoMention: [userId1, userId2],
-          notifyUserIds: [userId1, userId2],
-          mentionUserIds: [],
-          activityOnlyUserIds: [],
-          notifyNewRoomUserIds: [],
-          announcement: false,
+        createDistributionResponseNew = {
+          membersWithFlags: [
+            { userId: userId1, flags: MODES.all },
+            { userId: userId2, flags: MODES.all },
+          ],
+          mentions: [],
           presence: makeHash(userId1, 'online', userId2, 'online')
+        };
+
+        createDistributionResponseOriginal = {
+          membersWithFlags: [
+            { userId: userId1, flags: MODES.all },
+            { userId: userId2, flags: MODES.all },
+          ],
+          mentions: [userId1],
         };
 
         return unreadItemService.updateChatUnreadItems(fromUserId, troupe, chat, [{ userId: userId1 }])
@@ -519,151 +540,6 @@ describe('unread-item-service', function() {
 
   });
 
-  describe('generateMentionDeltaSet', function() {
-    var unreadItemService;
-
-    beforeEach(function() {
-      unreadItemService = testRequire("./services/unread-items");
-      unreadItemService.testOnly.setSendBadgeUpdates(false);
-    });
-
-    it('should not return empty delta when the list of mentions is empty before and after', function() {
-      var userId1 = mongoUtils.getNewObjectIdString();
-      var userId2 = mongoUtils.getNewObjectIdString();
-
-      var originalMentions = [];
-      var parsedChat = {
-        notifyUserIds: [userId1, userId2],
-        mentionUserIds: [],
-        notifyNewRoomUserIds: [],
-      };
-
-      var delta = unreadItemService.testOnly.generateMentionDeltaSet(parsedChat, originalMentions);
-      assert.deepEqual(delta.addNotify, []);
-      assert.deepEqual(delta.addMentions, []);
-      assert.deepEqual(delta.remove, []);
-      assert.deepEqual(delta.addNewRoom, []);
-    });
-
-    it('should not an empty delta when the list of mentions does not change', function() {
-      var userId1 = mongoUtils.getNewObjectIdString();
-      var userId2 = mongoUtils.getNewObjectIdString();
-      var userId3 = mongoUtils.getNewObjectIdString();
-
-      var originalMentions = [{ userId: userId1 }, { userIds: [userId2] }];
-      var parsedChat = {
-        notifyUserIds: [userId1, userId2, userId3],
-        mentionUserIds: [userId1, userId2],
-        notifyNewRoomUserIds: [userId1],
-      };
-
-      var delta = unreadItemService.testOnly.generateMentionDeltaSet(parsedChat, originalMentions);
-      assert.deepEqual(delta.addNotify, []);
-      assert.deepEqual(delta.addMentions, []);
-      assert.deepEqual(delta.remove, []);
-      assert.deepEqual(delta.addNewRoom, []);
-    });
-
-
-    it('should not an add delta when the list of mentions is empty before and has items after', function() {
-      var userId1 = mongoUtils.getNewObjectIdString();
-      var userId2 = mongoUtils.getNewObjectIdString();
-      var userId3 = mongoUtils.getNewObjectIdString();
-
-      var originalMentions = [];
-      var parsedChat = {
-        notifyUserIds: [userId1, userId2, userId3],
-        mentionUserIds: [userId1, userId2],
-        notifyNewRoomUserIds: [userId1],
-      };
-
-      var delta = unreadItemService.testOnly.generateMentionDeltaSet(parsedChat, originalMentions);
-      assert.deepEqual(delta.addNotify, ['' + userId1, '' + userId2]);
-      assert.deepEqual(delta.addMentions, ['' + userId1, '' + userId2]);
-      assert.deepEqual(delta.remove, []);
-      assert.deepEqual(delta.addNewRoom, ['' + userId1]);
-    });
-
-    it('should remove delta when the list of mentions was not empty before and has no items after', function() {
-      var userId1 = mongoUtils.getNewObjectIdString();
-      var userId2 = mongoUtils.getNewObjectIdString();
-      var userId3 = mongoUtils.getNewObjectIdString();
-
-      var originalMentions = [{ userId: userId1 }, { userIds: [userId2] }];
-      var parsedChat = {
-        notifyUserIds: [userId1, userId3], // userId2 is lurking
-        mentionUserIds: [],
-        notifyNewRoomUserIds: [],
-      };
-
-      var delta = unreadItemService.testOnly.generateMentionDeltaSet(parsedChat, originalMentions);
-
-      assert.deepEqual(delta.addNotify, ['' + userId1]);
-      assert.deepEqual(delta.addMentions, []);
-      assert.deepEqual(delta.remove, ['' + userId1, '' + userId2]);
-      assert.deepEqual(delta.addNewRoom, []);
-    });
-
-    it('should not notify when mentioned lurking users are removed from the mentions', function() {
-      var userId1 = mongoUtils.getNewObjectIdString();
-      var userId2 = mongoUtils.getNewObjectIdString();
-      var userId3 = mongoUtils.getNewObjectIdString();
-
-      var originalMentions = [{ userId: userId1 }, { userIds: [userId2] }];
-      var parsedChat = {
-        notifyUserIds: [userId3], // userId1, userId2 is lurking
-        mentionUserIds: [],
-        notifyNewRoomUserIds: [],
-      };
-
-      var delta = unreadItemService.testOnly.generateMentionDeltaSet(parsedChat, originalMentions);
-
-      assert.deepEqual(delta.addNotify, []);
-      assert.deepEqual(delta.addMentions, []);
-      assert.deepEqual(delta.remove, ['' + userId1, '' + userId2]);
-      assert.deepEqual(delta.addNewRoom, []);
-    });
-
-    it('should notify when mentioned non-lurking users are removed from the mentions', function() {
-      var userId1 = mongoUtils.getNewObjectIdString();
-      var userId2 = mongoUtils.getNewObjectIdString();
-
-      var originalMentions = [{ userId: userId1 }, { userIds: [userId2] }];
-      var parsedChat = {
-        notifyUserIds: [userId1, userId2], // userId3 is lurking
-        mentionUserIds: [],
-        notifyNewRoomUserIds: [],
-      };
-
-      var delta = unreadItemService.testOnly.generateMentionDeltaSet(parsedChat, originalMentions);
-
-      assert.deepEqual(delta.addNotify, ['' + userId1, '' + userId2]);
-      assert.deepEqual(delta.addMentions, []);
-      assert.deepEqual(delta.remove, ['' + userId1, '' + userId2]);
-      assert.deepEqual(delta.addNewRoom, []);
-    });
-
-    it('should deal with adds, removes and new users all in one', function() {
-      var userId1 = mongoUtils.getNewObjectIdString();
-      var userId2 = mongoUtils.getNewObjectIdString();
-      var userId3 = mongoUtils.getNewObjectIdString();
-
-      var originalMentions = [{ userId: userId1 }, { userIds: [userId2] }];
-      var parsedChat = {
-        notifyUserIds: [userId1, userId2, userId3],
-        mentionUserIds: [userId1, userId3],
-        notifyNewRoomUserIds: [userId3],
-      };
-
-      var delta = unreadItemService.testOnly.generateMentionDeltaSet(parsedChat, originalMentions);
-
-      assert.deepEqual(delta.addNotify, ['' + userId2, '' + userId3]);
-      assert.deepEqual(delta.addMentions, ['' + userId3]);
-      assert.deepEqual(delta.remove, ['' + userId2]);
-      assert.deepEqual(delta.addNewRoom, ['' + userId3]);
-    });
-
-  });
 
   describe('processResultsForNewItemWithMentions', function() {
     var unreadItemService, appEvents,
@@ -691,10 +567,10 @@ describe('unread-item-service', function() {
     var FIXTURES = [{
       name: 'processResultsForNewItemWithMentions',
       meta: {
-        notifyNoMention: [],
-        notifyUserIds: [],
+        usersModeAll: [],
+        usersModeMention: [],
+        usersModeMute: [],
         notifyNewRoomUserIds: [],
-        activityOnlyUserIds: [],
         mentionUserIds: [],
 
         isEdit: false,
@@ -722,8 +598,7 @@ describe('unread-item-service', function() {
       tests: [{
         name: 'Chat, no mention, single user',
         meta: {
-          notifyNoMention: [userId1],
-          notifyUserIds: [userId1],
+          usersModeAll: [userId1],
           results: [{ userId: userId1, unreadCount: 1, mentionCount: 0, badgeUpdate: true }],
         },
         tests: [ {
@@ -794,8 +669,7 @@ describe('unread-item-service', function() {
       }, {
         name: 'Chat, mention, single user',
         meta: {
-          notifyNoMention: [],
-          notifyUserIds: [userId1],
+          usersModeAll: [userId1],
           mentionUserIds: [userId1],
           results: [{ userId: userId1, unreadCount: 1, mentionCount: 1, badgeUpdate: true }],
         },
@@ -869,7 +743,7 @@ describe('unread-item-service', function() {
       }, {
         name: 'Lurking user',
         meta: {
-          activityOnlyUserIds: [userId1]
+          usersModeMention: [userId1]
         },
         tests: [{
           name: 'In room',
@@ -907,12 +781,23 @@ describe('unread-item-service', function() {
 
     testGenerator(FIXTURES, function(name, meta) {
       it(name, function() {
+        var membersWithFlags = [];
+
+        function pushUserId(flags) {
+          return function(userId) {
+            membersWithFlags.push({ userId: userId, flags: flags });
+          };
+        }
+
+        meta.usersModeAll.forEach(pushUserId(MODES.all));
+        meta.usersModeMention.forEach(pushUserId(MODES.mention));
+        meta.usersModeMute.forEach(pushUserId(MODES.mute));
+        meta.notifyNewRoomUserIds.forEach(pushUserId());
+
         var parsed = {
-          notifyNoMention: meta.notifyNoMention,
-          notifyUserIds: meta.notifyUserIds,
-          notifyNewRoomUserIds: meta.notifyNewRoomUserIds,
-          activityOnlyUserIds: meta.activityOnlyUserIds,
-          mentionUserIds: meta.mentionUserIds,
+          membersWithFlags: membersWithFlags,
+          mentions: meta.mentionUserIds,
+          nonMemberMentions: meta.notifyNewRoomUserIds
         };
 
         var results = meta.results.reduce(function(memo, result) {
@@ -922,8 +807,11 @@ describe('unread-item-service', function() {
 
         var isEdit = meta.isEdit;
 
+        var allUserIds = membersWithFlags.map(function(m) {
+          return m.userId;
+        });
 
-        var presence = parsed.notifyUserIds.concat(parsed.activityOnlyUserIds).reduce(function(memo,userId) {
+        var presence = allUserIds.reduce(function(memo,userId) {
 
           if (meta.inroom.indexOf(userId) >= 0) {
             memo[userId] = 'inroom';

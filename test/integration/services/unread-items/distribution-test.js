@@ -2,7 +2,9 @@
 
 var testRequire = require('../../test-require');
 var Distribution = testRequire('./services/unread-items/distribution');
+var roomMembershipFlags = testRequire('./services/room-membership-flags');
 var assert = require('assert');
+var MODES = roomMembershipFlags.MODES;
 
 function assertIteratorDeepEqual(iterator, expected) {
   iterator.toArray().forEach(function(array) {
@@ -11,12 +13,19 @@ function assertIteratorDeepEqual(iterator, expected) {
 }
 
 describe('distribution', function() {
-
   describe('getConnectedActivityUserIds', function() {
 
     it('should handle users in various connected states', function() {
       var distribution = new Distribution({
-        activityOnlyUserIds: ['1', '2', '3', '4', '5', '6', '7'],
+        membersWithFlags: [
+          { userId: '1', flags: MODES.announcement },
+          { userId: '2', flags: MODES.announcement },
+          { userId: '3', flags: MODES.announcement },
+          { userId: '4', flags: MODES.announcement },
+          { userId: '5', flags: MODES.announcement },
+          { userId: '6', flags: MODES.announcement },
+          { userId: '7', flags: MODES.announcement }
+        ],
         presence: {
           '1': 'inroom',
           '2': 'online',
@@ -36,7 +45,15 @@ describe('distribution', function() {
 
     it('should handle users in various connected states', function() {
       var distribution = new Distribution({
-        notifyUserIds: ['1', '2', '3', '4', '5', '6', '7'],
+        membersWithFlags: [
+          { userId: '1', flags: MODES.all },
+          { userId: '2', flags: MODES.all },
+          { userId: '3', flags: MODES.all },
+          { userId: '4', flags: MODES.all },
+          { userId: '5', flags: MODES.all },
+          { userId: '6', flags: MODES.all },
+          { userId: '7', flags: MODES.all }
+        ],
         presence: {
           '1': 'inroom',
           '2': 'online',
@@ -52,6 +69,7 @@ describe('distribution', function() {
 
     it('should handle distributions without mentions', function() {
       var distribution = new Distribution({
+        membersWithFlags: []
       });
 
       assertIteratorDeepEqual(distribution.getWebNotifications(), []);
@@ -63,7 +81,11 @@ describe('distribution', function() {
 
     it('should handle values', function() {
       var distribution = new Distribution({
-        notifyNewRoomUserIds: ['1', '2']
+        membersWithFlags: [
+          { userId: '1' },
+          { userId: '2' },
+        ],
+        nonMemberMentions: ['1', '2']
       });
 
       assertIteratorDeepEqual(distribution.getNotifyNewRoom(), ['1', '2']);
@@ -75,14 +97,24 @@ describe('distribution', function() {
 
     it('should handle users in various connected states', function() {
       var distribution = new Distribution({
-        notifyNoMention: ['1', '2', '3', '4', '5', '6', '7'],
+        membersWithFlags: [
+          { userId: '1', flags: MODES.all },
+          { userId: '2', flags: MODES.all },
+          { userId: '3', flags: MODES.all },
+          { userId: '4', flags: MODES.all },
+          { userId: '5', flags: MODES.all },
+          { userId: '6', flags: MODES.all },
+          { userId: '7', flags: MODES.all },
+          { userId: '8', flags: MODES.all },
+        ],
         presence: {
           '1': 'inroom',
           '2': 'online',
           '3': 'mobile',
           '4': 'push',
           '5': 'push_connected',
-          '6': 'push_notified_connected'
+          '6': 'push_notified_connected',
+          '7': 'push_notified',
         }
       });
 
@@ -91,7 +123,7 @@ describe('distribution', function() {
 
     it('should handle distributions without mentions', function() {
       var distribution = new Distribution({
-        notifyNoMention: []
+        membersWithFlags: []
       });
 
       assertIteratorDeepEqual(distribution.getPushCandidatesWithoutMention(), []);
@@ -103,23 +135,52 @@ describe('distribution', function() {
 
     it('should handle users in various connected states', function() {
       var distribution = new Distribution({
-        mentionUserIds: ['1', '2', '3', '4', '5', '6', '7'],
+        membersWithFlags: [
+          { userId: '1', flags: MODES.all },
+          { userId: '2', flags: MODES.all },
+          { userId: '3', flags: MODES.all },
+          { userId: '4', flags: MODES.all },
+          { userId: '5', flags: MODES.all },
+          { userId: '6', flags: MODES.all },
+          { userId: '7', flags: MODES.all },
+          { userId: '8', flags: MODES.all },
+        ],
+        mentions: ['1', '2', '3', '4', '5', '6', '7', '8'],
         presence: {
           '1': 'inroom',
           '2': 'online',
           '3': 'mobile',
           '4': 'push',
           '5': 'push_connected',
-          '6': 'push_notified_connected'
+          '6': 'push_notified_connected',
+          '8': 'push_notified',
         }
       });
 
-      assertIteratorDeepEqual(distribution.getPushCandidatesWithMention(), ['4', '5', '6']);
+      assertIteratorDeepEqual(distribution.getPushCandidatesWithMention(), ['4', '5', '6', '8']);
+    });
+
+    it('should handle users in various modes for announcements', function() {
+      var distribution = new Distribution({
+        membersWithFlags: [
+          { userId: '1', flags: MODES.all },
+          { userId: '2', flags: MODES.announcement },
+          { userId: '3', flags: MODES.mute },
+        ],
+        announcement: true,
+        presence: {
+          '1': 'push_notified',
+          '2': 'push_notified',
+          '3': 'push_notified',
+        }
+      });
+
+      assertIteratorDeepEqual(distribution.getPushCandidatesWithMention(), ['1','2']);
     });
 
     it('should handle distributions without mentions', function() {
       var distribution = new Distribution({
-        notifyNoMention: []
+        membersWithFlags: []
       });
 
       assertIteratorDeepEqual(distribution.getPushCandidatesWithMention(), []);
@@ -131,7 +192,15 @@ describe('distribution', function() {
 
     it('should handle users in various connected states', function() {
       var distribution = new Distribution({
-        notifyUserIds: ['1', '2', '3', '4', '5', '6', '7'],
+        membersWithFlags: [
+          { userId: '1', flags: MODES.all },
+          { userId: '2', flags: MODES.all },
+          { userId: '3', flags: MODES.all },
+          { userId: '4', flags: MODES.all },
+          { userId: '5', flags: MODES.all },
+          { userId: '6', flags: MODES.all },
+          { userId: '7', flags: MODES.all }
+        ],
         presence: {
           '1': 'inroom',
           '2': 'online',
@@ -163,7 +232,13 @@ describe('distribution', function() {
 
     it('should handle different values for counts', function() {
       var distribution = new Distribution({
-        notifyUserIds: ['1', '2', '3', '4', '5'],
+        membersWithFlags: [
+          { userId: '1', flags: MODES.all },
+          { userId: '2', flags: MODES.all },
+          { userId: '3', flags: MODES.all },
+          { userId: '4', flags: MODES.all },
+          { userId: '5', flags: MODES.all },
+        ],
         presence: {
           '1': 'inroom',
           '2': 'inroom',
@@ -193,7 +268,15 @@ describe('distribution', function() {
   describe('getBadgeUpdates', function() {
     it('should handle users in various connected states', function() {
       var distribution = new Distribution({
-        notifyUserIds: ['1', '2', '3', '4', '5', '6', '7'],
+        membersWithFlags: [
+          { userId: '1', flags: MODES.all },
+          { userId: '2', flags: MODES.all },
+          { userId: '3', flags: MODES.all },
+          { userId: '4', flags: MODES.all },
+          { userId: '5', flags: MODES.all },
+          { userId: '6', flags: MODES.all },
+          { userId: '7', flags: MODES.all }
+        ],
         presence: {
           '1': 'inroom',
           '2': 'online',
@@ -219,7 +302,12 @@ describe('distribution', function() {
 
     it('should handle different values for counts', function() {
       var distribution = new Distribution({
-        notifyUserIds: ['1', '2', '3', '4'],
+        membersWithFlags: [
+          { userId: '1', flags: MODES.all },
+          { userId: '2', flags: MODES.all },
+          { userId: '3', flags: MODES.all },
+          { userId: '4', flags: MODES.all },
+        ],
         presence: {
           '1': 'inroom',
           '2': 'inroom',
@@ -241,7 +329,16 @@ describe('distribution', function() {
   describe('getNewUnreadWithMention', function() {
     it('should handle users in various connected states', function() {
       var distribution = new Distribution({
-        mentionUserIds: ['1', '2', '3', '4', '5', '6', '7'],
+        membersWithFlags: [
+          { userId: '1', flags: MODES.all },
+          { userId: '2', flags: MODES.all },
+          { userId: '3', flags: MODES.all },
+          { userId: '4', flags: MODES.all },
+          { userId: '5', flags: MODES.all },
+          { userId: '6', flags: MODES.all },
+          { userId: '7', flags: MODES.all }
+        ],
+        mentions: ['1', '2', '3', '4', '5', '6', '7'],
         presence: {
           '1': 'inroom',
           '2': 'online',
@@ -257,13 +354,43 @@ describe('distribution', function() {
 
       assertIteratorDeepEqual(results.getNewUnreadWithMention(), ['1','2','3','5','6']);
     });
+
+    it('should treat announcements as mentions', function() {
+      var distribution = new Distribution({
+        membersWithFlags: [
+          { userId: '1', flags: MODES.announcement },
+          { userId: '2', flags: MODES.announcement },
+          { userId: '3', flags: MODES.announcement },
+          { userId: '4', flags: MODES.mute },
+        ],
+        announcement: true,
+        presence: {
+          '1': 'online',
+          '2': 'online',
+          '4': 'online',
+        }
+      });
+
+      var results = distribution.resultsProcessor({
+      });
+
+      assertIteratorDeepEqual(results.getNewUnreadWithMention(), ['1', '2']);
+    });
   });
 
 
   describe('getNewUnreadWithoutMention', function() {
     it('should handle users in various connected states', function() {
       var distribution = new Distribution({
-        notifyNoMention: ['1', '2', '3', '4', '5', '6', '7'],
+        membersWithFlags: [
+          { userId: '1', flags: MODES.all },
+          { userId: '2', flags: MODES.all },
+          { userId: '3', flags: MODES.all },
+          { userId: '4', flags: MODES.all },
+          { userId: '5', flags: MODES.all },
+          { userId: '6', flags: MODES.all },
+          { userId: '7', flags: MODES.all }
+        ],
         presence: {
           '1': 'inroom',
           '2': 'online',
@@ -279,6 +406,31 @@ describe('distribution', function() {
 
       assertIteratorDeepEqual(results.getNewUnreadWithoutMention(), ['1','2','3','5','6']);
     });
+
+    it('should treat announcements as mentions', function() {
+      var distribution = new Distribution({
+        membersWithFlags: [
+          { userId: '1', flags: MODES.all },
+          { userId: '2', flags: MODES.announcement },
+          { userId: '3', flags: MODES.mute }
+        ],
+        announcement: true,
+        presence: {
+          '1': 'online',
+          '2': 'online',
+          '3': 'online',
+          '4': 'online',
+          '5': 'online',
+          '6': 'online'
+        }
+      });
+
+      var results = distribution.resultsProcessor({
+      });
+
+      assertIteratorDeepEqual(results.getNewUnreadWithoutMention(), []);
+    });
+
   });
 
 });

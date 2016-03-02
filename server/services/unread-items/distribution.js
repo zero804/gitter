@@ -1,73 +1,159 @@
 'use strict';
 
 var Observable = require('rx').Observable;
+var roomMembershipFlags = require('../room-membership-flags');
+var _ = require('lodash');
 
-function connectedPredicate(presence) {
-  return function(userId) {
-    var status = presence[userId];
+function isConnected(memberDetail) {
+  var status = memberDetail.presence;
 
-    return status && (status === 'inroom' ||
-      status === 'online' ||
-      status === 'mobile' ||
-      status === 'push_connected' ||
-      status === 'push_notified_connected');
+  return status && (status === 'inroom' ||
+    status === 'online' ||
+    status === 'mobile' ||
+    status === 'push_connected' ||
+    status === 'push_notified_connected');
+}
+
+function hasBeenMentionedPredicate(announcement) {
+  return function hasBeenMentioned(memberDetail) {
+    var flags = memberDetail.flags;
+
+    return (announcement && roomMembershipFlags.hasNotifyAnnouncement(flags)) ||
+      (roomMembershipFlags.hasNotifyMention(flags) && memberDetail.mentioned);
   };
+
+}
+
+function hasNotBeenMentionedPredicate(announcement) {
+  return function hasNotBeenMentioned(memberDetail) {
+    var flags = memberDetail.flags;
+
+    return !(announcement && roomMembershipFlags.hasNotifyAnnouncement(flags)) &&
+      !(roomMembershipFlags.hasNotifyMention(flags) && memberDetail.mentioned);
+  };
+
+}
+
+function memberDetailsToUserId(memberWithFlags) {
+  return memberWithFlags.userId;
+}
+
+function processMemberDetails(membersDetails, mentions, presence, nonMemberMentions) {
+  var mentionHash = mentions && mentions.length && _.reduce(mentions, function(memo, userId) {
+    memo[userId] = true;
+    return memo;
+  }, {});
+
+  var nonMemberMentionsHash = nonMemberMentions && nonMemberMentions.length && _.reduce(nonMemberMentions, function(memo, userId) {
+    memo[userId] = true;
+    return memo;
+  }, {});
+
+  _.each(membersDetails, function(membersDetail) {
+    var userId = membersDetail.userId;
+    membersDetail.nonMemberMention = !!(nonMemberMentionsHash && nonMemberMentionsHash[userId]);
+    membersDetail.mentioned = !!(mentionHash && mentionHash[userId]);
+    membersDetail.presence = presence && presence[userId];
+    membersDetail.result = null;
+  });
+
+  return membersDetails;
 }
 
 function Distribution(options) {
-  this.notifyUserIds = options.notifyUserIds;
-  this.mentionUserIds = options.mentionUserIds;
-  this.notifyNewRoomUserIds = options.notifyNewRoomUserIds;
-
-  this._notifyNoMention = Observable.from(options.notifyNoMention || []);
-  this._notifyUserIds = Observable.from(options.notifyUserIds || []);
-  this._mentionUserIds = Observable.from(options.mentionUserIds || []);
-  this._activityOnlyUserIds = Observable.from(options.activityOnlyUserIds || []);
-  this._notifyNewRoomUserIds = Observable.from(options.notifyNewRoomUserIds || []);
-
+  var membersDetails = processMemberDetails(options.membersWithFlags, options.mentions, options.presence, options.nonMemberMentions);
+  this._membersDetails = Observable.from(membersDetails);
   this._announcement = options.announcement || false;
-  this._presence = options.presence || {};
 }
 
 Distribution.prototype = {
+
+  getEngineNotifyList: function() {
+    var announcement = this._announcement;
+
+    return this._membersDetails
+      .filter(function(memberDetail) {
+        var flags = memberDetail.flags;
+
+        return (roomMembershipFlags.hasNotifyUnread(flags)) ||
+          (announcement && roomMembershipFlags.hasNotifyAnnouncement(flags)) ||
+          (roomMembershipFlags.hasNotifyMention(flags) && memberDetail.mentioned);
+      })
+      .map(memberDetailsToUserId);
+  },
+
+
+  getEngineMentionList: function() {
+    var announcement = this._announcement;
+
+    return this._membersDetails
+      .filter(function(memberDetail) {
+        var flags = memberDetail.flags;
+
+        return (announcement && roomMembershipFlags.hasNotifyAnnouncement(flags)) ||
+          (roomMembershipFlags.hasNotifyMention(flags) && memberDetail.mentioned);
+      })
+      .map(memberDetailsToUserId);
+  },
+
+
+  /**
+   * userIds of users who have been mentioned, but are not in the room
+   * yet have permission to view the room
+   */
   getNotifyNewRoom: function() {
-    return this._notifyNewRoomUserIds;
+    return this._membersDetails
+      .filter(function(memberDetail) {
+        return memberDetail.nonMemberMention;
+      })
+      .map(memberDetailsToUserId);
+
   },
 
+  /**
+   * userId of users who should get desktop notifications
+   */
   getWebNotifications: function() {
-    var presenceStatus = this._presence;
+    var mentioned = hasBeenMentionedPredicate(this._announcement);
 
-    return this._notifyUserIds
-      .filter(function(userId) {
-        var status = presenceStatus[userId];
+    return this._membersDetails
+      .filter(function(memberDetail) {
+        if (memberDetail.presence !== 'online') return false;
 
-        return status === 'online';
-      });
+        var flags = memberDetail.flags;
+        return roomMembershipFlags.hasNotifyUnread(flags) || mentioned(memberDetail);
+      })
+      .map(memberDetailsToUserId);
   },
 
+  /**
+   * userId of users who should get push notifications but have
+   * not been mentioned
+   */
   getPushCandidatesWithoutMention: function() {
-    var presenceStatus = this._presence;
+    return this._membersDetails
+      .filter(hasNotBeenMentionedPredicate(this._announcement))
+      .filter(function(memberDetail) {
+        var flags = memberDetail.flags;
 
-    return this._notifyNoMention
-      .filter(function(userId) {
-        var status = presenceStatus[userId];
-
-        return status && (status === 'push' || status === 'push_connected');
-      });
+        var presence = memberDetail.presence;
+        return (presence === 'push' || presence === 'push_connected') &&
+               roomMembershipFlags.hasNotifyUnread(flags);
+      })
+      .map(memberDetailsToUserId);
   },
 
   getPushCandidatesWithMention: function() {
-    var presenceStatus = this._presence;
-
-    return this._mentionUserIds
-      .filter(function(userId) {
-        var status = presenceStatus[userId];
-
-        return status && (status === 'push' ||
-          status === 'push_connected' ||
-          status === 'push_notified' ||
-          status === 'push_notified_connected');
-      });
+    return this._membersDetails
+      .filter(hasBeenMentionedPredicate(this._announcement))
+      .filter(function(memberDetail) {
+        var presence = memberDetail.presence;
+        return (presence === 'push' ||
+            presence === 'push_connected' ||
+            presence === 'push_notified' ||
+            presence === 'push_notified_connected');
+      })
+      .map(memberDetailsToUserId);
   },
 
   /**
@@ -75,29 +161,38 @@ Distribution.prototype = {
    * who are currently connected
    */
   getConnectedActivityUserIds: function() {
-    return this._activityOnlyUserIds
-      .filter(connectedPredicate(this._presence));
+    return this._membersDetails
+      .filter(isConnected)
+      .filter(function(memberDetail) {
+        var flags = memberDetail.flags;
+        return roomMembershipFlags.hasNotifyActivity(flags);
+      })
+      .map(memberDetailsToUserId);
   },
 
   resultsProcessor: function(unreadItemResults) {
-    return new DistributionResultsProcessor(this, unreadItemResults);
+    // Mutates state, which is a pity, but it's very fast and it needs to be
+    this._membersDetails.forEach(function(memberDetail) {
+      memberDetail.result = unreadItemResults[memberDetail.userId];
+    });
+
+    return new DistributionResultsProcessor(this._membersDetails, this._announcement);
   },
 
 };
 
-function DistributionResultsProcessor(distribution, unreadItemResults) {
-  this._distribution = distribution;
-  this._unreadItemResults = unreadItemResults;
+function DistributionResultsProcessor(membersWithFlags, announcement) {
+  this._membersDetails = membersWithFlags;
+  this._announcement = announcement;
 }
 
 DistributionResultsProcessor.prototype = {
   getTroupeUnreadCountsChange: function() {
-    var unreadItemResults = this._unreadItemResults;
-
-    return this._distribution._notifyUserIds
-      .filter(connectedPredicate(this._distribution._presence))
-      .map(function(userId) {
-        var result = unreadItemResults[userId];
+    return this._membersDetails
+      .filter(isConnected)
+      .map(function(memberDetail) {
+        var userId = memberDetail.userId;
+        var result = memberDetail.result;
         if (!result) return;
 
         var unreadCount = result.unreadCount;
@@ -117,27 +212,34 @@ DistributionResultsProcessor.prototype = {
   },
 
   getBadgeUpdates: function() {
-    var unreadItemResults = this._unreadItemResults;
-    var presenceStatus = this._distribution._presence;
-
-    return this._distribution._notifyUserIds
-      .filter(function(userId) {
-        var userResult = unreadItemResults[userId];
-        var onlineStatus = presenceStatus[userId];
+    return this._membersDetails
+      .filter(function(memberDetail) {
+        var userResult = memberDetail.result;
+        var onlineStatus = memberDetail.presence;
 
         /* online status null implies the user has no push notification devices */
         return onlineStatus && userResult && userResult.badgeUpdate;
-      });
+      })
+      .map(memberDetailsToUserId);
   },
 
   getNewUnreadWithMention: function() {
-    return this._distribution._mentionUserIds
-      .filter(connectedPredicate(this._distribution._presence));
+    return this._membersDetails
+      .filter(isConnected)
+      .filter(hasBeenMentionedPredicate(this._announcement))
+      .map(memberDetailsToUserId);
   },
 
   getNewUnreadWithoutMention: function() {
-    return this._distribution._notifyNoMention
-      .filter(connectedPredicate(this._distribution._presence));
+    return this._membersDetails
+      .filter(isConnected)
+      .filter(hasNotBeenMentionedPredicate(this._announcement))
+      .filter(function(memberDetail) {
+        var flags = memberDetail.flags;
+
+        if (roomMembershipFlags.hasNotifyUnread(flags)) return true;
+      })
+      .map(memberDetailsToUserId);
   }
 };
 

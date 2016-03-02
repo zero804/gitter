@@ -15,6 +15,7 @@ var RedisBatcher          = require('../../utils/redis-batcher').RedisBatcher;
 var recentRoomCore        = require('../core/recent-room-core');
 var debug                 = require('debug')('gitter:unread-items:service');
 var badgeBatcher          = new RedisBatcher('badge', 1000, batchBadgeUpdates);
+var distributionDelta     = require('./distribution-delta');
 
 /* Handles batching badge updates to users */
 function batchBadgeUpdates(key, userIds, done) {
@@ -36,18 +37,12 @@ function sinceFilter(since) {
   };
 }
 
-function reject(msg) {
-  logger.error(msg);
-  return Promise.reject(new Error(msg));
-}
-
 /**
  * Item removed
- * @return {promise} promise of nothing
  */
-function removeItem(troupeId, itemId) {
-  if(!troupeId) return reject("removeItem failed. Troupe cannot be null");
-  if(!itemId) return reject("removeItem failed. itemId cannot be null");
+var removeItem = Promise.method(function (troupeId, itemId) {
+  if(!troupeId) throw new Error("removeItem failed. Troupe cannot be null");
+  if(!itemId) throw new Error("removeItem failed. itemId cannot be null");
 
   return roomMembershipService.findMembersForRoomWithLurk(troupeId)
     .then(function(userIdsWithLurk) {
@@ -86,15 +81,15 @@ function removeItem(troupeId, itemId) {
         });
 
   });
-}
+});
 
 /*
   This ensures that if all else fails, we clear out the unread items
   It should only have any effect when data is inconsistent
 */
-function ensureAllItemsRead(userId, troupeId) {
-  if(!userId) return reject("ensureAllItemsRead failed. userId required");
-  if(!troupeId) return reject("ensureAllItemsRead failed. troupeId required");
+var ensureAllItemsRead = Promise.method(function(userId, troupeId) {
+  if(!userId) throw new Error("ensureAllItemsRead failed. userId required");
+  if(!troupeId) throw new Error("ensureAllItemsRead failed. troupeId required");
 
   return engine.ensureAllItemsRead(userId, troupeId)
     .then(function(result) {
@@ -112,7 +107,8 @@ function ensureAllItemsRead(userId, troupeId) {
       }
 
     });
-}
+});
+
 exports.ensureAllItemsRead = ensureAllItemsRead;
 
 /**
@@ -127,9 +123,9 @@ exports.listTroupeUsersForEmailNotifications = function(horizonTime, emailLatchE
 /**
  * Mark many items as read, for a single user and troupe
  */
-exports.markItemsRead = function(userId, troupeId, itemIds, options) {
-  if(!userId) return reject("userId required");
-  if(!troupeId) return reject("troupeId required");
+exports.markItemsRead = Promise.method(function(userId, troupeId, itemIds, options) {
+  if(!userId) throw new Error("userId required");
+  if(!troupeId) throw new Error("troupeId required");
 
   var markAllRead = options && options.markAllRead;
 
@@ -163,11 +159,11 @@ exports.markItemsRead = function(userId, troupeId, itemIds, options) {
 
     });
 
-};
+});
 
-exports.markAllChatsRead = function(userId, troupeId, options) {
-  if(!mongoUtils.isLikeObjectId(userId)) return reject('userId must be a mongoid');
-  if(!mongoUtils.isLikeObjectId(troupeId)) return reject('troupeId must be a mongoid');
+exports.markAllChatsRead = Promise.method(function(userId, troupeId, options) {
+  if(!mongoUtils.isLikeObjectId(userId)) throw new Error('userId must be a mongoid');
+  if(!mongoUtils.isLikeObjectId(troupeId)) throw new Error('troupeId must be a mongoid');
 
   if(!options) options = {};
   appEvents.markAllRead({ userId: userId, troupeId: troupeId });
@@ -184,7 +180,7 @@ exports.markAllChatsRead = function(userId, troupeId, options) {
       /* Don't mark the items as read */
       return exports.markItemsRead(userId, troupeId, chatIds, options);
     });
-};
+});
 
 exports.getUserUnreadCountsForTroupeIds = function(userId, troupeIds) {
   return engine.getUserUnreadCountsForRooms(userId, troupeIds);
@@ -338,56 +334,20 @@ function processResultsForNewItemWithMentions(troupeId, chatId, distribution, re
 function createChatUnreadItems(fromUserId, troupe, chat) {
   return createDistribution(fromUserId, troupe, chat.mentions)
     .then(function(distribution) {
-      return engine.newItemWithMentions(troupe.id, chat.id, distribution.notifyUserIds, distribution.mentionUserIds)
+      // TODO: newItemWithMentions should take a distribution
+      return Promise.join(
+        distribution.getEngineNotifyList().toArray().toPromise(Promise),
+        distribution.getEngineMentionList().toArray().toPromise(Promise),
+        function(notifyUserIds, mentionUserIds) {
+          return engine.newItemWithMentions(troupe.id, chat.id, notifyUserIds, mentionUserIds);
+        })
         .then(function(results) {
-          return processResultsForNewItemWithMentions(troupe.id, chat.id, distribution, results, false);
+          processResultsForNewItemWithMentions(troupe.id, chat.id, distribution, results, false);
+          return null;
         });
     });
 }
 exports.createChatUnreadItems = createChatUnreadItems;
-
-function toString(f) {
-  if (!f) return '';
-  return '' + f;
-}
-/**
- * Given a set of original mentions and a chat message, returns
- * { addNotify: [userIds], addMentions: [userIds], remove: [userIds], addNewRoom: [userIds] }
- * Which consist of users no longer mentioned in a message and
- * new users who are now mentioned in the message, who were not
- * previously.
- */
-function generateMentionDeltaSet(parsedChat, originalMentions) {
-  var originalMentionUserIds = originalMentions
-    .map(function(mention) {
-      if(mention.userIds && mention.userIds.length) return mention.userIds;
-      return mention.userId;
-    })
-    .filter(function(m) {
-      return !!m;
-    });
-
-
-  /* Arg. Underscore. We need lazy evaluation! */
-  originalMentionUserIds = _.flatten(originalMentionUserIds).map(toString);
-  originalMentionUserIds = uniqueIds(originalMentionUserIds);
-
-  var mentionUserIds = parsedChat.mentionUserIds.map(toString);
-
-  var addMentions = _.without.apply(null, [mentionUserIds].concat(originalMentionUserIds));
-  var removeMentions = _.without.apply(null, [originalMentionUserIds].concat(mentionUserIds));
-
-  // List of users who should get unread items, who were previously mentioned but no longer are
-  var forNotifyWithRemoveMentions = _.intersection(parsedChat.notifyUserIds.map(toString), removeMentions);
-
-  // Everyone who was added via a mention, plus everyone who was no longer mentioned but is not lurking
-  var addNotify = forNotifyWithRemoveMentions.concat(addMentions);
-
-  // Users who are newly mentioned but not currently in the room
-  var addNewRoom = _.intersection(addMentions, parsedChat.notifyNewRoomUserIds.map(toString));
-
-  return { addNotify: addNotify, addMentions: addMentions, addNewRoom: addNewRoom, remove: removeMentions };
-}
 
 function removeMentionsForUpdatedChat(troupeId, chatId, removeUserIds) {
   return engine.removeItem(troupeId, chatId, removeUserIds)
@@ -422,20 +382,24 @@ function updateChatUnreadItems(fromUserId, troupe, chat, originalMentions) {
   var troupeId = troupe.id;
   var chatId = chat.id;
 
-  return createDistribution(fromUserId, troupe, chat.mentions)
-    .then(function(parsedChat) {
-      var delta = generateMentionDeltaSet(parsedChat, originalMentions);
+  return distributionDelta(fromUserId, troupe, chat.mentions, originalMentions)
+    .bind({ })
+    .spread(function(delta, newDistribution) {
+      this.delta = delta;
+      this.newDistribution = newDistribution;
 
-      // Remove first
-      return [parsedChat, delta, delta.remove.length && removeMentionsForUpdatedChat(troupeId, chatId, delta.remove)];
+      return removeMentionsForUpdatedChat(troupeId, chatId, delta.remove);
     })
-    .spread(function(parsedChat, delta) {
+    .then(function() {
+      var delta = this.delta;
+      var distribution = this.newDistribution;
+
       if (!delta.addNotify.length) return;
 
       // Add additional mentions
       return engine.newItemWithMentions(troupeId, chatId, delta.addNotify, delta.addMentions)
         .then(function(results) {
-          return processResultsForNewItemWithMentions(troupeId, chatId, parsedChat, results, true);
+          return processResultsForNewItemWithMentions(troupeId, chatId, distribution, results, true);
         });
     });
 }
@@ -491,6 +455,5 @@ exports.testOnly = {
   sinceFilter: sinceFilter,
   removeItem: removeItem,
   getTroupeIdsCausingBadgeCount: getTroupeIdsCausingBadgeCount,
-  generateMentionDeltaSet: generateMentionDeltaSet,
   processResultsForNewItemWithMentions: processResultsForNewItemWithMentions
 };
