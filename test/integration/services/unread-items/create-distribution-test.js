@@ -15,7 +15,13 @@ function makeHash() {
   return hash;
 }
 
-describe('unread-item-distribution', function() {
+function assertIteratorDeepEqual(iterator, expected) {
+  iterator.toArray().forEach(function(array) {
+    assert.deepEqual(array, expected);
+  });
+}
+
+describe('create-distribution', function() {
   before(blockTimer.on);
   after(blockTimer.off);
 
@@ -108,70 +114,77 @@ describe('unread-item-distribution', function() {
 
       return createDistribution(fromUserId, troupeNoLurkers, [])
         .then(function(result) {
-          assert.deepEqual(result.notifyUserIds, [userId1, userId2]);
-          assert.deepEqual(result.mentionUserIds, []);
-          assert.deepEqual(result.activityOnlyUserIds, []);
-          assert.deepEqual(result.notifyNewRoomUserIds, []);
+          assertIteratorDeepEqual(result._notifyNoMention, [userId1, userId2]);
+          assertIteratorDeepEqual(result._notifyUserIds, [userId1, userId2]);
+          assertIteratorDeepEqual(result._mentionUserIds, []);
+          assertIteratorDeepEqual(result._activityOnlyUserIds, []);
+          assertIteratorDeepEqual(result._notifyNewRoomUserIds, []);
         });
     });
 
     it('should parse messages with no mentions, some lurkers', function() {
       return createDistribution(fromUserId, troupeSomeLurkers, [])
         .then(function(result) {
-          assert.deepEqual(result.notifyUserIds, [userId1]);
-          assert.deepEqual(result.mentionUserIds, []);
-          assert.deepEqual(result.activityOnlyUserIds, [userId2]);
-          assert.deepEqual(result.notifyNewRoomUserIds, []);
+          assertIteratorDeepEqual(result._notifyNoMention, [userId1]);
+          assertIteratorDeepEqual(result._notifyUserIds, [userId1]);
+          assertIteratorDeepEqual(result._mentionUserIds, []);
+          assertIteratorDeepEqual(result._activityOnlyUserIds, [userId2]);
+          assertIteratorDeepEqual(result._notifyNewRoomUserIds, []);
         });
     });
 
     it('should parse messages with no mentions, all lurkers', function() {
       return createDistribution(fromUserId, troupeAllLurkers, [])
         .then(function(result) {
-          assert.deepEqual(result.notifyUserIds, []);
-          assert.deepEqual(result.mentionUserIds, []);
-          assert.deepEqual(result.activityOnlyUserIds, [userId1, userId2]);
-          assert.deepEqual(result.notifyNewRoomUserIds, []);
+          assertIteratorDeepEqual(result._notifyNoMention, []);
+          assertIteratorDeepEqual(result._notifyUserIds, []);
+          assertIteratorDeepEqual(result._mentionUserIds, []);
+          assertIteratorDeepEqual(result._activityOnlyUserIds, [userId1, userId2]);
+          assertIteratorDeepEqual(result._notifyNewRoomUserIds, []);
         });
     });
 
     it('should parse messages with user mentions to non lurkers', function() {
       return createDistribution(fromUserId, troupeNoLurkers, singleMention)
         .then(function(result) {
-          assert.deepEqual(result.notifyUserIds, [userId1, userId2]);
-          assert.deepEqual(result.mentionUserIds, [userId1]);
-          assert.deepEqual(result.activityOnlyUserIds, []);
-          assert.deepEqual(result.notifyNewRoomUserIds, []);
+          assertIteratorDeepEqual(result._notifyNoMention, [userId2]);
+          assertIteratorDeepEqual(result._notifyUserIds, [userId1, userId2]);
+          assertIteratorDeepEqual(result._mentionUserIds, [userId1]);
+          assertIteratorDeepEqual(result._activityOnlyUserIds, []);
+          assertIteratorDeepEqual(result._notifyNewRoomUserIds, []);
         });
     });
 
     it('should parse messages with user mentions to lurkers', function() {
       return createDistribution(fromUserId, troupeAllLurkers, singleMention)
         .then(function(result) {
-          assert.deepEqual(result.notifyUserIds, [userId1]);
-          assert.deepEqual(result.mentionUserIds, [userId1]);
-          assert.deepEqual(result.activityOnlyUserIds, [userId2]);
-          assert.deepEqual(result.notifyNewRoomUserIds, []);
+          assertIteratorDeepEqual(result._notifyNoMention, []);
+          assertIteratorDeepEqual(result._notifyUserIds, [userId1]);
+          assertIteratorDeepEqual(result._mentionUserIds, [userId1]);
+          assertIteratorDeepEqual(result._activityOnlyUserIds, [userId2]);
+          assertIteratorDeepEqual(result._notifyNewRoomUserIds, []);
         });
     });
 
     it('should parse messages with group mentions', function() {
       return createDistribution(fromUserId, troupeSomeLurkers, groupMention)
         .then(function(result) {
-          assert.deepEqual(result.notifyUserIds, [userId1, userId2]);
-          assert.deepEqual(result.mentionUserIds, [userId1, userId2]);
-          assert.deepEqual(result.activityOnlyUserIds, []);
-          assert.deepEqual(result.notifyNewRoomUserIds, []);
+          assertIteratorDeepEqual(result._notifyNoMention, []);
+          assertIteratorDeepEqual(result._notifyUserIds, [userId1, userId2]);
+          assertIteratorDeepEqual(result._mentionUserIds, [userId1, userId2]);
+          assertIteratorDeepEqual(result._activityOnlyUserIds, []);
+          assertIteratorDeepEqual(result._notifyNewRoomUserIds, []);
         });
     });
 
     it('should parse messages with duplicate mentions', function() {
       return createDistribution(fromUserId, troupeSomeLurkers, duplicateMention)
         .then(function(result) {
-          assert.deepEqual(result.notifyUserIds, [userId1]);
-          assert.deepEqual(result.mentionUserIds, [userId1]);
-          assert.deepEqual(result.activityOnlyUserIds, [userId2]);
-          assert.deepEqual(result.notifyNewRoomUserIds, []);
+          assertIteratorDeepEqual(result._notifyNoMention, []);
+          assertIteratorDeepEqual(result._notifyUserIds, [userId1]);
+          assertIteratorDeepEqual(result._mentionUserIds, [userId1]);
+          assertIteratorDeepEqual(result._activityOnlyUserIds, [userId2]);
+          assertIteratorDeepEqual(result._notifyNewRoomUserIds, []);
         });
     });
 
@@ -184,10 +197,10 @@ describe('unread-item-distribution', function() {
 
       return createDistribution(fromUserId, troupeSomeLurkers, nonMemberMention)
         .then(function(result) {
-          assert.deepEqual(result.notifyUserIds, [userId1, userId3]);
-          assert.deepEqual(result.mentionUserIds, [userId3]);
-          assert.deepEqual(result.activityOnlyUserIds, [userId2]);
-          assert.deepEqual(result.notifyNewRoomUserIds, [userId3]);
+          assertIteratorDeepEqual(result._notifyUserIds, [userId1, userId3]);
+          assertIteratorDeepEqual(result._mentionUserIds, [userId3]);
+          assertIteratorDeepEqual(result._activityOnlyUserIds, [userId2]);
+          assertIteratorDeepEqual(result._notifyNewRoomUserIds, [userId3]);
         });
     });
 
@@ -200,10 +213,10 @@ describe('unread-item-distribution', function() {
 
       return createDistribution(fromUserId, troupeSomeLurkers, nonMemberMention)
         .then(function(result) {
-          assert.deepEqual(result.notifyUserIds, [userId1]);
-          assert.deepEqual(result.mentionUserIds, []);
-          assert.deepEqual(result.activityOnlyUserIds, [userId2]);
-          assert.deepEqual(result.notifyNewRoomUserIds, []);
+          assertIteratorDeepEqual(result._notifyUserIds, [userId1]);
+          assertIteratorDeepEqual(result._mentionUserIds, []);
+          assertIteratorDeepEqual(result._activityOnlyUserIds, [userId2]);
+          assertIteratorDeepEqual(result._notifyNewRoomUserIds, []);
         });
     });
 
@@ -213,10 +226,10 @@ describe('unread-item-distribution', function() {
 
       return createDistribution(fromUserId, troupeSomeLurkers, nonMemberMention)
         .then(function(result) {
-          assert.deepEqual(result.notifyUserIds, [userId1]);
-          assert.deepEqual(result.mentionUserIds, []);
-          assert.deepEqual(result.activityOnlyUserIds, [userId2]);
-          assert.deepEqual(result.notifyNewRoomUserIds, []);
+          assertIteratorDeepEqual(result._notifyUserIds, [userId1]);
+          assertIteratorDeepEqual(result._mentionUserIds, []);
+          assertIteratorDeepEqual(result._activityOnlyUserIds, [userId2]);
+          assertIteratorDeepEqual(result._notifyNewRoomUserIds, []);
         });
     });
 

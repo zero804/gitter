@@ -142,13 +142,14 @@ function unreadItemDistribution(fromUserId, troupe, mentions) {
       });
 
       if(!mentions || !mentions.length) {
-        return new Distribution({
+        return {
+          notifyNoMention: active,
           notifyUserIds: active,
           mentionUserIds: [],
           activityOnlyUserIds: nonActive,
           notifyNewRoomUserIds: [],
           announcement: false
-        });
+        };
       }
 
       /* Add the mentions into the mix */
@@ -156,30 +157,37 @@ function unreadItemDistribution(fromUserId, troupe, mentions) {
         .then(function(parsedMentions) {
           var notifyUserIdsHash = {};
           _.each(active, function(userId) { notifyUserIdsHash[userId] = 1; });
-          _.each(parsedMentions.mentionUserIds, function(userId) { notifyUserIdsHash[userId] = 1; });
+          _.each(parsedMentions.mentionUserIds, function(userId) { notifyUserIdsHash[userId] = 2; });
+
+          var notifyUserIds = Object.keys(notifyUserIdsHash);
+
+          var notifyNoMention = _.filter(notifyUserIds, function(userId) {
+            return notifyUserIdsHash[userId] === 1;
+          });
 
           var nonActiveLessMentions = _.filter(nonActive, function(userId) {
             return !notifyUserIdsHash[userId];
           });
 
-          return new Distribution({
-            notifyUserIds: Object.keys(notifyUserIdsHash),
+          return {
+            notifyNoMention: notifyNoMention,
+            notifyUserIds: notifyUserIds,
             mentionUserIds: parsedMentions.mentionUserIds,
             activityOnlyUserIds: nonActiveLessMentions,
             notifyNewRoomUserIds: parsedMentions.nonMemberUserIds,
             announcement: parsedMentions.announcement
-          });
+          };
         });
 
     })
-    .then(function(distribution) {
-      var allUserIds = distribution.notifyUserIds.concat(distribution.activityOnlyUserIds);
+    .then(function(options) {
+      var allUserIds = options.notifyUserIds.concat(options.activityOnlyUserIds);
 
       // In future, this should take into account announcements
       return categoriseUserInRoom(troupeId, allUserIds)
         .then(function(presenceStatus) {
-          distribution.presence = presenceStatus;
-          return distribution;
+          options.presence = presenceStatus;
+          return new Distribution(options);
         });
     });
 }

@@ -40,7 +40,6 @@ describe('unread-item-service-engine-combined #slow', function() {
       afterEach(function(done) {
         unreadItemServiceEngine.testOnly.redisClient.slowlog('GET', 10, function(err, result) {
           if (result.length > 0) {
-            console.log('SLOWLOG ', result);
             assert(false, 'Test generated slowlog entries');
           }
           done();
