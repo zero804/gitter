@@ -6,6 +6,8 @@ var assert        = require("assert");
 var Promise       = require('bluebird');
 var sinon         = require('sinon');
 var fixture       = {};
+var roomMembershipFlags = testRequire('./services/room-membership-flags');
+
 
 function mongoIdEqualPredicate(value) {
   var strValue = String(value);
@@ -664,7 +666,8 @@ describe('room-membership-service', function() {
         return roomMembershipService.findMembersForRoomForNotify(troupeId1)
           .then(function(result) {
             var expected = {};
-            expected[userId1] = 'all';
+            expected[userId1] = roomMembershipFlags.MODES.all;
+            expected[userId2] = roomMembershipFlags.MODES.announcement;
 
             assert.deepEqual(result, expected);
           });
@@ -674,8 +677,8 @@ describe('room-membership-service', function() {
         return roomMembershipService.findMembersForRoomForNotify(troupeId1, true)
           .then(function(result) {
             var expected = {};
-            expected[userId1] = 'all';
-            expected[userId2] = 'announcement';
+            expected[userId1] = roomMembershipFlags.MODES.all;
+            expected[userId2] = roomMembershipFlags.MODES.announcement;
 
             assert.deepEqual(result, expected);
           });
@@ -685,7 +688,8 @@ describe('room-membership-service', function() {
         return roomMembershipService.findMembersForRoomForNotify(troupeId1, false, [userId1])
           .then(function(result) {
             var expected = {};
-            expected[userId1] = 'all';
+            expected[userId1] = roomMembershipFlags.MODES.all;
+            expected[userId2] = roomMembershipFlags.MODES.announcement;
 
             assert.deepEqual(result, expected);
           });
@@ -695,8 +699,8 @@ describe('room-membership-service', function() {
         return roomMembershipService.findMembersForRoomForNotify(troupeId1, false, [userId2])
           .then(function(result) {
             var expected = {};
-            expected[userId1] = 'all';
-            expected[userId2] = 'announcement';
+            expected[userId1] = roomMembershipFlags.MODES.all;
+            expected[userId2] = roomMembershipFlags.MODES.announcement;
 
             assert.deepEqual(result, expected);
           });
@@ -706,8 +710,9 @@ describe('room-membership-service', function() {
         return roomMembershipService.findMembersForRoomForNotify(troupeId1, false, [userId3])
           .then(function(result) {
             var expected = {};
-            expected[userId1] = 'all';
-            expected[userId3] = 'mute';
+            expected[userId1] = roomMembershipFlags.MODES.all;
+            expected[userId2] = roomMembershipFlags.MODES.announcement;
+            expected[userId3] = roomMembershipFlags.MODES.mute;
 
             assert.deepEqual(result, expected);
           });
@@ -717,9 +722,9 @@ describe('room-membership-service', function() {
         return roomMembershipService.findMembersForRoomForNotify(troupeId1, true, [userId3])
           .then(function(result) {
             var expected = {};
-            expected[userId1] = 'all';
-            expected[userId2] = 'announcement';
-            expected[userId3] = 'mute';
+            expected[userId1] = roomMembershipFlags.MODES.all;
+            expected[userId2] = roomMembershipFlags.MODES.announcement;
+            expected[userId3] = roomMembershipFlags.MODES.mute;
 
             assert.deepEqual(result, expected);
           });

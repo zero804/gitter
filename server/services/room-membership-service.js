@@ -442,14 +442,21 @@ var findMembershipModeForUsersInRoom = Promise.method(function(troupeId, userIds
 /**
  * Given a room, returns users in that should get some form of notification
  */
-var findMembersForRoomForNotify = Promise.method(function(troupeId, isAnnouncement, mentionUserIds) {
+function findMembersForRoomForNotify(troupeId, isAnnouncement, mentionUserIds) {
   var requiredBits, query;
   var hasMentions = mentionUserIds && mentionUserIds.length;
 
   if (isAnnouncement) {
-    requiredBits = [roomMembershipFlags.FLAG_POS_NOTIFY_UNREAD, roomMembershipFlags.FLAG_POS_NOTIFY_ANNOUNCEMENT];
+    requiredBits = [
+      roomMembershipFlags.FLAG_POS_NOTIFY_UNREAD,
+      roomMembershipFlags.FLAG_POS_NOTIFY_ACTIVITY,
+      roomMembershipFlags.FLAG_POS_NOTIFY_ANNOUNCEMENT
+    ];
   } else {
-    requiredBits = [roomMembershipFlags.FLAG_POS_NOTIFY_UNREAD];
+    requiredBits = [
+      roomMembershipFlags.FLAG_POS_NOTIFY_UNREAD,
+      roomMembershipFlags.FLAG_POS_NOTIFY_ACTIVITY,
+    ];
   }
 
   if (hasMentions) {
@@ -484,11 +491,11 @@ var findMembersForRoomForNotify = Promise.method(function(troupeId, isAnnounceme
     .exec()
     .then(function(troupeUsers) {
       return _.reduce(troupeUsers, function(memo, troupeUser) {
-        memo[troupeUser.userId] = roomMembershipFlags.getModeFromFlags(troupeUser.flags);
+        memo[troupeUser.userId] = troupeUser.flags;
         return memo;
       }, {});
     });
-});
+}
 
 /* Exports */
 exports.findRoomIdsForUser          = findRoomIdsForUser;
