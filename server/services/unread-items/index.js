@@ -293,22 +293,11 @@ function processResultsForNewItemWithMentions(troupeId, chatId, distribution, re
   if (!isEdit) {
     // Next notify all the users currently online but not in this room who
     // will receive desktop notifications
-
-    distribution.getWebNotificationsWithoutMention()
-      .toArray()
-      .forEach(function(userIds) {
-        if (userIds.length) {
-          appEvents.newOnlineNotification(troupeId, chatId, userIds, false);
-        }
-      });
-
-    // Next notify all the users currently online but not in this room who
-    // will receive desktop notifications
-    distribution.getWebNotificationsWithMention()
+    distribution.getWebNotifications()
       .toArray()
       .forEach(function(userIds) {
         if (!userIds.length) return;
-        appEvents.newOnlineNotification(troupeId, chatId, userIds, true);
+        appEvents.newOnlineNotification(troupeId, chatId, userIds);
       });
 
     distribution.getPushCandidatesWithoutMention()

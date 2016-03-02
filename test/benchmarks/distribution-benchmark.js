@@ -53,12 +53,7 @@ function runTestWith(options, results) {
     .forEach(function() {
     });
 
-  distribution.getWebNotificationsWithoutMention()
-    .toArray()
-    .forEach(function() {
-    });
-
-  distribution.getWebNotificationsWithMention()
+  distribution.getWebNotifications()
     .toArray()
     .forEach(function() {
     });

@@ -18,7 +18,7 @@ function Distribution(options) {
   this.notifyUserIds = options.notifyUserIds;
   this.mentionUserIds = options.mentionUserIds;
   this.notifyNewRoomUserIds = options.notifyNewRoomUserIds;
-  
+
   this._notifyNoMention = Observable.from(options.notifyNoMention || []);
   this._notifyUserIds = Observable.from(options.notifyUserIds || []);
   this._mentionUserIds = Observable.from(options.mentionUserIds || []);
@@ -34,21 +34,10 @@ Distribution.prototype = {
     return this._notifyNewRoomUserIds;
   },
 
-  getWebNotificationsWithoutMention: function() {
+  getWebNotifications: function() {
     var presenceStatus = this._presence;
 
-    return this._notifyNoMention
-      .filter(function(userId) {
-        var status = presenceStatus[userId];
-
-        return status === 'online';
-      });
-  },
-
-  getWebNotificationsWithMention: function() {
-    var presenceStatus = this._presence;
-
-    return this._mentionUserIds
+    return this._notifyUserIds
       .filter(function(userId) {
         var status = presenceStatus[userId];
 
