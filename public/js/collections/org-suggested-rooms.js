@@ -9,14 +9,19 @@ var SyncMixin           = require('./sync-mixin');
 var SuggestedCollection = Backbone.Collection.extend({
   initialize: function(attrs) {//jshint unused: true
 
-    console.log(attrs);
     if (!attrs || !attrs.contextModel) {
       throw new Error('A valid model must be passed to SuggestedOrgCollection when initialized');
     }
 
     this.contextModel = attrs.contextModel;
+    this.roomCollection = attrs.roomCollection;
     this.urlModel     = backboneUrlResolver('/v1/orgs/:selectedOrgName/suggestedRooms', this.contextModel);
     this.listenTo(this.contextModel, 'change:selectedOrgName', this.onOrgNameUpdate, this);
+
+    if(!!this.roomCollection.findWhere({ name: this.contextModel.get('selectedOrgName')})){
+      this.fetch({ reset: true });
+    }
+
   },
 
   url: function() {
@@ -25,7 +30,6 @@ var SuggestedCollection = Backbone.Collection.extend({
 
   onOrgNameUpdate: function(model, val) {//jshint unused: true
     if (!val || val  === '') return;
-    console.log('FETCHING');
     this.fetch({ reset: true });
   },
 

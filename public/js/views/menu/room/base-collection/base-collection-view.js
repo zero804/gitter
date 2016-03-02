@@ -43,6 +43,12 @@ module.exports = Marionette.CompositeView.extend({
     Marionette.CompositeView.prototype.constructor.apply(this, arguments);
   },
 
+  initialize: function() {
+    if(this.model.get('active')){
+      this.render();
+    }
+  },
+
   updateSelectedModel: function() {
     var selectedModel      = this.collection.findWhere({ selected: true });
     var newlySelectedModel = this.collection.findWhere({ id: context.troupe().get('id') });

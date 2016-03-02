@@ -111,6 +111,9 @@ module.exports = Backbone.Model.extend({
     this.listenTo(this, 'change:searchTerm', this.onSearchTermChange, this);
     this.listenTo(this, 'change:state', this.onSwitchState, this);
     this.listenTo(this, 'change', _.debounce(this.save.bind(this), 500));
+
+    //boot the model
+    this.onSwitchState(this, this.get('state'));
   },
 
   onStateChangeCalled: function(newState) {
