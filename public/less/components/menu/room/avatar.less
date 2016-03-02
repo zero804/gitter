@@ -1,13 +1,12 @@
+@import "trp3Vars";
+
 .room-menu-avatar() {
   width:         2rem;
   height:        2rem;
   border-radius: .2rem;
-
-  .desktop & {
-    height:       2.2rem;
-    width:        2.2rem;
-    margin-right: 1rem;
-  }
+  height:       @menu-avatar-dims;
+  width:        @menu-avatar-dims;
+  margin-right: 1rem;
 
   .mobile & {
     margin-right: @mobile-menu-left-padding;
