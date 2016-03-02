@@ -19,7 +19,7 @@ var Promise = require('bluebird');
 var assert = require('assert');
 var testGenerator = require('../../test-generator');
 var MockBadgeBatcherController = require('../../utils/mock-redis-batcher');
-
+var Distribution = testRequire('./services/unread-items/distribution');
 var times = mockito.Verifiers.times;
 var never = mockito.Verifiers.never;
 var once = times(1);
@@ -263,7 +263,7 @@ describe('unread-item-service', function() {
         createDistributionResponse = null;
 
         mockito.when(createDistribution)().then(function() {
-          return Promise.resolve(createDistributionResponse);
+          return Promise.resolve(new Distribution(createDistributionResponse));
         });
 
         unreadItemService = testRequire.withProxies("./services/unread-items", {
@@ -276,6 +276,7 @@ describe('unread-item-service', function() {
 
       it('should create messages with no mentions, no lurkers', function() {
         createDistributionResponse = {
+          notifyNoMention: [userId1, userId2],
           notifyUserIds: [userId1, userId2],
           mentionUserIds: [],
           activityOnlyUserIds: [],
@@ -298,6 +299,7 @@ describe('unread-item-service', function() {
 
       it('should create messages with no mentions, some lurkers', function() {
         createDistributionResponse = {
+          notifyNoMention: [userId1],
           notifyUserIds: [userId1],
           mentionUserIds: [],
           activityOnlyUserIds: [userId2],
@@ -319,6 +321,7 @@ describe('unread-item-service', function() {
 
       it('should create messages with no mentions, all lurkers', function() {
         createDistributionResponse = {
+          notifyNoMention: [],
           notifyUserIds: [],
           mentionUserIds: [],
           activityOnlyUserIds: [userId1, userId2],
@@ -339,6 +342,7 @@ describe('unread-item-service', function() {
 
       it('should create messages with user mentions to non lurkers', function() {
         createDistributionResponse = {
+          notifyNoMention: [userId2],
           notifyUserIds: [userId1, userId2],
           mentionUserIds: [userId1],
           activityOnlyUserIds: [],
@@ -361,6 +365,7 @@ describe('unread-item-service', function() {
 
       it('should create messages with user mentions to lurkers', function() {
         createDistributionResponse = {
+          notifyNoMention: [],
           notifyUserIds: [userId1],
           mentionUserIds: [userId1],
           activityOnlyUserIds: [userId1, userId2],
@@ -382,6 +387,7 @@ describe('unread-item-service', function() {
 
       it('should create messages with group mentions', function() {
         createDistributionResponse = {
+          notifyNoMention: [],
           notifyUserIds: [userId1, userId2],
           mentionUserIds: [userId1, userId2],
           activityOnlyUserIds: [userId1, userId2],
@@ -441,7 +447,7 @@ describe('unread-item-service', function() {
         createDistribution = mockito.mockFunction();
         createDistributionResponse = null;
         mockito.when(createDistribution)().then(function() {
-          return Promise.resolve(createDistributionResponse);
+          return Promise.resolve(new Distribution(createDistributionResponse));
         });
 
         unreadItemService = testRequire.withProxies("./services/unread-items", {
@@ -454,6 +460,7 @@ describe('unread-item-service', function() {
 
       it('should handle updates that add no mentions to a message with no mentions', function() {
         createDistributionResponse = {
+          notifyNoMention: [userId1, userId2],
           notifyUserIds: [userId1, userId2],
           mentionUserIds: [],
           activityOnlyUserIds: [],
@@ -470,6 +477,7 @@ describe('unread-item-service', function() {
 
       it('should handle updates that add mentions to a message with no mentions', function() {
         createDistributionResponse = {
+          notifyNoMention: [userId2],
           notifyUserIds: [userId1, userId2],
           mentionUserIds: [userId1],
           activityOnlyUserIds: [],
@@ -490,6 +498,7 @@ describe('unread-item-service', function() {
 
       it('should handle updates that remove mentions from a message with mentions', function() {
         createDistributionResponse = {
+          notifyNoMention: [userId1, userId2],
           notifyUserIds: [userId1, userId2],
           mentionUserIds: [],
           activityOnlyUserIds: [],
@@ -682,6 +691,7 @@ describe('unread-item-service', function() {
     var FIXTURES = [{
       name: 'processResultsForNewItemWithMentions',
       meta: {
+        notifyNoMention: [],
         notifyUserIds: [],
         notifyNewRoomUserIds: [],
         activityOnlyUserIds: [],
@@ -713,6 +723,7 @@ describe('unread-item-service', function() {
       tests: [{
         name: 'Chat, no mention, single user',
         meta: {
+          notifyNoMention: [userId1],
           notifyUserIds: [userId1],
           results: [{ userId: userId1, unreadCount: 1, mentionCount: 0, badgeUpdate: true }],
         },
@@ -784,6 +795,7 @@ describe('unread-item-service', function() {
       }, {
         name: 'Chat, mention, single user',
         meta: {
+          notifyNoMention: [],
           notifyUserIds: [userId1],
           mentionUserIds: [userId1],
           results: [{ userId: userId1, unreadCount: 1, mentionCount: 1, badgeUpdate: true }],
@@ -894,10 +906,10 @@ describe('unread-item-service', function() {
       }]
     }];
 
-
     testGenerator(FIXTURES, function(name, meta) {
       it(name, function() {
         var parsed = {
+          notifyNoMention: meta.notifyNoMention,
           notifyUserIds: meta.notifyUserIds,
           notifyNewRoomUserIds: meta.notifyNewRoomUserIds,
           activityOnlyUserIds: meta.activityOnlyUserIds,
@@ -934,7 +946,7 @@ describe('unread-item-service', function() {
         }, {});
         parsed.presence = presence;
 
-        processResultsForNewItemWithMentions(troupeId, chatId, parsed, results, isEdit);
+        processResultsForNewItemWithMentions(troupeId, chatId, new Distribution(parsed), results, isEdit);
 
         if (meta.expectUserMentionedInNonMemberRoom.length) {
           meta.expectUserMentionedInNonMemberRoom.forEach(function(userId) {
