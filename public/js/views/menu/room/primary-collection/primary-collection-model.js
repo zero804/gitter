@@ -6,7 +6,7 @@ module.exports = BaseCollectionModel.extend({
 
   onSearch: function() {
     this.set({
-      header: 'Rooms & People',
+      header: false,
       active: true,
     });
   },

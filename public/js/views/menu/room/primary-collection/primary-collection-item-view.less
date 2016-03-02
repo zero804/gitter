@@ -1,6 +1,7 @@
 @import "trp3Vars";
 @import "../../../../../less/components/menu/room/avatar.less";
 @import "../../../../../less/components/menu/room/menu-text.less";
+@import "../base-collection/base-collection-view.less";
 @import (inline) "../../../../../../node_modules/dragula/dist/dragula.css";
 
 /*
@@ -257,19 +258,26 @@ JP 11/2/16
 
 .search-message-empty-container {
   display:         flex;
-  flex-direction:  column;
+  flex-direction:  row;
   align-items:     center;
-  justify-content: center;
+  justify-content: flex-start;
+  padding-left:    4.5rem;
 }
 
 .search-message-empty-decal {
-  color:       @search-message-decal-color;
-  transform:   rotate(90deg);
-  font-size:   10rem;
-  user-select: none;
+  margin-right: 2rem;
+  color:        @search-message-decal-color;
+  transform:    rotate(90deg);
+  font-size:    6rem;
+  user-select:  none;
 }
 
 .search-message-empty-heading {
+  .collection__title();
+  flex-basis: 100%;
+}
+
+.search-message-empty-message {
   .room-menu-text();
   height:     auto;
   max-height: initial;
