@@ -13,7 +13,7 @@ module.exports = BaseCollectionModel.extend({
 
   onSearch: function() {
     this.set({
-      header: 'Chat Messages',
+      header: false,
       active: true,
     });
   },
