@@ -2,7 +2,7 @@
 'use strict';
 
 var assert            = require('assert');
-var roomNameShortener = require('public/js/utils/room-menu-name-shortener');
+var roomNameShortener = require('../../../../shared/room-name-shortener.js');
 
 describe('roomNameShortener()', function() {
 
@@ -21,6 +21,12 @@ describe('roomNameShortener()', function() {
   it('should treat strings with extra /\'s differently ', function() {
     var result = roomNameShortener('gitterHQ/repo/channel');
     var expected = 'repo/channel';
+    assert.equal(expected, result);
+  });
+
+  it('should return a value for names with spaces', function(){
+    var result = roomNameShortener('Anand Babu (AB) Periasamy');
+    var expected = 'Anand Babu (AB) Periasamy';
     assert.equal(expected, result);
   });
 
