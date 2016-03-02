@@ -25,9 +25,10 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   initMiniBar: function(optionsForRegion) {
+    var orgsSnapshot = context.getSnapshot('orgs') || [];
     return new MiniBarView(optionsForRegion({
       model:          this.model,
-      collection:     new MinibarCollection(context.getSnapshot('orgs'), { roomCollection: this.roomCollection }),
+      collection:     new MinibarCollection(orgsSnapshot, { roomCollection: this.roomCollection }),
       bus:            this.bus,
       dndCtrl:        this.dndCtrl,
       roomCollection: this.model._roomCollection,

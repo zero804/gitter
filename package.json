@@ -30,7 +30,7 @@
     "gitter-env": "^0.21.1",
     "gitter-faye": "^1.1.0-e",
     "gitter-faye-redis": "^0.4.4",
-    "gitter-markdown-processor": "^11.1.0",
+    "gitter-markdown-processor": "^11.1.1",
     "gitter-passport-github": "^0.1.8-f",
     "gitter-passport-http-bearer": "^1.1.2",
     "gitter-passport-oauth2": "^1.1.2-b",
