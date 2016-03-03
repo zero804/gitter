@@ -1,4 +1,4 @@
-<a href="{{when absoluteRoomUri absoluteRoomUri uri}}" class="room-item__container {{#if selected}}selected{{/if}} {{#if focus}}focus{{/if}}">
+<a href="{{when absoluteRoomUri absoluteRoomUri uri}}" id="room-item__container" class="room-item__container {{#if selected}}selected{{/if}} {{#if focus}}focus{{/if}}">
   {{#if avatarUrl}}<img class="room-item__avatar" src="{{ avatarUrl }}" />{{/if}}
   <h2 class="room-item__title">{{name}}</h2>
   {{#unless isSearch}}
