@@ -5,7 +5,7 @@ var logger = env.logger;
 var url = require('url');
 var debug = require('debug')('gitter:login-required-middleware');
 
-var validProviders = {
+var validAuthProviders = {
   github: true,
   google: true,
   linkedin: true,
@@ -27,8 +27,8 @@ module.exports = function(req, res) {
     req.session.returnTo = req.originalUrl;
   }
 
-  var provider = getProviderIfValid(req);
-  if (provider) {
+  var authProvider = getAuthProviderIfValid(req);
+  if (authProvider) {
 
     var query = {};
     // tracking data from the original request needs to be passed on to the
@@ -36,9 +36,9 @@ module.exports = function(req, res) {
     if (req.query.action) query.action = req.query.action;
     if (req.query.source) query.source = req.query.source;
 
-    debug("User is not logged in, redirecting to %s login page", provider);
+    debug("User is not logged in, redirecting to %s login page", authProvider);
 
-    var redirect = url.format({ pathname: '/login/' + provider, query: query });
+    var redirect = url.format({ pathname: '/login/' + authProvider, query: query });
     return res.relativeRedirect(redirect);
   }
 
@@ -49,13 +49,13 @@ module.exports = function(req, res) {
   return res.relativeRedirect("/login");
 };
 
-function getProviderIfValid(req) {
-  var provider = req.query.provider;
+function getAuthProviderIfValid(req) {
+  var authProvider = req.query.auth_provider;
 
-  if (!validProviders[provider]) {
-    debug('invalid auth provider "%s", skipping', provider);
+  if (!validAuthProviders[authProvider]) {
+    debug('invalid auth provider "%s", skipping', authProvider);
     return;
   }
 
-  return provider;
+  return authProvider;
 }

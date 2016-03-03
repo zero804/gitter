@@ -25,7 +25,7 @@ describe('login-required', function() {
     var req = {
       nonApiRoute: true,
       query: {
-        provider: 'twitter'
+        auth_provider: 'twitter'
       }
     };
 
@@ -43,7 +43,7 @@ describe('login-required', function() {
     var req = {
       nonApiRoute: true,
       query: {
-        provider: 'github'
+        auth_provider: 'github'
       }
     };
 
@@ -61,7 +61,7 @@ describe('login-required', function() {
     var req = {
       nonApiRoute: true,
       query: {
-        provider: 'google'
+        auth_provider: 'google'
       }
     };
 
@@ -79,7 +79,7 @@ describe('login-required', function() {
     var req = {
       nonApiRoute: true,
       query: {
-        provider: 'linkedin'
+        auth_provider: 'linkedin'
       }
     };
 
@@ -97,7 +97,7 @@ describe('login-required', function() {
     var req = {
       nonApiRoute: true,
       query: {
-        provider: 'mcdonalds'
+        auth_provider: 'mcdonalds'
       }
     };
 
@@ -115,7 +115,7 @@ describe('login-required', function() {
     var req = {
       nonApiRoute: true,
       query: {
-        provider: 'github',
+        auth_provider: 'github',
         action: 'login',
         source: 'login_page-login'
       }
