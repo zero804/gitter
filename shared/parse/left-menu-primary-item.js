@@ -11,7 +11,10 @@ module.exports = function parseContentToTemplateData(data, state) {
 
     //For user results
     if (data.displayName) {
-      return _.extend({}, { name: data.displayName, avatarUrl: data.avatarUrlSmall });
+      return _.extend({}, {
+          name: data.displayName,
+          avatarUrl: data.avatarUrlSmall
+      });
     }
 
     var hasMentions  = !!data.mentions && data.mentions;
@@ -19,7 +22,7 @@ module.exports = function parseContentToTemplateData(data, state) {
     var lurkActivity = data.lurk && (!hasMentions && !unreadItems) && !!data.activity;
 
     return _.extend({}, data, {
-      avatarUrl: getRoomAvatar(data.url.substring(1)),
+      avatarUrl:     getRoomAvatar(data.url.substring(1)),
       isNotOneToOne: (data.githubType !== 'ONETOONE'),
       name:          roomNameShortener(data.name),
       mentions:      hasMentions,
