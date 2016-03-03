@@ -5,7 +5,7 @@ var assert = require('assert');
 var roomPermissionsModel = require('./room-permissions-model');
 var roomMembershipService = require('./room-membership-service');
 var _ = require('lodash');
-var userRoomNotificationService = require('./user-room-notification-service')
+var userRoomNotificationService = require('./user-room-notification-service');
 /**
  * Return a value or a promise of the team members
  */
