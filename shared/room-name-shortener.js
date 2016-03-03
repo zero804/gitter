@@ -8,7 +8,7 @@ module.exports = function roomNameShortener(name){
     formattedName = spliceFirstPart(name);
     //Using a RegExp here is actually faster than splitting and testing length
     //JP 10/2/16 http://jsperf.com/testing-for-slashes/2
-    if(!/\//.test()){ break }
+    if(!/\//.test(formattedName)){ break }
   }
   return formattedName || name;
 };
