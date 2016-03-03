@@ -136,18 +136,3 @@ var PrimaryCollectionView = BaseCollectionView.extend({
 });
 
 module.exports = PrimaryCollectionView;
-
-
-
-
-
-/*
-
-
-    var baseOptions   = BaseCollectionView.prototype.childViewOptions.apply(this, arguments);
-    baseOptions.model = model;
-    var id            = model.get('id');
-    var element       = this.domMap[id];
-
-    return !!element ? _.extend(baseOptions, { el: element }) : baseOptions;
-    */
