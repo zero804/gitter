@@ -1,4 +1,3 @@
-/*global describe:true, it:true, before:false, after:false */
 'use strict';
 
 var loginRequired = require('../../test-require')('./web/middlewares/login-required');
