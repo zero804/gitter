@@ -27,7 +27,7 @@
     "express-session": "^1.11.3",
     "fast-csv": "^0.6.0",
     "fflip": "git+https://github.com/suprememoocow/fflip.git#fa77d5d981c2b93279c42305e8fe5632716c06a5",
-    "gitter-env": "^0.21.1",
+    "gitter-env": "^0.23.1",
     "gitter-faye": "^1.1.0-e",
     "gitter-faye-redis": "^0.4.4",
     "gitter-markdown-processor": "^11.1.1",
