@@ -1,6 +1,5 @@
 /* jshint unused:strict, browser:true, strict:true, -W097 */
 "use strict";
-var $ = require('jquery');
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 var context = require('utils/context');
@@ -13,169 +12,182 @@ var titleTemplate = require('./tmpl/issuePopoverTitle.hbs');
 var footerTemplate = require('./tmpl/commitPopoverFooter.hbs');
 var SyncMixin = require('collections/sync-mixin');
 
-module.exports = (function() {
 
+var convertToIssueAnchor = function(element, githubIssueUrl) {
+  var resultantElement = element;
+  if(element.tagName !== 'a') {
+    var newElement = document.createElement('a');
+    newElement.innerHTML = element.innerHTML;
+    element.parentNode.replaceChild(newElement, element);
 
-  var BodyView = Marionette.ItemView.extend({
-    className: 'issue-popover-body',
-    template: bodyTemplate,
-    modelEvents: {
-      change: 'render'
-    },
-    serializeData: function() {
-      var data = this.model.toJSON();
-      data.date = moment(data.created_at).format("LLL");
-      return data;
-    }
-  });
-
-  var TitleView = Marionette.ItemView.extend({
-    className: 'issue-popover-title',
-    modelEvents: {
-      change: 'render'
-    },
-    template: titleTemplate
-  });
-
-  var FooterView = Marionette.ItemView.extend({
-    className: 'commit-popover-footer',
-    template: footerTemplate,
-    events: {
-      'click button.mention': 'onMentionClick'
-    },
-    modelEvents: {
-      change: 'render'
-    },
-    onMentionClick: function() {
-      var roomRepo = getRoomRepo();
-      var modelRepo = this.model.get('repo');
-      var modelNumber = this.model.get('number');
-      var mentionText = (modelRepo === roomRepo) ? '#' + modelNumber : modelRepo + '#' + modelNumber;
-      appEvents.trigger('input.append', mentionText);
-      this.parentPopover.hide();
-    }
-  });
-
-  function getRoomRepo() {
-    var room = context.troupe();
-    if(room.get('githubType') === 'REPO') {
-      return room.get('uri');
-    } else {
-      return '';
-    }
-  }
-
-  function createPopover(model, targetElement) {
-    return new Popover({
-      titleView: new TitleView({ model: model }),
-      view: new BodyView({ model: model }),
-      footerView: new FooterView({ model: model }),
-      targetElement: targetElement,
-      placement: 'horizontal'
+    var attrNamedNodeMap = element.attributes;
+    Object.keys(attrNamedNodeMap).forEach(function(index) {
+      var attr = attrNamedNodeMap[index];
+      newElement.setAttribute(attr.nodeName, attr.nodeValue);
     });
+
+    newElement.setAttribute('href', githubIssueUrl);
+    newElement.setAttribute('target', '_blank');
+
+    resultantElement = newElement;
   }
 
-  var localCache = { };
+  return resultantElement;
+};
 
-  function addIssue(repo, issueNumber, callback) {
-    var issue = repo + '/' + issueNumber;
-    var localResult = localCache[issue];
-    if(localResult) {
-      setTimeout(function() { callback(localResult); }, 0);
-      return;
-    }
 
-    apiClient.priv.get('/issue-state', { q: issue })
-      .then(function(states) {
-        localCache[issue] = states[0];
-        setTimeout(function() { delete localCache[issue]; }, 60000);
-        callback(states[0]);
-      });
 
+function getIssueState(repo, issueNumber) {
+  var issue = repo + '/' + issueNumber;
+  return apiClient.priv.get('/issue-state', { q: issue })
+    .then(function(states) {
+      return states[0];
+    });
+}
+
+var BodyView = Marionette.ItemView.extend({
+  className: 'issue-popover-body',
+  template: bodyTemplate,
+  modelEvents: {
+    change: 'render'
+  },
+  serializeData: function() {
+    var data = this.model.toJSON();
+    data.date = moment(data.created_at).format('LLL');
+    return data;
   }
+});
 
-  var IssueModel = Backbone.Model.extend({
-    idAttribute: "number",
-    urlRoot: function() {
-      var repo = this.get('repo');
-      return '/private/gh/repos/' + repo + '/issues/';
-    },
-    sync: SyncMixin.sync
+var TitleView = Marionette.ItemView.extend({
+  className: 'issue-popover-title',
+  modelEvents: {
+    change: 'render'
+  },
+  template: titleTemplate
+});
+
+var FooterView = Marionette.ItemView.extend({
+  className: 'commit-popover-footer',
+  template: footerTemplate,
+  events: {
+    'click button.mention': 'onMentionClick'
+  },
+  modelEvents: {
+    change: 'render'
+  },
+  onMentionClick: function() {
+    var roomRepo = getRoomRepo();
+    var modelRepo = this.model.get('repo');
+    var modelNumber = this.model.get('number');
+    var mentionText = (modelRepo === roomRepo) ? '#' + modelNumber : modelRepo + '#' + modelNumber;
+    appEvents.trigger('input.append', mentionText);
+    this.parentPopover.hide();
+  }
+});
+
+function getRoomRepo() {
+  var room = context.troupe();
+  if(room.get('githubType') === 'REPO') {
+    return room.get('uri');
+  } else {
+    return '';
+  }
+}
+
+function createPopover(model, targetElement) {
+  return new Popover({
+    titleView: new TitleView({ model: model }),
+    view: new BodyView({ model: model }),
+    footerView: new FooterView({ model: model }),
+    targetElement: targetElement,
+    placement: 'horizontal'
   });
+}
+
+var IssueModel = Backbone.Model.extend({
+  idAttribute: 'number',
+  urlRoot: function() {
+    var repo = this.get('repo');
+    return '/private/gh/repos/' + repo + '/issues/';
+  },
+  sync: SyncMixin.sync
+});
+
+
+function getGitHubIssueUrl(repo, issueNumber) {
+  return 'https://github.com/' + repo + '/issues/' + issueNumber;
+}
 
 
 
 
+var decorator = {
+  decorate: function(view) {
+    var roomRepo = getRoomRepo();
 
+    Array.prototype.forEach.call(view.el.querySelectorAll('*[data-link-type="issue"]'), function(issueElement) {
+      var repo = issueElement.dataset.issueRepo || roomRepo;
+      var issueNumber = issueElement.dataset.issue;
+      var githubIssueUrl = getGitHubIssueUrl(repo, issueNumber);
 
-  var decorator = {
+      issueElement = convertToIssueAnchor(issueElement, githubIssueUrl);
 
-    decorate: function(view) {
-      var roomRepo = getRoomRepo();
-
-      view.$el.find('*[data-link-type="issue"]').each(function() {
-        var $issue = $(this);
-
-        var repo = $issue.data('issueRepo') || roomRepo;
-        var issueNumber = $issue.data('issue');
-
-        addIssue(repo, issueNumber, function(state) {
+      getIssueState(repo, issueNumber)
+        .then(function(state) {
           if(state) {
             // We depend on this to style the issue after making sure it is an issue
-            $issue.addClass('is-existent');
+            issueElement.classList.add('is-existent');
 
             // dont change the issue state colouring for the activity feed
-            if(!$issue.hasClass('open') && !$issue.hasClass('closed')) {
-              $issue.addClass(state);
+            if(!issueElement.classList.contains('open') && !issueElement.classList.contains('closed')) {
+              issueElement.classList.add(state);
             }
 
             // Hook up all of the listeners
-            $issue.on('click', showPopover);
-            $issue.on('mouseover', showPopoverLater);
+            issueElement.addEventListener('click', showPopover);
+            issueElement.addEventListener('mouseover', showPopoverLater);
 
             view.once('destroy', function() {
-              $issue.off('click', showPopover);
-              $issue.off('mouseover', showPopoverLater);
+              issueElement.removeEventListener('click', showPopover);
+              issueElement.removeEventListener('mouseover', showPopoverLater);
             });
           }
         });
 
-        function getModel() {
-          var model = new IssueModel({
-            repo: repo,
-            number: issueNumber,
-            html_url: 'https://github.com/' + repo + '/issues/' + issueNumber
-          });
+      function getModel() {
+        var model = new IssueModel({
+          repo: repo,
+          number: issueNumber,
+          html_url: githubIssueUrl
+        });
 
-          model.fetch({
-            data: { renderMarkdown: true },
-            error: function() {
-              model.set({ error: true });
-            }
-          });
-          return model;
-        }
-        function showPopover(e, model) {
-          if(!model) model = getModel();
+        model.fetch({
+          data: { renderMarkdown: true },
+          error: function() {
+            model.set({ error: true });
+          }
+        });
+        return model;
+      }
+      function showPopover(e, model) {
+        if(!model) model = getModel();
 
-          var popover = createPopover(model, e.target);
-          popover.show();
-          Popover.singleton(view, popover);
-        }
+        var popover = createPopover(model, e.target);
+        popover.show();
+        Popover.singleton(view, popover);
 
-        function showPopoverLater(e) {
-          var model = getModel();
+        e.preventDefault();
+      }
 
-          Popover.hoverTimeout(e, function() {
-            showPopover(e, model);
-          });
-        }
+      function showPopoverLater(e) {
+        var model = getModel();
 
-      });
-    }
-  };
+        Popover.hoverTimeout(e, function() {
+          showPopover(e, model);
+        });
+      }
+    });
+  }
+};
 
-  return decorator;
-
-
-})();
+module.exports = decorator;
