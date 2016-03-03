@@ -21,10 +21,12 @@ module.exports =  Marionette.ItemView.extend({
     //account for initial render
     var className = 'room-menu-options__item--' + type;
     if (this.model.get('active')) { className = className += ' active'; }
+    var id = (type === 'org') ? this.model.get('name') : type;
 
     return {
       'class':             className,
       'data-state-change': type,
+      id:                  'minibar-' + id
     };
   },
 

@@ -6,7 +6,8 @@ var ItemView      = require('./minibar-item-view');
 var CloseItemView = require('./minibar-close-item-view');
 var FavouriteView = require('./minibar-favourite-item-view');
 var PeopleView    = require('./minibar-people-item-view.js');
-var fastdom    = require('fastdom');
+var fastdom       = require('fastdom');
+var domIndexById  = require('../../../../utils/dom-index-by-id');
 
 
 //TODO TEST ALL THE THINGS JP 2/2/16
@@ -24,11 +25,11 @@ module.exports = Marionette.CollectionView.extend({
     //
     //use different selectors for orgs
     var selector = (model.get('type') === 'org') ?
-      '[data-org-name=' + model.get('name')  + ']' :
-      '[data-state-change=' + model.get('type') + ']';
+      'minibar-' + model.get('name') :
+      'minibar-' + model.get('type');
 
-    var element = this.$el.find(selector);
-    return !!element.length ? { el: element, index: index, model: model } : { index: index, model: model };
+    var element = this.domMap[selector];
+    return !!element ? { el: element, index: index, model: model } : { index: index, model: model };
   },
 
   buildChildView: function(model, ViewClass, options) {
@@ -65,6 +66,10 @@ module.exports = Marionette.CollectionView.extend({
     this.listenTo(this.roomCollection, 'add remove', this.render, this);
     this.listenTo(this.collection, 'snapshot', this.onCollectionSnapshot, this);
     this.listenTo(this.model, 'change:state change:selectedOrgName', this.onMenuStateUpdate, this);
+  },
+
+  onBeforeRender: function (){
+    this.domMap = domIndexById(this.el);
   },
 
   render: function() {
