@@ -1,10 +1,13 @@
+@import "../../../mixins/optimise-text.less";
+
 .room-menu-text() {
+  .optimised-text ();
   height:        @menu-item-height;
   max-height:    @menu-item-height;
   overflow:      hidden;
   color:         @menu-item-color;
   font-size:     1.5rem;
-  font-weight:   400;
+  font-weight:   600;
   line-height:   @menu-item-height;
   text-overflow: ellipsis;
 }
