@@ -17,7 +17,8 @@ require('filtered-collection');
 
 module.exports = (function() {
   var orgsCollection = new orgModels.OrgCollection(null, { listen: true });
-  var existingRooms = context.getSnapshot('rooms').map(function(data){
+  var roomsSnapshot = context.getSnapshot('rooms') || [];
+  var existingRooms = roomsSnapshot.map(function(data){
     return !!data.lastAccessTime ? _.extend(data, { lastAccessTime: moment(data.lastAccessTime) }) : data;
   });
   var troupeCollection = new troupeModels.TroupeCollection(existingRooms, { listen: true });
