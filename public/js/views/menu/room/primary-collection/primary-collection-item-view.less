@@ -85,11 +85,11 @@ JP 11/2/16
 }
 
 .room-item__container {
-  display:        flex;
-  flex-direction: row;
-  align-items:    center;
-  margin-right:   (@desktop-menu-left-padding / 2);
-  transition:     background-color .2s ease-out;
+  display:         flex;
+  flex-direction:  row;
+  align-items:     center;
+  margin-right:    (@desktop-menu-left-padding / 2);
+  transition:      background-color .2s ease-out;
 
   .room-item.active & {
     .room-item-selected();
@@ -104,6 +104,7 @@ JP 11/2/16
   }
 
   &:hover {
+    text-decoration: none;
     cursor: pointer;
     .room-item-selected();
   }
