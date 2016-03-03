@@ -38,19 +38,17 @@ module.exports = Marionette.ItemView.extend({
 
   onModelChangeState: function (model, val){ //jshint unused: true
     this.el.classList.toggle('active', (val === 'search'));
-    this.ui.input.focus();
+    if(val === 'search') { this.ui.input.focus(); }
   },
 
   onModelChangeSearchTerm: function (model, val) { //jshint unused: true
     this.ui.input.val(val);
     this.el.classList.toggle('empty', !val);
-    this.ui.input.focus();
   },
 
   onClearClicked: function (e){
     e.preventDefault();
     this.model.set('searchTerm', '');
-    this.ui.input.focus();
   },
 
 });

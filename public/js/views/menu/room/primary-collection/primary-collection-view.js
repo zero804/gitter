@@ -7,6 +7,7 @@ var BaseCollectionView          = require('../base-collection/base-collection-vi
 var EmptySearchView             = require('./primary-collection-item-search-empty-view.js');
 var perfTiming                  = require('components/perf-timing');
 var compositeViewRenderTemplate = require('utils/composite-view-render-template');
+var domIndexById                = require('../../../../utils/dom-index-by-id');
 
 var proto = BaseCollectionView.prototype;
 
@@ -29,9 +30,9 @@ var PrimaryCollectionView = BaseCollectionView.extend({
   childViewOptions: function(model) {
     var baseOptions   = BaseCollectionView.prototype.childViewOptions.apply(this, arguments);
     baseOptions.model = model;
-    var selector      = '[data-id=' + model.get('id') + ']';
-    var element       = this.$el.find(selector);
-    return !!element.length ? _.extend(baseOptions, { el: element }) : baseOptions;
+    var id            = model.get('id');
+    var element       = this.domMap[id];
+    return !!element ? _.extend(baseOptions, { el: element }) : baseOptions;
   },
 
   buildChildView: function(model, ItemView, attrs) {
@@ -103,13 +104,14 @@ var PrimaryCollectionView = BaseCollectionView.extend({
   //TODO TEST THIS YOU FOOL JP 10/2/16
   getHighestFavourite: function() {
     return this.collection.pluck('favourite')
-    .filter(function(num) { return !!num; })
-    .sort(function(a, b) { return a < b ? -1 : 1; })
-    .slice(-1)[0];
+      .filter(function(num) { return !!num; })
+      .sort(function(a, b) { return a < b ? -1 : 1; })
+      .slice(-1)[0];
   },
 
   //Before we render we remove the collection container from the drag & drop instance
   onBeforeRender: function() {
+    this.domMap = domIndexById(this.el.children[0]);
     this.dndCtrl.removeContainer(this.ui.collection[0]);
   },
 
@@ -134,3 +136,18 @@ var PrimaryCollectionView = BaseCollectionView.extend({
 });
 
 module.exports = PrimaryCollectionView;
+
+
+
+
+
+/*
+
+
+    var baseOptions   = BaseCollectionView.prototype.childViewOptions.apply(this, arguments);
+    baseOptions.model = model;
+    var id            = model.get('id');
+    var element       = this.domMap[id];
+
+    return !!element ? _.extend(baseOptions, { el: element }) : baseOptions;
+    */
