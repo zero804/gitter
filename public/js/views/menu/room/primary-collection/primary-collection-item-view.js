@@ -17,6 +17,9 @@ module.exports = BaseCollectionItemView.extend({
     'click #room-item-hide':           'onHideClicked',
     'click #room-item-leave':          'onLeaveClicked',
     'mouseleave':                      'onMouseOut',
+    // Note this probably won't get triggered because we listen to clicks on
+    // the wrapper but better safe than sorry
+    'click':                           'onClick'
   },
 
   className: null,
@@ -33,7 +36,10 @@ module.exports = BaseCollectionItemView.extend({
   },
 
   serializeData: function() {
-    return parseForTemplate(this.model.toJSON(), this.roomMenuModel.get('state'));
+    var data = parseForTemplate(this.model.toJSON(), this.roomMenuModel.get('state'));
+    var absoluteRoomUri = context.env('basePath') + data.url;
+    data.absoluteRoomUri = absoluteRoomUri;
+    return data;
   },
 
   onOptionsClicked: function(e) {
@@ -49,6 +55,10 @@ module.exports = BaseCollectionItemView.extend({
 
   onMouseOut: function() {
     this.uiModel.set('menuIsOpen', false);
+  },
+
+  onClick: function(e) {
+    e.preventDefault();
   },
 
   onHideClicked: function(e) {
