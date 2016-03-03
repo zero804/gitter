@@ -85,10 +85,14 @@ function createConnection(suffix, isProduction) {
     errorReporter(err, { apnEnv: suffix }, { module: 'ios-notification-gateway' });
   });
 
-  connection.on('transmissionError', function(errCode) {
+  connection.on('transmissionError', function(errCode, notification, device) {
     var err = new Error('apn transmission error ' + errCode +': ' + ERROR_DESCRIPTIONS[errCode]);
-    logger.error('ios push notification gateway (' + suffix + ')', { error: err.message });
-    errorReporter(err, { apnEnv: suffix }, { module: 'ios-notification-gateway' });
+    if (errCode === 8) {
+      logger.warn('ios push notification gateway (' + suffix + ') invalid device token for "' + suffix + '". Need to remove the following device sometime:', { device: device });
+    } else {
+      logger.error('ios push notification gateway (' + suffix + ')', { error: err.message });
+      errorReporter(err, { apnEnv: suffix }, { module: 'ios-notification-gateway' });
+    }
   });
 
   return connection;
