@@ -111,7 +111,9 @@ module.exports = Marionette.LayoutView.extend({
   }, 50),
 
   _initNano: function(params) {
-    this.$el.find('.nano').nanoScroller(params);
+    require('fastdom').mutate(function(){
+      this.$el.find('.nano').nanoScroller(params);
+    }.bind(this));
   },
 
   onPanelOpenStateChange: function(model, val) { /*jshint unused: true */
