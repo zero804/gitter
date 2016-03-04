@@ -150,7 +150,8 @@ function ChatStrategy(options)  {
             screenName: m.screenName,
             userId: m.userId,
             userIds: m.userIds, // For groups
-            group: m.group
+            group: m.group || undefined,
+            announcement: m.announcement || undefined
           };
         })),
       issues: castArray(item.issues),
