@@ -124,7 +124,7 @@
     background-color: rgba(230, 126, 34,0.08);
   }
 
-  &.mentioned .chat-item__text .mention {
+  &.mentioned .chat-item__text .mention,   &.mentioned .chat-item__text .groupmention  {
     color: @orange;
     background-color: lighten(@orange, 40%);
     border-radius: 2px;
@@ -354,11 +354,6 @@ body.mobile .chat-item__icon--read {
     border-bottom: 1px dotted;
     cursor: pointer;
     padding: 0 2px;
-  }
-
-  .groupmention {
-    color: @blue;
-    background-color: lighten(@blue, 45%);
   }
 
   .embed {
