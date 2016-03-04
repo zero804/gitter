@@ -1,30 +1,21 @@
 "use strict";
 
-var troupeService     = require("../../services/troupe-service");
-var winston           = require('../../utils/winston');
-var collections       = require("../../utils/collections");
-var execPreloads      = require('../exec-preloads');
-var TroupeStrategy    = require('./troupe-strategy');
-var debug             = require('debug')('troupe-id-strategy');
+var troupeService  = require("../../services/troupe-service");
+var collections    = require("../../utils/collections");
+var TroupeStrategy = require('./troupe-strategy');
+var debug          = require('debug')('troupe-id-strategy');
 
 function TroupeIdStrategy(options) {
   var troupeStrategy = new TroupeStrategy(options);
   var troupesIndexed;
 
-  this.preload = function(ids, callback) {
-    troupeService.findByIds(ids, function(err, troupes) {
-      if(err) {
-        winston.error("Error loading troupes", { exception: err });
-        return callback(err);
-      }
-      troupesIndexed = collections.indexById(troupes);
+  this.preload = function(ids) {
+    return troupeService.findByIds(ids)
+      .then(function(troupes) {
+        troupesIndexed = collections.indexById(troupes);
 
-      execPreloads([{
-        strategy: troupeStrategy,
-        data: troupes
-      }], callback);
-
-    });
+        return troupeStrategy.preload(troupes);
+      });
   };
 
   this.map = function(troupeId) {

@@ -2,7 +2,6 @@
 
 // var winston = require('../utils/winston');
 var collections = require("../utils/collections");
-var execPreloads = require('./exec-preloads');
 var Promise = require('bluebird');
 var debug = require('debug')('gitter:serializer:id-loader');
 
@@ -11,8 +10,8 @@ function idStrategyGenerator(name, FullObjectStrategy, loaderFunction) {
     var strategy = new FullObjectStrategy(options);
     var objectHash;
 
-    this.preload = function(ids, callback) {
-      if (!ids.length) return Promise.resolve([]).nodeify(callback);
+    this.preload = Promise.method(function(ids) {
+      if (!ids.length) return [];
 
       var time = debug.enabled && Date.now();
       return loaderFunction(ids)
@@ -22,13 +21,9 @@ function idStrategyGenerator(name, FullObjectStrategy, loaderFunction) {
 
           objectHash = collections.indexById(fullObjects);
 
-          return execPreloads([{
-            strategy: strategy,
-            data: fullObjects
-          }]);
-        })
-        .nodeify(callback);
-    };
+          return strategy.preload(fullObjects);
+        });
+    });
 
 
     this.map = function(id) {

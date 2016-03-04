@@ -1,11 +1,12 @@
 "use strict";
 
-var unreadItemService = require("../../services/unread-item-service");
+var unreadItemService     = require("../../services/unread-item-service");
 var collapsedChatsService = require('../../services/collapsed-chats-service');
-var execPreloads      = require('../exec-preloads');
-var getVersion        = require('../get-model-version');
-var UserIdStrategy    = require('./user-id-strategy');
-var TroupeIdStrategy  = require('./troupe-id-strategy');
+var getVersion            = require('../get-model-version');
+var UserIdStrategy        = require('./user-id-strategy');
+var TroupeIdStrategy      = require('./troupe-id-strategy');
+var _                     = require('lodash');
+var Promise               = require('bluebird');
 
 function formatDate(d) {
   return d ? d.toISOString() : null;
@@ -14,17 +15,17 @@ function formatDate(d) {
 function UnreadItemStategy() {
   var unreadItemsHash;
 
-  this.preload = function(data, callback) {
-    unreadItemService.getUnreadItems(data.userId, data.troupeId)
+  this.preload = function(data) {
+    return unreadItemService.getUnreadItems(data.userId, data.troupeId)
       .then(function(ids) {
         var hash = {};
-        ids.forEach(function(id) {
+
+        _.each(ids, function(id) {
           hash[id] = true;
         });
 
         unreadItemsHash = hash;
-      })
-      .nodeify(callback);
+      });
   };
 
   this.map = function(id) {
@@ -36,19 +37,16 @@ UnreadItemStategy.prototype = {
   name: 'UnreadItemStategy'
 };
 
-
-
 function CollapsedItemStrategy(options) {
   var itemsHash;
   var userId = options.userId;
   var roomId = options.roomId;
 
-  this.preload = function(data, callback) {
-    collapsedChatsService.getHash(userId, roomId)
-      .then(function (hash) {
+  this.preload = function() {
+    return collapsedChatsService.getHash(userId, roomId)
+      .then(function(hash) {
         itemsHash = hash;
-      })
-      .nodeify(callback);
+      });
   };
 
   this.map = function (chatId) {
@@ -77,7 +75,7 @@ function ChatStrategy(options)  {
   var troupeStrategy = options.includeTroupe ? new TroupeIdStrategy(options) : null;
   var defaultUnreadStatus = options.unread === undefined ? true : !!options.unread;
 
-  this.preload = function(items, callback) {
+  this.preload = function(items) {
     var users = items.map(function(i) { return i.fromUserId; });
 
     var strategies = [];
@@ -110,8 +108,7 @@ function ChatStrategy(options)  {
         data: items.map(function(i) { return i.toTroupeId; })
       });
     }
-
-    execPreloads(strategies, callback);
+    return Promise.all(strategies);
   };
 
   function safeArray(array) {

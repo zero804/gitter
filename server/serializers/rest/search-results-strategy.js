@@ -1,20 +1,14 @@
 "use strict";
 
-var _                 = require("underscore");
-var execPreloads      = require('../exec-preloads');
+var _ = require("lodash");
 
 function SearchResultsStrategy(options) {
   var resultItemStrategy = options.resultItemStrategy;
 
-  this.preload = function(searchResults, callback) {
+  this.preload = function(searchResults) {
     var items = _.flatten(searchResults.map(function(i) { return i.results; }), true);
 
-    var strategies = [{
-      strategy: resultItemStrategy,
-      data: items
-    }];
-
-    execPreloads(strategies, callback);
+    return resultItemStrategy.preload(items);
   };
 
   this.map = function(item) {

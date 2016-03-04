@@ -14,7 +14,7 @@ var uniqueIds             = require('mongodb-unique-ids');
 var winston               = require('../../utils/winston');
 var collections           = require('../../utils/collections');
 var debug                 = require('debug')('gitter:troupe-strategy');
-var execPreloads          = require('../exec-preloads');
+var Promise               = require('bluebird');
 var getVersion            = require('../get-model-version');
 var UserIdStrategy        = require('./user-id-strategy');
 var Promise               = require('bluebird');
@@ -26,12 +26,11 @@ function AllUnreadItemCountStategy(options) {
   var self = this;
   var userId = options.userId || options.currentUserId;
 
-  this.preload = function(troupeIds, callback) {
-    unreadItemService.getUserUnreadCountsForTroupeIds(userId, troupeIds)
+  this.preload = function(troupeIds) {
+    return unreadItemService.getUserUnreadCountsForTroupeIds(userId, troupeIds)
       .then(function(result) {
         self.unreadCounts = result;
-      })
-      .nodeify(callback);
+      });
   };
 
   this.map = function(id) {
@@ -49,17 +48,16 @@ function RoomMembershipStrategy(options) {
   var predefinedValue = options.isRoomMember !== undefined;
   var memberships;
 
-  this.preload = function(troupeIds, callback) {
+  this.preload = function(troupeIds) {
     // Shortcut logic
     if (nonMemberTroupeIds || predefinedValue) {
-      return callback();
+      return;
     }
 
     return roomMembershipService.findUserMembershipInRooms(userId, troupeIds)
       .then(function(memberTroupeIds) {
         memberships = collections.hashArray(memberTroupeIds);
-      })
-      .nodeify(callback);
+      });
   };
 
   this.map = function(id) {
@@ -84,12 +82,11 @@ function LastTroupeAccessTimesForUserStrategy(options) {
   var userId = options.userId || options.currentUserId;
   var timesIndexed;
 
-  this.preload = function(data, callback) {
+  this.preload = function() {
     return recentRoomCore.getTroupeLastAccessTimesForUserExcludingHidden(userId)
       .then(function(times) {
         timesIndexed = times;
-      })
-      .nodeify(callback);
+      });
   };
 
   this.map = function(id) {
@@ -105,12 +102,11 @@ function FavouriteTroupesForUserStrategy(options) {
   var self = this;
   var userId = options.userId || options.currentUserId;
 
-  this.preload = function(data, callback) {
-    recentRoomCore.findFavouriteTroupesForUser(userId)
+  this.preload = function() {
+    return recentRoomCore.findFavouriteTroupesForUser(userId)
       .then(function(favs) {
         self.favs = favs;
-      })
-      .nodeify(callback);
+      });
   };
 
   this.map = function(id) {
@@ -128,12 +124,11 @@ function LurkTroupeForUserStrategy(options) {
   var currentUserId = options.currentUserId;
   var roomsWithLurk;
 
-  this.preload = function(data, callback) {
-    roomMembershipService.findRoomIdsForUserWithLurk(currentUserId)
+  this.preload = function() {
+    return roomMembershipService.findRoomIdsForUserWithLurk(currentUserId)
       .then(function(result) {
         roomsWithLurk = result;
-      })
-      .nodeify(callback);
+      });
   };
 
   this.map = function(roomId) {
@@ -148,13 +143,11 @@ function ActivityForUserStrategy(options) {
   var currentUserId = options.currentUserId;
   var activity = {};
 
-  this.preload = function(troupeIds, callback) {
-    unreadItemService.getActivityIndicatorForTroupeIds(troupeIds, currentUserId)
-    .then(function(values) {
-      activity = values;
-      return activity;
-    })
-    .nodeify(callback);
+  this.preload = function(troupeIds) {
+    return unreadItemService.getActivityIndicatorForTroupeIds(troupeIds, currentUserId)
+      .then(function(values) {
+        activity = values;
+      });
   };
 
   this.map = function(roomId) {
@@ -172,8 +165,7 @@ function ProOrgStrategy() {
     return uri.split('/', 1).shift();
   };
 
-  this.preload = function (troupes, callback) {
-
+  this.preload = function(troupes) {
     var uris = troupes.map(function(troupe) {
       if(!troupe.uri) return; // one-to-one
       return getOwner(troupe.uri);
@@ -187,10 +179,7 @@ function ProOrgStrategy() {
         subscriptions.forEach(function(subscription) {
           proOrgs[subscription.uri.toLowerCase()] = !!subscription;
         });
-
-        return true;
-      })
-      .nodeify(callback);
+      });
   };
 
   this.map = function(troupe) {
@@ -212,7 +201,7 @@ function TroupePermissionsStrategy(options) {
     return userService.findById(options.currentUserId);
   }
 
-  this.preload = function (troupes, callback) {
+  this.preload = function(troupes) {
     return getUser()
       .then(function(user) {
         if (!user) return;
@@ -228,8 +217,7 @@ function TroupePermissionsStrategy(options) {
               isAdmin[troupe.id] = false;
             });
         });
-      })
-      .nodeify(callback);
+      });
   };
 
   this.map = function(troupe) {
@@ -247,7 +235,7 @@ var TroupeOwnerIsOrgStrategy = function (){
 
   var ownerIsOrg = {};
 
-  this.preload = function(troupes, callback) {
+  this.preload = function(troupes) {
     // Use uniq as the list of items will probably be much smaller than the original set,
     // this means way fewer queries to mongodb
     var ownersForQuery = _.uniq(troupes.map(function(troupe){
@@ -257,21 +245,21 @@ var TroupeOwnerIsOrgStrategy = function (){
     }));
 
     return Promise.map(ownersForQuery, function(lcOwner){
-      return troupeService.checkGitHubTypeForUri(lcOwner || '', 'ORG');
-    })
-    .then(function(results) {
-      var hashed = ownersForQuery.reduce(function(memo, lcOwnerId, index){
-        memo[lcOwnerId] = results[index];
-        return memo;
-      }, {});
+        return troupeService.checkGitHubTypeForUri(lcOwner || '', 'ORG');
+      })
+      .then(function(results) {
+        var hashed = ownersForQuery.reduce(function(memo, lcOwnerId, index){
+          memo[lcOwnerId] = results[index];
+          return memo;
+        }, {});
 
-      results.forEach(function(result, index){
-        //not being able to pass the troupe means we ASSUME they come through in order correctly
-        var troupe = troupes[index];
-        ownerIsOrg[troupe.id] = troupe.lcOwner && hashed[troupe.lcOwner];
+        results.forEach(function(result, index){
+          //not being able to pass the troupe means we ASSUME they come through in order correctly
+          var troupe = troupes[index];
+          ownerIsOrg[troupe.id] = troupe.lcOwner && hashed[troupe.lcOwner];
+        });
       });
-    })
-    .nodeify(callback);
+
   };
 
   this.map = function (troupe){
@@ -300,8 +288,7 @@ function TroupeStrategy(options) {
   var ownerIsOrgStrategy    = (options.includeOwner) ? new TroupeOwnerIsOrgStrategy(options) : null;
   var roomMembershipStrategy = currentUserId || options.isRoomMember !== undefined ? new RoomMembershipStrategy(options) : null;
 
-  this.preload = function(items, callback) {
-    var strategies = [];
+  this.preload = function(items) {
     var troupeIds = [];
     var userIdSet = {};
 
@@ -315,76 +302,46 @@ function TroupeStrategy(options) {
         });
       }
     });
+
     var userIds = Object.keys(userIdSet);
+    var strategies = [
+      userIdStategy.preload(userIds),
+      proOrgStrategy.preload(items)
+    ];
 
     if (roomMembershipStrategy) {
-      strategies.push({
-        strategy: roomMembershipStrategy,
-        data: troupeIds
-      });
+      strategies.push(roomMembershipStrategy.preload(troupeIds));
     }
 
     if(unreadItemStategy) {
-      strategies.push({
-        strategy: unreadItemStategy,
-        data: troupeIds
-      });
+      strategies.push(unreadItemStategy.preload(troupeIds));
     }
 
     if(favouriteStrategy) {
-      strategies.push({
-        strategy: favouriteStrategy,
-        data: null
-      });
+      strategies.push(favouriteStrategy.preload());
     }
 
     if(lastAccessTimeStategy) {
-      strategies.push({
-        strategy: lastAccessTimeStategy,
-        data: null
-      });
+      strategies.push(lastAccessTimeStategy.preload());
     }
 
-    strategies.push({
-      strategy: proOrgStrategy,
-      data: items
-    });
-
     if (lurkStrategy) {
-      strategies.push({
-        strategy: lurkStrategy,
-        data: null
-      });
+      strategies.push(lurkStrategy.preload());
     }
 
     if (permissionsStategy) {
-      strategies.push({
-        strategy: permissionsStategy,
-        data: items
-      });
+      strategies.push(permissionsStategy.preload(items));
     }
 
-    strategies.push({
-      strategy: userIdStategy,
-      data: userIds
-    });
-
     if(ownerIsOrgStrategy) {
-      strategies.push({
-        strategy: ownerIsOrgStrategy,
-        data: items
-      });
+      strategies.push(ownerIsOrgStrategy.preload(items));
     }
 
     if(activityStrategy) {
-      strategies.push({
-        strategy: activityStrategy,
-        data: troupeIds
-      });
+      strategies.push(activityStrategy.preload(troupeIds));
     }
 
-
-    execPreloads(strategies, callback);
+    return Promise.all(strategies);
   };
 
   function mapOtherUser(users) {
