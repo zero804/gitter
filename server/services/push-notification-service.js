@@ -124,6 +124,7 @@ exports.deregisterIosDevices = function(deviceTokens) {
     return hash(deviceToken);
   });
 
+  // mongo will do an indexBounded query with the hashes (super fast) before filtering by appleToken
   return PushNotificationDevice.remove({ tokenHash: { $in: tokenHashes }, appleToken: { $in: appleTokens } }).exec();
 };
 
