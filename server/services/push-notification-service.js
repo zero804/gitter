@@ -46,9 +46,13 @@ function findAndRemoveDevicesWithDuplicateTokens(deviceId, deviceType, deviceTok
     });
 }
 
+function hash(token) {
+  return crypto.createHash('md5').update(token).digest('hex');
+}
+
 exports.registerDevice = function(deviceId, deviceType, deviceToken, deviceName, appVersion, appBuild, callback) {
   debug("Registering device %s", deviceId);
-  var tokenHash = crypto.createHash('md5').update(deviceToken).digest('hex');
+  var tokenHash = hash(deviceToken);
 
   return PushNotificationDevice.findOneAndUpdate(
     { deviceId: deviceId },
@@ -76,7 +80,7 @@ exports.registerDevice = function(deviceId, deviceType, deviceToken, deviceName,
 
 exports.registerAndroidDevice = function(deviceId, deviceName, registrationId, appVersion, userId, callback) {
   debug("Registering device %s", deviceId);
-  var tokenHash = crypto.createHash('md5').update(registrationId).digest('hex');
+  var tokenHash = hash(registrationId);
 
   return PushNotificationDevice.findOneAndUpdate(
     { deviceId: deviceId },
@@ -103,7 +107,25 @@ exports.registerAndroidDevice = function(deviceId, deviceName, registrationId, a
 };
 
 exports.deregisterAndroidDevice = function(registrationId) {
-  return PushNotificationDevice.findOneAndRemove({ androidToken: registrationId }).exec();
+  // tokenHash needed as androidToken/registrationId is not indexed
+  var tokenHash = hash(registrationId);
+  return PushNotificationDevice.findOneAndRemove({ tokenHash: tokenHash, androidToken: registrationId }).exec();
+};
+
+exports.deregisterIosDevices = function(deviceTokens) {
+  if (deviceTokens.length === 0) return Promise.resolve();
+
+  var appleTokens = deviceTokens.map(function(deviceToken) {
+    return deviceToken.toString('hex');
+  });
+
+  // tokenHashes needed as appleTokens/deviceTokens are not indexed
+  var tokenHashes = deviceTokens.map(function(deviceToken) {
+    return hash(deviceToken);
+  });
+
+  // mongo will do an indexBounded query with the hashes (super fast) before filtering by appleToken
+  return PushNotificationDevice.remove({ tokenHash: { $in: tokenHashes }, appleToken: { $in: appleTokens } }).exec();
 };
 
 exports.registerUser = function(deviceId, userId, callback) {
