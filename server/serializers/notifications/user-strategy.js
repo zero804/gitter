@@ -5,9 +5,7 @@ var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avata
 function UserStrategy(options) {
   options = options ? options : {};
 
-  this.preload = function(users, callback) {
-    callback(null, true);
-  };
+  this.preload = function() { };
 
   this.map = function(user) {
     if(!user) return null;

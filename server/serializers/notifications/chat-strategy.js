@@ -1,8 +1,8 @@
 "use strict";
 
-var execPreloads = require('../exec-preloads');
 var UserIdStrategy = require('./user-id-strategy');
 var TroupeIdStrategy = require('./troupe-id-strategy');
+var Promise = require('bluebird');
 
 function ChatStrategy(options)  {
   if(!options) options = {};
@@ -10,24 +10,19 @@ function ChatStrategy(options)  {
   var userStategy = new UserIdStrategy(options);
   var troupeStrategy = options.includeTroupe && new TroupeIdStrategy(options);
 
-  this.preload = function(items, callback) {
+  this.preload = function(items) {
     var users = items.map(function(i) { return i.fromUserId; });
 
-    var strategies = [];
-    strategies.push({
-      strategy: userStategy,
-      data: users
-    });
+    var strategies = [
+      userStategy.preload(users)
+    ];
 
     if(troupeStrategy) {
       var troupeIds = items.map(function(i) { return i.toTroupeId; });
-      strategies.push({
-        strategy: troupeStrategy,
-        data: troupeIds
-      });
+      strategies.push(troupeStrategy.preload(troupeIds));
     }
 
-    execPreloads(strategies, callback);
+    return Promise.all(strategies);
   };
 
   this.map = function(item) {

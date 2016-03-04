@@ -1,28 +1,23 @@
 "use strict";
 
-var collections       = require("../../utils/collections");
-var execPreloads      = require('../exec-preloads');
-var TroupeStrategy    = require('./troupe-strategy');
-var leanTroupeDao     = require('../../services/daos/troupe-dao').full;
+var collections    = require("../../utils/collections");
+var TroupeStrategy = require('./troupe-strategy');
+var leanTroupeDao  = require('../../services/daos/troupe-dao').full;
 
 function GithubRepoStrategy(options) {
 
   var troupeStrategy = new TroupeStrategy(options);
   var troupesIndexed;
 
-  this.preload = function(userAdminRepos, callback) {
+  this.preload = function(userAdminRepos) {
     var repos = userAdminRepos.map(function(repo) { return repo.full_name; });
 
     return leanTroupeDao.findByUris(repos)
       .then(function(troupes) {
         troupesIndexed = collections.indexByProperty(troupes, 'uri');
 
-        return execPreloads([{
-          strategy: troupeStrategy,
-          data: troupes
-        }]);
-      })
-      .nodeify(callback);
+        return troupeStrategy.preload(troupes);
+      });
   };
 
   this.map = function(item) {

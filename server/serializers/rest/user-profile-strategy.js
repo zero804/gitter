@@ -1,18 +1,14 @@
 "use strict";
 
 var identityService = require("../../services/identity-service");
-var _ = require('lodash');
-var Promise = require('bluebird');
-
-var BackendMuxer = require('../../services/backend-muxer');
-
-var STANDARD_ATTRIBUTES = ['company', 'location', 'email', 'website', 'profile'];
+var _               = require('lodash');
+var Promise         = require('bluebird');
+var BackendMuxer    = require('../../services/backend-muxer');
 
 function UserProfileStrategy(options) {
   options = options ? options : {};
 
-
-  this.preload = function(users, callback) {
+  this.preload = function(users) {
     // pre-fill the cache
     return identityService.preloadForUsers(users)
       .then(function() {
@@ -22,11 +18,12 @@ function UserProfileStrategy(options) {
             .then(function(profiles) {
               // cache the profiles so we can get them out later.
               // (is this the best variable name?)
+
+              // A hash would probably we better for this
               user.profiles = profiles;
             });
         }, { concurrency: 2 });
-      })
-      .nodeify(callback);
+      });
   };
 
   this.map = function(user) {
@@ -53,7 +50,7 @@ function UserProfileStrategy(options) {
     }
 
     return profile;
-  }
+  };
 }
 
 UserProfileStrategy.prototype = {

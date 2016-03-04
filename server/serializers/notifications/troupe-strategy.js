@@ -2,7 +2,6 @@
 
 var _ = require("underscore");
 var UserIdStrategy = require('./user-id-strategy');
-var execPreloads = require('../exec-preloads');
 
 function TroupeStrategy(options) {
   if(!options) options = {};
@@ -11,7 +10,7 @@ function TroupeStrategy(options) {
 
   var recipientUserId = options.recipientUserId;
 
-  this.preload = function(items, callback) {
+  this.preload = function(items) {
     var userIds = items.map(function(t) {
                     if(t.oneToOne) {
                       if(recipientUserId) {
@@ -25,14 +24,11 @@ function TroupeStrategy(options) {
                     }});
 
     userIds = _.flatten(userIds).filter(function(f) { return !!f; });
-    if(userIds.length) {
-      execPreloads([{
-        strategy: userStategy,
-        data: userIds
-      }], callback);
 
+    if(userIds.length) {
+      return userStategy.preload(userIds);
     } else {
-      callback();
+      return;
     }
   };
 

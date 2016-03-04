@@ -1,9 +1,9 @@
 "use strict";
 
-var execPreloads      = require('../exec-preloads');
-var getVersion        = require('../get-model-version');
+var Promise          = require('bluebird');
+var getVersion       = require('../get-model-version');
 var TroupeIdStrategy = require('./troupe-strategy');
-var UserIdStrategy = require('./user-id-strategy');
+var UserIdStrategy   = require('./user-id-strategy');
 
 function formatDate(d) {
   return d ? d.toISOString() : null;
@@ -15,27 +15,21 @@ function EventStrategy(options) {
   var userStategy = options.user ? null : new UserIdStrategy();
   var troupeStrategy = options.includeTroupe ? new TroupeIdStrategy(options) : null;
 
-  this.preload = function(items, callback) {
-    var users = items.map(function(i) { return i.fromUserId; });
-
+  this.preload = function(items) {
     var strategies = [];
 
     // If the user is fixed in options, we don't need to look them up using a strategy...
     if(userStategy) {
-      strategies.push({
-        strategy: userStategy,
-        data: users
-      });
+      var userIds = items.map(function(i) { return i.fromUserId; });
+      strategies.push(userStategy.preload(userIds));
     }
 
     if(troupeStrategy) {
-      strategies.push({
-        strategy: troupeStrategy,
-        data: items.map(function(i) { return i.toTroupeId; })
-      });
+      var troupeIds = items.map(function(i) { return i.toTroupeId; });
+      strategies.push(troupeStrategy.preload(troupeIds));
     }
 
-    execPreloads(strategies, callback);
+    return Promise.all(strategies);
   };
 
   this.map = function(item) {

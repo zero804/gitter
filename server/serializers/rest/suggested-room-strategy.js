@@ -8,23 +8,21 @@ var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avata
 function SuggestedRoomStrategy() {
   var roomHash;
 
-  this.preload = function(suggestedRooms, callback) {
+  this.preload = function(suggestedRooms) {
     var suggestedRoomIds = suggestedRooms
       .filter(function(f) { return !!f.roomId; })
       .map(function(f) { return mongoUtils.asObjectID(f.roomId); });
 
     if (!suggestedRoomIds.length) {
       roomHash = {};
-      callback();
       return;
     }
 
-    persistence.Troupe.find({ _id: { $in: suggestedRoomIds }, security: 'PUBLIC' }, { uri: 1, githubType: 1, userCount: 1, topic: 1 })
+    return persistence.Troupe.find({ _id: { $in: suggestedRoomIds }, security: 'PUBLIC' }, { uri: 1, githubType: 1, userCount: 1, topic: 1 })
       .exec()
       .then(function(rooms) {
         roomHash = collections.indexById(rooms);
-      })
-      .nodeify(callback);
+      });
   };
 
   this.map = function(suggestedRoom) {
