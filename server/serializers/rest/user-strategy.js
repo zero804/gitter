@@ -23,10 +23,7 @@ function UserPremiumStatusStrategy() {
           memo[s.userId] = true;
           return memo;
         }, {});
-
-        return true;
-      })
-      .nodeify(callback);
+      });
   };
 
   this.map = function(userId) {
