@@ -12,11 +12,11 @@ function formatDate(d) {
   return d ? d.toISOString() : null;
 }
 
-function UnreadItemStategy() {
+function UnreadItemStategy(options) {
   var unreadItemsHash;
 
-  this.preload = function(data) {
-    return unreadItemService.getUnreadItems(data.userId, data.troupeId)
+  this.preload = function() {
+    return unreadItemService.getUnreadItems(options.userId, options.roomId)
       .then(function(ids) {
         var hash = {};
 
@@ -65,7 +65,7 @@ function ChatStrategy(options)  {
   var unreadItemStategy, collapsedItemStategy;
   /* If options.unread has been set, we don't need a strategy */
   if(options.currentUserId && options.unread === undefined) {
-    unreadItemStategy = new UnreadItemStategy();
+    unreadItemStategy = new UnreadItemStategy({ userId: options.currentUserId, roomId: options.troupeId });
   }
 
   if (options.currentUserId && options.troupeId) {
@@ -82,32 +82,22 @@ function ChatStrategy(options)  {
 
     // If the user is fixed in options, we don't need to look them up using a strategy...
     if(userStategy) {
-      strategies.push({
-        strategy: userStategy,
-        data: users
-      });
+      strategies.push(userStategy.preload(users));
     }
 
     if(unreadItemStategy) {
-      strategies.push({
-        strategy: unreadItemStategy,
-        data: { userId: options.currentUserId, troupeId: options.troupeId }
-      });
+      strategies.push(unreadItemStategy.preload());
     }
 
     if(collapsedItemStategy) {
-      strategies.push({
-        strategy: collapsedItemStategy,
-        data: null
-      });
+      strategies.push(collapsedItemStategy.preload());
     }
 
     if(troupeStrategy) {
-      strategies.push({
-        strategy: troupeStrategy,
-        data: items.map(function(i) { return i.toTroupeId; })
-      });
+      var troupeIds = items.map(function(i) { return i.toTroupeId; });
+      strategies.push(troupeStrategy.preload(troupeIds));
     }
+
     return Promise.all(strategies);
   };
 

@@ -9,16 +9,14 @@ var Promise = require('bluebird');
 var fs      = require('fs');
 var path    = require('path');
 var debug   = require('debug')('gitter:serializer');
+var Lazy    = require('lazy.js');
 
 var maxSerializerTime = nconf.get('serializer:warning-period');
 
 /**
  * Serialize some items using a strategy, returning a promise
  */
-var serialize = Promise.method(function(items, strat, callback) {
-  // Remove this in future
-  if (callback) throw new Error('Callback is invalid');
-
+var serialize = Promise.method(function(items, strat) {
   if(items === null || items === undefined) {
     return items;
   }
@@ -43,9 +41,10 @@ var serialize = Promise.method(function(items, strat, callback) {
   }
 
   var start = Date.now();
+  var seq = Lazy(items);
 
   return Promise.try(function() {
-      return strat.preload(items);
+      return strat.preload(seq);
     })
     .then(function() {
       var time = Date.now() - start;
@@ -56,19 +55,19 @@ var serialize = Promise.method(function(items, strat, callback) {
         stats.responseTime('serializer.slow.preload', time);
       }
 
-      var serialized = items.map(strat.map)
+      var serialized = seq.map(strat.map)
         .filter(function(f) {
-          return f !== undefined;
+          return f !== undefined && f !== null;
         });
-
-      if(strat.post) {
-        serialized = strat.post(serialized);
-      }
+      //
+      // if(strat.post) {
+      //   serialized = strat.post(serialized);
+      // }
 
       if (single) {
-        return serialized[0];
+        return serialized.first();
       } else {
-        return serialized;
+        return serialized.toArray();
       }
     });
 

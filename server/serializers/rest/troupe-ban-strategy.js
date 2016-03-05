@@ -17,6 +17,7 @@ function TroupeBanStrategy(options) {
     var bannedBy = userIdStategy.map(troupeBan.bannedBy);
 
     if(!user) return null;
+
     return {
       user: user,
       bannedBy: bannedBy,

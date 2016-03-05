@@ -1,6 +1,5 @@
 "use strict";
 
-var _ = require("underscore");
 var UserIdStrategy = require('./user-id-strategy');
 
 function TroupeStrategy(options) {
@@ -12,24 +11,24 @@ function TroupeStrategy(options) {
 
   this.preload = function(items) {
     var userIds = items.map(function(t) {
-                    if(t.oneToOne) {
-                      if(recipientUserId) {
-                        return getOtherUserId(t);
-                      } else {
-                        // Return all the userIds if one was not specified
-                        return t.oneToOneUsers.map(function(oneToOneUser) {
-                          return oneToOneUser.userId;
-                        });
-                      }
-                    }});
+      if(t.oneToOne) {
+        if(recipientUserId) {
+          return getOtherUserId(t);
+        } else {
+          // Return all the userIds if one was not specified
+          return t.oneToOneUsers.map(function(oneToOneUser) {
+            return oneToOneUser.userId;
+          });
+        }
+      }})
+      .flatten()
+      .filter(function(f) {
+        return !!f;
+      });
 
-    userIds = _.flatten(userIds).filter(function(f) { return !!f; });
+    if(userIds.isEmpty()) return;
 
-    if(userIds.length) {
-      return userStategy.preload(userIds);
-    } else {
-      return;
-    }
+    return userStategy.preload(userIds);
   };
 
 

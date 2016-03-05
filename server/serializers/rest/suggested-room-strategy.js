@@ -13,12 +13,20 @@ function SuggestedRoomStrategy() {
       .filter(function(f) { return !!f.roomId; })
       .map(function(f) { return mongoUtils.asObjectID(f.roomId); });
 
-    if (!suggestedRoomIds.length) {
+    if (suggestedRoomIds.isEmpty()) {
       roomHash = {};
       return;
     }
 
-    return persistence.Troupe.find({ _id: { $in: suggestedRoomIds }, security: 'PUBLIC' }, { uri: 1, githubType: 1, userCount: 1, topic: 1 })
+    return persistence.Troupe.find({
+        _id: { $in: suggestedRoomIds.toArray() }, 
+        security: 'PUBLIC'
+      }, {
+        uri: 1,
+        githubType: 1,
+        userCount: 1,
+        topic: 1
+      })
       .exec()
       .then(function(rooms) {
         roomHash = collections.indexById(rooms);

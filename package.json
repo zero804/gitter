@@ -64,7 +64,7 @@
     "keyword-extractor": "0.0.9",
     "langs": "^1.0.1",
     "languagedetect": "^1.1.1",
-    "lazy.js": "~0.2.1",
+    "lazy.js": "^0.4.2",
     "linklocal": "^2.5.2",
     "locale": "0.0.17",
     "lodash": "~3.2.0",
