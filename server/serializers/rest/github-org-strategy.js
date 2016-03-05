@@ -8,7 +8,7 @@ function OrgPlanStrategy() {
   var orgsWithPlans;
 
   this.preload = function(orgUris) {
-    return billingService.findActiveOrgPlans(orgUris)
+    return billingService.findActiveOrgPlans(orgUris.toArray())
       .then(function(subscriptions) {
         orgsWithPlans = subscriptions.reduce(function(memo, s) {
           memo[s.uri.toLowerCase()] = s.plan;

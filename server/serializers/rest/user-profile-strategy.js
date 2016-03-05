@@ -10,9 +10,11 @@ function UserProfileStrategy(options) {
 
   this.preload = function(users) {
     // pre-fill the cache
-    return identityService.preloadForUsers(users)
+    var usersArray = users.toArray();
+
+    return identityService.preloadForUsers(usersArray)
       .then(function() {
-        return Promise.map(users, function(user) {
+        return Promise.map(usersArray, function(user) {
           var backendMuxer = new BackendMuxer(user);
           return backendMuxer.findProfiles()
             .then(function(profiles) {

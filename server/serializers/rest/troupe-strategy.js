@@ -10,7 +10,6 @@ var billingService        = require('../../services/billing-service');
 var roomPermissionsModel  = require('../../services/room-permissions-model');
 var troupeService         = require('../../services/troupe-service');
 var _                     = require("lodash");
-var uniqueIds             = require('mongodb-unique-ids');
 var winston               = require('../../utils/winston');
 var collections           = require('../../utils/collections');
 var debug                 = require('debug')('gitter:troupe-strategy');
@@ -27,7 +26,7 @@ function AllUnreadItemCountStategy(options) {
   var userId = options.userId || options.currentUserId;
 
   this.preload = function(troupeIds) {
-    return unreadItemService.getUserUnreadCountsForTroupeIds(userId, troupeIds)
+    return unreadItemService.getUserUnreadCountsForTroupeIds(userId, troupeIds.toArray())
       .then(function(result) {
         self.unreadCounts = result;
       });
@@ -54,7 +53,7 @@ function RoomMembershipStrategy(options) {
       return;
     }
 
-    return roomMembershipService.findUserMembershipInRooms(userId, troupeIds)
+    return roomMembershipService.findUserMembershipInRooms(userId, troupeIds.toArray())
       .then(function(memberTroupeIds) {
         memberships = collections.hashArray(memberTroupeIds);
       });
@@ -144,7 +143,7 @@ function ActivityForUserStrategy(options) {
   var activity = {};
 
   this.preload = function(troupeIds) {
-    return unreadItemService.getActivityIndicatorForTroupeIds(troupeIds, currentUserId)
+    return unreadItemService.getActivityIndicatorForTroupeIds(troupeIds.toArray(), currentUserId)
       .then(function(values) {
         activity = values;
       });
@@ -161,20 +160,21 @@ ActivityForUserStrategy.prototype = {
 function ProOrgStrategy() {
   var proOrgs = {};
 
-  var getOwner = function (uri) {
+  function getOwner(uri) {
     return uri.split('/', 1).shift();
-  };
+  }
 
   this.preload = function(troupes) {
     var uris = troupes.map(function(troupe) {
-      if(!troupe.uri) return; // one-to-one
-      return getOwner(troupe.uri);
-    }).filter(function(room) {
-      return !!room; // this removes the `undefined` left behind (one-to-ones)
-    });
+        if(!troupe.uri) return; // one-to-one
+        return getOwner(troupe.uri);
+      })
+      .filter(function(room) {
+        return !!room; // this removes the `undefined` left behind (one-to-ones)
+      })
+      .uniq();
 
-    // uniqueIds should work here as they're strings although it's not strictly correct
-    return billingService.findActiveOrgPlans(uniqueIds(uris))
+    return billingService.findActiveOrgPlans(uris.toArray())
       .then(function(subscriptions) {
         subscriptions.forEach(function(subscription) {
           proOrgs[subscription.uri.toLowerCase()] = !!subscription;
@@ -206,7 +206,7 @@ function TroupePermissionsStrategy(options) {
       .then(function(user) {
         if (!user) return;
 
-        return Promise.map(troupes, function(troupe) {
+        return Promise.map(troupes.toArray(), function(troupe) {
           return roomPermissionsModel(user, 'admin', troupe)
             .then(function(admin) {
               isAdmin[troupe.id] = admin;
@@ -233,37 +233,35 @@ TroupePermissionsStrategy.prototype = {
 
 var TroupeOwnerIsOrgStrategy = function (){
 
-  var ownerIsOrg = {};
+  var ownerHash;
 
   this.preload = function(troupes) {
     // Use uniq as the list of items will probably be much smaller than the original set,
     // this means way fewer queries to mongodb
-    var ownersForQuery = _.uniq(troupes.map(function(troupe){
-      return troupe.lcOwner;
-    }).filter(function(t){
-      return !!t;
-    }));
+    var ownersForQuery = troupes.map(function(troupe){
+        return troupe.lcOwner;
+      })
+      .filter(function(t) {
+        return !!t;
+      })
+      .uniq()
+      .toArray();
 
     return Promise.map(ownersForQuery, function(lcOwner){
         return troupeService.checkGitHubTypeForUri(lcOwner || '', 'ORG');
       })
       .then(function(results) {
-        var hashed = ownersForQuery.reduce(function(memo, lcOwnerId, index){
-          memo[lcOwnerId] = results[index];
+        ownerHash = _.reduce(ownersForQuery, function(memo, lcOwner, index) {
+          memo[lcOwner] = results[index];
           return memo;
         }, {});
 
-        results.forEach(function(result, index){
-          //not being able to pass the troupe means we ASSUME they come through in order correctly
-          var troupe = troupes[index];
-          ownerIsOrg[troupe.id] = troupe.lcOwner && hashed[troupe.lcOwner];
-        });
       });
 
   };
 
-  this.map = function (troupe){
-    return (ownerIsOrg[troupe.id] || false);
+  this.map = function (troupe) {
+    return !!ownerHash[troupe.lcOwner];
   };
 };
 
@@ -289,21 +287,19 @@ function TroupeStrategy(options) {
   var roomMembershipStrategy = currentUserId || options.isRoomMember !== undefined ? new RoomMembershipStrategy(options) : null;
 
   this.preload = function(items) {
-    var troupeIds = [];
-    var userIdSet = {};
-
-    _.each(items, function(troupe) {
-      troupeIds.push(troupe.id);
-
-      // Add one-to-one users to the mix
-      if(troupe.oneToOne) {
-        _.each(troupe.oneToOneUsers, function(troupeUser) {
-          userIdSet[troupeUser.userId] = true;
-        });
-      }
+    var troupeIds = items.map(function(troupe) {
+      return troupe.id;
     });
 
-    var userIds = Object.keys(userIdSet);
+    var userIds = items.filter(function(troupe) {
+        return troupe.oneToOne;
+      })
+      .map(function(troupe) {
+        return troupe.oneToOneUsers;
+      })
+      .flatten()
+      .uniq();
+
     var strategies = [
       userIdStategy.preload(userIds),
       proOrgStrategy.preload(items)
@@ -367,7 +363,7 @@ function TroupeStrategy(options) {
 
     if(item.oneToOne) {
       if(currentUserId) {
-        otherUser =  mapOtherUser(item.oneToOneUsers);
+        otherUser = mapOtherUser(item.oneToOneUsers);
       } else {
         if(!shownWarning) {
           winston.warn('TroupeStrategy initiated without currentUserId, but generating oneToOne troupes. This can be a problem!');

@@ -5,7 +5,6 @@ var TroupeIdStrategy = require('./troupe-id-strategy');
 var UserIdStrategy = require('./user-id-strategy');
 
 function SampleChatStrategy() {
-  // TODO: simple strategy
   var userStategy = new UserIdStrategy();
   var troupeStategy = new TroupeIdStrategy();
 

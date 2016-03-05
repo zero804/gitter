@@ -17,7 +17,7 @@ function UserPremiumStatusStrategy() {
   var usersWithPlans;
 
   this.preload = function(userIds) {
-    return billingService.findActivePersonalPlansForUsers(userIds)
+    return billingService.findActivePersonalPlansForUsers(userIds.toArray())
       .then(function(subscriptions) {
         usersWithPlans = subscriptions.reduce(function(memo, s) {
           memo[s.userId] = true;
@@ -30,6 +30,7 @@ function UserPremiumStatusStrategy() {
     return usersWithPlans[userId];
   };
 }
+
 UserPremiumStatusStrategy.prototype = {
   name: 'UserPremiumStatusStrategy'
 };
@@ -43,11 +44,13 @@ function UserRoleInTroupeStrategy(options) {
         if(options.includeRolesForTroupe) return options.includeRolesForTroupe;
 
         if(options.includeRolesForTroupeId) {
+          // TODO: don't do this
           return troupeService.findById(options.includeRolesForTroupeId);
         }
       })
       .then(function(troupe) {
         if(!troupe) return;
+
         /* Only works for repos */
         if(troupe.githubType !== 'REPO') return;
         var userPromise;
@@ -95,6 +98,7 @@ function UserRoleInTroupeStrategy(options) {
     return contributors && contributors[username];
   };
 }
+
 UserRoleInTroupeStrategy.prototype = {
   name: 'UserRoleInTroupeStrategy'
 };
@@ -210,6 +214,7 @@ function UserStrategy(options) {
     return obj;
   };
 }
+
 UserStrategy.prototype = {
   name: 'UserStrategy'
 };

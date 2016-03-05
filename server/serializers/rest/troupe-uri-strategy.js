@@ -3,17 +3,18 @@
 var collections    = require("../../utils/collections");
 var TroupeStrategy = require('./troupe-strategy');
 var leanTroupeDao  = require('../../services/daos/troupe-dao').full;
+var Lazy           = require('lazy.js');
 
 function TroupeUriStrategy(options) {
   var troupeStrategy = new TroupeStrategy(options);
   var troupesIndexed;
 
   this.preload = function(uris) {
-    return leanTroupeDao.findByUris(uris)
+    return leanTroupeDao.findByUris(uris.toArray())
       .then(function(troupes) {
         troupesIndexed = collections.indexByProperty(troupes, 'uri');
 
-        return troupeStrategy.preload(troupes);
+        return troupeStrategy.preload(Lazy(troupes));
       });
 
   };

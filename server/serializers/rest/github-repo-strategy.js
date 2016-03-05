@@ -3,9 +3,9 @@
 var collections    = require("../../utils/collections");
 var TroupeStrategy = require('./troupe-strategy');
 var leanTroupeDao  = require('../../services/daos/troupe-dao').full;
+var Lazy           = require('lazy.js');
 
 function GithubRepoStrategy(options) {
-
   var troupeStrategy = new TroupeStrategy(options);
   var troupesIndexed;
 
@@ -16,7 +16,7 @@ function GithubRepoStrategy(options) {
       .then(function(troupes) {
         troupesIndexed = collections.indexByProperty(troupes, 'uri');
 
-        return troupeStrategy.preload(troupes);
+        return troupeStrategy.preload(Lazy(troupes));
       });
   };
 
