@@ -4,7 +4,6 @@ var unreadItemService     = require("../../services/unread-item-service");
 var collapsedChatsService = require('../../services/collapsed-chats-service');
 var getVersion            = require('../get-model-version');
 var UserIdStrategy        = require('./user-id-strategy');
-var TroupeIdStrategy      = require('./troupe-id-strategy');
 var _                     = require('lodash');
 var Promise               = require('bluebird');
 
@@ -61,7 +60,15 @@ CollapsedItemStrategy.prototype = {
 function ChatStrategy(options)  {
   if(!options) options = {};
 
+  var useLookups = options.lean === 2;
+
+  var userLookups;
+  if (useLookups) {
+    userLookups = {};
+  }
+
   var userStategy = options.user ? null : new UserIdStrategy({ lean: options.lean });
+
   var unreadItemStategy, collapsedItemStategy;
   /* If options.unread has been set, we don't need a strategy */
   if(options.currentUserId && options.unread === undefined) {
@@ -72,16 +79,14 @@ function ChatStrategy(options)  {
     collapsedItemStategy = new CollapsedItemStrategy({ userId: options.currentUserId, roomId: options.troupeId });
   }
 
-  var troupeStrategy = options.includeTroupe ? new TroupeIdStrategy(options) : null;
   var defaultUnreadStatus = options.unread === undefined ? true : !!options.unread;
 
   this.preload = function(items) {
-    var users = items.map(function(i) { return i.fromUserId; });
-
     var strategies = [];
 
     // If the user is fixed in options, we don't need to look them up using a strategy...
     if(userStategy) {
+      var users = items.map(function(i) { return i.fromUserId; });
       strategies.push(userStategy.preload(users));
     }
 
@@ -91,11 +96,6 @@ function ChatStrategy(options)  {
 
     if(collapsedItemStategy) {
       strategies.push(collapsedItemStategy.preload());
-    }
-
-    if(troupeStrategy) {
-      var troupeIds = items.map(function(i) { return i.toTroupeId; });
-      strategies.push(troupeStrategy.preload(troupeIds));
     }
 
     return Promise.all(strategies);
@@ -112,6 +112,18 @@ function ChatStrategy(options)  {
     return array;
   }
 
+  function mapUser(userId) {
+    if (useLookups) {
+      if (!userLookups[userId]) {
+        userLookups[userId] = userStategy.map(userId);
+      }
+
+      return userId;
+    } else {
+      return userStategy.map(userId);
+    }
+  }
+
   this.map = function(item) {
     var unread = unreadItemStategy ? unreadItemStategy.map(item._id) : defaultUnreadStatus;
     var collapsed = collapsedItemStategy && collapsedItemStategy.map(item._id);
@@ -125,10 +137,9 @@ function ChatStrategy(options)  {
       html: item.html,
       sent: formatDate(item.sent),
       editedAt: item.editedAt ? formatDate(item.editedAt) : undefined,
-      fromUser: options.user ? options.user : userStategy.map(item.fromUserId),
+      fromUser: options.user ? options.user : mapUser(item.fromUserId),
       unread: unread,
       collapsed: collapsed,
-      room: troupeStrategy ? troupeStrategy.map(item.toTroupeId) : undefined,
       readBy: item.readBy ? item.readBy.length : undefined,
       urls: castArray(item.urls),
       initial: options.initialId && item._id == options.initialId || undefined,
@@ -147,6 +158,19 @@ function ChatStrategy(options)  {
       v: getVersion(item)
     };
 
+  };
+
+  this.postProcess = function(serialized) {
+    if (useLookups) {
+      return {
+        items: serialized.toArray(),
+        lookups: {
+          users: userLookups
+        }
+      };
+    } else {
+      return serialized.toArray();
+    }
   };
 }
 

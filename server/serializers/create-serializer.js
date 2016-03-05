@@ -17,7 +17,7 @@ var maxSerializerTime = nconf.get('serializer:warning-period');
  * Serialize some items using a strategy, returning a promise
  */
 var serialize = Promise.method(function(items, strat) {
-  if(items === null || items === undefined) {
+  if(items === null || items === undefined || !items.length) {
     return items;
   }
 
@@ -25,20 +25,7 @@ var serialize = Promise.method(function(items, strat) {
           'serializer.' + strat.strategyType + '.' + strat.name :
           'serializer.' + strat.name;
 
-  var single;
-  if (Array.isArray(items)) {
-    /** Array with zero items, shortcut */
-    if (!items.length) {
-      return [];
-    }
-
-    statsd.histogram(statsPrefix + '.size', items.length, 0.1);
-
-    single = false;
-  } else {
-    single = true;
-    items = [ items ];
-  }
+  statsd.histogram(statsPrefix + '.size', items.length, 0.1);
 
   var start = Date.now();
   var seq = Lazy(items);
@@ -59,22 +46,55 @@ var serialize = Promise.method(function(items, strat) {
         .filter(function(f) {
           return f !== undefined && f !== null;
         });
-      //
-      // if(strat.post) {
-      //   serialized = strat.post(serialized);
-      // }
 
-      if (single) {
-        return serialized.first();
+      if(strat.postProcess) {
+        return strat.postProcess(serialized);
       } else {
         return serialized.toArray();
       }
     });
 
 });
+/**
+ * Serialize some items using a strategy, returning a promise
+ */
+var serializeObject = Promise.method(function(item, strat) {
+  if(item === null || item === undefined) {
+    return item;
+  }
+
+  var statsPrefix = strat.strategyType ?
+          'serializer.' + strat.strategyType + '.' + strat.name :
+          'serializer.' + strat.name;
+
+  var start = Date.now();
+  var seq = Lazy([ item ]);
+
+  return Promise.try(function() {
+      return strat.preload(seq);
+    })
+    .then(function() {
+      var time = Date.now() - start;
+      debug('strategy %s with %s items took %sms to complete', strat.name, 1, time);
+      statsd.timing(statsPrefix + '.timing', time, 0.1);
+
+      if(time > maxSerializerTime) {
+        stats.responseTime('serializer.slow.preload', time);
+      }
+
+      var serialized = seq.map(strat.map)
+        .filter(function(f) {
+          return f !== undefined && f !== null;
+        });
+
+      return serialized.first();
+    });
+
+});
 
 module.exports = function(serializerDirectory, e) {
   e.serialize = serialize;
+  e.serializeObject = serializeObject;
 
   fs.readdirSync(__dirname + '/' + serializerDirectory).forEach(function(fileName) {
     if(!/\.js$/.test(fileName)) return;

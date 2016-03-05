@@ -41,7 +41,7 @@ module.exports = {
 
   show: function(req) {
     var strategy = new restSerializer.UserStrategy();
-    return restSerializer.serialize(req.resourceUser, strategy);
+    return restSerializer.serializeObject(req.resourceUser, strategy);
   },
 
   load: function(req, id) {

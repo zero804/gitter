@@ -175,7 +175,7 @@ exports.serializeProfileForUsername = function(username) {
     .then(function(user) {
       if (user) {
         var strategy = new restSerializer.UserProfileStrategy();
-        return restSerializer.serialize(user, strategy);
+        return restSerializer.serializeObject(user, strategy);
 
       } else {
         var gitHubUser = {username: username};
