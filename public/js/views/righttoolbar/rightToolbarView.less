@@ -9,7 +9,7 @@
 @import "activity.less";
 
 .right-toolbar-region {
-  z-index: 200;
+  box-sizing: border-box;
   position: relative;
   top: 0;
   bottom: 0;
@@ -17,10 +17,7 @@
 
   order: 2;
   flex-shrink: 0;
-  display: inline-block;
-  vertical-align: top;
-  height: calc(100vh ~"-" @chat-frame-desktop-header-height);
-  margin-top: @chat-frame-desktop-header-height;
+  display: flex;
 
   color: #333;
   text-align: left;
@@ -31,7 +28,6 @@
     display: inline-block;
     flex-shrink: 0;
     order: 2;
-    height: 100%;
     width: 300px;
     text-align: left;
     vertical-align: top;
@@ -156,8 +152,6 @@
   }
 
   .right-toolbar__body {
-    height: 100%;
-    flex-shrink: 1;
     overflow: auto;
     padding-top: 10px;
   }
