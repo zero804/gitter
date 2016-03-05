@@ -71,14 +71,14 @@ module.exports = {
       })
       .then(function(chatMessage) {
         var strategy = new restSerializer.ChatStrategy({ currentUserId: req.user.id, troupeId: req.params.troupeId });
-        return restSerializer.serialize(chatMessage, strategy);
+        return restSerializer.serializeObject(chatMessage, strategy);
       });
   },
 
   show: function(req) {
     // TODO: ensure troupeId matches
     var strategy = new restSerializer.ChatIdStrategy({ currentUserId: req.user.id, troupeId: req.params.troupeId });
-    return restSerializer.serialize(req.params.chatMessageId, strategy);
+    return restSerializer.serializeObject(req.params.chatMessageId, strategy);
   },
 
   update: function(req) {
@@ -89,7 +89,7 @@ module.exports = {
       })
       .then(function(chatMessage) {
         var strategy = new restSerializer.ChatStrategy({ currentUserId: req.user.id, troupeId: req.params.troupeId });
-        return restSerializer.serialize(chatMessage, strategy);
+        return restSerializer.serializeObject(chatMessage, strategy);
       });
   },
 

@@ -13,7 +13,7 @@ var MAX_MESSAGES_FOR_NOTIFICATION = 3;
 
 function serializeItems(troupeId, recipientUserId, chatIds) {
   var troupeStrategy = new serializer.TroupeIdStrategy({ recipientUserId: recipientUserId });
-  var chatStrategy = new serializer.ChatIdStrategy({ includeTroupe: false, recipientUserId: recipientUserId });
+  var chatStrategy = new serializer.ChatIdStrategy({ recipientUserId: recipientUserId });
 
   return Promise.all([
     serializer.serialize(troupeId, troupeStrategy),

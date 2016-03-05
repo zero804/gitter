@@ -160,7 +160,7 @@ function getPermalinkChatForRoom(troupe, chatId) {
         troupeId: troupe.id
       });
 
-      return restSerializer.serialize(chat, strategy);
+      return restSerializer.serializeObject(chat, strategy);
     });
 }
 

@@ -56,7 +56,7 @@ function performUpdateToUserRoom(req) {
     .then(function() {
       var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: userId });
 
-      return restSerializer.serialize(req.params.userTroupeId, strategy);
+      return restSerializer.serializeObject(req.params.userTroupeId, strategy);
     });
 
 }
@@ -83,7 +83,7 @@ module.exports = {
       .then(function() {
         var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: req.user.id });
 
-        return restSerializer.serialize(troupeId, strategy);
+        return restSerializer.serializeObject(troupeId, strategy);
       });
   },
 

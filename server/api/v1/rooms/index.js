@@ -25,7 +25,7 @@ function searchRooms(req) {
         resultItemStrategy: new restSerializer.TroupeStrategy({ currentUserId: userId })
       });
 
-      return restSerializer.serialize({ results: rooms }, strategy);
+      return restSerializer.serializeObject({ results: rooms }, strategy);
     });
 }
 
@@ -46,7 +46,7 @@ module.exports = {
   show: function(req) {
     var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: req.user && req.user.id });
 
-    return restSerializer.serialize(req.params.troupeId, strategy);
+    return restSerializer.serializeObject(req.params.troupeId, strategy);
   },
 
   create: function(req) {
@@ -61,7 +61,7 @@ module.exports = {
 
         var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, includeRolesForTroupe: room.troupe });
 
-        return restSerializer.serialize(room.troupe, strategy)
+        return restSerializer.serializeObject(room.troupe, strategy)
         .then(function(serialized) {
 
           serialized.extra = {
@@ -103,7 +103,7 @@ module.exports = {
       .then(function() {
         var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: req.user.id });
 
-        return restSerializer.serialize(req.params.troupeId, strategy);
+        return restSerializer.serializeObject(req.params.troupeId, strategy);
       });
   },
 
