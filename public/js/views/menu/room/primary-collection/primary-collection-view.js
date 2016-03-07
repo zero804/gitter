@@ -17,7 +17,8 @@ var PrimaryCollectionView = BaseCollectionView.extend({
   childView: ItemView,
   className: 'primary-collection',
   ui: {
-    collection: '#collection-list',
+    collection:   '#collection-list',
+    searchHeader: '#primary-collection-search-header'
   },
 
   hasInit: false,
@@ -66,9 +67,18 @@ var PrimaryCollectionView = BaseCollectionView.extend({
   setActive: function() {
     switch (this.roomMenuModel.get('state')){
       case 'search':
-        this.el.classList.toggle('active', !!this.roomMenuModel.get('searchTerm'));
+        if(!!this.roomMenuModel.get('searchTerm')){
+          this.el.classList.add('active');
+          this.ui.searchHeader[0].classList.remove('hidden');
+        }
+        //
+        else {
+          this.el.classList.remove('active');
+          this.ui.searchHeader[0].classList.add('hidden');
+        }
         break;
       default:
+        this.ui.searchHeader[0].classList.add('hidden');
         proto.setActive.apply(this, arguments);
         break;
 
