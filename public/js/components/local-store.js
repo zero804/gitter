@@ -37,6 +37,9 @@ InMemoryStore.prototype = {
   },
   remove: function(key) {
     delete this.values[key];
+  },
+  getKeys: function() {
+    return Object.keys(this.values);
   }
 };
 
@@ -64,6 +67,21 @@ LocalStorageStore.prototype = {
     try {
       windowLocalStorage.removeItem(key);
     } catch(e) {
+    }
+  },
+
+  getKeys: function() {
+    try {
+      var len = windowLocalStorage.length;
+      var result = [];
+      for (var i = 0; i < len; i++) {
+        var key = windowLocalStorage.key(i);
+        result.push(key);
+      }
+
+      return result;
+    } catch(e) {
+      return [];
     }
   }
 };

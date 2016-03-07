@@ -5,6 +5,7 @@ var template = require('./tmpl/join-room-view.hbs');
 var context = require('utils/context');
 var apiClient = require('components/apiClient');
 var urlParse = require('url-parse');
+var frameUtils = require('utils/frame-utils');
 
 var JoinRoomView = Marionette.ItemView.extend({
   template: template,
@@ -25,12 +26,21 @@ var JoinRoomView = Marionette.ItemView.extend({
   joinRoom: function(e) {
     if (e) e.preventDefault();
 
-    var parsed = urlParse(window.top.location.href, true);
 
-    return apiClient.user.post('/rooms', {
-      id: context.getTroupeId(),
-      source: parsed.query.source
-    })
+    var roomPostOptions = {
+      id: context.getTroupeId()
+    };
+
+    if(frameUtils.hasParentFrameSameOrigin()) {
+      var parsed = urlParse(window.parent.location.href, true);
+      roomPostOptions.source = parsed.query.source;
+    }
+    else {
+      roomPostOptions.source = '~embed';
+    }
+
+    return apiClient.user
+      .post('/rooms', roomPostOptions)
       .then(function(body) {
         context.setTroupe(body);
       });
