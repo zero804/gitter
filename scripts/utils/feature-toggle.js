@@ -18,7 +18,7 @@ var opts = require('yargs')
      description: 'Username of user to allow'
    })
    .option('exclude-user', {
-     type: 'array'
+     type: 'array',
      description: 'Username of user to exclude'
    })
    .option('percentage', {
