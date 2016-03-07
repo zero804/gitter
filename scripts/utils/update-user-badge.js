@@ -14,6 +14,8 @@ var opts = require('yargs')
     required: true,
     description: "username to send badge update to"
   }))
+  .help('help')
+  .alias('help', 'h')
   .argv;
 
 onMongoConnect()

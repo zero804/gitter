@@ -35,6 +35,8 @@ var opts = yargs
     default: 'en',
     description: 'human language'
   })
+  .help('help')
+  .alias('help', 'h')
   .argv;
 
 if(!opts.username && opts.uri) {

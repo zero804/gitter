@@ -14,6 +14,8 @@ var opts = require('yargs')
     type: 'boolean',
     description: 'Display names'
   })
+  .help('help')
+  .alias('help', 'h')
   .argv;
 
 presenceService.listOnlineUsers(function(err, userIds) {

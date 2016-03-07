@@ -11,7 +11,9 @@ var opts = require('yargs')
       required: false,
       description: 'Path to listen to'
    })
-   .argv;
+   .help('help')
+  .alias('help', 'h')
+  .argv;
 
 var path = opts.path || '/**';
 

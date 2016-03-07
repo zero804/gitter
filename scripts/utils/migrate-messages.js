@@ -19,6 +19,8 @@ var opts = require('yargs')
     required: true,
     description: 'Room to migrate messages to'
   })
+  .help('help')
+  .alias('help', 'h')
   .argv;
 
 Promise.all([
