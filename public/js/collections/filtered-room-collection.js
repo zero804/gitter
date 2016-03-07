@@ -67,6 +67,7 @@ FilteredRoomCollection.prototype = _.extend(
         this.setFilter(this.filterDefault);
         break;
     }
+    //sort silently to stop multiple renders
     this.sort({ silent: true });
   },
 
