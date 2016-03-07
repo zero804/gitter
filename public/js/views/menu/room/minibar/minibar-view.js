@@ -65,6 +65,7 @@ module.exports = Marionette.CollectionView.extend({
     this.listenTo(this.roomCollection, 'add remove', this.render, this);
     this.listenTo(this.collection, 'snapshot', this.onCollectionSnapshot, this);
     this.listenTo(this.model, 'change:state change:selectedOrgName', this.onMenuStateUpdate, this);
+    this.onMenuStateUpdate();
   },
 
   render: function() {
@@ -80,11 +81,17 @@ module.exports = Marionette.CollectionView.extend({
   },
 
   onItemClicked: function(view, model) { //jshint unused: true
+    var modelName = model.get('name');
+    //stop selectedOrg name from changing if it does not need to
+    if(modelName === 'all' || modelName === 'search' || modelName === 'favourite' || modelName === 'people'){
+      modelName = this.model.get('name');
+    }
+
     this.model.set({
       panelOpenState:       true,
       state:                model.get('type'),
       profileMenuOpenState: false,
-      selectedOrgName:      model.get('name'),
+      selectedOrgName:      modelName,
     });
   },
 

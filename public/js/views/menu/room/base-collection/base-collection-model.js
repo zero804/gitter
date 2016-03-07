@@ -18,6 +18,8 @@ module.exports = Backbone.Model.extend({
     this.roomMenuModel = options.roomMenuModel;
     this.listenTo(this.roomMenuModel, 'change:state', this.onModelChangeState, this);
     Backbone.Model.prototype.constructor.apply(this, arguments);
+
+    this.onModelChangeState(this.roomMenuModel, this.roomMenuModel.get('state'));
   },
 
   onModelChangeState: function(model, val) { //jshint unused: true
