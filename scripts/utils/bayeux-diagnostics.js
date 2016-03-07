@@ -5,16 +5,16 @@
 var bayeux = require('../../server/web/bayeux');
 var winston = require('../../server/utils/winston');
 
-var opts = require("nomnom")
+var opts = require('yargs')
    .option('count', {
-      abbr: 'c',
+      alias: 'c',
       default: 10
    })
    .option('wait', {
-      abbr: 'w',
+      alias: 'w',
       default: 1000
    })
-   .parse();
+   .argv;
 
 
 var sentCount = 0;

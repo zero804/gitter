@@ -18,12 +18,12 @@ var intercom = require('gitter-web-intercom');
 var getIntercomStream = require('intercom-stream');
 
 
-var opts = require("nomnom")
+var opts = require('yargs')
    .option('segment', {
-      abbr: 's',
-      help: 'Id of the segment to list'
+      alias: 's',
+      description: 'Id of the segment to list'
    })
-   .parse();
+   .argv;
 
 if (!opts.segment) {
   // this just makes running the production (or beta) script much easier
@@ -101,8 +101,8 @@ stream
         callback();
       })
       .catch(function(err) {
-        console.error(error);
-        console.error(error.stack);
+        console.error(err);
+        console.error(err.stack);
         callback(err)
       });
   }))
