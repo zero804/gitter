@@ -27,7 +27,6 @@ function idStrategyGenerator(name, FullObjectStrategy, loaderFunction) {
         });
     });
 
-
     this.map = function(id) {
       var fullObject = objectHash[id];
 
@@ -37,6 +36,12 @@ function idStrategyGenerator(name, FullObjectStrategy, loaderFunction) {
 
       return strategy.map(fullObject);
     };
+
+    if (strategy.postProcess) {
+      this.postProcess = function(results) {
+        return strategy.postProcess(results);
+      };
+    }
 
   };
 
