@@ -8,10 +8,12 @@
 
   {{#if showPeopleButton}}
   {{#if hasHiddenMembers}}
-  <a href="#people" class="remaining-view-button secondary-button-caribbean--xsmall">
+  <a href="#people" class="remaining-view-secondary-button secondary-button-caribbean--xsmall">
     See All
+    <span class="remaining-view-button-secondary-text">
+      ({{userCount}} people)
+    </span>
   </a>
-  <small>({{userCount}} members)</small>
   {{else}}
   <a href="#people" class="remaining-view-button secondary-button-caribbean--xsmall">
     Details

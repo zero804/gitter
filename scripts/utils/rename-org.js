@@ -12,18 +12,18 @@ var Promise = require('bluebird');
 
 require('../../server/event-listeners').install();
 
-var opts = require("nomnom")
+var opts = require('yargs')
    .option('old', {
-      abbr: 'o',
+      alias: 'o',
       required: true,
-      help: 'Old uri for the organisation'
+      description: 'Old uri for the organisation'
    })
    .option('new', {
-      abbr: 'n',
+      alias: 'n',
       required: true,
-      help: 'New uri for the organisation'
+      description: 'New uri for the organisation'
    })
-   .parse();
+   .argv;
 
 var lcOld = opts.old.toLowerCase();
 var lcNew = opts.new.toLowerCase();

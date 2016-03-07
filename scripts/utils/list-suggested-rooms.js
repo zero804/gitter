@@ -8,14 +8,14 @@ var suggestions = require('gitter-web-suggestions');
 var shutdown = require('shutdown');
 var _ = require('lodash')
 
-var opts = require("nomnom")
+var opts = require('yargs')
   .option('uri', {
-    help: "uri of room to list suggestions for"
+    description: "uri of room to list suggestions for"
   })
   .option('username', {
-    help: "username of user list suggestions for"
+    description: "username of user list suggestions for"
   })
-  .parse();
+  .argv;
 
 function getRooms() {
   var lang = opts.lang || 'en';
