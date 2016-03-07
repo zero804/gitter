@@ -6,19 +6,19 @@ var shutdown = require('shutdown');
 var intercom = require('gitter-web-intercom');
 
 
-var opts = require("nomnom")
+var opts = require('yargs')
    .option('id', {
       required: false,
-      help: 'Intercom user id'
+      description: 'Intercom user id'
    })
    .option('user_id', {
       required: false,
-      help: 'Mongo user id'
+      description: 'Mongo user id'
    })
    .option('email', {
       required: false
    })
-   .parse();
+   .argv;
 
 if (!opts.id && !opts.user_id && !opts.email) {
   throw new Error("id, user_id or email required.");

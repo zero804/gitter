@@ -6,14 +6,14 @@ var winston = require('../../server/utils/winston');
 var mongoose = require('mongoose');
 require('../../server/services/persistence-service');
 
-var opts = require("nomnom")
+var opts = require('yargs')
    .option('max', {
-      abbr: 'm',
+      alias: 'm',
       required: false,
       'default': 50,
-      help: 'Max querytime'
+      description: 'Max querytime'
    })
-   .parse();
+   .argv;
 
 var max = opts.max;
 

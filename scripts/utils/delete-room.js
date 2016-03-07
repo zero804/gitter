@@ -9,13 +9,13 @@ var Promise = require('bluebird');
 
 require('../../server/event-listeners').install();
 
-var opts = require("nomnom")
+var opts = require('yargs')
    .option('uri', {
-      abbr: 'u',
+      alias: 'u',
       required: true,
-      help: 'Uri of the room to delete'
+      description: 'Uri of the room to delete'
    })
-   .parse();
+   .argv;
 
 var readline = require('readline');
 

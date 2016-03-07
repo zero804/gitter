@@ -2,17 +2,20 @@
 /*jslint node: true */
 "use strict";
 
+var Promise = require('bluebird');
 var userService = require('../../server/services/user-service');
 var troupeService = require('../../server/services/troupe-service');
 var presenceService = require('gitter-web-presence');
 var shutdown = require('shutdown');
-var Promise = require('bluebird');
+var shimPositionOption = require('../yargs-shim-position-option');
 
-var opts = require("nomnom").option('username', {
-  position: 0,
-  required: true,
-  help: "username to look up e.g trevorah"
-}).parse();
+var opts = require('yargs')
+  .option('username', shimPositionOption({
+    position: 0,
+    required: true,
+    description: "username to look up e.g trevorah"
+  }))
+  .argv;
 
 userService.findByUsername(opts.username)
   .then(function(user) {
