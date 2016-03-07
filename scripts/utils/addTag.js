@@ -9,6 +9,8 @@ var opts = require('yargs')
     description: 'A list of tags to be added.',
     type: 'array'
   })
+  .help('help')
+  .alias('help', 'h')
   .argv;
 
 var troupeService = require('../../server/services/troupe-service');

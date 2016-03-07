@@ -14,7 +14,9 @@ var opts = require('yargs')
       alias: 'w',
       default: 1000
    })
-   .argv;
+   .help('help')
+  .alias('help', 'h')
+  .argv;
 
 
 var sentCount = 0;

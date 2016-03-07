@@ -15,7 +15,9 @@ var opts = require('yargs')
       required: true,
       description: 'Uri of the room to delete'
    })
-   .argv;
+   .help('help')
+  .alias('help', 'h')
+  .argv;
 
 var readline = require('readline');
 

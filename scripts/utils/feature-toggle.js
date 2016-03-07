@@ -44,7 +44,9 @@ var opts = require('yargs')
      type: 'boolean',
      description: 'Turn off enabled'
    })
-   .argv;
+   .help('help')
+  .alias('help', 'h')
+  .argv;
 
 opts.name = opts.name || opts._[0];
 

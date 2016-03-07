@@ -23,6 +23,8 @@ var opts = require('yargs')
     required: true,
     description: 'What to call the sitemap (ie. the prefix)'
   })
+  .help('help')
+  .alias('help', 'h')
   .argv;
 
 function die(error) {

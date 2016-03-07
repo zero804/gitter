@@ -15,7 +15,9 @@ var opts = require('yargs')
       required: true,
       description: 'Username of the user to remove'
    })
-   .argv;
+   .help('help')
+  .alias('help', 'h')
+  .argv;
 
 userRemovalService.removeByUsername(opts.username)
   .delay(5000)

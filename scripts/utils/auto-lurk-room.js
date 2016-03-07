@@ -30,7 +30,9 @@ var opts = require('yargs')
       type: 'boolean',
       description: 'Just show the users who will be affected'
    })
-   .argv;
+   .help('help')
+  .alias('help', 'h')
+  .argv;
 
 var minTimeInDays = parseInt(opts.min, 10);
 var members = parseInt(opts.members, 10);

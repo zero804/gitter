@@ -23,6 +23,8 @@ var opts = require('yargs')
     type: 'boolean',
     description: 'Dry run'
   })
+  .help('help')
+  .alias('help', 'h')
   .argv;
 
 function main(uri, dryRun) {

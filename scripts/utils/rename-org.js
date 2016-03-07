@@ -23,7 +23,9 @@ var opts = require('yargs')
       required: true,
       description: 'New uri for the organisation'
    })
-   .argv;
+   .help('help')
+  .alias('help', 'h')
+  .argv;
 
 var lcOld = opts.old.toLowerCase();
 var lcNew = opts.new.toLowerCase();

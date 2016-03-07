@@ -35,9 +35,9 @@ var opts = yargs
     default: 'en',
     description: 'human language'
   })
-  .argv;
-
-if(!opts.username && opts.uri) {
+  .a.help('help')
+  .alias('help', 'h')
+  .argv;if(!opts.username && opts.uri) {
   var maxUri = opts['max-uri'];
   var rooms = [].concat(opts.uri).map(function(uri) {
     return troupeService.findByUri(uri);

@@ -42,7 +42,9 @@ var opts = require('yargs')
       alias: 's',
       description: 'Sound to send'
    })
-   .argv;
+   .help('help')
+  .alias('help', 'h')
+  .argv;
 
 
 if(opts.user) {

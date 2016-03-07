@@ -13,7 +13,9 @@ var opts = require('yargs')
       required: true,
       description: 'Socket to destroy'
    })
-   .argv;
+   .help('help')
+  .alias('help', 'h')
+  .argv;
 
 bayeux.destroyClient(opts.socketId, function(err) {
   if(err) winston.error('Error disconnecting socket' + err, { exception: err });

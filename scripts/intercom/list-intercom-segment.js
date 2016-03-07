@@ -13,7 +13,9 @@ var opts = require('yargs')
       required: true,
       description: 'Id of the segment to list'
    })
-   .argv;
+   .help('help')
+  .alias('help', 'h')
+  .argv;
 
 var stream = getIntercomStream({ client: intercom.client, key: 'users'}, function() {
   return intercom.client.users.listBy({segment_id: opts.segment});

@@ -18,7 +18,9 @@ var opts = require('yargs')
    .option('email', {
       required: false
    })
-   .argv;
+   .help('help')
+  .alias('help', 'h')
+  .argv;
 
 if (!opts.id && !opts.user_id && !opts.email) {
   throw new Error("id, user_id or email required.");

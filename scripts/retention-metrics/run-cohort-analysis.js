@@ -80,6 +80,8 @@ var opts = require('yargs')
     default: false,
     description: 'Arrange the subcohorts in descending order of size'
   })
+  .help('help')
+  .alias('help', 'h')
   .argv;
 
 opts.start = new Date(opts.start);
