@@ -590,7 +590,7 @@ function processResultsForNewItemWithMentions(troupeId, chatId, parsed, results,
       }
 
       debug("distribution of chat notification to users completed");
-
+      return null;
     });
 }
 

@@ -82,16 +82,19 @@ function resolveMentions(troupe, user, parsedMessage) {
       return parsedMessage.mentions
         .map(function(mention) {
           if(mention.group) {
-            var groupUserIds = groups[mention.screenName] || [];
+            var groupInfo = groups[mention.screenName];
+            if (!groupInfo) {
+              return null;
+            }
 
-            groupUserIds = groupUserIds.filter(notCurrentUserPredicate);
+            var groupUserIds = groupInfo.userIds || [];
 
             return {
               screenName: mention.screenName,
               group: true,
-              userIds: groupUserIds
+              announcement: groupInfo.announcement || undefined,
+              userIds: groupUserIds.filter(notCurrentUserPredicate)
             };
-
           }
 
           // Not a group mention
@@ -102,6 +105,9 @@ function resolveMentions(troupe, user, parsedMessage) {
             screenName: mention.screenName,
             userId: userId
           };
+        })
+        .filter(function(f) {
+          return !!f;
         });
       });
 }
