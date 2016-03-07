@@ -13,10 +13,11 @@ var ChatMessageSchema = new Schema({
   html:       String,
   urls:       Array,    // TODO: schema-ify this
   mentions: [{
-    screenName: { type: String, required: true },
-    userId:     { type: ObjectId },
-    userIds:    { type: [ObjectId] },
-    group:      { type: Boolean, required: false }, // True iff screenname is a group
+    screenName:   { type: String, required: true },
+    userId:       { type: ObjectId },
+    userIds:      { type: [ObjectId] },
+    group:        { type: Boolean, required: false }, // True iff screenname is a group
+    announcement: { type: Boolean, required: false }, // True iff screenname is an announcement
   }],
   issues:     Array, // TODO: schema-ify this
   meta:       Schema.Types.Mixed,

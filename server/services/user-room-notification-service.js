@@ -5,6 +5,7 @@ var userTroupeSettingsService = require('./user-troupe-settings-service');
 var roomMembershipService     = require('./room-membership-service');
 var _                         = require('lodash');
 var StatusError               = require('statuserror');
+var persistence               = require('./persistence-service');
 
 var DEFAULT_NOTIFICATION_SETTING = 'all';
 
@@ -33,6 +34,12 @@ var findSettingsForUsersInRoom = Promise.method(function (roomId, userIds) {
 
       return result;
     });
+});
+
+/** Codedebt: remove this */
+var findUsersInRoomWithSetting = Promise.method(function (roomId, value) {
+  return persistence.UserTroupeSettings.distinct("userId", { troupeId: roomId, 'settings.notifications.push': value })
+    .exec();
 });
 
 /**
@@ -101,9 +108,10 @@ var updateSettingsForUsersInRoom = Promise.method(function (roomId, userIds, val
 
 /* Exports */
 module.exports = {
-  getSettingForUserRoom:        getSettingForUserRoom,
+  getSettingForUserRoom:         getSettingForUserRoom,
   findSettingsForUsersInRoom:    findSettingsForUsersInRoom,
   findSettingsForMultiUserRooms: findSettingsForMultiUserRooms,
   updateSettingForUserRoom:      updateSettingForUserRoom,
   updateSettingsForUsersInRoom:  updateSettingsForUsersInRoom,
+  findUsersInRoomWithSetting:    findUsersInRoomWithSetting
 };
