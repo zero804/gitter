@@ -86,11 +86,11 @@ JP 11/2/16
 }
 
 .room-item__container {
-  display:        flex;
-  flex-direction: row;
-  align-items:    center;
-  margin-right:   (@desktop-menu-left-padding / 2);
-  transition:     background-color .2s ease-out;
+  display:         flex;
+  flex-direction:  row;
+  align-items:     center;
+  margin-right:    (@desktop-menu-left-padding / 2);
+  transition:      background-color .2s ease-out;
 
   .room-item.active & {
     .room-item-selected();
@@ -105,6 +105,7 @@ JP 11/2/16
   }
 
   &:hover {
+    text-decoration: none;
     cursor: pointer;
     .room-item-selected();
   }
@@ -136,7 +137,7 @@ JP 11/2/16
   text-overflow: ellipsis;
   padding-right: @desktop-menu-left-padding / 2;
   color:         @search-message-detail-color;
-  font-size:     1.4rem;
+  font-size:     1.3rem;
 }
 
 .room-item__search__link {
@@ -146,6 +147,14 @@ JP 11/2/16
 .room-item__avatar {
   .room-menu-avatar();
   margin-left:  @desktop-menu-left-padding / 2;
+}
+
+
+.room-item__avatar--search {
+  .room-menu-avatar();
+  margin-left: @desktop-menu-left-padding / 2;
+  height:      @menu-search-avatar-dims;
+  width:       @menu-search-avatar-dims;
 }
 
 .room-item__title {
@@ -160,40 +169,46 @@ JP 11/2/16
   height:        @menu-item-height;
   overflow:      hidden;
   max-width:     100%;
+  font-size:     1.4rem;
   text-overflow: ellipsis;
   margin-left:   @desktop-menu-left-padding / 2;
 }
 
 .notification (@size){
-  border-radius: 100%;
-  border:        1px solid transparent;
-  height:        @size;
-  width:         @size;
+  box-sizing:    border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   min-width:     @size;
+  height:        @size;
   margin-left:   1rem;
-  font-size:     1.1rem;
 
-  //TODO Figure out why this is needed jp 2/2/16
-  line-height:   @size;
+  border-radius: 100%;
+  border:        2px solid transparent;
 
-  text-align:    center;
   color:         white;
+  font-size:     1.1rem;
+  line-height:   1;
 }
 
 .room-item__unreads {
   .notification(@menu-unread-badge-size);
   background:    @caribbean;
-  text-indent:    -.05rem;
 }
 
 .room-item__mentions {
   .notification(@menu-unread-badge-size);
   background:    @jaffa;
-  text-indent:    -.3rem;
+
+  &:before {
+    content: '@';
+    // The `@` character in this font is slightly not vertically centered
+    transform: translateY(-0.125em);
+  }
 }
 
 .room-item__lurk {
-  .notification(@menu-unread-badge-size / 4);
+  .notification(@menu-unread-badge-size / 2.4);
   border-color: @caribbean;
 }
 

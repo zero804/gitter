@@ -7,14 +7,17 @@ var troupeService = require('../../server/services/troupe-service');
 var troupeUriMapper = require('../../server/services/troupe-uri-mapper');
 var unreadService = require('../../server/services/unread-item-service');
 var restful = require("../../server/services/restful");
+var shimPositionOption = require('../yargs-shim-position-option');
 
 var shutdown = require('shutdown');
 
-var opts = require("nomnom").option('username', {
-  position: 0,
-  required: true,
-  help: "username to look up e.g trevorah"
-}).parse();
+var opts = require('yargs')
+  .option('username', shimPositionOption({
+    position: 0,
+    required: true,
+    description: "username to look up e.g trevorah"
+  }))
+  .argv;
 
 function getBadgeCount(userId) {
   return unreadService.getBadgeCountsForUserIds([userId])
