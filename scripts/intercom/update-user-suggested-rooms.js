@@ -12,10 +12,10 @@ var userSettingsService = require('../../server/services/user-settings-service')
 var intercom = require('gitter-web-intercom');
 var suggestions = require('gitter-web-suggestions');
 
-var opts = require("nomnom")
+var opts = require('yargs')
    .option('id', {
       required: false,
-      help: 'mongo user id'
+      description: 'mongo user id'
    })
    .option('username', {
       required: false
@@ -23,7 +23,7 @@ var opts = require("nomnom")
    .option('email', {
       required: false
    })
-   .parse();
+   .argv;
 
 if (!opts.id && !opts.username && !opts.email) {
   throw new error("id, username or email required.");
