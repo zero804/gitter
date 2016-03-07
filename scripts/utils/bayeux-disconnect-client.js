@@ -8,12 +8,12 @@ var presenceService = require('gitter-web-presence');
 var shutdown = require('shutdown');
 
 var opts = require('yargs')
-   .option('socketId', {
-      alias: 's',
-      required: true,
-      description: 'Socket to destroy'
-   })
-   .help('help')
+  .option('socketId', {
+    alias: 's',
+    required: true,
+    description: 'Socket to destroy'
+  })
+  .help('help')
   .alias('help', 'h')
   .argv;
 

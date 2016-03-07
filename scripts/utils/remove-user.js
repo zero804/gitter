@@ -10,12 +10,12 @@ var winston = require('../../server/utils/winston');
 require('../../server/event-listeners').install();
 
 var opts = require('yargs')
-   .option('username', {
-      alias: 'u',
-      required: true,
-      description: 'Username of the user to remove'
-   })
-   .help('help')
+  .option('username', {
+    alias: 'u',
+    required: true,
+    description: 'Username of the user to remove'
+  })
+  .help('help')
   .alias('help', 'h')
   .argv;
 

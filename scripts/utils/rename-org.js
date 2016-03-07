@@ -13,17 +13,17 @@ var Promise = require('bluebird');
 require('../../server/event-listeners').install();
 
 var opts = require('yargs')
-   .option('old', {
-      alias: 'o',
-      required: true,
-      description: 'Old uri for the organisation'
-   })
-   .option('new', {
-      alias: 'n',
-      required: true,
-      description: 'New uri for the organisation'
-   })
-   .help('help')
+  .option('old', {
+    alias: 'o',
+    required: true,
+    description: 'Old uri for the organisation'
+  })
+  .option('new', {
+    alias: 'n',
+    required: true,
+    description: 'New uri for the organisation'
+  })
+  .help('help')
   .alias('help', 'h')
   .argv;
 

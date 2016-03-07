@@ -14,20 +14,20 @@ var validateUri = require('gitter-web-github').GitHubUriValidator;
 var permissionsModel   = require('../../server/services/permissions-model');
 
 var opts = require('yargs')
-   .option('username', {
-      required: true,
-      description: 'Username of the user to make into an org'
-   })
-   .option('first-user', {
-      required: true,
-      description: 'User to add to the org room'
-   })
-   .option('dry-run', {
-      type: 'boolean',
-      alias: 'd',
-      description: 'Just show the users who will be affected'
-   })
-   .help('help')
+  .option('username', {
+    required: true,
+    description: 'Username of the user to make into an org'
+  })
+  .option('first-user', {
+    required: true,
+    description: 'User to add to the org room'
+  })
+  .option('dry-run', {
+    type: 'boolean',
+    alias: 'd',
+    description: 'Just show the users who will be affected'
+  })
+  .help('help')
   .alias('help', 'h')
   .argv;
 
