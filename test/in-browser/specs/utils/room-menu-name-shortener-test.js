@@ -2,7 +2,7 @@
 'use strict';
 
 var assert            = require('assert');
-var roomNameShortener = require('../../../../shared/room-name-shortener.js');
+var roomNameShortener = require('../../../../shared/room-name-shortener');
 
 describe('roomNameShortener()', function() {
 
