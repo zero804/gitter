@@ -35,7 +35,7 @@ var opts = yargs
     default: 'en',
     description: 'human language'
   })
-  .a.help('help')
+  .help('help')
   .alias('help', 'h')
   .argv;
 

@@ -14,23 +14,23 @@ var es = require('event-stream');
 // require('../../server/event-listeners').install();
 
 var opts = require('yargs')
-   .option('room', {
-      alias: 'r',
-      description: 'Room URI'
-   })
-   .option('min', {
-      alias: 'm',
-      default: '31',
-      description: 'Minimum time in days since last login'
-   })
-   .option('members', {
-      description: 'Minimum number of members in the room'
-   })
-   .option('dryRun', {
-      type: 'boolean',
-      description: 'Just show the users who will be affected'
-   })
-   .help('help')
+  .option('room', {
+    alias: 'r',
+    description: 'Room URI'
+  })
+  .option('min', {
+    alias: 'm',
+    default: '31',
+    description: 'Minimum time in days since last login'
+  })
+  .option('members', {
+    description: 'Minimum number of members in the room'
+  })
+  .option('dryRun', {
+    type: 'boolean',
+    description: 'Just show the users who will be affected'
+  })
+  .help('help')
   .alias('help', 'h')
   .argv;
 

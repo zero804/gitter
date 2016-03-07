@@ -10,12 +10,12 @@ var Promise = require('bluebird');
 require('../../server/event-listeners').install();
 
 var opts = require('yargs')
-   .option('uri', {
-      alias: 'u',
-      required: true,
-      description: 'Uri of the room to delete'
-   })
-   .help('help')
+  .option('uri', {
+    alias: 'u',
+    required: true,
+    description: 'Uri of the room to delete'
+  })
+  .help('help')
   .alias('help', 'h')
   .argv;
 

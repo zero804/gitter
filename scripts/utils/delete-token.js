@@ -6,12 +6,12 @@ var shutdown = require('shutdown');
 var oauthService = require('../../server/services/oauth-service');
 
 var opts = require('yargs')
-   .option('token', {
-      alias: 't',
-      required: true,
-      description: 'Token to delete'
-   })
-   .help('help')
+  .option('token', {
+    alias: 't',
+    required: true,
+    description: 'Token to delete'
+  })
+  .help('help')
   .alias('help', 'h')
   .argv;
 
