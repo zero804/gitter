@@ -23,6 +23,13 @@ makeBenchmark({
         fixtureDescription.troupe2.users.push('user' + i);
       }
     }
+
+    for (var j = 0; j < 100; j++) {
+      fixtureDescription['message' + j] = {
+        troupe: 'troupe1',
+        user: 'user' + (j % 10)
+      };
+    }
     // userOnlyOne is in one room
     // user0...5000 are in two or three rooms
     fixtureLoader(fixture, fixtureDescription)(done);
@@ -33,6 +40,11 @@ makeBenchmark({
   },
 
   tests: {
+    'serializeChatsForTroupe': function(done) {
+      restful.serializeChatsForTroupe(fixture.troupe1.id, fixture.user0.id, {})
+        .nodeify(done);
+    },
+
     'serializeTroupesForUser#oneRoom': function(done) {
       restful.serializeTroupesForUser(fixture.userOnlyOne.id)
         .nodeify(done);
