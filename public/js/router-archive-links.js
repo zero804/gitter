@@ -8,7 +8,6 @@ var apiClient = require('components/apiClient');
 
 require('components/timezone-cookie');
 require('views/widgets/preload');
-require('filtered-collection');
 require('components/dozy');
 require('template/helpers/all');
 require('components/bug-reporting');

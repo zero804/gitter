@@ -24,4 +24,10 @@ describe('roomNameShortener()', function() {
     assert.equal(expected, result);
   });
 
+  it('should return a value for names with spaces', function(){
+    var result = roomNameShortener('Anand Babu (AB) Periasamy');
+    var expected = 'Anand Babu (AB) Periasamy';
+    assert.equal(expected, result);
+  });
+
 });
