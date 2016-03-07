@@ -145,12 +145,13 @@ function ChatStrategy(options)  {
       readBy: item.readBy ? item.readBy.length : undefined,
       urls: castArray(item.urls),
       initial: options.initialId && item._id == options.initialId || undefined,
-      mentions: castArray(item.mentions.map(function(m) {
+      mentions: castArray(item.mentions && _.map(item.mentions, function(m) {
           return {
             screenName: m.screenName,
             userId: m.userId,
             userIds: m.userIds, // For groups
-            group: m.group
+            group: m.group || undefined,
+            announcement: m.announcement || undefined
           };
         })),
       issues: castArray(item.issues),

@@ -7,14 +7,14 @@ var checkRepoPrivacy = require('../server/services/check-repo-privacy');
 
 var Promise = require('bluebird');
 
-var opts = require("nomnom")
+var opts = require('yargs')
   .option('max', {
-    abbr: 'm',
+    alias: 'm',
     default: '50',
     required: false,
-    help: 'Maximum count'
+    description: 'Maximum count'
   })
-  .parse();
+  .argv;
 
 
 function die(error) {

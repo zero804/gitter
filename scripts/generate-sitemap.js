@@ -12,18 +12,18 @@ var sitemapLocation = nconf.get('sitemap:location');
 
 
 
-var opts = require("nomnom")
+var opts = require('yargs')
   .option('tempdir', {
-    abbr: 't',
+    alias: 't',
     required: true,
-    help: 'Where to write the sitemap files to'
+    description: 'Where to write the sitemap files to'
   })
   .option('name', {
-    abbr: 'n',
+    alias: 'n',
     required: true,
-    help: 'What to call the sitemap (ie. the prefix)'
+    description: 'What to call the sitemap (ie. the prefix)'
   })
-  .parse();
+  .argv;
 
 function die(error) {
   console.error(error);

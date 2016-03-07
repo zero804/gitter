@@ -354,12 +354,20 @@ ul.roster {
   }
 }
 
-.remaining-view-button {
+.remaining-view-button,
+.remaining-view-secondary-button {
   @media @mid {
     padding: 0;
     letter-spacing: 0;
     text-transform: none;
   }
+}
+.remaining-view-secondary-button {
+  color: darken(@caribbean, 10%);
+}
+
+.remaining-view-button-secondary-text {
+  color: rgba(51, 51, 51, 0.5);
 }
 
 

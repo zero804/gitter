@@ -9,13 +9,13 @@ var winston = require('../../server/utils/winston');
 
 require('../../server/event-listeners').install();
 
-var opts = require("nomnom")
+var opts = require('yargs')
    .option('username', {
-      abbr: 'u',
+      alias: 'u',
       required: true,
-      help: 'Username of the user to remove'
+      description: 'Username of the user to remove'
    })
-   .parse();
+   .argv;
 
 userRemovalService.removeByUsername(opts.username)
   .delay(5000)

@@ -24,8 +24,8 @@ exports.getUserSettings = function(userId, troupeId, settingsKey) {
 };
 
 
-exports.getMultiUserTroupeSettings = function(userTroupes, settingsKey) {
-  if(!userTroupes.length) return Promise.resolve({});
+exports.getMultiUserTroupeSettings = Promise.method(function(userTroupes, settingsKey) {
+  if(!userTroupes.length) return {};
 
   var terms = userTroupes.map(function(userTroupe) {
     if(!mongoUtils.isLikeObjectId(userTroupe.userId) || !mongoUtils.isLikeObjectId(userTroupe.troupeId)) return;
@@ -37,7 +37,11 @@ exports.getMultiUserTroupeSettings = function(userTroupes, settingsKey) {
     return !!f;
   });
 
-  return persistence.UserTroupeSettings.find({ $or: terms }, 'userId troupeId settings.' + settingsKey, {
+  if (!terms.length) return {};
+
+  var query = mongoUtils.conjunctionIds(terms, ['userId', 'troupeId']);
+
+  return persistence.UserTroupeSettings.find(query, 'userId troupeId settings.' + settingsKey, {
       lean: true,
       slaveOk: true // This query can be run against a slave. If it's a tiny bit out of date, that shouldn't be a problem
     })
@@ -50,8 +54,9 @@ exports.getMultiUserTroupeSettings = function(userTroupes, settingsKey) {
 
       return hash;
     });
-};
+});
 
+/** Deprecated */
 exports.getUserTroupeSettingsForUsersInTroupe = function(troupeId, settingsKey, userIds) {
   if(!userIds.length) return Promise.resolve({});
 

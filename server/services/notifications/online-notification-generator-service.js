@@ -1,14 +1,14 @@
 "use strict";
 
-var Promise                   = require('bluebird');
-var userTroupeSettingsService = require('../user-troupe-settings-service');
-var appEvents                 = require('gitter-web-appevents');
-var resolveUserAvatarUrl      = require('gitter-web-shared/avatars/resolve-user-avatar-url');
-var troupeDao                 = require('../daos/troupe-dao').lean;
-var userDao                   = require('../daos/user-dao').lean;
-var chatService               = require('../chat-service');
-var _                         = require('lodash');
-var debug                     = require('debug')('gitter:online-notification-generator');
+var Promise                     = require('bluebird');
+var userRoomNotificationService = require('../user-room-notification-service');
+var appEvents                   = require('gitter-web-appevents');
+var resolveUserAvatarUrl        = require('gitter-web-shared/avatars/resolve-user-avatar-url');
+var troupeDao                   = require('../daos/troupe-dao').lean;
+var userDao                     = require('../daos/user-dao').lean;
+var chatService                 = require('../chat-service');
+var _                           = require('lodash');
+var debug                       = require('debug')('gitter:online-notification-generator');
 
 function generateChatMessageNotification(troupeId, chatId) {
   return Promise.all([
@@ -43,11 +43,10 @@ function generateChatMessageNotification(troupeId, chatId) {
 }
 
 function filterUsersByNotificationSettings(troupeId, userIds, mentioned) {
-  return userTroupeSettingsService.getUserTroupeSettingsForUsersInTroupe(troupeId, 'notifications', userIds)
+  return userRoomNotificationService.findSettingsForUsersInRoom(troupeId, userIds)
     .then(function(notificationSettings) {
       return _.filter(userIds, function(userId) {
-        var ns = notificationSettings[userId];
-        var notificationSetting = ns && ns.push;
+        var notificationSetting = notificationSettings[userId];
 
         if (notificationSetting === 'mute') return false;
         if (notificationSetting === 'mention') return mentioned;

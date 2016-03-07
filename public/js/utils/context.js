@@ -8,7 +8,7 @@ var Promise    = require('bluebird');
 module.exports = (function() {
 
   var ctx         = window.troupeContext || {};
-  var snapshots   = (ctx.snapshots || { rooms: [], orgs: [] });
+  var snapshots   = ctx.snapshots || {};
 
   function getTroupeModel() {
     var troupeModel;
