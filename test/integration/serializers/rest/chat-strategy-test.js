@@ -7,8 +7,6 @@ var assert = require('assert');
 var serialize = testRequire('./serializers/serialize');
 var ChatStrategy = testRequire('./serializers/rest/chat-strategy');
 var ChatIdStrategy = testRequire('./serializers/rest/chat-id-strategy');
-var _ = require('lodash');
-
 
 function makeHash() {
   var hash = {};
@@ -16,6 +14,12 @@ function makeHash() {
     hash[arguments[i]] = arguments[i + 1];
   }
   return hash;
+}
+
+function assertSerializedEqual(value, expected) {
+  assert.strictEqual(
+    JSON.stringify(value, null, '  '),
+    JSON.stringify(expected, null, '  '));
 }
 
 describe('chat-strategy-test', function() {
@@ -43,14 +47,14 @@ describe('chat-strategy-test', function() {
       id: fixture.message1.id,
       text: 'old_message',
       sent: '2014-01-01T00:00:00.000Z',
-      fromUser:
-       { id: fixture.user1.id,
-         username: fixture.user1.username,
-         displayName: fixture.user1.displayName,
-         url: '/' + fixture.user1.username,
-         avatarUrlSmall: '/api/private/user-avatar/' + fixture.user1.username + '?s=60',
-         avatarUrlMedium: '/api/private/user-avatar/' + fixture.user1.username + '?s=128',
-         v: 1 },
+      fromUser: {
+        id: fixture.user1.id,
+        username: fixture.user1.username,
+        displayName: fixture.user1.displayName,
+        url: '/' + fixture.user1.username,
+        avatarUrlSmall: '/api/private/user-avatar/' + fixture.user1.username + '?s=60',
+        avatarUrlMedium: '/api/private/user-avatar/' + fixture.user1.username + '?s=128',
+        v: 1 },
       unread: false,
       readBy: 0,
       urls: [],
@@ -106,10 +110,10 @@ describe('chat-strategy-test', function() {
          avatarUrlSmall: '/api/private/user-avatar/' + fixture.user1.username + '?s=60',
          avatarUrlMedium: '/api/private/user-avatar/' + fixture.user1.username + '?s=128',
          v: 1 },
-      initial: true,
       unread: true,
       readBy: 0,
       urls: [],
+      initial: true,
       mentions: [],
       issues: [],
       meta: [],
@@ -145,39 +149,6 @@ describe('chat-strategy-test', function() {
     return fixture.cleanup();
   });
 
-  function assertSerializedEqual(value, expected) {
-    assert.strictEqual(
-      JSON.toString(value, null, '  '),
-      JSON.toString(expected, null, '  '));
-  }
-
-  function cleanResult(result) {
-    result.id = result.id && String(result.id);
-    var withoutUndefined = _.pairs(result).filter(function(pair) {
-      return (pair[1] !== undefined);
-    }).map(function(pair) {
-      if (pair[1] && pair[1]._bsontype) {
-        pair[1] = String(pair[1]);
-      }
-      return pair;
-    });
-
-    return _.zipObject(withoutUndefined);
-  }
-
-  function cleanMap(result) {
-    var cleanedValues = _.pairs(result).map(function(pair) {
-      return [pair[0], cleanResult(pair[1])];
-    });
-
-    return _.zipObject(cleanedValues);
-  }
-
-  function cleanChat(chat) {
-    var a = cleanResult(chat);
-    a.fromUser = a.fromUser && cleanResult(a.fromUser);
-    return a;
-  }
 
   describe('chat-serializer', function() {
 
