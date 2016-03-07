@@ -101,8 +101,8 @@ stream
         callback();
       })
       .catch(function(err) {
-        console.error(error);
-        console.error(error.stack);
+        console.error(err);
+        console.error(err.stack);
         callback(err)
       });
   }))
