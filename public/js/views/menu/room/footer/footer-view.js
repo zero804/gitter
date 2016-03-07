@@ -25,6 +25,7 @@ module.exports = Marionette.ItemView.extend({
     }
 
     this.bus = attrs.bus;
+    this.onModelChange();
   },
 
   onModelChange: function() {

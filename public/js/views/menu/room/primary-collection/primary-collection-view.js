@@ -18,7 +18,8 @@ var PrimaryCollectionView = BaseCollectionView.extend({
   childView: ItemView,
   className: 'primary-collection',
   ui: {
-    collection: '#collection-list',
+    collection:   '#collection-list',
+    searchHeader: '#primary-collection-search-header'
   },
 
   hasInit: false,
@@ -26,6 +27,7 @@ var PrimaryCollectionView = BaseCollectionView.extend({
   isEmpty: function() {
     return ((this.roomMenuModel.get('state') === 'search') && !this.collection.length);
   },
+
 
   childViewOptions: function(model) {
     var baseOptions   = BaseCollectionView.prototype.childViewOptions.apply(this, arguments);
@@ -56,20 +58,28 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     this.dndCtrl = options.dndCtrl;
     this.uiModel = new Backbone.Model({ isFocused: false });
 
-    this.model.set('active', this.roomMenuModel.get('state') !== 'search');
-
     //TODO turn this into an error if there is a dndCtrl
     this.listenTo(this.dndCtrl, 'room-menu:add-favourite', this.onFavouriteAdded, this);
     this.listenTo(this.dndCtrl, 'room-menu:sort-favourite', this.onFavouritesSorted, this);
     this.listenTo(this.roomMenuModel, 'change:searchTerm', this.setActive, this);
+    BaseCollectionView.prototype.initialize.apply(this, arguments);
   },
 
   setActive: function() {
     switch (this.roomMenuModel.get('state')){
       case 'search':
-        this.el.classList.toggle('active', !!this.roomMenuModel.get('searchTerm'));
+        if(!!this.roomMenuModel.get('searchTerm')){
+          this.el.classList.add('active');
+          this.ui.searchHeader[0].classList.remove('hidden');
+        }
+        //
+        else {
+          this.el.classList.remove('active');
+          this.ui.searchHeader[0].classList.add('hidden');
+        }
         break;
       default:
+        this.ui.searchHeader[0].classList.add('hidden');
         proto.setActive.apply(this, arguments);
         break;
 
