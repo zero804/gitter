@@ -7,11 +7,10 @@ var assert = require('assert');
 var shutdown = require('shutdown');
 var pushNotificationGateway = require('../../server/gateways/push-notification-gateway');
 
-var opts = require("nomnom").option('username', {
-  position: 0,
+var opts = require('yargs').option('username', {
   required: true,
-  help: "username to look up e.g trevorah"
-}).parse();
+  description: 'username to look up e.g trevorah'
+}).argv;
 
 userService.findByUsername(opts.username)
   .then(function(user) {

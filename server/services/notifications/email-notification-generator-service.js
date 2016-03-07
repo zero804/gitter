@@ -5,19 +5,19 @@ var logger                    = env.logger;
 var config                    = env.config;
 var stats                     = env.stats;
 
-var _                         = require("underscore");
-var troupeService             = require("../troupe-service");
-var userService               = require("../user-service");
-var unreadItemService         = require("../unread-item-service");
-var serializer                = require('../../serializers/notification-serializer');
-var moment                    = require('moment');
-var Promise                   = require('bluebird');
-var collections               = require('../../utils/collections');
-var mongoUtils                = require('../../utils/mongo-utils');
-var emailNotificationService  = require('../email-notification-service');
-var userSettingsService       = require('../user-settings-service');
-var userTroupeSettingsService = require('../user-troupe-settings-service');
-var debug                     = require('debug')('gitter:email-notification-generator-service');
+var _                            = require("underscore");
+var troupeService                = require("../troupe-service");
+var userService                  = require("../user-service");
+var unreadItemService            = require("../unread-item-service");
+var serializer                   = require('../../serializers/notification-serializer');
+var moment                       = require('moment');
+var Promise                      = require('bluebird');
+var collections                  = require('../../utils/collections');
+var mongoUtils                   = require('../../utils/mongo-utils');
+var emailNotificationService     = require('../email-notification-service');
+var userSettingsService          = require('../user-settings-service');
+var userRoomNotificationService  = require('../user-room-notification-service');
+var debug                        = require('debug')('gitter:email-notification-generator-service');
 
 var filterTestValues = config.get('notifications:filterTestValues');
 
@@ -106,14 +106,12 @@ function sendEmailNotifications(since) {
           });
       });
 
-      return userTroupeSettingsService.getMultiUserTroupeSettings(userTroupes, "notifications")
+      return userRoomNotificationService.findSettingsForMultiUserRooms(userTroupes)
         .then(function(notificationSettings) {
-
           Object.keys(userTroupeUnreadHash).forEach(function(userId) {
               var troupeIds = Object.keys(userTroupeUnreadHash[userId]);
               troupeIds.forEach(function(troupeId) {
-                var ns = notificationSettings[userId + ':' + troupeId];
-                var setting = ns && ns.push;
+                var setting = notificationSettings[userId + ':' + troupeId];
 
                 if(setting && setting !== 'all') {
                   debug('User %s has disabled notifications for this troupe', userId);

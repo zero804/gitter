@@ -111,8 +111,9 @@ onready(function() {
         perfTiming.start('room-switch.render');
 
         debug('changing room: %j', message.newTroupe);
-        //destroy any modal views
-        appView.dialogRegion.destroy();
+        
+        // destroy any modal views
+        router.navigate('', { trigger: true, replace: true });
 
         //set the context troupe to new troupe
         context.setTroupe(message.newTroupe);
@@ -354,7 +355,7 @@ onready(function() {
 
   var showingHelp = false;
   var hideHelp = function() {
-    router.navigate('', {trigger: true});
+    router.navigate('', { trigger: true });
     showingHelp = false;
   };
 

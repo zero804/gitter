@@ -204,6 +204,7 @@ makeTestTasks('localtest', function(name, files) {
     .pipe(mocha({
       reporter: 'spec',
       timeout: 10000,
+      bail: !!process.env.BAIL,
       env: {
         SKIP_BADGER_TESTS: 1,
         DISABLE_CONSOLE_LOGGING: 1,
@@ -575,7 +576,7 @@ gulp.task('watch', ['css'], function() {
 
 
 // Run gulp safe-install --package xyz@0.1.0
-var opts = require("nomnom").parse();
+var opts = require('yargs').argv;
 gulp.task('safe-install', shell.task([
   'npm run unlink',
   'npm install --production',
@@ -632,7 +633,7 @@ gulp.task('sonar', function () {
         }
       },
       analysis: {
-        mode: 'publish'
+        mode: 'preview'
       },
       github: {
         pullRequest: process.env.ghprbPullId,

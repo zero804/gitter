@@ -20,6 +20,7 @@ module.exports = function resourceRoute(routeIdentifier, resource) {
           }
 
           req[idParam] = value;
+          return null;
         })
         .nodeify(next);
     });
@@ -41,6 +42,8 @@ module.exports = function resourceRoute(routeIdentifier, resource) {
             } else {
               res.send(response);
             }
+
+            return null;
           })
           .catch(next);
       });
@@ -52,6 +55,7 @@ module.exports = function resourceRoute(routeIdentifier, resource) {
   mount('get',    '/:' + idParam,            'show');
   mount('get',    '/:' + idParam + '/edit',  'edit');
   mount('put',    '/:' + idParam,            'update');
+  mount('patch',  '/:' + idParam,            'patch');
   mount('delete', '/:' + idParam,            'destroy');
 
   if (resource.subresources) {
