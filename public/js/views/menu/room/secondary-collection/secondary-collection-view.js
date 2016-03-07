@@ -15,7 +15,6 @@ module.exports = BaseCollectionView.extend({
 
   childEvents: {
     'item:clicked':      'onItemClicked',
-    'user:item:clicked': 'onUserLinkClicked',
   },
 
   buildChildView: function(model, ItemView, attrs) {
@@ -105,12 +104,5 @@ module.exports = BaseCollectionView.extend({
     this._triggerNavigation(url, 'chat', name);
   },
 
-  onUserLinkClicked: function(view) {
-    var model = view.model.get('fromUser');
-    var user = this.userModel;
-    if (model.id === user.get('id')) { return; }
-
-    proto.onItemClicked.apply(this, arguments);
-  },
 
 });
