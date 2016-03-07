@@ -111,7 +111,7 @@ module.exports = Marionette.LayoutView.extend({
   }, 50),
 
   _initNano: function(params) {
-    require('fastdom').mutate(function(){
+    fastdom.mutate(function(){
       this.$el.find('.nano').nanoScroller(params);
     }.bind(this));
   },
