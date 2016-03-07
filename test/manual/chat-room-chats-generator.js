@@ -9,21 +9,21 @@ var dictionary = require('lorem-ipsum/lib/dictionary').words;
 
 require('../../server/event-listeners').install();
 
-var opts = require("nomnom")
+var opts = require('yargs')
 .option('room', {
-  abbr: 'r',
+  alias: 'r',
   required: true
 })
 .option('users', {
-  abbr: 'u',
+  alias: 'u',
   required: true,
-  list: true
+  type: 'array'
 })
 .option('count', {
-  abbr: 'c',
+  alias: 'c',
   default: 1000
 })
-.parse();
+.argv;
 
 Promise.all([
   userService.findByUsernames(opts.users),

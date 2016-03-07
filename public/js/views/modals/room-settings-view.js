@@ -6,10 +6,10 @@ var context                = require('utils/context');
 var apiClient              = require('components/apiClient');
 var ModalView              = require('./modal');
 var troupeSettingsTemplate = require('./tmpl/room-settings-view.hbs');
-var notifications          = require('components/notifications');
+var userNotifications      = require('components/user-notifications');
 
 function getNotificationSetting(value) {
-  switch(value) {
+  switch (value) {
     case 'all': return 'all';
     case 'annoucements': return 'mention';
     case 'mention': return 'mention';
@@ -62,7 +62,7 @@ var View = Marionette.ItemView.extend({
   serializeData: function() {
     return _.extend({},
       context.getTroupe(), {
-        notificationsBlocked: notifications.hasBeenDenied(),
+        notificationsBlocked: userNotifications.isAccessDenied(),
         isNativeDesktopApp: context().isNativeDesktopApp,
         troupeUrl: '//' + window.location.host + window.location.pathname
       });

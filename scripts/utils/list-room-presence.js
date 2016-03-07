@@ -19,17 +19,17 @@ function pad(string, length) {
   }
   return string;
 }
-var opts = require("nomnom")
+var opts = require('yargs')
   .option('uri', {
-    help: "uri of room to list presence for"
+    description: "uri of room to list presence for"
   })
   .option('fromUser', {
-    help: "id of room to list presence for"
+    description: "id of room to list presence for"
   })
   .option('toUser', {
-    help: "id of room to list presence for"
+    description: "id of room to list presence for"
   })
-  .parse();
+  .argv;
 
 function getTroupe() {
   if (opts.uri)

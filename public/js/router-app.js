@@ -24,8 +24,7 @@ var roomListGenerator                 = require('./components/chat-cache/room-li
 
 require('components/statsc');
 require('views/widgets/preload');
-require('components/webNotifications');
-require('components/desktopNotifications');
+require('components/user-notifications');
 require('template/helpers/all');
 require('components/bug-reporting');
 require('components/focus-events');
