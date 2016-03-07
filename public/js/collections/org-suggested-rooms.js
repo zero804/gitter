@@ -7,15 +7,15 @@ var backboneUrlResolver = require('backbone-url-resolver');
 var SyncMixin           = require('./sync-mixin');
 
 var SuggestedCollection = Backbone.Collection.extend({
-  initialize: function(attrs) {//jshint unused: true
+  initialize: function(attrs) {
 
     if (!attrs || !attrs.contextModel) {
       throw new Error('A valid model must be passed to SuggestedOrgCollection when initialized');
     }
 
-    this.contextModel = attrs.contextModel;
+    this.contextModel   = attrs.contextModel;
     this.roomCollection = attrs.roomCollection;
-    this.urlModel     = backboneUrlResolver('/v1/orgs/:selectedOrgName/suggestedRooms', this.contextModel);
+    this.urlModel       = backboneUrlResolver('/v1/orgs/:selectedOrgName/suggestedRooms', this.contextModel);
     this.listenTo(this.contextModel, 'change:selectedOrgName', this.onOrgNameUpdate, this);
 
     if(!!this.roomCollection.findWhere({ name: this.contextModel.get('selectedOrgName')})){
