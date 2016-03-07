@@ -1,11 +1,12 @@
 "use strict";
 
-var unreadItemService = require("../../services/unread-item-service");
+var _                     = require('lodash');
+var unreadItemService     = require("../../services/unread-item-service");
 var collapsedChatsService = require('../../services/collapsed-chats-service');
-var execPreloads      = require('../exec-preloads');
-var getVersion        = require('../get-model-version');
-var UserIdStrategy    = require('./user-id-strategy');
-var TroupeIdStrategy  = require('./troupe-id-strategy');
+var execPreloads          = require('../exec-preloads');
+var getVersion            = require('../get-model-version');
+var UserIdStrategy        = require('./user-id-strategy');
+var TroupeIdStrategy      = require('./troupe-id-strategy');
 
 function formatDate(d) {
   return d ? d.toISOString() : null;
