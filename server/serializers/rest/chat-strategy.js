@@ -63,11 +63,15 @@ function ChatStrategy(options)  {
   var useLookups = options.lean === 2;
 
   var userLookups;
+  var leanUser;
   if (useLookups) {
     userLookups = {};
+    leanUser = false;
+  } else {
+    leanUser = options.lean;
   }
 
-  var userStategy = options.user ? null : new UserIdStrategy({ lean: options.lean });
+  var userStategy = options.user ? null : new UserIdStrategy({ lean: leanUser });
 
   var unreadItemStategy, collapsedItemStategy;
   /* If options.unread has been set, we don't need a strategy */
