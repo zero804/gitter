@@ -5,7 +5,7 @@ var apiClient                = require('components/apiClient');
 var Marionette               = require('backbone.marionette');
 var Backbone                 = require('backbone');
 var autolink                 = require('autolink');
-var notifications            = require('components/notifications');
+var userNotifications        = require('components/user-notifications');
 var Dropdown                 = require('views/controls/dropdown');
 var appEvents                = require('utils/appevents');
 var headerViewTemplate       = require('./tmpl/headerViewTemplate.hbs');
@@ -160,49 +160,53 @@ module.exports = Marionette.ItemView.extend({
   },
 
   createMenu: function() {
-      var menuItems = [
-        { title: 'Add people to this room', href: '#add' },
-      ];
-
+      var menuItems = [];
       var c = context();
       var isAdmin = context.isTroupeAdmin();
       var isRoomMember = context.isRoomMember();
-
+      var githubType = this.model.get('githubType');
+      var isOneToOne = githubType === 'ONETOONE';
       var url = this.model.get('url');
 
-      menuItems.push({ title: 'Share this chat room', href: '#share' });
-      menuItems.push({ divider: true });
+      if (!isOneToOne) {
+        menuItems.push({ title: 'Add people to this room', href: '#add' });
+        menuItems.push({ title: 'Share this chat room', href: '#share' });
+        menuItems.push({ divider: true });
+      }
 
       if (isRoomMember) menuItems.push({ title: 'Notifications', href: '#notifications' });
 
-      if (isAdmin) {
-        if (c.isNativeDesktopApp) {
-          menuItems.push({ title: 'Integrations', href: context.env('basePath') + url + '#integrations', target: '_blank', dataset: { disableRouting: 1 } });
-        } else {
-          menuItems.push({ title: 'Integrations', href: '#integrations' });
+      if (!isOneToOne) {
+        if (isAdmin) {
+          if (c.isNativeDesktopApp) {
+            menuItems.push({ title: 'Integrations', href: context.env('basePath') + url + '#integrations', target: '_blank', dataset: { disableRouting: 1 } });
+          } else {
+            menuItems.push({ title: 'Integrations', href: '#integrations' });
+          }
+
+          if (githubType !== 'USER_CHANNEL') {
+            menuItems.push({ title: 'Edit tags', href: '#tags/' + context().troupe.id });
+          }
         }
 
-        if (context.troupe().get('githubType') !== 'USER_CHANNEL') {
-          menuItems.push({ title: 'Edit tags', href: '#tags/' + context().troupe.id });
+        menuItems.push({ divider: true });
+
+        menuItems.push({ title: 'Archives', href: url + '/archives/all', target: '_blank'});
+
+        if (githubType === 'REPO' || githubType === 'ORG') {
+          menuItems.push({ title: 'Open in GitHub', href: 'https://www.github.com' + url, target: '_blank' });
+        }
+
+        menuItems.push({ divider: true });
+
+        if (isAdmin) {
+          menuItems.push({ title: 'Delete this room', href: '#delete' });
+        }
+
+        if (isRoomMember) {
+          menuItems.push({ title: 'Leave this room', href: '#leave' });
         }
       }
-
-      menuItems.push({ divider: true });
-
-      menuItems.push({ title: 'Archives', href: url + '/archives/all', target: '_blank'});
-
-      var githubType = this.model.get('githubType');
-      if (githubType === 'REPO' || githubType === 'ORG') {
-        menuItems.push({ title: 'Open in GitHub', href: 'https://www.github.com' + url, target: '_blank' });
-      }
-
-      menuItems.push({ divider: true });
-
-      if (isAdmin) {
-        menuItems.push({ title: 'Delete this room', href: '#delete' });
-      }
-
-      if (isRoomMember) menuItems.push({ title: 'Leave this room', href: '#leave' });
 
       return menuItems;
     },
@@ -291,9 +295,7 @@ module.exports = Marionette.ItemView.extend({
   },
 
   requestBrowserNotificationsPermission: function() {
-    if(notifications.hasNotBeenSetup() && context().desktopNotifications){
-      notifications.enable();
-    }
+    userNotifications.requestAccess();
   },
 
   // Look at the attributes that have changed

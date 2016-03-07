@@ -106,11 +106,6 @@ var accessTokenFailureExtension = {
   }
 };
 
-var BRIDGE_NOTIFICATIONS = {
-  user_notification: 1,
-  activity: 1
-};
-
 var client;
 var pingTimer;
 
@@ -123,9 +118,10 @@ function getOrCreateClient() {
     authProvider: authProvider,
     fayeOptions: c.options,
     extensions: [
-        handshakeExtension,
-        accessTokenFailureExtension
-      ]
+      handshakeExtension,
+      accessTokenFailureExtension
+    ],
+    websocketsDisabled: context.hasFeature('disable-websockets')
   });
 
   client.on('stats', function (type, statName, value) {
@@ -159,8 +155,13 @@ function getOrCreateClient() {
         user.set(message.model);
       }
 
-      if (BRIDGE_NOTIFICATIONS[message.notification]) {
-        appEvents.trigger(message.notification, message);
+      switch(message.notification) {
+        case 'user_notification':
+          appEvents.trigger('user_notification', _.extend(message, { notificationKey: message.chatId }));
+          break;
+        case 'activity':
+          appEvents.trigger('activity', message);
+          break;
       }
     }
   });

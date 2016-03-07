@@ -1378,22 +1378,6 @@ function findBanByUsername(troupeId, bannedUsername) {
 }
 exports.findBanByUsername = findBanByUsername;
 
-
-function updateTroupeLurkForUserId(userId, troupeId, lurk) {
-  lurk = !!lurk; // Force boolean
-  return roomMembershipService.setMemberLurkStatus(troupeId, userId, lurk)
-    .then(function(changed) {
-      // Did a change did not occur?
-      if(!changed) return;
-
-      if(lurk) {
-        // Delete all the chats in Redis for this person too
-        return unreadItemService.markAllChatsRead(userId, troupeId, { member: true });
-      }
-    });
-}
-exports.updateTroupeLurkForUserId = updateTroupeLurkForUserId;
-
 function searchRooms(userId, queryText, options) {
 
   return persistence.Troupe

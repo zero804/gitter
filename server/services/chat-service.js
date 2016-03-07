@@ -65,11 +65,15 @@ function resolveMentions(troupe, user, parsedMessage) {
       return mention.screenName;
     });
 
-  return Promise.all([
-      mentionUserNames.length ? userService.findByUsernames(mentionUserNames) : [],
-      mentionGroupNames.length ? groupResolver(troupe, user, mentionGroupNames) : []
-    ])
-    .spread(function(users, groups) {
+  var userLookup = mentionUserNames.length ?
+                    userService.findByUsernames(mentionUserNames) :
+                    [];
+
+  var groupLookup = mentionGroupNames.length ?
+                      groupResolver(troupe, user, mentionGroupNames) :
+                      [];
+
+  return Promise.join(userLookup, groupLookup, function(users, groups) {
       var notCurrentUserPredicate = excludingUserId(user.id);
 
       var usersIndexed = collections.indexByProperty(users, 'username');
@@ -78,16 +82,19 @@ function resolveMentions(troupe, user, parsedMessage) {
       return parsedMessage.mentions
         .map(function(mention) {
           if(mention.group) {
-            var groupUserIds = groups[mention.screenName] || [];
+            var groupInfo = groups[mention.screenName];
+            if (!groupInfo) {
+              return null;
+            }
 
-            groupUserIds = groupUserIds.filter(notCurrentUserPredicate);
+            var groupUserIds = groupInfo.userIds || [];
 
             return {
               screenName: mention.screenName,
               group: true,
-              userIds: groupUserIds
+              announcement: groupInfo.announcement || undefined,
+              userIds: groupUserIds.filter(notCurrentUserPredicate)
             };
-
           }
 
           // Not a group mention
@@ -98,6 +105,9 @@ function resolveMentions(troupe, user, parsedMessage) {
             screenName: mention.screenName,
             userId: userId
           };
+        })
+        .filter(function(f) {
+          return !!f;
         });
       });
 }
@@ -108,7 +118,7 @@ function resolveMentions(troupe, user, parsedMessage) {
  * NB: it is the callers responsibility to ensure that the user has permission
  * to chat in the room
  */
-exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
+exports.newChatMessageToTroupe = function(troupe, user, data) {
 
   // Keep this up here, set sent time asap to ensure order
   var sentAt = new Date();
@@ -151,7 +161,8 @@ exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
         unreadItemService.createChatUnreadItems(user.id, troupe, chatMessage)
           .catch(function(err) {
             errorReporter(err, { operation: 'unreadItemService.createChatUnreadItems', chat: chatMessage }, { module: 'chat-service' });
-          });
+          })
+          .done();
 
         var statMetadata = _.extend({
           userId: user.id,
@@ -165,8 +176,7 @@ exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
 
         return chatMessage;
       });
-  })
-  .nodeify(callback);
+  });
 };
 
 // Returns some recent public chats
