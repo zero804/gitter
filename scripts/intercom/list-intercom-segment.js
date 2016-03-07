@@ -8,12 +8,12 @@ var getIntercomStream = require('intercom-stream');
 
 
 var opts = require('yargs')
-   .option('segment', {
-      alias: 's',
-      required: true,
-      description: 'Id of the segment to list'
-   })
-   .help('help')
+  .option('segment', {
+    alias: 's',
+    required: true,
+    description: 'Id of the segment to list'
+  })
+  .help('help')
   .alias('help', 'h')
   .argv;
 

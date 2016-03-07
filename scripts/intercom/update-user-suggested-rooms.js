@@ -13,17 +13,17 @@ var intercom = require('gitter-web-intercom');
 var suggestions = require('gitter-web-suggestions');
 
 var opts = require('yargs')
-   .option('id', {
-      required: false,
-      description: 'mongo user id'
-   })
-   .option('username', {
-      required: false
-   })
-   .option('email', {
-      required: false
-   })
-   .help('help')
+  .option('id', {
+    required: false,
+    description: 'mongo user id'
+  })
+  .option('username', {
+    required: false
+  })
+  .option('email', {
+    required: false
+  })
+  .help('help')
   .alias('help', 'h')
   .argv;
 
