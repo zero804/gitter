@@ -6,7 +6,7 @@ var roomNameShortener = require('../room-name-shortener');
 
 module.exports = function parseContentToTemplateData(data, state) {
 
-    data.url = (data.url || '');
+    data.url  = (data.url || '');
     data.name = (data.name || '');
 
     //For user results
