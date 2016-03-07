@@ -16,6 +16,8 @@ var opts = require('yargs')
     required: false,
     description: 'Age in minutes of the unread items'
   })
+  .help('help')
+  .alias('help', 'h')
   .argv;
 
 winston.info('Looking for all unread messages older than ' + opts.age + ' minutes');

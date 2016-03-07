@@ -17,6 +17,8 @@ var opts = require('yargs')
     type: 'boolean',
     description: 'unban user from hell'
   })
+  .help('help')
+  .alias('help', 'h')
   .argv;
 
 console.log(opts);

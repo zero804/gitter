@@ -13,17 +13,19 @@ var intercom = require('gitter-web-intercom');
 var suggestions = require('gitter-web-suggestions');
 
 var opts = require('yargs')
-   .option('id', {
-      required: false,
-      description: 'mongo user id'
-   })
-   .option('username', {
-      required: false
-   })
-   .option('email', {
-      required: false
-   })
-   .argv;
+  .option('id', {
+    required: false,
+    description: 'mongo user id'
+  })
+  .option('username', {
+    required: false
+  })
+  .option('email', {
+    required: false
+  })
+  .help('help')
+  .alias('help', 'h')
+  .argv;
 
 if (!opts.id && !opts.username && !opts.email) {
   throw new error("id, username or email required.");
@@ -94,6 +96,3 @@ getUserFromMongo(opts)
     console.error(err.stack);
     shutdown.shutdownGracefully(1);
   });
-
-
-

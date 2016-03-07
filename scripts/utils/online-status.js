@@ -15,6 +15,8 @@ var opts = require('yargs')
     required: true,
     description: "username to look up e.g trevorah"
   }))
+  .help('help')
+  .alias('help', 'h')
   .argv;
 
 userService.findByUsername(opts.username)
