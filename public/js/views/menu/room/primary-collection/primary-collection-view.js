@@ -26,6 +26,7 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     return ((this.roomMenuModel.get('state') === 'search') && !this.collection.length);
   },
 
+
   childViewOptions: function(model) {
     var baseOptions   = BaseCollectionView.prototype.childViewOptions.apply(this, arguments);
     baseOptions.model = model;
@@ -55,12 +56,11 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     this.dndCtrl = options.dndCtrl;
     this.uiModel = new Backbone.Model({ isFocused: false });
 
-    this.model.set('active', this.roomMenuModel.get('state') !== 'search');
-
     //TODO turn this into an error if there is a dndCtrl
     this.listenTo(this.dndCtrl, 'room-menu:add-favourite', this.onFavouriteAdded, this);
     this.listenTo(this.dndCtrl, 'room-menu:sort-favourite', this.onFavouritesSorted, this);
     this.listenTo(this.roomMenuModel, 'change:searchTerm', this.setActive, this);
+    BaseCollectionView.prototype.initialize.apply(this, arguments);
   },
 
   setActive: function() {
