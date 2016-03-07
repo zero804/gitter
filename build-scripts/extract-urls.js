@@ -7,14 +7,15 @@ var fs = require('fs');
 var path = require('path');
 var reduceFunctionCall = require('reduce-function-call');
 var url = require('url');
+var shimPositionOption = require('../scripts/yargs-shim-position-option');
 
-var opts = require("nomnom")
-  .option('input', {
+var opts = require('yargs')
+  .option('input', shimPositionOption({
     position: 0,
     required: true,
-    help: 'Output'
-  })
-  .parse();
+    description: 'Output'
+  }))
+  .argv;
 
 var resources = {};
 

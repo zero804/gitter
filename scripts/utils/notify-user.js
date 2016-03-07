@@ -10,39 +10,39 @@ var winston = require('../../server/utils/winston');
 
 require('../../server/event-listeners').install();
 
-var opts = require("nomnom")
+var opts = require('yargs')
    .option('user', {
-      abbr: 'u',
-      list: true,
+      alias: 'u',
+      type: 'array'
       required: false,
-      help: 'Send message to userId'
+      description: 'Send message to userId'
    })
    .option('email', {
-      abbr: 'e',
-      list: true,
+      alias: 'e',
+      type: 'array'
       required: false,
-      help: 'Send message to email address'
+      description: 'Send message to email address'
    })
    .option('message', {
-      abbr: 'm',
+      alias: 'm',
       required: true,
-      help: 'Message to send'
+      description: 'Message to send'
    })
    .option('title', {
-      abbr: 'd',
+      alias: 'd',
       required: true,
-      help: 'Title'
+      description: 'Title'
    })
    .option('link', {
-      abbr: 'l',
+      alias: 'l',
       required: false,
-      help: 'Link'
+      description: 'Link'
    })
    .option('sound', {
-      abbr: 's',
-      help: 'Sound to send'
+      alias: 's',
+      description: 'Sound to send'
    })
-   .parse();
+   .argv;
 
 
 if(opts.user) {

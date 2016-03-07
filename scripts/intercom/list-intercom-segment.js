@@ -7,13 +7,13 @@ var intercom = require('gitter-web-intercom');
 var getIntercomStream = require('intercom-stream');
 
 
-var opts = require("nomnom")
+var opts = require('yargs')
    .option('segment', {
-      abbr: 's',
+      alias: 's',
       required: true,
-      help: 'Id of the segment to list'
+      description: 'Id of the segment to list'
    })
-   .parse();
+   .argv;
 
 var stream = getIntercomStream({ client: intercom.client, key: 'users'}, function() {
   return intercom.client.users.listBy({segment_id: opts.segment});
