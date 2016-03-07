@@ -1,15 +1,15 @@
-var opts = require("nomnom")
+var opts = require('yargs')
   .script("addTag")
   .option('roomUri', {
-    abbr: 'r',
-    help: 'The roomUri to be tagged.'
+    alias: 'r',
+    description: 'The roomUri to be tagged.'
   })
   .option('tags', {
-    abbr: 't',
-    help: 'A list of tags to be added.',
-    list: true
+    alias: 't',
+    description: 'A list of tags to be added.',
+    type: 'array'
   })
-  .parse();
+  .argv;
 
 var troupeService = require('../../server/services/troupe-service');
 var persistenceService = require('../../server/services/persistence-service');
