@@ -13,7 +13,7 @@ gzip -9 $TEMP_DIR/sitemap*
 for f in $TEMP_DIR/sitemap*.xml.gz
 do
   NAME=$(basename $f .gz)
-  /usr/local/bin/aws s3 cp $f s3://gitter-sitemap/$NODE_ENV/$NAME --content-encoding gzip --acl public-read
+  aws s3 cp $f s3://gitter-sitemap/$NODE_ENV/$NAME --content-encoding gzip --acl public-read
 done
 
 
