@@ -301,7 +301,6 @@ module.exports = (function() {
 
     //cleanup
     delete snapshots[key];
-    //delete ctx.snapshots[key];
 
     return snapshot;
   };
