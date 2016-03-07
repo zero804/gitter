@@ -2,15 +2,10 @@
   <form id="troupeSettings">
 
     <select class="trpInput" style="width: 306px; height: 36px" id="notification-options">
-      <option value="all">Notify me for all messages</option>
-      <option value="mention">Notify me when somebody mentions me</option>
-      <option value="mute">Don't notify me at all</option>
+      <option value="all">All: Notify me for all messages</option>
+      <option value="mention">Announcements: Notify me for mentions and announcements</option>
+      <option value="mute">Mute: Notify me only when I'm directly mentioned</option>
     </select>
-    <br>
-    <label for="unread-checkbox" style="color: black;">
-      <input type="checkbox" id="unread-checkbox" name="lurk" value="1" style="display:inline" {{#if lurk}}checked{{/if}}/>
-      Hide unread message badge
-    </label>
     <br>
     <br>
     <div class="u-font-smaller" style="color: #999">

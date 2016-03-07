@@ -104,6 +104,44 @@ describe('mongo-utils', function() {
       assert.equal(null, underTest.serializeObjectId(id));
     });
 
+  });
+
+  describe('conjunctionIds', function() {
+    var id1, id2, id3, id4, id5, id6;
+
+    before(function() {
+      id1 = new ObjectID('51adcd412aefe1576f000005');
+      id2 = new ObjectID('51adcd412aefe1576f000006');
+      id3 = new ObjectID('51adcd412aefe1576f000007');
+      id4 = new ObjectID('51adcd412aefe1576f000008');
+      id5 = new ObjectID('51adcd412aefe1576f000009');
+      id6 = new ObjectID('51adcd412aefe1576f00000a');
+    });
+
+    it('should deal with sets with less than three items', function() {
+      var result = underTest.conjunctionIds([{ x: id1, y: id2 }, { x: id1, y: id3 }], ['x', 'y']);
+      assert.deepEqual(result, { $or: [{ x: id1, y: id2 }, { x: id1, y: id3 }] });
+    });
+
+    it('should deal with sets where the first item is unique', function() {
+      var result;
+      for (var i = 0; i < 100000; i++) {
+        result = underTest.conjunctionIds([{ x: id1, y: id2 }, { x: id1, y: id3 }, { x: id1, y: id4 }, { x: id1, y: id5 }], ['x', 'y']);
+      }
+      assert.deepEqual(result, { $and: [{ x: id1 }, { y: { $in: [id2, id3, id4, id5 ] } }] });
+
+    });
+
+    it('should deal with sets where the second item is unique', function() {
+      var result = underTest.conjunctionIds([{ x: id2, y: id1 }, { x: id3, y: id1 }, { x: id4, y: id1 }, { x: id5, y: id1 }], ['x', 'y']);
+      assert.deepEqual(result, { $and: [{ y: id1 }, { x: { $in: [id2, id3, id4, id5 ] } }] });
+    });
+
+    it('should deal with sets with no unique items', function() {
+      var terms = [{ x: id1, y: id2 }, { x: id3, y: id4 }, { x: id5, y: id6 }, { x: id1, y: id6 }];
+      var result = underTest.conjunctionIds(terms, ['x', 'y']);
+      assert.deepEqual(result, { $or: terms });
+    });
 
   });
 

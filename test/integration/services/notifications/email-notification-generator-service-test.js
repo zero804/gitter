@@ -9,10 +9,10 @@ var mockito     = require('jsmockito').JsMockito;
 var Promise     = require('bluebird');
 
 var userSettingsService = testRequire('./services/user-settings-service');
-var userTroupeSettingsService = testRequire('./services/user-troupe-settings-service');
 var fixtureLoader       = require('../../test-fixtures');
 var underlyingUnreadItemService = testRequire('./services/unread-item-service');
 var mongoUtils = testRequire('./utils/mongo-utils');
+var userRoomNotificationService = testRequire("./services/user-room-notification-service");
 
 var unreadItemServiceMock = mockito.spy(underlyingUnreadItemService);
 
@@ -151,7 +151,7 @@ describe('email-notification-generator-service', function() {
 
     return Promise.all([
         userSettingsService.setUserSettings(fixture.user2.id, 'unread_notifications_optout', true),
-        userTroupeSettingsService.setUserSettings(fixture.user2.id, troupeId, 'notification', { push:  "all" }), // <-- NB
+        userRoomNotificationService.updateSettingForUserRoom(fixture.user2.id, troupeId, 'all')
       ])
       .then(function() {
         return unreadEngine.newItemWithMentions(troupeId, itemId1, [fixture.user2.id, fixture.user3.id], []);
@@ -190,7 +190,7 @@ it('SHOULD NOT email somebody who has opted out of notifications set to mention 
   var troupeId = fixture.troupe1.id;
 
   mockito.when(emailNotificationServiceMock).sendUnreadItemsNotification().then(function(user, troupeWithCounts) {
-    assert(user.id !== fixture.user2.id);
+    assert.notEqual(user.id, fixture.user2.id);
 
     if(user.id == fixture.user3.id) {
       v++;
@@ -205,7 +205,7 @@ it('SHOULD NOT email somebody who has opted out of notifications set to mention 
   return Promise.all([
       underlyingUnreadItemService.markAllChatsRead(fixture.user2.id, fixture.troupe1.id),
       userSettingsService.setUserSettings(fixture.user2.id, 'unread_notifications_optout', false),
-      userTroupeSettingsService.setUserSettings(fixture.user2.id, fixture.troupe1.id, 'notifications', { push: "mentions" } ), // <-- NB
+      userRoomNotificationService.updateSettingForUserRoom(fixture.user2.id, fixture.troupe1.id, 'mention')
     ])
     .then(function() {
       return unreadEngine.newItemWithMentions(troupeId, itemId1, [fixture.user2.id, fixture.user3.id], []);
@@ -253,7 +253,7 @@ it('SHOULD NOT email somebody who has opted out of notifications set to mention 
 
     Promise.all([
       userSettingsService.setUserSettings(fixture.user2.id, 'unread_notifications_optout', false),
-      userTroupeSettingsService.setUserSettings(fixture.user2.id, fixture.troupe1.id, 'notifications', { push: "all" } ), // <-- NB
+      userRoomNotificationService.updateSettingForUserRoom(fixture.user2.id, fixture.troupe1.id, 'all'),
       unreadEngine.newItemWithMentions(troupeId, itemId1, [fixture.user2.id, fixture.user3.id], [])
       ])
       .then(function() {
