@@ -11,7 +11,9 @@ var opts = require('yargs')
       required: true,
       description: 'Token to delete'
    })
-   .argv;
+   .help('help')
+  .alias('help', 'h')
+  .argv;
 
 
 function runScript(token) {

@@ -23,7 +23,9 @@ var opts = require('yargs')
   alias: 'c',
   default: 1000
 })
-.argv;
+.help('help')
+  .alias('help', 'h')
+  .argv;
 
 Promise.all([
   userService.findByUsernames(opts.users),

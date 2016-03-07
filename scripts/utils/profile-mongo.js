@@ -13,7 +13,9 @@ var opts = require('yargs')
       'default': 50,
       description: 'Max querytime'
    })
-   .argv;
+   .help('help')
+  .alias('help', 'h')
+  .argv;
 
 var max = opts.max;
 

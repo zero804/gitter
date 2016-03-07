@@ -15,6 +15,8 @@ var opts = require('yargs')
   .option('username', {
     description: "username of user list suggestions for"
   })
+  .help('help')
+  .alias('help', 'h')
   .argv;
 
 function getRooms() {

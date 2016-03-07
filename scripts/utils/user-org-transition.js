@@ -27,7 +27,9 @@ var opts = require('yargs')
       alias: 'd',
       description: 'Just show the users who will be affected'
    })
-   .argv;
+   .help('help')
+  .alias('help', 'h')
+  .argv;
 
 require('../../server/event-listeners').install();
 

@@ -15,6 +15,8 @@ var opts = require('yargs')
     required: true,
     description: "username of user to list presence for"
   })
+  .help('help')
+  .alias('help', 'h')
   .argv;
 
 var sockets;

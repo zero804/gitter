@@ -24,7 +24,9 @@ var opts = require('yargs')
       required: true,
       description: 'New uri for the room'
    })
-   .argv;
+   .help('help')
+  .alias('help', 'h')
+  .argv;
 
 var fromRoomInput = opts.from;
 var toRoomInput = opts.to;

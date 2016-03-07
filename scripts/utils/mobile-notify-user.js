@@ -10,7 +10,9 @@ var pushNotificationGateway = require('../../server/gateways/push-notification-g
 var opts = require('yargs').option('username', {
   required: true,
   description: 'username to look up e.g trevorah'
-}).argv;
+}).help('help')
+  .alias('help', 'h')
+  .argv;
 
 userService.findByUsername(opts.username)
   .then(function(user) {
