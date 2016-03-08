@@ -1,45 +1,55 @@
 'use strict';
 
-var _             = require('underscore');
+var _  = require('underscore');
 var closeTemplate = require('./minibar-close-item-view.hbs');
-var ItemView      = require('./minibar-item-view.js');
+var ItemView = require('./minibar-item-view.js');
+var generateMenuToggleButton = require('../../../../utils/generate-menu-toggle-button');
 
 module.exports = ItemView.extend({
   template: closeTemplate,
 
+  ui: {
+    toggleIcon: '.js-menu-toggle-icon'
+  },
+
   initialize: function(attrs) {
     this.roomModel = attrs.roomModel;
-    this.listenTo(this.roomModel, 'change:panelOpenState change:roomMenuIsPinned', this.onPanelOpenChange, this);
+    // 'change:panelOpenState change:roomMenuIsPinned'
+    this.listenTo(this.roomModel, 'change:roomMenuIsPinned', this.onPanelPinChange, this);
   },
 
   onItemClicked: function() {
     this.trigger('minibar-item:close');
   },
 
-  onPanelOpenChange: _.debounce(function() { //jshint unused: true
+  updatePinnedState: function() {
     var pinState  = this.roomModel.get('roomMenuIsPinned');
-    var openState = this.roomModel.get('panelOpenState');
+    //var openState = this.roomModel.get('panelOpenState');
 
-    //if the menu is open && pinned
-    if (!!openState && !!pinState) {
-      this.el.classList.add('left');
-      this.el.classList.remove('right');
+    // We do this because jQuery `toggleClass` doesn't work on SVG
+    if(!!pinState) {
+      this.ui.toggleIcon[0].classList.add('is-menu-pinned');
+    }
+    else {
+      this.ui.toggleIcon[0].classList.remove('is-menu-pinned');
     }
 
-    if (!!openState && !pinState) {
-      this.el.classList.add('right');
-      this.el.classList.remove('left');
-    }
+    this.ui.toggleIcon.trigger('update-toggle-icon-state');
+  },
 
-    if (!openState) {
-      this.el.classList.add('left');
-      this.el.classList.remove('right');
-    }
-  }, 200),
+  onPanelPinChange: function() {
+    this.updatePinnedState();
+  },
 
   onDestroy: function() {
     this.stopListening(this.roomModel);
   },
 
-});
+  onRender: function() {
+    this.updatePinnedState();
+    generateMenuToggleButton('.js-menu-toggle-icon', {
+      extraMouseOverElement: this.$el
+    });
+  }
 
+});
