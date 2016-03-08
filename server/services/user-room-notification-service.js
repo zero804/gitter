@@ -10,9 +10,16 @@ var persistence               = require('./persistence-service');
 var DEFAULT_NOTIFICATION_SETTING = 'all';
 
 var getSettingForUserRoom = Promise.method(function (userId, roomId) {
-  return userTroupeSettingsService.getUserSettings(userId, roomId, 'notifications')
-    .then(function(notificationSetting) {
-      return notificationSetting && notificationSetting.push || DEFAULT_NOTIFICATION_SETTING;
+  return Promise.join(
+    userTroupeSettingsService.getUserSettings(userId, roomId, 'notifications'),
+    roomMembershipService.getMemberLurkStatus(roomId, userId),
+    function(notificationSetting, lurk) {
+      var setting = notificationSetting && notificationSetting.push || DEFAULT_NOTIFICATION_SETTING;
+      return {
+        push: setting, // REMOVE THIS
+        mode: setting,
+        lurk: lurk
+      };
     });
 });
 
@@ -77,7 +84,7 @@ var updateSettingForUserRoom = Promise.method(function (userId, roomId, value, i
     userTroupeSettingsService.setUserSettings(userId, roomId, 'notifications', { push: value }),
     roomMembershipService.setMembershipMode(userId, roomId, value, isDefault),
     function() {
-      return value;
+      return getSettingForUserRoom(userId, roomId);
     });
 });
 
