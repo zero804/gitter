@@ -29,6 +29,8 @@ var opts = require('yargs')
   .option('toUser', {
     description: "id of room to list presence for"
   })
+  .help('help')
+  .alias('help', 'h')
   .argv;
 
 function getTroupe() {

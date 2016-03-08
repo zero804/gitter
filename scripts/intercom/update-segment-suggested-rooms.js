@@ -19,11 +19,13 @@ var getIntercomStream = require('intercom-stream');
 
 
 var opts = require('yargs')
-   .option('segment', {
-      alias: 's',
-      description: 'Id of the segment to list'
-   })
-   .argv;
+  .option('segment', {
+    alias: 's',
+    description: 'Id of the segment to list'
+  })
+  .help('help')
+  .alias('help', 'h')
+  .argv;
 
 if (!opts.segment) {
   // this just makes running the production (or beta) script much easier

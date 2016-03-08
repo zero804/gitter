@@ -14,6 +14,8 @@ var opts = require('yargs')
     required: false,
     description: 'Maximum count'
   })
+  .help('help')
+  .alias('help', 'h')
   .argv;
 
 

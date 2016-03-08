@@ -15,6 +15,8 @@ var opts = require('yargs')
     required: true,
     description: 'Output'
   }))
+  .help('help')
+  .alias('help', 'h')
   .argv;
 
 var resources = {};

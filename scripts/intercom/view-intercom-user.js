@@ -7,18 +7,20 @@ var intercom = require('gitter-web-intercom');
 
 
 var opts = require('yargs')
-   .option('id', {
-      required: false,
-      description: 'Intercom user id'
-   })
-   .option('user_id', {
-      required: false,
-      description: 'Mongo user id'
-   })
-   .option('email', {
-      required: false
-   })
-   .argv;
+  .option('id', {
+    required: false,
+    description: 'Intercom user id'
+  })
+  .option('user_id', {
+    required: false,
+    description: 'Mongo user id'
+  })
+  .option('email', {
+    required: false
+  })
+  .help('help')
+  .alias('help', 'h')
+  .argv;
 
 if (!opts.id && !opts.user_id && !opts.email) {
   throw new Error("id, user_id or email required.");

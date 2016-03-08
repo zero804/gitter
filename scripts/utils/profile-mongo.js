@@ -7,13 +7,15 @@ var mongoose = require('mongoose');
 require('../../server/services/persistence-service');
 
 var opts = require('yargs')
-   .option('max', {
-      alias: 'm',
-      required: false,
-      'default': 50,
-      description: 'Max querytime'
-   })
-   .argv;
+  .option('max', {
+    alias: 'm',
+    required: false,
+    'default': 50,
+    description: 'Max querytime'
+  })
+  .help('help')
+  .alias('help', 'h')
+  .argv;
 
 var max = opts.max;
 
@@ -48,4 +50,3 @@ connection.on('open', function () {
 
 
 });
-
