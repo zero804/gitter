@@ -7,7 +7,7 @@ var backboneUrlResolver = require('backbone-url-resolver');
 var SyncMixin           = require('./sync-mixin');
 
 var SuggestedCollection = Backbone.Collection.extend({
-  initialize: function(attrs) {
+  initialize: function(models, attrs) {
 
     if (!attrs || !attrs.contextModel) {
       throw new Error('A valid model must be passed to SuggestedOrgCollection when initialized');
@@ -37,7 +37,7 @@ var SuggestedCollection = Backbone.Collection.extend({
 });
 
 var FilteredSuggestedCollection = function(attrs, options) {
-  this.collection       = new SuggestedCollection(attrs, options);
+  this.collection       = new SuggestedCollection(null, attrs, options);
   this.roomCollection   = attrs.roomCollection;
   this.collectionFilter = this.collectionFilter.bind(this);
   attrs                 = _.extend({}, attrs, { collection: this.collection });
