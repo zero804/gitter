@@ -12,23 +12,28 @@ module.exports = Marionette.ItemView.extend({
 
   ui: {
     clear: '.js-search-clear',
-    input: 'input'
+    input: 'input',
   },
 
   events: {
     'change':          'onInputChange',
     'input':           'onInputChange',
-    'click @ui.clear': 'onClearClicked'
+    'click @ui.clear': 'onClearClicked',
   },
 
   modelEvents: {
     'change:state':      'onModelChangeState',
-    'change:searchTerm': 'onModelChangeSearchTerm'
+    'change:searchTerm': 'onModelChangeSearchTerm',
+  },
+
+  initialize: function() {
+    this.onModelChangeState();
   },
 
   onInputChange: _.debounce(function(e) {
     e.preventDefault();
     var val = e.target.value.trim();
+
     //This is here and not in a model change event because of the debounce
     //Obviously the styles need to change more quickly to give a responsive feel to thr ui
     //JP 10/2/16
@@ -38,19 +43,17 @@ module.exports = Marionette.ItemView.extend({
 
   onModelChangeState: function (model, val){ //jshint unused: true
     this.el.classList.toggle('active', (val === 'search'));
-    this.ui.input.focus();
+    if(val === 'search') { this.ui.input.focus(); }
   },
 
-  onModelChangeSearchTerm: function (model, val) { //jshint unused: true
+  onModelChangeSearchTerm: function(model, val) { //jshint unused: true
     this.ui.input.val(val);
     this.el.classList.toggle('empty', !val);
-    this.ui.input.focus();
   },
 
-  onClearClicked: function (e){
+  onClearClicked: function(e) {
     e.preventDefault();
     this.model.set('searchTerm', '');
-    this.ui.input.focus();
   },
 
 });

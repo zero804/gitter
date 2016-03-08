@@ -8,18 +8,20 @@ var StatusError = require('statuserror');
 
 require('../../server/event-listeners').install();
 
-var opts = require("nomnom")
+var opts = require('yargs')
    .option('old', {
-      abbr: 'o',
+      alias: 'o',
       required: true,
-      help: 'Old username for the user'
+      description: 'Old username for the user'
    })
    .option('new', {
-      abbr: 'n',
+      alias: 'n',
       required: true,
-      help: 'New username for the user'
+      description: 'New username for the user'
    })
-   .parse();
+   .help('help')
+  .alias('help', 'h')
+  .argv;
 
 userService.findByUsername(opts.old)
   .then(function(user) {

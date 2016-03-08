@@ -8,7 +8,7 @@ var shutdown = require('shutdown');
 
 require('../../server/event-listeners').install();
 
-var opts = require("nomnom")
+var opts = require('yargs')
    .option('user', {
       abbr: 'u',
       required: true

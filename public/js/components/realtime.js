@@ -118,9 +118,10 @@ function getOrCreateClient() {
     authProvider: authProvider,
     fayeOptions: c.options,
     extensions: [
-        handshakeExtension,
-        accessTokenFailureExtension
-      ]
+      handshakeExtension,
+      accessTokenFailureExtension
+    ],
+    websocketsDisabled: context.hasFeature('disable-websockets')
   });
 
   client.on('stats', function (type, statName, value) {
