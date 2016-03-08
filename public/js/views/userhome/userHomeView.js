@@ -31,7 +31,7 @@ module.exports = (function() {
     },
 
     initSuggestedRoomsRegion: function(optionsForRegion) {
-      var suggestedRoomCollection = new FilteredSuggestedRoomsCollection(null, { roomsCollection: troupeCollections.troupes });
+      var suggestedRoomCollection = new FilteredSuggestedRoomsCollection({ roomsCollection: troupeCollections.troupes });
       suggestedRoomCollection.fetchForUser();
 
       return new SuggestedCollectionView(optionsForRegion({ collection: suggestedRoomCollection }));

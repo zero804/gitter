@@ -1,7 +1,5 @@
 "use strict";
 
-var _                    = require('underscore');
-var moment               = require('moment');
 var context              = require('utils/context');
 var realtime             = require('components/realtime');
 var gitterRealtimeClient = require('gitter-realtime-client');

@@ -2,27 +2,30 @@
 /*jslint node:true, unused:true */
 "use strict";
 
+var Promise = require('bluebird');
 var troupeService = require('../../server/services/troupe-service');
 var unreadItemService = require('../../server/services/unread-item-service');
-var roomMembershipService = require("../../server/services/room-membership-service");
+var roomMembershipService = require('../../server/services/room-membership-service');
 var persistence = require('../../server/services/persistence-service');
 var mongoUtils = require('../../server/utils/mongo-utils');
 var shutdown = require('shutdown');
-var Promise = require('bluebird');
+var shimPositionOption = require('../yargs-shim-position-option');
 
 // require('../../server/event-listeners').install();
 
-var opts = require("nomnom")
-  .option('uri', {
+var opts = require('yargs')
+  .option('uri', shimPositionOption({
     position: 0,
     required: true,
-    help: "uri of room, eg: gitterHQ/gitter"
-  })
+    description: 'uri of room, eg: gitterHQ/gitter'
+  }))
   .option('dryRun', {
-    flag: true,
-    help: "Dry run"
+    type: 'boolean',
+    description: 'Dry run'
   })
-  .parse();
+  .help('help')
+  .alias('help', 'h')
+  .argv;
 
 function main(uri, dryRun) {
   return troupeService.findByUri(uri)

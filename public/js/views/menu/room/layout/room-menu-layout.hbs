@@ -3,31 +3,31 @@
     <nav id="minibar" class="minibar nano">
       <ul id="minibar-list" class="room-menu-options nano-content">
 
-        <li data-state-change="all" class="room-menu-options__item--all">
+        <li data-state-change="all" id="minibar-all"  class="room-menu-options__item--all">
           <a><img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/logo.svg"}}' /></a>
         </li>
 
-        <li data-state-change="search" class="room-menu-options__item--search">
+        <li data-state-change="search" id="minibar-search" class="room-menu-options__item--search">
           <a><img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/search.svg"}}' /></a>
         </li>
 
-        <li data-state-change="favourite" class="room-menu-options__item--favourite">
+        <li data-state-change="favourite" id="minibar-favourite" class="room-menu-options__item--favourite">
           <a><img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/favourites.svg"}}' /></a>
         </li>
 
-        <li data-state-change="people" class="room-menu-options__item--people">
+        <li data-state-change="people" id="minibar-people" class="room-menu-options__item--people">
           <a><img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/people.svg"}}' /></a>
         </li>
 
         {{#each leftMenuOrgs}} {{! JP 9/12/15 }} {{! TODO SHOULD THIS BE MOVED INTO A PARTIAL TO BE SHARED AROUND }}
-        <li data-state-change="org" data-org-name="{{name}}" class="room-menu-options__item--org">
+          <li data-state-change="org" id="minibar-{{name}}"  data-org-name="{{name}}" class="room-menu-options__item--org">
           {{#if mentions}}<span class="room-menu-options__item__mentions">{{mentions}}</span>{{/if}}
           {{#if unreadItems}}<span class="room-menu-options__item__unread-items">{{unreadItems}}</span>{{/if}}
           <a><img class="room-menu-options__item__avatar" src="{{imgUrl}}" /></a>
         </li>
         {{/each}}
 
-        <li data-state-change="close" class="room-menu-options__item--close {{#if roomMenuIsPinned}}left{{/if}}">
+        <li data-state-change="close" id="minibar-close"  class="room-menu-options__item--close {{#if roomMenuIsPinned}}left{{/if}}">
           <a id="menu-close-button" class="menu-close-button">
             <div class="close-icon">
               <div class="close-icon-stay"></div>
@@ -51,9 +51,10 @@
             <div id="search-input"></div>
             <section id="primary-collection">
               <div class="primary-collection loaded active">
+                <header><h2 class="collection__title hidden" id="primary-collection-search-header">Rooms &amp; People</h2></header>
                 <div id="collection-list">
                   {{#each leftMenuRooms}}
-                    <div class="room-item" data-id="{{id}}">
+                    <div class="room-item" id="{{id}}"  data-id="{{id}}">
                       {{{ prerenderView "js/views/menu/room/primary-collection/primary-collection-view" }}}
                     </div>
                   {{/each}}

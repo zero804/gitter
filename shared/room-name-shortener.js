@@ -1,17 +1,22 @@
 'use strict';
 
-module.exports = function roomNameShortener(name){
-  if(!name) return '';
-  if(name[0] === '/') { name = name.substring(1) }
-  while(name.length > 19) {
-    name = spliceFirstPart(name);
-    //Using a RegExp here is actually faster than splitting and testing length
-    //JP 10/2/16 http://jsperf.com/testing-for-slashes/2
-    if(!/\//.test(name)){ break }
-  }
-  return name;
-};
+module.exports = function roomNameShortener(name) {
+  var resultantName = '';
 
-function spliceFirstPart(name) {
-  return name.split('/').slice(1).join('/');
-}
+  name
+    .split('/')
+    .reverse()
+    .some(function(piece, index) {
+      var newResult = piece + (resultantName.length ? '/' : '') + resultantName;
+
+      if(newResult.length <= 19 || index === 0) {
+        resultantName = newResult;
+      }
+      else {
+        // break, we went over with this piece
+        return true;
+      }
+    }, '');
+
+  return resultantName || name;
+};

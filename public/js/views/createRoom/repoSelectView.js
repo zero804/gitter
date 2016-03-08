@@ -13,7 +13,7 @@ var LoadingCollectionMixin    = require('views/loading-mixin');
 var liveSearch                = require('views/controls/live-search');
 var dataset                   = require('utils/dataset-shim');
 
-require('filtered-collection');
+var FilteredCollection = require('backbone-filtered-collection');
 
 
 
@@ -56,7 +56,7 @@ var createCollection = function()  {
   var underlying = new repoModels.ReposCollection();
   underlying.fetch();
 
-  var c = new Backbone.FilteredCollection(null, { model: repoModels.RepoModel, collection: underlying });
+  var c = new FilteredCollection({ model: repoModels.RepoModel, collection: underlying });
   // Trigger loading/loaded triggers on the filtered collection
   loadingFilteredCollection(c);
   c.setFilter(function() {
