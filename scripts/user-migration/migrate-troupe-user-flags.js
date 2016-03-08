@@ -3,9 +3,6 @@
 'use strict';
 
 var persistence = require('../../server/services/persistence-service');
-var userService = require('../../server/services/user-service');
-var troupeService = require('../../server/services/troupe-service');
-var collections = require('../../server/utils/collections');
 var roomMembershipFlags = require('../../server/services/room-membership-flags');
 var onMongoConnect = require('../../server/utils/on-mongo-connect');
 var through2Concurrent = require('through2-concurrent');
@@ -43,65 +40,6 @@ function preloadUserTroupeSettings() {
 
   });
 }
-
-// function getModeFromLurkAndSettings(lurk, notificationSetting) {
-//   switch(notificationSetting || "none") {
-//     case "all":
-//       if (lurk) {
-//         return { mode: "mention", warning: 1 };
-//       } else {
-//         return { mode: "all" };
-//       }
-//       break;
-//
-//     case "mention":
-//     case "announcement":
-//       if (lurk) {
-//         return { mode: "mention" };
-//       } else {
-//         return { mode: "mention", warning: 2 }; // Add a warning!
-//       }
-//       break;
-//
-//     case "mute":
-//       if (lurk) {
-//         return { mode: "mute" };
-//       } else {
-//         return { mode: "mute", warning: 3 }; // Add a warning!
-//       }
-//
-//       break;
-//
-//     case "none":
-//       if (lurk) {
-//         return { mode: "mention" };
-//       } else {
-//         return { mode: "all", isDefault: true };
-//       }
-//       break;
-//
-//     default:
-//       // Add a warning
-//       if (lurk) {
-//         return { mode: "mention", warning: 4, warningMessage: "Unknown setting " + JSON.stringify(notificationSetting) + " (lurk=1) "};
-//       } else {
-//         return { mode: "all", warning: 4, warningMessage: "Unknown setting " + JSON.stringify(notificationSetting) + " (lurk=0) " };
-//       }
-//   }
-// }
-//
-// function getModeForTroupeUser(userId, troupeId, flags, lurk, notificationSetting) {
-//   var calculated = getModeFromLurkAndSettings(lurk, notificationSetting);
-//
-//   if (flags !== undefined && flags !== null) {
-//     var currentMode = roomMembershipFlags.getModeFromFlags(flags);
-//     if (currentMode !== calculated.mode) {
-//       calculated.mismatch = "Calculated " + calculated.mode + " but set as " + currentMode + " " + JSON.stringify({ lurk: lurk, notificationSetting: notificationSetting, flags: Number(flags).toString(2) });
-//     }
-//   }
-//
-//   return calculated;
-// }
 
 function getFlagsForSettings(settings, lurk) {
   lurk = !!lurk;
@@ -170,8 +108,8 @@ function getFlagsForSettings(settings, lurk) {
     flags: flagsWithLurk,
     warning: warning
   };
-
 }
+
 function getTroupeUserBatchUpdates(troupeUsers, notificationSettings) {
   var updates = _.map(troupeUsers, function(troupeUser) {
     var lurk = troupeUser.lurk;
