@@ -28,12 +28,17 @@
         {{/each}}
 
         <li data-state-change="close" id="minibar-close"  class="room-menu-options__item--close {{#if roomMenuIsPinned}}left{{/if}}">
-          <a id="menu-close-button" class="menu-close-button">
-            <div class="close-icon">
-              <div class="close-icon-stay"></div>
-              <div class="close-icon-stay"></div>
-              <div class="close-icon-stay"></div>
-            </div>
+          <a id="menu-toggle-button" class="menu-toggle-button">
+            <svg
+                 class="menu-toggle-icon js-menu-toggle-icon"
+                 width="30px"
+                 height="34px"
+                 viewBox="0 0 30 34"
+             >
+              <path d="M0,6 l15,0 l15,0" />
+              <path d="M0,17 l15,0 l15,0" />
+              <path d="M0,28 l15,0 l15,0" />
+            </svg>
           </a>
         </li>
 
