@@ -14,17 +14,19 @@ var Promise = require('bluebird');
 require('../../server/event-listeners').install();
 
 var opts = require('yargs')
-   .option('from', {
-      alias: 'f',
-      required: true,
-      description: 'Old uri for the room'
-   })
-   .option('to', {
-      alias: 't',
-      required: true,
-      description: 'New uri for the room'
-   })
-   .argv;
+  .option('from', {
+    alias: 'f',
+    required: true,
+    description: 'Old uri for the room'
+  })
+  .option('to', {
+    alias: 't',
+    required: true,
+    description: 'New uri for the room'
+  })
+  .help('help')
+  .alias('help', 'h')
+  .argv;
 
 var fromRoomInput = opts.from;
 var toRoomInput = opts.to;

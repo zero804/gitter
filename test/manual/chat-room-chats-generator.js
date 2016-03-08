@@ -10,20 +10,22 @@ var dictionary = require('lorem-ipsum/lib/dictionary').words;
 require('../../server/event-listeners').install();
 
 var opts = require('yargs')
-.option('room', {
-  alias: 'r',
-  required: true
-})
-.option('users', {
-  alias: 'u',
-  required: true,
-  type: 'array'
-})
-.option('count', {
-  alias: 'c',
-  default: 1000
-})
-.argv;
+  .option('room', {
+    alias: 'r',
+    required: true
+  })
+  .option('users', {
+    alias: 'u',
+    required: true,
+    type: 'array'
+  })
+  .option('count', {
+    alias: 'c',
+    default: 1000
+  })
+  .help('help')
+  .alias('help', 'h')
+  .argv;
 
 Promise.all([
   userService.findByUsernames(opts.users),

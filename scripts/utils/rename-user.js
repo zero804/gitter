@@ -19,7 +19,9 @@ var opts = require('yargs')
       required: true,
       description: 'New username for the user'
    })
-   .argv;
+   .help('help')
+  .alias('help', 'h')
+  .argv;
 
 userService.findByUsername(opts.old)
   .then(function(user) {
