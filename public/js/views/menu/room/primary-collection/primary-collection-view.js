@@ -121,7 +121,8 @@ var PrimaryCollectionView = BaseCollectionView.extend({
 
   //Before we render we remove the collection container from the drag & drop instance
   onBeforeRender: function() {
-    this.domMap = domIndexById(this.el.children[0]);
+    //use the second child because the first child is the hidden search header
+    this.domMap = domIndexById(this.el.children[1]);
     this.dndCtrl.removeContainer(this.ui.collection[0]);
   },
 
