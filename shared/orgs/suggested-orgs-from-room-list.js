@@ -30,9 +30,8 @@ module.exports = function suggestedOrgsFromRoomList(roomList, uri) {
     return memo;
   }, []);
 
-  //If we are viewing a room for an org in which the user is not yet a memeber of
-  //shunt the new org to the top of the minibar list
-  //JP 8/3/16
+  //If we are viewing a room owned by an org which the user is not yet a memeber of
+  //we shunt the new org to the top of the minibar list JP 8/3/16
   var currentOrg    = getOrgNameFromTroupeName(uri);
 
   //This is pretty dodge tbh. JP 7/3/16
