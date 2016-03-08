@@ -102,6 +102,7 @@ var View = Marionette.ItemView.extend({
       option.value = val;
       option.textContent = text;
       option.selected = true;
+      option.style.display = 'none';
       selectInput.append(option);
     }
   },
