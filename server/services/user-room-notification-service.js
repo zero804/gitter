@@ -68,14 +68,14 @@ var findSettingsForMultiUserRooms = Promise.method(function (userRooms) {
  * Update the notification setting for a single user in a room.
  * Returns the new mode for the user
  */
-var updateSettingForUserRoom = Promise.method(function (userId, roomId, value) {
+var updateSettingForUserRoom = Promise.method(function (userId, roomId, value, isDefault) {
   if (value !== 'mention' && value !== 'all' && value !== 'mute') {
     throw new StatusError(400, 'Invalid notification setting ' + value);
   }
 
   return Promise.join(
     userTroupeSettingsService.setUserSettings(userId, roomId, 'notifications', { push: value }),
-    roomMembershipService.setMembershipMode(userId, roomId, value),
+    roomMembershipService.setMembershipMode(userId, roomId, value, isDefault),
     function() {
       return value;
     });
@@ -85,7 +85,7 @@ var updateSettingForUserRoom = Promise.method(function (userId, roomId, value) {
  * Update the settings for many users in a room. Return the new mode for the
  * users
  */
-var updateSettingsForUsersInRoom = Promise.method(function (roomId, userIds, value) {
+var updateSettingsForUsersInRoom = Promise.method(function (roomId, userIds, value, isDefault) {
   if (value !== 'mention' && value !== 'all' && value !== 'mute' && value !== 'announcement') {
     throw new StatusError(400, 'Invalid notification setting ' + value);
   }
@@ -98,7 +98,7 @@ var updateSettingsForUsersInRoom = Promise.method(function (roomId, userIds, val
   if (!userIds || !userIds.length) return;
 
   return Promise.join(
-    roomMembershipService.setMembershipModeForUsersInRoom(roomId, userIds, value),
+    roomMembershipService.setMembershipModeForUsersInRoom(roomId, userIds, value, isDefault),
     userTroupeSettingsService.setUserSettingsForUsersInTroupe(roomId, userIds, 'notifications', { push: value }),
     function() {
       return value;
