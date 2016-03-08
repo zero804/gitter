@@ -3,9 +3,6 @@
 'use strict';
 
 var persistence = require('../../server/services/persistence-service');
-var userService = require('../../server/services/user-service');
-var troupeService = require('../../server/services/troupe-service');
-var collections = require('../../server/utils/collections');
 var roomMembershipFlags = require('../../server/services/room-membership-flags');
 var onMongoConnect = require('../../server/utils/on-mongo-connect');
 var through2Concurrent = require('through2-concurrent');
@@ -20,7 +17,7 @@ function preloadUserTroupeSettings() {
     var count = 0;
     return persistence.UserTroupeSettings.find({}, { userId: 1, troupeId: 1, 'settings.notifications.push': 1, _id: 0 })
       .lean()
-      .read('secondary')
+      .read('secondaryPreferred')
       .stream()
       .on('error', reject)
       .on('end', function() {
@@ -44,67 +41,76 @@ function preloadUserTroupeSettings() {
   });
 }
 
-function getModeFromLurkAndSettings(lurk, notificationSetting) {
-  switch(notificationSetting || "none") {
+function getFlagsForSettings(settings, lurk) {
+  lurk = !!lurk;
+  var flags, flagsWithLurk;
+  var warning;
+  var defaultValue;
+
+  switch(settings || "none") {
     case "all":
-      if (lurk) {
-        return { mode: "mention", warning: 1 };
-      } else {
-        return { mode: "all" };
+      flags = roomMembershipFlags.getFlagsForMode("all", false);
+      flagsWithLurk = roomMembershipFlags.toggleLegacyLurkMode(flags, lurk);
+
+      if (flagsWithLurk !== flags) {
+        warning = lurk ? "all_with_lurk" : "unhandled_case_1";
       }
+
+      defaultValue = false;
       break;
 
-    case "mention":
     case "announcement":
-      if (lurk) {
-        return { mode: "mention" };
-      } else {
-        return { mode: "mention", warning: 2 }; // Add a warning!
+    case "mention":
+      flags = roomMembershipFlags.getFlagsForMode(settings, false);
+      flagsWithLurk = roomMembershipFlags.toggleLegacyLurkMode(flags, lurk);
+
+      if (flagsWithLurk !== flags) {
+        warning = lurk ? "unhandled_case_2" : "mention_with_unread";
       }
+
+      defaultValue = false;
       break;
 
     case "mute":
-      if (lurk) {
-        return { mode: "mute" };
-      } else {
-        return { mode: "mute", warning: 3 }; // Add a warning!
+      flags = roomMembershipFlags.getFlagsForMode(settings, false);
+      flagsWithLurk = roomMembershipFlags.toggleLegacyLurkMode(flags, lurk);
+
+      if (flagsWithLurk !== flags) {
+        warning = lurk ? "unhandled_case_3" : "mute_with_unread";
       }
 
+      defaultValue = false;
       break;
 
     case "none":
       if (lurk) {
-        return { mode: "mention" };
+        flagsWithLurk = flags = roomMembershipFlags.getFlagsForMode("announcement", false);
       } else {
-        return { mode: "all" };
+        flagsWithLurk = flags = roomMembershipFlags.getFlagsForMode("all", true);
+        defaultValue = true;
       }
       break;
 
     default:
-      // Add a warning
       if (lurk) {
-        return { mode: "mention", warning: "Unknown setting " + JSON.stringify(notificationSetting) + " (lurk=1) "};
+        flags = roomMembershipFlags.getFlagsForMode("announcement", false);
+        warning = "unknown_with_lurk";
       } else {
-        return { mode: "all", warning: "Unknown setting " + JSON.stringify(notificationSetting) + " (lurk=0) " };
+        flags = roomMembershipFlags.getFlagsForMode("all", true);
+        warning = "unknown_without_lurk";
       }
-  }
-}
-
-function getModeForTroupeUser(userId, troupeId, flags, lurk, notificationSetting) {
-  var calculated = getModeFromLurkAndSettings(lurk, notificationSetting);
-
-  if (flags !== undefined && flags !== null) {
-    var currentMode = roomMembershipFlags.getModeFromFlags(flags);
-    if (currentMode !== calculated.mode) {
-      calculated.mismatch = "Calculated " + calculated.mode + " but set as " + currentMode + " " + JSON.stringify({ lurk: lurk, notificationSetting: notificationSetting, flags: Number(flags).toString(2) });
-    }
+      break;
   }
 
-  return calculated;
+  return {
+    lurk: lurk,
+    isDefault: defaultValue,
+    flags: flagsWithLurk,
+    warning: warning
+  };
 }
 
-
-function updateTroupeUserBatch(troupeUsers, notificationSettings) {
+function getTroupeUserBatchUpdates(troupeUsers, notificationSettings) {
   var updates = _.map(troupeUsers, function(troupeUser) {
     var lurk = troupeUser.lurk;
     var flags = troupeUser.flags;
@@ -112,11 +118,17 @@ function updateTroupeUserBatch(troupeUsers, notificationSettings) {
     var troupeId = troupeUser.troupeId;
     var notificationSetting = notificationSettings[userId + ":" + troupeId];
 
+    var info = getFlagsForSettings(notificationSetting, lurk);
+
     return {
       _id: troupeUser._id,
       userId: troupeUser.userId,
       troupeId: troupeUser.troupeId,
-      update: getModeForTroupeUser(userId, troupeId, flags, lurk, notificationSetting)
+      currentFlags: flags,
+      newFlags: info.flags,
+      lurk: info.lurk,
+      warning: info.warning,
+      isDefault: info.isDefault
     };
   });
 
@@ -125,12 +137,47 @@ function updateTroupeUserBatch(troupeUsers, notificationSettings) {
 
 function getTroupeUsersBatchedStream() {
   return persistence.TroupeUser
-    .find({})
-    .slaveOk()
-    .read('secondary')
+    .find({ $or: [{
+      flags: { $exists: false }
+    }, {
+      flags: null
+    }, {
+      flags: 0
+    }]})
+    .read('secondaryPreferred')
     .stream()
     .pipe(new BatchStream({ size: 4096 }));
 }
+
+var bulkUpdate = Promise.method(function (updates) {
+  if (!updates || !updates.length) return;
+
+  var bulk = persistence.TroupeUser.collection.initializeUnorderedBulkOp();
+
+  updates.forEach(function(update) {
+    bulk.find({ _id: update._id, $or: [{
+      flags: { $exists: false }
+    }, {
+      flags: null
+    }, {
+      flags: 0
+    } ] })
+    .updateOne({
+      $set: {
+        flags: update.newFlags,
+        lurk: update.lurk
+      }
+    });
+  });
+
+  return Promise.fromCallback(function(callback) {
+      bulk.execute(callback);
+    })
+    .then(function(result) {
+      console.log(result.toJSON());
+    });
+
+});
 
 function migrateTroupeUsers(notificationSettings) {
   return new Promise(function(resolve, reject) {
@@ -140,8 +187,9 @@ function migrateTroupeUsers(notificationSettings) {
         console.log('## Updating batch');
 
         count += troupeUsers.length;
-        updateTroupeUserBatch(troupeUsers, notificationSettings);
-        callback();
+        var updates = getTroupeUserBatchUpdates(troupeUsers, notificationSettings);
+        return bulkUpdate(updates)
+          .asCallback(callback);
       }))
       .on('end', function() {
         resolve();
@@ -151,44 +199,45 @@ function migrateTroupeUsers(notificationSettings) {
   });
 }
 
-function displayWarningsForUpdates(warnings) {
-  if (!warnings.length) return Promise.resolve();
-
-  var uniqueUserIds = _(warnings)
-    .map(function(f) { return "" + f.userId; })
-    .uniq()
-    .value();
-
-  var uniqueTroupeIds = _(warnings)
-    .map(function(f) { return "" + f.troupeId; })
-    .uniq()
-    .value();
-
-  return Promise.join(
-    userService.findByIdsLean(uniqueUserIds, { username: 1 }),
-    troupeService.findByIdsLean(uniqueTroupeIds, { uri: 1 }),
-    function(users, troupes) {
-      var usersHashed = collections.indexById(users);
-      var troupesHashed = collections.indexById(troupes);
-
-      _.each(warnings, function(warning) {
-        var user = usersHashed[warning.userId];
-        var troupe = troupesHashed[warning.troupeId];
-        console.log(user && user.username, troupe && troupe.uri, warning.update);
-      });
-    });
-}
-
 function dryrunTroupeUsers(notificationSettings) {
+  var defaultCount = 0;
+  var warningCount = 0;
+  var warningAggregation = {
+
+  };
+  var count = 0;
+
   return new Promise(function(resolve, reject) {
     getTroupeUsersBatchedStream()
       .pipe(through2Concurrent.obj({ maxConcurrency: 1 }, function(troupeUsers, enc, callback) {
-        var updates = updateTroupeUserBatch(troupeUsers, notificationSettings);
-        var warnings = _.filter(updates, function(f) { return f.update.mismatch || f.update.warning; });
-        return displayWarningsForUpdates(warnings)
-          .asCallback(callback);
+
+        count += troupeUsers.length;
+        console.log('## Processesing batch', count);
+
+        var updates = getTroupeUserBatchUpdates(troupeUsers, notificationSettings);
+        _.forEach(updates, function(f) {
+          if (f.isDefault) {
+            defaultCount++;
+          }
+
+          var warning = f.warning;
+          if (warning) {
+            warningCount++;
+            if (!warningAggregation[warning]) {
+              warningAggregation[warning] = 1;
+            } else {
+              warningAggregation[warning]++;
+            }
+          }
+        });
+        return callback();
+        // return displayWarningsForUpdates(warnings)
+        //   .asCallback(callback);
       }))
       .on('end', function() {
+        console.log('TroupeUsers on default settings: ' + defaultCount);
+        console.log('TroupeUsers with warnings: ' + warningCount);
+        console.log('Warning types: ', JSON.stringify(warningAggregation, null, '  '));
         resolve();
       })
       .on('error', reject)
