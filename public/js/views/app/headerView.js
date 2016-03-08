@@ -31,21 +31,22 @@ module.exports = Marionette.ItemView.extend({
   },
 
   ui: {
-    cog:          '.js-chat-settings',
-    dropdownMenu: '#cog-dropdown',
-    topic:        '.js-chat-topic',
-    name:         '.js-chat-name',
-    favourite:    '.js-favourite-button',
-    orgrooms:     '.js-org-page',
+    cog:            '.js-chat-settings',
+    dropdownMenu:   '#cog-dropdown',
+    topic:          '.js-chat-topic',
+    topicActivator: '.js-chat-topic-activator',
+    name:           '.js-chat-name',
+    favourite:      '.js-favourite-button',
+    orgrooms:       '.js-org-page',
   },
 
   events: {
-    'click @ui.cog':       'showDropdown',
-    'click #leave-room':   'leaveRoom',
-    'click @ui.favourite': 'toggleFavourite',
-    'dblclick @ui.topic':  'showInput',
-    'keydown textarea':    'detectKeys',
-    'click @ui.orgrooms':  'goToOrgRooms',
+    'click @ui.cog':               'showDropdown',
+    'click #leave-room':           'leaveRoom',
+    'click @ui.favourite':         'toggleFavourite',
+    'dblclick @ui.topicActivator': 'showInput',
+    'keydown textarea':            'detectKeys',
+    'click @ui.orgrooms':          'goToOrgRooms',
   },
 
   behaviors: {
@@ -151,6 +152,14 @@ module.exports = Marionette.ItemView.extend({
     if (topicEl) {
       autolink(topicEl);
     }
+
+    var spacebarKey = 32;
+    var enterKey = 13;
+    this.ui.topicActivator.on('keydown', function(e) {
+      if(e.type === 'click' || (e.type === 'keydown' && (e.keyCode === spacebarKey || e.keyCode === enterKey))) {
+        this.showInput();
+      }
+    }.bind(this));
   },
 
   showDropdown: function() {

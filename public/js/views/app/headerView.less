@@ -73,14 +73,9 @@
   position: relative;
   flex: 1;
 
-  & .topic-input {
-    width: 95%;
-    resize: none;
-    height: 20px;
-    margin-bottom: 0px;
-    padding: 1px 2px;
+  &:focus {
+    outline: none;
   }
-
 }
 
 .chat-header__topic-wrapper {
@@ -98,7 +93,7 @@
 .chat-header__topic {
   box-sizing: border-box;
   overflow: hidden;
-  display: inline-block;
+  display: flex;
   vertical-align: baseline;
   width: 100%;
   // min height so that an empty topic can be double clicked to edit
@@ -115,14 +110,56 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 
+  cursor: pointer;
+
   transition: max-height .5s ease-in-out;
 
-  .chat-header__topic-wrapper:hover & {
-    // pleanty of room to auto expand into
+
+  &:after {
+    content: '\e810';
+    margin-left: 1em;
+    opacity: 0;
+    font-family: 'fontello';
+
+    transition: opacity .2s ease;
+  }
+
+  &:empty {
+    &:before {
+      content: 'Double-click here to enter a description for your room.';
+      opacity: 0;
+      font-style: italic;
+
+      transition: opacity .2s ease;
+    }
+  }
+
+  .chat-header__topic-grouping:hover &,
+  .chat-header__topic-grouping:focus & {
+    // plenty of room to auto expand into
     max-height: 800px;
 
     white-space: normal;
     word-wrap: break-word;
+
+    &:after {
+      opacity: 1;
+    }
+
+    &:empty {
+      &:before {
+        opacity: 1;
+      }
+    }
+  }
+
+
+  & .topic-input {
+    flex: 1;
+    resize: none;
+    height: 20px;
+    margin-bottom: 0px;
+    padding: 1px 2px;
   }
 }
 
