@@ -31,7 +31,10 @@ router.get('/*', function(req, res, next) {
 router.get('/',
   identifyRoute('login'),
   function(req, res) {
-    res.render('login', { });
+    res.render('login', {
+      bootScriptName: 'router-login',
+      cssFileName:  "styles/login.css",
+    });
   });
 
 // ----------------------------------------------------------
