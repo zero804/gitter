@@ -15,13 +15,13 @@
 </div>
 
 
-{{#unless oneToOne}}
 <div class="chat-header__main-grouping chat-header__topic-grouping">
   <div class="chat-header__topic-wrapper">
+    {{~#unless oneToOne~}}
     <p class="js-chat-topic chat-header__topic">{{troupeTopic}}</p>
+    {{~/unless~}}
   </div>
 </div>
-{{/unless}}
 
 
 <div class="chat-header__main-grouping">
@@ -38,11 +38,9 @@
       <div class="chat-header__favourite js-favourite-button">
         <i class="chat-header__action-icon icon-star-empty {{#if troupeFavourite}}favourite{{/if}}"></i>
       </div>
-        {{#unless oneToOne}}
-          <div class="chat-header__settings js-chat-settings" data-toggle="dropdown">
-            <i class="chat-header__action-icon icon-slider-vertical"></i>
-          </div>
-        {{/unless}}
+      <div class="chat-header__settings js-chat-settings" data-toggle="dropdown">
+        <i class="chat-header__action-icon icon-slider-vertical"></i>
+      </div>
     {{/if}}
   {{/unless}}
 </div>

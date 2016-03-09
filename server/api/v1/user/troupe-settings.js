@@ -1,26 +1,34 @@
 "use strict";
 
-var userTroupeSettingsService = require("../../../services/user-troupe-settings-service");
+var userRoomNotificationService = require("../../../services/user-room-notification-service");
+var StatusError = require('statuserror');
 
 module.exports = {
   id: 'setting',
-  index: function(req) {
-    return userTroupeSettingsService.getAllUserSettings(req.resourceUser.id, req.params.userTroupeId)
-      .then(function(settings) {
-        return settings || {};
-      });
-  },
 
   show: function(req) {
-    return userTroupeSettingsService.getUserSettings(req.resourceUser.id, req.params.userTroupeId, req.params.setting)
-      .then(function(f) {
-        return f || {};
-      });
+    var userId = req.resourceUser.id;
+    var troupeId = req.params.userTroupeId;
+    var setting = req.params.setting;
+
+    if (setting !== 'notifications') throw new StatusError(404);
+
+    return userRoomNotificationService.getSettingForUserRoom(userId, troupeId);
   },
 
   update: function(req) {
+    var userId = req.resourceUser.id;
+    var troupeId = req.params.userTroupeId;
+    var setting = req.params.setting;
+
+    if (setting !== 'notifications') throw new StatusError(404);
+
     var settings = req.body;
-    return userTroupeSettingsService.setUserSettings(req.resourceUser.id, req.params.userTroupeId, req.params.setting, settings);
+    var mode = settings && (settings.mode || settings.push);
+
+    if (!mode) throw new StatusError(400, 'Illegal notifications mode');
+
+    return userRoomNotificationService.updateSettingForUserRoom(userId, troupeId, mode, false);
   }
 
 };

@@ -18,6 +18,7 @@ module.exports = {
         *  false, undefined: no lurking
         *  true: lurking
         */
+      flags: { type: Number },
     });
     TroupeUserSchema.schemaTypeName = 'TroupeUserSchema';
 

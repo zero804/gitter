@@ -1,26 +1,26 @@
 <div class="modal-content">
   <form id="troupeSettings">
 
-    <select class="trpInput" style="width: 306px; height: 36px" id="notification-options">
-      <option value="all">Notify me for all messages</option>
-      <option value="mention">Notify me when somebody mentions me</option>
-      <option value="mute">Don't notify me at all</option>
+    <select class="trpInput" style="width: 80%; height: 36px" id="notification-options">
     </select>
-    <br>
-    <label for="unread-checkbox" style="color: black;">
-      <input type="checkbox" id="unread-checkbox" name="lurk" value="1" style="display:inline" {{#if lurk}}checked{{/if}}/>
-      Hide unread message badge
-    </label>
-    <br>
-    <br>
-    <div class="u-font-smaller" style="color: #999">
-      Notification settings only apply to you and not to other users.
+
+    <div class="u-font-smaller" id="nonstandard">
       <br>
+      <p><strong>Legacy settings</strong>: We've simplied our notification settings but you're using
+        outdated settings. Choose a new option from the pull-down, or just leave them as
+        they are for now.</p>      
+    </div>
+
+    <div class="u-font-smaller" style="color: #999">
+      <br>
+      <p>
+      Notification settings only apply to you and not to other users.
       {{#if notificationsBlocked}}
         Notifications have beed disabled by your browser. <a href="/apps" target="new">Download Gitter Apps</a> or change your permissions to receive notifications.
       {{else}}
         <a href="/apps" target="new">Download Gitter Apps</a> for always-on desktop notifications.
       {{/if}}
+      </p>
     </div>
   </div>
 

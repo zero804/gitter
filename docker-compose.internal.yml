@@ -32,7 +32,7 @@ sentinel1:
 # Mongo
 #
 mongo1:
-  image: mongo:3.0
+  image: mongo:3.2
   restart: always
   links:
     - mongo2
@@ -40,17 +40,17 @@ mongo1:
   entrypoint: [ "/usr/bin/mongod", "--replSet", "troupeSet", "--journal", "--smallfiles", "--storageEngine=wiredTiger", "--oplogSize=20", "--port=27017" ]
 
 mongo2:
-  image: mongo:3.0
+  image: mongo:3.2
   restart: always
   entrypoint: [ "/usr/bin/mongod", "--replSet", "troupeSet", "--journal", "--smallfiles", "--storageEngine=wiredTiger", "--oplogSize=20", "--port=27018" ]
 
 mongo3:
-  image: mongo:3.0
+  image: mongo:3.2
   restart: always
   entrypoint: [ "/usr/bin/mongod", "--replSet", "troupeSet", "--journal", "--smallfiles", "--storageEngine=wiredTiger", "--oplogSize=20", "--port=27019" ]
 
 mongosetup:
-  image: mongo:3.0
+  image: mongo:3.2
   restart: 'no'
   links:
     - mongo1
