@@ -9,7 +9,7 @@ var notifications          = require('components/notifications');
 var OPTIONS = [
   { val: 'all', text: 'All: Notify me for all messages' },
   { val: 'mention', text: 'Announcements: Notify me for mentions and announcements' },
-  { val: 'mute', text: 'Mute: Notify me only when I\m directly mentioned' }
+  { val: 'mute', text: 'Mute: Notify me only when I\'m directly mentioned' }
 ];
 
 var View = Marionette.ItemView.extend({
