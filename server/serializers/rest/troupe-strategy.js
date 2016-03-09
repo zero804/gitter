@@ -169,10 +169,8 @@ ActivityForUserStrategy.prototype = {
 
 // Only show reserved(with colons) tags to staff
 function TagsStrategy(options) {
-  console.log('asdf', options, new Error().stack);
   var self = this;
   self.tagMap = {};
-  var userId = options.userId || options.currentUserId;
 
   this.preload = function(rooms, callback) {
     rooms.forEach(function(room) {
