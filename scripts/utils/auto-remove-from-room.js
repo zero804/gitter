@@ -13,24 +13,26 @@ var es = require('event-stream');
 
 require('../../server/event-listeners').install();
 
-var opts = require("nomnom")
-   .option('room', {
-      abbr: 'r',
-      help: 'Room URI'
-   })
-   .option('min', {
-      abbr: 'm',
-      default: '31',
-      help: 'Minimum time in days since last login'
-   })
-   .option('members', {
-      help: 'Minimum number of members in the room'
-   })
-   .option('dryRun', {
-     flag: true,
-     help: 'Just show the users who will be affected'
-   })
-   .parse();
+var opts = require('yargs')
+  .option('room', {
+    alias: 'r',
+    description: 'Room URI'
+  })
+  .option('min', {
+    alias: 'm',
+    default: '31',
+    description: 'Minimum time in days since last login'
+  })
+  .option('members', {
+    description: 'Minimum number of members in the room'
+  })
+  .option('dryRun', {
+    type: 'boolean',
+    description: 'Just show the users who will be affected'
+  })
+  .help('help')
+  .alias('help', 'h')
+  .argv;
 
 var minTimeInDays = parseInt(opts.min, 10);
 var members = parseInt(opts.members, 10);

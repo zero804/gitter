@@ -61,6 +61,12 @@ describe('room-membership-service', function() {
         .then(function(roomIds) {
           assert(roomIds.length >= 1);
           assert(roomIds.some(mongoIdEqualPredicate(troupeId3)));
+
+          return persistence.TroupeUser.findOne({ troupeId: troupeId3, userId: userId1 }).exec();
+        })
+        .then(function(troupeUser) {
+          assert.strictEqual(troupeUser.lurk, false);
+          assert.strictEqual(Number(troupeUser.flags).toString(2), "11101");
         });
     });
 
@@ -81,6 +87,12 @@ describe('room-membership-service', function() {
         })
         .then(function(troupe) {
           assert.strictEqual(troupe.userCount, 1);
+          return persistence.TroupeUser.findOne({ troupeId: fixture.troupe1.id, userId: fixture.user1.id }).exec();
+        })
+        .then(function(troupeUser) {
+          assert.strictEqual(troupeUser.lurk, false);
+          assert.strictEqual(Number(troupeUser.flags).toString(2), "11101");
+
           return roomMembershipService.checkRoomMembership(fixture.troupe1.id, fixture.user2.id);
         })
         .then(function(member) {

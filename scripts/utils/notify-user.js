@@ -10,39 +10,41 @@ var winston = require('../../server/utils/winston');
 
 require('../../server/event-listeners').install();
 
-var opts = require("nomnom")
-   .option('user', {
-      abbr: 'u',
-      list: true,
-      required: false,
-      help: 'Send message to userId'
-   })
-   .option('email', {
-      abbr: 'e',
-      list: true,
-      required: false,
-      help: 'Send message to email address'
-   })
-   .option('message', {
-      abbr: 'm',
-      required: true,
-      help: 'Message to send'
-   })
-   .option('title', {
-      abbr: 'd',
-      required: true,
-      help: 'Title'
-   })
-   .option('link', {
-      abbr: 'l',
-      required: false,
-      help: 'Link'
-   })
-   .option('sound', {
-      abbr: 's',
-      help: 'Sound to send'
-   })
-   .parse();
+var opts = require('yargs')
+  .option('user', {
+    alias: 'u',
+    type: 'array'
+    required: false,
+    description: 'Send message to userId'
+  })
+  .option('email', {
+    alias: 'e',
+    type: 'array'
+    required: false,
+    description: 'Send message to email address'
+  })
+  .option('message', {
+    alias: 'm',
+    required: true,
+    description: 'Message to send'
+  })
+  .option('title', {
+    alias: 'd',
+    required: true,
+    description: 'Title'
+  })
+  .option('link', {
+    alias: 'l',
+    required: false,
+    description: 'Link'
+  })
+  .option('sound', {
+    alias: 's',
+    description: 'Sound to send'
+  })
+  .help('help')
+  .alias('help', 'h')
+  .argv;
 
 
 if(opts.user) {

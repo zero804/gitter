@@ -1,11 +1,12 @@
 "use strict";
 
-var unreadItemService = require("../../services/unread-items");
+var _                     = require('lodash');
+var unreadItemService     = require("../../services/unread-items");
 var collapsedChatsService = require('../../services/collapsed-chats-service');
-var execPreloads      = require('../exec-preloads');
-var getVersion        = require('../get-model-version');
-var UserIdStrategy    = require('./user-id-strategy');
-var TroupeIdStrategy  = require('./troupe-id-strategy');
+var execPreloads          = require('../exec-preloads');
+var getVersion            = require('../get-model-version');
+var UserIdStrategy        = require('./user-id-strategy');
+var TroupeIdStrategy      = require('./troupe-id-strategy');
 
 function formatDate(d) {
   return d ? d.toISOString() : null;
@@ -145,7 +146,7 @@ function ChatStrategy(options)  {
       readBy: item.readBy ? item.readBy.length : undefined,
       urls: castArray(item.urls),
       initial: options.initialId && item._id == options.initialId || undefined,
-      mentions: castArray(item.mentions.map(function(m) {
+      mentions: castArray(item.mentions && _.map(item.mentions, function(m) {
           return {
             screenName: m.screenName,
             userId: m.userId,

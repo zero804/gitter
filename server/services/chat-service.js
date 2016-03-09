@@ -82,8 +82,7 @@ function resolveMentions(troupe, user, parsedMessage) {
         .map(function(mention) {
           if(mention.group) {
             var groupInfo = groups[mention.screenName];
-
-            if (groupInfo) {
+            if (!groupInfo) {
               return null;
             }
 
@@ -95,7 +94,6 @@ function resolveMentions(troupe, user, parsedMessage) {
               announcement: groupInfo.announcement || undefined,
               userIds: groupUserIds.filter(notCurrentUserPredicate)
             };
-
           }
 
           // Not a group mention

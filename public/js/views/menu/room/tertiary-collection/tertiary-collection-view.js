@@ -28,6 +28,7 @@ module.exports =  BaseCollectionView.extend({
     this.roomCollection = attrs.roomCollection;
     this.listenTo(this.roomMenuModel, 'change:searchTerm', this.setActive, this);
     this.listenTo(this.collection, 'filter-complete', this.render, this);
+    BaseCollectionView.prototype.initialize.apply(this, arguments);
   },
 
   setActive: function() {

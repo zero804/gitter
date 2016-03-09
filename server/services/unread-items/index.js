@@ -329,6 +329,7 @@ function processResultsForNewItemWithMentions(troupeId, chatId, distribution, re
     });
 
   debug("distribution of chat notification to users completed");
+  return null;
 }
 
 function createChatUnreadItems(fromUserId, troupe, chat) {

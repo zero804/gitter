@@ -1,7 +1,6 @@
 'use strict';
 
 var _                     = require('underscore');
-var PrimaryCollectionView = require('../primary-collection/primary-collection-view');
 var ItemView              = require('./secondary-collection-item-view');
 var SearchItemView        = require('./secondary-collection-item-search-view');
 var BaseCollectionView    = require('../base-collection/base-collection-view');
@@ -15,7 +14,6 @@ module.exports = BaseCollectionView.extend({
 
   childEvents: {
     'item:clicked':      'onItemClicked',
-    'user:item:clicked': 'onUserLinkClicked',
   },
 
   buildChildView: function(model, ItemView, attrs) {
@@ -47,6 +45,7 @@ module.exports = BaseCollectionView.extend({
     this.troupeModel       = attrs.troupeModel;
     this.roomCollection    = attrs.roomCollection;
     this.listenTo(this.roomMenuModel, 'change:searchTerm', this.setActive, this);
+    BaseCollectionView.prototype.initialize.apply(this, arguments);
   },
 
   setActive: function() {
@@ -105,12 +104,5 @@ module.exports = BaseCollectionView.extend({
     this._triggerNavigation(url, 'chat', name);
   },
 
-  onUserLinkClicked: function(view) {
-    var model = view.model.get('fromUser');
-    var user = this.userModel;
-    if (model.id === user.get('id')) { return; }
-
-    proto.onItemClicked.apply(this, arguments);
-  },
 
 });

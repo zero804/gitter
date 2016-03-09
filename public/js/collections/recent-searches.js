@@ -2,7 +2,7 @@
 
 var Backbone           = require('backbone');
 var _                  = require('underscore');
-var FilteredCollection = require('filtered-collection');
+var FilteredCollection = require('backbone-filtered-collection');
 var localStorageSync   = require('../utils/local-storage-sync');
 
 var Model = Backbone.Model.extend({
@@ -42,24 +42,22 @@ var RecentSearchesCollection = Backbone.Collection.extend({
   },
 
   //Limit the number of entries saved into local storage
-  toJSON: function (){
+  toJSON: function() {
     return this.models.sort(this.comparator).slice(0, 5);
   },
 
   sync: localStorageSync.sync,
 });
 
-module.exports = Backbone.FilteredCollection.extend({
-  constructor: function(models, attrs) {
-    this.collection = new RecentSearchesCollection(models);
-    var options = _.extend({}, attrs, { collection: this.collection });
-    Backbone.FilteredCollection.prototype.constructor.call(this, null, options);
-  },
+var FilteredRecentSearches = function(attrs, options) {
+  this.collection = new RecentSearchesCollection(null);
+  attrs  = _.extend({}, attrs, { collection: this.collection });
+  FilteredCollection.call(this, attrs, options);
+};
 
-  initialize: function(models, attrs) { //jshint unused: true
-    var options = _.extend({}, attrs, { collection: this.collection });
-    Backbone.FilteredCollection.prototype.initialize.call(this, null, options);
-  },
+FilteredRecentSearches.prototype = _.extend(
+  FilteredRecentSearches.prototype,
+  FilteredCollection.prototype, {
 
   collectionFilter: function(model, index) { //jshint unused: true
     return (index < 5);
@@ -87,3 +85,5 @@ module.exports = Backbone.FilteredCollection.extend({
     this.setFilter();
   },
 });
+
+module.exports = FilteredRecentSearches;

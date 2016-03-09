@@ -1,22 +1,22 @@
 "use strict";
-var $ = require('jquery');
-var _ = require('underscore');
-var Marionette = require('backbone.marionette');
-var context = require('utils/context');
-var appEvents = require('utils/appevents');
-var isMobile = require('utils/is-mobile');
-var troupeCollections = require('collections/instances/troupes');
+var $                               = require('jquery');
+var _                               = require('underscore');
+var Marionette                      = require('backbone.marionette');
+var context                         = require('utils/context');
+var appEvents                       = require('utils/appevents');
+var isMobile                        = require('utils/is-mobile');
+var troupeCollections               = require('collections/instances/troupes');
 var FilteredSuggestedRoomCollection = require('collections/suggested-rooms').Filtered;
-var RoomCollectionView = require('./room-collection-view');
-var SuggestedCollectionView = require('./suggested-collection-view');
-var log = require('utils/log');
-var cocktail = require('cocktail');
-var KeyboardEventsMixin = require('views/keyboard-events-mixin');
-var CollectionWrapperViewTemplate = require('./tmpl/collection-wrapper-view.hbs');
-var ProfileView = require('./profileView');
-var OrgCollectionView = require('./orgCollectionView');
-var dataSet = require('utils/dataset-shim');
-var toggle = require('utils/toggle');
+var RoomCollectionView              = require('./room-collection-view');
+var SuggestedCollectionView         = require('./suggested-collection-view');
+var log                             = require('utils/log');
+var cocktail                        = require('cocktail');
+var KeyboardEventsMixin             = require('views/keyboard-events-mixin');
+var CollectionWrapperViewTemplate   = require('./tmpl/collection-wrapper-view.hbs');
+var ProfileView                     = require('./profileView');
+var OrgCollectionView               = require('./orgCollectionView');
+var dataSet                         = require('utils/dataset-shim');
+var toggle                          = require('utils/toggle');
 
 require('views/behaviors/isomorphic');
 require('views/behaviors/tooltip');
@@ -221,7 +221,7 @@ module.exports = (function () {
 
       var collection = this.suggestedRoomsCollection;
       if (!collection) {
-        collection = this.suggestedRoomsCollection = new FilteredSuggestedRoomCollection(null, { roomsCollection: troupeCollections.troupes });
+        collection = this.suggestedRoomsCollection = new FilteredSuggestedRoomCollection({ roomsCollection: troupeCollections.troupes });
 
         // For now, only fetch the suggested rooms once
         if (context.getTroupeId()) {

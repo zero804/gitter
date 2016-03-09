@@ -2,20 +2,26 @@
 
 var Backbone            = require('backbone');
 var _                   = require('underscore');
-var FilteredCollection  = require('filtered-collection');
+var FilteredCollection  = require('backbone-filtered-collection');
 var backboneUrlResolver = require('backbone-url-resolver');
 var SyncMixin           = require('./sync-mixin');
 
 var SuggestedCollection = Backbone.Collection.extend({
-  initialize: function(models, attrs) {//jshint unused: true
+  initialize: function(models, attrs) {
 
     if (!attrs || !attrs.contextModel) {
       throw new Error('A valid model must be passed to SuggestedOrgCollection when initialized');
     }
 
-    this.contextModel = attrs.contextModel;
-    this.urlModel     = backboneUrlResolver('/v1/orgs/:selectedOrgName/suggestedRooms', this.contextModel);
+    this.contextModel   = attrs.contextModel;
+    this.roomCollection = attrs.roomCollection;
+    this.urlModel       = backboneUrlResolver('/v1/orgs/:selectedOrgName/suggestedRooms', this.contextModel);
     this.listenTo(this.contextModel, 'change:selectedOrgName', this.onOrgNameUpdate, this);
+
+    if(!!this.roomCollection.findWhere({ name: this.contextModel.get('selectedOrgName')})){
+      this.fetch({ reset: true });
+    }
+
   },
 
   url: function() {
@@ -30,26 +36,29 @@ var SuggestedCollection = Backbone.Collection.extend({
   sync: SyncMixin.sync,
 });
 
-module.exports = Backbone.FilteredCollection.extend({
+var FilteredSuggestedCollection = function(attrs, options) {
+  this.collection       = new SuggestedCollection(null, attrs, options);
+  this.roomCollection   = attrs.roomCollection;
+  this.collectionFilter = this.collectionFilter.bind(this);
+  attrs                 = _.extend({}, attrs, { collection: this.collection });
 
-  constructor: function(models, attrs) {
+  this.listenTo(this.roomCollection, 'update', this.onCollectionSync, this);
 
-    this.collection       = new SuggestedCollection(models, attrs);
-    this.roomCollection   = attrs.roomCollection;
-    this.collectionFilter = this.collectionFilter.bind(this);
-    var options           = _.extend({}, attrs, { collection: this.collection });
+  FilteredCollection.call(this, attrs, options);
+};
 
-    this.listenTo(this.roomCollection, 'update', this.onCollectionSync, this);
+FilteredSuggestedCollection.prototype = _.extend(
+  FilteredSuggestedCollection.prototype,
+  FilteredCollection.prototype, {
 
-    Backbone.FilteredCollection.prototype.constructor.call(this, null, options);
-  },
-
-  collectionFilter: function (model){
+  collectionFilter: function(model) {
     return !this.roomCollection.get(model.get('id'));
   },
 
-  onCollectionSync: function (){
+  onCollectionSync: function() {
     this.setFilter();
   },
 
 });
+
+module.exports = FilteredSuggestedCollection;
