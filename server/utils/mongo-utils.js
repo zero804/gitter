@@ -216,6 +216,13 @@ function conjunctionIds(terms, termIdentifiers) {
 }
 exports.conjunctionIds = conjunctionIds;
 
+function isMongoError(err) {
+  // instanceof is not suitable since there may be multiple instances of
+  // mongo driver loaded
+  return err && err instanceof Error && err.name === 'MongoError';
+}
+exports.isMongoError = isMongoError;
+
 exports.setIds = setIds;
 
 exports.isLikeObjectId = isLikeObjectId;
@@ -229,3 +236,4 @@ exports.serializeObjectIds = serializeObjectIds;
 exports.createIdForTimestamp = createIdForTimestamp;
 exports.createIdForTimestampString = createIdForTimestampString;
 exports.fieldInPredicate = fieldInPredicate;
+exports.isMongoError = isMongoError;
