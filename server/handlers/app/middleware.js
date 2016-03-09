@@ -51,7 +51,7 @@ function uriContextResolverMiddleware(options) {
 
         req.uriContext = uriContext;
         next();
-        return null;
+        return null; // Stop bluebird from moaning about promises
       })
       .catch(function(e) {
         if (!(e instanceof StatusError)) throw e;
@@ -60,7 +60,7 @@ function uriContextResolverMiddleware(options) {
             // TODO: check this works for userhome....
             if (e.path) {
               res.redirect(getRedirectUrl(e.path, req));
-              return;
+              return null;
             }
             throw new StatusError(500, 'Invalid redirect');
 
@@ -73,7 +73,7 @@ function uriContextResolverMiddleware(options) {
                 url = url += '/~iframe';
               }
               res.redirect(url);
-              return;
+              return null;
             }
         }
         throw e;

@@ -1,76 +1,125 @@
 "use strict";
 
 var Marionette             = require('backbone.marionette');
-var _                      = require('underscore');
-var context                = require('utils/context');
 var apiClient              = require('components/apiClient');
 var ModalView              = require('./modal');
 var troupeSettingsTemplate = require('./tmpl/room-settings-view.hbs');
-var log                    = require('utils/log');
 var notifications          = require('components/notifications');
 
+var OPTIONS = [
+  { val: 'all', text: 'All: Notify me for all messages' },
+  { val: 'mention', text: 'Announcements: Notify me for mentions and announcements' },
+  { val: 'mute', text: 'Mute: Notify me only when I\'m directly mentioned' }
+];
 
 var View = Marionette.ItemView.extend({
   template: troupeSettingsTemplate,
   events: {
-    'click #save-troupe-settings': 'saveSettings',
     'click #close-settings' : 'destroySettings',
-    'click #enable-lurk-mode' : 'enableLurkMode',
-    'change #notification-options' : 'formChange',
-    'change #unread-checkbox' : 'formChange'
+    'change #notification-options' : 'formChange'
+  },
+  modelEvents: {
+    change: 'update'
+  },
+  ui: {
+    options: '#notification-options',
+    nonstandard: '#nonstandard',
   },
 
   initialize: function() {
-    this.model = context.troupe();
-
-    this.listenTo(this.model, 'change:lurk', this.setShowUnreadBadgeValue);
-    this.listenTo(this, 'menuItemClicked', this.menuItemClicked, this);
-
-    var self = this;
     apiClient.userRoom.get('/settings/notifications')
+      .bind(this)
       .then(function(settings) {
-        self.settings = settings && settings.push || "all";
-        self.$el.find("#notification-options").val(self.settings);
-        self.setLurkButton();
-      })
-      .catch(function(err) {
-        log.error('An error occurred while communicating with notification settings', err);
+        this.model.set(settings);
       });
+
   },
 
-  menuItemClicked: function (type){
-    switch(type){
-      case 'lurk':
-        this.enableLurkMode();
-      break;
+  getNotificationOption: function() {
+    var model = this.model;
+    var value = model.get('mode') || model.get('push');
+    var lurk = model.get('lurk');
+
+    switch(value) {
+      case 'all':
+        return { selectValue: 'all', nonStandard: lurk === true, lurk: lurk };
+
+      case 'annoucement':
+      case 'annoucements':
+      case 'mention':
+        return { selectValue: 'mention', nonStandard: lurk === false, lurk: lurk };
+
+      case 'mute':
+        return { selectValue: 'mute', nonStandard: lurk === false, lurk: lurk };
+
+      default:
+        return null;
     }
   },
 
-  formChange: function() {
-    this.saveSettings();
-  },
+  update: function() {
+    var val = this.getNotificationOption();
+    var nonStandard = false;
 
-  enableLurkMode: function() {
-    this.$el.find('#notification-options').val("mention");
-    this.$el.find('#unread-checkbox').prop('checked', true);
-    this.saveSettings();
-    this.destroySettings();
-  },
-
-  setShowUnreadBadgeValue: function() {
-    var lurk = this.model.get('lurk');
-    this.el.querySelector("#unread-checkbox").checked = lurk;
-  },
-
-  setLurkButton: function() {
-    if (this.$el.find('#unread-checkbox').prop('checked') && (this.$el.find('#notification-options').val() == "mention" || this.$el.find('#notification-options').val() == "mute")) {
-      this.$el.find('#enable-lurk-mode').hide();
-      this.$el.find('#is-lurking').show();
+    if (val) {
+      if (val.nonStandard) {
+        nonStandard = true;
+        this.setOption('', 'Legacy setting: ' + val.selectValue + ' mode, with ' + (val.lurk ? 'lurk on' : 'lurk off'));
+      } else {
+        this.setOption(val.selectValue);
+      }
+    } else {
+      this.setOption('', 'Please wait...');
     }
-    else {
-      this.$el.find('#is-lurking').hide();
-      this.$el.find('#enable-lurk-mode').show();
+
+    if (nonStandard) {
+      this.ui.nonstandard.show();
+    } else {
+      this.ui.nonstandard.hide();
     }
+  },
+
+  setOption: function(val, text) {
+    var selectInput = this.ui.options;
+    selectInput.empty();
+
+    var found = false;
+    var items = OPTIONS.map(function(o) {
+      var option = document.createElement("option");
+      option.value = o.val;
+      option.textContent = o.text;
+      var selected = o.val === val;
+      option.selected = selected;
+      if (selected) {
+        found = true;
+      }
+      return option;
+    });
+    selectInput.append(items);
+
+    if (!found) {
+      var option = document.createElement("option");
+      option.value = val;
+      option.textContent = text;
+      option.selected = true;
+      option.style.display = 'none';
+      selectInput.append(option);
+    }
+  },
+
+  onRender: function() {
+    this.update();
+  },
+
+  formChange: function(e) {
+    if(e) e.preventDefault();
+
+    var mode = this.ui.options.val();
+    apiClient.userRoom.put('/settings/notifications', { mode: mode })
+      .bind(this)
+      .then(function(settings) {
+        this.model.set(settings);
+      });
   },
 
   destroySettings : function () {
@@ -78,50 +127,18 @@ var View = Marionette.ItemView.extend({
     this.dialog = null;
   },
 
-  onRender: function() {
-    if (this.settings) {
-      this.setLurkButton();
-      this.$el.find("#notification-options").val(this.settings);
-    }
-  },
-
   serializeData: function() {
-    return _.extend({},
-      context.getTroupe(), {
-        lurk: context.troupe().get('lurk'),
-        notificationsBlocked: notifications.hasBeenDenied(),
-        isNativeDesktopApp: context().isNativeDesktopApp,
-        troupeUrl: '//' + window.location.host + window.location.pathname
-      });
-  },
-
-  saveSettings: function(e) {
-    if(e) e.preventDefault();
-
-    var self = this;
-    var push = self.$el.find("#notification-options").val();
-    var lurk = self.el.querySelector("#unread-checkbox").checked;
-
-    function done() {
-      self.setLurkButton();
-    }
-
-    apiClient.userRoom.put('/settings/notifications', { push: push })
-      .then(done);
-
-    apiClient.userRoom.put('', { lurk: lurk })
-      .then(done);
-
+    return {
+      notificationsBlocked: notifications.hasBeenDenied(),
+    };
   }
+
 });
 
 module.exports = ModalView.extend({
     initialize: function(options) {
       options.title = "Notification Settings";
       ModalView.prototype.initialize.apply(this, arguments);
-      this.view = new View({ });
-    },
-    menuItems: [
-      { action: "lurk", text: "Enable lurk mode", pull: 'left', className: "modal--default__footer__link" },
-    ]
-  });
+      this.view = new View(options);
+    }
+});
