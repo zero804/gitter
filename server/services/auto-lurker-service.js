@@ -3,7 +3,6 @@
 var env                         = require('gitter-web-env');
 var stats                       = env.stats;
 var recentRoomCore              = require('./core/recent-room-core');
-var userRoomNotificationService = require('./user-room-notification-service');
 var unreadItemService           = require('./unread-items');
 var Promise                     = require('bluebird');
 var roomMembershipService       = require('./room-membership-service');
@@ -16,52 +15,30 @@ var roomMembershipService       = require('./room-membership-service');
  */
 function findLurkCandidates(troupe, options) {
   var troupeId = troupe._id;
-
-  return roomMembershipService.findMembersForRoomWithLurk(troupeId)
-    .then(function(lurkStatus) {
-      var userIds = Object.keys(lurkStatus);
+  return roomMembershipService.findMembersForRoomWithFlags(troupeId, {
+      notify: true,
+      activity: true
+    })
+    .then(function(userIds) {
       var minTimeInDays = (options.minTimeInDays || 14);
 
       return recentRoomCore.findLastAccessTimesForUsersInRoom(troupeId, userIds)
         .then(function(lastAccessDates) {
           var cutoff = Date.now() - minTimeInDays * 86400000;
 
-          var oldUserIds = Object.keys(lastAccessDates).map(function(userId) {
-              var lastAccess = lastAccessDates[userId];
+          return Object.keys(lastAccessDates).map(function(userId) {
+            var lastAccess = lastAccessDates[userId];
 
-              if (lastAccess && lastAccess < cutoff) {
-                return userId;
-              }
-            }).filter(function(f) {
-              return !!f;
-            });
-
-          return [
-            oldUserIds,
-            lurkStatus,
-            userRoomNotificationService.findSettingsForUsersInRoom(troupeId, oldUserIds),
-            lastAccessDates
-          ];
-        });
-    })
-    .spread(function(oldUsersIds, lurkStatus, settings, lastAccessDates) {
-      return oldUsersIds
-        .filter(function(userId) {
-          var notificationSettings = settings[userId];
-          var isLurking = lurkStatus[userId];
-
-          return !isLurking || (notificationSettings !== 'mute' && notificationSettings !== 'mention');
-        })
-        .map(function(userId) {
-          var notificationSettings = settings[userId];
-          var isLurking = lurkStatus[userId];
-
-          return {
-            userId: userId,
-            notificationSettings: notificationSettings,
-            lurk: isLurking,
-            lastAccessTime: lastAccessDates[userId]
-          };
+            if (lastAccess && lastAccess < cutoff) {
+              return {
+                userId: userId,
+                lastAccessTime: lastAccessDates[userId]
+              };
+            }
+          })
+          .filter(function(f) {
+            return !!f;
+          });
         });
     });
 }
@@ -72,7 +49,7 @@ exports.findLurkCandidates = findLurkCandidates;
  * Bulk lurk users without putting undue strain on mongodb
  */
 function bulkLurkUsers(troupeId, userIds) {
-  return roomMembershipService.setMembersLurkStatus(troupeId, userIds, true)
+  return roomMembershipService.setMembershipModeForUsersInRoom(troupeId, userIds, 'mute', true)
     .then(function() {
       return Promise.map(userIds, function(userId) {
         return unreadItemService.ensureAllItemsRead(userId, troupeId);
@@ -110,28 +87,10 @@ function autoLurkInactiveUsers(troupe, options) {
     .then(function(candidates) {
       if (!candidates.length) return [];
 
-      var usersToLurk = candidates
-        .filter(function(candidate) {
-          return !candidate.lurk;
-        })
-        .map(function(candidate) {
-          return candidate.userId;
-        });
-
-      var usersToChangeSettings = candidates
-        .filter(function(candidate) {
-          return candidate.notificationSettings !== 'mute' && candidate.notificationSettings !== 'mention';
-        })
-        .map(function(candidate) {
-          return candidate.userId;
-        });
-
-      return Promise.join(
-        userRoomNotificationService.updateSettingsForUsersInRoom(troupe._id, usersToChangeSettings, 'mention'),
-        usersToLurk.length && bulkLurkUsers(troupe.id, usersToLurk),
-        function() {
-          return candidates;
-        });
+        return bulkLurkUsers(troupe.id, candidates.map(function(u) {
+          return u.userId;
+        }))
+        .return(candidates);
     });
 }
 exports.autoLurkInactiveUsers = autoLurkInactiveUsers;

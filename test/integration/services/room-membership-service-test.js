@@ -163,10 +163,14 @@ describe('room-membership-service', function() {
             assert.deepEqual([userId1], spyCall.args[1]);
             assert.strictEqual(true, spyCall.args[2]);
 
-            return roomMembershipService.getMembershipMode(userId1, troupeId2);
+            return roomMembershipService.getMembershipDetails(userId1, troupeId2);
           })
-          .then(function(mode) {
-            assert.strictEqual(mode, 'mute');
+          .then(function(modeExtended) {
+            assert.deepEqual(modeExtended, {
+              mode: 'mute',
+              lurk: true,
+              flags: parseInt('100', 2)
+            });
             return roomMembershipService.getMemberLurkStatus(troupeId2, userId1);
           })
           .then(function(lurking) {
