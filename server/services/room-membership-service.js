@@ -390,7 +390,23 @@ var getMembershipMode = Promise.method(function (userId, troupeId) {
     .exec()
     .then(function(troupeUser) {
        if (!troupeUser) return null;
+
        return roomMembershipFlags.getModeFromFlags(troupeUser.flags);
+    });
+});
+
+var getMembershipDetails = Promise.method(function (userId, troupeId) {
+  return TroupeUser.findOne({ troupeId: troupeId, userId: userId }, { flags: 1, _id: 0 }, { lean: true })
+    .exec()
+    .then(function(troupeUser) {
+       if (!troupeUser) return null;
+       var flags = troupeUser.flags;
+
+       return {
+         mode: roomMembershipFlags.getModeFromFlags(flags),
+         lurk: roomMembershipFlags.getLurkForFlags(flags),
+         flags: flags
+       };
     });
 });
 
@@ -510,6 +526,60 @@ function findMembersForRoomForNotify(troupeId, fromUserId, isAnnouncement, menti
     .exec();
 }
 
+function queryForToggles(flagToggles) {
+  var setBits = 0;
+  var clearBits = 0;
+
+  function addToggle(field, bitPosition) {
+    var value = flagToggles[field];
+    if (value === false) {
+      clearBits = clearBits | 1 << bitPosition;
+    } else if (value === true) {
+      setBits = setBits | 1 << bitPosition;
+    }
+  }
+
+  addToggle('notify', roomMembershipFlags.FLAG_POS_NOTIFY_MENTION);
+  addToggle('activity', roomMembershipFlags.FLAG_POS_NOTIFY_ACTIVITY);
+  addToggle('mention', roomMembershipFlags.FLAG_POS_NOTIFY_MENTION);
+  addToggle('announcement', roomMembershipFlags.FLAG_POS_NOTIFY_ANNOUNCEMENT);
+  addToggle('default', roomMembershipFlags.FLAG_POS_NOTIFY_DEFAULT);
+
+  var allRequired = flagToggles.all === true;
+
+  if (!setBits && !clearBits) {
+    return;
+  }
+
+  var query = {};
+
+  if (setBits) {
+    if (allRequired) {
+      query.$bitsAllSet = setBits;
+    } else {
+      query.$bitsAnySet = setBits;
+    }
+  }
+
+  if (clearBits) {
+    if (allRequired) {
+      query.$bitsAllClear = clearBits;
+    } else {
+      query.$bitsAnyClear = clearBits;
+    }
+  }
+
+  return query;
+}
+
+function findMembersForRoomWithFlags(troupeId, flagToggles) {
+  return TroupeUser.distinct('userId', {
+      troupeId: troupeId,
+      flags: queryForToggles(flagToggles)
+    })
+    .exec();
+
+}
 /* Exports */
 exports.findRoomIdsForUser          = findRoomIdsForUser;
 exports.findRoomIdsForUserWithLurk  = findRoomIdsForUserWithLurk;
@@ -530,10 +600,12 @@ exports.findMembersForRoomMulti     = findMembersForRoomMulti;
 exports.getMemberLurkStatus         = getMemberLurkStatus;
 
 exports.getMembershipMode           = getMembershipMode;
+exports.getMembershipDetails        = getMembershipDetails;
 exports.setMembershipMode           = setMembershipMode;
 exports.setMembershipModeForUsersInRoom = setMembershipModeForUsersInRoom;
 exports.findMembershipModeForUsersInRoom = findMembershipModeForUsersInRoom;
 exports.findMembersForRoomForNotify = findMembersForRoomForNotify;
+exports.findMembersForRoomWithFlags = findMembersForRoomWithFlags;
 
 /* Event emitter */
 exports.events                      = roomMembershipEvents;

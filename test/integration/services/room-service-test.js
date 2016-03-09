@@ -15,7 +15,7 @@ var once = times(1);
 
 var persistence = testRequire("./services/persistence-service");
 var mongoUtils = testRequire("./utils/mongo-utils");
-var userRoomNotificationService = testRequire('./services/user-room-notification-service');
+var roomMembershipService = testRequire('./services/room-membership-service');
 
 describe('room-service', function() {
   before(fixtureLoader(fixture, {
@@ -1469,9 +1469,28 @@ describe('room-service', function() {
             });
         });
 
-        it('should remove user from the room if lurking', function() {
+        it('should remove user from the room if mode=announcement', function() {
           // Set user as lurking
-          return userRoomNotificationService.updateSettingForUserRoom(fixture.userFavourite.id, fixture.troupeCanRemove.id, 'mention')
+          roomMembershipService.setMembershipMode(fixture.userFavourite.id, fixture.troupeCanRemove.id, 'announcement', false)
+            .then(function() { // Get updated troupe
+              return troupeService.findById(fixture.troupeCanRemove.id);
+            })
+            .then(function(troupe) {
+              return roomService.hideRoomFromUser(troupe.id, fixture.userFavourite.id);
+            })
+            .then(getFavs)
+            .then(function(favs) {
+              assert(!favs[fixture.troupeCanRemove.id]); // Favourite is removed
+            })
+            .then(checkHere)
+            .then(function(here) {
+              assert(!here); // User has been removed
+            });
+        });
+
+        it('should remove user from the room if mode=mute', function() {
+          // Set user as lurking
+          roomMembershipService.setMembershipMode(fixture.userFavourite.id, fixture.troupeCanRemove.id, 'mute', false)
             .then(function() { // Get updated troupe
               return troupeService.findById(fixture.troupeCanRemove.id);
             })

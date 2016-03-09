@@ -16,7 +16,6 @@ var collections                  = require('../../utils/collections');
 var mongoUtils                   = require('../../utils/mongo-utils');
 var emailNotificationService     = require('../email-notification-service');
 var userSettingsService          = require('../user-settings-service');
-var userRoomNotificationService  = require('../user-room-notification-service');
 var debug                        = require('debug')('gitter:email-notification-generator-service');
 
 var filterTestValues = config.get('notifications:filterTestValues');
@@ -88,45 +87,45 @@ function sendEmailNotifications(since) {
           return userTroupeUnreadHash;
         });
     })
-    .then(function(userTroupeUnreadHash) {
-      /**
-       * Now we need to filter out users who've turned off notifications for a specific troupe
-       */
-      var userTroupes = [];
-      var userIds = Object.keys(userTroupeUnreadHash);
-
-      if(!userIds.length) return {};
-
-      debug('After removing opt-out users: %s', userIds.length);
-
-      userIds.forEach(function(userId) {
-          var troupeIds = Object.keys(userTroupeUnreadHash[userId]);
-          troupeIds.forEach(function(troupeId) {
-            userTroupes.push({ userId: userId, troupeId: troupeId });
-          });
-      });
-
-      return userRoomNotificationService.findSettingsForMultiUserRooms(userTroupes)
-        .then(function(notificationSettings) {
-          Object.keys(userTroupeUnreadHash).forEach(function(userId) {
-              var troupeIds = Object.keys(userTroupeUnreadHash[userId]);
-              troupeIds.forEach(function(troupeId) {
-                var setting = notificationSettings[userId + ':' + troupeId];
-
-                if(setting && setting !== 'all') {
-                  debug('User %s has disabled notifications for this troupe', userId);
-                  delete userTroupeUnreadHash[userId][troupeId];
-
-                  if(Object.keys(userTroupeUnreadHash[userId]).length === 0) {
-                    delete userTroupeUnreadHash[userId];
-                  }
-                }
-              });
-          });
-
-          return userTroupeUnreadHash;
-        });
-    })
+    // .then(function(userTroupeUnreadHash) {
+    //   /**
+    //    * Now we need to filter out users who've turned off notifications for a specific troupe
+    //    */
+    //   var userTroupes = [];
+    //   var userIds = Object.keys(userTroupeUnreadHash);
+    //
+    //   if(!userIds.length) return {};
+    //
+    //   debug('After removing opt-out users: %s', userIds.length);
+    //
+    //   userIds.forEach(function(userId) {
+    //       var troupeIds = Object.keys(userTroupeUnreadHash[userId]);
+    //       troupeIds.forEach(function(troupeId) {
+    //         userTroupes.push({ userId: userId, troupeId: troupeId });
+    //       });
+    //   });
+    //
+    //   return userRoomNotificationService.findSettingsForMultiUserRooms(userTroupes)
+    //     .then(function(notificationSettings) {
+    //       Object.keys(userTroupeUnreadHash).forEach(function(userId) {
+    //           var troupeIds = Object.keys(userTroupeUnreadHash[userId]);
+    //           troupeIds.forEach(function(troupeId) {
+    //             var setting = notificationSettings[userId + ':' + troupeId];
+    //
+    //             if(setting && setting !== 'all') {
+    //               debug('User %s has disabled notifications for this troupe', userId);
+    //               delete userTroupeUnreadHash[userId][troupeId];
+    //
+    //               if(Object.keys(userTroupeUnreadHash[userId]).length === 0) {
+    //                 delete userTroupeUnreadHash[userId];
+    //               }
+    //             }
+    //           });
+    //       });
+    //
+    //       return userTroupeUnreadHash;
+    //     });
+    // })
     .then(function(userTroupeUnreadHash) {
       /**
        *load the data we're going to need for the emails

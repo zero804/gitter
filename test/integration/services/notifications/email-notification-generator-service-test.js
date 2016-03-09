@@ -12,7 +12,7 @@ var userSettingsService = testRequire('./services/user-settings-service');
 var fixtureLoader       = require('../../test-fixtures');
 var underlyingUnreadItemService = testRequire('./services/unread-items');
 var mongoUtils = testRequire('./utils/mongo-utils');
-var userRoomNotificationService = testRequire("./services/user-room-notification-service");
+var roomMembershipService = testRequire("./services/room-membership-service");
 
 var unreadItemServiceMock = mockito.spy(underlyingUnreadItemService);
 
@@ -148,10 +148,9 @@ describe('email-notification-generator-service', function() {
       return Promise.resolve();
     });
 
-
     return Promise.all([
         userSettingsService.setUserSettings(fixture.user2.id, 'unread_notifications_optout', true),
-        userRoomNotificationService.updateSettingForUserRoom(fixture.user2.id, troupeId, 'all')
+        roomMembershipService.setMembershipMode(fixture.user2.id, troupeId, 'all'),
       ])
       .then(function() {
         return unreadEngine.newItemWithMentions(troupeId, itemId1, [fixture.user2.id, fixture.user3.id], []);
@@ -205,10 +204,10 @@ it('SHOULD NOT email somebody who has opted out of notifications set to mention 
   return Promise.all([
       underlyingUnreadItemService.markAllChatsRead(fixture.user2.id, fixture.troupe1.id),
       userSettingsService.setUserSettings(fixture.user2.id, 'unread_notifications_optout', false),
-      userRoomNotificationService.updateSettingForUserRoom(fixture.user2.id, fixture.troupe1.id, 'mention')
+      roomMembershipService.setMembershipMode(fixture.user2.id, fixture.troupe1.id, 'announcement'),
     ])
     .then(function() {
-      return unreadEngine.newItemWithMentions(troupeId, itemId1, [fixture.user2.id, fixture.user3.id], []);
+      return unreadEngine.newItemWithMentions(troupeId, itemId1, [fixture.user3.id], []);
     })
     .then(function() {
       return sendEmailNotifications(Date.now());
@@ -253,7 +252,7 @@ it('SHOULD NOT email somebody who has opted out of notifications set to mention 
 
     Promise.all([
       userSettingsService.setUserSettings(fixture.user2.id, 'unread_notifications_optout', false),
-      userRoomNotificationService.updateSettingForUserRoom(fixture.user2.id, fixture.troupe1.id, 'all'),
+      roomMembershipService.setMembershipMode(fixture.user2.id, fixture.troupe1.id, 'all'),
       unreadEngine.newItemWithMentions(troupeId, itemId1, [fixture.user2.id, fixture.user3.id], [])
       ])
       .then(function() {
