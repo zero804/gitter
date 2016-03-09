@@ -9,6 +9,8 @@ function SuggestedRoomStrategy() {
   var roomHash;
 
   this.preload = function(suggestedRooms, callback) {
+    // NOTE: only suggestions with roomId will be preloaded. If it has a room
+    // attribute then that will be used.
     var suggestedRoomIds = suggestedRooms
       .filter(function(f) { return !!f.roomId; })
       .map(function(f) { return mongoUtils.asObjectID(f.roomId); });
@@ -28,17 +30,22 @@ function SuggestedRoomStrategy() {
   };
 
   this.map = function(suggestedRoom) {
+    // NOTE: It uses the preloaded room for suggestions with roomId, otherwise
+    // it uses sthe room attribute if that exists, otherwise the code below
+    // will just fall through to use suggestedRoom.
     var room = roomHash[suggestedRoom.roomId] || suggestedRoom.room;
     var uri = room && room.uri || suggestedRoom.uri;
     if (!uri) return;
 
     return {
-      id: room && room.id,
+      id: room && room.id || suggestedRoom.id,
       uri: uri,
       avatarUrl: resolveRoomAvatarUrl((room && room.uri) ? room : suggestedRoom, 48),
       userCount: room && room.userCount || suggestedRoom.userCount,
+      messageCount: room && room.messageCount || suggestedRoom.messageCount,
+      // NOTE: room.topic isn't always loaded in
       description: room && room.topic || suggestedRoom.topic,
-      exists: !!room
+      exists: !!room || suggestedRoom._id
     };
   };
 }

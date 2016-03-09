@@ -13,6 +13,7 @@ var troupeService = require('../../server/services/troupe-service');
 var roomMembershipService = require('../../server/services/room-membership-service');
 var suggestionsService = require('../../server/services/suggestions-service');
 var userSettingsService = require('../../server/services/user-settings-service');
+var restSerializer = require('../../server/serializers/rest-serializer');
 var suggestions = require('gitter-web-suggestions');
 var intercom = require('gitter-web-intercom');
 var getIntercomStream = require('intercom-stream');
@@ -67,12 +68,16 @@ stream
     console.log("Starting "+ username);
 
     var promises = [
+      userService.findById(userId),
       getRoomsForUserId(userId),
       userSettingsService.getUserSettings(userId, 'lang')
     ];
     Promise.all(promises)
-      .spread(function(rooms, language) {
-        return suggestionsService.findSuggestionsForRooms(rooms, language);
+      .spread(function(user, rooms, language) {
+        return suggestionsService.findSuggestionsForRooms(user, rooms, language);
+      })
+      .then(function(suggestedRooms) {
+        return restSerializer.serialize(suggestedRooms, new restSerializer.SuggestedRoomStrategy());
       })
       .then(function(suggestions) {
         var suggestionsString = _.pluck(suggestions, 'uri').join(', ');
