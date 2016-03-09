@@ -6,6 +6,7 @@ var apiClient        = require('components/apiClient');
 var context          = require('utils/context');
 var appEvents        = require('utils/appevents');
 var parseForTemplate = require('gitter-web-shared/parse/left-menu-primary-item');
+var toggleClass      = require('utils/toggle-class');
 
 var BaseCollectionItemView = require('../base-collection/base-collection-item-view');
 
@@ -55,7 +56,7 @@ module.exports = BaseCollectionItemView.extend({
   },
 
   onModelToggleMenu: function(model, val) {// jshint unused: true
-    this.el.classList.toggle('active', val);
+    toggleClass(this.el, 'active', val);
   },
 
   onMouseOut: function() {
