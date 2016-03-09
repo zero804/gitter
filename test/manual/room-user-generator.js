@@ -10,20 +10,22 @@ var roomService = require('../../server/services/room-service');
 var roomMembershipService = require('../../server/services/room-membership-service');
 var cumberbatch = require('cumberbatch-name');
 
-var opts = require("nomnom")
-.option('room', {
-  abbr: 'r',
-  required: true
-})
-.option('user', {
-  abbr: 'u',
-  required: true
-})
-.option('count', {
-  abbr: 'c',
-  default: 1000
-})
-.parse();
+var opts = require('yargs')
+  .option('room', {
+    alias: 'r',
+    required: true
+  })
+  .option('user', {
+    alias: 'u',
+    required: true
+  })
+  .option('count', {
+    alias: 'c',
+    default: 1000
+  })
+  .help('help')
+  .alias('help', 'h')
+  .argv;
 
 Promise.all([
     troupeService.findByUri(opts.room),

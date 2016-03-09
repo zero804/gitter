@@ -1,7 +1,7 @@
 'use strict';
 
-var Backbone                   = require('backbone');
-var BackboneFilteredCollection = require('filtered-collection');
+var FilteredCollection = require('backbone-filtered-collection');
+var _                  = require('underscore');
 
 //Filters
 var defaultFilter              = require('gitter-web-shared/filters/left-menu-primary-default');
@@ -13,29 +13,35 @@ var orgFilter                  = require('gitter-web-shared/filters/left-menu-pr
 var defaultSort                = require('gitter-web-shared/sorting/left-menu-primary-default');
 var favouriteSort              = require('gitter-web-shared/sorting/left-menu-primary-favourite');
 
-var FilteredRoomCollection = Backbone.FilteredCollection.extend({
-  initialize: function(collection, options) {//jshint unused: true
-    if (!options || !options.roomModel) {
-      throw new Error('A valid RoomMenuModel must be passed to a new instance of FilteredRoomCollection');
-    }
+var FilteredRoomCollection = function() {
+  FilteredCollection.apply(this, arguments);
+};
 
-    this.roomModel = options.roomModel;
-    this.listenTo(this.roomModel, 'change:state', this.onModelChangeState, this);
-    this.listenTo(this.roomModel, 'change:selectedOrgName', this.onOrgNameChange, this);
+FilteredRoomCollection.prototype = _.extend(
+  FilteredRoomCollection.prototype,
+  FilteredCollection.prototype, {
 
-    if (!options || !options.collection) {
-      throw new Error('A valid RoomCollection must be passed to a new instance of FilteredRoomCollection');
-    }
+    initialize: function(options) {//jshint unused: true
+      if (!options || !options.roomModel) {
+        throw new Error('A valid RoomMenuModel must be passed to a new instance of FilteredRoomCollection');
+      }
 
-    this.roomCollection = options.collection;
-    this.listenTo(this.roomCollection, 'snapshot', this.onRoomCollectionSnapshot, this);
+      this.roomModel = options.roomModel;
+      this.listenTo(this.roomModel, 'change:state', this.onModelChangeState, this);
+      this.listenTo(this.roomModel, 'change:selectedOrgName', this.onOrgNameChange, this);
 
-    this.listenTo(this, 'sync', this.onSync, this);
+      if (!options || !options.collection) {
+        throw new Error('A valid RoomCollection must be passed to a new instance of FilteredRoomCollection');
+      }
 
+      this.roomCollection = options.collection;
+      this.listenTo(this.roomCollection, 'snapshot', this.onRoomCollectionSnapshot, this);
 
-    BackboneFilteredCollection.prototype.initialize.apply(this, arguments);
-    this.onModelChangeState();
-  },
+      this.listenTo(this, 'sync', this.onSync, this);
+
+      FilteredCollection.prototype.initialize.apply(this, arguments);
+      this.onModelChangeState();
+    },
 
   comparator: function(a, b) {
     return defaultSort(a.toJSON(), b.toJSON());
@@ -61,7 +67,8 @@ var FilteredRoomCollection = Backbone.FilteredCollection.extend({
         this.setFilter(this.filterDefault);
         break;
     }
-    this.sort();
+    //sort silently to stop multiple renders
+    this.sort({ silent: true });
   },
 
   onOrgNameChange: function() {
@@ -80,7 +87,7 @@ var FilteredRoomCollection = Backbone.FilteredCollection.extend({
     return false;
   },
 
-  filterDefault: function (model){
+  filterDefault: function(model) {
     return defaultFilter(model.toJSON());
   },
 

@@ -4,18 +4,25 @@
 
 var userService = require('../../server/services/user-service');
 var shutdown = require('shutdown');
+var shimPositionOption = require('../yargs-shim-position-option');
 
-var opts = require("nomnom")
-  .option('username', {
+var opts = require('yargs')
+  .option('username', shimPositionOption({
     position: 0,
     required: true,
-    help: "username to hellban e.g trevorah"
-  })
+    description: 'username to hellban e.g trevorah'
+  }))
  .option('unban', {
-    abbr: 'u',
-    flag: true,
-    help: 'unban user from hell'
-  }).parse();
+    alias: 'u',
+    type: 'boolean',
+    description: 'unban user from hell'
+  })
+  .help('help')
+  .alias('help', 'h')
+  .argv;
+
+console.log(opts);
+
 
 var banned = !opts.unban;
 

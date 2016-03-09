@@ -24,9 +24,11 @@ module.exports = BaseCollectionItemView.extend({
 
   className: null,
   attributes: function() {
+    var id = this.model.get('id');
     return {
       class:     (this.model.get('githubType') === 'ONETOONE') ? 'room-item--one2one' : 'room-item',
-      'data-id': this.model.get('id'),
+      'data-id': id,
+      id: id,
     };
   },
 
@@ -43,7 +45,10 @@ module.exports = BaseCollectionItemView.extend({
   },
 
   onOptionsClicked: function(e) {
+    //Stop this view triggering up to the parent
     e.stopPropagation();
+    //stop this view from triggering a click on the anchor
+    e.preventDefault();
     if (this.roomMenuModel.get('state') === 'search') { return; }
 
     this.uiModel.set('menuIsOpen', !this.uiModel.get('menuIsOpen'));

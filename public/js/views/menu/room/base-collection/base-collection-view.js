@@ -22,11 +22,11 @@ module.exports = Marionette.CompositeView.extend({
   },
 
   modelEvents: {
-    'change:state:post change:header': 'render',
+    'change:header': 'render',
   },
 
   collectionEvents: {
-    'change:mentions change:unreadMessages change:lastAccessTime': 'render',
+    'change:mentions change:unreadMessages change:lastAccessTime add remove': 'render',
     'add remove reset': 'onFilterComplete',
   },
 
@@ -39,7 +39,14 @@ module.exports = Marionette.CompositeView.extend({
     this.collection    = attrs.collection;
     this.roomMenuModel = attrs.roomMenuModel;
     this.listenTo(context.troupe(), 'change:id', this.updateSelectedModel, this);
+    this.listenTo(this.roomMenuModel, 'change:state:post change:selectedOrgName', this.render, this);
     Marionette.CompositeView.prototype.constructor.apply(this, arguments);
+  },
+
+  initialize: function() {
+    if(this.model.get('active')){
+      this.render();
+    }
   },
 
   updateSelectedModel: function() {
