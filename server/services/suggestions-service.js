@@ -5,9 +5,13 @@ var _ = require('lodash');
 var collections = require('../utils/collections');
 var promiseUtils = require('../utils/promise-utils');
 var troupeService = require('./troupe-service');
+var roomMembershipService = require('./room-membership-service');
+var userService = require('./user-service');
+var userSettingsService = require('./user-settings-service');
+var chatService = require('./chat-service');
 var graphSuggestions = require('gitter-web-suggestions');
 var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
-var chatService = require('./chat-service');
+var cacheWrapper = require('gitter-web-cache-wrapper');
 var debug = require('debug')('gitter:suggestions');
 
 var NUM_SUGGESTIONS = 10;
@@ -165,4 +169,28 @@ function findSuggestionsForRooms(user, existingRooms, language) {
 }
 exports.findSuggestionsForRooms = findSuggestionsForRooms;
 
+function findRoomsByUserId(userId) {
+  return roomMembershipService.findRoomIdsForUser(userId)
+    .then(function(roomIds) {
+      return troupeService.findByIdsLean(roomIds, {
+        uri: 1,
+        lcOwner: 1,
+        lang: 1,
+        oneToOne: 1
+      });
+    });
+}
+
+// cache by userId
+exports.findSuggestionsForUserId = cacheWrapper('findSuggestionsForUserId',
+  function(userId) {
+    return Promise.all([
+      userService.findById(userId),
+      findRoomsByUserId(userId),
+      userSettingsService.getUserSettings(userId, 'lang')
+    ])
+    .spread(function(user, existingRooms, language) {
+      return findSuggestionsForRooms(user, existingRooms, language);
+    })
+  });
 
