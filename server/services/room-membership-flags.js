@@ -8,6 +8,8 @@ var FLAG_POS_NOTIFY_UNREAD       = 0;
 var FLAG_POS_NOTIFY_ACTIVITY     = 1;
 var FLAG_POS_NOTIFY_MENTION      = 2;
 var FLAG_POS_NOTIFY_ANNOUNCEMENT = 3;
+var FLAG_POS_NOTIFY_DEFAULT      = 4;
+
 /* -----8<---- */
 
 var BITMASK_INVERT = 0x0FFFFFFF;
@@ -16,13 +18,18 @@ var BITMASK_MODE = 1 << FLAG_POS_NOTIFY_UNREAD |
                    1 << FLAG_POS_NOTIFY_MENTION |
                    1 << FLAG_POS_NOTIFY_ANNOUNCEMENT;
 
-var BITMASK_INVERT_MODE = BITMASK_INVERT & ~BITMASK_MODE;
+var BITMASK_MODE_DEFAULT = BITMASK_MODE | 1 << FLAG_POS_NOTIFY_DEFAULT;
+
+var BITMASK_INVERT_MODE_DEFAULT = BITMASK_INVERT & ~BITMASK_MODE_DEFAULT;
 
 var BITMASK_NOTIFY_UNREAD       = 1 << FLAG_POS_NOTIFY_UNREAD;
 var BITMASK_NO_NOTIFY_UNREAD    = BITMASK_INVERT & ~BITMASK_NOTIFY_UNREAD;
 var BITMASK_NOTIFY_ACTIVITY     = 1 << FLAG_POS_NOTIFY_ACTIVITY;
+var BITMASK_NO_NOTIFY_ACTIVITY  = BITMASK_INVERT & ~BITMASK_NOTIFY_ACTIVITY;
+
 var BITMASK_NOTIFY_MENTIONS     = 1 << FLAG_POS_NOTIFY_MENTION;
 var BITMASK_NOTIFY_ANNOUNCEMENT = 1 << FLAG_POS_NOTIFY_ANNOUNCEMENT;
+var BITMASK_NOTIFY_DEFAULT      = 1 << FLAG_POS_NOTIFY_DEFAULT;
 
 var MODES = {
   /* Mode: all: unread + no activity + mentions + announcements */
@@ -53,13 +60,19 @@ function getModeFromFlags(flags) {
   return null;
 }
 
-function getUpdateForMode(mode) {
+function getUpdateForMode(mode, isDefault) {
   if (!MODES.hasOwnProperty(mode)) {
     throw new StatusError(400, 'Invalid mode ' + mode);
   }
 
   var setBits = MODES[mode];
-  var clearBits = BITMASK_INVERT_MODE | setBits;
+
+  /* Set the 'default setting' bit if this is a default */
+  if (isDefault) {
+    setBits = (setBits | BITMASK_NOTIFY_DEFAULT);
+  }
+
+  var clearBits = BITMASK_INVERT_MODE_DEFAULT | setBits;
 
   var lurk = !(setBits & BITMASK_NOTIFY_UNREAD);
 
@@ -67,6 +80,34 @@ function getUpdateForMode(mode) {
     $set: { lurk: lurk },
     $bit: { flags: { or: setBits, and: clearBits } }
   };
+}
+
+function getFlagsForMode(mode, isDefault) {
+  if (!MODES.hasOwnProperty(mode)) {
+    throw new StatusError(400, 'Invalid mode ' + mode);
+  }
+
+  var flags = MODES[mode];
+  if (isDefault) {
+    return flags | BITMASK_NOTIFY_DEFAULT;
+  } else {
+    return flags;
+  }
+}
+
+function toggleLegacyLurkMode(flags, isLurk) {
+  isLurk = !!isLurk;
+
+  if (getLurkForFlags(flags) === isLurk) {
+    return flags;
+  }
+
+  if (isLurk) {
+    return flags & BITMASK_NO_NOTIFY_UNREAD | BITMASK_NOTIFY_ACTIVITY;
+  } else {
+    return flags & BITMASK_NO_NOTIFY_ACTIVITY | BITMASK_NOTIFY_UNREAD;
+  }
+
 }
 
 function getLurkForFlags(flags) {
@@ -83,8 +124,10 @@ function getLurkForMode(mode) {
 
 module.exports = {
   MODES: MODES,
+  getFlagsForMode: getFlagsForMode,
   getModeFromFlags: getModeFromFlags,
   getUpdateForMode: getUpdateForMode,
   getLurkForFlags: getLurkForFlags,
-  getLurkForMode: getLurkForMode
+  getLurkForMode: getLurkForMode,
+  toggleLegacyLurkMode: toggleLegacyLurkMode
 };
