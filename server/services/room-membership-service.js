@@ -13,6 +13,8 @@ var roomMembershipEvents = new EventEmitter();
 var _                    = require('lodash');
 var roomMembershipFlags  = require('./room-membership-flags');
 
+var NEW_ROOM_MEMBER_DEFAULT = 'all';
+
 /**
  * Returns the rooms the user is in
  */
@@ -165,13 +167,18 @@ function addRoomMember(troupeId, userId) {
   assert(troupeId);
   assert(userId);
 
+  var flagsDefault = roomMembershipFlags.getFlagsForMode(NEW_ROOM_MEMBER_DEFAULT, true);
+  var lurkDefault = roomMembershipFlags.getLurkForFlags(flagsDefault);
+
   return TroupeUser.findOneAndUpdate({
       troupeId: troupeId,
       userId: userId
     }, {
       $setOnInsert: {
         troupeId: troupeId,
-        userId: userId
+        userId: userId,
+        lurk: lurkDefault,
+        flags: flagsDefault
       }
     }, { upsert: true, new: false })
     .exec()
@@ -210,6 +217,9 @@ function addRoomMembers(troupeId, userIds) {
     assert(userId);
   });
 
+  var flagsDefault = roomMembershipFlags.getFlagsForMode(NEW_ROOM_MEMBER_DEFAULT, true);
+  var lurkDefault = roomMembershipFlags.getLurkForFlags(flagsDefault);
+
   var bulk = TroupeUser.collection.initializeUnorderedBulkOp();
 
   troupeId = mongoUtils.asObjectID(troupeId);
@@ -219,7 +229,14 @@ function addRoomMembers(troupeId, userIds) {
 
     bulk.find({ troupeId: troupeId, userId: userId })
       .upsert()
-      .updateOne({ $setOnInsert: { troupeId: troupeId, userId:userId } });
+      .updateOne({
+        $setOnInsert: {
+          troupeId: troupeId,
+          userId: userId,
+          lurk: lurkDefault,
+          flags: flagsDefault
+        }
+      });
   });
 
   return Promise.fromCallback(function(callback) {
@@ -377,12 +394,12 @@ var getMembershipMode = Promise.method(function (userId, troupeId) {
     });
 });
 
-var setMembershipMode = Promise.method(function (userId, troupeId, value) {
+var setMembershipMode = Promise.method(function (userId, troupeId, value, isDefault) {
   debug('setMembershipMode userId=%s, troupeId=%s, value=%s', userId, troupeId, value);
   return TroupeUser.findOneAndUpdate({
       troupeId: troupeId,
       userId: userId
-    }, roomMembershipFlags.getUpdateForMode(value), {
+    }, roomMembershipFlags.getUpdateForMode(value, isDefault), {
       new: false
     })
     .exec()
@@ -400,11 +417,11 @@ var setMembershipMode = Promise.method(function (userId, troupeId, value) {
     });
 });
 
-var setMembershipModeForUsersInRoom = Promise.method(function(troupeId, userIds, value) {
+var setMembershipModeForUsersInRoom = Promise.method(function(troupeId, userIds, value, isDefault) {
   return TroupeUser.update({
       troupeId: troupeId,
       userId: { $in: mongoUtils.asObjectIDs(userIds) }
-    }, roomMembershipFlags.getUpdateForMode(value), {
+    }, roomMembershipFlags.getUpdateForMode(value, isDefault), {
       multi: true
     })
     .exec()
