@@ -1,9 +1,10 @@
 'use strict';
 
-var Marionette = require('backbone.marionette');
-var fastdom    = require('fastdom');
-var template   = require('./base-collection-view.hbs');
-var context    = require('utils/context');
+var Marionette  = require('backbone.marionette');
+var fastdom     = require('fastdom');
+var template    = require('./base-collection-view.hbs');
+var context     = require('utils/context');
+var toggleClass = require('utils/toggle-class');
 
 module.exports = Marionette.CompositeView.extend({
 
@@ -84,13 +85,13 @@ module.exports = Marionette.CompositeView.extend({
   },
 
   setActive: function (){
-    this.el.classList.toggle('active', this.model.get('active'));
+    toggleClass(this.el, 'active', this.model.get('active'));
   },
 
 
   setLoaded: function (val){
     val = (val || true);
-    this.el.classList.toggle('loaded', val);
+    toggleClass(this.el, 'loaded', val);
   },
 
   onDestroy: function() {
