@@ -89,17 +89,16 @@ var View = Marionette.LayoutView.extend({
     });
   },
 
-  onTagValid: function(model, value) {
-    if (!model.get) return;
-    model.get('errorModel').set({
+  onTagValid: function(el, value) {
+    this.model.get('errorModel').set({
       message: 'Press enter to add ' + value,
       isError: false,
     });
   },
 
-  onTagError: function() {
+  onTagError: function(el, message) {
     this.model.get('errorModel').set({
-      message: 'Tags must be between 1 and 20 characters in length',
+      message: message,
       isError: true,
     });
   },
