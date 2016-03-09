@@ -1,4 +1,4 @@
-/* jshint maxcomplexity:15 */
+/* jshint maxcomplexity:16 */
 "use strict";
 
 var logger                = require('gitter-web-env').logger;
@@ -165,6 +165,54 @@ ActivityForUserStrategy.prototype = {
   name: 'ActivityForUserStrategy'
 };
 
+
+
+// Only show reserved(with colons) tags to staff
+// TODO: Share this regex with `troupe-service.js` and `tagInputView.js`
+var reservedTagTestRegex = (/(.*?):(.*?)/);
+function TagsStrategy(options) {
+  var self = this;
+  self.tagMap = {};
+  var userId = options.userId || options.currentUserId;
+
+  this.preload = function(rooms, callback) {
+    userService.findById(userId)
+      .then(function(user) {
+        return user.staff;
+      })
+      .then(function(isStaff) {
+        return rooms.forEach(function(room) {
+          var tags = room.tags
+            .filter(function(tag) {
+              // staff can do anything
+              if(isStaff) {
+                return true;
+              }
+              // Users can only save, non-reserved tags
+              if(!reservedTagTestRegex.test(tag)) {
+                return true;
+              }
+
+              return false;
+            });
+
+          self.tagMap[room.id] = tags;
+        });
+      })
+      .nodeify(callback);
+  };
+
+  this.map = function(roomId) {
+    return self.tagMap[roomId] || [];
+  };
+}
+TagsStrategy.prototype = {
+  name: 'TagsStrategy'
+};
+
+
+
+
 function ProOrgStrategy() {
   var proOrgs = {};
 
@@ -293,6 +341,7 @@ function TroupeStrategy(options) {
   var favouriteStrategy     = currentUserId ? new FavouriteTroupesForUserStrategy(options) : null;
   var lurkStrategy          = currentUserId ? new LurkTroupeForUserStrategy(options) : null;
   var activityStrategy      = currentUserId ? new ActivityForUserStrategy(options) : null;
+  var tagsStrategy          = currentUserId ? new TagsStrategy(options) : null;
 
   var userIdStategy         = new UserIdStrategy(options);
   var proOrgStrategy        = new ProOrgStrategy(options);
@@ -383,6 +432,12 @@ function TroupeStrategy(options) {
       });
     }
 
+    if(tagsStrategy) {
+      strategies.push({
+        strategy: tagsStrategy,
+        data: items
+      });
+    }
 
     execPreloads(strategies, callback);
   };
@@ -454,7 +509,7 @@ function TroupeStrategy(options) {
       security: item.security,
       premium: isPro,
       noindex: item.noindex,
-      tags: item.tags,
+      tags: tagsStrategy ? tagsStrategy.map(item.id) : undefined,
       permissions: permissionsStategy ? permissionsStategy.map(item) : undefined,
       ownerIsOrg: ownerIsOrgStrategy ? ownerIsOrgStrategy.map(item) : undefined,
       roomMember: roomMembershipStrategy ? roomMembershipStrategy.map(item.id) : undefined,
