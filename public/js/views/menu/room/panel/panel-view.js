@@ -12,6 +12,7 @@ var TertiaryCollectionView   = require('../tertiary-collection/tertiary-collecti
 var TertiaryCollectionModel  = require('../tertiary-collection/tertiary-collection-model');
 var ProfileMenuView          = require('../profile/profile-menu-view');
 var fastdom                  = require('fastdom');
+var toggleClass              = require('utils/toggle-class');
 
 var SearchInputView       = require('views/menu/room/search-input/search-input-view');
 
@@ -118,7 +119,7 @@ module.exports = Marionette.LayoutView.extend({
 
   onPanelOpenStateChange: function(model, val) { /*jshint unused: true */
     fastdom.mutate(function() {
-      this.el.classList.toggle('active', val);
+      toggleClass(this.el, 'avtive', val);
     }.bind(this));
   },
 
