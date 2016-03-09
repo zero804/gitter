@@ -17,6 +17,7 @@ var restSerializer = require('../../server/serializers/rest-serializer');
 var suggestions = require('gitter-web-suggestions');
 var intercom = require('gitter-web-intercom');
 var getIntercomStream = require('intercom-stream');
+var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
 
 
 var opts = require('yargs')
@@ -80,6 +81,11 @@ stream
         return restSerializer.serialize(suggestedRooms, new restSerializer.SuggestedRoomStrategy());
       })
       .then(function(suggestions) {
+        // we use big avatars in the emails
+        suggestions.forEach(function(room) {
+          room.avatarUrl = resolveRoomAvatarUrl(room, 160);
+        });
+
         var suggestionsString = _.pluck(suggestions, 'uri').join(', ');
         console.log("Suggestions for", username + ':', suggestionsString);
 

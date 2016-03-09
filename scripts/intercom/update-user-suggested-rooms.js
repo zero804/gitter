@@ -12,6 +12,7 @@ var userSettingsService = require('../../server/services/user-settings-service')
 var restSerializer = require('../../server/serializers/rest-serializer');
 var intercom = require('gitter-web-intercom');
 var suggestions = require('gitter-web-suggestions');
+var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
 
 var opts = require('yargs')
   .option('id', {
@@ -76,6 +77,10 @@ getUserFromMongo(opts)
     return restSerializer.serialize(suggestedRooms, new restSerializer.SuggestedRoomStrategy());
   })
   .then(function(suggestions) {
+    // we use big avatars in the emails
+    suggestions.forEach(function(room) {
+      room.avatarUrl = resolveRoomAvatarUrl(room, 160);
+    });
     //console.log(user);
     // email (and user_id?) should be enough to uniquely identify the user.
     // Create against an existing user acts as an update.
