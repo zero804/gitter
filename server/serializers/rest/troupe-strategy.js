@@ -168,42 +168,23 @@ ActivityForUserStrategy.prototype = {
 
 
 // Only show reserved(with colons) tags to staff
-// TODO: Share this regex with `troupe-service.js` and `tagInputView.js`
-var reservedTagTestRegex = (/(.*?):(.*?)/);
 function TagsStrategy(options) {
+  console.log('asdf', options, new Error().stack);
   var self = this;
   self.tagMap = {};
   var userId = options.userId || options.currentUserId;
 
   this.preload = function(rooms, callback) {
-    userService.findById(userId)
-      .then(function(user) {
-        return user.staff;
-      })
-      .then(function(isStaff) {
-        return rooms.forEach(function(room) {
-          var tags = room.tags
-            .filter(function(tag) {
-              // staff can do anything
-              if(isStaff) {
-                return true;
-              }
-              // Users can only save, non-reserved tags
-              if(!reservedTagTestRegex.test(tag)) {
-                return true;
-              }
-
-              return false;
-            });
-
-          self.tagMap[room.id] = tags;
-        });
-      })
-      .nodeify(callback);
+    rooms.forEach(function(room) {
+      self.tagMap[room.id] = room.tags;
+    });
+    callback();
   };
 
   this.map = function(roomId) {
-    return self.tagMap[roomId] || [];
+    if(options.includeTags) {
+      return self.tagMap[roomId] || [];
+    }
   };
 }
 TagsStrategy.prototype = {

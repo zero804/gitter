@@ -138,7 +138,8 @@ makeTestTasks('test-mocha', function(name, files) {
     env: {
       multi: 'spec=- xunit=output/test-reports/' + name + '.xml',
       NODE_ENV: 'test',
-      Q_DEBUG: 1,
+      BLUEBIRD_DEBUG: 1,
+      TZ: 'UTC'
     }
   };
 

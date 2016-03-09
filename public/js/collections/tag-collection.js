@@ -3,8 +3,6 @@
 var Backbone = require('backbone');
 var context = require('utils/context');
 
-// TODO: Share this regex with `troupe-service.js` and `troupe-strategy.js`
-var reservedTagTestRegex = (/(.*?):(.*?)/);
 var maxTagLength = 20;
 var TagModel = Backbone.Model.extend({
   defaults: {
@@ -19,6 +17,7 @@ var TagModel = Backbone.Model.extend({
   },
 
   validate: function(attrs) {
+    var reservedTagTestRegex = (/:/);
     var messageList = [];
     var isStaff = context.isStaff();
 

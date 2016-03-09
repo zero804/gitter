@@ -257,9 +257,8 @@ function toggleSearchIndexing(user, troupe, bool) {
     });
 }
 
-// TODO: Share this regex with `troupe-strategy.js` and `tagInputView.js`
-var reservedTagTestRegex = (/(.*?):(.*?)/);
 function updateTags(user, room, tags) {
+  var reservedTagTestRegex = (/:/);
   var isStaff = user.get('staff');
 
   return Promise.resolve(isStaff || roomPermissionsModel(user, 'admin', room))
