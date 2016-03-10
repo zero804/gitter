@@ -137,7 +137,7 @@
     "argparse": "^1.0.1",
     "autoprefixer": "^6.0.3",
     "autoprefixer-core": "^5.1.0",
-    "backbone": "^1.2.3",
+    "backbone": "1.2.3",
     "backbone-proxy-collection": "^2.1.1",
     "backbone-url-resolver": "^0.1.1",
     "backbone.babysitter": "^0.1.6",
