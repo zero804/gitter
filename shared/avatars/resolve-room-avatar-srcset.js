@@ -3,6 +3,9 @@
 var resolveUserAvatarSrcSet = require('./resolve-user-avatar-srcset');
 
 module.exports = function resolveRoomAvatarSrcSet(name, size) {
+
+  if(!name) { return }
+
   // this is only supporting room.uri for now. Not sure if room.user or
   // room.owner or something would make more sense in future?
   size = size || 48;
@@ -16,5 +19,4 @@ module.exports = function resolveRoomAvatarSrcSet(name, size) {
 
   // default: just return resolveUserAvatarSrcSet's default
   return resolveUserAvatarSrcSet({}, size);
-}
-
+};
