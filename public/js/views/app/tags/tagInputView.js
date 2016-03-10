@@ -30,14 +30,24 @@ var TagInputView = Marionette.ItemView.extend({
     this.listenTo(this.model, 'change', this.onModelChange);
   },
 
+  getTagInputValue: function(e) {
+    return e ? e.target.value : this.$el.find('input').val();
+  },
+
   onTagSubmit: function(e) {
     if (e) e.preventDefault();
 
-    //TODO --> what happens if the model is invalid??
-    //jp 3/9/15
-
-    if (this.model.isValid()) {
+    // The `testTag` and our actual model should be the same if valid
+    // This check is necessary because if there was invalid input
+    // our legit model would stop setting the value after seeing it as invalid
+    // which would cause extraneous length errors
+    var val = this.getTagInputValue();
+    var testTag = new TagModel().set('value', val, {silent: true});
+    if (testTag.isValid() && this.model.isValid()) {
+      // Add the tag we just entered
       this.collection.addModel(this.model);
+
+      // Then reset the text input for the next one
       this.model = new TagModel();
       this.bindToModel();
       this.$el.find('input').val('');
@@ -45,11 +55,13 @@ var TagInputView = Marionette.ItemView.extend({
     }
   },
 
+
+
   onTagInput: function(e) {
     if (e) e.preventDefault();
 
     //guard against manual invocation of this function
-    var val =  e ? e.target.value : this.$el.find('input').val();
+    var val = this.getTagInputValue();
     this.model.set('value', val, {validate: true});
     if (val.length === 0) {
       this.triggerMethod('tag:warning:empty');
@@ -59,17 +71,15 @@ var TagInputView = Marionette.ItemView.extend({
   onKeyPressed: function(e) {
     switch (e.keyCode) {
 
-      //submit tag by pressing enter
+      // Submit tag by pressing enter
       case ENTER_KEY_CODE :
-
-        //manually trigger tag submission
-        this.onTagInput();
+        // manually trigger tag submission
         this.onTagSubmit();
         break;
 
-      //if a user presses (meta+backspace)/delete
-      //and the input is empty
-      //remove the last tag
+      // If a user presses (meta+backspace)/delete
+      // and the input is empty
+      // remove the last tag
       case DELETE_KEY_CODE :
         this.removeLastTag();
         break;
@@ -94,11 +104,11 @@ var TagInputView = Marionette.ItemView.extend({
     this.triggerMethod('tag:valid', model.get('value'));
   },
 
-  onModelInvalid: function() {
+  onModelInvalid: function(model, message) {
     this.$el.find('input').addClass('invalid');
 
     //if the tag is empty we want to show a message not error
-    this.triggerMethod('tag:error');
+    this.triggerMethod('tag:error', message);
   },
 
   focus: function() {
