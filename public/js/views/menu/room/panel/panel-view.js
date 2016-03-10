@@ -119,7 +119,7 @@ module.exports = Marionette.LayoutView.extend({
 
   onPanelOpenStateChange: function(model, val) { /*jshint unused: true */
     fastdom.mutate(function() {
-      toggleClass(this.el, 'avtive', val);
+      toggleClass(this.el, 'active', val);
     }.bind(this));
   },
 
