@@ -2,7 +2,7 @@
 /*jslint node: true */
 "use strict";
 
-var appEvents = require('../../server/app-events');
+var appEvents = require('gitter-web-appevents');
 var userService = require('../../server/services/user-service');
 var shutdown = require('shutdown');
 
@@ -13,25 +13,25 @@ require('../../server/event-listeners').install();
 var opts = require('yargs')
   .option('user', {
     alias: 'u',
-    type: 'array'
+    type: 'array',
     required: false,
     description: 'Send message to userId'
   })
   .option('email', {
     alias: 'e',
-    type: 'array'
+    type: 'array',
     required: false,
     description: 'Send message to email address'
-  })
-  .option('message', {
-    alias: 'm',
-    required: true,
-    description: 'Message to send'
   })
   .option('title', {
     alias: 'd',
     required: true,
     description: 'Title'
+  })
+  .option('message', {
+    alias: 'm',
+    required: true,
+    description: 'Message to send'
   })
   .option('link', {
     alias: 'l',
@@ -51,7 +51,7 @@ if(opts.user) {
    appEvents.userNotification({
     userId: opts.user,
     title: opts.title,
-    text: opts.text,
+    text: opts.message,
     link: opts.link,
     sound: opts.sound
    });
