@@ -95,7 +95,7 @@ module.exports = (function() {
     serializeData: function() {
       var data = this.model.toJSON();
       data.name = roomNameTrimmer(data.name, MAX_NAME_LENGTH);
-      data.roomAvatarSrcSet = resolveRoomAvatarSrcSet({ uri: data.url }, 16);
+      data.roomAvatarSrcSet = resolveRoomAvatarSrcSet(data.url, 16);
       return data;
     },
 

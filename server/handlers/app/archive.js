@@ -98,7 +98,7 @@ exports.datesList = [
       public: troupe.security === 'PUBLIC',
       avatarUrl: avatarUrl,
       isPrivate: isPrivate,
-      avatarSrcSet: resolveRoomAvatarSrcSet({ uri: req.uriContext.uri }, 48)
+      avatarSrcSet: resolveRoomAvatarSrcSet(req.uriContext.uri, 48)
     };
 
     return roomService.validateRoomForReadOnlyAccess(user, troupe)
