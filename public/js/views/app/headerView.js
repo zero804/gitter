@@ -69,7 +69,7 @@ module.exports = Marionette.ItemView.extend({
       troupeName:      data.name,
       troupeFavourite: !!data.favourite,
       troupeTopic:     data.topic,
-      avatarSrcSet:    resolveRoomAvatarSrcSet({ uri: data.url }, 48),
+      avatarSrcSet:    resolveRoomAvatarSrcSet(data.url, 48),
       user:            !!context.isLoggedIn(),
       archives:        this.options.archives,
       oneToOne:        (data.githubType === 'ONETOONE'),

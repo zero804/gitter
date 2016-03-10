@@ -3,6 +3,6 @@
 var resolveRoomAvatarSrcSet = require('./resolve-room-avatar-srcset');
 
 module.exports = function(room, size) {
-  var srcset = resolveRoomAvatarSrcSet(room, size);
+  var srcset = resolveRoomAvatarSrcSet(room.uri, size);
   return srcset.src;
 };
