@@ -9,96 +9,55 @@
   </head>
   <body>
     <header class="page-header">
-      <div class='wrap--large'>
-        <div class='logo'>{{> logo }}</div>
-      </div>
-      <div class='wrap'>
-        {{#if isLoggedIn }}
-          <h1 class="title">Explore <b>Gitter</b></h1>
-          <form action='/explore/tags' class='js-search-form'>
-            <p><input name='search' id='search' class='page-header__search' type='search' placeholder='Search for tags... e.g. node' /></p>
-          </form>
-          <p>or try one of our selected tags: <a href='/explore/tags/javascript' class='js-pills'><span class='pill--primary'>JavaScript</span></a> <a href='/explore/tags/ruby' class='js-pills'><span class='pill--primary'>Ruby</span></a> or <a href='/explore/tags/php' class='js-pills'><span class='pill--primary'>PHP</span></a></p>
-        {{else}}
-          <h1 class="title">Chat for <b>GitHub</b>.</h1>
-          <div class='page-header__features'>
-            <div class='feature'>
-              <p><span class="mega-octicon octicon-comment-discussion"></span></p>
-              <h2>Unlimited Free Chats</h2>
-              <p><small>As well as free private one-to-one chats and private team plans starting from as little as $5 per user per month.</small></p>
-            </div>
-            <div class='feature'>
-              <p><span class="mega-octicon octicon-file-code"></span></p>
-              <h2>Developer Focused</h2>
-              <p><small>Markdown, syntax highlighting and even LaTeX. Auto-completion of GitHub #issues, @usernames and more. Real-time integration with the services that matter to devs.</small></p>
-            </div>
-            <div class='feature'>
-              <p><span class="mega-octicon octicon-organization"></span></p>
-              <h2>Be Part of a Community</h2>
-              <p><small>Ask questions, help other users or discuss the next big feature. Open source is only as strong as the community that builds it. So get involved.</small></p>
-            </div>
-          </div>
-          <p><a href='/home/createroom' class='btn--primary  js-sign-up'>Sign up with <span class="octicon octicon-mark-github"></span></a></p>
-          <p><small>or <a href="/?redirect=no#pricing-panel">check out the premium plans</a></small></p>
-        {{/if}}
-      </div>
-    </header>
-    <section class="page-result">
+
+    <ul class="tag-pill-list">
+      {{#each tagMap}}
+        <li class="tag-pill-list-item">
+          <input type="checkbox" class="tag-pill-checkbox-toggle" id="tag-pill-checkbox-toggle-{{@key}}">
+          <label class="tag-pill" for="tag-pill-checkbox-toggle-{{@key}}">
+            {{this}}
+          </label>
+        </li>
+      {{/each}}
+
+      <li class="tag-pill-list-pagination-item">
+        More
+      </li>
+    </ul>
+
+    <div>
       {{#if rooms}}
-        {{#if isLoggedIn }}
-          <p>Displaying results for: <b>{{ searchName }}</b></p>
-        {{else}}
-          <p>Here's a selection of <b>{{ searchName }}</b> rooms:</p>
-        {{/if}}
-      {{else}}
-        <p><span class="octicon octicon-stop"></span>Sorry about that. No results found for: <b>{{ searchName }}</b></p>
-      {{/if}}
-    </section>
-    <div class='page-content'>
-      <div class='wrap--large'>
-        {{#if rooms}}
-          <div class="page-content__room-list">
-            {{#each rooms}}
-              <a class='explore-room-item  js-room-item' href="/{{ room.uri }}?source=explore" target="_parent">
-                <header>
-                  <img class="explore-room-item__avatar" src="https://avatars.githubusercontent.com/{{ owner }}?s=80">
-                  <h3 class="repo-name">
-                  {{#each roomNameParts}}
-                    {{!-- if index is greater than 0, add a slash --}}
-                    {{#if @index}}
-                    <span>/</span>
-                    {{/if}}
-                    <span class="repo-name__collapsable">{{ this }}</span>
-                  {{/each}}
-                  </h3>
-                </header>
-                <section class='explore-room-item__description'>
-                  <small>{{ description }}</small>
-                </section>
-                <section class='explore-room-item__content'>
-                  {{!-- <p>Some content, content about something.</p> --}}
-                </section>
-                <footer>
-                  <small><span class="octicon octicon-organization"></span> {{ room.userCount }} {{ pluralize room.userCount 'person' 'people'}}</small>
-                  <small><span class="octicon octicon-comment-discussion"></span> {{ formatNumber messageCount }} {{ pluralize messageCount 'message' 'messages'}}</small>
-                </footer>
-              </a>
-            {{/each}}
-          </div>
-        {{/if}}
-        <div class='page-content__new-room'>
-          <h1><span class="mega-octicon octicon-search"></span> Haven't found what you're looking for?</h1>
-          <p><a href='/home/createroom' target="_parent" class='btn--primary  js-create-new'><span class="octicon octicon-plus"></span> Create a room</a></p>
+        <div class="page-content__room-list">
+          {{#each rooms}}
+            <a class='explore-room-item  js-room-item' href="/{{ room.uri }}?source=explore" target="_parent">
+              <header>
+                <img class="explore-room-item__avatar" src="https://avatars.githubusercontent.com/{{ owner }}?s=80">
+                <h3 class="repo-name">
+                {{#each roomNameParts}}
+                  {{!-- if index is greater than 0, add a slash --}}
+                  {{#if @index}}
+                  <span>/</span>
+                  {{/if}}
+                  <span class="repo-name__collapsable">{{ this }}</span>
+                {{/each}}
+                </h3>
+              </header>
+              <section class='explore-room-item__description'>
+                <small>{{ description }}</small>
+              </section>
+              <section class='explore-room-item__content'>
+                {{!-- <p>Some content, content about something.</p> --}}
+              </section>
+              <footer>
+                <small><span class="octicon octicon-organization"></span> {{ room.userCount }} {{ pluralize room.userCount 'person' 'people'}}</small>
+                <small><span class="octicon octicon-comment-discussion"></span> {{ formatNumber messageCount }} {{ pluralize messageCount 'message' 'messages'}}</small>
+              </footer>
+            </a>
+          {{/each}}
         </div>
-      </div>
+      {{/if}}
     </div>
 
-    {{#unless isLoggedIn }}
-    <footer>
-      <p>Our team is <b>proud</b> to host thousands of public conversations for open-source communities, for free. <b>Gitter</b>, where developers come together to talk.</p>
-      <p><a href='/?redirect=no' class='btn--secondary  js-find-out'><span class="octicon octicon-telescope"></span> Find out more</a></p>
-    </footer>
-    {{/unless}}
 
     <script type="text/javascript" src="//use.typekit.net/ohh4mcl.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/octicons/2.0.2/octicons.min.css">
