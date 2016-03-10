@@ -202,11 +202,11 @@ gulp.task('submit-coveralls-post-tests', ['merge-lcov'], function() {
     });
 });
 
-gulp.task('submit-coveralls', ['test-mocha', 'test-redis-lua'], function(callback) {
+gulp.task('submit-coveralls', ['test-mocha'/*, 'test-redis-lua'*/], function(callback) {
   runSequence('submit-coveralls-post-tests', callback);
 });
 
-gulp.task('test', ['test-mocha', 'test-redis-lua', 'submit-coveralls']);
+gulp.task('test', ['test-mocha'/*, 'test-redis-lua'*/, 'submit-coveralls']);
 
 makeTestTasks('localtest', function(name, files) {
   return gulp.src(files, { read: false })
