@@ -3,16 +3,18 @@
 @import 'pills';
 @import 'typography';
 
+@bg-color: #ffffff;
 // if you change this, make sure to change the image url "s" param.
 // it has to be double to support retina displays.
 @AVATAR_SIZE: 4 * 0.625em; // @const
+
 
 html {
   box-sizing: border-box;
 }
 
 body {
-  background-color: @dark;
+  background-color: @bg-color;
   margin: 0;
 }
 
@@ -20,178 +22,140 @@ body {
   box-sizing: inherit;
 }
 
-* {
-  smoothing: antialiased;
-  font-smoothing: grayscale;
-}
 
-p {
-  &:last-child {
-    margin-bottom: 0;
-  }
-}
 
-a {
-  color:inherit;
-  text-decoration: none;
-  border-bottom: 1px dotted rgba(255, 255, 255, 0.75);
-  transition: border-color 0.2s;
-  &:hover {
-    border-bottom: 1px dotted rgba(255, 255, 255, 1);
-  }
-}
 
-textarea:focus, input:focus{
-  outline: 0;
-}
 
-.wrap {
-  max-width: 75em;
-  margin: 0 auto;
-  overflow: hidden;
-}
 
-.wrap--large {
-  .wrap;
-  max-width: 93.75em;
-}
 
-.avatar {
-  float: left;
-  border-radius: 3px;
-  margin-right: 8px;
-}
+.tag-pill-list(@num-rows: 2, @num-per-row: 5) {
+  @tag-vertical-padding: 0.75em;
+  @tag-margin: 1rem;
 
-.see-all-link {
-  float: right;
-}
+  @tag-width: calc((100% / @num-per-row) ~"-" ((@tag-margin * (@num-per-row - 1)) / @num-per-row));
+  @tag-height: (1em + (2 * @tag-vertical-padding));
+  @tag-margin-box: @tag-height + @tag-margin;
 
-.page-header {
-  background: url('../images/home/banner.jpg') no-repeat center center;
-  background-size: cover;
-  // Give a dark colour for the background to fade into
-  background-color: #512e92;
-
-  // jonny ive would love this shit
-  // background: rgb(80,41,131); /* Old browsers */
-  // background: -moz-linear-gradient(top,  rgba(80,41,131,1) 0%, rgba(158,55,93,1) 100%); /* FF3.6+ */
-  // background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(80,41,131,1)), color-stop(100%,rgba(158,55,93,1))); /* Chrome,Safari4+ */
-  // background: -webkit-linear-gradient(top,  rgba(80,41,131,1) 0%,rgba(158,55,93,1) 100%); /* Chrome10+,Safari5.1+ */
-  // background: -o-linear-gradient(top,  rgba(80,41,131,1) 0%,rgba(158,55,93,1) 100%); /* Opera 11.10+ */
-  // background: -ms-linear-gradient(top,  rgba(80,41,131,1) 0%,rgba(158,55,93,1) 100%); /* IE10+ */
-  // background: linear-gradient(to bottom,  rgba(80,41,131,1) 0%,rgba(158,55,93,1) 100%); /* W3C */
-  // filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#502983', endColorstr='#9e375d',GradientType=0 ); /* IE6-9 */
-  padding: 1.875em 1.25em;
-  text-align: center;
-  color: white;
-
-  .logo {
-    height: 40px;
-    svg {
-      width: 23px;
-      height: 40px;
-      fill: white;
-    }
-    margin-bottom: 1.25em;
-  }
-
-  nav {
-    float: right;
-  }
-
-  .octicon-heart {
-    color: desaturate(@red, 20%);
-  }
-
-  p {
-    font-size: 1.25em;
-    &:last-child {
-      margin-bottom: 0;
-    }
-  }
-
-  h1 {
-    letter-spacing: 0.1em;
-    text-align: center;
-    line-height: 1.4em;
-    font-size: 10vw;
-    text-transform: uppercase;
-    font-weight: 300;
-  }
-
-  &__search {
-    -webkit-appearance: none;
-    color: @dark;
-    width: 100%;
-    border: 3px solid darken(@light, 5%);
-    background-color: rgba(255, 255, 255, 0.9);
-    font-size: 1em;
-    height: 4 * 0.625em;
-    padding: 0 0.7em 0 0.4em;
-    max-width: 600px;
-    border-radius: 4px;
-    font-family: proxima-nova-alt, "Proxima Nova Alt", sans-serif;
-  }
-
-  &__features {
+  .tag-pill-list {
+    overflow: hidden;
+    position: relative;
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
+    justify-content: flex-start;
+    align-items: stretch;
 
-    .feature {
-      padding: 2 * 0.625em;
-      max-width: 25em;
-      margin: 0 auto;
-    }
-  }
+    // 2 rows + margin - the margin we don't have on the first row
+    height: calc(@num-rows * @tag-margin-box - @tag-margin);
 
-  @media (min-width: 64em) {
-    h1 {
-      font-size: 3vw;
-    }
-  }
-}
-
-.page-result {
-  background-color: darken(@light, 10%);
-  color: #7d7669;
-  padding: 2 * 0.625em;
-  text-align: center;
-  p {
     margin: 0;
-  }
-}
-
-.page-content {
-  background-color: @light;
-  padding: 0.625em;
-
-  &__room-list {
-    display: flex;
-    flex-wrap: wrap;
+    padding: 0;
     list-style: none;
-    padding-left: 0;
-    margin: 0;
   }
 
-  &__new-room {
-    text-align: center;
-    padding: 2 * 0.625em;
-    h1 {
-      margin-bottom: 2 * 0.625em;
+
+  .tag-pill-list-item {
+    display: inline-block;
+    width: @tag-width;
+    margin-right: @tag-margin;
+
+    // Only put top margin on the second row onward
+    @num-per-row-plus: @num-per-row + 1;
+    &:nth-child(n + @{num-per-row-plus}) {
+      margin-top: @tag-margin;
+    }
+    &:nth-child(@{num-per-row}n) {
+      margin-right: 0;
+    }
+
+    /* * /
+    // Hide the extra tags
+    @extra-tag-start-index: @num-rows * @num-per-row;
+    &:nth-child(n + @{extra-tag-start-index}) {
+      visibility: hidden;
+    }
+    /* */
+  }
+
+
+  .tag-pill {
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: @tag-vertical-padding 2em;
+
+    background-color: @pampas;
+    border-radius: 4px;
+
+    color: #808080;
+    line-height: 1;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    cursor: pointer;
+
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+
+    .tag-pill-checkbox-toggle:checked + & {
+      background-color: @jaffa;
+      color: #ffffff;
+    }
+  }
+
+  .tag-pill-checkbox-toggle {
+    display: none;
+  }
+
+
+
+  .tag-pill-list-pagination-item {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+
+    display: flex;
+    width: @tag-width;
+    height: @tag-height;
+
+    background-color: @bg-color;
+    border: 1px solid @pampas;
+    border-radius: 4px;
+
+    & > * {
+      flex: 1;
+      display: block;
     }
   }
 }
 
-footer {
-  color: @light;
-  padding: 4 * 0.625em;
-  text-align: center;
 
-  p {
-    margin-bottom: 2 * 0.625em;
-  }
+@media-tag-list-large: 1300px;
+@media-tag-list-medium: 1100px;
+@media-tag-list-small: 700px;
+
+
+// `postcss-reverse-media` would be nice here: https://github.com/MadLittleMods/postcss-reverse-media
+@media (min-width: (@media-tag-list-large + 0.001)) {
+  .tag-pill-list(2, 8);
 }
+
+@media (max-width: @media-tag-list-large) and (min-width: (@media-tag-list-medium + 0.001)) {
+  .tag-pill-list(2, 6);
+}
+
+@media (max-width: @media-tag-list-medium) and (min-width: (@media-tag-list-small + 0.001)) {
+  .tag-pill-list(2, 4);
+}
+
+@media (max-width: @media-tag-list-small) {
+  .tag-pill-list(2, 3);
+}
+
+
+
+
 
 .explore-room-item {
 

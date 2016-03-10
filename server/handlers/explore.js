@@ -7,6 +7,13 @@ var Promise = require('bluebird');
 var langs = require('langs');
 var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
 
+var slugify = function(str){
+  return str
+    .toLowerCase()
+    .replace(/ +/g, '-')
+    .replace(/[^-\w]/g, '');
+};
+
 // @const
 var DEFAULT_TAGS = ['javascript', 'php', 'ruby'];
 
@@ -33,18 +40,6 @@ function processTagResult(rooms) {
   return Promise.all(rooms.map(getRoomRenderData));
 }
 
-function getSearchName(tags) {
-  return tags.map(function(tag) {
-    var m = /^lang:(\w+)/.exec(tag);
-    if(!m || !m[1]) return tag;
-
-    var lang = langs.where("1", m[1]);
-    if(!lang || !lang.local) return m[1];
-
-    return lang.local;
-  });
-}
-
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
 /* Seriously, wtf is this all about? */
@@ -60,14 +55,46 @@ router.get('/:tags?',
 router.get('/tags/:tags',
   identifyRoute('explore-tags'),
   function (req, res, next) {
-    var tags = req.params.tags.split(',');
-    return exploreService.fetchByTags(tags)
+    var userTags = req.params.tags.split(',');
+    var defaultTags = [
+      'javascript',
+      'php',
+      'curated:frontend',
+      'curated:ios & curated:android & objective-c',
+      'curated:ios ',
+      'curated:android',
+      'curated:datascience',
+      'curated:devops',
+      'curated:gamedev & game',
+      'frameworks',
+      'scala',
+      'ruby',
+      'css',
+      'curated:materialdesign',
+      'react',
+      'java',
+      'swift',
+      'go',
+      'node & nodejs',
+      'meteor',
+      'django',
+      'dotnet',
+      'angular',
+      'rails',
+      'haskell'
+    ];
+
+    var combinedTags = userTags.concat(defaultTags)
+    var tagMap = {};
+    combinedTags.forEach(function(tag) {
+      tagMap[slugify(tag)] = tag;
+    });
+
+    return exploreService.fetchByTags(combinedTags)
       .then(processTagResult)
       .then(function (rooms) {
-        var searchNames = getSearchName(tags);
         res.render('explore', {
-          tags: tags.join(', '),
-          searchName: searchNames.join(', '),
+          tagMap: tagMap,
           rooms: rooms,
           isLoggedIn: !!req.user
         });
