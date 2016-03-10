@@ -35,13 +35,13 @@ module.exports =  Marionette.ItemView.extend({
     var data = this.model.toJSON();
     var activity = (data.mentions || data.unreadItems) ? false : data.activity;
     return _.extend({}, data, {
-      isHome:      (data.type === 'all'),
-      isSearch:    (data.type === 'search'),
-      isFavourite: (data.type === 'favourite'),
-      isPeople:    (data.type === 'people'),
-      isOrg:       (data.type === 'org'),
-      avatarUrl:   resolveRoomAvatar(data.name, 23),
-      activity:    activity,
+      isHome:       (data.type === 'all'),
+      isSearch:     (data.type === 'search'),
+      isFavourite:  (data.type === 'favourite'),
+      isPeople:     (data.type === 'people'),
+      isOrg:        (data.type === 'org'),
+      avatarSrcset: resolveRoomAvatar(data.name, 23),
+      activity:     activity,
     });
   },
 
