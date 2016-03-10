@@ -167,7 +167,6 @@ ActivityForUserStrategy.prototype = {
 
 
 
-// Only show reserved(with colons) tags to staff
 function TagsStrategy(options) {
   var self = this;
   self.tagMap = {};
