@@ -23,7 +23,7 @@ module.exports = function parseContentToTemplateData(data, state) {
     var lurkActivity = data.lurk && (!hasMentions && !unreadItems) && !!data.activity;
 
     return _.extend({}, data, {
-      avatarSrcset:  resolveRoomAvatarSrcSet(name, 22),
+      avatarSrcset:  resolveRoomAvatarSrcSet({ uri: name }, 22),
       isNotOneToOne: (data.githubType !== 'ONETOONE'),
       name:          roomNameShortener(data.name),
       mentions:      hasMentions,

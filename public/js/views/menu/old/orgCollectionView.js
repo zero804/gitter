@@ -27,7 +27,7 @@ module.exports = (function() {
 
     serializeData: function() {
       var data = this.model.toJSON();
-      data.roomAvatarSrcSet = resolveRoomAvatarSrcSet(data.name, 16);
+      data.roomAvatarSrcSet = resolveRoomAvatarSrcSet({uri: data.name}, 16);
       return data;
     },
 
