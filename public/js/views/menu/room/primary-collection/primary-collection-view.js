@@ -28,7 +28,6 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     return ((this.roomMenuModel.get('state') === 'search') && !this.collection.length);
   },
 
-
   childViewOptions: function(model) {
     var baseOptions   = BaseCollectionView.prototype.childViewOptions.apply(this, arguments);
     baseOptions.model = model;
