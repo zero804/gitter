@@ -3,10 +3,13 @@
 @import 'pills';
 @import 'typography';
 
+@page-bg-color: #ffffff;
 @room-card-bg-color: #ffffff;
 
 @page-wrapper-max-width: 93.75rem;
 @page-wrapper-horizontal-padding: 2rem;
+
+@explore-header-mobile-icon-size: 72px;
 
 // if you change this, make sure to change the image url "s" param.
 // it has to be double to support retina displays.
@@ -24,7 +27,7 @@ html {
 body {
   height: 100%;
   margin: 0;
-  background-color: @room-card-bg-color;
+  background-color: @page-bg-color;
 }
 
 *, *:before, *:after {
@@ -50,10 +53,83 @@ body {
   padding-right: @page-wrapper-horizontal-padding;
 }
 
+.explore-header-info-bar__mobile-diagram {
+  @explore-header-mobile-icon-size: 72px;
+
+  z-index: 1;
+  display: inline-block;
+  vertical-align: middle;
+  width: 1ch;
+
+  color: fade(@light, 75%);
+
+  font-size: @explore-header-mobile-icon-size;
+  line-height: 1rem;
+
+}
+
+.explore-header-info-bar__mobile-icon {
+  position: relative;
+  transform: translateX(-33%);
+  display: inline-block;
+
+  &,
+  &:before {
+    line-height: inherit;
+  }
+
+  &:after {
+    content: '';
+    z-index: -1;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+
+    width: 1ch;
+    width: calc(1ch ~"-" 8px);
+    height: @explore-header-mobile-icon-size;
+
+    background-color: @page-bg-color;
+  }
+}
+
 .secondary-header-info-bar {
   display: flex;
+  padding-bottom: 8px;
+
   border-bottom: 3px solid fade(@light, 75%);
+
+  & > .secondary-header-info-bar__item:first-child {
+    margin-left: 0;
+  }
 }
+
+.secondary-header-info-bar__spacer {
+  flex: 1;
+}
+
+.secondary-header-info-bar__item {
+  margin-left: 1em;
+  margin-right: 1em;
+
+  color: #bcbcbc;
+  text-decoration: none;
+}
+
+.secondary-header-info-bar__item-icon {
+  color: #e2e2e2;
+}
+
+
+.explore-header-info-bar__mobile-item {
+  .secondary-header-info-bar__item();
+
+  margin-left: 0.5em;
+  margin-right: 0.5em;
+}
+
+
+
 
 .explore-pill-list-section {
   width: 100%;
@@ -260,9 +336,9 @@ body {
 }
 
 .room-card {
-
   @room-card-bg-color: white;
 
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   flex: 1 0 15.625em;
