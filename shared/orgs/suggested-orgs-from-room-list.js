@@ -34,12 +34,10 @@ module.exports = function suggestedOrgsFromRoomList(roomList, uri) {
   //we shunt the new org to the top of the minibar list JP 8/3/16
   var currentOrg = getOrgNameFromUri(uri);
 
-  //This is pretty dodge tbh. JP 7/3/16
-  //If a user is viewing gitterHQ/gitter or gitterHQ and have never joined a gitterHQ room
-  //we want to show the gitterHQ org in the minibar
-  //which is fine, but we only have the url to discern whether this is the case
-  //this throws up issues for the home page and any other url with is not a room url
-  //eg /home || /explore In the future if we add anymore /:pageName urls this will need to be changed :(
+  // FIXME: This is pretty dodge tbh. JP 7/3/16
+  // If a user is viewing `/gitterHQ/gitter` or `/gitterHQ` and have never joined a gitterHQ room
+  // we want to show the `gitterHQ` org in the minibar
+  // But when someone visits `/home` or `/explore`, we don't want it to pick it up as an org
   if(currentOrg === 'home' || currentOrg === 'explore') {
     return orgList;
   }
