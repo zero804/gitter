@@ -16,21 +16,13 @@ var View = Marionette.ItemView.extend({
     this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
   },
 
-  events: {
-  },
-
   menuItemClicked: function(button) {
     switch (button) {
       case 'cancel':
         this.dialog.hide();
         break;
     }
-  },
-
-  serializeData: function() {
-    return { };
-  },
-
+  }
 });
 
 var Modal = ModalView.extend({
