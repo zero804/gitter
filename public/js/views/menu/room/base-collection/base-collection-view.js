@@ -33,6 +33,7 @@ module.exports = Marionette.CompositeView.extend({
 
   childEvents: {
     'item:clicked': 'onItemClicked',
+    'hide:complete': 'onHideComplete'
   },
 
   constructor: function(attrs) {
@@ -88,10 +89,16 @@ module.exports = Marionette.CompositeView.extend({
     toggleClass(this.el, 'active', this.model.get('active'));
   },
 
-
   setLoaded: function (val){
     val = (val || true);
     toggleClass(this.el, 'loaded', val);
+  },
+
+  onHideComplete: function (view){
+    //If we are hiding the current room, navigate to /home JP 11/3/16
+    if(view.model.get('id') === context.troupe().get('id')) {
+      this._triggerNavigation('/home', 'home', 'Home');
+    }
   },
 
   onDestroy: function() {
