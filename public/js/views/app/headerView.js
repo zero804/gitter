@@ -162,6 +162,7 @@ module.exports = Marionette.ItemView.extend({
   createMenu: function() {
       var menuItems = [];
       var c = context();
+      var isStaff = context.isStaff();
       var isAdmin = context.isTroupeAdmin();
       var isRoomMember = context.isRoomMember();
       var githubType = this.model.get('githubType');
@@ -183,10 +184,10 @@ module.exports = Marionette.ItemView.extend({
           } else {
             menuItems.push({ title: 'Integrations', href: '#integrations' });
           }
+        }
 
-          if (githubType !== 'USER_CHANNEL') {
-            menuItems.push({ title: 'Edit tags', href: '#tags/' + context().troupe.id });
-          }
+        if (isStaff || isAdmin) {
+          menuItems.push({ title: 'Edit tags', href: '#tags/' + context().troupe.id });
         }
 
         menuItems.push({ divider: true });
