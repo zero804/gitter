@@ -32,8 +32,9 @@ module.exports = Marionette.CompositeView.extend({
   },
 
   childEvents: {
-    'item:clicked': 'onItemClicked',
-    'hide:complete': 'onHideComplete'
+    'item:clicked':   'onItemClicked',
+    'hide:complete':  'onHideLeaveRoom',
+    'leave:complete': 'onHideLeaveRoom',
   },
 
   constructor: function(attrs) {
@@ -46,7 +47,7 @@ module.exports = Marionette.CompositeView.extend({
   },
 
   initialize: function() {
-    if(this.model.get('active')){
+    if (this.model.get('active')) {
       this.render();
     }
   },
@@ -66,10 +67,6 @@ module.exports = Marionette.CompositeView.extend({
     this._triggerNavigation(url, 'chat', name);
   },
 
-  _triggerNavigation: function (url, type, name){
-    this.bus.trigger('navigation', url, type, name);
-  },
-
   onFilterComplete: function() {
     this.setActive();
   },
@@ -85,24 +82,34 @@ module.exports = Marionette.CompositeView.extend({
     }.bind(this));
   },
 
-  setActive: function (){
+  setActive: function () {
     toggleClass(this.el, 'active', this.model.get('active'));
   },
 
-  setLoaded: function (val){
+  setLoaded: function (val) {
     val = (val || true);
     toggleClass(this.el, 'loaded', val);
   },
 
-  onHideComplete: function (view){
+  onHideLeaveRoom: function (view) {
     //If we are hiding the current room, navigate to /home JP 11/3/16
-    if(view.model.get('id') === context.troupe().get('id')) {
-      this._triggerNavigation('/home', 'home', 'Home');
-    }
+    if (this._isCurrentRoom(view.model)) { this._navigateToHome(); }
   },
 
   onDestroy: function() {
     this.stopListening(context.troupe());
+  },
+
+  _triggerNavigation: function (url, type, name) {
+    this.bus.trigger('navigation', url, type, name);
+  },
+
+  _navigateToHome: function () {
+    this._triggerNavigation('/home', 'home', 'Home');
+  },
+
+  _isCurrentRoom: function (model) {
+    return (context.troupe().get('id') === model.get('id'));
   },
 
 });

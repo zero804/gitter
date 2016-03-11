@@ -94,8 +94,8 @@ module.exports = BaseCollectionItemView.extend({
 
     apiClient.delete('/v1/rooms/' + this.model.get('id') + '/users/' + context.getUserId())
       .then(function() {
-        appEvents.trigger('navigation', '/home', 'home', '');
-      });
+        this.trigger('leave:complete');
+      }.bind(this));
   },
 
   render: function() {
