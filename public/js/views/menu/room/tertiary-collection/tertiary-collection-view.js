@@ -13,7 +13,6 @@ var ItemView = BaseCollectionItemView.extend({
     var data = this.model.toJSON();
     data.name = roomNameShortener(data.name || data.uri);
     var name = (this.roomMenuModel.get('state') === 'search') ? null : (data.name || data.uri);
-    console.log(name);
     return _.extend({}, data, {
       avatarSrcset: resolveRoomAvatarSrcSet({ uri: name }, 22),
     });
