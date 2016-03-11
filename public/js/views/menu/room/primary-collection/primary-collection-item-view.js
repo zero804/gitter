@@ -47,7 +47,6 @@ module.exports = BaseCollectionItemView.extend({
   },
 
   onOptionsClicked: function(e) {
-    console.log(this);
     //Stop this view triggering up to the parent
     e.stopPropagation();
 
