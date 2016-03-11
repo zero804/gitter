@@ -36,7 +36,7 @@ var View = Marionette.ItemView.extend({
 var Modal = ModalView.extend({
   initialize: function(options) {
     options = options || {};
-    options.title = options.title || "Login";
+    options.style = 'modal--default__narrow';
 
     ModalView.prototype.initialize.call(this, options);
     this.view = new View(options);
