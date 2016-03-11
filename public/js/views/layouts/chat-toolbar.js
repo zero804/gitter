@@ -1,12 +1,21 @@
 "use strict";
 
 var context = require('utils/context');
+var appEvents = require('utils/appevents');
 var ChatLayout = require('./chat');
 var HeaderView = require('views/app/headerView');
 var RightToolbarView = require('views/righttoolbar/rightToolbarView');
 require('views/behaviors/isomorphic');
 
 module.exports = ChatLayout.extend({
+  events: {
+    'click a[href="/login"]': 'clickLogin'
+  },
+
+  clickLogin: function(e) {
+    e.preventDefault();
+    appEvents.trigger('loginClicked');
+  },
 
   behaviors: {
     Isomorphic: {

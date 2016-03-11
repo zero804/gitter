@@ -66,7 +66,11 @@ onready(function() {
 
   });
 
-  new Router();
+  var router = new Router();
+
+  appEvents.on('loginClicked', function() {
+    router.navigate('login', {trigger: true});
+  });
 
   // // Listen for changes to the room
   // liveContext.syncRoom();
