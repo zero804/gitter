@@ -19,7 +19,7 @@ module.exports = BaseCollectionItemView.extend({
     var name = (data.name || data.uri);
     return _.extend({}, data, {
       name:         roomNameShortener(name),
-      avatarSrcset: resolveRoomAvatarSrcSet(name, 22)
+      avatarSrcset: resolveRoomAvatarSrcSet({ uri: name }, 22)
     });
   }
 });

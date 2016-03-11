@@ -40,7 +40,7 @@ module.exports =  Marionette.ItemView.extend({
       isFavourite:  (data.type === 'favourite'),
       isPeople:     (data.type === 'people'),
       isOrg:        (data.type === 'org'),
-      avatarSrcset: resolveRoomAvatar(data.name, 23),
+      avatarSrcset: resolveRoomAvatar({ uri: data.name }, 23),
       activity:     activity,
     });
   },
