@@ -256,7 +256,7 @@ To tun these tests you will need these variables within your `env`:
 BROWSERSTACK_USERNAME
 BROWSERSTACK_KEY
 
-once you have these you can run `npm run test:unit:browser` which should kick off the tests via browserstack
+Once you have these you can run `npm run test:unit:browser` which should kick off the tests via browserstack
 
 
 
