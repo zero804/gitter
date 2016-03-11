@@ -260,6 +260,10 @@ module.exports = (function() {
     return !!user.id;
   };
 
+  context.isStaff = function() {
+    return user.get('staff');
+  };
+
   context.isTroupeAdmin = function() {
     var permissions = troupe.get('permissions');
     if (!permissions) return false;

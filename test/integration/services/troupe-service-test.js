@@ -23,16 +23,46 @@ describe('troupe-service', function() {
       './room-permissions-model': function() { return Promise.resolve(true); }
     });
 
-    it('should update tags', function(done) {
+    it('should update tags', function() {
       var rawTags = 'js, open source,    looooooooooooooooooooooooooooongtag,,,,';
       var cleanTags = ['js','open source', 'looooooooooooooooooo'];
 
-      troupeService.updateTags(fixture.user1, fixture.troupe1, rawTags)
-      .then(function(troupe) {
-        assert.deepEqual(troupe.tags.toObject(), cleanTags);
-        done();
-      })
-      .catch(done);
+      return troupeService.updateTags(fixture.user1, fixture.troupe1, rawTags)
+        .then(function(troupe) {
+          assert.deepEqual(troupe.tags.toObject(), cleanTags);
+        });
+    });
+
+    it('should not save reserved-word tags(colons) with normal-user', function() {
+      var rawTags = 'hey, foo:bar, there';
+      var cleanTags = ['hey', 'there'];
+
+      return troupeService.updateTags(fixture.user1, fixture.troupe1, rawTags)
+        .then(function(troupe) {
+          assert.deepEqual(troupe.tags.toObject(), cleanTags);
+        });
+    });
+
+    it('should save reserved-word tags with staff-user', function() {
+      var rawTags = 'hey, foo:bar, there';
+      var cleanTags = ['hey', 'foo:bar', 'there'];
+
+      return troupeService.updateTags(fixture.userStaff, fixture.troupe1, rawTags)
+        .then(function(troupe) {
+          assert.deepEqual(troupe.tags.toObject(), cleanTags);
+        });
+    });
+
+    it('should retain reserved-word tags with normal-user', function() {
+      var fixtureTags = 'foo:bar, foo';
+      var userTags = 'hey, there';
+      var userActualTags = ['hey', 'there', 'foo:bar'];
+
+      return troupeService.updateTags(fixture.userStaff, fixture.troupeWithReservedTags, fixtureTags)
+        .then(troupeService.updateTags(fixture.user1, fixture.troupeWithReservedTags, userTags))
+        .then(function(troupe) {
+          assert.deepEqual(troupe.tags.toObject(), userActualTags);
+        });
     });
   });
 
@@ -178,12 +208,21 @@ describe('troupe-service', function() {
     },
     userNoTroupes: {
     },
+    userStaff: {
+      staff: true
+    },
     troupe1: {
       users: ['user1', 'user2']
     },
     troupe2: {
     },
     troupe3: {
+    },
+    troupeWithReservedTags: {
+      tags: [
+        'foo:bar',
+        'foo'
+      ]
     },
     troupeForDeletion: {
       users: ['user1', 'user2']
