@@ -6,6 +6,7 @@ var apiClient        = require('components/apiClient');
 var context          = require('utils/context');
 var appEvents        = require('utils/appevents');
 var parseForTemplate = require('gitter-web-shared/parse/left-menu-primary-item');
+var toggleClass      = require('utils/toggle-class');
 
 var BaseCollectionItemView = require('../base-collection/base-collection-item-view');
 
@@ -45,14 +46,17 @@ module.exports = BaseCollectionItemView.extend({
   },
 
   onOptionsClicked: function(e) {
+    //Stop this view triggering up to the parent
     e.stopPropagation();
+    //stop this view from triggering a click on the anchor
+    e.preventDefault();
     if (this.roomMenuModel.get('state') === 'search') { return; }
 
     this.uiModel.set('menuIsOpen', !this.uiModel.get('menuIsOpen'));
   },
 
   onModelToggleMenu: function(model, val) {// jshint unused: true
-    this.el.classList.toggle('active', val);
+    toggleClass(this.el, 'active', val);
   },
 
   onMouseOut: function() {

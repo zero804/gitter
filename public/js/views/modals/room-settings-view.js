@@ -1,23 +1,16 @@
 "use strict";
 
 var Marionette             = require('backbone.marionette');
-var _                      = require('underscore');
-var context                = require('utils/context');
 var apiClient              = require('components/apiClient');
 var ModalView              = require('./modal');
 var troupeSettingsTemplate = require('./tmpl/room-settings-view.hbs');
 var userNotifications      = require('components/user-notifications');
 
-function getNotificationSetting(value) {
-  switch (value) {
-    case 'all': return 'all';
-    case 'annoucements': return 'mention';
-    case 'mention': return 'mention';
-    case 'mute': return 'mute';
-    default:
-      return 'mention';
-  }
-}
+var OPTIONS = [
+  { val: 'all', text: 'All: Notify me for all messages' },
+  { val: 'mention', text: 'Announcements: Notify me for mentions and announcements' },
+  { val: 'mute', text: 'Mute: Notify me only when I\'m directly mentioned' }
+];
 
 var View = Marionette.ItemView.extend({
   template: troupeSettingsTemplate,
@@ -25,33 +18,108 @@ var View = Marionette.ItemView.extend({
     'click #close-settings' : 'destroySettings',
     'change #notification-options' : 'formChange'
   },
-
+  modelEvents: {
+    change: 'update'
+  },
   ui: {
-    options: '#notification-options'
+    options: '#notification-options',
+    nonstandard: '#nonstandard',
   },
 
   initialize: function() {
-    this.model = context.troupe();
+    apiClient.userRoom.get('/settings/notifications')
+      .bind(this)
+      .then(function(settings) {
+        this.model.set(settings);
+      });
+
+  },
+
+  getNotificationOption: function() {
+    var model = this.model;
+    var value = model.get('mode') || model.get('push');
+    var lurk = model.get('lurk');
+
+    switch(value) {
+      case 'all':
+        return { selectValue: 'all', nonStandard: lurk === true, lurk: lurk };
+
+      case 'annoucement':
+      case 'annoucements':
+      case 'mention':
+        return { selectValue: 'mention', nonStandard: lurk === false, lurk: lurk };
+
+      case 'mute':
+        return { selectValue: 'mute', nonStandard: lurk === false, lurk: lurk };
+
+      default:
+        return null;
+    }
+  },
+
+  update: function() {
+    var val = this.getNotificationOption();
+    var nonStandard = false;
+
+    if (val) {
+      if (val.nonStandard) {
+        nonStandard = true;
+        this.setOption('', 'Legacy setting: ' + val.selectValue + ' mode, with ' + (val.lurk ? 'lurk on' : 'lurk off'));
+      } else {
+        this.setOption(val.selectValue);
+      }
+    } else {
+      this.setOption('', 'Please wait...');
+    }
+
+    if (nonStandard) {
+      this.ui.nonstandard.show();
+    } else {
+      this.ui.nonstandard.hide();
+    }
+  },
+
+  setOption: function(val, text) {
+    var selectInput = this.ui.options;
+    selectInput.empty();
+
+    var found = false;
+    var items = OPTIONS.map(function(o) {
+      var option = document.createElement("option");
+      option.value = o.val;
+      option.textContent = o.text;
+      var selected = o.val === val;
+      option.selected = selected;
+      if (selected) {
+        found = true;
+      }
+      return option;
+        });
+    selectInput.append(items);
+
+    if (!found) {
+      var option = document.createElement("option");
+      option.value = val;
+      option.textContent = text;
+      option.selected = true;
+      option.style.display = 'none';
+      selectInput.append(option);
+    }
   },
 
   onRender: function() {
-    if (this.settings) {
-      this.ui.options.val(this.settings);
-    } else {
-      apiClient.userRoom.get('/settings/notifications')
-        .bind(this)
-        .then(function(settings) {
-          this.settings = getNotificationSetting(settings && settings.mode || settings.push);
-          this.ui.options.val(this.settings);
-        });
-    }
+    this.update();
   },
 
   formChange: function(e) {
     if(e) e.preventDefault();
 
     var mode = this.ui.options.val();
-    apiClient.userRoom.put('/settings/notifications', { mode: mode });
+    apiClient.userRoom.put('/settings/notifications', { mode: mode })
+      .bind(this)
+      .then(function(settings) {
+        this.model.set(settings);
+      });
   },
 
   destroySettings : function () {
@@ -60,12 +128,9 @@ var View = Marionette.ItemView.extend({
   },
 
   serializeData: function() {
-    return _.extend({},
-      context.getTroupe(), {
-        notificationsBlocked: userNotifications.isAccessDenied(),
-        isNativeDesktopApp: context().isNativeDesktopApp,
-        troupeUrl: '//' + window.location.host + window.location.pathname
-      });
+    return {
+      notificationsBlocked: userNotifications.isAccessDenied(),
+    };
   }
 
 });
@@ -74,6 +139,6 @@ module.exports = ModalView.extend({
     initialize: function(options) {
       options.title = "Notification Settings";
       ModalView.prototype.initialize.apply(this, arguments);
-      this.view = new View({ });
+      this.view = new View(options);
     }
 });

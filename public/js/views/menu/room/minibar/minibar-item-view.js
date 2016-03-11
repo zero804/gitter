@@ -4,6 +4,7 @@ var _             = require('underscore');
 var Marionette    = require('backbone.marionette');
 var itemTemplate  = require('./minibar-item-view.hbs');
 var getRoomAvatar = require('gitter-web-shared/avatars/get-room-avatar');
+var toggleClass   = require('utils/toggle-class');
 
 module.exports =  Marionette.ItemView.extend({
   tagName:      'li',
@@ -49,11 +50,11 @@ module.exports =  Marionette.ItemView.extend({
   },
 
   onActiveStateUpdate: function(model, val) { //jshint unused: true
-    this.el.classList.toggle('active', !!val);
+    toggleClass(this.el, 'active', !!val);
   },
 
   onRender: function() {
-    this.el.classList.toggle('active', !!this.model.get('active'));
+    toggleClass(this.el, 'active', !!this.model.get('active'));
   },
 
 });

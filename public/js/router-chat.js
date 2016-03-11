@@ -111,7 +111,7 @@ onready(function() {
         perfTiming.start('room-switch.render');
 
         debug('changing room: %j', message.newTroupe);
-        
+
         // destroy any modal views
         router.navigate('', { trigger: true, replace: true });
 
@@ -276,7 +276,7 @@ onready(function() {
     notifications: function() {
       require.ensure(['views/modals/room-settings-view'], function(require) {
         var TroupeSettingsView = require('views/modals/room-settings-view');
-        appView.dialogRegion.show(new TroupeSettingsView({}));
+        appView.dialogRegion.show(new TroupeSettingsView({ model: new Backbone.Model() }));
       });
     },
 
