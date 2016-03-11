@@ -12,14 +12,14 @@ module.exports = function parseContentToTemplateData(data, state) {
     //For user results
     if (data.displayName) {
       return _.extend({}, {
-          name:      data.displayName,
+          name:      roomNameShortener(data.displayName),
           avatarUrl: data.avatarUrlSmall
       });
     }
 
     if(data.isSearchRepoResult) {
       return _.extend({}, {
-        name:      data.name,
+        name:      roomNameShortener(data.name),
         avatarUrl: data.avatar_url,
       });
     }
