@@ -1,9 +1,10 @@
 //TODO TEST THIS JP 10/2/16
 'use strict';
 
-var Marionette = require('backbone.marionette');
-var _          = require('underscore');
-var template   = require('./search-input-view.hbs');
+var Marionette  = require('backbone.marionette');
+var _           = require('underscore');
+var template    = require('./search-input-view.hbs');
+var toggleClass = require('utils/toggle-class');
 
 module.exports = Marionette.ItemView.extend({
 
@@ -37,18 +38,18 @@ module.exports = Marionette.ItemView.extend({
     //This is here and not in a model change event because of the debounce
     //Obviously the styles need to change more quickly to give a responsive feel to thr ui
     //JP 10/2/16
-    this.el.classList.toggle('empty', !val);
+    toggleClass(this.el, 'empty', !val);
     this.model.set('searchTerm', val);
   }, 100),
 
   onModelChangeState: function (model, val){ //jshint unused: true
-    this.el.classList.toggle('active', (val === 'search'));
+    toggleClass(this.el, 'active', val === 'search');
     if(val === 'search') { this.ui.input.focus(); }
   },
 
   onModelChangeSearchTerm: function(model, val) { //jshint unused: true
     this.ui.input.val(val);
-    this.el.classList.toggle('empty', !val);
+    toggleClass(this.el, 'empty', !val);
   },
 
   onClearClicked: function(e) {
