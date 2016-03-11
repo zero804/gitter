@@ -29,7 +29,7 @@ module.exports = BaseCollectionItemView.extend({
     return {
       class:     (this.model.get('githubType') === 'ONETOONE') ? 'room-item--one2one' : 'room-item',
       'data-id': id,
-      id: id,
+      id:        id,
     };
   },
 
