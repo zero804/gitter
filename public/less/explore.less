@@ -3,32 +3,71 @@
 @import 'pills';
 @import 'typography';
 
-@bg-color: #ffffff;
+@room-card-bg-color: #ffffff;
+
+@page-wrapper-max-width: 93.75rem;
+@page-wrapper-horizontal-padding: 2rem;
+
 // if you change this, make sure to change the image url "s" param.
 // it has to be double to support retina displays.
 @AVATAR_SIZE: 4 * 0.625em; // @const
 
+@section-spacing: 2rem;
+@room-card-spacing: 0.5em;
+
 
 html {
   box-sizing: border-box;
+  height: 100%;
 }
 
 body {
-  background-color: @bg-color;
+  height: 100%;
   margin: 0;
+  background-color: @room-card-bg-color;
 }
 
 *, *:before, *:after {
   box-sizing: inherit;
 }
 
+.explore-page-wrap {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
 
 
 
 
+.explore-header-section {
+  width: 100%;
+  max-width: @page-wrapper-max-width;
+  margin-left: auto;
+  margin-bottom: @section-spacing;
+  margin-right: auto;
+  padding-left: @page-wrapper-horizontal-padding;
+  padding-right: @page-wrapper-horizontal-padding;
+}
+
+.secondary-header-info-bar {
+  display: flex;
+  border-bottom: 3px solid fade(@light, 75%);
+}
+
+.explore-pill-list-section {
+  width: 100%;
+  max-width: @page-wrapper-max-width;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: @page-wrapper-horizontal-padding;
+  padding-right: @page-wrapper-horizontal-padding;
+}
 
 
 .tag-pill-list(@num-rows: 2, @num-per-row: 5) {
+  @tag-pill-text-color: #808080;
+
   @tag-vertical-padding: 0.75em;
   @tag-margin: 1rem;
 
@@ -45,11 +84,20 @@ body {
     align-items: stretch;
 
     // 2 rows + margin - the margin we don't have on the first row
-    height: calc(@num-rows * @tag-margin-box - @tag-margin);
+    max-height: calc(@num-rows * @tag-margin-box - @tag-margin);
+    margin-top: @section-spacing;
+    margin-left: 0;
+    margin-bottom: @section-spacing;
+    margin-right: 0;
+    padding-left: 0;
 
-    margin: 0;
-    padding: 0;
     list-style: none;
+
+    transition: max-height 0.4s ease;
+
+    &.is-expanded {
+      max-height: 1000px;
+    }
   }
 
 
@@ -78,16 +126,20 @@ body {
 
 
   .tag-pill {
+
     overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
+    width: 100%;
     padding: @tag-vertical-padding 2em;
 
     background-color: @pampas;
+    border: 0;
     border-radius: 4px;
 
-    color: #808080;
+    color: @tag-pill-text-color;
+    font-size: inherit;
     line-height: 1;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -95,12 +147,23 @@ body {
     cursor: pointer;
 
     transition:
-      background-color 0.2s ease,
+      background-color .2s ease,
       color 0.2s ease;
 
-    .tag-pill-checkbox-toggle:checked + & {
+    &:hover,
+    &:focus {
+      background-color: darken(@pampas, 5%);
+      outline: none;
+    }
+
+    &.is-active {
       background-color: @jaffa;
       color: #ffffff;
+
+      &:hover,
+      &:focus {
+        background-color: darken(@jaffa, 5%);
+      }
     }
   }
 
@@ -115,17 +178,34 @@ body {
     bottom: 0;
     right: 0;
 
-    display: flex;
     width: @tag-width;
     height: @tag-height;
+  }
 
-    background-color: @bg-color;
+  .tag-pill-list-pagination-more-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+
+    background-color: @room-card-bg-color;
     border: 1px solid @pampas;
     border-radius: 4px;
 
-    & > * {
-      flex: 1;
-      display: block;
+    color: @tag-pill-text-color;
+    font-size: inherit;
+    cursor: pointer;
+
+    transition:
+      background-color .2s ease,
+      border-color .2s ease;
+
+    &:hover,
+    &:focus {
+      background-color: darken(@room-card-bg-color, 2%);
+      border-color: darken(@pampas, 2%);
+      outline: none;
     }
   }
 }
@@ -155,27 +235,66 @@ body {
 
 
 
+.explore-room-card-list-section {
+  @list-padding: calc(@section-spacing - @room-card-spacing);
 
+  flex: 1;
+  padding-top: @list-padding;
+  padding-bottom: @list-padding;
 
-.explore-room-item {
+  background-color: fade(@light, 75%);
+}
 
-  @color: white;
-  opacity: 0.7;
-  flex: 1 0 15.625em;
-  margin: 0.8em;
-  max-height: 10em;
-  color: #333;
+.room-card-list {
+  @side-padding: calc(@page-wrapper-horizontal-padding - @room-card-spacing);
+
+  overflow-x: hidden;
+  display: flex;
+  flex-wrap: wrap;
+
+  max-width: @page-wrapper-max-width;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: @side-padding;
+  padding-right: @side-padding;
+}
+
+.room-card {
+
+  @room-card-bg-color: white;
+
   display: flex;
   flex-direction: column;
+  flex: 1 0 15.625em;
+  max-height: 10em;
+  margin: @room-card-spacing;
+
+  opacity: 0.7;
+  background-color: @room-card-bg-color;
+  border-radius: 3px;
+
+  color: #333;
+
+  transition:
+    transform .2s ease,
+    max-width .2s ease,
+    margin .2s ease,
+    opacity .2s ease;
 
   &:hover {
     opacity: 1;
   }
 
+  &.is-hidden {
+    transform: scale(0);
+    max-width: 0;
+    margin: 0;
+    opacity: 0;
+  }
+
+
   header {
     // border-top: 0.4em solid @personal;
-    border-radius: 3px 3px 0 0;
-    background-color: @color;
     padding: 0.625em;
     height: @AVATAR_SIZE + 2 * 0.625em;
     line-height: @AVATAR_SIZE;
@@ -198,7 +317,6 @@ body {
   }
 
   &__description {
-    background-color: @color;
     padding: 0 0.625em 0.625em;
     max-height: 3.4375em;
     overflow: hidden;
@@ -211,20 +329,17 @@ body {
       left: 0;
       right: 0;
       height: 2 * 0.625em;
-      background: linear-gradient(to bottom,  rgba( red(@color), green(@color), blue(@color), 0) 0%, rgba( red(@color), green(@color), blue(@color), 1) 100%); /* W3C */
+      background: linear-gradient(to bottom,  rgba( red(@room-card-bg-color), green(@room-card-bg-color), blue(@room-card-bg-color), 0) 0%, rgba( red(@room-card-bg-color), green(@room-card-bg-color), blue(@room-card-bg-color), 1) 100%); /* W3C */
     }
   }
 
   &__content {
-    background-color: @color;
     flex-grow: 1;
     padding: 0.625em;
   }
 
   footer {
-    background-color: @color;
     color: #444;
-    border-radius: 0 0 3px 3px;
     padding: 0.625em;
     flex-shrink: 0;
     border-top: 1px dotted hsl(0, 0%, 90%);
