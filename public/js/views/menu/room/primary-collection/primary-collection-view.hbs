@@ -1,5 +1,11 @@
 <a href="{{when absoluteRoomUri absoluteRoomUri uri}}" id="room-item__container" class="room-item__container {{#if selected}}selected{{/if}} {{#if focus}}focus{{/if}}">
-  {{#if avatarUrl}}<img class="room-item__avatar" src="{{ avatarUrl }}" />{{/if}}
+  {{#if avatarSrcset}}
+    <img class="room-item__avatar"
+         src="{{ avatarSrcset.src }}"
+         srceset="{{avatarSrcset.srcset}}"
+         height="{{avatarSrcset.size}}"
+         width="{{avatarSrcset.size}}"/>
+  {{/if}}
   <h2 class="room-item__title">{{name}}</h2>
   {{#unless isSearch}}
     <img class="room-item__options" id="room-item-options-toggle" src='{{cdn "images/svg/menu/room-options.svg"}}'/>
