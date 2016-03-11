@@ -62,11 +62,24 @@ module.exports = Marionette.CompositeView.extend({
     var model = view.model;
     var name = (model.get('uri') || model.get('url') || model.get('name') || model.get('fromUser').username);
     var url  = (name[0] !== '/') ?  '/' + name : name;
+
+    //We have to explicitly check for false because search
+    //results come through with `exists: false` for rooms yet to be created
+    //whereas on room models `exists: undefined` :( JP 10/3/16
+    if(model.get('exists') === false) {
+      return this._openCreateRoomDialog(view.model);
+    }
+
+    //default trigger navigation to an existing room
     this._triggerNavigation(url, 'chat', name);
   },
 
   _triggerNavigation: function (url, type, name){
     this.bus.trigger('navigation', url, type, name);
+  },
+
+  _openCreateRoomDialog: function(model){
+      window.location.hash = '#confirm/' + model.get('name');
   },
 
   onFilterComplete: function() {
