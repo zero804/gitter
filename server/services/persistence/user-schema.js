@@ -33,6 +33,7 @@ var UserSchema = new Schema({
   permissions: {
     createRoom: { type: Boolean, 'default': true }
   },
+  staff: { type: Boolean },
   hellbanned: { type: Boolean }, // to troll the trolls
   githubScopes: { type: Schema.Types.Mixed },
   state: { type: String },
