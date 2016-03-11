@@ -45,6 +45,8 @@ module.exports = function suggestedOrgsFromRoomList(roomList, uri) {
   }
 
   var hasCurrentOrg = _.findWhere(orgList, { name: currentOrg });
+  //If we are sure that you are viewing an room for an org you have yet to join then
+  //we add a temporary org to your org list
   if (!hasCurrentOrg) { orgList.unshift(getOrgItem(currentOrg, null, true)); }
 
   return orgList;
