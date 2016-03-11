@@ -76,13 +76,13 @@ module.exports = BaseCollectionItemView.extend({
     //implementation is exactly the same as on develop?
     //JP 13/1/16
     apiClient.user.delete('/rooms/' + this.model.id)
-      .then(this.onHidComplete.bind(this))
+      .then(this.onHideComplete.bind(this))
 
       //TODO should this so some kind of visual error? JP
-      .catch(this.onHidComplete.bind(this));
+      .catch(this.onHideComplete.bind(this));
   },
 
-  onHidComplete: function() {
+  onHideComplete: function() {
     this.trigger('hide:complete');
   },
 
