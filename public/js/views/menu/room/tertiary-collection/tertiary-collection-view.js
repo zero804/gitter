@@ -1,20 +1,20 @@
 'use strict';
 
-var _                      = require('underscore');
-var getRoomAvatar          = require('gitter-web-shared/avatars/get-room-avatar');
-var BaseCollectionView     = require('../base-collection/base-collection-view');
-var BaseCollectionItemView = require('../base-collection/base-collection-item-view');
-var roomNameShortener      = require('gitter-web-shared/room-name-shortener');
+var _                       = require('underscore');
+var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
+var BaseCollectionView      = require('../base-collection/base-collection-view');
+var BaseCollectionItemView  = require('../base-collection/base-collection-item-view');
+var roomNameShortener       = require('gitter-web-shared/room-name-shortener');
 
 var proto = BaseCollectionView.prototype;
 
 var ItemView = BaseCollectionItemView.extend({
   serializeData: function() {
     var data = this.model.toJSON();
-    var avatarURL = (this.roomMenuModel.get('state') === 'search') ? null : getRoomAvatar(data.name || data.uri  || ' ');
     data.name = roomNameShortener(data.name || data.uri);
+    var name = (this.roomMenuModel.get('state') === 'search') ? null : (data.name || data.uri);
     return _.extend({}, data, {
-      avatarUrl: avatarURL,
+      avatarSrcset: resolveRoomAvatarSrcSet({ uri: name }, 22),
     });
   },
 });
