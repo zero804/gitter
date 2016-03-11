@@ -26,7 +26,8 @@ var ModalView = Marionette.LayoutView.extend({
   initialize: function(options) {
     this.options = {
       menuItems: [],
-      title: null
+      title: null,
+      style: null
     };
     _.extend(this.options, options);
 
@@ -37,6 +38,7 @@ var ModalView = Marionette.LayoutView.extend({
     var menuItems = this.menuItems || this.options.menuItems;
     return {
       title: this.options.title,
+      style: this.options.style,
       hasMenuItems: !!menuItems.length,
       menuItems: menuItems
     };
