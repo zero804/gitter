@@ -1,8 +1,8 @@
 'use strict';
 
-var _                        = require('lodash');
-var getRoomAvatar            = require('../avatars/get-room-avatar');
-var getOrgNameFromTroupeName = require('../get-org-name-from-troupe-name.js');
+var _                 = require('lodash');
+var getRoomAvatar     = require('../avatars/get-room-avatar');
+var getOrgNameFromUri = require('../get-org-name-from-uri');
 
 module.exports = function suggestedOrgsFromRoomList(roomList, uri) {
   var orgList = roomList.reduce(function(memo, room) {
@@ -32,7 +32,7 @@ module.exports = function suggestedOrgsFromRoomList(roomList, uri) {
 
   //If we are viewing a room owned by an org which the user is not yet a memeber of
   //we shunt the new org to the top of the minibar list JP 8/3/16
-  var currentOrg    = getOrgNameFromTroupeName(uri);
+  var currentOrg = getOrgNameFromUri(uri);
 
   //This is pretty dodge tbh. JP 7/3/16
   //If a user is viewing gitterHQ/gitter or gitterHQ and have never joined a gitterHQ room
