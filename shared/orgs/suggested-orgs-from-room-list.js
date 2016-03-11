@@ -1,6 +1,6 @@
 'use strict';
-var _             = require('lodash');
-var getRoomAvatar = require('../avatars/get-room-avatar');
+var _                       = require('lodash');
+var resolveRoomAvatarSrcSet = require('../avatars/resolve-room-avatar-srcset.js');
 
 module.exports = function suggestedOrgsFromRoomList(roomList) {
   return roomList.reduce(function(memo, room) {
@@ -26,7 +26,7 @@ module.exports = function suggestedOrgsFromRoomList(roomList) {
 
     memo.push({
       name:        orgName,
-      imgUrl:      getRoomAvatar(orgName),
+      imgUrl:      resolveRoomAvatarSrcSet({ uri: orgName }, 22),
       id:          orgName,
       unreadItems: (room.unreadItems || 0),
       mentions:    (room.mentions || 0),
