@@ -8,55 +8,116 @@
     <link rel="stylesheet" type="text/css" href="{{ cdn 'styles/explore.css' }}">
   </head>
   <body>
-    <header class="page-header">
 
-    <ul class="tag-pill-list">
-      {{#each tagMap}}
-        <li class="tag-pill-list-item">
-          <input type="checkbox" class="tag-pill-checkbox-toggle" id="tag-pill-checkbox-toggle-{{@key}}">
-          <label class="tag-pill" for="tag-pill-checkbox-toggle-{{@key}}">
-            {{this}}
-          </label>
-        </li>
-      {{/each}}
+    <div class="explore-page-wrap">
 
-      <li class="tag-pill-list-pagination-item">
-        More
-      </li>
-    </ul>
+      <header class="explore-header-section">
+        <h1 class="h1">Explore</h1>
 
-    <div>
-      {{#if rooms}}
-        <div class="page-content__room-list">
-          {{#each rooms}}
-            <a class='explore-room-item  js-room-item' href="/{{ room.uri }}?source=explore" target="_parent">
-              <header>
-                <img class="explore-room-item__avatar" src="https://avatars.githubusercontent.com/{{ owner }}?s=80">
-                <h3 class="repo-name">
-                {{#each roomNameParts}}
-                  {{!-- if index is greater than 0, add a slash --}}
-                  {{#if @index}}
-                  <span>/</span>
-                  {{/if}}
-                  <span class="repo-name__collapsable">{{ this }}</span>
-                {{/each}}
-                </h3>
-              </header>
-              <section class='explore-room-item__description'>
-                <small>{{ description }}</small>
-              </section>
-              <section class='explore-room-item__content'>
-                {{!-- <p>Some content, content about something.</p> --}}
-              </section>
-              <footer>
-                <small><span class="octicon octicon-organization"></span> {{ room.userCount }} {{ pluralize room.userCount 'person' 'people'}}</small>
-                <small><span class="octicon octicon-comment-discussion"></span> {{ formatNumber messageCount }} {{ pluralize messageCount 'message' 'messages'}}</small>
-              </footer>
+        <section class="secondary-header-info-bar">
+          <div>
+            <i class="icon-user"></i>
+            <span>320K+ People</span>
+          </div>
+          <div>
+            <i class="icon-chat-empty"></i>
+            <span>100K+ Rooms</span>
+          </div>
+          <div>
+            <i class="icon-users"></i>
+            <span>40K+ Communities</span>
+          </div>
+          <div>
+            <i class="icon-globe"></i>
+            <span>74+ Countries</span>
+          </div>
+
+          <div>
+            <i class="icon-mobile"></i>
+
+            <a href="http://appstore.com/gitter" target="_blank">
+              <i class="icon-apple"></i>
+              <span>IOS</span>
             </a>
+            <a href="https://play.google.com/store/apps/details?id=im.gitter.gitter" target="_blank">
+              <i class="icon-android"></i>
+              <span>Android</span>
+            </a>
+          </div>
+      </header>
+
+
+      <section class="explore-pill-list-section">
+        <h2 class="h2">
+          Simply toggle tags to discover Communities
+        </h2>
+
+        <ul class="tag-pill-list js-explore-tag-pills-list">
+          {{#each tagMap}}
+            <li class="tag-pill-list-item">
+              <button class="tag-pill {{when this.selected 'is-active' : ''}} js-explore-tag-pill" data-tags="{{#each this.tags}}{{this}}{{#unless @last}},{{/unless}}{{/each}}">
+                {{this.name}}
+              </button>
+            </li>
           {{/each}}
-        </div>
-      {{/if}}
-    </div>
+
+          <li class="tag-pill-list-pagination-item">
+            <button class="tag-pill-list-pagination-more-button js-explore-show-more-tag-pills">
+              More
+            </button
+          </li>
+        </ul>
+      </section>
+
+      <section class="explore-room-card-list-section">
+        {{#if rooms}}
+          <div class="room-card-list">
+            {{#each rooms}}
+              <a
+                class="room-card js-explore-room-item"
+                href="/{{ room.uri }}?source=explore"
+                target="_parent"
+                data-tags="{{#each this.room.tags}}{{this}}{{#unless @last}},{{/unless}}{{/each}}"
+              >
+                <header>
+                  <img
+                    src="{{roomAvatarSrcSet.src}}"
+                    srcset="{{roomAvatarSrcSet.srcset}}"
+                    class="room-card__avatar"
+                  >
+                  <h3 class="repo-name">
+                  {{#each roomNameParts}}
+                    {{!-- if index is greater than 0, add a slash --}}
+                    {{#if @index}}
+                    <span>/</span>
+                    {{/if}}
+                    <span class="repo-name__collapsable">{{ this }}</span>
+                  {{/each}}
+                  </h3>
+                </header>
+                <section class="room-card__tags">
+                  {{#each this.room.tags}}
+                    <button>
+                      {{this}}
+                    </button>
+                  {{/each}}
+                </section>
+                <section class="room-card__description">
+                  <small>{{ description }}</small>
+                </section>
+                <section class="room-card__content">
+                  {{!-- <p>Some content, content about something.</p> --}}
+                </section>
+                <footer>
+                  <small><span class="octicon octicon-organization"></span> {{ room.userCount }} {{ pluralize room.userCount 'person' 'people'}}</small>
+                  <small><span class="octicon octicon-comment-discussion"></span> {{ formatNumber messageCount }} {{ pluralize messageCount 'message' 'messages'}}</small>
+                </footer>
+              </a>
+            {{/each}}
+          </div>
+        {{/if}}
+      </div>
+    </section>
 
 
     <script type="text/javascript" src="//use.typekit.net/ohh4mcl.js"></script>
