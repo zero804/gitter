@@ -54,9 +54,8 @@ router.get('/:tags?',
 router.get('/tags/:tags',
   identifyRoute('explore-tags'),
   function (req, res, next) {
-    contextGenerator.generateNonChatContext(req)
-      .then(function (troupeContext) {
-      var isStaff = troupeContext.user.staff;
+    contextGenerator.generateNonChatContext(req).then(function (troupeContext) {
+      var isStaff = !!(troupeContext.user || {}).staff;
 
       var selectedTags = req.params.tags.split(',');
 
