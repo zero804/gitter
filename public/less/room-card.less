@@ -82,9 +82,15 @@
 
 .room-card__heading {
   overflow: hidden;
+  flex: 1;
   display: flex;
+  align-items: center;
 
   white-space: nowrap;
+}
+
+.room-card__heading-private-icon {
+  margin-right: 1rem;
 }
 
 .room-card__heading-name-piece {
@@ -96,6 +102,7 @@
   transition: flex-shrink 0.3s ease-in-out;
 
   &:last-child,
+  &:only-child,
   &:hover {
     flex-shrink: 0.01;
   }
