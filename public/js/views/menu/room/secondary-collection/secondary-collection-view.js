@@ -1,10 +1,11 @@
 'use strict';
 
-var _                     = require('underscore');
-var ItemView              = require('./secondary-collection-item-view');
-var SearchItemView        = require('./secondary-collection-item-search-view');
-var BaseCollectionView    = require('../base-collection/base-collection-view');
-var EmptySearchView       = require('./secondary-collection-item-search-empty-view');
+var Marionette         = require('backbone.marionette');
+var _                  = require('underscore');
+var ItemView           = require('./secondary-collection-item-view');
+var SearchItemView     = require('./secondary-collection-item-search-view');
+var BaseCollectionView = require('../base-collection/base-collection-view');
+var EmptySearchView    = require('./secondary-collection-item-search-empty-view');
 
 var proto = BaseCollectionView.prototype;
 
@@ -16,14 +17,24 @@ module.exports = BaseCollectionView.extend({
     'item:clicked':      'onItemClicked',
   },
 
-  buildChildView: function(model, ItemView, attrs) {
-    switch (this.roomMenuModel.get('state')){
+  getEmptyView: function(){
+    switch(this.roomMenuModel.get('state')) {
       case 'search':
-        var opts = _.extend({}, attrs, { model: model });
-        return (!!this.collection.length) ? new SearchItemView(opts) : new EmptySearchView(opts);
+        return EmptySearchView;
       default:
-        return new ItemView(_.extend({}, attrs, { model: model }));
+        return Marionette.ItemView.extend({ template: false });
     }
+  },
+
+  buildChildView: function(model, ItemView, attrs) {
+    var opts = _.extend({}, attrs, { model: model });
+
+    //Only render  search result view if we are in the search state with search results
+    if(this.roomMenuModel.get('state') === 'search' && !!this.collection.length) {
+      return new SearchItemView(opts);
+    }
+
+    return new ItemView(opts);
   },
 
   serializeData: function() {
@@ -31,11 +42,6 @@ module.exports = BaseCollectionView.extend({
     return _.extend({}, data, {
       isSearch: (data.state === 'search'),
     });
-  },
-
-  emptyView: EmptySearchView,
-  isEmpty: function() {
-    return ((this.roomMenuModel.get('state') === 'search') && !this.collection.length);
   },
 
   initialize: function(attrs) {
