@@ -258,8 +258,6 @@ BROWSERSTACK_KEY
 
 Once you have these you can run `npm run test:unit:browser` which should kick off the tests via browserstack
 
-
-
 ## Shrinkwrap Cheatsheat
 
 ### 1. I've got a conflict in my shrinkwrap
