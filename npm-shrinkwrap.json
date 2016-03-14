@@ -4,8 +4,8 @@
   "dependencies": {
     "@gitterhq/translations": {
       "version": "1.0.0",
-      "from": "http://beta-internal:4873/@gitterhq/translations/-/translations-1.0.0.tgz",
-      "resolved": "http://beta-internal:4873/@gitterhq/translations/-/translations-1.0.0.tgz"
+      "from": "@gitterhq/translations@>=1.0.0 <2.0.0",
+      "resolved": "https://registry.npmjs.org/@gitterhq/translations/-/translations-1.0.0.tgz"
     },
     "apn": {
       "version": "1.7.5",
