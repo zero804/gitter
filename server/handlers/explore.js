@@ -60,8 +60,6 @@ router.get('/tags/:tags',
       var selectedTags = req.params.tags.split(',');
 
       var fauxTagMap = {
-        'JavaScript': 'javascript',
-        'PHP': 'php',
         'Frontend': ['curated:frontend'],
         'Mobile': [
           'curated:ios',
@@ -74,6 +72,7 @@ router.get('/tags/:tags',
         'Devops': ['curated:devops'],
         'Game Dev': ['curated:gamedev', 'game'],
         'Frameworks': ['frameworks'],
+        'JavaScript': 'javascript',
         'Scala': 'scala',
         'Ruby': 'ruby',
         'CSS': 'css',
