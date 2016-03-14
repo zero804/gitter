@@ -5,6 +5,8 @@ var onready = require('./utils/onready');
 require('utils/tracking');
 require('utils/frame-utils');
 
+require('gitter-styleguide/css/components/buttons.css');
+require('gitter-styleguide/css/components/headings.css');
 
 // Can't use `classList.toggle` with the second parameter (force)
 // Because IE11 does not support it
@@ -28,7 +30,7 @@ var toggleClass = function(element, class1, force) {
 onready(function() {
 
 
-  Array.prototype.forEach.call(document.querySelectorAll('.js-explore-room-item'), function(roomItemElement) {
+  Array.prototype.forEach.call(document.querySelectorAll('.js-explore-room-card'), function(roomItemElement) {
     roomItemElement.addEventListener('click', function() {
       // Tracking
       appEvents.trigger('track-event', 'explore_room_click');
@@ -41,13 +43,14 @@ onready(function() {
 
   var updateRoomCardListVisibility = function() {
     var activeTags = {};
-    Array.prototype.forEach.call(document.querySelectorAll('.js-explore-tag-pill' + ('.' + activeClass)), function(tagPillElement) {
+
+    require('gitter-styleguide/css/components/buttons.css');    Array.prototype.forEach.call(document.querySelectorAll('.js-explore-tag-pill' + ('.' + activeClass)), function(tagPillElement) {
       (tagPillElement.getAttribute('data-tags') || '').split(',').forEach(function(tag) {
         activeTags[tag] = true;
       });
     });
 
-    Array.prototype.forEach.call(document.querySelectorAll('.js-explore-room-item'), function(roomItemElement) {
+    Array.prototype.forEach.call(document.querySelectorAll('.js-explore-room-card'), function(roomItemElement) {
       (roomItemElement.getAttribute('data-tags') || '').split(',').some(function(roomTag) {
         var hasActiveTag = activeTags[roomTag];
         toggleClass(roomItemElement, 'is-hidden', !hasActiveTag);

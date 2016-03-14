@@ -56,9 +56,14 @@
       </div>
     </header>
 
-    <div class='org-page__room-cards'>
+    <div class="org-page__room-card-list">
       {{#each rooms}}
-        {{> room_card }}
+        {{> room_card
+          linkSource='orgpage'
+          extraClasses='org-page__room-card'
+          isLoggedIn=../isLoggedIn
+          canEditTags=../canEditTags
+        }}
       {{/each}}
     </div>
 

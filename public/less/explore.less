@@ -1,12 +1,15 @@
 @import 'colors';
-@import 'buttons';
-@import 'pills';
+@import 'trp3Vars';
 @import 'typography';
+@import 'base-web';
+@import 'buttons';
+@import 'room-card';
+@import './components/pills';
+@import './components/header-info-bar';
 
 @page-bg-color: #ffffff;
-@room-card-bg-color: #ffffff;
 
-@page-wrapper-max-width: 93.75rem;
+@page-wrapper-max-width: 140rem;
 @page-wrapper-horizontal-padding: 2rem;
 
 @explore-header-mobile-icon-size: 72px;
@@ -16,7 +19,6 @@
 @AVATAR_SIZE: 4 * 0.625em; // @const
 
 @section-spacing: 2rem;
-@room-card-spacing: 0.5em;
 
 
 html {
@@ -25,6 +27,7 @@ html {
 }
 
 body {
+  overflow: auto;
   height: 100%;
   margin: 0;
   background-color: @page-bg-color;
@@ -37,7 +40,8 @@ body {
 .explore-page-wrap {
   display: flex;
   flex-direction: column;
-  min-height: 100%;
+  height: 100%;
+  margin-top: 5rem;
 }
 
 
@@ -53,6 +57,11 @@ body {
   padding-right: @page-wrapper-horizontal-padding;
 }
 
+.explore-header-info-bar__mobile-group {
+  diplay: flex;
+  flex-wrap: nowrap;
+}
+
 .explore-header-info-bar__mobile-diagram {
   @explore-header-mobile-icon-size: 72px;
 
@@ -62,10 +71,14 @@ body {
   width: 1ch;
 
   color: fade(@light, 75%);
-
   font-size: @explore-header-mobile-icon-size;
   line-height: 1rem;
 
+  pointer-events: none;
+
+  @media (max-width: 600px) {
+    display: none;
+  }
 }
 
 .explore-header-info-bar__mobile-icon {
@@ -93,32 +106,6 @@ body {
   }
 }
 
-.secondary-header-info-bar {
-  display: flex;
-  padding-bottom: 8px;
-
-  border-bottom: 3px solid fade(@light, 75%);
-
-  & > .secondary-header-info-bar__item:first-child {
-    margin-left: 0;
-  }
-}
-
-.secondary-header-info-bar__spacer {
-  flex: 1;
-}
-
-.secondary-header-info-bar__item {
-  margin-left: 1em;
-  margin-right: 1em;
-
-  color: #bcbcbc;
-  text-decoration: none;
-}
-
-.secondary-header-info-bar__item-icon {
-  color: #e2e2e2;
-}
 
 
 .explore-header-info-bar__mobile-item {
@@ -140,151 +127,12 @@ body {
   padding-right: @page-wrapper-horizontal-padding;
 }
 
-
-.tag-pill-list(@num-rows: 2, @num-per-row: 5) {
-  @tag-pill-text-color: #808080;
-
-  @tag-vertical-padding: 0.75em;
-  @tag-margin: 1rem;
-
-  @tag-width: calc((100% / @num-per-row) ~"-" ((@tag-margin * (@num-per-row - 1)) / @num-per-row));
-  @tag-height: (1em + (2 * @tag-vertical-padding));
-  @tag-margin-box: @tag-height + @tag-margin;
-
-  .tag-pill-list {
-    overflow: hidden;
-    position: relative;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    align-items: stretch;
-
-    // 2 rows + margin - the margin we don't have on the first row
-    max-height: calc(@num-rows * @tag-margin-box - @tag-margin);
-    margin-top: @section-spacing;
-    margin-left: 0;
-    margin-bottom: @section-spacing;
-    margin-right: 0;
-    padding-left: 0;
-
-    list-style: none;
-
-    transition: max-height 0.4s ease;
-
-    &.is-expanded {
-      max-height: 1000px;
-    }
-  }
-
-
-  .tag-pill-list-item {
-    display: inline-block;
-    width: @tag-width;
-    margin-right: @tag-margin;
-
-    // Only put top margin on the second row onward
-    @num-per-row-plus: @num-per-row + 1;
-    &:nth-child(n + @{num-per-row-plus}) {
-      margin-top: @tag-margin;
-    }
-    &:nth-child(@{num-per-row}n) {
-      margin-right: 0;
-    }
-
-    /* * /
-    // Hide the extra tags
-    @extra-tag-start-index: @num-rows * @num-per-row;
-    &:nth-child(n + @{extra-tag-start-index}) {
-      visibility: hidden;
-    }
-    /* */
-  }
-
-
-  .tag-pill {
-
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    padding: @tag-vertical-padding 2em;
-
-    background-color: @pampas;
-    border: 0;
-    border-radius: 4px;
-
-    color: @tag-pill-text-color;
-    font-size: inherit;
-    line-height: 1;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-
-    cursor: pointer;
-
-    transition:
-      background-color .2s ease,
-      color 0.2s ease;
-
-    &:hover,
-    &:focus {
-      background-color: darken(@pampas, 5%);
-      outline: none;
-    }
-
-    &.is-active {
-      background-color: @jaffa;
-      color: #ffffff;
-
-      &:hover,
-      &:focus {
-        background-color: darken(@jaffa, 5%);
-      }
-    }
-  }
-
-  .tag-pill-checkbox-toggle {
-    display: none;
-  }
-
-
-
-  .tag-pill-list-pagination-item {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-
-    width: @tag-width;
-    height: @tag-height;
-  }
-
-  .tag-pill-list-pagination-more-button {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-
-    background-color: @room-card-bg-color;
-    border: 1px solid @pampas;
-    border-radius: 4px;
-
-    color: @tag-pill-text-color;
-    font-size: inherit;
-    cursor: pointer;
-
-    transition:
-      background-color .2s ease,
-      border-color .2s ease;
-
-    &:hover,
-    &:focus {
-      background-color: darken(@room-card-bg-color, 2%);
-      border-color: darken(@pampas, 2%);
-      outline: none;
-    }
-  }
+.explore-pill-list-section-header {
+  display: flex;
+  justify-content: space-between;
 }
+
+
 
 
 @media-tag-list-large: 1300px;
@@ -312,7 +160,7 @@ body {
 
 
 .explore-room-card-list-section {
-  @list-padding: calc(@section-spacing - @room-card-spacing);
+  @list-padding: calc(@section-spacing - @room-card-list-spacing);
 
   flex: 1;
   padding-top: @list-padding;
@@ -321,146 +169,14 @@ body {
   background-color: fade(@light, 75%);
 }
 
-.room-card-list {
-  @side-padding: calc(@page-wrapper-horizontal-padding - @room-card-spacing);
+.explore-room-card-list {
+  .room-card-list();
 
-  overflow-x: hidden;
-  display: flex;
-  flex-wrap: wrap;
+  @side-padding: calc(@page-wrapper-horizontal-padding - @room-card-list-spacing);
 
   max-width: @page-wrapper-max-width;
   margin-left: auto;
   margin-right: auto;
   padding-left: @side-padding;
   padding-right: @side-padding;
-}
-
-.room-card {
-  @room-card-bg-color: white;
-
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  flex: 1 0 15.625em;
-  max-height: 10em;
-  margin: @room-card-spacing;
-
-  opacity: 0.7;
-  background-color: @room-card-bg-color;
-  border-radius: 3px;
-
-  color: #333;
-
-  transition:
-    transform .2s ease,
-    max-width .2s ease,
-    margin .2s ease,
-    opacity .2s ease;
-
-  &:hover {
-    opacity: 1;
-  }
-
-  &.is-hidden {
-    transform: scale(0);
-    max-width: 0;
-    margin: 0;
-    opacity: 0;
-  }
-
-
-  header {
-    // border-top: 0.4em solid @personal;
-    padding: 0.625em;
-    height: @AVATAR_SIZE + 2 * 0.625em;
-    line-height: @AVATAR_SIZE;
-    overflow: hidden;
-  }
-
-  // &:nth-child(3n + 3) header {
-  //   border-top: 0.4em solid @silver;
-  // }
-
-  // &:nth-child(2n + 1) header {
-  //   border-top: 0.4em solid @bronze;
-  // }
-
-  &__avatar {
-    float: left;
-    width: @AVATAR_SIZE;
-    margin-right: 0.625em;
-    border-radius: 3px;
-  }
-
-  &__description {
-    padding: 0 0.625em 0.625em;
-    max-height: 3.4375em;
-    overflow: hidden;
-    position: relative;
-
-    &:after {
-      content: "";
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 2 * 0.625em;
-      background: linear-gradient(to bottom,  rgba( red(@room-card-bg-color), green(@room-card-bg-color), blue(@room-card-bg-color), 0) 0%, rgba( red(@room-card-bg-color), green(@room-card-bg-color), blue(@room-card-bg-color), 1) 100%); /* W3C */
-    }
-  }
-
-  &__content {
-    flex-grow: 1;
-    padding: 0.625em;
-  }
-
-  footer {
-    color: #444;
-    padding: 0.625em;
-    flex-shrink: 0;
-    border-top: 1px dotted hsl(0, 0%, 90%);
-    text-transform: uppercase;
-    display: flex;
-    flex-direction: row;
-
-    small {
-      text-align: center;
-      flex-grow: 1;
-
-      &:first-child {
-        text-align: left;
-      }
-
-      &:last-child {
-        text-align: right;
-      }
-    }
-  }
-}
-
-.repo-name {
-  display: flex;
-}
-
-.repo-name__collapsable {
-  display: inline-block;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  flex-shrink: 1000;
-  transition: flex-shrink 300ms ease-in-out;
-}
-
-.repo-name span:not(.repo-name__collapsable) {
-  flex-shrink: 0;
-}
-
-.repo-name__collapsable:last-child,
-.repo-name__collapsable:hover {
-  flex-shrink: 0.01;
-}
-
-.repo-name__collapsable:last-child ~ .repo-name__collapsable,
-.repo-name span:hover ~ .repo-name__collapsable {
-  flex-shrink: 1000;
 }
