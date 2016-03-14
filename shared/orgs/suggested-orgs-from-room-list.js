@@ -39,7 +39,7 @@ module.exports = function suggestedOrgsFromRoomList(roomList, uri) {
   // we want to show the `gitterHQ` org in the minibar
   // But when someone visits `/home` or `/explore`, we don't want it to pick it up as an org
   var existingConversationByOrg = _.where(roomList, { url: '/' + currentOrg })[0];
-  var isExistingOneToOne        = (existingConversationByOrg.githubType === 'ONETOONE');
+  var isExistingOneToOne        = !!existingConversationByOrg && (existingConversationByOrg.githubType === 'ONETOONE');
   if (currentOrg === 'home' || currentOrg === 'explore' || isExistingOneToOne) {
     return orgList;
   }
