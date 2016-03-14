@@ -29,16 +29,12 @@
 
         {{#each leftMenuOrgs}} {{! JP 9/12/15 }} {{! TODO SHOULD THIS BE MOVED INTO A PARTIAL TO BE SHARED AROUND }}
           <li data-state-change="org" id="minibar-{{name}}"  data-org-name="{{name}}" class="room-menu-options__item--org">
-          {{#if mentions}}<span class="room-menu-options__item__mentions">{{mentions}}</span>{{/if}}
-          {{#if unreadItems}}<span class="room-menu-options__item__unread-items">{{unreadItems}}</span>{{/if}}
-            <button class="room-menu-options__item-button" title="{{name}}">
-            <img class="room-menu-options__item__avatar" src="{{imgUrl}}" />
-          </button>
-        </li>
+            {{{ prerenderView "js/views/menu/room/minibar/minibar-item-view" }}}
+          </li>
         {{/each}}
 
         <li data-state-change="close" id="minibar-close"  class="room-menu-options__item--close {{#if roomMenuIsPinned}}left{{/if}}">
-          <button id="menu-close-button" class="menu-close-button" title="Close">
+          <button id="menu-close-button" class="room-menu-options__item-button menu-close-button" title="Close">
             <div class="close-icon">
               <div class="close-icon-stay"></div>
               <div class="close-icon-stay"></div>
