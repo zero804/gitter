@@ -9,7 +9,7 @@ require('views/behaviors/isomorphic');
 
 module.exports = ChatLayout.extend({
   events: {
-    'click a[href="/login"]': 'clickLogin'
+    'click a[href^="/login"]': 'clickLogin'
   },
 
   clickLogin: function(e) {
