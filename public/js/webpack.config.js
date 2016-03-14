@@ -9,15 +9,8 @@ var DedupePlugin             = require('webpack/lib/optimize/DedupePlugin');
 var OccurrenceOrderPlugin    = require('webpack/lib/optimize/OccurrenceOrderPlugin');
 var UglifyJsPlugin           = require('webpack/lib/optimize/UglifyJsPlugin');
 
-//POSTCSS
-var mixins       = require('postcss-mixins');
-var atImport     = require('postcss-import');
-var simpleVars   = require('postcss-simple-vars');
-var forLoops     = require('postcss-for-var');
-var calc         = require('postcss-calc');
-var autoprefixer = require('autoprefixer');
-var nested       = require('postcss-nested');
-var conditionals = require('postcss-conditionals');
+var getPostcssStack = require('gitter-styleguide/postcss-stack');
+
 
 var devMode = process.env.WEBPACK_DEV_MODE === '1';
 
@@ -129,50 +122,8 @@ var webpackConfig = {
   ],
   bail: true,
   recordsPath: '/tmp/records.json',
-  postcss: function() {
-    return [
-
-      //parse @import statements
-      atImport({
-        path: [
-          path.resolve(__dirname, '../../node_modules'),
-          path.resolve(__dirname, '../../node_modules/gitter-styleguide/css'),
-        ],
-
-        //tell webpack to watch @import declarations
-        onImport: function(files) {
-          files.forEach(this.addDependency);
-        }.bind(this),
-      }),
-
-
-      //added before simple vars so @mixin {name} ($var) can process $var
-      mixins(),
-
-      //parse $var: 'some-awesomeo-variable';
-      simpleVars({
-        variables: function() {
-          return require('gitter-styleguide/config/variables.js');
-        },
-      }),
-
-      //parse @for
-      forLoops(),
-
-      //parse calc();
-      calc(),
-
-      conditionals(),
-
-      //added here to process mixins after vars have been parsed
-      mixins(),
-
-      //parse .className{ &:hover{} }
-      nested(),
-
-      //make old browsers work like a boss (kinda...)
-      autoprefixer(),
-    ];
+  postcss: function(webpack) {
+    return getPostcssStack(webpack);
   },
 };
 
