@@ -13,6 +13,8 @@ var orgFilter                  = require('gitter-web-shared/filters/left-menu-pr
 var defaultSort                = require('gitter-web-shared/sorting/left-menu-primary-default');
 var favouriteSort              = require('gitter-web-shared/sorting/left-menu-primary-favourite');
 
+var sortAndFilters = require('gitter-realtime-client/lib/sorts-filters').model;
+
 var FilteredRoomCollection = function() {
   FilteredCollection.apply(this, arguments);
 };
@@ -43,9 +45,7 @@ FilteredRoomCollection.prototype = _.extend(
       this.onModelChangeState();
     },
 
-  comparator: function(a, b) {
-    return defaultSort(a.toJSON(), b.toJSON());
-  },
+  comparator: sortAndFilters.recents.sort,
 
   onModelChangeState: function() {//jshint unused: true
     this.comparator = FilteredRoomCollection.prototype.comparator;
@@ -75,9 +75,7 @@ FilteredRoomCollection.prototype = _.extend(
     this.setFilter();
   },
 
-  filterFavourite: function(model) {
-    return favouriteFilter(model.toJSON());
-  },
+  filterFavourite: sortAndFilters.favourites.filter,
 
   filterOneToOnes: function(model) {
     return one2oneFilter(model.toJSON());
@@ -87,9 +85,7 @@ FilteredRoomCollection.prototype = _.extend(
     return false;
   },
 
-  filterDefault: function(model) {
-    return defaultFilter(model.toJSON());
-  },
+  filterDefault: sortAndFilters.recents.filter,
 
   filterOrgRooms: function(model) {
     var orgName = this.roomModel.get('selectedOrgName');
@@ -101,9 +97,7 @@ FilteredRoomCollection.prototype = _.extend(
     this.trigger.apply(this, ['snapshot'].concat(args));
   },
 
-  sortFavourites: function(a, b) {
-    return favouriteSort(a.toJSON(), b.toJSON());
-  },
+  sortFavourites: sortAndFilters.favourites.sort,
 
   onSync: function() {
     if (this.comparator) { this.sort(); }
