@@ -17,10 +17,11 @@ module.exports = BaseCollectionItemView.extend({
     'click #room-item-options-toggle': 'onOptionsClicked',
     'click #room-item-hide':           'onHideClicked',
     'click #room-item-leave':          'onLeaveClicked',
-    'mouseleave':                      'onMouseOut',
+    mouseleave:                      'onMouseOut',
+
     // Note this probably won't get triggered because we listen to clicks on
     // the wrapper but better safe than sorry
-    'click':                           'onClick'
+    click:                           'onClick'
   },
 
   className: null,
@@ -48,6 +49,7 @@ module.exports = BaseCollectionItemView.extend({
   onOptionsClicked: function(e) {
     //Stop this view triggering up to the parent
     e.stopPropagation();
+
     //stop this view from triggering a click on the anchor
     e.preventDefault();
     if (this.roomMenuModel.get('state') === 'search') { return; }
@@ -69,10 +71,19 @@ module.exports = BaseCollectionItemView.extend({
 
   onHideClicked: function(e) {
     e.stopPropagation();
+
     //TODO figure out why this throws an error.
     //implementation is exactly the same as on develop?
     //JP 13/1/16
-    apiClient.user.delete('/rooms/' + this.model.id);
+    apiClient.user.delete('/rooms/' + this.model.id)
+      .then(this.onHideComplete.bind(this))
+
+      //TODO should this so some kind of visual error? JP
+      .catch(this.onHideComplete.bind(this));
+  },
+
+  onHideComplete: function() {
+    this.trigger('hide:complete');
   },
 
   onLeaveClicked: function(e) {
@@ -83,8 +94,8 @@ module.exports = BaseCollectionItemView.extend({
 
     apiClient.delete('/v1/rooms/' + this.model.get('id') + '/users/' + context.getUserId())
       .then(function() {
-        appEvents.trigger('navigation', '/home', 'home', '');
-      });
+        this.trigger('leave:complete');
+      }.bind(this));
   },
 
   render: function() {
