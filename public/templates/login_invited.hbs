@@ -8,7 +8,7 @@
 
     <link id="favicon" rel="shortcut icon" href="{{ cdn 'images/favicon-normal.ico' }}">
 
-    <link href='{{cdn "styles/login.css" }}' rel="stylesheet">
+    <link rel="stylesheet" href='{{cdn cssFileName }}'>
   </head>
 
   <body>
@@ -25,12 +25,16 @@
           <p>To join <strong>{{uri}}</strong>, we need to authenticate you.</p>
           <p><small>By continuing you agree to our <a href="https://gitter.zendesk.com/hc/en-us/sections/200274872-Legal-documentation" target="_blank">Terms and Conditions</a>.</b></p>
 
-          <p><a class='btn signup' href="/login?action=signup&source=invited_page-signup"><img src="{{cdn 'images/home/github.png'}}"> Continue &rarr;</a></p>
+          {{#if showNewLogin}}
+            <p><a class='btn' href="/login?action=login&source=login_page-login">Continue &rarr;</a></p>
+          {{else}}
+            <p><a class='btn signup' href="/login?action=signup&source=invited_page-signup"><img src="{{cdn 'images/home/github.png'}}"> Continue &rarr;</a></p>
+          {{/if}}
         </section>
       </div>
     </div>
     {{{ generateEnv }}}
-    {{{ bootScript "just-tracking" }}}
+    {{{ bootScript bootScriptName jsRoot=jsRoot }}}
     {{> live_reload }}
   </body>
 </html>

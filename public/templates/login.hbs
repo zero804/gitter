@@ -22,9 +22,13 @@
         </header>
         <section>
           <h1>Where developers come to talk.</h1>
-          <p><a class='btn transparent' href="/login/github?action=login&source=login_page-login">Existing user login</a></p>
-          <p class='or'>Or</p>
-          <p><a class='btn signup' href="/login/github?action=signup&source=login_page-signup"><img class="github-icon" src="{{cdn 'images/home/github@2x.png'}}">Signup free</a></p>
+          {{#if showNewLogin}}
+            <p><a class='btn' href="/login?action=login&source=login_page-login">Sign in to start talking</a></p>
+          {{else}}
+            <p><a class='btn transparent' href="/login/github?action=login&source=login_page-login">Existing user login</a></p>
+            <p class='or'>Or</p>
+            <p><a class='btn signup' href="/login/github?action=signup&source=login_page-signup"><img class="github-icon" src="{{cdn 'images/home/github@2x.png'}}">Signup free with GitHub</a></p>
+          {{/if}}
         </section>
       </div>
     </div>

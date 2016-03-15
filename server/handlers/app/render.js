@@ -370,6 +370,7 @@ function renderChat(req, res, options, next) {
             ownerIsOrg: ownerIsOrg,
             orgPageHref: orgPageHref,
             roomMember: req.uriContext.roomMember,
+            showNewLogin: !!req.cookies.new_login,
 
             //Feature Switch Left Menu
             hasNewLeftMenu: req.fflip && req.fflip.has('left-menu'),
