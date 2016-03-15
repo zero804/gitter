@@ -10,6 +10,7 @@ var SuggestedOrgCollection         = require('../collections/org-suggested-rooms
 var apiClient                      = require('components/apiClient');
 var FilteredRoomCollection         = require('../collections/filtered-room-collection.js');
 var SuggestedRoomsByRoomCollection = require('../collections/left-menu-suggested-by-room');
+var UserSuggestions                = require('../collections/user-suggested-rooms')
 var SearchRoomPeopleCollection     = require('../collections/left-menu-search-rooms-and-people');
 var SearchChatMessages             = require('../collections/search-chat-messages');
 var perfTiming                     = require('components/perf-timing');
@@ -80,6 +81,7 @@ module.exports = Backbone.Model.extend({
     this.searchRoomAndPeople      = new SearchRoomPeopleCollection(null, { roomMenuModel: this });
     this.searchChatMessages       = new SearchChatMessages(null, { roomMenuModel: this, roomModel: this._troupeModel });
     this.suggestedOrgs            = new SuggestedOrgCollection({ contextModel: this, roomCollection: this._roomCollection });
+    this.userSuggestions          = new UserSuggestions(null, { contextModel: context.user() });
     this._suggestedRoomCollection = new SuggestedRoomsByRoomCollection({
       roomMenuModel:           this,
       troupeModel:             this._troupeModel,
@@ -139,7 +141,7 @@ module.exports = Backbone.Model.extend({
     switch (val) {
       case 'all':
         this.primaryCollection.switchCollection(this.activeRoomCollection);
-        this.secondaryCollection.switchCollection(this._suggestedRoomCollection);
+        this.secondaryCollection.switchCollection(this.userSuggestions);
         this.tertiaryCollection.switchCollection(this._orgCollection);
         break;
 
