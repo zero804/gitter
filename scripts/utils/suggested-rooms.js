@@ -41,9 +41,10 @@ function lookupByRooms() {
 
   return suggestionsService.findSuggestionsForRooms(null, rooms, opts.language)
     .then(function(suggestedRooms) {
-      return restSerializer.serialize(suggestedRooms, new restSerializer.TroupeStrategy());
+      return restSerializer.serialize(suggestedRooms, new restSerializer.SuggestedRoomStrategy());
     })
     .then(function(suggestions) {
+      console.log(suggestions.length, "results");
       suggestions.forEach(function(suggestion) {
         console.log(suggestion.uri, suggestion);
       });
@@ -79,9 +80,10 @@ function lookupByUsername() {
       return suggestionsService.findSuggestionsForRooms(user, existingRooms, language);
     })
     .then(function(suggestedRooms) {
-      return restSerializer.serialize(suggestedRooms, new restSerializer.TroupeStrategy());
+      return restSerializer.serialize(suggestedRooms, new restSerializer.SuggestedRoomStrategy());
     })
     .then(function(suggestions) {
+      console.log(suggestions.length, "results");
       suggestions.forEach(function(suggestion) {
         console.log(suggestion.uri, suggestion);
       });

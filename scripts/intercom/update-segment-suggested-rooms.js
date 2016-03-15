@@ -78,7 +78,7 @@ stream
         return suggestionsService.findSuggestionsForRooms(user, rooms, language);
       })
       .then(function(suggestedRooms) {
-        return restSerializer.serialize(suggestedRooms, new restSerializer.TroupeStrategy());
+        return restSerializer.serialize(suggestedRooms, new restSerializer.SuggestedRoomStrategy());
       })
       .then(function(suggestions) {
         // we use big avatars in the emails

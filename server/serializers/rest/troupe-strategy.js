@@ -442,7 +442,6 @@ function TroupeStrategy(options) {
       uri: item.uri,
       oneToOne: item.oneToOne,
       userCount: item.userCount,
-      messageCount: item.messageCount,
       user: otherUser,
       unreadItems: unreadCounts ? unreadCounts.unreadItems : undefined,
       mentions: unreadCounts ? unreadCounts.mentions : undefined,
