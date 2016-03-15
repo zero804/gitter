@@ -10,7 +10,7 @@ var persistence = require('./persistence-service');
  */
 function fetchByTags(tags) {
   // limit by 8 tags to avoid mega queries
-  tags = tags.slice(0, 8);
+  //tags = tags.slice(0, 8);
 
   return persistence.Troupe
     .where('security').equals('PUBLIC')

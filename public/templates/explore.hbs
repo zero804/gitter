@@ -73,7 +73,7 @@
         <ul class="tag-pill-list js-explore-tag-pills-list">
           {{#each tagMap}}
             <li class="tag-pill-list-item">
-              <button class="tag-pill {{when this.selected 'is-active' : ''}} js-explore-tag-pill" data-tags="{{#each this.tags}}{{this}}{{#unless @last}},{{/unless}}{{/each}}">
+              <button class="tag-pill {{when this.selected 'is-active' : ''}} js-explore-tag-pill" {{when this.selected 'aria-selected' : ''}} data-tags="{{#each this.tags}}{{this}}{{#unless @last}},{{/unless}}{{/each}}">
                 {{this.name}}
               </button>
             </li>

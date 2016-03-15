@@ -1,8 +1,9 @@
 "use strict";
 var $ = require('jquery');
 var appEvents = require('utils/appevents');
-var onready = require('./utils/onready');
-var toggleClass = require('./utils/toggle-class');
+var onready = require('utils/onready');
+var toggleClass = require('utils/toggle-class');
+var toggleAttribute = require('utils/toggle-attribute');
 
 require('utils/tracking');
 require('utils/frame-utils');
@@ -50,7 +51,8 @@ onready(function() {
   // Hook up our pills to update the card list
   Array.prototype.forEach.call(document.querySelectorAll('.js-explore-tag-pill'), function(tagPillElement) {
     tagPillElement.addEventListener('click', function() {
-      $(this).toggleClass(activeClass);
+      var state = toggleClass(tagPillElement, state);
+      tagPillElement.setAttribute('aria-selected', state);
       updateRoomCardListVisibility();
 
       // Tracking
@@ -63,7 +65,8 @@ onready(function() {
   Array.prototype.forEach.call(document.querySelectorAll('.js-explore-show-more-tag-pills'), function(showMoreElement) {
     showMoreElement.addEventListener('click', function() {
       Array.prototype.forEach.call(document.querySelectorAll('.js-explore-tag-pills-list'), function(pillListElement) {
-        toggleClass(pillListElement, 'is-expanded');
+        var state = toggleClass(pillListElement, 'is-expanded');
+        pillListElement.setAttribute('aria-selected', state);
       });
     });
   });
