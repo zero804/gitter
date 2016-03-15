@@ -8,9 +8,15 @@
 
 @import "colors.less";
 
+@import "../js/views/modals/login-view.less";
+
 * {
   box-sizing: border-box;
 }
+
+// fixes for ui-components
+html { font-size: 62.5%;}
+body { font-size: 1.6rem;}
 
 body, html {
   margin: 0;
@@ -95,4 +101,10 @@ a {
 
 .github-icon {
   height: 26px;
+}
+
+// fixes for using ui-components in here
+.modal section {
+  position: inherit;
+  min-height: inherit;
 }

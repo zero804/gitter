@@ -1,5 +1,6 @@
 "use strict";
 
+var _ = require('underscore');
 var $ = require('jquery');
 var Backbone = require('backbone');
 var appEvents = require('utils/appevents');
@@ -7,6 +8,7 @@ var onready = require('./utils/onready');
 var LoginView = require('views/modals/login-view');
 var modalRegion = require('components/modal-region');
 var debug = require('debug-proxy')('app:login');
+var urlParse = require('url-parse');
 
 require('utils/tracking');
 require('template/helpers/all');
@@ -31,12 +33,20 @@ onready(function() {
       modalRegion.destroy();
     },
 
-    login: function() {
-      modalRegion.show(new LoginView());
+    login: function(query) {
+      var options = (query) ? urlParse('?'+query, true).query : {};
+      modalRegion.show(new LoginView(options));
     }
   });
 
-  new Router();
+  var router = new Router();
 
   Backbone.history.start();
+
+  $(document).on('click', '.login a[href^="/login"]', function(e) {
+    e.preventDefault();
+    var href = $(e.currentTarget).attr('href');
+    var route = 'login'+href.slice(href.indexOf('?'));
+    router.navigate(route, {trigger: true});
+  });
 });

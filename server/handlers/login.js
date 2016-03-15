@@ -34,6 +34,7 @@ router.get('/',
     res.render('login', {
       bootScriptName: 'router-login',
       cssFileName:  "styles/login.css",
+      showNewLogin: !!req.cookies.new_login
     });
   });
 
