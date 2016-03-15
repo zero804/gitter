@@ -28,7 +28,7 @@ module.exports = Marionette.ItemView.extend({
   },
 
   initialize: function() {
-    this.onModelChangeState();
+    this.onModelChangeState(this.model, this.model.get('state'));
   },
 
   onInputChange: _.debounce(function(e) {
@@ -44,7 +44,11 @@ module.exports = Marionette.ItemView.extend({
 
   onModelChangeState: function (model, val){ //jshint unused: true
     toggleClass(this.el, 'active', val === 'search');
-    if(val === 'search') { this.ui.input.focus(); }
+
+    //We need to check if the ui elements have been bound
+    //as this is a string before it is bounce we can't check [0] || .length
+    //so we will check for the find function JP 15/3/16
+    if(val === 'search' && this.ui.input.find) { this.ui.input.focus(); }
   },
 
   onModelChangeSearchTerm: function(model, val) { //jshint unused: true

@@ -40,8 +40,8 @@ module.exports = BaseCollectionItemView.extend({
   },
 
   serializeData: function() {
-    var data = parseForTemplate(this.model.toJSON(), this.roomMenuModel.get('state'));
-    var absoluteRoomUri = context.env('basePath') + data.url;
+    var data             = parseForTemplate(this.model.toJSON(), this.roomMenuModel.get('state'));
+    var absoluteRoomUri  = context.env('basePath') + data.url;
     data.absoluteRoomUri = absoluteRoomUri;
     return data;
   },
