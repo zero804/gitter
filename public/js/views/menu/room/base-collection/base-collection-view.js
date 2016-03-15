@@ -32,7 +32,9 @@ module.exports = Marionette.CompositeView.extend({
   },
 
   childEvents: {
-    'item:clicked': 'onItemClicked',
+    'item:clicked':   'onItemClicked',
+    'hide:complete':  'onHideLeaveRoom',
+    'leave:complete': 'onHideLeaveRoom',
   },
 
   constructor: function(attrs) {
@@ -45,7 +47,7 @@ module.exports = Marionette.CompositeView.extend({
   },
 
   initialize: function() {
-    if(this.model.get('active')){
+    if (this.model.get('active')) {
       this.render();
     }
   },
@@ -62,11 +64,16 @@ module.exports = Marionette.CompositeView.extend({
     var model = view.model;
     var name = (model.get('uri') || model.get('url') || model.get('name') || model.get('fromUser').username);
     var url  = (name[0] !== '/') ?  '/' + name : name;
-    this._triggerNavigation(url, 'chat', name);
-  },
 
-  _triggerNavigation: function (url, type, name){
-    this.bus.trigger('navigation', url, type, name);
+    //We have to explicitly check for false because search
+    //results come through with `exists: false` for rooms yet to be created
+    //whereas on room models `exists: undefined` :( JP 10/3/16
+    if (model.get('exists') === false) {
+      return this._openCreateRoomDialog(view.model);
+    }
+
+    //default trigger navigation to an existing room
+    this._triggerNavigation(url, 'chat', name);
   },
 
   onFilterComplete: function() {
@@ -84,18 +91,38 @@ module.exports = Marionette.CompositeView.extend({
     }.bind(this));
   },
 
-  setActive: function (){
+  setActive: function () {
     toggleClass(this.el, 'active', this.model.get('active'));
   },
 
-
-  setLoaded: function (val){
+  setLoaded: function (val) {
     val = (val || true);
     toggleClass(this.el, 'loaded', val);
   },
 
+  onHideLeaveRoom: function (view) {
+    //If we are hiding the current room, navigate to /home JP 11/3/16
+    if (this._isCurrentRoom(view.model)) { this._navigateToHome(); }
+  },
+
   onDestroy: function() {
     this.stopListening(context.troupe());
+  },
+
+  _triggerNavigation: function (url, type, name) {
+    this.bus.trigger('navigation', url, type, name);
+  },
+
+  _navigateToHome: function () {
+    this._triggerNavigation('/home', 'home', 'Home');
+  },
+
+  _isCurrentRoom: function (model) {
+    return (context.troupe().get('id') === model.get('id'));
+  },
+
+  _openCreateRoomDialog: function(model) {
+    window.location.hash = '#confirm/' + model.get('name');
   },
 
 });

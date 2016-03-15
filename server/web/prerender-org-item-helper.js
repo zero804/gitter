@@ -7,7 +7,7 @@ var prerenderWrapper        = require('./prerender-wrapper');
 
 module.exports = function (model) {
   var data = _.extend(model, {
-    roomAvatarSrcSet: resolveRoomAvatarSrcSet({ uri: model.name}, 16)
+    roomAvatarSrcSet: resolveRoomAvatarSrcSet({ uri: model.name }, 16)
   });
 
   var inner = template(data);
