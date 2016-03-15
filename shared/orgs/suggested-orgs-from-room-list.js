@@ -3,11 +3,13 @@
 var _                       = require('lodash');
 var resolveRoomAvatarSrcSet = require('../avatars/resolve-room-avatar-srcset.js');
 var getOrgNameFromUri       = require('../get-org-name-from-uri');
+var defaultFilter           = require('../filters/left-menu-primary-default');
 
 module.exports = function suggestedOrgsFromRoomList(roomList, uri) {
   var orgList = roomList.reduce(function(memo, room) {
     //remove on-to-one conversations
     if (room.githubType === 'ONETOONE') { return memo; }
+    if(!defaultFilter(room)) { return memo; }
 
     //clean the prepending / from the url
     room.url = (room.url || '');
