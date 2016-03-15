@@ -12,7 +12,13 @@ var View = Marionette.ItemView.extend({
   template: template,
   className: 'login-view',
 
-  initialize: function() {
+  initialize: function(options) {
+    options = options || {};
+
+    // these are mixpanel variables that we have to pass on
+    this.action = options.action || '';
+    this.source = options.source || '';
+
     this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
   },
 
@@ -21,6 +27,13 @@ var View = Marionette.ItemView.extend({
       case 'cancel':
         this.dialog.hide();
         break;
+    }
+  },
+
+  serializeData: function() {
+    return {
+      action: this.action,
+      source: this.source
     }
   }
 });

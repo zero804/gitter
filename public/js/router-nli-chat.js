@@ -10,6 +10,7 @@ var LoginView = require('views/modals/login-view');
 var onready = require('./utils/onready');
 var frameUtils = require('./utils/frame-utils');
 var ChatToolbarLayout = require('views/layouts/chat-toolbar');
+var urlParse = require('url-parse');
 
 /* Set the timezone cookie */
 require('components/timezone-cookie');
@@ -60,16 +61,17 @@ onready(function() {
       }));
     },
 
-    login: function() {
-      appView.dialogRegion.show(new LoginView());
+    login: function(query) {
+      var options = (query) ? urlParse('?'+query, true).query : {};
+      appView.dialogRegion.show(new LoginView(options));
     },
 
   });
 
   var router = new Router();
 
-  appEvents.on('loginClicked', function() {
-    router.navigate('login', {trigger: true});
+  appEvents.on('loginClicked', function(route) {
+    router.navigate(route, {trigger: true});
   });
 
   // // Listen for changes to the room
