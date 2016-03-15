@@ -2,29 +2,14 @@
 var $ = require('jquery');
 var appEvents = require('utils/appevents');
 var onready = require('./utils/onready');
+var toggleClass = require('./utils/toggle-class');
+
 require('utils/tracking');
 require('utils/frame-utils');
 
 require('gitter-styleguide/css/components/buttons.css');
 require('gitter-styleguide/css/components/headings.css');
 
-// Can't use `classList.toggle` with the second parameter (force)
-// Because IE11 does not support it
-var toggleClass = function(element, class1, force) {
-  if(arguments.length === 3) {
-    if(force) {
-      element.classList.add(class1);
-    }
-    else {
-      element.classList.remove(class1);
-    }
-  }
-  else {
-    element.classList.toggle(class1);
-  }
-
-  return force;
-};
 
 
 onready(function() {

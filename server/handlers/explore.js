@@ -106,13 +106,13 @@ router.get('/tags/:tags',
       selectedTags.forEach(function(selectedTag) {
         var fauxKey = 'faux-' + slugify(selectedTag);
         var fauxTagEntry = tagMap[fauxKey];
-        if(fauxTagEntry.tags.length === 1) {
+        if(fauxTagEntry && fauxTagEntry.tags.length === 1) {
           tagMap[fauxKey].selected = true;
         }
         else {
           tagMap[slugify(selectedTag)] = {
             name: selectedTag,
-            tags: selectedTag,
+            tags: [selectedTag],
             selected: true
           };
         }
