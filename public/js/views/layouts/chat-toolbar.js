@@ -14,7 +14,9 @@ module.exports = ChatLayout.extend({
 
   clickLogin: function(e) {
     e.preventDefault();
-    appEvents.trigger('loginClicked');
+    var href = $(e.currentTarget).attr('href');
+    var route = 'login'+href.slice(href.indexOf('?'));
+    appEvents.trigger('loginClicked', route);
   },
 
   behaviors: {
