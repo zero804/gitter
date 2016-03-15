@@ -43,7 +43,7 @@ onready(function() {
 
   Backbone.history.start();
 
-  $(document).on('click', '.login a[href^="/login"]', function(e) {
+  $('.login').on('click', 'a[href^="/login"]', function(e) {
     e.preventDefault();
     var href = $(e.currentTarget).attr('href');
     var route = 'login'+href.slice(href.indexOf('?'));
