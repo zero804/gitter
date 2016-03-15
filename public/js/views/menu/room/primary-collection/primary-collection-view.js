@@ -1,6 +1,7 @@
 'use strict';
 
 var Backbone                    = require('backbone');
+var Marionette                  = require('backbone.marionette');
 var _                           = require('underscore');
 var ItemView                    = require('./primary-collection-item-view');
 var BaseCollectionView          = require('../base-collection/base-collection-view');
@@ -23,11 +24,14 @@ var PrimaryCollectionView = BaseCollectionView.extend({
   },
 
   hasInit: false,
-  emptyView: EmptySearchView,
-  isEmpty: function() {
-    return ((this.roomMenuModel.get('state') === 'search') && !this.collection.length);
+  getEmptyView: function(){
+    switch(this.roomMenuModel.get('state')) {
+      case 'search':
+        return EmptySearchView;
+      default:
+        return Marionette.ItemView.extend({ template: false });
+    }
   },
-
 
   childViewOptions: function(model) {
     var baseOptions   = BaseCollectionView.prototype.childViewOptions.apply(this, arguments);
@@ -35,16 +39,6 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     var id            = model.get('id');
     var element       = this.domMap[id];
     return !!element ? _.extend(baseOptions, { el: element }) : baseOptions;
-  },
-
-  buildChildView: function(model, ItemView, attrs) {
-    switch (this.roomMenuModel.get('state')){
-      case 'search':
-        var opts = _.extend({}, attrs, { model: model });
-        return (!!this.collection.length) ? new ItemView(opts) : new EmptySearchView(opts);
-      default:
-        return new ItemView(_.extend({}, attrs, { model: model }));
-    }
   },
 
   initialize: function(options) {

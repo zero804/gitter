@@ -13,7 +13,7 @@
     {{#each socialMetadata}}
     <meta property="{{@key}}" content="{{this}}"/>
     {{/each}}
-    <link rel="stylesheet" href='{{cdn cssFileName }}'>
+    <link rel="stylesheet" href='{{cdn cssFileName }}' media="all" type="text/css">
 
     {{!-- if you change this, you must change the favicon reference in titlebar.js --}}
     <link id="favicon" rel="shortcut icon" href='{{cdn "images/favicon-read.ico" }}'>
