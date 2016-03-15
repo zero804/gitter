@@ -1,51 +1,84 @@
 "use strict";
 
+var Promise = require('bluebird');
+var chatService = require('../../services/chat-service');
 var persistence = require('../../services/persistence-service');
 var collections = require('../../utils/collections');
 var mongoUtils = require('../../utils/mongo-utils');
 var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
 
+
+var loadRooms = Promise.method(function(roomIds) {
+  if (!roomIds.length) {
+    return [];
+  }
+
+  return persistence.Troupe.find({ _id: { $in: roomIds }, security: 'PUBLIC' }, { uri: 1, githubType: 1, userCount: 1, topic: 1, tags: 1 })
+    .exec();
+});
+
+var loadMessageCounts = Promise.method(function(roomIds) {
+  if (!roomIds.length) {
+    return [];
+  }
+  return Promise.map(roomIds, function(roomId) {
+    return chatService.getRoughMessageCount(roomId)
+      .then(function(messageCount) {
+        return {
+          id: roomId,
+          count: messageCount
+        };
+      });
+  });
+});
+
 function SuggestedRoomStrategy() {
   var roomHash;
+  var messageCountHash;
 
   this.preload = function(suggestedRooms, callback) {
-    // NOTE: only suggestions with roomId will be preloaded. If it has a room
-    // attribute then that will be used.
+    var allRoomIds = suggestedRooms.map(function(suggestedRoom) {
+      return suggestedRoom.roomId || suggestedRoom.id;
+    });
+
+    // NOTE: only suggestions with roomId will be preloaded. Otherwise it
+    // assumes that the suggestion IS the room.
     var suggestedRoomIds = suggestedRooms
       .filter(function(f) { return !!f.roomId; })
       .map(function(f) { return mongoUtils.asObjectID(f.roomId); });
 
-    if (!suggestedRoomIds.length) {
-      roomHash = {};
-      callback();
-      return;
-    }
-
-    persistence.Troupe.find({ _id: { $in: suggestedRoomIds }, security: 'PUBLIC' }, { uri: 1, githubType: 1, userCount: 1, topic: 1 })
-      .exec()
-      .then(function(rooms) {
+    Promise.join(
+      loadRooms(suggestedRoomIds),
+      loadMessageCounts(allRoomIds),
+      function(rooms, messageCounts) {
         roomHash = collections.indexById(rooms);
+        messageCountHash = {};
+        messageCounts.forEach(function(mc) {
+          messageCountHash[mc.id] = mc.count;
+        });
       })
       .nodeify(callback);
   };
 
   this.map = function(suggestedRoom) {
-    // NOTE: It uses the preloaded room for suggestions with roomId, otherwise
-    // it uses sthe room attribute if that exists, otherwise the code below
-    // will just fall through to use suggestedRoom.
-    var room = roomHash[suggestedRoom.roomId] || suggestedRoom.room;
-    var uri = room && room.uri || suggestedRoom.uri;
+    // NOTE: It uses the preloaded room for suggestions with roomId
+    // (getSuggestionsForOrg, getSuggestionsForRoom), otherwise it assumes that
+    //  the entire object is the room (getSuggestionsForUserId.)
+    var room = roomHash[suggestedRoom.roomId] || suggestedRoom;
+
+    var uri = room && room.uri;
     if (!uri) return;
 
     return {
-      id: room && room.id || suggestedRoom.id,
+      id: room.id,
       uri: uri,
-      avatarUrl: resolveRoomAvatarUrl((room && room.uri) ? room : suggestedRoom, 48),
-      userCount: room && room.userCount || suggestedRoom.userCount,
-      messageCount: room && room.messageCount || suggestedRoom.messageCount,
-      // NOTE: room.topic isn't always loaded in
-      description: room && room.topic || suggestedRoom.topic,
-      exists: !!room || suggestedRoom._id
+      avatarUrl: resolveRoomAvatarUrl(room, 48),
+      userCount: room.userCount,
+      messageCount: messageCountHash[room.id],
+      tags: room.tags,
+      // TODO: users/avatars (sample)
+      description: room.topic,
+      exists: !!room.id
     };
   };
 }

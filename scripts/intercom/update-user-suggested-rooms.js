@@ -74,13 +74,14 @@ getUserFromMongo(opts)
     return suggestionsService.findSuggestionsForRooms(user, existingRooms, language);
   })
   .then(function(suggestedRooms) {
-    return restSerializer.serialize(suggestedRooms, new restSerializer.TroupeStrategy());
+    return restSerializer.serialize(suggestedRooms, new restSerializer.SuggestedRoomStrategy());
   })
   .then(function(suggestions) {
     // we use big avatars in the emails
     suggestions.forEach(function(room) {
       room.avatarUrl = resolveRoomAvatarUrl(room, 160);
     });
+
     //console.log(user);
     // email (and user_id?) should be enough to uniquely identify the user.
     // Create against an existing user acts as an update.

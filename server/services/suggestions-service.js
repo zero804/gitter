@@ -8,7 +8,6 @@ var troupeService = require('./troupe-service');
 var roomMembershipService = require('./room-membership-service');
 var userService = require('./user-service');
 var userSettingsService = require('./user-settings-service');
-var chatService = require('./chat-service');
 var graphSuggestions = require('gitter-web-suggestions');
 var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
 var cacheWrapper = require('gitter-web-cache-wrapper');
@@ -154,18 +153,7 @@ function findSuggestionsForRooms(user, existingRooms, language) {
   var filterSuggestions = function(results) {
     return filterRooms(results, existingRooms);
   };
-  return promiseUtils.waterfall(recommenders, [user, existingRooms, language], filterSuggestions, NUM_SUGGESTIONS)
-    .then(function(suggestedRooms) {
-      // format for SuggestedRoomStrategy
-      return Promise.map(suggestedRooms, function(room) {
-        return chatService.getRoughMessageCount(getId(room))
-          .then(function(messageCount) {
-            // just modify the room in place
-            room.messageCount = messageCount;
-            return room;
-          });
-      })
-    });
+  return promiseUtils.waterfall(recommenders, [user, existingRooms, language], filterSuggestions, NUM_SUGGESTIONS);
 }
 exports.findSuggestionsForRooms = findSuggestionsForRooms;
 
