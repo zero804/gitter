@@ -13,9 +13,11 @@ var troupeService = require('../../server/services/troupe-service');
 var roomMembershipService = require('../../server/services/room-membership-service');
 var suggestionsService = require('../../server/services/suggestions-service');
 var userSettingsService = require('../../server/services/user-settings-service');
+var restSerializer = require('../../server/serializers/rest-serializer');
 var suggestions = require('gitter-web-suggestions');
 var intercom = require('gitter-web-intercom');
 var getIntercomStream = require('intercom-stream');
+var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
 
 
 var opts = require('yargs')
@@ -67,14 +69,23 @@ stream
     console.log("Starting "+ username);
 
     var promises = [
+      userService.findById(userId),
       getRoomsForUserId(userId),
       userSettingsService.getUserSettings(userId, 'lang')
     ];
     Promise.all(promises)
-      .spread(function(rooms, language) {
-        return suggestionsService.findSuggestionsForRooms(rooms, language);
+      .spread(function(user, rooms, language) {
+        return suggestionsService.findSuggestionsForRooms(user, rooms, language);
+      })
+      .then(function(suggestedRooms) {
+        return restSerializer.serialize(suggestedRooms, new restSerializer.SuggestedRoomStrategy());
       })
       .then(function(suggestions) {
+        // we use big avatars in the emails
+        suggestions.forEach(function(room) {
+          room.avatarUrl = resolveRoomAvatarUrl(room, 160);
+        });
+
         var suggestionsString = _.pluck(suggestions, 'uri').join(', ');
         console.log("Suggestions for", username + ':', suggestionsString);
 

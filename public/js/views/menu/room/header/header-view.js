@@ -1,8 +1,9 @@
 'use strict';
 
-var Marionette = require('backbone.marionette');
-var template   = require('./header-view.hbs');
-var fastdom    = require('fastdom');
+var Marionette  = require('backbone.marionette');
+var template    = require('./header-view.hbs');
+var fastdom     = require('fastdom');
+var toggleClass = require('utils/toggle-class');
 
 module.exports = Marionette.ItemView.extend({
 
@@ -39,11 +40,11 @@ module.exports = Marionette.ItemView.extend({
     //jp 6/12/16
     setTimeout(function() {
       fastdom.mutate(function() {
-        this.ui.headerAll[0].classList.toggle('active', state === 'all');
-        this.ui.headerSearch[0].classList.toggle('active', state === 'search');
-        this.ui.headerFavourite[0].classList.toggle('active', state === 'favourite');
-        this.ui.headerPeople[0].classList.toggle('active', state === 'people');
-        this.ui.headerOrg[0].classList.toggle('active', state === 'org');
+        toggleClass(this.ui.headerAll[0], 'active', state === 'all');
+        toggleClass(this.ui.headerSearch[0], 'active', state === 'search');
+        toggleClass(this.ui.headerFavourite[0], 'active', state === 'favourite');
+        toggleClass(this.ui.headerPeople[0], 'active', state === 'people');
+        toggleClass(this.ui.headerOrg[0], 'active', state === 'org');
       }.bind(this));
     }.bind(this));
   },
@@ -70,7 +71,7 @@ module.exports = Marionette.ItemView.extend({
   },
 
   onProfileToggle: function(model, val) { //jshint unused: true
-    this.ui.profileToggle[0].classList.toggle('active', !!val);
+    toggleClass(this.ui.profileToggle[0], 'active', !!val);
   },
 
   onDestroy: function() {

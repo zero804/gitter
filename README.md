@@ -6,6 +6,8 @@ Gitter Webapp
 Copyright Troupe Technology Limited 2012 - 2016
 All rights reserved.
 
+
+
 Please symlink pre-commit to .git/hooks/pre-commit to enable the pre-commit hooks.
 
 Prerequisites
@@ -254,9 +256,7 @@ To tun these tests you will need these variables within your `env`:
 BROWSERSTACK_USERNAME
 BROWSERSTACK_KEY
 
-once you have these you can run `npm run test:unit:browser` which should kick off the tests via browserstack
-
-
+Once you have these you can run `npm run test:unit:browser` which should kick off the tests via browserstack
 
 ## Shrinkwrap Cheatsheat
 

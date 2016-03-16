@@ -1,10 +1,12 @@
 'use strict';
 
 var Backbone                    = require('backbone');
+var Marionette                  = require('backbone.marionette');
 var _                           = require('underscore');
 var ItemView                    = require('./primary-collection-item-view');
 var BaseCollectionView          = require('../base-collection/base-collection-view');
 var EmptySearchView             = require('./primary-collection-item-search-empty-view.js');
+var EmptyFavouriteView          = require('./primary-collection-item-favourite-empty-view.js');
 var perfTiming                  = require('components/perf-timing');
 var compositeViewRenderTemplate = require('utils/composite-view-render-template');
 var domIndexById                = require('../../../../utils/dom-index-by-id');
@@ -23,11 +25,16 @@ var PrimaryCollectionView = BaseCollectionView.extend({
   },
 
   hasInit: false,
-  emptyView: EmptySearchView,
-  isEmpty: function() {
-    return ((this.roomMenuModel.get('state') === 'search') && !this.collection.length);
+  getEmptyView: function(){
+    switch(this.roomMenuModel.get('state')) {
+      case 'search':
+        return EmptySearchView;
+      case 'favourite':
+        return EmptyFavouriteView;
+      default:
+        return Marionette.ItemView.extend({ template: false });
+    }
   },
-
 
   childViewOptions: function(model) {
     var baseOptions   = BaseCollectionView.prototype.childViewOptions.apply(this, arguments);
@@ -35,16 +42,6 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     var id            = model.get('id');
     var element       = this.domMap[id];
     return !!element ? _.extend(baseOptions, { el: element }) : baseOptions;
-  },
-
-  buildChildView: function(model, ItemView, attrs) {
-    switch (this.roomMenuModel.get('state')){
-      case 'search':
-        var opts = _.extend({}, attrs, { model: model });
-        return (!!this.collection.length) ? new ItemView(opts) : new EmptySearchView(opts);
-      default:
-        return new ItemView(_.extend({}, attrs, { model: model }));
-    }
   },
 
   initialize: function(options) {
@@ -121,7 +118,8 @@ var PrimaryCollectionView = BaseCollectionView.extend({
 
   //Before we render we remove the collection container from the drag & drop instance
   onBeforeRender: function() {
-    this.domMap = domIndexById(this.el.children[0]);
+    //use the second child because the first child is the hidden search header
+    this.domMap = domIndexById(this.el.children[1]);
     this.dndCtrl.removeContainer(this.ui.collection[0]);
   },
 

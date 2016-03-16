@@ -74,7 +74,7 @@ onready(function() {
     notifications: function() {
       require.ensure(['views/modals/room-settings-view'], function(require) {
         var TroupeSettingsView = require('views/modals/room-settings-view');
-        appView.dialogRegion.show(new TroupeSettingsView({}));
+        appView.dialogRegion.show(new TroupeSettingsView({ model: new Backbone.Model() }));
       });
     }
   });
