@@ -3,7 +3,6 @@ var $ = require('jquery');
 var appEvents = require('utils/appevents');
 var onready = require('utils/onready');
 var toggleClass = require('utils/toggle-class');
-var toggleAttribute = require('utils/toggle-attribute');
 
 require('utils/tracking');
 require('utils/frame-utils');
