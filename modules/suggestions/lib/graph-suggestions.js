@@ -78,7 +78,9 @@ function getSuggestionsForUser(user /*, locale */) {
 exports.getSuggestionsForUser = getSuggestionsForUser;
 
 function getSuggestionsForRooms(rooms, localeLanguage) {
-  var roomIds = _.pluck(rooms, 'id');
+  var roomIds = _.map(rooms, function(room) {
+    return (room.id) ? room.id : ''+room._id;
+  });
 
   // NOTE: include way more than what we'll use, because we're only sampling
   // the input rooms and we'll be heavily filtering this list later.
