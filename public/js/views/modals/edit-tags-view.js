@@ -7,6 +7,7 @@ var ModalView        = require('./modal');
 var TagInputView     = require('views/app/tags/tagInputView');
 var TagListView      = require('views/app/tags/tagListView');
 var TagErrorView     = require('views/app/tags/tagErrorView');
+var TagModel         = require('collections/tag-collection').TagModel;
 var TagCollection    = require('collections/tag-collection').TagCollection;
 var apiClient        = require('components/apiClient');
 var editTagsTemplate = require('./tmpl/edit-tags-view.hbs');
@@ -47,10 +48,15 @@ var View = Marionette.LayoutView.extend({
     //get existing tags
     ////TODO need to add error states to the below request
     apiClient.get('/v1/rooms/' + this.options.roomId)
-    .then(function(data) {
-      this.model.set(data);
-      this.model.get('tagCollection').add(data.tags);
-    }.bind(this));
+      .then(function(data) {
+        this.model.set(data);
+        var tags = data.tags
+          .filter(function(tagValue) {
+            var testTag = new TagModel().set('value', tagValue, {silent: true});
+            return testTag.isValid();
+          });
+        this.model.get('tagCollection').add(tags);
+      }.bind(this));
 
     //events
     this.listenTo(tagCollection, 'tag:error:duplicate', this.onDuplicateTag);
@@ -89,17 +95,16 @@ var View = Marionette.LayoutView.extend({
     });
   },
 
-  onTagValid: function(model, value) {
-    if (!model.get) return;
-    model.get('errorModel').set({
+  onTagValid: function(el, value) {
+    this.model.get('errorModel').set({
       message: 'Press enter to add ' + value,
       isError: false,
     });
   },
 
-  onTagError: function() {
+  onTagError: function(el, message) {
     this.model.get('errorModel').set({
-      message: 'Tags must be between 1 and 20 characters in length',
+      message: message,
       isError: true,
     });
   },

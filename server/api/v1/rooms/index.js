@@ -22,7 +22,9 @@ function searchRooms(req) {
   return roomService.searchRooms(userId, req.query.q, options)
     .then(function(rooms) {
       var strategy = new restSerializer.SearchResultsStrategy({
-        resultItemStrategy: new restSerializer.TroupeStrategy({ currentUserId: userId })
+        resultItemStrategy: new restSerializer.TroupeStrategy({
+          currentUserId: userId
+        })
       });
 
       return restSerializer.serialize({ results: rooms }, strategy);
@@ -44,7 +46,10 @@ module.exports = {
   },
 
   show: function(req) {
-    var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: req.user && req.user.id });
+    var strategy = new restSerializer.TroupeIdStrategy({
+      currentUserId: req.user && req.user.id,
+      includeTags: true
+    });
 
     return restSerializer.serialize(req.params.troupeId, strategy);
   },

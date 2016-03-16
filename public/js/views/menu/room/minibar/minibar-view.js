@@ -9,7 +9,6 @@ var PeopleView    = require('./minibar-people-item-view.js');
 var fastdom       = require('fastdom');
 var domIndexById  = require('../../../../utils/dom-index-by-id');
 
-
 //TODO TEST ALL THE THINGS JP 2/2/16
 module.exports = Marionette.CollectionView.extend({
   tagName:   'ul',
@@ -67,9 +66,14 @@ module.exports = Marionette.CollectionView.extend({
     this.listenTo(this.collection, 'snapshot', this.onCollectionSnapshot, this);
     this.listenTo(this.model, 'change:state change:selectedOrgName', this.onMenuStateUpdate, this);
     this.onMenuStateUpdate();
+
+    //Guard against not getting a snapshot
+    this.timeout = setTimeout(function() {
+      this.onCollectionSnapshot();
+    }.bind(this), 2000);
   },
 
-  onBeforeRender: function (){
+  onBeforeRender: function () {
     this.domMap = domIndexById(this.el);
   },
 
@@ -78,6 +82,8 @@ module.exports = Marionette.CollectionView.extend({
   },
 
   onCollectionSnapshot: function() {
+    clearTimeout(this.timeout);
+
     //Only render after a snapshot
     this.shouldRender = true;
     fastdom.mutate(function() {
@@ -87,8 +93,9 @@ module.exports = Marionette.CollectionView.extend({
 
   onItemClicked: function(view, model) { //jshint unused: true
     var modelName = model.get('name');
+
     //stop selectedOrg name from changing if it does not need to
-    if(modelName === 'all' || modelName === 'search' || modelName === 'favourite' || modelName === 'people'){
+    if (modelName === 'all' || modelName === 'search' || modelName === 'favourite' || modelName === 'people') {
       modelName = this.model.get('name');
     }
 
@@ -144,7 +151,7 @@ module.exports = Marionette.CollectionView.extend({
 
   },
 
-  onDestroy: function (){
+  onDestroy: function () {
     this.stopListening(this.collection);
     this.stopListening(this.model);
     this.stopListening(this.roomCollection);
