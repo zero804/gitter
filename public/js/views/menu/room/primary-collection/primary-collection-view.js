@@ -6,6 +6,7 @@ var _                           = require('underscore');
 var ItemView                    = require('./primary-collection-item-view');
 var BaseCollectionView          = require('../base-collection/base-collection-view');
 var EmptySearchView             = require('./primary-collection-item-search-empty-view.js');
+var EmptyFavouriteView          = require('./primary-collection-item-favourite-empty-view.js');
 var perfTiming                  = require('components/perf-timing');
 var compositeViewRenderTemplate = require('utils/composite-view-render-template');
 var domIndexById                = require('../../../../utils/dom-index-by-id');
@@ -28,6 +29,8 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     switch(this.roomMenuModel.get('state')) {
       case 'search':
         return EmptySearchView;
+      case 'favourite':
+        return EmptyFavouriteView;
       default:
         return Marionette.ItemView.extend({ template: false });
     }
