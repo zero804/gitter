@@ -28,13 +28,15 @@
   overflow:    visible;
 }
 
+@favourite-image-margin: 2rem;
 .empty-favourite-img {
-  margin: 2rem 0;
+  margin: @favourite-image-margin 0;
 }
 
 .empty-favourite-img--primary {
   .empty-favourite-img();
-  margin-top:  4rem;
-  margin-left: -3rem;
+  height:      7.5rem;
+  margin-top:  (@favourite-image-margin * 2);
+  margin-left: -4.5rem;
 }
 
