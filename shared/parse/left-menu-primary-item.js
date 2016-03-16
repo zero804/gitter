@@ -4,6 +4,8 @@ var _                       = require('underscore');
 var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 var roomNameShortener       = require('../room-name-shortener');
 
+var AVATAR_SIZE = 22;
+
 module.exports = function parseContentToTemplateData(data, state) {
 
     data.url  = (data.url || '');
@@ -18,9 +20,10 @@ module.exports = function parseContentToTemplateData(data, state) {
     }
 
     if(data.isSearchRepoResult) {
+      var avatarSrcset = resolveRoomAvatarSrcSet({ uri: data.name }, AVATAR_SIZE);
       return _.extend({}, {
-        name:      roomNameShortener(data.name),
-        avatarUrl: data.avatar_url,
+        name:         roomNameShortener(data.name),
+        avatarSrcset: avatarSrcset,
       });
     }
 
@@ -30,7 +33,7 @@ module.exports = function parseContentToTemplateData(data, state) {
     var lurkActivity = data.lurk && (!hasMentions && !unreadItems) && !!data.activity;
 
     return _.extend({}, data, {
-      avatarSrcset:  resolveRoomAvatarSrcSet({ uri: name }, 22),
+      avatarSrcset:  resolveRoomAvatarSrcSet({ uri: name }, AVATAR_SIZE),
       isNotOneToOne: (data.githubType !== 'ONETOONE'),
       name:          roomNameShortener(data.name),
       mentions:      hasMentions,
