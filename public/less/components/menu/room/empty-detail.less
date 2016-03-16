@@ -1,12 +1,14 @@
 @import "./room-item";
+@import "../../../mixins/optimise-text";
 
 .m-empty-detail() {
   .room-item();
+  .optimised-text();
   height:      auto;
   max-height:  none;
   padding:     (@desktop-menu-left-padding / 2) 0;
   color:       white;
-  font-weight: 200;
+  font-weight: 300;
   line-height: 1.5;
   overflow:    visible;
 }
