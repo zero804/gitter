@@ -1,5 +1,6 @@
 @import "../../../../../less/components/menu/room/avatar.less";
 @import "../../../../../less/components/menu/room/menu-text.less";
+@import "../../../../../less/components/menu/room/header-title";
 @import "../../../../../less/mixins/optimise-text.less";
 
 .panel-header {
@@ -25,46 +26,31 @@
 }
 
 .panel-header__title {
-  .optimised-text();
-  box-sizing:    border-box;
-  max-width:     80%;
-  margin:        0;
-  overflow:      hidden;
-  font-weight:   400;
-  font-size:     2.5rem;
-  white-space:   nowrap;
-  text-overflow: ellipsis;
-  padding:       0 0 0 @desktop-menu-left-padding;
-  line-height:   @desktop-header-height;
-
-  .mobile & {
-    padding:     0 0 0 @mobile-menu-left-padding;
-    line-height: @mobile-header-height;
-  }
+  .m-header-title();
 }
 
 .panel-header__title--all {
-  .panel-header__title;
+  .m-header-title();
   color: white;
 }
 
 .panel-header__title--search  {
-  .panel-header__title;
+  .m-header-title();
   color:       @jaffa;
 }
 
 .panel-header__title--favourite {
-  .panel-header__title;
+  .m-header-title();
   color:       @caribbean;
 }
 
 .panel-header__title--people {
-  .panel-header__title;
+  .m-header-title();
   color:       @people-header-bg;
 }
 
 .panel-header__title--org {
-  .panel-header__title;
+  .m-header-title();
   color:       @org-header-color;
 }
 
