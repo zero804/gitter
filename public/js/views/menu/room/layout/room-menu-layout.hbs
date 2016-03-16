@@ -4,31 +4,37 @@
       <ul id="minibar-list" class="room-menu-options nano-content">
 
         <li data-state-change="all" id="minibar-all"  class="room-menu-options__item--all">
-          <a><img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/logo.svg"}}' /></a>
+          <button class="room-menu-options__item-button" title="All Conversations">
+            <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/logo.svg"}}' />
+          </button>
         </li>
 
         <li data-state-change="search" id="minibar-search" class="room-menu-options__item--search">
-          <a><img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/search.svg"}}' /></a>
+          <button class="room-menu-options__item-button" title="Search Gitter">
+            <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/search.svg"}}' />
+          </button>
         </li>
 
         <li data-state-change="favourite" id="minibar-favourite" class="room-menu-options__item--favourite">
-          <a><img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/favourites.svg"}}' /></a>
+          <button class="room-menu-options__item-button" title="Your Favourite Conversations">
+            <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/favourites.svg"}}' />
+          </button>
         </li>
 
         <li data-state-change="people" id="minibar-people" class="room-menu-options__item--people">
-          <a><img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/people.svg"}}' /></a>
+          <button class="room-menu-options__item-button" title="Your One to One Conversations">
+            <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/people.svg"}}' />
+          </button>
         </li>
 
         {{#each leftMenuOrgs}} {{! JP 9/12/15 }} {{! TODO SHOULD THIS BE MOVED INTO A PARTIAL TO BE SHARED AROUND }}
           <li data-state-change="org" id="minibar-{{name}}"  data-org-name="{{name}}" class="room-menu-options__item--org">
-          {{#if mentions}}<span class="room-menu-options__item__mentions">{{mentions}}</span>{{/if}}
-          {{#if unreadItems}}<span class="room-menu-options__item__unread-items">{{unreadItems}}</span>{{/if}}
-          <a><img class="room-menu-options__item__avatar" src="{{imgUrl}}" /></a>
-        </li>
+            {{{ prerenderView "js/views/menu/room/minibar/minibar-item-view" }}}
+          </li>
         {{/each}}
 
         <li data-state-change="close" id="minibar-close"  class="room-menu-options__item--close {{#if roomMenuIsPinned}}left{{/if}}">
-          <a id="menu-toggle-button" class="menu-toggle-button">
+          <button id="menu-toggle-button" class="room-menu-options__item-button menu-toggle-button" title="Toggle left menu">
             <svg
                  class="menu-toggle-icon js-menu-toggle-icon"
                  width="30px"
@@ -39,7 +45,7 @@
               <path d="M0,17 l15,0 l15,0" />
               <path d="M0,28 l15,0 l15,0" />
             </svg>
-          </a>
+          </button>
         </li>
 
       </ul>
@@ -54,7 +60,7 @@
           <footer id="panel-footer" class="panel-footer-container"></footer>
           <div class="nano-content panel-content">
             <div id="search-input"></div>
-            <section id="primary-collection">
+            <section id="primary-collection" class="left-menu-collection">
               <div class="primary-collection loaded active">
                 <header><h2 class="collection__title hidden" id="primary-collection-search-header">Rooms &amp; People</h2></header>
                 <div id="collection-list">
@@ -66,8 +72,8 @@
                 </div>
               </div>
             </section>
-            <section id="secondary-collection"></section>
-            <section id="tertiary-collection"></section>
+            <section id="secondary-collection" class="left-menu-collection"></section>
+            <section id="tertiary-collection" class="left-menu-collection"></section>
           </div>
         </div>
       </section>

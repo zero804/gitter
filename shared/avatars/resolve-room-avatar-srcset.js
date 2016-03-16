@@ -3,6 +3,11 @@
 var resolveUserAvatarSrcSet = require('./resolve-user-avatar-srcset');
 
 module.exports = function resolveRoomAvatarSrcSet(room, size) {
+
+  //In the case where we explicit pass null we just return it.
+  //useful for recent searches in the new left menu
+  if(room.uri === null) { return null; }
+
   // this is only supporting room.uri for now. Not sure if room.user or
   // room.owner or something would make more sense in future?
   size = size || 48;
@@ -18,5 +23,4 @@ module.exports = function resolveRoomAvatarSrcSet(room, size) {
 
   // default: just return resolveUserAvatarSrcSet's default
   return resolveUserAvatarSrcSet({}, size);
-}
-
+};
