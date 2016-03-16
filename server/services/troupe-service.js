@@ -257,24 +257,48 @@ function toggleSearchIndexing(user, troupe, bool) {
     });
 }
 
-function updateTags(user, troupe, tags) {
-  return roomPermissionsModel(user, 'admin', troupe)
+function updateTags(user, room, tags) {
+  var reservedTagTestRegex = (/:/);
+  var isStaff = user.get('staff');
+
+  return Promise.resolve(isStaff || roomPermissionsModel(user, 'admin', room))
     .then(function(access) {
       if(!access) throw new StatusError(403); /* Forbidden */
 
       var cleanTags = tags.trim().slice(0, MAX_RAW_TAGS_LENGTH).split(',')
-      .filter(function(tag) {
-        return !!tag; //
-      })
-      .map(function(tag) {
-        return tag.trim().slice(0, MAX_TAG_LENGTH);
-      });
+        .filter(function(tag) {
+          return !!tag; //
+        })
+        .map(function(tag) {
+          return tag.trim().slice(0, MAX_TAG_LENGTH);
+        })
+        .filter(function(tag) {
+          // staff can do anything
+          if(isStaff) {
+            return true;
+          }
+          // Users can only save, non-reserved tags
+          if(!reservedTagTestRegex.test(tag)) {
+            return true;
+          }
 
-      troupe.tags = cleanTags;
+          return false;
+        });
 
-      return troupe.save()
+      // Make sure a normal user doesn't clear out our already existing reserved-word(with colons) tags
+      var reservedTags = [];
+      if(!isStaff) {
+        reservedTags = room.tags
+          .filter(function(tag) {
+            return reservedTagTestRegex.test(tag);
+          });
+      }
+
+      room.tags = [].concat(cleanTags, reservedTags);
+
+      return room.save()
         .then(function() {
-          return troupe;
+          return room;
         });
     });
 }

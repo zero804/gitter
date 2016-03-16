@@ -1,11 +1,12 @@
 "use strict";
 
+var _                     = require('lodash');
+var Promise               = require('bluebird');
 var unreadItemService     = require("../../services/unread-item-service");
 var collapsedChatsService = require('../../services/collapsed-chats-service');
 var getVersion            = require('../get-model-version');
 var UserIdStrategy        = require('./user-id-strategy');
-var _                     = require('lodash');
-var Promise               = require('bluebird');
+var TroupeIdStrategy      = require('./troupe-id-strategy');
 
 function formatDate(d) {
   return d ? d.toISOString() : null;

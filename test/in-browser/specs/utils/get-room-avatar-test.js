@@ -2,7 +2,7 @@
 'use strict';
 
 var assert = require('assert');
-var getRoomAvatar = require('../../../../public/js/utils/get-room-avatar');
+var getRoomAvatar = require('../../../../shared/avatars/get-room-avatar');
 
 
 describe('getRoomAvatar', function(){

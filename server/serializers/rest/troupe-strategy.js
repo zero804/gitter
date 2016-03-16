@@ -1,4 +1,4 @@
-/* jshint maxcomplexity:15 */
+/* jshint maxcomplexity:16 */
 "use strict";
 
 var logger                = require('gitter-web-env').logger;
@@ -157,6 +157,32 @@ ActivityForUserStrategy.prototype = {
   name: 'ActivityForUserStrategy'
 };
 
+
+
+function TagsStrategy(options) {
+  var self = this;
+  self.tagMap = {};
+
+  this.preload = function(rooms, callback) {
+    rooms.forEach(function(room) {
+      self.tagMap[room.id] = room.tags;
+    });
+    callback();
+  };
+
+  this.map = function(roomId) {
+    if(options.includeTags) {
+      return self.tagMap[roomId] || [];
+    }
+  };
+}
+TagsStrategy.prototype = {
+  name: 'TagsStrategy'
+};
+
+
+
+
 function ProOrgStrategy() {
   var proOrgs = {};
 
@@ -279,6 +305,7 @@ function TroupeStrategy(options) {
   var favouriteStrategy     = currentUserId ? new FavouriteTroupesForUserStrategy(options) : null;
   var lurkStrategy          = currentUserId ? new LurkTroupeForUserStrategy(options) : null;
   var activityStrategy      = currentUserId ? new ActivityForUserStrategy(options) : null;
+  var tagsStrategy          = currentUserId ? new TagsStrategy(options) : null;
 
   var userIdStategy         = new UserIdStrategy(options);
   var proOrgStrategy        = new ProOrgStrategy(options);
@@ -337,7 +364,15 @@ function TroupeStrategy(options) {
       strategies.push(activityStrategy.preload(troupeIds));
     }
 
+    if(tagsStrategy) {
+      strategies.push({
+        strategy: tagsStrategy,
+        data: items
+      });
+    }
+
     return Promise.all(strategies);
+
   };
 
   function mapOtherUser(users) {
@@ -407,7 +442,7 @@ function TroupeStrategy(options) {
       security: item.security,
       premium: isPro,
       noindex: item.noindex,
-      tags: item.tags,
+      tags: tagsStrategy ? tagsStrategy.map(item.id) : undefined,
       permissions: permissionsStategy ? permissionsStategy.map(item) : undefined,
       ownerIsOrg: ownerIsOrgStrategy ? ownerIsOrgStrategy.map(item) : undefined,
       roomMember: roomMembershipStrategy ? roomMembershipStrategy.map(item.id) : undefined,

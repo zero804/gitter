@@ -35,6 +35,7 @@ describe('user-strategy-test', function() {
       url: '/' + fixture.user1.username,
       avatarUrlSmall: '/api/private/user-avatar/' + fixture.user1.username + '?s=60',
       avatarUrlMedium: '/api/private/user-avatar/' + fixture.user1.username + '?s=128',
+      staff: false,
       v: 1
     }];
 

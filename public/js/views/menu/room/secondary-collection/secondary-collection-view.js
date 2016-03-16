@@ -1,11 +1,11 @@
 'use strict';
 
-var _                     = require('underscore');
-var PrimaryCollectionView = require('../primary-collection/primary-collection-view');
-var ItemView              = require('./secondary-collection-item-view');
-var SearchItemView        = require('./secondary-collection-item-search-view');
-var BaseCollectionView    = require('../base-collection/base-collection-view');
-var EmptySearchView       = require('./secondary-collection-item-search-empty-view');
+var Marionette         = require('backbone.marionette');
+var _                  = require('underscore');
+var ItemView           = require('./secondary-collection-item-view');
+var SearchItemView     = require('./secondary-collection-item-search-view');
+var BaseCollectionView = require('../base-collection/base-collection-view');
+var EmptySearchView    = require('./secondary-collection-item-search-empty-view');
 
 var proto = BaseCollectionView.prototype;
 
@@ -15,17 +15,26 @@ module.exports = BaseCollectionView.extend({
 
   childEvents: {
     'item:clicked':      'onItemClicked',
-    'user:item:clicked': 'onUserLinkClicked',
+  },
+
+  getEmptyView: function(){
+    switch(this.roomMenuModel.get('state')) {
+      case 'search':
+        return EmptySearchView;
+      default:
+        return Marionette.ItemView.extend({ template: false });
+    }
   },
 
   buildChildView: function(model, ItemView, attrs) {
-    switch (this.roomMenuModel.get('state')){
-      case 'search':
-        var opts = _.extend({}, attrs, { model: model });
-        return (!!this.collection.length) ? new SearchItemView(opts) : new EmptySearchView(opts);
-      default:
-        return new ItemView(_.extend({}, attrs, { model: model }));
+    var opts = _.extend({}, attrs, { model: model });
+
+    //Only render  search result view if we are in the search state with search results
+    if(this.roomMenuModel.get('state') === 'search' && !!this.collection.length) {
+      return new SearchItemView(opts);
     }
+
+    return new ItemView(opts);
   },
 
   serializeData: function() {
@@ -35,11 +44,6 @@ module.exports = BaseCollectionView.extend({
     });
   },
 
-  emptyView: EmptySearchView,
-  isEmpty: function() {
-    return ((this.roomMenuModel.get('state') === 'search') && !this.collection.length);
-  },
-
   initialize: function(attrs) {
     //TODO test this JP 8/1/16
     this.primaryCollection = attrs.primaryCollection;
@@ -47,6 +51,7 @@ module.exports = BaseCollectionView.extend({
     this.troupeModel       = attrs.troupeModel;
     this.roomCollection    = attrs.roomCollection;
     this.listenTo(this.roomMenuModel, 'change:searchTerm', this.setActive, this);
+    BaseCollectionView.prototype.initialize.apply(this, arguments);
   },
 
   setActive: function() {
@@ -105,12 +110,5 @@ module.exports = BaseCollectionView.extend({
     this._triggerNavigation(url, 'chat', name);
   },
 
-  onUserLinkClicked: function(view) {
-    var model = view.model.get('fromUser');
-    var user = this.userModel;
-    if (model.id === user.get('id')) { return; }
-
-    proto.onItemClicked.apply(this, arguments);
-  },
 
 });

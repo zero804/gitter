@@ -10,12 +10,14 @@ var _ = require('lodash');
 
 var shutdown = require('shutdown');
 
-var opts = require("nomnom")
+var opts = require('yargs')
   .option('username', {
     required: true,
-    help: "username of user to list presence for"
+    description: "username of user to list presence for"
   })
-  .parse();
+  .help('help')
+  .alias('help', 'h')
+  .argv;
 
 var sockets;
 userService.findByUsername(opts.username)

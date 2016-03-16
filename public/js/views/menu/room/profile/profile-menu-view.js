@@ -4,6 +4,8 @@ var Marionette   = require('backbone.marionette');
 var Backbone     = require('backbone');
 var itemTemplate = require('./profile-menu-item-view.hbs');
 var fastdom      = require('fastdom');
+var toggleClass  = require('utils/toggle-class');
+var logout       = require('utils/logout');
 
 var profileCollection = new Backbone.Collection([
   { name: 'Home', stub: '/home' },
@@ -31,6 +33,7 @@ module.exports = Marionette.CollectionView.extend({
   },
 
   events: {
+    'click': 'onItemClicked',
     'mouseleave': 'onMouseLeave'
   },
 
@@ -40,12 +43,19 @@ module.exports = Marionette.CollectionView.extend({
 
   onOpenStateChange: function(model, val) {/*jshint unused:true */
     fastdom.mutate(function(){
-      this.el.classList.toggle('active', !!val);
+      toggleClass(this.el, 'active', val);
     }.bind(this));
   },
 
   onMouseLeave: function (){
     this.model.set('profileMenuOpenState', false);
   },
+
+  onItemClicked: function(e){
+    if(e.target.href && /\/logout$/.test(e.target.href)) {
+      e.preventDefault();
+      logout();
+    }
+  }
 
 });
