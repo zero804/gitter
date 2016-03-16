@@ -3,11 +3,13 @@
 var _                       = require('lodash');
 var resolveRoomAvatarSrcSet = require('../avatars/resolve-room-avatar-srcset.js');
 var getOrgNameFromUri       = require('../get-org-name-from-uri');
+var defaultFilter           = require('../filters/left-menu-primary-default');
 
 module.exports = function suggestedOrgsFromRoomList(roomList, uri) {
   var orgList = roomList.reduce(function(memo, room) {
     //remove on-to-one conversations
     if (room.githubType === 'ONETOONE') { return memo; }
+    if(!defaultFilter(room)) { return memo; }
 
     //clean the prepending / from the url
     room.url = (room.url || '');
@@ -38,7 +40,9 @@ module.exports = function suggestedOrgsFromRoomList(roomList, uri) {
   // If a user is viewing `/gitterHQ/gitter` or `/gitterHQ` and have never joined a gitterHQ room
   // we want to show the `gitterHQ` org in the minibar
   // But when someone visits `/home` or `/explore`, we don't want it to pick it up as an org
-  if (currentOrg === 'home' || currentOrg === 'explore') {
+  var existingConversationByOrg = _.where(roomList, { url: '/' + currentOrg })[0];
+  var isExistingOneToOne        = !!existingConversationByOrg && (existingConversationByOrg.githubType === 'ONETOONE');
+  if (currentOrg === 'home' || currentOrg === 'explore' || isExistingOneToOne) {
     return orgList;
   }
 

@@ -227,9 +227,11 @@
 
 
 .room-menu-options__item__avatar  {
-  z-index:       2;
+  position:      relative;
   width:         2.34rem;
   height:        2.34rem;
+  margin:        auto;
+  z-index:       2;
   border-radius: .2rem;
 
   .mobile & {
@@ -284,11 +286,12 @@
 }
 
 .close-icon {
-  position:       relative;
-  width:          20px;
-  height:         30px;
-  transition:     transform .15s linear;
-  transform:      rotate(90deg);
+  position:   relative;
+  width:      20px;
+  height:     30px;
+  margin:     auto;
+  transition: transform .15s linear;
+  transform:  rotate(90deg);
 
   .left &  { transform: rotate(0); }
   .right & { transform: rotate(0);}
