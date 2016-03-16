@@ -77,7 +77,7 @@ module.exports = Backbone.Model.extend({
 
     //expose the public collection
     this.searchTerms              = new RecentSearchesCollection(null);
-    this.searchRoomAndPeople      = new SearchRoomPeopleCollection(null, { roomMenuModel: this });
+    this.searchRoomAndPeople      = new SearchRoomPeopleCollection(null, { roomMenuModel: this, roomCollection: this._roomCollection });
     this.searchChatMessages       = new SearchChatMessages(null, { roomMenuModel: this, roomModel: this._troupeModel });
     this.suggestedOrgs            = new SuggestedOrgCollection({ contextModel: this, roomCollection: this._roomCollection });
     this._suggestedRoomCollection = new SuggestedRoomsByRoomCollection({
