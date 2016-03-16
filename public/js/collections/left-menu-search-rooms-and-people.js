@@ -1,6 +1,7 @@
 'use strict';
 
 var Backbone               = require('backbone');
+var _                      = require('underscore');
 var context                = require('utils/context');
 var SearchPeopleCollection = require('./search-people');
 var SearchRoomCollection   = require('./search-rooms');
@@ -8,10 +9,8 @@ var SearchRepoCollection   = require('./search-repos');
 var FilteredCollection     = require('backbone-filtered-collection');
 var fuzzysearch            = require('fuzzysearch');
 
-//`this` is controlled and will be the instance of roomMenuModel
-function roomFilter(room) {
-  /*jshint validthis:true */
-  return fuzzysearch(this.get('searchTerm'), room.get('name'));
+function roomFilter(roomMenuModel, room) {
+  return fuzzysearch(roomMenuModel.get('searchTerm'), room.get('name'));
 }
 
 //take a list of object which have a property of id and return a uniq array
@@ -48,7 +47,7 @@ module.exports = Backbone.Collection.extend({
     this.searchRoomCollection   = new SearchRoomCollection(null, { contextModel: this.roomMenuModel });
     this.searchRepoCollection   = new SearchRepoCollection(null, { contextModel: context.user() });
     this.searchCurrentRooms     = new FilteredCollection({ collection: this.roomCollection });
-    this.searchCurrentRooms.setFilter(roomFilter.bind(this.roomMenuModel));
+    this.searchCurrentRooms.setFilter(_.partial(roomFilter, this.roomMenuModel));
 
     this.listenTo(this.roomMenuModel, 'change:searchTerm', this.onSearchUpdate, this);
     this.listenTo(this.searchPeopleCollection, 'change add remove reset update', this.onCollectionChange, this);
