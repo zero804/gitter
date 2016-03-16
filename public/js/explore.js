@@ -50,7 +50,7 @@ onready(function() {
   // Hook up our pills to update the card list
   Array.prototype.forEach.call(document.querySelectorAll('.js-explore-tag-pill'), function(tagPillElement) {
     tagPillElement.addEventListener('click', function() {
-      var state = toggleClass(tagPillElement, state);
+      var state = toggleClass(tagPillElement, activeClass);
       tagPillElement.setAttribute('aria-selected', state);
       updateRoomCardListVisibility();
 

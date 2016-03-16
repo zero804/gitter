@@ -103,14 +103,18 @@ router.get('/tags/:tags',
       });
 
       // Work out the selection
+      var selectedTagMap = {};
       selectedTags.forEach(function(selectedTag) {
-        var fauxKey = 'faux-' + slugify(selectedTag);
+        var key = slugify(selectedTag);
+        var fauxKey = 'faux-' + key;
         var fauxTagEntry = tagMap[fauxKey];
         if(fauxTagEntry && fauxTagEntry.tags.length === 1) {
-          tagMap[fauxKey].selected = true;
+          // This will update the tagMap and selectedTagMap
+          fauxTagEntry.selected = true;
+          selectedTagMap[fauxKey] = fauxTagEntry;
         }
         else {
-          tagMap[slugify(selectedTag)] = {
+          selectedTagMap[key] = {
             name: selectedTag,
             tags: [selectedTag],
             selected: true
@@ -118,10 +122,12 @@ router.get('/tags/:tags',
         }
       });
 
+      // Put the selected tags at the front of the list
+      var resultantTagMap = _.extend({}, selectedTagMap, tagMap);
 
-
-      var allTags = Object.keys(tagMap).reduce(function(result, tagKey) {
-        return result.concat(tagMap[tagKey].tags || []);
+      // Shove the tags into an array for the exploreService
+      var allTags = Object.keys(resultantTagMap).reduce(function(result, tagKey) {
+        return result.concat(resultantTagMap[tagKey].tags || []);
       }, []);
 
       return exploreService.fetchByTags(allTags)
@@ -135,7 +141,7 @@ router.get('/tags/:tags',
           });
 
           res.render('explore', {
-            tagMap: tagMap,
+            tagMap: resultantTagMap,
             rooms: rooms,
             isLoggedIn: !!req.user,
             // Room owners can also edit tags but
