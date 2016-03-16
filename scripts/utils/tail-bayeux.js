@@ -5,13 +5,15 @@
 var bayeux = require('../../server/web/bayeux');
 var winston = require('../../server/utils/winston');
 
-var opts = require("nomnom")
+var opts = require('yargs')
    .option('path', {
-      abbr: 'p',
+      alias: 'p',
       required: false,
-      help: 'Path to listen to'
+      description: 'Path to listen to'
    })
-   .parse();
+   .help('help')
+  .alias('help', 'h')
+  .argv;
 
 var path = opts.path || '/**';
 

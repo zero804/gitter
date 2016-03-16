@@ -4,26 +4,26 @@
 
 var format = require('stringformat');
 var _ = require('underscore');
-var nomnom = require('nomnom');
+var yargs = require('yargs');
 
 var CliOutput = function(columns, extraOpts) {
   var defaults = {};
   var showing = {};
-  var opts = nomnom();
+  var cliOpts = {};
 
   if(extraOpts) {
-    opts.options(extraOpts);
+    _.extend(cliOpts, extraOpts);
   }
 
-  opts.option('noheader', { flag: true });
+  cliOpts['noheader'] = { type: 'boolean' };
 
   Object.keys(columns).forEach(function(column) {
     defaults[column] = '-';
-    opts.option(column, { flag: true });
-    opts.option('no' + column, { flag: true });
+    cliOpts[column] = { type: 'boolean' };
+    cliOpts['no' + column] = { type: 'boolean' };
   });
 
-  var parsedOpts = opts.parse();
+  var parsedOpts = yargs.options(cliOpts).argv;
 
   var hasNoShowColumns = Object.keys(columns).some(function(column) {
     return parsedOpts['no' + column];

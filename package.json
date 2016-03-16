@@ -89,7 +89,6 @@
     "node-statsd": "0.0.7",
     "node-uuid": "1.4.0",
     "nodemailer": "0.3.14",
-    "nomnom": "~1.6.2",
     "oauth2orize": "~1.0.0",
     "octonode": "^0.6.8",
     "on-headers": "^1.0.1",
@@ -130,15 +129,17 @@
     "winston-logstash-udp": "0.0.4",
     "wreck": "^5.2.0",
     "xml2js": "0.2.2",
-    "xregexp": "^2.0.0"
+    "xregexp": "^2.0.0",
+    "yargs": "^4.2.0"
   },
   "devDependencies": {
     "archiver": "^0.14.3",
     "argparse": "^1.0.1",
     "autoprefixer": "^6.0.3",
     "autoprefixer-core": "^5.1.0",
-    "backbone": "^1.2.3",
-    "backbone-proxy-collection": "^2.1.1",
+    "backbone-filtered-collection": "^1.2.0",
+    "backbone-proxy-collection": "^2.3.0",
+    "backbone": "1.2.3",
     "backbone-url-resolver": "^0.1.1",
     "backbone.babysitter": "^0.1.6",
     "backbone.marionette": "^2.4.4",

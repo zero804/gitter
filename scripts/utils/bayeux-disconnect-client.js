@@ -7,13 +7,15 @@ var winston = require('../../server/utils/winston');
 var presenceService = require('gitter-web-presence');
 var shutdown = require('shutdown');
 
-var opts = require("nomnom")
-   .option('socketId', {
-      abbr: 's',
-      required: true,
-      help: 'Socket to destroy'
-   })
-   .parse();
+var opts = require('yargs')
+  .option('socketId', {
+    alias: 's',
+    required: true,
+    description: 'Socket to destroy'
+  })
+  .help('help')
+  .alias('help', 'h')
+  .argv;
 
 bayeux.destroyClient(opts.socketId, function(err) {
   if(err) winston.error('Error disconnecting socket' + err, { exception: err });

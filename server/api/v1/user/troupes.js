@@ -43,7 +43,7 @@ function performUpdateToUserRoom(req) {
       // TODO: deprecate this....
       if('lurk' in updatedTroupe) {
         if (isMember) {
-          promises.push(userRoomNotificationService.updateSettingForUserRoom(userId, troupeId, updatedTroupe.lurk ? 'mention' : 'all'));
+          promises.push(userRoomNotificationService.updateSettingForUserRoom(userId, troupeId, updatedTroupe.lurk ? 'mention' : 'all', false));
         }
       }
 

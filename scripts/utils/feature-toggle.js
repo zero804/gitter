@@ -2,50 +2,54 @@
 
 'use strict';
 
-var opts = require("nomnom")
-   .option('name', {
-     position: 0,
-     required: true,
-     list: false,
-     help: 'Name of feature'
-   })
-   .option('description',{
-     required: false,
-     list: false,
-     help: 'Description of feature'
-   })
-   .option('include-user', {
-     list: true,
-     help: 'Username of user to allow'
-   })
-   .option('exclude-user', {
-     list: true,
-     help: 'Username of user to exclude'
-   })
-   .option('percentage', {
-     help: 'Percentage of users to allow'
-   })
-   .option('percentage-off', {
-     flag: true,
-     help: 'Turn off percentage'
-   })
-   .option('disable-browser', {
-     help: 'Disable a specific browser, up to a given version. eg "Chrome:47" or "Safari:all". Browser family names come from npm package `useragent`.',
-     list: true
-   })
-   .option('disable-browser-off', {
-     help: 'Renable for a specific browser, eg "Chrome"',
-     list: true
-   })
-   .option('enable', {
-     flag: true,
-     help: 'Enabled'
-   })
-   .option('enable-off', {
-     flag: true,
-     help: 'Turn off enabled'
-   })
-   .parse();
+var opts = require('yargs')
+  .option('name', {
+   required: true,
+   type: 'string',
+   description: 'Name of feature'
+  })
+  .option('description',{
+   required: false,
+   type: 'string',
+   description: 'Description of feature'
+  })
+  .option('include-user', {
+   type: 'array',
+   description: 'Username of user to allow'
+  })
+  .option('exclude-user', {
+   type: 'array',
+   description: 'Username of user to exclude'
+  })
+  .option('percentage', {
+   description: 'Percentage of users to allow'
+  })
+  .option('percentage-off', {
+   type: 'boolean',
+   description: 'Turn off percentage'
+  })
+  .option('disable-browser', {
+   description: 'Disable a specific browser, up to a given version. eg "Chrome:47" or "Safari:all". Browser family names come from npm package `useragent`.',
+   type: 'array'
+  })
+  .option('disable-browser-off', {
+   description: 'Renable for a specific browser, eg "Chrome"',
+   type: 'array'
+  })
+  .option('enable', {
+   type: 'boolean',
+   description: 'Enabled'
+  })
+  .option('enable-off', {
+   type: 'boolean',
+   description: 'Turn off enabled'
+  })
+  .help('help')
+  .alias('help', 'h')
+  .argv;
+
+opts.name = opts.name || opts._[0];
+
 
  if (!opts.name) {
   console.error('Name required');

@@ -1,12 +1,14 @@
 'use strict';
 
 var Backbone                    = require('backbone');
+var Marionette                  = require('backbone.marionette');
 var _                           = require('underscore');
 var ItemView                    = require('./primary-collection-item-view');
 var BaseCollectionView          = require('../base-collection/base-collection-view');
 var EmptySearchView             = require('./primary-collection-item-search-empty-view.js');
 var perfTiming                  = require('components/perf-timing');
 var compositeViewRenderTemplate = require('utils/composite-view-render-template');
+var domIndexById                = require('../../../../utils/dom-index-by-id');
 
 var proto = BaseCollectionView.prototype;
 
@@ -17,31 +19,26 @@ var PrimaryCollectionView = BaseCollectionView.extend({
   childView: ItemView,
   className: 'primary-collection',
   ui: {
-    collection: '#collection-list',
+    collection:   '#collection-list',
+    searchHeader: '#primary-collection-search-header'
   },
 
   hasInit: false,
-  emptyView: EmptySearchView,
-  isEmpty: function() {
-    return ((this.roomMenuModel.get('state') === 'search') && !this.collection.length);
+  getEmptyView: function(){
+    switch(this.roomMenuModel.get('state')) {
+      case 'search':
+        return EmptySearchView;
+      default:
+        return Marionette.ItemView.extend({ template: false });
+    }
   },
 
   childViewOptions: function(model) {
     var baseOptions   = BaseCollectionView.prototype.childViewOptions.apply(this, arguments);
     baseOptions.model = model;
-    var selector      = '[data-id=' + model.get('id') + ']';
-    var element       = this.$el.find(selector);
-    return !!element.length ? _.extend(baseOptions, { el: element }) : baseOptions;
-  },
-
-  buildChildView: function(model, ItemView, attrs) {
-    switch (this.roomMenuModel.get('state')){
-      case 'search':
-        var opts = _.extend({}, attrs, { model: model });
-        return (!!this.collection.length) ? new ItemView(opts) : new EmptySearchView(opts);
-      default:
-        return new ItemView(_.extend({}, attrs, { model: model }));
-    }
+    var id            = model.get('id');
+    var element       = this.domMap[id];
+    return !!element ? _.extend(baseOptions, { el: element }) : baseOptions;
   },
 
   initialize: function(options) {
@@ -55,20 +52,28 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     this.dndCtrl = options.dndCtrl;
     this.uiModel = new Backbone.Model({ isFocused: false });
 
-    this.model.set('active', this.roomMenuModel.get('state') !== 'search');
-
     //TODO turn this into an error if there is a dndCtrl
     this.listenTo(this.dndCtrl, 'room-menu:add-favourite', this.onFavouriteAdded, this);
     this.listenTo(this.dndCtrl, 'room-menu:sort-favourite', this.onFavouritesSorted, this);
     this.listenTo(this.roomMenuModel, 'change:searchTerm', this.setActive, this);
+    BaseCollectionView.prototype.initialize.apply(this, arguments);
   },
 
   setActive: function() {
     switch (this.roomMenuModel.get('state')){
       case 'search':
-        this.el.classList.toggle('active', !!this.roomMenuModel.get('searchTerm'));
+        if(!!this.roomMenuModel.get('searchTerm')){
+          this.el.classList.add('active');
+          this.ui.searchHeader[0].classList.remove('hidden');
+        }
+        //
+        else {
+          this.el.classList.remove('active');
+          this.ui.searchHeader[0].classList.add('hidden');
+        }
         break;
       default:
+        this.ui.searchHeader[0].classList.add('hidden');
         proto.setActive.apply(this, arguments);
         break;
 
@@ -103,13 +108,15 @@ var PrimaryCollectionView = BaseCollectionView.extend({
   //TODO TEST THIS YOU FOOL JP 10/2/16
   getHighestFavourite: function() {
     return this.collection.pluck('favourite')
-    .filter(function(num) { return !!num; })
-    .sort(function(a, b) { return a < b ? -1 : 1; })
-    .slice(-1)[0];
+      .filter(function(num) { return !!num; })
+      .sort(function(a, b) { return a < b ? -1 : 1; })
+      .slice(-1)[0];
   },
 
   //Before we render we remove the collection container from the drag & drop instance
   onBeforeRender: function() {
+    //use the second child because the first child is the hidden search header
+    this.domMap = domIndexById(this.el.children[1]);
     this.dndCtrl.removeContainer(this.ui.collection[0]);
   },
 

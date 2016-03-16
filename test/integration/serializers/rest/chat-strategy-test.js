@@ -38,7 +38,7 @@ describe('chat-strategy-test', function() {
       troupe: 'troupe1',
       readBy: [],
       text: 'old_message',
-      sent: new Date("01/01/2014")
+      sent: new Date('2014-01-01T00:00:00.000Z')
     }
   }));
 
@@ -54,7 +54,9 @@ describe('chat-strategy-test', function() {
         url: '/' + fixture.user1.username,
         avatarUrlSmall: '/api/private/user-avatar/' + fixture.user1.username + '?s=60',
         avatarUrlMedium: '/api/private/user-avatar/' + fixture.user1.username + '?s=128',
-        v: 1 },
+        staff: false,
+        v: 1
+      },
       unread: false,
       readBy: 0,
       urls: [],
@@ -75,7 +77,9 @@ describe('chat-strategy-test', function() {
          url: '/' + fixture.user1.username,
          avatarUrlSmall: '/api/private/user-avatar/' + fixture.user1.username + '?s=60',
          avatarUrlMedium: '/api/private/user-avatar/' + fixture.user1.username + '?s=128',
-         v: 1 },
+         staff: false,
+         v: 1
+      },
       unread: true,
       readBy: 0,
       urls: [],
@@ -109,7 +113,9 @@ describe('chat-strategy-test', function() {
          url: '/' + fixture.user1.username,
          avatarUrlSmall: '/api/private/user-avatar/' + fixture.user1.username + '?s=60',
          avatarUrlMedium: '/api/private/user-avatar/' + fixture.user1.username + '?s=128',
-         v: 1 },
+         staff: false,
+         v: 1
+      },
       unread: true,
       readBy: 0,
       urls: [],
@@ -138,6 +144,7 @@ describe('chat-strategy-test', function() {
           url: '/' + fixture.user1.username,
           avatarUrlSmall: '/api/private/user-avatar/' + fixture.user1.username + '?s=60',
           avatarUrlMedium: '/api/private/user-avatar/' + fixture.user1.username + '?s=128',
+          staff: false,
           v: 1
         })
       }

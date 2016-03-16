@@ -105,7 +105,6 @@ var webpackConfig = {
       "mutant": path.resolve(path.join(__dirname, "../repo/mutant/mutant.js")),
       "cocktail": path.resolve(path.join(__dirname, "../repo/cocktail/cocktail.js")),
       "keymaster": path.resolve(path.join(__dirname, "../repo/keymaster/keymaster.js")),
-      "filtered-collection": path.resolve(path.join(__dirname, "../repo/filtered-collection/filtered-collection.js")),
       "emojify": path.resolve(path.join(__dirname, "../repo/emojify/emojify.js")),
       "jquery-iframely": path.resolve(path.join(__dirname, "../repo/jquery-iframely/jquery-iframely.js")),
       "jquery-textcomplete": path.resolve(path.join(__dirname, "../repo/jquery-textcomplete/jquery.textcomplete.js")),

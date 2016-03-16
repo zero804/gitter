@@ -6,7 +6,7 @@ var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-av
 
 module.exports = function (model) {
   var data = _.extend(model, {
-    roomAvatarSrcSet: resolveRoomAvatarSrcSet({ uri: model.url}, 16)
+    roomAvatarSrcSet: resolveRoomAvatarSrcSet({ uri: model.url }, 16)
   });
   return template(data);
 };
