@@ -9,8 +9,10 @@ var troupeService = require('../../server/services/troupe-service');
 var roomMembershipService = require('../../server/services/room-membership-service');
 var suggestionsService = require('../../server/services/suggestions-service');
 var userSettingsService = require('../../server/services/user-settings-service');
+var restSerializer = require('../../server/serializers/rest-serializer');
 var intercom = require('gitter-web-intercom');
 var suggestions = require('gitter-web-suggestions');
+var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
 
 var opts = require('yargs')
   .option('id', {
@@ -28,7 +30,7 @@ var opts = require('yargs')
   .argv;
 
 if (!opts.id && !opts.username && !opts.email) {
-  throw new error("id, username or email required.");
+  throw new Error("id, username or email required.");
 }
 
 function getUserFromMongo(opts) {
@@ -68,10 +70,18 @@ getUserFromMongo(opts)
       userSettingsService.getUserSettings(user.id, 'lang')
     ]);
   })
-  .spread(function(rooms, language) {
-    return suggestionsService.findSuggestionsForRooms(rooms, language);
+  .spread(function(existingRooms, language) {
+    return suggestionsService.findSuggestionsForRooms(user, existingRooms, language);
+  })
+  .then(function(suggestedRooms) {
+    return restSerializer.serialize(suggestedRooms, new restSerializer.SuggestedRoomStrategy());
   })
   .then(function(suggestions) {
+    // we use big avatars in the emails
+    suggestions.forEach(function(room) {
+      room.avatarUrl = resolveRoomAvatarUrl(room, 160);
+    });
+
     //console.log(user);
     // email (and user_id?) should be enough to uniquely identify the user.
     // Create against an existing user acts as an update.
