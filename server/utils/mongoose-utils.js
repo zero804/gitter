@@ -4,7 +4,6 @@ var Promise     = require('bluebird');
 var _           = require('underscore');
 var collections = require('./collections');
 var mongoUtils  = require('./mongo-utils');
-
 var mongoose    = require('./mongoose-q');
 var Schema      = mongoose.Schema;
 
@@ -100,10 +99,30 @@ exports.cloneSchema = function(schema) {
 
 /*
  * Returns a promise [document, updatedExisting]
+ * If mongo experiences a contention where it tries to
+ * perform an insert but looses the battle to another
+ * insert, this function will retry
  */
+var MAX_UPSERT_ATTEMPTS = 2;
+var MONGO_DUPLICATE_KEY_ERROR = 11000;
+
 exports.upsert = function(schema, query, setOperation) {
-  return schema.findOneAndUpdate(query, setOperation, { upsert: true, new: false })
-    .exec()
+  var attempts = 0;
+
+  function performUpdate() {
+    attempts++;
+    return schema.findOneAndUpdate(query, setOperation, { upsert: true, new: false })
+      .exec()
+      .catch(function(err) {
+        if (attempts >= MAX_UPSERT_ATTEMPTS) throw err;
+        if (!mongoUtils.isMongoError(err)) throw err;
+        if (err.code !== MONGO_DUPLICATE_KEY_ERROR) throw err;
+        
+        return performUpdate();
+      });
+  }
+
+  return performUpdate()
     .then(function(doc) {
       // If doc is null then an insert occurred
       return Promise.all([schema.findOne(query).exec(), !!doc]);
