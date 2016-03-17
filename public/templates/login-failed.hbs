@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Login Failed</title>
+    <title>Sign in failed</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link id="favicon" rel="shortcut icon" href="{{ cdn 'images/favicon-normal.ico' }}">
@@ -15,7 +15,7 @@
     <div class='background'>
       <div class='login'>
         <header>
-          <h1>Login Failed</h1>
+          <h1>Sign in failed</h1>
                     <p>We're very sorry, but we're unable to log you in right now.
             {{#if message}}
             <br>({{message}})
@@ -23,7 +23,7 @@
         </header>
         <section>
 
-          <p><a class='btn' href="/login/github?action=login&source=login-failed">Try login again</a></p>
+          <p><a class='btn' href="/login?action=login&source=login-failed">Try sign in again</a></p>
           <p class='or'>Or</p>
           <p><a class='btn transparent' href="http://support.gitter.im">Contact Support</a></p>
         </section>
