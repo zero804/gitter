@@ -39,6 +39,9 @@ router.get(nconf.get('web:homeurl'),
 
     // when the viewer is not logged in:
     res.render('homepage', {
+      bootScriptName: 'homepage',
+      cssFileName: 'styles/homepage.css',
+      showNewLogin: !!req.cookies.new_login,
       useOptimizely: locale === 'en',
       wordy: locale === 'ru',
       translationRequired: locale !== requested,
