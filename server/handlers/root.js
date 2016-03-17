@@ -41,7 +41,6 @@ router.get(nconf.get('web:homeurl'),
     res.render('homepage', {
       bootScriptName: 'homepage',
       cssFileName: 'styles/homepage.css',
-      showNewLogin: !!req.cookies.new_login,
       useOptimizely: locale === 'en',
       wordy: locale === 'ru',
       translationRequired: locale !== requested,
