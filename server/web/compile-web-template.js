@@ -13,8 +13,8 @@ setImmediate(function() {
 });
 
 var registerPartials = require('./register-partials');
-console.log('registerPartials');
-registerPartials(hbsInstance);
+var partialNames = registerPartials(hbsInstance);
+console.log('registerPartials', partialNames.length, partialNames);
 
 
 /**
