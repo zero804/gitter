@@ -8,30 +8,16 @@ var glob = Promise.promisify(require('glob'));
 
 
 module.exports = function(hbs) {
-  var partialsDir = path.join(__dirname, 'public/templates/partials/**');
+  var baseDir = path.resolve(__dirname, '../../');
+  var partialsDir = path.resolve(baseDir, './public/templates/partials/');
+  var partialsGlob = path.join(partialsDir, '**/*.hbs');
 
-  /* * /
-  // async
-  return glob(partialsDir)
-    .then(function(files) {
-      var registeringPromises = files.map(function(file) {
-        return readFile(file)
-          .then(function(partialTemplate) {
-            var partialName = path.basename(file, '.hbs');
-            hbs.registerPartial(partialName, partialTemplate);
-          });
-      });
-
-      return Promise.all(registeringPromises);
-    });
-  /* */
-
-  var files = glob.sync(partialsDir);
-  console.log(partialsDir, files);
-  files.forEach(function(file) {
-    var partialName = path.basename(file, '.hbs');
+  var files = glob.sync(partialsGlob);
+  return files.map(function(file) {
+    var partialName = path.relative(partialsDir, file).replace(/\.hbs$/, '');
     var partialTemplate = fs.readFileSync(file);
-    console.log('Registering partial', partialName);
     hbs.registerPartial(partialName, partialTemplate);
+
+    return partialName;
   });
 };

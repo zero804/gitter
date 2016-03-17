@@ -14,6 +14,8 @@ var getPostcssStack = require('gitter-styleguide/postcss-stack');
 
 var devMode = process.env.WEBPACK_DEV_MODE === '1';
 
+console.log('asdf', path.resolve(__dirname, '../templates/partials/'));
+
 var webpackConfig = {
   entry: {
     "router-nli-app": path.resolve(path.join(__dirname, "./router-nli-app.js")),
@@ -69,14 +71,15 @@ var webpackConfig = {
     loaders: [
       {
         test: /\.hbs$/,
-        loader: "handlebars-loader", // disable minify for now + path.resolve(path.join(__dirname, "../../build-scripts/html-min-loader"))
+        loader: 'handlebars-loader', // disable minify for now + path.resolve(path.join(__dirname, "../../build-scripts/html-min-loader"))
         query: {
-          'helperDirs': [
+          helperDirs: [
             path.resolve(__dirname, '../../shared/handlebars/helpers')
           ],
-          'knownHelpers': [
+          knownHelpers: [
             'cdn'
-          ]
+          ],
+          rootRelative: path.resolve(__dirname, '../templates/partials/')
         }
       },
       {
