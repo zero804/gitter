@@ -19,9 +19,10 @@ var defaults = {
 // generateRoomCardContext
 module.exports = function(room, options) {
   var opts = _.extend({}, defaults, options);
-  var roomObj = _.extend({}, room);
+  var roomObj = _.extend({}, room.toJSON());
 
   roomObj.isPrivate = roomObj.security !== 'PUBLIC';
+  roomObj.canEditTags = opts.isStaff;
   roomObj.roomNameParts = roomObj.uri.split('/');
   roomObj.roomAvatarSrcSet = resolveRoomAvatarSrcSet({ uri: roomObj.lcUri }, 40);
   if(opts.messageCount) {
@@ -30,6 +31,8 @@ module.exports = function(room, options) {
   roomObj.displayTags = (roomObj.tags || []).filter(function(tag) {
     return validateTag(tag, opts.isStaff).isValid;
   });
+
+  //console.log('ro', roomObj);
 
   return roomObj;
 };

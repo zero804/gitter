@@ -468,7 +468,7 @@ function renderOrgPage(req, res, next) {
     orgPermissionModel(req.user, 'join', org)
   ])
   .spread(function (ghOrg,rooms, troupeContext, isOrgAdmin, isOrgMember) {
-    var isStaff = troupeContext.user.staff;
+    var isStaff = !!(troupeContext.user || {}).staff;
 
     // Filter out PRIVATE rooms
     _.remove(rooms, function(room) { return room.security === 'PRIVATE'; });
@@ -522,10 +522,14 @@ function renderOrgPage(req, res, next) {
 
       // Custom data for the org page
       rooms = rooms.map(function(room) {
-        return generateRoomCardContext(room, {
+        var result = generateRoomCardContext(room, {
           isStaff: isStaff
         });
+        result.isStaff = result.isStaff || isOrgAdmin;
+        return result;
       });
+
+      console.log('rooms', rooms);
 
       // This is used to track pageViews in mixpanel
       troupeContext.isCommunityPage = true;

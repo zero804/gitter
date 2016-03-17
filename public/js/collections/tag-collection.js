@@ -18,12 +18,13 @@ var TagModel = Backbone.Model.extend({
   },
 
   validate: function(attrs) {
-    var result = validateTag(attrs.value);
+    var isStaff = context.isStaff();
+    var result = validateTag(attrs.value, isStaff);
 
     if(result.messages.length > 0) {
       return result.messages.join(' ');
     }
-  },
+  }
 
 });
 

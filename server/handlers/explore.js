@@ -6,6 +6,7 @@ var langs = require('langs');
 var express = require('express');
 var contextGenerator = require('../web/context-generator');
 var exploreService = require('../services/explore-service');
+var suggestionsService = require('../services/suggestions-service');
 var getRoughMessageCount = require('../services/chat-service').getRoughMessageCount;
 var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
 
@@ -19,7 +20,7 @@ var slugify = function(str){
 };
 
 // @const
-var DEFAULT_TAGS = ['javascript', 'php', 'ruby'];
+var DEFAULT_TAGS = ['suggested'];
 
 function trim(str) {
   return str.trim();
@@ -56,10 +57,13 @@ router.get('/tags/:tags',
   function (req, res, next) {
     contextGenerator.generateNonChatContext(req).then(function (troupeContext) {
       var isStaff = !!(troupeContext.user || {}).staff;
+      console.log('u', req.user, troupeContext.user);
 
       var selectedTags = req.params.tags.split(',');
 
+      var suggestedFauxTag = 'generated:suggested';
       var fauxTagMap = {
+        'Suggested': [suggestedFauxTag],
         'Frontend': ['curated:frontend'],
         'Mobile': [
           'curated:ios',
@@ -104,21 +108,29 @@ router.get('/tags/:tags',
 
       // Work out the selection
       var selectedTagMap = {};
-      selectedTags.forEach(function(selectedTag) {
+      selectedTags.forEach(function(selectedTag, index) {
         var key = slugify(selectedTag);
         var fauxKey = 'faux-' + key;
         var fauxTagEntry = tagMap[fauxKey];
         if(fauxTagEntry && fauxTagEntry.tags.length === 1) {
-          // This will update the tagMap and selectedTagMap
-          fauxTagEntry.selected = true;
-          selectedTagMap[fauxKey] = fauxTagEntry;
+          // We preload only the first one
+          if(index === 0) {
+            // This will update the tagMap and selectedTagMap
+            fauxTagEntry.selected = true;
+            selectedTagMap[fauxKey] = fauxTagEntry;
+          }
         }
         else {
-          selectedTagMap[key] = {
+          var newEntry = {
             name: selectedTag,
-            tags: [selectedTag],
-            selected: true
+            tags: [selectedTag]
           };
+          // We preload only the first one
+          if(index === 0) {
+            newEntry.selected = true;
+          }
+
+          selectedTagMap[key] = newEntry;
         }
       });
 
@@ -132,7 +144,25 @@ router.get('/tags/:tags',
 
       return exploreService.fetchByTags(allTags)
         .then(processTagResult)
+        .then(function(prevRooms) {
+          var getSuggestedRoomsPromise = Promise.resolve([]);
+          if(req.user) {
+            getSuggestedRoomsPromise = suggestionsService.findSuggestionsForUserId(req.user.id);
+          }
+
+          return getSuggestedRoomsPromise
+            .then(function(rooms) {
+              rooms = rooms || [];
+              console.log('suggestedRooms', rooms);
+              rooms = rooms.map(function(room) {
+                room.tags.push(suggestedFauxTag);
+              });
+
+              return rooms.concat(prevRooms);
+            });
+        })
         .then(function(rooms) {
+
           rooms = rooms.map(function(roomObj) {
             return generateRoomCardContext(roomObj.room, {
               isStaff: isStaff,
@@ -140,13 +170,12 @@ router.get('/tags/:tags',
             });
           });
 
+          //console.log('rs', rooms);
+
           res.render('explore', {
             tagMap: resultantTagMap,
             rooms: rooms,
-            isLoggedIn: !!req.user,
-            // Room owners can also edit tags but
-            // we don't worry about that on explore for perf
-            canEditTags: isStaff
+            isLoggedIn: !!req.user
           });
         })
         .catch(next);
