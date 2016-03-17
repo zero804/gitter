@@ -43,13 +43,11 @@ onready(function() {
 
   Backbone.history.start();
 
-  if (document.cookie.indexOf('new_login') !== -1) {
-    $('.login').on('click', 'a[href^="/login"]', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      var href = $(e.currentTarget).attr('href');
-      var route = 'login'+href.slice(href.indexOf('?'));
-      router.navigate(route, {trigger: true});
-    });
-  }
+  $('.login').on('click', 'a[href^="/login"]', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var href = $(e.currentTarget).attr('href');
+    var route = 'login'+href.slice(href.indexOf('?'));
+    router.navigate(route, {trigger: true});
+  });
 });
