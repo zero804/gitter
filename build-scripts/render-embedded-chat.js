@@ -7,13 +7,15 @@ var fs            = require('fs');
 var expressHbs    = require('express-hbs');
 var resolveStatic = require('../server/web/resolve-static');
 
-var opts = require("nomnom")
+var opts = require('yargs')
   .option('output', {
-     abbr: 'o',
+     alias: 'o',
      required: true,
-     help: 'Output'
+     description: 'Output'
   })
-  .parse();
+  .help('help')
+  .alias('help', 'h')
+  .argv;
 
 function die(err) {
   console.error('Unable to render', err);

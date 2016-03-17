@@ -231,6 +231,32 @@
   }
 }
 
-// stop the header from covering the first chat message
-.collaborators-container {
+.chat-header-wrapper {
+  height: 100%;
+}
+
+.chat-and-toolbar-wrapper {
+  box-sizing: border-box;
+  display: flex;
+  justify-content: flex-end;
+  align-items: stretch;
+  height: 100%;
+  padding-top: @chat-frame-desktop-header-height;
+}
+
+.chat-app {
+  box-sizing: border-box;
+  overflow: hidden;
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  /* Sometimes `.chat-and-toolbar-wrapper` isn't a parent */
+  height: 100%;
+}
+
+.org-page-link {
+  &:hover {
+    text-decoration: none;
+  }
 }

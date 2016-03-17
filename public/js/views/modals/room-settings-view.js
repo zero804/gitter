@@ -4,7 +4,7 @@ var Marionette             = require('backbone.marionette');
 var apiClient              = require('components/apiClient');
 var ModalView              = require('./modal');
 var troupeSettingsTemplate = require('./tmpl/room-settings-view.hbs');
-var notifications          = require('components/notifications');
+var userNotifications      = require('components/user-notifications');
 
 var OPTIONS = [
   { val: 'all', text: 'All: Notify me for all messages' },
@@ -94,7 +94,7 @@ var View = Marionette.ItemView.extend({
         found = true;
       }
       return option;
-    });
+        });
     selectInput.append(items);
 
     if (!found) {
@@ -129,7 +129,7 @@ var View = Marionette.ItemView.extend({
 
   serializeData: function() {
     return {
-      notificationsBlocked: notifications.hasBeenDenied(),
+      notificationsBlocked: userNotifications.isAccessDenied(),
     };
   }
 

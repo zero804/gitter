@@ -21,7 +21,6 @@ require('components/timezone-cookie');
 
 require('components/statsc');
 require('views/widgets/preload');
-require('filtered-collection');
 require('components/dozy');
 require('template/helpers/all');
 require('components/eyeballs');

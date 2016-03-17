@@ -54,7 +54,7 @@ module.exports = Backbone.Collection.extend({
   },
 
   getNewCollection: function (){
-    return defaultModels.concat(getSuggestedOrgsFromRoomList(this.roomCollection.toJSON())).concat(tailDefaults);
+    return defaultModels.concat(getSuggestedOrgsFromRoomList(this.roomCollection.toJSON(), document.location.pathname)).concat(tailDefaults);
   },
 
 });

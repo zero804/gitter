@@ -5,7 +5,7 @@ var apiClient                = require('components/apiClient');
 var Marionette               = require('backbone.marionette');
 var Backbone                 = require('backbone');
 var autolink                 = require('autolink');
-var notifications            = require('components/notifications');
+var userNotifications        = require('components/user-notifications');
 var Dropdown                 = require('views/controls/dropdown');
 var appEvents                = require('utils/appevents');
 var headerViewTemplate       = require('./tmpl/headerViewTemplate.hbs');
@@ -162,6 +162,7 @@ module.exports = Marionette.ItemView.extend({
   createMenu: function() {
       var menuItems = [];
       var c = context();
+      var isStaff = context.isStaff();
       var isAdmin = context.isTroupeAdmin();
       var isRoomMember = context.isRoomMember();
       var githubType = this.model.get('githubType');
@@ -183,10 +184,10 @@ module.exports = Marionette.ItemView.extend({
           } else {
             menuItems.push({ title: 'Integrations', href: '#integrations' });
           }
+        }
 
-          if (githubType !== 'USER_CHANNEL') {
-            menuItems.push({ title: 'Edit tags', href: '#tags/' + context().troupe.id });
-          }
+        if (isStaff || isAdmin) {
+          menuItems.push({ title: 'Edit tags', href: '#tags/' + context().troupe.id });
         }
 
         menuItems.push({ divider: true });
@@ -295,9 +296,7 @@ module.exports = Marionette.ItemView.extend({
   },
 
   requestBrowserNotificationsPermission: function() {
-    if(notifications.hasNotBeenSetup() && context().desktopNotifications){
-      notifications.enable();
-    }
+    userNotifications.requestAccess();
   },
 
   // Look at the attributes that have changed

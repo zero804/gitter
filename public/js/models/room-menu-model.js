@@ -79,8 +79,8 @@ module.exports = Backbone.Model.extend({
     this.searchTerms              = new RecentSearchesCollection(null);
     this.searchRoomAndPeople      = new SearchRoomPeopleCollection(null, { roomMenuModel: this });
     this.searchChatMessages       = new SearchChatMessages(null, { roomMenuModel: this, roomModel: this._troupeModel });
-    this.suggestedOrgs            = new SuggestedOrgCollection([], { contextModel: this, roomCollection: this._roomCollection });
-    this._suggestedRoomCollection = new SuggestedRoomsByRoomCollection(null, {
+    this.suggestedOrgs            = new SuggestedOrgCollection({ contextModel: this, roomCollection: this._roomCollection });
+    this._suggestedRoomCollection = new SuggestedRoomsByRoomCollection({
       roomMenuModel:           this,
       troupeModel:             this._troupeModel,
       roomCollection:          this._roomCollection,
@@ -88,7 +88,7 @@ module.exports = Backbone.Model.extend({
     });
 
 
-    this.activeRoomCollection   = new FilteredRoomCollection(null, {
+    this.activeRoomCollection   = new FilteredRoomCollection({
       roomModel:  this,
       collection: this._roomCollection,
     });
@@ -111,6 +111,9 @@ module.exports = Backbone.Model.extend({
     this.listenTo(this, 'change:searchTerm', this.onSearchTermChange, this);
     this.listenTo(this, 'change:state', this.onSwitchState, this);
     this.listenTo(this, 'change', _.debounce(this.save.bind(this), 500));
+
+    //boot the model
+    this.onSwitchState(this, this.get('state'));
   },
 
   onStateChangeCalled: function(newState) {
@@ -121,9 +124,7 @@ module.exports = Backbone.Model.extend({
 
 
     perfTiming.start('left-menu-change');
-    this.trigger('change:state:pre', this.get('state'), newState);
     this.set('state', newState);
-    this.trigger('change:state:post', this.get('state'));
     perfTiming.end('left-menu-change');
   },
 
@@ -165,6 +166,8 @@ module.exports = Backbone.Model.extend({
         this.tertiaryCollection.switchCollection(new Backbone.Collection(null));
         break;
     }
+
+    this.trigger('change:state:post');
   },
 
   onSearchTermChange: _.debounce(function() {
@@ -174,7 +177,6 @@ module.exports = Backbone.Model.extend({
   onPrimaryCollectionSnapshot: function() {
     clearTimeout(this.snapshotTimeout);
     this.trigger('primary-collection:snapshot');
-    this.trigger('change:state', this, this.get('state'));
   },
 
   toJSON: function() {

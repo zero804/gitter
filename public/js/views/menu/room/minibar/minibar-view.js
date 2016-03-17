@@ -6,8 +6,8 @@ var ItemView      = require('./minibar-item-view');
 var CloseItemView = require('./minibar-close-item-view');
 var FavouriteView = require('./minibar-favourite-item-view');
 var PeopleView    = require('./minibar-people-item-view.js');
-var fastdom    = require('fastdom');
-
+var fastdom       = require('fastdom');
+var domIndexById  = require('../../../../utils/dom-index-by-id');
 
 //TODO TEST ALL THE THINGS JP 2/2/16
 module.exports = Marionette.CollectionView.extend({
@@ -24,11 +24,11 @@ module.exports = Marionette.CollectionView.extend({
     //
     //use different selectors for orgs
     var selector = (model.get('type') === 'org') ?
-      '[data-org-name=' + model.get('name')  + ']' :
-      '[data-state-change=' + model.get('type') + ']';
+      'minibar-' + model.get('name') :
+      'minibar-' + model.get('type');
 
-    var element = this.$el.find(selector);
-    return !!element.length ? { el: element, index: index, model: model } : { index: index, model: model };
+    var element = this.domMap[selector];
+    return !!element ? { el: element, index: index, model: model } : { index: index, model: model };
   },
 
   buildChildView: function(model, ViewClass, options) {
@@ -65,6 +65,16 @@ module.exports = Marionette.CollectionView.extend({
     this.listenTo(this.roomCollection, 'add remove', this.render, this);
     this.listenTo(this.collection, 'snapshot', this.onCollectionSnapshot, this);
     this.listenTo(this.model, 'change:state change:selectedOrgName', this.onMenuStateUpdate, this);
+    this.onMenuStateUpdate();
+
+    //Guard against not getting a snapshot
+    this.timeout = setTimeout(function() {
+      this.onCollectionSnapshot();
+    }.bind(this), 2000);
+  },
+
+  onBeforeRender: function () {
+    this.domMap = domIndexById(this.el);
   },
 
   render: function() {
@@ -72,6 +82,8 @@ module.exports = Marionette.CollectionView.extend({
   },
 
   onCollectionSnapshot: function() {
+    clearTimeout(this.timeout);
+
     //Only render after a snapshot
     this.shouldRender = true;
     fastdom.mutate(function() {
@@ -80,11 +92,18 @@ module.exports = Marionette.CollectionView.extend({
   },
 
   onItemClicked: function(view, model) { //jshint unused: true
+    var modelName = model.get('name');
+
+    //stop selectedOrg name from changing if it does not need to
+    if (modelName === 'all' || modelName === 'search' || modelName === 'favourite' || modelName === 'people') {
+      modelName = this.model.get('name');
+    }
+
     this.model.set({
       panelOpenState:       true,
       state:                model.get('type'),
       profileMenuOpenState: false,
-      selectedOrgName:      model.get('name'),
+      selectedOrgName:      modelName,
     });
   },
 
@@ -132,7 +151,7 @@ module.exports = Marionette.CollectionView.extend({
 
   },
 
-  onDestroy: function (){
+  onDestroy: function () {
     this.stopListening(this.collection);
     this.stopListening(this.model);
     this.stopListening(this.roomCollection);
