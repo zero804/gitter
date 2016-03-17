@@ -14,12 +14,12 @@
 
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <link rel="stylesheet" href="{{cdn 'styles/homepage.css' }}">
+        <link rel="stylesheet" href='{{cdn cssFileName }}'>
 
         <link id="favicon" rel="shortcut icon" href="{{ cdn 'images/favicon-normal.ico' }}">
         {{#if useOptimizely}}<script src="//cdn.optimizely.com/js/590160700.js"></script>{{/if }}
     </head>
-    <body  {{#if wordy}}class="wordy"{{/if}}>
+    <body  {{#if wordy}}class="wordy"{{/if}}><div class="homepage">
       <header id="intro-panel">
         <nav class="site-nav">
           <div class="wrap">
@@ -443,13 +443,13 @@
           {{/if}}
 
         </div>
-      </footer>
+      </footer></div>
 
       {{{ generateEnv anonymous=true }}}
-      {{{ bootScript "homepage" }}}
+      {{{ bootScript bootScriptName jsRoot=jsRoot }}}
 
-        <script type="text/javascript" src="//use.typekit.net/ohh4mcl.js"></script>
-        <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+      <script type="text/javascript" src="//use.typekit.net/ohh4mcl.js"></script>
+      <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
 
     </body>
 </html>
