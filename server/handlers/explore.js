@@ -56,7 +56,8 @@ router.get('/tags/:tags',
   identifyRoute('explore-tags'),
   function (req, res, next) {
     contextGenerator.generateNonChatContext(req).then(function (troupeContext) {
-      var isStaff = !!(troupeContext.user || {}).staff;
+      var user = troupeContext.user;
+      var isStaff = !!(user || {}).staff;
       console.log('u', req.user, troupeContext.user);
 
       var selectedTags = req.params.tags.split(',');
@@ -146,8 +147,8 @@ router.get('/tags/:tags',
         .then(processTagResult)
         .then(function(prevRooms) {
           var getSuggestedRoomsPromise = Promise.resolve([]);
-          if(req.user) {
-            getSuggestedRoomsPromise = suggestionsService.findSuggestionsForUserId(req.user.id);
+          if(user) {
+            getSuggestedRoomsPromise = suggestionsService.findSuggestionsForUserId(user.id);
           }
 
           return getSuggestedRoomsPromise
@@ -175,7 +176,7 @@ router.get('/tags/:tags',
           res.render('explore', {
             tagMap: resultantTagMap,
             rooms: rooms,
-            isLoggedIn: !!req.user
+            isLoggedIn: !!user
           });
         })
         .catch(next);
