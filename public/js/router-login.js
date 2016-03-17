@@ -45,6 +45,7 @@ onready(function() {
 
   $('.login').on('click', 'a[href^="/login"]', function(e) {
     e.preventDefault();
+    e.stopPropagation();
     var href = $(e.currentTarget).attr('href');
     var route = 'login'+href.slice(href.indexOf('?'));
     router.navigate(route, {trigger: true});
