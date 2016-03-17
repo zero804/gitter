@@ -294,20 +294,18 @@ onready(function() {
     appEvents.trigger('stats.event', 'apps.windows.download');
   });
 
-  if (document.cookie.indexOf('new_login') !== -1) {
-    $('a[href^="/login"]').on('click', function(e) {
-      var href = $(e.currentTarget).attr('href');
-      var parsed = urlParse(href, true);
-      if (parsed.pathname !== '/login') {
-        // don't accidentally intercept links inside the modal
-        return;
-      }
-      e.preventDefault();
-      e.stopPropagation();
-      var modal = new LoginView(parsed.query);
-      modalRegion.show(modal);
-      // hack this modal because we're not using history or routing here
-      modal.navigable = false;
-    });
-  }
+  $('a[href^="/login"]').on('click', function(e) {
+    var href = $(e.currentTarget).attr('href');
+    var parsed = urlParse(href, true);
+    if (parsed.pathname !== '/login') {
+      // don't accidentally intercept links inside the modal
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    var modal = new LoginView(parsed.query);
+    modalRegion.show(modal);
+    // hack this modal because we're not using history or routing here
+    modal.navigable = false;
+  });
 });
