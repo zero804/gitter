@@ -1,7 +1,5 @@
 'use strict';
 
-var defaultFilter = require('./left-menu-primary-default.js');
+var filter = require('gitter-realtime-client/lib/sorts-filters').pojo.favourites.filter;
 
-module.exports = function leftMenuFavouriteFilter(room) {
-  return defaultFilter(room) && !!room.favourite;
-};
+module.exports = filter;

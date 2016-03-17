@@ -1,20 +1,22 @@
 'use strict';
 
-var Backbone                   = require('backbone');
-var BackboneFilteredCollection = require('filtered-collection');
+var FilteredCollection = require('backbone-filtered-collection');
+var _                  = require('underscore');
 
 //Filters
-var defaultFilter              = require('gitter-web-shared/filters/left-menu-primary-default');
-var favouriteFilter            = require('gitter-web-shared/filters/left-menu-primary-favourite');
-var one2oneFilter              = require('gitter-web-shared/filters/left-menu-primary-one2one');
-var orgFilter                  = require('gitter-web-shared/filters/left-menu-primary-org');
+var one2oneFilter  = require('gitter-web-shared/filters/left-menu-primary-one2one');
+var orgFilter      = require('gitter-web-shared/filters/left-menu-primary-org');
+var sortAndFilters = require('gitter-realtime-client/lib/sorts-filters').model;
 
-//Sort
-var defaultSort                = require('gitter-web-shared/sorting/left-menu-primary-default');
-var favouriteSort              = require('gitter-web-shared/sorting/left-menu-primary-favourite');
+var FilteredRoomCollection = function() {
+  FilteredCollection.apply(this, arguments);
+};
 
-var FilteredRoomCollection = Backbone.FilteredCollection.extend({
-  initialize: function(collection, options) {//jshint unused: true
+FilteredRoomCollection.prototype = _.extend(
+  FilteredRoomCollection.prototype,
+  FilteredCollection.prototype, {
+
+  initialize: function(options) {//jshint unused: true
     if (!options || !options.roomModel) {
       throw new Error('A valid RoomMenuModel must be passed to a new instance of FilteredRoomCollection');
     }
@@ -32,13 +34,8 @@ var FilteredRoomCollection = Backbone.FilteredCollection.extend({
 
     this.listenTo(this, 'sync', this.onSync, this);
 
-
-    BackboneFilteredCollection.prototype.initialize.apply(this, arguments);
+    FilteredCollection.prototype.initialize.apply(this, arguments);
     this.onModelChangeState();
-  },
-
-  comparator: function(a, b) {
-    return defaultSort(a.toJSON(), b.toJSON());
   },
 
   onModelChangeState: function() {//jshint unused: true
@@ -61,16 +58,16 @@ var FilteredRoomCollection = Backbone.FilteredCollection.extend({
         this.setFilter(this.filterDefault);
         break;
     }
-    this.sort();
+    //sort silently to stop multiple renders
+    this.sort({ silent: true });
   },
 
   onOrgNameChange: function() {
     this.setFilter();
   },
 
-  filterFavourite: function(model) {
-    return favouriteFilter(model.toJSON());
-  },
+  filterDefault: sortAndFilters.leftMenu.filter,
+  filterFavourite: sortAndFilters.favourites.filter,
 
   filterOneToOnes: function(model) {
     return one2oneFilter(model.toJSON());
@@ -78,10 +75,6 @@ var FilteredRoomCollection = Backbone.FilteredCollection.extend({
 
   filterSearches: function() {
     return false;
-  },
-
-  filterDefault: function (model){
-    return defaultFilter(model.toJSON());
   },
 
   filterOrgRooms: function(model) {
@@ -94,9 +87,8 @@ var FilteredRoomCollection = Backbone.FilteredCollection.extend({
     this.trigger.apply(this, ['snapshot'].concat(args));
   },
 
-  sortFavourites: function(a, b) {
-    return favouriteSort(a.toJSON(), b.toJSON());
-  },
+  comparator:     sortAndFilters.recents.sort,
+  sortFavourites: sortAndFilters.favourites.sort,
 
   onSync: function() {
     if (this.comparator) { this.sort(); }
