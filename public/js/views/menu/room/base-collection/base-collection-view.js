@@ -41,7 +41,6 @@ module.exports = Marionette.CompositeView.extend({
     this.bus           = attrs.bus;
     this.collection    = attrs.collection;
     this.roomMenuModel = attrs.roomMenuModel;
-    this.listenTo(context.troupe(), 'change:id', this.updateSelectedModel, this);
     this.listenTo(this.roomMenuModel, 'change:state:post change:selectedOrgName', this.render, this);
     Marionette.CompositeView.prototype.constructor.apply(this, arguments);
   },
@@ -50,14 +49,6 @@ module.exports = Marionette.CompositeView.extend({
     if (this.model.get('active')) {
       this.render();
     }
-  },
-
-  updateSelectedModel: function() {
-    var selectedModel      = this.collection.findWhere({ selected: true });
-    var newlySelectedModel = this.collection.findWhere({ id: context.troupe().get('id') });
-
-    if (selectedModel) selectedModel.set('selected', false);
-    if (newlySelectedModel) newlySelectedModel.set('selected', true);
   },
 
   onItemClicked: function(view) {

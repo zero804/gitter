@@ -1,17 +1,17 @@
 #!/usr/bin/env node
-/*jslint node:true, unused:true */
 'use strict';
 
 var yargs = require('yargs');
 var _ = require('lodash');
+var shutdown = require('shutdown');
 var userService = require('../../server/services/user-service');
 var troupeService = require('../../server/services/troupe-service');
 var restSerializer = require('../../server/serializers/rest-serializer');
-var legacyRecommendations = require('../../server/services/recommendations/legacy-recommendations');
-var shutdown = require('shutdown');
+var suggestionsService = require('../../server/services/suggestions-service')
+var roomMembershipService = require('../../server/services/room-membership-service');
+var userSettingsService = require('../../server/services/user-settings-service');
+var troupeService = require('../../server/services/troupe-service');
 var shimPositionOption = require('../yargs-shim-position-option');
-
-var suggestions  = require('gitter-web-suggestions');
 
 
 var argv = yargs.argv;
@@ -26,71 +26,77 @@ var opts = yargs
     required: !argv.username,
     description: 'room(s) in which to do the lookup'
   })
-  .option('max-uri', {
-    default: 10,
-    description: 'Number of room(s) we limit to when providing multiple room uri in `--uri`',
-    defaultDescription: 'This should be limited to 10 for performance with `getSuggestionsForRooms` but we are leaving it flexible in case you need it.'
-  })
   .option('language', {
-    default: 'en',
-    description: 'human language'
+    required: !!argv.uri,
+    description: 'human language (only required & used when not specifying a username)'
   })
   .help('help')
   .alias('help', 'h')
   .argv;
 
-if(!opts.username && opts.uri) {
-  var maxUri = opts['max-uri'];
+function lookupByRooms() {
   var rooms = [].concat(opts.uri).map(function(uri) {
     return troupeService.findByUri(uri);
   });
 
-  if(rooms.length > maxUri) {
-    console.warn('You passed in more than ' + maxUri + ' rooms in. We will only use the first ' + maxUri);
-  }
-
-  suggestions.getSuggestionsForRooms(rooms.slice(0, maxUri))
-    .then(function(suggestions) {
-      var roomIds = _.pluck(suggestions, 'roomId');
-      return troupeService.findByIdsLean(roomIds, {
-        uri: 1,
-        lcOwner: 1,
-        userCount: 1
-      });
-    })
+  return suggestionsService.findSuggestionsForRooms(null, rooms, opts.language)
     .then(function(suggestedRooms) {
-      suggestedRooms.forEach(function(suggestedRoom) {
-        console.log(suggestedRoom.uri, suggestedRoom);
-      });
-    });
-}
-else {
-  userService.findByUsername(opts.username)
-    .then(function(user) {
-      var uri = opts.uri[0];
-      return [user, uri && troupeService.findByUri(uri)];
-    })
-    .spread(function(user, room) {
-      if (room) {
-        return suggestions.getSuggestionsForRoom(room, user, opts.language);
-      }
-
-      return legacyRecommendations.getSuggestionsForUser(user, opts.language);
-      // return suggestions.getSuggestionsForUser(user, opts.language);
+      return restSerializer.serialize(suggestedRooms, new restSerializer.SuggestedRoomStrategy());
     })
     .then(function(suggestions) {
-      return restSerializer.serialize(suggestions, new restSerializer.SuggestedRoomStrategy({ }));
-    })
-    .then(function(repos) {
-      repos.forEach(function(suggestion) {
+      console.log(suggestions.length, "results");
+      suggestions.forEach(function(suggestion) {
         console.log(suggestion.uri, suggestion);
       });
-    })
-    .delay(1000)
-    .catch(function(err) {
-      console.error(err.stack);
-    })
-    .finally(function() {
-      shutdown.shutdownGracefully();
     });
 }
+
+function run() {
+  if (opts.uri) {
+    return lookupByRooms();
+  } else {
+    return lookupByUsername();
+  }
+}
+
+function lookupByUsername() {
+  return userService.findByUsername(opts.username)
+    .then(function(user) {
+      return [
+        user,
+        roomMembershipService.findRoomIdsForUser(user.id)
+          .then(function(roomIds) {
+            return troupeService.findByIdsLean(roomIds, {
+              uri: 1,
+              lcOwner: 1,
+              lang: 1,
+              oneToOne: 1
+            });
+          }),
+        userSettingsService.getUserSettings(user.id, 'lang')
+      ];
+    })
+    .spread(function(user, existingRooms, language) {
+      return suggestionsService.findSuggestionsForRooms(user, existingRooms, language);
+    })
+    .then(function(suggestedRooms) {
+      return restSerializer.serialize(suggestedRooms, new restSerializer.SuggestedRoomStrategy());
+    })
+    .then(function(suggestions) {
+      console.log(suggestions.length, "results");
+      suggestions.forEach(function(suggestion) {
+        console.log(suggestion.uri, suggestion);
+      });
+    });
+}
+
+run()
+  .then(function() {
+    shutdown.shutdownGracefully();
+  })
+  .catch(function(err) {
+    console.error(err);
+    console.error(err.stack);
+    process.exit(1);
+    shutdown.shutdownGracefully(1);
+  });
