@@ -1,8 +1,10 @@
-"use strict";
+'use strict';
+
 var $ = require('jquery');
 var appEvents = require('utils/appevents');
 var onready = require('utils/onready');
 var toggleClass = require('utils/toggle-class');
+var ExploreView = require('views/explore/explore-view');
 
 require('utils/tracking');
 require('utils/frame-utils');
@@ -11,8 +13,12 @@ require('gitter-styleguide/css/components/buttons.css');
 require('gitter-styleguide/css/components/headings.css');
 
 
-
 onready(function() {
+
+  var exploreView = new ExploreView({
+    el: '.explore-page-wrap'
+  });
+  exploreView.render();
 
 
   Array.prototype.forEach.call(document.querySelectorAll('.js-explore-room-card'), function(roomItemElement) {

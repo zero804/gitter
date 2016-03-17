@@ -28,20 +28,22 @@
     <p class="room-card__topic">
       {{ topic }}
     </p>
-    <section class="room-card__tag-list">
-      {{#each displayTags}}
-        <a href="/explore/tags/{{this}}" target="_parent" class="room-card__tag">
-          {{this}}
-        </a>
-      {{/each}}
-    </section>
+    {{#if displayTags.length}}
+      <section class="room-card__tag-list">
+        {{#each displayTags}}
+          <a href="/explore/tags/{{this}}" class="room-card__tag">
+            {{this}}
+          </a>
+        {{/each}}
+      </section>
+    {{/if}}
   </section>
 
   <footer class="room-card__footer">
     <div class="room-card__footer-info-section">
       <div class="room-card__footer-user-count subdued-button-pampas--xsmall">
-        +{{ userCount }}
         <i class="icon-user"></i>
+        {{ userCount }}
       </div>
       {{#if messageCountSiPrefixed}}
         <div class="room-card__footer-message-count">

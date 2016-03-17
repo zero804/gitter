@@ -1,22 +1,27 @@
 'use strict';
 
-var Marionette                = require('backbone.marionette');
-var Backbone                  = require('backbone');
+var Marionette = require('backbone.marionette');
+var Backbone = require('backbone');
 
-var template                  = require('./tmpl/repoSelectView.hbs');
-var itemTemplate              = require('./tmpl/repoItemView.hbs');
+var template = require('./tmpl/explore-view.hbs');
+var itemTemplate = require('../../../templates/partials/room_card.hbs');
 
 
-var ItemView = Marionette.ItemView.extend({
+var RoomCardView = Marionette.ItemView.extend({
   template: itemTemplate,
   tagName: 'div'
 });
 
 
-var View = Marionette.CompositeView.extend({
+var ExploreView = Marionette.CompositeView.extend({
   events: {
   },
-  childView: ItemView,
+  childView: RoomCardView,
   template: template,
-  childViewContainer: '#list'
+  childViewContainer: '.explore-room-card-list',
+  initialize: function() {
+    console.log('explore init');
+  }
 });
+
+module.exports = ExploreView;

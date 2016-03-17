@@ -6,6 +6,7 @@ var logoutDestroyTokens = require('./logout-destroy-tokens');
 
 function ensureLoggedIn(req, res, next) {
   /* Bearer strategy must return a user. If the user is { _anonymous: true }, it should be null */
+  console.log('eli', req.user);
   if (req.user && req.user._anonymous) {
     req.user = null;
   }

@@ -4,7 +4,7 @@
 @room-card-bg-color: #ffffff;
 
 @room-card-side-padding: 1rem;
-
+@room-card-tag-vertical-padding: .55rem;
 
 
 .room-card-list {
@@ -22,11 +22,11 @@
 
 .room-card {
   overflow: hidden;
-  flex: 1 0 15.625em;
+  flex: 1 0 18.625em;
   display: flex;
   flex-direction: column;
 
-  opacity: 0.7;
+  opacity: .7;
   background-color: @room-card-bg-color;
   border-radius: 3px;
 
@@ -99,12 +99,12 @@
   max-width: calc(100% ~"-" 5ch);
   text-overflow: ellipsis;
 
-  transition: flex-shrink 0.3s ease-in-out;
+  transition: flex-shrink .3s ease-in-out;
 
   &:last-child,
   &:only-child,
   &:hover {
-    flex-shrink: 0.01;
+    flex-shrink: .01;
   }
 }
 
@@ -116,13 +116,14 @@
 }
 
 .room-card__header-avatar {
+  height: 40px;
   margin-right: 1rem;
 }
 
 
 .room-card__body {
   flex: 1;
-  margin-top: 0.25rem;
+  margin-top: .25rem;
   padding-left: @room-card-side-padding;
   padding-right: @room-card-side-padding;
 }
@@ -130,8 +131,8 @@
 .room-card__topic {
   overflow: hidden;
   min-height: 1em;
-  margin-top: 0.75rem;
-  margin-bottom: 0.75rem;
+  margin-top: .75rem;
+  margin-bottom: .75rem;
 
   font-size: 1em;
   line-height: 1em;
@@ -142,20 +143,24 @@
 .room-card__tag-list {
   overflow: hidden;
   display: flex;
+  flex-wrap: wrap;
+  height: calc(1em ~"+" (2 * @room-card-tag-vertical-padding));
+  margin-top: .25rem;
+  margin-bottom: .75rem;
 }
 
 .room-card__tag {
-  margin-right: 0.5rem;
-  margin-bottom: 0.5rem;
-  padding-top: 0.25rem;
-  padding-left: 0.75rem;
-  padding-bottom: 0.25rem;
-  padding-right: 0.75rem;
+  margin-right: .5rem;
+  padding-top: @room-card-tag-vertical-padding;
+  padding-left: .75rem;
+  padding-bottom: @room-card-tag-vertical-padding;
+  padding-right: .75rem;
 
   background-color: #d6d6d6;
   border-radius: 3px;
 
   color: @room-card-bg-color;
+  line-height: 1;
   white-space: nowrap;
 }
 
@@ -187,8 +192,8 @@
 }
 
 .room-card__footer-user-count {
-  padding-left: 0.75em;
-  padding-right: 0.75em;
+  padding-left: .75em;
+  padding-right: .75em;
 }
 
 .room-card__footer-action-section {
