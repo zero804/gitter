@@ -3,9 +3,11 @@
     <a href="/login/github?action={{action}}&source={{source}}" class="login-view__button button-github--small">
       <i class="icon-github-circled"></i> Sign in with GitHub
     </a>
+    {{# if showTwitter}}
     <a href="/login/twitter?action={{action}}&source={{source}}" class="login-view__button button-twitter--small">
       <i class="icon-twitter"></i> Sign in with Twitter
     </a>
+    {{/if}}
   </div>
 
   <div class="modal--default__content__fineprint login-view__agree">
