@@ -14,7 +14,6 @@ setImmediate(function() {
 
 var registerPartials = require('./register-partials');
 var partialNames = registerPartials(hbsInstance);
-console.log('registerPartials', partialNames.length, partialNames);
 
 
 /**

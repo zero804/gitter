@@ -146,5 +146,18 @@
       border-color: darken(@pampas, 2%);
       outline: none;
     }
+
+    & > .tag-pill-list-pagination-more-button__expanded-text {
+      display: none;
+    }
+    &.is-expanded {
+      & > .tag-pill-list-pagination-more-button__collapsed-text {
+        display: none;
+      }
+      & > .tag-pill-list-pagination-more-button__expanded-text {
+        display: block;
+      }
+    }
   }
+
 }

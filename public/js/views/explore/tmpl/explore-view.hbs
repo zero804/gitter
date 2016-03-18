@@ -52,7 +52,7 @@
       <div class="explore-pill-list-section__header-secondary-action-annotation">
         Can't find what you're looking for?
       </div>
-      <button class="subdued-button-jaffa--xsmall">
+      <button class="subdued-button-jaffa--xsmall js-explore-create-room-button">
         Create your own
       </button>
     </div>
@@ -61,7 +61,10 @@
   <ul class="tag-pill-list js-explore-tag-pills-list">
     {{#each tagMap}}
       <li class="tag-pill-list-item">
-        <button class="tag-pill {{when this.selected 'is-active' : ''}} js-explore-tag-pill" {{when this.selected 'aria-selected' : ''}} data-tags="{{#each this.tags}}{{this}}{{#unless @last}},{{/unless}}{{/each}}">
+        <button
+          class="tag-pill {{when this.selected 'is-active' : ''}} js-explore-tag-pill" {{when this.selected 'aria-selected' : ''}}
+          data-tags="{{#each this.tags}}{{this}}{{#unless @last}},{{/unless}}{{/each}}"
+        >
           {{this.name}}
         </button>
       </li>
@@ -69,7 +72,8 @@
 
     <li class="tag-pill-list-pagination-item">
       <button class="tag-pill-list-pagination-more-button js-explore-show-more-tag-pills">
-        More
+        <span class="tag-pill-list-pagination-more-button__collapsed-text">More</span>
+        <span class="tag-pill-list-pagination-more-button__expanded-text">Less</span>
       </button
     </li>
   </ul>
@@ -77,7 +81,7 @@
 
 <section class="explore-room-card-list-section">
   {{#if rooms}}
-    <div class="explore-room-card-list">
+    <div class="explore-room-card-list js-room-card-list">
       {{#each rooms}}
         {{> room_card
           linkSource='explore'
