@@ -1,6 +1,7 @@
 @import "trp3Vars";
 @import "../../../../../less/components/menu/room/avatar.less";
 @import "../../../../../less/components/menu/room/menu-text.less";
+@import "../../../../../less/components/menu/room/room-item.less";
 @import "../base-collection/base-collection-view.less";
 @import (inline) "../../../../../../node_modules/dragula/dist/dragula.css";
 
@@ -17,47 +18,7 @@ JP 11/2/16
 
 //TODO this name is stupid, replace it JP 8/1/16
 .room-item {
-  height:     @menu-item-height * 3;
-  max-height: @menu-item-height;
-  opacity:    0;
-  transition: opacity .2s ease-in, max-height .2s ease-in;
-  overflow:   hidden;
-
-  &.active {
-    max-height: @menu-item-height * 3;
-  }
-
-  .loaded & {
-    opacity: 1;
-  }
-
-  &.gu-mirror, &.gu-transit {
-
-    .room-item-selected();
-    max-height: @menu-item-height;
-    opacity: 1;
-
-    & .room-item__options-menu {
-      display: none;
-    }
-  }
-
-  &:hover {
-    //.room-item-selected();
-
-    & .room-item__options {
-      opacity: 1;
-    }
-  }
-
-  .desktop & {
-    //margin-left:   @desktop-menu-left-padding / 2;
-  }
-
-  .mobile & {
-    padding-left:  @mobile-menu-left-padding;
-    padding-right: @mobile-menu-left-padding;
-  }
+  .m-room-item();
 }
 
 .room-item--one2one {

@@ -33,7 +33,8 @@ var View = Marionette.ItemView.extend({
   serializeData: function() {
     return {
       action: this.action,
-      source: this.source
+      source: this.source,
+      showTwitter: document.cookie.indexOf('new_login') !== -1
     }
   }
 });
