@@ -41,6 +41,14 @@ module.exports = BaseCollectionItemView.extend({
 
   serializeData: function() {
     var data             = parseForTemplate(this.model.toJSON(), this.roomMenuModel.get('state'));
+
+    //When the user is viewing a room he is lurking in and activity occurs
+    //we explicitly, in this case, cancel the lurk activity
+    //this would be a lot easier (as with a lot of things) if we persisted activity on the server JP 17/3/16
+    if(data.lurkActivity && (data.id === context.troupe().get('id'))) {
+      data.lurkActivity = false;
+    }
+
     var absoluteRoomUri  = context.env('basePath') + data.url;
     data.absoluteRoomUri = absoluteRoomUri;
     return data;

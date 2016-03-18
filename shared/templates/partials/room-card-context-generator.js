@@ -25,7 +25,6 @@ module.exports = function(room, options) {
   result.canEditTags = opts.isStaff;
   result.roomNameParts = result.uri.split('/');
   result.roomAvatarSrcSet = resolveRoomAvatarSrcSet({ uri: result.lcUri }, 40);
-  console.log(result.name, opts.messageCount);
   if(opts.messageCount) {
     result.messageCountSiPrefixed = formatNumberWithSiPrefix(opts.messageCount);
   }

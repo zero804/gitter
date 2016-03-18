@@ -32,7 +32,10 @@ routes.invited = [
 
     res.render('login_invited', {
       username: query.welcome,
-      uri: query.uri
+      uri: query.uri,
+      bootScriptName: 'router-login',
+      cssFileName:  "styles/login.css",
+      showNewLogin: !!req.cookies.new_login
     });
   }
 ];
