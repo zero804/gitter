@@ -89,7 +89,11 @@ module.exports =  BaseCollectionView.extend({
   onRender: function (){
     BaseCollectionView.prototype.onRender.apply(this, arguments);
     if(this.ui.header && this.ui.header[0]) {
-      toggleClass(this.ui.header[0], 'hidden', this.isEmpty());
+      toggleClass(
+        this.ui.header[0],
+        'hidden',
+        (this.isEmpty() && (this.roomMenuModel.get('state') === 'search'))
+      );
     }
   },
 
