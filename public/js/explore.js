@@ -76,6 +76,7 @@ onready(function() {
       // Redirect to new page (we don't have a API to query client-side yet)
       window.location.href = '/explore/tags/' + tagPillElement.getAttribute('data-tags');
 
+      /* * /
       // Only one tag can be selected at a time so
       // unselect all of the tags
       Array.prototype.forEach.call(tagPillElements, function(tagPillElement) {
@@ -90,6 +91,7 @@ onready(function() {
       appEvents.trigger('track-event', 'explore_pills_click', {
         tag: tagPillElement.textContent.toLowerCase()
       });
+      /* */
     });
   });
 
@@ -98,7 +100,7 @@ onready(function() {
   Array.prototype.forEach.call(showMoreElemnts, function(showMoreElement) {
     showMoreElement.addEventListener('click', function() {
       var state = toggleClass(showMoreElement, 'is-expanded');
-      
+
       Array.prototype.forEach.call(tagPillListElements, function(pillListElement) {
         toggleClass(pillListElement, 'is-expanded', state);
         pillListElement.setAttribute('aria-selected', state);

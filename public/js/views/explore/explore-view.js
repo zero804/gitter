@@ -17,18 +17,18 @@ var TagPillView = Marionette.ItemView.extend({
     'click': 'onClick'
   },
   initialize: function() {
-    //console.log('tagPillView init');
+    console.log('tagPillView init');
   },
 
   onClick: function() {
-    //console.log('click tag pill');
+    console.log('click tag pill');
   }
 });
 
 var TagPillListView = Marionette.CollectionView.extend({
   childView: TagPillView,
   initialize: function() {
-    //console.log('tagPillListView init');
+    console.log('tagPillListView init');
   }
 });
 
@@ -52,7 +52,7 @@ var RoomCardView = Marionette.ItemView.extend({
 var RoomCardListView = Marionette.CollectionView.extend({
   childView: RoomCardView,
   initialize: function() {
-    //console.log('roomCardListView init');
+    console.log('roomCardListView init');
   }
 });
 
@@ -82,7 +82,7 @@ var ExploreView = Marionette.LayoutView.extend({
   },
 
   initialize: function() {
-    //console.log('explore init');
+    console.log('explore init');
   },
 
   initRoomCardListView: function(optionsForRegion) {
