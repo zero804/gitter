@@ -1,6 +1,7 @@
 'use strict';
 
 var Marionette  = require('backbone.marionette');
+var _           = require('underscore');
 var template    = require('./base-collection-item-view.hbs');
 var toggleClass = require('utils/toggle-class');
 var context     = require('utils/context');
@@ -27,10 +28,6 @@ module.exports = Marionette.ItemView.extend({
   constructor: function(attrs) {
     this.roomMenuModel = attrs.roomMenuModel;
     this.index         = attrs.index;
-    if(attrs.model) {
-      var check = (attrs.model.get('id') === context.troupe().get('id'));
-      attrs.model.set('selected', check);
-    }
     Marionette.ItemView.prototype.constructor.apply(this, arguments);
   },
 
