@@ -276,7 +276,6 @@
     "unlink": "linklocal unlink -r",
     "shrinkwrap": "mv node_modules/ node_modules_temp && rm -f npm-shrinkwrap.json && npm i --production && npm shrinkwrap && rm -rf node_modules/ && mv node_modules_temp node_modules/ && npm prune && npm install",
     "preinstall": "(linklocal list --format '%S' --no-summary || find node_modules -maxdepth 1 -type l -exec basename {} \\;)|while read line; do if [ -d \"$line\" ] && [ ! -h \"$line\" ]; then rm -r \"$line\"; fi; done",
-    "postinstall": "npm run link",
     "shrinkwrap-conflict": "rm -f npm-shrinkwrap.json && npm run shrinkwrap",
     "fix-shrinkwrap-registry": "sed -i '' 's#https://registry.npmjs.org/#http://beta-internal:4873/#g' npm-shrinkwrap.json && sed -i '' 's#http://beta-internal:8089/nexus/content/groups/npm/#http://beta-internal:4873/#g' npm-shrinkwrap.json",
     "flush-dev-db": "mongo gitter-mongo-dev/gitter --eval 'printjson(db.dropDatabase())'; ./scripts/dataupgrades/001-oauth-client/002-add-redirect-uri.sh gitter-mongo-dev/gitter; redis-cli -h gitter-redis-dev flushall",
