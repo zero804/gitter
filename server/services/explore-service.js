@@ -1,6 +1,7 @@
 "use strict";
 
 var persistence = require('./persistence-service');
+var cacheWrapper = require('gitter-web-cache-wrapper');
 
 /**
  * fetchByTags() retrives rooms that match a given set of tags
@@ -21,3 +22,6 @@ function fetchByTags(tags) {
 }
 
 exports.fetchByTags = fetchByTags;
+
+exports.fetchByTagsCached = cacheWrapper('fetchByTagsCached', fetchByTags);
+

@@ -2,10 +2,37 @@
 @import "homepage-mobile.less";
 @import "colors.less";
 @import "logo.less";
+@import (less) "../fonts/fontello/css/fontello.css";
+@import (less) "../fonts/octicons/octicons.css";
 
 @import "./mixins/text/button-text.less";
 @import "./components/home-team-list.less";
 @import "./components/home-communities.less";
+
+@import "trpModals.less";
+@import "trpButtons.less";
+
+@import "bootstrap/mixins";
+
+@import "../js/views/modals/login-view.less";
+
+// fixes for ui-components
+html { font-size: 62.5%;}
+body { font-size: 1.6rem;}
+.modal-backdrop {
+  z-index: 10000;
+  -webkit-font-smoothing: antialiased;
+  section {
+    position: inherit;
+    min-height: inherit;
+  }
+  a {
+    text-decoration: none;
+  }
+  p {
+    margin-bottom: 1.3rem;
+  }
+}
 
 .appear__keyframes() {
   0% { opacity: 0; }
@@ -152,7 +179,8 @@ h1:after, h2:after {
 }
 */
 
- [class^="icon-"]:before, [class*=" icon-"]:before {
+.homepage [class^="icon-"]:before,
+.homepage [class*=" icon-"]:before {
   font-family: "os-icons";
   font-style: normal;
   font-weight: normal;
