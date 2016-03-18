@@ -60,39 +60,43 @@ router.get('/tags/:tags',
       var isStaff = !!(user || {}).staff;
       console.log('u', req.user, troupeContext.user);
 
-      var selectedTags = req.params.tags.split(',');
+      var selectedTags = req.params.tags
+        .split(',')
+        .map(function(tag) {
+          return tag.toLowerCase();
+        });
 
       var suggestedFauxTag = 'generated:suggested';
       var fauxTagMap = {
         'Suggested': [suggestedFauxTag],
-        'Frontend': ['curated:frontend'],
+        'Frontend': [],
         'Mobile': [
           'curated:ios',
           'curated:android',
           'objective-c'
         ],
-        'iOS': ['curated:ios'],
-        'Android': ['curated:android'],
-        'Data Science': ['curated:datascience'],
-        'Devops': ['curated:devops'],
-        'Game Dev': ['curated:gamedev', 'game'],
+        'iOS': [],
+        'Android': [],
+        'Data Science': [],
+        'Devops': [],
+        'Game Dev': ['game'],
         'Frameworks': ['frameworks'],
-        'JavaScript': 'javascript',
-        'Scala': 'scala',
-        'Ruby': 'ruby',
-        'CSS': 'css',
-        'Material Design': ['curated:materialdesign'],
-        'React': 'react',
-        'Java': 'java',
-        'Swift': 'swift',
-        'Go': 'go',
+        'JavaScript': ['javascript'],
+        'Scala': ['scala'],
+        'Ruby': ['ruby'],
+        'CSS': ['css'],
+        'Material Design': [],
+        'React': ['react'],
+        'Java': ['java'],
+        'Swift': ['swift'],
+        'Go': ['go'],
         'Node': ['node', 'nodejs'],
-        'Meteor': 'meteor',
-        'Django': 'django',
-        '.NET': 'dotnet',
-        'Angular': 'angular',
-        'Rails': 'rails',
-        'Haskell': 'haskell'
+        'Meteor': ['meteor'],
+        'Django': ['django'],
+        '.NET': ['dotnet'],
+        'Angular': ['angular'],
+        'Rails': ['rails'],
+        'Haskell': ['haskell']
       };
 
       // Generate the tagMap
@@ -100,6 +104,8 @@ router.get('/tags/:tags',
       Object.keys(fauxTagMap).forEach(function(fauxKey) {
         // The tags driving the faux-tag
         var backendTags = [].concat(fauxTagMap[fauxKey]);
+        // Add the primary backend tag to the front
+        backendTags.unshift('curated:' + slugify(fauxKey));
 
         tagMap['faux-' + slugify(fauxKey)] = {
           name: fauxKey,
@@ -109,27 +115,30 @@ router.get('/tags/:tags',
 
       // Work out the selection
       var selectedTagMap = {};
-      selectedTags.forEach(function(selectedTag, index) {
-        var key = slugify(selectedTag);
+      // We only take one selected tag
+      selectedTags.slice(0, 1).forEach(function(selectedTag) {
+        var tagPortionMatches = selectedTag.match(/((?:(?:.*?):){0,})(.*)$/);
+        var tagReservedPrefixPortion = tagPortionMatches[1];
+        var tagMainPortion = tagPortionMatches[2];
+        var key = slugify(tagMainPortion);
+
+        // Only match to faux keys if we are using some special sauce or
+        // the special `explore/tags/suggested` url
+        var shouldUseFauxKey = tagReservedPrefixPortion.length > 0 || tagMainPortion === 'suggested';
+
         var fauxKey = 'faux-' + key;
         var fauxTagEntry = tagMap[fauxKey];
-        if(fauxTagEntry && fauxTagEntry.tags.length === 1) {
-          // We preload only the first one
-          if(index === 0) {
-            // This will update the tagMap and selectedTagMap
-            fauxTagEntry.selected = true;
-            selectedTagMap[fauxKey] = fauxTagEntry;
-          }
+        if(shouldUseFauxKey && fauxTagEntry) {
+          // This will update the tagMap and selectedTagMap
+          fauxTagEntry.selected = true;
+          selectedTagMap[fauxKey] = fauxTagEntry;
         }
         else {
           var newEntry = {
             name: selectedTag,
-            tags: [selectedTag]
+            tags: [selectedTag],
+            selected: true
           };
-          // We preload only the first one
-          if(index === 0) {
-            newEntry.selected = true;
-          }
 
           selectedTagMap[key] = newEntry;
         }
@@ -145,6 +154,13 @@ router.get('/tags/:tags',
 
       return exploreService.fetchByTags(allTags)
         .then(processTagResult)
+        .then(function(exploreServiceRoomResults) {
+          return exploreServiceRoomResults.map(function(roomResult) {
+            var room = roomResult.room;
+            room.messageCount = roomResult.messageCount;
+            return room;
+          });
+        })
         .then(function(prevRooms) {
           var getSuggestedRoomsPromise = Promise.resolve([]);
           if(user) {
@@ -154,20 +170,21 @@ router.get('/tags/:tags',
           return getSuggestedRoomsPromise
             .then(function(rooms) {
               rooms = rooms || [];
-              console.log('suggestedRooms', rooms);
               rooms = rooms.map(function(room) {
                 room.tags.push(suggestedFauxTag);
+
+                return room;
               });
 
               return rooms.concat(prevRooms);
-            });
+            }, []);
         })
         .then(function(rooms) {
 
-          rooms = rooms.map(function(roomObj) {
-            return generateRoomCardContext(roomObj.room, {
+          rooms = rooms.map(function(room) {
+            return generateRoomCardContext(room, {
               isStaff: isStaff,
-              messageCount: roomObj.messageCount
+              messageCount: room.messageCount
             });
           });
 

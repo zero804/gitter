@@ -1,6 +1,8 @@
 'use strict';
 
 var $ = require('jquery');
+var backbone = require('backbone');
+var Marionette = require('backbone.marionette');
 var appEvents = require('utils/appevents');
 var onready = require('utils/onready');
 var toggleClass = require('utils/toggle-class');
@@ -15,13 +17,21 @@ require('gitter-styleguide/css/components/headings.css');
 
 onready(function() {
 
+
   var exploreView = new ExploreView({
     el: '.explore-page-wrap'
   });
   //exploreView.render();
 
 
-  Array.prototype.forEach.call(document.querySelectorAll('.js-explore-room-card'), function(roomItemElement) {
+
+  var tagPillElements = document.querySelectorAll('.js-explore-tag-pill');
+  var roomCardElements = document.querySelectorAll('.js-explore-room-card');
+  var showMoreElemnts = document.querySelectorAll('.js-explore-show-more-tag-pills');
+  var tagPillListElements = document.querySelectorAll('.js-explore-tag-pills-list');
+
+
+  Array.prototype.forEach.call(roomCardElements, function(roomItemElement) {
     roomItemElement.addEventListener('click', function() {
       // Tracking
       appEvents.trigger('track-event', 'explore_room_click');
@@ -35,13 +45,16 @@ onready(function() {
   var updateRoomCardListVisibility = function() {
     var activeTags = {};
 
-    require('gitter-styleguide/css/components/buttons.css');    Array.prototype.forEach.call(document.querySelectorAll('.js-explore-tag-pill' + ('.' + activeClass)), function(tagPillElement) {
+    Array.prototype.filter.call(tagPillElements, function(tagPillElement) {
+      return tagPillElement.classList.contains(activeClass);
+    })
+    .forEach(function(tagPillElement) {
       (tagPillElement.getAttribute('data-tags') || '').split(',').forEach(function(tag) {
         activeTags[tag] = true;
       });
     });
 
-    Array.prototype.forEach.call(document.querySelectorAll('.js-explore-room-card'), function(roomItemElement) {
+    Array.prototype.forEach.call(roomCardElements, function(roomItemElement) {
       (roomItemElement.getAttribute('data-tags') || '').split(',').some(function(roomTag) {
         var hasActiveTag = activeTags[roomTag];
         toggleClass(roomItemElement, 'is-hidden', !hasActiveTag);
@@ -49,15 +62,28 @@ onready(function() {
       });
     });
   };
-
   // Initially call it
   updateRoomCardListVisibility();
 
+
   // Hook up our pills to update the card list
-  Array.prototype.forEach.call(document.querySelectorAll('.js-explore-tag-pill'), function(tagPillElement) {
+  var toggleTagPillActive = function(el, state) {
+    toggleClass(el, activeClass, state);
+    el.setAttribute('aria-selected', state);
+  }
+  Array.prototype.forEach.call(tagPillElements, function(tagPillElement) {
     tagPillElement.addEventListener('click', function() {
-      var state = toggleClass(tagPillElement, activeClass);
-      tagPillElement.setAttribute('aria-selected', state);
+      // Redirect to new page (we don't have a API to query client-side yet)
+      window.location.href = '/explore/tags/' + tagPillElement.getAttribute('data-tags');
+
+      // Only one tag can be selected at a time so
+      // unselect all of the tags
+      Array.prototype.forEach.call(tagPillElements, function(tagPillElement) {
+        toggleTagPillActive(tagPillElement, false);
+      });
+      // Select the tag we just clicked
+      toggleTagPillActive(tagPillElement, true);
+
       updateRoomCardListVisibility();
 
       // Tracking
@@ -67,10 +93,14 @@ onready(function() {
     });
   });
 
-  Array.prototype.forEach.call(document.querySelectorAll('.js-explore-show-more-tag-pills'), function(showMoreElement) {
+
+  // Expand/Collapse tag pill list
+  Array.prototype.forEach.call(showMoreElemnts, function(showMoreElement) {
     showMoreElement.addEventListener('click', function() {
-      Array.prototype.forEach.call(document.querySelectorAll('.js-explore-tag-pills-list'), function(pillListElement) {
-        var state = toggleClass(pillListElement, 'is-expanded');
+      var state = toggleClass(showMoreElement, 'is-expanded');
+      
+      Array.prototype.forEach.call(tagPillListElements, function(pillListElement) {
+        toggleClass(pillListElement, 'is-expanded', state);
         pillListElement.setAttribute('aria-selected', state);
       });
     });

@@ -19,7 +19,7 @@ var defaults = {
 // generateRoomCardContext
 module.exports = function(room, options) {
   var opts = _.extend({}, defaults, options);
-  var roomObj = _.extend({}, room.toJSON());
+  var roomObj = _.extend({}, room);
 
   roomObj.isPrivate = roomObj.security !== 'PUBLIC';
   roomObj.canEditTags = opts.isStaff;
