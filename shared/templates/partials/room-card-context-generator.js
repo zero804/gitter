@@ -13,26 +13,27 @@ function formatNumberWithSiPrefix(n) {
 
 var defaults = {
   isStaff: false,
-  messageCount: false
+  messageCount: undefined
 };
 
 // generateRoomCardContext
 module.exports = function(room, options) {
   var opts = _.extend({}, defaults, options);
-  var roomObj = _.extend({}, room);
+  var result = _.extend({}, room);
 
-  roomObj.isPrivate = roomObj.security !== 'PUBLIC';
-  roomObj.canEditTags = opts.isStaff;
-  roomObj.roomNameParts = roomObj.uri.split('/');
-  roomObj.roomAvatarSrcSet = resolveRoomAvatarSrcSet({ uri: roomObj.lcUri }, 40);
+  result.isPrivate = result.security !== 'PUBLIC';
+  result.canEditTags = opts.isStaff;
+  result.roomNameParts = result.uri.split('/');
+  result.roomAvatarSrcSet = resolveRoomAvatarSrcSet({ uri: result.lcUri }, 40);
+  console.log(result.name, opts.messageCount);
   if(opts.messageCount) {
-    roomObj.messageCountSiPrefixed = formatNumberWithSiPrefix(opts.messageCount);
+    result.messageCountSiPrefixed = formatNumberWithSiPrefix(opts.messageCount);
   }
-  roomObj.displayTags = (roomObj.tags || []).filter(function(tag) {
+  result.displayTags = (result.tags || []).filter(function(tag) {
     return validateTag(tag, opts.isStaff).isValid;
   });
 
-  //console.log('ro', roomObj);
+  //console.log('ro', result);
 
-  return roomObj;
+  return result;
 };
