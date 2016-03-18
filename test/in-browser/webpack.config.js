@@ -22,7 +22,7 @@ module.exports = {
     loaders: [
       {
         test: /\.hbs$/,
-        loader: 'handlebars-loader?helperDirs[]=' + path.resolve(__dirname, './fixtures/hbs'),
+        loader: 'gitter-handlebars-loader?helperDirs[]=' + path.resolve(__dirname, './fixtures/hbs'),
       },
       {
         test:    /.css$/,

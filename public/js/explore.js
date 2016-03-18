@@ -18,7 +18,7 @@ onready(function() {
   var exploreView = new ExploreView({
     el: '.explore-page-wrap'
   });
-  exploreView.render();
+  //exploreView.render();
 
 
   Array.prototype.forEach.call(document.querySelectorAll('.js-explore-room-card'), function(roomItemElement) {
