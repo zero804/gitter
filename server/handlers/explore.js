@@ -9,7 +9,8 @@ var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
 
 var exploreService = require('../services/explore-service');
 var suggestionsService = require('../services/suggestions-service');
-var generateExploreSnapshot = require('./explore-snapshot');
+var exploreTagUtils = require('../utils/explore-tag-utils');
+var generateExploreSnapshot = require('./snapshots/explore-snapshot');
 
 var trim = function(str) {
   return str.trim();
@@ -17,11 +18,12 @@ var trim = function(str) {
 
 
 // @const
-var DEFAULT_TAGS = ['suggested'];
+var SUGGESTED_TAG_LABEL = 'Suggested';
+var SUGGESTED_BACKEND_TAG = 'generated:suggested';
 
-var suggestedFauxTag = 'generated:suggested';
-var fauxTagMap = {
-  'Suggested': [suggestedFauxTag],
+var FAUX_TAG_MAP = {};
+FAUX_TAG_MAP[SUGGESTED_TAG_LABEL] = [SUGGESTED_BACKEND_TAG];
+_.extend(FAUX_TAG_MAP, {
   'Frontend': [],
   'Mobile': [
     'curated:ios',
@@ -50,17 +52,19 @@ var fauxTagMap = {
   'Angular': ['angular'],
   'Rails': ['rails'],
   'Haskell': ['haskell']
-};
+});
+
+var DEFAULT_TAGS = [SUGGESTED_TAG_LABEL.toLowerCase()];
 
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
-/* Seriously, wtf is this all about? */
+// This will redirect `/explore` to `/explore/DEFAULT_TAGS`
 router.get('/:tags?',
   identifyRoute('explore-tags-redirect'),
   function (req, res) {
     var search = req.query.search;
-    var tags = (search) ? search.split(/[ ,]+/).map(trim).sort().join(',') : DEFAULT_TAGS.join(',');
+    var tags = (search) ? search.split(/[ ,]+/).map(trim).sort().join(',') : [].concat(DEFAULT_TAGS).join(',');
     res.redirect('/explore/tags/' + tags);
   });
 
@@ -73,7 +77,7 @@ router.get('/tags/:tags',
       var isStaff = !!(user || {}).staff;
       console.log('u', req.user, troupeContext.user);
 
-      var selectedTags = req.params.tags
+      var selectedTagsInput = req.params.tags
         .split(',')
         .map(function(tag) {
           return tag.toLowerCase();
@@ -82,9 +86,16 @@ router.get('/tags/:tags',
         .slice(0, 1);
 
 
+      var tagMap = exploreTagUtils.generateTagMap(FAUX_TAG_MAP);
+      var selectedTagMap = exploreTagUtils.getSelectedEntriesInTagMap(tagMap, selectedTagsInput);
 
+      var selectedBackendTags = Object.keys(selectedTagMap).reduce(function(prev, key) {
+        return prev.concat(selectedTagMap[key].tags);
+      }, []);
 
-      return exploreService.fetchByTags(selectedTags)
+      console.log('selectedBackendTags', selectedBackendTags);
+
+      return exploreService.fetchByTags(selectedBackendTags)
         .then(function(prevRooms) {
           var getSuggestedRoomsPromise = Promise.resolve([]);
           if(user) {
@@ -92,24 +103,30 @@ router.get('/tags/:tags',
           }
 
           return getSuggestedRoomsPromise
-            .then(function(rooms) {
-              rooms = rooms || [];
-              rooms = rooms.map(function(room) {
-                room.tags.push(suggestedFauxTag);
-
+            .then(function(suggestedRooms) {
+              suggestedRooms = suggestedRooms || [];
+              suggestedRooms = suggestedRooms.map(function(room) {
+                room.tags.push(SUGGESTED_BACKEND_TAG);
                 return room;
               });
 
-              return rooms.concat(prevRooms);
+              // If there are no suggestions, just get rid of that tag-pill
+              if(suggestedRooms.length === 0) {
+                delete FAUX_TAG_MAP[SUGGESTED_TAG_LABEL];
+              }
+
+              return suggestedRooms.concat(prevRooms);
             }, []);
         })
         .then(function(rooms) {
           var snapshot = generateExploreSnapshot({
-            fauxTagMap: fauxTagMap,
-            selectedTags: selectedTags,
+            fauxTagMap: FAUX_TAG_MAP,
+            selectedTags: selectedTagsInput,
             rooms: rooms
           });
-
+          return snapshot;
+        })
+        .then(function(snapshot) {
           res.render('explore', _.extend({}, snapshot, {
             isLoggedIn: !!user
           }));
