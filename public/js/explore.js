@@ -43,8 +43,8 @@ onready(function() {
   var activeClass = 'is-active';
 
   var updateRoomCardListVisibility = function() {
+    // Grab the active tags
     var activeTags = {};
-
     Array.prototype.filter.call(tagPillElements, function(tagPillElement) {
       return tagPillElement.classList.contains(activeClass);
     })

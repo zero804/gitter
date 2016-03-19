@@ -8,10 +8,17 @@
 
 
 .room-card-list {
+  /* */
   overflow-x: hidden;
   display: flex;
   flex-wrap: wrap;
   align-items: stretch;
+  /* */
+
+  /* * /
+  -webkit-column-width: 18em;
+  -webkit-column-gap: 0;
+  /* */
 
   & > * {
     margin: @room-card-list-spacing;
@@ -22,8 +29,8 @@
 
 .room-card {
   overflow: hidden;
+  flex: 1 0 18.625em;
   display: flex;
-  width: calc(25% - (2 * @room-card-list-spacing));
   flex-direction: column;
 
   opacity: .7;
