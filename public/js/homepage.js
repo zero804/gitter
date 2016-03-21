@@ -1,6 +1,7 @@
 "use strict";
 var $ = require('jquery');
 
+var urlParse = require('url-parse');
 var appEvents = require('utils/appevents');
 var context = require('utils/context');
 var mapMessageTemplate = require('./map-message.hbs');
@@ -8,6 +9,9 @@ var roomNameTrimmer = require('utils/room-name-trimmer');
 var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 var apiClient = require('components/apiClient');
 var onready = require('./utils/onready');
+
+var modalRegion = require('components/modal-region');
+var LoginView = require('views/modals/login-view');
 
 require('utils/tracking');
 
@@ -288,5 +292,20 @@ onready(function() {
 
   document.getElementById('windows-download').addEventListener('click', function() {
     appEvents.trigger('stats.event', 'apps.windows.download');
+  });
+
+  $('a[href^="/login"]').on('click', function(e) {
+    var href = $(e.currentTarget).attr('href');
+    var parsed = urlParse(href, true);
+    if (parsed.pathname !== '/login') {
+      // don't accidentally intercept links inside the modal
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    var modal = new LoginView(parsed.query);
+    modalRegion.show(modal);
+    // hack this modal because we're not using history or routing here
+    modal.navigable = false;
   });
 });
