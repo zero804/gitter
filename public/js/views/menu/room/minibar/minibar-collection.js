@@ -1,6 +1,7 @@
 'use strict';
 
-var Backbone                     = require('backbone');
+var Backbone = require('backbone');
+var context  = require('utils/context');
 //just use shared/
 var getSuggestedOrgsFromRoomList = require('gitter-web-shared/orgs/suggested-orgs-from-room-list');
 
@@ -54,7 +55,13 @@ module.exports = Backbone.Collection.extend({
   },
 
   getNewCollection: function (){
-    return defaultModels.concat(getSuggestedOrgsFromRoomList(this.roomCollection.toJSON(), document.location.pathname)).concat(tailDefaults);
+    return defaultModels
+      .concat(getSuggestedOrgsFromRoomList(
+        this.roomCollection.toJSON(),
+        document.location.pathname,
+        context.troupe().get('id')
+      ))
+      .concat(tailDefaults);
   },
 
 });

@@ -16,7 +16,7 @@ FilteredRoomCollection.prototype = _.extend(
   FilteredRoomCollection.prototype,
   FilteredCollection.prototype, {
 
-  initialize: function(options) {//jshint unused: true
+  initialize: function(options) {
     if (!options || !options.roomModel) {
       throw new Error('A valid RoomMenuModel must be passed to a new instance of FilteredRoomCollection');
     }
@@ -38,7 +38,7 @@ FilteredRoomCollection.prototype = _.extend(
     this.onModelChangeState();
   },
 
-  onModelChangeState: function() {//jshint unused: true
+  onModelChangeState: function() {
     this.comparator = FilteredRoomCollection.prototype.comparator;
     switch (this.roomModel.get('state')) {
       case 'favourite' :

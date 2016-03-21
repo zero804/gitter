@@ -10,6 +10,7 @@ var SuggestedOrgCollection         = require('../collections/org-suggested-rooms
 var apiClient                      = require('components/apiClient');
 var FilteredRoomCollection         = require('../collections/filtered-room-collection.js');
 var SuggestedRoomsByRoomCollection = require('../collections/left-menu-suggested-by-room');
+var UserSuggestions                = require('../collections/user-suggested-rooms')
 var SearchRoomPeopleCollection     = require('../collections/left-menu-search-rooms-and-people');
 var SearchChatMessages             = require('../collections/search-chat-messages');
 var perfTiming                     = require('components/perf-timing');
@@ -77,9 +78,10 @@ module.exports = Backbone.Model.extend({
 
     //expose the public collection
     this.searchTerms              = new RecentSearchesCollection(null);
-    this.searchRoomAndPeople      = new SearchRoomPeopleCollection(null, { roomMenuModel: this });
+    this.searchRoomAndPeople      = new SearchRoomPeopleCollection(null, { roomMenuModel: this, roomCollection: this._roomCollection });
     this.searchChatMessages       = new SearchChatMessages(null, { roomMenuModel: this, roomModel: this._troupeModel });
     this.suggestedOrgs            = new SuggestedOrgCollection({ contextModel: this, roomCollection: this._roomCollection });
+    this.userSuggestions          = new UserSuggestions(null, { contextModel: context.user() });
     this._suggestedRoomCollection = new SuggestedRoomsByRoomCollection({
       roomMenuModel:           this,
       troupeModel:             this._troupeModel,
@@ -111,6 +113,7 @@ module.exports = Backbone.Model.extend({
     this.listenTo(this, 'change:searchTerm', this.onSearchTermChange, this);
     this.listenTo(this, 'change:state', this.onSwitchState, this);
     this.listenTo(this, 'change', _.debounce(this.save.bind(this), 500));
+    this.listenTo(context.troupe(), 'change:id', this.onRoomChange, this);
 
     //boot the model
     this.onSwitchState(this, this.get('state'));
@@ -139,7 +142,7 @@ module.exports = Backbone.Model.extend({
     switch (val) {
       case 'all':
         this.primaryCollection.switchCollection(this.activeRoomCollection);
-        this.secondaryCollection.switchCollection(this._suggestedRoomCollection);
+        this.secondaryCollection.switchCollection(this.userSuggestions);
         this.tertiaryCollection.switchCollection(this._orgCollection);
         break;
 
@@ -219,6 +222,22 @@ module.exports = Backbone.Model.extend({
     //JP 11/1/16
     this.set(context.getLeftRoomMenuContext());
     if (options.success) options.success();
+  },
+
+  onRoomChange: function (){
+    var selectedModel      = this._getModel('selected', true);
+    var newlySelectedModel = this._getModel('id', context.troupe().get('id'));
+
+    if(selectedModel) { selectedModel.set('selected', false); }
+    if(newlySelectedModel) { newlySelectedModel.set('selected', true); }
+  },
+
+  _getModel: function (prop, val){
+    var query = {}; query[prop] = val;
+    return this.primaryCollection.findWhere(query) ||
+           this.secondaryCollection.findWhere(query) ||
+           this.tertiaryCollection.findWhere(query) ||
+           this._roomCollection.findWhere(query);
   },
 
 });
