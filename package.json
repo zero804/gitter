@@ -273,7 +273,7 @@
   "main": "web.js",
   "scripts": {
     "start": "nodemon web.js",
-    "dev": "nodemon & gulp watch",
+    "dev": "npm run start & gulp watch",
     "test": "gulp localtest",
     "link": "linklocal link -r",
     "unlink": "linklocal unlink -r",
