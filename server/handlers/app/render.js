@@ -522,7 +522,7 @@ function renderOrgPage(req, res, next) {
       rooms.forEach(function(room) {
         var nameParts = room.uri.split('/');
         room.shortName = nameParts.length === 3 ? nameParts[1] + '/' + nameParts[2] : nameParts[1] || nameParts[0];
-        room.canEditTags = isOrgAdmin || troupeContext.user.staff;
+        room.canEditTags = isOrgAdmin || troupeContext.user && troupeContext.user.staff;
         room.private = room.security !== 'PUBLIC';
       });
 
