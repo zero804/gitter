@@ -52,10 +52,12 @@ var getSelectedEntriesInTagMap = function(tagMap, selectedTags) {
     var shouldMatchFauxKey = tagReservedPrefixPortion.length > 0 || tagMainPortion === 'suggested';
 
     var fauxKey = FAUX_KEY_TAG_MAP_KEY_PREFIX + ':' + key;
-    var tagEntry = _.extend({}, tagMap[fauxKey]);
+    var tagEntry = tagMap[fauxKey];
     if(shouldMatchFauxKey && tagEntry) {
-      tagEntry.selected = true;
-      selectedTagMap[fauxKey] = tagEntry;
+      var newTagEntry = _.extend({}, tagEntry, {
+        selected: true
+      });
+      selectedTagMap[fauxKey] = newTagEntry;
     }
     else {
       var newEntry = {

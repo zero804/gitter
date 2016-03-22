@@ -55,19 +55,23 @@
     </div>
 
     <div class="room-card__footer-action-section">
+      {{#if false}}
       {{#if canEditTags}}
         <a class="secondary-button-jaffa--xsmall" href="/{{ uri }}#tags/#{{ id }}" target="_parent">
           Edit tags
         </a>
       {{/if}}
+      {{/if}}
 
-      <a class="secondary-button-jaffa--xsmall" href="/{{ uri }}?source=orgpage" target="_parent">
+      <a class="button-jaffa--xsmall" href="/{{ uri }}?source={{linkSource}}" target="_parent">
         View
       </a>
+      {{#if false}}
       {{#if isLoggedIn}}
-        <a class="button-jaffa--xsmall" href="/{{ uri }}?source=orgpage" target="_parent">
+        <a class="button-jaffa--xsmall" href="/{{ uri }}?source={{linkSource}}" target="_parent">
           Join
         </a>
+      {{/if}}
       {{/if}}
     </div>
   </footer>

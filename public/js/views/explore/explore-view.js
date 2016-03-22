@@ -3,8 +3,14 @@
 var Marionette = require('backbone.marionette');
 var Backbone = require('backbone');
 
+var context = require('utils/context');
+var appEvents = require('utils/appevents');
+var frameUtils = require('utils/frame-utils');
+var linkHandler = require('../../../js/components/link-handler');
+
 var template = require('./tmpl/explore-view.hbs');
 var itemTemplate = require('../../../templates/partials/room_card.hbs');
+
 
 
 require('views/behaviors/isomorphic');
@@ -92,14 +98,35 @@ var ExploreView = Marionette.LayoutView.extend({
     return new TagPillListView(optionsForRegion({ }));
   },
 
-  popCreateRoomModal: function() {
+  popCreateRoomModal: function(e) {
     //console.log('popping create room modal');
-
-    require.ensure(['views/modals/create-room-view'], function(require) {
-      var createRoomView = require('views/modals/create-room-view');
-      var createRoomModal = new createRoomView.Modal({});
-      createRoomModal.show();
+    //console.log('asdf', e.target.href);
+    //appEvents.trigger('navigation', e.target.href);
+    /* * /
+    frameUtils.postMessage({
+      type: 'navigation',
+      url: e.target.href,
+      urlType: 'chat',
+      title: 'Create Room'
     });
+    /* */
+    /* * /
+    linkHandler.routeLink(e.target.href, {
+      appFrame: true
+    });
+    /* */
+    //appEvents.trigger('route', 'createroom');
+    frameUtils.postMessage({ type: 'route', hash: 'createroom' });
+
+
+    /* * /
+    require.ensure(['views/modals/choose-room-view'], function(require) {
+      var chooseRoomView = require('views/modals/choose-room-view');
+      var chooseRoomModal = new chooseRoomView.Modal();
+      chooseRoomModal.show();
+    });
+    /* */
+    e.preventDefault();
   }
 });
 
