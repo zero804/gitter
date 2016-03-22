@@ -4,6 +4,7 @@ var Promise = require('bluebird');
 var _ = require('lodash');
 var collections = require('../utils/collections');
 var promiseUtils = require('../utils/promise-utils');
+var mongooseUtils = require('../utils/mongoose-utils');
 var troupeService = require('./troupe-service');
 var roomMembershipService = require('./room-membership-service');
 var userService = require('./user-service');
@@ -104,30 +105,27 @@ function hilightedRooms(user, existingRooms, language) {
   }));
 }
 
-function getId(item) {
-  return (item.id) ? item.id : ''+item._id;
-}
-
 function filterRooms(suggested, existing) {
+  // not necessarily sure where suggested comes from, so make sure id is filled
+  // in and a string so we can safely use that as a key in a map.
+  mongooseUtils.addIdToLeanArray(suggested);
+
   // remove all the nulls/undefineds from things that didn't exist
   var filtered = _.filter(suggested);
 
   // filter out the existing rooms
-  var existingMap = _.indexBy(existing, function(item) {
-    return getId(item);
-  });
+  var existingMap = _.indexBy(existing, 'id');
   filtered = _.filter(filtered, function(room) {
-    return existingMap[getId(room)] === undefined;
+    return existingMap[room.id] === undefined;
   })
 
   // filter out duplicates
   var roomMap = {};
   filtered = _.filter(filtered, function(room) {
-    var roomId = getId(room);
-    if (roomMap[roomId]) {
+    if (roomMap[room.id]) {
       return false;
     } else {
-      roomMap[roomId] = true;
+      roomMap[room.id] = true;
       return true;
     }
   });
