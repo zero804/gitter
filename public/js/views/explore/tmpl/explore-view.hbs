@@ -41,21 +41,22 @@
   </section>
 </header>
 
-
 <section class="explore-pill-list-section">
   <div class="explore-pill-list-section__header">
     <h2 class="h2">
       Simply toggle tags to discover Communities
     </h2>
 
-    <div class="explore-pill-list-section__header-secondary-actions">
-      <div class="explore-pill-list-section__header-secondary-action-annotation">
-        Can't find what you're looking for?
+    {{#if isLoggedIn}}
+      <div class="explore-pill-list-section__header-secondary-actions">
+        <div class="explore-pill-list-section__header-secondary-action-annotation">
+          Can't find what you're looking for?
+        </div>
+          <a href="{{createRoomUrl}}" class="subdued-button-jaffa--xsmall js-explore-create-room-button">
+            Create your own
+          </a>
       </div>
-      <button class="subdued-button-jaffa--xsmall js-explore-create-room-button">
-        Create your own
-      </button>
-    </div>
+    {{/if}}
   </div>
 
   <ul class="tag-pill-list js-explore-tag-pills-list">

@@ -4,6 +4,9 @@ var Promise = require('bluebird');
 var _ = require('underscore');
 var langs = require('langs');
 var express = require('express');
+var urlJoin = require('url-join');
+
+var troupeEnv = require('../web/troupe-env');
 var contextGenerator = require('../web/context-generator');
 var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
 
@@ -14,6 +17,20 @@ var generateExploreSnapshot = require('./snapshots/explore-snapshot');
 
 var trim = function(str) {
   return str.trim();
+};
+
+var processTagInput = function(input) {
+  input = input || '';
+  var selectedTagsInput = input
+    .split(',')
+    .filter(function(inputItem) {
+      return inputItem.trim().length > 0;
+    })
+    .map(function(tag) {
+      return tag.toLowerCase();
+    });
+
+  return selectedTagsInput;
 };
 
 
@@ -54,81 +71,125 @@ _.extend(FAUX_TAG_MAP, {
   'Haskell': ['haskell']
 });
 
-var DEFAULT_TAGS = [SUGGESTED_TAG_LABEL.toLowerCase()];
-
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
+
+
 // This will redirect `/explore` to `/explore/DEFAULT_TAGS`
+var exploreRedirectStaticTagMap = exploreTagUtils.generateTagMap(FAUX_TAG_MAP);
+var firstTag = exploreRedirectStaticTagMap[Object.keys(exploreRedirectStaticTagMap)[1]];
 router.get('/:tags?',
   identifyRoute('explore-tags-redirect'),
   function (req, res) {
-    var search = req.query.search;
-    var tags = (search) ? search.split(/[ ,]+/).map(trim).sort().join(',') : [].concat(DEFAULT_TAGS).join(',');
-    res.redirect('/explore/tags/' + tags);
-  });
+    var inputTags = processTagInput(req.query.search);
 
+    var defaultTags = firstTag.tags;
+    // Default to suggested if logged in
+    if(req.user) {
+      defaultTags = [SUGGESTED_TAG_LABEL.toLowerCase()];
+    }
+
+    var tagsToUse = [].concat((inputTags.length > 0 ? inputTags : defaultTags));
+    var exploreTargetRedirectUrl = urlJoin(req.baseUrl, '/tags/' + tagsToUse.join(','));
+    res.redirect(exploreTargetRedirectUrl);
+  });
 
 router.get('/tags/:tags',
   identifyRoute('explore-tags'),
-  function (req, res, next) {
-    contextGenerator.generateNonChatContext(req).then(function (troupeContext) {
+  function(req, res, next) {
+    contextGenerator.generateNonChatContext(req).then(function(troupeContext) {
       var user = troupeContext.user;
       var isStaff = !!(user || {}).staff;
-      console.log('u', req.user, troupeContext.user);
+      //console.log('u', req.user, troupeContext.user);
 
-      var selectedTagsInput = req.params.tags
-        .split(',')
-        .map(function(tag) {
-          return tag.toLowerCase();
-        })
+      // Copy so we can modify later on
+      var fauxTagMap = _.extend({}, FAUX_TAG_MAP);
+
+      var selectedTagsInput = processTagInput(req.params.tags)
         // We only take one selected tag
         .slice(0, 1);
 
-
-      var tagMap = exploreTagUtils.generateTagMap(FAUX_TAG_MAP);
+      // We only generate the tag map here to grab the list of selected tags so
+      // we can populate our rooms from the explore service
+      var tagMap = exploreTagUtils.generateTagMap(fauxTagMap);
       var selectedTagMap = exploreTagUtils.getSelectedEntriesInTagMap(tagMap, selectedTagsInput);
 
+      var hasSuggestedTag = false;
+      // Mush into an array of selected tags
       var selectedBackendTags = Object.keys(selectedTagMap).reduce(function(prev, key) {
+        // Check for the selected tag for easy reference later
+        selectedTagMap[key].tags.forEach(function(tag) {
+          if(tag === SUGGESTED_BACKEND_TAG) {
+            hasSuggestedTag = true;
+          }
+        });
+
         return prev.concat(selectedTagMap[key].tags);
       }, []);
 
-      console.log('selectedBackendTags', selectedBackendTags);
 
-      return exploreService.fetchByTags(selectedBackendTags)
-        .then(function(prevRooms) {
-          var getSuggestedRoomsPromise = Promise.resolve([]);
-          if(user) {
-            getSuggestedRoomsPromise = suggestionsService.findSuggestionsForUserId(user.id);
+      var getSuggestedRoomsPromise = Promise.resolve()
+        .then(function() {
+          if(hasSuggestedTag && user) {
+            return suggestionsService.findSuggestionsForUserId(user.id)
+              .then(function(suggestedRooms) {
+                suggestedRooms = suggestedRooms || [];
+                suggestedRooms = suggestedRooms.map(function(room) {
+                  room.tags.push(SUGGESTED_BACKEND_TAG);
+                  return room;
+                });
+
+                return suggestedRooms;
+              }, []);
           }
 
-          return getSuggestedRoomsPromise
-            .then(function(suggestedRooms) {
-              suggestedRooms = suggestedRooms || [];
-              suggestedRooms = suggestedRooms.map(function(room) {
-                room.tags.push(SUGGESTED_BACKEND_TAG);
-                return room;
-              });
+          return [];
+        })
+        .then(function(suggestedRooms) {
+          // If there are no suggestions, just get rid of that tag-pill
+          if(suggestedRooms.length === 0) {
+            delete fauxTagMap[SUGGESTED_TAG_LABEL];
+          }
 
-              // If there are no suggestions, just get rid of that tag-pill
-              if(suggestedRooms.length === 0) {
-                delete FAUX_TAG_MAP[SUGGESTED_TAG_LABEL];
-              }
+          return suggestedRooms;
+        });
 
-              return suggestedRooms.concat(prevRooms);
-            }, []);
+      var getExploreRoomsPromise = getSuggestedRoomsPromise.then(function(suggestedRooms) {
+        if(suggestedRooms.length === 0) {
+          return exploreService.fetchByTags(selectedBackendTags);
+        }
+
+        return [];
+      });
+
+
+      var gatherRoomsPromises = [
+        getSuggestedRoomsPromise,
+        getExploreRoomsPromise
+      ];
+
+      return Promise.all(gatherRoomsPromises)
+        .then(function(roomResults) {
+          // Mush the results into one array
+          return roomResults.reduce(function(prev, rooms) {
+            return prev.concat(rooms);
+          }, []);
         })
         .then(function(rooms) {
-          var snapshot = generateExploreSnapshot({
-            fauxTagMap: FAUX_TAG_MAP,
+          var snapshots = generateExploreSnapshot({
+            fauxTagMap: fauxTagMap,
             selectedTags: selectedTagsInput,
             rooms: rooms
           });
-          return snapshot;
+          return snapshots;
         })
-        .then(function(snapshot) {
-          res.render('explore', _.extend({}, snapshot, {
-            isLoggedIn: !!user
+        .then(function(snapshots) {
+          troupeContext.snapshots = snapshots;
+          res.render('explore', _.extend({}, snapshots, {
+            troupeContext: troupeContext,
+            isLoggedIn: !!user,
+            createRoomUrl: urlJoin(troupeEnv.basePath, '#createroom')
           }));
         })
         .catch(next);

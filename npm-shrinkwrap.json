@@ -379,7 +379,7 @@
       "dependencies": {
         "sequin": {
           "version": "0.1.0",
-          "from": "sequin@*",
+          "from": "sequin@latest",
           "resolved": "http://beta-internal:4873/sequin/-/sequin-0.1.0.tgz"
         }
       }
@@ -684,7 +684,7 @@
           "dependencies": {
             "mime-types": {
               "version": "2.1.10",
-              "from": "mime-types@>=2.1.6 <2.2.0",
+              "from": "mime-types@>=2.1.10 <2.2.0",
               "resolved": "http://beta-internal:4873/mime-types/-/mime-types-2.1.10.tgz",
               "dependencies": {
                 "mime-db": {
@@ -873,7 +873,7 @@
             },
             "mime-types": {
               "version": "2.1.10",
-              "from": "mime-types@>=2.1.6 <2.2.0",
+              "from": "mime-types@>=2.1.10 <2.2.0",
               "resolved": "http://beta-internal:4873/mime-types/-/mime-types-2.1.10.tgz",
               "dependencies": {
                 "mime-db": {
@@ -1386,7 +1386,7 @@
         },
         "tunnel-agent": {
           "version": "0.4.2",
-          "from": "tunnel-agent@*",
+          "from": "tunnel-agent@latest",
           "resolved": "http://beta-internal:4873/tunnel-agent/-/tunnel-agent-0.4.2.tgz"
         }
       }
@@ -1397,9 +1397,9 @@
       "resolved": "http://beta-internal:4873/gitter-faye-redis/-/gitter-faye-redis-0.4.4.tgz",
       "dependencies": {
         "redis": {
-          "version": "2.5.2",
-          "from": "redis@*",
-          "resolved": "http://beta-internal:4873/redis/-/redis-2.5.2.tgz",
+          "version": "2.5.3",
+          "from": "redis@latest",
+          "resolved": "http://beta-internal:4873/redis/-/redis-2.5.3.tgz",
           "dependencies": {
             "double-ended-queue": {
               "version": "2.1.0-0",
@@ -2402,7 +2402,7 @@
                                   "dependencies": {
                                     "align-text": {
                                       "version": "0.1.4",
-                                      "from": "align-text@>=0.1.1 <0.2.0",
+                                      "from": "align-text@>=0.1.3 <0.2.0",
                                       "resolved": "http://beta-internal:4873/align-text/-/align-text-0.1.4.tgz",
                                       "dependencies": {
                                         "kind-of": {
@@ -2443,7 +2443,7 @@
                                   "dependencies": {
                                     "align-text": {
                                       "version": "0.1.4",
-                                      "from": "align-text@>=0.1.1 <0.2.0",
+                                      "from": "align-text@>=0.1.3 <0.2.0",
                                       "resolved": "http://beta-internal:4873/align-text/-/align-text-0.1.4.tgz",
                                       "dependencies": {
                                         "kind-of": {
@@ -2651,9 +2651,9 @@
                   }
                 },
                 "to-fast-properties": {
-                  "version": "1.0.1",
+                  "version": "1.0.2",
                   "from": "to-fast-properties@>=1.0.0 <2.0.0",
-                  "resolved": "http://beta-internal:4873/to-fast-properties/-/to-fast-properties-1.0.1.tgz"
+                  "resolved": "http://beta-internal:4873/to-fast-properties/-/to-fast-properties-1.0.2.tgz"
                 },
                 "trim-right": {
                   "version": "1.0.1",
@@ -2843,7 +2843,7 @@
             },
             "mime": {
               "version": "1.2.11",
-              "from": "mime@>=1.2.7 <1.3.0",
+              "from": "mime@>=1.2.11 <1.3.0",
               "resolved": "http://beta-internal:4873/mime/-/mime-1.2.11.tgz"
             },
             "request": {
@@ -3328,9 +3328,9 @@
       "resolved": "http://beta-internal:4873/moment/-/moment-2.12.0.tgz"
     },
     "mongodb": {
-      "version": "2.1.7",
+      "version": "2.1.10",
       "from": "mongodb@>=2.0.34 <3.0.0",
-      "resolved": "http://beta-internal:4873/mongodb/-/mongodb-2.1.7.tgz",
+      "resolved": "http://beta-internal:4873/mongodb/-/mongodb-2.1.10.tgz",
       "dependencies": {
         "es6-promise": {
           "version": "3.0.2",
@@ -3338,9 +3338,9 @@
           "resolved": "http://beta-internal:4873/es6-promise/-/es6-promise-3.0.2.tgz"
         },
         "mongodb-core": {
-          "version": "1.3.1",
-          "from": "mongodb-core@1.3.1",
-          "resolved": "http://beta-internal:4873/mongodb-core/-/mongodb-core-1.3.1.tgz",
+          "version": "1.3.9",
+          "from": "mongodb-core@1.3.9",
+          "resolved": "http://beta-internal:4873/mongodb-core/-/mongodb-core-1.3.9.tgz",
           "dependencies": {
             "bson": {
               "version": "0.4.22",
@@ -3354,7 +3354,7 @@
               "dependencies": {
                 "semver": {
                   "version": "5.1.0",
-                  "from": "semver@>=5.1.0 <6.0.0",
+                  "from": "semver@>=2.0.0 <3.0.0||>=3.0.0 <4.0.0||>=4.0.0 <5.0.0||>=5.0.0 <6.0.0",
                   "resolved": "http://beta-internal:4873/semver/-/semver-5.1.0.tgz"
                 },
                 "resolve-from": {
@@ -5372,9 +5372,9 @@
       "resolved": "http://beta-internal:4873/tough-cookie/-/tough-cookie-0.12.1.tgz",
       "dependencies": {
         "punycode": {
-          "version": "1.4.0",
+          "version": "1.4.1",
           "from": "punycode@>=0.2.0",
-          "resolved": "http://beta-internal:4873/punycode/-/punycode-1.4.0.tgz"
+          "resolved": "http://beta-internal:4873/punycode/-/punycode-1.4.1.tgz"
         }
       }
     },
@@ -5492,6 +5492,11 @@
       "version": "1.8.3",
       "from": "underscore@>=1.8.3 <2.0.0",
       "resolved": "http://beta-internal:4873/underscore/-/underscore-1.8.3.tgz"
+    },
+    "url-join": {
+      "version": "0.0.1",
+      "from": "url-join@0.0.1",
+      "resolved": "https://registry.npmjs.org/url-join/-/url-join-0.0.1.tgz"
     },
     "url-parse": {
       "version": "1.0.5",
@@ -5680,9 +5685,9 @@
       "resolved": "http://beta-internal:4873/xml2js/-/xml2js-0.2.2.tgz",
       "dependencies": {
         "sax": {
-          "version": "1.1.6",
+          "version": "1.2.1",
           "from": "sax@>=0.4.2",
-          "resolved": "http://beta-internal:4873/sax/-/sax-1.1.6.tgz"
+          "resolved": "http://beta-internal:4873/sax/-/sax-1.2.1.tgz"
         }
       }
     },
@@ -5692,9 +5697,9 @@
       "resolved": "http://beta-internal:4873/xregexp/-/xregexp-2.0.0.tgz"
     },
     "yargs": {
-      "version": "4.3.1",
+      "version": "4.3.2",
       "from": "yargs@>=4.2.0 <5.0.0",
-      "resolved": "http://beta-internal:4873/yargs/-/yargs-4.3.1.tgz",
+      "resolved": "http://beta-internal:4873/yargs/-/yargs-4.3.2.tgz",
       "dependencies": {
         "camelcase": {
           "version": "2.1.1",
@@ -5904,7 +5909,7 @@
                           "dependencies": {
                             "spdx-license-ids": {
                               "version": "1.2.0",
-                              "from": "spdx-license-ids@>=1.0.2 <2.0.0",
+                              "from": "spdx-license-ids@>=1.0.0 <2.0.0",
                               "resolved": "http://beta-internal:4873/spdx-license-ids/-/spdx-license-ids-1.2.0.tgz"
                             }
                           }
@@ -5921,7 +5926,7 @@
                             },
                             "spdx-license-ids": {
                               "version": "1.2.0",
-                              "from": "spdx-license-ids@>=1.0.2 <2.0.0",
+                              "from": "spdx-license-ids@>=1.0.0 <2.0.0",
                               "resolved": "http://beta-internal:4873/spdx-license-ids/-/spdx-license-ids-1.2.0.tgz"
                             }
                           }
@@ -6101,7 +6106,7 @@
                           "dependencies": {
                             "spdx-license-ids": {
                               "version": "1.2.0",
-                              "from": "spdx-license-ids@>=1.0.2 <2.0.0",
+                              "from": "spdx-license-ids@>=1.0.0 <2.0.0",
                               "resolved": "http://beta-internal:4873/spdx-license-ids/-/spdx-license-ids-1.2.0.tgz"
                             }
                           }
@@ -6118,7 +6123,7 @@
                             },
                             "spdx-license-ids": {
                               "version": "1.2.0",
-                              "from": "spdx-license-ids@>=1.0.2 <2.0.0",
+                              "from": "spdx-license-ids@>=1.0.0 <2.0.0",
                               "resolved": "http://beta-internal:4873/spdx-license-ids/-/spdx-license-ids-1.2.0.tgz"
                             }
                           }
@@ -6219,9 +6224,9 @@
           "resolved": "http://beta-internal:4873/y18n/-/y18n-3.2.1.tgz"
         },
         "yargs-parser": {
-          "version": "2.1.1",
+          "version": "2.1.2",
           "from": "yargs-parser@>=2.1.1 <3.0.0",
-          "resolved": "http://beta-internal:4873/yargs-parser/-/yargs-parser-2.1.1.tgz"
+          "resolved": "http://beta-internal:4873/yargs-parser/-/yargs-parser-2.1.2.tgz"
         }
       }
     }
