@@ -32,7 +32,5 @@ module.exports = function(room, options) {
     return validateTag(tag, opts.isStaff).isValid;
   });
 
-  //console.log('ro', result);
-
   return result;
 };
