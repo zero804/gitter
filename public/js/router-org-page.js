@@ -7,6 +7,9 @@ var modalRegion = require('components/modal-region');
 var _           = require('underscore');
 var context     = require('utils/context');
 
+require('gitter-styleguide/css/components/buttons.css');
+require('gitter-styleguide/css/components/headings.css');
+
 require('utils/tracking');
 
 onReady(function(){
