@@ -545,6 +545,7 @@ function renderOrgPage(req, res, next) {
       res.render('org-page', {
         socialUrl: url,
         isLoggedIn: !!req.user,
+        exploreBaseUrl: '/home/~explore',
         roomCount: roomCount,
         orgUserCount: orgUserCount,
         org: ghOrg,

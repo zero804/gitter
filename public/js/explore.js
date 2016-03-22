@@ -74,7 +74,7 @@ onready(function() {
   Array.prototype.forEach.call(tagPillElements, function(tagPillElement) {
     tagPillElement.addEventListener('click', function() {
       // Redirect to new page (we don't have a API to query client-side yet)
-      window.location.href = '/explore/tags/' + tagPillElement.getAttribute('data-tags');
+      window.location.href = tagPillElement.getAttribute('href');
 
       /* * /
       // Only one tag can be selected at a time so

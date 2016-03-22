@@ -187,6 +187,7 @@ router.get('/tags/:tags',
         .then(function(snapshots) {
           troupeContext.snapshots = snapshots;
           res.render('explore', _.extend({}, snapshots, {
+            exploreBaseUrl: req.baseUrl,
             troupeContext: troupeContext,
             isLoggedIn: !!user,
             createRoomUrl: urlJoin(troupeEnv.basePath, '#createroom')
