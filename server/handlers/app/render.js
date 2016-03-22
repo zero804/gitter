@@ -525,11 +525,9 @@ function renderOrgPage(req, res, next) {
         var result = generateRoomCardContext(room, {
           isStaff: isStaff
         });
-        result.isStaff = result.isStaff || isOrgAdmin;
+        result.isStaff = isOrgAdmin || result.isStaff;
         return result;
       });
-
-      console.log('rooms', rooms);
 
       // This is used to track pageViews in mixpanel
       troupeContext.isCommunityPage = true;
