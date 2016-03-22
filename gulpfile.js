@@ -2,6 +2,7 @@
 'use strict';
 
 var gulp = require('gulp');
+var argv = require('yargs').argv;
 var livereload = require('gulp-livereload');
 var webpack = require('gulp-webpack');
 var less = require('gulp-less');
@@ -128,19 +129,27 @@ makeTestTasks('test-mocha', function(name, files) {
   mkdirp.sync('output/test-reports/');
   mkdirp.sync('output/coverage-reports/' + name);
 
+  var mochaOpts = {
+    reporter: 'mocha-multi',
+    timeout: 10000,
+    istanbul: {
+      dir: 'output/coverage-reports/' + name
+    },
+    env: {
+      multi: 'spec=- xunit=output/test-reports/' + name + '.xml',
+      NODE_ENV: 'test',
+      BLUEBIRD_DEBUG: 1,
+      TZ: 'UTC'
+    }
+  };
+
+  var grepOpt = argv.grep || argv.g;
+  if(grepOpt) {
+    mochaOpts.grep = grepOpt;
+  }
+
   return gulp.src(files, { read: false })
-    .pipe(mocha({
-      reporter: 'mocha-multi',
-      timeout: 10000,
-      istanbul: {
-        dir: 'output/coverage-reports/' + name
-      },
-      env: {
-        multi: 'spec=- xunit=output/test-reports/' + name + '.xml',
-        NODE_ENV: 'test',
-        Q_DEBUG: 1,
-      }
-    }));
+    .pipe(mocha(mochaOpts));
 });
 
 makeTestTasks('test-docker', function(name, files) {
@@ -193,11 +202,11 @@ gulp.task('submit-coveralls-post-tests', ['merge-lcov'], function() {
     });
 });
 
-gulp.task('submit-coveralls', ['test-mocha', 'test-redis-lua'], function(callback) {
+gulp.task('submit-coveralls', ['test-mocha'/*, 'test-redis-lua'*/], function(callback) {
   runSequence('submit-coveralls-post-tests', callback);
 });
 
-gulp.task('test', ['test-mocha', 'test-redis-lua', 'submit-coveralls']);
+gulp.task('test', ['test-mocha'/*, 'test-redis-lua'*/, 'submit-coveralls']);
 
 makeTestTasks('localtest', function(name, files) {
   return gulp.src(files, { read: false })
@@ -576,12 +585,11 @@ gulp.task('watch', ['css'], function() {
 
 
 // Run gulp safe-install --package xyz@0.1.0
-var opts = require('yargs').argv;
 gulp.task('safe-install', shell.task([
   'npm run unlink',
   'npm install --production',
   'npm prune --production',
-  'npm install ' + opts.package + ' --save',
+  'npm install ' + argv.package + ' --save',
   'npm shrinkwrap',
   'npm install',
   'npm run link',
