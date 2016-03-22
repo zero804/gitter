@@ -100,8 +100,6 @@ router.get('/tags/:tags',
   function(req, res, next) {
     contextGenerator.generateNonChatContext(req).then(function(troupeContext) {
       var user = troupeContext.user;
-      var isStaff = !!(user || {}).staff;
-      //console.log('u', req.user, troupeContext.user);
 
       // Copy so we can modify later on
       var fauxTagMap = _.extend({}, FAUX_TAG_MAP);
