@@ -61,9 +61,10 @@
     <div class="org-page__room-card-list">
       {{#each rooms}}
         {{> room_card
+          exploreBaseUrl=../exploreBaseUrl
+          isLoggedIn=../isLoggedIn
           linkSource='orgpage'
           extraClasses='org-page__room-card'
-          isLoggedIn=../isLoggedIn
         }}
       {{/each}}
     </div>

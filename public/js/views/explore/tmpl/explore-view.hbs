@@ -52,9 +52,9 @@
         <div class="explore-pill-list-section__header-secondary-action-annotation">
           Can't find what you're looking for?
         </div>
-          <a href="{{createRoomUrl}}" class="subdued-button-jaffa--xsmall js-explore-create-room-button">
+          <button class="subdued-button-jaffa--xsmall js-explore-create-room-button">
             Create your own
-          </a>
+          </button>
       </div>
     {{/if}}
   </div>
@@ -63,6 +63,7 @@
     {{#each tagMap}}
       <li class="tag-pill-list-item">
         <button
+          href="{{when ../exploreBaseUrl ../exploreBaseUrl '/explore'}}/tags/{{#each this.tags}}{{this}}{{#unless @last}},{{/unless}}{{/each}}"
           class="tag-pill {{when this.selected 'is-active' : ''}} js-explore-tag-pill" {{when this.selected 'aria-selected' : ''}}
           data-tags="{{#each this.tags}}{{this}}{{#unless @last}},{{/unless}}{{/each}}"
         >
@@ -85,9 +86,10 @@
     <div class="explore-room-card-list js-room-card-list">
       {{#each rooms}}
         {{> room_card
+          exploreBaseUrl=../exploreBaseUrl
+          isLoggedIn=../isLoggedIn
           linkSource='explore'
           extraClasses='js-explore-room-card'
-          isLoggedIn=../isLoggedIn
         }}
       {{/each}}
     </div>

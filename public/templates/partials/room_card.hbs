@@ -32,7 +32,10 @@
     {{#if displayTags.length}}
       <section class="room-card__tag-list">
         {{#each displayTags}}
-          <a href="/explore/tags/{{this}}" class="room-card__tag">
+          <a
+            href="{{when ../exploreBaseUrl ../exploreBaseUrl '/explore'}}/tags/{{this}}"
+            class="room-card__tag"
+          >
             {{this}}
           </a>
         {{/each}}
