@@ -53,7 +53,10 @@ var starredRepoRooms = Promise.method(function(user, existingRooms, localeLangua
   return [];
 });
 
-function graphRooms(user, existingRooms, language) {
+function graphRooms(options) {
+  var existingRooms = options.rooms;
+  var language = options.language;
+
   // limit how many we send to neo4j
   var firstTen = existingRooms.slice(0, 10);
   return graphSuggestions.getSuggestionsForRooms(firstTen, language)
@@ -78,7 +81,9 @@ function graphRooms(user, existingRooms, language) {
     });
 }
 
-function siblingRooms(user, existingRooms, language) {
+function siblingRooms(options) {
+  var existingRooms = options.rooms;
+
   var orgNames = _.uniq(_.pluck(existingRooms, 'lcOwner'));
   return Promise.all(_.map(orgNames, function(orgName) {
       // TODO: include private/inherited rooms for orgs you're in. Requires
@@ -93,12 +98,14 @@ function siblingRooms(user, existingRooms, language) {
     });
 }
 
-function hilightedRooms(user, existingRooms, language) {
+function hilightedRooms(options) {
+  var language = options.language;
+
   // TODO: maybe we should pick some random rooms that are tagged by staff to
   // be featured here rather than the hardcoded hilighted list?
   var filtered = _.filter(HIGHLIGHTED_ROOMS, function(roomInfo) {
     var roomLang = roomInfo.localeLanguage;
-    return (roomLang == 'en' || roomLang == 'language');
+    return (roomLang == 'en' || roomLang == language);
   });
   return Promise.all(_.map(filtered, function(roomInfo) {
     return troupeService.findByUri(roomInfo.uri);
@@ -140,8 +147,23 @@ var recommenders = [
   hilightedRooms
 ];
 
-function findSuggestionsForRooms(user, existingRooms, language) {
-  language = language || 'en';
+/*
+
+options can have the following and they are all optional
+* user
+* rooms (array)
+* language (defaults to 'en')
+
+The plugins can just skip themselves if options doesn't contain what they need.
+
+*/
+function findSuggestionsForRooms(options) {
+  var existingRooms = options.rooms || [];
+  var language = options.language || 'en';
+
+  // copy the defaults back in so all the plugins get the defaults
+  options.rooms = existingRooms;
+  options.language = language;
 
   // 1to1 rooms aren't included in the graph anyway, so filter them out first
   existingRooms = _.filter(existingRooms, function(room) {
@@ -151,7 +173,7 @@ function findSuggestionsForRooms(user, existingRooms, language) {
   var filterSuggestions = function(results) {
     return filterRooms(results, existingRooms);
   };
-  return promiseUtils.waterfall(recommenders, [user, existingRooms, language], filterSuggestions, NUM_SUGGESTIONS);
+  return promiseUtils.waterfall(recommenders, [options], filterSuggestions, NUM_SUGGESTIONS);
 }
 exports.findSuggestionsForRooms = findSuggestionsForRooms;
 
@@ -176,7 +198,11 @@ exports.findSuggestionsForUserId = cacheWrapper('findSuggestionsForUserId',
       userSettingsService.getUserSettings(userId, 'lang')
     ])
     .spread(function(user, existingRooms, language) {
-      return findSuggestionsForRooms(user, existingRooms, language);
+      return findSuggestionsForRooms({
+        user: user,
+        rooms: existingRooms,
+        language: language
+      });
     })
   });
 

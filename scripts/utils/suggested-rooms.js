@@ -39,7 +39,10 @@ function lookupByRooms() {
     return troupeService.findByUri(uri);
   });
 
-  return suggestionsService.findSuggestionsForRooms(null, rooms, opts.language)
+  return suggestionsService.findSuggestionsForRooms({
+    rooms: rooms,
+    language: opts.language
+    })
     .then(function(suggestedRooms) {
       return restSerializer.serialize(suggestedRooms, new restSerializer.SuggestedRoomStrategy());
     })
@@ -77,7 +80,11 @@ function lookupByUsername() {
       ];
     })
     .spread(function(user, existingRooms, language) {
-      return suggestionsService.findSuggestionsForRooms(user, existingRooms, language);
+      return suggestionsService.findSuggestionsForRooms({
+        user: user,
+        rooms: existingRooms,
+        language: language
+      });
     })
     .then(function(suggestedRooms) {
       return restSerializer.serialize(suggestedRooms, new restSerializer.SuggestedRoomStrategy());
