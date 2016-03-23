@@ -2,9 +2,8 @@
 
 var Backbone = require('backbone');
 var context = require('utils/context');
-var validateTag = require('gitter-web-shared/validation/validate-tag');
+var validateTag = require('gitter-web-shared/validation/validate-tag').validateTag;
 
-var maxTagLength = 20;
 var TagModel = Backbone.Model.extend({
   defaults: {
     value: '',
