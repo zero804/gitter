@@ -52,12 +52,6 @@ var featuredRooms  = [
     language: 'JavaScript',
     locale: 'en'
   },
-  { uri: 'ruby-vietnam/chat',
-    name: 'Ruby Vietnam',
-    channel: true,
-    language: 'Ruby',
-    locale: 'vi'
-  },
   { uri: 'require-lx/group',
     name: "require('lx')",
     language: 'JavaScript',

@@ -26,7 +26,9 @@
 
         {{#if isLoggedIn}}
         <div class="org-page__login">
-         <a class="btn secondary pampas" href="{{socialUrl}}" target="_blank"><i class="icon-twitter"></i> Share</a>
+         <a class="button-pampas--small" href="{{socialUrl}}" target="_blank">
+           <i class="icon-twitter"></i> Share
+         </a>
         </div>
         {{else}}
           <div class="org-page__login">
@@ -56,9 +58,14 @@
       </div>
     </header>
 
-    <div class='org-page__room-cards'>
+    <div class="org-page__room-card-list">
       {{#each rooms}}
-        {{> room_card }}
+        {{> room_card
+          exploreBaseUrl=../exploreBaseUrl
+          isLoggedIn=../isLoggedIn
+          linkSource='orgpage'
+          extraClasses='org-page__room-card'
+        }}
       {{/each}}
     </div>
 

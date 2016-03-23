@@ -38,9 +38,6 @@ var HIGHLIGHTED_ROOMS = [
     uri: 'webpack/webpack',
     localeLanguage: 'en',
   }, {
-    uri: 'ruby-vietnam/chat',
-    localeLanguage: 'vi',
-  }, {
     uri: 'angular-ui/ng-grid',
     localeLanguage: 'en',
   }
@@ -181,4 +178,3 @@ exports.findSuggestionsForUserId = cacheWrapper('findSuggestionsForUserId',
       return findSuggestionsForRooms(user, existingRooms, language);
     })
   });
-
