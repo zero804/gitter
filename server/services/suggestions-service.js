@@ -123,6 +123,10 @@ function filterRooms(suggested, existing) {
   // filter out the existing rooms
   var existingMap = _.indexBy(existing, 'id');
   filtered = _.filter(filtered, function(room) {
+    // make very sure we only find public rooms
+    if (room.security != 'PUBLIC') {
+      return false;
+    }
     return existingMap[room.id] === undefined;
   })
 
