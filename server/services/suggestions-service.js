@@ -63,8 +63,10 @@ function reposToRooms(repos) {
       return troupeService.findByUri(repo.uri);
     }))
     .then(function(rooms) {
-      // strip nulls;
-      return _.filter(rooms);
+      // strip nulls, limit to a sane number that's a bit higher than the
+      // number we'll use because we're still going to be filtering out the
+      // ones you're already in later.
+      return _.filter(rooms).slice(0, 2*NUM_SUGGESTIONS);
     });
 }
 
