@@ -1,3 +1,23 @@
+{{#unless isLoggedIn}}
+  <header class="primary-branded-header">
+    <div class="primary-branded-header-inner explore-primary-header-innner">
+      <div class="explore-primary-header-group">
+        <a href="/" class="logo">
+          {{> logo_man}}
+          <img src="{{ cdn 'images/home/logo.png' }}" alt="Gitter" title="Gitter logo" class="logo-image menu-animation">
+        </a>
+
+        <h3 class="primary-branded-header__sub-heading explore-primary-header__sub-header">
+          The Home of Community
+        </h3>
+      </div>
+
+      <a href="/" class="subdued-button-clouds--small explore-primary-header__learn-more-button">
+        Find out More
+      </a>
+    </div>
+  </header>
+{{/unless}}
 <header class="explore-header-section">
   <h1 class="h1">
     Explore
