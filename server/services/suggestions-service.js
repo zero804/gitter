@@ -62,12 +62,15 @@ function reposToRooms(repos) {
   // Limit to a sane number that's a bit higher than the number we'll use
   // because we're still going to be filtering out the ones the user is already
   // in later.
-  repos = repos.slice(0, 2*NUM_SUGGESTIONS);
+  repos = repos.slice(0, 100);
 
+  debug("start reposToRooms");
   return Promise.all(_.map(repos, function(repo) {
       return troupeService.findByUri(repo.uri);
     }))
     .then(function(rooms) {
+      debug("end reposToRooms");
+
       // strip nulls
       return _.filter(rooms);
     });
@@ -78,12 +81,13 @@ var ownedRepoRooms = Promise.method(function(options) {
   if (!user) {
     return [];
   }
+
+  debug('checking ownedRepoRooms');
+
   return ownedRepos(user)
     .then(reposToRooms)
     .then(function(rooms) {
-      if (rooms.length) {
-        debug("ownedRepoRooms", _.pluck(rooms, "uri"));
-      }
+      debug("ownedRepoRooms", _.pluck(rooms, "uri"));
       return rooms;
     });
 });
@@ -93,12 +97,13 @@ var starredRepoRooms = Promise.method(function(options) {
   if (!user) {
     return [];
   }
+
+  debug('checking starredRepoRooms');
+
   return starredRepos(user)
     .then(reposToRooms)
     .then(function(rooms) {
-      if (rooms.length) {
-        debug("starredRepoRooms", _.pluck(rooms, "uri"));
-      }
+      debug("starredRepoRooms", _.pluck(rooms, "uri"));
       return rooms;
     });
 });
@@ -108,12 +113,13 @@ var watchedRepoRooms = Promise.method(function(options) {
   if (!user) {
     return [];
   }
+
+  debug('checking watchedRepoRooms');
+
   return watchedRepos(user)
     .then(reposToRooms)
     .then(function(rooms) {
-      if (rooms.length) {
-        debug("watchedRepoRooms", _.pluck(rooms, "uri"));
-      }
+      debug("watchedRepoRooms", _.pluck(rooms, "uri"));
       return rooms;
     });
 });
@@ -124,6 +130,8 @@ var graphRooms = Promise.method(function(options) {
   if (!existingRooms || !existingRooms.length) {
     return [];
   }
+
+  debug('checking graphRooms');
 
   var language = options.language;
 
@@ -148,9 +156,7 @@ var graphRooms = Promise.method(function(options) {
         return (orgTotals[room.lcOwner] > MAX_SUGGESTIONS_PER_ORG);
       });
 
-      if (suggestedRooms.length) {
-        debug("graphRooms", _.pluck(suggestedRooms, "uri"));
-      }
+      debug("graphRooms", _.pluck(suggestedRooms, "uri"));
 
       return suggestedRooms;
     });
@@ -163,6 +169,8 @@ var siblingRooms = Promise.method(function(options) {
     return [];
   }
 
+  debug('checking siblingRooms');
+
   var orgNames = _.uniq(_.pluck(existingRooms, 'lcOwner'));
   return Promise.all(_.map(orgNames, function(orgName) {
       return troupeService.findChildRoomsForOrg(orgName, {security: 'PUBLIC'});
@@ -170,9 +178,7 @@ var siblingRooms = Promise.method(function(options) {
     .then(function(arrays) {
       var suggestedRooms = Array.prototype.concat.apply([], arrays);
 
-      if (suggestedRooms.length) {
-        debug("siblingRooms", _.pluck(suggestedRooms, "uri"));
-      }
+      debug("siblingRooms", _.pluck(suggestedRooms, "uri"));
 
       return suggestedRooms;
     });
