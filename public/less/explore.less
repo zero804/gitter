@@ -4,8 +4,10 @@
 @import 'base-web';
 @import 'buttons';
 @import 'room-card';
-@import './components/pills';
+@import 'logo';
+@import './components/primary-branded-header';
 @import './components/header-info-bar';
+@import './components/pills';
 @import '../js/views/modals/choose-room-view';
 
 @page-bg-color: #ffffff;
@@ -42,15 +44,45 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100%;
-  padding-top: 5rem;
 }
 
+
+
+.explore-primary-header-innner {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+
+  width: auto;
+  max-width: @page-wrapper-max-width;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: @page-wrapper-horizontal-padding;
+  padding-right: @page-wrapper-horizontal-padding;
+}
+
+.explore-primary-header-group {
+  display: flex;
+  align-items: center;
+}
+
+.explore-primary-header__sub-header {
+  margin-left: 4rem;
+}
+
+.explore-primary-header__learn-more-button {
+  @media (max-width: 700px) {
+    display: none;
+  }
+}
 
 
 
 .explore-header-section {
   width: 100%;
   max-width: @page-wrapper-max-width;
+  margin-top: @section-spacing;
   margin-left: auto;
   margin-bottom: @section-spacing;
   margin-right: auto;
