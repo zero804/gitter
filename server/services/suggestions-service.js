@@ -23,12 +23,24 @@ var HIGHLIGHTED_ROOMS = [
   }, {
     uri: 'gitterHQ/developers',
     localeLanguage: 'en',
-  }, {
-    uri: 'marionettejs/backbone.marionette',
-    localeLanguage: 'en',
   },{
     uri: 'LaravelRUS/chat',
     localeLanguage: 'ru',
+  }, {
+    uri: 'google/material-design-lite',
+    localeLanguage: 'en'
+  }, {
+    uri: 'pydata/pandas',
+    localeLanguage: 'en'
+  }, {
+    uri: 'PerfectlySoft/Perfect',
+    localeLanguage: 'en'
+  }, {
+    uri: 'twbs/bootstrap',
+    localeLanguage: 'en'
+  }, {
+    uri: 'scala-js/scala-js',
+    localeLanguage: 'en'
   }, {
     uri: 'gitterHQ/nodejs',
     localeLanguage: 'en',
@@ -38,17 +50,20 @@ var HIGHLIGHTED_ROOMS = [
   }, {
     uri: 'webpack/webpack',
     localeLanguage: 'en',
-  }, {
-    uri: 'ruby-vietnam/chat',
-    localeLanguage: 'vi',
-  }, {
-    uri: 'angular-ui/ng-grid',
-    localeLanguage: 'en',
   }
 ];
 
+var ownedRepoRooms = Promise.method(function(options) {
+  // TODO
+  return [];
+});
 
-var starredRepoRooms = Promise.method(function(user, existingRooms, localeLanguage) {
+var starredRepoRooms = Promise.method(function(options) {
+  // TODO
+  return [];
+});
+
+var watchedRepoRooms = Promise.method(function(options) {
   // TODO
   return [];
 });
@@ -86,10 +101,6 @@ function siblingRooms(options) {
 
   var orgNames = _.uniq(_.pluck(existingRooms, 'lcOwner'));
   return Promise.all(_.map(orgNames, function(orgName) {
-      // TODO: include private/inherited rooms for orgs you're in. Requires
-      // render.js to be refactored a bit so we can reuse the same logic.
-      // We should also probably limit the number of results and also the
-      // fields that get returned.
       return troupeService.findChildRoomsForOrg(orgName, {security: 'PUBLIC'});
     }))
     .then(function(arrays) {
@@ -101,12 +112,14 @@ function siblingRooms(options) {
 function hilightedRooms(options) {
   var language = options.language;
 
-  // TODO: maybe we should pick some random rooms that are tagged by staff to
-  // be featured here rather than the hardcoded hilighted list?
-  var filtered = _.filter(HIGHLIGHTED_ROOMS, function(roomInfo) {
+  // shuffle so we don't always present the same ones first
+  var shuffled = _.shuffle(HIGHLIGHTED_ROOMS);
+
+  var filtered = _.filter(shuffled, function(roomInfo) {
     var roomLang = roomInfo.localeLanguage;
     return (roomLang == 'en' || roomLang == language);
   });
+
   return Promise.all(_.map(filtered, function(roomInfo) {
     return troupeService.findByUri(roomInfo.uri);
   }));
@@ -145,6 +158,8 @@ function filterRooms(suggested, existing) {
 }
 
 var recommenders = [
+  ownedRepoRooms,
+  watchedRepoRooms,
   starredRepoRooms,
   graphRooms,
   siblingRooms,
