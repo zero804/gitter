@@ -19,7 +19,7 @@ var ownedRepos = require('./recommendations/owned-repos');
 var starredRepos = require('./recommendations/starred-repos');
 var watchedRepos = require('./recommendations/watched-repos');
 
-var NUM_SUGGESTIONS = 10;
+var NUM_SUGGESTIONS = 12;
 var MAX_SUGGESTIONS_PER_ORG = 2;
 var HIGHLIGHTED_ROOMS = [
   {
