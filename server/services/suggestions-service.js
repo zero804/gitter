@@ -59,14 +59,17 @@ var HIGHLIGHTED_ROOMS = [
 ];
 
 function reposToRooms(repos) {
+  // Limit to a sane number that's a bit higher than the number we'll use
+  // because we're still going to be filtering out the ones the user is already
+  // in later.
+  repos = repos.slice(0, 2*NUM_SUGGESTIONS);
+
   return Promise.all(_.map(repos, function(repo) {
       return troupeService.findByUri(repo.uri);
     }))
     .then(function(rooms) {
-      // strip nulls, limit to a sane number that's a bit higher than the
-      // number we'll use because we're still going to be filtering out the
-      // ones you're already in later.
-      return _.filter(rooms).slice(0, 2*NUM_SUGGESTIONS);
+      // strip nulls
+      return _.filter(rooms);
     });
 }
 
