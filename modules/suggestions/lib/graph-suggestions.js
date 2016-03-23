@@ -88,7 +88,7 @@ function getSuggestionsForRooms(rooms, localeLanguage) {
     'WHERE r.roomId IN {roomIds} ' +
     'WITH u ORDER BY m.weight LIMIT 1000 ' +
     'MATCH (u)-[:MEMBER]-(r2:Room) ' +
-    'WHERE r2.lang = "en" OR r2.lang = {lang} AND NOT r2.roomId IN {roomIds} AND r2.security <> "PRIVATE" ' +
+    'WHERE r2.lang = "en" OR r2.lang = {lang} AND NOT r2.roomId IN {roomIds} AND r2.security = "PUBLIC" ' +
     'RETURN r2.roomId AS roomId, count(r2) AS c ' +
     'ORDER BY c DESC ' +
     'LIMIT 20';
