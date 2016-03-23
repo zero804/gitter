@@ -14,6 +14,11 @@ var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avata
 var cacheWrapper = require('gitter-web-cache-wrapper');
 var debug = require('debug')('gitter:suggestions');
 
+// the old github recommenders that find repos, to be filtered to rooms
+var ownedRepos = require('./recommendations/owned-repos');
+var starredRepos = require('./recommendations/starred-repos');
+var watchedRepos = require('./recommendations/watched-repos');
+
 var NUM_SUGGESTIONS = 10;
 var MAX_SUGGESTIONS_PER_ORG = 2;
 var HIGHLIGHTED_ROOMS = [
@@ -53,23 +58,68 @@ var HIGHLIGHTED_ROOMS = [
   }
 ];
 
+function reposToRooms(repos) {
+  return Promise.all(_.map(repos, function(repo) {
+      return troupeService.findByUri(repo.uri);
+    }))
+    .then(function(rooms) {
+      // strip nulls;
+      return _.filter(rooms);
+    });
+}
+
 var ownedRepoRooms = Promise.method(function(options) {
-  // TODO
-  return [];
+  var user = options.user;
+  if (!user) {
+    return [];
+  }
+  return ownedRepos(user)
+    .then(reposToRooms)
+    .then(function(rooms) {
+      if (rooms.length) {
+        debug("ownedRepoRooms", _.pluck(rooms, "uri"));
+      }
+      return rooms;
+    });
 });
 
 var starredRepoRooms = Promise.method(function(options) {
-  // TODO
-  return [];
+  var user = options.user;
+  if (!user) {
+    return [];
+  }
+  return starredRepos(user)
+    .then(reposToRooms)
+    .then(function(rooms) {
+      if (rooms.length) {
+        debug("starredRepoRooms", _.pluck(rooms, "uri"));
+      }
+      return rooms;
+    });
 });
 
 var watchedRepoRooms = Promise.method(function(options) {
-  // TODO
-  return [];
+  var user = options.user;
+  if (!user) {
+    return [];
+  }
+  return watchedRepos(user)
+    .then(reposToRooms)
+    .then(function(rooms) {
+      if (rooms.length) {
+        debug("watchedRepoRooms", _.pluck(rooms, "uri"));
+      }
+      return rooms;
+    });
 });
 
-function graphRooms(options) {
+var graphRooms = Promise.method(function(options) {
   var existingRooms = options.rooms;
+
+  if (!existingRooms || !existingRooms.length) {
+    return [];
+  }
+
   var language = options.language;
 
   // limit how many we send to neo4j
@@ -92,12 +142,21 @@ function graphRooms(options) {
         orgTotals[room.lcOwner] += 1;
         return (orgTotals[room.lcOwner] > MAX_SUGGESTIONS_PER_ORG);
       });
+
+      if (suggestedRooms.length) {
+        debug("graphRooms", _.pluck(suggestedRooms, "uri"));
+      }
+
       return suggestedRooms;
     });
-}
+});
 
-function siblingRooms(options) {
+var siblingRooms = Promise.method(function(options) {
   var existingRooms = options.rooms;
+
+  if (!existingRooms || !existingRooms.length) {
+    return [];
+  }
 
   var orgNames = _.uniq(_.pluck(existingRooms, 'lcOwner'));
   return Promise.all(_.map(orgNames, function(orgName) {
@@ -105,9 +164,14 @@ function siblingRooms(options) {
     }))
     .then(function(arrays) {
       var suggestedRooms = Array.prototype.concat.apply([], arrays);
+
+      if (suggestedRooms.length) {
+        debug("siblingRooms", _.pluck(suggestedRooms, "uri"));
+      }
+
       return suggestedRooms;
     });
-}
+});
 
 function hilightedRooms(options) {
   var language = options.language;
@@ -121,8 +185,15 @@ function hilightedRooms(options) {
   });
 
   return Promise.all(_.map(filtered, function(roomInfo) {
-    return troupeService.findByUri(roomInfo.uri);
-  }));
+      return troupeService.findByUri(roomInfo.uri);
+    }))
+    .then(function(suggestedRooms) {
+      if (suggestedRooms.length) {
+        debug("hilightedRooms", _.pluck(suggestedRooms, "uri"));
+      }
+
+      return suggestedRooms;
+    });
 }
 
 function filterRooms(suggested, existing) {
@@ -158,8 +229,13 @@ function filterRooms(suggested, existing) {
 }
 
 var recommenders = [
-  ownedRepoRooms,
-  watchedRepoRooms,
+  // Disabling these for now because they both just tend to find "my-org/*" and
+  // we have other places to suggest those already and you certainly have other
+  // ways of discovering or being told about your orgs' own rooms so I feel
+  // doubtful about the potential network effect here.
+  //ownedRepoRooms,
+  //watchedRepoRooms,
+
   starredRepoRooms,
   graphRooms,
   siblingRooms,
