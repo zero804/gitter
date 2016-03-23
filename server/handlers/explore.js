@@ -50,7 +50,7 @@ _.extend(FAUX_TAG_MAP, {
   'iOS': [],
   'Android': [],
   'Data Science': [],
-  'Devops': [],
+  'Devops': ['devops'],
   'Game Dev': ['game'],
   'Frameworks': ['frameworks'],
   'JavaScript': ['javascript'],

@@ -33,9 +33,10 @@ module.exports = function(room, options) {
   var opts = _.extend({}, defaults, options);
   var result = _.extend({}, room);
 
-  result.isPrivate = result.security !== 'PUBLIC';
+  result.isPrivate = result.security !== 'PUBLIC' && result.security !== null && result.security !== undefined;
   result.canEditTags = opts.isStaff;
   result.roomNameParts = result.uri.split('/');
+  result.topic = room.topic || room.description;
   result.roomAvatarSrcSet = resolveRoomAvatarSrcSet({ uri: result.uri }, 40);
   if(room.messageCount) {
     result.messageCountSiPrefixed = formatNumberWithSiPrefix(room.messageCount);
