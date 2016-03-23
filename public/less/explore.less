@@ -48,8 +48,9 @@ body {
 
 
 
-.explore-primary-branded-header-innner {
+.explore-primary-header-innner {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
 
@@ -61,13 +62,19 @@ body {
   padding-right: @page-wrapper-horizontal-padding;
 }
 
-.explore-primary-branded-header-group {
+.explore-primary-header-group {
   display: flex;
   align-items: center;
 }
 
-.explore-primary-branded-header__sub-header {
+.explore-primary-header__sub-header {
   margin-left: 4rem;
+}
+
+.explore-primary-header__learn-more-button {
+  @media (max-width: 700px) {
+    display: none;
+  }
 }
 
 
