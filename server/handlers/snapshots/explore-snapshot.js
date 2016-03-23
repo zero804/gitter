@@ -35,7 +35,7 @@ module.exports = function getSnapshotsForPageContext(options) {
 
   return restSerializer.serialize(opts.rooms, new restSerializer.SuggestedRoomStrategy())
     .then(function(rooms) {
-      var resultantRooms = opts.rooms.map(function(roomObj) {
+      var resultantRooms = rooms.map(function(roomObj) {
         return generateRoomCardContext(roomObj);
       });
 

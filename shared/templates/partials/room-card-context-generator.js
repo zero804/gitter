@@ -4,16 +4,28 @@ var _ = require('underscore');
 var resolveRoomAvatarSrcSet = require('../../avatars/resolve-room-avatar-srcset');
 var validateTag = require('gitter-web-shared/validation/validate-tag');
 
-// via https://gist.github.com/cho45/9968462
-function formatNumberWithSiPrefix(n) {
-	var nn = n.toExponential(2).split(/e/);
-	var u = Math.floor(+nn[1] / 3);
-	return nn[0] * Math.pow(10, +nn[1] - u * 3) + ['p', 'n', 'u', 'm', '', 'k', 'M', 'G', 'T'][u + 4];
-}
+// via http://stackoverflow.com/a/17633552/796832
+var ranges = [
+  { divider: 1e18, suffix: 'P' },
+  { divider: 1e15, suffix: 'E' },
+  { divider: 1e12, suffix: 'T' },
+  { divider: 1e9, suffix: 'G' },
+  { divider: 1e6, suffix: 'M' },
+  { divider: 1e3, suffix: 'k' }
+];
+var formatNumberWithSiPrefix = function(n) {
+  for (var i = 0; i < ranges.length; i++) {
+    if (n >= ranges[i].divider) {
+      var siValue = n / ranges[i].divider;
+      return (Math.round(siValue * 10) / 10).toString() + ranges[i].suffix;
+    }
+  }
+  return n.toString();
+};
+
 
 var defaults = {
-  isStaff: false,
-  messageCount: undefined
+  isStaff: false
 };
 
 // generateRoomCardContext
@@ -24,9 +36,9 @@ module.exports = function(room, options) {
   result.isPrivate = result.security !== 'PUBLIC';
   result.canEditTags = opts.isStaff;
   result.roomNameParts = result.uri.split('/');
-  result.roomAvatarSrcSet = resolveRoomAvatarSrcSet({ uri: result.lcUri }, 40);
-  if(opts.messageCount) {
-    result.messageCountSiPrefixed = formatNumberWithSiPrefix(opts.messageCount);
+  result.roomAvatarSrcSet = resolveRoomAvatarSrcSet({ uri: result.uri }, 40);
+  if(room.messageCount) {
+    result.messageCountSiPrefixed = formatNumberWithSiPrefix(room.messageCount);
   }
   result.displayTags = (result.tags || []).filter(function(tag) {
     return validateTag(tag, opts.isStaff).isValid;
