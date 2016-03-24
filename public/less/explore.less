@@ -105,6 +105,10 @@ body {
   margin-right: auto;
   padding-left: @page-wrapper-horizontal-padding;
   padding-right: @page-wrapper-horizontal-padding;
+
+  @media (max-width: 550px) {
+    margin-top: @section-spacing / 2;
+  }
 }
 
 .explore-secondary-header-info-bar {
@@ -173,7 +177,15 @@ body {
   margin-right: 0.5em;
 }
 
+.explore-tag-pill-list {
+  margin-top: @section-spacing;
+  margin-bottom: @section-spacing;
 
+  @media (max-width: 550px) {
+    margin-top: @section-spacing / 2;
+    margin-bottom: @section-spacing / 2;
+  }
+}
 
 
 .explore-pill-list-section {
