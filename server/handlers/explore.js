@@ -34,12 +34,9 @@ var processTagInput = function(input) {
 };
 
 
-// @const
-var SUGGESTED_TAG_LABEL = 'Suggested';
-var SUGGESTED_BACKEND_TAG = 'generated:suggested';
 
 var FAUX_TAG_MAP = {};
-FAUX_TAG_MAP[SUGGESTED_TAG_LABEL] = [SUGGESTED_BACKEND_TAG];
+FAUX_TAG_MAP[exploreTagUtils.tagConstants.SUGGESTED_TAG_LABEL] = [exploreTagUtils.tagConstants.SUGGESTED_BACKEND_TAG];
 _.extend(FAUX_TAG_MAP, {
   'Frontend': [],
   'Mobile': [
@@ -87,7 +84,7 @@ router.get('/:tags?',
     var defaultTags = firstTag.tags;
     // Default to suggested if logged in
     if(req.user) {
-      defaultTags = [SUGGESTED_TAG_LABEL.toLowerCase()];
+      defaultTags = [exploreTagUtils.tagConstants.SUGGESTED_TAG_LABEL.toLowerCase()];
     }
 
     var tagsToUse = [].concat((inputTags.length > 0 ? inputTags : defaultTags));
@@ -100,6 +97,7 @@ router.get('/tags/:tags',
   function(req, res, next) {
     contextGenerator.generateNonChatContext(req).then(function(troupeContext) {
       var user = troupeContext.user;
+      var isLoggedIn = !!user;
 
       // Copy so we can modify later on
       var fauxTagMap = _.extend({}, FAUX_TAG_MAP);
@@ -118,7 +116,7 @@ router.get('/tags/:tags',
       var selectedBackendTags = Object.keys(selectedTagMap).reduce(function(prev, key) {
         // Check for the selected tag for easy reference later
         selectedTagMap[key].tags.forEach(function(tag) {
-          if(tag === SUGGESTED_BACKEND_TAG) {
+          if(tag === exploreTagUtils.tagConstants.SUGGESTED_BACKEND_TAG) {
             hasSuggestedTag = true;
           }
         });
@@ -129,12 +127,12 @@ router.get('/tags/:tags',
 
       var getSuggestedRoomsPromise = Promise.resolve()
         .then(function() {
-          if(hasSuggestedTag && user) {
+          if(hasSuggestedTag && isLoggedIn) {
             return suggestionsService.findSuggestionsForUserId(user.id)
               .then(function(suggestedRooms) {
                 suggestedRooms = suggestedRooms || [];
                 suggestedRooms = suggestedRooms.map(function(room) {
-                  room.tags.push(SUGGESTED_BACKEND_TAG);
+                  room.tags.push(exploreTagUtils.tagConstants.SUGGESTED_BACKEND_TAG);
                   return room;
                 });
 
@@ -143,14 +141,6 @@ router.get('/tags/:tags',
           }
 
           return [];
-        })
-        .then(function(suggestedRooms) {
-          // If there are no suggestions, just get rid of that tag-pill
-          if(suggestedRooms.length === 0) {
-            delete fauxTagMap[SUGGESTED_TAG_LABEL];
-          }
-
-          return suggestedRooms;
         });
 
       var getExploreRoomsPromise = getSuggestedRoomsPromise.then(function(suggestedRooms) {
@@ -176,6 +166,7 @@ router.get('/tags/:tags',
         })
         .then(function(rooms) {
           var snapshots = generateExploreSnapshot({
+            isLoggedIn: isLoggedIn,
             fauxTagMap: fauxTagMap,
             selectedTags: selectedTagsInput,
             rooms: rooms
@@ -187,7 +178,7 @@ router.get('/tags/:tags',
           res.render('explore', _.extend({}, snapshots, {
             exploreBaseUrl: req.baseUrl,
             troupeContext: troupeContext,
-            isLoggedIn: !!user,
+            isLoggedIn: isLoggedIn,
             createRoomUrl: urlJoin(troupeEnv.basePath, '#createroom')
           }));
         })
