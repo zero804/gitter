@@ -73,6 +73,15 @@ body {
 
 .explore-primary-header__sub-header {
   margin-left: 4rem;
+
+  @media (max-width: 550px) {
+    margin-left: 2rem;
+    font-size: 1.8rem;
+  }
+
+  @media (max-width: 370px) {
+    display: none;
+  }
 }
 
 .explore-primary-header__action-area {
@@ -81,7 +90,7 @@ body {
     margin-left: 8px;
   }
 
-  @media (max-width: 700px) {
+  @media (max-width: 760px) {
     display: none;
   }
 }
@@ -93,10 +102,17 @@ body {
   max-width: @page-wrapper-max-width;
   margin-top: @section-spacing;
   margin-left: auto;
-  margin-bottom: @section-spacing;
   margin-right: auto;
   padding-left: @page-wrapper-horizontal-padding;
   padding-right: @page-wrapper-horizontal-padding;
+}
+
+.explore-secondary-header-info-bar {
+  margin-bottom: @section-spacing;
+
+  @media (max-width: 550px) {
+    display: none;
+  }
 }
 
 .explore-header-info-bar__mobile-group {
