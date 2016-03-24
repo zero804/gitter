@@ -174,7 +174,7 @@
     "fs-extra": "^0.8.1",
     "fuzzysearch": "^1.0.3",
     "gitter-handlebars-loader": "^1.2.0",
-    "gitter-styleguide": "^1.6.3",
+    "gitter-styleguide": "^1.6.4",
     "glob": "^6.0.4",
     "gulp": "^3.8.11",
     "gulp-coveralls": "^0.1.4",

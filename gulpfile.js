@@ -473,8 +473,7 @@ gulp.task('css-web', function () {
     'public/less/homepage.less',
     'public/less/userhome.less',
     'public/less/402.less',
-    'public/less/org-page.less',
-    'public/less/room-card.less'
+    'public/less/org-page.less'
   ];
 
   return gulp.src(lessFiles)

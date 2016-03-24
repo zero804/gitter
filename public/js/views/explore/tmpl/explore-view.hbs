@@ -12,9 +12,14 @@
         </h3>
       </div>
 
-      <a href="/" class="subdued-button-clouds--small explore-primary-header__learn-more-button">
-        Find out More
-      </a>
+      <div class="explore-primary-header__action-area">
+        <a class="button-caribbean--small js-sign-in" href="/login?action=login&source=explore">
+          Sign In
+        </a>
+        <a href="/" class="subdued-button-clouds--small explore-primary-header__learn-more-button">
+          Find out More
+        </a>
+      </div>
     </div>
   </header>
 {{/unless}}
@@ -80,13 +85,15 @@
   <ul class="tag-pill-list js-explore-tag-pills-list">
     {{#each tagMap}}
       <li class="tag-pill-list-item">
-        <button
+        <a
           href="{{when ../exploreBaseUrl ../exploreBaseUrl '/explore'}}/tags/{{#each this.tags}}{{this}}{{#unless @last}},{{/unless}}{{/each}}"
           class="tag-pill {{when this.selected 'is-active' : ''}} js-explore-tag-pill" {{when this.selected 'aria-selected' : ''}}
+          data-id={{@key}}
           data-tags="{{#each this.tags}}{{this}}{{#unless @last}},{{/unless}}{{/each}}"
+          {{when needsAuthentication 'data-needs-authentication="true"' : ''}}
         >
           {{this.name}}
-        </button>
+        </a>
       </li>
     {{/each}}
 

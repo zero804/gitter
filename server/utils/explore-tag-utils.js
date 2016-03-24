@@ -12,8 +12,11 @@ var slugify = function(str){
 var FAUX_KEY_TAG_MAP_KEY_PREFIX = 'faux';
 var FAUX_KEY_TAG_PREFIX = 'curated';
 
+var SUGGESTED_TAG_LABEL = 'Suggested';
+var SUGGESTED_BACKEND_TAG = 'generated:suggested';
 
-// Given a simple map from readable label to array of tags,
+
+// Given a simple faux map from readable label to array of tags,
 // generate lookup-able map we can do work with
 var generateTagMap = function(fauxTagMap) {
   // Generate the tagMap
@@ -21,7 +24,7 @@ var generateTagMap = function(fauxTagMap) {
   Object.keys(fauxTagMap).forEach(function(fauxKey) {
     // The tags driving the faux-tag
     var backendTags = [].concat(fauxTagMap[fauxKey]);
-    // Conver the readable-label into a curated tag which will be used as the
+    // Convert the readable-label into a curated tag which will be used as the
     // primary backend tag to reach this entry (used in the URLs)
     backendTags.unshift(FAUX_KEY_TAG_PREFIX + ':' + slugify(fauxKey));
 
@@ -92,5 +95,13 @@ var generateSelectedTagMap = function(tagMap, selectedTags) {
 module.exports = {
   generateTagMap: generateTagMap,
   generateSelectedTagMap: generateSelectedTagMap,
-  getSelectedEntriesInTagMap: getSelectedEntriesInTagMap
+  getSelectedEntriesInTagMap: getSelectedEntriesInTagMap,
+
+  tagConstants: {
+    FAUX_KEY_TAG_MAP_KEY_PREFIX: FAUX_KEY_TAG_MAP_KEY_PREFIX,
+    FAUX_KEY_TAG_PREFIX: FAUX_KEY_TAG_PREFIX,
+
+    SUGGESTED_TAG_LABEL: SUGGESTED_TAG_LABEL,
+    SUGGESTED_BACKEND_TAG: SUGGESTED_BACKEND_TAG
+  }
 };
