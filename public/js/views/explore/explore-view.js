@@ -1,10 +1,14 @@
 'use strict';
 
-var Marionette = require('backbone.marionette');
+var $ = require('jquery');
 var Backbone = require('backbone');
+var Marionette = require('backbone.marionette');
+var urlParse = require('url-parse');
 
 var frameUtils = require('utils/frame-utils');
 
+var modalRegion = require('components/modal-region');
+var LoginView = require('views/modals/login-view');
 var template = require('./tmpl/explore-view.hbs');
 var itemTemplate = require('../../../templates/partials/room_card.hbs');
 
@@ -78,14 +82,18 @@ var ExploreView = Marionette.LayoutView.extend({
     dialogRegion: 'body'
   },
   ui: {
+    signInButton: '.js-sign-in',
     createRoomButton: '.js-explore-create-room-button'
   },
   events: {
+    'click @ui.signInButton': 'popSignInModal',
     'click @ui.createRoomButton': 'popCreateRoomModal'
   },
 
   initialize: function() {
     //console.log('explore init');
+
+    $('.js-explore-tag-pill[data-needs-authentication]').on('click', this.popSignInModal);
   },
 
   initRoomCardListView: function(optionsForRegion) {
@@ -93,6 +101,18 @@ var ExploreView = Marionette.LayoutView.extend({
   },
   initTagPillListView: function(optionsForRegion) {
     return new TagPillListView(optionsForRegion({ }));
+  },
+
+  popSignInModal: function(e) {
+    var href = $(e.currentTarget).attr('href');
+    var parsedUrl = urlParse(href, true);
+
+    var modal = new LoginView(parsedUrl.query);
+    modalRegion.show(modal);
+    // hack this modal because we're not using history or routing here
+    modal.navigable = false;
+
+    e.preventDefault();
   },
 
   popCreateRoomModal: function(e) {
