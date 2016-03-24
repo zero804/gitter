@@ -66,6 +66,7 @@ onready(function() {
   updateRoomCardListVisibility();
 
 
+  /* * /
   // Hook up our pills to update the card list
   var toggleTagPillActive = function(el, state) {
     toggleClass(el, activeClass, state);
@@ -74,9 +75,8 @@ onready(function() {
   Array.prototype.forEach.call(tagPillElements, function(tagPillElement) {
     tagPillElement.addEventListener('click', function() {
       // Redirect to new page (we don't have a API to query client-side yet)
-      window.location.href = tagPillElement.getAttribute('href');
+      //window.location.href = tagPillElement.getAttribute('href');
 
-      /* * /
       // Only one tag can be selected at a time so
       // unselect all of the tags
       Array.prototype.forEach.call(tagPillElements, function(tagPillElement) {
@@ -91,9 +91,9 @@ onready(function() {
       appEvents.trigger('track-event', 'explore_pills_click', {
         tag: tagPillElement.textContent.toLowerCase()
       });
-      /* */
     });
   });
+  /* */
 
 
   // Expand/Collapse tag pill list
