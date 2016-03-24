@@ -16,6 +16,8 @@
 
 @page-bg-color: #ffffff;
 
+@explore-breakpoint-small: ~"(max-width: 550px)";
+
 @page-wrapper-max-width: 140rem;
 @page-wrapper-horizontal-padding: 2rem;
 
@@ -74,7 +76,7 @@ body {
 .explore-primary-header__sub-header {
   margin-left: 4rem;
 
-  @media (max-width: 550px) {
+  @media @explore-breakpoint-small {
     margin-left: 2rem;
     font-size: 1.8rem;
   }
@@ -106,7 +108,7 @@ body {
   padding-left: @page-wrapper-horizontal-padding;
   padding-right: @page-wrapper-horizontal-padding;
 
-  @media (max-width: 550px) {
+  @media @explore-breakpoint-small {
     margin-top: @section-spacing / 2;
   }
 }
@@ -114,7 +116,7 @@ body {
 .explore-secondary-header-info-bar {
   margin-bottom: @section-spacing;
 
-  @media (max-width: 550px) {
+  @media @explore-breakpoint-small {
     display: none;
   }
 }
@@ -181,7 +183,7 @@ body {
   margin-top: @section-spacing;
   margin-bottom: @section-spacing;
 
-  @media (max-width: 550px) {
+  @media @explore-breakpoint-small {
     margin-top: @section-spacing / 2;
     margin-bottom: @section-spacing / 2;
   }
