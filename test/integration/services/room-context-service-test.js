@@ -74,7 +74,7 @@ describe('room-context-service', function() {
     })
     .catch(function(err) {
       assert(err.status === 301);
-      assert(err.path === '/home');
+      assert(err.path === '/home/explore');
     })
     .nodeify(done);
   });

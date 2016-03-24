@@ -23,6 +23,7 @@ var FastAttachMixin = require('views/fast-attach-mixin');
 var timeFormat = require('gitter-web-shared/time/time-format');
 var fullTimeFormat = require('gitter-web-shared/time/full-time-format');
 var dataset = require('utils/dataset-shim');
+var toggleClass = require('utils/toggle-class');
 
 var RAF = require('utils/raf');
 var toggle = require('utils/toggle');
@@ -32,25 +33,6 @@ require('views/behaviors/highlight');
 require('views/behaviors/last-message-seen');
 require('views/behaviors/timeago');
 require('views/behaviors/tooltip');
-
-
-// Can't use `classList.toggle` with the second parameter (force)
-// Because IE11 does not support it
-var toggleClass = function(element, class1, force) {
-  if(arguments.length === 3) {
-    if(force) {
-      element.classList.add(class1);
-    }
-    else {
-      element.classList.remove(class1);
-    }
-  }
-  else {
-    element.classList.toggle(class1);
-  }
-
-  return force;
-};
 
 
 module.exports = (function() {

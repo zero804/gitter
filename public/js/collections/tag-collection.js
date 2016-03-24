@@ -1,6 +1,8 @@
 'use strict';
 
 var Backbone = require('backbone');
+var context = require('utils/context');
+var validateTag = require('gitter-web-shared/validation/validate-tag').validateTag;
 
 var TagModel = Backbone.Model.extend({
   defaults: {
@@ -15,14 +17,13 @@ var TagModel = Backbone.Model.extend({
   },
 
   validate: function(attrs) {
-    var tagLength = !!attrs.value && attrs.value.length;
-    if (!tagLength || tagLength <= 0 || tagLength > 20) {
-      //if we have an invalid tag the we want to reset the model
-      //the next valid input event will override it
-      this.set('value', '', { silent: true });
-      return 'Tags must be of a valid tagLength';
+    var isStaff = context.isStaff();
+    var result = validateTag(attrs.value, isStaff);
+
+    if(result.messages.length > 0) {
+      return result.messages.join(' ');
     }
-  },
+  }
 
 });
 

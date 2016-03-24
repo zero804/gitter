@@ -5,12 +5,15 @@ var _ = require('lodash');
 var collections = require('../utils/collections');
 var promiseUtils = require('../utils/promise-utils');
 var troupeService = require('./troupe-service');
+var roomMembershipService = require('./room-membership-service');
+var userService = require('./user-service');
+var userSettingsService = require('./user-settings-service');
 var graphSuggestions = require('gitter-web-suggestions');
 var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
-var chatService = require('./chat-service');
+var cacheWrapper = require('gitter-web-cache-wrapper');
 var debug = require('debug')('gitter:suggestions');
 
-var NUM_SUGGESTIONS = 5;
+var NUM_SUGGESTIONS = 10;
 var MAX_SUGGESTIONS_PER_ORG = 2;
 var HIGHLIGHTED_ROOMS = [
   {
@@ -35,26 +38,24 @@ var HIGHLIGHTED_ROOMS = [
     uri: 'webpack/webpack',
     localeLanguage: 'en',
   }, {
-    uri: 'ruby-vietnam/chat',
-    localeLanguage: 'vi',
-  }, {
     uri: 'angular-ui/ng-grid',
     localeLanguage: 'en',
   }
 ];
 
 
-function graphRooms(existingRooms, language) {
+var starredRepoRooms = Promise.method(function(user, existingRooms, localeLanguage) {
+  // TODO
+  return [];
+});
+
+function graphRooms(user, existingRooms, language) {
   // limit how many we send to neo4j
   var firstTen = existingRooms.slice(0, 10);
   return graphSuggestions.getSuggestionsForRooms(firstTen, language)
     .then(function(suggestions) {
       var roomIds = _.pluck(suggestions, 'roomId');
-      return troupeService.findByIdsLean(roomIds, {
-        uri: 1,
-        lcOwner: 1,
-        userCount: 1
-      });
+      return troupeService.findByIdsLean(roomIds);
     })
     .then(function(suggestedRooms) {
       // Make sure there are no more than MAX_SUGGESTIONS_PER_ORG per
@@ -73,7 +74,7 @@ function graphRooms(existingRooms, language) {
     });
 }
 
-function siblingRooms(existingRooms, language) {
+function siblingRooms(user, existingRooms, language) {
   var orgNames = _.uniq(_.pluck(existingRooms, 'lcOwner'));
   return Promise.all(_.map(orgNames, function(orgName) {
       // TODO: include private/inherited rooms for orgs you're in. Requires
@@ -83,11 +84,14 @@ function siblingRooms(existingRooms, language) {
       return troupeService.findChildRoomsForOrg(orgName, {security: 'PUBLIC'});
     }))
     .then(function(arrays) {
-      return Array.prototype.concat.apply([], arrays);
+      var suggestedRooms = Array.prototype.concat.apply([], arrays);
+      return suggestedRooms;
     });
 }
 
-function hilightedRooms(existingRooms, language) {
+function hilightedRooms(user, existingRooms, language) {
+  // TODO: maybe we should pick some random rooms that are tagged by staff to
+  // be featured here rather than the hardcoded hilighted list?
   var filtered = _.filter(HIGHLIGHTED_ROOMS, function(roomInfo) {
     var roomLang = roomInfo.localeLanguage;
     return (roomLang == 'en' || roomLang == 'language');
@@ -97,23 +101,30 @@ function hilightedRooms(existingRooms, language) {
   }));
 }
 
+function getId(item) {
+  return (item.id) ? item.id : ''+item._id;
+}
+
 function filterRooms(suggested, existing) {
   // remove all the nulls/undefineds from things that didn't exist
-  filtered = _.filter(suggested);
+  var filtered = _.filter(suggested);
 
   // filter out the existing rooms
-  var existingMap = _.indexBy(existing, '_id');
-  var filtered = _.filter(filtered, function(room) {
-    return existingMap[room._id] === undefined;
+  var existingMap = _.indexBy(existing, function(item) {
+    return getId(item);
+  });
+  filtered = _.filter(filtered, function(room) {
+    return existingMap[getId(room)] === undefined;
   })
 
   // filter out duplicates
   var roomMap = {};
   filtered = _.filter(filtered, function(room) {
-    if (roomMap[room._id]) {
+    var roomId = getId(room);
+    if (roomMap[roomId]) {
       return false;
     } else {
-      roomMap[room._id] = true;
+      roomMap[roomId] = true;
       return true;
     }
   });
@@ -122,12 +133,13 @@ function filterRooms(suggested, existing) {
 }
 
 var recommenders = [
+  starredRepoRooms,
   graphRooms,
   siblingRooms,
   hilightedRooms
 ];
 
-function findSuggestionsForRooms(existingRooms, language) {
+function findSuggestionsForRooms(user, existingRooms, language) {
   language = language || 'en';
 
   // 1to1 rooms aren't included in the graph anyway, so filter them out first
@@ -138,21 +150,31 @@ function findSuggestionsForRooms(existingRooms, language) {
   var filterSuggestions = function(results) {
     return filterRooms(results, existingRooms);
   };
-  return promiseUtils.waterfall(recommenders, [existingRooms, language], filterSuggestions, NUM_SUGGESTIONS)
-    .then(function(suggestedRooms) {
-      // pre-fill the extra values we'll need
-      return Promise.all(suggestedRooms.map(function(room) {
-        room.avatarUrl = resolveRoomAvatarUrl(room, 160);
-        return chatService.getRoughMessageCount(room.id)
-          .then(function(messageCount) {
-            room.messageCount = messageCount;
-          });
-        }))
-        .then(function() {
-          return suggestedRooms;
-        });
-    });
+  return promiseUtils.waterfall(recommenders, [user, existingRooms, language], filterSuggestions, NUM_SUGGESTIONS);
 }
 exports.findSuggestionsForRooms = findSuggestionsForRooms;
 
+function findRoomsByUserId(userId) {
+  return roomMembershipService.findRoomIdsForUser(userId)
+    .then(function(roomIds) {
+      return troupeService.findByIdsLean(roomIds, {
+        uri: 1,
+        lcOwner: 1,
+        lang: 1,
+        oneToOne: 1
+      });
+    });
+}
 
+// cache by userId
+exports.findSuggestionsForUserId = cacheWrapper('findSuggestionsForUserId',
+  function(userId) {
+    return Promise.all([
+      userService.findById(userId),
+      findRoomsByUserId(userId),
+      userSettingsService.getUserSettings(userId, 'lang')
+    ])
+    .spread(function(user, existingRooms, language) {
+      return findSuggestionsForRooms(user, existingRooms, language);
+    })
+  });
