@@ -367,7 +367,7 @@ makeTestTasks('test-mocha', function(name, files) {
 
   var grepOpt = argv.grep || argv.g;
   if(grepOpt) {
-    mochaOpts.grep = grepOpt
+    mochaOpts.grep = grepOpt;
   }
 
   return gulp.src(files, { read: false })

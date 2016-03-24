@@ -32,6 +32,7 @@ var resolveRoomAvatarSrcSet        = require('gitter-web-shared/avatars/resolve-
 var getOrgNameFromTroupeName       = require('gitter-web-shared/get-org-name-from-troupe-name');
 var parseRoomsIntoLeftMenuRoomList = require('gitter-web-shared/rooms/left-menu-room-list.js');
 var parseSnapshotsForPageContext   = require('gitter-web-shared/parse/snapshots');
+var generateRoomCardContext = require('gitter-web-shared/templates/partials/room-card-context-generator');
 
 /* How many chats to send back */
 var INITIAL_CHAT_COUNT = 50;
@@ -467,6 +468,7 @@ function renderOrgPage(req, res, next) {
     orgPermissionModel(req.user, 'join', org)
   ])
   .spread(function (ghOrg,rooms, troupeContext, isOrgAdmin, isOrgMember) {
+    var isStaff = !!(troupeContext.user || {}).staff;
 
     // Filter out PRIVATE rooms
     _.remove(rooms, function(room) { return room.security === 'PRIVATE'; });
@@ -519,11 +521,12 @@ function renderOrgPage(req, res, next) {
       });
 
       // Custom data for the org page
-      rooms.forEach(function(room) {
-        var nameParts = room.uri.split('/');
-        room.shortName = nameParts.length === 3 ? nameParts[1] + '/' + nameParts[2] : nameParts[1] || nameParts[0];
-        room.canEditTags = isOrgAdmin;
-        room.private = room.security !== 'PUBLIC';
+      rooms = rooms.map(function(room) {
+        var result = generateRoomCardContext(room, {
+          isStaff: isStaff
+        });
+        result.isStaff = isOrgAdmin || result.isStaff;
+        return result;
       });
 
       // This is used to track pageViews in mixpanel
@@ -540,6 +543,7 @@ function renderOrgPage(req, res, next) {
       res.render('org-page', {
         socialUrl: url,
         isLoggedIn: !!req.user,
+        exploreBaseUrl: '/home/~explore',
         roomCount: roomCount,
         orgUserCount: orgUserCount,
         org: ghOrg,

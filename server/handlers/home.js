@@ -1,6 +1,7 @@
 "use strict";
 
 var express            = require('express');
+var urlJoin            = require('url-join');
 var ensureLoggedIn     = require('../web/middlewares/ensure-logged-in');
 var appMiddleware      = require('./app/middleware');
 var timezoneMiddleware = require('../web/middlewares/timezone');
@@ -38,7 +39,7 @@ router.get('/~home',
   });
 
 
-// This is used from the explore page
+// Used for the create button on `/home`
 router.get('/createroom',
   identifyRoute('create-room-redirect'),
   ensureLoggedIn,
@@ -47,7 +48,7 @@ router.get('/createroom',
     res.redirect('/home#createroom');
   });
 
-router.get('/explore',
+router.get(new RegExp('/explore(.*)?'),
   identifyRoute('home-explore'),
   ensureLoggedIn,
   featureToggles,
@@ -56,7 +57,9 @@ router.get('/explore',
       uri: 'home'
     };
 
-    appRender.renderMainFrame(req, res, next, 'explore');
+    var frameUrl = urlJoin('explore', (req.params[0] || ''));
+
+    appRender.renderMainFrame(req, res, next, frameUrl);
   });
 
 router.get('/learn',
