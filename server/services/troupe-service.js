@@ -14,10 +14,10 @@ var roomPermissionsModel  = require('./room-permissions-model');
 var mongooseUtils         = require('../utils/mongoose-utils');
 var StatusError           = require('statuserror');
 var roomMembershipService = require('./room-membership-service');
+var getMaxTagLength       = require('gitter-web-shared/validation/validate-tag').getMaxTagLength;
 var debug                 = require('debug')('gitter:troupe-service');
 
 var MAX_RAW_TAGS_LENGTH = 100;
-var MAX_TAG_LENGTH = 20;
 
 function findByUri(uri, callback) {
   var lcUri = uri.toLowerCase();
@@ -270,7 +270,7 @@ function updateTags(user, room, tags) {
           return !!tag; //
         })
         .map(function(tag) {
-          return tag.trim().slice(0, MAX_TAG_LENGTH);
+          return tag.trim().slice(0, getMaxTagLength(isStaff));
         })
         .filter(function(tag) {
           // staff can do anything

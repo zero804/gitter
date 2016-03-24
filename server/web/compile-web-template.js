@@ -12,6 +12,10 @@ setImmediate(function() {
   registerHelpers(hbsInstance);
 });
 
+var registerPartials = require('./register-partials');
+var partialNames = registerPartials(hbsInstance);
+
+
 /**
  * compiles templates for other modules given a path
  */

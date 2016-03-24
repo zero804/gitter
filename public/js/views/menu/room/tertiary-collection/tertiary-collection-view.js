@@ -1,10 +1,13 @@
 'use strict';
 
 var _                       = require('underscore');
+var Marionette              = require('backbone.marionette');
 var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 var BaseCollectionView      = require('../base-collection/base-collection-view');
 var BaseCollectionItemView  = require('../base-collection/base-collection-item-view');
 var roomNameShortener       = require('gitter-web-shared/room-name-shortener');
+var EmptySearchView         = require('./tertiary-collection-item-search-empty-view');
+var toggleClass             = require('utils/toggle-class');
 
 var proto = BaseCollectionView.prototype;
 
@@ -23,6 +26,10 @@ module.exports =  BaseCollectionView.extend({
   childView:          ItemView,
   className:          'tertiary-collection',
 
+  ui :{
+    header: '#collection-header'
+  },
+
   initialize: function(attrs) {
     this.roomMenuModel  = attrs.roomMenuModel;
     this.roomCollection = attrs.roomCollection;
@@ -30,6 +37,16 @@ module.exports =  BaseCollectionView.extend({
     this.listenTo(this.collection, 'filter-complete', this.render, this);
     BaseCollectionView.prototype.initialize.apply(this, arguments);
   },
+
+  getEmptyView: function(){
+    switch(this.roomMenuModel.get('state')) {
+      case 'search':
+        return EmptySearchView;
+      default:
+        return Marionette.ItemView.extend({ template: false });
+    }
+  },
+
 
   setActive: function() {
     switch (this.roomMenuModel.get('state')) {
@@ -67,6 +84,17 @@ module.exports =  BaseCollectionView.extend({
 
   onSearchItemClicked: function(view) {
     this.roomMenuModel.set('searchTerm', view.model.get('name'));
+  },
+
+  onRender: function (){
+    BaseCollectionView.prototype.onRender.apply(this, arguments);
+    if(this.ui.header && this.ui.header[0]) {
+      toggleClass(
+        this.ui.header[0],
+        'hidden',
+        (this.isEmpty() && (this.roomMenuModel.get('state') === 'search'))
+      );
+    }
   },
 
   onDestroy: function() {
