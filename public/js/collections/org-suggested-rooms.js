@@ -7,7 +7,7 @@ var backboneUrlResolver = require('backbone-url-resolver');
 var SyncMixin           = require('./sync-mixin');
 
 var SuggestedCollection = Backbone.Collection.extend({
-  initialize: function(models, attrs) {
+  initialize: function(models, attrs) { //jshint unused: true
 
     if (!attrs || !attrs.contextModel) {
       throw new Error('A valid model must be passed to SuggestedOrgCollection when initialized');

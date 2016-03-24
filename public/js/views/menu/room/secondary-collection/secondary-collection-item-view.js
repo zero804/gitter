@@ -6,6 +6,7 @@ var BaseCollectionItemView  = require('../base-collection/base-collection-item-v
 var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 
 module.exports = BaseCollectionItemView.extend({
+
   serializeData: function() {
     var data = this.model.toJSON();
 

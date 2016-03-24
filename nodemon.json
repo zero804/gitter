@@ -1,7 +1,8 @@
 
 {
-  "watch": ["server", "shared", "modules"],
-  "ext": "js",
+  "watch": ["server", "shared", "modules", "public"],
+  "ext": "js,json,hbs",
+  "ignore": ["public/**/!(*.hbs)"],
   "env": {
     "NODEMON": "1",
     "Q_DEBUG": "1",
