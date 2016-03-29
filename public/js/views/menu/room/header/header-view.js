@@ -9,6 +9,13 @@ module.exports = Marionette.ItemView.extend({
 
   template: template,
 
+
+  behaviors: {
+    Tooltip: {
+      '.js-left-menu-org-page-action': { placement: 'left' }
+    }
+  },
+
   modelEvents: {
     'change:state':                'updateActiveElement',
     'change:selectedOrgName':      'render',
