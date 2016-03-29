@@ -66,7 +66,7 @@ FilteredRoomCollection.prototype = _.extend(
     this.setFilter();
   },
 
-  filterDefault: sortAndFilters.leftMenu.filter,
+  filterDefault: sortAndFilters.recents.filter,
   filterFavourite: sortAndFilters.favourites.filter,
 
   filterOneToOnes: function(model) {
