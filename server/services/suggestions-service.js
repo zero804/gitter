@@ -91,7 +91,9 @@ var ownedRepoRooms = Promise.method(function(options) {
   return ownedRepos(user)
     .then(reposToRooms)
     .then(function(rooms) {
-      debug("ownedRepoRooms", _.pluck(rooms, "uri"));
+      if (debug.enabled) {
+        debug("ownedRepoRooms", _.pluck(rooms, "uri"));
+      }
       return rooms;
     });
 });
@@ -107,7 +109,9 @@ var starredRepoRooms = Promise.method(function(options) {
   return starredRepos(user)
     .then(reposToRooms)
     .then(function(rooms) {
-      debug("starredRepoRooms", _.pluck(rooms, "uri"));
+      if (debug.enabled) {
+        debug("starredRepoRooms", _.pluck(rooms, "uri"));
+      }
       return rooms;
     });
 });
@@ -123,7 +127,9 @@ var watchedRepoRooms = Promise.method(function(options) {
   return watchedRepos(user)
     .then(reposToRooms)
     .then(function(rooms) {
-      debug("watchedRepoRooms", _.pluck(rooms, "uri"));
+      if (debug.enabled) {
+        debug("watchedRepoRooms", _.pluck(rooms, "uri"));
+      }
       return rooms;
     });
 });
@@ -161,7 +167,9 @@ var graphRooms = Promise.method(function(options) {
         return (orgTotals[room.lcOwner] > MAX_SUGGESTIONS_PER_ORG);
       });
 
-      debug("graphRooms", _.pluck(suggestedRooms, "uri"));
+      if (debug.enabled) {
+        debug("graphRooms", _.pluck(suggestedRooms, "uri"));
+      }
 
       return suggestedRooms;
     });
@@ -183,7 +191,9 @@ var siblingRooms = Promise.method(function(options) {
     .then(function(arrays) {
       var suggestedRooms = Array.prototype.concat.apply([], arrays);
 
-      debug("siblingRooms", _.pluck(suggestedRooms, "uri"));
+      if (debug.enabled) {
+        debug("siblingRooms", _.pluck(suggestedRooms, "uri"));
+      }
 
       return suggestedRooms;
     });
@@ -205,7 +215,9 @@ function hilightedRooms(options) {
     }))
     .then(function(suggestedRooms) {
       if (suggestedRooms.length) {
-        debug("hilightedRooms", _.pluck(suggestedRooms, "uri"));
+        if (debug.enabled) {
+          debug("hilightedRooms", _.pluck(suggestedRooms, "uri"));
+        }
       }
 
       return suggestedRooms;
