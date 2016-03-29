@@ -55,6 +55,19 @@
           <footer id="panel-footer" class="panel-footer-container"></footer>
           <div class="nano-content panel-content">
             <div id="search-input"></div>
+
+            <section id="favourite-collection" class="left-menu-collection">
+              <div class="primary-collection loaded active">
+                <div id="collection-list">
+                  {{#each leftMenuFavouriteRooms}}
+                    <div class="room-item" id="{{id}}"  data-id="{{id}}">
+                      {{{ prerenderView "js/views/menu/room/primary-collection/primary-collection-view" }}}
+                    </div>
+                  {{/each}}
+                </div>
+              </div>
+            </section>
+
             <section id="primary-collection" class="left-menu-collection">
               <div class="primary-collection loaded active">
                 <header><h2 class="collection__title hidden" id="primary-collection-search-header">Rooms &amp; People</h2></header>
@@ -67,6 +80,7 @@
                 </div>
               </div>
             </section>
+
             <section id="secondary-collection" class="left-menu-collection"></section>
             <section id="tertiary-collection" class="left-menu-collection"></section>
           </div>
