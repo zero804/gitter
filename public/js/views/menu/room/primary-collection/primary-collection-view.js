@@ -101,9 +101,9 @@ var PrimaryCollectionView = BaseCollectionView.extend({
 
   onFavouritesSorted: function(targetID, siblingID) {
 
-    var target       = this.collection.get(targetID);
-    var sibling      = this.collection.get(siblingID);
-    var index = !!sibling ? sibling.get('favourite') : (this.getHighestFavourite() + 1);
+    var target  = this.collection.get(targetID);
+    var sibling = this.collection.get(siblingID);
+    var index   = !!sibling ? sibling.get('favourite') : (this.getHighestFavourite() + 1);
 
     //Save the new favourite
     target.set('favourite', index);
