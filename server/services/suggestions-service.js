@@ -9,6 +9,7 @@ var troupeService = require('./troupe-service');
 var roomMembershipService = require('./room-membership-service');
 var userService = require('./user-service');
 var userSettingsService = require('./user-settings-service');
+var userScopes = require('../utils/models/user-scopes');
 var graphSuggestions = require('gitter-web-suggestions');
 var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
 var cacheWrapper = require('gitter-web-cache-wrapper');
@@ -78,7 +79,7 @@ function reposToRooms(repos) {
 
 var ownedRepoRooms = Promise.method(function(options) {
   var user = options.user;
-  if (!user) {
+  if (!user || !userScopes.isGitHubUser(user)) {
     return [];
   }
 
@@ -94,7 +95,7 @@ var ownedRepoRooms = Promise.method(function(options) {
 
 var starredRepoRooms = Promise.method(function(options) {
   var user = options.user;
-  if (!user) {
+  if (!user || !userScopes.isGitHubUser(user)) {
     return [];
   }
 
@@ -110,7 +111,7 @@ var starredRepoRooms = Promise.method(function(options) {
 
 var watchedRepoRooms = Promise.method(function(options) {
   var user = options.user;
-  if (!user) {
+  if (!user || !userScopes.isGitHubUser(user)) {
     return [];
   }
 
