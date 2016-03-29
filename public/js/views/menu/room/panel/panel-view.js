@@ -4,6 +4,7 @@ var _                        = require('underscore');
 var Marionette               = require('backbone.marionette');
 var PanelHeaderView          = require('../header/header-view');
 var PanelFooterView          = require('../footer/footer-view');
+var FavouriteCollectionView  = require('../favourite-collection/favourite-collection-view');
 var PrimaryCollectionView    = require('../primary-collection/primary-collection-view');
 var PrimaryCollectionModel   = require('../primary-collection/primary-collection-model');
 var SecondaryCollectionView  = require('../secondary-collection/secondary-collection-view');
@@ -26,6 +27,7 @@ module.exports = Marionette.LayoutView.extend({
       header:              { el: '#panel-header', init: 'initHeader' },
       profile:             { el: '#profile-menu', init: 'initProfileMenu' },
       searchInput:         { el: '#search-input', init: 'initSearchInput' },
+      favouriteCollection: { el: '#favourite-collection', init: 'initFavouriteCollection' },
       primaryCollection:   { el: '#primary-collection', init: 'initPrimaryCollection' },
       secondaryCollection: { el: '#secondary-collection', init: 'initSecondaryCollection' },
       teritaryCollection:  { el: '#tertiary-collection', init: 'initTertiaryCollection' },
@@ -46,6 +48,18 @@ module.exports = Marionette.LayoutView.extend({
 
   initSearchInput: function(optionsForRegion) {
     return new SearchInputView(optionsForRegion({ model: this.model }));
+  },
+
+  initFavouriteCollection: function (optionsForRegion){
+    console.log(optionsForRegion());
+    return new FavouriteCollectionView(optionsForRegion({
+      collection:    this.model.favouriteCollection,
+      model:         new PrimaryCollectionModel(null, { roomMenuModel: this.model }),
+      roomMenuModel: this.model,
+      bus:           this.bus,
+      dndCtrl:       this.dndCtrl,
+    }));
+
   },
 
   initPrimaryCollection: function(optionsForRegion) {
