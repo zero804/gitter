@@ -17,9 +17,7 @@ _.extend(
     filterDefault: sortAndFilters.favourites.filter,
     comparator:    sortAndFilters.favourites.sort,
     filterOneToOnes: function(model) {
-      //if(model.get('name') === 'pastey151') { debugger; }
-      return false;
-      //return one2oneFavouriteFilter(model.toJSON());
+      return one2oneFavouriteFilter(model.toJSON());
     },
     filterOrgRooms: function(model) {
       var orgName = this.roomModel.get('selectedOrgName');
