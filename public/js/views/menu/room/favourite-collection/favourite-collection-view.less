@@ -1,0 +1,19 @@
+@import "../../../../../less/components/menu/room/collection";
+
+.favourite-collection {
+  .m-collection();
+  /*
+  This is pretty gross JP 29/3/16
+  Basically we don't want to remove the `margin-top: 1.3rem` from the `.{primary/secondary/tertiary}-collection`'s
+  because this will cause A LOT of vertical spacing issues.
+  We also need the favourite collection to sit seamlessly against the primary collection when visible
+  as such, when visible, this negative margin will negate the margin-top styles applied to `.primary-collection`
+  but leave the spacing alone for the rest of the menu states
+
+  TO BE CLEAR:
+  This is a hack and a consequence of adding the favourite collection into the menu sections
+  as an after thought and not as part of the design. Please ensure you consider this when you find this code.
+  Don't give me a hard time, I know its shit. Thanks. JP.
+  */
+  margin-bottom: -1.3rem;
+}
