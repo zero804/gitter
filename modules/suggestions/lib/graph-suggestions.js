@@ -29,7 +29,7 @@ function queryRoomSuggestions(roomId, userId) {
                  "WHERE u.userId = {userId} AND r.roomId = {roomId} AND NOT(u-[:MEMBER]-r2) AND r2.security = 'PUBLIC'" +
                  "RETURN r2.roomId, count(*) * r2.weight as occurrence " +
                  "ORDER BY occurrence DESC " +
-                 "LIMIT 6",
+                 "LIMIT 20",
     {
       roomId: roomId,
       userId: userId
@@ -41,7 +41,7 @@ function queryRoomSuggestions(roomId, userId) {
                "WHERE r.roomId = {roomId} AND r2.security = 'PUBLIC'" +
                "RETURN r2.roomId, count(*) * r2.weight as occurrence " +
                "ORDER BY occurrence DESC " +
-               "LIMIT 6",
+               "LIMIT 20",
   {
     roomId: roomId
   });
@@ -65,7 +65,7 @@ function getSuggestionsForUser(user /*, locale */) {
                "WHERE u.userId = {userId} AND NOT(u-[:MEMBER]-r) AND r.security = 'PUBLIC'" +
                "RETURN r.roomId, count(*) * r.weight as occurrence " +
                "ORDER BY occurrence DESC " +
-               "LIMIT 6",
+               "LIMIT 20",
           {
             userId: user.id,
           })
