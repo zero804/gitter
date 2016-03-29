@@ -71,7 +71,11 @@ getUserFromMongo(opts)
     ]);
   })
   .spread(function(existingRooms, language) {
-    return suggestionsService.findSuggestionsForRooms(user, existingRooms, language);
+    return suggestionsService.findSuggestionsForRooms({
+      user: user,
+      rooms: existingRooms,
+      language: language
+    });
   })
   .then(function(suggestedRooms) {
     return restSerializer.serialize(suggestedRooms, new restSerializer.SuggestedRoomStrategy());
