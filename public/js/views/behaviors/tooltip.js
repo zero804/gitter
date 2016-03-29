@@ -44,8 +44,6 @@ var Behavior = Marionette.Behavior.extend({
     var self = this;
 
     Object.keys(this.options).forEach(function(selector) {
-      if (self.handlers[selector]) return; // Already listening
-
       var $el = selector === '' ? self.$el : self.$el.find(selector);
       var el = $el[0];
       if (!el) {
@@ -78,18 +76,16 @@ var Behavior = Marionette.Behavior.extend({
   initTooltip: function(selector, $el, el) {
     var tooltipOptions = this.options[selector];
 
-    var title;
+    var title = tooltipOptions.title || el.getAttribute('title');
     if (tooltipOptions.titleFn) {
       title = this.view[tooltipOptions.titleFn].bind(this.view);
-    } else {
-      title = tooltipOptions.title;
     }
 
     this.tooltips[selector] = $el;
     $el.tooltip({
       html: tooltipOptions.html,
       title: title,
-      placement : tooltipOptions.placement,
+      placement: tooltipOptions.placement,
       container: tooltipOptions.container || 'body'
     });
 

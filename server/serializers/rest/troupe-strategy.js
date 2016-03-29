@@ -300,6 +300,7 @@ var TroupeOwnerIsOrgStrategy = function (){
     .nodeify(callback);
   };
 
+
   this.map = function (troupe){
     return (ownerIsOrg[troupe.id] || false);
   };

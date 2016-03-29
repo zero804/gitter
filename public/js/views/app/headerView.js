@@ -52,6 +52,8 @@ module.exports = Marionette.ItemView.extend({
     Tooltip: {
       '.js-chat-name': { titleFn: 'getChatNameTitle', placement: 'right' },
       '.js-org-page':  { titleFn: 'getOrgPageTitle', placement: 'left' },
+      '.js-favourite-button': { placement: 'left' },
+      '.js-chat-settings': { placement: 'left' }
     },
   },
 
