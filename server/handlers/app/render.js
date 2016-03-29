@@ -309,7 +309,7 @@ function renderChat(req, res, options, next) {
         options.generateContext === false ? null : contextGenerator.generateTroupeContext(req, { snapshots: { chat: snapshotOptions }, permalinkChatId: aroundId }),
         restful.serializeChatsForTroupe(troupe.id, userId, chatSerializerOptions),
         options.fetchEvents === false ? null : restful.serializeEventsForTroupe(troupe.id, userId),
-        options.fetchUsers === false ? null :restful.serializeUsersForTroupe(troupe.id, userId, userSerializerOptions),
+        options.fetchUsers === false ? null : restful.serializeUsersForTroupe(troupe.id, userId, userSerializerOptions),
       ]).spread(function (troupeContext, chats, activityEvents, users, ownerIsOrg) {
         var initialChat = _.find(chats, function(chat) { return chat.initial; });
         var initialBottom = !initialChat;
@@ -345,6 +345,8 @@ function renderChat(req, res, options, next) {
         troupeContext.troupe.ownerIsOrg = ownerIsOrg;
         var orgName     = getOrgNameFromTroupeName(troupeContext.troupe.name);
         var orgPageHref = '/orgs/' + orgName + '/rooms/';
+
+        console.log('ownerIsOrg', ownerIsOrg);
 
         var renderOptions = _.extend({
             isRepo: troupe.githubType === 'REPO',
