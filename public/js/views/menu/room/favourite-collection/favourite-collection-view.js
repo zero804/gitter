@@ -1,5 +1,6 @@
 'use strict';
 
+var Marionette = require('backbone.marionette');
 var PrimaryCollectionView = require('../primary-collection/primary-collection-view');
 var BaseCollectionView    = require('../base-collection/base-collection-view');
 
@@ -18,6 +19,13 @@ var FavouriteCollection = PrimaryCollectionView.extend({
   //If the complexity around this rises I may consider it
   setActive: function (){
     BaseCollectionView.prototype.setActive.apply(this, arguments);
+  },
+
+  getEmptyView: function(){
+    switch(this.roomMenuModel.get('state')) {
+      default:
+        return Marionette.ItemView.extend({ template: false });
+    }
   },
 
 });
