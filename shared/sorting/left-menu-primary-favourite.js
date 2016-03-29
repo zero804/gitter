@@ -1,5 +1,5 @@
 'use strict';
 
-module.exports = function leftMenuFavouriteSort(a, b){
-  return a.favourite < b.favourite ? -1 : 1;
-};
+var sort = require('gitter-realtime-client/lib/sorts-filters').pojo.favourites.sort;
+
+module.exports = sort;

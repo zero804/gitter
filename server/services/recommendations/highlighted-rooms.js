@@ -46,13 +46,6 @@ var HIGHLIGHTED_ROOMS = [
     roomExists: true,
     highlighted: true
   }, {
-    uri: 'ruby-vietnam/chat',
-    language: 'Ruby',
-    githubType: 'ORG_CHANNEL',
-    localeLanguage: 'vi',
-    roomExists: true,
-    highlighted: true
-  }, {
     uri: 'angular-ui/ng-grid',
     language: 'JavaScript',
     githubType: 'REPO',
