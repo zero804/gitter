@@ -24,7 +24,7 @@ module.exports = {
 
             return _.reject(suggestions, function(suggestion) {
               return idMap[suggestion.roomId];
-            });
+            }).slice(0, 6);
           }
         );
       })
