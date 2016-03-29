@@ -117,7 +117,7 @@ var View = Marionette.ItemView.extend({
 
     var mode = this.ui.options.val();
     // TODO: this should go to the userRoom endpoint as a patch
-    apiClient.userRoom.patch('/settings/notifications', { mode: mode })
+    apiClient.userRoom.put('/settings/notifications', { mode: mode })
       .bind(this)
       .then(function(settings) {
         this.model.set(settings);
