@@ -19,7 +19,7 @@ var opts = require('yargs')
       required: true,
       description: 'New username for the user'
    })
-   .help('help')
+  .help('help')
   .alias('help', 'h')
   .argv;
 

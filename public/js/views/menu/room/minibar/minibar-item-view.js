@@ -1,10 +1,10 @@
 'use strict';
 
-var _             = require('underscore');
-var Marionette    = require('backbone.marionette');
-var itemTemplate  = require('./minibar-item-view.hbs');
-var getRoomAvatar = require('gitter-web-shared/avatars/get-room-avatar');
-var toggleClass   = require('utils/toggle-class');
+var _                 = require('underscore');
+var Marionette        = require('backbone.marionette');
+var itemTemplate      = require('./minibar-item-view.hbs');
+var resolveRoomAvatar = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
+var toggleClass       = require('utils/toggle-class');
 
 module.exports =  Marionette.ItemView.extend({
   tagName:      'li',
@@ -35,13 +35,13 @@ module.exports =  Marionette.ItemView.extend({
     var data = this.model.toJSON();
     var activity = (data.mentions || data.unreadItems) ? false : data.activity;
     return _.extend({}, data, {
-      isHome:      (data.type === 'all'),
-      isSearch:    (data.type === 'search'),
-      isFavourite: (data.type === 'favourite'),
-      isPeople:    (data.type === 'people'),
-      isOrg:       (data.type === 'org'),
-      avatarUrl:   getRoomAvatar(data.name),
-      activity:    activity,
+      isHome:       (data.type === 'all'),
+      isSearch:     (data.type === 'search'),
+      isFavourite:  (data.type === 'favourite'),
+      isPeople:     (data.type === 'people'),
+      isOrg:        (data.type === 'org'),
+      avatarSrcset: resolveRoomAvatar({ uri: data.name }, 23),
+      activity:     activity,
     });
   },
 

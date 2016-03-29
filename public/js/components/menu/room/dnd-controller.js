@@ -29,7 +29,9 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
   },
 
   shouldItemMove: function (el){
-    return (el.tagName  !== 'A' && !el.classList.contains('search-message-empty-container'));
+    return (el.tagName  !== 'A' &&
+            !el.classList.contains('search-message-empty-container') &&
+            el.id !== 'empty-view');
   },
 
   pushContainer: function (el){

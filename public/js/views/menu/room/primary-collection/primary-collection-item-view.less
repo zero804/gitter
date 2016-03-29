@@ -1,6 +1,7 @@
 @import "trp3Vars";
 @import "../../../../../less/components/menu/room/avatar.less";
 @import "../../../../../less/components/menu/room/menu-text.less";
+@import "../../../../../less/components/menu/room/room-item.less";
 @import "../base-collection/base-collection-view.less";
 @import (inline) "../../../../../../node_modules/dragula/dist/dragula.css";
 
@@ -10,59 +11,14 @@ JP 11/2/16
 */
 
 .room-item-selected() {
-  cursor: pointer;
+  cursor:           pointer;
   background-color: rgba(255, 255, 255, .1);
-  color: white;
+  color:            white;
 }
 
 //TODO this name is stupid, replace it JP 8/1/16
 .room-item {
-  height:     @menu-item-height * 3;
-  max-height: @menu-item-height;
-  opacity:    0;
-  transition: opacity .2s ease-in, max-height .2s ease-in;
-  overflow:   hidden;
-
-  &.active {
-    max-height: @menu-item-height * 3;
-  }
-
-  .loaded & {
-    opacity: 1;
-  }
-
-  &.gu-mirror, &.gu-transit {
-
-    .room-item-selected();
-    max-height: @menu-item-height;
-    opacity: 1;
-
-    & .room-item__options-menu {
-      display: none;
-    }
-  }
-
-  &:hover {
-    //.room-item-selected();
-
-    & .room-item__options {
-      opacity: 1;
-    }
-  }
-
-  .desktop & {
-    //margin-left:   @desktop-menu-left-padding / 2;
-  }
-
-  .mobile & {
-    padding-left:  @mobile-menu-left-padding;
-    padding-right: @mobile-menu-left-padding;
-  }
-}
-
-.room-item--search-message {
-  .room-item();
-  max-height: @menu-item-height * 2;
+  .m-room-item();
 }
 
 .room-item--one2one {
@@ -73,15 +29,6 @@ JP 11/2/16
     .room-item__container {
       background: rgba(255, 255, 255, .1);
     }
-  }
-}
-
-.room-item--search {
-  .room-item();
-  opacity: 1;
-
-  &:hover{
-    cursor: pointer;
   }
 }
 
@@ -121,40 +68,9 @@ JP 11/2/16
 
 }
 
-.room-item__container--search {
-  .room-item__container();
-  flex-wrap:   wrap;
-  align-items: center;
-  padding-top: @desktop-menu-left-padding / 4;
-}
-
-.room-item__search-detail {
-  flex-basis:    80%;
-  box-sizing:    border-box;
-  margin:        0;
-  white-space:   nowrap;
-  overflow:      hidden;
-  text-overflow: ellipsis;
-  padding-right: @desktop-menu-left-padding / 2;
-  color:         @search-message-detail-color;
-  font-size:     1.3rem;
-}
-
-.room-item__search__link {
-  color: @search-message-detail-color;
-}
-
 .room-item__avatar {
   .room-menu-avatar();
   margin-left:  @desktop-menu-left-padding / 2;
-}
-
-
-.room-item__avatar--search {
-  .room-menu-avatar();
-  margin-left: @desktop-menu-left-padding / 2;
-  height:      @menu-search-avatar-dims;
-  width:       @menu-search-avatar-dims;
 }
 
 .room-item__title {
@@ -162,16 +78,6 @@ JP 11/2/16
   &:first-child {
     margin-left: @desktop-menu-left-padding / 2;
   }
-}
-
-.room-item__title--search {
-  .room-item__title();
-  height:        @menu-item-height;
-  overflow:      hidden;
-  max-width:     100%;
-  font-size:     1.4rem;
-  text-overflow: ellipsis;
-  margin-left:   @desktop-menu-left-padding / 2;
 }
 
 .notification (@size){
@@ -272,44 +178,4 @@ JP 11/2/16
   &:hover {
     text-decoration: none;
   }
-}
-
-.search-message-empty-container {
-  display:         flex;
-  flex-direction:  row;
-  align-items:     center;
-  justify-content: flex-start;
-  padding-left:    4.5rem;
-}
-
-.search-message-empty-decal {
-  margin-right: 2rem;
-  color:        @search-message-decal-color;
-  transform:    rotate(90deg);
-  font-size:    6rem;
-  user-select:  none;
-}
-
-.search-message-empty-decal-eyes {
-  position: relative;
-  bottom:   2px;
-}
-
-.search-message-empty-heading {
-  .collection__title();
-  flex-basis: 100%;
-}
-
-.search-message-empty-message {
-  .room-menu-text();
-  height:     auto;
-  max-height: initial;
-  line-height: 2rem;
-}
-
-.search-message-empty-link {
-  .room-menu-text();
-  height:     auto;
-  max-height: initial;
-  color:      @search-message-detail-color;
 }

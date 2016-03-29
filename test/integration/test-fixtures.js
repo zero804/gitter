@@ -122,6 +122,7 @@ function createExpectedFixtures(expected, done) {
       confirmationCode: confirmationCode,
       username:         username      || generateUsername(),
       status:           f.status      || 'ACTIVE',
+      staff:            f.staff       || false,
       permissions:      f.permissions
     });
   }
