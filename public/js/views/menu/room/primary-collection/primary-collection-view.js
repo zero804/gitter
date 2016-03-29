@@ -119,10 +119,14 @@ var PrimaryCollectionView = BaseCollectionView.extend({
       .slice(-1)[0];
   },
 
+  getChildContainerToBeIndexed: function (){
+    //use the second child because the first child is the hidden search header
+    return this.el.children[1];
+  },
+
   //Before we render we remove the collection container from the drag & drop instance
   onBeforeRender: function() {
-    //use the second child because the first child is the hidden search header
-    this.domMap = domIndexById(this.el.children[1]);
+    this.domMap = domIndexById(this.getChildContainerToBeIndexed());
     this.dndCtrl.removeContainer(this.ui.collection[0]);
   },
 

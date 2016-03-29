@@ -2,19 +2,20 @@
 
 //TODO This has basically turned into a controller, refactor it JP 2/2/16
 
-var Backbone                       = require('backbone');
-var _                              = require('underscore');
-var ProxyCollection                = require('backbone-proxy-collection');
-var RecentSearchesCollection       = require('../collections/recent-searches');
-var SuggestedOrgCollection         = require('../collections/org-suggested-rooms');
-var apiClient                      = require('components/apiClient');
-var FilteredRoomCollection         = require('../collections/filtered-room-collection.js');
-var SuggestedRoomsByRoomCollection = require('../collections/left-menu-suggested-by-room');
-var UserSuggestions                = require('../collections/user-suggested-rooms')
-var SearchRoomPeopleCollection     = require('../collections/left-menu-search-rooms-and-people');
-var SearchChatMessages             = require('../collections/search-chat-messages');
-var perfTiming                     = require('components/perf-timing');
-var context                        = require('utils/context');
+var Backbone                        = require('backbone');
+var _                               = require('underscore');
+var ProxyCollection                 = require('backbone-proxy-collection');
+var RecentSearchesCollection        = require('../collections/recent-searches');
+var SuggestedOrgCollection          = require('../collections/org-suggested-rooms');
+var apiClient                       = require('components/apiClient');
+var FilteredRoomCollection          = require('../collections/filtered-room-collection.js');
+var FilteredFavouriteRoomCollection = require('../collections/filtered-favourite-room-collection.js');
+var SuggestedRoomsByRoomCollection  = require('../collections/left-menu-suggested-by-room');
+var UserSuggestions                 = require('../collections/user-suggested-rooms');
+var SearchRoomPeopleCollection      = require('../collections/left-menu-search-rooms-and-people');
+var SearchChatMessages              = require('../collections/search-chat-messages');
+var perfTiming                      = require('components/perf-timing');
+var context                         = require('utils/context');
 
 var states = [
   'all',
@@ -89,12 +90,17 @@ module.exports = Backbone.Model.extend({
       suggestedOrgsCollection: this.suggestedOrgs,
     });
 
+    this.activeFavouriteRoomCollection   = new FilteredRoomCollection({
+      roomModel:  this,
+      collection: this._roomCollection,
+    });
 
     this.activeRoomCollection   = new FilteredRoomCollection({
       roomModel:  this,
       collection: this._roomCollection,
     });
 
+    this.favouriteCollection = window.favourites = this.activeFavouriteRoomCollection;
     this.primaryCollection   = new ProxyCollection({ collection: this.activeRoomCollection });
     this.secondaryCollection = new ProxyCollection({ collection: this.searchTerms });
     this.tertiaryCollection  = new ProxyCollection({ collection: this._orgCollection });
