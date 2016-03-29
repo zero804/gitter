@@ -1,8 +1,9 @@
 /* jshint node: true */
-"use strict";
+'use strict';
 
-var env           = require('gitter-web-env');
-var express       = require('express');
+var env     = require('gitter-web-env');
+var express = require('express');
+var urlJoin = require('url-join');
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
@@ -11,7 +12,17 @@ router.use('/logout', require('./logout'));
 router.use('/login', require('./login'));
 
 // Double route mounting for explore onto /explore and /home/~explore
-router.use('/explore', require('./explore'));
+router.use('/explore', function(req, res, next) {
+  // If logged in and trying to go to `/explore`, redirect to `/home/explore`
+  if(req.user) {
+    var userHomeExploreUrl = urlJoin('/home/explore', req.url);
+    res.redirect(userHomeExploreUrl);
+  }
+  else {
+    next();
+  }
+}, require('./explore'));
+// The route for the inner frame
 router.use('/home/~explore', require('./explore'));
 
 router.use('/home', require('./home'));

@@ -56,6 +56,9 @@ var HIGHLIGHTED_ROOMS = [
   }, {
     uri: 'webpack/webpack',
     localeLanguage: 'en',
+  }, {
+    uri: 'angular-ui/ng-grid',
+    localeLanguage: 'en',
   }
 ];
 
@@ -313,4 +316,3 @@ exports.findSuggestionsForUserId = cacheWrapper('findSuggestionsForUserId',
       });
     })
   });
-
