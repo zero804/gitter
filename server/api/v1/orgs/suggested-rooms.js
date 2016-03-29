@@ -18,12 +18,13 @@ module.exports = {
         function(rooms, existingRoomIds) {
           var idMap = collections.hashArray(existingRoomIds);
 
-          var suggestions = _.reject(rooms, function(room) {
+          return _.reject(rooms, function(room) {
             return idMap[room.id];
           });
-
-          return restSerializer.serialize(suggestions, new restSerializer.SuggestedRoomStrategy({ }));
         }
-      );
+      )
+      .then(function(suggestions) {
+        return restSerializer.serialize(suggestions, new restSerializer.SuggestedRoomStrategy({ }));
+      });
   },
 };
