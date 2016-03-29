@@ -51,7 +51,6 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   initFavouriteCollection: function (optionsForRegion){
-    console.log(optionsForRegion());
     return new FavouriteCollectionView(optionsForRegion({
       collection:    this.model.favouriteCollection,
       model:         new PrimaryCollectionModel(null, { roomMenuModel: this.model }),
