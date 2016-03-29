@@ -4,6 +4,7 @@ var _ = require('underscore');
 var context = require('utils/context');
 var appEvents = require('utils/appevents');
 var apiClient = require('components/apiClient');
+var unreadItemsClient = require('components/unread-items-client');
 
 function updateNotifications(mode) {
   apiClient.userRoom.put('/settings/notifications', { mode: mode })
@@ -261,6 +262,18 @@ var commandsList = [
       updateNotifications('mute');
     }
   },
+
+  {
+    command: 'mark-all-read',
+    description: 'Mark all chat items as read',
+    completion: 'mark-all-read',
+    regexp: /^\/mark-all-read\s*$/,
+    action: function() {
+      unreadItemsClient.markAllRead();
+    }
+  },
+
+
 
 ];
 
