@@ -5,6 +5,7 @@ var Marionette               = require('backbone.marionette');
 var PanelHeaderView          = require('../header/header-view');
 var PanelFooterView          = require('../footer/footer-view');
 var FavouriteCollectionView  = require('../favourite-collection/favourite-collection-view');
+var FavouriteCollectionModel = require('../favourite-collection/favourite-collection-model');
 var PrimaryCollectionView    = require('../primary-collection/primary-collection-view');
 var PrimaryCollectionModel   = require('../primary-collection/primary-collection-model');
 var SecondaryCollectionView  = require('../secondary-collection/secondary-collection-view');
@@ -53,7 +54,7 @@ module.exports = Marionette.LayoutView.extend({
   initFavouriteCollection: function (optionsForRegion){
     return new FavouriteCollectionView(optionsForRegion({
       collection:    this.model.favouriteCollection,
-      model:         new PrimaryCollectionModel(null, { roomMenuModel: this.model }),
+      model:         new FavouriteCollectionModel(null, { roomMenuModel: this.model }),
       roomMenuModel: this.model,
       bus:           this.bus,
       dndCtrl:       this.dndCtrl,
