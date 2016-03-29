@@ -346,8 +346,6 @@ function renderChat(req, res, options, next) {
         var orgName     = getOrgNameFromTroupeName(troupeContext.troupe.name);
         var orgPageHref = '/orgs/' + orgName + '/rooms/';
 
-        console.log('ownerIsOrg', ownerIsOrg);
-
         var renderOptions = _.extend({
             isRepo: troupe.githubType === 'REPO',
             bootScriptName: script,
