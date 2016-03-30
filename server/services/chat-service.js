@@ -12,13 +12,12 @@ var userService          = require("./user-service");
 var processChat          = require('../utils/markdown-processor');
 var Promise              = require('bluebird');
 var StatusError          = require('statuserror');
-var unreadItemService    = require('./unread-item-service');
 var _                    = require('underscore');
 var mongooseUtils        = require('../utils/mongoose-utils');
 var cacheWrapper         = require('gitter-web-cache-wrapper');
 var groupResolver        = require('./group-resolver');
 var chatSearchService    = require('./chat-search-service');
-var unreadItemService    = require('./unread-item-service');
+var unreadItemService    = require('./unread-items');
 var markdownMajorVersion = require('gitter-markdown-processor').version.split('.')[0];
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 
