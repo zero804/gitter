@@ -1,3 +1,7 @@
+@import '../../../../../less/components/menu/menu.less';
+
+
+
 .minibar {
   position:   relative;
   width:      100%;
@@ -256,7 +260,11 @@
 .room-menu-options__item__unread-items {
   .base-notification-icon(@icon-size);
   background: @caribbean;
-  z-index:    1;
+  z-index: 1;
+
+  animation-name: unread-badge-subtle-pulse-animation;
+  animation-duration: 2s;
+  animation-timing-function: ease;
 }
 
 .room-menu-options__item__mentions {
@@ -266,11 +274,17 @@
   z-index:      2;
 }
 
+
+
 .room-menu-options__item__activity {
   .base-notification-icon(@icon-size);
   background:   transparent;
   border-color: @caribbean;
   z-index:      2;
+
+  animation-name: unread-badge-subtle-pulse-animation;
+  animation-duration: 2s;
+  animation-timing-function: ease;
 }
 
 

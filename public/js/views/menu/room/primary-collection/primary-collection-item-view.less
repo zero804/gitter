@@ -1,4 +1,5 @@
 @import "trp3Vars";
+@import '../../../../../less/components/menu/menu.less';
 @import "../../../../../less/components/menu/room/avatar.less";
 @import "../../../../../less/components/menu/room/menu-text.less";
 @import "../../../../../less/components/menu/room/room-item.less";
@@ -99,7 +100,11 @@ JP 11/2/16
 
 .room-item__unreads {
   .notification(@menu-unread-badge-size);
-  background:    @caribbean;
+  background: @caribbean;
+
+  animation-name: unread-badge-subtle-pulse-animation;
+  animation-duration: 2s;
+  animation-timing-function: ease;
 }
 
 .room-item__mentions {
@@ -116,6 +121,10 @@ JP 11/2/16
 .room-item__lurk {
   .notification(@menu-unread-badge-size / 3);
   border-color: @caribbean;
+
+  animation-name: unread-badge-subtle-pulse-animation;
+  animation-duration: 2s;
+  animation-timing-function: ease;
 }
 
 .room-item__options {
