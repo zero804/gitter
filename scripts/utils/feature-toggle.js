@@ -42,6 +42,13 @@ var opts = require('yargs')
    type: 'boolean',
    description: 'Turn off created after'
   })
+  .option('bucket-created-after', {
+    description: 'bucket,createdAfter'
+  })
+  .option('bucket-created-after-off', {
+   type: 'boolean',
+   description: 'Turn off bucketCreatedAfter'
+  })
   .option('disable-browser', {
    description: 'Disable a specific browser, up to a given version. eg "Chrome:47" or "Safari:all". Browser family names come from npm package `useragent`.',
    type: 'array'
@@ -133,6 +140,21 @@ function runWithOpts(opts) {
 
   if (opts['created-after-off']) {
     unset['criteria.createdAfter'] = true;
+  }
+
+  var bucketCreatedAfter = opts['bucket-created-after'];
+  if (bucketCreatedAfter) {
+    var split = bucketCreatedAfter.split(',')
+    var bucket = split[0];
+    var createdAfter = parseInt(split[1], 10);
+    set['criteria.bucketCreatedAfter'] = {
+      bucket: bucket,
+      createdAfter: createdAfter
+    };
+  }
+
+  if (opts['bucket-created-after-off']) {
+    unset['criteria.bucketCreatedAfter'] = true;
   }
 
   if (opts.enable) {
