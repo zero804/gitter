@@ -5,7 +5,7 @@ var makeBenchmark = require('../make-benchmark');
 var testRequire = require('../integration/test-require');
 
 var mongoUtils = testRequire('./utils/mongo-utils');
-var unreadItemsServiceEngine = testRequire('./services/unread-item-service-engine');
+var unreadItemsServiceEngine = testRequire('./services/unread-items/engine');
 
 var largeUserSet = [];
 var largeUserSetSingleMention = [];
@@ -39,7 +39,7 @@ makeBenchmark({
   after: function(done) {
     if (process.env.DISABLE_EMAIL_NOTIFY_CLEAR_AFTER_TEST) return done();
 
-    var unreadItemServiceEngine = testRequire('./services/unread-item-service-engine');
+    var unreadItemServiceEngine = testRequire('./services/unread-items/engine');
     unreadItemServiceEngine.testOnly.removeAllEmailNotifications()
       .nodeify(done);
   },

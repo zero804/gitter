@@ -12,7 +12,7 @@ local TIME_NOW = 1
 local TIME_NOW_2 = 22
 
 function under_test(keys, value)
-  return call_redis_script('../../redis-lua/unread/unread-add-item-with-mentions.lua', keys, value)
+  return call_redis_script('../../server/services/unread-items/redis-lua/unread-add-item-with-mentions.lua', keys, value)
 end
 
 function add_item(room, item, time, user_ids, mention_user_ids)

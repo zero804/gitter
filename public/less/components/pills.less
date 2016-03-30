@@ -24,9 +24,7 @@
 
     // 2 rows + margin - the margin we don't have on the first row
     max-height: calc(@num-rows ~"*" @tag-margin-box ~"-" @tag-margin);
-    margin-top: @section-spacing;
     margin-left: 0;
-    margin-bottom: @section-spacing;
     margin-right: 0;
     padding-left: 0;
 
@@ -62,6 +60,7 @@
 
   .tag-pill {
     overflow: hidden;
+    display: block;
     width: 100%;
     padding: @tag-vertical-padding 2em;
 
@@ -86,6 +85,7 @@
     &:focus {
       background-color: darken(@pampas, 5%);
       outline: none;
+      text-decoration: none;
     }
 
     &.is-active {
