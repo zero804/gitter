@@ -75,7 +75,11 @@ stream
     ];
     Promise.all(promises)
       .spread(function(user, rooms, language) {
-        return suggestionsService.findSuggestionsForRooms(user, rooms, language);
+        return suggestionsService.findSuggestionsForRooms({
+          user: user,
+          rooms: rooms,
+          language: language
+        });
       })
       .then(function(suggestedRooms) {
         return restSerializer.serialize(suggestedRooms, new restSerializer.SuggestedRoomStrategy());
