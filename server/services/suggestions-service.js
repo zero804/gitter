@@ -14,6 +14,8 @@ var graphSuggestions = require('gitter-web-suggestions');
 var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
 var cacheWrapper = require('gitter-web-cache-wrapper');
 var debug = require('debug')('gitter:suggestions');
+var logger = require('gitter-web-env').logger;
+
 
 // the old github recommenders that find repos, to be filtered to rooms
 var ownedRepos = require('./recommendations/owned-repos');
@@ -172,6 +174,12 @@ var graphRooms = Promise.method(function(options) {
       }
 
       return suggestedRooms;
+    })
+    .catch(function(err) {
+      logger.error("Neo4J error: " + err, {
+        exception: err
+      });
+      return [];
     });
 });
 
