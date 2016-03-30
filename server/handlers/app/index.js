@@ -27,7 +27,7 @@ var mainFrameMiddlewarePipeline = [
   timezoneMiddleware,
   function (req, res, next) {
     if (req.uriContext.ownUrl) {
-      return res.redirect('/home');
+      return res.redirect('/home/explore');
     }
 
     if(req.isPhone) {
