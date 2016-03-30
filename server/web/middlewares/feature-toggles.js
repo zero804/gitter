@@ -58,7 +58,7 @@ var Criteria = {
   },
 
   bucketCreatedAfter: function(userDetails, opts) {
-    return (Criteria.bucket(userDetails, opts.bucket) && Criteria.bucket(userDetails, opts.createdAfter));
+    return (Criteria.bucket(userDetails, opts.bucket) && Criteria.createdAfter(userDetails, opts.createdAfter));
   },
 
   /* Enabled criteria */
