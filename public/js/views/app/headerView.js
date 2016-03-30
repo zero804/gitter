@@ -14,6 +14,11 @@ var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-av
 
 require('views/behaviors/tooltip');
 
+
+var SPACE_KEY = 32;
+var ENTER_KEY = 13;
+
+
 function getPrivateStatus(data) {
   return data.githubType === 'ORG' || data.githubType === 'ONETOONE' || data.security === 'PRIVATE';
 }
@@ -46,6 +51,7 @@ module.exports = Marionette.ItemView.extend({
     'click @ui.favourite':         'toggleFavourite',
     'dblclick @ui.topicActivator': 'showInput',
     'keydown textarea':            'detectKeys',
+    'keydown @ui.topicActivator':  'handleKeyboardStartTopicEdit',
     'click @ui.orgrooms':          'goToOrgRooms',
   },
 
@@ -153,13 +159,7 @@ module.exports = Marionette.ItemView.extend({
       autolink(topicEl);
     }
 
-    var spacebarKey = 32;
-    var enterKey = 13;
-    this.ui.topicActivator.on('keydown', function(e) {
-      if(e.type === 'click' || (e.type === 'keydown' && (e.keyCode === spacebarKey || e.keyCode === enterKey))) {
-        this.showInput();
-      }
-    }.bind(this));
+
   },
 
   showDropdown: function() {
@@ -281,6 +281,12 @@ module.exports = Marionette.ItemView.extend({
     if (e.keyCode === 27) {
       // found escape, cancel edit
       this.cancelEditTopic();
+    }
+  },
+
+  handleKeyboardStartTopicEdit: function(e) {
+    if(e.type === 'click' || (e.type === 'keydown' && (e.keyCode === SPACE_KEY || e.keyCode === ENTER_KEY))) {
+      this.showInput();
     }
   },
 
