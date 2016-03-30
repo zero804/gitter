@@ -3,9 +3,8 @@
 var Promise = require('bluebird');
 var assert = require('assert');
 var roomPermissionsModel = require('./room-permissions-model');
-var roomMembershipService = require('./room-membership-service');
 var _ = require('lodash');
-var userRoomNotificationService = require('./user-room-notification-service');
+
 /**
  * Return a value or a promise of the team members
  */
@@ -19,31 +18,9 @@ function resolveTeam(room, user, groupName) {
       .then(function(access) {
         if(!access) return;
 
-        // CODEDEBT, drop this
-        // https://github.com/troupe/gitter-webapp/issues/985
-        return Promise.join(
-          roomMembershipService.findMembersForRoom(room.id),
-          userRoomNotificationService.findUsersInRoomWithSetting(room.id, 'mute'),
-          function(userIds, mutedUserIds) {
-            if (!mutedUserIds || !mutedUserIds.length) return userIds;
-
-            var mutedHash = _.reduce(mutedUserIds, function(memo, userId) {
-              memo[userId] = true;
-              return memo;
-            });
-
-            return userIds.filter(function(userId) {
-              /* Only return non muted users */
-              return !mutedHash[userId];
-            });
-          })
-          .then(function(userIds) {
-            return { announcement: true, userIds: userIds };
-          });
+        return { announcement: true };
       });
   }
-
-  // In future look up other groups here...
 }
 
 /**

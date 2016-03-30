@@ -1,7 +1,6 @@
 "use strict";
 
 var Promise                     = require('bluebird');
-var userRoomNotificationService = require('../user-room-notification-service');
 var appEvents                   = require('gitter-web-appevents');
 var resolveUserAvatarUrl        = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 var troupeDao                   = require('../daos/troupe-dao').lean;
@@ -42,44 +41,28 @@ function generateChatMessageNotification(troupeId, chatId) {
     });
 }
 
-function filterUsersByNotificationSettings(troupeId, userIds, mentioned) {
-  return userRoomNotificationService.findSettingsForUsersInRoom(troupeId, userIds)
-    .then(function(notificationSettings) {
-      return _.filter(userIds, function(userId) {
-        var notificationSetting = notificationSettings[userId];
-
-        if (notificationSetting === 'mute') return false;
-        if (notificationSetting === 'mention') return mentioned;
-        return true;
-      });
-    });
-}
-
 // Takes an array of notification items, which looks like
-exports.sendOnlineNotifications = function (troupeId, chatId, userIds, mentioned) {
+exports.sendOnlineNotifications = Promise.method(function(troupeId, chatId, userIds) {
+  if (!userIds.length) return;
   debug('sendOnlineNotifications to %s users', userIds.length);
-  return filterUsersByNotificationSettings(troupeId, userIds, mentioned)
-    .then(function(filteredUserIds) {
-      if (filteredUserIds.length === 0) return;
 
-      return generateChatMessageNotification(troupeId, chatId)
-        .then(function(notification) {
-          _.forEach(filteredUserIds, function(userId) {
-            var n = {
-              userId: userId,
-              troupeId: troupeId,
-              title: notification.title,
-              text: notification.text,
-              link: notification.link,
-              icon: notification.icon,
-              sound: notification.sound,
-              chatId: chatId
-            };
+  return generateChatMessageNotification(troupeId, chatId)
+    .then(function(notification) {
+      _.forEach(userIds, function(userId) {
+        var n = {
+          userId: userId,
+          troupeId: troupeId,
+          title: notification.title,
+          text: notification.text,
+          link: notification.link,
+          icon: notification.icon,
+          sound: notification.sound,
+          chatId: chatId
+        };
 
-            debug("Online notifications: %j", n);
-            appEvents.userNotification(n);
-          });
+        debug("Online notifications: %j", n);
+        appEvents.userNotification(n);
+      });
 
-        });
     });
-};
+});

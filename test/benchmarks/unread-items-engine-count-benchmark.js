@@ -7,7 +7,7 @@ var _ = require('lodash');
 var Promise = require('bluebird');
 
 var mongoUtils = testRequire('./utils/mongo-utils');
-var unreadItemsServiceEngine = testRequire('./services/unread-item-service-engine');
+var unreadItemsServiceEngine = testRequire('./services/unread-items/engine');
 
 var largeUserSet = [];
 var largeUserSetSingleMention = [];
