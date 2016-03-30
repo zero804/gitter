@@ -36,14 +36,14 @@ var opts = require('yargs')
    description: 'Turn off bucket'
   })
   .option('created-after', {
-    description: 'Timestamp after which users have to have been created'
+    description: 'Timestamp after which users have to have been created or now'
   })
   .option('created-after-off', {
    type: 'boolean',
    description: 'Turn off created after'
   })
   .option('bucket-created-after', {
-    description: 'bucket,createdAfter'
+    description: 'bucket,now'
   })
   .option('bucket-created-after-off', {
    type: 'boolean',
@@ -79,6 +79,13 @@ opts.name = opts.name || opts._[0];
 
 var FeatureToggle = require("../../server/services/persistence-service").FeatureToggle;
 
+
+function parseTimestamp(ts) {
+  if (ts === 'now') {
+    return Date.now();
+  }
+  return parseInt(ts, 10);
+}
 
 function runWithOpts(opts) {
   var set = { };
@@ -133,7 +140,7 @@ function runWithOpts(opts) {
     unset['criteria.bucket'] = true;
   }
 
-  var createdAfter = parseInt(opts['created-after'], 10);
+  var createdAfter = parseTimestamp(opts['created-after']);
   if (createdAfter) {
     set['criteria.createdAfter'] = createdAfter;
   }
@@ -146,7 +153,7 @@ function runWithOpts(opts) {
   if (bucketCreatedAfter) {
     var split = bucketCreatedAfter.split(',')
     var bucket = split[0];
-    var createdAfter = parseInt(split[1], 10);
+    var createdAfter = parseTimestamp(split[1]);
     set['criteria.bucketCreatedAfter'] = {
       bucket: bucket,
       createdAfter: createdAfter
