@@ -242,6 +242,7 @@ function renderMainFrame(req, res, next, frame) {
       var snapshots                 = troupeContext.snapshots = parseSnapshotsForPageContext(req, troupeContext, orgs, rooms);
       var leftMenuRoomList          = parseRoomsIntoLeftMenuRoomList(snapshots.leftMenu.state, snapshots.rooms, snapshots.leftMenu.selectedOrgName);
       var leftMenuFavouriteRoomList = parseRoomsIntoLeftMenuFavouriteRoomList(snapshots.leftMenu.state, snapshots.rooms, snapshots.leftMenu.selectedOrgName);
+      if(snapshots.leftMenu.state === 'favourite') { leftMenuRoomList = []; }
 
       res.render(template, {
         socialMetadata:         socialMetadata,

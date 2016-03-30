@@ -14,14 +14,27 @@ var FilteredFavouriteCollection = function() {
 _.extend(
   FilteredFavouriteCollection.prototype,
   FilteredRoomCollection.prototype, {
+
+    initialize: function() {
+      FilteredRoomCollection.prototype.initialize.apply(this, arguments);
+      this.sort();
+    },
+    comparator: function(a, b){
+      return sortAndFilters.favourites.sort(a, b);
+    },
+
     filterDefault: sortAndFilters.favourites.filter,
-    comparator:    sortAndFilters.favourites.sort,
     filterOneToOnes: function(model) {
       return one2oneFavouriteFilter(model.toJSON());
     },
     filterOrgRooms: function(model) {
       var orgName = this.roomModel.get('selectedOrgName');
       return orgFavouriteFilter(model.toJSON(), orgName);
+    },
+    getList: function (){
+      this.models.forEach(function(model){
+        console.log(model.get('url'), model.get('favourite'));
+      });
     },
   }
 );
