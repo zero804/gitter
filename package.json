@@ -156,6 +156,7 @@
     "chai": "^3.4.1",
     "chokidar": "^1.4.3",
     "classnames": "^2.2.3",
+    "concurrently": "^2.0.0",
     "css-loader": "^0.23.1",
     "css-mqpacker": "^3.0.0",
     "csswring": "^3.0.0",
@@ -276,7 +277,7 @@
   "main": "web.js",
   "scripts": {
     "start": "nodemon web.js",
-    "dev": "npm run start & gulp watch",
+    "dev": "concurrently --raw 'npm run start' 'gulp watch'",
     "test": "gulp localtest",
     "link": "linklocal link -r",
     "unlink": "linklocal unlink -r",
