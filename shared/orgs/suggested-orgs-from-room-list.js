@@ -46,7 +46,10 @@ module.exports = function suggestedOrgsFromRoomList(roomList, uri, currentRoomId
   // But when someone visits `/home` or `/explore`, we don't want it to pick it up as an org
   var existingConversationByOrg = _.where(roomList, { url: '/' + currentOrg })[0];
   var isExistingOneToOne        = !!existingConversationByOrg && (existingConversationByOrg.githubType === 'ONETOONE');
-  if (currentOrg === 'home' || currentOrg === 'explore' || isExistingOneToOne) {
+  if (currentOrg === 'home' ||
+      currentOrg === 'explore' ||
+      currentOrg === 'learn' ||
+      isExistingOneToOne) {
     return orgList;
   }
 
