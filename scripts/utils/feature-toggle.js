@@ -28,6 +28,20 @@ var opts = require('yargs')
    type: 'boolean',
    description: 'Turn off percentage'
   })
+  .option('bucket', {
+    description: 'Bucket of users to allow (A or B)'
+  })
+  .option('bucket-off', {
+   type: 'boolean',
+   description: 'Turn off bucket'
+  })
+  .option('created-after', {
+    description: 'Timestamp after which users have to have been created'
+  })
+  .option('created-after-off', {
+   type: 'boolean',
+   description: 'Turn off created after'
+  })
   .option('disable-browser', {
    description: 'Disable a specific browser, up to a given version. eg "Chrome:47" or "Safari:all". Browser family names come from npm package `useragent`.',
    type: 'array'
@@ -101,6 +115,24 @@ function runWithOpts(opts) {
 
   if (opts['percentage-off']) {
     unset['criteria.percentageOfUsers'] = true;
+  }
+
+  var bucket = opts['bucket'];
+  if (bucket) {
+    set['criteria.bucket'] = bucket;
+  }
+
+  if (opts['bucket-off']) {
+    unset['criteria.bucket'] = true;
+  }
+
+  var createdAfter = parseInt(opts['created-after'], 10);
+  if (createdAfter) {
+    set['criteria.createdAfter'] = createdAfter;
+  }
+
+  if (opts['created-after-off']) {
+    unset['criteria.createdAfter'] = true;
   }
 
   if (opts.enable) {
