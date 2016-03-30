@@ -678,8 +678,7 @@ var cssWeb = function(overrideOpts) {
     'public/less/homepage.less',
     'public/less/userhome.less',
     'public/less/402.less',
-    'public/less/org-page.less',
-    'public/less/room-card.less'
+    'public/less/org-page.less'
   ];
 
   var opts = _.extend({}, {

@@ -14,13 +14,14 @@ function roomFilter(roomMenuModel, room) {
 }
 
 //take a list of object which have a property of id and return a uniq array
-function uniqById(list) {
+function uniqByUrl(list) {
 
   var map = {};
 
   //push items into the map such that they are uniq
   list.forEach(function(item) {
-    map[item.id] = item;
+    //guard against no url property
+    if(item.url){ map[item.url] = item; }
   });
 
   //return the objects not the map
@@ -77,7 +78,7 @@ module.exports = Backbone.Collection.extend({
 
     //format our results
     var results = currentRooms.concat(repos).concat(rooms).concat(people);
-    results     = uniqById(results);
+    results     = uniqByUrl(results);
     this.reset(results);
   },
 

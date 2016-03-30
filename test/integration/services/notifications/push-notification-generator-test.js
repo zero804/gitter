@@ -55,7 +55,7 @@ describe('push notification generator service', function() {
       '../../gateways/push-notification-gateway': {
         sendUserNotification: mockSendUserNotification
       },
-      '../unread-item-service': unreadItemServiceStub,
+      '../unread-items': unreadItemServiceStub,
       '../../serializers/notification-serializer': notificationSerializerStub
     });
 
@@ -83,7 +83,7 @@ describe('push notification generator service', function() {
       '../../gateways/push-notification-gateway': {
         sendUserNotification: mockSendUserNotification
       },
-      '../unread-item-service': unreadItemServiceStub,
+      '../unread-items': unreadItemServiceStub,
       '../../serializers/notification-serializer': notificationSerializerStub
     });
 

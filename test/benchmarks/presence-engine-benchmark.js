@@ -96,7 +96,7 @@ function doTest(iterations) {
       })
       .then(function(online) {
         assert(online.length === 0);
-      })
+      });
   }, { concurrency: 1 });
 }
 
