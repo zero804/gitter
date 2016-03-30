@@ -325,6 +325,9 @@ function TroupeStrategy(options) {
         return troupe.oneToOneUsers;
       })
       .flatten()
+      .map(function(troupeOneToOneUser) {
+        return troupeOneToOneUser.userId;
+      })
       .uniq();
 
     var strategies = [
