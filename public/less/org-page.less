@@ -8,7 +8,7 @@
 @import "trpButtons.less";
 @import "trp3.less";
 
-@import "room-card.less";
+@import 'components/room-card';
 @import "bootstrap/mixins";
 
 @import "colors.less";
@@ -22,7 +22,6 @@ html {
 
 *, *:before, *:after {
   box-sizing: inherit;
-  vertical-align: bottom;
 }
 
 body {
@@ -126,6 +125,7 @@ body {
   }
 
   .octicon {
+    vertical-align: middle;
     margin-right: 6px;
     font-size: 1.2em;
     color:  @trpLightGrey;
@@ -136,18 +136,22 @@ body {
   }
 }
 
-.org-page__room-cards {
+.org-page__room-card-list {
+  .room-card-list();
+
   @excess-card-margin: 0.5em;
   padding: 0 3.25em-@excess-card-margin 3.25em 3.25em-@excess-card-margin;
 
   @media (max-width: @mobileBreakPoint) {
     padding: 1em-@excess-card-margin;
   }
-
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
 }
+
+.org-page__room-card {
+  border: 1px solid @pampas;
+}
+
+
 
 .hidden {
   display: none;

@@ -10,7 +10,7 @@ function whereToNext(user) {
   return recentRoomService.findInitialRoomUrlForUser(user)
     .then(function(url) {
       if (url) return url;
-      return user.username ? '/' + user.username : '/home';
+      return user.username ? '/' + user.username : '/home/explore';
     });
 }
 exports.whereToNext = whereToNext;
