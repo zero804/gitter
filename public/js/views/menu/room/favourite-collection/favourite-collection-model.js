@@ -13,7 +13,7 @@ module.exports = PrimaryCollectionModel.extend({
 
   onFavourite: function(){
     this.set({
-      active: false,
+      active: true,
       header: false,
     });
   }
