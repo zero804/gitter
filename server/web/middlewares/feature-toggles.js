@@ -57,6 +57,10 @@ var Criteria = {
     return (userTimestamp > timestamp);
   },
 
+  bucketCreatedAfter: function(userDetails, opts) {
+    return (Criteria.bucket(userDetails, opts.bucket) && Criteria.bucket(userDetails, opts.createdAfter));
+  },
+
   /* Enabled criteria */
   enabled: function(/*user*/) {
     return true;
