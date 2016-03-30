@@ -4,7 +4,6 @@ var winston                     = require('../../utils/winston');
 var pushNotificationFilter      = require("gitter-web-push-notification-filter");
 var nconf                       = require('../../utils/config');
 var workerQueue                 = require('../../utils/worker-queue-redis');
-var userRoomNotificationService = require('../user-room-notification-service');
 var debug                       = require('debug')('gitter:push-notification-postbox');
 var mongoUtils                  = require('../../utils/mongo-utils');
 var Promise                     = require('bluebird');
@@ -66,57 +65,42 @@ function filterNotificationsForPush(troupeId, chatId, userIds, mentioned) {
   var chatTime = mongoUtils.getTimestampFromObjectId(chatId);
   debug('filterNotificationsForPush for %s users', userIds.length);
 
-  // TODO: consider asking Redis whether its possible to send to this user BEFORE
-  // going to mongo to get notification settings as reversing these two operations
-  // may well be much faster
-  return userRoomNotificationService.findSettingsForUsersInRoom(troupeId, userIds)
-    .then(function(settings) {
-      return Promise.map(userIds, function(userId) {
-        var pushNotificationSetting = settings[userId];
+  return Promise.map(userIds, function(userId) {
+    var maxLocks = mentioned ? maxNotificationsForMentions : maxNotificationsForNonMentions;
 
-        /* Mute, then don't continue */
-        if (pushNotificationSetting === 'mute' || (pushNotificationSetting === 'mention' && !mentioned)) {
-          debug('Ignoring push notification for user %s due to push notification setting %s', userId, pushNotificationSetting);
-          // Only pushing on mentions and this ain't a mention
+    // TODO: bulk version of this method please
+    return pushNotificationFilter.canLockForNotification(userId, troupeId, chatTime, maxLocks)
+      .then(function(notificationNumber) {
+        if(!notificationNumber) {
+          // TODO: For mentions: consider cancelling the current lock on mentions and creating a
+          // new one as if we're in the 60 second window period, we'll need to
+          // wait until the end of the window before sending the mention
+          debug('Unable to obtain a lock (max=%s) for user %s in troupe %s. Will not notify', maxLocks, userId, troupeId);
           return;
         }
 
-        var maxLocks = mentioned ? maxNotificationsForMentions : maxNotificationsForNonMentions;
+        var delay;
+        if (mentioned) {
+          /* Send the notification to the user very shortly */
+          delay = mentionNotificationWindowPeriod;
+        } else {
+          delay = notificationWindowPeriods[notificationNumber - 1];
+          if(!delay) {
+            debug("Obtained a lock in excess of the maximum lock number of %s", maxLocks);
+            return;
+          }
+        }
 
-        // TODO: bulk version of this method please
-        return pushNotificationFilter.canLockForNotification(userId, troupeId, chatTime, maxLocks)
-          .then(function(notificationNumber) {
-            if(!notificationNumber) {
-              // TODO: For mentions: consider cancelling the current lock on mentions and creating a
-              // new one as if we're in the 60 second window period, we'll need to
-              // wait until the end of the window before sending the mention
-              debug('Unable to obtain a lock (max=%s) for user %s in troupe %s. Will not notify', maxLocks, userId, troupeId);
-              return;
-            }
+        debug('Queuing notification %s to be send to user %s in %sms', notificationNumber, userId, delay);
 
-            var delay;
-            if (mentioned) {
-              /* Send the notification to the user very shortly */
-              delay = mentionNotificationWindowPeriod;
-            } else {
-              delay = notificationWindowPeriods[notificationNumber - 1];
-              if(!delay) {
-                debug("Obtained a lock in excess of the maximum lock number of %s", maxLocks);
-                return;
-              }
-            }
+        return pushNotificationGeneratorQueue.invoke({
+          userId: userId,
+          troupeId: troupeId,
+          notificationNumber: notificationNumber
+        }, { delay: delay });
 
-            debug('Queuing notification %s to be send to user %s in %sms', notificationNumber, userId, delay);
-
-            return pushNotificationGeneratorQueue.invoke({
-              userId: userId,
-              troupeId: troupeId,
-              notificationNumber: notificationNumber
-            }, { delay: delay });
-
-          });
       });
-    });
+  });
 }
 
 exports.queueNotificationsForChat = function(troupeId, chatId, userIds, mentioned) {

@@ -4,6 +4,7 @@ var _ = require('underscore');
 var context = require('utils/context');
 var appEvents = require('utils/appevents');
 var apiClient = require('components/apiClient');
+var unreadItemsClient = require('components/unread-items-client');
 
 function updateNotifications(mode) {
   apiClient.userRoom.put('/settings/notifications', { mode: mode })
@@ -242,25 +243,35 @@ var commandsList = [
     }
   },
   {
-    // TODO: CODEDEBT: https://github.com/troupe/gitter-webapp/issues/988
-    // rename this to 'announcements'
-    command: 'notify-mentions',
+    command: 'notify-announcements',
     description: 'Get notified on mentions and group messages',
-    completion: 'notify-mentions',
-    regexp: /^\/notify-mentions\s*$/,
+    completion: 'notify-announcements',
+    regexp: /^\/notify-announcements\s*$/,
     action: function() {
-      updateNotifications('mention');
+      updateNotifications('announcement');
     }
   },
   {
     command: 'notify-mute',
-    description: 'Mute all notifications, except mentions',
+    description: 'Mute all notifications, except direct mentions',
     completion: 'notify-mute',
     regexp: /^\/notify-mute\s*$/,
     action: function() {
       updateNotifications('mute');
     }
   },
+
+  {
+    command: 'mark-all-read',
+    description: 'Mark all chat items as read',
+    completion: 'mark-all-read',
+    regexp: /^\/mark-all-read\s*$/,
+    action: function() {
+      unreadItemsClient.markAllRead();
+    }
+  },
+
+
 
 ];
 

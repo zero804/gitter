@@ -1,8 +1,6 @@
-/*jslint node: true */
-/*global describe:true, it: true, beforeEach:true, afterEach:true */
 "use strict";
 
-var fs = require('fs');
+var path = require('path');
 
 var proxyquireNoCallThru = require("proxyquire").noCallThru();
 
@@ -11,15 +9,7 @@ function resolveModuleName(module) {
     return module;
   }
 
-  var n;
-  if(process.env['TROUPE_COVERAGE']) {
-    n = __dirname + '/../../coverage/' + module;
-  } else {
-    n = __dirname + '/../../server/' + module;
-  }
-
-  n = fs.realpathSync(n + '.js');
-  return n;
+  return path.resolve(__dirname + '/../../server/' + module);
 }
 
 // when using this require function, the module path should be relative to the server directory
