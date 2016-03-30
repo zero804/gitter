@@ -45,7 +45,7 @@ function findContextForUri(user, uri, options) {
 
         if(resolvedUser.id == userId) {
           var redirect = new StatusError(301);
-          redirect.path = '/home'; // TODO: is this a good idea??
+          redirect.path = '/home/explore'; // TODO: is this a good idea??
           throw redirect;
         }
 

@@ -26,11 +26,13 @@
 
         {{#if isLoggedIn}}
         <div class="org-page__login">
-         <a class="btn secondary pampas" href="{{socialUrl}}" target="_blank"><i class="icon-twitter"></i> Share</a>
+         <a class="button-pampas--small" href="{{socialUrl}}" target="_blank">
+           <i class="icon-twitter"></i> Share
+         </a>
         </div>
         {{else}}
           <div class="org-page__login">
-            Are you a member of {{ org.login }}?  <a class="btn secondary orange sorg-page__login__btn" href="/login/github?action=login&source=orgpage" target="_parent">Login</a>
+            Are you a member of {{ org.login }}?  <a class="btn secondary orange sorg-page__login__btn" href="/login?action=login&source=orgpage" target="_parent">Sign in</a>
           </div>
         {{/if}}
       </div>
@@ -56,9 +58,14 @@
       </div>
     </header>
 
-    <div class='org-page__room-cards'>
+    <div class="org-page__room-card-list">
       {{#each rooms}}
-        {{> room_card }}
+        {{> room_card
+          exploreBaseUrl=../exploreBaseUrl
+          isLoggedIn=../isLoggedIn
+          linkSource='orgpage'
+          extraClasses='org-page__room-card'
+        }}
       {{/each}}
     </div>
 
