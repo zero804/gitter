@@ -9,10 +9,13 @@ function GithubRepoStrategy(options) {
   var troupeStrategy = new TroupeStrategy(options);
   var troupesIndexed;
 
-  this.preload = function(userAdminRepos) {
-    var repos = userAdminRepos.map(function(repo) { return repo.full_name; });
+  this.preload = function(repos) {
+    var repoFullNames = repos.map(function(repo) {
+        return repo.full_name;
+      })
+      .toArray();
 
-    return leanTroupeDao.findByUris(repos)
+    return leanTroupeDao.findByUris(repoFullNames)
       .then(function(troupes) {
         troupesIndexed = collections.indexByProperty(troupes, 'uri');
 
