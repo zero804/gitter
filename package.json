@@ -278,7 +278,7 @@
   "main": "web.js",
   "scripts": {
     "start": "nodemon web.js",
-    "dev": "concurrently --raw 'npm run start' 'gulp watch'",
+    "dev": "concurrently --raw \"npm run start\" \"gulp watch\"",
     "test": "gulp localtest",
     "link": "linklocal link -r",
     "unlink": "linklocal unlink -r",
