@@ -26,20 +26,19 @@ var BITMASK_NOTIFY_UNREAD       = 1 << FLAG_POS_NOTIFY_UNREAD;
 var BITMASK_NO_NOTIFY_UNREAD    = BITMASK_INVERT & ~BITMASK_NOTIFY_UNREAD;
 var BITMASK_NOTIFY_ACTIVITY     = 1 << FLAG_POS_NOTIFY_ACTIVITY;
 var BITMASK_NO_NOTIFY_ACTIVITY  = BITMASK_INVERT & ~BITMASK_NOTIFY_ACTIVITY;
-
-var BITMASK_NOTIFY_MENTIONS     = 1 << FLAG_POS_NOTIFY_MENTION;
+var BITMASK_NOTIFY_MENTION      = 1 << FLAG_POS_NOTIFY_MENTION;
 var BITMASK_NOTIFY_ANNOUNCEMENT = 1 << FLAG_POS_NOTIFY_ANNOUNCEMENT;
 var BITMASK_NOTIFY_DEFAULT      = 1 << FLAG_POS_NOTIFY_DEFAULT;
 
 var MODES = {
   /* Mode: all: unread + no activity + mentions + announcements */
-  all: BITMASK_NOTIFY_UNREAD | BITMASK_NOTIFY_MENTIONS | BITMASK_NOTIFY_ANNOUNCEMENT,
+  all: BITMASK_NOTIFY_UNREAD | BITMASK_NOTIFY_MENTION | BITMASK_NOTIFY_ANNOUNCEMENT,
 
   /* Mode: announcement: no unread + activity + mentions + announcements */
-  announcement: BITMASK_NOTIFY_ACTIVITY | BITMASK_NOTIFY_MENTIONS | BITMASK_NOTIFY_ANNOUNCEMENT,
+  announcement: BITMASK_NOTIFY_ACTIVITY | BITMASK_NOTIFY_MENTION | BITMASK_NOTIFY_ANNOUNCEMENT,
 
   /* Mode: mute: no unread + no activity + mentions + no announcements */
-  mute: BITMASK_NOTIFY_MENTIONS,
+  mute: BITMASK_NOTIFY_MENTION,
 };
 
 /* Alias modes */
@@ -51,7 +50,7 @@ function getModeFromFlags(flags) {
     case MODES.all:
       return 'all';
     case MODES.announcement:
-      return 'mention'; // TODO: rename this to announcement
+      return 'announcement';
     case MODES.mute:
       return 'mute';
   }
@@ -122,12 +121,40 @@ function getLurkForMode(mode) {
   return getLurkForFlags(MODES[mode]);
 }
 
+
+function hasNotifyUnread(flags) {
+  return flags & BITMASK_NOTIFY_UNREAD;
+}
+
+function hasNotifyActivity(flags) {
+  return flags & BITMASK_NOTIFY_ACTIVITY;
+}
+
+function hasNotifyMention(flags) {
+  return flags & BITMASK_NOTIFY_MENTION;
+}
+
+function hasNotifyAnnouncement(flags) {
+  return flags & BITMASK_NOTIFY_ANNOUNCEMENT;
+}
+
 module.exports = {
   MODES: MODES,
+
+  FLAG_POS_NOTIFY_UNREAD: FLAG_POS_NOTIFY_UNREAD,
+  FLAG_POS_NOTIFY_ACTIVITY: FLAG_POS_NOTIFY_ACTIVITY,
+  FLAG_POS_NOTIFY_MENTION: FLAG_POS_NOTIFY_MENTION,
+  FLAG_POS_NOTIFY_ANNOUNCEMENT: FLAG_POS_NOTIFY_ANNOUNCEMENT,
+
   getFlagsForMode: getFlagsForMode,
   getModeFromFlags: getModeFromFlags,
   getUpdateForMode: getUpdateForMode,
   getLurkForFlags: getLurkForFlags,
   getLurkForMode: getLurkForMode,
-  toggleLegacyLurkMode: toggleLegacyLurkMode
+  toggleLegacyLurkMode: toggleLegacyLurkMode,
+
+  hasNotifyUnread: hasNotifyUnread,
+  hasNotifyActivity: hasNotifyActivity,
+  hasNotifyMention: hasNotifyMention,
+  hasNotifyAnnouncement: hasNotifyAnnouncement,
 };

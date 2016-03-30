@@ -2,7 +2,7 @@
 "use strict";
 
 var logger                = require('gitter-web-env').logger;
-var unreadItemService     = require("../../services/unread-item-service");
+var unreadItemService     = require("../../services/unread-items");
 var userService           = require("../../services/user-service");
 var recentRoomCore        = require('../../services/core/recent-room-core');
 var roomMembershipService = require('../../services/room-membership-service');

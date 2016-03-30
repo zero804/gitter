@@ -10,9 +10,9 @@ var Promise     = require('bluebird');
 
 var userSettingsService = testRequire('./services/user-settings-service');
 var fixtureLoader       = require('../../test-fixtures');
-var underlyingUnreadItemService = testRequire('./services/unread-item-service');
+var underlyingUnreadItemService = testRequire('./services/unread-items');
 var mongoUtils = testRequire('./utils/mongo-utils');
-var userRoomNotificationService = testRequire("./services/user-room-notification-service");
+var roomMembershipService = testRequire("./services/room-membership-service");
 
 var unreadItemServiceMock = mockito.spy(underlyingUnreadItemService);
 
@@ -30,11 +30,11 @@ describe('email-notification-generator-service', function() {
 
   it('should send out an email notification for a user with unread items #slow', function(done) {
     var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
-    var unreadEngine = testRequire('./services/unread-item-service-engine');
+    var unreadEngine = testRequire('./services/unread-items/engine');
 
     var sendEmailNotifications = testRequire.withProxies('./services/notifications/email-notification-generator-service', {
       '../email-notification-service': emailNotificationServiceMock,
-      '../unread-item-service': unreadItemServiceMock
+      '../unread-items': unreadItemServiceMock
     });
 
     var itemId1 = mongoUtils.getNewObjectIdString();
@@ -78,11 +78,11 @@ describe('email-notification-generator-service', function() {
 
   it('SHOULD NOT email somebody who has opted out of notifications 1 #slow', function(done) {
     var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
-    var unreadEngine = testRequire('./services/unread-item-service-engine');
+    var unreadEngine = testRequire('./services/unread-items/engine');
 
     var sendEmailNotifications = testRequire.withProxies('./services/notifications/email-notification-generator-service', {
       '../email-notification-service': emailNotificationServiceMock,
-      '../unread-item-service': unreadItemServiceMock
+      '../unread-items': unreadItemServiceMock
     });
 
     var itemId1 = mongoUtils.getNewObjectIdString();
@@ -121,11 +121,11 @@ describe('email-notification-generator-service', function() {
 
   it('SHOULD NOT email somebody who has opted out of notifications 2 #slow', function(done) {
     var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
-    var unreadEngine = testRequire('./services/unread-item-service-engine');
+    var unreadEngine = testRequire('./services/unread-items/engine');
 
     var sendEmailNotifications = testRequire.withProxies('./services/notifications/email-notification-generator-service', {
       '../email-notification-service': emailNotificationServiceMock,
-      '../unread-item-service': unreadItemServiceMock
+      '../unread-items': unreadItemServiceMock
     });
 
 
@@ -148,10 +148,9 @@ describe('email-notification-generator-service', function() {
       return Promise.resolve();
     });
 
-
     return Promise.all([
         userSettingsService.setUserSettings(fixture.user2.id, 'unread_notifications_optout', true),
-        userRoomNotificationService.updateSettingForUserRoom(fixture.user2.id, troupeId, 'all')
+        roomMembershipService.setMembershipMode(fixture.user2.id, troupeId, 'all'),
       ])
       .then(function() {
         return unreadEngine.newItemWithMentions(troupeId, itemId1, [fixture.user2.id, fixture.user3.id], []);
@@ -178,11 +177,11 @@ describe('email-notification-generator-service', function() {
 
 it('SHOULD NOT email somebody who has opted out of notifications set to mention only #slow', function(done) {
   var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
-  var unreadEngine = testRequire('./services/unread-item-service-engine');
+  var unreadEngine = testRequire('./services/unread-items/engine');
 
   var sendEmailNotifications = testRequire.withProxies('./services/notifications/email-notification-generator-service', {
     '../email-notification-service': emailNotificationServiceMock,
-    '../unread-item-service': unreadItemServiceMock
+    '../unread-items': unreadItemServiceMock
   });
 
   var v = 0;
@@ -205,10 +204,10 @@ it('SHOULD NOT email somebody who has opted out of notifications set to mention 
   return Promise.all([
       underlyingUnreadItemService.markAllChatsRead(fixture.user2.id, fixture.troupe1.id),
       userSettingsService.setUserSettings(fixture.user2.id, 'unread_notifications_optout', false),
-      userRoomNotificationService.updateSettingForUserRoom(fixture.user2.id, fixture.troupe1.id, 'mention')
+      roomMembershipService.setMembershipMode(fixture.user2.id, fixture.troupe1.id, 'announcement'),
     ])
     .then(function() {
-      return unreadEngine.newItemWithMentions(troupeId, itemId1, [fixture.user2.id, fixture.user3.id], []);
+      return unreadEngine.newItemWithMentions(troupeId, itemId1, [fixture.user3.id], []);
     })
     .then(function() {
       return sendEmailNotifications(Date.now());
@@ -223,11 +222,11 @@ it('SHOULD NOT email somebody who has opted out of notifications set to mention 
   // TODO: handle mentions
   it('SHOULD email somebody who has not opted out of notifications for a specific troupe #slow', function(done) {
     var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
-    var unreadEngine = testRequire('./services/unread-item-service-engine');
+    var unreadEngine = testRequire('./services/unread-items/engine');
 
     var sendEmailNotifications = testRequire.withProxies('./services/notifications/email-notification-generator-service', {
       '../email-notification-service': emailNotificationServiceMock,
-      '../unread-item-service': unreadItemServiceMock
+      '../unread-items': unreadItemServiceMock
     });
 
     var itemId1 = mongoUtils.getNewObjectIdString();
@@ -253,7 +252,7 @@ it('SHOULD NOT email somebody who has opted out of notifications set to mention 
 
     Promise.all([
       userSettingsService.setUserSettings(fixture.user2.id, 'unread_notifications_optout', false),
-      userRoomNotificationService.updateSettingForUserRoom(fixture.user2.id, fixture.troupe1.id, 'all'),
+      roomMembershipService.setMembershipMode(fixture.user2.id, fixture.troupe1.id, 'all'),
       unreadEngine.newItemWithMentions(troupeId, itemId1, [fixture.user2.id, fixture.user3.id], [])
       ])
       .then(function() {
