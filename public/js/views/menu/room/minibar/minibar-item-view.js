@@ -35,13 +35,13 @@ module.exports =  Marionette.ItemView.extend({
     var data = this.model.toJSON();
     var activity = (data.mentions || data.unreadItems) ? false : data.activity;
     return _.extend({}, data, {
-      isHome:       (data.type === 'all'),
-      isSearch:     (data.type === 'search'),
-      isFavourite:  (data.type === 'favourite'),
-      isPeople:     (data.type === 'people'),
-      isOrg:        (data.type === 'org'),
-      avatarSrcset: resolveRoomAvatar({ uri: data.name }, 23),
-      activity:     activity,
+      isHome:        (data.type === 'all'),
+      isSearch:      (data.type === 'search'),
+      isFavourite:   (data.type === 'favourite'),
+      isPeople:      (data.type === 'people'),
+      isOrg:         (data.type === 'org'),
+      hasIndicators: (data.type === 'people' || data.type === 'org'),
+      avatarSrcset:  resolveRoomAvatar({ uri: data.name }, 23)
     });
   },
 
@@ -53,9 +53,26 @@ module.exports =  Marionette.ItemView.extend({
     toggleClass(this.el, 'active', !!val);
   },
 
+  pulseIndicators: function() {
+    var model = this.model;
+    var hasIndicators = model.get('activity') > 0 || model.get('unreadItems') > 0 || model.get('mentions') > 0;
+
+    if(hasIndicators) {
+      // Re-trigger the pulse animation
+      // 16ms is a good 60-fps number to trigger on which Firefox needs (requestAnimationFrame doesn't work for this)
+      var unreadIndicatorElements = this.el.querySelectorAll('.room-menu-options__item__unread-items, .room-menu-options__item__mentions, .room-menu-options__item__activity');
+      Array.prototype.forEach.call(unreadIndicatorElements, function(unreadIndicatorElement) {
+      unreadIndicatorElement.style.animation = 'none';
+        setTimeout(function() {
+            unreadIndicatorElement.style.animation = '';
+        }, 16);
+      });
+    }
+  },
+
   onRender: function() {
     toggleClass(this.el, 'active', !!this.model.get('active'));
+    this.pulseIndicators();
   },
 
 });
-
