@@ -38,6 +38,29 @@ var Criteria = {
     return undefined;
   },
 
+  bucket: function(userDetails, bucket) {
+    var user = userDetails.user;
+    if (!user) return false;
+    var userId = user._id;
+
+    // This is copied from gitter-env.
+    var lastChar = userId.toString().slice(-1);
+    var userBucket = (parseInt(lastChar+'', 16) % 2) ? 'A' : 'B';
+
+    return (userBucket === bucket);
+  },
+
+  createdAfter: function(userDetails, timestamp) {
+    var user = userDetails.user;
+    if (!user) return false;
+    var userTimestamp = mongoUtils.getTimestampFromObjectId(user._id);
+    return (userTimestamp > timestamp);
+  },
+
+  bucketCreatedAfter: function(userDetails, opts) {
+    return (Criteria.bucket(userDetails, opts.bucket) && Criteria.createdAfter(userDetails, opts.createdAfter));
+  },
+
   /* Enabled criteria */
   enabled: function(/*user*/) {
     return true;
