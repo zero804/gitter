@@ -19,7 +19,7 @@ exports.listen = function() {
     .then(function() {
       debug('Starting works on successful mongodb connection');
       require('../services/readby-service').listen();
-      require('../services/unread-item-service').listen();
+      require('../services/unread-items').listen();
       require('../services/notifications/push-notification-postbox').listen();
     });
 

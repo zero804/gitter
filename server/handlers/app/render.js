@@ -17,7 +17,7 @@ var roomSort                                = require('gitter-realtime-client/li
                                                                                           libraries that we don't need */
 var roomNameTrimmer                         = require('../../../public/js/utils/room-name-trimmer');
 var isolateBurst                            = require('gitter-web-shared/burst/isolate-burst-array');
-var unreadItemService                       = require('../../services/unread-item-service');
+var unreadItemService                       = require('../../services/unread-items');
 var mongoUtils                              = require('../../utils/mongo-utils');
 var url                                     = require('url');
 var cdn                                     = require("../../web/cdn");
@@ -30,9 +30,9 @@ var orgPermissionModel                      = require('../../services/permission
 var resolveUserAvatarUrl                    = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 var resolveRoomAvatarSrcSet                 = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 var getOrgNameFromTroupeName                = require('gitter-web-shared/get-org-name-from-troupe-name');
-var parseRoomsIntoLeftMenuRoomList          = require('gitter-web-shared/rooms/left-menu-room-list');
-var parseRoomsIntoLeftMenuFavouriteRoomList = require('gitter-web-shared/rooms/left-menu-room-favourite-list');
+var parseRoomsIntoLeftMenuRoomList          = require('gitter-web-shared/rooms/left-menu-room-list.js');
 var parseSnapshotsForPageContext            = require('gitter-web-shared/parse/snapshots');
+var parseRoomsIntoLeftMenuFavouriteRoomList = require('gitter-web-shared/rooms/left-menu-room-favourite-list');
 var generateRoomCardContext                 = require('gitter-web-shared/templates/partials/room-card-context-generator');
 
 /* How many chats to send back */
