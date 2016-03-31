@@ -5,7 +5,7 @@ var resolveRoomAvatarSrcSet = require('../avatars/resolve-room-avatar-srcset.js'
 var getOrgNameFromUri       = require('../get-org-name-from-uri');
 var defaultFilter           = require('../filters/left-menu-primary-default');
 
-module.exports = function suggestedOrgsFromRoomList(roomList, uri, currentRoomId) {
+module.exports = function suggestedOrgsFromRoomList(roomList, uri, currentRoomId, currentRoom) {
   var orgList = roomList.reduce(function(memo, room) {
     //remove on-to-one conversations
     if (room.githubType === 'ONETOONE') { return memo; }
@@ -40,24 +40,12 @@ module.exports = function suggestedOrgsFromRoomList(roomList, uri, currentRoomId
   //we shunt the new org to the top of the minibar list JP 8/3/16
   var currentOrg = getOrgNameFromUri(uri);
 
-  // FIXME: This is pretty dodge tbh. JP 7/3/16
-  // If a user is viewing `/gitterHQ/gitter` or `/gitterHQ` and have never joined a gitterHQ room
-  // we want to show the `gitterHQ` org in the minibar
-  // But when someone visits `/home` or `/explore`, we don't want it to pick it up as an org
-  var existingConversationByOrg = _.where(roomList, { url: '/' + currentOrg })[0];
-  var isExistingOneToOne        = !!existingConversationByOrg && (existingConversationByOrg.githubType === 'ONETOONE');
-  if (currentOrg === 'home' ||
-      currentOrg === 'explore' ||
-      currentOrg === 'learn' ||
-      isExistingOneToOne) {
-    return orgList;
+  if(currentRoom) {
+    var hasCurrentOrg = _.findWhere(orgList, { name: currentOrg });
+    //If we are sure that you are viewing an room for an org you have yet to join then
+    //we add a temporary org to your org list
+    if (!hasCurrentOrg) { orgList.unshift(getOrgItem(currentOrg, null, true)); }
   }
-
-  var hasCurrentOrg = _.findWhere(orgList, { name: currentOrg });
-
-  //If we are sure that you are viewing an room for an org you have yet to join then
-  //we add a temporary org to your org list
-  if (!hasCurrentOrg) { orgList.unshift(getOrgItem(currentOrg, null, true)); }
 
   return orgList;
 };
