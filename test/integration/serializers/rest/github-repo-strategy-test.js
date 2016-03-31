@@ -17,7 +17,7 @@ describe('GithubRepoStrategy', function() {
     user1: {},
     troupe1: {
       users: ['user1'],
-      githubType: 'USER_CHANNEL',
+      githubType: 'REPO',
       security: 'PUBLIC'
     }
   }));
@@ -86,7 +86,7 @@ describe('GithubRepoStrategy', function() {
             oneToOne: false,
             userCount: 1,
             url: '/' + t.uri,
-            githubType: 'USER_CHANNEL',
+            githubType: 'REPO',
             security: 'PUBLIC',
             noindex: false,
             v: 1
