@@ -483,12 +483,16 @@ function findMembersForRoomForNotify(troupeId, fromUserId, isAnnouncement, menti
     requiredBits = [
       roomMembershipFlags.FLAG_POS_NOTIFY_UNREAD,
       roomMembershipFlags.FLAG_POS_NOTIFY_ACTIVITY,
-      roomMembershipFlags.FLAG_POS_NOTIFY_ANNOUNCEMENT
+      roomMembershipFlags.FLAG_POS_NOTIFY_ANNOUNCEMENT,
+      roomMembershipFlags.FLAG_POS_NOTIFY_DESKTOP,
+      roomMembershipFlags.FLAG_POS_NOTIFY_MOBILE,
     ];
   } else {
     requiredBits = [
       roomMembershipFlags.FLAG_POS_NOTIFY_UNREAD,
       roomMembershipFlags.FLAG_POS_NOTIFY_ACTIVITY,
+      roomMembershipFlags.FLAG_POS_NOTIFY_DESKTOP,
+      roomMembershipFlags.FLAG_POS_NOTIFY_MOBILE
     ];
   }
 
@@ -539,11 +543,13 @@ function queryForToggles(flagToggles) {
     }
   }
 
-  addToggle('notify', roomMembershipFlags.FLAG_POS_NOTIFY_MENTION);
-  addToggle('activity', roomMembershipFlags.FLAG_POS_NOTIFY_ACTIVITY);
-  addToggle('mention', roomMembershipFlags.FLAG_POS_NOTIFY_MENTION);
+  addToggle('notify'      , roomMembershipFlags.FLAG_POS_NOTIFY_MENTION);
+  addToggle('activity'    , roomMembershipFlags.FLAG_POS_NOTIFY_ACTIVITY);
+  addToggle('mention'     , roomMembershipFlags.FLAG_POS_NOTIFY_MENTION);
   addToggle('announcement', roomMembershipFlags.FLAG_POS_NOTIFY_ANNOUNCEMENT);
-  addToggle('default', roomMembershipFlags.FLAG_POS_NOTIFY_DEFAULT);
+  addToggle('default'     , roomMembershipFlags.FLAG_POS_NOTIFY_DEFAULT);
+  addToggle('desktop'     , roomMembershipFlags.FLAG_POS_NOTIFY_DESKTOP);
+  addToggle('mobile'      , roomMembershipFlags.FLAG_POS_NOTIFY_MOBILE);
 
   var allRequired = flagToggles.all === true;
 

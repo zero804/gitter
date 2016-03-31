@@ -4,23 +4,16 @@ var StatusError = require('statuserror');
 
 /* Note, these can not change! */
 /* -----8<---- */
-var FLAG_POS_NOTIFY_UNREAD       = 0;
-var FLAG_POS_NOTIFY_ACTIVITY     = 1;
-var FLAG_POS_NOTIFY_MENTION      = 2;
-var FLAG_POS_NOTIFY_ANNOUNCEMENT = 3;
-var FLAG_POS_NOTIFY_DEFAULT      = 4;
+var FLAG_POS_NOTIFY_UNREAD       = 0; // Track unread counts
+var FLAG_POS_NOTIFY_ACTIVITY     = 1; // Send activity indicator
+var FLAG_POS_NOTIFY_MENTION      = 2; // Notify on mentions
+var FLAG_POS_NOTIFY_ANNOUNCEMENT = 3; // Notify on announcements
+var FLAG_POS_NOTIFY_DEFAULT      = 4; // Default setting?
+var FLAG_POS_NOTIFY_DESKTOP      = 5; // Send desktop notifications
+var FLAG_POS_NOTIFY_MOBILE       = 6; // Send mobile notifications
 
 /* -----8<---- */
-
 var BITMASK_INVERT = 0x0FFFFFFF;
-var BITMASK_MODE = 1 << FLAG_POS_NOTIFY_UNREAD |
-                   1 << FLAG_POS_NOTIFY_ACTIVITY |
-                   1 << FLAG_POS_NOTIFY_MENTION |
-                   1 << FLAG_POS_NOTIFY_ANNOUNCEMENT;
-
-var BITMASK_MODE_DEFAULT = BITMASK_MODE | 1 << FLAG_POS_NOTIFY_DEFAULT;
-
-var BITMASK_INVERT_MODE_DEFAULT = BITMASK_INVERT & ~BITMASK_MODE_DEFAULT;
 
 var BITMASK_NOTIFY_UNREAD       = 1 << FLAG_POS_NOTIFY_UNREAD;
 var BITMASK_NO_NOTIFY_UNREAD    = BITMASK_INVERT & ~BITMASK_NOTIFY_UNREAD;
@@ -29,13 +22,41 @@ var BITMASK_NO_NOTIFY_ACTIVITY  = BITMASK_INVERT & ~BITMASK_NOTIFY_ACTIVITY;
 var BITMASK_NOTIFY_MENTION      = 1 << FLAG_POS_NOTIFY_MENTION;
 var BITMASK_NOTIFY_ANNOUNCEMENT = 1 << FLAG_POS_NOTIFY_ANNOUNCEMENT;
 var BITMASK_NOTIFY_DEFAULT      = 1 << FLAG_POS_NOTIFY_DEFAULT;
+var BITMASK_NOTIFY_DESKTOP      = 1 << FLAG_POS_NOTIFY_DESKTOP;
+var BITMASK_NO_NOTIFY_DESKTOP   = BITMASK_INVERT & ~BITMASK_NOTIFY_DESKTOP;
+var BITMASK_NOTIFY_MOBILE       = 1 << FLAG_POS_NOTIFY_MOBILE;
+var BITMASK_NO_NOTIFY_MOBILE    = BITMASK_INVERT & ~BITMASK_NOTIFY_MOBILE;
+
+var BITMASK_MODE = BITMASK_NOTIFY_UNREAD |
+                   BITMASK_NOTIFY_ACTIVITY |
+                   BITMASK_NOTIFY_MENTION |
+                   BITMASK_NOTIFY_ANNOUNCEMENT |
+                   BITMASK_NOTIFY_DESKTOP |
+                   BITMASK_NOTIFY_MOBILE;
+
+/** Like BITMASK_MODE but ignores DESKTOP & MOBILE bits */
+var BITMASK_MODE_LEGACY = BITMASK_NOTIFY_UNREAD |
+                          BITMASK_NOTIFY_ACTIVITY |
+                          BITMASK_NOTIFY_MENTION |
+                          BITMASK_NOTIFY_ANNOUNCEMENT;
+
+var BITMASK_MODE_DEFAULT = BITMASK_MODE |
+                           BITMASK_NOTIFY_DEFAULT;
+
+var BITMASK_INVERT_MODE_DEFAULT = BITMASK_INVERT & ~BITMASK_MODE_DEFAULT;
 
 var MODES = {
   /* Mode: all: unread + no activity + mentions + announcements */
-  all: BITMASK_NOTIFY_UNREAD | BITMASK_NOTIFY_MENTION | BITMASK_NOTIFY_ANNOUNCEMENT,
+  all: BITMASK_NOTIFY_UNREAD |
+       BITMASK_NOTIFY_MENTION |
+       BITMASK_NOTIFY_ANNOUNCEMENT |
+       BITMASK_NOTIFY_DESKTOP |
+       BITMASK_NOTIFY_MOBILE,
 
   /* Mode: announcement: no unread + activity + mentions + announcements */
-  announcement: BITMASK_NOTIFY_ACTIVITY | BITMASK_NOTIFY_MENTION | BITMASK_NOTIFY_ANNOUNCEMENT,
+  announcement: BITMASK_NOTIFY_ACTIVITY |
+                BITMASK_NOTIFY_MENTION |
+                BITMASK_NOTIFY_ANNOUNCEMENT,
 
   /* Mode: mute: no unread + no activity + mentions + no announcements */
   mute: BITMASK_NOTIFY_MENTION,
@@ -44,7 +65,6 @@ var MODES = {
 /* Alias modes */
 MODES.mention = MODES.announcement;
 
-
 function getModeFromFlags(flags) {
   switch(flags & BITMASK_MODE) {
     case MODES.all:
@@ -52,6 +72,16 @@ function getModeFromFlags(flags) {
     case MODES.announcement:
       return 'announcement';
     case MODES.mute:
+      return 'mute';
+  }
+
+  // Ignoring the mobile and desktop notification settings..
+  switch(flags & BITMASK_MODE_LEGACY) {
+    case MODES.all & BITMASK_MODE_LEGACY:
+      return 'all';
+    case MODES.announcement & BITMASK_MODE_LEGACY:
+      return 'announcement';
+    case MODES.mute & BITMASK_MODE_LEGACY:
       return 'mute';
   }
 
@@ -102,7 +132,10 @@ function toggleLegacyLurkMode(flags, isLurk) {
   }
 
   if (isLurk) {
-    return flags & BITMASK_NO_NOTIFY_UNREAD | BITMASK_NOTIFY_ACTIVITY;
+    return flags & BITMASK_NO_NOTIFY_UNREAD
+            & BITMASK_NO_NOTIFY_DESKTOP // Legacy lurk mode, no desktop notifications
+            & BITMASK_NO_NOTIFY_MOBILE  // Legacy lurk mode, no mobile notifications
+            | BITMASK_NOTIFY_ACTIVITY;
   } else {
     return flags & BITMASK_NO_NOTIFY_ACTIVITY | BITMASK_NOTIFY_UNREAD;
   }
@@ -138,6 +171,14 @@ function hasNotifyAnnouncement(flags) {
   return flags & BITMASK_NOTIFY_ANNOUNCEMENT;
 }
 
+function hasNotifyDesktop(flags) {
+  return flags & BITMASK_NOTIFY_DESKTOP;
+}
+
+function hasNotifyMobile(flags) {
+  return flags & BITMASK_NOTIFY_MOBILE;
+}
+
 module.exports = {
   MODES: MODES,
 
@@ -145,6 +186,8 @@ module.exports = {
   FLAG_POS_NOTIFY_ACTIVITY: FLAG_POS_NOTIFY_ACTIVITY,
   FLAG_POS_NOTIFY_MENTION: FLAG_POS_NOTIFY_MENTION,
   FLAG_POS_NOTIFY_ANNOUNCEMENT: FLAG_POS_NOTIFY_ANNOUNCEMENT,
+  FLAG_POS_NOTIFY_DESKTOP: FLAG_POS_NOTIFY_DESKTOP,
+  FLAG_POS_NOTIFY_MOBILE: FLAG_POS_NOTIFY_MOBILE,
 
   getFlagsForMode: getFlagsForMode,
   getModeFromFlags: getModeFromFlags,
@@ -157,4 +200,8 @@ module.exports = {
   hasNotifyActivity: hasNotifyActivity,
   hasNotifyMention: hasNotifyMention,
   hasNotifyAnnouncement: hasNotifyAnnouncement,
+  hasNotifyDesktop: hasNotifyDesktop,
+  hasNotifyMobile: hasNotifyMobile,
+
+
 };
