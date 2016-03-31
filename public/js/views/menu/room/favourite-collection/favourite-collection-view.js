@@ -5,6 +5,13 @@ var PrimaryCollectionView = require('../primary-collection/primary-collection-vi
 var BaseCollectionView    = require('../base-collection/base-collection-view');
 
 var FavouriteCollection = PrimaryCollectionView.extend({
+
+  initialize: function() {
+    PrimaryCollectionView.prototype.initialize.apply(this, arguments);
+    this.listenTo(this.dndCtrl, 'dnd:start-drag', this.onDragStart, this);
+    this.listenTo(this.dndCtrl, 'dnd:start-end room-menu:add-favourite room-menu:sort-favourite', this.onDragEnd, this);
+  },
+
   getChildContainerToBeIndexed: function () {
     //For the favourite collection we use the first child because there
     //is no search header unlike the primary collection
@@ -17,15 +24,25 @@ var FavouriteCollection = PrimaryCollectionView.extend({
   //down to the base class. Not ideal but I don't want to introduce another layer of inheritance
   //between this and the primary collection at this point.
   //If the complexity around this rises I may consider it
-  setActive: function (){
+  setActive: function () {
     BaseCollectionView.prototype.setActive.apply(this, arguments);
   },
 
-  getEmptyView: function(){
-    switch(this.roomMenuModel.get('state')) {
+  getEmptyView: function() {
+    switch (this.roomMenuModel.get('state')) {
       default:
         return Marionette.ItemView.extend({ template: false });
     }
+  },
+
+  onDragStart: function () {
+    this.el.classList.add('dragging');
+    console.log('this is working', this.el);
+  },
+
+  onDragEnd: function () {
+    console.log('this is drag end');
+    this.el.classList.remove('dragging');
   },
 
 });
