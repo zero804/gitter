@@ -21,7 +21,7 @@ var Promise               = require('bluebird');
 /**
  *
  */
-function AllUnreadItemCountStategy(options) {
+function AllUnreadItemCountStrategy(options) {
   var self = this;
   var userId = options.userId || options.currentUserId;
 
@@ -37,8 +37,8 @@ function AllUnreadItemCountStategy(options) {
   };
 }
 
-AllUnreadItemCountStategy.prototype = {
-  name: 'AllUnreadItemCountStategy'
+AllUnreadItemCountStrategy.prototype = {
+  name: 'AllUnreadItemCountStrategy'
 };
 
 function RoomMembershipStrategy(options) {
@@ -73,7 +73,7 @@ function RoomMembershipStrategy(options) {
 }
 
 RoomMembershipStrategy.prototype = {
-  name: 'AllUnreadItemCountStategy'
+  name: 'AllUnreadItemCountStrategy'
 };
 
 
@@ -300,16 +300,16 @@ function TroupeStrategy(options) {
 
   var currentUserId = options.currentUserId;
 
-  var unreadItemStategy     = currentUserId && !options.skipUnreadCounts ? new AllUnreadItemCountStategy(options) : null;
-  var lastAccessTimeStategy = currentUserId ? new LastTroupeAccessTimesForUserStrategy(options) : null;
+  var unreadItemStrategy     = currentUserId && !options.skipUnreadCounts ? new AllUnreadItemCountStrategy(options) : null;
+  var lastAccessTimeStrategy = currentUserId ? new LastTroupeAccessTimesForUserStrategy(options) : null;
   var favouriteStrategy     = currentUserId ? new FavouriteTroupesForUserStrategy(options) : null;
   var lurkStrategy          = currentUserId ? new LurkTroupeForUserStrategy(options) : null;
   var activityStrategy      = currentUserId ? new ActivityForUserStrategy(options) : null;
   var tagsStrategy          = currentUserId ? new TagsStrategy(options) : null;
 
-  var userIdStategy         = new UserIdStrategy(options);
+  var userIdStrategy         = new UserIdStrategy(options);
   var proOrgStrategy        = new ProOrgStrategy(options);
-  var permissionsStategy    = (currentUserId || options.currentUser) && options.includePermissions ? new TroupePermissionsStrategy(options) : null;
+  var permissionsStrategy    = (currentUserId || options.currentUser) && options.includePermissions ? new TroupePermissionsStrategy(options) : null;
   var ownerIsOrgStrategy    = (options.includeOwner) ? new TroupeOwnerIsOrgStrategy(options) : null;
   var roomMembershipStrategy = currentUserId || options.isRoomMember !== undefined ? new RoomMembershipStrategy(options) : null;
 
@@ -331,7 +331,7 @@ function TroupeStrategy(options) {
       .uniq();
 
     var strategies = [
-      userIdStategy.preload(userIds),
+      userIdStrategy.preload(userIds),
       proOrgStrategy.preload(items)
     ];
 
@@ -339,24 +339,24 @@ function TroupeStrategy(options) {
       strategies.push(roomMembershipStrategy.preload(troupeIds));
     }
 
-    if(unreadItemStategy) {
-      strategies.push(unreadItemStategy.preload(troupeIds));
+    if(unreadItemStrategy) {
+      strategies.push(unreadItemStrategy.preload(troupeIds));
     }
 
     if(favouriteStrategy) {
       strategies.push(favouriteStrategy.preload());
     }
 
-    if(lastAccessTimeStategy) {
-      strategies.push(lastAccessTimeStategy.preload());
+    if(lastAccessTimeStrategy) {
+      strategies.push(lastAccessTimeStrategy.preload());
     }
 
     if (lurkStrategy) {
       strategies.push(lurkStrategy.preload());
     }
 
-    if (permissionsStategy) {
-      strategies.push(permissionsStategy.preload(items));
+    if (permissionsStrategy) {
+      strategies.push(permissionsStrategy.preload(items));
     }
 
     if(ownerIsOrgStrategy) {
@@ -379,13 +379,12 @@ function TroupeStrategy(options) {
   };
 
   function mapOtherUser(users) {
-
     var otherUser = users.filter(function(troupeUser) {
       return '' + troupeUser.userId !== '' + currentUserId;
     })[0];
 
     if(otherUser) {
-      var user = userIdStategy.map(otherUser.userId);
+      var user = userIdStrategy.map(otherUser.userId);
       if(user) {
         return user;
       }
@@ -424,7 +423,7 @@ function TroupeStrategy(options) {
         troupeUrl = "/" + item.uri;
     }
 
-    var unreadCounts = unreadItemStategy && unreadItemStategy.map(item.id);
+    var unreadCounts = unreadItemStrategy && unreadItemStrategy.map(item.id);
 
     return {
       id: item.id || item._id,
@@ -436,7 +435,7 @@ function TroupeStrategy(options) {
       user: otherUser,
       unreadItems: unreadCounts ? unreadCounts.unreadItems : undefined,
       mentions: unreadCounts ? unreadCounts.mentions : undefined,
-      lastAccessTime: lastAccessTimeStategy ? lastAccessTimeStategy.map(item.id) : undefined,
+      lastAccessTime: lastAccessTimeStrategy ? lastAccessTimeStrategy.map(item.id) : undefined,
       favourite: favouriteStrategy ? favouriteStrategy.map(item.id) : undefined,
       lurk: lurkStrategy ? !item.oneToOne && lurkStrategy.map(item.id) : undefined,
       activity: activityStrategy ? activityStrategy.map(item.id) : undefined,
@@ -446,7 +445,7 @@ function TroupeStrategy(options) {
       premium: isPro,
       noindex: item.noindex,
       tags: tagsStrategy ? tagsStrategy.map(item.id) : undefined,
-      permissions: permissionsStategy ? permissionsStategy.map(item) : undefined,
+      permissions: permissionsStrategy ? permissionsStrategy.map(item) : undefined,
       ownerIsOrg: ownerIsOrgStrategy ? ownerIsOrgStrategy.map(item) : undefined,
       roomMember: roomMembershipStrategy ? roomMembershipStrategy.map(item.id) : undefined,
       v: getVersion(item)
