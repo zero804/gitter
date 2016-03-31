@@ -4,13 +4,21 @@ var _                 = require('underscore');
 var Marionette        = require('backbone.marionette');
 var itemTemplate      = require('./minibar-item-view.hbs');
 var resolveRoomAvatar = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
+var updateUnreadIndicatorClassState = require('../../../../components/menu/update-unread-indicator-class-state');
 var toggleClass       = require('utils/toggle-class');
+
+
 
 module.exports =  Marionette.ItemView.extend({
   tagName:      'li',
   template:     itemTemplate,
+  ui: {
+    unreadIndicatorWrapper: '.room-menu-options__item__unread-indicator-wrapper',
+    unreadIndicator: '.room-menu-options__item__unread-indicator'
+  },
+
   modelEvents: {
-    'change:unreadItems change:mentions change:activity': 'render',
+    'change:unreadItems change:mentions change:activity': 'onUnreadUpdate',
     'change:active': 'onActiveStateUpdate',
   },
   events: {
@@ -31,6 +39,7 @@ module.exports =  Marionette.ItemView.extend({
     };
   },
 
+
   serializeData: function() {
     var data = this.model.toJSON();
     return _.extend({}, data, {
@@ -44,6 +53,18 @@ module.exports =  Marionette.ItemView.extend({
     });
   },
 
+  pulseIndicators: function() {
+    // Re-trigger the pulse animation
+    // 16ms is a good 60-fps number to trigger on which Firefox needs (requestAnimationFrame doesn't work for this)
+    Array.prototype.forEach.call(this.ui.unreadIndicator, function(unreadIndicatorElement) {
+    unreadIndicatorElement.style.animation = 'none';
+      setTimeout(function() {
+          unreadIndicatorElement.style.animation = '';
+      }, 16);
+    });
+  },
+
+
   onItemClicked: function() {
     this.trigger('minibar-item:clicked', this.model);
   },
@@ -52,26 +73,15 @@ module.exports =  Marionette.ItemView.extend({
     toggleClass(this.el, 'active', !!val);
   },
 
-  pulseIndicators: function() {
-    var model = this.model;
-    var hasIndicators = model.get('activity') > 0 || model.get('unreadItems') > 0 || model.get('mentions') > 0;
+  onUnreadUpdate: function() {
+    updateUnreadIndicatorClassState(this.model, this.ui.unreadIndicatorWrapper);
+    updateUnreadIndicatorClassState(this.model, this.ui.unreadIndicator);
 
-    if(hasIndicators) {
-      // Re-trigger the pulse animation
-      // 16ms is a good 60-fps number to trigger on which Firefox needs (requestAnimationFrame doesn't work for this)
-      var unreadIndicatorElements = this.el.querySelectorAll('.room-menu-options__item__unread-items, .room-menu-options__item__mentions, .room-menu-options__item__activity');
-      Array.prototype.forEach.call(unreadIndicatorElements, function(unreadIndicatorElement) {
-      unreadIndicatorElement.style.animation = 'none';
-        setTimeout(function() {
-            unreadIndicatorElement.style.animation = '';
-        }, 16);
-      });
-    }
+    this.pulseIndicators();
   },
 
   onRender: function() {
     toggleClass(this.el, 'active', !!this.model.get('active'));
-    this.pulseIndicators();
   },
 
 });
