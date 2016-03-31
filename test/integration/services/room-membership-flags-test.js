@@ -13,8 +13,8 @@ describe('room-membership-flags', function () {
     var FIXTURES = {
       "01101": "all",
       "11101": "all", // Ignore other values
-      "00100": "mute",
-      "10100": "mute", // Ignore other values
+      "00110": "mute",
+      "10110": "mute", // Ignore other values
       "01110": "announcement",
       "11110": "announcement", // Ignore other values
     };
@@ -57,8 +57,8 @@ describe('room-membership-flags', function () {
       },
       "mute-no-default": {
         mode: 'mute',
-        and: UNTOUCHED_BITS + "0000100",
-        or: "0000100",
+        and: UNTOUCHED_BITS + "0000110",
+        or: "0000110",
         lurk: true,
         isDefault: undefined
       },
@@ -88,8 +88,8 @@ describe('room-membership-flags', function () {
       },
       "mute-is-default": {
         mode: 'mute',
-        and: UNTOUCHED_BITS + "0010100",
-        or: "0010100",
+        and: UNTOUCHED_BITS + "0010110",
+        or: "0010110",
         lurk: true,
         isDefault: true
       },
@@ -119,8 +119,8 @@ describe('room-membership-flags', function () {
       },
       "mute-not-default": {
         mode: 'mute',
-        and: UNTOUCHED_BITS + "0000100",
-        or: "0000100",
+        and: UNTOUCHED_BITS + "0000110",
+        or: "0000110",
         lurk: true,
         isDefault: false
       },
@@ -225,7 +225,7 @@ describe('room-membership-flags', function () {
       "mute-default": {
         mode: 'mute',
         default: true,
-        value: '10100'
+        value: '10110'
       },
 
       /* ----------------------- */
@@ -248,7 +248,7 @@ describe('room-membership-flags', function () {
       "mute-not-default": {
         mode: 'mute',
         default: false,
-        value: '100'
+        value: '110'
       },
     };
 

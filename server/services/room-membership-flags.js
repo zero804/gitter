@@ -58,14 +58,15 @@ var MODES = {
                 BITMASK_NOTIFY_MENTION |
                 BITMASK_NOTIFY_ANNOUNCEMENT,
 
-  /* Mode: mute: no unread + no activity + mentions + no announcements */
-  mute: BITMASK_NOTIFY_MENTION,
+  /* Mode: mute: no unread + activity + mentions + no announcements */
+  mute: BITMASK_NOTIFY_ACTIVITY |
+        BITMASK_NOTIFY_MENTION,
 };
 
 /* Alias modes */
 MODES.mention = MODES.announcement;
 
-function getModeFromFlags(flags) {
+function getModeFromFlags(flags, strict) {
   switch(flags & BITMASK_MODE) {
     case MODES.all:
       return 'all';
@@ -74,6 +75,8 @@ function getModeFromFlags(flags) {
     case MODES.mute:
       return 'mute';
   }
+
+  if (strict) return null;
 
   // Ignoring the mobile and desktop notification settings..
   switch(flags & BITMASK_MODE_LEGACY) {

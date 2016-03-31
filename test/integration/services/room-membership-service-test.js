@@ -169,7 +169,13 @@ describe('room-membership-service', function() {
             assert.deepEqual(modeExtended, {
               mode: 'mute',
               lurk: true,
-              flags: parseInt('100', 2)
+              flags: parseInt('110', 2),
+              unread: false,
+              activity: true,
+              announcement: false,
+              mention: true,
+              desktop: false,
+              mobile: false
             });
             return roomMembershipService.getMemberLurkStatus(troupeId2, userId1);
           })
@@ -203,6 +209,21 @@ describe('room-membership-service', function() {
           })
           .then(function(mode) {
             assert.strictEqual(mode, 'announcement');
+            return roomMembershipService.getMembershipDetails(userId1, troupeId2);
+          })
+          .then(function(modeExtended) {
+            assert.deepEqual(modeExtended, {
+              mode: 'announcement',
+              lurk: true,
+              flags: parseInt('1110', 2),
+              unread: false,
+              activity: true,
+              announcement: true,
+              mention: true,
+              desktop: false,
+              mobile: false
+            });
+
             return roomMembershipService.getMemberLurkStatus(troupeId2, userId1);
           })
           .then(function(lurking) {
@@ -229,6 +250,20 @@ describe('room-membership-service', function() {
           })
           .then(function(mode) {
             assert.strictEqual(mode, 'all');
+            return roomMembershipService.getMembershipDetails(userId1, troupeId2);
+          })
+          .then(function(modeExtended) {
+            assert.deepEqual(modeExtended, {
+              mode: 'all',
+              lurk: false,
+              flags: parseInt('1101101', 2),
+              unread: true,
+              activity: false,
+              announcement: true,
+              mention: true,
+              desktop: true,
+              mobile: true
+            });
             return roomMembershipService.getMemberLurkStatus(troupeId2, userId1);
           })
           .then(function(lurking) {
@@ -293,6 +328,21 @@ describe('room-membership-service', function() {
           })
           .then(function(mode) {
             assert.strictEqual(mode, 'all');
+            return roomMembershipService.getMembershipDetails(userId1, troupeId2);
+          })
+          .then(function(modeExtended) {
+            assert.deepEqual(modeExtended, {
+              mode: 'all',
+              lurk: false,
+              flags: parseInt('1101101', 2),
+              unread: true,
+              activity: false,
+              announcement: true,
+              mention: true,
+              desktop: true,
+              mobile: true
+            });
+
             return roomMembershipService.getMemberLurkStatus(troupeId2, userId1);
           })
           .then(function(lurking) {
@@ -670,7 +720,7 @@ describe('room-membership-service', function() {
 
       function equivalentValues(array, expected) {
         var keys = Object.keys(expected);
-        assert.strictEqual(array.length, keys.length);
+        assert.strictEqual(array.length, keys.length, 'Expected ' + keys.length + ' items, got ' + array.length);
         array.forEach(function(item) {
           var expectedItem = expected[item.userId];
           assert(expectedItem !== undefined, 'Item for user ' + item.userId + ' does not exist');
@@ -705,6 +755,7 @@ describe('room-membership-service', function() {
             var expected = {};
             expected[userId1] = roomMembershipFlags.MODES.all;
             expected[userId2] = roomMembershipFlags.MODES.announcement;
+            expected[userId3] = roomMembershipFlags.MODES.mute;
 
             equivalentValues(result, expected);
           });
@@ -717,6 +768,7 @@ describe('room-membership-service', function() {
             result.sort(roomForNotifySort);
             var expected = {};
             expected[userId2] = roomMembershipFlags.MODES.announcement;
+            expected[userId3] = roomMembershipFlags.MODES.mute;
 
             equivalentValues(result, expected);
           });
@@ -728,6 +780,7 @@ describe('room-membership-service', function() {
             var expected = {};
             expected[userId1] = roomMembershipFlags.MODES.all;
             expected[userId2] = roomMembershipFlags.MODES.announcement;
+            expected[userId3] = roomMembershipFlags.MODES.mute;
 
             equivalentValues(result, expected);
           });
@@ -739,6 +792,7 @@ describe('room-membership-service', function() {
             var expected = {};
             expected[userId1] = roomMembershipFlags.MODES.all;
             expected[userId2] = roomMembershipFlags.MODES.announcement;
+            expected[userId3] = roomMembershipFlags.MODES.mute;
 
             equivalentValues(result, expected);
           });
@@ -750,6 +804,7 @@ describe('room-membership-service', function() {
             var expected = {};
             expected[userId1] = roomMembershipFlags.MODES.all;
             expected[userId2] = roomMembershipFlags.MODES.announcement;
+            expected[userId3] = roomMembershipFlags.MODES.mute;
 
             equivalentValues(result, expected);
           });

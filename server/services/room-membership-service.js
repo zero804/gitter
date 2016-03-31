@@ -385,13 +385,13 @@ function resetTroupeUserCount(troupeId) {
     });
 }
 
-var getMembershipMode = Promise.method(function (userId, troupeId) {
+var getMembershipMode = Promise.method(function (userId, troupeId, strict) {
   return TroupeUser.findOne({ troupeId: troupeId, userId: userId }, { flags: 1, _id: 0 }, { lean: true })
     .exec()
     .then(function(troupeUser) {
        if (!troupeUser) return null;
 
-       return roomMembershipFlags.getModeFromFlags(troupeUser.flags);
+       return roomMembershipFlags.getModeFromFlags(troupeUser.flags, strict);
     });
 });
 
@@ -401,11 +401,20 @@ var getMembershipDetails = Promise.method(function (userId, troupeId) {
     .then(function(troupeUser) {
        if (!troupeUser) return null;
        var flags = troupeUser.flags;
+       var mode = roomMembershipFlags.getModeFromFlags(flags);
+       var hash = roomMembershipFlags.flagsToHash(flags);
 
        return {
-         mode: roomMembershipFlags.getModeFromFlags(flags),
+         mode: mode,
          lurk: roomMembershipFlags.getLurkForFlags(flags),
-         flags: flags
+         flags: flags,
+
+         unread: hash.unread,
+         activity: hash.activity,
+         mention: hash.mention,
+         announcement: hash.announcement,
+         desktop: hash.desktop,
+         mobile: hash.mobile
        };
     });
 });
@@ -452,7 +461,7 @@ var setMembershipModeForUsersInRoom = Promise.method(function(troupeId, userIds,
     });
 });
 
-var findMembershipModeForUsersInRoom = Promise.method(function(troupeId, userIds) {
+var findMembershipModeForUsersInRoom = Promise.method(function(troupeId, userIds, strict) {
   return TroupeUser.find({
       troupeId: troupeId,
       userId: { $in: mongoUtils.asObjectIDs(userIds) }
@@ -466,7 +475,7 @@ var findMembershipModeForUsersInRoom = Promise.method(function(troupeId, userIds
     .exec()
     .then(function(troupeUsers) {
       return _.reduce(troupeUsers, function(memo, troupeUser) {
-        memo[troupeUser.userId] = roomMembershipFlags.getModeFromFlags(troupeUser.flags);
+        memo[troupeUser.userId] = roomMembershipFlags.getModeFromFlags(troupeUser.flags, strict);
         return memo;
       }, {});
     });
