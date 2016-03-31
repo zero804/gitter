@@ -1,13 +1,28 @@
 'use strict';
 
+var Promise = require('bluebird');
+var _ = require('lodash');
 var suggestions    = require('gitter-web-suggestions');
 var restSerializer = require('../../../serializers/rest-serializer');
+var troupeService = require('../../../services/troupe-service');
+var roomMembershipService = require('../../../services/room-membership-service');
+var collections = require('../../../utils/collections');
 
 module.exports = {
   index: function(req) {
     var userId  = req.user._id;
     var orgName = req.params.orgName.toLowerCase();
-    return suggestions.getSuggestionsForOrg(orgName, userId)
+    return Promise.join(
+        troupeService.findChildRoomsForOrg(orgName, {security: 'PUBLIC'}),
+        roomMembershipService.findRoomIdsForUser(userId),
+        function(rooms, existingRoomIds) {
+          var idMap = collections.hashArray(existingRoomIds);
+
+          return _.reject(rooms, function(room) {
+            return idMap[room.id];
+          });
+        }
+      )
       .then(function(suggestions) {
         return restSerializer.serialize(suggestions, new restSerializer.SuggestedRoomStrategy({ }));
       });

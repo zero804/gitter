@@ -21,8 +21,8 @@ exports.install = function() {
   installed = true;
 
   /* New online notification */
-  appEvents.onNewOnlineNotification(function(troupeId, chatId, userIds, mentioned) {
-    return onlineNotificationGeneratorService.sendOnlineNotifications(troupeId, chatId, userIds, mentioned)
+  appEvents.onNewOnlineNotification(function(troupeId, chatId, userIds) {
+    return onlineNotificationGeneratorService.sendOnlineNotifications(troupeId, chatId, userIds)
       .catch(function (err) {
         logger.error('Error while generating online notifications: ' + err, { exception: err });
       });

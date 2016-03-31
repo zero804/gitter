@@ -8,7 +8,7 @@ var userNotifications      = require('components/user-notifications');
 
 var OPTIONS = [
   { val: 'all', text: 'All: Notify me for all messages' },
-  { val: 'mention', text: 'Announcements: Notify me for mentions and announcements' },
+  { val: 'announcement', text: 'Announcements: Notify me for mentions and announcements' },
   { val: 'mute', text: 'Mute: Notify me only when I\'m directly mentioned' }
 ];
 
@@ -27,6 +27,8 @@ var View = Marionette.ItemView.extend({
   },
 
   initialize: function() {
+    // TODO: this should go to the userRoom endpoint as a get
+    // or better yet should be a live field on the room
     apiClient.userRoom.get('/settings/notifications')
       .bind(this)
       .then(function(settings) {
@@ -37,17 +39,16 @@ var View = Marionette.ItemView.extend({
 
   getNotificationOption: function() {
     var model = this.model;
-    var value = model.get('mode') || model.get('push');
+    var value = model.get('mode');
     var lurk = model.get('lurk');
 
     switch(value) {
       case 'all':
         return { selectValue: 'all', nonStandard: lurk === true, lurk: lurk };
 
-      case 'annoucement':
-      case 'annoucements':
+      case 'announcement':
       case 'mention':
-        return { selectValue: 'mention', nonStandard: lurk === false, lurk: lurk };
+        return { selectValue: 'announcement', nonStandard: lurk === false, lurk: lurk };
 
       case 'mute':
         return { selectValue: 'mute', nonStandard: lurk === false, lurk: lurk };
@@ -115,6 +116,7 @@ var View = Marionette.ItemView.extend({
     if(e) e.preventDefault();
 
     var mode = this.ui.options.val();
+    // TODO: this should go to the userRoom endpoint as a patch
     apiClient.userRoom.put('/settings/notifications', { mode: mode })
       .bind(this)
       .then(function(settings) {
