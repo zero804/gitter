@@ -12,7 +12,7 @@ JP 11/2/16
 
 .room-item-selected() {
   cursor:           pointer;
-  background-color: rgba(255, 255, 255, .1);
+  background-color: @room-item-selected-bg;
   color:            white;
 }
 
@@ -22,7 +22,7 @@ JP 11/2/16
 }
 
 .room-item--one2one {
-  .room-item();
+  .m-room-item();
 
   &.active {
     max-height: @menu-item-height * 2;
