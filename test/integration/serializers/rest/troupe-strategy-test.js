@@ -1,17 +1,11 @@
 "use strict";
 
-var assert = require("assert");
 var testRequire = require('../../test-require');
+var assertUtils = testRequire('./utils/assert-utils')
 var fixtureLoader = require('../../test-fixtures');
 var serialize = testRequire('./serializers/serialize');
 var TroupeStrategy = testRequire('./serializers/rest/troupe-strategy');
 
-
-function assertSerializedEqual(value, expected) {
-  assert.strictEqual(
-    JSON.stringify(value, null, '  '),
-    JSON.stringify(expected, null, '  '));
-}
 
 describe('TroupeStrategy', function() {
   var blockTimer = require('../../block-timer');
@@ -44,7 +38,7 @@ describe('TroupeStrategy', function() {
     var t = fixture.troupe1;
     return serialize([t], strategy)
       .then(function(s) {
-        assertSerializedEqual(s, [{
+        assertUtils.assertSerializedEqual(s, [{
           id: t.id,
           name: t.uri,
           topic: '',
@@ -64,7 +58,7 @@ describe('TroupeStrategy', function() {
     var t = fixture.troupe1;
     return serialize([t], strategy)
       .then(function(s) {
-        assertSerializedEqual(s, [{
+        assertUtils.assertSerializedEqual(s, [{
           id: t.id,
           name: t.uri,
           topic: '',
@@ -90,7 +84,7 @@ describe('TroupeStrategy', function() {
     var t = fixture.troupe2;
     return serialize([t], strategy)
       .then(function(s) {
-        assertSerializedEqual(s, [{
+        assertUtils.assertSerializedEqual(s, [{
           id: t.id,
           name: u2.displayName,
           topic: '',
@@ -127,7 +121,7 @@ describe('TroupeStrategy', function() {
     var t = fixture.troupe1;
     return serialize([t], strategy)
       .then(function(s) {
-        assertSerializedEqual(s, [{
+        assertUtils.assertSerializedEqual(s, [{
           id: t.id,
           name: t.uri,
           topic: '',
@@ -153,7 +147,7 @@ describe('TroupeStrategy', function() {
     var t = fixture.troupe1;
     return serialize([t], strategy)
       .then(function(s) {
-        assertSerializedEqual(s, [{
+        assertUtils.assertSerializedEqual(s, [{
           id: t.id,
           name: t.uri,
           topic: '',
@@ -186,7 +180,7 @@ describe('TroupeStrategy', function() {
     var t = fixture.troupe1;
     return serialize([t], strategy)
       .then(function(s) {
-        assertSerializedEqual(s, [{
+        assertUtils.assertSerializedEqual(s, [{
           id: t.id,
           name: t.uri,
           topic: '',
@@ -207,7 +201,7 @@ describe('TroupeStrategy', function() {
     var t = fixture.troupe1;
     return serialize([t], strategy)
       .then(function(s) {
-        assertSerializedEqual(s, [{
+        assertUtils.assertSerializedEqual(s, [{
           id: t.id,
           name: t.uri,
           topic: '',

@@ -3,16 +3,10 @@
 var testRequire = require('../../test-require');
 
 var fixtureLoader = require('../../test-fixtures');
-var assert = require('assert');
+var assertUtils = testRequire('./utils/assert-utils')
 var serialize = testRequire('./serializers/serialize');
 var UserStrategy = testRequire('./serializers/rest/user-strategy');
 var UserIdStrategy = testRequire('./serializers/rest/user-id-strategy');
-
-function assertSerializedEqual(value, expected) {
-  assert.strictEqual(
-    JSON.stringify(value, null, '  '),
-    JSON.stringify(expected, null, '  '));
-}
 
 describe('user-strategy-test', function() {
   var blockTimer = require('../../block-timer');
@@ -58,7 +52,7 @@ describe('user-strategy-test', function() {
       var strategy = new UserStrategy({ });
       return serialize([fixture.user1], strategy)
         .then(function(s) {
-          assertSerializedEqual(s, expected1);
+          assertUtils.assertSerializedEqual(s, expected1);
         });
     });
 
@@ -66,7 +60,7 @@ describe('user-strategy-test', function() {
       var strategy = new UserStrategy({ lean: true });
       return serialize([fixture.user1], strategy)
         .then(function(s) {
-          assertSerializedEqual(s, expectedLean);
+          assertUtils.assertSerializedEqual(s, expectedLean);
         });
     });
 
@@ -74,7 +68,7 @@ describe('user-strategy-test', function() {
       var strategy = new UserStrategy({ includeRolesForTroupeId: fixture.troupe1.id });
       return serialize([fixture.user1], strategy)
         .then(function(s) {
-          assertSerializedEqual(s, expected1);
+          assertUtils.assertSerializedEqual(s, expected1);
         });
     });
 
@@ -82,7 +76,7 @@ describe('user-strategy-test', function() {
       var strategy = new UserStrategy({ showPresenceForTroupeId: fixture.troupe1.id });
       return serialize([fixture.user1], strategy)
         .then(function(s) {
-          assertSerializedEqual(s, expected1);
+          assertUtils.assertSerializedEqual(s, expected1);
         });
     });
 
@@ -91,7 +85,7 @@ describe('user-strategy-test', function() {
       var strategy = new UserStrategy({ showPremiumStatus: true });
       return serialize([fixture.user1], strategy)
         .then(function(s) {
-          assertSerializedEqual(s, expected1);
+          assertUtils.assertSerializedEqual(s, expected1);
         });
     });
 
@@ -103,7 +97,7 @@ describe('user-strategy-test', function() {
       var strategy = new UserIdStrategy({ });
       return serialize([fixture.user1.id], strategy)
         .then(function(s) {
-          assertSerializedEqual(s, expected1);
+          assertUtils.assertSerializedEqual(s, expected1);
         });
     });
 
@@ -111,7 +105,7 @@ describe('user-strategy-test', function() {
       var strategy = new UserIdStrategy({ lean: true });
       return serialize([fixture.user1.id], strategy)
         .then(function(s) {
-          assertSerializedEqual(s, expectedLean);
+          assertUtils.assertSerializedEqual(s, expectedLean);
         });
     });
 
@@ -119,7 +113,7 @@ describe('user-strategy-test', function() {
       var strategy = new UserIdStrategy({ includeRolesForTroupeId: fixture.troupe1.id });
       return serialize([fixture.user1.id], strategy)
         .then(function(s) {
-          assertSerializedEqual(s, expected1);
+          assertUtils.assertSerializedEqual(s, expected1);
         });
     });
 
@@ -127,7 +121,7 @@ describe('user-strategy-test', function() {
       var strategy = new UserIdStrategy({ showPresenceForTroupeId: fixture.troupe1.id });
       return serialize([fixture.user1.id], strategy)
         .then(function(s) {
-          assertSerializedEqual(s, expected1);
+          assertUtils.assertSerializedEqual(s, expected1);
         });
     });
 
@@ -136,7 +130,7 @@ describe('user-strategy-test', function() {
       var strategy = new UserIdStrategy({ showPremiumStatus: true });
       return serialize([fixture.user1.id], strategy)
         .then(function(s) {
-          assertSerializedEqual(s, expected1);
+          assertUtils.assertSerializedEqual(s, expected1);
         });
     });
 

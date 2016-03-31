@@ -1,9 +1,8 @@
 'use strict';
 
 var testRequire = require('../../test-require');
-
+var assertUtils = testRequire('./utils/assert-utils')
 var fixtureLoader = require('../../test-fixtures');
-var assert = require('assert');
 var serialize = testRequire('./serializers/serialize');
 var ChatStrategy = testRequire('./serializers/rest/chat-strategy');
 var ChatIdStrategy = testRequire('./serializers/rest/chat-id-strategy');
@@ -16,11 +15,6 @@ function makeHash() {
   return hash;
 }
 
-function assertSerializedEqual(value, expected) {
-  assert.strictEqual(
-    JSON.stringify(value, null, '  '),
-    JSON.stringify(expected, null, '  '));
-}
 
 describe('chat-strategy-test', function() {
   var blockTimer = require('../../block-timer');
@@ -163,7 +157,7 @@ describe('chat-strategy-test', function() {
       var strategy = new ChatStrategy({ currentUserId: fixture.user1.id, troupeId: fixture.troupe1.id });
       return serialize([fixture.message1], strategy)
         .then(function(s) {
-          assertSerializedEqual(s, expected1);
+          assertUtils.assertSerializedEqual(s, expected1);
         });
     });
 
@@ -171,7 +165,7 @@ describe('chat-strategy-test', function() {
       var strategy = new ChatStrategy({ currentUserId: null, troupeId: fixture.troupe1.id });
       return serialize([fixture.message1], strategy)
         .then(function(s) {
-          assertSerializedEqual(s, expectedAnonymous);
+          assertUtils.assertSerializedEqual(s, expectedAnonymous);
         });
     });
 
@@ -179,7 +173,7 @@ describe('chat-strategy-test', function() {
       var strategy = new ChatStrategy({ lean: true, currentUserId: fixture.user1.id, troupeId: fixture.troupe1.id });
       return serialize([fixture.message1], strategy)
         .then(function(s) {
-          assertSerializedEqual(s, expectedLeanTrue);
+          assertUtils.assertSerializedEqual(s, expectedLeanTrue);
         });
     });
 
@@ -187,7 +181,7 @@ describe('chat-strategy-test', function() {
       var strategy = new ChatStrategy({ initialId: fixture.message1.id });
       return serialize([fixture.message1], strategy)
         .then(function(s) {
-          assertSerializedEqual(s, expectedInitialId);
+          assertUtils.assertSerializedEqual(s, expectedInitialId);
         });
     });
 
@@ -195,7 +189,7 @@ describe('chat-strategy-test', function() {
       var strategy = new ChatStrategy({ lean: 2, currentUserId: fixture.user1.id, troupeId: fixture.troupe1.id });
       return serialize([fixture.message1], strategy)
         .then(function(s) {
-          assertSerializedEqual(s, expectedLean2);
+          assertUtils.assertSerializedEqual(s, expectedLean2);
         });
     });
   });
@@ -206,7 +200,7 @@ describe('chat-strategy-test', function() {
       var strategy = new ChatIdStrategy({ currentUserId: fixture.user1.id, troupeId: fixture.troupe1.id });
       return serialize([fixture.message1.id], strategy)
         .then(function(s) {
-          assertSerializedEqual(s, expected1);
+          assertUtils.assertSerializedEqual(s, expected1);
         });
     });
 
@@ -214,7 +208,7 @@ describe('chat-strategy-test', function() {
       var strategy = new ChatIdStrategy({ currentUserId: null, troupeId: fixture.troupe1.id });
       return serialize([fixture.message1.id], strategy)
         .then(function(s) {
-          assertSerializedEqual(s, expectedAnonymous);
+          assertUtils.assertSerializedEqual(s, expectedAnonymous);
         });
     });
 
@@ -222,7 +216,7 @@ describe('chat-strategy-test', function() {
       var strategy = new ChatIdStrategy({ lean: true, currentUserId: fixture.user1.id, troupeId: fixture.troupe1.id });
       return serialize([fixture.message1.id], strategy)
         .then(function(s) {
-          assertSerializedEqual(s, expectedLeanTrue);
+          assertUtils.assertSerializedEqual(s, expectedLeanTrue);
         });
     });
 
@@ -230,7 +224,7 @@ describe('chat-strategy-test', function() {
       var strategy = new ChatIdStrategy({ initialId: fixture.message1.id });
       return serialize([fixture.message1.id], strategy)
         .then(function(s) {
-          assertSerializedEqual(s, expectedInitialId);
+          assertUtils.assertSerializedEqual(s, expectedInitialId);
         });
     });
 
@@ -238,7 +232,7 @@ describe('chat-strategy-test', function() {
       var strategy = new ChatIdStrategy({ lean: 2, currentUserId: fixture.user1.id, troupeId: fixture.troupe1.id });
       return serialize([fixture.message1.id], strategy)
         .then(function(s) {
-          assertSerializedEqual(s, expectedLean2);
+          assertUtils.assertSerializedEqual(s, expectedLean2);
         });
     });
   });
