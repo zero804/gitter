@@ -1,11 +1,15 @@
-{{#if hasIndicators}}
-  {{#if mentions}}
-    <span class="room-menu-options__item__mentions">{{mentions}}</span>
-  {{else if unreadItems}}
-    <span class="room-menu-options__item__unread-items">{{unreadItems}}</span>
-  {{else if activity}}
-    <span class="room-menu-options__item__activity">&nbsp;</span>
-  {{/if}}
+{{#if hasUnreadIndicators}}
+  <span
+    class="room-menu-options__item__unread-indicator
+      {{#if mentions}}has-mentions{{else if unreadItems}}has-unreads{{else if activity}}has-activity{{/if}}"
+    aria-label="{{#if mentions}}You were mentioned in a {{name}} room{{else}}Unread activity in a {{name}} room{{/if}}"
+  >
+    {{#if mentions}}
+      {{mentions}}
+    {{else if unreadItems}}
+      {{unreadItems}}
+    {{/if}}
+  </span>
 {{/if}}
 
 {{#if isHome}}

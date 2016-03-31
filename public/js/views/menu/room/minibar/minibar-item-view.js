@@ -33,14 +33,13 @@ module.exports =  Marionette.ItemView.extend({
 
   serializeData: function() {
     var data = this.model.toJSON();
-    var activity = (data.mentions || data.unreadItems) ? false : data.activity;
     return _.extend({}, data, {
       isHome:        (data.type === 'all'),
       isSearch:      (data.type === 'search'),
       isFavourite:   (data.type === 'favourite'),
       isPeople:      (data.type === 'people'),
       isOrg:         (data.type === 'org'),
-      hasIndicators: (data.type === 'people' || data.type === 'org'),
+      hasUnreadIndicators: (data.type === 'people' || data.type === 'org'),
       avatarSrcset:  resolveRoomAvatar({ uri: data.name }, 23)
     });
   },
