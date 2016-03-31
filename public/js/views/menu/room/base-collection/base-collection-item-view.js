@@ -2,9 +2,10 @@
 
 var Marionette  = require('backbone.marionette');
 var _           = require('underscore');
-var template    = require('./base-collection-item-view.hbs');
-var toggleClass = require('utils/toggle-class');
 var context     = require('utils/context');
+var toggleClass = require('utils/toggle-class');
+var template    = require('./base-collection-item-view.hbs');
+var updateUnreadIndicatorClassState = require('../../../../components/menu/update-unread-indicator-class-state');
 
 module.exports = Marionette.ItemView.extend({
 
@@ -18,11 +19,12 @@ module.exports = Marionette.ItemView.extend({
   modelEvents: {
     'change:selected': 'onSelectedChange',
     'change:focus':    'onItemFocused',
-    'change:unreadItems change:mentions change:activity': 'render',
+    'change:unreadItems change:mentions change:activity': 'onUnreadUpdate',
   },
 
   ui: {
-    container: '#room-item__container'
+    container: '#room-item__container',
+    unreadIndicator: '.room-item__unread-indicator'
   },
 
   constructor: function(attrs) {
@@ -44,6 +46,20 @@ module.exports = Marionette.ItemView.extend({
 
   onItemFocused: function(model, val) {//jshint unused: true
     toggleClass(this.ui.container[0], 'focus', !!val);
+  },
+
+  onUnreadUpdate: function() {
+    updateUnreadIndicatorClassState(this.model, this.ui.unreadIndicator);
+
+    // Update the count inside the badge indicator
+    var unreadIndicatorContent = '';
+    var unreads = this.model.get('unreadItems');
+    if(unreads > 0) {
+      unreadIndicatorContent = unreads;
+    }
+    Array.prototype.forEach.call(  this.ui.unreadIndicator, function(indicatorElement) {
+      indicatorElement.innerHTML = unreadIndicatorContent;
+    });
   },
 
 });

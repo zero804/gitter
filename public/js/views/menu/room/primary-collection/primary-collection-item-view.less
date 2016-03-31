@@ -85,7 +85,6 @@ JP 11/2/16
   justify-content: center;
   min-width:     @size;
   height:        @size;
-  margin-left:   1rem;
 
   border-radius: 100%;
   border:        2px solid transparent;
@@ -95,22 +94,28 @@ JP 11/2/16
   line-height:   1;
 }
 
+.room-item__unread-indicator-visibile-reset() {
+  visibility: visible;
+  margin-left: 0;
+  opacity: 1;
+  transition-delay: 0s;
+}
+
 .room-item__unread-indicator {
   .unread-indicator(@menu-unread-badge-size);
-  position: absolute;
   visibility: hidden;
+  margin-left: -@menu-unread-badge-size;
   opacity: 0;
 
   transition:
-    max-width .2s ease,
+    visibility 0s ease .2s,
+    margin-left .2s ease,
     opacity .2s ease,
     background-color .2s ease,
     border-color .2s ease;
 
   &.has-unreads {
-    position: relative;
-    visibility: visible;
-    opacity: 1;
+    .room-item__unread-indicator-visibile-reset();
 
     background-color: @caribbean;
 
@@ -120,9 +125,7 @@ JP 11/2/16
   }
   &.has-activity {
     .unread-indicator(@menu-unread-badge-size / 3);
-    position: relative;
-    visibility: visible;
-    opacity: 1;
+    .room-item__unread-indicator-visibile-reset();
 
     border-color: @caribbean;
 
@@ -131,9 +134,7 @@ JP 11/2/16
     animation-timing-function: ease;
   }
   &.has-mentions {
-    position: relative;
-    visibility: visible;
-    opacity: 1;
+    .room-item__unread-indicator-visibile-reset();
 
     background-color: @jaffa;
 
