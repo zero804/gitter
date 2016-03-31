@@ -1,13 +1,13 @@
 'use strict';
 
-var _                       = require('underscore');
-var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
-var roomNameShortener       = require('../room-name-shortener');
+var _                        = require('underscore');
+var resolveRoomAvatarSrcSet  = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
+var roomNameShortener        = require('../room-name-shortener');
+var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 
 var AVATAR_SIZE = 22;
 
 module.exports = function parseContentToTemplateData(data, state) {
-
     data.url  = (data.url || '');
     data.name = (data.name || '');
 
@@ -32,10 +32,16 @@ module.exports = function parseContentToTemplateData(data, state) {
     var unreadItems  = !hasMentions && data.unreadItems;
     var lurkActivity = data.lurk && (!hasMentions && !unreadItems) && !!data.activity;
 
+    var roomName = data.name;
+    // Get rid of the org prefix, if viewing in a org bucket
+    if(state === 'org') {
+      roomName = data.name.replace(new RegExp('^' + getOrgNameFromTroupeName(data.name) + '/'), '');
+    }
+
     return _.extend({}, data, {
       avatarSrcset:  resolveRoomAvatarSrcSet({ uri: name }, AVATAR_SIZE),
       isNotOneToOne: (data.githubType !== 'ONETOONE'),
-      name:          roomNameShortener(data.name),
+      name:          roomNameShortener(roomName),
       mentions:      hasMentions,
       unreadItems:   unreadItems,
       lurkActivity:  lurkActivity,
