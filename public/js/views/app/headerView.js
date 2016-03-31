@@ -78,6 +78,7 @@ module.exports = Marionette.ItemView.extend({
       troupeTopic:     data.topic,
       avatarSrcSet:    resolveRoomAvatarSrcSet({ uri: data.url }, 48),
       user:            !!context.isLoggedIn(),
+      isAdmin:         context.isTroupeAdmin(),
       archives:        this.options.archives,
       oneToOne:        (data.githubType === 'ONETOONE'),
       githubLink:      getGithubUrl(data),
