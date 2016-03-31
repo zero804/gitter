@@ -31,34 +31,34 @@ describe('room-membership-flags', function () {
   });
 
   describe('getUpdateForMode', function() {
-    var UNTOUCHED_BITS = '11111111111111111111111';
+    var UNTOUCHED_BITS = '111111111111111111111';
 
     var FIXTURES = {
       "all-no-default": {
         mode: 'all',
-        and: UNTOUCHED_BITS + "01101",
-        or: "01101",
+        and: UNTOUCHED_BITS + "1101101",
+        or: "1101101",
         lurk: false,
         isDefault: undefined
       },
       "announcement-no-default": {
         mode: 'announcement',
-        and: UNTOUCHED_BITS + "01110",
-        or: "01110",
+        and: UNTOUCHED_BITS + "0001110",
+        or: "0001110",
         lurk: true,
         isDefault: undefined
       },
       "mention-no-default": {
         mode: 'mention',
-        and: UNTOUCHED_BITS + "01110",
-        or: "01110",
+        and: UNTOUCHED_BITS + "0001110",
+        or: "0001110",
         lurk: true,
         isDefault: undefined
       },
       "mute-no-default": {
         mode: 'mute',
-        and: UNTOUCHED_BITS + "00100",
-        or: "00100",
+        and: UNTOUCHED_BITS + "0000100",
+        or: "0000100",
         lurk: true,
         isDefault: undefined
       },
@@ -67,29 +67,29 @@ describe('room-membership-flags', function () {
 
       "all-is-default": {
         mode: 'all',
-        and: UNTOUCHED_BITS + "11101",
-        or: "11101",
+        and: UNTOUCHED_BITS + "1111101",
+        or: "1111101",
         lurk: false,
         isDefault: true
       },
       "announcement-is-default": {
         mode: 'announcement',
-        and: UNTOUCHED_BITS + "11110",
-        or: "11110",
+        and: UNTOUCHED_BITS + "0011110",
+        or: "0011110",
         lurk: true,
         isDefault: true
       },
       "mention-is-default": {
         mode: 'mention',
-        and: UNTOUCHED_BITS + "11110",
-        or: "11110",
+        and: UNTOUCHED_BITS + "0011110",
+        or: "0011110",
         lurk: true,
         isDefault: true
       },
       "mute-is-default": {
         mode: 'mute',
-        and: UNTOUCHED_BITS + "10100",
-        or: "10100",
+        and: UNTOUCHED_BITS + "0010100",
+        or: "0010100",
         lurk: true,
         isDefault: true
       },
@@ -98,29 +98,29 @@ describe('room-membership-flags', function () {
 
       "all-not-default": {
         mode: 'all',
-        and: UNTOUCHED_BITS + "01101",
-        or: "01101",
+        and: UNTOUCHED_BITS + "1101101",
+        or: "1101101",
         lurk: false,
         isDefault: false
       },
       "announcement-not-default": {
         mode: 'announcement',
-        and: UNTOUCHED_BITS + "01110",
-        or: "01110",
+        and: UNTOUCHED_BITS + "0001110",
+        or: "0001110",
         lurk: true,
         isDefault: false
       },
       "mention-not-default": {
         mode: 'mention',
-        and: UNTOUCHED_BITS + "01110",
-        or: "01110",
+        and: UNTOUCHED_BITS + "0001110",
+        or: "0001110",
         lurk: true,
         isDefault: false
       },
       "mute-not-default": {
         mode: 'mute',
-        and: UNTOUCHED_BITS + "00100",
-        or: "00100",
+        and: UNTOUCHED_BITS + "0000100",
+        or: "0000100",
         lurk: true,
         isDefault: false
       },
@@ -210,7 +210,7 @@ describe('room-membership-flags', function () {
       "all-default": {
         mode: 'all',
         default: true,
-        value: '11101'
+        value: '1111101'
       },
       "announcement-default": {
         mode: 'announcement',
@@ -233,7 +233,7 @@ describe('room-membership-flags', function () {
       "all-not-default": {
         mode: 'all',
         default: false,
-        value: '1101'
+        value: '1101101'
       },
       "announcement-not-default": {
         mode: 'announcement',

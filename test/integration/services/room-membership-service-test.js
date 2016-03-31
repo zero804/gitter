@@ -66,7 +66,7 @@ describe('room-membership-service', function() {
         })
         .then(function(troupeUser) {
           assert.strictEqual(troupeUser.lurk, false);
-          assert.strictEqual(Number(troupeUser.flags).toString(2), "11101");
+          assert.strictEqual(Number(troupeUser.flags).toString(2), "1111101");
         });
     });
 
@@ -91,7 +91,7 @@ describe('room-membership-service', function() {
         })
         .then(function(troupeUser) {
           assert.strictEqual(troupeUser.lurk, false);
-          assert.strictEqual(Number(troupeUser.flags).toString(2), "11101");
+          assert.strictEqual(Number(troupeUser.flags).toString(2), "1111101");
 
           return roomMembershipService.checkRoomMembership(fixture.troupe1.id, fixture.user2.id);
         })
