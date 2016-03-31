@@ -38,6 +38,7 @@ JP 11/2/16
   flex-direction:  row;
   align-items:     center;
   margin-right:    (@desktop-menu-left-padding / 2);
+  padding-right:   (@desktop-menu-left-padding / 2);
   transition:      background-color .2s ease-out;
 
   .room-item.active & {
@@ -56,10 +57,6 @@ JP 11/2/16
     text-decoration: none;
     cursor: pointer;
     .room-item-selected();
-  }
-
-  & *:last-child {
-    margin-right:  @desktop-menu-left-padding / 2;
   }
 
   //this sucks so so much.
@@ -81,7 +78,7 @@ JP 11/2/16
   }
 }
 
-.notification (@size){
+.unread-indicator(@size){
   box-sizing:    border-box;
   display: flex;
   align-items: center;
@@ -98,37 +95,58 @@ JP 11/2/16
   line-height:   1;
 }
 
-.room-item__unreads {
-  .notification(@menu-unread-badge-size);
-  background: @caribbean;
+.room-item__unread-indicator {
+  .unread-indicator(@menu-unread-badge-size);
+  position: absolute;
+  visibility: hidden;
+  opacity: 0;
 
-  animation-name: unread-indicator-subtle-pulse-animation;
-  animation-duration: 2s;
-  animation-timing-function: ease;
-}
+  transition:
+    max-width .2s ease,
+    opacity .2s ease,
+    background-color .2s ease,
+    border-color .2s ease;
 
-.room-item__mentions {
-  .notification(@menu-unread-badge-size);
-  background:    @jaffa;
+  &.has-unreads {
+    position: relative;
+    visibility: visible;
+    opacity: 1;
 
-  animation-name: mention-indicator-subtle-pulse-animation;
-  animation-duration: 2s;
-  animation-timing-function: ease;
-  
-  &:before {
-    content: '@';
-    // The `@` character in this font is slightly not vertically centered
-    transform: translateY(-0.125em);
+    background-color: @caribbean;
+
+    animation-name: unread-indicator-subtle-pulse-animation;
+    animation-duration: 2s;
+    animation-timing-function: ease;
   }
-}
+  &.has-activity {
+    .unread-indicator(@menu-unread-badge-size / 3);
+    position: relative;
+    visibility: visible;
+    opacity: 1;
 
-.room-item__lurk {
-  .notification(@menu-unread-badge-size / 3);
-  border-color: @caribbean;
+    border-color: @caribbean;
 
-  animation-name: unread-indicator-subtle-pulse-animation;
-  animation-duration: 2s;
-  animation-timing-function: ease;
+    animation-name: unread-indicator-subtle-pulse-animation;
+    animation-duration: 2s;
+    animation-timing-function: ease;
+  }
+  &.has-mentions {
+    position: relative;
+    visibility: visible;
+    opacity: 1;
+
+    background-color: @jaffa;
+
+    animation-name: mention-indicator-subtle-pulse-animation;
+    animation-duration: 2s;
+    animation-timing-function: ease;
+
+    &:before {
+      content: '@';
+      // The `@` character in this font is slightly not vertically centered
+      transform: translateY(-0.125em);
+    }
+  }
 }
 
 .room-item__options {

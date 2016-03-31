@@ -256,7 +256,54 @@
   color:         transparent;
 }
 
-@icon-size:    1rem;
+@icon-size: 1rem;
+.room-menu-options__item__unread-indicator {
+  .base-notification-icon(@icon-size);
+  z-index: 1;
+  opacity: 0;
+  visibility: hidden;
+
+  transition:
+    opacity .2s ease,
+    background-color .2s ease,
+    border-color .2s ease;
+
+  &.has-unreads {
+    visibility: visible;
+    opacity: 1;
+
+    background-color: @caribbean;
+
+    animation-name: unread-indicator-subtle-pulse-animation;
+    animation-duration: 2s;
+    animation-timing-function: ease;
+  }
+
+  &.has-activity {
+    visibility: visible;
+    opacity: 1;
+
+    background-color: transparent;
+    border-color: @caribbean;
+
+    animation-name: unread-indicator-subtle-pulse-animation;
+    animation-duration: 2s;
+    animation-timing-function: ease;
+  }
+  &.has-mentions {
+    visibility: visible;
+    opacity: 1;
+    
+    background-color: @jaffa;
+    border-color: @jaffa;
+
+    animation-name: mention-indicator-subtle-pulse-animation;
+    animation-duration: 2s;
+    animation-timing-function: ease;
+  }
+}
+
+
 .room-menu-options__item__unread-items {
   .base-notification-icon(@icon-size);
   background: @caribbean;
