@@ -110,45 +110,47 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 
-  cursor: pointer;
-
   transition: max-height .5s ease-in-out;
 
 
-  &:after {
-    content: '\e81a';
-    margin-left: 1em;
-    opacity: 0;
-    font-family: 'fontello';
-
-    transition: opacity .2s ease;
-  }
-
-  &:empty {
-    &:before {
-      content: 'Double-click here to enter a description for your room.';
-      opacity: 0;
-      font-style: italic;
-
-      transition: opacity .2s ease;
-    }
-  }
-
-  .chat-header__topic-grouping:hover &,
-  .chat-header__topic-grouping:focus & {
-    // plenty of room to auto expand into
-    max-height: 800px;
-
-    white-space: normal;
-    word-wrap: break-word;
+  &.is-admin {
+    cursor: pointer;
 
     &:after {
-      opacity: 1;
+      content: '\e81a';
+      margin-left: 1em;
+      opacity: 0;
+      font-family: 'fontello';
+
+      transition: opacity .2s ease;
     }
 
     &:empty {
       &:before {
+        content: 'Double-click here to enter a description for your room.';
+        opacity: 0;
+        font-style: italic;
+
+        transition: opacity .2s ease;
+      }
+    }
+
+    .chat-header__topic-grouping:hover &,
+    .chat-header__topic-grouping:focus & {
+      // plenty of room to auto expand into
+      max-height: 800px;
+
+      white-space: normal;
+      word-wrap: break-word;
+
+      &:after {
         opacity: 1;
+      }
+
+      &:empty {
+        &:before {
+          opacity: 1;
+        }
       }
     }
   }
