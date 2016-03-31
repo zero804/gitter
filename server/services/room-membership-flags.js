@@ -179,6 +179,28 @@ function hasNotifyMobile(flags) {
   return flags & BITMASK_NOTIFY_MOBILE;
 }
 
+function flagsToHash(flags) {
+  return {
+    unread: !!(flags & BITMASK_NOTIFY_UNREAD),
+    activity: !!(flags & BITMASK_NOTIFY_ACTIVITY),
+    mention: !!(flags & BITMASK_NOTIFY_MENTION),
+    announcement: !!(flags & BITMASK_NOTIFY_ANNOUNCEMENT),
+    default: !!(flags & BITMASK_NOTIFY_DEFAULT),
+    desktop: !!(flags & BITMASK_NOTIFY_DESKTOP),
+    mobile: !!(flags & BITMASK_NOTIFY_MOBILE)
+  };
+}
+
+function hashToFlags(hash) {
+  return (hash.unread ? BITMASK_NOTIFY_UNREAD : 0) |
+    (hash.activity ? BITMASK_NOTIFY_ACTIVITY : 0) |
+    (hash.mention ? BITMASK_NOTIFY_MENTION : 0) |
+    (hash.announcement ? BITMASK_NOTIFY_ANNOUNCEMENT : 0) |
+    (hash.default ? BITMASK_NOTIFY_DEFAULT : 0) |
+    (hash.desktop ? BITMASK_NOTIFY_DESKTOP : 0) |
+    (hash.mobile ? BITMASK_NOTIFY_MOBILE : 0);
+}
+
 module.exports = {
   MODES: MODES,
 
@@ -203,5 +225,6 @@ module.exports = {
   hasNotifyDesktop: hasNotifyDesktop,
   hasNotifyMobile: hasNotifyMobile,
 
-
+  flagsToHash: flagsToHash,
+  hashToFlags: hashToFlags
 };
