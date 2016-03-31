@@ -195,76 +195,82 @@
   background-position: -96px -16px;
 }
 
-.service-sprite.pagerduty-logo {
+.service-sprite.opencollective-logo {
   width: 16px;
   height: 16px;
   background-position: -96px -32px;
 }
 
-.service-sprite.pivotaltracker-logo {
+.service-sprite.pagerduty-logo {
   width: 16px;
   height: 16px;
   background-position: -96px -48px;
 }
 
-.service-sprite.sentry-error {
+.service-sprite.pivotaltracker-logo {
   width: 16px;
   height: 16px;
   background-position: -96px -64px;
 }
 
-.service-sprite.sentry-logo {
+.service-sprite.sentry-error {
   width: 16px;
   height: 16px;
   background-position: 0 -82px;
 }
 
-.service-sprite.sprintly-columns {
+.service-sprite.sentry-logo {
   width: 16px;
   height: 16px;
   background-position: -16px -82px;
 }
 
-.service-sprite.sprintly-logo {
+.service-sprite.sprintly-columns {
   width: 16px;
   height: 16px;
   background-position: -32px -82px;
 }
 
-.service-sprite.trackjs-error {
+.service-sprite.sprintly-logo {
   width: 16px;
   height: 16px;
   background-position: -48px -82px;
 }
 
-.service-sprite.trackjs-logo {
+.service-sprite.trackjs-error {
   width: 16px;
   height: 16px;
   background-position: -64px -82px;
 }
 
-.service-sprite.travis-frown {
+.service-sprite.trackjs-logo {
   width: 16px;
   height: 16px;
   background-position: -80px -82px;
 }
 
-.service-sprite.travis-logo {
+.service-sprite.travis-frown {
   width: 16px;
   height: 16px;
   background-position: -96px -82px;
 }
 
-.service-sprite.travis-meh {
+.service-sprite.travis-logo {
   width: 16px;
   height: 16px;
   background-position: -112px 0;
 }
 
-.service-sprite.travis-smile {
+.service-sprite.travis-meh {
   width: 16px;
   height: 16px;
   background-position: -112px -16px;
+}
+
+.service-sprite.travis-smile {
+  width: 16px;
+  height: 16px;
+  background-position: -112px -32px;
 }
 
 
