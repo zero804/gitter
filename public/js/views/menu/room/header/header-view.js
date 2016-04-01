@@ -14,7 +14,10 @@ module.exports = Marionette.ItemView.extend({
 
   behaviors: {
     Tooltip: {
-      '.js-left-menu-org-page-action': { placement: 'left' }
+      '.js-left-menu-org-page-action': { placement: 'left' },
+      '.js-panel-header-all': { titleFn: function() {
+        return 'Click to toggle the profile menu';
+      }, placement: 'right' }
     }
   },
 
