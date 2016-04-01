@@ -53,8 +53,8 @@ var MODES = {
        BITMASK_NOTIFY_DESKTOP |
        BITMASK_NOTIFY_MOBILE,
 
-  /* Mode: announcement: no unread + activity + mentions + announcements */
-  announcement: BITMASK_NOTIFY_ACTIVITY |
+  /* Mode: announcement: unread + no activity + mentions + announcements */
+  announcement: BITMASK_NOTIFY_UNREAD |
                 BITMASK_NOTIFY_MENTION |
                 BITMASK_NOTIFY_ANNOUNCEMENT,
 
