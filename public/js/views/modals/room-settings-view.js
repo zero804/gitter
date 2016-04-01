@@ -39,45 +39,72 @@ var View = Marionette.ItemView.extend({
 
   getNotificationOption: function() {
     var model = this.model;
+
+    if (!model.attributes.hasOwnProperty('mode')) {
+      // Not yet loaded...
+      return null;
+    }
     var value = model.get('mode');
     var lurk = model.get('lurk');
 
+    var nonStandard;
+
+    var defaultDescription = 'Legacy setting: ' + value + ' mode, with ' + (lurk ? 'unread item count off' : 'unread item count on');
+
     switch(value) {
       case 'all':
-        return { selectValue: 'all', nonStandard: lurk === true, lurk: lurk };
+        nonStandard = lurk === true;
+        return {
+          selectValue: 'all',
+          nonStandard: nonStandard,
+          description: nonStandard ?  defaultDescription : null
+        };
 
       case 'announcement':
       case 'mention':
-        return { selectValue: 'announcement', nonStandard: lurk === false, lurk: lurk };
+        nonStandard = lurk === true;
+
+        return {
+          selectValue: 'announcement',
+          nonStandard: nonStandard,
+          description: nonStandard ?  defaultDescription : null
+        };
 
       case 'mute':
-        return { selectValue: 'mute', nonStandard: lurk === false, lurk: lurk };
+        nonStandard = lurk === false;
+
+        return {
+          selectValue: 'mute',
+          nonStandard: nonStandard,
+          description: nonStandard ?  defaultDescription : null
+        };
 
       default:
-        return null;
+        return {
+          selectValue: 'mute',
+          nonStandard: true,
+          description: 'Legacy value with ' + (lurk ? 'unread item count off' : 'unread item count on')
+        };
     }
   },
 
   update: function() {
     var val = this.getNotificationOption();
-    var nonStandard = false;
 
     if (val) {
       if (val.nonStandard) {
-        nonStandard = true;
-        this.setOption('', 'Legacy setting: ' + val.selectValue + ' mode, with ' + (val.lurk ? 'lurk on' : 'lurk off'));
+        this.ui.nonstandard.show();
+        this.setOption('', val.description);
       } else {
+        this.ui.nonstandard.hide();
         this.setOption(val.selectValue);
       }
+
     } else {
       this.setOption('', 'Please wait...');
-    }
-
-    if (nonStandard) {
-      this.ui.nonstandard.show();
-    } else {
       this.ui.nonstandard.hide();
     }
+
   },
 
   setOption: function(val, text) {
