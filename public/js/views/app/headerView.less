@@ -112,7 +112,7 @@
 
   transition: max-height .5s ease-in-out;
 
-
+  /* Handle the placeholder description and edit icon */
   &.is-admin {
     cursor: pointer;
 
@@ -135,14 +135,9 @@
       }
     }
 
+    &.is-new-room,
     .chat-header__topic-grouping:hover &,
     .chat-header__topic-grouping:focus & {
-      // plenty of room to auto expand into
-      max-height: 800px;
-
-      white-space: normal;
-      word-wrap: break-word;
-
       &:after {
         opacity: 1;
       }
@@ -153,6 +148,16 @@
         }
       }
     }
+  }
+
+
+  .chat-header__topic-grouping:hover &,
+  .chat-header__topic-grouping:focus & {
+    // plenty of room to auto expand into
+    max-height: 800px;
+
+    white-space: normal;
+    word-wrap: break-word;
   }
 
 
