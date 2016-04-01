@@ -180,13 +180,13 @@ var bulkUpdate = Promise.method(function (updates) {
   var bulk = persistence.TroupeUser.collection.initializeUnorderedBulkOp();
 
   updates.forEach(function(update) {
-    bulk.find({ _id: update._id, $or: [{
+    bulk.find({ _id: update._id /*, $or: [{
       flags: { $exists: false }
     }, {
       flags: null
     }, {
       flags: 0
-    } ] })
+    } ] */ })
     .updateOne({
       $set: {
         flags: update.newFlags,
