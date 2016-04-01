@@ -40,6 +40,17 @@ module.exports = Marionette.ItemView.extend({
     };
   },
 
+  pulseIndicators: function() {
+    // Re-trigger the pulse animation
+    // 16ms is a good 60-fps number to trigger on which Firefox needs (requestAnimationFrame doesn't work for this)
+    Array.prototype.forEach.call(this.ui.unreadIndicator, function(unreadIndicatorElement) {
+    unreadIndicatorElement.style.animation = 'none';
+      setTimeout(function() {
+          unreadIndicatorElement.style.animation = '';
+      }, 16);
+    });
+  },
+
   onSelectedChange: function(model, val) { //jshint unused: true
     toggleClass(this.ui.container[0], 'selected', !!val);
   },
@@ -54,12 +65,15 @@ module.exports = Marionette.ItemView.extend({
     // Update the count inside the badge indicator
     var unreadIndicatorContent = '';
     var unreads = this.model.get('unreadItems');
-    if(unreads > 0) {
+    var mentions = this.model.get('mentions');
+    if(mentions === 0 && unreads > 0) {
       unreadIndicatorContent = unreads;
     }
     Array.prototype.forEach.call(  this.ui.unreadIndicator, function(indicatorElement) {
       indicatorElement.innerHTML = unreadIndicatorContent;
     });
+
+    this.pulseIndicators();
   },
 
 });
