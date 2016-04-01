@@ -77,7 +77,10 @@ var Behavior = Marionette.Behavior.extend({
     var tooltipOptions = this.options[selector];
 
     var title = tooltipOptions.title || el.getAttribute('title');
-    if (tooltipOptions.titleFn) {
+    if (typeof tooltipOptions.titleFn === 'function') {
+      title = tooltipOptions.titleFn.bind(this.view)();
+    }
+    else if(tooltipOptions.titleFn) {
       title = this.view[tooltipOptions.titleFn].bind(this.view);
     }
 
