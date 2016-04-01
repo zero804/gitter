@@ -36,7 +36,7 @@ describe('distribution', function() {
         }
       });
 
-      assertIteratorDeepEqual(distribution.getConnectedActivityUserIds(), ['1', '2', '3', '5', '6']);
+      assertIteratorDeepEqual(distribution.getConnectedActivityUserIds(), []);
     });
 
   });

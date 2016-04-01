@@ -198,6 +198,34 @@ describe('room-membership-service', function() {
           })
           .then(function() {
             // Check that the event emitter fired
+            assert.strictEqual(0, this.onMembersLurkChange.callCount);
+            return roomMembershipService.getMembershipMode(userId1, troupeId2);
+          })
+          .then(function(mode) {
+            assert.strictEqual(mode, 'announcement');
+            return roomMembershipService.getMembershipDetails(userId1, troupeId2);
+          })
+          .then(function(modeExtended) {
+            assert.deepEqual(modeExtended, {
+              mode: 'announcement',
+              lurk: false,
+              flags: parseInt('1101', 2),
+              unread: true,
+              activity: false,
+              announcement: true,
+              mention: true,
+              desktop: false,
+              mobile: false
+            });
+
+            return roomMembershipService.getMemberLurkStatus(troupeId2, userId1);
+          })
+          .then(function(lurking) {
+            assert.strictEqual(lurking, false);
+            return roomMembershipService.setMembershipMode(userId1, troupeId2, 'mute');
+          })
+          .then(function() {
+            // Check that the event emitter fired
             assert.strictEqual(1, this.onMembersLurkChange.callCount);
             var spyCall = this.onMembersLurkChange.getCall(0);
 
@@ -208,17 +236,17 @@ describe('room-membership-service', function() {
             return roomMembershipService.getMembershipMode(userId1, troupeId2);
           })
           .then(function(mode) {
-            assert.strictEqual(mode, 'announcement');
+            assert.strictEqual(mode, 'mute');
             return roomMembershipService.getMembershipDetails(userId1, troupeId2);
           })
           .then(function(modeExtended) {
             assert.deepEqual(modeExtended, {
-              mode: 'announcement',
+              mode: 'mute',
               lurk: true,
-              flags: parseInt('1110', 2),
+              flags: parseInt('0110', 2),
               unread: false,
               activity: true,
-              announcement: true,
+              announcement: false,
               mention: true,
               desktop: false,
               mobile: false
@@ -228,7 +256,8 @@ describe('room-membership-service', function() {
           })
           .then(function(lurking) {
             assert.strictEqual(lurking, true);
-          });
+          })
+
       });
 
       it('should handle lurk status alongside membership mode all', function() {
@@ -294,7 +323,7 @@ describe('room-membership-service', function() {
           })
           .then(function(lurking) {
             assert.strictEqual(lurking, false);
-            return roomMembershipService.setMembershipMode(userId1, troupeId2, 'announcement');
+            return roomMembershipService.setMembershipMode(userId1, troupeId2, 'mute');
           })
           .then(function() {
             // Check that the event emitter fired
@@ -308,7 +337,7 @@ describe('room-membership-service', function() {
             return roomMembershipService.getMembershipMode(userId1, troupeId2);
           })
           .then(function(mode) {
-            assert.strictEqual(mode, 'announcement');
+            assert.strictEqual(mode, 'mute');
             return roomMembershipService.getMemberLurkStatus(troupeId2, userId1);
           })
           .then(function(lurking) {
@@ -378,12 +407,14 @@ describe('room-membership-service', function() {
         var troupeId2 = fixture.troupe2.id;
         var userId1 = fixture.user1.id;
         var userId2 = fixture.user2.id;
+        var userId3 = fixture.user3.id;
 
-        return roomMembershipService.addRoomMembers(troupeId2, [userId1, userId2])
+        return roomMembershipService.addRoomMembers(troupeId2, [userId1, userId2, userId3])
           .then(function() {
             return [
               roomMembershipService.setMembershipMode(userId1, troupeId2, 'all'),
-              roomMembershipService.setMembershipMode(userId2, troupeId2, 'mention')
+              roomMembershipService.setMembershipMode(userId2, troupeId2, 'mention'),
+              roomMembershipService.setMembershipMode(userId3, troupeId2, 'mute')
             ];
           })
           .spread(function() {
@@ -399,7 +430,13 @@ describe('room-membership-service', function() {
           })
           .then(function(result) {
             assert(typeof result === 'object');
-            assert(!!result);
+            assert(result.hasOwnProperty(troupeId2));
+            assert.strictEqual(result[troupeId2], false);
+
+            return roomMembershipService.findRoomIdsForUserWithLurk(userId3);
+          })
+          .then(function(result) {
+            assert(typeof result === 'object');
             assert(result.hasOwnProperty(troupeId2));
             assert.strictEqual(result[troupeId2], true);
           });
@@ -514,7 +551,7 @@ describe('room-membership-service', function() {
             function() {
               return [
                 roomMembershipService.setMembershipMode(userId2, troupeId, 'all'),
-                roomMembershipService.setMembershipMode(userId3, troupeId, 'mention')
+                roomMembershipService.setMembershipMode(userId3, troupeId, 'mute'),
               ];
             })
             .spread(function() {
