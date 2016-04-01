@@ -1,11 +1,13 @@
 'use strict';
 
-var Marionette = require('backbone.marionette');
+var Marionette            = require('backbone.marionette');
 var PrimaryCollectionView = require('../primary-collection/primary-collection-view');
 var BaseCollectionView    = require('../base-collection/base-collection-view');
+var ItemView              = require('./favourite-collection-item-view');
 
 var FavouriteCollection = PrimaryCollectionView.extend({
 
+  childView: ItemView,
   initialize: function() {
     PrimaryCollectionView.prototype.initialize.apply(this, arguments);
     this.listenTo(this.dndCtrl, 'dnd:start-drag', this.onDragStart, this);

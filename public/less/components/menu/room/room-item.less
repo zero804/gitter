@@ -1,5 +1,11 @@
 @import "trp3Vars";
 
+.room-item-selected() {
+  cursor:           pointer;
+  background-color: @room-item-selected-bg;
+  color:            white;
+}
+
 .m-room-item() {
   height:     @menu-item-height * 3;
   max-height: @menu-item-height;
@@ -18,12 +24,18 @@
   &.gu-mirror, &.gu-transit {
 
     .room-item-selected();
-    max-height: @menu-item-height;
-    opacity: 1;
+    margin-left:  (@desktop-menu-left-padding / 2);
+    margin-right: (@desktop-menu-left-padding / 2);
+    max-height:   @menu-item-height;
+    opacity:      1;
 
     & .room-item__options-menu {
       display: none;
     }
+  }
+
+  &.gu-mirror {
+    position: fixed !important;
   }
 
   &:hover {
