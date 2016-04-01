@@ -181,9 +181,6 @@ h1:after, h2:after {
 
 .homepage [class^="icon-"]:before,
 .homepage [class*=" icon-"]:before {
-  font-family: "os-icons";
-  font-style: normal;
-  font-weight: normal;
   speak: none;
 
   display: inline-block;
@@ -199,13 +196,8 @@ h1:after, h2:after {
 
   /* fix buttons height, for twitter bootstrap */
   line-height: 1em;
-
 }
 
-.icon-windows:before { content: '\e800'; } /* '' */
-.icon-apple:before { content: '\e801'; } /* '' */
-.icon-android:before { content: '\e802'; } /* '' */
-.icon-linux:before { content: '\e803'; } /* '' */
 
 /**
  *   Buttons and tooltips
@@ -531,14 +523,14 @@ h1:after, h2:after {
 }
 
 #intro-panel ul {
-  overflow: hidden;
   padding: 50px 0 30px;
+  display: flex;
+  width: 100%;
 }
 
 #intro-panel li {
   position: relative;
 
-  float: left;
   padding: 0 55px 0 115px;
 }
 
@@ -1050,4 +1042,3 @@ footer small a:hover {
   display: none;
   @media only screen and (max-width: @exceptDesktop_bp) { display: inline; }
 }
-
