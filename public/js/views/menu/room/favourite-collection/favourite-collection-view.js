@@ -1,17 +1,27 @@
 'use strict';
 
+var Backbone              = require('backbone');
 var Marionette            = require('backbone.marionette');
 var PrimaryCollectionView = require('../primary-collection/primary-collection-view');
 var BaseCollectionView    = require('../base-collection/base-collection-view');
 var ItemView              = require('./favourite-collection-item-view');
+var toggleClass           = require('utils/toggle-class');
 
 var FavouriteCollection = PrimaryCollectionView.extend({
 
   childView: ItemView,
+
+  events: {
+    'mouseenter': 'onMouseEnter',
+    'mouseleave': 'onMouseLeave'
+  },
+
   initialize: function() {
     PrimaryCollectionView.prototype.initialize.apply(this, arguments);
+    this.uiModel = new Backbone.Model({ isDragging: false });
+    this.listenTo(this.uiModel, 'change:isDragging', this.onDragStateUpdate, this);
     this.listenTo(this.dndCtrl, 'dnd:start-drag', this.onDragStart, this);
-    this.listenTo(this.dndCtrl, 'dnd:start-end room-menu:add-favourite room-menu:sort-favourite', this.onDragEnd, this);
+    this.listenTo(this.dndCtrl, 'dnd:end-drag room-menu:add-favourite room-menu:sort-favourite', this.onDragEnd, this);
   },
 
   getChildContainerToBeIndexed: function () {
@@ -38,13 +48,27 @@ var FavouriteCollection = PrimaryCollectionView.extend({
   },
 
   onDragStart: function () {
+    this.uiModel.set('isDragging', true);
     this.el.classList.add('dragging');
-    console.log('this is working', this.el);
   },
 
   onDragEnd: function () {
-    console.log('this is drag end');
+    this.uiModel.set('isDragging', false);
     this.el.classList.remove('dragging');
+  },
+
+  onDragStateUpdate: function (model, val) { //jshint unused: true
+    toggleClass(this.el, 'dragging', val);
+  },
+
+  onMouseEnter: function (){
+    if(!this.uiModel.get('isDragging')) { return; }
+    document.body.classList.add('drag-over-favourite');
+  },
+
+  onMouseLeave: function (){
+    if(!this.uiModel.get('isDragging')) { return; }
+    document.body.classList.remove('drag-over-favourite');
   },
 
 });

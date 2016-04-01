@@ -19,7 +19,7 @@ _.extend(
       FilteredRoomCollection.prototype.initialize.apply(this, arguments);
       this.dndCtrl = attrs.dndCtrl;
       this.listenTo(this.dndCtrl, 'dnd:start-drag', this.onDragStart, this);
-      this.listenTo(this.dndCtrl, 'dnd:end-drag', this.onDragEnd, this);
+      this.listenTo(this.dndCtrl, 'dnd:end-drag room-menu:add-favourite room-menu:sort-favourite', this.onDragEnd, this);
       this.sort();
     },
 
@@ -57,7 +57,10 @@ _.extend(
     },
 
     onDragEnd: function () {
-      //reset the models back to their orignal filtered state
+      //reset the models back to their original filtered state
+      this.collection.models.filter(this.filterDefault).forEach(function(model) {
+        model.set('isTempItem', false);
+      }.bind(this));
       this.setFilter(this.oldFilter);
     },
   }

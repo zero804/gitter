@@ -17,6 +17,8 @@ var DNDCtrl = function(attrs){
   });
 
   this.drag.on('dragend', this.onDragEnd.bind(this));
+  this.drag.on('cancel', this.onDragEnd.bind(this));
+  this.drag.on('remove', this.onDragEnd.bind(this));
   this.drag.on('drag', this.onDragStart.bind(this));
   this.drag.on('drop', this.onItemDropped.bind(this));
 

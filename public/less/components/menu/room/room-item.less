@@ -35,6 +35,11 @@
 
   &.gu-mirror {
     position: fixed !important;
+    //When dragging over the favourite collection
+    //remove the mirror
+    body.drag-over-favourite & {
+      display: none;
+    }
   }
 
   &:hover {
