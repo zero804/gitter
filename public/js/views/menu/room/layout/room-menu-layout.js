@@ -49,8 +49,9 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   ui: {
-    minibar: '#minibar',
-    panel:   '#panel',
+    minibar:     '#minibar',
+    minibarList: '#minibar-list',
+    panel:       '#panel',
   },
 
   events: {
@@ -148,7 +149,6 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   _initNano: _.debounce(function () {
-    console.log('working');
     var params = { sliderMaxHeight: 100, iOSNativeScrolling: true };
     fastdom.mutate(function() {
 
@@ -161,7 +161,7 @@ module.exports = Marionette.LayoutView.extend({
       var minibarItems       = this.minibar.currentView.collection.length;
       var minibarItemsHeight = (minibarItems * MINIBAR_ITEM_HEIGHT);
       fastdom.measure(function() {
-        var minibarContainerHeight = this.ui.minibar.height();
+        var minibarContainerHeight = this.ui.minibarList.height();
         if (minibarItemsHeight > minibarContainerHeight) {
           fastdom.mutate(function(){
             //
