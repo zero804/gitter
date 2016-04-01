@@ -18,7 +18,7 @@ function makeHash() {
 
 describe('chat-strategy-test', function() {
   var blockTimer = require('../../block-timer');
-  var expected1, expectedAnonymous, expectedLeanTrue, expectedInitialId, expectedLean2;
+  var expected1, expectedAnonymous, expectedLeanTrue, expectedInitialId, expectedLookups;
 
   before(blockTimer.on);
   after(blockTimer.off);
@@ -120,7 +120,7 @@ describe('chat-strategy-test', function() {
       v: 1
     }];
 
-    expectedLean2 = {
+    expectedLookups = {
       items: [{
         id: fixture.message1.id,
         text: 'old_message',
@@ -128,6 +128,10 @@ describe('chat-strategy-test', function() {
         fromUser: fixture.user1.id,
         unread: false,
         readBy: 0,
+        urls: [],
+        mentions: [],
+        issues: [],
+        meta: [],
         v: 1
       }],
       lookups: {
@@ -185,11 +189,11 @@ describe('chat-strategy-test', function() {
         });
     });
 
-    it('should serialize a message with lean=2', function() {
-      var strategy = new ChatStrategy({ lean: 2, currentUserId: fixture.user1.id, troupeId: fixture.troupe1.id });
+    it("should serialize a message with lookups=['user']", function() {
+      var strategy = new ChatStrategy({ lookups: ['user'], currentUserId: fixture.user1.id, troupeId: fixture.troupe1.id });
       return serialize([fixture.message1], strategy)
         .then(function(s) {
-          assertUtils.assertSerializedEqual(s, expectedLean2);
+          assertUtils.assertSerializedEqual(s, expectedLookups);
         });
     });
   });
@@ -228,11 +232,11 @@ describe('chat-strategy-test', function() {
         });
     });
 
-    it('should serialize a message with lean=2', function() {
-      var strategy = new ChatIdStrategy({ lean: 2, currentUserId: fixture.user1.id, troupeId: fixture.troupe1.id });
+    it("should serialize a message with lookups=['user']", function() {
+      var strategy = new ChatIdStrategy({ lookups:['user'], currentUserId: fixture.user1.id, troupeId: fixture.troupe1.id });
       return serialize([fixture.message1.id], strategy)
         .then(function(s) {
-          assertUtils.assertSerializedEqual(s, expectedLean2);
+          assertUtils.assertSerializedEqual(s, expectedLookups);
         });
     });
   });

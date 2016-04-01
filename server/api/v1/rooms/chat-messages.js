@@ -8,6 +8,15 @@ var StatusError         = require('statuserror');
 var loadTroupeFromParam = require('./load-troupe-param');
 var Promise             = require('bluebird');
 
+
+function parseLookups(lookups) {
+  // string of comma-delimited attributes passed in via req.query
+  if (!lookups) {
+    return undefined;
+  }
+  return lookups.split(',');
+}
+
 module.exports = {
   id: 'chatMessageId',
   index: function(req) {
@@ -22,6 +31,7 @@ module.exports = {
     var userId = req.user && req.user.id;
     var troupeId = req.params.troupeId;
     var lean = !!req.query.lean;
+    var lookups = parseLookups(req.query.lookups)
     var options;
 
     var query;
@@ -54,7 +64,8 @@ module.exports = {
           currentUserId: userId,
           troupeId: troupeId,
           initialId: aroundId,
-          lean: lean
+          lean: lean,
+          lookups: lookups
         });
 
         return restSerializer.serialize(chatMessages, strategy);

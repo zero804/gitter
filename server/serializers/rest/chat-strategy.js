@@ -12,7 +12,7 @@ function formatDate(d) {
   return d ? d.toISOString() : null;
 }
 
-function UnreadItemStategy(options) {
+function UnreadItemStrategy(options) {
   var unreadItemsHash;
 
   this.preload = function() {
@@ -33,8 +33,8 @@ function UnreadItemStategy(options) {
   };
 }
 
-UnreadItemStategy.prototype = {
-  name: 'UnreadItemStategy'
+UnreadItemStrategy.prototype = {
+  name: 'UnreadItemStrategy'
 };
 
 function CollapsedItemStrategy(options) {
@@ -59,29 +59,27 @@ CollapsedItemStrategy.prototype = {
 };
 
 function ChatStrategy(options)  {
-  if(!options) options = {};
+  if (!options) options = {};
 
-  var useLookups = options.lean === 2;
-
+  // useLookups will be set to true if there are any lookups that this strategy
+  // understands. Currently it only knows about user lookups.
+  var useLookups = false;
   var userLookups;
-  var leanUser;
-  if (useLookups) {
+  if (options.lookups && options.lookups.indexOf('user') !== -1) {
+    useLookups = true;
     userLookups = {};
-    leanUser = false;
-  } else {
-    leanUser = options.lean;
   }
 
-  var userStategy = options.user ? null : new UserIdStrategy({ lean: leanUser });
+  var userStrategy = options.user ? null : new UserIdStrategy({ lean: options.lean });
 
-  var unreadItemStategy, collapsedItemStategy;
+  var unreadItemStrategy, collapsedItemStrategy;
   /* If options.unread has been set, we don't need a strategy */
-  if(options.currentUserId && options.unread === undefined) {
-    unreadItemStategy = new UnreadItemStategy({ userId: options.currentUserId, roomId: options.troupeId });
+  if (options.currentUserId && options.unread === undefined) {
+    unreadItemStrategy = new UnreadItemStrategy({ userId: options.currentUserId, roomId: options.troupeId });
   }
 
   if (options.currentUserId && options.troupeId) {
-    collapsedItemStategy = new CollapsedItemStrategy({ userId: options.currentUserId, roomId: options.troupeId });
+    collapsedItemStrategy = new CollapsedItemStrategy({ userId: options.currentUserId, roomId: options.troupeId });
   }
 
   var defaultUnreadStatus = options.unread === undefined ? true : !!options.unread;
@@ -90,17 +88,17 @@ function ChatStrategy(options)  {
     var strategies = [];
 
     // If the user is fixed in options, we don't need to look them up using a strategy...
-    if(userStategy) {
+    if (userStrategy) {
       var users = items.map(function(i) { return i.fromUserId; });
-      strategies.push(userStategy.preload(users));
+      strategies.push(userStrategy.preload(users));
     }
 
-    if(unreadItemStategy) {
-      strategies.push(unreadItemStategy.preload());
+    if (unreadItemStrategy) {
+      strategies.push(unreadItemStrategy.preload());
     }
 
-    if(collapsedItemStategy) {
-      strategies.push(collapsedItemStategy.preload());
+    if (collapsedItemStrategy) {
+      strategies.push(collapsedItemStrategy.preload());
     }
 
     return Promise.all(strategies);
@@ -118,20 +116,20 @@ function ChatStrategy(options)  {
   }
 
   function mapUser(userId) {
-    if (useLookups) {
+    if (userLookups) {
       if (!userLookups[userId]) {
-        userLookups[userId] = userStategy.map(userId);
+        userLookups[userId] = userStrategy.map(userId);
       }
 
       return userId;
     } else {
-      return userStategy.map(userId);
+      return userStrategy.map(userId);
     }
   }
 
   this.map = function(item) {
-    var unread = unreadItemStategy ? unreadItemStategy.map(item._id) : defaultUnreadStatus;
-    var collapsed = collapsedItemStategy && collapsedItemStategy.map(item._id);
+    var unread = unreadItemStrategy ? unreadItemStrategy.map(item._id) : defaultUnreadStatus;
+    var collapsed = collapsedItemStrategy && collapsedItemStrategy.map(item._id);
 
     var castArray = options.lean ? undefinedForEmptyArray : safeArray;
 
