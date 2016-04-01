@@ -1,7 +1,7 @@
 "use strict";
 
 var _                     = require('lodash');
-var unreadItemService     = require("../../services/unread-item-service");
+var unreadItemService     = require("../../services/unread-items");
 var collapsedChatsService = require('../../services/collapsed-chats-service');
 var execPreloads          = require('../exec-preloads');
 var getVersion            = require('../get-model-version');
