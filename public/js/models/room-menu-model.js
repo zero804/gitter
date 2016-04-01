@@ -90,17 +90,11 @@ module.exports = Backbone.Model.extend({
       suggestedOrgsCollection: this.suggestedOrgs,
     });
 
-    this.activeFavouriteRoomCollection   = new FilteredFavouriteRoomCollection({
-      roomModel:  this,
-      collection: this._roomCollection,
-    });
-
     this.activeRoomCollection   = new FilteredRoomCollection({
       roomModel:  this,
       collection: this._roomCollection,
     });
 
-    this.favouriteCollection = window.favourites = this.activeFavouriteRoomCollection;
     this.primaryCollection   = new ProxyCollection({ collection: this.activeRoomCollection });
     this.secondaryCollection = new ProxyCollection({ collection: this.searchTerms });
     this.tertiaryCollection  = new ProxyCollection({ collection: this._orgCollection });
