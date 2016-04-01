@@ -6,6 +6,8 @@ var assert        = require("assert");
 var Promise       = require('bluebird');
 var sinon         = require('sinon');
 var fixture       = {};
+var roomMembershipFlags = testRequire('./services/room-membership-flags');
+
 
 function mongoIdEqualPredicate(value) {
   var strValue = String(value);
@@ -161,10 +163,14 @@ describe('room-membership-service', function() {
             assert.deepEqual([userId1], spyCall.args[1]);
             assert.strictEqual(true, spyCall.args[2]);
 
-            return roomMembershipService.getMembershipMode(userId1, troupeId2);
+            return roomMembershipService.getMembershipDetails(userId1, troupeId2);
           })
-          .then(function(mode) {
-            assert.strictEqual(mode, 'mute');
+          .then(function(modeExtended) {
+            assert.deepEqual(modeExtended, {
+              mode: 'mute',
+              lurk: true,
+              flags: parseInt('100', 2)
+            });
             return roomMembershipService.getMemberLurkStatus(troupeId2, userId1);
           })
           .then(function(lurking) {
@@ -196,7 +202,7 @@ describe('room-membership-service', function() {
             return roomMembershipService.getMembershipMode(userId1, troupeId2);
           })
           .then(function(mode) {
-            assert.strictEqual(mode, 'mention');
+            assert.strictEqual(mode, 'announcement');
             return roomMembershipService.getMemberLurkStatus(troupeId2, userId1);
           })
           .then(function(lurking) {
@@ -211,7 +217,7 @@ describe('room-membership-service', function() {
         return roomMembershipService.removeRoomMember(troupeId2, userId1)
           .bind(this)
           .then(function() {
-            return roomMembershipService.addRoomMembers(troupeId2, [userId1])
+            return roomMembershipService.addRoomMembers(troupeId2, [userId1]);
           })
           .then(function() {
             return roomMembershipService.setMembershipMode(userId1, troupeId2, 'all');
@@ -267,7 +273,7 @@ describe('room-membership-service', function() {
             return roomMembershipService.getMembershipMode(userId1, troupeId2);
           })
           .then(function(mode) {
-            assert.strictEqual(mode, 'mention');
+            assert.strictEqual(mode, 'announcement');
             return roomMembershipService.getMemberLurkStatus(troupeId2, userId1);
           })
           .then(function(lurking) {
@@ -619,7 +625,7 @@ describe('room-membership-service', function() {
             })
             .then(function(result) {
               var expected = {};
-              expected[userId1] = 'mention';
+              expected[userId1] = 'announcement';
               expected[userId2] = 'all';
               assert.deepEqual(result, expected);
 
@@ -630,7 +636,7 @@ describe('room-membership-service', function() {
             })
             .then(function(result) {
               var expected = {};
-              expected[userId1] = 'mention';
+              expected[userId1] = 'announcement';
               expected[userId2] = 'mute';
               assert.deepEqual(result, expected);
 
@@ -649,6 +655,131 @@ describe('room-membership-service', function() {
       });
     });
 
+    describe('findMembersForRoomForNotify', function() {
+      var troupeId1, userId1, userId2, userId3;
+
+      function roomForNotifySort(a, b) {
+        var u1 = a.userId;
+        var u2 = b.userId;
+        if (u1 === u2) {
+          return 0;
+        } else {
+          return u1 > u2 ? 1 : -1;
+        }
+      }
+
+      function equivalentValues(array, expected) {
+        var keys = Object.keys(expected);
+        assert.strictEqual(array.length, keys.length);
+        array.forEach(function(item) {
+          var expectedItem = expected[item.userId];
+          assert(expectedItem !== undefined, 'Item for user ' + item.userId + ' does not exist');
+          assert.strictEqual(item.flags, expectedItem);
+        });
+      }
+
+      before(function() {
+        troupeId1 = fixture.troupe1.id;
+        userId1 = fixture.user1._id;
+        userId2 = fixture.user2._id;
+        userId3 = fixture.user3._id;
+
+        return Promise.join(
+            roomMembershipService.addRoomMember(troupeId1, userId1),
+            roomMembershipService.addRoomMember(troupeId1, userId2),
+            roomMembershipService.addRoomMember(troupeId1, userId3),
+          function() {
+            return Promise.join(
+              roomMembershipService.setMembershipModeForUsersInRoom(troupeId1, [userId1], 'all'),
+              roomMembershipService.setMembershipModeForUsersInRoom(troupeId1, [userId2], 'announcement'),
+              roomMembershipService.setMembershipModeForUsersInRoom(troupeId1, [userId3], 'mute')
+            );
+          });
+      });
+
+      it('should return notify users', function() {
+        // No announcement, no
+        return roomMembershipService.findMembersForRoomForNotify(troupeId1, null)
+          .then(function(result) {
+            result.sort(roomForNotifySort);
+            var expected = {};
+            expected[userId1] = roomMembershipFlags.MODES.all;
+            expected[userId2] = roomMembershipFlags.MODES.announcement;
+
+            equivalentValues(result, expected);
+          });
+      });
+
+      it('should not return the sender', function() {
+        // No announcement, no
+        return roomMembershipService.findMembersForRoomForNotify(troupeId1, userId1)
+          .then(function(result) {
+            result.sort(roomForNotifySort);
+            var expected = {};
+            expected[userId2] = roomMembershipFlags.MODES.announcement;
+
+            equivalentValues(result, expected);
+          });
+      });
+
+      it('should return notify users and announce users', function() {
+        return roomMembershipService.findMembersForRoomForNotify(troupeId1, null, true)
+          .then(function(result) {
+            var expected = {};
+            expected[userId1] = roomMembershipFlags.MODES.all;
+            expected[userId2] = roomMembershipFlags.MODES.announcement;
+
+            equivalentValues(result, expected);
+          });
+      });
+
+      it('should return notify users and mention users who are already notify users', function() {
+        return roomMembershipService.findMembersForRoomForNotify(troupeId1, null, false, [userId1])
+          .then(function(result) {
+            var expected = {};
+            expected[userId1] = roomMembershipFlags.MODES.all;
+            expected[userId2] = roomMembershipFlags.MODES.announcement;
+
+            equivalentValues(result, expected);
+          });
+      });
+
+      it('should return notify users and mention users who are announcement users', function() {
+        return roomMembershipService.findMembersForRoomForNotify(troupeId1, null, false, [userId2])
+          .then(function(result) {
+            var expected = {};
+            expected[userId1] = roomMembershipFlags.MODES.all;
+            expected[userId2] = roomMembershipFlags.MODES.announcement;
+
+            equivalentValues(result, expected);
+          });
+      });
+
+      it('should return notify users and mention users who are announcement users', function() {
+        return roomMembershipService.findMembersForRoomForNotify(troupeId1, null, false, [userId3])
+          .then(function(result) {
+            var expected = {};
+            expected[userId1] = roomMembershipFlags.MODES.all;
+            expected[userId2] = roomMembershipFlags.MODES.announcement;
+            expected[userId3] = roomMembershipFlags.MODES.mute;
+
+            equivalentValues(result, expected);
+          });
+      });
+
+      it('should return notify users and mention users who are mute users', function() {
+        return roomMembershipService.findMembersForRoomForNotify(troupeId1, null, true, [userId3])
+          .then(function(result) {
+            var expected = {};
+            expected[userId1] = roomMembershipFlags.MODES.all;
+            expected[userId2] = roomMembershipFlags.MODES.announcement;
+            expected[userId3] = roomMembershipFlags.MODES.mute;
+
+            equivalentValues(result, expected);
+          });
+      });
+
+    });
   });
 
 });

@@ -5,7 +5,7 @@
 var userService = require('../../server/services/user-service');
 var troupeService = require('../../server/services/troupe-service');
 var troupeUriMapper = require('../../server/services/troupe-uri-mapper');
-var unreadService = require('../../server/services/unread-item-service');
+var unreadService = require('../../server/services/unread-items');
 var restful = require("../../server/services/restful");
 var shimPositionOption = require('../yargs-shim-position-option');
 
