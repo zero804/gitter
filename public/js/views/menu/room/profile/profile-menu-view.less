@@ -17,6 +17,8 @@
 .lm-profile-menu__item {
   height: @menu-item-height;
 
+  transition: background-color .2s ease;
+
   .desktop & {
     padding-left: @desktop-menu-left-padding / 2;
     margin-left:  @desktop-menu-left-padding / 2;
@@ -27,7 +29,8 @@
     padding-left: @mobile-menu-left-padding;
   }
 
-  &:hover {
+  &:hover,
+  &:focus {
     background-color: rgba(255, 255, 255, .1);
   }
 }
