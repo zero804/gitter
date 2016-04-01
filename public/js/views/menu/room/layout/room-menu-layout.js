@@ -101,6 +101,7 @@ module.exports = Marionette.LayoutView.extend({
     //Make a new drag & drop control
     this.dndCtrl = new DNDCtrl({ model: this.model });
 
+    window.addEventListener('resize', this._initNano.bind(this));
     this.listenTo(this.dndCtrl, 'dnd:start-drag', this.onDragStart.bind(this));
     this.listenTo(this.dndCtrl, 'dnd:end-drag',   this.onDragEnd.bind(this));
     this.listenTo(this.bus,     'panel:render',   this.onPanelRender, this);
@@ -146,7 +147,8 @@ module.exports = Marionette.LayoutView.extend({
     this._initNano();
   },
 
-  _initNano: function () {
+  _initNano: _.debounce(function () {
+    console.log('working');
     var params = { sliderMaxHeight: 100, iOSNativeScrolling: true };
     fastdom.mutate(function() {
 
@@ -170,9 +172,10 @@ module.exports = Marionette.LayoutView.extend({
         }
       }.bind(this));
     }.bind(this));
-  },
+  }, 500),
 
   onDestroy: function() {
+    window.removeEventListener('resize', this._initNano.bind(this));
     this.stopListening(this.dndCtrl);
   },
 
