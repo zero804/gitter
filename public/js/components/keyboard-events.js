@@ -40,6 +40,9 @@ module.exports = (function() {
     else if (/^(INPUT|TEXTAREA|SELECT)$/.test(tag.tagName)) {
       scope = 'input.other';
     }
+    else if (tag.classList.contains('js-room-topic-edit-activator')) {
+      scope = 'button.room-topic-edit';
+    }
     else {
       scope = 'other';
     }
@@ -75,6 +78,10 @@ module.exports = (function() {
       name: 'document.escape',
       scope: 'other'
     }],
+    'space': [{
+      name: 'room-topic.edit',
+      scope: 'button.room-topic-edit'
+    }],
     'enter': [{
       name: 'search.go',
       scope: 'input.search'
@@ -84,6 +91,9 @@ module.exports = (function() {
     },{
       name: 'chat.compose.auto',
       scope: 'input.chat'
+    }, {
+      name: 'room-topic.edit',
+      scope: 'button.room-topic-edit'
     }],
     'shift+enter': [{
       name: 'chat.compose.auto',
