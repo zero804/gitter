@@ -14,7 +14,7 @@ function SearchResultsStrategy(options) {
       limit: item.limit,
       skip: item.skip,
       results: item.results.map(function(i) {
-        return resultItemStrategy.map(i); 
+        return resultItemStrategy.map(i);
       })
     };
   };
