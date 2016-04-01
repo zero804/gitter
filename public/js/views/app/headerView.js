@@ -84,7 +84,8 @@ module.exports = Marionette.ItemView.extend({
       githubLink:      getGithubUrl(data),
       isPrivate:       getPrivateStatus(data),
       orgName:         orgName,
-      orgPageHref:     orgPageHref
+      orgPageHref:     orgPageHref,
+      shouldShowPlaceholderRoomTopic: data.userCount <= 1
     });
 
     return data;
