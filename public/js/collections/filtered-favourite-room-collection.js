@@ -37,15 +37,28 @@ _.extend(
       return orgFavouriteFilter(model.toJSON(), orgName);
     },
 
-    onDragStart: function (){
+    //When we start dragging an element we want to display all the
+    //items within the favourite collection so a user can order it properly
+    //JP 1/4/16
+    onDragStart: function () {
       this.oldFilter = this.getFilter();
+
+      //Set a property on the item views model
+      //to denote if this model would normally be in the collection
+
+      //At this point this.models represents the filtered models,
+      //as in, only favourites that are one-to-one for example
+      //so we have to filter this down from the initial collection  with the defaultFavouritesFilter (this.filterDefault)
+      this.collection.models.filter(this.filterDefault).forEach(function(model) {
+        model.set('isTempItem', !this.oldFilter(model));
+      }.bind(this));
+
       this.setFilter(this.filterDefault);
-      console.log('drag start');
     },
 
-    onDragEnd: function (){
+    onDragEnd: function () {
+      //reset the models back to their orignal filtered state
       this.setFilter(this.oldFilter);
-      console.log('drag end');
     },
   }
 );

@@ -12,8 +12,8 @@ var DNDCtrl = function(attrs){
   this.model = attrs.model;
 
   this.drag = dragula([], {
-    copy: this.shouldCopyDraggedItem.bind(this),
-    moves: this.shouldItemMove.bind(this)
+    copy:            this.shouldCopyDraggedItem.bind(this),
+    moves:           this.shouldItemMove.bind(this),
   });
 
   this.drag.on('dragend', this.onDragEnd.bind(this));
