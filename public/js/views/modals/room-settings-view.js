@@ -1,6 +1,8 @@
 "use strict";
 
 var Marionette             = require('backbone.marionette');
+var Backbone               = require('backbone');
+var _                      = require('underscore');
 var apiClient              = require('components/apiClient');
 var ModalView              = require('./modal');
 var troupeSettingsTemplate = require('./tmpl/room-settings-view.hbs');
@@ -12,7 +14,7 @@ var OPTIONS = [
   { val: 'mute', text: 'Mute: Notify me only when I\'m directly mentioned' }
 ];
 
-var View = Marionette.ItemView.extend({
+var View = Marionette.LayoutView.extend({
   template: troupeSettingsTemplate,
   events: {
     'click #close-settings' : 'destroySettings',
@@ -24,6 +26,10 @@ var View = Marionette.ItemView.extend({
   ui: {
     options: '#notification-options',
     nonstandard: '#nonstandard',
+    notifyFeatures: '#notify-features'
+  },
+  regions: {
+    notifyFeatures: '#notify-features'
   },
 
   initialize: function() {
@@ -35,6 +41,9 @@ var View = Marionette.ItemView.extend({
         this.model.set(settings);
       });
 
+    this.notifyFeatureCollection = new Backbone.Collection([{
+      text: 'moo'
+    }]);
   },
 
   getNotificationOption: function() {
@@ -105,6 +114,38 @@ var View = Marionette.ItemView.extend({
       this.ui.nonstandard.hide();
     }
 
+    var attributes = this.model.attributes;
+    var features = [];
+    if (attributes.unread) {
+      features.push({ id: 1, text: 'Show unread item counts' });
+    }
+
+    if (attributes.activity) {
+      features.push({ id: 2, text: 'Pulse activity indicator for room on new chat' });
+    }
+
+    if (attributes.mention) {
+      features.push({ id: 3, text: 'Show unread mentions' });
+    }
+
+    if (attributes.announcement) {
+      features.push({ id: 4, text: 'Show unread announcements' });
+    }
+
+    if (attributes.desktop) {
+      features.push({ id: 5, text: 'Desktop notifications for new chats' });
+    }
+
+    if (attributes.desktop) {
+      features.push({ id: 6, text: 'Mobile notifications for new chats' });
+    }
+
+    this.notifyFeatureCollection.reset(features);
+    if (features.length) {
+      this.ui.notifyFeatures.show();
+    } else {
+      this.ui.notifyFeatures.hide();
+    }
   },
 
   setOption: function(val, text) {
@@ -122,7 +163,7 @@ var View = Marionette.ItemView.extend({
         found = true;
       }
       return option;
-        });
+    });
     selectInput.append(items);
 
     if (!found) {
@@ -137,6 +178,14 @@ var View = Marionette.ItemView.extend({
 
   onRender: function() {
     this.update();
+    this.getRegion('notifyFeatures').show(new Marionette.CollectionView({
+      tagName: 'ul',
+      collection: this.notifyFeatureCollection,
+      childView: Marionette.ItemView.extend({
+        tagName: 'li',
+        template: _.template("<%= text %>")
+      })
+    }));
   },
 
   formChange: function(e) {
