@@ -12,7 +12,6 @@ var DNDCtrl = function(attrs){
   this.model = attrs.model;
 
   this.drag = dragula([], {
-    copy:            this.shouldCopyDraggedItem.bind(this),
     moves:           this.shouldItemMove.bind(this),
   });
 
@@ -25,10 +24,6 @@ var DNDCtrl = function(attrs){
 };
 
 DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
-
-  shouldCopyDraggedItem: function (){
-    return (this.model.get('state') !== 'favourite');
-  },
 
   shouldItemMove: function (el){
     return (el.tagName  !== 'A' &&
@@ -54,10 +49,16 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
     if (this.model.get('state') !== 'favourite' &&
         target.dataset.stateChange === 'favourite') {
       this.trigger('room-menu:add-favourite', el.dataset.id);
+      this.onDragEnd();
+    }
+    else if(target.classList.contains('collection-list--primary')) {
+      this.trigger('room-menu:remove-favourite', el.dataset.id);
+      this.onDragEnd();
     }
     else {
       var siblingID = !!sibling && sibling.dataset.id;
       this.trigger('room-menu:sort-favourite', el.dataset.id, siblingID);
+      this.onDragEnd();
     }
 
   },
