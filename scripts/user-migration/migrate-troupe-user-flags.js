@@ -10,12 +10,29 @@ var BatchStream = require('batch-stream');
 var _ = require('lodash');
 var Promise = require('bluebird');
 
+var mongoose      = require('../../server/utils/mongoose-q');
+var Schema        = mongoose.Schema;
+var ObjectId      = Schema.ObjectId;
+
+var connection = mongoose.connection;
+
+var UserTroupeSettingsSchema = new Schema({
+  userId:   ObjectId,
+  troupeId: ObjectId,
+  settings: Schema.Types.Mixed
+});
+UserTroupeSettingsSchema.index({ userId: 1, troupeId: 1 }, { unique: true });
+UserTroupeSettingsSchema.schemaTypeName = 'UserTroupeSettingsSchema';
+
+var UserTroupeSettings = connection.model('UserTroupeSettings', UserTroupeSettingsSchema);
+
+
 function preloadUserTroupeSettings() {
   console.log('## Preloading usertroupesettings');
   return new Promise(function(resolve, reject) {
     var settings = {};
     var count = 0;
-    return persistence.UserTroupeSettings.find({}, { userId: 1, troupeId: 1, 'settings.notifications.push': 1, _id: 0 })
+    return UserTroupeSettings.find({}, { userId: 1, troupeId: 1, 'settings.notifications.push': 1, _id: 0 })
       .lean()
       .read('secondaryPreferred')
       .stream()
@@ -46,6 +63,7 @@ function getFlagsForSettings(settings, lurk) {
   var flags, flagsWithLurk;
   var warning;
   var defaultValue;
+  var category;
 
   switch(settings || "none") {
     case "all":
@@ -55,7 +73,7 @@ function getFlagsForSettings(settings, lurk) {
       if (flagsWithLurk !== flags) {
         warning = lurk ? "all_with_lurk" : "unhandled_case_1";
       }
-
+      category = lurk ? 1 : 2;
       defaultValue = false;
       break;
 
@@ -67,6 +85,7 @@ function getFlagsForSettings(settings, lurk) {
       if (flagsWithLurk !== flags) {
         warning = lurk ? "unhandled_case_2" : "mention_with_unread";
       }
+      category = lurk ? 3 : 4;
 
       defaultValue = false;
       break;
@@ -78,16 +97,19 @@ function getFlagsForSettings(settings, lurk) {
       if (flagsWithLurk !== flags) {
         warning = lurk ? "unhandled_case_3" : "mute_with_unread";
       }
-
+      category = lurk ? 5 : 6;
       defaultValue = false;
       break;
 
     case "none":
       if (lurk) {
         flagsWithLurk = flags = roomMembershipFlags.getFlagsForMode("announcement", false);
+        category = 7;
+
       } else {
         flagsWithLurk = flags = roomMembershipFlags.getFlagsForMode("all", true);
         defaultValue = true;
+        category = 8;
       }
       break;
 
@@ -106,7 +128,8 @@ function getFlagsForSettings(settings, lurk) {
     lurk: lurk,
     isDefault: defaultValue,
     flags: flagsWithLurk,
-    warning: warning
+    warning: warning,
+    category: category
   };
 }
 
@@ -128,7 +151,8 @@ function getTroupeUserBatchUpdates(troupeUsers, notificationSettings) {
       newFlags: info.flags,
       lurk: info.lurk,
       warning: info.warning,
-      isDefault: info.isDefault
+      isDefault: info.isDefault,
+      category: info.category
     };
   });
 
@@ -137,13 +161,14 @@ function getTroupeUserBatchUpdates(troupeUsers, notificationSettings) {
 
 function getTroupeUsersBatchedStream() {
   return persistence.TroupeUser
-    .find({ $or: [{
-      flags: { $exists: false }
-    }, {
-      flags: null
-    }, {
-      flags: 0
-    }]})
+    .find()
+    // .find({ $or: [{
+    //   flags: { $exists: false }
+    // }, {
+    //   flags: null
+    // }, {
+    //   flags: 0
+    // }]})
     .read('secondaryPreferred')
     .stream()
     .pipe(new BatchStream({ size: 4096 }));
@@ -205,6 +230,7 @@ function dryrunTroupeUsers(notificationSettings) {
   var warningAggregation = {
 
   };
+  var categoryAggregation = {};
   var count = 0;
 
   return new Promise(function(resolve, reject) {
@@ -216,6 +242,12 @@ function dryrunTroupeUsers(notificationSettings) {
 
         var updates = getTroupeUserBatchUpdates(troupeUsers, notificationSettings);
         _.forEach(updates, function(f) {
+          if (!categoryAggregation[f.category]) {
+            categoryAggregation[f.category] = 1;
+          } else {
+            categoryAggregation[f.category]++;
+          }
+
           if (f.isDefault) {
             defaultCount++;
           }
@@ -238,6 +270,7 @@ function dryrunTroupeUsers(notificationSettings) {
         console.log('TroupeUsers on default settings: ' + defaultCount);
         console.log('TroupeUsers with warnings: ' + warningCount);
         console.log('Warning types: ', JSON.stringify(warningAggregation, null, '  '));
+        console.log('Categories: ', JSON.stringify(categoryAggregation, null, '  '));
         resolve();
       })
       .on('error', reject)
@@ -262,6 +295,24 @@ var opts = require("nomnom")
     help: 'Do not perform a dry-run.'
   })
   .parse();
+
+function showResult(setting, lurk) {
+  var x = getFlagsForSettings(setting, lurk);
+
+  var hash = roomMembershipFlags.flagsToHash(x.flags);
+  console.log("setting=", setting, "lurk=", lurk, "result=", hash, "output=", x);
+}
+showResult("all", true);
+showResult("all", false);
+
+showResult("mention", true);
+showResult("mention", false);
+
+showResult("mute", true);
+showResult("mute", false);
+
+showResult(undefined, true);
+showResult(undefined, false);
 
 onMongoConnect()
   .then(function() {
