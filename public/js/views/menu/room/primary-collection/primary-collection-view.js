@@ -20,6 +20,7 @@ var PrimaryCollectionView = BaseCollectionView.extend({
   _renderTemplate: compositeViewRenderTemplate,
   childView: ItemView,
   className: 'primary-collection',
+
   ui: {
     collection:   '#collection-list',
     searchHeader: '#primary-collection-search-header'
