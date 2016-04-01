@@ -58,7 +58,7 @@
 
             <section id="favourite-collection" class="left-menu-collection">
               <div class="favourite-collection loaded active">
-                <div id="collection-list">
+                <div id="collection-list" class="collection-list--favourite">
                   {{#each leftMenuFavouriteRooms}}
                     <div class="room-item--favourite" id="{{id}}"  data-id="{{id}}">
                       {{{ prerenderView "js/views/menu/room/primary-collection/primary-collection-view" }}}
@@ -71,7 +71,7 @@
             <section id="primary-collection" class="left-menu-collection">
               <div class="primary-collection loaded active">
                 <header><h2 class="collection__title hidden" id="primary-collection-search-header">Rooms &amp; People</h2></header>
-                <div id="collection-list">
+                <div id="collection-list" class="collection-list--primary">
                   {{#each leftMenuRooms}}
                     <div class="room-item" id="{{id}}"  data-id="{{id}}">
                       {{{ prerenderView "js/views/menu/room/primary-collection/primary-collection-view" }}}

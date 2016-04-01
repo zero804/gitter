@@ -21,7 +21,7 @@ var FavouriteCollection = PrimaryCollectionView.extend({
     this.uiModel = new Backbone.Model({ isDragging: false });
     this.listenTo(this.uiModel, 'change:isDragging', this.onDragStateUpdate, this);
     this.listenTo(this.dndCtrl, 'dnd:start-drag', this.onDragStart, this);
-    this.listenTo(this.dndCtrl, 'dnd:end-drag room-menu:add-favourite room-menu:sort-favourite', this.onDragEnd, this);
+    this.listenTo(this.dndCtrl, 'dnd:end-drag', this.onDragEnd, this);
   },
 
   getChildContainerToBeIndexed: function () {

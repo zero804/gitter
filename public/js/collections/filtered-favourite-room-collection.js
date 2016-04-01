@@ -19,7 +19,8 @@ _.extend(
       FilteredRoomCollection.prototype.initialize.apply(this, arguments);
       this.dndCtrl = attrs.dndCtrl;
       this.listenTo(this.dndCtrl, 'dnd:start-drag', this.onDragStart, this);
-      this.listenTo(this.dndCtrl, 'dnd:end-drag room-menu:add-favourite room-menu:sort-favourite', this.onDragEnd, this);
+      this.listenTo(this.dndCtrl, 'dnd:end-drag', this.onDragEnd, this);
+      this.listenTo(this.dndCtrl, 'room-menu:remove-favourite', this.onRemoveFavourite, this);
       this.sort();
     },
 
@@ -62,6 +63,14 @@ _.extend(
         model.set('isTempItem', false);
       }.bind(this));
       this.setFilter(this.oldFilter);
+    },
+
+    onRemoveFavourite: function (id){
+      var model = this.findWhere({ id: id });
+      if(model) {
+        model.set('favourite', false);
+        model.save();
+      }
     },
   }
 );
