@@ -5,10 +5,12 @@ var template    = require('./header-view.hbs');
 var fastdom     = require('fastdom');
 var toggleClass = require('utils/toggle-class');
 
+var SPACE_KEY = 32;
+var ENTER_KEY = 13;
+
+
 module.exports = Marionette.ItemView.extend({
-
   template: template,
-
 
   behaviors: {
     Tooltip: {
@@ -24,6 +26,7 @@ module.exports = Marionette.ItemView.extend({
 
   events: {
     'click':                          'onClick',
+    'keydown':                        'onKeydown',
     'click #menu-panel-header-close': 'onCloseClicked',
   },
 
@@ -56,16 +59,28 @@ module.exports = Marionette.ItemView.extend({
     }.bind(this));
   },
 
-  onRender: function() {
-    this.updateActiveElement(this.model, this.model.get('state'));
-  },
 
-  onClick: function() {
+  toggleProfileMenuWhenAll: function() {
     //Open the profile menu ONLY when in the all channels state
     if (this.model.get('state') === 'all') {
       this.model.set('profileMenuOpenState', !this.model.get('profileMenuOpenState'));
     }
   },
+
+  onRender: function() {
+    this.updateActiveElement(this.model, this.model.get('state'));
+  },
+
+  onClick: function() {
+    this.toggleProfileMenuWhenAll();
+  },
+
+  onKeydown: function(e) {
+    if(e.type === 'click' || (e.type === 'keydown' && (e.keyCode === SPACE_KEY || e.keyCode === ENTER_KEY))) {
+      this.toggleProfileMenuWhenAll();
+    }
+  },
+
 
   //TODO CHECK IF THIS CAN BE REMOVED JP 27/1/16
   onCloseClicked: function(e) {
@@ -79,6 +94,7 @@ module.exports = Marionette.ItemView.extend({
 
   onProfileToggle: function(model, val) { //jshint unused: true
     toggleClass(this.ui.profileToggle[0], 'active', !!val);
+    this.el.setAttribute('aria-expanded', !!val);
   },
 
   onDestroy: function() {

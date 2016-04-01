@@ -29,6 +29,18 @@
   .m-header-title();
 }
 
+.panel-header__accessible-description {
+  /* Visually hidden */
+  position: absolute;
+  overflow: hidden;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  clip: rect(0 0 0 0);
+}
+
 .panel-header__title--all {
   .m-header-title();
   color: white;
@@ -78,9 +90,14 @@
   align-items: center;
   width:       100%;
 
+  transition:  background-color .2s ease;
 
   &:hover {
     cursor: pointer;
+  }
+  &:focus {
+    background-color: rgba(255, 255, 255, .075);
+    outline: none;
   }
 
   .desktop & {

@@ -21,6 +21,7 @@ require('nanoscroller');
 
 module.exports = Marionette.LayoutView.extend({
 
+
   behaviors: {
     Isomorphic: {
       header:              { el: '#panel-header', init: 'initHeader' },
@@ -88,9 +89,15 @@ module.exports = Marionette.LayoutView.extend({
     }));
   },
 
+
+  ui: {
+    profileMenu: '#profile-menu'
+  },
+
   modelEvents: {
     'change:panelOpenState':       'onPanelOpenStateChange',
     'primary-collection:snapshot': 'onPrimaryCollectionSnapshot',
+    'change:profileMenuOpenState': 'onProfileToggle'
   },
 
   childEvents: {
@@ -141,6 +148,15 @@ module.exports = Marionette.LayoutView.extend({
     if (type) { return this._initNano({ scroll: type }); }
 
     this._initNano({ scrollTo: '[data-collection-index=' + offset + ']' });
+  },
+
+
+  onProfileToggle: function(model, val) { //jshint unused: true
+    this.ui.profileMenu[0].setAttribute('aria-hidden', !val);
+  },
+
+  onRender: function() {
+    this.ui.profileMenu[0].setAttribute('aria-hidden', !this.profileMenuOpenState);
   },
 
   onDestroy: function() {
