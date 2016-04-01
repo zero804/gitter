@@ -4,18 +4,17 @@ var Marionette  = require('backbone.marionette');
 var template    = require('./header-view.hbs');
 var fastdom     = require('fastdom');
 var toggleClass = require('utils/toggle-class');
+var cocktail = require('cocktail');
+var KeyboardEventMixin = require('views/keyboard-events-mixin');
 
-var SPACE_KEY = 32;
-var ENTER_KEY = 13;
 
-
-module.exports = Marionette.ItemView.extend({
+var HeaderView = Marionette.ItemView.extend({
   template: template,
 
   behaviors: {
     Tooltip: {
       '.js-left-menu-org-page-action': { placement: 'left' },
-      '.js-panel-header-all': { titleFn: function() {
+      '.js-profile-menu-toggle': { titleFn: function() {
         return 'Click to toggle the profile menu';
       }, placement: 'right' }
     }
@@ -28,9 +27,12 @@ module.exports = Marionette.ItemView.extend({
   },
 
   events: {
-    'click':                          'onClick',
-    'keydown':                        'onKeydown',
+    'click':                          'toggleProfileMenuWhenAll',
     'click #menu-panel-header-close': 'onCloseClicked',
+  },
+
+  keyboardEvents: {
+    'profile-menu.toggle': 'toggleProfileMenuWhenAll'
   },
 
   ui: {
@@ -74,16 +76,6 @@ module.exports = Marionette.ItemView.extend({
     this.updateActiveElement(this.model, this.model.get('state'));
   },
 
-  onClick: function() {
-    this.toggleProfileMenuWhenAll();
-  },
-
-  onKeydown: function(e) {
-    if(e.type === 'click' || (e.type === 'keydown' && (e.keyCode === SPACE_KEY || e.keyCode === ENTER_KEY))) {
-      this.toggleProfileMenuWhenAll();
-    }
-  },
-
 
   //TODO CHECK IF THIS CAN BE REMOVED JP 27/1/16
   onCloseClicked: function(e) {
@@ -105,3 +97,7 @@ module.exports = Marionette.ItemView.extend({
   },
 
 });
+
+cocktail.mixin(HeaderView, KeyboardEventMixin);
+
+module.exports = HeaderView;
