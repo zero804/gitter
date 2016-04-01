@@ -1,22 +1,22 @@
 'use strict';
 
-var _                        = require('underscore');
-var Marionette               = require('backbone.marionette');
-var PanelHeaderView          = require('../header/header-view');
-var PanelFooterView          = require('../footer/footer-view');
-var FavouriteCollectionView  = require('../favourite-collection/favourite-collection-view');
-var FavouriteCollectionModel = require('../favourite-collection/favourite-collection-model');
-var PrimaryCollectionView    = require('../primary-collection/primary-collection-view');
-var PrimaryCollectionModel   = require('../primary-collection/primary-collection-model');
-var SecondaryCollectionView  = require('../secondary-collection/secondary-collection-view');
-var SecondaryCollectionModel = require('../secondary-collection/secondary-collection-model');
-var TertiaryCollectionView   = require('../tertiary-collection/tertiary-collection-view');
-var TertiaryCollectionModel  = require('../tertiary-collection/tertiary-collection-model');
-var ProfileMenuView          = require('../profile/profile-menu-view');
-var fastdom                  = require('fastdom');
-var toggleClass              = require('utils/toggle-class');
-
-var SearchInputView       = require('views/menu/room/search-input/search-input-view');
+var _                               = require('underscore');
+var Marionette                      = require('backbone.marionette');
+var PanelHeaderView                 = require('../header/header-view');
+var PanelFooterView                 = require('../footer/footer-view');
+var FavouriteCollectionView         = require('../favourite-collection/favourite-collection-view');
+var FavouriteCollectionModel        = require('../favourite-collection/favourite-collection-model');
+var PrimaryCollectionView           = require('../primary-collection/primary-collection-view');
+var PrimaryCollectionModel          = require('../primary-collection/primary-collection-model');
+var SecondaryCollectionView         = require('../secondary-collection/secondary-collection-view');
+var SecondaryCollectionModel        = require('../secondary-collection/secondary-collection-model');
+var TertiaryCollectionView          = require('../tertiary-collection/tertiary-collection-view');
+var TertiaryCollectionModel         = require('../tertiary-collection/tertiary-collection-model');
+var ProfileMenuView                 = require('../profile/profile-menu-view');
+var FilteredFavouriteRoomCollection = require('../../../../collections/filtered-favourite-room-collection.js');
+var SearchInputView                 = require('views/menu/room/search-input/search-input-view');
+var fastdom                         = require('fastdom');
+var toggleClass                     = require('utils/toggle-class');
 
 require('views/behaviors/isomorphic');
 require('nanoscroller');
@@ -51,9 +51,17 @@ module.exports = Marionette.LayoutView.extend({
     return new SearchInputView(optionsForRegion({ model: this.model }));
   },
 
-  initFavouriteCollection: function (optionsForRegion){
+  initFavouriteCollection: function (optionsForRegion) {
+    //Sadly the favourite collection needs to be generated here rather than the room-menu-model
+    //because it has a dependency on the dnd-controller JP 1/4/16
+    var favCollection = new FilteredFavouriteRoomCollection({
+      roomModel:  this.model,
+      collection: this.model._roomCollection,
+      dndCtrl:    this.dndCtrl,
+    });
+
     return new FavouriteCollectionView(optionsForRegion({
-      collection:    this.model.favouriteCollection,
+      collection:    favCollection,
       model:         new FavouriteCollectionModel(null, { roomMenuModel: this.model }),
       roomMenuModel: this.model,
       bus:           this.bus,
@@ -108,7 +116,7 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   childEvents: {
-    'render': 'onChildViewRender',
+    render: 'onChildViewRender',
   },
 
   initialize: function(attrs) {
@@ -126,7 +134,7 @@ module.exports = Marionette.LayoutView.extend({
   }, 50),
 
   _initNano: function(params) {
-    fastdom.mutate(function(){
+    fastdom.mutate(function() {
       this.$el.find('.nano').nanoScroller(params);
     }.bind(this));
   },

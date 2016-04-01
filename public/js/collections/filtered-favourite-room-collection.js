@@ -15,11 +15,15 @@ _.extend(
   FilteredFavouriteCollection.prototype,
   FilteredRoomCollection.prototype, {
 
-    initialize: function() {
+    initialize: function(attrs) {
       FilteredRoomCollection.prototype.initialize.apply(this, arguments);
+      this.dndCtrl = attrs.dndCtrl;
+      this.listenTo(this.dndCtrl, 'dnd:start-drag', this.onDragStart, this);
+      this.listenTo(this.dndCtrl, 'dnd:end-drag', this.onDragEnd, this);
       this.sort();
     },
-    comparator: function(a, b){
+
+    comparator: function(a, b) {
       return sortAndFilters.favourites.sort(a, b);
     },
 
@@ -27,14 +31,21 @@ _.extend(
     filterOneToOnes: function(model) {
       return one2oneFavouriteFilter(model.toJSON());
     },
+
     filterOrgRooms: function(model) {
       var orgName = this.roomModel.get('selectedOrgName');
       return orgFavouriteFilter(model.toJSON(), orgName);
     },
-    getList: function (){
-      this.models.forEach(function(model){
-        console.log(model.get('url'), model.get('favourite'));
-      });
+
+    onDragStart: function (){
+      this.oldFilter = this.getFilter();
+      this.setFilter(this.filterDefault);
+      console.log('drag start');
+    },
+
+    onDragEnd: function (){
+      this.setFilter(this.oldFilter);
+      console.log('drag end');
     },
   }
 );
