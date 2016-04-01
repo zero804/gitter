@@ -6,7 +6,7 @@ var parseLeftMenuTroupeContext = require('./left-menu-troupe-context');
 module.exports = function getSnapshotsForPageContext(req, troupeContext, orgs, rooms) {
 
   //generate the org list for the minibar, this is derived from the room list
-  var minibarOrgList = suggestedOrgsFromRoomList(rooms, req.uriContext.uri);
+  var minibarOrgList = suggestedOrgsFromRoomList(rooms, req.uriContext.uri, null, req.troupe);
 
   return {
     rooms:    rooms,

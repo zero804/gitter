@@ -17,7 +17,6 @@ var toggleClass              = require('utils/toggle-class');
 var SearchInputView       = require('views/menu/room/search-input/search-input-view');
 
 require('views/behaviors/isomorphic');
-require('nanoscroller');
 
 module.exports = Marionette.LayoutView.extend({
 
@@ -94,7 +93,7 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   childEvents: {
-    'render': 'onChildViewRender',
+    'render': 'onChildRender'
   },
 
   initialize: function(attrs) {
@@ -103,18 +102,7 @@ module.exports = Marionette.LayoutView.extend({
 
     this.listenTo(this.bus, 'ui:swipeleft', this.onSwipeLeft, this);
     this.listenTo(this.bus, 'focus.request.chat', this.onSearchItemSelected, this);
-    this.listenTo(this.bus, 'room-menu:keyboard:change-focus', this.onFocusChangeRequested, this);
     this.$el.find('#search-results').show();
-  },
-
-  onChildViewRender: _.debounce(function() {
-    this._initNano({ iOSNativeScrolling: true, sliderMaxHeight: 200 });
-  }, 50),
-
-  _initNano: function(params) {
-    fastdom.mutate(function(){
-      this.$el.find('.nano').nanoScroller(params);
-    }.bind(this));
   },
 
   onPanelOpenStateChange: function(model, val) { /*jshint unused: true */
@@ -137,11 +125,9 @@ module.exports = Marionette.LayoutView.extend({
     this.el.classList.add('loading');
   },
 
-  onFocusChangeRequested: function(offset, type) { //jshint unused: true
-    if (type) { return this._initNano({ scroll: type }); }
-
-    this._initNano({ scrollTo: '[data-collection-index=' + offset + ']' });
-  },
+  onChildRender: _.debounce(function (){
+    this.bus.trigger('panel:render');
+  }, 10),
 
   onDestroy: function() {
     this.stopListening(this.bus);
