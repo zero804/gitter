@@ -4,19 +4,17 @@ var context                  = require('utils/context');
 var apiClient                = require('components/apiClient');
 var Marionette               = require('backbone.marionette');
 var Backbone                 = require('backbone');
+var cocktail                 = require('cocktail');
 var autolink                 = require('autolink');
 var userNotifications        = require('components/user-notifications');
 var Dropdown                 = require('views/controls/dropdown');
 var appEvents                = require('utils/appevents');
+var KeyboardEventMixin       = require('views/keyboard-events-mixin');
 var headerViewTemplate       = require('./tmpl/headerViewTemplate.hbs');
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
-var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
+var resolveRoomAvatarSrcSet  = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 
 require('views/behaviors/tooltip');
-
-
-var SPACE_KEY = 32;
-var ENTER_KEY = 13;
 
 
 function getPrivateStatus(data) {
@@ -28,7 +26,7 @@ function getGithubUrl(data) {
   return 'https://github.com' + data.url;
 }
 
-module.exports = Marionette.ItemView.extend({
+var HeaderView = Marionette.ItemView.extend({
   template: headerViewTemplate,
 
   modelEvents: {
@@ -39,7 +37,7 @@ module.exports = Marionette.ItemView.extend({
     cog:            '.js-chat-settings',
     dropdownMenu:   '#cog-dropdown',
     topic:          '.js-chat-topic',
-    topicActivator: '.js-chat-topic-activator',
+    topicActivator: '.js-room-topic-edit-activator',
     name:           '.js-chat-name',
     favourite:      '.js-favourite-button',
     orgrooms:       '.js-org-page',
@@ -51,9 +49,12 @@ module.exports = Marionette.ItemView.extend({
     'click @ui.favourite':         'toggleFavourite',
     'dblclick @ui.topicActivator': 'showInput',
     'keydown textarea':            'detectKeys',
-    'keydown @ui.topicActivator':  'handleKeyboardStartTopicEdit',
     'click @ui.orgrooms':          'goToOrgRooms',
   },
+
+  keyboardEvents: {
+     'room-topic.edit': 'showInput'
+   },
 
   behaviors: {
     Tooltip: {
@@ -286,12 +287,6 @@ module.exports = Marionette.ItemView.extend({
     }
   },
 
-  handleKeyboardStartTopicEdit: function(e) {
-    if(e.type === 'click' || (e.type === 'keydown' && (e.keyCode === SPACE_KEY || e.keyCode === ENTER_KEY))) {
-      this.showInput();
-    }
-  },
-
   showInput: function() {
     if (!context.isTroupeAdmin()) return;
     if (this.editingTopic === true) return;
@@ -337,3 +332,8 @@ module.exports = Marionette.ItemView.extend({
     }
   },
 });
+
+cocktail.mixin(HeaderView, KeyboardEventMixin);
+
+
+module.exports = HeaderView;
