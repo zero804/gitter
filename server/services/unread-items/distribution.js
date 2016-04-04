@@ -121,7 +121,7 @@ Distribution.prototype = {
         if (memberDetail.presence !== 'online') return false;
 
         var flags = memberDetail.flags;
-        return roomMembershipFlags.hasNotifyUnread(flags) || mentioned(memberDetail);
+        return roomMembershipFlags.hasNotifyDesktop(flags) || mentioned(memberDetail);
       })
       .map(memberDetailsToUserId);
   },
@@ -138,7 +138,7 @@ Distribution.prototype = {
 
         var presence = memberDetail.presence;
         return (presence === 'push' || presence === 'push_connected') &&
-               roomMembershipFlags.hasNotifyUnread(flags);
+               roomMembershipFlags.hasNotifyMobile(flags);
       })
       .map(memberDetailsToUserId);
   },

@@ -1,5 +1,8 @@
-<div class="panel-header__container--all" id="panel-header-all">
+<div class="panel-header__container--all js-profile-menu-toggle" id="panel-header-all" aria-describedby="panel-header__accessible-description--all" aria-controls="profile-menu" aria-expanded="false" tabindex="0">
   <h2 class="panel-header__title--all">All Conversations</h2>
+  <p id="panel-header__accessible-description--all" class="panel-header__accessible-description">
+    Activate or click this element to toggle the profile menu
+  </p>
   <img id="panel-header-profile-toggle"
        class="panel-header__icon--all"
        src='{{cdn "images/svg/menu/down-arrow.svg"}}'
@@ -23,7 +26,7 @@
   <h2 class="panel-header__title--org">{{orgName}}</h2>
   {{! TODO Should this links navigation be handled in the JS so we just chnage the frames src?
       JP 11/1/16 }}
-      <a class="panel-header__org-icon" href="/orgs/{{orgName}}/rooms">
-        <span class="panel-header__org-icon__globe">&#127760;</span>
-      </a>
+  <a class="panel-header__org-icon js-left-menu-org-page-action" href="/orgs/{{orgName}}/rooms" title="More {{orgName}} rooms">
+    <i class="panel-header__org-icon__globe icon-globe"></i>
+  </a>
 </div>
