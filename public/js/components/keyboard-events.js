@@ -40,6 +40,9 @@ module.exports = (function() {
     else if (/^(INPUT|TEXTAREA|SELECT)$/.test(tag.tagName)) {
       scope = 'input.other';
     }
+    else if (tag.classList.contains('js-profile-menu-toggle')) {
+      scope = 'button.profile-menu'
+    }
     else {
       scope = 'other';
     }
@@ -75,6 +78,10 @@ module.exports = (function() {
       name: 'document.escape',
       scope: 'other'
     }],
+    'space': [{
+      name: 'profile-menu.toggle',
+      scope: 'button.profile-menu'
+    }],
     'enter': [{
       name: 'search.go',
       scope: 'input.search'
@@ -84,6 +91,9 @@ module.exports = (function() {
     },{
       name: 'chat.compose.auto',
       scope: 'input.chat'
+    },{
+      name: 'profile-menu.toggle',
+      scope: 'button.profile-menu'
     }],
     'shift+enter': [{
       name: 'chat.compose.auto',

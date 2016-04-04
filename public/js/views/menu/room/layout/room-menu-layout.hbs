@@ -35,16 +35,7 @@
 
         <li data-state-change="close" id="minibar-close"  class="room-menu-options__item--close {{#if roomMenuIsPinned}}left{{/if}}">
           <button id="menu-toggle-button" class="room-menu-options__item-button menu-toggle-button" title="Toggle left menu">
-            <svg
-                 class="menu-toggle-icon js-menu-toggle-icon"
-                 width="30px"
-                 height="34px"
-                 viewBox="0 0 30 34"
-             >
-              <path d="M0,6 l15,0 l15,0" />
-              <path d="M0,17 l15,0 l15,0" />
-              <path d="M0,28 l15,0 l15,0" />
-            </svg>
+            {{> pinned-hamburger-menu-icon }}
           </button>
         </li>
 
