@@ -90,7 +90,7 @@ var View = Marionette.LayoutView.extend({
         return {
           selectValue: 'mute',
           nonStandard: true,
-          description: 'Legacy value with ' + (lurk ? 'unread item count off' : 'unread item count on')
+          description: 'Custom legacy setting (details below)'
         };
     }
   },
@@ -119,15 +119,15 @@ var View = Marionette.LayoutView.extend({
     }
 
     if (attributes.activity) {
-      features.push({ id: 2, text: 'Pulse activity indicator for room on new chat' });
+      features.push({ id: 2, text: 'Show pulse activity indicator on chat' });
     }
 
     if (attributes.mention) {
-      features.push({ id: 3, text: 'Show unread mentions' });
+      features.push({ id: 3, text: 'Notify on direct mentions' });
     }
 
     if (attributes.announcement) {
-      features.push({ id: 4, text: 'Show unread announcements' });
+      features.push({ id: 4, text: 'Notify on @/all announcements' });
     }
 
     if (attributes.desktop) {
