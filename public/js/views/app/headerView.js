@@ -40,7 +40,7 @@ var HeaderView = Marionette.ItemView.extend({
     topicActivator: '.js-room-topic-edit-activator',
     name:           '.js-chat-name',
     favourite:      '.js-favourite-button',
-    orgrooms:       '.js-org-page',
+    orgrooms:       '.js-chat-header-org-page-action',
   },
 
   events: {
@@ -59,7 +59,9 @@ var HeaderView = Marionette.ItemView.extend({
   behaviors: {
     Tooltip: {
       '.js-chat-name': { titleFn: 'getChatNameTitle', placement: 'right' },
-      '.js-org-page':  { titleFn: 'getOrgPageTitle', placement: 'left' },
+      '.js-chat-header-org-page-action': { placement: 'left' },
+      '.js-favourite-button': { placement: 'left' },
+      '.js-chat-settings': { placement: 'left' }
     },
   },
 
@@ -141,12 +143,6 @@ var HeaderView = Marionette.ItemView.extend({
       default:
         return model.get('oneToOne') ? 'This chat is just between you two' : 'Only invited users can join';
     }
-  },
-
-  getOrgPageTitle: function() {
-    var uri = this.model.get('uri');
-    var orgName = uri.split('/')[0];
-    return 'More ' + orgName + ' rooms';
   },
 
   onRender: function() {
