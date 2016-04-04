@@ -63,21 +63,23 @@ module.exports = Marionette.LayoutView.extend({
       collection:        this.model.secondaryCollection,
       model:             new SecondaryCollectionModel({}, { roomMenuModel: this.model }),
       roomMenuModel:     this.model,
-      primaryCollection: this.model.primaryCollection,
       bus:               this.bus,
+      roomCollection:    this.model._roomCollection,
+      primaryCollection: this.model.primaryCollection,
       userModel:         this.model.userModel,
       troupeModel:       this.model._troupeModel,
-      roomCollection:    this.model._roomCollection,
     }));
   },
 
   initTertiaryCollection: function(optionsForRegion) {
     return new TertiaryCollectionView(optionsForRegion({
-      model:          new TertiaryCollectionModel({}, { roomMenuModel: this.model }),
-      collection:     this.model.tertiaryCollection,
-      roomMenuModel:  this.model,
-      bus:            this.bus,
-      roomCollection: this.model._roomCollection,
+      model:               new TertiaryCollectionModel({}, { roomMenuModel: this.model }),
+      collection:          this.model.tertiaryCollection,
+      roomMenuModel:       this.model,
+      bus:                 this.bus,
+      primaryCollection:   this.model.primaryCollection,
+      secondaryCollection: this.model.secondaryCollection,
+      roomCollection:      this.model._roomCollection,
     }));
   },
 

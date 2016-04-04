@@ -87,7 +87,12 @@ var PrimaryCollectionView = BaseCollectionView.extend({
   },
 
   filter: function(model, index) { //jshint unused: true
-    return (this.model.get('search') === 'search') ? (index <= 5) : true;
+    switch(this.roomMenuModel.get('state')) {
+      case 'search':
+        return (index <= 5);
+      default:
+        return true;
+    }
   },
 
   //TODO The filter should be reused within the view filter method?
