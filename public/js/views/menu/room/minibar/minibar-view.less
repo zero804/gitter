@@ -93,11 +93,9 @@
 
   &.active,
   &.dragging {
-
     .room-menu-options__item-button {
       opacity: 1;
     }
-
   }
 }
 
@@ -207,9 +205,20 @@
     opacity:         1;
     text-decoration: none;
   }
-
   &:focus {
     outline: none;
+  }
+
+  &:before {
+     .sudo-panel();
+     background-color: currentColor;
+  }
+
+  .active > &,
+  .dragging > & {
+    &:before {
+      transform: translateX(0);
+    }
   }
 }
 
