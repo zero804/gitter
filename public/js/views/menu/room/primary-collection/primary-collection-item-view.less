@@ -73,31 +73,32 @@ JP 11/2/16
 
 .room-item__title {
   .room-menu-text();
+  flex: 1;
+
   &:first-child {
     margin-left: @desktop-menu-left-padding / 2;
   }
 }
 
-.unread-indicator(@size){
-  box-sizing:    border-box;
+.unread-indicator(@size) {
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width:     @size;
-  height:        @size;
+  width: @size;
+  height: @size;
+  margin-left: 1rem;
 
   border-radius: 100%;
-  border:        2px solid transparent;
 
-  color:         white;
-  font-size:     1.1rem;
-  line-height:   1;
+  color: white;
+  font-size: 1.1rem;
+  line-height: 1;
 }
 
 .room-item__unread-indicator-visibile-reset() {
   visibility: visible;
   transform: scale(1);
-  margin-left: 1rem;
   opacity: 1;
 
   transition:
@@ -110,10 +111,10 @@ JP 11/2/16
 }
 
 .room-item__unread-indicator {
-  .unread-indicator(@menu-unread-badge-size);
+  .unread-indicator(0);
   visibility: hidden;
   transform: scale(0.5);
-  margin-left: -@menu-unread-badge-size;
+  margin-left: 0;
   opacity: 0;
 
   /* Slower transition back to hidden state
@@ -127,6 +128,7 @@ JP 11/2/16
     border-color .2s ease;
 
   &.has-unreads {
+    .unread-indicator(@menu-unread-badge-size);
     .room-item__unread-indicator-visibile-reset();
 
     background-color: @caribbean;
@@ -139,13 +141,23 @@ JP 11/2/16
     .unread-indicator(@menu-unread-badge-size / 3);
     .room-item__unread-indicator-visibile-reset();
 
-    border-color: @caribbean;
-
     animation-name: unread-indicator-subtle-pulse-animation;
     animation-duration: 2s;
     animation-timing-function: ease;
+
+    &:before {
+      content: '';
+      box-sizing: border-box;
+      display: block;
+      width: 100%;
+      height: 100%;
+
+      border: 2px solid @caribbean;
+      border-radius: 100%;
+    }
   }
   &.has-mentions {
+    .unread-indicator(@menu-unread-badge-size);
     .room-item__unread-indicator-visibile-reset();
 
     background-color: @jaffa;
@@ -167,7 +179,7 @@ JP 11/2/16
   height: @menu-item-height;
   //default is off, when a room-item is hovered we show it
   opacity: 0;
-  margin-left: auto;
+  margin-left: 1rem;
   transition: opacity .2s ease-out;
   &:hover {
     cursor: pointer;
