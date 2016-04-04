@@ -2,7 +2,7 @@
 
 var _                     = require('lodash');
 var Promise               = require('bluebird');
-var unreadItemService     = require("../../services/unread-item-service");
+var unreadItemService     = require("../../services/unread-items");
 var collapsedChatsService = require('../../services/collapsed-chats-service');
 var getVersion            = require('../get-model-version');
 var UserIdStrategy        = require('./user-id-strategy');

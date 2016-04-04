@@ -53,7 +53,6 @@ module.exports = createExports({
   UserTroupeFavourites: require('./persistence/user-troupe-favourites-schema'),
   Troupe: require('./persistence/troupe-schema'),
   TroupeUser: require('./persistence/troupe-user-schema'),
-  UserTroupeSettings: require('./persistence/user-troupe-settings-schema'),
   UserSettings: require('./persistence/user-settings-schema'),
   ChatMessage: require('./persistence/chat-message-schema'),
   Event: require('./persistence/event-schema'),
