@@ -35,7 +35,7 @@ module.exports = function parseContentToTemplateData(data, state) {
     var roomName = data.name;
     // Get rid of the org prefix, if viewing in a org bucket
     if(state === 'org') {
-      roomName = data.name.replace(new RegExp('^' + getOrgNameFromTroupeName(data.name) + '/'), '');
+      roomName = data.name.split('/').slice(1).join('/');
     }
 
     return _.extend({}, data, {
