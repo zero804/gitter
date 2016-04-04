@@ -119,24 +119,25 @@ var View = Marionette.LayoutView.extend({
     }
 
     if (attributes.activity) {
-      features.push({ id: 2, text: 'Show pulse activity indicator on chat' });
+      features.push({ id: 2, text: 'Show activity indicator on chat' });
+    }
+
+    if (attributes.desktop) {
+      features.push({ id: 5, text: 'Notify for all chats' });
     }
 
     if (attributes.mention) {
-      features.push({ id: 3, text: 'Notify on direct mentions' });
+      features.push({ id: 3, text: 'Notify when you\'re mentioned' });
     }
 
     if (attributes.announcement) {
       features.push({ id: 4, text: 'Notify on @/all announcements' });
     }
 
-    if (attributes.desktop) {
-      features.push({ id: 5, text: 'Desktop notifications for new chats' });
-    }
-
-    if (attributes.desktop) {
-      features.push({ id: 6, text: 'Mobile notifications for new chats' });
-    }
+    // For now, desktop = mobile so don't confuse the user
+    // if (attributes.mobile) {
+    //   features.push({ id: 6, text: 'Mobile notifications for chats' });
+    // }
 
     this.notifyFeatureCollection.reset(features);
     if (features.length) {
