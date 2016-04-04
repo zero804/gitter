@@ -2,6 +2,7 @@
 
 var _                         = require('underscore');
 var PrimaryCollectionItemView = require('../primary-collection/primary-collection-item-view');
+var fastdom                   = require('fastdom');
 
 module.exports = PrimaryCollectionItemView.extend({
 
@@ -13,5 +14,16 @@ module.exports = PrimaryCollectionItemView.extend({
     return _.extend({}, PrimaryCollectionItemView.prototype.attributes.apply(this, arguments), {
       class: className
     });
-  }
+  },
+
+  onRender: function (){
+    if(this.model.get('isTempItem')) {
+      setTimeout(function(){
+        fastdom.mutate(function(){
+          console.log('setting temp');
+          this.el.classList.add('temp-active');
+        }.bind(this));
+      }.bind(this), 32);
+    }
+  },
 });
