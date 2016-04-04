@@ -41,9 +41,7 @@ var View = Marionette.LayoutView.extend({
         this.model.set(settings);
       });
 
-    this.notifyFeatureCollection = new Backbone.Collection([{
-      text: 'moo'
-    }]);
+    this.notifyFeatureCollection = new Backbone.Collection([]);
   },
 
   getNotificationOption: function() {
