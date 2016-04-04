@@ -302,8 +302,9 @@ describe('unread-item-service', function() {
           membersWithFlags: [
             { userId: userId1, flags: MODES.all },
             { userId: userId2, flags: MODES.mention },
+            { userId: userId3, flags: MODES.mute },
           ],
-          presence: makeHash(userId1, 'online', userId2, 'online')
+          presence: makeHash(userId1, 'online', userId2, 'online', userId3, 'online')
         };
 
         return unreadItemService.createChatUnreadItems(fromUserId, troupe, chat)
@@ -313,15 +314,15 @@ describe('unread-item-service', function() {
             mockito.verify(appEvents, never()).troupeUnreadCountsChange(hasMember('userId', fromUserId));
             mockito.verify(appEvents).troupeUnreadCountsChange(deep({userId: userId1, troupeId: troupeId, total: 1, mentions: undefined }));
 
-            mockito.verify(appEvents).newLurkActivity(deep({ userId: userId2, troupeId: troupeId }));
+            mockito.verify(appEvents).newLurkActivity(deep({ userId: userId3, troupeId: troupeId }));
           });
       });
 
       it('should create messages with no mentions, all lurkers', function() {
         createDistributionResponse = {
           membersWithFlags: [
-            { userId: userId1, flags: MODES.mention },
-            { userId: userId2, flags: MODES.mention },
+            { userId: userId1, flags: MODES.mute },
+            { userId: userId2, flags: MODES.mute },
           ],
           presence: makeHash(userId1, 'online', userId2, 'online')
         };
@@ -361,8 +362,8 @@ describe('unread-item-service', function() {
       it('should create messages with user mentions to lurkers', function() {
         createDistributionResponse = {
           membersWithFlags: [
-            { userId: userId1, flags: MODES.mention },
-            { userId: userId2, flags: MODES.mention },
+            { userId: userId1, flags: MODES.mute },
+            { userId: userId2, flags: MODES.mute },
           ],
           mentions: [userId1, userId2],
           presence: makeHash(userId1, 'online', userId2, 'online')
@@ -743,7 +744,7 @@ describe('unread-item-service', function() {
       }, {
         name: 'Lurking user',
         meta: {
-          usersModeMention: [userId1]
+          usersModeMute: [userId1]
         },
         tests: [{
           name: 'In room',
