@@ -20,6 +20,13 @@
   }
 
   &.temp {
-    opacity: .2;
+    opacity:    0;
+    max-height: 0;
+    transition: max-height .2s ease-in, opacity .1s .1s;
+  }
+
+  &.temp-active {
+    opacity:    .2;
+    max-height: @menu-item-height;
   }
 }
