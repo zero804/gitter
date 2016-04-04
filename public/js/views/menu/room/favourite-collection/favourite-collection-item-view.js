@@ -17,10 +17,11 @@ module.exports = PrimaryCollectionItemView.extend({
   },
 
   onRender: function (){
+    //when temp items are rendered we want to wait and then
+    //animate them in JP 4/4/16
     if(this.model.get('isTempItem')) {
       setTimeout(function(){
         fastdom.mutate(function(){
-          console.log('setting temp');
           this.el.classList.add('temp-active');
         }.bind(this));
       }.bind(this), 32);

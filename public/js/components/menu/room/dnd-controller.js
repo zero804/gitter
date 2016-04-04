@@ -10,16 +10,17 @@ var DNDCtrl = function(attrs){
     throw new Error('A valid model must be passed to a new instance of the DNDController');
   }
   this.model = attrs.model;
+  this.onMouseUp = this.onMouseUp.bind(this);
 
   this.drag = dragula([], {
     moves:           this.shouldItemMove.bind(this),
   });
 
   this.drag.on('dragend', this.onDragEnd.bind(this));
-  this.drag.on('cancel', this.onDragEnd.bind(this));
-  this.drag.on('remove', this.onDragEnd.bind(this));
-  this.drag.on('drag', this.onDragStart.bind(this));
-  this.drag.on('drop', this.onItemDropped.bind(this));
+  this.drag.on('cancel',  this.onDragEnd.bind(this));
+  this.drag.on('remove',  this.onDragEnd.bind(this));
+  this.drag.on('drag',    this.onDragStart.bind(this));
+  this.drag.on('drop',    this.onItemDropped.bind(this));
 
 };
 
@@ -65,10 +66,17 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
 
   onDragStart: function (){
     this.trigger('dnd:start-drag');
+    window.addEventListener('mouseup', this.onMouseUp);
   },
 
   onDragEnd: function (){
     this.trigger('dnd:end-drag');
+  },
+
+  onMouseUp: function (){
+    console.log('this is working');
+    window.removeEventListener('mouseup', this.onMouseUp);
+    this.onDragEnd();
   },
 
 });
