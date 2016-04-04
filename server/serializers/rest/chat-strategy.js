@@ -1,5 +1,8 @@
 "use strict";
 
+
+var env                   = require('gitter-web-env');
+var logger                = env.logger;
 var _                     = require('lodash');
 var Promise               = require('bluebird');
 var unreadItemService     = require("../../services/unread-items");
@@ -68,6 +71,16 @@ function ChatStrategy(options)  {
   if (options.lookups && options.lookups.indexOf('user') !== -1) {
     useLookups = true;
     userLookups = {};
+  }
+
+  if (useLookups) {
+    if (options.lean) {
+      // we're breaking users out, but then not returning their displayNames
+      // which kinda defeats the purpose
+      logger.warn("ChatStrategy was called with lookups, but also with lean", options);
+    }
+  } else {
+    logger.warn("ChatStrategy was called without lookups", options);
   }
 
   var userStrategy = options.user ? null : new UserIdStrategy({ lean: options.lean });

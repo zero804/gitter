@@ -64,7 +64,8 @@ exports.serializeChatsForTroupe = function(troupeId, userId, options, callback) 
         currentUserId: userId,
         troupeId: troupeId,
         unread: options.unread,
-        lean: options.lean
+        lean: options.lean,
+        lookups: options.lookups
       });
 
       return restSerializer.serialize(chatMessages, strategy);

@@ -19,6 +19,7 @@ var roomNameTrimmer                = require('../../../public/js/utils/room-name
 var isolateBurst                   = require('gitter-web-shared/burst/isolate-burst-array');
 var unreadItemService              = require('../../services/unread-items');
 var mongoUtils                     = require('../../utils/mongo-utils');
+var lookupParser                    = require('gitter-web-shared/lookup-parser');
 var url                            = require('url');
 var cdn                            = require("../../web/cdn");
 var roomMembershipService          = require('../../services/room-membership-service');
@@ -278,6 +279,7 @@ function renderMainFrame(req, res, next, frame) {
     .catch(next);
 }
 
+
 function renderChat(req, res, options, next) {
   var troupe = req.uriContext.troupe;
   var aroundId = fixBadLinksOnId(req.query.at);
@@ -297,7 +299,7 @@ function renderChat(req, res, options, next) {
     };
 
     var chatSerializerOptions = _.defaults({
-      lean: true
+      lookups: ['user']
     }, snapshotOptions);
 
     var userSerializerOptions = _.defaults({
@@ -310,7 +312,10 @@ function renderChat(req, res, options, next) {
         restful.serializeChatsForTroupe(troupe.id, userId, chatSerializerOptions),
         options.fetchEvents === false ? null : restful.serializeEventsForTroupe(troupe.id, userId),
         options.fetchUsers === false ? null :restful.serializeUsersForTroupe(troupe.id, userId, userSerializerOptions),
-      ]).spread(function (troupeContext, chats, activityEvents, users, ownerIsOrg) {
+      ]).spread(function (troupeContext, chatResults, activityEvents, users, ownerIsOrg) {
+        // chatResult is now lookups and items
+        var chats = lookupParser.parseChats(chatResults);
+
         var initialChat = _.find(chats, function(chat) { return chat.initial; });
         var initialBottom = !initialChat;
         var githubLink;

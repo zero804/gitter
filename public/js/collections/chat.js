@@ -11,6 +11,7 @@ var log                     = require('utils/log');
 var LiveCollection          = require('gitter-realtime-client').LiveCollection;
 var realtime                = require('components/realtime');
 var SyncMixin               = require('./sync-mixin');
+var lookupParser            = require('gitter-web-shared/lookup-parser');
 
 var ChatModel = Backbone.Model.extend({
   idAttribute: 'id',
@@ -146,15 +147,20 @@ var ChatCollection = LiveCollection.extend({
   },
 
   getQuery: function() {
-    return { lean: true };
+    return { lookups: ['user'] };
   },
 
   getSnapshotExtras: function() {
-    return { lean: true };
+    return { lookups: ['user'] };
   },
 
   parse: function(collection) {
-    return burstCalculator.parse(collection);
+    if (collection.lookups) {
+      var chats = lookupParser.parseChats(collection)
+      return burstCalculator.parse(chats);
+    } else {
+      return burstCalculator.parse(collection);
+    }
   },
 
   findModelForOptimisticMerge: function(newModel) {
