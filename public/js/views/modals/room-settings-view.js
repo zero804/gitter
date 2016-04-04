@@ -47,7 +47,7 @@ var View = Marionette.ItemView.extend({
       case 'annoucement':
       case 'annoucements':
       case 'mention':
-        return { selectValue: 'mention', nonStandard: lurk === false, lurk: lurk };
+        return { selectValue: 'mention', nonStandard: lurk === true, lurk: lurk };
 
       case 'mute':
         return { selectValue: 'mute', nonStandard: lurk === false, lurk: lurk };
