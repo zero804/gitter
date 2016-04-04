@@ -40,6 +40,9 @@ module.exports = (function() {
     else if (/^(INPUT|TEXTAREA|SELECT)$/.test(tag.tagName)) {
       scope = 'input.other';
     }
+    else if (tag.classList.contains('js-room-topic-edit-activator')) {
+      scope = 'button.room-topic-edit';
+    }
     else if (tag.classList.contains('js-profile-menu-toggle')) {
       scope = 'button.profile-menu'
     }
@@ -79,6 +82,9 @@ module.exports = (function() {
       scope: 'other'
     }],
     'space': [{
+      name: 'room-topic.edit',
+      scope: 'button.room-topic-edit'
+      },{
       name: 'profile-menu.toggle',
       scope: 'button.profile-menu'
     }],
@@ -91,6 +97,9 @@ module.exports = (function() {
     },{
       name: 'chat.compose.auto',
       scope: 'input.chat'
+    },{
+      name: 'room-topic.edit',
+      scope: 'button.room-topic-edit'
     },{
       name: 'profile-menu.toggle',
       scope: 'button.profile-menu'
