@@ -201,23 +201,41 @@
 
 
 
+.chat-header__action-grouping {
+  align-items: stretch;
+}
+
 .chat-header__org-page,
 .chat-header__favourite,
 .chat-header__settings {
   body.embedded & { visibility: hidden; }
+
   display: inline-block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   margin-left: 2px;
+  padding: 0;
+
+  background-color: transparent;
+  border: none;
 
   font-size: 26px;
   line-height: 1;
-  color: rgba(51, 51, 51, 0.4);
+  color: rgba(51, 51, 51, .4);
   text-align: center;
   cursor: pointer;
 
-  transition: color .2s ease-in-out;
+  transition:
+    background-color .2s ease-in-out,
+    color .2s ease-in-out;
 
   &:hover {
     color: rgba(51, 51, 51, 1);
+  }
+  &:focus {
+    outline: none;
+    background: rgba(0, 0, 0, .05);
   }
 
 

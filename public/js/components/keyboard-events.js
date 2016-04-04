@@ -43,6 +43,9 @@ module.exports = (function() {
     else if (tag.classList.contains('js-room-topic-edit-activator')) {
       scope = 'button.room-topic-edit';
     }
+    else if (tag.classList.contains('js-profile-menu-toggle')) {
+      scope = 'button.profile-menu'
+    }
     else {
       scope = 'other';
     }
@@ -81,6 +84,9 @@ module.exports = (function() {
     'space': [{
       name: 'room-topic.edit',
       scope: 'button.room-topic-edit'
+      },{
+      name: 'profile-menu.toggle',
+      scope: 'button.profile-menu'
     }],
     'enter': [{
       name: 'search.go',
@@ -91,9 +97,12 @@ module.exports = (function() {
     },{
       name: 'chat.compose.auto',
       scope: 'input.chat'
-    }, {
+    },{
       name: 'room-topic.edit',
       scope: 'button.room-topic-edit'
+    },{
+      name: 'profile-menu.toggle',
+      scope: 'button.profile-menu'
     }],
     'shift+enter': [{
       name: 'chat.compose.auto',
