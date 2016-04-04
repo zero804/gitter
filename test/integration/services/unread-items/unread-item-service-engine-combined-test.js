@@ -1,12 +1,12 @@
 "use strict";
 
-var testRequire = require('../test-require');
-var Promise = require('bluebird');
-var assert = require('assert');
-var mongoUtils = testRequire('./utils/mongo-utils');
-var randomSeed = require('random-seed');
-var _ = require('lodash');
-var debug = require('debug')('gitter:unread-item-service-engine-combined-tests');
+var testRequire = require('../../test-require');
+var Promise     = require('bluebird');
+var assert      = require('assert');
+var mongoUtils  = testRequire('./utils/mongo-utils');
+var randomSeed  = require('random-seed');
+var _           = require('lodash');
+var debug       = require('debug')('gitter:unread-item-service-engine-combined-tests');
 
 var TEST_ITERATIONS = parseInt(process.env.UNREAD_ENGINE_TEST_ITERATIONS, 10) || 200;
 var CHECK_SLOWLOG = process.env.CHECK_SLOWLOG;
@@ -17,7 +17,7 @@ describe('unread-item-service-engine-combined #slow', function() {
   after(function(done) {
     if (process.env.DISABLE_EMAIL_NOTIFY_CLEAR_AFTER_TEST) return done();
 
-    var unreadItemServiceEngine = testRequire('./services/unread-item-service-engine');
+    var unreadItemServiceEngine = testRequire('./services/unread-items/engine');
     unreadItemServiceEngine.testOnly.removeAllEmailNotifications()
       .nodeify(done);
   });
@@ -26,7 +26,7 @@ describe('unread-item-service-engine-combined #slow', function() {
     var unreadItemServiceEngine, troupeId1, userId1;
 
     beforeEach(function() {
-      unreadItemServiceEngine = testRequire('./services/unread-item-service-engine');
+      unreadItemServiceEngine = testRequire('./services/unread-items/engine');
 
       troupeId1 = mongoUtils.getNewObjectIdString();
       userId1 = mongoUtils.getNewObjectIdString();
@@ -40,7 +40,6 @@ describe('unread-item-service-engine-combined #slow', function() {
       afterEach(function(done) {
         unreadItemServiceEngine.testOnly.redisClient.slowlog('GET', 10, function(err, result) {
           if (result.length > 0) {
-            console.log('SLOWLOG ', result);
             assert(false, 'Test generated slowlog entries');
           }
           done();

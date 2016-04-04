@@ -132,6 +132,7 @@ router.get('/tags/:tags',
               .then(function(suggestedRooms) {
                 suggestedRooms = suggestedRooms || [];
                 suggestedRooms = suggestedRooms.map(function(room) {
+                  room.tags = room.tags || [];
                   room.tags.push(exploreTagUtils.tagConstants.SUGGESTED_BACKEND_TAG);
                   return room;
                 });

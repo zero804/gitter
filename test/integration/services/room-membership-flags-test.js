@@ -15,8 +15,8 @@ describe('room-membership-flags', function () {
       "11101": "all", // Ignore other values
       "00100": "mute",
       "10100": "mute", // Ignore other values
-      "01110": "mention",
-      "11110": "mention", // Ignore other values
+      "01110": "announcement",
+      "11110": "announcement", // Ignore other values
     };
 
     Object.keys(FIXTURES).forEach(function(flags) {
@@ -158,7 +158,7 @@ describe('room-membership-flags', function () {
           assert.strictEqual(result1.toString(2), result2.toString(2));
           var newMode = underTest.getModeFromFlags(result1);
 
-          assert.strictEqual(newMode, mode === "announcement" ? "mention" : mode, "For flags " + flags + ", expected mode " + mode + " got " + newMode);
+          assert.strictEqual(newMode, mode === "mention" ? "announcement" : mode, "For flags " + flags + ", expected mode " + mode + " got " + newMode);
         });
 
       });

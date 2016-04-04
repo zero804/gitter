@@ -62,8 +62,8 @@ function SuggestedRoomStrategy() {
 
   this.map = function(suggestedRoom) {
     // NOTE: It uses the preloaded room for suggestions with roomId
-    // (getSuggestionsForOrg, getSuggestionsForRoom), otherwise it assumes that
-    //  the entire object is the room (getSuggestionsForUserId.)
+    // (getSuggestionsForRoom), otherwise it assumes that the entire object is
+    // the room (getSuggestionsForUserId.)
     var room = roomHash[suggestedRoom.roomId] || suggestedRoom;
 
     var uri = room && room.uri;
