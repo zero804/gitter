@@ -10,11 +10,18 @@ var toggleClass       = require('utils/toggle-class');
 
 
 module.exports =  Marionette.ItemView.extend({
-  tagName:      'li',
-  template:     itemTemplate,
+  tagName: 'li',
+  template: itemTemplate,
   ui: {
+    minibarButton: '.room-menu-options__item-button',
     unreadIndicatorWrapper: '.room-menu-options__item__unread-indicator-wrapper',
     unreadIndicator: '.room-menu-options__item__unread-indicator'
+  },
+
+  behaviors: {
+    Tooltip: {
+      '.room-menu-options__item-button': { placement: 'right' }
+    }
   },
 
   modelEvents: {
