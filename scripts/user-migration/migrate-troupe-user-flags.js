@@ -5,6 +5,7 @@
 var persistence = require('../../server/services/persistence-service');
 var roomMembershipFlags = require('../../server/services/room-membership-flags');
 var onMongoConnect = require('../../server/utils/on-mongo-connect');
+var mongoUtils = require('../../server/utils/mongo-utils');
 var through2Concurrent = require('through2-concurrent');
 var BatchStream = require('batch-stream');
 var _ = require('lodash');
@@ -27,12 +28,13 @@ UserTroupeSettingsSchema.schemaTypeName = 'UserTroupeSettingsSchema';
 var UserTroupeSettings = connection.model('UserTroupeSettings', UserTroupeSettingsSchema);
 
 
-function preloadUserTroupeSettings() {
+function preloadUserTroupeSettings(userId) {
   console.log('## Preloading usertroupesettings');
   return new Promise(function(resolve, reject) {
     var settings = {};
     var count = 0;
-    return UserTroupeSettings.find({}, { userId: 1, troupeId: 1, 'settings.notifications.push': 1, _id: 0 })
+    var query = userId ? { userId: userId } : { };
+    return UserTroupeSettings.find(query, { userId: 1, troupeId: 1, 'settings.notifications.push': 1, _id: 0 })
       .lean()
       .read('secondaryPreferred')
       .stream()
@@ -83,7 +85,7 @@ function getFlagsForSettings(settings, lurk) {
       flagsWithLurk = roomMembershipFlags.toggleLegacyLurkMode(flags, lurk);
 
       if (flagsWithLurk !== flags) {
-        warning = lurk ? "unhandled_case_2" : "mention_with_unread";
+        warning = lurk ? "mention_without_unread" : "unhandled_case_2";
       }
       category = lurk ? 3 : 4;
 
@@ -159,16 +161,11 @@ function getTroupeUserBatchUpdates(troupeUsers, notificationSettings) {
   return updates;
 }
 
-function getTroupeUsersBatchedStream() {
+function getTroupeUsersBatchedStream(userId) {
+  var query = userId ? { userId: userId } : { };
+
   return persistence.TroupeUser
-    .find()
-    // .find({ $or: [{
-    //   flags: { $exists: false }
-    // }, {
-    //   flags: null
-    // }, {
-    //   flags: 0
-    // }]})
+    .find(query)
     .read('secondaryPreferred')
     .stream()
     .pipe(new BatchStream({ size: 4096 }));
@@ -204,10 +201,10 @@ var bulkUpdate = Promise.method(function (updates) {
 
 });
 
-function migrateTroupeUsers(notificationSettings) {
+function migrateTroupeUsers(userId, notificationSettings) {
   return new Promise(function(resolve, reject) {
     var count = 0;
-    getTroupeUsersBatchedStream()
+    getTroupeUsersBatchedStream(userId)
       .pipe(through2Concurrent.obj({ maxConcurrency: 10 }, function(troupeUsers, enc, callback) {
         console.log('## Updating batch');
 
@@ -224,17 +221,15 @@ function migrateTroupeUsers(notificationSettings) {
   });
 }
 
-function dryrunTroupeUsers(notificationSettings) {
+function dryrunTroupeUsers(userId, notificationSettings) {
   var defaultCount = 0;
   var warningCount = 0;
-  var warningAggregation = {
-
-  };
+  var warningAggregation = {};
   var categoryAggregation = {};
   var count = 0;
 
   return new Promise(function(resolve, reject) {
-    getTroupeUsersBatchedStream()
+    getTroupeUsersBatchedStream(userId)
       .pipe(through2Concurrent.obj({ maxConcurrency: 1 }, function(troupeUsers, enc, callback) {
 
         count += troupeUsers.length;
@@ -278,14 +273,18 @@ function dryrunTroupeUsers(notificationSettings) {
   });
 }
 
-function performMigration() {
-  return preloadUserTroupeSettings()
-    .then(migrateTroupeUsers);
+function performMigration(userId) {
+  return preloadUserTroupeSettings(userId)
+    .then(function(userTroupeSettings) {
+      return migrateTroupeUsers(userId, userTroupeSettings);
+    });
 }
 
-function performDryRun() {
-  return preloadUserTroupeSettings()
-    .then(dryrunTroupeUsers);
+function performDryRun(userId) {
+  return preloadUserTroupeSettings(userId)
+    .then(function(userTroupeSettings) {
+      return dryrunTroupeUsers(userId, userTroupeSettings);
+    });
 }
 
 
@@ -293,6 +292,9 @@ var opts = require("nomnom")
   .option('execute', {
     flag: true,
     help: 'Do not perform a dry-run.'
+  })
+  .option('userId', {
+    help: 'Only perform the migration for a single userId.'
   })
   .parse();
 
@@ -316,10 +318,12 @@ showResult(undefined, false);
 
 onMongoConnect()
   .then(function() {
+    var userId = mongoUtils.asObjectID(opts.userId);
+
     if (opts.execute) {
-      return performMigration();
+      return performMigration(userId);
     } else {
-      return performDryRun();
+      return performDryRun(userId);
     }
   })
   .delay(1000)
