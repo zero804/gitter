@@ -3,11 +3,12 @@
 @import "../../../../../less/components/menu/room/menu-text.less";
 
 .lm-profile-menu {
-  margin-left:   0;
-  margin-bottom: 0;
-  max-height:    0;
-  transition:    max-height .2s linear;
-  overflow:      hidden;
+  margin-left:      0;
+  margin-bottom:    0;
+  max-height:       0;
+  overflow:         hidden;
+  background-image: linear-gradient(rgba(255, 255, 255, .1), transparent);
+  transition:       max-height .2s linear;
 
   &.active {
     max-height: 40rem;
@@ -15,15 +16,11 @@
 }
 
 .lm-profile-menu__item {
-  height: @menu-item-height;
-
-  transition: background-color .2s ease;
-
-  .desktop & {
-    padding-left: @desktop-menu-left-padding / 2;
-    margin-left:  @desktop-menu-left-padding / 2;
-    margin-right: @desktop-menu-left-padding / 2;
-  }
+  height:       @menu-item-height;
+  margin-left:  @desktop-menu-left-padding / 2;
+  margin-right: @desktop-menu-left-padding / 2;
+  padding-left: @desktop-menu-left-padding / 2;
+  transition:   background-color .2s ease;
 
   .mobile {
     padding-left: @mobile-menu-left-padding;
