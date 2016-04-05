@@ -23,19 +23,20 @@ function parseLookups(response, fill) {
   // ie. users: [] becomes users: {}
   var lookupNames = Object.keys(response.lookups);
   var maps = {};
-  lookupNames.forEach(function(lookupName) {
+  _.each(lookupNames, function(lookupName) {
     var map = _.indexBy(response.lookups[lookupName], 'id');
     maps[lookupName] = map;
   });
 
   // fill the lookup values in place
   // ie. result.fromUser which is an id becomes an object
-  return response.items.map(function(item) {
+  _.each(response.items, function(item) {
     _.each(fill, function(lookupName, attribute) {
       item[attribute] = maps[lookupName][item[attribute]];
     });
-    return item;
   });
+
+  return response.items;
 }
 exports.parseLookups = parseLookups
 
