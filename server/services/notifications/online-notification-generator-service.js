@@ -26,14 +26,14 @@ function generateChatMessageNotification(troupeId, chatId) {
       if (oneToOne) {
         return {
           text: chat.text,
-          title: fromUser.username,
+          title: fromUser.displayName,
           link: '/' + fromUser.username,
           icon: resolveUserAvatarUrl({ username: fromUser.username, version: fromUser.gravatarVersion}, 128)
         };
       } else {
         return {
           text: chat.text,
-          title: fromUser.username + ' @ ' + troupe.uri,
+          title: fromUser.displayName + ' @ ' + troupe.uri,
           link: '/' + troupe.uri,
           icon: resolveUserAvatarUrl({ username: fromUser.username, version: fromUser.gravatarVersion }, 128)
         };
