@@ -115,7 +115,7 @@
     "serve-favicon": "^2.3.0",
     "shutdown": "^0.2.3",
     "snappy-cache": "^0.3.0",
-    "statuserror": "0.0.1",
+    "statuserror": "^0.1.3",
     "stringformat": "0.0.5",
     "targetenv": "^1.0.0",
     "temp": "0.4.0",
