@@ -5,6 +5,7 @@ var context = require('utils/context');
 var appEvents = require('utils/appevents');
 var apiClient = require('components/apiClient');
 var unreadItemsClient = require('components/unread-items-client');
+var isMobile = require('../../utils/is-mobile');
 
 function updateNotifications(mode) {
   apiClient.userRoom.put('/settings/notifications', { mode: mode })
@@ -158,8 +159,23 @@ var commandsList = [
     description: 'Collapse chat messages with embedded media',
     completion: 'collapse ',
     regexp: /^\/collapse\s*$/,
+    criteria: function() {
+      return !isMobile();
+    },
     action: function() {
       appEvents.trigger('command.collapse.chat');
+    }
+  },
+  {
+    command: 'collapse-all',
+    description: 'Collapse all chats in room',
+    completion: 'collapse-all',
+    regexp: /^\/collapse-all\s*$/,
+    criteria: function() {
+      return !isMobile();
+    },
+    action: function() {
+      appEvents.trigger('command.collapse.chat.all');
     }
   },
   {
@@ -270,6 +286,7 @@ var commandsList = [
       unreadItemsClient.markAllRead();
     }
   },
+
 
 
 

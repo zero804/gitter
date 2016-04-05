@@ -10,6 +10,7 @@ var isolateBurst = require('gitter-web-shared/burst/isolate-burst-bb');
 var context      = require('utils/context');
 var perfTiming   = require('../../components/perf-timing');
 var debug        = require('debug-proxy')('app:chat-collection-view');
+var collapsedItemsClient   = require('../../utils/collapsed-item-client');
 
 require('views/behaviors/infinite-scroll');
 require('views/behaviors/smooth-scroll');
@@ -204,6 +205,7 @@ module.exports = (function() {
       });
 
       this.listenTo(appEvents, 'command.collapse.chat', this.collapseChats);
+      this.listenTo(appEvents, 'command.collapse.chat.all', this.collapseAllChats);
       this.listenTo(appEvents, 'command.expand.chat', this.expandChats);
 
       this.listenTo(appEvents, 'chatCollectionView:pageUp', this.pageUp);
@@ -296,6 +298,10 @@ module.exports = (function() {
     /* Collapses the most recent chat with embedded media */
     collapseChats: function() {
       this.setLastCollapsibleChat(true);
+    },
+
+    collapseAllChats: function() {
+      collapsedItemsClient.collapseAll(this.collection);
     },
 
     /* Expands the most recent chat with embedded media */
@@ -463,7 +469,7 @@ module.exports = (function() {
       perfTiming.end('chat-collection.render');
 
       if (!this.collection.loading) {
-        perfTiming.end('room-switch.render'); 
+        perfTiming.end('room-switch.render');
       }
 
       var c = context();
