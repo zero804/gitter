@@ -8,7 +8,7 @@ var getSuggestedOrgsFromRoomList = require('gitter-web-shared/orgs/suggested-org
 var defaultModels = [
   { name: 'all', type: 'all', id: 0 },
   { name: 'search', type: 'search', id: 1 },
-  { name: 'favourite', type: 'favourite', id: 2 },
+  //{ name: 'favourite', type: 'favourite', id: 2 },
   { name: 'people', type: 'people', id: 3 },
 ];
 
