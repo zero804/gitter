@@ -14,7 +14,7 @@ var proto = BaseCollectionView.prototype;
 var ItemView = BaseCollectionItemView.extend({
   serializeData: function() {
     var data = this.model.toJSON();
-    data.name = roomNameShortener(data.name || data.uri);
+    data.name = roomNameShortener(data.name || data.uri || '');
     var name = (this.roomMenuModel.get('state') === 'search') ? null : (data.name || data.uri);
     return _.extend({}, data, {
       avatarSrcset: resolveRoomAvatarSrcSet({ uri: name }, 22),
