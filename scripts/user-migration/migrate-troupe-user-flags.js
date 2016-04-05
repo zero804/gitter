@@ -5,17 +5,36 @@
 var persistence = require('../../server/services/persistence-service');
 var roomMembershipFlags = require('../../server/services/room-membership-flags');
 var onMongoConnect = require('../../server/utils/on-mongo-connect');
+var mongoUtils = require('../../server/utils/mongo-utils');
 var through2Concurrent = require('through2-concurrent');
 var BatchStream = require('batch-stream');
 var _ = require('lodash');
 var Promise = require('bluebird');
 
-function preloadUserTroupeSettings() {
+var mongoose      = require('../../server/utils/mongoose-q');
+var Schema        = mongoose.Schema;
+var ObjectId      = Schema.ObjectId;
+
+var connection = mongoose.connection;
+
+var UserTroupeSettingsSchema = new Schema({
+  userId:   ObjectId,
+  troupeId: ObjectId,
+  settings: Schema.Types.Mixed
+});
+UserTroupeSettingsSchema.index({ userId: 1, troupeId: 1 }, { unique: true });
+UserTroupeSettingsSchema.schemaTypeName = 'UserTroupeSettingsSchema';
+
+var UserTroupeSettings = connection.model('UserTroupeSettings', UserTroupeSettingsSchema);
+
+
+function preloadUserTroupeSettings(userId) {
   console.log('## Preloading usertroupesettings');
   return new Promise(function(resolve, reject) {
     var settings = {};
     var count = 0;
-    return persistence.UserTroupeSettings.find({}, { userId: 1, troupeId: 1, 'settings.notifications.push': 1, _id: 0 })
+    var query = userId ? { userId: userId } : { };
+    return UserTroupeSettings.find(query, { userId: 1, troupeId: 1, 'settings.notifications.push': 1, _id: 0 })
       .lean()
       .read('secondaryPreferred')
       .stream()
@@ -46,6 +65,7 @@ function getFlagsForSettings(settings, lurk) {
   var flags, flagsWithLurk;
   var warning;
   var defaultValue;
+  var category;
 
   switch(settings || "none") {
     case "all":
@@ -55,7 +75,7 @@ function getFlagsForSettings(settings, lurk) {
       if (flagsWithLurk !== flags) {
         warning = lurk ? "all_with_lurk" : "unhandled_case_1";
       }
-
+      category = lurk ? 1 : 2;
       defaultValue = false;
       break;
 
@@ -65,8 +85,9 @@ function getFlagsForSettings(settings, lurk) {
       flagsWithLurk = roomMembershipFlags.toggleLegacyLurkMode(flags, lurk);
 
       if (flagsWithLurk !== flags) {
-        warning = lurk ? "unhandled_case_2" : "mention_with_unread";
+        warning = lurk ? "mention_without_unread" : "unhandled_case_2";
       }
+      category = lurk ? 3 : 4;
 
       defaultValue = false;
       break;
@@ -78,16 +99,19 @@ function getFlagsForSettings(settings, lurk) {
       if (flagsWithLurk !== flags) {
         warning = lurk ? "unhandled_case_3" : "mute_with_unread";
       }
-
+      category = lurk ? 5 : 6;
       defaultValue = false;
       break;
 
     case "none":
       if (lurk) {
         flagsWithLurk = flags = roomMembershipFlags.getFlagsForMode("announcement", false);
+        category = 7;
+
       } else {
         flagsWithLurk = flags = roomMembershipFlags.getFlagsForMode("all", true);
         defaultValue = true;
+        category = 8;
       }
       break;
 
@@ -106,7 +130,8 @@ function getFlagsForSettings(settings, lurk) {
     lurk: lurk,
     isDefault: defaultValue,
     flags: flagsWithLurk,
-    warning: warning
+    warning: warning,
+    category: category
   };
 }
 
@@ -128,22 +153,19 @@ function getTroupeUserBatchUpdates(troupeUsers, notificationSettings) {
       newFlags: info.flags,
       lurk: info.lurk,
       warning: info.warning,
-      isDefault: info.isDefault
+      isDefault: info.isDefault,
+      category: info.category
     };
   });
 
   return updates;
 }
 
-function getTroupeUsersBatchedStream() {
+function getTroupeUsersBatchedStream(userId) {
+  var query = userId ? { userId: userId } : { };
+
   return persistence.TroupeUser
-    .find({ $or: [{
-      flags: { $exists: false }
-    }, {
-      flags: null
-    }, {
-      flags: 0
-    }]})
+    .find(query)
     .read('secondaryPreferred')
     .stream()
     .pipe(new BatchStream({ size: 4096 }));
@@ -155,13 +177,13 @@ var bulkUpdate = Promise.method(function (updates) {
   var bulk = persistence.TroupeUser.collection.initializeUnorderedBulkOp();
 
   updates.forEach(function(update) {
-    bulk.find({ _id: update._id, $or: [{
+    bulk.find({ _id: update._id /*, $or: [{
       flags: { $exists: false }
     }, {
       flags: null
     }, {
       flags: 0
-    } ] })
+    } ] */ })
     .updateOne({
       $set: {
         flags: update.newFlags,
@@ -179,10 +201,10 @@ var bulkUpdate = Promise.method(function (updates) {
 
 });
 
-function migrateTroupeUsers(notificationSettings) {
+function migrateTroupeUsers(userId, notificationSettings) {
   return new Promise(function(resolve, reject) {
     var count = 0;
-    getTroupeUsersBatchedStream()
+    getTroupeUsersBatchedStream(userId)
       .pipe(through2Concurrent.obj({ maxConcurrency: 10 }, function(troupeUsers, enc, callback) {
         console.log('## Updating batch');
 
@@ -199,16 +221,15 @@ function migrateTroupeUsers(notificationSettings) {
   });
 }
 
-function dryrunTroupeUsers(notificationSettings) {
+function dryrunTroupeUsers(userId, notificationSettings) {
   var defaultCount = 0;
   var warningCount = 0;
-  var warningAggregation = {
-
-  };
+  var warningAggregation = {};
+  var categoryAggregation = {};
   var count = 0;
 
   return new Promise(function(resolve, reject) {
-    getTroupeUsersBatchedStream()
+    getTroupeUsersBatchedStream(userId)
       .pipe(through2Concurrent.obj({ maxConcurrency: 1 }, function(troupeUsers, enc, callback) {
 
         count += troupeUsers.length;
@@ -216,6 +237,12 @@ function dryrunTroupeUsers(notificationSettings) {
 
         var updates = getTroupeUserBatchUpdates(troupeUsers, notificationSettings);
         _.forEach(updates, function(f) {
+          if (!categoryAggregation[f.category]) {
+            categoryAggregation[f.category] = 1;
+          } else {
+            categoryAggregation[f.category]++;
+          }
+
           if (f.isDefault) {
             defaultCount++;
           }
@@ -238,6 +265,7 @@ function dryrunTroupeUsers(notificationSettings) {
         console.log('TroupeUsers on default settings: ' + defaultCount);
         console.log('TroupeUsers with warnings: ' + warningCount);
         console.log('Warning types: ', JSON.stringify(warningAggregation, null, '  '));
+        console.log('Categories: ', JSON.stringify(categoryAggregation, null, '  '));
         resolve();
       })
       .on('error', reject)
@@ -245,14 +273,18 @@ function dryrunTroupeUsers(notificationSettings) {
   });
 }
 
-function performMigration() {
-  return preloadUserTroupeSettings()
-    .then(migrateTroupeUsers);
+function performMigration(userId) {
+  return preloadUserTroupeSettings(userId)
+    .then(function(userTroupeSettings) {
+      return migrateTroupeUsers(userId, userTroupeSettings);
+    });
 }
 
-function performDryRun() {
-  return preloadUserTroupeSettings()
-    .then(dryrunTroupeUsers);
+function performDryRun(userId) {
+  return preloadUserTroupeSettings(userId)
+    .then(function(userTroupeSettings) {
+      return dryrunTroupeUsers(userId, userTroupeSettings);
+    });
 }
 
 
@@ -261,14 +293,37 @@ var opts = require("nomnom")
     flag: true,
     help: 'Do not perform a dry-run.'
   })
+  .option('userId', {
+    help: 'Only perform the migration for a single userId.'
+  })
   .parse();
+
+function showResult(setting, lurk) {
+  var x = getFlagsForSettings(setting, lurk);
+
+  var hash = roomMembershipFlags.flagsToHash(x.flags);
+  console.log("setting=", setting, "lurk=", lurk, "result=", hash, "output=", x);
+}
+showResult("all", true);
+showResult("all", false);
+
+showResult("mention", true);
+showResult("mention", false);
+
+showResult("mute", true);
+showResult("mute", false);
+
+showResult(undefined, true);
+showResult(undefined, false);
 
 onMongoConnect()
   .then(function() {
+    var userId = mongoUtils.asObjectID(opts.userId);
+
     if (opts.execute) {
-      return performMigration();
+      return performMigration(userId);
     } else {
-      return performDryRun();
+      return performDryRun(userId);
     }
   })
   .delay(1000)

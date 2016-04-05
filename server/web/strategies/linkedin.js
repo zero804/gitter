@@ -34,7 +34,7 @@ function linkedinOauth2Callback(req, accessToken, refreshToken, profile, done) {
     .spread(function(_user, isNewUser) {
       user = _user;
 
-      trackSignupOrLogin(req, user, isNewUser);
+      trackSignupOrLogin(req, user, isNewUser, 'linkedin');
       updateUserLocale(req, user);
 
       return Promise.fromCallback(function(callback) {

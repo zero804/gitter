@@ -73,12 +73,12 @@ module.exports = BaseCollectionView.extend({
     }
   },
 
-  filter: function(model, index) {//jshint unused: true
+  filter: function(model, index) {
     switch (this.roomMenuModel.get('state')) {
       case 'search':
-        return true;
+        return (index <= 25);
       default:
-        return (index <= 10);
+        return !this.primaryCollection.get(model.get('id'));
     }
   },
 
