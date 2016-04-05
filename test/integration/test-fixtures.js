@@ -183,12 +183,12 @@ function createExpectedFixtures(expected, done) {
     var security = f.security || undefined;
 
     var uri, lcUri, githubType;
-    if(!f.oneToOne) {
+    if (f.oneToOne) {
+      githubType = 'ONETOONE';
+    } else {
       uri = f.uri || generateUri(githubType);
       githubType = f.githubType || 'ORG';
       lcUri = uri.toLowerCase();
-    } else {
-      githubType = 'ONETOONE';
     }
 
     var doc = {
@@ -200,7 +200,8 @@ function createExpectedFixtures(expected, done) {
       security: security,
       oneToOneUsers: oneToOneUsers,
       githubType: githubType,
-      dateDeleted: f.dateDeleted
+      dateDeleted: f.dateDeleted,
+      userCount: f.users && f.users.length || f.userCount
     };
 
     debug('Creating troupe %s with %j', fixtureName, doc);
