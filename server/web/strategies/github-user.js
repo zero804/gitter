@@ -65,7 +65,7 @@ function updateUser(req, accessToken, user, githubUserProfile) {
 
   return user.save()
     .then(function() {
-      trackUserLogin(req, user);
+      trackUserLogin(req, user, 'github');
 
       updateUserLocale(req, user);
 
@@ -106,7 +106,7 @@ function addUser(req, accessToken, githubUserProfile) {
       stats.alias(mixpanel.getMixpanelDistinctId(req.cookies), user.id, function(err) {
         if (err) logger.error('Error aliasing user:', { exception: err });
 
-        trackNewUser(req, user);
+        trackNewUser(req, user, 'github');
 
         // Flag the user as a new github user if they've created their account
         // in the last two hours
