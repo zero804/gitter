@@ -4,15 +4,13 @@ var roomService = require('../../../services/room-service');
 var restSerializer = require("../../../serializers/rest-serializer");
 
 function serialize(items, req, res, next) {
-
   var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id });
 
-  restSerializer.serialize(items, strategy, function(err, serialized) {
-    if(err) return next(err);
-
-    res.send(serialized);
-  });
-
+  return restSerializer.serialize(items, strategy)
+    .then(function(serialized) {
+      res.send(serialized);
+    })
+    .catch(next);
 }
 
 module.exports = function(req, res, next) {

@@ -48,7 +48,7 @@ function serializeOneToOneRoomToUsers(userIds, operation, troupe) {
   return Promise.map(userIds, function(userId) {
     var strategy = new restSerializer.TroupeStrategy({ currentUserId: userId });
 
-    return restSerializer.serialize(troupe, strategy)
+    return restSerializer.serializeObject(troupe, strategy)
       .then(function(serializedTroupe) {
         appEvents.dataChange2('/user/' + userId + '/rooms', operation, serializedTroupe, 'room');
       });

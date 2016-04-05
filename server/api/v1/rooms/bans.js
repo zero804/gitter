@@ -6,8 +6,7 @@ var loadTroupeFromParam = require('./load-troupe-param');
 
 function serialize(bans) {
   var strategy = new restSerializer.TroupeBanStrategy({ });
-
-  return restSerializer.serializeExcludeNulls(bans, strategy);
+  return restSerializer.serialize(bans, strategy);
 }
 
 module.exports = {

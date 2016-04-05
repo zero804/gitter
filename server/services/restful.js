@@ -42,7 +42,7 @@ exports.serializeTroupesForUser = function(userId, callback) {
         includeTags: true
       });
 
-      return restSerializer.serializeExcludeNulls(allTroupeIds, strategy);
+      return restSerializer.serialize(allTroupeIds, strategy);
     })
     .nodeify(callback);
 };
@@ -64,10 +64,11 @@ exports.serializeChatsForTroupe = function(troupeId, userId, options, callback) 
         currentUserId: userId,
         troupeId: troupeId,
         unread: options.unread,
-        lean: options.lean
+        lean: options.lean,
+        lookups: options.lookups
       });
 
-      return restSerializer.serializeExcludeNulls(chatMessages, strategy);
+      return restSerializer.serialize(chatMessages, strategy);
     })
     .nodeify(callback);
 
@@ -98,7 +99,7 @@ exports.serializeUsersForTroupe = function(troupeId, userId, options) {
     return userSearchService.searchForUsersInRoom(searchTerm, troupeId, { limit: limit })
       .then(function(resp) {
         var strategy = new restSerializer.UserStrategy();
-        return restSerializer.serializeExcludeNulls(resp.results, strategy);
+        return restSerializer.serialize(resp.results, strategy);
       });
 
   }
@@ -112,7 +113,7 @@ exports.serializeUsersForTroupe = function(troupeId, userId, options) {
         lean: !!options.lean
       });
 
-      return restSerializer.serializeExcludeNulls(userIds, strategy);
+      return restSerializer.serialize(userIds, strategy);
     });
 };
 
@@ -137,7 +138,7 @@ exports.serializeReadBysForChat = function(troupeId, chatId, callback) {
     .then(function(chatMessage) {
       var strategy = new restSerializer.UserIdStrategy({});
 
-      return restSerializer.serializeExcludeNulls(chatMessage.readBy, strategy);
+      return restSerializer.serialize(chatMessage.readBy, strategy);
     })
     .nodeify(callback);
 
@@ -147,7 +148,7 @@ exports.serializeEventsForTroupe = function(troupeId, userId, callback) {
   return eventService.findEventsForTroupe(troupeId, {})
     .then(function(events) {
       var strategy = new restSerializer.EventStrategy({ currentUserId: userId, troupeId: troupeId });
-      return restSerializer.serializeExcludeNulls(events, strategy);
+      return restSerializer.serialize(events, strategy);
     })
     .nodeify(callback);
 };
@@ -159,7 +160,7 @@ exports.serializeOrgsForUser = function(user) {
       var strategyOptions = { currentUserId: user.id };
       // TODO: not all organisations are going to be github ones in future!
       var strategy = new restSerializer.GithubOrgStrategy(strategyOptions);
-      return restSerializer.serializeExcludeNulls(orgs, strategy);
+      return restSerializer.serialize(orgs, strategy);
     });
 };
 
@@ -177,7 +178,7 @@ exports.serializeProfileForUsername = function(username) {
     .then(function(user) {
       if (user) {
         var strategy = new restSerializer.UserProfileStrategy();
-        return restSerializer.serialize(user, strategy);
+        return restSerializer.serializeObject(user, strategy);
 
       } else {
         var gitHubUser = {username: username};
