@@ -16,9 +16,9 @@
 
 
 <div class="chat-header__main-grouping chat-header__topic-grouping js-room-topic-edit-activator" tabindex="0">
-  <div class="chat-header__topic-wrapper">
+  <div class="chat-header__topic-wrapper js-room-topic-wrapper {{when isAdmin 'is-admin' : ''}} {{when shouldShowPlaceholderRoomTopic 'is-new-room' : ''}}">
     {{~#unless oneToOne~}}
-    <p class="js-chat-topic chat-header__topic {{when isAdmin 'is-admin' : ''}} {{when shouldShowPlaceholderRoomTopic 'is-new-room' : ''}}">{{troupeTopic}}</p>
+    <p class="js-room-topic chat-header__topic {{when isAdmin 'is-admin' : ''}} {{when shouldShowPlaceholderRoomTopic 'is-new-room' : ''}}">{{troupeTopic}}</p>
     {{~/unless~}}
   </div>
 </div>
