@@ -69,7 +69,7 @@ var FavouriteCollection = PrimaryCollectionView.extend({
   onMouseLeave: function (){
     if(!this.uiModel.get('isDragging')) { return; }
     document.body.classList.remove('drag-over-favourite');
-  },
+  }
 
 });
 

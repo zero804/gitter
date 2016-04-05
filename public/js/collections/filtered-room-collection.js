@@ -31,7 +31,7 @@ FilteredRoomCollection.prototype = _.extend(
 
     this.roomCollection = options.collection;
     this.listenTo(this.roomCollection, 'snapshot', this.onRoomCollectionSnapshot, this);
-    this.listenTo(this, 'filter-complete', this.sort, this);
+    this.listenTo(this, 'filter-complete change:lastAccessTime change activity change:unreadItems change:mentions', this.sort, this);
 
     FilteredCollection.prototype.initialize.apply(this, arguments);
     this.onModelChangeState();
@@ -81,6 +81,7 @@ FilteredRoomCollection.prototype = _.extend(
   },
 
   comparator:     sortAndFilters.recents.sort,
+
 });
 
 module.exports = FilteredRoomCollection;
