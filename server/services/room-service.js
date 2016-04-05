@@ -6,42 +6,44 @@ var nconf              = env.config;
 var stats              = env.stats;
 var errorReporter      = env.errorReporter;
 
-var appEvents          = require('gitter-web-appevents');
-var Promise            = require('bluebird');
-var request            = require('request');
-var _                  = require('lodash');
-var xregexp            = require('xregexp').XRegExp;
-var persistence        = require('./persistence-service');
-var validateUri        = require('gitter-web-github').GitHubUriValidator;
-var uriLookupService   = require("./uri-lookup-service");
-var permissionsModel   = require('./permissions-model');
-var roomPermissionsModel = require('./room-permissions-model');
-var userService        = require('./user-service');
-var troupeService      = require('./troupe-service');
-var GitHubRepoService  = require('gitter-web-github').GitHubRepoService;
-var GitHubOrgService   = require('gitter-web-github').GitHubOrgService;
-var validate           = require('../utils/validate');
-var collections        = require('../utils/collections');
-var StatusError        = require('statuserror');
-var eventService       = require('./event-service');
-var emailNotificationService = require('./email-notification-service');
+var appEvents                  = require('gitter-web-appevents');
+var Promise                    = require('bluebird');
+var request                    = require('request');
+var _                          = require('lodash');
+var xregexp                    = require('xregexp').XRegExp;
+var persistence                = require('./persistence-service');
+var uriLookupService           = require("./uri-lookup-service");
+var permissionsModel           = require('./permissions-model');
+var roomPermissionsModel       = require('./room-permissions-model');
+var userService                = require('./user-service');
+var troupeService              = require('./troupe-service');
+var oneToOneRoomService        = require('./one-to-one-room-service');
+var userDefaultFlagsService    = require('./user-default-flags-service');
+var validateUri                = require('gitter-web-github').GitHubUriValidator;
+var GitHubRepoService          = require('gitter-web-github').GitHubRepoService;
+var GitHubOrgService           = require('gitter-web-github').GitHubOrgService;
+var validate                   = require('../utils/validate');
+var collections                = require('../utils/collections');
+var StatusError                = require('statuserror');
+var eventService               = require('./event-service');
+var emailNotificationService   = require('./email-notification-service');
 var canUserBeInvitedToJoinRoom = require('./invited-permissions-service');
-var emailAddressService = require('./email-address-service');
-var mongoUtils         = require('../utils/mongo-utils');
-var mongooseUtils      = require('../utils/mongoose-utils');
-var badger             = require('./badger-service');
-var userSettingsService = require('./user-settings-service');
-var roomSearchService  = require('./room-search-service');
-var assertMemberLimit  = require('./assert-member-limit');
-var redisLockPromise   = require("../utils/redis-lock-promise");
-var unreadItemService  = require('./unread-items');
-var debug              = require('debug')('gitter:room-service');
-var roomMembershipService = require('./room-membership-service');
-var liveCollections    = require('./live-collections');
-var recentRoomService  = require('./recent-room-service');
-var badgerEnabled      = nconf.get('autoPullRequest:enabled');
-var uriResolver        = require('./uri-resolver');
-var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
+var emailAddressService        = require('./email-address-service');
+var mongoUtils                 = require('../utils/mongo-utils');
+var mongooseUtils              = require('../utils/mongoose-utils');
+var badger                     = require('./badger-service');
+var userSettingsService        = require('./user-settings-service');
+var roomSearchService          = require('./room-search-service');
+var assertMemberLimit          = require('./assert-member-limit');
+var redisLockPromise           = require("../utils/redis-lock-promise");
+var unreadItemService          = require('./unread-items');
+var debug                      = require('debug')('gitter:room-service');
+var roomMembershipService      = require('./room-membership-service');
+var liveCollections            = require('./live-collections');
+var recentRoomService          = require('./recent-room-service');
+var badgerEnabled              = nconf.get('autoPullRequest:enabled');
+var uriResolver                = require('./uri-resolver');
+var getOrgNameFromTroupeName   = require('gitter-web-shared/get-org-name-from-troupe-name');
 
 exports.testOnly = {};
 
@@ -310,20 +312,6 @@ function findOrCreateGroupRoom(user, troupe, uri, options) {
     });
 }
 
-
-/* Keep this in as one day it'll probably be useful */
-
-// function determineDefaultNotifyForRoom(user, troupe) {
-//   var repoService = new GitHubRepoService(user);
-//   return repoService.getRepo(troupe.uri)
-//     .then(function(repoInfo) {
-//       if(!repoInfo || !repoInfo.permissions) return 0;
-//
-//       /* Admin or push? Notify */
-//       return repoInfo.permissions.admin || repoInfo.permissions.push ? 1 : 0;
-//     });
-// }
-
 /**
  * Grant or remove the users access to a room
  * Makes the troupe reflect the users access to a room
@@ -333,7 +321,8 @@ function findOrCreateGroupRoom(user, troupe, uri, options) {
 function ensureAccessControl(user, troupe, access) {
   if(troupe) {
     if(access) {
-      return roomMembershipService.addRoomMember(troupe._id, user._id);
+      var flags = userDefaultFlagsService.getDefaultFlagsForUser(user);
+      return roomMembershipService.addRoomMember(troupe._id, user._id, flags);
     } else {
       return roomMembershipService.removeRoomMember(troupe._id, user._id);
     }
@@ -585,7 +574,8 @@ function findOrCreateRoom(user, uri, options) {
               // TODO: check whether this needs a slash at the front
               throw extendStatusError(404, { githubType: 'ONETOONE', uri: resolvedUser.username });
             }
-            return troupeService.findOrCreateOneToOneTroupeIfPossible(userId, resolvedUser.id)
+
+            return oneToOneRoomService.findOrCreateOneToOneRoom(userId, resolvedUser.id)
               .spread(function(troupe, resolvedUser) {
                 return {
                   oneToOne: true,
@@ -620,7 +610,10 @@ function findOrCreateRoom(user, uri, options) {
           var didCreate = findOrCreateResult.didCreate;
 
           if (access && didCreate) {
-            emailNotificationService.createdRoomNotification(user, troupe);  // now the san email to the room', wne
+            emailNotificationService.createdRoomNotification(user, troupe)  // now the san email to the room', wne
+              .catch(function(err) {
+                logger.error('Unable to send create room notification: ' + err, { exception: err });
+              });
           }
 
           if(didCreate) {
@@ -899,11 +892,19 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
           .spread(function(newRoom, updatedExisting) {
             if (!user) return [newRoom, updatedExisting];
 
-            return roomMembershipService.addRoomMember(newRoom._id, user._id)
+            var flags = userDefaultFlagsService.getDefaultFlagsForUser(user);
+
+            return roomMembershipService.addRoomMember(newRoom._id, user._id, flags)
               .thenReturn([newRoom, updatedExisting]);
           })
           .spread(function(newRoom, updatedExisting) {
-            emailNotificationService.createdRoomNotification(user, newRoom); // send an email to the room's owner
+
+            // Send the created room notification
+            emailNotificationService.createdRoomNotification(user, newRoom) // send an email to the room's owner
+              .catch(function(err) {
+                logger.error('Unable to send create room notification: ' + err, { exception: err });
+              });
+
             sendJoinStats(user, newRoom, options.tracking); // now the channel has now been created, send join stats for owner joining
 
             if (updatedExisting) {
@@ -942,6 +943,7 @@ exports.createCustomChildRoom = createCustomChildRoom;
  * returns        User - the invited user
  */
 function notifyInvitedUser(fromUser, invitedUser, room/*, isNewUser*/) {
+  
   // get the email address
   return emailAddressService(invitedUser, { attemptDiscovery: true })
     .then(function (emailAddress) {
@@ -955,12 +957,18 @@ function notifyInvitedUser(fromUser, invitedUser, room/*, isNewUser*/) {
       if (invitedUser.state === 'INVITED') {
         if (emailAddress) {
           notification = 'email_invite_sent';
-          emailNotificationService.sendInvitation(fromUser, invitedUser, room);
+          emailNotificationService.sendInvitation(fromUser, invitedUser, room)
+            .catch(function(err) {
+              logger.error('Unable to send invitation: ' + err, { exception: err });
+            });
         } else {
           notification = 'unreachable_for_invite';
         }
       } else {
-        emailNotificationService.addedToRoomNotification(fromUser, invitedUser, room);
+        emailNotificationService.addedToRoomNotification(fromUser, invitedUser, room)
+          .catch(function(err) {
+            logger.error('Unable to send added to room notification: ' + err, { exception: err });
+          });
         notification = 'email_notification_sent';
       }
 
@@ -1007,7 +1015,9 @@ function joinRoom(roomId, user, options) {
           return recentRoomService.saveLastVisitedTroupeforUserId(user._id, room._id, { skipFayeUpdate: true });
         })
         .then(function() {
-          return roomMembershipService.addRoomMember(room._id, user._id);
+          var flags = userDefaultFlagsService.getDefaultFlagsForUser(user);
+
+          return roomMembershipService.addRoomMember(room._id, user._id, flags);
         })
         .then(function() {
           sendJoinStats(user, room, options.tracking);
@@ -1043,7 +1053,8 @@ function addUserToRoom(room, instigatingUser, usernameToAdd) {
       // the last access time and not be hidden in the troupe list
       return recentRoomService.saveLastVisitedTroupeforUserId(addedUser._id, room._id, { skipFayeUpdate: true })
         .then(function() {
-          return roomMembershipService.addRoomMember(room._id, addedUser._id);
+          var flags = userDefaultFlagsService.getDefaultFlagsForUser(addedUser);
+          return roomMembershipService.addRoomMember(room._id, addedUser._id, flags);
         })
         .then(function(wasAdded) {
           if (!wasAdded) return addedUser;

@@ -13,8 +13,6 @@ var roomMembershipEvents = new EventEmitter();
 var _                    = require('lodash');
 var roomMembershipFlags  = require('./room-membership-flags');
 
-var NEW_ROOM_MEMBER_DEFAULT = 'all';
-
 /**
  * Returns the rooms the user is in
  */
@@ -161,14 +159,14 @@ function findMembersForRoomWithLurk(troupeId) {
  * user was added, false if they were already in the
  * room
  */
-function addRoomMember(troupeId, userId) {
+function addRoomMember(troupeId, userId, flags) {
   debug('Adding member %s to room %s', userId, troupeId);
 
-  assert(troupeId);
-  assert(userId);
+  assert(troupeId, 'Expected troupeId parameter');
+  assert(userId, 'Expected userId parameter');
+  assert(flags, 'Expected flags parameter');
 
-  var flagsDefault = roomMembershipFlags.getFlagsForMode(NEW_ROOM_MEMBER_DEFAULT, true);
-  var lurkDefault = roomMembershipFlags.getLurkForFlags(flagsDefault);
+  var lurkDefault = roomMembershipFlags.getLurkForFlags(flags);
 
   return TroupeUser.findOneAndUpdate({
       troupeId: troupeId,
@@ -178,7 +176,7 @@ function addRoomMember(troupeId, userId) {
         troupeId: troupeId,
         userId: userId,
         lurk: lurkDefault,
-        flags: flagsDefault
+        flags: flags
       }
     }, { upsert: true, new: false })
     .exec()
@@ -201,61 +199,6 @@ function addRoomMember(troupeId, userId) {
         .thenReturn(added);
     });
 
-}
-/**
- * Adds members to a room.
- * NB: expects the mongo connection to already be established
- *
- * Returns an array of the users who were added...
- */
-function addRoomMembers(troupeId, userIds) {
-  debug('Adding %s members to room %s', userIds.length, troupeId);
-
-  assert(troupeId);
-  if (!userIds.length) return Promise.resolve();
-  userIds.forEach(function(userId) {
-    assert(userId);
-  });
-
-  var flagsDefault = roomMembershipFlags.getFlagsForMode(NEW_ROOM_MEMBER_DEFAULT, true);
-  var lurkDefault = roomMembershipFlags.getLurkForFlags(flagsDefault);
-
-  var bulk = TroupeUser.collection.initializeUnorderedBulkOp();
-
-  troupeId = mongoUtils.asObjectID(troupeId);
-
-  userIds.forEach(function(userId) {
-    userId = mongoUtils.asObjectID(userId);
-
-    bulk.find({ troupeId: troupeId, userId: userId })
-      .upsert()
-      .updateOne({
-        $setOnInsert: {
-          troupeId: troupeId,
-          userId: userId,
-          lurk: lurkDefault,
-          flags: flagsDefault
-        }
-      });
-  });
-
-  return Promise.fromCallback(function(callback) {
-      bulk.execute(callback);
-    })
-    .then(function(bulkResult) {
-      var upserted = bulkResult.getUpsertedIds();
-
-      var addedUserIds = _.map(upserted, function(upsertedDoc) {
-        return userIds[upsertedDoc.index];
-      });
-
-      if (!addedUserIds.length) return addedUserIds;
-
-      roomMembershipEvents.emit("members.added", troupeId, addedUserIds);
-
-      return incrementTroupeUserCount(troupeId, addedUserIds.length)
-        .thenReturn(addedUserIds);
-    });
 }
 
 /**
@@ -606,7 +549,6 @@ exports.findMembersForRoom          = findMembersForRoom;
 exports.countMembersInRoom          = countMembersInRoom;
 exports.findMembersForRoomWithLurk  = findMembersForRoomWithLurk;
 exports.addRoomMember               = addRoomMember;
-exports.addRoomMembers              = addRoomMembers;
 exports.removeRoomMember            = removeRoomMember;
 exports.removeRoomMembers           = removeRoomMembers;
 exports.findAllMembersForRooms      = findAllMembersForRooms;
