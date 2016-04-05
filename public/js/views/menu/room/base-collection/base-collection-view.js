@@ -28,7 +28,7 @@ module.exports = Marionette.CompositeView.extend({
 
   collectionEvents: {
     //TODO Review the performance impact of rendering on sync JP 29/3/16
-    'change:mentions change:unreadMessages change:lastAccessTime change:favourite add remove sync': 'render',
+    'sync sort': 'render',
     'add remove reset': 'onFilterComplete',
   },
 
