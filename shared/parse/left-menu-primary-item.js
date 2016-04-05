@@ -8,8 +8,7 @@ var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-trou
 var AVATAR_SIZE = 22;
 
 module.exports = function parseContentToTemplateData(data, state) {
-    data.url  = (data.url || '');
-    data.name = (data.name || '');
+    data.name = (data.name || data.uri || '');
 
     //For user results
     if (data.displayName) {
@@ -27,7 +26,6 @@ module.exports = function parseContentToTemplateData(data, state) {
       });
     }
 
-    var name         = data.url.substring(1);
     var hasMentions  = !!data.mentions && data.mentions;
     var unreadItems  = !hasMentions && data.unreadItems;
     var lurkActivity = data.lurk && (!hasMentions && !unreadItems) && !!data.activity;
@@ -38,8 +36,9 @@ module.exports = function parseContentToTemplateData(data, state) {
       roomName = (data.name.split('/').slice(1).join('/') || data.name);
     }
 
+    var uri = data.uri || data.url.substring(1);
     return _.extend({}, data, {
-      avatarSrcset:  resolveRoomAvatarSrcSet({ uri: name }, AVATAR_SIZE),
+      avatarSrcset:  resolveRoomAvatarSrcSet({ uri: uri }, AVATAR_SIZE),
       isNotOneToOne: (data.githubType !== 'ONETOONE'),
       name:          roomNameShortener(roomName),
       mentions:      hasMentions,
