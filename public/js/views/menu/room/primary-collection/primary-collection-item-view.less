@@ -1,4 +1,5 @@
 @import "trp3Vars";
+@import '../../../../../less/components/menu/menu.less';
 @import "../../../../../less/components/menu/room/avatar.less";
 @import "../../../../../less/components/menu/room/menu-text.less";
 @import "../../../../../less/components/menu/room/room-item.less";
@@ -32,6 +33,7 @@ JP 11/2/16
   flex-direction:  row;
   align-items:     center;
   margin-right:    (@desktop-menu-left-padding / 2);
+  padding-right:   (@desktop-menu-left-padding / 2);
   transition:      background-color .2s ease-out;
 
   .room-item.active & {
@@ -52,10 +54,6 @@ JP 11/2/16
     .room-item-selected();
   }
 
-  & *:last-child {
-    margin-right:  @desktop-menu-left-padding / 2;
-  }
-
   //this sucks so so much.
   & .room-item__lurk:last-child {
     margin-right: 2.1rem;
@@ -70,47 +68,105 @@ JP 11/2/16
 
 .room-item__title {
   .room-menu-text();
+  flex: 1;
+
   &:first-child {
     margin-left: @desktop-menu-left-padding / 2;
   }
 }
 
-.notification (@size){
-  box-sizing:    border-box;
+.unread-indicator(@size) {
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width:     @size;
-  height:        @size;
-  margin-left:   1rem;
+  width: @size;
+  height: @size;
+  margin-left: 1rem;
 
   border-radius: 100%;
-  border:        2px solid transparent;
 
-  color:         white;
-  font-size:     1.1rem;
-  line-height:   1;
+  color: white;
+  font-size: 1.1rem;
+  line-height: 1;
 }
 
-.room-item__unreads {
-  .notification(@menu-unread-badge-size);
-  background:    @caribbean;
+.room-item__unread-indicator-visibile-reset() {
+  visibility: visible;
+  transform: scale(1);
+  opacity: 1;
+
+  transition:
+    visibility 0s ease 0s,
+    transform .2s cubic-bezier(1, 2.5, 0.5, 0.76),
+    margin-left .2s ease,
+    opacity .2s ease,
+    background-color .2s ease,
+    border-color .2s ease;
 }
 
-.room-item__mentions {
-  .notification(@menu-unread-badge-size);
-  background:    @jaffa;
+.room-item__unread-indicator {
+  .unread-indicator(0);
+  visibility: hidden;
+  transform: scale(0.5);
+  margin-left: 0;
+  opacity: 0;
 
-  &:before {
-    content: '@';
-    // The `@` character in this font is slightly not vertically centered
-    transform: translateY(-0.125em);
+  /* Slower transition back to hidden state
+   * There is a faster transition in the reset, when they appear */
+  transition:
+    visibility 0s ease .4s,
+    transform .4s cubic-bezier(1, 2.5, 0.5, 0.76),
+    margin-left .4s ease,
+    opacity .4s ease,
+    background-color .2s ease,
+    border-color .2s ease;
+
+  &.has-unreads {
+    .unread-indicator(@menu-unread-badge-size);
+    .room-item__unread-indicator-visibile-reset();
+
+    background-color: @caribbean;
+
+    animation-name: unread-indicator-subtle-pulse-animation;
+    animation-duration: 2s;
+    animation-timing-function: ease;
   }
-}
+  &.has-activity {
+    .unread-indicator(@menu-unread-badge-size / 3);
+    .room-item__unread-indicator-visibile-reset();
 
-.room-item__lurk {
-  .notification(@menu-unread-badge-size / 3);
-  border-color: @caribbean;
+    animation-name: unread-indicator-subtle-pulse-animation;
+    animation-duration: 2s;
+    animation-timing-function: ease;
+
+    &:before {
+      content: '';
+      box-sizing: border-box;
+      display: block;
+      width: 100%;
+      height: 100%;
+
+      border: 2px solid @caribbean;
+      border-radius: 100%;
+    }
+  }
+  &.has-mentions {
+    .unread-indicator(@menu-unread-badge-size);
+    .room-item__unread-indicator-visibile-reset();
+
+    background-color: @jaffa;
+
+    animation-name: mention-indicator-subtle-pulse-animation;
+    animation-duration: 2s;
+    animation-timing-function: ease;
+
+    &:before {
+      content: '@';
+      // The `@` character in this font is slightly not vertically centered
+      transform: translateY(-0.125em);
+    }
+  }
 }
 
 .room-item__options {
@@ -118,7 +174,7 @@ JP 11/2/16
   height: @menu-item-height;
   //default is off, when a room-item is hovered we show it
   opacity: 0;
-  margin-left: auto;
+  margin-left: 1rem;
   transition: opacity .2s ease-out;
   &:hover {
     cursor: pointer;
@@ -165,11 +221,13 @@ JP 11/2/16
 
 .room-item__options-menu__item__btn {
   .room-menu-text();
-  border:     none;
-  background: none;
-  outline:    none;
+  width:        100%;
+  border:       none;
+  background:   none;
+  outline:      none;
   display:      block;
   padding-left: 4.5rem;
+  text-align:   left;
   &:hover {
     text-decoration: none;
   }

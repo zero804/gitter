@@ -1,15 +1,15 @@
 "use strict";
 
-var UserIdStrategy    = require('./user-id-strategy');
+var UserIdStrategy = require('./user-id-strategy');
 
 function TroupeBanStrategy(options) {
   var userIdStategy = new UserIdStrategy(options);
 
-  this.preload = function(troupeBans, callback) {
+  this.preload = function(troupeBans) {
     var userIds = troupeBans.map(function(troupeBan) { return troupeBan.userId; });
     var banningUsers = troupeBans.map(function(troupeBan) { return troupeBan.bannedBy; });
 
-    userIdStategy.preload(userIds.concat(banningUsers), callback);
+    return userIdStategy.preload(userIds.concat(banningUsers));
   };
 
   this.map = function(troupeBan) {
@@ -17,6 +17,7 @@ function TroupeBanStrategy(options) {
     var bannedBy = userIdStategy.map(troupeBan.bannedBy);
 
     if(!user) return null;
+
     return {
       user: user,
       bannedBy: bannedBy,

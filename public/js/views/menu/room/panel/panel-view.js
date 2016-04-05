@@ -19,9 +19,9 @@ var fastdom                         = require('fastdom');
 var toggleClass                     = require('utils/toggle-class');
 
 require('views/behaviors/isomorphic');
-require('nanoscroller');
 
 module.exports = Marionette.LayoutView.extend({
+
 
   behaviors: {
     Isomorphic: {
@@ -85,21 +85,23 @@ module.exports = Marionette.LayoutView.extend({
       collection:        this.model.secondaryCollection,
       model:             new SecondaryCollectionModel({}, { roomMenuModel: this.model }),
       roomMenuModel:     this.model,
-      primaryCollection: this.model.primaryCollection,
       bus:               this.bus,
+      roomCollection:    this.model._roomCollection,
+      primaryCollection: this.model.primaryCollection,
       userModel:         this.model.userModel,
       troupeModel:       this.model._troupeModel,
-      roomCollection:    this.model._roomCollection,
     }));
   },
 
   initTertiaryCollection: function(optionsForRegion) {
     return new TertiaryCollectionView(optionsForRegion({
-      model:          new TertiaryCollectionModel({}, { roomMenuModel: this.model }),
-      collection:     this.model.tertiaryCollection,
-      roomMenuModel:  this.model,
-      bus:            this.bus,
-      roomCollection: this.model._roomCollection,
+      model:               new TertiaryCollectionModel({}, { roomMenuModel: this.model }),
+      collection:          this.model.tertiaryCollection,
+      roomMenuModel:       this.model,
+      bus:                 this.bus,
+      primaryCollection:   this.model.primaryCollection,
+      secondaryCollection: this.model.secondaryCollection,
+      roomCollection:      this.model._roomCollection,
     }));
   },
 
@@ -110,9 +112,14 @@ module.exports = Marionette.LayoutView.extend({
     }));
   },
 
+  ui: {
+    profileMenu: '#profile-menu'
+  },
+
   modelEvents: {
     'change:panelOpenState':       'onPanelOpenStateChange',
     'primary-collection:snapshot': 'onPrimaryCollectionSnapshot',
+    'change:profileMenuOpenState': 'onProfileToggle'
   },
 
   childEvents: {
@@ -125,7 +132,6 @@ module.exports = Marionette.LayoutView.extend({
 
     this.listenTo(this.bus, 'ui:swipeleft', this.onSwipeLeft, this);
     this.listenTo(this.bus, 'focus.request.chat', this.onSearchItemSelected, this);
-    this.listenTo(this.bus, 'room-menu:keyboard:change-focus', this.onFocusChangeRequested, this);
     this.$el.find('#search-results').show();
   },
 
@@ -159,10 +165,17 @@ module.exports = Marionette.LayoutView.extend({
     this.el.classList.add('loading');
   },
 
-  onFocusChangeRequested: function(offset, type) { //jshint unused: true
-    if (type) { return this._initNano({ scroll: type }); }
+  onChildRender: _.debounce(function (){
+    this.bus.trigger('panel:render');
+  }, 10),
 
-    this._initNano({ scrollTo: '[data-collection-index=' + offset + ']' });
+
+  onProfileToggle: function(model, val) { //jshint unused: true
+    this.ui.profileMenu[0].setAttribute('aria-hidden', !val);
+  },
+
+  onRender: function() {
+    this.ui.profileMenu[0].setAttribute('aria-hidden', !this.profileMenuOpenState);
   },
 
   onDestroy: function() {
