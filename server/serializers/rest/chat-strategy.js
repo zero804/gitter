@@ -79,8 +79,6 @@ function ChatStrategy(options)  {
       // which kinda defeats the purpose
       logger.warn("ChatStrategy was called with lookups, but also with lean", options);
     }
-  } else {
-    logger.warn("ChatStrategy was called without lookups", options);
   }
 
   var userStrategy = options.user ? null : new UserIdStrategy({ lean: options.lean });
