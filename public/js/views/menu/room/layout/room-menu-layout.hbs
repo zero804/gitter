@@ -15,11 +15,11 @@
           </button>
         </li>
 
-        <li data-state-change="favourite" id="minibar-favourite" class="room-menu-options__item--favourite">
+        {{!<li data-state-change="favourite" id="minibar-favourite" class="room-menu-options__item--favourite">
           <button class="room-menu-options__item-button" title="Your Favourite Conversations">
-            <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/favourites.svg"}}' />
+            <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/favourites.svg"}}{{!' />
           </button>
-        </li>
+        </li>}}
 
         <li data-state-change="people" id="minibar-people" class="room-menu-options__item--people">
           <button class="room-menu-options__item-button" title="Your One to One Conversations">
@@ -57,7 +57,7 @@
                 <div id="collection-list" class="collection-list--favourite">
                   {{#each leftMenuFavouriteRooms}}
                     <div class="room-item--favourite" id="{{id}}"  data-id="{{id}}">
-                      {{{ prerenderView "js/views/menu/room/primary-collection/primary-collection-view" }}}
+                      {{{ prerenderView "js/views/menu/room/primary-collection/primary-collection-item-view" }}}
                     </div>
                   {{/each}}
                 </div>
