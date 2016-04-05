@@ -208,7 +208,7 @@ function sendEmailNotifications(since) {
             }, []);
 
             var chatStrategy = new serializer.ChatIdStrategy({ recipientUserId: user.id });
-            return serializer.serializeExcludeNulls(chatIdsForUser, chatStrategy)
+            return serializer.serialize(chatIdsForUser, chatStrategy)
               .then(function(chats) {
                 var chatsIndexed = collections.indexById(chats);
 

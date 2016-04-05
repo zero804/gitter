@@ -26,9 +26,10 @@ module.exports = function suggestedOrgsFromRoomList(roomList, uri, currentRoomId
     var existingEntry = _.where(memo, { name: orgName })[0];
     if (!!existingEntry) {
       var index = memo.indexOf(existingEntry);
+      // Aggregate the counts in each org bucket from each room
       memo[index].unreadItems = ((existingEntry.unreadItems || 0) + (room.unreadItems || 0));
       memo[index].mentions    = ((existingEntry.mentions || 0) + (room.mentions || 0));
-      memo[index].activity    = (!!memo[index].activity || (room.lurk && room.activity));
+      memo[index].activity    = ((existingEntry.activity || 0) + (room.activity || 0));
       return memo;
     }
 

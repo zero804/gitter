@@ -1,7 +1,7 @@
 'use strict';
 
 var Backbone         = require('backbone');
-var itemTemplate     = require('./primary-collection-view.hbs');
+var itemTemplate     = require('./primary-collection-item-view.hbs');
 var apiClient        = require('components/apiClient');
 var context          = require('utils/context');
 var appEvents        = require('utils/appevents');
