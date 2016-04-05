@@ -27,7 +27,7 @@ function notifyUsersOfAddedGroupRooms(room, userIds) {
   var singleUserId = userIds.length === 1 && userIds[0];
 
   // TODO: custom serializations per user
-  return restSerializer.serialize(room, new restSerializer.TroupeStrategy({ isRoomMember: true, currentUserId: singleUserId }))
+  return restSerializer.serializeObject(room, new restSerializer.TroupeStrategy({ isRoomMember: true, currentUserId: singleUserId }))
     .then(function(serializedRoom) {
 
       userIds.forEach(function(userId) {
@@ -41,7 +41,7 @@ function notifyUsersOfAddedOneToOneRooms(room, userIds) {
   return Promise.map(userIds, function(userId) {
     var strategy = new restSerializer.TroupeStrategy({ currentUserId: userId, isRoomMember: true });
 
-    return restSerializer.serialize(room, strategy)
+    return restSerializer.serializeObject(room, strategy)
       .then(function(serializedRoom) {
         appEvents.dataChange2('/user/' + userId + '/rooms', "create", serializedRoom, 'room');
       });

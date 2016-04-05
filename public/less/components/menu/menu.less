@@ -1,0 +1,17 @@
+
+.activity-indicator-pulse-animation(@name @color) {
+  @keyframes @name {
+    0% {
+      box-shadow: none;
+    }
+    50% {
+      box-shadow: 0 0 8px 0 @color;
+    }
+    100% {
+      box-shadow: none;
+    }
+  }
+}
+
+.activity-indicator-pulse-animation(unread-indicator-subtle-pulse-animation, @caribbean);
+.activity-indicator-pulse-animation(mention-indicator-subtle-pulse-animation, @jaffa);
