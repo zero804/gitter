@@ -73,28 +73,10 @@ var getGulpSourceMapOptions = function(mapsSubDir) {
 };
 
 
-var cssDest = 'output/assets/styles';
-var cssSourceMapDest = url.resolve((getSourceMapUrl() || ''), 'output/maps/');
-var cssWatch = 'public/**/*.less';
+var cssDestDir = 'output/assets/styles';
+var cssSourceMapDestDir = url.resolve((getSourceMapUrl() || ''), 'output/maps/');
+var cssWatchGlob = 'public/**/*.less';
 
-
-
-
-
-gulp.task('asdfdfasafds', function() {
-  var cssWebStyleBuilder = styleBuilder([
-    'public/less/explore.less'
-  ], {
-    dest: cssDest,
-    sourceMapOptions: getGulpSourceMapOptions(),
-    lessOptions: {
-      paths: ['public/less']
-    }
-    // streamTransform: function(stream) { return stream; }
-  });
-
-  cssWebStyleBuilder.build();
-});
 
 
 
@@ -434,112 +416,86 @@ gulp.task('copy-asset-files', function() {
 
 
 
-
-/* * /
-var cssIos = function(overrideOpts) {
-  overrideOpts = overrideOpts || {};
-
-  var lessOpts = {
+var cssIosStyleBuilder = styleBuilder([
+  'public/less/mobile-native-chat.less'
+], {
+  dest: cssDestDir,
+  watchGlob: cssWatchGlob,
+  sourceMapOptions: getGulpSourceMapOptions(),
+  lessOptions: {
     paths: ['public/less'],
     globalVars: {
-      "target-env": '"mobile"'
+      'target-env': '"mobile"'
     }
-  };
+  }
+  // streamTransform: function(stream) { return stream; }
+});
 
-  var lessWebFiles = [
-    'public/less/mobile-native-chat.less'
-  ];
-
-  var opts = _.extend({}, {
-    sourceMapDest: cssSourceMapDest,
-    lessOptions: lessOpts
-  }, overrideOpts);
-  return createLessTask(lessWebFiles, cssWatch, cssDest, opts);
-};
-
-gulp.task('css-ios', cssIos({
-  watch: false
-}));
-/* */
+gulp.task('css-ios', function() {
+  return cssIosStyleBuilder.build();
+});
 
 
-/* * /
-var cssMobile = function(overrideOpts) {
-  overrideOpts = overrideOpts || {};
-
-  var lessOpts = {
+var cssMobileStyleBuilder = styleBuilder([
+  'public/less/mobile-app.less',
+  'public/less/mobile-nli-app.less',
+  'public/less/mobile-userhome.less',
+  'public/less/mobile-native-userhome.less'
+], {
+  dest: cssDestDir,
+  watchGlob: cssWatchGlob,
+  sourceMapOptions: getGulpSourceMapOptions(),
+  lessOptions: {
     paths: ['public/less'],
     globalVars: {
-      "target-env": '"mobile"'
+      'target-env': '"mobile"'
     }
-  };
+  }
+  // streamTransform: function(stream) { return stream; }
+});
 
-  var lessWebFiles = [
-    'public/less/mobile-app.less',
-    'public/less/mobile-nli-app.less',
-    'public/less/mobile-userhome.less',
-    'public/less/mobile-native-userhome.less'
-  ];
+gulp.task('css-mobile', function() {
+  return cssMobileStyleBuilder.build();
+});
 
-  var opts = _.extend({}, {
-    sourceMapDest: cssSourceMapDest,
-    lessOptions: lessOpts
-  }, overrideOpts);
-  return createLessTask(lessWebFiles, cssWatch, cssDest, opts);
-};
-
-gulp.task('css-mobile', cssMobile({
-  watch: false
-}));
-/* */
-
-
-/* * /
-var cssWeb = function(overrideOpts) {
-  overrideOpts = overrideOpts || {};
-
-  var lessOpts = {
+var cssWebStyleBuilder = styleBuilder([
+  'public/less/trpAppsPage.less',
+  'public/less/error-page.less',
+  'public/less/error-layout.less',
+  'public/less/generic-layout.less',
+  'public/less/trpHooks.less',
+  'public/less/login.less',
+  'public/less/explore.less',
+  'public/less/router-chat.less',
+  'public/less/router-app.less',
+  'public/less/router-nli-app.less',
+  'public/less/router-nli-chat.less',
+  'public/less/router-embed-chat.less',
+  'public/less/router-nli-embed-chat.less',
+  'public/less/chat-card.less',
+  'public/less/router-archive-home.less',
+  'public/less/router-archive-links.less',
+  'public/less/router-archive-chat.less',
+  'public/less/homepage.less',
+  'public/less/userhome.less',
+  'public/less/402.less',
+  'public/less/org-page.less'
+], {
+  dest: cssDestDir,
+  watchGlob: cssWatchGlob,
+  sourceMapOptions: getGulpSourceMapOptions(),
+  lessOptions: {
     paths: ['public/less'],
     globalVars: {
-      "target-env": '"web"'
+      'target-env': '"web"'
     }
-  };
+  }
+  // streamTransform: function(stream) { return stream; }
+});
 
-  var lessWebFiles = [
-    'public/less/trpAppsPage.less',
-    'public/less/error-page.less',
-    'public/less/error-layout.less',
-    'public/less/generic-layout.less',
-    'public/less/trpHooks.less',
-    'public/less/login.less',
-    'public/less/explore.less',
-    'public/less/router-chat.less',
-    'public/less/router-app.less',
-    'public/less/router-nli-app.less',
-    'public/less/router-nli-chat.less',
-    'public/less/router-embed-chat.less',
-    'public/less/router-nli-embed-chat.less',
-    'public/less/chat-card.less',
-    'public/less/router-archive-home.less',
-    'public/less/router-archive-links.less',
-    'public/less/router-archive-chat.less',
-    'public/less/homepage.less',
-    'public/less/userhome.less',
-    'public/less/402.less',
-    'public/less/org-page.less'
-  ];
-
-  var opts = _.extend({}, {
-    sourceMapDest: cssSourceMapDest,
-    lessOptions: lessOpts
-  }, overrideOpts);
-  return createLessTask(lessWebFiles, cssWatch, cssDest, opts);
-};
-
-gulp.task('css-web', cssWeb({
-  watch: false
-}));
-/* */
+gulp.task('css-web', function() {
+  return cssWebStyleBuilder.build();
+});
 
 
 gulp.task('css', function() {
@@ -629,13 +585,9 @@ gulp.task('default', function(callback) {
  * watch
  */
 gulp.task('watch', function() {
-  //livereload.listen();
-  //gulp.watch('public/**/*.less', ['css-web']).on('change', livereload.changed);
-  return Promise.all([
-    //cssIos()(),
-    //cssMobile()(),
-    //cssWeb()()
-  ]);
+  cssIosStyleBuilder.startWatching();
+  cssMobileStyleBuilder.startWatching();
+  cssWebStyleBuilder.startWatching();
 });
 
 

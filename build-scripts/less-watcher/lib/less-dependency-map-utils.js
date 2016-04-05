@@ -51,7 +51,7 @@ var generateLessDependencyMap = memoize(function(rootFilePath, options, /*intern
   var absolutePathsOptionHash = (function() {
     var hash = {};
     opts.paths.map(function(dir) {
-      hash[path.resolve(__dirname, dir)] = true;
+      hash[path.resolve(process.cwd(), dir)] = true;
     });
 
     return hash;
@@ -78,7 +78,7 @@ var generateLessDependencyMap = memoize(function(rootFilePath, options, /*intern
       //console.log('m', rootFilePath, matchedFilePaths);
       var checkAllMatchedFilesModifiedPromises = matchedFilePaths.map(function(matchedFilePath) {
         // Assemble a list of directories the `@import` can resolve from
-        var parentDirectoryPath = path.resolve(__dirname, path.dirname(rootFilePath));
+        var parentDirectoryPath = path.resolve(process.cwd(), path.dirname(rootFilePath));
         var possibleDirs = Object.keys(_.extend({}, absolutePathsOptionHash, (function() {
           var tempHash = {};
           tempHash[parentDirectoryPath] = true;
@@ -117,7 +117,7 @@ var generateLessDependencyMap = memoize(function(rootFilePath, options, /*intern
         return Promise.all(checkAllDirsFileModifiedPromises)
           .then(function(checkFileResults) {
             if(opts.debug) {
-              // An `undefined` filled results means we weren't able to find the `@import` at all
+              // `undefined` filled results means we weren't able to find the `@import` at all
               var fileNotFound = checkFileResults.reduce(function(prev, result) {
                 return prev && result === undefined;
               }, true);
