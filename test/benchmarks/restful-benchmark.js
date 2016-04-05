@@ -45,6 +45,16 @@ makeBenchmark({
         .nodeify(done);
     },
 
+    'serializeChatsForTroupe#lean1': function(done) {
+      restful.serializeChatsForTroupe(fixture.troupe1.id, fixture.user0.id, { lean: true })
+        .nodeify(done);
+    },
+
+    'serializeChatsForTroupe#lean2': function(done) {
+      restful.serializeChatsForTroupe(fixture.troupe1.id, fixture.user0.id, { lean: 2 })
+        .nodeify(done);
+    },
+
     'serializeTroupesForUser#oneRoom': function(done) {
       restful.serializeTroupesForUser(fixture.userOnlyOne.id)
         .nodeify(done);

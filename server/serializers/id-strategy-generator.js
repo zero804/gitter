@@ -1,46 +1,47 @@
 "use strict";
 
-// var winston = require('../utils/winston');
 var collections = require("../utils/collections");
-var execPreloads = require('./exec-preloads');
 var Promise = require('bluebird');
 var debug = require('debug')('gitter:serializer:id-loader');
+var Lazy = require('lazy.js');
 
 function idStrategyGenerator(name, FullObjectStrategy, loaderFunction) {
   var Strategy = function IdStrategy(options) {
     var strategy = new FullObjectStrategy(options);
     var objectHash;
 
-    this.preload = function(ids, callback) {
-      if (!ids.length) return Promise.resolve([]).nodeify(callback);
+    this.preload = Promise.method(function(ids) {
+      if (ids.isEmpty()) return [];
 
       var time = debug.enabled && Date.now();
-      return loaderFunction(ids)
+
+      var idArray = ids.toArray();
+      return loaderFunction(idArray)
         .then(function(fullObjects) {
           var duration = debug.enabled && Date.now() - time;
-          debug("%s loaded %s items from ids in %sms", name, ids.length, duration);
+          debug("%s loaded %s items from ids in %sms", name, idArray.length, duration);
 
           objectHash = collections.indexById(fullObjects);
 
-          return execPreloads([{
-            strategy: strategy,
-            data: fullObjects
-          }]);
-        })
-        .nodeify(callback);
-    };
-
+          return strategy.preload(Lazy(fullObjects));
+        });
+    });
 
     this.map = function(id) {
       var fullObject = objectHash[id];
 
       if(!fullObject) {
-        // winston.warn("Unable to locate object ", { id: id, strategy: Strategy.prototype.name });
         return null;
       }
 
       return strategy.map(fullObject);
     };
+
+    if (strategy.postProcess) {
+      this.postProcess = function(results) {
+        return strategy.postProcess(results);
+      };
+    }
 
   };
 
