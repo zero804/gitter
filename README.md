@@ -262,7 +262,7 @@ Once you have these you can run `npm run test:unit:browser` which should kick of
 ### 1. I've got a conflict in my shrinkwrap
 
 1. Merge any conflicts in your `package.json`, but ignore conflicts in your `npm-shrinkwrap.json`
-2. Run `npm run npm shrinkwrap-conflict`
+2. Run `npm run shrinkwrap` to rebuild the shrinkwrap
 2. Commit your changes to `npm-shrinkwrap.json` and `package.json`
 
 ### 2. I would like to add a dev-dependency
@@ -277,5 +277,5 @@ Once you have these you can run `npm run test:unit:browser` which should kick of
 
 ### 4. The shrinkwrap file is completely screwed up. Can I recreate it?
 
-1. Use `npm clean-shrinkwrap`
+1. Run `npm run shrinkwrap` to rebuild the shrinkwrap
 2. Commit your changes to `npm-shrinkwrap.json`
