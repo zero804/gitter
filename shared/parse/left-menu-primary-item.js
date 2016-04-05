@@ -15,7 +15,7 @@ module.exports = function parseContentToTemplateData(data, state) {
     if (data.displayName) {
       return _.extend({}, {
           name:         roomNameShortener(data.displayName),
-          avatarSrcset: resolveRoomAvatarSrcSet({ uri: data.displayName }, AVATAR_SIZE),
+          avatarSrcset: resolveRoomAvatarSrcSet({ uri: data.name }, AVATAR_SIZE),
       });
     }
 
