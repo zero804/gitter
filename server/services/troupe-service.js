@@ -17,7 +17,7 @@ var roomMembershipService = require('./room-membership-service');
 var getMaxTagLength       = require('gitter-web-shared/validation/validate-tag').getMaxTagLength;
 var debug                 = require('debug')('gitter:troupe-service');
 
-var MAX_RAW_TAGS_LENGTH = 100;
+var MAX_RAW_TAGS_LENGTH = 200;
 
 function findByUri(uri, callback) {
   var lcUri = uri.toLowerCase();

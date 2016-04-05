@@ -234,7 +234,7 @@ describe('distribution-delta', function() {
         .spread(function(result, newDistribution) {
           assert(newDistribution);
           assert.deepEqual(result, {
-            addNotify: [userId1],
+            addNotify: [userId1, userId2],
             addMentions: [],
             remove: [userId1, userId2]
           });
