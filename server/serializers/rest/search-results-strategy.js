@@ -1,20 +1,11 @@
 "use strict";
 
-var _                 = require("underscore");
-var execPreloads      = require('../exec-preloads');
-
 function SearchResultsStrategy(options) {
   var resultItemStrategy = options.resultItemStrategy;
 
-  this.preload = function(searchResults, callback) {
-    var items = _.flatten(searchResults.map(function(i) { return i.results; }), true);
-
-    var strategies = [{
-      strategy: resultItemStrategy,
-      data: items
-    }];
-
-    execPreloads(strategies, callback);
+  this.preload = function(searchResults) {
+    var items = searchResults.map(function(i) { return i.results; }).flatten();
+    return resultItemStrategy.preload(items);
   };
 
   this.map = function(item) {
@@ -22,7 +13,9 @@ function SearchResultsStrategy(options) {
       hasMoreResults: item.hasMoreResults,
       limit: item.limit,
       skip: item.skip,
-      results: item.results.map(function(i) { return resultItemStrategy.map(i); })
+      results: item.results.map(function(i) {
+        return resultItemStrategy.map(i);
+      })
     };
   };
 
