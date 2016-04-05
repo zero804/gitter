@@ -10,6 +10,12 @@ require('gitter-styleguide/css/components/buttons.css');
 module.exports = Marionette.ItemView.extend({
   template: template,
 
+  behaviors: {
+    Tooltip: {
+      '.js-create-room-button': { placement: 'left' }
+    }
+  },
+
   modelEvents: {
     'change:state': 'onModelChange',
     'change:searchTerm': 'onModelChange',

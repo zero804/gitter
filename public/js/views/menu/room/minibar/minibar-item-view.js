@@ -7,8 +7,19 @@ var resolveRoomAvatar = require('gitter-web-shared/avatars/resolve-room-avatar-s
 var toggleClass       = require('utils/toggle-class');
 
 module.exports =  Marionette.ItemView.extend({
-  tagName:      'li',
-  template:     itemTemplate,
+  tagName: 'li',
+  template: itemTemplate,
+
+  ui: {
+    minibarButton: '.room-menu-options__item-button'
+  },
+
+  behaviors: {
+    Tooltip: {
+      '.room-menu-options__item-button': { placement: 'right' }
+    }
+  },
+
   modelEvents: {
     'change:unreadItems change:mentions change:activity': 'render',
     'change:active': 'onActiveStateUpdate',
@@ -58,4 +69,3 @@ module.exports =  Marionette.ItemView.extend({
   },
 
 });
-

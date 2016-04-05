@@ -4,15 +4,18 @@ var context                  = require('utils/context');
 var apiClient                = require('components/apiClient');
 var Marionette               = require('backbone.marionette');
 var Backbone                 = require('backbone');
+var cocktail                 = require('cocktail');
 var autolink                 = require('autolink');
 var userNotifications        = require('components/user-notifications');
 var Dropdown                 = require('views/controls/dropdown');
 var appEvents                = require('utils/appevents');
+var KeyboardEventMixin       = require('views/keyboard-events-mixin');
 var headerViewTemplate       = require('./tmpl/headerViewTemplate.hbs');
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
-var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
+var resolveRoomAvatarSrcSet  = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 
 require('views/behaviors/tooltip');
+
 
 function getPrivateStatus(data) {
   return data.githubType === 'ORG' || data.githubType === 'ONETOONE' || data.security === 'PRIVATE';
@@ -23,7 +26,7 @@ function getGithubUrl(data) {
   return 'https://github.com' + data.url;
 }
 
-module.exports = Marionette.ItemView.extend({
+var HeaderView = Marionette.ItemView.extend({
   template: headerViewTemplate,
 
   modelEvents: {
@@ -31,27 +34,34 @@ module.exports = Marionette.ItemView.extend({
   },
 
   ui: {
-    cog:          '.js-chat-settings',
-    dropdownMenu: '#cog-dropdown',
-    topic:        '.js-chat-topic',
-    name:         '.js-chat-name',
-    favourite:    '.js-favourite-button',
-    orgrooms:     '.js-org-page',
+    cog:            '.js-chat-settings',
+    dropdownMenu:   '#cog-dropdown',
+    topic:          '.js-chat-topic',
+    topicActivator: '.js-room-topic-edit-activator',
+    name:           '.js-chat-name',
+    favourite:      '.js-favourite-button',
+    orgrooms:       '.js-chat-header-org-page-action',
   },
 
   events: {
-    'click @ui.cog':       'showDropdown',
-    'click #leave-room':   'leaveRoom',
-    'click @ui.favourite': 'toggleFavourite',
-    'dblclick @ui.topic':  'showInput',
-    'keydown textarea':    'detectKeys',
-    'click @ui.orgrooms':  'goToOrgRooms',
+    'click @ui.cog':               'showDropdown',
+    'click #leave-room':           'leaveRoom',
+    'click @ui.favourite':         'toggleFavourite',
+    'dblclick @ui.topicActivator': 'showInput',
+    'keydown textarea':            'detectKeys',
+    'click @ui.orgrooms':          'goToOrgRooms',
   },
+
+  keyboardEvents: {
+     'room-topic.edit': 'showInput'
+   },
 
   behaviors: {
     Tooltip: {
       '.js-chat-name': { titleFn: 'getChatNameTitle', placement: 'right' },
-      '.js-org-page':  { titleFn: 'getOrgPageTitle', placement: 'left' },
+      '.js-chat-header-org-page-action': { placement: 'left' },
+      '.js-favourite-button': { placement: 'left' },
+      '.js-chat-settings': { placement: 'left' }
     },
   },
 
@@ -71,12 +81,14 @@ module.exports = Marionette.ItemView.extend({
       troupeTopic:     data.topic,
       avatarSrcSet:    resolveRoomAvatarSrcSet({ uri: data.url }, 48),
       user:            !!context.isLoggedIn(),
+      isAdmin:         context.isTroupeAdmin(),
       archives:        this.options.archives,
       oneToOne:        (data.githubType === 'ONETOONE'),
       githubLink:      getGithubUrl(data),
       isPrivate:       getPrivateStatus(data),
       orgName:         orgName,
-      orgPageHref:     orgPageHref
+      orgPageHref:     orgPageHref,
+      shouldShowPlaceholderRoomTopic: data.userCount <= 1
     });
 
     return data;
@@ -133,12 +145,6 @@ module.exports = Marionette.ItemView.extend({
     }
   },
 
-  getOrgPageTitle: function() {
-    var uri = this.model.get('uri');
-    var orgName = uri.split('/')[0];
-    return 'More ' + orgName + ' rooms';
-  },
-
   onRender: function() {
     if (this.dropdown) {
       // Deal with re-renders
@@ -151,6 +157,8 @@ module.exports = Marionette.ItemView.extend({
     if (topicEl) {
       autolink(topicEl);
     }
+
+
   },
 
   showDropdown: function() {
@@ -320,3 +328,8 @@ module.exports = Marionette.ItemView.extend({
     }
   },
 });
+
+cocktail.mixin(HeaderView, KeyboardEventMixin);
+
+
+module.exports = HeaderView;

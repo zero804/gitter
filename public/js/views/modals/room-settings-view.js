@@ -1,6 +1,8 @@
 "use strict";
 
 var Marionette             = require('backbone.marionette');
+var Backbone               = require('backbone');
+var _                      = require('underscore');
 var apiClient              = require('components/apiClient');
 var ModalView              = require('./modal');
 var troupeSettingsTemplate = require('./tmpl/room-settings-view.hbs');
@@ -12,7 +14,7 @@ var OPTIONS = [
   { val: 'mute', text: 'Mute: Notify me only when I\'m directly mentioned' }
 ];
 
-var View = Marionette.ItemView.extend({
+var View = Marionette.LayoutView.extend({
   template: troupeSettingsTemplate,
   events: {
     'click #close-settings' : 'destroySettings',
@@ -24,6 +26,10 @@ var View = Marionette.ItemView.extend({
   ui: {
     options: '#notification-options',
     nonstandard: '#nonstandard',
+    notifyFeatures: '#notify-features'
+  },
+  regions: {
+    notifyFeatures: '#notify-features'
   },
 
   initialize: function() {
@@ -35,48 +41,109 @@ var View = Marionette.ItemView.extend({
         this.model.set(settings);
       });
 
+    this.notifyFeatureCollection = new Backbone.Collection([]);
   },
 
   getNotificationOption: function() {
     var model = this.model;
+
+    if (!model.attributes.hasOwnProperty('mode')) {
+      // Not yet loaded...
+      return null;
+    }
     var value = model.get('mode');
     var lurk = model.get('lurk');
 
+    var nonStandard;
+
+    var defaultDescription = 'Legacy setting: ' + value + ' mode, with ' + (lurk ? 'unread item count off' : 'unread item count on');
+
     switch(value) {
       case 'all':
-        return { selectValue: 'all', nonStandard: lurk === true, lurk: lurk };
+        nonStandard = lurk === true;
+        return {
+          selectValue: 'all',
+          nonStandard: nonStandard,
+          description: nonStandard ?  defaultDescription : null
+        };
 
       case 'announcement':
       case 'mention':
-        return { selectValue: 'announcement', nonStandard: lurk === false, lurk: lurk };
+        nonStandard = lurk === true;
+
+        return {
+          selectValue: 'announcement',
+          nonStandard: nonStandard,
+          description: nonStandard ?  defaultDescription : null
+        };
 
       case 'mute':
-        return { selectValue: 'mute', nonStandard: lurk === false, lurk: lurk };
+        nonStandard = lurk === false;
+
+        return {
+          selectValue: 'mute',
+          nonStandard: nonStandard,
+          description: nonStandard ?  defaultDescription : null
+        };
 
       default:
-        return null;
+        return {
+          selectValue: 'mute',
+          nonStandard: true,
+          description: 'Custom legacy setting (details below)'
+        };
     }
   },
 
   update: function() {
     var val = this.getNotificationOption();
-    var nonStandard = false;
 
     if (val) {
       if (val.nonStandard) {
-        nonStandard = true;
-        this.setOption('', 'Legacy setting: ' + val.selectValue + ' mode, with ' + (val.lurk ? 'lurk on' : 'lurk off'));
+        this.ui.nonstandard.show();
+        this.setOption('', val.description);
       } else {
+        this.ui.nonstandard.hide();
         this.setOption(val.selectValue);
       }
+
     } else {
       this.setOption('', 'Please wait...');
+      this.ui.nonstandard.hide();
     }
 
-    if (nonStandard) {
-      this.ui.nonstandard.show();
+    var attributes = this.model.attributes;
+    var features = [];
+    if (attributes.unread) {
+      features.push({ id: 1, text: 'Show unread item counts' });
+    }
+
+    if (attributes.activity) {
+      features.push({ id: 2, text: 'Show activity indicator on chat' });
+    }
+
+    if (attributes.desktop) {
+      features.push({ id: 5, text: 'Notify for all chats' });
+    }
+
+    if (attributes.mention) {
+      features.push({ id: 3, text: 'Notify when you\'re mentioned' });
+    }
+
+    if (attributes.announcement) {
+      features.push({ id: 4, text: 'Notify on @/all announcements' });
+    }
+
+    // For now, desktop = mobile so don't confuse the user
+    // if (attributes.mobile) {
+    //   features.push({ id: 6, text: 'Mobile notifications for chats' });
+    // }
+
+    this.notifyFeatureCollection.reset(features);
+    if (features.length) {
+      this.ui.notifyFeatures.show();
     } else {
-      this.ui.nonstandard.hide();
+      this.ui.notifyFeatures.hide();
     }
   },
 
@@ -95,7 +162,7 @@ var View = Marionette.ItemView.extend({
         found = true;
       }
       return option;
-        });
+    });
     selectInput.append(items);
 
     if (!found) {
@@ -110,6 +177,14 @@ var View = Marionette.ItemView.extend({
 
   onRender: function() {
     this.update();
+    this.getRegion('notifyFeatures').show(new Marionette.CollectionView({
+      tagName: 'ul',
+      collection: this.notifyFeatureCollection,
+      childView: Marionette.ItemView.extend({
+        tagName: 'li',
+        template: _.template("<%= text %>")
+      })
+    }));
   },
 
   formChange: function(e) {
