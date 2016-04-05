@@ -64,7 +64,7 @@ describe('room-membership-service', function() {
         })
         .then(function(troupeUser) {
           assert.strictEqual(troupeUser.lurk, false);
-          assert.strictEqual(Number(troupeUser.flags).toString(2), "11101");
+          assert.strictEqual(Number(troupeUser.flags).toString(2), "1111101");
         });
     });
 
@@ -89,7 +89,7 @@ describe('room-membership-service', function() {
         })
         .then(function(troupeUser) {
           assert.strictEqual(troupeUser.lurk, false);
-          assert.strictEqual(Number(troupeUser.flags).toString(2), "11101");
+          assert.strictEqual(Number(troupeUser.flags).toString(2), "1111101");
 
           return roomMembershipService.checkRoomMembership(fixture.troupe1.id, fixture.user2.id);
         })
@@ -182,7 +182,7 @@ describe('room-membership-service', function() {
             return roomMembershipService.addRoomMembers(troupeId2, [userId1]);
           })
           .then(function() {
-            return roomMembershipService.setMembershipMode(userId1, troupeId2, 'announcement');
+            return roomMembershipService.setMembershipMode(userId1, troupeId2, 'mute');
           })
           .then(function() {
             // Check that the event emitter fired
@@ -196,7 +196,7 @@ describe('room-membership-service', function() {
             return roomMembershipService.getMembershipMode(userId1, troupeId2);
           })
           .then(function(mode) {
-            assert.strictEqual(mode, 'mention');
+            assert.strictEqual(mode, 'mute');
             return roomMembershipService.getMemberLurkStatus(troupeId2, userId1);
           })
           .then(function(lurking) {
@@ -253,7 +253,7 @@ describe('room-membership-service', function() {
           })
           .then(function(lurking) {
             assert.strictEqual(lurking, false);
-            return roomMembershipService.setMembershipMode(userId1, troupeId2, 'announcement');
+            return roomMembershipService.setMembershipMode(userId1, troupeId2, 'mute');
           })
           .then(function() {
             // Check that the event emitter fired
@@ -267,7 +267,7 @@ describe('room-membership-service', function() {
             return roomMembershipService.getMembershipMode(userId1, troupeId2);
           })
           .then(function(mode) {
-            assert.strictEqual(mode, 'mention');
+            assert.strictEqual(mode, 'mute');
             return roomMembershipService.getMemberLurkStatus(troupeId2, userId1);
           })
           .then(function(lurking) {
@@ -327,7 +327,7 @@ describe('room-membership-service', function() {
           .then(function() {
             return [
               roomMembershipService.setMembershipMode(userId1, troupeId2, 'all'),
-              roomMembershipService.setMembershipMode(userId2, troupeId2, 'mention')
+              roomMembershipService.setMembershipMode(userId2, troupeId2, 'mute')
             ];
           })
           .spread(function() {
@@ -458,7 +458,7 @@ describe('room-membership-service', function() {
             function() {
               return [
                 roomMembershipService.setMembershipMode(userId2, troupeId, 'all'),
-                roomMembershipService.setMembershipMode(userId3, troupeId, 'mention')
+                roomMembershipService.setMembershipMode(userId3, troupeId, 'mute')
               ];
             })
             .spread(function() {
@@ -619,7 +619,7 @@ describe('room-membership-service', function() {
             })
             .then(function(result) {
               var expected = {};
-              expected[userId1] = 'mention';
+              expected[userId1] = 'announcement';
               expected[userId2] = 'all';
               assert.deepEqual(result, expected);
 
@@ -630,7 +630,7 @@ describe('room-membership-service', function() {
             })
             .then(function(result) {
               var expected = {};
-              expected[userId1] = 'mention';
+              expected[userId1] = 'announcement';
               expected[userId2] = 'mute';
               assert.deepEqual(result, expected);
 
