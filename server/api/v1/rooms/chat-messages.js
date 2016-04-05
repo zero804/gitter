@@ -14,7 +14,7 @@ function parseLookups(lookups) {
   if (!lookups) {
     return undefined;
   }
-  if (_.isArray(lookups)) {
+  if (Array.isArray(lookups)) {
     return lookups;
   }
   return lookups.split(',');
