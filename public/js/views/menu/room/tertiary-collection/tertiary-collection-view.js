@@ -17,7 +17,7 @@ var ItemView = BaseCollectionItemView.extend({
     var name = (data.name || data.uri);
     return _.extend({}, data, {
       name:         roomNameShortener(name),
-      avatarSrcset: resolveRoomAvatarSrcSet({ uri: name }, 22),
+      avatarSrcset: (!data.isRecentSearch) ? resolveRoomAvatarSrcSet({ uri: name }, 22) : null,
     });
   },
 });

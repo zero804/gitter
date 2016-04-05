@@ -1,10 +1,8 @@
 'use strict';
 
 var Marionette  = require('backbone.marionette');
-var _           = require('underscore');
 var template    = require('./base-collection-item-view.hbs');
 var toggleClass = require('utils/toggle-class');
-var context     = require('utils/context');
 
 module.exports = Marionette.ItemView.extend({
 
