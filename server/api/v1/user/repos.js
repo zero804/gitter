@@ -25,7 +25,7 @@ function indexQuery(req) {
         filteredRepos = filteredRepos.slice(0, limit + 1);
       }
 
-      return restSerializer.serialize({ results: filteredRepos }, strategy);
+      return restSerializer.serializeObject({ results: filteredRepos }, strategy);
     });
 }
 
