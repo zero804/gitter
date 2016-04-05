@@ -36,7 +36,7 @@ describe('distribution', function() {
         }
       });
 
-      assertIteratorDeepEqual(distribution.getConnectedActivityUserIds(), ['1', '2', '3', '5', '6']);
+      assertIteratorDeepEqual(distribution.getConnectedActivityUserIds(), []);
     });
 
   });
@@ -73,6 +73,117 @@ describe('distribution', function() {
       });
 
       assertIteratorDeepEqual(distribution.getWebNotifications(), []);
+    });
+
+    it('should not send online notifications to announcement users', function() {
+      var distribution = new Distribution({
+        membersWithFlags: [
+          { userId: '1', flags: MODES.announcement },
+          { userId: '2', flags: MODES.announcement },
+          { userId: '3', flags: MODES.announcement },
+          { userId: '4', flags: MODES.announcement },
+          { userId: '5', flags: MODES.announcement },
+          { userId: '6', flags: MODES.announcement },
+          { userId: '7', flags: MODES.announcement }
+        ],
+        presence: {
+          '1': 'inroom',
+          '2': 'online',
+          '3': 'mobile',
+          '4': 'push',
+          '5': 'push_connected',
+          '6': 'push_notified_connected'
+        }
+      });
+
+      assertIteratorDeepEqual(distribution.getWebNotifications(), []);
+    });
+
+    it('should not send online notifications to mute users', function() {
+      var distribution = new Distribution({
+        membersWithFlags: [
+          { userId: '1', flags: MODES.mute },
+          { userId: '2', flags: MODES.mute },
+          { userId: '3', flags: MODES.mute },
+          { userId: '4', flags: MODES.mute },
+          { userId: '5', flags: MODES.mute },
+          { userId: '6', flags: MODES.mute },
+          { userId: '7', flags: MODES.mute }
+        ],
+        presence: {
+          '1': 'inroom',
+          '2': 'online',
+          '3': 'mobile',
+          '4': 'push',
+          '5': 'push_connected',
+          '6': 'push_notified_connected'
+        }
+      });
+
+      assertIteratorDeepEqual(distribution.getWebNotifications(), []);
+    });
+
+    it('should handle custom users', function() {
+      var distribution = new Distribution({
+        membersWithFlags: [
+          { userId: '1', flags: roomMembershipFlags.hashToFlags({ unread: true, desktop: true }) },
+          { userId: '2', flags: roomMembershipFlags.hashToFlags({ unread: true, desktop: false }) },
+          { userId: '3', flags: roomMembershipFlags.hashToFlags({ activity: true, desktop: true }) },
+          { userId: '4', flags: roomMembershipFlags.hashToFlags({ activity: true, desktop: false }) }
+        ],
+        presence: {
+          '1': 'online',
+          '2': 'online',
+          '3': 'online',
+          '4': 'online',
+        }
+      });
+
+      assertIteratorDeepEqual(distribution.getWebNotifications(), ['1', '3']);
+    });
+
+    it('should send announcement desktop notifications to announcement and all users but not mute', function() {
+      var distribution = new Distribution({
+        membersWithFlags: [
+          { userId: '1', flags: MODES.all },
+          { userId: '2', flags: MODES.announcement },
+          { userId: '3', flags: MODES.mute },
+        ],
+        announcement: true,
+        presence: {
+          '1': 'online',
+          '2': 'online',
+          '3': 'online',
+        }
+      });
+
+      assertIteratorDeepEqual(distribution.getWebNotifications(), ['1', '2']);
+    });
+
+    it('should send mention desktop notifications to the correct users', function() {
+      var distribution = new Distribution({
+        membersWithFlags: [
+          { userId: '1', flags: MODES.all },
+          { userId: '2', flags: MODES.announcement },
+          { userId: '3', flags: MODES.mute },
+          { userId: '4', flags: roomMembershipFlags.hashToFlags({ activity: true, mention: true, desktop: true }) },
+          { userId: '5', flags: roomMembershipFlags.hashToFlags({ activity: true, mention: true, desktop: false }) },
+          { userId: '6', flags: roomMembershipFlags.hashToFlags({ activity: true, mention: false, desktop: true }) },
+          { userId: '7', flags: roomMembershipFlags.hashToFlags({ activity: true, mention: false, desktop: false }) },
+        ],
+        mentions: ['1', '2', '3', '4', '5', '6', '7'],
+        presence: {
+          '1': 'online',
+          '2': 'online',
+          '3': 'online',
+          '4': 'online',
+          '5': 'online',
+          '6': 'online',
+          '7': 'online',
+        }
+      });
+
+      assertIteratorDeepEqual(distribution.getWebNotifications(), ['1', '2', '3', '4', '5', '6']);
     });
 
   });
@@ -119,6 +230,58 @@ describe('distribution', function() {
       });
 
       assertIteratorDeepEqual(distribution.getPushCandidatesWithoutMention(), ['4', '5']);
+    });
+
+    it('should not send notifications to unmentioned announcement users', function() {
+      var distribution = new Distribution({
+        membersWithFlags: [
+          { userId: '1', flags: MODES.announcement },
+          { userId: '2', flags: MODES.announcement },
+          { userId: '3', flags: MODES.announcement },
+          { userId: '4', flags: MODES.announcement },
+          { userId: '5', flags: MODES.announcement },
+          { userId: '6', flags: MODES.announcement },
+          { userId: '7', flags: MODES.announcement },
+          { userId: '8', flags: MODES.announcement },
+        ],
+        presence: {
+          '1': 'inroom',
+          '2': 'online',
+          '3': 'mobile',
+          '4': 'push',
+          '5': 'push_connected',
+          '6': 'push_notified_connected',
+          '7': 'push_notified',
+        }
+      });
+
+      assertIteratorDeepEqual(distribution.getPushCandidatesWithoutMention(), []);
+    });
+
+    it('should not send notifications to unmentioned mute users', function() {
+      var distribution = new Distribution({
+        membersWithFlags: [
+          { userId: '1', flags: MODES.mute },
+          { userId: '2', flags: MODES.mute },
+          { userId: '3', flags: MODES.mute },
+          { userId: '4', flags: MODES.mute },
+          { userId: '5', flags: MODES.mute },
+          { userId: '6', flags: MODES.mute },
+          { userId: '7', flags: MODES.mute },
+          { userId: '8', flags: MODES.mute },
+        ],
+        presence: {
+          '1': 'inroom',
+          '2': 'online',
+          '3': 'mobile',
+          '4': 'push',
+          '5': 'push_connected',
+          '6': 'push_notified_connected',
+          '7': 'push_notified',
+        }
+      });
+
+      assertIteratorDeepEqual(distribution.getPushCandidatesWithoutMention(), []);
     });
 
     it('should handle distributions without mentions', function() {
@@ -180,7 +343,17 @@ describe('distribution', function() {
 
     it('should handle distributions without mentions', function() {
       var distribution = new Distribution({
-        membersWithFlags: []
+        membersWithFlags: [
+          { userId: '1', flags: MODES.all },
+          { userId: '2', flags: MODES.announcement },
+          { userId: '3', flags: MODES.mute }
+        ],
+        mentions: [],
+        presence: {
+          '1': 'push',
+          '2': 'push',
+          '3': 'push',
+        }
       });
 
       assertIteratorDeepEqual(distribution.getPushCandidatesWithMention(), []);

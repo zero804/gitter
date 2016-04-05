@@ -4,10 +4,21 @@ var Marionette  = require('backbone.marionette');
 var template    = require('./header-view.hbs');
 var fastdom     = require('fastdom');
 var toggleClass = require('utils/toggle-class');
+var cocktail = require('cocktail');
+var KeyboardEventMixin = require('views/keyboard-events-mixin');
 
-module.exports = Marionette.ItemView.extend({
 
+var HeaderView = Marionette.ItemView.extend({
   template: template,
+
+  behaviors: {
+    Tooltip: {
+      '.js-left-menu-org-page-action': { placement: 'left' },
+      '.js-profile-menu-toggle': { titleFn: function() {
+        return 'Click to toggle the profile menu';
+      }, placement: 'right' }
+    }
+  },
 
   modelEvents: {
     'change:state':                'updateActiveElement',
@@ -16,8 +27,12 @@ module.exports = Marionette.ItemView.extend({
   },
 
   events: {
-    'click':                          'onClick',
+    'click':                          'toggleProfileMenuWhenAll',
     'click #menu-panel-header-close': 'onCloseClicked',
+  },
+
+  keyboardEvents: {
+    'profile-menu.toggle': 'toggleProfileMenuWhenAll'
   },
 
   ui: {
@@ -49,16 +64,18 @@ module.exports = Marionette.ItemView.extend({
     }.bind(this));
   },
 
-  onRender: function() {
-    this.updateActiveElement(this.model, this.model.get('state'));
-  },
 
-  onClick: function() {
+  toggleProfileMenuWhenAll: function() {
     //Open the profile menu ONLY when in the all channels state
     if (this.model.get('state') === 'all') {
       this.model.set('profileMenuOpenState', !this.model.get('profileMenuOpenState'));
     }
   },
+
+  onRender: function() {
+    this.updateActiveElement(this.model, this.model.get('state'));
+  },
+
 
   //TODO CHECK IF THIS CAN BE REMOVED JP 27/1/16
   onCloseClicked: function(e) {
@@ -72,6 +89,7 @@ module.exports = Marionette.ItemView.extend({
 
   onProfileToggle: function(model, val) { //jshint unused: true
     toggleClass(this.ui.profileToggle[0], 'active', !!val);
+    this.el.setAttribute('aria-expanded', !!val);
   },
 
   onDestroy: function() {
@@ -79,3 +97,7 @@ module.exports = Marionette.ItemView.extend({
   },
 
 });
+
+cocktail.mixin(HeaderView, KeyboardEventMixin);
+
+module.exports = HeaderView;

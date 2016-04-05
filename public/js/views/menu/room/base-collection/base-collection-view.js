@@ -61,7 +61,7 @@ module.exports = Marionette.CompositeView.extend({
     //results come through with `exists: false` for rooms yet to be created
     //whereas on room models `exists: undefined` :( JP 10/3/16
     if (model.get('exists') === false) {
-      return this._openCreateRoomDialog(view.model);
+      return this._openCreateRoomDialog(name);
     }
 
     //default trigger navigation to an existing room
@@ -113,8 +113,8 @@ module.exports = Marionette.CompositeView.extend({
     return (context.troupe().get('id') === model.get('id'));
   },
 
-  _openCreateRoomDialog: function(model) {
-    window.location.hash = '#confirm/' + model.get('name');
+  _openCreateRoomDialog: function(name) {
+    window.location.hash = '#confirm/' + name;
   },
 
 });

@@ -1,14 +1,14 @@
 "use strict";
 
-var execPreloads      = require('../exec-preloads');
+var Promise           = require('bluebird');
 var TroupeUriStrategy = require('./troupe-uri-strategy');
 var billingService    = require('../../services/billing-service');
 
 function OrgPlanStrategy() {
   var orgsWithPlans;
 
-  this.preload = function(orgUris, callback) {
-    return billingService.findActiveOrgPlans(orgUris)
+  this.preload = function(orgUris) {
+    return billingService.findActiveOrgPlans(orgUris.toArray())
       .then(function(subscriptions) {
         orgsWithPlans = subscriptions.reduce(function(memo, s) {
           memo[s.uri.toLowerCase()] = s.plan;
@@ -16,8 +16,7 @@ function OrgPlanStrategy() {
         }, {});
 
         return true;
-      })
-      .nodeify(callback);
+      });
   };
 
   this.map = function(orgUri) {
@@ -34,16 +33,12 @@ function GitHubOrgStrategy(options) {
   var troupeUriStrategy = new TroupeUriStrategy(options);
   var planStrategy = new OrgPlanStrategy();
 
-  this.preload = function(orgs, callback) {
+  this.preload = function(orgs) {
     var orgUris = orgs.map(function(org) { return org.login; });
 
-    execPreloads([{
-      strategy: troupeUriStrategy,
-      data: orgUris
-    },{
-      strategy: planStrategy,
-      data: orgUris
-    }], callback);
+    return Promise.join(
+      troupeUriStrategy.preload(orgUris),
+      planStrategy.preload(orgUris));
   };
 
   this.map = function(item) {

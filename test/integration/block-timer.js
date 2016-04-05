@@ -11,10 +11,7 @@ var last;
 module.exports = {
   on: function() {
     if(timer) return;
-
-    // These are blocking, but once off
-    testRequire('./serializers/rest-serializer').testOnly.eagerLoadStrategies();
-
+    
     timer = true;
     last = Date.now();
 

@@ -17,7 +17,7 @@ var roomMembershipService = require('./room-membership-service');
 var getMaxTagLength       = require('gitter-web-shared/validation/validate-tag').getMaxTagLength;
 var debug                 = require('debug')('gitter:troupe-service');
 
-var MAX_RAW_TAGS_LENGTH = 100;
+var MAX_RAW_TAGS_LENGTH = 200;
 
 function findByUri(uri, callback) {
   var lcUri = uri.toLowerCase();
@@ -178,7 +178,7 @@ function findOrCreateOneToOneTroupe(userId1, userId2) {
           //
           //   var strategy = new restSerializer.TroupeStrategy({ currentUserId: currentUserId });
           //
-          //   restSerializer.serialize(troupe, strategy, function(err, serializedModel) {
+          //   restSerializer.serializeObject(troupe, strategy, function(err, serializedModel) {
           //     if(err) return logger.error('Error while serializing oneToOne troupe: ' + err, { exception: err });
           //     appEvents.dataChange2(url, 'create', serializedModel);
           //   });

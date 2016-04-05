@@ -1,25 +1,21 @@
 "use strict";
 
-var collections       = require("../../utils/collections");
-var execPreloads      = require('../exec-preloads');
-var TroupeStrategy    = require('./troupe-strategy');
-var leanTroupeDao     = require('../../services/daos/troupe-dao').full;
+var collections    = require("../../utils/collections");
+var TroupeStrategy = require('./troupe-strategy');
+var leanTroupeDao  = require('../../services/daos/troupe-dao').full;
+var Lazy           = require('lazy.js');
 
 function TroupeUriStrategy(options) {
   var troupeStrategy = new TroupeStrategy(options);
   var troupesIndexed;
 
-  this.preload = function(uris, callback) {
-    return leanTroupeDao.findByUris(uris)
+  this.preload = function(uris) {
+    return leanTroupeDao.findByUris(uris.toArray())
       .then(function(troupes) {
         troupesIndexed = collections.indexByProperty(troupes, 'uri');
 
-        return execPreloads([{
-          strategy: troupeStrategy,
-          data: troupes
-        }]);
-      })
-      .nodeify(callback);
+        return troupeStrategy.preload(Lazy(troupes));
+      });
 
   };
 

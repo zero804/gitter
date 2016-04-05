@@ -27,9 +27,10 @@ module.exports = function suggestedOrgsFromRoomList(roomList, uri, currentRoomId
     var existingEntry = _.where(memo, { name: orgName })[0];
     if (!!existingEntry) {
       var index = memo.indexOf(existingEntry);
+      // Aggregate the counts in each org bucket from each room
       memo[index].unreadItems = ((existingEntry.unreadItems || 0) + (room.unreadItems || 0));
       memo[index].mentions    = ((existingEntry.mentions || 0) + (room.mentions || 0));
-      memo[index].activity    = (!!memo[index].activity || (room.lurk && room.activity));
+      memo[index].activity    = ((existingEntry.activity || 0) + (room.activity || 0));
       return memo;
     }
 
@@ -41,7 +42,7 @@ module.exports = function suggestedOrgsFromRoomList(roomList, uri, currentRoomId
   //we shunt the new org to the top of the minibar list JP 8/3/16
   var currentOrg = getOrgNameFromUri(uri);
 
-  if(currentRoom) {
+  if(currentRoom && !currentRoom.oneToOne) {
     var hasCurrentOrg = _.findWhere(orgList, { name: currentOrg });
     //If we are sure that you are viewing an room for an org you have yet to join then
     //we add a temporary org to your org list
