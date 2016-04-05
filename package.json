@@ -265,6 +265,7 @@
     "tap-file": "0.0.2",
     "through2": "^0.6.3",
     "vinyl-paths": "^2.0.0",
+    "vinyl-sourcemaps-apply": "^0.2.1",
     "webpack": "^1.12.10",
     "webpack-dev-middleware": "^1.0.11",
     "zip-stream": "^0.5.1"

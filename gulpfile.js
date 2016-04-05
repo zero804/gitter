@@ -14,11 +14,11 @@ var _ = require('underscore');
 var livereload = require('gulp-livereload');
 var sourcemaps = require('gulp-sourcemaps');
 
-var less = require('less');
 var postcss = require('gulp-postcss');
 var autoprefixer = require('autoprefixer-core');
 var mqpacker = require('css-mqpacker');
 var csswring = require('csswring');
+var styleBuilder = require('./build-scripts/style-builder');
 
 var webpack = require('gulp-webpack');
 var jshint = require('gulp-jshint');
@@ -38,18 +38,11 @@ var lcovMerger = require('lcov-result-merger');
 var sonar = require('gulp-sonar');
 
 var fs = require('fs-extra');
-var readFile = Promise.promisify(fs.readFile);
-var outputFile = Promise.promisify(fs.outputFile);
 var path = require('path');
-var pathUtils = require('./build-scripts/path-parse-format-utils');
 var mkdirp = require('mkdirp');
 var del = require('del');
 var glob = require('glob');
-var chokidar = require('chokidar');
 var url = require('url');
-
-var lessDependencyMapUtils = require('./build-scripts/less-dependency-map-utils.js');
-
 
 
 var getSourceMapUrl = function() {
@@ -73,47 +66,11 @@ var getGulpSourceMapOptions = function(mapsSubDir) {
   return {
     dest: path.relative('./output/assets/js/' + suffix + '/', './output/maps/' + suffix + '/'),
     options: {
-      sourceRoot: path.relative('./output/maps/' + suffix, './output/assets/js/' + suffix ),
+      sourceRoot: path.relative('./output/maps/' + suffix, './output/assets/js/' + suffix),
       sourceMappingURLPrefix: sourceMapUrl,
     }
   };
 };
-
-
-
-
-var getUrlPortionOfParsedUrl = function(parsedUrl) {
-  var urlPortion = (parsedUrl.protocol ? parsedUrl.protocol : '') +
-    (parsedUrl.slashes ? '//' : '') +
-    (parsedUrl.auth ? (parsedUrl.auth + '@') : '') +
-    (parsedUrl.host ? parsedUrl.host : '') +
-    (parsedUrl.port ? (':' + parsedUrl.port) : '');
-
-  if(urlPortion.length > 0) {
-    return urlPortion;
-  }
-
-  return undefined;
-};
-
-var renderLess = function(filePath, lessOpts) {
-  lessOpts = lessOpts || {};
-  return readFile(filePath, 'utf8')
-    .then(function(data) {
-      return less.render(data, lessOpts);
-    });
-};
-
-var renderLessEntryPoints = function(entryPoints, lessOpts) {
-  var renderPromiseMap = {};
-
-  entryPoints.map(function(entryPoint) {
-    renderPromiseMap[entryPoint] = renderLess(entryPoint, lessOpts);
-  });
-
-  return renderPromiseMap;
-};
-
 
 
 var cssDest = 'output/assets/styles';
@@ -122,135 +79,22 @@ var cssWatch = 'public/**/*.less';
 
 
 
-var createLessTask = function(entryPoints, watchGlob, cssDest, options) {
-
-  var defaults = {
-    sourceMapDest: undefined,
-    lessOptions: {},
-    watch: true
-  };
-
-  var lessDefaults = {
-    // see https://github.com/less/less-docs/blob/master/content/usage/programmatic-usage.md
-    sourceMap: {}
-  };
-
-  var opts = _.extend({}, defaults, options);
-  var lessOpts = _.extend({}, lessDefaults, opts.lessOptions);
-  return function() {
-
-    var absoluteEntryPoints = entryPoints.map(function(entryPoint) {
-      return path.resolve(__dirname, entryPoint);
-    });
-
-    var depMap = {};
-    var depMapGeneratedPromise = Promise.all(absoluteEntryPoints.map(function(entryPoint) {
-      var depMapPromise = lessDependencyMapUtils.generateLessDependencyMap(entryPoint, {
-        paths: ['public/less']
-      });
-
-      return depMapPromise
-        .then(function(partialDepMap) {
-          depMap = lessDependencyMapUtils.extendDepMaps(depMap, partialDepMap);
-        });
-    }));
 
 
+gulp.task('asdfdfasafds', function() {
+  var cssWebStyleBuilder = styleBuilder([
+    'public/less/explore.less'
+  ], {
+    dest: cssDest,
+    sourceMapOptions: getGulpSourceMapOptions(),
+    lessOptions: {
+      paths: ['public/less']
+    }
+    // streamTransform: function(stream) { return stream; }
+  });
 
-    var buildEntryPoints = function(entryPoints) {
-      var renderMap = renderLessEntryPoints(entryPoints, lessOpts);
-      return Object.keys(renderMap)
-        .map(function(entryPoint) {
-          var renderPromise = renderMap[entryPoint];
-          var parsedPath = pathUtils.parsePath(entryPoint);
-          var destPathObject = _.extend({}, parsedPath, {
-            ext: '.css',
-            dir: path.resolve(__dirname, cssDest)
-          });
-          var destPath = pathUtils.formatPath(destPathObject);
-
-          return renderPromise
-            .then(function(result) {
-              // TODO sourcemaps
-              var sourceMappingUrlComment = '';
-              var sourceMapOutputPromise = Promise.resolve();
-              if(opts.sourceMapDest && result.map) {
-                var parsedUrlSourceMapDest = url.parse(opts.sourceMapDest);
-                var sourceMapDestUrlPortion = getUrlPortionOfParsedUrl(parsedUrlSourceMapDest);
-                var isLocalPath = !sourceMapDestUrlPortion;
-
-                var sourceMapPathObject = _.extend({}, destPathObject, {
-                  // If local, we have to save right next to the file because we can't do relative paths
-                  // Otherwise save it where they want it because they can link via URL
-                  dir: isLocalPath ? destPathObject.dir : path.resolve(__dirname, parsedUrlSourceMapDest.pathname),
-                  ext: '.css.map'
-                });
-                var sourceMapDest = pathUtils.formatPath(sourceMapPathObject);
-                sourceMapOutputPromise = outputFile(sourceMapDest, result.map);
-
-                var sourceMappingUrl = url.resolve(opts.sourceMapDest, (sourceMapPathObject.name + sourceMapPathObject.ext));
-                if(isLocalPath) {
-                  sourceMappingUrl = path.relative(destPathObject.dir, sourceMapDest);
-                }
-
-                sourceMappingUrlComment = '\n' + '/*# sourceMappingURL=' + sourceMappingUrl + ' */';
-              }
-
-              return Promise.all([
-                outputFile(destPath, result.css + sourceMappingUrlComment),
-                sourceMapOutputPromise
-              ]);
-            })
-            .then(function() {
-              console.log('Saved:', destPath);
-            })
-            .catch(function(err) {
-              console.log('Error rendering:', entryPoint, err, err.stack);
-            });
-        });
-    };
-
-    return depMapGeneratedPromise
-      .then(function() {
-        //console.log('depMap', depMap);
-        console.log('depMap has ' + Object.keys(depMap).length + ' keys.');
-      })
-      .then(function() {
-        // Initially build everything
-        Promise.all(buildEntryPoints(absoluteEntryPoints))
-          .then(function() {
-            if(opts.watch) {
-              console.log('Starting to watch Less');
-              chokidar.watch(watchGlob).on('all', function(e, needleFile) {
-                if(e === 'change') {
-                  console.log(e, needleFile);
-                  var needlePath = path.resolve(__dirname, needleFile);
-
-                  var affectedEntryPoints = lessDependencyMapUtils.getEntryPointsAffectedByFile(
-                    depMap,
-                    absoluteEntryPoints,
-                    needlePath
-                    //'/Users/eric/Documents/github/gitter-webapp/public/js/views/app/headerView.less'
-                    //'/Users/eric/Documents/github/gitter-webapp/public/less/colors.less'
-                  );
-                  console.log('affectedEntryPoints', affectedEntryPoints);
-
-                  Promise.all(buildEntryPoints(affectedEntryPoints));
-                }
-              });
-            }
-          });
-
-
-      });
-
-  };
-};
-
-
-
-
-
+  cssWebStyleBuilder.build();
+});
 
 
 
@@ -591,7 +435,7 @@ gulp.task('copy-asset-files', function() {
 
 
 
-
+/* * /
 var cssIos = function(overrideOpts) {
   overrideOpts = overrideOpts || {};
 
@@ -616,8 +460,10 @@ var cssIos = function(overrideOpts) {
 gulp.task('css-ios', cssIos({
   watch: false
 }));
+/* */
 
 
+/* * /
 var cssMobile = function(overrideOpts) {
   overrideOpts = overrideOpts || {};
 
@@ -645,8 +491,10 @@ var cssMobile = function(overrideOpts) {
 gulp.task('css-mobile', cssMobile({
   watch: false
 }));
+/* */
 
 
+/* * /
 var cssWeb = function(overrideOpts) {
   overrideOpts = overrideOpts || {};
 
@@ -691,6 +539,7 @@ var cssWeb = function(overrideOpts) {
 gulp.task('css-web', cssWeb({
   watch: false
 }));
+/* */
 
 
 gulp.task('css', function() {
@@ -699,8 +548,8 @@ gulp.task('css', function() {
   };
 
   return Promise.all([
-    cssIos(overrideOpts)(),
-    cssMobile(overrideOpts)(),
+    //cssIos(overrideOpts)(),
+    //cssMobile(overrideOpts)(),
     cssWeb(overrideOpts)()
   ]);
 });
@@ -783,9 +632,9 @@ gulp.task('watch', function() {
   //livereload.listen();
   //gulp.watch('public/**/*.less', ['css-web']).on('change', livereload.changed);
   return Promise.all([
-    cssIos()(),
-    cssMobile()(),
-    cssWeb()()
+    //cssIos()(),
+    //cssMobile()(),
+    //cssWeb()()
   ]);
 });
 
