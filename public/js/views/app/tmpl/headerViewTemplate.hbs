@@ -15,32 +15,30 @@
 </div>
 
 
-<div class="chat-header__main-grouping chat-header__topic-grouping">
+<div class="chat-header__main-grouping chat-header__topic-grouping js-room-topic-edit-activator" tabindex="0">
   <div class="chat-header__topic-wrapper">
     {{~#unless oneToOne~}}
-    <p class="js-chat-topic chat-header__topic">{{troupeTopic}}</p>
+    <p class="js-chat-topic chat-header__topic {{when isAdmin 'is-admin' : ''}} {{when shouldShowPlaceholderRoomTopic 'is-new-room' : ''}}">{{troupeTopic}}</p>
     {{~/unless~}}
   </div>
 </div>
 
 
-<div class="chat-header__main-grouping">
+<div class="chat-header__main-grouping chat-header__action-grouping">
   {{#if ownerIsOrg}}
-    <div class="js-org-page chat-header__org-page">
-      <a href="{{orgPageHref}}" title="Navigate to {{orgName}}'s page"  class="chat-header__action-icon org-page-link js-org-page">
-        <i class="chat-header__action-icon icon-globe"></i>
-      </a>
-    </div>
+    <a href="{{orgPageHref}}" class="chat-header__org-page org-page-link js-chat-header-org-page-action" title="More {{orgName}} rooms">
+      <i class="chat-header__action-icon icon-globe"></i>
+    </a>
   {{/if}}
 
   {{#unless archives}}
     {{#if user}}
-      <div class="chat-header__favourite js-favourite-button">
-        <i class="chat-header__action-icon icon-star-empty {{#if troupeFavourite}}favourite{{/if}}"></i>
-      </div>
-      <div class="chat-header__settings js-chat-settings" data-toggle="dropdown">
-        <i class="chat-header__action-icon icon-slider-vertical"></i>
-      </div>
+    <button class="chat-header__favourite js-favourite-button" title="Favourite {{troupeName}}">
+      <i class="chat-header__action-icon icon-star-empty {{#if troupeFavourite}}favourite{{/if}}" aria-hidden="true"></i>
+    </button>
+    <button class="chat-header__settings js-chat-settings" title="Room settings" data-toggle="dropdown">
+       <i class="chat-header__action-icon icon-slider-vertical" aria-hidden="true"></i>
+    </button>
     {{/if}}
   {{/unless}}
 </div>

@@ -10,6 +10,11 @@ var DNDCtrl           = require('../../../../components/menu/room/dnd-controller
 var MinibarCollection = require('../minibar/minibar-collection');
 var context           = require('utils/context');
 var _                 = require('underscore');
+var fastdom           = require('fastdom');
+
+var MINIBAR_ITEM_HEIGHT = 65;
+
+require('nanoscroller');
 
 var MENU_HIDE_DELAY = 200;
 
@@ -43,9 +48,19 @@ module.exports = Marionette.LayoutView.extend({
     }));
   },
 
+  ui: {
+    minibar:     '#minibar',
+    minibarList: '#minibar-list',
+    panel:       '#panel',
+  },
+
   events: {
-    'mouseenter': 'openPanel',
-    'mouseleave': 'closePanel',
+    mouseenter: 'openPanel',
+    mouseleave: 'closePanel',
+  },
+
+  childEvents: {
+    render: 'onChildRender',
   },
 
   initialize: function(attrs) {
@@ -73,7 +88,7 @@ module.exports = Marionette.LayoutView.extend({
     this.delay = MENU_HIDE_DELAY;
 
     //Make a new model
-    this.model = window.model = new RoomMenuModel(_.extend({}, context.getSnapshot('leftMenu'), {
+    this.model = new RoomMenuModel(_.extend({}, context.getSnapshot('leftMenu'), {
       bus:                     this.bus,
       roomCollection:          this.roomCollection,
       orgCollection:           this.orgCollection,
@@ -87,8 +102,10 @@ module.exports = Marionette.LayoutView.extend({
     //Make a new drag & drop control
     this.dndCtrl = new DNDCtrl({ model: this.model });
 
+    window.addEventListener('resize', this._initNano.bind(this));
     this.listenTo(this.dndCtrl, 'dnd:start-drag', this.onDragStart.bind(this));
-    this.listenTo(this.dndCtrl, 'dnd:end-drag', this.onDragEnd.bind(this));
+    this.listenTo(this.dndCtrl, 'dnd:end-drag',   this.onDragEnd.bind(this));
+    this.listenTo(this.bus,     'panel:render',   this.onPanelRender, this);
 
     //this.$el.find('#searc-results').show();
   },
@@ -123,7 +140,42 @@ module.exports = Marionette.LayoutView.extend({
 
   },
 
+  onChildRender: function () {
+    this._initNano();
+  },
+
+  onPanelRender: function () {
+    this._initNano();
+  },
+
+  _initNano: _.debounce(function () {
+    var params = { sliderMaxHeight: 100, iOSNativeScrolling: true };
+    fastdom.mutate(function() {
+
+      //init panel && minibar scrollers
+      this.ui.panel.nanoScroller(params);
+      this.ui.minibar.nanoScroller(params);
+
+      //because of the margins nanoScroller will never show the scroller
+      //so here is some custom logic to work around it
+      var minibarItems       = this.minibar.currentView.collection.length;
+      var minibarItemsHeight = (minibarItems * MINIBAR_ITEM_HEIGHT);
+      fastdom.measure(function() {
+        var minibarContainerHeight = this.ui.minibarList.height();
+        if (minibarItemsHeight > minibarContainerHeight) {
+          fastdom.mutate(function(){
+            //
+            //if the combined height of the minibar items is greater
+            //than the minibar container's height show the scrollbar
+            this.ui.minibar.find('.nano-pane').show();
+          }.bind(this));
+        }
+      }.bind(this));
+    }.bind(this));
+  }, 500),
+
   onDestroy: function() {
+    window.removeEventListener('resize', this._initNano.bind(this));
     this.stopListening(this.dndCtrl);
   },
 
