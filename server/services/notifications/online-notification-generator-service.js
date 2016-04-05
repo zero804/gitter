@@ -17,7 +17,7 @@ function generateChatMessageNotification(troupeId, chatId) {
     .spread(function(chat, troupe) {
       if (!chat) throw new Error('Chat not found');
 
-      return [chat, troupe, userDao.findById(chat.fromUserId, { username: 1, displayName: 1, gravatarVersion: 1 })];
+      return [chat, troupe, userDao.findById(chat.fromUserId, { username: 1, displayName: 1, gravatarImageUrl: 1, gravatarVersion: 1 })];
     })
     .spread(function(chat, troupe, fromUser) {
       var oneToOne = troupe.oneToOne;
@@ -28,14 +28,14 @@ function generateChatMessageNotification(troupeId, chatId) {
           text: chat.text,
           title: fromUser.displayName,
           link: '/' + fromUser.username,
-          icon: resolveUserAvatarUrl({ username: fromUser.username, version: fromUser.gravatarVersion}, 128)
+          icon: resolveUserAvatarUrl(fromUser, 128)
         };
       } else {
         return {
           text: chat.text,
           title: fromUser.displayName + ' @ ' + troupe.uri,
           link: '/' + troupe.uri,
-          icon: resolveUserAvatarUrl({ username: fromUser.username, version: fromUser.gravatarVersion }, 128)
+          icon: resolveUserAvatarUrl(fromUser, 128)
         };
       }
     });
