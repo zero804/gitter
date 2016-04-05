@@ -43,7 +43,8 @@ module.exports = Backbone.Collection.extend({
   },
 
   onCollectionUpdate: function() {
-    this.set(this.getNewCollection(), { merge: true });
+    var newCollection = this.getNewCollection();
+    this.set(newCollection, { merge: true });
   },
 
   onItemRemoved: function() {
