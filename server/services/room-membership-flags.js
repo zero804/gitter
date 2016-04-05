@@ -66,6 +66,8 @@ var MODES = {
 /* Alias modes */
 MODES.mention = MODES.announcement;
 
+var DEFAULT_USER_FLAGS = MODES.all | BITMASK_NOTIFY_DEFAULT;
+
 function getModeFromFlags(flags, strict) {
   switch(flags & BITMASK_MODE) {
     case MODES.all:
@@ -206,6 +208,7 @@ function hashToFlags(hash) {
 
 module.exports = {
   MODES: MODES,
+  DEFAULT_USER_FLAGS: DEFAULT_USER_FLAGS, 
 
   FLAG_POS_NOTIFY_UNREAD: FLAG_POS_NOTIFY_UNREAD,
   FLAG_POS_NOTIFY_ACTIVITY: FLAG_POS_NOTIFY_ACTIVITY,

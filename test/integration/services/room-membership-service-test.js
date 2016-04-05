@@ -41,93 +41,115 @@ describe('room-membership-service', function() {
 
     after(function() { fixture.cleanup(); });
 
-    it('should add a single user to a room', function() {
-      var troupeId3 = fixture.troupe3._id;
-      var userId1 = fixture.user1._id;
+    describe('addRoomMember', function() {
+      beforeEach(function() {
+        return roomMembershipService.removeRoomMembers(fixture.troupe3._id, [
+          fixture.user1.id,
+          fixture.user2.id,
+          fixture.user3.id]);
+      });
 
-      return roomMembershipService.addRoomMember(troupeId3, userId1)
-        .then(function() {
-          return roomMembershipService.countMembersInRoom(troupeId3);
-        })
-        .then(function(count) {
-          assert.strictEqual(count, 1);
-          return roomMembershipService.findMembersForRoom(troupeId3);
-        })
-        .then(function(members) {
-          assert.deepEqual(members, [userId1]);
+      it('should add a single user to a room', function() {
+        var troupeId3 = fixture.troupe3._id;
+        var userId1 = fixture.user1._id;
+        var flags = roomMembershipFlags.MODES.all;
 
-          return roomMembershipService.findRoomIdsForUser(userId1);
-        })
-        .then(function(roomIds) {
-          assert(roomIds.length >= 1);
-          assert(roomIds.some(mongoIdEqualPredicate(troupeId3)));
+        return roomMembershipService.addRoomMember(troupeId3, userId1, flags)
+          .then(function() {
+            return roomMembershipService.countMembersInRoom(troupeId3);
+          })
+          .then(function(count) {
+            assert.strictEqual(count, 1);
+            return roomMembershipService.findMembersForRoom(troupeId3);
+          })
+          .then(function(members) {
+            assert.deepEqual(members, [userId1]);
 
-          return persistence.TroupeUser.findOne({ troupeId: troupeId3, userId: userId1 }).exec();
-        })
-        .then(function(troupeUser) {
-          assert.strictEqual(troupeUser.lurk, false);
-          assert.strictEqual(Number(troupeUser.flags).toString(2), "1111101");
-        });
+            return roomMembershipService.findRoomIdsForUser(userId1);
+          })
+          .then(function(roomIds) {
+            assert(roomIds.length >= 1);
+            assert(roomIds.some(mongoIdEqualPredicate(troupeId3)));
+
+            return persistence.TroupeUser.findOne({ troupeId: troupeId3, userId: userId1 }).exec();
+          })
+          .then(function(troupeUser) {
+            assert.strictEqual(troupeUser.lurk, false);
+            assert.strictEqual(troupeUser.flags, flags);
+          });
+      });
+
+      it('should handle different flags', function() {
+        var troupeId3 = fixture.troupe3._id;
+        var userId1 = fixture.user1._id;
+        var userId2 = fixture.user2._id;
+        var userId3 = fixture.user3._id;
+
+        return Promise.join(
+          roomMembershipService.addRoomMember(troupeId3, userId1, roomMembershipFlags.MODES.all),
+          roomMembershipService.addRoomMember(troupeId3, userId2, roomMembershipFlags.MODES.announcement),
+          roomMembershipService.addRoomMember(troupeId3, userId3, roomMembershipFlags.MODES.mute))
+          .then(function() {
+            return roomMembershipService.findMembersForRoomWithLurk(troupeId3);
+          })
+          .then(function(result) {
+            var expected = {};
+            expected[userId1] = false;
+            expected[userId2] = false;
+            expected[userId3] = true;
+            assert.deepEqual(result, expected);
+
+            return roomMembershipService.getMembershipDetails(userId1, troupeId3);
+          })
+          .then(function(result) {
+            assert.strictEqual(result.flags, roomMembershipFlags.MODES.all);
+            return roomMembershipService.getMembershipDetails(userId2, troupeId3);
+          })
+          .then(function(result) {
+            assert.strictEqual(result.flags, roomMembershipFlags.MODES.announcement);
+            return roomMembershipService.getMembershipDetails(userId3, troupeId3);
+          })
+          .then(function(result) {
+            assert.strictEqual(result.flags, roomMembershipFlags.MODES.mute);
+          });
+      });
+
     });
 
-    it('should allow users to be added to a room', function() {
-      return roomMembershipService.addRoomMembers(fixture.troupe1.id, [fixture.user1.id])
-        .then(function(userIds) {
-          assert.strictEqual(userIds.length, 1);
-          assert.strictEqual(userIds[0], fixture.user1.id);
-          return roomMembershipService.countMembersInRoom(fixture.troupe1.id);
-        })
-        .then(function(count) {
-          assert.strictEqual(count, 1);
-          return roomMembershipService.checkRoomMembership(fixture.troupe1.id, fixture.user1.id);
-        })
-        .then(function(member) {
-          assert(member);
-          return persistence.Troupe.findById(fixture.troupe1.id).exec();
-        })
-        .then(function(troupe) {
-          assert.strictEqual(troupe.userCount, 1);
-          return persistence.TroupeUser.findOne({ troupeId: fixture.troupe1.id, userId: fixture.user1.id }).exec();
-        })
-        .then(function(troupeUser) {
-          assert.strictEqual(troupeUser.lurk, false);
-          assert.strictEqual(Number(troupeUser.flags).toString(2), "1111101");
+    describe('removeRoomMembers', function() {
+      it('should allow users to be removed from a room', function() {
+        var flags = roomMembershipFlags.MODES.all;
 
-          return roomMembershipService.checkRoomMembership(fixture.troupe1.id, fixture.user2.id);
-        })
-        .then(function(member) {
-          assert(!member);
-        });
-    });
+        return Promise.join(
+          roomMembershipService.addRoomMember(fixture.troupe2.id, fixture.user1.id, flags),
+          roomMembershipService.addRoomMember(fixture.troupe2.id, fixture.user2.id, flags))
+          .then(function() {
+            return persistence.Troupe.findById(fixture.troupe2.id).exec();
+          })
+          .then(function(troupe) {
+            assert.strictEqual(troupe.userCount, 2);
+            return roomMembershipService.removeRoomMembers(fixture.troupe2.id, [fixture.user1.id]);
+          })
+          .then(function() {
+            return roomMembershipService.countMembersInRoom(fixture.troupe2.id);
+          })
+          .then(function(count) {
+            assert.strictEqual(count, 1);
+            return persistence.Troupe.findById(fixture.troupe2.id).exec();
+          })
+          .then(function(troupe) {
+            assert.strictEqual(troupe.userCount, 1);
 
-    it('should allow users to be removed from a room', function() {
-      return roomMembershipService.addRoomMembers(fixture.troupe2.id, [fixture.user1.id, fixture.user2.id])
-        .then(function() {
-          return persistence.Troupe.findById(fixture.troupe2.id).exec();
-        })
-        .then(function(troupe) {
-          assert.strictEqual(troupe.userCount, 2);
-          return roomMembershipService.removeRoomMembers(fixture.troupe2.id, [fixture.user1.id]);
-        })
-        .then(function() {
-          return roomMembershipService.countMembersInRoom(fixture.troupe2.id);
-        })
-        .then(function(count) {
-          assert.strictEqual(count, 1);
-          return persistence.Troupe.findById(fixture.troupe2.id).exec();
-        })
-        .then(function(troupe) {
-          assert.strictEqual(troupe.userCount, 1);
-
-          return roomMembershipService.checkRoomMembership(fixture.troupe2.id, fixture.user2.id);
-        })
-        .then(function(member) {
-          assert(member);
-          return roomMembershipService.checkRoomMembership(fixture.troupe2.id, fixture.user1.id);
-        })
-        .then(function(member) {
-          assert(!member);
-        });
+            return roomMembershipService.checkRoomMembership(fixture.troupe2.id, fixture.user2.id);
+          })
+          .then(function(member) {
+            assert(member);
+            return roomMembershipService.checkRoomMembership(fixture.troupe2.id, fixture.user1.id);
+          })
+          .then(function(member) {
+            assert(!member);
+          });
+      });
     });
 
     describe('membership modes', function() {
@@ -149,7 +171,7 @@ describe('room-membership-service', function() {
         return roomMembershipService.removeRoomMember(troupeId2, userId1)
           .bind(this)
           .then(function() {
-            return roomMembershipService.addRoomMembers(troupeId2, [userId1]);
+            return roomMembershipService.addRoomMember(troupeId2, userId1, roomMembershipFlags.MODES.all);
           })
           .then(function() {
             return roomMembershipService.setMembershipMode(userId1, troupeId2, 'mute');
@@ -191,7 +213,7 @@ describe('room-membership-service', function() {
         return roomMembershipService.removeRoomMember(troupeId2, userId1)
           .bind(this)
           .then(function() {
-            return roomMembershipService.addRoomMembers(troupeId2, [userId1]);
+            return roomMembershipService.addRoomMember(troupeId2, userId1, roomMembershipFlags.MODES.all);
           })
           .then(function() {
             return roomMembershipService.setMembershipMode(userId1, troupeId2, 'announcement');
@@ -256,7 +278,7 @@ describe('room-membership-service', function() {
           })
           .then(function(lurking) {
             assert.strictEqual(lurking, true);
-          })
+          });
 
       });
 
@@ -267,7 +289,7 @@ describe('room-membership-service', function() {
         return roomMembershipService.removeRoomMember(troupeId2, userId1)
           .bind(this)
           .then(function() {
-            return roomMembershipService.addRoomMembers(troupeId2, [userId1]);
+            return roomMembershipService.addRoomMember(troupeId2, userId1, roomMembershipFlags.MODES.all);
           })
           .then(function() {
             return roomMembershipService.setMembershipMode(userId1, troupeId2, 'all');
@@ -307,7 +329,7 @@ describe('room-membership-service', function() {
         return roomMembershipService.removeRoomMember(troupeId2, userId1)
           .bind(this)
           .then(function() {
-            return roomMembershipService.addRoomMembers(troupeId2, [userId1]);
+            return roomMembershipService.addRoomMember(troupeId2, userId1, roomMembershipFlags.MODES.all);
           })
           .then(function() {
             return roomMembershipService.setMembershipMode(userId1, troupeId2, 'all');
@@ -381,25 +403,31 @@ describe('room-membership-service', function() {
       });
     });
 
-    it('findMembersForRoom should handle skip and limit', function() {
-      var troupeId2 = fixture.troupe2.id;
-      var userId1 = fixture.user1.id;
-      var userId2 = fixture.user2.id;
+    describe('findMembersForRoom', function() {
+      it('findMembersForRoom should handle skip and limit', function() {
+        var troupeId2 = fixture.troupe2.id;
+        var userId1 = fixture.user1.id;
+        var userId2 = fixture.user2.id;
 
-      return roomMembershipService.addRoomMembers(troupeId2, [userId1, userId2])
-        .then(function() {
-          return Promise.join(
-            roomMembershipService.findMembersForRoom(troupeId2, { limit: 1 }),
-            roomMembershipService.findMembersForRoom(troupeId2, { skip: 1, limit: 1 }),
-            function(find1, find2) {
-              assert.strictEqual(find1.length, 1);
-              assert.strictEqual(find2.length, 1);
+        var flags = roomMembershipFlags.MODES.all;
 
-              assert(find1.some(mongoIdEqualPredicate(userId1)) || find2.some(mongoIdEqualPredicate(userId1)));
-              assert(find1.some(mongoIdEqualPredicate(userId2)) || find2.some(mongoIdEqualPredicate(userId2)));
-            });
-        });
+        return Promise.join(
+          roomMembershipService.addRoomMember(troupeId2, userId1, flags),
+          roomMembershipService.addRoomMember(troupeId2, userId2, flags))
+          .then(function() {
+            return Promise.join(
+              roomMembershipService.findMembersForRoom(troupeId2, { limit: 1 }),
+              roomMembershipService.findMembersForRoom(troupeId2, { skip: 1, limit: 1 }),
+              function(find1, find2) {
+                assert.strictEqual(find1.length, 1);
+                assert.strictEqual(find2.length, 1);
 
+                assert(find1.some(mongoIdEqualPredicate(userId1)) || find2.some(mongoIdEqualPredicate(userId1)));
+                assert(find1.some(mongoIdEqualPredicate(userId2)) || find2.some(mongoIdEqualPredicate(userId2)));
+              });
+          });
+
+      });      
     });
 
     describe('findRoomIdsForUserWithLurk', function() {
@@ -409,15 +437,11 @@ describe('room-membership-service', function() {
         var userId2 = fixture.user2.id;
         var userId3 = fixture.user3.id;
 
-        return roomMembershipService.addRoomMembers(troupeId2, [userId1, userId2, userId3])
+        return Promise.join(
+          roomMembershipService.addRoomMember(troupeId2, userId1, roomMembershipFlags.MODES.all),
+          roomMembershipService.addRoomMember(troupeId2, userId2, roomMembershipFlags.MODES.announcement),
+          roomMembershipService.addRoomMember(troupeId2, userId3, roomMembershipFlags.MODES.mute))
           .then(function() {
-            return [
-              roomMembershipService.setMembershipMode(userId1, troupeId2, 'all'),
-              roomMembershipService.setMembershipMode(userId2, troupeId2, 'mention'),
-              roomMembershipService.setMembershipMode(userId3, troupeId2, 'mute')
-            ];
-          })
-          .spread(function() {
             return roomMembershipService.findRoomIdsForUserWithLurk(userId1);
           })
           .then(function(result) {
@@ -460,7 +484,7 @@ describe('room-membership-service', function() {
         return roomMembershipService.removeRoomMember(troupeId, userId)
           .then(function() {
             roomMembershipService.events.on('members.added', listener);
-            return roomMembershipService.addRoomMember(troupeId, userId);
+            return roomMembershipService.addRoomMember(troupeId, userId, roomMembershipFlags.MODES.all);
           })
           .then(function(result) {
             assert.strictEqual(result, true);
@@ -481,10 +505,10 @@ describe('room-membership-service', function() {
           called++;
         }
 
-        return roomMembershipService.addRoomMember(troupeId, userId)
+        return roomMembershipService.addRoomMember(troupeId, userId, roomMembershipFlags.MODES.all)
           .then(function() {
             roomMembershipService.events.on('members.added', listener);
-            return roomMembershipService.addRoomMember(troupeId, userId);
+            return roomMembershipService.addRoomMember(troupeId, userId, roomMembershipFlags.MODES.all);
           })
           .then(function(result) {
             assert.strictEqual(result, false);
@@ -505,7 +529,7 @@ describe('room-membership-service', function() {
 
         return Promise.join(
             roomMembershipService.removeRoomMember(troupeId1, userId),
-            roomMembershipService.addRoomMember(troupeId2, userId),
+            roomMembershipService.addRoomMember(troupeId2, userId, roomMembershipFlags.MODES.all),
             function() {
               return roomMembershipService.findUserMembershipInRooms(userId, [troupeId1, troupeId2]);
             })
@@ -525,7 +549,7 @@ describe('room-membership-service', function() {
 
         return Promise.join(
             roomMembershipService.removeRoomMember(troupeId, userId1),
-            roomMembershipService.addRoomMember(troupeId, userId2),
+            roomMembershipService.addRoomMember(troupeId, userId2, roomMembershipFlags.MODES.all),
             function() {
               return roomMembershipService.findMembershipForUsersInRoom(troupeId, [userId1, userId2]);
             })
@@ -546,8 +570,8 @@ describe('room-membership-service', function() {
 
         return Promise.join(
             roomMembershipService.removeRoomMember(troupeId, userId1),
-            roomMembershipService.addRoomMember(troupeId, userId2),
-            roomMembershipService.addRoomMember(troupeId, userId3),
+            roomMembershipService.addRoomMember(troupeId, userId2, roomMembershipFlags.MODES.all),
+            roomMembershipService.addRoomMember(troupeId, userId3, roomMembershipFlags.MODES.all),
             function() {
               return [
                 roomMembershipService.setMembershipMode(userId2, troupeId, 'all'),
@@ -579,7 +603,7 @@ describe('room-membership-service', function() {
           called++;
         }
 
-        return roomMembershipService.addRoomMember(troupeId, userId)
+        return roomMembershipService.addRoomMember(troupeId, userId, roomMembershipFlags.MODES.all)
           .then(function() {
             roomMembershipService.events.on('members.removed', listener);
 
@@ -632,9 +656,9 @@ describe('room-membership-service', function() {
         return Promise.join(
             roomMembershipService.removeRoomMember(troupeId1, userId3),
             roomMembershipService.removeRoomMember(troupeId2, userId3),
-            roomMembershipService.addRoomMember(troupeId1, userId1),
-            roomMembershipService.addRoomMember(troupeId1, userId2),
-            roomMembershipService.addRoomMember(troupeId2, userId1),
+            roomMembershipService.addRoomMember(troupeId1, userId1, roomMembershipFlags.MODES.all),
+            roomMembershipService.addRoomMember(troupeId1, userId2, roomMembershipFlags.MODES.announcement),
+            roomMembershipService.addRoomMember(troupeId2, userId1, roomMembershipFlags.MODES.mute),
             function() {
               return roomMembershipService.findAllMembersForRooms([troupeId1, troupeId2]);
             })
@@ -658,9 +682,9 @@ describe('room-membership-service', function() {
         return Promise.join(
             roomMembershipService.removeRoomMember(troupeId1, userId3),
             roomMembershipService.removeRoomMember(troupeId2, userId3),
-            roomMembershipService.addRoomMember(troupeId1, userId1),
-            roomMembershipService.addRoomMember(troupeId1, userId2),
-            roomMembershipService.addRoomMember(troupeId2, userId1),
+            roomMembershipService.addRoomMember(troupeId1, userId1, roomMembershipFlags.MODES.all),
+            roomMembershipService.addRoomMember(troupeId1, userId2, roomMembershipFlags.MODES.announcement),
+            roomMembershipService.addRoomMember(troupeId2, userId1, roomMembershipFlags.MODES.mute),
             roomMembershipService.removeRoomMember(troupeId2, userId2),
             function() {
               return roomMembershipService.findMembersForRoomMulti([troupeId1, troupeId2]);
@@ -691,8 +715,8 @@ describe('room-membership-service', function() {
         var userId2 = fixture.user2.id;
 
         return Promise.join(
-            roomMembershipService.addRoomMember(troupeId1, userId1),
-            roomMembershipService.addRoomMember(troupeId1, userId2),
+            roomMembershipService.addRoomMember(troupeId1, userId1, roomMembershipFlags.MODES.mute),
+            roomMembershipService.addRoomMember(troupeId1, userId2, roomMembershipFlags.MODES.mute),
             function() {
               return roomMembershipService.setMembershipModeForUsersInRoom(troupeId1, [userId1, userId2], 'all');
             })
@@ -772,9 +796,9 @@ describe('room-membership-service', function() {
         userId3 = fixture.user3._id;
 
         return Promise.join(
-            roomMembershipService.addRoomMember(troupeId1, userId1),
-            roomMembershipService.addRoomMember(troupeId1, userId2),
-            roomMembershipService.addRoomMember(troupeId1, userId3),
+            roomMembershipService.addRoomMember(troupeId1, userId1, roomMembershipFlags.MODES.all),
+            roomMembershipService.addRoomMember(troupeId1, userId2, roomMembershipFlags.MODES.announcement),
+            roomMembershipService.addRoomMember(troupeId1, userId3, roomMembershipFlags.MODES.mute),
           function() {
             return Promise.join(
               roomMembershipService.setMembershipModeForUsersInRoom(troupeId1, [userId1], 'all'),
