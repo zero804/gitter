@@ -36,7 +36,7 @@ describe.skip('MinibarView', function() {
     el.appendChild(innerEl3);
 
     closeBtn = document.createElement('div');
-    closeBtn.id = 'menu-close-button';
+    closeBtn.id = 'menu-toggle-button';
     innerEl3.appendChild(closeBtn);
 
     model = new Backbone.Model({
@@ -143,7 +143,7 @@ describe.skip('MinibarView', function() {
 
   it('should change the roomMenuIsPinned when the close button is clicked', function() {
     miniBar.model.set('roomMenuIsPinned', true);
-    miniBar.$el.find('#menu-close-button').click();
+    miniBar.$el.find('#menu-toggle-button').click();
     assert.ok(!miniBar.model.get('roomMenuIsPinned'));
   });
 
