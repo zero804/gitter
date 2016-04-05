@@ -34,7 +34,7 @@ function googleOauth2Callback(req, accessToken, refreshToken, params, profile, d
     .spread(function(_user, isNewUser) {
       user = _user;
 
-      trackSignupOrLogin(req, user, isNewUser);
+      trackSignupOrLogin(req, user, isNewUser, 'google');
       updateUserLocale(req, user);
 
       return Promise.fromCallback(function(callback) {
