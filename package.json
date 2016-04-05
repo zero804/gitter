@@ -177,7 +177,6 @@
     "fuzzysearch": "^1.0.3",
     "gitter-handlebars-loader": "^1.2.0",
     "gitter-styleguide": "^1.6.4",
-    "glob": "^6.0.4",
     "gulp": "^3.8.11",
     "gulp-coveralls": "^0.1.4",
     "gulp-debug": "^2.1.2",
