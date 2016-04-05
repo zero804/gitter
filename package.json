@@ -37,7 +37,7 @@
     "gitter-passport-oauth2": "^1.1.2-b",
     "gitter-realtime-client": "^1.1.0",
     "gitter-redis-scripto": "^0.2.2",
-    "gitter-services": "git+https://github.com/gitterHQ/services.git#1.16.0",
+    "gitter-services": "git+https://github.com/gitterHQ/services.git#1.17.0",
     "gitter-web-appevents": "file:modules/appevents",
     "gitter-web-cache-wrapper": "file:modules/cache-wrapper",
     "gitter-web-env": "file:modules/env",
@@ -276,7 +276,7 @@
   "main": "web.js",
   "scripts": {
     "start": "nodemon web.js",
-    "dev": "concurrently --raw 'npm run start' 'gulp watch'",
+    "dev": "concurrently --raw \"npm run start\" \"gulp watch\"",
     "test": "gulp localtest",
     "link": "linklocal link -r",
     "unlink": "linklocal unlink -r",

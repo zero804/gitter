@@ -34,12 +34,8 @@
         {{/each}}
 
         <li data-state-change="close" id="minibar-close"  class="room-menu-options__item--close {{#if roomMenuIsPinned}}left{{/if}}">
-          <button id="menu-close-button" class="room-menu-options__item-button menu-close-button" title="Close">
-            <div class="close-icon">
-              <div class="close-icon-stay"></div>
-              <div class="close-icon-stay"></div>
-              <div class="close-icon-stay"></div>
-            </div>
+          <button id="menu-toggle-button" class="room-menu-options__item-button menu-toggle-button" title="Toggle left menu">
+            {{> pinned-hamburger-menu-icon }}
           </button>
         </li>
 
@@ -49,7 +45,7 @@
       <section class="room-menu__panel {{#if roomMenuIsPinned}}active loading{{/if}}">
         <header class="panel-header" id="panel-header"></header>
         <div id="profile-menu"></div>
-        <div class="nano">
+        <div id="panel" class="nano">
           {{! JP 5/1/15
               NANO SCROLLER DOES SUPER WEIRD THINGS WITH Z-INDEXES SO THE FOOTER COMES FIRST }}
           <footer id="panel-footer" class="panel-footer-container"></footer>

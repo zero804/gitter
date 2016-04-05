@@ -11,7 +11,14 @@ function generateResponse(userId, troupeId) {
       return {
         push: details.mode, // REMOVE THIS
         mode: details.mode,
-        lurk: details.lurk // ALSO deprecated
+        lurk: details.lurk, // ALSO deprecated
+
+        unread: details.unread,
+        activity: details.activity,
+        mention: details.mention,
+        announcement: details.announcement,
+        desktop: details.desktop,
+        mobile: details.mobile
       };
     });
 

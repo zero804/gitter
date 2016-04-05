@@ -31,10 +31,14 @@ module.exports =  BaseCollectionView.extend({
   },
 
   initialize: function(attrs) {
-    this.roomMenuModel  = attrs.roomMenuModel;
-    this.roomCollection = attrs.roomCollection;
+    this.roomMenuModel       = attrs.roomMenuModel;
+    this.roomCollection      = attrs.roomCollection;
+    this.primaryCollection   = attrs.primaryCollection;
+    this.secondaryCollection = attrs.secondaryCollection;
+
     this.listenTo(this.roomMenuModel, 'change:searchTerm', this.setActive, this);
     this.listenTo(this.collection, 'filter-complete', this.render, this);
+
     BaseCollectionView.prototype.initialize.apply(this, arguments);
   },
 
@@ -44,6 +48,16 @@ module.exports =  BaseCollectionView.extend({
         return EmptySearchView;
       default:
         return Marionette.ItemView.extend({ template: false });
+    }
+  },
+
+  filter: function (model, index){
+    switch(this.roomMenuModel.get('state')) {
+      case 'search':
+        return (index <= 5);
+      default:
+        return  !this.primaryCollection.get(model.get('id')) &&
+                !this.secondaryCollection.get(model.get('id'));
     }
   },
 
