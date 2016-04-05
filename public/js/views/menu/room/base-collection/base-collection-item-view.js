@@ -6,6 +6,7 @@ var context     = require('utils/context');
 var toggleClass = require('utils/toggle-class');
 var template    = require('./base-collection-item-view.hbs');
 var updateUnreadIndicatorClassState = require('../../../../components/menu/update-unread-indicator-class-state');
+var toggleClass = require('utils/toggle-class');
 
 module.exports = Marionette.ItemView.extend({
 
