@@ -1471,7 +1471,7 @@ describe('room-service', function() {
 
         it('should remove user from the room if lurking', function() {
           // Set user as lurking
-          return userRoomNotificationService.updateSettingForUserRoom(fixture.userFavourite.id, fixture.troupeCanRemove.id, 'mention')
+          return userRoomNotificationService.updateSettingForUserRoom(fixture.userFavourite.id, fixture.troupeCanRemove.id, 'mute')
             .then(function() { // Get updated troupe
               return troupeService.findById(fixture.troupeCanRemove.id);
             })
