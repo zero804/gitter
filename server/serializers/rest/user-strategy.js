@@ -1,38 +1,36 @@
 /* jshint maxcomplexity:18 */
 "use strict";
 
-var troupeService     = require("../../services/troupe-service");
-var presenceService   = require("gitter-web-presence");
-var Promise           = require('bluebird');
-var winston           = require('../../utils/winston');
-var collections       = require("../../utils/collections");
+var troupeService            = require("../../services/troupe-service");
+var presenceService          = require("gitter-web-presence");
+var Promise                  = require('bluebird');
+var winston                  = require('../../utils/winston');
+var collections              = require("../../utils/collections");
 var GithubContributorService = require('gitter-web-github').GitHubContributorService;
-var execPreloads      = require('../exec-preloads');
-var getVersion        = require('../get-model-version');
-var billingService    = require('../../services/billing-service');
-var leanUserDao       = require('../../services/daos/user-dao').full;
-var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-url');
+var Promise                  = require('bluebird');
+var getVersion               = require('../get-model-version');
+var billingService           = require('../../services/billing-service');
+var leanUserDao              = require('../../services/daos/user-dao').full;
+var resolveUserAvatarUrl     = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 
 function UserPremiumStatusStrategy() {
   var usersWithPlans;
 
-  this.preload = function(userIds, callback) {
-    return billingService.findActivePersonalPlansForUsers(userIds)
+  this.preload = function(userIds) {
+    return billingService.findActivePersonalPlansForUsers(userIds.toArray())
       .then(function(subscriptions) {
         usersWithPlans = subscriptions.reduce(function(memo, s) {
           memo[s.userId] = true;
           return memo;
         }, {});
-
-        return true;
-      })
-      .nodeify(callback);
+      });
   };
 
   this.map = function(userId) {
     return usersWithPlans[userId];
   };
 }
+
 UserPremiumStatusStrategy.prototype = {
   name: 'UserPremiumStatusStrategy'
 };
@@ -41,16 +39,18 @@ function UserRoleInTroupeStrategy(options) {
   var contributors;
   var ownerLogin;
 
-  this.preload = function(unused, callback) {
+  this.preload = function() {
     return Promise.try(function() {
         if(options.includeRolesForTroupe) return options.includeRolesForTroupe;
 
         if(options.includeRolesForTroupeId) {
+          // TODO: don't do this
           return troupeService.findById(options.includeRolesForTroupeId);
         }
       })
       .then(function(troupe) {
         if(!troupe) return;
+
         /* Only works for repos */
         if(troupe.githubType !== 'REPO') return;
         var userPromise;
@@ -91,14 +91,14 @@ function UserRoleInTroupeStrategy(options) {
         // Temporary stop-gap solution until we can figure out
         // who the admins are
         contributors[ownerLogin] = 'admin';
-      })
-      .nodeify(callback);
+      });
   };
 
   this.map = function(username) {
     return contributors && contributors[username];
   };
 }
+
 UserRoleInTroupeStrategy.prototype = {
   name: 'UserRoleInTroupeStrategy'
 };
@@ -106,12 +106,11 @@ UserRoleInTroupeStrategy.prototype = {
 function UserPresenceInTroupeStrategy(troupeId) {
   var onlineUsers;
 
-  this.preload = function(unused, callback) {
-    presenceService.findOnlineUsersForTroupe(troupeId, function(err, result) {
-      if(err) return callback(err);
-      onlineUsers = collections.hashArray(result);
-      callback(null, true);
-    });
+  this.preload = function() {
+    return presenceService.findOnlineUsersForTroupe(troupeId)
+      .then(function(result) {
+        onlineUsers = collections.hashArray(result);
+      });
   };
 
   this.map = function(userId) {
@@ -129,31 +128,23 @@ function UserStrategy(options) {
   var userPresenceInTroupeStrategy = options.showPresenceForTroupeId ? new UserPresenceInTroupeStrategy(options.showPresenceForTroupeId) : null;
   var userPremiumStatusStrategy = options.showPremiumStatus ? new UserPremiumStatusStrategy() : null;
 
-  this.preload = function(users, callback) {
+  this.preload = function(users) {
     var strategies = [];
 
     if(userRoleInTroupeStrategy) {
-      strategies.push({
-        strategy: userRoleInTroupeStrategy,
-        data: null
-      });
+      strategies.push(userRoleInTroupeStrategy.preload());
     }
 
     if(userPresenceInTroupeStrategy) {
-      strategies.push({
-        strategy: userPresenceInTroupeStrategy,
-        data: null
-      });
+      strategies.push(userPresenceInTroupeStrategy.preload());
     }
 
     if(userPremiumStatusStrategy) {
-      strategies.push({
-        strategy: userPremiumStatusStrategy,
-        data: users.map(function(user) { return user.id; })
-      });
+      var userIds = users.map(function(user) { return user.id; });
+      strategies.push(userPremiumStatusStrategy.preload(userIds));
     }
 
-    execPreloads(strategies, callback);
+    return Promise.all(strategies);
   };
 
   this.map = function(user) {
@@ -224,6 +215,7 @@ function UserStrategy(options) {
     return obj;
   };
 }
+
 UserStrategy.prototype = {
   name: 'UserStrategy'
 };

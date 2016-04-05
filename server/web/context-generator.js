@@ -119,7 +119,7 @@ function serializeUser(user) {
     showPremiumStatus: true
   });
 
-  return restSerializer.serialize(user, strategy);
+  return restSerializer.serializeObject(user, strategy);
 }
 
 function serializeTroupeId(troupeId, user) {
@@ -130,7 +130,7 @@ function serializeTroupeId(troupeId, user) {
     includeOwner: true
   });
 
-  return restSerializer.serialize(troupeId, strategy);
+  return restSerializer.serializeObject(troupeId, strategy);
 }
 
 
@@ -142,7 +142,7 @@ function serializeTroupe(troupe, user) {
     includeOwner: true
   });
 
-  return restSerializer.serialize(troupe, strategy);
+  return restSerializer.serializeObject(troupe, strategy);
 }
 
 function createTroupeContext(req, options) {
