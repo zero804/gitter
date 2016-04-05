@@ -59,7 +59,9 @@ describe('troupe-service', function() {
       var userActualTags = ['hey', 'there', 'foo:bar'];
 
       return troupeService.updateTags(fixture.userStaff, fixture.troupeWithReservedTags, fixtureTags)
-        .then(troupeService.updateTags(fixture.user1, fixture.troupeWithReservedTags, userTags))
+        .then(function() {
+          return troupeService.updateTags(fixture.user1, fixture.troupeWithReservedTags, userTags);
+        })
         .then(function(troupe) {
           assert.deepEqual(troupe.tags.toObject(), userActualTags);
         });
