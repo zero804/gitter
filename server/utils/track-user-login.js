@@ -8,7 +8,7 @@ var emailAddressService = require('../services/email-address-service');
 var useragentTagger = require('../utils/user-agent-tagger');
 
 // Use this whenever a user logs in again
-module.exports = function trackUserLogin(req, user) {
+module.exports = function trackUserLogin(req, user, provider) {
   emailAddressService(user)
     .then(function(email) {
       var properties = useragentTagger(req.headers['user-agent']);
@@ -20,7 +20,7 @@ module.exports = function trackUserLogin(req, user) {
       // NOTE: other stats calls also pass in source and googleAnalyticsUniqueId
       stats.event("user_login", _.extend({
         userId: user.id,
-        method: 'github_oauth',
+        method: provider + '_oauth',
         username: user.username
       }, properties));
     });

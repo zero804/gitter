@@ -32,7 +32,7 @@ function twitterOauthCallback(req, token, tokenSecret, profile, done) {
     .spread(function(_user, isNewUser) {
       user = _user;
 
-      trackSignupOrLogin(req, user, isNewUser);
+      trackSignupOrLogin(req, user, isNewUser, 'twitter');
       updateUserLocale(req, user);
 
       return Promise.fromCallback(function(callback) {
