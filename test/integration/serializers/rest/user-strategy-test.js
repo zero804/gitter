@@ -1,9 +1,8 @@
 'use strict';
 
 var testRequire = require('../../test-require');
-
 var fixtureLoader = require('../../test-fixtures');
-var assertUtils = testRequire('./utils/assert-utils')
+var assertUtils = require('../../assert-utils')
 var serialize = testRequire('./serializers/serialize');
 var UserStrategy = testRequire('./serializers/rest/user-strategy');
 var UserIdStrategy = testRequire('./serializers/rest/user-id-strategy');

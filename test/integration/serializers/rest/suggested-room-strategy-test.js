@@ -2,7 +2,7 @@
 
 var testRequire = require('../../test-require');
 var fixtureLoader = require('../../test-fixtures');
-var assertUtils = testRequire('./utils/assert-utils')
+var assertUtils = require('../../assert-utils')
 var serialize = testRequire('./serializers/serialize');
 var SuggestedRoomStrategy = testRequire('./serializers/rest/suggested-room-strategy');
 
