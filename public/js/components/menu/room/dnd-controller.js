@@ -75,7 +75,6 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
   },
 
   onMouseUp: function (){
-    window.removeEventListener('mouseup', this.onMouseUp);
     this.onDragEnd();
   },
 
