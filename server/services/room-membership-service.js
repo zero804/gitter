@@ -385,12 +385,37 @@ function resetTroupeUserCount(troupeId) {
     });
 }
 
-var getMembershipMode = Promise.method(function (userId, troupeId) {
+var getMembershipMode = Promise.method(function (userId, troupeId, strict) {
   return TroupeUser.findOne({ troupeId: troupeId, userId: userId }, { flags: 1, _id: 0 }, { lean: true })
     .exec()
     .then(function(troupeUser) {
        if (!troupeUser) return null;
-       return roomMembershipFlags.getModeFromFlags(troupeUser.flags);
+
+       return roomMembershipFlags.getModeFromFlags(troupeUser.flags, strict);
+    });
+});
+
+var getMembershipDetails = Promise.method(function (userId, troupeId) {
+  return TroupeUser.findOne({ troupeId: troupeId, userId: userId }, { flags: 1, _id: 0 }, { lean: true })
+    .exec()
+    .then(function(troupeUser) {
+       if (!troupeUser) return null;
+       var flags = troupeUser.flags;
+       var mode = roomMembershipFlags.getModeFromFlags(flags);
+       var hash = roomMembershipFlags.flagsToHash(flags);
+
+       return {
+         mode: mode,
+         lurk: roomMembershipFlags.getLurkForFlags(flags),
+         flags: flags,
+
+         unread: hash.unread,
+         activity: hash.activity,
+         mention: hash.mention,
+         announcement: hash.announcement,
+         desktop: hash.desktop,
+         mobile: hash.mobile
+       };
     });
 });
 
@@ -436,7 +461,7 @@ var setMembershipModeForUsersInRoom = Promise.method(function(troupeId, userIds,
     });
 });
 
-var findMembershipModeForUsersInRoom = Promise.method(function(troupeId, userIds) {
+var findMembershipModeForUsersInRoom = Promise.method(function(troupeId, userIds, strict) {
   return TroupeUser.find({
       troupeId: troupeId,
       userId: { $in: mongoUtils.asObjectIDs(userIds) }
@@ -450,12 +475,126 @@ var findMembershipModeForUsersInRoom = Promise.method(function(troupeId, userIds
     .exec()
     .then(function(troupeUsers) {
       return _.reduce(troupeUsers, function(memo, troupeUser) {
-        memo[troupeUser.userId] = roomMembershipFlags.getModeFromFlags(troupeUser.flags);
+        memo[troupeUser.userId] = roomMembershipFlags.getModeFromFlags(troupeUser.flags, strict);
         return memo;
       }, {});
     });
 });
 
+/**
+ * Given a room, returns users in that should get some form of notification
+ */
+function findMembersForRoomForNotify(troupeId, fromUserId, isAnnouncement, mentionUserIds) {
+  var requiredBits, query;
+  var hasMentions = mentionUserIds && mentionUserIds.length;
+
+  if (isAnnouncement) {
+    requiredBits = [
+      roomMembershipFlags.FLAG_POS_NOTIFY_UNREAD,
+      roomMembershipFlags.FLAG_POS_NOTIFY_ACTIVITY,
+      roomMembershipFlags.FLAG_POS_NOTIFY_ANNOUNCEMENT,
+      roomMembershipFlags.FLAG_POS_NOTIFY_DESKTOP,
+      roomMembershipFlags.FLAG_POS_NOTIFY_MOBILE,
+    ];
+  } else {
+    requiredBits = [
+      roomMembershipFlags.FLAG_POS_NOTIFY_UNREAD,
+      roomMembershipFlags.FLAG_POS_NOTIFY_ACTIVITY,
+      roomMembershipFlags.FLAG_POS_NOTIFY_DESKTOP,
+      roomMembershipFlags.FLAG_POS_NOTIFY_MOBILE
+    ];
+  }
+
+  if (hasMentions) {
+    /* If there are mentions, we need to include mention users */
+    query = {
+      troupeId: troupeId,
+      userId: { $ne: fromUserId },
+      $or: [
+        { flags: { $bitsAnySet: requiredBits } },
+        {
+          userId: { $in: mongoUtils.asObjectIDs(mentionUserIds) },
+          flags: { $bitsAnySet: [roomMembershipFlags.FLAG_POS_NOTIFY_MENTION] },
+        }
+      ],
+    };
+  } else {
+    /* No mentions? Just include the users for notify and possible also announcements */
+    query = {
+      troupeId: troupeId,
+      userId: { $ne: fromUserId },
+      flags: {
+         $bitsAnySet: requiredBits
+      }
+    };
+  }
+
+  return TroupeUser.find(query, {
+      userId: 1,
+      flags: 1,
+      _id: 0
+    }, {
+      lean: true
+    })
+    .exec();
+}
+
+function queryForToggles(flagToggles) {
+  var setBits = 0;
+  var clearBits = 0;
+
+  function addToggle(field, bitPosition) {
+    var value = flagToggles[field];
+    if (value === false) {
+      clearBits = clearBits | 1 << bitPosition;
+    } else if (value === true) {
+      setBits = setBits | 1 << bitPosition;
+    }
+  }
+
+  addToggle('notify'      , roomMembershipFlags.FLAG_POS_NOTIFY_MENTION);
+  addToggle('activity'    , roomMembershipFlags.FLAG_POS_NOTIFY_ACTIVITY);
+  addToggle('mention'     , roomMembershipFlags.FLAG_POS_NOTIFY_MENTION);
+  addToggle('announcement', roomMembershipFlags.FLAG_POS_NOTIFY_ANNOUNCEMENT);
+  addToggle('default'     , roomMembershipFlags.FLAG_POS_NOTIFY_DEFAULT);
+  addToggle('desktop'     , roomMembershipFlags.FLAG_POS_NOTIFY_DESKTOP);
+  addToggle('mobile'      , roomMembershipFlags.FLAG_POS_NOTIFY_MOBILE);
+
+  var allRequired = flagToggles.all === true;
+
+  if (!setBits && !clearBits) {
+    return;
+  }
+
+  var query = {};
+
+  if (setBits) {
+    if (allRequired) {
+      query.$bitsAllSet = setBits;
+    } else {
+      query.$bitsAnySet = setBits;
+    }
+  }
+
+  if (clearBits) {
+    if (allRequired) {
+      query.$bitsAllClear = clearBits;
+    } else {
+      query.$bitsAnyClear = clearBits;
+    }
+  }
+
+  return query;
+}
+
+function findMembersForRoomWithFlags(troupeId, flagToggles) {
+  return TroupeUser.distinct('userId', {
+      troupeId: troupeId,
+      flags: queryForToggles(flagToggles)
+    })
+    .exec();
+
+}
 /* Exports */
 exports.findRoomIdsForUser          = findRoomIdsForUser;
 exports.findRoomIdsForUserWithLurk  = findRoomIdsForUserWithLurk;
@@ -476,9 +615,12 @@ exports.findMembersForRoomMulti     = findMembersForRoomMulti;
 exports.getMemberLurkStatus         = getMemberLurkStatus;
 
 exports.getMembershipMode           = getMembershipMode;
+exports.getMembershipDetails        = getMembershipDetails;
 exports.setMembershipMode           = setMembershipMode;
 exports.setMembershipModeForUsersInRoom = setMembershipModeForUsersInRoom;
 exports.findMembershipModeForUsersInRoom = findMembershipModeForUsersInRoom;
+exports.findMembersForRoomForNotify = findMembersForRoomForNotify;
+exports.findMembersForRoomWithFlags = findMembersForRoomWithFlags;
 
 /* Event emitter */
 exports.events                      = roomMembershipEvents;

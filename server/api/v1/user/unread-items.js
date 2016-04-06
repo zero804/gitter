@@ -1,6 +1,6 @@
 "use strict";
 
-var unreadItemService = require("../../../services/unread-item-service");
+var unreadItemService = require("../../../services/unread-items");
 var StatusError       = require('statuserror');
 var uniqueIds         = require('mongodb-unique-ids');
 

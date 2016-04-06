@@ -52,11 +52,11 @@ makeBenchmark({
 
     mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId).thenReturn(Promise.resolve(troupeLurkersUserHash));
 
-    unreadItemService = testRequire.withProxies("./services/unread-item-service", {
-      './room-membership-service': roomMembershipService,
-      './user-service': userService,
+    unreadItemService = testRequire.withProxies("./services/unread-items", {
+      '../room-membership-service': roomMembershipService,
+      '../user-service': userService,
       '../app-events': appEvents,
-      './room-permissions-model': roomPermissionsModel,
+      '../room-permissions-model': roomPermissionsModel,
     });
     unreadItemService.testOnly.setSendBadgeUpdates(false);
   },
@@ -64,7 +64,7 @@ makeBenchmark({
   after: function(done) {
     if (process.env.DISABLE_EMAIL_NOTIFY_CLEAR_AFTER_TEST) return done();
 
-    var unreadItemServiceEngine = testRequire('./services/unread-item-service-engine');
+    var unreadItemServiceEngine = testRequire('./services/unread-items/engine');
     unreadItemServiceEngine.testOnly.removeAllEmailNotifications()
       .nodeify(done);
   },
