@@ -243,7 +243,7 @@
         "nan": {
           "version": "2.2.1",
           "from": "nan@>=2.0.5 <3.0.0",
-          "resolved": "https://registry.npmjs.org/nan/-/nan-2.2.1.tgz"
+          "resolved": "http://beta-internal:4873/nan/-/nan-2.2.1.tgz"
         },
         "rimraf": {
           "version": "2.5.2",
@@ -379,7 +379,7 @@
       "dependencies": {
         "sequin": {
           "version": "0.1.0",
-          "from": "sequin@latest",
+          "from": "sequin@*",
           "resolved": "http://beta-internal:4873/sequin/-/sequin-0.1.0.tgz"
         }
       }
@@ -411,7 +411,7 @@
                 },
                 "json-stringify-safe": {
                   "version": "5.0.1",
-                  "from": "json-stringify-safe@>=5.0.1 <5.1.0",
+                  "from": "json-stringify-safe@>=5.0.0 <5.1.0",
                   "resolved": "http://beta-internal:4873/json-stringify-safe/-/json-stringify-safe-5.0.1.tgz"
                 },
                 "forever-agent": {
@@ -572,11 +572,6 @@
               "from": "ansi-styles@>=1.1.0 <2.0.0",
               "resolved": "http://beta-internal:4873/ansi-styles/-/ansi-styles-1.1.0.tgz"
             },
-            "escape-string-regexp": {
-              "version": "1.0.5",
-              "from": "escape-string-regexp@>=1.0.0 <2.0.0",
-              "resolved": "http://beta-internal:4873/escape-string-regexp/-/escape-string-regexp-1.0.5.tgz"
-            },
             "has-ansi": {
               "version": "0.1.0",
               "from": "has-ansi@>=0.1.0 <0.2.0",
@@ -584,7 +579,7 @@
               "dependencies": {
                 "ansi-regex": {
                   "version": "0.2.1",
-                  "from": "ansi-regex@>=0.2.1 <0.3.0",
+                  "from": "ansi-regex@>=0.2.0 <0.3.0",
                   "resolved": "http://beta-internal:4873/ansi-regex/-/ansi-regex-0.2.1.tgz"
                 }
               }
@@ -596,7 +591,7 @@
               "dependencies": {
                 "ansi-regex": {
                   "version": "0.2.1",
-                  "from": "ansi-regex@>=0.2.1 <0.3.0",
+                  "from": "ansi-regex@>=0.2.0 <0.3.0",
                   "resolved": "http://beta-internal:4873/ansi-regex/-/ansi-regex-0.2.1.tgz"
                 }
               }
@@ -630,6 +625,11 @@
       "from": "ent@>=0.1.0 <0.2.0",
       "resolved": "http://beta-internal:4873/ent/-/ent-0.1.0.tgz"
     },
+    "escape-string-regexp": {
+      "version": "1.0.5",
+      "from": "escape-string-regexp@>=1.0.5 <2.0.0",
+      "resolved": "http://beta-internal:4873/escape-string-regexp/-/escape-string-regexp-1.0.5.tgz"
+    },
     "event-stream": {
       "version": "3.3.2",
       "from": "event-stream@>=3.3.1 <4.0.0",
@@ -658,7 +658,7 @@
         "pause-stream": {
           "version": "0.0.11",
           "from": "pause-stream@0.0.11",
-          "resolved": "https://registry.npmjs.org/pause-stream/-/pause-stream-0.0.11.tgz"
+          "resolved": "http://beta-internal:4873/pause-stream/-/pause-stream-0.0.11.tgz"
         },
         "split": {
           "version": "0.3.3",
@@ -748,7 +748,7 @@
           "dependencies": {
             "unpipe": {
               "version": "1.0.0",
-              "from": "unpipe@1.0.0",
+              "from": "unpipe@>=1.0.0 <1.1.0",
               "resolved": "http://beta-internal:4873/unpipe/-/unpipe-1.0.0.tgz"
             }
           }
@@ -851,7 +851,7 @@
             },
             "statuses": {
               "version": "1.2.1",
-              "from": "statuses@>=1.2.1 <2.0.0",
+              "from": "statuses@>=1.2.1 <1.3.0",
               "resolved": "http://beta-internal:4873/statuses/-/statuses-1.2.1.tgz"
             }
           }
@@ -1047,7 +1047,7 @@
         },
         "utils-merge": {
           "version": "1.0.0",
-          "from": "utils-merge@>=1.0.0 <2.0.0",
+          "from": "utils-merge@1.0.0",
           "resolved": "http://beta-internal:4873/utils-merge/-/utils-merge-1.0.0.tgz"
         }
       }
@@ -1154,7 +1154,7 @@
         "rimraf": {
           "version": "2.2.8",
           "from": "rimraf@>=2.2.0 <2.3.0",
-          "resolved": "https://registry.npmjs.org/rimraf/-/rimraf-2.2.8.tgz"
+          "resolved": "http://beta-internal:4873/rimraf/-/rimraf-2.2.8.tgz"
         }
       }
     },
@@ -1386,7 +1386,7 @@
         },
         "tunnel-agent": {
           "version": "0.4.2",
-          "from": "tunnel-agent@latest",
+          "from": "tunnel-agent@*",
           "resolved": "http://beta-internal:4873/tunnel-agent/-/tunnel-agent-0.4.2.tgz"
         }
       }
@@ -1397,9 +1397,9 @@
       "resolved": "http://beta-internal:4873/gitter-faye-redis/-/gitter-faye-redis-0.4.4.tgz",
       "dependencies": {
         "redis": {
-          "version": "2.6.0-1",
-          "from": "redis@latest",
-          "resolved": "http://beta-internal:4873/redis/-/redis-2.6.0-1.tgz",
+          "version": "2.5.3",
+          "from": "redis@*",
+          "resolved": "http://beta-internal:4873/redis/-/redis-2.5.3.tgz",
           "dependencies": {
             "double-ended-queue": {
               "version": "2.1.0-0",
@@ -1408,12 +1408,12 @@
             },
             "redis-commands": {
               "version": "1.1.0",
-              "from": "redis-commands@>=1.1.0 <2.0.0",
+              "from": "redis-commands@>=1.0.1 <2.0.0",
               "resolved": "http://beta-internal:4873/redis-commands/-/redis-commands-1.1.0.tgz"
             },
             "redis-parser": {
               "version": "1.3.0",
-              "from": "redis-parser@>=1.2.0 <2.0.0",
+              "from": "redis-parser@>=1.1.0 <2.0.0",
               "resolved": "http://beta-internal:4873/redis-parser/-/redis-parser-1.3.0.tgz"
             }
           }
@@ -2115,7 +2115,7 @@
           "dependencies": {
             "json-stringify-safe": {
               "version": "5.0.1",
-              "from": "json-stringify-safe@>=5.0.1 <5.1.0",
+              "from": "json-stringify-safe@>=5.0.0 <5.1.0",
               "resolved": "http://beta-internal:4873/json-stringify-safe/-/json-stringify-safe-5.0.1.tgz"
             },
             "forever-agent": {
@@ -2392,7 +2392,7 @@
         "nan": {
           "version": "2.2.1",
           "from": "nan@>=2.0.0 <3.0.0",
-          "resolved": "https://registry.npmjs.org/nan/-/nan-2.2.1.tgz"
+          "resolved": "http://beta-internal:4873/nan/-/nan-2.2.1.tgz"
         }
       }
     },
@@ -2455,7 +2455,7 @@
               "dependencies": {
                 "semver": {
                   "version": "5.1.0",
-                  "from": "semver@>=5.1.0 <6.0.0",
+                  "from": "semver@>=2.0.0 <3.0.0||>=3.0.0 <4.0.0||>=4.0.0 <5.0.0||>=5.0.0 <6.0.0",
                   "resolved": "http://beta-internal:4873/semver/-/semver-5.1.0.tgz"
                 },
                 "resolve-from": {
@@ -3036,7 +3036,7 @@
             },
             "combined-stream": {
               "version": "0.0.7",
-              "from": "combined-stream@>=0.0.4 <0.1.0",
+              "from": "combined-stream@>=0.0.5 <0.1.0",
               "resolved": "http://beta-internal:4873/combined-stream/-/combined-stream-0.0.7.tgz",
               "dependencies": {
                 "delayed-stream": {
@@ -3210,7 +3210,7 @@
             },
             "utils-merge": {
               "version": "1.0.0",
-              "from": "utils-merge@1.0.0",
+              "from": "utils-merge@>=1.0.0 <2.0.0",
               "resolved": "http://beta-internal:4873/utils-merge/-/utils-merge-1.0.0.tgz"
             }
           }
@@ -3256,7 +3256,7 @@
         },
         "json-stringify-safe": {
           "version": "5.0.1",
-          "from": "json-stringify-safe@>=5.0.1 <5.1.0",
+          "from": "json-stringify-safe@>=5.0.0 <5.1.0",
           "resolved": "http://beta-internal:4873/json-stringify-safe/-/json-stringify-safe-5.0.1.tgz"
         },
         "mime-types": {
@@ -3288,7 +3288,7 @@
             },
             "mime": {
               "version": "1.2.11",
-              "from": "mime@>=1.2.9 <1.3.0",
+              "from": "mime@>=1.2.11 <1.3.0",
               "resolved": "http://beta-internal:4873/mime/-/mime-1.2.11.tgz"
             }
           }
@@ -3493,18 +3493,13 @@
               "dependencies": {
                 "chalk": {
                   "version": "1.1.3",
-                  "from": "chalk@>=1.0.0 <2.0.0",
+                  "from": "chalk@>=1.1.1 <2.0.0",
                   "resolved": "https://registry.npmjs.org/chalk/-/chalk-1.1.3.tgz",
                   "dependencies": {
                     "ansi-styles": {
                       "version": "2.2.1",
                       "from": "ansi-styles@>=2.2.1 <3.0.0",
                       "resolved": "https://registry.npmjs.org/ansi-styles/-/ansi-styles-2.2.1.tgz"
-                    },
-                    "escape-string-regexp": {
-                      "version": "1.0.5",
-                      "from": "escape-string-regexp@>=1.0.2 <2.0.0",
-                      "resolved": "http://beta-internal:4873/escape-string-regexp/-/escape-string-regexp-1.0.5.tgz"
                     },
                     "has-ansi": {
                       "version": "2.0.0",
@@ -3551,7 +3546,7 @@
                 },
                 "is-my-json-valid": {
                   "version": "2.13.1",
-                  "from": "is-my-json-valid@>=2.12.0 <3.0.0",
+                  "from": "is-my-json-valid@>=2.12.4 <3.0.0",
                   "resolved": "http://beta-internal:4873/is-my-json-valid/-/is-my-json-valid-2.13.1.tgz",
                   "dependencies": {
                     "generate-function": {
@@ -3719,7 +3714,7 @@
             },
             "mime-types": {
               "version": "2.1.10",
-              "from": "mime-types@>=2.1.10 <2.2.0",
+              "from": "mime-types@>=2.1.6 <2.2.0",
               "resolved": "http://beta-internal:4873/mime-types/-/mime-types-2.1.10.tgz",
               "dependencies": {
                 "mime-db": {
@@ -3756,7 +3751,7 @@
             },
             "tunnel-agent": {
               "version": "0.4.2",
-              "from": "tunnel-agent@>=0.4.0 <0.5.0",
+              "from": "tunnel-agent@>=0.4.1 <0.5.0",
               "resolved": "http://beta-internal:4873/tunnel-agent/-/tunnel-agent-0.4.2.tgz"
             }
           }
@@ -3851,7 +3846,7 @@
       "dependencies": {
         "debug": {
           "version": "1.0.4",
-          "from": "debug@>=1.0.2 <2.0.0",
+          "from": "debug@>=1.0.4 <2.0.0",
           "resolved": "http://beta-internal:4873/debug/-/debug-1.0.4.tgz",
           "dependencies": {
             "ms": {
@@ -4041,11 +4036,6 @@
                       "version": "2.2.1",
                       "from": "ansi-styles@>=2.2.1 <3.0.0",
                       "resolved": "https://registry.npmjs.org/ansi-styles/-/ansi-styles-2.2.1.tgz"
-                    },
-                    "escape-string-regexp": {
-                      "version": "1.0.5",
-                      "from": "escape-string-regexp@>=1.0.2 <2.0.0",
-                      "resolved": "http://beta-internal:4873/escape-string-regexp/-/escape-string-regexp-1.0.5.tgz"
                     },
                     "has-ansi": {
                       "version": "2.0.0",
@@ -4568,7 +4558,7 @@
             },
             "combined-stream": {
               "version": "1.0.5",
-              "from": "combined-stream@>=1.0.5 <1.1.0",
+              "from": "combined-stream@>=1.0.1 <1.1.0",
               "resolved": "http://beta-internal:4873/combined-stream/-/combined-stream-1.0.5.tgz",
               "dependencies": {
                 "delayed-stream": {
@@ -4580,7 +4570,7 @@
             },
             "isstream": {
               "version": "0.1.2",
-              "from": "isstream@>=0.1.2 <0.2.0",
+              "from": "isstream@>=0.1.1 <0.2.0",
               "resolved": "http://beta-internal:4873/isstream/-/isstream-0.1.2.tgz"
             },
             "har-validator": {
@@ -4602,11 +4592,6 @@
                       "version": "2.2.1",
                       "from": "ansi-styles@>=2.2.1 <3.0.0",
                       "resolved": "https://registry.npmjs.org/ansi-styles/-/ansi-styles-2.2.1.tgz"
-                    },
-                    "escape-string-regexp": {
-                      "version": "1.0.5",
-                      "from": "escape-string-regexp@>=1.0.2 <2.0.0",
-                      "resolved": "http://beta-internal:4873/escape-string-regexp/-/escape-string-regexp-1.0.5.tgz"
                     },
                     "has-ansi": {
                       "version": "2.0.0",
@@ -4917,7 +4902,7 @@
         "cliui": {
           "version": "3.1.2",
           "from": "cliui@>=3.1.2 <4.0.0",
-          "resolved": "http://beta-internal:4873/cliui/-/cliui-3.1.2.tgz",
+          "resolved": "https://registry.npmjs.org/cliui/-/cliui-3.1.2.tgz",
           "dependencies": {
             "strip-ansi": {
               "version": "3.0.1",
@@ -5213,7 +5198,7 @@
                           "dependencies": {
                             "spdx-license-ids": {
                               "version": "1.2.0",
-                              "from": "spdx-license-ids@>=1.0.0 <2.0.0",
+                              "from": "spdx-license-ids@>=1.0.2 <2.0.0",
                               "resolved": "http://beta-internal:4873/spdx-license-ids/-/spdx-license-ids-1.2.0.tgz"
                             }
                           }
@@ -5230,7 +5215,7 @@
                             },
                             "spdx-license-ids": {
                               "version": "1.2.0",
-                              "from": "spdx-license-ids@>=1.0.0 <2.0.0",
+                              "from": "spdx-license-ids@>=1.0.2 <2.0.0",
                               "resolved": "http://beta-internal:4873/spdx-license-ids/-/spdx-license-ids-1.2.0.tgz"
                             }
                           }
@@ -5308,7 +5293,7 @@
             },
             "strip-ansi": {
               "version": "3.0.1",
-              "from": "strip-ansi@>=3.0.1 <4.0.0",
+              "from": "strip-ansi@>=3.0.0 <4.0.0",
               "resolved": "http://beta-internal:4873/strip-ansi/-/strip-ansi-3.0.1.tgz",
               "dependencies": {
                 "ansi-regex": {
