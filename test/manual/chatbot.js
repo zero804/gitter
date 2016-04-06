@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 /*jslint node: true, unused:true */
 "use strict";
 
@@ -9,18 +11,20 @@ var shutdown = require('shutdown');
 require('../../server/event-listeners').install();
 
 var opts = require('yargs')
-   .option('user', {
-      abbr: 'u',
-      required: true
-   })
-   .option('troupe', {
-      abbr: 't'
-   })
-   .option('frequency', {
-      abbr: 'f',
-      'default': '10'
-   })
-   .parse();
+  .option('user', {
+    alias: 'u',
+    required: true
+  })
+  .option('troupe', {
+    alias: 't',
+    required: true
+  })
+  .option('frequency', {
+    alias: 'f',
+    default: '10'
+  })
+  .argv;
+
 
 var count = 0;
 
@@ -70,6 +74,6 @@ process.stdin.on('data', function () {
 
 chatbot()
   .delay(5000)
-  .then(function() {
+  .then(function () {
     shutdown.shutdownGracefully();
   });
