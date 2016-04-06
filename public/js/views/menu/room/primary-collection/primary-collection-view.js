@@ -110,7 +110,8 @@ var PrimaryCollectionView = BaseCollectionView.extend({
 
     var target  = this.collection.get(targetID);
     var sibling = this.collection.get(siblingID);
-    var index   = !!sibling ? sibling.get('favourite') : true;
+    if(!sibling) { sibling = this.collection.max('favourite'); }
+    var index   = sibling.get('favourite');
 
     //Save the new favourite
     target.set('favourite', index);
