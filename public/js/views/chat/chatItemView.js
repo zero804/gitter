@@ -171,6 +171,7 @@ module.exports = (function() {
 
       if (data.fromUser) {
         data.username = data.fromUser.username;
+        data.displayName = data.fromUser.displayName;
       }
 
       // No sent time, use the current time as the message has just been sent
