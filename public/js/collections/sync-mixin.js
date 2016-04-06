@@ -1,7 +1,6 @@
 'use strict';
 
 var _         = require('underscore');
-var Backbone  = require('backbone');
 var apiClient = require('components/apiClient');
 
 var methodMap = {
@@ -12,6 +11,23 @@ var methodMap = {
   'read':   'get'
 };
 
+function performAction(m, url, model, options) {
+  switch(m) {
+    case 'get':
+      return apiClient.get(url, options.data);
+
+    case 'patch':
+      if (options.attrs) {
+        return apiClient.patch(url, options.attrs);
+      } else {
+        return apiClient.patch(url, model);
+      }
+      break;
+
+    default:
+      return apiClient[m](url, model);
+  }
+}
 module.exports = {
   sync: function(method, model, options) {
 
@@ -20,12 +36,7 @@ module.exports = {
 
     var m = methodMap[method];
 
-    var promise;
-    if(m === 'get') {
-      promise = apiClient[m](url, options.data);
-    } else {
-      promise = apiClient[m](url, model);
-    }
+    var promise = performAction(m, url, model, options);
 
     if(options.success) {
       promise = promise.then(options.success);

@@ -1,6 +1,5 @@
 "use strict";
 
-
 var Promise = require('bluebird');
 var _ = require('lodash');
 var restSerializer = require("../../../serializers/rest-serializer");
@@ -24,7 +23,7 @@ module.exports = {
 
             return _.reject(suggestions, function(suggestion) {
               return idMap[suggestion.roomId];
-            }).slice(0, 6);
+            }).slice(0, 12);
           }
         );
       })

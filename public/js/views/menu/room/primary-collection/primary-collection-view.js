@@ -102,8 +102,8 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     //TODO Move to collection.max
     var favIndex    = this.collection
       .filter(function(model) { return !!model.get('favourite'); }).length;
-    newFavModel.set('favourite', (favIndex + 1));
-    newFavModel.save();
+
+    newFavModel.save({ favourite: favIndex + 1 }, { patch: true });
   },
 
   onFavouritesSorted: function(targetID, siblingID) {
