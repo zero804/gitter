@@ -8,7 +8,7 @@ describe('notification-message-generator', function() {
   it('should generate message for the simple case', function() {
     var message = underTest({ uri: 'gitterHQ/gitter-webapp' }, [ { id: '00001', text: 'Yo', fromUser: { displayName: 'Mike Bartlett '} }]);
 
-    assert.equal(message, 'gitterHQ/gitter-webapp  \nMike: Yo');
+    assert.equal(message, 'gitterHQ/gitter-webapp  \nMike Bartlett: Yo');
   });
   it('should should not repeat usernames', function() {
     var message = underTest({ uri: 'gitterHQ/gitter-webapp' }, [
@@ -16,7 +16,7 @@ describe('notification-message-generator', function() {
       { id: '00001', text: 'Moo', fromUser: { displayName: 'Mike Bartlett '} },
     ]);
 
-    assert.equal(message, 'gitterHQ/gitter-webapp  \nMike: Yo  \nMoo');
+    assert.equal(message, 'gitterHQ/gitter-webapp  \nMike Bartlett: Yo  \nMoo');
   });
 
   it('should generate a message for a one to one', function() {
@@ -51,7 +51,7 @@ describe('notification-message-generator', function() {
       { id: '00001', text: 'Yo', fromUser: { displayName: 'Mike Bartlett '} },
       { id: '00002', text: 'Hey how are you?', fromUser: { displayName: 'Andrew Newdigate' } }
     ]);
-    assert.equal(message, 'gitterHQ/gitter-webapp  \nMike: Yo  \nAndrew: Hey how are you?');
+    assert.equal(message, 'gitterHQ/gitter-webapp  \nMike Bartlett: Yo  \nAndrew Newdigate: Hey how are you?');
   });
 
 
@@ -61,7 +61,7 @@ describe('notification-message-generator', function() {
       { id: '00002', text: 'Why is your name so long?', fromUser: { displayName: 'Andrew Newdigate' } }
     ]);
 
-    assert.equal(message, 'gitterHQ/gitter-webapp  \nMahershalalhashbaz: Hey I just wanted to run by those accounts figures with you  \nAndrew: Why is your name so long?');
+    assert.equal(message, 'gitterHQ/gitter-webapp  \nMahershalalhashbaz Smith: Hey I just wanted to run by those accounts figures with you  \nAndrew Newdigate: Why is your name so long?');
   });
 
 
@@ -72,7 +72,7 @@ describe('notification-message-generator', function() {
       { id: '00005', text: 'Hey how are you?', fromUser: { displayName: 'Andrew Newdigate' } }
     ]);
     assert.strictEqual(message.length, 1024);
-    assert.equal(message, 'gitterHQ/gitter-webapp  \nAndrew: Freaky  \nMike: This is a fairly long message do you not thing. I think it is. I\'m quite verbose sometimes when I want to say something.This is a fairly long message do you not thing. I think it is. I\'m quite verbose sometimes when I want to say something.This is a fairly long message do you not thing. I think it is. I\'m quite verbose sometimes when I want to say something.This is a fairly long message do you not thing. I think it is. I\'m quite verbose sometimes when I want to say something.This is a fairly long message do you not thing. I think it is. I\'m quite verbose sometimes when I want to say something.This is a fairly long message do you not thing. I think it is. I\'m quite verbose sometimes when I want to say something.This is a fairly long message do you not thing. I think it is. I\'m quite verbose sometimes when I want to say something.This is a fairly long message do you not thing. I think it is. I\'m quite verbose sometimes when I want to say something.This is a fairl…');
+    assert.equal(message, 'gitterHQ/gitter-webapp  \nAndrew Newdigate: Freaky  \nMike Bartlett: This is a fairly long message do you not thing. I think it is. I\'m quite verbose sometimes when I want to say something.This is a fairly long message do you not thing. I think it is. I\'m quite verbose sometimes when I want to say something.This is a fairly long message do you not thing. I think it is. I\'m quite verbose sometimes when I want to say something.This is a fairly long message do you not thing. I think it is. I\'m quite verbose sometimes when I want to say something.This is a fairly long message do you not thing. I think it is. I\'m quite verbose sometimes when I want to say something.This is a fairly long message do you not thing. I think it is. I\'m quite verbose sometimes when I want to say something.This is a fairly long message do you not thing. I think it is. I\'m quite verbose sometimes when I want to say something.This is a fairly long message do you not thing. I think it is. I\'m quite verbose sometimes when I want to say someth…');
   });
 
   it('should truncate a second line if it is huge', function() {
