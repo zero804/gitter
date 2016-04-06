@@ -28,6 +28,27 @@ var opts = require('yargs')
    type: 'boolean',
    description: 'Turn off percentage'
   })
+  .option('bucket', {
+    description: 'Bucket of users to allow (A or B)'
+  })
+  .option('bucket-off', {
+   type: 'boolean',
+   description: 'Turn off bucket'
+  })
+  .option('created-after', {
+    description: 'Timestamp after which users have to have been created or now'
+  })
+  .option('created-after-off', {
+   type: 'boolean',
+   description: 'Turn off created after'
+  })
+  .option('bucket-created-after', {
+    description: 'bucket,now'
+  })
+  .option('bucket-created-after-off', {
+   type: 'boolean',
+   description: 'Turn off bucketCreatedAfter'
+  })
   .option('disable-browser', {
    description: 'Disable a specific browser, up to a given version. eg "Chrome:47" or "Safari:all". Browser family names come from npm package `useragent`.',
    type: 'array'
@@ -58,6 +79,13 @@ opts.name = opts.name || opts._[0];
 
 var FeatureToggle = require("../../server/services/persistence-service").FeatureToggle;
 
+
+function parseTimestamp(ts) {
+  if (ts === 'now') {
+    return Date.now();
+  }
+  return parseInt(ts, 10);
+}
 
 function runWithOpts(opts) {
   var set = { };
@@ -101,6 +129,39 @@ function runWithOpts(opts) {
 
   if (opts['percentage-off']) {
     unset['criteria.percentageOfUsers'] = true;
+  }
+
+  var bucket = opts['bucket'];
+  if (bucket) {
+    set['criteria.bucket'] = bucket;
+  }
+
+  if (opts['bucket-off']) {
+    unset['criteria.bucket'] = true;
+  }
+
+  var createdAfter = parseTimestamp(opts['created-after']);
+  if (createdAfter) {
+    set['criteria.createdAfter'] = createdAfter;
+  }
+
+  if (opts['created-after-off']) {
+    unset['criteria.createdAfter'] = true;
+  }
+
+  var bucketCreatedAfter = opts['bucket-created-after'];
+  if (bucketCreatedAfter) {
+    var split = bucketCreatedAfter.split(',')
+    var bucket = split[0];
+    var createdAfter = parseTimestamp(split[1]);
+    set['criteria.bucketCreatedAfter'] = {
+      bucket: bucket,
+      createdAfter: createdAfter
+    };
+  }
+
+  if (opts['bucket-created-after-off']) {
+    unset['criteria.bucketCreatedAfter'] = true;
   }
 
   if (opts.enable) {

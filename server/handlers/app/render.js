@@ -17,7 +17,7 @@ var roomSort                       = require('gitter-realtime-client/lib/sorts-f
                                                                                           libraries that we don't need */
 var roomNameTrimmer                = require('../../../public/js/utils/room-name-trimmer');
 var isolateBurst                   = require('gitter-web-shared/burst/isolate-burst-array');
-var unreadItemService              = require('../../services/unread-item-service');
+var unreadItemService              = require('../../services/unread-items');
 var mongoUtils                     = require('../../utils/mongo-utils');
 var url                            = require('url');
 var cdn                            = require("../../web/cdn");
@@ -309,7 +309,7 @@ function renderChat(req, res, options, next) {
         options.generateContext === false ? null : contextGenerator.generateTroupeContext(req, { snapshots: { chat: snapshotOptions }, permalinkChatId: aroundId }),
         restful.serializeChatsForTroupe(troupe.id, userId, chatSerializerOptions),
         options.fetchEvents === false ? null : restful.serializeEventsForTroupe(troupe.id, userId),
-        options.fetchUsers === false ? null :restful.serializeUsersForTroupe(troupe.id, userId, userSerializerOptions),
+        options.fetchUsers === false ? null : restful.serializeUsersForTroupe(troupe.id, userId, userSerializerOptions),
       ]).spread(function (troupeContext, chats, activityEvents, users, ownerIsOrg) {
         var initialChat = _.find(chats, function(chat) { return chat.initial; });
         var initialBottom = !initialChat;

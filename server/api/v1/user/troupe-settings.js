@@ -1,8 +1,32 @@
 "use strict";
 
-var userRoomNotificationService = require("../../../services/user-room-notification-service");
-var StatusError = require('statuserror');
+var StatusError           = require('statuserror');
+var roomMembershipService = require('../../../services/room-membership-service');
 
+function generateResponse(userId, troupeId) {
+  return roomMembershipService.getMembershipDetails(userId, troupeId)
+    .then(function(details) {
+      if (!details) throw new StatusError(404);
+
+      return {
+        push: details.mode, // REMOVE THIS
+        mode: details.mode,
+        lurk: details.lurk, // ALSO deprecated
+
+        unread: details.unread,
+        activity: details.activity,
+        mention: details.mention,
+        announcement: details.announcement,
+        desktop: details.desktop,
+        mobile: details.mobile
+      };
+    });
+
+}
+/**
+ * TODO: REMOVE THIS WHOLE RESOURCE AND UPDATE THIS VIA THE USER TROUPE
+ * with { mode: x }
+*/
 module.exports = {
   id: 'setting',
 
@@ -13,7 +37,7 @@ module.exports = {
 
     if (setting !== 'notifications') throw new StatusError(404);
 
-    return userRoomNotificationService.getSettingForUserRoom(userId, troupeId);
+    return generateResponse(userId, troupeId);
   },
 
   update: function(req) {
@@ -28,7 +52,10 @@ module.exports = {
 
     if (!mode) throw new StatusError(400, 'Illegal notifications mode');
 
-    return userRoomNotificationService.updateSettingForUserRoom(userId, troupeId, mode, false);
+    return roomMembershipService.setMembershipMode(userId, troupeId, mode, false)
+      .then(function() {
+        return generateResponse(userId, troupeId);
+      });
   }
 
 };

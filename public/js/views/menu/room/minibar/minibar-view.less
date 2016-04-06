@@ -1,3 +1,6 @@
+@minibar-top-offset:    (@desktop-header-height * 4);
+@minibar-bottom-offset: @desktop-header-height;
+
 .minibar {
   position:   relative;
   width:      100%;
@@ -45,8 +48,8 @@
   flex-direction: column;
   list-style:     none;
   margin-left:    0;
-  margin-top:     @desktop-header-height * 4;
-  margin-bottom:  @desktop-header-height;
+  margin-top:     @minibar-top-offset;
+  margin-bottom:  @minibar-bottom-offset;
 }
 
 .sudo-panel() {
@@ -90,11 +93,9 @@
 
   &.active,
   &.dragging {
-
     .room-menu-options__item-button {
       opacity: 1;
     }
-
   }
 }
 
@@ -159,7 +160,7 @@
   }
 
   //This is here because of a dragula bug JP 25/1/16
-  & .room-item {
+  & .room-item, & .room-item--one2one, & .room-item--favourite {
     display:  none;
   }
 
@@ -186,8 +187,6 @@
 
 
 .room-menu-options__item-button {
-  z-index:          1;
-  position:         relative;
   display:          flex;
   justify-content:  center;
   align-items:      center;
@@ -206,15 +205,13 @@
     opacity:         1;
     text-decoration: none;
   }
-
   &:focus {
     outline: none;
   }
 
-
   &:before {
-    .sudo-panel();
-    background-color: currentColor;
+     .sudo-panel();
+     background-color: currentColor;
   }
 
   .active > &,
@@ -275,53 +272,33 @@
 
 
 
-.half-stay() {
-  content:    ' ';
-  display:    inline-block;
-  position:   absolute;
-  width:      100%;
-  height:     50%;
-  background: white;
-  transition: transform .2s linear;
+
+.menu-toggle-button {
+  &:focus {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
 }
 
-.close-icon {
-  position:   relative;
-  width:      20px;
-  height:     30px;
-  margin:     auto;
-  transition: transform .15s linear;
-  transform:  rotate(90deg);
+.menu-toggle-icon {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 2;
 
-  .left &  { transform: rotate(0); }
-  .right & { transform: rotate(0);}
+  cursor: pointer;
+
+  transition: transform 0.2s ease;
+
+  &:hover,
+  &.is-menu-pinned,
+  .menu-toggle-button:hover > & {
+    transform: rotateZ(90deg);
+  }
 }
 
-.close-icon-stay {
-  width:    1px;
-  height:   100%;
-  position: absolute;
-  top:      0;
-  left:     50%;
-
-  &:first-child { left: 0; }
-  &:last-child  { left: 100%; }
-
-  &:before { .half-stay(); top: 0;}
-  &:after  { .half-stay(); bottom: 0;}
-
-  .left & {
-    &:first-child {
-      &:before { transform: skewX(-25deg);}
-      &:after  { transform: skewX(25deg);}
-    }
+.minibar {
+  .nano-pane {
+    box-sizing:    border-box;
+    padding-top:   @minibar-top-offset;
+    margin-bottom: @minibar-bottom-offset;
   }
-
-  .right & {
-    &:last-child {
-      &:before { transform: skewX(25deg);}
-      &:after  { transform: skewX(-25deg);}
-    }
-  }
-
 }

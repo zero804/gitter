@@ -6,7 +6,7 @@ var FilteredCollection = require('backbone-filtered-collection');
 var localStorageSync   = require('../utils/local-storage-sync');
 
 var Model = Backbone.Model.extend({
-  defaults: { name: null, avatarUrl: null },
+  defaults: { name: null, avatarUrl: null, isRecentSearch: true },
 });
 
 var RecentSearchesCollection = Backbone.Collection.extend({
