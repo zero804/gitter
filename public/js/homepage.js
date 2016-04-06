@@ -222,6 +222,7 @@ function initMapMessages() {
 function createMessageElement(chatMessage, pos) {
   var html = mapMessageTemplate({
     username: chatMessage.username,
+    displayName: chatMessage.displayName,
     avatarUrl: chatMessage.avatarUrl,
     fullRoomName: chatMessage.room,
     roomName: roomNameTrimmer(chatMessage.room),
