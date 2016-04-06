@@ -99,6 +99,7 @@ var PrimaryCollectionView = BaseCollectionView.extend({
   //TODO The filter should be reused within the view filter method?
   onFavouriteAdded: function(id) {
     var newFavModel = this.collection.get(id);
+    //TODO Move to collection.max
     var favIndex    = this.collection
       .filter(function(model) { return !!model.get('favourite'); }).length;
     newFavModel.set('favourite', (favIndex + 1));
@@ -109,20 +110,12 @@ var PrimaryCollectionView = BaseCollectionView.extend({
 
     var target  = this.collection.get(targetID);
     var sibling = this.collection.get(siblingID);
-    var index   = !!sibling ? sibling.get('favourite') : (this.getHighestFavourite() + 1);
+    var index   = !!sibling ? sibling.get('favourite') : true;
 
     //Save the new favourite
     target.set('favourite', index);
     target.save();
     this.collection.sort();
-  },
-
-  //TODO TEST THIS YOU FOOL JP 10/2/16
-  getHighestFavourite: function() {
-    return this.collection.pluck('favourite')
-      .filter(function(num) { return !!num; })
-      .sort(function(a, b) { return a < b ? -1 : 1; })
-      .slice(-1)[0];
   },
 
   getChildContainerToBeIndexed: function (){

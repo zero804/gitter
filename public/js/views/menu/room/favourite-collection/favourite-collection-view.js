@@ -63,6 +63,8 @@ var FavouriteCollection = PrimaryCollectionView.extend({
 
   onMouseEnter: function (){
     if(!this.uiModel.get('isDragging')) { return; }
+    //Add a class to the body to hide the gu-mirror drag element
+    //when a user hovers over the favourite collection
     document.body.classList.add('drag-over-favourite');
   },
 

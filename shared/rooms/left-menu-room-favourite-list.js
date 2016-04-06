@@ -15,14 +15,20 @@ module.exports = function generateLemMenuFavouriteRoomsList(state, rooms, select
     case 'search':
       return [];
     case 'people':
-      return rooms.filter(favouriteOneToOneFilter).sort(defaultSort).map(parseToTemplateItem);
+      return rooms.filter(favouriteOneToOneFilter).sort(defaultSort).map(function(room){
+        return parseToTemplateItem(room, state);
+      });
     case 'org':
       return rooms
         .filter(function(model){ return orgFavouriteFilter(model, selectedOrgName); })
         .sort(defaultSort)
-        .map(parseToTemplateItem);
+        .map(function(room){
+          return parseToTemplateItem(room, state);
+        });
     default:
-      return rooms.filter(favouriteFilter).sort(favouriteSort).map(parseToTemplateItem);
+      return rooms.filter(favouriteFilter).sort(favouriteSort).map(function(room){
+        return parseToTemplateItem(room, state);
+      });
   }
 
 };

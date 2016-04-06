@@ -1,7 +1,8 @@
 'use strict';
 
-var defaultFilter = require('./left-menu-primary-default.js');
+var defaultFilter            = require('./left-menu-primary-default.js');
+var getTroupeNameFromORgName = require('../get-org-name-from-troupe-name');
 
 module.exports = function leftMenuFavouriteOrg(room, orgName) {
-  return defaultFilter(room) && room.name.split('/')[0] === orgName && room.roomMember;
+  return defaultFilter(room) && (getTroupeNameFromORgName(room.name) === orgName) && room.roomMember;
 };
