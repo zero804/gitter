@@ -2,7 +2,6 @@
 
 var nconf = require('../utils/config');
 var appVersion = require('./appVersion');
-var cdn = require('./cdn');
 
 var env = process.env.NODE_ENV;
 
