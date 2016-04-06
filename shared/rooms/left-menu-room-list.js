@@ -15,14 +15,24 @@ module.exports = function generateLeftMenuRoomsList(state, rooms, selectedOrgNam
     case 'search':
       return [];
     case 'favourite':
-      return rooms.filter(favouriteFilter).sort(favouriteSort).map(parseToTemplateItem);
+      return rooms
+        .filter(favouriteFilter).sort(favouriteSort)
+        .map(function(room) {
+          return parseToTemplateItem(room, state);
+        });
     case 'people':
-      return rooms.filter(one2oneFilter).sort(defaultSort).map(parseToTemplateItem);
+      return rooms
+        .filter(one2oneFilter).sort(defaultSort)
+        .map(function(room) {
+          return parseToTemplateItem(room, state);
+        });
     case 'org':
       return rooms
         .filter(function(model){ return orgFilter(model, selectedOrgName); })
         .sort(defaultSort)
-        .map(parseToTemplateItem);
+        .map(function(room) {
+          return parseToTemplateItem(room, state);
+        });
     default:
       return rooms.filter(defaultFilter).sort(defaultSort).map(parseToTemplateItem);
   }

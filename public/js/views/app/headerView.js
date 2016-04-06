@@ -13,6 +13,7 @@ var KeyboardEventMixin       = require('views/keyboard-events-mixin');
 var headerViewTemplate       = require('./tmpl/headerViewTemplate.hbs');
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 var resolveRoomAvatarSrcSet  = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
+var toggleClass = require('utils/toggle-class');
 
 require('views/behaviors/tooltip');
 
@@ -36,7 +37,8 @@ var HeaderView = Marionette.ItemView.extend({
   ui: {
     cog:            '.js-chat-settings',
     dropdownMenu:   '#cog-dropdown',
-    topic:          '.js-chat-topic',
+    topic:          '.js-room-topic',
+    topicWrapper:   '.js-room-topic-wrapper',
     topicActivator: '.js-room-topic-edit-activator',
     name:           '.js-chat-name',
     favourite:      '.js-favourite-button',
@@ -292,6 +294,9 @@ var HeaderView = Marionette.ItemView.extend({
 
     this.oldTopic = unsafeText;
 
+    toggleClass(this.ui.topicActivator[0], 'is-editing', true);
+    toggleClass(this.ui.topicWrapper[0], 'is-editing', true);
+    toggleClass(this.ui.topic[0], 'is-editing', true);
     // create inputview
     this.ui.topic.html('<textarea class=\'topic-input\'></textarea>');
 
