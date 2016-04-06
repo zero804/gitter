@@ -43,7 +43,7 @@ var FavouriteCollection = PrimaryCollectionView.extend({
   getEmptyView: function() {
     switch (this.roomMenuModel.get('state')) {
       default:
-        return Marionette.ItemView.extend({ template: false });
+        return Marionette.ItemView.extend({ template: '<div></div>' });
     }
   },
 
