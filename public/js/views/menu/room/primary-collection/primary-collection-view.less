@@ -2,4 +2,13 @@
 
 .primary-collection {
   .m-collection();
+
+  &.dragging {
+    min-height: @menu-item-height;
+
+    .collection-list--primary {
+      min-height: @menu-item-height;
+    }
+  }
+
 }
