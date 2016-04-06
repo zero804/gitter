@@ -289,6 +289,7 @@ module.exports = (function() {
           var el = item[0];
           var model = self.roomsCollection.get(dataset.get(el, 'id'));
           var droppedAt = this.getDropTarget(container.el);
+
           if (!cancelDrop) {
             if (droppedAt === 'favs') {
               var previousElement = el.previousElementSibling;
@@ -299,11 +300,9 @@ module.exports = (function() {
                 var previousModel = self.roomsCollection.get(dataset.get(previousElement, 'id'));
                 position = previousModel.get('favourite') + 1;
               }
-              model.set('favourite', position);
-              model.save();
+              model.save({ favourite: position }, { patch: true });
             } else if (droppedAt === 'recents') {
-              model.set('favourite', null);
-              model.save();
+              model.save({ favourite: null }, { patch: true });
             }
           }
           cancelDrop = false;
@@ -316,7 +315,7 @@ module.exports = (function() {
 
           if ($(container.el).parent().attr('id') == 'list-favs') {
             var collectionItem = self.roomsCollection.get(dataset.get(el, 'id'));
-            collectionItem.set('favourite', false).save();
+            collectionItem.save({ favourite: false }, { patch: true });
 
             // do whatever else needs to be done to remove from favourites and store positions
             // TODO: at the moment if you remove all items, the UL takes up space and that makes no sense!
