@@ -37,7 +37,7 @@ module.exports = function parseContentToTemplateData(data, state) {
       roomName = data.name.replace(new RegExp('^' + escapeStringRegexp(getOrgNameFromTroupeName(data.name)) + '/'), '');
     }
 
-    var uri = data.uri || data.url.substring(1);
+    var uri = data.uri || (data.url || '').substring(1);
     return _.extend({}, data, {
       avatarSrcset:  resolveRoomAvatarSrcSet({ uri: uri }, AVATAR_SIZE),
       isNotOneToOne: (data.githubType !== 'ONETOONE'),
