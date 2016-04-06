@@ -27,8 +27,8 @@ var PrimaryCollectionView = BaseCollectionView.extend({
   },
 
   hasInit: false,
-  getEmptyView: function(){
-    switch(this.roomMenuModel.get('state')) {
+  getEmptyView: function() {
+    switch (this.roomMenuModel.get('state')) {
       case 'all':
         return EmptyAllView;
       case 'search':
@@ -69,15 +69,17 @@ var PrimaryCollectionView = BaseCollectionView.extend({
   setActive: function() {
     switch (this.roomMenuModel.get('state')){
       case 'search':
-        if(!!this.roomMenuModel.get('searchTerm')){
+        if (!!this.roomMenuModel.get('searchTerm')) {
           this.el.classList.add('active');
           this.ui.searchHeader[0].classList.remove('hidden');
         }
+
         //
         else {
           this.el.classList.remove('active');
           this.ui.searchHeader[0].classList.add('hidden');
         }
+
         break;
       default:
         this.ui.searchHeader[0].classList.add('hidden');
@@ -88,7 +90,7 @@ var PrimaryCollectionView = BaseCollectionView.extend({
   },
 
   filter: function(model, index) { //jshint unused: true
-    switch(this.roomMenuModel.get('state')) {
+    switch (this.roomMenuModel.get('state')) {
       case 'search':
         return (index <= 5);
       default:
@@ -99,6 +101,7 @@ var PrimaryCollectionView = BaseCollectionView.extend({
   //TODO The filter should be reused within the view filter method?
   onFavouriteAdded: function(id) {
     var newFavModel = this.collection.get(id);
+
     //TODO Move to collection.max
     var favIndex    = this.collection
       .filter(function(model) { return !!model.get('favourite'); }).length;
@@ -108,10 +111,9 @@ var PrimaryCollectionView = BaseCollectionView.extend({
 
   onFavouritesSorted: function(targetID, siblingID) {
 
-    var target  = this.collection.get(targetID);
-    var sibling = this.collection.get(siblingID);
-    if(!sibling) { sibling = this.collection.max('favourite'); }
-    var index   = sibling.get('favourite');
+    var target       = this.collection.get(targetID);
+    var sibling      = this.collection.get(siblingID);
+    var index = !!sibling ? sibling.get('favourite') : (this.getHighestFavourite() + 1);
 
     //Save the new favourite
     target.set('favourite', index);
@@ -119,7 +121,15 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     this.collection.sort();
   },
 
-  getChildContainerToBeIndexed: function (){
+  //TODO TEST THIS YOU FOOL JP 10/2/16
+  getHighestFavourite: function() {
+    return (this.collection.pluck('favourite')
+      .filter(function(num) { return !!num; })
+      .sort(function(a, b) { return a < b ? -1 : 1; })
+      .slice(-1)[0] || 0);
+  },
+
+  getChildContainerToBeIndexed: function () {
     //use the second child because the first child is the hidden search header
     return this.el.children[1];
   },
