@@ -9,7 +9,6 @@ var RecentSearchesCollection        = require('../collections/recent-searches');
 var SuggestedOrgCollection          = require('../collections/org-suggested-rooms');
 var apiClient                       = require('components/apiClient');
 var FilteredRoomCollection          = require('../collections/filtered-room-collection.js');
-var FilteredFavouriteRoomCollection = require('../collections/filtered-favourite-room-collection.js');
 var SuggestedRoomsByRoomCollection  = require('../collections/left-menu-suggested-by-room');
 var UserSuggestions                 = require('../collections/user-suggested-rooms');
 var SearchRoomPeopleCollection      = require('../collections/left-menu-search-rooms-and-people');
