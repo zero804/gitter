@@ -21,6 +21,7 @@ var DNDCtrl = function(attrs){
   this.drag.on('remove',  this.onDragEnd.bind(this));
   this.drag.on('drag',    this.onDragStart.bind(this));
   this.drag.on('drop',    this.onItemDropped.bind(this));
+  this.drag.on('over',    this.onContainerHover.bind(this));
 
 };
 
@@ -65,17 +66,34 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
   },
 
   onDragStart: function (){
+    this.mirror = document.querySelector('gu-mirror');
     this.trigger('dnd:start-drag');
     window.addEventListener('mouseup', this.onMouseUp);
   },
 
   onDragEnd: function (){
+    this.mirror = null;
     window.removeEventListener('mouseup', this.onMouseUp);
     this.trigger('dnd:end-drag');
   },
 
   onMouseUp: function (){
     this.onDragEnd();
+  },
+
+
+  onContainerHover: function (el, container){ //jshint unused: true
+    var mirror;
+    //If we hover over the favourite collection hide the drag mirror
+    if(container.classList.contains('collection-list--favourite')){
+      mirror = document.querySelector('.gu-mirror');
+      if(mirror) { mirror.style.display = 'none'; }
+    }
+    //If we hover over the primary collection show the drag mirror
+    else if (container.classList.contains('collection-list--primary')) {
+      mirror = document.querySelector('.gu-mirror');
+      if(mirror) { mirror.style.display = ''; }
+    }
   },
 
 });

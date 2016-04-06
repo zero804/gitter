@@ -13,7 +13,7 @@ var FavouriteCollection = PrimaryCollectionView.extend({
 
   events: {
     'mouseenter': 'onMouseEnter',
-    'mouseleave': 'onMouseLeave'
+    'mouseout':   'onMouseLeave'
   },
 
   initialize: function() {
@@ -59,18 +59,6 @@ var FavouriteCollection = PrimaryCollectionView.extend({
 
   onDragStateUpdate: function (model, val) { //jshint unused: true
     toggleClass(this.el, 'dragging', val);
-  },
-
-  onMouseEnter: function (){
-    if(!this.uiModel.get('isDragging')) { return; }
-    //Add a class to the body to hide the gu-mirror drag element
-    //when a user hovers over the favourite collection
-    document.body.classList.add('drag-over-favourite');
-  },
-
-  onMouseLeave: function (){
-    if(!this.uiModel.get('isDragging')) { return; }
-    document.body.classList.remove('drag-over-favourite');
   }
 
 });
