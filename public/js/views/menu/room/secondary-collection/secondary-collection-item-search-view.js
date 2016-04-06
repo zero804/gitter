@@ -13,6 +13,7 @@ module.exports = SecondaryCollectionItemView.extend({
   template: searchTemplate,
   serializeData: function() {
     var data = this.model.toJSON();
+
     return (!!data && data.fromUser) ?
       _.extend({}, SecondaryCollectionItemView.prototype.serializeData.apply(this, arguments), {
         userUrl:         data.fromUser.url,

@@ -79,40 +79,25 @@
 }
 
 .chat-header__topic-wrapper {
+  box-sizing: border-box;
   align-self: flex-start;
-  width: 100%;
-  white-space: nowrap;
+  display: flex;
+  max-width: 100%;
 
   @space-to-chat-header: (@chat-frame-desktop-header-height - @chat-header-heading-line-height) / 2;
   @chat-header-font-vertical-padding: (@chat-header-heading-line-height - @chat-header-heading-font-size) / 2;
   @vert-diff-baseline-offset-between-header-and-topic: @chat-header-font-vertical-padding ~"+" @chat-header-heading-font-size ~"-" @chat-header-topic-line-height;
   // The extra `.125` is for account for desenders to match baseline
   margin-top: calc(@space-to-chat-header ~"+" @vert-diff-baseline-offset-between-header-and-topic ~"+" .125em);
-}
 
-.chat-header__topic {
-  box-sizing: border-box;
-  overflow: hidden;
-  display: flex;
-  vertical-align: baseline;
-  width: 100%;
-  // min height so that an empty topic can be double clicked to edit
-  min-height: @chat-header-topic-line-height;
-  // max height to allow height animations
-  max-height: @chat-header-topic-line-height;
-  margin: 0;
   padding-right: 2em;
-
-  color: #777;
-  font-size: @chat-header-topic-font-size;
-  line-height: @chat-header-topic-line-height;
-  font-style: italic;
-  text-overflow: ellipsis;
   white-space: nowrap;
 
-  transition: max-height .5s ease-in-out;
+  &.is-editing {
+    width: 100%;
+  }
 
-  /* Handle the placeholder description and edit icon */
+  /* Handle the edit icon */
   &.is-admin {
     cursor: pointer;
 
@@ -126,6 +111,49 @@
       transition: opacity .2s ease;
     }
 
+    &.is-new-room,
+    &:hover,
+    &:focus {
+      &:after {
+        opacity: 1;
+      }
+
+      .chat-header__topic:empty {
+        &:before {
+          opacity: 1;
+        }
+      }
+    }
+  }
+}
+
+.chat-header__topic {
+  box-sizing: border-box;
+  overflow: hidden;
+  display: inline-block;
+  vertical-align: baseline;
+  width: 100%;
+  // min height so that an empty topic can be double clicked to edit
+  min-height: @chat-header-topic-line-height;
+  // max height to allow height animations
+  max-height: @chat-header-topic-line-height;
+  margin: 0;
+  // For the italic overflow
+  padding-right: .25rem;
+
+  color: #777;
+  font-size: @chat-header-topic-font-size;
+  line-height: @chat-header-topic-line-height;
+  font-style: italic;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  transition: max-height .5s ease-in-out;
+
+  /* Handle the placeholder description */
+  &.is-admin {
+    cursor: pointer;
+
     &:empty {
       &:before {
         content: 'Double-click here to enter a description for your room.';
@@ -133,20 +161,6 @@
         font-style: italic;
 
         transition: opacity .2s ease;
-      }
-    }
-
-    &.is-new-room,
-    .chat-header__topic-grouping:hover &,
-    .chat-header__topic-grouping:focus & {
-      &:after {
-        opacity: 1;
-      }
-
-      &:empty {
-        &:before {
-          opacity: 1;
-        }
       }
     }
   }
@@ -163,11 +177,12 @@
 
 
   & .topic-input {
-    flex: 1;
-    resize: none;
+    box-sizing: border-box;
+    width: 100%;
     height: 20px;
     margin-bottom: 0px;
     padding: 1px 2px;
+    resize: none;
   }
 }
 
