@@ -2,14 +2,18 @@
 
 var _                        = require('underscore');
 var escapeStringRegexp       = require('escape-string-regexp');
+var urlJoin                  = require('url-join');
 var resolveRoomAvatarSrcSet  = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 var roomNameShortener        = require('../room-name-shortener');
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
+
+var troupeEnv = require('gitter-web-shared/troupe-env');
 
 var AVATAR_SIZE = 22;
 
 module.exports = function parseContentToTemplateData(data, state) {
     data.name = (data.name || data.uri || '');
+    data.absoluteRoomUri = urlJoin(troupeEnv.basePath, data.uri);
 
     //For user results
     if (data.displayName) {

@@ -11,7 +11,6 @@ var UglifyJsPlugin           = require('webpack/lib/optimize/UglifyJsPlugin');
 
 var getPostcssStack = require('gitter-styleguide/postcss-stack');
 
-
 var devMode = process.env.WEBPACK_DEV_MODE === '1';
 
 var webpackConfig = {
@@ -89,6 +88,7 @@ var webpackConfig = {
   },
   resolve: {
     alias: {
+      "gitter-web-shared/troupe-env": path.resolve(path.join(__dirname, "/utils/troupe-env.js")),
       "utils": path.resolve(path.join(__dirname, "/utils/")),
       // "shared": path.resolve(path.join(__dirname, "../../shared/")),
       "views": path.resolve(path.join(__dirname, "./views/")),
