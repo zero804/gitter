@@ -5,11 +5,12 @@ var resolveRoomAvatarSrcSet = require('../avatars/resolve-room-avatar-srcset.js'
 var getOrgNameFromUri       = require('../get-org-name-from-uri');
 var defaultFilter           = require('../filters/left-menu-primary-default');
 var defaultFavouriteFilter  = require('../filters/left-menu-primary-favourite');
+var defaultOneToOneFilter   = require('../filters/left-menu-primary-favourite-one2one');
 
 module.exports = function suggestedOrgsFromRoomList(roomList, uri, currentRoomId, currentRoom) {
   var orgList = roomList.reduce(function(memo, room) {
     //remove on-to-one conversations
-    if (room.githubType === 'ONETOONE') { return memo; }
+    if (defaultOneToOneFilter(room)) { return memo; }
     if (!defaultFilter(room) && !defaultFavouriteFilter(room)) { return memo; }
 
     //In the case where a user is lurking in the current room and activity is updated
