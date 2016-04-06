@@ -47,18 +47,18 @@ var Criteria = {
     var lastChar = userId.toString().slice(-1);
     var userBucket = (parseInt(lastChar+'', 16) % 2) ? 'A' : 'B';
 
-    return (userBucket === bucket);
+    return (userBucket === bucket) || undefined;
   },
 
   createdAfter: function(userDetails, timestamp) {
     var user = userDetails.user;
     if (!user) return false;
     var userTimestamp = mongoUtils.getTimestampFromObjectId(user._id);
-    return (userTimestamp > timestamp);
+    return (userTimestamp > timestamp) || undefined;
   },
 
   bucketCreatedAfter: function(userDetails, opts) {
-    return (Criteria.bucket(userDetails, opts.bucket) && Criteria.createdAfter(userDetails, opts.createdAfter));
+    return (Criteria.bucket(userDetails, opts.bucket) && Criteria.createdAfter(userDetails, opts.createdAfter)) || undefined;
   },
 
   /* Enabled criteria */
