@@ -70,6 +70,7 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
   },
 
   onDragEnd: function (){
+    window.removeEventListener('mouseup', this.onMouseUp);
     this.trigger('dnd:end-drag');
   },
 
