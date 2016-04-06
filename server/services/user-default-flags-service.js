@@ -6,6 +6,8 @@ var mongooseUtils = require("../utils/mongoose-utils");
 var StatusError = require('statuserror');
 var roomMembershipFlags = require('./room-membership-flags');
 var User = persistence.User;
+var Promise = require('bluebird');
+var assert = require('assert');
 
 var DEFAULT_USER_FLAGS = roomMembershipFlags.DEFAULT_USER_FLAGS;
 
@@ -18,6 +20,7 @@ function getDefaultFlagsForUser(user) {
 }
 
 exports.getDefaultFlagsForUser = getDefaultFlagsForUser;
+
 /**
  * Returns the default flags for a user or
  * 404 StatusError if the user does not exist
@@ -59,3 +62,20 @@ function getDefaultFlagsForUserIds(userIds) {
 }
 
 exports.getDefaultFlagsForUserIds = getDefaultFlagsForUserIds;
+
+/**
+ * Set the default flags for a user. A fasley value
+ * unsets the current default
+ */
+function setDefaultFlagsForUserId(userId, flags) {
+  assert(userId, 'Expected userId');
+
+  if (flags) {
+    return User.update({ _id: userId }, { $set: { defaultFlags: flags } }).exec();
+  } else {
+    // Unset the flags for this user
+    return User.update({ _id: userId }, { $unset: { defaultFlags: true } }).exec();
+  }
+}
+
+exports.setDefaultFlagsForUserId = Promise.method(setDefaultFlagsForUserId);
