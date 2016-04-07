@@ -31,7 +31,7 @@ describe('TroupeStrategy', function() {
     troupe3: {
       users: ['user1'],
       githubType: 'USER_CHANNEL',
-      disabledProviders: ['nongithub'],
+      disabledProviders: ['twitter', 'google', 'linkedin'],
       tags: ['foo'],
       security: 'PUBLIC'
     },
@@ -87,20 +87,17 @@ describe('TroupeStrategy', function() {
       });
   });
 
-  it('should serialize disabledProviders with currentUserId', function() {
-    var strategy = new TroupeStrategy({ currentUserId: fixture.user1._id});
+  it('should serialize disabledProviders with includeDisabledProviders', function() {
+    var strategy = new TroupeStrategy({ includeDisabledProviders: true});
     var t = fixture.troupe3;
     return serialize([t], strategy)
       .then(function(s) {
-        assert.equal(s[0].disabledProviders[0], 'nongithub');
+        assert.equal(s[0].disabledProviders[0], 'twitter');
       });
   });
 
-  it('should serialize tags with currentUserId and includeTags', function() {
-    var strategy = new TroupeStrategy({
-      currentUserId: fixture.user1._id,
-      includeTags: true
-    });
+  it('should serialize tags with includeTags', function() {
+    var strategy = new TroupeStrategy({ includeTags: true });
     var t = fixture.troupe3;
     return serialize([t], strategy)
       .then(function(s) {
