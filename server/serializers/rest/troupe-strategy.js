@@ -170,9 +170,7 @@ function TagsStrategy(options) {
   });
 
   this.map = function(roomId) {
-    if (options.includeTags) {
-      return self.tagMap[roomId] || [];
-    }
+    return self.tagMap[roomId] || [];
   };
 }
 TagsStrategy.prototype = {
@@ -186,14 +184,12 @@ function DisabledProvidersStrategy(options) {
 
   this.preload = Promise.method(function(rooms, callback) {
     rooms.forEach(function(room) {
-      if (room.disabledProviders && room.disabledProviders.length) {
-        self.providerMap[room.id] = room.disabledProviders;
-      }
+      self.providerMap[room.id] = room.disabledProviders;
     });
   });
 
   this.map = function(roomId) {
-    return self.providerMap[roomId] || undefined;
+    return self.providerMap[roomId] || [];
   };
 }
 DisabledProvidersStrategy.prototype = {
@@ -324,8 +320,8 @@ function TroupeStrategy(options) {
   var favouriteStrategy     = currentUserId ? new FavouriteTroupesForUserStrategy(options) : null;
   var lurkStrategy          = currentUserId ? new LurkTroupeForUserStrategy(options) : null;
   var activityStrategy      = currentUserId ? new ActivityForUserStrategy(options) : null;
-  var tagsStrategy          = currentUserId ? new TagsStrategy(options) : null;
-  var disabledProvidersStrategy = currentUserId ? new DisabledProvidersStrategy(options) : null;
+  var tagsStrategy          = (options.includeTags) ? new TagsStrategy(options) : null;
+  var disabledProvidersStrategy = (options.includeDisabledProviders) ? new DisabledProvidersStrategy(options) : null;
   var userIdStrategy         = new UserIdStrategy(options);
   var proOrgStrategy        = new ProOrgStrategy(options);
   var permissionsStrategy    = (currentUserId || options.currentUser) && options.includePermissions ? new TroupePermissionsStrategy(options) : null;
