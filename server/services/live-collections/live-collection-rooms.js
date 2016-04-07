@@ -26,11 +26,11 @@ function serializeRoomToUsers(userIds, operation, troupe) {
 
   if(troupe.oneToOne) {
     // Because the troupe needs customized per-user....
-    serializeOneToOneRoomToUsers(userIds, operation, troupe);
-    return;
+    return serializeOneToOneRoomToUsers(userIds, operation, troupe);
   }
 
-  return restSerializer.serializeModel(troupe)
+  var strategy = new restSerializer.TroupeStrategy();
+  return restSerializer.serializeObject(troupe, strategy)
     .then(function(serializedTroupe) {
       appEvents.dataChange2('/rooms/' + troupe._id, operation, serializedTroupe, 'room');
 

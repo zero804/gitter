@@ -3,9 +3,11 @@
 var fs      = require('fs');
 var path    = require('path');
 
-module.exports = function(serializerDirectory, e) {
-  e.serialize = require('./serialize');
-  e.serializeObject = require('./serialize-object');
+module.exports = function(serializerDirectory) {
+  var e = {
+    serialize: require('./serialize'),
+    serializeObject: require('./serialize-object')
+  };
 
   fs.readdirSync(__dirname + '/' + serializerDirectory).forEach(function(fileName) {
     if(!/\.js$/.test(fileName)) return;
