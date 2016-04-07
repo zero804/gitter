@@ -123,7 +123,6 @@ module.exports = Marionette.CollectionView.extend({
 
   onCloseClicked: function() {
     var newVal = !this.model.get('roomMenuIsPinned');
-    var ANIMATION_TIME = 300;
 
     //if we are opening the panel
     if (newVal === true) {
@@ -131,10 +130,8 @@ module.exports = Marionette.CollectionView.extend({
         this.model.set({ roomMenuIsPinned: newVal });
         this.bus.trigger('room-menu:pin', newVal);
       } else {
-        setTimeout(function() {
-            this.model.set({ roomMenuIsPinned: newVal });
-            this.bus.trigger('room-menu:pin', newVal);
-          }.bind(this), ANIMATION_TIME);
+        this.model.set({ roomMenuIsPinned: newVal });
+        this.bus.trigger('room-menu:pin', newVal);
       }
 
       this.model.set({ panelOpenState: newVal });
@@ -144,9 +141,7 @@ module.exports = Marionette.CollectionView.extend({
     else {
       this.model.set({ roomMenuIsPinned: newVal });
       this.bus.trigger('room-menu:pin', newVal);
-      setTimeout(function() {
-        this.model.set({ panelOpenState: newVal });
-      }.bind(this), ANIMATION_TIME);
+      this.model.set({ panelOpenState: newVal });
     }
 
   },
