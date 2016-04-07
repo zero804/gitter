@@ -88,6 +88,24 @@ describe('user-strategy-test', function() {
         });
     });
 
+    it('should serialize a user with includeProviders', function() {
+      var strategy = new UserStrategy({ includeProviders: true });
+      return serialize([fixture.user1], strategy)
+        .then(function(s) {
+          assertUtils.assertSerializedEqual(s, [{
+            id: fixture.user1.id,
+            username: fixture.user1.username,
+            displayName: fixture.user1.displayName,
+            url: '/' + fixture.user1.username,
+            avatarUrlSmall: '/api/private/user-avatar/' + fixture.user1.username + '?s=60',
+            avatarUrlMedium: '/api/private/user-avatar/' + fixture.user1.username + '?s=128',
+            staff: false,
+            providers: [],
+            v: 1
+          }]);
+        });
+    });
+
   });
 
   describe('user-id-serializer', function() {
