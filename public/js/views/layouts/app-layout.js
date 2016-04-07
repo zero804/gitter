@@ -41,13 +41,18 @@ module.exports = (function () {
     },
 
     events: {
-      "keydown": "onKeyDown"
+      "keydown": "onKeyDown",
     },
 
     initialize: function (options) {
       this.roomCollection          = options.roomCollection;
       this.orgCollection           = options.orgCollection;
       this.dialogRegion            = modalRegion;
+
+      //Mobile events don't seem to bind 100% of the time so lets use a native method
+      document.querySelector('.menu__hotspot').addEventListener('click', function(){
+        this.fireEventToggleMobileMenu();
+      }.bind(this));
     },
 
     initMenuRegion: function (optionsForRegion){
@@ -69,6 +74,11 @@ module.exports = (function () {
         e.stopPropagation();
         e.preventDefault();
       }
+    },
+
+
+    fireEventToggleMobileMenu: function() {
+      appEvents.trigger('menu:show');
     }
 
   });
