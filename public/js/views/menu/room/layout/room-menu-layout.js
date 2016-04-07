@@ -15,9 +15,6 @@ var fastdom           = require('fastdom');
 var MINIBAR_ITEM_HEIGHT = 65;
 
 require('nanoscroller');
-
-var MENU_HIDE_DELAY = 200;
-
 require('views/behaviors/isomorphic');
 
 module.exports = Marionette.LayoutView.extend({
@@ -54,6 +51,10 @@ module.exports = Marionette.LayoutView.extend({
     panel:       '#panel',
   },
 
+  events: {
+    mouseleave: 'closePanel'
+  },
+
   childEvents: {
     render: 'onChildRender',
   },
@@ -78,9 +79,6 @@ module.exports = Marionette.LayoutView.extend({
     //JP 28/1/16
     this.orgCollection           = attrs.orgCollection;
     this.suggestedRoomCollection = attrs.suggestedRoomCollection;
-
-    //Menu Hide Delay
-    this.delay = MENU_HIDE_DELAY;
 
     //Make a new model
     this.model = new RoomMenuModel(_.extend({}, context.getSnapshot('leftMenu'), {
@@ -129,10 +127,7 @@ module.exports = Marionette.LayoutView.extend({
   closePanel: function() {
     if (this.model.get('roomMenuIsPinned')) { return; }
 
-    this.timeout = setTimeout(function() {
-      this.model.set('panelOpenState', false);
-    }.bind(this), this.delay);
-
+    this.model.set('panelOpenState', false);
   },
 
   onChildRender: function () {
