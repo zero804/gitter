@@ -11,6 +11,8 @@ var presenceService   = require("gitter-web-presence");
 var restSerializer    = require('../serializers/rest-serializer');
 var debug             = require('debug')('gitter:bayeux-events-bridge');
 
+var useDeprecatedChannels = nconf.get('ws:useDeprecatedChannels');
+
 function findFailbackChannel(channel) {
   var res = [
     /^\/api\/v1\/rooms\//,
@@ -43,10 +45,13 @@ exports.install = function() {
 
     bayeux.publish(channel, message);
 
-    var failbackChannel = findFailbackChannel(channel);
+    if (useDeprecatedChannels) {
+      // TODO: remove this fallback channel
+      var failbackChannel = findFailbackChannel(channel);
 
-    if(failbackChannel) {
-      bayeux.publish(failbackChannel, message);
+      if(failbackChannel) {
+        bayeux.publish(failbackChannel, message);
+      }
     }
   }
 
