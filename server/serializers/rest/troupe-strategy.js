@@ -1,4 +1,4 @@
-/* jshint maxcomplexity:16 */
+/* jshint maxcomplexity:17 */
 "use strict";
 
 var logger                = require('gitter-web-env').logger;
@@ -110,8 +110,8 @@ function FavouriteTroupesForUserStrategy(options) {
 
   this.map = function(id) {
     var favs = self.favs[id];
-    if(!favs) return undefined;
-    if(favs === '1') return 1000;
+    if (!favs) return undefined;
+    if (favs === '1') return 1000;
     return favs;
   };
 }
@@ -163,15 +163,14 @@ function TagsStrategy(options) {
   var self = this;
   self.tagMap = {};
 
-  this.preload = function(rooms, callback) {
+  this.preload = Promise.method(function(rooms, callback) {
     rooms.forEach(function(room) {
       self.tagMap[room.id] = room.tags;
     });
-    callback();
-  };
+  });
 
   this.map = function(roomId) {
-    if(options.includeTags) {
+    if (options.includeTags) {
       return self.tagMap[roomId] || [];
     }
   };
@@ -180,6 +179,26 @@ TagsStrategy.prototype = {
   name: 'TagsStrategy'
 };
 
+
+function DisabledProvidersStrategy(options) {
+  var self = this;
+  self.providerMap = {};
+
+  this.preload = Promise.method(function(rooms, callback) {
+    rooms.forEach(function(room) {
+      if (room.disabledProviders && room.disabledProviders.length) {
+        self.providerMap[room.id] = room.disabledProviders;
+      }
+    });
+  });
+
+  this.map = function(roomId) {
+    return self.providerMap[roomId] || undefined;
+  };
+}
+DisabledProvidersStrategy.prototype = {
+  name: 'DisabledProvidersStrategy'
+};
 
 
 
@@ -192,7 +211,7 @@ function ProOrgStrategy() {
 
   this.preload = function(troupes) {
     var uris = troupes.map(function(troupe) {
-        if(!troupe.uri) return; // one-to-one
+        if (!troupe.uri) return; // one-to-one
         return getOwner(troupe.uri);
       })
       .filter(function(room) {
@@ -296,7 +315,7 @@ TroupeOwnerIsOrgStrategy.prototype = {
 };
 
 function TroupeStrategy(options) {
-  if(!options) options = {};
+  if (!options) options = {};
 
   var currentUserId = options.currentUserId;
 
@@ -306,7 +325,7 @@ function TroupeStrategy(options) {
   var lurkStrategy          = currentUserId ? new LurkTroupeForUserStrategy(options) : null;
   var activityStrategy      = currentUserId ? new ActivityForUserStrategy(options) : null;
   var tagsStrategy          = currentUserId ? new TagsStrategy(options) : null;
-
+  var disabledProvidersStrategy = currentUserId ? new DisabledProvidersStrategy(options) : null;
   var userIdStrategy         = new UserIdStrategy(options);
   var proOrgStrategy        = new ProOrgStrategy(options);
   var permissionsStrategy    = (currentUserId || options.currentUser) && options.includePermissions ? new TroupePermissionsStrategy(options) : null;
@@ -339,15 +358,15 @@ function TroupeStrategy(options) {
       strategies.push(roomMembershipStrategy.preload(troupeIds));
     }
 
-    if(unreadItemStrategy) {
+    if (unreadItemStrategy) {
       strategies.push(unreadItemStrategy.preload(troupeIds));
     }
 
-    if(favouriteStrategy) {
+    if (favouriteStrategy) {
       strategies.push(favouriteStrategy.preload());
     }
 
-    if(lastAccessTimeStrategy) {
+    if (lastAccessTimeStrategy) {
       strategies.push(lastAccessTimeStrategy.preload());
     }
 
@@ -359,19 +378,20 @@ function TroupeStrategy(options) {
       strategies.push(permissionsStrategy.preload(items));
     }
 
-    if(ownerIsOrgStrategy) {
+    if (ownerIsOrgStrategy) {
       strategies.push(ownerIsOrgStrategy.preload(items));
     }
 
-    if(activityStrategy) {
+    if (activityStrategy) {
       strategies.push(activityStrategy.preload(troupeIds));
     }
 
-    if(tagsStrategy) {
-      strategies.push({
-        strategy: tagsStrategy,
-        data: items
-      });
+    if (tagsStrategy) {
+      strategies.push(tagsStrategy.preload(items));
+    }
+
+    if (disabledProvidersStrategy) {
+      strategies.push(disabledProvidersStrategy.preload(items));
     }
 
     return Promise.all(strategies);
@@ -383,9 +403,9 @@ function TroupeStrategy(options) {
       return '' + troupeUser.userId !== '' + currentUserId;
     })[0];
 
-    if(otherUser) {
+    if (otherUser) {
       var user = userIdStrategy.map(otherUser.userId);
-      if(user) {
+      if (user) {
         return user;
       }
     }
@@ -398,11 +418,11 @@ function TroupeStrategy(options) {
 
     isPro = proOrgStrategy.map(item);
 
-    if(item.oneToOne) {
-      if(currentUserId) {
+    if (item.oneToOne) {
+      if (currentUserId) {
         otherUser = mapOtherUser(item.oneToOneUsers);
       } else {
-        if(!shownWarning) {
+        if (!shownWarning) {
           winston.warn('TroupeStrategy initiated without currentUserId, but generating oneToOne troupes. This can be a problem!');
           shownWarning = true;
         } else {
@@ -410,7 +430,7 @@ function TroupeStrategy(options) {
         }
       }
 
-      if(otherUser) {
+      if (otherUser) {
         troupeName = otherUser.displayName;
         troupeUrl = "/" + otherUser.username;
       } else {
@@ -445,6 +465,7 @@ function TroupeStrategy(options) {
       premium: isPro,
       noindex: item.noindex,
       tags: tagsStrategy ? tagsStrategy.map(item.id) : undefined,
+      disabledProviders: disabledProvidersStrategy ? disabledProvidersStrategy.map(item.id) : undefined,
       permissions: permissionsStrategy ? permissionsStrategy.map(item) : undefined,
       ownerIsOrg: ownerIsOrgStrategy ? ownerIsOrgStrategy.map(item) : undefined,
       roomMember: roomMembershipStrategy ? roomMembershipStrategy.map(item.id) : undefined,
