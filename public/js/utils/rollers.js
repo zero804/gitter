@@ -1,6 +1,9 @@
 "use strict";
+
+var Promise = require('bluebird');
 var Mutant = require('mutantjs');
 var _ = require('underscore');
+var raf = require('utils/raf');
 var rafUtils = require('utils/raf-utils');
 var isMobile = require('utils/is-mobile');
 
@@ -59,9 +62,12 @@ module.exports = (function() {
 
   Rollers.prototype = {
     adjustScroll: function() {
-      this._mutationHandlers[this._mode]();
-      this._postMutateTop = this._target.scrollTop;
-      return true;
+      var getTargetScrollTop = this._mutationHandlers[this._mode]();
+      Promise.resolve(getTargetScrollTop)
+        .then(function(targetScrollTop) {
+          targetScrollTop = targetScrollTop || this._target.scrollTop;
+          this._postMutateTop = targetScrollTop;
+        }.bind(this));
     },
 
     adjustScrollContinuously: function(ms) {
@@ -122,9 +128,15 @@ module.exports = (function() {
      * Update the scroll position to follow the bottom of the scroll pane
      */
     updateTrackBottom: function() {
-      var target = this._target;
-      var scrollTop = target.scrollHeight - target.clientHeight;
-      this.scroll(scrollTop);
+      return new Promise(function(resolve, reject) {
+        var target = this._target;
+        raf(function() {
+          var actualScrollTop = target.scrollTop;
+          var scrollTop = target.scrollHeight - target.clientHeight;
+          this.scroll(scrollTop);
+          resolve(actualScrollTop);
+        }.bind(this));
+      }.bind(this));
     },
 
     startTransition: function(element, maxTimeMs) {
@@ -186,12 +198,16 @@ module.exports = (function() {
     /* Update the scrollTop to adjust for reflow when in STABLE mode */
     updateStableTracking: function() {
       if(!this._stableElement) return;
-      var target = this._target;
-
-      var stableElementTop = this._stableElement.offsetTop - target.offsetTop;
-      var top = stableElementTop - target.clientHeight + this._stableElementFromBottom;
-
-      this.scroll(top);
+      return new Promise(function(resolve, reject) {
+        var target = this._target;
+        raf(function() {
+          var stableElementTop = this._stableElement.offsetTop - target.offsetTop;
+          var actualScrollTop = target.scrollTop;
+          var top = stableElementTop - target.clientHeight + this._stableElementFromBottom;
+          this.scroll(top);
+          resolve(actualScrollTop);
+        }.bind(this));
+      }.bind(this));
     },
 
     /* Track current position */
