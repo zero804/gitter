@@ -26,7 +26,6 @@ var Behavior = Marionette.Behavior.extend({
     this.lazyDecoratorQueue = rafUtils.debounce(this.decorateQueue, this);
 
     this.lazyTracker        = _.debounce(this.trackViewport.bind(this), 500);
-    this.lazyPointerEvents  = _.debounce(this.enablePointerEvents.bind(this), 250);
 
     this.scrollHandler = this.smoothScroll.bind(this);
     this.scrollElement.addEventListener('scroll', this.scrollHandler, false);
@@ -66,22 +65,9 @@ var Behavior = Marionette.Behavior.extend({
     this.view.triggerMethod('trackViewportCenter');
   },
 
-  // Disable hover and other pointer events while scrolling
-  disablePointerEvents: function() {
-    if (this.wrapper && !this.wrapper.classList.contains('disable-hover'))
-      this.wrapper.classList.add('disable-hover');
-  },
-
-  enablePointerEvents: function() {
-    if (this.wrapper)
-      this.wrapper.classList.remove('disable-hover');
-  },
-
   smoothScroll: function() {
-    this.disablePointerEvents();
     this.lazyDecorator();
     this.lazyTracker();
-    this.lazyPointerEvents();
   },
 
   onDestroy: function() {
