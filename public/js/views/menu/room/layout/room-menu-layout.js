@@ -54,11 +54,6 @@ module.exports = Marionette.LayoutView.extend({
     panel:       '#panel',
   },
 
-  events: {
-    mouseenter: 'openPanel',
-    mouseleave: 'closePanel',
-  },
-
   childEvents: {
     render: 'onChildRender',
   },
