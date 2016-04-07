@@ -50,9 +50,12 @@ module.exports = (function () {
       this.dialogRegion            = modalRegion;
 
       //Mobile events don't seem to bind 100% of the time so lets use a native method
-      document.querySelector('.menu__hotspot').addEventListener('click', function(){
-        this.fireEventToggleMobileMenu();
-      }.bind(this));
+      var menuHotspot = document.querySelector('.menu__hotspot');
+      if(menuHotspot) {
+        menuHotspot.addEventListener('click', function(){
+          this.fireEventToggleMobileMenu();
+        }.bind(this));
+      }
     },
 
     initMenuRegion: function (optionsForRegion){
