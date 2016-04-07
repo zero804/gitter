@@ -35,7 +35,7 @@ module.exports = Backbone.Collection.extend({
     this.roomCollection = attrs.roomCollection;
     this.listenTo(this.roomCollection, 'snapshot', this.onCollectionSnapshot, this);
     //TODO 'add remove events'
-    this.listenTo(this.roomCollection, 'sync change', this.onCollectionUpdate, this);
+    this.listenTo(this.roomCollection, 'sync change:activity change:unreadItems change:mentions', this.onCollectionUpdate, this);
     this.listenTo(this.roomCollection, 'remove reset', this.onItemRemoved, this);
 
     models = defaultModels.concat(models || []).concat(tailDefaults);
