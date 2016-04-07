@@ -15,8 +15,16 @@ var maxSerializerTime = nconf.get('serializer:warning-period');
  * Serialize some items using a strategy, returning a promise
  */
 module.exports = Promise.method(function serialize(items, strat) {
-  if(items === null || items === undefined || !items.length) {
-    return items;
+  if(items === null || items === undefined) {
+    return null;
+  }
+
+  if (!Array.isArray(items)) {
+    throw new Error('serialize requires an array of values');
+  }
+
+  if (!items.length) {
+    return [];
   }
 
   var statsPrefix = strat.strategyType ?
