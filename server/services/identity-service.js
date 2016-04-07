@@ -10,12 +10,15 @@ var identityService = {
       return Promise.resolve(user._cachedIdentities);
     }
 
-    return persistence.Identity.find({userId: user._id})
-      .exec()
+    return identityService.findByUserId(user.id)
       .then(function(identities) {
         user._cachedIdentities = identities;
         return identities;
       });
+  },
+
+  findByUserId: function(userId) {
+    return persistence.Identity.find({userId: userId}).exec();
   },
 
   findByUserIds: function(userIds) {
