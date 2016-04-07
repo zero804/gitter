@@ -6,6 +6,7 @@ var appEvents   = require('utils/appevents');
 //OLD LEFT MENU
 var TroupeMenu = require('views/menu/old/troupeMenu');
 var context    = require('utils/context');
+var isMobile   = require('utils/is-mobile');
 
 //NEW LEFT MENU
 var RoomMenuLayout    = require('../menu/room/layout/room-menu-layout');
@@ -27,7 +28,7 @@ module.exports = (function () {
     el: 'body',
 
     behaviors: function(){
-      if(!context.hasFeature('left-menu')) {
+      if(isMobile() || !context.hasFeature('left-menu')) {
         return { Isomorphic: {
           menu: { el: "#menu-region", init: 'initMenuRegion' }
         }};
