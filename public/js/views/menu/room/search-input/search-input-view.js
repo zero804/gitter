@@ -52,7 +52,7 @@ module.exports = Marionette.ItemView.extend({
   },
 
   onModelChangeSearchTerm: function(model, val) { //jshint unused: true
-    this.ui.input.val(val);
+    if(val === '') { this.ui.input.val(val); }
     toggleClass(this.el, 'empty', !val);
   },
 
