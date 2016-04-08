@@ -16,16 +16,19 @@ var _                = require('underscore');
  */
 exports.generateNonChatContext = function(req) {
   var user = req.user;
+  var troupe = req.uriContext.troupe;
 
   return Promise.all([
       user ? serializeUser(user) : null,
+      troupe ? serializeTroupe(troupe, user) : undefined,
       user ? determineDesktopNotifications(user, req) : false,
       user ? userSettingsService.getUserSettings(user.id, 'suggestedRoomsHidden') : false,
       user ? userSettingsService.getUserSettings(user.id, 'leftRoomMenu') : false,
     ])
-    .spread(function (serializedUser, desktopNotifications, suggestedRoomsHidden, leftRoomMenuState) {
+    .spread(function (serializedUser, serializedTroupe, desktopNotifications, suggestedRoomsHidden, leftRoomMenuState) {
       return createTroupeContext(req, {
         user:                 serializedUser,
+        troupe:               serializedTroupe,
         suggestedRoomsHidden: suggestedRoomsHidden,
         desktopNotifications: desktopNotifications,
         leftRoomMenuState:    leftRoomMenuState
