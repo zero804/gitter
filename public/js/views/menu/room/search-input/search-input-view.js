@@ -27,8 +27,10 @@ module.exports = Marionette.ItemView.extend({
     'change:searchTerm': 'onModelChangeSearchTerm',
   },
 
-  initialize: function() {
+  initialize: function(attrs) {
+    this.bus = attrs.bus;
     this.onModelChangeState(this.model, this.model.get('state'));
+    this.listenTo(this.bus, 'left-menu:recent-search', this.onRecentSearchUpdate, this);
   },
 
   onInputChange: _.debounce(function(e) {
@@ -59,6 +61,10 @@ module.exports = Marionette.ItemView.extend({
   onClearClicked: function(e) {
     e.preventDefault();
     this.model.set('searchTerm', '');
+  },
+
+  onRecentSearchUpdate: function (val){
+    this.ui.input.val(val);
   },
 
 });
