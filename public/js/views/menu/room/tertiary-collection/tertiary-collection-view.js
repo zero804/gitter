@@ -98,6 +98,7 @@ module.exports =  BaseCollectionView.extend({
 
   onSearchItemClicked: function(view) {
     this.roomMenuModel.set('searchTerm', view.model.get('name'));
+    this.bus.trigger('left-menu:recent-search', view.model.get('name'));
   },
 
   onRender: function (){
