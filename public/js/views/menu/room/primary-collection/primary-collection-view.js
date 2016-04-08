@@ -116,9 +116,17 @@ var PrimaryCollectionView = BaseCollectionView.extend({
 
   onFavouritesSorted: function(targetID, siblingID) {
 
-    var target       = this.collection.get(targetID);
-    var sibling      = this.collection.get(siblingID);
-    var index = !!sibling ? sibling.get('favourite') : (this.getHighestFavourite() + 1);
+    var target  = this.collection.get(targetID);
+    var sibling = this.collection.get(siblingID);
+    var index   = !!sibling ? sibling.get('favourite') : (this.getHighestFavourite() + 1);
+    var max     = this.collection.max('favourite');
+
+    //If we have a sibling and that sibling has the highest favourite value
+    //then we have dropped the item in the second to last position
+    //so we need to account for that
+    if (!!sibling && !!max && (sibling.get('id') === max.get('id'))) {
+      index = max.get('favourite');
+    }
 
     //Save the new favourite
     target.set('favourite', index);
