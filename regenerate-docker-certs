@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# This may be set for node debug, but those
+# values will break python scripts
+export DEBUG=
+
+set -euo pipefail
+
+DOCKER_MACHINE_NAME=${DOCKER_MACHINE_NAME-default}
+
+docker-machine regenerate-certs "${DOCKER_MACHINE_NAME}" || true
+docker-machine ssh "${DOCKER_MACHINE_NAME}" sudo /etc/init.d/docker stop || true
+docker-machine ssh "${DOCKER_MACHINE_NAME}" sudo /etc/init.d/docker start
+
+./start
