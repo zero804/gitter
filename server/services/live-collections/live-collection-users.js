@@ -12,8 +12,9 @@ function getRoomDistribution(userId) {
 
 function serializeUserToRooms(troupeIds, operation, user) {
   if (!troupeIds.length) return Promise.resolve();
+  var strategy = new restSerializer.UserStrategy();
 
-  return restSerializer.serializeModel(user)
+  return restSerializer.serializeObject(user, strategy)
     .then(function(serializedUser) {
 
       troupeIds.forEach(function(troupeId) {
