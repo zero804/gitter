@@ -54,12 +54,13 @@ function getText(username, chat) {
 
 function getShortFromUserName(user) {
   if (!user) return;
-  if (user.username) return user.username;
 
   var displayName = user.displayName;
   if (!displayName) return '';
 
-  return displayName && displayName.split(/\s/,1)[0];
+  // this is dodgy, btw. See #373
+  //return displayName && displayName.split(/\s/,1)[0];
+  return displayName.trim();
 }
 
 function summarizeChatsInRoom(troupe, chats, options) {
