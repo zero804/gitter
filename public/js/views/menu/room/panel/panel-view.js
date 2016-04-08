@@ -54,7 +54,7 @@ module.exports = Marionette.LayoutView.extend({
   initFavouriteCollection: function (optionsForRegion) {
     //Sadly the favourite collection needs to be generated here rather than the room-menu-model
     //because it has a dependency on the dnd-controller JP 1/4/16
-    var favCollection = window.fav = new FilteredFavouriteRoomCollection({
+    var favCollection =  new FilteredFavouriteRoomCollection({
       roomModel:  this.model,
       collection: this.model._roomCollection,
       dndCtrl:    this.dndCtrl,
