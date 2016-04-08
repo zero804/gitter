@@ -27,7 +27,7 @@
     {{/each}}
 
   </head>
-  <body class='hover desktop application-container'>
+  <body class='{{#if isPhone}}mobile{{/if}}  hover desktop application-container'>
     {{> staging_marker}}
 
     {{! feature switch left-menu }}

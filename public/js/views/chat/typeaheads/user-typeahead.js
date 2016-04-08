@@ -146,10 +146,17 @@ module.exports = function(chatCollection) {
       });
     },
     template: function(user) {
-      return template({
-        name: user.username,
-        description: user.displayName
-      });
+      if (user.username == '/all') {
+        return template({
+          name: user.username,
+          description: user.displayName
+        });
+      } else {
+        return template({
+          name: user.displayName,
+          description: user.username
+        });
+      }
     },
     replace: function(user) {
       return '$1@' + user.username + ' ';

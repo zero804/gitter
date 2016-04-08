@@ -1,13 +1,14 @@
 "use strict";
 
-var _              = require('underscore');
+var _              = require('lodash');
 var appEvents      = require('gitter-web-appevents');
 var restSerializer = require("../../serializers/rest-serializer");
 
 function serializeEventToRoom(operation, event) {
   var url = '/rooms/' + event.toTroupeId + '/events';
+  var strategy = new restSerializer.EventStrategy();
 
-  return restSerializer.serializeModel(event)
+  return restSerializer.serializeObject(event, strategy)
     .then(function(serializedEvent) {
       appEvents.dataChange2(url, operation, serializedEvent, 'event');
     });

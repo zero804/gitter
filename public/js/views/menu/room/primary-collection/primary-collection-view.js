@@ -98,10 +98,14 @@ var PrimaryCollectionView = BaseCollectionView.extend({
   //TODO The filter should be reused within the view filter method?
   onFavouriteAdded: function(id) {
     var newFavModel = this.collection.get(id);
+
+    // @cutandpastey, this is wrong.
+    // this should be `max + 1` not `length + 1`
+    // as favorite index could = 1000
     var favIndex    = this.collection
       .filter(function(model) { return !!model.get('favourite'); }).length;
-    newFavModel.set('favourite', (favIndex + 1));
-    newFavModel.save();
+      
+    newFavModel.save({ favourite: favIndex + 1 }, { patch: true });
   },
 
   onFavouritesSorted: function(targetID, siblingID) {
