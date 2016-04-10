@@ -6,7 +6,7 @@ var langs = require('langs');
 var express = require('express');
 var urlJoin = require('url-join');
 
-var troupeEnv = require('../web/troupe-env');
+var clientEnv = require('client-env');
 var contextGenerator = require('../web/context-generator');
 var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
 
@@ -180,7 +180,7 @@ router.get('/tags/:tags',
             exploreBaseUrl: req.baseUrl,
             troupeContext: troupeContext,
             isLoggedIn: isLoggedIn,
-            createRoomUrl: urlJoin(troupeEnv.basePath, '#createroom')
+            createRoomUrl: urlJoin(clientEnv.basePath, '#createroom')
           }));
         })
         .catch(next);

@@ -5,6 +5,7 @@
   "dependencies": {
     "@gitterhq/translations": "^1.0.0",
     "apn": "~1.7.3",
+    "app-version": "file:modules/app-version",
     "async": "~0.9.0",
     "batch-stream": "^0.1.0",
     "bluebird": "^3.2.1",
@@ -29,6 +30,7 @@
     "fast-csv": "^0.6.0",
     "fflip": "git+https://github.com/suprememoocow/fflip.git#fa77d5d981c2b93279c42305e8fe5632716c06a5",
     "fs-extra": "^0.8.1",
+    "gitter-client-env": "file:modules/client-env",
     "gitter-env": "^0.23.1",
     "gitter-faye": "^1.1.0-e",
     "gitter-faye-redis": "^0.4.4",

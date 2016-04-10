@@ -2,9 +2,9 @@
 
 /* #### See version-files in the Makefile #### */
 
-var fs = require("fs");
+var fs = require('fs');
 var path = require('path');
-var winston = require('../utils/winston');
+var winston = require('gitter-web-env').logger;
 
 function readFileSync(fileName) {
   var file = path.join(__dirname, '../..', fileName);

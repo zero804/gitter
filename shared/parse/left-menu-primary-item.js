@@ -7,13 +7,13 @@ var resolveRoomAvatarSrcSet  = require('gitter-web-shared/avatars/resolve-room-a
 var roomNameShortener        = require('../room-name-shortener');
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 
-var troupeEnv = require('gitter-web-shared/troupe-env');
+var clientEnv = require('gitter-cient-env');
 
 var AVATAR_SIZE = 22;
 
 module.exports = function parseContentToTemplateData(data, state) {
     data.name = (data.name || data.uri || '');
-    data.absoluteRoomUri = urlJoin(troupeEnv.basePath, data.uri);
+    data.absoluteRoomUri = urlJoin(clientEnv.basePath, data.uri);
 
     //For user results
     if (data.displayName) {
