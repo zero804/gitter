@@ -6,7 +6,7 @@ var langs = require('langs');
 var express = require('express');
 var urlJoin = require('url-join');
 
-var clientEnv = require('client-env');
+var clientEnv = require('gitter-client-env');
 var contextGenerator = require('../web/context-generator');
 var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
 
