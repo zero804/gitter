@@ -16,7 +16,7 @@ var _                = require('underscore');
  */
 exports.generateNonChatContext = function(req) {
   var user = req.user;
-  var troupe = req.uriContext.troupe;
+  var troupe = (req.uriContext || {}).troupe;
 
   return Promise.all([
       user ? serializeUser(user) : null,
