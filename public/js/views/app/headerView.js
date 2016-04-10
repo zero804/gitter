@@ -20,7 +20,12 @@ require('views/behaviors/tooltip');
 
 
 function getPrivateStatus(data) {
-  return data.githubType === 'ORG' || data.githubType === 'ONETOONE' || data.security === 'PRIVATE';
+  if (data.security === 'PUBLIC') {
+    return false;
+  }
+  // actually everything not-public in getChatNameTitle says it is private in
+  // some way, but be safe for now.
+  return (data.security === 'PRIVATE' || ['REPO', 'ORG', 'REPO_CHANNEL', 'ORG_CHANNEL', 'USER_CHANNEL', 'ONETOONE'].indexOf(data.githubType) !== -1);
 }
 
 function getGithubUrl(data) {

@@ -37,7 +37,7 @@ module.exports =  BaseCollectionView.extend({
     this.secondaryCollection = attrs.secondaryCollection;
 
     this.listenTo(this.roomMenuModel, 'change:searchTerm', this.setActive, this);
-    this.listenTo(this.collection, 'filter-complete', this.render, this);
+    this.listenTo(this.collection, 'filter-complete sync', this.render, this);
 
     BaseCollectionView.prototype.initialize.apply(this, arguments);
   },
@@ -98,6 +98,7 @@ module.exports =  BaseCollectionView.extend({
 
   onSearchItemClicked: function(view) {
     this.roomMenuModel.set('searchTerm', view.model.get('name'));
+    this.bus.trigger('left-menu:recent-search', view.model.get('name'));
   },
 
   onRender: function (){

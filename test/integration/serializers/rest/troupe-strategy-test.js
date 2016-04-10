@@ -1,5 +1,6 @@
 "use strict";
 
+var assert = require('assert');
 var testRequire = require('../../test-require');
 var assertUtils = require('../../assert-utils')
 var fixtureLoader = require('../../test-fixtures');
@@ -26,7 +27,14 @@ describe('TroupeStrategy', function() {
     troupe2: {
       oneToOne: true,
       users: ['user1', 'user2']
-    }
+    },
+    troupe3: {
+      users: ['user1'],
+      githubType: 'USER_CHANNEL',
+      disabledProviders: ['nongithub'],
+      tags: ['foo'],
+      security: 'PUBLIC'
+    },
   }));
 
   after(function() {
@@ -76,6 +84,27 @@ describe('TroupeStrategy', function() {
           roomMember: true,
           v: 1
         }]);
+      });
+  });
+
+  it('should serialize disabledProviders with currentUserId', function() {
+    var strategy = new TroupeStrategy({ currentUserId: fixture.user1._id});
+    var t = fixture.troupe3;
+    return serialize([t], strategy)
+      .then(function(s) {
+        assert.equal(s[0].disabledProviders[0], 'nongithub');
+      });
+  });
+
+  it('should serialize tags with currentUserId and includeTags', function() {
+    var strategy = new TroupeStrategy({
+      currentUserId: fixture.user1._id,
+      includeTags: true
+    });
+    var t = fixture.troupe3;
+    return serialize([t], strategy)
+      .then(function(s) {
+        assert.equal(s[0].tags[0], 'foo');
       });
   });
 

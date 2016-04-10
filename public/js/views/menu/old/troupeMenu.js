@@ -190,7 +190,7 @@ module.exports = (function () {
       // TODO: build a behavior to handle this declaratively
       this.listenTo(appEvents, 'menu:hide', this.hideMenu);
       this.listenTo(appEvents, 'menu:show', this.showMenu);
-      this.listenTo(appEvents, 'navigation', this.showMenu);
+      this.listenTo(appEvents, 'navigation', this.onNavigation);
       this.listenTo(appEvents, 'troupeUnreadTotalChange', this.updateUnread);
       this.listenTo(appEvents, 'context.troupeId', this.troupeContextChanged);
 
@@ -206,6 +206,10 @@ module.exports = (function () {
       }
 
       this.initNanoScrollerThrottled = _.throttle(this.initNanoScroller, 100, { leading: false });
+    },
+
+    onNavigation: function (){
+      return (isMobile()) ? this.hideMenu() : this.showMenu();
     },
 
     initNanoScroller: function() {
