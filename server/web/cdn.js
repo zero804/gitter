@@ -1,7 +1,7 @@
 "use strict";
 
 var nconf = require('../utils/config');
-var appVersion = require('./appVersion');
+var appVersion = require('app-version');
 
 var hosts, hostLength, cdnPrefix;
 

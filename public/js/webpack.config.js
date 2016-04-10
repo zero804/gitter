@@ -88,7 +88,6 @@ var webpackConfig = {
   },
   resolve: {
     alias: {
-      "gitter-web-shared/troupe-env": path.resolve(path.join(__dirname, "/utils/troupe-env.js")),
       "utils": path.resolve(path.join(__dirname, "/utils/")),
       // "shared": path.resolve(path.join(__dirname, "../../shared/")),
       "views": path.resolve(path.join(__dirname, "./views/")),
