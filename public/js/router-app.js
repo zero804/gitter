@@ -5,6 +5,7 @@ require('utils/initial-setup');
 var $                                 = require('jquery');
 var appEvents                         = require('utils/appevents');
 var context                           = require('utils/context');
+var clientEnv                         = require('gitter-client-env');
 var Backbone                          = require('backbone');
 var _                                 = require('underscore');
 var AppLayout                         = require('views/layouts/app-layout');
@@ -84,7 +85,7 @@ onready(function() {
     return contentFrame.contentWindow.location;
   }
 
-  var roomSwitcher = new SPARoomSwitcher(troupeCollections.troupes, context.env('basePath'), getContentFrameLocation);
+  var roomSwitcher = new SPARoomSwitcher(troupeCollections.troupes, clientEnv['basePath'], getContentFrameLocation);
   roomSwitcher.on('replace', function(href) {
     debug('Room switch: replace %s', href);
 
@@ -204,7 +205,7 @@ onready(function() {
   });
 
   window.addEventListener('message', function(e) {
-    if (e.origin !== context.env('basePath')) {
+    if (e.origin !== clientEnv['basePath']) {
       debug('Ignoring message from %s', e.origin);
       return;
     }
@@ -312,7 +313,7 @@ onready(function() {
   }, false);
 
   function postMessage(message) {
-    chatIFrame.contentWindow.postMessage(JSON.stringify(message), context.env('basePath'));
+    chatIFrame.contentWindow.postMessage(JSON.stringify(message), clientEnv['basePath']);
   }
 
   // Call preventDefault() on tab events so that we can manage focus as we want

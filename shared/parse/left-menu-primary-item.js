@@ -7,7 +7,7 @@ var resolveRoomAvatarSrcSet  = require('gitter-web-shared/avatars/resolve-room-a
 var roomNameShortener        = require('../room-name-shortener');
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 
-var clientEnv = require('gitter-cient-env');
+var clientEnv = require('gitter-client-env');
 
 var AVATAR_SIZE = 22;
 

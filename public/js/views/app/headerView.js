@@ -1,6 +1,7 @@
 'use strict';
 var _                        = require('underscore');
 var context                  = require('utils/context');
+var clientEnv                = require('gitter-client-env');
 var apiClient                = require('components/apiClient');
 var Marionette               = require('backbone.marionette');
 var Backbone                 = require('backbone');
@@ -190,7 +191,7 @@ var HeaderView = Marionette.ItemView.extend({
       if (!isOneToOne) {
         if (isAdmin) {
           if (c.isNativeDesktopApp) {
-            menuItems.push({ title: 'Integrations', href: context.env('basePath') + url + '#integrations', target: '_blank', dataset: { disableRouting: 1 } });
+            menuItems.push({ title: 'Integrations', href: clientEnv['basePath'] + url + '#integrations', target: '_blank', dataset: { disableRouting: 1 } });
           } else {
             menuItems.push({ title: 'Integrations', href: '#integrations' });
           }

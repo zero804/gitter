@@ -3,6 +3,7 @@ require('utils/initial-setup');
 
 var Backbone               = require('backbone');
 var context                = require('utils/context');
+var clientEnv              = require('gitter-client-env');
 var liveContext            = require('components/live-context');
 var appEvents              = require('utils/appevents');
 var debug                  = require('debug-proxy')('app:router-chat');
@@ -49,7 +50,7 @@ onready(function() {
     // Shortcut for performance
     if (!e || !e.data || typeof e.data !== 'string') return;
 
-    if (e.origin !== context.env('basePath')) {
+    if (e.origin !== clientEnv['basePath']) {
       debug('Ignoring message from ' + e.origin);
       return;
     }
@@ -149,7 +150,7 @@ onready(function() {
     var id = chat.id;
 
     if (options && options.appendInput) {
-      var fullUrl = context.env('basePath') + url + '?at=' + id;
+      var fullUrl = clientEnv['basePath'] + url + '?at=' + id;
       var formattedDate = fullTimeFormat(chat.get('sent'));
       appEvents.trigger('input.append', ':point_up: [' + formattedDate + '](' + fullUrl + ')');
     }
@@ -297,7 +298,7 @@ onready(function() {
     addPeople: function() {
       require.ensure(['views/app/addPeopleView', 'views/modals/upgrade-to-pro-view'], function(require) {
         var room = context.troupe();
-        var maxFreeMembers = context.env('maxFreeOrgRoomMembers');
+        var maxFreeMembers = clientEnv['maxFreeOrgRoomMembers'];
         var isOverLimit = room.get('security') !== 'PUBLIC' &&
           room.get('githubType').indexOf('ORG') >= 0 &&
           !room.get('premium') &&

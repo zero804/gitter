@@ -53,8 +53,9 @@ exports.generateEnv = function(parameters) {
   var env = createEnv(this, options);
 
   return '<script type="text/javascript">' +
-          'window.clientEnv = ' + safeJson(JSON.stringify(env)) + ';' +
+          'window.gitterClientEnv = ' + safeJson(JSON.stringify(env)) + ';' +
           '</script>';
+
 };
 
 exports.generateTroupeContext = function(troupeContext, parameters) {
@@ -63,7 +64,7 @@ exports.generateTroupeContext = function(troupeContext, parameters) {
   var env = createEnv(this, options);
 
   return '<script type="text/javascript">' +
-          'window.clientEnv = ' + safeJson(JSON.stringify(env)) + ';' +
+          'window.gitterClientEnv = ' + safeJson(JSON.stringify(env)) + ';' +
           'window.troupeContext = ' + safeJson(JSON.stringify(troupeContext)) + ';' +
           '</script>';
 };

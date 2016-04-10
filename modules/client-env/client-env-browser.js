@@ -1,7 +1,7 @@
 'use strict';
 var qs = require('qs').parse(window.location.search);
 
-var env = window.troupeEnv || {};
+var env = window.gitterClientEnv || {};
 // Allow env through the querystring
 if(qs.env) {
   var m;
@@ -18,4 +18,4 @@ if(qs.env) {
   }
 }
 
-module.export = env;
+module.exports = env;

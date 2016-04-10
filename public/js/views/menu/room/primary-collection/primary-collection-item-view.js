@@ -4,6 +4,7 @@ var Backbone         = require('backbone');
 var itemTemplate     = require('./primary-collection-item-view.hbs');
 var apiClient        = require('components/apiClient');
 var context          = require('utils/context');
+var clientEnv        = require('gitter-client-env');
 var appEvents        = require('utils/appevents');
 var parseForTemplate = require('gitter-web-shared/parse/left-menu-primary-item');
 var toggleClass      = require('utils/toggle-class');
@@ -49,7 +50,7 @@ module.exports = BaseCollectionItemView.extend({
       data.lurkActivity = false;
     }
 
-    var absoluteRoomUri  = context.env('basePath') + data.url;
+    var absoluteRoomUri  = clientEnv['basePath'] + data.url;
     data.absoluteRoomUri = absoluteRoomUri;
     return data;
   },
