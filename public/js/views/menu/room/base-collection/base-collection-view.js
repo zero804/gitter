@@ -53,7 +53,10 @@ module.exports = Marionette.CompositeView.extend({
 
   onItemClicked: function(view) {
     var model = view.model;
-    var name = (model.get('uri') || model.get('url') || model.get('name') || model.get('fromUser').username);
+    var name = (model.get('uri') ||
+                model.get('url') ||
+                model.get('name') ||
+                (model.get('fromUser') && model.get('fromUser').username));
     var url  = (name[0] !== '/') ?  '/' + name : name;
 
     //We have to explicitly check for false because search

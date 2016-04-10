@@ -52,6 +52,7 @@ router.get(new RegExp('/explore(.*)?'),
   identifyRoute('home-explore'),
   ensureLoggedIn,
   featureToggles,
+  appMiddleware.isPhoneMiddleware,
   function (req, res, next) {
     req.uriContext = {
       uri: 'home'
