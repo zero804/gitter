@@ -101,10 +101,20 @@ var View = Marionette.LayoutView.extend({
     if (val) {
       if (val.nonStandard) {
         this.ui.nonstandard.show();
-        this.setOption('', val.description);
       } else {
         this.ui.nonstandard.hide();
-        this.setOption(val.selectValue);
+      }
+
+      var isDefault = this.model.get('default');
+
+      if (isDefault) {
+        this.setOption('default');
+      } else {
+        if (val.nonStandard) {
+          this.setOption('', val.description);
+        } else {
+          this.setOption(val.selectValue);
+        }
       }
 
     } else {
@@ -150,8 +160,17 @@ var View = Marionette.LayoutView.extend({
   setOption: function(val, text) {
     var selectInput = this.ui.options;
     selectInput.empty();
-
     var found = false;
+
+    var defaultOption = document.createElement("option");
+    defaultOption.value = 'default';
+    defaultOption.textContent = this.getDefaulDescription();
+    if (val === 'default') {
+      defaultOption.selected = true;
+      found = true;
+    }
+    selectInput.append(defaultOption);
+
     var items = OPTIONS.map(function(o) {
       var option = document.createElement("option");
       option.value = o.val;
@@ -173,6 +192,15 @@ var View = Marionette.LayoutView.extend({
       option.style.display = 'none';
       selectInput.append(option);
     }
+  },
+
+  getDefaulDescription: function() {
+    var model = this.model;
+    var defaultSettings = model.get('defaultSettings');
+    if (!defaultSettings) return "Default settings";
+
+    if (!defaultSettings.mode) return "Default settings: legacy";
+    return "Default settings: " + defaultSettings.mode;
   },
 
   onRender: function() {

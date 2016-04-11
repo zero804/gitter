@@ -1,9 +1,10 @@
 "use strict";
 
-var Promise                 = require('bluebird');
-var StatusError             = require('statuserror');
-var roomMembershipService   = require('../../../services/room-membership-service');
-var userDefaultFlagsService = require('../../../services/user-default-flags-service');
+var Promise                   = require('bluebird');
+var StatusError               = require('statuserror');
+var roomMembershipService     = require('../../../services/room-membership-service');
+var userDefaultFlagsService   = require('../../../services/user-default-flags-service');
+var userRoomModeUpdateService = require('../../../services/user-room-mode-update-service');
 
 function generateResponse(userId, troupeId) {
   return Promise.join(
@@ -58,8 +59,7 @@ module.exports = {
     var mode = settings && (settings.mode || settings.push);
 
     if (!mode) throw new StatusError(400, 'Illegal notifications mode');
-
-    return roomMembershipService.setMembershipMode(userId, troupeId, mode, false)
+    return userRoomModeUpdateService.setModeForUserInRoom(req.resourceUser, troupeId, mode)
       .then(function() {
         return generateResponse(userId, troupeId);
       });
