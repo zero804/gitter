@@ -1,6 +1,7 @@
 'use strict';
 
 var StatusError = require('statuserror');
+var assert = require('assert');
 
 /* Note, these can not change! */
 /* -----8<---- */
@@ -116,6 +117,16 @@ function getUpdateForMode(mode, isDefault) {
   };
 }
 
+function getUpdateForFlags(flags) {
+  assert(!isNaN(flags));
+
+  var lurk = !(flags & BITMASK_NOTIFY_UNREAD);
+
+  return {
+    $set: { lurk: lurk, flags: flags }
+  };
+}
+
 function getFlagsForMode(mode, isDefault) {
   if (!MODES.hasOwnProperty(mode)) {
     throw new StatusError(400, 'Invalid mode ' + mode);
@@ -222,6 +233,7 @@ module.exports = {
   getFlagsForMode: getFlagsForMode,
   getModeFromFlags: getModeFromFlags,
   getUpdateForMode: getUpdateForMode,
+  getUpdateForFlags: getUpdateForFlags,
   getLurkForFlags: getLurkForFlags,
   getLurkForMode: getLurkForMode,
   toggleLegacyLurkMode: toggleLegacyLurkMode,

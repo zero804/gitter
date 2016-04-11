@@ -363,6 +363,29 @@ var getMembershipDetails = Promise.method(function (userId, troupeId) {
     });
 });
 
+var setMembershipFlags = Promise.method(function (userId, troupeId, flags) {
+  debug('setMembershipFlags userId=%s, troupeId=%s, flags=%s', flags);
+  return TroupeUser.findOneAndUpdate({
+      troupeId: troupeId,
+      userId: userId
+    }, roomMembershipFlags.getUpdateForFlags(flags), {
+      new: false
+    })
+    .exec()
+    .then(function(oldTroupeUser) {
+       if (!oldTroupeUser) return false;
+
+       var valueIsLurking = roomMembershipFlags.getLurkForFlags(flags);
+       var changed = getLurkFromTroupeUser(oldTroupeUser) !== valueIsLurking;
+
+       if (changed) {
+         roomMembershipEvents.emit("members.lurk.change", troupeId, [userId], valueIsLurking);
+       }
+
+       return changed;
+    });
+});
+
 var setMembershipMode = Promise.method(function (userId, troupeId, value, isDefault) {
   debug('setMembershipMode userId=%s, troupeId=%s, value=%s', userId, troupeId, value);
   return TroupeUser.findOneAndUpdate({
@@ -614,6 +637,7 @@ exports.getMemberLurkStatus         = getMemberLurkStatus;
 
 exports.getMembershipMode           = getMembershipMode;
 exports.getMembershipDetails        = getMembershipDetails;
+exports.setMembershipFlags          = setMembershipFlags;
 exports.setMembershipMode           = setMembershipMode;
 exports.setMembershipModeForUsersInRoom = setMembershipModeForUsersInRoom;
 exports.findMembershipModeForUsersInRoom = findMembershipModeForUsersInRoom;
