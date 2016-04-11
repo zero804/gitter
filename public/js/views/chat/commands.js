@@ -287,6 +287,22 @@ var commandsList = [
     }
   },
 
+  // Hidden Commands
+  {
+    command: 'update-default-mode',
+    description: 'Update default mode for rooms',
+    // regexp: /^\/mark-all-read\s*$/,
+    action: function(text) {
+      var topicMatch = text.match(/^\/update-default-mode\s+(all|annoucement|mute)(\s+override)?/);
+      if (!topicMatch) return;
+
+      var override = !!topicMatch[2];
+
+      apiClient.user.put('/settings/defaultRoomMode', { mode: topicMatch[1], override: override });
+    }
+  },
+
+
 
 
 
