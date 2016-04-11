@@ -188,29 +188,26 @@ var ModalView = Marionette.LayoutView.extend({
     this.destroy();
   },
 
-  backdrop: function( callback ) {
-    if (this.isShown) {
-
+  backdrop: function(callback) {
+    if (this.isShown && this.options.backdrop !== false) {
       this.$backdrop = $('<div class="modal-backdrop" />')
         .appendTo(document.body);
 
       var bd = this.$backdrop;
       this.$backdrop.click(function(e) {
         if( e.target !== this ) return;
-
         bd.modal.hide();
       });
       this.$backdrop.modal = this;
       this.$backdrop.addClass('in');
 
       callback();
-
-    } else if (!this.isShown && this.$backdrop) {
+    } else if(!this.isShown && this.$backdrop) {
       this.$backdrop.removeClass('in');
 
       this.removeBackdrop();
 
-    } else if (callback) {
+    } else if(callback) {
       callback();
     }
   },

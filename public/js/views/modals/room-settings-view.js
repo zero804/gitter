@@ -1,12 +1,12 @@
 "use strict";
 
 var Marionette             = require('backbone.marionette');
-var Backbone               = require('backbone');
 var _                      = require('underscore');
 var apiClient              = require('components/apiClient');
 var ModalView              = require('./modal');
 var troupeSettingsTemplate = require('./tmpl/room-settings-view.hbs');
 var userNotifications      = require('components/user-notifications');
+var FeaturesView           = require('./notification-features-collection-view');
 
 var OPTIONS = [
   { val: 'all', text: 'All: Notify me for all messages' },
@@ -41,7 +41,7 @@ var View = Marionette.LayoutView.extend({
         this.model.set(settings);
       });
 
-    this.notifyFeatureCollection = new Backbone.Collection([]);
+    this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
   },
 
   getNotificationOption: function() {
@@ -122,35 +122,14 @@ var View = Marionette.LayoutView.extend({
       this.ui.nonstandard.hide();
     }
 
-    var attributes = this.model.attributes;
-    var features = [];
-    if (attributes.unread) {
-      features.push({ id: 1, text: 'Show unread item counts' });
+    var count = 0;
+    if(this.featuresView) {
+      count = this.featuresView.resetFromHash(this.model.attributes);
+    } else {
+      count = 0;
     }
 
-    if (attributes.activity) {
-      features.push({ id: 2, text: 'Show activity indicator on chat' });
-    }
-
-    if (attributes.desktop) {
-      features.push({ id: 5, text: 'Notify for all chats' });
-    }
-
-    if (attributes.mention) {
-      features.push({ id: 3, text: 'Notify when you\'re mentioned' });
-    }
-
-    if (attributes.announcement) {
-      features.push({ id: 4, text: 'Notify on @/all announcements' });
-    }
-
-    // For now, desktop = mobile so don't confuse the user
-    // if (attributes.mobile) {
-    //   features.push({ id: 6, text: 'Mobile notifications for chats' });
-    // }
-
-    this.notifyFeatureCollection.reset(features);
-    if (features.length) {
+    if (count > 0) {
       this.ui.notifyFeatures.show();
     } else {
       this.ui.notifyFeatures.hide();
@@ -204,15 +183,9 @@ var View = Marionette.LayoutView.extend({
   },
 
   onRender: function() {
+    this.featuresView = new FeaturesView({ });
+    this.getRegion('notifyFeatures').show(this.featuresView);
     this.update();
-    this.getRegion('notifyFeatures').show(new Marionette.CollectionView({
-      tagName: 'ul',
-      collection: this.notifyFeatureCollection,
-      childView: Marionette.ItemView.extend({
-        tagName: 'li',
-        template: _.template("<%= text %>")
-      })
-    }));
   },
 
   formChange: function(e) {
@@ -236,14 +209,27 @@ var View = Marionette.LayoutView.extend({
     return {
       notificationsBlocked: userNotifications.isAccessDenied(),
     };
-  }
+  },
 
+  menuItemClicked: function(button) {
+    switch(button) {
+      case 'set-defaults':
+        window.location.href = "#notification-defaults";
+        break;
+    }
+  }
 });
 
 module.exports = ModalView.extend({
     initialize: function(options) {
-      options.title = "Notification Settings";
-      ModalView.prototype.initialize.apply(this, arguments);
+      options = _.extend({
+        title: "Notification Settings",
+        menuItems: [
+          { action: "set-defaults", pull: 'left', text: "Configure Defaults", className: "modal--default__footer__btn"}
+        ]
+      }, options);
+
+      ModalView.prototype.initialize.call(this, options);
       this.view = new View(options);
     }
 });
