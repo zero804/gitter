@@ -31,7 +31,7 @@ describe('TroupeStrategy', function() {
     troupe3: {
       users: ['user1'],
       githubType: 'USER_CHANNEL',
-      disabledProviders: ['twitter', 'google', 'linkedin'],
+      providers: ['github'],
       tags: ['foo'],
       security: 'PUBLIC'
     },
@@ -87,12 +87,12 @@ describe('TroupeStrategy', function() {
       });
   });
 
-  it('should serialize disabledProviders with includeDisabledProviders', function() {
-    var strategy = new TroupeStrategy({ includeDisabledProviders: true});
+  it('should serialize providers with includeProviders', function() {
+    var strategy = new TroupeStrategy({ includeProviders: true});
     var t = fixture.troupe3;
     return serialize([t], strategy)
       .then(function(s) {
-        assert.equal(s[0].disabledProviders[0], 'twitter');
+        assert.equal(s[0].providers[0], 'github');
       });
   });
 
