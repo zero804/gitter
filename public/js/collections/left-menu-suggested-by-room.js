@@ -18,6 +18,7 @@ var SuggestedCollection = SuggestedRoomsByRoomCollection.extend({
 
     this.roomMenuModel = attrs.roomMenuModel;
     this.listenTo(this.roomMenuModel, 'change:state', this.onDataUpdate, this);
+    this.listenTo(this.roomMenuModel, 'change:hasDismissedSuggestions', this.onDismissStateChange, this);
 
     if (!attrs || !attrs.troupeModel) {
       throw new Error('A valid instance of a TroupeModel must be passed to a new instance of LeftMenuSuggestionsCollection');
@@ -53,6 +54,13 @@ var SuggestedCollection = SuggestedRoomsByRoomCollection.extend({
     //If we have not changed room dont fetch
     if(!this.contextModel.changed.roomId) { return }
 
+    //If a user has previously dismissed suggestions never fetch()
+    if(this.roomMenuModel.get('hasDismissedSuggestions')) { return; }
+    this.fetch();
+  },
+
+  onDismissStateChange: function (model, val){ //jshint unused: true
+    if(val) { return }
     this.fetch();
   },
 
