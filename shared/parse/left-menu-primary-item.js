@@ -13,13 +13,14 @@ var AVATAR_SIZE = 22;
 
 module.exports = function parseContentToTemplateData(data, state) {
   data.name = (data.name || data.uri || '');
-  data.absoluteRoomUri = urlJoin(clientEnv.basePath, data.uri);
+  data.absoluteRoomUri = urlJoin(clientEnv.basePath, (data.uri || data.url));
 
   //For user results
   if (data.displayName) {
     return _.extend({}, {
       name:         roomNameShortener(data.displayName),
       avatarSrcset: resolveRoomAvatarSrcSet({ uri: data.username }, AVATAR_SIZE),
+      absoluteRoomUri: data.absoluteRoomUri
     });
   }
 
