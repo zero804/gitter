@@ -291,6 +291,9 @@ var commandsList = [
   {
     command: 'update-default-mode',
     description: 'Update default mode for rooms',
+    completion: 'update-default-mode',
+    regexp: /^\/update-default-mode\b/,
+    hidden: true,
     // regexp: /^\/mark-all-read\s*$/,
     action: function(text) {
       var topicMatch = text.match(/^\/update-default-mode\s+(all|annoucement|mute)(\s+override)?/);
@@ -314,7 +317,7 @@ module.exports = {
 
   getSuggestions: function(term) {
     return commandsList.filter(function(cmd) {
-      var elligible = (!cmd.criteria || cmd.criteria()) && cmd.completion;
+      var elligible = !cmd.hidden && (!cmd.criteria || cmd.criteria()) && cmd.completion;
       return elligible && cmd.command.indexOf(term) === 0;
     });
   },

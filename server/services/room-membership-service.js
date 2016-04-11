@@ -357,7 +357,8 @@ var getMembershipDetails = Promise.method(function (userId, troupeId) {
          mention: hash.mention,
          announcement: hash.announcement,
          desktop: hash.desktop,
-         mobile: hash.mobile
+         mobile: hash.mobile,
+         default: hash.default
        };
     });
 });
@@ -583,11 +584,12 @@ function updateRoomMembershipFlagsForUser(userId, newFlags, overrideAll) {
         multi: true
       });
     })
-    .then(function() {
+    .then(function(result) {
+      debug('Updated %s rooms to new default', result.nModified);
       this.roomsWithLurkChange.forEach(function(troupeId) {
         roomMembershipEvents.emit("members.lurk.change", troupeId, [userId], newDefaultIsLurking);
       });
-      
+
       return null;
     });
 }
