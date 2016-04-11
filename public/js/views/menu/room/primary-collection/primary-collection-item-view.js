@@ -50,8 +50,6 @@ module.exports = BaseCollectionItemView.extend({
       data.lurkActivity = false;
     }
 
-    var absoluteRoomUri  = clientEnv['basePath'] + data.url;
-    data.absoluteRoomUri = absoluteRoomUri;
     return data;
   },
 
