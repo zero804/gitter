@@ -9,13 +9,13 @@ var trackUserLogin = require('./track-user-login');
 var mixpanel = require('../web/mixpanelUtils');
 
 
-module.exports = function trackSignupOrLogin(req, user, isNewUser) {
+module.exports = function trackSignupOrLogin(req, user, isNewUser, provider) {
   if (isNewUser) {
     stats.alias(mixpanel.getMixpanelDistinctId(req.cookies), user.id, function(err) {
       if (err) logger.error('Error aliasing user:', { exception: err });
-      trackNewUser(req, user);
+      trackNewUser(req, user, provider);
     });
   } else {
-    trackUserLogin(req, user);
+    trackUserLogin(req, user, provider);
   }
 }

@@ -1,11 +1,8 @@
 'use strict';
 
-var Promise = require('bluebird');
 var path = require('path');
 var fs = require('fs-extra');
-var readFile = Promise.promisify(fs.readFile);
-var glob = Promise.promisify(require('glob'));
-
+var glob = require('glob');
 
 module.exports = function(hbs) {
   var baseDir = path.resolve(__dirname, '../../');

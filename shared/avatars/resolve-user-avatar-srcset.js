@@ -174,4 +174,3 @@ module.exports = function resolveUserAvatarSrcSet(user, size) {
   // default: best we can do
   return defaultAvatarForSize(size);
 };
-

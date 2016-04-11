@@ -18,7 +18,7 @@ ElasticSearchLoggingAdapter.prototype.warning = function(message) {
 };
 
 ElasticSearchLoggingAdapter.prototype.info = function(message) {
-  logger.info('es: ' + message);
+  debug('es: ' + message);
 };
 
 ElasticSearchLoggingAdapter.prototype.debug = function(message) {

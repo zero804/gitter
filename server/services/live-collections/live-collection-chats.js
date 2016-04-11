@@ -1,16 +1,16 @@
 "use strict";
 
-var _              = require('underscore');
+var _              = require('lodash');
 var appEvents      = require('gitter-web-appevents');
 var restSerializer = require("../../serializers/rest-serializer");
 
 function serializeChatToRoom(operation, chat) {
   var url = "/rooms/" + chat.toTroupeId + "/chatMessages";
+  var strategy = new restSerializer.ChatStrategy();
 
-  return restSerializer.serializeModel(chat)
+  return restSerializer.serializeObject(chat, strategy)
     .then(function(serializedChat) {
       appEvents.dataChange2(url, operation, serializedChat, 'chatMessage');
-      appEvents.chat('create', chat.toTroupeId, serializedChat);
     });
 }
 
@@ -27,7 +27,6 @@ module.exports = {
     var url = "/rooms/" + troupeId + "/chatMessages";
     var patchMessage = _.extend({ }, patch, { id: chatId });
     appEvents.dataChange2(url, "patch", patchMessage, 'chatMessage');
-    appEvents.chat('patch', troupeId, patchMessage);
   },
 
   remove: function(chat) {
@@ -37,7 +36,6 @@ module.exports = {
   removeId: function(chatId, troupeId) {
     var url = "/rooms/" + troupeId + "/chatMessages";
     appEvents.dataChange2(url, "remove", { id: chatId }, 'chatMessage');
-    appEvents.chat('remove', troupeId, { id: chatId });
   },
 
 };

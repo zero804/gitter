@@ -27,11 +27,6 @@ var unreadItemServiceStub = {
 var notificationSerializerStub = {
   TroupeIdStrategy: function() { this.name = 'troupeId'; },
   ChatIdStrategy: function() { this.name = 'chatId'; },
-  getStrategy: function(name) {
-    return function() {
-      this.name = name;
-    };
-  },
   serialize: function(item, strategy) {
     return Promise.try(function() {
       if(strategy.name === 'troupeId') {

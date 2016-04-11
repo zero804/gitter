@@ -72,6 +72,17 @@ body.hover .menu:hover {
   margin-left: 0;
 }
 
+//Collapse mobile with page in a frame is broken, this fixes it
+.mobile {
+  .menu--collapsed {
+    margin-left: -260px !important;
+    .menu__hotspot {
+      right: -@tabWidth !important;
+      width: @tabWidth !important;
+    }
+  }
+}
+
 @media @mid-min {
   .menu:not(.menu--collapsed),
   body.hover .menu:hover:not(.menu--collapsed) {
@@ -82,7 +93,7 @@ body.hover .menu:hover {
 }
 
 @tabWidth: 25px;
-@tabHeight: 30px;
+@tabHeight: 35px;
 
 .menu__hotspot {
   z-index: 1;

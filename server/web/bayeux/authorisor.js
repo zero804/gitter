@@ -163,7 +163,7 @@ function populateTroupe(options) {
     includePermissions: true,
     includeOwner: true
   });
-  return restSerializer.serialize(troupeId, strategy)
+  return restSerializer.serializeObject(troupeId, strategy)
     .then(dataToSnapshot('room'));
 }
 

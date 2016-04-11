@@ -7,7 +7,7 @@ var emailAddressService = require('../services/email-address-service');
 var gaCookieParser = require('../utils/ga-cookie-parser');
 
 // Use this whenever a user first signs up.
-module.exports = function trackNewUser(req, user) {
+module.exports = function trackNewUser(req, user, provider) {
   // NOTE: tracking a signup after an invite is separate to this
   emailAddressService(user)
     .then(function(email) {
@@ -19,7 +19,7 @@ module.exports = function trackNewUser(req, user) {
       stats.event("new_user", {
         userId: user.id,
         email: email,
-        method: 'github_oauth',
+        method: provider + '_oauth',
         username: user.username,
         source: req.session.source,
         googleAnalyticsUniqueId: gaCookieParser(req)
