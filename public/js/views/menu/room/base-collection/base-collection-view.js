@@ -24,7 +24,6 @@ module.exports = Marionette.CompositeView.extend({
 
   ui: {
     header:  '#collection-header',
-    dismiss: '#dismiss-suggestion',
   },
 
   events: {
@@ -116,7 +115,8 @@ module.exports = Marionette.CompositeView.extend({
   onDismissSuggestionsUpdate: function (model, val){ //jshint unused: true
     //Only opperate if we are displaying suggestions
     if(!this.model.get('isSuggestion')) { return; }
-    toggleClass(this.el, 'dismissed', val);
+    //If the suggestions have been dismissed hide the collection
+    if(val) { this.el.classList.remove('active'); }
   },
 
   onDestroy: function() {

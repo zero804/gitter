@@ -21,13 +21,6 @@
 
 .collection-list {
   margin-left: 0;
-  max-height:  500px;
-  overflow:    hidden;
-  //transition:  max-height .2s ease-out;
-
-  .dismissed & {
-    max-height: 0;
-  }
 }
 
 .collection-header {
@@ -44,10 +37,4 @@
   right:      @desktop-menu-left-padding;
   transform:  translateY(-50%);
   color:      @menu-collection-title;
-  opacity:    1;
-  transition: opacity .4s ease-in;
-
-  .dismissed & {
-    opacity: 0;
-  }
 }
