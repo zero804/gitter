@@ -7,7 +7,7 @@ module.exports = BaseCollectionModel.extend({
   onAll: function() {
     this.set({
       header:       'Your Suggestions',
-      active:       true,
+      active:       !this.roomMenuModel.get('hasDismissedSuggestions'),
       isSuggestion: true,
     });
   },
@@ -23,7 +23,7 @@ module.exports = BaseCollectionModel.extend({
   onFavourite: function(){
     this.set({
       header:       'Your Suggestions',
-      active:       true,
+      active:       !this.roomMenuModel.get('hasDismissedSuggestions'),
       isSuggestion: true,
     });
   },
