@@ -248,7 +248,8 @@ onready(function() {
       'integrations': 'integrations',
       'add': 'addPeople',
       'tags/:roomId': 'editTags',
-      'autojoin': 'autojoin'
+      'autojoin': 'autojoin',
+      'notification-defaults': 'notificationDefaults'
     },
 
     autojoin: function() {
@@ -348,6 +349,17 @@ onready(function() {
         appView.dialogRegion.show(new DeleteModal({}));
       });
     },
+
+    notificationDefaults: function() {
+      require.ensure(['./views/modals/notification-defaults-view'], function(require) {
+        var NotificationDefaultsView = require('./views/modals/notification-defaults-view');
+
+        appView.dialogRegion.show(new NotificationDefaultsView({
+          model: new Backbone.Model() 
+        }));
+
+      });
+    }
 
   });
 
