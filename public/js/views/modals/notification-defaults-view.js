@@ -86,7 +86,7 @@ var View = Marionette.LayoutView.extend({
             .then(function() {
               this.dialog.hide();
               this.dialog = null;
-            });          
+            });
         }
     }
   }
