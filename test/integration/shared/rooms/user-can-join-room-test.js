@@ -8,7 +8,9 @@ var GITHUB_ONLY = ['github'];
 
 describe('user-can-join-room', function() {
   it('should allow github users to join open rooms', function() {
+    assert.equal(userCanJoinRoom(['github'], null), true);
     assert.equal(userCanJoinRoom(['github'], undefined), true);
+    assert.equal(userCanJoinRoom(['github'], []), true);
   });
 
   it('should allow github users to join github-only rooms', function() {
@@ -16,7 +18,9 @@ describe('user-can-join-room', function() {
   });
 
   it('should allow twitter users to join open rooms', function() {
+    assert.equal(userCanJoinRoom(['twitter'], null), true);
     assert.equal(userCanJoinRoom(['twitter'], undefined), true);
+    assert.equal(userCanJoinRoom(['twitter'], []), true);
   });
 
   it('should not allow twitter users to join github-only rooms', function() {
@@ -24,7 +28,9 @@ describe('user-can-join-room', function() {
   });
 
   it('should allow users with multiple identities to join if at least one is allowed', function() {
+    assert.equal(userCanJoinRoom(['github', 'twitter'], null), true);
     assert.equal(userCanJoinRoom(['github', 'twitter'], undefined), true);
+    assert.equal(userCanJoinRoom(['github', 'twitter'], []), true);
     assert.equal(userCanJoinRoom(['github', 'twitter'], GITHUB_ONLY), true);
   });
 
