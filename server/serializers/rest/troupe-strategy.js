@@ -178,26 +178,6 @@ TagsStrategy.prototype = {
 };
 
 
-function TroupeProvidersStrategy(options) {
-  var self = this;
-  self.providerMap = {};
-
-  this.preload = Promise.method(function(rooms, callback) {
-    rooms.forEach(function(room) {
-      self.providerMap[room.id] = room.providers;
-    });
-  });
-
-  this.map = function(roomId) {
-    return self.providerMap[roomId] || [];
-  };
-}
-TroupeProvidersStrategy.prototype = {
-  name: 'TroupeProvidersStrategy'
-};
-
-
-
 function ProOrgStrategy() {
   var proOrgs = {};
 
@@ -321,7 +301,6 @@ function TroupeStrategy(options) {
   var lurkStrategy          = currentUserId ? new LurkTroupeForUserStrategy(options) : null;
   var activityStrategy      = currentUserId ? new ActivityForUserStrategy(options) : null;
   var tagsStrategy          = (options.includeTags) ? new TagsStrategy(options) : null;
-  var providersStrategy = (options.includeProviders) ? new TroupeProvidersStrategy(options) : null;
   var userIdStrategy         = new UserIdStrategy(options);
   var proOrgStrategy        = new ProOrgStrategy(options);
   var permissionsStrategy    = (currentUserId || options.currentUser) && options.includePermissions ? new TroupePermissionsStrategy(options) : null;
@@ -386,10 +365,6 @@ function TroupeStrategy(options) {
       strategies.push(tagsStrategy.preload(items));
     }
 
-    if (providersStrategy) {
-      strategies.push(providersStrategy.preload(items));
-    }
-
     return Promise.all(strategies);
 
   };
@@ -441,6 +416,8 @@ function TroupeStrategy(options) {
 
     var unreadCounts = unreadItemStrategy && unreadItemStrategy.map(item.id);
 
+    var providers = (item.providers && item.providers.length) ? item.providers : undefined;
+
     return {
       id: item.id || item._id,
       name: troupeName,
@@ -461,7 +438,7 @@ function TroupeStrategy(options) {
       premium: isPro,
       noindex: item.noindex,
       tags: tagsStrategy ? tagsStrategy.map(item.id) : undefined,
-      providers: providersStrategy ? providersStrategy.map(item.id) : undefined,
+      providers: providers,
       permissions: permissionsStrategy ? permissionsStrategy.map(item) : undefined,
       ownerIsOrg: ownerIsOrgStrategy ? ownerIsOrgStrategy.map(item) : undefined,
       roomMember: roomMembershipStrategy ? roomMembershipStrategy.map(item.id) : undefined,
