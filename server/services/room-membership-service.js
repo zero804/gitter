@@ -536,8 +536,62 @@ function findMembersForRoomWithFlags(troupeId, flagToggles) {
       flags: queryForToggles(flagToggles)
     })
     .exec();
-
 }
+
+
+function updateRoomMembershipFlagsForUser(userId, newFlags, overrideAll) {
+  var query = {
+    userId: userId
+  };
+
+  if (!overrideAll) {
+    query.flags = queryForToggles({ default: true, all: true });
+  }
+
+  var newDefaultIsLurking = !!roomMembershipFlags.getLurkForFlags(newFlags);
+
+  return TroupeUser.find(query, { _id: 0, troupeId: 1, lurk: 1, flags: 1 })
+    .lean()
+    .exec()
+    .bind({ roomsWithLurkChange: undefined })
+    .then(function(troupeUsers) {
+      // Not atomic!
+      this.roomsWithLurkChange = troupeUsers
+        .filter(function(troupeUser) {
+          var isCurrentlyLurking = !!troupeUser.lurk;
+
+          return isCurrentlyLurking !== newDefaultIsLurking;
+        })
+        .map(function(troupeUser) {
+          return troupeUser.troupeId;
+        });
+
+      var troupeIdsForUpdate = troupeUsers
+        .map(function(troupeUser) {
+          return troupeUser.troupeId;
+        });
+
+      return TroupeUser.update({
+        userId: userId,
+        troupeId: { $in: troupeIdsForUpdate }
+      }, {
+        $set: {
+          flags: newFlags,
+          lurk: newDefaultIsLurking
+        }
+      }, {
+        multi: true
+      });
+    })
+    .then(function() {
+      this.roomsWithLurkChange.forEach(function(troupeId) {
+        roomMembershipEvents.emit("members.lurk.change", troupeId, [userId], newDefaultIsLurking);
+      });
+      
+      return null;
+    });
+}
+
 /* Exports */
 exports.findRoomIdsForUser          = findRoomIdsForUser;
 exports.findRoomIdsForUserWithLurk  = findRoomIdsForUserWithLurk;
@@ -563,6 +617,7 @@ exports.setMembershipModeForUsersInRoom = setMembershipModeForUsersInRoom;
 exports.findMembershipModeForUsersInRoom = findMembershipModeForUsersInRoom;
 exports.findMembersForRoomForNotify = findMembersForRoomForNotify;
 exports.findMembersForRoomWithFlags = findMembersForRoomWithFlags;
+exports.updateRoomMembershipFlagsForUser = updateRoomMembershipFlagsForUser;
 
 /* Event emitter */
 exports.events                      = roomMembershipEvents;

@@ -19,7 +19,6 @@ function getDefaultFlagsForUser(user) {
   return user.defaultFlags || DEFAULT_USER_FLAGS;
 }
 
-exports.getDefaultFlagsForUser = getDefaultFlagsForUser;
 
 /**
  * Returns the default flags for a user or
@@ -44,8 +43,6 @@ function getDefaultFlagsForUserId(userId) {
     });
 }
 
-exports.getDefaultFlagsForUserId = getDefaultFlagsForUserId;
-
 /**
  * Returns a hash default flags for some userIds
  */
@@ -61,11 +58,10 @@ function getDefaultFlagsForUserIds(userIds) {
     });
 }
 
-exports.getDefaultFlagsForUserIds = getDefaultFlagsForUserIds;
 
 /**
  * Set the default flags for a user. A fasley value
- * unsets the current default
+ * unsets the current default.
  */
 function setDefaultFlagsForUserId(userId, flags) {
   assert(userId, 'Expected userId');
@@ -78,4 +74,31 @@ function setDefaultFlagsForUserId(userId, flags) {
   }
 }
 
-exports.setDefaultFlagsForUserId = Promise.method(setDefaultFlagsForUserId);
+function getDefaultFlagDetailsForUserId(userId) {
+  return getDefaultFlagsForUserId(userId)
+    .then(function(flags) {
+      var mode = roomMembershipFlags.getModeFromFlags(flags);
+      var hash = roomMembershipFlags.flagsToHash(flags);
+
+      return {
+        mode: mode,
+        lurk: roomMembershipFlags.getLurkForFlags(flags),
+        flags: flags,
+
+        unread: hash.unread,
+        activity: hash.activity,
+        mention: hash.mention,
+        announcement: hash.announcement,
+        desktop: hash.desktop,
+        mobile: hash.mobile
+      };
+    });
+}
+
+module.exports = {
+  getDefaultFlagsForUser: getDefaultFlagsForUser,
+  getDefaultFlagsForUserId: getDefaultFlagsForUserId,
+  getDefaultFlagsForUserIds: getDefaultFlagsForUserIds,
+  setDefaultFlagsForUserId: Promise.method(setDefaultFlagsForUserId),
+  getDefaultFlagDetailsForUserId: getDefaultFlagDetailsForUserId,
+};

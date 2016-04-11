@@ -12,10 +12,12 @@ describe('user-default-flags', function() {
 
     var userDefaultFlagsService = testRequire('./services/user-default-flags-service');
     var roomMembershipFlags = testRequire('./services/room-membership-flags');
+    var userDefaultFlagsUpdateService = testRequire('./services/user-default-flags-update-service');
 
     before(fixtureLoader(fixture, {
       user1: { },
-      user2: { }
+      user2: { },
+      user3: { }
     }));
 
     after(function() {
@@ -87,8 +89,6 @@ describe('user-default-flags', function() {
       });
     });
 
-
-
     describe('setDefaultFlagsForUserId', function() {
       it('should handle setting and unsetting the value', function() {
         var userId1 = fixture.user1._id;
@@ -123,8 +123,94 @@ describe('user-default-flags', function() {
             return userDefaultFlagsService.setDefaultFlagsForUserId(userId1, 1)
           })
       });
+    });
+
+
+    describe('getDefaultFlagDetailsForUserId', function() {
+      it('should handle users who have not changed their default', function() {
+        var user3 = fixture.user3;
+
+        return userDefaultFlagsService.getDefaultFlagDetailsForUserId(user3._id)
+          .then(function(details) {
+            assert.deepEqual(details, {
+              "activity": false,
+              "announcement": true,
+              "desktop": true,
+              "flags": 125,
+              "lurk": false,
+              "mention": true,
+              "mobile": true,
+              "mode": "all",
+              "unread": true,
+            });
+          });
+      });
+
+      it('should handle users who have changed their default to all', function() {
+        var user1 = fixture.user1;
+        return userDefaultFlagsUpdateService.updateDefaultModeForUser(user1, 'all', false)
+          .then(function() {
+            return userDefaultFlagsService.getDefaultFlagDetailsForUserId(user1._id);
+          })
+          .then(function(details) {
+            assert.deepEqual(details, {
+              "activity": false,
+              "announcement": true,
+              "desktop": true,
+              "flags": 125,
+              "lurk": false,
+              "mention": true,
+              "mobile": true,
+              "mode": "all",
+              "unread": true,
+            });
+          });
+      });
+
+      it('should handle users who have changed their default to announcement', function() {
+        var user1 = fixture.user1;
+        return userDefaultFlagsUpdateService.updateDefaultModeForUser(user1, 'announcement', false)
+          .then(function() {
+            return userDefaultFlagsService.getDefaultFlagDetailsForUserId(user1._id);
+          })
+          .then(function(details) {
+            assert.deepEqual(details, {
+              "activity": false,
+              "announcement": true,
+              "desktop": false,
+              "flags": 29,
+              "lurk": false,
+              "mention": true,
+              "mobile": false,
+              "mode": "announcement",
+              "unread": true,
+            });
+          });
+      });
+
+      it('should handle users who have changed their default to mute', function() {
+        var user1 = fixture.user1;
+        return userDefaultFlagsUpdateService.updateDefaultModeForUser(user1, 'mute', false)
+          .then(function() {
+            return userDefaultFlagsService.getDefaultFlagDetailsForUserId(user1._id);
+          })
+          .then(function(details) {
+            assert.deepEqual(details, {
+              "activity": true,
+              "announcement": false,
+              "desktop": false,
+              "flags": 22,
+              "lurk": true,
+              "mention": true,
+              "mobile": false,
+              "mode": "mute",
+              "unread": false,
+            });
+          });
+      });
 
     });
+
   });
 
 });
