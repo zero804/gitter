@@ -7,7 +7,6 @@ var collections = require('../../utils/collections');
 var mongoUtils = require('../../utils/mongo-utils');
 var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
 
-
 var loadRooms = Promise.method(function(roomIds) {
   if (!roomIds.length) {
     return [];
@@ -36,18 +35,20 @@ function SuggestedRoomStrategy() {
   var roomHash;
   var messageCountHash;
 
-  this.preload = function(suggestedRooms, callback) {
+  this.preload = function(suggestedRooms) {
     var allRoomIds = suggestedRooms.map(function(suggestedRoom) {
-      return suggestedRoom.roomId || suggestedRoom.id;
-    });
+        return suggestedRoom.roomId || suggestedRoom.id;
+      })
+      .toArray();
 
     // NOTE: only suggestions with roomId will be preloaded. Otherwise it
     // assumes that the suggestion IS the room.
     var suggestedRoomIds = suggestedRooms
       .filter(function(f) { return !!f.roomId; })
-      .map(function(f) { return mongoUtils.asObjectID(f.roomId); });
+      .map(function(f) { return mongoUtils.asObjectID(f.roomId); })
+      .toArray();
 
-    Promise.join(
+    return Promise.join(
       loadRooms(suggestedRoomIds),
       loadMessageCounts(allRoomIds),
       function(rooms, messageCounts) {
@@ -56,8 +57,7 @@ function SuggestedRoomStrategy() {
         messageCounts.forEach(function(mc) {
           messageCountHash[mc.id] = mc.count;
         });
-      })
-      .nodeify(callback);
+      });
   };
 
   this.map = function(suggestedRoom) {

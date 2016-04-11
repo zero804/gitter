@@ -161,7 +161,7 @@ function getPermalinkChatForRoom(troupe, chatId) {
         troupeId: troupe.id
       });
 
-      return restSerializer.serialize(chat, strategy);
+      return restSerializer.serializeObject(chat, strategy);
     });
 }
 
@@ -237,7 +237,7 @@ function renderMainFrame(req, res, next, frame) {
         social.getMetadata({ room: req.troupe  });
 
       //TODO Pass this to MINIBAR?? JP 17/2/16
-      var hasNewLeftMenu   = req.fflip && req.fflip.has('left-menu');
+      var hasNewLeftMenu   = !req.isPhone && req.fflip && req.fflip.has('left-menu');
       var snapshots        = troupeContext.snapshots = parseSnapshotsForPageContext(req, troupeContext, orgs, rooms);
       var leftMenuRoomList = parseRoomsIntoLeftMenuRoomList(snapshots.leftMenu.state, snapshots.rooms, snapshots.leftMenu.selectedOrgName);
 
@@ -262,6 +262,7 @@ function renderMainFrame(req, res, next, frame) {
         hasNewLeftMenu:     hasNewLeftMenu,
         leftMenuOrgs:       troupeContext.snapshots.orgs,
         leftMenuRooms:      leftMenuRoomList,
+        isPhone:            req.isPhone,
         //TODO Remove this when left-menu switch goes away JP 23/2/16
         rooms: {
           favourites: rooms
@@ -277,6 +278,7 @@ function renderMainFrame(req, res, next, frame) {
     })
     .catch(next);
 }
+
 
 function renderChat(req, res, options, next) {
   var troupe = req.uriContext.troupe;
@@ -297,7 +299,6 @@ function renderChat(req, res, options, next) {
     };
 
     var chatSerializerOptions = _.defaults({
-      lean: true
     }, snapshotOptions);
 
     var userSerializerOptions = _.defaults({
@@ -311,6 +312,7 @@ function renderChat(req, res, options, next) {
         options.fetchEvents === false ? null : restful.serializeEventsForTroupe(troupe.id, userId),
         options.fetchUsers === false ? null : restful.serializeUsersForTroupe(troupe.id, userId, userSerializerOptions),
       ]).spread(function (troupeContext, chats, activityEvents, users, ownerIsOrg) {
+
         var initialChat = _.find(chats, function(chat) { return chat.initial; });
         var initialBottom = !initialChat;
         var githubLink;

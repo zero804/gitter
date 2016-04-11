@@ -1,5 +1,8 @@
+@import '../../../../../less/components/menu/menu.less';
+
 @minibar-top-offset:    (@desktop-header-height * 4);
 @minibar-bottom-offset: @desktop-header-height;
+
 
 .minibar {
   position:   relative;
@@ -160,7 +163,7 @@
   }
 
   //This is here because of a dragula bug JP 25/1/16
-  & .room-item {
+  & .room-item, & .room-item--one2one, & .room-item--favourite {
     display:  none;
   }
 
@@ -192,6 +195,7 @@
   align-items:      center;
   width:            100%;
   height:           100%;
+  padding:          0;
 
   opacity:          .45;
   background-color: transparent;
@@ -200,6 +204,8 @@
 
   color:            inherit;
   text-decoration:  none;
+  font-size:        0;
+  line-height:      0;
 
   &:hover {
     opacity:         1;
@@ -237,37 +243,112 @@
   }
 }
 
-.base-notification-icon(@size) {
-  position:      absolute;
-  top:           50%;
-  left:          0;
-  width:         @size;
-  height:        @size;
-  transform:     translateY(-50%) translateX(-50%);
-  border:        2px solid @caribbean;
+
+.base-minibar-unread-indicator(@size) {
+  box-sizing: border-box;
+
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateX(-50%) translateY(-50%);
+
+  display: block;
+  width: @size;
+  height: @size;
+
+  border: 2px solid @caribbean;
   border-radius: 100%;
-  color:         transparent;
+  color: transparent;
 }
 
-@icon-size:    1rem;
+.room-menu-options__item__unread-indicator-visibility-reset() {
+  visibility: visible;
+  transition-delay: 0s;
+  transform: translateX(-50%) translateY(-50%);
+}
+
+@icon-size: 1.4rem;
+.room-menu-options__item__unread-indicator {
+  .base-minibar-unread-indicator(@icon-size);
+  z-index: 2;
+  visibility: hidden;
+  transform: translateX(-100%) translateY(-50%);
+  /* We do this over `opacity` because of slight perf */
+  background-color: transparent;
+  border-color: transparent;
+
+  transition:
+    visibility 0s ease .2s,
+    transform 0.2s cubic-bezier(1, 2.5, 0.5, 0.76),
+    background-color .2s ease,
+    border-color .2s ease;
+
+
+  &.has-activity {
+    .room-menu-options__item__unread-indicator-visibility-reset();
+
+    background-color: transparent;
+    border-color: @caribbean;
+
+    animation-name: unread-indicator-subtle-pulse-animation;
+    animation-duration: 2s;
+    animation-timing-function: ease;
+  }
+  &.has-unreads {
+    .room-menu-options__item__unread-indicator-visibility-reset();
+
+    background-color: @caribbean;
+
+    animation-name: unread-indicator-subtle-pulse-animation;
+    animation-duration: 2s;
+    animation-timing-function: ease;
+
+  }
+  &.has-mentions {
+    .room-menu-options__item__unread-indicator-visibility-reset();
+
+    background-color: @jaffa;
+    border-color: @jaffa;
+
+    animation-name: mention-indicator-subtle-pulse-animation;
+    animation-duration: 2s;
+    animation-timing-function: ease;
+  }
+}
+
+
 .room-menu-options__item__unread-items {
-  .base-notification-icon(@icon-size);
+  .base-minibar-unread-indicator(@icon-size);
   background: @caribbean;
-  z-index:    1;
+  z-index: 1;
+
+  animation-name: unread-indicator-subtle-pulse-animation;
+  animation-duration: 2s;
+  animation-timing-function: ease;
 }
 
 .room-menu-options__item__mentions {
-  .base-notification-icon(@icon-size);
+  .base-minibar-unread-indicator(@icon-size);
   background:   @jaffa;
   border-color: @jaffa;
   z-index:      2;
+
+  animation-name: mention-indicator-subtle-pulse-animation;
+  animation-duration: 2s;
+  animation-timing-function: ease;
 }
 
+
+
 .room-menu-options__item__activity {
-  .base-notification-icon(@icon-size);
+  .base-minibar-unread-indicator(@icon-size);
   background:   transparent;
   border-color: @caribbean;
   z-index:      2;
+
+  animation-name: unread-indicator-subtle-pulse-animation;
+  animation-duration: 2s;
+  animation-timing-function: ease;
 }
 
 
@@ -280,6 +361,8 @@
 }
 
 .menu-toggle-icon {
+  margin: 0 auto;
+
   fill: none;
   stroke: #ffffff;
   stroke-width: 2;
@@ -291,7 +374,7 @@
   &:hover,
   &.is-menu-pinned,
   .menu-toggle-button:hover > & {
-    transform: rotateZ(90deg);
+    transform: translateZ(0) rotateZ(90deg);
   }
 }
 

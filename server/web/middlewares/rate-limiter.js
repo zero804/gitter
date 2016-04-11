@@ -4,9 +4,12 @@ var dolph       = require('dolph');
 var redis       = require("../../utils/redis");
 var redisClient = redis.getClient();
 
+var env         = require('gitter-web-env');
+var config      = env.config;
+
 module.exports = dolph({
   prefix: 'rate:',
-  limit: 100,
+  limit: config.get('web:apiRateLimit') || 100,
   expiry: 60,
   applyLimit: function(req) {
     if (req.user) return true;

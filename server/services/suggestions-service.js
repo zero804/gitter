@@ -302,7 +302,16 @@ function findSuggestionsForRooms(options) {
   });
 
   var filterSuggestions = function(results) {
-    return filterRooms(results, existingRooms);
+    var filtered = filterRooms(results, existingRooms);
+    // Add all the rooms we've found so far to the rooms used by subsequent
+    // lookups. This means that a new github user that hasn't joined any rooms
+    // yet but has starred some GitHub rooms can get graph results whereas
+    // otherwise graphRooms would be skipped because it wouldn't have any rooms
+    // to use as input. This should also benefit siblingRooms because it will
+    // find siblings of suggested rooms (if it gets there) which is probably
+    // better than just serving hilighted rooms.
+    options.rooms = existingRooms.concat(filtered);
+    return filtered;
   };
   return promiseUtils.waterfall(recommenders, [options], filterSuggestions, NUM_SUGGESTIONS);
 }

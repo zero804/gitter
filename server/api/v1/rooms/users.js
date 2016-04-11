@@ -66,7 +66,7 @@ module.exports = {
         var strategy = new restSerializer.UserStrategy();
 
         return [
-          restSerializer.serialize(addedUser, strategy),
+          restSerializer.serializeObject(addedUser, strategy),
           emailAddressService(addedUser, { attemptDiscovery: true })
         ];
       })

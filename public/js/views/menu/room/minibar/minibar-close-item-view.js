@@ -124,11 +124,13 @@ module.exports = ItemView.extend({
       duration: 200,
       queue: false,
       step: function(t, fx) {
-        if(fx.prop === 'firstT') {
-          legElements[0].setAttribute('d', getFirstLegDescription(opts, fx.now));
-        }
-        else if(fx.prop === 'thirdT') {
-          legElements[2].setAttribute('d', getThirdLegDescription(opts, fx.now));
+        if(legElements) {
+          if(fx.prop === 'firstT') {
+            legElements[0].setAttribute('d', getFirstLegDescription(opts, fx.now));
+          }
+          else if(fx.prop === 'thirdT') {
+            legElements[2].setAttribute('d', getThirdLegDescription(opts, fx.now));
+          }
         }
       }
     };
@@ -170,7 +172,7 @@ module.exports = ItemView.extend({
 
 
     var legElements = toggleIconElement.children;
-    if(legElements.length >= 3) {
+    if(legElements && legElements.length >= 3) {
       legElements[0].setAttribute('d', getFirstLegDescription(this.iconOpts, 0));
       legElements[1].setAttribute('d', getSecondLegDescription(this.iconOpts, 0));
       legElements[2].setAttribute('d', getThirdLegDescription(this.iconOpts, 0));

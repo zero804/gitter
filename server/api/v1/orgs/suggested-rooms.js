@@ -20,7 +20,7 @@ module.exports = {
 
           return _.reject(rooms, function(room) {
             return idMap[room.id];
-          });
+          }).slice(0, 12);
         }
       )
       .then(function(suggestions) {
