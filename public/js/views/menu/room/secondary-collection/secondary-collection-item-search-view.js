@@ -2,8 +2,11 @@
 
 var _                           = require('underscore');
 var moment                      = require('moment');
+var urlJoin                     = require('url-join');
 var searchTemplate              = require('./secondary-collection-item-search-view.hbs');
 var SecondaryCollectionItemView = require('./secondary-collection-item-view');
+
+var clientEnv = require('gitter-client-env');
 
 module.exports = SecondaryCollectionItemView.extend({
   className: 'room-item--search-message',
@@ -16,7 +19,7 @@ module.exports = SecondaryCollectionItemView.extend({
 
     return (!!data && data.fromUser) ?
       _.extend({}, SecondaryCollectionItemView.prototype.serializeData.apply(this, arguments), {
-        userUrl:         data.fromUser.url,
+        userUrl:         urlJoin(clientEnv.basePath, data.fromUser.url),
         userDisplayName: data.fromUser.displayName,
         sent:            moment(data.sent).format('MMM Do LT'),
       }) :
