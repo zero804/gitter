@@ -97,8 +97,6 @@ module.exports = Marionette.CompositeView.extend({
 
   setActive: function () {
     toggleClass(this.el, 'active', this.model.get('active'));
-    var isDismissed = (this.model.get('isSuggestion') && this.roomMenuModel.get('hasDismissedSuggestions'));
-    toggleClass(this.el, 'dismissed', isDismissed);
   },
 
   setLoaded: function (val) {
