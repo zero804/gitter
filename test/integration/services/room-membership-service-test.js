@@ -197,7 +197,8 @@ describe('room-membership-service', function() {
               announcement: false,
               mention: true,
               desktop: false,
-              mobile: false
+              mobile: false,
+              default: false
             });
             return roomMembershipService.getMemberLurkStatus(troupeId2, userId1);
           })
@@ -237,7 +238,8 @@ describe('room-membership-service', function() {
               announcement: true,
               mention: true,
               desktop: false,
-              mobile: false
+              mobile: false,
+              default: false
             });
 
             return roomMembershipService.getMemberLurkStatus(troupeId2, userId1);
@@ -271,7 +273,8 @@ describe('room-membership-service', function() {
               announcement: false,
               mention: true,
               desktop: false,
-              mobile: false
+              mobile: false,
+              default: false
             });
 
             return roomMembershipService.getMemberLurkStatus(troupeId2, userId1);
@@ -313,7 +316,8 @@ describe('room-membership-service', function() {
               announcement: true,
               mention: true,
               desktop: true,
-              mobile: true
+              mobile: true,
+              default: false
             });
             return roomMembershipService.getMemberLurkStatus(troupeId2, userId1);
           })
@@ -391,7 +395,8 @@ describe('room-membership-service', function() {
               announcement: true,
               mention: true,
               desktop: true,
-              mobile: true
+              mobile: true,
+              default: false
             });
 
             return roomMembershipService.getMemberLurkStatus(troupeId2, userId1);
@@ -427,7 +432,7 @@ describe('room-membership-service', function() {
               });
           });
 
-      });      
+      });
     });
 
     describe('findRoomIdsForUserWithLurk', function() {
