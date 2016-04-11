@@ -8,11 +8,11 @@ var troupeSettingsTemplate = require('./tmpl/room-settings-view.hbs');
 var userNotifications      = require('components/user-notifications');
 var FeaturesView           = require('./notification-features-collection-view');
 
-var OPTIONS = [
-  { val: 'all', text: 'All: Notify me for all messages' },
-  { val: 'announcement', text: 'Announcements: Notify me for mentions and announcements' },
-  { val: 'mute', text: 'Mute: Notify me only when I\'m directly mentioned' }
-];
+var OPTIONS = {
+  all: 'All: Notify me for all messages',
+  announcement: 'Announcements: Notify me for mentions and announcements',
+  mute: 'Mute: Notify me only when I\'m directly mentioned'
+}
 
 var View = Marionette.LayoutView.extend({
   template: troupeSettingsTemplate,
@@ -141,6 +141,10 @@ var View = Marionette.LayoutView.extend({
     selectInput.empty();
     var found = false;
 
+    var defaultOptgroup = document.createElement("optgroup");
+    defaultOptgroup.label = 'Use Default Setting';
+    selectInput.append(defaultOptgroup);
+
     var defaultOption = document.createElement("option");
     defaultOption.value = 'default';
     defaultOption.textContent = this.getDefaulDescription();
@@ -148,20 +152,25 @@ var View = Marionette.LayoutView.extend({
       defaultOption.selected = true;
       found = true;
     }
-    selectInput.append(defaultOption);
+    defaultOptgroup.appendChild(defaultOption);
 
-    var items = OPTIONS.map(function(o) {
+    var overrideOptGroup = document.createElement("optgroup");
+    overrideOptGroup.label = 'Override Default Setting';
+    selectInput.append(overrideOptGroup);
+
+    Object.keys(OPTIONS).forEach(function(key) {
+      var text = OPTIONS[key];
+
       var option = document.createElement("option");
-      option.value = o.val;
-      option.textContent = o.text;
-      var selected = o.val === val;
+      option.value = key;
+      option.textContent = text;
+      var selected = key === val;
       option.selected = selected;
       if (selected) {
         found = true;
       }
-      return option;
+      overrideOptGroup.appendChild(option);
     });
-    selectInput.append(items);
 
     if (!found) {
       var option = document.createElement("option");
@@ -169,7 +178,7 @@ var View = Marionette.LayoutView.extend({
       option.textContent = text;
       option.selected = true;
       option.style.display = 'none';
-      selectInput.append(option);
+      overrideOptGroup.appendChild(option);
     }
   },
 
@@ -178,8 +187,8 @@ var View = Marionette.LayoutView.extend({
     var defaultSettings = model.get('defaultSettings');
     if (!defaultSettings) return "Default settings";
 
-    if (!defaultSettings.mode) return "Default settings: legacy";
-    return "Default settings: " + defaultSettings.mode;
+    if (!defaultSettings.mode || !OPTIONS[defaultSettings.mode]) return "Default settings: legacy";
+    return "My Default: " + OPTIONS[defaultSettings.mode];
   },
 
   onRender: function() {
