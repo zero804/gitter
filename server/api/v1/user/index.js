@@ -31,7 +31,7 @@ module.exports = {
             resultItemStrategy: new restSerializer.UserStrategy()
           });
 
-          return restSerializer.serialize(searchResults, strategy);
+          return restSerializer.serializeObject(searchResults.results, strategy);
         });
     }
 
