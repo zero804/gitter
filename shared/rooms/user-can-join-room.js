@@ -9,8 +9,11 @@ must know to not allow the user to join and the backend/API must prevent that
 from happening.
 */
 function userCanJoinRoom(userProviders, troupeProviders) {
-  // By default (undefined) all providers are allowed
-  if (troupeProviders === undefined) {
+  // By default (undefined or null or empty array) all providers are allowed
+  // why all three? Because you might not have set it (undefined) or because it
+  // came back from the db and got upgraded to an empty array because of the
+  // new schema
+  if (!troupeProviders || !troupeProviders.length) {
     return true;
   }
 
