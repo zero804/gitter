@@ -504,9 +504,9 @@ gulp.task('css', function() {
   };
 
   return Promise.all([
-    //cssIos(overrideOpts)(),
-    //cssMobile(overrideOpts)(),
-    cssWeb(overrideOpts)()
+    cssIosStyleBuilder.build(),
+    cssMobileStyleBuilder.build(),
+    cssWebStyleBuilder.build()
   ]);
 });
 
