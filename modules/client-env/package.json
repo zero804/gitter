@@ -7,8 +7,5 @@
   "browser": "client-env-browser.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "dependencies": {
-    "qs": "^6.1.0"
   }
 }

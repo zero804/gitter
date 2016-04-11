@@ -14,7 +14,7 @@ var contextGenerator  = require('../context-generator');
 var StatusError       = require('statuserror');
 var bayeuxExtension   = require('./extension');
 var clientUsageStats  = require('../../utils/client-usage-stats');
-var appVersion        = require('app-version');
+var appVersion        = require('gitter-app-version');
 var useragent         = require('useragent');
 var debug             = require('debug')('gitter:bayeux-authenticator');
 

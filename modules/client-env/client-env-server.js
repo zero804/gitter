@@ -1,7 +1,7 @@
 'use strict';
 
 var config = require('gitter-web-env').config;
-var appVersion = require('app-version');
+var appVersion = require('gitter-app-version');
 
 var env = process.env.NODE_ENV;
 

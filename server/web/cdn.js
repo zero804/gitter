@@ -1,7 +1,7 @@
 "use strict";
 
 var nconf = require('../utils/config');
-var appVersion = require('app-version');
+var appVersion = require('gitter-app-version');
 
 var hosts, hostLength, cdnPrefix;
 
