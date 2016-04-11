@@ -9,11 +9,16 @@ function SearchResultsStrategy(options) {
   };
 
   this.map = function(item) {
+    var results = item.results;
+    if(item.results === undefined || item.results === null) {
+      results = [].concat(item);
+    }
+
     return {
       hasMoreResults: item.hasMoreResults,
       limit: item.limit,
       skip: item.skip,
-      results: item.results.map(function(i) {
+      results: results.map(function(i) {
         return resultItemStrategy.map(i);
       })
     };
