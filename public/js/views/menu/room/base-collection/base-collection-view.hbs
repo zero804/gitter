@@ -1,8 +1,9 @@
 {{#if header}}
-<header id="collection-header">
-  <h2 class="collection__title">
-    {{ header }}
-  </h2>
+<header id="collection-header" class="collection-header">
+  <h2 class="collection__title">{{ header }}</h2>
+  {{#if isSuggestion}}
+    <i class="icon-cancel-circle collection-header__dismiss-suggestion"></i>
+  {{/if}}
 </header>
 {{/if}}
 

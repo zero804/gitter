@@ -6,8 +6,9 @@ module.exports = BaseCollectionModel.extend({
 
   onAll: function() {
     this.set({
-      header: 'Your Suggestions',
-      active: true,
+      header:       'Your Suggestions',
+      active:       true,
+      isSuggestion: true,
     });
   },
 
@@ -15,27 +16,31 @@ module.exports = BaseCollectionModel.extend({
     this.set({
       header: 'Chat Messages',
       active: true,
+      isSuggestion: false,
     });
   },
 
   onFavourite: function(){
     this.set({
-      header: 'Your Suggestions',
-      active: true,
+      header:       'Your Suggestions',
+      active:       true,
+      isSuggestion: true,
     });
   },
 
   onOrg: function() {
     this.set({
-      header: 'All Rooms',
-      active: true,
+      header:       'All Rooms',
+      active:       true,
+      isSuggestion: false,
     });
   },
 
   onDefault: function() {
     this.set({
-      header: false,
-      active: false,
+      header:       false,
+      active:       false,
+      isSuggestion: false,
     });
   },
 });
