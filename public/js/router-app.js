@@ -153,7 +153,7 @@ onready(function() {
   var allRoomsCollection = troupeCollections.troupes;
   new RoomCollectionTracker(allRoomsCollection);
 
-  var appLayout = window.appLayout = new AppLayout({
+  var appLayout = new AppLayout({
     template: false,
     el: 'body',
     roomCollection: troupeCollections.troupes,
