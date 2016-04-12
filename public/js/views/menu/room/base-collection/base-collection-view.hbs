@@ -1,5 +1,5 @@
 {{#if header}}
-<header id="collection-header" class="collection-header">
+  <header id="collection-header" class="collection-header {{#if isSuggestion}}suggestion{{/if}}">
   <h2 class="collection__title">{{ header }}</h2>
   {{#if isSuggestion}}
     <i class="icon-cancel-circle collection-header__dismiss-suggestion"></i>
