@@ -115,7 +115,7 @@ describe('push notification generator service', function() {
 
   });
 
-  describe('serializeItems', function() {
+  describe('serializeItems #slow', function() {
     var fixture = {};
     before(fixtureLoader(fixture, {
       user1: {},
