@@ -409,7 +409,7 @@ onready(function() {
         var hasPermissionToCreateOrgChildRoom = !!troupeCollections.troupes.findWhere({ uri: currentlySelectedOrg });
 
         if(currentLeftMenuState === 'org' && hasPermissionToCreateOrgChildRoom) {
-          return roomMenuModel.get('selectedOrgName');
+          return currentlySelectedOrg;
         }
 
         var currentRoomUri = window.location.pathname.split('/').slice(1).join('/');
