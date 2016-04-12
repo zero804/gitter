@@ -64,7 +64,8 @@ onready(function() {
   var Router = Backbone.Router.extend({
     routes: {
       "": "hideModal",
-      "notifications": "notifications"
+      "notifications": "notifications",
+      'notification-defaults': 'notificationDefaults'
     },
 
     hideModal: function() {
@@ -75,6 +76,17 @@ onready(function() {
       require.ensure(['views/modals/notification-settings-view'], function(require) {
         var NotificationSettingsView = require('views/modals/notification-settings-view');
         appView.dialogRegion.show(new NotificationSettingsView({ model: new Backbone.Model() }));
+      });
+    },
+
+    notificationDefaults: function() {
+      require.ensure(['./views/modals/notification-defaults-view'], function(require) {
+        var NotificationDefaultsView = require('./views/modals/notification-defaults-view');
+
+        appView.dialogRegion.show(new NotificationDefaultsView({
+          model: new Backbone.Model()
+        }));
+
       });
     }
   });
