@@ -12,19 +12,19 @@
         all rooms and reset to default.</label>
     </p>
 
-    <p class="u-font-smaller">Any rooms that you join will use this default setting
-      and any rooms that are currently set to use the default will also change if
-      you change this.</p>
-
-    <p class="u-font-smaller">Note that changing the default to mute will
-    mark all unread chats as read in applicable rooms.</p>
-
     <div class="u-font-smaller">
       <p>Your settings:</p>
       <div id="notify-features">
       </div>
     </div>
 
+    <p class="u-font-smaller" style="color: #999" id="notice-no-override">
+      This change will apply to any existing rooms currently set to use your
+      default notification setting, as well as any new room you join in future.
+    </p>
+    <p class="u-font-smaller" style="color: #e74c3c; display: none" id="notice-override">
+      This change will apply to all rooms.
+    </p>
   </div>
 
   </form>
