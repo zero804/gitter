@@ -19,9 +19,6 @@ var FavouriteCollection = PrimaryCollectionView.extend({
   initialize: function() {
     PrimaryCollectionView.prototype.initialize.apply(this, arguments);
     this.uiModel = new Backbone.Model({ isDragging: false });
-    this.listenTo(this.uiModel, 'change:isDragging', this.onDragStateUpdate, this);
-    this.listenTo(this.dndCtrl, 'dnd:start-drag', this.onDragStart, this);
-    this.listenTo(this.dndCtrl, 'dnd:end-drag', this.onDragEnd, this);
     this.listenTo(this.dndCtrl, 'room-menu:sort-favourite', this.onFavouritesSorted, this);
     this.listenTo(this.dndCtrl, 'room-menu:add-favourite', this.onFavouriteAdded, this);
   },
@@ -49,19 +46,6 @@ var FavouriteCollection = PrimaryCollectionView.extend({
     }
   },
 
-  onDragStart: function () {
-    this.uiModel.set('isDragging', true);
-    this.el.classList.add('dragging');
-  },
-
-  onDragEnd: function () {
-    this.uiModel.set('isDragging', false);
-    this.el.classList.remove('dragging');
-  },
-
-  onDragStateUpdate: function (model, val) { //jshint unused: true
-    toggleClass(this.el, 'dragging', val);
-  },
 
   onFavouritesSorted: function(targetID, siblingID) {
 

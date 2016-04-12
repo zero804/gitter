@@ -11,6 +11,7 @@ var EmptyFavouriteView          = require('./primary-collection-item-favourite-e
 var perfTiming                  = require('components/perf-timing');
 var compositeViewRenderTemplate = require('utils/composite-view-render-template');
 var domIndexById                = require('../../../../utils/dom-index-by-id');
+var toggleClass                 = require('utils/toggle-class');
 
 var proto = BaseCollectionView.prototype;
 
@@ -58,6 +59,9 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     this.dndCtrl = options.dndCtrl;
     this.uiModel = new Backbone.Model({ isFocused: false, isDragging: false });
     this.listenTo(this.roomMenuModel, 'change:searchTerm', this.setActive, this);
+    this.listenTo(this.dndCtrl, 'dnd:start-drag', this.onDragStart, this);
+    this.listenTo(this.dndCtrl, 'dnd:end-drag', this.onDragEnd, this);
+    this.listenTo(this.uiModel, 'change:isDragging', this.onDragStateUpdate, this);
     BaseCollectionView.prototype.initialize.apply(this, arguments);
   },
 
@@ -91,6 +95,20 @@ var PrimaryCollectionView = BaseCollectionView.extend({
       default:
         return true;
     }
+  },
+
+  onDragStart: function () {
+    this.uiModel.set('isDragging', true);
+    this.el.classList.add('dragging');
+  },
+
+  onDragEnd: function () {
+    this.uiModel.set('isDragging', false);
+    this.el.classList.remove('dragging');
+  },
+
+  onDragStateUpdate: function (model, val) { //jshint unused: true
+    toggleClass(this.el, 'dragging', val);
   },
 
   getChildContainerToBeIndexed: function () {
