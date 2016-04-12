@@ -3,7 +3,7 @@
 
 var _                        = require('lodash');
 var troupeService            = require("../../services/troupe-service");
-var identityService            = require("../../services/identity-service");
+var identityService          = require("../../services/identity-service");
 var presenceService          = require("gitter-web-presence");
 var Promise                  = require('bluebird');
 var winston                  = require('../../utils/winston');
