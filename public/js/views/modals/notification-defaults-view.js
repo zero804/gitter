@@ -62,13 +62,12 @@ var View = Marionette.LayoutView.extend({
 
   formChange: function(e) {
     if(e) e.preventDefault();
-
     var mode = this.ui.options.val();
-    apiClient.user.put('/settings/defaultRoomMode', { mode: mode })
-      .bind(this)
-      .then(function(settings) {
-        this.model.set(settings);
-      });
+    this.featuresView.resetFromMode(mode);
+
+    var noChange = mode === this.model.get('mode');
+    this.dialog.toggleButtonClass('apply', 'modal--default__footer__btn--neutral', noChange);
+    this.dialog.toggleButtonClass('apply', 'modal--default__footer__btn', !noChange);
   },
 
   destroySettings : function () {
@@ -79,16 +78,37 @@ var View = Marionette.LayoutView.extend({
   menuItemClicked: function(button) {
     switch(button) {
       case 'override-all':
-        if (window.confirm('Are you sure you want to change all your rooms to use your default?')) {
-          var mode = this.ui.options.val();
-          apiClient.user.put('/settings/defaultRoomMode', { mode: mode, override: true })
-            .bind(this)
-            .then(function() {
-              this.dialog.hide();
-              this.dialog = null;
-            });
-        }
+        this.overrideAllAndClose();
+        break;
+      case 'apply':
+        this.applyChangeAndClose();
+        break;
     }
+  },
+
+  overrideAllAndClose: function() {
+    if (!window.confirm('Are you sure you want to change all your rooms to use your default?')) {
+      return;
+    }
+
+    var mode = this.ui.options.val();
+    apiClient.user.put('/settings/defaultRoomMode', { mode: mode, override: true })
+      .bind(this)
+      .then(function() {
+        this.dialog.hide();
+        this.dialog = null;
+      });
+  },
+
+  applyChangeAndClose: function() {
+    var mode = this.ui.options.val();
+
+    apiClient.user.put('/settings/defaultRoomMode', { mode: mode })
+      .bind(this)
+      .then(function() {
+        this.dialog.hide();
+        this.dialog = null;
+      });
   }
 });
 
@@ -98,8 +118,14 @@ module.exports = ModalView.extend({
         title: "Default Notification Settings",
         menuItems: [{
           action: 'override-all',
+          pull: 'left',
           text: 'Override All',
           className: 'modal--default__footer__btn--negative'
+        },{
+          action: "apply",
+          pull: 'right',
+          text: "Apply",
+          className: "modal--default__footer__btn--neutral"
         }]
       }, options);
 

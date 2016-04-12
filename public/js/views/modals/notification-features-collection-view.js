@@ -42,6 +42,30 @@ var View = Marionette.CollectionView.extend({
 
     this.collection.reset(features);
     return features.length;
+  },
+  
+  resetFromMode: function(mode) {
+    var features = [];
+    if (mode === 'all' || mode === 'announcement') {
+      features.push({ id: 1, text: 'Show unread item counts' });
+    }
+
+    if (mode === 'mute') {
+      features.push({ id: 2, text: 'Show activity indicator on chat' });
+    }
+
+    if (mode === 'all') {
+      features.push({ id: 5, text: 'Notify for all chats' });
+    }
+
+    features.push({ id: 3, text: 'Notify when you\'re mentioned' });
+
+    if (mode === 'all' || mode === 'announcement') {
+      features.push({ id: 4, text: 'Notify on @/all announcements' });
+    }
+
+    this.collection.reset(features);
+    return features.length;
   }
 
 });

@@ -82,6 +82,10 @@ var ModalView = Marionette.LayoutView.extend({
     }
   },
 
+  toggleButtonClass: function(name, className, enabled) {
+    var $s = this.$el.find('button[data-action=' + name + ']');
+    $s.toggleClass(className, enabled);
+  },
 
   hideActions: function() {
     var $s = this.$el.find('.modal-footer .action');
