@@ -48,7 +48,6 @@ var PrimaryCollectionView = BaseCollectionView.extend({
   },
 
   initialize: function(options) {
-
     if (!options || !options.bus) {
       throw new Error('A valid event bus must be passed to a new PrimaryCollectionView');
     }
@@ -104,7 +103,7 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     // as favorite index could = 1000
     var favIndex    = this.collection
       .filter(function(model) { return !!model.get('favourite'); }).length;
-      
+
     newFavModel.save({ favourite: favIndex + 1 }, { patch: true });
   },
 
