@@ -200,13 +200,22 @@ var View = Marionette.LayoutView.extend({
   formChange: function(e) {
     if(e) e.preventDefault();
     var mode = this.ui.options.val();
+    var oldIsDefault = this.model.get('default');
+
+    var effectiveMode = mode;
     if (mode === 'default') {
       var defaultSettings = this.model.get('defaultSettings');
-      mode = defaultSettings && defaultSettings.mode;
+      effectiveMode = defaultSettings && defaultSettings.mode;
     }
-    this.featuresView.resetFromMode(mode);
+    this.featuresView.resetFromMode(effectiveMode);
 
-    var noChange = mode === this.model.get('mode');
+    var noChange;
+    if (oldIsDefault) {
+      noChange = mode === "default";
+    } else {
+      noChange = mode === this.model.get('mode');
+    }
+
     this.dialog.toggleButtonClass('apply', 'modal--default__footer__btn--neutral', noChange);
     this.dialog.toggleButtonClass('apply', 'modal--default__footer__btn', !noChange);
   },
@@ -250,7 +259,7 @@ module.exports = ModalView.extend({
       options = _.extend({
         title: "Notification Settings",
         menuItems: [
-          { action: "set-defaults", pull: 'left', text: "Configure Defaults", className: "modal--default__footer__btn--neutral" },
+          { action: "set-defaults", pull: 'left', text: "Configure Defaults", className: "modal--default__footer__link" },
           { action: "apply", pull: 'right', text: "Apply", className: "modal--default__footer__btn--neutral" }
         ]
       }, options);
