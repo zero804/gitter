@@ -109,7 +109,11 @@ function fieldInPredicate(fieldName, values, additionalClauses) {
     predicate[fieldName] = { $in: values };
   }
 
-  return _.defaults(predicate, additionalClauses);
+  if (!additionalClauses) {
+    return predicate;
+  } else {
+    return _.defaults(predicate, additionalClauses);
+  }
 }
 
 function setId(model) {

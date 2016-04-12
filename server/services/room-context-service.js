@@ -3,6 +3,7 @@
 var uriResolver          = require('./uri-resolver');
 var StatusError          = require('statuserror');
 var troupeService        = require('./troupe-service');
+var oneToOneRoomService  = require('./one-to-one-room-service');
 var debug                = require('debug')('gitter:room-context-service');
 var roomPermissionsModel = require('./room-permissions-model');
 var permissionsModel     = require('./permissions-model');
@@ -57,7 +58,7 @@ function findContextForUri(user, uri, options) {
           .then(function(access) {
             if(!access) throw new StatusError(404);
 
-            return troupeService.findOrCreateOneToOneTroupeIfPossible(userId, resolvedUser.id)
+            return oneToOneRoomService.findOrCreateOneToOneRoom(userId, resolvedUser.id)
               .spread(function(troupe, resolvedUser) {
                 return {
                   troupe: troupe,

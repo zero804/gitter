@@ -5,6 +5,7 @@
 var userService = require('../../server/services/user-service');
 var troupeService = require('../../server/services/troupe-service');
 var chatService = require('../../server/services/chat-service');
+var oneToOneRoomService = require('../../server/services/one-to-one-room-service');
 
 require('../../server/event-listeners').install();
 var Promise = require('bluebird');
@@ -37,7 +38,7 @@ function getTroupe(fromUser) {
   .then(function(toUser) {
     if (!toUser) throw new Error('User ' + opts.toUser + ' not found');
 
-    return troupeService.findOneToOneTroupe(fromUser._id, toUser._id);
+    return oneToOneRoomService.findOneToOneRoom(fromUser._id, toUser._id);
   });
 
 }
