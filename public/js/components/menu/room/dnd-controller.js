@@ -18,7 +18,7 @@ var DNDCtrl = function(attrs) {
   });
 
   this.drag.on('dragend', this.onDragEnd.bind(this));
-  this.drag.on('cancel',  this.onDragEnd.bind(this));
+  this.drag.on('cancel',  this.onCancel.bind(this));
   this.drag.on('remove',  this.onDragEnd.bind(this));
   this.drag.on('drag',    this.onDragStart.bind(this));
   this.drag.on('drop',    this.onItemDropped.bind(this));
@@ -74,6 +74,16 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
     this.mirror = null;
     window.removeEventListener('mouseup', this.onMouseUp);
     this.trigger('dnd:end-drag');
+  },
+
+  onCancel: function (el, container, source){
+    //If a room item is the only item in the favourite list when dragging begins
+    //and that room is dropped at the bottom of the list dragula thinks this is a cancellation event
+    //so we check here if the item is dropped on favourites from favourites
+    //if so we treat it as adding a favourite which assigns it to the end of the list
+    if(container.classList.contains('collection-list--favourite') &&  container === source) {
+      this.trigger('room-menu:add-favourite', el.dataset.id);
+    }
   },
 
   onMouseUp: function () {
