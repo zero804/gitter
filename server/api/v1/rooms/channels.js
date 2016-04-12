@@ -10,6 +10,12 @@ function serialize(items, req) {
   return restSerializer.serialize(items, strategy);
 }
 
+function serializeObject(item, req) {
+  var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id });
+
+  return restSerializer.serializeObject(item, strategy);
+}
+
 module.exports = {
   id: 'channel',
   index: function(req) {
@@ -28,7 +34,7 @@ module.exports = {
         return roomService.createCustomChildRoom(troupe, req.user, { name: body.name, security: security });
       })
       .then(function(customRoom) {
-        return serialize(customRoom, req);
+        return serializeObject(customRoom, req);
       })
       .catch(function(err) {
         if(err.clientDetail && err.responseStatusCode) {

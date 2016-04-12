@@ -64,8 +64,7 @@ var Modal = ModalView.extend({
     options = options || {};
     options.title = 'Careful Now...';
     var roomName = context.troupe().get('uri');
-    options.menuItems = [
-    {
+    options.menuItems = [{
       disabled: true,
       action: 'delete',
       text: 'Delete "' + roomName + '"',

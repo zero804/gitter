@@ -389,7 +389,9 @@ describe('room-service', function() {
         },
         './email-notification-service': {
           sendInvitation: stubs.onInviteEmail,
-          addedToRoomNotification: function() {}
+          addedToRoomNotification: function() {
+            return Promise.resolve();
+          }
         },
         './email-address-service': function() {
           return Promise.resolve('a@b.com');
@@ -403,7 +405,9 @@ describe('room-service', function() {
         findByUsernameResult: { username: 'test-user', id: userId, _id: userId },
         createInvitedUserResult: null,
         canBeInvited: true,
-        onInviteEmail: function() {}
+        onInviteEmail: function() {
+          return Promise.resolve();
+        }
       });
 
       var _troupId = new ObjectID();
@@ -433,7 +437,9 @@ describe('room-service', function() {
         findByUsernameResult: { username: 'test-user', id: userId, _id: userId },
         createInvitedUserResult: null,
         canBeInvited: true,
-        onInviteEmail: function() {}
+        onInviteEmail: function() {
+          return Promise.resolve();
+        }
       });
 
       var _troupId = new ObjectID();
@@ -463,7 +469,9 @@ describe('room-service', function() {
         findByUsernameResult: { username: 'test-user', id: userId, _id: userId },
         createInvitedUserResult: null,
         canBeInvited: true,
-        onInviteEmail: function() {}
+        onInviteEmail: function() {
+          return Promise.resolve();
+        }
       });
 
       var _troupId = new ObjectID();
@@ -513,6 +521,7 @@ describe('room-service', function() {
         canBeInvited: true,
         onInviteEmail: function() {
           done();
+          return Promise.resolve();
         }
       });
 
@@ -540,7 +549,9 @@ describe('room-service', function() {
         findByUsernameResult: null,
         createInvitedUserResult: { username: 'test-user', id: 'test-user-id', state: 'INVITED' },
         canBeInvited: false,
-        onInviteEmail: function() {}
+        onInviteEmail: function() {
+          return Promise.resolve();
+        }
       });
 
       var troupe = {
@@ -561,7 +572,9 @@ describe('room-service', function() {
         findByUsernameResult: { username: 'test-user', id: _inviteeUserId, _id: _inviteeUserId },
         createInvitedUserResult: null,
         canBeInvited: true,
-        onInviteEmail: function() {}
+        onInviteEmail: function() {
+          return Promise.resolve();
+        }
       });
 
       var _troupId = new ObjectID();
@@ -590,7 +603,9 @@ describe('room-service', function() {
         findByUsernameResult: { username: 'test-user', id: 'test-user-id' },
         createInvitedUserResult: null,
         canBeInvited: true,
-        onInviteEmail: function() {}
+        onInviteEmail: function() {
+          return Promise.resolve();
+        }
       });
 
       var troupe = {
@@ -1469,9 +1484,9 @@ describe('room-service', function() {
             });
         });
 
-        it('should remove user from the room if mode=announcement', function() {
+        it('should remove user from the room if mode=mute', function() {
           // Set user as lurking
-          roomMembershipService.setMembershipMode(fixture.userFavourite.id, fixture.troupeCanRemove.id, 'announcement', false)
+          return roomMembershipService.setMembershipMode(fixture.userFavourite.id, fixture.troupeCanRemove.id, 'mute', false)
             .then(function() { // Get updated troupe
               return troupeService.findById(fixture.troupeCanRemove.id);
             })
@@ -1490,7 +1505,7 @@ describe('room-service', function() {
 
         it('should remove user from the room if mode=mute', function() {
           // Set user as lurking
-          roomMembershipService.setMembershipMode(fixture.userFavourite.id, fixture.troupeCanRemove.id, 'mute', false)
+          return roomMembershipService.setMembershipMode(fixture.userFavourite.id, fixture.troupeCanRemove.id, 'mute', false)
             .then(function() { // Get updated troupe
               return troupeService.findById(fixture.troupeCanRemove.id);
             })
