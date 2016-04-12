@@ -248,7 +248,8 @@ onready(function() {
       'integrations': 'integrations',
       'add': 'addPeople',
       'tags/:roomId': 'editTags',
-      'autojoin': 'autojoin'
+      'autojoin': 'autojoin',
+      'notification-defaults': 'notificationDefaults'
     },
 
     autojoin: function() {
@@ -274,9 +275,9 @@ onready(function() {
     },
 
     notifications: function() {
-      require.ensure(['views/modals/room-settings-view'], function(require) {
-        var TroupeSettingsView = require('views/modals/room-settings-view');
-        appView.dialogRegion.show(new TroupeSettingsView({ model: new Backbone.Model() }));
+      require.ensure(['views/modals/notification-settings-view'], function(require) {
+        var NotificationSettingsView = require('views/modals/notification-settings-view');
+        appView.dialogRegion.show(new NotificationSettingsView({ model: new Backbone.Model() }));
       });
     },
 
@@ -348,6 +349,17 @@ onready(function() {
         appView.dialogRegion.show(new DeleteModal({}));
       });
     },
+
+    notificationDefaults: function() {
+      require.ensure(['./views/modals/notification-defaults-view'], function(require) {
+        var NotificationDefaultsView = require('./views/modals/notification-defaults-view');
+
+        appView.dialogRegion.show(new NotificationDefaultsView({
+          model: new Backbone.Model()
+        }));
+
+      });
+    }
 
   });
 

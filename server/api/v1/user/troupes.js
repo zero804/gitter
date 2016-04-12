@@ -5,6 +5,7 @@ var restful           = require("../../../services/restful");
 var restSerializer    = require("../../../serializers/rest-serializer");
 var recentRoomService = require('../../../services/recent-room-service');
 var roomMembershipService = require('../../../services/room-membership-service');
+var userRoomModeUpdateService = require('../../../services/user-room-mode-update-service');
 var roomService       = require('../../../services/room-service');
 var Promise           = require('bluebird');
 var mongoUtils        = require('../../../utils/mongo-utils');
@@ -46,7 +47,7 @@ function performUpdateToUserRoom(req) {
       }
 
       if('mode' in updatedTroupe) {
-        promises.push(roomMembershipService.setMembershipMode(userId, troupeId, updatedTroupe.mode, false));
+        promises.push(userRoomModeUpdateService.setModeForUserInRoom(req.resourceUser, troupeId, updatedTroupe.mode));
       }
 
       return Promise.all(promises);
