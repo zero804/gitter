@@ -229,7 +229,6 @@ module.exports = {
   FLAG_POS_NOTIFY_DESKTOP      : FLAG_POS_NOTIFY_DESKTOP,
   FLAG_POS_NOTIFY_MOBILE       : FLAG_POS_NOTIFY_MOBILE,
 
-
   getFlagsForMode: getFlagsForMode,
   getModeFromFlags: getModeFromFlags,
   getUpdateForMode: getUpdateForMode,
