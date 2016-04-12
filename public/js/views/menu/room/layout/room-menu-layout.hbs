@@ -16,11 +16,13 @@
             </button>
           </li>
 
+          {{!
           <li data-state-change="favourite" id="minibar-favourite" class="room-menu-options__item--favourite">
             <button class="room-menu-options__item-button" title="Your Favourite Conversations">
-              <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/favourites.svg"}}' />
+              <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/favourites.svg"}}{{!' />
             </button>
           </li>
+          }}
 
           <li data-state-change="people" id="minibar-people" class="room-menu-options__item--people">
             <button class="room-menu-options__item-button" title="Your One to One Conversations">
@@ -53,10 +55,23 @@
           <footer id="panel-footer" class="panel-footer-container"></footer>
           <div class="nano-content panel-content">
             <div id="search-input"></div>
+
+            <section id="favourite-collection" class="left-menu-collection">
+              <div class="favourite-collection loaded active">
+                <div id="collection-list" class="collection-list--favourite">
+                  {{#each leftMenuFavouriteRooms}}
+                    <div class="room-item--favourite" id="{{id}}"  data-id="{{id}}">
+                      {{{ prerenderView "js/views/menu/room/primary-collection/primary-collection-item-view" }}}
+                    </div>
+                  {{/each}}
+                </div>
+              </div>
+            </section>
+
             <section id="primary-collection" class="left-menu-collection">
               <div class="primary-collection loaded active">
                 <header><h2 class="collection__title hidden" id="primary-collection-search-header">Rooms &amp; People</h2></header>
-                <div id="collection-list">
+                <div id="collection-list" class="collection-list--primary">
                   {{#each leftMenuRooms}}
                     <div class="room-item" id="{{id}}"  data-id="{{id}}">
                       {{{ prerenderView "js/views/menu/room/primary-collection/primary-collection-item-view" }}}
@@ -65,6 +80,7 @@
                 </div>
               </div>
             </section>
+
             <section id="secondary-collection" class="left-menu-collection"></section>
             <section id="tertiary-collection" class="left-menu-collection"></section>
           </div>

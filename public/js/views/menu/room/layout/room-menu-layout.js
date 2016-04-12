@@ -1,5 +1,6 @@
 'use strict';
 
+var _                 = require('underscore');
 var $                 = require('jquery');
 var Marionette        = require('backbone.marionette');
 var RoomMenuModel     = require('../../../../models/room-menu-model');
@@ -9,7 +10,6 @@ var context           = require('utils/context');
 var DNDCtrl           = require('../../../../components/menu/room/dnd-controller');
 var MinibarCollection = require('../minibar/minibar-collection');
 var context           = require('utils/context');
-var _                 = require('underscore');
 var fastdom           = require('fastdom');
 
 var MINIBAR_ITEM_HEIGHT = 65;
