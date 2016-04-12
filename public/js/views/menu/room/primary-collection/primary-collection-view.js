@@ -11,6 +11,7 @@ var EmptyFavouriteView          = require('./primary-collection-item-favourite-e
 var perfTiming                  = require('components/perf-timing');
 var compositeViewRenderTemplate = require('utils/composite-view-render-template');
 var domIndexById                = require('../../../../utils/dom-index-by-id');
+var toggleClass                 = require('utils/toggle-class');
 
 var proto = BaseCollectionView.prototype;
 
@@ -20,14 +21,15 @@ var PrimaryCollectionView = BaseCollectionView.extend({
   _renderTemplate: compositeViewRenderTemplate,
   childView: ItemView,
   className: 'primary-collection',
+
   ui: {
     collection:   '#collection-list',
     searchHeader: '#primary-collection-search-header'
   },
 
   hasInit: false,
-  getEmptyView: function(){
-    switch(this.roomMenuModel.get('state')) {
+  getEmptyView: function() {
+    switch (this.roomMenuModel.get('state')) {
       case 'all':
         return EmptyAllView;
       case 'search':
@@ -48,7 +50,6 @@ var PrimaryCollectionView = BaseCollectionView.extend({
   },
 
   initialize: function(options) {
-
     if (!options || !options.bus) {
       throw new Error('A valid event bus must be passed to a new PrimaryCollectionView');
     }
@@ -56,27 +57,28 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     this.bus     = options.bus;
     this.model   = options.model;
     this.dndCtrl = options.dndCtrl;
-    this.uiModel = new Backbone.Model({ isFocused: false });
-
-    //TODO turn this into an error if there is a dndCtrl
-    this.listenTo(this.dndCtrl, 'room-menu:add-favourite', this.onFavouriteAdded, this);
-    this.listenTo(this.dndCtrl, 'room-menu:sort-favourite', this.onFavouritesSorted, this);
+    this.uiModel = new Backbone.Model({ isFocused: false, isDragging: false });
     this.listenTo(this.roomMenuModel, 'change:searchTerm', this.setActive, this);
+    this.listenTo(this.dndCtrl, 'dnd:start-drag', this.onDragStart, this);
+    this.listenTo(this.dndCtrl, 'dnd:end-drag', this.onDragEnd, this);
+    this.listenTo(this.uiModel, 'change:isDragging', this.onDragStateUpdate, this);
     BaseCollectionView.prototype.initialize.apply(this, arguments);
   },
 
   setActive: function() {
     switch (this.roomMenuModel.get('state')){
       case 'search':
-        if(!!this.roomMenuModel.get('searchTerm')){
+        if (!!this.roomMenuModel.get('searchTerm')) {
           this.el.classList.add('active');
           this.ui.searchHeader[0].classList.remove('hidden');
         }
+
         //
         else {
           this.el.classList.remove('active');
           this.ui.searchHeader[0].classList.add('hidden');
         }
+
         break;
       default:
         this.ui.searchHeader[0].classList.add('hidden');
@@ -87,7 +89,7 @@ var PrimaryCollectionView = BaseCollectionView.extend({
   },
 
   filter: function(model, index) { //jshint unused: true
-    switch(this.roomMenuModel.get('state')) {
+    switch (this.roomMenuModel.get('state')) {
       case 'search':
         return (index <= 5);
       default:
@@ -95,43 +97,28 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     }
   },
 
-  //TODO The filter should be reused within the view filter method?
-  onFavouriteAdded: function(id) {
-    var newFavModel = this.collection.get(id);
-
-    // @cutandpastey, this is wrong.
-    // this should be `max + 1` not `length + 1`
-    // as favorite index could = 1000
-    var favIndex    = this.collection
-      .filter(function(model) { return !!model.get('favourite'); }).length;
-      
-    newFavModel.save({ favourite: favIndex + 1 }, { patch: true });
+  onDragStart: function () {
+    this.uiModel.set('isDragging', true);
+    this.el.classList.add('dragging');
   },
 
-  onFavouritesSorted: function(targetID, siblingID) {
-
-    var target       = this.collection.get(targetID);
-    var sibling      = this.collection.get(siblingID);
-    var index = !!sibling ? sibling.get('favourite') : (this.getHighestFavourite() + 1);
-
-    //Save the new favourite
-    target.set('favourite', index);
-    target.save();
-    this.collection.sort();
+  onDragEnd: function () {
+    this.uiModel.set('isDragging', false);
+    this.el.classList.remove('dragging');
   },
 
-  //TODO TEST THIS YOU FOOL JP 10/2/16
-  getHighestFavourite: function() {
-    return this.collection.pluck('favourite')
-      .filter(function(num) { return !!num; })
-      .sort(function(a, b) { return a < b ? -1 : 1; })
-      .slice(-1)[0];
+  onDragStateUpdate: function (model, val) { //jshint unused: true
+    toggleClass(this.el, 'dragging', val);
+  },
+
+  getChildContainerToBeIndexed: function () {
+    //use the second child because the first child is the hidden search header
+    return this.el.children[1];
   },
 
   //Before we render we remove the collection container from the drag & drop instance
   onBeforeRender: function() {
-    //use the second child because the first child is the hidden search header
-    this.domMap = domIndexById(this.el.children[1]);
+    this.domMap = domIndexById(this.getChildContainerToBeIndexed());
     this.dndCtrl.removeContainer(this.ui.collection[0]);
   },
 

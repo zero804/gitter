@@ -4,7 +4,18 @@
 
 .room-item--search-message {
   .room-item();
+  height: auto;
   max-height: @menu-item-height * 2;
+  margin-left: @desktop-menu-left-padding / 2;
+  margin-right: @desktop-menu-left-padding / 2;
+  padding-left: @desktop-menu-left-padding / 2;
+
+  transition: background-color .2s ease-out;
+
+  &:hover,
+  &:focus {
+    .room-item-selected();
+  }
 }
 
 .room-item--search {
@@ -18,9 +29,23 @@
 
 .room-item__container--search {
   .room-item__container();
-  flex-wrap:   wrap;
-  align-items: center;
-  padding-top: @desktop-menu-left-padding / 4;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-left: 0;
+  padding-top: @desktop-menu-left-padding / 2.6;
+  padding-bottom: @desktop-menu-left-padding / 1.44;
+  padding-right: 0;
+
+  border-bottom: 1px solid rgba(255, 255, 255, .1);
+
+  &:hover,
+  &:focus {
+    background-color: transparent;
+  }
+}
+
+.room-item__container-body--search {
+  display: flex;
 }
 
 .room-item__search-detail {
@@ -41,17 +66,20 @@
 
 .room-item__avatar--search {
   .room-menu-avatar();
-  margin-left: @desktop-menu-left-padding / 2;
+  margin-left: 0;
   height:      @menu-search-avatar-dims;
   width:       @menu-search-avatar-dims;
 }
 
 .room-item__title--search {
   .room-item__title();
-  height:        @menu-item-height;
+  height:        1.25em;
   overflow:      hidden;
   max-width:     100%;
+  margin-top:    0.5em;
+  margin-left:   0;
+
   font-size:     1.4rem;
+  line-height:   1.25em;
   text-overflow: ellipsis;
-  margin-left:   @desktop-menu-left-padding / 2;
 }

@@ -6,8 +6,10 @@
 
 var env                   = require('gitter-web-env');
 var stats                 = env.stats;
+var errorReporter         = env.errorReporter;
 var roomMembershipService = require('../services/room-membership-service');
 var liveCollections       = require('../services/live-collections');
+var unreadItemService     = require('../services/unread-items');
 
 function onMembersAdded(troupeId, userIds) {
   liveCollections.roomMembers.emit('added', troupeId, userIds);
@@ -24,9 +26,18 @@ function onMembersLurkChange(troupeId, userIds, lurk) {
       troupeId: '' + troupeId,
       lurking: lurk
     });
+
+    if (lurk) {
+      unreadItemService.ensureAllItemsRead(userId, troupeId)
+        .catch(function(err) {
+          errorReporter(err, { unreadItemsFailed: true }, { module: 'room-membership-events' });
+        })
+        .done();
+    }
   });
 
   liveCollections.roomMembers.emit('lurkChange', troupeId, userIds, lurk);
+  return null;
 }
 
 var installed = false;
