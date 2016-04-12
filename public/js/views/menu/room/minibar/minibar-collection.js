@@ -8,7 +8,7 @@ var getSuggestedOrgsFromRoomList = require('gitter-web-shared/orgs/suggested-org
 var defaultModels = [
   { name: 'all', type: 'all', id: 0 },
   { name: 'search', type: 'search', id: 1 },
-  { name: 'favourite', type: 'favourite', id: 2 },
+  //{ name: 'favourite', type: 'favourite', id: 2 },
   { name: 'people', type: 'people', id: 3 },
 ];
 
@@ -35,7 +35,7 @@ module.exports = Backbone.Collection.extend({
     this.roomCollection = attrs.roomCollection;
     this.listenTo(this.roomCollection, 'snapshot', this.onCollectionSnapshot, this);
     //TODO 'add remove events'
-    this.listenTo(this.roomCollection, 'sync change', this.onCollectionUpdate, this);
+    this.listenTo(this.roomCollection, 'sync change:activity change:unreadItems change:mentions', this.onCollectionUpdate, this);
     this.listenTo(this.roomCollection, 'remove reset', this.onItemRemoved, this);
 
     models = defaultModels.concat(models || []).concat(tailDefaults);
