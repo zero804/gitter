@@ -98,16 +98,16 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
     if (container.classList.contains('collection-list--favourite')) {
       mirror  = document.querySelector('.gu-mirror');
       transit = document.querySelector('.gu-transit');
-      if (mirror) { mirror.style.display = 'none'; }
-      if(transit) { transit.style.display = ''; }
+      if (mirror) { mirror.classList.add('hidden'); }
+      if(transit) { transit.classList.remove('hidden'); }
     }
 
     //If we hover over the primary collection show the drag mirror
     else if (container.classList.contains('collection-list--primary')) {
       mirror  = document.querySelector('.gu-mirror');
       transit = document.querySelector('.gu-transit');
-      if (mirror) { mirror.style.display = ''; }
-      if(transit) { transit.style.display = 'none'; }
+      if (mirror) { mirror.classList.remove('hidden'); }
+      if(transit) { transit.classList.add('hidden'); }
     }
   },
 
