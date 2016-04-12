@@ -40,7 +40,7 @@ module.exports = BaseCollectionView.extend({
   serializeData: function() {
     var data = this.model.toJSON();
     return _.extend({}, data, {
-      isSearch:    (data.state === 'search'),
+      isSearch: (data.state === 'search'),
     });
   },
 
