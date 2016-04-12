@@ -266,7 +266,7 @@ describe('presenceService', function () {
 
           return presenceService.clientEyeballSignal(userId, socketId, signal)
             .then(function () {
-              assertUserTroupeStatus(signal)
+              return assertUserTroupeStatus(signal)
                 .then(function () {
                   return doNext();
                 });

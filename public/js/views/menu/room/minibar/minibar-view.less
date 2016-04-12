@@ -4,25 +4,6 @@
 @minibar-bottom-offset: @desktop-header-height;
 
 
-.minibar {
-  position:   relative;
-  width:      100%;
-  height:     100%;
-  z-index:    1;
-
-  &:before {
-    content:    ' ';
-    display:    inline-block;
-    position:   absolute;
-    top:        0;
-    left:       0;
-    width:      100%;
-    height:     100%;
-    background: @menu-panel-bg;
-    opacity:    .4;
-  }
-}
-
 .room-menu-container {
   position:   relative;
   height:     100%;
@@ -46,13 +27,45 @@
   z-index:  2;
 }
 
+.minibar {
+  position:   relative;
+  width:      100%;
+  height:     100%;
+  z-index:    1;
+
+  &:before {
+    content:    ' ';
+    display:    inline-block;
+    position:   absolute;
+    top:        0;
+    left:       0;
+    width:      100%;
+    height:     100%;
+    background: @menu-panel-bg;
+    opacity:    .3;
+  }
+}
+
+.minibar-inner {
+  position: absolute;
+  top: @minibar-top-offset;
+  bottom: @minibar-bottom-offset;
+  height: auto;
+
+  & > .nano-pane {
+    left: auto;
+    right: 0;
+  }
+}
+
+
 .room-menu-options {
   display:        flex;
   flex-direction: column;
-  list-style:     none;
+  width:          100%;
   margin-left:    0;
-  margin-top:     @minibar-top-offset;
-  margin-bottom:  @minibar-bottom-offset;
+  margin-bottom:  0;
+  list-style:     none;
 }
 
 .sudo-panel() {
@@ -173,11 +186,15 @@
 .room-menu-options__item--org {
   .room-menu-options__item();
 
+  color: @org-bg;
+
   .room-menu-options__item-button {
     opacity:         .8;
   }
 
-  color: @org-bg;
+  .room-menu-options__item__avatar  {
+    background-color: #ffffff;
+  }
 }
 
 .room-menu-options__item--close {
@@ -375,13 +392,5 @@
   &.is-menu-pinned,
   .menu-toggle-button:hover > & {
     transform: translateZ(0) rotateZ(90deg);
-  }
-}
-
-.minibar {
-  .nano-pane {
-    box-sizing:    border-box;
-    padding-top:   @minibar-top-offset;
-    margin-bottom: @minibar-bottom-offset;
   }
 }
