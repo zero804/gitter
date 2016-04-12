@@ -207,7 +207,20 @@ body.mobile .chat-item__container {
   cursor: pointer;
   font-weight: 600;
   margin-top: 2px;
+  opacity: 0.7;
+}
+
+.chat-item__username {
+  vertical-align: middle;
+  display: inline;
+  cursor: pointer;
+  font-weight: 600;
+  margin-top: 2px;
   opacity: 0.5;
+}
+
+body.mobile .chat-item__username {
+  display: none;
 }
 
 .chat-item__time {
@@ -294,6 +307,7 @@ body.mobile .chat-item__icon--read {
   padding: 0;
   word-wrap: break-word;
   user-select: text;
+  color: #000;
 
   a {
     color: @blue;

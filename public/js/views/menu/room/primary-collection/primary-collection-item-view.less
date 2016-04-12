@@ -11,11 +11,6 @@ TODO Seperate this better, its currently a bit of a monolith
 JP 11/2/16
 */
 
-.room-item-selected() {
-  cursor:           pointer;
-  background-color: rgba(255, 255, 255, .1);
-  color:            white;
-}
 
 //TODO this name is stupid, replace it JP 8/1/16
 .room-item {
@@ -23,12 +18,12 @@ JP 11/2/16
 }
 
 .room-item--one2one {
-  .room-item();
+  .m-room-item();
 
   &.active {
     max-height: @menu-item-height * 2;
     .room-item__container {
-      background: rgba(255, 255, 255, .1);
+      background: rgba(255, 255, 255, .2);
     }
   }
 }

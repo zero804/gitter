@@ -1,5 +1,6 @@
 'use strict';
 
+var _                 = require('underscore');
 var $                 = require('jquery');
 var Marionette        = require('backbone.marionette');
 var RoomMenuModel     = require('../../../../models/room-menu-model');
@@ -9,7 +10,6 @@ var context           = require('utils/context');
 var DNDCtrl           = require('../../../../components/menu/room/dnd-controller');
 var MinibarCollection = require('../minibar/minibar-collection');
 var context           = require('utils/context');
-var _                 = require('underscore');
 var fastdom           = require('fastdom');
 
 var MINIBAR_ITEM_HEIGHT = 65;
@@ -24,7 +24,7 @@ module.exports = Marionette.LayoutView.extend({
 
   behaviors: {
     Isomorphic: {
-      minibar: { el: '#minibar', init: 'initMiniBar' },
+      minibar: { el: '.minibar-inner', init: 'initMiniBar' },
       panel: { el: '#room-menu__panel', init: 'initMenuPanel' },
     },
   },
@@ -49,9 +49,10 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   ui: {
-    minibar:     '#minibar',
-    minibarList: '#minibar-list',
-    panel:       '#panel',
+    minibar:      '#minibar',
+    minibarInner: '.minibar-inner',
+    minibarList:  '#minibar-list',
+    panel:        '#panel',
   },
 
   events: {
@@ -154,7 +155,7 @@ module.exports = Marionette.LayoutView.extend({
 
       //init panel && minibar scrollers
       this.ui.panel.nanoScroller(params);
-      this.ui.minibar.nanoScroller(params);
+      this.ui.minibarInner.nanoScroller(params);
 
       //because of the margins nanoScroller will never show the scroller
       //so here is some custom logic to work around it
@@ -177,6 +178,10 @@ module.exports = Marionette.LayoutView.extend({
   onDestroy: function() {
     window.removeEventListener('resize', this._initNano.bind(this));
     this.stopListening(this.dndCtrl);
+  },
+
+  getModel: function (){
+    return this.model;
   },
 
 });
