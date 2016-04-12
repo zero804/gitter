@@ -1,22 +1,22 @@
 "use strict";
 
-var Marionette             = require('backbone.marionette');
-var _                      = require('underscore');
-var apiClient              = require('components/apiClient');
-var ModalView              = require('./modal');
-var troupeSettingsTemplate = require('./tmpl/room-settings-view.hbs');
-var userNotifications      = require('components/user-notifications');
-var FeaturesView           = require('./notification-features-collection-view');
+var Marionette        = require('backbone.marionette');
+var _                 = require('underscore');
+var apiClient         = require('components/apiClient');
+var ModalView         = require('./modal');
+var template          = require('./tmpl/notification-settings-view.hbs');
+var userNotifications = require('components/user-notifications');
+var FeaturesView      = require('./notification-features-collection-view');
 
 var OPTIONS = {
   all: 'All: Notify me for all messages',
   announcement: 'Announcements: Notify me for mentions and announcements',
   mute: 'Mute: Notify me only when I\'m directly mentioned'
-}
+};
 
 var View = Marionette.LayoutView.extend({
-  template: troupeSettingsTemplate,
-  events: {
+  template: template,
+  events:   {
     'click #close-settings' : 'destroySettings',
     'change #notification-options' : 'formChange'
   },
@@ -199,14 +199,16 @@ var View = Marionette.LayoutView.extend({
 
   formChange: function(e) {
     if(e) e.preventDefault();
-
     var mode = this.ui.options.val();
-    // TODO: this should go to the userRoom endpoint as a patch
-    apiClient.userRoom.put('/settings/notifications', { mode: mode })
-      .bind(this)
-      .then(function(settings) {
-        this.model.set(settings);
-      });
+    if (mode === 'default') {
+      var defaultSettings = this.model.get('defaultSettings');
+      mode = defaultSettings && defaultSettings.mode;
+    }
+    this.featuresView.resetFromMode(mode);
+
+    var noChange = mode === this.model.get('mode');
+    this.dialog.toggleButtonClass('apply', 'modal--default__footer__btn--neutral', noChange);
+    this.dialog.toggleButtonClass('apply', 'modal--default__footer__btn', !noChange);
   },
 
   destroySettings : function () {
@@ -225,7 +227,21 @@ var View = Marionette.LayoutView.extend({
       case 'set-defaults':
         window.location.href = "#notification-defaults";
         break;
+      case 'apply':
+        this.applyChangeAndClose();
+        break;
     }
+  },
+
+  applyChangeAndClose: function() {
+    var mode = this.ui.options.val();
+    // TODO: this should go to the userRoom endpoint as a patch
+    apiClient.userRoom.put('/settings/notifications', { mode: mode })
+      .bind(this)
+      .then(function() {
+        this.dialog.hide();
+        this.dialog = null;
+      });
   }
 });
 
@@ -234,7 +250,8 @@ module.exports = ModalView.extend({
       options = _.extend({
         title: "Notification Settings",
         menuItems: [
-          { action: "set-defaults", pull: 'left', text: "Configure Defaults", className: "modal--default__footer__btn"}
+          { action: "set-defaults", pull: 'left', text: "Configure Defaults", className: "modal--default__footer__btn--neutral" },
+          { action: "apply", pull: 'right', text: "Apply", className: "modal--default__footer__btn--neutral" }
         ]
       }, options);
 

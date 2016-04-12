@@ -275,9 +275,9 @@ onready(function() {
     },
 
     notifications: function() {
-      require.ensure(['views/modals/room-settings-view'], function(require) {
-        var TroupeSettingsView = require('views/modals/room-settings-view');
-        appView.dialogRegion.show(new TroupeSettingsView({ model: new Backbone.Model() }));
+      require.ensure(['views/modals/notification-settings-view'], function(require) {
+        var NotificationSettingsView = require('views/modals/notification-settings-view');
+        appView.dialogRegion.show(new NotificationSettingsView({ model: new Backbone.Model() }));
       });
     },
 
@@ -355,7 +355,7 @@ onready(function() {
         var NotificationDefaultsView = require('./views/modals/notification-defaults-view');
 
         appView.dialogRegion.show(new NotificationDefaultsView({
-          model: new Backbone.Model() 
+          model: new Backbone.Model()
         }));
 
       });
