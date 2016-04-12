@@ -11,13 +11,15 @@ var View = Marionette.LayoutView.extend({
   template: template,
   events: {
     'click #close-settings' : 'destroySettings',
-    'change #notification-options' : 'formChange'
+    'change #notification-options' : 'formChange',
+    'change #override-all' : 'formChange'
   },
   modelEvents: {
     change: 'update'
   },
   ui: {
     options: '#notification-options',
+    override: '#override-all',
     notifyFeatures: '#notify-features'
   },
   regions: {
@@ -63,9 +65,11 @@ var View = Marionette.LayoutView.extend({
   formChange: function(e) {
     if(e) e.preventDefault();
     var mode = this.ui.options.val();
+    var override = !!this.ui.override.is(':checked');
+
     this.featuresView.resetFromMode(mode);
 
-    var noChange = mode === this.model.get('mode');
+    var noChange = (mode === this.model.get('mode')) && !override;
     this.dialog.toggleButtonClass('apply', 'modal--default__footer__btn--neutral', noChange);
     this.dialog.toggleButtonClass('apply', 'modal--default__footer__btn', !noChange);
   },
@@ -77,8 +81,8 @@ var View = Marionette.LayoutView.extend({
 
   menuItemClicked: function(button) {
     switch(button) {
-      case 'override-all':
-        this.overrideAllAndClose();
+      case 'room-settings':
+        window.location.href = "#notifications";
         break;
       case 'apply':
         this.applyChangeAndClose();
@@ -86,24 +90,11 @@ var View = Marionette.LayoutView.extend({
     }
   },
 
-  overrideAllAndClose: function() {
-    if (!window.confirm('Are you sure you want to change all your rooms to use your default?')) {
-      return;
-    }
-
-    var mode = this.ui.options.val();
-    apiClient.user.put('/settings/defaultRoomMode', { mode: mode, override: true })
-      .bind(this)
-      .then(function() {
-        this.dialog.hide();
-        this.dialog = null;
-      });
-  },
-
   applyChangeAndClose: function() {
     var mode = this.ui.options.val();
+    var override = !!this.ui.override.is(':checked');
 
-    apiClient.user.put('/settings/defaultRoomMode', { mode: mode })
+    apiClient.user.put('/settings/defaultRoomMode', { mode: mode, override: override })
       .bind(this)
       .then(function() {
         this.dialog.hide();
@@ -117,10 +108,10 @@ module.exports = ModalView.extend({
       options = _.extend({
         title: "Default Notification Settings",
         menuItems: [{
-          action: 'override-all',
+          action: "room-settings",
           pull: 'left',
-          text: 'Override All',
-          className: 'modal--default__footer__btn--negative'
+          text: "Room Settings",
+          className: "modal--default__footer__link"
         },{
           action: "apply",
           pull: 'right',
