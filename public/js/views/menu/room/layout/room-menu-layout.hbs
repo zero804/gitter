@@ -1,51 +1,53 @@
 <aside id="room-menu-container" class="room-menu-container">
   <section class="room-menu">
-    <nav id="minibar" class="minibar nano">
-      <ul id="minibar-list" class="room-menu-options nano-content">
+    <nav id="minibar" class="minibar">
+      <div class="minibar-inner nano">
+        <ul id="minibar-list" class="room-menu-options nano-content">
 
-        <li data-state-change="all" id="minibar-all"  class="room-menu-options__item--all">
-          <button class="room-menu-options__item-button" title="All Conversations">
-            <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/logo.svg"}}' />
-          </button>
-        </li>
-
-        <li data-state-change="search" id="minibar-search" class="room-menu-options__item--search">
-          <button class="room-menu-options__item-button" title="Search Gitter">
-            <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/search.svg"}}' />
-          </button>
-        </li>
-
-        <li data-state-change="favourite" id="minibar-favourite" class="room-menu-options__item--favourite">
-          <button class="room-menu-options__item-button" title="Your Favourite Conversations">
-            <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/favourites.svg"}}' />
-          </button>
-        </li>
-
-        <li data-state-change="people" id="minibar-people" class="room-menu-options__item--people">
-          <button class="room-menu-options__item-button" title="Your One to One Conversations">
-            <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/people.svg"}}' />
-          </button>
-        </li>
-
-        {{#each leftMenuOrgs}} {{! JP 9/12/15 }} {{! TODO SHOULD THIS BE MOVED INTO A PARTIAL TO BE SHARED AROUND }}
-          <li data-state-change="org" id="minibar-{{name}}"  data-org-name="{{name}}" class="room-menu-options__item--org">
-            {{{ prerenderView "js/views/menu/room/minibar/minibar-item-view" }}}
+          <li data-state-change="all" id="minibar-all"  class="room-menu-options__item--all">
+            <button class="room-menu-options__item-button" title="All Conversations">
+              <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/logo.svg"}}' />
+            </button>
           </li>
-        {{/each}}
 
-        <li data-state-change="close" id="minibar-close"  class="room-menu-options__item--close {{#if roomMenuIsPinned}}left{{/if}}">
-          <button id="menu-toggle-button" class="room-menu-options__item-button menu-toggle-button" title="Toggle left menu">
-            {{> pinned-hamburger-menu-icon }}
-          </button>
-        </li>
+          <li data-state-change="search" id="minibar-search" class="room-menu-options__item--search">
+            <button class="room-menu-options__item-button" title="Search Gitter">
+              <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/search.svg"}}' />
+            </button>
+          </li>
 
-      </ul>
+          <li data-state-change="favourite" id="minibar-favourite" class="room-menu-options__item--favourite">
+            <button class="room-menu-options__item-button" title="Your Favourite Conversations">
+              <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/favourites.svg"}}' />
+            </button>
+          </li>
+
+          <li data-state-change="people" id="minibar-people" class="room-menu-options__item--people">
+            <button class="room-menu-options__item-button" title="Your One to One Conversations">
+              <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/people.svg"}}' />
+            </button>
+          </li>
+
+          {{#each leftMenuOrgs}} {{! JP 9/12/15 }} {{! TODO SHOULD THIS BE MOVED INTO A PARTIAL TO BE SHARED AROUND }}
+            <li data-state-change="org" id="minibar-{{name}}"  data-org-name="{{name}}" class="room-menu-options__item--org">
+              {{{ prerenderView "js/views/menu/room/minibar/minibar-item-view" }}}
+            </li>
+          {{/each}}
+
+          <li data-state-change="close" id="minibar-close"  class="room-menu-options__item--close {{#if roomMenuIsPinned}}left{{/if}}">
+            <button id="menu-toggle-button" class="room-menu-options__item-button menu-toggle-button" title="Toggle left menu">
+              {{> pinned-hamburger-menu-icon }}
+            </button>
+          </li>
+
+        </ul>
+      </div>
     </nav>
     <div id="room-menu__panel">
       <section class="room-menu__panel {{#if roomMenuIsPinned}}active loading{{/if}}">
         <header class="panel-header" id="panel-header"></header>
         <div id="profile-menu"></div>
-        <div id="panel" class="nano">
+        <div id="panel" class="room-menu__panel-inner nano">
           {{! JP 5/1/15
               NANO SCROLLER DOES SUPER WEIRD THINGS WITH Z-INDEXES SO THE FOOTER COMES FIRST }}
           <footer id="panel-footer" class="panel-footer-container"></footer>
