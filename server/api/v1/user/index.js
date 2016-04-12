@@ -31,7 +31,7 @@ module.exports = {
             resultItemStrategy: new restSerializer.UserStrategy()
           });
 
-          return restSerializer.serialize(searchResults, strategy);
+          return restSerializer.serializeObject(searchResults.results, strategy);
         });
     }
 
@@ -41,7 +41,7 @@ module.exports = {
 
   show: function(req) {
     var strategy = new restSerializer.UserStrategy();
-    return restSerializer.serialize(req.resourceUser, strategy);
+    return restSerializer.serializeObject(req.resourceUser, strategy);
   },
 
   load: function(req, id) {

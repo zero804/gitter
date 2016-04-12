@@ -13,10 +13,10 @@ var MAX_MESSAGES_FOR_NOTIFICATION = 3;
 
 function serializeItems(troupeId, recipientUserId, chatIds) {
   var troupeStrategy = new serializer.TroupeIdStrategy({ recipientUserId: recipientUserId });
-  var chatStrategy = new serializer.ChatIdStrategy({ includeTroupe: false, recipientUserId: recipientUserId });
+  var chatStrategy = new serializer.ChatIdStrategy();
 
   return Promise.all([
-    serializer.serialize(troupeId, troupeStrategy),
+    serializer.serializeObject(troupeId, troupeStrategy),
     serializer.serialize(chatIds, chatStrategy),
   ]);
 }
@@ -109,5 +109,6 @@ function sendUserTroupeNotification(userId, troupeId, notificationNumber, userNo
 
 module.exports.sendUserTroupeNotification = sendUserTroupeNotification;
 module.exports.testOnly = {
-  selectChatsForNotification: selectChatsForNotification
+  selectChatsForNotification: selectChatsForNotification,
+  serializeItems: serializeItems
 }

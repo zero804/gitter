@@ -1,9 +1,12 @@
 "use strict";
 
+
+var env                   = require('gitter-web-env');
+var logger                = env.logger;
 var _                     = require('lodash');
+var Promise               = require('bluebird');
 var unreadItemService     = require("../../services/unread-items");
 var collapsedChatsService = require('../../services/collapsed-chats-service');
-var execPreloads          = require('../exec-preloads');
 var getVersion            = require('../get-model-version');
 var UserIdStrategy        = require('./user-id-strategy');
 var TroupeIdStrategy      = require('./troupe-id-strategy');
@@ -12,20 +15,20 @@ function formatDate(d) {
   return d ? d.toISOString() : null;
 }
 
-function UnreadItemStategy() {
+function UnreadItemStrategy(options) {
   var unreadItemsHash;
 
-  this.preload = function(data, callback) {
-    unreadItemService.getUnreadItems(data.userId, data.troupeId)
+  this.preload = function() {
+    return unreadItemService.getUnreadItems(options.userId, options.roomId)
       .then(function(ids) {
         var hash = {};
-        ids.forEach(function(id) {
+
+        _.each(ids, function(id) {
           hash[id] = true;
         });
 
         unreadItemsHash = hash;
-      })
-      .nodeify(callback);
+      });
   };
 
   this.map = function(id) {
@@ -33,23 +36,20 @@ function UnreadItemStategy() {
   };
 }
 
-UnreadItemStategy.prototype = {
-  name: 'UnreadItemStategy'
+UnreadItemStrategy.prototype = {
+  name: 'UnreadItemStrategy'
 };
-
-
 
 function CollapsedItemStrategy(options) {
   var itemsHash;
   var userId = options.userId;
   var roomId = options.roomId;
 
-  this.preload = function(data, callback) {
-    collapsedChatsService.getHash(userId, roomId)
-      .then(function (hash) {
+  this.preload = function() {
+    return collapsedChatsService.getHash(userId, roomId)
+      .then(function(hash) {
         itemsHash = hash;
-      })
-      .nodeify(callback);
+      });
   };
 
   this.map = function (chatId) {
@@ -62,57 +62,57 @@ CollapsedItemStrategy.prototype = {
 };
 
 function ChatStrategy(options)  {
-  if(!options) options = {};
+  if (!options) options = {};
 
-  var userStategy = options.user ? null : new UserIdStrategy({ lean: options.lean });
-  var unreadItemStategy, collapsedItemStategy;
+  // useLookups will be set to true if there are any lookups that this strategy
+  // understands. Currently it only knows about user lookups.
+  var useLookups = false;
+  var userLookups;
+  if (options.lookups && options.lookups.indexOf('user') !== -1) {
+    useLookups = true;
+    userLookups = {};
+  }
+
+  if (useLookups) {
+    if (options.lean) {
+      // we're breaking users out, but then not returning their displayNames
+      // which kinda defeats the purpose
+      logger.warn("ChatStrategy was called with lookups, but also with lean", options);
+    }
+  }
+
+  var userStrategy = options.user ? null : new UserIdStrategy({ lean: options.lean });
+
+  var unreadItemStrategy, collapsedItemStrategy;
   /* If options.unread has been set, we don't need a strategy */
-  if(options.currentUserId && options.unread === undefined) {
-    unreadItemStategy = new UnreadItemStategy();
+  if (options.currentUserId && options.unread === undefined) {
+    unreadItemStrategy = new UnreadItemStrategy({ userId: options.currentUserId, roomId: options.troupeId });
   }
 
   if (options.currentUserId && options.troupeId) {
-    collapsedItemStategy = new CollapsedItemStrategy({ userId: options.currentUserId, roomId: options.troupeId });
+    collapsedItemStrategy = new CollapsedItemStrategy({ userId: options.currentUserId, roomId: options.troupeId });
   }
 
-  var troupeStrategy = options.includeTroupe ? new TroupeIdStrategy(options) : null;
   var defaultUnreadStatus = options.unread === undefined ? true : !!options.unread;
 
-  this.preload = function(items, callback) {
-    var users = items.map(function(i) { return i.fromUserId; });
-
+  this.preload = function(items) {
     var strategies = [];
 
     // If the user is fixed in options, we don't need to look them up using a strategy...
-    if(userStategy) {
-      strategies.push({
-        strategy: userStategy,
-        data: users
-      });
+    if (userStrategy) {
+      var users = items.map(function(i) { return i.fromUserId; });
+      strategies.push(userStrategy.preload(users));
     }
 
-    if(unreadItemStategy) {
-      strategies.push({
-        strategy: unreadItemStategy,
-        data: { userId: options.currentUserId, troupeId: options.troupeId }
-      });
+    if (unreadItemStrategy) {
+      strategies.push(unreadItemStrategy.preload());
     }
 
-    if(collapsedItemStategy) {
-      strategies.push({
-        strategy: collapsedItemStategy,
-        data: null
-      });
+    if (collapsedItemStrategy) {
+      strategies.push(collapsedItemStrategy.preload());
     }
 
-    if(troupeStrategy) {
-      strategies.push({
-        strategy: troupeStrategy,
-        data: items.map(function(i) { return i.toTroupeId; })
-      });
-    }
-
-    execPreloads(strategies, callback);
+    return Promise.all(strategies);
   };
 
   function safeArray(array) {
@@ -126,9 +126,21 @@ function ChatStrategy(options)  {
     return array;
   }
 
+  function mapUser(userId) {
+    if (userLookups) {
+      if (!userLookups[userId]) {
+        userLookups[userId] = userStrategy.map(userId);
+      }
+
+      return userId;
+    } else {
+      return userStrategy.map(userId);
+    }
+  }
+
   this.map = function(item) {
-    var unread = unreadItemStategy ? unreadItemStategy.map(item._id) : defaultUnreadStatus;
-    var collapsed = collapsedItemStategy && collapsedItemStategy.map(item._id);
+    var unread = unreadItemStrategy ? unreadItemStrategy.map(item._id) : defaultUnreadStatus;
+    var collapsed = collapsedItemStrategy && collapsedItemStrategy.map(item._id);
 
     var castArray = options.lean ? undefinedForEmptyArray : safeArray;
 
@@ -139,10 +151,9 @@ function ChatStrategy(options)  {
       html: item.html,
       sent: formatDate(item.sent),
       editedAt: item.editedAt ? formatDate(item.editedAt) : undefined,
-      fromUser: options.user ? options.user : userStategy.map(item.fromUserId),
+      fromUser: options.user ? options.user : mapUser(item.fromUserId),
       unread: unread,
       collapsed: collapsed,
-      room: troupeStrategy ? troupeStrategy.map(item.toTroupeId) : undefined,
       readBy: item.readBy ? item.readBy.length : undefined,
       urls: castArray(item.urls),
       initial: options.initialId && item._id == options.initialId || undefined,
@@ -161,6 +172,19 @@ function ChatStrategy(options)  {
       v: getVersion(item)
     };
 
+  };
+
+  this.postProcess = function(serialized) {
+    if (useLookups) {
+      return {
+        items: serialized.toArray(),
+        lookups: {
+          users: userLookups
+        }
+      };
+    } else {
+      return serialized.toArray();
+    }
   };
 }
 

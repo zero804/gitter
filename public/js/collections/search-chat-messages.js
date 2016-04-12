@@ -18,6 +18,9 @@ var ContextModel = Backbone.Model.extend({
     this.roomModel     = options.roomModel;
     this.listenTo(this.roomMenuModel, 'change:searchTerm change:state', this.onModelUpdate, this);
     this.listenTo(this.roomModel, 'change:id', this.onModelUpdate, this);
+
+    this.set('active', this.roomMenuModel.get('state') === 'search');
+    this.set('roomId', context.troupe().id);
   },
 
   onModelUpdate: function() {

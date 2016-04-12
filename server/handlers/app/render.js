@@ -161,7 +161,7 @@ function getPermalinkChatForRoom(troupe, chatId) {
         troupeId: troupe.id
       });
 
-      return restSerializer.serialize(chat, strategy);
+      return restSerializer.serializeObject(chat, strategy);
     });
 }
 
@@ -279,6 +279,7 @@ function renderMainFrame(req, res, next, frame) {
     .catch(next);
 }
 
+
 function renderChat(req, res, options, next) {
   var troupe = req.uriContext.troupe;
   var aroundId = fixBadLinksOnId(req.query.at);
@@ -298,7 +299,6 @@ function renderChat(req, res, options, next) {
     };
 
     var chatSerializerOptions = _.defaults({
-      lean: true
     }, snapshotOptions);
 
     var userSerializerOptions = _.defaults({
@@ -312,6 +312,7 @@ function renderChat(req, res, options, next) {
         options.fetchEvents === false ? null : restful.serializeEventsForTroupe(troupe.id, userId),
         options.fetchUsers === false ? null : restful.serializeUsersForTroupe(troupe.id, userId, userSerializerOptions),
       ]).spread(function (troupeContext, chats, activityEvents, users, ownerIsOrg) {
+
         var initialChat = _.find(chats, function(chat) { return chat.initial; });
         var initialBottom = !initialChat;
         var githubLink;

@@ -14,7 +14,7 @@ var proto = BaseCollectionView.prototype;
 var ItemView = BaseCollectionItemView.extend({
   serializeData: function() {
     var data = this.model.toJSON();
-    var name = (data.name || data.uri);
+    var name = (data.name || data.uri || '');
     return _.extend({}, data, {
       name:         roomNameShortener(name),
       avatarSrcset: (!data.isRecentSearch) ? resolveRoomAvatarSrcSet({ uri: name }, 22) : null,
@@ -37,7 +37,7 @@ module.exports =  BaseCollectionView.extend({
     this.secondaryCollection = attrs.secondaryCollection;
 
     this.listenTo(this.roomMenuModel, 'change:searchTerm', this.setActive, this);
-    this.listenTo(this.collection, 'filter-complete', this.render, this);
+    this.listenTo(this.collection, 'filter-complete sync', this.render, this);
 
     BaseCollectionView.prototype.initialize.apply(this, arguments);
   },
@@ -98,6 +98,7 @@ module.exports =  BaseCollectionView.extend({
 
   onSearchItemClicked: function(view) {
     this.roomMenuModel.set('searchTerm', view.model.get('name'));
+    this.bus.trigger('left-menu:recent-search', view.model.get('name'));
   },
 
   onRender: function (){

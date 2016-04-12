@@ -123,7 +123,7 @@ exports.listTroupeUsersForEmailNotifications = function(horizonTime, emailLatchE
 /**
  * Mark many items as read, for a single user and troupe
  */
-exports.markItemsRead = Promise.method(function(userId, troupeId, itemIds, options) {
+exports.markItemsRead = Promise.method(function markItemsRead(userId, troupeId, itemIds, options) {
   if(!userId) throw new Error("userId required");
   if(!troupeId) throw new Error("troupeId required");
 

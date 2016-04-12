@@ -3,18 +3,6 @@
 var roomService = require('../../../services/room-service');
 var restSerializer = require("../../../serializers/rest-serializer");
 
-function serialize(items, req, res, next) {
-
-  var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id });
-
-  restSerializer.serialize(items, strategy, function(err, serialized) {
-    if(err) return next(err);
-
-    res.send(serialized);
-  });
-
-}
-
 module.exports = function(req, res, next) {
   var user = req.user;
   var ownerUri = req.body.ownerUri;
@@ -27,7 +15,12 @@ module.exports = function(req, res, next) {
       // finally create channel
       return roomService.createCustomChildRoom(ownerRoom, user, { name: channelName, security: channelSecurity });
     }).then(function(customRoom) {
-      return serialize(customRoom, req, res, next);
+      var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id });
+
+      return restSerializer.serializeObject(customRoom, strategy);
+    })
+    .then(function(serialized) {
+      res.send(serialized);
     })
     .catch(function(err) {
       if(err.clientDetail && err.responseStatusCode) {

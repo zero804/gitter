@@ -5,15 +5,16 @@ var UserIdStrategy = require('./user-id-strategy');
 function TroupeUserStrategy(options) {
   var userIdStategy = new UserIdStrategy(options);
 
-  this.preload = function(troupeUsers, callback) {
+  this.preload = function(troupeUsers) {
     var userIds = troupeUsers.map(function(troupeUser) { return troupeUser.userId; });
-    userIdStategy.preload(userIds, callback);
+    return userIdStategy.preload(userIds);
   };
 
   this.map = function(troupeUser) {
     return userIdStategy.map(troupeUser.userId);
   };
 }
+
 TroupeUserStrategy.prototype = {
   name: 'TroupeUserStrategy'
 };

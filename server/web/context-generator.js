@@ -16,16 +16,19 @@ var _                = require('underscore');
  */
 exports.generateNonChatContext = function(req) {
   var user = req.user;
+  var troupe = (req.uriContext || {}).troupe;
 
   return Promise.all([
       user ? serializeUser(user) : null,
+      troupe ? serializeTroupe(troupe, user) : undefined,
       user ? determineDesktopNotifications(user, req) : false,
       user ? userSettingsService.getUserSettings(user.id, 'suggestedRoomsHidden') : false,
       user ? userSettingsService.getUserSettings(user.id, 'leftRoomMenu') : false,
     ])
-    .spread(function (serializedUser, desktopNotifications, suggestedRoomsHidden, leftRoomMenuState) {
+    .spread(function (serializedUser, serializedTroupe, desktopNotifications, suggestedRoomsHidden, leftRoomMenuState) {
       return createTroupeContext(req, {
         user:                 serializedUser,
+        troupe:               serializedTroupe,
         suggestedRoomsHidden: suggestedRoomsHidden,
         desktopNotifications: desktopNotifications,
         leftRoomMenuState:    leftRoomMenuState
@@ -119,7 +122,7 @@ function serializeUser(user) {
     showPremiumStatus: true
   });
 
-  return restSerializer.serialize(user, strategy);
+  return restSerializer.serializeObject(user, strategy);
 }
 
 function serializeTroupeId(troupeId, user) {
@@ -130,7 +133,7 @@ function serializeTroupeId(troupeId, user) {
     includeOwner: true
   });
 
-  return restSerializer.serialize(troupeId, strategy);
+  return restSerializer.serializeObject(troupeId, strategy);
 }
 
 
@@ -142,7 +145,7 @@ function serializeTroupe(troupe, user) {
     includeOwner: true
   });
 
-  return restSerializer.serialize(troupe, strategy);
+  return restSerializer.serializeObject(troupe, strategy);
 }
 
 function createTroupeContext(req, options) {
