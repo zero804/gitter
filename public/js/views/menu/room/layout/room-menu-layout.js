@@ -27,10 +27,9 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   initMiniBar: function(optionsForRegion) {
-    var orgsSnapshot = context.getSnapshot('orgs') || [];
     return new MiniBarView(optionsForRegion({
       model:          this.model,
-      collection:     new MinibarCollection(orgsSnapshot, { roomCollection: this.roomCollection }),
+      collection:     this.minibarCollection,
       bus:            this.bus,
       dndCtrl:        this.dndCtrl,
       roomCollection: this.model._roomCollection,
@@ -53,7 +52,7 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   events: {
-    mouseleave: 'closePanel'
+    mouseleave: 'onMouseLeave'
   },
 
   childEvents: {
@@ -74,12 +73,16 @@ module.exports = Marionette.LayoutView.extend({
       throw new Error('A valid room collection needs to be passed to a new instance of RoomMenyLayout');
     }
 
+
     this.roomCollection          = attrs.roomCollection;
 
     //TODO TEST THIS & FIGURE OUT IF THEY ARE REQUIRED FOR MOBILE?
     //JP 28/1/16
     this.orgCollection           = attrs.orgCollection;
     this.suggestedRoomCollection = attrs.suggestedRoomCollection;
+
+    var orgsSnapshot = context.getSnapshot('orgs') || [];
+    this.minibarCollection = new MinibarCollection(orgsSnapshot, { roomCollection: this.roomCollection });
 
     //Make a new model
     this.model = new RoomMenuModel(_.extend({}, context.getSnapshot('leftMenu'), {
@@ -116,6 +119,18 @@ module.exports = Marionette.LayoutView.extend({
     }
 
     this.openPanel();
+  },
+
+  onMouseLeave: function() {
+    this.closePanel();
+
+    // Clear out the active selected state
+    if(!this.model.get('roomMenuIsPinned')) {
+      var activeModel = this.minibarCollection.findWhere({ active: true });
+      if (activeModel) {
+        activeModel.set('active', false);
+      }
+    }
   },
 
   openPanel: function() {
