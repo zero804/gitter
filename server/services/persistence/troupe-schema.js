@@ -51,6 +51,7 @@ module.exports = {
       githubId: { type: Number, default: null },
       lang: { type: String }, // Human language of this room
       renamedLcUris: [String],
+      disabledProviders: [String],
       _nonce: { type: Number },
       _tv: { type: 'MongooseNumber', 'default': 0 }
     }, { strict: 'throw' });

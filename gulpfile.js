@@ -265,6 +265,7 @@ makeTestTasks('fasttest', function(name, files) {
       reporter: 'spec',
       grep: '#slow',
       invert: true,
+      bail: true,
       env: {
         TAP_FILE: "output/test-reports/" + name + ".tap",
         SKIP_BADGER_TESTS: 1,
