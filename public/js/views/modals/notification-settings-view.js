@@ -142,7 +142,7 @@ var View = Marionette.LayoutView.extend({
     var found = false;
 
     var defaultOptgroup = document.createElement("optgroup");
-    defaultOptgroup.label = 'Use Default Setting';
+    defaultOptgroup.label = 'Use Default';
     selectInput.append(defaultOptgroup);
 
     var defaultOption = document.createElement("option");
@@ -155,7 +155,7 @@ var View = Marionette.LayoutView.extend({
     defaultOptgroup.appendChild(defaultOption);
 
     var overrideOptGroup = document.createElement("optgroup");
-    overrideOptGroup.label = 'Override Default Setting';
+    overrideOptGroup.label = 'Override';
     selectInput.append(overrideOptGroup);
 
     Object.keys(OPTIONS).forEach(function(key) {
@@ -187,8 +187,8 @@ var View = Marionette.LayoutView.extend({
     var defaultSettings = model.get('defaultSettings');
     if (!defaultSettings) return "Default settings";
 
-    if (!defaultSettings.mode || !OPTIONS[defaultSettings.mode]) return "Default settings: legacy";
-    return "My Default: " + OPTIONS[defaultSettings.mode];
+    if (!defaultSettings.mode || !OPTIONS[defaultSettings.mode]) return "Legacy settings";
+    return OPTIONS[defaultSettings.mode];
   },
 
   onRender: function() {
