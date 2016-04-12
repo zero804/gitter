@@ -6,6 +6,7 @@ var testRequire = require('../../test-require');
 var Promise = require('bluebird');
 var mockito = require('jsmockito').JsMockito;
 var assert = require('assert');
+var fixtureLoader = require('../../test-fixtures');
 
 var times = mockito.Verifiers.times;
 var once = times(1);
@@ -28,13 +29,12 @@ var notificationSerializerStub = {
   TroupeIdStrategy: function() { this.name = 'troupeId'; },
   ChatIdStrategy: function() { this.name = 'chatId'; },
   serialize: function(item, strategy) {
-    return Promise.try(function() {
-      if(strategy.name === 'troupeId') {
-        return {id: 'serializedId', name: 'serializedName', url: 'serializedUrl'};
-      } else if(strategy.name === 'chatId') {
-        return [{id: 'serializedChatId', text: 'serializedText', fromUser: {displayName: 'serializedFromUser'}}];
-      }
-    });
+    assert.strictEqual(strategy.name, 'chatId');
+    return Promise.resolve([{id: 'serializedChatId', text: 'serializedText', fromUser: {displayName: 'serializedFromUser'}}]);
+  },
+  serializeObject: function(item, strategy) {
+    assert.strictEqual(strategy.name, 'troupeId');
+    return Promise.resolve({id: 'serializedId', name: 'serializedName', url: 'serializedUrl'});
   }
 };
 
@@ -113,6 +113,47 @@ describe('push notification generator service', function() {
       assert.deepEqual(service.testOnly.selectChatsForNotification(['1', '2', '3', '4', '5'], ['3']), ['2', '3', '4']);
     });
 
+  });
+
+  describe('serializeItems #slow', function() {
+    var fixture = {};
+    before(fixtureLoader(fixture, {
+      user1: {},
+      troupe1: {users: ['user1']},
+      message1: {
+        user: 'user1',
+        troupe: 'troupe1',
+        readBy: [],
+        text: 'foo',
+        sent: new Date('2014-01-01T00:00:00.000Z')
+      },
+      message2: {
+        user: 'user1',
+        troupe: 'troupe1',
+        readBy: [],
+        text: 'bar',
+        sent: new Date('2014-01-02T00:00:00.000Z')
+      }
+    }));
+
+    after(function() {
+      return fixture.cleanup();
+    });
+
+    it('should serialize for troupe, user and chats', function() {
+      var troupeId = fixture.troupe1.id;
+      var recipientUserId = fixture.user1.id;
+      var chatIds = [fixture.message1.id, fixture.message2.id];
+
+      // bring in a fresh service so we don't get the stubbed serializer
+      var service = testRequire('./services/notifications/push-notification-generator');
+      return service.testOnly.serializeItems(troupeId, recipientUserId, chatIds)
+        .spread(function(troupe, chats) {
+          assert.equal(troupe.id, troupeId);
+          assert.equal(chats[0].text, 'foo');
+          assert.equal(chats[1].text, 'bar');
+        });
+    });
   });
 
 });
