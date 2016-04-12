@@ -63,11 +63,12 @@ module.exports = (function () {
     },
 
     initNewMenuRegion: function (optionsForRegion){
-      return new RoomMenuLayout(optionsForRegion({
+      this.menuRegion =  new RoomMenuLayout(optionsForRegion({
         bus:                     appEvents,
         roomCollection:          this.roomCollection,
         orgCollection:           this.orgCollection
       }));
+      return this.menuRegion;
     },
 
     onKeyDown: function(e) {
@@ -77,6 +78,11 @@ module.exports = (function () {
         e.stopPropagation();
         e.preventDefault();
       }
+    },
+
+    getRoomMenuModel: function (){
+      if(!this.menuRegion) { return; }
+      return this.menuRegion.getModel();
     },
 
 
