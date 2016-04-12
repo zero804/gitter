@@ -30,9 +30,6 @@ var UserSchema = new Schema({
   githubUserToken: { type: String }, // The scope for this token will always be 'user'
   githubId: {type: Number },
   identities: [ProviderKeySchema],
-  permissions: {
-    createRoom: { type: Boolean, 'default': true }
-  },
   staff: { type: Boolean },
   hellbanned: { type: Boolean }, // to troll the trolls
   githubScopes: { type: Schema.Types.Mixed },
@@ -43,6 +40,7 @@ var UserSchema = new Schema({
     abbr: String,   // Abbreviation, like PDT (note that these are NOT globally unique)
     iana: String    // Timezone IANA description, eg `Europe/London` or `America/Los_Angeles`
   },
+  defaultFlags: { type: Number }, // Default flags for room membership
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
 

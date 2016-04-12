@@ -1,0 +1,37 @@
+@import "colors";
+@import "../../../../../less/components/menu/room/room-item.less";
+
+.room-item--favourite {
+  .m-room-item();
+  position: relative;
+
+  @start-icon-height: 2rem;
+  &:before {
+    content:     '\e803';
+    display:     block;
+    position:    absolute;
+    top: 0.9rem;
+    left: 1.8rem;
+    height:      @start-icon-height;
+    width:       @start-icon-height;
+    font-family: fontello;
+    color:       @search-message-decal-color;
+    z-index:     -1;
+    transition: left 0.3s ease-out;
+  }
+
+  &:hover:before {
+    left: 1.6rem;
+  }
+
+  &.temp {
+    opacity:    0;
+    max-height: 0;
+    transition: max-height .2s ease-in, opacity .1s .1s;
+  }
+
+  &.temp-active {
+    opacity:    .2;
+    max-height: @menu-item-height;
+  }
+}
