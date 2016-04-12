@@ -59,14 +59,6 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     this.model   = options.model;
     this.dndCtrl = options.dndCtrl;
     this.uiModel = new Backbone.Model({ isFocused: false, isDragging: false });
-
-    //TODO turn this into an error if there is a dndCtrl
-    this.listenTo(this.uiModel, 'change:isDragging', this.onDragStateUpdate, this);
-    this.listenTo(this.dndCtrl, 'room-menu:add-favourite', this.onFavouriteAdded, this);
-    this.listenTo(this.dndCtrl, 'room-menu:sort-favourite', this.onFavouritesSorted, this);
-    this.listenTo(this.dndCtrl, 'dnd:start-drag', this.onDragStart, this);
-    this.listenTo(this.dndCtrl, 'dnd:end-drag', this.onDragEnd, this);
-
     this.listenTo(this.roomMenuModel, 'change:searchTerm', this.setActive, this);
     BaseCollectionView.prototype.initialize.apply(this, arguments);
   },
@@ -103,45 +95,6 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     }
   },
 
-  //TODO The filter should be reused within the view filter method?
-  onFavouriteAdded: function(id) {
-    var newFavModel = this.collection.get(id);
-
-    //TODO Move to collection.max
-    var favIndex    = this.collection
-      .filter(function(model) { return !!model.get('favourite'); }).length;
-
-    newFavModel.save({ favourite: favIndex + 1 }, { patch: true });
-  },
-
-  onFavouritesSorted: function(targetID, siblingID) {
-
-    var target  = this.collection.get(targetID);
-    var sibling = this.collection.get(siblingID);
-    var index   = !!sibling ? sibling.get('favourite') : (this.getHighestFavourite() + 1);
-    var max     = this.collection.max('favourite');
-
-    //If we have a sibling and that sibling has the highest favourite value
-    //then we have dropped the item in the second to last position
-    //so we need to account for that
-    if (!!sibling && !!max && (sibling.get('id') === max.get('id'))) {
-      index = max.get('favourite');
-    }
-
-    //Save the new favourite
-    target.set('favourite', index);
-    target.save();
-    this.collection.sort();
-  },
-
-  //TODO TEST THIS YOU FOOL JP 10/2/16
-  getHighestFavourite: function() {
-    return (this.collection.pluck('favourite')
-      .filter(function(num) { return !!num; })
-      .sort(function(a, b) { return a < b ? -1 : 1; })
-      .slice(-1)[0] || 0);
-  },
-
   getChildContainerToBeIndexed: function () {
     //use the second child because the first child is the hidden search header
     return this.el.children[1];
@@ -162,20 +115,6 @@ var PrimaryCollectionView = BaseCollectionView.extend({
 
     this.dndCtrl.pushContainer(this.ui.collection[0]);
     BaseCollectionView.prototype.onRender.apply(this, arguments);
-  },
-
-  onDragStart: function () {
-    this.uiModel.set('isDragging', true);
-    this.el.classList.add('dragging');
-  },
-
-  onDragEnd: function () {
-    this.uiModel.set('isDragging', false);
-    this.el.classList.remove('dragging');
-  },
-
-  onDragStateUpdate: function (model, val) { //jshint unused: true
-    toggleClass(this.el, 'dragging', val);
   },
 
   onDestroy: function() {
