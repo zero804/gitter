@@ -180,4 +180,8 @@ module.exports = Marionette.LayoutView.extend({
     this.stopListening(this.dndCtrl);
   },
 
+  getModel: function (){
+    return this.model;
+  },
+
 });
