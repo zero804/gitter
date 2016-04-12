@@ -2,19 +2,19 @@
 
 //TODO This has basically turned into a controller, refactor it JP 2/2/16
 
-var Backbone                        = require('backbone');
-var _                               = require('underscore');
-var ProxyCollection                 = require('backbone-proxy-collection');
-var RecentSearchesCollection        = require('../collections/recent-searches');
-var SuggestedOrgCollection          = require('../collections/org-suggested-rooms');
-var apiClient                       = require('components/apiClient');
-var FilteredRoomCollection          = require('../collections/filtered-room-collection.js');
-var SuggestedRoomsByRoomCollection  = require('../collections/left-menu-suggested-by-room');
-var UserSuggestions                 = require('../collections/user-suggested-rooms');
-var SearchRoomPeopleCollection      = require('../collections/left-menu-search-rooms-and-people');
-var SearchChatMessages              = require('../collections/search-chat-messages');
-var perfTiming                      = require('components/perf-timing');
-var context                         = require('utils/context');
+var Backbone                       = require('backbone');
+var _                              = require('underscore');
+var ProxyCollection                = require('backbone-proxy-collection');
+var RecentSearchesCollection       = require('../collections/recent-searches');
+var SuggestedOrgCollection         = require('../collections/org-suggested-rooms');
+var apiClient                      = require('components/apiClient');
+var FilteredRoomCollection         = require('../collections/filtered-room-collection.js');
+var SuggestedRoomsByRoomCollection = require('../collections/left-menu-suggested-by-room');
+var UserSuggestions                = require('../collections/user-suggested-rooms');
+var SearchRoomPeopleCollection     = require('../collections/left-menu-search-rooms-and-people');
+var SearchChatMessages             = require('../collections/search-chat-messages');
+var perfTiming                     = require('components/perf-timing');
+var context                        = require('utils/context');
 
 var states = [
   'all',
@@ -36,6 +36,7 @@ module.exports = Backbone.Model.extend({
     panelOpenState:            true,
     roomMenuIsPinned:          true,
     selectedOrgName:           '',
+    hasDismissedSuggestions:   false,
   },
 
   //TODO Remove all these delete statements and pass the object with the options hash
