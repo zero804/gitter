@@ -1,5 +1,11 @@
 @import "trp3Vars";
 
+.room-item-selected() {
+  cursor:           pointer;
+  background-color: @room-item-selected-bg;
+  color:            white;
+}
+
 .m-room-item() {
   height:     @menu-item-height * 3;
   max-height: @menu-item-height;
@@ -15,13 +21,18 @@
     opacity: 1;
   }
 
-  &.gu-mirror, &.gu-transit {
 
-    .room-item-selected();
-    max-height: @menu-item-height;
+
+  &.gu-mirror {
     opacity: 1;
 
     & .room-item__options-menu {
+      display: none;
+    }
+  }
+
+  &.gu-mirror {
+    body.drag-over-favourite & {
       display: none;
     }
   }
@@ -42,4 +53,8 @@
     padding-left:  @mobile-menu-left-padding;
     padding-right: @mobile-menu-left-padding;
   }
+}
+
+.gu-transit .room-item__container {
+  background-color: rgba(255, 255, 255, .2);
 }

@@ -1,38 +1,39 @@
 "use strict";
 
-var winston                        = require('../../utils/winston');
-var nconf                          = require('../../utils/config');
-var Promise                        = require('bluebird');
-var contextGenerator               = require('../../web/context-generator');
-var restful                        = require('../../services/restful');
-var userService                    = require('../../services/user-service');
-var chatService                    = require('../../services/chat-service');
-var appVersion                     = require('../../web/appVersion');
-var social                         = require('../social-metadata');
-var restSerializer                 = require("../../serializers/rest-serializer");
-var burstCalculator                = require('../../utils/burst-calculator');
-var userSort                       = require('../../../public/js/utils/user-sort');
-var roomSort                       = require('gitter-realtime-client/lib/sorts-filters').pojo; /* <-- Don't use the default export
+var winston                                 = require('../../utils/winston');
+var nconf                                   = require('../../utils/config');
+var Promise                                 = require('bluebird');
+var contextGenerator                        = require('../../web/context-generator');
+var restful                                 = require('../../services/restful');
+var userService                             = require('../../services/user-service');
+var chatService                             = require('../../services/chat-service');
+var appVersion                              = require('../../web/appVersion');
+var social                                  = require('../social-metadata');
+var restSerializer                          = require("../../serializers/rest-serializer");
+var burstCalculator                         = require('../../utils/burst-calculator');
+var userSort                                = require('../../../public/js/utils/user-sort');
+var roomSort                                = require('gitter-realtime-client/lib/sorts-filters').pojo; /* <-- Don't use the default export
                                                                                           will bring in tons of client-side
                                                                                           libraries that we don't need */
-var roomNameTrimmer                = require('../../../public/js/utils/room-name-trimmer');
-var isolateBurst                   = require('gitter-web-shared/burst/isolate-burst-array');
-var unreadItemService              = require('../../services/unread-items');
-var mongoUtils                     = require('../../utils/mongo-utils');
-var url                            = require('url');
-var cdn                            = require("../../web/cdn");
-var roomMembershipService          = require('../../services/room-membership-service');
-var troupeService                  = require('../../services/troupe-service');
-var useragent                      = require('useragent');
-var _                              = require('lodash');
-var GitHubOrgService               = require('gitter-web-github').GitHubOrgService;
-var orgPermissionModel             = require('../../services/permissions/org-permissions-model');
-var resolveUserAvatarUrl           = require('gitter-web-shared/avatars/resolve-user-avatar-url');
-var resolveRoomAvatarSrcSet        = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
-var getOrgNameFromTroupeName       = require('gitter-web-shared/get-org-name-from-troupe-name');
-var parseRoomsIntoLeftMenuRoomList = require('gitter-web-shared/rooms/left-menu-room-list.js');
-var parseSnapshotsForPageContext   = require('gitter-web-shared/parse/snapshots');
-var generateRoomCardContext = require('gitter-web-shared/templates/partials/room-card-context-generator');
+var roomNameTrimmer                         = require('../../../public/js/utils/room-name-trimmer');
+var isolateBurst                            = require('gitter-web-shared/burst/isolate-burst-array');
+var unreadItemService                       = require('../../services/unread-items');
+var mongoUtils                              = require('../../utils/mongo-utils');
+var url                                     = require('url');
+var cdn                                     = require("../../web/cdn");
+var roomMembershipService                   = require('../../services/room-membership-service');
+var troupeService                           = require('../../services/troupe-service');
+var useragent                               = require('useragent');
+var _                                       = require('lodash');
+var GitHubOrgService                        = require('gitter-web-github').GitHubOrgService;
+var orgPermissionModel                      = require('../../services/permissions/org-permissions-model');
+var resolveUserAvatarUrl                    = require('gitter-web-shared/avatars/resolve-user-avatar-url');
+var resolveRoomAvatarSrcSet                 = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
+var getOrgNameFromTroupeName                = require('gitter-web-shared/get-org-name-from-troupe-name');
+var parseRoomsIntoLeftMenuRoomList          = require('gitter-web-shared/rooms/left-menu-room-list.js');
+var parseSnapshotsForPageContext            = require('gitter-web-shared/parse/snapshots');
+var parseRoomsIntoLeftMenuFavouriteRoomList = require('gitter-web-shared/rooms/left-menu-room-favourite-list');
+var generateRoomCardContext                 = require('gitter-web-shared/templates/partials/room-card-context-generator');
 
 /* How many chats to send back */
 var INITIAL_CHAT_COUNT = 50;
@@ -237,31 +238,36 @@ function renderMainFrame(req, res, next, frame) {
         social.getMetadata({ room: req.troupe  });
 
       //TODO Pass this to MINIBAR?? JP 17/2/16
-      var hasNewLeftMenu   = !req.isPhone && req.fflip && req.fflip.has('left-menu');
-      var snapshots        = troupeContext.snapshots = parseSnapshotsForPageContext(req, troupeContext, orgs, rooms);
-      var leftMenuRoomList = parseRoomsIntoLeftMenuRoomList(snapshots.leftMenu.state, snapshots.rooms, snapshots.leftMenu.selectedOrgName);
+      var hasNewLeftMenu            = !req.isPhone && req.fflip && req.fflip.has('left-menu');
+      var snapshots                 = troupeContext.snapshots = parseSnapshotsForPageContext(req, troupeContext, orgs, rooms);
+      var leftMenuRoomList          = parseRoomsIntoLeftMenuRoomList(snapshots.leftMenu.state, snapshots.rooms, snapshots.leftMenu.selectedOrgName);
+      var leftMenuFavouriteRoomList = parseRoomsIntoLeftMenuFavouriteRoomList(snapshots.leftMenu.state, snapshots.rooms, snapshots.leftMenu.selectedOrgName);
+
+      //TODO Remove this when favourite tab is removed for realz JP 8/4/16
+      if(snapshots.leftMenu.state === 'favourite') { leftMenuRoomList = []; }
 
       res.render(template, {
-        socialMetadata:     socialMetadata,
-        bootScriptName:     bootScriptName,
-        cssFileName:        "styles/" + bootScriptName + ".css",
-        troupeName:         req.uriContext.uri,
-        troupeContext:      troupeContext,
-        roomMenuIsPinned:   snapshots.leftMenu.roomMenuIsPinned,
-        chatAppLocation:    chatAppLocation,
-        agent:              req.headers['user-agent'],
-        stagingText:        stagingText,
-        stagingLink:        stagingLink,
-        dnsPrefetch:        dnsPrefetch,
-        subresources:       getSubResources(bootScriptName),
-        showFooterButtons:  true,
-        showUnreadTab:      true,
-        menuHeaderExpanded: false,
-        user:               user,
-        orgs:               orgs,
-        hasNewLeftMenu:     hasNewLeftMenu,
-        leftMenuOrgs:       troupeContext.snapshots.orgs,
-        leftMenuRooms:      leftMenuRoomList,
+        socialMetadata:         socialMetadata,
+        bootScriptName:         bootScriptName,
+        cssFileName:            "styles/" + bootScriptName + ".css",
+        troupeName:             req.uriContext.uri,
+        troupeContext:          troupeContext,
+        roomMenuIsPinned:       snapshots.leftMenu.roomMenuIsPinned,
+        chatAppLocation:        chatAppLocation,
+        agent:                  req.headers['user-agent'],
+        stagingText:            stagingText,
+        stagingLink:            stagingLink,
+        dnsPrefetch:            dnsPrefetch,
+        subresources:           getSubResources(bootScriptName),
+        showFooterButtons:      true,
+        showUnreadTab:          true,
+        menuHeaderExpanded:     false,
+        user:                   user,
+        orgs:                   orgs,
+        hasNewLeftMenu:         hasNewLeftMenu,
+        leftMenuOrgs:           troupeContext.snapshots.orgs,
+        leftMenuRooms:          leftMenuRoomList,
+        leftMenuFavouriteRooms: leftMenuFavouriteRoomList,
         isPhone:            req.isPhone,
         //TODO Remove this when left-menu switch goes away JP 23/2/16
         rooms: {

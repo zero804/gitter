@@ -11,6 +11,13 @@ module.exports = BaseCollectionModel.extend({
     });
   },
 
+  onFavourite: function(){
+    this.set({
+      header: false,
+      active: false
+    });
+  },
+
   onDefault: function() {
     this.set({
       header: false,
