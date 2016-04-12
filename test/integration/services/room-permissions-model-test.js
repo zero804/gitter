@@ -5,8 +5,8 @@ var testRequire = require('../test-require');
 
 
 describe('roomPermissionsModel', function() {
-  var githubUser = { id: 'github', providers: ['github'] };
-  var twitterUser = { id: 'twitter', providers: ['twitter'] };
+  var githubUser = { providers: ['github'] };
+  var twitterUser = { providers: ['twitter'] };
   var legacyRoom = { uri: 'foo/bar', githubType: 'REPO', security: 'PUBLIC'};
   var githubRoom = { providers: ['github'], uri: 'foo/bar', githubType: 'REPO', security: 'PUBLIC' };
 
@@ -15,11 +15,8 @@ describe('roomPermissionsModel', function() {
       return Promise.resolve("ok");
     },
     './identity-service': {
-      findByUserId: function(userId) {
-        var user = (userId == 'github') ? githubUser : twitterUser;
-        return Promise.resolve(user.providers.map(function(provider) {
-          return {provider: provider};
-        }));
+      listProvidersForUser: function(user) {
+        return Promise.resolve(user.providers);
       }
     }
   });
