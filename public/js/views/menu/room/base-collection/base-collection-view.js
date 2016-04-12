@@ -22,6 +22,14 @@ module.exports = Marionette.CompositeView.extend({
     };
   },
 
+  ui: {
+    header:  '#collection-header',
+  },
+
+  events: {
+    'click @ui.header':  'onHeaderClicked',
+  },
+
   modelEvents: {
     'change:header': 'render',
   },
@@ -42,6 +50,7 @@ module.exports = Marionette.CompositeView.extend({
     this.collection    = attrs.collection;
     this.roomMenuModel = attrs.roomMenuModel;
     this.listenTo(this.roomMenuModel, 'change:state:post change:selectedOrgName', this.render, this);
+    this.listenTo(this.roomMenuModel, 'change:hasDismissedSuggestions', this.onDismissSuggestionsUpdate, this);
     Marionette.CompositeView.prototype.constructor.apply(this, arguments);
   },
 
@@ -97,6 +106,17 @@ module.exports = Marionette.CompositeView.extend({
   onHideLeaveRoom: function (view) {
     //If we are hiding the current room, navigate to /home JP 11/3/16
     if (this._isCurrentRoom(view.model)) { this._navigateToHome(); }
+  },
+
+  onHeaderClicked: function (){
+    this.roomMenuModel.set('hasDismissedSuggestions', !this.roomMenuModel.get('hasDismissedSuggestions'));
+  },
+
+  onDismissSuggestionsUpdate: function (model, val){ //jshint unused: true
+    //Only opperate if we are displaying suggestions
+    if(!this.model.get('isSuggestion')) { return; }
+    //If the suggestions have been dismissed hide the collection
+    if(val) { this.el.classList.remove('active'); }
   },
 
   onDestroy: function() {
