@@ -11,7 +11,6 @@ var EmptyFavouriteView          = require('./primary-collection-item-favourite-e
 var perfTiming                  = require('components/perf-timing');
 var compositeViewRenderTemplate = require('utils/composite-view-render-template');
 var domIndexById                = require('../../../../utils/dom-index-by-id');
-var toggleClass                 = require('utils/toggle-class');
 
 var proto = BaseCollectionView.prototype;
 
@@ -50,7 +49,6 @@ var PrimaryCollectionView = BaseCollectionView.extend({
   },
 
   initialize: function(options) {
-
     if (!options || !options.bus) {
       throw new Error('A valid event bus must be passed to a new PrimaryCollectionView');
     }
