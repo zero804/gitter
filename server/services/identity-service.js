@@ -51,6 +51,14 @@ var identityService = {
         });
         return cachedIdentities.concat(identities);
       });
+  },
+
+  listProvidersForUserId: function(userId) {
+    return persistence.Identity.distinct('provider', { userId: userId }).exec();
+  },
+
+  listProvidersForUser: function(user) {
+    return identityService.listPovidersForUserId(user.id);
   }
 };
 

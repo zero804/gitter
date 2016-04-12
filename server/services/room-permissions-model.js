@@ -17,9 +17,8 @@ var checkJoinProviders = Promise.method(function(user, right, room) {
   // Don't bother loading in all the user's providers if the room allows all
   // providers anyway.
   if (room.providers && room.providers.length) {
-    return identityService.findByUserId(user.id)
-      .then(function(identities) {
-        var userProviders = _.pluck(identities, 'provider');
+    return identityService.listProvidersForUser(user)
+      .then(function(userProviders) {
         return userCanJoinRoom(userProviders, room.providers);
       });
   } else {
