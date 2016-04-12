@@ -416,7 +416,9 @@ function TroupeStrategy(options) {
 
     var unreadCounts = unreadItemStrategy && unreadItemStrategy.map(item.id);
 
-    var providers = (item.providers && item.providers.length) ? item.providers : undefined;
+    // mongoose is upgrading old undefineds to [] on load and we don't want to
+    // send through that no providers are allowed in that case
+    var providers = (options.includeProviders && item.providers && item.providers.length) ? item.providers : undefined;
 
     return {
       id: item.id || item._id,

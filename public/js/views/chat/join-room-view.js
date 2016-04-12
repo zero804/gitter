@@ -51,7 +51,6 @@ var JoinRoomView = Marionette.ItemView.extend({
   serializeData: function() {
     var userProviders = context.user().get('providers');
     var troupeProviders = context.troupe().get('providers');
-    console.log(userProviders, troupeProviders);
     return {
       allowJoin: userCanJoinRoom(userProviders, troupeProviders),
       disallowJoinReason: makeRoomProviderSentence(troupeProviders),
