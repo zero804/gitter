@@ -49,7 +49,6 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
   onItemDropped: function(el, target, source, sibling) {//jshint unused: true
     //guard against no drop target
     if (!target || !target.dataset) { return; }
-
     if (this.model.get('state') !== 'favourite' &&
         target.dataset.stateChange === 'favourite') {
       this.trigger('room-menu:add-favourite', el.dataset.id);

@@ -54,29 +54,31 @@ module.exports = Marionette.LayoutView.extend({
   initFavouriteCollection: function (optionsForRegion) {
     //Sadly the favourite collection needs to be generated here rather than the room-menu-model
     //because it has a dependency on the dnd-controller JP 1/4/16
-    var favCollection =  new FilteredFavouriteRoomCollection({
+    var favCollection = window.fav = new FilteredFavouriteRoomCollection({
       roomModel:  this.model,
       collection: this.model._roomCollection,
       dndCtrl:    this.dndCtrl,
     });
 
     return new FavouriteCollectionView(optionsForRegion({
-      collection:    favCollection,
-      model:         new FavouriteCollectionModel(null, { roomMenuModel: this.model }),
-      roomMenuModel: this.model,
-      bus:           this.bus,
-      dndCtrl:       this.dndCtrl,
+      collection:     favCollection,
+      model:          new FavouriteCollectionModel(null, { roomMenuModel: this.model }),
+      roomMenuModel:  this.model,
+      bus:            this.bus,
+      dndCtrl:        this.dndCtrl,
+      roomCollection: this.model._roomCollection,
     }));
 
   },
 
   initPrimaryCollection: function(optionsForRegion) {
     return new PrimaryCollectionView(optionsForRegion({
-      collection:    this.model.primaryCollection,
-      model:         new PrimaryCollectionModel(null, { roomMenuModel: this.model }),
-      roomMenuModel: this.model,
-      bus:           this.bus,
-      dndCtrl:       this.dndCtrl,
+      collection:     this.model.primaryCollection,
+      model:          new PrimaryCollectionModel(null, { roomMenuModel: this.model }),
+      roomMenuModel:  this.model,
+      bus:            this.bus,
+      dndCtrl:        this.dndCtrl,
+      roomCollection: this.model._roomCollection,
     }));
   },
 
