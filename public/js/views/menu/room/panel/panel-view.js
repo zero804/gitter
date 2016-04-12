@@ -48,7 +48,7 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   initSearchInput: function(optionsForRegion) {
-    return new SearchInputView(optionsForRegion({ model: this.model }));
+    return new SearchInputView(optionsForRegion({ model: this.model, bus: this.bus }));
   },
 
   initFavouriteCollection: function (optionsForRegion) {

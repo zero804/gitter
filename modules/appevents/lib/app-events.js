@@ -115,18 +115,6 @@ module.exports =  {
       localEventEmitter.on('dataChange2', callback);
     },
 
-    chat: function(operation, troupeId, model) {
-      localEventEmitter.emit('chat', {
-        operation: operation,
-        troupeId: troupeId,
-        model: model
-      });
-    },
-
-    onChat: function(callback) {
-      localEventEmitter.on('chat', callback);
-    },
-
     userRemovedFromTroupe: function(options) {
       localEventEmitter.emit('userRemovedFromTroupe', options);
     },

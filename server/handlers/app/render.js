@@ -238,7 +238,7 @@ function renderMainFrame(req, res, next, frame) {
         social.getMetadata({ room: req.troupe  });
 
       //TODO Pass this to MINIBAR?? JP 17/2/16
-      var hasNewLeftMenu            = req.fflip && req.fflip.has('left-menu');
+      var hasNewLeftMenu            = !req.isPhone && req.fflip && req.fflip.has('left-menu');
       var snapshots                 = troupeContext.snapshots = parseSnapshotsForPageContext(req, troupeContext, orgs, rooms);
       var leftMenuRoomList          = parseRoomsIntoLeftMenuRoomList(snapshots.leftMenu.state, snapshots.rooms, snapshots.leftMenu.selectedOrgName);
       var leftMenuFavouriteRoomList = parseRoomsIntoLeftMenuFavouriteRoomList(snapshots.leftMenu.state, snapshots.rooms, snapshots.leftMenu.selectedOrgName);
@@ -268,6 +268,7 @@ function renderMainFrame(req, res, next, frame) {
         leftMenuOrgs:           troupeContext.snapshots.orgs,
         leftMenuRooms:          leftMenuRoomList,
         leftMenuFavouriteRooms: leftMenuFavouriteRoomList,
+        isPhone:            req.isPhone,
         //TODO Remove this when left-menu switch goes away JP 23/2/16
         rooms: {
           favourites: rooms

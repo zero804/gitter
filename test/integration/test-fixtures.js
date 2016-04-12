@@ -201,7 +201,9 @@ function createExpectedFixtures(expected, done) {
       oneToOneUsers: oneToOneUsers,
       githubType: githubType,
       dateDeleted: f.dateDeleted,
-      userCount: f.users && f.users.length || f.userCount
+      userCount: f.users && f.users.length || f.userCount,
+      tags: f.tags,
+      disabledProviders: f.disabledProviders
     };
 
     debug('Creating troupe %s with %j', fixtureName, doc);

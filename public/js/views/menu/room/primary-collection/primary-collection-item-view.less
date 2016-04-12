@@ -23,7 +23,7 @@ JP 11/2/16
   &.active {
     max-height: @menu-item-height * 2;
     .room-item__container {
-      background: rgba(255, 255, 255, .1);
+      background: rgba(255, 255, 255, .2);
     }
   }
 }
@@ -32,16 +32,13 @@ JP 11/2/16
   display:         flex;
   flex-direction:  row;
   align-items:     center;
+  margin-left:     (@desktop-menu-left-padding / 2);
   margin-right:    (@desktop-menu-left-padding / 2);
   padding-right:   (@desktop-menu-left-padding / 2);
   transition:      background-color .2s ease-out;
 
   .room-item.active & {
     .room-item-selected();
-  }
-
-  .desktop & {
-    margin-left:   (@desktop-menu-left-padding / 2);
   }
 
   &.selected, &.focus {
