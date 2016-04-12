@@ -21,7 +21,6 @@ var View = Marionette.LayoutView.extend({
     options: '#notification-options',
     override: '#override-all',
     notifyFeatures: '#notify-features',
-    noticeOverride: '#notice-override',
     noticeNoOverride: '#notice-no-override',
   },
   regions: {
@@ -76,11 +75,9 @@ var View = Marionette.LayoutView.extend({
     this.dialog.toggleButtonClass('apply', 'modal--default__footer__btn', !noChange);
 
     if (override) {
-      this.ui.noticeOverride.show();
-      this.ui.noticeNoOverride.hide();
+      this.ui.noticeNoOverride.hide('fast');
     } else {
-      this.ui.noticeOverride.hide();
-      this.ui.noticeNoOverride.show();
+      this.ui.noticeNoOverride.show('fast');
     }
   },
 
