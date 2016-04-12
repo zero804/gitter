@@ -6,10 +6,14 @@
       <option value="mute">Mute: Notify me only when I'm directly mentioned</option>
     </select>
 
-    <p >
+    <p class="u-font-smaller" style="color: #999" id="notice-no-override">
+      This change will apply to any existing conversations currently set to use your
+      default notification setting, as well as any new room you join in future.
+    </p>
+
+    <p>
       <input id="override-all" type='checkbox' class="u-font-smaller"/>
-      <label for="override-all">Override the current settings for
-        all rooms and reset to default.</label>
+      <label for="override-all">Apply this setting to <strong>all</strong> existing conversations</label>
     </p>
 
     <div class="u-font-smaller">
@@ -18,13 +22,6 @@
       </div>
     </div>
 
-    <p class="u-font-smaller" style="color: #999" id="notice-no-override">
-      This change will apply to any existing rooms currently set to use your
-      default notification setting, as well as any new room you join in future.
-    </p>
-    <p class="u-font-smaller" style="color: #e74c3c; display: none" id="notice-override">
-      This change will apply to all rooms.
-    </p>
   </div>
 
   </form>
