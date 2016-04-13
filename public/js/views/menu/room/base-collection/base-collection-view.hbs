@@ -8,3 +8,13 @@
 {{/if}}
 
 <div id="collection-list" class="collection-list"></div>
+
+{{#if orgRoomUrl}}
+<div class="collection-show-more-container">
+  <a class="link--positive"
+     href="{{orgRoomUrl}}"
+     title="more {{selectedOrgName}} rooms">
+      show more
+  </a>
+</div>
+{{/if}}
