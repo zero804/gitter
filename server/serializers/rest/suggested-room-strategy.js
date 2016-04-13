@@ -69,6 +69,8 @@ function SuggestedRoomStrategy() {
     var uri = room && room.uri;
     if (!uri) return;
 
+    var providers = (room.providers && room.providers.length) ? room.providers : undefined;
+
     return {
       id: room.id,
       uri: uri,
@@ -76,6 +78,7 @@ function SuggestedRoomStrategy() {
       userCount: room.userCount,
       messageCount: messageCountHash[room.id],
       tags: room.tags,
+      providers: providers,
       // TODO: users/avatars (sample)
       description: room.topic,
       exists: !!room.id

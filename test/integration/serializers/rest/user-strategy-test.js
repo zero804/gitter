@@ -17,6 +17,7 @@ describe('user-strategy-test', function() {
   var fixture = {};
   before(fixtureLoader(fixture, {
     user1: {},
+    user2: {},
     troupe1: { users: ['user1']}
   }));
 
@@ -85,6 +86,25 @@ describe('user-strategy-test', function() {
       return serialize([fixture.user1], strategy)
         .then(function(s) {
           assertUtils.assertSerializedEqual(s, expected1);
+        });
+    });
+
+    it('should serialize a user with includeProviders', function() {
+      fixture.user2.username = 'githubuser';
+      var strategy = new UserStrategy({ includeProviders: true });
+      return serialize([fixture.user2], strategy)
+        .then(function(s) {
+          assertUtils.assertSerializedEqual(s, [{
+            id: fixture.user2.id,
+            username: fixture.user2.username,
+            displayName: fixture.user2.displayName,
+            url: '/' + fixture.user2.username,
+            avatarUrlSmall: "https://avatars2.githubusercontent.com/githubuser?&s=60",
+            avatarUrlMedium: "https://avatars2.githubusercontent.com/githubuser?&s=128",
+            staff: false,
+            providers: ['github'],
+            v: 1
+          }]);
         });
     });
 
