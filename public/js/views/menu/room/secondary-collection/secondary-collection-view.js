@@ -55,22 +55,28 @@ module.exports = BaseCollectionView.extend({
   },
 
   setActive: function() {
+    var shouldDisableCollection = false;
+
     switch (this.roomMenuModel.get('state')){
       case 'all':
-        return (this.primaryCollection.length >= 10 || this.collection.length <= 0) ?
-          this.el.classList.remove('active') :
-          proto.setActive.apply(this, arguments);
+        shouldDisableCollection = this.primaryCollection.length >= 10 || this.collection.length <= 0;
+        break;
 
       case 'search':
-        return !!this.roomMenuModel.get('searchTerm') ?
-          proto.setActive.apply(this, arguments) :
-          this.el.classList.remove('active');
+        shouldDisableCollection = !this.roomMenuModel.get('searchTerm');
+        break;
 
       default:
-        return !!this.collection.length ?
-          proto.setActive.apply(this, arguments) :
-          this.el.classList.remove('active');
+        shouldDisableCollection = !this.collection.length;
+        break;
     }
+
+    if(shouldDisableCollection) {
+      this.model.set('active', false);
+    }
+    proto.setActive.apply(this, arguments);
+
+    return shouldDisableCollection;
   },
 
   filter: function(model, index) {
