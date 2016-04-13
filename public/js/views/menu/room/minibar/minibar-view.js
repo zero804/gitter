@@ -131,10 +131,12 @@ module.exports = Marionette.CollectionView.extend({
         this.model.set({ roomMenuIsPinned: newVal });
         this.bus.trigger('room-menu:pin', newVal);
       } else {
+        // We stagger the trigger here so we don't jank the UI
+        // resizing the the left-menu and main chat-frame
         setTimeout(function() {
-            this.model.set({ roomMenuIsPinned: newVal });
-            this.bus.trigger('room-menu:pin', newVal);
-          }.bind(this), ANIMATION_TIME);
+          this.model.set({ roomMenuIsPinned: newVal });
+          this.bus.trigger('room-menu:pin', newVal);
+        }.bind(this), ANIMATION_TIME);
       }
 
       this.model.set({ panelOpenState: newVal });
@@ -144,6 +146,8 @@ module.exports = Marionette.CollectionView.extend({
     else {
       this.model.set({ roomMenuIsPinned: newVal });
       this.bus.trigger('room-menu:pin', newVal);
+      // We stagger the trigger here so we don't jank the UI
+      // resizing the the left-menu and main chat-frame
       setTimeout(function() {
         this.model.set({ panelOpenState: newVal });
       }.bind(this), ANIMATION_TIME);
