@@ -1,7 +1,6 @@
 /* jshint maxcomplexity:19 */
 "use strict";
 
-var _                        = require('lodash');
 var troupeService            = require("../../services/troupe-service");
 var identityService          = require("../../services/identity-service");
 var presenceService          = require("gitter-web-presence");
@@ -124,14 +123,13 @@ UserPresenceInTroupeStrategy.prototype = {
 };
 
 function UserProvidersStrategy() {
-  var providersByUser;
+  var providersByUser = {};
 
-  this.preload = Promise.method(function(users) {
+  this.preload = function(users) {
     // NOTE: This is currently operating on the assumption that a user can only
     // have one identity. Once we allow multiple identities per user we'll have
     // to revisit this.
     var nonGitHub = [];
-    providersByUser = {};
     users.each(function(user) {
       if (user.username.indexOf('_') === -1) {
         // github user so no need to look up identities at the time of writing
@@ -143,16 +141,16 @@ function UserProvidersStrategy() {
     });
 
     if (!nonGitHub.length) {
-      return;
+      return Promise.resolve();
     }
 
-    return nonGitHub.map(function(userId) {
-      return identityService.findByUserId(userId)
-        .then(function(identities) {
-          providersByUser[userId] = _.pluck(identities, 'provider');
+    return Promise.map(nonGitHub, function(userId) {
+      return identityService.listProvidersForUserId(userId)
+        .then(function(providers) {
+          providersByUser[userId] = providers;
         });
     });
-  });
+  };
 
   this.map = function(userId) {
     return providersByUser[userId] || [];
