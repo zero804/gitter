@@ -6,6 +6,8 @@ var template    = require('./base-collection-view.hbs');
 var context     = require('utils/context');
 var toggleClass = require('utils/toggle-class');
 
+require('gitter-styleguide/css/components/links.css');
+
 module.exports = Marionette.CompositeView.extend({
 
   template:           template,

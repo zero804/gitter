@@ -1,6 +1,7 @@
 @import "trp3Vars";
 @import "../../../../../less/components/menu/room/menu-text";
 @import "../../../../../less/components/menu/room/collection";
+@import "../../../../../less/components/menu/room/menu-text";
 
 .collection {
   .m-collection();
@@ -39,4 +40,16 @@
   right:      @desktop-menu-left-padding;
   transform:  translateY(-50%);
   color:      @menu-collection-title;
+}
+
+.collection-show-more-container {
+  width:           100%;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  padding:         (@desktop-menu-left-padding / 4)  0;
+
+  & .link--positive {
+    font-size: 1.2rem;
+  }
 }

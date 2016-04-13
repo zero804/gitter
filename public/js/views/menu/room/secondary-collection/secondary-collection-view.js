@@ -40,7 +40,8 @@ module.exports = BaseCollectionView.extend({
   serializeData: function() {
     var data = this.model.toJSON();
     return _.extend({}, data, {
-      isSearch: (data.state === 'search'),
+      isSearch:   (data.state === 'search'),
+      orgRoomUrl: (data.state !== 'org') ? null :  '/orgs/' + this.roomMenuModel.get('selectedOrgName') + '/rooms',
     });
   },
 
@@ -77,6 +78,8 @@ module.exports = BaseCollectionView.extend({
     switch (this.roomMenuModel.get('state')) {
       case 'search':
         return (index <= 25);
+      case 'org':
+        return (index <= 9);
       default:
         return !this.primaryCollection.get(model.get('id'));
     }
