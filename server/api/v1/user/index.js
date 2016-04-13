@@ -35,12 +35,12 @@ module.exports = {
         });
     }
 
-    var strategy = new restSerializer.UserStrategy();
+    var strategy = new restSerializer.UserStrategy({ includeProviders: true });
     return restSerializer.serialize([req.user], strategy);
   },
 
   show: function(req) {
-    var strategy = new restSerializer.UserStrategy();
+    var strategy = new restSerializer.UserStrategy({ includeProviders: true });
     return restSerializer.serializeObject(req.resourceUser, strategy);
   },
 
