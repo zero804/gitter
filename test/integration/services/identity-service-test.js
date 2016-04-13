@@ -39,4 +39,20 @@ describe('identityService', function() {
         assert.equal(identities2, identities1);
       })
   });
+
+  it('returns a provider for GitHub users', function() {
+    return identityService.listProvidersForUser({ username: 'githubuser' })
+      .then(function(providers) {
+        assert.strictEqual(providers.length, 1);
+        assert.strictEqual(providers[0], 'github');
+      });
+  });
+
+  it('returns a provider for Google users', function() {
+    return identityService.listProvidersForUser(fixture.user1)
+      .then(function(providers) {
+        assert.strictEqual(providers.length, 1);
+        assert.strictEqual(providers[0], 'google');
+      });
+  });
 });

@@ -59,7 +59,7 @@ module.exports = BaseCollectionView.extend({
 
     switch (this.roomMenuModel.get('state')){
       case 'all':
-        shouldDisableCollection = this.primaryCollection.length >= 10 || this.collection.length <= 0;
+        shouldDisableCollection = this.collection.length <= 0;
         break;
 
       case 'search':

@@ -6,7 +6,7 @@ var getOrgNameFromTroupeName = require('../get-org-name-from-troupe-name.js');
 module.exports = function parseLeftMenuTroupeContext(req, troupeContext, orgs, minibarOrgList) {
 
   var currentLeftMenuState    = (troupeContext.leftRoomMenuState || {});
-  var currentlySelectedOrg    = (currentLeftMenuState.selectedOrgName || getOrgNameFromTroupeName(req.uriContext.uri));
+  var currentlySelectedOrg    = !!req.troupe ? getOrgNameFromTroupeName(req.troupe.uri) : currentLeftMenuState.selectedOrgName;
   var currentRoomIsInRoomList = !!_.findWhere(orgs, { name: currentlySelectedOrg });
 
   if(currentRoomIsInRoomList) { currentLeftMenuState.state = 'org' }
@@ -28,6 +28,7 @@ module.exports = function parseLeftMenuTroupeContext(req, troupeContext, orgs, m
 
   return {
     roomMenuIsPinned:        currentLeftMenuState.roomMenuIsPinned,
+    panelOpenState:          currentLeftMenuState.roomMenuIsPinned,
     state:                   (currentLeftMenuState.state || 'all'),
     selectedOrgName:         (currentlySelectedOrg || ''),
     hasDismissedSuggestions: (currentLeftMenuState.hasDismissedSuggestions || false),
