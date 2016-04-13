@@ -48,9 +48,21 @@ module.exports = {
       settings = settings.value;
     }
 
+    // NOTE: this didn't used to return and when the return was added it
+    // started causing the left menu to respond to the payload whereas before
+    // it was "fire and forget" and this API just returned 200 OK without a
+    // json response. So as a quick temporary fix we're checking for the exact
+    // key and emulating the old behavior for that one case for now.
+    // cc @suprememoocow
     return userSettingsService.setUserSettings(userId, settingsKey, settings)
       .then(function() {
-        return settings;
+        if (settingsKey == 'leftRoomMenu') {
+          // blank object should be close enough to a 200 OK and hopefully will
+          // stop backbone from picking it up.
+          return {};
+        } else {
+          return settings;
+        }
       });
   }
 
