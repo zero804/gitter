@@ -13,6 +13,7 @@ var PanelView          = require('../panel/panel-view');
 var DNDCtrl            = require('../../../../components/menu/room/dnd-controller');
 var MinibarCollection  = require('../minibar/minibar-collection');
 var KeyboardEventMixin = require('views/keyboard-events-mixin');
+var KeyboardControllerView = require('./keyboard-controller-view');
 
 var MINIBAR_ITEM_HEIGHT = 65;
 var MENU_HIDE_DELAY = 200;
@@ -29,7 +30,7 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
       panel: { el: '#room-menu__panel', init: 'initMenuPanel' },
     },
   },
-
+  
   initMiniBar: function(optionsForRegion) {
     return new MiniBarView(optionsForRegion({
       model:          this.model,
@@ -37,6 +38,7 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
       bus:            this.bus,
       dndCtrl:        this.dndCtrl,
       roomCollection: this.model._roomCollection,
+      keyboardControllerView: this.keyboardControllerView
     }));
   },
 
@@ -45,6 +47,7 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
       model:   this.model,
       bus:     this.bus,
       dndCtrl: this.dndCtrl,
+      keyboardControllerView: this.keyboardControllerView
     }));
   },
 
@@ -99,6 +102,8 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
       //TODO id this the best way to do this? JP 12/1/16
       isMobile:                $('body').hasClass('mobile'),
     }));
+
+    this.keyboardControllerView = new KeyboardControllerView();
 
     //Make a new drag & drop control
     this.dndCtrl = new DNDCtrl({ model: this.model });
