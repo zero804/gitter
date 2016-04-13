@@ -1,3 +1,7 @@
-<a href="#" class="chat-input__btn js-join-room">
-  Join room
-</a>
+{{#if allowJoin}}
+  <a href="#" class="chat-input__btn js-join-room">
+    Join room
+  </a>
+{{else}}
+  <div class="chat-input__disabledtext">{{disallowJoinReason}}</div>
+{{/if}}

@@ -25,7 +25,6 @@ require('views/behaviors/isomorphic');
 
 var PanelView = Marionette.LayoutView.extend({
 
-
   behaviors: {
     Isomorphic: {
       header:              { el: '#panel-header', init: 'initHeader' },
@@ -120,6 +119,10 @@ var PanelView = Marionette.LayoutView.extend({
     profileMenu: '#profile-menu'
   },
 
+  events: {
+    mouseenter: 'onMouseenter'
+  },
+
   modelEvents: {
     'change:panelOpenState':       'onPanelOpenStateChange',
     'primary-collection:snapshot': 'onPrimaryCollectionSnapshot',
@@ -199,6 +202,11 @@ var PanelView = Marionette.LayoutView.extend({
     fastdom.mutate(function() {
       toggleClass(this.el, 'active', val);
     }.bind(this));
+  },
+
+  onMouseenter: function() {
+    // If they are able to touch the main room-list panel, then we always stay open
+    this.model.set('panelOpenState', true);
   },
 
   onSwipeLeft: function(e) {
