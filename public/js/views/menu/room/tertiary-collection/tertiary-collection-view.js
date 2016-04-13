@@ -36,7 +36,6 @@ module.exports =  BaseCollectionView.extend({
     this.primaryCollection   = attrs.primaryCollection;
     this.secondaryCollection = attrs.secondaryCollection;
 
-    this.listenTo(this.roomMenuModel, 'change:searchTerm', this.setActive, this);
     this.listenTo(this.collection, 'filter-complete sync', this.render, this);
 
     BaseCollectionView.prototype.initialize.apply(this, arguments);
@@ -58,21 +57,6 @@ module.exports =  BaseCollectionView.extend({
       default:
         return  !this.primaryCollection.get(model.get('id')) &&
                 !this.secondaryCollection.get(model.get('id'));
-    }
-  },
-
-
-  setActive: function() {
-    switch (this.roomMenuModel.get('state')) {
-      case 'search':
-        return (!this.roomMenuModel.get('searchTerm')) ?
-          proto.setActive.apply(this, arguments) :
-          this.el.classList.remove('active');
-
-      default:
-        return !!this.collection.length ?
-          proto.setActive.apply(this, arguments) :
-          this.el.classList.remove('active');
     }
   },
 

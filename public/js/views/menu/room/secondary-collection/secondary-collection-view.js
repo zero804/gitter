@@ -50,33 +50,7 @@ module.exports = BaseCollectionView.extend({
     this.userModel         = attrs.userModel;
     this.troupeModel       = attrs.troupeModel;
     this.roomCollection    = attrs.roomCollection;
-    this.listenTo(this.roomMenuModel, 'change:searchTerm', this.setActive, this);
     BaseCollectionView.prototype.initialize.apply(this, arguments);
-  },
-
-  setActive: function() {
-    var shouldDisableCollection = false;
-
-    switch (this.roomMenuModel.get('state')){
-      case 'all':
-        shouldDisableCollection = this.collection.length <= 0;
-        break;
-
-      case 'search':
-        shouldDisableCollection = !this.roomMenuModel.get('searchTerm');
-        break;
-
-      default:
-        shouldDisableCollection = !this.collection.length;
-        break;
-    }
-
-    if(shouldDisableCollection) {
-      this.model.set('active', false);
-    }
-    proto.setActive.apply(this, arguments);
-
-    return shouldDisableCollection;
   },
 
   filter: function(model, index) {
