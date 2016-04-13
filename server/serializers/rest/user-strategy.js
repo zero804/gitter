@@ -13,6 +13,8 @@ var getVersion               = require('../get-model-version');
 var billingService           = require('../../services/billing-service');
 var leanUserDao              = require('../../services/daos/user-dao').full;
 var resolveUserAvatarUrl     = require('gitter-web-shared/avatars/resolve-user-avatar-url');
+var userScopes               = require('../../utils/models/user-scopes');
+
 
 function UserPremiumStatusStrategy() {
   var usersWithPlans;
@@ -131,7 +133,7 @@ function UserProvidersStrategy() {
     // to revisit this.
     var nonGitHub = [];
     users.each(function(user) {
-      if (user.username.indexOf('_') === -1) {
+      if (userScopes.isGitHubUser(user)) {
         // github user so no need to look up identities at the time of writing
         providersByUser[user.id] = ['github'];
       } else {
