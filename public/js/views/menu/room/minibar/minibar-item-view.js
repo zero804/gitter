@@ -46,6 +46,10 @@ module.exports =  Marionette.ItemView.extend({
     };
   },
 
+  initialize: function() {
+    this.firstRender = true;
+  },
+
 
   serializeData: function() {
     var data = this.model.toJSON();
@@ -88,7 +92,11 @@ module.exports =  Marionette.ItemView.extend({
   },
 
   onRender: function() {
-    toggleClass(this.el, 'active', !!this.model.get('active'));
+    if(!this.firstRender || this.firstRender && this.model.get('roomMenuIsPinned')) {
+      toggleClass(this.el, 'active', !!this.model.get('active'));
+    }
+
+    this.firstRender = false;
   },
 
 });

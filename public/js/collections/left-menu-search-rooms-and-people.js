@@ -10,7 +10,7 @@ var FilteredCollection     = require('backbone-filtered-collection');
 var fuzzysearch            = require('fuzzysearch');
 
 function roomFilter(roomMenuModel, room) {
-  return fuzzysearch(roomMenuModel.get('searchTerm'), room.get('name'));
+  return roomMenuModel.get('searchTerm') && fuzzysearch(roomMenuModel.get('searchTerm'), room.get('name'));
 }
 
 //take a list of object which have a property of id and return a uniq array
