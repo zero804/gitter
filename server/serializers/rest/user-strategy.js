@@ -138,7 +138,7 @@ function UserProvidersStrategy() {
         providersByUser[user.id] = ['github'];
       } else {
         // non-github, so we have to look up the user's identities.
-        nonGitHub.push(user.id);
+        nonGitHub.push(user);
       }
     });
 
@@ -146,10 +146,10 @@ function UserProvidersStrategy() {
       return Promise.resolve();
     }
 
-    return Promise.map(nonGitHub, function(userId) {
-      return identityService.listProvidersForUserId(userId)
+    return Promise.map(nonGitHub, function(user) {
+      return identityService.listProvidersForUser(user)
         .then(function(providers) {
-          providersByUser[userId] = providers;
+          providersByUser[user.id] = providers;
         });
     });
   };
