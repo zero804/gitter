@@ -3,24 +3,25 @@
 var _                 = require('underscore');
 var $                 = require('jquery');
 var Marionette        = require('backbone.marionette');
-var RoomMenuModel     = require('../../../../models/room-menu-model');
-var MiniBarView       = require('../minibar/minibar-view');
-var PanelView         = require('../panel/panel-view');
-var context           = require('utils/context');
-var DNDCtrl           = require('../../../../components/menu/room/dnd-controller');
-var MinibarCollection = require('../minibar/minibar-collection');
+var cocktail          = require('cocktail');
 var context           = require('utils/context');
 var fastdom           = require('fastdom');
 
+var RoomMenuModel      = require('../../../../models/room-menu-model');
+var MiniBarView        = require('../minibar/minibar-view');
+var PanelView          = require('../panel/panel-view');
+var DNDCtrl            = require('../../../../components/menu/room/dnd-controller');
+var MinibarCollection  = require('../minibar/minibar-collection');
+var KeyboardEventMixin = require('views/keyboard-events-mixin');
+
 var MINIBAR_ITEM_HEIGHT = 65;
-
-require('nanoscroller');
-
 var MENU_HIDE_DELAY = 200;
 
+require('nanoscroller');
 require('views/behaviors/isomorphic');
 
-module.exports = Marionette.LayoutView.extend({
+
+var RoomMenuLayoutView = Marionette.LayoutView.extend({
 
   behaviors: {
     Isomorphic: {
@@ -185,3 +186,8 @@ module.exports = Marionette.LayoutView.extend({
   },
 
 });
+
+
+cocktail.mixin(RoomMenuLayoutView, KeyboardEventMixin);
+
+module.exports = RoomMenuLayoutView;

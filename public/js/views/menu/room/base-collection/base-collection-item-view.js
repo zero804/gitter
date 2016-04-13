@@ -18,6 +18,7 @@ module.exports = Marionette.ItemView.extend({
     'change:selected': 'onSelectedChange',
     'change:focus':    'onItemFocused',
     'change:unreadItems change:mentions change:activity': 'onUnreadUpdate',
+    'focus:item': 'focusItem'
   },
 
   ui: {
@@ -73,5 +74,10 @@ module.exports = Marionette.ItemView.extend({
 
     this.pulseIndicators();
   },
+
+  focusItem: function() {
+    console.log('focusItem', this);
+    this.ui.container.focus();
+  }
 
 });
