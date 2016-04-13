@@ -10,12 +10,15 @@ var identityService = {
       return Promise.resolve(user._cachedIdentities);
     }
 
-    return persistence.Identity.find({userId: user._id})
-      .exec()
+    return identityService.findByUserId(user.id)
       .then(function(identities) {
         user._cachedIdentities = identities;
         return identities;
       });
+  },
+
+  findByUserId: function(userId) {
+    return persistence.Identity.find({userId: userId}).exec();
   },
 
   findByUserIds: function(userIds) {
@@ -48,6 +51,14 @@ var identityService = {
         });
         return cachedIdentities.concat(identities);
       });
+  },
+
+  listProvidersForUserId: function(userId) {
+    return persistence.Identity.distinct('provider', { userId: userId }).exec();
+  },
+
+  listProvidersForUser: function(user) {
+    return identityService.listPovidersForUserId(user.id);
   }
 };
 

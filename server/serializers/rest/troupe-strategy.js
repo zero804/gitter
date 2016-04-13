@@ -170,36 +170,12 @@ function TagsStrategy(options) {
   });
 
   this.map = function(roomId) {
-    if (options.includeTags) {
-      return self.tagMap[roomId] || [];
-    }
+    return self.tagMap[roomId] || [];
   };
 }
 TagsStrategy.prototype = {
   name: 'TagsStrategy'
 };
-
-
-function DisabledProvidersStrategy(options) {
-  var self = this;
-  self.providerMap = {};
-
-  this.preload = Promise.method(function(rooms, callback) {
-    rooms.forEach(function(room) {
-      if (room.disabledProviders && room.disabledProviders.length) {
-        self.providerMap[room.id] = room.disabledProviders;
-      }
-    });
-  });
-
-  this.map = function(roomId) {
-    return self.providerMap[roomId] || undefined;
-  };
-}
-DisabledProvidersStrategy.prototype = {
-  name: 'DisabledProvidersStrategy'
-};
-
 
 
 function ProOrgStrategy() {
@@ -324,8 +300,7 @@ function TroupeStrategy(options) {
   var favouriteStrategy     = currentUserId ? new FavouriteTroupesForUserStrategy(options) : null;
   var lurkStrategy          = currentUserId ? new LurkTroupeForUserStrategy(options) : null;
   var activityStrategy      = currentUserId ? new ActivityForUserStrategy(options) : null;
-  var tagsStrategy          = currentUserId ? new TagsStrategy(options) : null;
-  var disabledProvidersStrategy = currentUserId ? new DisabledProvidersStrategy(options) : null;
+  var tagsStrategy          = (options.includeTags) ? new TagsStrategy(options) : null;
   var userIdStrategy         = new UserIdStrategy(options);
   var proOrgStrategy        = new ProOrgStrategy(options);
   var permissionsStrategy    = (currentUserId || options.currentUser) && options.includePermissions ? new TroupePermissionsStrategy(options) : null;
@@ -390,10 +365,6 @@ function TroupeStrategy(options) {
       strategies.push(tagsStrategy.preload(items));
     }
 
-    if (disabledProvidersStrategy) {
-      strategies.push(disabledProvidersStrategy.preload(items));
-    }
-
     return Promise.all(strategies);
 
   };
@@ -445,6 +416,10 @@ function TroupeStrategy(options) {
 
     var unreadCounts = unreadItemStrategy && unreadItemStrategy.map(item.id);
 
+    // mongoose is upgrading old undefineds to [] on load and we don't want to
+    // send through that no providers are allowed in that case
+    var providers = (options.includeProviders && item.providers && item.providers.length) ? item.providers : undefined;
+
     return {
       id: item.id || item._id,
       name: troupeName,
@@ -465,7 +440,7 @@ function TroupeStrategy(options) {
       premium: isPro,
       noindex: item.noindex,
       tags: tagsStrategy ? tagsStrategy.map(item.id) : undefined,
-      disabledProviders: disabledProvidersStrategy ? disabledProvidersStrategy.map(item.id) : undefined,
+      providers: providers,
       permissions: permissionsStrategy ? permissionsStrategy.map(item) : undefined,
       ownerIsOrg: ownerIsOrgStrategy ? ownerIsOrgStrategy.map(item) : undefined,
       roomMember: roomMembershipStrategy ? roomMembershipStrategy.map(item.id) : undefined,
