@@ -17,6 +17,7 @@ describe('user-strategy-test', function() {
   var fixture = {};
   before(fixtureLoader(fixture, {
     user1: {},
+    user2: {},
     troupe1: { users: ['user1']}
   }));
 
@@ -89,18 +90,19 @@ describe('user-strategy-test', function() {
     });
 
     it('should serialize a user with includeProviders', function() {
+      fixture.user2.username = 'githubuser';
       var strategy = new UserStrategy({ includeProviders: true });
-      return serialize([fixture.user1], strategy)
+      return serialize([fixture.user2], strategy)
         .then(function(s) {
           assertUtils.assertSerializedEqual(s, [{
-            id: fixture.user1.id,
-            username: fixture.user1.username,
-            displayName: fixture.user1.displayName,
-            url: '/' + fixture.user1.username,
-            avatarUrlSmall: '/api/private/user-avatar/' + fixture.user1.username + '?s=60',
-            avatarUrlMedium: '/api/private/user-avatar/' + fixture.user1.username + '?s=128',
+            id: fixture.user2.id,
+            username: fixture.user2.username,
+            displayName: fixture.user2.displayName,
+            url: '/' + fixture.user2.username,
+            avatarUrlSmall: "https://avatars2.githubusercontent.com/githubuser?&s=60",
+            avatarUrlMedium: "https://avatars2.githubusercontent.com/githubuser?&s=128",
             staff: false,
-            providers: [],
+            providers: ['github'],
             v: 1
           }]);
         });
