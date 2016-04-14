@@ -1,6 +1,7 @@
 "use strict";
 
-var nconf = require('../utils/config');
+var env = require('gitter-web-env');
+var nconf = env.config;
 var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
 

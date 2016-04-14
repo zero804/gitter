@@ -1,8 +1,8 @@
 /* jshint node:true */
 "use strict";
 
-var testRequire = require('./test-require');
-var winston = testRequire('./utils/winston');
+var env = require('gitter-web-env');
+var winston = env.logger;
 
 var timer;
 var t;
@@ -11,7 +11,7 @@ var last;
 module.exports = {
   on: function() {
     if(timer) return;
-    
+
     timer = true;
     last = Date.now();
 

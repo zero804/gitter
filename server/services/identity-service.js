@@ -3,6 +3,16 @@
 var Promise = require('bluebird');
 var persistence = require("./persistence-service");
 var mongooseUtils = require('../utils/mongoose-utils');
+var userScopes = require('../utils/models/user-scopes');
+
+
+/*
+NOTE: At present this is unreliable for finding all the identities for a user,
+because it doesn't contain any GitHub identities. In order to know if a user is
+a GitHub user you can sorta get away with just the username at present, but you
+really need (pretty much) the full user object to be sure and to get any useful
+info out. So be careful.
+*/
 
 var identityService = {
   findForUser: function(user) {
@@ -10,12 +20,15 @@ var identityService = {
       return Promise.resolve(user._cachedIdentities);
     }
 
-    return persistence.Identity.find({userId: user._id})
-      .exec()
+    return identityService.findByUserId(user.id)
       .then(function(identities) {
         user._cachedIdentities = identities;
         return identities;
       });
+  },
+
+  findByUserId: function(userId) {
+    return persistence.Identity.find({userId: userId}).exec();
   },
 
   findByUserIds: function(userIds) {
@@ -48,6 +61,16 @@ var identityService = {
         });
         return cachedIdentities.concat(identities);
       });
+  },
+
+  listProvidersForUser: function(user) {
+    // NOTE: right now you can only have one identity and this takes advantage
+    // of that, but in future this will have to be updated so it doesn't return
+    // early and instead appends them together.
+    if (userScopes.isGitHubUser(user)) {
+      return Promise.resolve(['github']);
+    }
+    return persistence.Identity.distinct('provider', { userId: user.id }).exec();
   }
 };
 

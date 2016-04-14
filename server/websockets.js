@@ -2,14 +2,15 @@
 
 require('./utils/diagnostics');
 
-var express    = require('express');
-var nconf      = require('./utils/config');
-var winston    = require('./utils/winston');
-var bayeux     = require('./web/bayeux');
-var appVersion = require('gitter-app-version');
-var http          = require('http');
-var shutdown      = require('shutdown');
-var serverStats   = require('./utils/server-stats');
+var env            = require('gitter-web-env');
+var winston        = env.logger;
+var nconf          = env.config;
+var express        = require('express');
+var bayeux         = require('./web/bayeux');
+var appVersion     = require('./web/appVersion');
+var http           = require('http');
+var shutdown       = require('shutdown');
+var serverStats    = require('./utils/server-stats');
 var onMongoConnect = require('./utils/on-mongo-connect');
 
 winston.info("Starting http/ws service");
