@@ -4,6 +4,13 @@ var Marionette                      = require('backbone.marionette');
 var cocktail                        = require('cocktail');
 var KeyboardEventMixin              = require('views/keyboard-events-mixin');
 
+var isNullOrUndefined = function(obj) {
+  return obj === null || obj === undefined;
+};
+
+
+var FOCUS_EVENT = 'focus:item';
+var BLUR_EVENT = 'blur:item';
 
 var MINIBAR_KEY = 'minibar';
 var ROOM_LIST_KEY = 'room-list';
@@ -11,22 +18,30 @@ var ROOM_LIST_KEY = 'room-list';
 
 var KeyboardControllerView = Marionette.LayoutView.extend({
   constants: {
+    FOCUS_EVENT: FOCUS_EVENT,
+    BLUR_EVENT: BLUR_EVENT,
+
     MINIBAR_KEY: MINIBAR_KEY,
     ROOM_LIST_KEY: ROOM_LIST_KEY
   },
 
   keyboardEvents: {
+    'minibar.start-nav': function(e) { this.startNavigation(e, MINIBAR_KEY, true); },
     'minibar-item.prev': function(e) { this.selectPrev(e, MINIBAR_KEY); },
     'minibar-item.next': function(e) { this.selectNext(e, MINIBAR_KEY); },
 
-    'room-list.start-nav': 'startKeyboardNavigation',
+    'room-list.start-nav': function(e) { this.startNavigation(e, ROOM_LIST_KEY, false); },
     'room-list-item.prev': function(e) { this.selectPrev(e, ROOM_LIST_KEY); },
-    'room-list-item.next': function(e) { this.selectPrev(e, ROOM_LIST_KEY); },
+    'room-list-item.next': function(e) { this.selectNext(e, ROOM_LIST_KEY); },
   },
 
   /* public method meant to be used on the outside */
-  inject: function(key, newNavigableCollectionItems) {
-    this.navigableCollectionItemsMap[key] = (this.navigableCollectionItemsMap[key] || []).concat(newNavigableCollectionItems);
+  inject: function(mapKey, newNavigableCollectionItems) {
+    this.navigableCollectionItemsMap[mapKey] = (this.navigableCollectionItemsMap[mapKey] || []).concat(newNavigableCollectionItems);
+
+    newNavigableCollectionItems.forEach(function(collectionItem) {
+      this.listenTo(collectionItem, 'update', this.startNavigation.bind(this, null, mapKey, true));
+    }.bind(this));
   },
 
   initialize: function() {
@@ -38,6 +53,9 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
       modelId: null
     };
     this.navigableCollectionItemsMap = {};
+
+    // TODO: Listen for any changes and set the new bookmark to any new active items
+    //   this.listenTo(this.roomMenuModel, 'change:state', /* cb to update bookmark */, this);
   },
 
 
@@ -49,7 +67,7 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
     var lookAtNextCollection = function lookAtNextCollection(index) {
       var incrementedIndex = index + dir;
       var nextIndex = incrementedIndex;
-      console.log('nb', nextIndex, startingIndex, dir);
+      //console.log('nb', nextIndex, startingIndex, dir);
       if(dir > 0 && incrementedIndex >= navigableCollectionItems.length) {
         nextIndex = 0;
       }
@@ -58,7 +76,7 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
       }
 
       var potentialNextCollectionItem = navigableCollectionItems[nextIndex];
-      console.log('na', nextIndex, startingIndex, dir);
+      //console.log('na', nextIndex, startingIndex, dir);
 
       // Find our resultant
       var getActiveCb = (potentialNextCollectionItem.getActive || function() { return true; });
@@ -82,18 +100,54 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
     return navigableCollectionItems ? lookAtNextCollection(startingIndex) : null;
   },
 
-  startKeyboardNavigation: function() {
-    var firstNavigableCollectionItem = this.findNextActiveNavigableCollection(this.navigableCollectionItemsMap[ROOM_LIST_KEY], -1, 1);
-    var firstModel = firstNavigableCollectionItem.collection.at(0);
-
-    console.log('startKeyboardNavigation');
-
-    this.currentNavigableItemReference = {
-      modelId: firstModel.id,
-      navigableItemIndex: firstNavigableCollectionItem.index
-    };
-    firstModel.trigger('focus:item');
+  blurCurrentItem: function() {
+    var currentItemReference = this.currentNavigableItemReference;
+    console.log('bci', currentItemReference);
+    if(!isNullOrUndefined(currentItemReference.mapKey) && !isNullOrUndefined(currentItemReference.navigableItemIndex) && !isNullOrUndefined(currentItemReference.modelId)) {
+      console.log('blurring current model');
+      var currentModel = this.navigableCollectionItemsMap[currentItemReference.mapKey][currentItemReference.navigableItemIndex].collection.get(currentItemReference.modelId);
+      currentModel.trigger(BLUR_EVENT);
+    }
   },
+
+  startNavigation: function(e, mapKey, shouldGoToActive) {
+    // Clear out any previous focus as we have moved to a new area
+    this.blurCurrentItem();
+
+    var startNavigableCollectionItem;
+    var startModel;
+    if(shouldGoToActive) {
+      // Find the first active item
+      // This will ensure we start from where the user is currently is
+      this.navigableCollectionItemsMap[mapKey].some(function(collectionItem) {
+        var activeModel = collectionItem.collection.findWhere({ active: true });
+        if(activeModel) {
+          startNavigableCollectionItem = collectionItem;
+          startModel = activeModel;
+          // break
+          return true;
+        }
+      });
+    }
+    else {
+      // Find the first item in the first active collection
+      startNavigableCollectionItem = this.findNextActiveNavigableCollection(this.navigableCollectionItemsMap[mapKey], -1, 1);
+      startModel = startNavigableCollectionItem.collection.at(0);
+    }
+
+    console.log('startNavigation', mapKey, startModel);
+
+    if(startModel) {
+      // Save it as the current
+      this.currentNavigableItemReference = {
+        mapKey: mapKey,
+        navigableItemIndex: startNavigableCollectionItem.index,
+        modelId: startModel.id
+      };
+      startModel.trigger(FOCUS_EVENT);
+    }
+  },
+
 
   progressInDirection: function(dir, mapKey) {
     console.log('--------------------------------------------------------------------------------------');
@@ -103,9 +157,7 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
 
     console.log('panel-view progressInDirection', dir, this.currentNavigableItemReference);
 
-    // `0` is a valid index but it's falsey :/ so we need to do this check
-    var validBookmarkIndex = this.currentNavigableItemReference.navigableItemIndex === 0 || this.currentNavigableItemReference.navigableItemIndex;
-    var collectionItemForActiveModel = validBookmarkIndex ?
+    var collectionItemForActiveModel = !isNullOrUndefined(this.currentNavigableItemReference.navigableItemIndex) ?
       // Get a collection item for a bookmark (just need to move the index back according to dir and use the nice findNext method)
       this.findNextActiveNavigableCollection(
         navigableCollectionItems,
@@ -120,13 +172,13 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
       );
 
     if(collectionItemForActiveModel) {
-      var activeModel = validBookmarkIndex && this.currentNavigableItemReference.modelId ?
+      var activeModel = (!isNullOrUndefined(this.currentNavigableItemReference.navigableItemIndex) && this.currentNavigableItemReference.modelId) ?
         // If we had a bookmark, find it in the collection
         collectionItemForActiveModel.collection.get(this.currentNavigableItemReference.modelId) :
         // Default to the first model in the collection
         collectionItemForActiveModel.collection.models[0];
 
-      console.log('--');
+      //console.log('--');
 
 
       if(activeModel) {
@@ -149,17 +201,18 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
           dir
         );
 
-
+        /* * /
         console.log(
           'cl',
           collectionItemForActiveModel && collectionItemForActiveModel.collection.length,
           nextCollectionItem && nextCollectionItem.collection.length
         );
+        /* */
 
         // Find the next model in the right collection
         var collectionItemWithNextModel = collectionItemForActiveModel;
         var nextInDirectionIndex = activeIndex + dir;
-        console.log('lb', nextInDirectionIndex, activeIndex, collectionItemWithNextModel.collection.length);
+        //console.log('lb', nextInDirectionIndex, activeIndex, collectionItemWithNextModel.collection.length);
         if(dir > 0 && nextInDirectionIndex >= collectionItemForActiveModel.collection.models.length) {
           collectionItemWithNextModel = nextCollectionItem;
           nextInDirectionIndex = 0;
@@ -168,14 +221,14 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
           collectionItemWithNextModel = nextCollectionItem;
           nextInDirectionIndex = collectionItemWithNextModel.collection.models.length - 1;
         }
-        console.log('la', nextInDirectionIndex, activeIndex, collectionItemWithNextModel.collection.length);
+        //console.log('la', nextInDirectionIndex, activeIndex, collectionItemWithNextModel.collection.length);
 
         // We use `collection.models[x]` vs `collection.at(x)` because the ProxyCollection doesn't update the index
         var nextInDirectionModel = collectionItemWithNextModel.collection.models[nextInDirectionIndex];
 
 
         // Deactivate the current item
-        activeModel.trigger('blur:item');
+        this.blurCurrentItem();
 
         // Activate the next item
         if(nextInDirectionModel) {
@@ -185,7 +238,7 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
             navigableItemIndex: collectionItemWithNextModel.index,
             modelId: nextInDirectionModel.id
           };
-          nextInDirectionModel.trigger('focus:item');
+          nextInDirectionModel.trigger(FOCUS_EVENT);
         }
       }
     }
