@@ -138,7 +138,10 @@ var PanelView = Marionette.LayoutView.extend({
       dndCtrl:    this.dndCtrl,
     });
 
-    this.favouriteCollectionModel = new FavouriteCollectionModel(null, { roomMenuModel: this.model });
+    this.favouriteCollectionModel = new FavouriteCollectionModel(null, {
+      collection: this.favCollection,
+      roomMenuModel: this.model
+    });
     this.primaryCollectionModel = new PrimaryCollectionModel(null, { roomMenuModel: this.model });
     this.secondaryCollectionModel = new SecondaryCollectionModel({}, {
       collection: this.model.secondaryCollection,
