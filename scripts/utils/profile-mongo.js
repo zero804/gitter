@@ -2,7 +2,8 @@
 /*jslint node: true */
 "use strict";
 
-var winston = require('../../server/utils/winston');
+var env = require('gitter-web-env');
+var winston = env.logger;
 var mongoose = require('mongoose');
 require('../../server/services/persistence-service');
 

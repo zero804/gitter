@@ -2,11 +2,11 @@
 /*jslint node: true */
 "use strict";
 
+var env = require('gitter-web-env');
+var winston = env.logger;
 var presenceService = require('gitter-web-presence');
 var userService = require('../../server/services/user-service');
 var shutdown = require('shutdown');
-
-var winston = require('../../server/utils/winston');
 
 var opts = require('yargs')
   .option('name', {

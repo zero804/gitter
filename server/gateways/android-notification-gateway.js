@@ -1,8 +1,9 @@
 "use strict";
 
+var env = require('gitter-web-env');
+var nconf = env.config;
 var gcm = require('node-gcm');
 var Promise = require('bluebird');
-var nconf = require('../utils/config');
 var pushNotificationService = require('../services/push-notification-service');
 
 var MAX_RETRIES = 4;
