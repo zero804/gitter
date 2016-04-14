@@ -42,7 +42,8 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
     // We accept 1/-1 or true/false
     var dir = (dir === false) ? -1 : Math.sign(dir || 1);
 
-    var nextCollection = (function lookAtNextCollection(index) {
+    // Recursive function
+    var lookAtNextCollection = function lookAtNextCollection(index) {
       var incrementedIndex = index + dir;
       var nextIndex = incrementedIndex;
       console.log('nb', nextIndex, startingIndex, dir);
@@ -72,10 +73,10 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
       }
 
       // Do another iteration
-      lookAtNextCollection.bind(this)(nextIndex);
-    }.bind(this))(startingIndex);
+      return lookAtNextCollection(nextIndex);
+    };
 
-    return nextCollection;
+    return lookAtNextCollection(startingIndex);
   },
 
   startKeyboardNavigation: function() {
