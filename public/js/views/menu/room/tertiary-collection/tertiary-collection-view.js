@@ -90,7 +90,7 @@ module.exports =  BaseCollectionView.extend({
   onOrgItemClicked: function(view) {
     var existingRoom = this.roomCollection.findWhere({ name: view.model.get('name') });
     if (!existingRoom) {
-      return this._openCreateRoomDialog(view.model);
+      return this._openCreateRoomDialog(view.model.get('name'));
     }
 
     proto.onItemClicked.apply(this, arguments);

@@ -1,13 +1,14 @@
 "use strict";
 
-var winston                     = require('../../utils/winston');
+var env                         = require('gitter-web-env');
+var errorReporter               = env.errorReporter;
+var winston                     = env.logger;
+var nconf                       = env.config;
 var pushNotificationFilter      = require("gitter-web-push-notification-filter");
-var nconf                       = require('../../utils/config');
 var workerQueue                 = require('../../utils/worker-queue-redis');
 var debug                       = require('debug')('gitter:push-notification-postbox');
 var mongoUtils                  = require('../../utils/mongo-utils');
 var Promise                     = require('bluebird');
-var errorReporter               = require('gitter-web-env').errorReporter;
 
 var notificationWindowPeriods = [
   nconf.get("notifications:notificationDelay") * 1000,
