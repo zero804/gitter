@@ -1,5 +1,6 @@
 "use strict";
 
+var _                     = require('lodash');
 var persistence           = require('./persistence-service');
 var assert                = require("assert");
 var mongoUtils            = require("../utils/mongo-utils");
@@ -105,13 +106,39 @@ function updateTopic(user, troupe, topic) {
 function toggleSearchIndexing(user, troupe, bool) {
   return roomPermissionsModel(user, 'admin', troupe)
     .then(function(access) {
-      if(!access) throw new StatusError(403); /* Forbidden */
+      if (!access) throw new StatusError(403); /* Forbidden */
 
       troupe.noindex = bool;
 
       return troupe.save()
         .then(function() {
           return troupe;
+        });
+    });
+}
+
+function updateProviders(user, room, providers) {
+  var isStaff = user.get('staff');
+
+  return Promise.resolve(isStaff || roomPermissionsModel(user, 'admin', room))
+    .then(function(access) {
+      if (!access) throw new StatusError(403); /* Forbidden */
+
+      // strictly validate the list of providers
+      var filtered = _.uniq(providers.filter(function(provider) {
+        // only github is allowed for now
+        return (provider == 'github');
+      }));
+
+      if (filtered.length) {
+        room.providers = filtered;
+      } else {
+        room.providers = undefined;
+      }
+
+      return room.save()
+        .then(function() {
+          return room;
         });
     });
 }
@@ -187,5 +214,6 @@ module.exports = {
   toggleSearchIndexing: toggleSearchIndexing,
   checkGitHubTypeForUri: checkGitHubTypeForUri,
   findChildRoomsForOrg: findChildRoomsForOrg,
+  updateProviders: updateProviders,
   updateTags: updateTags
 };

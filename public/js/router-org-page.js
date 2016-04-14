@@ -47,7 +47,7 @@ onReady(function(){
 
     routes: {
       '': 'index',
-      ':rommId/tags': 'onNavigateTags'
+      ':roomId/tags': 'onNavigateTags'
     },
 
     index: function(){

@@ -53,7 +53,10 @@ function performUpdateToUserRoom(req) {
       return Promise.all(promises);
     })
     .then(function() {
-      var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: userId });
+      var strategy = new restSerializer.TroupeIdStrategy({
+        currentUserId: userId,
+        includeProviders: true
+      });
 
       return restSerializer.serializeObject(req.params.userTroupeId, strategy);
     });
@@ -80,7 +83,10 @@ module.exports = {
 
     return roomService.joinRoom(troupeId, req.user, options)
       .then(function() {
-        var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: req.user.id });
+        var strategy = new restSerializer.TroupeIdStrategy({
+          currentUserId: req.user.id,
+          includeProviders: true
+        });
 
         return restSerializer.serializeObject(troupeId, strategy);
       });
