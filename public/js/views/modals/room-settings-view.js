@@ -11,7 +11,7 @@ var View = Marionette.ItemView.extend({
 
   events:   {
     'click #close-settings' : 'destroySettings',
-    'change [name=github-only]': 'formChange'
+    'change #github-only': 'formChange'
   },
 
   modelEvents: {
@@ -19,7 +19,7 @@ var View = Marionette.ItemView.extend({
   },
 
   ui: {
-    githubOnly: '[name=github-only]'
+    githubOnly: '#github-only'
   },
 
   destroySettings : function () {
