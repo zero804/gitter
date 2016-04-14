@@ -3,8 +3,6 @@
 var _             = require('underscore');
 var Marionette    = require('backbone.marionette');
 var fastdom       = require('fastdom');
-var cocktail      = require('cocktail');
-var KeyboardEventMixin = require('views/keyboard-events-mixin');
 var ItemView      = require('./minibar-item-view');
 var CloseItemView = require('./minibar-close-item-view');
 var FavouriteView = require('./minibar-favourite-item-view');
@@ -19,11 +17,6 @@ var MinibarView = Marionette.CollectionView.extend({
   childEvents: {
     'minibar-item:clicked': 'onItemClicked',
     'minibar-item:close':   'onCloseClicked',
-  },
-
-  keyboardEvents: {
-    'minibar-item.prev': 'selectPrev',
-    'minibar-item.next': 'selectNext'
   },
 
   //if an element exists in the dom pass that as the el prop
@@ -66,6 +59,7 @@ var MinibarView = Marionette.CollectionView.extend({
     this.dndCtrl        = attrs.dndCtrl;
     this.model          = attrs.model;
     this.roomCollection = attrs.roomCollection;
+    this.keyboardControllerView = attrs.keyboardControllerView;
 
     this.shouldRender   = false;
 
@@ -73,6 +67,10 @@ var MinibarView = Marionette.CollectionView.extend({
     this.listenTo(this.collection, 'snapshot', this.onCollectionSnapshot, this);
     this.listenTo(this.model, 'change:state change:selectedOrgName', this.onMenuStateUpdate, this);
     this.onMenuStateUpdate();
+
+    this.keyboardControllerView.inject(this.keyboardControllerView.constants.MINIBAR_KEY, [
+      { collection: this.collection }
+    ]);
 
     //Guard against not getting a snapshot
     this.timeout = setTimeout(function() {
@@ -166,40 +164,10 @@ var MinibarView = Marionette.CollectionView.extend({
     this.stopListening(this.collection);
     this.stopListening(this.model);
     this.stopListening(this.roomCollection);
-  },
-
-  progressInDirection: function(dir) {
-    var dir = (dir === false) ? -1 : Math.sign(dir);
-
-    var activeModel = this.collection.findWhere({ active: true });
-    var activeIndex = this.collection.indexOf(activeModel);
-    var nextInDirectionIndex = activeIndex + dir;
-    var nextInDirectionModel = this.collection.at(nextInDirectionIndex);
-    var nextInDirectionView = this.children.findByIndex(nextInDirectionIndex);
-
-    if(activeModel) {
-      activeModel.set('active', false);
-    }
-
-    if(nextInDirectionModel) {
-      nextInDirectionModel.set('active', true);
-      if(nextInDirectionView) {
-        nextInDirectionView.el.focus();
-      }
-    }
-  },
-
-  selectPrev: function() {
-    this.progressInDirection(-1);
-  },
-
-  selectNext: function() {
-    this.progressInDirection(1);
   }
 
-});
 
-cocktail.mixin(MinibarView, KeyboardEventMixin);
+});
 
 
 module.exports = MinibarView;

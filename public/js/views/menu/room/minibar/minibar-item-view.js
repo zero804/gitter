@@ -27,6 +27,8 @@ module.exports =  Marionette.ItemView.extend({
   modelEvents: {
     'change:unreadItems change:mentions change:activity': 'onUnreadUpdate',
     'change:active': 'onActiveStateUpdate',
+    'focus:item': 'focusItem',
+    'blur:item': 'blurItem'
   },
   events: {
     'click': 'onItemClicked',
@@ -98,5 +100,18 @@ module.exports =  Marionette.ItemView.extend({
 
     this.firstRender = false;
   },
+
+
+  focusItem: function() {
+    console.log('focusMinibarItem', this);
+    this.el.focus();
+    this.model.set('active', true);
+  },
+
+  blurItem: function() {
+    console.log('blurMinibarItem', this);
+    this.el.blur();
+    this.model.set('active', false);
+  }
 
 });
