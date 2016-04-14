@@ -205,9 +205,6 @@ var HeaderView = Marionette.ItemView.extend({
         if (isStaff || isAdmin) {
           menuItems.push({ title: 'Tags', href: '#tags' });
           menuItems.push({ title: 'Settings', href: '#settings' });
-        }
-
-        if (isStaff || isAdmin) {
           menuItems.push({ divider: true });
         }
 
