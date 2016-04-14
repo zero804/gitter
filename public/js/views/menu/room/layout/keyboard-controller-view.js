@@ -16,9 +16,12 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
   },
 
   keyboardEvents: {
+    'minibar-item.prev': function(e) { this.selectPrev(e, MINIBAR_KEY); },
+    'minibar-item.next': function(e) { this.selectNext(e, MINIBAR_KEY); },
+
     'room-list.start-nav': 'startKeyboardNavigation',
-    'room-list-item.prev': 'selectPrev',
-    'room-list-item.next': 'selectNext'
+    'room-list-item.prev': function(e) { this.selectPrev(e, ROOM_LIST_KEY); },
+    'room-list-item.next': function(e) { this.selectPrev(e, ROOM_LIST_KEY); },
   },
 
   /* public method meant to be used on the outside */
@@ -76,7 +79,7 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
       return lookAtNextCollection(nextIndex);
     };
 
-    return lookAtNextCollection(startingIndex);
+    return navigableCollectionItems ? lookAtNextCollection(startingIndex) : null;
   },
 
   startKeyboardNavigation: function() {
@@ -116,84 +119,86 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
         dir
       );
 
-    var activeModel = validBookmarkIndex && this.currentNavigableItemReference.modelId ?
-      // If we had a bookmark, find it in the collection
-      collectionItemForActiveModel.collection.get(this.currentNavigableItemReference.modelId) :
-      // Default to the first model in the collection
-      collectionItemForActiveModel.collection.models[0];
+    if(collectionItemForActiveModel) {
+      var activeModel = validBookmarkIndex && this.currentNavigableItemReference.modelId ?
+        // If we had a bookmark, find it in the collection
+        collectionItemForActiveModel.collection.get(this.currentNavigableItemReference.modelId) :
+        // Default to the first model in the collection
+        collectionItemForActiveModel.collection.models[0];
 
-    console.log('--');
+      console.log('--');
 
 
-    if(activeModel) {
-      // Find the index of the active model in our collection
-      var activeIndex = 0;
-      // We use `collection.models...` vs `collection.indexOf(model)` because the ProxyCollection doesn't update the index
-      collectionItemForActiveModel.collection.models.some(function(model, index) {
-        //console.log(model.id, activeModel.id)
-        if(model.id === activeModel.id) {
-          activeIndex = index;
-          // break
-          return true;
+      if(activeModel) {
+        // Find the index of the active model in our collection
+        var activeIndex = 0;
+        // We use `collection.models...` vs `collection.indexOf(model)` because the ProxyCollection doesn't update the index
+        collectionItemForActiveModel.collection.models.some(function(model, index) {
+          //console.log(model.id, activeModel.id)
+          if(model.id === activeModel.id) {
+            activeIndex = index;
+            // break
+            return true;
+          }
+        });
+
+        // Find the next active collection
+        var nextCollectionItem = this.findNextActiveNavigableCollection(
+          navigableCollectionItems,
+          collectionItemForActiveModel.index,
+          dir
+        );
+
+
+        console.log(
+          'cl',
+          collectionItemForActiveModel && collectionItemForActiveModel.collection.length,
+          nextCollectionItem && nextCollectionItem.collection.length
+        );
+
+        // Find the next model in the right collection
+        var collectionItemWithNextModel = collectionItemForActiveModel;
+        var nextInDirectionIndex = activeIndex + dir;
+        console.log('lb', nextInDirectionIndex, activeIndex, collectionItemWithNextModel.collection.length);
+        if(dir > 0 && nextInDirectionIndex >= collectionItemForActiveModel.collection.models.length) {
+          collectionItemWithNextModel = nextCollectionItem;
+          nextInDirectionIndex = 0;
         }
-      });
+        else if(dir < 0 && nextInDirectionIndex < 0) {
+          collectionItemWithNextModel = nextCollectionItem;
+          nextInDirectionIndex = collectionItemWithNextModel.collection.models.length - 1;
+        }
+        console.log('la', nextInDirectionIndex, activeIndex, collectionItemWithNextModel.collection.length);
 
-      // Find the next active collection
-      var nextCollectionItem = this.findNextActiveNavigableCollection(
-        navigableCollectionItems,
-        collectionItemForActiveModel.index,
-        dir
-      );
-
-
-      console.log(
-        'cl',
-        collectionItemForActiveModel && collectionItemForActiveModel.collection.length,
-        nextCollectionItem && nextCollectionItem.collection.length
-      );
-
-      // Find the next model in the right collection
-      var collectionItemWithNextModel = collectionItemForActiveModel;
-      var nextInDirectionIndex = activeIndex + dir;
-      console.log('lb', nextInDirectionIndex, activeIndex, collectionItemWithNextModel.collection.length);
-      if(dir > 0 && nextInDirectionIndex >= collectionItemForActiveModel.collection.models.length) {
-        collectionItemWithNextModel = nextCollectionItem;
-        nextInDirectionIndex = 0;
-      }
-      else if(dir < 0 && nextInDirectionIndex < 0) {
-        collectionItemWithNextModel = nextCollectionItem;
-        nextInDirectionIndex = collectionItemWithNextModel.collection.models.length - 1;
-      }
-      console.log('la', nextInDirectionIndex, activeIndex, collectionItemWithNextModel.collection.length);
-
-      // We use `collection.models[x]` vs `collection.at(x)` because the ProxyCollection doesn't update the index
-      var nextInDirectionModel = collectionItemWithNextModel.collection.models[nextInDirectionIndex];
+        // We use `collection.models[x]` vs `collection.at(x)` because the ProxyCollection doesn't update the index
+        var nextInDirectionModel = collectionItemWithNextModel.collection.models[nextInDirectionIndex];
 
 
-      // Deactivate the current item
-      activeModel.trigger('blur:item');
+        // Deactivate the current item
+        activeModel.trigger('blur:item');
 
-      // Activate the next item
-      if(nextInDirectionModel) {
-        //console.log('next', nextInDirectionIndex, nextInDirectionModel);
-        this.currentNavigableItemReference = {
-          mapKey: mapKey,
-          navigableItemIndex: collectionItemWithNextModel.index,
-          modelId: nextInDirectionModel.id
-        };
-        nextInDirectionModel.trigger('focus:item');
+        // Activate the next item
+        if(nextInDirectionModel) {
+          //console.log('next', nextInDirectionIndex, nextInDirectionModel);
+          this.currentNavigableItemReference = {
+            mapKey: mapKey,
+            navigableItemIndex: collectionItemWithNextModel.index,
+            modelId: nextInDirectionModel.id
+          };
+          nextInDirectionModel.trigger('focus:item');
+        }
       }
     }
   },
 
-  selectPrev: function(e) {
-    this.progressInDirection(-1, ROOM_LIST_KEY);
+  selectPrev: function(e, mapKey) {
+    this.progressInDirection(-1, mapKey);
     e.preventDefault();
     e.stopPropagation();
   },
 
-  selectNext: function(e) {
-    this.progressInDirection(1, ROOM_LIST_KEY);
+  selectNext: function(e, mapKey) {
+    this.progressInDirection(1, mapKey);
     e.preventDefault();
     e.stopPropagation();
   }
