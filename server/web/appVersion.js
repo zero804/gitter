@@ -1,10 +1,10 @@
 "use strict";
 
 /* #### See version-files in the Makefile #### */
-
+var env = require('gitter-web-env');
+var winston = env.logger;
 var fs = require("fs");
 var path = require('path');
-var winston = require('../utils/winston');
 
 function readFileSync(fileName) {
   var file = path.join(__dirname, '../..', fileName);
