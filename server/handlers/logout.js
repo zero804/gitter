@@ -1,9 +1,10 @@
 "use strict";
 
+var env           = require('gitter-web-env');
+var nconf         = env.config;
+var identifyRoute = env.middlewares.identifyRoute;
 var express       = require('express');
-var nconf         = require('../utils/config');
 var logout        = require('../web/middlewares/logout');
-var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 

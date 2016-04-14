@@ -1,16 +1,17 @@
 /* jshint node:true */
 "use strict";
 
+var env             = require('gitter-web-env');
+var logger          = env.logger;
+var stats           = env.stats;
+var conf            = env.config;
 var format          = require('util').format;
 var github          = require('octonode');
 var _               = require('underscore');
 var Promise         = require('bluebird');
-var conf            = require('../utils/config');
 var troupeTemplate  = require('../utils/troupe-template');
 var templatePromise = troupeTemplate.compile('github-pull-request-body');
-var env             = require('gitter-web-env');
-var logger          = env.logger;
-var stats           = env.stats;
+
 var StatusError     = require('statuserror');
 var badger          = require('readme-badger');
 var path            = require('path');

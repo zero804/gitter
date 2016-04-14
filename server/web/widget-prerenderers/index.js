@@ -1,6 +1,7 @@
 "use strict";
 
-var winston    = require('../../utils/winston');
+var env = require('gitter-web-env');
+var winston = env.logger;
 var compileTemplate = require('../compile-web-template');
 var safeTemplateWrapper = require('../safe-template-wrapper');
 
