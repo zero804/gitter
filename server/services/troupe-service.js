@@ -120,7 +120,7 @@ function toggleSearchIndexing(user, troupe, bool) {
 function updateProviders(user, room, providers) {
   var isStaff = user.get('staff');
 
-  return Promise.resolve(isStaff || roomPermissionsModel(user, 'admin', room))
+  return (isStaff ? Promise.resolve(true) : roomPermissionsModel(user, 'admin', room))
     .then(function(access) {
       if (!access) throw new StatusError(403); /* Forbidden */
 
@@ -147,7 +147,7 @@ function updateTags(user, room, tags) {
   var reservedTagTestRegex = (/:/);
   var isStaff = user.get('staff');
 
-  return Promise.resolve(isStaff || roomPermissionsModel(user, 'admin', room))
+  return (isStaff ? Promise.resolve(true) : roomPermissionsModel(user, 'admin', room))
     .then(function(access) {
       if(!access) throw new StatusError(403); /* Forbidden */
 
