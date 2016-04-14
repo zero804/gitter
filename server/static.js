@@ -3,11 +3,13 @@
 /* For development only */
 
 /* Configure winston before all else! */
-var winston  = require('./utils/winston');
+var env = require('gitter-web-env');
+var winston = env.logger;
+
 winston.info('Starting server/web.js');
+
 var express  = require('express');
 var http     = require('http');
-var nconf    = require('./utils/config');
 var cors = require('cors');
 var app = express();
 
@@ -31,7 +33,7 @@ var corsOptions = {
   ]
 };
 
-app.use(cors(corsOptions));  
+app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
 
 require('./web/express-static').install(app);

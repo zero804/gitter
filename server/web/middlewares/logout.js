@@ -1,8 +1,9 @@
 "use strict";
 
-var nconf       = require('../../utils/config');
-var rememberMe  = require('./rememberme-middleware');
-var winston     = require('../../utils/winston');
+var env        = require('gitter-web-env');
+var winston    = env.logger;
+var nconf      = env.config;
+var rememberMe = require('./rememberme-middleware');
 
 var authCookieName = nconf.get('web:cookiePrefix') + 'auth';
 var sessionCookieName = nconf.get('web:cookiePrefix') + 'session';

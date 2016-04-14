@@ -1,8 +1,9 @@
 "use strict";
 
-var nconf             = require('../../utils/config');
-var redis             = require('../../utils/redis');
-var uuid              = require('node-uuid');
+var env   = require('gitter-web-env');
+var nconf = env.config;
+var redis = require('../../utils/redis');
+var uuid  = require('node-uuid');
 
 var TransloaditClient = require('transloadit');
 var transloadit       = new TransloaditClient({

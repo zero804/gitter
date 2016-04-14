@@ -1,7 +1,8 @@
 "use strict";
 
-var winston                                 = require('../../utils/winston');
-var nconf                                   = require('../../utils/config');
+var env                                     = require('gitter-web-env');
+var winston                                 = env.logger;
+var nconf                                   = env.config;
 var Promise                                 = require('bluebird');
 var contextGenerator                        = require('../../web/context-generator');
 var restful                                 = require('../../services/restful');
