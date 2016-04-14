@@ -1,15 +1,32 @@
 'use strict';
 
+var Promise                       = require('bluebird');
 var userSettingsService           = require('../../../services/user-settings-service');
 var userDefaultFlagsService       = require('../../../services/user-default-flags-service');
 var userDefaultFlagsUpdateService = require('../../../services/user-default-flags-update-service');
 
 var DEFAULT_ROOM_MEMBERSHIP_MODE_KEY = 'defaultRoomMode';
+var UNREAD_EMAIL_OPT_OUT_KEY = 'unread_notifications_optout';
 
 module.exports = {
   id: 'userSetting',
 
   index: function(req) {
+    var userId = req.resourceUser._id;
+
+    if(req.query.category === 'notifications') {
+      // Allow a single get for the notification default settings dialog
+      return Promise.join(
+        userSettingsService.getUserSettings(userId, UNREAD_EMAIL_OPT_OUT_KEY),
+        userDefaultFlagsService.getDefaultFlagDetailsForUserId(userId),
+        function(emailOptOut, defaultFlags) {
+          var result = {};
+          result[UNREAD_EMAIL_OPT_OUT_KEY] = !!emailOptOut;
+          result[DEFAULT_ROOM_MEMBERSHIP_MODE_KEY] = defaultFlags;
+          return result;
+        });
+    }
+
     return userSettingsService.getAllUserSettings(req.resourceUser.id)
       .then(function (settings) {
         return settings || {};
