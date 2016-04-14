@@ -22,9 +22,6 @@ var View = Marionette.ItemView.extend({
     githubOnly: '[name=github-only]'
   },
 
-  initialize: function() {
-  },
-
   destroySettings : function () {
     this.dialog.hide();
     this.dialog = null;
