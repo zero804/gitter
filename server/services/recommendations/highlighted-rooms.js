@@ -32,9 +32,9 @@ var HIGHLIGHTED_ROOMS = [
     roomExists: true,
     highlighted: true
   },{
-    uri: 'rom-rb/chat',
-    language: 'Ruby',
-    githubType: 'ORG_CHANNEL',
+    uri: 'FreeCodeCamp/FreeCodeCamp',
+    language: 'JavaScript',
+    githubType: 'REPO',
     localeLanguage: 'en',
     roomExists: true,
     highlighted: true
