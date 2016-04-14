@@ -226,11 +226,11 @@ module.exports = Backbone.Model.extend({
   },
 
   onRoomChange: function (){
-    var selectedModel      = this._getModel('selected', true);
-    var newlySelectedModel = this._getModel('id', context.troupe().get('id'));
+    var activeModel      = this._getModel('active', true);
+    var newlyActiveModel = this._getModel('id', context.troupe().get('id'));
 
-    if(selectedModel) { selectedModel.set('selected', false); }
-    if(newlySelectedModel) { newlySelectedModel.set('selected', true); }
+    if(activeModel) { activeModel.set('active', false); }
+    if(newlyActiveModel) { newlyActiveModel.set('active', true); }
   },
 
   _getModel: function (prop, val){

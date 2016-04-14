@@ -15,7 +15,7 @@ module.exports = Marionette.ItemView.extend({
   },
 
   modelEvents: {
-    'change:selected': 'onSelectedChange',
+    'change:active': 'onActiveChange',
     'change:focus':    'onItemFocused',
     'change:unreadItems change:mentions change:activity': 'onUnreadUpdate',
     'focus:item': 'focusItem',
@@ -51,8 +51,8 @@ module.exports = Marionette.ItemView.extend({
     });
   },
 
-  onSelectedChange: function(model, val) { //jshint unused: true
-    toggleClass(this.ui.container[0], 'selected', !!val);
+  onActiveChange: function(model, val) { //jshint unused: true
+    toggleClass(this.ui.container[0], 'active', !!val);
   },
 
   onItemFocused: function(model, val) {//jshint unused: true

@@ -38,18 +38,18 @@ JP 11/2/16
   transition:      background-color .2s ease-out;
 
   .room-item.active & {
-    .room-item-selected();
+    .room-item-active();
   }
 
-  &.selected,
+  &.active,
   &.focus {
-    .room-item-selected();
+    .room-item-active();
   }
 
   &:hover {
     text-decoration: none;
     cursor: pointer;
-    .room-item-selected();
+    .room-item-active();
   }
 
   //this sucks so so much.

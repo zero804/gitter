@@ -35,12 +35,12 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
     'room-list-item.next': function(e) { this.selectNext(e, ROOM_LIST_KEY); },
   },
 
-  /* public method meant to be used on the outside */
+  // public method meant to be used on the outside
   inject: function(mapKey, newNavigableCollectionItems) {
     this.navigableCollectionItemsMap[mapKey] = (this.navigableCollectionItemsMap[mapKey] || []).concat(newNavigableCollectionItems);
 
     newNavigableCollectionItems.forEach(function(collectionItem) {
-      this.listenTo(collectionItem, 'update', this.startNavigation.bind(this, null, mapKey, true));
+      this.listenTo(collectionItem.collection, 'update', this.startNavigation.bind(this, null, mapKey, true));
     }.bind(this));
   },
 
