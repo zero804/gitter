@@ -106,7 +106,7 @@ function updateTopic(user, troupe, topic) {
 function toggleSearchIndexing(user, troupe, bool) {
   return roomPermissionsModel(user, 'admin', troupe)
     .then(function(access) {
-      if (!access) throw new StatusError(403); /* Forbidden */
+      if(!access) throw new StatusError(403); /* Forbidden */
 
       troupe.noindex = bool;
 
