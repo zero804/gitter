@@ -2,9 +2,9 @@
 
 "use strict";
 
+var env = require('gitter-web-env');
+var nconf = env.config;
 var faye = require('faye');
-var nconf = require('../server/utils/config');
-
 
 
 faye.logger = {};
@@ -41,4 +41,3 @@ subscription
   }, function(err) {
     console.log('FAILED ' + err);
   });
-

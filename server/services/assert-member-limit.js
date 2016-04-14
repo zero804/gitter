@@ -1,9 +1,10 @@
 "use strict";
 
+var env = require('gitter-web-env');
+var nconf = env.config;
 var StatusError  = require('statuserror');
 var troupeService = require('./troupe-service');
 var persistence = require('./persistence-service');
-var nconf = require('../utils/config');
 var debug = require('debug')('gitter:assert-room-limit');
 var Promise = require('bluebird');
 var roomMembershipService = require('./room-membership-service');
