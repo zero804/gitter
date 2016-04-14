@@ -23,9 +23,15 @@ function standardHandler(settingsKey) {
   };
 }
 
-var SETTINGS = {
+/**
+ * Each setting key can have it's own handler.
+ * This maps the setting key to a read and write handler.
+ * If the user attempts to write to an unknown key, we throw a
+ * 404 error
+ */
+var HANDLERS = {
   leftRoomMenu: standardHandler('leftRoomMenu'),
-  lang: standardHandler('leftRoomMenu'),
+  lang: standardHandler('lang'),
   unread_notifications_optout: {
     get: function(user) {
       return userSettingsService.getUserSettings(user._id, 'unread_notifications_optout')
@@ -58,14 +64,14 @@ var SETTINGS = {
 
 function mapHandlers(keys) {
   return keys.map(function(key) {
-    var handler = SETTINGS[key];
+    var handler = HANDLERS[key];
     if (!handler) throw new StatusError(404);
     return handler;
   });
 }
 
 function getSetting(user, key) {
-  var handler = SETTINGS[key];
+  var handler = HANDLERS[key];
   if (!handler) throw new StatusError(404);
   return handler.get(user)
     .then(function(f) {
@@ -87,7 +93,7 @@ function getSettings(user, keys) {
 }
 
 function updateSetting(user, key, value) {
-  var handler = SETTINGS[key];
+  var handler = HANDLERS[key];
   if (!handler) throw new StatusError(404);
 
   return handler.set(user, value);
