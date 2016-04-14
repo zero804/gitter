@@ -11,9 +11,9 @@ var View = Marionette.LayoutView.extend({
   template: template,
   events: {
     'click #close-settings' : 'destroySettings',
-    'change #notification-options' : 'formChange',
-    'change #override-all' : 'formChange',
-    'change #send-emails-checkbox' : 'formChange',
+    'change @ui.options' : 'formChange',
+    'change @ui.override' : 'formChange',
+    'change @ui.sendEmailsCheckbox' : 'formChange',
   },
   modelEvents: {
     change: 'update'
