@@ -6,7 +6,7 @@ var ModalView = require('./modal');
 var apiClient = require('components/apiClient');
 var roomSettingsTemplate = require('./tmpl/room-settings-view.hbs');
 
-var View = Marionette.LayoutView.extend({
+var View = Marionette.ItemView.extend({
   template: roomSettingsTemplate,
 
   events:   {

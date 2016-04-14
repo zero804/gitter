@@ -14,7 +14,7 @@ var OPTIONS = {
   mute: 'Mute: Notify me only when I\'m directly mentioned'
 };
 
-var View = Marionette.ItemView.extend({
+var View = Marionette.LayoutView.extend({
   template: template,
   events:   {
     'click #close-settings' : 'destroySettings',
