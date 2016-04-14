@@ -12,7 +12,8 @@ var View = Marionette.LayoutView.extend({
   events: {
     'click #close-settings' : 'destroySettings',
     'change #notification-options' : 'formChange',
-    'change #override-all' : 'formChange'
+    'change #override-all' : 'formChange',
+    'change #send-emails-checkbox' : 'formChange',
   },
   modelEvents: {
     change: 'update'
@@ -22,6 +23,7 @@ var View = Marionette.LayoutView.extend({
     override: '#override-all',
     notifyFeatures: '#notify-features',
     noticeNoOverride: '#notice-no-override',
+    sendEmailsCheckbox: '#send-emails-checkbox'
   },
   regions: {
     notifyFeatures: '#notify-features'
@@ -30,10 +32,13 @@ var View = Marionette.LayoutView.extend({
   initialize: function() {
     // TODO: this should go to the userRoom endpoint as a get
     // or better yet should be a live field on the room
-    apiClient.user.get('/settings/defaultRoomMode')
+    apiClient.user.get('/settings/defaultRoomMode,unread_notifications_optout')
       .bind(this)
-      .then(function(settings) {
-        this.model.set(settings);
+      .then(function(response) {
+        var defaultRoomMode = response.defaultRoomMode || {};
+        // Use a single, flat model for the view
+        defaultRoomMode.unread_notifications_optout = !!response.unread_notifications_optout;
+        this.model.set(defaultRoomMode);
       });
 
     this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
@@ -55,6 +60,9 @@ var View = Marionette.LayoutView.extend({
     } else {
       this.ui.notifyFeatures.hide();
     }
+
+    var sendEmails = !this.model.get('unread_notifications_optout');
+    this.ui.sendEmailsCheckbox.prop('checked', sendEmails);
   },
 
   onRender: function() {
@@ -67,10 +75,14 @@ var View = Marionette.LayoutView.extend({
     if(e) e.preventDefault();
     var mode = this.ui.options.val();
     var override = !!this.ui.override.is(':checked');
+    var emailOptOut = !this.ui.sendEmailsCheckbox.is(':checked');
 
     this.featuresView.resetFromMode(mode);
 
-    var noChange = (mode === this.model.get('mode')) && !override;
+    var noChange = (mode === this.model.get('mode')) &&
+                    !override &&
+                    (emailOptOut === this.model.get('unread_notifications_optout'));
+
     this.dialog.toggleButtonClass('apply', 'modal--default__footer__btn--neutral', noChange);
     this.dialog.toggleButtonClass('apply', 'modal--default__footer__btn', !noChange);
 
@@ -100,8 +112,15 @@ var View = Marionette.LayoutView.extend({
   applyChangeAndClose: function() {
     var mode = this.ui.options.val();
     var override = !!this.ui.override.is(':checked');
+    var emailOptOut = !this.ui.sendEmailsCheckbox.is(':checked');
 
-    apiClient.user.put('/settings/defaultRoomMode', { mode: mode, override: override })
+    apiClient.user.post('/settings/', {
+        defaultRoomMode: {
+          mode: mode,
+          override: override
+        },
+        unread_notifications_optout: emailOptOut
+      })
       .bind(this)
       .then(function() {
         this.dialog.hide();
