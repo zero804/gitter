@@ -40,8 +40,9 @@ module.exports = BaseCollectionView.extend({
   serializeData: function() {
     var data = this.model.toJSON();
     return _.extend({}, data, {
-      isSearch:   (data.state === 'search'),
-      orgRoomUrl: (data.state !== 'org') ? null :  '/orgs/' + this.roomMenuModel.get('selectedOrgName') + '/rooms',
+      isSearch:        (data.state === 'search'),
+      selectedOrgName: this.roomMenuModel.get('selectedOrgName'),
+      orgRoomUrl:      (data.state !== 'org') ? null :  '/orgs/' + this.roomMenuModel.get('selectedOrgName') + '/rooms',
     });
   },
 

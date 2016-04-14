@@ -10,11 +10,8 @@
 <div id="collection-list" class="collection-list"></div>
 
 {{#if orgRoomUrl}}
-<div class="collection-show-more-container">
-  <a class="link--positive"
-     href="{{orgRoomUrl}}"
-     title="more {{selectedOrgName}} rooms">
-      show more
-  </a>
-</div>
+<a class="room-item__container" href="{{orgRoomUrl}}" title="More {{selectedOrgName}} rooms">
+  <img class="room-item__avatar" src="{{cdn "images/svg/menu/show-more-rooms.svg"}}" />
+  <h2 class="room-item__title--show-more">Show More</h2>
+</a>
 {{/if}}
