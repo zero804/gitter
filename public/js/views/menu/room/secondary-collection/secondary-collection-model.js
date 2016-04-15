@@ -15,11 +15,19 @@ module.exports = BaseCollectionModel.extend({
   updateModelActiveState: function() {
     // We use `collection.models.length` and `collection.length` just to
     // play nice with proxycollections which don't seem to adjust `.length` appropriately
-    var active = !!this.collection.length && !!this.collection.models.length;
+    var defaultActive = !!this.collection.length && !!this.collection.models.length;
+    var active = defaultActive;
+
+    /* * /
+    console.log('secondary--updateModelActiveState', this.collection.length, this.collection.models.length, this.collection.models);
+    setTimeout(function() {
+        console.log('delayed secondary--updateModelActiveState', this.collection.length, this.collection.models.length, this.collection.models);
+    }.bind(this), 100);
+    /* */
 
     switch (this.roomMenuModel.get('state')){
       case 'all':
-        active = !!this.collection.length && !this.roomMenuModel.get('hasDismissedSuggestions');
+        active = defaultActive && !this.roomMenuModel.get('hasDismissedSuggestions');
         break;
 
       case 'search':
@@ -27,7 +35,7 @@ module.exports = BaseCollectionModel.extend({
         break;
 
       case 'favourite':
-        active = !!this.collection.length && !this.roomMenuModel.get('hasDismissedSuggestions');
+        active = defaultActive && !this.roomMenuModel.get('hasDismissedSuggestions');
         break;
     }
 

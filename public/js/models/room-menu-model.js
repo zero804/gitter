@@ -97,6 +97,8 @@ module.exports = Backbone.Model.extend({
       collection: this._roomCollection,
     });
 
+
+
     this.primaryCollection   = new ProxyCollection({ collection: this.activeRoomCollection });
     this.secondaryCollection = new ProxyCollection({ collection: this.searchTerms });
     this.tertiaryCollection  = new ProxyCollection({ collection: this._orgCollection });
@@ -114,9 +116,17 @@ module.exports = Backbone.Model.extend({
     this.listenTo(this.bus, 'room-menu:change:state', this.onStateChangeCalled, this);
     this.listenTo(this, 'change:searchTerm', this.onSearchTermChange, this);
     this.listenTo(this, 'change:state', this.onSwitchState, this);
-    this.listenTo(this, 'change:selectedOrgName', this.onSwitchSelectedOrg, this);
     this.listenTo(this, 'change', _.debounce(this.save.bind(this), 1500));
     this.listenTo(context.troupe(), 'change:id', this.onRoomChange, this);
+
+    // TODO: Should we be doing this stuff inside the collection-models?
+    //   We do something similar with the search in the model itself so maybe...
+    this.listenTo(this.activeRoomCollection, 'filter-complete', this.fireUpdateActiveState, this);
+    this.listenTo(this.searchTerms, 'filter-complete', this.fireUpdateActiveState, this);
+    this.listenTo(this.suggestedOrgs, 'sync', this.fireUpdateActiveState, this);
+    this.listenTo(this.searchRoomAndPeople, 'reset', this.fireUpdateActiveState, this);
+    this.listenTo(this.searchChatMessages, 'reset', this.fireUpdateActiveState, this);
+
 
     //boot the model
     this.onSwitchState(this, this.get('state'));
@@ -172,12 +182,12 @@ module.exports = Backbone.Model.extend({
         break;
     }
 
-    this.trigger('change:view');
+    this.fireUpdateActiveState();
     this.trigger('change:state:post');
   },
 
-  onSwitchSelectedOrg: function() {
-    this.trigger('change:view');
+  fireUpdateActiveState: function() {
+    this.trigger('update:collection-active-states');
   },
 
   onSearchTermChange: _.debounce(function() {

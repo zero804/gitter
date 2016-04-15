@@ -96,6 +96,9 @@ module.exports = (function() {
       },{
       name: 'room-list.start-nav',
       scope: 'minibar.item'
+    }, {
+      name: 'room-list-item:activate',
+      scope: 'room-list.item'
     }],
     'enter': [{
       name: 'search.go',
@@ -115,6 +118,9 @@ module.exports = (function() {
     },{
       name: 'room-list.start-nav',
       scope: 'minibar.item'
+    }, {
+      name: 'room-list-item:activate',
+      scope: 'room-list.item'
     }],
     'shift+enter': [{
       name: 'chat.compose.auto',

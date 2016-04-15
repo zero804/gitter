@@ -41,7 +41,7 @@ module.exports = Marionette.CompositeView.extend({
   },
 
   childEvents: {
-    'item:clicked':   'onItemClicked',
+    'item:activated': 'onItemActivated',
     'hide:complete':  'onHideLeaveRoom',
     'leave:complete': 'onHideLeaveRoom',
   },
@@ -62,7 +62,7 @@ module.exports = Marionette.CompositeView.extend({
     }
   },
 
-  onItemClicked: function(view) {
+  onItemActivated: function(view) {
     var model = view.model;
     var name = (model.get('uri') ||
                 model.get('url') ||
@@ -97,6 +97,7 @@ module.exports = Marionette.CompositeView.extend({
   },
 
   setActive: function () {
+    //console.log('setActive', this.el, this.model.get('active'));
     toggleClass(this.el, 'active', this.model.get('active'));
   },
 
