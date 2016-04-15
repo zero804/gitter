@@ -1,11 +1,12 @@
 /* jshint maxcomplexity:19 */
 "use strict";
 
+var env                      = require('gitter-web-env');
+var winston                  = env.logger;
 var troupeService            = require("../../services/troupe-service");
 var identityService          = require("../../services/identity-service");
 var presenceService          = require("gitter-web-presence");
 var Promise                  = require('bluebird');
-var winston                  = require('../../utils/winston');
 var collections              = require("../../utils/collections");
 var GithubContributorService = require('gitter-web-github').GitHubContributorService;
 var Promise                  = require('bluebird');
@@ -138,7 +139,7 @@ function UserProvidersStrategy() {
         providersByUser[user.id] = ['github'];
       } else {
         // non-github, so we have to look up the user's identities.
-        nonGitHub.push(user.id);
+        nonGitHub.push(user);
       }
     });
 
@@ -146,10 +147,10 @@ function UserProvidersStrategy() {
       return Promise.resolve();
     }
 
-    return Promise.map(nonGitHub, function(userId) {
-      return identityService.listProvidersForUserId(userId)
+    return Promise.map(nonGitHub, function(user) {
+      return identityService.listProvidersForUser(user)
         .then(function(providers) {
-          providersByUser[userId] = providers;
+          providersByUser[user.id] = providers;
         });
     });
   };

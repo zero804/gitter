@@ -1,14 +1,12 @@
 /* jshint node:true  */
 "use strict";
 
-
-var express  = require('express');
-var http     = require('http');
-var winston  = require('../../../../server/utils/winston');
+var env = require('gitter-web-env');
+var winston = env.logger;
+var express = require('express');
+var http = require('http');
 var expressHbs = require('express-hbs');
-var passportInstall = require('../../../../server/web/passport');
 var passport = require('passport');
-var nconf = require('../../../../server/utils/config');
 var GitHubStrategy = require('gitter-passport-github').Strategy;
 
 var app = express();
@@ -93,7 +91,7 @@ app.get(
     var scope = req.session.currentScope;
     passport.authorize('github_' + scope, { failWithError: true })(req, res, next);
   },
-  function(req, res, next) {
+  function(req, res) {
     res.redirect('/');
   });
 

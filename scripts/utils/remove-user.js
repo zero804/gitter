@@ -2,10 +2,10 @@
 /*jslint node: true */
 "use strict";
 
+var env = require('gitter-web-env');
+var winston = env.logger;
 var shutdown = require('shutdown');
 var userRemovalService = require('../../server/services/user-removal-service');
-
-var winston = require('../../server/utils/winston');
 
 require('../../server/event-listeners').install();
 
