@@ -9,7 +9,9 @@ var parseForTemplate        = require('gitter-web-shared/parse/left-menu-primary
 module.exports = BaseCollectionItemView.extend({
 
   serializeData: function() {
-    var data = parseForTemplate(this.model.toJSON(), this.roomMenuModel.get('state'));
+    var modelData = this.model.toJSON();
+    modelData.isSuggestion = this.isSuggestion;
+    var data = parseForTemplate(modelData, this.roomMenuModel.get('state'));
 
     if (data.fromUser) {
       return _.extend({}, data, {

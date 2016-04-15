@@ -2,23 +2,23 @@
 
 var _                       = require('underscore');
 var Marionette              = require('backbone.marionette');
+var toggleClass             = require('utils/toggle-class');
 var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
+var parseForTemplate        = require('gitter-web-shared/parse/left-menu-primary-item');
+var roomNameShortener       = require('gitter-web-shared/room-name-shortener');
 var BaseCollectionView      = require('../base-collection/base-collection-view');
 var BaseCollectionItemView  = require('../base-collection/base-collection-item-view');
-var roomNameShortener       = require('gitter-web-shared/room-name-shortener');
 var EmptySearchView         = require('./tertiary-collection-item-search-empty-view');
-var toggleClass             = require('utils/toggle-class');
 
 var proto = BaseCollectionView.prototype;
 
 var ItemView = BaseCollectionItemView.extend({
   serializeData: function() {
-    var data = this.model.toJSON();
-    var name = (data.name || data.uri || '');
-    return _.extend({}, data, {
-      name:         roomNameShortener(name),
-      avatarSrcset: (!data.isRecentSearch) ? resolveRoomAvatarSrcSet({ uri: name }, 22) : null,
-    });
+    var modelData = this.model.toJSON();
+    modelData.isSuggestion = this.isSuggestion;
+    var data = parseForTemplate(modelData, this.roomMenuModel.get('state'));
+
+    return data;
   },
 });
 

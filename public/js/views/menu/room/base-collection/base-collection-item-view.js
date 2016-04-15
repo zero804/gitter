@@ -28,6 +28,7 @@ module.exports = Marionette.ItemView.extend({
   constructor: function(attrs) {
     this.roomMenuModel = attrs.roomMenuModel;
     this.index         = attrs.index;
+    this.isSuggestion  = attrs.isSuggestion;
     Marionette.ItemView.prototype.constructor.apply(this, arguments);
   },
 
