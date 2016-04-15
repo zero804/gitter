@@ -165,7 +165,13 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
     var dir = (dir === false) ? -1 : Math.sign(dir);
     var navigableCollectionItems = this.navigableCollectionItemsMap[mapKey];
 
-    console.log('panel-view progressInDirection', dir, this.currentNavigableItemReference);
+    console.log('panel-view progressInDirection', mapKey, dir, this.currentNavigableItemReference);
+
+    // If we the current location reference is different than what we were just told
+    // to navigate. Restart the navigation from the currently active item
+    if(mapKey !== this.currentNavigableItemReference.mapKey) {
+      this.startNavigation(null, mapKey, true);
+    }
 
     var collectionItemForActiveModel = !isNullOrUndefined(this.currentNavigableItemReference.navigableItemIndex) ?
       // Get a collection item for a bookmark (just need to move the index back according to dir and use the nice findNext method)
