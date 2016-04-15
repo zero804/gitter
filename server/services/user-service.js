@@ -1,12 +1,13 @@
 "use strict";
 
+var env                    = require('gitter-web-env');
+var winston                = env.logger;
 var assert                 = require('assert');
 var _                      = require('underscore');
 var Promise                = require('bluebird');
 var githubUserService      = require('gitter-web-github').GitHubUserService;
 var persistence            = require("./persistence-service");
 var uriLookupService       = require('./uri-lookup-service');
-var winston                = require('../utils/winston');
 var mongooseUtils          = require('../utils/mongoose-utils');
 var extractGravatarVersion = require('../utils/extract-gravatar-version');
 

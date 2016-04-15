@@ -1,8 +1,9 @@
 "use strict";
 
+var env         = require('gitter-web-env');
+var winston     = env.logger;
 var Mirror      = require('gitter-web-github').GitHubMirrorService('user');
 var userService = require('../../../services/user-service');
-var winston     = require('../../../utils/winston');
 var url         = require('url');
 var StatusError = require('statuserror');
 

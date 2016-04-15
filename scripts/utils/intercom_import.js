@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 "use strict";
 
-var nconf               = require('../../server/utils/config');
-var winston             = require('../../server/utils/winston');
+var env                 = require('gitter-web-env');
+var winston             = env.logger;
+var nconf               = env.config;
 var persistence         = require("../../server/services/persistence-service");
 var shutdown            = require('shutdown');
 var async               = require('async');
 var emailAddressService = require('../../server/services/email-address-service');
-var Promise             = require('bluebird'); 
+var Promise             = require('bluebird');
 
 function getAllUsers(callback) {
   persistence.User.find(function (err, users) {

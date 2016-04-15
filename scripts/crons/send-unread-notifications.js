@@ -2,9 +2,10 @@
 
 "use strict";
 
+var env = require('gitter-web-env');
+var winston = env.logger;
+var nconf = env.config;
 var notificationGenerator = require('../../server/services/notifications/email-notification-generator-service');
-var nconf = require('../../server/utils/config');
-var winston = require('../../server/utils/winston');
 
 var MAX_TIME = 60000*5;
 

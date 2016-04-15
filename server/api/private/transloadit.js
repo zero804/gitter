@@ -1,15 +1,15 @@
 "use strict";
 
-var userService   = require('../../services/user-service');
-var troupeService = require('../../services/troupe-service');
-var chatService   = require('../../services/chat-service');
-var nconf         = require('../../utils/config');
-var Promise       = require('bluebird');
-var StatusError   = require('statuserror');
-
 var env           = require('gitter-web-env');
 var stats         = env.stats;
 var logger        = env.logger;
+var nconf         = env.config;
+
+var userService   = require('../../services/user-service');
+var troupeService = require('../../services/troupe-service');
+var chatService   = require('../../services/chat-service');
+var Promise       = require('bluebird');
+var StatusError   = require('statuserror');
 
 var redis         = require('../../utils/redis');
 var redisClient   = redis.getClient();

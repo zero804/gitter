@@ -2,7 +2,8 @@
 
 "use strict";
 
-var winston = require('../../server/utils/winston');
+var env = require('gitter-web-env');
+var winston = env.logger;
 var presenceService = require('gitter-web-presence');
 var shutdown = require('shutdown');
 
