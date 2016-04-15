@@ -47,7 +47,7 @@ var HANDLERS = {
     }
   },
 
-  /* Default Room Mode */
+  /* Default Notification Settings Mode */
   defaultRoomMode: {
     get: function(user) {
       return userDefaultFlagsService.getDefaultFlagDetailsForUserId(user._id);
@@ -97,7 +97,9 @@ function getSettings(user, keys) {
   });
 }
 
-/* Returns a single key setting */
+/**
+ * Updates a single key
+ */
 function updateSetting(user, key, value) {
   var handler = HANDLERS[key];
   if (!handler) throw new StatusError(404);
@@ -105,7 +107,11 @@ function updateSetting(user, key, value) {
   return handler.set(user, value);
 }
 
-/* Updates multiple key settings from a hash */
+/**
+ * Updates multiple key settings from a hash
+ * All keys need to be valid, otherwise we throw
+ * a 404
+ */
 function updateSettings(user, valuesHash) {
   var keys = Object.keys(valuesHash);
   var handlers = mapHandlers(keys);
