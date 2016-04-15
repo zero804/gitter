@@ -1,6 +1,6 @@
 "use strict";
 
-var mongoose = require('../../utils/mongoose-q');
+var mongoose = require('gitter-web-mongoose-bluebird');
 var userScopes = require('../../utils/models/user-scopes');
 var Schema   = mongoose.Schema;
 var ObjectId = Schema.ObjectId;
