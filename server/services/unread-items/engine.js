@@ -1,9 +1,9 @@
 "use strict";
 
-var config        = require('gitter-web-env');
-var stats         = config.stats;
+var env           = require('gitter-web-env');
+var stats         = env.stats;
+var winston       = env.logger;
 var redis         = require("../../utils/redis");
-var winston       = require('../../utils/winston');
 var mongoUtils    = require('../../utils/mongo-utils');
 var Scripto       = require('gitter-redis-scripto');
 var assert        = require('assert');

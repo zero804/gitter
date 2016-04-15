@@ -1,8 +1,9 @@
 /* jshint maxcomplexity:18 */
 "use strict";
 
+var env               = require('gitter-web-env');
+var winston           = env.logger;
 var GitHubRepoService = require('gitter-web-github').GitHubRepoService;
-var winston           = require('../../utils/winston');
 var Promise           = require('bluebird');
 var appEvents         = require('gitter-web-appevents');
 var userIsInRoom      = require('../user-in-room');
