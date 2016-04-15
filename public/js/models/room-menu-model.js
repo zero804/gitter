@@ -37,6 +37,8 @@ module.exports = Backbone.Model.extend({
     roomMenuIsPinned:          true,
     selectedOrgName:           '',
     hasDismissedSuggestions:   false,
+    // 'keyboard', null (we can probably assume click from mouse)
+    activationSourceType:      null
   },
 
   //TODO Remove all these delete statements and pass the object with the options hash
@@ -112,6 +114,7 @@ module.exports = Backbone.Model.extend({
     this.listenTo(this.bus, 'room-menu:change:state', this.onStateChangeCalled, this);
     this.listenTo(this, 'change:searchTerm', this.onSearchTermChange, this);
     this.listenTo(this, 'change:state', this.onSwitchState, this);
+    this.listenTo(this, 'change:selectedOrgName', this.onSwitchSelectedOrg, this);
     this.listenTo(this, 'change', _.debounce(this.save.bind(this), 1500));
     this.listenTo(context.troupe(), 'change:id', this.onRoomChange, this);
 
@@ -137,7 +140,6 @@ module.exports = Backbone.Model.extend({
   },
 
   onSwitchState: function(model, val) {/*jshint unused: true */
-
     //TODO Test this JP 27/1/15
     switch (val) {
       case 'all':
@@ -170,8 +172,12 @@ module.exports = Backbone.Model.extend({
         break;
     }
 
-    this.trigger('change:state:pre');
+    this.trigger('change:view');
     this.trigger('change:state:post');
+  },
+
+  onSwitchSelectedOrg: function() {
+    this.trigger('change:view');
   },
 
   onSearchTermChange: _.debounce(function() {

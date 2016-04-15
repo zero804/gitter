@@ -47,10 +47,13 @@ module.exports = Marionette.ItemView.extend({
   onModelChangeState: function (model, val){ //jshint unused: true
     toggleClass(this.el, 'active', val === 'search');
 
-    //We need to check if the ui elements have been bound
-    //as this is a string before it is bounce we can't check [0] || .length
-    //so we will check for the find function JP 15/3/16
-    if(val === 'search' && this.ui.input.find) { this.ui.input.focus(); }
+    // Don't ruin the minibar navigation when using a keyboard
+    if(model.get('activationSourceType') !== 'keyboard') {
+      //We need to check if the ui elements have been bound
+      //as this is a string before it is bounce we can't check [0] || .length
+      //so we will check for the find function JP 15/3/16
+      if(val === 'search' && this.ui.input.find) { this.ui.input.focus(); }
+    }
   },
 
   onModelChangeSearchTerm: function(model, val) { //jshint unused: true

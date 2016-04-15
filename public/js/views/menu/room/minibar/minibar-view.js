@@ -15,7 +15,8 @@ var MinibarView = Marionette.CollectionView.extend({
   id:        'minibar-list',
   childView: ItemView,
   childEvents: {
-    'minibar-item:clicked': 'onItemClicked',
+    'minibar-item:keyboard-activated': 'onItemKeyboardActivated',
+    'minibar-item:activated': 'onItemActivated',
     'minibar-item:close':   'onCloseClicked',
   },
 
@@ -96,7 +97,8 @@ var MinibarView = Marionette.CollectionView.extend({
     }.bind(this));
   },
 
-  onItemClicked: function(view, model) { //jshint unused: true
+
+  onItemActivated: function(view, model, activationSourceType) { //jshint unused: true
     var modelName = model.get('name');
 
     //stop selectedOrg name from changing if it does not need to
@@ -104,13 +106,24 @@ var MinibarView = Marionette.CollectionView.extend({
       modelName = this.model.get('name');
     }
 
-    this.model.set({
-      panelOpenState:       true,
-      state:                model.get('type'),
-      profileMenuOpenState: false,
-      selectedOrgName:      modelName,
-    });
+    var state = model.get('type');
+    // close-passthrough
+    // Don't change the state when we focus/activate the `close`/toggle icon
+    if(state !== 'close') {
+      this.model.set({
+        panelOpenState:       true,
+        state:                state,
+        profileMenuOpenState: false,
+        selectedOrgName:      modelName,
+        activationSourceType: activationSourceType
+      });
+    }
   },
+
+  onItemKeyboardActivated: function(view, model) { //jshint unused: true
+    this.onItemActivated(view, model, 'keyboard');
+  },
+
 
   onMenuStateUpdate: function() {
     //reset the currently active model

@@ -10,32 +10,29 @@ module.exports = PrimaryCollectionModel.extend({
     this.collection = options.collection;
   },
 
-  onModelChangePreState: function() {
-    var active = false;
+  updateModelActiveState: function() {
+    // We use `collection.models.length` and `collection.length` just to
+    // play nice with proxycollections which don't seem to adjust `.length` appropriately
+    var active = !!this.collection.length && !!this.collection.models.length;
 
     switch (this.roomMenuModel.get('state')) {
-      default:
-        // We use `collection.models.length` vs `collection.length`
-        active = !!this.collection.models.length;
+      case 'search':
+        active = false;
         break;
     }
 
-    // TODO, see why this isn't showing the correct number of filtered favourites in the views
-    console.log('onModelChangePreState', active, this.collection.length, this.collection.models.length, this.collection.models, this);
     this.set('active', active);
   },
 
   onSearch: function(){
     this.set({
-      active: false,
-      header: false,
+      header: false
     });
   },
 
   onFavourite: function(){
     this.set({
-      active: true,
-      header: false,
+      header: false
     });
   }
 
