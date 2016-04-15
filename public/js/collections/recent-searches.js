@@ -20,6 +20,8 @@ var RecentSearchesCollection = Backbone.Collection.extend({
   initialize: function() {
     this.cid = 'left-menu-saved-searches';
     this.fetch();
+
+    this.currentIncrementingModelIndex = 0;
   },
 
   comparator: function(a, b) {
@@ -32,7 +34,9 @@ var RecentSearchesCollection = Backbone.Collection.extend({
 
     if (!model.name) { return; }
 
+    this.currentIncrementingModelIndex += 1;
     model.time = +new Date();
+    model.id = '' + this.currentIncrementingModelIndex + model.time;
     Backbone.Collection.prototype.add.apply(this, arguments);
   },
 

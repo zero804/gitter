@@ -1,17 +1,23 @@
 'use strict';
 
 var Marionette                      = require('backbone.marionette');
+var toggleClass                     = require('utils/toggle-class');
+var cocktail                        = require('cocktail');
+var KeyboardEventMixin              = require('views/keyboard-events-mixin');
 var template                        = require('./base-collection-item-view.hbs');
 var updateUnreadIndicatorClassState = require('../../../../components/menu/update-unread-indicator-class-state');
-var toggleClass                     = require('utils/toggle-class');
 
-module.exports = Marionette.ItemView.extend({
+var BaseCollectionItemView = Marionette.ItemView.extend({
 
   className: 'room-item',
   template:  template,
 
   triggers: {
-    'click': 'item:clicked',
+    'click': 'item:activated',
+  },
+
+  keyboardEvents: {
+    'room-list-item:activate': 'onItemActivated',
   },
 
   modelEvents: {
@@ -56,6 +62,12 @@ module.exports = Marionette.ItemView.extend({
     toggleClass(this.ui.container[0], 'active', !!val);
   },
 
+  onItemActivated: function(e) {
+    this.trigger('item:activated', this);
+    console.log('onItemActivated', this);
+    e.preventDefault();
+  },
+
   onItemFocused: function(model, val) {//jshint unused: true
     toggleClass(this.ui.container[0], 'focus', !!val);
   },
@@ -90,3 +102,9 @@ module.exports = Marionette.ItemView.extend({
   }
 
 });
+
+
+cocktail.mixin(BaseCollectionItemView, KeyboardEventMixin);
+
+
+module.exports = BaseCollectionItemView;

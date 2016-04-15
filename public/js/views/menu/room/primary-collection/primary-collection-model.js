@@ -27,7 +27,7 @@ module.exports = BaseCollectionModel.extend({
         break;
     }
 
-    //console.log('primary-collection-model--updateModelActiveState', active, this.collection.length, this.collection.models.length, this.collection.models, this);
+    console.log('primary-collection-model--updateModelActiveState', active, this.collection.length, this.collection.models.length, this.collection.models, this);
     this.set('active', active);
   },
 

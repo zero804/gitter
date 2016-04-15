@@ -16,7 +16,7 @@ module.exports = Backbone.Model.extend({
 
     this.roomMenuModel = options.roomMenuModel;
     this.listenTo(this.roomMenuModel, 'change:state', this.onModelChangeState, this);
-    this.listenTo(this.roomMenuModel, 'change:view', this.updateModelActiveState, this);
+    this.listenTo(this.roomMenuModel, 'update:collection-active-states', this.updateModelActiveState, this);
     Backbone.Model.prototype.constructor.apply(this, arguments);
 
     this.updateModelActiveState();
