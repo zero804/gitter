@@ -1,4 +1,4 @@
-<div id="room-item__container" class="room-item__container">
+<a href="{{when absoluteRoomUri absoluteRoomUri uri}}" id="room-item__container" class="room-item__container {{#if active}}active{{/if}}">
   {{#if avatarSrcset}}
     <img class="room-item__avatar"
          src="{{ avatarSrcset.src }}"
@@ -7,4 +7,4 @@
          width="{{ avatarSrcset.size }}" />
   {{/if}}
   <h2 class="room-item__title">{{name}}</h2>
-</div>
+</a>

@@ -2,6 +2,7 @@
 
 var _                        = require('underscore');
 var escapeStringRegexp       = require('escape-string-regexp');
+var urlJoin                 = require('url-join');
 var resolveRoomAvatarSrcSet  = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 var roomNameShortener        = require('../room-name-shortener');
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
@@ -11,6 +12,10 @@ var AVATAR_SIZE = 22;
 module.exports = function parseContentToTemplateData(data, state) {
   data.name = (data.name || data.uri || '');
 
+  if(data.isSuggestion) {
+    data.uri = urlJoin(data.uri, '?source=suggested-menu');
+  }
+
   //For user results
   if (data.displayName) {
     return _.extend({}, {
@@ -19,8 +24,13 @@ module.exports = function parseContentToTemplateData(data, state) {
     });
   }
 
-  if(data.isSearchRepoResult) {
+  if(data.isRecentSearch || data.isSearchRepoResult) {
     var avatarSrcset = resolveRoomAvatarSrcSet({ uri: data.name }, AVATAR_SIZE);
+    // No avatars on recent searches
+    if(data.isRecentSearch) {
+      avatarSrcset = null;
+    }
+
     return _.extend({}, {
       name:         roomNameShortener(data.name),
       avatarSrcset: avatarSrcset,

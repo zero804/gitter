@@ -19,6 +19,7 @@ module.exports = Marionette.CompositeView.extend({
       index:     index,
       menuState: this.roomMenuModel.get('state'),
       roomMenuModel: this.roomMenuModel,
+      isSuggestion: this.model.get('isSuggestion')
     };
   },
 
