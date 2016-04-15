@@ -81,6 +81,27 @@ describe("user-settings-muxer", function() {
             assert.strictEqual(result.unread_notifications_optout, true);
           });
       });
+
+      it('should not blat existing settings', function() {
+        var user1 = fixture.user1;
+        assert(user1);
+        return userSettingsMuxer.updateSettings(user1, {
+            lang: 'gr',
+            leftRoomMenu: { a: 2 }
+          })
+          .then(function() {
+            return userSettingsMuxer.updateSettings(user1, { lang: 'de' });
+          })
+          .then(function() {
+            return userSettingsMuxer.getSettings(user1, ['lang', 'leftRoomMenu']);
+          })
+          .then(function(result) {
+            assert.deepEqual(result, {
+              lang: 'de',
+              leftRoomMenu: { a: 2 }
+            })
+          })
+      });
     });
 
 
