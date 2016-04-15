@@ -66,16 +66,20 @@ var PrimaryCollectionView = BaseCollectionView.extend({
   },
 
   onSearchTermChange: function() {
-    if(this.roomMenuModel.get('state') === 'search'){
-      if (!!this.roomMenuModel.get('searchTerm')) {
-        this.ui.searchHeader[0].classList.remove('hidden');
+    // Other collections can extend this view so we
+    // guard against someone who doesn't have the searchHeader
+    if(this.ui.searchHeader.length) {
+      if(this.roomMenuModel.get('state') === 'search') {
+        if (!!this.roomMenuModel.get('searchTerm')) {
+          this.ui.searchHeader[0].classList.remove('hidden');
+        }
+        else {
+          this.ui.searchHeader[0].classList.add('hidden');
+        }
       }
       else {
         this.ui.searchHeader[0].classList.add('hidden');
       }
-    }
-    else {
-      this.ui.searchHeader[0].classList.add('hidden');
     }
   },
 

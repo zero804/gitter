@@ -133,8 +133,8 @@ var PanelView = Marionette.LayoutView.extend({
     //Sadly the favourite collection needs to be generated here rather than the room-menu-model
     //because it has a dependency on the dnd-controller JP 1/4/16
     this.favCollection = new FilteredFavouriteRoomCollection({
-      roomModel:  this.model,
       collection: this.model._roomCollection,
+      roomModel:  this.model,
       dndCtrl:    this.dndCtrl,
     });
 
@@ -142,7 +142,10 @@ var PanelView = Marionette.LayoutView.extend({
       collection: this.favCollection,
       roomMenuModel: this.model
     });
-    this.primaryCollectionModel = new PrimaryCollectionModel(null, { roomMenuModel: this.model });
+    this.primaryCollectionModel = new PrimaryCollectionModel(null, {
+      collection: this.model.primaryCollection,
+      roomMenuModel: this.model
+    });
     this.secondaryCollectionModel = new SecondaryCollectionModel({}, {
       collection: this.model.secondaryCollection,
       roomMenuModel: this.model

@@ -79,7 +79,7 @@ module.exports =  Marionette.ItemView.extend({
 
 
   onItemClicked: function() {
-    this.trigger('minibar-item:clicked', this.model);
+    this.trigger('minibar-item:activated', this.model);
   },
 
   onActiveStateUpdate: function(model, val) { //jshint unused: true
@@ -106,6 +106,7 @@ module.exports =  Marionette.ItemView.extend({
     console.log('focusMinibarItem', this);
     this.ui.minibarButton.focus();
     this.ui.minibarButton.addClass('focus');
+    this.trigger('minibar-item:keyboard-activated', this.model);
   },
 
   blurItem: function() {

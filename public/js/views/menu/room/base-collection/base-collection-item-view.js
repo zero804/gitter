@@ -52,6 +52,7 @@ module.exports = Marionette.ItemView.extend({
   },
 
   onActiveChange: function(model, val) { //jshint unused: true
+    console.log('base-collection-item-view--onActiveChange', val);
     toggleClass(this.ui.container[0], 'active', !!val);
   },
 

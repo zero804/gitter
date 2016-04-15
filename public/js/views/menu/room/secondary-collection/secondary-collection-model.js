@@ -9,23 +9,25 @@ module.exports = BaseCollectionModel.extend({
     BaseCollectionModel.prototype.constructor.apply(this, arguments);
     this.collection = options.collection;
 
-    this.listenTo(this.roomMenuModel, 'change:searchTerm', this.onModelChangePreState, this);
+    this.listenTo(this.roomMenuModel, 'change:searchTerm', this.updateModelActiveState, this);
   },
 
-  onModelChangePreState: function() {
-    var active = false;
+  updateModelActiveState: function() {
+    // We use `collection.models.length` and `collection.length` just to
+    // play nice with proxycollections which don't seem to adjust `.length` appropriately
+    var active = !!this.collection.length && !!this.collection.models.length;
 
     switch (this.roomMenuModel.get('state')){
       case 'all':
-        active = this.collection.length > 0;
+        active = !!this.collection.length && !this.roomMenuModel.get('hasDismissedSuggestions');
         break;
 
       case 'search':
-        active = this.roomMenuModel.get('searchTerm');
+        active = !!this.roomMenuModel.get('searchTerm');
         break;
 
-      default:
-        active = this.collection.length;
+      case 'favourite':
+        active = !!this.collection.length && !this.roomMenuModel.get('hasDismissedSuggestions');
         break;
     }
 
@@ -35,7 +37,6 @@ module.exports = BaseCollectionModel.extend({
   onAll: function() {
     this.set({
       header:       'Your Suggestions',
-      active:       !this.roomMenuModel.get('hasDismissedSuggestions'),
       isSuggestion: true,
     });
   },
@@ -43,7 +44,6 @@ module.exports = BaseCollectionModel.extend({
   onSearch: function() {
     this.set({
       header: 'Chat Messages',
-      active: true,
       isSuggestion: false,
     });
   },
@@ -51,7 +51,6 @@ module.exports = BaseCollectionModel.extend({
   onFavourite: function(){
     this.set({
       header:       'Your Suggestions',
-      active:       !this.roomMenuModel.get('hasDismissedSuggestions'),
       isSuggestion: true,
     });
   },
@@ -59,7 +58,6 @@ module.exports = BaseCollectionModel.extend({
   onOrg: function() {
     this.set({
       header:       'All Rooms',
-      active:       true,
       isSuggestion: false,
     });
   },
@@ -67,7 +65,6 @@ module.exports = BaseCollectionModel.extend({
   onDefault: function() {
     this.set({
       header:       false,
-      active:       false,
       isSuggestion: false,
     });
   },

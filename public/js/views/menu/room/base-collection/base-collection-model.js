@@ -10,20 +10,20 @@ module.exports = Backbone.Model.extend({
   },
 
   constructor: function(attrs, options) { //jshint unused: true
-
     if (!options || !options.roomMenuModel) {
       throw new Error('A valid instance of roomMenuModel must be passed to a new instance of BaseCollectionModel');
     }
 
     this.roomMenuModel = options.roomMenuModel;
     this.listenTo(this.roomMenuModel, 'change:state', this.onModelChangeState, this);
-    this.listenTo(this.roomMenuModel, 'change:state:pre', this.onModelChangePreState, this);
+    this.listenTo(this.roomMenuModel, 'change:view', this.updateModelActiveState, this);
     Backbone.Model.prototype.constructor.apply(this, arguments);
 
+    this.updateModelActiveState();
     this.onModelChangeState(this.roomMenuModel, this.roomMenuModel.get('state'));
   },
 
-  onModelChangePreState: function() {
+  updateModelActiveState: function() {
 
   },
 

@@ -40,7 +40,12 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
     this.navigableCollectionItemsMap[mapKey] = (this.navigableCollectionItemsMap[mapKey] || []).concat(newNavigableCollectionItems);
 
     newNavigableCollectionItems.forEach(function(collectionItem) {
-      this.listenTo(collectionItem.collection, 'update', this.startNavigation.bind(this, null, mapKey, true));
+      this.listenTo(collectionItem.collection, 'change:active', function(model) {
+        // Set a new current reference when we find a new active model
+        if(model.get('active')) {
+          this.startNavigation(null, mapKey, true);
+        }
+      });
     }.bind(this));
   },
 
@@ -81,7 +86,7 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
       // Find our resultant
       var getActiveCb = (potentialNextCollectionItem.getActive || function() { return true; });
       if(getActiveCb()) {
-        // Strap on an index for bookmarking our place later on
+        // Strap on an index for referencing our current spot
         return _.extend({}, potentialNextCollectionItem, {
           index: nextIndex
         });
@@ -119,10 +124,13 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
     if(shouldGoToActive) {
       // Find the first active item
       // This will ensure we start from where the user is currently is
-      this.navigableCollectionItemsMap[mapKey].some(function(collectionItem) {
+      this.navigableCollectionItemsMap[mapKey].some(function(collectionItem, index) {
         var activeModel = collectionItem.collection.findWhere({ active: true });
         if(activeModel) {
-          startNavigableCollectionItem = collectionItem;
+          // Strap on an index for referencing our current spot
+          startNavigableCollectionItem = _.extend({}, collectionItem, {
+            index: index
+          });
           startModel = activeModel;
           // break
           return true;
@@ -131,6 +139,7 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
     }
     else {
       // Find the first item in the first active collection
+      // Items from `findNextActiveNavigableCollection` already have `index`
       startNavigableCollectionItem = this.findNextActiveNavigableCollection(this.navigableCollectionItemsMap[mapKey], -1, 1);
       startModel = startNavigableCollectionItem.collection.at(0);
     }
@@ -144,6 +153,7 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
         navigableItemIndex: startNavigableCollectionItem.index,
         modelId: startModel.id
       };
+      console.log('new current reference:', this.currentNavigableItemReference);
       startModel.trigger(FOCUS_EVENT);
     }
   },
@@ -178,7 +188,7 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
         // Default to the first model in the collection
         collectionItemForActiveModel.collection.models[0];
 
-      //console.log('--');
+      console.log('--');
 
 
       if(activeModel) {
@@ -212,7 +222,7 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
         // Find the next model in the right collection
         var collectionItemWithNextModel = collectionItemForActiveModel;
         var nextInDirectionIndex = activeIndex + dir;
-        //console.log('lb', nextInDirectionIndex, activeIndex, collectionItemWithNextModel.collection.length);
+        console.log('lb', nextInDirectionIndex, activeIndex, collectionItemWithNextModel.collection.length);
         if(dir > 0 && nextInDirectionIndex >= collectionItemForActiveModel.collection.models.length) {
           collectionItemWithNextModel = nextCollectionItem;
           nextInDirectionIndex = 0;
@@ -221,7 +231,7 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
           collectionItemWithNextModel = nextCollectionItem;
           nextInDirectionIndex = collectionItemWithNextModel.collection.models.length - 1;
         }
-        //console.log('la', nextInDirectionIndex, activeIndex, collectionItemWithNextModel.collection.length);
+        console.log('la', nextInDirectionIndex, activeIndex, collectionItemWithNextModel.collection.length);
 
         // We use `collection.models[x]` vs `collection.at(x)` because the ProxyCollection doesn't update the index
         var nextInDirectionModel = collectionItemWithNextModel.collection.models[nextInDirectionIndex];
