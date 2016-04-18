@@ -219,7 +219,10 @@ module.exports = Backbone.Model.extend({
     //save
     if (method === 'create' || method === 'update' || method === 'patch') {
       attrs = JSON.stringify(this);
-      return apiClient.user.put('/settings/leftRoomMenu', this.toJSON())
+      return apiClient.user.put('/settings/leftRoomMenu', this.toJSON(), {
+          // No need to get the JSON back from the server...
+          dataType: 'text'
+        })
         .then(function() { if (options.success) options.success.apply(self, arguments); })
         .catch(function(err) { if (options.error) options.error(err); });
     }
