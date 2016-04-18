@@ -42,8 +42,10 @@ JP 11/2/16
   }
 
   &.active,
-  &.focus {
+  &.focus,
+  &:focus {
     .room-item-active();
+    outline: none;
   }
 
   &:hover {
