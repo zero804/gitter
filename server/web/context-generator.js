@@ -131,7 +131,8 @@ function serializeTroupeId(troupeId, user) {
     currentUserId: user ? user.id : null,
     currentUser: user,
     includePermissions: true,
-    includeOwner: true
+    includeOwner: true,
+    includeProviders: true
   });
 
   return restSerializer.serializeObject(troupeId, strategy);

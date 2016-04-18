@@ -26,23 +26,28 @@ module.exports = function resourceRoute(routeIdentifier, resource) {
     });
   }
 
+  function defaultRespond(req, res, responseBody) {
+    if (responseBody === undefined) {
+      res.sendStatus(200);
+    } else {
+      res.send(responseBody);
+    }
+  }
+
   function mount(method, url, methodName) {
     var promiseImpl = resource[methodName];
     if (!promiseImpl) return;
 
     promiseImpl = Promise.method(promiseImpl);
 
+    var responder = resource.respond || defaultRespond;
+
     router[method](url,
       identifyRoute(routeIdentifier + '-' + methodName),
       function(req, res, next) {
         return promiseImpl(req, res)
           .then(function(response) {
-            if (response === undefined) {
-              res.sendStatus(200);
-            } else {
-              res.send(response);
-            }
-
+            responder(req, res, response);
             return null;
           })
           .catch(next);
