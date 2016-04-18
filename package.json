@@ -109,7 +109,6 @@
     "request-extensible": "^0.1.1",
     "request-http-cache": "^1.0.1",
     "response-time": "^2.3.1",
-    "rx": "^4.0.8",
     "sanitizer": "0.0.15",
     "scriptjs": "^2.5.7",
     "sechash": "0.1.3",

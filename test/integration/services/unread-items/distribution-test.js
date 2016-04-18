@@ -7,9 +7,8 @@ var assert = require('assert');
 var MODES = roomMembershipFlags.MODES;
 
 function assertIteratorDeepEqual(iterator, expected) {
-  iterator.toArray().forEach(function(array) {
-    assert.deepEqual(array, expected);
-  });
+  var actual = iterator.toArray();
+  assert.deepEqual(actual, expected);
 }
 
 describe('distribution', function() {
