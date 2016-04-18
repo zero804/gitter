@@ -1,5 +1,6 @@
 "use strict";
 
+var _                     = require('lodash');
 var persistence           = require('./persistence-service');
 var assert                = require("assert");
 var mongoUtils            = require("../utils/mongo-utils");
@@ -116,11 +117,37 @@ function toggleSearchIndexing(user, troupe, bool) {
     });
 }
 
+function updateProviders(user, room, providers) {
+  var isStaff = user.get('staff');
+
+  return (isStaff ? Promise.resolve(true) : roomPermissionsModel(user, 'admin', room))
+    .then(function(access) {
+      if (!access) throw new StatusError(403); /* Forbidden */
+
+      // strictly validate the list of providers
+      var filtered = _.uniq(providers.filter(function(provider) {
+        // only github is allowed for now
+        return (provider == 'github');
+      }));
+
+      if (filtered.length) {
+        room.providers = filtered;
+      } else {
+        room.providers = undefined;
+      }
+
+      return room.save()
+        .then(function() {
+          return room;
+        });
+    });
+}
+
 function updateTags(user, room, tags) {
   var reservedTagTestRegex = (/:/);
   var isStaff = user.get('staff');
 
-  return Promise.resolve(isStaff || roomPermissionsModel(user, 'admin', room))
+  return (isStaff ? Promise.resolve(true) : roomPermissionsModel(user, 'admin', room))
     .then(function(access) {
       if(!access) throw new StatusError(403); /* Forbidden */
 
@@ -187,5 +214,6 @@ module.exports = {
   toggleSearchIndexing: toggleSearchIndexing,
   checkGitHubTypeForUri: checkGitHubTypeForUri,
   findChildRoomsForOrg: findChildRoomsForOrg,
+  updateProviders: updateProviders,
   updateTags: updateTags
 };

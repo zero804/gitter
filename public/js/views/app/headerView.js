@@ -1,3 +1,4 @@
+/* jshint maxcomplexity:16 */
 'use strict';
 var _                        = require('underscore');
 var context                  = require('utils/context');
@@ -203,10 +204,10 @@ var HeaderView = Marionette.ItemView.extend({
         }
 
         if (isStaff || isAdmin) {
-          menuItems.push({ title: 'Edit tags', href: '#tags/' + context().troupe.id });
+          menuItems.push({ title: 'Tags', href: '#tags' });
+          menuItems.push({ title: 'Settings', href: '#settings' });
+          menuItems.push({ divider: true });
         }
-
-        menuItems.push({ divider: true });
 
         menuItems.push({ title: 'Archives', href: url + '/archives/all', target: '_blank'});
 
@@ -214,7 +215,9 @@ var HeaderView = Marionette.ItemView.extend({
           menuItems.push({ title: 'Open in GitHub', href: 'https://www.github.com' + url, target: '_blank' });
         }
 
-        menuItems.push({ divider: true });
+        if (isAdmin || isRoomMember) {
+          menuItems.push({ divider: true });
+        }
 
         if (isAdmin) {
           menuItems.push({ title: 'Delete this room', href: '#delete' });

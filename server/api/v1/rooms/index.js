@@ -48,7 +48,8 @@ module.exports = {
   show: function(req) {
     var strategy = new restSerializer.TroupeIdStrategy({
       currentUserId: req.user && req.user.id,
-      includeTags: true
+      includeTags: true,
+      includeProviders: true
     });
 
     return restSerializer.serializeObject(req.params.troupeId, strategy);
@@ -95,6 +96,10 @@ module.exports = {
           promises.push(troupeService.updateTopic(req.user, troupe, updatedTroupe.topic));
         }
 
+        if(updatedTroupe.hasOwnProperty('providers')) {
+          promises.push(troupeService.updateProviders(req.user, troupe, updatedTroupe.providers));
+        }
+
         if(updatedTroupe.hasOwnProperty('noindex')) {
           promises.push(troupeService.toggleSearchIndexing(req.user, troupe, updatedTroupe.noindex));
         }
@@ -106,7 +111,10 @@ module.exports = {
         return Promise.all(promises);
       })
       .then(function() {
-        var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: req.user.id });
+        var strategy = new restSerializer.TroupeIdStrategy({
+          currentUserId: req.user.id,
+          includeProviders: true
+        });
 
         return restSerializer.serializeObject(req.params.troupeId, strategy);
       });

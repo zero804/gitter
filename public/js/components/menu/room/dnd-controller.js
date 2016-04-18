@@ -77,12 +77,23 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
   },
 
   onCancel: function (el, container, source){
-    //If a room item is the only item in the favourite list when dragging begins
-    //and that room is dropped at the bottom of the list dragula thinks this is a cancellation event
-    //so we check here if the item is dropped on favourites from favourites
-    //if so we treat it as adding a favourite which assigns it to the end of the list
+    //If an el is dropped at the beginning or end of the list and it was already at that position
+    //a cancel event is fired. In that case we need to ensure we add in the first/last position
+    var position;
+    var containerFirstChild = container.children[0];
+    if(!!containerFirstChild && containerFirstChild.classList.contains('gu-transit')) {
+      position = 'first';
+    }
+
+    if(!position) {
+      var containerLastChild = container.children[container.children.length - 1];
+      if(!!containerLastChild && containerLastChild.classList.contains('gui-transit')) {
+        position = 'last';
+      }
+    }
+
     if(container.classList.contains('collection-list--favourite') &&  container === source) {
-      this.trigger('room-menu:add-favourite', el.dataset.id);
+      this.trigger('room-menu:sort-favourite', el.dataset.id, null, position);
     }
   },
 

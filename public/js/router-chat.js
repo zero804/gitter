@@ -248,7 +248,8 @@ onready(function() {
       'keys': 'keys',
       'integrations': 'integrations',
       'add': 'addPeople',
-      'tags/:roomId': 'editTags',
+      'settings': 'settings',
+      'tags': 'editTags',
       'autojoin': 'autojoin',
       'notification-defaults': 'notificationDefaults'
     },
@@ -314,6 +315,13 @@ onready(function() {
         }
       });
 
+    },
+
+    settings: function() {
+      require.ensure(['views/modals/room-settings-view'], function(require) {
+        var RoomSettingsModal = require('views/modals/room-settings-view');
+        appView.dialogRegion.show(new RoomSettingsModal({ model: context.troupe() }));
+      });
     },
 
     editTags: function() {
