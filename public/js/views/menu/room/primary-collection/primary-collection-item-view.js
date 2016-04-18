@@ -35,6 +35,8 @@ module.exports = BaseCollectionItemView.extend({
   },
 
   initialize: function() {
+    BaseCollectionItemView.prototype.initialize.apply(this, arguments);
+
     this.uiModel = new Backbone.Model({ menuIsOpen: false });
     this.listenTo(this.uiModel, 'change:menuIsOpen', this.onModelToggleMenu, this);
   },

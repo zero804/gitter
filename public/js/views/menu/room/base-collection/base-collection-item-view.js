@@ -58,14 +58,14 @@ var BaseCollectionItemView = Marionette.ItemView.extend({
   },
 
   onActiveChange: function(model, val) { //jshint unused: true
-    console.log('base-collection-item-view--onActiveChange', val);
     toggleClass(this.ui.container[0], 'active', !!val);
   },
 
   onItemActivated: function(e) {
-    this.trigger('item:activated', this);
-    console.log('onItemActivated', this);
-    e.preventDefault();
+    if(e.target === this.ui.container[0]) {
+      this.trigger('item:activated', this);
+      e.preventDefault();
+    }
   },
 
   onItemFocused: function(model, val) {//jshint unused: true
