@@ -3,6 +3,7 @@
 var Observable = require('rx').Observable;
 var roomMembershipFlags = require('../room-membership-flags');
 var _ = require('lodash');
+var assert = require('assert');
 
 function isConnected(memberDetail) {
   var status = memberDetail.presence;
@@ -61,7 +62,10 @@ function processMemberDetails(membersDetails, mentions, presence, nonMemberMenti
 }
 
 function Distribution(options) {
+  assert(options.membersWithFlags, 'membersWithFlags option required');
+
   var membersDetails = processMemberDetails(options.membersWithFlags, options.mentions, options.presence, options.nonMemberMentions);
+
   this._membersDetails = Observable.from(membersDetails);
   this._announcement = options.announcement || false;
 }
