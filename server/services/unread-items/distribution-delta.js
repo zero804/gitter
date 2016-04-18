@@ -44,11 +44,10 @@ function generateMentionDeltaSet(newNotifyUserIds, newMentionUserIds, originalMe
 }
 
 function deltaDistributions(newDistribution, originalDistribution) {
-  return Promise.join(
-    newDistribution.getEngineNotifyList().toArray().toPromise(Promise),
-    newDistribution.getEngineMentionList().toArray().toPromise(Promise),
-    originalDistribution.getEngineMentionList().toArray().toPromise(Promise),
-    generateMentionDeltaSet);
+  var newNotifyUserIds = newDistribution.getEngineNotifyList().toArray();
+  var newMentionUserIds = newDistribution.getEngineMentionList().toArray();
+  var originalMentions = originalDistribution.getEngineMentionList().toArray();
+  return generateMentionDeltaSet(newNotifyUserIds, newMentionUserIds, originalMentions);
 }
 
 function createDelta(fromUserId, troupe, newMentions, originalMentions) {

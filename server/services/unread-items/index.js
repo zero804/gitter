@@ -254,6 +254,12 @@ function getTroupeIdsCausingBadgeCount(userId) {
   return engine.getRoomsCausingBadgeCount(userId);
 }
 
+function withSequence(sequence, callback) {
+  if (sequence.isEmpty()) return;
+  var array = sequence.toArray();
+  return callback(array);
+}
+
 function processResultsForNewItemWithMentions(troupeId, chatId, distribution, results, isEdit) {
   debug("distributing chat notification to users");
 
@@ -289,27 +295,17 @@ function processResultsForNewItemWithMentions(troupeId, chatId, distribution, re
   if (!isEdit) {
     // Next notify all the users currently online but not in this room who
     // will receive desktop notifications
-    distribution.getWebNotifications()
-      .toArray()
-      .forEach(function(userIds) {
-        if (!userIds.length) return;
-        appEvents.newOnlineNotification(troupeId, chatId, userIds);
-      });
+    withSequence(distribution.getWebNotifications(), function(userIds) {
+      appEvents.newOnlineNotification(troupeId, chatId, userIds);
+    });
 
-    distribution.getPushCandidatesWithoutMention()
-      .toArray()
-      .forEach(function(userIds) {
-        if (!userIds.length) return;
+    withSequence(distribution.getPushCandidatesWithoutMention(), function(userIds) {
+      appEvents.newPushNotificationForChat(troupeId, chatId, userIds, false);
+    });
 
-        appEvents.newPushNotificationForChat(troupeId, chatId, userIds, false);
-      });
-
-    distribution.getPushCandidatesWithMention()
-      .toArray()
-      .forEach(function(userIds) {
-        if (!userIds.length) return;
-        appEvents.newPushNotificationForChat(troupeId, chatId, userIds, true);
-      });
+    withSequence(distribution.getPushCandidatesWithMention(), function(userIds) {
+      appEvents.newPushNotificationForChat(troupeId, chatId, userIds, true);
+    });
 
     // Next, notify all the lurkers
     // Note that this can be a very long list in a big room
@@ -320,13 +316,9 @@ function processResultsForNewItemWithMentions(troupeId, chatId, distribution, re
 
   }
 
-  /* Do we need to send the user a badge update? */
-  resultsDistribution.getBadgeUpdates()
-    .toArray()
-    .forEach(function(userIds) {
-      if (!userIds.length) return;
-      queueBadgeUpdateForUser(userIds);
-    });
+  withSequence(resultsDistribution.getBadgeUpdates(), function(userIds) {
+    queueBadgeUpdateForUser(userIds);
+  });
 
   debug("distribution of chat notification to users completed");
   return null;
@@ -335,16 +327,12 @@ function processResultsForNewItemWithMentions(troupeId, chatId, distribution, re
 function createChatUnreadItems(fromUserId, troupe, chat) {
   return createDistribution(fromUserId, troupe, chat.mentions)
     .then(function(distribution) {
-      // TODO: newItemWithMentions should take a distribution
-      return Promise.join(
-        distribution.getEngineNotifyList().toArray().toPromise(Promise),
-        distribution.getEngineMentionList().toArray().toPromise(Promise),
-        function(notifyUserIds, mentionUserIds) {
-          return engine.newItemWithMentions(troupe.id, chat.id, notifyUserIds, mentionUserIds);
-        })
+      var notifyUserIds = distribution.getEngineNotifyList().toArray();
+      var mentionUserIds = distribution.getEngineMentionList().toArray();
+
+      return engine.newItemWithMentions(troupe.id, chat.id, notifyUserIds, mentionUserIds)
         .then(function(results) {
-          processResultsForNewItemWithMentions(troupe.id, chat.id, distribution, results, false);
-          return null;
+          return processResultsForNewItemWithMentions(troupe.id, chat.id, distribution, results, false);
         });
     });
 }
@@ -395,7 +383,7 @@ function updateChatUnreadItems(fromUserId, troupe, chat, originalMentions) {
       var delta = this.delta;
       var distribution = this.newDistribution;
 
-      if (!delta.addNotify.length) return;
+      if (!delta.addNotify.length) return null;
 
       // Add additional mentions
       return engine.newItemWithMentions(troupeId, chatId, delta.addNotify, delta.addMentions)

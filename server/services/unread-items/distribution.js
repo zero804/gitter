@@ -1,6 +1,6 @@
 'use strict';
 
-var Observable = require('rx').Observable;
+var lazy = require('lazy.js');
 var roomMembershipFlags = require('../room-membership-flags');
 var _ = require('lodash');
 var assert = require('assert');
@@ -65,8 +65,7 @@ function Distribution(options) {
   assert(options.membersWithFlags, 'membersWithFlags option required');
 
   var membersDetails = processMemberDetails(options.membersWithFlags, options.mentions, options.presence, options.nonMemberMentions);
-
-  this._membersDetails = Observable.from(membersDetails);
+  this._membersDetails = lazy(membersDetails);
   this._announcement = options.announcement || false;
 }
 
