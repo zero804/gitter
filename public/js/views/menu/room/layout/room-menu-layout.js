@@ -16,7 +16,6 @@ var KeyboardEventMixin = require('views/keyboard-events-mixin');
 var KeyboardControllerView = require('./keyboard-controller-view');
 
 var MINIBAR_ITEM_HEIGHT = 65;
-var MENU_HIDE_DELAY = 200;
 
 require('nanoscroller');
 require('views/behaviors/isomorphic');
@@ -30,7 +29,7 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
       panel: { el: '#room-menu__panel', init: 'initMenuPanel' },
     },
   },
-  
+
   initMiniBar: function(optionsForRegion) {
     return new MiniBarView(optionsForRegion({
       model:          this.model,

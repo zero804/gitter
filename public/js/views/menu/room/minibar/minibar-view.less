@@ -231,11 +231,6 @@
     outline: none;
   }
 
-  &:before {
-     .sudo-panel();
-     background-color: currentColor;
-  }
-
   &.active,
   &.focus,
   &.dragging,
@@ -247,6 +242,11 @@
     &:before {
       transform: translateX(0);
     }
+  }
+
+  &:before {
+     .sudo-panel();
+     background-color: currentColor;
   }
 }
 

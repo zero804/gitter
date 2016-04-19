@@ -82,10 +82,10 @@ module.exports =  Marionette.ItemView.extend({
     this.trigger('minibar-item:activated', this.model);
   },
 
-  onActiveStateUpdate: function() { //jshint unused: true
-    var val = this.model.get('active');
-    toggleClass(this.el, 'active', !!val);
-    toggleClass(this.ui.minibarButton[0], 'focus', !!val);
+  onActiveStateUpdate: function() {
+    var isActive = !!this.model.get('active');
+    toggleClass(this.el, 'active', isActive);
+    toggleClass(this.ui.minibarButton[0], 'focus', isActive);
   },
 
   onUnreadUpdate: function() {

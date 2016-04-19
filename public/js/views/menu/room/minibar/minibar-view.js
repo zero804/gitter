@@ -116,7 +116,6 @@ var MinibarView = Marionette.CollectionView.extend({
     // close-passthrough
     // Don't change the state when we focus/activate the `close`/toggle icon
     if(state !== 'close') {
-      /* */
       this.model.set({
         panelOpenState:       true,
         state:                state,
@@ -124,13 +123,12 @@ var MinibarView = Marionette.CollectionView.extend({
         selectedOrgName:      modelName,
         activationSourceType: activationSourceType
       });
-      /* */
     }
   },
 
   onItemKeyboardActivated: function(view, model) { //jshint unused: true
-    // Arbitrary number based on when we can't render "instantly".
-    // We don't want to delay because majority of users won't run into this issues
+    // Arbitrary threshold based on when we can't render "instantly".
+    // We don't want to delay too much because majority of users won't run into render shortcomings
     // and the delay could cause confusion for screen-reader users not recnogizing when
     // the switch happens
     if(this.roomCollection.length > 50) {

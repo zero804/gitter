@@ -116,7 +116,9 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
     var currentItemReference = this.currentNavigableItemReference;
     if(!isNullOrUndefined(currentItemReference.mapKey) && !isNullOrUndefined(currentItemReference.navigableItemIndex) && !isNullOrUndefined(currentItemReference.modelId)) {
       var currentModel = this.navigableCollectionItemsMap[currentItemReference.mapKey][currentItemReference.navigableItemIndex].collection.get(currentItemReference.modelId);
-      currentModel.trigger(BLUR_EVENT);
+      if(currentModel) {
+        currentModel.trigger(BLUR_EVENT);
+      }
     }
   },
 
