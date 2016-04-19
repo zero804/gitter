@@ -90,13 +90,13 @@ var BaseCollectionItemView = Marionette.ItemView.extend({
   },
 
   focusItem: function() {
-    console.log('focusItem', this);
+    //console.log('focusItem', this);
     this.ui.container.focus();
     this.ui.container.addClass('focus');
   },
 
   blurItem: function() {
-    console.log('blurItem', this);
+    //console.log('blurItem', this);
     this.ui.container.blur();
     this.ui.container.removeClass('focus');
   }
