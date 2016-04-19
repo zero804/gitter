@@ -29,7 +29,16 @@ var MinibarView = Marionette.CollectionView.extend({
       'minibar-' + model.get('type');
 
     var element = this.domMap[selector];
-    return !!element ? { el: element, index: index, model: model } : { index: index, model: model };
+    var opts = {
+      index: index,
+      model: model,
+      roomMenuModel: this.model
+    };
+    if(!!element) {
+      opts.el = element;
+    }
+
+    return opts;
   },
 
   buildChildView: function(model, ViewClass, options) {
