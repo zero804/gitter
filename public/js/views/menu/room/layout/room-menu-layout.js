@@ -163,7 +163,12 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
   },
 
   _initNano: _.debounce(function () {
-    var params = { sliderMaxHeight: 100, iOSNativeScrolling: true };
+    var params = {
+      sliderMaxHeight: 100,
+      iOSNativeScrolling: true,
+      // We don't want the scroll container tabbable
+      tabIndex: 'null'
+    };
     fastdom.mutate(function() {
 
       //init panel && minibar scrollers

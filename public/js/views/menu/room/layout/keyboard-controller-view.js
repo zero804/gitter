@@ -172,12 +172,6 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
     dir = (dir === false) ? -1 : Math.sign(dir);
     var navigableCollectionItems = this.navigableCollectionItemsMap[mapKey];
 
-    // If we the current location reference is different than what we were just told
-    // to navigate. Restart the navigation from the currently active item
-    if(mapKey !== this.currentNavigableItemReference.mapKey) {
-      this.startNavigation(null, mapKey, true);
-    }
-
     var collectionItemForActiveModel = !isNullOrUndefined(this.currentNavigableItemReference.navigableItemIndex) ?
       // Get a collection item for a bookmark (just need to move the index back according to dir and use the nice findNext method)
       this.findNextActiveNavigableCollection(
@@ -278,9 +272,26 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
     return true;
   },
 
+  // Helper to smooth out problems
+  // Kick the current reference into shape
+  // And make sure we should handle the event itself(currently only have to worry about `tab`)
+  shouldHandleEvent: function(e, mapKey) {
+    // If we the current location reference is different than what we were just told
+    // to navigate. Restart the navigation from the currently active item
+    if(
+      mapKey !== this.currentNavigableItemReference.mapKey ||
+      isNullOrUndefined(this.currentNavigableItemReference.navigableItemIndex) ||
+      isNullOrUndefined(this.currentNavigableItemReference.modelId)
+    ) {
+      this.startNavigation(null, mapKey, true);
+    }
+
+    return this.shouldCaptureTabEvent(e);
+  },
+
   // Move to the previous item in the current navigableCollection
   selectPrev: function(e, mapKey) {
-    if(this.shouldCaptureTabEvent(e)) {
+    if(this.shouldHandleEvent(e, mapKey)) {
       this.progressInDirection(-1, mapKey);
       e.preventDefault();
       e.stopPropagation();
@@ -289,7 +300,7 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
 
   // Move to the next item in the current navigableCollection
   selectNext: function(e, mapKey) {
-    if(this.shouldCaptureTabEvent(e)) {
+    if(this.shouldHandleEvent(e, mapKey)) {
       this.progressInDirection(1, mapKey);
       e.preventDefault();
       e.stopPropagation();
