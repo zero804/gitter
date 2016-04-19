@@ -27,6 +27,7 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     searchHeader: '#primary-collection-search-header'
   },
 
+  reorderOnSort: true,
   hasInit: false,
   getEmptyView: function() {
     switch (this.roomMenuModel.get('state')) {
@@ -64,6 +65,10 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     this.listenTo(this.dndCtrl, 'dnd:end-drag', this.onDragEnd, this);
     this.listenTo(this.uiModel, 'change:isDragging', this.onDragStateUpdate, this);
     BaseCollectionView.prototype.initialize.apply(this, arguments);
+
+    this.collection.on('all', function (type){
+      console.log('TYPE ->', type);
+    })
   },
 
   setActive: function() {
