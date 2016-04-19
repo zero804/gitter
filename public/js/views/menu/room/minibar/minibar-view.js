@@ -73,6 +73,12 @@ var MinibarView = Marionette.CollectionView.extend({
       { collection: this.collection }
     ]);
 
+    // For the normal arrowing through
+    // when we have too many rooms to render instantly
+    this.debouncedOnItemActivated = _.debounce(this.onItemActivated, 300);
+    // Just for the quick flicks
+    this.shortDebouncedOnItemActivated = _.debounce(this.onItemActivated, 100);
+
     //Guard against not getting a snapshot
     this.timeout = setTimeout(function() {
       this.onCollectionSnapshot();
@@ -110,6 +116,7 @@ var MinibarView = Marionette.CollectionView.extend({
     // close-passthrough
     // Don't change the state when we focus/activate the `close`/toggle icon
     if(state !== 'close') {
+      /* */
       this.model.set({
         panelOpenState:       true,
         state:                state,
@@ -117,26 +124,25 @@ var MinibarView = Marionette.CollectionView.extend({
         selectedOrgName:      modelName,
         activationSourceType: activationSourceType
       });
+      /* */
     }
   },
 
   onItemKeyboardActivated: function(view, model) { //jshint unused: true
-    this.onItemActivated(view, model, 'keyboard');
+    // Arbitrary number based on when we can't render "instantly".
+    // We don't want to delay because majority of users won't run into this issues
+    // and the delay could cause confusion for screen-reader users not recnogizing when
+    // the switch happens
+    if(this.roomCollection.length > 50) {
+      this.debouncedOnItemActivated(view, model, 'keyboard');
+    }
+    else {
+      this.shortDebouncedOnItemActivated(view, model, 'keyboard');
+    }
   },
 
-
   onMenuStateUpdate: function() {
-    //reset the currently active model
-    var activeModel = this.collection.findWhere({ active: true });
-    if (activeModel) { activeModel.set('active', false); }
-
-    //activate the new model
-    var currentState = this.model.get('state');
-    var nextActiveModel = (currentState !== 'org') ?
-      this.collection.findWhere({ type: currentState }) :
-      this.collection.findWhere({ name: this.model.get('selectedOrgName') });
-
-    if (nextActiveModel) { nextActiveModel.set('active', true);}
+    this.updateMinibarActiveState(this.model.get('state'), this.model.get('selectedOrgName'));
   },
 
   onCloseClicked: function() {
@@ -177,6 +183,24 @@ var MinibarView = Marionette.CollectionView.extend({
     this.stopListening(this.collection);
     this.stopListening(this.model);
     this.stopListening(this.roomCollection);
+  },
+
+
+  updateMinibarActiveState: function(currentState, selectedOrgName) {
+    // Reset the currently active model
+    var activeModel = this.collection.findWhere({ active: true });
+    if (activeModel) {
+      activeModel.set('active', false);
+    }
+
+    // Activate the new model
+    var nextActiveModel = (currentState !== 'org') ?
+      this.collection.findWhere({ type: currentState }) :
+      this.collection.findWhere({ name: selectedOrgName });
+
+    if (nextActiveModel) {
+      nextActiveModel.set('active', true);
+    }
   }
 
 

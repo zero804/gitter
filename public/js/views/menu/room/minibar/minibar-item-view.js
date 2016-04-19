@@ -82,8 +82,10 @@ module.exports =  Marionette.ItemView.extend({
     this.trigger('minibar-item:activated', this.model);
   },
 
-  onActiveStateUpdate: function(model, val) { //jshint unused: true
+  onActiveStateUpdate: function() { //jshint unused: true
+    var val = this.model.get('active');
     toggleClass(this.el, 'active', !!val);
+    toggleClass(this.ui.minibarButton[0], 'focus', !!val);
   },
 
   onUnreadUpdate: function() {
@@ -95,7 +97,7 @@ module.exports =  Marionette.ItemView.extend({
 
   onRender: function() {
     if(!this.firstRender || this.firstRender && this.model.get('roomMenuIsPinned')) {
-      toggleClass(this.el, 'active', !!this.model.get('active'));
+      this.onActiveStateUpdate();
     }
 
     this.firstRender = false;
@@ -105,14 +107,14 @@ module.exports =  Marionette.ItemView.extend({
   focusItem: function() {
     //console.log('focusMinibarItem', this);
     this.ui.minibarButton.focus();
-    this.ui.minibarButton.addClass('focus');
+    toggleClass(this.ui.minibarButton[0], 'focus', true);
     this.trigger('minibar-item:keyboard-activated', this.model);
   },
 
   blurItem: function() {
     //console.log('blurMinibarItem', this);
     this.ui.minibarButton.blur();
-    this.ui.minibarButton.removeClass('focus');
+    toggleClass(this.ui.minibarButton[0], 'focus', false);
   }
 
 });
