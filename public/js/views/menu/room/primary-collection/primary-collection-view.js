@@ -65,10 +65,6 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     this.listenTo(this.dndCtrl, 'dnd:end-drag', this.onDragEnd, this);
     this.listenTo(this.uiModel, 'change:isDragging', this.onDragStateUpdate, this);
     BaseCollectionView.prototype.initialize.apply(this, arguments);
-
-    this.collection.on('all', function (type){
-      console.log('TYPE ->', type);
-    })
   },
 
   setActive: function() {
