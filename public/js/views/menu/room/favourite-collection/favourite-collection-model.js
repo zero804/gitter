@@ -21,7 +21,6 @@ module.exports = PrimaryCollectionModel.extend({
         break;
     }
 
-    //console.log('favourite-collection-model--updateModelActiveState', active, this.collection.length, this.collection.models.length, this.collection.models, this);
     this.set('active', active);
   },
 

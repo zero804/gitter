@@ -18,13 +18,6 @@ module.exports = BaseCollectionModel.extend({
     var defaultActive = !!this.collection.length && !!this.collection.models.length;
     var active = defaultActive;
 
-    /* * /
-    console.log('secondary--updateModelActiveState', this.collection.length, this.collection.models.length, this.collection.models);
-    setTimeout(function() {
-        console.log('delayed secondary--updateModelActiveState', this.collection.length, this.collection.models.length, this.collection.models);
-    }.bind(this), 100);
-    /* */
-
     switch (this.roomMenuModel.get('state')){
       case 'all':
         active = defaultActive && !this.roomMenuModel.get('hasDismissedSuggestions');

@@ -4,6 +4,7 @@ var Marionette                      = require('backbone.marionette');
 var toggleClass                     = require('utils/toggle-class');
 var cocktail                        = require('cocktail');
 var KeyboardEventMixin              = require('views/keyboard-events-mixin');
+var toggleClass                     = require('utils/toggle-class');
 var template                        = require('./base-collection-item-view.hbs');
 var updateUnreadIndicatorClassState = require('../../../../components/menu/update-unread-indicator-class-state');
 
@@ -90,15 +91,13 @@ var BaseCollectionItemView = Marionette.ItemView.extend({
   },
 
   focusItem: function() {
-    //console.log('focusItem', this);
     this.ui.container.focus();
-    this.ui.container.addClass('focus');
+    toggleClass(this.ui.container[0], 'focus', true);
   },
 
   blurItem: function() {
-    //console.log('blurItem', this);
     this.ui.container.blur();
-    this.ui.container.removeClass('focus');
+    toggleClass(this.ui.container[0], 'focus', false);
   }
 
 });

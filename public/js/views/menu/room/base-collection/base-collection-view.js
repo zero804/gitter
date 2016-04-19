@@ -97,7 +97,6 @@ module.exports = Marionette.CompositeView.extend({
   },
 
   setActive: function () {
-    //console.log('setActive', this.el, this.model.get('active'));
     toggleClass(this.el, 'active', this.model.get('active'));
   },
 
