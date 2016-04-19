@@ -14,7 +14,6 @@ Prerequisites
 * node.js 0.10+ `brew install node`
 * [Virtualbox](https://www.virtualbox.org/wiki/Downloads)
 * [Kitematic](https://kitematic.com/) or `boot2docker` if you prefer
-*
 
 Getting Started
 ---------------
