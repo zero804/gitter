@@ -63,6 +63,7 @@ var BaseCollectionItemView = Marionette.ItemView.extend({
   },
 
   onItemActivated: function(e) {
+    // Check to make sure the keyboard event was even spawned from this view
     if(e.target === this.ui.container[0]) {
       this.trigger('item:activated', this);
       e.preventDefault();

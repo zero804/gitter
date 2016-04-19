@@ -165,20 +165,17 @@ var PanelView = Marionette.LayoutView.extend({
         getActive: function() {
           return this.favouriteCollectionModel.get('active');
         }.bind(this)
-      },
-      {
+      }, {
         collection: this.model.primaryCollection,
         getActive: function() {
           return  this.primaryCollectionModel.get('active');
         }.bind(this)
-      },
-      {
+      }, {
         collection: this.model.secondaryCollection,
         getActive: function() {
           return  this.secondaryCollectionModel.get('active');
         }.bind(this)
-      },
-      {
+      }, {
         collection: this.model.tertiaryCollection,
         getActive: function() {
           return  this.tertiaryCollectionModel.get('active');
