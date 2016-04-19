@@ -1,24 +1,11 @@
 'use strict';
 
-var _                        = require('underscore');
-var getOrgNameFromTroupeName = require('../get-org-name-from-troupe-name.js');
+var _                            = require('underscore');
+var getOrgNameFromTroupeName     = require('../get-org-name-from-troupe-name');
 
 module.exports = function parseLeftMenuTroupeContext(req, troupeContext, orgs, minibarOrgList) {
 
-  var currentLeftMenuState    = (troupeContext.leftRoomMenuState || {});
-  var currentlySelectedOrg    = !!req.troupe ? getOrgNameFromTroupeName(req.troupe.uri) : currentLeftMenuState.selectedOrgName;
-  var currentRoomIsInRoomList = !!_.findWhere(orgs, { name: currentlySelectedOrg });
-
-  if(currentRoomIsInRoomList) { currentLeftMenuState.state = 'org' }
-
-  //In the case where we are viewing an room which belongs to an org we have not joined
-  //we neeed to set the menu state to org and select that org item JP 8/3/16
-  var temporaryOrg   = _.findWhere(minibarOrgList, { temp: true });
-
-  if(temporaryOrg) {
-    currentLeftMenuState.state = 'org';
-    currentlySelectedOrg       = temporaryOrg.name;
-  }
+  var currentLeftMenuState = (troupeContext.leftRoomMenuState || {});
 
   //we need to check he ONLY if the value is not false
   //If it is null or undefined then we define it as true JP 14/3/16
@@ -30,7 +17,7 @@ module.exports = function parseLeftMenuTroupeContext(req, troupeContext, orgs, m
     roomMenuIsPinned:        currentLeftMenuState.roomMenuIsPinned,
     panelOpenState:          currentLeftMenuState.roomMenuIsPinned,
     state:                   (currentLeftMenuState.state || 'all'),
-    selectedOrgName:         (currentlySelectedOrg || ''),
+    selectedOrgName:         currentLeftMenuState.selectedOrgName, //(currentlySelectedOrg || ''),
     hasDismissedSuggestions: (currentLeftMenuState.hasDismissedSuggestions || false),
   };
 };
