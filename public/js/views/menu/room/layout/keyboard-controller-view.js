@@ -59,9 +59,6 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
       modelId: null
     };
     this.navigableCollectionItemsMap = {};
-
-    // TODO: Listen for any changes and set the new bookmark to any new active items
-    //   this.listenTo(this.roomMenuModel, 'change:state', /* cb to update bookmark */, this);
   },
 
 
@@ -261,16 +258,49 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
     }
   },
 
-  selectPrev: function(e, mapKey) {
-    this.progressInDirection(-1, mapKey);
-    e.preventDefault();
-    e.stopPropagation();
+  // Helper function to determine whether it is ok to use the `Tab` event to navigate the items.
+  // We want to be able to escape out of this list of items once we `Tab` at the end of the list or
+  // we were at the start of the list using `Shift + Tab`
+  shouldCaptureTabEvent: function(e) {
+    // If the tab key was pushed
+    if(e.code.toLowerCase() === 'tab') {
+      var navigableCollectionItems = this.navigableCollectionItemsMap[this.currentNavigableItemReference.mapKey];
+      var collectionItemForCurrentModel = navigableCollectionItems[this.currentNavigableItemReference.navigableItemIndex];
+
+      // If we are on the first or last item already, let's just let them pass on
+      if(this.currentNavigableItemReference.navigableItemIndex === (navigableCollectionItems.length - 1)) {
+        // We use `collection.models.length` vs `collection.length` because the ProxyCollection doesn't update the length
+        var firstModel = collectionItemForCurrentModel.collection.models[0];
+        var lastModel = collectionItemForCurrentModel.collection.models[collectionItemForCurrentModel.collection.models.length - 1];
+
+        if(e.shiftKey && this.currentNavigableItemReference.modelId === firstModel.id) {
+          return false;
+        }
+        else if(!e.shiftKey && this.currentNavigableItemReference.modelId === lastModel.id) {
+          return false;
+        }
+      }
+    }
+
+    return true;
   },
 
+  // Move to the previous item in the current navigableCollection
+  selectPrev: function(e, mapKey) {
+    if(this.shouldCaptureTabEvent(e)) {
+      this.progressInDirection(-1, mapKey);
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  },
+
+  // Move to the next item in the current navigableCollection
   selectNext: function(e, mapKey) {
-    this.progressInDirection(1, mapKey);
-    e.preventDefault();
-    e.stopPropagation();
+    if(this.shouldCaptureTabEvent(e)) {
+      this.progressInDirection(1, mapKey);
+      e.preventDefault();
+      e.stopPropagation();
+    }
   }
 
 

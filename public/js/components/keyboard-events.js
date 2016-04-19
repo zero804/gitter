@@ -163,14 +163,20 @@ module.exports = (function() {
       name: 'room-list.start-nav',
       scope: 'minibar.item'
     },
-    'tab': {
+    'tab': [{
       name: 'maininput.tab.next',
       scope: ['input.chat', 'input.chat.edit', 'input.search']
-    },
-    '⇧+tab': {
+      },{
+      name: 'minibar-item.next',
+      scope: 'minibar.item'
+    }],
+    '⇧+tab': [{
       name: 'maininput.tab.prev',
       scope: ['input.chat', 'input.chat.edit', 'input.search']
-    },
+      },{
+      name: 'minibar-item.prev',
+      scope: 'minibar.item'
+    }],
     'pageup': 'pageUp',
     'pagedown': 'pageDown',
     'q, r': {
