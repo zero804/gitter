@@ -3,14 +3,15 @@
 var _                 = require('underscore');
 var $                 = require('jquery');
 var Marionette        = require('backbone.marionette');
+var fastdom           = require('fastdom');
+var context           = require('utils/context');
+var DNDCtrl           = require('components/menu/room/dnd-controller');
+var localStore        = require('components/local-store');
 var RoomMenuModel     = require('../../../../models/room-menu-model');
 var MiniBarView       = require('../minibar/minibar-view');
 var PanelView         = require('../panel/panel-view');
-var context           = require('utils/context');
-var DNDCtrl           = require('../../../../components/menu/room/dnd-controller');
 var MinibarCollection = require('../minibar/minibar-collection');
-var context           = require('utils/context');
-var fastdom           = require('fastdom');
+var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 
 var MINIBAR_ITEM_HEIGHT = 65;
 
@@ -84,8 +85,43 @@ module.exports = Marionette.LayoutView.extend({
     var orgsSnapshot = context.getSnapshot('orgs') || [];
     this.minibarCollection = new MinibarCollection(orgsSnapshot, { roomCollection: this.roomCollection });
 
+
+    var leftMenuSnapshot = context.getSnapshot('leftMenu');
+
+    var timeNow = new Date().getTime();
+    var previousLocationHref = localStore.get('previousLocationHref');
+    var previousLocationUnloadTime = localStore.get('previousLocationUnloadTime');
+    var currentLocationHref = window.location.href;
+    // Set it for next time
+    window.onbeforeunload = function(e) {
+      localStore.set('previousLocationHref', currentLocationHref);
+      var timeAtUnload = new Date().getTime();
+      localStore.set('previousLocationUnloadTime', timeAtUnload);
+    };
+
+    var currentState = leftMenuSnapshot.state;
+    var currentlySelectedOrg = leftMenuSnapshot.selectedOrgName;
+    // 5000 is an arbitrary good-enough threshold to aproximate page-refresh
+    var isWithinRefreshTimeThreshold = previousLocationUnloadTime && (timeNow - previousLocationUnloadTime) < 5000;
+
+    // If most-likely was not refresh because timing
+    // and they came through a link(because referrer).
+    // note: `document.referrer` is sticky through refreshes
+    var didComeThroughLinkOutsideApp = !isWithinRefreshTimeThreshold && document.referrer.length > 0;
+    // If they navigated to a completely separate URL than what we have saved
+    // And they they don't have a referrer meaning they navigated directly most likely
+    var didNavigateDirectly = currentLocationHref !== previousLocationHref && document.referrer.length === 0;
+
+    if(didComeThroughLinkOutsideApp || didNavigateDirectly) {
+      currentState = 'org';
+      currentlySelectedOrg = getOrgNameFromTroupeName(context.troupe().get('uri'));
+    }
+
     //Make a new model
-    this.model = new RoomMenuModel(_.extend({}, context.getSnapshot('leftMenu'), {
+    this.model = new RoomMenuModel(_.extend({}, leftMenuSnapshot, {
+      state:                   currentState,
+      selectedOrgName:         currentlySelectedOrg,
+
       bus:                     this.bus,
       roomCollection:          this.roomCollection,
       orgCollection:           this.orgCollection,
