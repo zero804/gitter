@@ -83,6 +83,14 @@ Distribution.prototype = {
       .map(function(memberDetail) {
         var flags = memberDetail.flags;
 
+        // This is a non-member who's been mentioned in the room
+        if (flags === null) {
+          return {
+            userId: memberDetail.userId,
+            mention: true
+          };
+        }
+
         var engineMention = (announcement && roomMembershipFlags.hasNotifyAnnouncement(flags)) ||
             (memberDetail.mentioned && roomMembershipFlags.hasNotifyMention(flags));
 
@@ -104,7 +112,8 @@ Distribution.prototype = {
       .filter(function(memberDetail) {
         var flags = memberDetail.flags;
 
-        return (roomMembershipFlags.hasNotifyUnread(flags) ||
+        return (flags === null) ||
+          (roomMembershipFlags.hasNotifyUnread(flags) ||
           (announcement && roomMembershipFlags.hasNotifyAnnouncement(flags)) ||
           (memberDetail.mentioned && roomMembershipFlags.hasNotifyMention(flags)));
       });
@@ -146,7 +155,7 @@ Distribution.prototype = {
         if (memberDetail.presence !== 'online') return false;
 
         var flags = memberDetail.flags;
-        return roomMembershipFlags.hasNotifyDesktop(flags) || mentioned(memberDetail);
+        return flags === null || roomMembershipFlags.hasNotifyDesktop(flags) || mentioned(memberDetail);
       })
       .map(memberDetailsToUserId);
   },
