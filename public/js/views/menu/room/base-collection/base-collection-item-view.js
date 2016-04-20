@@ -4,6 +4,7 @@ var Marionette                      = require('backbone.marionette');
 var template                        = require('./base-collection-item-view.hbs');
 var updateUnreadIndicatorClassState = require('../../../../components/menu/update-unread-indicator-class-state');
 var toggleClass                     = require('utils/toggle-class');
+var parseForTemplate                = require('gitter-web-shared/parse/left-menu-primary-item');
 
 module.exports = Marionette.ItemView.extend({
 
@@ -74,5 +75,13 @@ module.exports = Marionette.ItemView.extend({
 
     this.pulseIndicators();
   },
+
+
+  serializeData: function() {
+    var modelData = this.model.toJSON();
+    modelData.isSuggestion = this.isSuggestion;
+    var data = parseForTemplate(modelData, this.roomMenuModel.get('state'));
+    return data;
+  }
 
 });
