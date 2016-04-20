@@ -39,20 +39,14 @@ function memberDetailsToUserId(memberWithFlags) {
   return memberWithFlags.userId;
 }
 
-function processMemberDetails(membersDetails, mentions, presence, nonMemberMentions) {
+function processMemberDetails(membersDetails, mentions, presence) {
   var mentionHash = mentions && mentions.length && _.reduce(mentions, function(memo, userId) {
-    memo[userId] = true;
-    return memo;
-  }, {});
-
-  var nonMemberMentionsHash = nonMemberMentions && nonMemberMentions.length && _.reduce(nonMemberMentions, function(memo, userId) {
     memo[userId] = true;
     return memo;
   }, {});
 
   _.each(membersDetails, function(membersDetail) {
     var userId = membersDetail.userId;
-    membersDetail.nonMemberMention = !!(nonMemberMentionsHash && nonMemberMentionsHash[userId]);
     membersDetail.mentioned = !!(mentionHash && mentionHash[userId]);
     membersDetail.presence = presence && presence[userId];
     membersDetail.result = null;
@@ -64,29 +58,58 @@ function processMemberDetails(membersDetails, mentions, presence, nonMemberMenti
 function Distribution(options) {
   assert(options.membersWithFlags, 'membersWithFlags option required');
 
-  var membersDetails = processMemberDetails(options.membersWithFlags, options.mentions, options.presence, options.nonMemberMentions);
+  var membersDetails = processMemberDetails(options.membersWithFlags, options.mentions, options.presence);
   this._membersDetails = lazy(membersDetails);
+
+  var nonMemberMentions = options.nonMemberMentions;
+  if (nonMemberMentions && nonMemberMentions.length) {
+    this._nonMemberMentions = lazy(nonMemberMentions);
+  } else {
+    this._nonMemberMentions = lazy();
+  }
+
   this._announcement = options.announcement || false;
 }
 
 Distribution.prototype = {
-
-  getEngineNotifyList: function() {
+  /**
+   * Used by the unread-item-engine
+   * @return array of { userId: .., mention: ... }
+   */
+  getEngineNotifies: function() {
     var announcement = this._announcement;
 
-    return this._membersDetails
-      .filter(function(memberDetail) {
+    var sequence = this._membersDetails
+      .map(function(memberDetail) {
         var flags = memberDetail.flags;
 
-        return (roomMembershipFlags.hasNotifyUnread(flags)) ||
+        if (roomMembershipFlags.hasNotifyUnread(flags) ||
           (announcement && roomMembershipFlags.hasNotifyAnnouncement(flags)) ||
-          (roomMembershipFlags.hasNotifyMention(flags) && memberDetail.mentioned);
+          (memberDetail.mentioned && roomMembershipFlags.hasNotifyMention(flags))) {
+
+          var engineMention = (announcement && roomMembershipFlags.hasNotifyAnnouncement(flags)) ||
+              (memberDetail.mentioned && roomMembershipFlags.hasNotifyMention(flags));
+
+          return {
+            userId: memberDetail.userId,
+            mention: !!engineMention
+          };
+        }
       })
-      .map(memberDetailsToUserId);
+      .filter(function(f) {
+        return !!f;
+      });
+
+    // Snapshot the sequence
+    return lazy(sequence.toArray());
+
   },
 
-
-  getEngineMentionList: function() {
+  /**
+   * Used by the distribution-delta to figure out deltas
+   * @return array of userIds of mentioned userIds
+   */
+  getMentionUserIds: function() {
     var announcement = this._announcement;
 
     return this._membersDetails
@@ -99,18 +122,12 @@ Distribution.prototype = {
       .map(memberDetailsToUserId);
   },
 
-
   /**
    * userIds of users who have been mentioned, but are not in the room
    * yet have permission to view the room
    */
   getNotifyNewRoom: function() {
-    return this._membersDetails
-      .filter(function(memberDetail) {
-        return memberDetail.nonMemberMention;
-      })
-      .map(memberDetailsToUserId);
-
+    return this._nonMemberMentions;
   },
 
   /**

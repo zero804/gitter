@@ -16,10 +16,10 @@ describe('distribution-delta', function() {
 
     beforeEach(function() {
       troupeId = mongoUtils.getNewObjectIdString() + "";
-      fromUserId = mongoUtils.getNewObjectIdString() + "";
-      userId1 = mongoUtils.getNewObjectIdString() + "";
-      userId2 = mongoUtils.getNewObjectIdString() + "";
-      userId3 = mongoUtils.getNewObjectIdString() + "";
+      fromUserId = "from";
+      userId1 = "1";
+      userId2 = "2";
+      userId3 = "3";
       troupe = {
         _id: troupeId,
         id: troupeId
@@ -50,11 +50,8 @@ describe('distribution-delta', function() {
       return distributionDelta(fromUserId, troupe, [], [])
         .spread(function(result, newDistribution) {
           assert(newDistribution);
-          assert.deepEqual(result, {
-            addNotify: [],
-            addMentions: [],
-            remove: []
-          });
+          assert.deepEqual(result.add.toArray(), []);
+          assert.deepEqual(result.remove.toArray(), []);
         });
     });
 
@@ -62,11 +59,8 @@ describe('distribution-delta', function() {
       return distributionDelta(fromUserId, troupe, [userId1, userId2], [userId1, userId2])
         .spread(function(result, newDistribution) {
           assert(newDistribution);
-          assert.deepEqual(result, {
-            addNotify: [],
-            addMentions: [],
-            remove: []
-          });
+          assert.deepEqual(result.add.toArray(), []);
+          assert.deepEqual(result.remove.toArray(), []);
         });
     });
 
@@ -74,11 +68,11 @@ describe('distribution-delta', function() {
       return distributionDelta(fromUserId, troupe, [userId1], [])
         .spread(function(result, newDistribution) {
           assert(newDistribution);
-          assert.deepEqual(result, {
-            addNotify: [userId1],
-            addMentions: [userId1],
-            remove: []
-          });
+          assert.deepEqual(result.add.toArray(), [{
+            userId: userId1,
+            mention: true
+          }]);
+          assert.deepEqual(result.remove.toArray(), []);
         });
     });
 
@@ -86,11 +80,11 @@ describe('distribution-delta', function() {
       return distributionDelta(fromUserId, troupe, [], [userId1])
         .spread(function(result, newDistribution) {
           assert(newDistribution);
-          assert.deepEqual(result, {
-            addNotify: [userId1],
-            addMentions: [],
-            remove: [userId1]
-          });
+          assert.deepEqual(result.add.toArray(), [{
+            userId: userId1,
+            mention: false
+          }]);
+          assert.deepEqual(result.remove.toArray(), [userId1]);
         });
     });
   });
@@ -136,11 +130,8 @@ describe('distribution-delta', function() {
       return distributionDelta(fromUserId, troupe, [userId1, userId2], [userId1, userId2])
         .spread(function(result, newDistribution) {
           assert(newDistribution);
-          assert.deepEqual(result, {
-            addNotify: [],
-            addMentions: [],
-            remove: []
-          });
+          assert.deepEqual(result.add.toArray(), []);
+          assert.deepEqual(result.remove.toArray(), []);
         });
     });
 
@@ -148,11 +139,11 @@ describe('distribution-delta', function() {
       return distributionDelta(fromUserId, troupe, [userId1], [])
         .spread(function(result, newDistribution) {
           assert(newDistribution);
-          assert.deepEqual(result, {
-            addNotify: [userId1],
-            addMentions: [userId1],
-            remove: []
-          });
+          assert.deepEqual(result.add.toArray(), [{
+            userId: userId1,
+            mention: true
+          }]);
+          assert.deepEqual(result.remove.toArray(), []);
         });
     });
 
@@ -160,11 +151,8 @@ describe('distribution-delta', function() {
       return distributionDelta(fromUserId, troupe, [], [userId1])
         .spread(function(result, newDistribution) {
           assert(newDistribution);
-          assert.deepEqual(result, {
-            addNotify: [],
-            addMentions: [],
-            remove: [userId1]
-          });
+          assert.deepEqual(result.add.toArray(), []);
+          assert.deepEqual(result.remove.toArray(), [userId1]);
         });
     });
   });
@@ -218,11 +206,14 @@ describe('distribution-delta', function() {
       return distributionDelta(fromUserId, troupe, [], [])
         .spread(function(result, newDistribution) {
           assert(newDistribution);
-          assert.deepEqual(result, {
-            addNotify: [userId1, userId2],
-            addMentions: [userId1, userId2],
-            remove: []
-          });
+          assert.deepEqual(result.add.toArray(), [{
+            userId: userId1,
+            mention: true
+          }, {
+            userId: userId2,
+            mention: true
+          }]);
+          assert.deepEqual(result.remove.toArray(), []);
         });
     });
 
@@ -233,11 +224,14 @@ describe('distribution-delta', function() {
       return distributionDelta(fromUserId, troupe, [], [])
         .spread(function(result, newDistribution) {
           assert(newDistribution);
-          assert.deepEqual(result, {
-            addNotify: [userId1, userId2],
-            addMentions: [],
-            remove: [userId1, userId2]
-          });
+          assert.deepEqual(result.add.toArray(), [{
+            userId: userId1,
+            mention: false
+          }, {
+            userId: userId2,
+            mention: false
+          }]);
+          assert.deepEqual(result.remove.toArray(), [userId1, userId2]);
         });
     });
 
@@ -248,11 +242,8 @@ describe('distribution-delta', function() {
       return distributionDelta(fromUserId, troupe, [userId1], [])
         .spread(function(result, newDistribution) {
           assert(newDistribution);
-          assert.deepEqual(result, {
-            addNotify: [],
-            addMentions: [],
-            remove: []
-          });
+          assert.deepEqual(result.add.toArray(), []);
+          assert.deepEqual(result.remove.toArray(), []);
         });
     });
 
@@ -263,11 +254,11 @@ describe('distribution-delta', function() {
       return distributionDelta(fromUserId, troupe, [userId3], [])
         .spread(function(result, newDistribution) {
           assert(newDistribution);
-          assert.deepEqual(result, {
-            addNotify: [userId3],
-            addMentions: [userId3],
-            remove: []
-          });
+          assert.deepEqual(result.add.toArray(), [{
+            userId: userId3,
+            mention: true
+          }]);
+          assert.deepEqual(result.remove.toArray(), []);
         });
     });
 
@@ -278,11 +269,8 @@ describe('distribution-delta', function() {
       return distributionDelta(fromUserId, troupe, [], [userId3])
         .spread(function(result, newDistribution) {
           assert(newDistribution);
-          assert.deepEqual(result, {
-            addNotify: [],
-            addMentions: [],
-            remove: [userId3]
-          });
+          assert.deepEqual(result.add.toArray(), []);
+          assert.deepEqual(result.remove.toArray(), [userId3]);
         });
     });
 
