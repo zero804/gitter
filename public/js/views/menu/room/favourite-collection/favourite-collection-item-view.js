@@ -16,17 +16,6 @@ module.exports = PrimaryCollectionItemView.extend({
     });
   },
 
-  initialize: function() {
-    PrimaryCollectionItemView.prototype.initialize.apply(this, arguments);
-    this.listenTo(this.roomMenuModel, 'change:state', this.onMenuChangeState, this);
-  },
-
-  onMenuChangeState: function (){
-    //when the menu changes state we need to reset any drag temp classes this item may have
-    this.el.classList.remove('temp-active');
-    this.el.classList.remove('temp');
-  },
-
   onRender: function (){
     //when temp items are rendered we want to wait and then
     //animate them in JP 4/4/16
