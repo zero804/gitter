@@ -23,12 +23,8 @@ module.exports = PrimaryCollectionItemView.extend({
 
   onMenuChangeState: function (){
     //when the menu changes state we need to reset any drag temp classes this item may have
-    if(this.el.classList.contains('temp-active')) {
-      console.log('rmeove temp active');
-      this.el.classList.remove('temp-active'); }
-    if(this.el.classList.contains('temp')) {
-      console.log('remove temp');
-      this.el.classList.remove('temp'); }
+    if(this.el.classList.contains('temp-active')) { this.el.classList.remove('temp-active'); }
+    if(this.el.classList.contains('temp')) { this.el.classList.remove('temp'); }
   },
 
   onRender: function (){
