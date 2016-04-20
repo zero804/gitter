@@ -4,11 +4,14 @@ var _                       = require('underscore');
 var roomNameShortener       = require('gitter-web-shared/room-name-shortener');
 var BaseCollectionItemView  = require('../base-collection/base-collection-item-view');
 var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
+var parseForTemplate        = require('gitter-web-shared/parse/left-menu-primary-item');
 
 module.exports = BaseCollectionItemView.extend({
 
   serializeData: function() {
-    var data = BaseCollectionItemView.prototype.serializeData.apply(this, arguments);
+    var modelData = this.model.toJSON();
+    modelData.isSuggestion = this.isSuggestion;
+    var data = parseForTemplate(modelData, this.roomMenuModel.get('state'));
 
     if (data.fromUser) {
       return _.extend({}, data, {
