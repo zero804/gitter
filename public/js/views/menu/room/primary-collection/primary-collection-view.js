@@ -22,6 +22,13 @@ var PrimaryCollectionView = BaseCollectionView.extend({
   childView: ItemView,
   className: 'primary-collection',
 
+  render: function (){
+    console.log('-----------------------');
+    console.log('RENDER');
+    console.log('-----------------------');
+    BaseCollectionView.prototype.render.apply(this, arguments);
+  },
+
   ui: {
     collection:   '#collection-list',
     searchHeader: '#primary-collection-search-header'

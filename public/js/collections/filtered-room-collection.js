@@ -31,7 +31,7 @@ FilteredRoomCollection.prototype = _.extend(
 
     this.roomCollection = options.collection;
     this.listenTo(this.roomCollection, 'snapshot', this.onRoomCollectionSnapshot, this);
-    this.listenTo(this, 'filter-complete change:lastAccessTime change activity change:unreadItems change:mentions', this.sort, this);
+    this.listenTo(this, 'change:escalationTime change:activity change:unreadItems change:mentions', this.sort, this);
 
     FilteredCollection.prototype.initialize.apply(this, arguments);
     this.onModelChangeState();
