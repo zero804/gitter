@@ -17,13 +17,11 @@ var DNDCtrl = function(attrs) {
     moves:   this.shouldItemMove.bind(this),
   });
 
-  this.drag.on('dragend', this.onDragEnd.bind(this));
-  this.drag.on('cancel',  this.onCancel.bind(this));
-  this.drag.on('remove',  this.onDragEnd.bind(this));
   this.drag.on('drag',    this.onDragStart.bind(this));
+  this.drag.on('dragend', this.onDragEnd.bind(this));
+  this.drag.on('remove',  this.onDragEnd.bind(this));
   this.drag.on('drop',    this.onItemDropped.bind(this));
   this.drag.on('over',    this.onContainerHover.bind(this));
-
 };
 
 DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
@@ -70,30 +68,12 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
     window.addEventListener('mouseup', this.onMouseUp);
   },
 
-  onDragEnd: function () {
+  onDragEnd: function (el) {
     this.mirror = null;
     window.removeEventListener('mouseup', this.onMouseUp);
     this.trigger('dnd:end-drag');
-  },
-
-  onCancel: function (el, container, source){
-    //If an el is dropped at the beginning or end of the list and it was already at that position
-    //a cancel event is fired. In that case we need to ensure we add in the first/last position
-    var position;
-    var containerFirstChild = container.children[0];
-    if(!!containerFirstChild && containerFirstChild.classList.contains('gu-transit')) {
-      position = 'first';
-    }
-
-    if(!position) {
-      var containerLastChild = container.children[container.children.length - 1];
-      if(!!containerLastChild && containerLastChild.classList.contains('gui-transit')) {
-        position = 'last';
-      }
-    }
-
-    if(container.classList.contains('collection-list--favourite') &&  container === source) {
-      this.trigger('room-menu:sort-favourite', el.dataset.id, null, position);
+    if(el) {
+      el.classList.remove('hidden');
     }
   },
 
