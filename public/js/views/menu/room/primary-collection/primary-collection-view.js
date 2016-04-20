@@ -118,6 +118,8 @@ var PrimaryCollectionView = BaseCollectionView.extend({
 
   //Before we render we remove the collection container from the drag & drop instance
   onBeforeRender: function() {
+    BaseCollectionView.prototype.onBeforeRender.apply(this, arguments);
+
     this.domMap = domIndexById(this.getChildContainerToBeIndexed());
     this.dndCtrl.removeContainer(this.ui.collection[0]);
   },
