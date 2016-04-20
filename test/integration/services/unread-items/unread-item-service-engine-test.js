@@ -6,7 +6,22 @@ var assert = require('assert');
 var mongoUtils = testRequire('./utils/mongo-utils');
 var _ = require('lodash');
 var blockTimer = require('../../block-timer');
+var Lazy = require('lazy.js');
 
+function makeNotifyList(userIds, mentionIds) {
+  var mentionHash = mentionIds.reduce(function(memo, userId) {
+    memo[userId] = true;
+    return memo;
+  }, {});
+
+  return Lazy(userIds)
+    .map(function(userId) {
+      return {
+        userId: userId,
+        mention: !!mentionHash[userId]
+      };
+    });
+}
 
 describe('unread-item-service', function() {
 
@@ -60,7 +75,7 @@ describe('unread-item-service', function() {
       });
 
       it('should fetch last msg timestamps for the given troupeIds', function(done) {
-        return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, userIds, [])
+        return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, makeNotifyList(userIds, []))
           .then(function() {
             return unreadItemServiceEngine.getLastChatTimestamps([troupeId1]);
           })
@@ -72,7 +87,7 @@ describe('unread-item-service', function() {
       });
 
       it('should return an empty set if troupeIds are missing', function(done) {
-        return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, userIds, [])
+        return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, makeNotifyList(userIds, []))
           .then(function() {
             return unreadItemServiceEngine.getLastChatTimestamps([]);
           })
@@ -88,7 +103,7 @@ describe('unread-item-service', function() {
 
       it('should add items without mentions', function(done) {
         /* Add an item */
-        unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, userIds, [])
+        unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, makeNotifyList(userIds, []))
           .then(function(result) {
             var expected = {};
             expected[userId1] = { unreadCount: 1, badgeUpdate: true };
@@ -96,7 +111,7 @@ describe('unread-item-service', function() {
             assert.deepEqual(result, expected);
 
             /* Add a duplicate item */
-            return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, userIds, []);
+            return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, makeNotifyList(userIds, []));
           })
           .then(function(result) {
             var expected = {};
@@ -110,7 +125,7 @@ describe('unread-item-service', function() {
 
       it('should add items with mentions', function(done) {
         /* Add an item */
-        unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, userIds, [userId1])
+        unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, makeNotifyList(userIds, [userId1]))
           .then(function(result) {
             var expected = {};
             expected[userId1] = { unreadCount: 1, badgeUpdate: true, mentionCount: 1 };
@@ -118,11 +133,11 @@ describe('unread-item-service', function() {
             assert.deepEqual(result, expected);
 
             /* Add a duplicate item */
-            return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, userIds, [userId1]);
+            return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, makeNotifyList(userIds, [userId1]));
           })
           .then(function(result) {
             var expected = {};
-            expected[userId1] = { unreadCount: undefined, badgeUpdate: false, mentionCount: undefined };
+            expected[userId1] = { unreadCount: undefined, badgeUpdate: false };
             expected[userId2] = { unreadCount: undefined, badgeUpdate: false };
             assert.deepEqual(result, expected);
 
@@ -134,7 +149,7 @@ describe('unread-item-service', function() {
 
     describe('removeItem', function() {
       it('should remove items', function(done) {
-        unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, userIds, [])
+        unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, makeNotifyList(userIds, []))
           .then(function() {
             return unreadItemServiceEngine.removeItem(troupeId1, itemId1, userIds);
           })
@@ -164,7 +179,7 @@ describe('unread-item-service', function() {
       });
 
       it('should remove mentions', function(done) {
-        unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, userIds, [userId1])
+        unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, makeNotifyList(userIds, [userId1]))
           .then(function() {
             return unreadItemServiceEngine.removeItem(troupeId1, itemId1, userIds);
           })
@@ -201,7 +216,7 @@ describe('unread-item-service', function() {
     describe('ensureAllItemsRead', function() {
 
       it('should remove items', function(done) {
-        unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, userIds, [])
+        unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, makeNotifyList(userIds, []))
           .then(function() {
             return unreadItemServiceEngine.ensureAllItemsRead(userId1, troupeId1);
           })
@@ -223,7 +238,7 @@ describe('unread-item-service', function() {
 
     describe('markItemsRead', function() {
       it('should mark things as read', function(done) {
-        unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, userIds, [])
+        unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, makeNotifyList(userIds, []))
           .then(function() {
             return unreadItemServiceEngine.markItemsRead(userId1, troupeId1, [itemId1]);
           })
@@ -241,7 +256,7 @@ describe('unread-item-service', function() {
       });
 
       it('should create new mentions for users', function(done) {
-        unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, [userId1], [userId1])
+        unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, makeNotifyList([userId1], [userId1]))
           .then(function() {
             return unreadItemServiceEngine.markItemsRead(userId1, troupeId1, [itemId1], [itemId1]);
           })
@@ -267,8 +282,8 @@ describe('unread-item-service', function() {
 
       it('should handle some unread mentions for users', function(done) {
         Promise.all([
-          unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, [userId1], [userId1]),
-          unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId2, [userId1], [userId1])
+          unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, makeNotifyList([userId1], [userId1])),
+          unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId2, makeNotifyList([userId1], [userId1]))
           ])
           .then(function() {
             return unreadItemServiceEngine.markItemsRead(userId1, troupeId1, [itemId1], [itemId1]);
@@ -303,7 +318,7 @@ describe('unread-item-service', function() {
       });
 
       it('should list users for email notifications #slow', function(done) {
-        unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, userIds, [])
+        unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, makeNotifyList(userIds, []))
           .then(function() {
             return unreadItemServiceEngine.listTroupeUsersForEmailNotifications(Date.now(), 1);
           })
@@ -331,9 +346,9 @@ describe('unread-item-service', function() {
           this.timeout(10000);
 
           return Promise.all([
-              unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, [userId1], []),
-              unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId2, [userId1], []),
-              unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId3, [userId1], []),
+              unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, makeNotifyList([userId1], [])),
+              unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId2, makeNotifyList([userId1], [])),
+              unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId3, makeNotifyList([userId1], [])),
             ])
             .then(function() {
               return unreadItemServiceEngine.listTroupeUsersForEmailNotifications(Date.now() + 10, 5);
@@ -351,9 +366,9 @@ describe('unread-item-service', function() {
 
         it('should not find someone who has been notified', function(done) {
           return Promise.all([
-              unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, [userId1], []),
-              unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId2, [userId1], []),
-              unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId3, [userId1], []),
+              unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, makeNotifyList([userId1], [])),
+              unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId2, makeNotifyList([userId1], [])),
+              unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId3, makeNotifyList([userId1], [])),
             ])
             .then(function() {
               return unreadItemServiceEngine.listTroupeUsersForEmailNotifications(Date.now(), 5);
@@ -369,9 +384,9 @@ describe('unread-item-service', function() {
 
         it('should not notify someone who has read their messages', function(done) {
           return Promise.all([
-              unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, [userId1], []),
-              unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId2, [userId1], []),
-              unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId3, [userId1], []),
+              unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, makeNotifyList([userId1], [])),
+              unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId2, makeNotifyList([userId1], [])),
+              unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId3, makeNotifyList([userId1], [])),
             ])
             .then(function() {
               return unreadItemServiceEngine.markItemsRead(userId1, troupeId1, [itemId1, itemId2, itemId3]);
@@ -389,9 +404,9 @@ describe('unread-item-service', function() {
         it('should not find messages newer than the cutoff', function(done) {
           blockTimer.reset();
           return Promise.all([
-              unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, [userId1], []),
-              unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId2, [userId1], []),
-              unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId3, [userId1], []),
+              unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, makeNotifyList([userId1], [])),
+              unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId2, makeNotifyList([userId1], [])),
+              unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId3, makeNotifyList([userId1], [])),
             ])
             .then(function() {
               blockTimer.reset();
@@ -405,7 +420,7 @@ describe('unread-item-service', function() {
 
 
         it('should not email somebody until the email timeout period has expired #slow', function(done) {
-          return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, [userId1], [])
+          return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, makeNotifyList([userId1], []))
             .then(function() {
               return unreadItemServiceEngine.listTroupeUsersForEmailNotifications(Date.now(), 1);
             })
@@ -413,7 +428,7 @@ describe('unread-item-service', function() {
               assert(results[userId1]);
             })
             .then(function() {
-              return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId2, [userId1], []);
+              return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId2, makeNotifyList([userId1], []));
             })
             .then(function() {
               return unreadItemServiceEngine.listTroupeUsersForEmailNotifications(Date.now(), 1);
@@ -422,7 +437,7 @@ describe('unread-item-service', function() {
               assert(!results[userId1]);
             })
             .then(function() {
-              return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId3, [userId1], []);
+              return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId3, makeNotifyList([userId1], []));
             })
             .delay(1100)
             .then(function() {
@@ -437,7 +452,7 @@ describe('unread-item-service', function() {
         });
 
         it('should not email somebody twice if no new messages have arrived #slow', function(done) {
-          return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, [userId1], [])
+          return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, makeNotifyList([userId1], []))
             .then(function() {
               return unreadItemServiceEngine.listTroupeUsersForEmailNotifications(Date.now(), 1);
             })
@@ -456,10 +471,10 @@ describe('unread-item-service', function() {
         });
 
         it('should batch up emails for a user #slow', function(done) {
-          return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, [userId1], [])
+          return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, makeNotifyList([userId1], []))
             .delay(500)
             .then(function() {
-              return unreadItemServiceEngine.newItemWithMentions(troupeId2, itemId2, [userId1], []);
+              return unreadItemServiceEngine.newItemWithMentions(troupeId2, itemId2, makeNotifyList([userId1], []));
             })
             .then(function() {
               return unreadItemServiceEngine.listTroupeUsersForEmailNotifications(Date.now(), 600);
@@ -490,7 +505,7 @@ describe('unread-item-service', function() {
           .then(function(result) {
             assert.strictEqual(result[troupeId1].unreadItems, 0);
             assert.strictEqual(result[troupeId1].mentions, 0);
-            return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, userIds, []);
+            return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, makeNotifyList(userIds, []));
           })
           .then(function() {
             return unreadItemServiceEngine.getUserUnreadCountsForRooms(userId1, [troupeId1]);
@@ -512,7 +527,7 @@ describe('unread-item-service', function() {
           .then(function(result) {
             assert.strictEqual(result[troupeId1].unreadItems, 0);
             assert.strictEqual(result[troupeId1].mentions, 0);
-            return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, [userId1], [userId1]);
+            return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, makeNotifyList([userId1], [userId1]));
           })
           .then(function() {
             return unreadItemServiceEngine.getUserUnreadCountsForRooms(userId1, [troupeId1]);
@@ -533,7 +548,7 @@ describe('unread-item-service', function() {
         unreadItemServiceEngine.getUnreadItems(userId1, troupeId1)
           .then(function(result) {
             assert.strictEqual(result.length, 0);
-            return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, userIds, []);
+            return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, makeNotifyList(userIds, []));
           })
           .then(function() {
             return unreadItemServiceEngine.getUnreadItems(userId1, troupeId1);
@@ -553,7 +568,7 @@ describe('unread-item-service', function() {
           .spread(function(unreadItems, mentions) {
             assert.strictEqual(unreadItems.length, 0);
             assert.strictEqual(mentions.length, 0);
-            return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, userIds, userIds);
+            return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, makeNotifyList(userIds, userIds));
           })
           .then(function() {
             return unreadItemServiceEngine.getUnreadItemsAndMentions(userId1, troupeId1);
@@ -572,7 +587,7 @@ describe('unread-item-service', function() {
           .spread(function(unreadItems, mentions) {
             assert.strictEqual(unreadItems.length, 0);
             assert.strictEqual(mentions.length, 0);
-            return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, userIds, []);
+            return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, makeNotifyList(userIds, []));
           })
           .then(function() {
             return unreadItemServiceEngine.getUnreadItemsAndMentions(userId1, troupeId1);
@@ -592,7 +607,7 @@ describe('unread-item-service', function() {
         unreadItemServiceEngine.getUnreadItemsForUserTroupes([{ userId: userId1, troupeId: troupeId1 }])
           .then(function(result) {
             assert.strictEqual(result[userId1 + ":" + troupeId1].length, 0);
-            return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, userIds, []);
+            return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, makeNotifyList(userIds, []));
           })
           .then(function() {
             return unreadItemServiceEngine.getUnreadItemsForUserTroupes([{ userId: userId1, troupeId: troupeId1 }]);
@@ -612,7 +627,7 @@ describe('unread-item-service', function() {
         unreadItemServiceEngine.getAllUnreadItemCounts(userId1)
           .then(function(result) {
             assert.strictEqual(result.length, 0);
-            return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, userIds, []);
+            return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, makeNotifyList(userIds, []));
           })
           .then(function() {
             return unreadItemServiceEngine.getAllUnreadItemCounts(userId1);
@@ -624,7 +639,7 @@ describe('unread-item-service', function() {
             assert.strictEqual(r1.unreadItems, 1);
             assert.strictEqual(r1.mentions, 0);
 
-            return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, [userId1], [userId1]);
+            return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, makeNotifyList([userId1], [userId1]));
           })
           .then(function() {
             return unreadItemServiceEngine.getAllUnreadItemCounts(userId1);
@@ -646,7 +661,7 @@ describe('unread-item-service', function() {
         unreadItemServiceEngine.getRoomsMentioningUser(userId1)
           .then(function(result) {
             assert.strictEqual(result.length, 0);
-            return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, [userId1], [userId1]);
+            return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, makeNotifyList([userId1], [userId1]));
           })
           .then(function() {
             return unreadItemServiceEngine.getRoomsMentioningUser(userId1);
@@ -665,7 +680,7 @@ describe('unread-item-service', function() {
         unreadItemServiceEngine.getBadgeCountsForUserIds([userId1])
           .then(function(result) {
             assert.strictEqual(result[userId1], 0);
-            return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, userIds, []);
+            return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, makeNotifyList(userIds, []));
           })
           .then(function() {
             return unreadItemServiceEngine.getBadgeCountsForUserIds([userId1]);
@@ -679,7 +694,7 @@ describe('unread-item-service', function() {
 
     describe('removeMentionForUser', function() {
       it('should create new mentions for users', function(done) {
-        unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, [userId1], [userId1])
+        unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, makeNotifyList([userId1], [userId1]))
           .then(function() {
             return unreadItemServiceEngine.markItemsRead(userId1, troupeId1, [itemId1], [itemId1]);
           })
@@ -711,7 +726,7 @@ describe('unread-item-service', function() {
         unreadItemServiceEngine.getRoomsCausingBadgeCount(userId1)
           .then(function(results) {
             assert.strictEqual(results.length, 0);
-            return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, userIds, []);
+            return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, makeNotifyList(userIds, []));
           })
           .then(function() {
             return unreadItemServiceEngine.getRoomsCausingBadgeCount(userId1);
@@ -735,7 +750,7 @@ describe('unread-item-service', function() {
           var itemId = mongoUtils.createIdForTimestampString(startTimestamp);
           startTimestamp = startTimestamp + 1000; // Make sure that each timestamp is a unique second
           addItemIds.push("" + itemId);
-          adds.push(unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId, [userId1], []));
+          adds.push(unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId, makeNotifyList([userId1], [])));
         }
 
         blockTimer.reset();
@@ -750,7 +765,7 @@ describe('unread-item-service', function() {
 
             // Do a single insert sans contention. In the real world, there will never be this much
             // contention for a single usertroupe
-            return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId, [userId1], []);
+            return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId, makeNotifyList([userId1], []));
           })
           .delay(100)
           .then(function() {
@@ -795,91 +810,6 @@ describe('unread-item-service', function() {
     });
   });
 
-  describe('unread-batches', function() {
-    var unreadItemServiceEngine;
-    var batchSize;
-    beforeEach(function() {
-      unreadItemServiceEngine = testRequire('./services/unread-items/engine');
-      batchSize = unreadItemServiceEngine.testOnly.UNREAD_BATCH_SIZE;
-    });
-
-    it('should batch a single batch with no mentions', function() {
-      var batch = unreadItemServiceEngine.testOnly.getNewItemBatches(['a', 'b', 'c'], []);
-      assert.deepEqual([ { userIds: ['a', 'b', 'c'], mentionUserIds: [] }], batch);
-    });
-
-    it('should batch a single batch with some mentions', function() {
-      var batch = unreadItemServiceEngine.testOnly.getNewItemBatches(['a', 'b', 'c'], ['a']);
-      assert.deepEqual([ { userIds: ['a', 'b', 'c'], mentionUserIds: ['a'] }], batch);
-    });
-
-
-    it('should handle large batches', function() {
-      var TOTAL = 900;
-
-      var userIds = [];
-      var mentionUserIds = [];
-      for(var i = 0; i < TOTAL; i++) {
-        userIds.push(i);
-        if(i % 3 === 0) {
-          mentionUserIds.push(i);
-        }
-      }
-      var expectedNumberOfBatches = Math.floor(TOTAL / batchSize) + (TOTAL % batchSize === 0 ? 0 : 1);
-      var batches = unreadItemServiceEngine.testOnly.getNewItemBatches(userIds, mentionUserIds);
-      assert.strictEqual(expectedNumberOfBatches, batches.length);
-      for(var j = 0; j < expectedNumberOfBatches; j++) {
-        var expectedUsers = [];
-        var expectedMentions = [];
-        for(var k = 0; k < batchSize; k++) {
-          var id  = j * batchSize + k;
-
-          expectedUsers.push(id);
-          if(id % 3 === 0) {
-            expectedMentions.push(id);
-          }
-        }
-        assert.deepEqual(expectedUsers, batches[j].userIds);
-        assert.deepEqual(expectedMentions, batches[j].mentionUserIds);
-      }
-      });
-
-    it('should handle large batches #2', function() {
-      var TOTAL = 905;
-      var userIds = [];
-      var mentionUserIds = [];
-      for(var i = 0; i < 905; i++) {
-        userIds.push(i);
-        if(i % 3 === 0) {
-          mentionUserIds.push(i);
-        }
-      }
-
-      var expectedNumberOfBatches = Math.floor(TOTAL / batchSize) + (TOTAL % batchSize === 0 ? 0 : 1);
-      var batches = unreadItemServiceEngine.testOnly.getNewItemBatches(userIds, mentionUserIds);
-      assert.strictEqual(expectedNumberOfBatches, batches.length);
-      for(var j = 0; j < expectedNumberOfBatches; j++) {
-        var expectedUsers = [];
-        var expectedMentions = [];
-        for(var k = 0; k < batchSize; k++) {
-          var id  = j * batchSize + k;
-
-          if(id >= TOTAL) break;
-
-          expectedUsers.push(id);
-          if(id % 3 === 0) {
-            expectedMentions.push(id);
-          }
-        }
-        assert.deepEqual(expectedUsers, batches[j].userIds);
-        assert.deepEqual(expectedMentions, batches[j].mentionUserIds);
-      }
-    });
-
-
-
-  });
-
   describe('integration tests', function() {
     var unreadItemServiceEngine, troupeId1, troupeId2, troupeId3,
     userId1, userId2, itemId1, itemId2, itemId3, userIds;
@@ -916,7 +846,7 @@ describe('unread-item-service', function() {
 
     function newItemForUsers(troupeId, itemId, userIds, mentionUserIds) {
       return function() {
-        return unreadItemServiceEngine.newItemWithMentions(troupeId, itemId, userIds, mentionUserIds || []);
+        return unreadItemServiceEngine.newItemWithMentions(troupeId, itemId, makeNotifyList(userIds, mentionUserIds || []));
       };
     }
 
@@ -1081,7 +1011,7 @@ describe('unread-item-service', function() {
     });
 
     it('should handle unread items in very large rooms #slow', function(done) {
-      var SIZE = 2000;
+      var SIZE = 4500;
       var userIds = [];
       var mentionUserIds = [];
       for(var i = 0; i < SIZE; i++) {
@@ -1091,17 +1021,37 @@ describe('unread-item-service', function() {
         }
       }
 
-      return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, userIds, mentionUserIds)
+      // Make sure we get back different mention counts...
+      return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId3, makeNotifyList([0], [0]))
+        .then(function(result) {
+          assert.deepEqual(result, {
+            0: {
+              badgeUpdate: true,
+              mentionCount: 1,
+              unreadCount: 1
+            }
+          });
+
+          return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, makeNotifyList(userIds, mentionUserIds));
+        })
         .then(function(result) {
 
           var expected = _.range(SIZE).reduce(function(memo, index) {
-            var result = {
-              unreadCount: 1,
-              badgeUpdate: true
-            };
-
-            if (index % 3 === 0) {
-              result.mentionCount = 1;
+            var result;
+            if (index === 0) {
+              result = {
+                unreadCount: 2,
+                badgeUpdate: false,
+                mentionCount: 2
+              };
+            } else {
+              result = {
+                unreadCount: 1,
+                badgeUpdate: true
+              };
+              if (index % 3 === 0) {
+                result.mentionCount = 1;
+              }
             }
             memo[index] = result;
             return memo;
@@ -1118,16 +1068,23 @@ describe('unread-item-service', function() {
             }
           }
 
-          return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId2, userIds, mentionUserIds);
+          return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId2, makeNotifyList(userIds, mentionUserIds));
         })
         .then(function(result) {
           for(var j = 0; j < SIZE; j++) {
             assert(result[j]);
-            assert.strictEqual(result[j].unreadCount, 2);
-            assert.strictEqual(result[j].badgeUpdate, false);
-            if (j % 3 === 0) {
-              assert.strictEqual(result[j].mentionCount, 2);
+            if (j === 0) {
+              assert.strictEqual(result[j].unreadCount, 3);
+              assert.strictEqual(result[j].mentionCount, 3);
+            } else {
+              assert.strictEqual(result[j].unreadCount, 2);
+              if (j % 3 === 0) {
+                assert.strictEqual(result[j].mentionCount, 2);
+              }
             }
+            assert.strictEqual(result[j].badgeUpdate, false);
+
+
           }
 
         })
@@ -1146,10 +1103,10 @@ describe('unread-item-service', function() {
 
       var userId1 = userIds[1];
 
-      return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, userIds, [userId1])
+      return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, makeNotifyList(userIds, [userId1]))
         .then(function() {
           return Promise.all(chatIds.map(function(chatId) {
-            return unreadItemServiceEngine.newItemWithMentions(troupeId1, chatId, userIds, []);
+            return unreadItemServiceEngine.newItemWithMentions(troupeId1, chatId, makeNotifyList(userIds, []));
           }));
         })
         .then(function() {

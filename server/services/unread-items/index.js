@@ -327,10 +327,9 @@ function processResultsForNewItemWithMentions(troupeId, chatId, distribution, re
 function createChatUnreadItems(fromUserId, troupe, chat) {
   return createDistribution(fromUserId, troupe, chat.mentions)
     .then(function(distribution) {
-      var notifyUserIds = distribution.getEngineNotifyList().toArray();
-      var mentionUserIds = distribution.getEngineMentionList().toArray();
+      var userIdsWithMentions = distribution.getEngineNotifies();
 
-      return engine.newItemWithMentions(troupe.id, chat.id, notifyUserIds, mentionUserIds)
+      return engine.newItemWithMentions(troupe.id, chat.id, userIdsWithMentions)
         .then(function(results) {
           return processResultsForNewItemWithMentions(troupe.id, chat.id, distribution, results, false);
         });
@@ -383,10 +382,10 @@ function updateChatUnreadItems(fromUserId, troupe, chat, originalMentions) {
       var delta = this.delta;
       var distribution = this.newDistribution;
 
-      if (!delta.addNotify.length) return null;
+      if (delta.add.isEmpty()) return null;
 
       // Add additional mentions
-      return engine.newItemWithMentions(troupeId, chatId, delta.addNotify, delta.addMentions)
+      return engine.newItemWithMentions(troupeId, chatId, delta.add)
         .then(function(results) {
           return processResultsForNewItemWithMentions(troupeId, chatId, distribution, results, true);
         });
