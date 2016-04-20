@@ -85,10 +85,8 @@ module.exports = Marionette.LayoutView.extend({
     var orgsSnapshot = context.getSnapshot('orgs') || [];
     this.minibarCollection = new MinibarCollection(orgsSnapshot, { roomCollection: this.roomCollection });
 
-    var leftMenuSnapshot = context.getSnapshot('leftMenu');
-
     //Make a new model
-    this.model = new RoomMenuModel(_.extend({}, leftMenuSnapshot, {
+    this.model = new RoomMenuModel(_.extend({}, context.getSnapshot('leftMenu'), {
       bus:                     this.bus,
       roomCollection:          this.roomCollection,
       orgCollection:           this.orgCollection,
@@ -98,7 +96,7 @@ module.exports = Marionette.LayoutView.extend({
       //TODO id this the best way to do this? JP 12/1/16
       isMobile:                $('body').hasClass('mobile'),
     }));
-    this.resolvePageLoadedState();
+
 
     //Make a new drag & drop control
     this.dndCtrl = new DNDCtrl({ model: this.model });
@@ -109,42 +107,17 @@ module.exports = Marionette.LayoutView.extend({
     this.listenTo(this.bus,     'panel:render',   this.onPanelRender, this);
 
     //this.$el.find('#searc-results').show();
-  },
 
-  resolvePageLoadedState: function() {
-    var timeNow = new Date().getTime();
-    var previousLocationHref = localStore.get('previousLocationHref');
-    var previousLocationUnloadTime = localStore.get('previousLocationUnloadTime');
-    var currentLocationHref = window.location.href;
     // Set it for next time
     window.onbeforeunload = function(e) {
-      localStore.set('previousLocationHref', currentLocationHref);
+      var roomModel = this.roomCollection.get(context.troupe().get('id'));
+      var roomUri = roomModel.get('uri');
+
+      document.cookie = 'previousTroupeUri=' + roomUri;
       var timeAtUnload = new Date().getTime();
-      localStore.set('previousLocationUnloadTime', timeAtUnload);
-    };
-
-    var currentState = this.model.get('state');
-    var currentlySelectedOrg = this.model.get('selectedOrgName');
-    // 5000 is an arbitrary good-enough threshold to aproximate page-refresh
-    var isWithinRefreshTimeThreshold = previousLocationUnloadTime && (timeNow - previousLocationUnloadTime) < 5000;
-
-    // If most-likely was not refresh because timing
-    // and they came through a link(because referrer).
-    // note: `document.referrer` is sticky through refreshes
-    var didComeThroughLinkOutsideApp = !isWithinRefreshTimeThreshold && document.referrer.length > 0;
-    // If they navigated to a completely separate URL than what we have saved
-    // And they they don't have a referrer meaning they navigated directly most likely
-    var didNavigateDirectly =  (!isWithinRefreshTimeThreshold || currentLocationHref !== previousLocationHref) && document.referrer.length === 0;
-
-    if(didComeThroughLinkOutsideApp || didNavigateDirectly) {
-      currentState = 'org';
-      currentlySelectedOrg = getOrgNameFromTroupeName(context.troupe().get('uri'));
-    }
-
-    this.model.set({
-      state: currentState,
-      selectedOrgName: currentlySelectedOrg
-    });
+      document.cookie = 'previousLocationUnloadTime=' + timeAtUnload;
+      console.log('onbeforeunload', roomUri, timeAtUnload);
+    }.bind(this);
   },
 
   onDragStart: function() {
