@@ -85,9 +85,33 @@ module.exports = Marionette.LayoutView.extend({
     var orgsSnapshot = context.getSnapshot('orgs') || [];
     this.minibarCollection = new MinibarCollection(orgsSnapshot, { roomCollection: this.roomCollection });
 
-
     var leftMenuSnapshot = context.getSnapshot('leftMenu');
 
+    //Make a new model
+    this.model = new RoomMenuModel(_.extend({}, leftMenuSnapshot, {
+      bus:                     this.bus,
+      roomCollection:          this.roomCollection,
+      orgCollection:           this.orgCollection,
+      userModel:               context.user(),
+      troupeModel:             context.troupe(),
+
+      //TODO id this the best way to do this? JP 12/1/16
+      isMobile:                $('body').hasClass('mobile'),
+    }));
+    this.resolvePageLoadedState();
+
+    //Make a new drag & drop control
+    this.dndCtrl = new DNDCtrl({ model: this.model });
+
+    window.addEventListener('resize', this._initNano.bind(this));
+    this.listenTo(this.dndCtrl, 'dnd:start-drag', this.onDragStart.bind(this));
+    this.listenTo(this.dndCtrl, 'dnd:end-drag',   this.onDragEnd.bind(this));
+    this.listenTo(this.bus,     'panel:render',   this.onPanelRender, this);
+
+    //this.$el.find('#searc-results').show();
+  },
+
+  resolvePageLoadedState: function() {
     var timeNow = new Date().getTime();
     var previousLocationHref = localStore.get('previousLocationHref');
     var previousLocationUnloadTime = localStore.get('previousLocationUnloadTime');
@@ -99,8 +123,8 @@ module.exports = Marionette.LayoutView.extend({
       localStore.set('previousLocationUnloadTime', timeAtUnload);
     };
 
-    var currentState = leftMenuSnapshot.state;
-    var currentlySelectedOrg = leftMenuSnapshot.selectedOrgName;
+    var currentState = this.model.get('state');
+    var currentlySelectedOrg = this.model.get('selectedOrgName');
     // 5000 is an arbitrary good-enough threshold to aproximate page-refresh
     var isWithinRefreshTimeThreshold = previousLocationUnloadTime && (timeNow - previousLocationUnloadTime) < 5000;
 
@@ -110,37 +134,17 @@ module.exports = Marionette.LayoutView.extend({
     var didComeThroughLinkOutsideApp = !isWithinRefreshTimeThreshold && document.referrer.length > 0;
     // If they navigated to a completely separate URL than what we have saved
     // And they they don't have a referrer meaning they navigated directly most likely
-    var didNavigateDirectly = currentLocationHref !== previousLocationHref && document.referrer.length === 0;
+    var didNavigateDirectly =  (!isWithinRefreshTimeThreshold || currentLocationHref !== previousLocationHref) && document.referrer.length === 0;
 
     if(didComeThroughLinkOutsideApp || didNavigateDirectly) {
       currentState = 'org';
       currentlySelectedOrg = getOrgNameFromTroupeName(context.troupe().get('uri'));
     }
 
-    //Make a new model
-    this.model = new RoomMenuModel(_.extend({}, leftMenuSnapshot, {
-      state:                   currentState,
-      selectedOrgName:         currentlySelectedOrg,
-
-      bus:                     this.bus,
-      roomCollection:          this.roomCollection,
-      orgCollection:           this.orgCollection,
-      userModel:               context.user(),
-      troupeModel:             context.troupe(),
-
-      //TODO id this the best way to do this? JP 12/1/16
-      isMobile:                $('body').hasClass('mobile'),
-    }));
-
-    //Make a new drag & drop control
-    this.dndCtrl = new DNDCtrl({ model: this.model });
-
-    window.addEventListener('resize', this._initNano.bind(this));
-    this.listenTo(this.dndCtrl, 'dnd:start-drag', this.onDragStart.bind(this));
-    this.listenTo(this.dndCtrl, 'dnd:end-drag',   this.onDragEnd.bind(this));
-    this.listenTo(this.bus,     'panel:render',   this.onPanelRender, this);
-
-    //this.$el.find('#searc-results').show();
+    this.model.set({
+      state: currentState,
+      selectedOrgName: currentlySelectedOrg
+    });
   },
 
   onDragStart: function() {
