@@ -87,10 +87,6 @@ module.exports = Marionette.CompositeView.extend({
 
   onBeforeRender: function() {
     this.setLoaded(false);
-
-    // This should not be necessary but for some reason the collection-view
-    // is not clearing out the pre-rendered elements when rendering the children on initial load
-    (this.el.querySelector(this.childViewContainer) || this.el).innerHTML = '';
   },
 
   onRender: function() {

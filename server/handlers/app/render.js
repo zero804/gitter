@@ -28,6 +28,7 @@ var useragent                               = require('useragent');
 var _                                       = require('lodash');
 var GitHubOrgService                        = require('gitter-web-github').GitHubOrgService;
 var orgPermissionModel                      = require('../../services/permissions/org-permissions-model');
+var userSettingsService                     = require('../../services/user-settings-service');
 var resolveUserAvatarUrl                    = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 var resolveRoomAvatarSrcSet                 = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 var getOrgNameFromTroupeName                = require('gitter-web-shared/get-org-name-from-troupe-name');
@@ -243,6 +244,13 @@ function renderMainFrame(req, res, next, frame) {
       var snapshots                 = troupeContext.snapshots = parseSnapshotsForPageContext(req, troupeContext, orgs, rooms);
       var leftMenuRoomList          = parseRoomsIntoLeftMenuRoomList(snapshots.leftMenu.state, snapshots.rooms, snapshots.leftMenu.selectedOrgName);
       var leftMenuFavouriteRoomList = parseRoomsIntoLeftMenuFavouriteRoomList(snapshots.leftMenu.state, snapshots.rooms, snapshots.leftMenu.selectedOrgName);
+
+      // Save it so if they don't send any updates on the client, we still have it when they refresh
+      // We can't save it where it is changed(`./shared/parse/left-menu-troupe-context.js`) because that is in shared
+      // and the user-settings-service is in `./server`
+      userSettingsService.setUserSettings(req.user._id, 'leftRoomMenu', snapshots['leftMenu'])
+        .then(function() { return null; });
+
 
       //TODO Remove this when favourite tab is removed for realz JP 8/4/16
       if(snapshots.leftMenu.state === 'favourite') { leftMenuRoomList = []; }
