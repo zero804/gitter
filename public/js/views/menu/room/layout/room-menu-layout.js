@@ -110,13 +110,8 @@ module.exports = Marionette.LayoutView.extend({
 
     // Set it for next time
     window.onbeforeunload = function(e) {
-      var roomModel = this.roomCollection.get(context.troupe().get('id'));
-      var roomUri = roomModel.get('uri');
-
-      document.cookie = 'previousTroupeUri=' + roomUri;
       var timeAtUnload = new Date().getTime();
       document.cookie = 'previousLocationUnloadTime=' + timeAtUnload;
-      console.log('onbeforeunload', roomUri, timeAtUnload);
     }.bind(this);
   },
 
