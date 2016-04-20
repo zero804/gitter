@@ -135,7 +135,7 @@ module.exports = {
         return roomService.deleteRoom(troupe);
       })
       .then(function() {
-        return; // Undefined returns a 200 status only
+        return { success: true };
       });
   },
 
