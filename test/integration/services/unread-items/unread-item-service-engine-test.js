@@ -49,11 +49,11 @@ describe('unread-item-service', function() {
       unreadItemServiceEngine = testRequire('./services/unread-items/engine');
       troupeId1 = mongoUtils.getNewObjectIdString();
       troupeId2 = mongoUtils.getNewObjectIdString();
-      userId1 = mongoUtils.getNewObjectIdString();
-      userId2 = mongoUtils.getNewObjectIdString();
-      itemId1 = mongoUtils.getNewObjectIdString();
-      itemId2 = mongoUtils.getNewObjectIdString();
-      itemId3 = mongoUtils.getNewObjectIdString();
+      userId1 = String(mongoUtils.getNewObjectIdString());
+      userId2 = String(mongoUtils.getNewObjectIdString());
+      itemId1 = String(mongoUtils.getNewObjectIdString());
+      itemId2 = String(mongoUtils.getNewObjectIdString());
+      itemId3 = String(mongoUtils.getNewObjectIdString());
       userIds = [userId1, userId2];
     });
 
@@ -105,19 +105,21 @@ describe('unread-item-service', function() {
         /* Add an item */
         unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, makeNotifyList(userIds, []))
           .then(function(result) {
-            var expected = {};
-            expected[userId1] = { unreadCount: 1, badgeUpdate: true };
-            expected[userId2] = { unreadCount: 1, badgeUpdate: true };
-            assert.deepEqual(result, expected);
+            var expected = [
+              { userId: userId1, unreadCount: 1, badgeUpdate: true },
+              { userId: userId2, unreadCount: 1, badgeUpdate: true }
+            ];
+            assert.deepEqual(result.toArray(), expected);
 
             /* Add a duplicate item */
             return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, makeNotifyList(userIds, []));
           })
           .then(function(result) {
-            var expected = {};
-            expected[userId1] = { unreadCount: undefined, badgeUpdate: false };
-            expected[userId2] = { unreadCount: undefined, badgeUpdate: false };
-            assert.deepEqual(result, expected);
+            var expected = [
+              { userId: userId1, unreadCount: undefined, badgeUpdate: false },
+              { userId: userId2, unreadCount: undefined, badgeUpdate: false }
+            ];
+            assert.deepEqual(result.toArray(), expected);
 
           })
           .nodeify(done);
@@ -127,20 +129,21 @@ describe('unread-item-service', function() {
         /* Add an item */
         unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, makeNotifyList(userIds, [userId1]))
           .then(function(result) {
-            var expected = {};
-            expected[userId1] = { unreadCount: 1, badgeUpdate: true, mentionCount: 1 };
-            expected[userId2] = { unreadCount: 1, badgeUpdate: true };
-            assert.deepEqual(result, expected);
+            var expected = [
+              { userId: userId1, unreadCount: 1, badgeUpdate: true, mentionCount: 1 },
+              { userId: userId2, unreadCount: 1, badgeUpdate: true }
+            ];
+            assert.deepEqual(result.toArray(), expected);
 
             /* Add a duplicate item */
             return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, makeNotifyList(userIds, [userId1]));
           })
           .then(function(result) {
-            var expected = {};
-            expected[userId1] = { unreadCount: undefined, badgeUpdate: false };
-            expected[userId2] = { unreadCount: undefined, badgeUpdate: false };
-            assert.deepEqual(result, expected);
-
+            var expected = [
+              { userId: userId1, unreadCount: undefined, badgeUpdate: false },
+              { userId: userId2, unreadCount: undefined, badgeUpdate: false }
+            ];
+            assert.deepEqual(result.toArray(), expected);
           })
           .nodeify(done);
       });
@@ -1024,40 +1027,41 @@ describe('unread-item-service', function() {
       // Make sure we get back different mention counts...
       return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId3, makeNotifyList([0], [0]))
         .then(function(result) {
-          assert.deepEqual(result, {
-            0: {
-              badgeUpdate: true,
-              mentionCount: 1,
-              unreadCount: 1
-            }
-          });
+          assert.deepEqual(result.toArray(), [{
+            userId: 0,
+            badgeUpdate: true,
+            mentionCount: 1,
+            unreadCount: 1
+          }]);
 
           return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, makeNotifyList(userIds, mentionUserIds));
         })
         .then(function(result) {
 
-          var expected = _.range(SIZE).reduce(function(memo, index) {
-            var result;
+          var expected = _.range(SIZE).map(function(memo, index) {
             if (index === 0) {
-              result = {
+              return {
+                userId: String(index),
                 unreadCount: 2,
                 badgeUpdate: false,
                 mentionCount: 2
               };
-            } else {
-              result = {
-                unreadCount: 1,
-                badgeUpdate: true
-              };
-              if (index % 3 === 0) {
-                result.mentionCount = 1;
-              }
             }
-            memo[index] = result;
-            return memo;
-          }, {});
 
-          assert.deepEqual(result, expected);
+            var result = {
+              userId: String(index),
+              unreadCount: 1,
+              badgeUpdate: true
+            };
+
+            if (index % 3 === 0) {
+              result.mentionCount = 1;
+            }
+
+            return result;
+          });
+
+          assert.deepEqual(result.toArray(), expected);
 
           var userIds = [];
           var mentionUserIds = [];
@@ -1071,8 +1075,11 @@ describe('unread-item-service', function() {
           return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId2, makeNotifyList(userIds, mentionUserIds));
         })
         .then(function(result) {
+          result = result.toArray();
           for(var j = 0; j < SIZE; j++) {
             assert(result[j]);
+            assert.strictEqual(result[j].userId, String(j));
+
             if (j === 0) {
               assert.strictEqual(result[j].unreadCount, 3);
               assert.strictEqual(result[j].mentionCount, 3);

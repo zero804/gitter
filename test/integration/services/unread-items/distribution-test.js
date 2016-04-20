@@ -4,6 +4,7 @@ var testRequire = require('../../test-require');
 var Distribution = testRequire('./services/unread-items/distribution');
 var roomMembershipFlags = testRequire('./services/room-membership-flags');
 var assert = require('assert');
+var lazy = require('lazy.js');
 var MODES = roomMembershipFlags.MODES;
 
 function assertIteratorDeepEqual(iterator, expected) {
@@ -383,15 +384,15 @@ describe('distribution', function() {
         }
       });
 
-      var results = distribution.resultsProcessor({
-        '1': { unreadCount: 1, mentionCount: 1 },
-        '2': { unreadCount: 2, mentionCount: 2 },
-        '3': { unreadCount: 3, mentionCount: 3 },
-        '4': { unreadCount: 4, mentionCount: 4 },
-        '5': { unreadCount: 5, mentionCount: 5 },
-        '6': { unreadCount: 6, mentionCount: 6 },
-        '7': { unreadCount: 7, mentionCount: 7 },
-      });
+      var results = distribution.resultsProcessor(lazy([
+        { userId: '1', unreadCount: 1, mentionCount: 1 },
+        { userId: '2', unreadCount: 2, mentionCount: 2 },
+        { userId: '3', unreadCount: 3, mentionCount: 3 },
+        { userId: '4', unreadCount: 4, mentionCount: 4 },
+        { userId: '5', unreadCount: 5, mentionCount: 5 },
+        { userId: '6', unreadCount: 6, mentionCount: 6 },
+        { userId: '7', unreadCount: 7, mentionCount: 7 },
+      ]));
 
       assertIteratorDeepEqual(results.getTroupeUnreadCountsChange(), [
         { userId: '1', total: 1, mentions: 1 },
@@ -420,13 +421,13 @@ describe('distribution', function() {
         }
       });
 
-      var results = distribution.resultsProcessor({
-        '1': { unreadCount: 0, mentionCount: 0 },
-        '2': { unreadCount: 2, mentionCount: 0 },
-        '3': { unreadCount: 0, mentionCount: 3 },
-        '4': { unreadCount: 4, mentionCount: 4 },
-        '5': {  },
-      });
+      var results = distribution.resultsProcessor(lazy([
+        { userId: '1', unreadCount: 0, mentionCount: 0 },
+        { userId: '2', unreadCount: 2, mentionCount: 0 },
+        { userId: '3', unreadCount: 0, mentionCount: 3 },
+        { userId: '4', unreadCount: 4, mentionCount: 4 },
+        { userId: '5' },
+      ]));
 
       assertIteratorDeepEqual(results.getTroupeUnreadCountsChange(), [
         { userId: '1', total: 0, mentions: 0 },
@@ -459,15 +460,15 @@ describe('distribution', function() {
         }
       });
 
-      var results = distribution.resultsProcessor({
-        '1': { badgeUpdate: true },
-        '2': { badgeUpdate: true },
-        '3': { badgeUpdate: true },
-        '4': { badgeUpdate: true },
-        '5': { badgeUpdate: true },
-        '6': { badgeUpdate: true },
-        '7': { badgeUpdate: true },
-      });
+      var results = distribution.resultsProcessor(lazy([
+        { userId: '1', badgeUpdate: true },
+        { userId: '2', badgeUpdate: true },
+        { userId: '3', badgeUpdate: true },
+        { userId: '4', badgeUpdate: true },
+        { userId: '5', badgeUpdate: true },
+        { userId: '6', badgeUpdate: true },
+        { userId: '7', badgeUpdate: true },
+      ]));
 
       assertIteratorDeepEqual(results.getBadgeUpdates(), ['1','2','3','4','5','6']);
     });
@@ -488,11 +489,12 @@ describe('distribution', function() {
         }
       });
 
-      var results = distribution.resultsProcessor({
-        '1': { badgeUpdate: true },
-        '2': { badgeUpdate: false },
-        '3': {  },
-      });
+      var results = distribution.resultsProcessor(lazy([
+        { userId: '1', badgeUpdate: true },
+        { userId: '2', badgeUpdate: false },
+        { userId: '3' },
+        { userId: '4' },
+      ]));
 
       assertIteratorDeepEqual(results.getBadgeUpdates(), ['1']);
     });
@@ -521,8 +523,15 @@ describe('distribution', function() {
         }
       });
 
-      var results = distribution.resultsProcessor({
-      });
+      var results = distribution.resultsProcessor(lazy([
+        { userId: '1' },
+        { userId: '2' },
+        { userId: '3' },
+        { userId: '4' },
+        { userId: '5' },
+        { userId: '6' },
+        { userId: '7' },
+      ]));
 
       assertIteratorDeepEqual(results.getNewUnreadWithMention(), ['1','2','3','5','6']);
     });
@@ -543,8 +552,11 @@ describe('distribution', function() {
         }
       });
 
-      var results = distribution.resultsProcessor({
-      });
+      var results = distribution.resultsProcessor(lazy([
+        { userId: '1' },
+        { userId: '2' },
+        { userId: '3' },
+      ]));
 
       assertIteratorDeepEqual(results.getNewUnreadWithMention(), ['1', '2']);
     });
@@ -573,8 +585,15 @@ describe('distribution', function() {
         }
       });
 
-      var results = distribution.resultsProcessor({
-      });
+      var results = distribution.resultsProcessor(lazy([
+        { userId: '1' },
+        { userId: '2' },
+        { userId: '3' },
+        { userId: '4' },
+        { userId: '5' },
+        { userId: '6' },
+        { userId: '7' },
+      ]));
 
       assertIteratorDeepEqual(results.getNewUnreadWithoutMention(), ['1','2','3','5','6']);
     });
@@ -597,8 +616,10 @@ describe('distribution', function() {
         }
       });
 
-      var results = distribution.resultsProcessor({
-      });
+      var results = distribution.resultsProcessor(lazy([
+        { userId: '1' },
+        { userId: '2' },
+      ]));
 
       assertIteratorDeepEqual(results.getNewUnreadWithoutMention(), []);
     });

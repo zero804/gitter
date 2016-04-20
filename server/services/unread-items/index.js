@@ -260,10 +260,8 @@ function withSequence(sequence, callback) {
   return callback(array);
 }
 
-function processResultsForNewItemWithMentions(troupeId, chatId, distribution, results, isEdit) {
+function processResultsForNewItemWithMentions(troupeId, chatId, distribution, resultsDistribution, isEdit) {
   debug("distributing chat notification to users");
-
-  var resultsDistribution = distribution.resultsProcessor(results);
 
   distribution.getNotifyNewRoom()
     .forEach(function(userId) {
@@ -331,7 +329,8 @@ function createChatUnreadItems(fromUserId, troupe, chat) {
 
       return engine.newItemWithMentions(troupe.id, chat.id, userIdsWithMentions)
         .then(function(results) {
-          return processResultsForNewItemWithMentions(troupe.id, chat.id, distribution, results, false);
+          var resultsDistribution = distribution.resultsProcessor(results);
+          return processResultsForNewItemWithMentions(troupe.id, chat.id, distribution, resultsDistribution, false);
         });
     });
 }
@@ -387,7 +386,8 @@ function updateChatUnreadItems(fromUserId, troupe, chat, originalMentions) {
       // Add additional mentions
       return engine.newItemWithMentions(troupeId, chatId, delta.add)
         .then(function(results) {
-          return processResultsForNewItemWithMentions(troupeId, chatId, distribution, results, true);
+          var resultsDistribution = distribution.resultsProcessorForUpdate(results);
+          return processResultsForNewItemWithMentions(troupeId, chatId, distribution, resultsDistribution, true);
         });
     });
 }

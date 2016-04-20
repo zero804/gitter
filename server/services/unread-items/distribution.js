@@ -79,30 +79,35 @@ Distribution.prototype = {
   getEngineNotifies: function() {
     var announcement = this._announcement;
 
-    var sequence = this._membersDetails
+    var sequence = this._getEngineMembers()
       .map(function(memberDetail) {
         var flags = memberDetail.flags;
 
-        if (roomMembershipFlags.hasNotifyUnread(flags) ||
-          (announcement && roomMembershipFlags.hasNotifyAnnouncement(flags)) ||
-          (memberDetail.mentioned && roomMembershipFlags.hasNotifyMention(flags))) {
+        var engineMention = (announcement && roomMembershipFlags.hasNotifyAnnouncement(flags)) ||
+            (memberDetail.mentioned && roomMembershipFlags.hasNotifyMention(flags));
 
-          var engineMention = (announcement && roomMembershipFlags.hasNotifyAnnouncement(flags)) ||
-              (memberDetail.mentioned && roomMembershipFlags.hasNotifyMention(flags));
-
-          return {
-            userId: memberDetail.userId,
-            mention: !!engineMention
-          };
-        }
-      })
-      .filter(function(f) {
-        return !!f;
+        return {
+          userId: memberDetail.userId,
+          mention: !!engineMention
+        };
       });
 
     // Snapshot the sequence
     return lazy(sequence.toArray());
 
+  },
+
+  _getEngineMembers: function() {
+    var announcement = this._announcement;
+
+    return this._membersDetails
+      .filter(function(memberDetail) {
+        var flags = memberDetail.flags;
+
+        return (roomMembershipFlags.hasNotifyUnread(flags) ||
+          (announcement && roomMembershipFlags.hasNotifyAnnouncement(flags)) ||
+          (memberDetail.mentioned && roomMembershipFlags.hasNotifyMention(flags)));
+      });
   },
 
   /**
@@ -190,15 +195,46 @@ Distribution.prototype = {
       .map(memberDetailsToUserId);
   },
 
+  /**
+   * Fast result processor for the usual case
+   */
   resultsProcessor: function(unreadItemResults) {
-    // Mutates state, which is a pity, but it's very fast and it needs to be
-    this._membersDetails.forEach(function(memberDetail) {
-      memberDetail.result = unreadItemResults[memberDetail.userId];
-    });
+    var itResults = unreadItemResults.getIterator();
+    var memberResults = this._getEngineMembers().getIterator();
+
+    while(itResults.moveNext()) {
+      if (!memberResults.moveNext()) {
+        throw new Error('member and results collection lengths mismatched');
+      }
+
+      var memberDetail = memberResults.current();
+      var result = itResults.current();
+
+      // Mutates state, which is a pity, but it's very fast and it needs to be
+      memberDetail.result = result;
+    }
+
+    if(memberResults.moveNext()) {
+      throw new Error('member and results collection lengths mismatched');
+    }
+
 
     return new DistributionResultsProcessor(this._membersDetails, this._announcement);
   },
 
+  resultsProcessorForUpdate: function(unreadItemResults) {
+    var unreadItemHash = unreadItemResults.reduce(function(memo, result) {
+      memo[result.userId] = result;
+      return memo;
+    }, {});
+
+    // Mutates state, which is a pity, but it's very fast and it needs to be
+    this._membersDetails.forEach(function(memberDetail) {
+      memberDetail.result = unreadItemHash[memberDetail.userId];
+    });
+
+    return new DistributionResultsProcessor(this._membersDetails, this._announcement);
+  }
 };
 
 function DistributionResultsProcessor(membersWithFlags, announcement) {

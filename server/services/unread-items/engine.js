@@ -9,6 +9,7 @@ var Scripto       = require('gitter-redis-scripto');
 var assert        = require('assert');
 var _             = require('lodash');
 var Promise       = require('bluebird');
+var lazy          = require('lazy.js');
 var moment        = require('moment');
 var debug         = require('debug')('gitter:unread-items:engine');
 var redisClient   = redis.getClient();
@@ -34,15 +35,15 @@ var MAXIMUM_ROOMS_PER_USER_PER_NOTIFICATION = 15;
 /**
  *
  * Note: mentionUserIds must always be a subset of usersIds (or equal)
+ * Returns the updates for each user, in the same order
  */
 function newItemWithMentions(troupeId, itemId, userWithMentions) {
-
   var timestamp = mongoUtils.getTimestampFromObjectId(itemId);
 
   return setLastChatTimestamp(troupeId, timestamp)
     .then(function() {
 
-    if(userWithMentions.isEmpty()) return {};
+    if(userWithMentions.isEmpty()) return lazy([]);
 
     // Working in strings saves a stack of time
     troupeId = mongoUtils.serializeObjectId(troupeId);
@@ -77,12 +78,11 @@ function newItemWithMentions(troupeId, itemId, userWithMentions) {
 
       return runScript('unread-add-item-with-mentions', keys, values)
         .then(function(result) {
-          var resultHash = {};
-
-          // Using _.forEach as its much faster than native in a tight loop like this
+          // The location of the first mention result
           var mentionIndex = batchUserIds.length * 2;
 
-          _.forEach(batchUserIds, function(userId, index) {
+          // Using _.map as its much faster than native in a tight loop like this
+          return _.map(batchUserIds, function(userId, index) {
             var userWithMention     = usersWithMentions[index];
             var troupeUnreadCount   = result[index * 2];
             var flag                = result[(index * 2) + 1];
@@ -90,6 +90,7 @@ function newItemWithMentions(troupeId, itemId, userWithMentions) {
             var upgradedKey          = flag & 2;
 
             var userResult = {
+              userId: userId,
               unreadCount: troupeUnreadCount >= 0 ? troupeUnreadCount : undefined,
               badgeUpdate: badgeUpdate
             };
@@ -102,33 +103,25 @@ function newItemWithMentions(troupeId, itemId, userWithMentions) {
               }
             }
 
-            resultHash[userId] = userResult;
-
             if(upgradedKey) {
               upgradeCount++;
             }
-          });
 
-          return resultHash;
+            return userResult;
+          });
         });
     });
 
     return Promise.all(promises.toArray())
-      .then(function(resultsHashes) {
+      .then(function(results) {
         if (upgradeCount > 10) {
           winston.warn('unread-items: upgraded keys for ' + upgradeCount + ' user:troupes');
         } else if(upgradeCount > 0) {
           debug('unread-items: upgraded keys for %s user:troupes', upgradeCount);
         }
 
-        // THIS IS SHIT
-        return resultsHashes.reduce(function(memo, results) {
-          Object.keys(results).forEach(function(key) {
-            memo[key] = results[key];
-          });
-          return memo;
-        }, {});
-
+        var flattenedResults = lazy(results).flatten();
+        return flattenedResults;
       });
   });
 }
