@@ -4,7 +4,7 @@ var Promise     = require('bluebird');
 var _           = require('underscore');
 var collections = require('./collections');
 var mongoUtils  = require('./mongo-utils');
-var mongoose    = require('./mongoose-q');
+var mongoose    = require('gitter-web-mongoose-bluebird');
 var Schema      = mongoose.Schema;
 
 function hashList(list) {
