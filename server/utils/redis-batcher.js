@@ -1,9 +1,9 @@
 /*jshint node:true, unused:true */
 "use strict";
 
-
+var env = require('gitter-web-env');
+var winston = env.logger;
 var redis = require('./redis');
-var winston = require('./winston');
 var workerQueue = require('./worker-queue-redis');
 
 var PREFIX = "rb:";
