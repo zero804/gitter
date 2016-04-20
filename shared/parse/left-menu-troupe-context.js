@@ -17,7 +17,7 @@ module.exports = function parseLeftMenuTroupeContext(req, troupeContext, orgs, m
     roomMenuIsPinned:        currentLeftMenuState.roomMenuIsPinned,
     panelOpenState:          currentLeftMenuState.roomMenuIsPinned,
     state:                   (currentLeftMenuState.state || 'all'),
-    selectedOrgName:         currentLeftMenuState.selectedOrgName, //(currentlySelectedOrg || ''),
+    selectedOrgName:         currentLeftMenuState.selectedOrgName,
     hasDismissedSuggestions: (currentLeftMenuState.hasDismissedSuggestions || false),
   };
 };
