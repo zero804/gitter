@@ -4,6 +4,7 @@
 var makeBenchmark = require('../make-benchmark');
 var Distribution = require('../../server/services/unread-items/distribution');
 var _ = require('lodash');
+var lazy = require('lazy.js');
 var roomMembershipFlags = require('../../server/services/room-membership-flags');
 var MODES = roomMembershipFlags.MODES;
 
@@ -30,15 +31,19 @@ function makeOptions(a,b,c) {
     }, {})
   };
 }
-function makeResults(a) {
-  return _.range(a).reduce(function(memo, x) {
-    memo[String(x)] = {
+function makeResults(options) {
+  var distribution = new Distribution(options);
+
+  var size = distribution.getEngineNotifies().size();
+
+  return lazy.range(size).map(function(x) {
+    return {
+      userId: String(x),
       badgeUpdate: x % 4 === 0,
       unreadCount: x % 11 === 0 ? undefined : x % 5,
       mentionCount: x % 3 === 0 ? undefined : x % 7,
     };
-    return memo;
-  }, {});
+  });
 }
 
 function runBenchmarkWith(options, results) {
@@ -90,10 +95,10 @@ makeBenchmark({
   maxTime: 3,
   before: function() {
     optionsMedium = makeOptions(100, 3, 2);
-    resultsMedium = makeResults(100);
+    resultsMedium = makeResults(optionsMedium);
 
     optionsLarge = makeOptions(20000, 3, 2);
-    resultsLarge = makeResults(7000);
+    resultsLarge = makeResults(optionsLarge);
   },
   tests: {
     'mediumRoom': function() {

@@ -176,7 +176,7 @@ describe('unread-item-service-engine-combined #slow', function() {
 
             return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId, makeNotifyList([userId1], [userId1]))
               .then(function(result) {
-                var resultForUser = result[userId1];
+                var resultForUser = result.find(function(f) { return f.userId == userId1; });
 
                 mentionItems[itemId] = true;
                 unreadItems[itemId] = true;
@@ -199,7 +199,7 @@ describe('unread-item-service-engine-combined #slow', function() {
                   var itemId = nextId();
                   return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId, makeNotifyList([userId1], []))
                     .then(function(result) {
-                      var resultForUser = result[userId1];
+                      var resultForUser = result.find(function(f) { return f.userId == userId1; });
                       unreadItems[itemId] = false;
                       enforceLimit();
 
