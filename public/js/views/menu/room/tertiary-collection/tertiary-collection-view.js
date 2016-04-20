@@ -8,10 +8,18 @@ var roomNameShortener       = require('gitter-web-shared/room-name-shortener');
 var BaseCollectionView      = require('../base-collection/base-collection-view');
 var BaseCollectionItemView  = require('../base-collection/base-collection-item-view');
 var EmptySearchView         = require('./tertiary-collection-item-search-empty-view');
+var parseForTemplate        = require('gitter-web-shared/parse/left-menu-primary-item');
 
 var proto = BaseCollectionView.prototype;
 
-var ItemView = BaseCollectionItemView.extend({});
+var ItemView = BaseCollectionItemView.extend({
+  serializeData: function() {
+    var modelData = this.model.toJSON();
+    modelData.isSuggestion = this.isSuggestion;
+    var data = parseForTemplate(modelData, this.roomMenuModel.get('state'));
+    return data;
+  }
+});
 
 module.exports =  BaseCollectionView.extend({
   childView:          ItemView,

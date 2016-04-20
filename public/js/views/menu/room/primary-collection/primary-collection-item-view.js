@@ -40,7 +40,7 @@ module.exports = BaseCollectionItemView.extend({
   },
 
   serializeData: function() {
-    var data = BaseCollectionItemView.prototype.serializeData.apply(this, arguments);
+    var data = parseForTemplate(this.model.toJSON(), this.roomMenuModel.get('state'));
 
     //When the user is viewing a room he is lurking in and activity occurs
     //we explicitly, in this case, cancel the lurk activity
