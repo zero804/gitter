@@ -10,7 +10,6 @@ var billingService        = require('../../services/billing-service');
 var roomPermissionsModel  = require('../../services/room-permissions-model');
 var troupeService         = require('../../services/troupe-service');
 var _                     = require("lodash");
-var winston               = require('../../utils/winston');
 var collections           = require('../../utils/collections');
 var debug                 = require('debug')('gitter:troupe-strategy');
 var Promise               = require('bluebird');
@@ -394,7 +393,7 @@ function TroupeStrategy(options) {
         otherUser = mapOtherUser(item.oneToOneUsers);
       } else {
         if (!shownWarning) {
-          winston.warn('TroupeStrategy initiated without currentUserId, but generating oneToOne troupes. This can be a problem!');
+          logger.warn('TroupeStrategy initiated without currentUserId, but generating oneToOne troupes. This can be a problem!');
           shownWarning = true;
         } else {
           otherUser = null;

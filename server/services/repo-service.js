@@ -1,9 +1,10 @@
 "use strict";
 
+var env         = require('gitter-web-env');
+var winston     = env.logger;
 var GithubRepo  = require('gitter-web-github').GitHubRepoService;
 var persistence = require('./persistence-service');
 var Promise     = require('bluebird');
-var winston     = require('../utils/winston');
 
 function applyFilters(array, filters) {
   // Filter out what needs filtering out

@@ -2,8 +2,8 @@
 
 var env               = require('gitter-web-env');
 var nconf             = env.config;
+var winston           = env.logger;
 var statsd            = env.createStatsClient({ prefix: nconf.get('stats:statsd:prefix')});
-var winston           = require('../utils/winston');
 var appEvents         = require('gitter-web-appevents');
 var bayeux            = require('../web/bayeux');
 var ent               = require('ent');

@@ -1,8 +1,8 @@
 "use strict";
 
 var env            = require('gitter-web-env');
-var mongoose       = require('../utils/mongoose-q');
-var winston        = require('../utils/winston');
+var winston        = env.logger;
+var mongoose       = require('gitter-web-mongoose-bluebird');
 var debug          = require('debug')('gitter:persistence-service');
 var mongoDebug     = require('node-mongodb-debug-log');
 

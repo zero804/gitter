@@ -1,7 +1,8 @@
 "use strict";
 
+var env = require('gitter-web-env');
+var winston = env.logger;
 var logoutDestroyTokens = require('./logout-destroy-tokens');
-var winston = require('../../utils/winston');
 
 /* Has to have four args */
 module.exports = function(err, req, res, next) {
