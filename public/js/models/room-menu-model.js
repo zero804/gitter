@@ -93,7 +93,16 @@ module.exports = Backbone.Model.extend({
     this.activeRoomCollection   = new FilteredRoomCollection({
       roomModel:  this,
       collection: this._roomCollection,
+      shouldDebug: true
     });
+
+    this.listenTo(this.activeRoomCollection, 'add remove', function() {
+      console.log('activeRoomCollection-add-remove');
+    }, this);
+
+    window.arcSetFilter = function() {
+      this.activeRoomCollection.setFilter();
+    }.bind(this);
 
     this.primaryCollection   = new ProxyCollection({ collection: this.activeRoomCollection });
     this.secondaryCollection = new ProxyCollection({ collection: this.searchTerms });
@@ -137,6 +146,7 @@ module.exports = Backbone.Model.extend({
   },
 
   onSwitchState: function(model, val) {/*jshint unused: true */
+    console.log('onSwitchState');
 
     //TODO Test this JP 27/1/15
     switch (val) {
