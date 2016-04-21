@@ -18,7 +18,9 @@ var SuggestedCollection = Backbone.Collection.extend({
     this.urlModel       = backboneUrlResolver('/v1/orgs/:selectedOrgName/suggestedRooms', this.contextModel);
     this.listenTo(this.contextModel, 'change:selectedOrgName', this.onOrgNameUpdate, this);
 
-    if(this.contextModel.get('state') === 'org'){
+    var selectedOrg = this.contextModel.get('selectedOrgName');
+    var orgIsSelected = selectedOrg && selectedOrg.length > 0;
+    if(this.contextModel.get('state') === 'org' && orgIsSelected) {
       this.fetch({ reset: true });
     }
 
