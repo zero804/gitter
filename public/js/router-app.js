@@ -407,7 +407,7 @@ onready(function() {
           var roomMenuModel                     = appLayout.getRoomMenuModel();
           var currentLeftMenuState              = roomMenuModel.get('state');
           var currentlySelectedOrg              = roomMenuModel.get('selectedOrgName');
-          var hasPermissionToCreateOrgChildRoom = !!troupeCollections.troupes.findWhere({ uri: currentlySelectedOrg });
+          var hasPermissionToCreateOrgChildRoom = !!troupeCollections.troupes.findWhere({ uri: currentlySelectedOrg }) || context.getUser().username === currentlySelectedOrg;
 
           if(currentLeftMenuState === 'org' && hasPermissionToCreateOrgChildRoom) {
             return currentlySelectedOrg;
