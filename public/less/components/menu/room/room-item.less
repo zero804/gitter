@@ -10,18 +10,24 @@
   height:     @menu-item-height * 3;
   max-height: @menu-item-height;
   opacity:    0;
-  transition: opacity .2s ease-in, max-height .2s ease-in;
+  transition:
+    height .2s ease-in,
+    max-height .2s ease-in,
+    opacity .2s ease-in;
   overflow:   hidden;
 
+  &:hover {
+    //.room-item-selected();
+
+    & .room-item__options {
+      opacity: 1;
+    }
+  }
+
+  
   &.active {
     max-height: @menu-item-height * 3;
   }
-
-  .loaded & {
-    opacity: 1;
-  }
-
-
 
   &.gu-mirror {
     opacity: 1;
@@ -37,12 +43,13 @@
     }
   }
 
-  &:hover {
-    //.room-item-selected();
+  &.will-hideaway {
+    height: 0;
+  }
 
-    & .room-item__options {
-      opacity: 1;
-    }
+
+  .loaded & {
+    opacity: 1;
   }
 
   .desktop & {

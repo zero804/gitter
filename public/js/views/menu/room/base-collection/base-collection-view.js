@@ -39,7 +39,7 @@ module.exports = Marionette.CompositeView.extend({
   },
 
   childEvents: {
-    'item:clicked':   'onItemClicked',
+    'item:activated': 'onItemActivated',
     'hide:complete':  'onHideLeaveRoom',
     'leave:complete': 'onHideLeaveRoom',
   },
@@ -59,7 +59,7 @@ module.exports = Marionette.CompositeView.extend({
     }
   },
 
-  onItemClicked: function(view) {
+  onItemActivated: function(view) {
     var model = view.model;
     var name = (model.get('uri') ||
                 model.get('url') ||
