@@ -83,7 +83,7 @@ elasticsearch:
   entrypoint: [ "/src/scripts/docker/es/start-elasticsearch.sh" ]
 
 elasticsearchsetup:
-  image: node:0.10
+  image: node:4
   restart: 'no'
   links:
     - mongo1
@@ -96,7 +96,7 @@ elasticsearchsetup:
   entrypoint: [ "/src/scripts/docker/es/setup-elasticsearch.sh" ]
 
 internal-min:
-  image: node:0.10
+  image: node:4
   restart: 'no'
   links:
     - redis1
@@ -115,7 +115,7 @@ internal-min:
   working_dir: ${WORKSPACE}
 
 internal-mac:
-  image: node:0.10
+  image: node:4
   restart: 'no'
   links:
     - redis1
@@ -132,7 +132,7 @@ internal-mac:
   working_dir: ${WORKSPACE}
 
 internal:
-  image: node:0.10
+  image: node:4
   restart: 'no'
   links:
     - redis1
