@@ -32,6 +32,7 @@ router.get('/',
   identifyRoute('login'),
   function(req, res) {
     res.render('login', {
+      returnTo: req.query.returnTo,
       bootScriptName: 'router-login',
       cssFileName:  "styles/login.css",
       showNewLogin: !!req.cookies.new_login
