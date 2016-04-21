@@ -21,8 +21,6 @@ FilteredRoomCollection.prototype = _.extend(
       throw new Error('A valid RoomMenuModel must be passed to a new instance of FilteredRoomCollection');
     }
 
-    this.shouldDebug = options.shouldDebug;
-
     this.roomModel = options.roomModel;
     this.listenTo(this.roomModel, 'change:state', this.onModelChangeState, this);
     this.listenTo(this.roomModel, 'change:selectedOrgName', this.onOrgNameChange, this);
@@ -38,25 +36,9 @@ FilteredRoomCollection.prototype = _.extend(
 
     FilteredCollection.prototype.initialize.apply(this, arguments);
     this.onModelChangeState();
-
-    if(this.shouldDebug) {
-      window.logFrcComparator = function() {
-        console.groupCollapsed('frc-comparator')
-        console.log('comparator', this.comparator);
-        if(this.comparator) {
-          this.comparator({}, {}, true);
-        }
-        console.groupEnd();
-      }.bind(this);
-    }
   },
 
   onModelChangeState: function() {
-
-    if(this.shouldDebug) {
-      console.log('frc-onModelChangeStat', this.roomModel.get('state'));
-    }
-
     switch (this.roomModel.get('state')) {
 
       case 'people' :
@@ -75,16 +57,10 @@ FilteredRoomCollection.prototype = _.extend(
   },
 
   onOrgNameChange: function() {
-    if(this.shouldDebug) {
-      console.log('frc-onOrgNameChange');
-    }
     this.setFilter();
   },
 
   onFavouriteChange: function (){
-    if(this.shouldDebug) {
-      console.log('frc-onFavouriteChange');
-    }
     this.setFilter();
   },
 
@@ -109,12 +85,7 @@ FilteredRoomCollection.prototype = _.extend(
     this.trigger.apply(this, ['snapshot'].concat(args));
   },
 
-  comparator:     function(a, b, shouldDebug) {
-    if(shouldDebug) {
-      console.log('using frc comparator');
-    }
-    return sortAndFilters.recents.sort.apply(this, arguments);
-  },
+  comparator:     sortAndFilters.recents.sort,
 
 });
 
