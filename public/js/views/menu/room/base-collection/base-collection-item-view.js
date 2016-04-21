@@ -11,10 +11,11 @@ module.exports = Marionette.ItemView.extend({
   template:  template,
 
   triggers: {
-    'click': 'item:clicked',
+    'click': 'item:activated',
   },
 
   modelEvents: {
+    'activated':       'onItemActivated',
     'change:selected': 'onSelectedChange',
     'change:focus':    'onItemFocused',
     'change:unreadItems change:mentions change:activity': 'onUnreadUpdate',
@@ -28,6 +29,7 @@ module.exports = Marionette.ItemView.extend({
   constructor: function(attrs) {
     this.roomMenuModel = attrs.roomMenuModel;
     this.index         = attrs.index;
+
     Marionette.ItemView.prototype.constructor.apply(this, arguments);
   },
 
@@ -47,6 +49,10 @@ module.exports = Marionette.ItemView.extend({
           unreadIndicatorElement.style.animation = '';
       }, 16);
     });
+  },
+
+  onItemActivated: function() {
+    this.trigger('item:activated');
   },
 
   onSelectedChange: function(model, val) { //jshint unused: true

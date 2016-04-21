@@ -4,14 +4,28 @@ var Backbone = require('backbone');
 var dragula  = require('dragula');
 var _        = require('underscore');
 
-var DNDCtrl = function(attrs) {
+var distance = function(pt1, pt2) {
+  var dist2 = Math.pow(pt1.x - pt2.x, 2) + Math.pow(pt1.y - pt2.y, 2);
+  var dist = Math.sqrt(dist2);
+  return dist;
+};
 
-  if (!attrs || !attrs.model) {
+
+var DNDCtrl = function(attrs) {
+  attrs = attrs || {};
+
+  if (!attrs.model) {
     throw new Error('A valid model must be passed to a new instance of the DNDController');
   }
 
+  this.deadzone = attrs.deadzone || 20;
   this.model = attrs.model;
+
+  this.currentDragDistance = 0;
+  this.prevMousePosition = null;
+
   this.onMouseUp = this.onMouseUp.bind(this);
+  this.onMouseMove = this.onMouseMove.bind(this);
 
   this.drag = dragula([], {
     moves:   this.shouldItemMove.bind(this),
@@ -21,7 +35,12 @@ var DNDCtrl = function(attrs) {
   this.drag.on('dragend', this.onDragEnd.bind(this));
   this.drag.on('remove',  this.onDragEnd.bind(this));
   this.drag.on('drop',    this.onItemDropped.bind(this));
+  this.drag.on('cancel',  this.onDragCancel.bind(this));
   this.drag.on('over',    this.onContainerHover.bind(this));
+
+  // Can't space separate multiple events with dragulas `contra/emitter` :(
+  this.drag.on('drop',   this.onDragDoneDeadzoneActivate.bind(this));
+  this.drag.on('cancel', this.onDragDoneDeadzoneActivate.bind(this));
 };
 
 DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
@@ -45,8 +64,11 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
   },
 
   onItemDropped: function(el, target, source, sibling) {//jshint unused: true
+    this.onDragDoneDeadzoneActivate(el, target);
+
     //guard against no drop target
-    if (!target || !target.dataset) { return; }
+    if(!target || !target.dataset) { return }
+
     if (this.model.get('state') !== 'favourite' &&
         target.dataset.stateChange === 'favourite') {
       this.trigger('room-menu:add-favourite', el.dataset.id);
@@ -59,26 +81,59 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
       this.trigger('room-menu:sort-favourite', el.dataset.id, siblingID);
       this.onDragEnd();
     }
+  },
 
+  onDragCancel: function(el) {
+    this.onDragDoneDeadzoneActivate(el);
+  },
+
+  onDragDoneDeadzoneActivate: function(el, target) {
+    // When `target` isn't definend, the element was dropped where it came from
+    // So we will just consider it as a "click"/activation
+    if(!target && this.currentDragDistance <= this.deadzone) {
+      this.trigger('dnd:activate-item', el.dataset.id);
+    }
   },
 
   onDragStart: function () {
+    this.currentDragDistance = 0;
+    this.prevMousePosition = null;
+
     this.mirror = document.querySelector('gu-mirror');
-    this.trigger('dnd:start-drag');
     window.addEventListener('mouseup', this.onMouseUp);
+    // We could get slightly more accurate results if we always listened to mouse move
+    // Or had a click handler to start off the initial mouse position for this drag.
+    // But this is a simple way to avoid event-listener clean-up
+    window.addEventListener('mousemove', this.onMouseMove);
+
+    this.trigger('dnd:start-drag');
   },
 
   onDragEnd: function (el) {
     this.mirror = null;
     window.removeEventListener('mouseup', this.onMouseUp);
-    this.trigger('dnd:end-drag');
+    window.removeEventListener('mousemove', this.onMouseMove);
     if(el) {
       el.classList.remove('hidden');
+      el.classList.remove('will-hideaway');
     }
+
+    this.trigger('dnd:end-drag');
   },
 
   onMouseUp: function () {
     this.onDragEnd();
+  },
+
+  onMouseMove: function(e) {
+    var currentPosition = {
+      x: e.clientX,
+      y: e.clientY
+    };
+
+    this.currentDragDistance += distance(this.prevMousePosition || currentPosition, currentPosition);
+
+    this.prevMousePosition = currentPosition;
   },
 
   onContainerHover: function (el, container) { //jshint unused: true
@@ -90,7 +145,7 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
       mirror  = document.querySelector('.gu-mirror');
       transit = document.querySelector('.gu-transit');
       if (mirror) { mirror.classList.add('hidden'); }
-      if(transit) { transit.classList.remove('hidden'); }
+      if(transit) { transit.classList.remove('will-hideaway'); }
     }
 
     //If we hover over the primary collection show the drag mirror
@@ -98,7 +153,7 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
       mirror  = document.querySelector('.gu-mirror');
       transit = document.querySelector('.gu-transit');
       if (mirror) { mirror.classList.remove('hidden'); }
-      if(transit) { transit.classList.add('hidden'); }
+      if(transit) { transit.classList.add('will-hideaway'); }
     }
   },
 
