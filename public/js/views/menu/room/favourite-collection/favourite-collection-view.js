@@ -5,7 +5,6 @@ var Marionette            = require('backbone.marionette');
 var PrimaryCollectionView = require('../primary-collection/primary-collection-view');
 var BaseCollectionView    = require('../base-collection/base-collection-view');
 var ItemView              = require('./favourite-collection-item-view');
-var toggleClass           = require('utils/toggle-class');
 
 var FavouriteCollection = PrimaryCollectionView.extend({
 
@@ -36,6 +35,9 @@ var FavouriteCollection = PrimaryCollectionView.extend({
   //between this and the primary collection at this point.
   //If the complexity around this rises I may consider it
   setActive: function () {
+    if(!this.collection.length) {
+      return this.el.classList.remove('active');
+    }
     BaseCollectionView.prototype.setActive.apply(this, arguments);
   },
 
@@ -47,18 +49,24 @@ var FavouriteCollection = PrimaryCollectionView.extend({
   },
 
 
-  onFavouritesSorted: function(targetID, siblingID) {
+  onFavouritesSorted: function(targetID, siblingID, position) {
 
     var target  = this.roomCollection.get(targetID);
     var sibling = this.roomCollection.get(siblingID);
     var index   = !!sibling ? sibling.get('favourite') : (this.getHighestFavourite() + 1);
     var max     = this.roomCollection.max('favourite');
+    var min     = this.roomCollection.min('favourite');
 
     //If we have a sibling and that sibling has the highest favourite value
     //then we have dropped the item in the second to last position
     //so we need to account for that
-    if (!!sibling && !!max && (sibling.get('id') === max.get('id'))) {
+    if ((!!sibling && !!max && (sibling.get('id') === max.get('id'))) ||
+        !!max && position === 'last') {
       index = max.get('favourite');
+    }
+
+    if(position === 'first' && !!min) {
+      index = min.get('favourite');
     }
 
     //Save the new favourite
