@@ -44,11 +44,15 @@ test: clean npm
 	mkdir -p output/
 	./exec-in-docker ./node_modules/.bin/gulp test-docker
 
-npm-quick:
+print-nodejs-version:
+	node --version
+	npm --version
+
+npm-quick: print-nodejs-version
 	npm prune
 	npm install
 
-npm-full:
+npm-full: print-nodejs-version
 	npm cache clean
 	rm -rf node_modules/
 	npm install
