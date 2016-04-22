@@ -6,8 +6,12 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 WORKSPACE=${WORKSPACE-$SCRIPT_DIR}
 DEBUG=${DEBUG-}
+NODE_VERSION=$(node --version)
+NODE_VERSION=${NODE_VERSION#v} # Drop the `v` prefix
+
 export WORKSPACE
 export DEBUG
+export NODE_VERSION
 
 SU_TO_UID=${UID}
 SU_TO_USER=${USER}
