@@ -241,7 +241,7 @@ function renderMainFrame(req, res, next, frame) {
 
       //TODO Pass this to MINIBAR?? JP 17/2/16
       var hasNewLeftMenu            = !req.isPhone && req.fflip && req.fflip.has('left-menu');
-      var snapshots                 = troupeContext.snapshots = parseSnapshotsForPageContext(req, troupeContext, orgs, rooms);
+      var snapshots                 = troupeContext.snapshots = parseSnapshotsForPageContext(req, troupeContext, rooms);
       var leftMenuRoomList          = parseRoomsIntoLeftMenuRoomList(snapshots.leftMenu.state, snapshots.rooms, snapshots.leftMenu.selectedOrgName);
       var leftMenuFavouriteRoomList = parseRoomsIntoLeftMenuFavouriteRoomList(snapshots.leftMenu.state, snapshots.rooms, snapshots.leftMenu.selectedOrgName);
 

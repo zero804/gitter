@@ -27,6 +27,7 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     searchHeader: '#primary-collection-search-header'
   },
 
+  reorderOnSort: true,
   hasInit: false,
   getEmptyView: function() {
     switch (this.roomMenuModel.get('state')) {
@@ -59,9 +60,11 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     this.dndCtrl = options.dndCtrl;
     this.uiModel = new Backbone.Model({ isFocused: false, isDragging: false });
     this.listenTo(this.roomMenuModel, 'change:searchTerm', this.setActive, this);
+    this.listenTo(this.collection, 'filter-complete', this.setActive, this);
     this.listenTo(this.dndCtrl, 'dnd:start-drag', this.onDragStart, this);
     this.listenTo(this.dndCtrl, 'dnd:end-drag', this.onDragEnd, this);
     this.listenTo(this.uiModel, 'change:isDragging', this.onDragStateUpdate, this);
+    this.listenTo(this.roomMenuModel, 'change:state:post', this.render, this);
     BaseCollectionView.prototype.initialize.apply(this, arguments);
   },
 
@@ -82,6 +85,11 @@ var PrimaryCollectionView = BaseCollectionView.extend({
         break;
       default:
         this.ui.searchHeader[0].classList.add('hidden');
+
+        if (!this.collection.length) {
+          return this.el.classList.remove('active');
+        }
+
         proto.setActive.apply(this, arguments);
         break;
 
