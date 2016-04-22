@@ -42,6 +42,7 @@ clean:
 
 test: clean npm
 	mkdir -p output/
+	./exec-in-docker node --version
 	./exec-in-docker ./node_modules/.bin/gulp test-docker
 
 print-nodejs-version:
