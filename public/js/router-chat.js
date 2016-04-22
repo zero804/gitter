@@ -247,8 +247,10 @@ onready(function() {
       'keys': 'keys',
       'integrations': 'integrations',
       'add': 'addPeople',
-      'tags/:roomId': 'editTags',
-      'autojoin': 'autojoin'
+      'settings': 'settings',
+      'tags': 'editTags',
+      'autojoin': 'autojoin',
+      'notification-defaults': 'notificationDefaults'
     },
 
     autojoin: function() {
@@ -274,9 +276,9 @@ onready(function() {
     },
 
     notifications: function() {
-      require.ensure(['views/modals/room-settings-view'], function(require) {
-        var TroupeSettingsView = require('views/modals/room-settings-view');
-        appView.dialogRegion.show(new TroupeSettingsView({ model: new Backbone.Model() }));
+      require.ensure(['views/modals/notification-settings-view'], function(require) {
+        var NotificationSettingsView = require('views/modals/notification-settings-view');
+        appView.dialogRegion.show(new NotificationSettingsView({ model: new Backbone.Model() }));
       });
     },
 
@@ -314,6 +316,13 @@ onready(function() {
 
     },
 
+    settings: function() {
+      require.ensure(['views/modals/room-settings-view'], function(require) {
+        var RoomSettingsModal = require('views/modals/room-settings-view');
+        appView.dialogRegion.show(new RoomSettingsModal({ model: context.troupe() }));
+      });
+    },
+
     editTags: function() {
       require.ensure(['views/modals/edit-tags-view'], function(require) {
         var EditTagsView = require('views/modals/edit-tags-view');
@@ -348,6 +357,17 @@ onready(function() {
         appView.dialogRegion.show(new DeleteModal({}));
       });
     },
+
+    notificationDefaults: function() {
+      require.ensure(['./views/modals/notification-defaults-view'], function(require) {
+        var NotificationDefaultsView = require('./views/modals/notification-defaults-view');
+
+        appView.dialogRegion.show(new NotificationDefaultsView({
+          model: new Backbone.Model()
+        }));
+
+      });
+    }
 
   });
 

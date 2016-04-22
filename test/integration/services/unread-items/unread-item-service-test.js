@@ -17,6 +17,7 @@ var hamcrest = getHamcrest();
 var blockTimer = require('../../block-timer');
 var Promise = require('bluebird');
 var assert = require('assert');
+var lazy = require('lazy.js');
 var testGenerator = require('../../test-generator');
 var MockBadgeBatcherController = require('../../utils/mock-redis-batcher');
 var Distribution = testRequire('./services/unread-items/distribution');
@@ -801,10 +802,7 @@ describe('unread-item-service', function() {
           nonMemberMentions: meta.notifyNewRoomUserIds
         };
 
-        var results = meta.results.reduce(function(memo, result) {
-          memo[result.userId] = result;
-          return memo;
-        }, {});
+        var results = lazy(meta.results);
 
         var isEdit = meta.isEdit;
 
@@ -834,7 +832,9 @@ describe('unread-item-service', function() {
         }, {});
         parsed.presence = presence;
 
-        processResultsForNewItemWithMentions(troupeId, chatId, new Distribution(parsed), results, isEdit);
+        var distribution = new Distribution(parsed);
+        var resultsDistribution = distribution.resultsProcessor(results);
+        processResultsForNewItemWithMentions(troupeId, chatId, distribution, resultsDistribution, isEdit);
 
         if (meta.expectUserMentionedInNonMemberRoom.length) {
           meta.expectUserMentionedInNonMemberRoom.forEach(function(userId) {

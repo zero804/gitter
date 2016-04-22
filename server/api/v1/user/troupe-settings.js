@@ -1,11 +1,16 @@
 "use strict";
 
-var StatusError           = require('statuserror');
-var roomMembershipService = require('../../../services/room-membership-service');
+var Promise                   = require('bluebird');
+var StatusError               = require('statuserror');
+var roomMembershipService     = require('../../../services/room-membership-service');
+var userDefaultFlagsService   = require('../../../services/user-default-flags-service');
+var userRoomModeUpdateService = require('../../../services/user-room-mode-update-service');
 
 function generateResponse(userId, troupeId) {
-  return roomMembershipService.getMembershipDetails(userId, troupeId)
-    .then(function(details) {
+  return Promise.join(
+    roomMembershipService.getMembershipDetails(userId, troupeId),
+    userDefaultFlagsService.getDefaultFlagDetailsForUserId(userId),
+    function(details, defaults) {
       if (!details) throw new StatusError(404);
 
       return {
@@ -18,7 +23,10 @@ function generateResponse(userId, troupeId) {
         mention: details.mention,
         announcement: details.announcement,
         desktop: details.desktop,
-        mobile: details.mobile
+        mobile: details.mobile,
+
+        default: details.default,
+        defaultSettings: defaults
       };
     });
 
@@ -51,8 +59,7 @@ module.exports = {
     var mode = settings && (settings.mode || settings.push);
 
     if (!mode) throw new StatusError(400, 'Illegal notifications mode');
-
-    return roomMembershipService.setMembershipMode(userId, troupeId, mode, false)
+    return userRoomModeUpdateService.setModeForUserInRoom(req.resourceUser, troupeId, mode)
       .then(function() {
         return generateResponse(userId, troupeId);
       });

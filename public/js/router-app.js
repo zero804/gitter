@@ -397,6 +397,23 @@ onready(function() {
     createcustomroom: function(name) {
 
       function getSuitableParentRoomUri() {
+
+        if(context.hasFeature('left-menu')) {
+          //JP 12/4/16
+          // If the left menu is in an org state we can take the currently selected
+          // org as the correct parent for the newly created room
+          // we have to check if the org exists in the users room list otherwise
+          // they probably don't have permission to create a child room of that type
+          var roomMenuModel                     = appLayout.getRoomMenuModel();
+          var currentLeftMenuState              = roomMenuModel.get('state');
+          var currentlySelectedOrg              = roomMenuModel.get('selectedOrgName');
+          var hasPermissionToCreateOrgChildRoom = !!troupeCollections.troupes.findWhere({ uri: currentlySelectedOrg }) || context.getUser().username === currentlySelectedOrg;
+
+          if(currentLeftMenuState === 'org' && hasPermissionToCreateOrgChildRoom) {
+            return currentlySelectedOrg;
+          }
+        }
+
         var currentRoomUri = window.location.pathname.split('/').slice(1).join('/');
 
         if (currentRoomUri === 'home') {

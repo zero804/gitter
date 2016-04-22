@@ -1,6 +1,6 @@
 "use strict";
 
-var mongoose       = require('../../utils/mongoose-q');
+var mongoose       = require('gitter-web-mongoose-bluebird');
 var Schema         = mongoose.Schema;
 var ObjectId       = Schema.ObjectId;
 
@@ -51,7 +51,7 @@ module.exports = {
       githubId: { type: Number, default: null },
       lang: { type: String }, // Human language of this room
       renamedLcUris: [String],
-      disabledProviders: [String],
+      providers: [String],
       _nonce: { type: Number },
       _tv: { type: 'MongooseNumber', 'default': 0 }
     }, { strict: 'throw' });

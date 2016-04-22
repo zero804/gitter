@@ -1,5 +1,7 @@
 "use strict";
-var nconf       = require('../utils/config');
+
+var env = require('gitter-web-env');
+var nconf = env.config;
 var mixpanelToken = nconf.get('stats:mixpanel:token');
 
 exports.getMixpanelDistinctId = function(cookies) {

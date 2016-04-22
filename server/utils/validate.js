@@ -1,6 +1,7 @@
 "use strict";
 
-var winston = require('./winston');
+var env = require('gitter-web-env');
+var winston = env.logger;
 var StatusError = require('statuserror');
 
 var m = {

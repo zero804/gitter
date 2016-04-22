@@ -31,20 +31,16 @@ FilteredRoomCollection.prototype = _.extend(
 
     this.roomCollection = options.collection;
     this.listenTo(this.roomCollection, 'snapshot', this.onRoomCollectionSnapshot, this);
-
-    this.listenTo(this, 'sync', this.onSync, this);
+    this.listenTo(this, 'filter-complete change:escalationTime change:activity change:unreadItems change:mentions', this.sort, this);
+    this.listenTo(this, 'change:favourite', this.onFavouriteChange, this);
 
     FilteredCollection.prototype.initialize.apply(this, arguments);
     this.onModelChangeState();
   },
 
   onModelChangeState: function() {
-    this.comparator = FilteredRoomCollection.prototype.comparator;
     switch (this.roomModel.get('state')) {
-      case 'favourite' :
-        this.setFilter(this.filterFavourite.bind(this));
-        this.comparator = this.sortFavourites;
-        break;
+
       case 'people' :
         this.setFilter(this.filterOneToOnes.bind(this));
         break;
@@ -58,15 +54,17 @@ FilteredRoomCollection.prototype = _.extend(
         this.setFilter(this.filterDefault);
         break;
     }
-    //sort silently to stop multiple renders
-    this.sort({ silent: true });
   },
 
   onOrgNameChange: function() {
     this.setFilter();
   },
 
-  filterDefault: sortAndFilters.leftMenu.filter,
+  onFavouriteChange: function (){
+    this.setFilter();
+  },
+
+  filterDefault:   sortAndFilters.recents.filter,
   filterFavourite: sortAndFilters.favourites.filter,
 
   filterOneToOnes: function(model) {
@@ -88,11 +86,6 @@ FilteredRoomCollection.prototype = _.extend(
   },
 
   comparator:     sortAndFilters.recents.sort,
-  sortFavourites: sortAndFilters.favourites.sort,
-
-  onSync: function() {
-    if (this.comparator) { this.sort(); }
-  },
 
 });
 

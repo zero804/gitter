@@ -4,6 +4,7 @@
 
 var userService = require('../../server/services/user-service');
 var troupeService = require('../../server/services/troupe-service');
+var oneToOneRoomService = require('../../server/services/one-to-one-room-service');
 var categoriseUsersInRoom = require('../../server/services/categorise-users-in-room');
 var roomMembershipService = require('../../server/services/room-membership-service');
 var collections = require('../../server/utils/collections');
@@ -49,7 +50,7 @@ function getTroupe() {
     if (!fromUser) throw new Error('User ' + opts.fromUser + ' not found');
     if (!toUser) throw new Error('User ' + opts.toUser + ' not found');
 
-    return troupeService.findOneToOneTroupe(fromUser._id, toUser._id);
+    return oneToOneRoomService.findOneToOneRoom(fromUser._id, toUser._id);
   });
 
 }
