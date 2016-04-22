@@ -32,6 +32,7 @@ router.get('/',
   identifyRoute('login'),
   function(req, res) {
     res.render('login', {
+      source: req.query.source || 'login_page-login',
       returnTo: req.query.returnTo,
       bootScriptName: 'router-login',
       cssFileName:  "styles/login.css",
