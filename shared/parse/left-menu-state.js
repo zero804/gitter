@@ -1,14 +1,14 @@
 'use strict';
 
-var _                        = require('underscore');
-var getOrgNameFromTroupeName = require('../get-org-name-from-troupe-name.js');
+var _ = require('underscore');
+var getOrgNameFromUri = require('../get-org-name-from-uri');
 
 var defaults = {
   previousUnloadTime: null,
-  isOneToOne: false
+  isOneToOne: false,
 };
 
-module.exports = function generateLeftMenuState(leftRoomMenuState, roomUri, orgs, options) {
+module.exports = function generateLeftMenuState(leftRoomMenuState, uri, orgs, options) {
   var opts = _.extend({}, defaults, options);
   var currentLeftRoomMenuData = (leftRoomMenuState || {});
 
@@ -16,27 +16,24 @@ module.exports = function generateLeftMenuState(leftRoomMenuState, roomUri, orgs
   var currentState = currentLeftRoomMenuData.state || 'all';
   var currentlySelectedOrgName = currentLeftRoomMenuData.selectedOrgName || '';
 
-  // Try to resolve the left-menu state if there is an room to look at
-  if(roomUri) {
-    var timeNow = new Date().getTime();
-    var previousUnloadTime = opts.previousUnloadTime;
-    // 5000 is an arbitrary good-enough threshold to aproximate page-refresh
-    var isWithinRefreshTimeThreshold = previousUnloadTime && (timeNow - previousUnloadTime) < 5000;
+  var timeNow = new Date().getTime();
+  var previousUnloadTime = opts.previousUnloadTime;
+  // 5000 is an arbitrary good-enough threshold to aproximate page-refresh
+  var isWithinRefreshTimeThreshold = previousUnloadTime && (timeNow - previousUnloadTime) < 5000;
 
-    // Only try to resolve their state if they aren't "refreshing"
-    if(!isWithinRefreshTimeThreshold) {
-      currentlySelectedOrgName = getOrgNameFromTroupeName(roomUri);
+  // Only try to resolve their state if they aren't "refreshing"
+  if(!isWithinRefreshTimeThreshold) {
+    currentlySelectedOrgName = getOrgNameFromUri(uri);
 
-      var isCurrentRoomInRoomList = orgs.some(function(org) {
-        return org.name === currentlySelectedOrgName;
-      });
+    var isCurrentRoomInRoomList = orgs.some(function(org) {
+      return org.name === currentlySelectedOrgName;
+    });
 
-      if(isCurrentRoomInRoomList) {
-        currentState = 'org';
-      }
-      else if(opts.isOneToOne) {
-        currentState = 'people';
-      }
+    if(isCurrentRoomInRoomList) {
+      currentState = 'org';
+    }
+    else if(opts.isOneToOne) {
+      currentState = 'people';
     }
   }
 
