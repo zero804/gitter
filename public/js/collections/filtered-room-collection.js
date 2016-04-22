@@ -32,7 +32,8 @@ FilteredRoomCollection.prototype = _.extend(
 
     this.roomCollection = options.collection;
     this.listenTo(this.roomCollection, 'snapshot', this.onRoomCollectionSnapshot, this);
-    this.listenTo(this, 'filter-complete change:lastAccessTime change activity change:unreadItems change:mentions', this.sort, this);
+    this.listenTo(this, 'filter-complete change:escalationTime change:activity change:unreadItems change:mentions', this.sort, this);
+    this.listenTo(this, 'change:favourite', this.onFavouriteChange, this);
 
     FilteredCollection.prototype.initialize.apply(this, arguments);
     this.onModelChangeState();
@@ -58,6 +59,10 @@ FilteredRoomCollection.prototype = _.extend(
   },
 
   onOrgNameChange: function() {
+    this.setFilter();
+  },
+
+  onFavouriteChange: function (){
     this.setFilter();
   },
 

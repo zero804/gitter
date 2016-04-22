@@ -1,52 +1,53 @@
 'use strict';
 
-var _                            = require('underscore');
-var getOrgNameFromTroupeName     = require('../get-org-name-from-troupe-name');
+var _                        = require('underscore');
+var getOrgNameFromTroupeName = require('../get-org-name-from-troupe-name.js');
 
+module.exports = function parseLeftMenuTroupeContext(req, troupeContext, minibarOrgList) {
+  var currentLeftRoomMenuData = (troupeContext.leftRoomMenuState || {});
 
-var resolvePageLoadedLeftMenuState = function(currentLeftRoomMenuData, req) {
-  var currentState = currentLeftRoomMenuData.state;
-  var currentlySelectedOrg = currentLeftRoomMenuData.selectedOrgName;
+  var roomMenuIsPinned = currentLeftRoomMenuData.roomMenuIsPinned;
+  var currentState = currentLeftRoomMenuData.state || 'all';
+  var currentlySelectedOrgName = currentLeftRoomMenuData.selectedOrgName || '';
 
-  // If actually on a room page that needs some auto-resolving
+  // Try to resolve the left-menu state if there is an room to look at
   if(req.troupe) {
     var timeNow = new Date().getTime();
     var previousLocationUnloadTime = req.cookies.previousLocationUnloadTime;
     // 5000 is an arbitrary good-enough threshold to aproximate page-refresh
     var isWithinRefreshTimeThreshold = previousLocationUnloadTime && (timeNow - previousLocationUnloadTime) < 5000;
-
+    
+    // Only try to resolve their state if they aren't "refreshing"
     if(!isWithinRefreshTimeThreshold) {
-      currentState = 'org';
-      currentlySelectedOrg = getOrgNameFromTroupeName(req.troupe.uri);
+      currentlySelectedOrgName = getOrgNameFromTroupeName(req.troupe.uri);
+
+      if(req.troupe.oneToOne) {
+        currentlySelectedOrgName = req.uriContext.oneToOneUser.username;
+      }
+
+      minibarOrgList.some(function(org) {
+        var isCurrentRoomInRoomList = org.name === currentlySelectedOrgName;
+        if(isCurrentRoomInRoomList) {
+          currentState = 'org';
+          // break
+          return true;
+        }
+      });
     }
   }
 
-  return {
-    state: currentState,
-    selectedOrgName: currentlySelectedOrg
-  };
-};
 
-
-
-module.exports = function parseLeftMenuTroupeContext(req, troupeContext, orgs, minibarOrgList) {
-
-  var currentLeftMenuState = (troupeContext.leftRoomMenuState || {});
-
-  var resolvedLeftMenuPageLoadedState = resolvePageLoadedLeftMenuState(currentLeftMenuState, req);
-  _.extend(currentLeftMenuState, resolvedLeftMenuPageLoadedState);
-
-  //we need to check he ONLY if the value is not false
-  //If it is null or undefined then we define it as true JP 14/3/16
-  if(currentLeftMenuState.roomMenuIsPinned !== false) {
-    currentLeftMenuState.roomMenuIsPinned = true;
+  // We need to check he ONLY if the value is not false
+  // If it is null or undefined then we define it as true JP 14/3/16
+  if(roomMenuIsPinned !== false) {
+    roomMenuIsPinned = true;
   }
 
-  return {
-    roomMenuIsPinned:        currentLeftMenuState.roomMenuIsPinned,
-    panelOpenState:          currentLeftMenuState.roomMenuIsPinned,
-    state:                   (currentLeftMenuState.state || 'all'),
-    selectedOrgName:         currentLeftMenuState.selectedOrgName,
-    hasDismissedSuggestions: (currentLeftMenuState.hasDismissedSuggestions || false),
-  };
+  var result = _.extend({}, currentLeftRoomMenuData, {
+    roomMenuIsPinned: roomMenuIsPinned,
+    state: currentState,
+    selectedOrgName: currentlySelectedOrgName
+  });
+
+  return result;
 };
