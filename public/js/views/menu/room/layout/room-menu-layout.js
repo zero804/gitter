@@ -111,7 +111,7 @@ module.exports = Marionette.LayoutView.extend({
     // Set it for next time
     window.onbeforeunload = function(e) {
       var timeAtUnload = new Date().getTime();
-      document.cookie = 'previousLocationUnloadTime=' + timeAtUnload + '; path=/';
+      document.cookie = 'previousUnloadTime=' + timeAtUnload + '; path=/';
     }.bind(this);
   },
 

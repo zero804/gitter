@@ -33,7 +33,7 @@ var resolveUserAvatarUrl                    = require('gitter-web-shared/avatars
 var resolveRoomAvatarSrcSet                 = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 var getOrgNameFromTroupeName                = require('gitter-web-shared/get-org-name-from-troupe-name');
 var parseRoomsIntoLeftMenuRoomList          = require('gitter-web-shared/rooms/left-menu-room-list.js');
-var parseSnapshotsForPageContext            = require('gitter-web-shared/parse/snapshots');
+var generateLeftMenuSnapshot                = require('../snapshots/left-menu-snapshot');
 var parseRoomsIntoLeftMenuFavouriteRoomList = require('gitter-web-shared/rooms/left-menu-room-favourite-list');
 var generateRoomCardContext                 = require('gitter-web-shared/templates/partials/room-card-context-generator');
 
@@ -241,7 +241,7 @@ function renderMainFrame(req, res, next, frame) {
 
       //TODO Pass this to MINIBAR?? JP 17/2/16
       var hasNewLeftMenu            = !req.isPhone && req.fflip && req.fflip.has('left-menu');
-      var snapshots                 = troupeContext.snapshots = parseSnapshotsForPageContext(req, troupeContext, rooms);
+      var snapshots                 = troupeContext.snapshots = generateLeftMenuSnapshot(req, troupeContext, rooms);
       var leftMenuRoomList          = parseRoomsIntoLeftMenuRoomList(snapshots.leftMenu.state, snapshots.rooms, snapshots.leftMenu.selectedOrgName);
       var leftMenuFavouriteRoomList = parseRoomsIntoLeftMenuFavouriteRoomList(snapshots.leftMenu.state, snapshots.rooms, snapshots.leftMenu.selectedOrgName);
 
