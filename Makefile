@@ -23,18 +23,25 @@ PATH := ./node_modules/.bin:$(PATH)
 
 .PHONY: build clean test npm sprites npm-quick npm-full performance-tests
 
-build: clean npm
+validate: npm
 	gulp validate
-	mkdir -p output/
-	./exec-in-docker ./node_modules/.bin/gulp test-docker
-	#gulp test-redis-lua
-	gulp submit-coveralls-post-tests
+
+build: clean npm validate test test-lua submit-to-coveralls package
+
+test-lua:
+	echo lua tests disabled #gulp test-redis-lua
+
+package: npm
 	gulp package
+
+submit-to-coveralls: npm test
+	gulp submit-coveralls-post-tests
 
 clean:
 	rm -rf output
 
-test: npm
+test: clean npm
+	mkdir -p output/
 	./exec-in-docker ./node_modules/.bin/gulp test-docker
 
 npm-quick:
