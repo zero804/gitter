@@ -34,8 +34,8 @@ build: clean npm
 clean:
 	rm -rf output
 
-test:
-	gulp test
+test: npm
+	./exec-in-docker ./node_modules/.bin/gulp test-docker
 
 npm-quick:
 	npm prune
