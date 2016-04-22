@@ -203,7 +203,7 @@ function createExpectedFixtures(expected, done) {
       dateDeleted: f.dateDeleted,
       userCount: f.users && f.users.length || f.userCount,
       tags: f.tags,
-      disabledProviders: f.disabledProviders
+      providers: f.providers
     };
 
     debug('Creating troupe %s with %j', fixtureName, doc);

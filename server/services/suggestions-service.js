@@ -53,7 +53,7 @@ var HIGHLIGHTED_ROOMS = [
     uri: 'gitterHQ/nodejs',
     localeLanguage: 'en',
   },{
-    uri: 'rom-rb/chat',
+    uri: 'FreeCodeCamp/FreeCodeCamp',
     localeLanguage: 'en',
   }, {
     uri: 'webpack/webpack',

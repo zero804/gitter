@@ -35,9 +35,9 @@
       "resolved": "http://beta-internal:4873/batch-stream/-/batch-stream-0.1.2.tgz",
       "dependencies": {
         "readable-stream": {
-          "version": "1.0.33",
+          "version": "1.0.34",
           "from": "readable-stream@>=1.0.2 <1.1.0",
-          "resolved": "http://beta-internal:4873/readable-stream/-/readable-stream-1.0.33.tgz",
+          "resolved": "http://beta-internal:4873/readable-stream/-/readable-stream-1.0.34.tgz",
           "dependencies": {
             "core-util-is": {
               "version": "1.0.2",
@@ -64,9 +64,9 @@
       }
     },
     "bluebird": {
-      "version": "3.3.4",
+      "version": "3.3.5",
       "from": "bluebird@>=3.2.1 <4.0.0",
-      "resolved": "http://beta-internal:4873/bluebird/-/bluebird-3.3.4.tgz"
+      "resolved": "http://beta-internal:4873/bluebird/-/bluebird-3.3.5.tgz"
     },
     "body-parser": {
       "version": "1.15.0",
@@ -379,7 +379,7 @@
       "dependencies": {
         "sequin": {
           "version": "0.1.0",
-          "from": "sequin@*",
+          "from": "sequin@latest",
           "resolved": "http://beta-internal:4873/sequin/-/sequin-0.1.0.tgz"
         }
       }
@@ -973,9 +973,9 @@
               }
             },
             "readable-stream": {
-              "version": "1.0.33",
+              "version": "1.0.34",
               "from": "readable-stream@>=1.0.26-2 <1.1.0",
-              "resolved": "http://beta-internal:4873/readable-stream/-/readable-stream-1.0.33.tgz",
+              "resolved": "http://beta-internal:4873/readable-stream/-/readable-stream-1.0.34.tgz",
               "dependencies": {
                 "core-util-is": {
                   "version": "1.0.2",
@@ -1159,9 +1159,9 @@
       }
     },
     "gitter-env": {
-      "version": "0.23.1",
+      "version": "0.23.2",
       "from": "gitter-env@>=0.23.1 <0.24.0",
-      "resolved": "http://beta-internal:4873/gitter-env/-/gitter-env-0.23.1.tgz",
+      "resolved": "http://beta-internal:4873/gitter-env/-/gitter-env-0.23.2.tgz",
       "dependencies": {
         "async": {
           "version": "0.8.0",
@@ -1271,9 +1271,9 @@
           }
         },
         "lodash": {
-          "version": "4.8.2",
+          "version": "4.11.1",
           "from": "lodash@>=4.6.1 <5.0.0",
-          "resolved": "http://beta-internal:4873/lodash/-/lodash-4.8.2.tgz"
+          "resolved": "http://beta-internal:4873/lodash/-/lodash-4.11.1.tgz"
         },
         "nconf": {
           "version": "0.6.9",
@@ -1386,7 +1386,7 @@
         },
         "tunnel-agent": {
           "version": "0.4.2",
-          "from": "tunnel-agent@*",
+          "from": "tunnel-agent@latest",
           "resolved": "http://beta-internal:4873/tunnel-agent/-/tunnel-agent-0.4.2.tgz"
         }
       }
@@ -1397,9 +1397,9 @@
       "resolved": "http://beta-internal:4873/gitter-faye-redis/-/gitter-faye-redis-0.4.4.tgz",
       "dependencies": {
         "redis": {
-          "version": "2.5.3",
-          "from": "redis@*",
-          "resolved": "http://beta-internal:4873/redis/-/redis-2.5.3.tgz",
+          "version": "2.6.0-1",
+          "from": "redis@latest",
+          "resolved": "http://beta-internal:4873/redis/-/redis-2.6.0-1.tgz",
           "dependencies": {
             "double-ended-queue": {
               "version": "2.1.0-0",
@@ -1408,12 +1408,12 @@
             },
             "redis-commands": {
               "version": "1.1.0",
-              "from": "redis-commands@>=1.0.1 <2.0.0",
+              "from": "redis-commands@>=1.1.0 <2.0.0",
               "resolved": "http://beta-internal:4873/redis-commands/-/redis-commands-1.1.0.tgz"
             },
             "redis-parser": {
               "version": "1.3.0",
-              "from": "redis-parser@>=1.1.0 <2.0.0",
+              "from": "redis-parser@>=1.2.0 <2.0.0",
               "resolved": "http://beta-internal:4873/redis-parser/-/redis-parser-1.3.0.tgz"
             }
           }
@@ -1564,9 +1564,9 @@
       "resolved": "http://beta-internal:4873/gitter-realtime-client/-/gitter-realtime-client-1.1.0.tgz",
       "dependencies": {
         "backbone": {
-          "version": "1.3.2",
+          "version": "1.3.3",
           "from": "backbone@>=1.1.2 <2.0.0",
-          "resolved": "http://beta-internal:4873/backbone/-/backbone-1.3.2.tgz"
+          "resolved": "http://beta-internal:4873/backbone/-/backbone-1.3.3.tgz"
         },
         "backbone-sorted-collection": {
           "version": "0.3.9",
@@ -1712,6 +1712,11 @@
       "from": "modules/linkedin-backend",
       "resolved": "file:modules/linkedin-backend"
     },
+    "gitter-web-mongoose-bluebird": {
+      "version": "1.0.0",
+      "from": "modules/mongoose-bluebird",
+      "resolved": "file:modules/mongoose-bluebird"
+    },
     "gitter-web-presence": {
       "version": "1.0.0",
       "from": "modules/presence",
@@ -1810,7 +1815,7 @@
     "handlebars": {
       "version": "3.0.3",
       "from": "handlebars@>=3.0.3 <3.1.0",
-      "resolved": "http://beta-internal:4873/handlebars/-/handlebars-3.0.3.tgz",
+      "resolved": "https://registry.npmjs.org/handlebars/-/handlebars-3.0.3.tgz",
       "dependencies": {
         "optimist": {
           "version": "0.6.1",
@@ -1958,9 +1963,9 @@
                   "resolved": "http://beta-internal:4873/bl/-/bl-0.9.5.tgz",
                   "dependencies": {
                     "readable-stream": {
-                      "version": "1.0.33",
+                      "version": "1.0.34",
                       "from": "readable-stream@>=1.0.26 <1.1.0",
-                      "resolved": "http://beta-internal:4873/readable-stream/-/readable-stream-1.0.33.tgz",
+                      "resolved": "http://beta-internal:4873/readable-stream/-/readable-stream-1.0.34.tgz",
                       "dependencies": {
                         "core-util-is": {
                           "version": "1.0.2",
@@ -2424,14 +2429,14 @@
       "resolved": "http://beta-internal:4873/mixpanel/-/mixpanel-0.0.20.tgz"
     },
     "moment": {
-      "version": "2.12.0",
+      "version": "2.13.0",
       "from": "moment@>=2.10.3 <3.0.0",
-      "resolved": "http://beta-internal:4873/moment/-/moment-2.12.0.tgz"
+      "resolved": "http://beta-internal:4873/moment/-/moment-2.13.0.tgz"
     },
     "mongodb": {
-      "version": "2.1.14",
+      "version": "2.1.16",
       "from": "mongodb@>=2.0.34 <3.0.0",
-      "resolved": "http://beta-internal:4873/mongodb/-/mongodb-2.1.14.tgz",
+      "resolved": "http://beta-internal:4873/mongodb/-/mongodb-2.1.16.tgz",
       "dependencies": {
         "es6-promise": {
           "version": "3.0.2",
@@ -2439,14 +2444,14 @@
           "resolved": "http://beta-internal:4873/es6-promise/-/es6-promise-3.0.2.tgz"
         },
         "mongodb-core": {
-          "version": "1.3.13",
-          "from": "mongodb-core@1.3.13",
-          "resolved": "http://beta-internal:4873/mongodb-core/-/mongodb-core-1.3.13.tgz",
+          "version": "1.3.16",
+          "from": "mongodb-core@1.3.16",
+          "resolved": "http://beta-internal:4873/mongodb-core/-/mongodb-core-1.3.16.tgz",
           "dependencies": {
             "bson": {
-              "version": "0.4.22",
+              "version": "0.4.23",
               "from": "bson@>=0.4.21 <0.5.0",
-              "resolved": "http://beta-internal:4873/bson/-/bson-0.4.22.tgz"
+              "resolved": "http://beta-internal:4873/bson/-/bson-0.4.23.tgz"
             },
             "require_optional": {
               "version": "1.0.0",
@@ -2529,9 +2534,9 @@
       "resolved": "http://beta-internal:4873/mongodb-unique-ids/-/mongodb-unique-ids-0.1.2.tgz"
     },
     "mongoose": {
-      "version": "4.4.11",
+      "version": "4.4.12",
       "from": "mongoose@>=4.4.5 <5.0.0",
-      "resolved": "http://beta-internal:4873/mongoose/-/mongoose-4.4.11.tgz",
+      "resolved": "http://beta-internal:4873/mongoose/-/mongoose-4.4.12.tgz",
       "dependencies": {
         "async": {
           "version": "1.5.2",
@@ -2539,9 +2544,9 @@
           "resolved": "http://beta-internal:4873/async/-/async-1.5.2.tgz"
         },
         "bson": {
-          "version": "0.4.22",
+          "version": "0.4.23",
           "from": "bson@>=0.4.21 <0.5.0",
-          "resolved": "http://beta-internal:4873/bson/-/bson-0.4.22.tgz"
+          "resolved": "http://beta-internal:4873/bson/-/bson-0.4.23.tgz"
         },
         "hooks-fixed": {
           "version": "1.1.0",
@@ -2608,9 +2613,9 @@
       "resolved": "http://beta-internal:4873/mongoose-number/-/mongoose-number-0.1.1.tgz"
     },
     "newrelic": {
-      "version": "1.26.1",
+      "version": "1.26.2",
       "from": "newrelic@>=1.18.3 <2.0.0",
-      "resolved": "http://beta-internal:4873/newrelic/-/newrelic-1.26.1.tgz",
+      "resolved": "http://beta-internal:4873/newrelic/-/newrelic-1.26.2.tgz",
       "dependencies": {
         "concat-stream": {
           "version": "1.5.1",
@@ -2619,7 +2624,8 @@
           "dependencies": {
             "inherits": {
               "version": "2.0.1",
-              "from": "inherits@>=2.0.1 <2.1.0"
+              "from": "inherits@>=2.0.1 <2.1.0",
+              "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz"
             },
             "typedarray": {
               "version": "0.0.6",
@@ -2673,6 +2679,7 @@
             "debug": {
               "version": "2.2.0",
               "from": "debug@2.2.0",
+              "resolved": "https://registry.npmjs.org/debug/-/debug-2.2.0.tgz",
               "dependencies": {
                 "ms": {
                   "version": "0.7.1",
@@ -2715,7 +2722,8 @@
             },
             "inherits": {
               "version": "2.0.1",
-              "from": "inherits@>=2.0.1 <2.1.0"
+              "from": "inherits@>=2.0.1 <2.1.0",
+              "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz"
             }
           }
         },
@@ -2893,9 +2901,9 @@
               "resolved": "http://beta-internal:4873/bl/-/bl-0.9.5.tgz",
               "dependencies": {
                 "readable-stream": {
-                  "version": "1.0.33",
+                  "version": "1.0.34",
                   "from": "readable-stream@>=1.0.26 <1.1.0",
-                  "resolved": "http://beta-internal:4873/readable-stream/-/readable-stream-1.0.33.tgz",
+                  "resolved": "http://beta-internal:4873/readable-stream/-/readable-stream-1.0.34.tgz",
                   "dependencies": {
                     "core-util-is": {
                       "version": "1.0.2",
@@ -3370,9 +3378,9 @@
       "resolved": "http://beta-internal:4873/request-extensible/-/request-extensible-0.1.1.tgz",
       "dependencies": {
         "request": {
-          "version": "2.70.0",
+          "version": "2.72.0",
           "from": "request@>=2.53.0 <3.0.0",
-          "resolved": "http://beta-internal:4873/request/-/request-2.70.0.tgz",
+          "resolved": "http://beta-internal:4873/request/-/request-2.72.0.tgz",
           "dependencies": {
             "aws-sign2": {
               "version": "0.6.0",
@@ -3494,12 +3502,12 @@
                 "chalk": {
                   "version": "1.1.3",
                   "from": "chalk@>=1.1.1 <2.0.0",
-                  "resolved": "https://registry.npmjs.org/chalk/-/chalk-1.1.3.tgz",
+                  "resolved": "http://beta-internal:4873/chalk/-/chalk-1.1.3.tgz",
                   "dependencies": {
                     "ansi-styles": {
                       "version": "2.2.1",
                       "from": "ansi-styles@>=2.2.1 <3.0.0",
-                      "resolved": "https://registry.npmjs.org/ansi-styles/-/ansi-styles-2.2.1.tgz"
+                      "resolved": "http://beta-internal:4873/ansi-styles/-/ansi-styles-2.2.1.tgz"
                     },
                     "has-ansi": {
                       "version": "2.0.0",
@@ -3579,9 +3587,9 @@
                   }
                 },
                 "pinkie-promise": {
-                  "version": "2.0.0",
+                  "version": "2.0.1",
                   "from": "pinkie-promise@>=2.0.0 <3.0.0",
-                  "resolved": "http://beta-internal:4873/pinkie-promise/-/pinkie-promise-2.0.0.tgz",
+                  "resolved": "http://beta-internal:4873/pinkie-promise/-/pinkie-promise-2.0.1.tgz",
                   "dependencies": {
                     "pinkie": {
                       "version": "2.0.4",
@@ -3714,7 +3722,7 @@
             },
             "mime-types": {
               "version": "2.1.10",
-              "from": "mime-types@>=2.1.6 <2.2.0",
+              "from": "mime-types@>=2.1.7 <2.2.0",
               "resolved": "http://beta-internal:4873/mime-types/-/mime-types-2.1.10.tgz",
               "dependencies": {
                 "mime-db": {
@@ -3791,11 +3799,6 @@
           "resolved": "http://beta-internal:4873/depd/-/depd-1.0.1.tgz"
         }
       }
-    },
-    "rx": {
-      "version": "4.1.0",
-      "from": "rx@>=4.0.8 <5.0.0",
-      "resolved": "http://beta-internal:4873/rx/-/rx-4.1.0.tgz"
     },
     "sanitizer": {
       "version": "0.0.15",
@@ -3906,9 +3909,9 @@
           "resolved": "http://beta-internal:4873/lodash/-/lodash-3.10.1.tgz"
         },
         "request": {
-          "version": "2.70.0",
+          "version": "2.72.0",
           "from": "request@>=2.53.0 <3.0.0",
-          "resolved": "http://beta-internal:4873/request/-/request-2.70.0.tgz",
+          "resolved": "http://beta-internal:4873/request/-/request-2.72.0.tgz",
           "dependencies": {
             "aws-sign2": {
               "version": "0.6.0",
@@ -4030,12 +4033,12 @@
                 "chalk": {
                   "version": "1.1.3",
                   "from": "chalk@>=1.1.1 <2.0.0",
-                  "resolved": "https://registry.npmjs.org/chalk/-/chalk-1.1.3.tgz",
+                  "resolved": "http://beta-internal:4873/chalk/-/chalk-1.1.3.tgz",
                   "dependencies": {
                     "ansi-styles": {
                       "version": "2.2.1",
                       "from": "ansi-styles@>=2.2.1 <3.0.0",
-                      "resolved": "https://registry.npmjs.org/ansi-styles/-/ansi-styles-2.2.1.tgz"
+                      "resolved": "http://beta-internal:4873/ansi-styles/-/ansi-styles-2.2.1.tgz"
                     },
                     "has-ansi": {
                       "version": "2.0.0",
@@ -4115,9 +4118,9 @@
                   }
                 },
                 "pinkie-promise": {
-                  "version": "2.0.0",
+                  "version": "2.0.1",
                   "from": "pinkie-promise@>=2.0.0 <3.0.0",
-                  "resolved": "http://beta-internal:4873/pinkie-promise/-/pinkie-promise-2.0.0.tgz",
+                  "resolved": "http://beta-internal:4873/pinkie-promise/-/pinkie-promise-2.0.1.tgz",
                   "dependencies": {
                     "pinkie": {
                       "version": "2.0.4",
@@ -4586,12 +4589,12 @@
                 "chalk": {
                   "version": "1.1.3",
                   "from": "chalk@>=1.0.0 <2.0.0",
-                  "resolved": "https://registry.npmjs.org/chalk/-/chalk-1.1.3.tgz",
+                  "resolved": "http://beta-internal:4873/chalk/-/chalk-1.1.3.tgz",
                   "dependencies": {
                     "ansi-styles": {
                       "version": "2.2.1",
                       "from": "ansi-styles@>=2.2.1 <3.0.0",
-                      "resolved": "https://registry.npmjs.org/ansi-styles/-/ansi-styles-2.2.1.tgz"
+                      "resolved": "http://beta-internal:4873/ansi-styles/-/ansi-styles-2.2.1.tgz"
                     },
                     "has-ansi": {
                       "version": "2.0.0",
@@ -4890,9 +4893,9 @@
       "resolved": "http://beta-internal:4873/xregexp/-/xregexp-2.0.0.tgz"
     },
     "yargs": {
-      "version": "4.4.0",
+      "version": "4.6.0",
       "from": "yargs@>=4.2.0 <5.0.0",
-      "resolved": "http://beta-internal:4873/yargs/-/yargs-4.4.0.tgz",
+      "resolved": "http://beta-internal:4873/yargs/-/yargs-4.6.0.tgz",
       "dependencies": {
         "camelcase": {
           "version": "2.1.1",
@@ -4900,13 +4903,13 @@
           "resolved": "http://beta-internal:4873/camelcase/-/camelcase-2.1.1.tgz"
         },
         "cliui": {
-          "version": "3.1.2",
-          "from": "cliui@>=3.1.2 <4.0.0",
-          "resolved": "https://registry.npmjs.org/cliui/-/cliui-3.1.2.tgz",
+          "version": "3.2.0",
+          "from": "cliui@>=3.2.0 <4.0.0",
+          "resolved": "http://beta-internal:4873/cliui/-/cliui-3.2.0.tgz",
           "dependencies": {
             "strip-ansi": {
               "version": "3.0.1",
-              "from": "strip-ansi@>=3.0.1 <4.0.0",
+              "from": "strip-ansi@>=3.0.0 <4.0.0",
               "resolved": "http://beta-internal:4873/strip-ansi/-/strip-ansi-3.0.1.tgz",
               "dependencies": {
                 "ansi-regex": {
@@ -4929,9 +4932,9 @@
           "resolved": "http://beta-internal:4873/decamelize/-/decamelize-1.2.0.tgz"
         },
         "lodash.assign": {
-          "version": "4.0.7",
+          "version": "4.0.8",
           "from": "lodash.assign@>=4.0.3 <5.0.0",
-          "resolved": "http://beta-internal:4873/lodash.assign/-/lodash.assign-4.0.7.tgz",
+          "resolved": "http://beta-internal:4873/lodash.assign/-/lodash.assign-4.0.8.tgz",
           "dependencies": {
             "lodash.keys": {
               "version": "4.0.6",
@@ -4980,9 +4983,9 @@
                   "resolved": "http://beta-internal:4873/path-exists/-/path-exists-2.1.0.tgz"
                 },
                 "pinkie-promise": {
-                  "version": "2.0.0",
+                  "version": "2.0.1",
                   "from": "pinkie-promise@>=2.0.0 <3.0.0",
-                  "resolved": "http://beta-internal:4873/pinkie-promise/-/pinkie-promise-2.0.0.tgz",
+                  "resolved": "http://beta-internal:4873/pinkie-promise/-/pinkie-promise-2.0.1.tgz",
                   "dependencies": {
                     "pinkie": {
                       "version": "2.0.4",
@@ -5028,9 +5031,9 @@
                   "resolved": "http://beta-internal:4873/pify/-/pify-2.3.0.tgz"
                 },
                 "pinkie-promise": {
-                  "version": "2.0.0",
+                  "version": "2.0.1",
                   "from": "pinkie-promise@>=2.0.0 <3.0.0",
-                  "resolved": "http://beta-internal:4873/pinkie-promise/-/pinkie-promise-2.0.0.tgz",
+                  "resolved": "http://beta-internal:4873/pinkie-promise/-/pinkie-promise-2.0.1.tgz",
                   "dependencies": {
                     "pinkie": {
                       "version": "2.0.4",
@@ -5081,9 +5084,9 @@
                   "resolved": "http://beta-internal:4873/path-exists/-/path-exists-2.1.0.tgz"
                 },
                 "pinkie-promise": {
-                  "version": "2.0.0",
+                  "version": "2.0.1",
                   "from": "pinkie-promise@>=2.0.0 <3.0.0",
-                  "resolved": "http://beta-internal:4873/pinkie-promise/-/pinkie-promise-2.0.0.tgz",
+                  "resolved": "http://beta-internal:4873/pinkie-promise/-/pinkie-promise-2.0.1.tgz",
                   "dependencies": {
                     "pinkie": {
                       "version": "2.0.4",
@@ -5134,9 +5137,9 @@
                       "resolved": "http://beta-internal:4873/pify/-/pify-2.3.0.tgz"
                     },
                     "pinkie-promise": {
-                      "version": "2.0.0",
+                      "version": "2.0.1",
                       "from": "pinkie-promise@>=2.0.0 <3.0.0",
-                      "resolved": "http://beta-internal:4873/pinkie-promise/-/pinkie-promise-2.0.0.tgz",
+                      "resolved": "http://beta-internal:4873/pinkie-promise/-/pinkie-promise-2.0.1.tgz",
                       "dependencies": {
                         "pinkie": {
                           "version": "2.0.4",
@@ -5197,9 +5200,9 @@
                           "resolved": "http://beta-internal:4873/spdx-correct/-/spdx-correct-1.0.2.tgz",
                           "dependencies": {
                             "spdx-license-ids": {
-                              "version": "1.2.0",
+                              "version": "1.2.1",
                               "from": "spdx-license-ids@>=1.0.2 <2.0.0",
-                              "resolved": "http://beta-internal:4873/spdx-license-ids/-/spdx-license-ids-1.2.0.tgz"
+                              "resolved": "http://beta-internal:4873/spdx-license-ids/-/spdx-license-ids-1.2.1.tgz"
                             }
                           }
                         },
@@ -5214,9 +5217,9 @@
                               "resolved": "http://beta-internal:4873/spdx-exceptions/-/spdx-exceptions-1.0.4.tgz"
                             },
                             "spdx-license-ids": {
-                              "version": "1.2.0",
+                              "version": "1.2.1",
                               "from": "spdx-license-ids@>=1.0.2 <2.0.0",
-                              "resolved": "http://beta-internal:4873/spdx-license-ids/-/spdx-license-ids-1.2.0.tgz"
+                              "resolved": "http://beta-internal:4873/spdx-license-ids/-/spdx-license-ids-1.2.1.tgz"
                             }
                           }
                         }
@@ -5240,9 +5243,9 @@
                       "resolved": "http://beta-internal:4873/pify/-/pify-2.3.0.tgz"
                     },
                     "pinkie-promise": {
-                      "version": "2.0.0",
+                      "version": "2.0.1",
                       "from": "pinkie-promise@>=2.0.0 <3.0.0",
-                      "resolved": "http://beta-internal:4873/pinkie-promise/-/pinkie-promise-2.0.0.tgz",
+                      "resolved": "http://beta-internal:4873/pinkie-promise/-/pinkie-promise-2.0.1.tgz",
                       "dependencies": {
                         "pinkie": {
                           "version": "2.0.4",
@@ -5316,9 +5319,9 @@
           "resolved": "http://beta-internal:4873/y18n/-/y18n-3.2.1.tgz"
         },
         "yargs-parser": {
-          "version": "2.2.0",
-          "from": "yargs-parser@>=2.2.0 <3.0.0",
-          "resolved": "http://beta-internal:4873/yargs-parser/-/yargs-parser-2.2.0.tgz"
+          "version": "2.4.0",
+          "from": "yargs-parser@>=2.4.0 <3.0.0",
+          "resolved": "http://beta-internal:4873/yargs-parser/-/yargs-parser-2.4.0.tgz"
         }
       }
     }

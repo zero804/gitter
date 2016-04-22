@@ -41,10 +41,10 @@ var featuredRooms  = [
     language: 'Ruby',
     locale: 'en'
   },
-  { uri: 'rom-rb/chat',
-    name: 'rom-rb',
+  { uri: 'FreeCodeCamp/FreeCodeCamp',
+    name: 'FreeCodeCamp',
     channel: true,
-    language: 'Ruby',
+    language: 'JavaScript',
     locale: 'en'
   },
   { uri: 'webpack/webpack',

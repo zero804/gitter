@@ -1,0 +1,56 @@
+@import "trp3Vars";
+@import "colors";
+@import "../../../../../less/components/menu/room/collection";
+
+.favourite-collection {
+  .m-collection();
+  /*
+  This is pretty gross JP 29/3/16
+  Basically we don't want to remove the `margin-top: 1.3rem` from the `.{primary/secondary/tertiary}-collection`'s
+  because this will cause A LOT of vertical spacing issues.
+  We also need the favourite collection to sit seamlessly against the primary collection when visible
+  as such, when visible, this negative margin will negate the margin-top styles applied to `.primary-collection`
+  but leave the spacing alone for the rest of the menu states
+
+  TO BE CLEAR:
+  This is a hack and a consequence of adding the favourite collection into the menu sections
+  as an after thought and not as part of the design. Please ensure you consider this when you find this code.
+  Don't give me a hard time, I know its shit. Thanks. JP.
+  */
+margin-bottom: -1.3rem;
+position:      relative;
+
+  &:before {
+    content:          ' ';
+    display:          inline-block;
+    position:         absolute;
+    left:             (@desktop-menu-left-padding / 2);
+    right:            (@desktop-menu-left-padding / 2);
+    top:              0;
+    height:           100%;
+    border-top:       1px dashed transparent;
+    border-bottom:    1px dashed transparent;
+    border-left:      1px dashed transparent;
+    background-color: rgba(255, 255, 255, 0);
+    pointer-events:   none;
+  }
+
+  &.dragging {
+    min-height: @menu-item-height;
+    display:    block;
+
+    .collection-list--favourite {
+      min-height: @menu-item-height;
+    }
+
+    &:before {
+      background-color: @room-item-selected-bg;
+      border-color:     @search-message-decal-color;
+    }
+  }
+}
+
+.collection-list--favourite {
+  height:     100%;
+  width:      100%;
+}

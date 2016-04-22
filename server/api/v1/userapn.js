@@ -1,6 +1,7 @@
 "use strict";
 
-var winston = require('../../utils/winston');
+var env = require('gitter-web-env');
+var winston = env.logger;
 var pushNotificationService = require('../../services/push-notification-service');
 
 module.exports = function(req, res, next) {
@@ -11,4 +12,3 @@ module.exports = function(req, res, next) {
     res.send({ success: true });
   });
 };
-
