@@ -25,17 +25,18 @@ module.exports = function generateLeftMenuState(leftRoomMenuState, uri, orgs, op
   if(!isWithinRefreshTimeThreshold) {
     currentlySelectedOrgName = getOrgNameFromUri(uri);
 
-    var isCurrentRoomInRoomList = orgs.some(function(org) {
+    var isCurrentOrgInOrgList = orgs.some(function(org) {
       return org.name === currentlySelectedOrgName;
     });
 
-    if(isCurrentRoomInRoomList) {
+    if(isCurrentOrgInOrgList) {
       currentState = 'org';
     }
     else if(opts.isOneToOne) {
       currentState = 'people';
     }
   }
+
 
 
   // We need to check he ONLY if the value is not false
