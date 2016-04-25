@@ -1,10 +1,11 @@
 "use strict";
 
-var env            = require('gitter-web-env');
-var winston        = env.logger;
-var mongoose       = require('gitter-web-mongoose-bluebird');
-var debug          = require('debug')('gitter:persistence-service');
-var mongoDebug     = require('node-mongodb-debug-log');
+var env           = require('gitter-web-env');
+var winston       = env.logger;
+var errorReporter = env.errorReporter;
+var mongoose      = require('gitter-web-mongoose-bluebird');
+var debug         = require('debug')('gitter:persistence-service');
+var mongoDebug    = require('node-mongodb-debug-log');
 
 // Install inc and dec number fields in mongoose
 require('mongoose-number')(mongoose);
@@ -25,8 +26,7 @@ mongoDebug.install(mongoose.mongo, {
 
 connection.on('error', function(err) {
   winston.info("MongoDB connection error", { exception: err });
-  console.error(err);
-  if(err.stack) console.log(err.stack);
+  errorReporter(err, { connection_error:true }, { module: 'persistence' });
 });
 
 function createExports(schemas) {
