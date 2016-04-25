@@ -5,7 +5,7 @@
 var env = require('gitter-web-env');
 var winston = env.logger;
 var mongoose = require('mongoose');
-require('../../server/services/persistence-service');
+require('gitter-web-persistence');
 
 var opts = require('yargs')
   .option('max', {

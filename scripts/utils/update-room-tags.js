@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 
-var persistence = require('../../server/services/persistence-service');
+var persistence = require('gitter-web-persistence');
 var GitHubService = require('../../server/services/github/github-repo-service');
 var assert = require('assert');
 var shutdown = require('shutdown');

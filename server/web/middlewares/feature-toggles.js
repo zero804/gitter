@@ -2,7 +2,7 @@
 
 var fflip       = require('fflip');
 var mongoUtils  = require('../../utils/mongo-utils');
-var persistence = require('../../services/persistence-service');
+var persistence = require('gitter-web-persistence');
 var useragent   = require('useragent');
 
 /**
