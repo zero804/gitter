@@ -84,7 +84,8 @@ function findContextForUri(user, uri, options) {
           .then(function(access) {
             if (!access) {
               var error = new StatusError(404);
-
+              
+              // TODO: move away from githubType here
               error.githubType = resolvedTroupe.githubType;
               error.uri = resolvedTroupe.uri;
               throw error;

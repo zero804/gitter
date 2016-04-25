@@ -60,6 +60,7 @@ function findPublicReposWithRoom(user, query, options) {
   var filters = createRegExpsForQuery(query);
   if(!filters.length) return Promise.resolve([]);
 
+  // TODO: switch to `permissions`
   return persistence.Troupe
     .find({
       $and: filters.map(function(re) {
