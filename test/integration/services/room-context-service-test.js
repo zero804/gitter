@@ -12,7 +12,7 @@ mockito.when(permissionsModelMock)().thenReturn(Promise.resolve(true));
 mockito.when(roomPermissionsModelMock)().thenReturn(Promise.resolve(true));
 
 var roomContextService = testRequire.withProxies("./services/room-context-service", {
-  './permissions-model': permissionsModelMock,
+  'gitter-web-permissions/lib/permissions-model': permissionsModelMock,
   './room-permissions-model': roomPermissionsModelMock
 });
 

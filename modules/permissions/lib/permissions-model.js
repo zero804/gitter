@@ -3,14 +3,14 @@
 var env                  = require('gitter-web-env');
 var winston              = env.logger;
 var Promise              = require('bluebird');
-var userIsBannedFromRoom = require('gitter-web-permissions/lib/user-banned-from-room');
+var userIsBannedFromRoom = require('./user-banned-from-room');
 
-var repoPermissionsModel        = require('./permissions/repo-permissions-model');
-var orgPermissionsModel         = require('./permissions/org-permissions-model');
-var oneToOnePermissionsModel    = require('./permissions/one-to-one-permissions-model');
-var orgChannelPermissionsModel  = require('./permissions/org-channel-permissions-model');
-var repoChannelPermissionsModel = require('./permissions/repo-channel-permissions-model');
-var userChannelPermissionsModel = require('./permissions/user-channel-permissions-model');
+var repoPermissionsModel        = require('./models/repo-permissions-model');
+var orgPermissionsModel         = require('./models/org-permissions-model');
+var oneToOnePermissionsModel    = require('./models/one-to-one-permissions-model');
+var orgChannelPermissionsModel  = require('./models/org-channel-permissions-model');
+var repoChannelPermissionsModel = require('./models/repo-channel-permissions-model');
+var userChannelPermissionsModel = require('./models/user-channel-permissions-model');
 var debug                       = require('debug')('gitter:permissions-model');
 var appEvents                   = require('gitter-web-appevents');
 

@@ -44,6 +44,7 @@ var testModules = {
   'push-notification-filter': ['./modules/push-notification-filter/test/*.js'],
   'split-tests': ['./modules/split-tests/test/*.js'],
   'presence': ['./modules/presence/test/*.js'],
+  'permissions': ['./modules/permissions/test/**/*.js'],
 };
 
 /** Make a series of tasks based on the test modules */
