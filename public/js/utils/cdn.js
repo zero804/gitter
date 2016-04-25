@@ -1,12 +1,12 @@
 "use strict";
-var context = require('utils/context');
+var clientEnv = require('gitter-client-env');
 
 module.exports = (function() {
 
 
-  var hosts = context.env('cdns');
+  var hosts = clientEnv['cdns'];
   var hostLength = hosts && hosts.length;
-  var assetTag = context.env('assetTag');
+  var assetTag = clientEnv['assetTag'];
   var cdnPrefix =  assetTag ? "/_s/" + assetTag : '';
 
   function cdnNativeApp(url) {
