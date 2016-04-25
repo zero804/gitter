@@ -5,7 +5,7 @@ var env    = require('gitter-web-env');
 var nconf  = env.config;
 var logger = env.logger;
 
-var persistenceService   = require("./persistence-service");
+var persistenceService   = require('gitter-web-persistence');
 var Promise              = require('bluebird');
 var userService          = require('./user-service');
 var tokenProvider        = require('./tokens/');

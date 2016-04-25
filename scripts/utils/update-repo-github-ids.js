@@ -2,7 +2,7 @@
 /* jshint node:true, unused:true */
 'use strict';
 
-var persistence = require('../../server/services/persistence-service');
+var persistence = require('gitter-web-persistence');
 var onMongoConnect = require('../../server/utils/on-mongo-connect');
 var roomMembershipService = require('../../server/services/room-membership-service');
 var userService = require('../../server/services/user-service');

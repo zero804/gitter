@@ -4,7 +4,7 @@ var testRequire = require('../test-require');
 var assert = require('assert');
 var mongooseUtils = testRequire('./utils/mongoose-utils');
 var mongoUtils = testRequire('./utils/mongo-utils');
-var persistence = testRequire('./services/persistence-service');
+var persistence = require('gitter-web-persistence');
 var Promise = require('bluebird');
 var _ = require('lodash');
 
