@@ -1,6 +1,6 @@
 "use strict";
 
-var PushNotificationDevice = require("./persistence-service").PushNotificationDevice;
+var PushNotificationDevice = require('gitter-web-persistence').PushNotificationDevice;
 var crypto                 = require('crypto');
 var Promise                = require('bluebird');
 var mongoUtils             = require('../utils/mongo-utils');

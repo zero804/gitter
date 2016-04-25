@@ -3,7 +3,7 @@
 "use strict";
 
 var troupeService = require('../../server/services/troupe-service');
-var persistance = require('../../server/services/persistence-service');
+var persistance = require('gitter-web-persistence');
 var Promise = require('bluebird');
 var assert = require('assert');
 var shutdown = require('shutdown');

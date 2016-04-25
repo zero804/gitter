@@ -2,7 +2,7 @@
 'use strict';
 
 var Promise = require('bluebird');
-var persistence = require('../../server/services/persistence-service');
+var persistence = require('gitter-web-persistence');
 var shutdown = require('shutdown');
 var BatchStream = require('batch-stream');
 var markdownProcessor = require('../../server/utils/markdown-processor');
