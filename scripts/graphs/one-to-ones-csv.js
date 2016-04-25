@@ -1,7 +1,7 @@
 /* jshint node:true, unused:true */
 'use strict';
 
-var persistence = require('../../server/services/persistence-service');
+var persistence = require('gitter-web-persistence');
 var shutdown = require('shutdown');
 var es = require('event-stream');
 var csv = require('fast-csv');

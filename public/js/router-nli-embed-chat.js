@@ -36,7 +36,7 @@ onready(function() {
 
 
 // When the login is complete in the popup it'll post a message back
-window.addEventListener("message", function(event) {
+window.addEventListener('message', function(event) {
   if (event.origin !== location.origin) return;
   if (event.data === 'login_complete') {
     location.hash = '#autojoin';
