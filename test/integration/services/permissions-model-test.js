@@ -20,10 +20,10 @@ var oneToOnePermissionsModelMock;
 var orgChannelPermissionsModelMock;
 var repoChannelPermissionsModelMock;
 var userChannelPermissionsModelMock;
-var userServiceMock;
 var destroyTokensForUserIdMock;
 var permissionsModel;
 var permissionMocks;
+var appEventsMock;
 var fixtures;
 var delegate;
 
@@ -58,13 +58,13 @@ describe('permissions-model', function() {
       'USER_CHANNEL': userChannelPermissionsModelMock
     };
 
-    userServiceMock = {
-      destroyTokensForUserId: destroyTokensForUserIdMock
+    appEventsMock = {
+      destroyUserTokens: destroyTokensForUserIdMock
     };
 
     permissionsModel = testRequire.withProxies("./services/permissions-model", {
       'gitter-web-permissions/lib/user-banned-from-room': userBannedFromRoomMock,
-      './user-service': userServiceMock,
+      'gitter-web-appevents': appEventsMock,
       './permissions/repo-permissions-model': repoPermissionsModelMock,
       './permissions/org-permissions-model': orgPermissionsModelMock,
       './permissions/one-to-one-permissions-model': oneToOnePermissionsModelMock,

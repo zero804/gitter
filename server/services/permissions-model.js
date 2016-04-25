@@ -12,8 +12,7 @@ var orgChannelPermissionsModel  = require('./permissions/org-channel-permissions
 var repoChannelPermissionsModel = require('./permissions/repo-channel-permissions-model');
 var userChannelPermissionsModel = require('./permissions/user-channel-permissions-model');
 var debug                       = require('debug')('gitter:permissions-model');
-
-var userService                 = require('./user-service');
+var appEvents                   = require('gitter-web-appevents');
 
 function checkBan(user, uri) {
   if(!user) return Promise.resolve(false);
@@ -75,10 +74,10 @@ function permissionsModel(user, right, uri, roomType, security) {
         .then(log)
         .catch(function(err) {
           if(err && err.gitterAction === 'logout_destroy_user_tokens') {
-            winston.warn('User tokens have been revoked. Destroying tokens');
-
-            return userService.destroyTokensForUserId(user._id)
-              .thenThrow(err);
+            if (user) {
+              winston.warn('User tokens have been revoked. Destroying tokens');
+              appEvents.destroyUserTokens(user._id);
+            }
           }
 
           throw err;
