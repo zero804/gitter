@@ -61,7 +61,7 @@ describe('create-distribution', function() {
         '../room-membership-service': roomMembershipService,
         '../user-service': userService,
         './distribution': MockDistribution,
-        '../room-permissions-model': roomPermissionsModel,
+        'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModel,
         '../categorise-users-in-room': categoriseUserInRoom
       });
 
@@ -269,7 +269,7 @@ describe('create-distribution', function() {
 
       createDistribution = testRequire.withProxies("./services/unread-items/create-distribution", {
         '../user-service': userService,
-        '../room-permissions-model': roomPermissionsModel,
+        'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModel,
       });
     });
 

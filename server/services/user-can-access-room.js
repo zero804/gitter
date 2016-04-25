@@ -9,7 +9,7 @@ var dolph                 = require('dolph');
 var Promise               = require('bluebird');
 var userService           = require('./user-service');
 var troupeService         = require('./troupe-service');
-var roomPermissionsModel  = require('./room-permissions-model');
+var roomPermissionsModel  = require('gitter-web-permissions/lib/room-permissions-model');
 var roomMembershipService = require('./room-membership-service');
 var mongoUtils            = require('gitter-web-persistence-utils/lib/mongo-utils');
 

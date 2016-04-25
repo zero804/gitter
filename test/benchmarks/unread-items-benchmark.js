@@ -56,7 +56,7 @@ makeBenchmark({
       '../room-membership-service': roomMembershipService,
       '../user-service': userService,
       '../app-events': appEvents,
-      '../room-permissions-model': roomPermissionsModel,
+      'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModel,
     });
     unreadItemService.testOnly.setSendBadgeUpdates(false);
   },
