@@ -200,8 +200,8 @@ function UserStrategy(options) {
 
     if (options.includeScopes) {
       scopes = {
-        'public_repo': user.hasGitHubScope('public_repo'),
-        'private_repo': user.hasGitHubScope('repo')
+        'public_repo': userScopes.hasGitHubScope(user, 'public_repo'),
+        'private_repo': userScopes.hasGitHubScope(user, 'repo')
       };
     }
 
