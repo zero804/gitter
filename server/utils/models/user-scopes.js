@@ -96,10 +96,10 @@ exports.getIdentities = function(user) {
   // rather.
   var identities = [];
   if (isGitHubUser(user)) {
-    identities.push({provider: 'github', providerKey: user.githubId});
+    identities.push({ provider: 'github', providerKey: user.githubId });
   }
   if (user.identities) {
     identities.push.apply(identities, user.identities);
   }
   return identities;
-}
+};

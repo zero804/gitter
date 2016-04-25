@@ -389,7 +389,7 @@ describe('user-can-access-room', function() {
         'dolph': dolph,
         './user-service': userService,
         './troupe-service': troupeService,
-        './room-permissions-model': roomPermissionsModel,
+        'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModel,
         './room-membership-service': roomMembershipService
       });
 

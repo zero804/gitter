@@ -7,7 +7,7 @@ var Promise               = require('bluebird');
 var Distribution          = require('./distribution');
 var roomMembershipService = require('../room-membership-service');
 var userService           = require("../user-service");
-var roomPermissionsModel  = require('../room-permissions-model');
+var roomPermissionsModel  = require('gitter-web-permissions/lib/room-permissions-model');
 var categoriseUserInRoom  = require("../categorise-users-in-room");
 
 /**
