@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 "use strict";
 
-var mongoUtils = require('../../server/utils/mongo-utils');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var collections = require('../../server/utils/collections');
 var persistenceService = require('gitter-web-persistence');
 var userService = require('../../server/services/user-service');

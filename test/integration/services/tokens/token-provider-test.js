@@ -2,7 +2,7 @@
 
 var testRequire = require('../../test-require');
 var tokenProvider = testRequire('./services/tokens/index');
-var mongoUtils = testRequire('./utils/mongo-utils');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var assert = require('assert');
 var persistenceService = require('gitter-web-persistence');
 

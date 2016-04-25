@@ -27,7 +27,7 @@ describe('group-resolver', function() {
       };
 
       groupResolver = testRequire.withProxies("./services/group-resolver", {
-        './room-permissions-model': roomPermissionsModelMock
+        'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock
       });
     });
 
