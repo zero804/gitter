@@ -44,6 +44,7 @@ var recentRoomService          = require('./recent-room-service');
 var badgerEnabled              = nconf.get('autoPullRequest:enabled');
 var uriResolver                = require('./uri-resolver');
 var getOrgNameFromTroupeName   = require('gitter-web-shared/get-org-name-from-troupe-name');
+var userScopes                 = require('../utils/models/user-scopes');
 
 exports.testOnly = {};
 
@@ -258,7 +259,7 @@ function findOrCreateGroupRoom(user, troupe, uri, options) {
 
               /* Created here */
               /* TODO: Later we'll need to handle private repos too */
-              var hasScope = user.hasGitHubScope("public_repo");
+              var hasScope = userScopes.hasGitHubScope(user, "public_repo");
               var hookCreationFailedDueToMissingScope;
 
               if(hasScope) {
@@ -943,7 +944,7 @@ exports.createCustomChildRoom = createCustomChildRoom;
  * returns        User - the invited user
  */
 function notifyInvitedUser(fromUser, invitedUser, room/*, isNewUser*/) {
-  
+
   // get the email address
   return emailAddressService(invitedUser, { attemptDiscovery: true })
     .then(function (emailAddress) {

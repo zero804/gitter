@@ -1,7 +1,6 @@
 "use strict";
 
 var mongoose = require('gitter-web-mongoose-bluebird');
-var userScopes = require('../../utils/models/user-scopes');
 var Schema   = mongoose.Schema;
 var ObjectId = Schema.ObjectId;
 var assert   = require('assert');
@@ -49,22 +48,6 @@ UserSchema.index({'identities.provider': 1, 'identities.providerKey': 1}, { uniq
 UserSchema.index({ username: 1 }, { unique: true /*, sparse: true */});
 UserSchema.index({ stripeCustomerId: 1 }, { unique: true, sparse: true });
 UserSchema.schemaTypeName = 'UserSchema';
-
-UserSchema.methods.hasGitHubScope = function(scope) {
-  return userScopes.hasGitHubScope(this, scope);
-};
-
-UserSchema.methods.getGitHubScopes = function() {
-  return userScopes.getGitHubScopes(this);
-};
-
-UserSchema.methods.getGitHubToken = function(scope) {
-  return userScopes.getGitHubToken(this, scope);
-};
-
-UserSchema.methods.isMissingTokens = function() {
-  return userScopes.isMissingTokens(this);
-};
 
 UserSchema.methods.clearTokens = function() {
   this.githubToken = null;

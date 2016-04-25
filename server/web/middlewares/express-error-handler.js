@@ -1,9 +1,10 @@
 /*jshint trailing: false, unused: true, node: true */
 "use strict";
 
-var env    = require('gitter-web-env');
-var config = env.config;
-var _      = require('underscore');
+var env        = require('gitter-web-env');
+var config     = env.config;
+var _          = require('underscore');
+var userScopes = require('../../utils/models/user-scopes');
 
 function linkStack(stack) {
   if(!stack) return;
@@ -76,7 +77,7 @@ module.exports = function(err, req, res, next) { // jshint unused:false
          status: status,
          homeUrl : config.get('web:homeurl'),
          user: req.user,
-         userMissingPrivateRepoScope: req.user && !req.user.hasGitHubScope('repo'),
+         userMissingPrivateRepoScope: req.user && !userScopes.hasGitHubScope(req.user, 'repo'),
          message: message,
          // Only generate the stack-frames when we need to
          stack: config.get('express:showStack') && err && err.stack && linkStack(err.stack)
