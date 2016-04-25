@@ -46,7 +46,8 @@ module.exports =  Marionette.ItemView.extend({
     };
   },
 
-  initialize: function() {
+  initialize: function(options) {
+    this.roomMenuModel = options.roomMenuModel;
     this.firstRender = true;
   },
 
@@ -92,7 +93,7 @@ module.exports =  Marionette.ItemView.extend({
   },
 
   onRender: function() {
-    if(!this.firstRender || this.firstRender && this.model.get('roomMenuIsPinned')) {
+    if(!this.firstRender || this.firstRender && this.roomMenuModel && this.roomMenuModel.get('roomMenuIsPinned')) {
       toggleClass(this.el, 'active', !!this.model.get('active'));
     }
 
