@@ -3,7 +3,7 @@
 
 var env                 = require('gitter-web-env');
 var nconf               = env.config;
-var persistence         = require("../../server/services/persistence-service");
+var persistence         = require('gitter-web-persistence');
 var shutdown            = require('shutdown');
 var async               = require('async');
 var emailAddressService = require('../../server/services/email-address-service');

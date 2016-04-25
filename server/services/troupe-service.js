@@ -1,7 +1,7 @@
 "use strict";
 
 var _                     = require('lodash');
-var persistence           = require('./persistence-service');
+var persistence           = require('gitter-web-persistence');
 var assert                = require("assert");
 var mongoUtils            = require("../utils/mongo-utils");
 var Promise               = require('bluebird');

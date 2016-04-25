@@ -2,7 +2,7 @@
 
 var testRequire        = require('../test-require');
 var readyByService     = testRequire('./services/readby-service');
-var persistenceService = testRequire('./services/persistence-service');
+var persistenceService = require('gitter-web-persistence');
 var collections        = testRequire('./utils/collections');
 var fixtureLoader      = require('../test-fixtures');
 

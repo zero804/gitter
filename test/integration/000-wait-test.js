@@ -2,7 +2,7 @@
 
 var testRequire = require('./test-require');
 /* Force a connection */
-testRequire('./services/persistence-service');
+require('gitter-web-persistence');
 var env = testRequire('gitter-web-env');
 var Promise = require('bluebird');
 var onMongoConnect = testRequire('./utils/on-mongo-connect');
