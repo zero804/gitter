@@ -3,7 +3,7 @@
 var env                  = require('gitter-web-env');
 var winston              = env.logger;
 var Promise              = require('bluebird');
-var userIsBannedFromRoom = require('./user-banned-from-room');
+var userIsBannedFromRoom = require('gitter-web-permissions/lib/user-banned-from-room');
 
 var repoPermissionsModel        = require('./permissions/repo-permissions-model');
 var orgPermissionsModel         = require('./permissions/org-permissions-model');

@@ -1210,7 +1210,7 @@ describe('room-service', function() {
         './room-permissions-model': roomPermissionsModelMock
       });
       var roomMembershipService = testRequire('./services/room-membership-service');
-      var userBannedFromRoom = testRequire('./services/user-banned-from-room');
+      var userBannedFromRoom = require('gitter-web-permissions/lib/user-banned-from-room');
 
       mockito.when(roomPermissionsModelMock)().then(function(user, perm, incomingRoom) {
         assert.equal(perm, 'admin');
