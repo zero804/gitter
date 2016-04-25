@@ -1,11 +1,9 @@
-/*jslint node:true, unused:true*/
-/*global describe:true, it:true */
 "use strict";
 
-var testRequire   = require('../../test-require');
+var proxyquireNoCallThru = require("proxyquire").noCallThru();
 var assert        = require('assert');
 var Promise       = require('bluebird');
-var testGenerator = require('../../test-generator');
+var testGenerator = require('../../../../test/integration/test-generator');
 
 var mockito = require('jsmockito').JsMockito;
 
@@ -130,7 +128,7 @@ describe('user-channel-permissions', function() {
       var userIsInRoomMock = mockito.mockFunction();
 
 
-      var permissionsModel = testRequire.withProxies("./services/permissions/user-channel-permissions-model", {
+      var permissionsModel = proxyquireNoCallThru("../../lib/models/user-channel-permissions-model", {
         '../user-in-room': userIsInRoomMock
       });
 
