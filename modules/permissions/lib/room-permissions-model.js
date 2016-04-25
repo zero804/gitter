@@ -1,7 +1,7 @@
 "use strict";
 
 var Promise = require('bluebird');
-var permissionsModel = require('gitter-web-permissions/lib/permissions-model');
+var permissionsModel = require('./permissions-model');
 
 /**
  * Main entry point

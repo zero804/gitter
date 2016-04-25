@@ -299,7 +299,7 @@ describe('room-service', function() {
       var roomPermissionsModelMock = mockito.mockFunction();
 
       var roomService = testRequire.withProxies("./services/room-service", {
-        './room-permissions-model': roomPermissionsModelMock
+        'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock
       });
 
       mockito.when(roomPermissionsModelMock)().then(function(user, perm, incomingRoom) {
@@ -329,7 +329,7 @@ describe('room-service', function() {
       };
 
       var roomService = testRequire.withProxies("./services/room-service", {
-        './room-permissions-model': roomPermissionsModelMock,
+        'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock,
         './room-membership-service': roomMembershipServiceMock
       });
 
@@ -373,7 +373,7 @@ describe('room-service', function() {
 
     function createRoomServiceWithStubs(stubs) {
       return testRequire.withProxies("./services/room-service", {
-        './room-permissions-model': function() {
+        'gitter-web-permissions/lib/room-permissions-model': function() {
           return Promise.resolve(stubs.addUser);
         },
         './invited-permissions-service': function() {
@@ -649,7 +649,7 @@ describe('room-service', function() {
             // ADD A PERSON TO THE ROOM
             var roomPermissionsModelMock = mockito.mockFunction();
             var roomService = testRequire.withProxies("./services/room-service", {
-              './room-permissions-model': roomPermissionsModelMock
+              'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock
             });
 
             mockito.when(roomPermissionsModelMock)().then(function(user, perm, incomingRoom) {
@@ -700,7 +700,7 @@ describe('room-service', function() {
             // ADD A PERSON TO THE ROOM
             var roomPermissionsModelMock = mockito.mockFunction();
             var roomService = testRequire.withProxies("./services/room-service", {
-              './room-permissions-model': roomPermissionsModelMock
+              'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock
             });
 
             mockito.when(roomPermissionsModelMock)().then(function(user, perm, _room) {
@@ -751,7 +751,7 @@ describe('room-service', function() {
             // ADD A PERSON TO THE ROOM
             var roomPermissionsModelMock = mockito.mockFunction();
             var roomService = testRequire.withProxies("./services/room-service", {
-              './room-permissions-model': roomPermissionsModelMock,
+              'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock,
               './invited-permissions-service': function() { return Promise.resolve(true); }
             });
 
@@ -803,7 +803,7 @@ describe('room-service', function() {
             // ADD A PERSON TO THE ROOM
             var roomPermissionsModelMock = mockito.mockFunction();
             var roomService = testRequire.withProxies("./services/room-service", {
-              './room-permissions-model': roomPermissionsModelMock,
+              'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock,
               './invited-permissions-service': function() { return Promise.resolve(true); }
             });
 
@@ -858,7 +858,7 @@ describe('room-service', function() {
             // ADD A PERSON TO THE ROOM
             var roomPermissionsModelMock = mockito.mockFunction();
             var roomService = testRequire.withProxies("./services/room-service", {
-              './room-permissions-model': roomPermissionsModelMock
+              'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock
             });
 
             mockito.when(roomPermissionsModelMock)().then(function(user, perm, _room) {
@@ -910,7 +910,7 @@ describe('room-service', function() {
             // ADD A PERSON TO THE ROOM
             var roomPermissionsModelMock = mockito.mockFunction();
             var roomService = testRequire.withProxies("./services/room-service", {
-              './room-permissions-model': roomPermissionsModelMock
+              'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock
             });
 
             mockito.when(roomPermissionsModelMock)().then(function(user, perm, _room) {
@@ -961,7 +961,7 @@ describe('room-service', function() {
             // ADD A PERSON TO THE ROOM
             var roomPermissionsModelMock = mockito.mockFunction();
             var roomService = testRequire.withProxies("./services/room-service", {
-              './room-permissions-model': roomPermissionsModelMock,
+              'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock,
               './invited-permissions-service': function() { return Promise.resolve(true); }
             });
 
@@ -1016,7 +1016,7 @@ describe('room-service', function() {
             // ADD A PERSON TO THE ROOM
             var roomPermissionsModelMock = mockito.mockFunction();
             var roomService = testRequire.withProxies("./services/room-service", {
-              './room-permissions-model': roomPermissionsModelMock
+              'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock
             });
 
             mockito.when(roomPermissionsModelMock)().then(function(user, perm, _room) {
@@ -1068,7 +1068,7 @@ describe('room-service', function() {
             // ADD A PERSON TO THE ROOM
             var roomPermissionsModelMock = mockito.mockFunction();
             var roomService = testRequire.withProxies("./services/room-service", {
-              './room-permissions-model': roomPermissionsModelMock
+              'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock
             });
 
             mockito.when(roomPermissionsModelMock)().then(function(user, perm, _room) {
@@ -1119,7 +1119,7 @@ describe('room-service', function() {
             // ADD A PERSON TO THE ROOM
             var roomPermissionsModelMock = mockito.mockFunction();
             var roomService = testRequire.withProxies("./services/room-service", {
-              './room-permissions-model': roomPermissionsModelMock
+              'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock
             });
 
             mockito.when(roomPermissionsModelMock)().then(function(user, perm, _room) {
@@ -1207,7 +1207,7 @@ describe('room-service', function() {
       var roomPermissionsModelMock = mockito.mockFunction();
 
       var roomService = testRequire.withProxies("./services/room-service", {
-        './room-permissions-model': roomPermissionsModelMock
+        'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock
       });
       var roomMembershipService = testRequire('./services/room-membership-service');
       var userBannedFromRoom = require('gitter-web-permissions/lib/user-banned-from-room');
@@ -1274,7 +1274,7 @@ describe('room-service', function() {
       var roomPermissionsModelMock = mockito.mockFunction();
 
       var roomService = testRequire.withProxies("./services/room-service", {
-        './room-permissions-model': roomPermissionsModelMock
+        'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock
       });
 
       mockito.when(roomPermissionsModelMock)().then(function(user, perm, incomingRoom) {
@@ -1308,7 +1308,7 @@ describe('room-service', function() {
 
     var roomPermissionsModelMock = mockito.mockFunction();
     var roomService = testRequire.withProxies('./services/room-service', {
-      './room-permissions-model': roomPermissionsModelMock
+      'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock
     });
     // TODO: this should not be used
     var userIsInRoom = testRequire('gitter-web-permissions/lib/user-in-room');
@@ -1571,7 +1571,7 @@ describe('room-service', function() {
 
         var roomPermissionsModelMock = mockito.mockFunction();
         var roomService = testRequire.withProxies('./services/room-service', {
-          './room-permissions-model': roomPermissionsModelMock
+          'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock
         });
 
         mockito.when(roomPermissionsModelMock)().then(function(user, perm) {
@@ -1713,7 +1713,7 @@ describe('room-service', function() {
       roomValidatorMock = mockito.mockFunction();
       roomService = testRequire.withProxies('./services/room-service', {
         'gitter-web-permissions/lib/permissions-model': permissionsModelMock,
-        './room-permissions-model': roomPermissionsModelMock,
+        'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock,
         'gitter-web-github': {
           GitHubUriValidator: roomValidatorMock
         }
@@ -1810,7 +1810,7 @@ describe('room-service', function() {
       roomValidatorMock = mockito.mockFunction();
       roomService = testRequire.withProxies('./services/room-service', {
         'gitter-web-permissions/lib/permissions-model': permissionsModelMock,
-        './room-permissions-model': roomPermissionsModelMock,
+        'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock,
         'gitter-web-github': {
           GitHubUriValidator: roomValidatorMock
         }
@@ -2014,7 +2014,7 @@ describe('room-service', function() {
           './recent-room-service': {
             saveLastVisitedTroupeforUserId: recentRoomServiceSaveLastVisitedTroupeforUserId
           },
-          './room-permissions-model': roomPermissionsModel
+          'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModel
         });
       });
 
@@ -2102,7 +2102,7 @@ describe('room-service', function() {
 
 
         roomService = testRequire.withProxies('./services/room-service', {
-          './room-permissions-model': roomPermissionsModel
+          'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModel
         });
       });
 

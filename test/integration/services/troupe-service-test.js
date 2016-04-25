@@ -1,26 +1,18 @@
-/*jslint node:true, unused:true*/
-/*global describe:true, it:true, before:true, after:false */
 "use strict";
 
 
 var testRequire   = require('../test-require');
 var fixtureLoader = require('../test-fixtures');
 var Promise       = require('bluebird');
-var _             = require('underscore');
 var assert        = require("assert");
 var mongoUtils    = require('gitter-web-persistence-utils/lib/mongo-utils');
 var fixture       = {};
 
-function findUserIdPredicate(userId) {
-  return function(x) {
-    return "" + x === "" + userId;
-  };
-}
 describe('troupe-service', function() {
 
   describe('update actions', function() {
     var troupeService = testRequire.withProxies('./services/troupe-service', {
-      './room-permissions-model': function() { return Promise.resolve(true); }
+      'gitter-web-permissions/lib/room-permissions-model': function() { return Promise.resolve(true); }
     });
 
     it('should update tags', function() {

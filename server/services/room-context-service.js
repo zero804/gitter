@@ -5,7 +5,7 @@ var StatusError          = require('statuserror');
 var troupeService        = require('./troupe-service');
 var oneToOneRoomService  = require('./one-to-one-room-service');
 var debug                = require('debug')('gitter:room-context-service');
-var roomPermissionsModel = require('./room-permissions-model');
+var roomPermissionsModel = require('gitter-web-permissions/lib/room-permissions-model');
 var permissionsModel     = require('gitter-web-permissions/lib/permissions-model');
 var Promise              = require('bluebird');
 

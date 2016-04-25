@@ -2,7 +2,7 @@
 
 var badgerService = require('../../services/badger-service');
 var troupeService = require('../../services/troupe-service');
-var roomPermissionsModel = require('../../services/room-permissions-model');
+var roomPermissionsModel = require('gitter-web-permissions/lib/room-permissions-model');
 var StatusError = require('statuserror');
 
 module.exports = function (req, res, next) {
