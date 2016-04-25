@@ -5,7 +5,7 @@
 var testRequire = require('../test-require');
 
 var passport = testRequire('./web/passport');
-var persistence = testRequire('./services/persistence-service');
+var persistence = require('gitter-web-persistence');
 
 var assert = require('assert');
 

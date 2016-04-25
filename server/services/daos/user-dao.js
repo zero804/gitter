@@ -1,6 +1,6 @@
 "use strict";
 
-var persistence = require('../persistence-service');
+var persistence = require('gitter-web-persistence');
 var promiseUtils = require('../../utils/promise-utils');
 
 function create(lean) {

@@ -9,12 +9,28 @@ var mockito     = require('jsmockito').JsMockito;
 var Promise     = require('bluebird');
 
 var userSettingsService = testRequire('./services/user-settings-service');
-var fixtureLoader       = require('../../test-fixtures');
+var fixtureLoader = require('../../test-fixtures');
 var underlyingUnreadItemService = testRequire('./services/unread-items');
 var mongoUtils = testRequire('./utils/mongo-utils');
 var roomMembershipService = testRequire("./services/room-membership-service");
+var Lazy = require('lazy.js');
 
 var unreadItemServiceMock = mockito.spy(underlyingUnreadItemService);
+
+function makeNotifyList(userIds, mentionIds) {
+  var mentionHash = mentionIds.reduce(function(memo, userId) {
+    memo[userId] = true;
+    return memo;
+  }, {});
+
+  return Lazy(userIds)
+    .map(function(userId) {
+      return {
+        userId: userId,
+        mention: !!mentionHash[userId]
+      };
+    });
+}
 
 describe('email-notification-generator-service', function() {
   this.timeout(5000);
@@ -63,7 +79,7 @@ describe('email-notification-generator-service', function() {
       userSettingsService.setUserSettings(fixture.user2.id, 'unread_notifications_optout', false),
       ])
       .then(function() {
-        return unreadEngine.newItemWithMentions(troupeId, itemId1, [fixture.user2.id, fixture.user3.id], []);
+        return unreadEngine.newItemWithMentions(troupeId, itemId1, makeNotifyList([fixture.user2.id, fixture.user3.id], []));
       })
       .then(function() {
         return sendEmailNotifications(Date.now());
@@ -106,7 +122,7 @@ describe('email-notification-generator-service', function() {
       userSettingsService.setUserSettings(fixture.user2.id, 'unread_notifications_optout', true),
       ])
       .then(function() {
-        return unreadEngine.newItemWithMentions(troupeId, itemId1, [fixture.user2.id, fixture.user3.id], []);
+        return unreadEngine.newItemWithMentions(troupeId, itemId1, makeNotifyList([fixture.user2.id, fixture.user3.id], []));
       })
       .then(function() {
         return sendEmailNotifications(Date.now() + 10);
@@ -153,7 +169,7 @@ describe('email-notification-generator-service', function() {
         roomMembershipService.setMembershipMode(fixture.user2.id, troupeId, 'all'),
       ])
       .then(function() {
-        return unreadEngine.newItemWithMentions(troupeId, itemId1, [fixture.user2.id, fixture.user3.id], []);
+        return unreadEngine.newItemWithMentions(troupeId, itemId1, makeNotifyList([fixture.user2.id, fixture.user3.id], []));
       })
       .then(function() {
         return Promise.all([
@@ -162,7 +178,7 @@ describe('email-notification-generator-service', function() {
         ]);
       })
       .then(function() {
-        return unreadEngine.newItemWithMentions(troupeId, itemId2, [fixture.user2.id, fixture.user3.id], []);
+        return unreadEngine.newItemWithMentions(troupeId, itemId2, makeNotifyList([fixture.user2.id, fixture.user3.id], []));
       })
       .then(function() {
         return sendEmailNotifications(Date.now(), 1000)
@@ -207,7 +223,7 @@ it('SHOULD NOT email somebody who has opted out of notifications set to mention 
       roomMembershipService.setMembershipMode(fixture.user2.id, fixture.troupe1.id, 'announcement'),
     ])
     .then(function() {
-      return unreadEngine.newItemWithMentions(troupeId, itemId1, [fixture.user3.id], []);
+      return unreadEngine.newItemWithMentions(troupeId, itemId1, makeNotifyList([fixture.user3.id], []));
     })
     .then(function() {
       return sendEmailNotifications(Date.now());
@@ -253,7 +269,7 @@ it('SHOULD NOT email somebody who has opted out of notifications set to mention 
     Promise.all([
       userSettingsService.setUserSettings(fixture.user2.id, 'unread_notifications_optout', false),
       roomMembershipService.setMembershipMode(fixture.user2.id, fixture.troupe1.id, 'all'),
-      unreadEngine.newItemWithMentions(troupeId, itemId1, [fixture.user2.id, fixture.user3.id], [])
+      unreadEngine.newItemWithMentions(troupeId, itemId1, makeNotifyList([fixture.user2.id, fixture.user3.id], []))
       ])
       .then(function() {
         return sendEmailNotifications(Date.now());

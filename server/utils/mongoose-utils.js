@@ -58,8 +58,6 @@ exports.attachNotificationListenersToSchema = function (schema, options) {
 
       var isNewInstance = this.isNew;
 
-      this.get('_tv').increment();
-
       if(this._skipTroupeMiddleware) {
         delete this._skipTroupeMiddleware;
         return next();
@@ -117,7 +115,7 @@ exports.upsert = function(schema, query, setOperation) {
         if (attempts >= MAX_UPSERT_ATTEMPTS) throw err;
         if (!mongoUtils.isMongoError(err)) throw err;
         if (err.code !== MONGO_DUPLICATE_KEY_ERROR) throw err;
-        
+
         return performUpdate();
       });
   }
