@@ -3,6 +3,7 @@
 var mongoose       = require('gitter-web-mongoose-bluebird');
 var Schema         = mongoose.Schema;
 var ObjectId       = Schema.ObjectId;
+var installVersionIncMiddleware = require('../install-version-inc-middleware');
 
 module.exports = {
   install: function(mongooseConnection) {
@@ -73,6 +74,8 @@ module.exports = {
     TroupeSchema.index({ lcUri: 1 }, { unique: true, sparse: true });
 
     TroupeSchema.index({ "oneToOneUsers.userId": 1 });
+    
+    installVersionIncMiddleware(TroupeSchema);
 
     TroupeSchema.pre('save', function (next) {
       this.lcUri =  this.uri ? this.uri.toLowerCase() : undefined;

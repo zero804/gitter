@@ -2,7 +2,7 @@
 /* jshint node:true, unused:true */
 'use strict';
 
-var persistence = require('../../server/services/persistence-service');
+var persistence = require('gitter-web-persistence');
 var onMongoConnect = require('../../server/utils/on-mongo-connect');
 var through2Concurrent = require('through2-concurrent');
 var Promise = require('bluebird');

@@ -1,6 +1,6 @@
 "use strict";
 
-var persistence   = require("./persistence-service");
+var persistence   = require('gitter-web-persistence');
 var processChat   = require('../utils/markdown-processor');
 var ObjectID      = require('mongodb').ObjectID;
 var Promise       = require('bluebird');
