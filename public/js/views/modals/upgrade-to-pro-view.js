@@ -1,6 +1,7 @@
 "use strict";
 
 var context    = require('utils/context');
+var clientEnv  = require('gitter-client-env');
 var Marionette = require('backbone.marionette');
 var template   = require('./tmpl/upgrade-to-pro-view.hbs');
 var ModalView  = require('./modal');
@@ -16,7 +17,7 @@ var View = Marionette.ItemView.extend({
 
   billingUrl: function() {
     var orgName = context.troupe().get('uri').split('/')[0];
-    var billingUrl = context.env('billingUrl') + '/create/' + orgName + '/pro?r=' + context.troupe().get('url');
+    var billingUrl = clientEnv['billingUrl'] + '/create/' + orgName + '/pro?r=' + context.troupe().get('url');
     return billingUrl;
   },
 
@@ -33,12 +34,12 @@ var View = Marionette.ItemView.extend({
 
   serializeData: function() {
     var orgName = context.troupe().get('uri').split('/')[0];
-    var billingUrl = context.env('billingUrl') + '/create/' + orgName + '/pro?r=' + context.troupe().get('url');
+    var billingUrl = clientEnv['billingUrl'] + '/create/' + orgName + '/pro?r=' + context.troupe().get('url');
 
     return {
       orgName: orgName,
       billingUrl: billingUrl,
-      maxMemberCount: context.env('maxFreeOrgRoomMembers')
+      maxMemberCount: clientEnv['maxFreeOrgRoomMembers']
     };
   },
 });

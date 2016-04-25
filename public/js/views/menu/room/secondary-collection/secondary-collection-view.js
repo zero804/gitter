@@ -2,10 +2,13 @@
 
 var Marionette         = require('backbone.marionette');
 var _                  = require('underscore');
+var urlJoin            = require('url-join');
 var ItemView           = require('./secondary-collection-item-view');
 var SearchItemView     = require('./secondary-collection-item-search-view');
 var BaseCollectionView = require('../base-collection/base-collection-view');
 var EmptySearchView    = require('./secondary-collection-item-search-empty-view');
+
+var clientEnv = require('gitter-client-env');
 
 var proto = BaseCollectionView.prototype;
 
@@ -92,22 +95,12 @@ module.exports = BaseCollectionView.extend({
       proto.onItemActivated.apply(this, arguments);
   },
 
-  //TODO this assumes the room you are viewing is in the room collection
-  //if not we should perform a API request to get the details JP 12/2/16
   redirectToPermalink: function(view) {
-    var roomId = this.troupeModel.get('id');
-    var room   = this.roomCollection.findWhere({ id: roomId });
+    var roomUri = this.troupeModel.get('uri');
+    var permalink = urlJoin(clientEnv.basePath, roomUri, '?at=' + view.model.get('id'));
 
-    //TODO FIX THIS
-    if (!room) { throw new Error('ROOM NOT IN ROOM LIST AGHHHHHHHHH .....'); }
-
-    //Format URL
-    var url  = room.get('uri');
-    if (url[0] !== '/') { url = '/' + url }
-    url      = url + '?at=' + view.model.get('id');
-
-    var name = room.get('name');
-    this._triggerNavigation(url, 'chat', name);
+    var name = this.troupeModel.name;
+    this._triggerNavigation(permalink, 'chat', name);
   },
 
 

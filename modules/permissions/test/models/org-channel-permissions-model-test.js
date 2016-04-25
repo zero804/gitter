@@ -1,7 +1,6 @@
-/*jslint node:true, unused:true*/
 "use strict";
 
-var testRequire = require('../../test-require');
+var proxyquireNoCallThru = require("proxyquire").noCallThru();
 var assert = require('assert');
 var Promise = require('bluebird');
 
@@ -28,7 +27,7 @@ describe('ORG_CHANNEL', function() {
       assert(false, 'THIS MOCK STILL NEEDS TO BE CONFIGURED');
     });
 
-    permissionsModel = testRequire.withProxies("./services/permissions/org-channel-permissions-model", {
+    permissionsModel = proxyquireNoCallThru("../../lib/models/org-channel-permissions-model", {
       './org-permissions-model': orgPermissionsMock,
       '../user-in-room': userIsInRoomMock
     });

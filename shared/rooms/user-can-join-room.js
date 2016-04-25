@@ -23,6 +23,8 @@ function userCanJoinRoom(userProviders, troupeProviders) {
 
   // If the user has at least one provider that's allowed, then she can join
   // the room.
+  // TODO: drop `intersection`, it's got horrible performance:
+  // https://github.com/troupe/gitter-webapp/commit/431f7d9e96f1ccac153d54a51372adc814e21bc2#commitcomment-17233702
   return _.intersection(userProviders, troupeProviders).length > 0;
 }
 module.exports = userCanJoinRoom;
