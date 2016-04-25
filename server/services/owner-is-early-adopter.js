@@ -1,7 +1,7 @@
 "use strict";
 
 var persistence = require('gitter-web-persistence');
-var mongoUtils  = require('../utils/mongo-utils');
+var mongoUtils  = require('gitter-web-persistence-utils/lib/mongo-utils');
 var env         = require('gitter-web-env');
 var config      = env.config;
 

@@ -1,6 +1,6 @@
 'use strict';
 
-var context = require('utils/context');
+var clientEnv = require('gitter-client-env');
 var debug = require('debug-proxy')('app:frame-utils');
 
 function hasParentFrameSameOrigin() {
@@ -17,8 +17,8 @@ function hasParentFrameSameOrigin() {
 function postMessage(message) {
   try {
     var json = JSON.stringify(message);
-    debug('post: %j to origin %s', json, context.env('basePath'));
-    window.parent.postMessage(json, context.env('basePath'));
+    debug('post: %j to origin %s', json, clientEnv['basePath']);
+    window.parent.postMessage(json, clientEnv['basePath']);
   } catch(e) {
     debug('Unable to post message: %j', e);
   }

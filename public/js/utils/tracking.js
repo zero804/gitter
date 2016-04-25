@@ -2,6 +2,7 @@
 "use strict";
 
 var context = require('utils/context');
+var clientEnv = require('gitter-client-env');
 var appEvents = require('utils/appevents');
 var splitTests = require('gitter-web-split-tests');
 var _ = require('underscore');
@@ -11,8 +12,8 @@ require('./mixpanel');
 module.exports = (function() {
 
 
-  var trackingId = context.env('googleTrackingId');
-  var trackingDomain = context.env('googleTrackingDomain') || 'gitter.im'; // Remove this default 23/10/2014;
+  var trackingId = clientEnv['googleTrackingId'];
+  var trackingDomain = clientEnv['googleTrackingDomain'] || 'gitter.im'; // Remove this default 23/10/2014;
   var ga;
   var gosquared;
 
@@ -28,7 +29,7 @@ module.exports = (function() {
     ga('send', 'pageview');
   }
 
-  var goSquaredTrackingId = context.env('goSquaredTrackingId');
+  var goSquaredTrackingId = clientEnv['goSquaredTrackingId'];
   var user = context.getUser();
 
   if(goSquaredTrackingId) {
