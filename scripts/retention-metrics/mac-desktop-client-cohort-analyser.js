@@ -4,7 +4,7 @@
 var _ = require('lodash');
 var util = require("util");
 var BaseRetentionAnalyser = require('./base-cohort-analyser');
-var persistence = require('../../server/services/persistence-service');
+var persistence = require('gitter-web-persistence');
 
 var webClientPromise = persistence.OAuthClient.findOne({ name: 'Gitter OSX', tag: 'mac' })
     .exec()

@@ -2,7 +2,6 @@
 
 var testRequire = require('./test-require');
 
-var userService = testRequire('./services/user-service');
 var restSerializer = testRequire('./serializers/rest-serializer');
 
 var assert = require("assert");

@@ -1,6 +1,7 @@
 "use strict";
 
 var EVENT_LISTENERS = [
+  './mongoose-events',
   './bayeux-events-bridge',
   './room-permissions-change-listener',
   './repo-rename-detected-listener',
