@@ -55,7 +55,6 @@ module.exports = {
       renamedLcUris: [String],
       providers: [String],
       perms: PermissionsSubSchema,
-      _nonce: { type: Number },
       _tv: { type: 'MongooseNumber', 'default': 0 }
     }, { strict: 'throw' });
 
