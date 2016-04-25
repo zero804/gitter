@@ -2,6 +2,7 @@
 var $ = require('jquery');
 var Marionette = require('backbone.marionette');
 var context = require('utils/context');
+var clientEnv = require('gitter-client-env');
 var troupeCollections = require('collections/instances/troupes');
 var FilteredSuggestedRoomsCollection = require('collections/suggested-rooms').Filtered;
 var userHomeTemplate = require('./tmpl/userHomeTemplate.hbs');
@@ -50,7 +51,7 @@ module.exports = (function() {
       var hasPrivateRepoScope = !!user && !!user.scopes && !!user.scopes.private_repo;
 
       return {
-        basePath: context.env('basePath'),
+        basePath: clientEnv['basePath'],
         showUpgradeAuthLink: !isMobile() && !hasPrivateRepoScope
       };
     },
