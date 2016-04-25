@@ -4,6 +4,7 @@ var mongoose = require('gitter-web-mongoose-bluebird');
 var Schema   = mongoose.Schema;
 var ObjectId = Schema.ObjectId;
 var assert   = require('assert');
+var installVersionIncMiddleware = require('../install-version-inc-middleware');
 
 var ProviderKeySchema = new Schema({
   provider: { type: String },
@@ -48,6 +49,8 @@ UserSchema.index({'identities.provider': 1, 'identities.providerKey': 1}, { uniq
 UserSchema.index({ username: 1 }, { unique: true /*, sparse: true */});
 UserSchema.index({ stripeCustomerId: 1 }, { unique: true, sparse: true });
 UserSchema.schemaTypeName = 'UserSchema';
+
+installVersionIncMiddleware(UserSchema);
 
 UserSchema.methods.clearTokens = function() {
   this.githubToken = null;

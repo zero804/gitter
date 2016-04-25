@@ -1,6 +1,6 @@
 "use strict";
 
-var persistence = require('./persistence-service');
+var persistence = require('gitter-web-persistence');
 var mongoUtils = require('../utils/mongo-utils');
 var assert = require('assert');
 var Promise = require('bluebird');

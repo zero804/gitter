@@ -2,7 +2,7 @@
 
 var Promise                 = require('bluebird');
 var lazy                    = require('lazy.js');
-var persistence             = require('../persistence-service');
+var persistence             = require('gitter-web-persistence');
 var _                       = require('underscore');
 var debug                   = require('debug')('gitter:recent-room-core');
 

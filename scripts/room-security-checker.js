@@ -2,7 +2,7 @@
 
 "use strict";
 
-var persistence = require('../server/services/persistence-service');
+var persistence = require('gitter-web-persistence');
 var checkRepoPrivacy = require('../server/services/check-repo-privacy');
 
 var Promise = require('bluebird');

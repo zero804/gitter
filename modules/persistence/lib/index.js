@@ -47,23 +47,20 @@ function createExports(schemas) {
 }
 
 module.exports = createExports({
-  User: require('./persistence/user-schema'),
-  Identity: require('./persistence/identity-schema'),
-  UserTroupeLastAccess: require('./persistence/user-troupe-last-access-schema'),
-  UserTroupeFavourites: require('./persistence/user-troupe-favourites-schema'),
-  Troupe: require('./persistence/troupe-schema'),
-  TroupeUser: require('./persistence/troupe-user-schema'),
-  UserSettings: require('./persistence/user-settings-schema'),
-  ChatMessage: require('./persistence/chat-message-schema'),
-  Event: require('./persistence/event-schema'),
-  OAuthClient: require('./persistence/oauth-client-schema'),
-  OAuthCode: require('./persistence/oauth-code-schema'),
-  OAuthAccessToken: require('./persistence/oauth-access-token-schema'),
-  PushNotificationDevice: require('./persistence/push-notification-device-schema'),
-  UriLookup: require('./persistence/uri-lookup-schema'),
-  Subscription: require('./persistence/subscription-schema'),
-  FeatureToggle: require('./persistence/feature-toggle-schema')
+  User: require('./schemas/user-schema'),
+  Identity: require('./schemas/identity-schema'),
+  UserTroupeLastAccess: require('./schemas/user-troupe-last-access-schema'),
+  UserTroupeFavourites: require('./schemas/user-troupe-favourites-schema'),
+  Troupe: require('./schemas/troupe-schema'),
+  TroupeUser: require('./schemas/troupe-user-schema'),
+  UserSettings: require('./schemas/user-settings-schema'),
+  ChatMessage: require('./schemas/chat-message-schema'),
+  Event: require('./schemas/event-schema'),
+  OAuthClient: require('./schemas/oauth-client-schema'),
+  OAuthCode: require('./schemas/oauth-code-schema'),
+  OAuthAccessToken: require('./schemas/oauth-access-token-schema'),
+  PushNotificationDevice: require('./schemas/push-notification-device-schema'),
+  UriLookup: require('./schemas/uri-lookup-schema'),
+  Subscription: require('./schemas/subscription-schema'),
+  FeatureToggle: require('./schemas/feature-toggle-schema')
 });
-
-var events = require("./persistence-service-events");
-events.install(module.exports);
