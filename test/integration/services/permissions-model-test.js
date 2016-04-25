@@ -63,7 +63,7 @@ describe('permissions-model', function() {
     };
 
     permissionsModel = testRequire.withProxies("./services/permissions-model", {
-      './user-banned-from-room': userBannedFromRoomMock,
+      'gitter-web-permissions/lib/user-banned-from-room': userBannedFromRoomMock,
       './user-service': userServiceMock,
       './permissions/repo-permissions-model': repoPermissionsModelMock,
       './permissions/org-permissions-model': orgPermissionsModelMock,

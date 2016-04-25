@@ -48,6 +48,7 @@
     "gitter-web-intercom": "file:modules/intercom",
     "gitter-web-linkedin-backend": "file:modules/linkedin-backend",
     "gitter-web-mongoose-bluebird": "file:modules/mongoose-bluebird",
+    "gitter-web-permissions": "file:modules/permissions",
     "gitter-web-persistence": "file:modules/persistence",
     "gitter-web-presence": "file:modules/presence",
     "gitter-web-push-notification-filter": "file:modules/push-notification-filter",
