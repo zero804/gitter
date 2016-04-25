@@ -1,6 +1,6 @@
 "use strict";
 
-var persistence = require('./persistence-service');
+var persistence = require('gitter-web-persistence');
 var cacheWrapper = require('gitter-web-cache-wrapper');
 
 /**
