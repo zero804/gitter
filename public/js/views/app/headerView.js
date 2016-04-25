@@ -183,6 +183,7 @@ var HeaderView = Marionette.ItemView.extend({
       var isRoomMember = context.isRoomMember();
       var githubType = this.model.get('githubType');
       var isOneToOne = githubType === 'ONETOONE';
+      var security = this.model.get('security');
       var url = this.model.get('url');
 
       if (!isOneToOne) {
@@ -204,7 +205,9 @@ var HeaderView = Marionette.ItemView.extend({
 
         if (isStaff || isAdmin) {
           menuItems.push({ title: 'Tags', href: '#tags' });
-          menuItems.push({ title: 'Settings', href: '#settings' });
+          if (security == 'PUBLIC') {
+            menuItems.push({ title: 'Settings', href: '#settings' });
+          }
           menuItems.push({ divider: true });
         }
 

@@ -2,7 +2,7 @@
 
 var testRequire = require('./test-require');
 var Promise     = require('bluebird');
-var persistence = testRequire("./services/persistence-service");
+var persistence = require('gitter-web-persistence');
 var roomMembershipFlags = testRequire("./services/room-membership-flags");
 var debug       = require('debug')('gitter:test-fixtures');
 var counter     = 0;

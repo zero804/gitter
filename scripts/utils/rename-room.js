@@ -4,7 +4,7 @@
 "use strict";
 
 var shutdown = require('shutdown');
-var persistence = require('../../server/services/persistence-service');
+var persistence = require('gitter-web-persistence');
 var uriLookupService   = require("../../server/services/uri-lookup-service");
 
 var readline = require('readline');

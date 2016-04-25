@@ -46,7 +46,7 @@ describe("User Service", function() {
   it('should create new users', function(done) {
 
     var userService = testRequire("./services/user-service");
-    var persistence = testRequire("./services/persistence-service");
+    var persistence = require('gitter-web-persistence');
     return persistence.User.findOneAndRemove({ githubId: - 1})
       .exec()
       .then(function() {

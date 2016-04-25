@@ -77,7 +77,7 @@ opts.name = opts.name || opts._[0];
   process.exit(1);
 }
 
-var FeatureToggle = require("../../server/services/persistence-service").FeatureToggle;
+var FeatureToggle = require('gitter-web-persistence').FeatureToggle;
 
 
 function parseTimestamp(ts) {

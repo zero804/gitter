@@ -14,7 +14,7 @@ function twitterOauthCallback(req, token, tokenSecret, profile, done) {
   var avatar = profile.photos[0].value; // is this always set?
 
   var twitterUser = {
-    username: profile.id+'_twitter', // OR profile.username+'_twitter'
+    username: profile.username+'_twitter',
     displayName: profile.displayName,
     gravatarImageUrl: avatar
   };
