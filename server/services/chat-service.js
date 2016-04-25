@@ -241,6 +241,8 @@ exports.updateChatMessage = function(troupe, chatMessage, user, newText, callbac
             troupeId: troupe.id,
             username: user.username
           });
+
+          return null;
         })
         .thenReturn(chatMessage);
     })

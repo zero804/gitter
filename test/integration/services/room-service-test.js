@@ -1943,12 +1943,12 @@ describe('room-service', function() {
       var roomService;
       var troupeServiceFindById;
       var roomPermissionsModel;
-      var assertMemberLimit;
+      var assertJoinRoomChecks;
       var recentRoomServiceSaveLastVisitedTroupeforUserId;
       var roomMembershipServiceAddRoomMember;
       var troupe;
       var access;
-      var limitReached;
+      var joinRoomCheckFailed;
       var user;
       var userId;
       var troupeId;
@@ -1967,7 +1967,7 @@ describe('room-service', function() {
 
         troupeServiceFindById = mockito.mockFunction();
         roomPermissionsModel = mockito.mockFunction();
-        assertMemberLimit = mockito.mockFunction();
+        assertJoinRoomChecks = mockito.mockFunction();
         recentRoomServiceSaveLastVisitedTroupeforUserId = mockito.mockFunction();
         roomMembershipServiceAddRoomMember = mockito.mockFunction();
 
@@ -1983,10 +1983,10 @@ describe('room-service', function() {
           return Promise.resolve(access);
         });
 
-        mockito.when(assertMemberLimit)().then(function(pRoom, pUser) {
+        mockito.when(assertJoinRoomChecks)().then(function(pRoom, pUser) {
           assert.strictEqual(pUser, user);
           assert.strictEqual(pRoom, troupe);
-          if (limitReached) return Promise.reject(new Error());
+          if (joinRoomCheckFailed) return Promise.reject(new Error());
           return Promise.resolve();
         });
 
@@ -2010,7 +2010,7 @@ describe('room-service', function() {
           './room-membership-service': {
             addRoomMember: roomMembershipServiceAddRoomMember
           },
-          './assert-member-limit': assertMemberLimit,
+          './assert-join-room-checks': assertJoinRoomChecks,
           './recent-room-service': {
             saveLastVisitedTroupeforUserId: recentRoomServiceSaveLastVisitedTroupeforUserId
           },
@@ -2020,12 +2020,12 @@ describe('room-service', function() {
 
       it('should allow a user to join a room when they have permission', function(done) {
         access = true;
-        limitReached = false;
+        joinRoomCheckFailed = false;
         roomService.joinRoom(troupeId, user)
           .then(function() {
             mockito.verify(troupeServiceFindById, once)();
             mockito.verify(roomPermissionsModel, once)();
-            mockito.verify(assertMemberLimit, once)();
+            mockito.verify(assertJoinRoomChecks, once)();
             mockito.verify(recentRoomServiceSaveLastVisitedTroupeforUserId, once)();
             mockito.verify(roomMembershipServiceAddRoomMember, once)();
           })
@@ -2034,7 +2034,7 @@ describe('room-service', function() {
 
       it('should deny a user join room when they don\'t have permission', function(done) {
         access = false;
-        limitReached = false;
+        joinRoomCheckFailed = false;
 
         roomService.joinRoom(troupeId, user)
           .then(function() {
@@ -2051,7 +2051,7 @@ describe('room-service', function() {
 
       it('should deny a user join room there are too many people in the room', function(done) {
         access = true;
-        limitReached = true;
+        joinRoomCheckFailed = true;
 
         roomService.joinRoom(troupeId, user)
           .then(function() {
@@ -2062,7 +2062,7 @@ describe('room-service', function() {
           .then(function() {
             mockito.verify(troupeServiceFindById, once)();
             mockito.verify(roomPermissionsModel, once)();
-            mockito.verify(assertMemberLimit, once)();
+            mockito.verify(assertJoinRoomChecks, once)();
           })
           .nodeify(done);
       });
@@ -2072,7 +2072,7 @@ describe('room-service', function() {
       var fixture = {};
       var roomService;
       var roomPermissionsModel;
-      var assertMemberLimit;
+      var assertJoinRoomChecks;
       var access;
       var roomMembershipService;
 
@@ -2091,7 +2091,7 @@ describe('room-service', function() {
       beforeEach(function() {
         roomMembershipService = testRequire('./services/room-membership-service');
         roomPermissionsModel = mockito.mockFunction();
-        assertMemberLimit = mockito.mockFunction();
+        assertJoinRoomChecks = mockito.mockFunction();
 
         mockito.when(roomPermissionsModel)().then(function(pUser, pPerm, pRoom) {
           assert.strictEqual(pUser, fixture.user1);
