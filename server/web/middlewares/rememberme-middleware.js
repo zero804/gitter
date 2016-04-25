@@ -11,6 +11,7 @@ var sechash         = require('sechash');
 var userService     = require('../../services/user-service');
 var useragentTagger = require('../../utils/user-agent-tagger');
 var debug           = require('debug')('gitter:rememberme-middleware');
+var userScopes      = require('../../utils/models/user-scopes');
 
 var cookieName = nconf.get('web:cookiePrefix') + 'auth';
 
@@ -169,7 +170,7 @@ module.exports = {
         if(!user) return fail();
 
         /* No token, no touch */
-        if(user.isMissingTokens()) {
+        if(userScopes.isMissingTokens(user)) {
           return fail();
         }
 

@@ -4,7 +4,7 @@ var env                   = require('gitter-web-env');
 var redisClient           = env.redis.getClient();
 var errorReporter         = env.errorReporter;
 
-var persistence           = require('./persistence-service');
+var persistence           = require('gitter-web-persistence');
 var dolph                 = require('dolph');
 var Promise               = require('bluebird');
 var userService           = require('./user-service');
