@@ -1,5 +1,6 @@
 "use strict";
 var context = require('utils/context');
+var clientEnv = require('gitter-client-env');
 var Marionette = require('backbone.marionette');
 var appEvents = require('utils/appevents');
 var isMobile = require('utils/is-mobile');
@@ -38,7 +39,7 @@ module.exports = (function () {
       return {
         isMobile: isMobile(),
         user: userModel,
-        billingUrl: context.env('billingUrl'),
+        billingUrl: clientEnv['billingUrl'],
         showBilling: !isMobile(),
         showGetApps: !isMobile() && !isNativeResult,
         showSignout: !isNativeResult
