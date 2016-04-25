@@ -25,6 +25,7 @@ function findPublicChannels(user, query, options) {
     return { lcUri: re };
   });
 
+  // TODO: switch to `permissions`
   return persistence.Troupe
     .find({
       $and: filterQueries,

@@ -217,7 +217,8 @@ function findOrCreateGroupRoom(user, troupe, uri, options) {
                 topic: topic || "",
                 security: security,
                 dateLastSecurityCheck: new Date(),
-                userCount: 0
+                userCount: 0,
+                // permissions: permissions.fromLegacy(githubType, officialUri, security, githubId)
               }
             })
             .spread(function(troupe, updateExisting) {
@@ -820,6 +821,7 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
         validate.fail('Invalid security option: ' + security);
       }
 
+      // TODO: move to `permissions` here
       switch(parentTroupe.githubType) {
         case 'ORG':
           githubType = 'ORG_CHANNEL';
@@ -943,7 +945,7 @@ exports.createCustomChildRoom = createCustomChildRoom;
  * returns        User - the invited user
  */
 function notifyInvitedUser(fromUser, invitedUser, room/*, isNewUser*/) {
-  
+
   // get the email address
   return emailAddressService(invitedUser, { attemptDiscovery: true })
     .then(function (emailAddress) {
