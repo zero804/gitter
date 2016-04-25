@@ -1,8 +1,8 @@
 'use strict';
 
-var _                  = require('lodash');
 var Promise            = require('bluebird');
 var createDistribution = require('./create-distribution');
+var Lazy               = require('lazy.js');
 
 function toString(f) {
   if (!f) return '';
@@ -16,39 +16,63 @@ function toString(f) {
  * new users who are now mentioned in the message, who were not
  * previously.
  */
-function generateMentionDeltaSet(newNotifyUserIds, newMentionUserIds, originalMentions) {
-  var newNotifyUserIdStrings = _.map(newNotifyUserIds, toString);
-  var newMentionUserIdStrings = _.map(newMentionUserIds, toString);
-  var originalMentionUserIdStrings = _.map(originalMentions, toString);
+function generateMentionDeltaSet(newNotifies, originalMentions) {
+  var newNotifyUserIds = newNotifies
+    .map(function(memberWithMention) {
+      return toString(memberWithMention.userId);
+    });
 
-  var addMentions = _.without.apply(null, [newMentionUserIdStrings].concat(originalMentionUserIdStrings));
-  var removeMentions = _.without.apply(null, [originalMentionUserIdStrings].concat(newMentionUserIdStrings));
+  var newMentionUserIds = newNotifies
+    .filter(function(memberWithMention) {
+      return memberWithMention.mention;
+    })
+    .map(function(memberWithMention) {
+      return toString(memberWithMention.userId);
+    });
+
+  var originalMentionUserIdStrings = originalMentions.map(toString);
+
+  var addMentions = newMentionUserIds.without(originalMentionUserIdStrings);
+  var removeMentions = originalMentionUserIdStrings.without(newMentionUserIds);
 
   /*
    * List of users who should get unread items, who were previously mentioned
    * but no longer are
    */
-  var forNotifyWithRemoveMentions = _.intersection(newNotifyUserIdStrings, removeMentions);
+  var forNotifyWithRemoveMentions = newNotifyUserIds.intersection(removeMentions);
 
   /*
    * Everyone who was added via a mention, plus everyone who was no longer
    * mentioned but is not lurking
    */
-  var addNotify = forNotifyWithRemoveMentions.concat(addMentions);
+  var addWithoutMentionSeq = forNotifyWithRemoveMentions
+    .map(function(userId) {
+      return {
+        userId: userId,
+        mention: false
+      };
+    });
+
+  var addWithMentionSequence = addMentions
+    .map(function(userId) {
+      return {
+        userId: userId,
+        mention: true
+      };
+    });
+
+  var add = addWithoutMentionSeq.concat(addWithMentionSequence);
 
   return {
-    addNotify: addNotify,
-    addMentions: addMentions,
+    add: add,
     remove: removeMentions
   };
 }
 
 function deltaDistributions(newDistribution, originalDistribution) {
-  return Promise.join(
-    newDistribution.getEngineNotifyList().toArray().toPromise(Promise),
-    newDistribution.getEngineMentionList().toArray().toPromise(Promise),
-    originalDistribution.getEngineMentionList().toArray().toPromise(Promise),
-    generateMentionDeltaSet);
+  var newNotifies = newDistribution.getEngineNotifies();
+  var originalMentions = originalDistribution.getMentionUserIds();
+  return generateMentionDeltaSet(newNotifies, originalMentions);
 }
 
 function createDelta(fromUserId, troupe, newMentions, originalMentions) {

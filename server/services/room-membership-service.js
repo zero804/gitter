@@ -1,6 +1,6 @@
 "use strict";
 
-var persistence          = require('./persistence-service');
+var persistence          = require('gitter-web-persistence');
 var TroupeUser           = persistence.TroupeUser;
 var Troupe               = persistence.Troupe;
 var mongoUtils           = require("../utils/mongo-utils");

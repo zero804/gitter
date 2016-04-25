@@ -1,6 +1,6 @@
 "use strict";
 
-var persistence = require('../../services/persistence-service');
+var persistence = require('gitter-web-persistence');
 
 function listFeatures() {
   return persistence.FeatureToggle.find({}, { name: 1, description: 1 })

@@ -1,5 +1,5 @@
 var speedy = require ("speedy");
-var persistence = require('../../server/services/persistence-service');
+var persistence = require('gitter-web-persistence');
 
 var userIds = ['54355e03a6cf90638955c368', '5437c126c74d515442c792c5', '543ea21969fbc77aa6c097e6', '543ea2c569fbc77aa6c097e7'];
 var userId = userIds[0];
