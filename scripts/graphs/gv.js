@@ -2,7 +2,7 @@ var util = require('util');
 var graphviz = require('graphviz');
 var fs = require('fs');
 
-var persistenceService = require('../../server/services/persistence-service');
+var persistenceService = require('gitter-web-persistence');
 
 // Create digraph G
 var g = graphviz.digraph("G");

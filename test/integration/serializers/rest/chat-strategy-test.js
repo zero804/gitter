@@ -1,7 +1,7 @@
 'use strict';
 
 var testRequire = require('../../test-require');
-var assertUtils = require('../../assert-utils')
+var assertUtils = require('../../assert-utils');
 var fixtureLoader = require('../../test-fixtures');
 var serialize = testRequire('./serializers/serialize');
 var ChatStrategy = testRequire('./serializers/rest/chat-strategy');

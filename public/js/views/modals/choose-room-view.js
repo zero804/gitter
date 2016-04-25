@@ -3,6 +3,8 @@
 var Marionette = require('backbone.marionette');
 var ModalView  = require('./modal');
 var template   = require('./tmpl/choose-room-view.hbs');
+var context    = require('../../utils/context');
+
 
 var View = Marionette.ItemView.extend({
   template: template,
@@ -34,6 +36,13 @@ var View = Marionette.ItemView.extend({
     }
   },
 
+  serializeData: function() {
+    return {
+      allowCreate: this.options.allow,
+      disallowCreateReason: this.options.reason
+    };
+  }
+
 });
 
 var Modal = ModalView.extend({
@@ -42,12 +51,24 @@ var Modal = ModalView.extend({
     options = options || {};
     options.title = options.title || "Create a chat room";
 
+    var providers = context.user().get('providers');
+    options.allow = providers.indexOf('github') !== -1;
+    // This way we don't have to figure out how to dynamically map linkedin to
+    // LinkedIn and it is future-proof (works for all non-github) AND it tells
+    // you how to work around this. (ie. sign in with a github account).
+    options.reason = (options.allow) ? '' : 'Sorry, only GitHub users can create rooms at the moment.';
+
+    if (options.allow) {
+      this.menuItems = [
+        { action: "next", text: "Next", className: "modal--default__footer__btn" },
+      ]
+    } else {
+      this.menuItems = [];
+    }
+
     ModalView.prototype.initialize.call(this, options);
     this.view = new View(options);
   },
-  menuItems: [
-    { action: "next", text: "Next", className: "modal--default__footer__btn" },
-  ]
 });
 
 module.exports = {

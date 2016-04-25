@@ -1,6 +1,6 @@
 'use strict';
 
-var persistence = require('../persistence-service');
+var persistence = require('gitter-web-persistence');
 
 module.exports = function similarTags(user, roomUri) {
   if (!roomUri) return [];
