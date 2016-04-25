@@ -8,7 +8,7 @@ var fixtureLoader = require('../test-fixtures');
 
 var recentRoomService = testRequire("./services/recent-room-service");
 var recentRoomCore = testRequire("./services/core/recent-room-core");
-var persistenceService = testRequire("./services/persistence-service");
+var persistenceService = require('gitter-web-persistence');
 
 describe('recent-room-service', function() {
   describe('ordering', function() {

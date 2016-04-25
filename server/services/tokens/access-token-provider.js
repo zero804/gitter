@@ -1,6 +1,6 @@
 'use strict';
 
-var persistenceService = require("../persistence-service");
+var persistenceService = require('gitter-web-persistence');
 var mongoUtils = require("../../utils/mongo-utils");
 var random = require('../../utils/random');
 

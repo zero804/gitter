@@ -1,6 +1,6 @@
 "use strict";
 
-var persistence   = require("./persistence-service");
+var persistence   = require('gitter-web-persistence');
 var Promise       = require('bluebird');
 var client        = require('../utils/elasticsearch-client');
 var collections   = require('../utils/collections');
