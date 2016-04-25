@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 
-var persistence = require('../../server/services/persistence-service');
+var persistence = require('gitter-web-persistence');
 var findRoomHumanLanguage = require('../../server/services/find-room-human-language');
 var shutdown = require('shutdown');
 var es = require('event-stream');

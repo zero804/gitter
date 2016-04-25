@@ -215,7 +215,7 @@
                     "concat-map": {
                       "version": "0.0.1",
                       "from": "concat-map@0.0.1",
-                      "resolved": "http://beta-internal:4873/concat-map/-/concat-map-0.0.1.tgz"
+                      "resolved": "https://registry.npmjs.org/concat-map/-/concat-map-0.0.1.tgz"
                     }
                   }
                 }
@@ -290,7 +290,7 @@
                         "concat-map": {
                           "version": "0.0.1",
                           "from": "concat-map@0.0.1",
-                          "resolved": "http://beta-internal:4873/concat-map/-/concat-map-0.0.1.tgz"
+                          "resolved": "https://registry.npmjs.org/concat-map/-/concat-map-0.0.1.tgz"
                         }
                       }
                     }
@@ -326,7 +326,7 @@
       "dependencies": {
         "debug": {
           "version": "1.0.4",
-          "from": "debug@>=1.0.4 <2.0.0",
+          "from": "debug@>=1.0.2 <2.0.0",
           "resolved": "http://beta-internal:4873/debug/-/debug-1.0.4.tgz",
           "dependencies": {
             "ms": {
@@ -579,7 +579,7 @@
               "dependencies": {
                 "ansi-regex": {
                   "version": "0.2.1",
-                  "from": "ansi-regex@>=0.2.0 <0.3.0",
+                  "from": "ansi-regex@>=0.2.1 <0.3.0",
                   "resolved": "http://beta-internal:4873/ansi-regex/-/ansi-regex-0.2.1.tgz"
                 }
               }
@@ -591,7 +591,7 @@
               "dependencies": {
                 "ansi-regex": {
                   "version": "0.2.1",
-                  "from": "ansi-regex@>=0.2.0 <0.3.0",
+                  "from": "ansi-regex@>=0.2.1 <0.3.0",
                   "resolved": "http://beta-internal:4873/ansi-regex/-/ansi-regex-0.2.1.tgz"
                 }
               }
@@ -1407,9 +1407,9 @@
               "resolved": "http://beta-internal:4873/double-ended-queue/-/double-ended-queue-2.1.0-0.tgz"
             },
             "redis-commands": {
-              "version": "1.1.0",
+              "version": "1.2.0",
               "from": "redis-commands@>=1.1.0 <2.0.0",
-              "resolved": "http://beta-internal:4873/redis-commands/-/redis-commands-1.1.0.tgz"
+              "resolved": "http://beta-internal:4873/redis-commands/-/redis-commands-1.2.0.tgz"
             },
             "redis-parser": {
               "version": "1.3.0",
@@ -1717,6 +1717,11 @@
       "from": "modules/mongoose-bluebird",
       "resolved": "file:modules/mongoose-bluebird"
     },
+    "gitter-web-persistence": {
+      "version": "1.0.0",
+      "from": "modules/persistence",
+      "resolved": "file:modules/persistence"
+    },
     "gitter-web-presence": {
       "version": "1.0.0",
       "from": "modules/presence",
@@ -1787,7 +1792,7 @@
                 "concat-map": {
                   "version": "0.0.1",
                   "from": "concat-map@0.0.1",
-                  "resolved": "http://beta-internal:4873/concat-map/-/concat-map-0.0.1.tgz"
+                  "resolved": "https://registry.npmjs.org/concat-map/-/concat-map-0.0.1.tgz"
                 }
               }
             }
@@ -2460,7 +2465,7 @@
               "dependencies": {
                 "semver": {
                   "version": "5.1.0",
-                  "from": "semver@>=2.0.0 <3.0.0||>=3.0.0 <4.0.0||>=4.0.0 <5.0.0||>=5.0.0 <6.0.0",
+                  "from": "semver@>=5.1.0 <6.0.0",
                   "resolved": "http://beta-internal:4873/semver/-/semver-5.1.0.tgz"
                 },
                 "resolve-from": {
@@ -2534,9 +2539,9 @@
       "resolved": "http://beta-internal:4873/mongodb-unique-ids/-/mongodb-unique-ids-0.1.2.tgz"
     },
     "mongoose": {
-      "version": "4.4.12",
+      "version": "4.4.13",
       "from": "mongoose@>=4.4.5 <5.0.0",
-      "resolved": "http://beta-internal:4873/mongoose/-/mongoose-4.4.12.tgz",
+      "resolved": "http://beta-internal:4873/mongoose/-/mongoose-4.4.13.tgz",
       "dependencies": {
         "async": {
           "version": "1.5.2",
@@ -3660,26 +3665,29 @@
                   }
                 },
                 "sshpk": {
-                  "version": "1.7.4",
+                  "version": "1.8.2",
                   "from": "sshpk@>=1.7.0 <2.0.0",
-                  "resolved": "http://beta-internal:4873/sshpk/-/sshpk-1.7.4.tgz",
+                  "resolved": "http://beta-internal:4873/sshpk/-/sshpk-1.8.2.tgz",
                   "dependencies": {
                     "asn1": {
                       "version": "0.2.3",
                       "from": "asn1@>=0.2.3 <0.3.0",
                       "resolved": "http://beta-internal:4873/asn1/-/asn1-0.2.3.tgz"
                     },
+                    "assert-plus": {
+                      "version": "1.0.0",
+                      "from": "assert-plus@>=1.0.0 <2.0.0",
+                      "resolved": "http://beta-internal:4873/assert-plus/-/assert-plus-1.0.0.tgz"
+                    },
                     "dashdash": {
-                      "version": "1.13.0",
-                      "from": "dashdash@>=1.10.1 <2.0.0",
-                      "resolved": "http://beta-internal:4873/dashdash/-/dashdash-1.13.0.tgz",
-                      "dependencies": {
-                        "assert-plus": {
-                          "version": "1.0.0",
-                          "from": "assert-plus@>=1.0.0 <2.0.0",
-                          "resolved": "http://beta-internal:4873/assert-plus/-/assert-plus-1.0.0.tgz"
-                        }
-                      }
+                      "version": "1.13.1",
+                      "from": "dashdash@>=1.12.0 <2.0.0",
+                      "resolved": "http://beta-internal:4873/dashdash/-/dashdash-1.13.1.tgz"
+                    },
+                    "getpass": {
+                      "version": "0.1.5",
+                      "from": "getpass@>=0.1.1 <0.2.0",
+                      "resolved": "http://beta-internal:4873/getpass/-/getpass-0.1.5.tgz"
                     },
                     "jsbn": {
                       "version": "0.1.0",
@@ -3687,9 +3695,9 @@
                       "resolved": "http://beta-internal:4873/jsbn/-/jsbn-0.1.0.tgz"
                     },
                     "tweetnacl": {
-                      "version": "0.14.3",
-                      "from": "tweetnacl@>=0.13.0 <1.0.0",
-                      "resolved": "http://beta-internal:4873/tweetnacl/-/tweetnacl-0.14.3.tgz"
+                      "version": "0.13.3",
+                      "from": "tweetnacl@>=0.13.0 <0.14.0",
+                      "resolved": "http://beta-internal:4873/tweetnacl/-/tweetnacl-0.13.3.tgz"
                     },
                     "jodid25519": {
                       "version": "1.0.2",
@@ -3698,7 +3706,7 @@
                     },
                     "ecc-jsbn": {
                       "version": "0.1.1",
-                      "from": "ecc-jsbn@>=0.0.1 <1.0.0",
+                      "from": "ecc-jsbn@>=0.1.1 <0.2.0",
                       "resolved": "http://beta-internal:4873/ecc-jsbn/-/ecc-jsbn-0.1.1.tgz"
                     }
                   }
@@ -3849,7 +3857,7 @@
       "dependencies": {
         "debug": {
           "version": "1.0.4",
-          "from": "debug@>=1.0.4 <2.0.0",
+          "from": "debug@>=1.0.2 <2.0.0",
           "resolved": "http://beta-internal:4873/debug/-/debug-1.0.4.tgz",
           "dependencies": {
             "ms": {
@@ -4191,26 +4199,29 @@
                   }
                 },
                 "sshpk": {
-                  "version": "1.7.4",
+                  "version": "1.8.2",
                   "from": "sshpk@>=1.7.0 <2.0.0",
-                  "resolved": "http://beta-internal:4873/sshpk/-/sshpk-1.7.4.tgz",
+                  "resolved": "http://beta-internal:4873/sshpk/-/sshpk-1.8.2.tgz",
                   "dependencies": {
                     "asn1": {
                       "version": "0.2.3",
                       "from": "asn1@>=0.2.3 <0.3.0",
                       "resolved": "http://beta-internal:4873/asn1/-/asn1-0.2.3.tgz"
                     },
+                    "assert-plus": {
+                      "version": "1.0.0",
+                      "from": "assert-plus@>=1.0.0 <2.0.0",
+                      "resolved": "http://beta-internal:4873/assert-plus/-/assert-plus-1.0.0.tgz"
+                    },
                     "dashdash": {
-                      "version": "1.13.0",
-                      "from": "dashdash@>=1.10.1 <2.0.0",
-                      "resolved": "http://beta-internal:4873/dashdash/-/dashdash-1.13.0.tgz",
-                      "dependencies": {
-                        "assert-plus": {
-                          "version": "1.0.0",
-                          "from": "assert-plus@>=1.0.0 <2.0.0",
-                          "resolved": "http://beta-internal:4873/assert-plus/-/assert-plus-1.0.0.tgz"
-                        }
-                      }
+                      "version": "1.13.1",
+                      "from": "dashdash@>=1.12.0 <2.0.0",
+                      "resolved": "http://beta-internal:4873/dashdash/-/dashdash-1.13.1.tgz"
+                    },
+                    "getpass": {
+                      "version": "0.1.5",
+                      "from": "getpass@>=0.1.1 <0.2.0",
+                      "resolved": "http://beta-internal:4873/getpass/-/getpass-0.1.5.tgz"
                     },
                     "jsbn": {
                       "version": "0.1.0",
@@ -4218,9 +4229,9 @@
                       "resolved": "http://beta-internal:4873/jsbn/-/jsbn-0.1.0.tgz"
                     },
                     "tweetnacl": {
-                      "version": "0.14.3",
-                      "from": "tweetnacl@>=0.13.0 <1.0.0",
-                      "resolved": "http://beta-internal:4873/tweetnacl/-/tweetnacl-0.14.3.tgz"
+                      "version": "0.13.3",
+                      "from": "tweetnacl@>=0.13.0 <0.14.0",
+                      "resolved": "http://beta-internal:4873/tweetnacl/-/tweetnacl-0.13.3.tgz"
                     },
                     "jodid25519": {
                       "version": "1.0.2",
@@ -4229,7 +4240,7 @@
                     },
                     "ecc-jsbn": {
                       "version": "0.1.1",
-                      "from": "ecc-jsbn@>=0.0.1 <1.0.0",
+                      "from": "ecc-jsbn@>=0.1.1 <0.2.0",
                       "resolved": "http://beta-internal:4873/ecc-jsbn/-/ecc-jsbn-0.1.1.tgz"
                     }
                   }
@@ -5201,7 +5212,7 @@
                           "dependencies": {
                             "spdx-license-ids": {
                               "version": "1.2.1",
-                              "from": "spdx-license-ids@>=1.0.2 <2.0.0",
+                              "from": "spdx-license-ids@>=1.0.0 <2.0.0",
                               "resolved": "http://beta-internal:4873/spdx-license-ids/-/spdx-license-ids-1.2.1.tgz"
                             }
                           }
@@ -5218,7 +5229,7 @@
                             },
                             "spdx-license-ids": {
                               "version": "1.2.1",
-                              "from": "spdx-license-ids@>=1.0.2 <2.0.0",
+                              "from": "spdx-license-ids@>=1.0.0 <2.0.0",
                               "resolved": "http://beta-internal:4873/spdx-license-ids/-/spdx-license-ids-1.2.1.tgz"
                             }
                           }

@@ -1,6 +1,6 @@
 "use strict";
 
-var persistence = require('./persistence-service');
+var persistence = require('gitter-web-persistence');
 
 function userIsInRoom(uri, user) {
   var lcUri = uri.toLowerCase();
