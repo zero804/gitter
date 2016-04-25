@@ -2,6 +2,7 @@
 
 var appEvents       = require('utils/appevents');
 var context         = require('utils/context');
+var clientEnv       = require('gitter-client-env');
 var TitlebarUpdater = require('components/titlebar');
 var onready         = require('./utils/onready');
 var debug           = require('debug-proxy')('app:router-nli-app');
@@ -97,7 +98,7 @@ onready(function() {
   };
 
   window.addEventListener('message', function(e) {
-    if(e.origin !== context.env('basePath')) {
+    if(e.origin !== clientEnv['basePath']) {
       debug('Ignoring message from %s', e.origin);
       return;
     }

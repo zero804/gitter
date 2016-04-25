@@ -3,7 +3,7 @@
 
 var $ = require('jquery');
 require('jquery-iframely');
-var context = require('utils/context');
+var clientEnv = require('gitter-client-env');
 
 var iframelyProviders = ["youtube.com",
   "www.youtube.com",
@@ -48,7 +48,7 @@ var iframelyProviders = ["youtube.com",
 
 var MAX_HEIGHT = 640;
 
-var embedEnv = context.env('embed');
+var embedEnv = clientEnv['embed'] || {};
 $.iframely.defaults.endpoint = embedEnv.basepath+'/'+embedEnv.cacheBuster+'/iframely';
 
 function fetchAndRenderIframely(url, cb) {

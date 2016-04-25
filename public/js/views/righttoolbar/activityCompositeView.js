@@ -28,6 +28,7 @@ var activityTemplate = require('./tmpl/activity-composite.hbs');
 var activityEmptyTemplate = require('./tmpl/activity-empty.hbs');
 var activityDecorators = require('gitter-web-shared/activity/activity-decorators');
 var context = require('utils/context');
+var clientEnv = require('gitter-client-env');
 var timeFormat = require('gitter-web-shared/time/time-format');
 var fullTimeFormat = require('gitter-web-shared/time/full-time-format');
 var compositeViewRenderTemplate = require('utils/composite-view-render-template');
@@ -150,7 +151,7 @@ module.exports = (function() {
     template: activityEmptyTemplate,
     serializeData: function() {
       var isNativeDesktopApp = context().isNativeDesktopApp;
-      var basePath = isNativeDesktopApp ? context.env('basePath') + context.troupe().get('url') : '';
+      var basePath = isNativeDesktopApp ? clientEnv['basePath'] + context.troupe().get('url') : '';
       var integrationsUrl = basePath + '#integrations';
 
       return {

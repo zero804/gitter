@@ -5,7 +5,7 @@ var liveCollections = require('./live-collections');
 exports.install = function(persistenceService) {
 
   var schemas = persistenceService.schemas;
-  var mongooseUtils = require("../utils/mongoose-utils");
+  var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 
   /**
    * Users
