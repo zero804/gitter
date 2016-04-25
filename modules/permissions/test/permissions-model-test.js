@@ -1,14 +1,12 @@
-/*jslint node:true, unused:true*/
-/*global describe:true, it:true, beforeEach */
 "use strict";
 
-var testRequire = require('../test-require');
 var assert = require('assert');
 var Promise = require('bluebird');
 
 var mockito = require('jsmockito').JsMockito;
 var times = mockito.Verifiers.times;
 var once = times(1);
+var proxyquireNoCallThru = require("proxyquire").noCallThru();
 
 var USER;
 var URI;
@@ -20,10 +18,10 @@ var oneToOnePermissionsModelMock;
 var orgChannelPermissionsModelMock;
 var repoChannelPermissionsModelMock;
 var userChannelPermissionsModelMock;
-var userServiceMock;
 var destroyTokensForUserIdMock;
 var permissionsModel;
 var permissionMocks;
+var appEventsMock;
 var fixtures;
 var delegate;
 
@@ -58,19 +56,19 @@ describe('permissions-model', function() {
       'USER_CHANNEL': userChannelPermissionsModelMock
     };
 
-    userServiceMock = {
-      destroyTokensForUserId: destroyTokensForUserIdMock
+    appEventsMock = {
+      destroyUserTokens: destroyTokensForUserIdMock
     };
 
-    permissionsModel = testRequire.withProxies("./services/permissions-model", {
+    permissionsModel = proxyquireNoCallThru('../lib/permissions-model', {
       './user-banned-from-room': userBannedFromRoomMock,
-      './user-service': userServiceMock,
-      './permissions/repo-permissions-model': repoPermissionsModelMock,
-      './permissions/org-permissions-model': orgPermissionsModelMock,
-      './permissions/one-to-one-permissions-model': oneToOnePermissionsModelMock,
-      './permissions/org-channel-permissions-model': orgChannelPermissionsModelMock,
-      './permissions/repo-channel-permissions-model': repoChannelPermissionsModelMock,
-      './permissions/user-channel-permissions-model': userChannelPermissionsModelMock,
+      'gitter-web-appevents': appEventsMock,
+      './models/repo-permissions-model': repoPermissionsModelMock,
+      './models/org-permissions-model': orgPermissionsModelMock,
+      './models/one-to-one-permissions-model': oneToOnePermissionsModelMock,
+      './models/org-channel-permissions-model': orgChannelPermissionsModelMock,
+      './models/repo-channel-permissions-model': repoChannelPermissionsModelMock,
+      './models/user-channel-permissions-model': userChannelPermissionsModelMock,
     });
 
   });

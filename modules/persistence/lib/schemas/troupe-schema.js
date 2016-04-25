@@ -3,6 +3,7 @@
 var mongoose       = require('gitter-web-mongoose-bluebird');
 var Schema         = mongoose.Schema;
 var ObjectId       = Schema.ObjectId;
+var PermissionsSubSchema = require('./permissions-sub-schema');
 var installVersionIncMiddleware = require('../install-version-inc-middleware');
 
 module.exports = {
@@ -53,6 +54,7 @@ module.exports = {
       lang: { type: String }, // Human language of this room
       renamedLcUris: [String],
       providers: [String],
+      permissions: PermissionsSubSchema,
       _nonce: { type: Number },
       _tv: { type: 'MongooseNumber', 'default': 0 }
     }, { strict: 'throw' });
@@ -74,7 +76,7 @@ module.exports = {
     TroupeSchema.index({ lcUri: 1 }, { unique: true, sparse: true });
 
     TroupeSchema.index({ "oneToOneUsers.userId": 1 });
-    
+
     installVersionIncMiddleware(TroupeSchema);
 
     TroupeSchema.pre('save', function (next) {

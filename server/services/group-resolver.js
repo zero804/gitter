@@ -2,7 +2,7 @@
 
 var Promise = require('bluebird');
 var assert = require('assert');
-var roomPermissionsModel = require('./room-permissions-model');
+var roomPermissionsModel = require('gitter-web-permissions/lib/room-permissions-model');
 var _ = require('lodash');
 
 /**

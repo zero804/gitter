@@ -13,7 +13,7 @@ var processChat          = require('../utils/markdown-processor');
 var Promise              = require('bluebird');
 var StatusError          = require('statuserror');
 var _                    = require('underscore');
-var mongooseUtils        = require('../utils/mongoose-utils');
+var mongooseUtils        = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var cacheWrapper         = require('gitter-web-cache-wrapper');
 var groupResolver        = require('./group-resolver');
 var chatSearchService    = require('./chat-search-service');
@@ -241,6 +241,8 @@ exports.updateChatMessage = function(troupe, chatMessage, user, newText, callbac
             troupeId: troupe.id,
             username: user.username
           });
+
+          return null;
         })
         .thenReturn(chatMessage);
     })

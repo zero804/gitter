@@ -11,7 +11,7 @@ var Promise     = require('bluebird');
 var userSettingsService = testRequire('./services/user-settings-service');
 var fixtureLoader = require('../../test-fixtures');
 var underlyingUnreadItemService = testRequire('./services/unread-items');
-var mongoUtils = testRequire('./utils/mongo-utils');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var roomMembershipService = testRequire("./services/room-membership-service");
 var Lazy = require('lazy.js');
 

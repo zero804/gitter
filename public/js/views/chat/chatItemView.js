@@ -3,6 +3,7 @@ var $ = require('jquery');
 var _ = require('underscore');
 var classnames = require('classnames');
 var context = require('utils/context');
+var clientEnv = require('gitter-client-env');
 var chatModels = require('collections/chat');
 var AvatarView = require('views/widgets/avatar');
 var Marionette = require('backbone.marionette');
@@ -760,7 +761,7 @@ module.exports = (function() {
       var uri = context.troupe().get('uri');
       if (!uri) return '';
 
-      return context.env('basePath') + '/' + uri + '?at=' + modelId;
+      return clientEnv['basePath'] + '/' + uri + '?at=' + modelId;
     },
 
     getSentTimeTooltip: function() {

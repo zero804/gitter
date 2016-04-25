@@ -1,11 +1,12 @@
 "use strict";
 
 var context   = require('../utils/context');
+var clientEnv = require('gitter-client-env');
 var appEvents = require('../utils/appevents');
 var Raven     = require('raven-js');
 var log       = require('../utils/log');
 
-var ravenUrl  = context.env('ravenUrl');
+var ravenUrl  = clientEnv['ravenUrl'];
 
 // See https://github.com/troupe/gitter-webapp/issues/1056
 // TODO: renable unhandled rejections
@@ -64,7 +65,7 @@ if (REPORT_UNHANDLED_REJECTIONS) {
 
 if(ravenUrl) {
   Raven.config(ravenUrl, {
-      release: context.env('version'),
+      release: clientEnv['version'],
       // # we highly recommend restricting exceptions to a domain in order to filter out clutter
       // whitelistUrls: ['example.com/scripts/']
       dataCallback: function(data) {

@@ -1,7 +1,7 @@
 'use strict';
 
 var random     = require('../../utils/random');
-var mongoUtils = require('../../utils/mongo-utils');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var crypto     = require('crypto');
 
 var password   = 'soapP2igs1Od2gen';
