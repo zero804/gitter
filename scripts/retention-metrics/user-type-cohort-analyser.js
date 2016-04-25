@@ -5,7 +5,7 @@ var _ = require('lodash');
 var util = require("util");
 var BaseRetentionAnalyser = require('./base-cohort-analyser');
 var Troupe = require('gitter-web-persistence').Troupe;
-var mongoUtils = require('../../server/utils/mongo-utils');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var collections = require('../../server/utils/collections');
 
 function UserRoomsRetentionAnalyser() {

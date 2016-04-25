@@ -1,11 +1,9 @@
-/*jslint node:true, unused:true*/
-/*global describe:true, it:true, beforeEach */
 "use strict";
 
-var testRequire = require('../../test-require');
+var proxyquireNoCallThru = require("proxyquire").noCallThru();
 var assert = require('assert');
 var Promise = require('bluebird');
-var testGenerator = require('../../test-generator');
+var testGenerator = require('../../../../test/integration/test-generator');
 
 var mockito = require('jsmockito').JsMockito;
 
@@ -77,7 +75,7 @@ describe('org room permissions', function() {
     orgMemberMethodMock = mockito.mockFunction();
     userIsInRoomMock = mockito.mockFunction();
 
-    permissionsModel = testRequire.withProxies("./services/permissions/org-permissions-model", {
+    permissionsModel = proxyquireNoCallThru("../../lib/models/org-permissions-model", {
       'gitter-web-github': {
         GitHubOrgService: GitHubOrgServiceMocker,
       },

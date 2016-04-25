@@ -1,11 +1,10 @@
-/*jslint node:true, unused:true*/
 "use strict";
 
-var testRequire = require('../../test-require');
+var proxyquireNoCallThru = require("proxyquire").noCallThru();
 var assert = require('assert');
 var _ = require('underscore');
 var Promise = require('bluebird');
-var testGenerator = require('../../test-generator');
+var testGenerator = require('../../../../test/integration/test-generator');
 var mockito = require('jsmockito').JsMockito;
 
 var USER = { username: 'gitterbob' };
@@ -214,14 +213,14 @@ var generate = function(name, permsMock, permsModel) {
 };
 
 var orgPermissionsMock = mockito.mockFunction();
-var orgPermissionsModel = testRequire.withProxies("./services/permissions/org-channel-permissions-model", {
+var orgPermissionsModel = proxyquireNoCallThru("../../lib/models/org-channel-permissions-model", {
   './org-permissions-model': orgPermissionsMock,
   '../user-in-room': userIsInRoomMock,
 });
 generate('org', orgPermissionsMock, orgPermissionsModel);
 
 var repoPermissionsMock = mockito.mockFunction();
-var repoPermissionsModel = testRequire.withProxies("./services/permissions/repo-channel-permissions-model", {
+var repoPermissionsModel = proxyquireNoCallThru("../../lib/models/repo-channel-permissions-model", {
   './repo-permissions-model': repoPermissionsMock,
   '../user-in-room': userIsInRoomMock,
 });

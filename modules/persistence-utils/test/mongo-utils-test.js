@@ -1,9 +1,7 @@
-/*jslint node: true */
 "use strict";
 
-var testRequire = require('../test-require');
 var assert = require('assert');
-var underTest = testRequire('./utils/mongo-utils');
+var underTest = require('../lib/mongo-utils');
 var ObjectID = require('mongodb').ObjectID;
 var Promise = require('bluebird');
 

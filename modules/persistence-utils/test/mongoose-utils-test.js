@@ -1,9 +1,8 @@
 "use strict";
 
-var testRequire = require('../test-require');
 var assert = require('assert');
-var mongooseUtils = testRequire('./utils/mongoose-utils');
-var mongoUtils = testRequire('./utils/mongo-utils');
+var mongooseUtils = require('../lib/mongoose-utils');
+var mongoUtils = require('../lib/mongo-utils');
 var persistence = require('gitter-web-persistence');
 var Promise = require('bluebird');
 var _ = require('lodash');
