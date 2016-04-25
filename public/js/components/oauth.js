@@ -1,10 +1,10 @@
 "use strict";
-var context = require('utils/context');
+var clientEnv = require('gitter-client-env');
 
 module.exports = (function() {
 
 
-  var authToken = context.env('accessToken');
+  var authToken = clientEnv['accessToken'];
   if(!authToken) return;
 
   var XHR = window.XMLHttpRequest;
@@ -24,4 +24,3 @@ module.exports = (function() {
 
 
 })();
-
