@@ -1,11 +1,9 @@
-/*jslint node:true, unused:true*/
-/*global describe:true, it:true */
 "use strict";
 
-var testRequire = require('../../test-require');
+var proxyquireNoCallThru = require("proxyquire").noCallThru();
 var assert = require('assert');
 var mockito = require('jsmockito').JsMockito;
-var testGenerator = require('../../test-generator');
+var testGenerator = require('../../../../test/integration/test-generator');
 var Promise = require('bluebird');
 
 
@@ -60,7 +58,7 @@ var FIXTURES = [{
 
     var userHasSignedUpMock = mockito.mockFunction();
 
-    var permissionsModel = testRequire.withProxies("./services/permissions/one-to-one-permissions-model", {
+    var permissionsModel = proxyquireNoCallThru("../../lib/models/one-to-one-permissions-model", {
       '../user-has-signed-up': userHasSignedUpMock
     });
 
