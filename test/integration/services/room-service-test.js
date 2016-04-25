@@ -13,7 +13,7 @@ var mockito = require('jsmockito').JsMockito;
 var times = mockito.Verifiers.times;
 var once = times(1);
 
-var persistence = testRequire("./services/persistence-service");
+var persistence = require('gitter-web-persistence');
 var mongoUtils = testRequire("./utils/mongo-utils");
 var roomMembershipService = testRequire('./services/room-membership-service');
 

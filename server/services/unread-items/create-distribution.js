@@ -135,7 +135,7 @@ function parseMentions(fromUserId, troupe, membersWithFlags, mentionUserIds, opt
 
       return {
         membersWithFlags: membersWithFlags.concat(nonMemberUserIdsFiltered.map(function(userId) {
-          return { userId: userId, flags: null };
+          return { userId: userId, flags: null }; // Flags: null means the user is not in the room
         })),
         mentions: memberMentionUserIds.concat(nonMemberUserIdsFiltered),
         nonMemberMentions: nonMemberUserIdsFiltered

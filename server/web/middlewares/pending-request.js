@@ -2,10 +2,13 @@
 
 var onHeaders = require('on-headers');
 var env       = require('gitter-web-env');
-var stats     = env.stats;
 var logger    = env.logger;
 var config    = env.config;
-var statsd    = env.createStatsClient({ prefix: config.get('stats:statsd:prefix')});
+
+var statsd    = env.createStatsClient({
+  prefix: config.get('stats:statsd:prefix'),
+  includeNodeVersionTags: true
+});
 
 var TIMEOUT = 60 * 1000;
 

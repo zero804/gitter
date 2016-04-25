@@ -1,6 +1,6 @@
 "use strict";
 
-var persistence = require('./persistence-service');
+var persistence = require('gitter-web-persistence');
 
 function userHasSignedUp(username) {
   // TODO: add case insensitve matching for usernames!

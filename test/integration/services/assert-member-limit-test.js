@@ -27,7 +27,7 @@ var assertMemberLimit = testRequire.withProxies('./services/assert-member-limit'
       return Promise.resolve(countUsersInRoomResult);
     }
   },
-  './persistence-service': {
+  'gitter-web-persistence': {
     Subscription: { findOne: function() { return { exec: function() { return Promise.resolve(subscritionFindResult); } }; } }
   }
 });
