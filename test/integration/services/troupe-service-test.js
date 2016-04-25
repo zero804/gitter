@@ -8,7 +8,7 @@ var fixtureLoader = require('../test-fixtures');
 var Promise       = require('bluebird');
 var _             = require('underscore');
 var assert        = require("assert");
-var mongoUtils    = testRequire("./utils/mongo-utils");
+var mongoUtils    = require('gitter-web-persistence-utils/lib/mongo-utils');
 var fixture       = {};
 
 function findUserIdPredicate(userId) {

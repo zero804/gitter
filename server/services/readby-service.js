@@ -5,7 +5,7 @@ var logger          = env.logger;
 var RedisBatcher    = require('../utils/redis-batcher').RedisBatcher;
 var ChatMessage     = require('gitter-web-persistence').ChatMessage;
 var assert          = require('assert');
-var mongoUtils      = require('../utils/mongo-utils');
+var mongoUtils      = require('gitter-web-persistence-utils/lib/mongo-utils');
 var Promise         = require('bluebird');
 var liveCollections = require('./live-collections');
 

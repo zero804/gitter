@@ -5,7 +5,7 @@ var makeBenchmark = require('../make-benchmark');
 var testRequire = require('../integration/test-require');
 var mockito = require('jsmockito').JsMockito;
 var Promise = require('bluebird');
-var mongoUtils = testRequire('./utils/mongo-utils');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 var TOTAL_USERS = 10000;
 

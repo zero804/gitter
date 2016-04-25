@@ -2,7 +2,7 @@
 
 var testRequire = require('../../test-require');
 var mockito = require('jsmockito').JsMockito;
-var mongoUtils = testRequire('./utils/mongo-utils');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var Promise = require('bluebird');
 var assert = require('assert');
 var blockTimer = require('../../block-timer');

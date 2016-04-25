@@ -1,11 +1,12 @@
 "use strict";
 
 var Promise     = require('bluebird');
-var _           = require('underscore');
-var collections = require('./collections');
 var mongoUtils  = require('./mongo-utils');
-var mongoose    = require('gitter-web-mongoose-bluebird');
-var Schema      = mongoose.Schema;
+var uniqueIds = require('mongodb-unique-ids');
+
+function idsIn(ids) {
+  return uniqueIds(ids).filter(function(id) { return !!id; });
+}
 
 function hashList(list) {
   if(!list) return null;
@@ -88,13 +89,6 @@ exports.attachNotificationListenersToSchema = function (schema, options) {
 
 };
 
-exports.cloneSchema = function(schema) {
-  var tree = _.extend({}, schema.tree);
-  delete tree.id;
-  delete tree._id;
-  return new Schema(tree);
-};
-
 /*
  * Returns a promise [document, updatedExisting]
  * If mongo experiences a contention where it tries to
@@ -145,7 +139,7 @@ exports.findByIds = function(Model, ids, callback) {
     }
 
     /* Usual case */
-    return Model.where('_id')['in'](mongoUtils.asObjectIDs(collections.idsIn(ids))).exec();
+    return Model.where('_id')['in'](mongoUtils.asObjectIDs(idsIn(ids))).exec();
   }).nodeify(callback);
 };
 
@@ -168,7 +162,7 @@ exports.findByIdsLean = function(Model, ids, select) {
 
     /* Usual case */
     return Model.where('_id')
-      .in(mongoUtils.asObjectIDs(collections.idsIn(ids)))
+      .in(mongoUtils.asObjectIDs(idsIn(ids)))
       .select(select)
       .lean()
       .exec()
