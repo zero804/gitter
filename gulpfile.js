@@ -37,28 +37,37 @@ var glob = require('glob');
 var RUN_TESTS_IN_PARALLEL = false;
 
 var testModules = {
-  'integration': ['./test/integration/**/*.js', './test/public-js/**/*.js'],
-  'cache-wrapper': ['./modules/cache-wrapper/test/*.js'],
-  'github': ['./modules/github/test/*.js'],
-  'github-backend': ['./modules/github-backend/test/*.js'],
-  'push-notification-filter': ['./modules/push-notification-filter/test/*.js'],
-  'split-tests': ['./modules/split-tests/test/*.js'],
-  'presence': ['./modules/presence/test/*.js'],
-  'permissions': ['./modules/permissions/test/**/*.js'],
-  'persistence-utils': ['./modules/persistence-utils/test/*.js'],
+  'integration': { files: ['./test/integration/**/*.js', './test/public-js/**/*.js'], includeInFast: true },
+  'cache-wrapper': { files: ['./modules/cache-wrapper/test/*.js'], includeInFast: false },
+  'github': { files: ['./modules/github/test/*.js'], includeInFast: false },
+  'github-backend': { files: ['./modules/github-backend/test/*.js'], includeInFast: false },
+  'push-notification-filter': { files: ['./modules/push-notification-filter/test/*.js'], includeInFast: false },
+  'split-tests': { files: ['./modules/split-tests/test/*.js'], includeInFast: false },
+  'presence': { files: ['./modules/presence/test/*.js'], includeInFast: false },
+  'permissions': { files: ['./modules/permissions/test/**/*.js'], includeInFast: false },
+  'persistence-utils': { files: ['./modules/persistence-utils/test/*.js'], includeInFast: false },
 };
 
 /** Make a series of tasks based on the test modules */
-function makeTestTasks(taskName, generator) {
+function makeTestTasks(taskName, generator, isFast) {
   Object.keys(testModules).forEach(function(moduleName) {
-    var files = testModules[moduleName];
+    var definition = testModules[moduleName];
+
+    if (isFast && !definition.includeInFast) {
+      return;
+    }
 
     gulp.task(taskName + '-' + moduleName, function() {
-      return generator(moduleName, files);
+      return generator(moduleName, definition.files);
     });
   });
 
-  var childTasks = Object.keys(testModules).map(function(moduleName) { return taskName + '-' + moduleName; });
+  var childTasks = Object.keys(testModules)
+    .filter(function(moduleName) {
+      var definition = testModules[moduleName];
+      return !isFast || definition.includeInFast;
+    })
+    .map(function(moduleName) { return taskName + '-' + moduleName; });
 
   if (RUN_TESTS_IN_PARALLEL) {
     // Run tests in parallel
@@ -274,7 +283,7 @@ makeTestTasks('fasttest', function(name, files) {
         DISABLE_CONSOLE_LOGGING: 1
       }
     }));
-});
+}, true);
 
 gulp.task('copy-app-files', function() {
   return gulp.src([
