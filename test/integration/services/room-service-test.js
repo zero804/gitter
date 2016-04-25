@@ -14,7 +14,7 @@ var times = mockito.Verifiers.times;
 var once = times(1);
 
 var persistence = require('gitter-web-persistence');
-var mongoUtils = testRequire("./utils/mongo-utils");
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var roomMembershipService = testRequire('./services/room-membership-service');
 
 describe('room-service', function() {

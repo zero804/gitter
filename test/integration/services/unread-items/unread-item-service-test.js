@@ -68,7 +68,7 @@ describe('unread-item-service', function() {
   before(function() {
     /* Don't send batches out */
     unreadItemService = testRequire("./services/unread-items");
-    mongoUtils = testRequire('./utils/mongo-utils');
+    mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
     unreadItemService.testOnly.setSendBadgeUpdates(false);
   });
 
@@ -549,7 +549,7 @@ describe('unread-item-service', function() {
       troupeId, chatId;
 
     var userId1 = 'USERID1';
-    var mongoUtils = testRequire('./utils/mongo-utils');
+    var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
     beforeEach(function() {
       mockRedisBatcher = new MockBadgeBatcherController();

@@ -45,6 +45,7 @@ var testModules = {
   'split-tests': ['./modules/split-tests/test/*.js'],
   'presence': ['./modules/presence/test/*.js'],
   'permissions': ['./modules/permissions/test/**/*.js'],
+  'persistence-utils': ['./modules/persistence-utils/test/*.js'],
 };
 
 /** Make a series of tasks based on the test modules */

@@ -11,7 +11,7 @@ var userService           = require('./user-service');
 var troupeService         = require('./troupe-service');
 var roomPermissionsModel  = require('./room-permissions-model');
 var roomMembershipService = require('./room-membership-service');
-var mongoUtils            = require('../utils/mongo-utils');
+var mongoUtils            = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 var rateLimiter = dolph.rateLimiter({
   prefix: 'ac:',
