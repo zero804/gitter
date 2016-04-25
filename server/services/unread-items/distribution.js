@@ -1,8 +1,9 @@
 'use strict';
 
-var Observable = require('rx').Observable;
+var lazy = require('lazy.js');
 var roomMembershipFlags = require('../room-membership-flags');
 var _ = require('lodash');
+var assert = require('assert');
 
 function isConnected(memberDetail) {
   var status = memberDetail.presence;
@@ -38,20 +39,14 @@ function memberDetailsToUserId(memberWithFlags) {
   return memberWithFlags.userId;
 }
 
-function processMemberDetails(membersDetails, mentions, presence, nonMemberMentions) {
+function processMemberDetails(membersDetails, mentions, presence) {
   var mentionHash = mentions && mentions.length && _.reduce(mentions, function(memo, userId) {
-    memo[userId] = true;
-    return memo;
-  }, {});
-
-  var nonMemberMentionsHash = nonMemberMentions && nonMemberMentions.length && _.reduce(nonMemberMentions, function(memo, userId) {
     memo[userId] = true;
     return memo;
   }, {});
 
   _.each(membersDetails, function(membersDetail) {
     var userId = membersDetail.userId;
-    membersDetail.nonMemberMention = !!(nonMemberMentionsHash && nonMemberMentionsHash[userId]);
     membersDetail.mentioned = !!(mentionHash && mentionHash[userId]);
     membersDetail.presence = presence && presence[userId];
     membersDetail.result = null;
@@ -61,29 +56,74 @@ function processMemberDetails(membersDetails, mentions, presence, nonMemberMenti
 }
 
 function Distribution(options) {
-  var membersDetails = processMemberDetails(options.membersWithFlags, options.mentions, options.presence, options.nonMemberMentions);
-  this._membersDetails = Observable.from(membersDetails);
+  assert(options.membersWithFlags, 'membersWithFlags option required');
+
+  var membersDetails = processMemberDetails(options.membersWithFlags, options.mentions, options.presence);
+  this._membersDetails = lazy(membersDetails);
+
+  var nonMemberMentions = options.nonMemberMentions;
+  if (nonMemberMentions && nonMemberMentions.length) {
+    this._nonMemberMentions = lazy(nonMemberMentions);
+  } else {
+    this._nonMemberMentions = lazy();
+  }
+
   this._announcement = options.announcement || false;
 }
 
 Distribution.prototype = {
+  /**
+   * Used by the unread-item-engine
+   * @return array of { userId: .., mention: ... }
+   */
+  getEngineNotifies: function() {
+    var announcement = this._announcement;
 
-  getEngineNotifyList: function() {
+    var sequence = this._getEngineMembers()
+      .map(function(memberDetail) {
+        var flags = memberDetail.flags;
+
+        // This is a non-member who's been mentioned in the room
+        if (flags === null) {
+          return {
+            userId: memberDetail.userId,
+            mention: true
+          };
+        }
+
+        var engineMention = (announcement && roomMembershipFlags.hasNotifyAnnouncement(flags)) ||
+            (memberDetail.mentioned && roomMembershipFlags.hasNotifyMention(flags));
+
+        return {
+          userId: memberDetail.userId,
+          mention: !!engineMention
+        };
+      });
+
+    // Snapshot the sequence
+    return lazy(sequence.toArray());
+
+  },
+
+  _getEngineMembers: function() {
     var announcement = this._announcement;
 
     return this._membersDetails
       .filter(function(memberDetail) {
         var flags = memberDetail.flags;
 
-        return (roomMembershipFlags.hasNotifyUnread(flags)) ||
+        return (flags === null) ||
+          (roomMembershipFlags.hasNotifyUnread(flags) ||
           (announcement && roomMembershipFlags.hasNotifyAnnouncement(flags)) ||
-          (roomMembershipFlags.hasNotifyMention(flags) && memberDetail.mentioned);
-      })
-      .map(memberDetailsToUserId);
+          (memberDetail.mentioned && roomMembershipFlags.hasNotifyMention(flags)));
+      });
   },
 
-
-  getEngineMentionList: function() {
+  /**
+   * Used by the distribution-delta to figure out deltas
+   * @return array of userIds of mentioned userIds
+   */
+  getMentionUserIds: function() {
     var announcement = this._announcement;
 
     return this._membersDetails
@@ -96,18 +136,12 @@ Distribution.prototype = {
       .map(memberDetailsToUserId);
   },
 
-
   /**
    * userIds of users who have been mentioned, but are not in the room
    * yet have permission to view the room
    */
   getNotifyNewRoom: function() {
-    return this._membersDetails
-      .filter(function(memberDetail) {
-        return memberDetail.nonMemberMention;
-      })
-      .map(memberDetailsToUserId);
-
+    return this._nonMemberMentions;
   },
 
   /**
@@ -121,7 +155,7 @@ Distribution.prototype = {
         if (memberDetail.presence !== 'online') return false;
 
         var flags = memberDetail.flags;
-        return roomMembershipFlags.hasNotifyDesktop(flags) || mentioned(memberDetail);
+        return flags === null || roomMembershipFlags.hasNotifyDesktop(flags) || mentioned(memberDetail);
       })
       .map(memberDetailsToUserId);
   },
@@ -170,15 +204,46 @@ Distribution.prototype = {
       .map(memberDetailsToUserId);
   },
 
+  /**
+   * Fast result processor for the usual case
+   */
   resultsProcessor: function(unreadItemResults) {
-    // Mutates state, which is a pity, but it's very fast and it needs to be
-    this._membersDetails.forEach(function(memberDetail) {
-      memberDetail.result = unreadItemResults[memberDetail.userId];
-    });
+    var itResults = unreadItemResults.getIterator();
+    var memberResults = this._getEngineMembers().getIterator();
+
+    while(itResults.moveNext()) {
+      if (!memberResults.moveNext()) {
+        throw new Error('member and results collection lengths mismatched');
+      }
+
+      var memberDetail = memberResults.current();
+      var result = itResults.current();
+
+      // Mutates state, which is a pity, but it's very fast and it needs to be
+      memberDetail.result = result;
+    }
+
+    if(memberResults.moveNext()) {
+      throw new Error('member and results collection lengths mismatched');
+    }
+
 
     return new DistributionResultsProcessor(this._membersDetails, this._announcement);
   },
 
+  resultsProcessorForUpdate: function(unreadItemResults) {
+    var unreadItemHash = unreadItemResults.reduce(function(memo, result) {
+      memo[result.userId] = result;
+      return memo;
+    }, {});
+
+    // Mutates state, which is a pity, but it's very fast and it needs to be
+    this._membersDetails.forEach(function(memberDetail) {
+      memberDetail.result = unreadItemHash[memberDetail.userId];
+    });
+
+    return new DistributionResultsProcessor(this._membersDetails, this._announcement);
+  }
 };
 
 function DistributionResultsProcessor(membersWithFlags, announcement) {

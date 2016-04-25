@@ -18,6 +18,7 @@ var View = Marionette.ItemView.extend({
     // these are mixpanel variables that we have to pass on
     this.action = options.action || '';
     this.source = options.source || '';
+    this.returnTo = options.returnTo || '';
 
     this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
   },
@@ -34,6 +35,7 @@ var View = Marionette.ItemView.extend({
     return {
       action: this.action,
       source: this.source,
+      returnTo: this.returnTo,
       showTwitter: document.cookie.indexOf('new_login') !== -1
     }
   }
