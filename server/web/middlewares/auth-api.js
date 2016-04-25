@@ -3,6 +3,7 @@
 var passport            = require("passport");
 var rateLimiter         = require('./rate-limiter');
 var logoutDestroyTokens = require('./logout-destroy-tokens');
+var userScopes          = require('../../utils/models/user-scopes');
 
 function ensureLoggedIn(req, res, next) {
   /* Bearer strategy must return a user. If the user is { _anonymous: true }, it should be null */
@@ -10,7 +11,7 @@ function ensureLoggedIn(req, res, next) {
     req.user = null;
   }
 
-  if(req.user && req.user.isMissingTokens()) {
+  if(req.user && userScopes.isMissingTokens(req.user)) {
     return logoutDestroyTokens(req, res, next);
   }
 

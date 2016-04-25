@@ -2,7 +2,7 @@
 
 /* This should go once A/B testing has proven that the new method is better */
 
-var persistence           = require('../persistence-service');
+var persistence           = require('gitter-web-persistence');
 var Promise               = require('bluebird');
 var _                     = require('underscore');
 var collections           = require('../../utils/collections');

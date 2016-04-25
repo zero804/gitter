@@ -2,4 +2,6 @@
 
 sudo echo
 DEBUG="" node --perf-basic-prof $1 --logging:level error &
-sudo profile_1ms.d -p $! | cpuprofilify > out.cpuprofile
+PID=$!
+echo PID is ${PID}
+sudo profile_1ms.d -p ${PID} | cpuprofilify > out.cpuprofile
