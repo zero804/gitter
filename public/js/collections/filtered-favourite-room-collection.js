@@ -21,7 +21,6 @@ _.extend(
       this.listenTo(this.dndCtrl, 'dnd:start-drag', this.onDragStart, this);
       this.listenTo(this.dndCtrl, 'dnd:end-drag', this.onDragEnd, this);
       this.listenTo(this.dndCtrl, 'room-menu:remove-favourite', this.onRemoveFavourite, this);
-      this.sort();
     },
 
     comparator: function(a, b) {

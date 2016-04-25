@@ -6,7 +6,7 @@ var config               = env.config;
 var errorReporter        = env.errorReporter;
 var logger               = env.logger;
 
-var ChatMessage          = require("./persistence-service").ChatMessage;
+var ChatMessage          = require('gitter-web-persistence').ChatMessage;
 var collections          = require("../utils/collections");
 var userService          = require("./user-service");
 var processChat          = require('../utils/markdown-processor');

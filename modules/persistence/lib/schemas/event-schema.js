@@ -3,6 +3,7 @@
 var mongoose      = require('gitter-web-mongoose-bluebird');
 var Schema        = mongoose.Schema;
 var ObjectId      = Schema.ObjectId;
+var installVersionIncMiddleware = require('../install-version-inc-middleware');
 
 //
 // A single event
@@ -21,6 +22,8 @@ var EventSchema = new Schema({
 });
 EventSchema.index({ toTroupeId: 1, sent: -1 });
 EventSchema.schemaTypeName = 'EventSchema';
+
+installVersionIncMiddleware(EventSchema);
 
 module.exports = {
   install: function(mongooseConnection) {

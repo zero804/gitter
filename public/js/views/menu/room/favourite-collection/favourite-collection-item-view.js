@@ -26,5 +26,9 @@ module.exports = PrimaryCollectionItemView.extend({
         }.bind(this));
       }.bind(this), 32);
     }
+    else {
+      this.el.classList.remove('temp');
+      this.el.classList.remove('temp-active');
+    }
   },
 });
