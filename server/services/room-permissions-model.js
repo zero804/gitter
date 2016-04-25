@@ -1,7 +1,7 @@
 "use strict";
 
 var Promise = require('bluebird');
-var permissionsModel = require('./permissions-model');
+var permissionsModel = require('gitter-web-permissions/lib/permissions-model');
 var identityService = require("./identity-service");
 var userCanJoinRoom = require("gitter-web-shared/rooms/user-can-join-room");
 

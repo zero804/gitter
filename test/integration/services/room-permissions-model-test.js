@@ -12,7 +12,7 @@ describe('roomPermissionsModel', function() {
   var oneToOneRoom = { oneToOne: true, githubType: 'ONETOONE', security: 'PRIVATE' };
 
   var roomPermissionsModel = testRequire.withProxies('./services/room-permissions-model', {
-    './permissions-model': function(user, right, uri, githubType, security) {
+    'gitter-web-permissions/lib/permissions-model': function(user, right, uri, githubType, security) {
       return Promise.resolve("ok");
     },
     './identity-service': {

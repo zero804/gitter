@@ -66,7 +66,7 @@ describe('room-service', function() {
       var permissionsModelMock = mockito.mockFunction();
 
       var roomService = testRequire.withProxies("./services/room-service", {
-        './permissions-model': permissionsModelMock
+        'gitter-web-permissions/lib/permissions-model': permissionsModelMock
       });
 
       mockito.when(permissionsModelMock)().then(function (user, right, uri, githubType) {
@@ -94,7 +94,7 @@ describe('room-service', function() {
 
       var roomService = testRequire.withProxies('./services/room-service', {
         './uri-resolver': uriResolver,
-        './permissions-model': permissionsModelMock
+        'gitter-web-permissions/lib/permissions-model': permissionsModelMock
       });
 
       mockito
@@ -143,7 +143,7 @@ describe('room-service', function() {
       var permissionsModelMock = mockito.mockFunction();
 
       var roomService = testRequire.withProxies("./services/room-service", {
-        './permissions-model': permissionsModelMock
+        'gitter-web-permissions/lib/permissions-model': permissionsModelMock
       });
 
       mockito
@@ -172,7 +172,7 @@ describe('room-service', function() {
     it('should find or create a room for a person', function(done) {
       var permissionsModelMock = mockito.mockFunction();
       var roomService = testRequire.withProxies("./services/room-service", {
-        './permissions-model': permissionsModelMock
+        'gitter-web-permissions/lib/permissions-model': permissionsModelMock
       });
 
       mockito.when(permissionsModelMock)().then(function(user, right, uri, githubType) {
@@ -196,7 +196,7 @@ describe('room-service', function() {
     it('should create a room for a repo', function(done) {
       var permissionsModelMock = mockito.mockFunction();
       var roomService = testRequire.withProxies("./services/room-service", {
-        './permissions-model': permissionsModelMock
+        'gitter-web-permissions/lib/permissions-model': permissionsModelMock
       });
 
       mockito.when(permissionsModelMock)().then(function(user, right, uri, githubType) {
@@ -218,7 +218,7 @@ describe('room-service', function() {
         .then(function() {
           var permissionsModelMock = mockito.mockFunction();
           var roomService = testRequire.withProxies("./services/room-service", {
-            './permissions-model': permissionsModelMock
+            'gitter-web-permissions/lib/permissions-model': permissionsModelMock
           });
 
           mockito.when(permissionsModelMock)().then(function(user, right, uri, githubType) {
@@ -260,7 +260,7 @@ describe('room-service', function() {
         .then(function() {
           var permissionsModelMock = mockito.mockFunction();
           var roomService = testRequire.withProxies("./services/room-service", {
-            './permissions-model': permissionsModelMock
+            'gitter-web-permissions/lib/permissions-model': permissionsModelMock
           });
 
           mockito.when(permissionsModelMock)().then(function(user, right, uri, githubType) {
@@ -627,7 +627,7 @@ describe('room-service', function() {
       it('should create private rooms and allow users to be added to them', function(done) {
         var permissionsModelMock = mockito.mockFunction();
         var roomService = testRequire.withProxies("./services/room-service", {
-          './permissions-model': permissionsModelMock
+          'gitter-web-permissions/lib/permissions-model': permissionsModelMock
         });
 
         mockito.when(permissionsModelMock)().then(function(user, perm, uri, githubType, security) {
@@ -678,7 +678,7 @@ describe('room-service', function() {
       it('should create open rooms', function(done) {
         var permissionsModelMock = mockito.mockFunction();
         var roomService = testRequire.withProxies("./services/room-service", {
-          './permissions-model': permissionsModelMock
+          'gitter-web-permissions/lib/permissions-model': permissionsModelMock
         });
 
         mockito.when(permissionsModelMock)().then(function(user, perm, uri, githubType, security) {
@@ -729,7 +729,7 @@ describe('room-service', function() {
       it('should create inherited rooms', function(done) {
         var permissionsModelMock = mockito.mockFunction();
         var roomService = testRequire.withProxies("./services/room-service", {
-          './permissions-model': permissionsModelMock
+          'gitter-web-permissions/lib/permissions-model': permissionsModelMock
         });
 
         mockito.when(permissionsModelMock)().then(function(user, perm, uri, githubType, security) {
@@ -781,7 +781,7 @@ describe('room-service', function() {
       it('should create inherited rooms for empty orgs', function(done) {
         var permissionsModelMock = mockito.mockFunction();
         var roomService = testRequire.withProxies("./services/room-service", {
-          './permissions-model': permissionsModelMock
+          'gitter-web-permissions/lib/permissions-model': permissionsModelMock
         });
 
         mockito.when(permissionsModelMock)().then(function(user, perm, uri, githubType, security) {
@@ -836,7 +836,7 @@ describe('room-service', function() {
       it(/* ::repo */ 'should create private rooms', function(done) {
         var permissionsModelMock = mockito.mockFunction();
         var roomService = testRequire.withProxies("./services/room-service", {
-          './permissions-model': permissionsModelMock
+          'gitter-web-permissions/lib/permissions-model': permissionsModelMock
         });
 
         mockito.when(permissionsModelMock)().then(function(user, perm, uri, githubType, security) {
@@ -887,7 +887,7 @@ describe('room-service', function() {
       it(/* ::repo */ 'should create open rooms', function(done) {
         var permissionsModelMock = mockito.mockFunction();
         var roomService = testRequire.withProxies("./services/room-service", {
-          './permissions-model': permissionsModelMock
+          'gitter-web-permissions/lib/permissions-model': permissionsModelMock
         });
 
 
@@ -939,7 +939,7 @@ describe('room-service', function() {
       it(/* ::repo */ 'should create inherited rooms', function(done) {
         var permissionsModelMock = mockito.mockFunction();
         var roomService = testRequire.withProxies("./services/room-service", {
-          './permissions-model': permissionsModelMock
+          'gitter-web-permissions/lib/permissions-model': permissionsModelMock
         });
 
         mockito.when(permissionsModelMock)().then(function(user, perm, uri, githubType, security) {
@@ -995,7 +995,7 @@ describe('room-service', function() {
       it('should create private rooms without a name', function(done) {
         var permissionsModelMock = mockito.mockFunction();
         var roomService = testRequire.withProxies("./services/room-service", {
-          './permissions-model': permissionsModelMock
+          'gitter-web-permissions/lib/permissions-model': permissionsModelMock
         });
 
         mockito.when(permissionsModelMock)().then(function(user, perm, uri, githubType, security) {
@@ -1046,7 +1046,7 @@ describe('room-service', function() {
       it('should create private rooms with name', function(done) {
         var permissionsModelMock = mockito.mockFunction();
         var roomService = testRequire.withProxies("./services/room-service", {
-          './permissions-model': permissionsModelMock
+          'gitter-web-permissions/lib/permissions-model': permissionsModelMock
         });
 
         mockito.when(permissionsModelMock)().then(function(user, perm, uri, githubType, security) {
@@ -1097,7 +1097,7 @@ describe('room-service', function() {
       it('should create open rooms', function(done) {
         var permissionsModelMock = mockito.mockFunction();
         var roomService = testRequire.withProxies("./services/room-service", {
-          './permissions-model': permissionsModelMock
+          'gitter-web-permissions/lib/permissions-model': permissionsModelMock
         });
 
         mockito.when(permissionsModelMock)().then(function(user, perm, uri, githubType, security) {
@@ -1149,7 +1149,7 @@ describe('room-service', function() {
       it('should NOT create child rooms', function(done) {
         var permissionsModelMock = mockito.mockFunction();
         var roomService = testRequire.withProxies("./services/room-service", {
-          './permissions-model': permissionsModelMock
+          'gitter-web-permissions/lib/permissions-model': permissionsModelMock
         });
 
         var fail = 0;
@@ -1169,7 +1169,7 @@ describe('room-service', function() {
         var permissionsModelMock = mockito.mockFunction();
         var troupeService = testRequire('./services/troupe-service');
         var roomService = testRequire.withProxies('./services/room-service', {
-          './permissions-model': permissionsModelMock
+          'gitter-web-permissions/lib/permissions-model': permissionsModelMock
         });
 
         mockito.when(permissionsModelMock)().then(function(user, perm, uri, githubType, security) {
@@ -1310,7 +1310,8 @@ describe('room-service', function() {
     var roomService = testRequire.withProxies('./services/room-service', {
       './room-permissions-model': roomPermissionsModelMock
     });
-    var userIsInRoom = testRequire('./services/user-in-room');
+    // TODO: this should not be used
+    var userIsInRoom = testRequire('gitter-web-permissions/lib/user-in-room');
 
     mockito.when(roomPermissionsModelMock)().then(function(user, perm) {
       assert.equal(perm, 'admin');
@@ -1378,7 +1379,8 @@ describe('room-service', function() {
   describe('remove and hide #slow', function() {
     var troupeService = testRequire('./services/troupe-service');
     var recentRoomService = testRequire('./services/recent-room-service');
-    var userIsInRoom = testRequire('./services/user-in-room');
+    // TODO: this should not be used
+    var userIsInRoom = testRequire('gitter-web-permissions/lib/user-in-room');
     var recentRoomCore = testRequire('./services/core/recent-room-core');
     var appEvents = testRequire('gitter-web-appevents');
 
@@ -1644,7 +1646,7 @@ describe('room-service', function() {
       var permissionsModelMock = mockito.mockFunction();
 
       var roomService = testRequire.withProxies("./services/room-service", {
-        './permissions-model': permissionsModelMock
+        'gitter-web-permissions/lib/permissions-model': permissionsModelMock
       });
 
       mockito
@@ -1710,7 +1712,7 @@ describe('room-service', function() {
       roomPermissionsModelMock = mockito.mockFunction();
       roomValidatorMock = mockito.mockFunction();
       roomService = testRequire.withProxies('./services/room-service', {
-        './permissions-model': permissionsModelMock,
+        'gitter-web-permissions/lib/permissions-model': permissionsModelMock,
         './room-permissions-model': roomPermissionsModelMock,
         'gitter-web-github': {
           GitHubUriValidator: roomValidatorMock
@@ -1807,7 +1809,7 @@ describe('room-service', function() {
       roomPermissionsModelMock = mockito.mockFunction();
       roomValidatorMock = mockito.mockFunction();
       roomService = testRequire.withProxies('./services/room-service', {
-        './permissions-model': permissionsModelMock,
+        'gitter-web-permissions/lib/permissions-model': permissionsModelMock,
         './room-permissions-model': roomPermissionsModelMock,
         'gitter-web-github': {
           GitHubUriValidator: roomValidatorMock
