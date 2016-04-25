@@ -17,6 +17,7 @@ var mongoUtils                   = require('../../utils/mongo-utils');
 var emailNotificationService     = require('../email-notification-service');
 var userSettingsService          = require('../user-settings-service');
 var debug                        = require('debug')('gitter:email-notification-generator-service');
+var userScopes                   = require('../../utils/models/user-scopes');
 
 var filterTestValues = config.get('notifications:filterTestValues');
 
@@ -151,7 +152,7 @@ function sendEmailNotifications(since) {
 
       /* Remove anyone that we don't have a token for */
       users = users.filter(function(user) {
-        return user.hasGitHubScope('user:email');
+        return userScopes.hasGitHubScope(user, 'user:email');
       });
 
       userIds = users.map(function(user) { return user.id; });
