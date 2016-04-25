@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 'use strict';
 
 var userService = require('../../server/services/user-service');
@@ -5,9 +6,10 @@ var troupeService = require('../../server/services/troupe-service');
 var Promise = require('bluebird');
 var chatService = require('../../server/services/chat-service');
 var mongooseUtils = require('../../server/utils/mongoose-utils');
-var persistence = require('../../server/services/persistence-service');
+var persistence = require('gitter-web-persistence');
 var roomService = require('../../server/services/room-service');
 var roomMembershipService = require('../../server/services/room-membership-service');
+var roomMembershipFlags = require('../../server/services/room-membership-flags');
 var cumberbatch = require('cumberbatch-name');
 
 var opts = require('yargs')
@@ -52,12 +54,13 @@ Promise.all([
           .then(function() {
             if (++i % 10 === 0) console.log(i);
             return newUser._id;
-          });
+          })
+          .then(function(userId) {
+            var flags = roomMembershipFlags.getFlagsForMode('all', true);
+            return roomMembershipService.addRoomMember(room._id, userId, flags);
+          })
 
-      }, { concurrency: 2 })
-      .then(function(userIds) {
-        return roomMembershipService.addRoomMembers(room._id, userIds);
-      });
+      }, { concurrency: 2 });
   })
   .delay(1000)
   .then(function() {

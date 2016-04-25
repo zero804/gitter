@@ -1,6 +1,6 @@
 "use strict";
 
-var persistence           = require("./persistence-service");
+var persistence           = require('gitter-web-persistence');
 var userService           = require("./user-service");
 var collections           = require("../utils/collections");
 var mongoUtils            = require("../utils/mongo-utils");
@@ -34,7 +34,7 @@ exports.getUrlForTroupeForUserId = getUrlForTroupeForUserId;
 
 function getUrlOfFirstAccessibleRoom(troupeIds, userId) {
   if (!troupeIds.length) return Promise.resolve(null);
-  
+
   return roomMembershipService.findUserMembershipInRooms(userId, troupeIds)
     .then(function(memberTroupeIds) {
       return persistence.Troupe.find({

@@ -32,12 +32,10 @@ module.exports = Marionette.CompositeView.extend({
   },
 
   modelEvents: {
-    'change:header': 'render',
+    //'change:header': 'render',
   },
 
   collectionEvents: {
-    //TODO Review the performance impact of rendering on sync JP 29/3/16
-    'sync sort': 'render',
     'add remove reset': 'onFilterComplete',
   },
 
@@ -52,7 +50,6 @@ module.exports = Marionette.CompositeView.extend({
     this.collection     = attrs.collection;
     this.roomMenuModel  = attrs.roomMenuModel;
     this.roomCollection = attrs.roomCollection;
-    this.listenTo(this.roomMenuModel, 'change:state:post change:selectedOrgName', this.render, this);
     this.listenTo(this.roomMenuModel, 'change:hasDismissedSuggestions', this.onDismissSuggestionsUpdate, this);
     Marionette.CompositeView.prototype.constructor.apply(this, arguments);
   },
