@@ -4,7 +4,7 @@ var Promise = require('bluebird');
 var chatService = require('../../services/chat-service');
 var persistence = require('gitter-web-persistence');
 var collections = require('../../utils/collections');
-var mongoUtils = require('../../utils/mongo-utils');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
 
 var loadRooms = Promise.method(function(roomIds) {

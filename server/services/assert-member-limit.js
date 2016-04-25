@@ -11,8 +11,7 @@ var roomMembershipService = require('./room-membership-service');
 
 var maxFreeOrgRoomMembers = nconf.get('maxFreeOrgRoomMembers');
 
-function assertMemberLimit(room, user) {
-  var username = user && user.username;
+function assertMemberLimit(room, existingUser) {
   var uri = room && room.uri;
 
   if (room.security === 'PUBLIC') {
@@ -20,10 +19,9 @@ function assertMemberLimit(room, user) {
     return Promise.resolve();
   }
 
-  return checkUserInRoom(user, room)
+  return checkUserInRoom(existingUser, room)
     .then(function(isMember) {
       if (isMember) {
-        debug('%s is already in ' + uri + '. you dont need to pay.', username);
         return;
       }
 
@@ -63,9 +61,9 @@ function assertMemberLimit(room, user) {
     });
 }
 
-function checkUserInRoom(user, room) {
-  if (!user) return Promise.resolve(false);
-  return roomMembershipService.checkRoomMembership(room._id, user._id);
+function checkUserInRoom(existingUser, room) {
+  if (!existingUser) return Promise.resolve(false);
+  return roomMembershipService.checkRoomMembership(room._id, existingUser._id);
 }
 
 function checkIfOrg(owner) {
