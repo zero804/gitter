@@ -385,7 +385,7 @@ describe('user-can-access-room', function() {
       };
 
       var userCanAccessRoom = testRequire.withProxies("./services/user-can-access-room", {
-        './persistence-service': persistence,
+        'gitter-web-persistence': persistence,
         'dolph': dolph,
         './user-service': userService,
         './troupe-service': troupeService,

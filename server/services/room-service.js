@@ -11,7 +11,7 @@ var Promise                    = require('bluebird');
 var request                    = require('request');
 var _                          = require('lodash');
 var xregexp                    = require('xregexp').XRegExp;
-var persistence                = require('./persistence-service');
+var persistence                = require('gitter-web-persistence');
 var uriLookupService           = require("./uri-lookup-service");
 var permissionsModel           = require('./permissions-model');
 var roomPermissionsModel       = require('./room-permissions-model');
@@ -44,6 +44,7 @@ var recentRoomService          = require('./recent-room-service');
 var badgerEnabled              = nconf.get('autoPullRequest:enabled');
 var uriResolver                = require('./uri-resolver');
 var getOrgNameFromTroupeName   = require('gitter-web-shared/get-org-name-from-troupe-name');
+var userScopes                 = require('../utils/models/user-scopes');
 
 exports.testOnly = {};
 
@@ -259,7 +260,7 @@ function findOrCreateGroupRoom(user, troupe, uri, options) {
 
               /* Created here */
               /* TODO: Later we'll need to handle private repos too */
-              var hasScope = user.hasGitHubScope("public_repo");
+              var hasScope = userScopes.hasGitHubScope(user, "public_repo");
               var hookCreationFailedDueToMissingScope;
 
               if(hasScope) {
