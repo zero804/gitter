@@ -1,6 +1,5 @@
 "use strict";
 
-var _ = require('lodash');
 var Promise = require('bluebird');
 var permissionsModel = require('./permissions-model');
 var identityService = require("./identity-service");
