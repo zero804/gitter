@@ -27,7 +27,7 @@ var troupeService                           = require('../../services/troupe-ser
 var useragent                               = require('useragent');
 var _                                       = require('lodash');
 var GitHubOrgService                        = require('gitter-web-github').GitHubOrgService;
-var orgPermissionModel                      = require('../../services/permissions/org-permissions-model');
+var orgPermissionModel                      = require('gitter-web-permissions/lib/models/org-permissions-model');
 var resolveUserAvatarUrl                    = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 var resolveRoomAvatarSrcSet                 = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 var getOrgNameFromTroupeName                = require('gitter-web-shared/get-org-name-from-troupe-name');
@@ -473,7 +473,7 @@ function renderOrgPage(req, res, next) {
     ghOrgService.getOrg(org).catch(function() { return {login: org}; }),
     troupeService.findChildRoomsForOrg(org, opts),
     contextGenerator.generateNonChatContext(req),
-    orgPermissionModel(req.user, 'admin', org),
+    orgPermissionModel(req.user, 'admin', org), 
     orgPermissionModel(req.user, 'join', org)
   ])
   .spread(function (ghOrg,rooms, troupeContext, isOrgAdmin, isOrgMember) {
