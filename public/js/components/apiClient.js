@@ -46,6 +46,7 @@
  */
 var $ = require('jquery');
 var context = require('utils/context');
+var clientEnv = require('gitter-client-env');
 var appEvents = require('utils/appevents');
 var debug = require('debug-proxy')('app:api-client');
 var Promise = require('bluebird');
@@ -83,7 +84,7 @@ module.exports = (function() {
   function makeApiUrl(baseUrlFunction, url) {
     if(!url) url = '';
 
-    var baseUrl = context.env('apiBasePath');
+    var baseUrl = clientEnv['apiBasePath'];
 
     if(!baseUrlFunction) {
       return baseUrl + url;

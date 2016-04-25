@@ -7,7 +7,7 @@ var troupeService = require('../../server/services/troupe-service');
 var unreadItemService = require('../../server/services/unread-items');
 var roomMembershipService = require('../../server/services/room-membership-service');
 var persistence = require('gitter-web-persistence');
-var mongoUtils = require('../../server/utils/mongo-utils');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var shutdown = require('shutdown');
 var shimPositionOption = require('../yargs-shim-position-option');
 

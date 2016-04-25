@@ -11,7 +11,6 @@ var UglifyJsPlugin           = require('webpack/lib/optimize/UglifyJsPlugin');
 
 var getPostcssStack = require('gitter-styleguide/postcss-stack');
 
-
 var devMode = process.env.WEBPACK_DEV_MODE === '1';
 
 var webpackConfig = {

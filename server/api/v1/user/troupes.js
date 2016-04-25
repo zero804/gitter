@@ -8,7 +8,7 @@ var roomMembershipService = require('../../../services/room-membership-service')
 var userRoomModeUpdateService = require('../../../services/user-room-mode-update-service');
 var roomService       = require('../../../services/room-service');
 var Promise           = require('bluebird');
-var mongoUtils        = require('../../../utils/mongo-utils');
+var mongoUtils        = require('gitter-web-persistence-utils/lib/mongo-utils');
 var StatusError       = require('statuserror');
 
 function performUpdateToUserRoom(req) {

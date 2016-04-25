@@ -2,7 +2,7 @@
 
 var _ = require('lodash');
 var persistence = require('gitter-web-persistence');
-var mongooseUtils = require("../utils/mongoose-utils");
+var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var StatusError = require('statuserror');
 var roomMembershipFlags = require('./room-membership-flags');
 var User = persistence.User;
