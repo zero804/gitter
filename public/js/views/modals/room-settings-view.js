@@ -1,5 +1,6 @@
 'use strict';
 
+var context = require('utils/context');
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 var ModalView = require('./modal');
@@ -42,7 +43,10 @@ var View = Marionette.ItemView.extend({
 
   formChange: function() {
     var providers = (this.ui.githubOnly.is(':checked')) ? ['github'] : [];
-    apiClient.room.put('', { providers: providers });
+    apiClient.room.put('', { providers: providers })
+      .then(function(updated) {
+        context.setTroupe(updated);
+      });
   }
 });
 

@@ -2,7 +2,7 @@
 
 "use strict";
 
-require('../server/services/persistence-service');
+require('gitter-web-persistence');
 var mongoose = require('mongoose');
 
 function die(stage, error) {

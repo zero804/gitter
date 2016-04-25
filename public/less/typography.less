@@ -117,3 +117,19 @@ ul, ol {
 input {
   font-family: inherit;
 }
+
+// This hack appears in an old Chrome issue to fix font rendering similar to what we're experiencing
+// https://bugs.chromium.org/p/chromium/issues/detail?id=336476#c40
+
+body {
+    -webkit-animation-delay: 0.1s;
+    -webkit-animation-name: fontfix;
+    -webkit-animation-duration: 0.1s;
+    -webkit-animation-iteration-count: 1;
+    -webkit-animation-timing-function: linear;
+}
+
+@-webkit-keyframes fontfix {
+    from { opacity: 1; }
+    to   { opacity: 1; }
+}
