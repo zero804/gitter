@@ -1,7 +1,7 @@
 'use strict';
 
 var _ = require('lodash');
-var persistence = require("./persistence-service");
+var persistence = require('gitter-web-persistence');
 var mongooseUtils = require("../utils/mongoose-utils");
 var StatusError = require('statuserror');
 var roomMembershipFlags = require('./room-membership-flags');

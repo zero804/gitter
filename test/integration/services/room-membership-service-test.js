@@ -21,7 +21,7 @@ describe('room-membership-service', function() {
 
     before(function() {
        roomMembershipService = testRequire('./services/room-membership-service');
-       persistence = testRequire('./services/persistence-service');
+       persistence = require('gitter-web-persistence');
     });
 
     before(fixtureLoader(fixture, {
