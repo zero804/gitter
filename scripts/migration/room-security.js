@@ -82,6 +82,8 @@ function joinTroupesToParentsAndOwners(troupes) {
 
 function dryRun() {
   return new Promise(function(resolve, reject) {
+    var success = 0;
+    var fail = 0;
     getTroupeBatchedStream()
       .pipe(through2Concurrent.obj({ maxConcurrency: 1 }, function(troupes, enc, callback) {
         return joinTroupesToParentsAndOwners(troupes)
@@ -90,7 +92,9 @@ function dryRun() {
               try {
                 var perms = legacyMigration.generatePermissionsForRoom(result.troupe, result.parent, result.ownerUser)
                 // console.log(result.troupe, perms);
+                success++;
               } catch(e) {
+                fail++;
                 console.error('>>>>>>>>>>>>>>>>>')
                 console.error(result.troupe);
                 console.error(e.stack);
@@ -100,6 +104,8 @@ function dryRun() {
           .asCallback(callback);
       }))
       .on('end', function() {
+        console.log('FAIL', fail);
+        console.log('success', success);
         resolve();
       })
       .on('error', reject)
