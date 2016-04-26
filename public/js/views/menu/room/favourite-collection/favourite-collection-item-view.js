@@ -7,10 +7,13 @@ var fastdom                   = require('fastdom');
 module.exports = PrimaryCollectionItemView.extend({
 
   attributes: function() {
-    //JP 1/4/16
+    var className = (this.model.get('githubType') === 'ONETOONE') ? 'room-item--favourite-one2one' : 'room-item--favourite';
     //If the item was not previously in the favourite collection before drag start it could have
-    //just been added by a user dragging, as such we want to mark it as a temporary item
-    var className = this.model.get('isTempItem') ? 'room-item--favourite temp' : 'room-item--favourite';
+    //just been added by a user dragging, as such we want to mark it as a temporary item JP 1/4/16
+    if(this.model.get('isTempItem')){
+      className = className += ' temp';
+    }
+
     return _.extend({}, PrimaryCollectionItemView.prototype.attributes.apply(this, arguments), {
       class: className
     });
