@@ -65,12 +65,14 @@
 
 
 .room-menu-options {
-  //iOS seems to want to put -webkit-overflow-scrolling: touch; on the element itself
-  //so important! is used here to override that. JP 26/4/16
+  // `-webkit-overflow-scrolling: touch;` makes mobile-Safari not respect
+  // the "containing block" with `position: fixed` for some reason, gitterHQ/change#36#issuecomment-214075326
+  //
+  // iOS seems to want to put `-webkit-overflow-scrolling: touch;` on the element itself
+  // so `!important` is used here to override that. JP 26/4/16
   -webkit-overflow-scrolling: auto !important;
   display:                    flex;
   flex-direction:             column;
-  width:                      100%;
   margin-left:                0;
   margin-bottom:              0;
   list-style:                 none;
