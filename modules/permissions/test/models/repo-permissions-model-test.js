@@ -1,9 +1,9 @@
 "use strict";
 
-var testRequire = require('../../test-require');
+var proxyquireNoCallThru = require("proxyquire").noCallThru();
 var assert = require('assert');
 var Promise = require('bluebird');
-var testGenerator = require('../../test-generator');
+var testGenerator = require('../../../../test/integration/test-generator');
 var mockito = require('jsmockito').JsMockito;
 
 var ORG = 'ORG';
@@ -242,7 +242,7 @@ describe('repo-permissions', function() {
       URI = 'ORG/REPO';
       USERNAME = 'gitterbob';
 
-      permissionsModel = testRequire.withProxies("./services/permissions/repo-permissions-model", {
+      permissionsModel = proxyquireNoCallThru("../../lib/models/repo-permissions-model", {
         'gitter-web-github': {
           GitHubRepoService: createMockGitHubRepoService(getRepoMethodMock),
         },

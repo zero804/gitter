@@ -5,15 +5,14 @@ var winston              = env.logger;
 var Promise              = require('bluebird');
 var userIsBannedFromRoom = require('./user-banned-from-room');
 
-var repoPermissionsModel        = require('./permissions/repo-permissions-model');
-var orgPermissionsModel         = require('./permissions/org-permissions-model');
-var oneToOnePermissionsModel    = require('./permissions/one-to-one-permissions-model');
-var orgChannelPermissionsModel  = require('./permissions/org-channel-permissions-model');
-var repoChannelPermissionsModel = require('./permissions/repo-channel-permissions-model');
-var userChannelPermissionsModel = require('./permissions/user-channel-permissions-model');
+var repoPermissionsModel        = require('./models/repo-permissions-model');
+var orgPermissionsModel         = require('./models/org-permissions-model');
+var oneToOnePermissionsModel    = require('./models/one-to-one-permissions-model');
+var orgChannelPermissionsModel  = require('./models/org-channel-permissions-model');
+var repoChannelPermissionsModel = require('./models/repo-channel-permissions-model');
+var userChannelPermissionsModel = require('./models/user-channel-permissions-model');
 var debug                       = require('debug')('gitter:permissions-model');
-
-var userService                 = require('./user-service');
+var appEvents                   = require('gitter-web-appevents');
 
 function checkBan(user, uri) {
   if(!user) return Promise.resolve(false);
@@ -75,10 +74,10 @@ function permissionsModel(user, right, uri, roomType, security) {
         .then(log)
         .catch(function(err) {
           if(err && err.gitterAction === 'logout_destroy_user_tokens') {
-            winston.warn('User tokens have been revoked. Destroying tokens');
-
-            return userService.destroyTokensForUserId(user._id)
-              .thenThrow(err);
+            if (user) {
+              winston.warn('User tokens have been revoked. Destroying tokens');
+              appEvents.destroyUserTokens(user._id);
+            }
           }
 
           throw err;
