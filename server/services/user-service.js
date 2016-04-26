@@ -177,9 +177,9 @@ var userService = {
     return mongooseUtils.upsert(persistence.User, userQuery, {
         $setOnInsert: userInsertData
       })
-      .spread(function(_user, _isNewUser) {
+      .spread(function(_user, _isExistingUser) {
         user = _user;
-        isNewUser = _isNewUser;
+        isNewUser = !_isExistingUser;
         var identityQuery = {
           provider: identityData.provider,
           userId: user._id
