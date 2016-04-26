@@ -66,7 +66,7 @@ function getOrgItem(name, room, isViewingTemporaryOrg) {
     id:           name,
     unreadItems:  (room.unreadItems || 0),
     mentions:     (room.mentions || 0),
-    activity:     (!!room.lurk && room.activity),
+    activity:     room.activity,
     isOrg:        true,
 
     //we add a temp variable here to specify a user is viewing a room

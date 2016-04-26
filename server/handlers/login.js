@@ -36,7 +36,8 @@ router.get('/',
       returnTo: req.query.returnTo,
       bootScriptName: 'router-login',
       cssFileName:  "styles/login.css",
-      showNewLogin: !!req.cookies.new_login
+      // TODO: remove this and just show it anyway
+      showNewLogin: true
     });
   });
 
