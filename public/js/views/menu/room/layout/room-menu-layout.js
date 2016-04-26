@@ -7,7 +7,6 @@ var fastdom           = require('fastdom');
 var context           = require('utils/context');
 var DNDCtrl           = require('components/menu/room/dnd-controller');
 var localStore        = require('components/local-store');
-var unloadTracker     = require('utils/unload-tracker');
 var RoomMenuModel     = require('../../../../models/room-menu-model');
 var MiniBarView       = require('../minibar/minibar-view');
 var PanelView         = require('../panel/panel-view');
@@ -109,7 +108,15 @@ module.exports = Marionette.LayoutView.extend({
 
     //this.$el.find('#searc-results').show();
 
-    unloadTracker.startListening();
+    // Keeps track of the unload time so we can kinda detect if a refresh happened.
+    // We use this information with the left-menu state rehrydration
+
+    window.addEventListener('beforeunload', this.onPageUnload);
+  },
+
+  onPageUnload: function() {
+    var timeAtUnload = new Date().getTime();
+    document.cookie = 'previousUnloadTime=' + timeAtUnload + '; path=/';
   },
 
   onDragStart: function() {
@@ -186,6 +193,7 @@ module.exports = Marionette.LayoutView.extend({
   }, 500),
 
   onDestroy: function() {
+    window.removeEventListener('beforeunload', this.onPageUnload);
     window.removeEventListener('resize', this._initNano.bind(this));
     this.stopListening(this.dndCtrl);
   },
