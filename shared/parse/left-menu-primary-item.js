@@ -34,7 +34,7 @@ module.exports = function parseContentToTemplateData(data, state) {
 
   var hasMentions  = !!data.mentions && data.mentions;
   var unreadItems  = !hasMentions && data.unreadItems;
-  var lurkActivity = data.lurk && (!hasMentions && !unreadItems) && !!data.activity;
+  var lurkActivity = !!data.activity && (!hasMentions && !unreadItems);
 
   var roomName = data.name;
   // Get rid of the org prefix, if viewing in a org bucket
