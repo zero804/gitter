@@ -64,12 +64,15 @@
 
 
 .room-menu-options {
-  display:        flex;
-  flex-direction: column;
-  width:          100%;
-  margin-left:    0;
-  margin-bottom:  0;
-  list-style:     none;
+  //iOS seems to want to put -webkit-overflow-scrolling: touch; on the element itself
+  //so important! is used here to override that. JP 26/4/16
+  -webkit-overflow-scrolling: auto !important;
+  display:                    flex;
+  flex-direction:             column;
+  width:                      100%;
+  margin-left:                0;
+  margin-bottom:              0;
+  list-style:                 none;
 }
 
 .sudo-panel() {
