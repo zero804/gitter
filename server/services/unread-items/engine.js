@@ -4,11 +4,12 @@ var env           = require('gitter-web-env');
 var stats         = env.stats;
 var winston       = env.logger;
 var redis         = require("../../utils/redis");
-var mongoUtils    = require('../../utils/mongo-utils');
+var mongoUtils    = require('gitter-web-persistence-utils/lib/mongo-utils');
 var Scripto       = require('gitter-redis-scripto');
 var assert        = require('assert');
 var _             = require('lodash');
 var Promise       = require('bluebird');
+var lazy          = require('lazy.js');
 var moment        = require('moment');
 var debug         = require('debug')('gitter:unread-items:engine');
 var redisClient   = redis.getClient();
@@ -27,137 +28,100 @@ var redisClient_del      = Promise.promisify(redisClient.del, { context: redisCl
 var redisClient_zrange   = Promise.promisify(redisClient.zrange, { context: redisClient });
 
 var UNREAD_BATCH_SIZE = 100;
-var PRECONVERT_OBJECTID_TO_STRING_THRESHOLD = 1000;
 var MAXIMUM_USERS_PER_UNREAD_NOTIFICATION_BATCH = 1000*3;
 var MAXIMUM_ROOMS_PER_USER_PER_NOTIFICATION = 15;
-
-/**
- * Given an array of userIds and an array of mentionUserIds, returns an array of
- * { userIds: [...], mentionUserIds: [...] }
- * such that:
- * a) the `userIds` of any member of the result does not exceed UNREAD_BATCH_SIZE
- * b) the `mentionUserIds` will appear in the same batch as the corresponding element `userIds`,
- *    such that for any element of the result, `member.memberUserIds` ⊆ `member.userIds`
- */
-function getNewItemBatches(userIds, mentionUserIds) {
-  var mentionUsersHash = _.reduce(mentionUserIds, function(memo, mentionUserId) {
-    memo[mentionUserId] = true;
-    return memo;
-  }, {});
-
-  function userIsMentioned(userId) {
-    return mentionUsersHash[userId];
-  }
-
-  var length = userIds.length;
-  /* Preallocate the array to the correct size */
-  var results = new Array(~~(userIds.length / UNREAD_BATCH_SIZE) + ((userIds.length % UNREAD_BATCH_SIZE) === 0 ? 0 : 1));
-
-  for (var i = 0, count = 0; i < length; i += UNREAD_BATCH_SIZE, count++) {
-    var batch = userIds.slice(i, i + UNREAD_BATCH_SIZE);
-    var mentionBatch = _.filter(batch, userIsMentioned);
-
-    results[count] = { userIds: batch, mentionUserIds: mentionBatch };
-  }
-
-  return results;
-}
 
 
 /**
  *
  * Note: mentionUserIds must always be a subset of usersIds (or equal)
+ * Returns the updates for each user, in the same order
  */
-function newItemWithMentions(troupeId, itemId, userIds, mentionUserIds) {
-
+function newItemWithMentions(troupeId, itemId, userWithMentions) {
   var timestamp = mongoUtils.getTimestampFromObjectId(itemId);
 
   return setLastChatTimestamp(troupeId, timestamp)
     .then(function() {
 
-    if(!userIds.length) return {};
+    if(userWithMentions.isEmpty()) return lazy([]);
 
     // Working in strings saves a stack of time
     troupeId = mongoUtils.serializeObjectId(troupeId);
 
-    // Turn all the userIds into strings up front
-    // in large rooms this is a big performance gain.
-    // In small rooms, it slows things down
-    if (userIds.length > PRECONVERT_OBJECTID_TO_STRING_THRESHOLD) {
-      userIds = _.map(userIds, mongoUtils.serializeObjectId);
-    }
+    var batches = userWithMentions.chunk(UNREAD_BATCH_SIZE);
+    var upgradeCount = 0;
 
-    // Turn all the userIds into strings up front
-    // in large rooms this is a big performance gain.
-    // In small rooms, it slows things down
-    if (mentionUserIds.length > PRECONVERT_OBJECTID_TO_STRING_THRESHOLD) {
-      mentionUserIds = _.map(mentionUserIds, mongoUtils.serializeObjectId);
-    }
+    /* Handle each batch independently */
+    var promises = batches.map(function(usersWithMentions) {
+      // Now talk to redis and do the update
+      var keys = [EMAIL_NOTIFICATION_HASH_KEY];
+      var mentionKeys = [];
+      var batchUserIds = [];
 
-    var batches = getNewItemBatches(userIds, mentionUserIds);
+      usersWithMentions.forEach(function(usersWithMention) {
+        var userId = String(usersWithMention.userId);
 
-    return Promise.all(_.map(batches, function(batch) {
-        var batchUserIds = batch.userIds;
-        var batchMentionIds = batch.mentionUserIds;
+        batchUserIds.push(userId);
 
-        // Now talk to redis and do the update
-        var keys = [EMAIL_NOTIFICATION_HASH_KEY];
-        _.forEach(batchUserIds, function(userId) {
-          keys.push("unread:chat:" + userId + ":" + troupeId);
-          keys.push("ub:" + userId);
-        });
+        keys.push("unread:chat:" + userId + ":" + troupeId);
+        keys.push("ub:" + userId);
 
-        _.forEach(batchMentionIds, function(mentionUserId) {
-          var mentionKey = "m:" + mentionUserId;
-          keys.push(mentionKey + ":" + troupeId);
-          keys.push(mentionKey);
-        });
+        if (usersWithMention.mention) {
+          var mentionKey = "m:" + userId;
+          mentionKeys.push(mentionKey + ":" + troupeId);
+          mentionKeys.push(mentionKey);
+        }
+      });
 
-        var values = [batchUserIds.length, troupeId, itemId, timestamp].concat(batchUserIds);
+      keys = keys.concat(mentionKeys);
+      var values = [batchUserIds.length, troupeId, itemId, timestamp].concat(batchUserIds);
 
-        return runScript('unread-add-item-with-mentions', keys, values);
-      }))
-      .then(function(results) {
-        var resultHash = {};
+      return runScript('unread-add-item-with-mentions', keys, values)
+        .then(function(result) {
+          // The location of the first mention result
+          var mentionIndex = batchUserIds.length * 2;
 
-        // Using _.forEach as its much faster than native in a tight loop like this
-        _.forEach(results, function(result, index) {
-          var batch = batches[index];
-          var batchUserIds = batch.userIds;
-          var batchMentionIds = batch.mentionUserIds;
-
-          var upgradeCount = 0;
-          // Using _.forEach as its much faster than native in a tight loop like this
-          _.forEach(batchUserIds, function(userId) {
-            var troupeUnreadCount   = result.shift();
-            var flag                = result.shift();
+          // Using _.map as its much faster than native in a tight loop like this
+          return _.map(batchUserIds, function(userId, index) {
+            var userWithMention     = usersWithMentions[index];
+            var troupeUnreadCount   = result[index * 2];
+            var flag                = result[(index * 2) + 1];
             var badgeUpdate         = !!(flag & 1);
             var upgradedKey          = flag & 2;
 
-            resultHash[userId] = {
+            var userResult = {
+              userId: userId,
               unreadCount: troupeUnreadCount >= 0 ? troupeUnreadCount : undefined,
               badgeUpdate: badgeUpdate
             };
 
+            if (userWithMention.mention) {
+              var resultMentionCount = result[mentionIndex++];
+
+              if (resultMentionCount >= 0) {
+                userResult.mentionCount = resultMentionCount;
+              }
+            }
+
             if(upgradedKey) {
               upgradeCount++;
             }
+
+            return userResult;
           });
-
-          if (upgradeCount > 10) {
-            winston.warn('unread-items: upgraded keys for ' + upgradeCount + ' user:troupes');
-          } else if(upgradeCount > 0) {
-            debug('unread-items: upgraded keys for %s user:troupes', upgradeCount);
-          }
-
-          _.forEach(batchMentionIds, function(mentionUserId) {
-            var mentionCount = result.shift();
-            resultHash[mentionUserId].mentionCount = mentionCount >= 0 ? mentionCount : undefined;
-          });
-
         });
+    });
 
-        return resultHash;
+    return Promise.all(promises.toArray())
+      .then(function(results) {
+        if (upgradeCount > 10) {
+          winston.warn('unread-items: upgraded keys for ' + upgradeCount + ' user:troupes');
+        } else if(upgradeCount > 0) {
+          debug('unread-items: upgraded keys for %s user:troupes', upgradeCount);
+        }
+
+        var flattenedResults = lazy(results).flatten();
+        return flattenedResults;
       });
   });
 }
@@ -673,7 +637,6 @@ exports.getRoomsCausingBadgeCount = getRoomsCausingBadgeCount;
 exports.getLastChatTimestamps = getLastChatTimestamps;
 
 exports.testOnly = {
-  getNewItemBatches: getNewItemBatches,
   UNREAD_BATCH_SIZE: UNREAD_BATCH_SIZE,
   removeAllEmailNotifications: removeAllEmailNotifications,
   mergeUnreadItemsWithMentions: mergeUnreadItemsWithMentions,

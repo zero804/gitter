@@ -4,6 +4,7 @@ var qs         = require('./qs');
 var _          = require('underscore');
 var localStore = require('../components/local-store');
 var Promise    = require('bluebird');
+var clientEnv  = require('gitter-client-env');
 
 module.exports = (function() {
 
@@ -185,43 +186,9 @@ module.exports = (function() {
     }
   };
 
-  function initialiseEnv() {
-    var env = window.troupeEnv || {};
-
-    // Allow env through the querystring
-    if(qs.env) {
-      var m;
-      try {
-        m = JSON.parse(qs.env);
-      } catch(e) {
-        // Ignore errors here
-      }
-
-      if(m) {
-        Object.keys(m).forEach(function(k) {
-          env[k] = m[k];
-        });
-      }
-    }
-
-    return env;
-  }
-
-  // Initialise the environment
-  var env = initialiseEnv();
-
-  /**
-   * The difference between troupeContext and env.
-   * Env is static and will never change.
-   * TroupeContext depends on the user and troupe
-   */
-  context.env = function(envName) {
-    return !!envName ? env[envName] : env;
-  };
-
   context.getAccessToken = Promise.method(function() {
     var iterations = 0;
-    if(env.anonymous) {
+    if(clientEnv['anonymous']) {
       return;
     }
 
@@ -254,7 +221,7 @@ module.exports = (function() {
 
   context.isLoggedIn = function() {
     // If we're in a context where one cannot be logged out...
-    if(context.env('loggedIn')) return true;
+    if(clientEnv['loggedIn']) return true;
 
     // TODO: this is not ideal. perhaps make this better
     return !!user.id;
@@ -272,7 +239,7 @@ module.exports = (function() {
 
   context.lang = function() {
     if(ctx.lang) return ctx.lang;
-    var e = context.env('lang');
+    var e = clientEnv['lang'];
     if(e) return e;
     return [window.navigator.language];
   };

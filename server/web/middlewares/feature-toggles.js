@@ -1,8 +1,8 @@
 'use strict';
 
 var fflip       = require('fflip');
-var mongoUtils  = require('../../utils/mongo-utils');
-var persistence = require('../../services/persistence-service');
+var mongoUtils  = require('gitter-web-persistence-utils/lib/mongo-utils');
+var persistence = require('gitter-web-persistence');
 var useragent   = require('useragent');
 
 /**

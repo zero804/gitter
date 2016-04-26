@@ -1,7 +1,7 @@
 'use strict';
 
-var persistenceService = require("../persistence-service");
-var mongoUtils = require("../../utils/mongo-utils");
+var persistenceService = require('gitter-web-persistence');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var random = require('../../utils/random');
 
 module.exports = {
