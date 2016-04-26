@@ -23,7 +23,8 @@ module.exports = Marionette.CompositeView.extend({
   },
 
   ui: {
-    header:  '#collection-header',
+    header:   '#collection-header',
+    showMore: '#room-item-show-more'
   },
 
   events: {
