@@ -57,7 +57,7 @@ function findOrInsertNewOneToOneRoom(userId1, userId2) {
           _id: new ObjectID(),
           userId: userId2
         }],
-        userCount: 2
+        userCount: 0
       };
 
       debug('Attempting upsert for new one-to-one room');
