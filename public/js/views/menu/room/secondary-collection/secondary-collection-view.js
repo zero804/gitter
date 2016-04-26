@@ -42,13 +42,14 @@ module.exports = BaseCollectionView.extend({
 
   serializeData: function() {
     var data = this.model.toJSON();
-    var orgRoomUrl = (this.collection.length < 9 && data.state === 'org') ? null :
-      '/orgs/' + this.roomMenuModel.get('selectedOrgName') + '/rooms';
+    var shouldShowMore =  this.collection.length < 9 && data.state === 'org';
+    var orgRoomUrl = '/orgs/' + this.roomMenuModel.get('selectedOrgName') + '/rooms';
 
     return _.extend({}, data, {
       isSearch:        (data.state === 'search'),
       selectedOrgName: this.roomMenuModel.get('selectedOrgName'),
       orgRoomUrl:      orgRoomUrl,
+      shouldShowMore:  shouldShowMore,
     });
   },
 
