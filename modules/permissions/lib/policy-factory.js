@@ -55,8 +55,20 @@ function createPolicyForRoomId(user, roomId) {
     });
 }
 
+/**
+ * Only used during the migration. Remove this later.
+ */
+function createPolicyFromDescriptor(user, roomPerms, roomId) {
+  var policyDelegate = getDelegateForPolicy(user, roomPerms);
+  var contextDelegate = new RoomContextDelegate(roomId);
+
+  return new PolicyEvaluator(user, roomPerms, policyDelegate, contextDelegate);
+
+}
+
 module.exports = {
   createPolicyForRoomId: Promise.method(createPolicyForRoomId),
+  createPolicyFromDescriptor: createPolicyFromDescriptor,
   testOnly: {
     loadRoomPermissions: loadRoomPermissions
   }

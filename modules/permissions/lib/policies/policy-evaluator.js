@@ -13,6 +13,8 @@ function PolicyEvaluator(user, permissionPolicy, policyDelegate, contextDelegate
 
 PolicyEvaluator.prototype = {
   canRead: Promise.method(function() {
+    // TODO: ADD BANS
+    // TODO: deal with one-to-one
     var user = this._user;
     var userId = user;
     var membersPolicy = this._permissionPolicy.members;
@@ -30,7 +32,7 @@ PolicyEvaluator.prototype = {
       return true;
     }
 
-    if (membersPolicy === 'INVITE') {
+    if (membersPolicy === 'INVITE' && this._contextDelegate) {
       return this._contextDelegate.isMember(userId)
         .bind(this)
         .then(function(hasAccess) {
