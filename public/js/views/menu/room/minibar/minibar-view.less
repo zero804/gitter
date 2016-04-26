@@ -66,15 +66,9 @@
 .room-menu-options {
   display:        flex;
   flex-direction: column;
-  width:          100%;
   margin-left:    0;
   margin-bottom:  0;
   list-style:     none;
-
-  // Fix minibar active state not being fully-drawn, gitterHQ/change#37
-  .has-scrollbar > &.nano-content::-webkit-scrollbar {
-    display: none;
-  }
 }
 
 .sudo-panel() {
