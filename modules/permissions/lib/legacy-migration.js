@@ -64,9 +64,9 @@ function generateRepoChannelPermissionsForRoom(room, parentRoom) {
   var uri = room.uri;
   var ownerUri = uri.split(/\//).slice(0, 2).join('/');
   var security = room.security;
-  var githubId = parentRoom.githubId;
+  var githubId = parentRoom && parentRoom.githubId;
 
-  if (ownerUri !== parentRoom.uri) {
+  if (parentRoom && ownerUri !== parentRoom.uri) {
     throw new StatusError(500, 'Owner URI vs Parent URI mismatch: ' + ownerUri + ' vs. ' + parentRoom.uri);
   }
 
@@ -92,6 +92,10 @@ function generateRepoChannelPermissionsForRoom(room, parentRoom) {
       };
 
     case 'INHERITED':
+      if (!parentRoom) {
+        throw new StatusError(500, 'Cannot migrate orphaned repo channel: ' + uri);
+      }
+
       switch(parentRoom.security) {
         case 'PUBLIC':
           return {
@@ -125,11 +129,11 @@ function generateRepoChannelPermissionsForRoom(room, parentRoom) {
 
 function generateOrgChannelPermissionsForRoom(room, parentRoom) {
   var uri = room.uri;
-  var ownerUri = uri.split(/\//)[0]
-  var githubId = parentRoom.githubId;
+  var ownerUri = uri.split(/\//)[0];
+  var githubId = parentRoom && parentRoom.githubId;
   var security = room.security;
 
-  if (ownerUri !== parentRoom.uri) {
+  if (parentRoom && ownerUri !== parentRoom.uri) {
     throw new StatusError(500, 'Owner URI vs Parent URI mismatch: ' + ownerUri + ' vs. ' + parentRoom.uri);
   }
 
@@ -233,15 +237,9 @@ function generatePermissionsForRoom(room, parentRoom, ownerUser) {
       return generateOrgPermissionsForRoom(room);
 
     case 'REPO_CHANNEL':
-      if (!parentRoom) {
-        throw new StatusError(500, 'Parent room not found: ' + room.uri);
-      }
-
       return generateRepoChannelPermissionsForRoom(room, parentRoom);
+      
     case 'ORG_CHANNEL':
-      if (!parentRoom) {
-        throw new StatusError(500, 'Parent room not found: ' + room.uri);
-      }
       return generateOrgChannelPermissionsForRoom(room, parentRoom);
 
     case 'USER_CHANNEL':

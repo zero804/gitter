@@ -203,7 +203,17 @@ function createExpectedFixtures(expected, done) {
       dateDeleted: f.dateDeleted,
       userCount: f.users && f.users.length || f.userCount,
       tags: f.tags,
-      providers: f.providers
+      providers: f.providers,
+
+      // Permissions stuff
+      type: f.type ? f.type : f.oneToOne ? null : 'NONE',
+      members: f.members || 'PUBLIC',
+      admins: f.admins || 'MANUAL',
+      public: 'public' in f ? f.public : !f.oneToOne,
+      linkPath: f.linkPath,
+      externalId: f.externalId,
+      extraMembers: f.extraMembers,
+      extraAdmins: f.extraAdmins
     };
 
     debug('Creating troupe %s with %j', fixtureName, doc);
@@ -262,31 +272,52 @@ function createExpectedFixtures(expected, done) {
 
       if(key.match(/^troupe/)) {
         var t = expected[key];
+        var users = [];
+
         if(t.users) {
           if(!Array.isArray(t.users)) {
             t.users = [t.users];
           }
 
-          return Promise.all(t.users.map(function(user, index) {
-              if(typeof user == 'string') {
-                if(expected[user]) return; // Already specified at the top level
-                expected[user] = {};
-                return createUser(user, {}).then(function(createdUser) {
-                  fixture[user] = createdUser;
-                });
-              }
-
-              var fixtureName = 'user' + (++userCounter);
-              t.users[index] = fixtureName;
-              expected[fixtureName] = user;
-
-              return createUser(fixtureName, user)
-                .then(function(user) {
-                  fixture[fixtureName] = user;
-                });
-
-            }));
+          users = users.concat(t.users);
         }
+
+        if (t.extraMembers) {
+          if(!Array.isArray(t.extraMembers)) {
+            t.extraMembers = [t.extraMembers];
+          }
+
+          users = users.concat(t.extraMembers);
+        }
+
+        if (t.extraAdmins) {
+          if(!Array.isArray(t.extraAdmins)) {
+            t.extraAdmins = [t.extraAdmins];
+          }
+
+          users = users.concat(t.extraAdmins);
+        }
+
+        return Promise.map(users, function(user, index) {
+            if(typeof user == 'string') {
+              if(expected[user]) return; // Already specified at the top level
+              expected[user] = {};
+              return createUser(user, {}).then(function(createdUser) {
+                fixture[user] = createdUser;
+              });
+            }
+
+            var fixtureName = 'user' + (++userCounter);
+            t.users[index] = fixtureName;
+            expected[fixtureName] = user;
+
+            return createUser(fixtureName, user)
+              .then(function(user) {
+                fixture[fixtureName] = user;
+              });
+
+          });
+
       }
 
       return null;
@@ -320,11 +351,17 @@ function createExpectedFixtures(expected, done) {
       if(key.match(/^troupe/)) {
         var expectedTroupe = expected[key];
 
-        var userIds = expectedTroupe.users && expectedTroupe.users.map(function(user) {
+        expectedTroupe.userIds = expectedTroupe.users && expectedTroupe.users.map(function(user) {
           return fixture[user]._id;
         });
 
-        expectedTroupe.userIds = userIds;
+        expectedTroupe.extraMembers = expectedTroupe.extraMembers && expectedTroupe.extraMembers.map(function(user) {
+          return fixture[user]._id;
+        });
+
+        expectedTroupe.extraAdmins = expectedTroupe.extraAdmins && expectedTroupe.extraAdmins.map(function(user) {
+          return fixture[user]._id;
+        });
 
         return createTroupe(key, expectedTroupe)
           .then(function(troupe) {

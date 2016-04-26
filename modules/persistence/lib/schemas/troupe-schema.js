@@ -5,6 +5,7 @@ var Schema = mongoose.Schema;
 var ObjectId = Schema.ObjectId;
 var PermissionsSubSchema = require('./permissions-sub-schema');
 var installVersionIncMiddleware = require('../install-version-inc-middleware');
+var _ = require('lodash');
 
 module.exports = {
   install: function(mongooseConnection) {
@@ -31,7 +32,7 @@ module.exports = {
     //
     // A Troupe
     //
-    var TroupeSchema = new Schema({
+    var TroupeSchema = new Schema(_.extend({
       topic: { type: String, 'default':'' },
       uri: { type: String },
       tags: [String],
@@ -54,9 +55,8 @@ module.exports = {
       lang: { type: String }, // Human language of this room
       renamedLcUris: [String],
       providers: [String],
-      perms: PermissionsSubSchema,
       _tv: { type: 'MongooseNumber', 'default': 0 }
-    }, { strict: 'throw' });
+    }, PermissionsSubSchema), { strict: 'throw' });
 
     TroupeSchema.schemaTypeName = 'TroupeSchema';
 
