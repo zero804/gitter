@@ -42,10 +42,13 @@ module.exports = BaseCollectionView.extend({
 
   serializeData: function() {
     var data = this.model.toJSON();
+    var orgRoomUrl = (this.collection.length < 9 && data.state === 'org') ? null :
+      '/orgs/' + this.roomMenuModel.get('selectedOrgName') + '/rooms';
+
     return _.extend({}, data, {
       isSearch:        (data.state === 'search'),
       selectedOrgName: this.roomMenuModel.get('selectedOrgName'),
-      orgRoomUrl:      (data.state !== 'org') ? null :  '/orgs/' + this.roomMenuModel.get('selectedOrgName') + '/rooms',
+      orgRoomUrl:      orgRoomUrl,
     });
   },
 
@@ -56,6 +59,7 @@ module.exports = BaseCollectionView.extend({
     this.troupeModel       = attrs.troupeModel;
     this.roomCollection    = attrs.roomCollection;
     this.listenTo(this.roomMenuModel, 'change:searchTerm', this.setActive, this);
+    this.listenTo(this.collection, 'reset', this.render, this);
     BaseCollectionView.prototype.initialize.apply(this, arguments);
   },
 
