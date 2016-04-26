@@ -7,6 +7,7 @@ var fastdom           = require('fastdom');
 var context           = require('utils/context');
 var DNDCtrl           = require('components/menu/room/dnd-controller');
 var localStore        = require('components/local-store');
+var unloadTracker     = require('utils/unload-tracker');
 var RoomMenuModel     = require('../../../../models/room-menu-model');
 var MiniBarView       = require('../minibar/minibar-view');
 var PanelView         = require('../panel/panel-view');
@@ -108,11 +109,7 @@ module.exports = Marionette.LayoutView.extend({
 
     //this.$el.find('#searc-results').show();
 
-    // Set it for next time
-    window.onbeforeunload = function(e) {
-      var timeAtUnload = new Date().getTime();
-      document.cookie = 'previousUnloadTime=' + timeAtUnload + '; path=/';
-    }.bind(this);
+    unloadTracker.startListening();
   },
 
   onDragStart: function() {
