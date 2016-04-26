@@ -7,7 +7,6 @@
   left:           -1px;
   width:          100%;
   z-index:        1;
-  pointer-events: none;
 }
 
 .panel-footer__item {
@@ -42,10 +41,15 @@
 
 .panel-footer__item--all {
   .panel-footer__item();
-  display:        flex;
-  flex-direction: row-reverse;
-  align-items:    center;
-  padding-bottom: .15rem;
+  display:             flex;
+  flex-direction:      row-reverse;
+  align-items:         center;
+  padding-bottom:      .15rem;
+  //This makes me feel a bit sick TBH JP 14/4/16
+  background-image:    url('../images/left-menu-footer-bg.png');
+  background-position: bottom right;
+  background-repeat:   no-repeat;
+  background-size:     cover;
 }
 
 .panel-footer__title {
