@@ -9,8 +9,9 @@ module.exports = {
     'NONE',
     'GH_REPO',
     'GH_ORG',
+    null
     // 'GROUP' permissions from group
-  ]},
+  ], required: false },
   members: { type: String, enum: [
     'PUBLIC',          // Anyone
     'INVITE',          // Only invited users can join (private)
