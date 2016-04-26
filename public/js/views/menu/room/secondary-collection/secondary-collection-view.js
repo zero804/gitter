@@ -20,8 +20,8 @@ module.exports = BaseCollectionView.extend({
     'item:clicked':      'onItemClicked',
   },
 
-  getEmptyView: function(){
-    switch(this.roomMenuModel.get('state')) {
+  getEmptyView: function() {
+    switch (this.roomMenuModel.get('state')) {
       case 'search':
         return EmptySearchView;
       default:
@@ -33,7 +33,7 @@ module.exports = BaseCollectionView.extend({
     var opts = _.extend({}, attrs, { model: model });
 
     //Only render  search result view if we are in the search state with search results
-    if(this.roomMenuModel.get('state') === 'search' && !!this.collection.length) {
+    if (this.roomMenuModel.get('state') === 'search' && !!this.collection.length) {
       return new SearchItemView(opts);
     }
 
@@ -42,15 +42,15 @@ module.exports = BaseCollectionView.extend({
 
   serializeData: function() {
     var data = this.model.toJSON();
-    var shouldShowMore =  this.collection.length < 9 && data.state === 'org';
-    var orgRoomUrl = '/orgs/' + this.roomMenuModel.get('selectedOrgName') + '/rooms';
-
     return _.extend({}, data, {
       isSearch:        (data.state === 'search'),
       selectedOrgName: this.roomMenuModel.get('selectedOrgName'),
-      orgRoomUrl:      orgRoomUrl,
-      shouldShowMore:  shouldShowMore,
+      orgRoomUrl:      this.getOrgRoomUrl(),
     });
+  },
+
+  getOrgRoomUrl: function () {
+    return '/orgs/' + this.roomMenuModel.get('selectedOrgName') + '/rooms';
   },
 
   initialize: function(attrs) {
@@ -60,7 +60,8 @@ module.exports = BaseCollectionView.extend({
     this.troupeModel       = attrs.troupeModel;
     this.roomCollection    = attrs.roomCollection;
     this.listenTo(this.roomMenuModel, 'change:searchTerm', this.setActive, this);
-    this.listenTo(this.collection, 'reset', this.render, this);
+    this.listenTo(this.roomMenuModel, 'change:state:post',  this.toggleShowMore, this);
+    this.listenTo(this.collection, 'reset',  this.toggleShowMore, this);
     BaseCollectionView.prototype.initialize.apply(this, arguments);
   },
 
@@ -80,6 +81,17 @@ module.exports = BaseCollectionView.extend({
         return !!this.collection.length ?
           proto.setActive.apply(this, arguments) :
           this.el.classList.remove('active');
+    }
+    this.toggleShowMore();
+  },
+
+  toggleShowMore: function () {
+    //Sort out show more button
+    if (this.roomMenuModel.get('state') === 'org' && this.collection.length >= 9) {
+      this.ui.showMore.attr('href', this.getOrgRoomUrl());
+      this.ui.showMore[0].classList.remove('hidden');
+    } else {
+      this.ui.showMore[0].classList.add('hidden');
     }
   },
 
@@ -111,6 +123,5 @@ module.exports = BaseCollectionView.extend({
     var name = this.troupeModel.name;
     this._triggerNavigation(permalink, 'chat', name);
   },
-
 
 });
