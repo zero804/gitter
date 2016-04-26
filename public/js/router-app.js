@@ -5,6 +5,7 @@ require('utils/initial-setup');
 var $                                 = require('jquery');
 var appEvents                         = require('utils/appevents');
 var context                           = require('utils/context');
+var clientEnv                         = require('gitter-client-env');
 var Backbone                          = require('backbone');
 var _                                 = require('underscore');
 var AppLayout                         = require('views/layouts/app-layout');
@@ -84,7 +85,7 @@ onready(function() {
     return contentFrame.contentWindow.location;
   }
 
-  var roomSwitcher = new SPARoomSwitcher(troupeCollections.troupes, context.env('basePath'), getContentFrameLocation);
+  var roomSwitcher = new SPARoomSwitcher(troupeCollections.troupes, clientEnv['basePath'], getContentFrameLocation);
   roomSwitcher.on('replace', function(href) {
     debug('Room switch: replace %s', href);
 
@@ -204,7 +205,7 @@ onready(function() {
   });
 
   window.addEventListener('message', function(e) {
-    if (e.origin !== context.env('basePath')) {
+    if (e.origin !== clientEnv['basePath']) {
       debug('Ignoring message from %s', e.origin);
       return;
     }
@@ -312,7 +313,7 @@ onready(function() {
   }, false);
 
   function postMessage(message) {
-    chatIFrame.contentWindow.postMessage(JSON.stringify(message), context.env('basePath'));
+    chatIFrame.contentWindow.postMessage(JSON.stringify(message), clientEnv['basePath']);
   }
 
   // Call preventDefault() on tab events so that we can manage focus as we want
@@ -398,18 +399,20 @@ onready(function() {
 
       function getSuitableParentRoomUri() {
 
-        //JP 12/4/16
-        // If the left menu is in an org state we can take the currently selected
-        // org as the correct parent for the newly created room
-        // we have to check if the org exists in the users room list otherwise
-        // they probably don't have permission to create a child room of that type
-        var roomMenuModel                     = appLayout.getRoomMenuModel();
-        var currentLeftMenuState              = roomMenuModel.get('state');
-        var currentlySelectedOrg              = roomMenuModel.get('selectedOrgName');
-        var hasPermissionToCreateOrgChildRoom = !!troupeCollections.troupes.findWhere({ uri: currentlySelectedOrg });
+        if(context.hasFeature('left-menu')) {
+          //JP 12/4/16
+          // If the left menu is in an org state we can take the currently selected
+          // org as the correct parent for the newly created room
+          // we have to check if the org exists in the users room list otherwise
+          // they probably don't have permission to create a child room of that type
+          var roomMenuModel                     = appLayout.getRoomMenuModel();
+          var currentLeftMenuState              = roomMenuModel.get('state');
+          var currentlySelectedOrg              = roomMenuModel.get('selectedOrgName');
+          var hasPermissionToCreateOrgChildRoom = !!troupeCollections.troupes.findWhere({ uri: currentlySelectedOrg }) || context.getUser().username === currentlySelectedOrg;
 
-        if(currentLeftMenuState === 'org' && hasPermissionToCreateOrgChildRoom) {
-          return currentlySelectedOrg;
+          if(currentLeftMenuState === 'org' && hasPermissionToCreateOrgChildRoom) {
+            return currentlySelectedOrg;
+          }
         }
 
         var currentRoomUri = window.location.pathname.split('/').slice(1).join('/');

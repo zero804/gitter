@@ -7,7 +7,7 @@ var Promise               = require('bluebird');
 var Distribution          = require('./distribution');
 var roomMembershipService = require('../room-membership-service');
 var userService           = require("../user-service");
-var roomPermissionsModel  = require('../room-permissions-model');
+var roomPermissionsModel  = require('gitter-web-permissions/lib/room-permissions-model');
 var categoriseUserInRoom  = require("../categorise-users-in-room");
 
 /**
@@ -135,7 +135,7 @@ function parseMentions(fromUserId, troupe, membersWithFlags, mentionUserIds, opt
 
       return {
         membersWithFlags: membersWithFlags.concat(nonMemberUserIdsFiltered.map(function(userId) {
-          return { userId: userId, flags: null };
+          return { userId: userId, flags: null }; // Flags: null means the user is not in the room
         })),
         mentions: memberMentionUserIds.concat(nonMemberUserIdsFiltered),
         nonMemberMentions: nonMemberUserIdsFiltered

@@ -6,9 +6,9 @@
  * It is seperate from uri-service as that would create circular dependencies
  */
 
-var persistence = require("./persistence-service");
+var persistence = require('gitter-web-persistence');
 var Promise     = require('bluebird');
-var mongoUtils  = require('../utils/mongo-utils');
+var mongoUtils  = require('gitter-web-persistence-utils/lib/mongo-utils');
 var debug       = require('debug')('gitter:uri-lookup-service');
 
 

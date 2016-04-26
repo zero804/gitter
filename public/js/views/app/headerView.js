@@ -2,6 +2,7 @@
 'use strict';
 var _                        = require('underscore');
 var context                  = require('utils/context');
+var clientEnv                = require('gitter-client-env');
 var apiClient                = require('components/apiClient');
 var Marionette               = require('backbone.marionette');
 var Backbone                 = require('backbone');
@@ -183,6 +184,7 @@ var HeaderView = Marionette.ItemView.extend({
       var isRoomMember = context.isRoomMember();
       var githubType = this.model.get('githubType');
       var isOneToOne = githubType === 'ONETOONE';
+      var security = this.model.get('security');
       var url = this.model.get('url');
 
       if (!isOneToOne) {
@@ -196,7 +198,7 @@ var HeaderView = Marionette.ItemView.extend({
       if (!isOneToOne) {
         if (isAdmin) {
           if (c.isNativeDesktopApp) {
-            menuItems.push({ title: 'Integrations', href: context.env('basePath') + url + '#integrations', target: '_blank', dataset: { disableRouting: 1 } });
+            menuItems.push({ title: 'Integrations', href: clientEnv['basePath'] + url + '#integrations', target: '_blank', dataset: { disableRouting: 1 } });
           } else {
             menuItems.push({ title: 'Integrations', href: '#integrations' });
           }
@@ -204,7 +206,9 @@ var HeaderView = Marionette.ItemView.extend({
 
         if (isStaff || isAdmin) {
           menuItems.push({ title: 'Tags', href: '#tags' });
-          menuItems.push({ title: 'Settings', href: '#settings' });
+          if (security == 'PUBLIC') {
+            menuItems.push({ title: 'Settings', href: '#settings' });
+          }
           menuItems.push({ divider: true });
         }
 
