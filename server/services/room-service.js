@@ -13,8 +13,8 @@ var _                          = require('lodash');
 var xregexp                    = require('xregexp').XRegExp;
 var persistence                = require('gitter-web-persistence');
 var uriLookupService           = require("./uri-lookup-service");
-var permissionsModel           = require('./permissions-model');
-var roomPermissionsModel       = require('./room-permissions-model');
+var permissionsModel           = require('gitter-web-permissions/lib/permissions-model');
+var roomPermissionsModel       = require('gitter-web-permissions/lib/room-permissions-model');
 var userService                = require('./user-service');
 var troupeService              = require('./troupe-service');
 var oneToOneRoomService        = require('./one-to-one-room-service');
@@ -29,12 +29,12 @@ var eventService               = require('./event-service');
 var emailNotificationService   = require('./email-notification-service');
 var canUserBeInvitedToJoinRoom = require('./invited-permissions-service');
 var emailAddressService        = require('./email-address-service');
-var mongoUtils                 = require('../utils/mongo-utils');
-var mongooseUtils              = require('../utils/mongoose-utils');
+var mongoUtils                 = require('gitter-web-persistence-utils/lib/mongo-utils');
+var mongooseUtils              = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var badger                     = require('./badger-service');
 var userSettingsService        = require('./user-settings-service');
 var roomSearchService          = require('./room-search-service');
-var assertMemberLimit          = require('./assert-member-limit');
+var assertJoinRoomChecks       = require('./assert-join-room-checks');
 var redisLockPromise           = require("../utils/redis-lock-promise");
 var unreadItemService          = require('./unread-items');
 var debug                      = require('debug')('gitter:room-service');
@@ -142,7 +142,7 @@ function findOrCreateGroupRoom(user, troupe, uri, options) {
         if (!access) return payload;
 
         // If the user has access to the room, assert member count
-        return assertMemberLimit(troupe, user)
+        return assertJoinRoomChecks(troupe, user)
           .then(function() {
             return payload;
           });
@@ -218,7 +218,8 @@ function findOrCreateGroupRoom(user, troupe, uri, options) {
                 topic: topic || "",
                 security: security,
                 dateLastSecurityCheck: new Date(),
-                userCount: 0
+                userCount: 0,
+                // permissions: permissions.fromLegacy(githubType, officialUri, security, githubId)
               }
             })
             .spread(function(troupe, updateExisting) {
@@ -821,6 +822,7 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
         validate.fail('Invalid security option: ' + security);
       }
 
+      // TODO: move to `permissions` here
       switch(parentTroupe.githubType) {
         case 'ORG':
           githubType = 'ORG_CHANNEL';
@@ -952,7 +954,7 @@ function notifyInvitedUser(fromUser, invitedUser, room/*, isNewUser*/) {
 
       if(invitedUser.state === 'REMOVED') {
         stats.event('user_added_removed_user');
-        return; // This has been removed
+        return null; // This has been removed
       }
 
       if (invitedUser.state === 'INVITED') {
@@ -981,6 +983,7 @@ function notifyInvitedUser(fromUser, invitedUser, room/*, isNewUser*/) {
       };
 
       stats.event('user_added_someone', _.extend(metrics, { userId: fromUser.id }));
+      return null;
     })
     .thenReturn(invitedUser);
 }
@@ -1007,7 +1010,7 @@ function joinRoom(roomId, user, options) {
         .then(function(access) {
           if (!access) throw new StatusError(403);
 
-          return assertMemberLimit(room, user);
+          return assertJoinRoomChecks(room, user);
         })
         .then(function() {
           // We need to add the last access time before adding the member to the room
@@ -1041,7 +1044,7 @@ function addUserToRoom(room, instigatingUser, usernameToAdd) {
       return userService.findByUsername(usernameToAdd);
     })
     .then(function (existingUser) {
-      return assertMemberLimit(room, existingUser)
+      return assertJoinRoomChecks(room, existingUser)
         .then(function() {
           var isNewUser = !existingUser;
 
