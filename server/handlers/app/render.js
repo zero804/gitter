@@ -245,11 +245,15 @@ function renderMainFrame(req, res, next, frame) {
       var leftMenuRoomList          = parseRoomsIntoLeftMenuRoomList(snapshots.leftMenu.state, snapshots.rooms, snapshots.leftMenu.selectedOrgName);
       var leftMenuFavouriteRoomList = parseRoomsIntoLeftMenuFavouriteRoomList(snapshots.leftMenu.state, snapshots.rooms, snapshots.leftMenu.selectedOrgName);
 
-      // Save it so if they don't send any updates on the client, we still have it when they refresh
-      // We can't save it where it is changed(`./shared/parse/left-menu-troupe-context.js`) because that is in shared
-      // and the user-settings-service is in `./server`
-      userSettingsService.setUserSettings(req.user._id, 'leftRoomMenu', snapshots['leftMenu'])
-        .then(function() { return null; });
+      var previousLeftMenuState = troupeContext.leftRoomMenuState;
+      var newLeftMenuState = snapshots['leftMenu'];
+      if(req.user && !_.isEqual(previousLeftMenuState, newLeftMenuState)) {
+        // Save our left-menu state so that if they don't send any updates on the client,
+        // we still have it when they refresh. We can't save it where it is changed(`./shared/parse/left-menu-troupe-context.js`)
+        // because that is in shared and the user-settings-service is in `./server`
+        userSettingsService.setUserSettings(req.user._id, 'leftRoomMenu', newLeftMenuState)
+          .then(function() { return null; });
+      }
 
 
       //TODO Remove this when favourite tab is removed for realz JP 8/4/16
