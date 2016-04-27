@@ -12,9 +12,6 @@ function GhRepoPolicyDelegate(user, permissionPolicy) {
 
 GhRepoPolicyDelegate.prototype = {
   hasPolicy: Promise.method(function(policyName) {
-    if (!this._isValidUser()) {
-      return false;
-    }
 
     switch(policyName) {
       case 'GH_REPO_ACCESS':
@@ -24,6 +21,10 @@ GhRepoPolicyDelegate.prototype = {
           });
 
       case 'GH_REPO_PUSH':
+        // Anonymous users will never
+        // have push access, so why bother...
+        if (!this._user) return false;
+
         return this._fetch()
           .then(function(repoInfo) {
             /* Can't see the repo? no access */
@@ -38,11 +39,19 @@ GhRepoPolicyDelegate.prototype = {
     }
   }),
 
-  _isValidUser: function() {
+  /**
+   * Returns a key used to skip checks
+   */
+  getPolicyRateLimitKey: function(policyName) {
+    var uri = this._permissionPolicy.linkPath;
     var user = this._user;
-    if (!user) return false;
-    // TODO: check whether non-github users are allowed....
-    return true;
+    var userId = user && user._id;
+
+    if (policyName === 'GH_REPO_PUSH' && !user) {
+      return null;
+    }
+
+    return "GH_REPO:" + (userId || 'anon') + ":" + uri + ":" + policyName;
   },
 
   _fetch: function() {
