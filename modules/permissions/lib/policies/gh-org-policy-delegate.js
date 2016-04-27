@@ -40,7 +40,8 @@ GhOrgPolicyDelegate.prototype = {
     var uri = this._permissionPolicy.linkPath;
 
     var ghOrg = new GitHubOrgService(user);
-    return ghOrg.member(uri, user.username);
+    this._fetchPromise = ghOrg.member(uri, user.username);
+    return this._fetchPromise;
   }
 };
 
