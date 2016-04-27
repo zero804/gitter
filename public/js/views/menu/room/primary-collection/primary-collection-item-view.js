@@ -80,9 +80,9 @@ module.exports = BaseCollectionItemView.extend({
   },
 
   //This is overly complex but that's where we are today...
-  onFavouriteChange: function (model, val){
+  onFavouriteChange: function (model){
     if(model.get('oneToOne')) {
-      if(!!val) {
+      if(model.get('favourite')) {
         this.el.classList.remove('room-item--one2one');
         this.el.classList.add('room-item--favourite-one2one');
       }
@@ -92,7 +92,7 @@ module.exports = BaseCollectionItemView.extend({
       }
     }
     else {
-      if(!!val) {
+      if(!model.get('favourite')) {
         this.el.classList.remove('room-item');
         this.el.classList.add('room-item--favourite');
       }
