@@ -215,9 +215,9 @@ module.exports = (function() {
 
   // Go to a conversation by index in list
   _.each('123456789'.split(''), function (n) {
-    keyEvents[cmdKey + '+shift+' + n] = 'room.' + n;
+    keyEvents[cmdKey + '+' + roomKey + '+' + n] = 'room.' + n;
   });
-  keyEvents[cmdKey + '+shift' + '+0'] = 'room.10';
+  keyEvents[cmdKey + '+' + roomKey + '+0'] = 'room.10';
 
   // Add listeners
 
