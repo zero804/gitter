@@ -41,7 +41,7 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
     'room-list-item.prev': function(e) { this.selectPrev(e, ROOM_LIST_KEY); },
     'room-list-item.next': function(e) { this.selectNext(e, ROOM_LIST_KEY); },
 
-    'room.1 room.2 room.3 room.4 room.5 room.6 room.7 room.8 room.9 room.10': 'asdfasdfsdf'
+    'room.1 room.2 room.3 room.4 room.5 room.6 room.7 room.8 room.9 room.10': function(e, handler) { this.selectByIndex(e, ROOM_LIST_KEY, handler); },
   },
 
   // Public method meant to be used on the outside
@@ -95,7 +95,8 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
       var currentNavigationCollectionItem = currentNavigationCollectionList[currentItemReference.listIndex];
       var currentModel = currentItemReference.modelId ?
         currentNavigationCollectionItem.collection.get(currentItemReference.modelId) :
-        currentNavigationCollectionItem.collection.at(currentItemReference.modelIndex);
+        // We use `collection.models[x]` vs `collection.at(x)` because the ProxyCollection doesn't update the index
+        currentNavigationCollectionItem.collection.models[currentItemReference.modelIndex];
 
       return currentModel;
     }
@@ -225,8 +226,8 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
     this.blurCurrentItem();
 
     var startCollectionItem;
-    var startModel;
     var startModelIndex;
+    var startModel;
     if(shouldGoToActive) {
       // Find the first active item
       // This will ensure we start from where the user is currently is
@@ -260,7 +261,8 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
       // Find the first item in the first active collection
       // Items from `findNextActiveNavigableCollection` already have `index`
       startCollectionItem = this.findNextActiveNavigableCollection(this.navigableCollectionListMap[mapKey], -1, 1);
-      startModel = startCollectionItem.collection.at(0);
+      // We use `collection.models[x]` vs `collection.at(x)` because the ProxyCollection doesn't update the index
+      startModel = startCollectionItem.collection.models[0];
       startModelIndex = 0;
     }
 
@@ -283,7 +285,6 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
     dir = sanitizeDir(dir);
     var nextModelResult = this.findNextModel(dir, mapKey);
 
-
     if(nextModelResult && nextModelResult.model) {
       // Deactivate the current item
       this.blurCurrentItem();
@@ -291,6 +292,51 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
       // Activate the next item
       this.currentNavigableItemReference = nextModelResult.reference;
       nextModelResult.model.trigger(FOCUS_EVENT);
+    }
+  },
+
+  // Move to the next exact item according to their index across the collection list
+  progressToIndex: function(mapKey, index) {
+    var previousItemCount = 0;
+
+    var navigableCollectionList = this.navigableCollectionListMap[mapKey];
+    for(var i = 0; i < navigableCollectionList.length; i++) {
+      var collectionItem = this.findNextActiveNavigableCollection(navigableCollectionList, i - 1, 1);
+      if(collectionItem) {
+        // We use `collection.models.length` instead of `collection.length` because `ProxyCollection` doesn't update the length
+        var currentItemCount = previousItemCount + collectionItem.collection.models.length;
+
+        if((currentItemCount - 1) >= index) {
+          var nextModelIndex = index - previousItemCount;
+          // We use `collection.models[x]` vs `collection.at(x)` because the ProxyCollection doesn't update the index
+          var nextModel = collectionItem.collection.models[nextModelIndex];
+
+          if(nextModel) {
+            // Deactivate the current item
+            this.blurCurrentItem();
+
+            // Activate the next item
+            this.currentNavigableItemReference = {
+              mapKey: mapKey,
+              listIndex: collectionItem.index,
+              modelId: nextModel.id,
+              modelIndex: nextModelIndex
+            };
+            nextModel.trigger(FOCUS_EVENT);
+          }
+
+          // We got far enough to find the index so let's get out of here
+          break;
+        }
+
+        previousItemCount = currentItemCount;
+        // Skip to where we found the active collection
+        i = collectionItem.index;
+      }
+      else {
+        // If we didn't find any active, just break out of this
+        break;
+      }
     }
   },
 
@@ -355,6 +401,19 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
       e.preventDefault();
       e.stopPropagation();
     }
+  },
+
+  selectByIndex: function (e, mapKey, handler) { //jshint unused:true
+    var keys = handler.key.split('+');
+    var key = keys[keys.length - 1];
+
+    var keyInt = parseInt(key, 10);
+    var index = keyInt > 0 ? keyInt - 1 : 0;
+    if(keyInt === 0) {
+      index = 9;
+    }
+
+    this.progressToIndex(mapKey, index);
   }
 
 
