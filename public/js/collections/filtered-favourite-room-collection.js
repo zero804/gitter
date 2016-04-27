@@ -15,7 +15,7 @@ _.extend(
   FilteredFavouriteCollection.prototype,
   FilteredRoomCollection.prototype, {
 
-    initialize: function(attrs) {
+    initialize: function(models, attrs) { //jshint unused: true
       FilteredRoomCollection.prototype.initialize.apply(this, arguments);
       this.dndCtrl = attrs.dndCtrl;
       this.listenTo(this.dndCtrl, 'dnd:start-drag', this.onDragStart, this);
