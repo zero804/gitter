@@ -26,14 +26,14 @@ module.exports = function generateLeftMenuRoomsList(state, rooms, selectedOrgNam
   }
 
   return rooms
-  .filter(defaultFilter)
-  .map(function(model){
-    if(!filter(model)) {
-      if(model.get) { model.set('isHidden', true); }
-      model.isHidden = true;
-    }
-    return parseToTemplateItem(model, state);
-  })
-  .sort(defaultSort);
+    .filter(defaultFilter)
+    .map(function(model){
+      if(!filter(model)) {
+        if(model.get) { model.set('isHidden', true); }
+        model.isHidden = true;
+      }
+      return parseToTemplateItem(model, state);
+    })
+    .sort(defaultSort);
 
 };

@@ -26,6 +26,8 @@ var FilteredRoomCollection = Backbone.Collection.extend({
     this.roomCollection = options.collection;
     this.listenTo(this.roomCollection, 'snapshot', this.onRoomCollectionSnapshot, this);
     this.listenTo(this.roomCollection, 'change:favourite', this.onFavouriteChange, this);
+    this.listenTo(this.roomCollection, 'remove', this.onRoomRemoved, this);
+    this.listenTo(this.roomCollection, 'add', this.onRoomAdded, this);
     this.listenTo(this, 'filter-complete change:escalationTime change:activity change:unreadItems change:mentions', this.sort, this);
 
     this.onModelChangeState();
@@ -100,6 +102,17 @@ var FilteredRoomCollection = Backbone.Collection.extend({
 
   getFilter: function (){
     return (this._filter || this.filterDefault);
+  },
+
+  onRoomRemoved: function (model){
+    this.remove(model);
+  },
+
+  onRoomAdded: function (model){
+    if(!model.get('favourite')) {
+      model.set('isHidden', !this._filter(model));
+      this.add(model);
+    }
   },
 
 });

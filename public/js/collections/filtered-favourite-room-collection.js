@@ -78,6 +78,13 @@ _.extend(
       else { this.remove(model); }
       this.setFilter();
     },
+
+    onRoomAdded: function (model){
+      if(model.get('favourite')) {
+        model.set('isHidden', !this._filter(model));
+        this.add(model);
+      }
+    },
   }
 );
 

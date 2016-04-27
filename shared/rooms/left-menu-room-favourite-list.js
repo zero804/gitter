@@ -26,13 +26,13 @@ module.exports = function generateLemMenuFavouriteRoomsList(state, rooms, select
   }
 
   return rooms
-  .filter(favouriteFilter)
-  .map(function(model){
-    if(!filter(model)) {
-      if(model.get) { model.set('isHidden', true); }
-      model.isHidden = true;
-    }
-    return parseToTemplateItem(model, state);
-  })
-  .sort(favouriteSort);
+    .filter(favouriteFilter)
+    .map(function(model){
+      if(!filter(model)) {
+        if(model.get) { model.set('isHidden', true); }
+        model.isHidden = true;
+      }
+      return parseToTemplateItem(model, state);
+    })
+    .sort(favouriteSort);
 };
