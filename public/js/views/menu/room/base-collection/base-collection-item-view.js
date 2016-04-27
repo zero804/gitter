@@ -39,6 +39,10 @@ module.exports = Marionette.ItemView.extend({
     };
   },
 
+  onRender: function (){
+    toggleClass(this.el, 'hidden', this.model.get('isHidden'));
+  },
+
   pulseIndicators: function() {
     // Re-trigger the pulse animation
     // 16ms is a good 60-fps number to trigger on which Firefox needs (requestAnimationFrame doesn't work for this)

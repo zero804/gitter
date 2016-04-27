@@ -34,6 +34,7 @@ module.exports = Marionette.CompositeView.extend({
 
   modelEvents: {
     'change:header': 'onHeaderChange',
+    'change:active': 'setActive'
   },
 
   collectionEvents: {

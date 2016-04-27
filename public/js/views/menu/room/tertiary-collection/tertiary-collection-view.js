@@ -63,6 +63,7 @@ module.exports =  BaseCollectionView.extend({
 
 
   setActive: function() {
+    console.log('SET ACTIVE');
     switch (this.roomMenuModel.get('state')) {
       case 'search':
         return (!this.roomMenuModel.get('searchTerm')) ?
