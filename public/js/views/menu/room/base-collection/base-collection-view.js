@@ -55,12 +55,6 @@ module.exports = Marionette.CompositeView.extend({
     Marionette.CompositeView.prototype.constructor.apply(this, arguments);
   },
 
-  initialize: function() {
-    if (this.model.get('active')) {
-      this.render();
-    }
-  },
-
   onItemClicked: function(view) {
     var model = view.model;
     var name = (model.get('uri') ||
@@ -122,13 +116,8 @@ module.exports = Marionette.CompositeView.extend({
 
   //We avoid re-rendering AT ALL TIMES so now we have to manually change content
   onHeaderChange: function (model, val){ //jshint unused: true
-    if(this.ui.headerContent.length && this.ui.headerContent[0].innerHTML) {
-      //manually change header text
-      this.ui.headerContent[0].innnerHTML = val;
-    }
 
-    //No dismiss button just exit
-    if(!this.ui.dismissButton.classList) { return; }
+    this.ui.headerContent.html(val);
 
     //If this is a suggestion show the cancel button
     if(this.model.get('isSuggestion')) {
