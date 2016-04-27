@@ -16,7 +16,6 @@ PolicyEvaluator.prototype = {
   canRead: Promise.method(function() {
     debug('canRead');
     // TODO: ADD BANS
-    // TODO: deal with one-to-one
     var user = this._user;
     var userId = user;
     var membersPolicy = this._permissionPolicy.members;
@@ -70,6 +69,14 @@ PolicyEvaluator.prototype = {
     }
 
     return executeChain(promiseChain);
+  }),
+
+  canWrite: Promise.method(function() {
+    var user = this._user;
+    // Anonymous users can never write to a room
+    if (!user) return false;
+
+    return this.canRead();
   }),
 
   canJoin: Promise.method(function() {

@@ -3,6 +3,7 @@
 var Promise = require('bluebird');
 var persistence = require('gitter-web-persistence');
 var PolicyEvaluator = require('./policies/policy-evaluator');
+var OneToOnePolicyEvaluator = require('./policies/one-to-one-policy-evaluator');
 var RoomContextDelegate = require('./policies/room-context-delegate');
 var GhRepoPolicyDelegate = require('./policies/gh-repo-policy-delegate');
 var GhOrgPolicyDelegate = require('./policies/gh-org-policy-delegate');
@@ -12,6 +13,7 @@ function loadRoomPermissions(roomId, userId) {
   var projection = {
     _id: 0,
     type: 1,
+    oneToOne: 1, // TODO: type and oneToOne should be the same?
     members: 1,
     admins: 1,
     public: 1,
@@ -21,6 +23,7 @@ function loadRoomPermissions(roomId, userId) {
 
   if (userId) {
     var elemMatch = { $elemMatch: { $eq: userId } };
+    projection.oneToOneUsers = { $elemMatch: { userId: userId } };
     projection.bans = elemMatch;
     projection.extraMembers = elemMatch;
     projection.extraAdmins = elemMatch;
@@ -48,6 +51,10 @@ function createPolicyForRoomId(user, roomId) {
     .then(function(roomPerms) {
       if (!roomPerms) throw new StatusError(404);
 
+      if (roomPerms.oneToOne) {
+        return new OneToOnePolicyEvaluator(user, roomPerms);
+      }
+
       var policyDelegate = getDelegateForPolicy(user, roomPerms);
       var contextDelegate = new RoomContextDelegate(roomId);
 
@@ -59,6 +66,10 @@ function createPolicyForRoomId(user, roomId) {
  * Only used during the migration. Remove this later.
  */
 function createPolicyFromDescriptor(user, roomPerms, roomId) {
+  if (roomPerms.oneToOne) {
+    return new OneToOnePolicyEvaluator(user, roomPerms);
+  }
+
   var policyDelegate = getDelegateForPolicy(user, roomPerms);
   var contextDelegate = new RoomContextDelegate(roomId);
 

@@ -11,8 +11,17 @@ var StatusError = require('statuserror');
  * this module should be removed
  */
 
-function generateOneToOnePermissionsForRoom() {
-  return undefined;
+function generateOneToOnePermissionsForRoom(room) {
+  return {
+    oneToOne: true,
+    oneToOneUsers: room.oneToOneUsers,
+    type: undefined,
+    members: undefined,
+    admins: undefined,
+    public: false, // All existing org rooms are private
+    linkPath: undefined,
+    externalId: undefined
+  };
 }
 
 function generateOrgPermissionsForRoom(room) {

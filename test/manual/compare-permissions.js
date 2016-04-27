@@ -6,17 +6,18 @@ var persistence = require('gitter-web-persistence');
 var legacyMigration = require('gitter-web-permissions/lib/legacy-migration');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var roomPermissionsModel = require('gitter-web-permissions/lib/room-permissions-model');
+var userCanAccessRoom = require('gitter-web-permissions/lib/user-can-access-room');
 var Promise = require('bluebird');
 var assert = require('assert');
 
 function getSomeRooms() {
   return persistence.Troupe
     .aggregate([
-      { $match: {
-          oneToOne: { $ne: true },
-        }
-      },
-      { $sample: { size: 10 } },
+      // { $match: {
+      //     oneToOne: { $ne: true },
+      //   }
+      // },
+      { $sample: { size: 30 } },
       { $lookup: {
           from: "troupes",
           localField: "parentId",
@@ -56,6 +57,41 @@ function getSomeUsers() {
     .exec();
 }
 
+/**
+ * Test against a user who is known to be in the room
+ */
+function compareOneToOneRoomResultsFor(userId, room, perms) {
+  return persistence.User.findById(userId)
+    .then(function(user) {
+      if (!user) return;
+
+      var policy = policyFactory.createPolicyFromDescriptor(user, perms, room._id);
+      return Promise.props({
+          canRead: policy.canRead(),
+          canWrite: policy.canWrite(),
+          canJoin: policy.canJoin(),
+          canAdmin: policy.canAdmin(),
+          canAddUser: policy.canAddUser(),
+        })
+        .then(function(permDetails) {
+          return Promise.join(
+            userCanAccessRoom.permissionToRead(user._id, room._id),
+            userCanAccessRoom.permissionToWrite(user._id, room._id),
+            function(read, write) {
+              assert.strictEqual(permDetails.canRead, read, 'NEW result for `permissionToRead` was ' + permDetails.canRead + ' OLD RESULT was ' + read);
+              assert.strictEqual(permDetails.canWrite, write, 'NEW result for `permissionToWrite` was ' + permDetails.canWrite + ' OLD RESULT was ' + write);
+            })
+            .catch(function(e) {
+              console.log('ROOM', room);
+              console.log('PERMS', perms);
+              console.log('user', user.username);
+              console.log('new', permDetails);
+              throw e;
+            });
+        });
+    });
+
+}
 
 function dryRun() {
   return Promise.join(
@@ -72,11 +108,17 @@ function dryRun() {
           var policy = policyFactory.createPolicyFromDescriptor(user, perms, room._id);
           return Promise.props({
               canRead: policy.canRead(),
+              canWrite: policy.canWrite(),
               canJoin: policy.canJoin(),
               canAdmin: policy.canAdmin(),
               canAddUser: policy.canAddUser(),
             })
             .then(function(x) {
+              if (room.oneToOne) {
+                // Skip first tests for one to one
+                return x;
+              }
+
               return roomPermissionsModel(user, 'view', room)
                 .then(function(result) {
                   assert.strictEqual(x.canRead, result, 'NEW result for `view` was ' + x.canRead + ' OLD RESULT was ' + result);
@@ -90,14 +132,28 @@ function dryRun() {
                   assert.strictEqual(x.canAdmin, result, 'NEW result for `admin` was ' + x.canAdmin + ' OLD RESULT was ' + result);
                 })
                 .catch(function(e) {
-                  console.error(e.stack);
                   console.log('ROOM', room);
                   console.log('PERMS', perms);
                   console.log('user', user.username);
                   console.log('new', x);
                   throw e;
+                })
+                .return(x);
+            })
+            .then(function(x) {
+              return Promise.join(
+                userCanAccessRoom.permissionToRead(user._id, room._id),
+                userCanAccessRoom.permissionToWrite(user._id, room._id),
+                function(read, write) {
+                  assert.strictEqual(x.canRead, read, 'NEW result for `permissionToRead` was ' + x.canRead + ' OLD RESULT was ' + read);
+                  assert.strictEqual(x.canWrite, write, 'NEW result for `permissionToWrite` was ' + x.canWrite + ' OLD RESULT was ' + write);
+                  return x;
                 });
-
+            })
+            .then(function(x) {
+              if (room.oneToOne) {
+                return compareOneToOneRoomResultsFor(room.oneToOneUsers[0].userId, room, perms);
+              }
             })
         }, { concurrency: 1 });
 
