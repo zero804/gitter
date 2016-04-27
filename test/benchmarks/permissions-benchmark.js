@@ -61,6 +61,7 @@ var users;
 
 makeBenchmark({
   maxTime: 3,
+  initCount: 100,
   before: function(done) {
     return Promise.join(
       getSomeRooms(),
