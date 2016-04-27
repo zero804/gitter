@@ -118,6 +118,7 @@ describe('policy-factory', function() {
               externalId: null,
               linkPath: "gitterHQ/gitter",
               members: "PUBLIC",
+              oneToOne: false,
               public: true,
               type: "NONE",
               extraMembers: [userId],

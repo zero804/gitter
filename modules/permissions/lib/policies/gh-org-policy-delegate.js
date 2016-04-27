@@ -2,6 +2,7 @@
 
 var Promise = require('bluebird');
 var GitHubOrgService = require('gitter-web-github').GitHubOrgService;
+var StatusError = require('statuserror');
 
 function GhOrgPolicyDelegate(user, permissionPolicy) {
   this._user = user;
@@ -16,12 +17,18 @@ GhOrgPolicyDelegate.prototype = {
     }
 
     if (policyName !== 'GH_ORG_MEMBER') {
-      // This should never happen...
-      return false;
+      throw new StatusError(403, 'Invalid permissions');
     }
 
     return this._fetch();
   }),
+
+  getPolicyRateLimitKey: function(policyName) {
+    if (!this._isValidUser()) return;
+    var uri = this._permissionPolicy.linkPath;
+
+    return "GH_ORG:" + this._user._id + ":" + uri + ":" + policyName;
+  },
 
   _isValidUser: function() {
     var user = this._user;

@@ -3,6 +3,7 @@
 var Promise = require('bluebird');
 var _ = require('lodash');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var policyCheckRateLimiter = require('./policy-check-rate-limiter');
 var debug = require('debug')('gitter:permissions:policy-evaluator');
 
 function PolicyEvaluator(user, permissionPolicy, policyDelegate, contextDelegate) {
@@ -34,10 +35,9 @@ PolicyEvaluator.prototype = {
     }
 
     var promiseChain = [];
+    var contextDelegate = this._contextDelegate;
 
     if (membersPolicy === 'INVITE') {
-      var contextDelegate = this._contextDelegate;
-
       // INVITE rooms don't defer to the policyDelegate
       // Anonymous users can see INVITE rooms
       if (userId && contextDelegate) {
@@ -51,9 +51,42 @@ PolicyEvaluator.prototype = {
       var policyDelegate = this._policyDelegate;
 
       if (policyDelegate) {
+        var rateLimitKey = policyDelegate.getPolicyRateLimitKey(membersPolicy);
+
+        if (userId && contextDelegate && rateLimitKey) {
+          // Performance optimisation:
+          //
+          // If the user is already in the room and has recently
+          // done a full check, skip the full check and rely on
+          // the fact that the user is already in the room
+          promiseChain.push(function() {
+            return contextDelegate.isMember(userId)
+              .then(function(access) {
+                if (!access) return false;
+
+                // The user is already in the room
+                // check whether we've done a recent
+                // full check on them...
+                return policyCheckRateLimiter.checkForRecentSuccess(rateLimitKey);
+              });
+          });
+        }
+
         promiseChain.push(function() {
           debug('canRead: checking hasPolicy: %s', membersPolicy);
-          return policyDelegate.hasPolicy(membersPolicy);
+          var promise = policyDelegate.hasPolicy(membersPolicy);
+
+          if (rateLimitKey) {
+            // If we have a rate limit key, record the success, if any
+            // so that we can skip this check for a while
+            promise.tap(function(access) {
+              if (access) {
+                return policyCheckRateLimiter.recordSuccessfulCheck(rateLimitKey, 300);
+              }
+            });
+          }
+
+          return promise;
         });
       }
     }
