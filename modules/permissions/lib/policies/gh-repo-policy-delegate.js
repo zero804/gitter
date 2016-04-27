@@ -40,7 +40,7 @@ GhRepoPolicyDelegate.prototype = {
     var uri = this._permissionPolicy.linkPath;
 
     var repoService = new GitHubRepoService(user);
-    return repoService.getRepo(uri)
+    this._fetchPromise = repoService.getRepo(uri)
       .then(function(repoInfo) {
         /* Can't see the repo? no access */
         if(!repoInfo) return false;
@@ -48,6 +48,8 @@ GhRepoPolicyDelegate.prototype = {
         var perms = repoInfo.permissions;
         return perms && (perms.push || perms.admin);
       });
+
+    return this._fetchPromise;
   }
 };
 

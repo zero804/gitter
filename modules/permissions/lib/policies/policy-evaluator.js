@@ -32,25 +32,30 @@ PolicyEvaluator.prototype = {
       return true;
     }
 
-    if (membersPolicy === 'INVITE' && this._contextDelegate) {
-      return this._contextDelegate.isMember(userId)
-        .bind(this)
-        .then(function(hasAccess) {
-          if (hasAccess) return true;
+    var promiseChain = [];
+    var contextDelegate = this._contextDelegate;
+    var policyDelegate = this._policyDelegate;
+    var self = this;
 
-          // Last ditch for invite: Admins can always read...
-          return this.canAdmin();
+    if (membersPolicy === 'INVITE') {
+      if (contextDelegate) {
+        promiseChain.push(function() {
+          return contextDelegate.isMember(userId);
         });
+      }
+    } else {
+      if (policyDelegate) {
+        promiseChain.push(function() {
+          return policyDelegate.hasPolicy(membersPolicy);
+        });
+      }
     }
 
-    // Admins can always read...
-    if (this.canAdmin()) {
-      return true;
-    }
+    promiseChain.push(function() {
+      return self.canAdmin();
+    });
 
-    if (!this._policyDelegate) return false;
-
-    return this._policyDelegate.hasPolicy(membersPolicy);
+    return executeChain(promiseChain);
   }),
 
   canJoin: Promise.method(function() {
@@ -64,6 +69,8 @@ PolicyEvaluator.prototype = {
 
   canAdmin: Promise.method(function() {
     var user = this._user;
+
+    // Anonymous users are never admins
     if (!user) return false;
 
     var userId = user._id;
@@ -78,7 +85,10 @@ PolicyEvaluator.prototype = {
       return false;
     }
 
-    if (!this._policyDelegate) return false;
+    if (!this._policyDelegate) {
+      /* No further policy delegate, so no */
+      return false;
+    }
 
     return this._policyDelegate.hasPolicy(adminPolicy);
   }),
@@ -88,6 +98,20 @@ PolicyEvaluator.prototype = {
     return this.canJoin();
   }
 };
+
+/**
+ * Given an array of promise generating functions
+ * executes them from beginning to end until one
+ * returns true or the chain ends
+ */
+function executeChain(promiseChain) {
+  return (function next(access) {
+    if (access) return true;
+    var iter = promiseChain.shift();
+    if (!iter) return false;
+    return iter().then(next);
+  })(false);
+}
 
 function userIdIsIn(userId, collection) {
   return _.some(collection, function(item) {

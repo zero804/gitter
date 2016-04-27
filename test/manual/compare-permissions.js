@@ -5,13 +5,15 @@
 var persistence = require('gitter-web-persistence');
 var legacyMigration = require('gitter-web-permissions/lib/legacy-migration');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
+var roomPermissionsModel = require('gitter-web-permissions/lib/room-permissions-model');
 var Promise = require('bluebird');
+var assert = require('assert');
 
 function getSomeRooms() {
   return persistence.Troupe
     .aggregate([
       { $match: { oneToOne: { $ne: true } } },
-      { $sample: { size: 100 } },
+      { $sample: { size: 1 } },
       { $lookup: {
           from: "troupes",
           localField: "parentId",
@@ -57,14 +59,14 @@ function dryRun() {
       getSomeRooms(),
       getSomeUsers(),
       function(results, users) {
-        return Promise.map(results, function(result, index) {
-          var parent = result.parent;
-          var owner = result.owner;
-          delete result.parent;
-          delete result.owner;
-          var perms = legacyMigration.generatePermissionsForRoom(result, parent, owner);
+        return Promise.map(results, function(room, index) {
+          var parent = room.parent;
+          var owner = room.owner;
+          delete room.parent;
+          delete room.owner;
+          var perms = legacyMigration.generatePermissionsForRoom(room, parent, owner);
           var user = users[index % users.length];
-          var policy = policyFactory.createPolicyFromDescriptor(user, perms, result._id);
+          var policy = policyFactory.createPolicyFromDescriptor(user, perms, room._id);
 
           return Promise.props({
               canRead: policy.canRead(),
@@ -73,12 +75,29 @@ function dryRun() {
               canAddUser: policy.canAddUser(),
             })
             .then(function(x) {
-              console.log('................');
-              console.log(result);
-              console.log(user);
-              console.log(x);
-            });
-        });
+              return roomPermissionsModel(user, 'view', room)
+                .then(function(result) {
+                  assert.strictEqual(x.canRead, result);
+                  return roomPermissionsModel(user, 'join', room);
+                })
+                .then(function(result) {
+                  assert.strictEqual(x.canJoin, result);
+                  return roomPermissionsModel(user, 'admin', room);
+                })
+                .then(function(result) {
+                  assert.strictEqual(x.canAdmin, result);
+                })
+                .catch(function(e) {
+                  console.error(e.stack);
+                  console.log('ROOM', room);
+                  console.log('PERMS', perms);
+                  console.log('user', user.username);
+                  console.log('new', x);
+                  throw e;
+                });
+
+            })
+        }, { concurrent: 1 });
 
       });
 }
