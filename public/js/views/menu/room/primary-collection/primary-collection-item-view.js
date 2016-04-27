@@ -1,19 +1,23 @@
 'use strict';
 
-var Backbone         = require('backbone');
-var _                = require('underscore');
-var itemTemplate     = require('./primary-collection-item-view.hbs');
-var apiClient        = require('components/apiClient');
-var context          = require('utils/context');
-var appEvents        = require('utils/appevents');
-var parseForTemplate = require('gitter-web-shared/parse/left-menu-primary-item');
-var toggleClass      = require('utils/toggle-class');
+var Backbone          = require('backbone');
+var _                 = require('underscore');
+var itemTemplate      = require('./primary-collection-item-view.hbs');
+var apiClient         = require('components/apiClient');
+var context           = require('utils/context');
+var appEvents         = require('utils/appevents');
+var parseForTemplate  = require('gitter-web-shared/parse/left-menu-primary-item');
+var toggleClass       = require('utils/toggle-class');
+var parseRoomItemName = require('gitter-web-shared/parse/room-item-name');
 
 var BaseCollectionItemView = require('../base-collection/base-collection-item-view');
 
 module.exports = BaseCollectionItemView.extend({
 
   template: itemTemplate,
+  ui: {
+    title: '#room-item-title',
+  },
   modelEvents: _.extend({}, BaseCollectionItemView.prototype.modelEvents, {
     'change:favourite': 'onFavouriteChange',
   }),
@@ -41,6 +45,7 @@ module.exports = BaseCollectionItemView.extend({
   initialize: function() {
     this.uiModel = new Backbone.Model({ menuIsOpen: false });
     this.listenTo(this.uiModel, 'change:menuIsOpen', this.onModelToggleMenu, this);
+    this.listenTo(this.roomMenuModel, 'change:state:post', this.onMenuChangeState, this);
   },
 
   serializeData: function() {
@@ -141,5 +146,14 @@ module.exports = BaseCollectionItemView.extend({
 
   onDestroy: function() {
     this.stopListening(this.uiModel);
+  },
+
+  onMenuChangeState: function (){
+    if(this.roomMenuModel.get('state') === 'org') {
+      this.ui.title.html(parseRoomItemName(this.model.get('name')));
+    }
+    else {
+      this.ui.title.html(this.model.get('name'));
+    }
   },
 });
