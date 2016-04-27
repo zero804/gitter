@@ -49,7 +49,7 @@ module.exports = function parseContentToTemplateData(data, state) {
   var unreadItems  = !hasMentions && data.unreadItems;
 
   // Make sure we are lurking and we only have activity so we don't override mentions or unread indicators
-  var lurkActivity = data.lurk && (!hasMentions && !unreadItems) && !!data.activity;
+  var lurkActivity = !!data.activity && (!hasMentions && !unreadItems);
 
   var roomName = data.name;
   // Get rid of the org prefix, if viewing in a org bucket
