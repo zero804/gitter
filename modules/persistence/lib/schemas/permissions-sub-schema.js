@@ -6,23 +6,24 @@ var ObjectId = Schema.ObjectId;
 
 module.exports = {
   type: { type: String, enum: [
+    null,   // TODO: should none be null?
     'NONE',
     'GH_REPO',
     'GH_ORG',
-    null
     // 'GROUP' permissions from group
   ], required: false },
   members: { type: String, enum: [
     'PUBLIC',          // Anyone
     'INVITE',          // Only invited users can join (private)
+    'GH_REPO_ACCESS', // for GH_REPO, must be able to see the repo
     'GH_REPO_PUSH',    // for GH_REPO, must have repo push or admin
     'GH_ORG_MEMBER',   // for GH_ORG, must be org member
   ]},
   admins: { type: String, enum: [
-    'MANUAL',        // Only users in extraUserIds are admins
-    'GH_REPO_PUSH',  // for GH_REPO, must have repo push or admin
-    'GH_ORG_MEMBER', // for GH_ORG, must be org member
-    // 'GROUP_ADMIN' // for GROUP, but be a group admin
+    'MANUAL',         // Only users in extraUserIds are admins
+    'GH_REPO_PUSH',   // for GH_REPO, must have repo push or admin
+    'GH_ORG_MEMBER',  // for GH_ORG, must be org member
+    // 'GROUP_ADMIN'  // for GROUP, but be a group admin
   ]},
   public: { type: Boolean },
   linkPath: { type: String },
