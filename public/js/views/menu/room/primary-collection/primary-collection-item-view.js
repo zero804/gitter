@@ -4,7 +4,6 @@ var Backbone         = require('backbone');
 var itemTemplate     = require('./primary-collection-item-view.hbs');
 var apiClient        = require('components/apiClient');
 var context          = require('utils/context');
-var clientEnv        = require('gitter-client-env');
 var appEvents        = require('utils/appevents');
 var parseForTemplate = require('gitter-web-shared/parse/left-menu-primary-item');
 var toggleClass      = require('utils/toggle-class');
@@ -18,11 +17,11 @@ module.exports = BaseCollectionItemView.extend({
     'click #room-item-options-toggle': 'onOptionsClicked',
     'click #room-item-hide':           'onHideClicked',
     'click #room-item-leave':          'onLeaveClicked',
-    mouseleave:                      'onMouseOut',
+    mouseleave:                        'onMouseOut',
 
     // Note this probably won't get triggered because we listen to clicks on
     // the wrapper but better safe than sorry
-    click:                           'onClick'
+    click: 'onClick'
   },
 
   className: null,
