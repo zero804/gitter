@@ -9,6 +9,7 @@ module.exports = BaseCollectionModel.extend({
     BaseCollectionModel.prototype.constructor.apply(this, arguments);
     this.collection = options.collection;
 
+    this.listenTo(this.collection, 'sync', this.updateModelActiveState, this);
     this.listenTo(this.roomMenuModel, 'change:searchTerm', this.updateModelActiveState, this);
   },
 

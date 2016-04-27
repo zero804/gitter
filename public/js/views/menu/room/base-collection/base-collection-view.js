@@ -31,7 +31,7 @@ module.exports = Marionette.CompositeView.extend({
   },
 
   modelEvents: {
-    //'change:header': 'render',
+    'change:active': 'setActive',
   },
 
   collectionEvents: {
