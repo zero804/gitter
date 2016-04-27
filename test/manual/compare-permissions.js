@@ -17,7 +17,7 @@ function getSomeRooms() {
       //     oneToOne: { $ne: true },
       //   }
       // },
-      { $sample: { size: 30 } },
+      { $sample: { size: 50 } },
       { $lookup: {
           from: "troupes",
           localField: "parentId",
@@ -93,11 +93,48 @@ function compareOneToOneRoomResultsFor(userId, room, perms) {
 
 }
 
+function compareGroupRoomResultsFor(user, room, perms) {
+  var policy = policyFactory.createPolicyFromDescriptor(user, perms, room._id);
+  return Promise.props({
+      canRead: policy.canRead(),
+      canWrite: policy.canWrite(),
+      canJoin: policy.canJoin(),
+      canAdmin: policy.canAdmin(),
+      canAddUser: policy.canAddUser(),
+    })
+    .then(function(x) {
+      return roomPermissionsModel(user, 'view', room)
+        .then(function(result) {
+          assert.strictEqual(x.canRead, result, 'NEW result for `view` was ' + x.canRead + ' OLD RESULT was ' + result);
+          return roomPermissionsModel(user, 'join', room);
+        })
+        .then(function(result) {
+          assert.strictEqual(x.canJoin, result, 'NEW result for `join` was ' + x.canJoin + ' OLD RESULT was ' + result);
+          return roomPermissionsModel(user, 'admin', room);
+        })
+        .then(function(result) {
+          assert.strictEqual(x.canAdmin, result, 'NEW result for `admin` was ' + x.canAdmin + ' OLD RESULT was ' + result);
+        })
+        .then(function() {
+          return Promise.join(
+            userCanAccessRoom.permissionToRead(user._id, room._id),
+            userCanAccessRoom.permissionToWrite(user._id, room._id),
+            function(read, write) {
+              assert.strictEqual(x.canRead, read, 'NEW result for `permissionToRead` was ' + x.canRead + ' OLD RESULT was ' + read);
+              assert.strictEqual(x.canWrite, write, 'NEW result for `permissionToWrite` was ' + x.canWrite + ' OLD RESULT was ' + write);
+            });
+        });
+    });
+}
+
+
 function dryRun() {
   return Promise.join(
       getSomeRooms(),
       getSomeUsers(),
       function(results, users) {
+        var fail = 0;
+        var success = 0;
         return Promise.map(results, function(room, index) {
           var parent = room.parent;
           var owner = room.owner;
@@ -105,57 +142,26 @@ function dryRun() {
           delete room.owner;
           var perms = legacyMigration.generatePermissionsForRoom(room, parent, owner);
           var user = users[index % users.length];
-          var policy = policyFactory.createPolicyFromDescriptor(user, perms, room._id);
-          return Promise.props({
-              canRead: policy.canRead(),
-              canWrite: policy.canWrite(),
-              canJoin: policy.canJoin(),
-              canAdmin: policy.canAdmin(),
-              canAddUser: policy.canAddUser(),
-            })
-            .then(function(x) {
-              if (room.oneToOne) {
-                // Skip first tests for one to one
-                return x;
-              }
 
-              return roomPermissionsModel(user, 'view', room)
-                .then(function(result) {
-                  assert.strictEqual(x.canRead, result, 'NEW result for `view` was ' + x.canRead + ' OLD RESULT was ' + result);
-                  return roomPermissionsModel(user, 'join', room);
-                })
-                .then(function(result) {
-                  assert.strictEqual(x.canJoin, result, 'NEW result for `join` was ' + x.canJoin + ' OLD RESULT was ' + result);
-                  return roomPermissionsModel(user, 'admin', room);
-                })
-                .then(function(result) {
-                  assert.strictEqual(x.canAdmin, result, 'NEW result for `admin` was ' + x.canAdmin + ' OLD RESULT was ' + result);
-                })
-                .catch(function(e) {
-                  console.log('ROOM', room);
-                  console.log('PERMS', perms);
-                  console.log('user', user.username);
-                  console.log('new', x);
-                  throw e;
-                })
-                .return(x);
+          return (room.oneToOne ?
+            compareOneToOneRoomResultsFor(room.oneToOneUsers[0].userId, room, perms) :
+            compareGroupRoomResultsFor(user, room, perms))
+            .then(function() {
+              success++;
             })
-            .then(function(x) {
-              return Promise.join(
-                userCanAccessRoom.permissionToRead(user._id, room._id),
-                userCanAccessRoom.permissionToWrite(user._id, room._id),
-                function(read, write) {
-                  assert.strictEqual(x.canRead, read, 'NEW result for `permissionToRead` was ' + x.canRead + ' OLD RESULT was ' + read);
-                  assert.strictEqual(x.canWrite, write, 'NEW result for `permissionToWrite` was ' + x.canWrite + ' OLD RESULT was ' + write);
-                  return x;
-                });
-            })
-            .then(function(x) {
-              if (room.oneToOne) {
-                return compareOneToOneRoomResultsFor(room.oneToOneUsers[0].userId, room, perms);
-              }
-            })
-        }, { concurrency: 1 });
+            .catch(function(e) {
+              console.log('ROOM', room);
+              console.log('PERMS', perms);
+              console.log('user', user.username);
+              fail++;
+              console.log(e.stack);
+            });
+
+        }, { concurrency: 1 })
+        .then(function() {
+          console.log('FAILED', fail);
+          console.log('SUCCESS', success);
+        });
 
       });
 }
