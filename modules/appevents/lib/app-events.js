@@ -5,14 +5,6 @@ var events = require('events');
 var localEventEmitter = new events.EventEmitter();
 
 module.exports =  {
-    unreadRecalcRequired: function() {
-      localEventEmitter.emit('unreadRecalcRequired', true);
-    },
-
-    onUnreadRecalcRequired: function(callback) {
-      localEventEmitter('unreadRecalcRequired', callback);
-    },
-
     newUnreadItem: function(userId, troupeId, items, online) {
       localEventEmitter.emit('newUnreadItem', {
         userId: userId,
@@ -172,6 +164,14 @@ module.exports =  {
 
     onRepoRenameDetected: function(callback) {
       localEventEmitter.on('repo_rename_detected', callback);
+    },
+
+    destroyUserTokens: function(userId) {
+      localEventEmitter.emit('destroy_user_tokens', userId);  
+    },
+
+    onDestroyUserTokens: function(callback) {
+      localEventEmitter.on('destroy_user_tokens', callback);
     }
 
   };

@@ -1,25 +1,5 @@
 "use strict";
 
+var qs = require('qs');
 
-module.exports = (function() {
-
-
-  // "?foo=bar&fish=chips" -> { foo: bar, fish: chips }
-  function parse(qs) {
-    if(!qs || qs.length <= 1) return {};
-
-    return qs
-      .substring(1)
-      .split('&')
-      .reduce(function(memo, pair) {
-        var splitPair = pair.split('=', 2).map(decodeURIComponent);
-
-        memo[splitPair[0]] = splitPair[1];
-        return memo;
-      }, {});
-  }
-
-  return parse(window.location.search);
-
-})();
-
+module.exports = qs.parse(window.location.search);

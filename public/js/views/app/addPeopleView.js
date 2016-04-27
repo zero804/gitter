@@ -3,6 +3,7 @@ var Marionette             = require('backbone.marionette');
 var ModalView              = require('views/modals/modal');
 var Backbone               = require('backbone');
 var context                = require('utils/context');
+var clientEnv              = require('gitter-client-env');
 var apiClient              = require('components/apiClient');
 var template               = require('./tmpl/addPeople.hbs');
 var userSearchItemTemplate = require('./tmpl/userSearchItem.hbs');
@@ -103,7 +104,7 @@ var View = Marionette.CompositeView.extend({
 
   billingUrl: function() {
     var orgName = context.troupe().get('uri').split('/')[0];
-    var billingUrl = context.env('billingUrl') + '/create/' + orgName + '/pro?r=' + context.troupe().get('url');
+    var billingUrl = clientEnv['billingUrl'] + '/create/' + orgName + '/pro?r=' + context.troupe().get('url');
     return billingUrl;
   },
 

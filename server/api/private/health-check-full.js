@@ -2,7 +2,7 @@
 "use strict";
 
 var os            = require("os");
-var appVersion    = require('../../web/appVersion');
+var appVersion    = require('gitter-app-version');
 var mongoose      = require('mongoose');
 var env           = require('gitter-web-env');
 var logger        = env.logger;

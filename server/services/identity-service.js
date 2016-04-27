@@ -2,7 +2,7 @@
 
 var Promise = require('bluebird');
 var persistence = require('gitter-web-persistence');
-var mongooseUtils = require('../utils/mongoose-utils');
+var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var userScopes = require('../utils/models/user-scopes');
 
 
