@@ -1,7 +1,6 @@
 'use strict';
 
 var defaultFilter   = require('../filters/left-menu-primary-default');
-var favouriteFilter = require('../filters/left-menu-primary-favourite');
 var one2oneFilter   = require('../filters/left-menu-primary-one2one');
 var orgFilter       = require('../filters/left-menu-primary-org');
 
@@ -23,7 +22,7 @@ module.exports = function generateLeftMenuRoomsList(state, rooms, selectedOrgNam
       filter = function(model) { return orgFilter(model, selectedOrgName) };
       break;
     default:
-      filter = favouriteFilter;
+      filter = function(){ return true; };
   }
 
   return rooms
