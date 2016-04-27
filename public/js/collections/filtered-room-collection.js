@@ -1,7 +1,6 @@
 'use strict';
 
 var Backbone = require('backbone');
-var FilteredCollection = require('backbone-filtered-collection');
 
 //Filters
 var one2oneFilter  = require('gitter-web-shared/filters/left-menu-primary-one2one');
@@ -34,7 +33,6 @@ var FilteredRoomCollection = Backbone.Collection.extend({
 
   onModelChangeState: function() {
     switch (this.roomModel.get('state')) {
-
       case 'people' :
         this.setFilter(this.filterOneToOnes.bind(this));
         break;
@@ -90,6 +88,7 @@ var FilteredRoomCollection = Backbone.Collection.extend({
 
     //set isHidden on models that need to be hidden
     this.forEach(function(model) {
+      console.log(!filter(model), model.get('name'));
       model.set('isHidden', !filter(model));
     });
 

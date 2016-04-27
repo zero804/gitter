@@ -172,6 +172,7 @@ module.exports = Backbone.Model.extend({
         break;
     }
 
+    this.trigger('change:state:pre');
     this.trigger('change:state:post');
   },
 

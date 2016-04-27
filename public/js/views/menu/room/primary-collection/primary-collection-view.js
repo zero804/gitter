@@ -22,10 +22,10 @@ var PrimaryCollectionView = BaseCollectionView.extend({
   childView: ItemView,
   className: 'primary-collection',
 
-  ui: {
+  ui: _.extend({}, BaseCollectionView.prototype.ui, {
     collection:   '#collection-list',
     searchHeader: '#primary-collection-search-header'
-  },
+  }),
 
   reorderOnSort: true,
   hasInit: false,
@@ -64,6 +64,7 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     this.listenTo(this.dndCtrl, 'dnd:start-drag', this.onDragStart, this);
     this.listenTo(this.dndCtrl, 'dnd:end-drag', this.onDragEnd, this);
     this.listenTo(this.uiModel, 'change:isDragging', this.onDragStateUpdate, this);
+    this.listenTo(this.roomMenuModel, 'change:state:post', this.setActive, this);
     BaseCollectionView.prototype.initialize.apply(this, arguments);
   },
 
