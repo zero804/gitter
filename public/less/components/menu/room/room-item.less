@@ -7,11 +7,13 @@
 }
 
 .m-room-item() {
+  overflow:   hidden;
   height:     @menu-item-height * 3;
   max-height: @menu-item-height;
   opacity:    0;
+  color: #ffffff;
   transition: opacity .2s ease-in, max-height .2s ease-in;
-  overflow:   hidden;
+
 
   &.active {
     max-height: @menu-item-height * 3;
@@ -34,14 +36,6 @@
   &.gu-mirror {
     body.drag-over-favourite & {
       display: none;
-    }
-  }
-
-  &:hover {
-    //.room-item-selected();
-
-    & .room-item__options {
-      opacity: 1;
     }
   }
 
