@@ -38,7 +38,7 @@ function generateRepoPermissionsForRoom(room) {
     case 'PUBLIC':
       return {
         type: 'GH_REPO',
-        members: 'PUBLIC',
+        members: 'GH_REPO_ACCESS',
         admins: 'GH_REPO_PUSH',
         public: true,
         linkPath: uri,
@@ -47,6 +47,7 @@ function generateRepoPermissionsForRoom(room) {
 
     case 'PRIVATE':
       return {
+        type: 'GH_REPO',
         members: 'GH_REPO_ACCESS',
         admins: 'GH_REPO_PUSH',
         public: false,
@@ -100,7 +101,7 @@ function generateRepoChannelPermissionsForRoom(room, parentRoom) {
         case 'PUBLIC':
           return {
             type: 'GH_REPO',
-            members: 'PUBLIC',
+            members: 'GH_REPO_ACCESS',
             admins: 'GH_REPO_PUSH',
             public: true,
             linkPath: ownerUri,
@@ -238,7 +239,7 @@ function generatePermissionsForRoom(room, parentRoom, ownerUser) {
 
     case 'REPO_CHANNEL':
       return generateRepoChannelPermissionsForRoom(room, parentRoom);
-      
+
     case 'ORG_CHANNEL':
       return generateOrgChannelPermissionsForRoom(room, parentRoom);
 

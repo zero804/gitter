@@ -12,8 +12,11 @@ var assert = require('assert');
 function getSomeRooms() {
   return persistence.Troupe
     .aggregate([
-      { $match: { oneToOne: { $ne: true } } },
-      { $sample: { size: 1 } },
+      { $match: {
+          oneToOne: { $ne: true },
+        }
+      },
+      { $sample: { size: 10 } },
       { $lookup: {
           from: "troupes",
           localField: "parentId",
@@ -67,7 +70,6 @@ function dryRun() {
           var perms = legacyMigration.generatePermissionsForRoom(room, parent, owner);
           var user = users[index % users.length];
           var policy = policyFactory.createPolicyFromDescriptor(user, perms, room._id);
-
           return Promise.props({
               canRead: policy.canRead(),
               canJoin: policy.canJoin(),
@@ -77,15 +79,15 @@ function dryRun() {
             .then(function(x) {
               return roomPermissionsModel(user, 'view', room)
                 .then(function(result) {
-                  assert.strictEqual(x.canRead, result);
+                  assert.strictEqual(x.canRead, result, 'NEW result for `view` was ' + x.canRead + ' OLD RESULT was ' + result);
                   return roomPermissionsModel(user, 'join', room);
                 })
                 .then(function(result) {
-                  assert.strictEqual(x.canJoin, result);
+                  assert.strictEqual(x.canJoin, result, 'NEW result for `join` was ' + x.canJoin + ' OLD RESULT was ' + result);
                   return roomPermissionsModel(user, 'admin', room);
                 })
                 .then(function(result) {
-                  assert.strictEqual(x.canAdmin, result);
+                  assert.strictEqual(x.canAdmin, result, 'NEW result for `admin` was ' + x.canAdmin + ' OLD RESULT was ' + result);
                 })
                 .catch(function(e) {
                   console.error(e.stack);
@@ -97,7 +99,7 @@ function dryRun() {
                 });
 
             })
-        }, { concurrent: 1 });
+        }, { concurrency: 1 });
 
       });
 }
