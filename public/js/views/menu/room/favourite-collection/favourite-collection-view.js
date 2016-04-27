@@ -35,11 +35,7 @@ var FavouriteCollection = PrimaryCollectionView.extend({
   //between this and the primary collection at this point.
   //If the complexity around this rises I may consider it
   setActive: function () {
-    console.log('--- SET ACTIVE ---', !this.collection.length, this.model.get('active'));
     if(!this.collection.length) {
-      console.log('-----------------------');
-      console.log('in check');
-      console.log('-----------------------');
       return this.el.classList.remove('active');
     }
     BaseCollectionView.prototype.setActive.apply(this, arguments);

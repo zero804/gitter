@@ -24,7 +24,6 @@ var PrimaryCollectionView = BaseCollectionView.extend({
 
   ui: _.extend({}, BaseCollectionView.prototype.ui, {
     collection:   '#collection-list',
-    searchHeader: '#primary-collection-search-header'
   }),
 
   reorderOnSort: true,
@@ -73,18 +72,18 @@ var PrimaryCollectionView = BaseCollectionView.extend({
       case 'search':
         if (!!this.roomMenuModel.get('searchTerm')) {
           this.el.classList.add('active');
-          this.ui.searchHeader[0].classList.remove('hidden');
+          this.ui.headerContent[0].classList.remove('hidden');
         }
 
         //
         else {
           this.el.classList.remove('active');
-          this.ui.searchHeader[0].classList.add('hidden');
+          this.ui.headerContent[0].classList.add('hidden');
         }
 
         break;
       default:
-        this.ui.searchHeader[0].classList.add('hidden');
+        this.ui.headerContent[0].classList.add('hidden');
 
         if (!this.collection.length) {
           return this.el.classList.remove('active');
