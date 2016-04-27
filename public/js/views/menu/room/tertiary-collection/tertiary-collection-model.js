@@ -12,6 +12,7 @@ module.exports = BaseCollectionModel.extend({
   },
 
   onSearch: function() {
+    console.log('ON SEARCH');
     this.set({
       header:       'Recent Searches',
       active:       true,
