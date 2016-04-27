@@ -153,7 +153,8 @@
   }
 
   .right-toolbar__body {
-    overflow: hidden;
+    .scroller();
+    overflow: auto;
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -161,11 +162,6 @@
   }
 
   .right-toolbar-activity-area {
-    overflow: hidden;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-
     @media @mid {
       display: none;
     }
@@ -180,20 +176,10 @@
   }
 
   .right-toolbar-activity-area-inner {
-    overflow: hidden;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
 
   }
 
   .right-toolbar-activity-list {
-    .scroller();
-    overflow: auto;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-
     min-width: 230px;
     margin: 0;
     list-style-type: none;
