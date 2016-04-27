@@ -49,7 +49,7 @@ _.extend(
       //At this point this.models represents the filtered models,
       //as in, only favourites that are one-to-one for example
       //so we have to filter this down from the initial collection  with the defaultFavouritesFilter (this.filterDefault)
-      this.collection.models.filter(this.filterDefault).forEach(function(model) {
+      this.models.slice().filter(this.filterDefault).forEach(function(model) {
         model.set('isTempItem', !this.oldFilter(model));
       }.bind(this));
 
@@ -58,7 +58,7 @@ _.extend(
 
     onDragEnd: function () {
       //reset the models back to their original filtered state
-      this.collection.models.filter(this.filterDefault).forEach(function(model) {
+      this.models.slice().filter(this.filterDefault).forEach(function(model) {
         model.set('isTempItem', false);
       }.bind(this));
       this.setFilter(this.oldFilter);
