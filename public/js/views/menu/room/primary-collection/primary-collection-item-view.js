@@ -15,9 +15,10 @@ var BaseCollectionItemView = require('../base-collection/base-collection-item-vi
 module.exports = BaseCollectionItemView.extend({
 
   template: itemTemplate,
-  ui: {
+  ui: _.extend({}, BaseCollectionItemView.prototype.ui, {
     title: '#room-item-title',
-  },
+  }),
+
   modelEvents: _.extend({}, BaseCollectionItemView.prototype.modelEvents, {
     'change:favourite': 'onFavouriteChange',
   }),
