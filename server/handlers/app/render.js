@@ -3,6 +3,7 @@
 var env                                     = require('gitter-web-env');
 var winston                                 = env.logger;
 var nconf                                   = env.config;
+var errorReporter                           = env.errorReporter;
 var Promise                                 = require('bluebird');
 var contextGenerator                        = require('../../web/context-generator');
 var restful                                 = require('../../services/restful');
@@ -252,7 +253,9 @@ function renderMainFrame(req, res, next, frame) {
         // we still have it when they refresh. We can't save it where it is changed(`./shared/parse/left-menu-troupe-context.js`)
         // because that is in shared and the user-settings-service is in `./server`
         userSettingsService.setUserSettings(req.user._id, 'leftRoomMenu', newLeftMenuState)
-          .then(function() { return null; });
+          .catch(function(err) {
+            errorReporter(err, { userSettingsServiceSetFailed: true }, { module: 'app-render' });
+          });
       }
 
 
@@ -294,6 +297,8 @@ function renderMainFrame(req, res, next, frame) {
         userHasNoOrgs: !orgs || !orgs.length
 
       });
+
+      return null;
     })
     .catch(next);
 }
