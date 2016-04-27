@@ -13,11 +13,15 @@ var AVATAR_SIZE = 22;
 
 module.exports = function parseContentToTemplateData(data, state) {
   data.name = (data.name || data.uri || '');
-  data.absoluteRoomUri = urlJoin(clientEnv.basePath, (data.uri || data.url));
+  if(data.fromUser) {
+    data.name = data.text;
+  }
 
   if(data.isSuggestion) {
     data.uri = urlJoin(data.uri, '?source=suggested-menu');
   }
+
+  data.absoluteRoomUri = urlJoin(clientEnv.basePath, (data.uri || data.url));
 
   //For user results
   if (data.displayName) {
@@ -43,6 +47,8 @@ module.exports = function parseContentToTemplateData(data, state) {
 
   var hasMentions  = !!data.mentions && data.mentions;
   var unreadItems  = !hasMentions && data.unreadItems;
+
+  // Make sure we are lurking and we only have activity so we don't override mentions or unread indicators
   var lurkActivity = data.lurk && (!hasMentions && !unreadItems) && !!data.activity;
 
   var roomName = data.name;
