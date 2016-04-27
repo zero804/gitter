@@ -18,6 +18,7 @@ module.exports = Marionette.ItemView.extend({
     'change:selected': 'onSelectedChange',
     'change:focus':    'onItemFocused',
     'change:unreadItems change:mentions change:activity': 'onUnreadUpdate',
+    'change:isHidden': 'onHiddenChange',
   },
 
   ui: {
@@ -72,6 +73,10 @@ module.exports = Marionette.ItemView.extend({
     });
 
     this.pulseIndicators();
+  },
+
+  onHiddenChange: function (model, val){ //jshint unused: true
+    toggleClass(this.el, 'hidden', val);
   },
 
 });
