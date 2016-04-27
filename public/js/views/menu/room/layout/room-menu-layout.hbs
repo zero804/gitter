@@ -60,7 +60,9 @@
               <div class="favourite-collection loaded active">
                 <div id="collection-list" class="collection-list--favourite">
                   {{#each leftMenuFavouriteRooms}}
-                    <div class="{{#if isNotOneToOne}}room-item--favourite{{else}}room-item--favourite-one2one{{/if}}" id="{{id}}"  data-id="{{id}}">
+                    <div class="{{#if isNotOneToOne}}room-item--favourite{{else}}room-item--favourite-one2one{{/if}} {{#if isHidden}}hidden{{/if}}"
+                         id="{{id}}"
+                         data-id="{{id}}">
                       {{{ prerenderView "js/views/menu/room/primary-collection/primary-collection-item-view" }}}
                     </div>
                   {{/each}}
@@ -73,7 +75,7 @@
                 <header><h2 class="collection__title hidden" id="primary-collection-search-header">Rooms &amp; People</h2></header>
                 <div id="collection-list" class="collection-list--primary">
                   {{#each leftMenuRooms}}
-                    <div class="room-item" id="{{id}}"  data-id="{{id}}">
+                    <div class="room-item {{#if isHidden}}hidden{{/if}}" id="{{id}}"  data-id="{{id}}">
                       {{{ prerenderView "js/views/menu/room/primary-collection/primary-collection-item-view" }}}
                     </div>
                   {{/each}}
