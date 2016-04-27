@@ -58,12 +58,16 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     this.model   = options.model;
     this.dndCtrl = options.dndCtrl;
     this.uiModel = new Backbone.Model({ isFocused: false, isDragging: false });
+
     this.listenTo(this.roomMenuModel, 'change:searchTerm', this.setActive, this);
+    this.listenTo(this.roomMenuModel, 'change:state:post', this.setActive, this);
+
     this.listenTo(this.collection, 'filter-complete', this.setActive, this);
+
     this.listenTo(this.dndCtrl, 'dnd:start-drag', this.onDragStart, this);
     this.listenTo(this.dndCtrl, 'dnd:end-drag', this.onDragEnd, this);
     this.listenTo(this.uiModel, 'change:isDragging', this.onDragStateUpdate, this);
-    this.listenTo(this.roomMenuModel, 'change:state:post', this.setActive, this);
+
     BaseCollectionView.prototype.initialize.apply(this, arguments);
   },
 

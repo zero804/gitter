@@ -1,6 +1,7 @@
 'use strict';
 
 var Backbone         = require('backbone');
+var _                = require('underscore');
 var itemTemplate     = require('./primary-collection-item-view.hbs');
 var apiClient        = require('components/apiClient');
 var context          = require('utils/context');
@@ -13,6 +14,9 @@ var BaseCollectionItemView = require('../base-collection/base-collection-item-vi
 module.exports = BaseCollectionItemView.extend({
 
   template: itemTemplate,
+  modelEvents: _.extend({}, BaseCollectionItemView.prototype.modelEvents, {
+    'change:favourite': 'onFavouriteChange',
+  }),
   events: {
     'click #room-item-options-toggle': 'onOptionsClicked',
     'click #room-item-hide':           'onHideClicked',
@@ -73,6 +77,30 @@ module.exports = BaseCollectionItemView.extend({
 
   onClick: function(e) {
     e.preventDefault();
+  },
+
+  //This is overly complex but that's where we are today...
+  onFavouriteChange: function (model, val){
+    if(model.get('oneToOne')) {
+      if(!!val) {
+        this.el.classList.remove('room-item--one2one');
+        this.el.classList.add('room-item--favourite-one2one');
+      }
+      else {
+        this.el.classList.add('room-item--one2one');
+        this.el.classList.remove('room-item--favourite-one2one');
+      }
+    }
+    else {
+      if(!!val) {
+        this.el.classList.remove('room-item');
+        this.el.classList.add('room-item--favourite');
+      }
+      else {
+        this.el.classList.add('room-item');
+        this.el.classList.remove('room-item--favourite');
+      }
+    }
   },
 
   onHideClicked: function(e) {
