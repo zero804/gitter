@@ -14,9 +14,7 @@ var proto = BaseCollectionView.prototype;
 
 var ItemView = BaseCollectionItemView.extend({
   serializeData: function() {
-    var modelData = this.model.toJSON();
-    modelData.isSuggestion = this.isSuggestion;
-    var data = parseForTemplate(modelData, this.roomMenuModel.get('state'));
+    var data = parseForTemplate(this.model.toJSON(), this.roomMenuModel.get('state'));
     return data;
   }
 });

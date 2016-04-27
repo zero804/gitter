@@ -9,21 +9,7 @@ var parseForTemplate        = require('gitter-web-shared/parse/left-menu-primary
 module.exports = BaseCollectionItemView.extend({
 
   serializeData: function() {
-    var modelData = this.model.toJSON();
-    modelData.isSuggestion = this.isSuggestion;
-    var data = parseForTemplate(modelData, this.roomMenuModel.get('state'));
-
-    if (data.fromUser) {
-      return _.extend({}, data, {
-        name: data.text,
-        avatarUrl: data.fromUser.avatarUrlSmall,
-      });
-    }
-
-    var name = (data.name || data.uri);
-    return _.extend({}, data, {
-      name:         roomNameShortener(name),
-      avatarSrcset: resolveRoomAvatarSrcSet({ uri: data.uri }, 22)
-    });
+    var data = parseForTemplate(this.model.toJSON(), this.roomMenuModel.get('state'));
+    return data;
   }
 });
