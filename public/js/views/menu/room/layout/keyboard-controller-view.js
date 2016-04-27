@@ -113,8 +113,8 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
   },
 
 
-    // Helper function to the next progressable `navigableCollectionItem`
-    // in the provided, `navigableCollectionList`, list of items
+  // Helper function to the next progressable `navigableCollectionItem`
+  // in the provided, `navigableCollectionList`, list of items
   findNextActiveNavigableCollection: function(navigableCollectionList, startingIndex, dir) {
     dir = sanitizeDir(dir);
 
@@ -154,17 +154,17 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
   },
 
   // Helper function to the next model to move to
-  findNextModel: function(dir, mapKey) {
+  findNextModel: function(mapKey, dir, navigableItemReference) {
     dir = sanitizeDir(dir);
 
     var navigableCollectionList = this.navigableCollectionListMap[mapKey];
 
-    var collectionItemForActiveModel = !isNullOrUndefined(this.currentNavigableItemReference.listIndex) ?
+    var collectionItemForActiveModel = !isNullOrUndefined(navigableItemReference.listIndex) ?
       // Start at the current reference
       this.findNextActiveNavigableCollection(
         navigableCollectionList,
         // We go one back so the find next method will find the current
-        this.currentNavigableItemReference.listIndex - dir,
+        navigableItemReference.listIndex - dir,
         dir
       ) :
       // Otherwise just use the first active collection you can find
@@ -178,7 +178,7 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
       // Use the current reference if available
       // Otherwise default to the first model in the collection
       var activeModel = this.getCurrentReferenceModel() || collectionItemForActiveModel.collection.models[0];
-      var activeIndex = this.currentNavigableItemReference.modelIndex || 0;
+      var activeIndex = navigableItemReference.modelIndex || 0;
 
       if(activeModel) {
         // Find the next active collection
@@ -281,9 +281,9 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
 
 
   // Move to the next progressable item forwards/backwards depending on `dir`
-  progressInDirection: function(dir, mapKey) {
+  progressInDirection: function(mapKey, dir) {
     dir = sanitizeDir(dir);
-    var nextModelResult = this.findNextModel(dir, mapKey);
+    var nextModelResult = this.findNextModel(mapKey, dir, this.currentNavigableItemReference);
 
     if(nextModelResult && nextModelResult.model) {
       // Deactivate the current item
@@ -388,7 +388,7 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
   // Move to the previous item in the current navigableCollection
   selectPrev: function(e, mapKey) {
     if(this.shouldHandleEvent(e, mapKey)) {
-      this.progressInDirection(-1, mapKey);
+      this.progressInDirection(mapKey, -1);
       e.preventDefault();
       e.stopPropagation();
     }
@@ -397,7 +397,7 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
   // Move to the next item in the current navigableCollection
   selectNext: function(e, mapKey) {
     if(this.shouldHandleEvent(e, mapKey)) {
-      this.progressInDirection(1, mapKey);
+      this.progressInDirection(mapKey, 1);
       e.preventDefault();
       e.stopPropagation();
     }
