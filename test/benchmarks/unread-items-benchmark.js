@@ -5,7 +5,7 @@ var makeBenchmark = require('../make-benchmark');
 var testRequire = require('../integration/test-require');
 var mockito = require('jsmockito').JsMockito;
 var Promise = require('bluebird');
-var mongoUtils = testRequire('./utils/mongo-utils');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 var TOTAL_USERS = 10000;
 
@@ -56,7 +56,7 @@ makeBenchmark({
       '../room-membership-service': roomMembershipService,
       '../user-service': userService,
       '../app-events': appEvents,
-      '../room-permissions-model': roomPermissionsModel,
+      'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModel,
     });
     unreadItemService.testOnly.setSendBadgeUpdates(false);
   },

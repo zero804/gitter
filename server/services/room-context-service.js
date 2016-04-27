@@ -5,8 +5,8 @@ var StatusError          = require('statuserror');
 var troupeService        = require('./troupe-service');
 var oneToOneRoomService  = require('./one-to-one-room-service');
 var debug                = require('debug')('gitter:room-context-service');
-var roomPermissionsModel = require('./room-permissions-model');
-var permissionsModel     = require('./permissions-model');
+var roomPermissionsModel = require('gitter-web-permissions/lib/room-permissions-model');
+var permissionsModel     = require('gitter-web-permissions/lib/permissions-model');
 var Promise              = require('bluebird');
 
 /**
@@ -85,6 +85,7 @@ function findContextForUri(user, uri, options) {
             if (!access) {
               var error = new StatusError(404);
 
+              // TODO: move away from githubType here
               error.githubType = resolvedTroupe.githubType;
               error.uri = resolvedTroupe.uri;
               throw error;

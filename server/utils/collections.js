@@ -1,11 +1,5 @@
 "use strict";
 
-var uniqueIds = require('mongodb-unique-ids');
-
-exports.idsIn = function(ids) {
-  return uniqueIds(ids).filter(function(id) { return !!id; });
-};
-
 exports.keys = function(object) {
     var k = [];
     for (var i in object) if (object.hasOwnProperty(i)) {
