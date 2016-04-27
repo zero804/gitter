@@ -71,6 +71,13 @@ _.extend(
         model.save();
       }
     },
+
+    onFavouriteChange: function (model, val) {
+      //Because we no longer filter we must manually add/remove items when a favourite changes
+      if(!!val) { this.add(model); }
+      else { this.remove(model); }
+      this.setFilter();
+    },
   }
 );
 

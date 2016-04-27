@@ -91,7 +91,7 @@ module.exports = Backbone.Model.extend({
       suggestedOrgsCollection: this.suggestedOrgs,
     });
 
-    var models = this._roomCollection.toJSON().filter(defaultCollectionFilter);
+    var models = this._roomCollection.filter(defaultCollectionFilter);
     this.activeRoomCollection   = new FilteredRoomCollection(models, {
       roomModel:  this,
       collection: this._roomCollection,
