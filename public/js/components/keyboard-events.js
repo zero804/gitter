@@ -1,4 +1,5 @@
 "use strict";
+var context = require('utils/context');
 var appEvents = require('utils/appevents');
 var platformKeys = require('utils/platform-keys');
 var _ = require('underscore');
@@ -204,17 +205,19 @@ module.exports = (function() {
   keyEvents[cmdKey + '+' + gitterKey + '+m'] = 'help.markdown';
   keyEvents[cmdKey + '+' + gitterKey + '+k'] = 'help.keyboard';
 
-  keyEvents[cmdKey + '+' + roomKey + '+up'] = 'room.up';
-  keyEvents[cmdKey + '+' + roomKey + '+down'] = 'room.down';
-  // keyEvents[cmdKey + '+' + roomKey + '+left'] = 'room.prev';
-  // keyEvents[cmdKey + '+' + roomKey + '+right'] = 'room.next';
+  if(!context.hasFeature('left-menu')) {
+    keyEvents[cmdKey + '+' + roomKey + '+up'] = 'room.up';
+    keyEvents[cmdKey + '+' + roomKey + '+down'] = 'room.down';
+    // keyEvents[cmdKey + '+' + roomKey + '+left'] = 'room.prev';
+    // keyEvents[cmdKey + '+' + roomKey + '+right'] = 'room.next';
+  }
   keyEvents[cmdKey + '+' + roomKey + '+enter'] = 'room.enter';
 
   // Go to a conversation by index in list
   _.each('123456789'.split(''), function (n) {
-    keyEvents[cmdKey + '+' + gitterKey + '+' + n] = 'room.' + n;
+    keyEvents[cmdKey + '+shift+' + n] = 'room.' + n;
   });
-  keyEvents[cmdKey + '+' + gitterKey + '+0'] = 'room.10';
+  keyEvents[cmdKey + '+shift' + '+0'] = 'room.10';
 
   // Add listeners
 
