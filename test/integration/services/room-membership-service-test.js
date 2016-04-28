@@ -74,7 +74,6 @@ describe('room-membership-service', function() {
             return persistence.TroupeUser.findOne({ troupeId: troupeId3, userId: userId1 }).exec();
           })
           .then(function(troupeUser) {
-            assert.strictEqual(troupeUser.lurk, false);
             assert.strictEqual(troupeUser.flags, flags);
           });
       });
