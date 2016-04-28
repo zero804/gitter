@@ -22,7 +22,9 @@ function twitterOauthCallback(req, token, tokenSecret, profile, done) {
     provider: 'twitter',
     providerKey: profile.id,
     displayName: profile.displayName,
-    email: profile.email,
+    // NOTE: doesn't look like passport is parsing out the email address if we
+    // set userProfileURL for some reason. So profile.email is not set.
+    email: profile._json.email,
     accessToken: token,
     accessTokenSecret: tokenSecret,
     avatar: avatar
@@ -48,6 +50,7 @@ function twitterOauthCallback(req, token, tokenSecret, profile, done) {
 var twitterStrategy = new TwitterStrategy({
     consumerKey: config.get('twitteroauth:consumer_key'),
     consumerSecret: config.get('twitteroauth:consumer_secret'),
+    userProfileURL: "https://api.twitter.com/1.1/account/verify_credentials.json?include_email=true",
     callbackURL: config.get('web:basepath') + '/login/twitter/callback',
     passReqToCallback: true
   }, twitterOauthCallback);

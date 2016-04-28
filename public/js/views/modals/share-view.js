@@ -3,6 +3,7 @@
 var $             = require('jquery');
 var Marionette    = require('backbone.marionette');
 var context       = require('utils/context');
+var clientEnv     = require('gitter-client-env');
 var apiClient     = require('components/apiClient');
 var social        = require('utils/social');
 var ModalView     = require('./modal');
@@ -40,15 +41,15 @@ var View = Marionette.ItemView.extend({
   },
 
   getShareUrl: function() {
-    return context.env('basePath') + '/' + context.getTroupe().uri + '?utm_source=share-link&utm_medium=link&utm_campaign=share-link';
+    return clientEnv['basePath'] + '/' + context.getTroupe().uri + '?utm_source=share-link&utm_medium=link&utm_campaign=share-link';
   },
 
   getBadgeUrl: function() {
-    return context.env('badgeBaseUrl') + '/' + context.getTroupe().uri + '.svg';
+    return clientEnv['badgeBaseUrl'] + '/' + context.getTroupe().uri + '.svg';
   },
 
   getBadgeMD: function() {
-    var linkUrl = context.env('basePath') + '/' + context.getTroupe().uri + '?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge';
+    var linkUrl = clientEnv['basePath'] + '/' + context.getTroupe().uri + '?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge';
     return '[![Gitter](' + this.getBadgeUrl() + ')](' + linkUrl + ')';
   },
 

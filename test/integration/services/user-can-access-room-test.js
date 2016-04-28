@@ -385,11 +385,11 @@ describe('user-can-access-room', function() {
       };
 
       var userCanAccessRoom = testRequire.withProxies("./services/user-can-access-room", {
-        './persistence-service': persistence,
+        'gitter-web-persistence': persistence,
         'dolph': dolph,
         './user-service': userService,
         './troupe-service': troupeService,
-        './room-permissions-model': roomPermissionsModel,
+        'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModel,
         './room-membership-service': roomMembershipService
       });
 

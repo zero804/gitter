@@ -3,7 +3,7 @@
 var env         = require('gitter-web-env');
 var winston     = env.logger;
 var GithubRepo  = require('gitter-web-github').GitHubRepoService;
-var persistence = require('./persistence-service');
+var persistence = require('gitter-web-persistence');
 var Promise     = require('bluebird');
 
 function applyFilters(array, filters) {
@@ -60,6 +60,7 @@ function findPublicReposWithRoom(user, query, options) {
   var filters = createRegExpsForQuery(query);
   if(!filters.length) return Promise.resolve([]);
 
+  // TODO: switch to `permissions`
   return persistence.Troupe
     .find({
       $and: filters.map(function(re) {
