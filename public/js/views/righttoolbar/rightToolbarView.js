@@ -79,10 +79,6 @@ module.exports = (function() {
     },
 
     initActivityRegion: function(optionsForRegion, region) {
-      if (hasScrollBars()) {
-        region.$el.addClass("scroller");
-      }
-
       return new ActivityCompositeView(optionsForRegion({
         collection: itemCollections.events
       }));
