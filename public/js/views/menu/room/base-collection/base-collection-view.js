@@ -25,7 +25,8 @@ module.exports = Marionette.CompositeView.extend({
   ui: {
     header:        '#collection-header',
     headerContent: '#collection-header-text',
-    dismissButton: '#dismiss-suggestion'
+    dismissButton: '#dismiss-suggestion',
+    showMore:      '#room-item-show-more',
   },
 
   events: {

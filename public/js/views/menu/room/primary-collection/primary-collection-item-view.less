@@ -46,9 +46,13 @@ JP 11/2/16
   }
 
   &:hover {
+    .room-item-selected();
     text-decoration: none;
     cursor: pointer;
-    .room-item-selected();
+
+    & .room-item__options {
+      color: @menu-item-color;
+    }
   }
 
   //this sucks so so much.
@@ -63,6 +67,14 @@ JP 11/2/16
   margin-left:  @desktop-menu-left-padding / 2;
 }
 
+.room-item__avatar--show-more {
+ .room-menu-avatar();
+  box-sizing:  border-box;
+  margin-left: @desktop-menu-left-padding / 2;
+  padding:     .7rem;
+  background:  rgba(255, 255, 255, .3);
+}
+
 .room-item__title {
   .room-menu-text();
   flex: 1;
@@ -70,6 +82,12 @@ JP 11/2/16
   &:first-child {
     margin-left: @desktop-menu-left-padding / 2;
   }
+}
+
+.room-item__title--show-more {
+  .room-item__title();
+  font-size:      1.2rem;
+  text-transform: uppercase;
 }
 
 .unread-indicator(@size) {
@@ -167,16 +185,33 @@ JP 11/2/16
 }
 
 .room-item__options {
-  width: 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   height: @menu-item-height;
-  //default is off, when a room-item is hovered we show it
-  opacity: 0;
   margin-left: 1rem;
-  transition: opacity .2s ease-out;
+  padding: 0;
+
+  background-color: transparent;
+  border: 0;
+
+  color: transparent;
+  cursor: pointer;
+
+  transition: color .1s ease-out;
+
   &:hover {
-    cursor: pointer;
+    color: @menu-item-color;
+  }
+  &:focus {
+    outline: none;
   }
 }
+
+.room-item__options-icon {
+  .options-dots();
+}
+
 
 .room-item__options-menu {
   width:            ~"calc(100% - 2.6rem)";
