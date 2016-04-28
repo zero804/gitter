@@ -1,12 +1,11 @@
-{{#if header}}
-  <header id="collection-header" class="collection-header {{#if isSuggestion}}suggestion{{/if}}">
-  <h2 class="collection__title">{{ header }}</h2>
+<header id="collection-header" class="collection-header {{#if isSuggestion}}suggestion{{/if}}">
+  <h2 id="collection-header-text" class="collection__title">{{ header }}</h2>
   {{#if isSuggestion}}
-    <i class="icon-cancel-circle collection-header__dismiss-suggestion"></i>
+    <i id="dismiss-suggestion" class="icon-cancel-circle collection-header__dismiss-suggestion"></i>
+  {{else}}
+    <i id="dismiss-suggestion" class="icon-cancel-circle collection-header__dismiss-suggestion hidden"></i>
   {{/if}}
 </header>
-{{/if}}
-
 <div id="collection-list" class="collection-list"></div>
 
 <a class="room-item__container hidden" id="room-item-show-more" href="{{orgRoomUrl}}" title="More {{selectedOrgName}} rooms">

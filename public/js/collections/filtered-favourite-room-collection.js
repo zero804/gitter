@@ -15,7 +15,7 @@ _.extend(
   FilteredFavouriteCollection.prototype,
   FilteredRoomCollection.prototype, {
 
-    initialize: function(attrs) {
+    initialize: function(models, attrs) { //jshint unused: true
       FilteredRoomCollection.prototype.initialize.apply(this, arguments);
       this.dndCtrl = attrs.dndCtrl;
       this.listenTo(this.dndCtrl, 'dnd:start-drag', this.onDragStart, this);
@@ -49,7 +49,7 @@ _.extend(
       //At this point this.models represents the filtered models,
       //as in, only favourites that are one-to-one for example
       //so we have to filter this down from the initial collection  with the defaultFavouritesFilter (this.filterDefault)
-      this.collection.models.filter(this.filterDefault).forEach(function(model) {
+      this.models.slice().filter(this.filterDefault).forEach(function(model) {
         model.set('isTempItem', !this.oldFilter(model));
       }.bind(this));
 
@@ -58,7 +58,7 @@ _.extend(
 
     onDragEnd: function () {
       //reset the models back to their original filtered state
-      this.collection.models.filter(this.filterDefault).forEach(function(model) {
+      this.models.slice().filter(this.filterDefault).forEach(function(model) {
         model.set('isTempItem', false);
       }.bind(this));
       this.setFilter(this.oldFilter);
@@ -69,6 +69,20 @@ _.extend(
       if(model) {
         model.set('favourite', false);
         model.save();
+      }
+    },
+
+    onFavouriteChange: function (model, val) {
+      //Because we no longer filter we must manually add/remove items when a favourite changes
+      if(!!val) { this.add(model); }
+      else { this.remove(model); }
+      this.setFilter();
+    },
+
+    onRoomAdded: function (model){
+      if(model.get('favourite')) {
+        model.set('isHidden', !this._filter(model));
+        this.add(model);
       }
     },
   }
