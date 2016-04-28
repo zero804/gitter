@@ -50,7 +50,7 @@ module.exports = BaseCollectionView.extend({
   },
 
   getOrgRoomUrl: function () {
-    return '/orgs/' + this.roomMenuModel.get('selectedOrgName') + '/rooms';
+    return urlJoin('/orgs', this.roomMenuModel.get('selectedOrgName'), 'rooms');
   },
 
   initialize: function(attrs) {
