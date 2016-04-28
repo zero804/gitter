@@ -118,7 +118,9 @@ module.exports = BaseCollectionView.extend({
   },
 
   redirectToPermalink: function(view) {
-    var roomUri = this.troupeModel.get('uri');
+    var roomId    = this.troupeModel.get('id');
+    var model     = this.roomCollection.get(roomId);
+    var roomUri   = model.get('uri');
     var permalink = urlJoin(clientEnv.basePath, roomUri, '?at=' + view.model.get('id'));
 
     var name = this.troupeModel.name;
