@@ -22,8 +22,9 @@ module.exports = Marionette.ItemView.extend({
   },
 
   ui: {
-    container: '#room-item__container',
-    unreadIndicator: '.room-item__unread-indicator'
+    container:       '#room-item__container',
+    unreadIndicator: '.room-item__unread-indicator',
+    title:           '#room-item-title',
   },
 
   constructor: function(attrs) {
