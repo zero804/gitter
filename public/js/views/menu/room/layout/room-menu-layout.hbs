@@ -60,7 +60,7 @@
               <div class="favourite-collection loaded active">
                 <div id="collection-list" class="collection-list--favourite">
                   {{#each leftMenuFavouriteRooms}}
-                    <div class="room-item--favourite" id="{{id}}"  data-id="{{id}}">
+                    <div class="{{#if isNotOneToOne}}room-item--favourite{{else}}room-item--favourite-one2one{{/if}}" id="{{id}}"  data-id="{{id}}">
                       {{{ prerenderView "js/views/menu/room/primary-collection/primary-collection-item-view" }}}
                     </div>
                   {{/each}}
