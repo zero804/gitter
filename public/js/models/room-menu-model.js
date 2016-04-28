@@ -15,6 +15,7 @@ var SearchRoomPeopleCollection     = require('../collections/left-menu-search-ro
 var SearchChatMessages             = require('../collections/search-chat-messages');
 var perfTiming                     = require('components/perf-timing');
 var context                        = require('utils/context');
+var defaultCollectionFilter        = require('gitter-web-shared/filters/left-menu-primary-default');
 
 var states = [
   'all',
@@ -90,7 +91,8 @@ module.exports = Backbone.Model.extend({
       suggestedOrgsCollection: this.suggestedOrgs,
     });
 
-    this.activeRoomCollection   = new FilteredRoomCollection({
+    var models = this._roomCollection.filter(defaultCollectionFilter);
+    this.activeRoomCollection   = new FilteredRoomCollection(models, {
       roomModel:  this,
       collection: this._roomCollection,
     });
@@ -170,6 +172,7 @@ module.exports = Backbone.Model.extend({
         break;
     }
 
+    this.trigger('change:state:pre');
     this.trigger('change:state:post');
   },
 

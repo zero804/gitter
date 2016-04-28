@@ -23,8 +23,10 @@ module.exports = Marionette.CompositeView.extend({
   },
 
   ui: {
-    header:   '#collection-header',
-    showMore: '#room-item-show-more'
+    header:        '#collection-header',
+    headerContent: '#collection-header-text',
+    dismissButton: '#dismiss-suggestion',
+    showMore:      '#room-item-show-more',
   },
 
   events: {
@@ -32,7 +34,8 @@ module.exports = Marionette.CompositeView.extend({
   },
 
   modelEvents: {
-    'change:header': 'render',
+    'change:header': 'onHeaderChange',
+    'change:active': 'setActive'
   },
 
   collectionEvents: {
@@ -52,12 +55,6 @@ module.exports = Marionette.CompositeView.extend({
     this.roomCollection = attrs.roomCollection;
     this.listenTo(this.roomMenuModel, 'change:hasDismissedSuggestions', this.onDismissSuggestionsUpdate, this);
     Marionette.CompositeView.prototype.constructor.apply(this, arguments);
-  },
-
-  initialize: function() {
-    if (this.model.get('active')) {
-      this.render();
-    }
   },
 
   onItemClicked: function(view) {
@@ -117,6 +114,18 @@ module.exports = Marionette.CompositeView.extend({
     if(!this.model.get('isSuggestion')) { return; }
     //If the suggestions have been dismissed hide the collection
     if(val) { this.el.classList.remove('active'); }
+  },
+
+  //We avoid re-rendering AT ALL TIMES so now we have to manually change content
+  onHeaderChange: function (model, val){ //jshint unused: true
+
+    this.ui.headerContent.html(val);
+
+    //If this is a suggestion show the cancel button
+    if(this.model.get('isSuggestion')) {
+      return this.ui.dismissButton[0].classList.remove('hidden');
+    }
+    return this.ui.dismissButton[0].classList.add('hidden');
   },
 
   onDestroy: function() {
