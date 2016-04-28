@@ -92,7 +92,6 @@ var FilteredRoomCollection = Backbone.Collection.extend({
 
     //set isHidden on models that need to be hidden
     this.forEach(function(model) {
-      //console.log(!filter(model), model.get('name'));
       model.set('isHidden', !filter(model));
     });
 
