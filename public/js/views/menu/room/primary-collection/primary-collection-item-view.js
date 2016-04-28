@@ -9,15 +9,13 @@ var appEvents         = require('utils/appevents');
 var parseForTemplate  = require('gitter-web-shared/parse/left-menu-primary-item');
 var toggleClass       = require('utils/toggle-class');
 var parseRoomItemName = require('gitter-web-shared/parse/room-item-name');
+var roomNameShortener = require('gitter-web-shared/room-name-shortener');
 
 var BaseCollectionItemView = require('../base-collection/base-collection-item-view');
 
 module.exports = BaseCollectionItemView.extend({
 
   template: itemTemplate,
-  ui: _.extend({}, BaseCollectionItemView.prototype.ui, {
-    title: '#room-item-title',
-  }),
 
   modelEvents: _.extend({}, BaseCollectionItemView.prototype.modelEvents, {
     'change:favourite': 'onFavouriteChange',
@@ -154,7 +152,7 @@ module.exports = BaseCollectionItemView.extend({
       this.ui.title.html(parseRoomItemName(this.model.get('name')));
     }
     else {
-      this.ui.title.html(this.model.get('name'));
+      this.ui.title.html(roomNameShortener(this.model.get('name')));
     }
   },
 });
