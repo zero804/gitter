@@ -150,6 +150,6 @@ module.exports = BaseCollectionItemView.extend({
       parseRoomItemName(name) :
       roomNameShortener(name);
     content = _.escape(content);
-    this.ui.title.html(content);
+    this.ui.title.text(content);
   },
 });
