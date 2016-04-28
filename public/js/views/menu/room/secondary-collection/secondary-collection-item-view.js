@@ -14,6 +14,7 @@ module.exports = BaseCollectionItemView.extend({
     BaseCollectionItemView.prototype.initialize.apply(this, arguments);
     this.listenTo(this.roomMenuModel, 'change:state:post', this.onMenuChangeState, this);
   },
+
   serializeData: function() {
     var data = parseForTemplate(this.model.toJSON(), this.roomMenuModel.get('state'));
 
@@ -31,12 +32,11 @@ module.exports = BaseCollectionItemView.extend({
     });
   },
 
-  onMenuChangeState: function (){
-    if(this.roomMenuModel.get('state') === 'org') {
-      this.ui.title.html(parseRoomItemName(this.model.get('name')));
-    }
-    else {
-      this.ui.title.html(roomNameShortener(this.model.get('uri')));
-    }
+  onMenuChangeState: function () {
+    var content = (this.roomMenuModel.get('state') === 'org') ?
+      parseRoomItemName(this.model.get('name')) :
+      roomNameShortener(this.model.get('name'));
+    content = _.escape(content);
+    this.ui.title.html(content);
   },
 });

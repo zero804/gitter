@@ -53,7 +53,7 @@ module.exports = BaseCollectionItemView.extend({
     //When the user is viewing a room he is lurking in and activity occurs
     //we explicitly, in this case, cancel the lurk activity
     //this would be a lot easier (as with a lot of things) if we persisted activity on the server JP 17/3/16
-    if(data.lurkActivity && (data.id === context.troupe().get('id'))) {
+    if (data.lurkActivity && (data.id === context.troupe().get('id'))) {
       data.lurkActivity = false;
     }
 
@@ -84,23 +84,20 @@ module.exports = BaseCollectionItemView.extend({
   },
 
   //This is overly complex but that's where we are today...
-  onFavouriteChange: function (model){
-    if(model.get('oneToOne')) {
-      if(model.get('favourite')) {
+  onFavouriteChange: function (model) {
+    if (model.get('oneToOne')) {
+      if (model.get('favourite')) {
         this.el.classList.remove('room-item--one2one');
         this.el.classList.add('room-item--favourite-one2one');
-      }
-      else {
+      } else {
         this.el.classList.add('room-item--one2one');
         this.el.classList.remove('room-item--favourite-one2one');
       }
-    }
-    else {
-      if(!model.get('favourite')) {
+    } else {
+      if (!model.get('favourite')) {
         this.el.classList.remove('room-item');
         this.el.classList.add('room-item--favourite');
-      }
-      else {
+      } else {
         this.el.classList.add('room-item');
         this.el.classList.remove('room-item--favourite');
       }
@@ -147,12 +144,11 @@ module.exports = BaseCollectionItemView.extend({
     this.stopListening(this.uiModel);
   },
 
-  onMenuChangeState: function (){
-    if(this.roomMenuModel.get('state') === 'org') {
-      this.ui.title.html(parseRoomItemName(this.model.get('name')));
-    }
-    else {
-      this.ui.title.html(roomNameShortener(this.model.get('name')));
-    }
+  onMenuChangeState: function () {
+    var content = (this.roomMenuModel.get('state') === 'org') ?
+      parseRoomItemName(this.model.get('name')) :
+      roomNameShortener(this.model.get('name'));
+    content = _.escape(content);
+    this.ui.title.html(content);
   },
 });
