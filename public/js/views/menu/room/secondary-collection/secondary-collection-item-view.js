@@ -33,7 +33,7 @@ module.exports = BaseCollectionItemView.extend({
   },
 
   onMenuChangeState: function () {
-    var name    = (this.model.get('name') || this.model.get('uri'));
+    var name    = (this.model.get('name') || this.model.get('uri') || this.model.get('username'));
     var content = (this.roomMenuModel.get('state') === 'org') ?
       parseRoomItemName(name) :
       roomNameShortener(name);
