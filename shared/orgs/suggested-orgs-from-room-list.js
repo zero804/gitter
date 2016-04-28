@@ -10,7 +10,7 @@ var favouriteOneToOneFilter   = require('../filters/left-menu-primary-favourite-
 
 module.exports = function suggestedOrgsFromRoomList(roomList, uri, currentRoomId, currentRoom) {
   var orgList = roomList.reduce(function(memo, room) {
-    //remove on-to-one conversations
+    //remove one-to-one conversations
     if (defaultOneToOneFilter(room) || favouriteOneToOneFilter(room)) { return memo; }
     if (!defaultFilter(room) && !defaultFavouriteFilter(room)) { return memo; }
 
@@ -40,7 +40,7 @@ module.exports = function suggestedOrgsFromRoomList(roomList, uri, currentRoomId
     return memo;
   }, []);
 
-  //If we are viewing a room owned by an org which the user is not yet a memeber of
+  //If we are viewing a room owned by an org which the user is not yet a member of
   //we shunt the new org to the top of the minibar list JP 8/3/16
   var currentOrg = getOrgNameFromUri(uri);
 

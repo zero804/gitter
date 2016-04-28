@@ -66,7 +66,7 @@ module.exports = (function() {
     this._buffer = {};
     this._sendLimited = limit(this._send, this, 1000);
     this._updateLastAccessLimited = limit(this._updateLastAccess, this, 1000);
-
+    this._clearActivityBadgeLimited = limit(this._clearActivityBadge, this, 100);
 
     unreadItemStore.on('itemMarkedRead', this._onItemMarkedRead.bind(this));
 
@@ -80,7 +80,10 @@ module.exports = (function() {
     _onItemMarkedRead: function(itemId, mention, lurkMode) {
 
       // Update last access time to keep track of last viewed items
-      if (lurkMode) this._updateLastAccessLimited();
+      if (lurkMode) {
+        this._updateLastAccessLimited();
+        this._clearActivityBadgeLimited();
+      }
 
       // Don't sent unread items back to the server in lurk mode unless its a mention
       if (lurkMode && !mention) return;
@@ -108,10 +111,15 @@ module.exports = (function() {
       debug('_updateLastAccess');
 
       // TODO: fix this date. It is too far into the future
+      // wrong in so many ways
       apiClient.userRoom.put('', { updateLastAccess: new Date() })
       .then(function() {
         debug('_updateLastAccess done');
       });
+    },
+
+    _clearActivityBadge: function() {
+      appEvents.trigger('clearActivityBadge');
     },
 
     _send: function(options) {
@@ -208,13 +216,10 @@ module.exports = (function() {
 
           var roomMember = context.troupe().get('roomMember');
           var lurk = snapshot._meta && snapshot._meta.lurk;
-
-          if(lurk || !roomMember) {
-            store.enableLurkMode();
-          }
+          var isLurking = lurk || !roomMember;
 
           // TODO: send the recently marked items back to the server
-          store.reset(snapshot);
+          store.reset(snapshot, isLurking);
         }
       });
 

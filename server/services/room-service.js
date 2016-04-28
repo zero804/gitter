@@ -1354,7 +1354,7 @@ function unbanUserFromRoom(room, troupeBan, username, requestingUser, callback) 
     .then(function() {
       return eventService.newEventToTroupe(
         room, requestingUser,
-        "User @" + requestingUser.username + " unbanned @" + username + " from this room",
+        "User @" + requestingUser.username + " unbanned @" + username,
         {
           service: 'bans',
           event: 'unbanned',
