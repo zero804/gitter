@@ -5,7 +5,7 @@ var roomNameShortener       = require('gitter-web-shared/room-name-shortener');
 var BaseCollectionItemView  = require('../base-collection/base-collection-item-view');
 var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 var parseForTemplate        = require('gitter-web-shared/parse/left-menu-primary-item');
-var parseRoomItemName       = require('gitter-web-shared/parse/room-item-name');
+var parseRoomItemName       = require('gitter-web-shared/get-org-menu-state-name-from-troupe-name');
 var roomNameShortener       = require('gitter-web-shared/room-name-shortener');
 
 module.exports = BaseCollectionItemView.extend({
