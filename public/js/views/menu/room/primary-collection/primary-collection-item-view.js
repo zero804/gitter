@@ -149,7 +149,6 @@ module.exports = BaseCollectionItemView.extend({
     var content = (this.roomMenuModel.get('state') === 'org') ?
       parseRoomItemName(name) :
       roomNameShortener(name);
-    content = _.escape(content);
     this.ui.title.text(content);
   },
 });
