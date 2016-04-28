@@ -25,6 +25,7 @@ FilteredRoomCollection.prototype = _.extend(
     this.listenTo(this.roomModel, 'change:state', this.onModelChangeState, this);
     this.listenTo(this.roomModel, 'change:selectedOrgName', this.onOrgNameChange, this);
 
+
     if (!options || !options.collection) {
       throw new Error('A valid RoomCollection must be passed to a new instance of FilteredRoomCollection');
     }
@@ -36,6 +37,7 @@ FilteredRoomCollection.prototype = _.extend(
 
     FilteredCollection.prototype.initialize.apply(this, arguments);
     this.onModelChangeState();
+    this.onOrgNameChange();
   },
 
   onModelChangeState: function() {
