@@ -3,6 +3,7 @@
 var env                                     = require('gitter-web-env');
 var winston                                 = env.logger;
 var nconf                                   = env.config;
+var errorReporter                           = env.errorReporter;
 var Promise                                 = require('bluebird');
 var contextGenerator                        = require('../../web/context-generator');
 var restful                                 = require('../../services/restful');
@@ -28,11 +29,12 @@ var useragent                               = require('useragent');
 var _                                       = require('lodash');
 var GitHubOrgService                        = require('gitter-web-github').GitHubOrgService;
 var orgPermissionModel                      = require('gitter-web-permissions/lib/models/org-permissions-model');
+var userSettingsService                     = require('../../services/user-settings-service');
 var resolveUserAvatarUrl                    = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 var resolveRoomAvatarSrcSet                 = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 var getOrgNameFromTroupeName                = require('gitter-web-shared/get-org-name-from-troupe-name');
 var parseRoomsIntoLeftMenuRoomList          = require('gitter-web-shared/rooms/left-menu-room-list.js');
-var parseSnapshotsForPageContext            = require('gitter-web-shared/parse/snapshots');
+var generateLeftMenuSnapshot                = require('../snapshots/left-menu-snapshot');
 var parseRoomsIntoLeftMenuFavouriteRoomList = require('gitter-web-shared/rooms/left-menu-room-favourite-list');
 var generateRoomCardContext                 = require('gitter-web-shared/templates/partials/room-card-context-generator');
 
@@ -240,9 +242,22 @@ function renderMainFrame(req, res, next, frame) {
 
       //TODO Pass this to MINIBAR?? JP 17/2/16
       var hasNewLeftMenu            = !req.isPhone && req.fflip && req.fflip.has('left-menu');
-      var snapshots                 = troupeContext.snapshots = parseSnapshotsForPageContext(req, troupeContext, orgs, rooms);
+      var snapshots                 = troupeContext.snapshots = generateLeftMenuSnapshot(req, troupeContext, rooms);
       var leftMenuRoomList          = parseRoomsIntoLeftMenuRoomList(snapshots.leftMenu.state, snapshots.rooms, snapshots.leftMenu.selectedOrgName);
       var leftMenuFavouriteRoomList = parseRoomsIntoLeftMenuFavouriteRoomList(snapshots.leftMenu.state, snapshots.rooms, snapshots.leftMenu.selectedOrgName);
+
+      var previousLeftMenuState = troupeContext.leftRoomMenuState;
+      var newLeftMenuState = snapshots['leftMenu'];
+      if(req.user && !_.isEqual(previousLeftMenuState, newLeftMenuState)) {
+        // Save our left-menu state so that if they don't send any updates on the client,
+        // we still have it when they refresh. We can't save it where it is changed(`./shared/parse/left-menu-troupe-context.js`)
+        // because that is in shared and the user-settings-service is in `./server`
+        userSettingsService.setUserSettings(req.user._id, 'leftRoomMenu', newLeftMenuState)
+          .catch(function(err) {
+            errorReporter(err, { userSettingsServiceSetFailed: true }, { module: 'app-render' });
+          });
+      }
+
 
       //TODO Remove this when favourite tab is removed for realz JP 8/4/16
       if(snapshots.leftMenu.state === 'favourite') { leftMenuRoomList = []; }
@@ -282,6 +297,8 @@ function renderMainFrame(req, res, next, frame) {
         userHasNoOrgs: !orgs || !orgs.length
 
       });
+
+      return null;
     })
     .catch(next);
 }
