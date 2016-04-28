@@ -89,6 +89,7 @@ module.exports = BaseCollectionView.extend({
     //Sort out show more button
     if (this.roomMenuModel.get('state') === 'org' && this.collection.length >= 9) {
       this.ui.showMore.attr('href', this.getOrgRoomUrl());
+      this.ui.showMore.attr('title', 'more ' + this.roomMenuModel.get('selectedOrgName') + ' rooms');
       this.ui.showMore[0].classList.remove('hidden');
     } else {
       this.ui.showMore[0].classList.add('hidden');
