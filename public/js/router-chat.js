@@ -50,7 +50,7 @@ onready(function() {
     // Shortcut for performance
     if (!e || !e.data || typeof e.data !== 'string') return;
 
-    if (e.origin !== clientEnv['basePath']) {
+    if (e.origin !== clientEnv.basePath) {
       debug('Ignoring message from ' + e.origin);
       return;
     }
@@ -150,7 +150,7 @@ onready(function() {
     var id = chat.id;
 
     if (options && options.appendInput) {
-      var fullUrl = clientEnv['basePath'] + url + '?at=' + id;
+      var fullUrl = clientEnv.basePath + url + '?at=' + id;
       var formattedDate = fullTimeFormat(chat.get('sent'));
       appEvents.trigger('input.append', ':point_up: [' + formattedDate + '](' + fullUrl + ')');
     }
@@ -168,6 +168,10 @@ onready(function() {
 
   appEvents.on('unreadItemsCount', function(newCount) {
     frameUtils.postMessage({ type: 'unreadItemsCount', count: newCount, troupeId: context.getTroupeId() });
+  });
+
+  appEvents.on('clearActivityBadge', function() {
+    frameUtils.postMessage({ type: 'clearActivityBadge', troupeId: context.getTroupeId() });
   });
 
   // Bubble keyboard events
@@ -300,7 +304,7 @@ onready(function() {
     addPeople: function() {
       require.ensure(['views/app/addPeopleView', 'views/modals/upgrade-to-pro-view'], function(require) {
         var room = context.troupe();
-        var maxFreeMembers = clientEnv['maxFreeOrgRoomMembers'];
+        var maxFreeMembers = clientEnv.maxFreeOrgRoomMembers;
         var isOverLimit = room.get('security') !== 'PUBLIC' &&
           room.get('githubType').indexOf('ORG') >= 0 &&
           !room.get('premium') &&
