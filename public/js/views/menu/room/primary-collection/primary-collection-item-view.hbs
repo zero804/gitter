@@ -8,7 +8,9 @@
   {{/if}}
   <h2 id="room-item-title"  class="room-item__title">{{name}}</h2>
   {{#unless isSearch}}
-    <img class="room-item__options" id="room-item-options-toggle" src='{{cdn "images/svg/menu/room-options.svg"}}'/>
+    <button id="room-item-options-toggle" class="room-item__options" title="Toggle room actions dropdown">
+      <i class="room-item__options-icon" aria-hidden="true"></i>
+    </button>
   {{/unless}}
 
   <div class="room-item__unread-indicator {{#if unreadItems}}has-unreads{{else if mentions}}has-mentions{{else if lurkActivity}}has-activity{{/if}}" aria-label="{{#if mentions}}You were mentioned in {{name}}{{else}}Unread activity in a {{name}}{{/if}}">
