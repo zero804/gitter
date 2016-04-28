@@ -32,6 +32,8 @@ var SuggestedCollection = Backbone.Collection.extend({
 
   onOrgNameUpdate: function(model, val) {//jshint unused: true
     if (!val || val  === '') return;
+    //clear any old models
+    this.reset([]);
     this.fetch({ reset: true });
   },
 

@@ -36,7 +36,8 @@ var View = Marionette.ItemView.extend({
       action: this.action,
       source: this.source,
       returnTo: this.returnTo,
-      showTwitter: document.cookie.indexOf('new_login') !== -1
+      // TODO: remove this and just show it anyway
+      showTwitter: true
     }
   }
 });

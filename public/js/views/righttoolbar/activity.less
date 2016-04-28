@@ -9,30 +9,6 @@
   }
 }
 
-.gtrActivityList {
-  list-style-type: none;
-  margin: 0;
-  .commits {
-    display: none;
-  }
-
-  .activity-commit {
-    margin: 0;
-  }
-
-  .activity-time {
-    order: 3;
-
-    color: rgba(100,100,100,.4);
-    white-space: nowrap;
-  }
-
-  .activity-item__icon {
-    float: left;
-  }
-
-}
-
 .activity-item,
 .activity-tip {
   position: relative;
@@ -62,6 +38,25 @@
 .activity-item-inner {
   display: flex;
   align-items: flex-start;
+
+  .commits {
+    display: none;
+  }
+
+  .activity-commit {
+    margin: 0;
+  }
+
+  & > .activity-time {
+    order: 3;
+
+    color: rgba(100,100,100,.4);
+    white-space: nowrap;
+  }
+
+  & > .activity-item__icon {
+    float: left;
+  }
 }
 
 
