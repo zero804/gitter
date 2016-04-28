@@ -13,11 +13,6 @@ module.exports = {
     var TroupeUserSchema = new Schema({
       troupeId: { type: ObjectId },
       userId: { type: ObjectId },
-      lurk: { type: Boolean },
-      /** Lurk settings
-        *  false, undefined: no lurking
-        *  true: lurking
-        */
       flags: { type: Number },
     });
     TroupeUserSchema.schemaTypeName = 'TroupeUserSchema';
