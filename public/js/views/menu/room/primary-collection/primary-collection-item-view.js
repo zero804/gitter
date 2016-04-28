@@ -8,7 +8,7 @@ var context           = require('utils/context');
 var appEvents         = require('utils/appevents');
 var parseForTemplate  = require('gitter-web-shared/parse/left-menu-primary-item');
 var toggleClass       = require('utils/toggle-class');
-var parseRoomItemName = require('gitter-web-shared/parse/room-item-name');
+var parseRoomItemName = require('gitter-web-shared/get-org-menu-state-name-from-troupe-name');
 var roomNameShortener = require('gitter-web-shared/room-name-shortener');
 
 var BaseCollectionItemView = require('../base-collection/base-collection-item-view');
