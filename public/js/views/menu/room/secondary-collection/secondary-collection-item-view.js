@@ -33,9 +33,10 @@ module.exports = BaseCollectionItemView.extend({
   },
 
   onMenuChangeState: function () {
+    var name    = (this.model.get('name') || this.model.get('uri'));
     var content = (this.roomMenuModel.get('state') === 'org') ?
-      parseRoomItemName(this.model.get('name')) :
-      roomNameShortener(this.model.get('name'));
+      parseRoomItemName(name) :
+      roomNameShortener(name);
     content = _.escape(content);
     this.ui.title.html(content);
   },
