@@ -80,7 +80,6 @@ module.exports = Marionette.ItemView.extend({
   },
 
   onHiddenChange: function (model, val){ //jshint unused: true
-    //console.log('CHANGE HIDDEN', val, model.get('name'));
     toggleClass(this.el, 'hidden', val);
   },
 
