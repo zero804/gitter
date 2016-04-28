@@ -47,11 +47,13 @@ module.exports = function makeBenchmark(options) {
     if (fn.length === 0) {
       suite.add(name, {
         maxTime: options.maxTime || 2,
+        initCount: options.initCount || 1,
         fn: fn
       });
     } else {
       suite.add(name, {
         maxTime: options.maxTime || 2,
+        initCount: options.initCount || 1,
         defer: true,
         fn: function(deferred) {
           fn(function(err) {
