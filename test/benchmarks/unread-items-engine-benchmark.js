@@ -4,7 +4,7 @@
 var makeBenchmark = require('../make-benchmark');
 var testRequire = require('../integration/test-require');
 
-var mongoUtils = testRequire('./utils/mongo-utils');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var unreadItemsServiceEngine = testRequire('./services/unread-items/engine');
 
 var largeUserSet = [];

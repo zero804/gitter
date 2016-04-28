@@ -1,9 +1,9 @@
 "use strict";
 
-var persistence          = require('./persistence-service');
+var persistence          = require('gitter-web-persistence');
 var TroupeUser           = persistence.TroupeUser;
 var Troupe               = persistence.Troupe;
-var mongoUtils           = require("../utils/mongo-utils");
+var mongoUtils           = require('gitter-web-persistence-utils/lib/mongo-utils');
 var Promise              = require('bluebird');
 var EventEmitter         = require('events').EventEmitter;
 var assert               = require('assert');
