@@ -1,11 +1,10 @@
 'use strict';
 
-var _                        = require('underscore');
-var escapeStringRegexp       = require('escape-string-regexp');
-var urlJoin                  = require('url-join');
-var resolveRoomAvatarSrcSet  = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
-var roomNameShortener        = require('../room-name-shortener');
-var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
+var _                       = require('underscore');
+var urlJoin                 = require('url-join');
+var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
+var roomNameShortener       = require('../room-name-shortener');
+var parseRoomItemName       = require('../get-org-menu-state-name-from-troupe-name');
 
 var clientEnv = require('gitter-client-env');
 
@@ -14,7 +13,7 @@ var AVATAR_SIZE = 22;
 module.exports = function parseContentToTemplateData(data, state) {
   data.name = (data.name || data.uri || '');
   if(data.fromUser) {
-    data.name = data.text;
+    data.name = data.fromUser.username;
   }
 
   if(data.isSuggestion) {
@@ -55,10 +54,10 @@ module.exports = function parseContentToTemplateData(data, state) {
   var roomName = data.name;
   // Get rid of the org prefix, if viewing in a org bucket
   if(state === 'org') {
-    roomName = data.name.replace(new RegExp('^' + escapeStringRegexp(getOrgNameFromTroupeName(data.name)) + '/'), '');
+    roomName = parseRoomItemName(data.name);
   }
 
-  var uri = data.uri || (data.url || '').substring(1);
+  var uri = data.uri || (data.url || '').substring(1) || data.name;
   return _.extend({}, data, {
     avatarSrcset:  resolveRoomAvatarSrcSet({ uri: uri }, AVATAR_SIZE),
     isNotOneToOne: (data.githubType !== 'ONETOONE'),

@@ -23,9 +23,9 @@ module.exports =  BaseCollectionView.extend({
   childView:          ItemView,
   className:          'tertiary-collection',
 
-  ui :{
+  ui: _.extend({}, BaseCollectionView.prototype.ui, {
     header: '#collection-header'
-  },
+  }),
 
   initialize: function(attrs) {
     this.roomMenuModel       = attrs.roomMenuModel;
