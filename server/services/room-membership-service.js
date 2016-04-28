@@ -42,6 +42,20 @@ function findRoomIdsForUserWithLurk(userId) {
     });
 }
 
+
+/**
+ * Returns the rooms the user is in, with lurk status
+ */
+function findLurkingRoomIdsForUserId(userId) {
+  assert(userId);
+
+  return TroupeUser.distinct('troupeId', {
+      userId: userId,
+      flags: queryForToggles({ activity: true })
+    })
+    .exec();
+}
+
 /**
  * Returns true iff the user is a member of the room
  */
@@ -607,6 +621,7 @@ function updateRoomMembershipFlagsForUser(userId, newFlags, overrideAll) {
 /* Exports */
 exports.findRoomIdsForUser          = findRoomIdsForUser;
 exports.findRoomIdsForUserWithLurk  = findRoomIdsForUserWithLurk;
+exports.findLurkingRoomIdsForUserId = findLurkingRoomIdsForUserId;
 exports.checkRoomMembership         = checkRoomMembership;
 exports.findUserMembershipInRooms   = findUserMembershipInRooms;
 exports.findMembershipForUsersInRoom = findMembershipForUsersInRoom;
