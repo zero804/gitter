@@ -473,7 +473,7 @@ function renderOrgPage(req, res, next) {
     ghOrgService.getOrg(org).catch(function() { return {login: org}; }),
     troupeService.findChildRoomsForOrg(org, opts),
     contextGenerator.generateNonChatContext(req),
-    orgPermissionModel(req.user, 'admin', org), 
+    orgPermissionModel(req.user, 'admin', org),
     orgPermissionModel(req.user, 'join', org)
   ])
   .spread(function (ghOrg,rooms, troupeContext, isOrgAdmin, isOrgMember) {
@@ -555,7 +555,9 @@ function renderOrgPage(req, res, next) {
         exploreBaseUrl: '/home/~explore',
         roomCount: roomCount,
         orgUserCount: orgUserCount,
-        org: ghOrg,
+        org: ghOrg || {
+          login: org
+        },
         rooms: rooms,
         troupeContext: troupeContext,
         pagination: {
