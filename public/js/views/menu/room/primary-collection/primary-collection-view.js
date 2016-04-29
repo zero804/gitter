@@ -66,6 +66,7 @@ var PrimaryCollectionView = BaseCollectionView.extend({
 
     this.listenTo(this.dndCtrl, 'dnd:start-drag', this.onDragStart, this);
     this.listenTo(this.dndCtrl, 'dnd:end-drag', this.onDragEnd, this);
+    this.listenTo(this.dndCtrl, 'dnd:activate-item', this.onDndActivateItem, this);
     this.listenTo(this.uiModel, 'change:isDragging', this.onDragStateUpdate, this);
 
     BaseCollectionView.prototype.initialize.apply(this, arguments);
@@ -121,6 +122,13 @@ var PrimaryCollectionView = BaseCollectionView.extend({
   onDragStateUpdate: function (model, val) { //jshint unused: true
     toggleClass(this.el, 'dragging', val);
   },
+
+  onDndActivateItem: function(id) {
+    var itemModel = this.collection.get(id);
+    if(itemModel) {
+      itemModel.trigger('activated');
+    }
+   },
 
   getChildContainerToBeIndexed: function () {
     //use the second child because the first child is the hidden search header
