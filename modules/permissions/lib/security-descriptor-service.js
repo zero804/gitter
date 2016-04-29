@@ -32,38 +32,37 @@ function getForRoomUser(roomId, userId) {
 }
 
 /**
- * Returns true if an existing policy was updated
+ * Returns true if an existing descriptor was updated
  */
-function insertPolicyForRoom(roomId, policy) {
+function insertForRoom(roomId, descriptor) {
   roomId = mongoUtils.asObjectID(roomId);
 
-  // TODO: validate the policy
+  // TODO: validate the descriptor
   var setOperation = {
     $setOnInsert: {
       troupeId: roomId,
-      type: policy.type,
-      members: policy.members,
-      admins: policy.admins,
-      public: policy.public,
-      linkPath: policy.linkPath,
-      externalId: policy.externalId,
+      type: descriptor.type,
+      members: descriptor.members,
+      admins: descriptor.admins,
+      public: descriptor.public,
+      linkPath: descriptor.linkPath,
+      externalId: descriptor.externalId,
     }
   };
 
-  // if (policy.bans && policy.bans.length) {
-  //   setOperation.$setOnInsert.bans = mongoUtils.asObjectIDS(policy.extraMembers);
+  // if (descriptor.bans && descriptor.bans.length) {
+  //   setOperation.$setOnInsert.bans = mongoUtils.asObjectIDS(descriptor.extraMembers);
   // }
 
-  if (policy.extraMembers && policy.extraMembers.length) {
-    setOperation.$setOnInsert.extraMembers = mongoUtils.asObjectIDS(policy.extraMembers);
+  if (descriptor.extraMembers && descriptor.extraMembers.length) {
+    setOperation.$setOnInsert.extraMembers = mongoUtils.asObjectIDs(descriptor.extraMembers);
   }
 
-  if (policy.extraAdmins && policy.extraAdmins.length) {
-    setOperation.$setOnInsert.extraAdmins = mongoUtils.asObjectIDS(policy.extraAdmins);
+  if (descriptor.extraAdmins && descriptor.extraAdmins.length) {
+    setOperation.$setOnInsert.extraAdmins = mongoUtils.asObjectIDs(descriptor.extraAdmins);
   }
 
   return mongooseUtils.leanUpsert(SecurityDescriptor, { troupeId: roomId }, setOperation)
-    .exec()
     .then(function(existing) {
       return !existing;
     });
@@ -71,5 +70,5 @@ function insertPolicyForRoom(roomId, policy) {
 
 module.exports = {
   getForRoomUser: getForRoomUser,
-  insertPolicyForRoom: insertPolicyForRoom
+  insertForRoom: insertForRoom
 };
