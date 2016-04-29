@@ -57,12 +57,6 @@ module.exports = Marionette.CompositeView.extend({
     Marionette.CompositeView.prototype.constructor.apply(this, arguments);
   },
 
-  initialize: function() {
-    if (this.model.get('active')) {
-      this.render();
-    }
-  },
-
   onItemActivated: function(view) {
     var model = view.model;
     var name = (model.get('uri') ||
