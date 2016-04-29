@@ -22,10 +22,9 @@ var PrimaryCollectionView = BaseCollectionView.extend({
   childView: ItemView,
   className: 'primary-collection',
 
-  ui: {
+  ui: _.extend({}, BaseCollectionView.prototype.ui, {
     collection:   '#collection-list',
-    searchHeader: '#primary-collection-search-header'
-  },
+  }),
 
   reorderOnSort: true,
   hasInit: false,
@@ -59,12 +58,17 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     this.model   = options.model;
     this.dndCtrl = options.dndCtrl;
     this.uiModel = new Backbone.Model({ isFocused: false, isDragging: false });
+
     this.listenTo(this.roomMenuModel, 'change:searchTerm', this.setActive, this);
+    this.listenTo(this.roomMenuModel, 'change:state:post', this.setActive, this);
+
     this.listenTo(this.collection, 'filter-complete', this.setActive, this);
+
     this.listenTo(this.dndCtrl, 'dnd:start-drag', this.onDragStart, this);
     this.listenTo(this.dndCtrl, 'dnd:end-drag', this.onDragEnd, this);
+    this.listenTo(this.dndCtrl, 'dnd:activate-item', this.onDndActivateItem, this);
     this.listenTo(this.uiModel, 'change:isDragging', this.onDragStateUpdate, this);
-    this.listenTo(this.roomMenuModel, 'change:state:post', this.render, this);
+
     BaseCollectionView.prototype.initialize.apply(this, arguments);
   },
 
@@ -73,18 +77,18 @@ var PrimaryCollectionView = BaseCollectionView.extend({
       case 'search':
         if (!!this.roomMenuModel.get('searchTerm')) {
           this.el.classList.add('active');
-          this.ui.searchHeader[0].classList.remove('hidden');
+          this.ui.headerContent[0].classList.remove('hidden');
         }
 
         //
         else {
           this.el.classList.remove('active');
-          this.ui.searchHeader[0].classList.add('hidden');
+          this.ui.headerContent[0].classList.add('hidden');
         }
 
         break;
       default:
-        this.ui.searchHeader[0].classList.add('hidden');
+        this.ui.headerContent[0].classList.add('hidden');
 
         if (!this.collection.length) {
           return this.el.classList.remove('active');
@@ -119,6 +123,13 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     toggleClass(this.el, 'dragging', val);
   },
 
+  onDndActivateItem: function(id) {
+    var itemModel = this.collection.get(id);
+    if(itemModel) {
+      itemModel.trigger('activated');
+    }
+   },
+
   getChildContainerToBeIndexed: function () {
     //use the second child because the first child is the hidden search header
     return this.el.children[1];
@@ -126,6 +137,8 @@ var PrimaryCollectionView = BaseCollectionView.extend({
 
   //Before we render we remove the collection container from the drag & drop instance
   onBeforeRender: function() {
+    BaseCollectionView.prototype.onBeforeRender.apply(this, arguments);
+
     this.domMap = domIndexById(this.getChildContainerToBeIndexed());
     this.dndCtrl.removeContainer(this.ui.collection[0]);
   },

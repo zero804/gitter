@@ -17,6 +17,7 @@ var FilteredFavouriteRoomCollection = require('../../../../collections/filtered-
 var SearchInputView                 = require('views/menu/room/search-input/search-input-view');
 var fastdom                         = require('fastdom');
 var toggleClass                     = require('utils/toggle-class');
+var favouriteCollectionFilter       = require('gitter-web-shared/filters/left-menu-primary-favourite');
 
 require('views/behaviors/isomorphic');
 
@@ -53,7 +54,8 @@ module.exports = Marionette.LayoutView.extend({
   initFavouriteCollection: function (optionsForRegion) {
     //Sadly the favourite collection needs to be generated here rather than the room-menu-model
     //because it has a dependency on the dnd-controller JP 1/4/16
-    var favCollection = window.fav = new FilteredFavouriteRoomCollection({
+    var models = this.model._roomCollection.filter(favouriteCollectionFilter);
+    var favCollection = new FilteredFavouriteRoomCollection(models, {
       roomModel:  this.model,
       collection: this.model._roomCollection,
       dndCtrl:    this.dndCtrl,

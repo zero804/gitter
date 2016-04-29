@@ -109,10 +109,7 @@ function getUpdateForMode(mode, isDefault) {
 
   var clearBits = BITMASK_INVERT_MODE_DEFAULT | setBits;
 
-  var lurk = !(setBits & BITMASK_NOTIFY_UNREAD);
-
   return {
-    $set: { lurk: lurk },
     $bit: { flags: { or: setBits, and: clearBits } }
   };
 }
@@ -120,10 +117,8 @@ function getUpdateForMode(mode, isDefault) {
 function getUpdateForFlags(flags) {
   assert(!isNaN(flags));
 
-  var lurk = !(flags & BITMASK_NOTIFY_UNREAD);
-
   return {
-    $set: { lurk: lurk, flags: flags }
+    $set: { flags: flags }
   };
 }
 

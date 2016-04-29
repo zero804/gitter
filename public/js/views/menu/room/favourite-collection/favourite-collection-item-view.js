@@ -3,8 +3,13 @@
 var _                         = require('underscore');
 var PrimaryCollectionItemView = require('../primary-collection/primary-collection-item-view');
 var fastdom                   = require('fastdom');
+var toggleClass               = require('utils/toggle-class');
 
 module.exports = PrimaryCollectionItemView.extend({
+
+  modelEvents: _.extend({}, PrimaryCollectionItemView.prototype.modelEvents, {
+    'change:isTempItem': 'onChangeTemp'
+  }),
 
   attributes: function() {
     var className = (this.model.get('githubType') === 'ONETOONE') ? 'room-item--favourite-one2one' : 'room-item--favourite';
@@ -17,6 +22,10 @@ module.exports = PrimaryCollectionItemView.extend({
     return _.extend({}, PrimaryCollectionItemView.prototype.attributes.apply(this, arguments), {
       class: className
     });
+  },
+
+  onChangeTemp: function (model, val){ //jshint unused: true
+    toggleClass(this.el, 'temp-active', val);
   },
 
   onRender: function (){
