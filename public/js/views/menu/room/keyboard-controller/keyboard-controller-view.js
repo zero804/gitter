@@ -183,7 +183,6 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
         }
       );
 
-      console.log('start gotoactive activeModelResult', activeCollectionItemResult, activeModelResult);
       if(activeCollectionItemResult && activeModelResult) {
         // Save it as the current
         this.currentNavigableItemReference = {
@@ -203,7 +202,6 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
         listIndex: 0,
         modelIndex: null
       }, sanitizeDir.FORWARDS);
-      console.log('start fallback', nextModelResult);
 
       if(nextModelResult) {
         // Save it as the current
@@ -217,7 +215,6 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
   // Move to the next progressable item forwards/backwards depending on `dir`
   progressInDirection: function(dir) {
     dir = sanitizeDir(dir);
-    console.log('afd', this.getCurrentReferenceCollectionList());
     var nextModelResult = findNextNavigableModel(this.getCurrentReferenceCollectionList(), this.currentNavigableItemReference, dir);
 
     if(nextModelResult) {
@@ -272,7 +269,7 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
 
         previousItemCount = currentItemCount;
         // Skip to where we found the active collection
-        i = collectionItem.index;
+        i = collectionItemResult.index;
       }
       else {
         // If we didn't find any active, just break out of this
