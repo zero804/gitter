@@ -17,7 +17,7 @@ module.exports = BaseCollectionView.extend({
   className: 'secondary-collection',
 
   childEvents: {
-    'item:clicked':      'onItemClicked',
+    'item:activated':      'onItemActivated',
   },
 
   getEmptyView: function() {
@@ -111,10 +111,10 @@ module.exports = BaseCollectionView.extend({
     this.stopListening(this.model);
   },
 
-  onItemClicked: function(view) {
+  onItemActivated: function(view) {
     return (this.roomMenuModel.get('state') === 'search') ?
       this.redirectToPermalink(view) :
-      proto.onItemClicked.apply(this, arguments);
+      proto.onItemActivated.apply(this, arguments);
   },
 
   redirectToPermalink: function(view) {
