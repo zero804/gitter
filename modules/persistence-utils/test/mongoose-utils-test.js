@@ -66,7 +66,6 @@ describe('mongoose-utils', function() {
         $setOnInsert: {
           userId: fakeUserId,
           troupeId: fakeTroupeId,
-          lurk: false,
           flags: 1
         }
       });

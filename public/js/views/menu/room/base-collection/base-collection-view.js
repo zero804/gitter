@@ -5,6 +5,7 @@ var fastdom     = require('fastdom');
 var template    = require('./base-collection-view.hbs');
 var context     = require('utils/context');
 var toggleClass = require('utils/toggle-class');
+var parseItemForTemplate = require('gitter-web-shared/parse/left-menu-primary-item');
 
 module.exports = Marionette.CompositeView.extend({
 
@@ -23,7 +24,10 @@ module.exports = Marionette.CompositeView.extend({
   },
 
   ui: {
-    header:  '#collection-header',
+    header:        '#collection-header',
+    headerContent: '#collection-header-text',
+    dismissButton: '#dismiss-suggestion',
+    showMore:      '#room-item-show-more',
   },
 
   events: {
@@ -31,7 +35,8 @@ module.exports = Marionette.CompositeView.extend({
   },
 
   modelEvents: {
-    //'change:header': 'render',
+    'change:header': 'onHeaderChange',
+    'change:active': 'setActive'
   },
 
   collectionEvents: {
@@ -39,7 +44,7 @@ module.exports = Marionette.CompositeView.extend({
   },
 
   childEvents: {
-    'item:clicked':   'onItemClicked',
+    'item:activated': 'onItemActivated',
     'hide:complete':  'onHideLeaveRoom',
     'leave:complete': 'onHideLeaveRoom',
   },
@@ -53,19 +58,10 @@ module.exports = Marionette.CompositeView.extend({
     Marionette.CompositeView.prototype.constructor.apply(this, arguments);
   },
 
-  initialize: function() {
-    if (this.model.get('active')) {
-      this.render();
-    }
-  },
-
-  onItemClicked: function(view) {
+  onItemActivated: function(view) {
     var model = view.model;
-    var name = (model.get('uri') ||
-                model.get('url') ||
-                model.get('name') ||
-                (model.get('fromUser') && model.get('fromUser').username));
-    var url  = (name[0] !== '/') ?  '/' + name : name;
+    var url = view.getRoomUrl();
+    var name = view.getRoomName();
 
     //We have to explicitly check for false because search
     //results come through with `exists: false` for rooms yet to be created
@@ -116,6 +112,18 @@ module.exports = Marionette.CompositeView.extend({
     if(!this.model.get('isSuggestion')) { return; }
     //If the suggestions have been dismissed hide the collection
     if(val) { this.el.classList.remove('active'); }
+  },
+
+  //We avoid re-rendering AT ALL TIMES so now we have to manually change content
+  onHeaderChange: function (model, val){ //jshint unused: true
+
+    this.ui.headerContent.html(val);
+
+    //If this is a suggestion show the cancel button
+    if(this.model.get('isSuggestion')) {
+      return this.ui.dismissButton[0].classList.remove('hidden');
+    }
+    return this.ui.dismissButton[0].classList.add('hidden');
   },
 
   onDestroy: function() {

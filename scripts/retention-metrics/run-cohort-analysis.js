@@ -148,7 +148,7 @@ function printCSV(results, asPercent) {
 
 // Establish connection to db
 debug('Opening connection');
-new Db('cube', new Server('mongo-replica-member-001', 27017), { safe: false, slaveOk: true })
+new Db('cube', new Server('cube.prod.gitter', 27017), { safe: false, slaveOk: true })
   .open(function(err, cubeDb) {
     if (err) die(err);
 
