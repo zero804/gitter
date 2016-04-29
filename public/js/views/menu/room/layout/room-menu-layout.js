@@ -20,7 +20,7 @@ var PanelView          = require('../panel/panel-view');
 var DNDCtrl            = require('../../../../components/menu/room/dnd-controller');
 var MinibarCollection  = require('../minibar/minibar-collection');
 var KeyboardEventMixin = require('views/keyboard-events-mixin');
-var KeyboardControllerView = require('./keyboard-controller-view');
+var KeyboardControllerView = require('../keyboard-controller/keyboard-controller-view');
 
 var MINIBAR_ITEM_HEIGHT = 65;
 
