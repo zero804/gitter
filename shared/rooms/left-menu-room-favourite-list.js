@@ -5,30 +5,34 @@ var favouriteOneToOneFilter = require('../filters/left-menu-primary-favourite-on
 var orgFavouriteFilter      = require('../filters/left-menu-primary-favourite-org');
 
 var favouriteSort           = require('../sorting/left-menu-primary-favourite');
-var defaultSort             = require('../sorting/left-menu-primary-default');
 
 var parseToTemplateItem     = require('../parse/left-menu-primary-item');
 
 module.exports = function generateLemMenuFavouriteRoomsList(state, rooms, selectedOrgName) {
 
+  var filter;
   switch(state) {
     case 'search':
-      return [];
+      filter = function(){ return false; };
+      break;
     case 'people':
-      return rooms.filter(favouriteOneToOneFilter).sort(defaultSort).map(function(room){
-        return parseToTemplateItem(room, state);
-      });
+      filter = favouriteOneToOneFilter;
+      break;
     case 'org':
-      return rooms
-        .filter(function(model){ return orgFavouriteFilter(model, selectedOrgName); })
-        .sort(defaultSort)
-        .map(function(room){
-          return parseToTemplateItem(room, state);
-        });
+      filter = function(model) { return orgFavouriteFilter(model, selectedOrgName) };
+      break;
     default:
-      return rooms.filter(favouriteFilter).sort(favouriteSort).map(function(room){
-        return parseToTemplateItem(room, state);
-      });
+      filter = favouriteFilter;
   }
 
+  return rooms
+    .filter(favouriteFilter)
+    .map(function(model){
+      if(!filter(model)) {
+        if(model.get) { model.set('isHidden', true); }
+        model.isHidden = true;
+      }
+      return parseToTemplateItem(model, state);
+    })
+    .sort(favouriteSort);
 };

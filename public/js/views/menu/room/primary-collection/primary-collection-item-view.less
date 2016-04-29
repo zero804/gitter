@@ -66,6 +66,14 @@ JP 11/2/16
   margin-left:  @desktop-menu-left-padding / 2;
 }
 
+.room-item__avatar--show-more {
+ .room-menu-avatar();
+  box-sizing:  border-box;
+  margin-left: @desktop-menu-left-padding / 2;
+  padding:     .7rem;
+  background:  rgba(255, 255, 255, .3);
+}
+
 .room-item__title {
   .room-menu-text();
   flex: 1;
@@ -73,6 +81,12 @@ JP 11/2/16
   &:first-child {
     margin-left: @desktop-menu-left-padding / 2;
   }
+}
+
+.room-item__title--show-more {
+  .room-item__title();
+  font-size:      1.2rem;
+  text-transform: uppercase;
 }
 
 .unread-indicator(@size) {

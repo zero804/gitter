@@ -4,8 +4,15 @@ var _                 = require('underscore');
 var $                 = require('jquery');
 var Marionette        = require('backbone.marionette');
 var cocktail          = require('cocktail');
-var context           = require('utils/context');
 var fastdom           = require('fastdom');
+var context           = require('utils/context');
+var DNDCtrl           = require('components/menu/room/dnd-controller');
+var localStore        = require('components/local-store');
+var RoomMenuModel     = require('../../../../models/room-menu-model');
+var MiniBarView       = require('../minibar/minibar-view');
+var PanelView         = require('../panel/panel-view');
+var MinibarCollection = require('../minibar/minibar-collection');
+var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 
 var RoomMenuModel      = require('../../../../models/room-menu-model');
 var MiniBarView        = require('../minibar/minibar-view');
@@ -113,6 +120,16 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
     this.listenTo(this.bus,     'panel:render',   this.onPanelRender, this);
 
     //this.$el.find('#searc-results').show();
+
+    // Keeps track of the unload time so we can kinda detect if a refresh happened.
+    // We use this information with the left-menu state rehrydration
+
+    window.addEventListener('beforeunload', this.onPageUnload);
+  },
+
+  onPageUnload: function() {
+    var timeAtUnload = new Date().getTime();
+    document.cookie = 'previousUnloadTime=' + timeAtUnload + '; path=/';
   },
 
   onDragStart: function() {
@@ -194,6 +211,7 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
   }, 500),
 
   onDestroy: function() {
+    window.removeEventListener('beforeunload', this.onPageUnload);
     window.removeEventListener('resize', this._initNano.bind(this));
     this.stopListening(this.dndCtrl);
   },

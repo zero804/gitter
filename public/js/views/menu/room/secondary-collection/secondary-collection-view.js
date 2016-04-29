@@ -20,8 +20,12 @@ module.exports = BaseCollectionView.extend({
     'item:activated': 'onItemActivated',
   },
 
-  getEmptyView: function(){
-    switch(this.roomMenuModel.get('state')) {
+  modelEvents: {
+    'change:active': 'toggleShowMore'
+  },
+
+  getEmptyView: function() {
+    switch (this.roomMenuModel.get('state')) {
       case 'search':
         return EmptySearchView;
       default:
@@ -33,7 +37,7 @@ module.exports = BaseCollectionView.extend({
     var opts = _.extend({}, attrs, { model: model });
 
     //Only render  search result view if we are in the search state with search results
-    if(this.roomMenuModel.get('state') === 'search' && !!this.collection.length) {
+    if (this.roomMenuModel.get('state') === 'search' && !!this.collection.length) {
       return new SearchItemView(opts);
     }
 
@@ -43,23 +47,48 @@ module.exports = BaseCollectionView.extend({
   serializeData: function() {
     var data = this.model.toJSON();
     return _.extend({}, data, {
-      isSearch: (data.state === 'search'),
+      isSearch:        (data.state === 'search'),
+      selectedOrgName: this.roomMenuModel.get('selectedOrgName'),
+      orgRoomUrl:      this.getOrgRoomUrl(),
     });
+  },
+
+  getOrgRoomUrl: function () {
+    return urlJoin('/orgs', this.roomMenuModel.get('selectedOrgName'), 'rooms');
   },
 
   initialize: function(attrs) {
     //TODO test this JP 8/1/16
+    BaseCollectionView.prototype.initialize.apply(this, arguments);
+
     this.primaryCollection = attrs.primaryCollection;
     this.userModel         = attrs.userModel;
     this.troupeModel       = attrs.troupeModel;
     this.roomCollection    = attrs.roomCollection;
-    BaseCollectionView.prototype.initialize.apply(this, arguments);
+
+    this.listenTo(this.roomMenuModel, 'change:searchTerm', this.setActive, this);
+    this.listenTo(this.roomMenuModel, 'change:state:post',  this.toggleShowMore, this);
+    this.listenTo(this.collection, 'reset',  this.toggleShowMore, this);
+  },
+
+
+  toggleShowMore: function () {
+    //Sort out show more button
+    if (this.roomMenuModel.get('state') === 'org' && this.collection.length >= 9) {
+      this.ui.showMore.attr('href', this.getOrgRoomUrl());
+      this.ui.showMore.attr('title', 'more ' + this.roomMenuModel.get('selectedOrgName') + ' rooms');
+      this.ui.showMore[0].classList.remove('hidden');
+    } else {
+      this.ui.showMore[0].classList.add('hidden');
+    }
   },
 
   filter: function(model, index) {
     switch (this.roomMenuModel.get('state')) {
       case 'search':
         return (index <= 25);
+      case 'org':
+        return (index <= 9);
       default:
         return !this.primaryCollection.get(model.get('id'));
     }
@@ -76,12 +105,13 @@ module.exports = BaseCollectionView.extend({
   },
 
   redirectToPermalink: function(view) {
-    var roomUri = this.troupeModel.get('uri');
+    var roomId    = this.troupeModel.get('id');
+    var model     = this.roomCollection.get(roomId);
+    var roomUri   = model.get('uri');
     var permalink = urlJoin(clientEnv.basePath, roomUri, '?at=' + view.model.get('id'));
 
     var name = this.troupeModel.name;
     this._triggerNavigation(permalink, 'chat', name);
   },
-
 
 });
