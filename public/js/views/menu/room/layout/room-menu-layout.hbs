@@ -60,7 +60,9 @@
               <div class="favourite-collection loaded active">
                 <div id="collection-list" class="collection-list--favourite">
                   {{#each leftMenuFavouriteRooms}}
-                    <div class="{{#if isNotOneToOne}}room-item--favourite{{else}}room-item--favourite-one2one{{/if}}" id="{{id}}"  data-id="{{id}}">
+                    <div class="{{#if isNotOneToOne}}room-item--favourite{{else}}room-item--favourite-one2one{{/if}} {{#if isHidden}}hidden{{/if}}"
+                         id="{{id}}"
+                         data-id="{{id}}">
                       {{{ prerenderView "js/views/menu/room/primary-collection/primary-collection-item-view" }}}
                     </div>
                   {{/each}}
@@ -70,10 +72,13 @@
 
             <section id="primary-collection" class="left-menu-collection">
               <div class="primary-collection loaded active">
-                <header><h2 class="collection__title hidden" id="primary-collection-search-header">Rooms &amp; People</h2></header>
+                <header>
+                  <h2 class="collection__title hidden" id="collection-header-text">Rooms &amp; People</h2>
+                  <i id="dismiss-suggestion" class="icon-cancel-circle collection-header__dismiss-suggestion hidden"></i>
+                </header>
                 <div id="collection-list" class="collection-list--primary">
                   {{#each leftMenuRooms}}
-                    <div class="room-item" id="{{id}}"  data-id="{{id}}">
+                    <div class="{{#if isNotOneToOne}}room-item{{else}}room-item--one2one{{/if}} {{#if isHidden}}hidden{{/if}}" id="{{id}}"  data-id="{{id}}">
                       {{{ prerenderView "js/views/menu/room/primary-collection/primary-collection-item-view" }}}
                     </div>
                   {{/each}}

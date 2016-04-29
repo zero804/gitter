@@ -4,7 +4,6 @@ var troupeService     = require("../../../services/troupe-service");
 var restful           = require("../../../services/restful");
 var restSerializer    = require("../../../serializers/rest-serializer");
 var recentRoomService = require('../../../services/recent-room-service');
-var roomMembershipService = require('../../../services/room-membership-service');
 var userRoomModeUpdateService = require('../../../services/user-room-mode-update-service');
 var roomService       = require('../../../services/room-service');
 var Promise           = require('bluebird');

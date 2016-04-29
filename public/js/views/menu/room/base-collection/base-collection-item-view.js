@@ -26,12 +26,14 @@ var BaseCollectionItemView = Marionette.ItemView.extend({
     'change:focus':    'onItemFocused',
     'change:unreadItems change:mentions change:activity': 'onUnreadUpdate',
     'focus:item': 'focusItem',
-    'blur:item': 'blurItem'
+    'blur:item': 'blurItem',
+    'change:isHidden': 'onHiddenChange',
   },
 
   ui: {
-    container: '#room-item__container',
-    unreadIndicator: '.room-item__unread-indicator'
+    container:       '#room-item__container',
+    unreadIndicator: '.room-item__unread-indicator',
+    title:           '#room-item-title',
   },
 
   constructor: function(attrs) {
@@ -45,6 +47,10 @@ var BaseCollectionItemView = Marionette.ItemView.extend({
     return {
       'data-id': this.model.get('id'),
     };
+  },
+
+  onRender: function (){
+    toggleClass(this.el, 'hidden', this.model.get('isHidden'));
   },
 
   pulseIndicators: function() {
@@ -99,7 +105,11 @@ var BaseCollectionItemView = Marionette.ItemView.extend({
   blurItem: function() {
     this.ui.container.blur();
     toggleClass(this.ui.container[0], 'focus', false);
-  }
+  },
+
+  onHiddenChange: function (model, val){ //jshint unused: true
+    toggleClass(this.el, 'hidden', val);
+  },
 
 });
 

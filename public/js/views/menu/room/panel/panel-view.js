@@ -18,6 +18,7 @@ var TertiaryCollectionModel         = require('../tertiary-collection/tertiary-c
 var ProfileMenuView                 = require('../profile/profile-menu-view');
 var FilteredFavouriteRoomCollection = require('../../../../collections/filtered-favourite-room-collection.js');
 var SearchInputView                 = require('views/menu/room/search-input/search-input-view');
+var favouriteCollectionFilter       = require('gitter-web-shared/filters/left-menu-primary-favourite');
 
 require('views/behaviors/isomorphic');
 
@@ -132,7 +133,8 @@ var PanelView = Marionette.LayoutView.extend({
 
     //Sadly the favourite collection needs to be generated here rather than the room-menu-model
     //because it has a dependency on the dnd-controller JP 1/4/16
-    this.favCollection = new FilteredFavouriteRoomCollection({
+    var models = this.model._roomCollection.filter(favouriteCollectionFilter);
+    this.favCollection = new FilteredFavouriteRoomCollection(models, {
       collection: this.model._roomCollection,
       roomModel:  this.model,
       dndCtrl:    this.dndCtrl,
