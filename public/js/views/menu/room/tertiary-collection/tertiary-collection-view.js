@@ -92,7 +92,7 @@ module.exports =  BaseCollectionView.extend({
       case 'search':
         return this.onSearchItemClicked.apply(this, arguments);
       default:
-        return proto.onItemClicked.apply(this, arguments);
+        return proto.onItemActivated.apply(this, arguments);
     }
   },
 
@@ -102,7 +102,7 @@ module.exports =  BaseCollectionView.extend({
       return this._openCreateRoomDialog(view.model.get('name'));
     }
 
-    proto.onItemClicked.apply(this, arguments);
+    proto.onItemActivated.apply(this, arguments);
   },
 
   onSearchItemClicked: function(view) {
