@@ -204,24 +204,31 @@ function createExpectedFixtures(expected, done) {
       userCount: f.users && f.users.length || f.userCount,
       tags: f.tags,
       providers: f.providers,
-
-      // Permissions stuff
-      type: f.type ? f.type : f.oneToOne ? null : 'NONE',
-      members: f.members || 'PUBLIC',
-      admins: f.admins || 'MANUAL',
-      public: 'public' in f ? f.public : !f.oneToOne,
-      linkPath: f.linkPath,
-      externalId: f.externalId,
-      extraMembers: f.extraMembers,
-      extraAdmins: f.extraAdmins
     };
 
     debug('Creating troupe %s with %j', fixtureName, doc);
     return persistence.Troupe.create(doc)
-      .then(function(troupe) {
-        if (!f.userIds || !f.userIds.length) return troupe;
-        return bulkInsertTroupeUsers(troupe._id, f.userIds, f.membershipStrategy)
-          .thenReturn(troupe);
+      .tap(function(troupe) {
+        if (!f.userIds || !f.userIds.length) return;
+        return bulkInsertTroupeUsers(troupe._id, f.userIds, f.membershipStrategy);
+      })
+      .tap(function(troupe) {
+
+        var securityDescriptor = f.securityDescriptor || {};
+
+        return persistence.SecurityDescriptor.create({
+          troupeId: troupe._id,
+
+          // Permissions stuff
+          type: securityDescriptor.type ? securityDescriptor.type : f.oneToOne ? 'ONE_TO_ONE' : null,
+          members: securityDescriptor.members || 'PUBLIC',
+          admins: securityDescriptor.admins || 'MANUAL',
+          public: 'public' in securityDescriptor ? securityDescriptor.public : !f.oneToOne,
+          linkPath: securityDescriptor.linkPath,
+          externalId: securityDescriptor.externalId,
+          extraMembers: securityDescriptor.extraMembers,
+          extraAdmins: securityDescriptor.extraAdmins
+        });
       });
   }
 
@@ -282,20 +289,22 @@ function createExpectedFixtures(expected, done) {
           users = users.concat(t.users);
         }
 
-        if (t.extraMembers) {
-          if(!Array.isArray(t.extraMembers)) {
-            t.extraMembers = [t.extraMembers];
+        var extraMembers = t.securityDescriptor && t.securityDescriptor.extraMembers;
+        if (extraMembers) {
+          if(!Array.isArray(extraMembers)) {
+            extraMembers = [extraMembers];
           }
 
-          users = users.concat(t.extraMembers);
+          users = users.concat(extraMembers);
         }
 
-        if (t.extraAdmins) {
-          if(!Array.isArray(t.extraAdmins)) {
-            t.extraAdmins = [t.extraAdmins];
+        var extraAdmins = t.securityDescriptor && t.securityDescriptor.extraAdmins;
+        if (extraAdmins) {
+          if(!Array.isArray(extraAdmins)) {
+            extraAdmins = [extraAdmins];
           }
 
-          users = users.concat(t.extraAdmins);
+          users = users.concat(extraAdmins);
         }
 
         return Promise.map(users, function(user, index) {
@@ -355,13 +364,17 @@ function createExpectedFixtures(expected, done) {
           return fixture[user]._id;
         });
 
-        expectedTroupe.extraMembers = expectedTroupe.extraMembers && expectedTroupe.extraMembers.map(function(user) {
-          return fixture[user]._id;
-        });
+        var expectedSecurityDescriptor = expectedTroupe && expectedTroupe.securityDescriptor;
+        if (expectedSecurityDescriptor) {
+          expectedSecurityDescriptor.extraMembers = expectedSecurityDescriptor.extraMembers && expectedSecurityDescriptor.extraMembers.map(function(user) {
+            return fixture[user]._id;
+          });
 
-        expectedTroupe.extraAdmins = expectedTroupe.extraAdmins && expectedTroupe.extraAdmins.map(function(user) {
-          return fixture[user]._id;
-        });
+          expectedSecurityDescriptor.extraAdmins = expectedSecurityDescriptor.extraAdmins && expectedSecurityDescriptor.extraAdmins.map(function(user) {
+            return fixture[user]._id;
+          });
+        }
+
 
         return createTroupe(key, expectedTroupe)
           .then(function(troupe) {

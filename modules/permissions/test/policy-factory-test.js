@@ -9,6 +9,7 @@ var policyFactory = require('../lib/policy-factory');
 describe('policy-factory', function() {
   describe('integration tests #slow', function() {
 
+
     var fixture = {};
     before(fixtureLoader(fixture, {
       user1: {},
@@ -16,26 +17,29 @@ describe('policy-factory', function() {
       user3: {},
       troupe1: {
         users: ['user1'],
-
-        type: 'NONE',
-        members: 'PUBLIC',
-        admins: 'MANUAL',
-        public: true,
-        linkPath: 'gitterHQ/gitter',
-        externalId: null,
-        extraMembers: ['user1'],
-        extraAdmins: ['user1', 'user3']
+        securityDescriptor: {
+          type: null,
+          members: 'PUBLIC',
+          admins: 'MANUAL',
+          public: true,
+          linkPath: 'gitterHQ/gitter',
+          externalId: null,
+          extraMembers: ['user1'],
+          extraAdmins: ['user1', 'user3']
+        }
       },
       troupe2: {
         users: ['user1'],
-        type: 'NONE',
-        members: 'INVITE',
-        admins: 'MANUAL',
-        public: true,
-        linkPath: 'gitterHQ/gitter',
-        externalId: null,
-        extraMembers: [],
-        extraAdmins: []
+        securityDescriptor: {
+          type: null,
+          members: 'INVITE',
+          admins: 'MANUAL',
+          public: true,
+          linkPath: 'gitterHQ/gitter',
+          externalId: null,
+          extraMembers: [],
+          extraAdmins: []
+        }
       }
     }));
 
@@ -103,29 +107,6 @@ describe('policy-factory', function() {
           canAddUser: true
         });
       });
-
-    });
-
-    describe('loadRoomPermissions', function() {
-      it('should load all the fields', function() {
-        var userId = fixture.user1._id;
-        var roomId = fixture.troupe1._id;
-
-        return policyFactory.testOnly.loadRoomPermissions(roomId, userId)
-          .then(function(perms) {
-            assert.deepEqual(perms, {
-              admins: "MANUAL",
-              externalId: null,
-              linkPath: "gitterHQ/gitter",
-              members: "PUBLIC",
-              oneToOne: false,
-              public: true,
-              type: "NONE",
-              extraMembers: [userId],
-              extraAdmins: [userId]
-            });
-          });
-      })
 
     });
 
