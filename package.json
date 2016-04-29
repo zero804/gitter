@@ -185,6 +185,7 @@
     "gitter-handlebars-loader": "^1.2.0",
     "gitter-styleguide": "^1.6.4",
     "gulp": "^3.8.11",
+    "gulp-codacy": "^1.0.0",
     "gulp-coveralls": "^0.1.4",
     "gulp-debug": "^2.1.2",
     "gulp-expect-file": "0.0.7",
