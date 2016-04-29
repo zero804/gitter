@@ -229,53 +229,46 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
   },
 
   // Move to the next exact item according to their index across the collection list
-  progressToIndex: function(mapKey, index) {
+  progressToIndex: function(mapKey, targetIndex) {
     var previousItemCount = 0;
 
-    var navigableCollectionList = this.navigableCollectionListMap[mapKey];
-    for(var i = 0; i < navigableCollectionList.length; i++) {
-      var collectionItemResult = findNextActiveItem(
-        navigableCollectionList,
-        i - 1,
-        sanitizeDir.FORWARDS,
-        navigableCollectionItemActiveCb
-      );
+    var nextModelResult;
+    var collectionItemWithNextModelResult = findNextActiveItem(
+      this.navigableCollectionListMap[mapKey],
+      0,
+      sanitizeDir.FORWARDS,
+      function(navigableCollectionItem) {
+        var nonHiddenModels = navigableCollectionItem.collection.models.filter(function(model) {
+          return !model.get('isHidden');
+        });
 
-      if(collectionItemResult) {
-        // We use `collection.models.length` instead of `collection.length` because `ProxyCollection` doesn't update the length
-        var currentItemCount = previousItemCount + collectionItemResult.item.collection.models.length;
+        var currentItemCount = previousItemCount + nonHiddenModels.length;
+        if((currentItemCount - 1) >= targetIndex) {
+          var nextModelIndex = targetIndex - previousItemCount;
 
-        if((currentItemCount - 1) >= index) {
-          var nextModelIndex = index - previousItemCount;
-          // We use `collection.models[x]` vs `collection.at(x)` because the ProxyCollection doesn't update the index
-          var nextModel = collectionItemResult.item.collection.models[nextModelIndex];
-
-          if(nextModel) {
-            // Deactivate the current item
-            this.blurCurrentItem();
-
-            // Activate the next item
-            this.currentNavigableItemReference = {
-              mapKey: mapKey,
-              listIndex: collectionItemResult.index,
-              modelId: nextModel.id,
-              modelIndex: nextModelIndex
-            };
-            nextModel.trigger(FOCUS_EVENT);
-          }
-
-          // We got far enough to find the index so let's get out of here
-          break;
+          nextModelResult = {
+            item: navigableCollectionItem.collection.models[nextModelIndex],
+            index: nextModelIndex
+          };
+          return true;
         }
 
         previousItemCount = currentItemCount;
-        // Skip to where we found the active collection
-        i = collectionItemResult.index;
       }
-      else {
-        // If we didn't find any active, just break out of this
-        break;
-      }
+    );
+
+    if(collectionItemWithNextModelResult && nextModelResult) {
+      // Deactivate the current item
+      this.blurCurrentItem();
+
+      // Save it as the current
+      this.currentNavigableItemReference = {
+        mapKey: mapKey,
+        listIndex: collectionItemWithNextModelResult.index,
+        modelId: nextModelResult.item.id,
+        modelIndex: nextModelResult.index
+      };
+      nextModelResult.item.trigger(FOCUS_EVENT);
     }
   },
 
