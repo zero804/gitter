@@ -85,7 +85,7 @@ module.exports =  BaseCollectionView.extend({
     }
   },
 
-  onItemClicked: function() {
+  onItemActivated: function() {
     switch (this.roomMenuModel.get('state')) {
       case 'all':
         return this.onOrgItemClicked.apply(this, arguments);
