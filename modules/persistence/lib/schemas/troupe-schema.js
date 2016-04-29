@@ -3,9 +3,7 @@
 var mongoose = require('gitter-web-mongoose-bluebird');
 var Schema = mongoose.Schema;
 var ObjectId = Schema.ObjectId;
-var PermissionsSubSchema = require('./permissions-sub-schema');
 var installVersionIncMiddleware = require('../install-version-inc-middleware');
-var _ = require('lodash');
 
 module.exports = {
   install: function(mongooseConnection) {
@@ -32,7 +30,7 @@ module.exports = {
     //
     // A Troupe
     //
-    var TroupeSchema = new Schema(_.extend({
+    var TroupeSchema = new Schema({
       topic: { type: String, 'default':'' },
       uri: { type: String },
       tags: [String],
@@ -56,7 +54,7 @@ module.exports = {
       renamedLcUris: [String],
       providers: [String],
       _tv: { type: 'MongooseNumber', 'default': 0 }
-    }, PermissionsSubSchema), { strict: 'throw' });
+    }, { strict: 'throw' });
 
     TroupeSchema.schemaTypeName = 'TroupeSchema';
 
