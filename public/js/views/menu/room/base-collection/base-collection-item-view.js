@@ -18,11 +18,13 @@ module.exports = Marionette.ItemView.extend({
     'change:selected': 'onSelectedChange',
     'change:focus':    'onItemFocused',
     'change:unreadItems change:mentions change:activity': 'onUnreadUpdate',
+    'change:isHidden': 'onHiddenChange',
   },
 
   ui: {
-    container: '#room-item__container',
-    unreadIndicator: '.room-item__unread-indicator'
+    container:       '#room-item__container',
+    unreadIndicator: '.room-item__unread-indicator',
+    title:           '#room-item-title',
   },
 
   constructor: function(attrs) {
@@ -36,6 +38,10 @@ module.exports = Marionette.ItemView.extend({
     return {
       'data-id': this.model.get('id'),
     };
+  },
+
+  onRender: function (){
+    toggleClass(this.el, 'hidden', this.model.get('isHidden'));
   },
 
   pulseIndicators: function() {
@@ -72,6 +78,10 @@ module.exports = Marionette.ItemView.extend({
     });
 
     this.pulseIndicators();
+  },
+
+  onHiddenChange: function (model, val){ //jshint unused: true
+    toggleClass(this.el, 'hidden', val);
   },
 
 });
