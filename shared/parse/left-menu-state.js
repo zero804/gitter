@@ -35,6 +35,9 @@ module.exports = function generateLeftMenuState(leftRoomMenuState, uri, orgs, op
     else if(opts.isOneToOne) {
       currentState = 'people';
     }
+    else if(uri === 'home') {
+      currentState = 'search';
+    }
   }
 
 
