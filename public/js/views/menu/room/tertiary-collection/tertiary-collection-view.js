@@ -1,6 +1,7 @@
 'use strict';
 
 var _                       = require('underscore');
+var urlJoin                 = require('url-join');
 var Marionette              = require('backbone.marionette');
 var toggleClass             = require('utils/toggle-class');
 var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
@@ -13,6 +14,17 @@ var parseForTemplate        = require('gitter-web-shared/parse/left-menu-primary
 var proto = BaseCollectionView.prototype;
 
 var ItemView = BaseCollectionItemView.extend({
+
+  getRoomUrl: function() {
+    var url = BaseCollectionItemView.prototype.getRoomUrl.apply(this, arguments);
+
+    if(this.model.get('isSuggestion')) {
+      url = urlJoin(url, '?source=suggested-menu');
+    }
+
+    return url;
+  },
+
   serializeData: function() {
     var data = parseForTemplate(this.model.toJSON(), this.roomMenuModel.get('state'));
     return data;
