@@ -402,7 +402,6 @@ function queueBadgeUpdateForUser(userIds) {
 }
 
 exports.getActivityIndicatorForTroupeIds = function(troupeIds, userId) {
-
   return Promise.join(
     recentRoomCore.getTroupeLastAccessTimesForUser(userId),
     engine.getLastChatTimestamps(troupeIds),
