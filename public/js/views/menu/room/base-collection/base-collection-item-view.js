@@ -1,9 +1,10 @@
 'use strict';
 
 var Marionette                      = require('backbone.marionette');
+var urlJoin                         = require('url-join');
+var toggleClass                     = require('utils/toggle-class');
 var template                        = require('./base-collection-item-view.hbs');
 var updateUnreadIndicatorClassState = require('../../../../components/menu/update-unread-indicator-class-state');
-var toggleClass                     = require('utils/toggle-class');
 
 module.exports = Marionette.ItemView.extend({
 
@@ -38,6 +39,30 @@ module.exports = Marionette.ItemView.extend({
     return {
       'data-id': this.model.get('id'),
     };
+  },
+
+  getRoomName: function() {
+    var model = this.model;
+
+    var name = (model.get('uri') ||
+                model.get('url') ||
+                model.get('name') ||
+                (model.get('fromUser') && model.get('fromUser').username));
+
+    return name;
+  },
+
+  getRoomUrl: function() {
+    var state = this.roomMenuModel.get('state');
+    var name = this.getRoomName();
+
+    var url  = (name[0] !== '/') ?  '/' + name : name;
+
+    if(this.model.get('isSuggestion')) {
+      var sourceValue = state === 'all' ? 'all-rooms-list' : 'suggested-menu';
+      url = urlJoin(url, '?source=' + sourceValue);
+    }
+    return url;
   },
 
   onRender: function (){
