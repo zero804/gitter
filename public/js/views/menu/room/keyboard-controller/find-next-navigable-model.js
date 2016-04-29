@@ -1,5 +1,6 @@
 'use strict';
 
+var _ = require('underscore');
 var sanitizeDir = require('./sanitize-direction');
 var findNextActiveItem = require('./find-next-active-item');
 
@@ -11,11 +12,30 @@ var navigableCollectionItemActiveCb = function(navigableCollectionItem) {
 var findNextNavigableModel = function(navigableCollectionList, navigableItemReference, dir) {
   dir = sanitizeDir(dir);
 
+  console.log('nir-li', navigableItemReference.listIndex);
+
+  // Start on the current reference
+  //var startingListIndex = navigableItemReference.listIndex;
+  //var startingListIndex = navigableItemReference.listIndex - 1;
+  var startingListIndex = (dir > 0 ? navigableItemReference.listIndex-1 : navigableItemReference.listIndex+1);
+  /* * /
+  // Need to correct when rolling over backwards
+  if(dir < 0 && navigableItemReference.listIndex <= 0 && navigableItemReference.modelIndex <= 0) {
+    startingListIndex = navigableCollectionList.length;
+  }
+  /* */
+  /* */
+  // Need to correct when rolling over backwards
+  console.log(dir, startingListIndex, navigableItemReference.modelIndex);
+  if(dir < 0 && navigableItemReference.listIndex <= 0 && navigableItemReference.modelIndex <= 0) {
+    startingListIndex = 0;
+  }
+  /* */
+
   var nextModelResult;
   var collectionItemWithNextModelResult = findNextActiveItem(
     navigableCollectionList,
-    // Start on the current reference
-    navigableItemReference.listIndex - 1,
+    startingListIndex,
     dir,
     function(navigableCollectionItem, navigableCollectionItemIndex) {
       if(navigableCollectionItemActiveCb(navigableCollectionItem)) {
@@ -23,13 +43,12 @@ var findNextNavigableModel = function(navigableCollectionList, navigableItemRefe
         // Otherwise just move on to the next collectionItem.
         // This check only matters if there is more than one collection and
         // is what allows us to transfer over to the next.
-        console.log(navigableCollectionItemIndex, navigableItemReference.listIndex);
         if(navigableCollectionList.length > 1 && navigableCollectionItemIndex === navigableItemReference.listIndex) {
           console.log('::::', dir, navigableItemReference.modelIndex, navigableCollectionItem.collection.models.length-1);
           if(dir > 0 && navigableItemReference.modelIndex >= navigableCollectionItem.collection.models.length-1) {
             return false;
           }
-          else if(dir < 0 && navigableItemReference.modelIndex === 0) {
+          else if(dir < 0 && navigableItemReference.modelIndex <= 0) {
             return false;
           }
         }
@@ -56,14 +75,11 @@ var findNextNavigableModel = function(navigableCollectionList, navigableItemRefe
     //console.log('nextModelResult', nextModelResult);
     return {
       model: nextModelResult.item,
-      reference: {
-        // We don't use the mapKey here, but just leaving this here so you know
-        // We use it on the actual reference and you should extend this result
-        //mapKey: mapKey,
+      reference: _.extend({}, navigableItemReference, {
         listIndex: collectionItemWithNextModelResult.index,
         modelId: nextModelResult.item.id,
         modelIndex: nextModelResult.index
-      }
+      })
     };
   }
 
