@@ -224,18 +224,6 @@ function renderMainFrame(req, res, next, frame) {
         bootScriptName = 'router-nli-app';
       }
 
-      // pre-processing rooms
-      rooms = rooms
-        .filter(function(f) {
-          /* For some reason there can be null rooms. TODO: fix this upstream */
-          return !!f;
-        })
-        .map(function(room) {
-          room.selected = room.id == selectedRoomId;
-          room.name = roomNameTrimmer(room.name);
-          return room;
-        });
-
       var socialMetadata = permalinkChat ?
         social.getMetadataForChatPermalink({ room: req.troupe, chat: permalinkChat  }) :
         social.getMetadata({ room: req.troupe  });
@@ -261,6 +249,19 @@ function renderMainFrame(req, res, next, frame) {
 
       //TODO Remove this when favourite tab is removed for realz JP 8/4/16
       if(snapshots.leftMenu.state === 'favourite') { leftMenuRoomList = []; }
+
+      // pre-processing rooms
+      // Bad mutation ... BAD MUTATION
+      rooms = rooms
+        .filter(function(f) {
+          /* For some reason there can be null rooms. TODO: fix this upstream */
+          return !!f;
+        })
+        .map(function(room) {
+          room.selected = room.id == selectedRoomId;
+          room.name = roomNameTrimmer(room.name);
+          return room;
+        });
 
       res.render(template, {
         socialMetadata:         socialMetadata,
