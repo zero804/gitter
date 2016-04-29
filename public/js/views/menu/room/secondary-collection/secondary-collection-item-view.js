@@ -1,6 +1,7 @@
 'use strict';
 
 var _                       = require('underscore');
+var urlJoin                 = require('url-join');
 var roomNameShortener       = require('gitter-web-shared/room-name-shortener');
 var BaseCollectionItemView  = require('../base-collection/base-collection-item-view');
 var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
@@ -15,21 +16,21 @@ module.exports = BaseCollectionItemView.extend({
     this.listenTo(this.roomMenuModel, 'change:state:post', this.onMenuChangeState, this);
   },
 
-  serializeData: function() {
-    var data = parseForTemplate(this.model.toJSON(), this.roomMenuModel.get('state'));
+  getRoomUrl: function() {
+    var state = this.roomMenuModel.get('state');
+    var url = BaseCollectionItemView.prototype.getRoomUrl.apply(this, arguments);
 
-    if (data.fromUser) {
-      return _.extend({}, data, {
-        name: data.text,
-        avatarUrl: data.fromUser.avatarUrlSmall,
-      });
+    if(this.model.get('isSuggestion')) {
+      var sourceValue = state === 'org' ? 'all-rooms-list' : 'suggested-menu';
+      url = urlJoin(url, '?source=' + sourceValue);
     }
 
-    var name = (data.name || data.uri);
-    return _.extend({}, data, {
-      name:         roomNameShortener(name),
-      avatarSrcset: resolveRoomAvatarSrcSet({ uri: data.uri }, 22)
-    });
+    return url;
+  },
+
+  serializeData: function() {
+    var data = parseForTemplate(this.model.toJSON(), this.roomMenuModel.get('state'));
+    return data;
   },
 
   onMenuChangeState: function () {

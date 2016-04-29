@@ -47,12 +47,12 @@ describe('left-menu state', function() {
     });
   });
 
-  it('Resolves `/home` as the "all" state', function() {
+  it('Resolves `/home` as the "search" state', function() {
     var leftMenuState = generateLeftMenuState({}, 'home', orgListFixture);
 
     assert.deepEqual(leftMenuState,  {
       roomMenuIsPinned: true,
-      state: 'all',
+      state: 'search',
       selectedOrgName: 'home'
     });
   });

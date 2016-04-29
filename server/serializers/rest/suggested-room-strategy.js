@@ -66,6 +66,9 @@ function SuggestedRoomStrategy() {
     // the room (getSuggestionsForUserId.)
     var room = roomHash[suggestedRoom.roomId] || suggestedRoom;
 
+    // in case id wasn't loaded for whatever reason
+    room.id = room.id || room._id;
+
     var uri = room && room.uri;
     if (!uri) return;
 
