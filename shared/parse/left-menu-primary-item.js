@@ -17,8 +17,7 @@ module.exports = function parseContentToTemplateData(data, state) {
   }
 
   if(data.isSuggestion) {
-    var sourceValue = state === 'all' ? 'all-rooms-list' : 'suggested-menu';
-    data.uri = urlJoin(data.uri, '?source=' + sourceValue);
+    data.uri = urlJoin(data.uri, '?source=suggested-menu');
   }
 
   data.absoluteRoomUri = urlJoin(clientEnv.basePath, (data.uri || data.url));

@@ -1,6 +1,7 @@
 'use strict';
 
 var _                       = require('underscore');
+var urlJoin                 = require('url-join');
 var roomNameShortener       = require('gitter-web-shared/room-name-shortener');
 var BaseCollectionItemView  = require('../base-collection/base-collection-item-view');
 var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
@@ -13,6 +14,18 @@ module.exports = BaseCollectionItemView.extend({
   initialize: function() {
     BaseCollectionItemView.prototype.initialize.apply(this, arguments);
     this.listenTo(this.roomMenuModel, 'change:state:post', this.onMenuChangeState, this);
+  },
+
+  getRoomUrl: function() {
+    var state = this.roomMenuModel.get('state');
+    var url = BaseCollectionItemView.prototype.getRoomUrl.apply(this, arguments);
+
+    if(this.model.get('isSuggestion')) {
+      var sourceValue = state === 'org' ? 'all-rooms-list' : 'suggested-menu';
+      url = urlJoin(url, '?source=' + sourceValue);
+    }
+
+    return url;
   },
 
   serializeData: function() {
