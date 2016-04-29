@@ -11,16 +11,10 @@ var StatusError = require('statuserror');
  * this module should be removed
  */
 
-function generateOneToOnePermissionsForRoom(room) {
+function generateOneToOnePermissionsForRoom() {
   return {
-    oneToOne: true,
-    oneToOneUsers: room.oneToOneUsers,
-    type: undefined,
-    members: undefined,
-    admins: undefined,
+    type: 'ONE_TO_ONE',
     public: false, // All existing org rooms are private
-    linkPath: undefined,
-    externalId: undefined
   };
 }
 
@@ -72,7 +66,7 @@ function generateRepoPermissionsForRoom(room) {
 
 function generateRepoChannelPermissionsForRoom(room, parentRoom) {
   var uri = room.uri;
-  var ownerUri = uri.split(/\//).slice(0, 2).join('/');
+  var ownerUri = uri.split(/\//).slice(0, 1).join('/');
   var security = room.security;
   var githubId = parentRoom && parentRoom.githubId;
 
