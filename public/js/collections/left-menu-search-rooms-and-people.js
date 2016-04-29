@@ -78,7 +78,11 @@ module.exports = Backbone.Collection.extend({
 
     //format our results
     var results = currentRooms.concat(repos).concat(rooms).concat(people);
-    results     = uniqByUrl(results);
+    results     = uniqByUrl(results).map(function(model){
+      model.isHidden = false;
+      return model;
+    });
+
     this.reset(results);
   },
 
