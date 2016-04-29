@@ -1,9 +1,9 @@
 'use strict';
 
 var Marionette                      = require('backbone.marionette');
+var toggleClass                     = require('utils/toggle-class');
 var template                        = require('./base-collection-item-view.hbs');
 var updateUnreadIndicatorClassState = require('../../../../components/menu/update-unread-indicator-class-state');
-var toggleClass                     = require('utils/toggle-class');
 
 module.exports = Marionette.ItemView.extend({
 
@@ -11,10 +11,11 @@ module.exports = Marionette.ItemView.extend({
   template:  template,
 
   triggers: {
-    'click': 'item:clicked',
+    'click': 'item:activated',
   },
 
   modelEvents: {
+    'activated':       'onItemActivated',
     'change:selected': 'onSelectedChange',
     'change:focus':    'onItemFocused',
     'change:unreadItems change:mentions change:activity': 'onUnreadUpdate',
@@ -30,6 +31,7 @@ module.exports = Marionette.ItemView.extend({
   constructor: function(attrs) {
     this.roomMenuModel = attrs.roomMenuModel;
     this.index         = attrs.index;
+
     Marionette.ItemView.prototype.constructor.apply(this, arguments);
   },
 
@@ -38,6 +40,24 @@ module.exports = Marionette.ItemView.extend({
     return {
       'data-id': this.model.get('id'),
     };
+  },
+
+  getRoomName: function() {
+    var model = this.model;
+
+    var name = (model.get('uri') ||
+                model.get('url') ||
+                model.get('name') ||
+                (model.get('fromUser') && model.get('fromUser').username));
+
+    return name;
+  },
+
+  getRoomUrl: function() {
+    var name = this.getRoomName();
+    var url  = (name[0] !== '/') ?  '/' + name : name;
+
+    return url;
   },
 
   onRender: function (){
@@ -53,6 +73,10 @@ module.exports = Marionette.ItemView.extend({
           unreadIndicatorElement.style.animation = '';
       }, 16);
     });
+  },
+
+  onItemActivated: function() {
+    this.trigger('item:activated');
   },
 
   onSelectedChange: function(model, val) { //jshint unused: true
