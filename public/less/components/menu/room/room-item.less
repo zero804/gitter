@@ -7,21 +7,28 @@
 }
 
 .m-room-item() {
+  overflow:   hidden;
   height:     @menu-item-height * 3;
   max-height: @menu-item-height;
   opacity:    0;
-  transition: opacity .2s ease-in, max-height .2s ease-in;
-  overflow:   hidden;
+  color:      #ffffff;
+  transition:
+    height .2s ease-in,
+    max-height .2s ease-in,
+    opacity .2s ease-in;
+
+  &:hover {
+    //.room-item-selected();
+
+    & .room-item__options {
+      opacity: 1;
+    }
+  }
+
 
   &.active {
     max-height: @menu-item-height * 3;
   }
-
-  .loaded & {
-    opacity: 1;
-  }
-
-
 
   &.gu-mirror {
     opacity: 1;
@@ -37,16 +44,12 @@
     }
   }
 
-  &:hover {
-    //.room-item-selected();
-
-    & .room-item__options {
-      opacity: 1;
-    }
+  &.will-hideaway {
+    height: 0;
   }
 
-  .desktop & {
-    //margin-left:   @desktop-menu-left-padding / 2;
+  .loaded & {
+    opacity: 1;
   }
 
   .mobile & {

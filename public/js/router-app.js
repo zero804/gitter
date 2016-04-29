@@ -7,7 +7,6 @@ var appEvents                         = require('utils/appevents');
 var context                           = require('utils/context');
 var clientEnv                         = require('gitter-client-env');
 var Backbone                          = require('backbone');
-var _                                 = require('underscore');
 var AppLayout                         = require('views/layouts/app-layout');
 var LoadingView                       = require('views/app/loading-view');
 var troupeCollections                 = require('collections/instances/troupes');
@@ -85,7 +84,7 @@ onready(function() {
     return contentFrame.contentWindow.location;
   }
 
-  var roomSwitcher = new SPARoomSwitcher(troupeCollections.troupes, clientEnv['basePath'], getContentFrameLocation);
+  var roomSwitcher = new SPARoomSwitcher(troupeCollections.troupes, clientEnv.basePath, getContentFrameLocation);
   roomSwitcher.on('replace', function(href) {
     debug('Room switch: replace %s', href);
 
@@ -204,8 +203,34 @@ onready(function() {
     roomSwitcher.change(frameUrl);
   });
 
+  function onUnreadItemsCountMessage(message) {
+    var count = message.count;
+    var troupeId = message.troupeId;
+    if (troupeId !== context.getTroupeId()) {
+      debug('troupeId mismatch in unreadItemsCount: got', troupeId, 'expected', context.getTroupeId());
+    }
+
+    var v = {
+      unreadItems: count,
+    };
+
+    if (count === 0) {
+      // If there are no unread items, there can't be unread mentions
+      // either
+      v.mentions = 0;
+    }
+
+    debug('Received unread count message: troupeId=%s, update=%j ', troupeId, v);
+    allRoomsCollection.patch(troupeId, v);
+  }
+
+  function onClearActivityBadgeMessage(message) {
+    var troupeId = message.troupeId;
+    allRoomsCollection.patch(troupeId, { activity: 0 });
+  }
+
   window.addEventListener('message', function(e) {
-    if (e.origin !== clientEnv['basePath']) {
+    if (e.origin !== clientEnv.basePath) {
       debug('Ignoring message from %s', e.origin);
       return;
     }
@@ -255,25 +280,12 @@ onready(function() {
         break;
 
       case 'unreadItemsCount':
-        var count = message.count;
-        var troupeId = message.troupeId;
-        if (troupeId !== context.getTroupeId()) {
-          debug('troupeId mismatch in unreadItemsCount: got', troupeId, 'expected', context.getTroupeId());
-        }
+        onUnreadItemsCountMessage(message);
+        break;
 
-        var v = {
-        unreadItems: count,
-      };
-
-        if (count === 0) {
-          // If there are no unread items, there can't be unread mentions
-          // either
-          v.mentions = 0;
-        }
-
-        debug('Received unread count message: troupeId=%s, update=%j ', troupeId, v);
-        allRoomsCollection.patch(troupeId, v);
-      break;
+      case 'clearActivityBadge':
+        onClearActivityBadgeMessage(message);
+        break;
 
       case 'realtime.testConnection':
         var reason = message.reason;
@@ -313,7 +325,7 @@ onready(function() {
   }, false);
 
   function postMessage(message) {
-    chatIFrame.contentWindow.postMessage(JSON.stringify(message), clientEnv['basePath']);
+    chatIFrame.contentWindow.postMessage(JSON.stringify(message), clientEnv.basePath);
   }
 
   // Call preventDefault() on tab events so that we can manage focus as we want

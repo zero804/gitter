@@ -74,7 +74,6 @@ describe('room-membership-service', function() {
             return persistence.TroupeUser.findOne({ troupeId: troupeId3, userId: userId1 }).exec();
           })
           .then(function(troupeUser) {
-            assert.strictEqual(troupeUser.lurk, false);
             assert.strictEqual(troupeUser.flags, flags);
           });
       });
@@ -472,6 +471,34 @@ describe('room-membership-service', function() {
 
       });
 
+    });
+
+    describe('findLurkingRoomIdsForUserId', function() {
+      it('should return rooms in which a user is lurking', function() {
+        var troupeId1 = fixture.troupe1.id;
+        var troupeId2 = fixture.troupe2.id;
+        var troupeId3 = fixture.troupe3.id;
+        var userId1 = fixture.user1.id;
+
+        return Promise.join(
+            roomMembershipService.removeRoomMember(troupeId1, userId1),
+            roomMembershipService.removeRoomMember(troupeId2, userId1),
+            roomMembershipService.removeRoomMember(troupeId3, userId1))
+          .then(function() {
+            return Promise.join(
+              roomMembershipService.addRoomMember(troupeId1, userId1, roomMembershipFlags.MODES.all),
+              roomMembershipService.addRoomMember(troupeId2, userId1, roomMembershipFlags.MODES.announcement),
+              roomMembershipService.addRoomMember(troupeId3, userId1, roomMembershipFlags.MODES.mute));
+          })
+          .then(function() {
+            return roomMembershipService.findLurkingRoomIdsForUserId(userId1);
+          })
+          .then(function(troupeIds) {
+            assert.strictEqual(troupeIds.length, 1);
+            assert.strictEqual(String(troupeIds[0]), troupeId3);
+          });
+
+      });
     });
 
     describe('addRoomMember', function() {

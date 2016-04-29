@@ -169,7 +169,6 @@ describe('room-membership-flags', function () {
       it('should handle ' + testName, function() {
         var result = underTest.getUpdateForMode(mode, values.isDefault);
         assert.deepEqual(result, {
-          $set: { lurk: values.lurk },
           $bit: { flags: {
                     and: parseInt(values.and, 2),
                     or: parseInt(values.or, 2)

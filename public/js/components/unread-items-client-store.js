@@ -237,7 +237,7 @@ _.extend(UnreadItemStore.prototype, Backbone.Events, {
 
   markAllRead: function() {
     var lurkMode = this._lurkMode;
-    
+
     Object.keys(this._items).forEach(function(itemId) {
       var mention = this._items[itemId];
 
@@ -276,9 +276,9 @@ _.extend(UnreadItemStore.prototype, Backbone.Events, {
     return this._read.contains(itemId);
   },
 
-  reset: function(items) {
+  reset: function(items, lurking) {
     this.length = 0;
-    this._lurkMode = false;
+    this._lurkMode = !!lurking;
     this._read.reset();
 
     this._items = {};
