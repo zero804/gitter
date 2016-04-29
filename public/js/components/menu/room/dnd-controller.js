@@ -64,22 +64,24 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
   },
 
   onItemDropped: function(el, target, source, sibling) {//jshint unused: true
-    this.onDragDoneDeadzoneActivate(el, target);
+    var didActivate = this.onDragDoneDeadzoneActivate(el, target);
 
-    //guard against no drop target
-    if(!target || !target.dataset) { return }
+    if(!didActivate) {
+      //guard against no drop target
+      if(!target || !target.dataset) { return }
 
-    if (this.model.get('state') !== 'favourite' &&
-        target.dataset.stateChange === 'favourite') {
-      this.trigger('room-menu:add-favourite', el.dataset.id);
-      this.onDragEnd();
-    } else if (target.classList.contains('collection-list--primary')) {
-      this.trigger('room-menu:remove-favourite', el.dataset.id);
-      this.onDragEnd();
-    } else {
-      var siblingID = !!sibling && sibling.dataset.id;
-      this.trigger('room-menu:sort-favourite', el.dataset.id, siblingID);
-      this.onDragEnd();
+      if (this.model.get('state') !== 'favourite' &&
+          target.dataset.stateChange === 'favourite') {
+        this.trigger('room-menu:add-favourite', el.dataset.id);
+        this.onDragEnd();
+      } else if (target.classList.contains('collection-list--primary')) {
+        this.trigger('room-menu:remove-favourite', el.dataset.id);
+        this.onDragEnd();
+      } else {
+        var siblingID = !!sibling && sibling.dataset.id;
+        this.trigger('room-menu:sort-favourite', el.dataset.id, siblingID);
+        this.onDragEnd();
+      }
     }
   },
 
@@ -92,6 +94,7 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
     // So we will just consider it as a "click"/activation
     if(!target && this.currentDragDistance <= this.deadzone) {
       this.trigger('dnd:activate-item', el.dataset.id);
+      return true;
     }
   },
 
