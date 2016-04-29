@@ -53,6 +53,7 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
     'room-list-item.next': function(e) { this.selectNext(e, ROOM_LIST_KEY); },
 
     'room.1 room.2 room.3 room.4 room.5 room.6 room.7 room.8 room.9 room.10': function(e, handler) { this.selectByIndex(e, ROOM_LIST_KEY, handler); },
+    'minibar.1 minibar.2 minibar.3 minibar.4 minibar.5 minibar.6 minibar.7 minibar.8 minibar.9 minibar.10': function(e, handler) { this.selectByIndex(e, MINIBAR_KEY, handler); },
   },
 
   // Public method meant to be used on the outside
@@ -195,8 +196,8 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
       }
     }
 
+    // Fallback to find the first item in the first active collection
     if(!shouldGoToActive || !activeCollectionItemResult) {
-      // Find the first item in the first active collection
       var nextModelResult = findNextNavigableModel(this.navigableCollectionListMap[mapKey], {
         mapKey: mapKey,
         listIndex: 0,

@@ -213,11 +213,20 @@ module.exports = (function() {
   }
   keyEvents[cmdKey + '+' + roomKey + '+enter'] = 'room.enter';
 
-  // Go to a conversation by index in list
-  _.each('123456789'.split(''), function (n) {
-    keyEvents[cmdKey + '+' + roomKey + '+' + n] = 'room.' + n;
-  });
-  keyEvents[cmdKey + '+' + roomKey + '+0'] = 'room.10';
+  if(context.hasFeature('left-menu')) {
+    // Go to a conversation by index in list
+    _.each('123456789'.split(''), function (n) {
+      keyEvents[cmdKey + '+' + roomKey + '+' + n] = 'minibar.' + n;
+    });
+    keyEvents[cmdKey + '+' + roomKey + '+0'] = 'minibar.10';
+  }
+  else {
+    // Go to a conversation by index in list
+    _.each('123456789'.split(''), function (n) {
+      keyEvents[cmdKey + '+' + roomKey + '+' + n] = 'room.' + n;
+    });
+    keyEvents[cmdKey + '+' + roomKey + '+0'] = 'room.10';
+  }
 
   // Add listeners
 
