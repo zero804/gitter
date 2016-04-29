@@ -127,6 +127,8 @@ module.exports = Backbone.Model.extend({
     this.listenTo(this.searchTerms, 'filter-complete', this.fireUpdateActiveState, this);
     this.listenTo(this.suggestedOrgs, 'sync', this.fireUpdateActiveState, this);
     this.listenTo(this.suggestedOrgs, 'reset', this.fireUpdateActiveState, this);
+    this.listenTo(this.userSuggestions, 'sync', this.fireUpdateActiveState, this);
+    this.listenTo(this.userSuggestions, 'reset', this.fireUpdateActiveState, this);
     this.listenTo(this.searchRoomAndPeople, 'reset', this.fireUpdateActiveState, this);
     this.listenTo(this.searchChatMessages, 'reset', this.fireUpdateActiveState, this);
 

@@ -313,7 +313,6 @@ describe('Keyboard Controller', function() {
           dir
         );
 
-        console.log('nextResult', nextResult);
         assert.ok(nextResult);
         assert.strictEqual(nextResult.model.get('name'), mediumCollectionFixtureReferenceList[expectedReference.listIndex].at(expectedReference.modelIndex).get('name'));
         assertExpectedOnlyDeep(nextResult.reference, expectedReference);
@@ -382,6 +381,13 @@ describe('Keyboard Controller', function() {
     });
 
 
+    createMediumTest('Find next-item in first-collection when starting from middle in first-collection moving forward', FORWARDS, {
+      listIndex: 0,
+      modelIndex: 3
+    }, {
+      listIndex: 0,
+      modelIndex: 4
+    });
     createMediumTest('Find previous-item in first-collection when starting from middle in first-collection moving backward', BACKWARDS, {
       listIndex: 0,
       modelIndex: 3
@@ -390,6 +396,25 @@ describe('Keyboard Controller', function() {
       modelIndex: 2
     });
 
+
+    var mediumMiddleListIndex = Math.floor(mediumCollectionFixtureReferenceList.length/2);
+    createMediumTest('Find next-item in middle-collection when starting from middle in middle-collection moving forward', FORWARDS, {
+      listIndex: mediumMiddleListIndex,
+      modelIndex: 3
+    }, {
+      listIndex: mediumMiddleListIndex,
+      modelIndex: 4
+    });
+    createMediumTest('Find previous-item in middle-collection when starting from middle in middle-collection moving backward', BACKWARDS, {
+      listIndex: mediumMiddleListIndex,
+      modelIndex: 3
+    }, {
+      listIndex: mediumMiddleListIndex,
+      modelIndex: 2
+    });
+
+
+    // TODO: Add tests for different collections with tricky hidden combos
 
   });
 

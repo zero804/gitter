@@ -12,25 +12,12 @@ var navigableCollectionItemActiveCb = function(navigableCollectionItem) {
 var findNextNavigableModel = function(navigableCollectionList, navigableItemReference, dir) {
   dir = sanitizeDir(dir);
 
-  console.log('nir-li', navigableItemReference.listIndex);
-
   // Start on the current reference
-  //var startingListIndex = navigableItemReference.listIndex;
-  //var startingListIndex = navigableItemReference.listIndex - 1;
   var startingListIndex = (dir > 0 ? navigableItemReference.listIndex-1 : navigableItemReference.listIndex+1);
-  /* * /
   // Need to correct when rolling over backwards
-  if(dir < 0 && navigableItemReference.listIndex <= 0 && navigableItemReference.modelIndex <= 0) {
-    startingListIndex = navigableCollectionList.length;
-  }
-  /* */
-  /* */
-  // Need to correct when rolling over backwards
-  console.log(dir, startingListIndex, navigableItemReference.modelIndex);
   if(dir < 0 && navigableItemReference.listIndex <= 0 && navigableItemReference.modelIndex <= 0) {
     startingListIndex = 0;
   }
-  /* */
 
   var nextModelResult;
   var collectionItemWithNextModelResult = findNextActiveItem(
@@ -39,19 +26,6 @@ var findNextNavigableModel = function(navigableCollectionList, navigableItemRefe
     dir,
     function(navigableCollectionItem, navigableCollectionItemIndex) {
       if(navigableCollectionItemActiveCb(navigableCollectionItem)) {
-        // Check to make sure we weren't at the extremes when we came here
-        // Otherwise just move on to the next collectionItem.
-        // This check only matters if there is more than one collection and
-        // is what allows us to transfer over to the next.
-        if(navigableCollectionList.length > 1 && navigableCollectionItemIndex === navigableItemReference.listIndex) {
-          console.log('::::', dir, navigableItemReference.modelIndex, navigableCollectionItem.collection.models.length-1);
-          if(dir > 0 && navigableItemReference.modelIndex >= navigableCollectionItem.collection.models.length-1) {
-            return false;
-          }
-          else if(dir < 0 && navigableItemReference.modelIndex <= 0) {
-            return false;
-          }
-        }
 
         var modelResult = findNextActiveItem(
           navigableCollectionItem.collection.models,
@@ -62,6 +36,34 @@ var findNextNavigableModel = function(navigableCollectionList, navigableItemRefe
             return !model.get('isHidden');
           }
         );
+
+        // Check to make sure we aren't at the extremes of the available non-hidden items
+        // Otherwise just move on to the next collectionItem.
+        // This check only matters if there is more than one collection and
+        // is what allows us to transfer over to the next.
+        if(navigableCollectionList.length > 1 && navigableCollectionItemIndex === navigableItemReference.listIndex) {
+          if(
+            dir > 0 &&
+            (
+              navigableItemReference.modelIndex >= navigableCollectionItem.collection.models.length-1 ||
+              // No more collections going forward
+              modelResult && Number.isInteger(navigableItemReference.modelIndex) && modelResult.index <= navigableItemReference.modelIndex
+            )
+          ) {
+            return false;
+          }
+          else if(
+            dir < 0 &&
+            (
+              navigableItemReference.modelIndex <= 0 ||
+              // No more collections going backward
+              modelResult && Number.isInteger(navigableItemReference.modelIndex) && modelResult.index >= navigableItemReference.modelIndex
+            )
+          ) {
+            return false;
+          }
+        }
+
 
         if(modelResult) {
           nextModelResult = modelResult;
