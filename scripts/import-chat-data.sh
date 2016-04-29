@@ -17,7 +17,7 @@ execute_local() {
 }
 
 execute_prod() {
-  mongo --quiet mongo-replica-member-004/gitter --eval "rs.slaveOk(); $1"
+  mongo --quiet mongo-replica-02/gitter --eval "rs.slaveOk(); $1"
 }
 
 PROD_ROOM_ID=$(execute_prod "db.troupes.findOne({ lcUri: '$ROOM_URI' }, { _id: 1 })._id.valueOf()")
@@ -39,7 +39,7 @@ if [[ -z $DEV_USER_ID ]]; then
   exit 1
 fi
 
-mongoexport -h mongo-replica-member-004 -d gitter -c chatmessages -q "{ toTroupeId: ObjectId('$PROD_ROOM_ID') }" --jsonArray > /tmp/chats.json
+mongoexport -h mongo-replica-02 -d gitter -c chatmessages -q "{ toTroupeId: ObjectId('$PROD_ROOM_ID') }" --jsonArray > /tmp/chats.json
 
 node -e "
   var data = '';
@@ -52,11 +52,11 @@ node -e "
     var array = JSON.parse(data);
     array.forEach(function(d) {
       if(d.toTroupeId) {
-        d.toTroupeId.\$oid = '$DEV_ROOM_ID';        
-      }     
-      
+        d.toTroupeId.\$oid = '$DEV_ROOM_ID';
+      }
+
       if(d.fromUserId) {
-        d.fromUserId.\$oid = '$DEV_USER_ID';        
+        d.fromUserId.\$oid = '$DEV_USER_ID';
       }
     });
     console.log(JSON.stringify(array))
