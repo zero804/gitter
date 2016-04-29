@@ -1483,6 +1483,10 @@ function renameRepo(oldUri, newUri) {
               var newChannelUri = newUri + '/' + channel.uri.split('/')[2];
               var newChannelLcUri = newChannelUri.toLowerCase();
 
+              if (originalLcUri !== newChannelLcUri) {
+                channel.renamedLcUris.addToSet(originalLcUri);
+              }
+
               channel.lcUri = newChannelLcUri;
               channel.uri = newChannelUri;
               channel.lcOwner = lcOwner;
