@@ -35,7 +35,7 @@ package: npm
 	gulp package
 
 submit-to-coveralls: npm test
-	gulp submit-coveralls-post-tests
+	gulp submit-coveralls-post-tests submit-codacy-post-tests
 
 clean:
 	rm -rf output

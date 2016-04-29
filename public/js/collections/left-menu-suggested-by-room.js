@@ -8,8 +8,15 @@ var SyncMixin                      = require('./sync-mixin');
 
 var SuggestionsContextModel = Backbone.Model.extend({});
 
-var SuggestedCollection = SuggestedRoomsByRoomCollection.extend({
+var Model = Backbone.Model.extend({
+  defaults: {
+    isSuggestion: true
+  }
+});
 
+var SuggestedCollection = SuggestedRoomsByRoomCollection.extend({
+  model: Model,
+  
   initialize: function(models, attrs, options) {
 
     if (!attrs || !attrs.roomMenuModel) {
