@@ -108,6 +108,12 @@ module.exports = Marionette.CollectionView.extend({
       modelName = this.model.get('name');
     }
 
+    // Set the minibar-item active
+    model.set({
+      active: true
+    });
+
+    // Update the minibar state
     this.model.set({
       panelOpenState:       true,
       state:                model.get('type'),
