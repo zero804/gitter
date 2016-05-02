@@ -450,8 +450,18 @@ var cssIosStyleBuilder = styleBuilder([
     globalVars: {
       'target-env': '"mobile"'
     }
+  },
+  streamTransform: function(stream) {
+    return stream
+      .pipe(postcss([
+        autoprefixer({
+          browsers: ['ios_saf >= 6'],
+          cascade: false
+        }),
+        mqpacker,
+        csswring
+      ]));
   }
-  // streamTransform: function(stream) { return stream; }
 });
 
 gulp.task('css-ios', function() {
@@ -473,8 +483,23 @@ var cssMobileStyleBuilder = styleBuilder([
     globalVars: {
       'target-env': '"mobile"'
     }
+  },
+  streamTransform: function(stream) {
+    return stream
+      .pipe(postcss([
+        autoprefixer({
+          browsers: [
+            'last 4 ios_saf versions',
+            'last 4 and_chr versions',
+            'last 4 and_ff versions',
+            'last 2 ie_mob versions'
+          ],
+          cascade: false
+        }),
+        mqpacker,
+        csswring
+      ]));
   }
-  // streamTransform: function(stream) { return stream; }
 });
 
 gulp.task('css-mobile', function() {
@@ -512,8 +537,23 @@ var cssWebStyleBuilder = styleBuilder([
     globalVars: {
       'target-env': '"web"'
     }
+  },
+  streamTransform: function(stream) {
+    return stream
+      .pipe(postcss([
+        autoprefixer({
+          browsers: [
+            'Safari >= 5',
+            'last 4 Firefox versions',
+            'last 4 Chrome versions',
+            'IE >= 10'
+          ],
+          cascade: false
+        }),
+        mqpacker,
+        csswring
+      ]));
   }
-  // streamTransform: function(stream) { return stream; }
 });
 
 gulp.task('css-web', function() {
