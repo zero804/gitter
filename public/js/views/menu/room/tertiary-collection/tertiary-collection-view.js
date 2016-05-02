@@ -1,25 +1,34 @@
 'use strict';
 
 var _                       = require('underscore');
+var urlJoin                 = require('url-join');
 var Marionette              = require('backbone.marionette');
+var toggleClass             = require('utils/toggle-class');
 var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
+var roomNameShortener       = require('gitter-web-shared/room-name-shortener');
 var BaseCollectionView      = require('../base-collection/base-collection-view');
 var BaseCollectionItemView  = require('../base-collection/base-collection-item-view');
-var roomNameShortener       = require('gitter-web-shared/room-name-shortener');
 var EmptySearchView         = require('./tertiary-collection-item-search-empty-view');
-var toggleClass             = require('utils/toggle-class');
+var parseForTemplate        = require('gitter-web-shared/parse/left-menu-primary-item');
 
 var proto = BaseCollectionView.prototype;
 
 var ItemView = BaseCollectionItemView.extend({
-  serializeData: function() {
-    var data = this.model.toJSON();
-    var name = (data.name || data.uri || '');
-    return _.extend({}, data, {
-      name:         roomNameShortener(name),
-      avatarSrcset: (!data.isRecentSearch) ? resolveRoomAvatarSrcSet({ uri: name }, 22) : null,
-    });
+
+  getRoomUrl: function() {
+    var url = BaseCollectionItemView.prototype.getRoomUrl.apply(this, arguments);
+
+    if(this.model.get('isSuggestion')) {
+      url = urlJoin(url, '?source=suggested-menu');
+    }
+
+    return url;
   },
+
+  serializeData: function() {
+    var data = parseForTemplate(this.model.toJSON(), this.roomMenuModel.get('state'));
+    return data;
+  }
 });
 
 module.exports =  BaseCollectionView.extend({

@@ -1,10 +1,9 @@
 'use strict';
 
 var Marionette                      = require('backbone.marionette');
-var toggleClass                     = require('utils/toggle-class');
 var cocktail                        = require('cocktail');
-var KeyboardEventMixin              = require('views/keyboard-events-mixin');
 var toggleClass                     = require('utils/toggle-class');
+var KeyboardEventMixin              = require('views/keyboard-events-mixin');
 var template                        = require('./base-collection-item-view.hbs');
 var updateUnreadIndicatorClassState = require('../../../../components/menu/update-unread-indicator-class-state');
 
@@ -22,6 +21,7 @@ var BaseCollectionItemView = Marionette.ItemView.extend({
   },
 
   modelEvents: {
+    'activated':     'onItemActivated',
     'change:active': 'onActiveChange',
     'change:focus':    'onItemFocused',
     'change:unreadItems change:mentions change:activity': 'onUnreadUpdate',
@@ -39,6 +39,7 @@ var BaseCollectionItemView = Marionette.ItemView.extend({
   constructor: function(attrs) {
     this.roomMenuModel = attrs.roomMenuModel;
     this.index         = attrs.index;
+
     Marionette.ItemView.prototype.constructor.apply(this, arguments);
   },
 
@@ -47,6 +48,24 @@ var BaseCollectionItemView = Marionette.ItemView.extend({
     return {
       'data-id': this.model.get('id'),
     };
+  },
+
+  getRoomName: function() {
+    var model = this.model;
+
+    var name = (model.get('uri') ||
+                model.get('url') ||
+                model.get('name') ||
+                (model.get('fromUser') && model.get('fromUser').username));
+
+    return name;
+  },
+
+  getRoomUrl: function() {
+    var name = this.getRoomName();
+    var url  = (name[0] !== '/') ?  '/' + name : name;
+
+    return url;
   },
 
   onRender: function (){
@@ -68,12 +87,16 @@ var BaseCollectionItemView = Marionette.ItemView.extend({
     toggleClass(this.ui.container[0], 'active', !!val);
   },
 
-  onItemActivated: function(e) {
+  onKeyboardItemActivated: function(e) {
     // Check to make sure the keyboard event was even spawned from this view
     if(e.target === this.ui.container[0]) {
-      this.trigger('item:activated', this);
+      this.onItemActivated();
       e.preventDefault();
     }
+  },
+
+  onItemActivated: function(e) {
+    this.trigger('item:activated');
   },
 
   onItemFocused: function(model, val) {//jshint unused: true
