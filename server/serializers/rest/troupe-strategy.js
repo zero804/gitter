@@ -7,10 +7,9 @@ var userService           = require("../../services/user-service");
 var recentRoomCore        = require('../../services/core/recent-room-core');
 var roomMembershipService = require('../../services/room-membership-service');
 var billingService        = require('../../services/billing-service');
-var roomPermissionsModel  = require('../../services/room-permissions-model');
+var roomPermissionsModel  = require('gitter-web-permissions/lib/room-permissions-model');
 var troupeService         = require('../../services/troupe-service');
 var _                     = require("lodash");
-var winston               = require('../../utils/winston');
 var collections           = require('../../utils/collections');
 var debug                 = require('debug')('gitter:troupe-strategy');
 var Promise               = require('bluebird');
@@ -119,87 +118,57 @@ FavouriteTroupesForUserStrategy.prototype = {
   name: 'FavouriteTroupesForUserStrategy'
 };
 
-function LurkTroupeForUserStrategy(options) {
+function LurkAndActivityForUserStrategy(options) {
   var currentUserId = options.currentUserId;
   var roomsWithLurk;
+  var activity;
 
   this.preload = function() {
-    return roomMembershipService.findRoomIdsForUserWithLurk(currentUserId)
-      .then(function(result) {
-        roomsWithLurk = result;
-      });
-  };
+    return roomMembershipService.findLurkingRoomIdsForUserId(currentUserId)
+      .then(function(troupeIds) {
+        // Map the lurkers
+        roomsWithLurk = _.reduce(troupeIds, function(memo, troupeId) {
+          memo[troupeId] = true;
+          return memo;
+        }, {});
 
-  this.map = function(roomId) {
-    return roomsWithLurk[roomId];
-  };
-}
-LurkTroupeForUserStrategy.prototype = {
-  name: 'LurkTroupeForUserStrategy'
-};
-
-function ActivityForUserStrategy(options) {
-  var currentUserId = options.currentUserId;
-  var activity = {};
-
-  this.preload = function(troupeIds) {
-    return unreadItemService.getActivityIndicatorForTroupeIds(troupeIds.toArray(), currentUserId)
+        // Map the activity indicators
+        return unreadItemService.getActivityIndicatorForTroupeIds(troupeIds, currentUserId);
+      })
       .then(function(values) {
         activity = values;
       });
   };
 
-  this.map = function(roomId) {
+  this.mapLurkStatus = function(roomId) {
+    return roomsWithLurk[roomId] || false;
+  };
+
+  this.mapActivity = function(roomId) {
     return activity[roomId];
   };
 }
-ActivityForUserStrategy.prototype = {
-  name: 'ActivityForUserStrategy'
+LurkAndActivityForUserStrategy.prototype = {
+  name: 'LurkAndActivityForUserStrategy'
 };
 
-
-
-function TagsStrategy(options) {
+function TagsStrategy() {
   var self = this;
   self.tagMap = {};
 
-  this.preload = Promise.method(function(rooms, callback) {
+  this.preload = Promise.method(function(rooms) {
     rooms.forEach(function(room) {
       self.tagMap[room.id] = room.tags;
     });
   });
 
   this.map = function(roomId) {
-    if (options.includeTags) {
-      return self.tagMap[roomId] || [];
-    }
+    return self.tagMap[roomId] || [];
   };
 }
 TagsStrategy.prototype = {
   name: 'TagsStrategy'
 };
-
-
-function DisabledProvidersStrategy(options) {
-  var self = this;
-  self.providerMap = {};
-
-  this.preload = Promise.method(function(rooms, callback) {
-    rooms.forEach(function(room) {
-      if (room.disabledProviders && room.disabledProviders.length) {
-        self.providerMap[room.id] = room.disabledProviders;
-      }
-    });
-  });
-
-  this.map = function(roomId) {
-    return self.providerMap[roomId] || undefined;
-  };
-}
-DisabledProvidersStrategy.prototype = {
-  name: 'DisabledProvidersStrategy'
-};
-
 
 
 function ProOrgStrategy() {
@@ -321,11 +290,9 @@ function TroupeStrategy(options) {
 
   var unreadItemStrategy     = currentUserId && !options.skipUnreadCounts ? new AllUnreadItemCountStrategy(options) : null;
   var lastAccessTimeStrategy = currentUserId ? new LastTroupeAccessTimesForUserStrategy(options) : null;
-  var favouriteStrategy     = currentUserId ? new FavouriteTroupesForUserStrategy(options) : null;
-  var lurkStrategy          = currentUserId ? new LurkTroupeForUserStrategy(options) : null;
-  var activityStrategy      = currentUserId ? new ActivityForUserStrategy(options) : null;
-  var tagsStrategy          = currentUserId ? new TagsStrategy(options) : null;
-  var disabledProvidersStrategy = currentUserId ? new DisabledProvidersStrategy(options) : null;
+  var favouriteStrategy      = currentUserId ? new FavouriteTroupesForUserStrategy(options) : null;
+  var lurkActivityStrategy   = currentUserId ? new LurkAndActivityForUserStrategy(options) : null;
+  var tagsStrategy          = (options.includeTags) ? new TagsStrategy(options) : null;
   var userIdStrategy         = new UserIdStrategy(options);
   var proOrgStrategy        = new ProOrgStrategy(options);
   var permissionsStrategy    = (currentUserId || options.currentUser) && options.includePermissions ? new TroupePermissionsStrategy(options) : null;
@@ -370,8 +337,8 @@ function TroupeStrategy(options) {
       strategies.push(lastAccessTimeStrategy.preload());
     }
 
-    if (lurkStrategy) {
-      strategies.push(lurkStrategy.preload());
+    if (lurkActivityStrategy) {
+      strategies.push(lurkActivityStrategy.preload());
     }
 
     if (permissionsStrategy) {
@@ -382,16 +349,8 @@ function TroupeStrategy(options) {
       strategies.push(ownerIsOrgStrategy.preload(items));
     }
 
-    if (activityStrategy) {
-      strategies.push(activityStrategy.preload(troupeIds));
-    }
-
     if (tagsStrategy) {
       strategies.push(tagsStrategy.preload(items));
-    }
-
-    if (disabledProvidersStrategy) {
-      strategies.push(disabledProvidersStrategy.preload(items));
     }
 
     return Promise.all(strategies);
@@ -423,7 +382,7 @@ function TroupeStrategy(options) {
         otherUser = mapOtherUser(item.oneToOneUsers);
       } else {
         if (!shownWarning) {
-          winston.warn('TroupeStrategy initiated without currentUserId, but generating oneToOne troupes. This can be a problem!');
+          logger.warn('TroupeStrategy initiated without currentUserId, but generating oneToOne troupes. This can be a problem!');
           shownWarning = true;
         } else {
           otherUser = null;
@@ -445,6 +404,20 @@ function TroupeStrategy(options) {
 
     var unreadCounts = unreadItemStrategy && unreadItemStrategy.map(item.id);
 
+    // mongoose is upgrading old undefineds to [] on load and we don't want to
+    // send through that no providers are allowed in that case
+    var providers = (options.includeProviders && item.providers && item.providers.length) ? item.providers : undefined;
+
+    var isLurking;
+    var hasActivity;
+    if (lurkActivityStrategy) {
+      isLurking = lurkActivityStrategy.mapLurkStatus(item.id);
+      if (isLurking) {
+        // Can only have activity if you're lurking
+        hasActivity = lurkActivityStrategy.mapActivity(item.id);
+      }
+    }
+
     return {
       id: item.id || item._id,
       name: troupeName,
@@ -457,15 +430,15 @@ function TroupeStrategy(options) {
       mentions: unreadCounts ? unreadCounts.mentions : undefined,
       lastAccessTime: lastAccessTimeStrategy ? lastAccessTimeStrategy.map(item.id) : undefined,
       favourite: favouriteStrategy ? favouriteStrategy.map(item.id) : undefined,
-      lurk: lurkStrategy ? !item.oneToOne && lurkStrategy.map(item.id) : undefined,
-      activity: activityStrategy ? activityStrategy.map(item.id) : undefined,
+      lurk: isLurking,
+      activity: hasActivity,
       url: troupeUrl,
       githubType: item.githubType,
       security: item.security,
       premium: isPro,
       noindex: item.noindex,
       tags: tagsStrategy ? tagsStrategy.map(item.id) : undefined,
-      disabledProviders: disabledProvidersStrategy ? disabledProvidersStrategy.map(item.id) : undefined,
+      providers: providers,
       permissions: permissionsStrategy ? permissionsStrategy.map(item) : undefined,
       ownerIsOrg: ownerIsOrgStrategy ? ownerIsOrgStrategy.map(item) : undefined,
       roomMember: roomMembershipStrategy ? roomMembershipStrategy.map(item.id) : undefined,

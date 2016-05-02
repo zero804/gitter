@@ -36,6 +36,7 @@ var uglify = require('gulp-uglify');
 var coveralls = require('gulp-coveralls');
 var lcovMerger = require('lcov-result-merger');
 var sonar = require('gulp-sonar');
+var codacy = require('gulp-codacy');
 
 var fs = require('fs-extra');
 var path = require('path');
@@ -80,31 +81,41 @@ var cssWatchGlob = 'public/**/*.less';
 
 
 
-
 /* Don't do clean in gulp, use make */
 var RUN_TESTS_IN_PARALLEL = false;
 
 var testModules = {
-  'integration': ['./test/integration/**/*.js', './test/public-js/**/*.js'],
-  'cache-wrapper': ['./modules/cache-wrapper/test/*.js'],
-  'github': ['./modules/github/test/*.js'],
-  'github-backend': ['./modules/github-backend/test/*.js'],
-  'push-notification-filter': ['./modules/push-notification-filter/test/*.js'],
-  'split-tests': ['./modules/split-tests/test/*.js'],
-  'presence': ['./modules/presence/test/*.js'],
+  'integration': { files: ['./test/integration/**/*.js', './test/public-js/**/*.js'], includeInFast: true },
+  'cache-wrapper': { files: ['./modules/cache-wrapper/test/*.js'], includeInFast: false },
+  'github': { files: ['./modules/github/test/*.js'], includeInFast: false },
+  'github-backend': { files: ['./modules/github-backend/test/*.js'], includeInFast: false },
+  'push-notification-filter': { files: ['./modules/push-notification-filter/test/*.js'], includeInFast: false },
+  'split-tests': { files: ['./modules/split-tests/test/*.js'], includeInFast: false },
+  'presence': { files: ['./modules/presence/test/*.js'], includeInFast: false },
+  'permissions': { files: ['./modules/permissions/test/**/*.js'], includeInFast: false },
+  'persistence-utils': { files: ['./modules/persistence-utils/test/*.js'], includeInFast: false },
 };
 
 /** Make a series of tasks based on the test modules */
-function makeTestTasks(taskName, generator) {
+function makeTestTasks(taskName, generator, isFast) {
   Object.keys(testModules).forEach(function(moduleName) {
-    var files = testModules[moduleName];
+    var definition = testModules[moduleName];
+
+    if (isFast && !definition.includeInFast) {
+      return;
+    }
 
     gulp.task(taskName + '-' + moduleName, function() {
-      return generator(moduleName, files);
+      return generator(moduleName, definition.files);
     });
   });
 
-  var childTasks = Object.keys(testModules).map(function(moduleName) { return taskName + '-' + moduleName; });
+  var childTasks = Object.keys(testModules)
+    .filter(function(moduleName) {
+      var definition = testModules[moduleName];
+      return !isFast || definition.includeInFast;
+    })
+    .map(function(moduleName) { return taskName + '-' + moduleName; });
 
   if (RUN_TESTS_IN_PARALLEL) {
     // Run tests in parallel
@@ -231,6 +242,17 @@ gulp.task('merge-lcov', function() {
     .pipe(gulp.dest('output/coverage-reports/merged/'));
 });
 
+gulp.task('submit-codacy-post-tests', ['merge-lcov'], function() {
+  return gulp.src(['output/coverage-reports/merged/lcov.info'], { read: false })
+    .pipe(codacy({
+      token: '30c3b1cf278c41c795b06235102f141b'
+    }));
+});
+
+gulp.task('submit-codacy', ['test-mocha'/*, 'test-redis-lua'*/], function(callback) {
+  runSequence('submit-codacy-post-tests', callback);
+});
+
 gulp.task('submit-coveralls-post-tests', ['merge-lcov'], function() {
   var GIT_BRANCH = process.env.GIT_BRANCH;
   if (GIT_BRANCH) {
@@ -254,7 +276,7 @@ gulp.task('submit-coveralls', ['test-mocha'/*, 'test-redis-lua'*/], function(cal
   runSequence('submit-coveralls-post-tests', callback);
 });
 
-gulp.task('test', ['test-mocha'/*, 'test-redis-lua'*/, 'submit-coveralls']);
+gulp.task('test', ['test-mocha'/*, 'test-redis-lua'*/, 'submit-coveralls', 'submit-codacy']);
 
 makeTestTasks('localtest', function(name, files) {
   return gulp.src(files, { read: false })
@@ -320,7 +342,7 @@ makeTestTasks('fasttest', function(name, files) {
         DISABLE_CONSOLE_LOGGING: 1
       }
     }));
-});
+}, true);
 
 gulp.task('copy-app-files', function() {
   return gulp.src([

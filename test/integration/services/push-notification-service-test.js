@@ -5,8 +5,8 @@
 var testRequire = require('../test-require');
 
 var pushNotificationService = testRequire('./services/push-notification-service');
-var persistenceService = testRequire('./services/persistence-service');
-var mongoUtils = testRequire('./utils/mongo-utils');
+var persistenceService = require('gitter-web-persistence');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 var assert = require("assert");
 

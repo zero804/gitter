@@ -1,6 +1,6 @@
 "use strict";
 
-var persistence           = require("./persistence-service");
+var persistence           = require('gitter-web-persistence');
 var Promise               = require('bluebird');
 var roomMembershipService = require('./room-membership-service');
 
@@ -25,6 +25,7 @@ function findPublicChannels(user, query, options) {
     return { lcUri: re };
   });
 
+  // TODO: switch to `permissions`
   return persistence.Troupe
     .find({
       $and: filterQueries,

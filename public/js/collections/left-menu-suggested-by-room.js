@@ -8,8 +8,15 @@ var SyncMixin                      = require('./sync-mixin');
 
 var SuggestionsContextModel = Backbone.Model.extend({});
 
-var SuggestedCollection = SuggestedRoomsByRoomCollection.extend({
+var Model = Backbone.Model.extend({
+  defaults: {
+    isSuggestion: true
+  }
+});
 
+var SuggestedCollection = SuggestedRoomsByRoomCollection.extend({
+  model: Model,
+  
   initialize: function(models, attrs, options) {
 
     if (!attrs || !attrs.roomMenuModel) {
@@ -53,6 +60,8 @@ var SuggestedCollection = SuggestedRoomsByRoomCollection.extend({
     //If we have not changed room dont fetch
     if(!this.contextModel.changed.roomId) { return }
 
+    //If a user has previously dismissed suggestions never fetch()
+    if(this.roomMenuModel.get('hasDismissedSuggestions')) { return; }
     this.fetch();
   },
 

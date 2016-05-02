@@ -9,7 +9,7 @@ var ensureLoggedIn               = require('../web/middlewares/ensure-logged-in'
 var crypto                       = require('crypto');
 var userSettingsService          = require('../services/user-settings-service');
 var passphrase                   = config.get('email:unsubscribeNotificationsSecret');
-var roomPermissionsModel         = require('../services/room-permissions-model');
+var roomPermissionsModel         = require('gitter-web-permissions/lib/room-permissions-model');
 var request                      = require('request');
 var uriContextResolverMiddleware = require('./app/middleware').uriContextResolverMiddleware;
 var jwt                          = require('jwt-simple');
@@ -18,6 +18,7 @@ var services                     = require('gitter-services');
 var identifyRoute                = env.middlewares.identifyRoute;
 var debug                        = require('debug')('gitter:settings-route');
 var StatusError                  = require('statuserror');
+var userScopes                   = require('../utils/models/user-scopes');
 
 var supportedServices = [
   { id: 'github',    name: 'GitHub'},
@@ -105,8 +106,8 @@ function createIntegration(req, res, next) {
 
     // Pass through the token if we have write access
     // TODO: deal with private repos too
-    if(req.user.hasGitHubScope('public_repo')) {
-      encryptedUserToken = jwt.encode(req.user.getGitHubToken('public_repo'), config.get('jwt:secret'));
+    if(userScopes.hasGitHubScope(req.user, 'public_repo')) {
+      encryptedUserToken = jwt.encode(userScopes.getGitHubToken(req.user, 'public_repo'), config.get('jwt:secret'));
     } else {
       encryptedUserToken = "";
     }

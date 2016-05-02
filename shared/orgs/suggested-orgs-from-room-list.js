@@ -4,12 +4,15 @@ var _                       = require('lodash');
 var resolveRoomAvatarSrcSet = require('../avatars/resolve-room-avatar-srcset.js');
 var getOrgNameFromUri       = require('../get-org-name-from-uri');
 var defaultFilter           = require('../filters/left-menu-primary-default');
+var defaultFavouriteFilter  = require('../filters/left-menu-primary-favourite');
+var defaultOneToOneFilter   = require('../filters/left-menu-primary-one2one');
+var favouriteOneToOneFilter   = require('../filters/left-menu-primary-favourite-one2one');
 
 module.exports = function suggestedOrgsFromRoomList(roomList, uri, currentRoomId, currentRoom) {
   var orgList = roomList.reduce(function(memo, room) {
-    //remove on-to-one conversations
-    if (room.githubType === 'ONETOONE') { return memo; }
-    if (!defaultFilter(room)) { return memo; }
+    //remove one-to-one conversations
+    if (defaultOneToOneFilter(room) || favouriteOneToOneFilter(room)) { return memo; }
+    if (!defaultFilter(room) && !defaultFavouriteFilter(room)) { return memo; }
 
     //In the case where a user is lurking in the current room and activity is updated
     //we just clear it right away JP 17/3/16
@@ -37,7 +40,7 @@ module.exports = function suggestedOrgsFromRoomList(roomList, uri, currentRoomId
     return memo;
   }, []);
 
-  //If we are viewing a room owned by an org which the user is not yet a memeber of
+  //If we are viewing a room owned by an org which the user is not yet a member of
   //we shunt the new org to the top of the minibar list JP 8/3/16
   var currentOrg = getOrgNameFromUri(uri);
 
@@ -63,7 +66,7 @@ function getOrgItem(name, room, isViewingTemporaryOrg) {
     id:           name,
     unreadItems:  (room.unreadItems || 0),
     mentions:     (room.mentions || 0),
-    activity:     (!!room.lurk && room.activity),
+    activity:     room.activity,
     isOrg:        true,
 
     //we add a temp variable here to specify a user is viewing a room

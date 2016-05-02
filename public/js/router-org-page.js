@@ -5,7 +5,7 @@ var Backbone    = require('backbone');
 var appEvents   = require('utils/appevents');
 var modalRegion = require('components/modal-region');
 var _           = require('underscore');
-var context     = require('utils/context');
+var clientEnv   = require('gitter-client-env');
 
 require('gitter-styleguide/css/components/buttons.css');
 require('gitter-styleguide/css/components/headings.css');
@@ -24,7 +24,7 @@ onReady(function(){
 
   //listen for postMessageCalls
   window.addEventListener('message', function onWindowMessage(message, targetOrigin){
-    if (message.origin !== context.env('basePath')) return;
+    if (message.origin !== clientEnv['basePath']) return;
 
     var data;
     if(_.isString(message.data)) {
@@ -47,7 +47,7 @@ onReady(function(){
 
     routes: {
       '': 'index',
-      ':rommId/tags': 'onNavigateTags'
+      ':roomId/tags': 'onNavigateTags'
     },
 
     index: function(){

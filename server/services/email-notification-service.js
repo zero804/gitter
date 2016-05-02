@@ -9,7 +9,7 @@ var passphrase          = config.get('email:unsubscribeNotificationsSecret');
 var userSettingsService = require('./user-settings-service');
 var emailAddressService = require('./email-address-service');
 var roomNameTrimmer     = require('../../public/js/utils/room-name-trimmer');
-var mongoUtils          = require('../utils/mongo-utils');
+var mongoUtils          = require('gitter-web-persistence-utils/lib/mongo-utils');
 var moment              = require('moment');
 var Promise             = require('bluebird');
 var i18nFactory         = require('../utils/i18n-factory');
@@ -85,14 +85,14 @@ function sendInvite(fromUser, toUser, room, email, template, eventName) {
 
 module.exports = {
 
-  sendUnreadItemsNotification: function(user, troupesWithUnreadCounts) {
+  sendUnreadItemsNotification: Promise.method(function(user, troupesWithUnreadCounts) {
     var plaintext = user.id + ',' + 'unread_notifications';
     var cipher    = crypto.createCipher('aes256', passphrase);
     var hash      = cipher.update(plaintext, 'utf8', 'hex') + cipher.final('hex');
 
     if (user.state) {
       logger.info('Skipping email notification for ' + user.username + ', not active state.');
-      return Promise.resolve();
+      return;
     }
 
     // Re-enable all #lang!!
@@ -154,25 +154,25 @@ module.exports = {
         logger.error('Unable to send unread items notifications: ' + err, { exception: err });
         throw err;
       });
-  },
+  }),
 
-  sendInvitation: function(fromUser, toUser, room) {
+  sendInvitation: Promise.method(function(fromUser, toUser, room) {
     return emailAddressService(toUser, { preferInvitedEmail: true,  attemptDiscovery: true })
-    .then(function(email) {
-      return sendInvite(fromUser, toUser, room, email, 'invitation', 'invitation_sent');
-    });
-  },
+      .then(function(email) {
+        return sendInvite(fromUser, toUser, room, email, 'invitation', 'invitation_sent');
+      });
+  }),
 
-  sendInvitationReminder: function(fromUser, toUser, room) {
+  sendInvitationReminder: Promise.method(function(fromUser, toUser, room) {
     return emailAddressService(toUser, { preferInvitedEmail: true,  attemptDiscovery: true })
     .then(function(email) {
       return sendInvite(fromUser, toUser, room, email, 'invitation-reminder', 'invitation_reminder_sent');
     });
-  },
+  }),
 
-  sendManualInvitation: function(fromUser, toUser, room, email) {
+  sendManualInvitation: Promise.method(function(fromUser, toUser, room, email) {
     return sendInvite(fromUser, toUser, room, email, 'invitation', 'invitation_sent');
-  },
+  }),
 
   /**
    * createdRoomNotification() emails suggested actions for created rooms (`PUBLIC` or `PRIVATE`)
@@ -180,7 +180,7 @@ module.exports = {
    * user     User - the room's owner
    * room     Room - the room
    */
-  createdRoomNotification: function (user, room) {
+  createdRoomNotification: Promise.method(function (user, room) {
     var plaintext = user.id + ',' + 'created_room';
     var cipher    = crypto.createCipher('aes256', passphrase);
     var hash      = cipher.update(plaintext, 'utf8', 'hex') + cipher.final('hex');
@@ -230,9 +230,9 @@ module.exports = {
         logger.error('Unable to send unread items notifications: ' + err, { exception: err });
         throw err;
       });
-  },
+  }),
 
-  addedToRoomNotification: function(fromUser, toUser, room) {
+  addedToRoomNotification: Promise.method(function(fromUser, toUser, room) {
     var plaintext       = toUser.id + ',' + 'unread_notifications';
     var cipher          = crypto.createCipher('aes256', passphrase);
     var hash            = cipher.update(plaintext, 'utf8', 'hex') + cipher.final('hex');
@@ -243,7 +243,7 @@ module.exports = {
     var recipientName = (toUser.displayName || toUser.username).split(' ')[0];
     var fromName = (fromUser.displayName || fromUser.username);
 
-    userSettingsService.getUserSettings(toUser.id, 'unread_notifications_optout')
+    return userSettingsService.getUserSettings(toUser.id, 'unread_notifications_optout')
       .then(function(optout) {
         if (optout) {
           logger.info('Skipping email notification for ' + toUser.username + ' because opt-out');
@@ -277,7 +277,7 @@ module.exports = {
             });
         });
     });
-  }
+  })
 };
 
 module.exports.testOnly = {

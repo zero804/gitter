@@ -6,7 +6,7 @@ var restful              = require("../../../services/restful");
 var restSerializer       = require("../../../serializers/rest-serializer");
 var Promise              = require('bluebird');
 var StatusError          = require('statuserror');
-var roomPermissionsModel = require('../../../services/room-permissions-model');
+var roomPermissionsModel = require('gitter-web-permissions/lib/room-permissions-model');
 var userCanAccessRoom    = require('../../../services/user-can-access-room');
 var loadTroupeFromParam  = require('./load-troupe-param');
 
@@ -48,7 +48,8 @@ module.exports = {
   show: function(req) {
     var strategy = new restSerializer.TroupeIdStrategy({
       currentUserId: req.user && req.user.id,
-      includeTags: true
+      includeTags: true,
+      includeProviders: true
     });
 
     return restSerializer.serializeObject(req.params.troupeId, strategy);
@@ -95,6 +96,10 @@ module.exports = {
           promises.push(troupeService.updateTopic(req.user, troupe, updatedTroupe.topic));
         }
 
+        if(updatedTroupe.hasOwnProperty('providers')) {
+          promises.push(troupeService.updateProviders(req.user, troupe, updatedTroupe.providers));
+        }
+
         if(updatedTroupe.hasOwnProperty('noindex')) {
           promises.push(troupeService.toggleSearchIndexing(req.user, troupe, updatedTroupe.noindex));
         }
@@ -106,7 +111,13 @@ module.exports = {
         return Promise.all(promises);
       })
       .then(function() {
-        var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: req.user.id });
+        var strategy = new restSerializer.TroupeIdStrategy({
+          currentUserId: req.user.id,
+          currentUser: req.user,
+          includePermissions: true,
+          includeOwner: true,
+          includeProviders: true
+        });
 
         return restSerializer.serializeObject(req.params.troupeId, strategy);
       });
@@ -127,7 +138,7 @@ module.exports = {
         return roomService.deleteRoom(troupe);
       })
       .then(function() {
-        return; // Undefined returns a 200 status only
+        return { success: true };
       });
   },
 

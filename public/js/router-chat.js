@@ -3,6 +3,7 @@ require('utils/initial-setup');
 
 var Backbone               = require('backbone');
 var context                = require('utils/context');
+var clientEnv              = require('gitter-client-env');
 var liveContext            = require('components/live-context');
 var appEvents              = require('utils/appevents');
 var debug                  = require('debug-proxy')('app:router-chat');
@@ -49,7 +50,7 @@ onready(function() {
     // Shortcut for performance
     if (!e || !e.data || typeof e.data !== 'string') return;
 
-    if (e.origin !== context.env('basePath')) {
+    if (e.origin !== clientEnv.basePath) {
       debug('Ignoring message from ' + e.origin);
       return;
     }
@@ -149,7 +150,7 @@ onready(function() {
     var id = chat.id;
 
     if (options && options.appendInput) {
-      var fullUrl = context.env('basePath') + url + '?at=' + id;
+      var fullUrl = clientEnv.basePath + url + '?at=' + id;
       var formattedDate = fullTimeFormat(chat.get('sent'));
       appEvents.trigger('input.append', ':point_up: [' + formattedDate + '](' + fullUrl + ')');
     }
@@ -167,6 +168,10 @@ onready(function() {
 
   appEvents.on('unreadItemsCount', function(newCount) {
     frameUtils.postMessage({ type: 'unreadItemsCount', count: newCount, troupeId: context.getTroupeId() });
+  });
+
+  appEvents.on('clearActivityBadge', function() {
+    frameUtils.postMessage({ type: 'clearActivityBadge', troupeId: context.getTroupeId() });
   });
 
   // Bubble keyboard events
@@ -247,8 +252,10 @@ onready(function() {
       'keys': 'keys',
       'integrations': 'integrations',
       'add': 'addPeople',
-      'tags/:roomId': 'editTags',
-      'autojoin': 'autojoin'
+      'settings': 'settings',
+      'tags': 'editTags',
+      'autojoin': 'autojoin',
+      'notification-defaults': 'notificationDefaults'
     },
 
     autojoin: function() {
@@ -274,9 +281,9 @@ onready(function() {
     },
 
     notifications: function() {
-      require.ensure(['views/modals/room-settings-view'], function(require) {
-        var TroupeSettingsView = require('views/modals/room-settings-view');
-        appView.dialogRegion.show(new TroupeSettingsView({ model: new Backbone.Model() }));
+      require.ensure(['views/modals/notification-settings-view'], function(require) {
+        var NotificationSettingsView = require('views/modals/notification-settings-view');
+        appView.dialogRegion.show(new NotificationSettingsView({ model: new Backbone.Model() }));
       });
     },
 
@@ -297,7 +304,7 @@ onready(function() {
     addPeople: function() {
       require.ensure(['views/app/addPeopleView', 'views/modals/upgrade-to-pro-view'], function(require) {
         var room = context.troupe();
-        var maxFreeMembers = context.env('maxFreeOrgRoomMembers');
+        var maxFreeMembers = clientEnv.maxFreeOrgRoomMembers;
         var isOverLimit = room.get('security') !== 'PUBLIC' &&
           room.get('githubType').indexOf('ORG') >= 0 &&
           !room.get('premium') &&
@@ -312,6 +319,13 @@ onready(function() {
         }
       });
 
+    },
+
+    settings: function() {
+      require.ensure(['views/modals/room-settings-view'], function(require) {
+        var RoomSettingsModal = require('views/modals/room-settings-view');
+        appView.dialogRegion.show(new RoomSettingsModal({ model: context.troupe() }));
+      });
     },
 
     editTags: function() {
@@ -348,6 +362,17 @@ onready(function() {
         appView.dialogRegion.show(new DeleteModal({}));
       });
     },
+
+    notificationDefaults: function() {
+      require.ensure(['./views/modals/notification-defaults-view'], function(require) {
+        var NotificationDefaultsView = require('./views/modals/notification-defaults-view');
+
+        appView.dialogRegion.show(new NotificationDefaultsView({
+          model: new Backbone.Model()
+        }));
+
+      });
+    }
 
   });
 

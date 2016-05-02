@@ -5,6 +5,7 @@ var fastdom     = require('fastdom');
 var template    = require('./base-collection-view.hbs');
 var context     = require('utils/context');
 var toggleClass = require('utils/toggle-class');
+var parseItemForTemplate = require('gitter-web-shared/parse/left-menu-primary-item');
 
 module.exports = Marionette.CompositeView.extend({
 
@@ -22,42 +23,45 @@ module.exports = Marionette.CompositeView.extend({
     };
   },
 
+  ui: {
+    header:        '#collection-header',
+    headerContent: '#collection-header-text',
+    dismissButton: '#dismiss-suggestion',
+    showMore:      '#room-item-show-more',
+  },
+
+  events: {
+    'click @ui.header':  'onHeaderClicked',
+  },
+
   modelEvents: {
-    'change:header': 'render',
+    'change:header': 'onHeaderChange',
+    'change:active': 'setActive'
   },
 
   collectionEvents: {
-    'change:mentions change:unreadMessages change:lastAccessTime add remove': 'render',
     'add remove reset': 'onFilterComplete',
   },
 
   childEvents: {
-    'item:clicked':   'onItemClicked',
+    'item:activated': 'onItemActivated',
     'hide:complete':  'onHideLeaveRoom',
     'leave:complete': 'onHideLeaveRoom',
   },
 
   constructor: function(attrs) {
-    this.bus           = attrs.bus;
-    this.collection    = attrs.collection;
-    this.roomMenuModel = attrs.roomMenuModel;
-    this.listenTo(this.roomMenuModel, 'change:state:post change:selectedOrgName', this.render, this);
+    this.bus            = attrs.bus;
+    this.collection     = attrs.collection;
+    this.roomMenuModel  = attrs.roomMenuModel;
+    this.roomCollection = attrs.roomCollection;
+    this.listenTo(this.roomMenuModel, 'change:hasDismissedSuggestions', this.onDismissSuggestionsUpdate, this);
     Marionette.CompositeView.prototype.constructor.apply(this, arguments);
   },
 
-  initialize: function() {
-    if (this.model.get('active')) {
-      this.render();
-    }
-  },
-
-  onItemClicked: function(view) {
+  onItemActivated: function(view) {
     var model = view.model;
-    var name = (model.get('uri') ||
-                model.get('url') ||
-                model.get('name') ||
-                (model.get('fromUser') && model.get('fromUser').username));
-    var url  = (name[0] !== '/') ?  '/' + name : name;
+    var url = view.getRoomUrl();
+    var name = view.getRoomName();
 
     //We have to explicitly check for false because search
     //results come through with `exists: false` for rooms yet to be created
@@ -97,6 +101,29 @@ module.exports = Marionette.CompositeView.extend({
   onHideLeaveRoom: function (view) {
     //If we are hiding the current room, navigate to /home JP 11/3/16
     if (this._isCurrentRoom(view.model)) { this._navigateToHome(); }
+  },
+
+  onHeaderClicked: function (){
+    this.roomMenuModel.set('hasDismissedSuggestions', !this.roomMenuModel.get('hasDismissedSuggestions'));
+  },
+
+  onDismissSuggestionsUpdate: function (model, val){ //jshint unused: true
+    //Only opperate if we are displaying suggestions
+    if(!this.model.get('isSuggestion')) { return; }
+    //If the suggestions have been dismissed hide the collection
+    if(val) { this.el.classList.remove('active'); }
+  },
+
+  //We avoid re-rendering AT ALL TIMES so now we have to manually change content
+  onHeaderChange: function (model, val){ //jshint unused: true
+
+    this.ui.headerContent.html(val);
+
+    //If this is a suggestion show the cancel button
+    if(this.model.get('isSuggestion')) {
+      return this.ui.dismissButton[0].classList.remove('hidden');
+    }
+    return this.ui.dismissButton[0].classList.add('hidden');
   },
 
   onDestroy: function() {

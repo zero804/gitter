@@ -1,5 +1,8 @@
 "use strict";
 
+var env                     = require('gitter-web-env');
+var identifyRoute           = env.middlewares.identifyRoute;
+
 var moment                  = require('moment');
 var appMiddleware           = require('./middleware');
 var chatService             = require('../../services/chat-service');
@@ -8,11 +11,9 @@ var restSerializer          = require('../../serializers/rest-serializer');
 var contextGenerator        = require('../../web/context-generator');
 var Promise                 = require('bluebird');
 var roomService             = require('../../services/room-service');
-var env                     = require('gitter-web-env');
 var burstCalculator         = require('../../utils/burst-calculator');
-var roomPermissionsModel    = require('../../services/room-permissions-model');
+var roomPermissionsModel    = require('gitter-web-permissions/lib/room-permissions-model');
 var timezoneMiddleware      = require('../../web/middlewares/timezone');
-var identifyRoute           = require('gitter-web-env').middlewares.identifyRoute;
 var resolveRoomAvatarUrl    = require('gitter-web-shared/avatars/resolve-room-avatar-url');
 var dateTZtoUTC             = require('gitter-web-shared/time/date-timezone-to-utc');
 var beforeTodayAnyTimezone  = require('gitter-web-shared/time/before-today-any-timezone');

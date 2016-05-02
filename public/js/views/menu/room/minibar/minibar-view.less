@@ -1,27 +1,8 @@
 @import '../../../../../less/components/menu/menu.less';
 
-@minibar-top-offset:    (@desktop-header-height * 4);
+@minibar-top-offset:    (@desktop-header-height * 3);
 @minibar-bottom-offset: @desktop-header-height;
 
-
-.minibar {
-  position:   relative;
-  width:      100%;
-  height:     100%;
-  z-index:    1;
-
-  &:before {
-    content:    ' ';
-    display:    inline-block;
-    position:   absolute;
-    top:        0;
-    left:       0;
-    width:      100%;
-    height:     100%;
-    background: @menu-panel-bg;
-    opacity:    .4;
-  }
-}
 
 .room-menu-container {
   position:   relative;
@@ -46,13 +27,55 @@
   z-index:  2;
 }
 
+.minibar {
+  position:   relative;
+  width:      100%;
+  height:     100%;
+  z-index:    1;
+
+  &:before {
+    content:    ' ';
+    display:    inline-block;
+    position:   absolute;
+    top:        0;
+    left:       0;
+    width:      100%;
+    height:     100%;
+    background: @menu-panel-bg;
+    opacity:    .3;
+    transform:  translate3d(0, 0, 0);
+  }
+}
+
+.minibar-inner {
+  position: absolute;
+  top: @minibar-top-offset;
+  bottom: @minibar-bottom-offset;
+  height: auto;
+
+  & > .nano-pane {
+    left: auto;
+    right: 0;
+
+    & > .nano-slider {
+      background-color: #9996b0;
+    }
+  }
+}
+
+
 .room-menu-options {
-  display:        flex;
-  flex-direction: column;
-  list-style:     none;
-  margin-left:    0;
-  margin-top:     @minibar-top-offset;
-  margin-bottom:  @minibar-bottom-offset;
+  // `-webkit-overflow-scrolling: touch;` makes mobile-Safari not respect
+  // the "containing block" with `position: fixed` for some reason, gitterHQ/change#36#issuecomment-214075326
+  //
+  // iOS seems to want to put `-webkit-overflow-scrolling: touch;` on the element itself
+  // so `!important` is used here to override that. JP 26/4/16
+  -webkit-overflow-scrolling: auto !important;
+  display:                    flex;
+  flex-direction:             column;
+  margin-left:                0;
+  margin-bottom:              0;
+  list-style:                 none;
 }
 
 .sudo-panel() {
@@ -133,7 +156,7 @@
   .room-menu-options__item();
   background: rgba(0, 0, 0, .1);
   position:   fixed;
-  top:        @desktop-header-height * 3;
+  top:        @desktop-header-height * 2;
   left:       0;
   color:      @people-bg;
 
@@ -173,11 +196,15 @@
 .room-menu-options__item--org {
   .room-menu-options__item();
 
+  color: @org-bg;
+
   .room-menu-options__item-button {
     opacity:         .8;
   }
 
-  color: @org-bg;
+  .room-menu-options__item__avatar  {
+    background-color: #ffffff;
+  }
 }
 
 .room-menu-options__item--close {
@@ -375,13 +402,5 @@
   &.is-menu-pinned,
   .menu-toggle-button:hover > & {
     transform: translateZ(0) rotateZ(90deg);
-  }
-}
-
-.minibar {
-  .nano-pane {
-    box-sizing:    border-box;
-    padding-top:   @minibar-top-offset;
-    margin-bottom: @minibar-bottom-offset;
   }
 }

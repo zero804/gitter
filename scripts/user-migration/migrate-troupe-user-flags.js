@@ -2,16 +2,16 @@
 /* jshint node:true, unused:true */
 'use strict';
 
-var persistence = require('../../server/services/persistence-service');
+var persistence = require('gitter-web-persistence');
 var roomMembershipFlags = require('../../server/services/room-membership-flags');
 var onMongoConnect = require('../../server/utils/on-mongo-connect');
-var mongoUtils = require('../../server/utils/mongo-utils');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var through2Concurrent = require('through2-concurrent');
 var BatchStream = require('batch-stream');
 var _ = require('lodash');
 var Promise = require('bluebird');
 
-var mongoose      = require('../../server/utils/mongoose-q');
+var mongoose      = require('gitter-web-mongoose-bluebird');
 var Schema        = mongoose.Schema;
 var ObjectId      = Schema.ObjectId;
 

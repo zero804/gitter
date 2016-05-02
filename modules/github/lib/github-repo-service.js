@@ -3,7 +3,6 @@
 var wrap = require('./github-cache-wrapper');
 var tentacles = require('./tentacles-client');
 var userTokenSelector = require('./user-token-selector').full;
-var githubMediaTypes = require('./github-media-types');
 var appEvents = require('gitter-web-appevents');
 
 function GitHubRepoService(user) {
@@ -80,15 +79,16 @@ GitHubRepoService.prototype.getWatchedRepos = function() {
 };
 
 GitHubRepoService.prototype.getAllReposForAuthUser = function() {
-  return tentacles.repo.listForAuthUser({ accessToken: this.accessToken, headers: { Accept: githubMediaTypes.MOONDRAGON } });
+  return tentacles.repo.listForAuthUser({
+    accessToken: this.accessToken,
+  });
 };
 
 /** TODO: deprecated */
 GitHubRepoService.prototype.getReposForUser = function(username, options) {
   return tentacles.repo.listForUser(username, {
     firstPageOnly: options && options.firstPage,
-    accessToken: this.accessToken,
-    headers: { Accept: githubMediaTypes.MOONDRAGON }
+    accessToken: this.accessToken
   });
 };
 

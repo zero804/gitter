@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 "use strict";
 
-var nconf       = require('../../server/utils/config');
-var winston     = require('../../server/utils/winston');
-var persistence = require("../../server/services/persistence-service");
+var env         = require('gitter-web-env');
+var winston     = env.logger;
+var nconf       = env.config;
+var persistence = require('gitter-web-persistence');
 var shutdown    = require('shutdown');
 
 
@@ -43,4 +44,3 @@ getAllUsers(function(err, users) {
   shutdown.shutdownGracefully();
 
 });
-

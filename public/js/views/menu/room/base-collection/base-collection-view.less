@@ -1,5 +1,7 @@
+@import "trp3Vars";
 @import "../../../../../less/components/menu/room/menu-text";
 @import "../../../../../less/components/menu/room/collection";
+@import "../../../../../less/components/menu/room/menu-text";
 
 .collection {
   .m-collection();
@@ -11,7 +13,7 @@
   padding-left:   @desktop-menu-left-padding;
   color:          @menu-collection-title;
   text-transform: uppercase;
-  margin-top: 1.6rem;
+  margin-top:     1.6rem;
 
   &.search {
     color: @jaffa;
@@ -20,4 +22,22 @@
 
 .collection-list {
   margin-left: 0;
+}
+
+.collection-header {
+  position: relative;
+
+  &.suggestion {
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}
+
+.collection-header__dismiss-suggestion {
+  position:   absolute;
+  top:        50%;
+  right:      @desktop-menu-left-padding;
+  transform:  translateY(-50%);
+  color:      @menu-collection-title;
 }

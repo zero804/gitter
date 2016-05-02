@@ -3,13 +3,31 @@
 var testRequire = require('../../test-require');
 var Promise     = require('bluebird');
 var assert      = require('assert');
-var mongoUtils  = testRequire('./utils/mongo-utils');
+var mongoUtils  = require('gitter-web-persistence-utils/lib/mongo-utils');
 var randomSeed  = require('random-seed');
 var _           = require('lodash');
 var debug       = require('debug')('gitter:unread-item-service-engine-combined-tests');
+var Lazy        = require('lazy.js');
 
 var TEST_ITERATIONS = parseInt(process.env.UNREAD_ENGINE_TEST_ITERATIONS, 10) || 200;
 var CHECK_SLOWLOG = process.env.CHECK_SLOWLOG;
+
+
+function makeNotifyList(userIds, mentionIds) {
+  var mentionHash = mentionIds.reduce(function(memo, userId) {
+    memo[userId] = true;
+    return memo;
+  }, {});
+
+  return Lazy(userIds)
+    .map(function(userId) {
+      return {
+        userId: userId,
+        mention: !!mentionHash[userId]
+      };
+    });
+}
+
 
 describe('unread-item-service-engine-combined #slow', function() {
   this.timeout(150000);
@@ -156,9 +174,9 @@ describe('unread-item-service-engine-combined #slow', function() {
             debug('Operation %s: addMention', count);
             var itemId = nextId();
 
-            return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId, [userId1], [userId1])
+            return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId, makeNotifyList([userId1], [userId1]))
               .then(function(result) {
-                var resultForUser = result[userId1];
+                var resultForUser = result.find(function(f) { return f.userId == userId1; });
 
                 mentionItems[itemId] = true;
                 unreadItems[itemId] = true;
@@ -179,9 +197,9 @@ describe('unread-item-service-engine-combined #slow', function() {
             return _.range(numberOfItems).reduce(function(memo) {
                 function addNewItem() {
                   var itemId = nextId();
-                  return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId, [userId1], [])
+                  return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId, makeNotifyList([userId1], []))
                     .then(function(result) {
-                      var resultForUser = result[userId1];
+                      var resultForUser = result.find(function(f) { return f.userId == userId1; });
                       unreadItems[itemId] = false;
                       enforceLimit();
 

@@ -6,42 +6,45 @@ var nconf              = env.config;
 var stats              = env.stats;
 var errorReporter      = env.errorReporter;
 
-var appEvents          = require('gitter-web-appevents');
-var Promise            = require('bluebird');
-var request            = require('request');
-var _                  = require('lodash');
-var xregexp            = require('xregexp').XRegExp;
-var persistence        = require('./persistence-service');
-var validateUri        = require('gitter-web-github').GitHubUriValidator;
-var uriLookupService   = require("./uri-lookup-service");
-var permissionsModel   = require('./permissions-model');
-var roomPermissionsModel = require('./room-permissions-model');
-var userService        = require('./user-service');
-var troupeService      = require('./troupe-service');
-var GitHubRepoService  = require('gitter-web-github').GitHubRepoService;
-var GitHubOrgService   = require('gitter-web-github').GitHubOrgService;
-var validate           = require('../utils/validate');
-var collections        = require('../utils/collections');
-var StatusError        = require('statuserror');
-var eventService       = require('./event-service');
-var emailNotificationService = require('./email-notification-service');
+var appEvents                  = require('gitter-web-appevents');
+var Promise                    = require('bluebird');
+var request                    = require('request');
+var _                          = require('lodash');
+var xregexp                    = require('xregexp').XRegExp;
+var persistence                = require('gitter-web-persistence');
+var uriLookupService           = require("./uri-lookup-service");
+var permissionsModel           = require('gitter-web-permissions/lib/permissions-model');
+var roomPermissionsModel       = require('gitter-web-permissions/lib/room-permissions-model');
+var userService                = require('./user-service');
+var troupeService              = require('./troupe-service');
+var oneToOneRoomService        = require('./one-to-one-room-service');
+var userDefaultFlagsService    = require('./user-default-flags-service');
+var validateUri                = require('gitter-web-github').GitHubUriValidator;
+var GitHubRepoService          = require('gitter-web-github').GitHubRepoService;
+var GitHubOrgService           = require('gitter-web-github').GitHubOrgService;
+var validate                   = require('../utils/validate');
+var collections                = require('../utils/collections');
+var StatusError                = require('statuserror');
+var eventService               = require('./event-service');
+var emailNotificationService   = require('./email-notification-service');
 var canUserBeInvitedToJoinRoom = require('./invited-permissions-service');
-var emailAddressService = require('./email-address-service');
-var mongoUtils         = require('../utils/mongo-utils');
-var mongooseUtils      = require('../utils/mongoose-utils');
-var badger             = require('./badger-service');
-var userSettingsService = require('./user-settings-service');
-var roomSearchService  = require('./room-search-service');
-var assertMemberLimit  = require('./assert-member-limit');
-var redisLockPromise   = require("../utils/redis-lock-promise");
-var unreadItemService  = require('./unread-items');
-var debug              = require('debug')('gitter:room-service');
-var roomMembershipService = require('./room-membership-service');
-var liveCollections    = require('./live-collections');
-var recentRoomService  = require('./recent-room-service');
-var badgerEnabled      = nconf.get('autoPullRequest:enabled');
-var uriResolver        = require('./uri-resolver');
-var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
+var emailAddressService        = require('./email-address-service');
+var mongoUtils                 = require('gitter-web-persistence-utils/lib/mongo-utils');
+var mongooseUtils              = require('gitter-web-persistence-utils/lib/mongoose-utils');
+var badger                     = require('./badger-service');
+var userSettingsService        = require('./user-settings-service');
+var roomSearchService          = require('./room-search-service');
+var assertJoinRoomChecks       = require('./assert-join-room-checks');
+var redisLockPromise           = require("../utils/redis-lock-promise");
+var unreadItemService          = require('./unread-items');
+var debug                      = require('debug')('gitter:room-service');
+var roomMembershipService      = require('./room-membership-service');
+var liveCollections            = require('./live-collections');
+var recentRoomService          = require('./recent-room-service');
+var badgerEnabled              = nconf.get('autoPullRequest:enabled');
+var uriResolver                = require('./uri-resolver');
+var getOrgNameFromTroupeName   = require('gitter-web-shared/get-org-name-from-troupe-name');
+var userScopes                 = require('../utils/models/user-scopes');
 
 exports.testOnly = {};
 
@@ -139,7 +142,7 @@ function findOrCreateGroupRoom(user, troupe, uri, options) {
         if (!access) return payload;
 
         // If the user has access to the room, assert member count
-        return assertMemberLimit(troupe, user)
+        return assertJoinRoomChecks(troupe, user)
           .then(function() {
             return payload;
           });
@@ -215,7 +218,8 @@ function findOrCreateGroupRoom(user, troupe, uri, options) {
                 topic: topic || "",
                 security: security,
                 dateLastSecurityCheck: new Date(),
-                userCount: 0
+                userCount: 0,
+                // permissions: permissions.fromLegacy(githubType, officialUri, security, githubId)
               }
             })
             .spread(function(troupe, updateExisting) {
@@ -256,7 +260,7 @@ function findOrCreateGroupRoom(user, troupe, uri, options) {
 
               /* Created here */
               /* TODO: Later we'll need to handle private repos too */
-              var hasScope = user.hasGitHubScope("public_repo");
+              var hasScope = userScopes.hasGitHubScope(user, "public_repo");
               var hookCreationFailedDueToMissingScope;
 
               if(hasScope) {
@@ -310,20 +314,6 @@ function findOrCreateGroupRoom(user, troupe, uri, options) {
     });
 }
 
-
-/* Keep this in as one day it'll probably be useful */
-
-// function determineDefaultNotifyForRoom(user, troupe) {
-//   var repoService = new GitHubRepoService(user);
-//   return repoService.getRepo(troupe.uri)
-//     .then(function(repoInfo) {
-//       if(!repoInfo || !repoInfo.permissions) return 0;
-//
-//       /* Admin or push? Notify */
-//       return repoInfo.permissions.admin || repoInfo.permissions.push ? 1 : 0;
-//     });
-// }
-
 /**
  * Grant or remove the users access to a room
  * Makes the troupe reflect the users access to a room
@@ -333,7 +323,8 @@ function findOrCreateGroupRoom(user, troupe, uri, options) {
 function ensureAccessControl(user, troupe, access) {
   if(troupe) {
     if(access) {
-      return roomMembershipService.addRoomMember(troupe._id, user._id);
+      var flags = userDefaultFlagsService.getDefaultFlagsForUser(user);
+      return roomMembershipService.addRoomMember(troupe._id, user._id, flags);
     } else {
       return roomMembershipService.removeRoomMember(troupe._id, user._id);
     }
@@ -585,7 +576,8 @@ function findOrCreateRoom(user, uri, options) {
               // TODO: check whether this needs a slash at the front
               throw extendStatusError(404, { githubType: 'ONETOONE', uri: resolvedUser.username });
             }
-            return troupeService.findOrCreateOneToOneTroupeIfPossible(userId, resolvedUser.id)
+
+            return oneToOneRoomService.findOrCreateOneToOneRoom(userId, resolvedUser.id)
               .spread(function(troupe, resolvedUser) {
                 return {
                   oneToOne: true,
@@ -620,7 +612,10 @@ function findOrCreateRoom(user, uri, options) {
           var didCreate = findOrCreateResult.didCreate;
 
           if (access && didCreate) {
-            emailNotificationService.createdRoomNotification(user, troupe);  // now the san email to the room', wne
+            emailNotificationService.createdRoomNotification(user, troupe)  // now the san email to the room', wne
+              .catch(function(err) {
+                logger.error('Unable to send create room notification: ' + err, { exception: err });
+              });
           }
 
           if(didCreate) {
@@ -827,6 +822,7 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
         validate.fail('Invalid security option: ' + security);
       }
 
+      // TODO: move to `permissions` here
       switch(parentTroupe.githubType) {
         case 'ORG':
           githubType = 'ORG_CHANNEL';
@@ -899,11 +895,19 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
           .spread(function(newRoom, updatedExisting) {
             if (!user) return [newRoom, updatedExisting];
 
-            return roomMembershipService.addRoomMember(newRoom._id, user._id)
+            var flags = userDefaultFlagsService.getDefaultFlagsForUser(user);
+
+            return roomMembershipService.addRoomMember(newRoom._id, user._id, flags)
               .thenReturn([newRoom, updatedExisting]);
           })
           .spread(function(newRoom, updatedExisting) {
-            emailNotificationService.createdRoomNotification(user, newRoom); // send an email to the room's owner
+
+            // Send the created room notification
+            emailNotificationService.createdRoomNotification(user, newRoom) // send an email to the room's owner
+              .catch(function(err) {
+                logger.error('Unable to send create room notification: ' + err, { exception: err });
+              });
+
             sendJoinStats(user, newRoom, options.tracking); // now the channel has now been created, send join stats for owner joining
 
             if (updatedExisting) {
@@ -942,6 +946,7 @@ exports.createCustomChildRoom = createCustomChildRoom;
  * returns        User - the invited user
  */
 function notifyInvitedUser(fromUser, invitedUser, room/*, isNewUser*/) {
+
   // get the email address
   return emailAddressService(invitedUser, { attemptDiscovery: true })
     .then(function (emailAddress) {
@@ -949,18 +954,24 @@ function notifyInvitedUser(fromUser, invitedUser, room/*, isNewUser*/) {
 
       if(invitedUser.state === 'REMOVED') {
         stats.event('user_added_removed_user');
-        return; // This has been removed
+        return null; // This has been removed
       }
 
       if (invitedUser.state === 'INVITED') {
         if (emailAddress) {
           notification = 'email_invite_sent';
-          emailNotificationService.sendInvitation(fromUser, invitedUser, room);
+          emailNotificationService.sendInvitation(fromUser, invitedUser, room)
+            .catch(function(err) {
+              logger.error('Unable to send invitation: ' + err, { exception: err });
+            });
         } else {
           notification = 'unreachable_for_invite';
         }
       } else {
-        emailNotificationService.addedToRoomNotification(fromUser, invitedUser, room);
+        emailNotificationService.addedToRoomNotification(fromUser, invitedUser, room)
+          .catch(function(err) {
+            logger.error('Unable to send added to room notification: ' + err, { exception: err });
+          });
         notification = 'email_notification_sent';
       }
 
@@ -972,6 +983,7 @@ function notifyInvitedUser(fromUser, invitedUser, room/*, isNewUser*/) {
       };
 
       stats.event('user_added_someone', _.extend(metrics, { userId: fromUser.id }));
+      return null;
     })
     .thenReturn(invitedUser);
 }
@@ -998,7 +1010,7 @@ function joinRoom(roomId, user, options) {
         .then(function(access) {
           if (!access) throw new StatusError(403);
 
-          return assertMemberLimit(room, user);
+          return assertJoinRoomChecks(room, user);
         })
         .then(function() {
           // We need to add the last access time before adding the member to the room
@@ -1007,7 +1019,9 @@ function joinRoom(roomId, user, options) {
           return recentRoomService.saveLastVisitedTroupeforUserId(user._id, room._id, { skipFayeUpdate: true });
         })
         .then(function() {
-          return roomMembershipService.addRoomMember(room._id, user._id);
+          var flags = userDefaultFlagsService.getDefaultFlagsForUser(user);
+
+          return roomMembershipService.addRoomMember(room._id, user._id, flags);
         })
         .then(function() {
           sendJoinStats(user, room, options.tracking);
@@ -1030,7 +1044,7 @@ function addUserToRoom(room, instigatingUser, usernameToAdd) {
       return userService.findByUsername(usernameToAdd);
     })
     .then(function (existingUser) {
-      return assertMemberLimit(room, existingUser)
+      return assertJoinRoomChecks(room, existingUser)
         .then(function() {
           var isNewUser = !existingUser;
 
@@ -1043,7 +1057,8 @@ function addUserToRoom(room, instigatingUser, usernameToAdd) {
       // the last access time and not be hidden in the troupe list
       return recentRoomService.saveLastVisitedTroupeforUserId(addedUser._id, room._id, { skipFayeUpdate: true })
         .then(function() {
-          return roomMembershipService.addRoomMember(room._id, addedUser._id);
+          var flags = userDefaultFlagsService.getDefaultFlagsForUser(addedUser);
+          return roomMembershipService.addRoomMember(room._id, addedUser._id, flags);
         })
         .then(function(wasAdded) {
           if (!wasAdded) return addedUser;
@@ -1339,7 +1354,7 @@ function unbanUserFromRoom(room, troupeBan, username, requestingUser, callback) 
     .then(function() {
       return eventService.newEventToTroupe(
         room, requestingUser,
-        "User @" + requestingUser.username + " unbanned @" + username + " from this room",
+        "User @" + requestingUser.username + " unbanned @" + username,
         {
           service: 'bans',
           event: 'unbanned',
@@ -1449,6 +1464,10 @@ function renameRepo(oldUri, newUri) {
               var originalLcUri = channel.lcUri;
               var newChannelUri = newUri + '/' + channel.uri.split('/')[2];
               var newChannelLcUri = newChannelUri.toLowerCase();
+
+              if (originalLcUri !== newChannelLcUri) {
+                channel.renamedLcUris.addToSet(originalLcUri);
+              }
 
               channel.lcUri = newChannelLcUri;
               channel.uri = newChannelUri;

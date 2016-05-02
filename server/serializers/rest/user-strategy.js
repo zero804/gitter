@@ -1,10 +1,12 @@
-/* jshint maxcomplexity:18 */
+/* jshint maxcomplexity:19 */
 "use strict";
 
+var env                      = require('gitter-web-env');
+var winston                  = env.logger;
 var troupeService            = require("../../services/troupe-service");
+var identityService          = require("../../services/identity-service");
 var presenceService          = require("gitter-web-presence");
 var Promise                  = require('bluebird');
-var winston                  = require('../../utils/winston');
 var collections              = require("../../utils/collections");
 var GithubContributorService = require('gitter-web-github').GitHubContributorService;
 var Promise                  = require('bluebird');
@@ -12,6 +14,8 @@ var getVersion               = require('../get-model-version');
 var billingService           = require('../../services/billing-service');
 var leanUserDao              = require('../../services/daos/user-dao').full;
 var resolveUserAvatarUrl     = require('gitter-web-shared/avatars/resolve-user-avatar-url');
+var userScopes               = require('../../utils/models/user-scopes');
+
 
 function UserPremiumStatusStrategy() {
   var usersWithPlans;
@@ -41,30 +45,30 @@ function UserRoleInTroupeStrategy(options) {
 
   this.preload = function() {
     return Promise.try(function() {
-        if(options.includeRolesForTroupe) return options.includeRolesForTroupe;
+        if (options.includeRolesForTroupe) return options.includeRolesForTroupe;
 
-        if(options.includeRolesForTroupeId) {
+        if (options.includeRolesForTroupeId) {
           // TODO: don't do this
           return troupeService.findById(options.includeRolesForTroupeId);
         }
       })
       .then(function(troupe) {
-        if(!troupe) return;
+        if (!troupe) return;
 
         /* Only works for repos */
-        if(troupe.githubType !== 'REPO') return;
+        if (troupe.githubType !== 'REPO') return;
         var userPromise;
 
-        if(options.currentUser) {
+        if (options.currentUser) {
           userPromise = Promise.resolve(options.currentUser);
-        } else if(options.currentUserId) {
+        } else if (options.currentUserId) {
           userPromise = leanUserDao.findById(options.currentUserId);
         }
 
-        if(userPromise) {
+        if (userPromise) {
           return userPromise.then(function(user) {
             /* Need a user to perform the magic */
-            if(!user) return;
+            if (!user) return;
             var uri = troupe.uri;
             ownerLogin = uri.split('/')[0];
 
@@ -82,7 +86,7 @@ function UserRoleInTroupeStrategy(options) {
       .then(function(githubContributors) {
         contributors = {};
 
-        if(githubContributors) {
+        if (githubContributors) {
           githubContributors.forEach(function(contributor) {
             contributors[contributor.login] = 'contributor';
           });
@@ -121,40 +125,83 @@ UserPresenceInTroupeStrategy.prototype = {
   name: 'UserPresenceInTroupeStrategy'
 };
 
+function UserProvidersStrategy() {
+  var providersByUser = {};
+
+  this.preload = function(users) {
+    // NOTE: This is currently operating on the assumption that a user can only
+    // have one identity. Once we allow multiple identities per user we'll have
+    // to revisit this.
+    var nonGitHub = [];
+    users.each(function(user) {
+      if (userScopes.isGitHubUser(user)) {
+        // github user so no need to look up identities at the time of writing
+        providersByUser[user.id] = ['github'];
+      } else {
+        // non-github, so we have to look up the user's identities.
+        nonGitHub.push(user);
+      }
+    });
+
+    if (!nonGitHub.length) {
+      return Promise.resolve();
+    }
+
+    return Promise.map(nonGitHub, function(user) {
+      return identityService.listProvidersForUser(user)
+        .then(function(providers) {
+          providersByUser[user.id] = providers;
+        });
+    });
+  };
+
+  this.map = function(userId) {
+    return providersByUser[userId] || [];
+  };
+}
+UserProvidersStrategy.prototype = {
+  name: 'UserProvidersStrategy'
+};
+
 function UserStrategy(options) {
   options = options ? options : {};
   var lean = !!options.lean;
   var userRoleInTroupeStrategy = options.includeRolesForTroupeId || options.includeRolesForTroupe ? new UserRoleInTroupeStrategy(options) : null;
   var userPresenceInTroupeStrategy = options.showPresenceForTroupeId ? new UserPresenceInTroupeStrategy(options.showPresenceForTroupeId) : null;
   var userPremiumStatusStrategy = options.showPremiumStatus ? new UserPremiumStatusStrategy() : null;
+  var userProvidersStrategy = options.includeProviders ? new UserProvidersStrategy() : null;
 
   this.preload = function(users) {
     var strategies = [];
 
-    if(userRoleInTroupeStrategy) {
+    if (userRoleInTroupeStrategy) {
       strategies.push(userRoleInTroupeStrategy.preload());
     }
 
-    if(userPresenceInTroupeStrategy) {
+    if (userPresenceInTroupeStrategy) {
       strategies.push(userPresenceInTroupeStrategy.preload());
     }
 
-    if(userPremiumStatusStrategy) {
+    if (userPremiumStatusStrategy) {
       var userIds = users.map(function(user) { return user.id; });
       strategies.push(userPremiumStatusStrategy.preload(userIds));
+    }
+
+    if (userProvidersStrategy) {
+      strategies.push(userProvidersStrategy.preload(users));
     }
 
     return Promise.all(strategies);
   };
 
   this.map = function(user) {
-    if(!user) return null;
+    if (!user) return null;
     var scopes;
 
-    if(options.includeScopes) {
+    if (options.includeScopes) {
       scopes = {
-        'public_repo': user.hasGitHubScope('public_repo'),
-        'private_repo': user.hasGitHubScope('repo')
+        'public_repo': userScopes.hasGitHubScope(user, 'public_repo'),
+        'private_repo': userScopes.hasGitHubScope(user, 'repo')
       };
     }
 
@@ -196,6 +243,7 @@ function UserStrategy(options) {
       staff: user.staff,
       role: userRoleInTroupeStrategy && userRoleInTroupeStrategy.map(user.username) || undefined,
       premium: userPremiumStatusStrategy && userPremiumStatusStrategy.map(user.id) || undefined,
+      providers: userProvidersStrategy && userProvidersStrategy.map(user.id) || undefined,
       /* TODO: when adding states use user.state and the respective string value desired */
       invited: user.state === 'INVITED' || undefined, // true or undefined
       removed: user.state === 'REMOVED' || undefined, // true or undefined

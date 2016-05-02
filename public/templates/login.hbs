@@ -15,19 +15,31 @@
     <div class='background'>
       <div class='login'>
         <header>
-          <div class='logo'>
+          <a href="/" class="logo">
             {{> logo_man}}
-            <img src="{{ cdn 'images/home/logo_nomargin@2x.png' }}" alt="Gitter" title="Gitter logo">
-          </div>
+            <img src="{{ cdn 'images/home/logo_nomargin@2x.png' }}" alt="Gitter" title="Gitter logo" class="logo-image menu-animation">
+          </a>
         </header>
         <section>
           <h1>Where developers come to talk.</h1>
           {{#if showNewLogin}}
-            <p><a class='btn' href="/login?action=login&source=login_page-login">Sign in to start talking</a></p>
+            <p>
+              <a class="btn" href="/login?action=login&source={{source}}{{#if returnTo}}&returnTo={{returnTo}}{{/if}}">
+                Sign in to start talking
+              </a>
+            </p>
           {{else}}
-            <p><a class='btn transparent' href="/login/github?action=login&source=login_page-login">Existing user login</a></p>
+            <p>
+              <a class='btn transparent' href="/login/github?action=login&source={{source}}{{#if returnTo}}&returnTo={{returnTo}}{{/if}}">
+                Existing user login
+              </a>
+            </p>
             <p class='or'>Or</p>
-            <p><a class='btn signup' href="/login/github?action=signup&source=login_page-signup">Sign up to start talking</a></p>
+            <p>
+              <a class='btn signup' href="/login/github?action=signup&source={{source}}{{#if returnTo}}&returnTo={{returnTo}}{{/if}}">
+                Sign up to start talking
+              </a>
+            </p>
           {{/if}}
         </section>
       </div>
