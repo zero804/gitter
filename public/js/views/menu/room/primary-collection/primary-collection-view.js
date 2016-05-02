@@ -10,7 +10,7 @@ var EmptySearchView             = require('./primary-collection-item-search-empt
 var EmptyFavouriteView          = require('./primary-collection-item-favourite-empty-view.js');
 var perfTiming                  = require('components/perf-timing');
 var compositeViewRenderTemplate = require('utils/composite-view-render-template');
-var domIndexById                = require('../../../../utils/dom-index-by-id');
+var domIndexById                = require('utils/dom-index-by-id');
 var toggleClass                 = require('utils/toggle-class');
 
 var proto = BaseCollectionView.prototype;

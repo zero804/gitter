@@ -8,18 +8,13 @@ var fastdom           = require('fastdom');
 var context           = require('utils/context');
 var DNDCtrl           = require('components/menu/room/dnd-controller');
 var localStore        = require('components/local-store');
-var RoomMenuModel     = require('../../../../models/room-menu-model');
-var MiniBarView       = require('../minibar/minibar-view');
-var PanelView         = require('../panel/panel-view');
-var MinibarCollection = require('../minibar/minibar-collection');
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
+var KeyboardEventMixin = require('views/keyboard-events-mixin');
 
 var RoomMenuModel      = require('../../../../models/room-menu-model');
 var MiniBarView        = require('../minibar/minibar-view');
 var PanelView          = require('../panel/panel-view');
-var DNDCtrl            = require('../../../../components/menu/room/dnd-controller');
 var MinibarCollection  = require('../minibar/minibar-collection');
-var KeyboardEventMixin = require('views/keyboard-events-mixin');
 var KeyboardControllerView = require('../keyboard-controller/keyboard-controller-view');
 
 var MINIBAR_ITEM_HEIGHT = 65;

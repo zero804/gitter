@@ -6,11 +6,15 @@ var findNextActiveItem = require('./find-next-active-item');
 
 
 var navigableCollectionItemActiveCb = function(navigableCollectionItem) {
-  return (navigableCollectionItem.getActive || function() { return true })();
+  return (navigableCollectionItem.getActive || function() { return true; }).apply(this, arguments);
 };
 
 var findNextNavigableModel = function(navigableCollectionList, navigableItemReference, dir) {
   dir = sanitizeDir(dir);
+
+  var numberOfActiveNavigableCollectionItems = navigableCollectionList.reduce(function(prevCount, item, index) {
+    return navigableCollectionItemActiveCb(item, index) ? (prevCount + 1) : prevCount;
+  }, 0);
 
   // Start on the current reference
   var startingListIndex = (dir > 0 ? navigableItemReference.listIndex-1 : navigableItemReference.listIndex+1);
@@ -24,24 +28,25 @@ var findNextNavigableModel = function(navigableCollectionList, navigableItemRefe
     navigableCollectionList,
     startingListIndex,
     dir,
-    function(navigableCollectionItem, navigableCollectionItemIndex) {
-      if(navigableCollectionItemActiveCb(navigableCollectionItem)) {
+    function(navigableCollectionItem, navigableCollectionItemIndex) {//jshint maxcomplexity:9
+      if(navigableCollectionItemActiveCb(navigableCollectionItem, navigableCollectionItemIndex)) {
 
         var modelResult = findNextActiveItem(
           navigableCollectionItem.collection.models,
           // Start at the bookmark if we are looking in that list otherwise, start from the beginning
           (navigableCollectionItemIndex === navigableItemReference.listIndex ? navigableItemReference.modelIndex : null),
           dir,
-          function(model, modelIndex) {
+          function(model, modelIndex) {//jshint unused: false
             return !model.get('isHidden');
           }
         );
+
 
         // Check to make sure we aren't at the extremes of the available non-hidden items
         // Otherwise just move on to the next collectionItem.
         // This check only matters if there is more than one collection and
         // is what allows us to transfer over to the next.
-        if(navigableCollectionList.length > 1 && navigableCollectionItemIndex === navigableItemReference.listIndex) {
+        if(numberOfActiveNavigableCollectionItems > 1 && navigableCollectionItemIndex === navigableItemReference.listIndex) {
           if(
             dir > 0 &&
             (
