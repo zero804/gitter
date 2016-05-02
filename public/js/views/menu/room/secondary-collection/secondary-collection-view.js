@@ -3,6 +3,7 @@
 var Marionette         = require('backbone.marionette');
 var _                  = require('underscore');
 var urlJoin            = require('url-join');
+var extendCallbackHash = require('utils/marionette-extend-callback-hash');
 var ItemView           = require('./secondary-collection-item-view');
 var SearchItemView     = require('./secondary-collection-item-search-view');
 var BaseCollectionView = require('../base-collection/base-collection-view');
@@ -10,19 +11,20 @@ var EmptySearchView    = require('./secondary-collection-item-search-empty-view'
 
 var clientEnv = require('gitter-client-env');
 
+
 var proto = BaseCollectionView.prototype;
 
 module.exports = BaseCollectionView.extend({
   childView: ItemView,
   className: 'secondary-collection',
 
-  childEvents: {
+  childEvents: extendCallbackHash(proto.childEvents, {
     'item:activated': 'onItemActivated',
-  },
+  }),
 
-  modelEvents: {
+  modelEvents: extendCallbackHash(proto.modelEvents, {
     'change:active': 'toggleShowMore'
-  },
+  }),
 
   getEmptyView: function() {
     switch (this.roomMenuModel.get('state')) {
@@ -71,7 +73,6 @@ module.exports = BaseCollectionView.extend({
     this.listenTo(this.collection, 'reset',  this.toggleShowMore, this);
   },
 
-
   toggleShowMore: function () {
     //Sort out show more button
     if (this.roomMenuModel.get('state') === 'org' && this.collection.length >= 9) {
@@ -84,14 +85,22 @@ module.exports = BaseCollectionView.extend({
   },
 
   filter: function(model, index) {
+    var isHidden = false;
+
     switch (this.roomMenuModel.get('state')) {
       case 'search':
-        return (index <= 25);
+        isHidden = (index > 25);
+        break;
       case 'org':
-        return (index <= 9);
+        isHidden = (index > 9);
+        break;
       default:
-        return !this.primaryCollection.get(model.get('id'));
+        isHidden = !!this.primaryCollection.get(model.get('id'));
+        break;
     }
+
+    model.set({ isHidden: isHidden });
+    return !isHidden;
   },
 
   onDestroy: function() {

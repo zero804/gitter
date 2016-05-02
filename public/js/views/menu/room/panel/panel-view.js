@@ -3,7 +3,6 @@
 var _                               = require('underscore');
 var Marionette                      = require('backbone.marionette');
 var fastdom                         = require('fastdom');
-var appEvents                       = require('gitter-web-appevents');
 var toggleClass                     = require('utils/toggle-class');
 var PanelHeaderView                 = require('../header/header-view');
 var PanelFooterView                 = require('../footer/footer-view');
