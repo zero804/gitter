@@ -1,11 +1,9 @@
 var gulp = require('gulp');
 var through = require('through2');
-var applySourceMap = require('vinyl-sourcemaps-apply');
 var sourcemaps = require('gulp-sourcemaps');
 var less = require('gulp-less');
 
 var _ = require('underscore');
-var path = require('path');
 
 var lessWatcher = require('./less-watcher');
 

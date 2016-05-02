@@ -1,7 +1,6 @@
 var Promise = require('bluebird');
 var _ = require('underscore');
 var path = require('path');
-var pathUtils = require('./lib/path-parse-format-utils');
 var url = require('url');
 
 var EventEmitter = require('events').EventEmitter;
