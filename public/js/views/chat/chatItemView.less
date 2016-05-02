@@ -184,7 +184,7 @@ body.mobile .chat-item__actions {
   box-sizing: border-box;
   border-right: 2px solid transparent;
   margin: 0.4em 12px 0px;
-  padding-left: 32px;
+  padding-left: 22px;
   transition-delay: 1s;
   transition: 1s border linear, 2s background-color linear;
   clear: both;
@@ -207,7 +207,20 @@ body.mobile .chat-item__container {
   cursor: pointer;
   font-weight: 600;
   margin-top: 2px;
+  opacity: 0.7;
+}
+
+.chat-item__username {
+  vertical-align: middle;
+  display: inline;
+  cursor: pointer;
+  font-weight: 600;
+  margin-top: 2px;
   opacity: 0.5;
+}
+
+body.mobile .chat-item__username {
+  display: none;
 }
 
 .chat-item__time {
@@ -294,6 +307,7 @@ body.mobile .chat-item__icon--read {
   padding: 0;
   word-wrap: break-word;
   user-select: text;
+  color: #000;
 
   a {
     color: @blue;

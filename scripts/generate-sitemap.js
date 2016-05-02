@@ -2,8 +2,10 @@
 
 "use strict";
 
-var persistence = require('../server/services/persistence-service');
-var nconf = require('../server/utils/config');
+var env = require('gitter-web-env');
+var nconf = env.config;
+
+var persistence = require('gitter-web-persistence');
 var fs = require('fs');
 var BatchStream = require('batch-stream');
 var through2Concurrent = require('through2-concurrent');

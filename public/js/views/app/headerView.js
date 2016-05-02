@@ -1,6 +1,8 @@
+/* jshint maxcomplexity:16 */
 'use strict';
 var _                        = require('underscore');
 var context                  = require('utils/context');
+var clientEnv                = require('gitter-client-env');
 var apiClient                = require('components/apiClient');
 var Marionette               = require('backbone.marionette');
 var Backbone                 = require('backbone');
@@ -182,6 +184,7 @@ var HeaderView = Marionette.ItemView.extend({
       var isRoomMember = context.isRoomMember();
       var githubType = this.model.get('githubType');
       var isOneToOne = githubType === 'ONETOONE';
+      var security = this.model.get('security');
       var url = this.model.get('url');
 
       if (!isOneToOne) {
@@ -195,17 +198,19 @@ var HeaderView = Marionette.ItemView.extend({
       if (!isOneToOne) {
         if (isAdmin) {
           if (c.isNativeDesktopApp) {
-            menuItems.push({ title: 'Integrations', href: context.env('basePath') + url + '#integrations', target: '_blank', dataset: { disableRouting: 1 } });
+            menuItems.push({ title: 'Integrations', href: clientEnv['basePath'] + url + '#integrations', target: '_blank', dataset: { disableRouting: 1 } });
           } else {
             menuItems.push({ title: 'Integrations', href: '#integrations' });
           }
         }
 
         if (isStaff || isAdmin) {
-          menuItems.push({ title: 'Edit tags', href: '#tags/' + context().troupe.id });
+          menuItems.push({ title: 'Tags', href: '#tags' });
+          if (security == 'PUBLIC') {
+            menuItems.push({ title: 'Settings', href: '#settings' });
+          }
+          menuItems.push({ divider: true });
         }
-
-        menuItems.push({ divider: true });
 
         menuItems.push({ title: 'Archives', href: url + '/archives/all', target: '_blank'});
 
@@ -213,7 +218,9 @@ var HeaderView = Marionette.ItemView.extend({
           menuItems.push({ title: 'Open in GitHub', href: 'https://www.github.com' + url, target: '_blank' });
         }
 
-        menuItems.push({ divider: true });
+        if (isAdmin || isRoomMember) {
+          menuItems.push({ divider: true });
+        }
 
         if (isAdmin) {
           menuItems.push({ title: 'Delete this room', href: '#delete' });

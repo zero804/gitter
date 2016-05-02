@@ -2,7 +2,7 @@
 
 var testRequire = require('./test-require');
 var Promise     = require('bluebird');
-var persistence = testRequire("./services/persistence-service");
+var persistence = require('gitter-web-persistence');
 var roomMembershipFlags = testRequire("./services/room-membership-flags");
 var debug       = require('debug')('gitter:test-fixtures');
 var counter     = 0;
@@ -203,7 +203,7 @@ function createExpectedFixtures(expected, done) {
       dateDeleted: f.dateDeleted,
       userCount: f.users && f.users.length || f.userCount,
       tags: f.tags,
-      disabledProviders: f.disabledProviders
+      providers: f.providers
     };
 
     debug('Creating troupe %s with %j', fixtureName, doc);

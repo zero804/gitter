@@ -8,6 +8,8 @@
 
 @import "activity.less";
 
+
+
 .right-toolbar-region {
   box-sizing: border-box;
   position: relative;
@@ -151,9 +153,34 @@
   }
 
   .right-toolbar__body {
+    .scroller();
     overflow: auto;
     flex: 1;
     padding-top: 10px;
+  }
+
+  .right-toolbar-activity-area {
+    @media @mid {
+      display: none;
+    }
+    &.visible {
+      @media @mid {
+
+        width:240px;
+        border-left: 4px solid rgba(211, 223, 211, 0.6);
+        background-clip: padding-box;
+      }
+    }
+  }
+
+  .right-toolbar-activity-area-inner {
+
+  }
+
+  .right-toolbar-activity-list {
+    min-width: 230px;
+    margin: 0;
+    list-style-type: none;
   }
 
   .right-toolbar__footer {

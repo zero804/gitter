@@ -4,18 +4,14 @@ var roomService         = require('../../../services/room-service');
 var restSerializer      = require("../../../serializers/rest-serializer");
 var loadTroupeFromParam = require('./load-troupe-param');
 
-function serialize(bans) {
-  var strategy = new restSerializer.TroupeBanStrategy({ });
-  return restSerializer.serialize(bans, strategy);
-}
-
 module.exports = {
   id: 'troupeBan',
 
   index: function(req) {
     return loadTroupeFromParam(req)
       .then(function(troupe) {
-        return serialize(troupe.bans);
+        var strategy = new restSerializer.TroupeBanStrategy({ });
+        return restSerializer.serialize(troupe.bans, strategy);
       });
   },
 
@@ -28,12 +24,14 @@ module.exports = {
         return roomService.banUserFromRoom(troupe, username, req.user, { removeMessages: removeMessages });
       })
       .then(function(ban) {
-        return serialize(ban);
+        var strategy = new restSerializer.TroupeBanStrategy({ });
+        return restSerializer.serializeObject(ban, strategy);
       });
   },
 
   show: function(req) {
-    return serialize(req.troupeBan);
+    var strategy = new restSerializer.TroupeBanStrategy({ });
+    return restSerializer.serializeObject(req.troupeBan, strategy);
   },
 
   destroy: function(req) {

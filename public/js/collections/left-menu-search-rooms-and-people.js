@@ -10,7 +10,7 @@ var FilteredCollection     = require('backbone-filtered-collection');
 var fuzzysearch            = require('fuzzysearch');
 
 function roomFilter(roomMenuModel, room) {
-  return fuzzysearch(roomMenuModel.get('searchTerm'), room.get('name'));
+  return roomMenuModel.get('searchTerm') && fuzzysearch(roomMenuModel.get('searchTerm'), room.get('name'));
 }
 
 //take a list of object which have a property of id and return a uniq array
@@ -78,7 +78,11 @@ module.exports = Backbone.Collection.extend({
 
     //format our results
     var results = currentRooms.concat(repos).concat(rooms).concat(people);
-    results     = uniqByUrl(results);
+    results     = uniqByUrl(results).map(function(model){
+      model.isHidden = false;
+      return model;
+    });
+
     this.reset(results);
   },
 

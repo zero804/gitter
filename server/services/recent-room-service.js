@@ -2,8 +2,8 @@
 
 var Promise            = require('bluebird');
 var troupeUriMapper    = require('./troupe-uri-mapper');
-var mongoUtils         = require('../utils/mongo-utils');
-var persistence        = require('./persistence-service');
+var mongoUtils         = require('gitter-web-persistence-utils/lib/mongo-utils');
+var persistence        = require('gitter-web-persistence');
 var assert             = require('assert');
 var appEvents          = require('gitter-web-appevents');
 var moment             = require('moment');

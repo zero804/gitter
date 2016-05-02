@@ -1,9 +1,10 @@
 /* jshint -W033, -W030*/
 "use strict";
 var context = require('utils/context');
+var clientEnv = require('gitter-client-env');
 
 (function() {
-  var trackingId = context.env('mixpanelToken');
+  var trackingId = clientEnv['mixpanelToken'];
 
   if(!trackingId) return;
 

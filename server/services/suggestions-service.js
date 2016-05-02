@@ -4,7 +4,7 @@ var Promise = require('bluebird');
 var _ = require('lodash');
 var collections = require('../utils/collections');
 var promiseUtils = require('../utils/promise-utils');
-var mongooseUtils = require('../utils/mongoose-utils');
+var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var troupeService = require('./troupe-service');
 var roomMembershipService = require('./room-membership-service');
 var userService = require('./user-service');
@@ -53,7 +53,7 @@ var HIGHLIGHTED_ROOMS = [
     uri: 'gitterHQ/nodejs',
     localeLanguage: 'en',
   },{
-    uri: 'rom-rb/chat',
+    uri: 'FreeCodeCamp/FreeCodeCamp',
     localeLanguage: 'en',
   }, {
     uri: 'webpack/webpack',

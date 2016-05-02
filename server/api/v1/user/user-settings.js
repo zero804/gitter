@@ -1,35 +1,48 @@
 'use strict';
 
-var userSettingsService = require('../../../services/user-settings-service');
+var userSettingsMuxer = require('../../../services/user-settings-muxer');
 
 module.exports = {
   id: 'userSetting',
 
-  index: function(req) {
-    return userSettingsService.getAllUserSettings(req.resourceUser.id)
-      .then(function (settings) {
-        return settings || {};
-      });
+  show: function(req) {
+    var settingsKey = req.params.userSetting;
+    var user = req.resourceUser;
+
+    var settings = settingsKey.split(/,/);
+
+    if (settings.length === 1) {
+      return userSettingsMuxer.getSetting(user, settingsKey);
+    } else {
+      return userSettingsMuxer.getSettings(user, settingsKey.split(','));
+    }
   },
 
-  show: function(req) {
-    return userSettingsService.getUserSettings(req.resourceUser.id, req.params.userSetting)
-      .then(function(f) {
-        return f || {};
-      });
+  create: function(req) {
+    var valuesHash = req.body;
+    var user = req.resourceUser;
+    return userSettingsMuxer.updateSettings(user, valuesHash);
   },
 
   update: function(req) {
-    var settings = req.body;
+    var value = req.body;
+    var user = req.resourceUser;
+    var settingsKey = req.params.userSetting;
 
-    if (settings.hasOwnProperty('value')) {
-      settings = settings.value;
+    return userSettingsMuxer.updateSetting(user, settingsKey, value);
+  },
+
+  respond: function(req, res, responseBody) {
+    switch(req.accepts(['json', 'text'])) {
+      case 'json':
+        res.send(responseBody);
+        break;
+
+      default:
+        res.sendStatus(200);
+        break;
     }
 
-    userSettingsService.setUserSettings(req.resourceUser.id, req.params.userSetting, settings)
-      .then(function() {
-        return settings;
-      });
   }
 
 };

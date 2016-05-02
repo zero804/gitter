@@ -4,14 +4,14 @@ var env                   = require('gitter-web-env');
 var redisClient           = env.redis.getClient();
 var errorReporter         = env.errorReporter;
 
-var persistence           = require('./persistence-service');
+var persistence           = require('gitter-web-persistence');
 var dolph                 = require('dolph');
 var Promise               = require('bluebird');
 var userService           = require('./user-service');
 var troupeService         = require('./troupe-service');
-var roomPermissionsModel  = require('./room-permissions-model');
+var roomPermissionsModel  = require('gitter-web-permissions/lib/room-permissions-model');
 var roomMembershipService = require('./room-membership-service');
-var mongoUtils            = require('../utils/mongo-utils');
+var mongoUtils            = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 var rateLimiter = dolph.rateLimiter({
   prefix: 'ac:',

@@ -99,7 +99,7 @@ elasticsearch:
   entrypoint: [ "/src/scripts/docker/es/start-elasticsearch.sh" ]
 
 elasticsearchsetup:
-  image: node:0.10
+  image: elasticsearch:1.4.2
   restart: 'no'
   links:
     - mongo1

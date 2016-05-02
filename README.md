@@ -14,7 +14,6 @@ Prerequisites
 * node.js 0.10+ `brew install node`
 * [Virtualbox](https://www.virtualbox.org/wiki/Downloads)
 * [Kitematic](https://kitematic.com/) or `boot2docker` if you prefer
-*
 
 Getting Started
 ---------------
@@ -34,7 +33,7 @@ This is run as part of the beta build, but is **not** run as part of a productio
 
 * dev: run `./scripts/upgrade-data.sh` yourself
 * beta: updated automatically as part of the make task
-* prod: run the individual script yourself. e.g `./scripts/dataupgrades/001-oauth-client/002-add-redirect-uri.sh mongo-replica-member-003/gitter`
+* prod: run the individual script yourself. e.g `./scripts/dataupgrades/001-oauth-client/002-add-redirect-uri.sh mongo-replica-01/gitter`
 
 Run Like Production
 -------------------

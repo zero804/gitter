@@ -1,6 +1,7 @@
 'use strict';
 
 var StatusError = require('statuserror');
+var assert = require('assert');
 
 /* Note, these can not change! */
 /* -----8<---- */
@@ -66,6 +67,8 @@ var MODES = {
 /* Alias modes */
 MODES.mention = MODES.announcement;
 
+var DEFAULT_USER_FLAGS = MODES.all | BITMASK_NOTIFY_DEFAULT;
+
 function getModeFromFlags(flags, strict) {
   switch(flags & BITMASK_MODE) {
     case MODES.all:
@@ -106,11 +109,16 @@ function getUpdateForMode(mode, isDefault) {
 
   var clearBits = BITMASK_INVERT_MODE_DEFAULT | setBits;
 
-  var lurk = !(setBits & BITMASK_NOTIFY_UNREAD);
+  return {
+    $bit: { flags: { or: setBits, and: clearBits } }
+  };
+}
+
+function getUpdateForFlags(flags) {
+  assert(!isNaN(flags));
 
   return {
-    $set: { lurk: lurk },
-    $bit: { flags: { or: setBits, and: clearBits } }
+    $set: { flags: flags }
   };
 }
 
@@ -206,17 +214,20 @@ function hashToFlags(hash) {
 
 module.exports = {
   MODES: MODES,
+  DEFAULT_USER_FLAGS: DEFAULT_USER_FLAGS,
 
-  FLAG_POS_NOTIFY_UNREAD: FLAG_POS_NOTIFY_UNREAD,
-  FLAG_POS_NOTIFY_ACTIVITY: FLAG_POS_NOTIFY_ACTIVITY,
-  FLAG_POS_NOTIFY_MENTION: FLAG_POS_NOTIFY_MENTION,
-  FLAG_POS_NOTIFY_ANNOUNCEMENT: FLAG_POS_NOTIFY_ANNOUNCEMENT,
-  FLAG_POS_NOTIFY_DESKTOP: FLAG_POS_NOTIFY_DESKTOP,
-  FLAG_POS_NOTIFY_MOBILE: FLAG_POS_NOTIFY_MOBILE,
+  FLAG_POS_NOTIFY_UNREAD       : FLAG_POS_NOTIFY_UNREAD,
+  FLAG_POS_NOTIFY_ACTIVITY     : FLAG_POS_NOTIFY_ACTIVITY,
+  FLAG_POS_NOTIFY_MENTION      : FLAG_POS_NOTIFY_MENTION,
+  FLAG_POS_NOTIFY_ANNOUNCEMENT : FLAG_POS_NOTIFY_ANNOUNCEMENT,
+  FLAG_POS_NOTIFY_DEFAULT      : FLAG_POS_NOTIFY_DEFAULT,
+  FLAG_POS_NOTIFY_DESKTOP      : FLAG_POS_NOTIFY_DESKTOP,
+  FLAG_POS_NOTIFY_MOBILE       : FLAG_POS_NOTIFY_MOBILE,
 
   getFlagsForMode: getFlagsForMode,
   getModeFromFlags: getModeFromFlags,
   getUpdateForMode: getUpdateForMode,
+  getUpdateForFlags: getUpdateForFlags,
   getLurkForFlags: getLurkForFlags,
   getLurkForMode: getLurkForMode,
   toggleLegacyLurkMode: toggleLegacyLurkMode,

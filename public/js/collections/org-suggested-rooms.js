@@ -6,7 +6,15 @@ var FilteredCollection  = require('backbone-filtered-collection');
 var backboneUrlResolver = require('backbone-url-resolver');
 var SyncMixin           = require('./sync-mixin');
 
+var Model = Backbone.Model.extend({
+  defaults: {
+    isSuggestion: true
+  }
+});
+
 var SuggestedCollection = Backbone.Collection.extend({
+  model: Model,
+  
   initialize: function(models, attrs) { //jshint unused: true
 
     if (!attrs || !attrs.contextModel) {
@@ -18,7 +26,9 @@ var SuggestedCollection = Backbone.Collection.extend({
     this.urlModel       = backboneUrlResolver('/v1/orgs/:selectedOrgName/suggestedRooms', this.contextModel);
     this.listenTo(this.contextModel, 'change:selectedOrgName', this.onOrgNameUpdate, this);
 
-    if(this.contextModel.get('state') === 'org'){
+    var selectedOrg = this.contextModel.get('selectedOrgName');
+    var orgIsSelected = selectedOrg && selectedOrg.length > 0;
+    if(this.contextModel.get('state') === 'org' && orgIsSelected) {
       this.fetch({ reset: true });
     }
 
@@ -30,6 +40,8 @@ var SuggestedCollection = Backbone.Collection.extend({
 
   onOrgNameUpdate: function(model, val) {//jshint unused: true
     if (!val || val  === '') return;
+    //clear any old models
+    this.reset([]);
     this.fetch({ reset: true });
   },
 

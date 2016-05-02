@@ -4,10 +4,10 @@ var troupeService     = require("../../../services/troupe-service");
 var restful           = require("../../../services/restful");
 var restSerializer    = require("../../../serializers/rest-serializer");
 var recentRoomService = require('../../../services/recent-room-service');
-var roomMembershipService = require('../../../services/room-membership-service');
+var userRoomModeUpdateService = require('../../../services/user-room-mode-update-service');
 var roomService       = require('../../../services/room-service');
 var Promise           = require('bluebird');
-var mongoUtils        = require('../../../utils/mongo-utils');
+var mongoUtils        = require('gitter-web-persistence-utils/lib/mongo-utils');
 var StatusError       = require('statuserror');
 
 function performUpdateToUserRoom(req) {
@@ -46,13 +46,16 @@ function performUpdateToUserRoom(req) {
       }
 
       if('mode' in updatedTroupe) {
-        promises.push(roomMembershipService.setMembershipMode(userId, troupeId, updatedTroupe.mode, false));
+        promises.push(userRoomModeUpdateService.setModeForUserInRoom(req.resourceUser, troupeId, updatedTroupe.mode));
       }
 
       return Promise.all(promises);
     })
     .then(function() {
-      var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: userId });
+      var strategy = new restSerializer.TroupeIdStrategy({
+        currentUserId: userId,
+        includeProviders: true
+      });
 
       return restSerializer.serializeObject(req.params.userTroupeId, strategy);
     });
@@ -79,7 +82,10 @@ module.exports = {
 
     return roomService.joinRoom(troupeId, req.user, options)
       .then(function() {
-        var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: req.user.id });
+        var strategy = new restSerializer.TroupeIdStrategy({
+          currentUserId: req.user.id,
+          includeProviders: true
+        });
 
         return restSerializer.serializeObject(troupeId, strategy);
       });

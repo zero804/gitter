@@ -2,9 +2,9 @@
 'use strict';
 
 var speedy      = require ("speedy");
-var persistence = require('../../server/services/persistence-service');
+var persistence = require('gitter-web-persistence');
 var chatService = require('../../server/services/chat-service');
-var mongoose    = require('../../server/utils/mongoose-q');
+var mongoose    = require('gitter-web-mongoose-bluebird');
 var onMongoConnect    = require('../../server/utils/on-mongo-connect');
 var async = require('async');
 var ObjectID = mongoose.mongo.ObjectID;

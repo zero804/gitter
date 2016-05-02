@@ -2,9 +2,9 @@
 
 var Promise = require('bluebird');
 var chatService = require('../../services/chat-service');
-var persistence = require('../../services/persistence-service');
+var persistence = require('gitter-web-persistence');
 var collections = require('../../utils/collections');
-var mongoUtils = require('../../utils/mongo-utils');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
 
 var loadRooms = Promise.method(function(roomIds) {
@@ -66,8 +66,13 @@ function SuggestedRoomStrategy() {
     // the room (getSuggestionsForUserId.)
     var room = roomHash[suggestedRoom.roomId] || suggestedRoom;
 
+    // in case id wasn't loaded for whatever reason
+    room.id = room.id || room._id;
+
     var uri = room && room.uri;
     if (!uri) return;
+
+    var providers = (room.providers && room.providers.length) ? room.providers : undefined;
 
     return {
       id: room.id,
@@ -76,6 +81,7 @@ function SuggestedRoomStrategy() {
       userCount: room.userCount,
       messageCount: messageCountHash[room.id],
       tags: room.tags,
+      providers: providers,
       // TODO: users/avatars (sample)
       description: room.topic,
       exists: !!room.id

@@ -119,7 +119,8 @@ function serializeUser(user) {
     exposeRawDisplayName: true,
     includeScopes: true,
     includePermissions: true,
-    showPremiumStatus: true
+    showPremiumStatus: true,
+    includeProviders: true
   });
 
   return restSerializer.serializeObject(user, strategy);
@@ -130,7 +131,8 @@ function serializeTroupeId(troupeId, user) {
     currentUserId: user ? user.id : null,
     currentUser: user,
     includePermissions: true,
-    includeOwner: true
+    includeOwner: true,
+    includeProviders: true
   });
 
   return restSerializer.serializeObject(troupeId, strategy);
@@ -142,7 +144,8 @@ function serializeTroupe(troupe, user) {
     currentUserId: user ? user.id : null,
     currentUser: user,
     includePermissions: true,
-    includeOwner: true
+    includeOwner: true,
+    includeProviders: true
   });
 
   return restSerializer.serializeObject(troupe, strategy);

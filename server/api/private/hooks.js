@@ -2,13 +2,12 @@
 
 var env           = require('gitter-web-env');
 var stats         = env.stats;
+var winston       = env.logger;
 
 var crypto        = require('crypto');
-var winston       = require('../../utils/winston');
 var eventService  = require('../../services/event-service');
 var troupeService = require('../../services/troupe-service');
 var checkRepoPrivacy = require('../../services/check-repo-privacy');
-var winston       = require('../../utils/winston');
 var StatusError   = require('statuserror');
 
 // TODO: this is just horrible

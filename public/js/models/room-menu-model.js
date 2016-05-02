@@ -10,11 +10,12 @@ var SuggestedOrgCollection         = require('../collections/org-suggested-rooms
 var apiClient                      = require('components/apiClient');
 var FilteredRoomCollection         = require('../collections/filtered-room-collection.js');
 var SuggestedRoomsByRoomCollection = require('../collections/left-menu-suggested-by-room');
-var UserSuggestions                = require('../collections/user-suggested-rooms')
+var UserSuggestions                = require('../collections/user-suggested-rooms');
 var SearchRoomPeopleCollection     = require('../collections/left-menu-search-rooms-and-people');
 var SearchChatMessages             = require('../collections/search-chat-messages');
 var perfTiming                     = require('components/perf-timing');
 var context                        = require('utils/context');
+var defaultCollectionFilter        = require('gitter-web-shared/filters/left-menu-primary-default');
 
 var states = [
   'all',
@@ -36,6 +37,7 @@ module.exports = Backbone.Model.extend({
     panelOpenState:            true,
     roomMenuIsPinned:          true,
     selectedOrgName:           '',
+    hasDismissedSuggestions:   false,
   },
 
   //TODO Remove all these delete statements and pass the object with the options hash
@@ -89,8 +91,8 @@ module.exports = Backbone.Model.extend({
       suggestedOrgsCollection: this.suggestedOrgs,
     });
 
-
-    this.activeRoomCollection   = new FilteredRoomCollection({
+    var models = this._roomCollection.filter(defaultCollectionFilter);
+    this.activeRoomCollection   = new FilteredRoomCollection(models, {
       roomModel:  this,
       collection: this._roomCollection,
     });
@@ -112,7 +114,7 @@ module.exports = Backbone.Model.extend({
     this.listenTo(this.bus, 'room-menu:change:state', this.onStateChangeCalled, this);
     this.listenTo(this, 'change:searchTerm', this.onSearchTermChange, this);
     this.listenTo(this, 'change:state', this.onSwitchState, this);
-    this.listenTo(this, 'change', _.debounce(this.save.bind(this), 1500));
+    this.listenTo(this, 'change', _.throttle(this.save.bind(this), 1500));
     this.listenTo(context.troupe(), 'change:id', this.onRoomChange, this);
 
     //boot the model
@@ -170,6 +172,7 @@ module.exports = Backbone.Model.extend({
         break;
     }
 
+    this.trigger('change:state:pre');
     this.trigger('change:state:post');
   },
 
@@ -202,7 +205,10 @@ module.exports = Backbone.Model.extend({
     //save
     if (method === 'create' || method === 'update' || method === 'patch') {
       attrs = JSON.stringify(this);
-      return apiClient.user.put('/settings/leftRoomMenu', this.toJSON())
+      return apiClient.user.put('/settings/leftRoomMenu', this.toJSON(), {
+          // No need to get the JSON back from the server...
+          dataType: 'text'
+        })
         .then(function() { if (options.success) options.success.apply(self, arguments); })
         .catch(function(err) { if (options.error) options.error(err); });
     }

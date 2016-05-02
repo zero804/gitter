@@ -1,6 +1,7 @@
 "use strict";
 
 var context = require('utils/context');
+var clientEnv = require('gitter-client-env');
 var appEvents = require('utils/appevents');
 var log = require('utils/log');
 var logout = require('utils/logout');
@@ -26,7 +27,7 @@ function authProvider(callback) {
       var presenceDetails = realtimePresenceTracker.getAuthDetails();
       var authMessage = _.extend({
         token: accessToken,
-        version: context.env('version'),
+        version: clientEnv['version'],
         connType: mobile ? 'mobile' : 'online',
         client: mobile ? 'mobweb' : 'web',
       }, presenceDetails);
@@ -43,7 +44,7 @@ var handshakeExtension = {
     if (message.successful) {
       var ext = message.ext;
       if (ext) {
-        if (ext.appVersion && ext.appVersion !== context.env('version')) {
+        if (ext.appVersion && ext.appVersion !== clientEnv['version']) {
 
           debug('Application version mismatch');
           if (!updateTimers) {
@@ -112,7 +113,7 @@ var pingTimer;
 function getOrCreateClient() {
   if (client) return client;
 
-  var c = context.env('websockets');
+  var c = clientEnv['websockets'] || {};
   client = new RealtimeClient({
     fayeUrl: c.fayeUrl,
     authProvider: authProvider,

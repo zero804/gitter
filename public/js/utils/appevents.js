@@ -1,12 +1,12 @@
 "use strict";
 var _ = require('underscore');
 var Backbone = require('backbone');
-var context = require('utils/context');
+var clientEnv = require('gitter-client-env');
 
 module.exports = (function() {
 
 
-  var basePath = context.env('basePath');
+  var basePath = clientEnv['basePath'];
 
   /*
    *

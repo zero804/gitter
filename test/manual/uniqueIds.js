@@ -2,8 +2,8 @@
 'use strict';
 
 var speedy      = require ("speedy");
-var mongoose    = require('../../server/utils/mongoose-q');
-var mongoUtils    = require('../../server/utils/mongo-utils');
+var mongoose    = require('gitter-web-mongoose-bluebird');
+var mongoUtils    = require('gitter-web-persistence-utils/lib/mongo-utils');
 var _ = require('underscore');
 var ObjectID = require('mongodb').ObjectID;
 // ObjectID.cacheHexString = true;

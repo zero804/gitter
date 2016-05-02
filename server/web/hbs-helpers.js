@@ -3,7 +3,7 @@
 var _         = require('underscore');
 var safeJson  = require('../utils/safe-json');
 var util      = require('util');
-var troupeEnv = require('./troupe-env');
+var clientEnv = require('gitter-client-env');
 var cdn = require('./cdn');
 
 exports.cdn = function(url, parameters) {
@@ -44,17 +44,18 @@ function createEnv(context, options) {
   if(options) {
     return _.extend({
       lang: context.lang
-    }, troupeEnv, options);
+    }, clientEnv, options);
   }
-  return troupeEnv;
+  return clientEnv;
 }
 exports.generateEnv = function(parameters) {
   var options = parameters.hash;
   var env = createEnv(this, options);
 
   return '<script type="text/javascript">' +
-          'window.troupeEnv = ' + safeJson(JSON.stringify(env)) + ';' +
+          'window.gitterClientEnv = ' + safeJson(JSON.stringify(env)) + ';' +
           '</script>';
+
 };
 
 exports.generateTroupeContext = function(troupeContext, parameters) {
@@ -63,7 +64,7 @@ exports.generateTroupeContext = function(troupeContext, parameters) {
   var env = createEnv(this, options);
 
   return '<script type="text/javascript">' +
-          'window.troupeEnv = ' + safeJson(JSON.stringify(env)) + ';' +
+          'window.gitterClientEnv = ' + safeJson(JSON.stringify(env)) + ';' +
           'window.troupeContext = ' + safeJson(JSON.stringify(troupeContext)) + ';' +
           '</script>';
 };
