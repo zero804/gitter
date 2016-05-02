@@ -285,6 +285,7 @@
   "scripts": {
     "start": "nodemon web.js",
     "dev": "concurrently --raw \"npm run start\" \"gulp watch\"",
+    "dev-template": "concurrently --raw \"npm run start -- --watch server --watch shared --watch modules --watch public  --ignore public/**/!(*.hbs)\" \"gulp watch\"",
     "test": "gulp localtest",
     "link": "linklocal link -r",
     "unlink": "linklocal unlink -r",
