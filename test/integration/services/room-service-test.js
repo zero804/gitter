@@ -1172,7 +1172,7 @@ describe('room-service', function() {
               linkPath: null,
               members: "INVITE",
               public: false,
-              type: "NONE"
+              type: null
             });
           });
       });
@@ -1237,7 +1237,7 @@ describe('room-service', function() {
               linkPath: null,
               members: "INVITE",
               public: false,
-              type: "NONE"
+              type: null
             });
 
           });
@@ -1303,7 +1303,7 @@ describe('room-service', function() {
               linkPath: null,
               members: "PUBLIC",
               public: true,
-              type: "NONE"
+              type: null
             });
           });
       });

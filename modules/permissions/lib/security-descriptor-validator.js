@@ -12,22 +12,32 @@ function validateObjectIdsArray(array) {
 }
 
 function validateGhRepoDescriptor(descriptor) {
+  var usesGH = false;
+
   switch(descriptor.members) {
     case 'PUBLIC':
     case 'INVITE':
+      break;
     case 'GH_REPO_ACCESS':
     case 'GH_REPO_PUSH':
+      usesGH = true;
       break;
     default:
-      throw new StatusError(403, 'Invalid members attribute');
+      throw new StatusError(403, 'Invalid members attribute: ' + descriptor.members);
   }
 
   switch(descriptor.admins) {
     case 'MANUAL':
+      break;
     case 'GH_REPO_PUSH':
+      usesGH = true;
       break;
     default:
-      throw new StatusError(403, 'Invalid admins attribute');
+      throw new StatusError(403, 'Invalid admins attribute: ' + descriptor.admins);
+  }
+
+  if (!usesGH) {
+    throw new StatusError(403, 'Unused reference type: GH_REPO');
   }
 
   if (descriptor.public) {
@@ -36,21 +46,22 @@ function validateGhRepoDescriptor(descriptor) {
       case 'GH_REPO_ACCESS':
         break;
       default:
-        throw new StatusError(403, 'Invalid public attribute');
+        throw new StatusError(403, 'Invalid public attribute: ' + descriptor.public);
     }
   }
 
-  if (!descriptor.linkPath) {
-    throw new StatusError(403, 'Invalid linkPath attribute');
+  var linkPath = descriptor.linkPath;
+  if (!linkPath) {
+    throw new StatusError(403, 'Invalid empty linkPath attribute for repo');
   }
 
-  var parts = descriptor.linkPath.split(/\//);
+  var parts = linkPath.split(/\//);
   if (parts.length !== 2) {
-    throw new StatusError(403, 'Invalid linkPath attribute');
+    throw new StatusError(403, 'Invalid linkPath attribute for repo: ' + linkPath);
   }
 
   if (!parts[0].length || !parts[1].length) {
-    throw new StatusError(403, 'Invalid linkPath attribute');
+    throw new StatusError(403, 'Invalid linkPath attribute for repo: ' + linkPath);
   }
 
   if (!validateObjectIdsArray(parts.extraMembers)) {
@@ -64,21 +75,26 @@ function validateGhRepoDescriptor(descriptor) {
 }
 
 function validateGhOrgDescriptor(descriptor) {
+  var usesGH = false;
   switch(descriptor.members) {
     case 'PUBLIC':
     case 'INVITE':
+      break;
     case 'GH_ORG_MEMBER':
+      usesGH = true;
       break;
     default:
-      throw new StatusError(403, 'Invalid members attribute');
+      throw new StatusError(403, 'Invalid members attribute: ' + descriptor.members);
   }
 
   switch(descriptor.admins) {
     case 'MANUAL':
+      break;
     case 'GH_ORG_MEMBER':
+      usesGH = true;
       break;
     default:
-      throw new StatusError(403, 'Invalid admins attribute');
+      throw new StatusError(403, 'Invalid admins attribute: ' + descriptor.admins);
   }
 
   if (descriptor.public) {
@@ -87,13 +103,19 @@ function validateGhOrgDescriptor(descriptor) {
     }
   }
 
-  if (!descriptor.linkPath) {
-    throw new StatusError(403, 'Invalid linkPath attribute');
+  if (!usesGH) {
+    throw new StatusError(403, 'Unused reference type: GH_ORG');
   }
 
-  var parts = descriptor.linkPath.split(/\//);
+  var linkPath = descriptor.linkPath;
+
+  if (!linkPath) {
+    throw new StatusError(403, 'Invalid empty linkPath attribute for org');
+  }
+
+  var parts = linkPath.split(/\//);
   if (parts.length !== 1) {
-    throw new StatusError(403, 'Invalid linkPath attribute');
+    throw new StatusError(403, 'Invalid linkPath attribute for org: ' + linkPath);
   }
 
   if (!validateObjectIdsArray(descriptor.extraMembers)) {
@@ -186,7 +208,7 @@ function validate(descriptor) {
         return validateBasicDescriptor(descriptor);
       }
 
-      throw new StatusError(403, 'Invalid descriptor type');
+      throw new StatusError(403, 'Invalid descriptor type: ' + descriptor.type);
   }
 
 }

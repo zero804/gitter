@@ -67,7 +67,7 @@ function generateRepoPermissionsForRoom(room) {
 
 function generateRepoChannelPermissionsForRoom(room, parentRoom) {
   var uri = room.uri;
-  var ownerUri = uri.split(/\//).slice(0, 1).join('/');
+  var ownerUri = uri.split(/\//).slice(0, 2).join('/');
   var security = room.security;
   var githubId = parentRoom && parentRoom.githubId;
 
@@ -191,7 +191,7 @@ function generateUserChannelPermissionsForRoom(room, ownerUser) {
   switch(security) {
     case 'PUBLIC':
       return {
-        type: 'NONE',
+        type: null,
         members: 'PUBLIC',
         admins: 'MANUAL',
         public: true,
@@ -200,7 +200,7 @@ function generateUserChannelPermissionsForRoom(room, ownerUser) {
 
     case 'PRIVATE':
       return {
-        type: 'NONE',
+        type: null,
         members: 'INVITE',
         admins: 'MANUAL',
         public: false,
