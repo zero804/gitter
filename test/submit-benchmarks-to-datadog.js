@@ -1,3 +1,5 @@
+'use strict';
+
 var csv = require('fast-csv');
 
 var metrics = require('datadog-metrics');
