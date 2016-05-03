@@ -20,6 +20,7 @@ module.exports = {
     "no-useless-call": "error",
     "no-spaced-func": "error",
     "max-statements": ["warn", 30],
-    "max-depth": ["error", 4]
+    "max-depth": ["error", 4],
+    "no-sequences": "error"
   },
 };
