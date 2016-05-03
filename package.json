@@ -267,6 +267,7 @@
     "restler": "~2.0.1",
     "run-sequence": "^1.1.1",
     "sinon": "1.5.2",
+    "slug": "^0.9.1",
     "soupselect": "^0.2.0",
     "speedy": "^0.1.1",
     "style-loader": "^0.13.0",
