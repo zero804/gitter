@@ -73,7 +73,7 @@ module.exports = Marionette.CollectionView.extend({
 
     this.listenTo(this.roomCollection, 'add remove', this.render, this);
     this.listenTo(this.collection, 'snapshot', this.onCollectionSnapshot, this);
-    this.listenTo(this.model, 'change:state change:selectedOrgName', this.onMenuStateUpdate, this);
+    this.listenTo(this.model, 'change:panelOpenState change:state change:selectedOrgName', this.onMenuStateUpdate, this);
     this.onMenuStateUpdate();
 
     //Guard against not getting a snapshot
@@ -108,6 +108,7 @@ module.exports = Marionette.CollectionView.extend({
       modelName = this.model.get('name');
     }
 
+    // Update the minibar state
     this.model.set({
       panelOpenState:       true,
       state:                model.get('type'),
