@@ -195,7 +195,7 @@ function generateUserChannelPermissionsForRoom(room, ownerUser) {
         members: 'PUBLIC',
         admins: 'MANUAL',
         public: true,
-        extraAdmins: [ownerUser.id]
+        extraAdmins: [ownerUser._id]
       };
 
     case 'PRIVATE':
@@ -204,7 +204,7 @@ function generateUserChannelPermissionsForRoom(room, ownerUser) {
         members: 'INVITE',
         admins: 'MANUAL',
         public: false,
-        extraAdmins: [ownerUser.id]
+        extraAdmins: [ownerUser._id]
       };
 
     default:
@@ -223,11 +223,11 @@ function generatePermissionsForRoom(room, parentRoom, ownerUser) {
   // Do some checking of the things
   if (githubType === 'ONETOONE') {
     if (!oneToOne) {
-      throw new StatusError(500, 'Github type mismatch');
+      throw new StatusError(500, 'Github type mismatch ghType=ONETOONE, oneToOne=false');
     }
   } else {
     if (oneToOne) {
-      throw new StatusError(500, 'Github type mismatch');
+      throw new StatusError(500, 'Github type mismatch, ghType!=ONETOONE, oneToOne=true');
     }
   }
 
