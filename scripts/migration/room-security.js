@@ -95,9 +95,10 @@ function dryRun() {
                 success++;
               } catch(e) {
                 fail++;
-                // console.error('>>>>>>>>>>>>>>>>>')
-                // console.error(result.troupe);
-                // console.error(e.stack);
+                console.error('>>>>>>>>>>>>>>>>>')
+                console.error(result.troupe);
+                console.error(e.message);
+                // process.exit();
               }
             })
           })
