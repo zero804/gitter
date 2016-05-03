@@ -45,7 +45,6 @@ function insertForRoom(roomId, descriptor) {
   roomId = mongoUtils.asObjectID(roomId);
   securityDescriptorValidator(descriptor);
 
-  // TODO: validate the descriptor
   var setOperation = {
     $setOnInsert: {
       troupeId: roomId,
