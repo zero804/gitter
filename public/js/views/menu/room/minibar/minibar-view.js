@@ -121,10 +121,16 @@ var MinibarView = Marionette.CollectionView.extend({
       modelName = this.model.get('name');
     }
 
+    // Set the minibar-item active
+    model.set({
+      active: true
+    });
+
     var state = model.get('type');
     // close-passthrough
     // Don't change the state when we focus/activate the `close`/toggle icon
     if(state !== 'close') {
+      // Update the minibar state
       this.model.set({
         panelOpenState:       true,
         state:                state,
@@ -195,9 +201,11 @@ var MinibarView = Marionette.CollectionView.extend({
 
   updateMinibarActiveState: function(currentState, selectedOrgName) {
     // Reset the currently active model
-    var activeModel = this.collection.findWhere({ active: true });
-    if (activeModel) {
-      activeModel.set('active', false);
+    var activeModels = this.collection.where({ active: true });
+    if (activeModels) {
+      activeModels.forEach(function(model) {
+        model.set('active', false);
+      });
     }
 
     // Activate the new model
