@@ -1,3 +1,5 @@
+/*eslint-env node */
+
 'use strict';
 
 var config = require('gitter-web-env').config;
