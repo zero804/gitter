@@ -9,7 +9,6 @@ var presenceService          = require("gitter-web-presence");
 var Promise                  = require('bluebird');
 var collections              = require("../../utils/collections");
 var GithubContributorService = require('gitter-web-github').GitHubContributorService;
-var Promise                  = require('bluebird');
 var getVersion               = require('../get-model-version');
 var billingService           = require('../../services/billing-service');
 var leanUserDao              = require('../../services/daos/user-dao').full;
