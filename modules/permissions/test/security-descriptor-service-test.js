@@ -2,66 +2,65 @@
 
 var assert = require('assert');
 var fixtureLoader = require('../../../test/integration/test-fixtures');
-
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var securityDesciptorService = require('../lib/security-descriptor-service');
+var permissionCombinations = require('./permission-combinations');
 
 describe('security-descriptor-service', function() {
   describe('integration tests #slow', function() {
 
+    permissionCombinations.forEach(function(descriptor, index) {
+      it('should insert and read combination #' + index, function() {
+        var roomId = mongoUtils.getNewObjectIdString();
+        return securityDesciptorService.insertForRoom(roomId, descriptor)
+          .then(function() {
+            return securityDesciptorService.getForRoomUser(roomId, null);
+          })
+          .then(function(result) {
+            assert.strictEqual(result.type, descriptor.type);
+            assert.strictEqual(result.members, descriptor.members);
+            assert.strictEqual(result.admins, descriptor.admins);
+            assert.strictEqual(result.linkPath, descriptor.linkPath);
+            assert.strictEqual(result.externalId, descriptor.externalId);
+          });
+      });
+    });
+
+  });
+
+  describe('updateLinksForRepo #slow', function() {
     var fixture = {};
+
     before(fixtureLoader(fixture, {
-      user1: {},
-      user2: {},
-      user3: {},
       troupe1: {
-        users: ['user1'],
         securityDescriptor: {
-          type: null,
+          type: 'GH_REPO',
           members: 'PUBLIC',
-          admins: 'MANUAL',
+          admins: 'GH_REPO_PUSH',
           public: true,
           linkPath: 'gitterHQ/gitter',
           externalId: null,
-          extraMembers: ['user1'],
-          extraAdmins: ['user1', 'user3']
-        }
-      },
-      troupe2: {
-        users: ['user1'],
-        securityDescriptor: {
-          type: null,
-          members: 'INVITE',
-          admins: 'MANUAL',
-          public: true,
-          linkPath: 'gitterHQ/gitter',
-          externalId: null,
-          extraMembers: [],
-          extraAdmins: []
         }
       }
     }));
 
     after(function() { fixture.cleanup(); });
 
-    describe('getForRoomUser', function() {
-      it('should load all the fields', function() {
-        var userId = fixture.user1._id;
-        var roomId = fixture.troupe1._id;
-
-        return securityDesciptorService.getForRoomUser(roomId, userId)
-          .then(function(perms) {
-            assert.deepEqual(perms, {
-              admins: "MANUAL",
-              externalId: null,
-              linkPath: "gitterHQ/gitter",
-              members: "PUBLIC",
-              public: true,
-              type: null,
-              extraMembers: [userId],
-              extraAdmins: [userId]
-            });
+    it('should rename links', function() {
+      return securityDesciptorService.updateLinksForRepo('gitterHQ/gitter', 'gitterHQ/test')
+        .then(function() {
+          return securityDesciptorService.getForRoomUser(fixture.troupe1._id, null);
+        })
+        .then(function(descriptor) {
+          assert.deepEqual(descriptor, {
+            admins: "GH_REPO_PUSH",
+            externalId: null,
+            linkPath: "gitterHQ/test",
+            members: "PUBLIC",
+            public: true,
+            type: "GH_REPO"
           });
-      });
+        });
 
     });
 
