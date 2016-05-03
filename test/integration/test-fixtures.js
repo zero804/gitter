@@ -17,7 +17,7 @@ function generateName() {
 
 function generateUri(roomType) {
   if(roomType === 'REPO') {
-      return '_test_' + (++counter) + Date.now() + '/_repo_' + (++counter) + Date.now();
+    return '_test_' + (++counter) + Date.now() + '/_repo_' + (++counter) + Date.now();
   }
 
   return '_test_' + (++counter) + Date.now();
@@ -186,8 +186,9 @@ function createExpectedFixtures(expected, done) {
     if (f.oneToOne) {
       githubType = 'ONETOONE';
     } else {
-      uri = f.uri || generateUri(githubType);
       githubType = f.githubType || 'ORG';
+      uri = f.uri || generateUri(githubType);
+
       lcUri = uri.toLowerCase();
     }
 
