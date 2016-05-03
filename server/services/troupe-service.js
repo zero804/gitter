@@ -5,7 +5,6 @@ var persistence           = require('gitter-web-persistence');
 var assert                = require("assert");
 var mongoUtils            = require('gitter-web-persistence-utils/lib/mongo-utils');
 var Promise               = require('bluebird');
-var assert                = require('assert');
 var roomPermissionsModel  = require('gitter-web-permissions/lib/room-permissions-model');
 var mongooseUtils         = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var StatusError           = require('statuserror');

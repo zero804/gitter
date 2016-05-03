@@ -18,7 +18,6 @@ var RAF                               = require('utils/raf');
 var RoomCollectionTracker             = require('components/room-collection-tracker');
 var SPARoomSwitcher                   = require('components/spa-room-switcher');
 var debug                             = require('debug-proxy')('app:router-app');
-var urlParser                         = require('./utils/url-parser');
 var linkHandler                       = require('./components/link-handler');
 var roomListGenerator                 = require('./components/chat-cache/room-list-generator');
 
