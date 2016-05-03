@@ -3,8 +3,9 @@
 var Marionette = require('backbone.marionette');
 
 var template = require('./community-create-view.hbs');
-var CommunityCreationMainView = require('./views/community-creation-main-view');
 var CommunityCreateModel = require('./community-create-model');
+var CommunityCreationMainView = require('./views/community-creation-main-view');
+var CommunityCreationInvitePeopleView = require('./views/community-creation-invite-people-view');
 
 require('views/behaviors/isomorphic');
 
@@ -14,14 +15,22 @@ module.exports = Marionette.LayoutView.extend({
   behaviors: {
     Isomorphic: {
       mainStepView: { el: '.community-create-main-step-root', init: 'initMainStepView' },
+      invitePeopleStepView: { el: '.community-create-invite-people-step-root', init: 'initInvitePeopleView' },
     },
   },
 
   initMainStepView: function(optionsForRegion) {
     this.mainStepView = new CommunityCreationMainView(optionsForRegion({
-      model: this.communityCreateModel
+      communityCreateModel: this.communityCreateModel
     }));
     return this.mainStepView;
+  },
+
+  initInvitePeopleView: function(optionsForRegion) {
+    this.invitePeopleStepView = new CommunityCreationInvitePeopleView(optionsForRegion({
+      communityCreateModel: this.communityCreateModel
+    }));
+    return this.invitePeopleStepView;
   },
 
   initialize: function(options) {

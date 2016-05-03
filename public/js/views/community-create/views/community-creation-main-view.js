@@ -5,8 +5,6 @@ var slugify = require('slug');
 
 var template = require('./community-creation-main-view.hbs');
 
-require('views/behaviors/isomorphic');
-
 require('gitter-styleguide/css/components/headings.css');
 require('gitter-styleguide/css/components/buttons.css');
 
@@ -21,6 +19,7 @@ var updateElementValueAndMaintatinSelection = function(el, newValue) {
     el.setSelectionRange(start, end);
   }
 };
+
 
 module.exports = Marionette.ItemView.extend({
   template: template,
@@ -41,26 +40,25 @@ module.exports = Marionette.ItemView.extend({
     'change @ui.communitySlugInput': 'onCommunitSlugInputChange'
   },
 
-  modelEvents: {
-    'change:communitySlug': 'onCommunitySlugChange'
-  },
-
   initialize: function(options) {
     console.log('cc-main-view init');
+    this.communityCreateModel = options.communityCreateModel;
+
+    this.listenTo(this.communityCreateModel, 'change:communitySlug', this.onCommunitySlugChange, this);
   },
 
   onCommunityNameInputChange: function() {
-    var currentSlug = this.model.get('communitySlug');
-    var isUsingCustomSlug = this.model.get('isUsingCustomSlug');
+    var currentSlug = this.communityCreateModel.get('communitySlug');
+    var isUsingCustomSlug = this.communityCreateModel.get('isUsingCustomSlug');
 
     var newCommunityName = this.ui.communityNameInput[0].value;
-    this.model.set({
+    this.communityCreateModel.set({
       communityName: newCommunityName
     });
 
     var isSlugEmpty = !currentSlug || currentSlug.length === 0;
     if(isSlugEmpty || !isUsingCustomSlug) {
-      this.model.set({
+      this.communityCreateModel.set({
         communitySlug: slugify(newCommunityName),
         // Reset back if we started doing an automatic slug again
         isUsingCustomSlug: isSlugEmpty ? false : isUsingCustomSlug
@@ -69,12 +67,12 @@ module.exports = Marionette.ItemView.extend({
   },
 
   onCommunitySlugChange: function() {
-    updateElementValueAndMaintatinSelection(this.ui.communitySlugInput[0], this.model.get('communitySlug'));
+    updateElementValueAndMaintatinSelection(this.ui.communitySlugInput[0], this.communityCreateModel.get('communitySlug'));
   },
 
   onCommunitSlugInputChange: function() {
     var newSlug = this.ui.communitySlugInput[0].value;
-    this.model.set({
+    this.communityCreateModel.set({
       isUsingCustomSlug: true,
       communitySlug: newSlug
     });
