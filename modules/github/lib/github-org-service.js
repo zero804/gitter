@@ -3,7 +3,6 @@
 var wrap = require('./github-cache-wrapper');
 var tentacles = require('./tentacles-client');
 var userTokenSelector = require('./user-token-selector').full;
-var githubMediaTypes = require('./github-media-types');
 
 function GitHubOrgService(user) {
   this.user = user;
@@ -16,7 +15,6 @@ function GitHubOrgService(user) {
 GitHubOrgService.prototype.getOrg = function(org) {
   return tentacles.org.get(org, {
     accessToken: this.accessToken,
-    headers: { Accept: githubMediaTypes.MOONDRAGON }
   });
 };
 
@@ -26,7 +24,6 @@ GitHubOrgService.prototype.getOrg = function(org) {
 GitHubOrgService.prototype.members = function(org) {
   return tentacles.orgMember.listMembers(org, {
     accessToken: this.accessToken,
-    headers: { Accept: githubMediaTypes.MOONDRAGON }
   });
 };
 
@@ -34,28 +31,24 @@ GitHubOrgService.prototype.someMembers = function(org) {
   return tentacles.orgMember.listMembers(org, {
     accessToken: this.accessToken,
     firstPageOnly: true,
-    headers: { Accept: githubMediaTypes.MOONDRAGON }
   });
 };
 
 GitHubOrgService.prototype.member = function(org, username) {
   return tentacles.orgMember.checkMembershipForUser(org, username, {
     accessToken: this.accessToken,
-    headers: { Accept: githubMediaTypes.MOONDRAGON }
   });
 };
 
 GitHubOrgService.prototype.getRepos = function(org) {
   return tentacles.repo.listForOrg(org, {
     accessToken: this.accessToken,
-    headers: { Accept: githubMediaTypes.MOONDRAGON }
   });
 };
 
 GitHubOrgService.prototype.getMembership = function(org, username) {
   return tentacles.orgMember.getMembershipForUser(org, username, {
     accessToken: this.accessToken,
-    headers: { Accept: githubMediaTypes.MOONDRAGON }
   });
 };
 
