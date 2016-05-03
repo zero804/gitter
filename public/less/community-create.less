@@ -50,18 +50,15 @@ body {
   left: 0;
   bottom: 0;
   right: 0;
-  
+
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+
+  pointer-events: none;
 }
 
-@keyframes community-create-step-move-in-animation {
-  from {
-    transform: translateX(-200px);
-  }
-}
 
 
 .community-create-step-wrapper {
@@ -82,16 +79,18 @@ body {
   visibility: hidden;
   opacity: 0;
   transform: translateX(200px);
+  pointer-events: none;
 
   transition:
     visibility 0s ease .2s,
     opacity .2s ease,
     transform .2s ease;
 
-  .community-create-step-root.active > & {
+  &.active {
     visibility: visible;
     opacity: 1;
     transform: translateX(0);
+    pointer-events: auto;
 
     animation-name: community-create-step-move-in-animation;
     animation-duration: .2s;
@@ -105,6 +104,12 @@ body {
 
   & a {
     color: @ruby;
+  }
+}
+
+@keyframes community-create-step-move-in-animation {
+  from {
+    transform: translateX(-200px);
   }
 }
 
@@ -147,6 +152,10 @@ body {
 
 .primary-community-heading {
   color: #ffffff;
+}
+
+.secondary-community-create-button {
+  color: @base-text-color;
 }
 
 
@@ -202,12 +211,12 @@ body {
 
 
 
-.non-github-community-create-advanced-options-section {
+.community-create-advanced-options-section {
   display: flex;
   justify-content: flex-end;
 }
 
-.non-github-community-create-advanced-options-button {
+.community-create-advanced-options-button {
+  .secondary-community-create-button();
   padding-right: 0;
-  color: @base-text-color;
 }
