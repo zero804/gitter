@@ -36,14 +36,16 @@ function calculateSubjectForUnreadEmail(i18n, troupesWithUnreadCounts) {
       } else {
         return i18n.__("Unread messages in %s", roomNames[0]);
       }
-      break;
+      /* break; */
+
     case 2:
       if(allOneToOne) {
         return i18n.__("Unread messages from %s and %s", roomNames[0], roomNames[1]);
       } else {
         return i18n.__("Unread messages in %s and %s", roomNames[0], roomNames[1]);
       }
-      break;
+      /* break; */
+
     default:
       if(allOneToOne) {
         return i18n.__n("Unread messages from %%s, %%s and one other", "Unread messages from %%s, %%s and %d others", roomNames.length - 2, roomNames[0], roomNames[1]);
