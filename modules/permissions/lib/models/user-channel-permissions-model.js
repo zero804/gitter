@@ -29,7 +29,6 @@ module.exports = Promise.method(function userChannelPermissionsModel(user, right
 
   switch(right) {
     case 'join':
-
     case 'view':
       switch(security) {
         case 'PUBLIC': return true;
@@ -44,7 +43,7 @@ module.exports = Promise.method(function userChannelPermissionsModel(user, right
         default:
           throw 'Unknown security: ' + security;
       }
-      break;
+      /* break; */
 
     case 'adduser':
       if(security === 'PUBLIC') return true;
@@ -70,7 +69,7 @@ module.exports = Promise.method(function userChannelPermissionsModel(user, right
         default:
           throw new Error('Illegal state');
       }
-      break;
+      /* break; */
 
     case 'admin':
       return userUri === user.username;
