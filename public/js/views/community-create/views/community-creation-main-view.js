@@ -25,7 +25,7 @@ module.exports = Marionette.ItemView.extend({
   template: template,
 
   attributes: {
-    class: 'community-create-main-step-wrapper'
+    class: 'community-create-step-wrapper community-create-main-step-wrapper'
   },
 
   ui: {

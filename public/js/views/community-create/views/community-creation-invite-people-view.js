@@ -12,7 +12,7 @@ module.exports = Marionette.ItemView.extend({
   template: template,
 
   attributes: {
-    class: 'community-create-invite-people-step-wrapper'
+    class: 'community-create-step-wrapper community-create-invite-people-step-wrapper'
   },
 
   ui: {
