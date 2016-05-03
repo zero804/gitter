@@ -32,7 +32,6 @@ body {
 .community-create-wrapper {
   display: flex;
   justify-content: center;
-  align-items: center;
   width: 100%;
   height: 100%;
 
@@ -45,6 +44,7 @@ body {
 }
 
 .community-create-step-layout-wrapper {
+  position: relative;
   width: 75%;
   max-width: 800px;
 
@@ -56,13 +56,68 @@ body {
   }
 }
 
-.community-create-main-step-wrapper {
+.community-create-main-step-root,
+.community-create-invite-people-step-root {
+  overflow: auto;
+
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+
+  display: flex;
+  align-items: center;
+
+  visibility: hidden;
+  opacity: 0;
+  transform: translateX(200px);
+
+  transition:
+    visibility 0s ease .2s,
+    opacity .2s ease,
+    transform .2s ease;
+
+  &.active {
+    visibility: visible;
+    opacity: 1;
+    transform: translateX(0);
+
+    animation-name: community-create-step-move-in-animation;
+    animation-duration: .2s;
+    animation-timing-function: ease;
+
+    transition:
+      visibility 0s ease 0s,
+      opacity .2s ease,
+      transform .2s ease;
+  }
+}
+
+@keyframes community-create-step-move-in-animation {
+  from {
+    transform: translateX(-200px);
+  }
+}
+
+
+.community-create-base-step-wrapper() {
+  flex: 1;
   display: flex;
   align-items: flex-end;
 
   & a {
     color: @ruby;
   }
+}
+
+.community-create-main-step-wrapper,
+.community-create-invite-people-step-wrapper {
+  .community-create-base-step-wrapper();
+}
+
+.community-create-step-primary-content-area {
+  flex: 1;
 }
 
 
@@ -102,7 +157,8 @@ body {
 }
 
 
-.primary-community-name-input {
+.primary-community-name-input,
+.primary-community-invite-people-name-input {
   .primary-bare-input();
   margin-top: 3rem;
   margin-bottom: 3rem;
