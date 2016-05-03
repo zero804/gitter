@@ -10,6 +10,7 @@ module.exports = {
     "quotes": "off",
     "strict": ["error", "safe"],
     "no-unused-vars": ["warn"],
-    "no-extra-boolean-cast": ["warn"]
+    "no-extra-boolean-cast": ["warn"],
+    "complexity": ["error", { "max": 12 }]
   },
 };

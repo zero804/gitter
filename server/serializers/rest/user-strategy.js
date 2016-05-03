@@ -1,4 +1,4 @@
-/* jshint maxcomplexity:19 */
+/* eslint complexity: ["error", 19] */
 "use strict";
 
 var env                      = require('gitter-web-env');

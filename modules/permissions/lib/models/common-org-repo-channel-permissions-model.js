@@ -1,4 +1,4 @@
-/* jshint maxcomplexity:18 */
+/*eslint complexity: ["error", 18]*/
 "use strict";
 
 var Promise = require('bluebird');

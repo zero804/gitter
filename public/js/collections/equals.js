@@ -1,4 +1,4 @@
-/* jshint -W041, maxdepth:5, maxcomplexity: 31 */
+/* eslint complexity: ["error", 31] */
 "use strict";
 var _ = require('underscore');
 

@@ -1,4 +1,4 @@
-/* jshint maxcomplexity:16 */
+/* eslint complexity: ["error", 16] */
 'use strict';
 var _                        = require('underscore');
 var context                  = require('utils/context');

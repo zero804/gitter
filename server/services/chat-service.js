@@ -1,3 +1,5 @@
+/* eslint complexity: ["error", 14] */
+
 "use strict";
 
 var env                  = require('gitter-web-env');
@@ -337,7 +339,7 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
   }
 
   return findMarker
-    .then(function(markerId) {   // jshint maxcomplexity:14
+    .then(function(markerId) { 
       if(!markerId && !options.aroundId) {
         var q = ChatMessage
           .where('toTroupeId', troupeId);
