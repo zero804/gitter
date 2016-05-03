@@ -1,15 +1,15 @@
 'use strict';
 
-var speedy      = require ("speedy");
+var speedy      = require("speedy");
 var persistence = require('gitter-web-persistence');
 var chatService = require('../../server/services/chat-service');
 var mongoose    = require('gitter-web-mongoose-bluebird');
 
 var ObjectID = mongoose.mongo.ObjectID;
 
-// speedy.samples (10);
+// speedy.samples(10);
 
-speedy.run ({
+speedy.run({
   withHintAroundId: function (done) {
     chatService.testOnly.setUseHints(true);
 

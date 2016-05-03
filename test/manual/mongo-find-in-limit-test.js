@@ -1,11 +1,7 @@
 'use strict';
 
-var speedy      = require ("speedy");
+var speedy      = require("speedy");
 var persistence = require('gitter-web-persistence');
-var chatService = require('../../server/services/chat-service');
-var mongoose    = require('gitter-web-mongoose-bluebird');
-
-var ObjectID = mongoose.mongo.ObjectID;
 
 
 var userIds = ["54e4b1e56d46b9ea027e6e38", "54e4b1e56d46b9ea027e6e37", "54e4b1e56d46b9ea027e6e36", "54e4b1e56d46b9ea027e6e34",
@@ -16,9 +12,9 @@ var userIds = ["54e4b1e56d46b9ea027e6e38", "54e4b1e56d46b9ea027e6e37", "54e4b1e5
 "54d245131669fd481514071d", "54d245131669fd481514071e", "54d245131669fd481514071f", "54d26067957e5e3250987a6e",
 "54d26068957e5e3250987a6f", "54d26069957e5e3250987a70"];
 
-speedy.samples (10);
+speedy.samples(10);
 
-speedy.run ({
+speedy.run({
   withoutLimit: function(done) {
     persistence.ChatMessage.find({ _id: { $in: userIds } }).exec(done);
   },
