@@ -416,10 +416,7 @@ describe('room-service', function() {
       var troupe = {
         _id: _troupId,
         id: _troupId.toString(),
-        uri: 'user/room',
-        save: function() {
-          return Promise.resolve();
-        }
+        uri: 'user/room'
       };
 
       var user = {
@@ -448,10 +445,7 @@ describe('room-service', function() {
       var troupe = {
         _id: _troupId,
         id: _troupId.toString(),
-        uri: 'user/room',
-        save: function() {
-          return Promise.resolve();
-        }
+        uri: 'user/room'
       };
 
       var user = {
@@ -479,11 +473,7 @@ describe('room-service', function() {
 
       var troupe = {
         _id: _troupId,
-
-        uri: 'user/room',
-        save: function() {
-          return Promise.resolve();
-        }
+        uri: 'user/room'
       };
 
       var user = {
@@ -530,10 +520,7 @@ describe('room-service', function() {
 
       var troupe = {
         _id: _troupId,
-        uri: 'user/room',
-        save: function() {
-          return Promise.resolve();
-        }
+        uri: 'user/room'
       };
 
       var user = {
@@ -555,8 +542,7 @@ describe('room-service', function() {
       });
 
       var troupe = {
-        uri: 'user/room',
-        save: function() {}
+        uri: 'user/room'
       };
 
       service.addUserToRoom(troupe, {}, 'test-user').catch(function(err) {
@@ -582,8 +568,7 @@ describe('room-service', function() {
 
       var troupe = {
         _id: _troupId,
-        uri: 'user/room',
-        save: function() {}
+        uri: 'user/room'
       };
 
       var user = {
@@ -609,8 +594,7 @@ describe('room-service', function() {
       });
 
       var troupe = {
-        uri: 'user/room',
-        save: function() {}
+        uri: 'user/room'
       };
 
       service.addUserToRoom(troupe, {}, 'test-user').catch(function(err) {
