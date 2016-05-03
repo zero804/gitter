@@ -76,7 +76,7 @@ function findOrInsertNewOneToOneRoom(userId1, userId2) {
 
         var descriptor = legacyMigration.generatePermissionsForRoom(troupe, null, null);
         return securityDescriptorService.insertForRoom(troupe._id, descriptor);
-      })
+      });
     });
 }
 
