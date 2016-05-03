@@ -41,7 +41,7 @@ function markAllWeirdRoomsAsReadForUser(userId, roomIds) {
     return unreadService.markAllChatsRead(userId, roomId, { member: false, recordAsRead: false });
   });
 
-  return Q.all(promises);
+  return Promise.all(promises);
 }
 
 function findAllWeirdRoomIdsForUser(userId, userUnreadRoomIds) {
@@ -52,7 +52,7 @@ function findAllWeirdRoomIdsForUser(userId, userUnreadRoomIds) {
 }
 
 function logResult(userId, weirdRoomIds) {
-  return Q.all([
+  return Promise.all([
     userService.findById(userId),
     troupeService.findByIds(weirdRoomIds)
   ]).spread(function(user, weirdRooms) {
@@ -78,7 +78,7 @@ function markAllWeirdRoomsAsRead(hash) {
       });
   });
 
-  return Q.all(promises);
+  return Promise.all(promises);
 }
 
 getKeys()

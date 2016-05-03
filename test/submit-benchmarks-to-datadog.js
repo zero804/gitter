@@ -27,7 +27,6 @@ csv
 
    if (isNaN(avg)) return; // Ignore bad lines
 
-   console.log(metric + ": ", tags.join(' '), avg);
    metrics.gauge(metric, avg, tags);
  })
  .on("end", function() {
