@@ -48,6 +48,8 @@ var uriResolver                = require('./uri-resolver');
 var getOrgNameFromTroupeName   = require('gitter-web-shared/get-org-name-from-troupe-name');
 var userScopes                 = require('../utils/models/user-scopes');
 
+var splitsvilleEnabled = nconf.get("project-splitsville:enabled");
+
 exports.testOnly = {};
 
 /**
@@ -239,7 +241,7 @@ function findOrCreateGroupRoom(user, troupe, uri, options) {
                 if (troupe.uri !== officialUri) {
 
                   // TODO: deal with ORG renames too!
-                  if (githubType === 'REPO') {
+                  if (githubType === 'REPO' && !splitsvilleEnabled) {
                     debug('Attempting to rename room %s to %s', uri, officialUri);
 
                     return renameRepo(troupe.uri, officialUri)
@@ -480,7 +482,7 @@ var createGithubRoom = Promise.method(function(user, uri) {
                 });
               }
 
-              if (updateExisting && room.uri !== uri && githubType === 'REPO') {
+              if (updateExisting && room.uri !== uri && githubType === 'REPO' && !splitsvilleEnabled) {
                 // room has been renamed!
                 // TODO: deal with ORG renames too!
                 debug('Attempting to rename room %s to %s', room.uri, uri);
@@ -1468,6 +1470,10 @@ function renameRepo(oldUri, newUri) {
         }
 
         return room.save()
+          .then(function() {
+            // TODO: deal with externalId
+            return securityDescriptorService.updateLinksForRepo(oldUri, newUri, null);
+          })
           .then(function() {
             return uriLookupService.removeBadUri(oldUri);
           })
