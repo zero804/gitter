@@ -1,15 +1,11 @@
 'use strict';
 
-var speedy      = require ("speedy");
+var speedy      = require("speedy");
 var persistence = require('gitter-web-persistence');
-var chatService = require('../../server/services/chat-service');
-var mongoose    = require('gitter-web-mongoose-bluebird');
 var onMongoConnect    = require('../../server/utils/on-mongo-connect');
 
-var ObjectID = mongoose.mongo.ObjectID;
-
 onMongoConnect(function() {
-  speedy.run ({
+  speedy.run({
     withSelect: function(done) {
       console.log(persistence.Troupe);
       persistence.Troupe.find({}, { uri: 1, oneToOne: 1, users: 1 })
