@@ -1,0 +1,164 @@
+@import 'colors';
+@import 'trp3Vars';
+@import 'typography';
+@import 'base-web';
+
+
+@base-text-color: rgba(255, 255, 255, .8);
+
+
+html {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+
+.community-create-root {
+  width: 100%;
+  height: 100%;
+
+}
+
+.community-create-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+
+  background-color: #753e9c;
+  background-image: url('../images/home/banner.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
+
+  color: @base-text-color;
+}
+
+.community-create-step-layout-wrapper {
+  width: 75%;
+  max-width: 800px;
+
+  @media (max-width: 800px) {
+    width: 85%;
+  }
+  @media (max-width: 600px) {
+    width: 95%;
+  }
+}
+
+.community-create-main-step-wrapper {
+  display: flex;
+  align-items: flex-end;
+
+  & a {
+    color: @ruby;
+  }
+}
+
+
+.primary-bare-input(@font-size: 3.789rem; @border-width: 3px) {
+  width: 100%;
+
+  padding: .9em 0;
+
+  background-color: transparent;
+  border: 0;
+  border-bottom: @border-width solid @ruby;
+  box-shadow: none;
+  border-radius: 0;
+
+  color: @base-text-color;
+  font-size: @font-size;
+
+  &:hover,
+  &:focus {
+    border-color: @jaffa;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: none;
+  }
+}
+
+.secondary-bare-input() {
+  .primary-bare-input(1.6rem, 2px);
+}
+
+
+
+.primary-community-heading {
+  color: #ffffff;
+}
+
+
+.primary-community-name-input {
+  .primary-bare-input();
+  margin-top: 3rem;
+  margin-bottom: 3rem;
+}
+
+
+
+
+
+.community-creation-slug-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 4rem;
+
+  &:after {
+    position: absolute;
+    right: 0;
+
+    content: '\e81a';
+    font-family: 'fontello';
+
+    color: transparent;
+
+    transition: color .2s ease;
+  }
+
+  &:hover {
+    &:after {
+      color: rgba(255, 255, 255, 0.5);
+    }
+  }
+}
+
+.community-creation-slug-input-prefix {
+  margin-right: 0.5rem;
+}
+
+.community-creation-slug-input {
+  .secondary-bare-input();
+  flex: 1;
+}
+
+.community-creation-slug-input-icon {
+
+}
+
+
+
+
+.non-github-community-create-advanced-options-section {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.non-github-community-create-advanced-options-button {
+  padding-right: 0;
+  color: @base-text-color;
+}
