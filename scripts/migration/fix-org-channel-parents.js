@@ -6,7 +6,7 @@ var persistence = require('gitter-web-persistence');
 var Promise = require('bluebird');
 var _ = require('lodash');
 var cliff = require('cliff');
-
+var shutdown = require('shutdown');
 
 function getOrgChannelsWithIncorrectParent() {
   return persistence.Troupe
@@ -174,7 +174,7 @@ require('yargs')
     return execute()
       .delay(1000)
       .then(function() {
-        process.exit();
+        shutdown.shutdownGracefully();
       })
       .done();
   })

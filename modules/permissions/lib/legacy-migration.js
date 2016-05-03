@@ -2,6 +2,7 @@
 
 var StatusError = require('statuserror');
 var securityDescriptorValidator = require('./security-descriptor-validator');
+var debug = require('debug')('gitter:permissions:legacy-migration');
 
 /**
  * This module helps migrating from the old world of permissions
@@ -72,7 +73,8 @@ function generateRepoChannelPermissionsForRoom(room, parentRoom) {
   var githubId = parentRoom && parentRoom.githubId;
 
   if (parentRoom && ownerUri !== parentRoom.uri) {
-    throw new StatusError(500, 'Owner URI vs Parent URI mismatch: ' + ownerUri + ' vs. ' + parentRoom.uri);
+    debug('parent repo room differs: %s vs %s', ownerUri, parentRoom.uri);
+    ownerUri = parentRoom.uri;
   }
 
   switch(security) {
@@ -98,7 +100,15 @@ function generateRepoChannelPermissionsForRoom(room, parentRoom) {
 
     case 'INHERITED':
       if (!parentRoom) {
-        throw new StatusError(500, 'Cannot migrate orphaned repo channel: ' + uri);
+        debug('Inherited room not found: %s', uri);
+        return {
+          type: 'GH_REPO',
+          members: 'GH_REPO_ACCESS',
+          admins: 'GH_REPO_PUSH',
+          public: false,
+          linkPath: ownerUri,
+          externalId: githubId
+        };
       }
 
       switch(parentRoom.security) {
@@ -139,7 +149,8 @@ function generateOrgChannelPermissionsForRoom(room, parentRoom) {
   var security = room.security;
 
   if (parentRoom && ownerUri !== parentRoom.uri) {
-    throw new StatusError(500, 'Owner URI vs Parent URI mismatch: ' + ownerUri + ' vs. ' + parentRoom.uri);
+    debug('parent org room differs: %s vs %s', ownerUri, parentRoom.uri);
+    ownerUri = parentRoom.uri;
   }
 
   switch(security) {
@@ -180,13 +191,7 @@ function generateOrgChannelPermissionsForRoom(room, parentRoom) {
 }
 
 function generateUserChannelPermissionsForRoom(room, ownerUser) {
-  var uri = room.uri;
-  var ownerUri = uri.split(/\//)[0];
   var security = room.security;
-
-  if (ownerUri !== ownerUser.username) {
-    throw new StatusError(500, 'Owner URI vs owner username mismatch: ' + ownerUri + ' vs. ' + ownerUser.username);
-  }
 
   switch(security) {
     case 'PUBLIC':
