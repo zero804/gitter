@@ -3,5 +3,9 @@ module.exports = {
         "commonjs": true,
         "node": true,
         "mocha": true
+    },
+    "rules": {
+      "no-console": "warn",
+      "strict": ["warn", "safe"]
     }
 };
