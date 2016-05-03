@@ -1,4 +1,3 @@
-/* jshint -W069, -W030, -W033 */
 "use strict";
 
 var context = require('utils/context');

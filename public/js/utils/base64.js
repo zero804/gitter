@@ -1,6 +1,3 @@
-/* jshint strict:false */
-/* jshint -W120 */
-/* jshint -W117 */
 
 /**
 *
