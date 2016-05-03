@@ -47,24 +47,18 @@ var findNextNavigableModel = function(navigableCollectionList, navigableItemRefe
         // This check only matters if there is more than one collection and
         // is what allows us to transfer over to the next.
         if(numberOfActiveNavigableCollectionItems > 1 && navigableCollectionItemIndex === navigableItemReference.listIndex) {
-          if(
-            dir > 0 &&
-            (
-              navigableItemReference.modelIndex >= navigableCollectionItem.collection.models.length-1 ||
-              // No more collections going forward
-              modelResult && Number.isInteger(navigableItemReference.modelIndex) && modelResult.index <= navigableItemReference.modelIndex
-            )
-          ) {
+          var isMoreItemsFoward = navigableItemReference.modelIndex < navigableCollectionItem.collection.models.length-1 &&
+            // Check if item is the same as the current reference
+            (modelResult && modelResult.index > navigableItemReference.modelIndex || navigableItemReference.modelIndex === null);
+
+          var isMoreItemsBackward = navigableItemReference.modelIndex > 0 &&
+          	// Check if item is the same as the current reference
+            (modelResult && modelResult.index < navigableItemReference.modelIndex | navigableItemReference.modelIndex === null);
+
+          if(dir > 0 && !isMoreItemsFoward) {
             return false;
           }
-          else if(
-            dir < 0 &&
-            (
-              navigableItemReference.modelIndex <= 0 ||
-              // No more collections going backward
-              modelResult && Number.isInteger(navigableItemReference.modelIndex) && modelResult.index >= navigableItemReference.modelIndex
-            )
-          ) {
+          else if(dir < 0 && !isMoreItemsBackward) {
             return false;
           }
         }
