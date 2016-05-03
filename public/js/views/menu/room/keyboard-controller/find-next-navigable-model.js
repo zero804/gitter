@@ -31,6 +31,7 @@ var findNextNavigableModel = function(navigableCollectionList, navigableItemRefe
     function(navigableCollectionItem, navigableCollectionItemIndex) {//jshint maxcomplexity:9
       if(navigableCollectionItemActiveCb(navigableCollectionItem, navigableCollectionItemIndex)) {
 
+        // Find the potentially next active item
         var modelResult = findNextActiveItem(
           navigableCollectionItem.collection.models,
           // Start at the bookmark if we are looking in that list otherwise, start from the beginning
@@ -73,7 +74,6 @@ var findNextNavigableModel = function(navigableCollectionList, navigableItemRefe
   );
 
   if(collectionItemWithNextModelResult && nextModelResult) {
-    //console.log('nextModelResult', nextModelResult);
     return {
       model: nextModelResult.item,
       reference: _.extend({}, navigableItemReference, {

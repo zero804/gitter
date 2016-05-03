@@ -12,10 +12,8 @@ var arrayBoundWrap = function(index, length) {
 var iterateListUntilActive = function(list, dir, startIndex, stopIndex, getActiveCb) {//jshint maxcomplexity:5
   startIndex = arrayBoundWrap(startIndex, list.length);
 
-  //console.log('ilua', list.length, startIndex, stopIndex);
   for(var i = startIndex; (dir > 0 ? i < stopIndex : i > -1); (dir > 0 ? i++ : i--)) {
     var item = list[i];
-    //console.log('--', i, getActiveCb(item, i));
     if(getActiveCb(item, i)) {
       return {
         item: item,

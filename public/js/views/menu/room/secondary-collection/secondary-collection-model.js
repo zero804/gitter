@@ -4,7 +4,6 @@ var BaseCollectionModel = require('../base-collection/base-collection-model');
 
 module.exports = BaseCollectionModel.extend({
 
-
   constructor: function(attrs, options) {
     BaseCollectionModel.prototype.constructor.apply(this, arguments);
     this.collection = options.collection;
@@ -70,14 +69,5 @@ module.exports = BaseCollectionModel.extend({
       isSuggestion: false,
     });
   },
-
-
-
-
-
-
-
-
-
 
 });
