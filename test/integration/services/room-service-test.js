@@ -182,7 +182,6 @@ describe('room-service', function() {
     it('should find or create a room for a person', function() {
       var permissionsModelMock = mockito.mockFunction();
       var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
-      var persistence = require('gitter-web-persistence');
       var roomService = testRequire.withProxies("./services/room-service", {
         'gitter-web-permissions/lib/permissions-model': permissionsModelMock
       });
@@ -681,7 +680,7 @@ describe('room-service', function() {
             mockito.verify(permissionsModelMock, once)();
             return room;
           })
-          .then(function(room) {
+          .tap(function(room) {
             // Get another mock
             // ADD A PERSON TO THE ROOM
             var roomPermissionsModelMock = mockito.mockFunction();
@@ -699,8 +698,7 @@ describe('room-service', function() {
             return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username)
               .then(function() {
                 mockito.verify(permissionsModelMock, once)();
-              })
-              .thenReturn(room);
+              });
           })
           .then(function(room) {
             var roomMembershipService = testRequire('./services/room-membership-service');
@@ -731,7 +729,7 @@ describe('room-service', function() {
             mockito.verify(permissionsModelMock, once)();
             return room;
           })
-          .then(function(room) {
+          .tap(function(room) {
             // Get another mock
             // ADD A PERSON TO THE ROOM
             var roomPermissionsModelMock = mockito.mockFunction();
@@ -749,8 +747,7 @@ describe('room-service', function() {
             return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username)
               .then(function() {
                 mockito.verify(roomPermissionsModelMock, once)();
-              })
-              .thenReturn(room);
+              });
           })
           .then(function(room) {
             var roomMembershipService = testRequire('./services/room-membership-service');
@@ -781,7 +778,7 @@ describe('room-service', function() {
             mockito.verify(permissionsModelMock, once)();
             return room;
           })
-          .then(function(room) {
+          .tap(function(room) {
             // Get another mock
             // ADD A PERSON TO THE ROOM
             var roomPermissionsModelMock = mockito.mockFunction();
@@ -800,8 +797,7 @@ describe('room-service', function() {
             return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username)
               .then(function() {
                 mockito.verify(roomPermissionsModelMock, once)();
-              })
-              .thenReturn(room);
+              });
           })
           .then(function(room) {
             var roomMembershipService = testRequire('./services/room-membership-service');
@@ -832,7 +828,7 @@ describe('room-service', function() {
             mockito.verify(permissionsModelMock, once)();
             return room;
           })
-          .then(function(room) {
+          .tap(function(room) {
             // Get another mock
             // ADD A PERSON TO THE ROOM
             var roomPermissionsModelMock = mockito.mockFunction();
@@ -851,8 +847,7 @@ describe('room-service', function() {
             return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username)
               .then(function() {
                 mockito.verify(roomPermissionsModelMock, once)();
-              })
-              .thenReturn(room);
+              });
           })
           .then(function(room) {
             var roomMembershipService = testRequire('./services/room-membership-service');
@@ -886,7 +881,7 @@ describe('room-service', function() {
             mockito.verify(permissionsModelMock, once)();
             return room;
           })
-          .then(function(room) {
+          .tap(function(room) {
             // Get another mock
             // ADD A PERSON TO THE ROOM
             var roomPermissionsModelMock = mockito.mockFunction();
@@ -904,8 +899,7 @@ describe('room-service', function() {
             return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username)
               .then(function() {
                 mockito.verify(roomPermissionsModelMock, once)();
-              })
-              .thenReturn(room);
+              });
           })
           .then(function(room) {
             var roomMembershipService = testRequire('./services/room-membership-service');
@@ -937,7 +931,7 @@ describe('room-service', function() {
             mockito.verify(permissionsModelMock, once)();
             return room;
           })
-          .then(function(room) {
+          .tap(function(room) {
             // Get another mock
             // ADD A PERSON TO THE ROOM
             var roomPermissionsModelMock = mockito.mockFunction();
@@ -955,8 +949,7 @@ describe('room-service', function() {
             return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username)
               .then(function() {
                 mockito.verify(roomPermissionsModelMock, once)();
-              })
-              .thenReturn(room);
+              });
           })
           .then(function(room) {
             var roomMembershipService = testRequire('./services/room-membership-service');
@@ -987,7 +980,7 @@ describe('room-service', function() {
             mockito.verify(permissionsModelMock, once)();
             return room;
           })
-          .then(function(room) {
+          .tap(function(room) {
             // Get another mock
             // ADD A PERSON TO THE ROOM
             var roomPermissionsModelMock = mockito.mockFunction();
@@ -1006,8 +999,7 @@ describe('room-service', function() {
             return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username)
               .then(function() {
                 mockito.verify(permissionsModelMock, once)();
-              })
-              .thenReturn(room);
+              });
           })
           .then(function(room) {
             var roomMembershipService = testRequire('./services/room-membership-service');
@@ -1041,7 +1033,7 @@ describe('room-service', function() {
             mockito.verify(permissionsModelMock, once)();
             return room;
           })
-          .then(function(room) {
+          .tap(function(room) {
             // Get another mock
             // ADD A PERSON TO THE ROOM
             var roomPermissionsModelMock = mockito.mockFunction();
@@ -1059,8 +1051,7 @@ describe('room-service', function() {
             return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username)
               .then(function() {
                 mockito.verify(roomPermissionsModelMock, once)();
-              })
-              .thenReturn(room);
+              });
           })
           .then(function(room) {
             var roomMembershipService = testRequire('./services/room-membership-service');
@@ -1091,7 +1082,7 @@ describe('room-service', function() {
             mockito.verify(permissionsModelMock, once)();
             return room;
           })
-          .then(function(room) {
+          .tap(function(room) {
             // Get another mock
             // ADD A PERSON TO THE ROOM
             var roomPermissionsModelMock = mockito.mockFunction();
@@ -1109,8 +1100,7 @@ describe('room-service', function() {
             return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username)
               .then(function() {
                 mockito.verify(roomPermissionsModelMock, once)();
-              })
-              .thenReturn(room);
+              });
           })
           .then(function(room) {
             var roomMembershipService = testRequire('./services/room-membership-service');
@@ -1141,7 +1131,7 @@ describe('room-service', function() {
             mockito.verify(permissionsModelMock, once)();
             return room;
           })
-          .then(function(room) {
+          .tap(function(room) {
             // Get another mock
             // ADD A PERSON TO THE ROOM
             var roomPermissionsModelMock = mockito.mockFunction();
@@ -1159,8 +1149,7 @@ describe('room-service', function() {
             return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username)
               .then(function() {
                 mockito.verify(roomPermissionsModelMock, once)();
-              })
-              .thenReturn(room);
+              });
           })
           .then(function(room) {
             var roomMembershipService = testRequire('./services/room-membership-service');
