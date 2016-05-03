@@ -1,4 +1,4 @@
-/* jshint -W041, maxdepth:5, maxcomplexity: 31 */
+/* eslint complexity: ["error", 31] */
 "use strict";
 
 /* This require looks HORRIBLE, but it's a way to use the non-aliased underscore */

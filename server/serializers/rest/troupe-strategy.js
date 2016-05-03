@@ -1,4 +1,4 @@
-/* jshint maxcomplexity:17 */
+/* eslint complexity: ["error", 17] */
 "use strict";
 
 var logger                = require('gitter-web-env').logger;

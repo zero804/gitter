@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint complexity: ["error", 18] */
 
 'use strict';
 
