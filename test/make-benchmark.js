@@ -1,4 +1,3 @@
-/* jshint node:true, unused:true */
 /* eslint no-console: ["error", { allow: ["log", "warn", "error"] }] */
 'use strict';
 
