@@ -89,13 +89,8 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
       mapKey: null,
       listIndex: null,
       modelId: null,
-      // Back-up in case the model doesn't have an id
       modelIndex: null
     };
-
-    window.getCurrentNavigableItemReference = function() {
-      return this.currentNavigableItemReference;
-    }.bind(this);
 
     // This object has a structure like the following,
     // { foo: [{ collection, getActive }, { collection, getActive }], bar: [/*...*/]}
