@@ -67,14 +67,9 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
   // ```
   inject: function(mapKey, newNavigableCollectionItems) {
     var navigableCollectionList = (this.navigableCollectionListMap[mapKey] || []);
-    var beforeNavigableCollectionListLength = navigableCollectionList.length;
     this.navigableCollectionListMap[mapKey] = navigableCollectionList.concat(newNavigableCollectionItems);
 
     newNavigableCollectionItems.forEach(function(collectionItem, index) {
-      // Strap on an index that we can fallback to when
-      // there is not a modelId and we need to reference our current spot
-      collectionItem.index = beforeNavigableCollectionListLength + index;
-
       this.listenTo(collectionItem.collection, 'change:active', function(model) {
         // Set a new current reference when we find a new active model
         if(model.get('active')) {
