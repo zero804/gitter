@@ -18,6 +18,8 @@ module.exports = {
     "no-unsafe-finally": "error",
     "no-with": "error",
     "no-useless-call": "error",
-    "no-spaced-func": "error"
+    "no-spaced-func": "error",
+    "max-statements": ["warn", 30],
+    "max-depth": ["error", 4]
   },
 };
