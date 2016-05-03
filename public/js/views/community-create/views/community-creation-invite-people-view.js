@@ -1,27 +1,24 @@
 'use strict';
 
+var _ = require('underscore');
 var Marionette = require('backbone.marionette');
+var toggleClass = require('utils/toggle-class');
 
+var CommunityCreateBaseStepView = require('./community-creation-base-step-view');
 var template = require('./community-creation-invite-people-view.hbs');
 
 require('gitter-styleguide/css/components/headings.css');
 require('gitter-styleguide/css/components/buttons.css');
 
 
-module.exports = Marionette.ItemView.extend({
+module.exports = CommunityCreateBaseStepView.extend({
   template: template,
 
-  attributes: {
+  attributes: _.extend({}, CommunityCreateBaseStepView.prototype.attributes, {
     class: 'community-create-step-wrapper community-create-invite-people-step-wrapper'
-  },
-
-  ui: {
-    communityNameInput: '.primary-community-name-input',
-    communitySlugInput: '.community-creation-slug-input'
-  },
+  }),
 
   initialize: function(options) {
-    console.log('cc-invite-people-view init');
-    this.communityCreateModel = options.communityCreateModel;
+    CommunityCreateBaseStepView.prototype.initialize.apply(this, arguments);
   },
 });

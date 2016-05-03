@@ -2,7 +2,7 @@
 
 var Backbone = require('backbone');
 
-var Model = Backbone.Model.extend({
+var CommuntiyCreateModel = Backbone.Model.extend({
   defaults: {
     communityName: '',
     communitySlug: '',
@@ -10,8 +10,8 @@ var Model = Backbone.Model.extend({
   },
 
   initialize: function() {
-    console.log('cc-main-view model init');
+    
   }
 });
 
-module.exports = Model;
+module.exports = CommuntiyCreateModel;
