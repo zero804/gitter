@@ -96,7 +96,7 @@ module.exports = function repoPermissionsModel(user, right, uri, security) {
               winston.error("Unknown owner type " + ownerType, { repo: repoInfo, user: user });
               return false;
           }
-          break;
+          /* break; */
 
         case 'admin':
           return !!isAdmin;
