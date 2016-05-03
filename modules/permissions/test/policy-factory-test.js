@@ -22,7 +22,7 @@ describe('policy-factory', function() {
           members: 'PUBLIC',
           admins: 'MANUAL',
           public: true,
-          linkPath: 'gitterHQ/gitter',
+          linkPath: null,
           externalId: null,
           extraMembers: ['user1'],
           extraAdmins: ['user1', 'user3']
@@ -34,8 +34,8 @@ describe('policy-factory', function() {
           type: null,
           members: 'INVITE',
           admins: 'MANUAL',
-          public: true,
-          linkPath: 'gitterHQ/gitter',
+          public: false,
+          linkPath: null,
           externalId: null,
           extraMembers: [],
           extraAdmins: []

@@ -19,7 +19,7 @@ function validateGhRepoDescriptor(descriptor) {
     case 'GH_REPO_PUSH':
       break;
     default:
-      throw new StatusError(500, 'Invalid members attribute');
+      throw new StatusError(403, 'Invalid members attribute');
   }
 
   switch(descriptor.admins) {
@@ -27,7 +27,7 @@ function validateGhRepoDescriptor(descriptor) {
     case 'GH_REPO_PUSH':
       break;
     default:
-      throw new StatusError(500, 'Invalid admins attribute');
+      throw new StatusError(403, 'Invalid admins attribute');
   }
 
   if (descriptor.public) {
@@ -36,29 +36,29 @@ function validateGhRepoDescriptor(descriptor) {
       case 'GH_REPO_ACCESS':
         break;
       default:
-        throw new StatusError(500, 'Invalid public attribute');
+        throw new StatusError(403, 'Invalid public attribute');
     }
   }
 
   if (!descriptor.linkPath) {
-    throw new StatusError(500, 'Invalid linkPath attribute');
+    throw new StatusError(403, 'Invalid linkPath attribute');
   }
 
   var parts = descriptor.linkPath.split(/\//);
   if (parts.length !== 2) {
-    throw new StatusError(500, 'Invalid linkPath attribute');
+    throw new StatusError(403, 'Invalid linkPath attribute');
   }
 
-  if (!parts[0].length || parts[1].length) {
-    throw new StatusError(500, 'Invalid linkPath attribute');
+  if (!parts[0].length || !parts[1].length) {
+    throw new StatusError(403, 'Invalid linkPath attribute');
   }
 
   if (!validateObjectIdsArray(parts.extraMembers)) {
-    throw new StatusError(500, 'Invalid extraMembers attribute');
+    throw new StatusError(403, 'Invalid extraMembers attribute');
   }
 
   if (!validateObjectIdsArray(parts.extraAdmins)) {
-    throw new StatusError(500, 'Invalid extraAdmins attribute');
+    throw new StatusError(403, 'Invalid extraAdmins attribute');
   }
 
 }
@@ -70,7 +70,7 @@ function validateGhOrgDescriptor(descriptor) {
     case 'GH_ORG_MEMBER':
       break;
     default:
-      throw new StatusError(500, 'Invalid members attribute');
+      throw new StatusError(403, 'Invalid members attribute');
   }
 
   switch(descriptor.admins) {
@@ -78,60 +78,60 @@ function validateGhOrgDescriptor(descriptor) {
     case 'GH_ORG_MEMBER':
       break;
     default:
-      throw new StatusError(500, 'Invalid admins attribute');
+      throw new StatusError(403, 'Invalid admins attribute');
   }
 
   if (descriptor.public) {
     if (descriptor.members !== 'PUBLIC') {
-      throw new StatusError(500, 'Invalid public attribute');
+      throw new StatusError(403, 'Invalid public attribute');
     }
   }
 
   if (!descriptor.linkPath) {
-    throw new StatusError(500, 'Invalid linkPath attribute');
+    throw new StatusError(403, 'Invalid linkPath attribute');
   }
 
   var parts = descriptor.linkPath.split(/\//);
   if (parts.length !== 1) {
-    throw new StatusError(500, 'Invalid linkPath attribute');
+    throw new StatusError(403, 'Invalid linkPath attribute');
   }
 
   if (!validateObjectIdsArray(descriptor.extraMembers)) {
-    throw new StatusError(500, 'Invalid extraMembers attribute');
+    throw new StatusError(403, 'Invalid extraMembers attribute');
   }
 
   if (!validateObjectIdsArray(descriptor.extraAdmins)) {
-    throw new StatusError(500, 'Invalid extraAdmins attribute');
+    throw new StatusError(403, 'Invalid extraAdmins attribute');
   }
 }
 
 function validateOneToOneDescriptor(descriptor) {
   if (descriptor.members) {
-    throw new StatusError(500, 'Invalid members attribute');
+    throw new StatusError(403, 'Invalid members attribute');
   }
 
   if (descriptor.admins) {
-    throw new StatusError(500, 'Invalid admins attribute');
+    throw new StatusError(403, 'Invalid admins attribute');
   }
 
   if (descriptor.public) {
-    throw new StatusError(500, 'Invalid public attribute');
+    throw new StatusError(403, 'Invalid public attribute');
   }
 
   if (descriptor.linkPath) {
-    throw new StatusError(500, 'Invalid linkPath attribute');
+    throw new StatusError(403, 'Invalid linkPath attribute');
   }
 
   if (descriptor.externalId) {
-    throw new StatusError(500, 'Invalid externalId attribute');
+    throw new StatusError(403, 'Invalid externalId attribute');
   }
 
   if (descriptor.extraMembers) {
-    throw new StatusError(500, 'Invalid extraMembers attribute');
+    throw new StatusError(403, 'Invalid extraMembers attribute');
   }
 
   if (descriptor.extraAdmins) {
-    throw new StatusError(500, 'Invalid extraAdmins attribute');
+    throw new StatusError(403, 'Invalid extraAdmins attribute');
   }
 
 }
@@ -142,34 +142,34 @@ function validateBasicDescriptor(descriptor) {
     case 'INVITE':
       break;
     default:
-      throw new StatusError(500, 'Invalid members attribute');
+      throw new StatusError(403, 'Invalid members attribute');
   }
 
   if (descriptor.admins !== 'MANUAL') {
-    throw new StatusError(500, 'Invalid admins attribute');
+    throw new StatusError(403, 'Invalid admins attribute');
   }
 
   if (descriptor.public) {
     if (descriptor.members !== 'PUBLIC') {
-      throw new StatusError(500, 'Invalid public attribute');
+      throw new StatusError(403, 'Invalid public attribute');
     }
   }
 
   if (descriptor.linkPath) {
-    throw new StatusError(500, 'Invalid linkPath attribute');
+    throw new StatusError(403, 'Invalid linkPath attribute');
   }
 
   if (!validateObjectIdsArray(descriptor.extraMembers)) {
-    throw new StatusError(500, 'Invalid extraMembers attribute');
+    throw new StatusError(403, 'Invalid extraMembers attribute');
   }
 
   if (!validateObjectIdsArray(descriptor.extraAdmins)) {
-    throw new StatusError(500, 'Invalid extraAdmins attribute');
+    throw new StatusError(403, 'Invalid extraAdmins attribute');
   }
 }
 
 function validate(descriptor) {
-  if (!descriptor) throw new StatusError(500, 'Invalid descriptor');
+  if (!descriptor) throw new StatusError(403, 'Invalid descriptor');
 
   switch(descriptor.type) {
     case 'GH_REPO':
@@ -186,7 +186,7 @@ function validate(descriptor) {
         return validateBasicDescriptor(descriptor);
       }
 
-      throw new StatusError(500, 'Invalid descriptor type');
+      throw new StatusError(403, 'Invalid descriptor type');
   }
 
 }

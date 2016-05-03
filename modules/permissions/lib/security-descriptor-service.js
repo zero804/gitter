@@ -3,6 +3,9 @@
 var SecurityDescriptor = require('gitter-web-persistence').SecurityDescriptor;
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var assert = require('assert');
+var securityDescriptorValidator = require('./security-descriptor-validator');
+var StatusError = require('statuserror');
 
 function getForRoomUser(roomId, userId) {
   var projection = {
@@ -28,7 +31,11 @@ function getForRoomUser(roomId, userId) {
   };
 
   return SecurityDescriptor.findOne(query, projection, { lean: true })
-    .exec();
+    .exec()
+    .then(function(descriptor) {
+      securityDescriptorValidator(descriptor);
+      return descriptor;
+    });
 }
 
 /**
@@ -36,6 +43,7 @@ function getForRoomUser(roomId, userId) {
  */
 function insertForRoom(roomId, descriptor) {
   roomId = mongoUtils.asObjectID(roomId);
+  securityDescriptorValidator(descriptor);
 
   // TODO: validate the descriptor
   var setOperation = {
@@ -68,7 +76,41 @@ function insertForRoom(roomId, descriptor) {
     });
 }
 
+function updateLinksForRepo(linkPath, newLinkPath, externalId) {
+  assert(linkPath, 'linkPath expected');
+  assert(newLinkPath, 'newLinkPath expected');
+
+  var parts = newLinkPath.split(/\//);
+  if (parts.length !== 2) {
+    throw new StatusError(400, 'Invalid linkPath attribute');
+  }
+
+  if (!parts[0].length || !parts[1].length) {
+    throw new StatusError(400, 'Invalid linkPath attribute: ' + linkPath);
+  }
+
+
+  var query = {
+    type: 'GH_REPO',
+    linkPath: linkPath
+  };
+
+  var update = {
+    $set: {
+      linkPath: newLinkPath
+    }
+  };
+
+  if (externalId) {
+    update.$set.externalId = externalId;
+  }
+
+  return SecurityDescriptor.update(query, update, { multi: true })
+    .exec();
+}
+
 module.exports = {
   getForRoomUser: getForRoomUser,
-  insertForRoom: insertForRoom
+  insertForRoom: insertForRoom,
+  updateLinksForRepo: updateLinksForRepo,
 };
