@@ -16,6 +16,7 @@ var MiniBarView        = require('../minibar/minibar-view');
 var PanelView          = require('../panel/panel-view');
 var MinibarCollection  = require('../minibar/minibar-collection');
 var KeyboardControllerView = require('../keyboard-controller/keyboard-controller-view');
+var KeyboardControllerModel = require('../keyboard-controller/keyboard-controller-model');
 
 var MINIBAR_ITEM_HEIGHT = 65;
 
@@ -104,7 +105,9 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
       isMobile:                $('body').hasClass('mobile'),
     }));
 
-    this.keyboardControllerView = new KeyboardControllerView();
+    this.keyboardControllerView = new KeyboardControllerView({
+      model: new KeyboardControllerModel()
+    });
 
     //Make a new drag & drop control
     this.dndCtrl = new DNDCtrl({ model: this.model });
