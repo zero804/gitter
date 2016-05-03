@@ -54,6 +54,40 @@ function keyByField(results,field) {
   }, {});
 }
 
+function countRealUsersInRooms(troupeIds) {
+  return persistence.TroupeUser
+    .aggregate([
+      { $match: { troupeId: { $in: troupeIds } } },
+      { $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "user"
+        }
+      },
+      { $unwind: {
+          path: "$user",
+        }
+      },
+      {
+        $group: {
+          _id: "$troupeId",
+          count: { $sum: 1 }
+        }
+      }
+    ])
+    .read('secondaryPreferred')
+    .exec()
+    .then(function(results) {
+      return results.reduce(function(memo, result) {
+        memo[result._id] = result.count;
+        return memo;
+      }, {});
+    });
+}
+
+
+
 function findUsersHashed(ownerUserIds) {
   return persistence.User.find({
       _id: { $in: ownerUserIds },
@@ -70,18 +104,20 @@ function getUpdates() {
     .bind({ })
     .then(function(results) {
       this.results = results;
+      var troupeIds = _.pluck(results, '_id');
       var ownerIds = _.pluck(results, 'ownerUserId');
-      return findUsersHashed(ownerIds);
+
+      return [countRealUsersInRooms(troupeIds), findUsersHashed(ownerIds)];
     })
-    .then(function(usersHashed) {
+    .spread(function(realCounts, usersHashed) {
       return this.results.map(function(troupe) {
         var ownerUser = usersHashed[troupe.ownerUserId];
+        var count = realCounts[troupe._id] || 0;
 
         var newUri;
         if (ownerUser && ownerUser.username) {
           newUri = ownerUser.username + '/' + troupe.uri.split(/\//)[1];
         }
-
 
         return {
           _id: troupe._id,
@@ -89,7 +125,8 @@ function getUpdates() {
           currentLcOwner: troupe.lcOwner,
           correctLcOwner: ownerUser && ownerUser.username && ownerUser.username.toLowerCase(),
           correctUsername: ownerUser && ownerUser.username,
-          newUri: newUri
+          newUri: newUri,
+          userCount: count
         };
       });
     });
@@ -128,7 +165,7 @@ var renameUserChannel = Promise.method(function (id, oldUri, newUri) {
 function dryRun() {
   return getUpdates()
     .then(function(updates) {
-      console.log(cliff.stringifyObjectRows(updates, ['_id', 'uri', 'currentLcOwner', 'correctLcOwner', 'correctUsername', 'newUri']));
+      console.log(cliff.stringifyObjectRows(updates, ['_id', 'uri', 'currentLcOwner', 'correctLcOwner', 'correctUsername', 'newUri', 'userCount']));
     });
 }
 
