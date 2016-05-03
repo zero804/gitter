@@ -71,6 +71,7 @@ module.exports = {
 
     var SecurityDesciptor = mongooseConnection.model('SecurityDesciptor', SecurityDescriptorSchema);
 
+    // Create a partial index for troupe security descriptors
     SecurityDesciptor.collection.createIndex({
         troupeId : 1
       } , {
@@ -78,6 +79,32 @@ module.exports = {
         unique: true,
         partialFilterExpression : {
           troupeId: { $exists: true }
+        }
+      },
+      function(err) {
+        if (err) throw err;
+      });
+
+    SecurityDesciptor.collection.createIndex({
+        type: 1,
+        linkPath : 1
+      } , {
+        background: true,
+        partialFilterExpression : {
+          linkPath: { $exists: true }
+        }
+      },
+      function(err) {
+        if (err) throw err;
+      });
+
+    SecurityDesciptor.collection.createIndex({
+        type: 1,
+        externalId : 1
+      } , {
+        background: true,
+        partialFilterExpression : {
+          externalId: { $exists: true }
         }
       },
       function(err) {
