@@ -8,6 +8,8 @@ module.exports = {
     "indent": "off",
     "comma-dangle": "off",
     "quotes": "off",
-    "strict": ["error", "safe"]
+    "strict": ["error", "safe"],
+    "no-unused-vars": ["warn"],
+    "no-extra-boolean-cast": ["warn"]
   },
 };

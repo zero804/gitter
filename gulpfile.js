@@ -13,7 +13,7 @@ var tar = require('gulp-tar');
 var expect = require('gulp-expect-file');
 var git = require('gulp-git');
 var fs = require('fs');
-var jshint = require('gulp-jshint');
+var eslint = require('gulp-eslint');
 var postcss = require('gulp-postcss');
 var autoprefixer = require('autoprefixer-core');
 var mqpacker = require('css-mqpacker');
@@ -90,52 +90,14 @@ gulp.task('validate-config', function() {
     .pipe(jsonlint.failOnError());
 });
 
-gulp.task('validate-client-source', function() {
-  /* This is a very lax jshint, only looking for major problems */
-  return gulp.src(['public/js/**/*.js', 'shared/**/*.js'])
-    .pipe(jshint({
-      browser: true,
-      devel: false,
-      strict: "global",
-      unused: false,
-      laxbreak: true,
-      laxcomma: true,
-      "-W069": "",
-      "-W033": "",
-      "-W093": "",
-      // "-W084": "",
-      predef: ["module", "require"]
-     }))
-    .pipe(jshint.reporter('default', { verbose: true }))
-    .pipe(jshint.reporter('fail'));
+gulp.task('validate-eslint', function() {
+  return gulp.src(['**/*.js','!node_modules/**','!public/repo/**'])
+    .pipe(eslint())
+    .pipe(eslint.format())
+    .pipe(eslint.failAfterError());
 });
 
-gulp.task('validate-server-source', function() {
-  /* This is a very lax jshint, only looking for major problems */
-  return gulp.src(['server/**/*.js', 'shared/**/*.js', 'modules/*/lib/**/*.js'])
-    .pipe(jshint({
-      node: true,
-      devel: false,
-      unused: false,
-      strict: "global",
-      "-W064": "", // Missing 'new' prefix when invoking a constructor
-      "-W069": "", // [..] is better written in dot notation.
-      "-W033": "", // Missing semicolon.
-      "-W032": "", // Unnecessary semicolon.
-     }))
-    .pipe(jshint.reporter('default', { verbose: true }))
-    .pipe(jshint.reporter('fail'));
-});
-
-gulp.task('validate-illegal-markers', function() {
-  return gulp.src(['server/**/*.js', 'shared/**/*.js', 'modules/*/lib/**/*.js', 'public/js/**/*.js'])
-    .pipe(grepFail([ 'NOCOMMIT' ]));
-  //
-  // return gulp.src()
-  //   .pipe(grepFail([ '' ]));
-});
-
-gulp.task('validate', ['validate-config', 'validate-client-source', 'validate-server-source' /*, 'validate-illegal-markers'*/]);
+gulp.task('validate', ['validate-config', 'validate-eslint']);
 
 makeTestTasks('test-mocha', function(name, files) {
   mkdirp.sync('output/test-reports/');

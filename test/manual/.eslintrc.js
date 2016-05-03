@@ -1,10 +1,10 @@
 module.exports = {
     "env": {
         "commonjs": true,
-        "browser": true,
         "mocha": true
     },
-    rules: {
+    "rules": {
+      "no-console": "off",
       "strict": ["warn", "safe"],
     }
 };
