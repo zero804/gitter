@@ -119,6 +119,7 @@ function getUpdates() {
           newUri = ownerUser.username + '/' + troupe.uri.split(/\//)[1];
         }
 
+
         return {
           _id: troupe._id,
           uri: troupe.uri,
