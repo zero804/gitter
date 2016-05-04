@@ -35,7 +35,7 @@ getGroupableRooms()
     console.log('done!');
     shutdown.shutdownGracefully();
   })
-  .on('error', function(err) {
+  .on('error', function(error) {
     console.error(error);
     console.error(error.stack);
     shutdown.shutdownGracefully(1);
