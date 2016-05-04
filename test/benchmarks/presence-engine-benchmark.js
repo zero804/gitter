@@ -1,4 +1,3 @@
-/* jshint node:true, unused:true */
 'use strict';
 
 var makeBenchmark = require('../make-benchmark');
@@ -49,10 +48,16 @@ FakeClient.prototype = {
     switch(nextAction) {
       case 0:
         nextPromise = this.connect();
+        break;
+        
       case 1:
         nextPromise = this.signalEyeball();
+        break;
+
       case 2:
         nextPromise = this.disconnect();
+        break;
+
       default:
         return;
     }

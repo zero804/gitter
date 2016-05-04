@@ -1,4 +1,4 @@
-/* jshint maxcomplexity:17 */
+/* eslint complexity: ["error", 17] */
 "use strict";
 
 var logger                = require('gitter-web-env').logger;
@@ -15,7 +15,6 @@ var debug                 = require('debug')('gitter:troupe-strategy');
 var Promise               = require('bluebird');
 var getVersion            = require('../get-model-version');
 var UserIdStrategy        = require('./user-id-strategy');
-var Promise               = require('bluebird');
 
 /**
  *

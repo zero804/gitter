@@ -53,6 +53,7 @@ function parseToken(tokenInfo) {
   try {
     return JSON.parse(tokenInfo);
   } catch(e) {
+    /* */
   }
 }
 

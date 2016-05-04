@@ -1,4 +1,5 @@
-/* globals __webpack_public_path__: true */
+/* global __webpack_public_path__:true */
+
 "use strict";
 
 // See http://webpack.github.io/docs/configuration.html#output-publicpath
