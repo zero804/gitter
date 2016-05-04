@@ -4,9 +4,9 @@ var Promise = require('bluebird');
 var _ = require('lodash');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
-function OneToOnePolicyEvaluator(user, permissionPolicy) {
+function OneToOnePolicyEvaluator(user, securityDescriptor) {
   this._user = user;
-  this._permissionPolicy = permissionPolicy;
+  this._securityDescriptor = securityDescriptor;
 }
 
 OneToOnePolicyEvaluator.prototype = {
@@ -16,7 +16,7 @@ OneToOnePolicyEvaluator.prototype = {
     }
     var userId = this._user._id;
 
-    var allowed = userIdIsIn(userId, this._permissionPolicy.oneToOneUsers);
+    var allowed = userIdIsIn(userId, this._securityDescriptor.oneToOneUsers);
     return Promise.resolve(allowed);
   },
 

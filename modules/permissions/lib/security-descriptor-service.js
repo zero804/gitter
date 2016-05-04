@@ -79,7 +79,7 @@ function updateLinksForRepo(linkPath, newLinkPath, externalId) {
   assert(linkPath, 'linkPath expected');
   assert(newLinkPath, 'newLinkPath expected');
 
-  var parts = newLinkPath.split(/\//);
+  var parts = newLinkPath.split('/');
   if (parts.length !== 2) {
     throw new StatusError(400, 'Invalid linkPath attribute');
   }

@@ -55,7 +55,7 @@ function validateGhRepoDescriptor(descriptor) {
     throw new StatusError(403, 'Invalid empty linkPath attribute for repo');
   }
 
-  var parts = linkPath.split(/\//);
+  var parts = linkPath.split('/');
   if (parts.length !== 2) {
     throw new StatusError(403, 'Invalid linkPath attribute for repo: ' + linkPath);
   }
@@ -113,7 +113,7 @@ function validateGhOrgDescriptor(descriptor) {
     throw new StatusError(403, 'Invalid empty linkPath attribute for org');
   }
 
-  var parts = linkPath.split(/\//);
+  var parts = linkPath.split('/');
   if (parts.length !== 1) {
     throw new StatusError(403, 'Invalid linkPath attribute for org: ' + linkPath);
   }

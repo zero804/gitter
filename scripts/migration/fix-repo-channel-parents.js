@@ -95,13 +95,13 @@ function getUpdates() {
       this.results = results;
       var troupeIds = _.pluck(results, '_id');
       var ownerLcUris = _.map(results, function(troupe) {
-        return troupe.lcUri.split(/\//).splice(0, 2).join('/');
+        return troupe.lcUri.split('/').splice(0, 2).join('/');
       });
       return [countRealUsersInRooms(troupeIds), findRepoRoomsHashed(ownerLcUris)]
     })
     .spread(function(userCounts, reposHashed) {
       return this.results.map(function(troupe) {
-        var realOwnerLcUri = troupe.lcUri.split(/\//).splice(0, 2).join('/');
+        var realOwnerLcUri = troupe.lcUri.split('/').splice(0, 2).join('/');
         var correctParent = reposHashed[realOwnerLcUri];
         var count = userCounts[troupe._id] || 0;
         return {

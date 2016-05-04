@@ -4,9 +4,9 @@ var Promise = require('bluebird');
 var GitHubOrgService = require('gitter-web-github').GitHubOrgService;
 var StatusError = require('statuserror');
 
-function GhOrgPolicyDelegate(user, permissionPolicy) {
+function GhOrgPolicyDelegate(user, securityDescriptor) {
   this._user = user;
-  this._permissionPolicy = permissionPolicy;
+  this._securityDescriptor = securityDescriptor;
   this._fetchPromise = null;
 }
 
@@ -25,7 +25,7 @@ GhOrgPolicyDelegate.prototype = {
 
   getPolicyRateLimitKey: function(policyName) {
     if (!this._isValidUser()) return;
-    var uri = this._permissionPolicy.linkPath;
+    var uri = this._securityDescriptor.linkPath;
 
     return "GH_ORG:" + this._user._id + ":" + uri + ":" + policyName;
   },
@@ -44,7 +44,7 @@ GhOrgPolicyDelegate.prototype = {
     }
 
     var user = this._user;
-    var uri = this._permissionPolicy.linkPath;
+    var uri = this._securityDescriptor.linkPath;
 
     var ghOrg = new GitHubOrgService(user);
     this._fetchPromise = ghOrg.member(uri, user.username);
