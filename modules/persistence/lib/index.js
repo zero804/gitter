@@ -51,6 +51,7 @@ module.exports = createExports({
   Identity: require('./schemas/identity-schema'),
   UserTroupeLastAccess: require('./schemas/user-troupe-last-access-schema'),
   UserTroupeFavourites: require('./schemas/user-troupe-favourites-schema'),
+  Group: require('./schemas/group-schema'),
   Troupe: require('./schemas/troupe-schema'),
   TroupeUser: require('./schemas/troupe-user-schema'),
   UserSettings: require('./schemas/user-settings-schema'),
