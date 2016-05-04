@@ -2,6 +2,7 @@
 
 var env                       = require('gitter-web-env');
 var stats                     = env.stats;
+var logger                    = env.logger;
 var recentRoomCore            = require('./core/recent-room-core');
 var unreadItemService         = require('./unread-items');
 var Promise                   = require('bluebird');
@@ -50,10 +51,10 @@ exports.findRemovalCandidates = findRemovalCandidates;
 function bulkRemoveUsersFromRoom(roomId, userIds) {
 
   if (!userIds.length) return Promise.resolve();
-  console.log('Removing ', userIds.length, ' users from ', roomId);
+  logger.info('Removing ' + userIds.length + ' users from ' + roomId);
   return roomMembershipService.removeRoomMembers(roomId, userIds)
     .then(function() {
-      console.log('Marking items as read');
+      logger.info('Marking items as read');
       return Promise.map(userIds, function(userId) {
         return unreadItemService.ensureAllItemsRead(userId, roomId);
       }, { concurrency: 5 });

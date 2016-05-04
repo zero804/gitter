@@ -4,8 +4,6 @@
 var fs = require('fs');
 var path = require('path');
 var winston = require('gitter-web-env').logger;
-var fs = require("fs");
-var path = require('path');
 
 function readFileSync(fileName) {
   var file = path.join(__dirname, '../..', fileName);
