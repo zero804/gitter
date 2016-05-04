@@ -10,7 +10,6 @@ var assert                  = require("assert");
 var mongoUtils              = require('gitter-web-persistence-utils/lib/mongo-utils');
 var Promise                 = require('bluebird');
 var ObjectID                = require('mongodb').ObjectID;
-var assert                  = require('assert');
 var mongooseUtils           = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var StatusError             = require('statuserror');
 var roomMembershipService   = require('./room-membership-service');

@@ -20,7 +20,7 @@ var View = Marionette.ItemView.extend({
   },
 
   initialize: function(options) {
-    var isOrg = options.uri.split('/').length === 1 ? true : false;
+    var isOrg = options.uri.split('/').length === 1;
     this.model = new Backbone.Model({ uri: options.uri, isOrg: isOrg });
     this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
   },

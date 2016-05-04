@@ -1,7 +1,6 @@
-/* jshint node:true */
 'use strict';
 
-var speedy      = require ("speedy");
+var speedy      = require("speedy");
 var mongoose    = require('gitter-web-mongoose-bluebird');
 var mongoUtils    = require('gitter-web-persistence-utils/lib/mongo-utils');
 var _ = require('underscore');
@@ -47,7 +46,7 @@ var sets = {
 
 };
 
-speedy.samples (2);
+speedy.samples(2);
 
 var benchmarkSuite = Object.keys(sets).reduce(function(memo, key) {
 
@@ -74,4 +73,4 @@ speedy
   .on("progress", function(data) {
     global.gc();
   })
-  .run (benchmarkSuite);
+  .run(benchmarkSuite);

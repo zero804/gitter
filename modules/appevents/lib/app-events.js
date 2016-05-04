@@ -167,7 +167,7 @@ module.exports =  {
     },
 
     destroyUserTokens: function(userId) {
-      localEventEmitter.emit('destroy_user_tokens', userId);  
+      localEventEmitter.emit('destroy_user_tokens', userId);
     },
 
     onDestroyUserTokens: function(callback) {
