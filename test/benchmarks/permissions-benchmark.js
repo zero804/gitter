@@ -76,7 +76,9 @@ makeBenchmark({
               delete room.owner;
               var perms = legacyMigration.generatePermissionsForRoom(room, parent, owner);
               return { room: room, perms: perms };
-            } catch(e) {}
+            } catch(e) {
+              /* */
+            }
           })
           .filter(function(f) {
             return !!f;
@@ -93,40 +95,40 @@ makeBenchmark({
       var room = roomAndPerms[count % roomAndPerms.length].room;
       var perms = roomAndPerms[count % roomAndPerms.length].perms;
       var policy = policyFactory.createPolicyFromDescriptor(user, perms, room._id);
-      
+
       return policy.canRead()
         .asCallback(done);
     },
-    
+
     'old#permissionToRead': function(done) {
       count++
       var user = users[count % users.length];
       var room = roomAndPerms[count % roomAndPerms.length].room;
-      
+
       return userCanAccessRoom.permissionToRead(user._id, room._id)
         .asCallback(done);
     },
-    
+
     'new#canWrite': function(done) {
       count++
       var user = users[count % users.length];
       var room = roomAndPerms[count % roomAndPerms.length].room;
       var perms = roomAndPerms[count % roomAndPerms.length].perms;
       var policy = policyFactory.createPolicyFromDescriptor(user, perms, room._id);
-      
+
       return policy.canWrite()
         .asCallback(done);
     },
-    
+
     'old#permissionToWrite': function(done) {
       count++
       var user = users[count % users.length];
       var room = roomAndPerms[count % roomAndPerms.length].room;
-      
+
       return userCanAccessRoom.permissionToWrite(user._id, room._id)
         .asCallback(done);
     },
-    
+
 
   }
 

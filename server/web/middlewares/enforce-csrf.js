@@ -26,7 +26,7 @@ var WHITELIST_REGEXP = new RegExp('^(' + WHITELIST.map(escapeRegExp).join('|') +
 
 module.exports = function(req, res, next) {
   // ignore these methods, they shouldnt alter state
-  if('GET' == req.method || 'HEAD' == req.method || 'OPTIONS' == req.method) return next();
+  if(req.method === 'GET' || req.method === 'HEAD' || req.method === 'OPTIONS') return next();
 
   /* OAuth clients have req.authInfo. Aways let them through */
   if(req.authInfo) return next();

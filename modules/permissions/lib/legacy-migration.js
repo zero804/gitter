@@ -135,7 +135,7 @@ function generateRepoChannelPermissionsForRoom(room, parentRoom) {
         default:
           throw new StatusError(500, 'Unknown parent room security type: ' + security);
       }
-      break;
+      /* break; */
 
     default:
       throw new StatusError(500, 'Unknown security type: ' + security);

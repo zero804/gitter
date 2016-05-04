@@ -1,4 +1,3 @@
-/* jshint node:true, unused:strict */
 "use strict";
 
 var env                    = require('gitter-web-env');

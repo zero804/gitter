@@ -1,7 +1,6 @@
-/* jshint node:true */
 'use strict';
 
-var speedy      = require ("speedy");
+var speedy      = require("speedy");
 var persistence = require('gitter-web-persistence');
 var chatService = require('../../server/services/chat-service');
 var mongoose    = require('gitter-web-mongoose-bluebird');
@@ -9,7 +8,7 @@ var onMongoConnect    = require('../../server/utils/on-mongo-connect');
 var async = require('async');
 var ObjectID = mongoose.mongo.ObjectID;
 
-// speedy.samples (10);
+// speedy.samples(10);
 speedy.timeout(5000);
 
 onMongoConnect(function() {
@@ -35,7 +34,7 @@ onMongoConnect(function() {
         db.command({collMod: "col2", usePowerOf2Sizes : false }, function(err) {
           if (err) throw err;
 
-          speedy.run ({
+          speedy.run({
             withPowerOfTwo: function (done) {
               var i = Math.floor(Math.random() * 1000);
               col1.update({ moo: i }, { $pushAll: { bob: [new Date()] } }, done);

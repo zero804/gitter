@@ -11,6 +11,31 @@ function validateObjectIdsArray(array) {
   });
 }
 
+function validateGhRepoLinkPath(linkPath) {
+  if (!linkPath) {
+    throw new StatusError(403, 'Invalid empty linkPath attribute for repo');
+  }
+
+  var parts = linkPath.split('/');
+  if (parts.length !== 2) {
+    throw new StatusError(403, 'Invalid linkPath attribute for repo: ' + linkPath);
+  }
+
+  if (!parts[0].length || !parts[1].length) {
+    throw new StatusError(403, 'Invalid linkPath attribute for repo: ' + linkPath);
+  }
+}
+
+function validateExtraUserIds(descriptor) {
+  if (!validateObjectIdsArray(descriptor.extraMembers)) {
+    throw new StatusError(403, 'Invalid extraMembers attribute');
+  }
+
+  if (!validateObjectIdsArray(descriptor.extraAdmins)) {
+    throw new StatusError(403, 'Invalid extraAdmins attribute');
+  }
+}
+
 function validateGhRepoDescriptor(descriptor) {
   var usesGH = false;
 
@@ -50,28 +75,19 @@ function validateGhRepoDescriptor(descriptor) {
     }
   }
 
-  var linkPath = descriptor.linkPath;
+  validateGhRepoLinkPath(descriptor.linkPath);
+  validateExtraUserIds(descriptor);
+}
+
+function validateGhOrgLinkPath(linkPath) {
   if (!linkPath) {
-    throw new StatusError(403, 'Invalid empty linkPath attribute for repo');
+    throw new StatusError(403, 'Invalid empty linkPath attribute for org');
   }
 
   var parts = linkPath.split('/');
-  if (parts.length !== 2) {
-    throw new StatusError(403, 'Invalid linkPath attribute for repo: ' + linkPath);
+  if (parts.length !== 1) {
+    throw new StatusError(403, 'Invalid linkPath attribute for org: ' + linkPath);
   }
-
-  if (!parts[0].length || !parts[1].length) {
-    throw new StatusError(403, 'Invalid linkPath attribute for repo: ' + linkPath);
-  }
-
-  if (!validateObjectIdsArray(parts.extraMembers)) {
-    throw new StatusError(403, 'Invalid extraMembers attribute');
-  }
-
-  if (!validateObjectIdsArray(parts.extraAdmins)) {
-    throw new StatusError(403, 'Invalid extraAdmins attribute');
-  }
-
 }
 
 function validateGhOrgDescriptor(descriptor) {
@@ -107,24 +123,8 @@ function validateGhOrgDescriptor(descriptor) {
     throw new StatusError(403, 'Unused reference type: GH_ORG');
   }
 
-  var linkPath = descriptor.linkPath;
-
-  if (!linkPath) {
-    throw new StatusError(403, 'Invalid empty linkPath attribute for org');
-  }
-
-  var parts = linkPath.split('/');
-  if (parts.length !== 1) {
-    throw new StatusError(403, 'Invalid linkPath attribute for org: ' + linkPath);
-  }
-
-  if (!validateObjectIdsArray(descriptor.extraMembers)) {
-    throw new StatusError(403, 'Invalid extraMembers attribute');
-  }
-
-  if (!validateObjectIdsArray(descriptor.extraAdmins)) {
-    throw new StatusError(403, 'Invalid extraAdmins attribute');
-  }
+  validateGhOrgLinkPath(descriptor.linkPath);
+  validateExtraUserIds(descriptor);
 }
 
 function validateOneToOneDescriptor(descriptor) {
@@ -181,13 +181,7 @@ function validateBasicDescriptor(descriptor) {
     throw new StatusError(403, 'Invalid linkPath attribute');
   }
 
-  if (!validateObjectIdsArray(descriptor.extraMembers)) {
-    throw new StatusError(403, 'Invalid extraMembers attribute');
-  }
-
-  if (!validateObjectIdsArray(descriptor.extraAdmins)) {
-    throw new StatusError(403, 'Invalid extraAdmins attribute');
-  }
+  validateExtraUserIds(descriptor);
 }
 
 function validate(descriptor) {

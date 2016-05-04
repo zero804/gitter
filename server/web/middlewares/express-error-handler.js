@@ -29,10 +29,7 @@ function getTemplateForStatus(status) {
   }
 }
 /* Has to have four args */
-module.exports = function(err, req, res, next) { // jshint unused:false
-  var user = req.user;
-  var userId = user && user.id;
-
+module.exports = function(err, req, res, next) { // eslint-disable-line no-unused-vars
   var status = res.statusCode;
 
   /* Got a 401, the user isn't logged in and this is a browser? */
