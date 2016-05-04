@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint complexity: ["error", 18] */
 
 'use strict';
 
@@ -152,8 +153,8 @@ function runWithOpts(opts) {
   var bucketCreatedAfter = opts['bucket-created-after'];
   if (bucketCreatedAfter) {
     var split = bucketCreatedAfter.split(',')
-    var bucket = split[0];
-    var createdAfter = parseTimestamp(split[1]);
+    bucket = split[0];
+    createdAfter = parseTimestamp(split[1]);
     set['criteria.bucketCreatedAfter'] = {
       bucket: bucket,
       createdAfter: createdAfter

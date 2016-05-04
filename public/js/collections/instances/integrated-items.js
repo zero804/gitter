@@ -23,7 +23,7 @@ function updateUserStatus(data) {
   if (user) {
     // the backbone models have not always come through before the presence events,
     // but they will come with an accurate online status so we can just ignore the presence event
-    user.set('online', (data.status === 'in') ? true : false);
+    user.set('online', data.status === 'in');
   }
 }
 

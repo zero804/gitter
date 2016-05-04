@@ -67,6 +67,7 @@ var ModalView = Marionette.LayoutView.extend({
             v.select();
           }
         } catch(e) {
+          /* */
         }
       }, 100);
 

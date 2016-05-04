@@ -1,3 +1,5 @@
+'use strict';
+
 var Builder = require( 'node-spritesheet' ).Builder;
 var services = require('gitter-services');
 var fse = require('fs-extra');

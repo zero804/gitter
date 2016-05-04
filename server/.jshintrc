@@ -1,9 +1,0 @@
-{
-  "trailing": false,
-  "unused": true,
-  "node": true,
-  "strict": true,
-  "maxstatements": 50,
-  "maxcomplexity": 12,
-  "maxdepth": 4
-}
