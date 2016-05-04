@@ -1,5 +1,6 @@
 /*jshint unused:true, browser:true*/
 var isAndroid = require('../../../public/js/utils/is-android');
+var assert = require('assert');
 
 describe('phone detection', function() {
   it('detects iPhone is not android', function() {

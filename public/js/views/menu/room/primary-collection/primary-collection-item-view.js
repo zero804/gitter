@@ -96,7 +96,7 @@ module.exports = BaseCollectionItemView.extend({
         this.el.classList.remove('room-item--favourite-one2one');
       }
     } else {
-      if (!model.get('favourite')) {
+      if (!!model.get('favourite')) {
         this.el.classList.remove('room-item');
         this.el.classList.add('room-item--favourite');
       } else {

@@ -36,14 +36,16 @@ function calculateSubjectForUnreadEmail(i18n, troupesWithUnreadCounts) {
       } else {
         return i18n.__("Unread messages in %s", roomNames[0]);
       }
-      break;
+      /* break; */
+
     case 2:
       if(allOneToOne) {
         return i18n.__("Unread messages from %s and %s", roomNames[0], roomNames[1]);
       } else {
         return i18n.__("Unread messages in %s and %s", roomNames[0], roomNames[1]);
       }
-      break;
+      /* break; */
+
     default:
       if(allOneToOne) {
         return i18n.__n("Unread messages from %%s, %%s and one other", "Unread messages from %%s, %%s and %d others", roomNames.length - 2, roomNames[0], roomNames[1]);
@@ -187,8 +189,8 @@ module.exports = {
     var emailBasePath = config.get("email:emailBasePath");
     var unsubscribeUrl = emailBasePath + '/settings/unsubscribe/' + hash;
 
-    var isPublic = (room && room.security === 'PUBLIC') ? true : false;
-    var isOrg = (room && room.security === 'ORG_ROOM') ? true : false;
+    var isPublic = !!(room && room.security === 'PUBLIC');
+    var isOrg = !!(room && room.security === 'ORG_ROOM');
 
     var recipientName = (user.displayName || user.username).split(' ')[0];
 

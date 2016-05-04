@@ -31,7 +31,7 @@ troupeService.findByUri(opts.uri)
     return new Promise(function(resolve, reject) {
       rl.question("Are you sure you want to delete " + room.uri + " with " + room.userCount + " users in it? (yes/no)", function(answer) {
         rl.close();
-        console.dir(answer);
+        console.log(answer);
 
         if(answer === 'yes') {
           resolve(room);

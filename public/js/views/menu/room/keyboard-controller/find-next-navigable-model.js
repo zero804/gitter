@@ -53,7 +53,7 @@ var findNextNavigableModel = function(navigableCollectionList, navigableItemRefe
             (modelResult && modelResult.index > navigableItemReference.modelIndex || navigableItemReference.modelIndex === null);
 
           var isMoreItemsBackward = navigableItemReference.modelIndex > 0 &&
-          	// Check if item is the same as the current reference
+            // Check if item is the same as the current reference
             (modelResult && modelResult.index < navigableItemReference.modelIndex | navigableItemReference.modelIndex === null);
 
           if(dir > 0 && !isMoreItemsFoward) {

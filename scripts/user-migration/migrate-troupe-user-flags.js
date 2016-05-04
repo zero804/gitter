@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* jshint node:true, unused:true */
+/* eslint complexity: ["error", 18] */
 'use strict';
 
 var persistence = require('gitter-web-persistence');
