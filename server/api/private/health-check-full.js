@@ -50,7 +50,8 @@ module.exports = [
       next(e);
     }
   },
-  function(err, req, res, next) { // jshint unused:false
+  function(err, req, res, next) { // eslint-disable-line no-unused-vars
+
     logger.error('Health check failed: ' + err, { exception: err });
     errorReporter(err, { health_check_full: "failed" }, { module: 'health-check' });
     res.status(500).send('Failed: ' + err);

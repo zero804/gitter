@@ -1,4 +1,4 @@
-/* jshint -W041, maxdepth:5, maxcomplexity: 31 */
+/* eslint complexity: ["error", 31], max-depth: ["error", 5] */
 "use strict";
 var _ = require('underscore');
 
@@ -25,8 +25,7 @@ module.exports = (function() {
     if (className !== toString.call(b)) return false;
     switch (className) {
       // RegExps are coerced to strings for comparison.
-      case '[object RegExp]':
-      // Strings, numbers, dates, and booleans are compared by value.
+      case '[object RegExp]': // Strings, numbers, dates, and booleans are compared by value.
       case '[object String]':
         // Primitives and their corresponding object wrappers are equivalent; thus, `"5"` is
         // equivalent to `String("5")`.

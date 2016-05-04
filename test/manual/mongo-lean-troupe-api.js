@@ -1,7 +1,6 @@
-/* jshint node:true */
 'use strict';
 
-var speedy      = require ("speedy");
+var speedy      = require("speedy");
 var persistence = require('gitter-web-persistence');
 var chatService = require('../../server/services/chat-service');
 var troupeService = require('../../server/services/troupe-service');
@@ -11,7 +10,7 @@ var onMongoConnect    = require('../../server/utils/on-mongo-connect');
 var ObjectID = mongoose.mongo.ObjectID;
 
 onMongoConnect(function() {
-  speedy.run ({
+  speedy.run({
     withFindById: function(done) {
       troupeService.findById('54d244f1c53660e29b9f91d9')
         .nodeify(done);
