@@ -189,8 +189,8 @@ module.exports = {
     var emailBasePath = config.get("email:emailBasePath");
     var unsubscribeUrl = emailBasePath + '/settings/unsubscribe/' + hash;
 
-    var isPublic = (room && room.security === 'PUBLIC') ? true : false;
-    var isOrg = (room && room.security === 'ORG_ROOM') ? true : false;
+    var isPublic = !!(room && room.security === 'PUBLIC');
+    var isOrg = !!(room && room.security === 'ORG_ROOM');
 
     var recipientName = (user.displayName || user.username).split(' ')[0];
 

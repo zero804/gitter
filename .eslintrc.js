@@ -33,6 +33,8 @@ module.exports = {
     "space-in-parens": ["warn", "never"],  // Change to error once merged
     "max-nested-callbacks": ["error", 6],   // Lets aim to bring this down
     "eol-last": "warn",                     // Change to error once merged
-    "no-mixed-spaces-and-tabs": "error"
+    "no-mixed-spaces-and-tabs": "error",
+    "no-negated-condition": "warn",
+    "no-unneeded-ternary": "error"
   },
 };

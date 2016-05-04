@@ -100,7 +100,7 @@ module.exports = (function() {
       return;
     }
 
-    var outsideBurstWindow = ((time - state.time) > BURST_WINDOW) ? true : false;
+    var outsideBurstWindow = ((time - state.time) > BURST_WINDOW);
 
     if (state.prevIsStatus || user !== state.user || outsideBurstWindow) {
       state.burstStart = true;
