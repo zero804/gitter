@@ -29,7 +29,7 @@ userService.findByUsername(opts.username)
       throw new StatusError(404, 'user not found');
     }
 
-    var staffStatus = opts.remove ? false : true;
+    var staffStatus = !opts.remove;
     user.staff = staffStatus;
     return user
       .save()
