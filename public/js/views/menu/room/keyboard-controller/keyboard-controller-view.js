@@ -148,7 +148,7 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
         this.navigableCollectionListMap[mapKey],
         0,
         sanitizeDir.FORWARDS,
-        function(navigableCollectionItem, navigableCollectionItemIndex) {//jshint unused: false
+        function(navigableCollectionItem, navigableCollectionItemIndex) {
           if(navigableCollectionItemActiveCb(navigableCollectionItem)) {
             var modelResult = findNextActiveItem(
               navigableCollectionItem.collection.models,
@@ -258,7 +258,7 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
   // Helper function to determine whether it is ok to use the `Tab` event to navigate the items.
   // We want to be able to escape out of this list of items once we `Tab` at the end of the list or
   // we were at the start of the list using `Shift + Tab`
-  shouldCaptureTabEvent: function(e) {//jshint maxcomplexity:5
+  shouldCaptureTabEvent: function(e) {
     // If the tab key was pushed
     if(e.code.toLowerCase() === 'tab') {
       var navigableCollectionList = this.navigableCollectionListMap[this.model.get('mapKey')];
@@ -318,7 +318,7 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
     }
   },
 
-  selectByIndex: function (e, mapKey, handler) { //jshint unused:true
+  selectByIndex: function (e, mapKey, handler) {
     var keys = handler.key.split('+');
     var key = keys[keys.length - 1];
 

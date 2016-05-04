@@ -83,7 +83,7 @@ var BaseCollectionItemView = Marionette.ItemView.extend({
     });
   },
 
-  onActiveChange: function(model, val) { //jshint unused: true
+  onActiveChange: function(model, val) {
     toggleClass(this.ui.container[0], 'active', !!val);
   },
 
@@ -99,7 +99,7 @@ var BaseCollectionItemView = Marionette.ItemView.extend({
     this.trigger('item:activated');
   },
 
-  onItemFocused: function(model, val) {//jshint unused: true
+  onItemFocused: function(model, val) {
     toggleClass(this.ui.container[0], 'focus', !!val);
   },
 
@@ -130,7 +130,7 @@ var BaseCollectionItemView = Marionette.ItemView.extend({
     toggleClass(this.ui.container[0], 'focus', false);
   },
 
-  onHiddenChange: function (model, val){ //jshint unused: true
+  onHiddenChange: function (model, val){
     toggleClass(this.el, 'hidden', val);
   },
 
