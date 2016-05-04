@@ -4,6 +4,7 @@ var Promise = require('bluebird');
 var PolicyEvaluator = require('./policies/policy-evaluator');
 var OneToOnePolicyEvaluator = require('./policies/one-to-one-policy-evaluator');
 var RoomContextDelegate = require('./policies/room-context-delegate');
+var OneToOneContextDelegate = require('./policies/one-to-one-room-context-delegate');
 var GhRepoPolicyDelegate = require('./policies/gh-repo-policy-delegate');
 var GhOrgPolicyDelegate = require('./policies/gh-org-policy-delegate');
 var StatusError = require('statuserror');
@@ -22,7 +23,9 @@ function getDelegateForSecurityDescriptor(user, securityDescriptor) {
 
 function createPolicyFromDescriptor(user, securityDescriptor, roomId) {
   if (securityDescriptor.type === 'ONE_TO_ONE') {
-    return new OneToOnePolicyEvaluator(user, securityDescriptor);
+    var oneToOneContextDelegate = new OneToOneContextDelegate(roomId);
+
+    return new OneToOnePolicyEvaluator(user, securityDescriptor, oneToOneContextDelegate);
   }
 
   var policyDelegate = getDelegateForSecurityDescriptor(user, securityDescriptor);
