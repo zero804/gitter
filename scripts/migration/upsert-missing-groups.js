@@ -21,6 +21,7 @@ function getGroupableRooms() {
       },
       {
         $project: {
+          uri: 1,
           lcOwner: 1
         }
       },
@@ -49,7 +50,11 @@ function log(batch, enc, callback) {
 
 function migrate(batch, enc, callback) {
   var lcOwner = batch._id;
-  console.log(lcOwner, batch.rooms.length);
+
+  // Fish the owner out of the first room's uri. This is the case-sensitive
+  // version used for name and uri.
+  var owner = batch.rooms[0].uri.split('/')[0];
+  console.log(owner, batch.rooms.length);
 
   // upsert the lcOwner into group
   var query = { lcUri: lcOwner };
@@ -57,8 +62,8 @@ function migrate(batch, enc, callback) {
       // only set on insert because we don't want to override name or forumId
       // or anything like that
       $setOnInsert: {
-        name: lcOwner,
-        uri: lcOwner,
+        name: owner,
+        uri: owner,
         lcUri: lcOwner
       }
     })
