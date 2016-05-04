@@ -603,8 +603,8 @@ gulp.task('default', function(callback) {
  * watch
  */
 gulp.task('watch', ['css'], function() {
-  livereload.listen();
-  gulp.watch('public/**/*.less', ['css']).on('change', livereload.changed);
+  //livereload.listen();
+  gulp.watch('public/**/*.less', ['css'])/*.on('change', livereload.changed)*/;
 });
 
 
