@@ -43,28 +43,76 @@ body {
 }
 
 .community-create-step-root {
-  overflow: auto;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 
   position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-
-  pointer-events: none;
+  width: 100%;
+  height: 100%;
 }
 
 
 
 .community-create-step-wrapper {
-  flex-shrink: 0;
-  display: flex;
+  overflow: auto;
+  width: 100%;
+  height: 100%;
+
+  // for inline-block layout
+  text-align: center;
+
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+
+  transition:
+    visibility 0s ease .2s,
+    opacity .2s ease,
+    transform .2s ease;
+
+
+  & > .community-create-step-content-area {
+    transform: translateX(200px);
+    transition: transform .2s ease;
+  }
+
+  &.active {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+
+    transition:
+      visibility 0s ease 0s,
+      opacity .2s ease,
+      transform .2s ease;
+
+    & > .community-create-step-content-area {
+      transform: translateX(0);
+
+      animation-name: community-create-step-move-in-animation;
+      animation-duration: .2s;
+      animation-timing-function: ease;
+    }
+  }
+
+  &:before {
+    content: '';
+    display: inline-block;
+    vertical-align: middle;
+    height: 100%;
+    margin-right: -0.25em;
+  }
+
+}
+
+.community-create-step-content-area {
+  display: inline-block;
+  display: inline-flex;
   align-items: flex-end;
+  vertical-align: middle;
+  // reset centering from above
+  text-align: left;
 
   width: 75%;
   max-width: 800px;
@@ -73,33 +121,6 @@ body {
   }
   @media (max-width: 600px) {
     width: 95%;
-  }
-
-
-  visibility: hidden;
-  opacity: 0;
-  transform: translateX(200px);
-  pointer-events: none;
-
-  transition:
-    visibility 0s ease .2s,
-    opacity .2s ease,
-    transform .2s ease;
-
-  &.active {
-    visibility: visible;
-    opacity: 1;
-    transform: translateX(0);
-    pointer-events: auto;
-
-    animation-name: community-create-step-move-in-animation;
-    animation-duration: .2s;
-    animation-timing-function: ease;
-
-    transition:
-      visibility 0s ease 0s,
-      opacity .2s ease,
-      transform .2s ease;
   }
 
   & a {
@@ -114,7 +135,7 @@ body {
 }
 
 
-.community-create-step-primary-content-area {
+.community-create-step-main-body {
   flex: 1;
 }
 
@@ -159,7 +180,68 @@ body {
 }
 
 
+.primary-tabbed-navigation-list {
+  display: flex;
+
+  margin-top: 0;
+  margin-left: 0;
+  margin-bottom: 0;
+  padding-left: 0;
+  list-style: none;
+
+  font-size: 3rem;
+}
+
+.primary-tabbed-navigation-list-item {
+
+  &:first-child {
+    & > .primary-tabbed-navigation-button {
+      padding-left: 0;
+    }
+  }
+
+  & + & {
+    border-left: 2px solid rgba(255, 255, 255, .4);
+  }
+}
+
+.primary-tabbed-navigation-button {
+  display: block;
+  padding-top: .5em;
+  padding-left: 1em;
+  padding-bottom: .5em;
+  padding-right: 1em;
+
+  background-color: transparent;
+  border: 0;
+
+  color: fade(@base-text-color, 70%);
+  font-size: inherit;
+  font-family: inherit;
+  line-height: 1;
+
+  transition:
+    background-color .2s ease,
+    color .2s ease;
+
+  &:hover,
+  &:focus {
+    color: @base-text-color;
+  }
+  &:focus {
+    background: rgba(255, 255, 255, .08);
+    outline: none;
+  }
+
+  &.active {
+    color: @ruby;
+  }
+}
+
+
+
 .primary-community-name-input,
+.primary-community-repo-name-filter-input,
 .primary-community-invite-people-name-input {
   .primary-bare-input();
   margin-top: 3rem;
@@ -219,4 +301,36 @@ body {
 .community-create-advanced-options-button {
   .secondary-community-create-button();
   padding-right: 0;
+}
+
+
+.community-create-github-projects-tabbed-wrapper {
+  position: relative;
+}
+
+.community-create-github-projects-tab-content-area {
+  position: absolute;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+
+  transition:
+    visibility 0s ease .2s,
+    opacity .2s ease;
+
+  &.active {
+    position: relative;
+    visibility: visible;
+    opacity: 1;
+    .community-create-step-wrapper & {
+      pointer-events: none;
+    }
+    .community-create-step-wrapper.active & {
+      pointer-events: auto;
+    }
+
+    transition:
+      visibility 0s ease 0s,
+      opacity .2s ease;
+  }
 }

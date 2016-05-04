@@ -5,7 +5,7 @@ var toggleClass = require('utils/toggle-class');
 
 
 
-module.exports = Marionette.ItemView.extend({
+module.exports = Marionette.LayoutView.extend({
   template: false,
 
   ui: {

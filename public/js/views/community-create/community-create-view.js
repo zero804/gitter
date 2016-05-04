@@ -2,13 +2,18 @@
 
 var Marionette = require('backbone.marionette');
 
+require('views/behaviors/isomorphic');
+
 var template = require('./community-create-view.hbs');
+
 var CommunityCreateModel = require('./community-create-model');
 var CommunityCreateStepViewModel = require('./community-create-step-view-model');
+var CommunityCreateGitHubProjectsStepViewModel = require('./community-create-github-projects-step-view-model');
+
 var CommunityCreationMainView = require('./views/community-creation-main-view');
+var CommunityCreationGithubProjectsView = require('./views/community-creation-github-projects-view');
 var CommunityCreationInvitePeopleView = require('./views/community-creation-invite-people-view');
 
-require('views/behaviors/isomorphic');
 
 // Bounds input index to somewhere in [0, length] with wrapping/rollover
 var arrayBoundWrap = function(index, length) {
@@ -23,6 +28,8 @@ module.exports = Marionette.LayoutView.extend({
     Isomorphic: {
       mainStepView: { el: '.community-create-main-step-root', init: 'initMainStepView' },
       invitePeopleStepView: { el: '.community-create-invite-people-step-root', init: 'initInvitePeopleView' },
+      githubProjectsStepView: { el: '.community-create-github-projects-step-root', init: 'initGitHubProjectsView' },
+
     },
   },
 
@@ -34,6 +41,16 @@ module.exports = Marionette.LayoutView.extend({
     this.listenTo(this.mainStepView, 'step:next', this.onStepInDirection.bind(this, 1), this);
     this.listenTo(this.mainStepView, 'step:back', this.onStepInDirection.bind(this, -1), this);
     return this.mainStepView;
+  },
+
+  initGitHubProjectsView: function(optionsForRegion) {
+    this.githubProjectsStepView = new CommunityCreationGithubProjectsView(optionsForRegion({
+      model: this.githubProjectsStepViewModel,
+      communityCreateModel: this.communityCreateModel
+    }));
+    this.listenTo(this.githubProjectsStepView, 'step:next', this.onStepInDirection.bind(this, 1), this);
+    this.listenTo(this.githubProjectsStepView, 'step:back', this.onStepInDirection.bind(this, -1), this);
+    return this.githubProjectsStepView;
   },
 
   initInvitePeopleView: function(optionsForRegion) {
@@ -49,10 +66,12 @@ module.exports = Marionette.LayoutView.extend({
   initialize: function(options) {
     this.communityCreateModel = new CommunityCreateModel();
     this.mainStepViewModel = new CommunityCreateStepViewModel({ active: true });
+    this.githubProjectsStepViewModel = new CommunityCreateGitHubProjectsStepViewModel({ active: false });
     this.invitePeopleStepViewModel = new CommunityCreateStepViewModel({ active: false });
 
     this.modelStepOrder = [
       this.mainStepViewModel,
+      this.githubProjectsStepViewModel,
       this.invitePeopleStepViewModel
     ];
   },
@@ -64,7 +83,7 @@ module.exports = Marionette.LayoutView.extend({
     var nextActiveModel;
     this.modelStepOrder.some(function(model, index) {
       if(model === currentActiveModel) {
-        nextActiveModel = this.modelStepOrder[arrayBoundWrap(index + 1, this.modelStepOrder.length)];
+        nextActiveModel = this.modelStepOrder[arrayBoundWrap(index + dir, this.modelStepOrder.length)];
         // break
         return true;
       }
