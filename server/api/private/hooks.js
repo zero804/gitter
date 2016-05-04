@@ -36,6 +36,7 @@ function decipherHash(hash) {
     var decipher = crypto.createDecipher('aes256', passphrase);
     return decipher.update(hash, 'hex', 'utf8') + decipher.final('utf8');
   } catch(err) {
+    /* */
   }
 }
 

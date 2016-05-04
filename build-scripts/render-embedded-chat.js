@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-/* jshint node:true */
 "use strict";
 
 var express       = require('express');

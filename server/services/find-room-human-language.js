@@ -34,12 +34,10 @@ function findRoomHumanLanguage(roomId) {
 
   return esClient.search(query)
     .then(function(results) {
-      console.log(results.aggregations.lang);
       if (!results.aggregations.lang.buckets.length) return;
       var highestBucket = results.aggregations.lang.buckets[0];
 
       if (highestBucket.doc_count < 40) {
-        console.log('ONLY GOT ', highestBucket.doc_count, 'ITEMS')
         return; // Not enough data
       }
 

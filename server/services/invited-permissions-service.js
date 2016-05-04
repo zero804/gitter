@@ -38,7 +38,7 @@ var canUserBeInvitedToJoinRoom = Promise.method(function (usernameToBeInvited, t
           /* Dont know what kind of permission this is */
           throw new StatusError(400);
       }
-      break;
+      /* break; */
 
     case 'USER_CHANNEL':
       /* Anyone can be added, whether its PUBLIC or PRIVATE */

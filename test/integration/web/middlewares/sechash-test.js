@@ -1,4 +1,5 @@
 // Ensure that sechash is backwards compatible
+'use strict';
 
 var sechash = require('sechash');
 var assert = require('assert');
