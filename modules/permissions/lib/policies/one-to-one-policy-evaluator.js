@@ -1,24 +1,28 @@
 'use strict';
 
 var Promise = require('bluebird');
-var _ = require('lodash');
-var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var debug = require('debug')('gitter:permissions:one-to-one-policy-evaluator');
 
-function OneToOnePolicyEvaluator(user, securityDescriptor) {
+function OneToOnePolicyEvaluator(user, securityDescriptor, contextDelegate) {
   this._user = user;
-  this._securityDescriptor = securityDescriptor;
+  this._contextDelegate = contextDelegate;
 }
 
 OneToOnePolicyEvaluator.prototype = {
-  canRead: function() {
+  canRead: Promise.method(function() {
     if (!this._user) {
-      return Promise.resolve(false);
+      debug('canRead: Denying anonymous user');
+      return false;
     }
     var userId = this._user._id;
 
-    var allowed = userIdIsIn(userId, this._securityDescriptor.oneToOneUsers);
-    return Promise.resolve(allowed);
-  },
+    if (!this._contextDelegate) {
+      debug('canRead: Denying user without context');
+      return false;
+    }
+
+    return this._contextDelegate.isMember(userId);
+  }),
 
   canWrite: function() {
     return this.canRead();
@@ -36,11 +40,5 @@ OneToOnePolicyEvaluator.prototype = {
     return Promise.resolve(false);
   }
 };
-
-function userIdIsIn(userId, collection) {
-  return _.some(collection, function(item) {
-    return mongoUtils.objectIDsEqual(userId, item.userId);
-  });
-}
 
 module.exports = OneToOnePolicyEvaluator;

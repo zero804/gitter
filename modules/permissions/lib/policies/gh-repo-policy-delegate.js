@@ -2,7 +2,7 @@
 
 var Promise = require('bluebird');
 var GitHubRepoService = require('gitter-web-github').GitHubRepoService;
-var StatusError = require('statuserror');
+var PolicyDelegateTransportError = require('./policy-delegate-transport-error');
 
 function GhRepoPolicyDelegate(user, securityDescriptor) {
   this._user = user;
@@ -35,7 +35,7 @@ GhRepoPolicyDelegate.prototype = {
           });
 
       default:
-        throw new StatusError(403, 'Invalid permissions');
+        return false;
     }
   }),
 
@@ -63,7 +63,17 @@ GhRepoPolicyDelegate.prototype = {
     var uri = this._securityDescriptor.linkPath;
 
     var repoService = new GitHubRepoService(user);
-    this._fetchPromise = repoService.getRepo(uri);
+    this._fetchPromise = repoService.getRepo(uri)
+      .catch(function(err) {
+        if(err.errno && err.syscall || err.statusCode >= 500) {
+          // GitHub call failed and may be down.
+          // We can fall back to whether the user is already in the room
+          throw new PolicyDelegateTransportError(err.message);
+        }
+
+        throw err;
+      });
+
     // TODO: warn of privacy mismatch.....
     return this._fetchPromise;
   }

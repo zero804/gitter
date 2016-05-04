@@ -2,7 +2,7 @@
 
 var Promise = require('bluebird');
 var GitHubOrgService = require('gitter-web-github').GitHubOrgService;
-var StatusError = require('statuserror');
+var PolicyDelegateTransportError = require('./policy-delegate-transport-error');
 
 function GhOrgPolicyDelegate(user, securityDescriptor) {
   this._user = user;
@@ -12,12 +12,12 @@ function GhOrgPolicyDelegate(user, securityDescriptor) {
 
 GhOrgPolicyDelegate.prototype = {
   hasPolicy: Promise.method(function(policyName) {
-    if (!this._isValidUser()) {
+    if (policyName !== 'GH_ORG_MEMBER') {
       return false;
     }
 
-    if (policyName !== 'GH_ORG_MEMBER') {
-      throw new StatusError(403, 'Invalid permissions');
+    if (!this._isValidUser()) {
+      return false;
     }
 
     return this._fetch();
@@ -47,7 +47,16 @@ GhOrgPolicyDelegate.prototype = {
     var uri = this._securityDescriptor.linkPath;
 
     var ghOrg = new GitHubOrgService(user);
-    this._fetchPromise = ghOrg.member(uri, user.username);
+    this._fetchPromise = ghOrg.member(uri, user.username)
+      .catch(function(err) {
+        if(err.errno && err.syscall || err.statusCode >= 500) {
+          // GitHub call failed and may be down.
+          // We can fall back to whether the user is already in the room
+          throw new PolicyDelegateTransportError(err.message);
+        }
+
+        throw err;
+      })
     return this._fetchPromise;
   }
 };
