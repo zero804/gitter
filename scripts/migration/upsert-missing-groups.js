@@ -28,8 +28,6 @@ function getGroupableRooms() {
       {
         $group: {
           _id: '$lcOwner',
-          // Technically we don't have to keep these because we'll just
-          // bulk-update groupId by lcOwner, but maybe useful for debugging
           rooms: { $push: '$$CURRENT' }
         }
       }
