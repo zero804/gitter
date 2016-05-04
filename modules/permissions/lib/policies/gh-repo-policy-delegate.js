@@ -4,9 +4,9 @@ var Promise = require('bluebird');
 var GitHubRepoService = require('gitter-web-github').GitHubRepoService;
 var StatusError = require('statuserror');
 
-function GhRepoPolicyDelegate(user, permissionPolicy) {
+function GhRepoPolicyDelegate(user, securityDescriptor) {
   this._user = user;
-  this._permissionPolicy = permissionPolicy;
+  this._securityDescriptor = securityDescriptor;
   this._fetchPromise = null;
 }
 
@@ -43,7 +43,7 @@ GhRepoPolicyDelegate.prototype = {
    * Returns a key used to skip checks
    */
   getPolicyRateLimitKey: function(policyName) {
-    var uri = this._permissionPolicy.linkPath;
+    var uri = this._securityDescriptor.linkPath;
     var user = this._user;
     var userId = user && user._id;
 
@@ -60,7 +60,7 @@ GhRepoPolicyDelegate.prototype = {
     }
 
     var user = this._user;
-    var uri = this._permissionPolicy.linkPath;
+    var uri = this._securityDescriptor.linkPath;
 
     var repoService = new GitHubRepoService(user);
     this._fetchPromise = repoService.getRepo(uri);

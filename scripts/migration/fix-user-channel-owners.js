@@ -116,7 +116,7 @@ function getUpdates() {
 
         var newUri;
         if (ownerUser && ownerUser.username) {
-          newUri = ownerUser.username + '/' + troupe.uri.split(/\//)[1];
+          newUri = ownerUser.username + '/' + troupe.uri.split('/')[1];
         }
 
 
@@ -143,7 +143,7 @@ var renameUserChannel = Promise.method(function (id, oldUri, newUri) {
         return;
       }
       var newLcUri = newUri.toLowerCase();
-      var newLcOwner = newLcUri.split(/\//)[0].toLowerCase();
+      var newLcOwner = newLcUri.split('/')[0].toLowerCase();
 
       if (newLcUri !== channel.lcUri) {
         channel.renamedLcUris.addToSet(channel.lcUri);

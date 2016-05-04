@@ -68,7 +68,7 @@ function generateRepoPermissionsForRoom(room) {
 
 function generateRepoChannelPermissionsForRoom(room, parentRoom) {
   var uri = room.uri;
-  var ownerUri = uri.split(/\//).slice(0, 2).join('/');
+  var ownerUri = uri.split('/').slice(0, 2).join('/');
   var security = room.security;
   var githubId = parentRoom && parentRoom.githubId;
 
@@ -144,7 +144,7 @@ function generateRepoChannelPermissionsForRoom(room, parentRoom) {
 
 function generateOrgChannelPermissionsForRoom(room, parentRoom) {
   var uri = room.uri;
-  var ownerUri = uri.split(/\//)[0];
+  var ownerUri = uri.split('/')[0];
   var githubId = parentRoom && parentRoom.githubId;
   var security = room.security;
 

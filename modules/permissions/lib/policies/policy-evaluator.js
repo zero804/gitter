@@ -6,9 +6,11 @@ var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var policyCheckRateLimiter = require('./policy-check-rate-limiter');
 var debug = require('debug')('gitter:permissions:policy-evaluator');
 
-function PolicyEvaluator(user, permissionPolicy, policyDelegate, contextDelegate) {
+var SUCCESS_RESULT_CACHE_TIME = 5 * 60; // 5 minutes in seconds
+
+function PolicyEvaluator(user, securityDescriptor, policyDelegate, contextDelegate) {
   this._user = user;
-  this._permissionPolicy = permissionPolicy;
+  this._securityDescriptor = securityDescriptor;
   this._policyDelegate = policyDelegate;
   this._contextDelegate = contextDelegate;
 }
@@ -19,7 +21,7 @@ PolicyEvaluator.prototype = {
     // TODO: ADD BANS
     var user = this._user;
     var userId = user;
-    var membersPolicy = this._permissionPolicy.members;
+    var membersPolicy = this._securityDescriptor.members;
 
     if (membersPolicy === 'PUBLIC') {
       debug('canRead: allowing access to PUBLIC');
@@ -27,7 +29,7 @@ PolicyEvaluator.prototype = {
       return true;
     }
 
-    if (userId && userIdIsIn(userId, this._permissionPolicy.extraMembers)) {
+    if (userId && userIdIsIn(userId, this._securityDescriptor.extraMembers)) {
       // If the user is in extraMembers, always allow them
       // in...
       debug('canRead: allowing access to extraMember');
@@ -81,7 +83,7 @@ PolicyEvaluator.prototype = {
             // so that we can skip this check for a while
             promise.tap(function(access) {
               if (access) {
-                return policyCheckRateLimiter.recordSuccessfulCheck(rateLimitKey, 300);
+                return policyCheckRateLimiter.recordSuccessfulCheck(rateLimitKey, SUCCESS_RESULT_CACHE_TIME);
               }
             });
           }
@@ -133,9 +135,9 @@ PolicyEvaluator.prototype = {
     }
 
     var userId = user._id;
-    var adminPolicy = this._permissionPolicy.admins;
+    var adminPolicy = this._securityDescriptor.admins;
 
-    if (userIdIsIn(userId, this._permissionPolicy.extraAdmins)) {
+    if (userIdIsIn(userId, this._securityDescriptor.extraAdmins)) {
       // The user is in extraAdmins...
       debug('canAdmin: allow access for extraAdmin');
       return true;

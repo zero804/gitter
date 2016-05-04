@@ -166,7 +166,7 @@ function dryRun() {
       });
 }
 
-return dryRun()
+dryRun()
   .then(function() {
     process.exit();
   })
