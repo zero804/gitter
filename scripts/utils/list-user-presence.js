@@ -22,7 +22,7 @@ var opts = require('yargs')
 var sockets;
 userService.findByUsername(opts.username)
   .then(function(user) {
-    return presence.listAllSocketsForUser(user.id);    
+    return presence.listAllSocketsForUser(user.id);
   })
   .then(function(socketIds) {
     return presence.getSockets(socketIds);

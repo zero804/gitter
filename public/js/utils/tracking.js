@@ -64,7 +64,7 @@ module.exports = (function() {
       if (context.getUserId())
         window.mixpanel.register({ userStatus: 'ACTIVE'});
 
-      var isUserHome = '/home' === routeName;
+      var isUserHome = routeName === '/home';
       var authenticated = !!context.getUserId();
       var userAgent = window.navigator.userAgent;
 
