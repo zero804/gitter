@@ -10,5 +10,6 @@ module.exports = function extractGravatarVersion(avatarUrl) {
       return parsed.query.v || undefined;
     }
   } catch(e) {
+    /* */
   }
 };

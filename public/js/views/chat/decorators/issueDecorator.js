@@ -1,4 +1,3 @@
-/* jshint unused:strict, browser:true, strict:true, -W097 */
 "use strict";
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');

@@ -1,3 +1,5 @@
+'use strict';
+
 var split = require('../lib/server/split-tests-server');
 var assert = require('assert');
 

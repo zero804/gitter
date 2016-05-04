@@ -1,4 +1,3 @@
-/* jshint node:true, unused:true */
 'use strict';
 
 var express  = require('express');

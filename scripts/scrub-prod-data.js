@@ -1,3 +1,5 @@
+/* eslint-env mongo */
+'use strict';
 
 if (rs.status().set !== 'TroupeBetaProdData') {
   throw new Error('This script can only be executed against TroupeBetaProdData')

@@ -1,4 +1,3 @@
-/* jshint -W014, -W004, -W030, -W033 */
 "use strict";
 
 var jQuery = require('jquery');
@@ -174,7 +173,7 @@ module.exports = (function() {
         actualWidth = $tip[0].offsetWidth
         actualHeight = $tip[0].offsetHeight
 
-        var placement = this.options.placement;
+        placement = this.options.placement;
         if(placement === 'vertical')
             placement = this.selectBestVerticalPlacement($tip, this.$element);
         }
@@ -205,14 +204,14 @@ module.exports = (function() {
       } else {
         return 'top';
       }
-      var panel = target.offsetParent();
-      if(!panel) return 'bottom';
-
-      if(target.offset().top + div.height() + 20 >= panel[0].clientHeight) {
-        return 'top';
-      }
-
-      return 'bottom';
+      // var panel = target.offsetParent();
+      // if(!panel) return 'bottom';
+      //
+      // if(target.offset().top + div.height() + 20 >= panel[0].clientHeight) {
+      //   return 'top';
+      // }
+      //
+      // return 'bottom';
   }
 
   , applyPlacement: function(offset, placement){
