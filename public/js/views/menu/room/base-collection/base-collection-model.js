@@ -9,7 +9,7 @@ module.exports = Backbone.Model.extend({
     active: false,
   },
 
-  constructor: function(attrs, options) { //jshint unused: true
+  constructor: function(attrs, options) {
     if (!options || !options.roomMenuModel) {
       throw new Error('A valid instance of roomMenuModel must be passed to a new instance of BaseCollectionModel');
     }
@@ -27,7 +27,7 @@ module.exports = Backbone.Model.extend({
 
   },
 
-  onModelChangeState: function(model, val) { //jshint unused: true
+  onModelChangeState: function(model, val) {
     this.set('state', val);
     switch (this.roomMenuModel.get('state')) {
       case 'all':

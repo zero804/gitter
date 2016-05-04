@@ -154,7 +154,7 @@ module.exports = Backbone.Model.extend({
     this.onStateChangeCalled(type);
   },
 
-  onSwitchState: function(model, val) {/*jshint unused: true */
+  onSwitchState: function(model, val) {
     //TODO Test this JP 27/1/15
     switch (val) {
       case 'all':
@@ -217,7 +217,7 @@ module.exports = Backbone.Model.extend({
 
   //This can be changed to userPreferences once the data is maintained
   //JP 8/1/16
-  sync: function(method, model, options) {//jshint unused: true
+  sync: function(method, model, options) {
     var self = this;
     var attrs;
 

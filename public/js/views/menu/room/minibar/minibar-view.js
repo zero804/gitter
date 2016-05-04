@@ -113,7 +113,7 @@ var MinibarView = Marionette.CollectionView.extend({
   },
 
 
-  onItemActivated: function(view, model, activationSourceType) { //jshint unused: true
+  onItemActivated: function(view, model, activationSourceType) {
     var modelName = model.get('name');
 
     //stop selectedOrg name from changing if it does not need to
@@ -141,7 +141,7 @@ var MinibarView = Marionette.CollectionView.extend({
     }
   },
 
-  onItemKeyboardActivated: function(view, model) { //jshint unused: true
+  onItemKeyboardActivated: function(view, model) {
     // Arbitrary threshold based on when we can't render "instantly".
     // We don't want to delay too much because majority of users won't run into render shortcomings
     // and the delay could cause confusion for screen-reader users not recnogizing when

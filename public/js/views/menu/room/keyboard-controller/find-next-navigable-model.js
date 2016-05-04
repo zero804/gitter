@@ -28,7 +28,7 @@ var findNextNavigableModel = function(navigableCollectionList, navigableItemRefe
     navigableCollectionList,
     startingListIndex,
     dir,
-    function(navigableCollectionItem, navigableCollectionItemIndex) {//jshint maxcomplexity:9
+    function(navigableCollectionItem, navigableCollectionItemIndex) {
       if(navigableCollectionItemActiveCb(navigableCollectionItem, navigableCollectionItemIndex)) {
 
         // Find the potentially next active item
@@ -37,7 +37,7 @@ var findNextNavigableModel = function(navigableCollectionList, navigableItemRefe
           // Start at the bookmark if we are looking in that list otherwise, start from the beginning
           (navigableCollectionItemIndex === navigableItemReference.listIndex ? navigableItemReference.modelIndex : null),
           dir,
-          function(model, modelIndex) {//jshint unused: false
+          function(model, modelIndex) {
             return !model.get('isHidden');
           }
         );

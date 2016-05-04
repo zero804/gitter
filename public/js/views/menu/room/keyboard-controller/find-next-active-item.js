@@ -9,7 +9,7 @@ var arrayBoundWrap = function(index, length) {
 };
 
 // Helper to iterate and break/return the active item if we come across one
-var iterateListUntilActive = function(list, dir, startIndex, stopIndex, getActiveCb) {//jshint maxcomplexity:5
+var iterateListUntilActive = function(list, dir, startIndex, stopIndex, getActiveCb) {
   startIndex = arrayBoundWrap(startIndex, list.length);
 
   for(var i = startIndex; (dir > 0 ? i < stopIndex : i > -1); (dir > 0 ? i++ : i--)) {
@@ -27,7 +27,7 @@ var iterateListUntilActive = function(list, dir, startIndex, stopIndex, getActiv
 //   (startIndex, list.length] then [0, startIndex]
 // When `dir` is backwards:
 //   (startIndex, 0] then [list.length, startIndex]
-var findNextActiveItem = function(list, startIndex, dir, getActiveCb) {//jshint maxcomplexity:8
+var findNextActiveItem = function(list, startIndex, dir, getActiveCb) {
   dir = sanitizeDir(dir);
   getActiveCb = (getActiveCb || function() { return true; });
   // This is so you can pass in `null` and go to first or last item depending on direction
