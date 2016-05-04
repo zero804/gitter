@@ -6,5 +6,6 @@ module.exports = {
     "rules": {
       "no-console": "off",
       "strict": ["warn", "safe"],
+      "max-nested-callbacks": ["error", 10]
     }
 };

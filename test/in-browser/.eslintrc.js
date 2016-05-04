@@ -6,5 +6,6 @@ module.exports = {
     },
     rules: {
       "strict": ["warn", "safe"],
+      "max-nested-callbacks": ["error", 10]
     }
 };
