@@ -1,4 +1,4 @@
-/* jshint maxcomplexity:13 */
+/* eslint complexity: ["error", 13] */
 "use strict";
 var $ = require('jquery');
 var Popover = require('views/popover');

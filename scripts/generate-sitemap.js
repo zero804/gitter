@@ -69,7 +69,7 @@ function createSitemapIndex(urls) {
 
   xml.push('</sitemapindex>');
   return xml.join('\n')
-};
+}
 
 var pageNum = 0;
 var sitemapURLs = [];

@@ -1,4 +1,3 @@
-/* jshint unused:true, browser:true, node:true */
 'use strict';
 
 var $ = require('jquery');

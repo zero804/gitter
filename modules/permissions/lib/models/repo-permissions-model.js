@@ -1,4 +1,4 @@
-/* jshint maxcomplexity:18 */
+/* eslint complexity: ["error", 18] */
 "use strict";
 
 var env               = require('gitter-web-env');
@@ -96,7 +96,7 @@ module.exports = function repoPermissionsModel(user, right, uri, security) {
               winston.error("Unknown owner type " + ownerType, { repo: repoInfo, user: user });
               return false;
           }
-          break;
+          /* break; */
 
         case 'admin':
           return !!isAdmin;

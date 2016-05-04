@@ -37,7 +37,7 @@ module.exports = Backbone.Collection.extend({
       throw new Error('A valid instance of RoomMenuModel should be passed to a new LeftMenuSearchRoomsAndPeopleCollection');
     }
 
-    if (!attrs, !attrs.roomCollection) {
+    if (!attrs || !attrs.roomCollection) {
       throw new Error('A valid instance of a roomCollection should be passed to a new LeftMenuSearchRoomsAndPeopleCollection');
     }
 

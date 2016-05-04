@@ -1,4 +1,5 @@
-var util = require('util');
+'use strict';
+
 var graphviz = require('graphviz');
 var fs = require('fs');
 

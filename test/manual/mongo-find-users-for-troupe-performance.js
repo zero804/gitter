@@ -1,7 +1,6 @@
-/* jshint node:true */
 'use strict';
 
-var speedy      = require ("speedy");
+var speedy      = require("speedy");
 var persistence = require('gitter-web-persistence');
 var chatService = require('../../server/services/chat-service');
 var troupeService = require('../../server/services/troupe-service');
@@ -13,7 +12,7 @@ var ObjectID = mongoose.mongo.ObjectID;
 var troupeId = "54d244f1c53660e29b9f91d9";
 
 onMongoConnect(function() {
-  speedy.run ({
+  speedy.run({
     withSelect: function(done) {
       troupeService.findUserIdsForTroupe(troupeId)
         .nodeify(done);
