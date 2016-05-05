@@ -273,6 +273,10 @@ onready(function() {
         window.location.hash = '#' + message.hash;
       break;
 
+      case 'community-create-view:toggle':
+        appEvents.trigger('community-create-view:toggle', message.active);
+        break;
+
       //when the chat app requests the room list send it
       case 'request:roomList':
         initChatCache();
@@ -385,7 +389,7 @@ onready(function() {
       'createcustomroom/:name': 'createcustomroom',
       'createreporoom': 'createreporoom',
       'createroom': 'createroom',
-      'confirm/*uri': 'confirmRoom',
+      'confirm/*uri': 'confirmRoom'
     },
 
     hideModal: function() {
