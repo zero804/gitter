@@ -3,6 +3,22 @@
 var ObjectID = require('mongodb').ObjectID;
 var _        = require('lodash');
 
+function objectIDsEqual(a, b) {
+  if (a === b) return true;
+  if (!a) return !b;
+  if (!b) return false;
+
+  if (typeof a === 'string') {
+    if (typeof b === 'string') {
+      return a === b;
+    }
+
+    return b.equals(a);
+  }
+
+  return a.equals(b);
+}
+
 function stringToObjectID(string) {
   try {
     return new ObjectID(string);
@@ -225,10 +241,9 @@ function isMongoError(err) {
   // mongo driver loaded
   return err && err instanceof Error && err.name === 'MongoError';
 }
+exports.objectIDsEqual = objectIDsEqual;
 exports.isMongoError = isMongoError;
-
 exports.setIds = setIds;
-
 exports.isLikeObjectId = isLikeObjectId;
 exports.asObjectID = asObjectID;
 exports.asObjectIDs = asObjectIDs;
