@@ -7,6 +7,7 @@ var fastdom           = require('fastdom');
 var context           = require('utils/context');
 var DNDCtrl           = require('components/menu/room/dnd-controller');
 var localStore        = require('components/local-store');
+var toggleClass       = require('utils/toggle-class');
 var RoomMenuModel     = require('../../../../models/room-menu-model');
 var MiniBarView       = require('../minibar/minibar-view');
 var PanelView         = require('../panel/panel-view');
@@ -156,6 +157,10 @@ module.exports = Marionette.LayoutView.extend({
     if (this.model.get('roomMenuIsPinned')) { return; }
 
     this.model.set('panelOpenState', false);
+  },
+
+  onRender: function() {
+    toggleClass(this.ui.minibarInner[0], 'has-community-create', context.hasFeature('community-create'));
   },
 
   onChildRender: function () {

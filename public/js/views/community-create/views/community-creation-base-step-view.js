@@ -13,13 +13,8 @@ module.exports = Marionette.LayoutView.extend({
     backStep: '.js-community-create-step-back'
   },
 
-  triggers: {
-    'click @ui.nextStep': 'step:next',
-    'click @ui.backStep': 'step:back',
-  },
-
   modelEvents: {
-    'change:active': 'onChangeActive'
+    'change:active': 'onActiveChange'
   },
 
   initialize: function(options) {
@@ -27,11 +22,11 @@ module.exports = Marionette.LayoutView.extend({
     this.communityCreateModel = options.communityCreateModel;
   },
 
-  onChangeActive: function() {
+  onActiveChange: function() {
     toggleClass(this.$el[0], 'active', this.model.get('active'));
   },
 
   onRender: function() {
-    this.onChangeActive();
+    this.onActiveChange();
   }
 });

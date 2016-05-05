@@ -1,5 +1,7 @@
+@import (reference) 'base-zindex-levels';
 @import 'colors';
 @import 'trp3Vars';
+@import 'trp3';
 @import 'typography';
 @import 'base-web';
 
@@ -7,26 +9,43 @@
 @base-text-color: rgba(255, 255, 255, .8);
 
 
-html {
+
+.community-create-root,
+.community-create-app-root {
   box-sizing: border-box;
+
+  & *,
+  & *:before,
+  & *:after {
+    box-sizing: inherit;
+  }
 }
 
-html,
-body {
+.community-create-app-root {
+  z-index: @zIndexCommunityCreate;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+
+  pointer-events: none;
+}
+
+.community-create-root-inner {
   width: 100%;
   height: 100%;
-  margin: 0;
-}
 
-*, *:before, *:after {
-  box-sizing: inherit;
-}
+  opacity: 0;
+  pointer-events: none;
 
+  will-change: opacity;
+  transition: opacity .2s ease;
 
-.community-create-root {
-  width: 100%;
-  height: 100%;
-
+  &.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
 }
 
 .community-create-wrapper {
@@ -41,6 +60,18 @@ body {
 
   color: @base-text-color;
 }
+
+.community-create-close-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  padding: 3rem;
+
+  background-color: transparent;
+  border: 0;
+}
+
 
 .community-create-step-root {
   width: 100%;
@@ -66,6 +97,7 @@ body {
   opacity: 0;
   pointer-events: none;
 
+  will-change: transform, opacity;
   transition:
     visibility 0s ease .2s,
     opacity .2s ease,
@@ -81,6 +113,12 @@ body {
     visibility: visible;
     opacity: 1;
     pointer-events: auto;
+    .community-create-root-inner & {
+      pointer-events: none;
+    }
+    .community-create-root-inner.active & {
+      pointer-events: auto;
+    }
 
     transition:
       visibility 0s ease 0s,
@@ -215,7 +253,7 @@ body {
   background-color: transparent;
   border: 0;
 
-  color: fade(@base-text-color, 70%);
+  color: fade(@base-text-color, 40%);
   font-size: inherit;
   font-family: inherit;
   line-height: 1;
@@ -333,4 +371,71 @@ body {
       visibility 0s ease 0s,
       opacity .2s ease;
   }
+}
+
+
+.community-create-github-project-list-wrapper {
+  overflow: auto;
+  max-height: unit(60 * 4, px);
+
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, .2);
+  }
+  &:hover::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, .4);
+  }
+}
+
+.community-create-org-list,
+.community-create-repo-list {
+  margin-top: 0;
+  margin-left: 0;
+  margin-bottom: 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.community-create-list-item-link {
+  display: block;
+
+  transition:
+    background-color .2s ease;
+
+  &:focus {
+    background-color: rgba(255, 255, 255, .1);
+    outline: none;
+  }
+}
+
+.community-create-org-list-item {
+  margin-top: 1rem;
+  border: 2px solid transparent;
+
+  transition: border-color .2s ease;
+
+  &.active {
+    background-color: rgba(255, 255, 255, .08);
+    border: 2px solid fade(@ruby, 60%);
+  }
+}
+
+
+.community-create-org-list-item-avatar {
+  width: 44px;
+  vertical-align: middle;
+  margin-right: 16px;
+}
+
+.community-create-repo-list {
+  column-width: 250px;
+}
+
+.community-create-repo-list-item {
+  margin-top: 8px;
+}
+
+.community-create-repo-list-item-avatar {
+  width: 22px;
+  vertical-align: middle;
+  margin-right: .3rem;
 }
