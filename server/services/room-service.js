@@ -50,8 +50,6 @@ var userScopes                 = require('../utils/models/user-scopes');
 
 var splitsvilleEnabled = nconf.get("project-splitsville:enabled");
 
-exports.testOnly = {};
-
 /**
  * sendJoinStats() sends information to MixPanels about a join_room event
  *
@@ -101,7 +99,6 @@ function applyAutoHooksForRepoRoom(user, troupe) {
   });
 
 }
-exports.applyAutoHooksForRepoRoom = applyAutoHooksForRepoRoom;
 
 
 /* Creates a visitor that determines whether a room type creation is allowed */
@@ -370,7 +367,6 @@ function findAllRoomsIdsForUserIncludingMentions(userId, callback) {
     })
     .nodeify(callback);
 }
-exports.findAllRoomsIdsForUserIncludingMentions = findAllRoomsIdsForUserIncludingMentions;
 
 function updateRoomWithGithubId(user, troupe) {
   var promise;
@@ -500,7 +496,6 @@ var createGithubRoom = Promise.method(function(user, uri) {
     });
 });
 
-exports.createGithubRoom = createGithubRoom;
 
 /**
  * Add a user to a room.
@@ -651,7 +646,7 @@ function findOrCreateRoom(user, uri, options) {
                 var githubType = troupe && troupe.githubType;
                 // Only leak the githubType for ORGS and USERS
                 // otherwise it's a security breach
-                if (githubType != 'ORG' && githubType !== 'ONETOONE') githubType = null;
+                if (githubType !== 'ORG' && githubType !== 'ONETOONE') githubType = null;
                 var uri = githubType ? troupe && troupe.uri : null;
 
                 throw extendStatusError(404, { githubType: githubType, uri: uri });
@@ -677,7 +672,6 @@ function findOrCreateRoom(user, uri, options) {
     });
 }
 
-exports.findOrCreateRoom = findOrCreateRoom;
 
 /**
  * Find all non-private channels under a particular parent
@@ -713,7 +707,6 @@ function findAllChannelsForRoomId(user, parentTroupeId) {
         });
     });
 }
-exports.findAllChannelsForRoomId = findAllChannelsForRoomId;
 
 /**
  * Given parent and child ids, find a child channel that is
@@ -739,7 +732,6 @@ function findChildChannelRoom(user, parentTroupeId, childTroupeId) {
         });
     });
 }
-exports.findChildChannelRoom = findChildChannelRoom;
 
 /**
  * Find all non-private channels under a particular parent
@@ -750,7 +742,6 @@ function findAllChannelsForUser(user) {
     })
     .exec();
 }
-exports.findAllChannelsForUser = findAllChannelsForUser;
 
 /**
  * Given parent and child ids, find a child channel that is
@@ -765,7 +756,6 @@ function findUsersChannelRoom(user, childTroupeId, callback) {
     .exec()
     .nodeify(callback);
 }
-exports.findUsersChannelRoom = findUsersChannelRoom;
 
 function assertValidName(name) {
   var matcher = xregexp('^[\\p{L}\\d][\\p{L}\\d\\-\\_]*$');
@@ -800,7 +790,7 @@ function ensureNoRepoNameClash(user, uri) {
     throw "Bad channel uri";
   }
 
-  if(parts.length == 2) {
+  if(parts.length === 2) {
     /* If the name is non-valid in github land, it's safe to use it here */
     if(!notValidGithubRepoName(parts[1])) {
       return false;
@@ -837,7 +827,7 @@ function createCustomChildRoom(parentTroupe, user, options) {
     assertValidName(name);
     uri = parentTroupe.uri + '/' + name;
 
-    if(!{ ORG: 1, REPO: 1 }.hasOwnProperty(parentTroupe.githubType) ) {
+      if(!{ ORG: 1, REPO: 1 }.hasOwnProperty(parentTroupe.githubType)) {
       validate.fail('Invalid security option: ' + security);
     }
 
@@ -853,7 +843,7 @@ function createCustomChildRoom(parentTroupe, user, options) {
         validate.fail('Invalid parent room type');
     }
 
-    if(!{ PUBLIC: 1, PRIVATE: 1, INHERITED: 1 }.hasOwnProperty(security) ) {
+      if(!{ PUBLIC: 1, PRIVATE: 1, INHERITED: 1 }.hasOwnProperty(security)) {
       validate.fail('Invalid security option: ' + security);
     }
 
@@ -953,8 +943,6 @@ function createCustomChildRoom(parentTroupe, user, options) {
     });
 }
 
-exports.createCustomChildRoom = Promise.method(createCustomChildRoom);
-
 /**
  * notifyInvitedUser() informs an invited user
  *
@@ -1019,7 +1007,6 @@ function updateUserDateAdded(userId, roomId, date) {
      .exec();
 
 }
-exports.testOnly.updateUserDateAdded = updateUserDateAdded;
 
 /* When a user wants to join a room */
 function joinRoom(roomId, user, options) {
@@ -1048,7 +1035,6 @@ function joinRoom(roomId, user, options) {
         });
     });
 }
-exports.joinRoom = joinRoom;
 
 /**
  * Somebody adds another user to a room
@@ -1093,7 +1079,6 @@ function addUserToRoom(room, instigatingUser, usernameToAdd) {
 
 }
 
-exports.addUserToRoom = addUserToRoom;
 
 /* Re-insure that each user in the room has access to the room */
 function revalidatePermissionsForUsers(room) {
@@ -1133,13 +1118,12 @@ function revalidatePermissionsForUsers(room) {
     });
 
 }
-exports.revalidatePermissionsForUsers = revalidatePermissionsForUsers;
 
 /**
  * The security of a room may be off. Do a check and update if required
  */
 function ensureRepoRoomSecurity(uri, security) {
-  if(security !== 'PRIVATE' && security != 'PUBLIC') {
+  if(security !== 'PRIVATE' && security !== 'PUBLIC') {
     return Promise.reject(new Error("Unknown security type: " + security));
   }
 
@@ -1147,7 +1131,7 @@ function ensureRepoRoomSecurity(uri, security) {
     .then(function(troupe) {
       if(!troupe) return;
 
-      if(troupe.githubType != 'REPO') throw new Error("Only repo room security can be changed");
+      if(troupe.githubType !== 'REPO') throw new Error("Only repo room security can be changed");
 
       /* No need to change it? */
       if(troupe.security === security) return;
@@ -1174,7 +1158,6 @@ function ensureRepoRoomSecurity(uri, security) {
 
     });
 }
-exports.ensureRepoRoomSecurity = ensureRepoRoomSecurity;
 
 
 function findByIdForReadOnlyAccess(user, roomId) {
@@ -1190,7 +1173,6 @@ function findByIdForReadOnlyAccess(user, roomId) {
         });
     });
 }
-exports.findByIdForReadOnlyAccess = findByIdForReadOnlyAccess;
 
 function validateRoomForReadOnlyAccess(user, room) {
   if(!room) return Promise.reject(new StatusError(404)); // Mandatory
@@ -1202,7 +1184,6 @@ function validateRoomForReadOnlyAccess(user, room) {
       throw new StatusError(404);
     });
 }
-exports.validateRoomForReadOnlyAccess = validateRoomForReadOnlyAccess;
 
 function checkInstigatingUserPermissionForRemoveUser(room, user, requestingUser) {
   // User is requesting user -> leave
@@ -1233,7 +1214,6 @@ var removeUserFromRoom = Promise.method(function (room, user, requestingUser) {
       return recentRoomService.removeRecentRoomForUser(user._id, room._id);
     });
 });
-exports.removeUserFromRoom = removeUserFromRoom;
 
 /**
  * Hides a room for a user.
@@ -1258,7 +1238,6 @@ function hideRoomFromUser(roomId, userId) {
       appEvents.dataChange2('/user/' + userId + '/rooms', 'patch', { id: roomId, favourite: null, lastAccessTime: null, mentions: 0, unreadItems: 0 }, 'room');
     });
 }
-exports.hideRoomFromUser = hideRoomFromUser;
 
 function canBanInRoom(room) {
   if(room.githubType === 'ONETOONE') return false;
@@ -1295,7 +1274,7 @@ function banUserFromRoom(room, username, requestingUser, options, callback) {
           return persistence.Troupe.findById(room.id).exec();
         })
         .then(function(roomForUpdate) {
-          var existingBan = _.find(roomForUpdate.bans, function(ban) { return ban.userId == user.id;} );
+          var existingBan = _.find(roomForUpdate.bans, function(ban) { return ban.userId == user.id;});
 
           if(existingBan) {
             return existingBan;
@@ -1344,7 +1323,6 @@ function banUserFromRoom(room, username, requestingUser, options, callback) {
     })
     .nodeify(callback);
 }
-exports.banUserFromRoom = banUserFromRoom;
 
 function unbanUserFromRoom(room, troupeBan, username, requestingUser, callback) {
   return Promise.try(function() {
@@ -1387,7 +1365,6 @@ function unbanUserFromRoom(room, troupeBan, username, requestingUser, callback) 
     })
     .nodeify(callback);
 }
-exports.unbanUserFromRoom = unbanUserFromRoom;
 
 /**
  * If the ban is found, returns { ban: troupeBan, user: user}, else returns null
@@ -1411,7 +1388,6 @@ function findBanByUsername(troupeId, bannedUsername) {
 
     });
 }
-exports.findBanByUsername = findBanByUsername;
 
 function searchRooms(userId, queryText, options) {
 
@@ -1441,7 +1417,6 @@ function searchRooms(userId, queryText, options) {
         });
     });
 }
-exports.searchRooms = searchRooms;
 
 /**
  * Rename a REPO room to a new URI.
@@ -1513,7 +1488,6 @@ function renameRepo(oldUri, newUri) {
   });
 
 }
-exports.renameRepo = renameRepo;
 
 /**
  * Delete room
@@ -1550,4 +1524,32 @@ function deleteRoom(troupe) {
 
     });
 }
-exports.deleteRoom = deleteRoom;
+
+module.exports = {
+  applyAutoHooksForRepoRoom: applyAutoHooksForRepoRoom,
+  findAllRoomsIdsForUserIncludingMentions: findAllRoomsIdsForUserIncludingMentions,
+  createGithubRoom: createGithubRoom,
+  findOrCreateRoom: findOrCreateRoom,
+  findAllChannelsForRoomId: findAllChannelsForRoomId,
+  findChildChannelRoom: findChildChannelRoom,
+  findAllChannelsForUser: findAllChannelsForUser,
+  findUsersChannelRoom: findUsersChannelRoom,
+  createCustomChildRoom: createCustomChildRoom,
+  joinRoom: joinRoom,
+  addUserToRoom: addUserToRoom,
+  revalidatePermissionsForUsers: revalidatePermissionsForUsers,
+  ensureRepoRoomSecurity: ensureRepoRoomSecurity,
+  findByIdForReadOnlyAccess: findByIdForReadOnlyAccess,
+  validateRoomForReadOnlyAccess: validateRoomForReadOnlyAccess,
+  removeUserFromRoom: removeUserFromRoom,
+  hideRoomFromUser: hideRoomFromUser,
+  banUserFromRoom: banUserFromRoom,
+  unbanUserFromRoom: unbanUserFromRoom,
+  findBanByUsername: findBanByUsername,
+  searchRooms: searchRooms,
+  renameRepo: renameRepo,
+  deleteRoom: deleteRoom,
+  testOnly: {
+    updateUserDateAdded: updateUserDateAdded
+}
+};
