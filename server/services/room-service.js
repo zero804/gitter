@@ -627,7 +627,7 @@ function findOrCreateRoom(user, uri, options) {
                 var githubType = troupe && troupe.githubType;
                 // Only leak the githubType for ORGS and USERS
                 // otherwise it's a security breach
-                if (githubType != 'ORG' && githubType !== 'ONETOONE') githubType = null;
+                if (githubType !== 'ORG' && githubType !== 'ONETOONE') githubType = null;
                 var uri = githubType ? troupe && troupe.uri : null;
 
                 throw extendStatusError(404, { githubType: githubType, uri: uri });
@@ -771,7 +771,7 @@ function ensureNoRepoNameClash(user, uri) {
     throw "Bad channel uri";
   }
 
-  if(parts.length == 2) {
+  if(parts.length === 2) {
     /* If the name is non-valid in github land, it's safe to use it here */
     if(!notValidGithubRepoName(parts[1])) {
       return false;
@@ -809,7 +809,7 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
       assertValidName(name);
       uri = parentTroupe.uri + '/' + name;
 
-      if(!{ ORG: 1, REPO: 1 }.hasOwnProperty(parentTroupe.githubType) ) {
+      if(!{ ORG: 1, REPO: 1 }.hasOwnProperty(parentTroupe.githubType)) {
         validate.fail('Invalid security option: ' + security);
       }
 
@@ -825,7 +825,7 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
           validate.fail('Invalid parent room type');
       }
 
-      if(!{ PUBLIC: 1, PRIVATE: 1, INHERITED: 1 }.hasOwnProperty(security) ) {
+      if(!{ PUBLIC: 1, PRIVATE: 1, INHERITED: 1 }.hasOwnProperty(security)) {
         validate.fail('Invalid security option: ' + security);
       }
 
@@ -1105,7 +1105,7 @@ function revalidatePermissionsForUsers(room) {
  * The security of a room may be off. Do a check and update if required
  */
 function ensureRepoRoomSecurity(uri, security) {
-  if(security !== 'PRIVATE' && security != 'PUBLIC') {
+  if(security !== 'PRIVATE' && security !== 'PUBLIC') {
     return Promise.reject(new Error("Unknown security type: " + security));
   }
 
@@ -1113,7 +1113,7 @@ function ensureRepoRoomSecurity(uri, security) {
     .then(function(troupe) {
       if(!troupe) return;
 
-      if(troupe.githubType != 'REPO') throw new Error("Only repo room security can be changed");
+      if(troupe.githubType !== 'REPO') throw new Error("Only repo room security can be changed");
 
       /* No need to change it? */
       if(troupe.security === security) return;
@@ -1256,7 +1256,7 @@ function banUserFromRoom(room, username, requestingUser, options, callback) {
           return persistence.Troupe.findById(room.id).exec();
         })
         .then(function(roomForUpdate) {
-          var existingBan = _.find(roomForUpdate.bans, function(ban) { return ban.userId == user.id;} );
+          var existingBan = _.find(roomForUpdate.bans, function(ban) { return ban.userId == user.id;});
 
           if(existingBan) {
             return existingBan;
