@@ -16,7 +16,7 @@ var eventService          = require("./event-service");
 var roomService           = require('./room-service');
 var roomMembershipService = require('./room-membership-service');
 var BackendMuxer          = require('./backend-muxer');
-var userScopes            = require("../utils/models/user-scopes");
+var userScopes            = require('gitter-web-identity/lib/user-scopes');
 
 
 var survivalMode = !!process.env.SURVIVAL_MODE || false;

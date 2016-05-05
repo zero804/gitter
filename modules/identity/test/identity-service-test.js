@@ -1,10 +1,8 @@
 'use strict';
 
-var testRequire = require('../test-require');
-var identityService = testRequire('./services/identity-service');
-var fixtureLoader = require('../test-fixtures');
+var identityService = require('../lib/identity-service');
+var fixtureLoader = require('../../../test/integration/test-fixtures');
 var assert = require('assert');
-
 
 describe('identityService', function() {
   var fixture = {};

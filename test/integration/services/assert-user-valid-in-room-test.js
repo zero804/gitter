@@ -11,7 +11,7 @@ describe('assert-user-valid-in-room', function() {
   var oneToOneRoom = { oneToOne: true, githubType: 'ONETOONE', security: 'PRIVATE' };
 
   var assertUserValidInRoom = testRequire.withProxies('./services/assert-user-valid-in-room', {
-    './identity-service': {
+    'gitter-web-identity': {
       listProvidersForUser: function(user) {
         return Promise.resolve(user.providers);
       }
