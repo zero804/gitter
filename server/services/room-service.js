@@ -815,7 +815,7 @@ function ensureNoExistingChannelNameClash(uri) {
     });
 }
 
-function createCustomChildRoom(parentTroupe, user, options) {
+var createCustomChildRoom = Promise.method(function(parentTroupe, user, options) {
   validate.expect(user, 'user is expected');
   validate.expect(options, 'options is expected');
 
@@ -941,7 +941,7 @@ function createCustomChildRoom(parentTroupe, user, options) {
           return uriLookupService.reserveUriForTroupeId(newRoom._id, uri);
         });
     });
-}
+});
 
 /**
  * notifyInvitedUser() informs an invited user
