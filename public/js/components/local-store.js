@@ -9,7 +9,7 @@ var TEST_KEY = '_drafty_test_key';
 
 var windowLocalStorage;
 
-try { windowLocalStorage = window.localStorage; } catch(e) {}
+try { windowLocalStorage = window.localStorage; } catch(e) { /* */ }
 
 /* Attempts to use localStorage to check whether it's actually available for use */
 function isLocalStorageAvailable() {
@@ -60,6 +60,7 @@ LocalStorageStore.prototype = {
     try {
       windowLocalStorage[key] = value;
     } catch(e) {
+      /* */
     }
   },
 
@@ -67,6 +68,7 @@ LocalStorageStore.prototype = {
     try {
       windowLocalStorage.removeItem(key);
     } catch(e) {
+      /* */
     }
   },
 

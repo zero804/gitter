@@ -61,7 +61,7 @@ var ChatEditView = Marionette.ItemView.extend({
   onTextInput: function($event) {
     var event = $event.originalEvent;
     var key = event.data;
-    if (isMobile() && '\n' === key) {
+    if (isMobile() && key === '\n') {
       // google keyboard v4.1 on android doesnt actually send the correct
       // keyup/down events for the return key (code 13). This means that our
       // keyboardEvents dont fire, but we do have a "textInput" event that

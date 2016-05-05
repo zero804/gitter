@@ -48,7 +48,7 @@ module.exports = BaseCollectionItemView.extend({
   },
 
   serializeData: function() {
-    var data             = parseForTemplate(this.model.toJSON(), this.roomMenuModel.get('state'));
+    var data = parseForTemplate(this.model.toJSON(), this.roomMenuModel.get('state'));
 
     //When the user is viewing a room he is lurking in and activity occurs
     //we explicitly, in this case, cancel the lurk activity
@@ -94,7 +94,7 @@ module.exports = BaseCollectionItemView.extend({
         this.el.classList.remove('room-item--favourite-one2one');
       }
     } else {
-      if (!model.get('favourite')) {
+      if (!!model.get('favourite')) {
         this.el.classList.remove('room-item');
         this.el.classList.add('room-item--favourite');
       } else {
@@ -145,7 +145,7 @@ module.exports = BaseCollectionItemView.extend({
   },
 
   onMenuChangeState: function () {
-    var name    = (this.model.get('name') || this.model.get('uri'));
+    var name    = (this.model.get('name') || this.model.get('uri') || this.model.get('username'));
     var content = (this.roomMenuModel.get('state') === 'org') ?
       parseRoomItemName(name) :
       roomNameShortener(name);

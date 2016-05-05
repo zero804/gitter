@@ -1,3 +1,5 @@
+/*eslint-env browser */
+
 'use strict';
 var qs = require('qs').parse(window.location.search);
 

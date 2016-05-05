@@ -1,3 +1,4 @@
+/* eslint complexity: ["error", 13] */
 'use strict';
 
 var _                       = require('lodash');

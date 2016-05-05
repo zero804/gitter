@@ -1,4 +1,4 @@
-/* jshint maxcomplexity:18 */
+/*eslint complexity: ["error", 18]*/
 "use strict";
 
 var Promise = require('bluebird');
@@ -54,7 +54,7 @@ module.exports = function(delegatePermissionsModel, userIsInRoom) {
           default:
             throw new Error('Unknown security: ' + security);
         }
-        break;
+        /* break; */
 
       case 'adduser':
         switch(security) {
@@ -75,7 +75,7 @@ module.exports = function(delegatePermissionsModel, userIsInRoom) {
           default:
             throw new Error('Unknown security: ' + security);
         }
-        break;
+        /* break; */
 
       case 'create':
         /* Anyone who can CREATE an ORG or REPO can create a child channel */
@@ -96,7 +96,7 @@ module.exports = function(delegatePermissionsModel, userIsInRoom) {
           default:
             throw new Error('Unknown security: ' + security);
         }
-        break;
+        /* break; */
 
       case 'admin':
         /* Anyone who can join an ORG or REPO can create a child channel */
