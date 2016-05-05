@@ -1,10 +1,9 @@
-/*jshint trailing: false, unused: true, node: true */
 "use strict";
 
 var env        = require('gitter-web-env');
 var config     = env.config;
-var _          = require('underscore');
-var userScopes = require('../../utils/models/user-scopes');
+var _          = require('lodash');
+var userScopes = require('gitter-web-identity/lib/user-scopes');
 
 function linkStack(stack) {
   if(!stack) return;
