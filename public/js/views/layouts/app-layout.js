@@ -42,10 +42,12 @@ module.exports = (function () {
         behaviors.Isomorphic.RoomMenuLayout = { el: '#room-menu-container', init: 'initNewMenuRegion' };
       }
 
-      behaviors.Isomorphic.communityCreate = {
-        el: '.community-create-app-root',
-        init: 'initCommunityCreateRegion'
-      };
+      if(context.hasFeature('community-create')) {
+        behaviors.Isomorphic.communityCreate = {
+          el: '.community-create-app-root',
+          init: 'initCommunityCreateRegion'
+        };
+      }
 
       return behaviors;
     },
