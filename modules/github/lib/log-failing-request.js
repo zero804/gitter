@@ -20,7 +20,9 @@ function sanitizeHeaders(headers) {
 
 module.exports = function(options, callback, request) {
   request(options, function(error, response, body) {
-    if (error || response && response.statusCode >= 400) {
+    var statusCode = response && response.statusCode >= 400;
+    var loggableStatusCode = statusCode && statusCode >= 400 && statusCode != 404;
+    if (error || loggableStatusCode) {
       logger.error("Error while communicating with GitHub", {
         exception: error,
         // NOTE: this could potentially leak access_token, client_id or

@@ -16,37 +16,37 @@ var Promise = require('bluebird');
 
 describe('ONETOONE', function() {
 
-// All of our fixtures
-var FIXTURES = [{
-  name: 'One to one conversations with non-signed-in users',
-  meta: {
-    user: { username: 'gitterbob' },
-    security: null,
-    uri: 'x',
-    userHasSignedUp: false,
-    expectedResult: 'throw'
-  },
-  tests: [
-    { right: 'join', expectedResult: 'throw' },
-    { right: 'create', expectedResult: 'throw' },
-    { right: 'adduser', expectedResult: false },
-    { right: 'admin', expectedResult: false },
-  ]
-},{
-  name: 'Unauthenticated users',
-  meta: {
-    user: { username: 'gitterbob' },
-    security: null,
-    uri: 'x',
-    userHasSignedUp: true,
-  },
-  tests: [
-    { right: 'join', expectedResult: true },
-    { right: 'create', expectedResult: true },
-    { right: 'adduser', expectedResult: false },
-    { right: 'admin', expectedResult: false },
-  ]
-}];
+  // All of our fixtures
+  var FIXTURES = [{
+    name: 'One to one conversations with non-signed-in users',
+    meta: {
+      user: { username: 'gitterbob' },
+      security: null,
+      uri: 'x',
+      userHasSignedUp: false,
+      expectedResult: 'throw'
+    },
+    tests: [
+      { right: 'join', expectedResult: 'throw' },
+      { right: 'create', expectedResult: 'throw' },
+      { right: 'adduser', expectedResult: false },
+      { right: 'admin', expectedResult: false },
+    ]
+  },{
+    name: 'Unauthenticated users',
+    meta: {
+      user: { username: 'gitterbob' },
+      security: null,
+      uri: 'x',
+      userHasSignedUp: true,
+    },
+    tests: [
+      { right: 'join', expectedResult: true },
+      { right: 'create', expectedResult: true },
+      { right: 'adduser', expectedResult: false },
+      { right: 'admin', expectedResult: false },
+    ]
+  }];
 
   testGenerator(FIXTURES, function(name, meta) {
     var SECURITY = meta.security;

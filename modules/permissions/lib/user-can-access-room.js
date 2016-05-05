@@ -7,11 +7,9 @@ var errorReporter         = env.errorReporter;
 var persistence           = require('gitter-web-persistence');
 var dolph                 = require('dolph');
 var Promise               = require('bluebird');
-var userService           = require('./user-service');
-var troupeService         = require('./troupe-service');
-var roomPermissionsModel  = require('gitter-web-permissions/lib/room-permissions-model');
-var roomMembershipService = require('./room-membership-service');
+var roomPermissionsModel  = require('./room-permissions-model');
 var mongoUtils            = require('gitter-web-persistence-utils/lib/mongo-utils');
+var appEvents             = require('gitter-web-appevents');
 
 var rateLimiter = dolph.rateLimiter({
   prefix: 'ac:',
@@ -45,8 +43,8 @@ function goodFaithPermCheck(userId, roomId, permission) {
 
 function permCheck(userId, roomId, permission) {
   return Promise.join(
-    userService.findById(userId),
-    troupeService.findById(roomId),
+    persistence.User.findById(userId, null, { lean: true }).exec(),
+    persistence.Troupe.findById(roomId, null, { lean: true }).exec(),
     function(user, room) {
       if (!user || !room) return false;
 
@@ -70,12 +68,10 @@ function checkExpensivePerms(userId, roomId, permission, isInRoom) {
       .then(function(passes) {
         if (passes) return true;
 
-        // This person no longer actually has access. Remove them!
-        return roomMembershipService.removeRoomMember(roomId, userId)
-          .then(function() {
-            return false;
-          });
-        });
+        appEvents.roomMemberPermCheckFailed(roomId, userId);
+
+        return false;
+      });
   } else {
     // cant trust this user. we must be strict.
     return permCheck(userId, roomId, permission);
@@ -118,7 +114,7 @@ function permissionToRead(userId, roomId) {
 
       if (leanRoom.security === 'PUBLIC') return true;
 
-      return roomMembershipService.checkRoomMembership(roomId, userId)
+      return checkRoomMembership(roomId, userId)
         .then(function(isInRoom) {
 
           if (leanRoom.githubType === 'ONETOONE' || isPrivateChannel(leanRoom)) {
@@ -144,7 +140,7 @@ function permissionToWrite(userId, roomId) {
 
       if (checkIfBanned(leanRoom)) return false;
 
-      return roomMembershipService.checkRoomMembership(roomId, userId)
+      return checkRoomMembership(roomId, userId)
         .then(function(isInRoom) {
 
           if (leanRoom.githubType === 'ONETOONE' || isPrivateChannel(leanRoom)) {
@@ -153,6 +149,17 @@ function permissionToWrite(userId, roomId) {
 
           return checkExpensivePerms(userId, roomId, 'join', isInRoom);
         });
+    });
+}
+
+/**
+ * We can't use the room membership service here as we're in a module
+ */
+function checkRoomMembership(troupeId, userId) {
+  return persistence.TroupeUser.count({ troupeId: troupeId, userId: userId })
+    .exec()
+    .then(function(count) {
+      return count > 0;
     });
 }
 
