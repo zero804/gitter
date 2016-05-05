@@ -15,6 +15,8 @@ var persistence                = require('gitter-web-persistence');
 var uriLookupService           = require("./uri-lookup-service");
 var permissionsModel           = require('gitter-web-permissions/lib/permissions-model');
 var roomPermissionsModel       = require('gitter-web-permissions/lib/room-permissions-model');
+var securityDescriptorService  = require('gitter-web-permissions/lib/security-descriptor-service');
+var legacyMigration            = require('gitter-web-permissions/lib/legacy-migration');
 var userService                = require('./user-service');
 var troupeService              = require('./troupe-service');
 var oneToOneRoomService        = require('./one-to-one-room-service');
@@ -46,6 +48,7 @@ var uriResolver                = require('./uri-resolver');
 var getOrgNameFromTroupeName   = require('gitter-web-shared/get-org-name-from-troupe-name');
 var userScopes                 = require('gitter-web-identity/lib/user-scopes');
 
+var splitsvilleEnabled = nconf.get("project-splitsville:enabled");
 
 /**
  * sendJoinStats() sends information to MixPanels about a join_room event
@@ -202,6 +205,7 @@ function findOrCreateGroupRoom(user, troupe, uri, options) {
             };
           }
 
+          // TODO: this will change when uris break away
           var queryTerm = githubId ?
                 { githubId: githubId, githubType: githubType } :
                 { lcUri: lcUri, githubType: githubType };
@@ -217,8 +221,16 @@ function findOrCreateGroupRoom(user, troupe, uri, options) {
                 security: security,
                 dateLastSecurityCheck: new Date(),
                 userCount: 0,
-                // permissions: permissions.fromLegacy(githubType, officialUri, security, githubId)
               }
+            })
+            .tap(function(upsertResult) {
+              var troupe = upsertResult[0];
+              var updateExisting = upsertResult[1];
+
+              if (updateExisting) return;
+
+              var descriptor = legacyMigration.generatePermissionsForRoom(troupe, null, null);
+              return securityDescriptorService.insertForRoom(troupe._id, descriptor);
             })
             .spread(function(troupe, updateExisting) {
               if (updateExisting) {
@@ -226,7 +238,7 @@ function findOrCreateGroupRoom(user, troupe, uri, options) {
                 if (troupe.uri !== officialUri) {
 
                   // TODO: deal with ORG renames too!
-                  if (githubType === 'REPO') {
+                  if (githubType === 'REPO' && !splitsvilleEnabled) {
                     debug('Attempting to rename room %s to %s', uri, officialUri);
 
                     return renameRepo(troupe.uri, officialUri)
@@ -399,6 +411,7 @@ function updateRoomWithGithubIdIfRequired(user, troupe) {
  * no emails are sent, noone is added
  * used to silently create owner rooms for org channels
  */
+// TODO: remove this in the new world where we've broken away from GH uris
 var createGithubRoom = Promise.method(function(user, uri) {
   if(!user) throw new StatusError(400, 'user required');
   if(!uri) throw new StatusError(400, 'uri required');
@@ -449,6 +462,12 @@ var createGithubRoom = Promise.method(function(user, uri) {
                 userCount: 0
               }
             })
+            .tap(function(upsertResult) {
+              var room = upsertResult[0];
+              var descriptor = legacyMigration.generatePermissionsForRoom(room, null, null);
+
+              return securityDescriptorService.insertForRoom(room._id, descriptor);
+            })
             .spread(function(room, updateExisting) {
               debug('Upsert found existing room? %s', updateExisting);
 
@@ -459,7 +478,7 @@ var createGithubRoom = Promise.method(function(user, uri) {
                 });
               }
 
-              if (updateExisting && room.uri !== uri && githubType === 'REPO') {
+              if (updateExisting && room.uri !== uri && githubType === 'REPO' && !splitsvilleEnabled) {
                 // room has been renamed!
                 // TODO: deal with ORG renames too!
                 debug('Attempting to rename room %s to %s', room.uri, uri);
@@ -796,134 +815,133 @@ function ensureNoExistingChannelNameClash(uri) {
     });
 }
 
-function createCustomChildRoom(parentTroupe, user, options, callback) {
-  return Promise.try(function() {
-    validate.expect(user, 'user is expected');
-    validate.expect(options, 'options is expected');
+var createCustomChildRoom = Promise.method(function(parentTroupe, user, options) {
+  validate.expect(user, 'user is expected');
+  validate.expect(options, 'options is expected');
 
-    var name = options.name;
-    var security = options.security;
-    var uri, githubType;
+  var name = options.name;
+  var security = options.security;
+  var uri, githubType;
 
-    if(parentTroupe) {
-      assertValidName(name);
-      uri = parentTroupe.uri + '/' + name;
+  if(parentTroupe) {
+    assertValidName(name);
+    uri = parentTroupe.uri + '/' + name;
 
       if(!{ ORG: 1, REPO: 1 }.hasOwnProperty(parentTroupe.githubType)) {
-        validate.fail('Invalid security option: ' + security);
-      }
-
-      // TODO: move to `permissions` here
-      switch(parentTroupe.githubType) {
-        case 'ORG':
-          githubType = 'ORG_CHANNEL';
-          break;
-        case 'REPO':
-          githubType = 'REPO_CHANNEL';
-          break;
-        default:
-          validate.fail('Invalid parent room type');
-      }
-
-      if(!{ PUBLIC: 1, PRIVATE: 1, INHERITED: 1 }.hasOwnProperty(security)) {
-        validate.fail('Invalid security option: ' + security);
-      }
-
-    } else {
-      githubType = 'USER_CHANNEL';
-
-      // Create a child room for a user
-      switch(security) {
-        case 'PUBLIC':
-          assertValidName(name);
-          break;
-
-        case 'PRIVATE':
-          if(name) {
-            /* If you cannot afford a name, one will be assigned to you */
-            assertValidName(name);
-          } else {
-            name = generateRandomName();
-          }
-          break;
-
-        default:
-          validate.fail('Invalid security option: ' + security);
-      }
-
-      uri = user.username + '/' + name;
-
+      validate.fail('Invalid security option: ' + security);
     }
 
-    var lcUri = uri.toLowerCase();
-    return permissionsModel(user, 'create', uri, githubType, security)
-      .then(function(access) {
-        if(!access) throw new StatusError(403, 'You do not have permission to create a channel here');
-        // Make sure that no such repo exists on Github
-        return ensureNoRepoNameClash(user, uri);
-      })
-      .then(function(clash) {
-        if(clash) throw new StatusError(409, 'There is a repo at ' + uri + ' therefore you cannot create a channel there');
-        return ensureNoExistingChannelNameClash(uri);
-      })
-      .then(function(clash) {
-        if(clash) throw new StatusError(409, 'There is already a channel at ' + uri);
+    // TODO: move to `permissions` here
+    switch(parentTroupe.githubType) {
+      case 'ORG':
+        githubType = 'ORG_CHANNEL';
+        break;
+      case 'REPO':
+        githubType = 'REPO_CHANNEL';
+        break;
+      default:
+        validate.fail('Invalid parent room type');
+    }
 
-        return mongooseUtils.upsert(persistence.Troupe,
-          { lcUri: lcUri, githubType: githubType },
-          {
-            $setOnInsert: {
-              lcUri: lcUri,
-              lcOwner: lcUri.split('/')[0],
-              uri: uri,
-              security: security,
-              parentId: parentTroupe && parentTroupe._id,
-              ownerUserId: parentTroupe ? null : user._id,
-              githubType: githubType,
-              userCount: 0
-            }
-          })
-          .spread(function(newRoom, updatedExisting) {
-            if (!user) return [newRoom, updatedExisting];
+      if(!{ PUBLIC: 1, PRIVATE: 1, INHERITED: 1 }.hasOwnProperty(security)) {
+      validate.fail('Invalid security option: ' + security);
+    }
 
-            var flags = userDefaultFlagsService.getDefaultFlagsForUser(user);
+  } else {
+    githubType = 'USER_CHANNEL';
 
-            return roomMembershipService.addRoomMember(newRoom._id, user._id, flags)
-              .thenReturn([newRoom, updatedExisting]);
-          })
-          .spread(function(newRoom, updatedExisting) {
+    // Create a child room for a user
+    switch(security) {
+      case 'PUBLIC':
+        assertValidName(name);
+        break;
 
-            // Send the created room notification
-            emailNotificationService.createdRoomNotification(user, newRoom) // send an email to the room's owner
-              .catch(function(err) {
-                logger.error('Unable to send create room notification: ' + err, { exception: err });
-              });
+      case 'PRIVATE':
+        if(name) {
+          /* If you cannot afford a name, one will be assigned to you */
+          assertValidName(name);
+        } else {
+          name = generateRandomName();
+        }
+        break;
 
-            sendJoinStats(user, newRoom, options.tracking); // now the channel has now been created, send join stats for owner joining
+      default:
+        validate.fail('Invalid security option: ' + security);
+    }
 
-            if (updatedExisting) {
-              /* Somehow someone beat us to it */
-              throw new StatusError(409);
-            }
+    uri = user.username + '/' + name;
 
-            // TODO handle adding the user in the event that they didn't create the room!
-            if (user) {
-              liveCollections.rooms.emit('create', newRoom, [user._id]);
-            }
+  }
 
-            stats.event("create_room", {
-              userId: user.id,
-              roomType: "channel"
+  var lcUri = uri.toLowerCase();
+  return permissionsModel(user, 'create', uri, githubType, security)
+    .then(function(access) {
+      if(!access) throw new StatusError(403, 'You do not have permission to create a channel here');
+      // Make sure that no such repo exists on Github
+      return ensureNoRepoNameClash(user, uri);
+    })
+    .then(function(clash) {
+      if(clash) throw new StatusError(409, 'There is a repo at ' + uri + ' therefore you cannot create a channel there');
+      return ensureNoExistingChannelNameClash(uri);
+    })
+    .then(function(clash) {
+      if(clash) throw new StatusError(409, 'There is already a channel at ' + uri);
+
+      return mongooseUtils.upsert(persistence.Troupe,
+        { lcUri: lcUri, githubType: githubType },
+        {
+          $setOnInsert: {
+            lcUri: lcUri,
+            lcOwner: lcUri.split('/')[0],
+            uri: uri,
+            security: security,
+            parentId: parentTroupe && parentTroupe._id,
+            ownerUserId: parentTroupe ? null : user._id,
+            githubType: githubType,
+            userCount: 0
+          }
+        })
+        .spread(function(newRoom, updatedExisting) {
+          if (updatedExisting) {
+            /* Somehow someone beat us to it */
+            throw new StatusError(409);
+          }
+
+          return newRoom;
+        })
+        .tap(function(newRoom) {
+          var descriptor = legacyMigration.generatePermissionsForRoom(newRoom, parentTroupe, user);
+
+          return securityDescriptorService.insertForRoom(newRoom._id, descriptor);
+        })
+        .tap(function(newRoom) {
+          if (!user) return;
+
+          var flags = userDefaultFlagsService.getDefaultFlagsForUser(user);
+
+          return roomMembershipService.addRoomMember(newRoom._id, user._id, flags);
+        })
+        .tap(function(newRoom) {
+          // Send the created room notification
+          emailNotificationService.createdRoomNotification(user, newRoom) // send an email to the room's owner
+            .catch(function(err) {
+              logger.error('Unable to send create room notification: ' + err, { exception: err });
             });
-            return uriLookupService.reserveUriForTroupeId(newRoom._id, uri)
-              .thenReturn(newRoom);
 
+          sendJoinStats(user, newRoom, options.tracking); // now the channel has now been created, send join stats for owner joining
+
+          // TODO handle adding the user in the event that they didn't create the room!
+          liveCollections.rooms.emit('create', newRoom, [user._id]);
+
+          stats.event("create_room", {
+            userId: user.id,
+            roomType: "channel"
           });
-      });
 
-   })
-  .nodeify(callback);
-}
+          return uriLookupService.reserveUriForTroupeId(newRoom._id, uri);
+        });
+    });
+});
 
 /**
  * notifyInvitedUser() informs an invited user
@@ -1428,6 +1446,10 @@ function renameRepo(oldUri, newUri) {
 
         return room.save()
           .then(function() {
+            // TODO: deal with externalId
+            return securityDescriptorService.updateLinksForRepo(oldUri, newUri, null);
+          })
+          .then(function() {
             return uriLookupService.removeBadUri(oldUri);
           })
           .then(function() {
@@ -1529,5 +1551,5 @@ module.exports = {
   deleteRoom: deleteRoom,
   testOnly: {
     updateUserDateAdded: updateUserDateAdded
-  }
+}
 };
