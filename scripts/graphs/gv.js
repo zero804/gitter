@@ -1,3 +1,5 @@
+'use strict';
+
 var util = require('util');
 var graphviz = require('graphviz');
 var fs = require('fs');

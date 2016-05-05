@@ -3,7 +3,6 @@
 var wrap = require('./github-cache-wrapper');
 var tentacles = require('./tentacles-client');
 var userTokenSelector = require('./user-token-selector').user;
-var githubMediaTypes = require('./github-media-types');
 
 function GitHubMeService(user) {
   this.user = user;
@@ -34,14 +33,12 @@ GitHubMeService.prototype.getEmail = function() {
 GitHubMeService.prototype.getOrgs = function() {
   return tentacles.org.listForAuthUser({
     accessToken: this.accessToken,
-    headers: { Accept: githubMediaTypes.MOONDRAGON }
   });
 };
 
 GitHubMeService.prototype.getOrgMembership = function(org) {
   return tentacles.orgMember.getMembershipForAuthUser(org, {
     accessToken: this.accessToken,
-    headers: { Accept: githubMediaTypes.MOONDRAGON }
   });
 };
 
@@ -75,7 +72,6 @@ GitHubMeService.prototype.isOrgMember = function(org) {
 GitHubMeService.prototype.getRepos = function() {
   return tentacles.repo.listForAuthUser({
     accessToken: this.accessToken,
-    headers: { Accept: githubMediaTypes.MOONDRAGON }
   });
 };
 

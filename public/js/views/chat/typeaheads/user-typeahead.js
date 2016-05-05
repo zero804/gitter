@@ -5,7 +5,6 @@ var context = require('utils/context');
 var apiClient = require('components/apiClient');
 var template = require('./tmpl/typeahead.hbs');
 var _ = require('underscore');
-var context = require('utils/context');
 
 function getRecentMessageSenders(chatCollection) {
   var users = chatCollection.map(function(message) {

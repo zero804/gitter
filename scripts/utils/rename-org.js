@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-/* jshint node:true, unused:true */
 "use strict";
 
 var shutdown = require('shutdown');

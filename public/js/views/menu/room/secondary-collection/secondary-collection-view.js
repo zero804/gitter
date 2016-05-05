@@ -82,7 +82,7 @@ module.exports = BaseCollectionView.extend({
           proto.setActive.apply(this, arguments) :
           this.el.classList.remove('active');
     }
-    this.toggleShowMore();
+    // this.toggleShowMore();
   },
 
   toggleShowMore: function () {

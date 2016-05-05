@@ -1,9 +1,9 @@
 'use strict';
 
 var Marionette                      = require('backbone.marionette');
+var toggleClass                     = require('utils/toggle-class');
 var template                        = require('./base-collection-item-view.hbs');
 var updateUnreadIndicatorClassState = require('../../../../components/menu/update-unread-indicator-class-state');
-var toggleClass                     = require('utils/toggle-class');
 
 module.exports = Marionette.ItemView.extend({
 
@@ -40,6 +40,24 @@ module.exports = Marionette.ItemView.extend({
     return {
       'data-id': this.model.get('id'),
     };
+  },
+
+  getRoomName: function() {
+    var model = this.model;
+
+    var name = (model.get('uri') ||
+                model.get('url') ||
+                model.get('name') ||
+                (model.get('fromUser') && model.get('fromUser').username));
+
+    return name;
+  },
+
+  getRoomUrl: function() {
+    var name = this.getRoomName();
+    var url  = (name[0] !== '/') ?  '/' + name : name;
+
+    return url;
   },
 
   onRender: function (){
