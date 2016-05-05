@@ -14,7 +14,7 @@ describe('BaseCollectionView', function(){
   var model;
   beforeEach(function(){
     collection     = new Backbone.Collection();
-    roomMenuModel  = new Backbone.Model({ state: ''} );
+    roomMenuModel  = new Backbone.Model({ state: ''});
     model          = new Backbone.Model();
     collectionView = new BaseCollectionView({
       bus:           Backbone.Events,

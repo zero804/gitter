@@ -35,8 +35,8 @@ persistenceService.ChatMessage.aggregate([{
    .exec()
    .then(function(chats) {
     chats.forEach(function(c) {
-      g.addNode("" + c._id.userId, { shape: "point" } );
-      g.addNode("" + c._id.room, { shape: "point" } );
+      g.addNode("" + c._id.userId, { shape: "point" });
+      g.addNode("" + c._id.room, { shape: "point" });
       g.addEdge("" + c._id.userId, "" + c._id.room, { color: ONE_TO_ONE_EDGE_COLOR,  arrowhead: "none", weight: c.count  });
     });
 

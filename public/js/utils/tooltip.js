@@ -375,7 +375,7 @@ module.exports = (function() {
 
   var compact = detectCompact();
 
-  $.fn.tooltip = function ( option ) {
+  $.fn.tooltip = function (option) {
     if (compact) return; // Do nothing if compact
 
     return this.each(function () {
