@@ -380,11 +380,11 @@ function TroupeStrategy(options) {
       if (currentUserId) {
         otherUser = mapOtherUser(item.oneToOneUsers);
       } else {
-        if (!shownWarning) {
+        if (shownWarning) {
+          otherUser = null;
+        } else {
           logger.warn('TroupeStrategy initiated without currentUserId, but generating oneToOne troupes. This can be a problem!');
           shownWarning = true;
-        } else {
-          otherUser = null;
         }
       }
 

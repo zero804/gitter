@@ -1,7 +1,6 @@
 'use strict';
 
 var context = require('utils/context');
-var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 var ModalView = require('./modal');
 var apiClient = require('components/apiClient');

@@ -79,23 +79,23 @@ function reposToRooms(repos) {
     });
 }
 
-var ownedRepoRooms = Promise.method(function(options) {
-  var user = options.user;
-  if (!user || !userScopes.isGitHubUser(user)) {
-    return [];
-  }
-
-  debug('checking ownedRepoRooms');
-
-  return ownedRepos(user)
-    .then(reposToRooms)
-    .then(function(rooms) {
-      if (debug.enabled) {
-        debug("ownedRepoRooms", _.pluck(rooms, "uri"));
-      }
-      return rooms;
-    });
-});
+// var ownedRepoRooms = Promise.method(function(options) {
+//   var user = options.user;
+//   if (!user || !userScopes.isGitHubUser(user)) {
+//     return [];
+//   }
+//
+//   debug('checking ownedRepoRooms');
+//
+//   return ownedRepos(user)
+//     .then(reposToRooms)
+//     .then(function(rooms) {
+//       if (debug.enabled) {
+//         debug("ownedRepoRooms", _.pluck(rooms, "uri"));
+//       }
+//       return rooms;
+//     });
+// });
 
 var starredRepoRooms = Promise.method(function(options) {
   var user = options.user;
@@ -115,23 +115,23 @@ var starredRepoRooms = Promise.method(function(options) {
     });
 });
 
-var watchedRepoRooms = Promise.method(function(options) {
-  var user = options.user;
-  if (!user || !userScopes.isGitHubUser(user)) {
-    return [];
-  }
-
-  debug('checking watchedRepoRooms');
-
-  return watchedRepos(user)
-    .then(reposToRooms)
-    .then(function(rooms) {
-      if (debug.enabled) {
-        debug("watchedRepoRooms", _.pluck(rooms, "uri"));
-      }
-      return rooms;
-    });
-});
+// var watchedRepoRooms = Promise.method(function(options) {
+//   var user = options.user;
+//   if (!user || !userScopes.isGitHubUser(user)) {
+//     return [];
+//   }
+//
+//   debug('checking watchedRepoRooms');
+//
+//   return watchedRepos(user)
+//     .then(reposToRooms)
+//     .then(function(rooms) {
+//       if (debug.enabled) {
+//         debug("watchedRepoRooms", _.pluck(rooms, "uri"));
+//       }
+//       return rooms;
+//     });
+// });
 
 var graphRooms = Promise.method(function(options) {
   var existingRooms = options.rooms;
@@ -212,7 +212,7 @@ function hilightedRooms(options) {
 
   var filtered = _.filter(shuffled, function(roomInfo) {
     var roomLang = roomInfo.localeLanguage;
-    return (roomLang == 'en' || roomLang == language);
+    return (roomLang === 'en' || roomLang === language);
   });
 
   return Promise.all(_.map(filtered, function(roomInfo) {
@@ -241,7 +241,7 @@ function filterRooms(suggested, existing) {
   var existingMap = _.indexBy(existing, 'id');
   filtered = _.filter(filtered, function(room) {
     // make very sure we only find public rooms
-    if (room.security != 'PUBLIC') {
+    if (room.security !== 'PUBLIC') {
       return false;
     }
     return existingMap[room.id] === undefined;

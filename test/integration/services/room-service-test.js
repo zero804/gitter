@@ -2219,7 +2219,6 @@ describe('room-service', function() {
       var fixture = {};
       var roomService;
       var roomPermissionsModel;
-      var assertJoinRoomChecks;
       var access;
       var roomMembershipService;
 
@@ -2238,7 +2237,6 @@ describe('room-service', function() {
       beforeEach(function() {
         roomMembershipService = testRequire('./services/room-membership-service');
         roomPermissionsModel = mockito.mockFunction();
-        assertJoinRoomChecks = mockito.mockFunction();
 
         mockito.when(roomPermissionsModel)().then(function(pUser, pPerm, pRoom) {
           assert.strictEqual(pUser, fixture.user1);

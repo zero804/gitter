@@ -2,11 +2,6 @@
 
 var speedy      = require("speedy");
 var persistence = require('gitter-web-persistence');
-var chatService = require('../../server/services/chat-service');
-var mongoose    = require('gitter-web-mongoose-bluebird');
-
-var ObjectID = mongoose.mongo.ObjectID;
-
 
 var userIds = ["54e4b1e56d46b9ea027e6e38", "54e4b1e56d46b9ea027e6e37"];
 

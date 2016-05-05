@@ -20,7 +20,7 @@ var pipe = stream
   .pipe(new BatchStream({size: 100}))
   .pipe(through2Concurrent.obj({maxConcurrency: 10}, function(batch, enc, cb) {
     batchNum++;
-    if (batchNum % 10 == 0) {
+    if (batchNum % 10 === 0) {
       console.log(batchNum*100);
     }
 
@@ -37,8 +37,7 @@ var pipe = stream
     cb();
   }));
 
-pipe.on('data', function(err) {
-});
+pipe.on('data', function() { });
 
 pipe.on('end', function() {
   var popular = _(tags).chain()
@@ -60,5 +59,3 @@ pipe.on('error', function(err) {
   console.error(err.stack);
   process.exit(1);
 });
-
-

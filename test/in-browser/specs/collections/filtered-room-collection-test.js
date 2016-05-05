@@ -3,7 +3,6 @@
 
 var assert                 = require('assert');
 var Backbone               = require('backbone');
-var moment                 = require('moment');
 var FilteredRoomCollection = require('public/js/collections/filtered-room-collection');
 var MockRoomCollection     = require('fixtures/helpers/room-collection');
 
