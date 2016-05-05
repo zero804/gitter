@@ -8,7 +8,8 @@ var EVENT_LISTENERS = [
   './notification-event-listener',
   './live-collection-events-listener',
   './room-membership-events',
-  './destroy-user-tokens-listener'
+  './destroy-user-tokens-listener',
+  './room-membership-permission-check-failed',
 ];
 
 var installed = false;
