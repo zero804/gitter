@@ -1314,13 +1314,11 @@ describe('room-service', function() {
           'gitter-web-permissions/lib/permissions-model': permissionsModelMock
         });
 
-        var fail = 0;
         return roomService.createCustomChildRoom(null, fixture.user1, { name: 'inherited', security: 'INHERITED' })
-          .catch(function() {
-            fail++;
-          })
           .then(function() {
-            assert.equal(fail, 1);
+            assert.ok(false, 'Expected a reject');
+          }, function() {
+            // All good
           });
       });
 
