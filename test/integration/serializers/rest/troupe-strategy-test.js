@@ -107,7 +107,6 @@ describe('TroupeStrategy', function() {
 
   it('should serialize a one-to-one troupe with currentUserId', function() {
     var strategy = new TroupeStrategy({ currentUserId: fixture.user1._id});
-    var u1 = fixture.user1;
     var u2 = fixture.user2;
     var t = fixture.troupe2;
     return serialize([t], strategy)

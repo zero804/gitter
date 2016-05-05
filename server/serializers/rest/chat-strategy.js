@@ -9,7 +9,6 @@ var unreadItemService     = require("../../services/unread-items");
 var collapsedChatsService = require('../../services/collapsed-chats-service');
 var getVersion            = require('../get-model-version');
 var UserIdStrategy        = require('./user-id-strategy');
-var TroupeIdStrategy      = require('./troupe-id-strategy');
 
 function formatDate(d) {
   return d ? d.toISOString() : null;

@@ -127,9 +127,9 @@ function fieldInPredicate(fieldName, values, additionalClauses) {
 
   if (!additionalClauses) {
     return predicate;
-  } else {
-    return _.defaults(predicate, additionalClauses);
   }
+
+  return _.defaults(predicate, additionalClauses);
 }
 
 function setId(model) {

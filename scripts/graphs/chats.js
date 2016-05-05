@@ -9,8 +9,6 @@ var persistenceService = require('gitter-web-persistence');
 var g = graphviz.digraph("G");
 
 var ONE_TO_ONE_EDGE_COLOR =  "#0000ff";
-var ORG_EDGE_COLOR =  "#00ff00";
-var OTHER_EDGE_COLOR =  "#ff0000";
 
 var d1 = new Date('13 Nov 2014');
 var d2 = new Date('20 Nov 2014');

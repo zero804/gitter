@@ -1,5 +1,5 @@
+'use strict';
 
-var log = require('../../../public/js/utils/log');
 var mailto = require('../../../public/js/utils/mailto-gen');
 var assert = require('assert');
 

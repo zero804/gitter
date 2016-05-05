@@ -7,7 +7,7 @@ var oauthService = require('../../server/services/oauth-service');
 speedy.run({
   a: function(done) {
     return oauthService.generateAnonWebToken()
-      .spread(function(token, client) {
+      .spread(function(token) {
         return oauthService.validateAccessTokenAndClient(token);
       })
       .nodeify(done);

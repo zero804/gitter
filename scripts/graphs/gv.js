@@ -1,6 +1,5 @@
 'use strict';
 
-var util = require('util');
 var graphviz = require('graphviz');
 var fs = require('fs');
 
@@ -8,10 +7,6 @@ var persistenceService = require('gitter-web-persistence');
 
 // Create digraph G
 var g = graphviz.digraph("G");
-
-var ONE_TO_ONE_EDGE_COLOR =  "#0000ff";
-var ORG_EDGE_COLOR =  "#00ff00";
-var OTHER_EDGE_COLOR =  "#ff0000";
 
 var COLOR1 = "#00d1a0";
 var COLOR2 = "#fe0063";

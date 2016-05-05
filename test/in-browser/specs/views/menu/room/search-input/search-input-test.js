@@ -7,14 +7,13 @@ var SearchInputView = require('public/js/views/menu/room/search-input/search-inp
 
 describe('SearchInputView', function(){
 
-  var searchInputView;
   var model;
   var el;
 
   beforeEach(function(){
     el = document.createElement('div');
     model = new Backbone.Model({ state: 'all' });
-    searchInputView = new SearchInputView({ el: el, model: model });
+    new SearchInputView({ el: el, model: model });
   });
 
   it.skip('should apply an active class only when the model is in a search state', function(){

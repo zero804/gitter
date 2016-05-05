@@ -72,7 +72,6 @@ function load(expected, done) {
     return createExpectedFixtures(expected, done);
   }
 
-  console.error('Using old school fixtures. Try change this sometime old chap.');
   return createExpectedFixtures({
     user1: {
       //email: 'testuser@troupetest.local'
@@ -217,11 +216,18 @@ function createExpectedFixtures(expected, done) {
 
         var securityDescriptor = f.securityDescriptor || {};
 
+        var type;
+        if (securityDescriptor.type) {
+          type = securityDescriptor.type;
+        } else {
+          type = f.oneToOne ? 'ONE_TO_ONE' : null;
+        }
+
         return persistence.SecurityDescriptor.create({
           troupeId: troupe._id,
 
           // Permissions stuff
-          type: securityDescriptor.type ? securityDescriptor.type : f.oneToOne ? 'ONE_TO_ONE' : null,
+          type: type,
           members: securityDescriptor.members || 'PUBLIC',
           admins: securityDescriptor.admins || 'MANUAL',
           public: 'public' in securityDescriptor ? securityDescriptor.public : !f.oneToOne,
@@ -309,7 +315,7 @@ function createExpectedFixtures(expected, done) {
         }
 
         return Promise.map(users, function(user, index) {
-            if(typeof user == 'string') {
+            if(typeof user === 'string') {
               if(expected[user]) return; // Already specified at the top level
               expected[user] = {};
               return createUser(user, {}).then(function(createdUser) {

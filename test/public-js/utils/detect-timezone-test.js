@@ -1,5 +1,4 @@
-/*jslint node:true, unused:true*/
-/*global describe:true, it:true */
+'use strict';
 
 var detectTimezone = require('../../../public/js/utils/detect-timezone');
 var assert = require('assert');

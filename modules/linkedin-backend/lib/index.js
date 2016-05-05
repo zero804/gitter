@@ -7,7 +7,7 @@ function LinkedInBackend(user, identity) {
   this.identity = identity;
 }
 
-LinkedInBackend.prototype.getEmailAddress = Promise.method(function(preferStoredEmail) {
+LinkedInBackend.prototype.getEmailAddress = Promise.method(function(/*preferStoredEmail*/) {
   return this.identity.email;
 });
 

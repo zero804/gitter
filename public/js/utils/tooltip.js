@@ -270,9 +270,8 @@ module.exports = (function() {
     }
 
   , hide: function () {
-      var that = this
-        , $tip = this.tip()
-        , e = $.Event('hide')
+      var $tip = this.tip();
+      var e = $.Event('hide')
 
       this.$element.trigger(e)
       if (e.isDefaultPrevented()) return
@@ -301,7 +300,7 @@ module.exports = (function() {
 
   , fixTitle: function () {
       var $e = this.$element
-      if ($e.attr('title') && typeof($e.attr('data-original-title')) != 'string') {
+      if ($e.attr('title') && typeof($e.attr('data-original-title')) !== 'string') {
         $e.attr('data-original-title', $e.attr('title') || '').attr('title', '')
       }
     }

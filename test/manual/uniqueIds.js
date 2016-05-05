@@ -1,12 +1,8 @@
 'use strict';
 
 var speedy      = require("speedy");
-var mongoose    = require('gitter-web-mongoose-bluebird');
 var mongoUtils    = require('gitter-web-persistence-utils/lib/mongo-utils');
 var _ = require('underscore');
-var ObjectID = require('mongodb').ObjectID;
-// ObjectID.cacheHexString = true;
-// mongoose.mongo.ObjectID.cacheHexString = true;
 
 var sets = {
   tinyUniqueObjectIds: _.range(1).map(function() {
@@ -51,7 +47,7 @@ speedy.samples(2);
 var benchmarkSuite = Object.keys(sets).reduce(function(memo, key) {
 
   memo[key + 'WithUniq'] = function() {
-    var len = _.uniq(sets[key]);
+    _.uniq(sets[key]);
   };
   //
   // memo[key + 'Interlude1'] = function(done) {
@@ -70,7 +66,7 @@ var benchmarkSuite = Object.keys(sets).reduce(function(memo, key) {
 
 }, {});
 speedy
-  .on("progress", function(data) {
+  .on("progress", function() {
     global.gc();
   })
   .run(benchmarkSuite);

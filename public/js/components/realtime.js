@@ -108,7 +108,6 @@ var accessTokenFailureExtension = {
 };
 
 var client;
-var pingTimer;
 
 function getOrCreateClient() {
   if (client) return client;

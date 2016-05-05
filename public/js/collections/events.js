@@ -1,7 +1,5 @@
 "use strict";
 
-var _ = require('underscore');
-var apiClient = require('components/apiClient');
 var moment = require('moment');
 var LiveCollection = require('gitter-realtime-client').LiveCollection;
 var realtime = require('components/realtime');

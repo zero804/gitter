@@ -1,14 +1,10 @@
 'use strict';
 
-var _ = require('underscore');
 var $ = require('jquery');
 var Marionette = require('backbone.marionette');
 var moment = require('moment');
 var context = require('utils/context');
-var apiClient = require('components/apiClient');
 var template = require('./tmpl/archive-navigation-view.hbs');
-var CalHeatMap = require('cal-heatmap');
-var getTimezoneInfo = require('utils/detect-timezone');
 var heatmapUtils = require('components/archive-heatmap-utils');
 
 module.exports = (function() {
@@ -52,10 +48,6 @@ module.exports = (function() {
 
     onRender: function() {
       var a = moment(this.options.archiveDate).utc();
-      // Get the date **in the local timezone** so that the highlighted
-      // date does not display incorrectly for west-of-the-meridian locations
-      var highlightDate = new Date(a.year(), a.month(), a.date());
-
       var range = 3;
 
       // if the first day of the next month is in the future, subtract one from range
