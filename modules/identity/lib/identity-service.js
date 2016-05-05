@@ -13,7 +13,6 @@ a GitHub user you can sorta get away with just the username at present, but you
 really need (pretty much) the full user object to be sure and to get any useful
 info out. So be careful.
 */
-
 function findForUser(user) {
   if (user._cachedIdentities) {
     return Promise.resolve(user._cachedIdentities);
@@ -45,7 +44,7 @@ function preloadForUsers(users) {
       cachedIdentities.push.apply(cachedIdentities, user._cachedIdentities);
     } else {
       user._cachedIdentities = [];
-      ids.push(user.id);
+      ids.push(user._id);
     }
     return ids;
   }, []);
@@ -70,7 +69,8 @@ function listProvidersForUser(user) {
   if (userScopes.isGitHubUser(user)) {
     return Promise.resolve(['github']);
   }
-  return Identity.distinct('provider', { userId: user.id }).exec();
+
+  return Identity.distinct('provider', { userId: user._id }).exec();
 }
 
 module.exports = {
