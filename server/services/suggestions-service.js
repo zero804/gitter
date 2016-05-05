@@ -2,20 +2,17 @@
 
 var Promise = require('bluebird');
 var _ = require('lodash');
-var collections = require('../utils/collections');
 var promiseUtils = require('../utils/promise-utils');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var troupeService = require('./troupe-service');
 var roomMembershipService = require('./room-membership-service');
 var userService = require('./user-service');
 var userSettingsService = require('./user-settings-service');
-var userScopes = require('../utils/models/user-scopes');
+var userScopes = require('gitter-web-identity/lib/user-scopes');
 var graphSuggestions = require('gitter-web-suggestions');
-var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
 var cacheWrapper = require('gitter-web-cache-wrapper');
 var debug = require('debug')('gitter:suggestions');
 var logger = require('gitter-web-env').logger;
-
 
 // the old github recommenders that find repos, to be filtered to rooms
 var ownedRepos = require('./recommendations/owned-repos');

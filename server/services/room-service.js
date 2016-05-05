@@ -44,7 +44,7 @@ var recentRoomService          = require('./recent-room-service');
 var badgerEnabled              = nconf.get('autoPullRequest:enabled');
 var uriResolver                = require('./uri-resolver');
 var getOrgNameFromTroupeName   = require('gitter-web-shared/get-org-name-from-troupe-name');
-var userScopes                 = require('../utils/models/user-scopes');
+var userScopes                 = require('gitter-web-identity/lib/user-scopes');
 
 
 /**
