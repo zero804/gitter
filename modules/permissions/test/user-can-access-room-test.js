@@ -1,9 +1,9 @@
 "use strict";
 
-var testRequire = require('../test-require');
 var assert = require('assert');
 var Promise = require('bluebird');
-var testGenerator = require('../test-generator');
+var testGenerator = require('../../../test/integration/test-generator');
+var proxyquireNoCallThru = require("proxyquire").noCallThru();
 
 // All of our fixtures
 var FIXTURES = [{
@@ -328,6 +328,25 @@ describe('user-can-access-room', function() {
               }
             };
           }
+        },
+        User: {
+          findById: function() {
+            return {
+              exec: function() {
+                assert(!anonymous);
+                return Promise.resolve({ _id: userId });
+              }
+            };
+          }
+        },
+        TroupeUser: {
+          count: function() {
+            return {
+              exec: function() {
+                return Promise.resolve(inRoom ? 1 : 0);
+              }
+            };
+          }
         }
       };
 
@@ -340,19 +359,6 @@ describe('user-can-access-room', function() {
 
             return callback(null, recentCheck ? 2 : 1);
           };
-        }
-      };
-
-      var userService = {
-        findById: function() {
-          assert(!anonymous);
-          return Promise.resolve({ _id: userId });
-        }
-      };
-
-      var troupeService = {
-        findById: function() {
-          return Promise.resolve({ _id: troupeId });
         }
       };
 
@@ -372,25 +378,17 @@ describe('user-can-access-room', function() {
         return Promise.resolve(roomPermissionsGrantsAccess);
       };
 
-      var roomMembershipService = {
-        checkRoomMembership: function() {
-          assert(!anonymous);
-          return Promise.resolve(inRoom);
-        },
-        removeRoomMember: function() {
-          assert(expectRemoveRoomMember);
-          removeRoomMemberCount++;
-          return Promise.resolve();
-        }
-      };
+      var appEvents = require('gitter-web-appevents').testOnly.makeEmitter();
+      appEvents.onRoomMemberPermCheckFailed(function() {
+        assert(expectRemoveRoomMember);
+        removeRoomMemberCount++;
+      });
 
-      var userCanAccessRoom = testRequire.withProxies("./services/user-can-access-room", {
+      var userCanAccessRoom = proxyquireNoCallThru('../lib/user-can-access-room', {
         'gitter-web-persistence': persistence,
         'dolph': dolph,
-        './user-service': userService,
-        './troupe-service': troupeService,
-        'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModel,
-        './room-membership-service': roomMembershipService
+        './room-permissions-model': roomPermissionsModel,
+        'gitter-web-appevents': appEvents
       });
 
       var func;
