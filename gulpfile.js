@@ -91,7 +91,9 @@ gulp.task('validate-config', function() {
 
 gulp.task('validate-eslint', function() {
   return gulp.src(['**/*.js','!node_modules/**','!public/repo/**'])
-    .pipe(eslint())
+    .pipe(eslint({
+      quiet: argv.quiet
+    }))
     .pipe(eslint.format())
     .pipe(eslint.failAfterError());
 });
