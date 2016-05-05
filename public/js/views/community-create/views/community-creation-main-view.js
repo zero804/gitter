@@ -33,20 +33,40 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   ui: _.extend({}, CommunityCreateBaseStepView.prototype.ui, {
     communityNameInput: '.primary-community-name-input',
-    communitySlugInput: '.community-creation-slug-input'
+    communitySlugInput: '.community-creation-slug-input',
+    githubProjectLink: '.js-community-create-from-github-project-link'
   }),
 
   events: _.extend({}, CommunityCreateBaseStepView.prototype.events, {
+    'click @ui.nextStep': 'onStepNext',
     'input @ui.communityNameInput': 'onCommunityNameInputChange',
-    'change @ui.communityNameInput': 'onCommunityNameInputChange',
     'input @ui.communitySlugInput': 'onCommunitSlugInputChange',
-    'change @ui.communitySlugInput': 'onCommunitSlugInputChange'
+    'click @ui.githubProjectLink': 'onGitHubProjectLinkActivated'
   }),
 
-  initialize: function(options) {
+  modelEvents: _.extend({}, CommunityCreateBaseStepView.prototype.modelEvents, {
+    'change:communityName': 'updateCommunityFields'
+  }),
+
+  initialize: function() {
     CommunityCreateBaseStepView.prototype.initialize.apply(this, arguments);
 
-    this.listenTo(this.communityCreateModel, 'change:communitySlug', this.onCommunitySlugChange, this);
+    this.listenTo(this.communityCreateModel, 'change:communityName', this.updateCommunityFields, this);
+    this.listenTo(this.communityCreateModel, 'change:communitySlug', this.updateCommunityFields, this);
+  },
+
+  onStepNext: function() {
+    this.communityCreateModel.set('stepState', this.communityCreateModel.STEP_CONSTANT_MAP.invite);
+  },
+
+  onGitHubProjectLinkActivated: function() {
+    // Move to the pick github project views
+    this.communityCreateModel.set('stepState', this.communityCreateModel.STEP_CONSTANT_MAP.githubProjects);
+  },
+
+  updateCommunityFields: function() {
+    updateElementValueAndMaintatinSelection(this.ui.communityNameInput[0], this.communityCreateModel.get('communityName'));
+    updateElementValueAndMaintatinSelection(this.ui.communitySlugInput[0], this.communityCreateModel.get('communitySlug'));
   },
 
   onCommunityNameInputChange: function() {
@@ -66,10 +86,6 @@ module.exports = CommunityCreateBaseStepView.extend({
         isUsingCustomSlug: isSlugEmpty ? false : isUsingCustomSlug
       });
     }
-  },
-
-  onCommunitySlugChange: function() {
-    updateElementValueAndMaintatinSelection(this.ui.communitySlugInput[0], this.communityCreateModel.get('communitySlug'));
   },
 
   onCommunitSlugInputChange: function() {

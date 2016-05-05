@@ -7,8 +7,11 @@ var CommunityCreateStepViewModel = require('./community-create-step-view-model')
 
 var CommunityCreateGitHubProjectsStepViewModel = CommunityCreateStepViewModel.extend({
   defaults: _.extend({}, CommunityCreateStepViewModel.prototype.defaults, {
-    isOrgAreaActive: false,
-    isRepoAreaActive: true
+    isOrgAreaActive: true,
+    isRepoAreaActive: false,
+
+    selectedOrgId: null,
+    selectedOrgName: null
   })
 });
 

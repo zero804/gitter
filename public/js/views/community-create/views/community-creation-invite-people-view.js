@@ -18,7 +18,20 @@ module.exports = CommunityCreateBaseStepView.extend({
     class: 'community-create-step-wrapper community-create-invite-people-step-wrapper'
   }),
 
+  events: _.extend({}, CommunityCreateBaseStepView.prototype.events, {
+    'click @ui.nextStep': 'onStepNext',
+    'click @ui.backStep': 'onStepBack',
+  }),
+
   initialize: function(options) {
     CommunityCreateBaseStepView.prototype.initialize.apply(this, arguments);
+  },
+
+  onStepNext: function() {
+    // TODO: Go to some sort of overview page
+    //this.communityCreateModel.set('stepState', this.communityCreateModel.STEP_CONSTANT_MAP.invite);
+  },
+  onStepBack: function() {
+    this.communityCreateModel.set('stepState', this.communityCreateModel.STEP_CONSTANT_MAP.main);
   },
 });

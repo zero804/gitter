@@ -1,12 +1,12 @@
 'use strict';
 
 var Marionette = require('backbone.marionette');
+var toggleClass = require('utils/toggle-class');
 
 require('views/behaviors/isomorphic');
 
 var template = require('./community-create-view.hbs');
 
-var CommunityCreateModel = require('./community-create-model');
 var CommunityCreateStepViewModel = require('./community-create-step-view-model');
 var CommunityCreateGitHubProjectsStepViewModel = require('./community-create-github-projects-step-view-model');
 
@@ -15,83 +15,89 @@ var CommunityCreationGithubProjectsView = require('./views/community-creation-gi
 var CommunityCreationInvitePeopleView = require('./views/community-creation-invite-people-view');
 
 
-// Bounds input index to somewhere in [0, length] with wrapping/rollover
-var arrayBoundWrap = function(index, length) {
-  return ((index % length) + length) % length;
-};
-
-
 module.exports = Marionette.LayoutView.extend({
   template: template,
+
+  attributes: {
+    class: 'community-create-root-inner'
+  },
+
+  ui: {
+    close: '.js-community-create-close'
+  },
 
   behaviors: {
     Isomorphic: {
       mainStepView: { el: '.community-create-main-step-root', init: 'initMainStepView' },
       invitePeopleStepView: { el: '.community-create-invite-people-step-root', init: 'initInvitePeopleView' },
       githubProjectsStepView: { el: '.community-create-github-projects-step-root', init: 'initGitHubProjectsView' },
-
     },
   },
 
   initMainStepView: function(optionsForRegion) {
     this.mainStepView = new CommunityCreationMainView(optionsForRegion({
       model: this.mainStepViewModel,
-      communityCreateModel: this.communityCreateModel
+      communityCreateModel: this.model
     }));
-    this.listenTo(this.mainStepView, 'step:next', this.onStepInDirection.bind(this, 1), this);
-    this.listenTo(this.mainStepView, 'step:back', this.onStepInDirection.bind(this, -1), this);
     return this.mainStepView;
   },
 
   initGitHubProjectsView: function(optionsForRegion) {
     this.githubProjectsStepView = new CommunityCreationGithubProjectsView(optionsForRegion({
       model: this.githubProjectsStepViewModel,
-      communityCreateModel: this.communityCreateModel
+      communityCreateModel: this.model
     }));
-    this.listenTo(this.githubProjectsStepView, 'step:next', this.onStepInDirection.bind(this, 1), this);
-    this.listenTo(this.githubProjectsStepView, 'step:back', this.onStepInDirection.bind(this, -1), this);
     return this.githubProjectsStepView;
   },
 
   initInvitePeopleView: function(optionsForRegion) {
     this.invitePeopleStepView = new CommunityCreationInvitePeopleView(optionsForRegion({
       model: this.invitePeopleStepViewModel,
-      communityCreateModel: this.communityCreateModel
+      communityCreateModel: this.model
     }));
-    this.listenTo(this.invitePeopleStepView, 'step:next', this.onStepInDirection.bind(this, 1), this);
-    this.listenTo(this.invitePeopleStepView, 'step:back', this.onStepInDirection.bind(this, -1), this);
     return this.invitePeopleStepView;
   },
 
+
+  events: {
+    'click @ui.close': 'onViewCloseClicked'
+  },
+
+  modelEvents: {
+    'change:active': 'onActiveChange',
+    'change:stepState': 'onStepChangeState'
+  },
+
   initialize: function(options) {
-    this.communityCreateModel = new CommunityCreateModel();
     this.mainStepViewModel = new CommunityCreateStepViewModel({ active: true });
     this.githubProjectsStepViewModel = new CommunityCreateGitHubProjectsStepViewModel({ active: false });
     this.invitePeopleStepViewModel = new CommunityCreateStepViewModel({ active: false });
-
-    this.modelStepOrder = [
-      this.mainStepViewModel,
-      this.githubProjectsStepViewModel,
-      this.invitePeopleStepViewModel
-    ];
   },
 
-  onStepInDirection: function(dir, args) {
-    dir = (dir === false) ? -1 : Math.sign(dir || 1);
-    var currentActiveModel = args.model;
+  onStepChangeState: function() {
+    var newStepState = this.model.get('stepState');
+    var stepConstants = this.model.STEP_CONSTANT_MAP;
 
-    var nextActiveModel;
-    this.modelStepOrder.some(function(model, index) {
-      if(model === currentActiveModel) {
-        nextActiveModel = this.modelStepOrder[arrayBoundWrap(index + dir, this.modelStepOrder.length)];
-        // break
-        return true;
+    var stepActiveMap = Object.keys(stepConstants).reduce(function(map, stepKey) {
+      var stepConstant = stepConstants[stepKey];
+      var value = false;
+      if(newStepState === stepConstant) {
+        value = true;
       }
-    }.bind(this));
+      map[stepConstant] = value;
+      return map;
+    }, {});
 
-    if(nextActiveModel) {
-      currentActiveModel.set('active', false);
-      nextActiveModel.set('active', true);
-    }
+    this.mainStepViewModel.set({ active: stepActiveMap[stepConstants.main] });
+    this.githubProjectsStepViewModel.set({ active: stepActiveMap[stepConstants.githubProjects] });
+    this.invitePeopleStepViewModel.set({ active: stepActiveMap[stepConstants.invite] });
+  },
+
+  onActiveChange: function() {
+    toggleClass(this.$el[0], 'active', this.model.get('active'));
+  },
+
+  onViewCloseClicked: function() {
+    this.model.set('active', false);
   }
 });

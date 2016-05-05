@@ -2,16 +2,30 @@
 
 var Backbone = require('backbone');
 
-var CommuntiyCreateModel = Backbone.Model.extend({
+var STEP_CONSTANT_MAP = {
+  main: 'MAIN',
+  githubProjects: 'GITHUB_PROJECTS',
+  invite: 'INVITE'
+};
+
+var CommunityCreateModel = Backbone.Model.extend({
+  STEP_CONSTANT_MAP: STEP_CONSTANT_MAP,
+
   defaults: {
+    active: false,
+    stepState: STEP_CONSTANT_MAP.main,
+
     communityName: '',
     communitySlug: '',
-    isUsingCustomSlug: false
+    isUsingCustomSlug: false,
+    githubOrgId: null
   },
 
   initialize: function() {
-    
+
   }
 });
 
-module.exports = CommuntiyCreateModel;
+CommunityCreateModel.STEP_CONSTANT_MAP = STEP_CONSTANT_MAP;
+
+module.exports = CommunityCreateModel;
