@@ -389,7 +389,8 @@ onready(function() {
       'createcustomroom/:name': 'createcustomroom',
       'createreporoom': 'createreporoom',
       'createroom': 'createroom',
-      'confirm/*uri': 'confirmRoom'
+      'confirm/*uri': 'confirmRoom',
+      'createcommunity': 'createCommunity'
     },
 
     hideModal: function() {
@@ -479,6 +480,10 @@ onready(function() {
           uri: uri,
         }));
       });
+    },
+
+    createCommunity: function(uri) {
+      appEvents.trigger('community-create-view:toggle', true);
     },
   });
 
