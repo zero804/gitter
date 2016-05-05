@@ -29,7 +29,8 @@ router.use('/learn', require('./learn'));
 router.use('/mobile', require('./mobile'));
 router.use('/settings', require('./settings'));
 router.use('/orgs', require('./org-pages'));
-router.use('/community-create', require('./community-create'));
+// Community create UI is integrated into the app itself now
+//router.use('/community-create', require('./community-create'));
 
 router.use('/', require('./app'));
 
