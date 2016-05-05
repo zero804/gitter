@@ -1,8 +1,8 @@
 'use strict';
 
 var Promise = require('bluebird');
-var userScopes = require('../utils/models/user-scopes');
-var identityService = require('./identity-service');
+var userScopes = require('gitter-web-identity/lib/user-scopes');
+var identityService = require("gitter-web-identity");
 
 var registeredBackends = {
   google: require('gitter-web-google-backend'),
