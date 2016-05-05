@@ -166,8 +166,6 @@ function findOrCreateGroupRoom(user, troupe, uri, options) {
       var githubType = githubInfo.type;
       var officialUri = githubInfo.uri;
       var lcUri = officialUri.toLowerCase();
-      var lcOwner = lcUri.split('/')[0];
-      var groupName = officialUri.split('/')[0];
       var security = githubInfo.security || null;
       var githubId = githubInfo.githubId || null;
       var topic = githubInfo.description;
@@ -206,24 +204,14 @@ function findOrCreateGroupRoom(user, troupe, uri, options) {
             };
           }
 
-          // upsert group if applicable
-          return upsertGroup({
-            githubType: githubType,
-            name: groupName,
-            uri: groupName,
-            lcUri: lcOwner
-          });
-        })
-        .spread(function(group, existing) {
           var queryTerm = githubId ?
                 { githubId: githubId, githubType: githubType } :
                 { lcUri: lcUri, githubType: githubType };
 
           return mongooseUtils.upsert(persistence.Troupe, queryTerm, {
               $setOnInsert: {
-                groupId: group && group._id,
                 lcUri: lcUri,
-                lcOwner: lcOwner,
+                lcOwner: lcUri.split('/')[0],
                 uri: officialUri,
                 githubType: githubType,
                 githubId: githubId,
@@ -429,7 +417,6 @@ var createGithubRoom = Promise.method(function(user, uri) {
       }
 
       var officialUri = githubInfo.uri;
-      var groupName = officialUri.split('/')[0];
       var lcUri = officialUri.toLowerCase();
       var lcOwner = lcUri.split('/')[0];
       var security = githubInfo.security || null;
@@ -441,15 +428,7 @@ var createGithubRoom = Promise.method(function(user, uri) {
           if (!hasAccess) throw new StatusError(403, 'no permission to create ' + officialUri);
         })
         .then(function() {
-          // upsert group (the lcOwner for the org or repo)
-          return upsertGroup({
-            githubType: githubType,
-            name: groupName,
-            uri: groupName,
-            lcUri: lcOwner
-          });
-        })
-        .spread(function(group, existing) {
+
           var queryTerm = { githubType: githubType };
           if (githubId) {
             // prefer queries with githubIds, as they survive github renames
@@ -461,8 +440,7 @@ var createGithubRoom = Promise.method(function(user, uri) {
           debug('Upserting room for query %j', queryTerm);
 
           return mongooseUtils.upsert(persistence.Troupe, queryTerm, {
-              $setOnInsert: {
-                groupId: group._id,
+               $setOnInsert: {
                 lcUri: lcUri,
                 lcOwner: lcOwner,
                 uri: officialUri,
@@ -827,22 +805,6 @@ function ensureNoExistingChannelNameClash(uri) {
     });
 }
 
-
-function upsertGroup(opts) {
-  if (opts.githubType != 'ONETOONE' && opts.githubType != 'USER_CHANNEL') {
-    var query = { lcUri: opts.lcUri };
-    return mongooseUtils.upsert(persistence.Group, query, {
-      $setOnInsert: {
-        name: opts.name,
-        uri: opts.uri,
-        lcUri: opts.lcUri
-      }
-    });
-  } else {
-    return Promise.resolve([null, false]);
-  }
-}
-
 function createCustomChildRoom(parentTroupe, user, options, callback) {
   return Promise.try(function() {
     validate.expect(user, 'user is expected');
@@ -903,8 +865,6 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
     }
 
     var lcUri = uri.toLowerCase();
-    var lcOwner = lcUri.split('/')[0];
-    var groupName = uri.split('/')[0];
     return permissionsModel(user, 'create', uri, githubType, security)
       .then(function(access) {
         if(!access) throw new StatusError(403, 'You do not have permission to create a channel here');
@@ -918,22 +878,12 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
       .then(function(clash) {
         if(clash) throw new StatusError(409, 'There is already a channel at ' + uri);
 
-        // upsert group for rooms that should have a group
-        return upsertGroup({
-          githubType: githubType,
-          name: groupName,
-          uri: groupName,
-          lcUri: lcOwner
-        });
-      })
-      .spread(function(group, existing) {
         return mongooseUtils.upsert(persistence.Troupe,
           { lcUri: lcUri, githubType: githubType },
           {
             $setOnInsert: {
-              groupId: group && group._id,
               lcUri: lcUri,
-              lcOwner: lcOwner,
+              lcOwner: lcUri.split('/')[0],
               uri: uri,
               security: security,
               parentId: parentTroupe && parentTroupe._id,
