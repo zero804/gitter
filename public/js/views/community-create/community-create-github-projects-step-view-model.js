@@ -9,9 +9,13 @@ var CommunityCreateGitHubProjectsStepViewModel = CommunityCreateStepViewModel.ex
   defaults: _.extend({}, CommunityCreateStepViewModel.prototype.defaults, {
     isOrgAreaActive: true,
     isRepoAreaActive: false,
+    repoFilter: null,
 
     selectedOrgId: null,
-    selectedOrgName: null
+    selectedOrgName: null,
+
+    selectedRepoId: null,
+    selectedRepoName: null
   })
 });
 

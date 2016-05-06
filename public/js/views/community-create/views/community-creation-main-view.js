@@ -59,9 +59,12 @@ module.exports = CommunityCreateBaseStepView.extend({
     this.communityCreateModel.set('stepState', this.communityCreateModel.STEP_CONSTANT_MAP.invite);
   },
 
-  onGitHubProjectLinkActivated: function() {
+  onGitHubProjectLinkActivated: function(e) {
     // Move to the pick github project views
     this.communityCreateModel.set('stepState', this.communityCreateModel.STEP_CONSTANT_MAP.githubProjects);
+
+    e.preventDefault();
+    e.stopPropagation();
   },
 
   updateCommunityFields: function() {
