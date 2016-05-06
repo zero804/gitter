@@ -42,36 +42,7 @@ module.exports = (function () {
         behaviors.Isomorphic.RoomMenuLayout = { el: '#room-menu-container', init: 'initNewMenuRegion' };
       }
 
-      if(context.hasFeature('community-create')) {
-        behaviors.Isomorphic.communityCreate = {
-          el: '.community-create-app-root',
-          init: 'initCommunityCreateRegion'
-        };
-      }
-
       return behaviors;
-    },
-
-    events: {
-      "keydown": "onKeyDown",
-    },
-
-    initialize: function (options) {
-      this.roomCollection          = options.roomCollection;
-      this.orgCollection           = options.orgCollection;
-      this.dialogRegion            = modalRegion;
-
-      this.communityCreateModel = new CommunityCreateModel();
-
-      //Mobile events don't seem to bind 100% of the time so lets use a native method
-      var menuHotspot = document.querySelector('.menu__hotspot');
-      if(menuHotspot) {
-        menuHotspot.addEventListener('click', function(){
-          this.fireEventToggleMobileMenu();
-        }.bind(this));
-      }
-
-      this.listenTo(appEvents, 'community-create-view:toggle', this.onCommunityCreateToggle, this);
     },
 
     initMenuRegion: function (optionsForRegion){
@@ -87,12 +58,37 @@ module.exports = (function () {
       return this.menuRegion;
     },
 
-    initCommunityCreateRegion: function(optionsForRegion) {
-      this.communityCreateView = new CommunityCreateView(optionsForRegion({
+    events: {
+      "keydown": "onKeyDown",
+    },
+
+    initialize: function (options) {
+      this.roomCollection          = options.roomCollection;
+      this.orgCollection           = options.orgCollection;
+      this.dialogRegion            = modalRegion;
+
+      this.communityCreateModel = new CommunityCreateModel();
+      this.hasRenderedCommunityCreateView = false;
+
+      //Mobile events don't seem to bind 100% of the time so lets use a native method
+      var menuHotspot = document.querySelector('.menu__hotspot');
+      if(menuHotspot) {
+        menuHotspot.addEventListener('click', function(){
+          this.fireEventToggleMobileMenu();
+        }.bind(this));
+      }
+
+      this.listenTo(appEvents, 'community-create-view:toggle', this.onCommunityCreateToggle, this);
+    },
+
+    initCommunityCreateRegion: function() {
+      this.communityCreateView = new CommunityCreateView({
+        el: '.community-create-app-root',
         model: this.communityCreateModel
-      }));
+      });
       return this.communityCreateView;
     },
+
 
     onKeyDown: function(e) {
       if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
@@ -113,7 +109,13 @@ module.exports = (function () {
     },
 
     onCommunityCreateToggle: function(active) {
+      if(!this.hasRenderedCommunityCreateView) {
+        var communityCreateView = this.initCommunityCreateRegion();
+        communityCreateView.render();
+      }
       this.communityCreateModel.set('active', active);
+
+      this.hasRenderedCommunityCreateView = true;
     }
 
   });
