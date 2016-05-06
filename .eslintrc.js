@@ -23,7 +23,7 @@ module.exports = {
     "max-statements": ["warn", 30],
     "max-depth": ["error", 4],
     "no-sequences": "error",
-    "no-warning-comments": ["warn", { "terms": ["todo", "fixme", "xxx"], "location": "anywhere" }],
+    "no-warning-comments": ["warn", { "terms": ["fixme", "xxx"], "location": "anywhere" }],
     "radix": "error",
     "yoda": "error",
     "no-nested-ternary": "warn",

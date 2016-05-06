@@ -8,7 +8,7 @@ function createRegExpsForQuery(queryText) {
   var normalized = ("" + queryText).trim().toLowerCase();
   var parts = normalized.split(/[\s\'']+/)
                         .filter(function(s) { return !!s; })
-                        .filter(function(s, index) { return index < 10; } );
+                        .filter(function(s, index) { return index < 10; });
 
   return parts.map(function(i) {
     return new RegExp("\\b" + i.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&"));

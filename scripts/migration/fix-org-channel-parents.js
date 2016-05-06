@@ -5,7 +5,7 @@ var persistence = require('gitter-web-persistence');
 var Promise = require('bluebird');
 var _ = require('lodash');
 var cliff = require('cliff');
-
+var shutdown = require('shutdown');
 
 function getOrgChannelsWithIncorrectParent() {
   return persistence.Troupe
@@ -46,6 +46,37 @@ function getOrgChannelsWithIncorrectParent() {
     .exec();
 }
 
+function countRealUsersInRooms(troupeIds) {
+  return persistence.TroupeUser
+    .aggregate([
+      { $match: { troupeId: { $in: troupeIds } } },
+      { $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "user"
+        }
+      },
+      { $unwind: {
+          path: "$user",
+        }
+      },
+      {
+        $group: {
+          _id: "$troupeId",
+          count: { $sum: 1 }
+        }
+      }
+    ])
+    .read('secondaryPreferred')
+    .exec()
+    .then(function(results) {
+      return results.reduce(function(memo, result) {
+        memo[result._id] = result.count;
+        return memo;
+      }, {});
+    });
+}
 
 function keyByField(results,field) {
   return results.reduce(function(memo, result) {
@@ -72,18 +103,23 @@ function getUpdates() {
     .then(function(results) {
       this.results = results;
       var lcOwners = _.pluck(results, 'lcOwner');
-      return findOrgRoomsHashed(lcOwners);
+      var troupeIds = _.pluck(results, '_id');
+
+      return [countRealUsersInRooms(troupeIds), findOrgRoomsHashed(lcOwners)];
     })
-    .then(function(orgsHashed) {
+    .spread(function(userCounts, orgsHashed) {
       return this.results.map(function(troupe) {
         var correctParent = orgsHashed[troupe.lcOwner];
+        var count = userCounts[troupe._id] || 0;
+
         return {
           _id: troupe._id,
           uri: troupe.uri,
           originalParentId: troupe.parentId,
           originalOwnerUserId: troupe.ownerUserId,
           correctParentId: correctParent && correctParent._id,
-          correctParentUri: correctParent && correctParent.uri
+          correctParentUri: correctParent && correctParent.uri,
+          userCount: count
         };
       });
     });
@@ -92,7 +128,7 @@ function getUpdates() {
 function dryRun() {
   return getUpdates()
     .then(function(updates) {
-      console.log(cliff.stringifyObjectRows(updates, ['_id', 'uri', 'originalParentId', 'originalOwnerUserId', 'correctParentId', 'correctParentUri']));
+      console.log(cliff.stringifyObjectRows(updates, ['_id', 'uri', 'originalParentId', 'originalOwnerUserId', 'correctParentId', 'correctParentUri', 'userCount']));
     });
 }
 
@@ -137,7 +173,7 @@ require('yargs')
     return execute()
       .delay(1000)
       .then(function() {
-        process.exit();
+        shutdown.shutdownGracefully();
       })
       .done();
   })

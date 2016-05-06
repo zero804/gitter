@@ -2,7 +2,6 @@
 'use strict';
 
 var assert                    = require('assert');
-var $                         = require('jquery');
 var Backbone                  = require('backbone');
 var PrimaryCollectionItemView = require('public/js/views/menu/room/primary-collection/primary-collection-item-view');
 var apiClient                 = require('components/apiClient');

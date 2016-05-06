@@ -1,6 +1,6 @@
 "use strict";
 
-var identityService = require("../../services/identity-service");
+var identityService = require("gitter-web-identity");
 var _               = require('lodash');
 var Promise         = require('bluebird');
 var BackendMuxer    = require('../../services/backend-muxer');

@@ -1,7 +1,7 @@
 "use strict";
 
 var Promise = require('bluebird');
-var identityService = require("./identity-service");
+var identityService = require("gitter-web-identity");
 var userCanJoinRoom = require("gitter-web-shared/rooms/user-can-join-room");
 var StatusError = require('statuserror');
 

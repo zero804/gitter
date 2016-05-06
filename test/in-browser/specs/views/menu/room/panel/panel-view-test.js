@@ -12,7 +12,6 @@ describe('PanelView', function() {
   var model;
   var el;
   var panelView;
-  var sandbox;
 
   beforeEach(function() {
     //sandbox = sinon.sandbox.create();
