@@ -1,7 +1,7 @@
 "use strict";
 
-var _               = require('lodash');
-var BackendMuxer    = require('../../services/backend-muxer');
+var _            = require('lodash');
+var BackendMuxer = require('gitter-web-backend-muxer');
 
 function UserProfileStrategy(options) {
   options = options ? options : {};
