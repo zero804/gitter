@@ -230,8 +230,7 @@ function sendEmailNotifications(since) {
                     if(err.gitterAction === 'logout_destroy_user_tokens') {
                       stats.event('logout_destroy_user_tokens', { userId: user.id });
 
-                      user.destroyTokens();
-                      return user.save();
+                      userService.destroyTokensForUserId(user.id);
                     }
                   });
 
