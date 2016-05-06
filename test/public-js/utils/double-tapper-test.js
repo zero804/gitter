@@ -1,3 +1,5 @@
+'use strict';
+
 var DoubleTapper = require('../../../public/js/utils/double-tapper');
 var assert = require('assert');
 

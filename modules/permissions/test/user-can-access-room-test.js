@@ -367,7 +367,7 @@ describe('user-can-access-room', function() {
         assert(permission, 'permission required');
         assert(room, 'room required');
         assert(!anonymous);
-        if (roomPermissionsGrantsAccess !== true && roomPermissionsGrantsAccess !== false && roomPermissionsGrantsAccess !== "throw" ) {
+        if (roomPermissionsGrantsAccess !== true && roomPermissionsGrantsAccess !== false && roomPermissionsGrantsAccess !== "throw") {
           assert.ok(false, 'Unexpected call to roomPermissionsModel');
         }
 

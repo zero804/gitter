@@ -1,6 +1,5 @@
 'use strict';
 
-var util = require('util');
 var graphviz = require('graphviz');
 var fs = require('fs');
 
@@ -8,10 +7,6 @@ var persistenceService = require('gitter-web-persistence');
 
 // Create digraph G
 var g = graphviz.digraph("G");
-
-var ONE_TO_ONE_EDGE_COLOR =  "#0000ff";
-var ORG_EDGE_COLOR =  "#00ff00";
-var OTHER_EDGE_COLOR =  "#ff0000";
 
 var COLOR1 = "#00d1a0";
 var COLOR2 = "#fe0063";
@@ -27,8 +22,8 @@ persistenceService.Troupe.find({}, 'oneToOne users.userId githubType security ur
           var userId1 = room.users[0].userId;
           var userId2 = room.users[1].userId;
           if(userId1 && userId2) {
-            g.addNode("" + userId1, { shape: "point", color: COLOR1 } );
-            g.addNode("" + userId2, { shape: "point", color: COLOR1 } );
+            g.addNode("" + userId1, { shape: "point", color: COLOR1 });
+            g.addNode("" + userId2, { shape: "point", color: COLOR1 });
 
             g.addEdge("" + userId1, "" + userId2, { color: COLOR1,  arrowhead: "none"  });
             // g.addEdge("" + userId2, "" + userId1);
@@ -51,7 +46,7 @@ persistenceService.Troupe.find({}, 'oneToOne users.userId githubType security ur
 
         room.users.forEach(function(roomUser) {
           if(roomUser.userId) {
-            g.addNode("" + roomUser.userId, { shape: "point", color: COLOR1 } );
+            g.addNode("" + roomUser.userId, { shape: "point", color: COLOR1 });
             g.addEdge("" + roomUser.userId, "" + room.id, { color: color,  arrowhead: "none" });
           }
         });

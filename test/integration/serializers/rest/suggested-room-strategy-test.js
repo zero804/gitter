@@ -49,7 +49,6 @@ describe('SuggestedRoomStrategy', function() {
 
   it('should serialize a suggestion that is a room object', function() {
     var strategy = new SuggestedRoomStrategy({ currentUserId: fixture.user1._id});
-    var user = fixture.user1;
     var suggestion = fixture.troupe1;
     return serialize([suggestion], strategy)
       .then(function(s) {
@@ -59,7 +58,6 @@ describe('SuggestedRoomStrategy', function() {
 
   it('should serialize a suggestion with a roomId', function() {
     var strategy = new SuggestedRoomStrategy({ currentUserId: fixture.user1._id});
-    var user = fixture.user1;
     var suggestion = fixture.troupe1;
     return serialize([{roomId: suggestion.id}], strategy)
       .then(function(s) {

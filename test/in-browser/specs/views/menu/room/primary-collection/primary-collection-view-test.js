@@ -179,7 +179,7 @@ describe.skip('PrimaryCollectionView', function() {
   });
 
   it('should emit an event on keyboard up movement', function(done) {
-    primaryCollectionView.bus.on('room-menu:keyboard:change-focus', function(id) {
+    primaryCollectionView.bus.on('room-menu:keyboard:change-focus', function() {
       assert(true);
       done();
     });
@@ -190,7 +190,7 @@ describe.skip('PrimaryCollectionView', function() {
   });
 
   it('should emit an event on keyboard up movement', function(done) {
-    primaryCollectionView.bus.on('room-menu:keyboard:change-focus', function(id) {
+    primaryCollectionView.bus.on('room-menu:keyboard:change-focus', function() {
       assert(true);
       done();
     });

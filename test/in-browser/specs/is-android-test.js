@@ -1,4 +1,5 @@
-/*jshint unused:true, browser:true*/
+'use strict';
+
 var isAndroid = require('../../../public/js/utils/is-android');
 var assert = require('assert');
 
