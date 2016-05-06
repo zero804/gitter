@@ -2,7 +2,6 @@
 
 var Promise = require('bluebird');
 var _ = require('lodash');
-var suggestions    = require('gitter-web-suggestions');
 var restSerializer = require('../../../serializers/rest-serializer');
 var troupeService = require('../../../services/troupe-service');
 var roomMembershipService = require('../../../services/room-membership-service');

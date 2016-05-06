@@ -1,8 +1,5 @@
 'use strict';
 
-var $ = require('jquery');
-var backbone = require('backbone');
-var Marionette = require('backbone.marionette');
 var appEvents = require('utils/appevents');
 var onready = require('utils/onready');
 var toggleClass = require('utils/toggle-class');
@@ -18,11 +15,9 @@ require('gitter-styleguide/css/components/headings.css');
 onready(function() {
 
 
-  var exploreView = new ExploreView({
+  new ExploreView({
     el: '.explore-page-wrap'
   });
-  //exploreView.render();
-
 
 
   var tagPillElements = document.querySelectorAll('.js-explore-tag-pill');

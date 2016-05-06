@@ -3,7 +3,6 @@ var context = require('utils/context');
 var troupeModels = require('collections/troupes');
 var realtime = require('./realtime');
 var debug = require('debug-proxy')('app:live-context');
-var _ = require('underscore');
 
 module.exports = {
   syncRoom: function() {
@@ -44,7 +43,7 @@ module.exports = {
             debug("Unknown operation %s ignoring", operation);
         }
       },
-      
+
       getSnapshotState: function() {
         /* We don't want snapshots. Just the live stream */
         return false;

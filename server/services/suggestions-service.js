@@ -2,20 +2,17 @@
 
 var Promise = require('bluebird');
 var _ = require('lodash');
-var collections = require('../utils/collections');
 var promiseUtils = require('../utils/promise-utils');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var troupeService = require('./troupe-service');
 var roomMembershipService = require('./room-membership-service');
 var userService = require('./user-service');
 var userSettingsService = require('./user-settings-service');
-var userScopes = require('../utils/models/user-scopes');
+var userScopes = require('gitter-web-identity/lib/user-scopes');
 var graphSuggestions = require('gitter-web-suggestions');
-var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
 var cacheWrapper = require('gitter-web-cache-wrapper');
 var debug = require('debug')('gitter:suggestions');
 var logger = require('gitter-web-env').logger;
-
 
 // the old github recommenders that find repos, to be filtered to rooms
 var ownedRepos = require('./recommendations/owned-repos');
@@ -82,23 +79,23 @@ function reposToRooms(repos) {
     });
 }
 
-var ownedRepoRooms = Promise.method(function(options) {
-  var user = options.user;
-  if (!user || !userScopes.isGitHubUser(user)) {
-    return [];
-  }
-
-  debug('checking ownedRepoRooms');
-
-  return ownedRepos(user)
-    .then(reposToRooms)
-    .then(function(rooms) {
-      if (debug.enabled) {
-        debug("ownedRepoRooms", _.pluck(rooms, "uri"));
-      }
-      return rooms;
-    });
-});
+// var ownedRepoRooms = Promise.method(function(options) {
+//   var user = options.user;
+//   if (!user || !userScopes.isGitHubUser(user)) {
+//     return [];
+//   }
+//
+//   debug('checking ownedRepoRooms');
+//
+//   return ownedRepos(user)
+//     .then(reposToRooms)
+//     .then(function(rooms) {
+//       if (debug.enabled) {
+//         debug("ownedRepoRooms", _.pluck(rooms, "uri"));
+//       }
+//       return rooms;
+//     });
+// });
 
 var starredRepoRooms = Promise.method(function(options) {
   var user = options.user;
@@ -118,23 +115,23 @@ var starredRepoRooms = Promise.method(function(options) {
     });
 });
 
-var watchedRepoRooms = Promise.method(function(options) {
-  var user = options.user;
-  if (!user || !userScopes.isGitHubUser(user)) {
-    return [];
-  }
-
-  debug('checking watchedRepoRooms');
-
-  return watchedRepos(user)
-    .then(reposToRooms)
-    .then(function(rooms) {
-      if (debug.enabled) {
-        debug("watchedRepoRooms", _.pluck(rooms, "uri"));
-      }
-      return rooms;
-    });
-});
+// var watchedRepoRooms = Promise.method(function(options) {
+//   var user = options.user;
+//   if (!user || !userScopes.isGitHubUser(user)) {
+//     return [];
+//   }
+//
+//   debug('checking watchedRepoRooms');
+//
+//   return watchedRepos(user)
+//     .then(reposToRooms)
+//     .then(function(rooms) {
+//       if (debug.enabled) {
+//         debug("watchedRepoRooms", _.pluck(rooms, "uri"));
+//       }
+//       return rooms;
+//     });
+// });
 
 var graphRooms = Promise.method(function(options) {
   var existingRooms = options.rooms;
@@ -215,7 +212,7 @@ function hilightedRooms(options) {
 
   var filtered = _.filter(shuffled, function(roomInfo) {
     var roomLang = roomInfo.localeLanguage;
-    return (roomLang == 'en' || roomLang == language);
+    return (roomLang === 'en' || roomLang === language);
   });
 
   return Promise.all(_.map(filtered, function(roomInfo) {
@@ -244,7 +241,7 @@ function filterRooms(suggested, existing) {
   var existingMap = _.indexBy(existing, 'id');
   filtered = _.filter(filtered, function(room) {
     // make very sure we only find public rooms
-    if (room.security != 'PUBLIC') {
+    if (room.security !== 'PUBLIC') {
       return false;
     }
     return existingMap[room.id] === undefined;

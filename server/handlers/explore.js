@@ -2,7 +2,6 @@
 
 var Promise = require('bluebird');
 var _ = require('underscore');
-var langs = require('langs');
 var express = require('express');
 var urlJoin = require('url-join');
 
@@ -15,10 +14,6 @@ var exploreService = require('../services/explore-service');
 var suggestionsService = require('../services/suggestions-service');
 var exploreTagUtils = require('../utils/explore-tag-utils');
 var generateExploreSnapshot = require('./snapshots/explore-snapshot');
-
-var trim = function(str) {
-  return str.trim();
-};
 
 var processTagInput = function(input) {
   input = input || '';
