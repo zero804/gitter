@@ -70,6 +70,15 @@
 
   background-color: transparent;
   border: 0;
+
+  color: rgba(255, 255, 255, .5);
+  font-size: 4rem;
+
+  transition: color .2s ease;
+
+  &:hover {
+    color: rgba(255, 255, 255, .9);
+  }
 }
 
 
@@ -396,7 +405,12 @@
 }
 
 .community-create-list-item-link {
+  overflow: hidden;
   display: block;
+
+  color: @base-text-color;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 
   transition:
     background-color .2s ease;
@@ -405,6 +419,10 @@
     background-color: rgba(255, 255, 255, .1);
     outline: none;
   }
+}
+
+.community-create-list-item-name {
+
 }
 
 .community-create-org-list-item {
@@ -432,6 +450,18 @@
 
 .community-create-repo-list-item {
   margin-top: 8px;
+  border: 2px solid transparent;
+
+  transition: border-color .2s ease;
+
+  &.hidden {
+    display: none;
+  }
+
+  &.active {
+    background-color: rgba(255, 255, 255, .08);
+    border: 2px solid fade(@ruby, 60%);
+  }
 }
 
 .community-create-repo-list-item-avatar {

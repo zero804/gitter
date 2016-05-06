@@ -18,6 +18,7 @@ var CommunityCreateModel = Backbone.Model.extend({
     communityName: '',
     communitySlug: '',
     isUsingCustomSlug: false,
+    githubRepoId: null,
     githubOrgId: null
   },
 

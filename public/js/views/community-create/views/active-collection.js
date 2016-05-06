@@ -4,7 +4,8 @@ var Backbone = require('backbone');
 
 var ActiveItemModel = Backbone.Model.extend({
   defaults: {
-    active: false
+    active: false,
+    hidden: false
   },
 });
 
