@@ -1,6 +1,5 @@
 "use strict";
 
-var $ = require('jquery');
 var _ = require('underscore');
 
 var context = require('utils/context');

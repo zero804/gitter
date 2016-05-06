@@ -1,12 +1,9 @@
 'use strict';
 
 var speedy      = require("speedy");
-var persistence = require('gitter-web-persistence');
-var chatService = require('../../server/services/chat-service');
 var mongoose    = require('gitter-web-mongoose-bluebird');
 var onMongoConnect    = require('../../server/utils/on-mongo-connect');
 var async = require('async');
-var ObjectID = mongoose.mongo.ObjectID;
 
 // speedy.samples(10);
 speedy.timeout(5000);
@@ -61,5 +58,3 @@ onMongoConnect(function() {
 
 
 });
-
-

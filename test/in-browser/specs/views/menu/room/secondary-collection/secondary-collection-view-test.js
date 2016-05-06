@@ -1,8 +1,6 @@
-/*global describe:true, it:true, beforeEach:true */
 'use strict';
 
 var assert                  = require('assert');
-var _                       = require('underscore');
 var Backbone                = require('backbone');
 var SecondaryCollectionView = require('public/js/views/menu/room/secondary-collection/secondary-collection-view.js');
 

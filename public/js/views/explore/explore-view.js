@@ -1,7 +1,6 @@
 'use strict';
 
 var $ = require('jquery');
-var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 var urlParse = require('url-parse');
 
@@ -117,7 +116,7 @@ var ExploreView = Marionette.LayoutView.extend({
     e.preventDefault();
   },
 
-  popCreate: function(e) {
+  popCreate: function() {
     if(context.hasFeature('community-create')) {
       //appEvents.trigger('community-create-view:toggle', true);
       frameUtils.postMessage({ type: 'community-create-view:toggle', active: true });

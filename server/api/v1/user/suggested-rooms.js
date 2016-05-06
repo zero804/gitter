@@ -1,10 +1,8 @@
 "use strict";
 
-var Promise = require('bluebird');
 var restSerializer = require("../../../serializers/rest-serializer");
 var suggestionsService = require('../../../services/suggestions-service');
 var StatusError = require('statuserror');
-var _ = require('lodash');
 
 var EXPIRES_SECONDS = 180;
 var EXPIRES_MILLISECONDS = 180 * 1000;

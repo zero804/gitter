@@ -97,7 +97,7 @@ module.exports = Marionette.ItemView.extend({
     if(mentions === 0 && unreads > 0) {
       unreadIndicatorContent = unreads;
     }
-    Array.prototype.forEach.call(  this.ui.unreadIndicator, function(indicatorElement) {
+    Array.prototype.forEach.call(this.ui.unreadIndicator, function(indicatorElement) {
       indicatorElement.innerHTML = unreadIndicatorContent;
     });
 

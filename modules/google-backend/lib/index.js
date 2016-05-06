@@ -7,7 +7,7 @@ function GoogleBackend(user, identity) {
   this.identity = identity;
 }
 
-GoogleBackend.prototype.getEmailAddress = Promise.method(function(options) {
+GoogleBackend.prototype.getEmailAddress = Promise.method(function() {
   return this.identity.email;
 });
 

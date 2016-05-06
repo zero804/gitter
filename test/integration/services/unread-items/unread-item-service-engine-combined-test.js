@@ -104,9 +104,9 @@ describe('unread-item-service-engine-combined #slow', function() {
             ourKeys.sort();
             for(var i = 0; i < ourKeys.length; i++) {
               if ("" + ourKeys[i] !== "" + items[i]) {
-                console.log('OUR KEYS (length==' + ourKeys.length + ')', JSON.stringify(ourKeys, null, '  '));
-                console.log('REDIS KEYS (length==' + items.length + ')', JSON.stringify(items, null, '  '));
-                console.log('>>>> CHECK OUT unread:chat:' + userId1 + ':' + troupeId1);
+                // console.log('OUR KEYS (length==' + ourKeys.length + ')', JSON.stringify(ourKeys, null, '  '));
+                // console.log('REDIS KEYS (length==' + items.length + ')', JSON.stringify(items, null, '  '));
+                // console.log('>>>> CHECK OUT unread:chat:' + userId1 + ':' + troupeId1);
 
                 assert.deepEqual(ourKeys, items);
                 assert(false, 'sets do not match. first problem at ' + i + ': ours=' + ourKeys[i] + '. theirs=' + items[i]);

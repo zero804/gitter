@@ -1,19 +1,21 @@
 "use strict";
 
-var env                     = require('gitter-web-env');
-var stats                   = env.stats;
-var userService             = require('./user-service');
-var persistence             = require('gitter-web-persistence');
-var userDefaultFlagsService = require('./user-default-flags-service');
-var Troupe                  = persistence.Troupe;
-var assert                  = require("assert");
-var mongoUtils              = require('gitter-web-persistence-utils/lib/mongo-utils');
-var Promise                 = require('bluebird');
-var ObjectID                = require('mongodb').ObjectID;
-var mongooseUtils           = require('gitter-web-persistence-utils/lib/mongoose-utils');
-var StatusError             = require('statuserror');
-var roomMembershipService   = require('./room-membership-service');
-var debug                   = require('debug')('gitter:one-to-one-room-service');
+var env                       = require('gitter-web-env');
+var stats                     = env.stats;
+var userService               = require('./user-service');
+var persistence               = require('gitter-web-persistence');
+var userDefaultFlagsService   = require('./user-default-flags-service');
+var Troupe                    = persistence.Troupe;
+var assert                    = require("assert");
+var mongoUtils                = require('gitter-web-persistence-utils/lib/mongo-utils');
+var Promise                   = require('bluebird');
+var ObjectID                  = require('mongodb').ObjectID;
+var mongooseUtils             = require('gitter-web-persistence-utils/lib/mongoose-utils');
+var StatusError               = require('statuserror');
+var roomMembershipService     = require('./room-membership-service');
+var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
+var legacyMigration           = require('gitter-web-permissions/lib/legacy-migration');
+var debug                     = require('debug')('gitter:one-to-one-room-service');
 
 function getOneToOneRoomQuery(userId1, userId2) {
   // Need to use $elemMatch due to a regression in Mongo 2.6, see https://jira.mongodb.org/browse/SERVER-13843
@@ -56,7 +58,7 @@ function findOrInsertNewOneToOneRoom(userId1, userId2) {
           _id: new ObjectID(),
           userId: userId2
         }],
-        userCount: 2
+        userCount: 0
       };
 
       debug('Attempting upsert for new one-to-one room');
@@ -64,6 +66,15 @@ function findOrInsertNewOneToOneRoom(userId1, userId2) {
       // Upsert returns [model, existing] already
       return mongooseUtils.upsert(Troupe, query, {
         $setOnInsert: insertFields
+      })
+      .tap(function(upsertResult) {
+        var troupe = upsertResult[0];
+        var updateExisting = upsertResult[1];
+
+        if (updateExisting) return;
+
+        var descriptor = legacyMigration.generatePermissionsForRoom(troupe, null, null);
+        return securityDescriptorService.insertForRoom(troupe._id, descriptor);
       });
     });
 }

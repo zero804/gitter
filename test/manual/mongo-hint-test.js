@@ -1,11 +1,7 @@
 'use strict';
 
 var speedy      = require("speedy");
-var persistence = require('gitter-web-persistence');
 var chatService = require('../../server/services/chat-service');
-var mongoose    = require('gitter-web-mongoose-bluebird');
-
-var ObjectID = mongoose.mongo.ObjectID;
 
 // speedy.samples(10);
 
