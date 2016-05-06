@@ -1,3 +1,5 @@
+'use strict';
+
 var assert = require('assert');
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 

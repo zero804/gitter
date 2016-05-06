@@ -1,5 +1,3 @@
-/*jshint node:true */
-/*global consol:true*/
 "use strict";
 
 var stream = require("stream");

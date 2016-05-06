@@ -10,7 +10,6 @@ module.exports = (function() {
     var className = options.className || '';
     var action = options.action || 'show';
     var n = false;
-    var isNew = false;
 
     function show() {
       n.removeClass('is-hidden');
@@ -29,7 +28,6 @@ module.exports = (function() {
       }
 
       if (!options.id || n.length <= 0) {
-        isNew = true;
         n = $('<div class="notification"'+((options.id) ? ' id="'+options.id+'"':'')+'></div>');
         n.prependTo(container);
         // add the hide timeout for this notification

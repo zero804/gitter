@@ -1,6 +1,5 @@
 "use strict";
 
-var $             = require('jquery');
 var Marionette    = require('backbone.marionette');
 var ModalView     = require('./modal');
 var template      = require('./tmpl/login-view.hbs');

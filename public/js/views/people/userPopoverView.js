@@ -8,7 +8,6 @@ var footerTemplate = require('./tmpl/userPopoverFooterView.hbs');
 var appEvents = require('utils/appevents');
 var context = require('utils/context');
 var SyncMixin = require('collections/sync-mixin');
-var _ = require('underscore');
 
 module.exports = (function() {
 
