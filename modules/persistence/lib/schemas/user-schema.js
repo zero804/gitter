@@ -58,11 +58,6 @@ UserSchema.methods.clearTokens = function() {
   this.githubUserToken = null;
 };
 
-
-UserSchema.methods.getDisplayName = function() {
-  return this.displayName || this.username;
-};
-
 /* TODO: deprecate */
 UserSchema.methods.getFirstName = function() {
   if(this.displayName) {
