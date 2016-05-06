@@ -192,6 +192,10 @@ function UserStrategy(options) {
     return Promise.all(strategies);
   };
 
+  function displayNameForUser(user) {
+    return options.exposeRawDisplayName ? user.displayName : user.displayName || user.username
+  }
+
   this.map = function(user) {
     if (!user) return null;
     var scopes;
@@ -231,9 +235,8 @@ function UserStrategy(options) {
       id: user.id,
       status: options.includeEmail ? user.status : undefined,
       username: user.username,
-      displayName: options.exposeRawDisplayName ? user.displayName : user.getDisplayName(),
-      fallbackDisplayName: options.exposeRawDisplayName && user.getDisplayName(),
-      url: user.getHomeUrl(),
+      displayName: displayNameForUser(user),
+      url: '/' + user.username,
       avatarUrlSmall: resolveUserAvatarUrl(user, 60),
       avatarUrlMedium: resolveUserAvatarUrl(user, 128),
       scopes: scopes,

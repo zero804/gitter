@@ -25,7 +25,6 @@ function searchGithubUsers(query, user, callback) {
           username: user.login,
           gravatarImageUrl: user.avatar_url,
           gravatarVersion: extractGravatarVersion(user.avatar_url),
-          getDisplayName: function() {}, // Remove, deprecated
           getHomeUrl: function() {}  // Remove, deprecated
         };
       });

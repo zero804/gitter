@@ -108,7 +108,9 @@ exports.removeAllAccessTokensForUser = function(userId, callback) {
 };
 
 exports.findClientByClientKey = function(clientKey, callback) {
-  persistenceService.OAuthClient.findOne({ clientKey: clientKey }, callback);
+  return persistenceService.OAuthClient.findOne({ clientKey: clientKey })
+    .exec()
+    .asCallback(callback);
 };
 
 function findOrCreateToken(userId, clientId, callback) {

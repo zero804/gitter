@@ -12,7 +12,8 @@ var userService     = require('../../services/user-service');
 var useragentTagger = require('../../utils/user-agent-tagger');
 var debug           = require('debug')('gitter:rememberme-middleware');
 var userScopes      = require('gitter-web-identity/lib/user-scopes');
-
+var passportLogin   = require('../passport-login');
+var Promise         = require('bluebird');
 var cookieName = nconf.get('web:cookiePrefix') + 'auth';
 
 var redisClient = env.redis.getClient();
@@ -20,33 +21,34 @@ var redisClient = env.redis.getClient();
 var tokenGracePeriodMillis = 5000; /* How long after a token has been used can you reuse it? */
 var timeToLiveDays = nconf.get("web:rememberMeTTLDays");
 
-function generateAuthToken(userId, callback) {
+function generateAuthToken(userId) {
   var key = uuid.v4();
   var token = uuid.v4();
 
-  sechash.strongHash('sha512', token, function(err, hash3) {
-    if(err) return callback(err);
+  return Promise.fromCallback(function(callback) {
+      return sechash.strongHash('sha512', token, callback);
+    })
+    .then(function(hash3) {
+      var json = JSON.stringify({ userId: userId, hash: hash3 });
 
-    var json = JSON.stringify({ userId: userId, hash: hash3 });
-    redisClient.setex("rememberme:" + key, 60 * 60 * 24 * timeToLiveDays, json);
-
-    /* The server doesn't keep a copy of the token anywhere, only the hash */
-    callback(null, key, token);
-  });
-
+      /* The server doesn't keep a copy of the token anywhere, only the hash */
+      return Promise.fromCallback(function(callback) {
+        redisClient.setex("rememberme:" + key, 60 * 60 * 24 * timeToLiveDays, json, callback);
+      });
+    })
+    .return([key, token]);
 }
 
-function setupRememberMeTokenCookie(req, res, userId, callback) {
-  generateAuthToken(userId, function(err, key, token) {
-    res.cookie(cookieName, key + ":" + token, {
-      domain: nconf.get("web:cookieDomain"),
-      maxAge: 1000 * 60 * 60 * 24 * timeToLiveDays,
-      httpOnly: true,
-      secure: nconf.get("web:secureCookies")
+function setupRememberMeTokenCookie(req, res, userId) {
+  return generateAuthToken(userId)
+    .spread(function(key, token) {
+      res.cookie(cookieName, key + ":" + token, {
+        domain: nconf.get("web:cookieDomain"),
+        maxAge: 1000 * 60 * 60 * 24 * timeToLiveDays,
+        httpOnly: true,
+        secure: nconf.get("web:secureCookies")
+      });
     });
-
-    callback();
-  });
 }
 
 function parseToken(tokenInfo) {
@@ -57,69 +59,69 @@ function parseToken(tokenInfo) {
   }
 }
 
-function deleteAuthToken(authCookieValue, callback) {
+var deleteAuthToken = Promise.method(function(authCookieValue) {
   /* Auth cookie */
-  if(!authCookieValue) return callback();
+  if(!authCookieValue) return;
 
   var authToken = authCookieValue.split(":", 2);
-  if(authToken.length != 2) return callback();
+  if(authToken.length !== 2) return;
 
   var key = authToken[0];
 
-  if(!key) return callback();
+  if(!key) return;
 
   debug('Deleting rememberme token %s', key);
 
   var redisKey = "rememberme:" + key;
 
-  /* After the rememberme token has been used, it will expire in 5 seconds */
-  redisClient.del(redisKey, callback);
-}
+  return Promise.fromCallback(function(callback) {
+    /* After the rememberme token has been used, it will expire in 5 seconds */
+    redisClient.del(redisKey, callback);
+  });
+});
 
 /* Validate a token and call callback(err, userId) */
-function validateAuthToken(authCookieValue, callback) {
-    /* Auth cookie */
-    if(!authCookieValue) return callback();
+var validateAuthToken = Promise.method(function(authCookieValue) {
+  /* Auth cookie */
+  if(!authCookieValue) return;
 
-    var authToken = authCookieValue.split(":", 2);
-    if(authToken.length != 2) return callback();
+  var authToken = authCookieValue.split(":", 2);
+  if(authToken.length !== 2) return;
 
-    var key = authToken[0];
-    var clientToken = authToken[1];
+  var key = authToken[0];
+  var clientToken = authToken[1];
 
-    if(!key) return callback();
+  if(!key) return;
 
-    debug('Client has presented a rememberme auth cookie, attempting reauthentication: %s', key);
+  debug('Client has presented a rememberme auth cookie, attempting reauthentication: %s', key);
 
-    var redisKey = "rememberme:" + key;
+  var redisKey = "rememberme:" + key;
 
-    /* After the rememberme token has been used, it will expire in 5 seconds */
-    redisClient.multi()
-      .get(redisKey)
-      .pexpire(redisKey, tokenGracePeriodMillis)
-      .exec(function(err, replies) {
-        if(err) return callback(err);
+  return Promise.fromCallback(function(callback) {
+      return redisClient.multi()
+            .get(redisKey)
+            .pexpire(redisKey, tokenGracePeriodMillis)
+            .exec(callback);
+    })
+    .then(function(replies) {
+      var tokenInfo = replies[0];
+      if(!tokenInfo) {
+        logger.info("rememberme: rememberme token not found. Illegal or expired.", { key: key });
+        return;
+      }
 
-        var tokenInfo = replies[0];
-        if(!tokenInfo) {
-          logger.info("rememberme: rememberme token not found. Illegal or expired.", { key: key });
-          return callback();
-        }
+      var stored = parseToken(tokenInfo);
+      if(!stored) {
+        logger.info("rememberme: Saved token is corrupt.", { key: key, tokenInfo: tokenInfo });
+        return;
+      }
 
-        var stored = parseToken(tokenInfo);
-        if(!stored) {
-          logger.info("rememberme: Saved token is corrupt.", { key: key, tokenInfo: tokenInfo });
-          return callback();
-        }
+      var serverHash = stored.hash;
 
-        var serverHash = stored.hash;
-
-        sechash.testHash(clientToken, serverHash, function(err, match) {
-          if(err) {
-            logger.error("rememberme: error during testHash", { err: err });
-            return callback(err);
-          }
-
+      return Promise.fromCallback(function(callback) {
+          sechash.testHash(clientToken, serverHash, callback);
+        })
+        .then(function(match) {
           if(!match) {
             logger.warn("rememberme: testHash failed. Illegal token", {
               serverHash: serverHash,
@@ -127,92 +129,86 @@ function validateAuthToken(authCookieValue, callback) {
               key: key
             });
 
-            return callback();
+            return;
           }
 
           var userId = stored.userId;
-
-          return callback(null, userId);
+          return userId;
         });
-      });
-}
+    });
+});
 
 module.exports = {
   deleteRememberMeToken: function(cookie, callback) {
-      deleteAuthToken(cookie, function(err) {
-        if(err) { logger.warn('Error validating token, but ignoring error ' + err, { exception: err }); }
-
-        return callback();
-      });
+      return deleteAuthToken(cookie)
+        .asCallback(callback);
   },
 
   generateRememberMeTokenMiddleware: function(req, res, next) {
-    setupRememberMeTokenCookie(req, res, req.user.id, next);
+    return setupRememberMeTokenCookie(req, res, req.user.id)
+      .asCallback(next);
   },
 
-  rememberMeMiddleware: function(req, res, next) {
-    function fail(err) {
-      stats.event("rememberme_rejected");
-
-      res.clearCookie(cookieName, { domain: nconf.get("web:cookieDomain") });
-      return next(err);
-    }
-
+  rememberMeMiddleware: Promise.method(function(req, res, next) {
     /* If the user is logged in, no problem */
-    if (req.user) return next();
+    if (req.user || !req.cookies || !req.cookies[cookieName]) return next();
 
-    if(!req.cookies || !req.cookies[cookieName]) return next();
-
-    validateAuthToken(req.cookies[cookieName], function(err, userId) {
-      if(err || !userId) return fail(err);
-
-      userService.findById(userId, function(err, user) {
-        if(err)  return fail(err);
-        if(!user) return fail();
+    return Promise.try(function() {
+        return validateAuthToken(req.cookies[cookieName]);
+      })
+      .then(function(userId) {
+        return userService.findById(userId);
+      })
+      .then(function(user) {
+        if (!user) return;
 
         /* No token, no touch */
         if(userScopes.isMissingTokens(user)) {
-          return fail();
+          return;
         }
 
-        req.login(user, function(err) {
-          if(err) {
-            logger.info("rememberme: Passport login failed", { exception: err  });
-            return fail(err);
-          }
+        // Remove the old token for this user
+        req.accessToken = null;
+        if(req.session) req.session.accessToken = null;
 
-          // Remove the old token for this user
-          req.accessToken = null;
-          if(req.session) req.session.accessToken = null;
+        // Tracking
+        var properties = useragentTagger(req.headers['user-agent']);
+        stats.userUpdate(user, properties);
 
-          // Tracking
-          var properties = useragentTagger(req.headers['user-agent']);
-          stats.userUpdate(user, properties);
+        debug('Rememberme token used for login: %s', req.headers.cookie);
 
-          debug('Rememberme token used for login: %s', req.headers.cookie);
-
-          setupRememberMeTokenCookie(req, res, userId, function(err) {
-            if(err) return next(err);
-
+        return setupRememberMeTokenCookie(req, res, user._id)
+          .catch(function(err) {
+            logger.warn("rememberme: setupRememberMeTokenCookie failed", {
+              exception: err
+            });
+          })
+          .then(function() {
             stats.event("rememberme_accepted");
 
             stats.event("user_login", _.extend({
-              userId: userId,
+              userId: user._id,
               method: 'auto',
               email: user.email
             }, properties));
 
-            return next(err);
+            return passportLogin(req, user);
           });
 
-        });
+      })
+      .tap(function(user) {
+        if (!user) {
+          res.clearCookie(cookieName, { domain: nconf.get("web:cookieDomain") });
+        }
+      })
+      .catch(function(err) {
+        stats.event("rememberme_rejected");
 
-      });
-
-    });
-
-
-  },
+        res.clearCookie(cookieName, { domain: nconf.get("web:cookieDomain") });
+        throw err;
+      })
+      .asCallback(next);
+  }),
 
   testOnly: {
     generateAuthToken: generateAuthToken,
