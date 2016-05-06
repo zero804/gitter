@@ -187,7 +187,7 @@ module.exports = (function() {
     next: function () {
       var collection = this.collection;
       var index = collection.indexOf(this.selected);
-      if (index < collection.length - 1) this.swap(collection.at(index + 1 ));
+      if (index < collection.length - 1) this.swap(collection.at(index + 1));
     },
 
     prev: function () {

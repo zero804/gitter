@@ -3,7 +3,7 @@
 var passport            = require("passport");
 var rateLimiter         = require('./rate-limiter');
 var logoutDestroyTokens = require('./logout-destroy-tokens');
-var userScopes          = require('../../utils/models/user-scopes');
+var userScopes          = require('gitter-web-identity/lib/user-scopes');
 
 function ensureLoggedIn(req, res, next) {
   /* Bearer strategy must return a user. If the user is { _anonymous: true }, it should be null */

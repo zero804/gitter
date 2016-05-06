@@ -55,7 +55,7 @@ var HIGHLIGHTED_ROOMS = [
   }
 ];
 
-module.exports = function (userId, currentRoomUri) {
+module.exports = function (/*userId, currentRoomUri*/) {
   return Promise.all(HIGHLIGHTED_ROOMS.map(function(recommendation) {
     // if (recommendation.githubType === 'REPO') {
     //   return highlightedRoomCache(null, recommendation.uri)

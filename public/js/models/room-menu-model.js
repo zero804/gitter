@@ -200,11 +200,9 @@ module.exports = Backbone.Model.extend({
   //JP 8/1/16
   sync: function(method, model, options) {//jshint unused: true
     var self = this;
-    var attrs;
 
     //save
     if (method === 'create' || method === 'update' || method === 'patch') {
-      attrs = JSON.stringify(this);
       return apiClient.user.put('/settings/leftRoomMenu', this.toJSON(), {
           // No need to get the JSON back from the server...
           dataType: 'text'

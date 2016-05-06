@@ -1,5 +1,4 @@
-/*jslint node:true, unused:true*/
-/*global describe:true, it:true */
+'use strict';
 
 var selectCacheCandidates = require('../../../../public/js/components/chat-cache/select-cache-candidates');
 var assert = require('assert');

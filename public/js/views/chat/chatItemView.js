@@ -1,4 +1,5 @@
 "use strict";
+
 var $ = require('jquery');
 var _ = require('underscore');
 var classnames = require('classnames');
@@ -257,8 +258,6 @@ module.exports = (function() {
 
     updateRender: function(changes) {
       /* NB: `unread` updates occur in the behaviour */
-      var model = this.model;
-      var $el = this.$el;
       var sentElement = this.ui.sent[0];
 
       if (!changes || 'html' in changes || 'text' in changes) {

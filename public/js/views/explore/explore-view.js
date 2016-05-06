@@ -1,7 +1,6 @@
 'use strict';
 
 var $ = require('jquery');
-var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 var urlParse = require('url-parse');
 
@@ -115,7 +114,7 @@ var ExploreView = Marionette.LayoutView.extend({
     e.preventDefault();
   },
 
-  popCreateRoomModal: function(e) {
+  popCreateRoomModal: function() {
     frameUtils.postMessage({ type: 'route', hash: 'createroom' });
   }
 });
