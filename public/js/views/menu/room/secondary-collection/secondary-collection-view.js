@@ -3,6 +3,7 @@
 var Marionette         = require('backbone.marionette');
 var _                  = require('underscore');
 var urlJoin            = require('url-join');
+var extendCallbackHash = require('utils/marionette-extend-callback-hash');
 var ItemView           = require('./secondary-collection-item-view');
 var SearchItemView     = require('./secondary-collection-item-search-view');
 var BaseCollectionView = require('../base-collection/base-collection-view');
@@ -10,15 +11,20 @@ var EmptySearchView    = require('./secondary-collection-item-search-empty-view'
 
 var clientEnv = require('gitter-client-env');
 
+
 var proto = BaseCollectionView.prototype;
 
 module.exports = BaseCollectionView.extend({
   childView: ItemView,
   className: 'secondary-collection',
 
-  childEvents: {
-    'item:activated':      'onItemActivated',
-  },
+  childEvents: extendCallbackHash(proto.childEvents, {
+    'item:activated': 'onItemActivated',
+  }),
+
+  modelEvents: extendCallbackHash(proto.modelEvents, {
+    'change:active': 'toggleShowMore'
+  }),
 
   getEmptyView: function() {
     switch (this.roomMenuModel.get('state')) {
@@ -55,34 +61,16 @@ module.exports = BaseCollectionView.extend({
 
   initialize: function(attrs) {
     //TODO test this JP 8/1/16
+    BaseCollectionView.prototype.initialize.apply(this, arguments);
+
     this.primaryCollection = attrs.primaryCollection;
     this.userModel         = attrs.userModel;
     this.troupeModel       = attrs.troupeModel;
     this.roomCollection    = attrs.roomCollection;
+
     this.listenTo(this.roomMenuModel, 'change:searchTerm', this.setActive, this);
     this.listenTo(this.roomMenuModel, 'change:state:post',  this.toggleShowMore, this);
     this.listenTo(this.collection, 'reset',  this.toggleShowMore, this);
-    BaseCollectionView.prototype.initialize.apply(this, arguments);
-  },
-
-  setActive: function() {
-    switch (this.roomMenuModel.get('state')){
-      case 'all':
-        return (this.collection.length <= 0) ?
-          this.el.classList.remove('active') :
-          proto.setActive.apply(this, arguments);
-
-      case 'search':
-        return !!this.roomMenuModel.get('searchTerm') ?
-          proto.setActive.apply(this, arguments) :
-          this.el.classList.remove('active');
-
-      default:
-        return !!this.collection.length ?
-          proto.setActive.apply(this, arguments) :
-          this.el.classList.remove('active');
-    }
-    // this.toggleShowMore();
   },
 
   toggleShowMore: function () {
@@ -97,14 +85,22 @@ module.exports = BaseCollectionView.extend({
   },
 
   filter: function(model, index) {
+    var isHidden = false;
+
     switch (this.roomMenuModel.get('state')) {
       case 'search':
-        return (index <= 25);
+        isHidden = (index > 25);
+        break;
       case 'org':
-        return (index <= 9);
+        isHidden = (index > 9);
+        break;
       default:
-        return !this.primaryCollection.get(model.get('id'));
+        isHidden = !!this.primaryCollection.get(model.get('id'));
+        break;
     }
+
+    model.set({ isHidden: isHidden });
+    return !isHidden;
   },
 
   onDestroy: function() {

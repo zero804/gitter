@@ -117,12 +117,6 @@
   }
 
 
-  &.active,
-  &.dragging {
-    .room-menu-options__item-button {
-      opacity: 1;
-    }
-  }
 }
 
 .room-menu-options__item--all {
@@ -209,6 +203,7 @@
 
 .room-menu-options__item--close {
   .room-menu-options__item();
+  color: @org-bg;
   margin-top: auto;
   position:   fixed;
   bottom:     0;
@@ -238,20 +233,27 @@
     opacity:         1;
     text-decoration: none;
   }
-  &:focus {
+  &:focus,
+  &.focus {
     outline: none;
+  }
+
+  &.active,
+  &.focus,
+  &.dragging,
+  .active > &,
+  .focus > &,
+  .dragging > & {
+    opacity: 1;
+
+    &:before {
+      transform: translateX(0);
+    }
   }
 
   &:before {
      .sudo-panel();
      background-color: currentColor;
-  }
-
-  .active > &,
-  .dragging > & {
-    &:before {
-      transform: translateX(0);
-    }
   }
 }
 
