@@ -1,5 +1,4 @@
-/*jslint node:true, unused:true*/
-/*global describe:true, it:true */
+'use strict';
 
 var isNative = require('../../../public/js/utils/is-native');
 var assert = require('assert');

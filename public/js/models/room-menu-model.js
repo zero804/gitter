@@ -38,6 +38,8 @@ module.exports = Backbone.Model.extend({
     roomMenuIsPinned:          true,
     selectedOrgName:           '',
     hasDismissedSuggestions:   false,
+    // 'keyboard', null (we can probably assume click from mouse)
+    activationSourceType:      null
   },
 
   //TODO Remove all these delete statements and pass the object with the options hash
@@ -97,6 +99,8 @@ module.exports = Backbone.Model.extend({
       collection: this._roomCollection,
     });
 
+
+
     this.primaryCollection   = new ProxyCollection({ collection: this.activeRoomCollection });
     this.secondaryCollection = new ProxyCollection({ collection: this.searchTerms });
     this.tertiaryCollection  = new ProxyCollection({ collection: this._orgCollection });
@@ -116,6 +120,18 @@ module.exports = Backbone.Model.extend({
     this.listenTo(this, 'change:state', this.onSwitchState, this);
     this.listenTo(this, 'change', _.throttle(this.save.bind(this), 1500));
     this.listenTo(context.troupe(), 'change:id', this.onRoomChange, this);
+
+    // TODO: Should we be doing this stuff inside the collection-models?
+    //   We do something similar with the search in the model itself so maybe...
+    this.listenTo(this.activeRoomCollection, 'filter-complete', this.fireUpdateActiveState, this);
+    this.listenTo(this.searchTerms, 'filter-complete', this.fireUpdateActiveState, this);
+    this.listenTo(this.suggestedOrgs, 'sync', this.fireUpdateActiveState, this);
+    this.listenTo(this.suggestedOrgs, 'reset', this.fireUpdateActiveState, this);
+    this.listenTo(this.userSuggestions, 'sync', this.fireUpdateActiveState, this);
+    this.listenTo(this.userSuggestions, 'reset', this.fireUpdateActiveState, this);
+    this.listenTo(this.searchRoomAndPeople, 'reset', this.fireUpdateActiveState, this);
+    this.listenTo(this.searchChatMessages, 'reset', this.fireUpdateActiveState, this);
+
 
     //boot the model
     this.onSwitchState(this, this.get('state'));
@@ -138,8 +154,7 @@ module.exports = Backbone.Model.extend({
     this.onStateChangeCalled(type);
   },
 
-  onSwitchState: function(model, val) {/*jshint unused: true */
-
+  onSwitchState: function(model, val) {
     //TODO Test this JP 27/1/15
     switch (val) {
       case 'all':
@@ -172,8 +187,12 @@ module.exports = Backbone.Model.extend({
         break;
     }
 
-    this.trigger('change:state:pre');
+    this.fireUpdateActiveState();
     this.trigger('change:state:post');
+  },
+
+  fireUpdateActiveState: function() {
+    this.trigger('update:collection-active-states');
   },
 
   onSearchTermChange: _.debounce(function() {
@@ -198,13 +217,11 @@ module.exports = Backbone.Model.extend({
 
   //This can be changed to userPreferences once the data is maintained
   //JP 8/1/16
-  sync: function(method, model, options) {//jshint unused: true
+  sync: function(method, model, options) {
     var self = this;
-    var attrs;
 
     //save
     if (method === 'create' || method === 'update' || method === 'patch') {
-      attrs = JSON.stringify(this);
       return apiClient.user.put('/settings/leftRoomMenu', this.toJSON(), {
           // No need to get the JSON back from the server...
           dataType: 'text'
@@ -231,11 +248,11 @@ module.exports = Backbone.Model.extend({
   },
 
   onRoomChange: function (){
-    var selectedModel      = this._getModel('selected', true);
-    var newlySelectedModel = this._getModel('id', context.troupe().get('id'));
+    var activeModel      = this._getModel('active', true);
+    var newlyActiveModel = this._getModel('id', context.troupe().get('id'));
 
-    if(selectedModel) { selectedModel.set('selected', false); }
-    if(newlySelectedModel) { newlySelectedModel.set('selected', true); }
+    if(activeModel) { activeModel.set('active', false); }
+    if(newlyActiveModel) { newlyActiveModel.set('active', true); }
   },
 
   _getModel: function (prop, val){

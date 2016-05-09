@@ -1,6 +1,6 @@
+'use strict';
+
 var path              = require('path');
-var appWebpackConfig  = require('../../public/js/webpack.config.js');
-var _                 = require('underscore');
 var ProgressBarPlugin = require('progress-bar-webpack-plugin');
 
 module.exports = {

@@ -28,7 +28,7 @@ module.exports = function suggestedOrgsFromRoomList(roomList, uri, currentRoomId
 
     //check its unique
     var existingEntry = _.where(memo, { name: orgName })[0];
-    if (!!existingEntry) {
+    if (existingEntry) {
       var index = memo.indexOf(existingEntry);
       // Aggregate the counts in each org bucket from each room
       memo[index].unreadItems = ((existingEntry.unreadItems || 0) + (room.unreadItems || 0));

@@ -64,8 +64,6 @@ module.exports = exports = function(options, callback, request) {
     if(error) return callback(error, response, body);
     if(response.statusCode >= 400) return callback(error, response, body);
 
-    var remaining;
-
     if(!response.headers.link) {
       return callback(error, response, body);
     }
@@ -83,10 +81,10 @@ module.exports = exports = function(options, callback, request) {
       var lastPage = parseInt(lastParsed.query.page, 10);
 
       if(lastPage > 1) {
-        remaining = lastPage - 1;
+        lastPage - 1;
 
         var promises = lazy.range(1, lastPage + 1).map(function(i) {
-            if(i == 1) return firstPage;
+            if(i === 1) return firstPage;
 
             var uri = url.parse(links.last, true);
             delete uri.search;

@@ -18,7 +18,7 @@ var services                     = require('gitter-services');
 var identifyRoute                = env.middlewares.identifyRoute;
 var debug                        = require('debug')('gitter:settings-route');
 var StatusError                  = require('statuserror');
-var userScopes                   = require('../utils/models/user-scopes');
+var userScopes                   = require('gitter-web-identity/lib/user-scopes');
 
 var supportedServices = [
   { id: 'github',    name: 'GitHub'},
