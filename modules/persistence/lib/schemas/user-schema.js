@@ -52,56 +52,6 @@ UserSchema.schemaTypeName = 'UserSchema';
 
 installVersionIncMiddleware(UserSchema);
 
-UserSchema.methods.clearTokens = function() {
-  this.githubToken = null;
-  this.githubScopes = { };
-  this.githubUserToken = null;
-};
-
-/* TODO: deprecate */
-UserSchema.methods.getFirstName = function() {
-  if(this.displayName) {
-    var firstName = this.displayName.split(/\s+/)[0];
-    if(firstName) return firstName;
-  }
-
-  if(this.username) {
-    return this.username;
-  }
-
-  if(this.email) {
-    return this.email.split('@')[0];
-  }
-
-  return "Unknown";
-};
-
-
-UserSchema.methods.getAllEmails = function() {
-  return [this.email].concat(this.emails);
-};
-
-UserSchema.methods.getHomeUrl = function() {
-  return '/' +  this.username;
-};
-
-UserSchema.methods.isConfirmed = function() {
-  assert(this.status, 'User object does not have a status attribute. Did you select this field?');
-  return this.status !== 'UNCONFIRMED';
-};
-
-UserSchema.methods.hasUsername = function() {
-  return !!this.username;
-};
-
-UserSchema.methods.hasPassword = function() {
-  return !!this.passwordHash;
-};
-
-UserSchema.methods.hasEmail = function(email) {
-  return this.email === email || this.emails.some(function(e) { return e === email; });
-};
-
 // Returns true if the user is not INVITED or REMOVED
 UserSchema.methods.isActive = function() {
   return !this.state;
