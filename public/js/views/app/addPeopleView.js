@@ -64,7 +64,7 @@ var View = Marionette.CompositeView.extend({
   childView: RowView,
   template: template,
   ui: {
-    input: 'input.gtrInput',
+    input: '.gtrInput',
     share: '.js-add-people-share',
     loading: '.js-add-roster-loading',
     validation: '#modal-failure',
