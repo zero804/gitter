@@ -5,8 +5,9 @@ var Marionette = require('backbone.marionette');
 var slugify = require('slug');
 var toggleClass = require('utils/toggle-class');
 
-var CommunityCreateBaseStepView = require('./community-creation-base-step-view');
 var template = require('./community-creation-main-view.hbs');
+var CommunityCreateBaseStepView = require('./community-creation-base-step-view');
+var CommunityCreationSubRoomListView = require('./community-creation-sub-room-list-view');
 
 require('gitter-styleguide/css/components/headings.css');
 require('gitter-styleguide/css/components/buttons.css');
@@ -31,17 +32,38 @@ module.exports = CommunityCreateBaseStepView.extend({
     class: 'community-create-step-wrapper community-create-main-step-wrapper'
   }),
 
+  behaviors: {
+    Isomorphic: {
+      subRoomListView: { el: '.community-create-sub-room-list-root', init: 'initSubRoomListView' },
+    },
+  },
+
+  initSubRoomListView: function(optionsForRegion) {
+    this.subRoomListView = new CommunityCreationSubRoomListView(optionsForRegion({
+      collection: this.communityCreateModel.get('subRooms'),
+      communityCreateModel: this.communityCreateModel
+    }));
+    return this.subRoomListView;
+  },
+
   ui: _.extend({}, CommunityCreateBaseStepView.prototype.ui, {
     communityNameInput: '.primary-community-name-input',
     communitySlugInput: '.community-creation-slug-input',
-    githubProjectLink: '.js-community-create-from-github-project-link'
+    githubProjectLink: '.js-community-create-from-github-project-link',
+    advancedOptionsButton: '.js-community-create-advanced-options-toggle',
+    advancedOptionsArea: '.community-create-advanced-options-section',
+    subRoomNameInput: '.community-creation-sub-room-input',
+    subRoomSubmitButton: '.community-creation-sub-room-submit-button',
+    subRoomInputPrefix: '.community-creation-sub-room-input-prefix'
   }),
 
   events: _.extend({}, CommunityCreateBaseStepView.prototype.events, {
     'click @ui.nextStep': 'onStepNext',
     'input @ui.communityNameInput': 'onCommunityNameInputChange',
     'input @ui.communitySlugInput': 'onCommunitSlugInputChange',
-    'click @ui.githubProjectLink': 'onGitHubProjectLinkActivated'
+    'click @ui.githubProjectLink': 'onGitHubProjectLinkActivated',
+    'click @ui.advancedOptionsButton': 'onAdvancedOptionsToggle',
+    'click @ui.subRoomSubmitButton': 'onSubRoomSubmit'
   }),
 
   modelEvents: _.extend({}, CommunityCreateBaseStepView.prototype.modelEvents, {
@@ -68,8 +90,12 @@ module.exports = CommunityCreateBaseStepView.extend({
   },
 
   updateCommunityFields: function() {
-    updateElementValueAndMaintatinSelection(this.ui.communityNameInput[0], this.communityCreateModel.get('communityName'));
-    updateElementValueAndMaintatinSelection(this.ui.communitySlugInput[0], this.communityCreateModel.get('communitySlug'));
+    var communityName = this.communityCreateModel.get('communityName');
+    var communitySlug = this.communityCreateModel.get('communitySlug');
+
+    updateElementValueAndMaintatinSelection(this.ui.communityNameInput[0], communityName);
+    updateElementValueAndMaintatinSelection(this.ui.communitySlugInput[0], communitySlug);
+    this.ui.subRoomInputPrefix[0].textContent = communityName + ' /';
   },
 
   onCommunityNameInputChange: function() {
@@ -98,4 +124,20 @@ module.exports = CommunityCreateBaseStepView.extend({
       communitySlug: newSlug
     });
   },
+
+  onAdvancedOptionsToggle: function() {
+    toggleClass(this.ui.advancedOptionsArea[0], 'active');
+  },
+
+  onSubRoomSubmit: function() {
+    var subRoomName = this.ui.subRoomNameInput[0].value;
+    if(subRoomName) {
+      this.communityCreateModel.get('subRooms').add({
+        name: subRoomName
+      });
+    }
+
+    // Clear the input
+    this.ui.subRoomNameInput[0].value = '';
+  }
 });

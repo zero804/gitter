@@ -18,11 +18,6 @@ var CommunityCreationOrgListItemTemplate = require('./community-creation-github-
 var CommunityCreationRepoListTemplate = require('./community-creation-github-projects-repo-list-view.hbs');
 var CommunityCreationRepoListItemTemplate = require('./community-creation-github-projects-repo-list-item-view.hbs');
 
-var ActiveCollection = require('./active-collection');
-var troupeCollections = require('collections/instances/troupes');
-var orgsCollection = troupeCollections.orgs;
-var repoModels = require('collections/repos');
-var ReposCollection = repoModels.ReposCollection;
 
 
 
@@ -215,18 +210,11 @@ module.exports = CommunityCreateBaseStepView.extend({
     'change:repoFilter': 'onRepoFilterChange'
   }),
 
-  initialize: function() {
+  initialize: function(options) {
     CommunityCreateBaseStepView.prototype.initialize.apply(this, arguments);
 
-    this.orgsCollection = new ActiveCollection(orgsCollection.models, {
-      collection: orgsCollection
-    });
-
-    var backingReposCollection = new ReposCollection();
-    backingReposCollection.fetch();
-    this.reposCollection = new ActiveCollection(backingReposCollection.models, {
-      collection: backingReposCollection
-    });
+    this.orgsCollection = options.orgsCollection;
+    this.reposCollection = options.reposCollection;
 
     this.throttledApplyFilterToRepos = _.throttle(this.applyFilterToRepos, 500);
     this.shortThrottledApplyFilterToRepos = _.throttle(this.applyFilterToRepos, 100);
@@ -249,7 +237,7 @@ module.exports = CommunityCreateBaseStepView.extend({
       });
     }
     else if(this.model.get('isRepoAreaActive')) {
-      var selectedRepoId = this.model.get('selectedOrgId');
+      var selectedRepoId = this.model.get('selectedRepoId');
       var selectedRepoName = getRoomNameFromTroupeName(this.model.get('selectedRepoName') || '');
       this.communityCreateModel.set({
         communityName: selectedRepoName,

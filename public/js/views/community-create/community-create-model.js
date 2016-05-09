@@ -3,9 +3,10 @@
 var Backbone = require('backbone');
 
 var STEP_CONSTANT_MAP = {
-  main: 'MAIN',
-  githubProjects: 'GITHUB_PROJECTS',
-  invite: 'INVITE'
+  main: 'main',
+  githubProjects: 'githubProjects',
+  invite: 'invite',
+  overview: 'overview'
 };
 
 var CommunityCreateModel = Backbone.Model.extend({
@@ -18,8 +19,14 @@ var CommunityCreateModel = Backbone.Model.extend({
     communityName: '',
     communitySlug: '',
     isUsingCustomSlug: false,
+    githubOrgId: null,
     githubRepoId: null,
-    githubOrgId: null
+
+    subRooms: new Backbone.Collection([{
+      name: 'lobby'
+    }]),
+
+    peopleToInvite: new Backbone.Collection()
   },
 
   initialize: function() {

@@ -180,10 +180,6 @@
   @media (max-width: 600px) {
     width: 95%;
   }
-
-  & a {
-    color: @ruby;
-  }
 }
 
 @keyframes community-create-step-move-in-animation {
@@ -197,6 +193,20 @@
   flex: 1;
 }
 
+.community-create-general-link {
+  color: @ruby;
+}
+
+
+.primary-communtiy-create-horizontal-break {
+  display: block;
+  width: 100%;
+  height: 0;
+
+  background-color: 0;
+  border-top: 0;
+  border-bottom: 2px solid rgba(255, 255, 255, .2);
+}
 
 .primary-bare-input(@font-size: 3.789rem; @border-width: 3px) {
   width: 100%;
@@ -231,6 +241,7 @@
 
 .primary-community-heading {
   color: #ffffff;
+  margin-bottom: 1.5rem;
 }
 
 .secondary-community-create-button {
@@ -302,12 +313,21 @@
 .primary-community-repo-name-filter-input,
 .primary-community-invite-people-name-input {
   .primary-bare-input();
-  margin-top: 3rem;
+  margin-top: 1.5rem;
   margin-bottom: 3rem;
 }
 
 
 
+
+.community-create-next-button {
+  padding-right: 0;
+  text-align: left;
+}
+
+.community-create-back-button {
+  padding-left: 0;
+}
 
 
 .community-creation-slug-input-wrapper {
@@ -349,9 +369,34 @@
 }
 
 
+.community-creation-sub-room-input-wrapper {
+  display: flex;
+  align-items: baseline;
+}
+
+.community-creation-sub-room-input-prefix {
+  margin-right: .75em;
+}
+
+.community-creation-sub-room-input {
+  .secondary-bare-input();
+  flex: 1;
+}
+
+.community-creation-sub-room-submit-button {
+  padding: .5em;
+
+  background-color: transparent;
+  border: 0;
+
+  color: inherit;
+  font-size: inherit;
+}
 
 
-.community-create-advanced-options-section {
+
+
+.community-create-advanced-options-button-wrapper {
   display: flex;
   justify-content: flex-end;
 }
@@ -359,6 +404,24 @@
 .community-create-advanced-options-button {
   .secondary-community-create-button();
   padding-right: 0;
+}
+
+.community-create-advanced-options-section {
+  visibility: hidden;
+  max-height: 0;
+
+    transition:
+      visibility 0s ease .2s,
+      max-height .2s ease;
+
+  &.active {
+    visibility: visible;
+    max-height: 999px;
+
+    transition:
+      visibility 0s ease 0s,
+      max-height .2s ease;
+  }
 }
 
 
@@ -392,7 +455,6 @@
       opacity .2s ease;
   }
 }
-
 
 .community-create-github-project-list-wrapper {
   overflow: auto;
@@ -450,7 +512,7 @@
 
 
 .community-create-org-list-item-avatar {
-  width: 44px;
+  max-width: 44px;
   vertical-align: middle;
   margin-right: 16px;
 }
@@ -476,7 +538,98 @@
 }
 
 .community-create-repo-list-item-avatar {
-  width: 22px;
+  max-width: 22px;
   vertical-align: middle;
   margin-right: .3rem;
+}
+
+
+
+
+.community-create-people-list {
+  overflow: auto;
+  max-height: unit(60 * 4, px);
+
+  margin-left: 0;
+  padding-left: 2.5rem;
+
+  list-style: none;
+}
+
+.community-create-people-list-empty-note {
+  color: fade(@base-text-color, 40%);
+  font-size: 1.6rem;
+  font-style: italic;
+}
+
+.community-create-people-list-item {
+  margin-top: 1.5rem;
+}
+
+.community-create-people-list-item-link {
+  .community-create-list-item-link();
+  display: flex;
+  align-items: center;
+
+  &:hover,
+  &:focus {
+    text-decoration: none;
+  }
+}
+
+.community-create-people-list-item-avatar {
+  max-width: 44px;
+  margin-right: 1rem;
+}
+
+
+.community-create-list-item-name {
+  flex: 1;
+}
+
+.community-create-people-list-item-remove-button {
+  background-color: transparent;
+  border: 0;
+
+  color: inherit;
+  font-size: 1em;
+}
+
+
+
+.community-create-overview-community-name {
+  font-size: 2.3rem;
+  font-weight: bold;
+}
+
+.community-create-overview-url-heading {
+  color: fade(@base-text-color, 60%);
+  font-size: 1.8rem;
+  font-weight: normal;
+}
+
+.community-create-overview-sub-room-heading {
+  font-size: 2rem;
+  font-weight: normal;
+}
+
+.community-create-overview-sub-room-heading-note {
+  display: block;
+  color: fade(@base-text-color, 40%);
+  font-size: .8em;
+  font-style: italic;
+}
+
+.community-create-overview-sub-room-area {
+  margin-top: 2rem;
+}
+
+.community-create-sub-room-list-item-link {
+  color: inherit;
+
+  &:hover,
+  &:focus {
+    outline: none;
+    text-decoration: none;
+  }
 }
