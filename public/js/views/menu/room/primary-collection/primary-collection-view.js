@@ -10,7 +10,7 @@ var EmptySearchView             = require('./primary-collection-item-search-empt
 var EmptyFavouriteView          = require('./primary-collection-item-favourite-empty-view.js');
 var perfTiming                  = require('components/perf-timing');
 var compositeViewRenderTemplate = require('utils/composite-view-render-template');
-var domIndexById                = require('../../../../utils/dom-index-by-id');
+var domIndexById                = require('utils/dom-index-by-id');
 var toggleClass                 = require('utils/toggle-class');
 
 var proto = BaseCollectionView.prototype;
@@ -59,10 +59,9 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     this.dndCtrl = options.dndCtrl;
     this.uiModel = new Backbone.Model({ isFocused: false, isDragging: false });
 
-    this.listenTo(this.roomMenuModel, 'change:searchTerm', this.setActive, this);
+    this.listenTo(this.roomMenuModel, 'change:searchTerm', this.onSearchTermChange, this);
+    this.listenTo(this.collection, 'filter-complete', this.onSearchTermChange, this);
     this.listenTo(this.roomMenuModel, 'change:state:post', this.setActive, this);
-
-    this.listenTo(this.collection, 'filter-complete', this.setActive, this);
 
     this.listenTo(this.dndCtrl, 'dnd:start-drag', this.onDragStart, this);
     this.listenTo(this.dndCtrl, 'dnd:end-drag', this.onDragEnd, this);
@@ -72,32 +71,22 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     BaseCollectionView.prototype.initialize.apply(this, arguments);
   },
 
-  setActive: function() {
-    switch (this.roomMenuModel.get('state')){
-      case 'search':
+  onSearchTermChange: function() {
+    if(this.ui.headerContent.length) {
+      if(this.roomMenuModel.get('state') === 'search') {
         if (!!this.roomMenuModel.get('searchTerm')) {
-          this.el.classList.add('active');
           this.ui.headerContent[0].classList.remove('hidden');
         }
-
-        //
         else {
-          this.el.classList.remove('active');
           this.ui.headerContent[0].classList.add('hidden');
         }
-
-        break;
-      default:
+      }
+      else {
         this.ui.headerContent[0].classList.add('hidden');
-
-        if (!this.collection.length) {
-          return this.el.classList.remove('active');
-        }
-
-        proto.setActive.apply(this, arguments);
-        break;
-
+      }
     }
+
+    this.setActive();
   },
 
   filter: function(model, index) { //jshint unused: true
