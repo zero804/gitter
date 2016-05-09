@@ -31,7 +31,7 @@ var findNextActiveItem = function(list, startIndex, dir, getActiveCb) {
   dir = sanitizeDir(dir);
   getActiveCb = (getActiveCb || function() { return true; });
   // This is so you can pass in `null` and go to first or last item depending on direction
-  if(!Number.isInteger(startIndex)) {
+  if(startIndex === null) {
     startIndex = (dir > 0 ? -1 : 0);
   }
 
