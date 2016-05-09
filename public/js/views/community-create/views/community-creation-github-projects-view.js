@@ -192,8 +192,8 @@ module.exports = CommunityCreateBaseStepView.extend({
   ui: _.extend({}, CommunityCreateBaseStepView.prototype.ui, {
     orgsToggle: '.community-create-github-projects-toggle-orgs',
     reposToggle: '.community-create-github-projects-toggle-repos',
-    orgsArea: '.community-create-github-projects-orgs-area',
-    reposArea: '.community-create-github-projects-repos-area',
+    orgsArea: '.js-community-create-github-projects-orgs-area',
+    reposArea: '.js-community-create-github-projects-repos-area',
     repoFilterInput: '.primary-community-repo-name-filter-input'
   }),
 

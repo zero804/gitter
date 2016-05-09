@@ -36,10 +36,10 @@ module.exports = Marionette.LayoutView.extend({
 
   behaviors: {
     Isomorphic: {
-      mainStepView: { el: '.community-create-main-step-root', init: 'initMainStepView' },
-      invitePeopleStepView: { el: '.community-create-invite-people-step-root', init: 'initInvitePeopleView' },
-      githubProjectsStepView: { el: '.community-create-github-projects-step-root', init: 'initGitHubProjectsView' },
-      overviewStepView: { el: '.community-create-overview-step-root', init: 'initOverviewView' },
+      mainStepView: { el: '.js-community-create-main-step-root', init: 'initMainStepView' },
+      invitePeopleStepView: { el: '.js-community-create-invite-people-step-root', init: 'initInvitePeopleView' },
+      githubProjectsStepView: { el: '.js-community-create-github-projects-step-root', init: 'initGitHubProjectsView' },
+      overviewStepView: { el: '.js-community-create-overview-step-root', init: 'initOverviewView' },
     },
   },
 
