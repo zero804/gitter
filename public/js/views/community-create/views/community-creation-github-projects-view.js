@@ -6,155 +6,18 @@ var urlJoin = require('url-join');
 var toggleClass = require('utils/toggle-class');
 var slugify = require('slug');
 var fuzzysearch = require('fuzzysearch');
-var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 var getRoomNameFromTroupeName = require('gitter-web-shared/get-room-name-from-troupe-name');
 
 require('views/behaviors/isomorphic');
 
-var CommunityCreateBaseStepView = require('./community-creation-base-step-view');
 var template = require('./community-creation-github-projects-view.hbs');
-var CommunityCreationOrgListTemplate = require('./community-creation-github-projects-org-list-view.hbs');
-var CommunityCreationOrgListItemTemplate = require('./community-creation-github-projects-org-list-item-view.hbs');
-var CommunityCreationRepoListTemplate = require('./community-creation-github-projects-repo-list-view.hbs');
-var CommunityCreationRepoListItemTemplate = require('./community-creation-github-projects-repo-list-item-view.hbs');
-
-
+var CommunityCreateBaseStepView = require('./community-creation-base-step-view');
+var CommunityCreationOrgListView = require('./community-creation-org-list-view');
+var CommunityCreationRepoListView = require('./community-creation-repo-list-view');
 
 
 require('gitter-styleguide/css/components/headings.css');
 require('gitter-styleguide/css/components/buttons.css');
-
-
-var ORG_LIST_AVATAR_SIZE = 44;
-var REPO_LIST_AVATAR_SIZE = 22;
-
-
-// Orgs list
-// -----------------------
-var CommunityCreationOrgListItemView = Marionette.ItemView.extend({
-  template: CommunityCreationOrgListItemTemplate,
-  tagName: 'li',
-  attributes: {
-    class: 'community-create-org-list-item'
-  },
-
-  triggers: {
-    'click': 'item:activated'
-  },
-
-  modelEvents: {
-    'change:active': 'onActiveChange'
-  },
-
-  initialize: function(options) {
-
-  },
-
-  serializeData: function() {
-    var data = this.model.toJSON();
-    data.absoluteUri = urlJoin('https://github.com', data.name);
-    data.avatarSrcset = resolveRoomAvatarSrcSet({ uri: data.name }, ORG_LIST_AVATAR_SIZE);
-
-    return data;
-  },
-
-  onActiveChange: function() {
-    toggleClass(this.$el[0], 'active', this.model.get('active'));
-  }
-});
-
-var CommunityCreationOrgListView = Marionette.CompositeView.extend({
-  template: CommunityCreationOrgListTemplate,
-  childView: CommunityCreationOrgListItemView,
-  childViewContainer: '.community-create-org-list',
-  childEvents: {
-    'item:activated': 'onItemActivated'
-  },
-
-  onItemActivated: function(view) {
-    var newActiveValue = !view.model.get('active');
-
-    var previousActiveModel = this.collection.findWhere({ active: true });
-    if(previousActiveModel) {
-      previousActiveModel.set('active', false);
-    }
-    // Toggle active
-    view.model.set('active', newActiveValue);
-    if(newActiveValue) {
-      this.trigger('org:activated', view.model);
-    }
-    else {
-      this.trigger('org:cleared');
-    }
-  }
-});
-
-// Repos list
-// -----------------------
-var CommunityCreationRepoListItemView = Marionette.ItemView.extend({
-  template: CommunityCreationRepoListItemTemplate,
-  tagName: 'li',
-  attributes: {
-    class: 'community-create-repo-list-item'
-  },
-
-  triggers: {
-    'click': 'item:activated'
-  },
-
-  modelEvents: {
-    'change:hidden': 'onHiddenChange',
-    'change:active': 'onActiveChange'
-  },
-
-  initialize: function() {
-
-  },
-
-  serializeData: function() {
-    var data = this.model.toJSON();
-    data.absoluteUri = urlJoin('https://github.com', data.uri);
-    data.avatarSrcset = resolveRoomAvatarSrcSet({ uri: data.uri }, REPO_LIST_AVATAR_SIZE);
-
-    return data;
-  },
-
-  onHiddenChange: function() {
-    toggleClass(this.$el[0], 'hidden', this.model.get('hidden'));
-  },
-  onActiveChange: function() {
-    toggleClass(this.$el[0], 'active', this.model.get('active'));
-  },
-});
-
-var CommunityCreationRepoListView = Marionette.CompositeView.extend({
-  template: CommunityCreationRepoListTemplate,
-  childView: CommunityCreationRepoListItemView,
-  childViewContainer: '.community-create-repo-list',
-  childEvents: {
-    'item:activated': 'onItemActivated'
-  },
-
-  onItemActivated: function(view) {
-    var newActiveValue = !view.model.get('active');
-
-    var previousActiveModel = this.collection.findWhere({ active: true });
-    if(previousActiveModel) {
-      previousActiveModel.set('active', false);
-    }
-    // Toggle active
-    view.model.set('active', newActiveValue);
-    if(newActiveValue) {
-      this.trigger('repo:activated', view.model);
-    }
-    else {
-      this.trigger('repo:cleared');
-    }
-  }
-});
-
-
-
 
 
 module.exports = CommunityCreateBaseStepView.extend({
