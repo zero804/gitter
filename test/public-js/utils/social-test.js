@@ -1,5 +1,4 @@
-/*jslint node:true, unused:true*/
-/*global describe:true, it:true */
+'use strict';
 
 var social = require('../../../public/js/utils/social');
 var assert = require('assert');

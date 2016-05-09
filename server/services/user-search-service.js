@@ -14,7 +14,7 @@ function createRegExpsForQuery(queryText) {
   var normalized = ("" + queryText).trim().toLowerCase();
   var parts = normalized.split(/[\s\'']+/)
                         .filter(function(s) { return !!s; })
-                        .filter(function(s, index) { return index < 10; } );
+                        .filter(function(s, index) { return index < 10; });
 
   return Promise.resolve(parts.map(function(i) {
     return new RegExp("\\b" + i, "i");
@@ -261,7 +261,7 @@ exports.searchForUsers = function(userId, queryText, options, callback) {
         .then(function(troupeIds) {
           // No point in including a troupe if it's to be excluded
           if(options.excludeTroupeId) {
-            troupeIds = troupeIds.filter(function(t) { return t != options.excludeTroupeId; } );
+            troupeIds = troupeIds.filter(function(t) { return t != options.excludeTroupeId; });
           }
 
           if(!troupeIds.length) return emptyResponse;
@@ -270,7 +270,7 @@ exports.searchForUsers = function(userId, queryText, options, callback) {
             .then(function(userIds) {
 
               // Remove the user doing the search
-              userIds = userIds.filter(function(t) { return t != userId; } );
+              userIds = userIds.filter(function(t) { return t != userId; });
 
               if(!userIds.length) return emptyResponse;
 

@@ -8,12 +8,11 @@ var ProfileMenuView = require('public/js/views/menu/room/profile/profile-menu-vi
 describe('ProfileMenuView', function() {
   var model;
   var el;
-  var profileMenuView;
 
   beforeEach(function() {
     model = new Backbone.Model({ state: 'all', profileMenuOpenState: false });
     el = document.createElement('div');
-    profileMenuView = new ProfileMenuView({ el: el, model: model });
+    new ProfileMenuView({ el: el, model: model });
   });
 
   //Sadly as we are using request animation frame some checks must be wrapped

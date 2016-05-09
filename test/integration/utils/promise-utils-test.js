@@ -11,7 +11,7 @@ function fakeFilter(array) {
   return array.slice();
 }
 
-function fakePromiseMaker(foo) {
+function fakePromiseMaker() {
   return new Promise.resolve([1, 2]);
 }
 

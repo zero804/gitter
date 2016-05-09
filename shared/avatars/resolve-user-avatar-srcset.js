@@ -1,8 +1,6 @@
 'use strict';
 
-var _ = require('underscore');
 var hash = require('./hash-avatar-to-cdn');
-var targetEnv = require('targetenv');
 var DEFAULT_AVATAR_URL = 'https://avatars1.githubusercontent.com/u/0';
 var parse = require('url-parse');
 

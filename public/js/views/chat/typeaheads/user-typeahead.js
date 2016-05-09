@@ -21,7 +21,7 @@ function filterWithTerm(term) {
   return function(user) {
     return user && (
              user.username.toLowerCase().indexOf(lowerTerm) === 0 ||
-             ( user.displayName && user.displayName.toLowerCase().indexOf(lowerTerm) === 0 )
+             (user.displayName && user.displayName.toLowerCase().indexOf(lowerTerm) === 0)
            );
   };
 }

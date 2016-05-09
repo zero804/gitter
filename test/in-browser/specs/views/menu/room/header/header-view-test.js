@@ -1,4 +1,3 @@
-/*global describe:true, it:true, beforeEach:true */
 'use strict';
 
 var assert          = require('assert');
@@ -9,7 +8,6 @@ var PanelHeaderView = require('public/js/views/menu/room/header/header-view');
 describe('PanelHeaderView', function() {
 
   var model;
-  var userModel;
   var panelHeaderView;
   var el;
 
@@ -22,7 +20,7 @@ describe('PanelHeaderView', function() {
     });
     model.primaryCollection = [];
 
-    userModel       = model.userModel = new Backbone.Model();
+    model.userModel = new Backbone.Model();
     el              = document.createElement('div');
     panelHeaderView = new PanelHeaderView({ el: el, model: model });
     panelHeaderView.render();

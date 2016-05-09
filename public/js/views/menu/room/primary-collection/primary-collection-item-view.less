@@ -38,17 +38,16 @@ JP 11/2/16
   transition:      background-color .2s ease-out;
 
   .room-item.active & {
-    .room-item-selected();
+    .room-item-active();
   }
 
-  &.selected, &.focus {
-    .room-item-selected();
-  }
-
-  &:hover {
-    .room-item-selected();
+  &:hover,
+  &.active,
+  &.focus,
+  &:focus {
+    .room-item-active();
+    outline: none;
     text-decoration: none;
-    cursor: pointer;
 
     & .room-item__options {
       color: @menu-item-color;

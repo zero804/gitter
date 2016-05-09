@@ -68,14 +68,6 @@ function onNotificationMessageClicked(message) {
   return true;
 }
 
-function onUserNotificationWithLock(message) {
-  if (getDesktopNotificationAccess() === 'granted') {
-    showDesktopNotification(message, onNotificationMessageClicked);
-  } else {
-    webNotifications.show(message, onNotificationMessageClicked);
-  }
-}
-
 function onUserNotification(message) {
   if (getDesktopNotificationAccess() !== 'granted') {
     // Show web notifications in each tab

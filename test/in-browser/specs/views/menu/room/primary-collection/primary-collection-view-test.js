@@ -23,7 +23,7 @@ describe.skip('PrimaryCollectionView', function() {
   beforeEach(function() {
     context.troupe().set('id', 1);
     el = document.createElement('div');
-    model = new Backbone.Model({ state: 'all', panelOpenState: true, selectedOrgName: 'gitterHQ' });
+    model = new Backbone.Model({ state: 'all', panelOpenState: true, activeOrgName: 'gitterHQ' });
     collection = new Backbone.Collection([
       { name:  '1', id: 1, favourite: 1, uri: '1/1', url: '1/1' },
       { name:  '2', id: 2, uri: '2/2', url: '2/2'   },
@@ -76,10 +76,10 @@ describe.skip('PrimaryCollectionView', function() {
     assert.equal(1, primaryCollectionView.render.callCount);
   });
 
-  it('should render when selectedOrgName is changed', function() {
+  it('should render when activeOrgName is changed', function() {
     sinon.stub(primaryCollectionView, 'render');
     assert.equal(0, primaryCollectionView.render.callCount);
-    model.set('selectedOrgName', 'troupe');
+    model.set('activeOrgName', 'troupe');
     assert.equal(1, primaryCollectionView.render.callCount);
   });
 
@@ -131,19 +131,19 @@ describe.skip('PrimaryCollectionView', function() {
   });
 
   it('should select the correct model on init', function() {
-    assert.equal(1, primaryCollectionView.collection.where({ selected: true })[0].get('id'));
+    assert.equal(1, primaryCollectionView.collection.where({ active: true })[0].get('id'));
   });
 
-  it('should only have selected one model when the troupe model changes id', function() {
-    assert.equal(1, primaryCollectionView.collection.where({ selected: true }).length);
+  it('should only have active one model when the troupe model changes id', function() {
+    assert.equal(1, primaryCollectionView.collection.where({ active: true }).length);
     context.troupe().set('id', 2);
-    assert.equal(1, primaryCollectionView.collection.where({ selected: true }).length);
+    assert.equal(1, primaryCollectionView.collection.where({ active: true }).length);
   });
 
-  it('should update the selected model when the troupe model changes', function() {
-    assert.equal(1, primaryCollectionView.collection.where({ selected: true })[0].get('id'));
+  it('should update the active model when the troupe model changes', function() {
+    assert.equal(1, primaryCollectionView.collection.where({ active: true })[0].get('id'));
     context.troupe().set('id', 2);
-    assert.equal(2, primaryCollectionView.collection.where({ selected: true })[0].get('id'));
+    assert.equal(2, primaryCollectionView.collection.where({ active: true })[0].get('id'));
   });
 
   it('should focus the first element of its collection when keyboard focus is triggered', function() {
@@ -179,7 +179,7 @@ describe.skip('PrimaryCollectionView', function() {
   });
 
   it('should emit an event on keyboard up movement', function(done) {
-    primaryCollectionView.bus.on('room-menu:keyboard:change-focus', function(id) {
+    primaryCollectionView.bus.on('room-menu:keyboard:change-focus', function() {
       assert(true);
       done();
     });
@@ -190,7 +190,7 @@ describe.skip('PrimaryCollectionView', function() {
   });
 
   it('should emit an event on keyboard up movement', function(done) {
-    primaryCollectionView.bus.on('room-menu:keyboard:change-focus', function(id) {
+    primaryCollectionView.bus.on('room-menu:keyboard:change-focus', function() {
       assert(true);
       done();
     });
@@ -248,7 +248,7 @@ describe('PrimaryCollectionView2', function(){
     context.troupe().set('id', 1);
     el            = document.createElement('div');
     model         = new Backbone.Model();
-    roomMenuModel = new Backbone.Model({ state: 'all', panelOpenState: true, selectedOrgName: 'gitterHQ' });
+    roomMenuModel = new Backbone.Model({ state: 'all', panelOpenState: true, activeOrgName: 'gitterHQ' });
     collection    = new Backbone.Collection([
       { name:  '1', id: 1, favourite: 1, uri: '1/1', url: '1/1' },
       { name:  '2', id: 2, uri: '2/2', url: '2/2'   },

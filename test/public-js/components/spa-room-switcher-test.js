@@ -1,5 +1,5 @@
-/*jslint node:true, unused:true*/
-/*global describe:true, it:true */
+'use strict';
+
 var BASE_PATH = 'https://gitter.im'
 
 var SPARoomSwitcher = require("proxyquire").noCallThru()('../../../public/js/components/spa-room-switcher', {
