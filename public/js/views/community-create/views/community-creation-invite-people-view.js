@@ -83,6 +83,10 @@ module.exports = CommunityCreateBaseStepView.extend({
     this.setupPeopleTypahead();
   },
 
+  onDestroy: function() {
+    this.typeahead.destroy();
+  },
+
   onStepNext: function() {
     this.communityCreateModel.set('stepState', this.communityCreateModel.STEP_CONSTANT_MAP.overview);
   },
