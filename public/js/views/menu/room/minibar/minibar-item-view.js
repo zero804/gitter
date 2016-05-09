@@ -27,6 +27,8 @@ module.exports =  Marionette.ItemView.extend({
   modelEvents: {
     'change:unreadItems change:mentions change:activity': 'onUnreadUpdate',
     'change:active': 'onActiveStateUpdate',
+    'focus:item': 'focusItem',
+    'blur:item': 'blurItem'
   },
   events: {
     'click': 'onItemClicked',
@@ -79,11 +81,13 @@ module.exports =  Marionette.ItemView.extend({
 
 
   onItemClicked: function() {
-    this.trigger('minibar-item:clicked', this.model);
+    this.trigger('minibar-item:activated', this.model);
   },
 
-  onActiveStateUpdate: function(model, val) { //jshint unused: true
-    toggleClass(this.el, 'active', !!val);
+  onActiveStateUpdate: function() {
+    var isActive = !!this.model.get('active');
+    toggleClass(this.el, 'active', isActive);
+    toggleClass(this.ui.minibarButton[0], 'focus', isActive);
   },
 
   onUnreadUpdate: function() {
@@ -95,10 +99,22 @@ module.exports =  Marionette.ItemView.extend({
 
   onRender: function() {
     if(!this.firstRender || this.firstRender && this.roomMenuModel && this.roomMenuModel.get('roomMenuIsPinned')) {
-      toggleClass(this.el, 'active', !!this.model.get('active'));
+      this.onActiveStateUpdate();
     }
 
     this.firstRender = false;
   },
+
+
+  focusItem: function() {
+    this.ui.minibarButton.focus();
+    toggleClass(this.ui.minibarButton[0], 'focus', true);
+    this.trigger('minibar-item:keyboard-activated', this.model);
+  },
+
+  blurItem: function() {
+    this.ui.minibarButton.blur();
+    toggleClass(this.ui.minibarButton[0], 'focus', false);
+  }
 
 });

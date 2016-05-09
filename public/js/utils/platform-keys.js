@@ -1,5 +1,6 @@
 "use strict";
 var platformDetect = require('utils/platformDetect');
+var context = require('utils/context');
 
 module.exports = (function() {
 
@@ -9,7 +10,7 @@ module.exports = (function() {
   switch(platformDetect()) {
     case 'Mac': return {
       cmd: '⌘',
-      room: 'ctrl',
+      room: context.hasFeature('left-menu') ? 'alt' : 'ctrl',
       gitter: 'ctrl'
     };
     case 'Windows': return {
@@ -26,4 +27,3 @@ module.exports = (function() {
 
 
 })();
-

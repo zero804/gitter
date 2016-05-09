@@ -2,6 +2,8 @@
 
 var _                               = require('underscore');
 var Marionette                      = require('backbone.marionette');
+var fastdom                         = require('fastdom');
+var toggleClass                     = require('utils/toggle-class');
 var PanelHeaderView                 = require('../header/header-view');
 var PanelFooterView                 = require('../footer/footer-view');
 var FavouriteCollectionView         = require('../favourite-collection/favourite-collection-view');
@@ -15,13 +17,11 @@ var TertiaryCollectionModel         = require('../tertiary-collection/tertiary-c
 var ProfileMenuView                 = require('../profile/profile-menu-view');
 var FilteredFavouriteRoomCollection = require('../../../../collections/filtered-favourite-room-collection.js');
 var SearchInputView                 = require('views/menu/room/search-input/search-input-view');
-var fastdom                         = require('fastdom');
-var toggleClass                     = require('utils/toggle-class');
 var favouriteCollectionFilter       = require('gitter-web-shared/filters/left-menu-primary-favourite');
 
 require('views/behaviors/isomorphic');
 
-module.exports = Marionette.LayoutView.extend({
+var PanelView = Marionette.LayoutView.extend({
 
   behaviors: {
     Isomorphic: {
@@ -35,6 +35,7 @@ module.exports = Marionette.LayoutView.extend({
       footer:              { el: '#panel-footer', init: 'initFooter' },
     },
   },
+
 
   initHeader: function(optionsForRegion) {
     return new PanelHeaderView(optionsForRegion({
@@ -52,18 +53,9 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   initFavouriteCollection: function (optionsForRegion) {
-    //Sadly the favourite collection needs to be generated here rather than the room-menu-model
-    //because it has a dependency on the dnd-controller JP 1/4/16
-    var models = this.model._roomCollection.filter(favouriteCollectionFilter);
-    var favCollection = new FilteredFavouriteRoomCollection(models, {
-      roomModel:  this.model,
-      collection: this.model._roomCollection,
-      dndCtrl:    this.dndCtrl,
-    });
-
     return new FavouriteCollectionView(optionsForRegion({
-      collection:     favCollection,
-      model:          new FavouriteCollectionModel(null, { roomMenuModel: this.model }),
+      collection:     this.favCollection,
+      model:          this.favouriteCollectionModel,
       roomMenuModel:  this.model,
       bus:            this.bus,
       dndCtrl:        this.dndCtrl,
@@ -75,7 +67,7 @@ module.exports = Marionette.LayoutView.extend({
   initPrimaryCollection: function(optionsForRegion) {
     return new PrimaryCollectionView(optionsForRegion({
       collection:     this.model.primaryCollection,
-      model:          new PrimaryCollectionModel(null, { roomMenuModel: this.model }),
+      model:          this.primaryCollectionModel,
       roomMenuModel:  this.model,
       bus:            this.bus,
       dndCtrl:        this.dndCtrl,
@@ -86,7 +78,7 @@ module.exports = Marionette.LayoutView.extend({
   initSecondaryCollection: function(optionsForRegion) {
     return new SecondaryCollectionView(optionsForRegion({
       collection:        this.model.secondaryCollection,
-      model:             new SecondaryCollectionModel({}, { roomMenuModel: this.model }),
+      model:             this.secondaryCollectionModel,
       roomMenuModel:     this.model,
       bus:               this.bus,
       roomCollection:    this.model._roomCollection,
@@ -98,7 +90,7 @@ module.exports = Marionette.LayoutView.extend({
 
   initTertiaryCollection: function(optionsForRegion) {
     return new TertiaryCollectionView(optionsForRegion({
-      model:               new TertiaryCollectionModel({}, { roomMenuModel: this.model }),
+      model:               this.tertiaryCollectionModel,
       collection:          this.model.tertiaryCollection,
       roomMenuModel:       this.model,
       bus:                 this.bus,
@@ -136,6 +128,62 @@ module.exports = Marionette.LayoutView.extend({
   initialize: function(attrs) {
     this.bus     = attrs.bus;
     this.dndCtrl = attrs.dndCtrl;
+    this.keyboardControllerView = attrs.keyboardControllerView;
+
+    //Sadly the favourite collection needs to be generated here rather than the room-menu-model
+    //because it has a dependency on the dnd-controller JP 1/4/16
+    var models = this.model._roomCollection.filter(favouriteCollectionFilter);
+    this.favCollection = new FilteredFavouriteRoomCollection(models, {
+      collection: this.model._roomCollection,
+      roomModel:  this.model,
+      dndCtrl:    this.dndCtrl,
+    });
+    this.listenTo(this.favCollection, 'filter-complete', function() {
+      this.model.trigger('update:collection-active-states');
+    }, this);
+
+
+    this.favouriteCollectionModel = new FavouriteCollectionModel(null, {
+      collection: this.favCollection,
+      roomMenuModel: this.model
+    });
+    this.primaryCollectionModel = new PrimaryCollectionModel(null, {
+      collection: this.model.primaryCollection,
+      roomMenuModel: this.model
+    });
+    this.secondaryCollectionModel = new SecondaryCollectionModel({}, {
+      collection: this.model.secondaryCollection,
+      roomMenuModel: this.model
+    });
+    this.tertiaryCollectionModel = new TertiaryCollectionModel({}, {
+      collection: this.model.tertiaryCollection,
+      roomMenuModel: this.model
+    });
+
+    this.keyboardControllerView.inject(this.keyboardControllerView.constants.ROOM_LIST_KEY, [
+      {
+        collection: this.favCollection,
+        getActive: function() {
+          return this.favouriteCollectionModel.get('active');
+        }.bind(this)
+      }, {
+        collection: this.model.primaryCollection,
+        getActive: function() {
+          return  this.primaryCollectionModel.get('active');
+        }.bind(this)
+      }, {
+        collection: this.model.secondaryCollection,
+        getActive: function() {
+          return  this.secondaryCollectionModel.get('active');
+        }.bind(this)
+      }, {
+        collection: this.model.tertiaryCollection,
+        getActive: function() {
+          return  this.tertiaryCollectionModel.get('active');
+        }.bind(this)
+      }
+    ]);
+
 
     this.listenTo(this.bus, 'ui:swipeleft', this.onSwipeLeft, this);
     this.listenTo(this.bus, 'focus.request.chat', this.onSearchItemSelected, this);
@@ -193,5 +241,7 @@ module.exports = Marionette.LayoutView.extend({
   onDestroy: function() {
     this.stopListening(this.bus);
   },
-
 });
+
+
+module.exports = PanelView;
