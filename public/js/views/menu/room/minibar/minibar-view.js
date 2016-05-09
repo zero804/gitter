@@ -2,21 +2,22 @@
 
 var _             = require('underscore');
 var Marionette    = require('backbone.marionette');
+var fastdom       = require('fastdom');
 var ItemView      = require('./minibar-item-view');
 var CloseItemView = require('./minibar-close-item-view');
 var CommunityCreateItemView = require('./minibar-community-create-item-view');
 var FavouriteView = require('./minibar-favourite-item-view');
 var PeopleView    = require('./minibar-people-item-view.js');
-var fastdom       = require('fastdom');
 var domIndexById  = require('../../../../utils/dom-index-by-id');
 
 //TODO TEST ALL THE THINGS JP 2/2/16
-module.exports = Marionette.CollectionView.extend({
+var MinibarView = Marionette.CollectionView.extend({
   tagName:   'ul',
   id:        'minibar-list',
   childView: ItemView,
   childEvents: {
-    'minibar-item:clicked': 'onItemClicked',
+    'minibar-item:keyboard-activated': 'onItemKeyboardActivated',
+    'minibar-item:activated': 'onItemActivated',
     'minibar-item:close':   'onCloseClicked',
   },
 
@@ -71,13 +72,24 @@ module.exports = Marionette.CollectionView.extend({
     this.dndCtrl        = attrs.dndCtrl;
     this.model          = attrs.model;
     this.roomCollection = attrs.roomCollection;
+    this.keyboardControllerView = attrs.keyboardControllerView;
 
     this.shouldRender   = false;
 
     this.listenTo(this.roomCollection, 'add remove', this.render, this);
     this.listenTo(this.collection, 'snapshot', this.onCollectionSnapshot, this);
-    this.listenTo(this.model, 'change:panelOpenState change:state change:selectedOrgName', this.onMenuStateUpdate, this);
+    this.listenTo(this.model, 'change:state change:selectedOrgName', this.onMenuStateUpdate, this);
     this.onMenuStateUpdate();
+
+    this.keyboardControllerView.inject(this.keyboardControllerView.constants.MINIBAR_KEY, [
+      { collection: this.collection }
+    ]);
+
+    // For the normal arrowing through
+    // when we have too many rooms to render instantly
+    this.debouncedOnItemActivated = _.debounce(this.onItemActivated, 300);
+    // Just for the quick flicks
+    this.shortDebouncedOnItemActivated = _.debounce(this.onItemActivated, 100);
 
     //Guard against not getting a snapshot
     this.timeout = setTimeout(function() {
@@ -103,7 +115,8 @@ module.exports = Marionette.CollectionView.extend({
     }.bind(this));
   },
 
-  onItemClicked: function(view, model) { //jshint unused: true
+
+  onItemActivated: function(view, model, activationSourceType) {
     var modelName = model.get('name');
 
     //stop selectedOrg name from changing if it does not need to
@@ -111,27 +124,41 @@ module.exports = Marionette.CollectionView.extend({
       modelName = this.model.get('name');
     }
 
-    // Update the minibar state
-    this.model.set({
-      panelOpenState:       true,
-      state:                model.get('type'),
-      profileMenuOpenState: false,
-      selectedOrgName:      modelName,
+    // Set the minibar-item active
+    model.set({
+      active: true
     });
+
+    var state = model.get('type');
+    // close-passthrough
+    // Don't change the state when we focus/activate the `close`/toggle icon
+    if(state !== 'close') {
+      // Update the minibar state
+      this.model.set({
+        panelOpenState:       true,
+        state:                state,
+        profileMenuOpenState: false,
+        selectedOrgName:      modelName,
+        activationSourceType: activationSourceType
+      });
+    }
+  },
+
+  onItemKeyboardActivated: function(view, model) {
+    // Arbitrary threshold based on when we can't render "instantly".
+    // We don't want to delay too much because majority of users won't run into render shortcomings
+    // and the delay could cause confusion for screen-reader users not recnogizing when
+    // the switch happens
+    if(this.roomCollection.length > 50) {
+      this.debouncedOnItemActivated(view, model, 'keyboard');
+    }
+    else {
+      this.shortDebouncedOnItemActivated(view, model, 'keyboard');
+    }
   },
 
   onMenuStateUpdate: function() {
-    //reset the currently active model
-    var activeModel = this.collection.findWhere({ active: true });
-    if (activeModel) { activeModel.set('active', false); }
-
-    //activate the new model
-    var currentState = this.model.get('state');
-    var nextActiveModel = (currentState !== 'org') ?
-      this.collection.findWhere({ type: currentState }) :
-      this.collection.findWhere({ name: this.model.get('selectedOrgName') });
-
-    if (nextActiveModel) { nextActiveModel.set('active', true);}
+    this.updateMinibarActiveState(this.model.get('state'), this.model.get('selectedOrgName'));
   },
 
   onCloseClicked: function() {
@@ -174,4 +201,28 @@ module.exports = Marionette.CollectionView.extend({
     this.stopListening(this.roomCollection);
   },
 
+
+  updateMinibarActiveState: function(currentState, selectedOrgName) {
+    // Reset the currently active model
+    var activeModels = this.collection.where({ active: true });
+    if (activeModels) {
+      activeModels.forEach(function(model) {
+        model.set('active', false);
+      });
+    }
+
+    // Activate the new model
+    var nextActiveModel = (currentState !== 'org') ?
+      this.collection.findWhere({ type: currentState }) :
+      this.collection.findWhere({ name: selectedOrgName });
+
+    if (nextActiveModel) {
+      nextActiveModel.set('active', true);
+    }
+  }
+
+
 });
+
+
+module.exports = MinibarView;

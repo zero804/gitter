@@ -3,10 +3,12 @@
 
 var Marionette  = require('backbone.marionette');
 var _           = require('underscore');
+var cocktail    = require('cocktail');
+var KeyboardEventMixin = require('views/keyboard-events-mixin');
 var template    = require('./search-input-view.hbs');
 var toggleClass = require('utils/toggle-class');
 
-module.exports = Marionette.ItemView.extend({
+var SearchInputView = Marionette.ItemView.extend({
 
   template: template,
   className: 'left-menu-search empty',
@@ -25,6 +27,10 @@ module.exports = Marionette.ItemView.extend({
   modelEvents: {
     'change:state':      'onModelChangeState',
     'change:searchTerm': 'onModelChangeSearchTerm',
+  },
+
+  keyboardEvents: {
+    'room-list.start-nav': 'focusSearchInput',
   },
 
   initialize: function(attrs) {
@@ -47,10 +53,10 @@ module.exports = Marionette.ItemView.extend({
   onModelChangeState: function (model, val){ //jshint unused: true
     toggleClass(this.el, 'active', val === 'search');
 
-    //We need to check if the ui elements have been bound
-    //as this is a string before it is bounce we can't check [0] || .length
-    //so we will check for the find function JP 15/3/16
-    if(val === 'search' && this.ui.input.find) { this.ui.input.focus(); }
+    // Don't ruin the minibar navigation when using a keyboard
+    if(model.get('activationSourceType') !== 'keyboard') {
+      this.focusSearchInput();
+    }
   },
 
   onModelChangeSearchTerm: function(model, val) { //jshint unused: true
@@ -67,4 +73,17 @@ module.exports = Marionette.ItemView.extend({
     this.ui.input.val(val);
   },
 
+  focusSearchInput: function() {
+    var state = this.model.get('state');
+    //We need to check if the ui elements have been bound
+    //as this is a string before it is bounce we can't check [0] || .length
+    //so we will check for the find function JP 15/3/16
+    if(state === 'search' && this.ui.input.find) { this.ui.input.focus(); }
+  }
+
 });
+
+cocktail.mixin(SearchInputView, KeyboardEventMixin);
+
+
+module.exports = SearchInputView;
