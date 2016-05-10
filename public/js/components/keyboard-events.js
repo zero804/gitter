@@ -104,9 +104,6 @@ module.exports = (function() {
     'enter': [{
       name: 'search.go',
       scope: 'input.search'
-      },{
-      name: 'room.enter',
-      scope: 'other'
     },{
       name: 'chat.compose.auto',
       scope: 'input.chat'
@@ -217,8 +214,8 @@ module.exports = (function() {
     keyEvents[cmdKey + '+' + roomKey + '+down'] = 'room.down';
     // keyEvents[cmdKey + '+' + roomKey + '+left'] = 'room.prev';
     // keyEvents[cmdKey + '+' + roomKey + '+right'] = 'room.next';
+    keyEvents[cmdKey + '+' + roomKey + '+enter'] = 'room.enter';
   }
-  keyEvents[cmdKey + '+' + roomKey + '+enter'] = 'room.enter';
 
   if(context.hasFeature('left-menu')) {
     // Go to a conversation by index in list
