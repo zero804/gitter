@@ -11,10 +11,12 @@ var roomPermissionsModel  = require('gitter-web-permissions/lib/room-permissions
 var troupeService         = require('../../services/troupe-service');
 var _                     = require("lodash");
 var collections           = require('../../utils/collections');
-var debug                 = require('debug')('gitter:troupe-strategy');
+var debug                 = require('debug')('gitter:serializer:troupe');
 var Promise               = require('bluebird');
 var getVersion            = require('../get-model-version');
 var UserIdStrategy        = require('./user-id-strategy');
+var MultiPreload          = require('../strategy-tracing').MultiPreload
+var mongoUtils            = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 /**
  *
@@ -215,6 +217,8 @@ function TroupePermissionsStrategy(options) {
   }
 
   this.preload = function(troupes) {
+    if (troupes.isEmpty()) return;
+
     return getUser()
       .then(function(user) {
         if (!user) return;
@@ -268,7 +272,6 @@ var TroupeOwnerIsOrgStrategy = function (){
           memo[lcOwner] = results[index];
           return memo;
         }, {});
-
       });
 
   };
@@ -282,78 +285,111 @@ TroupeOwnerIsOrgStrategy.prototype = {
   name: 'TroupeOwnerIsOrgStrategy'
 };
 
+/**
+ * Given the currentUser and a sequence of troupes
+ * returns the 'other' userId for all one to one rooms
+ */
+function oneToOneOtherUserSequence(currentUserId, troupes) {
+  return troupes.filter(function(troupe) {
+      return troupe.oneToOne;
+    })
+    .map(function(troupe) {
+      var a = troupe.oneToOneUsers[0] && troupe.oneToOneUsers[0].userId;
+      var b = troupe.oneToOneUsers[1] && troupe.oneToOneUsers[1].userId;
+
+      if (mongoUtils.objectIDsEqual(currentUserId, a)) {
+        return b;
+      } else {
+        if (a) return a;
+      }
+    });
+}
+
+function mapIdsSequence(troupes) {
+  return troupes.map(function(troupe) {
+    return troupe._id;
+  });
+}
+
 function TroupeStrategy(options) {
   if (!options) options = {};
 
-  var currentUserId = options.currentUserId;
+  var currentUserId = mongoUtils.asObjectID(options.currentUserId);
 
-  var unreadItemStrategy     = currentUserId && !options.skipUnreadCounts ? new AllUnreadItemCountStrategy(options) : null;
-  var lastAccessTimeStrategy = currentUserId ? new LastTroupeAccessTimesForUserStrategy(options) : null;
-  var favouriteStrategy      = currentUserId ? new FavouriteTroupesForUserStrategy(options) : null;
-  var lurkActivityStrategy   = currentUserId ? new LurkAndActivityForUserStrategy(options) : null;
-  var tagsStrategy          = (options.includeTags) ? new TagsStrategy(options) : null;
-  var userIdStrategy         = new UserIdStrategy(options);
-  var proOrgStrategy        = new ProOrgStrategy(options);
-  var permissionsStrategy    = (currentUserId || options.currentUser) && options.includePermissions ? new TroupePermissionsStrategy(options) : null;
-  var ownerIsOrgStrategy    = (options.includeOwner) ? new TroupeOwnerIsOrgStrategy(options) : null;
-  var roomMembershipStrategy = currentUserId || options.isRoomMember !== undefined ? new RoomMembershipStrategy(options) : null;
+  var unreadItemStrategy;
+  var lastAccessTimeStrategy;
+  var favouriteStrategy;
+  var lurkActivityStrategy;
+  var tagsStrategy;
+  var userIdStrategy;
+  var proOrgStrategy;
+  var permissionsStrategy;
+  var ownerIsOrgStrategy;
+  var roomMembershipStrategy;
 
-  this.preload = function(items) {
-    var troupeIds = items.map(function(troupe) {
-      return troupe.id;
-    });
+  this.preload = function(items) { // eslint-disable-line max-statements
+    if (items.isEmpty()) return;
 
-    var userIds = items.filter(function(troupe) {
-        return troupe.oneToOne;
-      })
-      .map(function(troupe) {
-        return troupe.oneToOneUsers;
-      })
-      .flatten()
-      .map(function(troupeOneToOneUser) {
-        return troupeOneToOneUser.userId;
-      })
-      .uniq();
+    var troupeIds = mapIdsSequence(items);
 
-    var strategies = [
-      userIdStrategy.preload(userIds),
-      proOrgStrategy.preload(items)
-    ];
+    var strategies = new MultiPreload(this);
 
-    if (roomMembershipStrategy) {
-      strategies.push(roomMembershipStrategy.preload(troupeIds));
+    // Pro-org
+    proOrgStrategy = new ProOrgStrategy(options);
+    strategies.push(proOrgStrategy, items);
+
+    // Room Membership
+    if (currentUserId || options.isRoomMember !== undefined) {
+      roomMembershipStrategy = new RoomMembershipStrategy(options);
+      strategies.push(roomMembershipStrategy, troupeIds);
     }
 
-    if (unreadItemStrategy) {
-      strategies.push(unreadItemStrategy.preload(troupeIds));
+    // Unread items
+    if (currentUserId && !options.skipUnreadCounts) {
+      unreadItemStrategy = new AllUnreadItemCountStrategy(options);
+      strategies.push(unreadItemStrategy, troupeIds);
     }
 
-    if (favouriteStrategy) {
-      strategies.push(favouriteStrategy.preload());
+    if (currentUserId) {
+      // The other user in one-to-one rooms
+      var otherUserIds = oneToOneOtherUserSequence(currentUserId, items);
+      if (!otherUserIds.isEmpty()) {
+        userIdStrategy = new UserIdStrategy(options);
+        strategies.push(userIdStrategy, otherUserIds);
+      }
+
+      // Favourites for user
+      favouriteStrategy = new FavouriteTroupesForUserStrategy(options);
+      strategies.push(favouriteStrategy);
+
+      // Last Access Time
+      lastAccessTimeStrategy = new LastTroupeAccessTimesForUserStrategy(options);
+      strategies.push(lastAccessTimeStrategy);
+
+      // Lurk Activity
+      lurkActivityStrategy = new LurkAndActivityForUserStrategy(options);
+      strategies.push(lurkActivityStrategy);
     }
 
-    if (lastAccessTimeStrategy) {
-      strategies.push(lastAccessTimeStrategy.preload());
+    // Permissions
+    if ((currentUserId || options.currentUser) && options.includePermissions) {
+      permissionsStrategy = new TroupePermissionsStrategy(options);
+      strategies.push(permissionsStrategy, items);
     }
 
-    if (lurkActivityStrategy) {
-      strategies.push(lurkActivityStrategy.preload());
+    // Include the owner
+    if (options.includeOwner) {
+      ownerIsOrgStrategy = new TroupeOwnerIsOrgStrategy(options);
+      strategies.push(ownerIsOrgStrategy, items);
     }
 
-    if (permissionsStrategy) {
-      strategies.push(permissionsStrategy.preload(items));
+    // Include the tags
+    if (options.includeTags) {
+      tagsStrategy = new TagsStrategy(options);
+      strategies.push(tagsStrategy, items);
     }
 
-    if (ownerIsOrgStrategy) {
-      strategies.push(ownerIsOrgStrategy.preload(items));
-    }
-
-    if (tagsStrategy) {
-      strategies.push(tagsStrategy.preload(items));
-    }
-
-    return Promise.all(strategies);
-
+    return strategies.all();
   };
 
   function mapOtherUser(users) {

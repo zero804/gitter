@@ -14,6 +14,7 @@ var billingService           = require('../../services/billing-service');
 var leanUserDao              = require('../../services/daos/user-dao').full;
 var resolveUserAvatarUrl     = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 var userScopes               = require('gitter-web-identity/lib/user-scopes');
+var MultiPreload             = require('../strategy-tracing').MultiPreload;
 
 function UserPremiumStatusStrategy() {
   var usersWithPlans;
@@ -164,32 +165,39 @@ UserProvidersStrategy.prototype = {
 function UserStrategy(options) {
   options = options ? options : {};
   var lean = !!options.lean;
-  var userRoleInTroupeStrategy = options.includeRolesForTroupeId || options.includeRolesForTroupe ? new UserRoleInTroupeStrategy(options) : null;
-  var userPresenceInTroupeStrategy = options.showPresenceForTroupeId ? new UserPresenceInTroupeStrategy(options.showPresenceForTroupeId) : null;
-  var userPremiumStatusStrategy = options.showPremiumStatus ? new UserPremiumStatusStrategy() : null;
-  var userProvidersStrategy = options.includeProviders ? new UserProvidersStrategy() : null;
+
+  var userRoleInTroupeStrategy;
+  var userPresenceInTroupeStrategy;
+  var userPremiumStatusStrategy;
+  var userProvidersStrategy;
 
   this.preload = function(users) {
-    var strategies = [];
+    if (users.isEmpty()) return;
 
-    if (userRoleInTroupeStrategy) {
-      strategies.push(userRoleInTroupeStrategy.preload());
+    var strategies = new MultiPreload(this);
+
+    if (options.includeRolesForTroupeId || options.includeRolesForTroupe) {
+      userRoleInTroupeStrategy = new UserRoleInTroupeStrategy(options);
+      strategies.push(userRoleInTroupeStrategy);
     }
 
-    if (userPresenceInTroupeStrategy) {
-      strategies.push(userPresenceInTroupeStrategy.preload());
+    if (options.showPresenceForTroupeId) {
+      userPresenceInTroupeStrategy = new UserPresenceInTroupeStrategy(options.showPresenceForTroupeId)
+      strategies.push(userPresenceInTroupeStrategy);
     }
 
-    if (userPremiumStatusStrategy) {
+    if (options.showPremiumStatus) {
       var userIds = users.map(function(user) { return user.id; });
-      strategies.push(userPremiumStatusStrategy.preload(userIds));
+      userPremiumStatusStrategy = new UserPremiumStatusStrategy();
+      strategies.push(userPremiumStatusStrategy, userIds);
     }
 
-    if (userProvidersStrategy) {
-      strategies.push(userProvidersStrategy.preload(users));
+    if (options.includeProviders) {
+      userProvidersStrategy = new UserProvidersStrategy();
+      strategies.push(userProvidersStrategy, users);
     }
 
-    return Promise.all(strategies);
+    return strategies.all();
   };
 
   this.map = function(user) {
