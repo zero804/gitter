@@ -150,7 +150,7 @@ module.exports = {
       .asCallback(next);
   },
 
-  rememberMeMiddleware: Promise.method(function(req, res, next) {
+  rememberMeMiddleware: function(req, res, next) {
     /* If the user is logged in or doesn't have cookies, continue */
     if (req.user || !req.cookies || !req.cookies[cookieName]) return next();
 
@@ -208,7 +208,7 @@ module.exports = {
         throw err;
       })
       .asCallback(next);
-  }),
+  },
 
   testOnly: {
     generateAuthToken: generateAuthToken,
