@@ -32,7 +32,7 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   initOrgListView: function(optionsForRegion) {
     this.orgListView = new CommunityCreationOrgListView(optionsForRegion({
-      collection: this.orgsCollection
+      collection: this.orgCollection
     }));
     this.listenTo(this.orgListView, 'org:activated', this.onOrgSelectionChange, this);
     this.listenTo(this.orgListView, 'org:cleared', this.onOrgSelectionChange, this);
@@ -41,7 +41,7 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   initRepoListView: function(optionsForRegion) {
     this.repoListView = new CommunityCreationRepoListView(optionsForRegion({
-      collection: this.reposCollection
+      collection: this.repoCollection
     }));
     this.listenTo(this.repoListView, 'repo:activated', this.onRepoSelectionChange, this);
     this.listenTo(this.repoListView, 'repo:cleared', this.onRepoSelectionChange, this);
@@ -76,8 +76,8 @@ module.exports = CommunityCreateBaseStepView.extend({
   initialize: function(options) {
     CommunityCreateBaseStepView.prototype.initialize.apply(this, arguments);
 
-    this.orgsCollection = options.orgsCollection;
-    this.reposCollection = options.reposCollection;
+    this.orgCollection = options.orgCollection;
+    this.repoCollection = options.repoCollection;
 
     this.throttledApplyFilterToRepos = _.throttle(this.applyFilterToRepos, 500);
     this.shortThrottledApplyFilterToRepos = _.throttle(this.applyFilterToRepos, 100);
@@ -185,7 +185,7 @@ module.exports = CommunityCreateBaseStepView.extend({
   onRepoFilterChange: function() {
     // For people with thousands of repos, we want to hold off for perf
     // This is an arbitrary number
-    if(this.reposCollection.length > 500) {
+    if(this.repoCollection.length > 500) {
       this.throttledApplyFilterToRepos();
     }
     else {
@@ -195,7 +195,7 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   applyFilterToRepos: function() {
     var filterString = (this.model.get('repoFilter') || '').toLowerCase();
-    this.reposCollection.models.forEach(function(repoModel) {
+    this.repoCollection.models.forEach(function(repoModel) {
       var shouldShow = true;
       if(filterString && filterString.length > 0) {
         shouldShow = fuzzysearch(filterString, repoModel.get('name').toLowerCase());
