@@ -34,7 +34,7 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   behaviors: {
     Isomorphic: {
-      subRoomListView: { el: '.community-create-sub-room-list-root', init: 'initSubRoomListView' },
+      //subRoomListView: { el: '.community-create-sub-room-list-root', init: 'initSubRoomListView' },
     },
   },
 
@@ -54,7 +54,7 @@ module.exports = CommunityCreateBaseStepView.extend({
     advancedOptionsArea: '.community-create-advanced-options-section',
     subRoomNameInput: '.community-creation-sub-room-input',
     subRoomSubmitButton: '.community-creation-sub-room-submit-button',
-    subRoomInputPrefix: '.community-creation-sub-room-input-prefix'
+    //subRoomInputPrefix: '.community-creation-sub-room-input-prefix'
   }),
 
   events: _.extend({}, CommunityCreateBaseStepView.prototype.events, {
@@ -95,7 +95,7 @@ module.exports = CommunityCreateBaseStepView.extend({
 
     updateElementValueAndMaintatinSelection(this.ui.communityNameInput[0], communityName);
     updateElementValueAndMaintatinSelection(this.ui.communitySlugInput[0], communitySlug);
-    this.ui.subRoomInputPrefix[0].textContent = communityName + ' /';
+    //this.ui.subRoomInputPrefix[0].textContent = communityName + ' /';
   },
 
   onCommunityNameInputChange: function() {
