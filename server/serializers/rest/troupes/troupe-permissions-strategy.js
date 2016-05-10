@@ -5,19 +5,31 @@ var userService = require("../../../services/user-service");
 var roomPermissionsModel = require('gitter-web-permissions/lib/room-permissions-model');
 var Promise = require('bluebird');
 
-/** Returns the permissions the user has in the orgs. This is not intended to be used for large sets, rather individual items */
+/**
+ * Returns the permissions the user has in the orgs.
+ * This is not intended to be used for large sets, rather individual items
+ */
 function TroupePermissionsStrategy(options) {
-  var isAdmin = {};
+  this.currentUser = options.currentUser;
+  this.currentUserId = options.currentUserId;
+  this.isAdmin = null;
+}
 
-  function getUser() {
-    if (options.currentUser) return Promise.resolve(options.currentUser);
-    return userService.findById(options.currentUserId);
-  }
+TroupePermissionsStrategy.prototype = {
 
-  this.preload = function(troupes) {
+  preload: function(troupes) {
     if (troupes.isEmpty()) return;
 
-    return getUser()
+    var userPromise;
+    if (this.currentUser) {
+      userPromise = Promise.resolve(this.currentUser);
+    } else {
+      userPromise = userService.findById(this.currentUserId);
+    }
+
+    var isAdmin = {};
+
+    return userPromise
       .then(function(user) {
         if (!user) return;
 
@@ -32,17 +44,19 @@ function TroupePermissionsStrategy(options) {
               isAdmin[troupe.id] = false;
             });
         });
+      })
+      .bind(this)
+      .then(function() {
+        this.isAdmin = isAdmin;
       });
-  };
+  },
 
-  this.map = function(troupe) {
+  map: function(troupe) {
     return {
-      admin: isAdmin[troupe.id] || false
+      admin: this.isAdmin[troupe.id] || false
     };
-  };
-}
+  },
 
-TroupePermissionsStrategy.prototype = {
   name: 'TroupePermissionsStrategy'
 };
 

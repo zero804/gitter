@@ -5,37 +5,38 @@ var roomMembershipService = require('../../../services/room-membership-service')
 var _                     = require("lodash");
 
 function LurkAndActivityForUserStrategy(options) {
-  var currentUserId = options.currentUserId;
-  var roomsWithLurk;
-  var activity;
+  this.currentUserId = options.currentUserId;
+  this.roomsWithLurk = null;
+  this.activity = null
+}
 
-  this.preload = function() {
-    return roomMembershipService.findLurkingRoomIdsForUserId(currentUserId)
+LurkAndActivityForUserStrategy.prototype = {
+  preload: function() {
+    return roomMembershipService.findLurkingRoomIdsForUserId(this.currentUserId)
+      .bind(this)
       .then(function(troupeIds) {
         // Map the lurkers
-        roomsWithLurk = _.reduce(troupeIds, function(memo, troupeId) {
+        this.roomsWithLurk = _.reduce(troupeIds, function(memo, troupeId) {
           memo[troupeId] = true;
           return memo;
         }, {});
 
         // Map the activity indicators
-        return unreadItemService.getActivityIndicatorForTroupeIds(troupeIds, currentUserId);
+        return unreadItemService.getActivityIndicatorForTroupeIds(troupeIds, this.currentUserId);
       })
       .then(function(values) {
-        activity = values;
+        this.activity = values;
       });
-  };
+  },
 
-  this.mapLurkStatus = function(roomId) {
-    return roomsWithLurk[roomId] || false;
-  };
+  mapLurkStatus: function(roomId) {
+    return this.roomsWithLurk[roomId] || false;
+  },
 
-  this.mapActivity = function(roomId) {
-    return activity[roomId];
-  };
-}
+  mapActivity: function(roomId) {
+    return this.activity[roomId];
+  },
 
-LurkAndActivityForUserStrategy.prototype = {
   name: 'LurkAndActivityForUserStrategy'
 };
 

@@ -4,10 +4,12 @@ var troupeService = require('../../../services/troupe-service');
 var _ = require("lodash");
 var Promise = require('bluebird');
 
-var TroupeOwnerIsOrgStrategy = function (){
-  var ownerHash;
+function TroupeOwnerIsOrgStrategy(){
+  this.ownerHash = null;
+}
 
-  this.preload = function(troupes) {
+TroupeOwnerIsOrgStrategy.prototype = {
+  preload: function(troupes) {
     // Use uniq as the list of items will probably be much smaller than the original set,
     // this means way fewer queries to mongodb
     var ownersForQuery = troupes.map(function(troupe){
@@ -22,21 +24,19 @@ var TroupeOwnerIsOrgStrategy = function (){
     return Promise.map(ownersForQuery, function(lcOwner){
         return troupeService.checkGitHubTypeForUri(lcOwner || '', 'ORG');
       })
+      .bind(this)
       .then(function(results) {
-        ownerHash = _.reduce(ownersForQuery, function(memo, lcOwner, index) {
+        this.ownerHash = _.reduce(ownersForQuery, function(memo, lcOwner, index) {
           memo[lcOwner] = results[index];
           return memo;
         }, {});
       });
+  },
 
-  };
+  map: function (troupe) {
+    return !!this.ownerHash[troupe.lcOwner];
+  },
 
-  this.map = function (troupe) {
-    return !!ownerHash[troupe.lcOwner];
-  };
-};
-
-TroupeOwnerIsOrgStrategy.prototype = {
   name: 'TroupeOwnerIsOrgStrategy'
 };
 
