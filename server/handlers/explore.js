@@ -8,6 +8,7 @@ var urlJoin = require('url-join');
 var clientEnv = require('gitter-client-env');
 var contextGenerator = require('../web/context-generator');
 var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
+var featureToggles = require('../web/middlewares/feature-toggles');
 
 var exploreService = require('../services/explore-service');
 var suggestionsService = require('../services/suggestions-service');
@@ -73,6 +74,7 @@ var exploreRedirectStaticTagMap = exploreTagUtils.generateTagMap(FAUX_TAG_MAP);
 var firstTag = exploreRedirectStaticTagMap[Object.keys(exploreRedirectStaticTagMap)[1]];
 router.get('/:tags?',
   identifyRoute('explore-tags-redirect'),
+  featureToggles,
   function (req, res) {
     var inputTags = processTagInput(req.query.search);
 
@@ -89,6 +91,7 @@ router.get('/:tags?',
 
 router.get('/tags/:tags',
   identifyRoute('explore-tags'),
+  featureToggles,
   function(req, res, next) {
     contextGenerator.generateNonChatContext(req).then(function(troupeContext) {
       var user = troupeContext.user;

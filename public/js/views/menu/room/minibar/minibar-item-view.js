@@ -57,11 +57,12 @@ module.exports =  Marionette.ItemView.extend({
   serializeData: function() {
     var data = this.model.toJSON();
     return _.extend({}, data, {
-      isHome:        (data.type === 'all'),
-      isSearch:      (data.type === 'search'),
-      isFavourite:   (data.type === 'favourite'),
-      isPeople:      (data.type === 'people'),
-      isOrg:         (data.type === 'org'),
+      isHome:            (data.type === 'all'),
+      isSearch:          (data.type === 'search'),
+      isFavourite:       (data.type === 'favourite'),
+      isPeople:          (data.type === 'people'),
+      isOrg:             (data.type === 'org'),
+      isCommunityCreate: (data.type === 'community-create'),
       hasUnreadIndicators: (data.type === 'people' || data.type === 'org'),
       avatarSrcset:  resolveRoomAvatar({ uri: data.name }, 23)
     });

@@ -1,0 +1,640 @@
+@import (reference) 'base-zindex-levels';
+@import 'colors';
+@import 'trp3Vars';
+@import 'trp3';
+@import 'typography';
+@import 'base-web';
+
+
+@base-text-color: rgba(255, 255, 255, .8);
+
+
+
+.community-create-root,
+.community-create-app-root {
+  box-sizing: border-box;
+
+  & *,
+  & *:before,
+  & *:after {
+    box-sizing: inherit;
+  }
+}
+
+.community-create-app-root {
+  z-index: @zIndexCommunityCreate;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+
+  pointer-events: none;
+}
+
+// Backbone and our prerendre Isomorphic views work a bit differently
+// in how they put stuff in the wrapper so this just gets around either situation
+.community-create-app-root,
+.community-create-root-inner {
+  width: 100%;
+  height: 100%;
+
+  opacity: 0;
+  pointer-events: none;
+
+  will-change: opacity;
+  transition: opacity .2s ease;
+
+  &.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+.community-create-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+
+  background-color: #753e9c;
+  background-image: url('../images/home/banner.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
+
+  color: @base-text-color;
+}
+
+.community-create-close-button {
+  // To go above the full page step containers
+  z-index: 1;
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  padding: 3rem;
+
+  background-color: transparent;
+  border: 0;
+
+  color: rgba(255, 255, 255, .5);
+  font-size: 4rem;
+
+  transition: color .2s ease;
+
+  &:hover {
+    color: rgba(255, 255, 255, .9);
+  }
+  &:focus {
+    outline: none;
+    color: @jaffa;
+  }
+}
+
+
+.community-create-step-root {
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+
+
+.community-create-step-wrapper {
+  overflow: auto;
+  width: 100%;
+  height: 100%;
+
+  // for inline-block layout
+  text-align: center;
+
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+
+  will-change: transform, opacity;
+  transition:
+    visibility 0s ease .2s,
+    opacity .2s ease,
+    transform .2s ease;
+
+
+  & > .community-create-step-content-area {
+    transform: translateX(200px);
+    transition: transform .2s ease;
+  }
+
+  &.active {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+    .community-create-app-root &,
+    .community-create-root-inner & {
+      pointer-events: none;
+    }
+    .community-create-app-root.active &,
+    .community-create-root-inner.active & {
+      pointer-events: auto;
+    }
+
+    transition:
+      visibility 0s ease 0s,
+      opacity .2s ease,
+      transform .2s ease;
+
+    & > .community-create-step-content-area {
+      transform: translateX(0);
+
+      animation-name: community-create-step-move-in-animation;
+      animation-duration: .2s;
+      animation-timing-function: ease;
+    }
+  }
+
+  &:before {
+    content: '';
+    display: inline-block;
+    vertical-align: middle;
+    height: 100%;
+    margin-right: -0.25em;
+  }
+
+}
+
+.community-create-step-content-area {
+  display: inline-block;
+  display: inline-flex;
+  align-items: flex-end;
+  vertical-align: middle;
+  // reset centering from above
+  text-align: left;
+
+  width: 75%;
+  max-width: 800px;
+  @media (max-width: 800px) {
+    width: 85%;
+  }
+  @media (max-width: 600px) {
+    width: 95%;
+  }
+}
+
+@keyframes community-create-step-move-in-animation {
+  from {
+    transform: translateX(-200px);
+  }
+}
+
+
+.community-create-step-main-body {
+  flex: 1;
+}
+
+.community-create-general-link {
+  color: @ruby;
+}
+
+
+.primary-communtiy-create-horizontal-break {
+  display: block;
+  width: 100%;
+  height: 0;
+
+  background-color: 0;
+  border-top: 0;
+  border-bottom: 2px solid rgba(255, 255, 255, .2);
+}
+
+.primary-bare-input(@font-size: 3.789rem; @border-width: 3px) {
+  width: 100%;
+
+  padding: .9em 0;
+
+  background-color: transparent;
+  border: 0;
+  border-bottom: @border-width solid @ruby;
+  box-shadow: none;
+  border-radius: 0;
+
+  color: @base-text-color;
+  font-size: @font-size;
+
+  &:hover,
+  &:focus {
+    border-color: @jaffa;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: none;
+  }
+}
+
+.secondary-bare-input() {
+  .primary-bare-input(1.6rem, 2px);
+}
+
+
+
+.primary-community-heading {
+  color: #ffffff;
+  margin-bottom: 1.5rem;
+}
+
+.secondary-community-create-button {
+  color: @base-text-color;
+}
+
+
+.primary-tabbed-navigation-list {
+  display: flex;
+
+  margin-top: 0;
+  margin-left: 0;
+  margin-bottom: 0;
+  padding-left: 0;
+  list-style: none;
+
+  font-size: 3rem;
+}
+
+.primary-tabbed-navigation-list-item {
+
+  &:first-child {
+    & > .primary-tabbed-navigation-button {
+      padding-left: 0;
+    }
+  }
+
+  & + & {
+    border-left: 2px solid rgba(255, 255, 255, .4);
+  }
+}
+
+.primary-tabbed-navigation-button {
+  display: block;
+  padding-top: .5em;
+  padding-left: 1em;
+  padding-bottom: .5em;
+  padding-right: 1em;
+
+  background-color: transparent;
+  border: 0;
+
+  color: fade(@base-text-color, 40%);
+  font-size: inherit;
+  font-family: inherit;
+  line-height: 1;
+
+  transition:
+    background-color .2s ease,
+    color .2s ease;
+
+  &:hover,
+  &:focus {
+    color: @base-text-color;
+  }
+  &:focus {
+    background: rgba(255, 255, 255, .08);
+    outline: none;
+  }
+
+  &.active {
+    color: @ruby;
+  }
+}
+
+
+
+.primary-community-name-input,
+.primary-community-repo-name-filter-input,
+.primary-community-invite-people-name-input {
+  .primary-bare-input();
+  margin-top: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+
+
+
+.community-create-next-button {
+  padding-right: 0;
+  text-align: left;
+}
+
+.community-create-back-button {
+  .secondary-community-create-button();
+  padding-left: 0;
+}
+
+
+.community-creation-slug-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 4rem;
+
+  &:after {
+    position: absolute;
+    right: 0;
+
+    content: '\e81a';
+    font-family: 'fontello';
+
+    color: transparent;
+
+    transition: color .2s ease;
+  }
+
+  &:hover {
+    &:after {
+      color: rgba(255, 255, 255, 0.5);
+    }
+  }
+}
+
+.community-creation-slug-input-prefix {
+  margin-right: 0.5rem;
+}
+
+.community-creation-slug-input {
+  .secondary-bare-input();
+  flex: 1;
+}
+
+.community-creation-slug-input-icon {
+
+}
+
+
+.community-creation-sub-room-input-wrapper {
+  display: flex;
+  align-items: baseline;
+}
+
+.community-creation-sub-room-input-prefix {
+  margin-right: .75em;
+}
+
+.community-creation-sub-room-input {
+  .secondary-bare-input();
+  flex: 1;
+}
+
+.community-creation-sub-room-submit-button {
+  padding: .5em;
+
+  background-color: transparent;
+  border: 0;
+
+  color: inherit;
+  font-size: inherit;
+}
+
+
+
+
+.community-create-advanced-options-button-wrapper {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.community-create-advanced-options-button {
+  .secondary-community-create-button();
+  padding-right: 0;
+}
+
+.community-create-advanced-options-section {
+  visibility: hidden;
+  max-height: 0;
+
+    transition:
+      visibility 0s ease .2s,
+      max-height .2s ease;
+
+  &.active {
+    visibility: visible;
+    max-height: 999px;
+
+    transition:
+      visibility 0s ease 0s,
+      max-height .2s ease;
+  }
+}
+
+
+.community-create-github-projects-tabbed-wrapper {
+  position: relative;
+}
+
+.community-create-github-projects-tab-content-area {
+  position: absolute;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+
+  transition:
+    visibility 0s ease .2s,
+    opacity .2s ease;
+
+  &.active {
+    position: relative;
+    visibility: visible;
+    opacity: 1;
+    .community-create-step-wrapper & {
+      pointer-events: none;
+    }
+    .community-create-step-wrapper.active & {
+      pointer-events: auto;
+    }
+
+    transition:
+      visibility 0s ease 0s,
+      opacity .2s ease;
+  }
+}
+
+.community-create-github-project-list-wrapper {
+  overflow: auto;
+  max-height: unit(60 * 4, px);
+
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, .2);
+  }
+  &:hover::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, .4);
+  }
+}
+
+.community-create-org-list,
+.community-create-repo-list {
+  margin-top: 0;
+  margin-left: 0;
+  margin-bottom: 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.community-create-list-item-link {
+  overflow: hidden;
+  display: block;
+
+  color: @base-text-color;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  transition:
+    background-color .2s ease;
+
+  &:focus {
+    background-color: rgba(255, 255, 255, .1);
+    outline: none;
+  }
+}
+
+.community-create-list-item-name {
+
+}
+
+.community-create-org-list-item {
+  margin-top: 1rem;
+  border: 2px solid transparent;
+
+  transition: border-color .2s ease;
+
+  &.active {
+    background-color: rgba(255, 255, 255, .08);
+    border: 2px solid fade(@ruby, 60%);
+  }
+}
+
+
+.community-create-org-list-item-avatar {
+  max-width: 44px;
+  vertical-align: middle;
+  margin-right: 16px;
+}
+
+.community-create-repo-list {
+  column-width: 250px;
+}
+
+.community-create-repo-list-item {
+  margin-top: 8px;
+  border: 2px solid transparent;
+
+  transition: border-color .2s ease;
+
+  &.hidden {
+    display: none;
+  }
+
+  &.active {
+    background-color: rgba(255, 255, 255, .08);
+    border: 2px solid fade(@ruby, 60%);
+  }
+}
+
+.community-create-repo-list-item-avatar {
+  max-width: 22px;
+  vertical-align: middle;
+  margin-right: .3rem;
+}
+
+
+
+
+.community-create-people-list {
+  overflow: auto;
+  max-height: unit(60 * 4, px);
+
+  margin-left: 0;
+  padding-left: 2.5rem;
+
+  list-style: none;
+}
+
+.community-create-people-list-empty-note {
+  color: fade(@base-text-color, 40%);
+  font-size: 1.6rem;
+  font-style: italic;
+}
+
+.community-create-people-list-item {
+  margin-top: 1.5rem;
+}
+
+.community-create-people-list-item-link {
+  .community-create-list-item-link();
+  display: flex;
+  align-items: center;
+
+  &:hover,
+  &:focus {
+    text-decoration: none;
+  }
+}
+
+.community-create-people-list-item-avatar {
+  max-width: 44px;
+  margin-right: 1rem;
+}
+
+
+.community-create-list-item-name {
+  flex: 1;
+}
+
+.community-create-people-list-item-remove-button {
+  background-color: transparent;
+  border: 0;
+
+  color: inherit;
+  font-size: 1em;
+}
+
+
+
+.community-create-overview-community-name {
+  font-size: 2.3rem;
+  font-weight: bold;
+}
+
+.community-create-overview-url-heading {
+  color: fade(@base-text-color, 60%);
+  font-size: 1.8rem;
+  font-weight: normal;
+}
+
+.community-create-overview-github-link {
+  .community-create-general-link();
+}
+
+.community-create-overview-sub-room-heading {
+  font-size: 2rem;
+  font-weight: normal;
+}
+
+.community-create-overview-sub-room-heading-note {
+  display: block;
+  color: fade(@base-text-color, 40%);
+  font-size: .8em;
+  font-style: italic;
+}
+
+.community-create-overview-sub-room-area {
+  margin-top: 2rem;
+}
+
+.community-create-sub-room-list-item-link {
+  color: inherit;
+
+  &:hover,
+  &:focus {
+    outline: none;
+    text-decoration: none;
+  }
+}

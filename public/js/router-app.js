@@ -10,6 +10,8 @@ var Backbone                          = require('backbone');
 var AppLayout                         = require('views/layouts/app-layout');
 var LoadingView                       = require('views/app/loading-view');
 var troupeCollections                 = require('collections/instances/troupes');
+var repoModels                        = require('collections/repos');
+var ReposCollection                   = repoModels.ReposCollection;
 var TitlebarUpdater                   = require('components/titlebar');
 var realtime                          = require('components/realtime');
 var onready                           = require('./utils/onready');
@@ -152,12 +154,15 @@ onready(function() {
   var allRoomsCollection = troupeCollections.troupes;
   new RoomCollectionTracker(allRoomsCollection);
 
+  var repoCollection = new ReposCollection();
+
   var appLayout = new AppLayout({
     template: false,
     el: 'body',
     roomCollection: troupeCollections.troupes,
     //TODO ADD THIS TO MOBILE JP 25/1/16
     orgCollection: troupeCollections.orgs,
+    repoCollection: repoCollection
   });
   appLayout.render();
 
@@ -273,6 +278,10 @@ onready(function() {
         window.location.hash = '#' + message.hash;
       break;
 
+      case 'community-create-view:toggle':
+        appEvents.trigger('community-create-view:toggle', message.active);
+        break;
+
       //when the chat app requests the room list send it
       case 'request:roomList':
         initChatCache();
@@ -386,6 +395,7 @@ onready(function() {
       'createreporoom': 'createreporoom',
       'createroom': 'createroom',
       'confirm/*uri': 'confirmRoom',
+      'createcommunity': 'createCommunity'
     },
 
     hideModal: function() {
@@ -475,6 +485,10 @@ onready(function() {
           uri: uri,
         }));
       });
+    },
+
+    createCommunity: function(uri) {
+      appEvents.trigger('community-create-view:toggle', true);
     },
   });
 
