@@ -60,11 +60,11 @@ describe('troupe-service', function() {
     });
   });
 
-  describe('#findByIdLeanWithAccess', function() {
+  describe('#findByIdLeanWithMembership', function() {
     var troupeService = testRequire('./services/troupe-service');
 
     it('should find a room which exists and the user has access', function(done) {
-      troupeService.findByIdLeanWithAccess(fixture.troupe1.id, fixture.user1.id)
+      troupeService.findByIdLeanWithMembership(fixture.troupe1.id, fixture.user1.id)
         .spread(function(room, access) {
           assert.strictEqual(room.id, fixture.troupe1.id);
           assert.strictEqual(access, true);
@@ -73,7 +73,7 @@ describe('troupe-service', function() {
     });
 
     it('should find a room which exists and the does not have access', function(done) {
-      troupeService.findByIdLeanWithAccess(fixture.troupe2.id, fixture.user1.id)
+      troupeService.findByIdLeanWithMembership(fixture.troupe2.id, fixture.user1.id)
         .spread(function(room, access) {
           assert(room);
           assert.strictEqual(room.id, fixture.troupe2.id);
@@ -84,7 +84,7 @@ describe('troupe-service', function() {
     });
 
     it('should not find a room which does not exist, for a user', function(done) {
-      troupeService.findByIdLeanWithAccess(mongoUtils.getNewObjectIdString(), fixture.user1.id)
+      troupeService.findByIdLeanWithMembership(mongoUtils.getNewObjectIdString(), fixture.user1.id)
         .spread(function(room, access) {
           assert(!room);
           assert(!access);
@@ -93,7 +93,7 @@ describe('troupe-service', function() {
     });
 
     it('should find a room which exists and for anon', function(done) {
-      troupeService.findByIdLeanWithAccess(fixture.troupe2.id, null)
+      troupeService.findByIdLeanWithMembership(fixture.troupe2.id, null)
         .spread(function(room, access) {
           assert(room);
           assert(!access);
@@ -102,7 +102,7 @@ describe('troupe-service', function() {
     });
 
     it('should not find a room which does not exist for anon', function(done) {
-      troupeService.findByIdLeanWithAccess(mongoUtils.getNewObjectIdString(), null)
+      troupeService.findByIdLeanWithMembership(mongoUtils.getNewObjectIdString(), null)
         .spread(function(room, access) {
           assert(!room);
           assert(!access);

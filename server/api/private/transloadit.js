@@ -54,10 +54,10 @@ module.exports = function (req, res, next) {
       return next(new Error('Transload did not return ASSEMBLY_COMPLETED: ok=' + transloadit.ok + ', error=' + transloadit.error + ', message=' + transloadit.message));
     }
 
-    troupeService.findByIdLeanWithAccess(metadata.room_id, metadata.user_id)
-      .spread(function(room, access) {
+    troupeService.findByIdLeanWithMembership(metadata.room_id, metadata.user_id)
+      .spread(function(room, isMember) {
         if(!room) throw new StatusError(404, 'Unable to find room ' + metadata.room_id);
-        if(!access) throw new StatusError(403);
+        if(!isMember) throw new StatusError(403);
 
         return userService.findById(metadata.user_id)
           .then(function (user) {

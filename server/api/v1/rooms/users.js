@@ -21,9 +21,9 @@ function maskEmail(email) {
 }
 
 function getTroupeUserFromId(troupeId, userId) {
-  return troupeService.findByIdLeanWithAccess(troupeId, userId)
-    .spread(function(troupe, access) {
-      if (!access) return;
+  return troupeService.findByIdLeanWithMembership(troupeId, userId)
+    .spread(function(troupe, isMember) {
+      if (!isMember) return;
 
       return userService.findById(userId);
     });
@@ -32,9 +32,9 @@ function getTroupeUserFromId(troupeId, userId) {
 function getTroupeUserFromUsername(troupeId, username) {
   return userService.findByUsername(username)
     .then(function(user) {
-      return troupeService.findByIdLeanWithAccess(troupeId, user.id)
-        .spread(function(troupe, access) {
-          if (!access) return;
+      return troupeService.findByIdLeanWithMembership(troupeId, user.id)
+        .spread(function(troupe, isMember) {
+          if (!isMember) return;
 
           return user;
         });
