@@ -83,6 +83,8 @@ module.exports = (function () {
     },
 
     initCommunityCreateRegion: function() {
+      this.repoCollection.fetch();
+
       this.communityCreateView = new CommunityCreateView({
         el: '.community-create-app-root',
         model: this.communityCreateModel,

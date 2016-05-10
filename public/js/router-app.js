@@ -155,7 +155,6 @@ onready(function() {
   new RoomCollectionTracker(allRoomsCollection);
 
   var repoCollection = new ReposCollection();
-  repoCollection.fetch();
 
   var appLayout = new AppLayout({
     template: false,
