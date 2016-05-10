@@ -107,11 +107,11 @@ function findContextForUri(user, uri, options) {
 
 // TODO: needs work, needs to expose roomMember
 function findContextForId(user, troupeId, readOnly) {
-  return troupeService.findByIdLeanWithAccess(troupeId, user.id)
-    .spread(function(troupe, access) {
+  return troupeService.findByIdLeanWithMembership(troupeId, user.id)
+    .spread(function(troupe, isMember) {
       if (!troupe) throw new StatusError(404);
 
-      if (access) return troupe;
+      if (isMember) return troupe;
 
       if(troupe.security === 'PUBLIC' && readOnly) {
         return troupe;
@@ -122,7 +122,7 @@ function findContextForId(user, troupeId, readOnly) {
         throw new StatusError(401);
       }
 
-      if(!access) {
+      if(!isMember) {
         // if the user **cann** the admin of the room, we still grant access to load the room
         // this enables, for example, editing tags even if you're not in the room
         return roomPermissionsModel(user, 'view', troupe)

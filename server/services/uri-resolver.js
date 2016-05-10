@@ -48,7 +48,7 @@ module.exports = function uriResolver(userId, uri, options) {
       }
 
       if(uriLookup.troupeId) {
-        return troupeService.findByIdLeanWithAccess(uriLookup.troupeId, userId)
+        return troupeService.findByIdLeanWithMembership(uriLookup.troupeId, userId)
           .spread(function(troupe, roomMember) {
             if(!troupe) {
               logger.info('Removing stale uri: ' + uri + ' from URI lookups');

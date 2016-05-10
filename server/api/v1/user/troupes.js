@@ -14,7 +14,7 @@ function performUpdateToUserRoom(req) {
   var userId = req.user.id;
   var troupeId = req.params.userTroupeId;
 
-  return troupeService.findByIdLeanWithAccess(troupeId, req.user && req.user._id)
+  return troupeService.findByIdLeanWithMembership(troupeId, req.user && req.user._id)
     .spread(function(troupe, isMember) {
 
       var updatedTroupe = req.body;

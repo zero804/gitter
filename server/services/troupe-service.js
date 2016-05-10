@@ -50,7 +50,7 @@ function checkIdExists(id) {
 /**
  * [{troupe without users}, userIsInRoom:boolean]
  */
-function findByIdLeanWithAccess(troupeId, userId) {
+function findByIdLeanWithMembership(troupeId, userId) {
   troupeId = mongoUtils.asObjectID(troupeId);
   if (userId) {
     return Promise.join(
@@ -208,7 +208,7 @@ module.exports = {
   checkIdExists: checkIdExists,
   findByIds: findByIds,
   findByIdsLean: findByIdsLean,
-  findByIdLeanWithAccess: findByIdLeanWithAccess,
+  findByIdLeanWithMembership: findByIdLeanWithMembership,
   updateTopic: updateTopic,
   toggleSearchIndexing: toggleSearchIndexing,
   checkGitHubTypeForUri: checkGitHubTypeForUri,
