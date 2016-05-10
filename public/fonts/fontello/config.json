@@ -215,6 +215,18 @@
       "src": "fontawesome"
     },
     {
+      "uid": "11e664deed5b2587456a4f9c01d720b6",
+      "css": "cancel",
+      "code": 59424,
+      "src": "iconic"
+    },
+    {
+      "uid": "5278ef7773e948d56c4d442c8c8c98cf",
+      "css": "lightbulb",
+      "code": 59425,
+      "src": "fontawesome"
+    },
+    {
       "uid": "12af2bcbfe60f39e7a1e835639d38ad8",
       "css": "settings",
       "code": 59396,

@@ -3,6 +3,7 @@
 var env           = require('gitter-web-env');
 var nconf         = env.config;
 var identifyRoute = env.middlewares.identifyRoute;
+var featureToggles = require('../web/middlewares/feature-toggles');
 var express       = require('express');
 var loginUtils    = require('../web/login-utils');
 var social        = require('./social-metadata');
@@ -11,6 +12,7 @@ var router        = express.Router({ caseSensitive: true, mergeParams: true });
 
 router.get(nconf.get('web:homeurl'),
   identifyRoute('homepage'),
+  featureToggles,
   require('../web/middlewares/unawesome-browser'),
   function(req, res, next) {
 
@@ -38,6 +40,8 @@ router.get(nconf.get('web:homeurl'),
     /* i18n doesn't like empty strings. Use a dash as a proxy */
     if (translatedBy === "-") translatedBy = "";
 
+    var hasCommunityCreate = req.fflip && req.fflip.has('community-create');
+
     // when the viewer is not logged in:
     res.render('homepage', {
       bootScriptName: 'homepage',
@@ -49,7 +53,8 @@ router.get(nconf.get('web:homeurl'),
       requestLangLocalName: requestLangLocalName,
       translated: translatedBy,
       socialMetadata: social.getMetadata(),
-      billingBaseUrl: nconf.get('web:billingBaseUrl')
+      billingBaseUrl: nconf.get('web:billingBaseUrl'),
+      hasCommunityCreate: hasCommunityCreate
     });
   });
 

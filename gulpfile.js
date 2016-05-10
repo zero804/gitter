@@ -447,6 +447,7 @@ gulp.task('css-web', function () {
     'public/less/trpHooks.less',
     'public/less/login.less',
     'public/less/explore.less',
+    'public/less/community-create.less',
     'public/less/router-chat.less',
     'public/less/router-app.less',
     'public/less/router-nli-app.less',
@@ -565,8 +566,8 @@ gulp.task('default', function(callback) {
  * watch
  */
 gulp.task('watch', ['css'], function() {
-  livereload.listen();
-  gulp.watch('public/**/*.less', ['css']).on('change', livereload.changed);
+  //livereload.listen();
+  gulp.watch('public/**/*.less', ['css'])/*.on('change', livereload.changed)*/;
 });
 
 

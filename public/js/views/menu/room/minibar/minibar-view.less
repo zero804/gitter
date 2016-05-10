@@ -1,14 +1,16 @@
-@import '../../../../../less/components/menu/menu.less';
+@import (reference) "base-zindex-levels";
+@import 'components/menu/menu.less';
 
-@minibar-top-offset:    (@desktop-header-height * 3);
+@minibar-top-offset: (3 * @desktop-header-height);
 @minibar-bottom-offset: @desktop-header-height;
+@minibar-bottom-offset-with-community-create: (2 * @desktop-header-height);
 
 
 .room-menu-container {
   position:   relative;
   height:     100%;
   background: @menu-bg;
-  z-index:    101;
+  z-index:    @zIndexLeftMenu;
 
   .mobile & {
     width: @mobile-menu-width;
@@ -52,6 +54,10 @@
   top: @minibar-top-offset;
   bottom: @minibar-bottom-offset;
   height: auto;
+
+  &.has-community-create {
+    bottom: @minibar-bottom-offset-with-community-create;
+  }
 
   & > .nano-pane {
     left: auto;
@@ -201,6 +207,13 @@
   }
 }
 
+.room-menu-options__item--community-create {
+  .room-menu-options__item();
+  position:   fixed;
+  bottom:     @desktop-header-height;
+  left:       0;
+}
+
 .room-menu-options__item--close {
   .room-menu-options__item();
   color: @org-bg;
@@ -259,17 +272,22 @@
 
 
 .room-menu-options__item__avatar  {
+  z-index:       2;
   position:      relative;
   width:         2.34rem;
   height:        2.34rem;
   margin:        auto;
-  z-index:       2;
+
   border-radius: .2rem;
 
   .mobile & {
     width: 1.4rem;
     height: 1.4rem;
   }
+}
+
+.room-menu-options__item__community-create-icon {
+  font-size: 2.4rem;
 }
 
 
