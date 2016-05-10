@@ -11,10 +11,6 @@ var CommunityCreateStepViewModel = require('./community-create-step-view-model')
 var CommunityCreateGitHubProjectsStepViewModel = require('./community-create-github-projects-step-view-model');
 
 var ActiveCollection = require('./active-collection');
-var troupeCollections = require('collections/instances/troupes');
-var orgsCollection = troupeCollections.orgs;
-var repoModels = require('collections/repos');
-var ReposCollection = repoModels.ReposCollection;
 
 var CommunityCreationMainView = require('./views/community-creation-main-view');
 var CommunityCreationGithubProjectsView = require('./views/community-creation-github-projects-view');
@@ -55,8 +51,8 @@ module.exports = Marionette.LayoutView.extend({
     this.githubProjectsStepView = new CommunityCreationGithubProjectsView(optionsForRegion({
       model: this.githubProjectsStepViewModel,
       communityCreateModel: this.model,
-      orgsCollection: this.orgsCollection,
-      reposCollection: this.reposCollection
+      orgCollection: this.orgCollection,
+      repoCollection: this.repoCollection
     }));
     return this.githubProjectsStepView;
   },
@@ -73,8 +69,8 @@ module.exports = Marionette.LayoutView.extend({
     this.overviewStepView = new CommunityCreationOverviewView(optionsForRegion({
       model: this.overviewStepViewModel,
       communityCreateModel: this.model,
-      orgsCollection: this.orgsCollection,
-      reposCollection: this.reposCollection
+      orgsCollection: this.orgCollection,
+      reposCollection: this.repoCollection
     }));
     return this.overviewStepView;
   },
@@ -88,15 +84,16 @@ module.exports = Marionette.LayoutView.extend({
     'change:stepState': 'onStepChangeState'
   },
 
-  initialize: function() {
-    this.orgsCollection = new ActiveCollection(orgsCollection.models, {
-      collection: orgsCollection
+  initialize: function(options) {
+    var orgCollection = options.orgCollection;
+    var repoCollection = options.repoCollection;
+
+    this.orgCollection = new ActiveCollection(orgCollection.models, {
+      collection: orgCollection
     });
 
-    var backingReposCollection = new ReposCollection();
-    backingReposCollection.fetch();
-    this.reposCollection = new ActiveCollection(backingReposCollection.models, {
-      collection: backingReposCollection
+    this.repoCollection = new ActiveCollection(repoCollection.models, {
+      collection: repoCollection
     });
 
     this.mainStepViewModel = new CommunityCreateStepViewModel({ active: true });

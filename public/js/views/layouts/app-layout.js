@@ -63,9 +63,10 @@ module.exports = (function () {
     },
 
     initialize: function (options) {
-      this.roomCollection          = options.roomCollection;
-      this.orgCollection           = options.orgCollection;
-      this.dialogRegion            = modalRegion;
+      this.roomCollection = options.roomCollection;
+      this.orgCollection  = options.orgCollection;
+      this.repoCollection = options.repoCollection
+      this.dialogRegion   = modalRegion;
 
       this.communityCreateModel = new CommunityCreateModel();
       this.hasRenderedCommunityCreateView = false;
@@ -84,7 +85,9 @@ module.exports = (function () {
     initCommunityCreateRegion: function() {
       this.communityCreateView = new CommunityCreateView({
         el: '.community-create-app-root',
-        model: this.communityCreateModel
+        model: this.communityCreateModel,
+        orgCollection: this.orgCollection,
+        repoCollection: this.repoCollection
       });
       return this.communityCreateView;
     },
