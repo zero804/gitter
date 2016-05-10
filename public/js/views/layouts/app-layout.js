@@ -11,6 +11,9 @@ var isMobile   = require('utils/is-mobile');
 //NEW LEFT MENU
 var RoomMenuLayout    = require('../menu/room/layout/room-menu-layout');
 
+var CommunityCreateModel = require('../community-create/community-create-model');
+var CommunityCreateView = require('../community-create/community-create-view');
+
 var oldIsoProps = {
   menu: { el: "#menu-region", init: 'initMenuRegion' }
   //RoomMenuLayout: { el: '#room-menu-container', init: 'initNewMenuRegion' }
@@ -28,34 +31,18 @@ module.exports = (function () {
     el: 'body',
 
     behaviors: function(){
+      var behaviors = {
+        Isomorphic: {}
+      };
+
       if(isMobile() || !context.hasFeature('left-menu')) {
-        return { Isomorphic: {
-          menu: { el: "#menu-region", init: 'initMenuRegion' }
-        }};
+        behaviors.Isomorphic.menu = { el: "#menu-region", init: 'initMenuRegion' }
       }
       else {
-        return { Isomorphic: {
-          RoomMenuLayout: { el: '#room-menu-container', init: 'initNewMenuRegion' }
-        }};
+        behaviors.Isomorphic.RoomMenuLayout = { el: '#room-menu-container', init: 'initNewMenuRegion' };
       }
-    },
 
-    events: {
-      "keydown": "onKeyDown",
-    },
-
-    initialize: function (options) {
-      this.roomCollection          = options.roomCollection;
-      this.orgCollection           = options.orgCollection;
-      this.dialogRegion            = modalRegion;
-
-      //Mobile events don't seem to bind 100% of the time so lets use a native method
-      var menuHotspot = document.querySelector('.menu__hotspot');
-      if(menuHotspot) {
-        menuHotspot.addEventListener('click', function(){
-          this.fireEventToggleMobileMenu();
-        }.bind(this));
-      }
+      return behaviors;
     },
 
     initMenuRegion: function (optionsForRegion){
@@ -71,6 +58,43 @@ module.exports = (function () {
       return this.menuRegion;
     },
 
+    events: {
+      "keydown": "onKeyDown",
+    },
+
+    initialize: function (options) {
+      this.roomCollection = options.roomCollection;
+      this.orgCollection  = options.orgCollection;
+      this.repoCollection = options.repoCollection
+      this.dialogRegion   = modalRegion;
+
+      this.communityCreateModel = new CommunityCreateModel();
+      this.hasRenderedCommunityCreateView = false;
+
+      //Mobile events don't seem to bind 100% of the time so lets use a native method
+      var menuHotspot = document.querySelector('.menu__hotspot');
+      if(menuHotspot) {
+        menuHotspot.addEventListener('click', function(){
+          this.fireEventToggleMobileMenu();
+        }.bind(this));
+      }
+
+      this.listenTo(appEvents, 'community-create-view:toggle', this.onCommunityCreateToggle, this);
+    },
+
+    initCommunityCreateRegion: function() {
+      this.repoCollection.fetch();
+
+      this.communityCreateView = new CommunityCreateView({
+        el: '.community-create-app-root',
+        model: this.communityCreateModel,
+        orgCollection: this.orgCollection,
+        repoCollection: this.repoCollection
+      });
+      return this.communityCreateView;
+    },
+
+
     onKeyDown: function(e) {
       if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
@@ -85,9 +109,18 @@ module.exports = (function () {
       return this.menuRegion.getModel();
     },
 
-
     fireEventToggleMobileMenu: function() {
       appEvents.trigger('menu:show');
+    },
+
+    onCommunityCreateToggle: function(active) {
+      if(!this.hasRenderedCommunityCreateView) {
+        var communityCreateView = this.initCommunityCreateRegion();
+        communityCreateView.render();
+      }
+      this.communityCreateModel.set('active', active);
+
+      this.hasRenderedCommunityCreateView = true;
     }
 
   });
