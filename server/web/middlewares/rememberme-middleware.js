@@ -21,6 +21,8 @@ var redisClient = env.redis.getClient();
 var tokenGracePeriodMillis = 5000; /* How long after a token has been used can you reuse it? */
 var timeToLiveDays = nconf.get("web:rememberMeTTLDays");
 
+var REMEMBER_ME_PREFIX = "rememberme:";
+
 function generateAuthToken(userId) {
   var key = uuid.v4();
   var token = uuid.v4();
@@ -33,7 +35,7 @@ function generateAuthToken(userId) {
 
       /* The server doesn't keep a copy of the token anywhere, only the hash */
       return Promise.fromCallback(function(callback) {
-        redisClient.setex("rememberme:" + key, 60 * 60 * 24 * timeToLiveDays, json, callback);
+        redisClient.setex(REMEMBER_ME_PREFIX + key, 60 * 60 * 24 * timeToLiveDays, json, callback);
       });
     })
     .return([key, token]);
@@ -75,7 +77,6 @@ var deleteAuthToken = Promise.method(function(authCookieValue) {
   var redisKey = "rememberme:" + key;
 
   return Promise.fromCallback(function(callback) {
-    /* After the rememberme token has been used, it will expire in 5 seconds */
     redisClient.del(redisKey, callback);
   });
 });
@@ -95,7 +96,7 @@ var validateAuthToken = Promise.method(function(authCookieValue) {
 
   debug('Client has presented a rememberme auth cookie, attempting reauthentication: %s', key);
 
-  var redisKey = "rememberme:" + key;
+  var redisKey = REMEMBER_ME_PREFIX + key;
 
   return Promise.fromCallback(function(callback) {
       return redisClient.multi()
@@ -150,26 +151,24 @@ module.exports = {
   },
 
   rememberMeMiddleware: Promise.method(function(req, res, next) {
-    /* If the user is logged in, no problem */
+    /* If the user is logged in or doesn't have cookies, continue */
     if (req.user || !req.cookies || !req.cookies[cookieName]) return next();
 
     return Promise.try(function() {
         return validateAuthToken(req.cookies[cookieName]);
       })
       .then(function(userId) {
+        if (!userId) return;
         return userService.findById(userId);
       })
       .then(function(user) {
         if (!user) return;
 
         /* No token, no touch */
-        if(userScopes.isMissingTokens(user)) {
-          return;
-        }
+        if(userScopes.isMissingTokens(user)) return;
 
         // Remove the old token for this user
         req.accessToken = null;
-        if(req.session) req.session.accessToken = null;
 
         // Tracking
         var properties = useragentTagger(req.headers['user-agent']);
@@ -199,6 +198,7 @@ module.exports = {
       .tap(function(user) {
         if (!user) {
           res.clearCookie(cookieName, { domain: nconf.get("web:cookieDomain") });
+          stats.event("rememberme_rejected");
         }
       })
       .catch(function(err) {

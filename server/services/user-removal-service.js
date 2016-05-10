@@ -36,9 +36,9 @@ exports.removeByUsername = function(username, options) {
           user.state = 'REMOVED';
           user.email = undefined;
           user.invitedEmail = undefined;
-          this.githubToken = null;
-          this.githubScopes = { };
-          this.githubUserToken = null;
+          user.githubToken = null;
+          user.githubScopes = { };
+          user.githubUserToken = null;
 
           // TODO: remove user from intercom etc
 
