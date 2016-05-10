@@ -3,25 +3,27 @@
 var recentRoomCore = require('../../../services/core/recent-room-core');
 
 function FavouriteTroupesForUserStrategy(options) {
-  var self = this;
-  var userId = options.userId || options.currentUserId;
-
-  this.preload = function() {
-    return recentRoomCore.findFavouriteTroupesForUser(userId)
-      .then(function(favs) {
-        self.favs = favs;
-      });
-  };
-
-  this.map = function(id) {
-    var favs = self.favs[id];
-    if (!favs) return undefined;
-    if (favs === '1') return 1000;
-    return favs;
-  };
+  this.userId = options.userId || options.currentUserId;
+  this.favs = null;
 }
 
 FavouriteTroupesForUserStrategy.prototype = {
+  preload: function() {
+    return recentRoomCore.findFavouriteTroupesForUser(this.userId)
+      .bind(this)
+      .then(function(favs) {
+        this.favs = favs;
+      });
+  },
+
+  map: function(id) {
+    var favs = this.favs[id];
+    if (!favs) return undefined;
+
+    if (favs === '1') return 1000;
+    return favs;
+  },
+
   name: 'FavouriteTroupesForUserStrategy'
 };
 

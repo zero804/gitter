@@ -2,14 +2,16 @@
 
 var billingService = require('../../../services/billing-service');
 
+function getOwner(uri) {
+  return uri.split('/', 1).shift();
+}
+
 function ProOrgStrategy() {
-  var proOrgs = {};
+  this.proOrgs = null;
+}
 
-  function getOwner(uri) {
-    return uri.split('/', 1).shift();
-  }
-
-  this.preload = function(troupes) {
+ProOrgStrategy.prototype = {
+  preload: function(troupes) {
     var uris = troupes.map(function(troupe) {
         if (!troupe.uri) return; // one-to-one
         return getOwner(troupe.uri);
@@ -20,20 +22,24 @@ function ProOrgStrategy() {
       .uniq();
 
     return billingService.findActiveOrgPlans(uris.toArray())
+      .bind(this)
       .then(function(subscriptions) {
+        var proOrgs = {};
         subscriptions.forEach(function(subscription) {
           proOrgs[subscription.uri.toLowerCase()] = !!subscription;
         });
-      });
-  };
 
-  this.map = function(troupe) {
+        this.proOrgs = proOrgs;
+      });
+  },
+
+  map: function(troupe) {
     if (!troupe || !troupe.uri) return undefined;
+
     var owner = getOwner(troupe.uri).toLowerCase();
-    return proOrgs[owner];
-  };
-}
-ProOrgStrategy.prototype = {
+    return this.proOrgs[owner];
+  },
+
   name: 'ProOrgStrategy'
 };
 

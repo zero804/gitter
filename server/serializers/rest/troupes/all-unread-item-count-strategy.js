@@ -3,22 +3,24 @@
 var unreadItemService = require('../../../services/unread-items');
 
 function AllUnreadItemCountStrategy(options) {
-  var self = this;
-  var userId = options.userId || options.currentUserId;
-
-  this.preload = function(troupeIds) {
-    return unreadItemService.getUserUnreadCountsForTroupeIds(userId, troupeIds.toArray())
-      .then(function(result) {
-        self.unreadCounts = result;
-      });
-  };
-
-  this.map = function(id) {
-    return self.unreadCounts[id] ? self.unreadCounts[id] : 0;
-  };
+  this.userId = options.userId || options.currentUserId;
+  this.unreadCounts = null;
 }
 
 AllUnreadItemCountStrategy.prototype = {
+  preload: function(troupeIds) {
+    return unreadItemService.getUserUnreadCountsForTroupeIds(this.userId, troupeIds.toArray())
+      .bind(this)
+      .then(function(result) {
+        this.unreadCounts = result;
+      });
+  },
+
+  map: function(id) {
+    var count = this.unreadCounts[id];
+    return count || 0;
+  },
+
   name: 'AllUnreadItemCountStrategy'
 };
 

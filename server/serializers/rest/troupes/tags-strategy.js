@@ -1,14 +1,13 @@
 "use strict";
 
 function TagsStrategy() {
-  this.preload = function() { };
-
-  this.map = function(room) {
-    return room.tags || [];
-  };
 }
 
 TagsStrategy.prototype = {
+  preload: function() { },
+  map: function(room) {
+    return room.tags || [];
+  },
   name: 'TagsStrategy'
 };
 

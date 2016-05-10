@@ -4,37 +4,39 @@ var roomMembershipService = require('../../../services/room-membership-service')
 var collections = require('../../../utils/collections');
 
 function RoomMembershipStrategy(options) {
-  var userId = options.userId || options.currentUserId;
-  var nonMemberTroupeIds = options.nonMemberTroupeIds && collections.hashArray(options.nonMemberTroupeIds);
-  var predefinedValue = options.isRoomMember !== undefined;
-  var memberships;
-
-  this.preload = function(troupeIds) {
-    // Shortcut logic
-    if (nonMemberTroupeIds || predefinedValue) {
-      return;
-    }
-
-    return roomMembershipService.findUserMembershipInRooms(userId, troupeIds.toArray())
-      .then(function(memberTroupeIds) {
-        memberships = collections.hashArray(memberTroupeIds);
-      });
-  };
-
-  this.map = function(id) {
-    if (predefinedValue) {
-      return options.isRoomMember;
-    }
-
-    if (nonMemberTroupeIds) {
-      return !nonMemberTroupeIds[id]; // Negate
-    }
-
-    return !!memberships[id];
-  };
+  this.userId = options.userId || options.currentUserId;
+  this.nonMemberTroupeIds = options.nonMemberTroupeIds && collections.hashArray(options.nonMemberTroupeIds);
+  this.predefinedValue = options.isRoomMember !== undefined;
+  this.isRoomMember = options.isRoomMember;
+  this.memberships = null;
 }
 
 RoomMembershipStrategy.prototype = {
+  preload: function(troupeIds) {
+    // Shortcut logic
+    if (this.nonMemberTroupeIds || this.predefinedValue) {
+      return;
+    }
+
+    return roomMembershipService.findUserMembershipInRooms(this.userId, troupeIds.toArray())
+      .bind(this)
+      .then(function(memberTroupeIds) {
+        this.memberships = collections.hashArray(memberTroupeIds);
+      });
+  },
+
+  map: function(id) {
+    if (this.predefinedValue) {
+      return this.isRoomMember;
+    }
+
+    if (this.nonMemberTroupeIds) {
+      return !this.nonMemberTroupeIds[id]; // Negate
+    }
+
+    return !!this.memberships[id];
+  },
+
   name: 'AllUnreadItemCountStrategy'
 };
 
