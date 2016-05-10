@@ -39,7 +39,7 @@ function installApi() {
             /* This will be converted to null in auth-api.js */
             user = { _anonymous: true };
           }
-          // Not yet needed var accessToken = tokenInfo.accessToken;
+
           return [user, { client: client, accessToken: accessToken }];
         })
         .asCallback(done, { spread: true });
