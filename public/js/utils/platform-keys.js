@@ -10,7 +10,7 @@ module.exports = (function() {
   switch(platformDetect()) {
     case 'Mac': return {
       cmd: '⌘',
-      room: context.hasFeature('left-menu') ? 'alt' : 'ctrl',
+      room: 'ctrl',
       gitter: 'ctrl'
     };
     case 'Windows': return {

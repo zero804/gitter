@@ -104,9 +104,6 @@ module.exports = (function() {
     'enter': [{
       name: 'search.go',
       scope: 'input.search'
-      },{
-      name: 'room.enter',
-      scope: 'other'
     },{
       name: 'chat.compose.auto',
       scope: 'input.chat'
@@ -205,13 +202,20 @@ module.exports = (function() {
   keyEvents[cmdKey + '+' + gitterKey + '+m'] = 'help.markdown';
   keyEvents[cmdKey + '+' + gitterKey + '+k'] = 'help.keyboard';
 
-  if(!context.hasFeature('left-menu')) {
+
+  if(context.hasFeature('left-menu')) {
+    keyEvents[cmdKey + '+' + roomKey + '+up'] = 'left-menu.prev';
+    keyEvents[cmdKey + '+' + roomKey + '+down'] = 'left-menu.next';
+    keyEvents[cmdKey + '+' + roomKey + '+left'] = 'focus.minibar';
+    keyEvents[cmdKey + '+' + roomKey + '+right'] = 'focus.room-list';
+  }
+  else {
     keyEvents[cmdKey + '+' + roomKey + '+up'] = 'room.up';
     keyEvents[cmdKey + '+' + roomKey + '+down'] = 'room.down';
     // keyEvents[cmdKey + '+' + roomKey + '+left'] = 'room.prev';
     // keyEvents[cmdKey + '+' + roomKey + '+right'] = 'room.next';
+    keyEvents[cmdKey + '+' + roomKey + '+enter'] = 'room.enter';
   }
-  keyEvents[cmdKey + '+' + roomKey + '+enter'] = 'room.enter';
 
   if(context.hasFeature('left-menu')) {
     // Go to a conversation by index in list
