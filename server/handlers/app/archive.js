@@ -10,7 +10,6 @@ var heatmapService          = require('../../services/chat-heatmap-service');
 var restSerializer          = require('../../serializers/rest-serializer');
 var contextGenerator        = require('../../web/context-generator');
 var Promise                 = require('bluebird');
-var roomService             = require('../../services/room-service');
 var burstCalculator         = require('../../utils/burst-calculator');
 var roomPermissionsModel    = require('gitter-web-permissions/lib/room-permissions-model');
 var timezoneMiddleware      = require('../../web/middlewares/timezone');
