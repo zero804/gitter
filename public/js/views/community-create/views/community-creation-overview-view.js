@@ -23,7 +23,7 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   behaviors: {
     Isomorphic: {
-      subRoomListView: { el: '.community-create-sub-room-list-root', init: 'initSubRoomListView' },
+      //subRoomListView: { el: '.community-create-sub-room-list-root', init: 'initSubRoomListView' },
       inviteListView: { el: '.community-create-invite-list-root', init: 'initInviteListView' },
     },
   },
