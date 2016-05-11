@@ -100,11 +100,33 @@ function log(batch, enc, callback) {
     errors.push('owners');
   }
 
-  if (uniqueParentIds.length > 1) {
+  // all unique room ids in this batch
+  var idMap = {};
+  batch.rooms.forEach(function(room) {
+    idMap[room._id] = true;
+  });
+
+  // gather info
+  var missingParentIdMap = {}
+  var ownerUserIdMap = {};
+  batch.rooms.forEach(function(room) {
+    if (room.parentId && !idMap[room.parentId]) {
+      missingParentIdsMap[room.parentId] = true;
+    }
+    if (room.ownerUserId) {
+      ownerUserIdMap[room.ownerUserId] = true;
+    }
+  });
+
+  // all non-null, non-undefined parentIds MUST be in this batch
+  var missingParentIds = Object.keys(missingParentIdMap);
+  if (missingParentIds.length) {
     errors.push('parentIds');
   }
 
-  if (uniqueOwnerUserIds.length > 1) {
+  // only one unique, non-null, non-undefined ownerUserId is allowed per batch
+  var ownerUserIds = Object.keys(ownerUserIdMap);
+  if (ownerUserIds.length > 1) {
     errors.push('ownerUserIds');
   }
 
