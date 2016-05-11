@@ -176,7 +176,7 @@ function run(f, callback) {
     })
 }
 
-function done(err) {
+function done(error) {
   if (error) {
     console.error(error);
     console.error(error.stack);
