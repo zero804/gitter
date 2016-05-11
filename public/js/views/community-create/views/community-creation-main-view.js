@@ -50,10 +50,16 @@ module.exports = CommunityCreateBaseStepView.extend({
     communityNameInput: '.primary-community-name-input',
     communitySlugInput: '.community-creation-slug-input',
     githubProjectLink: '.js-community-create-from-github-project-link',
-    advancedOptionsButton: '.js-community-create-advanced-options-toggle',
-    advancedOptionsArea: '.community-create-advanced-options-section',
-    subRoomNameInput: '.community-creation-sub-room-input',
-    subRoomSubmitButton: '.community-creation-sub-room-submit-button',
+
+    addAssociatedProjectCopy: '.js-community-create-add-associated-project-copy',
+    hasAssociatedProjectCopy: '.js-community-create-has-associated-project-copy',
+    associatedProjectLink: '.js-community-create-associated-project-link',
+    associatedProjectName: '.js-community-create-associated-project-name',
+
+    //advancedOptionsButton: '.js-community-create-advanced-options-toggle',
+    //advancedOptionsArea: '.community-create-advanced-options-section',
+    //subRoomNameInput: '.community-creation-sub-room-input',
+    //subRoomSubmitButton: '.community-creation-sub-room-submit-button',
     //subRoomInputPrefix: '.community-creation-sub-room-input-prefix'
   }),
 
@@ -62,6 +68,7 @@ module.exports = CommunityCreateBaseStepView.extend({
     'input @ui.communityNameInput': 'onCommunityNameInputChange',
     'input @ui.communitySlugInput': 'onCommunitSlugInputChange',
     'click @ui.githubProjectLink': 'onGitHubProjectLinkActivated',
+
     'click @ui.advancedOptionsButton': 'onAdvancedOptionsToggle',
     'click @ui.subRoomSubmitButton': 'onSubRoomSubmit'
   }),
@@ -70,8 +77,11 @@ module.exports = CommunityCreateBaseStepView.extend({
     'change:communityName': 'updateCommunityFields'
   }),
 
-  initialize: function() {
+  initialize: function(options) {
     CommunityCreateBaseStepView.prototype.initialize.apply(this, arguments);
+
+    this.orgCollection = options.orgCollection;
+    this.repoCollection = options.repoCollection;
 
     this.listenTo(this.communityCreateModel, 'change:communityName', this.updateCommunityFields, this);
     this.listenTo(this.communityCreateModel, 'change:communitySlug', this.updateCommunityFields, this);
@@ -96,6 +106,12 @@ module.exports = CommunityCreateBaseStepView.extend({
     updateElementValueAndMaintatinSelection(this.ui.communityNameInput[0], communityName);
     updateElementValueAndMaintatinSelection(this.ui.communitySlugInput[0], communitySlug);
     //this.ui.subRoomInputPrefix[0].textContent = communityName + ' /';
+
+    var githubProjectInfo = this.communityCreateModel.getGithubProjectInfo(this.orgCollection, this.repoCollection);
+    this.ui.associatedProjectName[0].textContent = githubProjectInfo.name;
+    this.ui.associatedProjectLink[0].setAttribute('href', githubProjectInfo.link);
+    toggleClass(this.ui.addAssociatedProjectCopy[0], 'active', !githubProjectInfo.name);
+    toggleClass(this.ui.hasAssociatedProjectCopy[0], 'active', !!githubProjectInfo.name);
   },
 
   onCommunityNameInputChange: function() {

@@ -1,6 +1,7 @@
 'use strict';
 
 var Backbone = require('backbone');
+var urlJoin = require('url-join');
 
 var STEP_CONSTANT_MAP = {
   main: 'main',
@@ -31,6 +32,28 @@ var CommunityCreateModel = Backbone.Model.extend({
 
   initialize: function() {
 
+  },
+
+  getGithubProjectInfo: function(orgCollection, repoCollection) {
+    var info = {
+      name: null,
+      url: null
+    };
+
+    var githubOrgId = this.get('githubOrgId');
+    var githubRepoId = this.get('githubRepoId');
+    if(githubOrgId) {
+      var githubOrgModel = orgCollection.get(githubOrgId);
+      info.name = githubOrgModel.get('name');
+      info.url = urlJoin('https://github.com', githubOrgModel.get('name'));
+    }
+    else if(githubRepoId) {
+      var githubRepoModel = repoCollection.get(githubRepoId);
+      info.name = githubRepoModel.get('name');
+      info.url = urlJoin('https://github.com', githubRepoModel.get('uri'));
+    }
+
+    return info;
   }
 });
 
