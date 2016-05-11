@@ -1,54 +1,53 @@
 <div class="community-create-step-content-area">
-  <div class="community-create-step-main-body">
-    <h1 class="primary-community-heading h1">
-      Overview
-    </h1>
+  <h1 class="primary-community-heading h1">
+    Overview
+  </h1>
 
-    <div>
-      <h3 class="community-create-overview-community-name">{{ communityName }}</h3>
-      <h4 class="community-create-overview-url-heading">
-        <span class="community-create-overview-url-heading-prefix">gitter.im/</span><span class="community-create-overview-url-heading-slug"></span>
-      </h4>
+  <div>
+    <h3 class="community-create-overview-community-name">{{ communityName }}</h3>
+    <h4 class="community-create-overview-url-heading">
+      <span class="community-create-overview-url-heading-prefix">gitter.im/</span><span class="community-create-overview-url-heading-slug"></span>
+    </h4>
 
-      <a href="{{ githubLink }}" target="_blank" class="community-create-overview-github-link {{when githubLink '' 'hidden'}}">
-        &rdsh;
-        <i class="icon-github-circled"></i>
-        <span class="community-create-overview-github-name">{{ githubName }}</span>
-      </a>
-    </div>
-
-    {{!--
-    <div class="community-create-overview-sub-room-area">
-      <h3 class="community-create-overview-sub-room-heading">
-        Some sub-rooms in your community
-        <span class="community-create-overview-sub-room-heading-note">
-          (you can add more later)
-        </span>
-      </h3>
-
-      <div class="community-create-sub-room-list-root"></div>
-    </div>
-    --}}
-
-
-    <hr class="primary-communtiy-create-horizontal-break" />
-
-    <h2>
-      People to invite
-    </h2>
-
-    <div class="community-create-invite-list-root"></div>
-
-
-    <section>
-      <button class="community-create-back-button secondary-button-clouds js-community-create-step-back">
-        Back
-      </button>
-    </section>
+    <a href="{{ githubLink }}" target="_blank" class="community-create-overview-github-link {{when githubLink '' 'hidden'}}">
+      &rdsh;
+      <i class="icon-github-circled"></i>
+      <span class="community-create-overview-github-name">{{ githubName }}</span>
+    </a>
   </div>
 
-  <button class="community-create-next-button secondary-button-caribbean js-community-create-step-next">
-    Create and<br />
-    Finish
-  </button>
+  {{!--
+  <div class="community-create-overview-sub-room-area">
+    <h3 class="community-create-overview-sub-room-heading">
+      Some sub-rooms in your community
+      <span class="community-create-overview-sub-room-heading-note">
+        (you can add more later)
+      </span>
+    </h3>
+
+    <div class="community-create-sub-room-list-root"></div>
+  </div>
+  --}}
+
+
+  <hr class="primary-communtiy-create-horizontal-break" />
+
+  <h2>
+    People to invite
+  </h2>
+
+  <div class="community-create-invite-list-root"></div>
+
+
+
+  <section class="community-create-progression-button-wrapper">
+    <button class="community-create-back-button secondary-button-clouds js-community-create-step-back">
+      Back
+    </button>
+
+    <button class="community-create-next-button secondary-button-caribbean js-community-create-step-next">
+      Create and Finish
+    </button>
+  </section>
+
 </div>
