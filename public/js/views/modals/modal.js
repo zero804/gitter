@@ -67,6 +67,7 @@ var ModalView = Marionette.LayoutView.extend({
             v.select();
           }
         } catch(e) {
+          /* */
         }
       }, 100);
 
@@ -149,7 +150,7 @@ var ModalView = Marionette.LayoutView.extend({
     });
   },
 
-  hide: function ( e ) {
+  hide: function (e) {
     if(e) e.preventDefault();
     if(this.navigable) {
       window.location = '#';
@@ -199,7 +200,7 @@ var ModalView = Marionette.LayoutView.extend({
 
       var bd = this.$backdrop;
       this.$backdrop.click(function(e) {
-        if( e.target !== this ) return;
+        if(e.target !== this) return;
         bd.modal.hide();
       });
       this.$backdrop.modal = this;
@@ -229,7 +230,7 @@ var ModalView = Marionette.LayoutView.extend({
       $(document).off('keydown', keydown);
     }
 
-    function keydown( e ) {
+    function keydown(e) {
       if(e.which == 27) that.hide();
     }
 

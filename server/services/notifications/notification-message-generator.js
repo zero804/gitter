@@ -1,4 +1,3 @@
-/* jshint node:true */
 "use strict";
 
 
@@ -27,7 +26,6 @@ Mike: ?
 
 var MAX_NOTIFICATION_TEXT = 1024;
 var LAST_LINE_MIN_LENGTH = 30;
-var MAX_LINES = 3;
 
 var ent = require('ent');
 

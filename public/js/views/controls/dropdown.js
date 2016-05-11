@@ -44,6 +44,9 @@ module.exports = (function() {
       if(options && options.template) {
         this.template = options.template;
       }
+      if(options && options.serializeData) {
+        this.serializeData = options.serializeData;
+      }
     },
     className: function() {
       if(this.model.get('divider')) {
@@ -91,6 +94,9 @@ module.exports = (function() {
       var options = {};
       if(this.options.itemTemplate) {
         options.template = this.options.itemTemplate;
+      }
+      if(this.options.itemSerializeData) {
+        options.serializeData = this.options.itemSerializeData;
       }
       return options;
     },

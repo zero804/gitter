@@ -58,6 +58,42 @@ describe('mongo-utils', function() {
     assert.equal(t, 1370344769000);
   });
 
+  describe('objectIDsEqual', function() {
+    var FIXTURES = [
+      // Nulls
+      { a: null, b: null, result: true },
+      { a: null, b: '', result: true },
+      { a: '', b: null, result: true },
+      { a: null, b: '571f97883f33e1a227b8ab85', result: false },
+      { a: '571f97883f33e1a227b8ab85', b: null, result: false },
+      { a: new ObjectID('571f97883f33e1a227b8ab85'), b: null, result: false },
+      { a: null, b: new ObjectID('571f97883f33e1a227b8ab85'), result: false },
+
+      // Empty Strings
+      { a: '', b: '', result: true },
+      { a: '571f97883f33e1a227b8ab85', b: '', result: false },
+      { a: '', b: '571f97883f33e1a227b8ab85', result: false },
+      { a: new ObjectID('571f97883f33e1a227b8ab85'), b: '', result: false },
+      { a: '', b: new ObjectID('571f97883f33e1a227b8ab85'), result: false },
+
+      // Strings
+      { a: '571f97883f33e1a227b8ab85', b: '571f97883f33e1a227b8ab85', result: true },
+      { a: '571f97883f33e1a227b8ab86', b: '571f97883f33e1a227b8ab85', result: false },
+
+      // ObjectIDS
+      { a: '571f97883f33e1a227b8ab85', b: new ObjectID('571f97883f33e1a227b8ab85'), result: true },
+      { a: new ObjectID('571f97883f33e1a227b8ab85'), b: '571f97883f33e1a227b8ab85', result: true },
+      { a: new ObjectID('571f97883f33e1a227b8ab85'), b: new ObjectID('571f97883f33e1a227b8ab86'), result: false },
+    ];
+
+    FIXTURES.forEach(function(fixture, index) {
+      it('should handle case #' + index, function() {
+        var result = underTest.objectIDsEqual(fixture.a, fixture.b);
+        assert.strictEqual(result, fixture.result);
+      });
+    });
+  });
+
   describe('isLikeObjectId', function() {
     it('should parse objectIds', function() {
       var id = new ObjectID('51adcd412aefe1576f000005');

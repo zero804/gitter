@@ -12,9 +12,11 @@ var defaultModels = [
   { name: 'people', type: 'people', id: 3 },
 ];
 
-var tailDefaults = [
-  { name: 'close', type: 'close', id: 4 }
-];
+var tailDefaults = [{ name: 'close', type: 'close', id: 5 }];
+
+if(context.hasFeature('community-create')) {
+  tailDefaults.unshift({ name: 'Create Community', type: 'community-create', id: 4 });
+}
 
 var MinibarItemModel = Backbone.Model.extend({
   defaults: {

@@ -3,7 +3,6 @@
 "use strict";
 
 var workerQueue = require('../test-require')('./utils/worker-queue-redis');
-var assert = require('assert');
 var uuid = require('node-uuid');
 
 describe('worker-queue-redis', function() {

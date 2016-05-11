@@ -2,7 +2,6 @@
 'use strict';
 
 var yargs = require('yargs');
-var _ = require('lodash');
 var shutdown = require('shutdown');
 var userService = require('../../server/services/user-service');
 var troupeService = require('../../server/services/troupe-service');
@@ -10,9 +9,8 @@ var restSerializer = require('../../server/serializers/rest-serializer');
 var suggestionsService = require('../../server/services/suggestions-service')
 var roomMembershipService = require('../../server/services/room-membership-service');
 var userSettingsService = require('../../server/services/user-settings-service');
-var troupeService = require('../../server/services/troupe-service');
 var shimPositionOption = require('../yargs-shim-position-option');
-
+var Promise = require('bluebird');
 
 var argv = yargs.argv;
 var opts = yargs

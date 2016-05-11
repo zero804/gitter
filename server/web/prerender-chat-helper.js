@@ -32,8 +32,6 @@ function getFormattedTime(model, lang, tz, tzOffset, showDatesWithoutTimezone) {
 }
 
 module.exports = exports = function(model, params) {
-  var displayName;
-  var username;
   var deletedClass;
 
   var root = params.data.root;
@@ -57,8 +55,8 @@ module.exports = exports = function(model, params) {
   // TODO: add permalinkUrl and sentTimeFull
 
   var m = _.extend({}, model, {
-    displayName: displayName = model.fromUser && model.fromUser.displayName,
-    username: username = model.fromUser && model.fromUser.username,
+    displayName: model.fromUser && model.fromUser.displayName,
+    username: model.fromUser && model.fromUser.username,
     sentTimeFormatted: sentTimeFormatted,
     text: text,
     html: html,

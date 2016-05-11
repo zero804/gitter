@@ -1,4 +1,3 @@
-/* jshint node:true, unused:true */
 'use strict';
 
 var gulp = require('gulp');
@@ -13,7 +12,7 @@ var tar = require('gulp-tar');
 var expect = require('gulp-expect-file');
 var git = require('gulp-git');
 var fs = require('fs');
-var jshint = require('gulp-jshint');
+var eslint = require('gulp-eslint');
 var postcss = require('gulp-postcss');
 var autoprefixer = require('autoprefixer-core');
 var mqpacker = require('css-mqpacker');
@@ -32,6 +31,7 @@ var gutil = require('gulp-util');
 var path = require('path');
 var sonar = require('gulp-sonar');
 var glob = require('glob');
+var codacy = require('gulp-codacy');
 
 /* Don't do clean in gulp, use make */
 var RUN_TESTS_IN_PARALLEL = false;
@@ -89,52 +89,16 @@ gulp.task('validate-config', function() {
     .pipe(jsonlint.failOnError());
 });
 
-gulp.task('validate-client-source', function() {
-  /* This is a very lax jshint, only looking for major problems */
-  return gulp.src(['public/js/**/*.js', 'shared/**/*.js'])
-    .pipe(jshint({
-      browser: true,
-      devel: false,
-      strict: "global",
-      unused: false,
-      laxbreak: true,
-      laxcomma: true,
-      "-W069": "",
-      "-W033": "",
-      "-W093": "",
-      // "-W084": "",
-      predef: ["module", "require"]
-     }))
-    .pipe(jshint.reporter('default', { verbose: true }))
-    .pipe(jshint.reporter('fail'));
+gulp.task('validate-eslint', function() {
+  return gulp.src(['**/*.js','!node_modules/**','!public/repo/**'])
+    .pipe(eslint({
+      quiet: argv.quiet
+    }))
+    .pipe(eslint.format())
+    .pipe(eslint.failAfterError());
 });
 
-gulp.task('validate-server-source', function() {
-  /* This is a very lax jshint, only looking for major problems */
-  return gulp.src(['server/**/*.js', 'shared/**/*.js', 'modules/*/lib/**/*.js'])
-    .pipe(jshint({
-      node: true,
-      devel: false,
-      unused: false,
-      strict: "global",
-      "-W064": "", // Missing 'new' prefix when invoking a constructor
-      "-W069": "", // [..] is better written in dot notation.
-      "-W033": "", // Missing semicolon.
-      "-W032": "", // Unnecessary semicolon.
-     }))
-    .pipe(jshint.reporter('default', { verbose: true }))
-    .pipe(jshint.reporter('fail'));
-});
-
-gulp.task('validate-illegal-markers', function() {
-  return gulp.src(['server/**/*.js', 'shared/**/*.js', 'modules/*/lib/**/*.js', 'public/js/**/*.js'])
-    .pipe(grepFail([ 'NOCOMMIT' ]));
-  //
-  // return gulp.src()
-  //   .pipe(grepFail([ '' ]));
-});
-
-gulp.task('validate', ['validate-config', 'validate-client-source', 'validate-server-source' /*, 'validate-illegal-markers'*/]);
+gulp.task('validate', ['validate-config', 'validate-eslint']);
 
 makeTestTasks('test-mocha', function(name, files) {
   mkdirp.sync('output/test-reports/');
@@ -194,6 +158,17 @@ gulp.task('merge-lcov', function() {
     .pipe(gulp.dest('output/coverage-reports/merged/'));
 });
 
+gulp.task('submit-codacy-post-tests', ['merge-lcov'], function() {
+  return gulp.src(['output/coverage-reports/merged/lcov.info'], { read: false })
+    .pipe(codacy({
+      token: '30c3b1cf278c41c795b06235102f141b'
+    }));
+});
+
+gulp.task('submit-codacy', ['test-mocha'/*, 'test-redis-lua'*/], function(callback) {
+  runSequence('submit-codacy-post-tests', callback);
+});
+
 gulp.task('submit-coveralls-post-tests', ['merge-lcov'], function() {
   var GIT_BRANCH = process.env.GIT_BRANCH;
   if (GIT_BRANCH) {
@@ -217,7 +192,7 @@ gulp.task('submit-coveralls', ['test-mocha'/*, 'test-redis-lua'*/], function(cal
   runSequence('submit-coveralls-post-tests', callback);
 });
 
-gulp.task('test', ['test-mocha'/*, 'test-redis-lua'*/, 'submit-coveralls']);
+gulp.task('test', ['test-mocha'/*, 'test-redis-lua'*/, 'submit-coveralls', 'submit-codacy']);
 
 makeTestTasks('localtest', function(name, files) {
   return gulp.src(files, { read: false })
@@ -472,6 +447,7 @@ gulp.task('css-web', function () {
     'public/less/trpHooks.less',
     'public/less/login.less',
     'public/less/explore.less',
+    'public/less/community-create.less',
     'public/less/router-chat.less',
     'public/less/router-app.less',
     'public/less/router-nli-app.less',
@@ -590,8 +566,8 @@ gulp.task('default', function(callback) {
  * watch
  */
 gulp.task('watch', ['css'], function() {
-  livereload.listen();
-  gulp.watch('public/**/*.less', ['css']).on('change', livereload.changed);
+  //livereload.listen();
+  gulp.watch('public/**/*.less', ['css'])/*.on('change', livereload.changed)*/;
 });
 
 

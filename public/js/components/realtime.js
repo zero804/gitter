@@ -108,7 +108,6 @@ var accessTokenFailureExtension = {
 };
 
 var client;
-var pingTimer;
 
 function getOrCreateClient() {
   if (client) return client;
@@ -138,7 +137,7 @@ function getOrCreateClient() {
   });
 
   if (ENABLE_APP_LAYER_PINGS) {
-    pingTimer = setInterval(function() {
+    setInterval(function() {
       debug('Performing ping');
       client.testConnection('ping');
     }, PING_INTERVAL);

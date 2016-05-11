@@ -61,7 +61,7 @@ describe('authorisor', function() {
       var restfulMock = mockito.mock(testRequire('./services/restful'));
 
       var authorisor = testRequire.withProxies("./web/bayeux/authorisor", {
-        '../../services/user-can-access-room': { permissionToRead: userCanAccessRoomMock },
+        'gitter-web-permissions/lib/user-can-access-room': { permissionToRead: userCanAccessRoomMock },
         'gitter-web-presence': presenceServiceMock,
         '../../services/restful': restfulMock
       });

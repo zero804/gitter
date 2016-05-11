@@ -1,10 +1,11 @@
 'use strict';
 
 var $ = require('jquery');
-var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 var urlParse = require('url-parse');
 
+var context = require('utils/context');
+var appEvents = require('utils/appevents');
 var frameUtils = require('utils/frame-utils');
 
 var modalRegion = require('components/modal-region');
@@ -83,11 +84,11 @@ var ExploreView = Marionette.LayoutView.extend({
   },
   ui: {
     signInButton: '.js-sign-in',
-    createRoomButton: '.js-explore-create-room-button'
+    createRoomButton: '.js-explore-create-button'
   },
   events: {
     'click @ui.signInButton': 'popSignInModal',
-    'click @ui.createRoomButton': 'popCreateRoomModal'
+    'click @ui.createRoomButton': 'popCreate'
   },
 
   initialize: function() {
@@ -115,8 +116,14 @@ var ExploreView = Marionette.LayoutView.extend({
     e.preventDefault();
   },
 
-  popCreateRoomModal: function(e) {
-    frameUtils.postMessage({ type: 'route', hash: 'createroom' });
+  popCreate: function() {
+    if(context.hasFeature('community-create')) {
+      //appEvents.trigger('community-create-view:toggle', true);
+      frameUtils.postMessage({ type: 'community-create-view:toggle', active: true });
+    }
+    else {
+      frameUtils.postMessage({ type: 'route', hash: 'createroom' });
+    }
   }
 });
 

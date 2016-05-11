@@ -32,7 +32,7 @@ function GithubRepoStrategy(options) {
       uri:          item.full_name,
       private:      item.private,
       room:         room ? troupeStrategy.map(room) : undefined,
-      exists:       room ? true : false,
+      exists:       !!room,
       avatar_url:   item.owner.avatar_url
     };
   };

@@ -2,7 +2,6 @@
 'use strict';
 
 var assert                    = require('assert');
-var $                         = require('jquery');
 var Backbone                  = require('backbone');
 var PrimaryCollectionItemView = require('public/js/views/menu/room/primary-collection/primary-collection-item-view');
 var apiClient                 = require('components/apiClient');
@@ -88,12 +87,12 @@ describe.skip('PrimaryCollectionItemView()', function() {
     itemView.$el.find('[data-component="room-item-leave"]').click();
   });
 
-  it('should toggle a selected class dependant on its models selected value', function(){
-    assert(!itemView.el.firstChild.classList.contains('selected'));
-    itemView.model.set('selected', true);
-    assert(itemView.el.firstChild.classList.contains('selected'));
-    itemView.model.set('selected', false);
-    assert(!itemView.el.firstChild.classList.contains('selected'));
+  it('should toggle a active class dependant on its models active value', function(){
+    assert(!itemView.el.firstChild.classList.contains('active'));
+    itemView.model.set('active', true);
+    assert(itemView.el.firstChild.classList.contains('active'));
+    itemView.model.set('active', false);
+    assert(!itemView.el.firstChild.classList.contains('active'));
   });
 
   it('should assign a focus class when the model is focused', function(){

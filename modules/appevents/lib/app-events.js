@@ -2,9 +2,10 @@
 
 var events = require('events');
 
-var localEventEmitter = new events.EventEmitter();
+function makeEmitter() {
+  var localEventEmitter = new events.EventEmitter();
 
-module.exports =  {
+  return {
     newUnreadItem: function(userId, troupeId, items, online) {
       localEventEmitter.emit('newUnreadItem', {
         userId: userId,
@@ -167,11 +168,25 @@ module.exports =  {
     },
 
     destroyUserTokens: function(userId) {
-      localEventEmitter.emit('destroy_user_tokens', userId);  
+      localEventEmitter.emit('destroy_user_tokens', userId);
     },
 
     onDestroyUserTokens: function(callback) {
       localEventEmitter.on('destroy_user_tokens', callback);
+    },
+
+    roomMemberPermCheckFailed: function(roomId, userId) {
+      localEventEmitter.emit('room_membership_perm_check_failed', roomId, userId);
+    },
+
+    onRoomMemberPermCheckFailed: function(callback) {
+      localEventEmitter.on('room_membership_perm_check_failed', callback);
     }
 
   };
+}
+
+module.exports = makeEmitter();
+module.exports.testOnly = {
+  makeEmitter: makeEmitter
+};
