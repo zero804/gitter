@@ -7,8 +7,8 @@ var unreadItemService     = require("../../services/unread-items");
 var collapsedChatsService = require('../../services/collapsed-chats-service');
 var getVersion            = require('../get-model-version');
 var UserIdStrategy        = require('./user-id-strategy');
-var MultiPreload          = require('../strategy-tracing').MultiPreload
 var mongoUtils            = require('gitter-web-persistence-utils/lib/mongo-utils');
+var Promise               = require('bluebird');
 
 function formatDate(d) {
   return d ? d.toISOString() : null;
@@ -87,28 +87,28 @@ function ChatStrategy(options)  {
   this.preload = function(items) {
     if (items.isEmpty()) return;
 
-    var strategies = new MultiPreload(this);
+    var strategies = [];
 
     // If the user is fixed in options, we don't need to look them up using a strategy...
     if (!options.user) {
       userStrategy = new UserIdStrategy({ lean: options.lean });
 
       var users = items.map(function(i) { return i.fromUserId; });
-      strategies.push(userStrategy, users);
+      strategies.push(userStrategy.preload(users));
     }
 
     /* If options.unread has been set, we don't need a strategy */
     if (options.currentUserId && options.unread === undefined) {
       unreadItemStrategy = new UnreadItemStrategy({ userId: options.currentUserId, roomId: options.troupeId });
-      strategies.push(unreadItemStrategy);
+      strategies.push(unreadItemStrategy.preload());
     }
 
     if (options.currentUserId && options.troupeId) {
       collapsedItemStrategy = new CollapsedItemStrategy({ userId: options.currentUserId, roomId: options.troupeId });
-      strategies.push(collapsedItemStrategy);
+      strategies.push(collapsedItemStrategy.preload());
     }
 
-    return strategies.all();
+    return Promise.all(strategies);
   };
 
   function safeArray(array) {

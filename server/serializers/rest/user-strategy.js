@@ -14,7 +14,6 @@ var billingService           = require('../../services/billing-service');
 var leanUserDao              = require('../../services/daos/user-dao').full;
 var resolveUserAvatarUrl     = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 var userScopes               = require('gitter-web-identity/lib/user-scopes');
-var MultiPreload             = require('../strategy-tracing').MultiPreload;
 
 function UserPremiumStatusStrategy() {
   var usersWithPlans;
@@ -174,30 +173,30 @@ function UserStrategy(options) {
   this.preload = function(users) {
     if (users.isEmpty()) return;
 
-    var strategies = new MultiPreload(this);
+    var strategies = [];
 
     if (options.includeRolesForTroupeId || options.includeRolesForTroupe) {
       userRoleInTroupeStrategy = new UserRoleInTroupeStrategy(options);
-      strategies.push(userRoleInTroupeStrategy);
+      strategies.push(userRoleInTroupeStrategy.preload());
     }
 
     if (options.showPresenceForTroupeId) {
       userPresenceInTroupeStrategy = new UserPresenceInTroupeStrategy(options.showPresenceForTroupeId)
-      strategies.push(userPresenceInTroupeStrategy);
+      strategies.push(userPresenceInTroupeStrategy.preload());
     }
 
     if (options.showPremiumStatus) {
       var userIds = users.map(function(user) { return user.id; });
       userPremiumStatusStrategy = new UserPremiumStatusStrategy();
-      strategies.push(userPremiumStatusStrategy, userIds);
+      strategies.push(userPremiumStatusStrategy.preload(userIds));
     }
 
     if (options.includeProviders) {
       userProvidersStrategy = new UserProvidersStrategy();
-      strategies.push(userProvidersStrategy, users);
+      strategies.push(userProvidersStrategy.preload(users));
     }
 
-    return strategies.all();
+    return Promise.all(strategies);
   };
 
   this.map = function(user) {
