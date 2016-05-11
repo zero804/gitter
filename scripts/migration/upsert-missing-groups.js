@@ -172,12 +172,12 @@ function run(f, callback) {
       callback();
     })
     .on('error', function(error) {
-      callback(err);
+      callback(error);
     })
 }
 
 function done(err) {
-  if (err) {
+  if (error) {
     console.error(error);
     console.error(error.stack);
     process.exit(1);
