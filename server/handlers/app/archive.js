@@ -19,7 +19,6 @@ var beforeTodayAnyTimezone  = require('gitter-web-shared/time/before-today-any-t
 var debug                   = require('debug')('gitter:app-archive');
 var _                       = require('underscore');
 var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
-var userCanAccessRoom       = require('gitter-web-permissions/lib/user-can-access-room');
 var StatusError             = require('statuserror');
 
 var ONE_DAY_SECONDS = 60 * 60 * 24; // 1 day
@@ -27,16 +26,12 @@ var ONE_DAY_MILLISECONDS = ONE_DAY_SECONDS * 1000;
 var ONE_YEAR_SECONDS = 60 * 60 * 24 * 365; // 1 year
 var ONE_YEAR_MILLISECONDS = ONE_YEAR_SECONDS * 1000;
 
-var validateRoomForReadOnlyAccess = Promise.method(function(user, room) {
-  if(!room) throw new StatusError(404); // Mandatory
-
-  var userId = user._id;
-  var troupeId = room._id;
-  return userCanAccessRoom.permissionToRead(userId, troupeId)
+var validateRoomForReadOnlyAccess = Promise.method(function(user, policy) {
+  return policy.canRead()
     .then(function(access) {
       if (access) return;
-      if (!user) throw new StatusError(401);
-      throw new StatusError(404);
+      if (!user) throw new StatusError(401); // Very suspect...
+      throw new StatusError(404)
     });
 })
 
@@ -86,6 +81,7 @@ exports.datesList = [
   function(req, res, next) {
     var user = req.user;
     var troupe = req.uriContext.troupe;
+    var policy = req.uriContext.policy;
 
     // This is where we want non-logged-in users to return
     if(!user && req.session) {
@@ -115,12 +111,12 @@ exports.datesList = [
       avatarSrcSet: resolveRoomAvatarSrcSet({ uri: req.uriContext.uri }, 48)
     };
 
-    return validateRoomForReadOnlyAccess(user, troupe)
+    return validateRoomForReadOnlyAccess(user, policy)
       .then(function() {
-        return roomPermissionsModel(user, 'admin', troupe)
+        return policy.canAdmin();
       })
-      .then(function(access) {
-        templateContext.isAdmin = access
+      .then(function(adminAccess) {
+        templateContext.isAdmin = adminAccess
         return contextGenerator.generateTroupeContext(req)
       })
       .then(function(troupeContext) {
@@ -137,6 +133,7 @@ exports.linksList = [
   function(req, res, next) {
     var user = req.user;
     var troupe = req.uriContext.troupe;
+    var policy = req.uriContext.policy;
 
     // This is where we want non-logged-in users to return
     if(!user && req.session) {
@@ -167,12 +164,12 @@ exports.linksList = [
       isPrivate: isPrivate
     };
 
-    return validateRoomForReadOnlyAccess(user, troupe)
+    return validateRoomForReadOnlyAccess(user, policy)
       .then(function() {
-        return roomPermissionsModel(user, 'admin', troupe)
+        return policy.canAdmin();
       })
-      .then(function(access) {
-        templateContext.isAdmin = access
+      .then(function(adminAccess) {
+        templateContext.isAdmin = adminAccess
         // no start, no end, no timezone for now
         return heatmapService.getHeatmapForRoom(troupe.id)
       })

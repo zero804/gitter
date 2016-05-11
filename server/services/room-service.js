@@ -14,9 +14,10 @@ var xregexp                    = require('xregexp').XRegExp;
 var persistence                = require('gitter-web-persistence');
 var uriLookupService           = require("./uri-lookup-service");
 var permissionsModel           = require('gitter-web-permissions/lib/permissions-model');
-var roomPermissionsModel       = require('gitter-web-permissions/lib/room-permissions-model');
+var policyFactory              = require('gitter-web-permissions/lib/legacy-policy-factory');
 var securityDescriptorService  = require('gitter-web-permissions/lib/security-descriptor-service');
 var legacyMigration            = require('gitter-web-permissions/lib/legacy-migration');
+var canUserBeInvitedToJoinRoom = require('gitter-web-permissions/lib/invited-permissions-service');
 var userService                = require('./user-service');
 var troupeService              = require('./troupe-service');
 var oneToOneRoomService        = require('./one-to-one-room-service');
@@ -29,7 +30,6 @@ var collections                = require('../utils/collections');
 var StatusError                = require('statuserror');
 var eventService               = require('./event-service');
 var emailNotificationService   = require('./email-notification-service');
-var canUserBeInvitedToJoinRoom = require('./invited-permissions-service');
 var emailAddressService        = require('./email-address-service');
 var mongoUtils                 = require('gitter-web-persistence-utils/lib/mongo-utils');
 var mongooseUtils              = require('gitter-web-persistence-utils/lib/mongoose-utils');
@@ -128,19 +128,23 @@ function findOrCreateGroupRoom(user, troupe, uri, options) {
   var roomTypeCreationFilterFunction = makeRoomTypeCreationFilterFunction(options.creationFilter);
 
   if(troupe) {
+    debug('Room for uri %s exists', uri)
     /* The troupe exists. Ensure it's not past the max limit and the user can join */
-
-    return roomPermissionsModel(user, 'join', troupe)
-      .then(function(access) {
-        debug('Does user %s have access to existing room? %s', (user && user.username || '~anon~'), access);
+    return policyFactory.createPolicyForRoom(user, troupe)
+      .then(function(policy) {
+        return [policy, policy.canJoin()]
+      })
+      .spread(function(policy, joinAccess) {
+        debug('Does user %s have access to existing room? %s', (user && user.username || '~anon~'), joinAccess);
 
         var payload = {
           troupe: troupe,
-          access: access,
+          policy: policy,
+          access: joinAccess,
           didCreate: false
         };
 
-        if (!access) return payload;
+        if (!joinAccess) return payload;
 
         // If the user has access to the room, assert member count
         return assertJoinRoomChecks(troupe, user)
@@ -192,6 +196,7 @@ function findOrCreateGroupRoom(user, troupe, uri, options) {
       }
 
       /* Room does not yet exist */
+      // TODO: switch out for policy...
       return permissionsModel(user, 'create', officialUri, githubType, null) // Parent rooms always have security == null
         .then(function(access) {
           debug('Does the user have access to create room %s? %s', uri, access);
@@ -233,6 +238,9 @@ function findOrCreateGroupRoom(user, troupe, uri, options) {
               return securityDescriptorService.insertForRoom(troupe._id, descriptor);
             })
             .spread(function(troupe, updateExisting) {
+              return [troupe, updateExisting, policyFactory.createPolicyForRoom(user, troupe)];
+            })
+            .spread(function(troupe, updateExisting, policy) {
               if (updateExisting) {
                 /* Do we need to rename the old uri? */
                 if (troupe.uri !== officialUri) {
@@ -245,9 +253,13 @@ function findOrCreateGroupRoom(user, troupe, uri, options) {
                       .then(function() {
                         /* Refetch the troupe */
                         return troupeService.findById(troupe.id)
-                          .then(function(refreshedTroupe) {
+                          .then(function(troupe) {
+                            return [troupe, policyFactory.createPolicyForRoom(user, troupe)];
+                          })
+                          .spread(function(refreshedTroupe, refreshedPolicy) {
                             return {
                               troupe: refreshedTroupe,
+                              policy: refreshedPolicy,
                               access: true,
                               didCreate: false
                             };
@@ -258,6 +270,7 @@ function findOrCreateGroupRoom(user, troupe, uri, options) {
 
                 return {
                   troupe: troupe,
+                  policy: policy,
                   access: true,
                   didCreate: false
                 };
@@ -312,6 +325,7 @@ function findOrCreateGroupRoom(user, troupe, uri, options) {
 
               return {
                 troupe: troupe,
+                policy: policy,
                 access: true,
                 didCreate: true,
                 hookCreationFailedDueToMissingScope: hookCreationFailedDueToMissingScope
@@ -503,7 +517,7 @@ var createGithubRoom = Promise.method(function(user, uri) {
  * - If the room does exist, will add the user to the room if the user has permission
  * - If the user does not have access, will return null
  *
- * @return The promise of a troupe or nothing.
+ * @return { troupe: ..., uri: ..., policy: ..., roomMember: ..., accessDenied: ... }
  */
 function findOrCreateRoom(user, uri, options) {
   debug("findOrCreateRoom %s %s %j", user && user.username, uri, options);
@@ -514,14 +528,17 @@ function findOrCreateRoom(user, uri, options) {
 
   /**
    * this function returns an object containing accessDenied, which is used by the middlewares to allow the display
-   * of public rooms instead of the standard 404
+   * of public rooms instead of the standard 404.
+   *
+   * @private
    */
-  function denyAccess(resolvedTroupe) {
+  function denyAccess(resolvedTroupe, policy) {
     if (!resolvedTroupe) return null;
 
     var uri = resolvedTroupe.uri;
 
     return {
+      policy: policy,
       accessDenied: {
         githubType: resolvedTroupe.githubType
       },
@@ -532,22 +549,26 @@ function findOrCreateRoom(user, uri, options) {
   /* First off, try use local data to figure out what this url is for */
   return uriResolver(user && user.id, uri, options)
     .spread(function (resolvedUser, resolvedTroupe, roomMember) {
-      /* Deal with the case of the nonloggedin user first */
+      /* Deal with the case of the anonymous user first */
       if(!user) {
         if(resolvedUser) {
           debug("uriResolver returned user for uri=%s", uri);
 
           // TODO: figure out what we do for nonloggedin users viewing
           // user profiles
+          return null;
         }
 
         if(resolvedTroupe) {
           debug("uriResolver returned troupe for uri=%s", uri);
 
-          return roomPermissionsModel(null, 'view', resolvedTroupe)
-            .then(function (access) {
-              if (!access) {
-                return denyAccess(resolvedTroupe); // please see comment about denyAccess
+          return policyFactory.createPolicyForRoom(user, resolvedTroupe)
+            .then(function(policy) {
+              return [policy, policy.canView()];
+            })
+            .spread(function(policy, viewAccess) {
+              if (!viewAccess) {
+                return denyAccess(resolvedTroupe, policy); // please see comment about denyAccess
               }
 
               return {
@@ -563,14 +584,14 @@ function findOrCreateRoom(user, uri, options) {
 
       // If the Uri Lookup returned a user, do a one-to-one
       if(resolvedUser) {
-
-        if(resolvedUser.id == userId) {
+        if(mongoUtils.objectIDsEqual(resolvedUser.id, userId)) {
           debug("localUriLookup returned own user for uri=%s", uri);
 
           return {
             ownUrl: true,
             oneToOne: false,
             troupe: null,
+            policy: null,
             didCreate: false,
             uri: resolvedUser.username
           };
@@ -585,18 +606,16 @@ function findOrCreateRoom(user, uri, options) {
           return null;
         }
 
-        return permissionsModel(user, 'view', resolvedUser.username, 'ONETOONE', null)
-          .then(function(access) {
-            if(!access) {
-              // TODO: check whether this needs a slash at the front
-              throw extendStatusError(404, { githubType: 'ONETOONE', uri: resolvedUser.username });
-            }
+        // TODO: in future we need to add request one-to-one here...
+        return oneToOneRoomService.findOrCreateOneToOneRoom(userId, resolvedUser.id)
+          .spread(function(troupe, resolvedUser) {
 
-            return oneToOneRoomService.findOrCreateOneToOneRoom(userId, resolvedUser.id)
-              .spread(function(troupe, resolvedUser) {
+            return policyFactory.createPolicyForRoom(user, troupe)
+              .then(function(policy) {
                 return {
                   oneToOne: true,
                   troupe: troupe,
+                  policy: policy,
                   otherUser: resolvedUser,
                   uri: resolvedUser.username,
                   roomMember: true
@@ -605,20 +624,26 @@ function findOrCreateRoom(user, uri, options) {
           });
       }
 
-
       if (resolvedTroupe && roomMember) {
         debug("User is already a member of the room %s. Allowing access", resolvedTroupe.uri);
 
-        return {
-          troupe: resolvedTroupe,
-          uri: resolvedTroupe.uri,
-          roomMember: roomMember
-        };
+        return policyFactory.createPolicyForRoom(user, resolvedTroupe)
+          .then(function(policy) {
+            // TODO: check the user has view rights
+            return {
+              troupe: resolvedTroupe,
+              policy: policy,
+              uri: resolvedTroupe.uri,
+              roomMember: roomMember
+            };
+
+          });
       }
 
       debug("localUriLookup returned room %s for uri=%s. Finding or creating room", resolvedTroupe && resolvedTroupe.uri, uri);
 
-      // need to check for the rooms
+
+      // resolvedTroupe may or may not exist at this point...
       return findOrCreateGroupRoom(user, resolvedTroupe, uri, options)
         .then(function(findOrCreateResult) {
           var troupe = findOrCreateResult.troupe;
@@ -874,6 +899,7 @@ var createCustomChildRoom = Promise.method(function(parentTroupe, user, options)
   }
 
   var lcUri = uri.toLowerCase();
+  // TODO: this needs to be moved to a policy
   return permissionsModel(user, 'create', uri, githubType, security)
     .then(function(access) {
       if(!access) throw new StatusError(403, 'You do not have permission to create a channel here');
@@ -1009,13 +1035,19 @@ function updateUserDateAdded(userId, roomId, date) {
 }
 
 /* When a user wants to join a room */
-function joinRoom(roomId, user, options) {
+function joinRoomById(roomId, user, options) {
   options = options || {};
+
   return troupeService.findById(roomId)
     .then(function(room) {
-      return roomPermissionsModel(user, 'join', room)
-        .then(function(access) {
-          if (!access) throw new StatusError(403);
+      if (!room) throw new StatusError(404);
+
+      return policyFactory.createPolicyForRoom(user, room)
+        .then(function(policy) {
+          return policy.canJoin();
+        })
+        .then(function(joinAccess) {
+          if (!joinAccess) throw new StatusError(403);
 
           return assertJoinRoomChecks(room, user);
         })
@@ -1037,15 +1069,14 @@ function joinRoom(roomId, user, options) {
 }
 
 /**
- * Somebody adds another user to a room
+ * Somebody adds another user to a room.
+ * Caller needs to ensure that the instigatingUser can add
+ * the user to the room
  */
 function addUserToRoom(room, instigatingUser, usernameToAdd) {
-  return Promise.all([
-    roomPermissionsModel(instigatingUser, 'adduser', room),
-    canUserBeInvitedToJoinRoom(usernameToAdd, room, instigatingUser)
-  ]).spread(function (canInvite, canJoin) {
-      if (!canInvite) throw new StatusError(403, 'You do not have permission to add people to this room.');
-      if (!canJoin)   throw new StatusError(403, usernameToAdd + ' does not have permission to join this room.');
+  return canUserBeInvitedToJoinRoom(usernameToAdd, room, instigatingUser)
+    .then(function(canJoin) {
+      if (!canJoin) throw new StatusError(403, usernameToAdd + ' does not have permission to join this room.');
 
       return userService.findByUsername(usernameToAdd);
     })
@@ -1081,43 +1112,45 @@ function addUserToRoom(room, instigatingUser, usernameToAdd) {
 
 
 /* Re-insure that each user in the room has access to the room */
-function revalidatePermissionsForUsers(room) {
-  return roomMembershipService.findMembersForRoom(room._id)
-    .then(function(userIds) {
-        if(!userIds.length) return;
 
-        return userService.findByIds(userIds)
-          .then(function(users) {
-            var usersHash = collections.indexById(users);
-
-            var removalUserIds = [];
-
-            /** TODO: warning: this may run 10000 promises in parallel */
-            return Promise.map(userIds, function(userId) {
-              var user = usersHash[userId];
-              if(!user) {
-                // Can't find the user?, remove them
-                logger.warn('Unable to find user, removing from troupe', { userId: userId, troupeId: room.id });
-                removalUserIds.push(userId);
-                return;
-              }
-
-              return roomPermissionsModel(user, 'join', room)
-                .then(function(access) {
-                  if(!access) {
-                    logger.warn('User no longer has access to room', { userId: userId, troupeId: room.id });
-                    removalUserIds.push(userId);
-                  }
-                });
-            })
-            .then(function() {
-              if (!removalUserIds.length) return;
-              return roomMembershipService.removeRoomMembers(room._id, removalUserIds);
-            });
-          });
-    });
-
-}
+// DISABLED
+// function revalidatePermissionsForUsers(room) {
+//   return roomMembershipService.findMembersForRoom(room._id)
+//     .then(function(userIds) {
+//         if(!userIds.length) return;
+//
+//         return userService.findByIds(userIds)
+//           .then(function(users) {
+//             var usersHash = collections.indexById(users);
+//
+//             var removalUserIds = [];
+//
+//             /** TODO: warning: this may run 10000 promises in parallel */
+//             return Promise.map(userIds, function(userId) {
+//               var user = usersHash[userId];
+//               if(!user) {
+//                 // Can't find the user?, remove them
+//                 logger.warn('Unable to find user, removing from troupe', { userId: userId, troupeId: room.id });
+//                 removalUserIds.push(userId);
+//                 return;
+//               }
+//
+//               return roomPermissionsModel(user, 'join', room)
+//                 .then(function(access) {
+//                   if(!access) {
+//                     logger.warn('User no longer has access to room', { userId: userId, troupeId: room.id });
+//                     removalUserIds.push(userId);
+//                   }
+//                 });
+//             })
+//             .then(function() {
+//               if (!removalUserIds.length) return;
+//               return roomMembershipService.removeRoomMembers(room._id, removalUserIds);
+//             });
+//           });
+//     });
+//
+// }
 
 /**
  * The security of a room may be off. Do a check and update if required
@@ -1147,62 +1180,35 @@ function ensureRepoRoomSecurity(uri, security) {
       troupe.dateLastSecurityCheck = new Date();
 
       return troupe.save()
-        .then(function() {
-          if(security === 'PUBLIC') return;
-
-          /* Only do this after the save, otherwise
-           * multiple events will be generated */
-
-          return revalidatePermissionsForUsers(troupe);
-        }).thenReturn(troupe);
+        // .then(function() {
+        //   if(security === 'PUBLIC') return;
+        //
+        //   /* Only do this after the save, otherwise
+        //    * multiple events will be generated */
+        //
+        //   return revalidatePermissionsForUsers(troupe);
+        // })
+        .return(troupe);
 
     });
-}
-
-
-function findByIdForReadOnlyAccess(user, roomId) {
-  return troupeService.findById(roomId)
-    .then(function(troupe) {
-      if(!troupe) throw new StatusError(404); // Mandatory
-
-      return roomPermissionsModel(user, 'view', troupe)
-        .then(function(access) {
-          if(access) return troupe;
-          if(!user) throw new StatusError(401);
-          throw new StatusError(404);
-        });
-    });
-}
-
-function checkInstigatingUserPermissionForRemoveUser(room, user, requestingUser) {
-  // User is requesting user -> leave
-  if(user.id === requestingUser.id) return Promise.resolve(true);
-
-  // Check if not in one-to-one room and requesting user is admin
-  return roomPermissionsModel(requestingUser, 'admin', room);
 }
 
 /**
  * Remove user from room
  * If the user to be removed is not the one requesting, check permissions
  */
-var removeUserFromRoom = Promise.method(function (room, user, requestingUser) {
+function removeUserFromRoom(room, user) {
   if (!room) throw new StatusError(400, 'Room required');
   if (!user) throw new StatusError(400, 'User required');
-  if (!requestingUser) throw new StatusError(401, 'Not authenticated');
-  if (room.githubType === 'ONETOONE') throw new StatusError(400, 'This room does not support removing.');
+  // if (!requestingUser) throw new StatusError(401, 'Not authenticated');
+  if (room.oneToOne || room.githubType === 'ONETOONE') throw new StatusError(400, 'This room does not support removing.');
 
-  return checkInstigatingUserPermissionForRemoveUser(room, user, requestingUser)
-    .then(function(access) {
-      if(!access) throw new StatusError(403, 'You do not have permission to remove people. Admin permission is needed.');
-
-      return roomMembershipService.removeRoomMember(room._id, user._id);
-    })
+  return roomMembershipService.removeRoomMember(room._id, user._id)
     .then(function() {
       // Remove favorites, unread items and last access times
       return recentRoomService.removeRecentRoomForUser(user._id, room._id);
     });
-});
+}
 
 /**
  * Hides a room for a user.
@@ -1236,38 +1242,38 @@ function canBanInRoom(room) {
   return true;
 }
 
-function banUserFromRoom(room, username, requestingUser, options, callback) {
-  return Promise.try(function() {
-      if(!room) throw new StatusError(400, 'Room required');
-      if(!username) throw new StatusError(400, 'Username required');
-      if(!requestingUser) throw new StatusError(401, 'Not authenticated');
-      if(requestingUser.username === username) throw new StatusError(400, 'You cannot ban yourself');
-      if(!canBanInRoom(room)) throw new StatusError(400, 'This room does not support banning.');
+/**
+ * Ban a user from the room. Caller should ensure admin permissions
+ */
+function banUserFromRoom(room, username, requestingUser, options) {
+  if (!room) throw new StatusError(400, 'Room required');
+  if (!username) throw new StatusError(400, 'Username required');
+  if (!requestingUser) throw new StatusError(401, 'Not authenticated');
+  if (requestingUser.username === username) throw new StatusError(400, 'You cannot ban yourself');
+  if (!canBanInRoom(room)) throw new StatusError(400, 'This room does not support banning.');
 
-      /* Does the requesting user have admin rights to this room? */
-      return roomPermissionsModel(requestingUser, 'admin', room);
-    })
-    .then(function(access) {
-      if(!access) throw new StatusError(403, 'You do not have permission to ban people. Admin permission is needed.');
-
-      return userService.findByUsername(username);
-    })
-    .then(function(user) {
+    /* Does the requesting user have admin rights to this room? */
+  return Promise.join(
+    userService.findByUsername(username),
+    persistence.Troupe.findById(room._id).exec(),
+    function(user, roomForUpdate) {
       if(!user) throw new StatusError(404, 'User ' + username + ' not found.');
+      if(!roomForUpdate) throw new StatusError(404);
 
-      return roomPermissionsModel(user, 'admin', room)
-        .then(function(bannedUserIsAdmin) {
-          if(bannedUserIsAdmin) throw new StatusError(400, 'User ' + username + ' is an admin in this room.');
+      var existingBan = _.find(roomForUpdate.bans, function(ban) {
+        return mongoUtils.objectIDsEqual(ban.userId, user._id);
+      });
 
-          // Load the full object
-          return persistence.Troupe.findById(room.id).exec();
-        })
-        .then(function(roomForUpdate) {
-          var existingBan = _.find(roomForUpdate.bans, function(ban) { return ban.userId == user.id;});
+      if(existingBan) {
+        return existingBan;
+      } else {
+        return policyFactory.createPolicyForRoom(user, roomForUpdate)
+          .then(function(baneePolicy) {
+            return baneePolicy.canAdmin();
+          })
+          .then(function(baneeIsAdmin) {
+            if (baneeIsAdmin) throw new StatusError(403, 'Cannot ban an administrator');
 
-          if(existingBan) {
-            return existingBan;
-          } else {
             var ban = roomForUpdate.addUserBan({
               userId: user.id,
               bannedBy: requestingUser.id
@@ -1277,67 +1283,56 @@ function banUserFromRoom(room, username, requestingUser, options, callback) {
                 roomForUpdate.save(),
                 roomMembershipService.removeRoomMember(roomForUpdate._id, user._id)
               ])
-              .then(function() {
-                if (options && options.removeMessages) {
-                  // TODO: do this in a single query...
-                  return persistence.ChatMessage.find({ toTroupeId: roomForUpdate.id, fromUserId: user.id })
-                    .exec()
-                    .then(function(messages) {
-                      return Promise.all(messages.map(function(message) {
-                        return message.remove();
-                      }));
-                    });
-
-                }
-              })
-              .then(function() {
-                return eventService.newEventToTroupe(
-                  room, requestingUser,
-                  "@" + requestingUser.username + " banned @" + username,
-                  {
-                    service: 'bans',
-                    event: 'banned',
-                    bannedUser: username,
-                    prerendered: true,
-                    performingUser: requestingUser.username
-                  }, {}, function(err) {
-
-                  if(err) logger.error("Unable to create an event in troupe: " + err, { exception: err });
+              .return(ban);
+          })
+          .tap(function() {
+            if (options && options.removeMessages) {
+              // TODO: do this in a single query...
+              return persistence.ChatMessage.find({ toTroupeId: roomForUpdate.id, fromUserId: user.id })
+                .exec()
+                .then(function(messages) {
+                  return Promise.all(messages.map(function(message) {
+                    return message.remove();
+                  }));
                 });
-              }).thenReturn(ban);
-          }
+            }
+          })
+          .tap(function() {
+            return eventService.newEventToTroupe(
+              room, requestingUser,
+              "@" + requestingUser.username + " banned @" + username,
+              {
+                service: 'bans',
+                event: 'banned',
+                bannedUser: username,
+                prerendered: true,
+                performingUser: requestingUser.username
+              }, {}, function(err) {
 
-        });
-
-    })
-    .nodeify(callback);
+              if(err) logger.error("Unable to create an event in troupe: " + err, { exception: err });
+            });
+          });
+      }
+    });
 }
 
-function unbanUserFromRoom(room, troupeBan, username, requestingUser, callback) {
-  return Promise.try(function() {
-      if(!room) throw new StatusError(400, 'Room required');
-      if(!troupeBan) throw new StatusError(400, 'Username required');
-      if(!requestingUser) throw new StatusError(401, 'Not authenticated');
+function unbanUserFromRoom(room, troupeBan, username, requestingUser) {
+    if (!room) throw new StatusError(400, 'Room required');
+    if (!troupeBan) throw new StatusError(400, 'Username required');
+    if (!requestingUser) throw new StatusError(401, 'Not authenticated');
+    if (!canBanInRoom(room)) throw new StatusError(400, 'This room does not support bans');
 
-      if(!canBanInRoom(room)) throw new StatusError(400, 'This room does not support bans');
-
-      /* Does the requesting user have admin rights to this room? */
-      return [room.id, roomPermissionsModel(requestingUser, 'admin', room)];
-    })
-    .spread(function(troupeId, access) {
-      if(!access) throw new StatusError(403, 'You do not have permission to unban people. Admin permission is needed.');
-
-      return persistence.Troupe.update({
-          _id: mongoUtils.asObjectID(troupeId)
-        }, {
-          $pull: {
-            bans: {
-              userId: troupeBan.userId
-            }
+    /* Does the requesting user have admin rights to this room? */
+    return persistence.Troupe.update({
+        _id: mongoUtils.asObjectID(room._id)
+      }, {
+        $pull: {
+          bans: {
+            userId: troupeBan.userId
           }
-        })
-        .exec();
-    })
+        }
+      })
+    .exec()
     .then(function() {
       return eventService.newEventToTroupe(
         room, requestingUser,
@@ -1351,8 +1346,7 @@ function unbanUserFromRoom(room, troupeBan, username, requestingUser, callback) 
         }, {}, function(err) {
         if(err) logger.error("Unable to create an event in troupe: " + err, { exception: err });
       });
-    })
-    .nodeify(callback);
+    });
 }
 
 /**
@@ -1524,15 +1518,14 @@ module.exports = {
   findAllChannelsForUser: findAllChannelsForUser,
   findUsersChannelRoom: findUsersChannelRoom,
   createCustomChildRoom: createCustomChildRoom,
-  joinRoom: joinRoom,
+  joinRoomById: joinRoomById,
   addUserToRoom: addUserToRoom,
-  revalidatePermissionsForUsers: revalidatePermissionsForUsers,
+  /* DISABLED revalidatePermissionsForUsers: revalidatePermissionsForUsers, */
   ensureRepoRoomSecurity: ensureRepoRoomSecurity,
-  findByIdForReadOnlyAccess: findByIdForReadOnlyAccess,
-  removeUserFromRoom: removeUserFromRoom,
+  removeUserFromRoom: Promise.method(removeUserFromRoom),
   hideRoomFromUser: hideRoomFromUser,
-  banUserFromRoom: banUserFromRoom,
-  unbanUserFromRoom: unbanUserFromRoom,
+  banUserFromRoom: Promise.method(banUserFromRoom),
+  unbanUserFromRoom: Promise.method(unbanUserFromRoom),
   findBanByUsername: findBanByUsername,
   searchRooms: searchRooms,
   renameRepo: renameRepo,
