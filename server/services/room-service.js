@@ -28,7 +28,6 @@ var GitHubOrgService           = require('gitter-web-github').GitHubOrgService;
 var validate                   = require('../utils/validate');
 var collections                = require('../utils/collections');
 var StatusError                = require('statuserror');
-var eventService               = require('./event-service');
 var emailNotificationService   = require('./email-notification-service');
 var emailAddressService        = require('./email-address-service');
 var mongoUtils                 = require('gitter-web-persistence-utils/lib/mongo-utils');
@@ -1234,123 +1233,8 @@ function hideRoomFromUser(roomId, userId) {
     });
 }
 
-function canBanInRoom(room) {
-  if(room.githubType === 'ONETOONE') return false;
-  if(room.githubType === 'ORG') return false;
-  if(room.security === 'PRIVATE') return false; /* No bans in private rooms */
-
-  return true;
-}
-
 /**
- * Ban a user from the room. Caller should ensure admin permissions
- */
-function banUserFromRoom(room, username, requestingUser, options) {
-  if (!room) throw new StatusError(400, 'Room required');
-  if (!username) throw new StatusError(400, 'Username required');
-  if (!requestingUser) throw new StatusError(401, 'Not authenticated');
-  if (requestingUser.username === username) throw new StatusError(400, 'You cannot ban yourself');
-  if (!canBanInRoom(room)) throw new StatusError(400, 'This room does not support banning.');
-
-    /* Does the requesting user have admin rights to this room? */
-  return Promise.join(
-    userService.findByUsername(username),
-    persistence.Troupe.findById(room._id).exec(),
-    function(user, roomForUpdate) {
-      if(!user) throw new StatusError(404, 'User ' + username + ' not found.');
-      if(!roomForUpdate) throw new StatusError(404);
-
-      var existingBan = _.find(roomForUpdate.bans, function(ban) {
-        return mongoUtils.objectIDsEqual(ban.userId, user._id);
-      });
-
-      if(existingBan) {
-        return existingBan;
-      } else {
-        return policyFactory.createPolicyForRoom(user, roomForUpdate)
-          .then(function(baneePolicy) {
-            return baneePolicy.canAdmin();
-          })
-          .then(function(baneeIsAdmin) {
-            if (baneeIsAdmin) throw new StatusError(403, 'Cannot ban an administrator');
-
-            var ban = roomForUpdate.addUserBan({
-              userId: user.id,
-              bannedBy: requestingUser.id
-            });
-
-            return Promise.all([
-                roomForUpdate.save(),
-                roomMembershipService.removeRoomMember(roomForUpdate._id, user._id)
-              ])
-              .return(ban);
-          })
-          .tap(function() {
-            if (options && options.removeMessages) {
-              // TODO: do this in a single query...
-              return persistence.ChatMessage.find({ toTroupeId: roomForUpdate.id, fromUserId: user.id })
-                .exec()
-                .then(function(messages) {
-                  return Promise.all(messages.map(function(message) {
-                    return message.remove();
-                  }));
-                });
-            }
-          })
-          .tap(function() {
-            return eventService.newEventToTroupe(
-              room, requestingUser,
-              "@" + requestingUser.username + " banned @" + username,
-              {
-                service: 'bans',
-                event: 'banned',
-                bannedUser: username,
-                prerendered: true,
-                performingUser: requestingUser.username
-              }, {}, function(err) {
-
-              if(err) logger.error("Unable to create an event in troupe: " + err, { exception: err });
-            });
-          });
-      }
-    });
-}
-
-function unbanUserFromRoom(room, troupeBan, username, requestingUser) {
-    if (!room) throw new StatusError(400, 'Room required');
-    if (!troupeBan) throw new StatusError(400, 'Username required');
-    if (!requestingUser) throw new StatusError(401, 'Not authenticated');
-    if (!canBanInRoom(room)) throw new StatusError(400, 'This room does not support bans');
-
-    /* Does the requesting user have admin rights to this room? */
-    return persistence.Troupe.update({
-        _id: mongoUtils.asObjectID(room._id)
-      }, {
-        $pull: {
-          bans: {
-            userId: troupeBan.userId
-          }
-        }
-      })
-    .exec()
-    .then(function() {
-      return eventService.newEventToTroupe(
-        room, requestingUser,
-        "User @" + requestingUser.username + " unbanned @" + username,
-        {
-          service: 'bans',
-          event: 'unbanned',
-          bannedUser: username,
-          prerendered: true,
-          performingUser: requestingUser.username
-        }, {}, function(err) {
-        if(err) logger.error("Unable to create an event in troupe: " + err, { exception: err });
-      });
-    });
-}
-
-/**
- * If the ban is found, returns { ban: troupeBan, user: user}, else returns null
+ * If the ban is found, returns troupeBan else returns null
  */
 function findBanByUsername(troupeId, bannedUsername) {
   return userService.findByUsername(bannedUsername)
@@ -1366,7 +1250,7 @@ function findBanByUsername(troupeId, bannedUsername) {
         .then(function(troupe) {
           if (!troupe || !troupe.bans || !troupe.bans.length) return;
 
-          return { ban: troupe.bans[0], user: user };
+          return troupe.bans[0];
         });
 
     });
@@ -1524,8 +1408,7 @@ module.exports = {
   ensureRepoRoomSecurity: ensureRepoRoomSecurity,
   removeUserFromRoom: Promise.method(removeUserFromRoom),
   hideRoomFromUser: hideRoomFromUser,
-  banUserFromRoom: Promise.method(banUserFromRoom),
-  unbanUserFromRoom: Promise.method(unbanUserFromRoom),
+
   findBanByUsername: findBanByUsername,
   searchRooms: searchRooms,
   renameRepo: renameRepo,
