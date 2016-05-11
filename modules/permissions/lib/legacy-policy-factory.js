@@ -13,7 +13,12 @@ function createPolicyForRoomId(user, roomId) {
   return new LegacyPolicyEvaluator(userId, user, roomId, null);
 }
 
+function createPolicyForUserIdInRoomId(userId, roomId) {
+  return new LegacyPolicyEvaluator(userId, null, roomId, null);
+}
+
 module.exports = {
   createPolicyForRoom: Promise.method(createPolicyForRoom),
-  createPolicyForRoomId: Promise.method(createPolicyForRoomId)
+  createPolicyForRoomId: Promise.method(createPolicyForRoomId),
+  createPolicyForUserIdInRoomId: Promise.method(createPolicyForUserIdInRoomId)
 };
