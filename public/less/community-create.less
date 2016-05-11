@@ -166,8 +166,6 @@
 
 .community-create-step-content-area {
   display: inline-block;
-  display: inline-flex;
-  align-items: flex-end;
   vertical-align: middle;
   // reset centering from above
   text-align: left;
@@ -188,10 +186,6 @@
   }
 }
 
-
-.community-create-step-main-body {
-  flex: 1;
-}
 
 .community-create-general-link {
   color: @ruby;
@@ -319,6 +313,10 @@
 
 
 
+.community-create-progression-button-wrapper {
+  display: flex;
+  justify-content: space-between;
+}
 
 .community-create-next-button {
   padding-right: 0;
@@ -379,7 +377,7 @@
 
 .community-create-has-associated-project-copy {
   .community-create-associated-project-copy();
-  
+
   &.active {
     display: flex;
     justify-content: space-between;
