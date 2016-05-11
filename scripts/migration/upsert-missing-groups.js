@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 
+var _ = require('lodash');
 var shutdown = require('shutdown');
 var persistence = require('gitter-web-persistence');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
@@ -14,6 +15,8 @@ function getGroupableRooms() {
       {
         $match: {
           githubType: {
+            // TODO: don't strip out user channels here because that's useful
+            // info for the steps below
             $nin: ['ONETOONE', 'USER_CHANNEL']
           },
           lcOwner: { $exists: true, $ne: null },
@@ -23,7 +26,10 @@ function getGroupableRooms() {
       {
         $project: {
           uri: 1,
-          lcOwner: 1
+          lcOwner: 1,
+          githubType: 1,
+          parentId: 1,
+          ownerUserId: 1
         }
       },
       {
@@ -72,7 +78,17 @@ function migrate(batch, enc, callback) {
 
   // Fish the owner out of the first room's uri. This is the case-sensitive
   // version used for name and uri.
-  var owner = batch.rooms[0].uri.split('/')[0];
+  var uniqueOwners = _.uniq(batch.rooms.map(function(room) {
+    return room.uri.split('/')[0];
+  }));
+
+  if (uniqueOwners.length > 1) {
+    console.log('WARNING: MULTIPLE UNIQUE OWNERS', uniqueOwners);
+    // NOTE: should this be resolved BEFORE we run this script? Should we skip
+    // them?
+  }
+
+  var owner = uniqueOwners[0];
 
   var hasOrgRoom = !!batch.orgRoom.length;
   var hasUser = !!batch.user.length;
@@ -86,9 +102,15 @@ function migrate(batch, enc, callback) {
     // TODO: maybe here we can somehow lookup owner in users again so we can do
     // a case-sensitive match?
     result = "MAYBE";
+    // TODO: concat all the unique owners, not just the first one
+    // IDEA: if any of the rooms is an org channel, then it must be an
+    // org-based room
+    // IDEA: if there is a user channel for this same lcOwner, then it cannot
+    // be an org-based room
     lookups.push(owner);
   }
 
+  /*
   console.log(
     owner,
     batch.rooms.length+' rooms',
@@ -97,11 +119,15 @@ function migrate(batch, enc, callback) {
     'isDefinitelyOrg:'+isDefinitelyOrg,
     result
   );
+  */
 
   callback();
 
   // NOTE: disabling the actual upserting for now while I figure out how to
   // calculate if we need a group
+
+  // from here on out we need result == YES, owner and lcOwner OR result = NO.
+  // There shouldn't be any MAYBE anymore.
 
   /*
   // upsert the lcOwner into group
@@ -170,7 +196,7 @@ onMongoConnect()
         run(migrate, function(err) {
           console.log("numLookups: "+lookups.length);
           console.log('==========')
-          console.log(lookups);
+          //console.log(lookups.join(','));
           done(err);
         });
       })
