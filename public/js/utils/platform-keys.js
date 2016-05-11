@@ -21,6 +21,7 @@ module.exports = (function() {
     default: return { // Linux and other
       cmd: 'ctrl',
       room: '⇧',
+      room2: 'alt',
       gitter: 'alt'
     };
   }
