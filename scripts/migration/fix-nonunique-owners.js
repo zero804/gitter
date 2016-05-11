@@ -111,7 +111,7 @@ function log(batch, enc, callback) {
   var ownerUserIdMap = {};
   batch.rooms.forEach(function(room) {
     if (room.parentId && !idMap[room.parentId]) {
-      missingParentIdsMap[room.parentId] = true;
+      missingParentIdMap[room.parentId] = true;
     }
     if (room.ownerUserId) {
       ownerUserIdMap[room.ownerUserId] = true;
