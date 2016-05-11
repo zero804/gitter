@@ -3,62 +3,11 @@
 
 var testRequire   = require('../test-require');
 var fixtureLoader = require('../test-fixtures');
-var Promise       = require('bluebird');
 var assert        = require("assert");
 var mongoUtils    = require('gitter-web-persistence-utils/lib/mongo-utils');
 var fixture       = {};
 
 describe('troupe-service', function() {
-
-  describe('update actions', function() {
-    var troupeService = testRequire.withProxies('./services/troupe-service', {
-      'gitter-web-permissions/lib/room-permissions-model': function() { return Promise.resolve(true); }
-    });
-
-    it('should update tags', function() {
-      var rawTags = 'js, open source,    looooooooooooooooooooooooooooongtag,,,,';
-      var cleanTags = ['js','open source', 'looooooooooooooooooo'];
-
-      return troupeService.updateTags(fixture.user1, fixture.troupe1, rawTags)
-        .then(function(troupe) {
-          assert.deepEqual(troupe.tags.toObject(), cleanTags);
-        });
-    });
-
-    it('should not save reserved-word tags(colons) with normal-user', function() {
-      var rawTags = 'hey, foo:bar, there';
-      var cleanTags = ['hey', 'there'];
-
-      return troupeService.updateTags(fixture.user1, fixture.troupe1, rawTags)
-        .then(function(troupe) {
-          assert.deepEqual(troupe.tags.toObject(), cleanTags);
-        });
-    });
-
-    it('should save reserved-word tags with staff-user', function() {
-      var rawTags = 'hey, foo:bar, there';
-      var cleanTags = ['hey', 'foo:bar', 'there'];
-
-      return troupeService.updateTags(fixture.userStaff, fixture.troupe1, rawTags)
-        .then(function(troupe) {
-          assert.deepEqual(troupe.tags.toObject(), cleanTags);
-        });
-    });
-
-    it('should retain reserved-word tags with normal-user', function() {
-      var fixtureTags = 'foo:bar, foo';
-      var userTags = 'hey, there';
-      var userActualTags = ['hey', 'there', 'foo:bar'];
-
-      return troupeService.updateTags(fixture.userStaff, fixture.troupeWithReservedTags, fixtureTags)
-        .then(function() {
-          return troupeService.updateTags(fixture.user1, fixture.troupeWithReservedTags, userTags);
-        })
-        .then(function(troupe) {
-          assert.deepEqual(troupe.tags.toObject(), userActualTags);
-        });
-    });
-  });
 
   describe('#findByIdLeanWithMembership', function() {
     var troupeService = testRequire('./services/troupe-service');
@@ -116,37 +65,13 @@ describe('troupe-service', function() {
     },
     user2: {
     },
-    user3: {
-    },
-    userNoTroupes: {
-    },
-    userStaff: {
-      staff: true
-    },
     troupe1: {
       users: ['user1', 'user2']
     },
     troupe2: {
     },
-    troupe3: {
-    },
-    troupeWithReservedTags: {
-      tags: [
-        'foo:bar',
-        'foo'
-      ]
-    },
-    troupeForDeletion: {
-      users: ['user1', 'user2']
-    },
-    troupeForDeletion2: {
-      users: ['user1']
-    },
-    troupeForDeletion3: {
-      users: ['user1', 'user2']
-    }
-
   }));
+
   after(function() { fixture.cleanup(); });
 
 });
