@@ -1,13 +1,13 @@
 "use strict";
 
-var troupeService        = require("../../../services/troupe-service");
-var roomService          = require("../../../services/room-service");
-var restful              = require("../../../services/restful");
-var restSerializer       = require("../../../serializers/rest-serializer");
-var Promise              = require('bluebird');
-var StatusError          = require('statuserror');
+var roomService = require("../../../services/room-service");
+var restful = require("../../../services/restful");
+var restSerializer = require("../../../serializers/rest-serializer");
+var Promise = require('bluebird');
+var StatusError = require('statuserror');
 var loadTroupeFromParam  = require('./load-troupe-param');
-var policyFactory        = require('gitter-web-permissions/lib/legacy-policy-factory');
+var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
+var RoomWithPolicyService = require('../../../services/room-with-policy-service');
 
 function searchRooms(req) {
   var user = req.user;
@@ -83,28 +83,28 @@ module.exports = {
   update: function(req) {
     return loadTroupeFromParam(req)
       .then(function(troupe) {
-        var updatedTroupe = req.body;
-
+        var roomWithPolicyService = new RoomWithPolicyService(troupe, req.user, req.userRoomPolicy);
         var promises = [];
+        var updatedTroupe = req.body;
 
         if(updatedTroupe.autoConfigureHooks) {
           promises.push(roomService.applyAutoHooksForRepoRoom(req.user, troupe));
         }
 
         if(updatedTroupe.hasOwnProperty('topic')) {
-          promises.push(troupeService.updateTopic(req.user, troupe, updatedTroupe.topic));
+          promises.push(roomWithPolicyService.updateTopic(updatedTroupe.topic));
         }
 
         if(updatedTroupe.hasOwnProperty('providers')) {
-          promises.push(troupeService.updateProviders(req.user, troupe, updatedTroupe.providers));
+          promises.push(roomWithPolicyService.updateProviders(updatedTroupe.providers));
         }
 
         if(updatedTroupe.hasOwnProperty('noindex')) {
-          promises.push(troupeService.toggleSearchIndexing(req.user, troupe, updatedTroupe.noindex));
+          promises.push(roomWithPolicyService.toggleSearchIndexing(updatedTroupe.noindex));
         }
 
         if(updatedTroupe.hasOwnProperty('tags')) {
-          promises.push(troupeService.updateTags(req.user, troupe, updatedTroupe.tags));
+          promises.push(roomWithPolicyService.updateTags(updatedTroupe.tags));
         }
 
         return Promise.all(promises);
