@@ -2,7 +2,7 @@
 
 var Promise = require('bluebird');
 var Lazy = require('lazy.js');
-var debugStrategyPlan = require('./strategy-tracing').debugStrategyPlan
+var reportOnStrategy = require('./strategy-tracing').reportOnStrategy
 
 /**
  * Serialize some items using a strategy, returning a promise
@@ -21,12 +21,12 @@ module.exports = Promise.method(function serializeObject(item, strat) {
       start: start,
       seq: seq,
     })
-    .then(function(preloadData) {
+    .then(function() {
       var strat = this.strat;
       var seq = this.seq;
       var start = this.start;
 
-      debugStrategyPlan(strat, start, preloadData, 1);
+      reportOnStrategy(strat, start, 1);
 
       var serialized = seq.map(strat.map)
         .filter(function(f) {
