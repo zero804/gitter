@@ -15,7 +15,7 @@ module.exports = (function() {
     };
     case 'Windows': return {
       cmd: 'ctrl',
-      room: '⇧',
+      room: 'alt',
       gitter: '⇧'
     };
     default: return { // Linux and other
