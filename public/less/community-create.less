@@ -369,6 +369,24 @@
 
 }
 
+.community-create-associated-project-copy {
+  display: none;
+
+  &.active {
+    display: block;
+  }
+}
+
+.community-create-has-associated-project-copy {
+  .community-create-associated-project-copy();
+  
+  &.active {
+    display: flex;
+    justify-content: space-between;
+  }
+}
+
+
 
 .community-creation-sub-room-input-wrapper {
   display: flex;
@@ -490,6 +508,10 @@
   transition:
     background-color .2s ease;
 
+  &:hover {
+    background-color: rgba(255, 255, 255, .075);
+    text-decoration: none;
+  }
   &:focus {
     background-color: rgba(255, 255, 255, .1);
     outline: none;

@@ -59,8 +59,8 @@ module.exports = CommunityCreateBaseStepView.extend({
   initialize: function(options) {
     CommunityCreateBaseStepView.prototype.initialize.apply(this, arguments);
 
-    this.orgsCollection = options.orgsCollection;
-    this.reposCollection = options.reposCollection;
+    this.orgCollection = options.orgCollection;
+    this.repoCollection = options.repoCollection;
 
     this.listenTo(this.communityCreateModel, 'change:communityName change:communitySlug change:githubOrgId', this.onCommunityDataChange, this);
   },
@@ -70,19 +70,10 @@ module.exports = CommunityCreateBaseStepView.extend({
     data.communityName = this.communityCreateModel.get('communityName');
     data.communitySlug = this.communityCreateModel.get('communitySlug');
 
-    data.githubName = null;
-    var githubOrgId = this.communityCreateModel.get('githubOrgId');
-    var githubRepoId = this.communityCreateModel.get('githubRepoId');
-    if(githubOrgId) {
-      var githubOrgModel = this.orgsCollection.get(githubOrgId);
-      data.githubName = githubOrgModel.get('name');
-      data.githubLink = urlJoin('https://github.com', githubOrgModel.get('name'));
-    }
-    else if(githubRepoId) {
-      var githubRepoModel = this.reposCollection.get(githubRepoId);
-      data.githubName = githubRepoModel.get('name');
-      data.githubLink = urlJoin('https://github.com', githubRepoModel.get('uri'));
-    }
+    var githubProjectInfo = this.communityCreateModel.getGithubProjectInfo(this.orgCollection, this.repoCollection);
+    data.githubName = githubProjectInfo.name;
+    data.githubLink = githubProjectInfo.url;
+
     return data;
   },
 

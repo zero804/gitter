@@ -42,7 +42,9 @@ module.exports = Marionette.LayoutView.extend({
   initMainStepView: function(optionsForRegion) {
     this.mainStepView = new CommunityCreationMainView(optionsForRegion({
       model: this.mainStepViewModel,
-      communityCreateModel: this.model
+      communityCreateModel: this.model,
+      orgCollection: this.orgCollection,
+      repoCollection: this.repoCollection
     }));
     return this.mainStepView;
   },
@@ -69,8 +71,8 @@ module.exports = Marionette.LayoutView.extend({
     this.overviewStepView = new CommunityCreationOverviewView(optionsForRegion({
       model: this.overviewStepViewModel,
       communityCreateModel: this.model,
-      orgsCollection: this.orgCollection,
-      reposCollection: this.repoCollection
+      orgCollection: this.orgCollection,
+      repoCollection: this.repoCollection
     }));
     return this.overviewStepView;
   },
