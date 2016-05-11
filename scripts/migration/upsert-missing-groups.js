@@ -8,6 +8,7 @@ var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var onMongoConnect = require('../../server/utils/on-mongo-connect');
 var through2Concurrent = require('through2-concurrent');
 var orgMap = require('./org-map.json');
+var userMap = require('./user-map.json');
 
 
 function getGroupableRooms() {
@@ -15,9 +16,9 @@ function getGroupableRooms() {
       {
         $match: {
           githubType: {
-            // TODO: don't strip out user channels here because that's useful
-            // info for the steps below
-            $nin: ['ONETOONE', 'USER_CHANNEL']
+            // don't strip out user channels here because that's useful info
+            // for the steps below
+            $nin: ['ONETOONE']
           },
           lcOwner: { $exists: true, $ne: null },
           groupId: { $exists: false }
@@ -36,24 +37,6 @@ function getGroupableRooms() {
         $group: {
           _id: '$lcOwner',
           rooms: { $push: '$$CURRENT' }
-        }
-      }, {
-        $lookup: {
-          // NOTE: I'm assuming that troupe.lcUri is maintained and correct
-          from: "troupes",
-          localField: "_id",
-          foreignField: "lcUri",
-          as: "orgRoom"
-        }
-      }, {
-        // NOTE: comparing lcOwner (lowercased) with username (mixed case). Not
-        // sure of how to find owner (mixed case) at this stage because there
-        // is no troupe.owner unless we calculate it somehow.
-        $lookup: {
-          from: "users",
-          localField: "_id",
-          foreignField: "username",
-          as: "user"
         }
       }
       // TODO: project orgRoom & user for efficiency
@@ -83,20 +66,29 @@ function migrate(batch, enc, callback) {
   }));
 
   if (uniqueOwners.length > 1) {
-    console.log('WARNING: MULTIPLE UNIQUE OWNERS', uniqueOwners);
+    //console.log('WARNING: MULTIPLE UNIQUE OWNERS', uniqueOwners);
     // NOTE: should this be resolved BEFORE we run this script? Should we skip
     // them?
   }
 
   var owner = uniqueOwners[0];
 
-  var hasOrgRoom = !!batch.orgRoom.length;
-  var hasUser = !!batch.user.length;
+  var githubTypeMap = {};
+  batch.rooms.forEach(function(room) {
+    githubTypeMap[room.githubType] = true;
+  });
+
+  var hasOrgRoom = !!(githubTypeMap['ORG'] || githubTypeMap['ORG_CHANNEL']);
+  var hasUserRoom = !!githubTypeMap['USER_CHANNEL'];
   var isDefinitelyOrg = !!orgMap[lcOwner];
+  var isDefinitelyUser = _.any(uniqueOwners, function(o) {
+    return !!userMap[o];
+  })
+
   var result;
   if (hasOrgRoom || isDefinitelyOrg) {
     result = "YES";
-  } else if (hasUser) {
+  } else if (hasUserRoom || isDefinitelyUser) {
     result = "NO";
   } else {
     // TODO: maybe here we can somehow lookup owner in users again so we can do
@@ -110,16 +102,15 @@ function migrate(batch, enc, callback) {
     lookups.push(owner);
   }
 
-  /*
   console.log(
     owner,
-    batch.rooms.length+' rooms',
+    'rooms:'+batch.rooms.length,
     'hasOrgRoom:'+hasOrgRoom,
-    'hasUser:'+hasUser,
+    'hasUserRoom:'+hasUserRoom,
     'isDefinitelyOrg:'+isDefinitelyOrg,
+    'isDefinitelyUser:'+isDefinitelyUser,
     result
   );
-  */
 
   callback();
 
@@ -195,7 +186,7 @@ onMongoConnect()
       .command('execute', 'Execute', { }, function() {
         run(migrate, function(err) {
           console.log("numLookups: "+lookups.length);
-          console.log('==========')
+          //console.log('==========')
           //console.log(lookups.join(','));
           done(err);
         });
