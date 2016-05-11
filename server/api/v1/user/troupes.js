@@ -9,6 +9,7 @@ var roomService       = require('../../../services/room-service');
 var Promise           = require('bluebird');
 var mongoUtils        = require('gitter-web-persistence-utils/lib/mongo-utils');
 var StatusError       = require('statuserror');
+var policyFactory     = require('gitter-web-permissions/lib/legacy-policy-factory');
 
 function performUpdateToUserRoom(req) {
   var userId = req.user.id;
@@ -61,8 +62,10 @@ function performUpdateToUserRoom(req) {
     });
 
 }
+
 module.exports = {
   id: 'userTroupeId',
+
   index: function(req) {
     if(!req.user) throw new StatusError(401);
 
@@ -80,7 +83,7 @@ module.exports = {
       tracking: { source: req.body.source }
     };
 
-    return roomService.joinRoom(troupeId, req.user, options)
+    return roomService.joinRoomById(troupeId, req.user, options)
       .then(function() {
         var strategy = new restSerializer.TroupeIdStrategy({
           currentUserId: req.user.id,
@@ -116,8 +119,16 @@ module.exports = {
     return troupeService.checkIdExists(id)
       .then(function(exists) {
         if (!exists) throw new StatusError(404);
+
         return id;
-      });
+      })
+      .tap(function(id) {
+        return policyFactory.createPolicyForRoomId(req.user, id)
+          .then(function(policy) {
+            // TODO: middleware?
+            req.userRoomPolicy = policy;
+          });
+      })
   },
 
   subresources: {

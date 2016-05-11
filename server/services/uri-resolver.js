@@ -35,7 +35,7 @@ module.exports = function uriResolver(userId, uri, options) {
             }
 
             if(!ignoreCase &&
-                user.username != uri &&
+                user.username !== uri &&
                 user.username.toLowerCase() === uri.toLowerCase()) {
               logger.info('Incorrect case for room: ' + uri + ' redirecting to ' + user.username);
               var redirect = new StatusError(301);

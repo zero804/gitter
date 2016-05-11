@@ -4,6 +4,17 @@ var roomService         = require('../../../services/room-service');
 var restSerializer      = require("../../../serializers/rest-serializer");
 var loadTroupeFromParam = require('./load-troupe-param');
 
+function ensureAdminPermissions(req) {
+  return function(result) {
+    var policy = req.userRoomPolicy;
+    return policy.canAdmin()
+      .then(function() {
+        throw new Error(403, 'Admin permissions required');
+      })
+      .return(result);
+  }
+}
+
 module.exports = {
   id: 'troupeBan',
 
@@ -17,6 +28,7 @@ module.exports = {
 
   create: function(req) {
     return loadTroupeFromParam(req)
+      .then(ensureAdminPermissions(req))
       .then(function(troupe) {
         var username = req.body.username;
         var removeMessages = !!req.body.removeMessages;
@@ -36,6 +48,7 @@ module.exports = {
 
   destroy: function(req) {
     return loadTroupeFromParam(req)
+      .then(ensureAdminPermissions(req))
       .then(function(troupe) {
         return roomService.unbanUserFromRoom(troupe, req.troupeBan, req.troupeBanUser.username, req.user);
       })

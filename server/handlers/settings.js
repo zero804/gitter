@@ -9,7 +9,6 @@ var ensureLoggedIn               = require('../web/middlewares/ensure-logged-in'
 var crypto                       = require('crypto');
 var userSettingsService          = require('../services/user-settings-service');
 var passphrase                   = config.get('email:unsubscribeNotificationsSecret');
-var roomPermissionsModel         = require('gitter-web-permissions/lib/room-permissions-model');
 var request                      = require('request');
 var uriContextResolverMiddleware = require('./app/middleware').uriContextResolverMiddleware;
 var jwt                          = require('jwt-simple');
@@ -46,7 +45,7 @@ function getIntegrations(req, res, next) {
     url: url,
     json: true
   }, function(err, resp, hooks) {
-    if(err || resp.statusCode != 200 || !Array.isArray(hooks)) {
+    if(err || resp.statusCode !== 200 || !Array.isArray(hooks)) {
       logger.error('failed to fetch hooks for troupe', { exception: err, resp: resp, hooks: hooks});
       return next(new StatusError(500, 'Unable to perform request. Please try again later.'));
     }
@@ -75,7 +74,7 @@ function deleteIntegration(req, res, next) {
     json: true
   },
   function(err, resp) {
-    if(err || resp.statusCode != 200) {
+    if(err || resp.statusCode !== 200) {
       logger.error('failed to delete hook for troupe', { exception: err, resp: resp });
       return next(new StatusError(500, 'Unable to perform request. Please try again later.'));
     }
@@ -97,7 +96,7 @@ function createIntegration(req, res, next) {
   },
 
   function(err, resp, body) {
-    if(err || resp.statusCode != 200 || !body) {
+    if(err || resp.statusCode !== 200 || !body) {
       logger.error('failed to create hook for troupe', { exception: err, resp: resp });
       return next(new StatusError(500, 'Unable to perform request. Please try again later.'));
     }
@@ -122,7 +121,9 @@ function createIntegration(req, res, next) {
 
 function adminAccessCheck(req, res, next) {
   var uriContext = req.uriContext;
-  roomPermissionsModel(req.user, 'admin', uriContext.troupe)
+  var policy = uriContext.policy;
+
+  return policy.canAdmin()
     .then(function(access) {
       if(!access) throw new StatusError(403);
     })

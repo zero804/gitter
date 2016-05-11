@@ -6,9 +6,8 @@ var restful              = require("../../../services/restful");
 var restSerializer       = require("../../../serializers/rest-serializer");
 var Promise              = require('bluebird');
 var StatusError          = require('statuserror');
-var roomPermissionsModel = require('gitter-web-permissions/lib/room-permissions-model');
-var userCanAccessRoom    = require('gitter-web-permissions/lib/user-can-access-room');
 var loadTroupeFromParam  = require('./load-troupe-param');
+var policyFactory        = require('gitter-web-permissions/lib/legacy-policy-factory');
 
 function searchRooms(req) {
   var user = req.user;
@@ -126,11 +125,9 @@ module.exports = {
   destroy: function(req) {
     return loadTroupeFromParam(req)
       .then(function(troupe) {
-        var user = req.user;
+        if (troupe.oneToOne || !troupe.uri) throw new StatusError(400, 'cannot delete one to one rooms');
 
-        if (!troupe.uri) throw new StatusError(400, 'cannot delete one to one rooms');
-
-        return [troupe, roomPermissionsModel(user, 'admin', troupe)];
+        return [troupe, req.userRoomPolicy.isAdmin()];
       })
       .spread(function(troupe, isAdmin) {
         if (!isAdmin) throw new StatusError(403, 'admin permissions required');
@@ -145,17 +142,22 @@ module.exports = {
   load: function(req, id) {
     var userId = req.user && req.user._id;
 
-    var permsPromise = req.method === 'GET' ?
-      userCanAccessRoom.permissionToRead(userId, id) :
-      userCanAccessRoom.permissionToWrite(userId, id);
+    return policyFactory.createPolicyForRoomId(req.user, id)
+      .then(function(policy) {
+        // TODO: middleware?
+        req.userRoomPolicy = policy;
 
-    return permsPromise.then(function(access) {
-      if (access) {
-        return id;
-      } else {
-        throw new StatusError(userId ? 403 : 401);
-      }
-    });
+        return req.method === 'GET' ?
+          policy.canRead() :
+          policy.canWrite();
+      })
+      .then(function(access) {
+        if (access) {
+          return id;
+        } else {
+          throw new StatusError(userId ? 403 : 401);
+        }
+      });
   },
 
   subresources: {

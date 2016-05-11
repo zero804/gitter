@@ -10,6 +10,7 @@ var troupeService = require('../../services/troupe-service');
 var chatService   = require('../../services/chat-service');
 var Promise       = require('bluebird');
 var StatusError   = require('statuserror');
+var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
 
 var redis         = require('../../utils/redis');
 var redisClient   = redis.getClient();
@@ -54,54 +55,66 @@ module.exports = function (req, res, next) {
       return next(new Error('Transload did not return ASSEMBLY_COMPLETED: ok=' + transloadit.ok + ', error=' + transloadit.error + ', message=' + transloadit.message));
     }
 
-    troupeService.findByIdLeanWithMembership(metadata.room_id, metadata.user_id)
-      .spread(function(room, isMember) {
-        if(!room) throw new StatusError(404, 'Unable to find room ' + metadata.room_id);
-        if(!isMember) throw new StatusError(403);
-
-        return userService.findById(metadata.user_id)
-          .then(function (user) {
-            if (!user) throw new StatusError(404, 'Unable to find user ' + metadata.user_id);
-
-            var thumbs = {};
-
-            if (transloadit.results['doc_thumbs']) {
-              transloadit.results['doc_thumbs'].forEach(function (thumb) {
-                thumbs[thumb.original_id] = fixUrl(thumb.ssl_url);
-              });
-            }
-
-            if (transloadit.results['img_thumbs']) {
-              transloadit.results['img_thumbs'].forEach(function (thumb) {
-                thumbs[thumb.original_id] = fixUrl(thumb.ssl_url);
-              });
-            }
-
-            if (!transloadit.results[':original']) {
-              throw new StatusError(500, 'Transloadit upload failed' + transloadit.message ? ': ' + transloadit.message : '. AssemblyID: ' + transloadit.assembly_id);
-            }
-
-            // Generate a message for each uploaded file.
-            var promises = transloadit.results[':original'].map(function (upload) {
-              var name = upload.name;
-              var url = fixUrl(upload.ssl_url);
-              var thumb = thumbs[upload.id];
-
-              var text;
-              if (thumb) {
-                text = "[![" + name + "](" + thumb + ")](" + url + ")";
-              } else {
-                text = "[" + name + "](" + url + ")";
-              }
-
-              stats.event('file.upload');
-              return chatService.newChatMessageToTroupe(room, user, { text: text });
-            });
-
-            return Promise.all(promises);
-          });
+    return Promise.join(
+      troupeService.findById(metadata.room_id),
+      userService.findById(metadata.user_id))
+      .bind({
+        room: null,
+        user: null,
       })
-      .then(function () {
+      .spread(function(room, user) {
+        if(!room) throw new StatusError(404, 'Unable to find room ' + metadata.room_id);
+        if (!user) throw new StatusError(404, 'Unable to find user ' + metadata.user_id);
+
+        this.room = room;
+        this.user = user;
+
+        return policyFactory.createPolicyForRoom(user, room);
+      })
+      .then(function(policy) {
+        return policy.canWrite();
+      })
+      .then(function(writeAccess) {
+        if(!writeAccess) throw new StatusError(403);
+        var room = this.room;
+        var user = this.user;
+
+        var thumbs = {};
+
+        if (transloadit.results['doc_thumbs']) {
+          transloadit.results['doc_thumbs'].forEach(function (thumb) {
+            thumbs[thumb.original_id] = fixUrl(thumb.ssl_url);
+          });
+        }
+
+        if (transloadit.results['img_thumbs']) {
+          transloadit.results['img_thumbs'].forEach(function (thumb) {
+            thumbs[thumb.original_id] = fixUrl(thumb.ssl_url);
+          });
+        }
+
+        if (!transloadit.results[':original']) {
+          throw new StatusError(500, 'Transloadit upload failed' + transloadit.message ? ': ' + transloadit.message : '. AssemblyID: ' + transloadit.assembly_id);
+        }
+
+        // Generate a message for each uploaded file.
+        return Promise.map(transloadit.results[':original'], function (upload) {
+          var name = upload.name;
+          var url = fixUrl(upload.ssl_url);
+          var thumb = thumbs[upload.id];
+
+          var text;
+          if (thumb) {
+            text = "[![" + name + "](" + thumb + ")](" + url + ")";
+          } else {
+            text = "[" + name + "](" + url + ")";
+          }
+
+          stats.event('file.upload');
+          return chatService.newChatMessageToTroupe(room, user, { text: text });
+        }, { concurrency: 1 });
+      })
+      .then(function() {
         res.sendStatus(200);
       })
       .catch(function(err) {

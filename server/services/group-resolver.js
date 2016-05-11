@@ -2,8 +2,8 @@
 
 var Promise = require('bluebird');
 var assert = require('assert');
-var roomPermissionsModel = require('gitter-web-permissions/lib/room-permissions-model');
 var _ = require('lodash');
+var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
 
 /**
  * Return a value or a promise of the team members
@@ -13,9 +13,12 @@ function resolveTeam(room, user, groupName) {
   groupName = String(groupName);
 
   if(groupName.toLowerCase() === 'all') {
-    // Only admins are allowed to use 'all' for now
-    return roomPermissionsModel(user, 'admin', room)
+    return policyFactory.createPolicyForRoom(user, room)
+      .then(function(policy) {
+        return policy.canAdmin();
+      })
       .then(function(access) {
+        // Only admins are allowed to use 'all' for now
         if(!access) return;
 
         return { announcement: true };

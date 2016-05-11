@@ -56,7 +56,7 @@ describe('user-default-flags-update-service', function() {
             var mode = roomMembershipFlags.getModeFromFlags(flags);
             assert(mode, 'mute');
 
-            return roomService.joinRoom(troupeId1, user1, { });
+            return roomService.joinRoomById(troupeId1, user1, { });
           })
           .then(function() {
             return roomMembershipService.getMembershipDetails(userId1, troupeId1);
