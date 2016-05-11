@@ -70,12 +70,12 @@ function run(f, callback) {
     })
     .on('error', function(error) {
       console.log("STREAM ERROR");
-      callback(err);
+      callback(error);
     })
 }
 
 function done(err) {
-  if (err) {
+  if (error) {
     console.error(error);
     console.error(error.stack);
     process.exit(1);
