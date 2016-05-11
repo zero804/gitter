@@ -34,13 +34,6 @@ describe('room-service', function() {
       githubType: 'REPO',
       users: ['user1', 'user2']
     },
-    troupeBan: {
-      security: 'PUBLIC',
-      githubType: 'REPO',
-      users: ['userBan', 'userBanAdmin']
-    },
-    userBan: { },
-    userBanAdmin: {},
     troupeCanRemove: {
       security: 'PUBLIC',
       githubType: 'REPO',
@@ -1246,102 +1239,6 @@ describe('room-service', function() {
             assert(room === null, 'Expected room to be null after deletion');
           });
       });
-
-    });
-
-  });
-
-  describe('bans', function() {
-    it('should ban users from rooms #slow', function() {
-      var roomPermissionsModelMock = mockito.mockFunction();
-
-      var roomService = testRequire.withProxies("./services/room-service", {
-        'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock
-      });
-      var roomMembershipService = testRequire('./services/room-membership-service');
-      var userBannedFromRoom = require('gitter-web-permissions/lib/user-banned-from-room');
-
-      mockito.when(roomPermissionsModelMock)().then(function(user, perm, incomingRoom) {
-        assert.equal(perm, 'admin');
-        assert.equal(incomingRoom.id, fixture.troupeBan.id);
-
-        if(user.id == fixture.userBan.id) {
-          return Promise.resolve(false);
-        } else if(user.id == fixture.userBanAdmin.id) {
-          return Promise.resolve(true);
-        } else {
-          assert(false, 'Unknown user');
-        }
-      });
-
-      return userBannedFromRoom(fixture.troupeBan.uri, fixture.userBan)
-        .then(function(banned) {
-          assert(!banned);
-
-          return roomService.banUserFromRoom(fixture.troupeBan, fixture.userBan.username, fixture.userBanAdmin, {})
-            .then(function(ban) {
-              assert.equal(ban.userId, fixture.userBan.id);
-              assert.equal(ban.bannedBy, fixture.userBanAdmin.id);
-              assert(ban.dateBanned);
-
-              return roomMembershipService.checkRoomMembership(fixture.troupeBan._id, fixture.userBan.id);
-            })
-            .then(function(bannedUserIsInRoom) {
-              assert(!bannedUserIsInRoom);
-
-              return roomService.findBanByUsername(fixture.troupeBan.id, fixture.userBan.username);
-            })
-            .then(function(banAndUser) {
-              assert(banAndUser);
-              assert(banAndUser.user);
-              assert(banAndUser.ban);
-
-              return userBannedFromRoom(fixture.troupeBan.uri, fixture.userBan)
-                .then(function(banned) {
-                  assert(banned);
-
-                  return roomService.unbanUserFromRoom(fixture.troupeBan, banAndUser.ban, fixture.userBan.username, fixture.userBanAdmin)
-                    .then(function() {
-                      return userBannedFromRoom(fixture.troupeBan.uri, fixture.userBan)
-                        .then(function(banned) {
-                          assert(!banned);
-
-                          return roomService.findBanByUsername(fixture.troupeBan.id, fixture.userBan.username);
-                        })
-                        .then(function(banAndUser) {
-                          assert(!banAndUser);
-                        });
-                    });
-                });
-            });
-        });
-
-    });
-
-    it('should not allow admins to be banned', function() {
-
-      var roomService = testRequire.withProxies("./services/room-service", {
-        'gitter-web-permissions/lib/legacy-policy-factory': {
-          createPolicyForRoom: function(user, room) {
-            assert.strictEqual(user.id, fixture.userBan.id);
-            assert.strictEqual(room.id, fixture.troupeBan.id);
-            return Promise.resolve({
-              canAdmin: function() {
-                return Promise.resolve(true);
-              }
-            });
-          }
-        }
-      });
-
-      return roomService.banUserFromRoom(fixture.troupeBan, fixture.userBan.username, fixture.userBanAdmin, {})
-        .then(function() {
-          assert(false, 'Expected to fail as banned user is an admin');
-        })
-        .catch(function(err) {
-          if (!(err instanceof StatusError)) throw err;
-          assert.equal(err.status, 403);
-        });
 
     });
 
