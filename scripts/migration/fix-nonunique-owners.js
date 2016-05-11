@@ -130,6 +130,16 @@ function log(batch, enc, callback) {
     errors.push('ownerUserIds');
   }
 
+  // if an lcOwner has both an ORG_CHANNEL or ORG room  _and_ a USER_CHANNEL,
+  // then that's clearly wrong.
+  var githubTypeMap = {};
+  batch.rooms.forEach(function(room) {
+    githubTypeMap[room.githubType] = true;
+  });
+  if ((githubTypeMap['ORG_CHANNEL'] || githubTypeMap['ORG']) && githubTypeMap['USER_CHANNEL']) {
+    errors.push('githubType');
+  }
+
   if (errors.length) {
     console.log(lcOwner, errors);
     callback();
