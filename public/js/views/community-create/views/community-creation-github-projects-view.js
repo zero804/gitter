@@ -4,6 +4,7 @@ var _ = require('underscore');
 var Marionette = require('backbone.marionette');
 var urlJoin = require('url-join');
 var toggleClass = require('utils/toggle-class');
+var context = require('utils/context');
 var slugify = require('slug');
 var fuzzysearch = require('fuzzysearch');
 var getRoomNameFromTroupeName = require('gitter-web-shared/get-room-name-from-troupe-name');
@@ -81,6 +82,14 @@ module.exports = CommunityCreateBaseStepView.extend({
 
     this.throttledApplyFilterToRepos = _.throttle(this.applyFilterToRepos, 500);
     this.shortThrottledApplyFilterToRepos = _.throttle(this.applyFilterToRepos, 100);
+  },
+
+  serializeData: function() {
+    var data = this.model.toJSON();
+    var user = context.getUser();
+    data.isUserMissingPrivateRepoScope = user && !user.scopes.private_repo;
+
+    return data;
   },
 
   onRender: function() {
