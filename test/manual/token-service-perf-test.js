@@ -1,14 +1,13 @@
-/* jshint node:true */
 'use strict';
 
 
 var speedy = require('speedy');
 var oauthService = require('../../server/services/oauth-service');
 
-speedy.run ({
+speedy.run({
   a: function(done) {
     return oauthService.generateAnonWebToken()
-      .spread(function(token, client) {
+      .spread(function(token) {
         return oauthService.validateAccessTokenAndClient(token);
       })
       .nodeify(done);

@@ -1,4 +1,6 @@
-var Builder = require( 'node-spritesheet' ).Builder;
+'use strict';
+
+var Builder = require('node-spritesheet').Builder;
 var services = require('gitter-services');
 var fse = require('fs-extra');
 
@@ -25,13 +27,13 @@ var builder = new Builder({
     }
 });
 
-builder.addConfiguration( "default", {
+builder.addConfiguration("default", {
     images: legacyImages,
     pixelRatio: 1,
     outputImage: 'services.png'
 });
 
-builder.addConfiguration( "retina", {
+builder.addConfiguration("retina", {
     images: retinaImages,
     pixelRatio: 2,
     outputImage: 'services@2x.png'
@@ -39,5 +41,5 @@ builder.addConfiguration( "retina", {
 
 
 
-builder.build( function() {
+builder.build(function() {
 });

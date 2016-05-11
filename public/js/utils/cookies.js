@@ -23,7 +23,6 @@
 |*|  * docCookies.keys()
 |*|
 \*/
-var domain = document.domain || document.location.hostname;
 var secure = document.location.protocol === 'https:';
 
 module.exports = {

@@ -1,5 +1,6 @@
 "use strict";
 var platformDetect = require('utils/platformDetect');
+var context = require('utils/context');
 
 module.exports = (function() {
 
@@ -14,16 +15,16 @@ module.exports = (function() {
     };
     case 'Windows': return {
       cmd: 'ctrl',
-      room: '⇧',
+      room: 'alt',
       gitter: '⇧'
     };
     default: return { // Linux and other
       cmd: 'ctrl',
       room: '⇧',
+      room2: 'alt',
       gitter: 'alt'
     };
   }
 
 
 })();
-

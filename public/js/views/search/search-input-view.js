@@ -46,13 +46,11 @@ var SearchInputView = Marionette.ItemView.extend({
     this.model.set('searchTerm', e.target.value.trim());
   },
 
-  onResultsLoading: function(model, isLoading) { // jshint unused:true
+  onResultsLoading: function(model, isLoading) {
     this.ui.searchIcon.toggleClass('fetching', isLoading);
   },
 
-  onActiveChange: function(model, isActive) { // jshint unused:true
-    this.$el.toggleClass('active', isActive);
-
+  onActiveChange: function(model, isActive) {
     var $input = this.ui.input;
 
     if (isActive && !$input.is(':focus')) {

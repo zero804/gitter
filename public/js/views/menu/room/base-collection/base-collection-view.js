@@ -23,6 +23,12 @@ module.exports = Marionette.CompositeView.extend({
     };
   },
 
+  childEvents: {
+    'item:activated': 'onItemActivated',
+    'hide:complete':  'onHideLeaveRoom',
+    'leave:complete': 'onHideLeaveRoom',
+  },
+
   ui: {
     header:        '#collection-header',
     headerContent: '#collection-header-text',
@@ -43,11 +49,6 @@ module.exports = Marionette.CompositeView.extend({
     'add remove reset': 'onFilterComplete',
   },
 
-  childEvents: {
-    'item:activated': 'onItemActivated',
-    'hide:complete':  'onHideLeaveRoom',
-    'leave:complete': 'onHideLeaveRoom',
-  },
 
   constructor: function(attrs) {
     this.bus            = attrs.bus;

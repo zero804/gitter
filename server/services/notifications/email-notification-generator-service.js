@@ -17,7 +17,7 @@ var mongoUtils                   = require('gitter-web-persistence-utils/lib/mon
 var emailNotificationService     = require('../email-notification-service');
 var userSettingsService          = require('../user-settings-service');
 var debug                        = require('debug')('gitter:email-notification-generator-service');
-var userScopes                   = require('../../utils/models/user-scopes');
+var userScopes                   = require('gitter-web-identity/lib/user-scopes');
 
 var filterTestValues = config.get('notifications:filterTestValues');
 
@@ -238,8 +238,7 @@ function sendEmailNotifications(since) {
                     if(err.gitterAction === 'logout_destroy_user_tokens') {
                       stats.event('logout_destroy_user_tokens', { userId: user.id });
 
-                      user.destroyTokens();
-                      return user.save();
+                      userService.destroyTokensForUserId(user.id);
                     }
                   });
 

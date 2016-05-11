@@ -11,7 +11,7 @@ var mongoUtils        = require('gitter-web-persistence-utils/lib/mongo-utils');
 var StatusError       = require('statuserror');
 var bayeuxExtension   = require('./extension');
 var Promise           = require('bluebird');
-var userCanAccessRoom = require('../../services/user-can-access-room');
+var userCanAccessRoom = require('gitter-web-permissions/lib/user-can-access-room');
 var debug             = require('debug')('gitter:bayeux-authorisor');
 var recentRoomService = require('../../services/recent-room-service');
 

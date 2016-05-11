@@ -42,6 +42,8 @@ module.exports = BaseCollectionItemView.extend({
   },
 
   initialize: function() {
+    BaseCollectionItemView.prototype.initialize.apply(this, arguments);
+
     this.uiModel = new Backbone.Model({ menuIsOpen: false });
     this.listenTo(this.uiModel, 'change:menuIsOpen', this.onModelToggleMenu, this);
     this.listenTo(this.roomMenuModel, 'change:state:post', this.onMenuChangeState, this);
@@ -94,7 +96,7 @@ module.exports = BaseCollectionItemView.extend({
         this.el.classList.remove('room-item--favourite-one2one');
       }
     } else {
-      if (!model.get('favourite')) {
+      if (!!model.get('favourite')) {
         this.el.classList.remove('room-item');
         this.el.classList.add('room-item--favourite');
       } else {

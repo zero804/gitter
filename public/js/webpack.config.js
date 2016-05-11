@@ -1,13 +1,8 @@
-/* jshint node:true */
 "use strict";
 
 var path                     = require("path");
 var CommonsChunkPlugin       = require("webpack/lib/optimize/CommonsChunkPlugin");
 var ContextReplacementPlugin = require("webpack/lib/ContextReplacementPlugin");
-var DefinePlugin             = require("webpack/lib/DefinePlugin");
-var DedupePlugin             = require('webpack/lib/optimize/DedupePlugin');
-var OccurrenceOrderPlugin    = require('webpack/lib/optimize/OccurrenceOrderPlugin');
-var UglifyJsPlugin           = require('webpack/lib/optimize/UglifyJsPlugin');
 
 var getPostcssStack = require('gitter-styleguide/postcss-stack');
 

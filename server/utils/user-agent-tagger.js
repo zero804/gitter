@@ -13,7 +13,7 @@ var mobileBuildVersionMapping = {
 };
 
 function isNativeApp(userAgentString) {
-  return (userAgentString.indexOf('Gitter') >= 0 );
+  return (userAgentString.indexOf('Gitter') >= 0);
 }
 
 function getType(userAgentString) {

@@ -2,11 +2,10 @@
 
 var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 var userService = require('../../services/user-service');
-var StatusError = require('statuserror');
 
 var DEFAULT_AVATAR_URL = "https://avatars1.githubusercontent.com/u/0";
 
-function resolveAvatarForUsername(req, res, next) {
+function resolveAvatarForUsername(req, res) {
   var username = req.params.username;
   var size = parseInt(req.query.s, 10) || 60;
 
@@ -15,7 +14,7 @@ function resolveAvatarForUsername(req, res, next) {
       var url;
       if (user) {
         url = resolveUserAvatarUrl(user, size);
-        if (url.indexOf('/api/private/user-avatar/') != -1) {
+        if (url.indexOf('/api/private/user-avatar/') !== -1) {
           // don't keep redirecting back here in a loop..
           url = DEFAULT_AVATAR_URL;
         }

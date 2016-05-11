@@ -1,6 +1,5 @@
 'use strict';
 
-var Backbone           = require('backbone');
 var roomSort           = require('gitter-realtime-client').sortsFilters.model;
 var troupeModels       = require('../troupes');
 var orgModels          = require('../orgs');
@@ -18,7 +17,7 @@ module.exports = (function() {
   var orgsCollection = new orgModels.OrgCollection(null, { listen: true });
   var roomsSnapshot = context.getSnapshot('rooms') || [];
   var existingRooms = roomsSnapshot.map(function(data){
-    return !!data.lastAccessTime ? _.extend(data, { lastAccessTime: moment(data.lastAccessTime) }) : data;
+    return data.lastAccessTime ? _.extend(data, { lastAccessTime: moment(data.lastAccessTime) }) : data;
   });
   var troupeCollection = new troupeModels.TroupeCollection(existingRooms, { listen: true });
 

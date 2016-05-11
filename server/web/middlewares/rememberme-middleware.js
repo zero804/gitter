@@ -5,13 +5,13 @@ var logger          = env.logger;
 var nconf           = env.config;
 var stats           = env.stats;
 
-var _               = require('underscore');
+var _               = require('lodash');
 var uuid            = require('node-uuid');
 var sechash         = require('sechash');
 var userService     = require('../../services/user-service');
 var useragentTagger = require('../../utils/user-agent-tagger');
 var debug           = require('debug')('gitter:rememberme-middleware');
-var userScopes      = require('../../utils/models/user-scopes');
+var userScopes      = require('gitter-web-identity/lib/user-scopes');
 
 var cookieName = nconf.get('web:cookiePrefix') + 'auth';
 
@@ -53,6 +53,7 @@ function parseToken(tokenInfo) {
   try {
     return JSON.parse(tokenInfo);
   } catch(e) {
+    /* */
   }
 }
 

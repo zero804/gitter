@@ -5,7 +5,6 @@ var context = require('utils/context');
 var apiClient = require('components/apiClient');
 var template = require('./tmpl/typeahead.hbs');
 var _ = require('underscore');
-var context = require('utils/context');
 
 function getRecentMessageSenders(chatCollection) {
   var users = chatCollection.map(function(message) {
@@ -22,7 +21,7 @@ function filterWithTerm(term) {
   return function(user) {
     return user && (
              user.username.toLowerCase().indexOf(lowerTerm) === 0 ||
-             ( user.displayName && user.displayName.toLowerCase().indexOf(lowerTerm) === 0 )
+             (user.displayName && user.displayName.toLowerCase().indexOf(lowerTerm) === 0)
            );
   };
 }

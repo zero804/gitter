@@ -1,0 +1,10 @@
+node_modules/*
+public/repo/**
+output/**
+build-scripts/**
+gulpfile.js
+test/in-browser/old-n-busted/**
+test/in-browser/fixtures/coverage/**
+test/end-to-end/yslow/**
+public/js/utils/base64.js
+config/mongo-docker/*

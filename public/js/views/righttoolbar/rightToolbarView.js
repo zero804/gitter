@@ -6,7 +6,6 @@ var itemCollections       = require('collections/instances/integrated-items');
 var PeopleCollectionView  = require('views/people/peopleCollectionView');
 var RepoInfoView          = require('./repoInfo');
 var ActivityCompositeView = require('./activityCompositeView');
-var hasScrollBars         = require('utils/scrollbar-detect');
 
 var SearchView            = require('views/search/searchView');
 var SearchInputView       = require('views/search/search-input-view');
@@ -78,7 +77,7 @@ module.exports = (function() {
       return new RepoInfoView(optionsForRegion());
     },
 
-    initActivityRegion: function(optionsForRegion, region) {
+    initActivityRegion: function(optionsForRegion) {
       return new ActivityCompositeView(optionsForRegion({
         collection: itemCollections.events
       }));

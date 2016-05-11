@@ -46,7 +46,7 @@ module.exports = {
   },
 
   outgoing: function(message, req, callback) {
-    if(message.channel === '/meta/handshake' ) {
+    if(message.channel === '/meta/handshake') {
       var ip = getClientIp(req);
       var clientId = message.clientId;
 

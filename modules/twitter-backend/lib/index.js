@@ -7,7 +7,7 @@ function TwitterBackend(user, identity) {
   this.identity = identity;
 }
 
-TwitterBackend.prototype.getEmailAddress = Promise.method(function(preferStoredEmail) {
+TwitterBackend.prototype.getEmailAddress = Promise.method(function(/*preferStoredEmail*/) {
   return this.identity.email;
 });
 

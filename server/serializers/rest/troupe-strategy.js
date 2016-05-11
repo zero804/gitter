@@ -1,4 +1,4 @@
-/* jshint maxcomplexity:17 */
+/* eslint complexity: ["error", 17] */
 "use strict";
 
 var logger                = require('gitter-web-env').logger;
@@ -15,7 +15,6 @@ var debug                 = require('debug')('gitter:troupe-strategy');
 var Promise               = require('bluebird');
 var getVersion            = require('../get-model-version');
 var UserIdStrategy        = require('./user-id-strategy');
-var Promise               = require('bluebird');
 
 /**
  *
@@ -381,11 +380,11 @@ function TroupeStrategy(options) {
       if (currentUserId) {
         otherUser = mapOtherUser(item.oneToOneUsers);
       } else {
-        if (!shownWarning) {
+        if (shownWarning) {
+          otherUser = null;
+        } else {
           logger.warn('TroupeStrategy initiated without currentUserId, but generating oneToOne troupes. This can be a problem!');
           shownWarning = true;
-        } else {
-          otherUser = null;
         }
       }
 
