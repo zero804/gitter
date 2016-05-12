@@ -28,7 +28,7 @@ describe("email-address-service", function() {
 
     this.emailAddressService = testRequire.withProxies('./services/email-address-service', {
       'gitter-web-env': env,
-      './backend-muxer': FakeMuxer
+      'gitter-web-backend-muxer': FakeMuxer
     });
   });
 
