@@ -85,7 +85,8 @@ module.exports = CommunityCreateBaseStepView.extend({
     var input = this.ui.peopleInput[0].value;
     this.userSearchCollection.fetch({
       data: {
-          q: input
+          q: input,
+          limit: 12
         }
       },
       {
