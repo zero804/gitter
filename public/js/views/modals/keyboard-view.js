@@ -31,8 +31,10 @@ var View = Marionette.ItemView.extend({
     return {
       hasLeftMenuFeature: context.hasFeature('left-menu'),
 
+      shouldShowRoom2Keys: !!platformKeys.room2,
       cmdKey: platformKeys.cmd,
       roomKey: platformKeys.room,
+      room2Key: platformKeys.room2,
       gitterKey: platformKeys.gitter
     };
   },

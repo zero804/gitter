@@ -33,7 +33,7 @@ function oneToOneOtherUserSequence(currentUserId, troupes) {
       if (mongoUtils.objectIDsEqual(currentUserId, a)) {
         return b;
       } else {
-        if (a) return a;
+        return a;
       }
     });
 }
@@ -220,3 +220,6 @@ TroupeStrategy.prototype = {
 };
 
 module.exports = TroupeStrategy;
+module.exports.testOnly = {
+  oneToOneOtherUserSequence: oneToOneOtherUserSequence
+}
