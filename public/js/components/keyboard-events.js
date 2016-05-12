@@ -225,11 +225,14 @@ module.exports = (function() {
   }
 
   if(context.hasFeature('left-menu')) {
+    /* * /
+    // TODO: This intereferes with AltGr, https://github.com/gitterHQ/gitter/issues/1251
     // Go to a conversation by index in list
     _.each('123456789'.split(''), function (n) {
       keyEvents[roomModifiers + '+' + n] = 'minibar.' + n;
     });
     keyEvents[roomModifiers + '+0'] = 'minibar.10';
+    /* */
   }
   else {
     // Go to a conversation by index in list
