@@ -39,7 +39,7 @@ module.exports = (function() {
     this.mutant = new Mutant(target, adjustScroll, {
       transitions: true,
       observers: { attributes: false, characterData: false },
-      ignoreTransitions: ['opacity', 'background-color', 'border', 'color', 'border-right-color'],
+      ignoreTransitions: ['opacity', 'background-color', 'border', 'color', 'border-right-color', 'visibility'],
       //ignoreFilter: function(mutationRecords) {
       //  var filter = mutationRecords.reduce(function(accum, r) {
       //    var v = r.type === 'attributes' && r.attributeName === 'class' && r.target.id === 'chat-container';

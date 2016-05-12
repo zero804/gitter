@@ -127,6 +127,8 @@
                     emojiElement.setAttribute('src', defaultConfig.img_dir + '/' + emojiName + '.png');
                 }
 
+                emojiElement.setAttribute('height', '20');
+                emojiElement.setAttribute('width', '20');
                 emojiElement.setAttribute('title', ':' + emojiName + ':');
                 emojiElement.setAttribute('alt', ':' + emojiName + ':');
                 emojiElement.setAttribute('align', 'absmiddle');
