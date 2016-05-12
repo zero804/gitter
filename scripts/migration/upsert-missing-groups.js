@@ -10,6 +10,8 @@ var through2Concurrent = require('through2-concurrent');
 var orgMap = require('./org-map.json');
 var userMap = require('./user-map.json');
 
+var GITHUB_TOKEN = '***REMOVED***';
+
 
 function getGroupableRooms() {
   return persistence.Troupe.aggregate([
@@ -71,8 +73,6 @@ function migrate(batch, enc, callback) {
     // them?
   }
 
-  var owner = uniqueOwners[0];
-
   var githubTypeMap = {};
   batch.rooms.forEach(function(room) {
     githubTypeMap[room.githubType] = true;
@@ -80,10 +80,12 @@ function migrate(batch, enc, callback) {
 
   var hasOrgRoom = !!(githubTypeMap['ORG'] || githubTypeMap['ORG_CHANNEL']);
   var hasUserRoom = !!githubTypeMap['USER_CHANNEL'];
-  var isDefinitelyOrg = !!orgMap[lcOwner];
+  var isDefinitelyOrg = _.any(uniqueOwners, function(o) {
+    return !!orgMap[o];
+  });
   var isDefinitelyUser = _.any(uniqueOwners, function(o) {
     return !!userMap[o];
-  })
+  });
 
   var result;
   if (hasOrgRoom || isDefinitelyOrg) {
@@ -101,6 +103,8 @@ function migrate(batch, enc, callback) {
     // be an org-based room
     lookups.push(owner);
   }
+
+  var owner = uniqueOwners[0];
 
   console.log(
     owner,
