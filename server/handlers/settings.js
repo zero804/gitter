@@ -86,7 +86,7 @@ function deleteIntegration(req, res, next) {
 }
 
 function createIntegration(req, res, next) {
-  debug('Delete integration for %s', req.body.service, req.troupe.url);
+  debug('Create integration for %s', req.body.service, req.troupe.url);
 
   request.post({
     url: config.get('webhooks:basepath') + '/troupes/' + req.troupe.id + '/hooks',

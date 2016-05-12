@@ -48,7 +48,7 @@ var SearchInputView = Marionette.ItemView.extend({
     //JP 10/2/16
     toggleClass(this.el, 'empty', !val);
     this.model.set('searchTerm', val);
-  }, 100),
+  }, 500),
 
   onModelChangeState: function (model, val){ //jshint unused: true
     toggleClass(this.el, 'active', val === 'search');
