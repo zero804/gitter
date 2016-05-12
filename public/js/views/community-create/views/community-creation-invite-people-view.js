@@ -2,17 +2,14 @@
 
 var _ = require('underscore');
 var Marionette = require('backbone.marionette');
-var urlJoin = require('url-join');
-var clientEnv = require('gitter-client-env');
 var toggleClass = require('utils/toggle-class');
 
 var template = require('./community-creation-invite-people-view.hbs');
 var CommunityCreateBaseStepView = require('./community-creation-base-step-view');
 var CommunityCreationPeopleListView = require('./community-creation-people-list-view');
+var UserResultListView = require('./community-create-invite-user-result-list-view');
 
-var Typeahead = require('views/controls/typeahead');
 var userSearchModels = require('collections/user-search');
-var userSearchItemTemplate = require('views/app/tmpl/userSearchItem.hbs');
 
 require('gitter-styleguide/css/components/headings.css');
 require('gitter-styleguide/css/components/buttons.css');
@@ -29,8 +26,18 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   behaviors: {
     Isomorphic: {
-      orgListView: { el: '.community-create-invite-list-root', init: 'initInviteListView' },
+      userResultListView: { el: '.community-create-invite-user-result-list-root', init: 'initUserResultListView' },
+      inviteListView: { el: '.community-create-invite-list-root', init: 'initInviteListView' },
     },
+  },
+
+  initUserResultListView: function(optionsForRegion) {
+    this.userResultListView = new UserResultListView(optionsForRegion({
+      collection: this.userSearchCollection
+    }));
+    this.listenTo(this.userResultListView, 'user:activated', this.onPersonSelected, this);
+    //this.listenTo(this.inviteListView, 'user:cleared', this.onPersonRemoved, this);
+    return this.userResultListView;
   },
 
   initInviteListView: function(optionsForRegion) {
@@ -49,38 +56,14 @@ module.exports = CommunityCreateBaseStepView.extend({
   events: _.extend({}, CommunityCreateBaseStepView.prototype.events, {
     'click @ui.nextStep': 'onStepNext',
     'click @ui.backStep': 'onStepBack',
+    'input @ui.peopleInput': 'onPeopleInputUpdate'
   }),
 
   initialize: function(options) {
     CommunityCreateBaseStepView.prototype.initialize.apply(this, arguments);
-  },
 
-  setupPeopleTypahead: function() {
-    this.typeahead = new Typeahead({
-      collection: new userSearchModels.Collection(),
-      el: this.ui.peopleInput[0],
-      itemTemplate: userSearchItemTemplate,
-      itemSerializeData: function() {
-        var data = _.extend({}, this.model.toJSON());
-        data.absoluteUri = urlJoin(clientEnv.basePath, this.model.get('username'));
-        return data;
-      },
-      autoSelector: function(input) {
-        return function(m) {
-          var displayName = m.get('displayName');
-          var username = m.get('username');
-
-          return displayName && displayName.indexOf(input) >= 0 ||
-            username && username.indexOf(input) >= 0;
-        };
-      }
-    });
-
-    this.listenTo(this.typeahead, 'selected', this.onPersonSelected);
-  },
-
-  onRender: function() {
-    this.setupPeopleTypahead();
+    this.userSearchCollection = new userSearchModels.Collection();
+    this.throttledFetchUsers = _.throttle(this.fetchUsers, 300);
   },
 
   onDestroy: function() {
@@ -94,10 +77,27 @@ module.exports = CommunityCreateBaseStepView.extend({
     this.communityCreateModel.set('stepState', this.communityCreateModel.STEP_CONSTANT_MAP.main);
   },
 
+  onPeopleInputUpdate: function() {
+    this.throttledFetchUsers();
+  },
+
+  fetchUsers: function() {
+    var input = this.ui.peopleInput[0].value;
+    this.userSearchCollection.fetch({
+      data: {
+          q: input
+        }
+      },
+      {
+        add: true,
+        remove: true,
+        merge: true
+      }
+    );
+  },
+
   onPersonSelected: function(person) {
     this.communityCreateModel.get('peopleToInvite').add(person);
-    this.typeahead.dropdown.hide();
-    this.typeahead.clear();
   },
 
   onPersonRemoved: function(person) {
