@@ -43,6 +43,7 @@
     "gitter-redis-scripto": "^0.2.2",
     "gitter-services": "git+https://github.com/gitterHQ/services.git#1.17.1",
     "gitter-web-appevents": "file:modules/appevents",
+    "gitter-web-backend-muxer": "file:modules/backend-muxer",
     "gitter-web-cache-wrapper": "file:modules/cache-wrapper",
     "gitter-web-env": "file:modules/env",
     "gitter-web-github": "file:modules/github",
