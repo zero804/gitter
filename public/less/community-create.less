@@ -230,6 +230,7 @@
 
   color: @base-text-color;
   font-size: @font-size;
+  font-weight: 300;
 
   &:hover,
   &:focus {
@@ -253,8 +254,10 @@
 
 
 .primary-community-heading {
-  color: #ffffff;
   margin-bottom: 1.5rem;
+  color: #ffffff;
+  font-weight: 300;
+  line-height: 1.2;
 }
 
 .secondary-community-create-button {
@@ -377,6 +380,7 @@
 
 .community-creation-slug-input-prefix {
   margin-right: 0.5rem;
+  font-weight: 300;
 }
 
 .community-creation-slug-input {
@@ -588,6 +592,41 @@
 
 
 
+
+.primary-community-invite-people-email-section {
+  margin-top: 4rem;
+}
+
+.primary-community-invite-people-email-input-wrapper {
+  display: flex;
+}
+
+.primary-community-invite-people-email-input {
+  flex: 6;
+  height: auto;
+  padding: 1rem 2rem;
+
+  background-color: rgba(0, 0, 0, .3);
+  border: 0;
+
+  color: @base-text-color;
+
+  &:placeholder {
+    color: @base-text-color;
+  }
+}
+
+.primary-community-invite-people-email-submit-button {
+  .community-create-general-link();
+  flex: 1;
+  flex-shrink: 0;
+  background-color: transparent;
+  border: 0;
+  text-align: right;
+}
+
+
+
 .community-create-invite-user-result-list-wrapper {
   overflow: auto;
   max-height: unit(60 * 4, px);
@@ -628,6 +667,9 @@
 }
 
 
+.community-create-overview-invite-list-root {
+  margin-top: 2rem;
+}
 
 .community-create-invite-list-root {
   margin-top: 6rem;
@@ -731,11 +773,15 @@
 
 
 .community-create-overview-community-name {
+  margin-bottom: 1.2rem;
+
   font-size: 2.3rem;
   font-weight: bold;
 }
 
 .community-create-overview-url-heading {
+  margin-bottom: 1.2rem;
+
   color: fade(@base-text-color, 60%);
   font-size: 1.8rem;
   font-weight: normal;
