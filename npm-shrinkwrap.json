@@ -1097,7 +1097,7 @@
         "utils-merge": {
           "version": "1.0.0",
           "from": "utils-merge@1.0.0",
-          "resolved": "https://registry.npmjs.org/utils-merge/-/utils-merge-1.0.0.tgz"
+          "resolved": "http://beta-internal:4873/utils-merge/-/utils-merge-1.0.0.tgz"
         }
       }
     },
@@ -1735,6 +1735,11 @@
       "version": "1.0.0",
       "from": "modules/appevents",
       "resolved": "file:modules/appevents"
+    },
+    "gitter-web-backend-muxer": {
+      "version": "1.0.0",
+      "from": "modules/backend-muxer",
+      "resolved": "file:modules/backend-muxer"
     },
     "gitter-web-cache-wrapper": {
       "version": "1.0.0",
