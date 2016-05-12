@@ -5,10 +5,17 @@
     srcset="{{ avatarSrcset.srcset }}"
     height="{{ avatarSrcset.size }}"
     width="{{ avatarSrcset.size }}" />
-  <span class="community-create-list-item-name">
-    {{ username }}
-  </span>
-  <button class="community-create-people-list-item-remove-button">
-    <i class="icon-cancel"></i>
-  </button>
+  <div class="community-create-people-list-item-overlay">
+    {{#if displayName}}
+      <h5 class="community-create-list-item-display-name">
+        {{ displayName }}
+      </h5>
+    {{/if}}
+    <h6 class="community-create-list-item-username">
+      @{{ username }}
+    </h6>
+    <button class="community-create-people-list-item-remove-button">
+      <i class="icon-cancel"></i>
+    </button>
+  </div>
 </a>
