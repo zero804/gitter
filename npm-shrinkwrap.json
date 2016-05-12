@@ -30,9 +30,9 @@
       "resolved": "http://beta-internal:4873/async/-/async-0.9.2.tgz"
     },
     "batch-stream": {
-      "version": "0.1.2",
+      "version": "0.1.3",
       "from": "batch-stream@>=0.1.2 <0.2.0",
-      "resolved": "http://beta-internal:4873/batch-stream/-/batch-stream-0.1.2.tgz",
+      "resolved": "http://beta-internal:4873/batch-stream/-/batch-stream-0.1.3.tgz",
       "dependencies": {
         "readable-stream": {
           "version": "1.0.34",
@@ -79,9 +79,9 @@
           "resolved": "http://beta-internal:4873/bytes/-/bytes-2.3.0.tgz"
         },
         "content-type": {
-          "version": "1.0.1",
+          "version": "1.0.2",
           "from": "content-type@>=1.0.1 <1.1.0",
-          "resolved": "http://beta-internal:4873/content-type/-/content-type-1.0.1.tgz"
+          "resolved": "http://beta-internal:4873/content-type/-/content-type-1.0.2.tgz"
         },
         "depd": {
           "version": "1.1.0",
@@ -121,6 +121,11 @@
               "resolved": "http://beta-internal:4873/ee-first/-/ee-first-1.1.1.tgz"
             }
           }
+        },
+        "qs": {
+          "version": "6.1.0",
+          "from": "qs@6.1.0",
+          "resolved": "http://beta-internal:4873/qs/-/qs-6.1.0.tgz"
         },
         "raw-body": {
           "version": "2.1.6",
@@ -346,7 +351,7 @@
             },
             "isstream": {
               "version": "0.1.2",
-              "from": "isstream@>=0.1.0 <0.2.0",
+              "from": "isstream@>=0.1.2 <0.2.0",
               "resolved": "http://beta-internal:4873/isstream/-/isstream-0.1.2.tgz"
             },
             "pkginfo": {
@@ -756,9 +761,9 @@
           "resolved": "http://beta-internal:4873/content-disposition/-/content-disposition-0.5.1.tgz"
         },
         "content-type": {
-          "version": "1.0.1",
+          "version": "1.0.2",
           "from": "content-type@>=1.0.1 <1.1.0",
-          "resolved": "http://beta-internal:4873/content-type/-/content-type-1.0.1.tgz"
+          "resolved": "http://beta-internal:4873/content-type/-/content-type-1.0.2.tgz"
         },
         "cookie": {
           "version": "0.1.5",
@@ -832,7 +837,7 @@
         "path-to-regexp": {
           "version": "0.1.7",
           "from": "path-to-regexp@0.1.7",
-          "resolved": "https://registry.npmjs.org/path-to-regexp/-/path-to-regexp-0.1.7.tgz"
+          "resolved": "http://beta-internal:4873/path-to-regexp/-/path-to-regexp-0.1.7.tgz"
         },
         "proxy-addr": {
           "version": "1.0.10",
@@ -847,7 +852,7 @@
             "ipaddr.js": {
               "version": "1.0.5",
               "from": "ipaddr.js@1.0.5",
-              "resolved": "https://registry.npmjs.org/ipaddr.js/-/ipaddr.js-1.0.5.tgz"
+              "resolved": "http://beta-internal:4873/ipaddr.js/-/ipaddr.js-1.0.5.tgz"
             }
           }
         },
@@ -864,7 +869,7 @@
         "send": {
           "version": "0.13.1",
           "from": "send@0.13.1",
-          "resolved": "https://registry.npmjs.org/send/-/send-0.13.1.tgz",
+          "resolved": "http://beta-internal:4873/send/-/send-0.13.1.tgz",
           "dependencies": {
             "destroy": {
               "version": "1.0.4",
@@ -1325,9 +1330,9 @@
           }
         },
         "lodash": {
-          "version": "4.11.2",
+          "version": "4.12.0",
           "from": "lodash@>=4.6.1 <5.0.0",
-          "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.11.2.tgz"
+          "resolved": "http://beta-internal:4873/lodash/-/lodash-4.12.0.tgz"
         },
         "nconf": {
           "version": "0.6.9",
@@ -1705,9 +1710,9 @@
       }
     },
     "gitter-services": {
-      "version": "1.17.0",
-      "from": "git+https://github.com/gitterHQ/services.git#1.17.0",
-      "resolved": "git+https://github.com/gitterHQ/services.git#eac2aa23433cdf73c2fddc8ca63033f23dce70e0",
+      "version": "1.17.1",
+      "from": "git+https://github.com/gitterHQ/services.git#1.17.1",
+      "resolved": "git+https://github.com/gitterHQ/services.git#fa9d0d9c741b800e9908145105dd6eb36a2aac2b",
       "dependencies": {
         "require-all": {
           "version": "0.0.8",
@@ -2369,9 +2374,9 @@
       }
     },
     "langs": {
-      "version": "1.0.1",
+      "version": "1.0.2",
       "from": "langs@>=1.0.1 <2.0.0",
-      "resolved": "http://beta-internal:4873/langs/-/langs-1.0.1.tgz"
+      "resolved": "http://beta-internal:4873/langs/-/langs-1.0.2.tgz"
     },
     "languagedetect": {
       "version": "1.1.1",
@@ -2613,9 +2618,9 @@
       "resolved": "http://beta-internal:4873/mongodb-unique-ids/-/mongodb-unique-ids-0.1.2.tgz"
     },
     "mongoose": {
-      "version": "4.4.14",
+      "version": "4.4.16",
       "from": "mongoose@>=4.4.5 <5.0.0",
-      "resolved": "http://beta-internal:4873/mongoose/-/mongoose-4.4.14.tgz",
+      "resolved": "http://beta-internal:4873/mongoose/-/mongoose-4.4.16.tgz",
       "dependencies": {
         "async": {
           "version": "1.5.2",
@@ -2842,14 +2847,14 @@
       "resolved": "http://beta-internal:4873/nodemailer/-/nodemailer-0.3.14.tgz",
       "dependencies": {
         "mailcomposer": {
-          "version": "3.7.0",
+          "version": "3.9.0",
           "from": "mailcomposer@>=0.1.11",
-          "resolved": "http://beta-internal:4873/mailcomposer/-/mailcomposer-3.7.0.tgz",
+          "resolved": "http://beta-internal:4873/mailcomposer/-/mailcomposer-3.9.0.tgz",
           "dependencies": {
             "buildmail": {
-              "version": "3.6.0",
-              "from": "buildmail@3.6.0",
-              "resolved": "http://beta-internal:4873/buildmail/-/buildmail-3.6.0.tgz",
+              "version": "3.7.0",
+              "from": "buildmail@3.7.0",
+              "resolved": "http://beta-internal:4873/buildmail/-/buildmail-3.7.0.tgz",
               "dependencies": {
                 "addressparser": {
                   "version": "1.0.1",
@@ -2867,14 +2872,14 @@
                   "resolved": "http://beta-internal:4873/libqp/-/libqp-1.1.0.tgz"
                 },
                 "nodemailer-fetch": {
-                  "version": "1.3.0",
-                  "from": "nodemailer-fetch@1.3.0",
-                  "resolved": "http://beta-internal:4873/nodemailer-fetch/-/nodemailer-fetch-1.3.0.tgz"
+                  "version": "1.4.0",
+                  "from": "nodemailer-fetch@1.4.0",
+                  "resolved": "http://beta-internal:4873/nodemailer-fetch/-/nodemailer-fetch-1.4.0.tgz"
                 },
                 "nodemailer-shared": {
-                  "version": "1.0.4",
-                  "from": "nodemailer-shared@1.0.4",
-                  "resolved": "http://beta-internal:4873/nodemailer-shared/-/nodemailer-shared-1.0.4.tgz"
+                  "version": "1.0.5",
+                  "from": "nodemailer-shared@1.0.5",
+                  "resolved": "http://beta-internal:4873/nodemailer-shared/-/nodemailer-shared-1.0.5.tgz"
                 }
               }
             },
@@ -3301,9 +3306,9 @@
       "resolved": "http://beta-internal:4873/permessage-deflate/-/permessage-deflate-0.1.5.tgz"
     },
     "qs": {
-      "version": "6.1.0",
+      "version": "6.2.0",
       "from": "qs@>=6.1.0 <7.0.0",
-      "resolved": "http://beta-internal:4873/qs/-/qs-6.1.0.tgz"
+      "resolved": "http://beta-internal:4873/qs/-/qs-6.2.0.tgz"
     },
     "readme-badger": {
       "version": "0.1.2",
@@ -3451,28 +3456,9 @@
               "resolved": "http://beta-internal:4873/aws-sign2/-/aws-sign2-0.6.0.tgz"
             },
             "aws4": {
-              "version": "1.3.2",
+              "version": "1.4.1",
               "from": "aws4@>=1.2.1 <2.0.0",
-              "resolved": "http://beta-internal:4873/aws4/-/aws4-1.3.2.tgz",
-              "dependencies": {
-                "lru-cache": {
-                  "version": "4.0.1",
-                  "from": "lru-cache@>=4.0.0 <5.0.0",
-                  "resolved": "http://beta-internal:4873/lru-cache/-/lru-cache-4.0.1.tgz",
-                  "dependencies": {
-                    "pseudomap": {
-                      "version": "1.0.2",
-                      "from": "pseudomap@>=1.0.1 <2.0.0",
-                      "resolved": "http://beta-internal:4873/pseudomap/-/pseudomap-1.0.2.tgz"
-                    },
-                    "yallist": {
-                      "version": "2.0.0",
-                      "from": "yallist@>=2.0.0 <3.0.0",
-                      "resolved": "http://beta-internal:4873/yallist/-/yallist-2.0.0.tgz"
-                    }
-                  }
-                }
-              }
+              "resolved": "http://beta-internal:4873/aws4/-/aws4-1.4.1.tgz"
             },
             "bl": {
               "version": "1.1.2",
@@ -3807,6 +3793,11 @@
               "version": "0.8.2",
               "from": "oauth-sign@>=0.8.1 <0.9.0",
               "resolved": "http://beta-internal:4873/oauth-sign/-/oauth-sign-0.8.2.tgz"
+            },
+            "qs": {
+              "version": "6.1.0",
+              "from": "qs@>=6.1.0 <6.2.0",
+              "resolved": "http://beta-internal:4873/qs/-/qs-6.1.0.tgz"
             },
             "stringstream": {
               "version": "0.0.5",
@@ -3910,7 +3901,7 @@
       "dependencies": {
         "debug": {
           "version": "1.0.4",
-          "from": "debug@>=1.0.4 <2.0.0",
+          "from": "debug@>=1.0.2 <2.0.0",
           "resolved": "http://beta-internal:4873/debug/-/debug-1.0.4.tgz",
           "dependencies": {
             "ms": {
@@ -3955,9 +3946,9 @@
       "resolved": "http://beta-internal:4873/temp/-/temp-0.4.0.tgz"
     },
     "tentacles": {
-      "version": "0.3.0",
-      "from": "tentacles@>=0.3.0 <0.4.0",
-      "resolved": "http://beta-internal:4873/tentacles/-/tentacles-0.3.0.tgz",
+      "version": "0.3.2",
+      "from": "tentacles@>=0.3.2 <0.4.0",
+      "resolved": "http://beta-internal:4873/tentacles/-/tentacles-0.3.2.tgz",
       "dependencies": {
         "create-error": {
           "version": "0.3.1",
@@ -3980,28 +3971,9 @@
               "resolved": "http://beta-internal:4873/aws-sign2/-/aws-sign2-0.6.0.tgz"
             },
             "aws4": {
-              "version": "1.3.2",
+              "version": "1.4.1",
               "from": "aws4@>=1.2.1 <2.0.0",
-              "resolved": "http://beta-internal:4873/aws4/-/aws4-1.3.2.tgz",
-              "dependencies": {
-                "lru-cache": {
-                  "version": "4.0.1",
-                  "from": "lru-cache@>=4.0.0 <5.0.0",
-                  "resolved": "http://beta-internal:4873/lru-cache/-/lru-cache-4.0.1.tgz",
-                  "dependencies": {
-                    "pseudomap": {
-                      "version": "1.0.2",
-                      "from": "pseudomap@>=1.0.1 <2.0.0",
-                      "resolved": "http://beta-internal:4873/pseudomap/-/pseudomap-1.0.2.tgz"
-                    },
-                    "yallist": {
-                      "version": "2.0.0",
-                      "from": "yallist@>=2.0.0 <3.0.0",
-                      "resolved": "http://beta-internal:4873/yallist/-/yallist-2.0.0.tgz"
-                    }
-                  }
-                }
-              }
+              "resolved": "http://beta-internal:4873/aws4/-/aws4-1.4.1.tgz"
             },
             "bl": {
               "version": "1.1.2",
@@ -4337,6 +4309,11 @@
               "from": "oauth-sign@>=0.8.1 <0.9.0",
               "resolved": "http://beta-internal:4873/oauth-sign/-/oauth-sign-0.8.2.tgz"
             },
+            "qs": {
+              "version": "6.1.0",
+              "from": "qs@>=6.1.0 <6.2.0",
+              "resolved": "http://beta-internal:4873/qs/-/qs-6.1.0.tgz"
+            },
             "stringstream": {
               "version": "0.0.5",
               "from": "stringstream@>=0.0.4 <0.1.0",
@@ -4379,9 +4356,9 @@
       }
     },
     "through2-concurrent": {
-      "version": "1.1.0",
+      "version": "1.1.1",
       "from": "through2-concurrent@>=1.1.0 <2.0.0",
-      "resolved": "http://beta-internal:4873/through2-concurrent/-/through2-concurrent-1.1.0.tgz",
+      "resolved": "http://beta-internal:4873/through2-concurrent/-/through2-concurrent-1.1.1.tgz",
       "dependencies": {
         "through2": {
           "version": "2.0.1",
@@ -4642,7 +4619,7 @@
               "dependencies": {
                 "bluebird": {
                   "version": "2.10.2",
-                  "from": "bluebird@>=2.9.30 <3.0.0",
+                  "from": "bluebird@>=2.9.34 <3.0.0",
                   "resolved": "http://beta-internal:4873/bluebird/-/bluebird-2.10.2.tgz"
                 },
                 "chalk": {
@@ -4968,7 +4945,7 @@
           "dependencies": {
             "strip-ansi": {
               "version": "3.0.1",
-              "from": "strip-ansi@>=3.0.0 <4.0.0",
+              "from": "strip-ansi@>=3.0.1 <4.0.0",
               "resolved": "http://beta-internal:4873/strip-ansi/-/strip-ansi-3.0.1.tgz",
               "dependencies": {
                 "ansi-regex": {
@@ -5277,7 +5254,7 @@
                             },
                             "spdx-license-ids": {
                               "version": "1.2.1",
-                              "from": "spdx-license-ids@>=1.0.2 <2.0.0",
+                              "from": "spdx-license-ids@>=1.0.0 <2.0.0",
                               "resolved": "http://beta-internal:4873/spdx-license-ids/-/spdx-license-ids-1.2.1.tgz"
                             }
                           }
