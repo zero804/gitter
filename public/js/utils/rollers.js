@@ -4,6 +4,7 @@ var _ = require('underscore');
 var rafUtils = require('utils/raf-utils');
 var isMobile = require('utils/is-mobile');
 var addPassiveScrollListener = require('./passive-scroll-listener');
+var raf = require('utils/raf');
 
 module.exports = (function() {
 
@@ -51,7 +52,14 @@ module.exports = (function() {
       //}
     });
 
-    var _trackLocation = _.throttle(this.trackLocation.bind(this), 100);
+    var self = this;
+    function trackLocationAnimationFrame() {
+      raf(function() {
+        self.trackLocation();
+      })
+    }
+
+    var _trackLocation = _.throttle(trackLocationAnimationFrame, 100);
     addPassiveScrollListener(target, _trackLocation);
     window.addEventListener('resize', adjustScroll, false);
     window.addEventListener('focusin', adjustScroll, false);
