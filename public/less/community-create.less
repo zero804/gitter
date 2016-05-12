@@ -629,10 +629,12 @@
 
 .community-create-invite-user-result-list-wrapper {
   overflow: auto;
-  max-height: unit(60 * 4, px);
+  //max-height: unit(60 * 4, px);
 }
 
 .community-create-invite-user-result-list {
+  column-width: 20rem;
+
   margin-left: 0;
   padding-left: 2.5rem;
 
@@ -646,7 +648,8 @@
 }
 
 .community-create-invite-user-result-list-item {
-  margin-top: 1.5rem;
+  break-inside: avoid-column;
+  padding-top: 1.5rem;
 }
 
 .community-create-invite-user-result-list-item-link {

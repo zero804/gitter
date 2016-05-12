@@ -21,7 +21,12 @@ var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
   },
 
   ui: {
+    link: '.community-create-people-list-item-link',
     removeButton: '.community-create-people-list-item-remove-button'
+  },
+
+  events: {
+    'click @ui.link': 'onLinkClick'
   },
 
   triggers: {
@@ -38,6 +43,11 @@ var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
 
   onActiveChange: function() {
     toggleClass(this.$el[0], 'active', this.model.get('active'));
+  },
+
+  onLinkClick: function(e) {
+    e.preventDefault();
+    e.stopPropagation();
   }
 });
 
