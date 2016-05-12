@@ -10,7 +10,6 @@ var heatmapService          = require('../../services/chat-heatmap-service');
 var restSerializer          = require('../../serializers/rest-serializer');
 var contextGenerator        = require('../../web/context-generator');
 var Promise                 = require('bluebird');
-var roomService             = require('../../services/room-service');
 var burstCalculator         = require('../../utils/burst-calculator');
 var roomPermissionsModel    = require('gitter-web-permissions/lib/room-permissions-model');
 var timezoneMiddleware      = require('../../web/middlewares/timezone');
@@ -20,12 +19,26 @@ var beforeTodayAnyTimezone  = require('gitter-web-shared/time/before-today-any-t
 var debug                   = require('debug')('gitter:app-archive');
 var _                       = require('underscore');
 var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
-
+var userCanAccessRoom       = require('gitter-web-permissions/lib/user-can-access-room');
+var StatusError             = require('statuserror');
 
 var ONE_DAY_SECONDS = 60 * 60 * 24; // 1 day
 var ONE_DAY_MILLISECONDS = ONE_DAY_SECONDS * 1000;
 var ONE_YEAR_SECONDS = 60 * 60 * 24 * 365; // 1 year
 var ONE_YEAR_MILLISECONDS = ONE_YEAR_SECONDS * 1000;
+
+var validateRoomForReadOnlyAccess = Promise.method(function(user, room) {
+  if(!room) throw new StatusError(404); // Mandatory
+
+  var userId = user._id;
+  var troupeId = room._id;
+  return userCanAccessRoom.permissionToRead(userId, troupeId)
+    .then(function(access) {
+      if (access) return;
+      if (!user) throw new StatusError(401);
+      throw new StatusError(404);
+    });
+})
 
 function generateChatTree(chatActivity) {
   // group things in nested maps
@@ -102,7 +115,7 @@ exports.datesList = [
       avatarSrcSet: resolveRoomAvatarSrcSet({ uri: req.uriContext.uri }, 48)
     };
 
-    return roomService.validateRoomForReadOnlyAccess(user, troupe)
+    return validateRoomForReadOnlyAccess(user, troupe)
       .then(function() {
         return roomPermissionsModel(user, 'admin', troupe)
       })
@@ -154,7 +167,7 @@ exports.linksList = [
       isPrivate: isPrivate
     };
 
-    return roomService.validateRoomForReadOnlyAccess(user, troupe)
+    return validateRoomForReadOnlyAccess(user, troupe)
       .then(function() {
         return roomPermissionsModel(user, 'admin', troupe)
       })
@@ -186,7 +199,7 @@ exports.chatArchive = [
     var user = req.user;
     var troupe = req.uriContext.troupe;
 
-    return roomService.validateRoomForReadOnlyAccess(user, troupe)
+    return validateRoomForReadOnlyAccess(user, troupe)
       .then(function() {
         var troupeId = troupe.id;
 
