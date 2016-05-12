@@ -1,6 +1,7 @@
 "use strict";
 
 var Marionette       = require('backbone.marionette');
+var context          = require('utils/context');
 var appEvents        = require('../../utils/appevents');
 var platformKeys     = require('utils/platform-keys');
 var ModalView        = require('./modal');
@@ -28,8 +29,12 @@ var View = Marionette.ItemView.extend({
 
   serializeData: function() {
     return {
+      hasLeftMenuFeature: context.hasFeature('left-menu'),
+
+      shouldShowRoom2Keys: !!platformKeys.room2,
       cmdKey: platformKeys.cmd,
       roomKey: platformKeys.room,
+      room2Key: platformKeys.room2,
       gitterKey: platformKeys.gitter
     };
   },
