@@ -128,7 +128,7 @@
     "stringformat": "0.0.5",
     "targetenv": "^1.0.0",
     "temp": "0.4.0",
-    "tentacles": "^0.3.0",
+    "tentacles": "^0.3.2",
     "text-filter": "^0.1.1",
     "throat": "~1.0.0",
     "through2-concurrent": "^1.1.0",

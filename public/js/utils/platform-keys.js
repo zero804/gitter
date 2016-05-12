@@ -15,12 +15,13 @@ module.exports = (function() {
     };
     case 'Windows': return {
       cmd: 'ctrl',
-      room: '⇧',
+      room: 'alt',
       gitter: '⇧'
     };
     default: return { // Linux and other
       cmd: 'ctrl',
       room: '⇧',
+      room2: 'alt',
       gitter: 'alt'
     };
   }
