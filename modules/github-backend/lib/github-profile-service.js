@@ -19,10 +19,10 @@ module.exports = function gitHubProfileService(gitHubUser, options) {
 
       var blogUrl;
       if (body.blog) {
-        if (!body.blog.match(/^https?:\/\//)) {
-          blogUrl = 'http://' + body.blog;
-        } else {
+        if (body.blog.match(/^https?:\/\//)) {
           blogUrl = body.blog;
+        } else {
+          blogUrl = 'http://' + body.blog;
         }
       }
 

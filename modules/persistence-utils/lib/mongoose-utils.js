@@ -186,27 +186,6 @@ exports.findByIdsLean = function(Model, ids, select) {
   });
 };
 
-exports.findByFieldInValue = function(Model, field, values, callback) {
-  return Promise.try(function() {
-    if (!values || !values.length) return [];
-
-    /* Special case for a single value */
-    if (values.length === 1) {
-      var query = {};
-      query[field] = values[0];
-      return Model.findOne(query)
-        .exec()
-        .then(function(doc) {
-          if (doc) return [doc];
-          return [];
-        });
-    }
-
-    /* Usual case */
-    return Model.where(field).in(values).exec();
-  }).nodeify(callback);
-};
-
 exports.addIdToLean = function(object) {
   if (object && object._id) { object.id = object._id.toString(); }
   return object;
