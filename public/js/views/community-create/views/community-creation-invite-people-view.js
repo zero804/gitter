@@ -1,6 +1,7 @@
 'use strict';
 
 var _ = require('underscore');
+var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 var toggleClass = require('utils/toggle-class');
 
@@ -42,7 +43,10 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   initInviteListView: function(optionsForRegion) {
     this.inviteListView = new CommunityCreationPeopleListView(optionsForRegion({
-      collection: this.communityCreateModel.get('peopleToInvite')
+      collection: this.communityCreateModel.get('peopleToInvite'),
+      model: new Backbone.Model({
+        canRemove: true
+      })
     }));
     this.listenTo(this.inviteListView, 'person:remove', this.onPersonRemoved, this);
     return this.inviteListView;
