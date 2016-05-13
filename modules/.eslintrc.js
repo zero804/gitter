@@ -1,9 +1,9 @@
 module.exports = {
     "env": {
         "commonjs": true,
-        "browser": true
+        "node": true
     },
     rules: {
-      "node/no-unpublished-require": "error"
+      "node/no-unpublished-require": "warn"
     }
 };

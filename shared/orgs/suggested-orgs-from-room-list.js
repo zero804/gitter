@@ -1,7 +1,7 @@
 /* eslint complexity: ["error", 13] */
 'use strict';
 
-var _                       = require('lodash');
+var _                       = require('underscore');
 var resolveRoomAvatarSrcSet = require('../avatars/resolve-room-avatar-srcset.js');
 var getOrgNameFromUri       = require('../get-org-name-from-uri');
 var defaultFilter           = require('../filters/left-menu-primary-default');
