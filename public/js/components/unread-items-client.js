@@ -8,6 +8,8 @@ var Backbone        = require('backbone');
 var appEvents       = require('utils/appevents');
 var UnreadItemStore = require('./unread-items-client-store');
 var log             = require('utils/log');
+var raf             = require('utils/raf')
+var addPassiveScrollListener = require('utils/passive-scroll-listener');
 
 module.exports = (function() {
 
@@ -254,7 +256,10 @@ module.exports = (function() {
 
     appEvents.on('eyeballStateChange', this._eyeballStateChange, this);
 
-    this._scrollElement.addEventListener('scroll', boundGetBounds, false);
+    function rafGetBounds() {
+      raf(boundGetBounds);
+    }
+    addPassiveScrollListener(this._scrollElement, rafGetBounds);
 
     // this is not a live collection so this will not work inside an SPA
     //$('.mobile-scroll-class').on('scroll', boundGetBounds);
