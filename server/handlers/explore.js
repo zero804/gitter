@@ -53,6 +53,7 @@ _.extend(FAUX_TAG_MAP, {
   'Material Design': [],
   'React': ['react'],
   'Java': ['java'],
+  'PHP': ['php'],
   'Swift': ['swift'],
   'Go': ['go'],
   'Node': ['node', 'nodejs'],
@@ -63,7 +64,6 @@ _.extend(FAUX_TAG_MAP, {
   'Rails': ['rails'],
   'Haskell': ['haskell']
 });
-
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
