@@ -67,7 +67,6 @@ var MinibarView = Marionette.CollectionView.extend({
   },
 
   initialize: function(attrs) {
-
     this.bus            = attrs.bus;
     this.dndCtrl        = attrs.dndCtrl;
     this.model          = attrs.model;

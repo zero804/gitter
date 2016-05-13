@@ -1,0 +1,13 @@
+{
+  "name": "gitter-web-backend-muxer",
+  "version": "1.0.0",
+  "main": "lib/backend-muxer.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha test/"
+  },
+  "private": true
+}

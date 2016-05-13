@@ -10,6 +10,8 @@ function GithubRepoStrategy(options) {
   var troupesIndexed;
 
   this.preload = function(repos) {
+    if (repos.isEmpty()) return;
+
     var repoFullNames = repos.map(function(repo) {
         return repo.full_name;
       })

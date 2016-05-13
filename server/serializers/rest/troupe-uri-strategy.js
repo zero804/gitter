@@ -16,7 +16,6 @@ function TroupeUriStrategy(options) {
 
         return troupeStrategy.preload(Lazy(troupes));
       });
-
   };
 
   this.map = function(uri) {
