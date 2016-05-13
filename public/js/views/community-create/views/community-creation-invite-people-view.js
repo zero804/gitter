@@ -9,6 +9,7 @@ var template = require('./community-creation-invite-people-view.hbs');
 var CommunityCreateBaseStepView = require('./community-creation-base-step-view');
 var CommunityCreationPeopleListView = require('./community-creation-people-list-view');
 var UserResultListView = require('./community-create-invite-user-result-list-view');
+var CommunityCreationEmailListView = require('./community-creation-email-list-view');
 
 var userSearchModels = require('collections/user-search');
 
@@ -29,6 +30,7 @@ module.exports = CommunityCreateBaseStepView.extend({
     Isomorphic: {
       userResultListView: { el: '.community-create-invite-user-result-list-root', init: 'initUserResultListView' },
       inviteListView: { el: '.community-create-invite-list-root', init: 'initInviteListView' },
+      inviteEmailListView: { el: '.community-create-invite-email-list-root', init: 'initInviteEmailListView' },
     },
   },
 
@@ -52,15 +54,28 @@ module.exports = CommunityCreateBaseStepView.extend({
     return this.inviteListView;
   },
 
+  initInviteEmailListView: function(optionsForRegion) {
+    this.inviteEmailListView = new CommunityCreationEmailListView(optionsForRegion({
+      collection: this.communityCreateModel.get('emailsToInvite'),
+      model: new Backbone.Model({
+        canRemove: true
+      })
+    }));
+    return this.inviteEmailListView;
+  },
+
   ui: _.extend({}, CommunityCreateBaseStepView.prototype.ui, {
     peopleInput: '.primary-community-invite-people-name-input',
-    inviteList: '.community-create-invite-list'
+    inviteList: '.community-create-invite-list',
+    emailInput: '.community-invite-people-email-input',
+    emailSubmit: '.community-invite-people-email-submit-button'
   }),
 
   events: _.extend({}, CommunityCreateBaseStepView.prototype.events, {
     'click @ui.nextStep': 'onStepNext',
     'click @ui.backStep': 'onStepBack',
-    'input @ui.peopleInput': 'onPeopleInputUpdate'
+    'input @ui.peopleInput': 'onPeopleInputUpdate',
+    'click @ui.emailSubmit': 'onEmailSubmit'
   }),
 
   initialize: function(options) {
@@ -107,5 +122,18 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   onPersonRemoved: function(person) {
     this.communityCreateModel.get('peopleToInvite').remove(person);
+  },
+
+  onEmailSubmit: function() {
+    var newEmailAddress = this.ui.emailInput[0].value;
+
+    if(newEmailAddress.length) {
+      this.communityCreateModel.get('emailsToInvite').add({
+        address: newEmailAddress
+      });
+    }
+
+    // Clear the input
+    this.ui.emailInput[0].value = '';
   }
 });
