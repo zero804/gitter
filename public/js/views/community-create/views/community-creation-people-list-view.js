@@ -1,5 +1,6 @@
 'use strict';
 
+var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 var urlJoin = require('url-join');
 var clientEnv = require('gitter-client-env');
@@ -33,6 +34,10 @@ var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
     'click @ui.removeButton': 'item:remove'
   },
 
+  initialize: function(options) {
+    this.model.set('canRemove', options.canRemove);
+  },
+
   serializeData: function() {
     var data = this.model.toJSON();
     data.absoluteUri = urlJoin(clientEnv.basePath, this.model.get('username'));
@@ -56,10 +61,17 @@ var CommunityCreationPeopleListEmptyView = Marionette.ItemView.extend({
 });
 
 var CommunityCreationPeopleListView = Marionette.CompositeView.extend({
+  model: new Backbone.Model(),
+
   template: CommunityCreationPeopleListTemplate,
   childView: CommunityCreationPeopleListItemView,
   emptyView: CommunityCreationPeopleListEmptyView,
   childViewContainer: '.community-create-people-list',
+  childViewOptions: function() {
+    return {
+      canRemove: this.model.get('canRemove')
+    };
+  },
   childEvents: {
     'item:remove': 'onItemRemoved'
   },

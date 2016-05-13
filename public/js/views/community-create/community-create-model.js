@@ -23,11 +23,14 @@ var CommunityCreateModel = Backbone.Model.extend({
     githubOrgId: null,
     githubRepoId: null,
 
+    /* * /
     subRooms: new Backbone.Collection([{
       name: 'lobby'
     }]),
+    /* */
 
-    peopleToInvite: new Backbone.Collection()
+    peopleToInvite: new Backbone.Collection(),
+    emailsToInvite: new Backbone.Collection()
   },
 
   initialize: function() {

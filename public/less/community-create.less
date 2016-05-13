@@ -8,8 +8,34 @@
 
 @base-text-color: rgba(255, 255, 255, .75);
 
+@step-content-area-max-width: 800px;
+
+
+@primary-input-font-size: 3.8rem;
+@primary-input-height: 5.4rem;
+
+@primary-input-spacing-top: 1.5rem;
+@primary-input-spacing-bottom: 3rem;
+
+
+@number-org-items-per-column: 3;
+@org-item-avatar-size: 3.6rem;
+@org-item-height: @org-item-avatar-size;
+@org-item-spacing: 1.6rem;
+
+@org-area-total-height: (@number-org-items-per-column * @org-item-height) + (@number-org-items-per-column * @org-item-spacing);
+
+@number-repo-items-per-column: 5;
+@repo-item-avatar-size: 2rem;
+@repo-item-height: @repo-item-avatar-size;
+@repo-item-spacing: (@org-area-total-height - (@number-repo-items-per-column * @repo-item-height)) / @number-repo-items-per-column;
+
+
 
 @people-list-avatar-size: 44px;
+
+
+
 
 
 .community-create-root,
@@ -186,7 +212,7 @@
   text-align: left;
 
   width: 75%;
-  max-width: 800px;
+  max-width: @step-content-area-max-width;
   @media (max-width: 800px) {
     width: 85%;
   }
@@ -217,10 +243,18 @@
   border-bottom: 2px solid rgba(255, 255, 255, .2);
 }
 
-.primary-bare-input(@font-size: 3.789rem; @border-width: 3px) {
+.primary-bare-input(@explicit-height: @primary-input-height; @font-size: @primary-input-font-size; @border-width: 3px) {
+  display: block;
   width: 100%;
+  height: @explicit-height;
 
-  padding: .9em 0;
+  // Inputs are weird with height, idk
+  @leftover-height: @primary-input-height - @primary-input-font-size;
+  @vertical-padding: ~"calc(("@leftover-height ~"-" @border-width~") / 2)";
+  padding-top: 0;
+  padding-left: 0;
+  padding-bottom: @vertical-padding;
+  padding-right: 0;
 
   background-color: transparent;
   border: 0;
@@ -230,6 +264,7 @@
 
   color: @base-text-color;
   font-size: @font-size;
+  line-height: 1;
   font-weight: 300;
 
   &:hover,
@@ -248,13 +283,14 @@
 }
 
 .secondary-bare-input() {
-  .primary-bare-input(1.6rem, 2px);
+  .primary-bare-input(3rem, 1.6rem, 1px);
 }
 
 
 
 .primary-community-heading {
-  margin-bottom: 1.5rem;
+  margin-bottom: 3rem;
+
   color: #ffffff;
   font-weight: 300;
   line-height: 1.2;
@@ -265,7 +301,7 @@
 }
 
 
-.primary-tabbed-navigation-list {
+.primary-tabbed-navigation-list(@font-size: 3rem) {
   display: flex;
 
   margin-top: 0;
@@ -274,7 +310,9 @@
   padding-left: 0;
   list-style: none;
 
-  font-size: 3rem;
+  font-size: @primary-input-font-size;
+  line-height: 1;
+  font-weight: 300;
 }
 
 .primary-tabbed-navigation-list-item {
@@ -286,15 +324,15 @@
   }
 
   & + & {
-    border-left: 2px solid rgba(255, 255, 255, .4);
+    border-left: 3px solid rgba(255, 255, 255, .4);
   }
 }
 
-.primary-tabbed-navigation-button {
+.primary-tabbed-navigation-button(@vertical-padding: .5em) {
   display: block;
-  padding-top: .5em;
+  padding-top: @vertical-padding;
   padding-left: 1em;
-  padding-bottom: .5em;
+  padding-bottom: @vertical-padding;
   padding-right: 1em;
 
   background-color: transparent;
@@ -302,8 +340,9 @@
 
   color: fade(@base-text-color, 40%);
   font-size: inherit;
-  font-family: inherit;
   line-height: 1;
+  font-family: inherit;
+  font-weight: 300;
 
   transition:
     background-color .2s ease,
@@ -322,16 +361,11 @@
     color: @ruby;
   }
 }
-
-
-
-.primary-community-name-input,
-.primary-community-repo-name-filter-input,
-.primary-community-invite-people-name-input {
-  .primary-bare-input();
-  margin-top: 1.5rem;
-  margin-bottom: 3rem;
+.primary-tabbed-navigation-button {
+  .primary-tabbed-navigation-button((@primary-input-height - @primary-input-font-size) / 2);
 }
+
+
 
 
 
@@ -352,6 +386,16 @@
   padding-left: 0;
 }
 
+
+
+
+
+
+.primary-community-name-input {
+  .primary-bare-input();
+  margin-top: @primary-input-spacing-top;
+  margin-bottom: @primary-input-spacing-bottom;
+}
 
 .community-creation-slug-input-wrapper {
   position: relative;
@@ -472,6 +516,12 @@
   position: relative;
 }
 
+.community-create-github-projects-tabbed-navigation-list {
+  .primary-tabbed-navigation-list();
+  margin-top: @primary-input-spacing-top;
+  margin-bottom: @primary-input-spacing-bottom;
+}
+
 .community-create-github-projects-tab-content-area {
   position: absolute;
   visibility: hidden;
@@ -501,7 +551,7 @@
 
 .community-create-github-project-list-wrapper {
   overflow: auto;
-  max-height: unit(60 * 4, px);
+  height: @org-area-total-height;
 
   &::-webkit-scrollbar-thumb {
     background-color: rgba(255, 255, 255, .2);
@@ -511,15 +561,34 @@
   }
 }
 
-.community-create-org-list,
-.community-create-repo-list {
+.community-create-github-project-list() {
+  display: flex;
+  flex-wrap: wrap;
+
   margin-top: 0;
   margin-left: 0;
   margin-bottom: 0;
   padding-left: 0;
   list-style: none;
+}
 
-  column-width: 250px;
+.community-create-github-project-list-item(@item-spacing) {
+  @vertical-padding-calc-value: (@item-spacing / 2) ~"-" 2px;
+
+  flex-grow: 1;
+  flex-basis: (@step-content-area-max-width / 3) + 1;
+  display: block;
+  border: 2px solid transparent;
+
+  margin-top: calc(@vertical-padding-calc-value);
+  margin-bottom: calc(@vertical-padding-calc-value);
+
+  transition: border-color .2s ease;
+
+  &.active {
+    background-color: rgba(255, 255, 255, .08);
+    border: 2px solid fade(@ruby, 60%);
+  }
 }
 
 .community-create-list-item-link {
@@ -529,6 +598,7 @@
   color: @base-text-color;
   white-space: nowrap;
   text-overflow: ellipsis;
+  line-height: 1;
 
   transition:
     background-color .2s ease;
@@ -544,54 +614,59 @@
 }
 
 .community-create-list-item-name {
+}
 
+
+
+.community-create-org-list {
+  .community-create-github-project-list();
 }
 
 .community-create-org-list-item {
-  display: block;
-  margin-top: 1rem;
-  border: 2px solid transparent;
+  .community-create-github-project-list-item(@org-item-spacing);
+}
 
-  transition: border-color .2s ease;
+.community-create-org-list-item-link {
+  .community-create-list-item-link();
+}
 
-  &.active {
-    background-color: rgba(255, 255, 255, .08);
-    border: 2px solid fade(@ruby, 60%);
-  }
+.community-create-org-list-item-avatar {
+  width: @org-item-avatar-size;
+  height: @org-item-avatar-size;
+  vertical-align: middle;
+  margin-right: 1.6rem;
 }
 
 
-.community-create-org-list-item-avatar {
-  max-width: 44px;
-  vertical-align: middle;
-  margin-right: 16px;
+.primary-community-repo-name-filter-input {
+  .secondary-bare-input()
+}
+
+.community-create-repo-list {
+  .community-create-github-project-list();
 }
 
 .community-create-repo-list-item {
-  display: block;
-  margin-top: 8px;
-  border: 2px solid transparent;
+  .community-create-github-project-list-item(@repo-item-spacing);
+}
 
-  transition: border-color .2s ease;
-
-  &.hidden {
-    display: none;
-  }
-
-  &.active {
-    background-color: rgba(255, 255, 255, .08);
-    border: 2px solid fade(@ruby, 60%);
-  }
+.community-create-repo-list-item-link {
+  .community-create-list-item-link();
 }
 
 .community-create-repo-list-item-avatar {
-  max-width: 22px;
+  width: @repo-item-avatar-size;
+  height: @repo-item-avatar-size;
   vertical-align: middle;
   margin-right: .3rem;
 }
 
 
 
+
+.primary-community-invite-people-name-input {
+  .primary-community-name-input();
+}
 
 .primary-community-invite-people-email-section {
   margin-top: 4rem;
@@ -636,7 +711,7 @@
   column-width: 20rem;
 
   margin-left: 0;
-  padding-left: 2.5rem;
+  padding-left: 0;
 
   list-style: none;
 }
@@ -670,9 +745,7 @@
 }
 
 
-.community-create-overview-invite-list-root {
-  margin-top: 2rem;
-}
+
 
 .community-create-invite-list-root {
   margin-top: 6rem;
@@ -703,15 +776,6 @@
   &:hover,
   &:focus {
     text-decoration: none;
-
-    & > .community-create-people-list-item-overlay {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    & > .community-create-people-list-item-avatar {
-      z-index: 2;
-    }
   }
 }
 
@@ -722,55 +786,43 @@
 .community-create-people-list-item-overlay {
   z-index: 1;
   position: absolute;
-  left: 0;
-  padding-top: .4rem;
-  padding-left: calc(@people-list-avatar-size ~"+" 2rem);
-  padding-bottom: 2rem + 4rem;
-  padding-right: 2rem + 4rem;
-
-  opacity: 0;
-  background-color: rgba(60, 43, 80, .9);
-  color: @base-text-color;
-  pointer-events: none;
-
-  transition: opacity .2s ease;
-}
-
-.community-create-list-item-display-name {
-  margin-top: 0;
-  margin-bottom: .5em;
-
-  color: #ffffff;
-  font-size: 1.8rem;
-  font-weight: bold;
-  text-transform: none;
-}
-
-.community-create-list-item-username {
-  margin-top: .5em;
-  margin-bottom: .5em;
-
-  font-size: 1.4rem;
-  font-weight: normal;
-  white-space: nowrap;
+  top: 0;
+  right: 0;
 }
 
 .community-create-people-list-item-remove-button {
-  position: absolute;
-  bottom: 0;
-  right: 0;
+  @people-list-item-remove-button-size:  3rem;
+  @people-list-item-remove-button-background-color: @caribbean;
+  @people-list-item-remove-button-color: #ffffff;
 
-  width: 4rem;
-  height: 4rem;
+  width: @people-list-item-remove-button-size;
+  height: @people-list-item-remove-button-size;
   padding: 0;
 
-  background-color: @caribbean;
+  background-color: fade(@people-list-item-remove-button-background-color, 60%);
   border: 0;
 
-  color: #ffffff;
+  color: fade(@people-list-item-remove-button-color, 60%);
   font-size: 1em;
-  line-height: 4rem;
+  line-height: @people-list-item-remove-button-size;
   text-align: center;
+
+  transform: scale(.5);
+  transform-origin: top right;
+
+  will-change: transform;
+  transition:
+    background-color .2s ease,
+    color .2s ease,
+    transform .2s ease;
+
+  .community-create-people-list-item-link:hover &,
+  .community-create-people-list-item-link:focus & {
+    background-color: @people-list-item-remove-button-background-color;
+    color: @people-list-item-remove-button-color;
+    transform: scale(1);
+  }
+
 }
 
 
@@ -796,6 +848,10 @@
 
 .community-create-overview-invite-list-heading {
   font-weight: 300;
+}
+
+.community-create-overview-invite-list-root {
+  margin-top: 2rem;
 }
 
 .community-create-overview-sub-room-heading {
