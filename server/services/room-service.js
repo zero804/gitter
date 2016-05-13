@@ -13,7 +13,6 @@ var _                          = require('lodash');
 var xregexp                    = require('xregexp').XRegExp;
 var persistence                = require('gitter-web-persistence');
 var uriLookupService           = require("./uri-lookup-service");
-var permissionsModel           = require('gitter-web-permissions/lib/permissions-model');
 var policyFactory              = require('gitter-web-permissions/lib/legacy-policy-factory');
 var securityDescriptorService  = require('gitter-web-permissions/lib/security-descriptor-service');
 var legacyMigration            = require('gitter-web-permissions/lib/legacy-migration');
@@ -131,7 +130,7 @@ function findOrCreateGroupRoom(user, troupe, uri, options) {
     /* The troupe exists. Ensure it's not past the max limit and the user can join */
     return policyFactory.createPolicyForRoom(user, troupe)
       .then(function(policy) {
-        return [policy, policy.canJoin()]
+        return [policy, policy.canJoin()];
       })
       .spread(function(policy, joinAccess) {
         debug('Does user %s have access to existing room? %s', (user && user.username || '~anon~'), joinAccess);
@@ -196,7 +195,11 @@ function findOrCreateGroupRoom(user, troupe, uri, options) {
 
       /* Room does not yet exist */
       // TODO: switch out for policy...
-      return permissionsModel(user, 'create', officialUri, githubType, null) // Parent rooms always have security == null
+      // Parent rooms always have security == null
+      return policyFactory.createPolicyForGithubObject(user, officialUri, githubType, null)
+        .then(function(policy) {
+          return policy.canAdmin();
+        })
         .then(function(access) {
           debug('Does the user have access to create room %s? %s', uri, access);
 
@@ -425,7 +428,7 @@ function updateRoomWithGithubIdIfRequired(user, troupe) {
  * used to silently create owner rooms for org channels
  */
 // TODO: remove this in the new world where we've broken away from GH uris
-var createGithubRoom = Promise.method(function(user, uri) {
+function createGithubRoom(user, uri) {
   if(!user) throw new StatusError(400, 'user required');
   if(!uri) throw new StatusError(400, 'uri required');
 
@@ -446,9 +449,12 @@ var createGithubRoom = Promise.method(function(user, uri) {
       var githubId = githubInfo.githubId || null;
       var topic = githubInfo.description || '';
 
-      return permissionsModel(user, 'create', officialUri, githubType, null)
+      return policyFactory.createPolicyForGithubObject(user, officialUri, githubType, null)
+        .then(function(policy) {
+          return policy.canAdmin();
+        })
         .then(function(hasAccess) {
-          if (!hasAccess) throw new StatusError(403, 'no permission to create ' + officialUri);
+          if (!hasAccess) throw new StatusError(403, 'Permission to create ' + officialUri + ' denied');
         })
         .then(function() {
 
@@ -507,7 +513,7 @@ var createGithubRoom = Promise.method(function(user, uri) {
             });
         });
     });
-});
+}
 
 
 /**
@@ -806,7 +812,7 @@ function notValidGithubRepoName(repoName) {
   return (/^[\w\-]{1,}$/).test(repoName);
 }
 
-function ensureNoRepoNameClash(user, uri) {
+var ensureNoRepoNameClash = Promise.method(function (user, uri) {
   var parts = uri.split('/');
 
   if(parts.length < 2) {
@@ -830,7 +836,7 @@ function ensureNoRepoNameClash(user, uri) {
 
   // Cant clash with /x/y/z
   return false;
-}
+});
 
 function ensureNoExistingChannelNameClash(uri) {
   return troupeService.findByUri(uri)
@@ -839,7 +845,7 @@ function ensureNoExistingChannelNameClash(uri) {
     });
 }
 
-var createCustomChildRoom = Promise.method(function(parentTroupe, user, options) {
+function createRoomChannel(parentTroupe, user, options) {
   validate.expect(user, 'user is expected');
   validate.expect(options, 'options is expected');
 
@@ -847,64 +853,80 @@ var createCustomChildRoom = Promise.method(function(parentTroupe, user, options)
   var security = options.security;
   var uri, githubType;
 
-  if(parentTroupe) {
-    assertValidName(name);
-    uri = parentTroupe.uri + '/' + name;
+  assertValidName(name);
+  uri = parentTroupe.uri + '/' + name;
 
-      if(!{ ORG: 1, REPO: 1 }.hasOwnProperty(parentTroupe.githubType)) {
-      validate.fail('Invalid security option: ' + security);
-    }
-
-    // TODO: move to `permissions` here
-    switch(parentTroupe.githubType) {
-      case 'ORG':
-        githubType = 'ORG_CHANNEL';
-        break;
-      case 'REPO':
-        githubType = 'REPO_CHANNEL';
-        break;
-      default:
-        validate.fail('Invalid parent room type');
-    }
-
-      if(!{ PUBLIC: 1, PRIVATE: 1, INHERITED: 1 }.hasOwnProperty(security)) {
-      validate.fail('Invalid security option: ' + security);
-    }
-
-  } else {
-    githubType = 'USER_CHANNEL';
-
-    // Create a child room for a user
-    switch(security) {
-      case 'PUBLIC':
-        assertValidName(name);
-        break;
-
-      case 'PRIVATE':
-        if(name) {
-          /* If you cannot afford a name, one will be assigned to you */
-          assertValidName(name);
-        } else {
-          name = generateRandomName();
-        }
-        break;
-
-      default:
-        validate.fail('Invalid security option: ' + security);
-    }
-
-    uri = user.username + '/' + name;
-
+  switch(parentTroupe.githubType) {
+    case 'ORG':
+      githubType = 'ORG_CHANNEL';
+      break;
+    case 'REPO':
+      githubType = 'REPO_CHANNEL';
+      break;
+    default:
+      validate.fail('Invalid parent room type');
   }
 
+  switch(security) {
+    case 'PUBLIC':
+    case 'PRIVATE':
+    case 'INHERITED':
+      break;
+    default:
+      validate.fail('Invalid security option: ' + security);
+  }
+
+  return createChannel(user, null, {
+    uri: uri,
+    security: options.security,
+    githubType: githubType,
+  });
+}
+
+
+function createUserChannel(user, options) {
+  validate.expect(user, 'user is expected');
+  validate.expect(options, 'options is expected');
+
+  var name = options.name;
+  var security = options.security;
+
+  // Create a child room for a user
+  switch(security) {
+    case 'PUBLIC':
+      assertValidName(name);
+      break;
+
+    case 'PRIVATE':
+      if(name) {
+        /* If you cannot afford a name, one will be assigned to you */
+        assertValidName(name);
+      } else {
+        name = generateRandomName();
+      }
+      break;
+
+    default:
+      validate.fail('Invalid security option: ' + security);
+  }
+
+  var uri = user.username + '/' + name;
+  return createChannel(user, null, {
+    uri: uri,
+    security: options.security,
+    githubType: 'USER_CHANNEL',
+  });
+}
+
+function createChannel(user, parentRoom, options) {
+  var uri = options.uri;
+  var githubType = options.githubType;
   var lcUri = uri.toLowerCase();
-  // TODO: this needs to be moved to a policy
-  return permissionsModel(user, 'create', uri, githubType, security)
-    .then(function(access) {
-      if(!access) throw new StatusError(403, 'You do not have permission to create a channel here');
-      // Make sure that no such repo exists on Github
-      return ensureNoRepoNameClash(user, uri);
-    })
+  var lcOwner = lcUri.split('/')[0];
+  var security = options.security;
+
+  // TODO: Add group support in here....
+  return ensureNoRepoNameClash(user, uri)
     .then(function(clash) {
       if(clash) throw new StatusError(409, 'There is a repo at ' + uri + ' therefore you cannot create a channel there');
       return ensureNoExistingChannelNameClash(uri);
@@ -917,11 +939,11 @@ var createCustomChildRoom = Promise.method(function(parentTroupe, user, options)
         {
           $setOnInsert: {
             lcUri: lcUri,
-            lcOwner: lcUri.split('/')[0],
+            lcOwner: lcOwner,
             uri: uri,
             security: security,
-            parentId: parentTroupe && parentTroupe._id,
-            ownerUserId: parentTroupe ? null : user._id,
+            parentId: parentRoom ? parentRoom._id : undefined,
+            ownerUserId: parentRoom ? undefined: user._id,
             githubType: githubType,
             userCount: 0
           }
@@ -935,7 +957,7 @@ var createCustomChildRoom = Promise.method(function(parentTroupe, user, options)
           return newRoom;
         })
         .tap(function(newRoom) {
-          var descriptor = legacyMigration.generatePermissionsForRoom(newRoom, parentTroupe, user);
+          var descriptor = legacyMigration.generatePermissionsForRoom(newRoom, null, user);
 
           return securityDescriptorService.insertForRoom(newRoom._id, descriptor);
         })
@@ -966,7 +988,8 @@ var createCustomChildRoom = Promise.method(function(parentTroupe, user, options)
           return uriLookupService.reserveUriForTroupeId(newRoom._id, uri);
         });
     });
-});
+
+}
 
 /**
  * notifyInvitedUser() informs an invited user
@@ -1033,37 +1056,29 @@ function updateUserDateAdded(userId, roomId, date) {
 
 }
 
-/* When a user wants to join a room */
-function joinRoomById(roomId, user, options) {
+/**
+ * Adds a user to a room. Please note that the security checks should
+ * have already occurred in the caller
+ */
+function joinRoom(room, user, options) {
   options = options || {};
 
-  return troupeService.findById(roomId)
-    .then(function(room) {
-      if (!room) throw new StatusError(404);
+  if (!room) throw new StatusError(400);
 
-      return policyFactory.createPolicyForRoom(user, room)
-        .then(function(policy) {
-          return policy.canJoin();
-        })
-        .then(function(joinAccess) {
-          if (!joinAccess) throw new StatusError(403);
+  return assertJoinRoomChecks(room, user)
+    .then(function() {
+      // We need to add the last access time before adding the member to the room
+      // so that the serialized create that the user receives will contain
+      // the last access time and not be hidden in the troupe list
+      return recentRoomService.saveLastVisitedTroupeforUserId(user._id, room._id, { skipFayeUpdate: true });
+    })
+    .then(function() {
+      var flags = userDefaultFlagsService.getDefaultFlagsForUser(user);
 
-          return assertJoinRoomChecks(room, user);
-        })
-        .then(function() {
-          // We need to add the last access time before adding the member to the room
-          // so that the serialized create that the user receives will contain
-          // the last access time and not be hidden in the troupe list
-          return recentRoomService.saveLastVisitedTroupeforUserId(user._id, room._id, { skipFayeUpdate: true });
-        })
-        .then(function() {
-          var flags = userDefaultFlagsService.getDefaultFlagsForUser(user);
-
-          return roomMembershipService.addRoomMember(room._id, user._id, flags);
-        })
-        .then(function() {
-          sendJoinStats(user, room, options.tracking);
-        });
+      return roomMembershipService.addRoomMember(room._id, user._id, flags);
+    })
+    .then(function() {
+      sendJoinStats(user, room, options.tracking);
     });
 }
 
@@ -1395,14 +1410,15 @@ function deleteRoom(troupe) {
 module.exports = {
   applyAutoHooksForRepoRoom: applyAutoHooksForRepoRoom,
   findAllRoomsIdsForUserIncludingMentions: findAllRoomsIdsForUserIncludingMentions,
-  createGithubRoom: createGithubRoom,
+  createGithubRoom: Promise.method(createGithubRoom),
   findOrCreateRoom: findOrCreateRoom,
+  createRoomChannel: Promise.method(createRoomChannel),
+  createUserChannel: Promise.method(createUserChannel),
   findAllChannelsForRoomId: findAllChannelsForRoomId,
   findChildChannelRoom: findChildChannelRoom,
   findAllChannelsForUser: findAllChannelsForUser,
   findUsersChannelRoom: findUsersChannelRoom,
-  createCustomChildRoom: createCustomChildRoom,
-  joinRoomById: joinRoomById,
+  joinRoom: Promise.method(joinRoom),
   addUserToRoom: addUserToRoom,
   /* DISABLED revalidatePermissionsForUsers: revalidatePermissionsForUsers, */
   ensureRepoRoomSecurity: ensureRepoRoomSecurity,

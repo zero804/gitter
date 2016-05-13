@@ -29,7 +29,7 @@ module.exports = {
     var body = req.body;
     var security = body.security || 'INHERITED';
 
-    return roomService.createCustomChildRoom(null, req.user, { name: body.name, security: security })
+    return roomService.createUserChannel(req.user, { name: body.name, security: security })
       .then(function(customRoom) {
         return serializeObject(customRoom, req);
       })

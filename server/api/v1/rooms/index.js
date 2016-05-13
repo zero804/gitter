@@ -54,13 +54,16 @@ module.exports = {
     return restSerializer.serializeObject(req.params.troupeId, strategy);
   },
 
+  /**
+   * This endpoint will go under the new communities API
+   */
   create: function(req) {
     var roomUri = req.query.uri || req.body.uri;
     var addBadge = req.body.addBadge || false;
 
     if (!roomUri) throw new StatusError(400);
 
-    return roomService.findOrCreateRoom(req.user, roomUri, {ignoreCase: true, addBadge: addBadge})
+    return roomService.findOrCreateRoom(req.user, roomUri, { ignoreCase: true, addBadge: addBadge })
       .then(function (room) {
         if (!room || !room.troupe) throw new StatusError(403, 'Permission denied');
 

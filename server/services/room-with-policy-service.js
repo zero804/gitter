@@ -14,6 +14,7 @@ var eventService = require('./event-service');
 var chatService = require('./chat-service');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var roomMembershipService = require('./room-membership-service');
+var roomService = require('./room-service');
 
 var MAX_RAW_TAGS_LENGTH = 200;
 
@@ -32,6 +33,10 @@ function allowStaff() {
 
 function allowAdmin() {
   return this.policy.canAdmin();
+}
+
+function allowJoin() {
+  return this.policy.canJoin();
 }
 
 /**
@@ -184,7 +189,6 @@ RoomWithPolicyService.prototype.banUserFromRoom = secureMethod([allowStaff, allo
             });
           });
         });
-
 });
 
 RoomWithPolicyService.prototype.unbanUserFromRoom = secureMethod([allowStaff, allowAdmin], function(bannedUserId) {
@@ -223,7 +227,17 @@ RoomWithPolicyService.prototype.unbanUserFromRoom = secureMethod([allowStaff, al
             });
         });
       })
+});
 
+RoomWithPolicyService.prototype.createChannel = secureMethod([allowAdmin], function(options) {
+  return roomService.createRoomChannel(this.room, this.user, options);
+});
+
+/**
+ * User join room
+ */
+RoomWithPolicyService.prototype.joinRoom = secureMethod([allowJoin], function(options) {
+  return roomService.joinRoom(this.room, this.user, options);
 });
 
 module.exports = RoomWithPolicyService;
