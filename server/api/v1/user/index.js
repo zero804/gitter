@@ -1,9 +1,10 @@
 "use strict";
 
-var restSerializer         = require("../../../serializers/rest-serializer");
+var restSerializer = require("../../../serializers/rest-serializer");
 var githubGitterUserSearch = require("../../../services/github-gitter-user-search");
-var gitterUserSearch       = require("../../../services/user-search-service");
-var StatusError            = require('statuserror');
+var gitterUserSearch = require("../../../services/user-search-service");
+var StatusError = require('statuserror');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 module.exports = {
   id: 'resourceUser',
@@ -51,7 +52,7 @@ module.exports = {
 
     // TODO: can the currently logged in user view information about this other user?
     // For the moment, you'll only be able to see your own information
-    if(req.user.id != id) throw new StatusError(403);
+    if(!mongoUtils.objectIDsEqual(req.user.id, id)) throw new StatusError(403);
 
     return req.user;
   },

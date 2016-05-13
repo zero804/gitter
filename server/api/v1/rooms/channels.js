@@ -1,8 +1,9 @@
 "use strict";
 
-var roomService         = require("../../../services/room-service");
-var restSerializer      = require("../../../serializers/rest-serializer");
+var roomService     = require("../../../services/room-service");
+var restSerializer = require("../../../serializers/rest-serializer");
 var loadTroupeFromParam = require('./load-troupe-param');
+var RoomWithPolicyService = require('../../../services/room-with-policy-service');
 
 function serialize(items, req) {
   var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id });
@@ -28,10 +29,12 @@ module.exports = {
   create: function(req, res) {
     return loadTroupeFromParam(req)
       .then(function(troupe) {
+
         var body = req.body;
         var security = body.security || 'INHERITED';
 
-        return roomService.createCustomChildRoom(troupe, req.user, { name: body.name, security: security });
+        var roomWithPolicyService = new RoomWithPolicyService(troupe, req.user, req.userRoomPolicy);
+        return roomWithPolicyService.createChannel({ name: body.name, security: security });
       })
       .then(function(customRoom) {
         return serializeObject(customRoom, req);
