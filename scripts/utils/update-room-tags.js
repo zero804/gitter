@@ -2,11 +2,9 @@
 'use strict';
 
 var persistence = require('gitter-web-persistence');
-var GitHubService = require('../../server/services/github/github-repo-service');
-var assert = require('assert');
+var GitHubService = require('../../modules/github/lib/github-repo-service');
 var shutdown = require('shutdown');
 var BatchStream = require('batch-stream');
-var StatusError = require('statuserror');
 var Promise = require('bluebird');
 
 var roomTagger = require('../../server/utils/room-tagger');
