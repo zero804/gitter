@@ -4,6 +4,7 @@ module.exports = {
         "node": true
     },
     rules: {
-      "node/no-unpublished-require": "error"
+      "no-console": ["error", { allow: ["warn", "error", "log"] }],
+      "node/no-missing-require": "warn"
     }
 };

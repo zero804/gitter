@@ -3,6 +3,7 @@ module.exports = {
     "commonjs": true,
     "node": true
   },
+  "plugins": ["node"],
   "extends": "eslint:recommended",
   "rules": {
     "indent": "off",
@@ -35,6 +36,9 @@ module.exports = {
     "eol-last": "warn",                     // Change to error once merged
     "no-mixed-spaces-and-tabs": "error",
     "no-negated-condition": "warn",
-    "no-unneeded-ternary": "error"
+    "no-unneeded-ternary": "error",
+
+    "node/no-missing-require": "error",
+    "node/no-unsupported-features": ["error", {"version": 0.10 }],
   },
 };
