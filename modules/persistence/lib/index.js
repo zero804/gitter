@@ -65,4 +65,6 @@ module.exports = createExports({
   Subscription: require('./schemas/subscription-schema'),
   FeatureToggle: require('./schemas/feature-toggle-schema'),
   SecurityDescriptor: require('./schemas/security-descriptor-schema'),
+  GitHubOrg: require('./schemas/github-org-schema'),
+  GitHubUser: require('./schemas/github-user-schema')
 });
