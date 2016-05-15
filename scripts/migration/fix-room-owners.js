@@ -9,12 +9,29 @@ var persistence = require('gitter-web-persistence');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var onMongoConnect = require('../../server/utils/on-mongo-connect');
 var through2Concurrent = require('through2-concurrent');
+
+/*
 var orgMap = require('./org-map.json');
 var userMap = require('./user-map.json');
 
+var lcOrgMap = {};
+var reverseOrgMap = {};
+for (var k in orgMap) {
+  lcOrgMap[k.toLowerCase()] = orgMap[k];
+  reverseOrgMap[orgMap[k]] = k;
+}
+
+var lcUserMap = {};
+var reverseUserMap = {};
+for (var k in userMap) {
+  lcUserMap[k.toLowerCase()] = userMap[k];
+  reverseUserMap[userMap[k]] = k;
+}
+*/
 
 var GITHUB_TOKEN = '***REMOVED***';
 var tentacles = new Tentacles({ accessToken: GITHUB_TOKEN });
+
 
 function getBatchedRooms() {
     return persistence.Troupe.aggregate([
@@ -49,42 +66,8 @@ function getBatchedRooms() {
     .stream();
 }
 
-// totally synchronous function that just finds things that look wrong in the database
-function findBatchErrors(batch) {
+function logBatchWarnings(batch, githubTypes) {
   var lcOwner = batch._id;
-
-  var uniqueOwners = _.uniq(batch.rooms.map(function(room) {
-    return room.uri.split('/')[0];
-  }));
-
-  var errors = [];
-
-  if (uniqueOwners.length > 1) {
-    // What happens here is the case-sensitive owner part of the URL (not
-    // lcOwner) differs between the different rooms in the same batch. Either
-    // the username was changed (assuming they are a user's rooms) or the org
-    // was changed if it is an org's rooms. They can't all be right.
-
-    // NOTE: This doesn't help much if all the unique owners are wrong (we
-    // won't find the correct one later) or if they all have the same owner but
-    // it is wrong now. ie there's only one room with the owner and it is
-    // incorrect or there are multiple with the same owner but it has been
-    // renamed or deleted since.
-
-    //errors.push('owners');
-    //console.log(lcOwner, "has multiple different ways of spelling the owner.");
-    console.log(uniqueOwners);
-    errors.push({
-      type: "owner",
-      lcOwner: lcOwner,
-      uniqueOwners: uniqueOwners,
-      batch: batch
-    });
-  }
-
-  // NOTE: The rest of the problems we just log. Not going to automatically fix
-  // them as they are so rare. But if we find more that are worth automatically
-  // fixing we could add different types.
 
   // all unique room ids in this batch
   var idMap = {};
@@ -128,30 +111,153 @@ function findBatchErrors(batch) {
     // this is very rare and we'll have to just fix it manually
     console.log(lcOwner, "has both org rooms or channels AND user channels.");
   }
-
-  return errors;
 }
+
+function findGitHubOrg(lcUri) {
+  return persistence.GitHubOrg.findOne({ lcUri: lcUri })
+    .read('secondaryPreferred')
+    .lean()
+    .exec();
+}
+
+function findGitHubUser(lcUri) {
+  return persistence.GitHubUser.findOne({ lcUri: lcUri })
+    .read('secondaryPreferred')
+    .lean()
+    .exec();
+}
+
+
+// Try and find things wrong in the database, return a promise.
+var findBatchInfo = Promise.method(function(batch) {
+  var lcOwner = batch._id;
+
+  var uniqueOwners = _.uniq(batch.rooms.map(function(room) {
+    return room.uri.split('/')[0];
+  }));
+
+  var githubTypeMap = {};
+  batch.rooms.forEach(function(room) {
+    githubTypeMap[room.githubType] = true;
+  });
+  var githubTypes = Object.keys(githubTypeMap);
+
+  var type = 'unknown';
+  var errors = [];
+
+  return Promise.join(
+    findGitHubOrg(lcOwner),
+    findGitHubUser(lcOwner),
+    function(org, user) {
+      if (org) {
+        type = 'org';
+
+        // if they aren't all this org, update them
+        if (!_.every(uniqueOwners, org.uri)) {
+          errors.push({
+            type: "owner",
+            lcOwner: lcOwner,
+            correctOwner: org.uri,
+            batch: batch
+          });
+        }
+
+      } else if (user) {
+        type = 'user';
+
+        // if they aren't all this user, update them
+        if (!_.every(uniqueOwners, user.uri)) {
+          errors.push({
+            type: "owner",
+            lcOwner: lcOwner,
+            correctOwner: user.uri,
+            batch: batch
+          });
+        }
+
+      } else {
+
+        // TODO: if type is unknown and there are ownerUserIds, try and look
+        // them up in the user dump. Possible that the username has changed.
+        // (just be aware that some batches have multiple github user ids..)
+
+        // TODO: If we still really don't know, we can try and look up the repo
+        // by github ids via their API and then get the info from there. The
+        // org or username could have been completely renamed. It could also be
+        // a private repo, though.
+
+        // Whatever we do, we have to do something manually here if we still
+        // can't figure it out, so log this loudly.
+      }
+
+      console.log(lcOwner, type);
+
+
+      // NOTE: The rest of the problems we just log. Not going to automatically fix
+      // them as they are so rare. But if we find more that are worth automatically
+      // fixing we could add different types of errors.
+      logBatchWarnings(batch, githubTypes);
+
+      return {
+        type: type,
+        errors: errors,
+        githubTypes: githubTypes
+      };
+    });
+});
 
 // promise wrapping a stream that will return the things that are wrong that we
 // can try and fix automatically
 function getErrors() {
   return new Promise(function(resolve, reject) {
+    var numOrgs = 0;
+    var numUsers = 0;
+    var numBatches = 0;
+    var numOrgErrors = 0;
+    var numUserErrors = 0;
     var errors = [];
+    var unknown = [];
     getBatchedRooms()
-      .pipe(through2Concurrent.obj({maxConcurrency: 10},
+      .pipe(through2Concurrent.obj({ maxConcurrency: 10 },
       function(batch, enc, callback) {
-        var batchErrors = findBatchErrors(batch);
-        if (batchErrors.length) {
-          Array.prototype.push.apply(errors, batchErrors);
-          //console.log(batch._id, batchErrors);
-          callback();
-        } else {
-          callback();
-        }
+        numBatches++;
+        findBatchInfo(batch)
+          .then(function(info) {
+            if (info.type == 'org') {
+              numOrgs++;
+            }
+            if (info.type == 'user') {
+              numUsers++;
+            }
+            if (info.type == 'unknown') {
+              unknown.push([batch._id, info.githubTypes]);
+            }
+            if (info.errors.length) {
+              if (info.type == 'org') {
+                numOrgErrors++;
+              }
+              if (info.type == 'user') {
+                numUserErrors++;
+              }
+              Array.prototype.push.apply(errors, info.errors);
+              //console.log(batch._id, info);
+              callback();
+            } else {
+              callback();
+            }
+          });
       }))
       .on('data', function(batch) {
       })
       .on('end', function() {
+        console.log(numBatches, "batches processed");
+        console.log(errors.length, "batches with possible errors");
+        console.log(numOrgErrors, "org batches with possible errors");
+        console.log(numUserErrors, "user batches with possible errors");
+        console.log(numOrgs, "orgs");
+        console.log(numUsers, "users");
+        console.log(unknown.length, "unknown");
+        console.log("NOTE: room uris could still be wrong in other parts and this script doesn't double-check all users.")
         resolve(errors);
       })
       .on('error', function(error) {
@@ -170,6 +276,7 @@ ownerInfo.uri == the correct username or org name
 It only returns the first one it finds, because finding multiple different ones
 and trying to deal with that just does my head in.
 */
+/*
 var findOwner = Promise.method(function(lcOwner, uniqueOwners) {
   // this will only return the first one that matches
 
@@ -225,45 +332,38 @@ var findOwner = Promise.method(function(lcOwner, uniqueOwners) {
     }
   );
 });
+*/
 
-function findUpdatesForOwnerError(error) {
-  // figure out the correct owner (username or github org)
-  return findOwner(error.lcOwner, error.uniqueOwners)
-    .then(function(ownerInfo) {
-      if (ownerInfo) {
-        // check all the room uris and all the rooms with incorrect uris have to
-        // be updated. also add a redirect.
-        var updates = []
-        error.batch.rooms.forEach(function(room) {
-          // 1, 2 or 3 parts
-          var parts = room.uri.split('/');
-          parts[0] = ownerInfo.uri;
-          var correctUri = parts.join('/');
+var findUpdatesForOwnerError = Promise.method(function(error) {
+  // check all the room uris and all the rooms with incorrect uris have to
+  // be updated. also add a redirect.
+  var updates = []
 
-          if (room.uri == correctUri) {
-            // this one is correct
-            return;
-          }
+  error.batch.rooms.forEach(function(room) {
+    // 1, 2 or 3 parts
+    var parts = room.uri.split('/');
+    parts[0] = error.correctOwner;
+    var correctUri = parts.join('/');
 
-          var update = {
-            _id: room._id,
-            oldUri: room.uri,
-            newUri: correctUri,
-            newLcUri: correctUri.toLowerCase()
-          };
+    if (room.uri == correctUri) {
+      // this one is correct
+      return;
+    }
 
-          console.log(JSON.stringify(update));
+    var update = {
+      _id: room._id,
+      oldUri: room.uri,
+      newUri: correctUri,
+      newLcUri: correctUri.toLowerCase()
+    };
 
-          updates.push(update);
-        });
-        return updates;
-      } else {
-        // oh-oh. none of them are correct..
-        console.log("CANNOT FIND A VALID OWNER", error.uniqueOwners);
-        return [];
-      }
-    });
-}
+    console.log(JSON.stringify(update));
+
+    updates.push(update);
+  });
+
+  return updates;
+});
 
 // asynchronously figure out how to fix the errors and return a promise with
 // updates
@@ -290,40 +390,6 @@ function performUpdates(updates) {
   console.log("TODO");
   return Promise.resolve();
 }
-
-/*
-var totalYes = 0;
-var totalMaybe = 0;
-function fix(batch, enc, callback) {
-  var errors = findErrors(batch);
-
-  if (errors.length) {
-    console.log(batch._id, errors);
-    if (errors.indexOf('owners') !== -1) {
-      var uniqueOwners = _.uniq(batch.rooms.map(function(room) {
-        return room.uri.split('/')[0];
-      }));
-      // lookup user in userMap
-      var username = _.find(uniqueOwners, function(owner) {
-        return !!userMap[owner];
-      });
-      if (username) {
-        console.log("YES", uniqueOwners, '->', username);
-        totalYes++;
-      } else {
-        console.log("MAYBE");
-        totalMaybe++;
-      }
-      // if we can't find it there, then look it up in GitHub
-      callback()
-    } else {
-      callback();
-    }
-  } else {
-    callback();
-  }
-}
-*/
 
 function die(error) {
   console.error(error);
