@@ -701,10 +701,68 @@
 }
 
 
+.community-create-email-list {
+  margin-left: 0;
+  marginb-bottom: 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.community-create-email-list-item {
+  display: inline-block;
+}
+
+.community-create-email-list-item-comma-separated {
+  .community-create-email-list-item();
+
+  &:not(:last-child) {
+    &:after {
+      content: ',';
+      margin-right: 1ch;
+    }
+  }
+}
+
+.community-create-email-list-item-link {
+  display: inline-block;
+  color: @base-text-color;
+
+  & > .community-create-email-list-item-remove-button {
+    opacity: 0;
+  }
+  &:hover,
+  &:focus {
+    text-decoration: none;
+
+    & > .community-create-email-list-item-remove-button {
+      opacity: 1;
+    }
+  }
+}
+
+.community-create-email-list-item-remove-button {
+  padding-top: 0;
+  padding-left: .25em;
+  padding-bottom: 0;
+  padding-right: .4em;
+
+  background-color: transparent;
+  border: 0;
+
+  color: @base-text-color;
+
+  transition: opacity .2s ease;
+
+
+  &:hover,
+  &:focus {
+    opacity: 1;
+  }
+}
+
 
 .community-create-invite-user-result-list-wrapper {
   overflow: auto;
-  //max-height: unit(60 * 4, px);
 }
 
 .community-create-invite-user-result-list {
@@ -852,6 +910,14 @@
 
 .community-create-overview-invite-list-root {
   margin-top: 2rem;
+}
+
+.community-create-overview-invite-email-area {
+
+}
+
+.community-create-overview-invite-email-list-root {
+  display: inline-block;
 }
 
 .community-create-overview-sub-room-heading {
