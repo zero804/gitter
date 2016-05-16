@@ -8,6 +8,7 @@ var shutdown = require('shutdown');
 var persistence = require('gitter-web-persistence');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var onMongoConnect = require('../../server/utils/on-mongo-connect');
+var userService = require('../../server/services/user-service');
 var through2Concurrent = require('through2-concurrent');
 
 
@@ -182,11 +183,21 @@ var findBatchInfo = Promise.method(function(batch) {
       return Promise.map(errors, findUpdatesForOwnerError)
         .then(function(updates) {
           console.log(numProcessed, lcOwner, type, updates.length, warnings.length);
-          return {
+          var data = {
             type: type,
             updates: updates,
             warnings: warnings
           };
+          if (user) {
+            // does this user exist in our system?
+            return userService.findByGithubId(user.githubId)
+              .then(function(gitterUser) {
+                data.hasGitterUser = !!gitterUser;
+                return data;
+              });
+          } else {
+            return data;
+          }
         });
     });
 });
@@ -204,6 +215,7 @@ function getInfo() {
     var numWarnings = 0;
     var numOrgMultiple = 0;
     var numUserMultiple = 0;
+    var numMissingUsers = 0;
     var updates = [];
     var warnings = [];
     var unknown = [];
@@ -224,6 +236,9 @@ function getInfo() {
               numUsers++;
               if (batch.rooms.length > 1) {
                 numUserMultiple++;
+              }
+              if (!info.hasGitterUser) {
+                numMissingUsers++;
               }
             }
             if (info.type == 'unknown') {
@@ -261,6 +276,7 @@ function getInfo() {
         console.log(numWarnings + ' warnings');
         console.log(numOrgMultiple + ' orgs with multiple rooms.');
         console.log(numUserMultiple + ' users with multiple rooms.');
+        console.log(numMissingUsers + " users haven't signed up with us.");
         console.log("NOTE: rooms could still be wrong in other parts or aspects")
         resolve({
           numBatches: numBatches,
@@ -272,6 +288,7 @@ function getInfo() {
           numWarnings: numWarnings,
           numOrgMultiple: numOrgMultiple,
           numUserMultiple: numUserMultiple,
+          numMissingUsers: numMissingUsers,
           updates: updates,
           warnings: warnings,
           unknown: unknown
