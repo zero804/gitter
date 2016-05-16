@@ -20,7 +20,7 @@ module.exports = function(req, res, next) {
     .then(function(ownerRoom) {
       return [ownerRoom, policyFactory.createPolicyForRoom(req.user, ownerRoom)];
     })
-    .then(function(ownerRoom, policy) {
+    .spread(function(ownerRoom, policy) {
       var roomWithPolicyService = new RoomWithPolicyService(ownerRoom, user, policy);
       return roomWithPolicyService.createChannel({ name: channelName, security: channelSecurity });
     })
