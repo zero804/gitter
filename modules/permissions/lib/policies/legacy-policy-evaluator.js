@@ -3,8 +3,26 @@
 var Promise = require('bluebird');
 var userCanAccessRoom = require('../user-can-access-room');
 var roomPermissionsModel = require('../room-permissions-model');
+var permissionsModel = require('../permissions-model');
 var persistence = require('gitter-web-persistence');
 var debug = require('debug')('gitter:permissions:legacy-evaluator');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+
+function getOtherUser(userId, room) {
+  if (!room || !room.oneToOneUsers) return null;
+  var oneToOneUsers = room.oneToOneUsers;
+  var userId1 = oneToOneUsers[0].userId;
+  var userId2 = oneToOneUsers[1].userId;
+  if (mongoUtils.objectIDsEqual(userId, userId1)) {
+    return userId2;
+  }
+
+  if (mongoUtils.objectIDsEqual(userId, userId2)) {
+    return userId1;
+  }
+
+  return null;
+}
 
 function LegacyPolicyEvaluator(userId, user, roomId, room) {
   this._userId = userId;
@@ -23,6 +41,7 @@ function LegacyPolicyEvaluator(userId, user, roomId, room) {
   this._canJoin = null;
   this._canAdmin = null;
   this._canAddUser = null;
+  this._fetchOtherUserPromise = null;
 }
 
 LegacyPolicyEvaluator.prototype = {
@@ -66,12 +85,7 @@ LegacyPolicyEvaluator.prototype = {
 
     debug('Will perform canJoin');
 
-    this._canJoin = Promise.join(
-      this._fetchUser(),
-      this._fetchRoom(),
-      function(user, room) {
-        return roomPermissionsModel(user, 'join', room);
-      });
+    this._canJoin = this._performCheck('join');
 
     if (debug.enabled) {
       this._canJoin.tap(function(result) {
@@ -87,12 +101,7 @@ LegacyPolicyEvaluator.prototype = {
 
     debug('Will perform canAdmin');
 
-    this._canAdmin = Promise.join(
-      this._fetchUser(),
-      this._fetchRoom(),
-      function(user, room) {
-        return roomPermissionsModel(user, 'admin', room);
-      });
+    this._canAdmin = this._performCheck('admin');
 
     if (debug.enabled) {
       this._canAdmin.tap(function(result) {
@@ -108,12 +117,7 @@ LegacyPolicyEvaluator.prototype = {
 
     debug('Will perform canAddUser');
 
-    this._canAddUser = Promise.join(
-      this._fetchUser(),
-      this._fetchRoom(),
-      function(user, room) {
-        return roomPermissionsModel(user, 'adduser', room);
-      });
+    this._canAddUser = this._performCheck('adduser');
 
     if (debug.enabled) {
       this._canAddUser.tap(function(result) {
@@ -140,6 +144,39 @@ LegacyPolicyEvaluator.prototype = {
       .exec();
 
     return this._roomPromise;
+  },
+
+  _performCheck: function(right) {
+    var self = this;
+    return Promise.join(
+      this._fetchUser(),
+      this._fetchRoom(),
+      function(user, room) {
+        if (room.oneToOne) {
+          return self._fetchOtherUser(room)
+            .then(function(otherUser) {
+              if (!otherUser) return false;
+              return permissionsModel(user, right, otherUser.username, 'ONETOONE', null);
+            })
+        } else {
+          return roomPermissionsModel(user, right, room);
+        }
+      });
+  },
+
+  _fetchOtherUser: function(room) {
+    if (this._fetchOtherUserPromise) return this._fetchOtherUserPromise;
+
+    var otherUserId = getOtherUser(this._userId, room);
+    if (!otherUserId) {
+      this._fetchOtherUserPromise = Promise.resolve(null);
+      return this._fetchOtherUserPromise;
+    }
+
+    this._fetchOtherUserPromise = persistence.User.findById(otherUserId, { username: 1 }, { lean: true })
+      .exec();
+
+    return this._fetchOtherUserPromise;
   }
 
 
