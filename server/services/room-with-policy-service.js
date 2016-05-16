@@ -15,6 +15,7 @@ var chatService = require('./chat-service');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var roomMembershipService = require('./room-membership-service');
 var roomService = require('./room-service');
+var assert = require('assert');
 
 var MAX_RAW_TAGS_LENGTH = 200;
 
@@ -22,6 +23,8 @@ var MAX_RAW_TAGS_LENGTH = 200;
  * This could do with a better name
  */
 function RoomWithPolicyService(room, user, policy) {
+  assert(room, 'Room required');
+  assert(policy, 'Policy required');
   this.room = room;
   this.user = user;
   this.policy = policy;
