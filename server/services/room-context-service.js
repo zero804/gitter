@@ -51,7 +51,7 @@ function findContextForUri(user, uri, options) {
 
         debug("localUriLookup returned user for uri=%s. Finding or creating one-to-one", uri);
 
-        return oneToOneRoomService.findOrCreateOneToOneRoom(userId, resolvedUser.id)
+        return oneToOneRoomService.findOrCreateOneToOneRoom(user, resolvedUser.id)
           .spread(function(troupe, resolvedUser) {
             return policyFactory.createPolicyForRoom(user, troupe)
               .then(function(policy) {

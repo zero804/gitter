@@ -26,10 +26,15 @@ function createPolicyForGithubObject(user, uri, ghType, security) {
   return new LegacyGitHubPolicyEvaluator(user, uri, ghType, security);
 }
 
+function createPolicyForOneToOne(user, toUser) {
+  return new LegacyGitHubPolicyEvaluator(user, toUser.username, 'ONETOONE', null);
+}
+
 module.exports = {
   createPolicyForRoom: Promise.method(createPolicyForRoom),
   createPolicyForRoomId: Promise.method(createPolicyForRoomId),
   createPolicyForUserIdInRoomId: Promise.method(createPolicyForUserIdInRoomId),
   createPolicyForUserIdInRoom: Promise.method(createPolicyForUserIdInRoom),
-  createPolicyForGithubObject: Promise.method(createPolicyForGithubObject)
+  createPolicyForGithubObject: Promise.method(createPolicyForGithubObject),
+  createPolicyForOneToOne: Promise.method(createPolicyForOneToOne)
 };

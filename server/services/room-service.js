@@ -611,8 +611,7 @@ function findOrCreateRoom(user, uri, options) {
           return null;
         }
 
-        // TODO: in future we need to add request one-to-one here...
-        return oneToOneRoomService.findOrCreateOneToOneRoom(userId, resolvedUser.id)
+        return oneToOneRoomService.findOrCreateOneToOneRoom(user, resolvedUser._id)
           .spread(function(troupe, resolvedUser) {
 
             return policyFactory.createPolicyForRoom(user, troupe)
