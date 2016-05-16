@@ -37,7 +37,7 @@ describe('one-to-one-room-service', function() {
     after(function() { fixture.cleanup(); });
 
     it('should handle the creation of a oneToOneTroupe single', function() {
-      return oneToOneRoomService.findOrCreateOneToOneRoom(fixture.user1.id, fixture.user2.id)
+      return oneToOneRoomService.findOrCreateOneToOneRoom(fixture.user1, fixture.user2.id)
         .spread(function(troupe, otherUser) {
           assert(troupe);
           assert(troupe.oneToOne);
@@ -55,8 +55,8 @@ describe('one-to-one-room-service', function() {
 
     it('should handle the creation of a oneToOneTroupe atomicly', function() {
       return Promise.all([
-          oneToOneRoomService.findOrCreateOneToOneRoom(fixture.user2.id, fixture.user3.id),
-          oneToOneRoomService.findOrCreateOneToOneRoom(fixture.user3.id, fixture.user2.id)
+          oneToOneRoomService.findOrCreateOneToOneRoom(fixture.user2, fixture.user3.id),
+          oneToOneRoomService.findOrCreateOneToOneRoom(fixture.user3, fixture.user2.id)
         ])
         .spread(function(r1, r2) {
           var troupe1 = r1[0];
@@ -88,8 +88,8 @@ describe('one-to-one-room-service', function() {
 
     it('should handle the creation of a oneToOneTroupe atomicly', function() {
       return Promise.all([
-          oneToOneRoomService.findOrCreateOneToOneRoom(fixture.user2.id, fixture.user3.id),
-          oneToOneRoomService.findOrCreateOneToOneRoom(fixture.user3.id, fixture.user2.id)
+          oneToOneRoomService.findOrCreateOneToOneRoom(fixture.user2, fixture.user3.id),
+          oneToOneRoomService.findOrCreateOneToOneRoom(fixture.user3, fixture.user2.id)
         ])
         .spread(function(r1, r2) {
           var troupe1 = r1[0];
@@ -120,10 +120,9 @@ describe('one-to-one-room-service', function() {
     });
 
     it('should not allow a user to create a room with an INVITED user', function() {
-      var userId1 = fixture.user1._id;
       var userId2 = fixture.userInvited._id;
 
-      return oneToOneRoomService.findOrCreateOneToOneRoom(userId1, userId2)
+      return oneToOneRoomService.findOrCreateOneToOneRoom(fixture.user1, userId2)
         .then(function() {
           assert.ok(false);
         })
@@ -133,10 +132,9 @@ describe('one-to-one-room-service', function() {
     });
 
     it('should not allow a user to create a room with a REMOVED user', function() {
-      var userId1 = fixture.user1._id;
       var userId2 = fixture.userRemoved._id;
 
-      return oneToOneRoomService.findOrCreateOneToOneRoom(userId1, userId2)
+      return oneToOneRoomService.findOrCreateOneToOneRoom(fixture.user1, userId2)
         .then(function() {
           assert.ok(false);
         })
@@ -161,10 +159,11 @@ describe('one-to-one-room-service', function() {
     after(function() { fixture.cleanup(); });
 
     it('should add the requesting user back into a one-to-one room if they\'ve been removed', function() {
-      var userId1 = fixture.user1._id;
+      var user1 = fixture.user1;
+      var userId1 = user1._id;
       var userId2 = fixture.user2._id;
 
-      return oneToOneRoomService.findOrCreateOneToOneRoom(userId1, userId2)
+      return oneToOneRoomService.findOrCreateOneToOneRoom(user1, userId2)
         .bind({ room: undefined })
         .spread(function(room) {
           this.room = room;
@@ -177,7 +176,7 @@ describe('one-to-one-room-service', function() {
           assert.strictEqual(members.length, 1);
           assert.strictEqual(String(members[0]), String(userId2));
 
-          return oneToOneRoomService.findOrCreateOneToOneRoom(userId1, userId2);
+          return oneToOneRoomService.findOrCreateOneToOneRoom(user1, userId2);
         })
         .spread(function(room) {
           assert.strictEqual(room.id, this.room.id);
@@ -191,10 +190,11 @@ describe('one-to-one-room-service', function() {
     });
 
     it('should add the requesting user back into a one-to-one room if they\'ve both been removed', function() {
-      var userId1 = fixture.user1._id;
+      var user1 = fixture.user1;
+      var userId1 = user1._id;
       var userId2 = fixture.user2._id;
 
-      return oneToOneRoomService.findOrCreateOneToOneRoom(userId1, userId2)
+      return oneToOneRoomService.findOrCreateOneToOneRoom(user1, userId2)
         .bind({ room: undefined })
         .spread(function(room) {
           this.room = room;
@@ -208,7 +208,7 @@ describe('one-to-one-room-service', function() {
         .then(function(members) {
           assert.strictEqual(members.length, 0);
 
-          return oneToOneRoomService.findOrCreateOneToOneRoom(userId1, userId2);
+          return oneToOneRoomService.findOrCreateOneToOneRoom(user1, userId2);
         })
         .spread(function(room) {
           assert.strictEqual(room.id, this.room.id);
