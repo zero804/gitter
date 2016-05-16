@@ -86,7 +86,7 @@ module.exports = {
     var troupeId = req.body && req.body.id && "" + req.body.id;
     if(!troupeId || !mongoUtils.isLikeObjectId(troupeId)) throw new StatusError(400);
 
-    return troupeService.findById(troupeService)
+    return troupeService.findById(troupeId)
       .then(function(room) {
         return [room, policyFactory.createPolicyForRoom(req.user, room)];
       })
