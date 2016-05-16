@@ -150,18 +150,31 @@ function clearLastVisitedTroupeforUserId(userId, troupeId) {
          .exec();
 }
 
+/**
+ * Returns true if an update actually happened
+ */
 function saveUserTroupeLastAccess(userId, troupeId, lastAccessTime) {
-  if (!lastAccessTime) lastAccessTime = new Date();
+  if (lastAccessTime) {
+    if (!(lastAccessTime instanceof Date)) {
+      lastAccessTime = new Date(lastAccessTime);
+    }
+  } else {
+    lastAccessTime = new Date();
+  }
 
-  var setOp = {};
-  setOp['troupes.' + troupeId] = lastAccessTime;
-  setOp['last.' + troupeId] = lastAccessTime;
+  var maxOp = {};
+  maxOp['troupes.' + troupeId] = lastAccessTime;
+  maxOp['last.' + troupeId] = lastAccessTime;
 
   return persistence.UserTroupeLastAccess.update(
      { userId: userId },
-     { $set: setOp },
-     { upsert: true, new: true })
-     .exec();
+     { $max: maxOp },
+     { upsert: true })
+     .lean(true)
+     .exec()
+     .then(function(result) {
+       return !!(result.nModified || result.upserted && result.upserted.length);
+     });
 }
 
 function getTroupeLastAccessTimesForUserExcludingHidden(userId) {
