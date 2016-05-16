@@ -121,15 +121,23 @@ function findGitHubOrg(lcUri) {
 }
 
 function findGitHubUser(lcUri) {
+  // TODO: change once we import users
+  return Promise.resolve(undefined);
+  /*
   return persistence.GitHubUser.findOne({ lcUri: lcUri })
     .read('secondaryPreferred')
     .lean()
     .exec();
+  */
 }
 
 
+var numProcessed = 0;
+
 // Try and find things wrong in the database, return a promise.
 var findBatchInfo = Promise.method(function(batch) {
+  numProcessed++;
+
   var lcOwner = batch._id;
 
   var uniqueOwners = _.uniq(batch.rooms.map(function(room) {
@@ -153,7 +161,8 @@ var findBatchInfo = Promise.method(function(batch) {
         type = 'org';
 
         // if they aren't all this org, update them
-        if (!_.every(uniqueOwners, org.uri)) {
+        if (!_.every(uniqueOwners, function(uniqueUri) { return uniqueUri == org.uri; })) {
+          console.log("ERROR", uniqueOwners, org.uri);
           errors.push({
             type: "owner",
             lcOwner: lcOwner,
@@ -165,8 +174,11 @@ var findBatchInfo = Promise.method(function(batch) {
       } else if (user) {
         type = 'user';
 
+        // TODO: check user rooms too once we have users
+        /*
         // if they aren't all this user, update them
-        if (!_.every(uniqueOwners, user.uri)) {
+        if (!_.every(uniqueOwners, function(uniqueUri) { return uniqueUri == user.uri; })) {
+          console.log("ERROR", uniqueOwners, org.uri);
           errors.push({
             type: "owner",
             lcOwner: lcOwner,
@@ -174,6 +186,7 @@ var findBatchInfo = Promise.method(function(batch) {
             batch: batch
           });
         }
+        */
 
       } else {
 
@@ -190,7 +203,7 @@ var findBatchInfo = Promise.method(function(batch) {
         // can't figure it out, so log this loudly.
       }
 
-      console.log(lcOwner, type);
+      console.log(numProcessed, lcOwner, type);
 
 
       // NOTE: The rest of the problems we just log. Not going to automatically fix
