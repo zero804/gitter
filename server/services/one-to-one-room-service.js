@@ -141,9 +141,6 @@ function findOrCreateOneToOneRoom(fromUser, toUserId) {
     })
     .then(function(toUser) {
       if(!toUser) throw new StatusError(404, "User does not exist");
-
-      if (toUser.state === 'INVITED') throw new StatusError(403, 'Cannot create a one-to-one room for a INVITED user');
-
       this.toUser = toUser;
       return findOneToOneRoom(fromUserId, toUserId);
     })
@@ -156,7 +153,10 @@ function findOrCreateOneToOneRoom(fromUser, toUserId) {
 
       // Do not allow new rooms to be created for REMOVED users
       if (toUser.state === 'REMOVED') {
-        throw new StatusError(403, 'Cannot create a one-to-one room for a REMOVED user');
+        var err = new StatusError(404);
+        err.githubType = 'ONETOONE';
+        err.uri = toUser.username;
+        throw err;
       }
 
       // TODO: in future we need to add request one-to-one here...
