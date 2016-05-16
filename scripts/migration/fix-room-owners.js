@@ -1,36 +1,14 @@
 #!/usr/bin/env node
 'use strict';
 
+var fs = require('fs');
 var _ = require('lodash');
 var Promise = require('bluebird');
 var shutdown = require('shutdown');
-var Tentacles = require('tentacles');
 var persistence = require('gitter-web-persistence');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var onMongoConnect = require('../../server/utils/on-mongo-connect');
 var through2Concurrent = require('through2-concurrent');
-
-/*
-var orgMap = require('./org-map.json');
-var userMap = require('./user-map.json');
-
-var lcOrgMap = {};
-var reverseOrgMap = {};
-for (var k in orgMap) {
-  lcOrgMap[k.toLowerCase()] = orgMap[k];
-  reverseOrgMap[orgMap[k]] = k;
-}
-
-var lcUserMap = {};
-var reverseUserMap = {};
-for (var k in userMap) {
-  lcUserMap[k.toLowerCase()] = userMap[k];
-  reverseUserMap[userMap[k]] = k;
-}
-*/
-
-var GITHUB_TOKEN = '***REMOVED***';
-var tentacles = new Tentacles({ accessToken: GITHUB_TOKEN });
 
 
 function getBatchedRooms() {
@@ -66,8 +44,9 @@ function getBatchedRooms() {
     .stream();
 }
 
-function logBatchWarnings(batch, githubTypes) {
+function findBatchWarnings(batch, githubTypes) {
   var lcOwner = batch._id;
+  var warnings = [];
 
   // all unique room ids in this batch
   var idMap = {};
@@ -91,14 +70,14 @@ function logBatchWarnings(batch, githubTypes) {
   var missingParentIds = Object.keys(missingParentIdMap);
   if (missingParentIds.length) {
     // this doesn't actually occur in our dataset
-    console.log(lcOwner, "has parentIds that aren't included in the batch.");
+    warnings.push(lcOwner + " has parentIds that aren't included in the batch.");
   }
 
   // only one unique, non-null, non-undefined ownerUserId is allowed per batch
   var ownerUserIds = Object.keys(ownerUserIdMap);
   if (ownerUserIds.length > 1) {
     // this is very rare and we'll have to just fix it manually
-    console.log(lcOwner, "has more than one ownerUserId.");
+    warnings.push(lcOwner + " has more than one ownerUserId.");
   }
 
   // if an lcOwner has both an ORG_CHANNEL or ORG room _and_ a USER_CHANNEL,
@@ -109,8 +88,10 @@ function logBatchWarnings(batch, githubTypes) {
   });
   if ((githubTypeMap['ORG_CHANNEL'] || githubTypeMap['ORG']) && githubTypeMap['USER_CHANNEL']) {
     // this is very rare and we'll have to just fix it manually
-    console.log(lcOwner, "has both org rooms or channels AND user channels.");
+    warnings.push(lcOwner + " has both org rooms or channels AND user channels.");
   }
+
+  return warnings;
 }
 
 function findGitHubOrg(lcUri) {
@@ -121,14 +102,10 @@ function findGitHubOrg(lcUri) {
 }
 
 function findGitHubUser(lcUri) {
-  // TODO: change once we import users
-  return Promise.resolve(undefined);
-  /*
   return persistence.GitHubUser.findOne({ lcUri: lcUri })
     .read('secondaryPreferred')
     .lean()
     .exec();
-  */
 }
 
 
@@ -162,7 +139,6 @@ var findBatchInfo = Promise.method(function(batch) {
 
         // if they aren't all this org, update them
         if (!_.every(uniqueOwners, function(uniqueUri) { return uniqueUri == org.uri; })) {
-          console.log("ERROR", uniqueOwners, org.uri);
           errors.push({
             type: "owner",
             lcOwner: lcOwner,
@@ -174,11 +150,8 @@ var findBatchInfo = Promise.method(function(batch) {
       } else if (user) {
         type = 'user';
 
-        // TODO: check user rooms too once we have users
-        /*
         // if they aren't all this user, update them
         if (!_.every(uniqueOwners, function(uniqueUri) { return uniqueUri == user.uri; })) {
-          console.log("ERROR", uniqueOwners, org.uri);
           errors.push({
             type: "owner",
             lcOwner: lcOwner,
@@ -186,10 +159,8 @@ var findBatchInfo = Promise.method(function(batch) {
             batch: batch
           });
         }
-        */
 
       } else {
-
         // TODO: if type is unknown and there are ownerUserIds, try and look
         // them up in the user dump. Possible that the username has changed.
         // (just be aware that some batches have multiple github user ids..)
@@ -203,33 +174,38 @@ var findBatchInfo = Promise.method(function(batch) {
         // can't figure it out, so log this loudly.
       }
 
-      console.log(numProcessed, lcOwner, type);
-
-
       // NOTE: The rest of the problems we just log. Not going to automatically fix
       // them as they are so rare. But if we find more that are worth automatically
       // fixing we could add different types of errors.
-      logBatchWarnings(batch, githubTypes);
+      var warnings = findBatchWarnings(batch, githubTypes);
 
-      return {
-        type: type,
-        errors: errors,
-        githubTypes: githubTypes
-      };
+      return Promise.map(errors, findUpdatesForOwnerError)
+        .then(function(updates) {
+          console.log(numProcessed, lcOwner, type, updates.length, warnings.length);
+          return {
+            type: type,
+            updates: updates,
+            warnings: warnings
+          };
+        });
     });
 });
 
 // promise wrapping a stream that will return the things that are wrong that we
 // can try and fix automatically
-function getErrors() {
+function getInfo() {
   return new Promise(function(resolve, reject) {
+    var numBatches = 0;
     var numOrgs = 0;
     var numUsers = 0;
-    var numBatches = 0;
-    var numOrgErrors = 0;
-    var numUserErrors = 0;
-    var errors = [];
+    var numUnknown = 0;
+    var numOrgUpdates = 0;
+    var numUserUpdates = 0;
+    var numWarnings = 0;
+    var updates = [];
+    var warnings = [];
     var unknown = [];
+
     getBatchedRooms()
       .pipe(through2Concurrent.obj({ maxConcurrency: 10 },
       function(batch, enc, callback) {
@@ -243,109 +219,57 @@ function getErrors() {
               numUsers++;
             }
             if (info.type == 'unknown') {
-              unknown.push([batch._id, info.githubTypes]);
+              numUnknown++;
+              unknown.push(batch);
             }
-            if (info.errors.length) {
+
+            if (info.updates.length) {
               if (info.type == 'org') {
-                numOrgErrors++;
+                numOrgUpdates += info.updates.length;
               }
               if (info.type == 'user') {
-                numUserErrors++;
+                numUserUpdates += info.updates.length;
               }
-              Array.prototype.push.apply(errors, info.errors);
-              //console.log(batch._id, info);
-              callback();
-            } else {
-              callback();
+              Array.prototype.push.apply(updates, info.updates);
             }
+
+            if (info.warnings.length) {
+              numWarnings += info.warnings.length;
+              Array.prototype.push.apply(warnings, info.warnings);
+            }
+            callback();
           });
       }))
       .on('data', function(batch) {
       })
       .on('end', function() {
-        console.log(numBatches, "batches processed");
-        console.log(errors.length, "batches with possible errors");
-        console.log(numOrgErrors, "org batches with possible errors");
-        console.log(numUserErrors, "user batches with possible errors");
-        console.log(numOrgs, "orgs");
-        console.log(numUsers, "users");
-        console.log(unknown.length, "unknown");
-        console.log("NOTE: room uris could still be wrong in other parts and this script doesn't double-check all users.")
-        resolve(errors);
+        console.log('------------------------------------------')
+        console.log(numBatches + " batches processed");
+        console.log(numOrgs + " orgs");
+        console.log(numUsers + " users");
+        console.log(numUnknown + " unknown");
+        console.log(numOrgUpdates + " org updates");
+        console.log(numUserUpdates + " user updates");
+        console.log(numWarnings + "warnings");
+        console.log("NOTE: rooms could still be wrong in other parts or aspects")
+        resolve({
+          numBatches: numBatches,
+          numOrgs: numOrgs,
+          numUsers: numUsers,
+          numUnknown: numUnknown,
+          numOrgUpdates: numOrgUpdates,
+          numUserUpdates: numUserUpdates,
+          numWarnings: numWarnings,
+          updates: updates,
+          warnings: warnings,
+          unknown: unknown
+        });
       })
       .on('error', function(error) {
         reject(error);
       });
   });
 }
-
-/*
-Take an array of possible ways to spell an owner (probabably only differing in
-case), return a promise that will resolve to ownerInfo:
-ownerInfo could be null if we can't find it.
-ownerInfo.type == 'user' or 'org'
-ownerInfo.uri == the correct username or org name
-
-It only returns the first one it finds, because finding multiple different ones
-and trying to deal with that just does my head in.
-*/
-/*
-var findOwner = Promise.method(function(lcOwner, uniqueOwners) {
-  // this will only return the first one that matches
-
-  // synchronously:
-  // 1. check known orgs
-  var org = _.find(uniqueOwners, function(o) {
-    return !!orgMap[o];
-  });
-  if (org) {
-    return {
-      type: 'org',
-      uri: org
-    };
-  }
-
-  // 2. check known usernames
-  var user = _.find(uniqueOwners, function(o) {
-    return !!userMap[o];
-  });
-  if (user) {
-    return {
-      type: 'user',
-      uri: user
-    };
-  }
-
-  // asynchronously:
-  // 1. check github users via API
-  // 2. check github orgs via API
-  // NOTE: the github api is case-insensitive in terms of the uris, but will
-  // return the correct case in the login variable, so we return that. Also,
-  // orgs are users too, so in the org case you get both orgIngo AND userInfo.
-  return Promise.join(
-    tentacles.org.get(lcOwner),
-    tentacles.user.get(lcOwner),
-    function(orgInfo, userInfo) {
-      // could be nice if we cache the results so we don't have to look them up
-      // again after the dry run
-      if (orgInfo) {
-        return {
-          type: 'org',
-          uri: orgInfo.login
-        };
-      } else if (userInfo) {
-        return {
-          type: 'user',
-          uri: userInfo.login
-        };
-      } else {
-        // not found
-        return null;
-      }
-    }
-  );
-});
-*/
 
 var findUpdatesForOwnerError = Promise.method(function(error) {
   // check all the room uris and all the rooms with incorrect uris have to
@@ -415,22 +339,18 @@ onMongoConnect()
     require('yargs')
       .command('dry-run', 'Dry run', { }, function() {
         //run(log, done);
-        return getErrors()
-          .then(function(errors) {
-            console.log("finding fixes for", errors.length, "errors.");
-            return errorsToUpdates(errors);
-          })
-          .then(function(updates) {
-            console.log(updates.length, "updates have to be performed.");
+        return getInfo()
+          .then(function(report) {
+            fs.writeFileSync("owner-report.json", JSON.stringify(report));
             shutdown.shutdownGracefully();
           })
           .catch(die);
       })
       .command('execute', 'Execute', { }, function() {
-        return getErrors()
-          .then(function(errors) {
-            console.log("finding fixes for", errors.length, "errors.");
-            return errorsToUpdates(errors);
+        return getInfo()
+          .then(function(report) {
+            fs.writeFileSync("owner-report.json", JSON.stringify(report));
+            performUpdates(report.updates)
           })
           .then(function(updates) {
             console.log("performing", updates.length, "updates");
