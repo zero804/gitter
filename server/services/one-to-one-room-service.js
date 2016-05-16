@@ -28,55 +28,53 @@ function getOneToOneRoomQuery(userId1, userId2) {
   };
 
 }
-/**
- * Internal method. Find a room for two users or insert the room in the database.
- *
- * Does not handle any business logic...
- *
- * Returns [troupe, existing]
- */
-function findOrInsertNewOneToOneRoom(userId1, userId2) {
+
+function findExistingOneToOneRoom(userId1, userId2) {
   var query = getOneToOneRoomQuery(userId1, userId2);
 
   // First attempt is a simple find...
   return Troupe.findOne(query)
-    .exec()
-    .then(function(existing) {
-      debug('Found existing room? %s', !!existing);
+    .exec();
+}
 
-      if (existing) return [existing, true];
+/**
+ * Internal method.
 
-      // Second attempt is an upsert
-      var insertFields = {
-        oneToOne: true,
-        status: 'ACTIVE',
-        githubType: 'ONETOONE',
-        oneToOneUsers: [{
-          _id: new ObjectID(),
-          userId: userId1
-        }, {
-          _id: new ObjectID(),
-          userId: userId2
-        }],
-        userCount: 0
-      };
+ * Returns [troupe, existing]
+ */
+function upsertNewOneToOneRoom(userId1, userId2) {
+  var query = getOneToOneRoomQuery(userId1, userId2);
 
-      debug('Attempting upsert for new one-to-one room');
+  // Second attempt is an upsert
+  var insertFields = {
+    oneToOne: true,
+    status: 'ACTIVE',
+    githubType: 'ONETOONE',
+    oneToOneUsers: [{
+      _id: new ObjectID(),
+      userId: userId1
+    }, {
+      _id: new ObjectID(),
+      userId: userId2
+    }],
+    userCount: 0
+  };
 
-      // Upsert returns [model, existing] already
-      return mongooseUtils.upsert(Troupe, query, {
-        $setOnInsert: insertFields
-      })
-      .tap(function(upsertResult) {
-        var troupe = upsertResult[0];
-        var updateExisting = upsertResult[1];
+  debug('Attempting upsert for new one-to-one room');
 
-        if (updateExisting) return;
+  // Upsert returns [model, existing] already
+  return mongooseUtils.upsert(Troupe, query, {
+    $setOnInsert: insertFields
+  })
+  .tap(function(upsertResult) {
+    var troupe = upsertResult[0];
+    var updateExisting = upsertResult[1];
 
-        var descriptor = legacyMigration.generatePermissionsForRoom(troupe, null, null);
-        return securityDescriptorService.insertForRoom(troupe._id, descriptor);
-      });
-    });
+    if (updateExisting) return;
+
+    var descriptor = legacyMigration.generatePermissionsForRoom(troupe, null, null);
+    return securityDescriptorService.insertForRoom(troupe._id, descriptor);
+  });
 }
 
 /**
@@ -125,7 +123,7 @@ function findOrCreateOneToOneRoom(fromUserId, toUserId) {
   fromUserId = mongoUtils.asObjectID(fromUserId);
   toUserId = mongoUtils.asObjectID(toUserId);
 
-  if(String(fromUserId) === String(toUserId)) throw new StatusError(417); // You cannot be in a troupe with yourself.
+  if(mongoUtils.objectIDsEqual(fromUserId, toUserId)) throw new StatusError(417); // You cannot be in a troupe with yourself.
 
   return userService.findById(toUserId)
     .bind({
@@ -135,20 +133,30 @@ function findOrCreateOneToOneRoom(fromUserId, toUserId) {
     .then(function(toUser) {
       if(!toUser) throw new StatusError(404, "User does not exist");
 
-      this.toUser = toUser;
+      if (toUser.state === 'INVITED') throw new StatusError(403, 'Cannot create a one-to-one room for a INVITED user');
 
-      // For now, there is no permissions model between users
-      // There is an implicit connection between these two users,
-      // automatically create the troupe
-      return findOrInsertNewOneToOneRoom(fromUserId, toUserId);
+      this.toUser = toUser;
+      return findExistingOneToOneRoom(fromUserId, toUserId);
     })
-    .spread(function(troupe, existing) {
-      debug('findOrCreate existing=%s', existing);
+    .then(function(existingRoom) {
+      if (existingRoom) {
+        return [existingRoom, true];
+      }
+
+      // Do not allow new rooms to be created for REMOVED users
+      if (this.toUser.state === 'REMOVED') {
+        throw new StatusError(403, 'Cannot create a one-to-one room for a REMOVED user');
+      }
+
+      return upsertNewOneToOneRoom(fromUserId, toUserId);
+    })
+    .spread(function(troupe, isAlreadyExisting) {
+      debug('findOrCreate isAlreadyExisting=%s', isAlreadyExisting);
 
       var troupeId = troupe._id;
       this.troupe = troupe;
 
-      if (existing) {
+      if (isAlreadyExisting) {
         return ensureFromUserInRoom(troupeId, fromUserId);
       } else {
         stats.event('new_troupe', {

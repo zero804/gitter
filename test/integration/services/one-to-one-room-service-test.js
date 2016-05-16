@@ -5,6 +5,7 @@ var fixtureLoader = require('../test-fixtures');
 var Promise       = require('bluebird');
 var _             = require('underscore');
 var assert        = require("assert");
+var StatusError   = require('statuserror');
 
 function findUserIdPredicate(userId) {
   return function(x) {
@@ -24,6 +25,12 @@ describe('one-to-one-room-service', function() {
       user2: {
       },
       user3: {
+      },
+      userInvited: {
+        state: 'INVITED'
+      },
+      userRemoved: {
+        state: 'REMOVED'
       }
     }));
 
@@ -112,6 +119,31 @@ describe('one-to-one-room-service', function() {
         });
     });
 
+    it('should not allow a user to create a room with an INVITED user', function() {
+      var userId1 = fixture.user1._id;
+      var userId2 = fixture.userInvited._id;
+
+      return oneToOneRoomService.findOrCreateOneToOneRoom(userId1, userId2)
+        .then(function() {
+          assert.ok(false);
+        })
+        .catch(StatusError, function(err) {
+          assert(err.status, 403);
+        });
+    });
+
+    it('should not allow a user to create a room with a REMOVED user', function() {
+      var userId1 = fixture.user1._id;
+      var userId2 = fixture.userRemoved._id;
+
+      return oneToOneRoomService.findOrCreateOneToOneRoom(userId1, userId2)
+        .then(function() {
+          assert.ok(false);
+        })
+        .catch(StatusError, function(err) {
+          assert(err.status, 403);
+        });
+    });
   });
 
   describe('https://github.com/troupe/gitter-webapp/issues/1227 #slow', function() {
@@ -187,6 +219,7 @@ describe('one-to-one-room-service', function() {
           assert.strictEqual(String(members[0]), String(userId1));
         });
     });
+
 
   });
 
