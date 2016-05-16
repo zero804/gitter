@@ -4,8 +4,8 @@
 var path = require('path');
 var yargs = require('yargs');
 var fs = require('fs');
-var BatchStream = require('batch-stream');
 var es = require('event-stream');
+var through2 = require('through2');
 var shutdown = require('shutdown');
 var persistence = require('gitter-web-persistence');
 var onMongoConnect = require('../../server/utils/on-mongo-connect');
@@ -37,7 +37,7 @@ if (opts.schema == 'orgs') {
   schema = persistence.GitHubOrg;
 }
 
-function processBatch(lines, cb) {
+function processBatch(lines, enc, cb) {
   var bulk = schema.collection.initializeUnorderedBulkOp();
   var numOperations = 0;
   lines.forEach(function(line) {
@@ -60,7 +60,7 @@ function processBatch(lines, cb) {
         console.log('.');
       }
       // boo :(
-      //console.log(process.memoryUsage());
+      console.log(process.memoryUsage());
       cb();
     });
   } else {
@@ -68,13 +68,24 @@ function processBatch(lines, cb) {
   }
 }
 
+var batchLines = [];
+function processOne(line, enc, cb) {
+  batchLines.push(line);
+  if (batchLines.length == 1000) {
+    processBatch(batchLines, enc, cb);
+    batchLines = [];
+  } else {
+    cb()
+  }
+}
+
+
+
 onMongoConnect()
   .then(function() {
-    var batch = new BatchStream({ size: 1000 });
     var s = fs.createReadStream(opts.filename)
       .pipe(es.split())
-      .pipe(batch)
-      .pipe(es.map(processBatch))
+      .pipe(through2.obj(processOne))
       .on('error', function(err) {
         console.error(err);
         console.error(err.stack);
