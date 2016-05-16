@@ -100,7 +100,7 @@ module.exports = (function() {
       this._lastSeenItems[troupeId] = itemId;
       if (this._timers[troupeId]) return;
 
-      setTimeout(function() {
+      this._timers[troupeId] = setTimeout(function() {
         debug('_updateLastAccess: %s', troupeId);
 
         var lastSeen = this._lastSeenItems[troupeId];
