@@ -11,5 +11,7 @@
   },
   "private": true,
   "dependencies": {
+    "bluebird": "^3.2.1",
+    "gitter-web-persistence": "file:../modules/persistence"
   }
 }
