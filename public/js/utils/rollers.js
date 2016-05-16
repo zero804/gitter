@@ -3,6 +3,8 @@ var Mutant = require('mutantjs');
 var _ = require('underscore');
 var rafUtils = require('utils/raf-utils');
 var isMobile = require('utils/is-mobile');
+var addPassiveScrollListener = require('./passive-scroll-listener');
+var raf = require('utils/raf');
 
 module.exports = (function() {
 
@@ -39,7 +41,7 @@ module.exports = (function() {
     this.mutant = new Mutant(target, adjustScroll, {
       transitions: true,
       observers: { attributes: false, characterData: false },
-      ignoreTransitions: ['opacity', 'background-color', 'border', 'color', 'border-right-color'],
+      ignoreTransitions: ['opacity', 'background-color', 'border', 'color', 'border-right-color', 'visibility'],
       //ignoreFilter: function(mutationRecords) {
       //  var filter = mutationRecords.reduce(function(accum, r) {
       //    var v = r.type === 'attributes' && r.attributeName === 'class' && r.target.id === 'chat-container';
@@ -50,8 +52,15 @@ module.exports = (function() {
       //}
     });
 
-    var _trackLocation = _.throttle(this.trackLocation.bind(this), 100);
-    target.addEventListener('scroll', _trackLocation, false);
+    var self = this;
+    function trackLocationAnimationFrame() {
+      raf(function() {
+        self.trackLocation();
+      })
+    }
+
+    var _trackLocation = _.throttle(trackLocationAnimationFrame, 100);
+    addPassiveScrollListener(target, _trackLocation);
     window.addEventListener('resize', adjustScroll, false);
     window.addEventListener('focusin', adjustScroll, false);
     window.addEventListener('focusout', adjustScroll, false);
