@@ -202,6 +202,8 @@ function getInfo() {
     var numOrgUpdates = 0;
     var numUserUpdates = 0;
     var numWarnings = 0;
+    var numOrgMultiple = 0;
+    var numUserMultiple = 0;
     var updates = [];
     var warnings = [];
     var unknown = [];
@@ -214,9 +216,15 @@ function getInfo() {
           .then(function(info) {
             if (info.type == 'org') {
               numOrgs++;
+              if (batch.rooms.length > 1) {
+                numOrgMultiple++;
+              }
             }
             if (info.type == 'user') {
               numUsers++;
+              if (batch.rooms.length > 1) {
+                numUserMultiple++;
+              }
             }
             if (info.type == 'unknown') {
               numUnknown++;
@@ -244,13 +252,15 @@ function getInfo() {
       })
       .on('end', function() {
         console.log('------------------------------------------')
-        console.log(numBatches + " batches processed");
-        console.log(numOrgs + " orgs");
-        console.log(numUsers + " users");
-        console.log(numUnknown + " unknown");
-        console.log(numOrgUpdates + " org updates");
-        console.log(numUserUpdates + " user updates");
-        console.log(numWarnings + "warnings");
+        console.log(numBatches + ' batches processed');
+        console.log(numOrgs + ' orgs');
+        console.log(numUsers + ' users');
+        console.log(numUnknown + ' unknown');
+        console.log(numOrgUpdates + ' org updates');
+        console.log(numUserUpdates + ' user updates');
+        console.log(numWarnings + ' warnings');
+        console.log(numOrgMultiple + ' orgs with multiple rooms.');
+        console.log(numUserMultiple + ' users with multiple rooms.');
         console.log("NOTE: rooms could still be wrong in other parts or aspects")
         resolve({
           numBatches: numBatches,
@@ -260,6 +270,8 @@ function getInfo() {
           numOrgUpdates: numOrgUpdates,
           numUserUpdates: numUserUpdates,
           numWarnings: numWarnings,
+          numOrgMultiple: numOrgMultiple,
+          numUserMultiple: numUserMultiple,
           updates: updates,
           warnings: warnings,
           unknown: unknown
@@ -341,7 +353,7 @@ onMongoConnect()
         //run(log, done);
         return getInfo()
           .then(function(report) {
-            fs.writeFileSync("owner-report.json", JSON.stringify(report));
+            fs.writeFileSync("/tmp/owner-report.json", JSON.stringify(report));
             shutdown.shutdownGracefully();
           })
           .catch(die);
@@ -349,7 +361,6 @@ onMongoConnect()
       .command('execute', 'Execute', { }, function() {
         return getInfo()
           .then(function(report) {
-            fs.writeFileSync("owner-report.json", JSON.stringify(report));
             performUpdates(report.updates)
           })
           .then(function(updates) {
