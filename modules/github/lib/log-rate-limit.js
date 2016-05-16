@@ -21,7 +21,7 @@ module.exports = function(options, callback, request) {
             logger.warn("Rate limit is down to " + remaining, {
               options: options,
               reset: response.headers['x-ratelimit-reset'],
-              limit: response.headers['x-ratelimit-limit']
+              limit: response.headers['x-ratelimit-limit'] ? parseInt(response.headers['x-ratelimit-limit'], 10) : undefined
             });
 
           }
