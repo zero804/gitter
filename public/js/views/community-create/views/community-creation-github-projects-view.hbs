@@ -19,6 +19,20 @@
 
     <div class="community-create-github-projects-tab-content-area js-community-create-github-projects-orgs-area {{when isOrgAreaActive 'active' : ''}}">
       <div class="community-create-org-list-root"></div>
+
+      <p>
+        If you missing some orgs,
+        you will need to manually grant access on a per-org basis.
+        See
+        <a
+          href="https://gitter.zendesk.com/hc/en-us/articles/202460552-Why-isn-t-my-GitHub-organisation-appearing-"
+          target="_blank"
+          class="community-create-general-link">
+          this article
+        </a>
+        for more info.
+
+      </p>
     </div>
 
     <div class="community-create-github-projects-tab-content-area js-community-create-github-projects-repos-area {{when isRepoAreaActive 'active' : ''}}">
@@ -27,18 +41,19 @@
         placeholder="repo name filter" />
 
       <div class="community-create-repo-list-root"></div>
+
+      {{#if isUserMissingPrivateRepoScope}}
+        <p>
+          If you're looking to access a private repository,
+          you will need to upgrade your GitHub authentication to
+          allow us to access the list of your private repositories.
+          <a href="/login/upgrade?scopes=repo" target="_blank" class="community-create-general-link">
+            Click here to do this now.
+          </a>
+        </p>
+      {{/if}}
     </div>
 
-    {{#if isUserMissingPrivateRepoScope}}
-      <p>
-        If you're looking to access a private repository,
-        you will need to upgrade your GitHub authentication to
-        allow us to access the list of your private repositories.
-        <a href="/login/upgrade?scopes=repo" target="_blank" class="community-create-general-link">
-          Click here to do this now.
-        </a>
-      </p>
-    {{/if}}
   </section>
 
 

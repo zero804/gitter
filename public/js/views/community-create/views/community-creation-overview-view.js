@@ -9,6 +9,7 @@ var template = require('./community-creation-overview-view.hbs');
 var CommunityCreateBaseStepView = require('./community-creation-base-step-view');
 var CommunityCreationSubRoomListView = require('./community-creation-sub-room-list-view');
 var CommunityCreationPeopleListView = require('./community-creation-people-list-view');
+var CommunityCreationEmailListView = require('./community-creation-email-list-view');
 
 require('gitter-styleguide/css/components/headings.css');
 require('gitter-styleguide/css/components/buttons.css');
@@ -25,6 +26,7 @@ module.exports = CommunityCreateBaseStepView.extend({
     Isomorphic: {
       //subRoomListView: { el: '.community-create-sub-room-list-root', init: 'initSubRoomListView' },
       inviteListView: { el: '.community-create-overview-invite-list-root', init: 'initInviteListView' },
+      inviteEmailListView: { el: '.community-create-overview-invite-email-list-root', init: 'initInviteEmailListView' },
     },
   },
 
@@ -41,6 +43,13 @@ module.exports = CommunityCreateBaseStepView.extend({
       collection: this.communityCreateModel.get('peopleToInvite')
     }));
     return this.inviteListView;
+  },
+
+  initInviteEmailListView: function(optionsForRegion) {
+    this.inviteEmailListView = new CommunityCreationEmailListView(optionsForRegion({
+      collection: this.communityCreateModel.get('emailsToInvite')
+    }));
+    return this.inviteEmailListView;
   },
 
 

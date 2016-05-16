@@ -61,11 +61,12 @@ module.exports = CommunityCreateBaseStepView.extend({
         canRemove: true
       })
     }));
+    this.listenTo(this.inviteEmailListView, 'email:remove', this.onEmailRemoved, this);
     return this.inviteEmailListView;
   },
 
   ui: _.extend({}, CommunityCreateBaseStepView.prototype.ui, {
-    peopleInput: '.primary-community-invite-people-name-input',
+    peopleInput: '.community-invite-people-name-input',
     inviteList: '.community-create-invite-list',
     emailInput: '.community-invite-people-email-input',
     emailSubmit: '.community-invite-people-email-submit-button'
@@ -135,5 +136,9 @@ module.exports = CommunityCreateBaseStepView.extend({
 
     // Clear the input
     this.ui.emailInput[0].value = '';
+  },
+
+  onEmailRemoved: function(email) {
+    this.communityCreateModel.get('emailsToInvite').remove(email);
   }
 });

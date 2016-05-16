@@ -241,6 +241,12 @@
       ]
     },
     {
+      "uid": "bf882b30900da12fca090d9796bc3030",
+      "css": "mail",
+      "code": 59427,
+      "src": "fontawesome"
+    },
+    {
       "uid": "12af2bcbfe60f39e7a1e835639d38ad8",
       "css": "settings",
       "code": 59396,

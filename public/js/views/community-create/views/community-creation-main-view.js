@@ -141,10 +141,10 @@ module.exports = CommunityCreateBaseStepView.extend({
     });
   },
 
+  /* * /
   onAdvancedOptionsToggle: function() {
     toggleClass(this.ui.advancedOptionsArea[0], 'active');
   },
-
   onSubRoomSubmit: function() {
     var subRoomName = this.ui.subRoomNameInput[0].value;
     if(subRoomName) {
@@ -156,4 +156,5 @@ module.exports = CommunityCreateBaseStepView.extend({
     // Clear the input
     this.ui.subRoomNameInput[0].value = '';
   }
+  /* */
 });

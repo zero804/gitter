@@ -11,8 +11,10 @@ var CommunityCreationEmailListItemTemplate = require('./community-creation-email
 var CommunityCreationEmailListItemView = Marionette.ItemView.extend({
   template: CommunityCreationEmailListItemTemplate,
   tagName: 'li',
-  attributes: {
-    class: 'community-create-email-list-item'
+  attributes: function() {
+    return {
+      class: 'community-create-email-list-item' + (this.model.get('canRemove') ? '-comma-separated' : '')
+    };
   },
 
   ui: {
