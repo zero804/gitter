@@ -15,7 +15,7 @@ describe('recent-room-service', function() {
     var fixture = {};
 
     before(fixtureLoader(fixture, {
-      user1: { permissions: { createRoom: true } },
+      user1: { },
       userNoTroupes: { },
       troupe1: { users: ['user1'] },
       troupe2: { users: ['user1'] },
@@ -102,7 +102,7 @@ describe('recent-room-service', function() {
     var fixture = {};
 
     before(fixtureLoader(fixture, {
-      user1: { permissions: { createRoom: true } },
+      user1: { },
       troupe1: { users: ['user1'] }
     }));
 
@@ -142,7 +142,7 @@ describe('recent-room-service', function() {
     var fixture = {};
 
     before(fixtureLoader(fixture, {
-      user1: { permissions: { createRoom: true } },
+      user1: { },
       troupe1: { users: ['user1'] }
     }));
 
