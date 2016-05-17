@@ -9,5 +9,8 @@
   "scripts": {
     "test": "mocha test/"
   },
-  "private": true
+  "private": true,
+  "dependencies": {
+    "bluebird": "^3.3.5"
+  }
 }

@@ -11,7 +11,7 @@
 var SnappyCache = require('snappy-cache');
 var env = require('gitter-web-env');
 var config = env.config;
-var _ = require('underscore');
+var _ = require('lodash');
 var util = require("util");
 var Promise = require('bluebird');
 var redisClient;
