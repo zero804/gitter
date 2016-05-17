@@ -10,7 +10,7 @@ var appEvents                  = require('gitter-web-appevents');
 var Promise                    = require('bluebird');
 var request                    = require('request');
 var _                          = require('lodash');
-var xregexp                    = require('xregexp').XRegExp;
+var validateRoomName           = require('gitter-web-validators/lib/validate-room-name');
 var persistence                = require('gitter-web-persistence');
 var uriLookupService           = require("./uri-lookup-service");
 var permissionsModel           = require('gitter-web-permissions/lib/permissions-model');
@@ -758,8 +758,7 @@ function findUsersChannelRoom(user, childTroupeId, callback) {
 }
 
 function assertValidName(name) {
-  var matcher = xregexp('^[\\p{L}\\d][\\p{L}\\d\\-\\_]*$');
-  if(!matcher.test(name)) {
+  if (!validateRoomName(name)) {
     throw {
       responseStatusCode: 400,
       clientDetail: {
