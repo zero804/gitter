@@ -5,8 +5,8 @@ exports.install = function(app) {
   var resolveStatic  = require('./resolve-static');
   var favicon        = require('serve-favicon');
 
-  var webpackMiddleware = require("webpack-dev-middleware");
-  var webpack = require('webpack');
+  var webpackMiddleware = require("webpack-dev-middleware"); // eslint-disable-line node/no-unpublished-require
+  var webpack = require('webpack');// eslint-disable-line node/no-unpublished-require
 
   process.env.WEBPACK_DEV_MODE = '1';
 

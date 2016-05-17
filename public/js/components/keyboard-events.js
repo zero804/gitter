@@ -1,6 +1,7 @@
 "use strict";
 var context = require('utils/context');
 var appEvents = require('utils/appevents');
+var platformDetect = require('utils/platformDetect');
 var platformKeys = require('utils/platform-keys');
 var _ = require('underscore');
 var key = require('keymaster');
@@ -12,9 +13,11 @@ module.exports = (function() {
   // They will we emitted to appEvents with the `keyboard.` prefix
   // Use views/keyboard-events-mixin to attach handlers for these events to Backbone components
 
+  var platform = platformDetect();
   // Set modifier keys for the OS
   var cmdKey = platformKeys.cmd;
   var roomKey = platformKeys.room;
+  var room2Key = platformKeys.room2;
   var gitterKey = platformKeys.gitter;
 
   // Define different scopes for the key listeners
@@ -104,9 +107,6 @@ module.exports = (function() {
     'enter': [{
       name: 'search.go',
       scope: 'input.search'
-      },{
-      name: 'room.enter',
-      scope: 'other'
     },{
       name: 'chat.compose.auto',
       scope: 'input.chat'
@@ -205,20 +205,34 @@ module.exports = (function() {
   keyEvents[cmdKey + '+' + gitterKey + '+m'] = 'help.markdown';
   keyEvents[cmdKey + '+' + gitterKey + '+k'] = 'help.keyboard';
 
-  if(!context.hasFeature('left-menu')) {
+  var roomModifiers = cmdKey + '+' + roomKey;
+  if(platform !== 'Mac' && platform !== 'Windows') {
+    roomModifiers = roomKey + '+' + room2Key;
+  }
+
+  if(context.hasFeature('left-menu')) {
+    keyEvents[roomModifiers + '+up'] = 'left-menu.prev';
+    keyEvents[roomModifiers + '+down'] = 'left-menu.next';
+    keyEvents[roomModifiers + '+left'] = 'focus.minibar';
+    keyEvents[roomModifiers + '+right'] = 'focus.room-list';
+  }
+  else {
     keyEvents[cmdKey + '+' + roomKey + '+up'] = 'room.up';
     keyEvents[cmdKey + '+' + roomKey + '+down'] = 'room.down';
     // keyEvents[cmdKey + '+' + roomKey + '+left'] = 'room.prev';
     // keyEvents[cmdKey + '+' + roomKey + '+right'] = 'room.next';
+    keyEvents[cmdKey + '+' + roomKey + '+enter'] = 'room.enter';
   }
-  keyEvents[cmdKey + '+' + roomKey + '+enter'] = 'room.enter';
 
   if(context.hasFeature('left-menu')) {
+    /* * /
+    // TODO: This intereferes with AltGr, https://github.com/gitterHQ/gitter/issues/1251
     // Go to a conversation by index in list
     _.each('123456789'.split(''), function (n) {
-      keyEvents[cmdKey + '+' + roomKey + '+' + n] = 'minibar.' + n;
+      keyEvents[roomModifiers + '+' + n] = 'minibar.' + n;
     });
-    keyEvents[cmdKey + '+' + roomKey + '+0'] = 'minibar.10';
+    keyEvents[roomModifiers + '+0'] = 'minibar.10';
+    /* */
   }
   else {
     // Go to a conversation by index in list

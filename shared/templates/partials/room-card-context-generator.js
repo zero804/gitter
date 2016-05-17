@@ -2,7 +2,7 @@
 
 var _ = require('underscore');
 var resolveRoomAvatarSrcSet = require('../../avatars/resolve-room-avatar-srcset');
-var validateTag = require('gitter-web-shared/validation/validate-tag').validateTag;
+var validateTag = require('../../validation/validate-tag').validateTag;
 
 // via http://stackoverflow.com/a/17633552/796832
 var ranges = [
