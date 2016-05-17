@@ -29,6 +29,9 @@ module.exports = PrimaryCollectionItemView.extend({
   },
 
   onRender: function (){
+
+    toggleClass(this.el, 'hidden', this.model.get('isHidden'));
+
     //when temp items are rendered we want to wait and then
     //animate them in JP 4/4/16
     if(this.model.get('isTempItem')) {
