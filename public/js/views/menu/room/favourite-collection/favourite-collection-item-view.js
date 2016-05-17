@@ -2,6 +2,7 @@
 
 var _                         = require('underscore');
 var PrimaryCollectionItemView = require('../primary-collection/primary-collection-item-view');
+var BaseCollectionItemView    = require('../base-collection/base-collection-item-view');
 var fastdom                   = require('fastdom');
 var toggleClass               = require('utils/toggle-class');
 
@@ -29,9 +30,7 @@ module.exports = PrimaryCollectionItemView.extend({
   },
 
   onRender: function (){
-
-    toggleClass(this.el, 'hidden', this.model.get('isHidden'));
-
+    BaseCollectionItemView.prototype.onRender.apply(this, arguments);
     //when temp items are rendered we want to wait and then
     //animate them in JP 4/4/16
     if(this.model.get('isTempItem')) {
