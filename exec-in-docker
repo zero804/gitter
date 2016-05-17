@@ -1,5 +1,8 @@
 #!/bin/bash -eu
 
+set -u
+set -e
+
 function join { local IFS="$1"; shift; echo "$*"; }
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -42,5 +45,7 @@ docker-compose -p "webapp-${ISOLATED_UNIQ_ID}" -f docker-compose.internal.yml ru
 docker-compose -p "webapp-${ISOLATED_UNIQ_ID}" -f docker-compose.internal.yml run \
     --rm --entrypoint "${WORKSPACE}/scripts/docker/exec/exec.sh $(join ' ' "$@")" \
     "${TARGET_DOCKER_CONTAINER}"
+
+docker-compose -p "webapp-${ISOLATED_UNIQ_ID}" -f docker-compose.internal.yml ps
 
 echo "exec-in-docker complete, shutting down"
