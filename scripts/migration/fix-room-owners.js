@@ -167,22 +167,26 @@ var findBatchInfo = Promise.method(function(batch) {
   }));
 
   var type = 'unknown';
+  var reason = 'unknown';
   var errors = [];
 
   var lookups = {};
 
   return Promise.join(
+    // TODO: move this stuff to the aggregation as lookups
     findGitHubOrg(lcOwner),
     findGitHubUser(lcOwner),
     findRoomGitHubUser(uniqueUserIds[0]), // could be undefined
     function(org, user, roomUser) {
       if (org) {
         type = 'org';
+        reason = 'org-lookup';
 
         // if they aren't all this org, update them
         if (!_.every(uniqueOwners, function(uniqueUri) { return uniqueUri == org.uri; })) {
           errors.push({
-            type: "owner",
+            errorType: "owner",
+            type: type,
             lcOwner: lcOwner,
             correctOwner: org.uri,
             batch: batch
@@ -191,11 +195,13 @@ var findBatchInfo = Promise.method(function(batch) {
 
       } else if (user) {
         type = 'user';
+        reason = 'user-lookup';
 
         // if they aren't all this user, update them
         if (!_.every(uniqueOwners, function(uniqueUri) { return uniqueUri == user.uri; })) {
           errors.push({
-            type: "owner",
+            errorType: "owner",
+            type: type,
             lcOwner: lcOwner,
             correctOwner: user.uri,
             batch: batch
@@ -204,17 +210,23 @@ var findBatchInfo = Promise.method(function(batch) {
 
       } else if (roomUser) {
         type = 'user';
+        reason = 'owneruserid-lookup';
+
+        // NOTE: does this mean we should rename the user too?
 
         // the user has definitely been renamed
         errors.push({
-          type: "owner",
+          errorType: "owner",
+          type: type,
           lcOwner: lcOwner,
           correctOwner: roomUser.uri,
           batch: batch
         });
 
       } else {
-        // TODO?
+        // TODO: incorporate the "probably" checks?
+        // if we still can't figure it out, then try to look up the repo if it
+        // is public?
       }
 
       if (user) {
@@ -233,6 +245,7 @@ var findBatchInfo = Promise.method(function(batch) {
               }
               var data = {
                 type: type,
+                reason: reason,
                 updates: updates,
                 org: org,
                 user: user,
@@ -385,6 +398,7 @@ var findUpdatesForOwnerError = Promise.method(function(error) {
       return;
     }
 
+    // TODO: if error.type == 'user' we have to rename the user too
     var update = {
       _id: room._id,
       oldUri: room.uri,
@@ -405,7 +419,7 @@ var findUpdatesForOwnerError = Promise.method(function(error) {
 function errorsToUpdates(errors) {
   return Promise.map(errors, function(error) {
       // return an array of objects representing updates. could be empty.
-      if (error.type == 'owner') {
+      if (error.errorType == 'owner') {
         return findUpdatesForOwnerError(error);
 
       } else {
