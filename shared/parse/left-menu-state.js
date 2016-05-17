@@ -49,9 +49,10 @@ module.exports = function generateLeftMenuState(leftRoomMenuState, uri, orgs, op
   }
 
   var result = _.extend({}, currentLeftRoomMenuData, {
-    roomMenuIsPinned: roomMenuIsPinned,
-    state: currentState,
-    selectedOrgName: currentlySelectedOrgName
+    roomMenuIsPinned:     roomMenuIsPinned,
+    state:                currentState,
+    selectedOrgName:      currentlySelectedOrgName,
+    activationSourceType: null,
   });
 
   return result;
