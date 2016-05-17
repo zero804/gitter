@@ -87,5 +87,10 @@
 }
 
 .panel-content {
-  padding-bottom: 8rem;
+  &:after {
+    content: '';
+    flex-shrink: 0;
+    display: block;
+    height: 8rem;
+  }
 }
