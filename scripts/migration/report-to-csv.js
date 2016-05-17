@@ -11,7 +11,7 @@ var writableStream = fs.createWriteStream("owner-report.csv");
 
 var t = es.through(function write(data) {
   data.rooms.forEach(function(room) {
-    this.emit('data', { id: data._id, uri: room.uri, githubType: room.githubType });
+    this.emit('data', { id: data._id, uri: room.uri, githubType: room.githubType, room.security, room.userCount, room.probably});
   }, this)
 });
 

@@ -33,7 +33,7 @@ function getBatchedRooms() {
           uri: 1,
           githubType: 1,
           parentId: 1,
-          githubUd: 1,
+          githubId: 1,
           ownerUserId: 1,
           userCount: 1,
           security: 1
