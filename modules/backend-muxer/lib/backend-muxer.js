@@ -17,7 +17,7 @@ function resolveBackendForProvider(provider) {
 }
 
 function resolveUserBackends(user) {
-  return identityService.findForUser(user)
+  return identityService.listForUser(user)
     .then(function(identities) {
       return identities.reduce(function(map, identity) {
         map[identity.provider] = identity;

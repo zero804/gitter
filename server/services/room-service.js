@@ -1174,17 +1174,6 @@ function findByIdForReadOnlyAccess(user, roomId) {
     });
 }
 
-function validateRoomForReadOnlyAccess(user, room) {
-  if(!room) return Promise.reject(new StatusError(404)); // Mandatory
-
-  return roomPermissionsModel(user, 'view', room)
-    .then(function(access) {
-      if(access) return;
-      if(!user) throw new StatusError(401);
-      throw new StatusError(404);
-    });
-}
-
 function checkInstigatingUserPermissionForRemoveUser(room, user, requestingUser) {
   // User is requesting user -> leave
   if(user.id === requestingUser.id) return Promise.resolve(true);
@@ -1540,7 +1529,6 @@ module.exports = {
   revalidatePermissionsForUsers: revalidatePermissionsForUsers,
   ensureRepoRoomSecurity: ensureRepoRoomSecurity,
   findByIdForReadOnlyAccess: findByIdForReadOnlyAccess,
-  validateRoomForReadOnlyAccess: validateRoomForReadOnlyAccess,
   removeUserFromRoom: removeUserFromRoom,
   hideRoomFromUser: hideRoomFromUser,
   banUserFromRoom: banUserFromRoom,

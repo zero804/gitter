@@ -11,7 +11,7 @@ function idStrategyGenerator(name, FullObjectStrategy, loaderFunction) {
     var objectHash;
 
     this.preload = Promise.method(function(ids) {
-      if (ids.isEmpty()) return [];
+      if (ids.isEmpty()) return;
 
       var time = debug.enabled && Date.now();
 

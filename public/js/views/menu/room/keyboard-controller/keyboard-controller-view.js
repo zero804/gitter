@@ -44,6 +44,11 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
   },
 
   keyboardEvents: {
+    'focus.minibar': function(e) { this.startNavigation(e, MINIBAR_KEY, true); },
+    'focus.room-list': function(e) { this.startNavigation(e, ROOM_LIST_KEY, true); },
+    'left-menu.prev': function(e) { this.selectPrev(e, null); },
+    'left-menu.next': function(e) { this.selectNext(e, null); },
+
     'minibar.start-nav': function(e) { this.startNavigation(e, MINIBAR_KEY, true); },
     'minibar-item.prev': function(e) { this.selectPrev(e, MINIBAR_KEY); },
     'minibar-item.next': function(e) { this.selectNext(e, MINIBAR_KEY); },
@@ -260,7 +265,7 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
   // we were at the start of the list using `Shift + Tab`
   shouldCaptureTabEvent: function(e) {
     // If the tab key was pushed
-    if(e.code.toLowerCase() === 'tab') {
+    if(e && e.code && e.code.toLowerCase() === 'tab') {
       var navigableCollectionList = this.navigableCollectionListMap[this.model.get('mapKey')];
       var collectionItemForCurrentModel = navigableCollectionList[this.model.get('listIndex')];
 
@@ -301,7 +306,9 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
   },
 
   // Move to the previous item in the current navigableCollection
+  // Pass null, to move in whatever current collection-list
   selectPrev: function(e, mapKey) {
+    mapKey = mapKey || (this.model.get('mapKey') || ROOM_LIST_KEY);
     if(this.shouldHandleEvent(e, mapKey)) {
       this.progressInDirection(sanitizeDir.BACKWARDS);
       e.preventDefault();
@@ -310,7 +317,9 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
   },
 
   // Move to the next item in the current navigableCollection
+  // Pass null, to move in whatever current collection-list
   selectNext: function(e, mapKey) {
+    mapKey = mapKey || (this.model.get('mapKey') || ROOM_LIST_KEY);
     if(this.shouldHandleEvent(e, mapKey)) {
       this.progressInDirection(sanitizeDir.FORWARDS);
       e.preventDefault();

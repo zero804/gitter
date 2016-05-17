@@ -1,7 +1,6 @@
 'use strict';
 
-var testRequire = require('../test-require');
-var BackendMuxer = testRequire('./services/backend-muxer');
+var BackendMuxer = require('../lib/backend-muxer');
 var assert = require('assert');
 var Promise = require('bluebird');
 
