@@ -46,6 +46,6 @@ docker-compose -p "webapp-${ISOLATED_UNIQ_ID}" -f docker-compose.internal.yml ru
     --rm --entrypoint "${WORKSPACE}/scripts/docker/exec/exec.sh $(join ' ' "$@")" \
     "${TARGET_DOCKER_CONTAINER}"
 
-docker-compose -p "webapp-${ISOLATED_UNIQ_ID}" -f docker-compose.internal.yml ps -a
+docker-compose -p "webapp-${ISOLATED_UNIQ_ID}" -f docker-compose.internal.yml ps
 
 echo "exec-in-docker complete, shutting down"
