@@ -37,17 +37,16 @@ var codacy = require('gulp-codacy');
 var RUN_TESTS_IN_PARALLEL = false;
 
 var testModules = {
-  'integration': { files: ['./test/integration/**/*.js', './test/public-js/**/*.js'], includeInFast: true }
+  // 'integration': { files: ['./test/integration/**/*.js', './test/public-js/**/*.js'], includeInFast: true }
 };
 
 var modulesWithTest = glob.sync('./modules/*/test');
 modulesWithTest.forEach(function(testDir) {
   var moduleDir = path.dirname(testDir);
   var moduleName = path.basename(moduleDir);
-  if (moduleName === 'backend-muxer') return; // XXX remove this
   testModules[moduleName] = {
     files: path.join('modules', moduleName, 'test', '**', '*.js'),
-    includeInFast: false
+    includeInFast: true
   }
 })
 
