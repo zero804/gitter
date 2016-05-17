@@ -34,10 +34,9 @@ var glob = require('glob');
 var codacy = require('gulp-codacy');
 
 /* Don't do clean in gulp, use make */
-var RUN_TESTS_IN_PARALLEL = true;
+var RUN_TESTS_IN_PARALLEL = false;
 
 var testModules = {
-  'integration': { files: ['./test/integration/**/*.js', './test/public-js/**/*.js'], includeInFast: true }
 };
 
 var modulesWithTest = glob.sync('./modules/*/test');
@@ -48,7 +47,12 @@ modulesWithTest.forEach(function(testDir) {
     files: path.join('modules', moduleName, 'test', '**', '*.js'),
     includeInFast: false
   }
-})
+});
+
+testModules.integration = {
+  files: ['./test/integration/**/*.js', './test/public-js/**/*.js'],
+  includeInFast: true
+};
 
 /** Make a series of tasks based on the test modules */
 function makeTestTasks(taskName, generator, isFast) {
