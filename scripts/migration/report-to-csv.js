@@ -15,7 +15,7 @@ var t = es.through(function write(data) {
   }, this)
 });
 
-fs.createReadStream('./owner-report.json')
+fs.createReadStream('/Users/leroux/owner-report.json')
   .pipe(JSONStream.parse('unknown.*'))
   .pipe(t)
   .pipe(csvStream)

@@ -125,16 +125,24 @@ function findGitHubUser(lcUri) {
     .exec();
 }
 
-function findRoomGitHubUser(githubId) {
-  if (githubId) {
-    return migrationSchemas.GitHubUser.findOne({ githubId: githubId })
-      .read('secondaryPreferred')
-      .lean()
-      .exec();
+var findRoomGitHubUser = Promise.method(function(ownerUserId) {
+  if (ownerUserId) {
+    return userService.findById(ownerUserId)
+      .then(function(user) {
+        if (user) {
+          console.log('FOUND A GITHUB USER BY ID!');
+          return migrationSchemas.GitHubUser.findOne({ githubId: user.githubId })
+            .read('secondaryPreferred')
+            .lean()
+            .exec();
+        } else {
+          return null;
+        }
+      });
   } else {
-    return Promise.resolve();
+    return null;
   }
-}
+});
 
 
 var numProcessed = 0;
@@ -202,7 +210,7 @@ var findBatchInfo = Promise.method(function(batch) {
         errors.push({
           type: "owner",
           lcOwner: lcOwner,
-          correctOwner: user.uri,
+          correctOwner: roomUser.uri,
           batch: batch
         });
 
