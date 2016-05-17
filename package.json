@@ -63,6 +63,7 @@
     "gitter-web-split-tests": "file:modules/split-tests",
     "gitter-web-suggestions": "file:modules/suggestions",
     "gitter-web-twitter-backend": "file:modules/twitter-backend",
+    "gitter-web-validators": "file:modules/validators",
     "glob": "^6.0.4",
     "handlebars": "~3.0.3",
     "heapdump": "^0.3.7",
