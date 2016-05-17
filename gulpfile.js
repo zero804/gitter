@@ -37,7 +37,7 @@ var codacy = require('gulp-codacy');
 var RUN_TESTS_IN_PARALLEL = false;
 
 var testModules = {
-  'integration': { files: ['./test/integration/**/*.js', './test/public-js/**/*.js'], includeInFast: true }
+  // 'integration': { files: ['./test/integration/**/*.js', './test/public-js/**/*.js'], includeInFast: true }
 };
 
 var modulesWithTest = glob.sync('./modules/*/test');
@@ -46,7 +46,7 @@ modulesWithTest.forEach(function(testDir) {
   var moduleName = path.basename(moduleDir);
   testModules[moduleName] = {
     files: path.join('modules', moduleName, 'test', '**', '*.js'),
-    includeInFast: false
+    includeInFast: true
   }
 })
 
