@@ -37,7 +37,7 @@ var codacy = require('gulp-codacy');
 var RUN_TESTS_IN_PARALLEL = false;
 
 var testModules = {
-  // 'integration': { files: ['./test/integration/**/*.js', './test/public-js/**/*.js'], includeInFast: true }
+  'integration': { files: ['./test/integration/**/*.js', './test/public-js/**/*.js'], includeInFast: true }
 };
 
 var modulesWithTest = glob.sync('./modules/*/test');
@@ -115,7 +115,8 @@ makeTestTasks('test-mocha', function(name, files) {
       dir: 'output/coverage-reports/' + name
     },
     env: {
-      multi: 'spec=- xunit=output/test-reports/' + name + '.xml',
+      // multi: 'spec=- xunit=output/test-reports/' + name + '.xml',
+      multi: 'spec=-',
       NODE_ENV: 'test',
       BLUEBIRD_DEBUG: 1,
       TZ: 'UTC'
@@ -143,7 +144,8 @@ makeTestTasks('test-docker', function(name, files) {
         dir: 'output/coverage-reports/' + name
       },
       env: {
-        multi: 'spec=- xunit=output/test-reports/' + name + '.xml',
+        // multi: 'spec=- xunit=output/test-reports/' + name + '.xml',
+        multi: 'spec=-',
         NODE_ENV: 'test-docker',
         Q_DEBUG: 1,
         BLUEBIRD_DEBUG: 1
