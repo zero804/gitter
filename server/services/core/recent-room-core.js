@@ -151,7 +151,7 @@ function clearLastVisitedTroupeforUserId(userId, troupeId) {
 }
 
 /**
- * Returns true if an update actually happened
+ * Returns Promise of true if an update actually happened
  */
 function saveUserTroupeLastAccess(userId, troupeId, lastAccessTime) {
   if (lastAccessTime) {
