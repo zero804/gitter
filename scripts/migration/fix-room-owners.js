@@ -32,7 +32,10 @@ function getBatchedRooms() {
           uri: 1,
           githubType: 1,
           parentId: 1,
-          ownerUserId: 1
+          githubUd: 1,
+          ownerUserId: 1,
+          userCount: 1,
+          security: 1
         }
       },
       {
@@ -48,7 +51,14 @@ function getBatchedRooms() {
     .stream();
 }
 
-function findBatchWarnings(batch, githubTypes) {
+function findBatchWarnings(opts) {
+  var batch = opts.batch;
+  var githubTypes = opts.githubTypes;
+  var org = opts.org;
+  var user = opts.user;
+  var uniqueUserIds = opts.uniqueUserIds;
+  var uniqueOwners = opts.uniqueOwners;
+
   var lcOwner = batch._id;
   var warnings = [];
 
@@ -95,6 +105,8 @@ function findBatchWarnings(batch, githubTypes) {
     warnings.push(lcOwner + " has both org rooms or channels AND user channels.");
   }
 
+  // TODO: warn if user id doesn't match all the ownerUserIds
+
   return warnings;
 }
 
@@ -110,6 +122,17 @@ function findGitHubUser(lcUri) {
     .read('secondaryPreferred')
     .lean()
     .exec();
+}
+
+function findRoomGitHubUser(githubId) {
+  if (githubId) {
+    return Promise.resolve();
+  } else {
+    return migrationSchemas.GitHubOrg.findOne({ githubId: githubId })
+      .read('secondaryPreferred')
+      .lean()
+      .exec();
+  }
 }
 
 
@@ -131,13 +154,20 @@ var findBatchInfo = Promise.method(function(batch) {
   });
   var githubTypes = Object.keys(githubTypeMap);
 
+  var uniqueUserIds = _.uniq(batch.rooms.map(function(room) {
+    return room.ownerUserId;
+  }));
+
   var type = 'unknown';
   var errors = [];
+
+  var lookups = {};
 
   return Promise.join(
     findGitHubOrg(lcOwner),
     findGitHubUser(lcOwner),
-    function(org, user) {
+    findRoomGitHubUser(uniqueUserIds[0]), // could be undefined
+    function(org, user, roomUser) {
       if (org) {
         type = 'org';
 
@@ -164,43 +194,57 @@ var findBatchInfo = Promise.method(function(batch) {
           });
         }
 
+      } else if (roomUser) {
+        type = 'user';
+
+        // the user has definitely been renamed
+        errors.push({
+          type: "owner",
+          lcOwner: lcOwner,
+          correctOwner: user.uri,
+          batch: batch
+        });
+
       } else {
-        // TODO: if type is unknown and there are ownerUserIds, try and look
-        // them up in the user dump. Possible that the username has changed.
-        // (just be aware that some batches have multiple github user ids..)
-
-        // TODO: If we still really don't know, we can try and look up the repo
-        // by github ids via their API and then get the info from there. The
-        // org or username could have been completely renamed. It could also be
-        // a private repo, though.
-
-        // Whatever we do, we have to do something manually here if we still
-        // can't figure it out, so log this loudly.
+        // TODO?
       }
 
-      // NOTE: The rest of the problems we just log. Not going to automatically fix
-      // them as they are so rare. But if we find more that are worth automatically
-      // fixing we could add different types of errors.
-      var warnings = findBatchWarnings(batch, githubTypes);
+      if (user) {
+        // does this user exist in our system?
+        lookups.gitterUser = userService.findByGithubId(user.githubId);
+      }
 
-      return Promise.map(errors, findUpdatesForOwnerError)
-        .then(function(updates) {
-          console.log(numProcessed, lcOwner, type, updates.length, warnings.length);
-          var data = {
-            type: type,
-            updates: updates,
-            warnings: warnings
-          };
-          if (user) {
-            // does this user exist in our system?
-            return userService.findByGithubId(user.githubId)
-              .then(function(gitterUser) {
-                data.hasGitterUser = !!gitterUser;
-                return data;
-              });
-          } else {
-            return data;
-          }
+      return Promise.props(lookups)
+        .then(function(results) {
+          console.log(numProcessed, lcOwner, type);
+
+          return errorsToUpdates(errors)
+            .then(function(updates) {
+              if (updates.length) {
+                console.log(updates);
+              }
+              var data = {
+                type: type,
+                updates: updates,
+                org: org,
+                user: user,
+                warnings: findBatchWarnings({
+                  batch: batch,
+                  githubTypes: githubTypes,
+                  githubTypeMap: githubTypeMap,
+                  uniqueUserIds: uniqueUserIds,
+                  uniqueOwners: uniqueOwners,
+                  org: org,
+                  user: user
+                })
+              };
+
+              if (lookups.gitterUser) {
+                data.hasGitterUser = !!results.gitterUser;
+              }
+
+              return data;
+            });
         });
     });
 });
