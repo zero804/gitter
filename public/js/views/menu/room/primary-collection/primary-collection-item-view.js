@@ -146,13 +146,8 @@ module.exports = BaseCollectionItemView.extend({
     //The favourite item view overrides this function so here we can be 100%
     //sure this only runs for a primary item, as such we can just remove any favourite styles
     //here jp 17/5/16
-    if(this.el.classList.contains('room-item--favourite')) {
-      this.el.classList.remove('room-item--favourite');
-    }
-
-    if(this.el.classList.contains('room-item--favourite-one2one')) {
-      this.el.classList.remove('room-item--favourite-one2one');
-    }
+    this.el.classList.remove('room-item--favourite');
+    this.el.classList.remove('room-item--favourite-one2one');
 
     if (this.model.get('oneToOne')) {
       this.el.classList.add('room-item--one2one');
