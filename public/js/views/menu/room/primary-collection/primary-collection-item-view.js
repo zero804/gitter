@@ -142,6 +142,24 @@ module.exports = BaseCollectionItemView.extend({
     BaseCollectionItemView.prototype.render.apply(this, arguments);
   },
 
+  onRender: function (){
+    if(this.el.classList.contains('room-item--favourite')) {
+      this.el.classList.remove('room-item--favourite');
+    }
+
+    if(this.el.classList.contains('room-item--favourite-one2one')) {
+      this.el.classList.remove('room-item--favourite-one2one');
+    }
+
+    if (this.model.get('oneToOne')) {
+      this.el.classList.add('room-item--one2one');
+    }
+    else {
+      this.el.classList.add('room-item');
+    }
+
+  },
+
   onDestroy: function() {
     this.stopListening(this.uiModel);
   },
