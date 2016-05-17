@@ -130,7 +130,6 @@ var findRoomGitHubUser = Promise.method(function(ownerUserId) {
     return userService.findById(ownerUserId)
       .then(function(user) {
         if (user) {
-          console.log('FOUND A GITHUB USER BY ID!');
           return migrationSchemas.GitHubUser.findOne({ githubId: user.githubId })
             .read('secondaryPreferred')
             .lean()
