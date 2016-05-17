@@ -1,0 +1,13 @@
+{
+  "name": "gitter-web-groups",
+  "version": "1.0.0",
+  "main": "lib/group-service.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha test/"
+  },
+  "private": true
+}

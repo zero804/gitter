@@ -49,6 +49,7 @@
     "gitter-web-github": "file:modules/github",
     "gitter-web-github-backend": "file:modules/github-backend",
     "gitter-web-google-backend": "file:modules/google-backend",
+    "gitter-web-groups": "file:modules/groups",
     "gitter-web-identity": "file:modules/identity",
     "gitter-web-intercom": "file:modules/intercom",
     "gitter-web-linkedin-backend": "file:modules/linkedin-backend",
