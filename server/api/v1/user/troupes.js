@@ -52,6 +52,8 @@ function performUpdateToUserRoom(req) {
       return Promise.all(promises);
     })
     .then(function() {
+      if(req.accepts(['text', 'json']) === 'text') return;
+
       var strategy = new restSerializer.TroupeIdStrategy({
         currentUserId: userId,
         includeProviders: true
