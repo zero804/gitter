@@ -143,6 +143,7 @@ module.exports = BaseCollectionItemView.extend({
   },
 
   onRender: function (){
+    BaseCollectionItemView.prototype.onRender.apply(this, arguments);
     //The favourite item view overrides this function so here we can be 100%
     //sure this only runs for a primary item, as such we can just remove any favourite styles
     //here jp 17/5/16
