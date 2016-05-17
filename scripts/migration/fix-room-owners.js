@@ -127,12 +127,12 @@ function findGitHubUser(lcUri) {
 
 function findRoomGitHubUser(githubId) {
   if (githubId) {
-    return Promise.resolve();
-  } else {
     return migrationSchemas.GitHubUser.findOne({ githubId: githubId })
       .read('secondaryPreferred')
       .lean()
       .exec();
+  } else {
+    return Promise.resolve();
   }
 }
 
