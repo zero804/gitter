@@ -104,6 +104,82 @@ describe('left-menu state', function() {
   });
 
 
+  it('Resolve to respective URI org if shouldPreserveState=false passed even when refreshing/unload', function() {
+    var beforeLeftMenuState = {
+      state: 'org',
+      selectedOrgName: 'gitterHQ'
+    };
+    var leftMenuState = generateLeftMenuState(beforeLeftMenuState, 'w3c/svg', orgListFixture, {
+      shouldPreserveState: false,
+      // Simulate a unload "refresh"
+      previousUnloadTime: new Date().getTime()
+    });
+
+    assert.deepEqual(leftMenuState,  {
+      roomMenuIsPinned: true,
+      state: 'org',
+      selectedOrgName: 'w3c'
+    });
+  });
+
+  it('Maintain state if shouldPreserveState=true passed even if unload/"refresh" time was too far away', function() {
+    var beforeLeftMenuState = {
+      state: 'org',
+      selectedOrgName: 'gitterHQ'
+    };
+    var leftMenuState = generateLeftMenuState(beforeLeftMenuState, 'w3c/svg', orgListFixture, {
+      shouldPreserveState: true,
+      // Simulate a unload minutes ago
+      previousUnloadTime: new Date().getTime() - (5 * 60 * 1000)
+    });
+
+    assert.deepEqual(leftMenuState,  {
+      roomMenuIsPinned: true,
+      state: 'org',
+      selectedOrgName: 'gitterHQ'
+    });
+  });
+
+  it('Maintain state if non explicit true/false value passed to shouldPreserveState when refreshing/unload', function() {
+    var beforeLeftMenuState = {
+      state: 'org',
+      selectedOrgName: 'gitterHQ'
+    };
+    var leftMenuState = generateLeftMenuState(beforeLeftMenuState, 'w3c/svg', orgListFixture, {
+      shouldPreserveState: 'asdf',
+      // Simulate a unload "refresh"
+      previousUnloadTime: new Date().getTime()
+    });
+
+    assert.deepEqual(leftMenuState,  {
+      roomMenuIsPinned: true,
+      state: 'org',
+      selectedOrgName: 'gitterHQ'
+    });
+  });
+
+
+  it('Maintain state if shouldPreserveState=undefined when refreshing/unload', function() {
+    var beforeLeftMenuState = {
+      state: 'org',
+      selectedOrgName: 'gitterHQ'
+    };
+    var leftMenuState = generateLeftMenuState(beforeLeftMenuState, 'w3c/svg', orgListFixture, {
+      // It would actaully be a string if you passed via query parameter
+      // but this is testing actual `undefined`. The test for arbitrary string is above
+      shouldPreserveState: undefined,
+      // Simulate a unload "refresh"
+      previousUnloadTime: new Date().getTime()
+    });
+
+    assert.deepEqual(leftMenuState,  {
+      roomMenuIsPinned: true,
+      state: 'org',
+      selectedOrgName: 'gitterHQ'
+    });
+  });
+
+
   it('Resolve to people-state when visiting one-to-one that is not in your org list', function() {
     var leftMenuState = generateLeftMenuState({}, 'some-person', orgListFixture, {
       isOneToOne: true

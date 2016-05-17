@@ -21,7 +21,8 @@
     left:             .5rem;
     width:            90%;
     height:           1px;
-    background-color: fade(@jaffa, 60%);
+    background-color: fade(white, 30%);
+    transition: background-color .2s ease-in;
   }
 
   &.active {
@@ -57,7 +58,7 @@
   position:     relative;
   top:          .4rem;
   margin-left:  auto;
-  margin-right: @desktop-menu-left-padding / 2;
+  margin-right: @desktop-menu-left-padding;
   color:        white;
   font-size:    4rem;
   opacity:      1;

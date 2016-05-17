@@ -4,7 +4,9 @@ var _ = require('underscore');
 var getOrgNameFromUri = require('../get-org-name-from-uri');
 
 var defaults = {
-  previousUnloadTime: null,
+  // Works with explicit true/false values, otherwise doesn't get considered
+  shouldPreserveState: undefined,
+  previousUnloadTime: undefined,
   isOneToOne: false,
 };
 
@@ -22,7 +24,7 @@ module.exports = function generateLeftMenuState(leftRoomMenuState, uri, orgs, op
   var isWithinRefreshTimeThreshold = previousUnloadTime && (timeNow - previousUnloadTime) < 5000;
 
   // Only try to resolve their state if they aren't "refreshing"
-  if(!isWithinRefreshTimeThreshold) {
+  if(opts.shouldPreserveState !== true && (opts.shouldPreserveState === false || !isWithinRefreshTimeThreshold)) {
     currentlySelectedOrgName = getOrgNameFromUri(uri);
 
     var isCurrentOrgInOrgList = orgs.some(function(org) {
