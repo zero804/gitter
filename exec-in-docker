@@ -47,6 +47,8 @@ docker-compose -p "${PROJECT_NAME}" -f docker-compose.internal.yml run \
     --entrypoint "${WORKSPACE}/scripts/docker/exec/exec.sh $(join ' ' "$@")" \
     "${TARGET_DOCKER_CONTAINER}"
 
+echo "docker-compose run exited with $?"
+
 docker-compose -p "${PROJECT_NAME}" -f docker-compose.internal.yml ps
 docker ps -a|grep "${PROJECT_NAME}"
 
