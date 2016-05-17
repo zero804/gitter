@@ -228,6 +228,7 @@ var findBatchInfo = Promise.method(function(batch) {
                 updates: updates,
                 org: org,
                 user: user,
+                githubTypeMap: githubTypeMap,
                 warnings: findBatchWarnings({
                   batch: batch,
                   githubTypes: githubTypes,
@@ -291,6 +292,19 @@ function getInfo() {
             if (info.type == 'unknown') {
               numUnknown++;
               unknown.push(batch);
+
+              var hasOrgRoom = !!(info.githubTypeMap['ORG'] || info.githubTypeMap['ORG_CHANNEL']);
+              var hasUserRoom = !!info.githubTypeMap['USER_CHANNEL'];
+              var probably;
+              if (hasOrgRoom) {
+                probably = 'org';
+              }
+              if (hasUserRoom) {
+                probably = 'user';
+              }
+              batch.rooms.forEach(function(room) {
+                room.probably = probably;
+              });
             }
 
             if (info.updates.length) {
