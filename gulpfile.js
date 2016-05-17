@@ -199,7 +199,6 @@ gulp.task('test', ['test-mocha'/*, 'test-redis-lua'*/, 'submit-coveralls', 'subm
 makeTestTasks('localtest', function(name, files) {
 
   return gulp.src(files, { read: false })
-    .pipe(require('gulp-print')())
     .pipe(mocha({
       reporter: 'spec',
       timeout: 10000,
