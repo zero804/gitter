@@ -44,8 +44,8 @@ trap finish EXIT
 
 docker-compose -p "${PROJECT_NAME}" -f docker-compose.internal.yml run --rm mongosetup
 docker-compose -p "${PROJECT_NAME}" -f docker-compose.internal.yml run \
-    --entrypoint "${WORKSPACE}/scripts/docker/exec/exec.sh $(join ' ' "$@")" \
-    "${TARGET_DOCKER_CONTAINER}"
+    "${TARGET_DOCKER_CONTAINER}" \
+    "${WORKSPACE}/scripts/docker/exec/exec.sh" "$@"
 
 echo "docker-compose run exited with $?"
 
