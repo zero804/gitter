@@ -84,7 +84,6 @@ var SearchInputView = Marionette.ItemView.extend({
     //so we will check for the find function JP 15/3/16
     if(state === 'search' && this.ui.input.find) {
       RAF(function(){
-      console.log('FOCUS');
         this.ui.input.focus();
       }.bind(this));
     }
