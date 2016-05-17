@@ -143,6 +143,9 @@ module.exports = BaseCollectionItemView.extend({
   },
 
   onRender: function (){
+    //The favourite item view overrides this function so here we can be 100%
+    //sure this only runs for a primary item, as such we can just remove any favourite styles
+    //here jp 17/5/16
     if(this.el.classList.contains('room-item--favourite')) {
       this.el.classList.remove('room-item--favourite');
     }
