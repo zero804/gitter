@@ -1,24 +1,5 @@
-TESTS = test/integration
-END_TO_END_TESTS = test/end-to-end
-PERF_TESTS = test/performance
-MOCHA_REPORTER =
-DATA_MAINT_SCRIPTS = $(shell find ./scripts/datamaintenance -name '*.sh')
-SAUCELABS_REMOTE = http://trevorah:d6b21af1-7ae7-4bed-9c56-c5f9d290712b@ondemand.saucelabs.com:80/wd/hub
-BETA_SITE = https://beta.trou.pe
-BASE_URL = http://localhost:5000
-MAIL_HOST = localhost
-MAIL_PORT = 2525
-GIT_BRANCH ?= $(shell git rev-parse --abbrev-ref HEAD)
-GIT_COMMIT ?= $(shell git rev-parse HEAD)
-ASSET_TAG_PREFIX =
-ASSET_TAG = $(ASSET_TAG_PREFIX)$(shell echo $(GIT_COMMIT)|cut -c 1-6)
 EMBEDDED_NODE_ENV ?= prod
 EMBEDDED_WWW_DIRECTORY ?= ~/code/gitter/ios/Troupe/www/build
-ifeq ($(FAST_BUILD), 1)
-CLEAN_FILES = $(shell echo output/ coverage/ cobertura-coverage.xml html-report/ public-processed/ public/styles/)
-else
-CLEAN_FILES = $(shell echo output/ coverage/ cobertura-coverage.xml html-report/ public-processed/ public/styles/ public-compile-cache/)
-endif
 PATH := ./node_modules/.bin:$(PATH)
 
 .PHONY: build clean test npm sprites npm-quick npm-full performance-tests
