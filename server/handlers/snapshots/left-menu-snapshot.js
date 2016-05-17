@@ -7,6 +7,10 @@ module.exports = function getSnapshotsForPageContext(req, troupeContext, rooms) 
   // Generate the org list for the minibar, this is derived from the room list
   var minibarOrgList = suggestedOrgsFromRoomList(rooms, req.uriContext.uri, null, req.troupe);
 
+  var preserveLeftMenuState = (req.query.preserveLeftMenuState || '').toLowerCase();
+  // We only accept explicit `true`/`false` values
+  var shouldPreserveState = preserveLeftMenuState === 'true' ? true : (preserveLeftMenuState === 'false' ? false : undefined);
+
   return {
     rooms:    rooms,
     orgs:     minibarOrgList,
@@ -15,6 +19,7 @@ module.exports = function getSnapshotsForPageContext(req, troupeContext, rooms) 
     // we need to change the menu's state so it shows that org as selected both in the minibar
     // and the menu, as such the left-menu context need to know about the org list
     leftMenu: generateLeftMenuState(troupeContext.leftRoomMenuState, req.uriContext.uri, minibarOrgList, {
+      shouldPreserveState: shouldPreserveState,
       previousUnloadTime: req.cookies.previousUnloadTime,
       isOneToOne: req.troupe && req.troupe.oneToOne
     }),
