@@ -41,12 +41,16 @@ function saveLastVisitedTroupeforUserId(userId, troupeId, options) {
   return Promise.join(
     recentRoomCore.saveUserTroupeLastAccess(userId, troupeId, lastAccessTime),
     persistence.User.update({ _id: userId }, { $set: { lastTroupe: troupeId }}).exec(), // Update User
-    function() {
-      // XXX: lastAccessTime should be a date but for some bizarre reason it's not
+    function(didUpdate) {
+      if (!didUpdate) return null;
+
+      // NB: lastAccessTime should be a date but for some bizarre reason it's not
       // serializing properly
       if (!options || !options.skipFayeUpdate) {
         appEvents.dataChange2('/user/' + userId + '/rooms', 'patch', { id: troupeId, lastAccessTime: moment(lastAccessTime).toISOString() }, 'room');
       }
+
+      return null;
     });
 }
 

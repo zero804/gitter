@@ -11,10 +11,15 @@
   },
   "private": true,
   "dependencies": {
-    "bluebird": "^3.2.1",
+    "bluebird": "^3.3.5",
     "debug": "^2.2.0",
+    "dolph": "^0.2.0",
+    "gitter-web-appevents": "file:../appevents",
+    "gitter-web-env": "file:../env",
+    "gitter-web-github": "file:../github",
     "gitter-web-persistence": "file:../persistence",
     "gitter-web-persistence-utils": "file:../persistence-utils",
+    "lodash": "^3.2.0",
     "statuserror": "^0.1.3"
   }
 }

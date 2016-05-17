@@ -4,11 +4,11 @@ var testRequire   = require('../../test-require');
 var assert        = require('assert');
 var Promise       = require('bluebird');
 var fixtureLoader = require('../../test-fixtures');
-
+var ObjectID      = require('mongodb').ObjectID;
 var recentRoomCore = testRequire("./services/core/recent-room-core");
 
 describe('recent-room-core', function() {
-  describe('ordering', function() {
+  describe('ordering #slow', function() {
     var fixture = {};
 
     before(fixtureLoader(fixture, {
@@ -95,7 +95,7 @@ describe('recent-room-core', function() {
 
   });
 
-  describe('#updateFavourite()', function() {
+  describe('updateFavourite #slow', function() {
     var fixture = {};
 
     before(fixtureLoader(fixture, {
@@ -135,7 +135,7 @@ describe('recent-room-core', function() {
 
   });
 
-  describe('#findLastAccessTimesForUsersInRoom', function() {
+  describe('findLastAccessTimesForUsersInRoom #slow', function() {
     var fixture = {};
 
     before(fixtureLoader(fixture, {
@@ -178,4 +178,45 @@ describe('recent-room-core', function() {
     });
 
   });
+
+  describe('saveUserTroupeLastAccess #slow', function() {
+    it('should update on insert', function() {
+      var userId = new ObjectID();
+      var troupeId = new ObjectID();
+      return recentRoomCore.saveUserTroupeLastAccess(userId, troupeId)
+        .then(function(didUpdate) {
+          assert.strictEqual(didUpdate, true);
+        })
+    });
+
+    it('should update on update', function() {
+      var userId = new ObjectID();
+      var troupeId = new ObjectID();
+      var troupeId2 = new ObjectID();
+      return recentRoomCore.saveUserTroupeLastAccess(userId, troupeId)
+        .then(function(didUpdate) {
+          assert.strictEqual(didUpdate, true);
+          return recentRoomCore.saveUserTroupeLastAccess(userId, troupeId2);
+        })
+        .then(function(didUpdate) {
+          assert.strictEqual(didUpdate, true);
+        });
+    });
+
+    it('should not update when the date is equal', function() {
+      var userId = new ObjectID();
+      var troupeId = new ObjectID();
+      var lastAccessTime = new Date();
+      var lastAccessTimeOld = new Date(lastAccessTime - 1000);
+
+      return recentRoomCore.saveUserTroupeLastAccess(userId, troupeId, lastAccessTime)
+        .then(function(didUpdate) {
+          assert.strictEqual(didUpdate, true);
+          return recentRoomCore.saveUserTroupeLastAccess(userId, troupeId, lastAccessTimeOld);
+        })
+        .then(function(didUpdate) {
+          assert.strictEqual(didUpdate, false);
+        });
+    });
+  })
 });
