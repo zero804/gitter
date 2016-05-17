@@ -3,6 +3,7 @@
 var _ = require('underscore');
 var Marionette = require('backbone.marionette');
 var slugify = require('slug');
+var context = require('utils/context');
 var toggleClass = require('utils/toggle-class');
 
 var template = require('./community-creation-main-view.hbs');
@@ -85,6 +86,18 @@ module.exports = CommunityCreateBaseStepView.extend({
 
     this.listenTo(this.communityCreateModel, 'change:communityName', this.updateCommunityFields, this);
     this.listenTo(this.communityCreateModel, 'change:communitySlug', this.updateCommunityFields, this);
+  },
+
+
+  serializeData: function() {
+    var data = this.model.toJSON();
+    var user = context.getUser();
+    var hasGitHubProvider = user.providers.some(function(provider) {
+      return provider === 'github';
+    });
+    data.hasGitHubProvider = hasGitHubProvider;
+
+    return data;
   },
 
   onStepNext: function() {
