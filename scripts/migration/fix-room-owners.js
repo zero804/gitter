@@ -5,11 +5,14 @@ var fs = require('fs');
 var _ = require('lodash');
 var Promise = require('bluebird');
 var shutdown = require('shutdown');
+var mongoose = require('mongoose');
 var persistence = require('gitter-web-persistence');
-var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
+var installMigrationSchemas = require('./migration-schemas').install;
 var onMongoConnect = require('../../server/utils/on-mongo-connect');
 var userService = require('../../server/services/user-service');
 var through2Concurrent = require('through2-concurrent');
+
+var migrationSchemas;
 
 
 function getBatchedRooms() {
@@ -96,14 +99,14 @@ function findBatchWarnings(batch, githubTypes) {
 }
 
 function findGitHubOrg(lcUri) {
-  return persistence.GitHubOrg.findOne({ lcUri: lcUri })
+  return migrationSchemas.GitHubOrg.findOne({ lcUri: lcUri })
     .read('secondaryPreferred')
     .lean()
     .exec();
 }
 
 function findGitHubUser(lcUri) {
-  return persistence.GitHubUser.findOne({ lcUri: lcUri })
+  return migrationSchemas.GitHubUser.findOne({ lcUri: lcUri })
     .read('secondaryPreferred')
     .lean()
     .exec();
@@ -365,6 +368,7 @@ function die(error) {
 
 onMongoConnect()
   .then(function() {
+    migrationSchemas = installMigrationSchemas(mongoose.connection);
     require('yargs')
       .command('dry-run', 'Dry run', { }, function() {
         //run(log, done);
