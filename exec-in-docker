@@ -3,8 +3,6 @@
 set -u
 set -e
 
-function join { local IFS="$1"; shift; echo "$*"; }
-
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 WORKSPACE=${WORKSPACE-$SCRIPT_DIR}

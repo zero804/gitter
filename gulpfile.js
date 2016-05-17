@@ -109,14 +109,14 @@ makeTestTasks('test-mocha', function(name, files) {
   gutil.log('Writing XUnit output', 'output/test-reports/' + name + '.xml');
 
   var mochaOpts = {
-    reporter: 'mocha-multi',
+    // reporter: 'mocha-multi',
     timeout: 10000,
     istanbul: {
       dir: 'output/coverage-reports/' + name
     },
     env: {
       // multi: 'spec=- xunit=output/test-reports/' + name + '.xml',
-      multi: 'spec=-',
+      // multi: 'spec=-',
       NODE_ENV: 'test',
       BLUEBIRD_DEBUG: 1,
       TZ: 'UTC'
@@ -138,14 +138,14 @@ makeTestTasks('test-docker', function(name, files) {
   gutil.log('Writing XUnit output', 'output/test-reports/' + name + '.xml');
   return gulp.src(files, { read: false })
     .pipe(mocha({
-      reporter: 'mocha-multi',
+      // reporter: 'mocha-multi',
       timeout: 10000,
       istanbul: {
         dir: 'output/coverage-reports/' + name
       },
       env: {
         // multi: 'spec=- xunit=output/test-reports/' + name + '.xml',
-        multi: 'spec=-',
+        // multi: 'spec=-',
         NODE_ENV: 'test-docker',
         Q_DEBUG: 1,
         BLUEBIRD_DEBUG: 1
