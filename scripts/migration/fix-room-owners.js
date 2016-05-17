@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+/*eslint complexity: ["error", 30]*/
 
 var fs = require('fs');
 var _ = require('lodash');
@@ -128,7 +129,7 @@ function findRoomGitHubUser(githubId) {
   if (githubId) {
     return Promise.resolve();
   } else {
-    return migrationSchemas.GitHubOrg.findOne({ githubId: githubId })
+    return migrationSchemas.GitHubUser.findOne({ githubId: githubId })
       .read('secondaryPreferred')
       .lean()
       .exec();
