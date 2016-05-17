@@ -111,9 +111,9 @@ makeTestTasks('test-mocha', function(name, files) {
   var mochaOpts = {
     // reporter: 'mocha-multi',
     timeout: 10000,
-    istanbul: {
-      dir: 'output/coverage-reports/' + name
-    },
+    // istanbul: {
+    //   dir: 'output/coverage-reports/' + name
+    // },
     env: {
       // multi: 'spec=- xunit=output/test-reports/' + name + '.xml',
       // multi: 'spec=-',
@@ -140,9 +140,9 @@ makeTestTasks('test-docker', function(name, files) {
     .pipe(mocha({
       // reporter: 'mocha-multi',
       timeout: 10000,
-      istanbul: {
-        dir: 'output/coverage-reports/' + name
-      },
+      // istanbul: {
+      //   dir: 'output/coverage-reports/' + name
+      // },
       env: {
         // multi: 'spec=- xunit=output/test-reports/' + name + '.xml',
         // multi: 'spec=-',
