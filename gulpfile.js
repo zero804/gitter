@@ -34,7 +34,7 @@ var glob = require('glob');
 var codacy = require('gulp-codacy');
 
 /* Don't do clean in gulp, use make */
-var RUN_TESTS_IN_PARALLEL = false;
+var RUN_TESTS_IN_PARALLEL = true;
 
 var testModules = {
   'integration': { files: ['./test/integration/**/*.js', './test/public-js/**/*.js'], includeInFast: true }
@@ -46,7 +46,7 @@ modulesWithTest.forEach(function(testDir) {
   var moduleName = path.basename(moduleDir);
   testModules[moduleName] = {
     files: path.join('modules', moduleName, 'test', '**', '*.js'),
-    includeInFast: true
+    includeInFast: false
   }
 })
 
@@ -77,6 +77,8 @@ function makeTestTasks(taskName, generator, isFast) {
   } else {
     // Run tests in sequence
     gulp.task(taskName, function(callback) {
+      gutil.log('Run sequence for ' + taskName,childTasks.join(','));
+
       var args = childTasks.concat(callback);
       runSequence.apply(null, args);
     });
