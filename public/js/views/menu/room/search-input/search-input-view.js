@@ -82,7 +82,7 @@ var SearchInputView = Marionette.ItemView.extend({
     //We need to check if the ui elements have been bound
     //as this is a string before it is bounce we can't check [0] || .length
     //so we will check for the find function JP 15/3/16
-    if(state === 'search' && this.ui.input.find) {
+    if(state === 'search') {
       RAF(function(){
         this.ui.input.focus();
       }.bind(this));
