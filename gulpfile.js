@@ -106,6 +106,8 @@ makeTestTasks('test-mocha', function(name, files) {
   mkdirp.sync('output/test-reports/');
   mkdirp.sync('output/coverage-reports/' + name);
 
+  gutil.log('Writing XUnit output', 'output/test-reports/' + name + '.xml');
+
   var mochaOpts = {
     reporter: 'mocha-multi',
     timeout: 10000,
@@ -132,7 +134,7 @@ makeTestTasks('test-mocha', function(name, files) {
 makeTestTasks('test-docker', function(name, files) {
   mkdirp.sync('output/test-reports/');
   mkdirp.sync('output/coverage-reports/' + name);
-
+  gutil.log('Writing XUnit output', 'output/test-reports/' + name + '.xml');
   return gulp.src(files, { read: false })
     .pipe(mocha({
       reporter: 'mocha-multi',
