@@ -10,6 +10,14 @@ describe('group-service', function() {
 
       var fixture = {};
       before(fixtureLoader(fixture, {
+        deleteDocuments: {
+          User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }],
+          Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() }],
+        },
+        user1: {
+          githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
+          username: fixtureLoader.GITTER_INTEGRATION_USERNAME
+        },
         group1: {},
         troupe1: {}
       }));
@@ -20,9 +28,10 @@ describe('group-service', function() {
 
       describe('createGroup #slow', function() {
         it('should create a group', function() {
-          var groupUri = 'bob' + Date.now();
+          var groupUri = fixtureLoader.GITTER_INTEGRATION_ORG;
+          var user = fixture.user1;
 
-          return groupService.createGroup({ name: 'Bob', uri: groupUri })
+          return groupService.createGroup(user, { name: 'Bob', uri: groupUri })
             .then(function(group) {
               assert.strictEqual(group.name, 'Bob');
               assert.strictEqual(group.uri, groupUri);
@@ -34,16 +43,11 @@ describe('group-service', function() {
       describe('findById #slow', function() {
 
         it('should find a group', function() {
-          var groupUri = 'Bob' + Date.now();
-
-          return groupService.createGroup({ name: 'Bob', uri: groupUri })
+          return groupService.findById(fixture.group1._id)
             .then(function(group) {
-              return groupService.findById(group._id);
-            })
-            .then(function(group) {
-              assert.strictEqual(group.name, 'Bob');
-              assert.strictEqual(group.uri, groupUri);
-              assert.strictEqual(group.lcUri, groupUri.toLowerCase());
+              assert.strictEqual(group.name, fixture.group1.name);
+              assert.strictEqual(group.uri, fixture.group1.uri);
+              assert.strictEqual(group.lcUri, fixture.group1.lcUri);
             });
 
         });
