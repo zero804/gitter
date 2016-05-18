@@ -124,7 +124,8 @@ describe('left-menu state', function() {
     assert.deepEqual(leftMenuState,  {
       roomMenuIsPinned: true,
       state: 'org',
-      selectedOrgName: 'w3c'
+      selectedOrgName: 'w3c',
+      activationSourceType: null
     });
   });
 
@@ -142,7 +143,8 @@ describe('left-menu state', function() {
     assert.deepEqual(leftMenuState,  {
       roomMenuIsPinned: true,
       state: 'org',
-      selectedOrgName: 'gitterHQ'
+      selectedOrgName: 'gitterHQ',
+      activationSourceType: null
     });
   });
 
@@ -160,7 +162,8 @@ describe('left-menu state', function() {
     assert.deepEqual(leftMenuState,  {
       roomMenuIsPinned: true,
       state: 'org',
-      selectedOrgName: 'gitterHQ'
+      selectedOrgName: 'gitterHQ',
+      activationSourceType: null
     });
   });
 
@@ -181,7 +184,8 @@ describe('left-menu state', function() {
     assert.deepEqual(leftMenuState,  {
       roomMenuIsPinned: true,
       state: 'org',
-      selectedOrgName: 'gitterHQ'
+      selectedOrgName: 'gitterHQ',
+      activationSourceType: null
     });
   });
 
