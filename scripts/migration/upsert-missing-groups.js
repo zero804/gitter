@@ -4,7 +4,7 @@
 var _ = require('lodash');
 var shutdown = require('shutdown');
 var persistence = require('gitter-web-persistence');
-var through2Concurrent = require('through2-concurrent');
+var through2 = require('through2');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var onMongoConnect = require('../../server/utils/on-mongo-connect');
 var uriLookupService = require('../../server/services/uri-lookup-service');
@@ -184,7 +184,7 @@ function migrate(batch, enc, callback) {
 
 function run(f, callback) {
   getGroupableRooms()
-    .pipe(through2Concurrent.obj({maxConcurrency: 10}, f))
+    .pipe(through2.obj(f))
     .on('data', function(batch) {
     })
     .on('end', function() {
@@ -197,13 +197,16 @@ function run(f, callback) {
 }
 
 function done(error) {
-  if (error) {
-    console.error(error);
-    console.error(error.stack);
-    process.exit(1);
-  } else {
-    shutdown.shutdownGracefully();
-  }
+  console.log('Done. Waiting a bit...');
+  setTimeout(function() {
+    if (error) {
+      console.error(error);
+      console.error(error.stack);
+      process.exit(1);
+    } else {
+      shutdown.shutdownGracefully();
+    }
+  }, 10000);
 }
 
 onMongoConnect()
