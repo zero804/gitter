@@ -7,7 +7,6 @@ var cocktail           = require('cocktail');
 var KeyboardEventMixin = require('views/keyboard-events-mixin');
 var template           = require('./search-input-view.hbs');
 var toggleClass        = require('utils/toggle-class');
-var RAF                = require('utils/raf');
 
 var SearchInputView = Marionette.ItemView.extend({
 
