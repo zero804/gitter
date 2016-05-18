@@ -1,12 +1,13 @@
 //TODO TEST THIS JP 10/2/16
 'use strict';
 
-var Marionette  = require('backbone.marionette');
-var _           = require('underscore');
-var cocktail    = require('cocktail');
+var Marionette         = require('backbone.marionette');
+var _                  = require('underscore');
+var cocktail           = require('cocktail');
 var KeyboardEventMixin = require('views/keyboard-events-mixin');
-var template    = require('./search-input-view.hbs');
-var toggleClass = require('utils/toggle-class');
+var template           = require('./search-input-view.hbs');
+var toggleClass        = require('utils/toggle-class');
+var RAF                = require('utils/raf');
 
 var SearchInputView = Marionette.ItemView.extend({
 
@@ -35,7 +36,6 @@ var SearchInputView = Marionette.ItemView.extend({
 
   initialize: function(attrs) {
     this.bus = attrs.bus;
-    this.onModelChangeState(this.model, this.model.get('state'));
     this.listenTo(this.bus, 'left-menu:recent-search', this.onRecentSearchUpdate, this);
   },
 
@@ -59,6 +59,10 @@ var SearchInputView = Marionette.ItemView.extend({
     }
   },
 
+  onRender: function (){
+    this.onModelChangeState(this.model, this.model.get('state'));
+  },
+
   onModelChangeSearchTerm: function(model, val) { //jshint unused: true
     if(val === '') { this.ui.input.val(val); }
     toggleClass(this.el, 'empty', !val);
@@ -78,7 +82,11 @@ var SearchInputView = Marionette.ItemView.extend({
     //We need to check if the ui elements have been bound
     //as this is a string before it is bounce we can't check [0] || .length
     //so we will check for the find function JP 15/3/16
-    if(state === 'search' && this.ui.input.find) { this.ui.input.focus(); }
+    if(state === 'search') {
+      RAF(function(){
+        this.ui.input.focus();
+      }.bind(this));
+    }
   }
 
 });
