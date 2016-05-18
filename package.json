@@ -276,6 +276,8 @@
     "soupselect": "^0.2.0",
     "speedy": "^0.1.1",
     "style-loader": "^0.13.0",
+    "supertest": "^1.2.0",
+    "supertest-as-promised": "^3.1.0",
     "tap-file": "0.0.2",
     "through2": "^0.6.3",
     "vinyl-paths": "^2.0.0",

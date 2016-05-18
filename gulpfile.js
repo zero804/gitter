@@ -54,6 +54,11 @@ testModules.integration = {
   includeInFast: true
 };
 
+testModules.apiTests = {
+  files: ['./test/api-tests/**/*.js'],
+  includeInFast: false
+};
+
 /** Make a series of tasks based on the test modules */
 function makeTestTasks(taskName, generator, isFast) {
   Object.keys(testModules).forEach(function(moduleName) {

@@ -6,6 +6,7 @@ var persistence = require('gitter-web-persistence');
 var roomMembershipFlags = testRequire("./services/room-membership-flags");
 var debug       = require('debug')('gitter:test-fixtures');
 var util        = require('util');
+var uuid        = require('node-uuid');
 var counter     = 0;
 
 function generateEmail() {
@@ -128,7 +129,7 @@ function createExpectedFixtures(expected, done) {
       }
     }
 
-    return persistence.User.create({
+    var promise = persistence.User.create({
       identities:       f.identities,
       email:            possibleGenerate('email', generateEmail),
       displayName:      possibleGenerate('displayName', generateName),
@@ -138,7 +139,29 @@ function createExpectedFixtures(expected, done) {
       username:         possibleGenerate('username', generateUsername),
       status:           f.status      || 'ACTIVE',
       staff:            f.staff       || false
-    });
+    })
+
+    if (f.accessToken) {
+      promise = promise.tap(function(user) {
+        return persistence.OAuthClient.findOne({ clientKey: f.accessToken })
+          .then(function(client) {
+            if (!client) throw new Error('Client not found clientKey=' + f.accessToken);
+
+            var token = '_test_' + uuid.v4();
+            return persistence.OAuthAccessToken.create({
+              token: token,
+              userId: user._id,
+              clientId: client._id,
+              expires: new Date(Date.now() + 60 * 60 * 1000)
+            })
+            .then(function() {
+              user.accessToken = token;
+            });
+          });
+      });
+    }
+
+    return promise;
   }
 
   function createIdentity(fixtureName, f) {
