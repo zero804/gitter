@@ -68,7 +68,7 @@ describe('room-service', function() {
         }
       });
 
-      return roomService.findOrCreateRoom(fixture.user1, 'gitterTest')
+      return roomService.createRoomByUri(fixture.user1, 'gitterTest')
         .then(function () {
           assert(false, 'Expected an exception');
         })
@@ -111,7 +111,7 @@ describe('room-service', function() {
 
       // test
       return roomService
-        .findOrCreateRoom(fixture.user1, 'gitterTest')
+        .createRoomByUri(fixture.user1, 'gitterTest')
         .then(function () {
           assert(false, 'Expected an exception');
         })
@@ -154,7 +154,7 @@ describe('room-service', function() {
         });
 
       return roomService
-        .findOrCreateRoom(fixture.user1, 'gitterTest')
+        .createRoomByUri(fixture.user1, 'gitterTest')
         .bind({})
         .then(function (uriContext) {
           this.uriContext = uriContext;
@@ -183,7 +183,7 @@ describe('room-service', function() {
       var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
       var roomService = testRequire("./services/room-service");
 
-      return roomService.findOrCreateRoom(fixture.user1, fixture.user2.username)
+      return roomService.createRoomByUri(fixture.user1, fixture.user2.username)
         .bind({})
         .then(function(uriContext) {
           this.uriContext = uriContext;
@@ -230,7 +230,7 @@ describe('room-service', function() {
 
       return persistence.Troupe.findOneAndRemove({ lcUri: 'gitterhq/cloaked-avenger' })
         .then(function() {
-          return roomService.findOrCreateRoom(fixture.user1, 'gitterHQ/cloaked-avenger');
+          return roomService.createRoomByUri(fixture.user1, 'gitterHQ/cloaked-avenger');
         })
         .bind({})
         .then(function(uriContext) {
@@ -276,7 +276,7 @@ describe('room-service', function() {
         .exec()
         .bind({})
         .then(function() {
-          return roomService.findOrCreateRoom(fixture.user1, 'gitterhq/sandbox', { ignoreCase: true });
+          return roomService.createRoomByUri(fixture.user1, 'gitterhq/sandbox', { ignoreCase: true });
         })
         .then(function(uriContext) {
           this.uriContext = uriContext;
@@ -301,7 +301,7 @@ describe('room-service', function() {
     it('should detect when a user hits their own userhome', function() {
       var roomService = testRequire("./services/room-service");
 
-      return roomService.findOrCreateRoom(fixture.user1, fixture.user1.username)
+      return roomService.createRoomByUri(fixture.user1, fixture.user1.username)
         .then(function(context) {
           assert(context.ownUrl);
           assert(!context.oneToOne);
@@ -317,7 +317,7 @@ describe('room-service', function() {
       return persistence.Troupe.findOneAndRemove({ lcUri: 'gitterhq/sandbox' })
         .exec()
         .then(function() {
-          return roomService.findOrCreateRoom(fixture.user1, 'gitterhq/sandbox');
+          return roomService.createRoomByUri(fixture.user1, 'gitterhq/sandbox');
         })
         .then(function() {
           assert(false, 'Expected redirect');
@@ -331,7 +331,7 @@ describe('room-service', function() {
     it('should handle a user trying to create a room they dont have access to', function() {
       var roomService = testRequire("./services/room-service");
 
-      return roomService.findOrCreateRoom(fixture.user1, 'joyent')
+      return roomService.createRoomByUri(fixture.user1, 'joyent')
         .then(function () {
           assert(false, 'Expected exception');
         })
@@ -353,7 +353,7 @@ describe('room-service', function() {
         return Promise.resolve(false);
       });
 
-      return roomService.findOrCreateRoom(fixture.user3, fixture.troupeOrg1.uri)
+      return roomService.createRoomByUri(fixture.user3, fixture.troupeOrg1.uri)
         .then(function () {
           assert(false, 'Expected exception');
         }, function(err) {
@@ -1490,7 +1490,7 @@ describe('room-service', function() {
         });
       });
 
-      return roomService.findOrCreateRoom(fixture.user1, renamedUrl, {})
+      return roomService.createRoomByUri(fixture.user1, renamedUrl, {})
         .then(function(result) {
           assert.strictEqual(result.uri, renamedUrl);
 
@@ -1527,7 +1527,7 @@ describe('room-service', function() {
 
       // mockito.when(roomPermissionsModelMock)().thenReturn(Promise.resolve(true));
 
-      return roomService.findOrCreateRoom(fixture.user1, originalUrl2, {})
+      return roomService.createRoomByUri(fixture.user1, originalUrl2, {})
         .then(function(result) {
           assert.strictEqual(result.uri, renamedUrl2);
 
@@ -1564,7 +1564,7 @@ describe('room-service', function() {
       // mockito.when(permissionsModelMock)().thenReturn(Promise.resolve(true));
       // mockito.when(roomPermissionsModelMock)().thenReturn(Promise.resolve(true));
 
-      return roomService.findOrCreateRoom(fixture.user1, originalUrl3, {})
+      return roomService.createRoomByUri(fixture.user1, originalUrl3, {})
         .then(function(result) {
           assert.strictEqual(result.uri, renamedUrl3);
 
