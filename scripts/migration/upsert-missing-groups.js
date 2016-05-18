@@ -4,9 +4,10 @@
 var _ = require('lodash');
 var shutdown = require('shutdown');
 var persistence = require('gitter-web-persistence');
+var through2Concurrent = require('through2-concurrent');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var onMongoConnect = require('../../server/utils/on-mongo-connect');
-var through2Concurrent = require('through2-concurrent');
+var uriLookupService = require('../../server/services/uri-lookup-service');
 
 
 function getGroupableRooms() {
@@ -48,6 +49,16 @@ function getGroupableRooms() {
           foreignField: "lcUri",
           as: "githuborg"
         }
+      }, {
+        // We really don't want to upsert uri lookups. We actually want to just
+        // add them if it hasn't been reserved yet. This is because there could
+        // be a user for this uri or there could be an existing org room.
+        $lookup: {
+          from: "urilookups",
+          localField: "_id",
+          foreignField: "lcUri",
+          as: "existingUriLookup"
+        }
       }
     ])
     .read('secondaryPreferred')
@@ -73,7 +84,8 @@ function gatherBatchInfo(batch) {
     owner = batch.githubuser[0];
   } else {
     // TODO: after figuring out what to do about the rest, we'll do something
-    // about this. But this number will also go down if we rename some things.
+    // about this. But this number will also go down if we rename some things
+    // using fix-room-owners which is probably the better way to go about it.
     type = 'unknown';
   }
 
@@ -157,14 +169,26 @@ function migrate(batch, enc, callback) {
           lcOwner: lcOwner,
           // strip out things that shouldn't have a group just in case
           githubType: {
-            $nin: ['ONETOONE', 'USER_CHANNEL']
+            $nin: ['ONETOONE']
           },
           // only the missing ones
           groupId: { $exists: false }
         }, {
           $set: { groupId: groupId }
         })
-        .exec();
+        .exec()
+        .then(function() {
+          // now reserve the uri if it doesn't exist (ie is not already a user
+          // or an org room)
+          // (yes technically we could do this at the same time as updating the
+          // troupes)
+          if (batch.existingUriLookup && batch.existingUriLookup.length == 0) {
+            return uriLookupService.reserveUriForGroupId(groupId, group.uri);
+          } else {
+            // as explained above, we don't want to override existing uris.
+            return;
+          }
+        })
     })
     .nodeify(callback);
 }
