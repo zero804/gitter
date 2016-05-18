@@ -88,7 +88,7 @@ function reserveUriForUsername(userId, username) {
 
   return persistence.UriLookup.findOneAndUpdate(
     { $or: [{ uri: lcUri }, { userId: userId }] },
-    { $set: { uri: lcUri, userId: userId }, $unset: { troupeId: '' } },
+    { $set: { uri: lcUri, userId: userId }, $unset: { troupeId: '', groupId: '' } },
     { upsert: true })
     .exec();
 }
@@ -106,12 +106,24 @@ function reserveUriForTroupeId(troupeId, uri) {
 
   return persistence.UriLookup.findOneAndUpdate(
     { $or: [{ uri: lcUri }, { troupeId: troupeId }] },
-    { $set: { uri: lcUri, troupeId: troupeId }, $unset: { userId: '' } },
+    { $set: { uri: lcUri, troupeId: troupeId }, $unset: { userId: '', groupId: '' } },
+    { upsert: true, new: true })
+    .exec();
+}
+
+function reserveUriForGroupId(groupId, uri) {
+  var lcUri = uri.toLowerCase();
+  groupId = mongoUtils.asObjectID(groupId);
+
+  return persistence.UriLookup.findOneAndUpdate(
+    { $or: [{ uri: lcUri }, { groupId: groupId }] },
+    { $set: { uri: lcUri, groupId: groupId }, $unset: { userId: '', troupeId: '' } },
     { upsert: true, new: true })
     .exec();
 }
 
 exports.reserveUriForTroupeId = reserveUriForTroupeId;
+exports.reserveUriForGroupId = reserveUriForGroupId;
 exports.lookupUri = lookupUri;
 exports.removeUsernameForUserId = removeUsernameForUserId;
 exports.reserveUriForUsername = reserveUriForUsername;
