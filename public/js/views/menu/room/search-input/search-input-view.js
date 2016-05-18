@@ -7,7 +7,6 @@ var cocktail           = require('cocktail');
 var KeyboardEventMixin = require('views/keyboard-events-mixin');
 var template           = require('./search-input-view.hbs');
 var toggleClass        = require('utils/toggle-class');
-var RAF                = require('utils/raf');
 
 var SearchInputView = Marionette.ItemView.extend({
 
@@ -83,9 +82,13 @@ var SearchInputView = Marionette.ItemView.extend({
     //as this is a string before it is bounce we can't check [0] || .length
     //so we will check for the find function JP 15/3/16
     if(state === 'search') {
-      RAF(function(){
+      //This REALLY sucks but we need to avoid any debouncing affect
+      //caused by the keyboard controller and its desire to blur the current element
+      //sshould get fixed with https://github.com/troupe/gitter-webapp/pull/1503
+      //JP 18/5/16
+      setTimeout(function(){
         this.ui.input.focus();
-      }.bind(this));
+      }.bind(this), 300);
     }
   }
 
