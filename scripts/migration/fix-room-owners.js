@@ -430,8 +430,8 @@ var findUpdatesForOwnerError = Promise.method(function(error) {
         newUri: githubUser.uri,
         newLcUri: githubUser.lcUri
       };
-      console.log(JSON.stringify(roomUpdate));
-      updates.push(roomUpdate);
+      console.log(JSON.stringify(userUpdate));
+      updates.push(userUpdate);
     }
 
     var roomUpdate = {
