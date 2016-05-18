@@ -49,16 +49,6 @@ function getGroupableRooms() {
           foreignField: "lcUri",
           as: "githuborg"
         }
-      }, {
-        // We really don't want to upsert uri lookups. We actually want to just
-        // add them if it hasn't been reserved yet. This is because there could
-        // be a user for this uri or there could be an existing org room.
-        $lookup: {
-          from: "urilookups",
-          localField: "_id",
-          foreignField: "lcUri",
-          as: "existingUriLookup"
-        }
       }
     ])
     .read('secondaryPreferred')
@@ -126,7 +116,7 @@ function log(batch, enc, callback) {
   console.log(
     lcOwner,
     info.type,
-    info.owner && info.owner.uri,
+    info.owner && info.owner.uri, // could be undefined if type == unknown
     batch.rooms.length
   );
 
@@ -140,7 +130,7 @@ function migrate(batch, enc, callback) {
   console.log(
     lcOwner,
     info.type,
-    info.owner && info.owner.uri,
+    info.owner && info.owner.uri, // could be undefined if type == unknown
     batch.rooms.length
   );
 
@@ -178,16 +168,8 @@ function migrate(batch, enc, callback) {
         })
         .exec()
         .then(function() {
-          // now reserve the uri if it doesn't exist (ie is not already a user
-          // or an org room)
-          // (yes technically we could do this at the same time as updating the
-          // troupes)
-          if (batch.existingUriLookup && batch.existingUriLookup.length == 0) {
-            return uriLookupService.reserveUriForGroupId(groupId, group.uri);
-          } else {
-            // as explained above, we don't want to override existing uris.
-            return;
-          }
+          // all existing groups (org OR user) get the old style community uris.
+          return uriLookupService.reserveUriForGroupId(groupId, 'org/'+group.lcUri+'/rooms');
         })
     })
     .nodeify(callback);
