@@ -165,6 +165,8 @@ function migrate(batch, enc, callback) {
           groupId: { $exists: false }
         }, {
           $set: { groupId: groupId }
+        }, {
+          multi: true
         })
         .exec()
         .then(function() {
