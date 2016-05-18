@@ -14,6 +14,11 @@ describe('group-membership-service', function() {
   }
 
   function assertGroupEqual(actual, expected) {
+    if (expected && !actual || actual && !expected) {
+      // This will generate an assert failure
+      assert.deepEqual(actual, expected);
+    }
+
     assert.strictEqual(String(actual._id), String(expected._id));
     assert.strictEqual(actual.uri, expected.uri);
     assert.strictEqual(actual.lcUri, expected.lcUri);
