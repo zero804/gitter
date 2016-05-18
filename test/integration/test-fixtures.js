@@ -36,6 +36,10 @@ function generateGithubToken() {
   return '***REMOVED***';
 }
 
+function generateGroupUri() {
+  return '_group' + (++counter) + Date.now();
+}
+
 function createBaseFixture() {
   return {
     generateEmail: generateEmail,
@@ -44,6 +48,7 @@ function createBaseFixture() {
     generateUsername: generateUsername,
     generateGithubId: generateGithubId,
     generateGithubToken: generateGithubToken,
+    generateGroupUri: generateGroupUri,
 
     cleanup: function(callback) {
       var self = this;
@@ -250,18 +255,19 @@ function createExpectedFixtures(expected, done) {
       });
   }
 
-  function createInvite(fixtureName, f) {
+  function createGroup(fixtureName, f) {
     debug('Creating %s', fixtureName);
 
-    return persistence.Invite.create({
-      fromUserId:   f.fromUserId,
-      userId:       f.userId,
-      email:        f.email,
-      code:         f.code,
-      troupeId:     f.troupeId,
-      status:       f.status    || 'UNUSED'
-    });
+    var uri = f.uri || generateGroupUri();
 
+    return persistence.Group.create({
+      name: f.name || uri,
+      uri: uri,
+      lcUri: uri.toLowerCase(),
+      type: f.type,
+      githubId: f.githubId,
+      // forumId: later,
+    });
   }
 
   function createMessage(fixtureName, f) {
@@ -286,7 +292,7 @@ function createExpectedFixtures(expected, done) {
 
   function createUsers(fixture) {
     var userCounter = 0;
-    var promises = Object.keys(expected).map(function(key) {
+    return Promise.map(Object.keys(expected), function(key) {
 
       if(key.match(/^user/)) {
         return createUser(key, expected[key])
@@ -349,12 +355,10 @@ function createExpectedFixtures(expected, done) {
 
       return null;
     });
-
-    return Promise.all(promises).then(function() { return fixture; });
   }
 
   function createIdentities(fixture) {
-    var promises = Object.keys(expected).map(function(key) {
+    return Promise.map(Object.keys(expected), function(key) {
       if (key.match(/^identity/)) {
         var expectedIdentity = expected[key];
 
@@ -368,12 +372,33 @@ function createExpectedFixtures(expected, done) {
 
       return null;
     });
+  }
 
-    return Promise.all(promises).then(function() { return fixture; });
+  function createGroups(fixture) {
+    return Promise.map(Object.keys(expected), function(key) {
+        if(key.match(/^group/)) {
+          return createGroup(key, expected[key])
+            .then(function(group) {
+              fixture[key] = group;
+            });
+        }
+
+        if(key.match(/^troupe/)) {
+          var t = expected[key];
+          var group = t.group;
+
+          if(expected[group]) return; // Already specified at the top level
+          expected[group] = {};
+          return createGroup(group, {})
+            .then(function(createdGroup) {
+              fixture[group] = createdGroup;
+            });
+        }
+      });
   }
 
   function createTroupes(fixture) {
-    var promises = Object.keys(expected).map(function(key) {
+    return Promise.map(Object.keys(expected), function(key) {
 
       if(key.match(/^troupe/)) {
         var expectedTroupe = expected[key];
@@ -403,41 +428,10 @@ function createExpectedFixtures(expected, done) {
       return null;
     });
 
-    return Promise.all(promises).then(function() { return fixture; });
-  }
-
-
-  function createInvites(fixture) {
-    var promises = Object.keys(expected).map(function(key) {
-
-        if(key.match(/^invite/)) {
-          var expectedInvite = expected[key];
-
-          expectedInvite.fromUserId = fixture[expectedInvite.fromUser]._id;
-          expectedInvite.userId = expectedInvite.user && fixture[expectedInvite.user]._id;
-          expectedInvite.troupeId = expectedInvite.troupe && fixture[expectedInvite.troupe]._id;
-
-          if(expectedInvite.email === true) {
-            expectedInvite.email =  generateEmail();
-          }
-
-          if(expectedInvite.code === true) {
-            expectedInvite.code =  "confirm" + Math.random();
-          }
-          return createInvite(key, expectedInvite)
-            .then(function(invite) {
-              fixture[key] = invite;
-            });
-        }
-
-        return null;
-      });
-    return Promise.all(promises)
-      .thenReturn(fixture);
   }
 
   function createMessages(fixture) {
-    var promises = Object.keys(expected).map(function(key) {
+    return Promise.map(Object.keys(expected), function(key) {
       if(key.match(/^message/)) {
         var expectedMessage = expected[key];
 
@@ -452,16 +446,15 @@ function createExpectedFixtures(expected, done) {
 
       return null;
     });
-
-    return Promise.all(promises).then(function() { return fixture; });
   }
 
-  return createUsers(createBaseFixture())
-    .then(createIdentities)
-    .then(createTroupes)
-    .then(createInvites)
-    .then(createMessages)
-    .nodeify(done);
+  return Promise.try(createBaseFixture)
+    .tap(createUsers)
+    .tap(createIdentities)
+    .tap(createGroups)
+    .tap(createTroupes)
+    .tap(createMessages)
+    .asCallback(done);
 }
 
 function fixtureLoader(fixture, expected) {
