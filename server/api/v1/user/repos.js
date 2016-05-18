@@ -6,7 +6,7 @@ var createTextFilter = require('text-filter');
 var StatusError      = require('statuserror');
 
 function indexQuery(req) {
-  var limit = req.query.limit ? parseInt(req.query.limit, 10) : 0;
+  var limit = parseInt(req.query.limit, 10) || 0;
 
   return repoService.getReposForUser(req.user)
     .then(function(repos) {

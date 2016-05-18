@@ -133,7 +133,7 @@ function createExpectedFixtures(expected, done) {
       username:         possibleGenerate('username', generateUsername),
       state:            f.state      || undefined,
       staff:            f.staff      || false
-    })
+    });
 
     if (f.accessToken) {
       promise = promise.tap(function(user) {
