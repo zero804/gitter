@@ -13,6 +13,8 @@
   "dependencies": {
     "bluebird": "^3.3.5",
     "debug": "^2.2.0",
+    "gitter-web-github": "file:../github",
+    "gitter-web-permissions": "file:../permissions",
     "gitter-web-persistence": "file:../persistence",
     "gitter-web-persistence-utils": "file:../persistence-utils",
     "gitter-web-validators": "file:../validators",

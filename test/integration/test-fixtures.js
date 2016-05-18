@@ -309,6 +309,24 @@ function createExpectedFixtures(expected, done) {
 
   }
 
+  function deleteDocuments() {
+    var d = expected.deleteDocuments;
+    if (!d) return;
+
+    // This *REALLY* mustn't get run in the wrong environments
+    if (process.env.NODE_ENV === 'beta' || process.env.NODE_ENV === 'prod') {
+      throw new Error('https://cdn.meme.am/instances/400x/52869867.jpg')
+    }
+
+    return Promise.map(Object.keys(d), function(key) {
+      var queries = d[key];
+      return Promise.map(queries, function(query) {
+
+        return persistence[key].remove(query).exec();
+      });
+    })
+  }
+
   function createUsers(fixture) {
     var userCounter = 0;
     return Promise.map(Object.keys(expected), function(key) {
@@ -481,6 +499,7 @@ function createExpectedFixtures(expected, done) {
   }
 
   return Promise.try(createBaseFixture)
+    .tap(deleteDocuments)
     .tap(createUsers)
     .tap(createIdentities)
     .tap(createGroups)
@@ -510,5 +529,10 @@ fixtureLoader.use = function(expected) {
 };
 
 fixtureLoader.generateEmail = generateEmail;
+
+fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN = '***REMOVED***';
+fixtureLoader.GITTER_INTEGRATION_USERNAME = 'gitter-integration-tests';
+fixtureLoader.GITTER_INTEGRATION_ORG = 'gitter-integration-tests-organisation';
+
 
 module.exports = fixtureLoader;

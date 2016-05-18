@@ -35,6 +35,9 @@ var codacy = require('gulp-codacy');
 
 /* Don't do clean in gulp, use make */
 var RUN_TESTS_IN_PARALLEL = false;
+if (process.env.PARALLEL_TESTS) {
+  RUN_TESTS_IN_PARALLEL = true;
+}
 
 var testModules = {
 };

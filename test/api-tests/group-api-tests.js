@@ -15,7 +15,13 @@ describe('group-api', function() {
 
   var fixture = {};
   before(fixtureLoader(fixture, {
+    deleteDocuments: {
+      User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }],
+      Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() }],
+    },
     user1: {
+      githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
+      username: fixtureLoader.GITTER_INTEGRATION_USERNAME,
       accessToken: 'web-internal'
     },
     group1: {},
@@ -36,6 +42,7 @@ describe('group-api', function() {
   it('POST /', function() {
     return request(app)
       .post('/v1/groups')
+      .send({ uri: fixtureLoader.GITTER_INTEGRATION_ORG, name: 'Test' })
       .set('x-access-token', fixture.user1.accessToken)
       .expect(200)
   });
