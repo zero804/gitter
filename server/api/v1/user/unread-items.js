@@ -1,8 +1,10 @@
 "use strict";
 
 var unreadItemService = require("../../../services/unread-items");
+var recentRoomService = require("../../../services/recent-room-service");
 var StatusError       = require('statuserror');
 var uniqueIds         = require('mongodb-unique-ids');
+var mongoUtils        = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 module.exports = {
   id: 'unreadItem',
@@ -33,7 +35,19 @@ module.exports = {
         return { success: true };
       });
 
-   },
+  },
+
+  update: function(req) {
+    var lastSeenItem = req.unreadItem;
+    var lastAccessTime = mongoUtils.getDateFromObjectId(lastSeenItem);
+    if (lastAccessTime > new Date()) {
+      throw new StatusError(400, 'Invalid last seen item');
+    }
+
+    return recentRoomService.saveLastVisitedTroupeforUserId(req.resourceUser._id, req.params.userTroupeId, {
+      lastAccessTime: lastAccessTime
+    });
+  },
 
   destroy: function(req) {
     if(req.params.unreadItem.toLowerCase() !== 'all') throw new StatusError(404);
