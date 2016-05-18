@@ -16,7 +16,6 @@ module.exports = PrimaryCollectionItemView.extend({
     var className = (this.model.get('githubType') === 'ONETOONE') ? 'room-item--favourite-one2one' : 'room-item--favourite';
     //If the item was not previously in the favourite collection before drag start it could have
     //just been added by a user dragging, as such we want to mark it as a temporary item JP 1/4/16
-    debugger
 
     if(this.model.get('isTempItem')){
       className = className += ' temp';
