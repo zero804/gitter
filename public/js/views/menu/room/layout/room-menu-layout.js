@@ -107,7 +107,8 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
     }));
 
     this.keyboardControllerView = new KeyboardControllerView({
-      model: new KeyboardControllerModel()
+      model: new KeyboardControllerModel(),
+      roomMenuModel: this.model,
     });
 
     //Make a new drag & drop control
