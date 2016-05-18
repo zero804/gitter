@@ -66,6 +66,7 @@ var TypeaheadView = Marionette.ItemView.extend({
     this.dropdown = new Dropdown({
       collection: this.collection,
       itemTemplate: this.options.itemTemplate,
+      itemSerializeData: this.options.itemSerializeData,
       targetElement: this.el
     });
 
@@ -157,4 +158,3 @@ var TypeaheadView = Marionette.ItemView.extend({
 });
 
 module.exports = TypeaheadView;
-

@@ -17,7 +17,7 @@ var BaseCollectionItemView = Marionette.ItemView.extend({
   },
 
   keyboardEvents: {
-    'room-list-item:activate': 'onItemActivated',
+    'room-list-item:activate': 'onKeyboardItemActivated',
   },
 
   modelEvents: {

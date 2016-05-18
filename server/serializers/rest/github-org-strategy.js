@@ -8,6 +8,8 @@ function OrgPlanStrategy() {
   var orgsWithPlans;
 
   this.preload = function(orgUris) {
+    if (orgUris.isEmpty()) return;
+
     return billingService.findActiveOrgPlans(orgUris.toArray())
       .then(function(subscriptions) {
         orgsWithPlans = subscriptions.reduce(function(memo, s) {
