@@ -5,6 +5,7 @@ var Promise     = require('bluebird');
 var persistence = require('gitter-web-persistence');
 var roomMembershipFlags = testRequire("./services/room-membership-flags");
 var debug       = require('debug')('gitter:test-fixtures');
+var util        = require('util');
 var counter     = 0;
 
 function generateEmail() {
@@ -71,31 +72,20 @@ function createBaseFixture() {
   };
 }
 
-function load(expected, done) {
-  if(expected) {
-    // DO THINGS THE NEW SCHOOL WAY
-    return createExpectedFixtures(expected, done);
-  }
-
+function createLegacyFixtures(done) {
   return createExpectedFixtures({
     user1: {
-      //email: 'testuser@troupetest.local'
     },
     user2: {
-      //email: 'testuser2@troupetest.local'
     },
     user3: {
-      //email: 'testuser3@troupetest.local'
     },
     userNoTroupes: {
-      //email: 'testuserwithnotroupes@troupetest.local'
     },
     troupe1: {
-      //uri: 'testtroupe1',
       users: ['user1', 'user2']
     },
     troupe2: {
-      //uri: 'testtroupe2',
     },
     troupe3: {
       /* This troupe should not include test user 2 */
@@ -103,8 +93,17 @@ function load(expected, done) {
       users: ['user1', 'user3']
     }
   }, done);
+}
 
+function load(expected, done) {
+  if(expected) {
+    // DO THINGS THE NEW SCHOOL WAY
+    return createExpectedFixtures(expected, done);
+  } else {
 
+    // Deliberately log the message for every invocation
+    return util.deprecate(createLegacyFixtures, 'Legacy fixtures are deprecated')(done);
+  }
 }
 
 
