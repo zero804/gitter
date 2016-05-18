@@ -37,16 +37,18 @@ var codacy = require('gulp-codacy');
 var RUN_TESTS_IN_PARALLEL = false;
 
 var testModules = {
-  'integration': { files: ['./test/integration/**/*.js', './test/public-js/**/*.js'], includeInFast: true },
-  'cache-wrapper': { files: ['./modules/cache-wrapper/test/*.js'], includeInFast: false },
-  'github': { files: ['./modules/github/test/*.js'], includeInFast: false },
-  'github-backend': { files: ['./modules/github-backend/test/*.js'], includeInFast: false },
-  'push-notification-filter': { files: ['./modules/push-notification-filter/test/*.js'], includeInFast: false },
-  'split-tests': { files: ['./modules/split-tests/test/*.js'], includeInFast: false },
-  'presence': { files: ['./modules/presence/test/*.js'], includeInFast: false },
-  'permissions': { files: ['./modules/permissions/test/**/*.js'], includeInFast: false },
-  'persistence-utils': { files: ['./modules/persistence-utils/test/*.js'], includeInFast: false },
+  'integration': { files: ['./test/integration/**/*.js', './test/public-js/**/*.js'], includeInFast: true }
 };
+
+var modulesWithTest = glob.sync('./modules/*/test');
+modulesWithTest.forEach(function(testDir) {
+  var moduleDir = path.dirname(testDir);
+  var moduleName = path.basename(moduleDir);
+  testModules[moduleName] = {
+    files: path.join('modules', moduleName, 'test', '**', '*.js'),
+    includeInFast: false
+  }
+})
 
 /** Make a series of tasks based on the test modules */
 function makeTestTasks(taskName, generator, isFast) {
@@ -195,6 +197,7 @@ gulp.task('submit-coveralls', ['test-mocha'/*, 'test-redis-lua'*/], function(cal
 gulp.task('test', ['test-mocha'/*, 'test-redis-lua'*/, 'submit-coveralls', 'submit-codacy']);
 
 makeTestTasks('localtest', function(name, files) {
+
   return gulp.src(files, { read: false })
     .pipe(mocha({
       reporter: 'spec',

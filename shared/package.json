@@ -6,5 +6,14 @@
   "scripts": {
     "test": "mocha test/"
   },
-  "private": true
+  "private": true,
+  "dependencies": {
+    "gitter-realtime-client": "^1.1.0",
+    "moment": "^2.10.3",
+    "underscore": "^1.8.3",
+    "url-join": "0.0.1",
+    "url-parse": "^1.0.5",
+    "gitter-client-env": "file:../modules/client-env",
+    "escape-string-regexp": "^1.0.5"
+  }
 }
