@@ -45,7 +45,7 @@ module.exports = function suggestedOrgsFromRoomList(roomList, uri, currentRoomId
   //we shunt the new org to the top of the minibar list JP 8/3/16
   var currentOrg = getOrgNameFromUri(uri);
 
-  if(currentRoom && !currentRoom.oneToOne) {
+  if(currentRoomId && !currentRoom.oneToOne) {
     var hasCurrentOrg = _.findWhere(orgList, { name: currentOrg });
     //If we are sure that you are viewing an room for an org you have yet to join then
     //we add a temporary org to your org list
