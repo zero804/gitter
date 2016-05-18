@@ -12,16 +12,13 @@ describe('create-distribution', function() {
   after(blockTimer.off);
 
   describe('createDistribution', function() {
-    var chatId;
     var troupeId;
     var fromUserId;
     var userId1;
     var userId2;
     var userId3;
-    var user3;
     var roomMembershipService;
-    var userService;
-    var roomPermissionsModel;
+    var createPolicyForUserIdInRoom;
     var createDistribution;
     var troupe;
     var troupeNotifyArray;
@@ -30,12 +27,10 @@ describe('create-distribution', function() {
 
     beforeEach(function() {
       troupeId = mongoUtils.getNewObjectIdString() + "";
-      chatId = mongoUtils.getNewObjectIdString() + "";
       fromUserId = mongoUtils.getNewObjectIdString() + "";
       userId1 = mongoUtils.getNewObjectIdString() + "";
       userId2 = mongoUtils.getNewObjectIdString() + "";
       userId3 = mongoUtils.getNewObjectIdString() + "";
-      user3 = { id: userId3 };
 
       troupe = {
         id: troupeId,
@@ -44,8 +39,7 @@ describe('create-distribution', function() {
       troupeNotifyArray = [{ userId: userId1, flags: 1 }, { userId: userId2, flags: 2 }];
 
       roomMembershipService = mockito.mock(testRequire('./services/room-membership-service'));
-      userService = mockito.mock(testRequire('./services/user-service'));
-      roomPermissionsModel = mockito.mockFunction();
+      createPolicyForUserIdInRoom = mockito.mockFunction();
 
       MockDistribution = function(options) {
         this.options = options;
@@ -59,10 +53,11 @@ describe('create-distribution', function() {
 
       createDistribution = testRequire.withProxies("./services/unread-items/create-distribution", {
         '../room-membership-service': roomMembershipService,
-        '../user-service': userService,
         './distribution': MockDistribution,
-        'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModel,
-        '../categorise-users-in-room': categoriseUserInRoom
+        '../categorise-users-in-room': categoriseUserInRoom,
+        'gitter-web-permissions/lib/legacy-policy-factory': {
+          createPolicyForUserIdInRoom: createPolicyForUserIdInRoom
+        }
       });
 
     });
@@ -174,11 +169,13 @@ describe('create-distribution', function() {
     });
 
     it('should create a distribution with mentions to non members who are allowed in the room', function() {
-      mockito.when(userService).findByIds([userId3])
-        .thenReturn(Promise.resolve([user3]));
 
-      mockito.when(roomPermissionsModel)(user3, 'join', troupe)
-        .thenReturn(Promise.resolve(true));
+      mockito.when(createPolicyForUserIdInRoom)(userId3, troupe)
+        .thenReturn(Promise.resolve({
+          canJoin: function() {
+            return true;
+          }
+        }));
 
       return createDistribution(fromUserId, troupe, [{ userId: userId3 }])
         .then(function(result) {
@@ -205,11 +202,12 @@ describe('create-distribution', function() {
     });
 
     it('should create a distribution with mentions to non members who are not allowed in the room', function() {
-      mockito.when(userService).findByIds([userId3])
-        .thenReturn(Promise.resolve([user3]));
-
-      mockito.when(roomPermissionsModel)(user3, 'join', troupe)
-        .thenReturn(Promise.resolve(false));
+      mockito.when(createPolicyForUserIdInRoom)(userId3, troupe)
+        .thenReturn(Promise.resolve({
+          canJoin: function() {
+            return false;
+          }
+        }));
 
       return createDistribution(fromUserId, troupe, [{ userId: userId3 }])
         .then(function(result) {
@@ -233,8 +231,12 @@ describe('create-distribution', function() {
     });
 
     it('should create a distribution with mentions to non members who are not allowed on gitter', function() {
-      mockito.when(userService).findByIds([userId3])
-        .thenReturn(Promise.resolve([]));
+      mockito.when(createPolicyForUserIdInRoom)(userId3, troupe)
+        .thenReturn(Promise.resolve({
+          canJoin: function() {
+            return false;
+          }
+        }));
 
       return createDistribution(fromUserId, troupe, [{ userId: userId3 }])
         .then(function(result) {
@@ -261,15 +263,17 @@ describe('create-distribution', function() {
 
 
   describe('findNonMembersWithAccess', function() {
-    var userService, roomPermissionsModel, createDistribution;
+    var userService, createPolicyForUserIdInRoom, createDistribution;
 
     beforeEach(function() {
       userService = mockito.mock(testRequire('./services/user-service'));
-      roomPermissionsModel = mockito.mockFunction();
+      createPolicyForUserIdInRoom = mockito.mockFunction();
 
       createDistribution = testRequire.withProxies("./services/unread-items/create-distribution", {
         '../user-service': userService,
-        'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModel,
+        'gitter-web-permissions/lib/legacy-policy-factory': {
+          createPolicyForUserIdInRoom: createPolicyForUserIdInRoom
+        }
       });
     });
 
@@ -295,6 +299,14 @@ describe('create-distribution', function() {
     });
 
     it('should handle public rooms', function() {
+      mockito.when(createPolicyForUserIdInRoom)().then(function() {
+        return Promise.resolve({
+          canJoin: function() {
+            return true;
+          }
+        });
+      });
+      
       return createDistribution.testOnly.findNonMembersWithAccess({ security: 'PUBLIC' }, ['1','2','3'])
         .then(function(userIds) {
           assert.deepEqual(userIds, ['1','2','3']);
@@ -313,10 +325,13 @@ describe('create-distribution', function() {
         }));
       });
 
-      mockito.when(roomPermissionsModel)().then(function(user, operation, pTroupe) {
+      mockito.when(createPolicyForUserIdInRoom)().then(function(userId, pTroupe) {
         assert(pTroupe === troupe);
-        assert.strictEqual(operation, 'join');
-        return Promise.resolve(user.id !== '3');
+        return Promise.resolve({
+          canJoin: function() {
+            return Promise.resolve(userId !== '3');
+          }
+        });
       });
 
       return createDistribution.testOnly.findNonMembersWithAccess(troupe, ['1','2','3'])
