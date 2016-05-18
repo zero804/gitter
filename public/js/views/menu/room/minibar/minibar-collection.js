@@ -62,7 +62,8 @@ module.exports = Backbone.Collection.extend({
       .concat(getSuggestedOrgsFromRoomList(
         this.roomCollection.toJSON(),
         document.location.pathname,
-        context.troupe().get('id')
+        context.troupe().get('id'),
+        context.troupe()
       ))
       .concat(tailDefaults);
   },

@@ -1,5 +1,10 @@
 'use strict';
 
+if (require.main !== module) {
+  console.log('This should only be executed standalone'); // eslint-disable-line
+  process.exit(1);
+}
+
 var csv = require('fast-csv');
 
 var metrics = require('datadog-metrics');

@@ -19,8 +19,8 @@ module.exports = {
       var searchType = req.query.type;
 
       var options = {
-        limit: req.query.limit || 10,
-        skip: req.query.skip,
+        limit: parseInt(req.query.limit, 10) || 10,
+        skip: parseInt(req.query.skip, 10),
         excludeTroupeId: req.query.excludeTroupeId
       };
 

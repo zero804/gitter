@@ -200,7 +200,7 @@ module.exports = (function() {
   }];
 
   keyEvents[cmdKey + '+/, ' + cmdKey + '+' + gitterKey + '+/'] = 'chat.toggle';
-  keyEvents[cmdKey + '+' /*+ gitterKey*/ + '+f'] = 'focus.search';
+  keyEvents[cmdKey + '+' /*+ gitterKey*/ + '+s'] = 'focus.search';
   keyEvents[cmdKey + '+' + gitterKey + '+c'] = 'focus.chat';
   keyEvents[cmdKey + '+' + gitterKey + '+m'] = 'help.markdown';
   keyEvents[cmdKey + '+' + gitterKey + '+k'] = 'help.keyboard';
