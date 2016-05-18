@@ -96,7 +96,7 @@ module.exports = CommunityCreateBaseStepView.extend({
     this.onAreaActiveChange();
   },
 
-  onStepNext: function() {
+  setSelectedGitHubProjectCommunityState: function() {
     if(this.model.get('isOrgAreaActive')) {
       var selectedOrgId = this.model.get('selectedOrgId');
       var selectedOrgName = this.model.get('selectedOrgName');
@@ -119,7 +119,9 @@ module.exports = CommunityCreateBaseStepView.extend({
         githubRepoId: selectedRepoId
       });
     }
+  },
 
+  onStepNext: function() {
     this.communityCreateModel.set('stepState', this.communityCreateModel.STEP_CONSTANT_MAP.main);
   },
   onStepBack: function() {
@@ -172,6 +174,12 @@ module.exports = CommunityCreateBaseStepView.extend({
       selectedOrgId: selectedOrgId,
       selectedOrgName: selectedOrgName
     });
+
+    // Clicking a org moves you onto the next step and fills in the data
+    if(activeModel) {
+      this.setSelectedGitHubProjectCommunityState();
+      this.onStepNext();
+    }
   },
   onRepoSelectionChange: function(activeModel) {
     var selectedRepoId = null;
@@ -184,6 +192,12 @@ module.exports = CommunityCreateBaseStepView.extend({
       selectedRepoId: selectedRepoId,
       selectedRepoName: selectedRepoName
     });
+
+    // Clicking a repo moves you onto the next step and fills in the data
+    if(activeModel) {
+      this.setSelectedGitHubProjectCommunityState();
+      this.onStepNext();
+    }
   },
 
   onRepoFilterInputChange: function() {
