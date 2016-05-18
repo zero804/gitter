@@ -172,7 +172,14 @@ function migrate(batch, enc, callback) {
           return uriLookupService.reserveUriForGroupId(groupId, 'org/'+group.lcUri+'/rooms');
         })
     })
-    .nodeify(callback);
+    .then(function() {
+      callback();
+    })
+    .catch(function(err) {
+      console.error(err);
+      console.error(err.stack);
+      callback(err);
+    });
 }
 
 function run(f, callback) {
