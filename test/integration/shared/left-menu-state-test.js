@@ -33,7 +33,8 @@ describe('left-menu state', function() {
     assert.deepEqual(leftMenuState,  {
       roomMenuIsPinned: true,
       state: 'org',
-      selectedOrgName: 'gitterHQ'
+      selectedOrgName: 'gitterHQ',
+      activationSourceType: null
     });
   });
 
@@ -43,7 +44,8 @@ describe('left-menu state', function() {
     assert.deepEqual(leftMenuState,  {
       roomMenuIsPinned: true,
       state: 'org',
-      selectedOrgName: 'gitterHQ'
+      selectedOrgName: 'gitterHQ',
+      activationSourceType: null
     });
   });
 
@@ -53,7 +55,8 @@ describe('left-menu state', function() {
     assert.deepEqual(leftMenuState,  {
       roomMenuIsPinned: true,
       state: 'search',
-      selectedOrgName: 'home'
+      selectedOrgName: 'home',
+      activationSourceType: null
     });
   });
 
@@ -63,7 +66,8 @@ describe('left-menu state', function() {
     assert.deepEqual(leftMenuState,  {
       roomMenuIsPinned: true,
       state: 'org',
-      selectedOrgName: 'temp-foo'
+      selectedOrgName: 'temp-foo',
+      activationSourceType: null
     });
   });
 
@@ -71,7 +75,7 @@ describe('left-menu state', function() {
   it('Maintain state if loading when refreshing/unload', function() {
     var beforeLeftMenuState = {
       state: 'org',
-      selectedOrgName: 'gitterHQ'
+      selectedOrgName: 'gitterHQ',
     };
     var leftMenuState = generateLeftMenuState(beforeLeftMenuState, 'w3c/svg', orgListFixture, {
       // Simulate a unload "refresh"
@@ -81,7 +85,8 @@ describe('left-menu state', function() {
     assert.deepEqual(leftMenuState,  {
       roomMenuIsPinned: true,
       state: 'org',
-      selectedOrgName: 'gitterHQ'
+      selectedOrgName: 'gitterHQ',
+      activationSourceType: null
     });
   });
 
@@ -89,7 +94,7 @@ describe('left-menu state', function() {
   it('Resolve to respective URI org if unload/"refresh" time was too far away', function() {
     var beforeLeftMenuState = {
       state: 'org',
-      selectedOrgName: 'gitterHQ'
+      selectedOrgName: 'gitterHQ',
     };
     var leftMenuState = generateLeftMenuState(beforeLeftMenuState, 'w3c/svg', orgListFixture, {
       // Simulate a unload minutes ago
@@ -99,7 +104,8 @@ describe('left-menu state', function() {
     assert.deepEqual(leftMenuState,  {
       roomMenuIsPinned: true,
       state: 'org',
-      selectedOrgName: 'w3c'
+      selectedOrgName: 'w3c',
+      activationSourceType: null
     });
   });
 
@@ -189,6 +195,7 @@ describe('left-menu state', function() {
       roomMenuIsPinned: true,
       state: 'people',
       selectedOrgName: 'some-person',
+      activationSourceType: null
     });
   });
 
