@@ -49,14 +49,14 @@ modulesWithTest.forEach(function(testDir) {
   }
 });
 
+testModules['api-tests'] = {
+  files: ['./test/api-tests/**/*.js'],
+  includeInFast: false
+};
+
 testModules.integration = {
   files: ['./test/integration/**/*.js', './test/public-js/**/*.js'],
   includeInFast: true
-};
-
-testModules.apiTests = {
-  files: ['./test/api-tests/**/*.js'],
-  includeInFast: false
 };
 
 /** Make a series of tasks based on the test modules */
