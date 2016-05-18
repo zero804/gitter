@@ -44,6 +44,20 @@ function getBatchedRooms() {
           _id: '$lcOwner',
           rooms: { $push: '$$CURRENT' }
         }
+      }, {
+        $lookup: {
+          from: "githubusers",
+          localField: "_id",
+          foreignField: "lcUri",
+          as: "githubuser"
+        }
+      }, {
+        $lookup: {
+          from: "githuborgs",
+          localField: "_id",
+          foreignField: "lcUri",
+          as: "githuborg"
+        }
       }
     ])
     .read('secondaryPreferred')
@@ -106,7 +120,12 @@ function findBatchWarnings(opts) {
     warnings.push(lcOwner + " has both org rooms or channels AND user channels.");
   }
 
-  // TODO: warn if user id doesn't match all the ownerUserIds
+  // warn if user id doesn't match all the ownerUserIds
+  if (user) {
+    if (!_.every(ownerUserIds, function(ownerId) { return ownerId == user.id })) {
+      warnings.push(lcOwner + " has ownerUserIds that don't match the owner user's id.");
+    }
+  }
 
   return warnings;
 }
@@ -173,11 +192,11 @@ var findBatchInfo = Promise.method(function(batch) {
   var lookups = {};
 
   return Promise.join(
-    // TODO: move this stuff to the aggregation as lookups
-    findGitHubOrg(lcOwner),
-    findGitHubUser(lcOwner),
+    // there used to be more here :)
     findRoomGitHubUser(uniqueUserIds[0]), // could be undefined
-    function(org, user, roomUser) {
+    function(roomUser) {
+      var org = batch.githuborg[0]; // could be undefined
+      var user = batch.githubuser[0]; // could be undefined
       if (org) {
         type = 'org';
         reason = 'org-lookup';
@@ -189,7 +208,8 @@ var findBatchInfo = Promise.method(function(batch) {
             type: type,
             lcOwner: lcOwner,
             correctOwner: org.uri,
-            batch: batch
+            batch: batch,
+            org: org
           });
         }
 
@@ -204,7 +224,8 @@ var findBatchInfo = Promise.method(function(batch) {
             type: type,
             lcOwner: lcOwner,
             correctOwner: user.uri,
-            batch: batch
+            batch: batch,
+            user: user
           });
         }
 
@@ -220,7 +241,8 @@ var findBatchInfo = Promise.method(function(batch) {
           type: type,
           lcOwner: lcOwner,
           correctOwner: roomUser.uri,
-          batch: batch
+          batch: batch,
+          user: roomUser
         });
 
       } else {
@@ -390,7 +412,7 @@ var findUpdatesForOwnerError = Promise.method(function(error) {
   error.batch.rooms.forEach(function(room) {
     // 1, 2 or 3 parts
     var parts = room.uri.split('/');
-    parts[0] = error.correctOwner;
+    parts[0] = error.correctOwner; // error.org.uri or error.user.uri
     var correctUri = parts.join('/');
 
     if (room.uri == correctUri) {
@@ -399,16 +421,28 @@ var findUpdatesForOwnerError = Promise.method(function(error) {
     }
 
     // TODO: if error.type == 'user' we have to rename the user too
-    var update = {
+    if (error.type == 'user') {
+      var githubUser = error.user;
+      var userUpdate = {
+        type: 'rename-user',
+        _id: githubUser._id,
+        oldUri: githubUser.uri,
+        newUri: githubUser.uri,
+        newLcUri: githubUser.lcUri
+      };
+      console.log(JSON.stringify(roomUpdate));
+      updates.push(roomUpdate);
+    }
+
+    var roomUpdate = {
+      type: 'rename-room',
       _id: room._id,
       oldUri: room.uri,
       newUri: correctUri,
       newLcUri: correctUri.toLowerCase()
     };
-
-    console.log(JSON.stringify(update));
-
-    updates.push(update);
+    console.log(JSON.stringify(roomUpdate));
+    updates.push(roomUpdate);
   });
 
   return updates;
