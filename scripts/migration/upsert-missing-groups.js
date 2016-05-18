@@ -7,10 +7,6 @@ var persistence = require('gitter-web-persistence');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var onMongoConnect = require('../../server/utils/on-mongo-connect');
 var through2Concurrent = require('through2-concurrent');
-var orgMap = require('./org-map.json');
-var userMap = require('./user-map.json');
-
-var GITHUB_TOKEN = '***REMOVED***';
 
 
 function getGroupableRooms() {
@@ -18,8 +14,6 @@ function getGroupableRooms() {
       {
         $match: {
           githubType: {
-            // don't strip out user channels here because that's useful info
-            // for the steps below
             $nin: ['ONETOONE']
           },
           lcOwner: { $exists: true, $ne: null },
@@ -40,8 +34,21 @@ function getGroupableRooms() {
           _id: '$lcOwner',
           rooms: { $push: '$$CURRENT' }
         }
+      }, {
+        $lookup: {
+          from: "githubusers",
+          localField: "_id",
+          foreignField: "lcUri",
+          as: "githubuser"
+        }
+      }, {
+        $lookup: {
+          from: "githuborgs",
+          localField: "_id",
+          foreignField: "lcUri",
+          as: "githuborg"
+        }
       }
-      // TODO: project orgRoom & user for efficiency
     ])
     .read('secondaryPreferred')
     .cursor({ batchSize: 1000 })
@@ -52,27 +59,26 @@ function getGroupableRooms() {
     .stream();
 }
 
-function log(batch, enc, callback) {
-  console.log(batch._id, batch.rooms.length);
-  callback();
-}
-
-var lookups = [];
-function migrate(batch, enc, callback) {
+function gatherBatchInfo(batch) {
   var lcOwner = batch._id;
 
-  // Fish the owner out of the first room's uri. This is the case-sensitive
-  // version used for name and uri.
-  var uniqueOwners = _.uniq(batch.rooms.map(function(room) {
-    return room.uri.split('/')[0];
-  }));
+  var type;
+  var owner;
+  if (batch.githuborg.length) {
+    type = 'org';
+    owner = batch.githuborg[0];
 
-  if (uniqueOwners.length > 1) {
-    //console.log('WARNING: MULTIPLE UNIQUE OWNERS', uniqueOwners);
-    // NOTE: should this be resolved BEFORE we run this script? Should we skip
-    // them?
+  } else if (batch.githubuser.length) {
+    type = 'user';
+    owner = batch.githubuser[0];
+  } else {
+    // TODO: after figuring out what to do about the rest, we'll do something
+    // about this. But this number will also go down if we rename some things.
+    type = 'unknown';
   }
 
+  /*
+  // in case we add groups for the "probably" cases.
   var githubTypeMap = {};
   batch.rooms.forEach(function(room) {
     githubTypeMap[room.githubType] = true;
@@ -80,12 +86,6 @@ function migrate(batch, enc, callback) {
 
   var hasOrgRoom = !!(githubTypeMap['ORG'] || githubTypeMap['ORG_CHANNEL']);
   var hasUserRoom = !!githubTypeMap['USER_CHANNEL'];
-  var isDefinitelyOrg = _.any(uniqueOwners, function(o) {
-    return !!orgMap[o];
-  });
-  var isDefinitelyUser = _.any(uniqueOwners, function(o) {
-    return !!userMap[o];
-  });
 
   var result;
   if (hasOrgRoom || isDefinitelyOrg) {
@@ -93,47 +93,60 @@ function migrate(batch, enc, callback) {
   } else if (hasUserRoom || isDefinitelyUser) {
     result = "NO";
   } else {
-    // TODO: maybe here we can somehow lookup owner in users again so we can do
-    // a case-sensitive match?
     result = "MAYBE";
-    // TODO: concat all the unique owners, not just the first one
-    // IDEA: if any of the rooms is an org channel, then it must be an
-    // org-based room
-    // IDEA: if there is a user channel for this same lcOwner, then it cannot
-    // be an org-based room
-    lookups.push(owner);
   }
 
   var owner = uniqueOwners[0];
+  */
+
+  var info = {
+    type: type,
+    owner: owner
+  };
+
+  return info;
+}
+
+function log(batch, enc, callback) {
+  var lcOwner = batch._id;
+  var info = gatherBatchInfo(batch);
 
   console.log(
-    owner,
-    'rooms:'+batch.rooms.length,
-    'hasOrgRoom:'+hasOrgRoom,
-    'hasUserRoom:'+hasUserRoom,
-    'isDefinitelyOrg:'+isDefinitelyOrg,
-    'isDefinitelyUser:'+isDefinitelyUser,
-    result
+    lcOwner,
+    info.type,
+    info.owner && info.owner.uri,
+    batch.rooms.length
   );
 
   callback();
+}
 
-  // NOTE: disabling the actual upserting for now while I figure out how to
-  // calculate if we need a group
+function migrate(batch, enc, callback) {
+  var lcOwner = batch._id;
+  var info = gatherBatchInfo(batch);
 
-  // from here on out we need result == YES, owner and lcOwner OR result = NO.
-  // There shouldn't be any MAYBE anymore.
+  console.log(
+    lcOwner,
+    info.type,
+    info.owner && info.owner.uri,
+    batch.rooms.length
+  );
 
-  /*
+  if (info.type == 'unknown') {
+    return callback();
+  }
+
   // upsert the lcOwner into group
   var query = { lcUri: lcOwner };
   return mongooseUtils.upsert(persistence.Group, query, {
       // only set on insert because we don't want to override name or forumId
       // or anything like that
       $setOnInsert: {
-        name: owner,
-        uri: owner,
-        lcUri: lcOwner
+        name: info.owner.uri,
+        uri: info.owner.uri,
+        lcUri: info.owner.lcUri,
+        type: info.type,
+        githubId: info.owner.githubId // could be null
       }
     })
     .spread(function(group, existing) {
@@ -154,7 +167,6 @@ function migrate(batch, enc, callback) {
         .exec();
     })
     .nodeify(callback);
-  */
 }
 
 function run(f, callback) {
@@ -189,9 +201,6 @@ onMongoConnect()
       })
       .command('execute', 'Execute', { }, function() {
         run(migrate, function(err) {
-          console.log("numLookups: "+lookups.length);
-          //console.log('==========')
-          //console.log(lookups.join(','));
           done(err);
         });
       })
