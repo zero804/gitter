@@ -142,7 +142,6 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
   // When you start/switch navigating a navigableCollection, we need to find where
   // you should start off and set the current reference
   startNavigation: function(e, mapKey, shouldGoToActive) {
-    if(this.roomMenuModel.get('activationSourceType') !== 'keyboard') { return; }
     // Clear out any previous focus as we have moved to a new area
     this.blurCurrentItem();
 
