@@ -63,7 +63,7 @@ module.exports = {
 
     if (!roomUri) throw new StatusError(400);
 
-    return roomService.findOrCreateRoom(req.user, roomUri, { ignoreCase: true, addBadge: addBadge })
+    return roomService.createRoomByUri(req.user, roomUri, { ignoreCase: true, addBadge: addBadge })
       .then(function (room) {
         if (!room || !room.troupe) throw new StatusError(403, 'Permission denied');
 

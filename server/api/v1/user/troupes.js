@@ -34,7 +34,7 @@ function performUpdateToUserRoom(req) {
           if (!troupe.oneToOne) {
             /* Ignore one-to-one rooms */
             promises.push(
-              roomService.findOrCreateRoom(req.resourceUser, troupe.uri)
+              roomService.createRoomByUri(req.resourceUser, troupe.uri)
                 .then(function() {
                   return recentRoomService.updateFavourite(userId, troupeId, updatedTroupe.favourite);
                 })
