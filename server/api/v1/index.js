@@ -11,11 +11,13 @@ router.use('/user', authMiddleware);
 router.use('/rooms', authMiddleware);
 router.use('/users', authMiddleware);
 router.use('/orgs', authMiddleware);
+router.use('/groups', authMiddleware);
 
 var userResources = resourceRoute('api-user', require('./user'));
 var roomsResources = resourceRoute('api-rooms', require('./rooms'));
 var usersResources = resourceRoute('api-rooms', require('./users'));
 var orgResources   = resourceRoute('api-orgs', require('./orgs'));
+var groupsResources   = resourceRoute('groups-orgs', require('./groups'));
 
 router.use('/user', userResources);
 router.use('/rooms', roomsResources);
