@@ -98,20 +98,6 @@ function applyAutoHooksForRepoRoom(user, troupe) {
 
 }
 
-
-/* Creates a visitor that determines whether a room type creation is allowed */
-function makeRoomTypeCreationFilterFunction(creationFilter) {
-  return function(githubType) {
-    if(!creationFilter) return true; // Default create all
-
-    if(githubType in creationFilter) return creationFilter[githubType];
-
-    if('all' in creationFilter) return creationFilter.all;
-
-    return true; // Default to true
-  };
-}
-
 /**
  * Assuming that oneToOne uris have been handled already,
  * Figure out what this troupe is for
@@ -122,8 +108,6 @@ function findOrCreateGroupRoom(user, troupe, uri, options) {
   debug("findOrCreateGroupRoom: %s", uri);
 
   if(!options) options = {};
-
-  var roomTypeCreationFilterFunction = makeRoomTypeCreationFilterFunction(options.creationFilter);
 
   if(troupe) {
     debug('Room for uri %s exists', uri)
@@ -172,16 +156,6 @@ function findOrCreateGroupRoom(user, troupe, uri, options) {
       var security = githubInfo.security || null;
       var githubId = githubInfo.githubId || null;
       var topic = githubInfo.description;
-
-      /* Are we going to allow users to create this type of room? */
-      if(!roomTypeCreationFilterFunction(githubType)) {
-        /* Don't allow creation */
-        return {
-          troupe: null,
-          access: false,
-          didCreate: false
-        };
-      }
 
       debug('URI validation %s returned type=%s uri=%s', uri, githubType, officialUri);
 
@@ -524,8 +498,8 @@ function createGithubRoom(user, uri) {
  *
  * @return { troupe: ..., uri: ..., policy: ..., roomMember: ..., accessDenied: ... }
  */
-function findOrCreateRoom(user, uri, options) {
-  debug("findOrCreateRoom %s %s %j", user && user.username, uri, options);
+function createRoomByUri(user, uri, options) {
+  debug("createRoomByUri %s %s %j", user && user.username, uri, options);
 
   var userId = user && user.id;
   options = options || {};
@@ -603,13 +577,6 @@ function findOrCreateRoom(user, uri, options) {
         }
 
         debug("localUriLookup returned user for uri=%s. Finding or creating one-to-one", uri);
-
-        var roomTypeCreationFilterFunction = makeRoomTypeCreationFilterFunction(options.creationFilter);
-
-        // Are we allowed to create one-to-one rooms?
-        if(!roomTypeCreationFilterFunction('ONETOONE')) {
-          return null;
-        }
 
         return oneToOneRoomService.findOrCreateOneToOneRoom(user, resolvedUser._id)
           .spread(function(troupe, resolvedUser) {
@@ -1410,7 +1377,7 @@ module.exports = {
   applyAutoHooksForRepoRoom: applyAutoHooksForRepoRoom,
   findAllRoomsIdsForUserIncludingMentions: findAllRoomsIdsForUserIncludingMentions,
   createGithubRoom: Promise.method(createGithubRoom),
-  findOrCreateRoom: findOrCreateRoom,
+  createRoomByUri: createRoomByUri,
   createRoomChannel: Promise.method(createRoomChannel),
   createUserChannel: Promise.method(createUserChannel),
   findAllChannelsForRoomId: findAllChannelsForRoomId,

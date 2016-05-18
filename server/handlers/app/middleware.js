@@ -35,16 +35,6 @@ function uriContextResolverMiddleware(options) {
 
     debug("Looking up normalised uri %s", uri);
 
-    // var creationFilter = {
-    //   all: false
-    // };
-    //
-    // if(options && options.create) {
-    //   creationFilter.all = true;
-    //   if(options.create === 'not-repos') {
-    //     creationFilter.REPO = false;
-    //   }
-    // }
     return roomContextService.findContextForUri(req.user, uri, options)
       .then(function(uriContext) {
         req.troupe = uriContext.troupe;
@@ -79,45 +69,6 @@ function uriContextResolverMiddleware(options) {
         throw e;
       })
       .catch(next);
-
-    // This becomes
-    // roomService.findRoomContext(req.user, uri)
-    // return roomService.findOrCreateRoom(req.user, uri, { tracking: tracking, creationFilter: creationFilter })
-    //   .then(function(uriContext) {
-    //
-    //     var isValid = uriContext && (uriContext.troupe || uriContext.ownUrl);
-    //     var accessToOrgRoomDenied = uriContext && uriContext.accessDenied && uriContext.accessDenied.githubType === 'ORG';
-    //
-    //     if (!isValid && !accessToOrgRoomDenied) {
-    //       if(!req.user) {
-    //         throw 401;
-    //       }
-    //
-    //       throw 404;
-    //     }
-    //
-    //     var events = req.session.events;
-    //     if(!events) {
-    //       events = [];
-    //       req.session.events = events;
-    //     }
-    //
-    //     if(uriContext.hookCreationFailedDueToMissingScope) {
-    //       events.push('hooks_require_additional_public_scope');
-    //     }
-    //
-    //     req.troupe = uriContext.troupe;
-    //     req.uriContext = uriContext;
-    //     next();
-    //   })
-    //   .catch(function(err) {
-    //     if(err && err.redirect) {
-    //       return res.relativeRedirect(getRedirectUrl(err.redirect, req));
-    //     }
-    //
-    //     throw err;
-    //   })
-    //   .catch(next);
   };
 }
 
