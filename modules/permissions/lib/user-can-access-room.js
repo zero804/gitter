@@ -154,6 +154,7 @@ function permissionToWrite(userId, roomId) {
 
 /**
  * We can't use the room membership service here as we're in a module
+ * @private
  */
 function checkRoomMembership(troupeId, userId) {
   return persistence.TroupeUser.count({ troupeId: troupeId, userId: userId })

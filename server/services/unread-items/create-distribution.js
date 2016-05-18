@@ -6,9 +6,8 @@ var _                     = require('lodash');
 var Promise               = require('bluebird');
 var Distribution          = require('./distribution');
 var roomMembershipService = require('../room-membership-service');
-var userService           = require("../user-service");
-var roomPermissionsModel  = require('gitter-web-permissions/lib/room-permissions-model');
 var categoriseUserInRoom  = require("../categorise-users-in-room");
+var policyFactory         = require('gitter-web-permissions/lib/legacy-policy-factory');
 
 /**
  * Given an array of non-member userIds in a room,
@@ -22,30 +21,23 @@ function findNonMembersWithAccess(troupe, userIds) {
     return Promise.resolve([]);
   }
 
-  // Everyone can always access a public room
-  if (troupe.security === 'PUBLIC') return Promise.resolve(userIds);
-
-  return userService.findByIds(userIds)
-    .then(function(users) {
-      var result = [];
-
-      return Promise.map(users, function(user) {
-        /* TODO: some sort of bulk service here */
-        return roomPermissionsModel(user, 'join', troupe)
-          .then(function(access) {
-            if(access) {
-              result.push("" + user.id);
-            }
-          })
-          .catch(function(e) {
-            // Swallow errors here. If the call fails, the chat should not fail
-            errorReporter(e, { username: user.username, operation: 'findNonMembersWithAccess' }, { module: 'unread-items' });
-          });
-      })
-      .then(function() {
-        return result;
-      });
-    });
+  var result = [];
+  return Promise.map(userIds, function(userId) {
+      return policyFactory.createPolicyForUserIdInRoom(userId, troupe)
+        .then(function(policy) {
+          return policy.canJoin();
+        })
+        .then(function(userCanJoin) {
+          if(userCanJoin) {
+            result.push(String(userId));
+          }
+        })
+        .catch(function(e) {
+          // Swallow errors here. If the call fails, the chat should not fail
+          errorReporter(e, { userId: userId, operation: 'findNonMembersWithAccess' }, { module: 'unread-items' });
+        })
+    })
+    .return(result);
 }
 
 /**
