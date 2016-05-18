@@ -147,12 +147,22 @@ function findGitHubUser(lcUri) {
 var findRoomGitHubUser = Promise.method(function(ownerUserId) {
   if (ownerUserId) {
     return userService.findById(ownerUserId)
-      .then(function(user) {
-        if (user) {
-          return migrationSchemas.GitHubUser.findOne({ githubId: user.githubId })
+      .then(function(gitterUser) {
+        if (gitterUser) {
+          return migrationSchemas.GitHubUser.findOne({ githubId: gitterUser.githubId })
             .read('secondaryPreferred')
             .lean()
-            .exec();
+            .exec()
+            .then(function(githubUser) {
+              if (githubUser) {
+                return {
+                  gitterUser: gitterUser,
+                  githubUser: githubUser
+                };
+              } else {
+                return null;
+              }
+            });
         } else {
           return null;
         }
@@ -194,7 +204,7 @@ var findBatchInfo = Promise.method(function(batch) {
   return Promise.join(
     // there used to be more here :)
     findRoomGitHubUser(uniqueUserIds[0]), // could be undefined
-    function(roomUser) {
+    function(roomUsers) {
       var org = batch.githuborg[0]; // could be undefined
       var user = batch.githubuser[0]; // could be undefined
       if (org) {
@@ -219,17 +229,28 @@ var findBatchInfo = Promise.method(function(batch) {
 
         // if they aren't all this user, update them
         if (!_.every(uniqueOwners, function(uniqueUri) { return uniqueUri == user.uri; })) {
+          var oldUser;
+          if (roomUsers && roomUsers.gitterUser) {
+            // If at least one of the rooms already belonged to a user that
+            // still exists we would find it here.
+            // HOWEVER, we better double check that the uri actually found the
+            // same github user, otherwise we'll rename the wrong person.
+            if (roomUsers.gitterUser.githubId == user.githubId) {
+              oldUser = roomUsers.gitterUser;
+            }
+          }
           errors.push({
             errorType: "owner",
             type: type,
             lcOwner: lcOwner,
             correctOwner: user.uri,
             batch: batch,
+            oldUser: oldUser, // could be undefined
             user: user
           });
         }
 
-      } else if (roomUser) {
+      } else if (roomUsers) {
         type = 'user';
         reason = 'owneruserid-lookup';
 
@@ -240,9 +261,10 @@ var findBatchInfo = Promise.method(function(batch) {
           errorType: "owner",
           type: type,
           lcOwner: lcOwner,
-          correctOwner: roomUser.uri,
+          correctOwner: roomUsers.githubUser.uri,
           batch: batch,
-          user: roomUser
+          oldUser: roomUsers.gitterUser,
+          user: roomUsers.githubUser
         });
 
       } else {
@@ -409,6 +431,23 @@ var findUpdatesForOwnerError = Promise.method(function(error) {
   // be updated. also add a redirect.
   var updates = []
 
+  if (error.type == 'user' && error.oldUser) {
+    // double check again
+    if (error.oldUser.githubId == error.user.githubId) {
+      console.log('rename the user too');
+      var gitterUser = error.oldUser;
+      var githubUser = error.user;
+      var userUpdate = {
+        type: 'rename-user',
+        _id: githubUser._id,
+        oldUsername: gitterUser.username,
+        newUsername: githubUser.uri,
+      };
+      console.log(JSON.stringify(userUpdate));
+      updates.push(userUpdate);
+    }
+  }
+
   error.batch.rooms.forEach(function(room) {
     // 1, 2 or 3 parts
     var parts = room.uri.split('/');
@@ -418,20 +457,6 @@ var findUpdatesForOwnerError = Promise.method(function(error) {
     if (room.uri == correctUri) {
       // this one is correct
       return;
-    }
-
-    // TODO: if error.type == 'user' we have to rename the user too
-    if (error.type == 'user') {
-      var githubUser = error.user;
-      var userUpdate = {
-        type: 'rename-user',
-        _id: githubUser._id,
-        oldUri: githubUser.uri,
-        newUri: githubUser.uri,
-        newLcUri: githubUser.lcUri
-      };
-      console.log(JSON.stringify(userUpdate));
-      updates.push(userUpdate);
     }
 
     var roomUpdate = {
