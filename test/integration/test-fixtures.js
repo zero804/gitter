@@ -207,10 +207,13 @@ function createExpectedFixtures(expected, done) {
       lcUri = uri.toLowerCase();
     }
 
+    var groupId = f.group && f.group._id;
+
     var doc = {
       uri: uri,
       lcUri: lcUri,
       githubId: f.githubId === true ? generateGithubId() : f.githubId || null,
+      groupId: groupId,
       status: f.status || 'ACTIVE',
       oneToOne: f.oneToOne,
       security: security,
@@ -375,26 +378,39 @@ function createExpectedFixtures(expected, done) {
   }
 
   function createGroups(fixture) {
-    return Promise.map(Object.keys(expected), function(key) {
-        if(key.match(/^group/)) {
-          return createGroup(key, expected[key])
-            .then(function(group) {
-              fixture[key] = group;
-            });
+    // Create groups
+    var pass1 = Promise.map(Object.keys(expected), function(key) {
+      if(key.match(/^group/)) {
+        return createGroup(key, expected[key])
+          .then(function(createdGroup) {
+            fixture[key] = createdGroup;
+          });
+      }
+    });
+
+    // Attach the groups to the troupes
+    var pass2 = Promise.map(Object.keys(expected), function(key) {
+      if(key.match(/^troupe/)) {
+        var troupe = expected[key];
+        var group = troupe.group;
+        if (!group) return;
+
+        if (typeof group !== 'string') throw new Error('Please specify the group as a string id')
+        if (fixture[group]) {
+          // Already specified at the top level
+          troupe.groupe = fixture[group];
+          return
         }
 
-        if(key.match(/^troupe/)) {
-          var t = expected[key];
-          var group = t.group;
+        return createGroup(group, { })
+          .then(function(createdGroup) {
+            troupe.group = createdGroup;
+            fixture[group] = createdGroup;
+          });
+      }
+    });
 
-          if(expected[group]) return; // Already specified at the top level
-          expected[group] = {};
-          return createGroup(group, {})
-            .then(function(createdGroup) {
-              fixture[group] = createdGroup;
-            });
-        }
-      });
+    return Promise.join(pass1, pass2);
   }
 
   function createTroupes(fixture) {
