@@ -251,6 +251,7 @@ var findBatchInfo = Promise.method(function(batch) {
         }
 
       } else if (roomUsers) {
+        // TODO: log these separately as a user rename
         type = 'user';
         reason = 'owneruserid-lookup';
 
@@ -495,6 +496,9 @@ function errorsToUpdates(errors) {
 // asynchronously perform database updates and return a promise
 function performUpdates(updates) {
   // TODO
+  // NOTE: remember to add to renamed uris for rooms, but not if it only
+  // changed in case. Same thing when updating uris - only when the uri changed
+  // in more than just case.
   console.log("TODO");
   return Promise.resolve();
 }

@@ -170,7 +170,7 @@ function migrate(batch, enc, callback) {
         .then(function() {
           // all existing groups (org OR user) get the old style community uris.
           return uriLookupService.reserveUriForGroupId(groupId, 'org/'+group.lcUri+'/rooms');
-        })
+        });
     })
     .then(function() {
       callback();
