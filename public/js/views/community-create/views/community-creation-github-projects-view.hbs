@@ -1,0 +1,45 @@
+<div class="community-create-step-content-area">
+  <div class="community-create-step-main-body">
+    <h1 class="primary-community-heading h1">
+      You can use any of your organisations or repositories to create a community
+    </h1>
+
+    <section class="community-create-github-projects-tabbed-wrapper">
+      <ul class="primary-tabbed-navigation-list">
+        <li class="primary-tabbed-navigation-list-item">
+          <button class="primary-tabbed-navigation-button {{when isOrgAreaActive 'active' : ''}} community-create-github-projects-toggle-orgs">
+            my orgs
+          </button>
+        </li>
+        <li class="primary-tabbed-navigation-list-item">
+          <button class="primary-tabbed-navigation-button  {{when isRepoAreaActive 'active' : ''}} community-create-github-projects-toggle-repos">
+            my repos
+          </button>
+        </li>
+      </ul>
+
+      <div class="community-create-github-projects-tab-content-area js-community-create-github-projects-orgs-area {{when isOrgAreaActive 'active' : ''}}">
+        <div class="community-create-org-list-root"></div>
+      </div>
+
+      <div class="community-create-github-projects-tab-content-area js-community-create-github-projects-repos-area {{when isRepoAreaActive 'active' : ''}}">
+        <input
+          class="primary-community-repo-name-filter-input"
+          placeholder="repo name filter" />
+
+        <div class="community-create-repo-list-root"></div>
+      </div>
+    </section>
+
+
+    <section>
+      <button class="community-create-back-button secondary-button-clouds js-community-create-step-back">
+        Back
+      </button>
+    </section>
+  </div>
+
+  <button class="community-create-next-button secondary-button-caribbean js-community-create-step-next">
+    Next
+  </button>
+</div>

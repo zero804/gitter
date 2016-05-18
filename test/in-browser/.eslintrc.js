@@ -6,6 +6,8 @@ module.exports = {
     },
     rules: {
       "strict": ["warn", "safe"],
-      "max-nested-callbacks": ["error", 10]
+      "max-nested-callbacks": ["error", 10],
+      "node/no-unpublished-require": "off",
+      "node/no-missing-require": "off"
     }
 };

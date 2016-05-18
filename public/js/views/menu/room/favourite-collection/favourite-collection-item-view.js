@@ -2,6 +2,7 @@
 
 var _                         = require('underscore');
 var PrimaryCollectionItemView = require('../primary-collection/primary-collection-item-view');
+var BaseCollectionItemView    = require('../base-collection/base-collection-item-view');
 var fastdom                   = require('fastdom');
 var toggleClass               = require('utils/toggle-class');
 
@@ -15,6 +16,8 @@ module.exports = PrimaryCollectionItemView.extend({
     var className = (this.model.get('githubType') === 'ONETOONE') ? 'room-item--favourite-one2one' : 'room-item--favourite';
     //If the item was not previously in the favourite collection before drag start it could have
     //just been added by a user dragging, as such we want to mark it as a temporary item JP 1/4/16
+    debugger
+
     if(this.model.get('isTempItem')){
       className = className += ' temp';
     }
@@ -29,8 +32,18 @@ module.exports = PrimaryCollectionItemView.extend({
   },
 
   onRender: function (){
+    BaseCollectionItemView.prototype.onRender.apply(this, arguments);
     //when temp items are rendered we want to wait and then
     //animate them in JP 4/4/16
+    this.el.classList.remove('room-item');
+    this.el.classList.remove('room-item--one2one');
+    if (this.model.get('oneToOne')) {
+      this.el.classList.add('room-item--favourite-one2one');
+    }
+    else {
+      this.el.classList.add('room-item--favourite');
+    }
+
     if(this.model.get('isTempItem')) {
       setTimeout(function(){
         fastdom.mutate(function(){

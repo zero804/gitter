@@ -10,17 +10,18 @@ module.exports = (function() {
   switch(platformDetect()) {
     case 'Mac': return {
       cmd: '⌘',
-      room: context.hasFeature('left-menu') ? 'alt' : 'ctrl',
+      room: 'ctrl',
       gitter: 'ctrl'
     };
     case 'Windows': return {
       cmd: 'ctrl',
-      room: '⇧',
+      room: context.hasFeature('left-menu') ? 'alt' : '⇧',
       gitter: '⇧'
     };
     default: return { // Linux and other
       cmd: 'ctrl',
       room: '⇧',
+      room2: 'alt',
       gitter: 'alt'
     };
   }
