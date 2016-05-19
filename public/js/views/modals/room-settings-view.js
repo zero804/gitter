@@ -11,18 +11,18 @@ var View = Marionette.ItemView.extend({
 
   events:   {
     'click #close-settings' : 'destroySettings',
-    'change #github-only': 'formChange'
   },
 
   ui: {
-    githubOnly: '#github-only'
+    githubOnly: '#github-only',
+    welcomeMessage: '#room-welcome-message'
   },
 
   initialize: function() {
     this.listenTo(this, 'menuItemClicked', this.menuItemClicked, this);
   },
 
-  destroySettings : function () {
+  destroySettings: function () {
     this.dialog.hide();
     this.dialog = null;
   },
@@ -30,13 +30,12 @@ var View = Marionette.ItemView.extend({
   menuItemClicked: function(action){
     switch(action) {
       case 'submit':
-        this.update();
+        this.formChange();
         break;
     }
   },
 
   update: function() {
-    debugger
     var hasGithub = (this.model.get('providers') || []).indexOf('github') !== -1;
     if (hasGithub) {
       this.ui.githubOnly.attr('checked', true);
@@ -50,11 +49,13 @@ var View = Marionette.ItemView.extend({
   },
 
   formChange: function() {
-    var providers = (this.ui.githubOnly.is(':checked')) ? ['github'] : [];
-    apiClient.room.put('', { providers: providers })
+    var providers             = (this.ui.githubOnly.is(':checked')) ? ['github'] : [];
+    var welcomeMessageContent = this.ui.welcomeMessage.val();
+    apiClient.room.put('', { providers: providers, welcomeMessage: welcomeMessageContent })
       .then(function(updated) {
         context.setTroupe(updated);
-      });
+        this.destroySettings();
+      }.bind(this));
   }
 });
 
