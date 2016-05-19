@@ -22,7 +22,7 @@ function performAction(m, url, model, options) {
       } else {
         return apiClient.patch(url, model);
       }
-      break;
+      /* break; */
 
     default:
       return apiClient[m](url, model);

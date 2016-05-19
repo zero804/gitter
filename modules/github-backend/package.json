@@ -9,5 +9,12 @@
   "scripts": {
     "test": "mocha test/"
   },
-  "private": true
+  "private": true,
+  "dependencies": {
+    "bluebird": "^3.3.5",
+    "email-validator": "^1.0.4",
+    "gitter-web-env": "file:../env",
+    "gitter-web-github": "file:../github",
+    "lodash": "^3.2.0"
+  }
 }

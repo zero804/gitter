@@ -143,6 +143,7 @@ module.exports = bayeuxExtension({
       message.ext.userId = userId;
 
       if(userId && troupeId && mongoUtils.isLikeObjectId(troupeId)) {
+        // In chat-cache mode, this will give the room an incorrect last-access-time
         recentRoomService.saveLastVisitedTroupeforUserId(userId, troupeId, { skipFayeUpdate: true })
           .catch(function(err) {
             logger.error('Error while saving last visted room. Silently ignoring. ' + err, { exception: err });

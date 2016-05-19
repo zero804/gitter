@@ -83,6 +83,7 @@ if(ravenUrl) {
           appEvents.trigger('stats.event', 'error');
 
         } catch(e) {
+          /* */
         }
 
 

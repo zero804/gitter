@@ -9,6 +9,7 @@ module.exports = (function() {
   // Central logic for focus events
   // Listens to specific keyboard events to trigger corresponding 'focus.request' events
 
+  var previousFocusOutOrigin;
   var $previous;
   var isEditing = false;
   var thisFrame = $('#content-frame').hasClass('trpChatContainer') && 'chat' || 'app';
@@ -55,7 +56,10 @@ module.exports = (function() {
   var focusOut = function(event) {
     if (event.origin) {
       // If the original event comes from another frame, transfer the focus request to it
-      if (event.origin !== thisFrame) return appEvents.trigger('focus.request.' + event.origin + '.out', event);
+      if (event.origin !== thisFrame) {
+        previousFocusOutOrigin = event.origin;
+        return appEvents.trigger('focus.request.' + event.origin + '.out', event);
+      }
       // If an event comes back to its original frame, it's because it originated in it
       // but the logic can be present in another frame, that would delegate the focus logic back to the original frame
       // It's also possible that the event fired in multiple frames, so we need to make sure it is not handled twice
@@ -68,12 +72,20 @@ module.exports = (function() {
       $previous.blur();
       appEvents.trigger('focus.change.out', $previous);
     }
+
+    // Focus the outer frame when you escape
+    window.top.focus();
   };
 
   var focusIn = function(event) {
     // If the original event comes from another frame, transfer the focus request to it
-    if (event.origin && event.origin !== thisFrame) {
+    if (event.origin && event.origin !== 'top' && event.origin !== thisFrame) {
       return appEvents.trigger('focus.request.' + event.origin + '.in', event);
+    }
+    else if(previousFocusOutOrigin && previousFocusOutOrigin !== thisFrame) {
+      var newEvent = new Event(event);
+      newEvent.origin = 'top';
+      return appEvents.trigger('focus.request.' + previousFocusOutOrigin + '.in', newEvent);
     }
 
     if ($previous) {

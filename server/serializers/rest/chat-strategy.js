@@ -1,15 +1,14 @@
 "use strict";
 
-
 var env                   = require('gitter-web-env');
 var logger                = env.logger;
 var _                     = require('lodash');
-var Promise               = require('bluebird');
 var unreadItemService     = require("../../services/unread-items");
 var collapsedChatsService = require('../../services/collapsed-chats-service');
 var getVersion            = require('../get-model-version');
 var UserIdStrategy        = require('./user-id-strategy');
-var TroupeIdStrategy      = require('./troupe-id-strategy');
+var mongoUtils            = require('gitter-web-persistence-utils/lib/mongo-utils');
+var Promise               = require('bluebird');
 
 function formatDate(d) {
   return d ? d.toISOString() : null;
@@ -81,34 +80,31 @@ function ChatStrategy(options)  {
     }
   }
 
-  var userStrategy = options.user ? null : new UserIdStrategy({ lean: options.lean });
-
-  var unreadItemStrategy, collapsedItemStrategy;
-  /* If options.unread has been set, we don't need a strategy */
-  if (options.currentUserId && options.unread === undefined) {
-    unreadItemStrategy = new UnreadItemStrategy({ userId: options.currentUserId, roomId: options.troupeId });
-  }
-
-  if (options.currentUserId && options.troupeId) {
-    collapsedItemStrategy = new CollapsedItemStrategy({ userId: options.currentUserId, roomId: options.troupeId });
-  }
+  var userStrategy,unreadItemStrategy, collapsedItemStrategy;
 
   var defaultUnreadStatus = options.unread === undefined ? true : !!options.unread;
 
   this.preload = function(items) {
+    if (items.isEmpty()) return;
+
     var strategies = [];
 
     // If the user is fixed in options, we don't need to look them up using a strategy...
-    if (userStrategy) {
+    if (!options.user) {
+      userStrategy = new UserIdStrategy({ lean: options.lean });
+
       var users = items.map(function(i) { return i.fromUserId; });
       strategies.push(userStrategy.preload(users));
     }
 
-    if (unreadItemStrategy) {
+    /* If options.unread has been set, we don't need a strategy */
+    if (options.currentUserId && options.unread === undefined) {
+      unreadItemStrategy = new UnreadItemStrategy({ userId: options.currentUserId, roomId: options.troupeId });
       strategies.push(unreadItemStrategy.preload());
     }
 
-    if (collapsedItemStrategy) {
+    if (options.currentUserId && options.troupeId) {
+      collapsedItemStrategy = new CollapsedItemStrategy({ userId: options.currentUserId, roomId: options.troupeId });
       strategies.push(collapsedItemStrategy.preload());
     }
 
@@ -144,6 +140,11 @@ function ChatStrategy(options)  {
 
     var castArray = options.lean ? undefinedForEmptyArray : safeArray;
 
+    var initial;
+    if (options.initialId) {
+      initial = mongoUtils.objectIDsEqual(item._id, options.initialId);
+    }
+
     return {
       id: item._id,
       text: item.text,
@@ -156,7 +157,7 @@ function ChatStrategy(options)  {
       collapsed: collapsed,
       readBy: item.readBy ? item.readBy.length : undefined,
       urls: castArray(item.urls),
-      initial: options.initialId && item._id == options.initialId || undefined,
+      initial: initial || undefined,
       mentions: castArray(item.mentions && _.map(item.mentions, function(m) {
           return {
             screenName: m.screenName,

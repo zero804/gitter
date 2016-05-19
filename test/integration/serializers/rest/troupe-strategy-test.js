@@ -6,7 +6,8 @@ var assertUtils = require('../../assert-utils')
 var fixtureLoader = require('../../test-fixtures');
 var serialize = testRequire('./serializers/serialize');
 var TroupeStrategy = testRequire('./serializers/rest/troupe-strategy');
-
+var lazy = require('lazy.js');
+var ObjectID = require('mongodb').ObjectID;
 
 describe('TroupeStrategy', function() {
   var blockTimer = require('../../block-timer');
@@ -107,7 +108,6 @@ describe('TroupeStrategy', function() {
 
   it('should serialize a one-to-one troupe with currentUserId', function() {
     var strategy = new TroupeStrategy({ currentUserId: fixture.user1._id});
-    var u1 = fixture.user1;
     var u2 = fixture.user2;
     var t = fixture.troupe2;
     return serialize([t], strategy)
@@ -247,5 +247,112 @@ describe('TroupeStrategy', function() {
           v: 1
         }]);
       });
+  });
+
+  describe('oneToOneOtherUserSequence', function() {
+    var oneToOneOtherUserSequence = TroupeStrategy.testOnly.oneToOneOtherUserSequence;
+
+    it('should deal with empty sequences', function() {
+      var x = lazy([]);
+      assert.deepEqual(oneToOneOtherUserSequence('1', x).toArray(), []);
+    });
+
+    it('should deal with non-one-to-one troupes sequences', function() {
+      var x = lazy([{
+        uri: 'x'
+      }, {
+        uri: 'y'
+      }]);
+      assert.deepEqual(oneToOneOtherUserSequence('1', x).toArray(), []);
+    });
+
+    it('should deal with one-to-one troupe sequences with strings', function() {
+      var x = lazy([{
+        oneToOne: true,
+        oneToOneUsers: [{
+          userId: '1'
+        }, {
+          userId: '2'
+        }]
+      }, {
+        oneToOne: true,
+        oneToOneUsers: [{
+          userId: '1'
+        }, {
+          userId: '3'
+        }]
+      }]);
+      assert.deepEqual(oneToOneOtherUserSequence('1', x).toArray(), ['2', '3']);
+    });
+
+    it('should deal with one-to-one troupe sequences with ObjectIds', function() {
+      var o1 = new ObjectID();
+      var o2 = new ObjectID();
+      var o3 = new ObjectID();
+
+      var x = lazy([{
+        oneToOne: true,
+        oneToOneUsers: [{
+          userId: o1
+        }, {
+          userId: o2
+        }]
+      }, {
+        oneToOne: true,
+        oneToOneUsers: [{
+          userId: o1
+        }, {
+          userId: o3
+        }]
+      }]);
+      assert.deepEqual(oneToOneOtherUserSequence(o1, x).toArray(), [o2, o3]);
+    });
+
+    it('should deal with one-to-one troupe sequences with ObjectIds mixed, case 1', function() {
+      var o1 = new ObjectID();
+      var o2 = new ObjectID();
+      var o3 = new ObjectID();
+
+      var x = lazy([{
+        oneToOne: true,
+        oneToOneUsers: [{
+          userId: o1
+        }, {
+          userId: o2
+        }]
+      }, {
+        oneToOne: true,
+        oneToOneUsers: [{
+          userId: o1
+        }, {
+          userId: o3
+        }]
+      }]);
+      assert.deepEqual(oneToOneOtherUserSequence(o1.toHexString(), x).toArray(), [o2, o3]);
+    });
+
+    it('should deal with one-to-one troupe sequences with ObjectIds mixed, case 1', function() {
+      var o1 = new ObjectID();
+      var o2 = new ObjectID().toHexString();
+      var o3 = new ObjectID().toHexString();
+
+      var x = lazy([{
+        oneToOne: true,
+        oneToOneUsers: [{
+          userId: o1.toHexString()
+        }, {
+          userId: o2
+        }]
+      }, {
+        oneToOne: true,
+        oneToOneUsers: [{
+          userId: o1.toHexString()
+        }, {
+          userId: o3
+        }]
+      }]);
+      assert.deepEqual(oneToOneOtherUserSequence(o1, x).toArray(), [o2, o3]);
+    });
+
   });
 });

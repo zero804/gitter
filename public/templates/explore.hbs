@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    {{{ generateTroupeContext troupeContext }}}
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Gitter &mdash; Explore</title>
     <link id="favicon" rel="shortcut icon" href="{{ cdn 'images/favicon-normal.ico' }}">
@@ -17,6 +16,7 @@
     <script type="text/javascript" src="//use.typekit.net/ohh4mcl.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/octicons/2.0.2/octicons.min.css">
     <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+    {{{ generateTroupeContext troupeContext }}}
     {{{ generateEnv }}}
     {{{ bootScript 'explore' }}}
     {{> live_reload}}

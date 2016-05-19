@@ -7,15 +7,15 @@ var restSerializer       = require("../../../serializers/rest-serializer");
 var Promise              = require('bluebird');
 var StatusError          = require('statuserror');
 var roomPermissionsModel = require('gitter-web-permissions/lib/room-permissions-model');
-var userCanAccessRoom    = require('../../../services/user-can-access-room');
+var userCanAccessRoom    = require('gitter-web-permissions/lib/user-can-access-room');
 var loadTroupeFromParam  = require('./load-troupe-param');
 
 function searchRooms(req) {
   var user = req.user;
 
   var options = {
-    limit: req.query.limit || 10,
-    skip: req.query.skip
+    limit: parseInt(req.query.limit, 10) || 10,
+    skip: parseInt(req.query.skip, 10)
   };
 
   var userId = user && user.id;

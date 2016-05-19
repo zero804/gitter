@@ -1,3 +1,10 @@
+'use strict';
+
+if (require.main !== module) {
+  console.log('This should only be executed standalone'); // eslint-disable-line
+  process.exit(1);
+}
+
 var csv = require('fast-csv');
 
 var metrics = require('datadog-metrics');
@@ -25,7 +32,6 @@ csv
 
    if (isNaN(avg)) return; // Ignore bad lines
 
-   console.log(metric + ": ", tags.join(' '), avg);
    metrics.gauge(metric, avg, tags);
  })
  .on("end", function() {

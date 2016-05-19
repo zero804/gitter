@@ -5,7 +5,6 @@
 var env = require('gitter-web-env');
 var winston = env.logger;
 var bayeux = require('../../server/web/bayeux');
-var presenceService = require('gitter-web-presence');
 var shutdown = require('shutdown');
 
 var opts = require('yargs')

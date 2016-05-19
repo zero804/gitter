@@ -10,6 +10,8 @@ function GithubRepoStrategy(options) {
   var troupesIndexed;
 
   this.preload = function(repos) {
+    if (repos.isEmpty()) return;
+
     var repoFullNames = repos.map(function(repo) {
         return repo.full_name;
       })
@@ -32,7 +34,7 @@ function GithubRepoStrategy(options) {
       uri:          item.full_name,
       private:      item.private,
       room:         room ? troupeStrategy.map(room) : undefined,
-      exists:       room ? true : false,
+      exists:       !!room,
       avatar_url:   item.owner.avatar_url
     };
   };
