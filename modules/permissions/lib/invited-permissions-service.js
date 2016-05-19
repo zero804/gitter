@@ -4,7 +4,8 @@ var githubMembers = require('gitter-web-github').GitHubMembers;
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
 
-var canUserBeInvitedToJoinRoom = Promise.method(function (usernameToBeInvited, troupe, instigatingUser) {
+// TODO: this needs to change to use permissions policies
+function canUserBeInvitedToJoinRoom(usernameToBeInvited, troupe, instigatingUser) {
   if(troupe.security === 'PUBLIC') {
     // anyone can join public rooms
     return true;
@@ -46,8 +47,8 @@ var canUserBeInvitedToJoinRoom = Promise.method(function (usernameToBeInvited, t
 
     default:
       /* Dont know what kind of room this is */
-      throw new StatusError(400);
+      throw new StatusError(400, 'Invalid type: ' + troupe.githubType);
   }
-});
+}
 
-module.exports = canUserBeInvitedToJoinRoom;
+module.exports = Promise.method(canUserBeInvitedToJoinRoom);

@@ -11,7 +11,7 @@ var mongoUtils        = require('gitter-web-persistence-utils/lib/mongo-utils');
 var StatusError       = require('statuserror');
 var bayeuxExtension   = require('./extension');
 var Promise           = require('bluebird');
-var userCanAccessRoom = require('gitter-web-permissions/lib/user-can-access-room');
+var policyFactory     = require('gitter-web-permissions/lib/legacy-policy-factory');
 var debug             = require('debug')('gitter:bayeux-authorisor');
 var recentRoomService = require('../../services/recent-room-service');
 
@@ -55,6 +55,13 @@ var routes = [{
   }
 ];
 
+function permissionToRead(userId, troupeId) {
+  return policyFactory.createPolicyForUserIdInRoomId(userId, troupeId)
+    .then(function(policy) {
+      return policy.canRead();
+    });
+}
+
 // This strategy ensures that a user can access a URL under a troupe URL
 function validateUserForSubTroupeSubscription(options) {
   var userId = options.userId;
@@ -67,25 +74,27 @@ function validateUserForSubTroupeSubscription(options) {
     return Promise.reject(new StatusError(400, 'Invalid ID: ' + troupeId));
   }
 
-  var promise = userCanAccessRoom.permissionToRead(userId, troupeId);
-  if (ext && ext.reassociate) {
-    promise = promise.then(function(access) {
-      if (!access) return access;
+  var promise = permissionToRead(userId, troupeId);
 
-      return presenceService.socketReassociated(options.clientId, userId, troupeId, !!ext.reassociate.eyeballs)
-        .then(function() {
-          // Update the lastAccessTime for the room
-          if(userId) {
-            return recentRoomService.saveLastVisitedTroupeforUserId(userId, troupeId);
-          }
-        })
-        .catch(function(err) {
-          logger.error('Unable to reassociate connection or update last access: ', { exception: err, userId: userId, troupeId: troupeId });
-        })
-        .return(access);
-    });
+  if (!ext || !ext.reassociate) {
+    return promise;
   }
-  return promise;
+
+  /** Reassociate the socket with a new room */
+  return promise.tap(function(access) {
+    if (!access) return;
+
+    return presenceService.socketReassociated(options.clientId, userId, troupeId, !!ext.reassociate.eyeballs)
+      .then(function() {
+        // Update the lastAccessTime for the room
+        if(userId) {
+          return recentRoomService.saveLastVisitedTroupeforUserId(userId, troupeId);
+        }
+      })
+      .catch(function(err) {
+        logger.error('Unable to reassociate connection or update last access: ', { exception: err, userId: userId, troupeId: troupeId });
+      });
+  });
 }
 
 // This is only used by the native client. The web client publishes to
@@ -107,7 +116,7 @@ function validateUserForUserSubscription(options) {
     return Promise.reject(new StatusError(400, 'Invalid ID: ' + userId));
   }
 
-  var result = userId == subscribeUserId;
+  var result = userId === subscribeUserId;
 
   return Promise.resolve(result);
 }
@@ -124,7 +133,7 @@ function populateSubUserCollection(options) {
   var subscribeUserId = match[1];
   var collection = match[2];
 
-  if(!userId || userId != subscribeUserId) {
+  if(!userId || userId !== subscribeUserId) {
     return Promise.resolve();
   }
 
