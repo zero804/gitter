@@ -7,6 +7,7 @@ var GitHubRepoService = require('gitter-web-github').GitHubRepoService;
 var Promise           = require('bluebird');
 var appEvents         = require('gitter-web-appevents');
 var userIsInRoom      = require('../user-in-room');
+var StatusError       = require('statuserror');
 
 function githubFailurePermissionsModel(user, right, uri, security) {
   if(right === 'admin') {
@@ -102,7 +103,7 @@ module.exports = function repoPermissionsModel(user, right, uri, security) {
           return !!isAdmin;
 
         default:
-          throw 'Unknown right ' + right;
+          throw new StatusError(400, 'Unknown right ' + right);
       }
 
     })
