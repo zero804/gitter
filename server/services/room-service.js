@@ -38,7 +38,6 @@ var redisLockPromise           = require("../utils/redis-lock-promise");
 var unreadItemService          = require('./unread-items');
 var debug                      = require('debug')('gitter:room-service');
 var roomMembershipService      = require('./room-membership-service');
-var liveCollections            = require('./live-collections');
 var recentRoomService          = require('./recent-room-service');
 var badgerEnabled              = nconf.get('autoPullRequest:enabled');
 var uriResolver                = require('./uri-resolver');
@@ -125,10 +124,6 @@ function doPostGitHubRoomCreationTasks(troupe, user, githubType, security, optio
   if (!user) return; // Can this ever happen?
 
   if (options.skipPostCreationSteps) return;
-
-  /* The room was created atomically */
-  // I don't think this should be here
-  /* XXX */liveCollections.rooms.emit('create', troupe, [user._id]);
 
   if (githubType !== 'REPO') return;
 
@@ -758,9 +753,6 @@ function createChannel(user, parentRoom, options) {
             });
 
           sendJoinStats(user, newRoom, options.tracking); // now the channel has now been created, send join stats for owner joining
-
-          // TODO handle adding the user in the event that they didn't create the room!
-          liveCollections.rooms.emit('create', newRoom, [user._id]);
 
           stats.event("create_room", {
             userId: user.id,
