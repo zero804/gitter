@@ -1,5 +1,6 @@
 {{!-- NOTE: this is wrapped by <div class='chat-item'> --}}
 <div class='chat-item__container'>
+  {{#if burstStart}}
   <div class='chat-item__aside'>
     <div class="chat-item__avatar">
     {{#if fromUser}}
@@ -7,6 +8,7 @@
     {{/if}}
     </div>
   </div>
+  {{/if}}
   <div class="chat-item__actions js-chat-item-actions">
     {{#if readByText}}
     <i class="chat-item__icon icon-check chat-item__icon--read chat-item__icon--read-by-some js-chat-item-readby"></i>
@@ -20,11 +22,13 @@
       {{! This is a way of forcing the browser to open at the bottom of the screen }}
       <div id='initial' style="position:relative;top:-120px; left: 0; height:0;width:0;overflow:hidden"><a name="initial"/>_</a></div>
     {{/if}}
+    {{#if burstStart}}
     <div class='chat-item__details'>
       <div class='chat-item__from js-chat-item-from'>{{displayName}}</div>
       <div class='chat-item__username js-chat-item-from'>@{{username}}</div>
       <a class='chat-item__time js-chat-time' {{#if permalinkUrl}} href='{{permalinkUrl}}'{{/if}} title="{{ sentTimeFormattedFull }}">{{ sentTimeFormatted }}</a>
     </div>
+    {{/if}}
     <div class='chat-item__text js-chat-item-text'>
       {{{ html }}}
     </div>
