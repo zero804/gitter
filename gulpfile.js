@@ -37,7 +37,6 @@ var codacy = require('gulp-codacy');
 var RUN_TESTS_IN_PARALLEL = false;
 
 var testModules = {
-  'integration': { files: ['./test/integration/**/*.js', './test/public-js/**/*.js'], includeInFast: true }
 };
 
 var modulesWithTest = glob.sync('./modules/*/test');
@@ -48,7 +47,12 @@ modulesWithTest.forEach(function(testDir) {
     files: path.join('modules', moduleName, 'test', '**', '*.js'),
     includeInFast: false
   }
-})
+});
+
+testModules.integration = {
+  files: ['./test/integration/**/*.js', './test/public-js/**/*.js'],
+  includeInFast: true
+};
 
 /** Make a series of tasks based on the test modules */
 function makeTestTasks(taskName, generator, isFast) {
@@ -77,6 +81,8 @@ function makeTestTasks(taskName, generator, isFast) {
   } else {
     // Run tests in sequence
     gulp.task(taskName, function(callback) {
+      gutil.log('Run sequence for ' + taskName,childTasks.join(','));
+
       var args = childTasks.concat(callback);
       runSequence.apply(null, args);
     });
@@ -106,6 +112,8 @@ makeTestTasks('test-mocha', function(name, files) {
   mkdirp.sync('output/test-reports/');
   mkdirp.sync('output/coverage-reports/' + name);
 
+  gutil.log('Writing XUnit output', 'output/test-reports/' + name + '.xml');
+
   var mochaOpts = {
     reporter: 'mocha-multi',
     timeout: 10000,
@@ -132,7 +140,7 @@ makeTestTasks('test-mocha', function(name, files) {
 makeTestTasks('test-docker', function(name, files) {
   mkdirp.sync('output/test-reports/');
   mkdirp.sync('output/coverage-reports/' + name);
-
+  gutil.log('Writing XUnit output', 'output/test-reports/' + name + '.xml');
   return gulp.src(files, { read: false })
     .pipe(mocha({
       reporter: 'mocha-multi',
