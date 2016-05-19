@@ -64,10 +64,10 @@ var getThirdLegDescription = function(options, t) {
 module.exports = ItemView.extend({
   template: closeTemplate,
 
-  ui: {
+  ui: _.extend({}, ItemView.prototype.ui, {
     toggleButton: '.js-menu-toggle-button',
     toggleIcon: '.js-menu-toggle-icon'
-  },
+  }),
 
   events: {
     'mouseenter': 'onItemMouseEnter',

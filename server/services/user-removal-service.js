@@ -24,7 +24,7 @@ exports.removeByUsername = function(username, options) {
             if (troupe.oneToOne) {
               return roomService.deleteRoom(troupe);
             } else {
-              return roomService.removeUserFromRoom(troupe, user, user);
+              return roomService.removeUserFromRoom(troupe, user);
             }
           }));
         })

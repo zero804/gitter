@@ -7,14 +7,14 @@ module.exports = {
   id: 'event',
 
   index: function(req) {
-    var skip = req.query.skip;
-    var limit = req.query.limit;
+    var skip = parseInt(req.query.skip, 10) || 0;
+    var limit = parseInt(req.query.limit, 10) || 50;
     var beforeId = req.query.beforeId;
 
     var options = {
-      skip: skip ? skip : 0,
+      skip: skip,
       beforeId: beforeId ? beforeId : null,
-      limit: limit ? limit: 50
+      limit: limit
     };
 
     return eventService.findEventsForTroupe(req.params.troupeId, options)

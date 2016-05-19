@@ -3,22 +3,29 @@
 var _                 = require('underscore');
 var $                 = require('jquery');
 var Marionette        = require('backbone.marionette');
+var cocktail          = require('cocktail');
 var fastdom           = require('fastdom');
 var context           = require('utils/context');
 var DNDCtrl           = require('components/menu/room/dnd-controller');
 var localStore        = require('components/local-store');
-var RoomMenuModel     = require('../../../../models/room-menu-model');
-var MiniBarView       = require('../minibar/minibar-view');
-var PanelView         = require('../panel/panel-view');
-var MinibarCollection = require('../minibar/minibar-collection');
+var toggleClass       = require('utils/toggle-class');
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
+var KeyboardEventMixin = require('views/keyboard-events-mixin');
+
+var RoomMenuModel      = require('../../../../models/room-menu-model');
+var MiniBarView        = require('../minibar/minibar-view');
+var PanelView          = require('../panel/panel-view');
+var MinibarCollection  = require('../minibar/minibar-collection');
+var KeyboardControllerView = require('../keyboard-controller/keyboard-controller-view');
+var KeyboardControllerModel = require('../keyboard-controller/keyboard-controller-model');
 
 var MINIBAR_ITEM_HEIGHT = 65;
 
 require('nanoscroller');
 require('views/behaviors/isomorphic');
 
-module.exports = Marionette.LayoutView.extend({
+
+var RoomMenuLayoutView = Marionette.LayoutView.extend({
 
   behaviors: {
     Isomorphic: {
@@ -34,6 +41,7 @@ module.exports = Marionette.LayoutView.extend({
       bus:            this.bus,
       dndCtrl:        this.dndCtrl,
       roomCollection: this.model._roomCollection,
+      keyboardControllerView: this.keyboardControllerView
     }));
   },
 
@@ -42,6 +50,7 @@ module.exports = Marionette.LayoutView.extend({
       model:   this.model,
       bus:     this.bus,
       dndCtrl: this.dndCtrl,
+      keyboardControllerView: this.keyboardControllerView
     }));
   },
 
@@ -97,6 +106,10 @@ module.exports = Marionette.LayoutView.extend({
       isMobile:                $('body').hasClass('mobile'),
     }));
 
+    this.keyboardControllerView = new KeyboardControllerView({
+      model: new KeyboardControllerModel(),
+      roomMenuModel: this.model,
+    });
 
     //Make a new drag & drop control
     this.dndCtrl = new DNDCtrl({ model: this.model });
@@ -158,6 +171,10 @@ module.exports = Marionette.LayoutView.extend({
     this.model.set('panelOpenState', false);
   },
 
+  onRender: function() {
+    toggleClass(this.ui.minibarInner[0], 'has-community-create', context.hasFeature('community-create'));
+  },
+
   onChildRender: function () {
     this._initNano();
   },
@@ -167,7 +184,12 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   _initNano: _.debounce(function () {
-    var params = { sliderMaxHeight: 100, iOSNativeScrolling: true };
+    var params = {
+      sliderMaxHeight: 100,
+      iOSNativeScrolling: true,
+      // We don't want the scroll container tabbable
+      tabIndex: 'null'
+    };
     fastdom.mutate(function() {
 
       //init panel && minibar scrollers
@@ -203,3 +225,8 @@ module.exports = Marionette.LayoutView.extend({
   },
 
 });
+
+
+cocktail.mixin(RoomMenuLayoutView, KeyboardEventMixin);
+
+module.exports = RoomMenuLayoutView;

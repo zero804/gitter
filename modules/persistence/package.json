@@ -11,5 +11,13 @@
   },
   "private": true,
   "dependencies": {
+    "bluebird": "^3.3.5",
+    "debug": "^2.2.0",
+    "gitter-web-env": "file:../env",
+    "gitter-web-mongoose-bluebird": "file:../mongoose-bluebird",
+    "lodash": "^3.2.0",
+    "mongoose": "^4.4.17",
+    "mongoose-number": "^0.1.1",
+    "node-mongodb-debug-log": "^0.1.2"
   }
 }
