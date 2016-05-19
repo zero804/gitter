@@ -18,6 +18,7 @@ exports.whereToNext = whereToNext;
 exports.redirectUserToDefaultTroupe = function(req, res, next) {
   return whereToNext(req.user)
     .then(function(url) {
+      url = url + '?preserveLeftMenuState=true';
       return res.relativeRedirect(url);
     })
     .catch(next);

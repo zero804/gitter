@@ -3,7 +3,7 @@
 
 var _                       = require('underscore');
 var urlJoin                 = require('url-join');
-var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
+var resolveRoomAvatarSrcSet = require('../avatars/resolve-room-avatar-srcset');
 var roomNameShortener       = require('../room-name-shortener');
 var parseRoomItemName       = require('../get-org-menu-state-name-from-troupe-name');
 

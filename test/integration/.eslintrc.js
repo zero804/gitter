@@ -8,5 +8,6 @@ module.exports = {
       "no-console": "warn",
       "strict": ["warn", "safe"],
       "max-nested-callbacks": ["error", 10]
-    }
+    },
+    
 };

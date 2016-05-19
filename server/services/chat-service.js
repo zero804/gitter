@@ -22,6 +22,8 @@ var chatSearchService    = require('./chat-search-service');
 var unreadItemService    = require('./unread-items');
 var markdownMajorVersion = require('gitter-markdown-processor').version.split('.')[0];
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
+var recentRoomService    = require("./recent-room-service");
+var mongoUtils           = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 var useHints = true;
 
@@ -158,6 +160,17 @@ exports.newChatMessageToTroupe = function(troupe, user, data) {
     if (user.hellbanned) return chatMessage;
     return chatMessage.save()
       .then(function() {
+        var lastAccessTime = mongoUtils.getDateFromObjectId(chatMessage._id);
+
+        recentRoomService.saveLastVisitedTroupeforUserId(user._id, troupe._id, {
+            lastAccessTime: lastAccessTime
+          })
+          .catch(function(err) {
+            errorReporter(err, { operation: 'unreadItemService.createChatUnreadItems', chat: chatMessage }, { module: 'chat-service' });
+          })
+          .done();
+
+
         // Async add unread items
         unreadItemService.createChatUnreadItems(user.id, troupe, chatMessage)
           .catch(function(err) {
@@ -496,6 +509,17 @@ exports.searchChatMessagesForRoom = function(troupeId, textQuery, options) {
     });
 
 };
+
+exports.removeAllMessagesForUserIdInRoomId = function(userId, roomId) {
+  return ChatMessage.find({ toTroupeId: roomId, fromUserId: userId })
+    .exec()
+    .then(function(messages) {
+      return Promise.map(messages, function(message) {
+        return message.remove();
+      }, { concurrency: 1 });
+    });
+};
+
 exports.testOnly = {
   setUseHints: function(value) {
     useHints = value;

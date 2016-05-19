@@ -57,11 +57,12 @@ module.exports =  Marionette.ItemView.extend({
   serializeData: function() {
     var data = this.model.toJSON();
     return _.extend({}, data, {
-      isHome:        (data.type === 'all'),
-      isSearch:      (data.type === 'search'),
-      isFavourite:   (data.type === 'favourite'),
-      isPeople:      (data.type === 'people'),
-      isOrg:         (data.type === 'org'),
+      isHome:            (data.type === 'all'),
+      isSearch:          (data.type === 'search'),
+      isFavourite:       (data.type === 'favourite'),
+      isPeople:          (data.type === 'people'),
+      isOrg:             (data.type === 'org'),
+      isCommunityCreate: (data.type === 'community-create'),
       hasUnreadIndicators: (data.type === 'people' || data.type === 'org'),
       avatarSrcset:  resolveRoomAvatar({ uri: data.name }, 23)
     });
@@ -71,9 +72,9 @@ module.exports =  Marionette.ItemView.extend({
     // Re-trigger the pulse animation
     // 16ms is a good 60-fps number to trigger on which Firefox needs (requestAnimationFrame doesn't work for this)
     Array.prototype.forEach.call(this.ui.unreadIndicator, function(unreadIndicatorElement) {
-    unreadIndicatorElement.style.animation = 'none';
+    unreadIndicatorElement.classList.remove('pulse-animation');
       setTimeout(function() {
-          unreadIndicatorElement.style.animation = '';
+          unreadIndicatorElement.classList.add('pulse-animation');
       }, 16);
     });
   },

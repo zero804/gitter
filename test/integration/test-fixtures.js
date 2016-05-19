@@ -108,21 +108,26 @@ function createExpectedFixtures(expected, done) {
 
     debug('Creating %s', fixtureName);
 
-    // A username of true means generate one
-    var username = f.username === true ? generateUsername() : f.username;
-    var confirmationCode = f.confirmationCode === true ? "confirm" + Math.random() : f.confirmationCode;
+    function possibleGenerate(key, fn) {
+      if (f.hasOwnProperty(key)) {
+        if (f[key] === true) {
+          return fn();
+        } else {
+          return f[key];
+        }
+      } else {
+        return fn()
+      }
+    }
 
     return persistence.User.create({
       identities:       f.identities,
-      email:            f.email       || generateEmail(),
-      displayName:      f.displayName || generateName(),
-      githubId:         f.githubId    || generateGithubId(),
-      githubToken:      f.githubToken || generateGithubToken(),
-      confirmationCode: confirmationCode,
-      username:         username      || generateUsername(),
-      status:           f.status      || 'ACTIVE',
-      staff:            f.staff       || false,
-      permissions:      f.permissions
+      displayName:      possibleGenerate('displayName', generateName),
+      githubId:         possibleGenerate('githubId', generateGithubId),
+      githubToken:      possibleGenerate('githubToken', generateGithubToken),
+      username:         possibleGenerate('username', generateUsername),
+      state:            f.state      || undefined,
+      staff:            f.staff      || false
     });
   }
 

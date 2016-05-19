@@ -14,7 +14,7 @@ describe("unread item end-to-end integration tests #slow", function() {
     user1: { username: true },
     user2: { username: true },
     user3: { username: true },
-    troupe1: { users: ['user1'], githubType: 'REPO', security: 'PUBLIC' },
+    troupe1: { users: ['user1'], githubType: 'REPO_CHANNEL', security: 'PUBLIC' },
     troupe2: { users: ['user1'], githubType: 'ORG_CHANNEL', security: 'PRIVATE' },
   }));
 

@@ -15,7 +15,7 @@ var userSearchService     = require('./user-search-service');
 var eventService          = require("./event-service");
 var roomService           = require('./room-service');
 var roomMembershipService = require('./room-membership-service');
-var BackendMuxer          = require('./backend-muxer');
+var BackendMuxer          = require('gitter-web-backend-muxer');
 var userScopes            = require('gitter-web-identity/lib/user-scopes');
 
 

@@ -1,12 +1,12 @@
 //TODO TEST THIS JP 10/2/16
 'use strict';
 
-var Marionette  = require('backbone.marionette');
-var _           = require('underscore');
-var cocktail    = require('cocktail');
+var Marionette         = require('backbone.marionette');
+var _                  = require('underscore');
+var cocktail           = require('cocktail');
 var KeyboardEventMixin = require('views/keyboard-events-mixin');
-var template    = require('./search-input-view.hbs');
-var toggleClass = require('utils/toggle-class');
+var template           = require('./search-input-view.hbs');
+var toggleClass        = require('utils/toggle-class');
 
 var SearchInputView = Marionette.ItemView.extend({
 
@@ -35,7 +35,6 @@ var SearchInputView = Marionette.ItemView.extend({
 
   initialize: function(attrs) {
     this.bus = attrs.bus;
-    this.onModelChangeState(this.model, this.model.get('state'));
     this.listenTo(this.bus, 'left-menu:recent-search', this.onRecentSearchUpdate, this);
   },
 
@@ -48,7 +47,7 @@ var SearchInputView = Marionette.ItemView.extend({
     //JP 10/2/16
     toggleClass(this.el, 'empty', !val);
     this.model.set('searchTerm', val);
-  }, 100),
+  }, 500),
 
   onModelChangeState: function (model, val){ //jshint unused: true
     toggleClass(this.el, 'active', val === 'search');
@@ -57,6 +56,10 @@ var SearchInputView = Marionette.ItemView.extend({
     if(model.get('activationSourceType') !== 'keyboard') {
       this.focusSearchInput();
     }
+  },
+
+  onRender: function (){
+    this.onModelChangeState(this.model, this.model.get('state'));
   },
 
   onModelChangeSearchTerm: function(model, val) { //jshint unused: true
@@ -78,7 +81,15 @@ var SearchInputView = Marionette.ItemView.extend({
     //We need to check if the ui elements have been bound
     //as this is a string before it is bounce we can't check [0] || .length
     //so we will check for the find function JP 15/3/16
-    if(state === 'search' && this.ui.input.find) { this.ui.input.focus(); }
+    if(state === 'search') {
+      //This REALLY sucks but we need to avoid any debouncing affect
+      //caused by the keyboard controller and its desire to blur the current element
+      //sshould get fixed with https://github.com/troupe/gitter-webapp/pull/1503
+      //JP 18/5/16
+      setTimeout(function(){
+        this.ui.input.focus();
+      }.bind(this), 300);
+    }
   }
 
 });

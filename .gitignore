@@ -93,3 +93,6 @@ node_modules_old
 config.dev.user-overrides.json
 node_modules_linux
 .sonar
+.eslintcache
+scripts/graphs/*.dot
+scripts/graphs/*.gephi

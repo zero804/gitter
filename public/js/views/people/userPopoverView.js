@@ -27,7 +27,7 @@ module.exports = (function() {
   var UserPopoverFooterView = Marionette.ItemView.extend({
     template: footerTemplate,
     modelEvents: {
-        'change': 'render',
+      change: 'render',
     },
     events: {
       'click #button-onetoone': function() {
@@ -49,7 +49,8 @@ module.exports = (function() {
     serializeData: function() {
       var data = this.model.toJSON();
       var isntSelf = data.username !== context.user().get('username');
-      var chatPrivately = data.has_gitter_login && isntSelf;
+      var inactive = data.invited || data.removed;
+      var chatPrivately = data.has_gitter_login && isntSelf && !inactive;
       var mentionable = isntSelf;
       var removable = isntSelf && context.isTroupeAdmin();
 
@@ -74,20 +75,19 @@ module.exports = (function() {
     initialize: function(options) {
       options.placement = 'horizontal';
       options.minHeight = '88px';
-      var username, displayName;
 
+      var m;
       if (this.model) {
-        username = this.model.get('username');
-        displayName = this.model.get('displayName'); // leave those in, optimistic loading.
+        m = this.model.toJSON();
       } else {
-        username = options.username;
-        displayName = options.displayName; // leave those in, optimistic loading.
+        m = {
+          username: options.username,
+          displayName: options.displayName
+        }
       }
 
-      var ghModel = new Backbone.Model({
-        username: username,
-        displayName: displayName
-      });
+      var username = m.username;
+      var ghModel = new Backbone.Model(m);
       ghModel.sync = SyncMixin.sync; // XXX This is less than ideal
       ghModel.url = '/v1/users/' + username;
       ghModel.fetch(function() {
