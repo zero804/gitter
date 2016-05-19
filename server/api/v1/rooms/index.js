@@ -14,8 +14,8 @@ function searchRooms(req) {
   var user = req.user;
 
   var options = {
-    limit: req.query.limit || 10,
-    skip: req.query.skip
+    limit: parseInt(req.query.limit, 10) || 10,
+    skip: parseInt(req.query.skip, 10)
   };
 
   var userId = user && user.id;
