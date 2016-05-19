@@ -8,19 +8,24 @@ var SecondaryCollectionItemView = require('./secondary-collection-item-view');
 
 var clientEnv = require('gitter-client-env');
 
+require('views/behaviors/highlight');
+
 module.exports = SecondaryCollectionItemView.extend({
+  behaviors: {
+      Highlight: {},
+  },
   className: 'room-item--search-message',
   triggers: {
-    'click': 'item:activated',
+    click: 'item:activated',
   },
   template: searchTemplate,
   serializeData: function() {
     var data = this.model.toJSON();
 
     var permalink;
-    if(this.roomMenuModel) {
+    if (this.roomMenuModel) {
       var troupeModel = this.roomMenuModel.get('troupeModel');
-      if(troupeModel) {
+      if (troupeModel) {
         var roomUri = troupeModel.get('uri');
         permalink = urlJoin(clientEnv.basePath, roomUri, '?at=' + data.id);
       }

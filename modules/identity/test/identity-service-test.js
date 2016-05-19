@@ -7,50 +7,104 @@ var assert = require('assert');
 describe('identityService', function() {
   var fixture = {};
   before(fixtureLoader(fixture, {
-    user1: {},
+    user1: {
+      githubId: null,
+      githubToken: null,
+    },
+    user2: {
+      githubId: true,
+      githubToken: true
+    },
     identity1: {
       user: 'user1',
       provider: 'google',
       providerKey: 'google-identity'
-    },
+    }
   }));
 
   after(function() {
     fixture.cleanup();
   });
 
-  it('returns the identities', function() {
-    return identityService.findForUser(fixture.user1)
-      .then(function(identities) {
-        assert.equal(identities.length, 1);
-      })
+  describe('listProvidersForUser', function() {
+    it('works for non github users', function() {
+      return identityService.listProvidersForUser(fixture.user1)
+        .then(function(providers) {
+          assert.deepEqual(providers, ['google']);
+        });
+    });
+
+    it('works for github users', function() {
+      return identityService.listProvidersForUser(fixture.user2)
+        .then(function(providers) {
+          assert.deepEqual(providers, ['github']);
+        });
+    });
   });
 
-  it('returns the cached identities', function() {
-    var identities1;
-    return identityService.findForUser(fixture.user1)
-      .then(function(identities) {
-        identities1 = identities;
-        return identityService.findForUser(fixture.user1)
-      })
-      .then(function(identities2) {
-        assert.equal(identities2, identities1);
-      })
-  });
+  describe('listForUser', function() {
 
-  it('returns a provider for GitHub users', function() {
-    return identityService.listProvidersForUser({ username: 'githubuser' })
-      .then(function(providers) {
-        assert.strictEqual(providers.length, 1);
-        assert.strictEqual(providers[0], 'github');
+      describe('non-github users', function() {
+        it('returns the identities', function() {
+          return identityService.listForUser(fixture.user1)
+            .then(function(identities) {
+              assert.deepEqual(identities, [{
+                provider: "google",
+                providerKey: "google-identity"
+              }]);
+            })
+        });
+
+        it('returns the cached identities', function() {
+          var identities1;
+          return identityService.listForUser(fixture.user1)
+            .then(function(identities) {
+              identities1 = identities;
+              return identityService.listForUser(fixture.user1)
+            })
+            .then(function(identities2) {
+              assert.equal(identities2, identities1);
+            })
+        });
       });
-  });
 
-  it('returns a provider for Google users', function() {
-    return identityService.listProvidersForUser(fixture.user1)
-      .then(function(providers) {
-        assert.strictEqual(providers.length, 1);
-        assert.strictEqual(providers[0], 'google');
+      describe('github users', function() {
+        it('returns the identities', function() {
+          var user = fixture.user2;
+          return identityService.listForUser(user)
+            .then(function(identities) {
+              assert.deepEqual(identities, [{
+                provider: "github",
+                providerKey: user.githubId,
+                username: user.username,
+                displayName: user.displayName,
+                email: null,
+                accessToken: user.githubUserToken,
+                refreshToken: null,
+                accessTokenSecret: null,
+                upgradedAccessToken: user.githubToken,
+                scopes: user.githubScopes,
+                avatar: user.gravatarImageUrl
+              }]);
+            })
+        });
+
+        it('returns the cached identities', function() {
+          var identities1;
+          return identityService.listForUser(fixture.user2)
+            .then(function(identities) {
+              identities1 = identities;
+              return identityService.listForUser(fixture.user2)
+            })
+            .then(function(identities2) {
+              assert.deepEqual(identities2, identities1);
+            })
+        });
+
       });
-  });
+
+  })
+
+
+
 });

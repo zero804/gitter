@@ -164,28 +164,35 @@ UserProvidersStrategy.prototype = {
 function UserStrategy(options) {
   options = options ? options : {};
   var lean = !!options.lean;
-  var userRoleInTroupeStrategy = options.includeRolesForTroupeId || options.includeRolesForTroupe ? new UserRoleInTroupeStrategy(options) : null;
-  var userPresenceInTroupeStrategy = options.showPresenceForTroupeId ? new UserPresenceInTroupeStrategy(options.showPresenceForTroupeId) : null;
-  var userPremiumStatusStrategy = options.showPremiumStatus ? new UserPremiumStatusStrategy() : null;
-  var userProvidersStrategy = options.includeProviders ? new UserProvidersStrategy() : null;
+
+  var userRoleInTroupeStrategy;
+  var userPresenceInTroupeStrategy;
+  var userPremiumStatusStrategy;
+  var userProvidersStrategy;
 
   this.preload = function(users) {
+    if (users.isEmpty()) return;
+
     var strategies = [];
 
-    if (userRoleInTroupeStrategy) {
+    if (options.includeRolesForTroupeId || options.includeRolesForTroupe) {
+      userRoleInTroupeStrategy = new UserRoleInTroupeStrategy(options);
       strategies.push(userRoleInTroupeStrategy.preload());
     }
 
-    if (userPresenceInTroupeStrategy) {
+    if (options.showPresenceForTroupeId) {
+      userPresenceInTroupeStrategy = new UserPresenceInTroupeStrategy(options.showPresenceForTroupeId)
       strategies.push(userPresenceInTroupeStrategy.preload());
     }
 
-    if (userPremiumStatusStrategy) {
+    if (options.showPremiumStatus) {
       var userIds = users.map(function(user) { return user.id; });
+      userPremiumStatusStrategy = new UserPremiumStatusStrategy();
       strategies.push(userPremiumStatusStrategy.preload(userIds));
     }
 
-    if (userProvidersStrategy) {
+    if (options.includeProviders) {
+      userProvidersStrategy = new UserProvidersStrategy();
       strategies.push(userProvidersStrategy.preload(users));
     }
 

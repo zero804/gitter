@@ -24,8 +24,6 @@
 </head>
 <body class="logged-out">
 
-  {{> staging_marker}}
-
   <div class="app-layout">
     <div class="nli-menu__logo">
       {{> logo_man}}
@@ -45,8 +43,8 @@
 
       <dl class="nli-menu__features">
 
-        <dd>Join over <strong>230k developers</strong></dd>
-        <dd>Join over <strong>35k communities</strong></dd>
+        <dd>Join over <strong>400k developers</strong></dd>
+        <dd>Join over <strong>40k communities</strong></dd>
         <dd>Discuss <strong>projects &amp; code</strong></dd>
         <dd>Create <strong>your own community</strong></dd>
         <dd>Deeply integrated <strong>with GitHub</strong></dd>
@@ -76,6 +74,9 @@
       <iframe id="content-frame" src="{{chatAppLocation}}" style="display: block; width: 100%; height: 100%; border: 0;" frameBorder="0"></iframe>
     </div>
   </div>
+
+  {{> staging_marker}}
+
 
   {{{ generateTroupeContext troupeContext }}}
 

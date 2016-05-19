@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 'use strict';
 
 var express  = require('express');
@@ -16,7 +17,7 @@ function wrapStream(stream) {
   var lineCount = 0;
   stream.on('data', function() {
     lineCount++;
-    if (lineCount % 1000 == 0) {
+    if (lineCount % 1000 === 0) {
       console.log(lineCount);
     }
   });

@@ -3,7 +3,6 @@
 var mongoose = require('gitter-web-mongoose-bluebird');
 var Schema   = mongoose.Schema;
 var ObjectId = Schema.ObjectId;
-var assert   = require('assert');
 var installVersionIncMiddleware = require('../install-version-inc-middleware');
 
 var ProviderKeySchema = new Schema({
@@ -21,7 +20,6 @@ var UserSchema = new Schema({
   invitedByUser: ObjectId,
   invitedToRoom: ObjectId,
   username: { type: String, required: true },
-  confirmationCode: {type: String },
   gravatarImageUrl: { type: String },
   gravatarVersion: { type: String },
   lastTroupe: ObjectId,
@@ -42,7 +40,7 @@ var UserSchema = new Schema({
   },
   defaultFlags: { type: Number }, // Default flags for room membership
   _tv: { type: 'MongooseNumber', 'default': 0 }
-});
+}, { strict: 'throw' });
 
 UserSchema.index({ githubId: 1 }, { unique: true, sparse: true }); // TODO: does this still need to be sparse?
 UserSchema.index({'identities.provider': 1, 'identities.providerKey': 1}, { unique: true, sparse: true });

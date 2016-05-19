@@ -42,6 +42,8 @@ module.exports = BaseCollectionItemView.extend({
   },
 
   initialize: function() {
+    BaseCollectionItemView.prototype.initialize.apply(this, arguments);
+
     this.uiModel = new Backbone.Model({ menuIsOpen: false });
     this.listenTo(this.uiModel, 'change:menuIsOpen', this.onModelToggleMenu, this);
     this.listenTo(this.roomMenuModel, 'change:state:post', this.onMenuChangeState, this);
@@ -138,6 +140,23 @@ module.exports = BaseCollectionItemView.extend({
     if (!Object.keys(this.model.changed)) { return; }
 
     BaseCollectionItemView.prototype.render.apply(this, arguments);
+  },
+
+  onRender: function (){
+    BaseCollectionItemView.prototype.onRender.apply(this, arguments);
+    //The favourite item view overrides this function so here we can be 100%
+    //sure this only runs for a primary item, as such we can just remove any favourite styles
+    //here jp 17/5/16
+    this.el.classList.remove('room-item--favourite');
+    this.el.classList.remove('room-item--favourite-one2one');
+
+    if (this.model.get('oneToOne')) {
+      this.el.classList.add('room-item--one2one');
+    }
+    else {
+      this.el.classList.add('room-item');
+    }
+
   },
 
   onDestroy: function() {

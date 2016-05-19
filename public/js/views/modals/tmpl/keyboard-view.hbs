@@ -32,18 +32,37 @@
         <td><code>{{cmdKey}}</code> + <code>{{gitterKey}}</code> + <code>k</code></td>
         <td>Show keyboard shortcuts</td>
       </tr>
-      <tr>
-        <td><code>{{cmdKey}}</code> + <code>{{roomKey}}</code> + <code>↓</code> or <code>↑</code></td>
-        <td>Navigate up and down the left menu</td>
-      </tr>
-      <tr>
-        <td><code>{{cmdKey}}</code> + <code>{{roomKey}}</code> + <code>Enter</code></td>
-        <td>Go to the selected conversation</td>
-      </tr>
-      <tr>
-        <td><code>{{cmdKey}}</code> + <code>{{roomKey}}</code> + <code>1</code>...<code>0</code></td>
-        <td>Open conversation in numbered position</td>
-      </tr>
+      {{#if hasLeftMenuFeature}}
+        <tr>
+          <td>{{#if shouldShowRoom2Keys}}<code>{{room2Key}}</code>{{else}}<code>{{cmdKey}}</code>{{/if}} + <code>{{roomKey}}</code> + <code>↓ ↑</code></td>
+          <td>Navigate up and down the left menu</td>
+        </tr>
+        <tr>
+          <td>{{#if shouldShowRoom2Keys}}<code>{{room2Key}}</code>{{else}}<code>{{cmdKey}}</code>{{/if}} + <code>{{roomKey}}</code> + <code>← →</code></td>
+          <td>Navigate between the menu bar and conversation list in the left menu</td>
+        </tr>
+        <tr>
+          <td>{{#if shouldShowRoom2Keys}}<code>{{room2Key}}</code>{{else}}<code>{{cmdKey}}</code>{{/if}} + <code>{{roomKey}}</code> + <code>Enter</code></td>
+          <td>Go to the selected room</td>
+        </tr>
+        <tr>
+          <td>{{#if shouldShowRoom2Keys}}<code>{{room2Key}}</code>{{else}}<code>{{cmdKey}}</code>{{/if}} + <code>{{roomKey}}</code> + <code>1</code>...<code>0</code></td>
+          <td>Open item at numbered position in the menu bar</td>
+        </tr>
+      {{else}}
+        <tr>
+          <td><code>{{cmdKey}}</code> + <code>{{roomKey}}</code> + <code>↓</code> or <code>↑</code></td>
+          <td>Navigate up and down the left menu</td>
+        </tr>
+        <tr>
+          <td><code>{{cmdKey}}</code> + <code>{{roomKey}}</code> + <code>Enter</code></td>
+          <td>Go to the selected conversation</td>
+        </tr>
+        <tr>
+          <td><code>{{cmdKey}}</code> + <code>{{roomKey}}</code> + <code>1</code>...<code>0</code></td>
+          <td>Open conversation in numbered position</td>
+        </tr>
+      {{/if}}
       <tr>
         <td colspan="2">
           <h2>Chat mode shortcuts</h2>
