@@ -1,7 +1,7 @@
 /* eslint complexity: ["error", 13] */
 'use strict';
 
-var _                       = require('lodash');
+var _                       = require('underscore');
 var resolveRoomAvatarSrcSet = require('../avatars/resolve-room-avatar-srcset.js');
 var getOrgNameFromUri       = require('../get-org-name-from-uri');
 var defaultFilter           = require('../filters/left-menu-primary-default');
@@ -43,9 +43,12 @@ module.exports = function suggestedOrgsFromRoomList(roomList, uri, currentRoomId
 
   //If we are viewing a room owned by an org which the user is not yet a member of
   //we shunt the new org to the top of the minibar list JP 8/3/16
-  var currentOrg = getOrgNameFromUri(uri);
+  var currentOrg     = getOrgNameFromUri(uri);
+  var roomIsOneToOne = (!!currentRoom && !!currentRoom.get) ?
+    currentRoom.get('oneToOne') :
+    !!currentRoom && currentRoom.oneToOne;
 
-  if(currentRoom && !currentRoom.oneToOne) {
+  if(currentRoomId && !roomIsOneToOne) {
     var hasCurrentOrg = _.findWhere(orgList, { name: currentOrg });
     //If we are sure that you are viewing an room for an org you have yet to join then
     //we add a temporary org to your org list

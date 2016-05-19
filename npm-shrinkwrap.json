@@ -79,9 +79,9 @@
           "resolved": "http://beta-internal:4873/bytes/-/bytes-2.3.0.tgz"
         },
         "content-type": {
-          "version": "1.0.1",
+          "version": "1.0.2",
           "from": "content-type@>=1.0.1 <1.1.0",
-          "resolved": "http://beta-internal:4873/content-type/-/content-type-1.0.1.tgz"
+          "resolved": "http://beta-internal:4873/content-type/-/content-type-1.0.2.tgz"
         },
         "depd": {
           "version": "1.1.0",
@@ -375,7 +375,7 @@
       "dependencies": {
         "debug": {
           "version": "1.0.4",
-          "from": "debug@>=1.0.2 <2.0.0",
+          "from": "debug@>=1.0.4 <2.0.0",
           "resolved": "http://beta-internal:4873/debug/-/debug-1.0.4.tgz",
           "dependencies": {
             "ms": {
@@ -580,7 +580,7 @@
         "ms": {
           "version": "0.7.1",
           "from": "ms@0.7.1",
-          "resolved": "http://beta-internal:4873/ms/-/ms-0.7.1.tgz"
+          "resolved": "https://registry.npmjs.org/ms/-/ms-0.7.1.tgz"
         }
       }
     },
@@ -761,9 +761,9 @@
           "resolved": "http://beta-internal:4873/content-disposition/-/content-disposition-0.5.1.tgz"
         },
         "content-type": {
-          "version": "1.0.1",
+          "version": "1.0.2",
           "from": "content-type@>=1.0.1 <1.1.0",
-          "resolved": "http://beta-internal:4873/content-type/-/content-type-1.0.1.tgz"
+          "resolved": "http://beta-internal:4873/content-type/-/content-type-1.0.2.tgz"
         },
         "cookie": {
           "version": "0.1.5",
@@ -896,7 +896,7 @@
             "ms": {
               "version": "0.7.1",
               "from": "ms@0.7.1",
-              "resolved": "http://beta-internal:4873/ms/-/ms-0.7.1.tgz"
+              "resolved": "https://registry.npmjs.org/ms/-/ms-0.7.1.tgz"
             },
             "statuses": {
               "version": "1.2.1",
@@ -937,7 +937,7 @@
         "utils-merge": {
           "version": "1.0.0",
           "from": "utils-merge@1.0.0",
-          "resolved": "https://registry.npmjs.org/utils-merge/-/utils-merge-1.0.0.tgz"
+          "resolved": "http://beta-internal:4873/utils-merge/-/utils-merge-1.0.0.tgz"
         },
         "vary": {
           "version": "1.0.1",
@@ -1570,7 +1570,7 @@
                 "utils-merge": {
                   "version": "1.0.0",
                   "from": "utils-merge@>=1.0.0 <2.0.0",
-                  "resolved": "https://registry.npmjs.org/utils-merge/-/utils-merge-1.0.0.tgz"
+                  "resolved": "http://beta-internal:4873/utils-merge/-/utils-merge-1.0.0.tgz"
                 }
               }
             }
@@ -1710,9 +1710,9 @@
       }
     },
     "gitter-services": {
-      "version": "1.17.0",
-      "from": "git+https://github.com/gitterHQ/services.git#1.17.0",
-      "resolved": "git+https://github.com/gitterHQ/services.git#eac2aa23433cdf73c2fddc8ca63033f23dce70e0",
+      "version": "1.17.1",
+      "from": "git+https://github.com/gitterHQ/services.git#1.17.1",
+      "resolved": "git+https://github.com/gitterHQ/services.git#fa9d0d9c741b800e9908145105dd6eb36a2aac2b",
       "dependencies": {
         "require-all": {
           "version": "0.0.8",
@@ -1735,6 +1735,11 @@
       "version": "1.0.0",
       "from": "modules/appevents",
       "resolved": "file:modules/appevents"
+    },
+    "gitter-web-backend-muxer": {
+      "version": "1.0.0",
+      "from": "modules/backend-muxer",
+      "resolved": "file:modules/backend-muxer"
     },
     "gitter-web-cache-wrapper": {
       "version": "1.0.0",
@@ -2667,7 +2672,7 @@
         "ms": {
           "version": "0.7.1",
           "from": "ms@0.7.1",
-          "resolved": "http://beta-internal:4873/ms/-/ms-0.7.1.tgz"
+          "resolved": "https://registry.npmjs.org/ms/-/ms-0.7.1.tgz"
         },
         "muri": {
           "version": "1.1.0",
@@ -2760,15 +2765,15 @@
           "from": "extend@>=3.0.0 <4.0.0",
           "resolved": "https://registry.npmjs.org/extend/-/extend-3.0.0.tgz"
         },
-        "isarray": {
-          "version": "1.0.0",
-          "from": "isarray@>=1.0.0 <1.1.0",
-          "resolved": "https://registry.npmjs.org/isarray/-/isarray-1.0.0.tgz"
-        },
         "inherits": {
           "version": "2.0.1",
           "from": "inherits@>=2.0.1 <2.1.0",
           "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz"
+        },
+        "isarray": {
+          "version": "1.0.0",
+          "from": "isarray@>=1.0.0 <1.1.0",
+          "resolved": "https://registry.npmjs.org/isarray/-/isarray-1.0.0.tgz"
         },
         "ms": {
           "version": "0.7.1",
@@ -2842,14 +2847,14 @@
       "resolved": "http://beta-internal:4873/nodemailer/-/nodemailer-0.3.14.tgz",
       "dependencies": {
         "mailcomposer": {
-          "version": "3.8.0",
+          "version": "3.9.0",
           "from": "mailcomposer@>=0.1.11",
-          "resolved": "http://beta-internal:4873/mailcomposer/-/mailcomposer-3.8.0.tgz",
+          "resolved": "http://beta-internal:4873/mailcomposer/-/mailcomposer-3.9.0.tgz",
           "dependencies": {
             "buildmail": {
-              "version": "3.6.0",
-              "from": "buildmail@3.6.0",
-              "resolved": "http://beta-internal:4873/buildmail/-/buildmail-3.6.0.tgz",
+              "version": "3.7.0",
+              "from": "buildmail@3.7.0",
+              "resolved": "http://beta-internal:4873/buildmail/-/buildmail-3.7.0.tgz",
               "dependencies": {
                 "addressparser": {
                   "version": "1.0.1",
@@ -2867,14 +2872,14 @@
                   "resolved": "http://beta-internal:4873/libqp/-/libqp-1.1.0.tgz"
                 },
                 "nodemailer-fetch": {
-                  "version": "1.3.0",
-                  "from": "nodemailer-fetch@1.3.0",
-                  "resolved": "http://beta-internal:4873/nodemailer-fetch/-/nodemailer-fetch-1.3.0.tgz"
+                  "version": "1.4.0",
+                  "from": "nodemailer-fetch@1.4.0",
+                  "resolved": "http://beta-internal:4873/nodemailer-fetch/-/nodemailer-fetch-1.4.0.tgz"
                 },
                 "nodemailer-shared": {
-                  "version": "1.0.4",
-                  "from": "nodemailer-shared@1.0.4",
-                  "resolved": "http://beta-internal:4873/nodemailer-shared/-/nodemailer-shared-1.0.4.tgz"
+                  "version": "1.0.5",
+                  "from": "nodemailer-shared@1.0.5",
+                  "resolved": "http://beta-internal:4873/nodemailer-shared/-/nodemailer-shared-1.0.5.tgz"
                 }
               }
             },
@@ -2934,7 +2939,7 @@
         "utils-merge": {
           "version": "1.0.0",
           "from": "utils-merge@>=1.0.0 <2.0.0",
-          "resolved": "https://registry.npmjs.org/utils-merge/-/utils-merge-1.0.0.tgz"
+          "resolved": "http://beta-internal:4873/utils-merge/-/utils-merge-1.0.0.tgz"
         },
         "debug": {
           "version": "0.7.4",
@@ -3277,7 +3282,7 @@
             "utils-merge": {
               "version": "1.0.0",
               "from": "utils-merge@>=1.0.0 <2.0.0",
-              "resolved": "https://registry.npmjs.org/utils-merge/-/utils-merge-1.0.0.tgz"
+              "resolved": "http://beta-internal:4873/utils-merge/-/utils-merge-1.0.0.tgz"
             }
           }
         },
@@ -3880,7 +3885,7 @@
         "ms": {
           "version": "0.7.1",
           "from": "ms@0.7.1",
-          "resolved": "http://beta-internal:4873/ms/-/ms-0.7.1.tgz"
+          "resolved": "https://registry.npmjs.org/ms/-/ms-0.7.1.tgz"
         },
         "parseurl": {
           "version": "1.3.1",
@@ -3896,7 +3901,7 @@
       "dependencies": {
         "debug": {
           "version": "1.0.4",
-          "from": "debug@>=1.0.2 <2.0.0",
+          "from": "debug@>=1.0.4 <2.0.0",
           "resolved": "http://beta-internal:4873/debug/-/debug-1.0.4.tgz",
           "dependencies": {
             "ms": {
@@ -3943,6 +3948,7 @@
     "tentacles": {
       "version": "0.3.2",
       "from": "tentacles@>=0.3.2 <0.4.0",
+      "resolved": "http://beta-internal:4873/tentacles/-/tentacles-0.3.2.tgz",
       "dependencies": {
         "create-error": {
           "version": "0.3.1",
@@ -4717,7 +4723,7 @@
     "underscore": {
       "version": "1.8.3",
       "from": "underscore@>=1.8.3 <2.0.0",
-      "resolved": "http://beta-internal:4873/underscore/-/underscore-1.8.3.tgz"
+      "resolved": "https://registry.npmjs.org/underscore/-/underscore-1.8.3.tgz"
     },
     "url-join": {
       "version": "0.0.1",
@@ -5231,7 +5237,7 @@
                           "dependencies": {
                             "spdx-license-ids": {
                               "version": "1.2.1",
-                              "from": "spdx-license-ids@>=1.0.0 <2.0.0",
+                              "from": "spdx-license-ids@>=1.0.2 <2.0.0",
                               "resolved": "http://beta-internal:4873/spdx-license-ids/-/spdx-license-ids-1.2.1.tgz"
                             }
                           }

@@ -78,12 +78,12 @@ var UnreadItemStore = function() {
   this._lurkMode = false;
   this._items = {};
   this._read = new DeletePit();
+  this.state = 'LOADING';
 
   this.notifyCountLimited = limit(this.notifyCount, this, 30);
 };
 
 _.extend(UnreadItemStore.prototype, Backbone.Events, {
-  state: 'LOADING',
 
   /**
    * Returns `true` if the result changes the state of the store
@@ -224,6 +224,10 @@ _.extend(UnreadItemStore.prototype, Backbone.Events, {
       if (this._items[itemId]) accum.push(itemId);
       return accum;
     }.bind(this), []);
+  },
+
+  getLurkMode: function() {
+    return this._lurkMode;
   },
 
   enableLurkMode: function() {

@@ -7,6 +7,8 @@ var restful = require('../../server/services/restful');
 var fixture = {};
 
 makeBenchmark({
+  maxTime: 3,
+  initCount: 100,
   before: function(done) {
     var fixtureDescription = {
       troupe1: { users: [] },
