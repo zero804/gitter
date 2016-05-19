@@ -7,6 +7,7 @@ var stats              = env.stats;
 var errorReporter      = env.errorReporter;
 
 var appEvents                  = require('gitter-web-appevents');
+var assert                     = require('assert');
 var Promise                    = require('bluebird');
 var request                    = require('request');
 var _                          = require('lodash');
@@ -43,7 +44,7 @@ var badgerEnabled              = nconf.get('autoPullRequest:enabled');
 var uriResolver                = require('./uri-resolver');
 var getOrgNameFromTroupeName   = require('gitter-web-shared/get-org-name-from-troupe-name');
 var userScopes                 = require('gitter-web-identity/lib/user-scopes');
-
+var groupService               = require('gitter-web-groups/lib/group-service');
 var splitsvilleEnabled = nconf.get("project-splitsville:enabled");
 
 /**
@@ -166,6 +167,38 @@ function doPostGitHubRoomCreationTasks(troupe, user, githubType, security, optio
 
 }
 
+function getOwnerFromRepoFullName(repoName) {
+  assert(repoName, 'repoName required');
+  var owner = repoName.split('/')[0];
+  return owner;
+}
+/**
+ * During communities API migration phase, finds or creates a room for the
+ * given uri.
+ */
+function ensureGroupForGitHubRoom(user, githubType, uri) {
+  var owner;
+  switch (githubType) {
+    case 'REPO':
+      owner = getOwnerFromRepoFullName(uri);
+      break;
+    case 'ORG':
+      owner = uri;
+      break;
+    default:
+      throw new StatusError(400, 'Cannot create a group for ' + githubType);
+  }
+
+  return groupService.migration.ensureGroup(user, {
+      uri: owner
+    })
+}
+
+function doPostRoomCreationMigrationSteps(troupe) {
+  // create security permissions
+  var descriptor = legacyMigration.generatePermissionsForRoom(troupe, null, null);
+  return securityDescriptorService.insertForRoom(troupe._id, descriptor);
+}
 /**
  * Assuming that oneToOne uris have been handled already,
  * Figure out what this troupe is for
@@ -239,7 +272,7 @@ function createRoomForGitHubUri(user, uri, options) {
             });
         })
         .tap(function(upsertResult) {
-          /* Next stage - create security permissions */
+          /* Next stage - post creation migration */
           var troupe = this.troupe = upsertResult[0];
           var updateExisting = this.updateExisting = upsertResult[1];
 
@@ -247,14 +280,13 @@ function createRoomForGitHubUri(user, uri, options) {
 
           if (updateExisting) return;
 
-          var descriptor = legacyMigration.generatePermissionsForRoom(troupe, null, null);
-          return securityDescriptorService.insertForRoom(troupe._id, descriptor);
+          return doPostRoomCreationMigrationSteps(troupe);
         })
         .tap(function() {
+          /* Next stage - possible rename */
           var troupe = this.troupe;
           var updateExisting = this.updateExisting;
 
-          /* Next stage - possible rename */
           // New room? Skip this step
           if (!updateExisting) return;
 

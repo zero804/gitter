@@ -10,8 +10,21 @@ var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
 var validateUri = require('gitter-web-github').GitHubUriValidator;
 var debug = require('debug')('gitter:groups:group-service');
 
+/**
+ * Find a group given an id
+ */
 function findById(groupId) {
   return Group.findById(groupId)
+    .lean()
+    .exec();
+}
+
+/**
+ * Find a group given a URI
+ */
+function findByUri(uri) {
+  assert(uri, 'uri required');
+  return Group.findOne({ lcUri: uri.toLowerCase() })
     .lean()
     .exec();
 }
@@ -43,6 +56,7 @@ function createGroup(user, options) {
       if (!githubInfo) throw new StatusError(404);
       var githubType = githubInfo.type;
       var officialUri = githubInfo.uri;
+
       if (githubType !== 'ORG') throw new StatusError(400, 'Can only create groups for ORGs right now');
 
       this.githubInfo = githubInfo;
@@ -75,7 +89,51 @@ function createGroup(user, options) {
     });
 }
 
+function canUserAdminGroup(user, group) {
+  return policyFactory.createPolicyForGroup(user, group)
+    .then(function(policy) {
+      return policy.canAdmin();
+    });
+}
+
+/**
+ * During the migration only
+ *
+ * Ensures that a group exists
+ */
+function ensureGroupForGitHubRoomCreation(user, options) {
+  var uri = options.uri;
+  var name = options.name || uri;
+  assert(user, 'user required');
+  assert(uri, 'name required');
+
+  return findByUri(uri)
+    .then(function(existingGroup) {
+      debug('Existing group found');
+
+      if (existingGroup) {
+        return canUserAdminGroup(user, existingGroup)
+          .then(function(adminAccess) {
+            debug('Has admin access? %s', adminAccess);
+
+            if (!adminAccess) throw new StatusError(403, 'Cannot create a room under ' + uri);
+            return existingGroup;
+          });
+      }
+
+      debug('No existing group. Will create');
+      return createGroup(user, {
+        uri: uri,
+        name: name
+      });
+    });
+}
+
 module.exports = {
+  findByUri: Promise.method(findByUri),
   findById: Promise.method(findById),
-  createGroup: Promise.method(createGroup)
+  createGroup: Promise.method(createGroup),
+  migration: {
+    ensureGroupForGitHubRoomCreation: ensureGroupForGitHubRoomCreation
+  }
 };
