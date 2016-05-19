@@ -17,7 +17,7 @@ var mongoUtils                   = require('gitter-web-persistence-utils/lib/mon
 var emailNotificationService     = require('../email-notification-service');
 var userSettingsService          = require('../user-settings-service');
 var debug                        = require('debug')('gitter:email-notification-generator-service');
-var userScopes                   = require('../../utils/models/user-scopes');
+var userScopes                   = require('gitter-web-identity/lib/user-scopes');
 
 var filterTestValues = config.get('notifications:filterTestValues');
 
@@ -152,7 +152,15 @@ function sendEmailNotifications(since) {
 
       /* Remove anyone that we don't have a token for */
       users = users.filter(function(user) {
-        return userScopes.hasGitHubScope(user, 'user:email');
+        // Using isGitHubUser is bad, but loading the user's identities just to be
+        // able to call into the exact right backend is really slow for this
+        // use case. The right way is to use the backend muxer.
+        if (userScopes.isGitHubUser(user)) {
+          return userScopes.hasGitHubScope(user, 'user:email');
+        } else {
+          // NOTE: some twitter accounts might not actually have an email address
+          return true;
+        }
       });
 
       userIds = users.map(function(user) { return user.id; });
@@ -230,8 +238,7 @@ function sendEmailNotifications(since) {
                     if(err.gitterAction === 'logout_destroy_user_tokens') {
                       stats.event('logout_destroy_user_tokens', { userId: user.id });
 
-                      user.destroyTokens();
-                      return user.save();
+                      userService.destroyTokensForUserId(user.id);
                     }
                   });
 

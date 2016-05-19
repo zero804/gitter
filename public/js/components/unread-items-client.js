@@ -8,6 +8,8 @@ var Backbone        = require('backbone');
 var appEvents       = require('utils/appevents');
 var UnreadItemStore = require('./unread-items-client-store');
 var log             = require('utils/log');
+var raf             = require('utils/raf')
+var addPassiveScrollListener = require('utils/passive-scroll-listener');
 
 module.exports = (function() {
 
@@ -58,6 +60,100 @@ module.exports = (function() {
     }
   };
 
+  var MILLIS_BEFORE_UPDATING_LAST_ACCESS_TIME = 1000;
+
+
+  /**
+   * Monitor the viewport for activity from lurking users
+   * and send it to the server
+   */
+  var LurkActivityMonitor = function(unreadItemStore, chatCollection) {
+    this._store = unreadItemStore;
+    this._chatCollection = chatCollection;
+    this._eyeballState = true;
+    this._timers = {};
+    this._lastSeenItems = {};
+    unreadItemStore.on('reset', this._onStoreReset, this);
+    unreadItemStore.on('itemMarkedRead', this._onItemMarkedRead, this);
+    chatCollection.on('reset', this._onCollectionReset, this);
+    appEvents.on('eyeballStateChange', this._eyeballStateChange, this);
+
+    this._clearActivityBadgeLimited = limit(this._clearActivityBadge, this, 100);
+  }
+
+  LurkActivityMonitor.prototype = {
+    _activity: function(itemId) {
+      this._clearActivityBadgeLimited();
+      var troupeId = context.getTroupeId();
+
+      if (!itemId) {
+        itemId = this._findMostRecentId();
+        // Best efforts
+        if (!itemId) return;
+      }
+
+      // No need to update if we've already got the latest
+      if (this._lastSeenItems[troupeId] >= itemId) {
+        return;
+      }
+
+      this._lastSeenItems[troupeId] = itemId;
+      if (this._timers[troupeId]) return;
+
+      this._timers[troupeId] = setTimeout(function() {
+        debug('_updateLastAccess: %s', troupeId);
+
+        var lastSeen = this._lastSeenItems[troupeId];
+        delete this._timers[troupeId];
+
+        // Note, we can't use the apiClient.userRoom endpoint
+        // as the room may have changed since the item was read.
+        // For example, after a room switch we don't want to
+        // be marking items as read in another room
+
+        apiClient.user.put('/rooms/' + troupeId + '/unreadItems/' + lastSeen, "", { dataType: 'text' })
+          .then(function() {
+            debug('_updateLastAccess done');
+          });
+
+      }.bind(this), MILLIS_BEFORE_UPDATING_LAST_ACCESS_TIME)
+    },
+
+    _findMostRecentId: function() {
+      return this._chatCollection.reduce(function(memo, item) {
+        if (!memo) return item.id;
+        if (memo > item.id) return memo;
+        return item.id;
+      }, null);
+    },
+
+    _clearActivityBadge: function() {
+      appEvents.trigger('clearActivityBadge');
+    },
+
+    _onItemMarkedRead: function(itemId, mention, lurkMode) {
+      if (lurkMode) {
+        this._activity(itemId);
+      }
+    },
+
+    _eyeballStateChange: function(newState) {
+      this._eyeballState = newState;
+    },
+
+    _onStoreReset: function() {
+      var lurk = this._store.getLurkMode();
+      if (lurk && this._eyeballState) {
+        this._activity();
+      }
+    },
+
+    _onCollectionReset: function() {
+      this._onStoreReset();
+    }
+
+  }
+
   // -----------------------------------------------------
   // This component sends read notifications back to the server
   // -----------------------------------------------------
@@ -65,8 +161,6 @@ module.exports = (function() {
   var ReadItemSender = function(unreadItemStore) {
     this._buffer = {};
     this._sendLimited = limit(this._send, this, 1000);
-    this._updateLastAccessLimited = limit(this._updateLastAccess, this, 1000);
-    this._clearActivityBadgeLimited = limit(this._clearActivityBadge, this, 100);
 
     unreadItemStore.on('itemMarkedRead', this._onItemMarkedRead.bind(this));
 
@@ -74,17 +168,11 @@ module.exports = (function() {
     ['unload', 'beforeunload'].forEach(function(e) {
       window.addEventListener(e, bound, false);
     });
+
   };
 
   ReadItemSender.prototype = {
     _onItemMarkedRead: function(itemId, mention, lurkMode) {
-
-      // Update last access time to keep track of last viewed items
-      if (lurkMode) {
-        this._updateLastAccessLimited();
-        this._clearActivityBadgeLimited();
-      }
-
       // Don't sent unread items back to the server in lurk mode unless its a mention
       if (lurkMode && !mention) return;
 
@@ -107,20 +195,6 @@ module.exports = (function() {
       }
     },
 
-    _updateLastAccess: function() {
-      debug('_updateLastAccess');
-
-      // TODO: fix this date. It is too far into the future
-      // wrong in so many ways
-      apiClient.userRoom.put('', { updateLastAccess: new Date() })
-      .then(function() {
-        debug('_updateLastAccess done');
-      });
-    },
-
-    _clearActivityBadge: function() {
-      appEvents.trigger('clearActivityBadge');
-    },
 
     _send: function(options) {
       debug('_send');
@@ -254,7 +328,10 @@ module.exports = (function() {
 
     appEvents.on('eyeballStateChange', this._eyeballStateChange, this);
 
-    this._scrollElement.addEventListener('scroll', boundGetBounds, false);
+    function rafGetBounds() {
+      raf(boundGetBounds);
+    }
+    addPassiveScrollListener(this._scrollElement, rafGetBounds);
 
     // this is not a live collection so this will not work inside an SPA
     //$('.mobile-scroll-class').on('scroll', boundGetBounds);
@@ -591,8 +668,6 @@ module.exports = (function() {
   function getUnreadItemStore() {
     if(_unreadItemStore) return _unreadItemStore;
 
-    // TODO: XXX: we'll need to come up with a new way of
-    // figuring out if we're on a not-logged-in page
     if(context.troupe().id) {
       _unreadItemStore = new UnreadItemStore();
 
@@ -658,6 +733,7 @@ module.exports = (function() {
 
     monitorViewForUnreadItems: function($el, collectionView) {
       var unreadItemStore = getUnreadItemStoreReq();
+      new LurkActivityMonitor(_unreadItemStore, collectionView.collection);
       return new TroupeUnreadItemsViewportMonitor($el, unreadItemStore, collectionView);
     }
   };

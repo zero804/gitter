@@ -94,7 +94,7 @@ describe('RoomMenuModel', function() {
 
     it('should emit pre & post state change events', function(done) {
 
-      roomMenuModel.on('change:state:pre', function(oldState, newState) {
+      roomMenuModel.on('change:view', function(oldState, newState) {
         assert.equal('', oldState);
         assert.equal('search', newState);
       });

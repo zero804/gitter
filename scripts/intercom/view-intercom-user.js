@@ -1,10 +1,8 @@
 #!/usr/bin/env node
 "use strict";
 
-var _ = require('lodash');
 var shutdown = require('shutdown');
 var intercom = require('gitter-web-intercom');
-
 
 var opts = require('yargs')
   .option('id', {

@@ -1,5 +1,3 @@
-/*jslint node:true, unused:true*/
-/*global describe:true, it:true */
 'use strict';
 
 var isValidRoomUri = require('../../../public/js/utils/valid-room-uri');

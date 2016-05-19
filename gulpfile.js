@@ -1,4 +1,3 @@
-/* jshint node:true, unused:true */
 'use strict';
 
 var Promise = require('bluebird');
@@ -21,7 +20,7 @@ var csswring = require('csswring');
 var styleBuilder = require('./build-scripts/style-builder');
 
 var webpack = require('gulp-webpack');
-var jshint = require('gulp-jshint');
+var eslint = require('gulp-eslint');
 
 var gzip = require('gulp-gzip');
 var mocha = require('gulp-spawn-mocha');
@@ -29,6 +28,7 @@ var using = require('gulp-using');
 var tar = require('gulp-tar');
 var expect = require('gulp-expect-file');
 var git = require('gulp-git');
+
 var shell = require('gulp-shell');
 var grepFail = require('gulp-grep-fail');
 var jsonlint = require('gulp-jsonlint');
@@ -85,15 +85,21 @@ var cssWatchGlob = 'public/**/*.less';
 var RUN_TESTS_IN_PARALLEL = false;
 
 var testModules = {
-  'integration': { files: ['./test/integration/**/*.js', './test/public-js/**/*.js'], includeInFast: true },
-  'cache-wrapper': { files: ['./modules/cache-wrapper/test/*.js'], includeInFast: false },
-  'github': { files: ['./modules/github/test/*.js'], includeInFast: false },
-  'github-backend': { files: ['./modules/github-backend/test/*.js'], includeInFast: false },
-  'push-notification-filter': { files: ['./modules/push-notification-filter/test/*.js'], includeInFast: false },
-  'split-tests': { files: ['./modules/split-tests/test/*.js'], includeInFast: false },
-  'presence': { files: ['./modules/presence/test/*.js'], includeInFast: false },
-  'permissions': { files: ['./modules/permissions/test/**/*.js'], includeInFast: false },
-  'persistence-utils': { files: ['./modules/persistence-utils/test/*.js'], includeInFast: false },
+};
+
+var modulesWithTest = glob.sync('./modules/*/test');
+modulesWithTest.forEach(function(testDir) {
+  var moduleDir = path.dirname(testDir);
+  var moduleName = path.basename(moduleDir);
+  testModules[moduleName] = {
+    files: path.join('modules', moduleName, 'test', '**', '*.js'),
+    includeInFast: false
+  }
+});
+
+testModules.integration = {
+  files: ['./test/integration/**/*.js', './test/public-js/**/*.js'],
+  includeInFast: true
 };
 
 /** Make a series of tasks based on the test modules */
@@ -123,6 +129,8 @@ function makeTestTasks(taskName, generator, isFast) {
   } else {
     // Run tests in sequence
     gulp.task(taskName, function(callback) {
+      gutil.log('Run sequence for ' + taskName,childTasks.join(','));
+
       var args = childTasks.concat(callback);
       runSequence.apply(null, args);
     });
@@ -137,56 +145,22 @@ gulp.task('validate-config', function() {
     .pipe(jsonlint.failOnError());
 });
 
-gulp.task('validate-client-source', function() {
-  /* This is a very lax jshint, only looking for major problems */
-  return gulp.src(['public/js/**/*.js', 'shared/**/*.js'])
-    .pipe(jshint({
-      browser: true,
-      devel: false,
-      strict: "global",
-      unused: false,
-      laxbreak: true,
-      laxcomma: true,
-      "-W069": "",
-      "-W033": "",
-      "-W093": "",
-      // "-W084": "",
-      predef: ["module", "require"]
-     }))
-    .pipe(jshint.reporter('default', { verbose: true }))
-    .pipe(jshint.reporter('fail'));
+gulp.task('validate-eslint', function() {
+  return gulp.src(['**/*.js','!node_modules/**','!public/repo/**'])
+    .pipe(eslint({
+      quiet: argv.quiet
+    }))
+    .pipe(eslint.format())
+    .pipe(eslint.failAfterError());
 });
 
-gulp.task('validate-server-source', function() {
-  /* This is a very lax jshint, only looking for major problems */
-  return gulp.src(['server/**/*.js', 'shared/**/*.js', 'modules/*/lib/**/*.js'])
-    .pipe(jshint({
-      node: true,
-      devel: false,
-      unused: false,
-      strict: "global",
-      "-W064": "", // Missing 'new' prefix when invoking a constructor
-      "-W069": "", // [..] is better written in dot notation.
-      "-W033": "", // Missing semicolon.
-      "-W032": "", // Unnecessary semicolon.
-     }))
-    .pipe(jshint.reporter('default', { verbose: true }))
-    .pipe(jshint.reporter('fail'));
-});
-
-gulp.task('validate-illegal-markers', function() {
-  return gulp.src(['server/**/*.js', 'shared/**/*.js', 'modules/*/lib/**/*.js', 'public/js/**/*.js'])
-    .pipe(grepFail([ 'NOCOMMIT' ]));
-  //
-  // return gulp.src()
-  //   .pipe(grepFail([ '' ]));
-});
-
-gulp.task('validate', ['validate-config', 'validate-client-source', 'validate-server-source' /*, 'validate-illegal-markers'*/]);
+gulp.task('validate', ['validate-config', 'validate-eslint']);
 
 makeTestTasks('test-mocha', function(name, files) {
   mkdirp.sync('output/test-reports/');
   mkdirp.sync('output/coverage-reports/' + name);
+
+  gutil.log('Writing XUnit output', 'output/test-reports/' + name + '.xml');
 
   var mochaOpts = {
     reporter: 'mocha-multi',
@@ -214,7 +188,7 @@ makeTestTasks('test-mocha', function(name, files) {
 makeTestTasks('test-docker', function(name, files) {
   mkdirp.sync('output/test-reports/');
   mkdirp.sync('output/coverage-reports/' + name);
-
+  gutil.log('Writing XUnit output', 'output/test-reports/' + name + '.xml');
   return gulp.src(files, { read: false })
     .pipe(mocha({
       reporter: 'mocha-multi',
@@ -279,6 +253,7 @@ gulp.task('submit-coveralls', ['test-mocha'/*, 'test-redis-lua'*/], function(cal
 gulp.task('test', ['test-mocha'/*, 'test-redis-lua'*/, 'submit-coveralls', 'submit-codacy']);
 
 makeTestTasks('localtest', function(name, files) {
+
   return gulp.src(files, { read: false })
     .pipe(mocha({
       reporter: 'spec',

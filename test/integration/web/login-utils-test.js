@@ -7,8 +7,6 @@ var loginUtils = testRequire('./web/login-utils');
 var fixtureLoader = require('../test-fixtures');
 var fixture = {};
 
-var assert = require('assert');
-
 describe('login-utils', function() {
 	describe('#whereToNext', function(done) {
 

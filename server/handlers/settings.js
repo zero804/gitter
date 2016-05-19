@@ -18,7 +18,7 @@ var services                     = require('gitter-services');
 var identifyRoute                = env.middlewares.identifyRoute;
 var debug                        = require('debug')('gitter:settings-route');
 var StatusError                  = require('statuserror');
-var userScopes                   = require('../utils/models/user-scopes');
+var userScopes                   = require('gitter-web-identity/lib/user-scopes');
 
 var supportedServices = [
   { id: 'github',    name: 'GitHub'},
@@ -86,7 +86,7 @@ function deleteIntegration(req, res, next) {
 }
 
 function createIntegration(req, res, next) {
-  debug('Delete integration for %s', req.body.service, req.troupe.url);
+  debug('Create integration for %s', req.body.service, req.troupe.url);
 
   request.post({
     url: config.get('webhooks:basepath') + '/troupes/' + req.troupe.id + '/hooks',

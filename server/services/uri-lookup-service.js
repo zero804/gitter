@@ -27,7 +27,7 @@ function lookupUri(uri) {
     .then(function(uriLookup) {
       debug('URI lookup returned a result? %s', !!uriLookup);
 
-      if(uriLookup && (uriLookup.userId || uriLookup.troupeId )) return uriLookup;
+      if(uriLookup && (uriLookup.userId || uriLookup.troupeId)) return uriLookup;
 
       debug('Attempting to search through users and troupes to find %s', uri);
 

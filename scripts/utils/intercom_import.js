@@ -2,13 +2,11 @@
 "use strict";
 
 var env                 = require('gitter-web-env');
-var winston             = env.logger;
 var nconf               = env.config;
 var persistence         = require('gitter-web-persistence');
 var shutdown            = require('shutdown');
 var async               = require('async');
 var emailAddressService = require('../../server/services/email-address-service');
-var Promise             = require('bluebird');
 
 function getAllUsers(callback) {
   persistence.User.find(function (err, users) {
@@ -57,7 +55,7 @@ getAllUsers(function(err, users) {
                 //   }
                 // ],
               },
-              function(err, res) {
+              function(err/*, res*/) {
                 if (err) console.log(err);
                 console.log("Successfully added: " + user.username);
                 callback();
@@ -73,7 +71,7 @@ getAllUsers(function(err, users) {
           callback();
         }
       },
-      function(err){
+      function(){
         console.log("Shutting down gracefully");
         shutdown.shutdownGracefully();
       }

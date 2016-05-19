@@ -2,7 +2,6 @@
 
 var Promise            = require('bluebird');
 var createDistribution = require('./create-distribution');
-var Lazy               = require('lazy.js');
 
 function toString(f) {
   if (!f) return '';

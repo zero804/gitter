@@ -89,16 +89,17 @@ exports.attachNotificationListenersToSchema = function (schema, options) {
 
 };
 
-/*
- * Returns a promise [document, updatedExisting]
- * If mongo experiences a contention where it tries to
- * perform an insert but looses the battle to another
- * insert, this function will retry
- */
 var MAX_UPSERT_ATTEMPTS = 2;
 var MONGO_DUPLICATE_KEY_ERROR = 11000;
 
-exports.upsert = function(schema, query, setOperation) {
+/**
+ * Performs a safe upsert,
+ * returns an Promise of a boolean indicating
+ * that the document already exists
+ *   - true: means the query matched an existing document
+ *   - false: means a new document was inserted
+ */
+function leanUpsert(schema, query, setOperation) {
   var attempts = 0;
 
   function performUpdate() {
@@ -116,8 +117,22 @@ exports.upsert = function(schema, query, setOperation) {
 
   return performUpdate()
     .then(function(doc) {
+      return !!doc;
+    });
+}
+exports.leanUpsert = leanUpsert;
+
+/*
+ * Returns a promise [document, updatedExisting]
+ * If mongo experiences a contention where it tries to
+ * perform an insert but looses the battle to another
+ * insert, this function will retry
+ */
+exports.upsert = function(schema, query, setOperation) {
+  return leanUpsert(schema, query, setOperation)
+    .then(function(existing) {
       // If doc is null then an insert occurred
-      return Promise.all([schema.findOne(query).exec(), !!doc]);
+      return Promise.all([schema.findOne(query).exec(), existing]);
     });
 };
 
@@ -169,27 +184,6 @@ exports.findByIdsLean = function(Model, ids, select) {
       .then(mongoUtils.setIds);
 
   });
-};
-
-exports.findByFieldInValue = function(Model, field, values, callback) {
-  return Promise.try(function() {
-    if (!values || !values.length) return [];
-
-    /* Special case for a single value */
-    if (values.length === 1) {
-      var query = {};
-      query[field] = values[0];
-      return Model.findOne(query)
-        .exec()
-        .then(function(doc) {
-          if (doc) return [doc];
-          return [];
-        });
-    }
-
-    /* Usual case */
-    return Model.where(field).in(values).exec();
-  }).nodeify(callback);
 };
 
 exports.addIdToLean = function(object) {

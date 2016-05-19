@@ -17,7 +17,7 @@ function generateName() {
 
 function generateUri(roomType) {
   if(roomType === 'REPO') {
-      return '_test_' + (++counter) + Date.now() + '/_repo_' + (++counter) + Date.now();
+    return '_test_' + (++counter) + Date.now() + '/_repo_' + (++counter) + Date.now();
   }
 
   return '_test_' + (++counter) + Date.now();
@@ -72,7 +72,6 @@ function load(expected, done) {
     return createExpectedFixtures(expected, done);
   }
 
-  console.error('Using old school fixtures. Try change this sometime old chap.');
   return createExpectedFixtures({
     user1: {
       //email: 'testuser@troupetest.local'
@@ -110,20 +109,31 @@ function createExpectedFixtures(expected, done) {
     debug('Creating %s', fixtureName);
 
     // A username of true means generate one
-    var username = f.username === true ? generateUsername() : f.username;
     var confirmationCode = f.confirmationCode === true ? "confirm" + Math.random() : f.confirmationCode;
+
+
+    function possibleGenerate(key, fn) {
+      if (f.hasOwnProperty(key)) {
+        if (f[key] === true) {
+          return fn();
+        } else {
+          return f[key];
+        }
+      } else {
+        return fn()
+      }
+    }
 
     return persistence.User.create({
       identities:       f.identities,
-      email:            f.email       || generateEmail(),
-      displayName:      f.displayName || generateName(),
-      githubId:         f.githubId    || generateGithubId(),
-      githubToken:      f.githubToken || generateGithubToken(),
+      email:            possibleGenerate('email', generateEmail),
+      displayName:      possibleGenerate('displayName', generateName),
+      githubId:         possibleGenerate('githubId', generateGithubId),
+      githubToken:      possibleGenerate('githubToken', generateGithubToken),
       confirmationCode: confirmationCode,
-      username:         username      || generateUsername(),
+      username:         possibleGenerate('username', generateUsername),
       status:           f.status      || 'ACTIVE',
-      staff:            f.staff       || false,
-      permissions:      f.permissions
+      staff:            f.staff       || false
     });
   }
 
@@ -186,8 +196,9 @@ function createExpectedFixtures(expected, done) {
     if (f.oneToOne) {
       githubType = 'ONETOONE';
     } else {
-      uri = f.uri || generateUri(githubType);
       githubType = f.githubType || 'ORG';
+      uri = f.uri || generateUri(githubType);
+
       lcUri = uri.toLowerCase();
     }
 
@@ -203,15 +214,39 @@ function createExpectedFixtures(expected, done) {
       dateDeleted: f.dateDeleted,
       userCount: f.users && f.users.length || f.userCount,
       tags: f.tags,
-      providers: f.providers
+      providers: f.providers,
     };
 
     debug('Creating troupe %s with %j', fixtureName, doc);
     return persistence.Troupe.create(doc)
-      .then(function(troupe) {
-        if (!f.userIds || !f.userIds.length) return troupe;
-        return bulkInsertTroupeUsers(troupe._id, f.userIds, f.membershipStrategy)
-          .thenReturn(troupe);
+      .tap(function(troupe) {
+        if (!f.userIds || !f.userIds.length) return;
+        return bulkInsertTroupeUsers(troupe._id, f.userIds, f.membershipStrategy);
+      })
+      .tap(function(troupe) {
+
+        var securityDescriptor = f.securityDescriptor || {};
+
+        var type;
+        if (securityDescriptor.type) {
+          type = securityDescriptor.type;
+        } else {
+          type = f.oneToOne ? 'ONE_TO_ONE' : null;
+        }
+
+        return persistence.SecurityDescriptor.create({
+          troupeId: troupe._id,
+
+          // Permissions stuff
+          type: type,
+          members: securityDescriptor.members || 'PUBLIC',
+          admins: securityDescriptor.admins || 'MANUAL',
+          public: 'public' in securityDescriptor ? securityDescriptor.public : !f.oneToOne,
+          linkPath: securityDescriptor.linkPath,
+          externalId: securityDescriptor.externalId,
+          extraMembers: securityDescriptor.extraMembers,
+          extraAdmins: securityDescriptor.extraAdmins
+        });
       });
   }
 
@@ -262,31 +297,54 @@ function createExpectedFixtures(expected, done) {
 
       if(key.match(/^troupe/)) {
         var t = expected[key];
+        var users = [];
+
         if(t.users) {
           if(!Array.isArray(t.users)) {
             t.users = [t.users];
           }
 
-          return Promise.all(t.users.map(function(user, index) {
-              if(typeof user == 'string') {
-                if(expected[user]) return; // Already specified at the top level
-                expected[user] = {};
-                return createUser(user, {}).then(function(createdUser) {
-                  fixture[user] = createdUser;
-                });
-              }
-
-              var fixtureName = 'user' + (++userCounter);
-              t.users[index] = fixtureName;
-              expected[fixtureName] = user;
-
-              return createUser(fixtureName, user)
-                .then(function(user) {
-                  fixture[fixtureName] = user;
-                });
-
-            }));
+          users = users.concat(t.users);
         }
+
+        var extraMembers = t.securityDescriptor && t.securityDescriptor.extraMembers;
+        if (extraMembers) {
+          if(!Array.isArray(extraMembers)) {
+            extraMembers = [extraMembers];
+          }
+
+          users = users.concat(extraMembers);
+        }
+
+        var extraAdmins = t.securityDescriptor && t.securityDescriptor.extraAdmins;
+        if (extraAdmins) {
+          if(!Array.isArray(extraAdmins)) {
+            extraAdmins = [extraAdmins];
+          }
+
+          users = users.concat(extraAdmins);
+        }
+
+        return Promise.map(users, function(user, index) {
+            if(typeof user === 'string') {
+              if(expected[user]) return; // Already specified at the top level
+              expected[user] = {};
+              return createUser(user, {}).then(function(createdUser) {
+                fixture[user] = createdUser;
+              });
+            }
+
+            var fixtureName = 'user' + (++userCounter);
+            t.users[index] = fixtureName;
+            expected[fixtureName] = user;
+
+            return createUser(fixtureName, user)
+              .then(function(user) {
+                fixture[fixtureName] = user;
+              });
+
+          });
+
       }
 
       return null;
@@ -320,11 +378,21 @@ function createExpectedFixtures(expected, done) {
       if(key.match(/^troupe/)) {
         var expectedTroupe = expected[key];
 
-        var userIds = expectedTroupe.users && expectedTroupe.users.map(function(user) {
+        expectedTroupe.userIds = expectedTroupe.users && expectedTroupe.users.map(function(user) {
           return fixture[user]._id;
         });
 
-        expectedTroupe.userIds = userIds;
+        var expectedSecurityDescriptor = expectedTroupe && expectedTroupe.securityDescriptor;
+        if (expectedSecurityDescriptor) {
+          expectedSecurityDescriptor.extraMembers = expectedSecurityDescriptor.extraMembers && expectedSecurityDescriptor.extraMembers.map(function(user) {
+            return fixture[user]._id;
+          });
+
+          expectedSecurityDescriptor.extraAdmins = expectedSecurityDescriptor.extraAdmins && expectedSecurityDescriptor.extraAdmins.map(function(user) {
+            return fixture[user]._id;
+          });
+        }
+
 
         return createTroupe(key, expectedTroupe)
           .then(function(troupe) {

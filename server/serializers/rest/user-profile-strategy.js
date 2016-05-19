@@ -1,34 +1,37 @@
 "use strict";
 
-var identityService = require("../../services/identity-service");
-var _               = require('lodash');
-var Promise         = require('bluebird');
-var BackendMuxer    = require('../../services/backend-muxer');
+var _            = require('lodash');
+var BackendMuxer = require('gitter-web-backend-muxer');
 
 function UserProfileStrategy(options) {
   options = options ? options : {};
 
+  var user;
+  var profileResults;
+
   this.preload = function(users) {
-    // pre-fill the cache
-    var usersArray = users.toArray();
+    var length = users.size();
+    if (length === 0) return;
+    if (length !== 1) {
+      throw new Error('User profile serializer can only load a single profile at a time');
+    }
 
-    return identityService.preloadForUsers(usersArray)
-      .then(function() {
-        return Promise.map(usersArray, function(user) {
-          var backendMuxer = new BackendMuxer(user);
-          return backendMuxer.findProfiles()
-            .then(function(profiles) {
-              // cache the profiles so we can get them out later.
-              // (is this the best variable name?)
+    user = users.first();
+    var backendMuxer = new BackendMuxer(user);
+    return backendMuxer.findProfiles(profileResults)
+      .then(function(profiles) {
+        profileResults = profiles;
+        // cache the profiles so we can get them out later.
+        // (is this the best variable name?)
 
-              // A hash would probably we better for this
-              user.profiles = profiles;
-            });
-        }, { concurrency: 2 });
+        // A hash would probably we better for this
+        user.profiles = profiles;
       });
   };
 
-  this.map = function(user) {
+  this.map = function(_user) {
+    if (user !== _user) return;
+
     var profile = {
       id: user.id,
       username: user.username,

@@ -6,7 +6,6 @@ var HeaderView = require('views/app/headerView');
 var apiClient = require('components/apiClient');
 var onready = require('./utils/onready');
 var appEvents = require('utils/appevents');
-var getTimezoneInfo = require('utils/detect-timezone');
 var heatmapUtils = require('components/archive-heatmap-utils');
 
 require('components/timezone-cookie');

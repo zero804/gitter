@@ -1,21 +1,19 @@
-/* jshint maxcomplexity:19 */
+/* eslint complexity: ["error", 19] */
 "use strict";
 
 var env                      = require('gitter-web-env');
 var winston                  = env.logger;
 var troupeService            = require("../../services/troupe-service");
-var identityService          = require("../../services/identity-service");
+var identityService          = require("gitter-web-identity");
 var presenceService          = require("gitter-web-presence");
 var Promise                  = require('bluebird');
 var collections              = require("../../utils/collections");
 var GithubContributorService = require('gitter-web-github').GitHubContributorService;
-var Promise                  = require('bluebird');
 var getVersion               = require('../get-model-version');
 var billingService           = require('../../services/billing-service');
 var leanUserDao              = require('../../services/daos/user-dao').full;
 var resolveUserAvatarUrl     = require('gitter-web-shared/avatars/resolve-user-avatar-url');
-var userScopes               = require('../../utils/models/user-scopes');
-
+var userScopes               = require('gitter-web-identity/lib/user-scopes');
 
 function UserPremiumStatusStrategy() {
   var usersWithPlans;
@@ -166,28 +164,35 @@ UserProvidersStrategy.prototype = {
 function UserStrategy(options) {
   options = options ? options : {};
   var lean = !!options.lean;
-  var userRoleInTroupeStrategy = options.includeRolesForTroupeId || options.includeRolesForTroupe ? new UserRoleInTroupeStrategy(options) : null;
-  var userPresenceInTroupeStrategy = options.showPresenceForTroupeId ? new UserPresenceInTroupeStrategy(options.showPresenceForTroupeId) : null;
-  var userPremiumStatusStrategy = options.showPremiumStatus ? new UserPremiumStatusStrategy() : null;
-  var userProvidersStrategy = options.includeProviders ? new UserProvidersStrategy() : null;
+
+  var userRoleInTroupeStrategy;
+  var userPresenceInTroupeStrategy;
+  var userPremiumStatusStrategy;
+  var userProvidersStrategy;
 
   this.preload = function(users) {
+    if (users.isEmpty()) return;
+
     var strategies = [];
 
-    if (userRoleInTroupeStrategy) {
+    if (options.includeRolesForTroupeId || options.includeRolesForTroupe) {
+      userRoleInTroupeStrategy = new UserRoleInTroupeStrategy(options);
       strategies.push(userRoleInTroupeStrategy.preload());
     }
 
-    if (userPresenceInTroupeStrategy) {
+    if (options.showPresenceForTroupeId) {
+      userPresenceInTroupeStrategy = new UserPresenceInTroupeStrategy(options.showPresenceForTroupeId)
       strategies.push(userPresenceInTroupeStrategy.preload());
     }
 
-    if (userPremiumStatusStrategy) {
+    if (options.showPremiumStatus) {
       var userIds = users.map(function(user) { return user.id; });
+      userPremiumStatusStrategy = new UserPremiumStatusStrategy();
       strategies.push(userPremiumStatusStrategy.preload(userIds));
     }
 
-    if (userProvidersStrategy) {
+    if (options.includeProviders) {
+      userProvidersStrategy = new UserProvidersStrategy();
       strategies.push(userProvidersStrategy.preload(users));
     }
 

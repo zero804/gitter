@@ -19,7 +19,7 @@ module.exports = (function() {
         if(_.isFunction(method)) {
           method.call(view, currentValue);
         } else {
-          view[method].call(view, currentValue);
+          view[method](currentValue);
         }
       }
 
@@ -34,7 +34,7 @@ module.exports = (function() {
         if(_.isFunction(immediate)) {
           immediate.call(view, currentValue);
         } else {
-          view[immediate].call(view, currentValue);
+          view[immediate](currentValue);
         }
       }
 
@@ -56,4 +56,3 @@ module.exports = (function() {
 
 
 })();
-

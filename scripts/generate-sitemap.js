@@ -61,7 +61,7 @@ function createSitemapIndex(urls) {
       'xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0" ' +
       'xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">');
 
-  urls.forEach(function(url, index) {
+  urls.forEach(function(url) {
     xml.push('<sitemap>');
     xml.push('<loc>' + url + '</loc>');
     xml.push('</sitemap>');
@@ -69,7 +69,7 @@ function createSitemapIndex(urls) {
 
   xml.push('</sitemapindex>');
   return xml.join('\n')
-};
+}
 
 var pageNum = 0;
 var sitemapURLs = [];
@@ -81,7 +81,7 @@ var query = {
   ]
 };
 var projection = { _id: 1, uri: 1 };
-var stream = persistence.Troupe
+persistence.Troupe
   .find(query, projection)
   .sort({_id: 1})
   .slaveOk()

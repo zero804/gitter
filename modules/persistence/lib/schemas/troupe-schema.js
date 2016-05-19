@@ -1,9 +1,8 @@
 "use strict";
 
-var mongoose       = require('gitter-web-mongoose-bluebird');
-var Schema         = mongoose.Schema;
-var ObjectId       = Schema.ObjectId;
-var PermissionsSubSchema = require('./permissions-sub-schema');
+var mongoose = require('gitter-web-mongoose-bluebird');
+var Schema = mongoose.Schema;
+var ObjectId = Schema.ObjectId;
 var installVersionIncMiddleware = require('../install-version-inc-middleware');
 
 module.exports = {
@@ -54,8 +53,6 @@ module.exports = {
       lang: { type: String }, // Human language of this room
       renamedLcUris: [String],
       providers: [String],
-      permissions: PermissionsSubSchema,
-      _nonce: { type: Number },
       _tv: { type: 'MongooseNumber', 'default': 0 }
     }, { strict: 'throw' });
 

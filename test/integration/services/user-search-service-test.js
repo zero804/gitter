@@ -76,9 +76,9 @@ describe("User Search Service", function() {
         if(err) return done(err);
         assert(searchResults.results.length >= 2, "Expect some users");
 
-        assert(searchResults.results.filter(function(f) { return f.displayName === fixture.user1.displayName; } ).length === 0, "Expect test user 1 not to be returned");
-        assert(searchResults.results.filter(function(f) { return f.displayName === fixture.user2.displayName; } ).length == 1, "Expect test user 2");
-        assert(searchResults.results.filter(function(f) { return f.displayName === fixture.user3.displayName; } ).length == 1, "Expect test user 3");
+        assert(searchResults.results.filter(function(f) { return f.displayName === fixture.user1.displayName; }).length === 0, "Expect test user 1 not to be returned");
+        assert(searchResults.results.filter(function(f) { return f.displayName === fixture.user2.displayName; }).length == 1, "Expect test user 2");
+        assert(searchResults.results.filter(function(f) { return f.displayName === fixture.user3.displayName; }).length == 1, "Expect test user 3");
 
         return done();
       });
@@ -93,7 +93,7 @@ describe("User Search Service", function() {
         if(err) return done(err);
 
         assert(searchResults.results.length >= 1, "Expect one user: got " + searchResults.results.join(', '));
-        assert(searchResults.results.filter(function(f) { return f.displayName === fixture.user2.displayName; } ).length == 1, "Expect test user 2");
+        assert(searchResults.results.filter(function(f) { return f.displayName === fixture.user2.displayName; }).length == 1, "Expect test user 2");
 
         return done();
       });
@@ -106,8 +106,8 @@ describe("User Search Service", function() {
       userSearchService.searchForUsers(userId, 'tEst user', { excludeTroupeId: fixture.troupe3.id }, function(err, searchResults) {
         if(err) return done(err);
 
-        assert(searchResults.results.filter(function(f) { return f.displayName === fixture.user2.displayName; } ).length === 1, "Expected to find test user 2");
-        assert(searchResults.results.filter(function(f) { return f.displayName === fixture.user3.displayName; } ).length === 0, "Expected to not find test user 3");
+        assert(searchResults.results.filter(function(f) { return f.displayName === fixture.user2.displayName; }).length === 1, "Expected to find test user 2");
+        assert(searchResults.results.filter(function(f) { return f.displayName === fixture.user3.displayName; }).length === 0, "Expected to not find test user 3");
 
         return done();
       });

@@ -117,7 +117,7 @@ module.exports = (function() {
     options = defaults(options, defaultOptions);
 
     // If we're doing a DELETE but have no data, unset the contentType
-    if(method === 'delete' && !data) {
+    if((method === 'delete' || method === 'put') && !data) {
       delete options.contentType;
     }
 
