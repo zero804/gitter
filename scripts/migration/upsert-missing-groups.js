@@ -4,7 +4,7 @@
 var _ = require('lodash');
 var shutdown = require('shutdown');
 var persistence = require('gitter-web-persistence');
-var through2Concurrent = require('through2-concurrent');
+var through2 = require('through2');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var onMongoConnect = require('../../server/utils/on-mongo-connect');
 var uriLookupService = require('../../server/services/uri-lookup-service');
@@ -48,16 +48,6 @@ function getGroupableRooms() {
           localField: "_id",
           foreignField: "lcUri",
           as: "githuborg"
-        }
-      }, {
-        // We really don't want to upsert uri lookups. We actually want to just
-        // add them if it hasn't been reserved yet. This is because there could
-        // be a user for this uri or there could be an existing org room.
-        $lookup: {
-          from: "urilookups",
-          localField: "_id",
-          foreignField: "lcUri",
-          as: "existingUriLookup"
         }
       }
     ])
@@ -126,7 +116,7 @@ function log(batch, enc, callback) {
   console.log(
     lcOwner,
     info.type,
-    info.owner && info.owner.uri,
+    info.owner && info.owner.uri, // could be undefined if type == unknown
     batch.rooms.length
   );
 
@@ -140,7 +130,7 @@ function migrate(batch, enc, callback) {
   console.log(
     lcOwner,
     info.type,
-    info.owner && info.owner.uri,
+    info.owner && info.owner.uri, // could be undefined if type == unknown
     batch.rooms.length
   );
 
@@ -175,27 +165,28 @@ function migrate(batch, enc, callback) {
           groupId: { $exists: false }
         }, {
           $set: { groupId: groupId }
+        }, {
+          multi: true
         })
         .exec()
         .then(function() {
-          // now reserve the uri if it doesn't exist (ie is not already a user
-          // or an org room)
-          // (yes technically we could do this at the same time as updating the
-          // troupes)
-          if (batch.existingUriLookup && batch.existingUriLookup.length == 0) {
-            return uriLookupService.reserveUriForGroupId(groupId, group.uri);
-          } else {
-            // as explained above, we don't want to override existing uris.
-            return;
-          }
-        })
+          // all existing groups (org OR user) get the old style community uris.
+          return uriLookupService.reserveUriForGroupId(groupId, 'org/'+group.lcUri+'/rooms');
+        });
     })
-    .nodeify(callback);
+    .then(function() {
+      callback();
+    })
+    .catch(function(err) {
+      console.error(err);
+      console.error(err.stack);
+      callback(err);
+    });
 }
 
 function run(f, callback) {
   getGroupableRooms()
-    .pipe(through2Concurrent.obj({maxConcurrency: 10}, f))
+    .pipe(through2.obj(f))
     .on('data', function(batch) {
     })
     .on('end', function() {
@@ -208,13 +199,16 @@ function run(f, callback) {
 }
 
 function done(error) {
-  if (error) {
-    console.error(error);
-    console.error(error.stack);
-    process.exit(1);
-  } else {
-    shutdown.shutdownGracefully();
-  }
+  console.log('Done. Waiting a bit...');
+  setTimeout(function() {
+    if (error) {
+      console.error(error);
+      console.error(error.stack);
+      process.exit(1);
+    } else {
+      shutdown.shutdownGracefully();
+    }
+  }, 10000);
 }
 
 onMongoConnect()

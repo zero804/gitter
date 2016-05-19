@@ -11,7 +11,7 @@ var persistence = require('gitter-web-persistence');
 var installMigrationSchemas = require('./migration-schemas').install;
 var onMongoConnect = require('../../server/utils/on-mongo-connect');
 var userService = require('../../server/services/user-service');
-var through2Concurrent = require('through2-concurrent');
+var through2 = require('through2');
 
 var migrationSchemas;
 
@@ -251,6 +251,7 @@ var findBatchInfo = Promise.method(function(batch) {
         }
 
       } else if (roomUsers) {
+        // TODO: log these separately as a user rename
         type = 'user';
         reason = 'owneruserid-lookup';
 
@@ -334,8 +335,7 @@ function getInfo() {
     var unknown = [];
 
     getBatchedRooms()
-      .pipe(through2Concurrent.obj({ maxConcurrency: 10 },
-      function(batch, enc, callback) {
+      .pipe(through2.obj(function(batch, enc, callback) {
         numBatches++;
         findBatchInfo(batch)
           .then(function(info) {
@@ -392,33 +392,37 @@ function getInfo() {
       .on('data', function(batch) {
       })
       .on('end', function() {
-        console.log('------------------------------------------')
-        console.log(numBatches + ' batches processed');
-        console.log(numOrgs + ' orgs');
-        console.log(numUsers + ' users');
-        console.log(numUnknown + ' unknown');
-        console.log(numOrgUpdates + ' org updates');
-        console.log(numUserUpdates + ' user updates');
-        console.log(numWarnings + ' warnings');
-        console.log(numOrgMultiple + ' orgs with multiple rooms.');
-        console.log(numUserMultiple + ' users with multiple rooms.');
-        console.log(numMissingUsers + " users haven't signed up with us.");
-        console.log("NOTE: rooms could still be wrong in other parts or aspects")
-        resolve({
-          numBatches: numBatches,
-          numOrgs: numOrgs,
-          numUsers: numUsers,
-          numUnknown: numUnknown,
-          numOrgUpdates: numOrgUpdates,
-          numUserUpdates: numUserUpdates,
-          numWarnings: numWarnings,
-          numOrgMultiple: numOrgMultiple,
-          numUserMultiple: numUserMultiple,
-          numMissingUsers: numMissingUsers,
-          updates: updates,
-          warnings: warnings,
-          unknown: unknown
-        });
+        // because things are happening that are making me paranoid
+        console.log('Reached the end. Waiting a bit..');
+        setTimeout(function() {
+          console.log('------------------------------------------');
+          console.log(numBatches + ' batches processed');
+          console.log(numOrgs + ' orgs');
+          console.log(numUsers + ' users');
+          console.log(numUnknown + ' unknown');
+          console.log(numOrgUpdates + ' org updates');
+          console.log(numUserUpdates + ' user updates');
+          console.log(numWarnings + ' warnings');
+          console.log(numOrgMultiple + ' orgs with multiple rooms.');
+          console.log(numUserMultiple + ' users with multiple rooms.');
+          console.log(numMissingUsers + " users haven't signed up with us.");
+          console.log("NOTE: rooms could still be wrong in other parts or aspects");
+          resolve({
+            numBatches: numBatches,
+            numOrgs: numOrgs,
+            numUsers: numUsers,
+            numUnknown: numUnknown,
+            numOrgUpdates: numOrgUpdates,
+            numUserUpdates: numUserUpdates,
+            numWarnings: numWarnings,
+            numOrgMultiple: numOrgMultiple,
+            numUserMultiple: numUserMultiple,
+            numMissingUsers: numMissingUsers,
+            updates: updates,
+            warnings: warnings,
+            unknown: unknown
+          });
+        }, 10000);
       })
       .on('error', function(error) {
         reject(error);
@@ -495,6 +499,9 @@ function errorsToUpdates(errors) {
 // asynchronously perform database updates and return a promise
 function performUpdates(updates) {
   // TODO
+  // NOTE: remember to add to renamed uris for rooms, but not if it only
+  // changed in case. Same thing when updating uris - only when the uri changed
+  // in more than just case.
   console.log("TODO");
   return Promise.resolve();
 }
