@@ -7,16 +7,18 @@ var es = require('event-stream');
 var fs = require('fs');
 var csv = require('fast-csv')
 var csvStream = csv.createWriteStream({headers: true})
-var writableStream = fs.createWriteStream("owner-report.csv");
+var writableStream = fs.createWriteStream("room-updates.csv");
 
 var t = es.through(function write(data) {
-  data.rooms.forEach(function(room) {
-    this.emit('data', { id: data._id, uri: room.uri, githubType: room.githubType });
+  data.forEach(function(update) {
+    if (update.type == 'rename-room') {
+      this.emit('data', update);
+    }
   }, this)
 });
 
-fs.createReadStream('./owner-report.json')
-  .pipe(JSONStream.parse('unknown.*'))
+fs.createReadStream('/Users/leroux/owner-report.json')
+  .pipe(JSONStream.parse('updates'))
   .pipe(t)
   .pipe(csvStream)
   .pipe(writableStream);

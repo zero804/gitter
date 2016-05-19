@@ -6,7 +6,7 @@ var Schema = mongoose.Schema;
 var GitHubUserSchema = new Schema({
   uri: { type: String },
   lcUri: { type: String },
-  githubId: { type: String },
+  githubId: { type: Number },
 });
 
 GitHubUserSchema.schemaTypeName = 'GitHubUserSchema';
@@ -17,7 +17,7 @@ GitHubUserSchema.index({ githubId: 1 }, { unique: true });
 var GitHubOrgSchema = new Schema({
   uri: { type: String },
   lcUri: { type: String },
-  githubId: { type: String },
+  githubId: { type: Number },
 });
 
 GitHubOrgSchema.schemaTypeName = 'GitHubOrgSchema';
