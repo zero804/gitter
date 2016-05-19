@@ -160,7 +160,7 @@ function getOrCreateClient() {
           // Only send desktop notifications if the user
           // does not have the desktop client open
           // Fixes https://github.com/troupe/gitter-webapp/issues/1254
-          if(!context().desktopNotifications) {
+          if(context().desktopNotifications) {
             appEvents.trigger('user_notification', _.extend(message, { notificationKey: message.chatId }));
           }
           break;
