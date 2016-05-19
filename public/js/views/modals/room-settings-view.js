@@ -14,12 +14,12 @@ var View = Marionette.ItemView.extend({
     'change #github-only': 'formChange'
   },
 
-  modelEvents: {
-    change: 'update'
-  },
-
   ui: {
     githubOnly: '#github-only'
+  },
+
+  initialize: function() {
+    this.listenTo(this, 'menuItemClicked', this.menuItemClicked, this);
   },
 
   destroySettings : function () {
@@ -27,7 +27,16 @@ var View = Marionette.ItemView.extend({
     this.dialog = null;
   },
 
+  menuItemClicked: function(action){
+    switch(action) {
+      case 'submit':
+        this.update();
+        break;
+    }
+  },
+
   update: function() {
+    debugger
     var hasGithub = (this.model.get('providers') || []).indexOf('github') !== -1;
     if (hasGithub) {
       this.ui.githubOnly.attr('checked', true);
