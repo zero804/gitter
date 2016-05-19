@@ -35,8 +35,11 @@
 @repo-item-spacing: (@org-area-total-height - (@number-repo-items-per-column * @repo-item-height)) / @number-repo-items-per-column;
 
 
-
-@people-list-avatar-size: 44px;
+@number-invite-user-items-per-column: 2;
+@invite-user-item-avatar-size: 3.6rem;
+@invite-user-item-height: @invite-user-item-avatar-size;
+@invite-user-item-spacing: 1.6rem;
+@invite-user-area-total-height: @org-area-total-height - ((2 * @repo-item-height) + @repo-item-spacing);
 
 
 
@@ -581,12 +584,14 @@
 }
 
 .community-create-github-project-list-item(@item-spacing) {
-  @vertical-padding-calc-value: (@item-spacing / 2) ~"-" 2px;
+  @border-width: 2px;
+  @vertical-padding-calc-value: (@item-spacing / 2) ~"-" @border-width;
 
   flex-grow: 1;
+  // This will ensure we can have at max 2 items
   flex-basis: (@step-content-area-max-width / 3) + 1;
   display: block;
-  border: 2px solid transparent;
+  border: @border-width solid transparent;
 
   margin-top: calc(@vertical-padding-calc-value);
   margin-bottom: calc(@vertical-padding-calc-value);
@@ -776,10 +781,12 @@
 
 .community-create-invite-user-result-list-wrapper {
   overflow: auto;
+  height: @invite-user-area-total-height;
 }
 
 .community-create-invite-user-result-list {
-  column-width: 20rem;
+  display: flex;
+  flex-wrap: wrap;
 
   margin-left: 0;
   padding-left: 0;
@@ -794,8 +801,13 @@
 }
 
 .community-create-invite-user-result-list-item {
-  break-inside: avoid-column;
-  padding-top: 1.5rem;
+  @vertical-padding-calc-value: (@invite-user-item-spacing / 2);
+
+  flex-grow: 1;
+  // This will ensure we can have at max 2 items
+  flex-basis: (@step-content-area-max-width / 3) + 1;
+  margin-top: calc(@vertical-padding-calc-value);
+  margin-bottom: calc(@vertical-padding-calc-value);
 }
 
 .community-create-invite-user-result-list-item-link {
@@ -810,8 +822,8 @@
 }
 
 .community-create-invite-user-result-list-item-avatar {
-  width: @people-list-avatar-size;
-  height: @people-list-avatar-size;
+  width: @invite-user-item-avatar-size;
+  height: @invite-user-item-avatar-size;
   margin-right: 1rem;
 }
 
@@ -851,7 +863,8 @@
 }
 
 .community-create-people-list-item-avatar {
-  max-width: @people-list-avatar-size;
+  width: @invite-user-item-avatar-size;
+  height: @invite-user-item-avatar-size;
 }
 
 .community-create-people-list-item-overlay {
