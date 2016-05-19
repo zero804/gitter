@@ -1,6 +1,5 @@
 "use strict";
 
-// var roomService = require('../../services/room-service');
 var roomContextService = require('../../services/room-context-service');
 var isPhone     = require('../../web/is-phone');
 var url         = require('url');
@@ -31,8 +30,6 @@ function uriContextResolverMiddleware(options) {
 
   return function(req, res, next) {
     var uri = normaliseUrl(req.params);
-    // var tracking = { source: req.query.source };
-
     debug("Looking up normalised uri %s", uri);
 
     return roomContextService.findContextForUri(req.user, uri, options)

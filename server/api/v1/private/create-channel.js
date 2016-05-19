@@ -16,8 +16,9 @@ module.exports = function(req, res, next) {
   var channelSecurity = req.body.security || 'INHERITED';
 
   // silently create owner room
-  return roomService.createGithubRoom(user, ownerUri)
-    .then(function(ownerRoom) {
+  return roomService.createRoomForGitHubUri(user, ownerUri, { skipPostCreationSteps: true })
+    .then(function(result) {
+      var ownerRoom = result.troupe;
       return [ownerRoom, policyFactory.createPolicyForRoom(req.user, ownerRoom)];
     })
     .spread(function(ownerRoom, policy) {
