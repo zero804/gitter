@@ -23,6 +23,7 @@ module.exports = {
     "no-spaced-func": "error",
     "max-statements": ["warn", 30],
     "max-depth": ["error", 4],
+    "no-throw-literal": ["warn"],
     "no-sequences": "error",
     "no-warning-comments": ["warn", { "terms": ["fixme", "xxx"], "location": "anywhere" }],
     "radix": "error",
