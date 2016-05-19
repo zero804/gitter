@@ -13,9 +13,13 @@
 
 @primary-input-font-size: 3.8rem;
 @primary-input-height: 6rem;
-
 @primary-input-spacing-top: 1.5rem;
 @primary-input-spacing-bottom: 3rem;
+
+@secondary-input-font-size: 1.6rem;
+@secondary-input-height: 3rem;
+@secondary-input-spacing-top: 0;
+@secondary-input-spacing-bottom: 2rem;
 
 
 @number-org-items-per-column: 3;
@@ -283,7 +287,9 @@
 }
 
 .secondary-bare-input() {
-  .primary-bare-input(3rem, 1.6rem, 1px);
+  .primary-bare-input(@secondary-input-height, @secondary-input-font-size, 1px);
+  margin-top: @secondary-input-spacing-top;
+  margin-bottom: 0;
 }
 
 
@@ -401,7 +407,9 @@
   position: relative;
   display: flex;
   align-items: baseline;
-  margin-bottom: 4rem;
+  // aligning to baseline makes the whole thing a bit taller so just shrink this down to explicit height
+  height: @secondary-input-height;
+  margin-bottom: @secondary-input-spacing-bottom;
 
   &:after {
     position: absolute;
@@ -617,6 +625,9 @@
 }
 
 
+.community-create-org-list-root {
+  margin-top: @secondary-input-height + @secondary-input-spacing-top + @secondary-input-spacing-bottom;
+}
 
 .community-create-org-list {
   .community-create-github-project-list();
@@ -639,7 +650,9 @@
 
 
 .primary-community-repo-name-filter-input {
-  .secondary-bare-input()
+  .secondary-bare-input();
+  margin-top: @secondary-input-spacing-top;
+  margin-bottom: @secondary-input-spacing-bottom;
 }
 
 .community-create-repo-list {
