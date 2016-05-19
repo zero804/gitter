@@ -98,7 +98,7 @@ function applyAutoHooksForRepoRoom(user, troupe) {
 
 
 /**
- * Returns { troupe, access }
+ * Returns Promise{boolean} if the user can join the room
  */
 function joinRoomForGitHubUri(user, troupe) {
   /* The troupe exists. Ensure it's not past the max limit and the user can join */
@@ -132,7 +132,7 @@ function doPostGitHubRoomCreationTasks(troupe, user, githubType, security, optio
   var hasScope = userScopes.hasGitHubScope(user, "public_repo");
   var hookCreationFailedDueToMissingScope;
   if(hasScope) {
-    debug('Upgrading requirements');
+    debug('User has public_repo scope. Will attempt to setup webhooks for this room');
 
     /* Do this asynchronously */
     applyAutoHooksForRepoRoom(user, troupe)
