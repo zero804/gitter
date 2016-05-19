@@ -566,12 +566,11 @@ function findUsersChannelRoom(user, childTroupeId, callback) {
 
 function assertValidName(name) {
   if (!validateRoomName(name)) {
-    throw {
-      responseStatusCode: 400,
-      clientDetail: {
-        illegalName: true
-      }
+    var err = new StatusError(400);
+    err.clientDetail = {
+      illegalName: true
     };
+    throw err;
   }
 }
 
@@ -593,7 +592,7 @@ var ensureNoRepoNameClash = Promise.method(function (user, uri) {
 
   if(parts.length < 2) {
     /* The classic "this should never happen" gag */
-    throw "Bad channel uri";
+    throw new StatusError(400, "Bad channel uri");
   }
 
   if(parts.length === 2) {
