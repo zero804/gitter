@@ -1,9 +1,9 @@
 'use strict';
 
-var context = require('utils/context');
-var Marionette = require('backbone.marionette');
-var ModalView = require('./modal');
-var apiClient = require('components/apiClient');
+var context              = require('utils/context');
+var Marionette           = require('backbone.marionette');
+var ModalView            = require('./modal');
+var apiClient            = require('components/apiClient');
 var roomSettingsTemplate = require('./tmpl/room-settings-view.hbs');
 
 var View = Marionette.ItemView.extend({
@@ -20,6 +20,11 @@ var View = Marionette.ItemView.extend({
 
   initialize: function() {
     this.listenTo(this, 'menuItemClicked', this.menuItemClicked, this);
+    apiClient.room.get('/meta/welcome-message').then(function(msg){
+      console.log('-----------------------');
+      console.log(msg);
+      console.log('-----------------------');
+    });
   },
 
   destroySettings: function () {
