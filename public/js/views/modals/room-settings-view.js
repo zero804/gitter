@@ -56,7 +56,9 @@ var Modal = ModalView.extend({
     ModalView.prototype.initialize.apply(this, arguments);
     this.view = new View(options);
   },
-  menuItems: []
+  menuItems: [
+    { action: 'submit', pull: 'right', text: 'Submit', className: 'modal--default__footer__btn' }
+  ]
 });
 
 module.exports = Modal;
