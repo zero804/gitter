@@ -1,12 +1,11 @@
 'use strict';
 
-var _                               = require('underscore');
-var Marionette                      = require('backbone.marionette');
-var cocktail                        = require('cocktail');
-var KeyboardEventMixin              = require('views/keyboard-events-mixin');
-
-var sanitizeDir = require('./sanitize-direction');
-var findNextActiveItem = require('./find-next-active-item');
+var _                      = require('underscore');
+var Marionette             = require('backbone.marionette');
+var cocktail               = require('cocktail');
+var KeyboardEventMixin     = require('views/keyboard-events-mixin');
+var sanitizeDir            = require('./sanitize-direction');
+var findNextActiveItem     = require('./find-next-active-item');
 var findNextNavigableModel = require('./find-next-navigable-model');
 
 var navigableCollectionItemActiveCb = findNextNavigableModel.navigableCollectionItemActiveCb;
@@ -59,6 +58,7 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
 
     'room.1 room.2 room.3 room.4 room.5 room.6 room.7 room.8 room.9 room.10': function(e, handler) { this.selectByIndex(e, ROOM_LIST_KEY, handler); },
     'minibar.1 minibar.2 minibar.3 minibar.4 minibar.5 minibar.6 minibar.7 minibar.8 minibar.9 minibar.10': function(e, handler) { this.selectByIndex(e, MINIBAR_KEY, handler); },
+    'focus.search': 'focusSearch',
   },
 
   // Public method meant to be used on the outside
@@ -84,10 +84,11 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
     }.bind(this));
   },
 
-  initialize: function() {
+  initialize: function(attrs) {
     // This object has a structure like the following,
     // { foo: [{ collection, getActive }, { collection, getActive }], bar: [/*...*/]}
     this.navigableCollectionListMap = {};
+    this.roomMenuModel = attrs.roomMenuModel;
   },
 
 
@@ -338,7 +339,11 @@ var KeyboardControllerView = Marionette.LayoutView.extend({
     }
 
     this.progressToIndex(mapKey, index);
-  }
+  },
+
+  focusSearch: function (e){
+    this.roomMenuModel.set({ activationSourceType: null, state: 'search' });
+  },
 
 
 });
