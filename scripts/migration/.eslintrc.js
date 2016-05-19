@@ -1,0 +1,11 @@
+module.exports = {
+    "env": {
+        "commonjs": true,
+        "node": true
+    },
+    rules: {
+      "no-console": ["error", { allow: ["warn", "error", "log"] }],
+      "node/no-unpublished-require": "off",
+      "node/no-missing-require": "off"
+    }
+};

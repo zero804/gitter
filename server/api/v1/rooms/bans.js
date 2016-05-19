@@ -3,6 +3,7 @@
 var roomService         = require('../../../services/room-service');
 var restSerializer      = require("../../../serializers/rest-serializer");
 var loadTroupeFromParam = require('./load-troupe-param');
+var RoomWithPolicyService = require('../../../services/room-with-policy-service');
 
 module.exports = {
   id: 'troupeBan',
@@ -18,10 +19,11 @@ module.exports = {
   create: function(req) {
     return loadTroupeFromParam(req)
       .then(function(troupe) {
+        var roomWithPolicyService = new RoomWithPolicyService(troupe, req.user, req.userRoomPolicy);
+
         var username = req.body.username;
         var removeMessages = !!req.body.removeMessages;
-
-        return roomService.banUserFromRoom(troupe, username, req.user, { removeMessages: removeMessages });
+        return roomWithPolicyService.banUserFromRoom(username, { removeMessages: removeMessages });
       })
       .then(function(ban) {
         var strategy = new restSerializer.TroupeBanStrategy({ });
@@ -37,7 +39,8 @@ module.exports = {
   destroy: function(req) {
     return loadTroupeFromParam(req)
       .then(function(troupe) {
-        return roomService.unbanUserFromRoom(troupe, req.troupeBan, req.troupeBanUser.username, req.user);
+        var roomWithPolicyService = new RoomWithPolicyService(troupe, req.user, req.userRoomPolicy);
+        return roomWithPolicyService.unbanUserFromRoom(req.troupeBan.userId);
       })
       .then(function() {
         return { success: true };
@@ -45,15 +48,7 @@ module.exports = {
   },
 
   load: function(req, id) {
-    return roomService.findBanByUsername(req.params.troupeId, id)
-      .then(function(banAndUser) {
-        if(!banAndUser) return;
-
-        /* Bit nasty */
-        req.troupeBanUser = banAndUser.user;
-
-        return banAndUser.ban;
-      });
+    return roomService.findBanByUsername(req.params.troupeId, id);
   }
 
 };

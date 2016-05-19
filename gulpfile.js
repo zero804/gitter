@@ -37,15 +37,21 @@ var codacy = require('gulp-codacy');
 var RUN_TESTS_IN_PARALLEL = false;
 
 var testModules = {
-  'integration': { files: ['./test/integration/**/*.js', './test/public-js/**/*.js'], includeInFast: true },
-  'cache-wrapper': { files: ['./modules/cache-wrapper/test/*.js'], includeInFast: false },
-  'github': { files: ['./modules/github/test/*.js'], includeInFast: false },
-  'github-backend': { files: ['./modules/github-backend/test/*.js'], includeInFast: false },
-  'push-notification-filter': { files: ['./modules/push-notification-filter/test/*.js'], includeInFast: false },
-  'split-tests': { files: ['./modules/split-tests/test/*.js'], includeInFast: false },
-  'presence': { files: ['./modules/presence/test/*.js'], includeInFast: false },
-  'permissions': { files: ['./modules/permissions/test/**/*.js'], includeInFast: false },
-  'persistence-utils': { files: ['./modules/persistence-utils/test/*.js'], includeInFast: false },
+};
+
+var modulesWithTest = glob.sync('./modules/*/test');
+modulesWithTest.forEach(function(testDir) {
+  var moduleDir = path.dirname(testDir);
+  var moduleName = path.basename(moduleDir);
+  testModules[moduleName] = {
+    files: path.join('modules', moduleName, 'test', '**', '*.js'),
+    includeInFast: false
+  }
+});
+
+testModules.integration = {
+  files: ['./test/integration/**/*.js', './test/public-js/**/*.js'],
+  includeInFast: true
 };
 
 /** Make a series of tasks based on the test modules */
@@ -75,6 +81,8 @@ function makeTestTasks(taskName, generator, isFast) {
   } else {
     // Run tests in sequence
     gulp.task(taskName, function(callback) {
+      gutil.log('Run sequence for ' + taskName,childTasks.join(','));
+
       var args = childTasks.concat(callback);
       runSequence.apply(null, args);
     });
@@ -104,6 +112,8 @@ makeTestTasks('test-mocha', function(name, files) {
   mkdirp.sync('output/test-reports/');
   mkdirp.sync('output/coverage-reports/' + name);
 
+  gutil.log('Writing XUnit output', 'output/test-reports/' + name + '.xml');
+
   var mochaOpts = {
     reporter: 'mocha-multi',
     timeout: 10000,
@@ -130,7 +140,7 @@ makeTestTasks('test-mocha', function(name, files) {
 makeTestTasks('test-docker', function(name, files) {
   mkdirp.sync('output/test-reports/');
   mkdirp.sync('output/coverage-reports/' + name);
-
+  gutil.log('Writing XUnit output', 'output/test-reports/' + name + '.xml');
   return gulp.src(files, { read: false })
     .pipe(mocha({
       reporter: 'mocha-multi',
@@ -195,6 +205,7 @@ gulp.task('submit-coveralls', ['test-mocha'/*, 'test-redis-lua'*/], function(cal
 gulp.task('test', ['test-mocha'/*, 'test-redis-lua'*/, 'submit-coveralls', 'submit-codacy']);
 
 makeTestTasks('localtest', function(name, files) {
+
   return gulp.src(files, { read: false })
     .pipe(mocha({
       reporter: 'spec',
@@ -447,6 +458,7 @@ gulp.task('css-web', function () {
     'public/less/trpHooks.less',
     'public/less/login.less',
     'public/less/explore.less',
+    'public/less/community-create.less',
     'public/less/router-chat.less',
     'public/less/router-app.less',
     'public/less/router-nli-app.less',
@@ -565,8 +577,8 @@ gulp.task('default', function(callback) {
  * watch
  */
 gulp.task('watch', ['css'], function() {
-  livereload.listen();
-  gulp.watch('public/**/*.less', ['css']).on('change', livereload.changed);
+  //livereload.listen();
+  gulp.watch('public/**/*.less', ['css'])/*.on('change', livereload.changed)*/;
 });
 
 

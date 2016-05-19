@@ -48,7 +48,7 @@ module.exports = Promise.method(function validateUri(user, uri) {
   debug("validateUri: %s", uri);
 
   var parts = uri.split('/');
-  if(parts.length == 1) {
+  if(parts.length === 1) {
     /** Its a user or org.
      *  We only need to check if it's an org because we'll
      *  already know if its a registered user and won't be
@@ -58,12 +58,9 @@ module.exports = Promise.method(function validateUri(user, uri) {
 
   }
 
-  if(parts.length == 2) {
+  if(parts.length === 2) {
     /* Its a repo or a channel */
-    // TODO: figure out what this is all about....
-    if(parts[1].indexOf('*') !== 0) {
-      return validateRepoUri(user, uri);
-    }
+    return validateRepoUri(user, uri);
   }
 
   return;

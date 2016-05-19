@@ -8,6 +8,7 @@ var fastdom           = require('fastdom');
 var context           = require('utils/context');
 var DNDCtrl           = require('components/menu/room/dnd-controller');
 var localStore        = require('components/local-store');
+var toggleClass       = require('utils/toggle-class');
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 var KeyboardEventMixin = require('views/keyboard-events-mixin');
 
@@ -106,7 +107,8 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
     }));
 
     this.keyboardControllerView = new KeyboardControllerView({
-      model: new KeyboardControllerModel()
+      model: new KeyboardControllerModel(),
+      roomMenuModel: this.model,
     });
 
     //Make a new drag & drop control
@@ -167,6 +169,10 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
     if (this.model.get('roomMenuIsPinned')) { return; }
 
     this.model.set('panelOpenState', false);
+  },
+
+  onRender: function() {
+    toggleClass(this.ui.minibarInner[0], 'has-community-create', context.hasFeature('community-create'));
   },
 
   onChildRender: function () {

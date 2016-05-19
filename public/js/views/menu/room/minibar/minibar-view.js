@@ -5,6 +5,7 @@ var Marionette    = require('backbone.marionette');
 var fastdom       = require('fastdom');
 var ItemView      = require('./minibar-item-view');
 var CloseItemView = require('./minibar-close-item-view');
+var CommunityCreateItemView = require('./minibar-community-create-item-view');
 var FavouriteView = require('./minibar-favourite-item-view');
 var PeopleView    = require('./minibar-people-item-view.js');
 var domIndexById  = require('../../../../utils/dom-index-by-id');
@@ -51,6 +52,8 @@ var MinibarView = Marionette.CollectionView.extend({
       case 'close':
         viewOptions = _.extend(viewOptions, { roomModel: this.model });
         return new CloseItemView(viewOptions);
+      case 'community-create':
+        return new CommunityCreateItemView(viewOptions);
       case 'favourite':
         viewOptions = _.extend(viewOptions, { dndCtrl: this.dndCtrl });
         return new FavouriteView(viewOptions);
@@ -64,7 +67,6 @@ var MinibarView = Marionette.CollectionView.extend({
   },
 
   initialize: function(attrs) {
-
     this.bus            = attrs.bus;
     this.dndCtrl        = attrs.dndCtrl;
     this.model          = attrs.model;

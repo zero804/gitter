@@ -17,7 +17,7 @@ var BaseCollectionItemView = Marionette.ItemView.extend({
   },
 
   keyboardEvents: {
-    'room-list-item:activate': 'onItemActivated',
+    'room-list-item:activate': 'onKeyboardItemActivated',
   },
 
   modelEvents: {
@@ -76,9 +76,9 @@ var BaseCollectionItemView = Marionette.ItemView.extend({
     // Re-trigger the pulse animation
     // 16ms is a good 60-fps number to trigger on which Firefox needs (requestAnimationFrame doesn't work for this)
     Array.prototype.forEach.call(this.ui.unreadIndicator, function(unreadIndicatorElement) {
-    unreadIndicatorElement.style.animation = 'none';
+    unreadIndicatorElement.classList.remove('pulse-animation');
       setTimeout(function() {
-          unreadIndicatorElement.style.animation = '';
+          unreadIndicatorElement.classList.add('pulse-animation');
       }, 16);
     });
   },

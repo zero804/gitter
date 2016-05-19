@@ -22,12 +22,18 @@ describe('group-resolver', function() {
     });
 
     beforeEach(function() {
-      var roomPermissionsModelMock = function() {
-        return Promise.resolve(adminPermission);
+      var createPolicyForRoom = function() {
+        return Promise.resolve({
+          canAdmin: function() {
+            return Promise.resolve(adminPermission);
+          }
+        });
       };
 
       groupResolver = testRequire.withProxies("./services/group-resolver", {
-        'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock
+        'gitter-web-permissions/lib/legacy-policy-factory': {
+          createPolicyForRoom: createPolicyForRoom
+        }
       });
     });
 

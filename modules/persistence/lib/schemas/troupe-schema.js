@@ -67,7 +67,7 @@ module.exports = {
     // Ideally we should never search against URI, only lcURI
     TroupeSchema.index({ uri: 1 }, { unique: true, sparse: true });
     TroupeSchema.index({ lcUri: 1 }, { unique: true, sparse: true });
-    TroupeSchema.index({ githubId: 1 }, { /* XXX we cannot make this unique as there may be duplicates in existing data unfortunately */ });
+    TroupeSchema.index({ githubId: 1 }, { /* NB we cannot make this unique as there may be duplicates in existing data unfortunately */ });
     TroupeSchema.index({ renamedLcUris: 1 });
     TroupeSchema.index({ parentId: 1 });
     TroupeSchema.index({ lcOwner: 1 });
