@@ -35,7 +35,7 @@ module.exports = function uriResolver(userId, uri, options) {
             }
 
             if(!ignoreCase &&
-                user.username != uri &&
+                user.username !== uri &&
                 user.username.toLowerCase() === uri.toLowerCase()) {
               logger.info('Incorrect case for room: ' + uri + ' redirecting to ' + user.username);
               var redirect = new StatusError(301);
@@ -48,7 +48,7 @@ module.exports = function uriResolver(userId, uri, options) {
       }
 
       if(uriLookup.troupeId) {
-        return troupeService.findByIdLeanWithAccess(uriLookup.troupeId, userId)
+        return troupeService.findByIdLeanWithMembership(uriLookup.troupeId, userId)
           .spread(function(troupe, roomMember) {
             if(!troupe) {
               logger.info('Removing stale uri: ' + uri + ' from URI lookups');
