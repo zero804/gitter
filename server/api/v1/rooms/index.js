@@ -64,23 +64,24 @@ module.exports = {
     if (!roomUri) throw new StatusError(400);
 
     return roomService.createRoomByUri(req.user, roomUri, { ignoreCase: true, addBadge: addBadge })
-      .then(function (room) {
-        if (!room || !room.troupe) throw new StatusError(403, 'Permission denied');
-
-        var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, includeRolesForTroupe: room.troupe });
-
-        return restSerializer.serializeObject(room.troupe, strategy)
-        .then(function(serialized) {
-
-          serialized.extra = {
-            access: room.access,
-            didCreate: room.didCreate,
-            hookCreationFailedDueToMissingScope: room.hookCreationFailedDueToMissingScope
-          };
-
-          return serialized;
+      .then(function (createResult) {
+        var strategy = new restSerializer.TroupeStrategy({
+          currentUserId: req.user.id,
+          currentUser: req.user,
+          includeRolesForTroupe: createResult.troupe
         });
-    });
+
+        return [createResult, restSerializer.serializeObject(createResult.troupe, strategy)];
+      })
+      .spread(function(createResult, serialized) {
+        serialized.extra = {
+          didCreate: createResult.didCreate,
+          hookCreationFailedDueToMissingScope: createResult.hookCreationFailedDueToMissingScope
+        };
+
+        return serialized;
+      });
+
   },
 
   update: function(req) {
