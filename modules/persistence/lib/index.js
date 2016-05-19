@@ -52,6 +52,7 @@ module.exports = createExports({
   UserTroupeLastAccess: require('./schemas/user-troupe-last-access-schema'),
   UserTroupeFavourites: require('./schemas/user-troupe-favourites-schema'),
   Troupe: require('./schemas/troupe-schema'),
+  TroupeMeta: require('./schemas/troupe-meta-schema'),
   TroupeUser: require('./schemas/troupe-user-schema'),
   UserSettings: require('./schemas/user-settings-schema'),
   ChatMessage: require('./schemas/chat-message-schema'),
