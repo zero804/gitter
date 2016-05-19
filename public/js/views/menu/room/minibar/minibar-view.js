@@ -162,7 +162,7 @@ var MinibarView = Marionette.CollectionView.extend({
 
   onCloseClicked: function() {
     var newVal = !this.model.get('roomMenuIsPinned');
-    var ANIMATION_TIME = 300;
+    var ANIMATION_TIME = 150;
 
     //if we are opening the panel
     if (newVal === true) {
