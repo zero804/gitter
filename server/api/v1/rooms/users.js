@@ -47,8 +47,8 @@ module.exports = {
   index: function(req) {
     var options = {
       lean: !!req.query.lean,
-      skip: req.query.skip && parseInt(req.query.skip, 10) || undefined,
-      limit: req.query.limit && parseInt(req.query.limit, 10) || undefined,
+      skip: parseInt(req.query.skip, 10) || undefined,
+      limit: parseInt(req.query.limit, 10) || undefined,
       searchTerm: req.query.q
     };
 
