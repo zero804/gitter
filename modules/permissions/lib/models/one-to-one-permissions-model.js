@@ -9,7 +9,7 @@ function ensureUserHasSignedUp(uri) {
     .then(function(signedUp) {
       if(signedUp) return true;
 
-      var err = new StatusError(404, 'User not signed up');
+      var err = new StatusError(404, 'User ' + uri + ' not signed up');
       err.uri = uri;
       err.userNotSignedUp = true;
       throw err;
