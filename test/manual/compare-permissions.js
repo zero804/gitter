@@ -5,8 +5,7 @@
 var persistence = require('gitter-web-persistence');
 var legacyMigration = require('gitter-web-permissions/lib/legacy-migration');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
-var roomPermissionsModel = require('gitter-web-permissions/lib/room-permissions-model');
-var userCanAccessRoom = require('gitter-web-permissions/lib/user-can-access-room');
+var legacyPolicyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
 var Promise = require('bluebird');
 var assert = require('assert');
 
@@ -17,7 +16,7 @@ function getSomeRooms() {
       //     oneToOne: { $ne: true },
       //   }
       // },
-      { $sample: { size: 50 } },
+      { $sample: { size: 100 } },
       { $lookup: {
           from: "troupes",
           localField: "parentId",
@@ -51,7 +50,7 @@ function getSomeUsers() {
   return persistence.User
     .aggregate([
       { $match: { githubUserToken: { $ne: null } } },
-      { $sample: { size: 50 } },
+      { $sample: { size: 500 } },
     ])
     .read('secondaryPreferred')
     .exec();
@@ -64,31 +63,7 @@ function compareOneToOneRoomResultsFor(userId, room, perms) {
   return persistence.User.findById(userId)
     .then(function(user) {
       if (!user) return;
-
-      var policy = policyFactory.createPolicyFromDescriptor(user, perms, room._id);
-      return Promise.props({
-          canRead: policy.canRead(),
-          canWrite: policy.canWrite(),
-          canJoin: policy.canJoin(),
-          canAdmin: policy.canAdmin(),
-          canAddUser: policy.canAddUser(),
-        })
-        .then(function(permDetails) {
-          return Promise.join(
-            userCanAccessRoom.permissionToRead(user._id, room._id),
-            userCanAccessRoom.permissionToWrite(user._id, room._id),
-            function(read, write) {
-              assert.strictEqual(permDetails.canRead, read, 'NEW result for `permissionToRead` was ' + permDetails.canRead + ' OLD RESULT was ' + read);
-              assert.strictEqual(permDetails.canWrite, write, 'NEW result for `permissionToWrite` was ' + permDetails.canWrite + ' OLD RESULT was ' + write);
-            })
-            .catch(function(e) {
-              console.log('ROOM', room);
-              console.log('PERMS', perms);
-              console.log('user', user.username);
-              console.log('new', permDetails);
-              throw e;
-            });
-        });
+      return compareGroupRoomResultsFor(user, room, perms);
     });
 
 }
@@ -102,27 +77,19 @@ function compareGroupRoomResultsFor(user, room, perms) {
       canAdmin: policy.canAdmin(),
       canAddUser: policy.canAddUser(),
     })
-    .then(function(x) {
-      return roomPermissionsModel(user, 'view', room)
-        .then(function(result) {
-          assert.strictEqual(x.canRead, result, 'NEW result for `view` was ' + x.canRead + ' OLD RESULT was ' + result);
-          return roomPermissionsModel(user, 'join', room);
-        })
-        .then(function(result) {
-          assert.strictEqual(x.canJoin, result, 'NEW result for `join` was ' + x.canJoin + ' OLD RESULT was ' + result);
-          return roomPermissionsModel(user, 'admin', room);
-        })
-        .then(function(result) {
-          assert.strictEqual(x.canAdmin, result, 'NEW result for `admin` was ' + x.canAdmin + ' OLD RESULT was ' + result);
-        })
-        .then(function() {
-          return Promise.join(
-            userCanAccessRoom.permissionToRead(user._id, room._id),
-            userCanAccessRoom.permissionToWrite(user._id, room._id),
-            function(read, write) {
-              assert.strictEqual(x.canRead, read, 'NEW result for `permissionToRead` was ' + x.canRead + ' OLD RESULT was ' + read);
-              assert.strictEqual(x.canWrite, write, 'NEW result for `permissionToWrite` was ' + x.canWrite + ' OLD RESULT was ' + write);
-            });
+    .then(function(newPerms) {
+      return legacyPolicyFactory.createPolicyForRoom(user, room)
+        .then(function(legacyPolicy) {
+          return Promise.props({
+              canRead: legacyPolicy.canRead(),
+              canWrite: legacyPolicy.canWrite(),
+              canJoin: legacyPolicy.canJoin(),
+              canAdmin: legacyPolicy.canAdmin(),
+              canAddUser: legacyPolicy.canAddUser(),
+            })
+            .then(function(oldPerms) {
+              assert.deepEqual(newPerms, oldPerms);
+            })
         });
     });
 }
