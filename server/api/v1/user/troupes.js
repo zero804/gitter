@@ -12,11 +12,20 @@ var StatusError = require('statuserror');
 var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
 var RoomWithPolicyService = require('../../../services/room-with-policy-service');
 
-function performUpdateToUserRoom(req) {
-  var userId = req.user.id;
-  var troupeId = req.params.userTroupeId;
+function joinRoom(user, room, policy, options) {
+  var roomWithPolicyService = new RoomWithPolicyService(room, user, policy);
+  return roomWithPolicyService.joinRoom(options);
+}
 
-  return troupeService.findByIdLeanWithMembership(troupeId, req.user && req.user._id)
+function performUpdateToUserRoom(req) {
+  var user = req.user;
+  if (!user) throw new StatusError(401);
+
+  var userId = user._id;
+  var troupeId = req.params.userTroupeId;
+  var policy = req.userRoomPolicy;
+
+  return troupeService.findByIdLeanWithMembership(troupeId, userId)
     .spread(function(troupe, isMember) {
 
       var updatedTroupe = req.body;
@@ -34,9 +43,9 @@ function performUpdateToUserRoom(req) {
           if (!troupe.oneToOne) {
             /* Ignore one-to-one rooms */
             promises.push(
-              roomService.createRoomByUri(req.resourceUser, troupe.uri)
+              joinRoom(user, troupe, policy)
                 .then(function() {
-                  return recentRoomService.updateFavourite(userId, troupeId, updatedTroupe.favourite);
+                  return recentRoomService.updateFavourite(userId, troupeId, fav);
                 })
               );
           }
@@ -48,7 +57,7 @@ function performUpdateToUserRoom(req) {
       }
 
       if('mode' in updatedTroupe) {
-        promises.push(userRoomModeUpdateService.setModeForUserInRoom(req.resourceUser, troupeId, updatedTroupe.mode));
+        promises.push(userRoomModeUpdateService.setModeForUserInRoom(user, troupeId, updatedTroupe.mode));
       }
 
       return Promise.all(promises);
@@ -93,16 +102,13 @@ module.exports = {
         return [room, policyFactory.createPolicyForRoom(req.user, room)];
       })
       .spread(function(room, policy) {
-        var roomWithPolicyService = new RoomWithPolicyService(room, user, policy);
-
-        var options = {
-        };
+        var options = {};
 
         if (source) {
           options.tracking = { source: source };
         }
 
-        return roomWithPolicyService.joinRoom(options);
+        return joinRoom(user, room, policy, options);
       })
       .then(function() {
         var strategy = new restSerializer.TroupeIdStrategy({
