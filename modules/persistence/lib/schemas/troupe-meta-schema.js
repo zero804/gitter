@@ -1,7 +1,6 @@
 var mongoose                    = require('gitter-web-mongoose-bluebird');
 var Schema                      = mongoose.Schema;
 var ObjectId                    = Schema.ObjectId;
-var String                      = Schema.String;
 var installVersionIncMiddleware = require('../install-version-inc-middleware');
 
 
