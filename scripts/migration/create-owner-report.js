@@ -20,11 +20,11 @@ function getBatchedRooms() {
     return persistence.Troupe.aggregate([
       {
         $match: {
-          githubType: {
-            $nin: ['ONETOONE']
-          },
+          githubType: { $nin: ['ONETOONE'] },
+          oneToOne: { $ne: true },
           lcOwner: { $exists: true, $ne: null },
-          // NOTE: this skips existing org-owned room renames for now
+          // NOTE: this skips existing org-owned room renames for now, but it
+          // speeds things up a lot when testing remotely
           groupId: { $exists: false }
         }
       },

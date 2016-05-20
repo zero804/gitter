@@ -14,9 +14,8 @@ function getGroupableRooms() {
   return persistence.Troupe.aggregate([
       {
         $match: {
-          githubType: {
-            $nin: ['ONETOONE']
-          },
+          githubType: { $nin: ['ONETOONE'] },
+          oneToOne: { $ne: true },
           lcOwner: { $exists: true, $ne: null },
           groupId: { $exists: false }
         }
