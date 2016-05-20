@@ -22,33 +22,33 @@ function createNewMetaRecord(troupeId, data) {
 
   //should this be sanitised? JP 20/5/16 ... probably
   return processMarkdown(data.welcomeMessage)
-  .then(function(parsedWelcomeMessage){
+    .then(function(parsedWelcomeMessage) {
 
-    var setOperation = {
-      $set: {
+      var setOperation = {
+        $set: {
+          welcomeMessage: {
+            html: parsedWelcomeMessage.html,
+            text: parsedWelcomeMessage.text
+          }
+        }
+      };
+
+      var data = {
         welcomeMessage: {
           html: parsedWelcomeMessage.html,
           text: parsedWelcomeMessage.text
         }
-      }
-    };
+      };
 
-    var data = {
-      welcomeMessage: {
-        html: parsedWelcomeMessage.html,
-        text: parsedWelcomeMessage.text
-      }
-    };
+      return Promise.fromCallback(function(callback) {
+        persistence.TroupeMeta.findOneAndUpdate({ troupeId: troupeId }, data, { upsert: true }, callback);
+      });
 
-    return Promise.fromCallback(function(callback) {
-      persistence.TroupeMeta.findOneAndUpdate({ troupeId: troupeId }, data, { upsert: true }, callback);
+    })
+    .catch(function(err) {
+      //TODO Error Reporting
+      //console.log(err.message);
     });
-
-  })
-  .catch(function(err){
-    //TODO Error Reporting
-    //console.log(err.message);
-  });
 
 }
 
