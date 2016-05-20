@@ -20,7 +20,7 @@ var View = Marionette.ItemView.extend({
 
   initialize: function() {
     this.listenTo(this, 'menuItemClicked', this.menuItemClicked, this);
-    apiClient.room.get('/meta/welcome-message').then(function(msg){
+    apiClient.room.get('/meta').then(function(msg){
       console.log('-----------------------');
       console.log(msg);
       console.log('-----------------------');
