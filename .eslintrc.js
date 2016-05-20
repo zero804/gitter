@@ -38,7 +38,18 @@ module.exports = {
     "no-mixed-spaces-and-tabs": "error",
     "no-negated-condition": "warn",
     "no-unneeded-ternary": "error",
-
+    "no-multi-spaces": ["warn", { exceptions: { "Property": true } }],
+    "key-spacing": ["warn", {
+        "singleLine": {
+          "beforeColon": false,
+          "afterColon": true
+        },
+        "multiLine": {
+            "beforeColon": false,
+            "afterColon": true,
+            "mode": "minimum"
+        }
+    }],
     "node/no-missing-require": "error",
     "node/no-unsupported-features": ["error", {"version": 0.10 }],
   },
