@@ -25,7 +25,7 @@ function getBatchedRooms() {
           lcOwner: { $exists: true, $ne: null },
           // NOTE: this skips existing org-owned room renames for now, but it
           // speeds things up a lot when testing remotely
-          groupId: { $exists: false }
+          //groupId: { $exists: false }
         }
       },
       {
@@ -137,6 +137,7 @@ function findBatchWarnings(opts) {
   return warnings;
 }
 
+/*
 function findGitHubOrg(lcUri) {
   return migrationSchemas.GitHubOrg.findOne({ lcUri: lcUri })
     .read('secondaryPreferred')
@@ -150,16 +151,43 @@ function findGitHubUser(lcUri) {
     .lean()
     .exec();
 }
+*/
 
-var findRoomGitHubUser = Promise.method(function(ownerUserId) {
+function findGithubUserById(githubId) {
+  return migrationSchemas.GitHubUser.findOne({ githubId: githubId })
+    .read('secondaryPreferred')
+    .lean()
+    .exec()
+}
+
+var findUsersByOwner = function(lcOwner) {
+  var regex = new RegExp(["^", lcOwner, "$"].join(""), "i");
+  return userService.findByUsername(regex)
+    .then(function(gitterUser) {
+      if (gitterUser) {
+        return findGithubUserById(gitterUser.githubId)
+          .then(function(githubUser) {
+            if (githubUser) {
+              return {
+                gitterUser: gitterUser,
+                githubUser: githubUser
+              };
+            } else {
+              return null;
+            }
+          });
+      } else {
+        return null;
+      }
+    });
+}
+
+var findUsersByGitterId = Promise.method(function(ownerUserId) {
   if (ownerUserId) {
     return userService.findById(ownerUserId)
       .then(function(gitterUser) {
         if (gitterUser) {
-          return migrationSchemas.GitHubUser.findOne({ githubId: gitterUser.githubId })
-            .read('secondaryPreferred')
-            .lean()
-            .exec()
+          return findGithubUserById(gitterUser.githubId)
             .then(function(githubUser) {
               if (githubUser) {
                 return {
@@ -207,14 +235,15 @@ var findBatchInfo = Promise.method(function(batch) {
   var lookups = {};
 
   return Promise.join(
-    // there used to be more here :)
-    findRoomGitHubUser(uniqueUserIds[0]), // could be undefined
-    function(roomUsers) {
+    findUsersByOwner(lcOwner),
+    findUsersByGitterId(uniqueUserIds[0]), // could be undefined
+    function(ownerUsers, roomUsers) {
       var org = batch.githuborg[0]; // could be undefined
       var user = batch.githubuser[0]; // could be undefined
       if (org) {
+        // A case-insensitive lookup matched the lcOwner to a current github org.
         type = 'org';
-        reason = 'org-lookup';
+        reason = 'github-org-lookup';
 
         // if they aren't all this org, update them
         if (!_.every(uniqueOwners, function(uniqueUri) { return uniqueUri == org.uri; })) {
@@ -229,19 +258,32 @@ var findBatchInfo = Promise.method(function(batch) {
         }
 
       } else if (user) {
+        // A case-insensitive lookup matched the lcOwner to a current github user.
         type = 'user';
-        reason = 'user-lookup';
+        reason = 'github-username-lookup';
 
         // if they aren't all this user, update them
         if (!_.every(uniqueOwners, function(uniqueUri) { return uniqueUri == user.uri; })) {
           var oldUser;
-          if (roomUsers && roomUsers.gitterUser) {
+          if (ownerUsers && ownerUsers.gitterUser) {
+            // we already have a user with a username matching the lcOwner
+            // (case insensitive), but it has clearly been renamed
+            // double-check that we actually found the same user, though,
+            // otherwise we'll end up renaming the wrong person
+            if (ownerUsers.gitterUser.githubId === user.githubId) {
+              oldUser = roomUsers.gitterUser;
+            } else {
+              console.log("WARNING: owner user and github user doesn't match!", ownerUsers.gitterUser.githubId, '!=', user.githubId);
+            }
+          } else if (roomUsers && roomUsers.gitterUser) {
             // If at least one of the rooms already belonged to a user that
             // still exists we would find it here.
             // HOWEVER, we better double check that the uri actually found the
             // same github user, otherwise we'll rename the wrong person.
-            if (roomUsers.gitterUser.githubId == user.githubId) {
+            if (roomUsers.gitterUser.githubId === user.githubId) {
               oldUser = roomUsers.gitterUser;
+            } else {
+              console.log("WARNING: room user and github user doesn't match!", roomUsers.gitterUser.githubId, '!=', user.githubId);
             }
           }
           errors.push({
@@ -251,17 +293,42 @@ var findBatchInfo = Promise.method(function(batch) {
             correctOwner: user.uri,
             batch: batch,
             // gitter user
-            oldUser: oldUser, // could be undefined
+            oldUser: oldUser, // could be undefined as in the jashkenas case
             // github user
             user: user
           });
         }
 
+      } else if (ownerUsers) {
+        // The lcOwner still matches a username (case-insensitive) on our
+        // system and we could still find a github user with that user's
+        // githubId. So the user has been renamed in the meantime.
+
+        type = 'user';
+        reason = 'gitter-username-lookup';
+
+        errors.push({
+          errorType: "owner",
+          type: type,
+          lcOwner: lcOwner,
+          correctOwner: ownerUsers.githubUser.uri,
+          batch: batch,
+          oldUser: ownerUsers.gitterUser,
+          user: ownerUsers.githubUser
+        });
+
       } else if (roomUsers) {
+        // At least one room in this batch was a user channel and we managed to
+        // still find that user and then a github user for the same github id.
+        // So by now that user has been renamed totally, but at least the
+        // github user id is still around.
+
+        // This is a really rare case where the lcOwner isn't even a user on
+        // our system anymore. (Need to test to see if it actually happens.)
+
         type = 'user';
         reason = 'owneruserid-lookup';
 
-        // the user has definitely been renamed, and not just some case change
         errors.push({
           errorType: "owner",
           type: type,
@@ -273,11 +340,10 @@ var findBatchInfo = Promise.method(function(batch) {
         });
 
       } else {
-        // TODO: we can actually try and look up the existing user based on the
-        // first uri component, then get the id, then get the github user for
-        // that. But the existing usernames are case sensitive and lcOwner is
-        // not..
-
+        // any other ideas? Try and check github using a room id and see if we
+        // get anything back? Most remaining differences are probably caused by
+        // renamed orgs as we can't detect anything more than a simple case
+        // change.
       }
 
       if (user) {
@@ -287,7 +353,7 @@ var findBatchInfo = Promise.method(function(batch) {
 
       return Promise.props(lookups)
         .then(function(results) {
-          console.log(++numProcessed, lcOwner, type);
+          console.log(++numProcessed, lcOwner, type, reason);
 
           return errorsToUpdates(errors)
             .then(function(updates) {
@@ -344,7 +410,7 @@ function getInfo() {
     var unknown = [];
 
     getBatchedRooms()
-      .pipe(through2Concurrent.obj({ concurrency: 10 }, function(batch, enc, callback) {
+      .pipe(through2Concurrent.obj({ concurrency: 25 }, function(batch, enc, callback) {
         numBatches++;
         findBatchInfo(batch)
           .then(function(info) {
