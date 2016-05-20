@@ -54,12 +54,18 @@ function createGroup(user, options) {
       debug("GitHub information for %s is %j", uri, githubInfo);
 
       if (!githubInfo) throw new StatusError(404);
+      this.githubInfo = githubInfo;
       var githubType = githubInfo.type;
       var officialUri = githubInfo.uri;
 
-      if (githubType !== 'ORG') throw new StatusError(400, 'Can only create groups for ORGs right now');
+      switch (githubType) {
+        case 'ORG':
+        case 'USER':
+          break;
 
-      this.githubInfo = githubInfo;
+        default:
+          throw new StatusError(400, 'Unknown github type:' + githubType);
+      }
 
       return policyFactory.createPolicyForGithubObject(user, officialUri, githubType, null);
     })
