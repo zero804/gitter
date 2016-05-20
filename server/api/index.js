@@ -48,9 +48,11 @@ router.get('/api/private/health_check/full',
   require('./private/health-check-full'));
 
 /* Catch all - return 404 error */
-router.get('/*', function(req, res, next) {
-  return next(404);
-});
+if (!process.env.DISABLE_API_404_HANDLER) {
+  router.get('/*', function(req, res, next) {
+    return next(404);
+  });
+}
 
 // Error Handlers
 router.use('/', require('../web/middlewares/token-error-handler'));
