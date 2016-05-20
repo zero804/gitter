@@ -1,50 +1,50 @@
 "use strict";
 
-var env                = require('gitter-web-env');
-var logger             = env.logger;
-var nconf              = env.config;
-var stats              = env.stats;
-var errorReporter      = env.errorReporter;
+var env = require('gitter-web-env');
+var logger = env.logger;
+var nconf = env.config;
+var stats = env.stats;
+var errorReporter = env.errorReporter;
 
-var appEvents                  = require('gitter-web-appevents');
-var assert                     = require('assert');
-var Promise                    = require('bluebird');
-var request                    = require('request');
-var _                          = require('lodash');
-var validateRoomName           = require('gitter-web-validators/lib/validate-room-name');
-var persistence                = require('gitter-web-persistence');
-var uriLookupService           = require("./uri-lookup-service");
-var policyFactory              = require('gitter-web-permissions/lib/legacy-policy-factory');
-var securityDescriptorService  = require('gitter-web-permissions/lib/security-descriptor-service');
-var legacyMigration            = require('gitter-web-permissions/lib/legacy-migration');
+var appEvents = require('gitter-web-appevents');
+var assert = require('assert');
+var Promise = require('bluebird');
+var request = require('request');
+var _ = require('lodash');
+var validateRoomName = require('gitter-web-validators/lib/validate-room-name');
+var persistence = require('gitter-web-persistence');
+var uriLookupService = require("./uri-lookup-service");
+var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
+var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
+var legacyMigration = require('gitter-web-permissions/lib/legacy-migration');
 var canUserBeInvitedToJoinRoom = require('gitter-web-permissions/lib/invited-permissions-service');
-var userService                = require('./user-service');
-var troupeService              = require('./troupe-service');
-var oneToOneRoomService        = require('./one-to-one-room-service');
-var userDefaultFlagsService    = require('./user-default-flags-service');
-var validateUri                = require('gitter-web-github').GitHubUriValidator;
-var GitHubRepoService          = require('gitter-web-github').GitHubRepoService;
-var validate                   = require('../utils/validate');
-var collections                = require('../utils/collections');
-var StatusError                = require('statuserror');
-var emailNotificationService   = require('./email-notification-service');
-var emailAddressService        = require('./email-address-service');
-var mongoUtils                 = require('gitter-web-persistence-utils/lib/mongo-utils');
-var mongooseUtils              = require('gitter-web-persistence-utils/lib/mongoose-utils');
-var badger                     = require('./badger-service');
-var userSettingsService        = require('./user-settings-service');
-var roomSearchService          = require('./room-search-service');
-var assertJoinRoomChecks       = require('./assert-join-room-checks');
-var redisLockPromise           = require("../utils/redis-lock-promise");
-var unreadItemService          = require('./unread-items');
-var debug                      = require('debug')('gitter:room-service');
-var roomMembershipService      = require('./room-membership-service');
-var recentRoomService          = require('./recent-room-service');
-var badgerEnabled              = nconf.get('autoPullRequest:enabled');
-var uriResolver                = require('./uri-resolver');
-var getOrgNameFromTroupeName   = require('gitter-web-shared/get-org-name-from-troupe-name');
-var userScopes                 = require('gitter-web-identity/lib/user-scopes');
-var groupService               = require('gitter-web-groups/lib/group-service');
+var userService = require('./user-service');
+var troupeService = require('./troupe-service');
+var oneToOneRoomService = require('./one-to-one-room-service');
+var userDefaultFlagsService = require('./user-default-flags-service');
+var validateUri = require('gitter-web-github').GitHubUriValidator;
+var GitHubRepoService = require('gitter-web-github').GitHubRepoService;
+var validate = require('../utils/validate');
+var collections = require('../utils/collections');
+var StatusError = require('statuserror');
+var emailNotificationService = require('./email-notification-service');
+var emailAddressService = require('./email-address-service');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
+var badger = require('./badger-service');
+var userSettingsService = require('./user-settings-service');
+var roomSearchService = require('./room-search-service');
+var assertJoinRoomChecks = require('./assert-join-room-checks');
+var redisLockPromise = require("../utils/redis-lock-promise");
+var unreadItemService = require('./unread-items');
+var debug = require('debug')('gitter:room-service');
+var roomMembershipService = require('./room-membership-service');
+var recentRoomService = require('./recent-room-service');
+var badgerEnabled = nconf.get('autoPullRequest:enabled');
+var uriResolver = require('./uri-resolver');
+var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
+var userScopes = require('gitter-web-identity/lib/user-scopes');
+var groupService = require('gitter-web-groups/lib/group-service');
 var splitsvilleEnabled = nconf.get("project-splitsville:enabled");
 
 /**
@@ -177,21 +177,26 @@ function getOwnerFromRepoFullName(repoName) {
  * given uri.
  */
 function ensureGroupForGitHubRoom(user, githubType, uri) {
-  var owner;
+  var options;
   switch (githubType) {
     case 'REPO':
-      owner = getOwnerFromRepoFullName(uri);
+      options = {
+        uri: getOwnerFromRepoFullName(uri),
+        obtainAccessFromGitHubRepo: uri
+      }
       break;
+
     case 'ORG':
-      owner = uri;
+      options = {
+        uri: uri
+      }
       break;
+
     default:
       throw new StatusError(400, 'Cannot create a group for ' + githubType);
   }
 
-  return groupService.migration.ensureGroupForGitHubRoomCreation(user, {
-      uri: owner
-    });
+  return groupService.migration.ensureGroupForGitHubRoomCreation(user, options);
 }
 
 function doPostRoomCreationMigrationSteps(troupe) {
