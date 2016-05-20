@@ -3,8 +3,11 @@
 var Promise = require('bluebird');
 var persistence = require('gitter-web-persistence');
 var LegacyGitHubPolicyEvaluator = require('./legacy-github-policy-evaluator');
+var StaticPolicyEvaluator = require('./static-policy-evaluator');
+var debug = require('debug')('gitter:permissions:legacy-group-policy-evaluator');
+var StatusError = require('statuserror');
 
-function LegacyGroupPolicyEvaluator(userId, user, groupId, group) {
+function LegacyGroupPolicyEvaluator(userId, user, groupId, group, obtainAccessFromGitHubRepo) {
   this._userId = userId;
   if (this._userId) {
     this._userPromise = user && Promise.resolve(user);
@@ -13,6 +16,7 @@ function LegacyGroupPolicyEvaluator(userId, user, groupId, group) {
     this._userPromise = Promise.resolve(null);
   }
 
+  this._obtainAccessFromGitHubRepo = obtainAccessFromGitHubRepo;
   this._groupId = groupId;
   this._groupPromise = group && Promise.resolve(group);
   this._policyPromise = null;
@@ -20,27 +24,29 @@ function LegacyGroupPolicyEvaluator(userId, user, groupId, group) {
 
 LegacyGroupPolicyEvaluator.prototype = {
   canRead: Promise.method(function() {
-    return true;
+    return this._fetchLegacyPolicy()
+      .then(function(policy) {
+        return policy.canRead();
+      });
   }),
 
   canWrite: Promise.method(function() {
     return this._fetchLegacyPolicy()
       .then(function(policy) {
-        if (!policy) return false;
-
         return policy.canWrite();
       });
   }),
 
   canJoin: Promise.method(function() {
-    return true;
+    return this._fetchLegacyPolicy()
+      .then(function(policy) {
+        return policy.canJoin();
+      });
   }),
 
   canAdmin: Promise.method(function() {
     return this._fetchLegacyPolicy()
       .then(function(policy) {
-        if (!policy) return false;
-
         return policy.canAdmin();
       });
   }),
@@ -48,8 +54,6 @@ LegacyGroupPolicyEvaluator.prototype = {
   canAddUser: Promise.method(function() {
     return this._fetchLegacyPolicy()
       .then(function(policy) {
-        if (!policy) return false;
-
         return policy.canAddUser();
       });
   }),
@@ -75,28 +79,54 @@ LegacyGroupPolicyEvaluator.prototype = {
   _fetchLegacyPolicy: function() {
     if (this._policyPromise) return this._policyPromise;
 
+    var obtainAccessFromGitHubRepo = this._obtainAccessFromGitHubRepo;
+
     this._policyPromise = Promise.join(
       this._fetchGroup(),
       this._fetchUser(),
       function(group, user) {
-        if (!group) return null;
+        if (!group) {
+          throw new StatusError(404);
+        }
 
         switch (group.type) {
           case 'USER':
-            // What to do?
-            return false;
+            if (callingUserMatchesGroup(user, group)) {
+              debug('User and group match, granting user full access');
+              return new StaticPolicyEvaluator(true);
+            }
+
+            if (obtainAccessFromGitHubRepo) {
+              debug('Deferring permissions to GitHub repo: uri=%s', obtainAccessFromGitHubRepo);
+              return new LegacyGitHubPolicyEvaluator(user, obtainAccessFromGitHubRepo, 'REPO', null);
+            } else {
+              throw new StatusError(500, 'User and group do not match, and obtainAccessFromGitHubRepo not provided, denying access');
+            }
+            /* break; */
+
           case 'ORG':
+            debug('Delegating permissions to GitHub org: uri=%s', group.uri);
             return new LegacyGitHubPolicyEvaluator(user, group.uri, 'ORG', null);
 
           default:
-            return false;
+            debug('Unknown group type: type=%s, denying access', group.uri);
+            /* Deny all */
+            return new StaticPolicyEvaluator(false);
         }
       });
 
     return this._policyPromise;
-  },
-
-
+  }
 };
+
+/**
+ * @private
+ */
+function callingUserMatchesGroup(user, group) {
+  if (group.type !== 'USER') return false;
+  return user.username === group.uri ||
+         user.githubId && user.githubId === group.githubId ||
+         user.username.toLowerCase() === group.lcUri;
+}
 
 module.exports = LegacyGroupPolicyEvaluator;

@@ -31,9 +31,13 @@ function createPolicyForOneToOne(user, toUser) {
   return new LegacyGitHubPolicyEvaluator(user, toUser.username, 'ONETOONE', null);
 }
 
-function createPolicyForGroup(user, group) {
+/**
+ * NB: obtainAccessFromGitHubRepo is a stop-gap until we have proper
+ * user-group permissions
+ */
+function createPolicyForGroup(user, group, obtainAccessFromGitHubRepo) {
   var userId = user && user._id;
-  return new LegacyGroupPolicyEvaluator(userId, user, group._id, group);
+  return new LegacyGroupPolicyEvaluator(userId, user, group._id, group, obtainAccessFromGitHubRepo);
 }
 
 module.exports = {

@@ -126,10 +126,22 @@ describe('room-service', function() {
 
 
     it('should find or create a room for an organization', function() {
+      var groupId = new ObjectID();
       var uriResolver = mockito.mockFunction();
       var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
       var roomService = testRequire.withProxies("./services/room-service", {
         './uri-resolver': uriResolver,
+        'gitter-web-groups/lib/group-service': {
+          migration: {
+            ensureGroupForGitHubRoomCreation: function(pUser, options) {
+              assert.strictEqual(pUser, fixture.user1);
+              assert.deepEqual(options, {
+                uri: 'gitterTest'
+              });
+              return Promise.resolve({ _id: groupId });
+            }
+          }
+        },
         'gitter-web-permissions/lib/legacy-policy-factory': {
           createPolicyForGithubObject: function(user, uri, ghType, security) {
             assert.equal(user.username, fixture.user1.username);
@@ -206,7 +218,20 @@ describe('room-service', function() {
 
     it('should create a room for a repo', function() {
       var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
+      var groupId = new ObjectID();
       var roomService = testRequire.withProxies("./services/room-service", {
+        'gitter-web-groups/lib/group-service': {
+          migration: {
+            ensureGroupForGitHubRoomCreation: function(pUser, options) {
+              assert.strictEqual(pUser, fixture.user1);
+              assert.deepEqual(options, {
+                obtainAccessFromGitHubRepo: "gitterHQ/cloaked-avenger",
+                uri: "gitterHQ"
+              });
+              return Promise.resolve({ _id: groupId });
+            }
+          }
+        },
         'gitter-web-permissions/lib/legacy-policy-factory': {
           createPolicyForGithubObject: function(user, uri, ghType, security) {
             assert.equal(user.username, fixture.user1.username);
@@ -222,6 +247,7 @@ describe('room-service', function() {
           },
           createPolicyForRoom: function(user, room) {
             assert.equal(room.uri, 'gitterHQ/cloaked-avenger');
+            assert.equal(room.groupId, groupId);
             return Promise.resolve({});
           }
         }
@@ -249,8 +275,22 @@ describe('room-service', function() {
     });
 
     it('should create a room for a repo ignoring the case', function() {
+      var groupId = new ObjectID();
+
       var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
       var roomService = testRequire.withProxies("./services/room-service", {
+        'gitter-web-groups/lib/group-service': {
+          migration: {
+            ensureGroupForGitHubRoomCreation: function(pUser, options) {
+              assert.strictEqual(pUser, fixture.user1);
+              assert.deepEqual(options, {
+                uri: 'gitterHQ',
+                obtainAccessFromGitHubRepo: "gitterHQ/sandbox"
+              });
+              return Promise.resolve({ _id: groupId });
+            }
+          }
+        },
         'gitter-web-permissions/lib/legacy-policy-factory': {
           createPolicyForGithubObject: function(user, uri, ghType, security) {
             assert.equal(user.username, fixture.user1.username);
@@ -1363,7 +1403,19 @@ describe('room-service', function() {
 
   describe('createRoomForGitHubUri #slow', function() {
     it('should create an empty room for an organization', function() {
+      var groupId = new ObjectID();
       var roomService = testRequire.withProxies("./services/room-service", {
+        'gitter-web-groups/lib/group-service': {
+          migration: {
+            ensureGroupForGitHubRoomCreation: function(pUser, options) {
+              assert.strictEqual(pUser, fixture.user1);
+              assert.deepEqual(options, {
+                uri: "gitterTest"
+              });
+              return Promise.resolve({ _id: groupId });
+            }
+          }
+        },
         'gitter-web-permissions/lib/legacy-policy-factory': {
           createPolicyForGithubObject: function(user, uri, githubType, security) {
             assert.strictEqual(user.username, fixture.user1.username);
@@ -1394,9 +1446,11 @@ describe('room-service', function() {
   describe('renames #slow', function() {
     var roomValidatorMock, roomService;
     var createPolicyForGithubObjectMock;
+    var groupId;
 
     beforeEach(function() {
       createPolicyForGithubObjectMock = mockito.mockFunction();
+      groupId = new ObjectID();
 
       roomValidatorMock = mockito.mockFunction();
       roomService = testRequire.withProxies('./services/room-service', {
@@ -1405,7 +1459,14 @@ describe('room-service', function() {
         },
         'gitter-web-permissions/lib/legacy-policy-factory': {
           createPolicyForGithubObject: createPolicyForGithubObjectMock
-        }
+        },
+        'gitter-web-groups/lib/group-service': {
+          migration: {
+            ensureGroupForGitHubRoomCreation: function() {
+              return Promise.resolve({ _id: groupId });
+            }
+          }
+        },
       });
     });
 
@@ -1598,6 +1659,7 @@ describe('room-service', function() {
     var roomValidatorMock, roomService;
     var createPolicyForGithubObjectMock;
     var duplicateGithubId = fixtureLoader.generateGithubId();
+    var groupId;
 
     var fixture = fixtureLoader.setup({
       troupeOrg1: {
@@ -1617,9 +1679,16 @@ describe('room-service', function() {
 
     beforeEach(function() {
       createPolicyForGithubObjectMock = mockito.mockFunction();
-
+      groupId = new ObjectID();
       roomValidatorMock = mockito.mockFunction();
       roomService = testRequire.withProxies('./services/room-service', {
+        'gitter-web-groups/lib/group-service': {
+          migration: {
+            ensureGroupForGitHubRoomCreation: function() {
+              return Promise.resolve({ _id: groupId });
+            }
+          }
+        },
         'gitter-web-github': {
           GitHubUriValidator: roomValidatorMock
         },

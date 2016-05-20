@@ -48,31 +48,14 @@ function createGroup(user, options) {
   return validateUri(user, uri)
     .bind({
       githubInfo: null,
-      policy: null
     })
     .then(function(githubInfo) {
       debug("GitHub information for %s is %j", uri, githubInfo);
 
       if (!githubInfo) throw new StatusError(404);
       this.githubInfo = githubInfo;
-      var githubType = githubInfo.type;
-      var officialUri = githubInfo.uri;
 
-      switch (githubType) {
-        case 'ORG':
-        case 'USER':
-          break;
-
-        default:
-          throw new StatusError(400, 'Unknown github type:' + githubType);
-      }
-
-      return policyFactory.createPolicyForGithubObject(user, officialUri, githubType, null);
-    })
-    .then(function(policy) {
-      this.policy = policy;
-
-      return policy.canAdmin();
+      return canAdminPotentialGitHubGroup(user, githubInfo, options.obtainAccessFromGitHubRepo);
     })
     .then(function(isAdmin) {
       if (!isAdmin) throw new StatusError(403, 'Not an administrator of this org');
@@ -95,8 +78,31 @@ function createGroup(user, options) {
     });
 }
 
-function canUserAdminGroup(user, group) {
-  return policyFactory.createPolicyForGroup(user, group)
+/**
+ * @private
+ */
+function canAdminPotentialGitHubGroup(user, githubInfo, obtainAccessFromGitHubRepo) {
+  // FIXME: This is pretty dodgy.
+  // https://github.com/troupe/gitter-webapp/issues/1519
+  var group = {
+    _id: -1,
+    uri: githubInfo.uri,
+    lcUri: githubInfo.uri.toLowerCase(),
+    type: githubInfo.type,
+    githubId: githubInfo.id,
+  }
+
+  return policyFactory.createPolicyForGroup(user, group, obtainAccessFromGitHubRepo)
+    .then(function(policy) {
+      return policy.canAdmin();
+    });
+}
+
+/**
+ * @private
+ */
+function canUserAdminGroup(user, group, obtainAccessFromGitHubRepo) {
+  return policyFactory.createPolicyForGroup(user, group, obtainAccessFromGitHubRepo)
     .then(function(policy) {
       return policy.canAdmin();
     });
