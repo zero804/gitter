@@ -16,15 +16,18 @@ module.exports = {
     return troupeService.findById(req.params.troupeId)
       .then(function(troupe) {
         var roomWithPolicyService = new RoomWithPolicyService(troupe, req.user, req.userRoomPolicy);
-        return roomWithPolicyService.getRoomWelcomeMessage(req.params.roomMetaKey);
+        return roomWithPolicyService.getRoomWelcomeMessage();
       });
   },
 
-  create: function(req) {
+  update: function(){
     if (!req.user) { throw new StatusError(401); }
-
+    if(req.params.roomMetaKey !== 'welcome-message') { return {}; }
     var data = _.clone(req.body);
-    return metaService.createNewMetaRecord(req.params.troupeId, data);
-  }
-
+    return troupeService.findById(req.params.troupeId)
+      .then(function(troupe) {
+        var roomWithPolicyService = new RoomWithPolicyService(troupe, req.user, req.userRoomPolicy);
+        return roomWithPolicyService.updateRoomWelcomeMessage({ welcomeMessage: data.welcomeMessage });
+      });
+  },
 };

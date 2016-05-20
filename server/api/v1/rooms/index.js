@@ -1,7 +1,6 @@
 "use strict";
 
 var troupeService = require("../../../services/troupe-service");
-var troupeMetaService = require('../../../services/room-meta-service');
 var roomService = require("../../../services/room-service");
 var restful = require("../../../services/restful");
 var restSerializer = require("../../../serializers/rest-serializer");
@@ -113,11 +112,6 @@ module.exports = {
         if(updatedTroupe.hasOwnProperty('tags')) {
           promises.push(roomWithPolicyService.updateTags(updatedTroupe.tags));
         }
-
-        if(updatedTroupe.hasOwnProperty('welcomeMessage')) {
-          promises.push(troupeMetaService.createNewMetaRecord(troupe.id, updatedTroupe));
-        }
-
 
         return Promise.all(promises);
       })
