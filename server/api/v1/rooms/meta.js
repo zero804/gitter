@@ -8,7 +8,8 @@ module.exports = {
 
     return metaService.findMetaByTroupeId(req.params.troupeId)
       .then(function(res) {
-        return res.welcomeMessage;
+        res = (res || {});
+        return { welcomeMessage: (res.welcomeMessage || {}) };
       });
   },
 
