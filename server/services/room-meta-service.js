@@ -26,9 +26,11 @@ function createNewMetaRecord(troupeId, data) {
     .then(function(parsedWelcomeMessage) {
 
       var data = {
-        welcomeMessage: {
-          html: parsedWelcomeMessage.html,
-          text: parsedWelcomeMessage.text
+        $set: {
+          welcomeMessage: {
+            html: parsedWelcomeMessage.html,
+            text: parsedWelcomeMessage.text
+          }
         }
       };
 
