@@ -13,6 +13,24 @@ function findMetaByTroupeId(troupeId) {
   return persistence.TroupeMeta.findOne({ troupeId: troupeId }).exec();
 }
 
+function roomHasWelcomeMessage(troupeId){
+  assert(mongoUtils.isLikeObjectId(troupeId));
+  troupeId = mongoUtils.asObjectID(troupeId);
+
+  return Promise.fromCallback(function(callback) {
+      persistence.TroupeMeta.findOne({ troupeId: troupeId }, callback);
+    })
+    .then(function(meta){
+      meta = (meta || {});
+      meta.welcomeMessage = (meta.welcomeMessage || {});
+      return !!meta.welcomeMessage.text && !!meta.welcomeMessage.text.length;
+    })
+    .catch(function(err){
+      //TODO error reporting
+      console.log(err);
+    });
+}
+
 //Rename as this upserts
 function createNewMetaRecord(troupeId, data) {
   assert(mongoUtils.isLikeObjectId(troupeId));
@@ -48,5 +66,6 @@ function createNewMetaRecord(troupeId, data) {
 
 module.exports = {
   findMetaByTroupeId: findMetaByTroupeId,
-  createNewMetaRecord: createNewMetaRecord
+  createNewMetaRecord: createNewMetaRecord,
+  roomHasWelcomeMessage: roomHasWelcomeMessage
 };
