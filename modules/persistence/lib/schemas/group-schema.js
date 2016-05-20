@@ -4,7 +4,6 @@ var mongoose = require('gitter-web-mongoose-bluebird');
 var Schema = mongoose.Schema;
 var ObjectId = Schema.ObjectId;
 
-
 var GroupSchema = new Schema({
   name: { type: String, required: true },
   uri: { type: String, required: true },
