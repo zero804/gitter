@@ -5,7 +5,10 @@ module.exports = {
 
   index: function(req){
     if (!req.user) { throw new StatusError(401); }
-    return metaService.findMetaByTroupeId(req.params.troupeId);
+    return metaService.findMetaByTroupeId(req.params.troupeId)
+      .then(function(res){
+        //console.log(res.welcomeMessage);
+      });
   },
 
   create: function(req){

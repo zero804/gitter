@@ -8,6 +8,8 @@ var processMarkdown = require('../utils/markdown-processor');
 var errorReporter = env.errorReporter;
 
 function findMetaByTroupeId(troupeId) {
+  assert(mongoUtils.isLikeObjectId(troupeId));
+  troupeId = mongoUtils.asObjectID(troupeId);
   return persistence.TroupeMeta.findOne({ troupeId: troupeId }).exec();
 }
 
@@ -22,10 +24,6 @@ function createNewMetaRecord(troupeId, data) {
   return processMarkdown(data.welcomeMessage)
   .then(function(parsedWelcomeMessage){
 
-    console.log('-----------------------');
-    console.log(troupeId, parsedWelcomeMessage.text);
-    console.log('-----------------------');
-
     var setOperation = {
       $set: {
         welcomeMessage: {
@@ -35,13 +33,21 @@ function createNewMetaRecord(troupeId, data) {
       }
     };
 
+    var data = {
+      welcomeMessage: {
+        html: parsedWelcomeMessage.html,
+        text: parsedWelcomeMessage.text
+      }
+    };
+
     return Promise.fromCallback(function(callback) {
-      persistence.TroupeMeta.collection.update({ troupeId: troupeId }, setOperation, { upsert: true, new: true }, callback);
+      persistence.TroupeMeta.findOneAndUpdate({ troupeId: troupeId }, data, { upsert: true }, callback);
     });
 
   })
   .catch(function(err){
     //TODO Error Reporting
+    //console.log(err.message);
   });
 
 }
