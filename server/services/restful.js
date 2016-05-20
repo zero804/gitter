@@ -7,6 +7,7 @@ var Promise               = require('bluebird');
 var StatusError           = require('statuserror');
 var _                     = require('underscore');
 var gitHubProfileService  = require('gitter-web-github-backend/lib/github-profile-service');
+var groupMembershipService  = require('gitter-web-groups/lib/group-membership-service');
 var restSerializer        = require("../serializers/rest-serializer");
 var unreadItemService     = require("./unread-items");
 var chatService           = require("./chat-service");
@@ -18,7 +19,6 @@ var roomMembershipService = require('./room-membership-service');
 var BackendMuxer          = require('gitter-web-backend-muxer');
 var userScopes            = require('gitter-web-identity/lib/user-scopes');
 
-
 var survivalMode = !!process.env.SURVIVAL_MODE || false;
 
 if (survivalMode) {
@@ -29,7 +29,7 @@ var DEFAULT_CHAT_COUNT_LIMIT = 30;
 var DEFAULT_USERS_LIMIT = 30;
 var MAX_USERS_LIMIT = 100;
 
-exports.serializeTroupesForUser = function(userId, callback) {
+function serializeTroupesForUser(userId, callback) {
   if(!userId) return Promise.resolve([]);
 
   return roomService.findAllRoomsIdsForUserIncludingMentions(userId)
@@ -45,9 +45,9 @@ exports.serializeTroupesForUser = function(userId, callback) {
       return restSerializer.serialize(allTroupeIds, strategy);
     })
     .nodeify(callback);
-};
+}
 
-exports.serializeChatsForTroupe = function(troupeId, userId, options, callback) {
+function serializeChatsForTroupe(troupeId, userId, options, callback) {
   options = _.extend({}, {
     skip: 0,
     limit: DEFAULT_CHAT_COUNT_LIMIT,
@@ -71,10 +71,9 @@ exports.serializeChatsForTroupe = function(troupeId, userId, options, callback) 
       return restSerializer.serialize(chatMessages, strategy);
     })
     .nodeify(callback);
+}
 
-};
-
-exports.serializeUsersForTroupe = function(troupeId, userId, options) {
+function serializeUsersForTroupe(troupeId, userId, options) {
   if (!options) options = {};
 
   var skip = options.skip;
@@ -115,10 +114,9 @@ exports.serializeUsersForTroupe = function(troupeId, userId, options) {
 
       return restSerializer.serialize(userIds, strategy);
     });
-};
+}
 
-
-exports.serializeUnreadItemsForTroupe = function(troupeId, userId, callback) {
+function serializeUnreadItemsForTroupe(troupeId, userId, callback) {
   return Promise.all([
       roomMembershipService.getMemberLurkStatus(troupeId, userId),
       unreadItemService.getUnreadItemsForUser(userId, troupeId)
@@ -130,9 +128,9 @@ exports.serializeUnreadItemsForTroupe = function(troupeId, userId, callback) {
       return items;
     })
     .nodeify(callback);
-};
+}
 
-exports.serializeReadBysForChat = function(troupeId, chatId, callback) {
+function serializeReadBysForChat(troupeId, chatId, callback) {
   // TODO: assert that troupeId=chat.troupeId....
   return chatService.findById(chatId)
     .then(function(chatMessage) {
@@ -141,19 +139,18 @@ exports.serializeReadBysForChat = function(troupeId, chatId, callback) {
       return restSerializer.serialize(chatMessage.readBy, strategy);
     })
     .nodeify(callback);
+}
 
-};
-
-exports.serializeEventsForTroupe = function(troupeId, userId, callback) {
+function serializeEventsForTroupe(troupeId, userId, callback) {
   return eventService.findEventsForTroupe(troupeId, {})
     .then(function(events) {
       var strategy = new restSerializer.EventStrategy({ currentUserId: userId, troupeId: troupeId });
       return restSerializer.serialize(events, strategy);
     })
     .nodeify(callback);
-};
+}
 
-exports.serializeOrgsForUser = function(user) {
+function serializeOrgsForUser(user) {
   var backendMuxer = new BackendMuxer(user);
   return backendMuxer.findOrgs()
     .then(function(orgs) {
@@ -162,18 +159,18 @@ exports.serializeOrgsForUser = function(user) {
       var strategy = new restSerializer.GithubOrgStrategy(strategyOptions);
       return restSerializer.serialize(orgs, strategy);
     });
-};
+}
 
-exports.serializeOrgsForUserId = function(userId, options) {
+function serializeOrgsForUserId(userId, options) {
   return userService.findById(userId)
     .then(function(user) {
       if(!user) return [];
 
-      return exports.serializeOrgsForUser(user, options);
+      return serializeOrgsForUser(user, options);
     });
-};
+}
 
-exports.serializeProfileForUsername = function(username) {
+function serializeProfileForUsername(username) {
   return userService.findByUsername(username)
     .then(function(user) {
       if (user) {
@@ -190,4 +187,30 @@ exports.serializeProfileForUsername = function(username) {
         return gitHubProfileService(gitHubUser, {includeCore: true});
       }
     });
-};
+}
+
+
+function serializeGroupsForUserId(userId) {
+  if (!userId) return [];
+
+  return groupMembershipService.findGroupsForUser(userId)
+    .then(function(groups) {
+      if (!groups || !groups.length) return [];
+
+      var strategy = new restSerializer.GroupStrategy({ currentUserId: userId });
+      return restSerializer.serialize(groups, strategy);
+    });
+}
+
+module.exports = {
+  serializeTroupesForUser: serializeTroupesForUser,
+  serializeChatsForTroupe: serializeChatsForTroupe,
+  serializeUsersForTroupe: serializeUsersForTroupe,
+  serializeUnreadItemsForTroupe: serializeUnreadItemsForTroupe,
+  serializeReadBysForChat: serializeReadBysForChat,
+  serializeEventsForTroupe: serializeEventsForTroupe,
+  serializeOrgsForUser: serializeOrgsForUser,
+  serializeOrgsForUserId: serializeOrgsForUserId,
+  serializeProfileForUsername: serializeProfileForUsername,
+  serializeGroupsForUserId: Promise.method(serializeGroupsForUserId)
+}

@@ -156,8 +156,6 @@ var View = Marionette.LayoutView.extend({
         appEvents.trigger('navigation', data.url , 'chat#add', data.uri);
       })
       .catch(function(err) {
-
-
         var status = err.status;
         var message = 'Unable to create channel.';
 

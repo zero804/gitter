@@ -1,7 +1,7 @@
 'use strict';
 
 var isValidRoomUri = require('../../../public/js/utils/valid-room-uri');
-var RESERVED = require('../../../public/js/utils/vanity-keywords');
+var RESERVED = require('gitter-web-validators/lib/reserved-namespaces');
 var assert = require('assert');
 
 function test(name, result) {
