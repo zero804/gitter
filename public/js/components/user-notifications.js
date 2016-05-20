@@ -2,7 +2,6 @@
 
 var appEvents           = require('utils/appevents');
 var cdn                 = require('../utils/cdn');
-var context             = require('../utils/context');
 var WindowNotification  = window.Notification;
 var webkitNotifications = window.webkitNotifications;
 var urlParser           = require('../utils/url-parser');

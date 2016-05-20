@@ -1,15 +1,17 @@
 "use strict";
 
-var troupeService        = require("../../../services/troupe-service");
+var troupeService = require("../../../services/troupe-service");
 var troupeMetaService = require('../../../services/room-meta-service');
-var roomService          = require("../../../services/room-service");
-var restful              = require("../../../services/restful");
-var restSerializer       = require("../../../serializers/rest-serializer");
-var Promise              = require('bluebird');
-var StatusError          = require('statuserror');
+var roomService = require("../../../services/room-service");
+var restful = require("../../../services/restful");
+var restSerializer = require("../../../serializers/rest-serializer");
+var Promise = require('bluebird');
+var StatusError = require('statuserror');
 var roomPermissionsModel = require('gitter-web-permissions/lib/room-permissions-model');
-var userCanAccessRoom    = require('gitter-web-permissions/lib/user-can-access-room');
+var userCanAccessRoom = require('gitter-web-permissions/lib/user-can-access-room');
 var loadTroupeFromParam  = require('./load-troupe-param');
+var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
+var RoomWithPolicyService = require('../../../services/room-with-policy-service');
 
 function searchRooms(req) {
   var user = req.user;
@@ -56,13 +58,16 @@ module.exports = {
     return restSerializer.serializeObject(req.params.troupeId, strategy);
   },
 
+  /**
+   * This endpoint will go under the new communities API
+   */
   create: function(req) {
     var roomUri = req.query.uri || req.body.uri;
     var addBadge = req.body.addBadge || false;
 
     if (!roomUri) throw new StatusError(400);
 
-    return roomService.findOrCreateRoom(req.user, roomUri, {ignoreCase: true, addBadge: addBadge})
+    return roomService.findOrCreateRoom(req.user, roomUri, { ignoreCase: true, addBadge: addBadge })
       .then(function (room) {
         if (!room || !room.troupe) throw new StatusError(403, 'Permission denied');
 
@@ -85,28 +90,28 @@ module.exports = {
   update: function(req) {
     return loadTroupeFromParam(req)
       .then(function(troupe) {
-        var updatedTroupe = req.body;
-
+        var roomWithPolicyService = new RoomWithPolicyService(troupe, req.user, req.userRoomPolicy);
         var promises = [];
+        var updatedTroupe = req.body;
 
         if(updatedTroupe.autoConfigureHooks) {
           promises.push(roomService.applyAutoHooksForRepoRoom(req.user, troupe));
         }
 
         if(updatedTroupe.hasOwnProperty('topic')) {
-          promises.push(troupeService.updateTopic(req.user, troupe, updatedTroupe.topic));
+          promises.push(roomWithPolicyService.updateTopic(updatedTroupe.topic));
         }
 
         if(updatedTroupe.hasOwnProperty('providers')) {
-          promises.push(troupeService.updateProviders(req.user, troupe, updatedTroupe.providers));
+          promises.push(roomWithPolicyService.updateProviders(updatedTroupe.providers));
         }
 
         if(updatedTroupe.hasOwnProperty('noindex')) {
-          promises.push(troupeService.toggleSearchIndexing(req.user, troupe, updatedTroupe.noindex));
+          promises.push(roomWithPolicyService.toggleSearchIndexing(updatedTroupe.noindex));
         }
 
         if(updatedTroupe.hasOwnProperty('tags')) {
-          promises.push(troupeService.updateTags(req.user, troupe, updatedTroupe.tags));
+          promises.push(roomWithPolicyService.updateTags(updatedTroupe.tags));
         }
 
         if(updatedTroupe.hasOwnProperty('welcomeMessage')) {
@@ -132,11 +137,9 @@ module.exports = {
   destroy: function(req) {
     return loadTroupeFromParam(req)
       .then(function(troupe) {
-        var user = req.user;
+        if (troupe.oneToOne || !troupe.uri) throw new StatusError(400, 'cannot delete one to one rooms');
 
-        if (!troupe.uri) throw new StatusError(400, 'cannot delete one to one rooms');
-
-        return [troupe, roomPermissionsModel(user, 'admin', troupe)];
+        return [troupe, req.userRoomPolicy.isAdmin()];
       })
       .spread(function(troupe, isAdmin) {
         if (!isAdmin) throw new StatusError(403, 'admin permissions required');
@@ -151,17 +154,22 @@ module.exports = {
   load: function(req, id) {
     var userId = req.user && req.user._id;
 
-    var permsPromise = req.method === 'GET' ?
-      userCanAccessRoom.permissionToRead(userId, id) :
-      userCanAccessRoom.permissionToWrite(userId, id);
+    return policyFactory.createPolicyForRoomId(req.user, id)
+      .then(function(policy) {
+        // TODO: middleware?
+        req.userRoomPolicy = policy;
 
-    return permsPromise.then(function(access) {
-      if (access) {
-        return id;
-      } else {
-        throw new StatusError(userId ? 403 : 401);
-      }
-    });
+        return req.method === 'GET' ?
+          policy.canRead() :
+          policy.canWrite();
+      })
+      .then(function(access) {
+        if (access) {
+          return id;
+        } else {
+          throw new StatusError(userId ? 403 : 401);
+        }
+      });
   },
 
   subresources: {
