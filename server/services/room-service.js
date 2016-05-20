@@ -189,9 +189,9 @@ function ensureGroupForGitHubRoom(user, githubType, uri) {
       throw new StatusError(400, 'Cannot create a group for ' + githubType);
   }
 
-  return groupService.migration.ensureGroup(user, {
+  return groupService.migration.ensureGroupForGitHubRoomCreation(user, {
       uri: owner
-    })
+    });
 }
 
 function doPostRoomCreationMigrationSteps(troupe) {
@@ -219,6 +219,20 @@ function createRoomForGitHubUri(user, uri, options) {
       if (!githubInfo) throw new StatusError(404);
 
       var githubType = githubInfo.type;
+
+      switch (githubType) {
+        case 'ORG':
+        case 'REPO':
+          break;
+
+        case 'USER':
+          // We got back a user. Since we've managed to get this far,
+          // it means that the user is on GitHub but not gitter, so
+          // we'll 404
+          // In future, it might be worth bring up a page.
+          throw new StatusError(404);
+      }
+
       var officialUri = githubInfo.uri;
       var lcUri = officialUri.toLowerCase();
       var security = githubInfo.security || null;
@@ -251,16 +265,22 @@ function createRoomForGitHubUri(user, uri, options) {
 
           // If the user is not allowed to create this room, go no further
           if(!access) throw new StatusError(403);
-
+          return ensureGroupForGitHubRoom(user, githubType, officialUri);
+        })
+        .then(function(group) {
           // TODO: this will change when uris break away
           var queryTerm = githubId ?
                 { githubId: githubId, githubType: githubType } :
                 { lcUri: lcUri, githubType: githubType };
 
+          // TODO: remove this when lcOwner goes away
+          var lcOwner =  lcUri.split('/')[0];
+
           return mongooseUtils.upsert(persistence.Troupe, queryTerm, {
               $setOnInsert: {
                 lcUri: lcUri,
-                lcOwner: lcUri.split('/')[0],
+                lcOwner: lcOwner, // This will go
+                groupId: group._id,
                 uri: officialUri,
                 githubType: githubType,
                 githubId: githubId,
