@@ -26,8 +26,15 @@ var JoinRoomView = Marionette.ItemView.extend({
   },
 
   joinRoom: function(e) {
-    if (e) e.preventDefault();
 
+    if(context.roomHasWelcomeMessage()) {
+      return;
+    }
+
+    if (e) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    }
 
     var roomPostOptions = {
       id: context.getTroupeId()
