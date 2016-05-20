@@ -3,6 +3,7 @@ var metaService = require('../../../services/room-meta-service');
 
 module.exports = {
 
+  //This is not ideal but can't get the nested sub resource to work
   index: function(req) {
     if (!req.user) { throw new StatusError(401); }
 
