@@ -11,7 +11,7 @@ var persistence = require('gitter-web-persistence');
 var installMigrationSchemas = require('./migration-schemas').install;
 var onMongoConnect = require('../../server/utils/on-mongo-connect');
 var userService = require('../../server/services/user-service');
-var through2 = require('through2');
+var through2Concurrent = require('through2-concurrent');
 
 var migrationSchemas;
 
@@ -23,7 +23,9 @@ function getBatchedRooms() {
           githubType: {
             $nin: ['ONETOONE']
           },
-          lcOwner: { $exists: true, $ne: null }
+          lcOwner: { $exists: true, $ne: null },
+          // NOTE: this skips existing org-owned room renames for now
+          groupId: { $exists: false }
         }
       },
       {
@@ -120,10 +122,15 @@ function findBatchWarnings(opts) {
     warnings.push(lcOwner + " has both org rooms or channels AND user channels.");
   }
 
-  // warn if user id doesn't match all the ownerUserIds
   if (user) {
+    // warn if user id doesn't match all the ownerUserIds
     if (!_.every(ownerUserIds, function(ownerId) { return ownerId == user.id })) {
       warnings.push(lcOwner + " has ownerUserIds that don't match the owner user's id.");
+    }
+  } else {
+    // warn if the batch has ownerUserIds, but the owner is not a user
+    if (ownerUserIds.length) {
+      warnings.push(lcOwner + " has ownerUserIds, but is not a user.");
     }
   }
 
@@ -177,8 +184,6 @@ var numProcessed = 0;
 
 // Try and find things wrong in the database, return a promise.
 var findBatchInfo = Promise.method(function(batch) {
-  numProcessed++;
-
   var lcOwner = batch._id;
 
   var uniqueOwners = _.uniq(batch.rooms.map(function(room) {
@@ -245,19 +250,18 @@ var findBatchInfo = Promise.method(function(batch) {
             lcOwner: lcOwner,
             correctOwner: user.uri,
             batch: batch,
+            // gitter user
             oldUser: oldUser, // could be undefined
+            // github user
             user: user
           });
         }
 
       } else if (roomUsers) {
-        // TODO: log these separately as a user rename
         type = 'user';
         reason = 'owneruserid-lookup';
 
-        // NOTE: does this mean we should rename the user too?
-
-        // the user has definitely been renamed
+        // the user has definitely been renamed, and not just some case change
         errors.push({
           errorType: "owner",
           type: type,
@@ -269,9 +273,11 @@ var findBatchInfo = Promise.method(function(batch) {
         });
 
       } else {
-        // TODO: incorporate the "probably" checks?
-        // if we still can't figure it out, then try to look up the repo if it
-        // is public?
+        // TODO: we can actually try and look up the existing user based on the
+        // first uri component, then get the id, then get the github user for
+        // that. But the existing usernames are case sensitive and lcOwner is
+        // not..
+
       }
 
       if (user) {
@@ -281,13 +287,15 @@ var findBatchInfo = Promise.method(function(batch) {
 
       return Promise.props(lookups)
         .then(function(results) {
-          console.log(numProcessed, lcOwner, type);
+          console.log(++numProcessed, lcOwner, type);
 
           return errorsToUpdates(errors)
             .then(function(updates) {
+              /*
               if (updates.length) {
                 console.log(updates);
               }
+              */
               var data = {
                 type: type,
                 reason: reason,
@@ -326,6 +334,7 @@ function getInfo() {
     var numUnknown = 0;
     var numOrgUpdates = 0;
     var numUserUpdates = 0;
+    var numUserRenames = 0;
     var numWarnings = 0;
     var numOrgMultiple = 0;
     var numUserMultiple = 0;
@@ -335,7 +344,7 @@ function getInfo() {
     var unknown = [];
 
     getBatchedRooms()
-      .pipe(through2.obj(function(batch, enc, callback) {
+      .pipe(through2Concurrent.obj({ concurrency: 10 }, function(batch, enc, callback) {
         numBatches++;
         findBatchInfo(batch)
           .then(function(info) {
@@ -378,6 +387,21 @@ function getInfo() {
               }
               if (info.type == 'user') {
                 numUserUpdates += info.updates.length;
+
+                info.updates.forEach(function(update) {
+                  if (update.oldUsername && update.newUsername) {
+                    if (update.oldUsername !== update.newUsername) {
+                      // a rename is one where more than just the case changed
+                      // NOTE: it is possible that we could end up with
+                      // duplicate user renames because the room batches had
+                      // separate uri prefixes, but got renamed to the same
+                      // user because they belonged to the same one. Happens if
+                      // the user created some rooms before the rename and some
+                      // afterwards.
+                      numUserRenames++;
+                    }
+                  }
+                });
               }
               Array.prototype.push.apply(updates, info.updates);
             }
@@ -393,36 +417,35 @@ function getInfo() {
       })
       .on('end', function() {
         // because things are happening that are making me paranoid
-        console.log('Reached the end. Waiting a bit..');
-        setTimeout(function() {
-          console.log('------------------------------------------');
-          console.log(numBatches + ' batches processed');
-          console.log(numOrgs + ' orgs');
-          console.log(numUsers + ' users');
-          console.log(numUnknown + ' unknown');
-          console.log(numOrgUpdates + ' org updates');
-          console.log(numUserUpdates + ' user updates');
-          console.log(numWarnings + ' warnings');
-          console.log(numOrgMultiple + ' orgs with multiple rooms.');
-          console.log(numUserMultiple + ' users with multiple rooms.');
-          console.log(numMissingUsers + " users haven't signed up with us.");
-          console.log("NOTE: rooms could still be wrong in other parts or aspects");
-          resolve({
-            numBatches: numBatches,
-            numOrgs: numOrgs,
-            numUsers: numUsers,
-            numUnknown: numUnknown,
-            numOrgUpdates: numOrgUpdates,
-            numUserUpdates: numUserUpdates,
-            numWarnings: numWarnings,
-            numOrgMultiple: numOrgMultiple,
-            numUserMultiple: numUserMultiple,
-            numMissingUsers: numMissingUsers,
-            updates: updates,
-            warnings: warnings,
-            unknown: unknown
-          });
-        }, 10000);
+        console.log('------------------------------------------');
+        console.log(numBatches + ' batches processed');
+        console.log(numOrgs + ' orgs');
+        console.log(numUsers + ' users');
+        console.log(numUnknown + ' unknown');
+        console.log(numOrgUpdates + ' org updates');
+        console.log(numUserUpdates + ' user updates');
+        console.log(numUserRenames + ' user renames');
+        console.log(numWarnings + ' warnings');
+        console.log(numOrgMultiple + ' orgs with multiple rooms.');
+        console.log(numUserMultiple + ' users with multiple rooms.');
+        console.log(numMissingUsers + " users haven't signed up with us.");
+        console.log("NOTE: rooms could still be wrong in other parts or aspects");
+        resolve({
+          numBatches: numBatches,
+          numOrgs: numOrgs,
+          numUsers: numUsers,
+          numUnknown: numUnknown,
+          numOrgUpdates: numOrgUpdates,
+          numUserUpdates: numUserUpdates,
+          numUserRenames: numUserRenames,
+          numWarnings: numWarnings,
+          numOrgMultiple: numOrgMultiple,
+          numUserMultiple: numUserMultiple,
+          numMissingUsers: numMissingUsers,
+          updates: updates,
+          warnings: warnings,
+          unknown: unknown
+        });
       })
       .on('error', function(error) {
         reject(error);
@@ -435,19 +458,23 @@ var findUpdatesForOwnerError = Promise.method(function(error) {
   // be updated. also add a redirect.
   var updates = []
 
+  // either or both of these could be null
+  var gitterUser = error.oldUser;
+  var githubUser = error.user;
+
+
   if (error.type == 'user' && error.oldUser) {
     // double check again
     if (error.oldUser.githubId == error.user.githubId) {
-      console.log('rename the user too');
-      var gitterUser = error.oldUser;
-      var githubUser = error.user;
+      // rename the user too
       var userUpdate = {
         type: 'rename-user',
-        _id: githubUser._id,
+        gitterUserId: gitterUser._id,
+        githubUserId: githubUser.githubId,
         oldUsername: gitterUser.username,
         newUsername: githubUser.uri,
       };
-      console.log(JSON.stringify(userUpdate));
+      //console.log(JSON.stringify(userUpdate));
       updates.push(userUpdate);
     }
   }
@@ -465,12 +492,17 @@ var findUpdatesForOwnerError = Promise.method(function(error) {
 
     var roomUpdate = {
       type: 'rename-room',
-      _id: room._id,
+      roomId: room._id,
+      groupType: error.type,
+      // only filled in for renames
+      gitterUserId: gitterUser && gitterUser._id,
+      // only filled in for type user or renames
+      githubUserId: githubUser && githubUser.githubId,
       oldUri: room.uri,
       newUri: correctUri,
-      newLcUri: correctUri.toLowerCase()
+      newLcUri: correctUri.toLowerCase(),
     };
-    console.log(JSON.stringify(roomUpdate));
+    //console.log(JSON.stringify(roomUpdate));
     updates.push(roomUpdate);
   });
 
@@ -496,15 +528,6 @@ function errorsToUpdates(errors) {
     });
 }
 
-// asynchronously perform database updates and return a promise
-function performUpdates(updates) {
-  // TODO
-  // NOTE: remember to add to renamed uris for rooms, but not if it only
-  // changed in case. Same thing when updating uris - only when the uri changed
-  // in more than just case.
-  console.log("TODO");
-  return Promise.resolve();
-}
 
 function die(error) {
   console.error(error);
@@ -512,37 +535,22 @@ function die(error) {
   process.exit(1);
 }
 
+var opts = require('yargs')
+  .option('output', {
+    required: true,
+    description: 'where to write the json report'
+  })
+  .help('help')
+  .alias('help', 'h')
+  .argv;
+
 onMongoConnect()
   .then(function() {
     migrationSchemas = installMigrationSchemas(mongoose.connection);
-    require('yargs')
-      .command('dry-run', 'Dry run', { }, function() {
-        //run(log, done);
-        return getInfo()
-          .then(function(report) {
-            fs.writeFileSync("/tmp/owner-report.json", JSON.stringify(report));
-            shutdown.shutdownGracefully();
-          })
-          .catch(die);
+    return getInfo()
+      .then(function(report) {
+        fs.writeFileSync(opts.output, JSON.stringify(report));
+        shutdown.shutdownGracefully();
       })
-      .command('execute', 'Execute', { }, function() {
-        return getInfo()
-          .then(function(report) {
-            performUpdates(report.updates)
-          })
-          .then(function(updates) {
-            console.log("performing", updates.length, "updates");
-            return performUpdates(updates);
-          })
-          .then(function() {
-            shutdown.shutdownGracefully();
-          })
-          .catch(die);
-      })
-      .demand(1)
-      .strict()
-      .help('help')
-      .alias('help', 'h')
-      .argv;
+      .catch(die);
   });
-
