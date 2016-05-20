@@ -337,18 +337,22 @@
     background-color: transparent;
     border-color: @caribbean;
 
-    animation-name: unread-indicator-subtle-pulse-animation;
-    animation-duration: 2s;
-    animation-timing-function: ease;
+    &.pulse-animation {
+      animation-name: unread-indicator-subtle-pulse-animation;
+      animation-duration: 2s;
+      animation-timing-function: ease;
+    }
   }
   &.has-unreads {
     .room-menu-options__item__unread-indicator-visibility-reset();
 
     background-color: @caribbean;
 
-    animation-name: unread-indicator-subtle-pulse-animation;
-    animation-duration: 2s;
-    animation-timing-function: ease;
+    &.pulse-animation {
+      animation-name: unread-indicator-subtle-pulse-animation;
+      animation-duration: 2s;
+      animation-timing-function: ease;
+    }
 
   }
   &.has-mentions {
@@ -357,9 +361,11 @@
     background-color: @jaffa;
     border-color: @jaffa;
 
-    animation-name: mention-indicator-subtle-pulse-animation;
-    animation-duration: 2s;
-    animation-timing-function: ease;
+    &.pulse-animation {
+      animation-name: unread-indicator-subtle-pulse-animation;
+      animation-duration: 2s;
+      animation-timing-function: ease;
+    }
   }
 }
 
@@ -419,7 +425,6 @@
   transition: transform 0.2s ease;
 
   &:hover,
-  &.is-menu-pinned,
   .menu-toggle-button:hover > & {
     transform: translateZ(0) rotateZ(90deg);
   }

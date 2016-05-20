@@ -1,13 +1,12 @@
-/* global describe:true, it:true */
 "use strict";
 
-var testRequire = require('../test-require');
 var assert = require("assert");
 var Promise = require('bluebird');
 var username = 'test-user';
+var proxyquireNoCallThru = require("proxyquire").noCallThru();
 
 function createServiceWithStubData(callback) {
-  return testRequire.withProxies('./services/invited-permissions-service', {
+  return proxyquireNoCallThru('../lib/invited-permissions-service', {
     'gitter-web-github': {
       GitHubMembers: {
         isMember: function(username, uri, githubType) {

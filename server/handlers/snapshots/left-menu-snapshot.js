@@ -5,7 +5,9 @@ var generateLeftMenuState = require('gitter-web-shared/parse/left-menu-state');
 
 module.exports = function getSnapshotsForPageContext(req, troupeContext, rooms) {
   // Generate the org list for the minibar, this is derived from the room list
-  var minibarOrgList = suggestedOrgsFromRoomList(rooms, req.uriContext.uri, null, req.troupe);
+  var currentRoom    = (req.troupe || {});
+  var currentRoomId  = currentRoom.id;
+  var minibarOrgList = suggestedOrgsFromRoomList(rooms, req.uriContext.uri, currentRoomId, currentRoom);
 
   var preserveLeftMenuState = (req.query.preserveLeftMenuState || '').toLowerCase();
   // We only accept explicit `true`/`false` values

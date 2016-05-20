@@ -15,6 +15,11 @@ GhRepoPolicyDelegate.prototype = {
 
     switch(policyName) {
       case 'GH_REPO_ACCESS':
+        // Shortcut for public repos
+        if (this._securityDescriptor.public) {
+          return true;
+        }
+
         return this._fetch()
           .then(function(repoInfo) {
             return !!repoInfo;

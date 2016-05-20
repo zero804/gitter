@@ -2,8 +2,8 @@
 
 var logger = require('gitter-web-env').logger;
 var userService = require("../../../services/user-service");
-var roomPermissionsModel = require('gitter-web-permissions/lib/room-permissions-model');
 var Promise = require('bluebird');
+var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
 
 /**
  * Returns the permissions the user has in the orgs.
@@ -34,7 +34,10 @@ TroupePermissionsStrategy.prototype = {
         if (!user) return;
 
         return Promise.map(troupes.toArray(), function(troupe) {
-          return roomPermissionsModel(user, 'admin', troupe)
+          return policyFactory.createPolicyForRoom(user, troupe)
+            .then(function(policy) {
+              return policy.canAdmin();
+            })
             .then(function(admin) {
               isAdmin[troupe.id] = admin;
             })
