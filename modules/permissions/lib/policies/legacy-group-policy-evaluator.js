@@ -2,7 +2,7 @@
 
 var Promise = require('bluebird');
 var persistence = require('gitter-web-persistence');
-var StatusError = require('statuserror');
+var LegacyGitHubPolicyEvaluator = require('./legacy-github-policy-evaluator');
 
 function LegacyGroupPolicyEvaluator(userId, user, groupId, group) {
   this._userId = userId;
@@ -15,37 +15,43 @@ function LegacyGroupPolicyEvaluator(userId, user, groupId, group) {
 
   this._groupId = groupId;
   this._groupPromise = group && Promise.resolve(group);
-
-  this._canRead = null;
-  this._canWrite = null;
-  this._canJoin = null;
-  this._canAdmin = null;
-  this._canAddUser = null;
-  this._fetchOtherUserPromise = null;
+  this._policyPromise = null;
 }
 
 LegacyGroupPolicyEvaluator.prototype = {
   canRead: Promise.method(function() {
-    throw new StatusError(500, 'Not implemented');
+    return true;
   }),
 
   canWrite: Promise.method(function() {
-    throw new StatusError(500, 'Not implemented');
+    return this._fetchLegacyPolicy()
+      .then(function(policy) {
+        if (!policy) return false;
+
+        return policy.canWrite();
+      });
   }),
 
-  /**
-   * Similar to canRead, but with a full access check
-   */
   canJoin: Promise.method(function() {
-    throw new StatusError(500, 'Not implemented');
+    return true;
   }),
 
   canAdmin: Promise.method(function() {
-    throw new StatusError(500, 'Not implemented');
+    return this._fetchLegacyPolicy()
+      .then(function(policy) {
+        if (!policy) return false;
+
+        return policy.canAdmin();
+      });
   }),
 
   canAddUser: Promise.method(function() {
-    throw new StatusError(500, 'Not implemented');
+    return this._fetchLegacyPolicy()
+      .then(function(policy) {
+        if (!policy) return false;
+
+        return policy.canAddUser();
+      });
   }),
 
   _fetchUser: function() {
@@ -65,6 +71,31 @@ LegacyGroupPolicyEvaluator.prototype = {
 
     return this._groupPromise;
   },
+
+  _fetchLegacyPolicy: function() {
+    if (this._policyPromise) return this._policyPromise;
+
+    this._policyPromise = Promise.join(
+      this._fetchGroup(),
+      this._fetchUser(),
+      function(group, user) {
+        if (!group) return null;
+
+        switch (group.type) {
+          case 'USER':
+            // What to do?
+            return false;
+          case 'ORG':
+            return new LegacyGitHubPolicyEvaluator(user, group.uri, 'ORG', null);
+
+          default:
+            return false;
+        }
+      });
+
+    return this._policyPromise;
+  },
+
 
 };
 
