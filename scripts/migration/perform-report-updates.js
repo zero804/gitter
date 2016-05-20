@@ -14,17 +14,62 @@ var uriLookupService = require('../../server/services/uri-lookup-service');
 
 
 function renameUser(update) {
-  // NOTE: update lookup uris too, but not if it is only a case change
   console.log("USER", update.oldUsername, update.newUsername);
-  return Promise.resolve();
+
+  var promises = [];
+
+  promises.push(
+    // update the user itself
+    userService.findById(update.gitterUserId)
+      .then(function(user) {
+        // if user is null, then that's a pretty bad error anyway
+        user.username = update.newUsername;
+        return user.save();
+      })
+  );
+
+  var lcMatches = update.oldUsername.toLowerCase() === update.newUsername.toLowerCase();
+  if (!lcMatches) {
+    // also update the uri lookup
+    promises.push(uriLookupService.removeBadUri(update.oldUsername));
+    promises.push(uriLookupService.reserveUriForUsername(update.gitterUserId, update.newUsername));
+  }
+
+  return Promise.all(promises);
 }
 
 function renameRoom(update) {
-  // NOTE: remember to add to renamed uris for rooms, but not if it only
-  // changed in case. Same thing when updating lookup uris - only when the uri
-  // changed in more than just case.
   console.log("ROOM", update.oldUri, update.newUri);
-  return Promise.resolve();
+  var promises = [];
+
+  var lcMatches = update.oldUri.toLowerCase() === update.newLcUri;
+
+  promises.push(
+    // update the room uri
+    troupeService.findById(update.roomId)
+      .then(function(room) {
+        // if room is null, then that's a pretty bad error anyway
+        room.uri = update.newUri;
+        room.lcUri = update.newLcUri;
+        room.lcOwner = update.newLcUri.split('/')[0];
+
+        if (!lcMatches) {
+          // also add a redirect if the uri changed in more than just case
+          room.renamedLcUris.addToSet(update.oldUri.toLowerCase());
+        }
+
+        return room.save();
+      })
+  );
+
+
+  if (!lcMatches) {
+    // also update the uri lookup
+    promises.push(uriLookupService.removeBadUri(update.oldUri));
+    promises.push(uriLookupService.reserveUriForTroupeId(update.roomId, update.newUri));
+  }
+
+  return Promise.all(promises);
 }
 
 var performUpdate = Promise.method(function(update, duplicates) {
@@ -63,7 +108,10 @@ var opts = require('yargs')
   .argv;
 
 function lookupUsername(username) {
-  return userService.findByUsername(username);
+  // case-insensitive just in case
+  var lcUsername = username.toLowerCase();
+  var regex = new RegExp(["^", lcUsername, "$"].join(""), "i");
+  return userService.findByUsername(regex);
 }
 
 function lookupRoomUris(uri) {
