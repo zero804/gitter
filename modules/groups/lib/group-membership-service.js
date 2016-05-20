@@ -1,12 +1,10 @@
 "use strict";
 
-var persistence          = require('gitter-web-persistence');
-var TroupeUser           = persistence.TroupeUser;
-var mongoUtils           = require('gitter-web-persistence-utils/lib/mongo-utils');
-var Promise              = require('bluebird');
-var EventEmitter         = require('events').EventEmitter;
-var assert               = require('assert');
-var debug                = require('debug')('gitter:room-membership-service');
+var persistence = require('gitter-web-persistence');
+var TroupeUser = persistence.TroupeUser;
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var Promise = require('bluebird');
+var EventEmitter = require('events').EventEmitter;
 
 var groupMembershipEvents = new EventEmitter();
 
@@ -42,6 +40,7 @@ function findGroupsForUser(userId) {
           lcUri: '$group.lcUri'
         }
       }])
+      .read('primary')
       .exec()
       .then(function(results) {
         return results;
