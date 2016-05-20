@@ -13,6 +13,7 @@ function findMetaByTroupeId(troupeId) {
   return persistence.TroupeMeta.findOne({ troupeId: troupeId }).exec();
 }
 
+//Rename as this upserts
 function createNewMetaRecord(troupeId, data) {
   assert(mongoUtils.isLikeObjectId(troupeId));
   troupeId = mongoUtils.asObjectID(troupeId);
@@ -23,15 +24,6 @@ function createNewMetaRecord(troupeId, data) {
   //should this be sanitised? JP 20/5/16 ... probably
   return processMarkdown(data.welcomeMessage)
     .then(function(parsedWelcomeMessage) {
-
-      var setOperation = {
-        $set: {
-          welcomeMessage: {
-            html: parsedWelcomeMessage.html,
-            text: parsedWelcomeMessage.text
-          }
-        }
-      };
 
       var data = {
         welcomeMessage: {
