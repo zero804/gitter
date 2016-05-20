@@ -16,6 +16,7 @@ var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var roomMembershipService = require('./room-membership-service');
 var roomService = require('./room-service');
 var assert = require('assert');
+var roomMetaService = require('./room-meta-service');
 
 var MAX_RAW_TAGS_LENGTH = 200;
 
@@ -241,6 +242,17 @@ RoomWithPolicyService.prototype.createChannel = secureMethod([allowAdmin], funct
  */
 RoomWithPolicyService.prototype.joinRoom = secureMethod([allowJoin], function(options) {
   return roomService.joinRoom(this.room, this.user, options);
+});
+
+/**
+ * Add room meat/welcome-message
+ */
+
+RoomWithPolicyService.prototype.getRoomWelcomeMessage = secureMethod([allowJoin], function(options){
+  return roomMetaService.findMetaByTroupeId(this.room.id).then(function(res) {
+    res = (res || {});
+    return { welcomeMessage: (res.welcomeMessage || {}) };
+  });
 });
 
 module.exports = RoomWithPolicyService;
