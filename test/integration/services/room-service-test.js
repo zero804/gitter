@@ -17,6 +17,9 @@ var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var roomMembershipService = testRequire('./services/room-membership-service');
 testRequire("./services/room-service");
 
+// to work around proxyquire caching bugs...
+testRequire("./services/room-service");
+
 describe('room-service', function() {
   before(fixtureLoader(fixture, {
     user1: { },
@@ -242,6 +245,61 @@ describe('room-service', function() {
             public: true,
             type: "GH_REPO"
           });
+
+          return roomMembershipService.checkRoomMembership(this.uriContext.troupe._id, fixture.user1._id);
+        })
+        .then(function(isRoomMember) {
+          assert.strictEqual(isRoomMember, true);
+        });
+    });
+
+    it('should add a user to a room if the room exists', function() {
+      var roomService = testRequire.withProxies("./services/room-service", {
+        'gitter-web-permissions/lib/legacy-policy-factory': {
+          createPolicyForGithubObject: function(user, uri, ghType, security) {
+            assert.equal(user.username, fixture.user1.username);
+            assert.equal(uri, 'gitterHQ/cloaked-avenger');
+            assert.equal(ghType, 'REPO');
+            assert.equal(security, null);
+
+            return Promise.resolve({
+              canAdmin: function() {
+                return Promise.resolve(true);
+              }
+            });
+          },
+          createPolicyForRoom: function(user, room) {
+            assert.equal(room.uri, 'gitterHQ/cloaked-avenger');
+            return Promise.resolve({
+              canJoin: function() {
+                return Promise.resolve(true);
+              }
+            });
+          }
+        }
+      });
+
+      return persistence.Troupe.findOneAndRemove({ lcUri: 'gitterhq/cloaked-avenger' })
+        .then(function() {
+          return roomService.findOrCreateRoom(fixture.user1, 'gitterHQ/cloaked-avenger');
+        })
+        .bind({})
+        .then(function(uriContext) {
+          this.uriContext = uriContext;
+          return roomMembershipService.removeRoomMember(this.uriContext.troupe._id, fixture.user1._id);
+        })
+        .then(function() {
+          return roomMembershipService.checkRoomMembership(this.uriContext.troupe._id, fixture.user1._id);
+        })
+        .then(function(isRoomMember) {
+          assert.strictEqual(isRoomMember, false);
+          return roomService.findOrCreateRoom(fixture.user1, 'gitterHQ/cloaked-avenger');
+        })
+        .then(function() {
+          return roomMembershipService.checkRoomMembership(this.uriContext.troupe._id, fixture.user1._id);
+        })
+        .then(function(isRoomMember) {
+          assert.strictEqual(isRoomMember, true);
         });
     });
 
@@ -291,6 +349,11 @@ describe('room-service', function() {
             public: true,
             type: "GH_REPO"
           });
+
+          return roomMembershipService.checkRoomMembership(this.uriContext.troupe._id, fixture.user1._id);
+        })
+        .then(function(isRoomMember) {
+          assert.strictEqual(isRoomMember, true);
         });
     });
 
