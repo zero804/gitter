@@ -283,7 +283,20 @@ describe('room-service', function() {
     });
 
     it('should add a user to a room if the room exists', function() {
+      var groupId = new ObjectID();
       var roomService = testRequire.withProxies("./services/room-service", {
+        'gitter-web-groups/lib/group-service': {
+          migration: {
+            ensureGroupForGitHubRoomCreation: function(pUser, options) {
+              assert.strictEqual(pUser, fixture.user1);
+              assert.deepEqual(options, {
+                obtainAccessFromGitHubRepo: "gitterHQ/cloaked-avenger",
+                uri: "gitterHQ"
+              });
+              return Promise.resolve({ _id: groupId });
+            }
+          }
+        },
         'gitter-web-permissions/lib/legacy-policy-factory': {
           createPolicyForGithubObject: function(user, uri, ghType, security) {
             assert.equal(user.username, fixture.user1.username);

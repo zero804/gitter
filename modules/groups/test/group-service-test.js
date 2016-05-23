@@ -3,6 +3,7 @@
 var groupService = require('../lib/group-service');
 var assert = require('assert');
 var fixtureLoader = require('../../../test/integration/test-fixtures');
+var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
 
 describe('group-service', function() {
 
@@ -26,7 +27,7 @@ describe('group-service', function() {
         return fixture.cleanup();
       });
 
-      describe('createGroup #slow', function() {
+      describe('createGroup', function() {
         it('should create a group', function() {
           var groupUri = fixtureLoader.GITTER_INTEGRATION_ORG;
           var user = fixture.user1;
@@ -36,7 +37,18 @@ describe('group-service', function() {
               assert.strictEqual(group.name, 'Bob');
               assert.strictEqual(group.uri, groupUri);
               assert.strictEqual(group.lcUri, groupUri.toLowerCase());
-            });
+              return securityDescriptorService.getForGroupUser(group._id, null);
+            })
+            .then(function(securityDescriptor) {
+              assert.deepEqual(securityDescriptor, {
+                admins: 'GH_ORG_MEMBER',
+                externalId: fixtureLoader.GITTER_INTEGRATION_ORG_ID,
+                linkPath: fixtureLoader.GITTER_INTEGRATION_ORG,
+                members: 'PUBLIC',
+                public: true,
+                type: 'GH_ORG'
+              })
+            })
         });
       });
 

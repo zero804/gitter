@@ -7,7 +7,10 @@ var assert = require('assert');
 var securityDescriptorValidator = require('./security-descriptor-validator');
 var StatusError = require('statuserror');
 
-function getForRoomUser(roomId, userId) {
+/**
+ * @private
+ */
+function findForQueryAndUser(query, userId) {
   var projection = {
     _id: 0,
     type: 1,
@@ -26,10 +29,6 @@ function getForRoomUser(roomId, userId) {
     projection.extraAdmins = elemMatch;
   }
 
-  var query = {
-    troupeId: roomId
-  };
-
   return SecurityDescriptor.findOne(query, projection, { lean: true })
     .exec()
     .then(function(descriptor) {
@@ -38,16 +37,30 @@ function getForRoomUser(roomId, userId) {
     });
 }
 
+function getForRoomUser(roomId, userId) {
+  var query = {
+    troupeId: roomId
+  };
+
+  return findForQueryAndUser(query, userId);
+}
+
+function getForGroupUser(groupId, userId) {
+  var query = {
+    groupId: groupId
+  };
+
+  return findForQueryAndUser(query, userId);
+}
+
 /**
- * Returns true if an existing descriptor was updated
+ * @private
  */
-function insertForRoom(roomId, descriptor) {
-  roomId = mongoUtils.asObjectID(roomId);
-  securityDescriptorValidator(descriptor);
+function insertForRoomOrGroup(roomId, groupId, descriptor) {
+  var query;
 
   var setOperation = {
     $setOnInsert: {
-      troupeId: roomId,
       type: descriptor.type,
       members: descriptor.members,
       admins: descriptor.admins,
@@ -56,6 +69,25 @@ function insertForRoom(roomId, descriptor) {
       externalId: descriptor.externalId,
     }
   };
+
+  if (roomId) {
+    assert(!groupId, 'Require either a roomId or a groupId');
+    roomId = mongoUtils.asObjectID(roomId);
+    groupId = undefined;
+
+    query = { troupeId: roomId };
+    setOperation.$setOnInsert.troupeId = roomId;
+  } else {
+    assert(groupId, 'Require either a roomId or a groupId');
+    groupId = mongoUtils.asObjectID(groupId);
+    roomId = undefined;
+    query = { groupId: groupId };
+    setOperation.$setOnInsert.groupId = groupId;
+  }
+
+  securityDescriptorValidator(descriptor);
+
+
 
   // if (descriptor.bans && descriptor.bans.length) {
   //   setOperation.$setOnInsert.bans = mongoUtils.asObjectIDS(descriptor.extraMembers);
@@ -69,10 +101,21 @@ function insertForRoom(roomId, descriptor) {
     setOperation.$setOnInsert.extraAdmins = mongoUtils.asObjectIDs(descriptor.extraAdmins);
   }
 
-  return mongooseUtils.leanUpsert(SecurityDescriptor, { troupeId: roomId }, setOperation)
+  return mongooseUtils.leanUpsert(SecurityDescriptor, query, setOperation)
     .then(function(existing) {
       return !existing;
     });
+}
+
+/**
+ * Returns true if an existing descriptor was updated
+ */
+function insertForRoom(roomId, descriptor) {
+  return insertForRoomOrGroup(roomId, null, descriptor);
+}
+
+function insertForGroup(groupId, descriptor) {
+  return insertForRoomOrGroup(null, groupId, descriptor);
 }
 
 function updateLinksForRepo(linkPath, newLinkPath, externalId) {
@@ -87,7 +130,6 @@ function updateLinksForRepo(linkPath, newLinkPath, externalId) {
   if (!parts[0].length || !parts[1].length) {
     throw new StatusError(400, 'Invalid linkPath attribute: ' + linkPath);
   }
-
 
   var query = {
     type: 'GH_REPO',
@@ -110,6 +152,8 @@ function updateLinksForRepo(linkPath, newLinkPath, externalId) {
 
 module.exports = {
   getForRoomUser: getForRoomUser,
+  getForGroupUser: getForGroupUser,
   insertForRoom: insertForRoom,
+  insertForGroup: insertForGroup,
   updateLinksForRepo: updateLinksForRepo,
 };

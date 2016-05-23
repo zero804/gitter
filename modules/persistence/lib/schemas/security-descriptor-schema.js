@@ -12,7 +12,7 @@ module.exports = {
     //
     var SecurityDescriptorSchema = new Schema({
       troupeId: { type: ObjectId },
-      // groupId: { in future}
+      groupId: { type: ObjectId },
       type: { type: String, enum: [
         null,   // TODO: should none be null?
         'ONE_TO_ONE',
@@ -73,11 +73,11 @@ module.exports = {
 
     // Create a partial index for troupe security descriptors
     SecurityDesciptor.collection.createIndex({
-        troupeId : 1
+        troupeId: 1
       } , {
         background: true,
         unique: true,
-        partialFilterExpression : {
+        partialFilterExpression: {
           troupeId: { $exists: true }
         }
       },
@@ -86,11 +86,24 @@ module.exports = {
       });
 
     SecurityDesciptor.collection.createIndex({
-        type: 1,
-        linkPath : 1
+        groupId: 1
       } , {
         background: true,
-        partialFilterExpression : {
+        unique: true,
+        partialFilterExpression: {
+          groupId: { $exists: true }
+        }
+      },
+      function(err) {
+        if (err) throw err;
+      });
+
+    SecurityDesciptor.collection.createIndex({
+        type: 1,
+        linkPath: 1
+      } , {
+        background: true,
+        partialFilterExpression: {
           linkPath: { $exists: true }
         }
       },
@@ -100,10 +113,10 @@ module.exports = {
 
     SecurityDesciptor.collection.createIndex({
         type: 1,
-        externalId : 1
+        externalId: 1
       } , {
         background: true,
-        partialFilterExpression : {
+        partialFilterExpression: {
           externalId: { $exists: true }
         }
       },

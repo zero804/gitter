@@ -45,7 +45,23 @@ function createPolicyForRoomId(user, roomId) {
     });
 }
 
+function createPolicyForGroupId(user, groupId) {
+  var userId = user && user._id;
+
+  return securityDescriptorService.getForGroupUser(groupId, userId)
+    .then(function(securityDescriptor) {
+      if (!securityDescriptor) throw new StatusError(404);
+
+      var policyDelegate = getDelegateForSecurityDescriptor(user, securityDescriptor);
+      var contextDelegate = null; // No group context yet
+
+      return new PolicyEvaluator(user, securityDescriptor, policyDelegate, contextDelegate);
+    });
+}
+
+
 module.exports = {
   createPolicyForRoomId: Promise.method(createPolicyForRoomId),
+  createPolicyForGroupId: Promise.method(createPolicyForGroupId),
   createPolicyFromDescriptor: createPolicyFromDescriptor,
 };
