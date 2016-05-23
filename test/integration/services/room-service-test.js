@@ -251,6 +251,46 @@ describe('room-service', function() {
             public: true,
             type: "GH_REPO"
           });
+
+          return roomMembershipService.checkRoomMembership(this.uriContext.troupe._id, fixture.user1._id);
+        })
+        .then(function(isRoomMember) {
+          assert.strictEqual(isRoomMember, true);
+        });
+    });
+
+    it('should add a user to a room if the room exists', function() {
+      var permissionsModelMock = mockito.mockFunction();
+      var roomService = testRequire.withProxies("./services/room-service", {
+        'gitter-web-permissions/lib/permissions-model': permissionsModelMock
+      });
+
+      mockito.when(permissionsModelMock)().then(function(user, right, uri, githubType) {
+        assert.equal(user.username, fixture.user1.username);
+        assert.equal(right, 'create');
+        assert.equal(uri, 'gitterHQ/cloaked-avenger');
+        assert.equal(githubType, 'REPO');
+
+        return Promise.resolve(true);
+      });
+
+      return persistence.Troupe.findOneAndRemove({ lcUri: 'gitterhq/cloaked-avenger' })
+        .then(function() {
+          return roomService.findOrCreateRoom(fixture.user1, 'gitterHQ/cloaked-avenger');
+        })
+        .bind({})
+        .then(function(uriContext) {
+          this.uriContext = uriContext;
+          return roomMembershipService.removeRoomMember(this.uriContext.troupe._id, fixture.user1._id, fixture.user1._id)
+        })
+        .then(function() {
+          return roomService.findOrCreateRoom(fixture.user1, 'gitterHQ/cloaked-avenger');
+        })
+        .then(function() {
+          return roomMembershipService.checkRoomMembership(this.uriContext.troupe._id, fixture.user1._id);
+        })
+        .then(function(isRoomMember) {
+          assert.strictEqual(isRoomMember, true);
         });
     });
 
@@ -294,6 +334,11 @@ describe('room-service', function() {
             public: true,
             type: "GH_REPO"
           });
+
+          return roomMembershipService.checkRoomMembership(this.uriContext.troupe._id, fixture.user1._id);
+        })
+        .then(function(isRoomMember) {
+          assert.strictEqual(isRoomMember, true);
         });
     });
 
