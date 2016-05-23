@@ -73,10 +73,12 @@ function findBatchWarnings(opts) {
   var githubTypes = opts.githubTypes;
   var org = opts.org;
   var user = opts.user;
+  var oldUser = opts.oldUser;
   var uniqueUserIds = opts.uniqueUserIds;
   var uniqueOwners = opts.uniqueOwners;
 
   var lcOwner = batch._id;
+  var warning;
   var warnings = [];
 
   // all unique room ids in this batch
@@ -101,14 +103,18 @@ function findBatchWarnings(opts) {
   var missingParentIds = Object.keys(missingParentIdMap);
   if (missingParentIds.length) {
     // this doesn't actually occur in our dataset
-    warnings.push(lcOwner + " has parentIds that aren't included in the batch.");
+    warning = lcOwner + " has parentIds that aren't included in the batch.";
+    console.log(warning);
+    warnings.push(warning);
   }
 
   // only one unique, non-null, non-undefined ownerUserId is allowed per batch
   var ownerUserIds = Object.keys(ownerUserIdMap);
   if (ownerUserIds.length > 1) {
     // this is very rare and we'll have to just fix it manually
-    warnings.push(lcOwner + " has more than one ownerUserId.");
+    warning = lcOwner + " has more than one ownerUserId.";
+    console.log(warning);
+    warnings.push(warning);
   }
 
   // if an lcOwner has both an ORG_CHANNEL or ORG room _and_ a USER_CHANNEL,
@@ -119,18 +125,26 @@ function findBatchWarnings(opts) {
   });
   if ((githubTypeMap['ORG_CHANNEL'] || githubTypeMap['ORG']) && githubTypeMap['USER_CHANNEL']) {
     // this is very rare and we'll have to just fix it manually
-    warnings.push(lcOwner + " has both org rooms or channels AND user channels.");
+    warning = lcOwner + " has both org rooms or channels AND user channels.";
+    console.log(warning);
+    warnings.push(warning);
   }
 
   if (user) {
-    // warn if user id doesn't match all the ownerUserIds
-    if (!_.every(ownerUserIds, function(ownerId) { return ownerId == user.id })) {
-      warnings.push(lcOwner + " has ownerUserIds that don't match the owner user's id.");
+    if (oldUser) {
+      // warn if user id doesn't match all the ownerUserIds
+      if (!_.every(ownerUserIds, function(ownerId) { return ownerId == oldUser._id })) {
+        warning = lcOwner + " has ownerUserIds that don't match the owner user's id. ("+ownerUserIds+' != '+oldUser._id+')';
+        console.log(warning);
+        warnings.push(warning);
+      }
     }
   } else {
     // warn if the batch has ownerUserIds, but the owner is not a user
     if (ownerUserIds.length) {
-      warnings.push(lcOwner + " has ownerUserIds, but is not a user.");
+      warning = lcOwner + " has ownerUserIds, but is not a user.";
+      console.log(warning);
+      warnings.push(warning);
     }
   }
 
@@ -236,8 +250,8 @@ var findBatchInfo = Promise.method(function(batch) {
 
   return Promise.join(
     function() {
-      // no need to look this up if we're using the matching gh org or user
-      if (batch.githuborg.length || batch.githubuser.length) {
+      // no need to look this up if we're using the matching gh org
+      if (batch.githuborg.length) {
         return Promise.resolve(null);
       } else {
         return findUsersByOwner(lcOwner);
@@ -245,7 +259,7 @@ var findBatchInfo = Promise.method(function(batch) {
     }(),
     function() {
       // ditto
-      if (batch.githuborg.length || batch.githubuser.length) {
+      if (batch.githuborg.length) {
         return Promise.resolve(null);
       } else {
         return findUsersByGitterId(uniqueUserIds[0]);
@@ -254,6 +268,8 @@ var findBatchInfo = Promise.method(function(batch) {
     function(ownerUsers, roomUsers) {
       var org = batch.githuborg[0]; // could be undefined
       var user = batch.githubuser[0]; // could be undefined
+      var oldUser;
+
       if (org) {
         // A case-insensitive lookup matched the lcOwner to a current github org.
         type = 'org';
@@ -278,7 +294,6 @@ var findBatchInfo = Promise.method(function(batch) {
 
         // if they aren't all this user, update them
         if (!_.every(uniqueOwners, function(uniqueUri) { return uniqueUri == user.uri; })) {
-          var oldUser;
           if (ownerUsers && ownerUsers.gitterUser) {
             // we already have a user with a username matching the lcOwner
             // (case insensitive), but it has clearly been renamed
@@ -321,13 +336,14 @@ var findBatchInfo = Promise.method(function(batch) {
         type = 'user';
         reason = 'gitter-username-lookup';
 
+        oldUser = ownerUsers.gitterUser;
         errors.push({
           errorType: "owner",
           type: type,
           lcOwner: lcOwner,
           correctOwner: ownerUsers.githubUser.uri,
           batch: batch,
-          oldUser: ownerUsers.gitterUser,
+          oldUser: oldUser,
           user: ownerUsers.githubUser
         });
 
@@ -343,13 +359,14 @@ var findBatchInfo = Promise.method(function(batch) {
         type = 'user';
         reason = 'owneruserid-lookup';
 
+        oldUser = roomUsers.gitterUser;
         errors.push({
           errorType: "owner",
           type: type,
           lcOwner: lcOwner,
           correctOwner: roomUsers.githubUser.uri,
           batch: batch,
-          oldUser: roomUsers.gitterUser,
+          oldUser: oldUser,
           user: roomUsers.githubUser
         });
 
@@ -362,12 +379,25 @@ var findBatchInfo = Promise.method(function(batch) {
 
       if (user) {
         // does this user exist in our system?
-        lookups.gitterUser = userService.findByGithubId(user.githubId);
+        // (this is primarily for checking the jashkenas case, not the same as oldUser)
+        if (oldUser && oldUser.githubId == user.githubId) {
+          // little optimisation..
+          lookups.gitterUser = Promise.resolve(oldUser);
+        } else {
+          lookups.gitterUser = userService.findByGithubId(user.githubId);
+        }
       }
 
       return Promise.props(lookups)
         .then(function(results) {
           console.log(++numProcessed, lcOwner, type, reason);
+
+          errors.forEach(function(error) {
+            // in case there was a matching github user above, but no
+            // ownerUsers and no roomUsers, so we didn't already have the old
+            // gitterUser set.
+            error.oldUser = oldUser || results.gitterUser;
+          });
 
           return errorsToUpdates(errors)
             .then(function(updates) {
@@ -390,7 +420,8 @@ var findBatchInfo = Promise.method(function(batch) {
                   uniqueUserIds: uniqueUserIds,
                   uniqueOwners: uniqueOwners,
                   org: org,
-                  user: user
+                  user: user,
+                  oldUser: oldUser || results.gitterUser
                 })
               };
 
