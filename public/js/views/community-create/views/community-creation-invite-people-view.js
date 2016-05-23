@@ -2,6 +2,7 @@
 
 var _ = require('underscore');
 var Backbone = require('backbone');
+var ProxyCollection = require('backbone-proxy-collection');
 var Marionette = require('backbone.marionette');
 var toggleClass = require('utils/toggle-class');
 
@@ -12,6 +13,7 @@ var UserResultListView = require('./community-create-invite-user-result-list-vie
 var CommunityCreationEmailListView = require('./community-creation-email-list-view');
 
 var userSearchModels = require('collections/user-search');
+var collaboratorsModels = require('collections/collaborators');
 
 require('gitter-styleguide/css/components/headings.css');
 require('gitter-styleguide/css/components/buttons.css');
@@ -36,7 +38,7 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   initUserResultListView: function(optionsForRegion) {
     this.userResultListView = new UserResultListView(optionsForRegion({
-      collection: this.userSearchCollection
+      collection: this.userResultCollection
     }));
     this.listenTo(this.userResultListView, 'user:activated', this.onPersonSelected, this);
     //this.listenTo(this.inviteListView, 'user:cleared', this.onPersonRemoved, this);
@@ -79,10 +81,17 @@ module.exports = CommunityCreateBaseStepView.extend({
     'click @ui.emailSubmit': 'onEmailSubmit'
   }),
 
-  initialize: function(options) {
+  initialize: function() {
     CommunityCreateBaseStepView.prototype.initialize.apply(this, arguments);
 
     this.userSearchCollection = new userSearchModels.Collection();
+    this.userSuggestionCollection = new collaboratorsModels.CollabCollection();
+    this.userSuggestionCollection.fetch();
+
+    this.userResultCollection = new ProxyCollection({
+      collection: this.userSuggestionCollection
+    });
+
     this.throttledFetchUsers = _.throttle(this.fetchUsers, 300);
   },
 
@@ -103,18 +112,24 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   fetchUsers: function() {
     var input = this.ui.peopleInput[0].value;
-    this.userSearchCollection.fetch({
-      data: {
-          q: input,
-          limit: 12
+    if(input.length) {
+      this.userResultCollection.switchCollection(this.userSearchCollection);
+      this.userSearchCollection.fetch({
+        data: {
+            q: input,
+            limit: 12
+          }
+        },
+        {
+          add: true,
+          remove: true,
+          merge: true
         }
-      },
-      {
-        add: true,
-        remove: true,
-        merge: true
-      }
-    );
+      );
+    }
+    else {
+      this.userResultCollection.switchCollection(this.userSuggestionCollection);
+    }
   },
 
   onPersonSelected: function(person) {
