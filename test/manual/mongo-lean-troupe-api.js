@@ -12,7 +12,7 @@ onMongoConnect(function() {
     },
 
     withAccess: function(done) {
-      troupeService.findByIdLeanWithAccess('54d244f1c53660e29b9f91d9', '5435479aa6cf90638955c34a')
+      troupeService.findByIdLeanWithMembership('54d244f1c53660e29b9f91d9', '5435479aa6cf90638955c34a')
         .nodeify(done);
     },
 

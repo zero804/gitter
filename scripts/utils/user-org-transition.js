@@ -62,7 +62,7 @@ function performUserToOrgTransition(usernameForConversion, firstUserUsername, dr
     .then(function() {
       /* Create the org room */
       if (dryRun) return;
-      return roomService.findOrCreateRoom(context.firstUser, usernameForConversion);
+      return roomService.createRoomByUri(context.firstUser, usernameForConversion);
     })
     .then(function(findOrCreateResult) {
       /* Find all child orgs */

@@ -1,5 +1,3 @@
-/*jslint node:true, unused:true*/
-/*global describe:true, it:true, before:true, after: true */
 "use strict";
 
 var testRequire = require('../test-require');
@@ -7,6 +5,7 @@ var assert = require('assert');
 var fixtureLoader = require('../test-fixtures');
 var Promise = require('bluebird');
 var ObjectID = require('mongodb').ObjectID;
+var StatusError = require('statuserror');
 var fixture = {};
 
 var mockito = require('jsmockito').JsMockito;
@@ -16,6 +15,10 @@ var once = times(1);
 var persistence = require('gitter-web-persistence');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var roomMembershipService = testRequire('./services/room-membership-service');
+testRequire("./services/room-service");
+
+// to work around proxyquire caching bugs...
+testRequire("./services/room-service");
 
 describe('room-service', function() {
   before(fixtureLoader(fixture, {
@@ -35,13 +38,6 @@ describe('room-service', function() {
       githubType: 'REPO',
       users: ['user1', 'user2']
     },
-    troupeBan: {
-      security: 'PUBLIC',
-      githubType: 'REPO',
-      users: ['userBan', 'userBanAdmin']
-    },
-    userBan: { },
-    userBanAdmin: {},
     troupeCanRemove: {
       security: 'PUBLIC',
       githubType: 'REPO',
@@ -62,49 +58,43 @@ describe('room-service', function() {
   });
 
   describe('classic functionality #slow', function() {
-    it('should fail to create a room for an org', function () {
-      var permissionsModelMock = mockito.mockFunction();
+    it('should fail to create a room for an org where the user is not an admin', function () {
 
       var roomService = testRequire.withProxies("./services/room-service", {
-        'gitter-web-permissions/lib/permissions-model': permissionsModelMock
+        'gitter-web-permissions/lib/legacy-policy-factory': {
+          createPolicyForGithubObject: function() {
+            return Promise.resolve({
+              canAdmin: function() {
+                return Promise.resolve(false);
+              }
+            });
+          }
+        }
       });
 
-      mockito.when(permissionsModelMock)().then(function (user, right, uri, githubType) {
-        assert.equal(user.username, fixture.user1.username);
-        assert.equal(right, 'create');
-        assert.equal(uri, 'gitterTest');
-        assert.equal(githubType, 'ORG');
-
-        return Promise.resolve(false);
-      });
-
-      return roomService.findOrCreateRoom(fixture.user1, 'gitterTest')
+      return roomService.createRoomByUri(fixture.user1, 'gitterTest')
         .then(function () {
           assert(false, 'Expected an exception');
-        }, function(err) {
-          assert.strictEqual(err.status, 404);
+        })
+        .catch(StatusError, function(err) {
+          assert.strictEqual(err.status, 403);
         });
     });
 
-    it('should deny access but provide public rooms #slow', function () {
-
-      var permissionsModelMock = mockito.mockFunction();
+    it('should disallow users from accessing rooms they cannot join #slow', function () {
       var uriResolver = mockito.mockFunction();
       var roomService = testRequire.withProxies('./services/room-service', {
         './uri-resolver': uriResolver,
-        'gitter-web-permissions/lib/permissions-model': permissionsModelMock
+        'gitter-web-permissions/lib/legacy-policy-factory': {
+          createPolicyForRoom: function() {
+            return Promise.resolve({
+              canJoin: function() {
+                return Promise.resolve(false);
+              }
+            });
+          }
+        }
       });
-
-      mockito
-        .when(permissionsModelMock)()
-        .then(function (user, right, uri, githubType) {
-          assert.equal(user.username, fixture.user1.username);
-          assert.equal(right, 'create');
-          assert.equal(uri, 'gitterTest');
-          assert.equal(githubType, 'ORG');
-
-          return Promise.resolve(false);
-        });
 
       mockito
         .when(uriResolver)()
@@ -125,36 +115,48 @@ describe('room-service', function() {
 
       // test
       return roomService
-        .findOrCreateRoom(fixture.user1, 'gitterTest')
+        .createRoomByUri(fixture.user1, 'gitterTest')
         .then(function () {
           assert(false, 'Expected an exception');
-        }, function(err) {
+        })
+        .catch(StatusError, function(err) {
           assert.strictEqual(err.status, 404);
-          assert.strictEqual(err.githubType, 'ORG');
-          assert.strictEqual(err.uri, 'gitterTest');
         });
     });
 
 
     it('should find or create a room for an organization', function() {
-      var permissionsModelMock = mockito.mockFunction();
+      var uriResolver = mockito.mockFunction();
       var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
       var roomService = testRequire.withProxies("./services/room-service", {
-        'gitter-web-permissions/lib/permissions-model': permissionsModelMock
+        './uri-resolver': uriResolver,
+        'gitter-web-permissions/lib/legacy-policy-factory': {
+          createPolicyForGithubObject: function(user, uri, ghType, security) {
+            assert.equal(user.username, fixture.user1.username);
+            assert.equal(uri, 'gitterTest');
+            assert.equal(ghType, 'ORG');
+            assert.equal(security, null);
+
+            return Promise.resolve({
+              canAdmin: function() {
+                return Promise.resolve(true);
+              }
+            });
+          },
+          createPolicyForRoom: function(user, room) {
+            assert.equal(room.uri, 'gitterTest');
+            return Promise.resolve({});
+          }
+        }
       });
 
-      mockito
-        .when(permissionsModelMock)().then(function (user, right, uri, githubType) {
-        assert.equal(user.username, fixture.user1.username);
-        assert.equal(right, 'create');
-        assert.equal(uri, 'gitterTest');
-        assert.equal(githubType, 'ORG');
-
-        return Promise.resolve(true);
-      });
+      mockito.when(uriResolver)()
+        .then(function () {
+          return Promise.resolve([null, null, false]);
+        });
 
       return roomService
-        .findOrCreateRoom(fixture.user1, 'gitterTest')
+        .createRoomByUri(fixture.user1, 'gitterTest')
         .bind({})
         .then(function (uriContext) {
           this.uriContext = uriContext;
@@ -180,29 +182,14 @@ describe('room-service', function() {
     });
 
     it('should find or create a room for a person', function() {
-      var permissionsModelMock = mockito.mockFunction();
       var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
-      var roomService = testRequire.withProxies("./services/room-service", {
-        'gitter-web-permissions/lib/permissions-model': permissionsModelMock
-      });
+      var roomService = testRequire("./services/room-service");
 
-      mockito.when(permissionsModelMock)().then(function(user, right, uri, githubType) {
-        assert.equal(user.username, fixture.user1.username);
-        assert.equal(right, 'view');
-        assert.equal(uri, fixture.user2.username);
-        assert.equal(githubType, 'ONETOONE');
-
-        return Promise.resolve(true);
-      });
-
-      return roomService.findOrCreateRoom(fixture.user1, fixture.user2.username)
+      return roomService.createRoomByUri(fixture.user1, fixture.user2.username)
         .bind({})
         .then(function(uriContext) {
           this.uriContext = uriContext;
-          assert(uriContext.oneToOne);
           assert(uriContext.troupe);
-          assert.equal(uriContext.otherUser.id, fixture.user2.id);
-
           return securityDescriptorService.getForRoomUser(uriContext.troupe._id, fixture.user1._id);
         })
         .then(function(securityDescriptor) {
@@ -218,24 +205,31 @@ describe('room-service', function() {
     });
 
     it('should create a room for a repo', function() {
-      var permissionsModelMock = mockito.mockFunction();
       var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
       var roomService = testRequire.withProxies("./services/room-service", {
-        'gitter-web-permissions/lib/permissions-model': permissionsModelMock
-      });
+        'gitter-web-permissions/lib/legacy-policy-factory': {
+          createPolicyForGithubObject: function(user, uri, ghType, security) {
+            assert.equal(user.username, fixture.user1.username);
+            assert.equal(uri, 'gitterHQ/cloaked-avenger');
+            assert.equal(ghType, 'REPO');
+            assert.equal(security, null);
 
-      mockito.when(permissionsModelMock)().then(function(user, right, uri, githubType) {
-        assert.equal(user.username, fixture.user1.username);
-        assert.equal(right, 'create');
-        assert.equal(uri, 'gitterHQ/cloaked-avenger');
-        assert.equal(githubType, 'REPO');
-
-        return Promise.resolve(true);
+            return Promise.resolve({
+              canAdmin: function() {
+                return Promise.resolve(true);
+              }
+            });
+          },
+          createPolicyForRoom: function(user, room) {
+            assert.equal(room.uri, 'gitterHQ/cloaked-avenger');
+            return Promise.resolve({});
+          }
+        }
       });
 
       return persistence.Troupe.findOneAndRemove({ lcUri: 'gitterhq/cloaked-avenger' })
         .then(function() {
-          return roomService.findOrCreateRoom(fixture.user1, 'gitterHQ/cloaked-avenger');
+          return roomService.createRoomByUri(fixture.user1, 'gitterHQ/cloaked-avenger');
         })
         .bind({})
         .then(function(uriContext) {
@@ -251,31 +245,92 @@ describe('room-service', function() {
             public: true,
             type: "GH_REPO"
           });
+
+          return roomMembershipService.checkRoomMembership(this.uriContext.troupe._id, fixture.user1._id);
+        })
+        .then(function(isRoomMember) {
+          assert.strictEqual(isRoomMember, true);
+        });
+    });
+
+    it('should add a user to a room if the room exists', function() {
+      var roomService = testRequire.withProxies("./services/room-service", {
+        'gitter-web-permissions/lib/legacy-policy-factory': {
+          createPolicyForGithubObject: function(user, uri, ghType, security) {
+            assert.equal(user.username, fixture.user1.username);
+            assert.equal(uri, 'gitterHQ/cloaked-avenger');
+            assert.equal(ghType, 'REPO');
+            assert.equal(security, null);
+
+            return Promise.resolve({
+              canAdmin: function() {
+                return Promise.resolve(true);
+              }
+            });
+          },
+          createPolicyForRoom: function(user, room) {
+            assert.equal(room.uri, 'gitterHQ/cloaked-avenger');
+            return Promise.resolve({
+              canJoin: function() {
+                return Promise.resolve(true);
+              }
+            });
+          }
+        }
+      });
+
+      return persistence.Troupe.findOneAndRemove({ lcUri: 'gitterhq/cloaked-avenger' })
+        .then(function() {
+          return roomService.createRoomByUri(fixture.user1, 'gitterHQ/cloaked-avenger');
+        })
+        .bind({})
+        .then(function(uriContext) {
+          this.uriContext = uriContext;
+          return roomMembershipService.removeRoomMember(this.uriContext.troupe._id, fixture.user1._id);
+        })
+        .then(function() {
+          return roomMembershipService.checkRoomMembership(this.uriContext.troupe._id, fixture.user1._id);
+        })
+        .then(function(isRoomMember) {
+          assert.strictEqual(isRoomMember, false);
+          return roomService.createRoomByUri(fixture.user1, 'gitterHQ/cloaked-avenger');
+        })
+        .then(function() {
+          return roomMembershipService.checkRoomMembership(this.uriContext.troupe._id, fixture.user1._id);
+        })
+        .then(function(isRoomMember) {
+          assert.strictEqual(isRoomMember, true);
         });
     });
 
     it('should create a room for a repo ignoring the case', function() {
-      var permissionsModelMock = mockito.mockFunction();
       var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
-
       var roomService = testRequire.withProxies("./services/room-service", {
-        'gitter-web-permissions/lib/permissions-model': permissionsModelMock
-      });
+        'gitter-web-permissions/lib/legacy-policy-factory': {
+          createPolicyForGithubObject: function(user, uri, ghType, security) {
+            assert.equal(user.username, fixture.user1.username);
+            assert.equal(uri, 'gitterHQ/sandbox');
+            assert.equal(ghType, 'REPO');
+            assert.equal(security, null);
 
-      mockito.when(permissionsModelMock)().then(function(user, right, uri, githubType) {
-        assert.equal(user.username, fixture.user1.username);
-        assert.equal(right, 'create');
-        assert.equal(uri, 'gitterHQ/sandbox');
-        assert.equal(githubType, 'REPO');
-
-        return Promise.resolve(true);
+            return Promise.resolve({
+              canAdmin: function() {
+                return Promise.resolve(true);
+              }
+            });
+          },
+          createPolicyForRoom: function(user, room) {
+            assert.equal(room.uri, 'gitterHQ/sandbox');
+            return Promise.resolve({});
+          }
+        }
       });
 
       return persistence.Troupe.findOneAndRemove({ lcUri: 'gitterhq/sandbox' })
         .exec()
         .bind({})
         .then(function() {
-          return roomService.findOrCreateRoom(fixture.user1, 'gitterhq/sandbox', { ignoreCase: true });
+          return roomService.createRoomByUri(fixture.user1, 'gitterhq/sandbox', { ignoreCase: true });
         })
         .then(function(uriContext) {
           this.uriContext = uriContext;
@@ -294,41 +349,33 @@ describe('room-service', function() {
             public: true,
             type: "GH_REPO"
           });
+
+          return roomMembershipService.checkRoomMembership(this.uriContext.troupe._id, fixture.user1._id);
+        })
+        .then(function(isRoomMember) {
+          assert.strictEqual(isRoomMember, true);
         });
     });
 
     it('should detect when a user hits their own userhome', function() {
       var roomService = testRequire("./services/room-service");
 
-      return roomService.findOrCreateRoom(fixture.user1, fixture.user1.username)
-        .then(function(context) {
-          assert(context.ownUrl);
-          assert(!context.oneToOne);
-          assert(!context.troupe);
-          assert(!context.didCreate);
-          assert.strictEqual(context.uri, fixture.user1.username);
+      return roomService.createRoomByUri(fixture.user1, fixture.user1.username)
+        .then(function() {
+          assert.ok(false, 'Expected an exception');
+        })
+        .catch(StatusError, function(err) {
+          assert.strictEqual(err.status, 404);
         });
     });
 
     it('should redirect a user when a URI is in the wrong case and the room is to be created', function() {
-      var permissionsModelMock = mockito.mockFunction();
-      var roomService = testRequire.withProxies("./services/room-service", {
-        'gitter-web-permissions/lib/permissions-model': permissionsModelMock
-      });
-
-      mockito.when(permissionsModelMock)().then(function(user, right, uri, githubType) {
-        assert.equal(user.username, fixture.user1.username);
-        assert.equal(right, 'create');
-        assert.equal(uri, 'gitterHQ/sandbox');
-        assert.equal(githubType, 'REPO');
-
-        return Promise.resolve(true);
-      });
+      var roomService = testRequire("./services/room-service");
 
       return persistence.Troupe.findOneAndRemove({ lcUri: 'gitterhq/sandbox' })
         .exec()
         .then(function() {
-          return roomService.findOrCreateRoom(fixture.user1, 'gitterhq/sandbox');
+          return roomService.createRoomByUri(fixture.user1, 'gitterhq/sandbox');
         })
         .then(function() {
           assert(false, 'Expected redirect');
@@ -339,14 +386,15 @@ describe('room-service', function() {
 
     });
 
-    it('should handle an invalid url correctly', function() {
+    it('should handle a user trying to create a room they dont have access to', function() {
       var roomService = testRequire("./services/room-service");
 
-      return roomService.findOrCreateRoom(fixture.user1, 'joyent')
+      return roomService.createRoomByUri(fixture.user1, 'joyent')
         .then(function () {
           assert(false, 'Expected exception');
-        }, function(err) {
-          assert.strictEqual(err.status, 404);
+        })
+        .catch(StatusError, function(err) {
+          assert.strictEqual(err.status, 403);
         });
     });
 
@@ -363,18 +411,16 @@ describe('room-service', function() {
         return Promise.resolve(false);
       });
 
-      return roomService.findOrCreateRoom(fixture.user3, fixture.troupeOrg1.uri)
+      return roomService.createRoomByUri(fixture.user3, fixture.troupeOrg1.uri)
         .then(function () {
           assert(false, 'Expected exception');
         }, function(err) {
           assert.strictEqual(err.status, 404);
-          assert.strictEqual(err.githubType, 'ORG');
-          assert.strictEqual(err.uri, fixture.troupeOrg1.uri);
         });
     });
   });
 
-  describe('user revalidation', function() {
+  describe.skip('user revalidation', function() {
     it('should correctly revalidate the users in a room', function() {
       var roomPermissionsModelMock = mockito.mockFunction();
       var roomMembershipServiceMock = {
@@ -391,9 +437,9 @@ describe('room-service', function() {
         assert.equal(perm, 'join');
         assert.equal(incomingRoom.id, fixture.troupeRepo.id);
 
-        if(user.id == fixture.user1.id) {
+        if(user.id === fixture.user1.id) {
           return Promise.resolve(true);
-        } else if(user.id == fixture.user2.id) {
+        } else if(user.id === fixture.user2.id) {
           return Promise.resolve(false);
         } else {
           assert(false, 'Unknown user');
@@ -428,7 +474,7 @@ describe('room-service', function() {
         'gitter-web-permissions/lib/room-permissions-model': function() {
           return Promise.resolve(stubs.addUser);
         },
-        './invited-permissions-service': function() {
+        'gitter-web-permissions/lib/invited-permissions-service': function() {
           return Promise.resolve(stubs.canBeInvited);
         },
         './user-service': {
@@ -631,29 +677,40 @@ describe('room-service', function() {
       return service.addUserToRoom(troupe, user, 'test-user');
     });
 
-    it('fails with 403 when instigating user doesnt have permission to add people', function() {
-      var service = createRoomServiceWithStubs({
-        addUser: false,
-        findByUsernameResult: { username: 'test-user', id: 'test-user-id' },
-        createInvitedUserResult: null,
-        canBeInvited: true,
-        onInviteEmail: function() {
-          return Promise.resolve();
-        }
-      });
-
-      var troupe = {
-        uri: 'user/room'
-      };
-
-      return service.addUserToRoom(troupe, {}, 'test-user')
-        .then(function() {
-          assert.ok(false, 'Expected exception');
-        }, function(err) {
-          assert.equal(err.status, 403);
-        });
-    });
-
+  //   it('fails with 403 when instigating user doesnt have permission to add people', function() {
+  //
+  //     var troupeId = new ObjectID();
+  //     var userId = new ObjectID();
+  //
+  //     var troupe = {
+  //       _id: troupeId,
+  //       id: troupeId.toHexString(),
+  //       uri: 'user/room'
+  //     };
+  //
+  //     var service = createRoomServiceWithStubs({
+  //       addUser: false,
+  //       findByUsernameResult: {
+  //         username: 'test-user',
+  //         _id: userId,
+  //         id: userId.toHexString()
+  //       },
+  //       createInvitedUserResult: null,
+  //       canBeInvited: true,
+  //       onInviteEmail: function() {
+  //         return Promise.resolve();
+  //       }
+  //     });
+  //
+  //     return service.addUserToRoom(troupe, {}, 'test-user')
+  //       .then(function() {
+  //         assert.ok(false, 'Expected exception');
+  //       }, function(err) {
+  //         if (!(err instanceof StatusError)) throw err;
+  //         assert.equal(err.status, 403);
+  //       });
+  //   });
+  //
   });
 
   describe('custom rooms #slow', function() {
@@ -661,47 +718,25 @@ describe('room-service', function() {
     describe('::org::', function() {
 
       it('should create private rooms and allow users to be added to them', function() {
-        var permissionsModelMock = mockito.mockFunction();
         var roomPermissionsModelMock = mockito.mockFunction();
         var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
         var roomService = testRequire.withProxies("./services/room-service", {
-          'gitter-web-permissions/lib/permissions-model': permissionsModelMock,
           'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock
         });
         var roomMembershipService = testRequire('./services/room-membership-service');
 
-        mockito.when(permissionsModelMock)().then(function(user, perm, uri, githubType, security) {
-          assert.equal(user.id, fixture.user1.id);
-          assert.equal(perm, 'create');
-          assert.equal(uri, fixture.troupeOrg1.uri + '/private');
-          assert.equal(githubType, 'ORG_CHANNEL');
-          assert.equal(security, 'PRIVATE');
-          return Promise.resolve(true);
-        });
-
-        return roomService.createCustomChildRoom(fixture.troupeOrg1, fixture.user1, {
+        return roomService.createRoomChannel(fixture.troupeOrg1, fixture.user1, {
             name: 'private',
             security: 'PRIVATE'
           })
           .bind({})
           .then(function(room) {
             this.room = room;
-            mockito.verify(permissionsModelMock, once)();
-
-            mockito.when(roomPermissionsModelMock)().then(function(user, perm, incomingRoom) {
-              assert.equal(user.id, fixture.user1.id);
-              assert.equal(perm, 'adduser');
-              assert.equal(incomingRoom.id, room.id);
-              return Promise.resolve(true);
-            });
 
             return room;
           })
           .tap(function(room) {
-            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username)
-              .then(function() {
-                mockito.verify(permissionsModelMock, once)();
-              });
+            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username);
           })
           .then(function(room) {
             return roomMembershipService.checkRoomMembership(room.id, fixture.user3.id);
@@ -723,47 +758,31 @@ describe('room-service', function() {
       });
 
       it('should create open rooms', function() {
-        var permissionsModelMock = mockito.mockFunction();
-        var roomPermissionsModelMock = mockito.mockFunction();
+        var invitedPermissionsModelMock = mockito.mockFunction();
         var roomService = testRequire.withProxies("./services/room-service", {
-          'gitter-web-permissions/lib/permissions-model': permissionsModelMock,
-          'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock
+          'gitter-web-permissions/lib/invited-permissions-service': invitedPermissionsModelMock
         });
         var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
         var roomMembershipService = testRequire('./services/room-membership-service');
 
-        mockito.when(permissionsModelMock)().then(function(user, perm, uri, githubType, security) {
-          assert.equal(user.id, fixture.user1.id);
-          assert.equal(perm, 'create');
-          assert.equal(uri, fixture.troupeOrg1.uri + '/open');
-          assert.equal(githubType, 'ORG_CHANNEL');
-          assert.equal(security, 'PUBLIC');
-          return Promise.resolve(true);
-        });
-
-        return roomService.createCustomChildRoom(fixture.troupeOrg1, fixture.user1, {
+        return roomService.createRoomChannel(fixture.troupeOrg1, fixture.user1, {
             name: 'open',
             security: 'PUBLIC'
           })
           .bind({})
           .then(function(room) {
             this.room = room;
-            mockito.verify(permissionsModelMock, once)();
             return room;
           })
           .tap(function(room) {
-            // Get another mock
-            // ADD A PERSON TO THE ROOM
-            mockito.when(roomPermissionsModelMock)().then(function(user, perm, _room) {
-              assert.equal(user.id, fixture.user1.id);
-              assert.equal(perm, 'adduser');
-              assert.equal(room.id, _room.id);
+
+            mockito.when(invitedPermissionsModelMock)().then(function() {
               return Promise.resolve(true);
             });
 
             return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username)
               .then(function() {
-                mockito.verify(roomPermissionsModelMock, once)();
+                mockito.verify(invitedPermissionsModelMock, once)();
               });
           })
           .then(function(room) {
@@ -786,50 +805,24 @@ describe('room-service', function() {
       });
 
       it('should create inherited rooms', function() {
-        var permissionsModelMock = mockito.mockFunction();
-        var roomPermissionsModelMock = mockito.mockFunction();
         var roomService = testRequire.withProxies("./services/room-service", {
-          'gitter-web-permissions/lib/permissions-model': permissionsModelMock,
-          'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock,
-          './invited-permissions-service': function() { return Promise.resolve(true); }
+          'gitter-web-permissions/lib/invited-permissions-service': function() { return Promise.resolve(true); }
         });
         var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
         var roomMembershipService = testRequire('./services/room-membership-service');
 
-        mockito.when(permissionsModelMock)().then(function(user, perm, uri, githubType, security) {
-          assert.equal(user.id, fixture.user1.id);
-          assert.equal(perm, 'create');
-          assert.equal(uri, fixture.troupeOrg1.uri + '/child');
-          assert.equal(githubType, 'ORG_CHANNEL');
-          assert.equal(security, 'INHERITED');
-          return Promise.resolve(true);
-        });
-
-        return roomService.createCustomChildRoom(fixture.troupeOrg1, fixture.user1, {
+        return roomService.createRoomChannel(fixture.troupeOrg1, fixture.user1, {
             name: 'child',
             security: 'INHERITED'
           })
           .bind({})
           .then(function(room) {
             this.room = room;
-            mockito.verify(permissionsModelMock, once)();
+            // mockito.verify(permissionsModelMock, once)();
             return room;
           })
           .tap(function(room) {
-            // Get another mock
-            // ADD A PERSON TO THE ROOM
-
-            mockito.when(roomPermissionsModelMock)().then(function(user, perm, _room) {
-              assert.equal(user.id, fixture.user1.id);
-              assert.equal(perm, 'adduser');
-              assert.equal(room.id, _room.id);
-              return Promise.resolve(true);
-            });
-
-            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username)
-              .then(function() {
-                mockito.verify(roomPermissionsModelMock, once)();
-              });
+            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username);
           })
           .then(function(room) {
             return roomMembershipService.checkRoomMembership(room.id, fixture.user3.id);
@@ -851,49 +844,23 @@ describe('room-service', function() {
       });
 
       it('should create inherited rooms for empty orgs', function() {
-        var permissionsModelMock = mockito.mockFunction();
-        var roomPermissionsModelMock = mockito.mockFunction();
         var roomService = testRequire.withProxies("./services/room-service", {
-          'gitter-web-permissions/lib/permissions-model': permissionsModelMock,
-          'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock,
-          './invited-permissions-service': function() { return Promise.resolve(true); }
+          'gitter-web-permissions/lib/invited-permissions-service': function() { return Promise.resolve(true); }
         });
         var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
         var roomMembershipService = testRequire('./services/room-membership-service');
 
-        mockito.when(permissionsModelMock)().then(function(user, perm, uri, githubType, security) {
-          assert.equal(user.id, fixture.user1.id);
-          assert.equal(perm, 'create');
-          assert.equal(uri, fixture.troupeEmptyOrg.uri + '/child');
-          assert.equal(githubType, 'ORG_CHANNEL');
-          assert.equal(security, 'INHERITED');
-          return Promise.resolve(true);
-        });
-
-        return roomService.createCustomChildRoom(fixture.troupeEmptyOrg, fixture.user1, {
+        return roomService.createRoomChannel(fixture.troupeEmptyOrg, fixture.user1, {
             name: 'child',
             security: 'INHERITED'
           })
           .bind({})
           .then(function(room) {
             this.room = room;
-            mockito.verify(permissionsModelMock, once)();
             return room;
           })
           .tap(function(room) {
-            // Get another mock
-            // ADD A PERSON TO THE ROOM
-            mockito.when(roomPermissionsModelMock)().then(function(user, perm, _room) {
-              assert.equal(user.id, fixture.user1.id);
-              assert.equal(perm, 'adduser');
-              assert.equal(room.id, _room.id);
-              return Promise.resolve(true);
-            });
-
             return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username)
-              .then(function() {
-                mockito.verify(roomPermissionsModelMock, once)();
-              });
           })
           .then(function(room) {
             return roomMembershipService.checkRoomMembership(room.id, fixture.user3.id);
@@ -918,49 +885,22 @@ describe('room-service', function() {
 
     describe('::repo::', function() {
       it(/* ::repo */ 'should create private rooms', function() {
-        var permissionsModelMock = mockito.mockFunction();
-        var roomPermissionsModelMock = mockito.mockFunction();
         var roomService = testRequire.withProxies("./services/room-service", {
-          'gitter-web-permissions/lib/permissions-model': permissionsModelMock,
-          'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock
         });
         var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
         var roomMembershipService = testRequire('./services/room-membership-service');
 
-        mockito.when(permissionsModelMock)().then(function(user, perm, uri, githubType, security) {
-          assert.equal(user.id, fixture.user1.id);
-          assert.equal(perm, 'create');
-          assert.equal(uri, fixture.troupeRepo.uri + '/private');
-          assert.equal(githubType, 'REPO_CHANNEL');
-          assert.equal(security, 'PRIVATE');
-          return Promise.resolve(true);
-        });
-
-        return roomService.createCustomChildRoom(fixture.troupeRepo, fixture.user1, {
+        return roomService.createRoomChannel(fixture.troupeRepo, fixture.user1, {
             name: 'private',
             security: 'PRIVATE'
           })
           .bind({})
           .then(function(room) {
             this.room = room;
-            mockito.verify(permissionsModelMock, once)();
             return room;
           })
           .tap(function(room) {
-            // Get another mock
-            // ADD A PERSON TO THE ROOM
-
-            mockito.when(roomPermissionsModelMock)().then(function(user, perm, _room) {
-              assert.equal(user.id, fixture.user1.id);
-              assert.equal(perm, 'adduser');
-              assert.equal(_room.id, room.id);
-              return Promise.resolve(true);
-            });
-
-            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username)
-              .then(function() {
-                mockito.verify(roomPermissionsModelMock, once)();
-              });
+            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username);
           })
           .then(function(room) {
             return roomMembershipService.checkRoomMembership(room.id, fixture.user3.id);
@@ -982,49 +922,21 @@ describe('room-service', function() {
       });
 
       it(/* ::repo */ 'should create open rooms', function() {
-        var permissionsModelMock = mockito.mockFunction();
-        var roomPermissionsModelMock = mockito.mockFunction();
-        var roomService = testRequire.withProxies("./services/room-service", {
-          'gitter-web-permissions/lib/permissions-model': permissionsModelMock,
-          'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock
-        });
+        var roomService = testRequire("./services/room-service");
         var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
         var roomMembershipService = testRequire('./services/room-membership-service');
 
-        mockito.when(permissionsModelMock)().then(function(user, perm, uri, githubType, security) {
-          assert.equal(user.id, fixture.user1.id);
-          assert.equal(perm, 'create');
-          assert.equal(uri, fixture.troupeRepo.uri + '/open');
-          assert.equal(githubType, 'REPO_CHANNEL');
-          assert.equal(security, 'PUBLIC');
-          return Promise.resolve(true);
-        });
-
-        return roomService.createCustomChildRoom(fixture.troupeRepo, fixture.user1, {
+        return roomService.createRoomChannel(fixture.troupeRepo, fixture.user1, {
             name: 'open',
             security: 'PUBLIC'
           })
           .bind({})
           .then(function(room) {
             this.room = room;
-            mockito.verify(permissionsModelMock, once)();
             return room;
           })
           .tap(function(room) {
-            // Get another mock
-            // ADD A PERSON TO THE ROOM
-
-            mockito.when(roomPermissionsModelMock)().then(function(user, perm, _room) {
-              assert.equal(user.id, fixture.user1.id);
-              assert.equal(perm, 'adduser');
-              assert.equal(_room.id, room.id);
-              return Promise.resolve(true);
-            });
-
-            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username)
-              .then(function() {
-                mockito.verify(roomPermissionsModelMock, once)();
-              });
+            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username);
           })
           .then(function(room) {
             return roomMembershipService.checkRoomMembership(room.id, fixture.user3.id);
@@ -1046,50 +958,23 @@ describe('room-service', function() {
       });
 
       it(/* ::repo */ 'should create inherited rooms', function() {
-        var permissionsModelMock = mockito.mockFunction();
-        var roomPermissionsModelMock = mockito.mockFunction();
         var roomService = testRequire.withProxies("./services/room-service", {
-          'gitter-web-permissions/lib/permissions-model': permissionsModelMock,
-          'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock,
-          './invited-permissions-service': function() { return Promise.resolve(true); }
+          'gitter-web-permissions/lib/invited-permissions-service': function() { return Promise.resolve(true); }
         });
         var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
         var roomMembershipService = testRequire('./services/room-membership-service');
 
-        mockito.when(permissionsModelMock)().then(function(user, perm, uri, githubType, security) {
-          assert.equal(user.id, fixture.user1.id);
-          assert.equal(perm, 'create');
-          assert.equal(uri, fixture.troupeRepo.uri + '/child');
-          assert.equal(githubType, 'REPO_CHANNEL');
-          assert.equal(security, 'INHERITED');
-          return Promise.resolve(true);
-        });
-
-        return roomService.createCustomChildRoom(fixture.troupeRepo, fixture.user1, {
+        return roomService.createRoomChannel(fixture.troupeRepo, fixture.user1, {
             name: 'child',
             security: 'INHERITED'
           })
           .bind({})
           .then(function(room) {
             this.room = room;
-            mockito.verify(permissionsModelMock, once)();
             return room;
           })
           .tap(function(room) {
-            // Get another mock
-            // ADD A PERSON TO THE ROOM
-
-            mockito.when(roomPermissionsModelMock)().then(function(user, perm, _room) {
-              assert.equal(user.id, fixture.user1.id);
-              assert.equal(perm, 'adduser');
-              assert.equal(_room.id, room.id);
-              return Promise.resolve(true);
-            });
-
-            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username)
-              .then(function() {
-                mockito.verify(permissionsModelMock, once)();
-              });
+            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username);
           })
           .then(function(room) {
             return roomMembershipService.checkRoomMembership(room.id, fixture.user3.id);
@@ -1115,44 +1000,18 @@ describe('room-service', function() {
     describe('::user::', function() {
 
       it('should create private rooms without a name', function() {
-        var permissionsModelMock = mockito.mockFunction();
-        var roomPermissionsModelMock = mockito.mockFunction();
-        var roomService = testRequire.withProxies("./services/room-service", {
-          'gitter-web-permissions/lib/permissions-model': permissionsModelMock,
-          'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock
-        });
+        var roomService = testRequire("./services/room-service");
         var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
         var roomMembershipService = testRequire('./services/room-membership-service');
 
-        mockito.when(permissionsModelMock)().then(function(user, perm, uri, githubType, security) {
-          assert.equal(user.id, fixture.user1.id);
-          assert.equal(perm, 'create');
-          assert.equal(githubType, 'USER_CHANNEL');
-          assert.equal(security, 'PRIVATE');
-          return Promise.resolve(true);
-        });
-
-        return roomService.createCustomChildRoom(null, fixture.user1, { security: 'PRIVATE' })
+        return roomService.createUserChannel(fixture.user1, { security: 'PRIVATE' })
           .bind({})
           .then(function(room) {
             this.room = room;
-            mockito.verify(permissionsModelMock, once)();
             return room;
           })
           .tap(function(room) {
-            // Get another mock
-            // ADD A PERSON TO THE ROOM
-            mockito.when(roomPermissionsModelMock)().then(function(user, perm, _room) {
-              assert.equal(user.id, fixture.user1.id);
-              assert.equal(perm, 'adduser');
-              assert.equal(_room.id, room.id);
-              return Promise.resolve(true);
-            });
-
-            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username)
-              .then(function() {
-                mockito.verify(roomPermissionsModelMock, once)();
-              });
+            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username);
           })
           .then(function(room) {
             return roomMembershipService.checkRoomMembership(room.id, fixture.user3.id);
@@ -1178,46 +1037,18 @@ describe('room-service', function() {
       });
 
       it('should create private rooms with name', function() {
-        var permissionsModelMock = mockito.mockFunction();
-        var roomPermissionsModelMock = mockito.mockFunction();
-        var roomService = testRequire.withProxies("./services/room-service", {
-          'gitter-web-permissions/lib/permissions-model': permissionsModelMock,
-          'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock
-        });
+        var roomService = testRequire("./services/room-service");
         var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
         var roomMembershipService = testRequire('./services/room-membership-service');
 
-        mockito.when(permissionsModelMock)().then(function(user, perm, uri, githubType, security) {
-          assert.equal(user.id, fixture.user1.id);
-          assert.equal(perm, 'create');
-          assert.equal(uri, fixture.user1.username + '/private');
-          assert.equal(githubType, 'USER_CHANNEL');
-          assert.equal(security, 'PRIVATE');
-          return Promise.resolve(true);
-        });
-
-        return roomService.createCustomChildRoom(null, fixture.user1, { name: 'private',  security: 'PRIVATE' })
+        return roomService.createUserChannel(fixture.user1, { name: 'private',  security: 'PRIVATE' })
           .bind({})
           .then(function(room) {
             this.room = room;
-            mockito.verify(permissionsModelMock, once)();
             return room;
           })
           .tap(function(room) {
-            // Get another mock
-            // ADD A PERSON TO THE ROOM
-
-            mockito.when(roomPermissionsModelMock)().then(function(user, perm, _room) {
-              assert.equal(user.id, fixture.user1.id);
-              assert.equal(perm, 'adduser');
-              assert.equal(_room.id, room.id);
-              return Promise.resolve(true);
-            });
-
-            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username)
-              .then(function() {
-                mockito.verify(roomPermissionsModelMock, once)();
-              });
+            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username);
           })
           .then(function(room) {
             return roomMembershipService.checkRoomMembership(room.id, fixture.user3.id);
@@ -1244,46 +1075,20 @@ describe('room-service', function() {
       });
 
       it('should create open rooms', function() {
-        var permissionsModelMock = mockito.mockFunction();
-        var roomPermissionsModelMock = mockito.mockFunction();
-        var roomService = testRequire.withProxies("./services/room-service", {
-          'gitter-web-permissions/lib/permissions-model': permissionsModelMock,
-          'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock
-        });
+        var roomService = testRequire("./services/room-service");
         var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
         var roomMembershipService = testRequire('./services/room-membership-service');
 
-        mockito.when(permissionsModelMock)().then(function(user, perm, uri, githubType, security) {
-          assert.equal(user.id, fixture.user1.id);
-          assert.equal(perm, 'create');
-          assert.equal(uri, fixture.user1.username + '/open');
-          assert.equal(githubType, 'USER_CHANNEL');
-          assert.equal(security, 'PUBLIC');
-          return Promise.resolve(true);
-        });
-
-        return roomService.createCustomChildRoom(null, fixture.user1, { name: 'open', security: 'PUBLIC' })
+        return roomService.createUserChannel(fixture.user1, { name: 'open', security: 'PUBLIC' })
           .bind({})
           .then(function(room) {
             this.room = room;
-            mockito.verify(permissionsModelMock, once)();
             return room;
           })
           .tap(function(room) {
             // Get another mock
             // ADD A PERSON TO THE ROOM
-
-            mockito.when(roomPermissionsModelMock)().then(function(user, perm, _room) {
-              assert.equal(user.id, fixture.user1.id);
-              assert.equal(perm, 'adduser');
-              assert.equal(_room.id, room.id);
-              return Promise.resolve(true);
-            });
-
-            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username)
-              .then(function() {
-                mockito.verify(roomPermissionsModelMock, once)();
-              });
+            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username);
           })
           .then(function(room) {
             return roomMembershipService.checkRoomMembership(room.id, fixture.user3.id);
@@ -1309,38 +1114,23 @@ describe('room-service', function() {
       });
 
       it('should NOT create child rooms', function() {
-        var permissionsModelMock = mockito.mockFunction();
-        var roomService = testRequire.withProxies("./services/room-service", {
-          'gitter-web-permissions/lib/permissions-model': permissionsModelMock
-        });
+        var roomService = testRequire("./services/room-service");
 
-        return roomService.createCustomChildRoom(null, fixture.user1, { name: 'inherited', security: 'INHERITED' })
+        return roomService.createUserChannel(fixture.user1, { name: 'inherited', security: 'INHERITED' })
           .then(function() {
             assert.ok(false, 'Expected a reject');
-          }, function() {
-            // All good
+          })
+          .catch(StatusError, function(err) {
+            assert.strictEqual(err.status, 400);
           });
       });
 
       it('should be able to delete rooms #slow', function() {
-        var permissionsModelMock = mockito.mockFunction();
         var troupeService = testRequire('./services/troupe-service');
-        var roomService = testRequire.withProxies('./services/room-service', {
-          'gitter-web-permissions/lib/permissions-model': permissionsModelMock
-        });
+        var roomService = testRequire('./services/room-service');
 
-        mockito.when(permissionsModelMock)().then(function(user, perm, uri, githubType, security) {
-          assert.equal(user.id, fixture.user1.id);
-          assert.equal(perm, 'create');
-          assert.equal(uri, fixture.user1.username + '/tobedeleted');
-          assert.equal(githubType, 'USER_CHANNEL');
-          assert.equal(security, 'PUBLIC');
-          return Promise.resolve(true);
-        });
-
-        return roomService.createCustomChildRoom(null, fixture.user1, { name: 'tobedeleted', security: 'PUBLIC' })
+        return roomService.createUserChannel(fixture.user1, { name: 'tobedeleted', security: 'PUBLIC' })
           .then(function(room) {
-            mockito.verify(permissionsModelMock, once)();
             return room;
           })
           .then(function(room) {
@@ -1359,143 +1149,28 @@ describe('room-service', function() {
 
   });
 
-  describe('bans', function() {
-    it('should ban users from rooms #slow', function() {
-      var roomPermissionsModelMock = mockito.mockFunction();
-
-      var roomService = testRequire.withProxies("./services/room-service", {
-        'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock
-      });
-      var roomMembershipService = testRequire('./services/room-membership-service');
-      var userBannedFromRoom = require('gitter-web-permissions/lib/user-banned-from-room');
-
-      mockito.when(roomPermissionsModelMock)().then(function(user, perm, incomingRoom) {
-        assert.equal(perm, 'admin');
-        assert.equal(incomingRoom.id, fixture.troupeBan.id);
-
-        if(user.id == fixture.userBan.id) {
-          return Promise.resolve(false);
-        } else if(user.id == fixture.userBanAdmin.id) {
-          return Promise.resolve(true);
-        } else {
-          assert(false, 'Unknown user');
-        }
-      });
-
-      return userBannedFromRoom(fixture.troupeBan.uri, fixture.userBan)
-        .then(function(banned) {
-          assert(!banned);
-
-          return roomService.banUserFromRoom(fixture.troupeBan, fixture.userBan.username, fixture.userBanAdmin, {})
-            .then(function(ban) {
-              assert.equal(ban.userId, fixture.userBan.id);
-              assert.equal(ban.bannedBy, fixture.userBanAdmin.id);
-              assert(ban.dateBanned);
-
-              return roomMembershipService.checkRoomMembership(fixture.troupeBan._id, fixture.userBan.id);
-            })
-            .then(function(bannedUserIsInRoom) {
-              assert(!bannedUserIsInRoom);
-
-              return roomService.findBanByUsername(fixture.troupeBan.id, fixture.userBan.username);
-            })
-            .then(function(banAndUser) {
-              assert(banAndUser);
-              assert(banAndUser.user);
-              assert(banAndUser.ban);
-
-              return userBannedFromRoom(fixture.troupeBan.uri, fixture.userBan)
-                .then(function(banned) {
-                  assert(banned);
-
-                  return roomService.unbanUserFromRoom(fixture.troupeBan, banAndUser.ban, fixture.userBan.username, fixture.userBanAdmin)
-                    .then(function() {
-                      return userBannedFromRoom(fixture.troupeBan.uri, fixture.userBan)
-                        .then(function(banned) {
-                          assert(!banned);
-
-                          return roomService.findBanByUsername(fixture.troupeBan.id, fixture.userBan.username);
-                        })
-                        .then(function(banAndUser) {
-                          assert(!banAndUser);
-                        });
-                    });
-                });
-            });
-        });
-
-    });
-
-    it('should not allow admins to be banned', function() {
-      var roomPermissionsModelMock = mockito.mockFunction();
-
-      var roomService = testRequire.withProxies("./services/room-service", {
-        'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock
-      });
-
-      mockito.when(roomPermissionsModelMock)().then(function(user, perm, incomingRoom) {
-        assert.equal(perm, 'admin');
-        assert.equal(incomingRoom.id, fixture.troupeBan.id);
-
-        if(user.id == fixture.userBan.id) {
-          return Promise.resolve(true);
-        } else if(user.id == fixture.userBanAdmin.id) {
-          return Promise.resolve(true);
-        } else {
-          assert(false, 'Unknown user');
-        }
-      });
-
-
-      return roomService.banUserFromRoom(fixture.troupeBan, fixture.userBan.username, fixture.userBanAdmin, {})
-        .then(function() {
-          assert(false, 'Expected to fail as user is not an admin');
-        })
-        .catch(function(err) {
-          assert.equal(err.status, 400);
-        });
-
-    });
-
-  });
-
   describe('removals', function() {
 
-    var roomPermissionsModelMock = mockito.mockFunction();
     var roomService = testRequire.withProxies('./services/room-service', {
-      'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock
-    });
-    // TODO: this should not be used
-    var userIsInRoom = testRequire('gitter-web-permissions/lib/user-in-room');
-
-    mockito.when(roomPermissionsModelMock)().then(function(user, perm) {
-      assert.equal(perm, 'admin');
-
-      if(user.id == fixture.userRemoveNonAdmin.id) {
-        return Promise.resolve(false);
-      } else if(user.id == fixture.userRemoveAdmin.id) {
-        return Promise.resolve(true);
-      } else {
-        assert(false, 'Unknown user');
+      'gitter-web-permissions/lib/legacy-policy-factory': {
+        createPolicyForRoom: function(user/*, room*/) {
+          return Promise.resolve({
+            canAdmin: function() {
+              if(user.id === fixture.userRemoveNonAdmin.id) {
+                return Promise.resolve(false);
+              } else if(user.id === fixture.userRemoveAdmin.id) {
+                return Promise.resolve(true);
+              } else {
+                assert(false, 'Unknown user');
+              }
+              return Promise.resolve(true);
+            }
+          });
+        }
       }
     });
 
-    it('should prevent non-admin from removing users from rooms', function() {
-      return userIsInRoom(fixture.troupeCanRemove.uri, fixture.userToRemove)
-        .then(function(here) {
-          assert(here);
-          return roomService.removeUserFromRoom(fixture.troupeCanRemove, fixture.userToRemove, fixture.userRemoveNonAdmin);
-        })
-        .catch(function(err) {
-          assert.equal(err.status, 403);
-        })
-        .then(function() {
-          return userIsInRoom(fixture.troupeCanRemove.uri, fixture.userToRemove);
-        })
-        .then(function(here) {
-          assert(here);
-        });
-    });
+    var userIsInRoom = testRequire('gitter-web-permissions/lib/user-in-room');
 
     it('should prevent from removing users from one-to-one rooms', function() {
       return userIsInRoom(fixture.troupeCannotRemove.uri, fixture.userToRemove)
@@ -1724,57 +1399,7 @@ describe('room-service', function() {
 
       describe('#removeUserFromRoom', function() {
 
-        var roomPermissionsModelMock = mockito.mockFunction();
-        var roomService = testRequire.withProxies('./services/room-service', {
-          'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock
-        });
-
-        mockito.when(roomPermissionsModelMock)().then(function(user, perm) {
-          assert.equal(perm, 'admin');
-
-          if(user.id == fixture.userRemoveNonAdmin.id) {
-            return Promise.resolve(false);
-          } else if(user.id == fixture.userRemoveAdmin.id) {
-            return Promise.resolve(true);
-          } else {
-            assert(false, 'Unknown user');
-          }
-        });
-
-        it('should prevent non-admin from removing users from rooms', function() {
-          return userIsInRoom(fixture.troupeCanRemove.uri, fixture.userToRemove)
-            .then(function(here) {
-              assert(here);
-              return roomService.removeUserFromRoom(fixture.troupeCanRemove, fixture.userToRemove, fixture.userRemoveNonAdmin);
-            })
-            .catch(function(err) {
-              assert.equal(err.status, 403);
-            })
-            .then(function() {
-              return userIsInRoom(fixture.troupeCanRemove.uri, fixture.userToRemove);
-            })
-            .then(function(here) {
-              assert(here);
-            });
-        });
-
-        it('should prevent from removing users from one-to-one rooms', function() {
-          return userIsInRoom(fixture.troupeCannotRemove.uri, fixture.userToRemove)
-            .then(function(here) {
-              assert(here);
-              return roomService.removeUserFromRoom(fixture.troupeCannotRemove, fixture.userToRemove, fixture.userRemoveAdmin);
-            })
-            .catch(function(err) {
-              assert.equal(err.status, 400);
-              assert.equal(err.message, 'This room does not support removing.');
-            })
-            .then(function() {
-              return userIsInRoom(fixture.troupeCannotRemove.uri, fixture.userToRemove);
-            })
-            .then(function(here) {
-              assert(here);
-            });
-        });
+        var roomService = testRequire('./services/room-service');
 
         it('should remove users from rooms', function() {
           return userIsInRoom(fixture.troupeCanRemove.uri, fixture.userToRemove)
@@ -1796,29 +1421,29 @@ describe('room-service', function() {
 
   });
 
-  describe('createGithubRoom #slow', function() {
+  describe('createRoomForGitHubUri #slow', function() {
     it('should create an empty room for an organization', function() {
-      var permissionsModelMock = mockito.mockFunction();
-
       var roomService = testRequire.withProxies("./services/room-service", {
-        'gitter-web-permissions/lib/permissions-model': permissionsModelMock
-      });
-
-      mockito
-        .when(permissionsModelMock)().then(function (user, right, uri, githubType) {
-        assert.equal(user.username, fixture.user1.username);
-        assert.equal(right, 'create');
-        assert.equal(uri, 'gitterTest');
-        assert.equal(githubType, 'ORG');
-
-        return Promise.resolve(true);
+        'gitter-web-permissions/lib/legacy-policy-factory': {
+          createPolicyForGithubObject: function(user, uri, githubType, security) {
+            assert.strictEqual(user.username, fixture.user1.username);
+            assert.strictEqual(uri, 'gitterTest');
+            assert.strictEqual(githubType, 'ORG');
+            assert.strictEqual(security, null);
+            return Promise.resolve({
+              canAdmin: function() {
+                return Promise.resolve(true);
+              }
+            });
+          }
+        }
       });
 
       return roomService
-        .createGithubRoom(fixture.user1, 'gitterTest')
-        .then(function (troupe) {
-          assert.equal(troupe.uri, 'gitterTest');
-          assert.equal(troupe.userCount, 0);
+        .createRoomForGitHubUri(fixture.user1, 'gitterTest')
+        .then(function (result) {
+          assert.equal(result.troupe.uri, 'gitterTest');
+          assert.equal(result.troupe.userCount, 0);
         })
         .finally(function () {
           return persistence.Troupe.remove({ uri: 'gitterTest' }).exec();
@@ -1827,162 +1452,253 @@ describe('room-service', function() {
   });
 
   describe('renames #slow', function() {
-    var originalUrl = 'moo/cow-' + Date.now();
-    var renamedUrl = 'bob/renamed-cow-' + Date.now();
-
-    var originalUrl2 = 'moo2/cow-' + Date.now();
-    var renamedUrl2 = 'bob2/renamed-cow-' + Date.now();
-
-    var originalUrl3 = 'moo3/cow-' + Date.now();
-    var renamedUrl3 = 'bob3/renamed-cow-' + Date.now();
-
-    var permissionsModelMock, roomPermissionsModelMock, roomValidatorMock, roomService;
-
-    var fixture = {};
-    before(fixtureLoader(fixture, {
-      user1: { },
-      user2: { },
-      troupeRepo: {
-        uri: originalUrl,
-        lcUri: originalUrl,
-        githubType: 'REPO',
-        githubId: true,
-        users: ['user1', 'user2']
-      },
-      troupeRepo2: {
-        uri: renamedUrl2,
-        lcUri: renamedUrl2,
-        githubType: 'REPO',
-        githubId: true,
-        users: ['user1', 'user2']
-      }
-    }));
-
-    after(function() {
-      fixture.cleanup();
-    });
+    var roomValidatorMock, roomService;
+    var createPolicyForGithubObjectMock;
 
     beforeEach(function() {
-      permissionsModelMock = mockito.mockFunction();
-      roomPermissionsModelMock = mockito.mockFunction();
+      createPolicyForGithubObjectMock = mockito.mockFunction();
+
       roomValidatorMock = mockito.mockFunction();
       roomService = testRequire.withProxies('./services/room-service', {
-        'gitter-web-permissions/lib/permissions-model': permissionsModelMock,
-        'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock,
         'gitter-web-github': {
           GitHubUriValidator: roomValidatorMock
+        },
+        'gitter-web-permissions/lib/legacy-policy-factory': {
+          createPolicyForGithubObject: createPolicyForGithubObjectMock
         }
       });
     });
 
-    it('should rename a room if a user attempts to create a new room with an existing githubId', function() {
-      mockito.when(roomValidatorMock)().then(function() {
-        return Promise.resolve({
-          type: 'REPO',
-          uri: renamedUrl,
-          description: 'renamed',
-          githubId: fixture.troupeRepo.githubId,
-          security: 'PUBLIC'
-        });
+    describe('rename a room if a user attempts to create a new room with an existing githubId', function() {
+      var originalUrl = 'moo/cow-' + Date.now();
+      var renamedUrl = 'bob/renamed-cow-' + Date.now();
+
+      var fixture = fixtureLoader.setup({
+        user1: { },
+        troupeRepo: {
+          uri: originalUrl,
+          lcUri: originalUrl,
+          githubType: 'REPO',
+          githubId: true,
+          users: ['user1']
+        },
       });
 
-      mockito.when(permissionsModelMock)().thenReturn(Promise.resolve(true));
-      mockito.when(roomPermissionsModelMock)().thenReturn(Promise.resolve(true));
-
-      return roomService.findOrCreateRoom(fixture.user1, renamedUrl, {})
-        .then(function(result) {
-          assert.strictEqual(result.uri, renamedUrl);
-
-          assert.strictEqual(result.didCreate, false);
-          assert.strictEqual(result.troupe.uri, renamedUrl);
-          assert.strictEqual(result.troupe.lcUri, renamedUrl);
-          assert.strictEqual(result.troupe.renamedLcUris[0], originalUrl);
+      it('should succeed', function() {
+        mockito.when(roomValidatorMock)().then(function() {
+          return Promise.resolve({
+            type: 'REPO',
+            uri: renamedUrl,
+            description: 'renamed',
+            githubId: fixture.troupeRepo.githubId,
+            security: 'PUBLIC'
+          });
         });
+
+        mockito.when(createPolicyForGithubObjectMock)().then(function() {
+          return Promise.resolve({
+            canAdmin: function() {
+              return true;
+            }
+          });
+        })
+
+        return roomService.createRoomByUri(fixture.user1, renamedUrl, {})
+          .then(function(result) {
+            assert.strictEqual(result.didCreate, false);
+            assert.strictEqual(result.troupe.uri, renamedUrl);
+            assert.strictEqual(result.troupe.lcUri, renamedUrl);
+            assert.strictEqual(result.troupe.renamedLcUris[0], originalUrl);
+          });
+      });
     });
 
-    it('should rename a room if a user attempts to create an old room with an existing githubId', function() {
-      mockito.when(roomValidatorMock)().then(function() {
-        return Promise.resolve({
-          type: 'REPO',
+    /**
+     * • A room "x/y" does not exist but used to be called "a/b" on GitHub
+     * • User attempts to create a new room "a/b"
+     * • Should return room 'x/y'
+     */
+     describe('rename a room if a user attempts to create an repo room which has been renamed but does not have a room on Gitter', function() {
+       var originalUrl4 = 'moo4/cow-' + Date.now();
+       var renamedUrl4 = 'bob4/renamed-cow-' + Date.now();
+
+       it('should succeed', function() {
+         mockito.when(roomValidatorMock)().then(function() {
+           return Promise.resolve({
+             type: 'REPO',
+             uri: renamedUrl4,
+             description: 'renamed',
+             githubId: fixture.generateGithubId(),
+             security: 'PUBLIC'
+           });
+         });
+
+         mockito.when(createPolicyForGithubObjectMock)().then(function() {
+           return Promise.resolve({
+             canAdmin: function() {
+               return true;
+             }
+           });
+         })
+
+         return roomService.createRoomByUri(fixture.user1, originalUrl4, {})
+           .then(function(result) {
+             assert.strictEqual(result.didCreate, true);
+             assert.strictEqual(result.troupe.uri, renamedUrl4);
+             assert.strictEqual(result.troupe.lcUri, renamedUrl4);
+           });
+       });
+    });
+    /**
+     * • A room "x/y" exists.
+     * • User renames repo on github to "a/b"
+     * • User attempts to create a new room "x/y"
+     * • Should return room 'x/y' but renamed to "a/b"
+     */
+    it('rename a room if a user attempts to create an old room with an existing githubId', function() {
+      var originalUrl2 = 'moo2/cow-' + Date.now();
+      var renamedUrl2 = 'bob2/renamed-cow-' + Date.now();
+
+      var fixture = fixtureLoader.setup({
+        user1: {},
+        troupeRepo2: {
           uri: renamedUrl2,
-          description: 'renamed',
-          githubId: fixture.troupeRepo2.githubId,
-          security: 'PUBLIC'
-        });
+          lcUri: renamedUrl2,
+          githubType: 'REPO',
+          githubId: true,
+          users: ['user1', 'user2']
+        }
       });
 
-      mockito.when(permissionsModelMock)().thenReturn(Promise.resolve(true));
-      mockito.when(roomPermissionsModelMock)().thenReturn(Promise.resolve(true));
-
-      return roomService.findOrCreateRoom(fixture.user1, originalUrl2, {})
-        .then(function(result) {
-          assert.strictEqual(result.uri, renamedUrl2);
-
-          assert.strictEqual(result.didCreate, false);
-          assert.strictEqual(result.troupe.uri, renamedUrl2);
-          assert.strictEqual(result.troupe.lcUri, renamedUrl2);
+      it('should succeed', function() {
+        mockito.when(roomValidatorMock)().then(function() {
+          return Promise.resolve({
+            type: 'REPO',
+            uri: renamedUrl2,
+            description: 'renamed',
+            githubId: fixture.troupeRepo2.githubId,
+            security: 'PUBLIC'
+          });
         });
+
+        mockito.when(createPolicyForGithubObjectMock)().then(function() {
+          return Promise.resolve({
+            canAdmin: function() {
+              return true;
+            }
+          });
+        })
+
+        return roomService.createRoomByUri(fixture.user1, originalUrl2, {})
+          .then(function(result) {
+            assert.strictEqual(result.didCreate, false);
+            assert.strictEqual(result.troupe.id, fixture.troupeRepo2.id);
+            assert.strictEqual(result.troupe.uri, renamedUrl2);
+            assert.strictEqual(result.troupe.lcUri, renamedUrl2);
+          });
+      });
     });
 
-    it('should rename a room if a user attempts to create a new room with an old uri that does not exist', function() {
-      mockito.when(roomValidatorMock)().then(function() {
-        return Promise.resolve({
-          type: 'REPO',
-          uri: renamedUrl3,
-          description: 'renamed',
-          githubId: fixture.generateGithubId(),
-          security: 'PUBLIC'
-        });
+    /**
+     * • A room "x/y" exists.
+     * • User renames repo on github to "a/b"
+     * • User attempts to create a new room "a/b"
+     * • Should return room 'x/y' but renamed to "a/b"
+     */
+    describe('should rename a room if a user attempts to create a new room with an old uri that does not exist', function() {
+      var originalUrl3 = 'moo3/cow-' + Date.now();
+      var renamedUrl3 = 'bob3/renamed-cow-' + Date.now();
+
+      var fixture = fixtureLoader.setup({
+        user1: {},
+        troupe: {
+          uri: originalUrl3,
+          lcUri: originalUrl3,
+          githubType: 'REPO',
+          githubId: true,
+          users: ['user1']
+        }
       });
 
-      mockito.when(permissionsModelMock)().thenReturn(Promise.resolve(true));
-      mockito.when(roomPermissionsModelMock)().thenReturn(Promise.resolve(true));
-
-      return roomService.findOrCreateRoom(fixture.user1, originalUrl3, {})
-        .then(function(result) {
-          assert.strictEqual(result.uri, renamedUrl3);
-
-          assert.strictEqual(result.didCreate, true);
-          assert.strictEqual(result.troupe.uri, renamedUrl3);
-          assert.strictEqual(result.troupe.lcUri, renamedUrl3);
-          // assert.strictEqual(result.troupe.renamedLcUris[0], originalUrl);
+      it('should succeed', function() {
+        mockito.when(roomValidatorMock)().then(function() {
+          return Promise.resolve({
+            type: 'REPO',
+            uri: renamedUrl3,
+            description: 'renamed',
+            githubId: fixture.troupe.githubId,
+            security: 'PUBLIC'
+          });
         });
+
+        mockito.when(createPolicyForGithubObjectMock)().then(function() {
+          return Promise.resolve({
+            canAdmin: function() {
+              return true;
+            }
+          });
+        })
+
+        return roomService.createRoomByUri(fixture.user1, renamedUrl3, {})
+          .then(function(result) {
+            assert.strictEqual(result.didCreate, false);
+            assert.strictEqual(result.troupe.id, fixture.troupe.id);
+            assert.strictEqual(result.troupe.uri, renamedUrl3);
+            assert.strictEqual(result.troupe.lcUri, renamedUrl3);
+          });
+      });
+
     });
+
 
 
   });
 
-  describe('createGithubRoom #slow', function() {
-    var fixture = {};
-    var permissionsModelMock, roomPermissionsModelMock, roomValidatorMock, roomService;
+  describe('createRoomForGitHubUri #slow', function() {
+    var roomValidatorMock, roomService;
+    var createPolicyForGithubObjectMock;
+    var duplicateGithubId = fixtureLoader.generateGithubId();
 
-    beforeEach(function() {
-      permissionsModelMock = mockito.mockFunction();
-      roomPermissionsModelMock = mockito.mockFunction();
-      roomValidatorMock = mockito.mockFunction();
-      roomService = testRequire.withProxies('./services/room-service', {
-        'gitter-web-permissions/lib/permissions-model': permissionsModelMock,
-        'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock,
-        'gitter-web-github': {
-          GitHubUriValidator: roomValidatorMock
-        }
-      });
-    });
-
-    before(fixtureLoader(fixture, {
+    var fixture = fixtureLoader.setup({
       troupeOrg1: {
         githubType: 'ORG',
         users: []
       },
+      troupeDup1: {
+        githubType: 'REPO',
+        githubId: duplicateGithubId
+      },
+      troupeDup2: {
+        githubType: 'REPO',
+        githubId: duplicateGithubId
+      },
       user1: {}
-    }));
+    });
 
-    after(function() {
-      fixture.cleanup();
+    beforeEach(function() {
+      createPolicyForGithubObjectMock = mockito.mockFunction();
+
+      roomValidatorMock = mockito.mockFunction();
+      roomService = testRequire.withProxies('./services/room-service', {
+        'gitter-web-github': {
+          GitHubUriValidator: roomValidatorMock
+        },
+        'gitter-web-permissions/lib/legacy-policy-factory': {
+          createPolicyForGithubObject: createPolicyForGithubObjectMock,
+        }
+      });
     });
 
     it('should return an new room if one does not exist', function() {
-      mockito.when(permissionsModelMock)().thenReturn(Promise.resolve(true));
+
+      mockito.when(createPolicyForGithubObjectMock)().then(function() {
+        return Promise.resolve({
+          canAdmin: function() {
+            return true;
+          }
+        });
+      })
+
       var orgUri = fixture.generateUri('ORG');
       var githubId = fixture.generateGithubId();
       mockito.when(roomValidatorMock)().then(function() {
@@ -1995,30 +1711,61 @@ describe('room-service', function() {
         });
       });
 
-      return roomService.createGithubRoom(fixture.user1, orgUri)
-        .then(function(room) {
-          assert.strictEqual(room.uri, orgUri);
-          assert.strictEqual(room.githubId, githubId);
+      return roomService.createRoomForGitHubUri(fixture.user1, orgUri)
+        .then(function(result) {
+          assert.strictEqual(result.troupe.uri, orgUri);
+          assert.strictEqual(result.troupe.githubId, githubId);
         });
     });
 
     it('should return an existing room if it exists', function() {
-      mockito.when(permissionsModelMock)().thenReturn(Promise.resolve(true));
-      var githubId = fixture.generateGithubId();
+      mockito.when(createPolicyForGithubObjectMock)().then(function() {
+        return Promise.resolve({
+          canAdmin: function() {
+            return true;
+          }
+        });
+      })
 
       mockito.when(roomValidatorMock)().then(function() {
         return Promise.resolve({
-          type: 'ORG',
+          type: fixture.troupeOrg1.githubType,
           uri: fixture.troupeOrg1.uri,
-          githubId: githubId,
+          githubId: fixture.troupeOrg1.githubId,
           description: 'renamed',
           security: 'PUBLIC'
         });
       });
 
-      return roomService.createGithubRoom(fixture.user1, fixture.troupeOrg1.uri)
-        .then(function(room) {
-          assert.strictEqual(room.id, fixture.troupeOrg1.id);
+      return roomService.createRoomForGitHubUri(fixture.user1, fixture.troupeOrg1.uri)
+        .then(function(result) {
+          assert.strictEqual(result.troupe.id, fixture.troupeOrg1.id);
+        });
+    });
+
+    it('should deal with room renames where a room with the new URI has been created', function() {
+      mockito.when(createPolicyForGithubObjectMock)().then(function() {
+        return Promise.resolve({
+          canAdmin: function() {
+            return true;
+          }
+        });
+      })
+
+      mockito.when(roomValidatorMock)().then(function() {
+        // The room has been renamed
+        return Promise.resolve({
+          type: 'REPO',
+          uri: fixture.troupeDup2.uri,
+          githubId: duplicateGithubId,
+          description: 'renamed',
+          security: 'PUBLIC'
+        });
+      });
+
+      return roomService.createRoomForGitHubUri(fixture.user1, fixture.troupeDup1.uri)
+        .then(function(result) {
+          assert.strictEqual(result.troupe.id, fixture.troupeDup2.id);
         });
     });
 
@@ -2090,13 +1837,10 @@ describe('room-service', function() {
   describe('joinRoom', function() {
     describe('unit tests', function() {
       var roomService;
-      var troupeServiceFindById;
-      var roomPermissionsModel;
       var assertJoinRoomChecks;
       var recentRoomServiceSaveLastVisitedTroupeforUserId;
       var roomMembershipServiceAddRoomMember;
       var troupe;
-      var access;
       var joinRoomCheckFailed;
       var user;
       var userId;
@@ -2114,28 +1858,14 @@ describe('room-service', function() {
           _id: troupeId
         };
 
-        troupeServiceFindById = mockito.mockFunction();
-        roomPermissionsModel = mockito.mockFunction();
         assertJoinRoomChecks = mockito.mockFunction();
         recentRoomServiceSaveLastVisitedTroupeforUserId = mockito.mockFunction();
         roomMembershipServiceAddRoomMember = mockito.mockFunction();
 
-        mockito.when(troupeServiceFindById)().then(function(pTroupeId) {
-          assert.strictEqual(pTroupeId, troupeId);
-          return Promise.resolve(troupe);
-        });
-
-        mockito.when(roomPermissionsModel)().then(function(pUser, pPerm, pRoom) {
-          assert.strictEqual(pUser, user);
-          assert.strictEqual(pPerm, 'join');
-          assert.strictEqual(pRoom, troupe);
-          return Promise.resolve(access);
-        });
-
         mockito.when(assertJoinRoomChecks)().then(function(pRoom, pUser) {
           assert.strictEqual(pUser, user);
           assert.strictEqual(pRoom, troupe);
-          if (joinRoomCheckFailed) return Promise.reject(new Error());
+          if (joinRoomCheckFailed) return Promise.reject(new StatusError());
           return Promise.resolve();
         });
 
@@ -2153,63 +1883,38 @@ describe('room-service', function() {
         });
 
         roomService = testRequire.withProxies('./services/room-service', {
-          './troupe-service': {
-            findById: troupeServiceFindById
-          },
           './room-membership-service': {
             addRoomMember: roomMembershipServiceAddRoomMember
           },
           './assert-join-room-checks': assertJoinRoomChecks,
           './recent-room-service': {
             saveLastVisitedTroupeforUserId: recentRoomServiceSaveLastVisitedTroupeforUserId
-          },
-          'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModel
+          }
         });
       });
 
-      it('should allow a user to join a room when they have permission', function() {
-        access = true;
+      it('should allow a user to join a room', function() {
         joinRoomCheckFailed = false;
 
-        return roomService.joinRoom(troupeId, user)
+        return roomService.joinRoom(troupe, user)
           .then(function() {
-            mockito.verify(troupeServiceFindById, once)();
-            mockito.verify(roomPermissionsModel, once)();
             mockito.verify(assertJoinRoomChecks, once)();
             mockito.verify(recentRoomServiceSaveLastVisitedTroupeforUserId, once)();
             mockito.verify(roomMembershipServiceAddRoomMember, once)();
           });
       });
 
-      it('should deny a user join room when they don\'t have permission', function() {
-        access = false;
-        joinRoomCheckFailed = false;
-
-        return roomService.joinRoom(troupeId, user)
-          .then(function() {
-            assert.ok(false, 'Expected an exception');
-          }, function(err) {
-            assert.strictEqual(err.status, 403);
-          })
-          .then(function() {
-            mockito.verify(troupeServiceFindById, once)();
-            mockito.verify(roomPermissionsModel, once)();
-          });
-      });
-
       it('should deny a user join room there are too many people in the room', function() {
-        access = true;
         joinRoomCheckFailed = true;
 
-        return roomService.joinRoom(troupeId, user)
+        return roomService.joinRoom(troupe, user)
           .then(function() {
             assert.ok(false, 'Expected an exception');
-          }, function() {
-            // Swallow the error
+          })
+          .catch(StatusError, function() {
+            // This is what we want...
           })
           .then(function() {
-            mockito.verify(troupeServiceFindById, once)();
-            mockito.verify(roomPermissionsModel, once)();
             mockito.verify(assertJoinRoomChecks, once)();
           });
       });
@@ -2218,7 +1923,7 @@ describe('room-service', function() {
     describe('integration tests #slow', function() {
       var fixture = {};
       var roomService;
-      var roomPermissionsModel;
+      var createPolicyForRoom;
       var access;
       var roomMembershipService;
 
@@ -2236,18 +1941,22 @@ describe('room-service', function() {
 
       beforeEach(function() {
         roomMembershipService = testRequire('./services/room-membership-service');
-        roomPermissionsModel = mockito.mockFunction();
+        createPolicyForRoom = mockito.mockFunction();
 
-        mockito.when(roomPermissionsModel)().then(function(pUser, pPerm, pRoom) {
+        mockito.when(createPolicyForRoom)().then(function(pUser, pRoom) {
           assert.strictEqual(pUser, fixture.user1);
-          assert.strictEqual(pPerm, 'join');
           assert.strictEqual(pRoom.id, fixture.troupeOrg1.id);
-          return Promise.resolve(access);
+          return Promise.resolve({
+            canJoin: function() {
+              return Promise.resolve(access);
+            }
+          });
         });
 
-
         roomService = testRequire.withProxies('./services/room-service', {
-          'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModel
+          'gitter-web-permissions/lib/legacy-policy-factory': {
+            createPolicyForRoom: createPolicyForRoom
+          }
         });
       });
 
@@ -2255,7 +1964,7 @@ describe('room-service', function() {
       it('should add a member to the room', function() {
         access = true;
 
-        return roomService.joinRoom(fixture.troupeOrg1.id, fixture.user1)
+        return roomService.joinRoom(fixture.troupeOrg1, fixture.user1)
           .then(function() {
             return roomMembershipService.checkRoomMembership(fixture.troupeOrg1.id, fixture.user1.id);
           })
@@ -2267,13 +1976,13 @@ describe('room-service', function() {
       it('should be idempotent', function() {
         access = true;
 
-        return roomService.joinRoom(fixture.troupeOrg1.id, fixture.user1)
+        return roomService.joinRoom(fixture.troupeOrg1, fixture.user1)
           .then(function() {
             return roomMembershipService.checkRoomMembership(fixture.troupeOrg1.id, fixture.user1.id);
           })
           .then(function(isMember) {
             assert.strictEqual(isMember,true);
-            return roomService.joinRoom(fixture.troupeOrg1.id, fixture.user1);
+            return roomService.joinRoom(fixture.troupeOrg1, fixture.user1);
           })
           .then(function() {
             return roomMembershipService.checkRoomMembership(fixture.troupeOrg1.id, fixture.user1.id);

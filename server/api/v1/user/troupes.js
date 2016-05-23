@@ -1,20 +1,31 @@
 "use strict";
 
-var troupeService     = require("../../../services/troupe-service");
-var restful           = require("../../../services/restful");
-var restSerializer    = require("../../../serializers/rest-serializer");
+var troupeService = require("../../../services/troupe-service");
+var restful = require("../../../services/restful");
+var restSerializer = require("../../../serializers/rest-serializer");
 var recentRoomService = require('../../../services/recent-room-service');
 var userRoomModeUpdateService = require('../../../services/user-room-mode-update-service');
-var roomService       = require('../../../services/room-service');
-var Promise           = require('bluebird');
-var mongoUtils        = require('gitter-web-persistence-utils/lib/mongo-utils');
-var StatusError       = require('statuserror');
+var roomService = require('../../../services/room-service');
+var Promise = require('bluebird');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var StatusError = require('statuserror');
+var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
+var RoomWithPolicyService = require('../../../services/room-with-policy-service');
+
+function joinRoom(user, room, policy, options) {
+  var roomWithPolicyService = new RoomWithPolicyService(room, user, policy);
+  return roomWithPolicyService.joinRoom(options);
+}
 
 function performUpdateToUserRoom(req) {
-  var userId = req.user.id;
-  var troupeId = req.params.userTroupeId;
+  var user = req.user;
+  if (!user) throw new StatusError(401);
 
-  return troupeService.findByIdLeanWithAccess(troupeId, req.user && req.user._id)
+  var userId = user._id;
+  var troupeId = req.params.userTroupeId;
+  var policy = req.userRoomPolicy;
+
+  return troupeService.findByIdLeanWithMembership(troupeId, userId)
     .spread(function(troupe, isMember) {
 
       var updatedTroupe = req.body;
@@ -32,9 +43,9 @@ function performUpdateToUserRoom(req) {
           if (!troupe.oneToOne) {
             /* Ignore one-to-one rooms */
             promises.push(
-              roomService.findOrCreateRoom(req.resourceUser, troupe.uri)
+              joinRoom(user, troupe, policy)
                 .then(function() {
-                  return recentRoomService.updateFavourite(userId, troupeId, updatedTroupe.favourite);
+                  return recentRoomService.updateFavourite(userId, troupeId, fav);
                 })
               );
           }
@@ -46,7 +57,7 @@ function performUpdateToUserRoom(req) {
       }
 
       if('mode' in updatedTroupe) {
-        promises.push(userRoomModeUpdateService.setModeForUserInRoom(req.resourceUser, troupeId, updatedTroupe.mode));
+        promises.push(userRoomModeUpdateService.setModeForUserInRoom(user, troupeId, updatedTroupe.mode));
       }
 
       return Promise.all(promises);
@@ -63,8 +74,10 @@ function performUpdateToUserRoom(req) {
     });
 
 }
+
 module.exports = {
   id: 'userTroupeId',
+
   index: function(req) {
     if(!req.user) throw new StatusError(401);
 
@@ -73,19 +86,35 @@ module.exports = {
 
   // Join a room
   create: function(req) {
-    if(!req.user) throw new StatusError(401);
+    var user = req.user;
+    if (!user) throw new StatusError(401);
+    var source;
+
+    if (typeof req.body.source === 'string') {
+      source = req.body.source;
+    }
 
     var troupeId = req.body && req.body.id && "" + req.body.id;
     if(!troupeId || !mongoUtils.isLikeObjectId(troupeId)) throw new StatusError(400);
 
-    var options = {
-      tracking: { source: req.body.source }
-    };
+    return troupeService.findById(troupeId)
+      .then(function(room) {
+        return [room, policyFactory.createPolicyForRoom(req.user, room)];
+      })
+      .spread(function(room, policy) {
+        var options = {};
 
-    return roomService.joinRoom(troupeId, req.user, options)
+        if (source) {
+          options.tracking = { source: source };
+        }
+
+        return joinRoom(user, room, policy, options);
+      })
       .then(function() {
         var strategy = new restSerializer.TroupeIdStrategy({
-          currentUserId: req.user.id,
+          currentUserId: req.user._id,
+          currentUser: req.user,
+          includePermissions: true,
           includeProviders: true
         });
 
@@ -118,8 +147,16 @@ module.exports = {
     return troupeService.checkIdExists(id)
       .then(function(exists) {
         if (!exists) throw new StatusError(404);
+
         return id;
-      });
+      })
+      .tap(function(id) {
+        return policyFactory.createPolicyForRoomId(req.user, id)
+          .then(function(policy) {
+            // TODO: middleware?
+            req.userRoomPolicy = policy;
+          });
+      })
   },
 
   subresources: {

@@ -7,29 +7,30 @@ var roomMembershipFlags = testRequire("./services/room-membership-flags");
 var debug       = require('debug')('gitter:test-fixtures');
 var counter     = 0;
 
+var seed = Date.now();
+
 function generateEmail() {
-  return 'testuser' + (++counter) + Date.now() + '@troupetest.local';
+  return 'testuser' + (++counter) + seed + '@troupetest.local';
 }
 
 function generateName() {
-  return 'Test ' + (++counter) + ' ' + Date.now();
+  return 'Test ' + (++counter) + ' ' + seed;
 }
 
 function generateUri(roomType) {
   if(roomType === 'REPO') {
-    return '_test_' + (++counter) + Date.now() + '/_repo_' + (++counter) + Date.now();
+    return '_test_' + (++counter) + seed + '/_repo_' + (++counter) + Date.now();
   }
 
-  return '_test_' + (++counter) + Date.now();
+  return '_test_' + (++counter) + seed;
 }
 
 function generateUsername() {
-  return '_testuser_' + (++counter) + Date.now();
+  return '_testuser_' + (++counter) + seed;
 }
 
 function generateGithubId() {
-  var hr = process.hrtime();
-  return hr[0] + hr[1];
+  return (++counter) + seed;
 }
 
 function generateGithubToken() {
@@ -108,10 +109,6 @@ function createExpectedFixtures(expected, done) {
 
     debug('Creating %s', fixtureName);
 
-    // A username of true means generate one
-    var confirmationCode = f.confirmationCode === true ? "confirm" + Math.random() : f.confirmationCode;
-
-
     function possibleGenerate(key, fn) {
       if (f.hasOwnProperty(key)) {
         if (f[key] === true) {
@@ -126,14 +123,12 @@ function createExpectedFixtures(expected, done) {
 
     return persistence.User.create({
       identities:       f.identities,
-      email:            possibleGenerate('email', generateEmail),
       displayName:      possibleGenerate('displayName', generateName),
       githubId:         possibleGenerate('githubId', generateGithubId),
       githubToken:      possibleGenerate('githubToken', generateGithubToken),
-      confirmationCode: confirmationCode,
       username:         possibleGenerate('username', generateUsername),
-      status:           f.status      || 'ACTIVE',
-      staff:            f.staff       || false
+      state:            f.state      || undefined,
+      staff:            f.staff      || false
     });
   }
 
@@ -480,10 +475,23 @@ function fixtureLoader(fixture, expected) {
    };
 }
 
+fixtureLoader.setup = function(expected) {
+  var fixture = {};
+
+  before(fixtureLoader(fixture, expected));
+  after(function() {
+    if (fixture.cleanup) {
+      fixture.cleanup();
+    }
+  });
+
+  return fixture;
+};
+
 fixtureLoader.use = function(expected) {
   return createExpectedFixtures(expected);
 };
 
 fixtureLoader.generateEmail = generateEmail;
-
+fixtureLoader.generateGithubId = generateGithubId;
 module.exports = fixtureLoader;

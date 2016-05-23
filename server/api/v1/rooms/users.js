@@ -8,6 +8,7 @@ var restSerializer      = require("../../../serializers/rest-serializer");
 var mongoUtils          = require('gitter-web-persistence-utils/lib/mongo-utils');
 var troupeService       = require("../../../services/troupe-service");
 var StatusError         = require('statuserror');
+var Promise             = require('bluebird');
 var loadTroupeFromParam = require('./load-troupe-param');
 
 function maskEmail(email) {
@@ -21,9 +22,9 @@ function maskEmail(email) {
 }
 
 function getTroupeUserFromId(troupeId, userId) {
-  return troupeService.findByIdLeanWithAccess(troupeId, userId)
-    .spread(function(troupe, access) {
-      if (!access) return;
+  return troupeService.findByIdLeanWithMembership(troupeId, userId)
+    .spread(function(troupe, isMember) {
+      if (!isMember) return;
 
       return userService.findById(userId);
     });
@@ -32,9 +33,9 @@ function getTroupeUserFromId(troupeId, userId) {
 function getTroupeUserFromUsername(troupeId, username) {
   return userService.findByUsername(username)
     .then(function(user) {
-      return troupeService.findByIdLeanWithAccess(troupeId, user.id)
-        .spread(function(troupe, access) {
-          if (!access) return;
+      return troupeService.findByIdLeanWithMembership(troupeId, user.id)
+        .spread(function(troupe, isMember) {
+          if (!isMember) return;
 
           return user;
         });
@@ -56,8 +57,14 @@ module.exports = {
   },
 
   create: function(req) {
-    return loadTroupeFromParam(req)
-      .then(function(troupe) {
+    var policy = req.userRoomPolicy;
+
+    return Promise.join(
+      loadTroupeFromParam(req),
+      policy.canAddUser(),
+      function(troupe, addUserAccess) {
+        if (!troupe) throw new StatusError(404);
+        if (!addUserAccess) throw new StatusError(403, 'You do not have permission to add people to this room.');
         var username = req.body.username;
 
         return roomService.addUserToRoom(troupe, req.user, username);
@@ -86,11 +93,24 @@ module.exports = {
    * DELETE /rooms/:roomId/users/:userId
    */
   destroy: function(req) {
-    return loadTroupeFromParam(req)
-      .then(function(troupe) {
-        var user = req.resourceTroupeUser;
+    var user = req.resourceTroupeUser;
+    if (!req.user) throw new StatusError(401);
+    var policy = req.userRoomPolicy;
 
-        return roomService.removeUserFromRoom(troupe, user, req.user);
+    var policyCheck;
+    if (mongoUtils.objectIDsEqual(user._id, req.user._id)) {
+      policyCheck = Promise.resolve(true); // You can always remove yourself
+    } else {
+      policyCheck = policy.canAdmin();
+    }
+
+    return Promise.join(
+      loadTroupeFromParam(req),
+      policyCheck,
+      function(troupe, hasAccess) {
+        if (!hasAccess) throw new StatusError(403);
+
+        return roomService.removeUserFromRoom(troupe, user);
       })
       .then(function() {
         return { success: true };

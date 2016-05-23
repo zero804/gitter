@@ -2,7 +2,7 @@
 
 var badgerService = require('../../services/badger-service');
 var troupeService = require('../../services/troupe-service');
-var roomPermissionsModel = require('gitter-web-permissions/lib/room-permissions-model');
+var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
 var StatusError = require('statuserror');
 
 module.exports = function (req, res, next) {
@@ -11,10 +11,15 @@ module.exports = function (req, res, next) {
 
   return troupeService.findByUri(uri)
     .then(function(troupe) {
-      return roomPermissionsModel(user, 'admin', troupe);
+      return policyFactory.createPolicyForRoom(user, troupe);
+    })
+    .then(function(policy) {
+      return policy.canAdmin();
     })
     .then(function(isAdmin) {
-      if (!isAdmin) throw new StatusError(403, 'admin permissions required');
+      if (!isAdmin) {
+        throw new StatusError(403, 'admin permissions required');
+      }
 
       return badgerService.sendBadgePullRequest(uri, user);
     })
