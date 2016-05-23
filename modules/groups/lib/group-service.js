@@ -47,9 +47,7 @@ function upsertGroup(user, options) {
       $setOnInsert: {
         name: name,
         uri: uri,
-        lcUri: lcUri,
-        type: type,
-        githubId: githubId,
+        lcUri: lcUri
       }
     })
     .spread(function(group, updateExisting) {
