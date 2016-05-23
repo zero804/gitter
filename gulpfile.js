@@ -75,9 +75,7 @@ var getGulpSourceMapOptions = function(mapsSubDir) {
 
 
 var cssDestDir = 'output/assets/styles';
-var cssSourceMapDestDir = url.resolve((getSourceMapUrl() || ''), 'output/maps/');
 var cssWatchGlob = 'public/**/*.less';
-
 
 
 

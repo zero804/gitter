@@ -92,7 +92,7 @@ var generateLessDependencyMap = memoize(function(rootFilePath, options, /*intern
           var importFilePath = path.join(dir, matchedFilePath);
 
           return stat(importFilePath)
-            .then(function(stats) {
+            .then(function(/*stats*/) {
               //console.log('\ti', rootFilePath, importFilePath);
 
               // Found a new dep
