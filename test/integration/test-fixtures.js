@@ -1,13 +1,13 @@
 "use strict";
 
 var testRequire = require('./test-require');
-var Promise     = require('bluebird');
+var Promise = require('bluebird');
 var persistence = require('gitter-web-persistence');
 var roomMembershipFlags = testRequire("./services/room-membership-flags");
-var debug       = require('debug')('gitter:test-fixtures');
-var util        = require('util');
-var uuid        = require('node-uuid');
-var counter     = 0;
+var debug = require('debug')('gitter:test-fixtures');
+var util = require('util');
+var uuid = require('node-uuid');
+var counter = 0;
 
 var seed = Date.now();
 
@@ -132,8 +132,8 @@ function createExpectedFixtures(expected, done) {
       githubId:         possibleGenerate('githubId', generateGithubId),
       githubToken:      possibleGenerate('githubToken', generateGithubToken),
       username:         possibleGenerate('username', generateUsername),
-      state:            f.state      || undefined,
-      staff:            f.staff      || false
+      state:            f.state || undefined,
+      staff:            f.staff || false
     });
 
     if (f.accessToken) {
@@ -190,11 +190,11 @@ function createExpectedFixtures(expected, done) {
           lurk = false;
         }
 
-        bulk.find({ troupeId: troupeId, userId:userId })
+        bulk.find({ troupeId: troupeId, userId: userId })
           .upsert()
           .updateOne({
             $set: { flags: flags, lurk: lurk },
-            $setOnInsert: { troupeId: troupeId, userId:userId }
+            $setOnInsert: { troupeId: troupeId, userId: userId }
           });
       });
 
@@ -283,10 +283,31 @@ function createExpectedFixtures(expected, done) {
     return persistence.Group.create({
       name: f.name || uri,
       uri: uri,
-      lcUri: uri.toLowerCase(),
-      type: f.type,
-      githubId: f.githubId,
-      // forumId: later,
+      lcUri: uri.toLowerCase()
+    })
+    .tap(function(group) {
+      var securityDescriptor = f.securityDescriptor || {};
+
+      var type;
+      if (securityDescriptor.type) {
+        type = securityDescriptor.type;
+      } else {
+        type = null;
+      }
+
+      return persistence.SecurityDescriptor.create({
+        groupId: group._id,
+
+        // Permissions stuff
+        type: type,
+        members: securityDescriptor.members || 'PUBLIC',
+        admins: securityDescriptor.admins || 'MANUAL',
+        public: 'public' in securityDescriptor ? securityDescriptor.public : true,
+        linkPath: securityDescriptor.linkPath,
+        externalId: securityDescriptor.externalId,
+        extraMembers: securityDescriptor.extraMembers,
+        extraAdmins: securityDescriptor.extraAdmins
+      });
     });
   }
 
@@ -548,6 +569,6 @@ fixtureLoader.generateGithubId = generateGithubId;
 fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN = '***REMOVED***';
 fixtureLoader.GITTER_INTEGRATION_USERNAME = 'gitter-integration-tests';
 fixtureLoader.GITTER_INTEGRATION_ORG = 'gitter-integration-tests-organisation';
-
+fixtureLoader.GITTER_INTEGRATION_ORG_ID = '19433202';
 
 module.exports = fixtureLoader;

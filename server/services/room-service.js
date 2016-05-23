@@ -251,7 +251,7 @@ function createRoomForGitHubUri(user, uri, options) {
         officialUri.toLowerCase() === uri.toLowerCase()) {
 
         debug('Redirecting client from %s to official uri %s', uri, officialUri);
-        throw extendStatusError(301, { path:  '/' + officialUri  });
+        throw extendStatusError(301, { path: '/' + officialUri });
       }
 
       /* Room does not yet exist */
@@ -279,7 +279,7 @@ function createRoomForGitHubUri(user, uri, options) {
                 { lcUri: lcUri, githubType: githubType };
 
           // TODO: remove this when lcOwner goes away
-          var lcOwner =  lcUri.split('/')[0];
+          var lcOwner = lcUri.split('/')[0];
 
           return mongooseUtils.upsert(persistence.Troupe, queryTerm, {
               $setOnInsert: {

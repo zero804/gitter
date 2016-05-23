@@ -10,8 +10,8 @@ describe('legacy-group-policy-evaluator', function() {
 
   describe('#slow', function() {
 
-    function expect(LegacyGroupPolicyEvaluator, user, group, expected) {
-      var evaluator = new LegacyGroupPolicyEvaluator(user._id, null, group._id, null);
+    function expect(LegacyGroupPolicyEvaluator, user, type, uri, githubId, expected) {
+      var evaluator = new LegacyGroupPolicyEvaluator(user._id, null, type, uri, githubId, null);
       return Promise.props({
           canRead: evaluator.canRead(),
           canWrite: evaluator.canWrite(),
@@ -22,7 +22,7 @@ describe('legacy-group-policy-evaluator', function() {
         .then(function(access) {
           assert.deepEqual(access, expected);
 
-          var evaluator = new LegacyGroupPolicyEvaluator(user._id, user, group._id, group);
+          var evaluator = new LegacyGroupPolicyEvaluator(user._id, user, type, uri, githubId);
           return Promise.props({
               canRead: evaluator.canRead(),
               canWrite: evaluator.canWrite(),
@@ -44,7 +44,6 @@ describe('legacy-group-policy-evaluator', function() {
 
       var fixture = fixtureLoader.setup({
         deleteDocuments: {
-          Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() }],
           User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }]
         },
         user1: {
@@ -53,14 +52,17 @@ describe('legacy-group-policy-evaluator', function() {
         },
         user2: {},
         user3: {},
-        group1: {
-          uri: fixtureLoader.GITTER_INTEGRATION_ORG,
-          type: 'ORG'
-        }
+        // group1: {
+        //   uri: fixtureLoader.GITTER_INTEGRATION_ORG,
+        //   type: 'ORG'
+        // }
       });
 
       it('should deal with org members', function() {
-        return expect(LegacyGroupPolicyEvaluator, fixture.user1, fixture.group1, {
+        var type = 'ORG';
+        var uri = fixtureLoader.GITTER_INTEGRATION_ORG;
+        var githubId = null;
+        return expect(LegacyGroupPolicyEvaluator, fixture.user1, type, uri, githubId, {
           canRead: true,
           canWrite: true,
           canJoin: true,
@@ -70,7 +72,11 @@ describe('legacy-group-policy-evaluator', function() {
       });
 
       it('should deal with non-org members ', function() {
-        return expect(LegacyGroupPolicyEvaluator, fixture.user2, fixture.group1, {
+        var type = 'ORG';
+        var uri = fixtureLoader.GITTER_INTEGRATION_ORG;
+        var githubId = null;
+
+        return expect(LegacyGroupPolicyEvaluator, fixture.user2, type, uri, githubId, {
           canRead: false,
           canWrite: false,
           canJoin: false,
@@ -84,7 +90,6 @@ describe('legacy-group-policy-evaluator', function() {
     describe('legacy user orgs', function() {
       var fixture = fixtureLoader.setup({
         deleteDocuments: {
-          Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() }],
           User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }]
         },
         user1: {
@@ -93,15 +98,19 @@ describe('legacy-group-policy-evaluator', function() {
         },
         user2: {},
         user3: {},
-        group1: {
-          uri: fixtureLoader.GITTER_INTEGRATION_USERNAME,
-          type: 'USER'
-        }
+        // group1: {
+        //   uri: fixtureLoader.GITTER_INTEGRATION_USERNAME,
+        //   type: 'USER'
+        // }
       });
 
       it('The owner should always have full access', function() {
         var LegacyGroupPolicyEvaluator = require('../../lib/policies/legacy-group-policy-evaluator');
-        return expect(LegacyGroupPolicyEvaluator, fixture.user1, fixture.group1, {
+        var uri = fixtureLoader.GITTER_INTEGRATION_USERNAME;
+        var type = 'USER';
+        var githubId = null;
+
+        return expect(LegacyGroupPolicyEvaluator, fixture.user1, type, uri, githubId, {
           canRead: true,
           canWrite: true,
           canJoin: true,
@@ -136,8 +145,11 @@ describe('legacy-group-policy-evaluator', function() {
             });
 
             var user = fixture.user2;
-            var group = fixture.group1;
-            var evaluator = new LegacyGroupPolicyEvaluator(user._id, user, group._id, group, testCase.obtainAccessFromGitHubRepo);
+            var uri = fixtureLoader.GITTER_INTEGRATION_USERNAME;
+            var type = 'USER';
+            var githubId = null;
+
+            var evaluator = new LegacyGroupPolicyEvaluator(user._id, user, type, uri, githubId, testCase.obtainAccessFromGitHubRepo);
             return evaluator.canRead()
               .then(function(result) {
                 if (expect === 'throw') {
