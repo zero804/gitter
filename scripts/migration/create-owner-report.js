@@ -268,7 +268,8 @@ var findBatchInfo = Promise.method(function(batch) {
     function(ownerUsers, roomUsers) {
       var org = batch.githuborg[0]; // could be undefined
       var user = batch.githubuser[0]; // could be undefined
-      var oldUser;
+      var githubUser; // user or ownerUser.githubUser or roomUser.githubUser
+      var oldUser; // ownerUser.githubUser or roomUser.githubUser
 
       if (org) {
         // A case-insensitive lookup matched the lcOwner to a current github org.
@@ -288,6 +289,8 @@ var findBatchInfo = Promise.method(function(batch) {
         }
 
       } else if (user) {
+        githubUser = user;
+
         // A case-insensitive lookup matched the lcOwner to a current github user.
         type = 'user';
         reason = 'github-username-lookup';
@@ -324,7 +327,7 @@ var findBatchInfo = Promise.method(function(batch) {
             // gitter user
             oldUser: oldUser, // could be undefined as in the jashkenas case
             // github user
-            user: user
+            user: githubUser
           });
         }
 
@@ -336,6 +339,7 @@ var findBatchInfo = Promise.method(function(batch) {
         type = 'user';
         reason = 'gitter-username-lookup';
 
+        githubUser = ownerUsers.githubUser;
         oldUser = ownerUsers.gitterUser;
         errors.push({
           errorType: "owner",
@@ -344,7 +348,7 @@ var findBatchInfo = Promise.method(function(batch) {
           correctOwner: ownerUsers.githubUser.uri,
           batch: batch,
           oldUser: oldUser,
-          user: ownerUsers.githubUser
+          user: githubUser
         });
 
       } else if (roomUsers) {
@@ -359,6 +363,7 @@ var findBatchInfo = Promise.method(function(batch) {
         type = 'user';
         reason = 'owneruserid-lookup';
 
+        githubUser = roomUsers.githubUser;
         oldUser = roomUsers.gitterUser;
         errors.push({
           errorType: "owner",
@@ -367,7 +372,7 @@ var findBatchInfo = Promise.method(function(batch) {
           correctOwner: roomUsers.githubUser.uri,
           batch: batch,
           oldUser: oldUser,
-          user: roomUsers.githubUser
+          user: githubUser
         });
 
       } else {
@@ -377,14 +382,14 @@ var findBatchInfo = Promise.method(function(batch) {
         // change.
       }
 
-      if (user) {
+      if (githubUser) {
         // does this user exist in our system?
         // (this is primarily for checking the jashkenas case, not the same as oldUser)
-        if (oldUser && oldUser.githubId == user.githubId) {
+        if (oldUser && oldUser.githubId == githubUser.githubId) {
           // little optimisation..
           lookups.gitterUser = Promise.resolve(oldUser);
         } else {
-          lookups.gitterUser = userService.findByGithubId(user.githubId);
+          lookups.gitterUser = userService.findByGithubId(githubUser.githubId);
         }
       }
 
@@ -411,7 +416,7 @@ var findBatchInfo = Promise.method(function(batch) {
                 reason: reason,
                 updates: updates,
                 org: org,
-                user: user,
+                user: githubUser,
                 githubTypeMap: githubTypeMap,
                 warnings: findBatchWarnings({
                   batch: batch,
@@ -420,7 +425,7 @@ var findBatchInfo = Promise.method(function(batch) {
                   uniqueUserIds: uniqueUserIds,
                   uniqueOwners: uniqueOwners,
                   org: org,
-                  user: user,
+                  user: githubUser,
                   oldUser: oldUser || results.gitterUser
                 })
               };
