@@ -310,7 +310,7 @@ describe('room-service', function() {
 
       return persistence.Troupe.findOneAndRemove({ lcUri: 'gitterhq/cloaked-avenger' })
         .then(function() {
-          return roomService.findOrCreateRoom(fixture.user1, 'gitterHQ/cloaked-avenger');
+          return roomService.createRoomByUri(fixture.user1, 'gitterHQ/cloaked-avenger');
         })
         .bind({})
         .then(function(uriContext) {
@@ -322,7 +322,7 @@ describe('room-service', function() {
         })
         .then(function(isRoomMember) {
           assert.strictEqual(isRoomMember, false);
-          return roomService.findOrCreateRoom(fixture.user1, 'gitterHQ/cloaked-avenger');
+          return roomService.createRoomByUri(fixture.user1, 'gitterHQ/cloaked-avenger');
         })
         .then(function() {
           return roomMembershipService.checkRoomMembership(this.uriContext.troupe._id, fixture.user1._id);
