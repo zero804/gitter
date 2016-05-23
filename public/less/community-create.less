@@ -13,12 +13,12 @@
 
 @primary-input-font-size: 3.8rem;
 @primary-input-height: 6rem;
-@primary-input-spacing-top: 1.5rem;
-@primary-input-spacing-bottom: 3rem;
+@primary-input-spacing-top: 3rem;
+@primary-input-spacing-bottom: 0;
 
 @secondary-input-font-size: 1.6rem;
 @secondary-input-height: 3rem;
-@secondary-input-spacing-top: 0;
+@secondary-input-spacing-top: 2.5rem;
 @secondary-input-spacing-bottom: 2rem;
 
 
@@ -42,6 +42,13 @@
 @invite-user-area-total-height: @org-area-total-height - ((2 * @repo-item-height) + @repo-item-spacing);
 
 
+@people-list-item-spacing: .4rem;
+@people-list-item-height: @invite-user-item-avatar-size + (2 * @people-list-item-spacing);
+
+@invited-email-item-font-size: 1.6rem;
+@invited-email-item-height: @invited-email-item-font-size;
+@invited-area-total-height: @people-list-item-height + @invite-user-item-spacing + @invited-email-item-height;
+@invited-area-spacing-top: 2.5rem;
 
 
 
@@ -291,15 +298,11 @@
 
 .secondary-bare-input() {
   .primary-bare-input(@secondary-input-height, @secondary-input-font-size, 1px);
-  margin-top: @secondary-input-spacing-top;
-  margin-bottom: 0;
 }
 
 
 
 .primary-community-heading {
-  margin-bottom: 3rem;
-
   color: #ffffff;
   font-weight: 300;
   line-height: 1.2;
@@ -412,6 +415,7 @@
   align-items: baseline;
   // aligning to baseline makes the whole thing a bit taller so just shrink this down to explicit height
   height: @secondary-input-height;
+  margin-top: @secondary-input-spacing-top;
   margin-bottom: @secondary-input-spacing-bottom;
 
   &:after {
@@ -447,6 +451,12 @@
 
 }
 
+
+.community-create-associated-project-section {
+  height: @org-area-total-height + @invited-area-total-height + @invited-area-spacing-top;
+  padding-top: @org-item-height + @org-item-spacing;
+}
+
 .community-create-associated-project-copy {
   display: none;
 
@@ -478,6 +488,8 @@
 .community-creation-sub-room-input {
   .secondary-bare-input();
   flex: 1;
+  margin-top: @secondary-input-spacing-top;
+  margin-bottom: @secondary-input-spacing-bottom;
 }
 
 .community-creation-sub-room-submit-button {
@@ -679,6 +691,12 @@
   margin-right: .3rem;
 }
 
+.community-create-org-missing-note,
+.community-create-repo-missing-note {
+  height: @invited-area-total-height;
+  margin-top: @invited-area-spacing-top;
+  margin-bottom: 0;
+}
 
 
 
@@ -687,7 +705,7 @@
 }
 
 .community-invite-people-email-section {
-  margin-top: 4rem;
+  margin-top: @invite-user-item-spacing;
 }
 
 .community-invite-people-email-input-wrapper {
@@ -696,8 +714,9 @@
 
 .community-invite-people-email-input {
   flex: 6;
-  height: auto;
-  padding: 1rem 2rem;
+  height: @invite-user-item-height;
+  margin: 0;
+  padding: 0 2rem;
 
   background-color: rgba(0, 0, 0, .3);
   border: 0;
@@ -718,16 +737,24 @@
   text-align: right;
 }
 
+.community-create-invite-email-list-root {
+  min-height: @invited-email-item-font-size;
+  margin-top: @invited-area-spacing-top;
+}
 
 .community-create-email-list {
   margin-left: 0;
-  marginb-bottom: 0;
+  margin-bottom: 0;
   padding-left: 0;
   list-style: none;
+
+  font-size: @invited-email-item-font-size;
+  line-height: 1;
 }
 
 .community-create-email-list-item {
   display: inline-block;
+  height: @invited-email-item-height;
 }
 
 .community-create-email-list-item-comma-separated {
@@ -768,6 +795,7 @@
   border: 0;
 
   color: @base-text-color;
+  line-height: 1;
 
   transition: opacity .2s ease;
 
@@ -778,6 +806,9 @@
   }
 }
 
+.community-create-invite-user-result-list-root {
+  margin-top: @secondary-input-height + @secondary-input-spacing-top + @secondary-input-spacing-bottom;
+}
 
 .community-create-invite-user-result-list-wrapper {
   overflow: auto;
@@ -831,13 +862,16 @@
 
 
 .community-create-invite-list-root {
-  margin-top: 6rem;
+  min-height: @people-list-item-height;
+  margin-top: @invite-user-item-spacing;
 }
 
 .community-create-people-list {
   margin-left: 0;
+  margin-bottom: 0;
 
   list-style: none;
+  line-height: 1;
 }
 
 .community-create-people-list-empty-note {
@@ -848,7 +882,7 @@
 
 .community-create-people-list-item {
   display: inline-block;
-  margin: .4rem;
+  margin: @people-list-item-spacing;
 }
 
 .community-create-people-list-item-link {
@@ -911,6 +945,18 @@
 
 
 
+
+.community-create-overview-invite-area {
+  height: @org-area-total-height + @invited-area-total-height + @invited-area-spacing-top;
+  padding-top: 3rem;
+  border-top: 2px solid rgba(255,255,255,.2);
+}
+
+.community-create-overview-info-area {
+  height: @primary-input-height + @primary-input-spacing-bottom + @secondary-input-height + @secondary-input-spacing-top + @secondary-input-spacing-bottom;
+  margin-top: 3rem;
+}
+
 .community-create-overview-community-name {
   margin-bottom: 1.2rem;
 
@@ -935,11 +981,12 @@
 }
 
 .community-create-overview-invite-list-root {
-  margin-top: 2rem;
+  min-height: @people-list-item-height;
+  margin-top: @invite-user-item-spacing;
 }
 
 .community-create-overview-invite-email-area {
-
+  margin-top: 2rem;
 }
 
 .community-create-overview-invite-email-list-root {

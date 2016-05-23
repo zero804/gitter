@@ -20,7 +20,7 @@
     <div class="community-create-github-projects-tab-content-area js-community-create-github-projects-orgs-area {{when isOrgAreaActive 'active' : ''}}">
       <div class="community-create-org-list-root"></div>
 
-      <p>
+      <p class="community-create-org-missing-note">
         If you are missing some orgs,
         you will need to manually grant access on a per-org basis.
         See
@@ -42,16 +42,16 @@
 
       <div class="community-create-repo-list-root"></div>
 
-      {{#if isUserMissingPrivateRepoScope}}
-        <p>
-          If you're looking to access a private repository,
-          you will need to upgrade your GitHub authentication to
-          allow us to access the list of your private repositories.
-          <a href="/login/upgrade?scopes=repo" target="_blank" class="community-create-general-link">
-            Click here to do this now.
-          </a>
-        </p>
-      {{/if}}
+      <p class="community-create-repo-missing-note">
+        {{#if isUserMissingPrivateRepoScope}}
+            If you're looking to access a private repository,
+            you will need to upgrade your GitHub authentication to
+            allow us to access the list of your private repositories.
+            <a href="/login/upgrade?scopes=repo" target="_blank" class="community-create-general-link">
+              Click here to do this now.
+            </a>
+        {{/if}}
+      </p>
     </div>
 
   </section>
