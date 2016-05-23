@@ -8,8 +8,6 @@ var GroupSchema = new Schema({
   name: { type: String, required: true },
   uri: { type: String, required: true },
   lcUri: { type: String, required: true },
-  type: { type: String },
-  githubId: { type: Number, required: false },
   forumId: { type: ObjectId, required: false },
 }, { strict: true });
 
