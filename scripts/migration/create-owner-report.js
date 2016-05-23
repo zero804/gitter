@@ -300,7 +300,7 @@ var findBatchInfo = Promise.method(function(batch) {
             // double-check that we actually found the same user, though,
             // otherwise we'll end up renaming the wrong person
             if (ownerUsers.gitterUser.githubId === user.githubId) {
-              oldUser = roomUsers.gitterUser;
+              oldUser = ownerUsers.gitterUser;
             } else {
               console.log("WARNING: owner user and github user doesn't match!", ownerUsers.gitterUser.githubId, '!=', user.githubId);
             }
