@@ -35,7 +35,6 @@ function roomHasWelcomeMessage(troupeId){
     });
 }
 
-//Rename as this upserts
 function createOrUpdateMetaRecord(troupeId, data) {
   assert(mongoUtils.isLikeObjectId(troupeId));
   troupeId = mongoUtils.asObjectID(troupeId);
@@ -43,7 +42,6 @@ function createOrUpdateMetaRecord(troupeId, data) {
   data = (data || {});
   data.welcomeMessage = (data.welcomeMessage || '');
 
-  //should this be sanitised? JP 20/5/16 ... probably
   return processMarkdown(data.welcomeMessage)
     .then(function(parsedWelcomeMessage) {
 
