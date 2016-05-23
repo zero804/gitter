@@ -30,11 +30,8 @@ var View = Marionette.ItemView.extend({
     }
   },
 
-  //TODO may want to prefetch this
   onRender: function (){
     apiClient.room.get('/meta/welcome-message').then(function(meta){
-      //I know this is not right, don't bust my balls. Need to figure out
-      //how to do this correctly, ie how to sanitise this before injecting it
       this.ui.welcomeMessage.html(meta.welcomeMessage.html);
     }.bind(this));
   },
