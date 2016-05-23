@@ -46,6 +46,7 @@ describe('group-membership-service', function() {
     });
 
     describe('findGroupsForUser', function() {
+      /*
       it('should return all the groups for a user, 1', function() {
 
         return groupMembershipService.findGroupsForUser(fixture.user1._id)
@@ -69,6 +70,7 @@ describe('group-membership-service', function() {
             assertGroupEqual(g2, fixture.group2);
           });
       });
+      */
 
       it('should return all the groups for a user without groups', function() {
 
