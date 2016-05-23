@@ -1,13 +1,10 @@
 "use strict";
 
-var troupeService = require("../../../services/troupe-service");
 var roomService = require("../../../services/room-service");
 var restful = require("../../../services/restful");
 var restSerializer = require("../../../serializers/rest-serializer");
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
-var roomPermissionsModel = require('gitter-web-permissions/lib/room-permissions-model');
-var userCanAccessRoom = require('gitter-web-permissions/lib/user-can-access-room');
 var loadTroupeFromParam  = require('./load-troupe-param');
 var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
 var RoomWithPolicyService = require('../../../services/room-with-policy-service');
