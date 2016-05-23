@@ -20,7 +20,7 @@ module.exports = {
       });
   },
 
-  update: function(){
+  update: function(req){
     if (!req.user) { throw new StatusError(401); }
     if(req.params.roomMetaKey !== 'welcome-message') { return {}; }
     var data = _.clone(req.body);

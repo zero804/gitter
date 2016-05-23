@@ -5,6 +5,7 @@ var ModalView = require('./modal');
 var context = require('utils/context');
 var template = require('./tmpl/welcome-message-view.hbs');
 var apiClient = require('components/apiClient');
+var Promise = require('bluebird');
 
 var View = Marionette.ItemView.extend({
   template: template,
@@ -31,7 +32,7 @@ var View = Marionette.ItemView.extend({
 
   //TODO may want to prefetch this
   onRender: function (){
-    apiClient.room.get('/meta').then(function(meta){
+    apiClient.room.get('/meta/welcome-message').then(function(meta){
       //I know this is not right, don't bust my balls. Need to figure out
       //how to do this correctly, ie how to sanitise this before injecting it
       this.ui.welcomeMessage.html(meta.welcomeMessage.html);
