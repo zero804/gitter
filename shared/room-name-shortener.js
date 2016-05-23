@@ -9,7 +9,7 @@ module.exports = function roomNameShortener(name) {
     .some(function(piece, index) {
       var newResult = piece + (resultantName.length ? '/' : '') + resultantName;
 
-      if(newResult.length <= 19 || index === 0) {
+      if(newResult.length <= 16 || index === 0) {
         resultantName = newResult;
       }
       else {

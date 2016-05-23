@@ -29,10 +29,13 @@ onready(function() {
     },
 
     autojoin: function() {
-      apiClient.post('/v1/rooms/' + context.getTroupeId() + '/users', { username: context().user.username })
-      .then(function() {
-        context.troupe().set('roomMember', true);
-      });
+      apiClient.post('/v1/rooms', {
+          uri: context.troupe().get('uri') || context.troupe().get('url')
+        })
+        .then(function() {
+          //location.reload();
+          context.troupe().set('roomMember', true);
+        });
     }
   });
 

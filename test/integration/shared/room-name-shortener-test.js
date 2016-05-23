@@ -7,16 +7,16 @@ describe('room-name-shortener', function() {
   it('Keeps short names as-is', function() {
     assert.equal(roomNameShortener('foo'), 'foo');
   });
-  
-  it('Keeps long names(>19 characters) with one piece as-is', function() {
+
+  it('Keeps long names(>16 characters) with one piece as-is', function() {
     assert.equal(roomNameShortener('foobarbazquxgarplywaldofredthudasdfqwer'), 'foobarbazquxgarplywaldofredthudasdfqwer');
   });
 
-  it('Keeps length 18 as-is', function() {
-    assert.equal(roomNameShortener('FreeCodeCamp/linux'), 'FreeCodeCamp/linux');
+  it('Keeps length 15 as-is', function() {
+    assert.equal(roomNameShortener('foobarbaz/quxaf'), 'foobarbaz/quxaf');
   });
-  it('Keeps length 19 as-is', function() {
-    assert.equal(roomNameShortener('FreeCodeCamp/macosx'), 'FreeCodeCamp/macosx');
+  it('Keeps length 16 as-is', function() {
+    assert.equal(roomNameShortener('foobarbaz/quxafd'), 'foobarbaz/quxafd');
   });
 
 
@@ -28,14 +28,14 @@ describe('room-name-shortener', function() {
     assert.equal(roomNameShortener('foo/barbazquxgarplywaldofredthudasdfqwer'), 'barbazquxgarplywaldofredthudasdfqwer');
   });
 
-  it('Truncates many levels into something <=19 characters', function() {
+  it('Truncates many levels into something <=16 characters', function() {
     assert.equal(roomNameShortener('foo/bar/baz/qux/garply/waldo/fred/thud'), 'waldo/fred/thud');
   });
 
   it('Truncates empty levels at the beginning', function() {
     assert.equal(roomNameShortener('//foobarbazquxgarplywaldofredthud'), 'foobarbazquxgarplywaldofredthud');
   });
-  it('Truncates empty levels at the beginning and keeps under <=19 characters', function() {
+  it('Truncates empty levels at the beginning and keeps under <=16 characters', function() {
     assert.equal(roomNameShortener('//foobarbazquxgarplywaldofredthud/asdf'), 'asdf');
   });
 
