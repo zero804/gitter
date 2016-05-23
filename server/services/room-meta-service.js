@@ -45,7 +45,7 @@ function createOrUpdateMetaRecord(troupeId, data) {
   return processMarkdown(data.welcomeMessage)
     .then(function(parsedWelcomeMessage) {
 
-      var data = {
+      var query = {
         $set: {
           welcomeMessage: {
             html: parsedWelcomeMessage.html,
@@ -55,7 +55,7 @@ function createOrUpdateMetaRecord(troupeId, data) {
       };
 
       return Promise.fromCallback(function(callback) {
-        persistence.TroupeMeta.findOneAndUpdate({ troupeId: troupeId }, data, { upsert: true }, callback);
+        persistence.TroupeMeta.findOneAndUpdate({ troupeId: troupeId }, query, { upsert: true }, callback);
       });
 
     })
