@@ -385,7 +385,7 @@ var findBatchInfo = Promise.method(function(batch) {
       if (githubUser) {
         // does this user exist in our system?
         // (this is primarily for checking the jashkenas case, not the same as oldUser)
-        if (oldUser && oldUser.githubId == user.githubId) {
+        if (oldUser && oldUser.githubId == githubUser.githubId) {
           // little optimisation..
           lookups.gitterUser = Promise.resolve(oldUser);
         } else {
