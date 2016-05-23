@@ -169,7 +169,8 @@ function ensureGroupForGitHubRoomCreation(user, options) {
       debug('No existing group. Will create');
       return createGroup(user, {
         uri: uri,
-        name: name
+        name: name,
+        obtainAccessFromGitHubRepo: options.obtainAccessFromGitHubRepo
       });
     });
 }
