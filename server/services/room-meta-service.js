@@ -10,7 +10,11 @@ var errorReporter = env.errorReporter;
 function findMetaByTroupeId(troupeId) {
   assert(mongoUtils.isLikeObjectId(troupeId));
   troupeId = mongoUtils.asObjectID(troupeId);
-  return persistence.TroupeMeta.findOne({ troupeId: troupeId }).exec();
+  return persistence.TroupeMeta.findOne({ troupeId: troupeId })
+  .exec()
+  .catch(function(err){
+    //TODO err reporting?
+  });
 }
 
 function roomHasWelcomeMessage(troupeId){
@@ -27,12 +31,12 @@ function roomHasWelcomeMessage(troupeId){
     })
     .catch(function(err){
       //TODO error reporting
-      console.log(err);
+      //console.log(err);
     });
 }
 
 //Rename as this upserts
-function createNewMetaRecord(troupeId, data) {
+function createOrUpdateMetaRecord(troupeId, data) {
   assert(mongoUtils.isLikeObjectId(troupeId));
   troupeId = mongoUtils.asObjectID(troupeId);
 
@@ -66,6 +70,6 @@ function createNewMetaRecord(troupeId, data) {
 
 module.exports = {
   findMetaByTroupeId: findMetaByTroupeId,
-  createNewMetaRecord: createNewMetaRecord,
+  createOrUpdateMetaRecord: createOrUpdateMetaRecord,
   roomHasWelcomeMessage: roomHasWelcomeMessage
 };

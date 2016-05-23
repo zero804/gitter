@@ -5,6 +5,7 @@ var Marionette = require('backbone.marionette');
 var ModalView = require('./modal');
 var apiClient = require('components/apiClient');
 var roomSettingsTemplate = require('./tmpl/room-settings-view.hbs');
+var Promise = require('bluebird');
 
 var View = Marionette.ItemView.extend({
   template: roomSettingsTemplate,
@@ -20,7 +21,7 @@ var View = Marionette.ItemView.extend({
 
   initialize: function() {
     this.listenTo(this, 'menuItemClicked', this.menuItemClicked, this);
-    apiClient.room.get('/meta').then(function(meta){
+    apiClient.room.get('/meta/welcome-message').then(function(meta){
       meta = (meta || {});
       var welcomeMessage = (meta.welcomeMessage || {});
       if(!welcomeMessage.text || !welcomeMessage.text.length) { return this.initEmptyTextArea(); }
@@ -36,7 +37,7 @@ var View = Marionette.ItemView.extend({
   menuItemClicked: function(action){
     switch(action) {
       case 'submit':
-        this.formChange();
+        this.formSubmit();
         break;
     }
   },
@@ -62,14 +63,21 @@ var View = Marionette.ItemView.extend({
     this.update();
   },
 
-  formChange: function() {
+  formSubmit: function() {
     var providers             = (this.ui.githubOnly.is(':checked')) ? ['github'] : [];
     var welcomeMessageContent = this.ui.welcomeMessage.val();
-    apiClient.room.put('', { providers: providers, welcomeMessage: welcomeMessageContent })
-      .then(function(updated) {
-        context.setTroupe(updated);
-        this.destroySettings();
-      }.bind(this));
+
+    Promise.all([
+      apiClient.room.put('', { providers: providers }),
+      apiClient.room.put('/meta/welcome-message', { welcomeMessage: welcomeMessageContent }),
+    ])
+    .spread(function(updatedTroupe /*, metaResponse*/){
+      context.setTroupe(updatedTroupe);
+      this.destroySettings();
+    }.bind(this))
+    .catch(function(err){
+      //TODO Handle Error
+    });
   }
 });
 

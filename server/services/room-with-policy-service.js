@@ -248,15 +248,19 @@ RoomWithPolicyService.prototype.joinRoom = secureMethod([allowJoin], function(op
  *  GET room meta/welcome-message
  */
 RoomWithPolicyService.prototype.getRoomWelcomeMessage = secureMethod([allowJoin], function(options){
-  return roomMetaService.findMetaByTroupeId(this.room.id).then(function(res) {
+  return roomMetaService.findMetaByTroupeId(this.room.id)
+  .then(function(res) {
     res = (res || {});
     return { welcomeMessage: (res.welcomeMessage || {}) };
   });
 });
 
 RoomWithPolicyService.prototype.updateRoomWelcomeMessage = secureMethod([allowAdmin], function(options){
-  //TODO rename this method
-  return roomMetaService.createNewMetaRecord(this.room.id, options.welcomeMessage);
+  return roomMetaService.createOrUpdateMetaRecord(this.room.id, { welcomeMessage: options.welcomeMessage})
+  .then(function(res){
+    res = (res || {});
+    return { welcomeMessage: (res.welcomeMessage || {}) };
+  });
 });
 
 module.exports = RoomWithPolicyService;
