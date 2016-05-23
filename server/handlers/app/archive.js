@@ -30,7 +30,7 @@ var ONE_YEAR_MILLISECONDS = ONE_YEAR_SECONDS * 1000;
 var validateRoomForReadOnlyAccess = Promise.method(function(user, room) {
   if(!room) throw new StatusError(404); // Mandatory
 
-  var userId = user._id;
+  var userId = user && user._id;
   var troupeId = room._id;
   return userCanAccessRoom.permissionToRead(userId, troupeId)
     .then(function(access) {
