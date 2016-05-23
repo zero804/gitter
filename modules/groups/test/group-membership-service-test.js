@@ -46,16 +46,17 @@ describe('group-membership-service', function() {
     });
 
     describe('findGroupsForUser', function() {
-      /*
       it('should return all the groups for a user, 1', function() {
-
         return groupMembershipService.findGroupsForUser(fixture.user1._id)
           .then(function(groups) {
-            assert.strictEqual(groups.length, 2);
+            // assert.strictEqual(groups.length, 2);
             var g1 = findGroup(groups, fixture.group1._id);
             var g2 = findGroup(groups, fixture.group3._id);
-            assertGroupEqual(g1, fixture.group1);
-            assertGroupEqual(g2, fixture.group3);
+            console.log('Returned ', g1) // eslint-disable-line
+            console.log('Returned ', g2) // eslint-disable-line
+            console.log('Returned ', groups) // eslint-disable-line
+            // assertGroupEqual(g1, fixture.group1);
+            // assertGroupEqual(g2, fixture.group3);
           });
       });
 
@@ -63,14 +64,16 @@ describe('group-membership-service', function() {
 
         return groupMembershipService.findGroupsForUser(fixture.user2._id)
           .then(function(groups) {
-            assert.strictEqual(groups.length, 2);
+            // assert.strictEqual(groups.length, 2);
             var g1 = findGroup(groups, fixture.group1._id);
             var g2 = findGroup(groups, fixture.group2._id);
-            assertGroupEqual(g1, fixture.group1);
-            assertGroupEqual(g2, fixture.group2);
+            // assertGroupEqual(g1, fixture.group1);
+            // assertGroupEqual(g2, fixture.group2);
+            console.log('Returned ', g1) // eslint-disable-line
+            console.log('Returned ', g2) // eslint-disable-line
+            console.log('Returned ', groups) // eslint-disable-line
           });
       });
-      */
 
       it('should return all the groups for a user without groups', function() {
 
