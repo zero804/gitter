@@ -1,0 +1,4 @@
+#!/bin/bash
+
+docker ps -a  -q|xargs docker rm -f
+docker images -a -q|xargs docker rmi -f
