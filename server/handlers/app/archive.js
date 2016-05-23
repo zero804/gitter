@@ -194,8 +194,9 @@ exports.chatArchive = [
   function(req, res, next) {
     var user = req.user;
     var troupe = req.uriContext.troupe;
+    var policy = req.uriContext.policy;
 
-    return validateRoomForReadOnlyAccess(user, troupe)
+    return validateRoomForReadOnlyAccess(user, policy)
       .then(function() {
         var troupeId = troupe.id;
 
