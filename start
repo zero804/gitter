@@ -8,11 +8,33 @@ set -euo pipefail
 
 DOCKER_MACHINE_NAME=${DOCKER_MACHINE_NAME-default}
 
+function has_local_docker_install {
+  if [[ "$OSTYPE" == "linux-gnu" ]]; then
+    return 0
+  fi
+
+  # Is Docker for Mac running?
+  if (pgrep -f /Applications/Docker.app/Contents/MacOS/Docker > /dev/null); then
+    return 0
+  fi
+
+  return 1
+}
+
+get_local_ip() {
+    local _ip _line
+    while IFS=$': \t' read -a _line ;do
+        [ -z "${_line%inet}" ] &&
+           _ip=${_line[${#_line[1]}>4?1:2]} &&
+           [ "${_ip#127.0.0.1}" ] && echo $_ip && return 0
+      done< <(LANG=C /sbin/ifconfig)
+}
+
 function get_ip {
-  if [[ "$OSTYPE" != "linux-gnu" ]]; then
-    echo "$(docker-machine ip $DOCKER_MACHINE_NAME)"
+  if has_local_docker_install; then
+    get_local_ip
   else
-    ip route get 8.8.8.8 | head -1 | cut -d' ' -f8
+    echo "$(docker-machine ip $DOCKER_MACHINE_NAME)"
   fi
 }
 
@@ -95,8 +117,7 @@ function startDockerServices {
   docker-compose up -d --no-recreate
 }
 
-
-if [[ "$OSTYPE" != "linux-gnu" ]]; then
+if ! has_local_docker_install; then
   startDockerMachine
 fi
 
@@ -117,4 +138,6 @@ setupHostAlias gitter-es-dev    "$DOCKER_HOST_IP"
 
 startDockerServices
 
-docker-machine env "${DOCKER_MACHINE_NAME}"
+if ! has_local_docker_install; then
+  docker-machine env "${DOCKER_MACHINE_NAME}"
+fi

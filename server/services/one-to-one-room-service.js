@@ -15,6 +15,7 @@ var StatusError               = require('statuserror');
 var roomMembershipService     = require('./room-membership-service');
 var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
 var legacyMigration           = require('gitter-web-permissions/lib/legacy-migration');
+var policyFactory             = require('gitter-web-permissions/lib/legacy-policy-factory');
 var debug                     = require('debug')('gitter:one-to-one-room-service');
 
 function getOneToOneRoomQuery(userId1, userId2) {
@@ -28,55 +29,62 @@ function getOneToOneRoomQuery(userId1, userId2) {
   };
 
 }
+
+function findOneToOneRoom(fromUserId, toUserId) {
+  assert(fromUserId, "Need to provide fromUserId");
+  assert(toUserId, "Need to provide toUserId");
+
+  fromUserId = mongoUtils.asObjectID(fromUserId);
+  toUserId = mongoUtils.asObjectID(toUserId);
+
+  if(mongoUtils.objectIDsEqual(fromUserId, toUserId)) throw new StatusError(417); // You cannot be in a troupe with yourself.
+
+  var query = getOneToOneRoomQuery(fromUserId, toUserId);
+
+  /* Find the existing one-to-one.... */
+  return persistence.Troupe.findOne(query)
+    .exec();
+}
+
+
 /**
- * Internal method. Find a room for two users or insert the room in the database.
- *
- * Does not handle any business logic...
- *
+ * Internal method.
+
  * Returns [troupe, existing]
  */
-function findOrInsertNewOneToOneRoom(userId1, userId2) {
+function upsertNewOneToOneRoom(userId1, userId2) {
   var query = getOneToOneRoomQuery(userId1, userId2);
 
-  // First attempt is a simple find...
-  return Troupe.findOne(query)
-    .exec()
-    .then(function(existing) {
-      debug('Found existing room? %s', !!existing);
+  // Second attempt is an upsert
+  var insertFields = {
+    oneToOne: true,
+    status: 'ACTIVE',
+    githubType: 'ONETOONE',
+    oneToOneUsers: [{
+      _id: new ObjectID(),
+      userId: userId1
+    }, {
+      _id: new ObjectID(),
+      userId: userId2
+    }],
+    userCount: 0
+  };
 
-      if (existing) return [existing, true];
+  debug('Attempting upsert for new one-to-one room');
 
-      // Second attempt is an upsert
-      var insertFields = {
-        oneToOne: true,
-        status: 'ACTIVE',
-        githubType: 'ONETOONE',
-        oneToOneUsers: [{
-          _id: new ObjectID(),
-          userId: userId1
-        }, {
-          _id: new ObjectID(),
-          userId: userId2
-        }],
-        userCount: 0
-      };
+  // Upsert returns [model, existing] already
+  return mongooseUtils.upsert(Troupe, query, {
+    $setOnInsert: insertFields
+  })
+  .tap(function(upsertResult) {
+    var troupe = upsertResult[0];
+    var updateExisting = upsertResult[1];
 
-      debug('Attempting upsert for new one-to-one room');
+    if (updateExisting) return;
 
-      // Upsert returns [model, existing] already
-      return mongooseUtils.upsert(Troupe, query, {
-        $setOnInsert: insertFields
-      })
-      .tap(function(upsertResult) {
-        var troupe = upsertResult[0];
-        var updateExisting = upsertResult[1];
-
-        if (updateExisting) return;
-
-        var descriptor = legacyMigration.generatePermissionsForRoom(troupe, null, null);
-        return securityDescriptorService.insertForRoom(troupe._id, descriptor);
-      });
-    });
+    var descriptor = legacyMigration.generatePermissionsForRoom(troupe, null, null);
+    return securityDescriptorService.insertForRoom(troupe._id, descriptor);
+  });
 }
 
 /**
@@ -118,14 +126,13 @@ function addOneToOneUsersToNewRoom(troupeId, fromUserId, toUserId) {
  *
  * @return {[ troupe, other-user ]}
  */
-function findOrCreateOneToOneRoom(fromUserId, toUserId) {
-  assert(fromUserId, "Need to provide fromUserId");
+function findOrCreateOneToOneRoom(fromUser, toUserId) {
+  assert(fromUser, "Need to provide fromUser");
+  assert(fromUser._id, "fromUser invalid");
   assert(toUserId, "Need to provide toUserId");
 
-  fromUserId = mongoUtils.asObjectID(fromUserId);
+  var fromUserId = fromUser._id;
   toUserId = mongoUtils.asObjectID(toUserId);
-
-  if(String(fromUserId) === String(toUserId)) throw new StatusError(417); // You cannot be in a troupe with yourself.
 
   return userService.findById(toUserId)
     .bind({
@@ -134,21 +141,48 @@ function findOrCreateOneToOneRoom(fromUserId, toUserId) {
     })
     .then(function(toUser) {
       if(!toUser) throw new StatusError(404, "User does not exist");
-
       this.toUser = toUser;
-
-      // For now, there is no permissions model between users
-      // There is an implicit connection between these two users,
-      // automatically create the troupe
-      return findOrInsertNewOneToOneRoom(fromUserId, toUserId);
+      return findOneToOneRoom(fromUserId, toUserId);
     })
-    .spread(function(troupe, existing) {
-      debug('findOrCreate existing=%s', existing);
+    .then(function(existingRoom) {
+      if (existingRoom) {
+        return [existingRoom, true];
+      }
+
+      var toUser = this.toUser;
+
+      // Do not allow new rooms to be created for REMOVED users
+      if (toUser.state === 'REMOVED') {
+        var err = new StatusError(404);
+        err.githubType = 'ONETOONE';
+        err.uri = toUser.username;
+        throw err;
+      }
+
+      // TODO: in future we need to add request one-to-one here...
+      return policyFactory.createPolicyForOneToOne(fromUser, toUser)
+        .then(function(policy) {
+          return policy.canJoin();
+        })
+        .then(function(canJoin) {
+          if (!canJoin) {
+            var err = new StatusError(404);
+            err.githubType = 'ONETOONE';
+            err.uri = toUser.username;
+            throw err;
+          }
+
+          return upsertNewOneToOneRoom(fromUserId, toUserId);
+        })
+
+    })
+    .spread(function(troupe, isAlreadyExisting) {
+      debug('findOrCreate isAlreadyExisting=%s', isAlreadyExisting);
 
       var troupeId = troupe._id;
       this.troupe = troupe;
 
-      if (existing) {
+      if (isAlreadyExisting) {
         return ensureFromUserInRoom(troupeId, fromUserId);
       } else {
         stats.event('new_troupe', {
@@ -166,20 +200,8 @@ function findOrCreateOneToOneRoom(fromUserId, toUserId) {
 }
 
 
-function findOneToOneRoom(fromUserId, toUserId) {
-  assert(fromUserId, "Need to provide fromUserId");
-  assert(toUserId, "Need to provide toUserId");
-
-  fromUserId = mongoUtils.asObjectID(fromUserId);
-  toUserId = mongoUtils.asObjectID(toUserId);
-
-  if(String(fromUserId) === String(toUserId)) throw new StatusError(417); // You cannot be in a troupe with yourself.
-
-  /* Find the existing one-to-one.... */
-  return persistence.Troupe.findOne(getOneToOneRoomQuery(fromUserId, toUserId))
-    .exec();
-}
-
 /* Exports */
-exports.findOrCreateOneToOneRoom = Promise.method(findOrCreateOneToOneRoom);
-exports.findOneToOneRoom = Promise.method(findOneToOneRoom);
+module.exports = {
+  findOrCreateOneToOneRoom: Promise.method(findOrCreateOneToOneRoom),
+  findOneToOneRoom: Promise.method(findOneToOneRoom),
+}
