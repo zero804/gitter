@@ -235,8 +235,22 @@ var findBatchInfo = Promise.method(function(batch) {
   var lookups = {};
 
   return Promise.join(
-    findUsersByOwner(lcOwner),
-    findUsersByGitterId(uniqueUserIds[0]), // could be undefined
+    function() {
+      // no need to look this up if we're using the matching gh org or user
+      if (batch.githuborg.length || batch.githubuser.length) {
+        return Promise.resolve(null);
+      } else {
+        return findUsersByOwner(lcOwner);
+      }
+    }(),
+    function() {
+      // ditto
+      if (batch.githuborg.length || batch.githubuser.length) {
+        return Promise.resolve(null);
+      } else {
+        return findUsersByGitterId(uniqueUserIds[0]);
+      }
+    }(),
     function(ownerUsers, roomUsers) {
       var org = batch.githuborg[0]; // could be undefined
       var user = batch.githubuser[0]; // could be undefined
