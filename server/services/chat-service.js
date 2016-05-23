@@ -509,6 +509,17 @@ exports.searchChatMessagesForRoom = function(troupeId, textQuery, options) {
     });
 
 };
+
+exports.removeAllMessagesForUserIdInRoomId = function(userId, roomId) {
+  return ChatMessage.find({ toTroupeId: roomId, fromUserId: userId })
+    .exec()
+    .then(function(messages) {
+      return Promise.map(messages, function(message) {
+        return message.remove();
+      }, { concurrency: 1 });
+    });
+};
+
 exports.testOnly = {
   setUseHints: function(value) {
     useHints = value;

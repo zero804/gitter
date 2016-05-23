@@ -2,7 +2,13 @@
 
 var roomService = require('../../../services/room-service');
 var restSerializer = require("../../../serializers/rest-serializer");
+var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
+var RoomWithPolicyService = require('../../../services/room-with-policy-service');
 
+/**
+ * TODO: this endpoint will go once we break way from
+ * GitHub URIs
+ */
 module.exports = function(req, res, next) {
   var user = req.user;
   var ownerUri = req.body.ownerUri;
@@ -10,13 +16,17 @@ module.exports = function(req, res, next) {
   var channelSecurity = req.body.security || 'INHERITED';
 
   // silently create owner room
-  return roomService.createGithubRoom(user, ownerUri)
-    .then(function(ownerRoom) {
-      // finally create channel
-      return roomService.createCustomChildRoom(ownerRoom, user, { name: channelName, security: channelSecurity });
-    }).then(function(customRoom) {
+  return roomService.createRoomForGitHubUri(user, ownerUri, { skipPostCreationSteps: true })
+    .then(function(result) {
+      var ownerRoom = result.troupe;
+      return [ownerRoom, policyFactory.createPolicyForRoom(req.user, ownerRoom)];
+    })
+    .spread(function(ownerRoom, policy) {
+      var roomWithPolicyService = new RoomWithPolicyService(ownerRoom, user, policy);
+      return roomWithPolicyService.createChannel({ name: channelName, security: channelSecurity });
+    })
+    .then(function(customRoom) {
       var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id });
-
       return restSerializer.serializeObject(customRoom, strategy);
     })
     .then(function(serialized) {
