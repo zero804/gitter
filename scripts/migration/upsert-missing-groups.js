@@ -14,15 +14,19 @@ var groupSecurityDescriptorGenerator = require('gitter-web-permissions/lib/group
 var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
 
 
-function getGroupableRooms() {
+function getGroupableRooms(matchMissingOnly) {
+  var match = {
+    githubType: { $nin: ['ONETOONE'] },
+    oneToOne: { $ne: true },
+    lcOwner: { $exists: true, $ne: null }
+  };
+  if (matchMissingOnly) {
+    match.groupId = { $exists: false };
+  }
+
   return persistence.Troupe.aggregate([
       {
-        $match: {
-          githubType: { $nin: ['ONETOONE'] },
-          oneToOne: { $ne: true },
-          lcOwner: { $exists: true, $ne: null },
-          //groupId: { $exists: false }
-        }
+        $match: match
       },
       {
         $project: {
@@ -217,8 +221,8 @@ function migrate(batch, enc, callback) {
     });
 }
 
-function run(f, callback) {
-  getGroupableRooms()
+function run(f, missingOnly, callback) {
+  getGroupableRooms(missingOnly)
     .pipe(through2.obj(f))
     .on('data', function(batch) {
     })
@@ -247,11 +251,13 @@ function done(error) {
 onMongoConnect()
   .then(function() {
     require('yargs')
-      .command('dry-run', 'Dry run', { }, function() {
-        run(log, done);
+      .boolean('missing')
+      .describe('missing', 'Only handle rooms missing groups.')
+      .command('dry-run', 'Dry run', { }, function(opts) {
+        run(log, opts.missing, done);
       })
-      .command('execute', 'Execute', { }, function() {
-        run(migrate, function(err) {
+      .command('execute', 'Execute', { }, function(opts) {
+        run(migrate, opts.missing, function(err) {
           done(err);
         });
       })
