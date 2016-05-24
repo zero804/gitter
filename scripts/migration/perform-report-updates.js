@@ -193,9 +193,8 @@ onMongoConnect()
     var json = JSON.parse(text);
     return findDuplicates(json.updates)
       .then(function(duplicates) {
-        console.log(duplicates);
         console.log('-------------------------');
-        //return performUpdates(json.updates, duplicates);
+        return performUpdates(json.updates, duplicates);
       });
   })
   .then(function() {
