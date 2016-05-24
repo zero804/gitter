@@ -37,17 +37,17 @@ mongo1:
   links:
     - mongo2
     - mongo3
-  entrypoint: [ "/usr/bin/mongod", "--replSet", "troupeSet", "--journal", "--smallfiles", "--storageEngine=wiredTiger", "--oplogSize=20", "--port=27017" ]
+  entrypoint: [ "/usr/bin/mongod", "--replSet", "troupeSet", "--journal", "--smallfiles", "--storageEngine=wiredTiger", "--oplogSize=20", "--port=27017", "--setParameter", "notablescan=1"]
 
 mongo2:
   image: mongo:3.2
   restart: always
-  entrypoint: [ "/usr/bin/mongod", "--replSet", "troupeSet", "--journal", "--smallfiles", "--storageEngine=wiredTiger", "--oplogSize=20", "--port=27018" ]
+  entrypoint: [ "/usr/bin/mongod", "--replSet", "troupeSet", "--journal", "--smallfiles", "--storageEngine=wiredTiger", "--oplogSize=20", "--port=27018", "--setParameter", "notablescan=1"]
 
 mongo3:
   image: mongo:3.2
   restart: always
-  entrypoint: [ "/usr/bin/mongod", "--replSet", "troupeSet", "--journal", "--smallfiles", "--storageEngine=wiredTiger", "--oplogSize=20", "--port=27019" ]
+  entrypoint: [ "/usr/bin/mongod", "--replSet", "troupeSet", "--journal", "--smallfiles", "--storageEngine=wiredTiger", "--oplogSize=20", "--port=27019", "--setParameter", "notablescan=1"]
 
 mongosetup:
   image: mongo:3.2
