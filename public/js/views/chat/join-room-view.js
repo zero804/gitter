@@ -27,15 +27,7 @@ var JoinRoomView = Marionette.ItemView.extend({
 
   joinRoom: function(e) {
 
-    if(context.roomHasWelcomeMessage()) {
-      return;
-    }
-
-    if (e) {
-      e.preventDefault();
-      e.stopImmediatePropagation();
-    }
-
+    var isEmbedded = false;
     var roomPostOptions = {
       id: context.getTroupeId()
     };
@@ -45,7 +37,21 @@ var JoinRoomView = Marionette.ItemView.extend({
       roomPostOptions.source = parsed.query.source;
     }
     else {
+      isEmbedded = true;
       roomPostOptions.source = '~embed';
+    }
+
+    //If the room has a welcome message
+    //and we aren't in an embedded frame
+    //get outta here and let the browser do its thing
+    if(context.roomHasWelcomeMessage() && !isEmbedded) {
+      return;
+    }
+
+    //Event cancelation
+    if (e) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
     }
 
     return apiClient.user
