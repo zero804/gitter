@@ -3,13 +3,25 @@
 var StatusError = require('statuserror');
 var assert = require('assert');
 
-function generateUserSecurityDescriptor(user/*, options */) {
+function generateUserSecurityDescriptor(user, options) {
+  var githubId = options.githubId;
+  var uri = options.uri;
+  
+  var extraAdmins;
+  if (user.username.toLowerCase() === uri.toLowerCase()) {
+    extraAdmins = [];
+  } else {
+    extraAdmins = [user._id];
+  }
+
   return {
-    type: null,
+    type: 'GH_USER',
     members: 'PUBLIC',
-    admins: 'MANUAL',
+    admins: 'GH_USER_SAME',
     public: true,
-    extraAdmins: [user._id]
+    linkPath: uri,
+    externalId: githubId,
+    extraAdmins: extraAdmins
   };
 }
 

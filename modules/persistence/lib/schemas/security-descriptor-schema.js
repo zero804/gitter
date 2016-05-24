@@ -18,12 +18,13 @@ module.exports = {
         'ONE_TO_ONE',
         'GH_REPO',
         'GH_ORG',
+        'GH_USER'
         // 'GROUP' permissions from group
       ], required: false },
       members: { type: String, enum: [
         'PUBLIC',          // Anyone
         'INVITE',          // Only invited users can join (private)
-        'GH_REPO_ACCESS', // for GH_REPO, must be able to see the repo
+        'GH_REPO_ACCESS',  // for GH_REPO, must be able to see the repo
         'GH_REPO_PUSH',    // for GH_REPO, must have repo push or admin
         'GH_ORG_MEMBER',   // for GH_ORG, must be org member
       ]},
@@ -31,6 +32,7 @@ module.exports = {
         'MANUAL',         // Only users in extraUserIds are admins
         'GH_REPO_PUSH',   // for GH_REPO, must have repo push or admin
         'GH_ORG_MEMBER',  // for GH_ORG, must be org member
+        'GH_USER_SAME'    // For GH_USER, user is same
         // 'GROUP_ADMIN'  // for GROUP, but be a group admin
       ]},
       public: { type: Boolean },
