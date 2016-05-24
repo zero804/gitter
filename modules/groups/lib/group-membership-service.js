@@ -40,12 +40,9 @@ function findGroupsForUser(userId) {
           lcUri: '$group.lcUri'
         }
       }])
-      .read('primary')
+      .read('primaryPreferred')
       .exec()
       .then(function(results) {
-        console.log('>>>>>>>>>>AGGREGATION RETURNED'); // eslint-disable-line
-        console.log(results); // eslint-disable-line
-        console.log('<<<<<<<<<<AGGREGATION RETURNED'); // eslint-disable-line
         return results;
       });
 }
