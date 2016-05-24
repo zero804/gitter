@@ -27,8 +27,7 @@ describe('group-membership-service', function() {
 
   describe('integration tests #slow', function() {
 
-    var fixture = {};
-    before(fixtureLoader(fixture, {
+    var fixture = fixtureLoader.setup({
       group1: {},
       group2: {},
       group3: {},
@@ -39,42 +38,29 @@ describe('group-membership-service', function() {
       troupe2: { users: ['user2'], group: 'group2' },
       troupe3: { users: ['user1'], group: 'group3' },
       troupe4: { users: ['user1', 'user3'] },
-    }));
-
-    after(function() {
-      return fixture.cleanup();
     });
 
     describe('findGroupsForUser', function() {
       it('should return all the groups for a user, 1', function() {
         return groupMembershipService.findGroupsForUser(fixture.user1._id)
           .then(function(groups) {
-            // assert.strictEqual(groups.length, 2);
+            assert.strictEqual(groups.length, 2);
             var g1 = findGroup(groups, fixture.group1._id);
             var g2 = findGroup(groups, fixture.group3._id);
-            console.log('Returned groups', groups) // eslint-disable-line
-            console.log('Returned for group1(', fixture.group1._id, '):', g1) // eslint-disable-line
-            console.log('Returned for group2(', fixture.group3._id, '):', g2) // eslint-disable-line
-            // assertGroupEqual(g1, fixture.group1);
-            // assertGroupEqual(g2, fixture.group3);
+            assertGroupEqual(g1, fixture.group1);
+            assertGroupEqual(g2, fixture.group3);
           });
       });
 
       it('should return all the groups for a user, 2', function() {
-
         return groupMembershipService.findGroupsForUser(fixture.user2._id)
           .then(function(groups) {
-            // assert.strictEqual(groups.length, 2);
+            assert.strictEqual(groups.length, 2);
             var g1 = findGroup(groups, fixture.group1._id);
             var g2 = findGroup(groups, fixture.group2._id);
 
-            console.log('Returned groups', groups) // eslint-disable-line
-
-            console.log('Returned for group1(', fixture.group1._id, '):', g1) // eslint-disable-line
-            console.log('Returned for group2(', fixture.group2._id, '):', g2) // eslint-disable-line
-
-            // assertGroupEqual(g1, fixture.group1);
-            // assertGroupEqual(g2, fixture.group2);
+            assertGroupEqual(g1, fixture.group1);
+            assertGroupEqual(g2, fixture.group2);
           });
       });
 
