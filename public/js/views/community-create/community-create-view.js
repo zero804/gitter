@@ -98,7 +98,10 @@ module.exports = Marionette.LayoutView.extend({
       collection: repoCollection
     });
 
-    this.mainStepViewModel = new CommunityCreateStepViewModel({ active: true });
+    this.mainStepViewModel = new CommunityCreateStepViewModel({
+      active: true,
+      valid: false
+    });
     this.githubProjectsStepViewModel = new CommunityCreateGitHubProjectsStepViewModel({ active: false });
     this.invitePeopleStepViewModel = new CommunityCreateStepViewModel({ active: false });
     this.overviewStepViewModel = new CommunityCreateStepViewModel({ active: false });

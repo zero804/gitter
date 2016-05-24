@@ -14,7 +14,8 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   modelEvents: {
-    'change:active': 'onActiveChange'
+    'change:active': 'onActiveChange',
+    'change:valid': 'onValidChange'
   },
 
   initialize: function(options) {
@@ -26,7 +27,14 @@ module.exports = Marionette.LayoutView.extend({
     toggleClass(this.$el[0], 'active', this.model.get('active'));
   },
 
+  onValidChange: function() {
+    var isValid = this.model.get('valid');
+    toggleClass(this.ui.nextStep[0], 'disabled', !isValid);
+    this.ui.nextStep[0][isValid ? 'removeAttribute' : 'setAttribute']('disabled', 'disabled');
+  },
+
   onRender: function() {
     this.onActiveChange();
+    this.onValidChange();
   }
 });
