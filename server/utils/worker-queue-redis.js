@@ -7,7 +7,7 @@ var stats = env.stats;
 var errorReporter = env.errorReporter;
 
 var resque = require("node-resque");
-var debug = require('debug')('gitter:worker-queue');
+var debug = require('debug')('gitter:infra:worker-queue');
 var shutdown = require('shutdown');
 var Promise = require('bluebird');
 var _ = require('lodash');
@@ -93,7 +93,7 @@ var Queue = function(name, options, loaderFn) {
     self.internalQueue.on('error', function(err) {
       logger.error('worker-queue-redis: queue error ' + err, { exception: err });
     });
-    
+
     self.internalQueue.connect(callback);
 
   }).then(function() {

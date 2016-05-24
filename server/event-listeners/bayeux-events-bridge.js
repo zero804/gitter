@@ -9,7 +9,7 @@ var bayeux            = require('../web/bayeux');
 var ent               = require('ent');
 var presenceService   = require("gitter-web-presence");
 var restSerializer    = require('../serializers/rest-serializer');
-var debug             = require('debug')('gitter:bayeux-events-bridge');
+var debug             = require('debug')('gitter:app:bayeux-events-bridge');
 
 var useDeprecatedChannels = nconf.get('ws:useDeprecatedChannels');
 

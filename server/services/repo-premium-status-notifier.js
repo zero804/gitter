@@ -4,7 +4,7 @@ var troupeDao   = require('./daos/troupe-dao').lean;
 var appEvents   = require('gitter-web-appevents');
 var userService = require('./user-service');
 var roomMembershipService = require('./room-membership-service');
-var debug       = require('debug')('gitter:repo-premium-status-notifier');
+var debug       = require('debug')('gitter:app:repo-premium-status-notifier');
 
 function repoPremiumStatusNotifier(userOrOrg, premiumStatus) {
   return userService.findByUsername(userOrOrg)

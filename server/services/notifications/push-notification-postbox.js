@@ -6,7 +6,7 @@ var winston                     = env.logger;
 var nconf                       = env.config;
 var pushNotificationFilter      = require("gitter-web-push-notification-filter");
 var workerQueue                 = require('../../utils/worker-queue-redis');
-var debug                       = require('debug')('gitter:push-notification-postbox');
+var debug                       = require('debug')('gitter:app:push-notification-postbox');
 var mongoUtils                  = require('gitter-web-persistence-utils/lib/mongo-utils');
 var Promise                     = require('bluebird');
 
