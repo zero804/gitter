@@ -160,7 +160,10 @@
 
 
 .community-create-step-wrapper {
-  overflow: auto;
+  // Because of what seems to be a bug when using transform
+  // that cause scrollbars but go away after causing a layout from a trivial CSS change
+  overflow-x: hidden;
+  overflow-y: auto;
   width: 100%;
   height: 100%;
 
@@ -174,8 +177,7 @@
   will-change: transform, opacity;
   transition:
     visibility 0s ease .2s,
-    opacity .2s ease,
-    transform .2s ease;
+    opacity .2s ease;
 
 
   & > .community-create-step-content-area {
