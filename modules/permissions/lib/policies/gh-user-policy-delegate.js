@@ -13,7 +13,13 @@ GhRepoPolicyDelegate.prototype = {
 
     switch(policyName) {
       case 'GH_USER_SAME':
-        return this._user.username === this._securityDescriptor.linkPath;
+        var currentUserName = this._user.username;
+        if (!currentUserName) return false;
+
+        var linkPath = this._securityDescriptor.linkPath;
+        if (!linkPath) return false;
+
+        return currentUserName.toLowerCase() === linkPath.toLowerCase();
 
       default:
         return false;
