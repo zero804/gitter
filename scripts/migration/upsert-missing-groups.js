@@ -105,7 +105,7 @@ var gatherBatchInfo = Promise.method(function(batch) {
         // mimick only the correct ones according to the owner report and what
         // would happen after we ran the renames. So exact (case-sensitive)
         // match on username with an existing github user only.
-        if (gitterUser.username == batch.githubuser.uri) {
+        if (gitterUser && gitterUser.username == batch.githubuser.uri) {
           batch.gitterUser = gitterUser;
         }
         return info;
