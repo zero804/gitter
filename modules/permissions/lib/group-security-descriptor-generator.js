@@ -3,12 +3,23 @@
 var StatusError = require('statuserror');
 var assert = require('assert');
 
+
+function usernameMatchesUri(user, linkPath) {
+  if (!user) return false;
+  var currentUserName = user.username;
+  if (!currentUserName) return false;
+
+  if (!linkPath) return false;
+
+  return currentUserName.toLowerCase() === linkPath.toLowerCase();
+}
+
 function generateUserSecurityDescriptor(user, options) {
   var githubId = options.githubId;
   var uri = options.uri;
-  
+
   var extraAdmins;
-  if (user.username.toLowerCase() === uri.toLowerCase()) {
+  if (!user || usernameMatchesUri(user, uri)) {
     extraAdmins = [];
   } else {
     extraAdmins = [user._id];

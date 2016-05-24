@@ -8,18 +8,22 @@ function GhRepoPolicyDelegate(user, securityDescriptor) {
   this._fetchPromise = null;
 }
 
+function usernameMatchesUri(user, linkPath) {
+  if (!user) return false;
+  var currentUserName = user.username;
+  if (!currentUserName) return false;
+
+  if (!linkPath) return false;
+
+  return currentUserName.toLowerCase() === linkPath.toLowerCase();
+}
+
 GhRepoPolicyDelegate.prototype = {
   hasPolicy: Promise.method(function(policyName) {
 
     switch(policyName) {
       case 'GH_USER_SAME':
-        var currentUserName = this._user.username;
-        if (!currentUserName) return false;
-
-        var linkPath = this._securityDescriptor.linkPath;
-        if (!linkPath) return false;
-
-        return currentUserName.toLowerCase() === linkPath.toLowerCase();
+        return usernameMatchesUri(this._user, this._securityDescriptor.linkPath);
 
       default:
         return false;
