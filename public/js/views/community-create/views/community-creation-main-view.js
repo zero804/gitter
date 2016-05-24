@@ -75,7 +75,7 @@ module.exports = CommunityCreateBaseStepView.extend({
   }),
 
   modelEvents: _.extend({}, CommunityCreateBaseStepView.prototype.modelEvents, {
-    'change:communityName': 'updateCommunityFields'
+
   }),
 
   initialize: function(options) {
@@ -84,8 +84,8 @@ module.exports = CommunityCreateBaseStepView.extend({
     this.orgCollection = options.orgCollection;
     this.repoCollection = options.repoCollection;
 
-    this.listenTo(this.communityCreateModel, 'change:communityName', this.updateCommunityFields, this);
-    this.listenTo(this.communityCreateModel, 'change:communitySlug', this.updateCommunityFields, this);
+    this.listenTo(this.communityCreateModel, 'change:communityName change:communitySlug', this.updateCommunityFields, this);
+    this.listenTo(this.communityCreateModel, 'change:communityName change:communitySlug', this.validateStep, this);
   },
 
 
@@ -100,8 +100,21 @@ module.exports = CommunityCreateBaseStepView.extend({
     return data;
   },
 
+  validateStep: function() {
+    var hasCommunityName = this.communityCreateModel.get('communityName').length;
+    var hasCommunitySlug = this.communityCreateModel.get('communitySlug').length;
+    this.model.set({
+      valid: hasCommunityName && hasCommunitySlug
+    });
+  },
+
   onStepNext: function() {
-    this.communityCreateModel.set('stepState', this.communityCreateModel.STEP_CONSTANT_MAP.invite);
+    this.validateStep();
+    var isValid = this.model.get('valid');
+
+    if(isValid) {
+      this.communityCreateModel.set('stepState', this.communityCreateModel.STEP_CONSTANT_MAP.invite);
+    }
   },
 
   onGitHubProjectLinkActivated: function(e) {
