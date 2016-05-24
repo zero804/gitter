@@ -11,7 +11,7 @@ var _             = require('lodash');
 var Promise       = require('bluebird');
 var lazy          = require('lazy.js');
 var moment        = require('moment');
-var debug         = require('debug')('gitter:unread-items:engine');
+var debug         = require('debug')('gitter:app:unread-items:engine');
 var redisClient   = redis.getClient();
 var scriptManager = new Scripto(redisClient);
 

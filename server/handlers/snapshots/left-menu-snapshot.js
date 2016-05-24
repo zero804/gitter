@@ -9,9 +9,15 @@ module.exports = function getSnapshotsForPageContext(req, troupeContext, rooms) 
   var currentRoomId  = currentRoom.id;
   var minibarOrgList = suggestedOrgsFromRoomList(rooms, req.uriContext.uri, currentRoomId, currentRoom);
 
-  var preserveLeftMenuState = (req.query.preserveLeftMenuState || '').toLowerCase();
+  // `?preserveLeftMenuState=true/false` or a session variable
   // We only accept explicit `true`/`false` values
+  var preserveLeftMenuState = (req.query.preserveLeftMenuState || '').toLowerCase();
   var shouldPreserveState = preserveLeftMenuState === 'true' ? true : (preserveLeftMenuState === 'false' ? false : undefined);
+  if(shouldPreserveState === undefined) {
+    shouldPreserveState = req.session.preserveLeftMenuState;
+  }
+  // Clear it out after use so we don't use it on subsequent requests
+  delete req.session.preserveLeftMenuState;
 
   return {
     rooms:    rooms,

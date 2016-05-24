@@ -13,7 +13,7 @@ var roomMembershipService = require('../room-membership-service');
 var mongoUtils            = require('gitter-web-persistence-utils/lib/mongo-utils');
 var RedisBatcher          = require('../../utils/redis-batcher').RedisBatcher;
 var recentRoomCore        = require('../core/recent-room-core');
-var debug                 = require('debug')('gitter:unread-items:service');
+var debug                 = require('debug')('gitter:app:unread-items:service');
 var badgeBatcher          = new RedisBatcher('badge', 1000, batchBadgeUpdates);
 var distributionDelta     = require('./distribution-delta');
 
