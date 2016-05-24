@@ -52,9 +52,9 @@ describe('group-membership-service', function() {
             // assert.strictEqual(groups.length, 2);
             var g1 = findGroup(groups, fixture.group1._id);
             var g2 = findGroup(groups, fixture.group3._id);
-            console.log('Returned ', g1) // eslint-disable-line
-            console.log('Returned ', g2) // eslint-disable-line
-            console.log('Returned ', groups) // eslint-disable-line
+            console.log('Returned groups', groups) // eslint-disable-line
+            console.log('Returned for group1(', fixture.group1._id, '):', g1) // eslint-disable-line
+            console.log('Returned for group2(', fixture.group3._id, '):', g2) // eslint-disable-line
             // assertGroupEqual(g1, fixture.group1);
             // assertGroupEqual(g2, fixture.group3);
           });
@@ -67,11 +67,14 @@ describe('group-membership-service', function() {
             // assert.strictEqual(groups.length, 2);
             var g1 = findGroup(groups, fixture.group1._id);
             var g2 = findGroup(groups, fixture.group2._id);
+
+            console.log('Returned groups', groups) // eslint-disable-line
+
+            console.log('Returned for group1(', fixture.group1._id, '):', g1) // eslint-disable-line
+            console.log('Returned for group2(', fixture.group2._id, '):', g2) // eslint-disable-line
+
             // assertGroupEqual(g1, fixture.group1);
             // assertGroupEqual(g2, fixture.group2);
-            console.log('Returned ', g1) // eslint-disable-line
-            console.log('Returned ', g2) // eslint-disable-line
-            console.log('Returned ', groups) // eslint-disable-line
           });
       });
 
