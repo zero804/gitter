@@ -1,7 +1,7 @@
 "use strict";
 
 var onMongoConnect = require('../utils/on-mongo-connect');
-var debug = require('debug')('gitter:workers');
+var debug = require('debug')('gitter:infra:workers');
 
 var listening = false;
 

@@ -2,10 +2,10 @@
 
 var env = require('gitter-web-env');
 var nconf = env.config;
-var StatusError  = require('statuserror');
+var StatusError = require('statuserror');
 var troupeService = require('./troupe-service');
 var persistence = require('gitter-web-persistence');
-var debug = require('debug')('gitter:assert-room-limit');
+var debug = require('debug')('gitter:app:assert-room-limit');
 var Promise = require('bluebird');
 var roomMembershipService = require('./room-membership-service');
 
