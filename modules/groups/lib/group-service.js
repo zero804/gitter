@@ -62,8 +62,7 @@ function upsertGroup(user, options) {
           uri: uri,
           type: type,
           githubId: githubId,
-          security: options.security,
-        }, user);
+        });
 
       return securityDescriptorService.insertForGroup(group._id, securityDescriptor)
         .return(group);

@@ -105,14 +105,14 @@ describe('group-service', function() {
             return securityDescriptorService.getForGroupUser(group._id, fixture.user1._id);
           })
           .then(function(securityDescriptor) {
-            assert.strictEqual(securityDescriptor.admins, 'MANUAL');
-            assert.strictEqual(securityDescriptor.externalId, null);
-            assert.strictEqual(securityDescriptor.extraAdmins.length, 1);
-            assert(mongoUtils.objectIDsEqual(securityDescriptor.extraAdmins[0], fixture.user1._id));
+            assert.strictEqual(securityDescriptor.admins, 'GH_USER_SAME');
+            assert.strictEqual(securityDescriptor.externalId, fixtureLoader.GITTER_INTEGRATION_USER_ID);
+            assert(!securityDescriptor.extraAdmins);
             assert.equal(securityDescriptor.public, true);
             assert.equal(securityDescriptor.members, 'PUBLIC');
-            assert.equal(securityDescriptor.type, null);
-          })
+            assert.equal(securityDescriptor.linkPath, fixtureLoader.GITTER_INTEGRATION_USERNAME);
+            assert.equal(securityDescriptor.type, 'GH_USER');
+          });
 
         });
       });
