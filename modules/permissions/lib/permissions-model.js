@@ -11,7 +11,7 @@ var oneToOnePermissionsModel    = require('./models/one-to-one-permissions-model
 var orgChannelPermissionsModel  = require('./models/org-channel-permissions-model');
 var repoChannelPermissionsModel = require('./models/repo-channel-permissions-model');
 var userChannelPermissionsModel = require('./models/user-channel-permissions-model');
-var debug                       = require('debug')('gitter:permissions-model');
+var debug                       = require('debug')('gitter:app:permissions-model');
 var appEvents                   = require('gitter-web-appevents');
 
 function checkBan(user, uri) {

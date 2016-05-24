@@ -5,7 +5,7 @@ var pushNotificationGateway      = require("../../gateways/push-notification-gat
 var serializer                   = require("../../serializers/notification-serializer");
 var notificationMessageGenerator = require('./notification-message-generator');
 var unreadItemService            = require('../unread-items');
-var debug                        = require('debug')('gitter:push-notification-generator');
+var debug                        = require('debug')('gitter:app:push-notification-generator');
 var Promise                      = require('bluebird');
 var _                            = require('lodash');
 

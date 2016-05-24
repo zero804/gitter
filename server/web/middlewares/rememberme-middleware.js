@@ -10,7 +10,7 @@ var uuid            = require('node-uuid');
 var sechash         = require('sechash');
 var userService     = require('../../services/user-service');
 var useragentTagger = require('../../utils/user-agent-tagger');
-var debug           = require('debug')('gitter:rememberme-middleware');
+var debug           = require('debug')('gitter:infra:rememberme-middleware');
 var userScopes      = require('gitter-web-identity/lib/user-scopes');
 
 var cookieName = nconf.get('web:cookiePrefix') + 'auth';
