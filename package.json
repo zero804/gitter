@@ -74,6 +74,7 @@
     "intercom-stream": "^1.0.0",
     "intercom.io": "~0.0.8",
     "ioredis": "^1.10.0",
+    "jsonstream": "^1.0.3",
     "jwt-simple": "~0.1.0",
     "keyword-extractor": "0.0.9",
     "langs": "^1.0.1",
