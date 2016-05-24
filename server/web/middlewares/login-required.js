@@ -3,7 +3,7 @@
 var env = require('gitter-web-env');
 var logger = env.logger;
 var url = require('url');
-var debug = require('debug')('gitter:login-required-middleware');
+var debug = require('debug')('gitter:infra:login-required-middleware');
 
 var validAuthProviders = {
   github: true,

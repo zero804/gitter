@@ -16,7 +16,7 @@ var roomMembershipService     = require('./room-membership-service');
 var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
 var legacyMigration           = require('gitter-web-permissions/lib/legacy-migration');
 var policyFactory             = require('gitter-web-permissions/lib/legacy-policy-factory');
-var debug                     = require('debug')('gitter:one-to-one-room-service');
+var debug                     = require('debug')('gitter:app:one-to-one-room-service');
 
 function getOneToOneRoomQuery(userId1, userId2) {
   // Need to use $elemMatch due to a regression in Mongo 2.6, see https://jira.mongodb.org/browse/SERVER-13843

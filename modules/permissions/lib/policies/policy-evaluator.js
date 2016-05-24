@@ -7,7 +7,7 @@ var _ = require('lodash');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var policyCheckRateLimiter = require('./policy-check-rate-limiter');
 var PolicyDelegateTransportError = require('./policy-delegate-transport-error');
-var debug = require('debug')('gitter:permissions:policy-evaluator');
+var debug = require('debug')('gitter:app:permissions:policy-evaluator');
 
 var SUCCESS_RESULT_CACHE_TIME = 5 * 60; // 5 minutes in seconds
 

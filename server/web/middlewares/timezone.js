@@ -4,7 +4,7 @@ var env           = require('gitter-web-env');
 var logger        = env.logger;
 var errorReporter = env.errorReporter;
 var userService   = require('../../services/user-service');
-var debug         = require('debug')('gitter:timezone-middleware');
+var debug         = require('debug')('gitter:infra:timezone-middleware');
 
 function parseOffset(value) {
   if (value.length !== 5) return;

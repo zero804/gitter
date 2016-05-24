@@ -1,7 +1,7 @@
 "use strict";
 
 var apn = require('apn');
-var debug = require('debug')('gitter:ios-notification-gateway');
+var debug = require('debug')('gitter:infra:ios-notification-gateway');
 var env = require('gitter-web-env');
 var Promise = require('bluebird');
 var pushNotificationService = require('../services/push-notification-service');

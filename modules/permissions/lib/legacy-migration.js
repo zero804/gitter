@@ -2,7 +2,7 @@
 
 var StatusError = require('statuserror');
 var securityDescriptorValidator = require('./security-descriptor-validator');
-var debug = require('debug')('gitter:permissions:legacy-migration');
+var debug = require('debug')('gitter:app:permissions:legacy-migration');
 
 /**
  * This module helps migrating from the old world of permissions

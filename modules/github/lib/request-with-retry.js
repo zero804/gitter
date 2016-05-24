@@ -3,7 +3,7 @@
 var env = require('gitter-web-env');
 var logger = env.logger;
 var stats = env.stats;
-var debug = require('debug')('gitter:github');
+var debug = require('debug')('gitter:infra:github');
 
 module.exports = exports = function(options) {
   var maxRetries = options.maxRetries || 4;
