@@ -2,7 +2,7 @@
 
 var collections = require("../utils/collections");
 var Promise = require('bluebird');
-var debug = require('debug')('gitter:serializer:id-loader');
+var debug = require('debug')('gitter:infra:serializer:id-loader');
 var Lazy = require('lazy.js');
 
 function idStrategyGenerator(name, FullObjectStrategy, loaderFunction) {

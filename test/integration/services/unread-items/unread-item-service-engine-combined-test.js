@@ -6,7 +6,7 @@ var assert      = require('assert');
 var mongoUtils  = require('gitter-web-persistence-utils/lib/mongo-utils');
 var randomSeed  = require('random-seed');
 var _           = require('lodash');
-var debug       = require('debug')('gitter:unread-item-service-engine-combined-tests');
+var debug       = require('debug')('gitter:tests:unread-item-service-engine-combined-tests');
 var Lazy        = require('lazy.js');
 
 var TEST_ITERATIONS = parseInt(process.env.UNREAD_ENGINE_TEST_ITERATIONS, 10) || 200;

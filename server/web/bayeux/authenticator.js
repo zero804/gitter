@@ -16,7 +16,7 @@ var bayeuxExtension   = require('./extension');
 var clientUsageStats  = require('../../utils/client-usage-stats');
 var appVersion        = require('gitter-app-version');
 var useragent         = require('useragent');
-var debug             = require('debug')('gitter:bayeux-authenticator');
+var debug             = require('debug')('gitter:app:bayeux-authenticator');
 
 function getConnectionType(incoming) {
   if(!incoming) return 'online';

@@ -16,7 +16,7 @@ var collections                  = require('../../utils/collections');
 var mongoUtils                   = require('gitter-web-persistence-utils/lib/mongo-utils');
 var emailNotificationService     = require('../email-notification-service');
 var userSettingsService          = require('../user-settings-service');
-var debug                        = require('debug')('gitter:email-notification-generator-service');
+var debug                        = require('debug')('gitter:app:email-notification-generator-service');
 var userScopes                   = require('gitter-web-identity/lib/user-scopes');
 
 var filterTestValues = config.get('notifications:filterTestValues');
