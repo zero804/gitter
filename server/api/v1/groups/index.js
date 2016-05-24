@@ -4,6 +4,7 @@ var restful = require("../../../services/restful");
 var StatusError = require('statuserror');
 var groupService = require('gitter-web-groups/lib/group-service');
 var restSerializer = require('../../../serializers/rest-serializer');
+var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 
 module.exports = {
   id: 'group',
@@ -24,7 +25,8 @@ module.exports = {
     }
 
     if (!req.authInfo || !req.authInfo.clientKey === 'web-internal') {
-      throw new StatusError(403, 'This is a private API');
+      // This is a private API
+      throw new StatusError(404);
     }
 
     var uri = String(req.body.uri);
@@ -41,15 +43,25 @@ module.exports = {
     return restSerializer.serializeObject(group, strategy);
   },
 
-  put: function(req) {
-    var group = req.params.group;
-    var user = req.user;
-    var userId = user && user._id;
+  load: function(req, id) {
+    return policyFactory.createPolicyForGroupId(req.user, id)
+      .then(function(policy) {
+        // TODO: middleware?
+        req.userGroupPolicy = policy;
+
+        return req.method === 'GET' ?
+          policy.canRead() :
+          policy.canWrite();
+      })
+      .then(function(access) {
+        if (!access) return null;
+
+        return groupService.findById(id);
+      });
   },
 
-  load: function(req, id) {
-    // TODO: security
-    return groupService.findById(id);
-  },
+  subresources: {
+    'rooms': require('./rooms'),
+  }
 
 };
