@@ -118,21 +118,45 @@ describe('group-service', function() {
 
     describe('findRoomsIdForGroup', function() {
       var fixture = fixtureLoader.setup({
+        user1: {},
+        user2: {},
         group1: {},
-        troupe1: { group: 'group1' },
-        troupe2: { group: 'group1' },
-        group2: {}
+        troupe1: { group: 'group1', security: 'PUBLIC' },
+        troupe2: { group: 'group1', security: 'PUBLIC' },
+        troupe3: { group: 'group1', security: 'PRIVATE', users: ['user1'] },
+        troupe4: { group: 'group1', security: 'PRIVATE' },
       });
 
-      it('should find the roomsIds a group', function() {
+      it('should find the roomIds for group', function() {
         return groupService.findRoomsIdForGroup(fixture.group1._id)
           .then(function(roomIds) {
             assert.deepEqual(roomIds.map(String), [
               fixture.troupe1.id,
-              fixture.troupe2.id
+              fixture.troupe2.id,
             ]);
           });
-      })
+      });
+
+      it('should find the roomIds for group and user with troupes', function() {
+        return groupService.findRoomsIdForGroup(fixture.group1._id, fixture.user1._id)
+          .then(function(roomIds) {
+            assert.deepEqual(roomIds.map(String), [
+              fixture.troupe1.id,
+              fixture.troupe2.id,
+              fixture.troupe3.id
+            ]);
+          });
+      });
+
+      it('should find the roomIds for group and user without troupes', function() {
+        return groupService.findRoomsIdForGroup(fixture.group1._id, fixture.user2._id)
+          .then(function(roomIds) {
+            assert.deepEqual(roomIds.map(String), [
+              fixture.troupe1.id,
+              fixture.troupe2.id,
+            ]);
+          });
+      });
     });
 
   });
