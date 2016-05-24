@@ -4,7 +4,7 @@ var fs = require('fs');
 var path = require('path');
 var env = require('gitter-web-env');
 var config = env.config;
-var debug = require('debug')('gitter:push-notification-filter');
+var debug = require('debug')('gitter:app:push-notification-filter');
 var redisClient = env.ioredis.createClient(null);
 
 var minimumUserAlertIntervalS = config.get("notifications:minimumUserAlertInterval");

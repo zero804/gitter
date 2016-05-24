@@ -2,7 +2,7 @@
 
 var env             = require('gitter-web-env');
 var nconf           = env.config;
-var debug           = require('debug')('gitter:split-tests');
+var debug           = require('debug')('gitter:infra:split-tests');
 
 var ONE_WEEK = 7 * 86400000;
 

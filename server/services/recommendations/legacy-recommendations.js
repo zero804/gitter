@@ -8,7 +8,7 @@ var _                     = require('underscore');
 var collections           = require('../../utils/collections');
 var recommendations       = require('./index');
 var roomMembershipService = require('../room-membership-service');
-var debug                 = require('debug')('gitter:legacy-recommendations');
+var debug                 = require('debug')('gitter:app:recommendations:legacy-recommendations');
 
 var MAX_RECOMMENDATIONS = 20;
 
