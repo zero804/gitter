@@ -145,7 +145,6 @@ describe('restful #slow', function() {
 
 
   describe('serializeGroupsForUserId', function() {
-
     it('should do what it says on the tin', function() {
       return restful.serializeGroupsForUserId(fixture.user1.id)
         .then(function(result) {
@@ -156,7 +155,26 @@ describe('restful #slow', function() {
           }]);
         });
     });
+  });
 
+  describe('serializeRoomsForGroupId', function() {
+    var fixture = fixtureLoader.setup({
+      group1: {},
+      user1: { },
+      troupe1: { group: 'group1', users: ['user1'] },
+      troupe2: { group: 'group1' },
+    });
+
+    it('should serializer the rooms for a group', function() {
+      return restful.serializeRoomsForGroupId(fixture.group1._id, fixture.user1._id)
+        .then(function(result) {
+          assert.strictEqual(result.length, 2);
+          var v1 = result[0];
+          var v2 = result[1];
+          assert.strictEqual(v1.roomMember, true);
+          assert.strictEqual(v2.roomMember, false);
+        });
+    });
   });
 
 });

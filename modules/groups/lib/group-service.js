@@ -2,6 +2,7 @@
 
 var Promise = require('bluebird');
 var Group = require('gitter-web-persistence').Group;
+var Troupe = require('gitter-web-persistence').Troupe;
 var assert = require('assert');
 var validateGroupName = require('gitter-web-validators/lib/validate-group-name');
 var validateGroupUri = require('gitter-web-validators/lib/validate-group-uri');
@@ -174,10 +175,24 @@ function ensureGroupForGitHubRoomCreation(user, options) {
     });
 }
 
+function findRoomsIdForGroup(groupId, userId) {
+  // TODO: only show visible rooms
+  return Troupe.distinct('_id', { groupId: groupId })
+    .lean()
+    .exec()
+    .then(function(results) {
+      if (!userId) return results;
+
+      // TODO: add private rooms
+      return results;
+    });
+}
+
 module.exports = {
   findByUri: Promise.method(findByUri),
   findById: Promise.method(findById),
   createGroup: Promise.method(createGroup),
+  findRoomsIdForGroup: Promise.method(findRoomsIdForGroup),
   migration: {
     upsertGroup: upsertGroup,
     ensureGroupForGitHubRoomCreation: ensureGroupForGitHubRoomCreation
