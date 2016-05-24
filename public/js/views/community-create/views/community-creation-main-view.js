@@ -152,7 +152,7 @@ module.exports = CommunityCreateBaseStepView.extend({
     var isSlugEmpty = !currentSlug || currentSlug.length === 0;
     if(isSlugEmpty || !isUsingCustomSlug) {
       this.communityCreateModel.set({
-        communitySlug: slugify(newCommunityName),
+        communitySlug: slugify(newCommunityName.toLowerCase()),
         // Reset back if we started doing an automatic slug again
         isUsingCustomSlug: isSlugEmpty ? false : isUsingCustomSlug
       });
