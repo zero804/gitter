@@ -4,6 +4,7 @@ process.env.DISABLE_API_LISTEN = '1';
 
 var Promise = require('bluebird');
 var fixtureLoader = require('../integration/test-fixtures');
+var assert = require('assert');
 
 describe('group-api', function() {
   var app, request;
@@ -25,26 +26,37 @@ describe('group-api', function() {
       accessToken: 'web-internal'
     },
     group1: {},
-    troupe1: {}
+    troupe1: { group: 'group1' }
   }));
 
   after(function() {
     return fixture.cleanup();
   });
 
-  it('GET /', function() {
+  it('GET /v1/groups', function() {
     return request(app)
       .get('/v1/groups')
       .set('x-access-token', fixture.user1.accessToken)
       .expect(200)
   });
 
-  it('POST /', function() {
+  it('POST /v1/groups', function() {
     return request(app)
       .post('/v1/groups')
       .send({ uri: fixtureLoader.GITTER_INTEGRATION_ORG, name: 'Test' })
       .set('x-access-token', fixture.user1.accessToken)
       .expect(200)
   });
+
+  it('GET /v1/groups/:groupId/rooms', function() {
+    return request(app)
+      .get('/v1/groups/' + fixture.group1.id + '/rooms')
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+      .then(function(result) {
+        assert(result.body.length > 0);
+      })
+  });
+
 
 })
