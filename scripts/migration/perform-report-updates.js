@@ -97,16 +97,6 @@ function performUpdates(updates, duplicates) {
   }, { concurrency: 3 });
 }
 
-
-var opts = require('yargs')
-  .option('input', {
-    required: true,
-    description: 'where to find the json report'
-  })
-  .help('help')
-  .alias('help', 'h')
-  .argv;
-
 function lookupUsername(username) {
   // case-insensitive just in case
   var lcUsername = username.toLowerCase();
@@ -127,15 +117,28 @@ function findDuplicates(updates) {
 
   var newUsernameMap = {};
   var newLcUriMap = {};
+  var renamedLcUsernameMap = {};
+  var renamedLcUriMap = {};
   updates.forEach(function(update) {
     if (update.type === 'rename-user') {
+      if (update.newUsername.toLowerCase() !== update.oldUsername.toLowerCase()) {
+        // the username changed in more than just case
+        renamedLcUsernameMap[update.newUsername.toLowerCase()] = true;
+      }
+
       if (newUsernameMap[update.newUsername]) {
         duplicateUsernames[update.newUsername] = true;
         console.log("duplicate username", update.newUsername);
       } else {
         newUsernameMap[update.newUsername] = true;
       }
+
     } else if (update.type === 'rename-room') {
+      if (update.newLcUri !== update.oldUri.toLowerCase()) {
+        // the room changed in more than just case
+        renamedLcUriMap[update.newLcUri] = true;
+      }
+
       if (newLcUriMap[update.newLcUri]) {
         duplicateLcUris[update.newLcUri] = true;
         console.log("duplicate lcUri", update.newLcUri);
@@ -145,8 +148,12 @@ function findDuplicates(updates) {
     }
   });
 
-  var usernames = Object.keys(newUsernameMap);
-  var lcUris = Object.keys(newLcUriMap);
+  // these will only be looking up usernames and uris that changed in more than
+  // case, otherwise we'll just find the same users and rooms..
+  var usernames = Object.keys(renamedLcUsernameMap);
+  var lcUris = Object.keys(renamedLcUriMap);
+  console.log("looking up", usernames.length, "usernames");
+  console.log("looking up", lcUris.length, "uris");
   return Promise.join(
     Promise.map(usernames, lookupUsername, { concurrency: 10 }),
     Promise.map(lcUris, lookupRoomUris, { concurrency: 10 }),
@@ -154,10 +161,12 @@ function findDuplicates(updates) {
       users = _.filter(users);
       rooms = _.filter(rooms);
       users.forEach(function(user) {
-        duplicateUsernames[user.newUsername] = true;
+        // if there's already a username like this, then it is a duplicate
+        duplicateUsernames[user.username] = true;
         console.log("duplicate username", user.username);
       });
       rooms.forEach(function(room) {
+        // if there is already a room uri like this, then it is a duplicate
         duplicateLcUris[room.lcUri] = true;
         console.log("duplicate room", room.uri);
       });
@@ -166,10 +175,17 @@ function findDuplicates(updates) {
         usernames: duplicateUsernames,
         lcUris: duplicateLcUris
       }
-    }
-    );
+    });
 }
 
+var opts = require('yargs')
+  .option('input', {
+    required: true,
+    description: 'where to find the json report'
+  })
+  .help('help')
+  .alias('help', 'h')
+  .argv;
 
 onMongoConnect()
   .then(function() {
@@ -177,8 +193,9 @@ onMongoConnect()
     var json = JSON.parse(text);
     return findDuplicates(json.updates)
       .then(function(duplicates) {
+        console.log(duplicates);
         console.log('-------------------------');
-        return performUpdates(json.updates, duplicates);
+        //return performUpdates(json.updates, duplicates);
       });
   })
   .then(function() {
