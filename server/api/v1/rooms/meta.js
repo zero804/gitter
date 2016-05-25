@@ -3,6 +3,7 @@
 var _ = require('lodash');
 var RoomWithPolicyService = require('../../../services/room-with-policy-service');
 var troupeService = require('../../../services/troupe-service');
+var StatusError = require('statuserror');
 
 module.exports = {
   id: 'roomMetaKey',
