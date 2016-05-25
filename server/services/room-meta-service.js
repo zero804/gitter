@@ -11,22 +11,14 @@ function findMetaByTroupeId(troupeId, metaKey) {
   assert(mongoUtils.isLikeObjectId(troupeId));
   assert(metaKey);
   troupeId = mongoUtils.asObjectID(troupeId);
-  return persistence.TroupeMeta.findOne({ troupeId: troupeId }).select(metaKey).exec();
-}
-
-function roomHasWelcomeMessage(troupeId){
-  assert(mongoUtils.isLikeObjectId(troupeId));
-  troupeId = mongoUtils.asObjectID(troupeId);
-
-  return  persistence.TroupeMeta.findOne({ troupeId: troupeId })
-    .then(function(meta){
-      meta = (meta || {});
-      meta.welcomeMessage = (meta.welcomeMessage || {});
-      return !!meta.welcomeMessage.text && !!meta.welcomeMessage.text.length;
+  return persistence.TroupeMeta.findOne({ troupeId: troupeId }).select(metaKey)
+    .exec()
+    .then(function(result){
+      return result[metaKey];
     });
 }
 
-function createOrUpdateMetaRecord(troupeId, data) {
+function upsertMetaKey(troupeId, data) {
   assert(mongoUtils.isLikeObjectId(troupeId));
   troupeId = mongoUtils.asObjectID(troupeId);
 
@@ -52,6 +44,5 @@ function createOrUpdateMetaRecord(troupeId, data) {
 
 module.exports = {
   findMetaByTroupeId: findMetaByTroupeId,
-  createOrUpdateMetaRecord: createOrUpdateMetaRecord,
-  roomHasWelcomeMessage: roomHasWelcomeMessage
+  upsertMetaKey: upsertMetaKey,
 };

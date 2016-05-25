@@ -69,16 +69,18 @@ exports.generateTroupeContext = function(req, extras) {
     user ? serializeUser(user) : null,
     troupe ? serializeTroupe(troupe, user) : undefined,
     determineDesktopNotifications(user, req),
-    troupe && troupe._id ? roomMetaService.roomHasWelcomeMessage(troupe._id) : false,
+    troupe && troupe._id ? roomMetaService.findMetaByTroupeId(troupe._id, 'welcomeMessage') : false,
   ])
-  .spread(function(serializedUser, serializedTroupe, desktopNotifications, roomHasWelcomeMessage) {
+  .spread(function(serializedUser, serializedTroupe, desktopNotifications, welcomeMessage) {
+
+    welcomeMessage = (welcomeMessage || { text: '' });
 
     return createTroupeContext(req, {
       user: serializedUser,
       troupe: serializedTroupe,
       desktopNotifications: desktopNotifications,
       extras: extras,
-      roomHasWelcomeMessage: roomHasWelcomeMessage,
+      roomHasWelcomeMessage: !!welcomeMessage.text && !!welcomeMessage.text.length,
     });
   });
 };
