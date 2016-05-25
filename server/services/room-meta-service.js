@@ -22,7 +22,7 @@ function upsertMetaKey(troupeId, metaKey, value) {
   troupeId = mongoUtils.asObjectID(troupeId);
     var query = { $set: {}};
     query.$set[metaKey] = value;
-    return persistence.TroupeMeta.findOneAndUpdate({ troupeId: troupeId }, query, { upsert: true });
+    return persistence.TroupeMeta.findOneAndUpdate({ troupeId: troupeId }, query, { upsert: true }).exec();
 }
 
 module.exports = {
