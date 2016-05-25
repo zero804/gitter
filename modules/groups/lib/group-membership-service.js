@@ -13,7 +13,7 @@ function findGroupsForUser(userId) {
   return TroupeUser.aggregate([
       { $match: { userId: userId } },
       { $project: { troupeId: 1 } },
-      { 
+      {
         /* Join the troupes onto TroupeUser */
         $lookup: {
           from: 'troupes',
