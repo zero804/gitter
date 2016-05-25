@@ -8,7 +8,7 @@ describe('validate-room-name', function() {
   var FIXTURES = {
     '321212332-1231223': true,
     'hasunderscoreatend_': true,
-    '_underscoreatstart': false,
+    '_underscoreatstart': true,
     'anythingwitha~': false,
     'anythingwitha@': false,
     '😗': false,

@@ -172,8 +172,9 @@ function getOwnerFromRepoFullName(repoName) {
   var owner = repoName.split('/')[0];
   return owner;
 }
+
 /**
- * During communities API migration phase, finds or creates a room for the
+ * During communities API migration phase, finds or creates a group for the
  * given uri.
  */
 function ensureGroupForGitHubRoom(user, githubType, uri) {
@@ -204,6 +205,7 @@ function doPostRoomCreationMigrationSteps(troupe) {
   var descriptor = legacyMigration.generatePermissionsForRoom(troupe, null, null);
   return securityDescriptorService.insertForRoom(troupe._id, descriptor);
 }
+
 /**
  * Assuming that oneToOne uris have been handled already,
  * Figure out what this troupe is for
@@ -708,14 +710,30 @@ function createRoomChannel(parentTroupe, user, options) {
       validate.fail('Invalid security option: ' + security);
   }
 
-  return createChannel(user, null, {
-    uri: uri,
-    security: options.security,
-    githubType: githubType,
-  });
+  return Promise.try(function() {
+      if (parentTroupe.groupId) return parentTroupe.groupId;
+
+      // The parent troupe does not have a groupId, but it should
+      // so, create the group add the parent to the group and
+      // the user the same groupId in the creation of this room
+      return groupService.migration.ensureGroupForRoom(parentTroupe, user)
+        .then(function(group) {
+          return group && group._id;
+        });
+    })
+    .then(function(groupId) {
+      return createChannel(user, null, {
+        uri: uri,
+        security: options.security,
+        githubType: githubType,
+        groupId: groupId
+      });
+    })
 }
 
-
+/**
+ * Create a channel under a user
+ */
 function createUserChannel(user, options) {
   validate.expect(user, 'user is expected');
   validate.expect(options, 'options is expected');
@@ -742,20 +760,30 @@ function createUserChannel(user, options) {
       validate.fail('Invalid security option: ' + security);
   }
 
-  var uri = user.username + '/' + name;
-  return createChannel(user, null, {
-    uri: uri,
-    security: options.security,
-    githubType: 'USER_CHANNEL',
-  });
+  return groupService.migration.ensureGroupForUser(user)
+    .then(function(group) {
+      var groupId = group && group._id;
+      var uri = user.username + '/' + name;
+
+      return createChannel(user, null, {
+        uri: uri,
+        security: options.security,
+        githubType: 'USER_CHANNEL',
+        groupId: groupId
+      });
+    })
 }
 
+/**
+ * @private
+ */
 function createChannel(user, parentRoom, options) {
   var uri = options.uri;
   var githubType = options.githubType;
   var lcUri = uri.toLowerCase();
   var lcOwner = lcUri.split('/')[0];
   var security = options.security;
+  var groupId = options.groupId;
 
   // TODO: Add group support in here....
   return ensureNoRepoNameClash(user, uri)
@@ -772,6 +800,7 @@ function createChannel(user, parentRoom, options) {
           $setOnInsert: {
             lcUri: lcUri,
             lcOwner: lcOwner,
+            groupId: groupId,
             uri: uri,
             security: security,
             parentId: parentRoom ? parentRoom._id : undefined,
