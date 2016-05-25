@@ -1,5 +1,6 @@
+"use strict";
+
 var _ = require('lodash');
-var metaService = require('../../../services/room-meta-service');
 var RoomWithPolicyService = require('../../../services/room-with-policy-service');
 var troupeService = require('../../../services/troupe-service');
 

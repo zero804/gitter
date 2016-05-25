@@ -11,7 +11,7 @@ var View = Marionette.ItemView.extend({
   template: roomSettingsTemplate,
 
   events:   {
-    'click #close-settings' : 'destroySettings',
+    'click #close-settings': 'destroySettings',
   },
 
   ui: {
@@ -75,7 +75,7 @@ var View = Marionette.ItemView.extend({
       context.setTroupe(updatedTroupe);
       this.destroySettings();
     }.bind(this))
-    .catch(function(err){
+    .catch(function(){
       this.ui.errorMessage[0].classList.remove('hidden');
     }.bind(this));
   }

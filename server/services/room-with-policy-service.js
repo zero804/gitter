@@ -247,7 +247,7 @@ RoomWithPolicyService.prototype.joinRoom = secureMethod([allowJoin], function(op
 /**
  *  GET room meta/welcome-message
  */
-RoomWithPolicyService.prototype.getRoomWelcomeMessage = secureMethod([allowJoin], function(options){
+RoomWithPolicyService.prototype.getRoomWelcomeMessage = secureMethod([allowJoin], function(){
   return roomMetaService.findMetaByTroupeId(this.room.id, 'welcomeMessage');
 });
 
