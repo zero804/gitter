@@ -69,7 +69,7 @@ exports.generateTroupeContext = function(req, extras) {
     user ? serializeUser(user) : null,
     troupe ? serializeTroupe(troupe, user) : undefined,
     determineDesktopNotifications(user, req),
-    troupe && troupe.id ? roomMetaService.roomHasWelcomeMessage(troupe.id) : false,
+    troupe && troupe._id ? roomMetaService.roomHasWelcomeMessage(troupe._id) : false,
   ])
   .spread(function(serializedUser, serializedTroupe, desktopNotifications, roomHasWelcomeMessage) {
 
