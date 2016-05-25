@@ -16,7 +16,8 @@ var View = Marionette.ItemView.extend({
 
   ui: {
     githubOnly: '#github-only',
-    welcomeMessage: '#room-welcome-message'
+    welcomeMessage: '#room-welcome-message',
+    errorMessage: '#error-message',
   },
 
   initialize: function() {
@@ -75,8 +76,8 @@ var View = Marionette.ItemView.extend({
       this.destroySettings();
     }.bind(this))
     .catch(function(err){
-      //TODO Handle Error
-    });
+      this.ui.errorMessage[0].classList.remove('hidden');
+    }.bind(this));
   }
 });
 
