@@ -11,7 +11,7 @@ var deflate           = require('permessage-deflate');
 var presenceService   = require('gitter-web-presence');
 var shutdown          = require('shutdown');
 var zlib              = require('zlib');
-var debug             = require('debug')('gitter:bayeux');
+var debug             = require('debug')('gitter:infra:bayeux');
 var Promise           = require('bluebird');
 
 
