@@ -8,7 +8,7 @@ var pushNotificationService = require("../services/push-notification-service");
 var unreadItemService = require("../services/unread-items");
 var androidGateway = require('./android-notification-gateway');
 var iosGateway = require('./ios-notification-gateway');
-var debug = require('debug')('gitter:push-notification-gateway');
+var debug = require('debug')('gitter:app:push-notification-gateway');
 
 function sendNotificationToDevice(notification, badge, device) {
   var notificationPromise;

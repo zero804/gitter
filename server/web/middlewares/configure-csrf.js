@@ -1,7 +1,7 @@
 'use strict';
 
 var oauthService = require('../../services/oauth-service');
-var debug = require('debug')('gitter:configure-csrf');
+var debug = require('debug')('gitter:infra:configure-csrf');
 var env = require('gitter-web-env');
 var stats = env.stats;
 

@@ -278,3 +278,25 @@ Once you have these you can run `npm run test:unit:browser` which should kick of
 
 1. Run `npm run shrinkwrap` to rebuild the shrinkwrap
 2. Commit your changes to `npm-shrinkwrap.json`
+
+### Debugging the application
+
+This application uses [`debug`](https://github.com/visionmedia/debug) for debugging.
+
+The debugging hierarchy is as follows:
+* `gitter`: all debug categories inside `gitter-webapp` should start with this
+  * `app`: application logic
+    * Everything starting with `gitter:app:*` should be used for application logic. Another way to think of this category is that if you run the app with `DEBUG=gitter:app:*` you should be given a clear idea of the flow through the application as user requests are handled.
+    * (further levels tbd)
+  * `infra`: infrastructure
+    * Everything starting with `gitter:infra:*` should be used for infrastructure/plumbing events. For example, worker messages. These categories should not be used for application logic
+    * (further levels tbd)
+  * `test`: debugging in tests
+
+#### TL;dd
+
+To get an idea of whats happening to serve your requests, use:
+
+```shell
+DEBUG=gitter:app:*
+```
