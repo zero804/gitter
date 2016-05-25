@@ -6,7 +6,7 @@ function validateGroupName(name) {
   if (/^\s+/.test(name)) return false;
   if (/\s+$/.test(name)) return false;
 
-  return !!/^[^\<\>]{1,30}$/.test(name);
+  return !!/^[^\<\>]{1,80}$/.test(name);
 }
 
 module.exports = validateGroupName;
