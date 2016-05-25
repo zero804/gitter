@@ -7,10 +7,11 @@ var processMarkdown = require('../utils/markdown-processor');
 
 var errorReporter = env.errorReporter;
 
-function findMetaByTroupeId(troupeId) {
+function findMetaByTroupeId(troupeId, metaKey) {
   assert(mongoUtils.isLikeObjectId(troupeId));
+  assert(metaKey);
   troupeId = mongoUtils.asObjectID(troupeId);
-  return persistence.TroupeMeta.findOne({ troupeId: troupeId }).exec();
+  return persistence.TroupeMeta.findOne({ troupeId: troupeId }).select(metaKey).exec();
 }
 
 function roomHasWelcomeMessage(troupeId){
