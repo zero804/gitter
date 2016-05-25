@@ -18,6 +18,9 @@ function Drafty(el, uniqueId) {
   if(value && !el.value) {
     el.value = value;
   }
+  else if(el.value) {
+    this.update();
+  }
 
   var periodic = _.throttle(this.update.bind(this), 1000, { leading: false });
   this.updatePeriodic = periodic;
