@@ -772,7 +772,7 @@ describe('room-service', function() {
 
   describe('channel creation #slow', function() {
 
-    describe('::org::', function() {
+    describe('org channels', function() {
 
       it('should create private rooms and allow users to be added to them', function() {
         var roomPermissionsModelMock = mockito.mockFunction();
@@ -814,7 +814,7 @@ describe('room-service', function() {
           .then(function(securityDescriptor) {
             assert.deepEqual(securityDescriptor, {
               admins: "GH_ORG_MEMBER",
-              externalId: null,
+              externalId: fixture.troupeOrg1.githubId,
               linkPath: fixture.troupeOrg1.uri,
               members: "INVITE",
               public: false,
@@ -871,7 +871,7 @@ describe('room-service', function() {
           .then(function(securityDescriptor) {
             assert.deepEqual(securityDescriptor, {
               admins: "GH_ORG_MEMBER",
-              externalId: null,
+              externalId: fixture.troupeOrg1.githubId,
               linkPath: fixture.troupeOrg1.uri,
               members: "PUBLIC",
               public: true,
@@ -919,7 +919,7 @@ describe('room-service', function() {
           .then(function(securityDescriptor) {
             assert.deepEqual(securityDescriptor, {
               admins: "GH_ORG_MEMBER",
-              externalId: null,
+              externalId: fixture.troupeOrg1.githubId,
               linkPath: fixture.troupeOrg1.uri,
               members: "GH_ORG_MEMBER",
               public: false,
@@ -967,7 +967,7 @@ describe('room-service', function() {
           .then(function(securityDescriptor) {
             assert.deepEqual(securityDescriptor, {
               admins: "GH_ORG_MEMBER",
-              externalId: null,
+              externalId: fixture.troupeEmptyOrg.githubId,
               linkPath: fixture.troupeEmptyOrg.uri,
               members: "GH_ORG_MEMBER",
               public: false,
@@ -978,7 +978,7 @@ describe('room-service', function() {
 
     });
 
-    describe('::repo::', function() {
+    describe('repo channels', function() {
       it(/* ::repo */ 'should create private rooms', function() {
         var roomService = testRequire.withProxies("./services/room-service", {
           'gitter-web-groups/lib/group-service': {
@@ -1017,7 +1017,7 @@ describe('room-service', function() {
           .then(function(securityDescriptor) {
             assert.deepEqual(securityDescriptor, {
               admins: "GH_REPO_PUSH",
-              externalId: null,
+              externalId: fixture.troupeRepo.githubId,
               linkPath: fixture.troupeRepo.uri,
               members: "INVITE",
               public: false,
@@ -1064,7 +1064,7 @@ describe('room-service', function() {
           .then(function(securityDescriptor) {
             assert.deepEqual(securityDescriptor, {
               admins: "GH_REPO_PUSH",
-              externalId: null,
+              externalId: fixture.troupeRepo.githubId,
               linkPath: fixture.troupeRepo.uri,
               members: "PUBLIC",
               public: true,
@@ -1112,7 +1112,7 @@ describe('room-service', function() {
           .then(function(securityDescriptor) {
             assert.deepEqual(securityDescriptor, {
               admins: "GH_REPO_PUSH",
-              externalId: null,
+              externalId:  fixture.troupeRepo.githubId,
               linkPath: fixture.troupeRepo.uri,
               members: "GH_REPO_ACCESS",
               public: false,
@@ -1290,7 +1290,7 @@ describe('room-service', function() {
             }
           }
         });
-        
+
         return roomService.createUserChannel(fixture.user1, { name: 'tobedeleted', security: 'PUBLIC' })
           .then(function(room) {
             return room;

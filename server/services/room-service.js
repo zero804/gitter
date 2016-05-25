@@ -818,8 +818,7 @@ function createChannel(user, parentRoom, options) {
           return newRoom;
         })
         .tap(function(newRoom) {
-          var descriptor = legacyMigration.generatePermissionsForRoom(newRoom, null, user);
-
+          var descriptor = legacyMigration.generatePermissionsForRoom(newRoom, parentRoom, user);
           return securityDescriptorService.insertForRoom(newRoom._id, descriptor);
         })
         .tap(function(newRoom) {
