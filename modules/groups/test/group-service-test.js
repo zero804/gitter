@@ -24,7 +24,6 @@ describe('group-service', function() {
       it('should create a group', function() {
         var groupUri = fixtureLoader.GITTER_INTEGRATION_ORG;
         var user = fixture.user1;
-
         return groupService.createGroup(user, { name: 'Bob', uri: groupUri })
           .then(function(group) {
             assert.strictEqual(group.name, 'Bob');
@@ -112,7 +111,6 @@ describe('group-service', function() {
           assert.equal(securityDescriptor.linkPath, fixtureLoader.GITTER_INTEGRATION_USERNAME);
           assert.equal(securityDescriptor.type, 'GH_USER');
         });
-
       });
     });
 
@@ -157,6 +155,9 @@ describe('group-service', function() {
             ]);
           });
       });
+    });
+
+    describe('ensureGroupForRoom', function() {
     });
 
   });
