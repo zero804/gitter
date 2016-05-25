@@ -100,4 +100,8 @@ router.get('/user-avatar/:username',
   identifyRoute('api-private-user-avatar'),
   require('./user-avatar'));
 
+router.get('/avatars/gravatar/:email',
+  identifyRoute('api-private-gravatar'),
+  require('./gravatar'));
+
 module.exports = router;
