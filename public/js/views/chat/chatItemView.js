@@ -256,7 +256,24 @@ module.exports = (function() {
       // this.$el.toggleClass('cantEdit', !canEdit);
     },
 
+    _requiresFullRender: function(changes) {
+      if (changes && 'burstStart' in changes) {
+        var prevBurstStart = !!this.model.previous('burstStart');
+        var burstStart = !!this.model.get('burstStart');
+
+        // If burstStart has changed
+        if (burstStart !== prevBurstStart) {
+          return true;
+        }
+      }
+      return false;
+    },
+
     updateRender: function(changes) {
+      if (this._requiresFullRender(changes)) {
+        return this.render();
+      }
+
       /* NB: `unread` updates occur in the behaviour */
       var sentElement = this.ui.sent[0];
 

@@ -56,12 +56,29 @@ describe('authorisor', function() {
 
     testGenerator(FIXTURES, function(name, meta) {
 
-      var userCanAccessRoomMock = mockito.mockFunction();
       var presenceServiceMock = mockito.mock(testRequire('gitter-web-presence'));
       var restfulMock = mockito.mock(testRequire('./services/restful'));
+      var createPolicyForUserIdInRoomId = mockito.mockFunction();
+
+      mockito.when(createPolicyForUserIdInRoomId)().then(function(userId, roomId) {
+        if(meta.canAccessRoom !== true && meta.canAccessRoom !== false) {
+          assert(false, 'Unexpected call to canAccessRoom');
+        }
+
+        assert.equal(userId, meta.userId);
+        assert.equal(roomId, meta.troupeId);
+
+        return Promise.resolve({
+          canRead: function() {
+            return Promise.resolve(!!meta.canAccessRoom);
+          }
+        })
+      });
 
       var authorisor = testRequire.withProxies("./web/bayeux/authorisor", {
-        'gitter-web-permissions/lib/user-can-access-room': { permissionToRead: userCanAccessRoomMock },
+        'gitter-web-permissions/lib/legacy-policy-factory': {
+          createPolicyForUserIdInRoomId: createPolicyForUserIdInRoomId
+        },
         'gitter-web-presence': presenceServiceMock,
         '../../services/restful': restfulMock
       });
@@ -81,25 +98,13 @@ describe('authorisor', function() {
             return Promise.resolve([meta.userId, true]);
           });
 
-        mockito.when(userCanAccessRoomMock)()
-          .then(function(userId, troupeId) {
-            if(meta.canAccessRoom !== true && meta.canAccessRoom !== false) {
-              assert(false, 'Unexpected call to canAccessRoom');
-            }
-
-            assert.equal(userId, meta.userId);
-            assert.equal(troupeId, meta.troupeId);
-            return Promise.resolve(!!meta.canAccessRoom);
-          });
-
         authorisor.incoming(message, null, function(message) {
           if(meta.expectedError) {
             assert(!!message.error, "Expected an error");
+            done();
           } else {
-            assert(!message.error, "Expected no error");
+            done(message.error);
           }
-
-          done();
         });
 
       });
