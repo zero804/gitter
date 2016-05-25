@@ -28,7 +28,6 @@ require('components/eyeballs');
 require('components/bug-reporting');
 require('components/focus-events');
 
-
 // Preload widgets
 require('components/ping');
 
