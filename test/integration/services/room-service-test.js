@@ -51,6 +51,7 @@ describe('room-service', function() {
       githubType: 'ONETOONE',
       users: ['userToRemove', 'userRemoveAdmin']
     },
+    group1: {},
     userToRemove: {},
     userRemoveNonAdmin: {},
     userRemoveAdmin: {}
@@ -391,8 +392,8 @@ describe('room-service', function() {
         .then(function(uriContext) {
           this.uriContext = uriContext;
           assert(uriContext.troupe);
-          assert(uriContext.troupe.lcUri  === 'gitterhq/sandbox');
-          assert(uriContext.troupe.uri    === 'gitterHQ/sandbox');
+          assert(uriContext.troupe.lcUri === 'gitterhq/sandbox');
+          assert(uriContext.troupe.uri === 'gitterHQ/sandbox');
 
           return securityDescriptorService.getForRoomUser(uriContext.troupe._id, fixture.user1._id);
         })
@@ -769,7 +770,7 @@ describe('room-service', function() {
   //
   });
 
-  describe('custom rooms #slow', function() {
+  describe('channel creation #slow', function() {
 
     describe('::org::', function() {
 
@@ -777,7 +778,16 @@ describe('room-service', function() {
         var roomPermissionsModelMock = mockito.mockFunction();
         var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
         var roomService = testRequire.withProxies("./services/room-service", {
-          'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock
+          'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock,
+          'gitter-web-groups/lib/group-service': {
+            migration: {
+              ensureGroupForRoom: function(parentTroupe, user) {
+                assert.strictEqual(parentTroupe, fixture.troupeOrg1);
+                assert.strictEqual(user, fixture.user1);
+                return Promise.resolve(fixture.group1);
+              }
+            }
+          }
         });
         var roomMembershipService = testRequire('./services/room-membership-service');
 
@@ -788,7 +798,7 @@ describe('room-service', function() {
           .bind({})
           .then(function(room) {
             this.room = room;
-
+            assert(mongoUtils.objectIDsEqual(room.groupId, fixture.group1._id));
             return room;
           })
           .tap(function(room) {
@@ -816,7 +826,16 @@ describe('room-service', function() {
       it('should create open rooms', function() {
         var invitedPermissionsModelMock = mockito.mockFunction();
         var roomService = testRequire.withProxies("./services/room-service", {
-          'gitter-web-permissions/lib/invited-permissions-service': invitedPermissionsModelMock
+          'gitter-web-permissions/lib/invited-permissions-service': invitedPermissionsModelMock,
+          'gitter-web-groups/lib/group-service': {
+            migration: {
+              ensureGroupForRoom: function(parentTroupe, user) {
+                assert.strictEqual(parentTroupe, fixture.troupeOrg1);
+                assert.strictEqual(user, fixture.user1);
+                return Promise.resolve(fixture.group1);
+              }
+            }
+          }
         });
         var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
         var roomMembershipService = testRequire('./services/room-membership-service');
@@ -828,6 +847,7 @@ describe('room-service', function() {
           .bind({})
           .then(function(room) {
             this.room = room;
+            assert(mongoUtils.objectIDsEqual(room.groupId, fixture.group1._id));
             return room;
           })
           .tap(function(room) {
@@ -862,7 +882,16 @@ describe('room-service', function() {
 
       it('should create inherited rooms', function() {
         var roomService = testRequire.withProxies("./services/room-service", {
-          'gitter-web-permissions/lib/invited-permissions-service': function() { return Promise.resolve(true); }
+          'gitter-web-permissions/lib/invited-permissions-service': function() { return Promise.resolve(true); },
+          'gitter-web-groups/lib/group-service': {
+            migration: {
+              ensureGroupForRoom: function(parentTroupe, user) {
+                assert.strictEqual(parentTroupe, fixture.troupeOrg1);
+                assert.strictEqual(user, fixture.user1);
+                return Promise.resolve(fixture.group1);
+              }
+            }
+          }
         });
         var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
         var roomMembershipService = testRequire('./services/room-membership-service');
@@ -874,7 +903,7 @@ describe('room-service', function() {
           .bind({})
           .then(function(room) {
             this.room = room;
-            // mockito.verify(permissionsModelMock, once)();
+            assert(mongoUtils.objectIDsEqual(room.groupId, fixture.group1._id));
             return room;
           })
           .tap(function(room) {
@@ -901,7 +930,16 @@ describe('room-service', function() {
 
       it('should create inherited rooms for empty orgs', function() {
         var roomService = testRequire.withProxies("./services/room-service", {
-          'gitter-web-permissions/lib/invited-permissions-service': function() { return Promise.resolve(true); }
+          'gitter-web-permissions/lib/invited-permissions-service': function() { return Promise.resolve(true); },
+          'gitter-web-groups/lib/group-service': {
+            migration: {
+              ensureGroupForRoom: function(parentTroupe, user) {
+                assert.strictEqual(parentTroupe, fixture.troupeEmptyOrg);
+                assert.strictEqual(user, fixture.user1);
+                return Promise.resolve(fixture.group1);
+              }
+            }
+          }
         });
         var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
         var roomMembershipService = testRequire('./services/room-membership-service');
@@ -913,6 +951,7 @@ describe('room-service', function() {
           .bind({})
           .then(function(room) {
             this.room = room;
+            assert(mongoUtils.objectIDsEqual(room.groupId, fixture.group1._id));
             return room;
           })
           .tap(function(room) {
@@ -942,6 +981,15 @@ describe('room-service', function() {
     describe('::repo::', function() {
       it(/* ::repo */ 'should create private rooms', function() {
         var roomService = testRequire.withProxies("./services/room-service", {
+          'gitter-web-groups/lib/group-service': {
+            migration: {
+              ensureGroupForRoom: function(parentTroupe, user) {
+                assert.strictEqual(parentTroupe, fixture.troupeRepo);
+                assert.strictEqual(user, fixture.user1);
+                return Promise.resolve(fixture.group1);
+              }
+            }
+          }
         });
         var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
         var roomMembershipService = testRequire('./services/room-membership-service');
@@ -953,6 +1001,7 @@ describe('room-service', function() {
           .bind({})
           .then(function(room) {
             this.room = room;
+            assert(mongoUtils.objectIDsEqual(room.groupId, fixture.group1._id));
             return room;
           })
           .tap(function(room) {
@@ -978,9 +1027,19 @@ describe('room-service', function() {
       });
 
       it(/* ::repo */ 'should create open rooms', function() {
-        var roomService = testRequire("./services/room-service");
         var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
         var roomMembershipService = testRequire('./services/room-membership-service');
+        var roomService = testRequire.withProxies("./services/room-service", {
+          'gitter-web-groups/lib/group-service': {
+            migration: {
+              ensureGroupForRoom: function(parentTroupe, user) {
+                assert.strictEqual(parentTroupe, fixture.troupeRepo);
+                assert.strictEqual(user, fixture.user1);
+                return Promise.resolve(fixture.group1);
+              }
+            }
+          }
+        });
 
         return roomService.createRoomChannel(fixture.troupeRepo, fixture.user1, {
             name: 'open',
@@ -989,6 +1048,7 @@ describe('room-service', function() {
           .bind({})
           .then(function(room) {
             this.room = room;
+            assert(mongoUtils.objectIDsEqual(room.groupId, fixture.group1._id));
             return room;
           })
           .tap(function(room) {
@@ -1015,7 +1075,16 @@ describe('room-service', function() {
 
       it(/* ::repo */ 'should create inherited rooms', function() {
         var roomService = testRequire.withProxies("./services/room-service", {
-          'gitter-web-permissions/lib/invited-permissions-service': function() { return Promise.resolve(true); }
+          'gitter-web-permissions/lib/invited-permissions-service': function() { return Promise.resolve(true); },
+          'gitter-web-groups/lib/group-service': {
+            migration: {
+              ensureGroupForRoom: function(parentTroupe, user) {
+                assert.strictEqual(parentTroupe, fixture.troupeRepo);
+                assert.strictEqual(user, fixture.user1);
+                return Promise.resolve(fixture.group1);
+              }
+            }
+          }
         });
         var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
         var roomMembershipService = testRequire('./services/room-membership-service');
@@ -1027,6 +1096,7 @@ describe('room-service', function() {
           .bind({})
           .then(function(room) {
             this.room = room;
+            assert(mongoUtils.objectIDsEqual(room.groupId, fixture.group1._id));
             return room;
           })
           .tap(function(room) {
@@ -1056,14 +1126,24 @@ describe('room-service', function() {
     describe('::user::', function() {
 
       it('should create private rooms without a name', function() {
-        var roomService = testRequire("./services/room-service");
         var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
         var roomMembershipService = testRequire('./services/room-membership-service');
+        var roomService = testRequire.withProxies("./services/room-service", {
+          'gitter-web-groups/lib/group-service': {
+            migration: {
+              ensureGroupForUser: function(user) {
+                assert.strictEqual(user, fixture.user1);
+                return Promise.resolve(fixture.group1);
+              }
+            }
+          }
+        });
 
         return roomService.createUserChannel(fixture.user1, { security: 'PRIVATE' })
           .bind({})
           .then(function(room) {
             this.room = room;
+            assert(mongoUtils.objectIDsEqual(room.groupId, fixture.group1._id));
             return room;
           })
           .tap(function(room) {
@@ -1093,14 +1173,24 @@ describe('room-service', function() {
       });
 
       it('should create private rooms with name', function() {
-        var roomService = testRequire("./services/room-service");
         var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
         var roomMembershipService = testRequire('./services/room-membership-service');
+        var roomService = testRequire.withProxies("./services/room-service", {
+          'gitter-web-groups/lib/group-service': {
+            migration: {
+              ensureGroupForUser: function(user) {
+                assert.strictEqual(user, fixture.user1);
+                return Promise.resolve(fixture.group1);
+              }
+            }
+          }
+        });
 
-        return roomService.createUserChannel(fixture.user1, { name: 'private',  security: 'PRIVATE' })
+        return roomService.createUserChannel(fixture.user1, { name: 'private', security: 'PRIVATE' })
           .bind({})
           .then(function(room) {
             this.room = room;
+            assert(mongoUtils.objectIDsEqual(room.groupId, fixture.group1._id));
             return room;
           })
           .tap(function(room) {
@@ -1131,10 +1221,18 @@ describe('room-service', function() {
       });
 
       it('should create open rooms', function() {
-        var roomService = testRequire("./services/room-service");
         var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
         var roomMembershipService = testRequire('./services/room-membership-service');
-
+        var roomService = testRequire.withProxies("./services/room-service", {
+          'gitter-web-groups/lib/group-service': {
+            migration: {
+              ensureGroupForUser: function(user) {
+                assert.strictEqual(user, fixture.user1);
+                return Promise.resolve(fixture.group1);
+              }
+            }
+          }
+        });
         return roomService.createUserChannel(fixture.user1, { name: 'open', security: 'PUBLIC' })
           .bind({})
           .then(function(room) {
@@ -1183,7 +1281,15 @@ describe('room-service', function() {
 
       it('should be able to delete rooms #slow', function() {
         var troupeService = testRequire('./services/troupe-service');
-        var roomService = testRequire('./services/room-service');
+        var roomService = testRequire.withProxies("./services/room-service", {
+          'gitter-web-groups/lib/group-service': {
+            migration: {
+              ensureGroupForUser: function() {
+                return Promise.resolve(null);
+              }
+            }
+          }
+        });
 
         return roomService.createUserChannel(fixture.user1, { name: 'tobedeleted', security: 'PUBLIC' })
           .then(function(room) {
