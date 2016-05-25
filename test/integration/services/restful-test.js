@@ -151,7 +151,8 @@ describe('restful #slow', function() {
           assert.deepEqual(result, [{
             id: fixture.group1.id,
             name: fixture.group1.name,
-            uri: fixture.group1.uri
+            uri: fixture.group1.uri,
+            avatarUrl: '/api/private/user-avatar/'+fixture.group1.uri+'?s=48',
           }]);
         });
     });
@@ -168,11 +169,9 @@ describe('restful #slow', function() {
     it('should serializer the rooms for a group', function() {
       return restful.serializeRoomsForGroupId(fixture.group1._id, fixture.user1._id)
         .then(function(result) {
-          assert.strictEqual(result.length, 2);
+          assert.strictEqual(result.length, 1);
           var v1 = result[0];
-          var v2 = result[1];
           assert.strictEqual(v1.roomMember, true);
-          assert.strictEqual(v2.roomMember, false);
         });
     });
   });
