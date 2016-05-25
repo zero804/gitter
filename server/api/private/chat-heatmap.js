@@ -1,8 +1,9 @@
 "use strict";
 
-var roomService = require('../../services/room-service');
+var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
 var heatmapService = require('../../services/chat-heatmap-service');
 var moment = require('moment');
+var StatusError = require('statuserror');
 var debug = require('debug')('gitter:chat-heapmap-route');
 
 module.exports = function(req, res, next) {
@@ -13,10 +14,12 @@ module.exports = function(req, res, next) {
   var end = req.query.end ? moment(req.query.end).add(1, 'day').toDate() : null;
   var tz = req.query.tz ? req.query.tz : 0;
 
-  // simple auth check, throws on failure
-  roomService.findByIdForReadOnlyAccess(req.user, roomId)
-    .then(function(room) {
-      var roomId = room.id;
+  return policyFactory.createPolicyForRoomId(req.user, roomId)
+    .then(function(policy) {
+      return policy.canRead();
+    })
+    .then(function(hasReadAccess) {
+      if (!hasReadAccess) throw new StatusError(404);
 
       debug('Searching troupeId=%s start=%s end=%s tz=%s', roomId, start, end, tz)
 
