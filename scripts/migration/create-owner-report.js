@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 'use strict';
-/*eslint complexity: ["error", 30]*/
+
+/* eslint-disable */ /* messy messy @lerouxb */
 
 var fs = require('fs');
 var _ = require('lodash');

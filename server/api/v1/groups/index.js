@@ -41,12 +41,6 @@ module.exports = {
     return restSerializer.serializeObject(group, strategy);
   },
 
-  put: function(req) {
-    var group = req.params.group;
-    var user = req.user;
-    var userId = user && user._id;
-  },
-
   load: function(req, id) {
     // TODO: security
     return groupService.findById(id);
