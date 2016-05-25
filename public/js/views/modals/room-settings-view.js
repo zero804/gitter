@@ -21,11 +21,10 @@ var View = Marionette.ItemView.extend({
 
   initialize: function() {
     this.listenTo(this, 'menuItemClicked', this.menuItemClicked, this);
-    apiClient.room.get('/meta/welcome-message').then(function(meta){
-      meta = (meta || {});
-      var welcomeMessage = (meta.welcomeMessage || {});
-      if(!welcomeMessage.text || !welcomeMessage.text.length) { return this.initEmptyTextArea(); }
-      this.initWithMessage(meta.welcomeMessage);
+    apiClient.room.get('/meta/welcome-message').then(function(welcomeMessage){
+      welcomeMessage = (welcomeMessage || { text: '', html: '' });
+      if(!!welcomeMessage.text.length) { return  this.initWithMessage(welcomeMessage); }
+      return this.initEmptyTextArea();
     }.bind(this));
   },
 
