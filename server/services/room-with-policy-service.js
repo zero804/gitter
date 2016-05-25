@@ -17,6 +17,8 @@ var roomMembershipService = require('./room-membership-service');
 var roomService = require('./room-service');
 var assert = require('assert');
 var roomMetaService = require('./room-meta-service');
+var processMarkdown = require('../utils/markdown-processor');
+var assert = require('assert');
 
 var MAX_RAW_TAGS_LENGTH = 200;
 
@@ -252,11 +254,15 @@ RoomWithPolicyService.prototype.getRoomWelcomeMessage = secureMethod([allowJoin]
 });
 
 RoomWithPolicyService.prototype.updateRoomWelcomeMessage = secureMethod([allowAdmin], function(options){
-  return roomMetaService.upsertMetaKey(this.room.id, { welcomeMessage: options.welcomeMessage})
-  .then(function(res){
-    res = (res || {});
-    return { welcomeMessage: (res.welcomeMessage || {}) };
-  });
+  assert(options.welcomeMessage);
+  return processMarkdown(options.welcomeMessage)
+    .then(function(welcomeMessage){
+      return roomMetaService.upsertMetaKey(this.room.id, 'welcomeMessage', welcomeMessage);
+    }.bind(this))
+    .then(function(res){
+      res = (res || {});
+      return { welcomeMessage: (res.welcomeMessage || {}) };
+    });
 });
 
 module.exports = RoomWithPolicyService;

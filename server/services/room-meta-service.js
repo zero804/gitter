@@ -17,28 +17,12 @@ function findMetaByTroupeId(troupeId, metaKey) {
     });
 }
 
-function upsertMetaKey(troupeId, data) {
+function upsertMetaKey(troupeId, metaKey, value) {
   assert(mongoUtils.isLikeObjectId(troupeId));
   troupeId = mongoUtils.asObjectID(troupeId);
-
-  data = (data || {});
-  data.welcomeMessage = (data.welcomeMessage || '');
-
-  return processMarkdown(data.welcomeMessage)
-    .then(function(parsedWelcomeMessage) {
-
-      var query = {
-        $set: {
-          welcomeMessage: {
-            html: parsedWelcomeMessage.html,
-            text: parsedWelcomeMessage.text
-          }
-        }
-      };
-      return persistence.TroupeMeta.findOneAndUpdate(
-        { troupeId: troupeId }, query, { upsert: true }
-      );
-    });
+    var query = { $set: {}};
+    query.$set[metaKey] = value;
+    return persistence.TroupeMeta.findOneAndUpdate({ troupeId: troupeId }, query, { upsert: true });
 }
 
 module.exports = {
