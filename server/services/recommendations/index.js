@@ -4,7 +4,7 @@ var Promise = require('bluebird');
 var _ = require('underscore');
 var highlightedRoomCache = require('./highlighted-room-cache');
 var collections = require('../../utils/collections');
-var debug = require('debug')('gitter:legacy-recommendations');
+var debug = require('debug')('gitter:app:recommendations:legacy-recommendations');
 
 var recommenders = [
   require('./highlighted-rooms'),

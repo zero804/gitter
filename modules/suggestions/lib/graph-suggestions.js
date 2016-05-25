@@ -4,7 +4,7 @@ var env   = require('gitter-web-env');
 var stats = env.stats;
 var cypher = require("cypher-promise");
 var neo4jClient = cypher(env.config.get('neo4j:endpoint'));
-var debug = require('debug')('gitter:graph-suggestions');
+var debug = require('debug')('gitter:app:graph-suggestions');
 var _ = require('lodash');
 
 function query(text, params) {
@@ -102,4 +102,3 @@ function getSuggestionsForRooms(rooms, localeLanguage) {
     });
 }
 exports.getSuggestionsForRooms = getSuggestionsForRooms;
-

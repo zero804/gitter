@@ -5,7 +5,7 @@ var restful = require("../../../services/restful");
 var restSerializer = require("../../../serializers/rest-serializer");
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
-var loadTroupeFromParam  = require('./load-troupe-param');
+var loadTroupeFromParam = require('./load-troupe-param');
 var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
 var RoomWithPolicyService = require('../../../services/room-with-policy-service');
 
@@ -131,12 +131,8 @@ module.exports = {
       .then(function(troupe) {
         if (troupe.oneToOne || !troupe.uri) throw new StatusError(400, 'cannot delete one to one rooms');
 
-        return [troupe, req.userRoomPolicy.isAdmin()];
-      })
-      .spread(function(troupe, isAdmin) {
-        if (!isAdmin) throw new StatusError(403, 'admin permissions required');
-
-        return roomService.deleteRoom(troupe);
+        var roomWithPolicyService = new RoomWithPolicyService(troupe, req.user, req.userRoomPolicy);
+        return roomWithPolicyService.deleteRoom();
       })
       .then(function() {
         return { success: true };

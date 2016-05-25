@@ -7,7 +7,7 @@ var troupeDao                   = require('../daos/troupe-dao').lean;
 var userDao                     = require('../daos/user-dao').lean;
 var chatService                 = require('../chat-service');
 var _                           = require('lodash');
-var debug                       = require('debug')('gitter:online-notification-generator');
+var debug                       = require('debug')('gitter:app:online-notification-generator');
 
 function generateChatMessageNotification(troupeId, chatId) {
   return Promise.all([

@@ -5,7 +5,7 @@ var troupeService = require('./troupe-service');
 var roomService = require('./room-service');
 var roomMembershipService = require('./room-membership-service');
 var Promise = require('bluebird');
-var debug = require('debug')('gitter:user-removal-service');
+var debug = require('debug')('gitter:app:user-removal-service');
 
 exports.removeByUsername = function(username, options) {
   return userService.findByUsername(username)
