@@ -54,7 +54,7 @@ describe('group-api', function() {
       .set('x-access-token', fixture.user1.accessToken)
       .expect(200)
       .then(function(result) {
-        assert(result.body.length > 0);
+        assert(result.body.length == 0);
       })
   });
 
