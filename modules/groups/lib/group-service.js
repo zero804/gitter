@@ -78,13 +78,15 @@ function createGroup(user, options) {
   assert(name, 'name required');
   assert(uri, 'name required');
 
-  if(!validateGroupName(name)) {
+  if (!validateGroupName(name)) {
     throw new StatusError(400, 'Invalid group name');
   }
 
-  if(!validateGroupUri(uri)) {
+  if (!validateGroupUri(uri)) {
     throw new StatusError(400, 'Invalid group uri: ' + uri);
   }
+
+  // TODO: validateUri is validate GITHUB uri..
 
   /* From here on we're going to be doing a create */
   return validateUri(user, uri)
@@ -106,14 +108,12 @@ function createGroup(user, options) {
       var type = githubInfo.type;
       var uri = githubInfo.uri;
       var githubId = githubInfo.githubId || null;
-      var security = githubInfo.security;
 
       return upsertGroup(user, {
         type: type,
         name: name,
         uri: uri,
-        githubId: githubId,
-        security: security
+        githubId: githubId
       });
     });
 }
