@@ -2,7 +2,7 @@
 "use strict";
 
 var logger                = require('gitter-web-env').logger;
-var debug                 = require('debug')('gitter:serializer:troupe');
+var debug                 = require('debug')('gitter:infra:serializer:troupe');
 var getVersion            = require('../get-model-version');
 var UserIdStrategy        = require('./user-id-strategy');
 var mongoUtils            = require('gitter-web-persistence-utils/lib/mongo-utils');

@@ -8,7 +8,7 @@ var appEvents                          = require('gitter-web-appevents');
 var presenceService                    = require('gitter-web-presence');
 var onlineNotificationGeneratorService = require('../services/notifications/online-notification-generator-service');
 var pushNotificationPostbox            = require('../services/notifications/push-notification-postbox');
-var debug                              = require('debug')('gitter:notification-event-listener');
+var debug                              = require('debug')('gitter:app:notification-event-listener');
 var pushNotificationGateway            = require("../gateways/push-notification-gateway");
 var pushNotificationFilter             = require("gitter-web-push-notification-filter");
 

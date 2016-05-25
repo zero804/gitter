@@ -18,7 +18,7 @@ var GitHubMeService = require('gitter-web-github').GitHubMeService;
 var trackNewUser = require('../../utils/track-new-user');
 var trackUserLogin = require('../../utils/track-user-login');
 var updateUserLocale = require('../../utils/update-user-locale');
-var debug = require('debug')('gitter:passport');
+var debug = require('debug')('gitter:infra:passport');
 var obfuscateToken = require('gitter-web-github').obfuscateToken;
 
 // Move this out once we use it multiple times. We're only interested in
