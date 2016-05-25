@@ -11,10 +11,7 @@ function findMetaByTroupeId(troupeId) {
   assert(mongoUtils.isLikeObjectId(troupeId));
   troupeId = mongoUtils.asObjectID(troupeId);
   return persistence.TroupeMeta.findOne({ troupeId: troupeId })
-  .exec()
-  .catch(function(err){
-    //TODO err reporting?
-  });
+  .exec();
 }
 
 function roomHasWelcomeMessage(troupeId){
@@ -28,10 +25,6 @@ function roomHasWelcomeMessage(troupeId){
       meta = (meta || {});
       meta.welcomeMessage = (meta.welcomeMessage || {});
       return !!meta.welcomeMessage.text && !!meta.welcomeMessage.text.length;
-    })
-    .catch(function(err){
-      //TODO error reporting
-      //console.log(err);
     });
 }
 
@@ -58,12 +51,7 @@ function createOrUpdateMetaRecord(troupeId, data) {
         persistence.TroupeMeta.findOneAndUpdate({ troupeId: troupeId }, query, { upsert: true }, callback);
       });
 
-    })
-    .catch(function(err) {
-      //TODO Error Reporting
-      //console.log(err.message);
     });
-
 }
 
 module.exports = {
