@@ -18,7 +18,6 @@ var roomService = require('./room-service');
 var assert = require('assert');
 var roomMetaService = require('./room-meta-service');
 var processMarkdown = require('../utils/markdown-processor');
-var assert = require('assert');
 
 var MAX_RAW_TAGS_LENGTH = 200;
 
