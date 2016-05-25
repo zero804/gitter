@@ -1,11 +1,10 @@
-var env = require('gitter-web-env');
+"use strict";
+
 var assert = require('assert');
-var Promise = require('bluebird');
 var persistence = require('gitter-web-persistence');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var processMarkdown = require('../utils/markdown-processor');
 
-var errorReporter = env.errorReporter;
 
 function findMetaByTroupeId(troupeId, metaKey) {
   assert(mongoUtils.isLikeObjectId(troupeId));
