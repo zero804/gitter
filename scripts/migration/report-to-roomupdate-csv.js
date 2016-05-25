@@ -25,7 +25,7 @@ var writableStream = fs.createWriteStream(opts.output);
 
 var t = es.through(function write(data) {
   data.forEach(function(update) {
-    if (update.type == 'rename-room') {
+    if (update.type === 'rename-room') {
       this.emit('data', update);
     }
   }, this)

@@ -1,14 +1,12 @@
 #!/usr/bin/env node
 'use strict';
 
-var _ = require('lodash');
 var shutdown = require('shutdown');
 var persistence = require('gitter-web-persistence');
 var through2 = require('through2');
 var Promise = require('bluebird');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var onMongoConnect = require('../../server/utils/on-mongo-connect');
-var uriLookupService = require('../../server/services/uri-lookup-service');
 var userService = require('../../server/services/user-service');
 var groupSecurityDescriptorGenerator = require('gitter-web-permissions/lib/group-security-descriptor-generator');
 var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
@@ -78,8 +76,6 @@ function getGroupableRooms(matchMissingOnly) {
 }
 
 var gatherBatchInfo = Promise.method(function(batch) {
-  var lcOwner = batch._id;
-
   var type;
   var owner;
   if (batch.githuborg) {
@@ -101,7 +97,7 @@ var gatherBatchInfo = Promise.method(function(batch) {
     owner: owner
   };
 
-  if (type == 'user' && batch.githubuser) {
+  if (type === 'user' && batch.githubuser) {
     // tried to do this with mongo lookups, but it gave me some kind of
     // cartesian product type effect
     return userService.findByGithubId(batch.githubuser.githubId)
@@ -109,7 +105,7 @@ var gatherBatchInfo = Promise.method(function(batch) {
         // mimick only the correct ones according to the owner report and what
         // would happen after we ran the renames. So exact (case-sensitive)
         // match on username with an existing github user only.
-        if (gitterUser && gitterUser.username == batch.githubuser.uri) {
+        if (gitterUser && gitterUser.username === batch.githubuser.uri) {
           batch.gitterUser = gitterUser;
         }
         return info;
@@ -147,7 +143,7 @@ function migrate(batch, enc, callback) {
         batch.rooms.length
       );
 
-      if (info.type == 'unknown') {
+      if (info.type === 'unknown') {
         return callback();
       }
 
@@ -164,7 +160,7 @@ function migrate(batch, enc, callback) {
             githubId: info.owner.githubId // could be null
           }
         })
-        .spread(function(group, existing) {
+        .spread(function(group/*, existing */) {
           var groupId = group._id;
           var promises = [];
 
@@ -196,7 +192,7 @@ function migrate(batch, enc, callback) {
           // case that will just be null.
           // QUESTION: In the jashkenas case, should the security descriptor
           // still be user or should it be org or something else?
-          var gitterUser = (info.type == 'user') ? batch.gitterUser : null;
+          var gitterUser = (info.type === 'user') ? batch.gitterUser : null;
 
           // Insert group security descriptors for the owning org or user.
           // (this will only insert if it is missing)
@@ -224,7 +220,7 @@ function migrate(batch, enc, callback) {
 function run(f, missingOnly, callback) {
   getGroupableRooms(missingOnly)
     .pipe(through2.obj(f))
-    .on('data', function(batch) {
+    .on('data', function() {
     })
     .on('end', function() {
       console.log('done!');

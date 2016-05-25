@@ -1,6 +1,6 @@
 "use strict";
 
-function GroupStrategy(/*options*/)  {
+function GroupStrategy(/*options*/) {
 }
 
 GroupStrategy.prototype = {

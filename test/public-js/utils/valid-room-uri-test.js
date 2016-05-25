@@ -5,7 +5,7 @@ var RESERVED = require('gitter-web-validators/lib/reserved-namespaces');
 var assert = require('assert');
 
 function test(name, result) {
-  result = typeof result !== 'undefined' ? result : true;
+  result = typeof result === 'undefined' ? true : result;
   assert.equal(isValidRoomUri(name), result);
 }
 

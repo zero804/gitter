@@ -392,8 +392,8 @@ describe('room-service', function() {
         .then(function(uriContext) {
           this.uriContext = uriContext;
           assert(uriContext.troupe);
-          assert(uriContext.troupe.lcUri  === 'gitterhq/sandbox');
-          assert(uriContext.troupe.uri    === 'gitterHQ/sandbox');
+          assert(uriContext.troupe.lcUri === 'gitterhq/sandbox');
+          assert(uriContext.troupe.uri === 'gitterHQ/sandbox');
 
           return securityDescriptorService.getForRoomUser(uriContext.troupe._id, fixture.user1._id);
         })

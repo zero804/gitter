@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 'use strict';
 
-var _ = require('lodash');
+/* eslint-disable */ /* messy messy @lerouxb */
+
 var shutdown = require('shutdown');
 var persistence = require('gitter-web-persistence');
-var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var onMongoConnect = require('../../server/utils/on-mongo-connect');
 var es = require('event-stream');
 
