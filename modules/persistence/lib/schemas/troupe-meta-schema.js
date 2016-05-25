@@ -5,13 +5,14 @@ var installVersionIncMiddleware = require('../install-version-inc-middleware');
 
 
 var TroupeMetaSchema = new Schema({
-  //TODO Fixme this breaks
-  troupe: { type: ObjectId, required: true, /* unique: true, index: true */ },
+  troupe: { type: ObjectId, required: true },
   welcomeMessage: {
     html: String,
     text: String
   }
 });
+
+TroupeMetaSchema.index({ troupe: 1 }, { unique: true });
 
 TroupeMetaSchema.schemaTypeName = 'TroupeMetaSchema';
 
