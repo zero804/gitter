@@ -1,7 +1,7 @@
 'use strict';
 
 var Promise = require('bluebird');
-var debug = require('debug')('gitter:permissions:legacy-github-policy-evaluator');
+var debug = require('debug')('gitter:app:permissions:legacy-github-policy-evaluator');
 var permissionsModel = require('../permissions-model');
 
 function LegacyGitHubPolicyEvaluator(user, uri, ghType, ghSecurity) {

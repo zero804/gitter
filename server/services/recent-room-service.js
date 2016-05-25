@@ -9,7 +9,7 @@ var appEvents          = require('gitter-web-appevents');
 var moment             = require('moment');
 var unreadItemsService = require('./unread-items');
 var recentRoomCore     = require('./core/recent-room-core');
-var debug              = require('debug')('gitter:recent-room-service');
+var debug              = require('debug')('gitter:app:recent-room-service');
 
 exports.removeRecentRoomForUser                        = removeRecentRoomForUser;
 exports.saveLastVisitedTroupeforUserId                 = saveLastVisitedTroupeforUserId;

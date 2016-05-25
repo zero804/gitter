@@ -4,7 +4,7 @@
  * To enable plan debugging, use
  * DEBUG='gitter:serializer:tracing:plan'
  */
-var debug = require('debug')('gitter:serializer:tracing');
+var debug = require('debug')('gitter:infra:serializer:tracing');
 
 var env    = require('gitter-web-env');
 var nconf  = env.config;

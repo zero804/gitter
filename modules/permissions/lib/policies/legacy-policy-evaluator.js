@@ -5,7 +5,7 @@ var userCanAccessRoom = require('../user-can-access-room');
 var roomPermissionsModel = require('../room-permissions-model');
 var permissionsModel = require('../permissions-model');
 var persistence = require('gitter-web-persistence');
-var debug = require('debug')('gitter:permissions:legacy-evaluator');
+var debug = require('debug')('gitter:app:permissions:legacy-evaluator');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 function getOtherUser(userId, room) {
