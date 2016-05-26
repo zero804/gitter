@@ -1,39 +1,47 @@
 "use strict";
 
 var testRequire = require('./test-require');
-var Promise     = require('bluebird');
+var Promise = require('bluebird');
 var persistence = require('gitter-web-persistence');
 var roomMembershipFlags = testRequire("./services/room-membership-flags");
-var debug       = require('debug')('gitter:test-fixtures');
-var counter     = 0;
+var util = require('util');
+var uuid = require('node-uuid');
+var debug = require('debug')('gitter:tests:test-fixtures');
+
+var counter = 0;
+
+var seed = Date.now();
 
 function generateEmail() {
-  return 'testuser' + (++counter) + Date.now() + '@troupetest.local';
+  return 'testuser' + (++counter) + seed + '@troupetest.local';
 }
 
 function generateName() {
-  return 'Test ' + (++counter) + ' ' + Date.now();
+  return 'Test ' + (++counter) + ' ' + seed;
 }
 
 function generateUri(roomType) {
   if(roomType === 'REPO') {
-    return '_test_' + (++counter) + Date.now() + '/_repo_' + (++counter) + Date.now();
+    return '_test_' + (++counter) + seed + '/_repo_' + (++counter) + Date.now();
   }
 
-  return '_test_' + (++counter) + Date.now();
+  return '_test_' + (++counter) + seed;
 }
 
 function generateUsername() {
-  return '_testuser_' + (++counter) + Date.now();
+  return '_testuser_' + (++counter) + seed;
 }
 
 function generateGithubId() {
-  var hr = process.hrtime();
-  return hr[0] + hr[1];
+  return (++counter) + seed;
 }
 
 function generateGithubToken() {
   return '***REMOVED***';
+}
+
+function generateGroupUri() {
+  return '_group' + (++counter) + Date.now();
 }
 
 function createBaseFixture() {
@@ -44,6 +52,7 @@ function createBaseFixture() {
     generateUsername: generateUsername,
     generateGithubId: generateGithubId,
     generateGithubToken: generateGithubToken,
+    generateGroupUri: generateGroupUri,
 
     cleanup: function(callback) {
       var self = this;
@@ -66,31 +75,20 @@ function createBaseFixture() {
   };
 }
 
-function load(expected, done) {
-  if(expected) {
-    // DO THINGS THE NEW SCHOOL WAY
-    return createExpectedFixtures(expected, done);
-  }
-
+function createLegacyFixtures(done) {
   return createExpectedFixtures({
     user1: {
-      //email: 'testuser@troupetest.local'
     },
     user2: {
-      //email: 'testuser2@troupetest.local'
     },
     user3: {
-      //email: 'testuser3@troupetest.local'
     },
     userNoTroupes: {
-      //email: 'testuserwithnotroupes@troupetest.local'
     },
     troupe1: {
-      //uri: 'testtroupe1',
       users: ['user1', 'user2']
     },
     troupe2: {
-      //uri: 'testtroupe2',
     },
     troupe3: {
       /* This troupe should not include test user 2 */
@@ -98,8 +96,17 @@ function load(expected, done) {
       users: ['user1', 'user3']
     }
   }, done);
+}
 
+function load(expected, done) {
+  if(expected) {
+    // DO THINGS THE NEW SCHOOL WAY
+    return createExpectedFixtures(expected, done);
+  } else {
 
+    // Deliberately log the message for every invocation
+    return util.deprecate(createLegacyFixtures, 'Legacy fixtures are deprecated')(done);
+  }
 }
 
 
@@ -120,15 +127,37 @@ function createExpectedFixtures(expected, done) {
       }
     }
 
-    return persistence.User.create({
+    var promise = persistence.User.create({
       identities:       f.identities,
       displayName:      possibleGenerate('displayName', generateName),
       githubId:         possibleGenerate('githubId', generateGithubId),
       githubToken:      possibleGenerate('githubToken', generateGithubToken),
       username:         possibleGenerate('username', generateUsername),
-      state:            f.state      || undefined,
-      staff:            f.staff      || false
+      state:            f.state || undefined,
+      staff:            f.staff || false
     });
+
+    if (f.accessToken) {
+      promise = promise.tap(function(user) {
+        return persistence.OAuthClient.findOne({ clientKey: f.accessToken })
+          .then(function(client) {
+            if (!client) throw new Error('Client not found clientKey=' + f.accessToken);
+
+            var token = '_test_' + uuid.v4();
+            return persistence.OAuthAccessToken.create({
+              token: token,
+              userId: user._id,
+              clientId: client._id,
+              expires: new Date(Date.now() + 60 * 60 * 1000)
+            })
+            .then(function() {
+              user.accessToken = token;
+            });
+          });
+      });
+    }
+
+    return promise;
   }
 
   function createIdentity(fixtureName, f) {
@@ -162,11 +191,11 @@ function createExpectedFixtures(expected, done) {
           lurk = false;
         }
 
-        bulk.find({ troupeId: troupeId, userId:userId })
+        bulk.find({ troupeId: troupeId, userId: userId })
           .upsert()
           .updateOne({
             $set: { flags: flags, lurk: lurk },
-            $setOnInsert: { troupeId: troupeId, userId:userId }
+            $setOnInsert: { troupeId: troupeId, userId: userId }
           });
       });
 
@@ -196,10 +225,13 @@ function createExpectedFixtures(expected, done) {
       lcUri = uri.toLowerCase();
     }
 
+    var groupId = f.group && f.group._id;
+
     var doc = {
       uri: uri,
       lcUri: lcUri,
       githubId: f.githubId === true ? generateGithubId() : f.githubId || null,
+      groupId: groupId,
       status: f.status || 'ACTIVE',
       oneToOne: f.oneToOne,
       security: security,
@@ -244,18 +276,47 @@ function createExpectedFixtures(expected, done) {
       });
   }
 
-  function createInvite(fixtureName, f) {
+  function createGroup(fixtureName, f) {
     debug('Creating %s', fixtureName);
 
-    return persistence.Invite.create({
-      fromUserId:   f.fromUserId,
-      userId:       f.userId,
-      email:        f.email,
-      code:         f.code,
-      troupeId:     f.troupeId,
-      status:       f.status    || 'UNUSED'
-    });
+    var uri = f.uri || generateGroupUri();
 
+    var doc = {
+      name: f.name || uri,
+      uri: uri,
+      lcUri: uri.toLowerCase()
+    };
+
+    debug('Creating group %s with %j', fixtureName, doc);
+
+    return persistence.Group.create(doc)
+    .tap(function(group) {
+      var securityDescriptor = f.securityDescriptor || {};
+
+      var type;
+      if (securityDescriptor.type) {
+        type = securityDescriptor.type;
+      } else {
+        type = null;
+      }
+
+      var securityDoc = {
+        groupId: group._id,
+
+        // Permissions stuff
+        type: type,
+        members: securityDescriptor.members || 'PUBLIC',
+        admins: securityDescriptor.admins || 'MANUAL',
+        public: 'public' in securityDescriptor ? securityDescriptor.public : true,
+        linkPath: securityDescriptor.linkPath,
+        externalId: securityDescriptor.externalId,
+        extraMembers: securityDescriptor.extraMembers,
+        extraAdmins: securityDescriptor.extraAdmins
+      };
+
+      debug('Creating security descriptor for group %s with %j', fixtureName, securityDoc);
+      return persistence.SecurityDescriptor.create(securityDoc);
+    });
   }
 
   function createMessage(fixtureName, f) {
@@ -278,9 +339,27 @@ function createExpectedFixtures(expected, done) {
 
   }
 
+  function deleteDocuments() {
+    var d = expected.deleteDocuments;
+    if (!d) return;
+
+    // This *REALLY* mustn't get run in the wrong environments
+    if (process.env.NODE_ENV === 'beta' || process.env.NODE_ENV === 'prod') {
+      throw new Error('https://cdn.meme.am/instances/400x/52869867.jpg')
+    }
+
+    return Promise.map(Object.keys(d), function(key) {
+      var queries = d[key];
+      return Promise.map(queries, function(query) {
+
+        return persistence[key].remove(query).exec();
+      });
+    })
+  }
+
   function createUsers(fixture) {
     var userCounter = 0;
-    var promises = Object.keys(expected).map(function(key) {
+    return Promise.map(Object.keys(expected), function(key) {
 
       if(key.match(/^user/)) {
         return createUser(key, expected[key])
@@ -343,12 +422,10 @@ function createExpectedFixtures(expected, done) {
 
       return null;
     });
-
-    return Promise.all(promises).then(function() { return fixture; });
   }
 
   function createIdentities(fixture) {
-    var promises = Object.keys(expected).map(function(key) {
+    return Promise.map(Object.keys(expected), function(key) {
       if (key.match(/^identity/)) {
         var expectedIdentity = expected[key];
 
@@ -362,12 +439,45 @@ function createExpectedFixtures(expected, done) {
 
       return null;
     });
+  }
 
-    return Promise.all(promises).then(function() { return fixture; });
+  function createGroups(fixture) {
+    // Create groups
+    return Promise.map(Object.keys(expected), function(key) {
+      if(key.match(/^group/)) {
+        return createGroup(key, expected[key])
+          .then(function(createdGroup) {
+            fixture[key] = createdGroup;
+          });
+      }
+    })
+    .then(function() {
+      // Attach the groups to the troupes
+      return Promise.map(Object.keys(expected), function(key) {
+        if(key.match(/^troupe/)) {
+          var troupe = expected[key];
+          var group = troupe.group;
+          if (!group) return;
+
+          if (typeof group !== 'string') throw new Error('Please specify the group as a string id')
+          if (fixture[group]) {
+            // Already specified at the top level
+            troupe.group = fixture[group];
+            return
+          }
+
+          return createGroup(group, { })
+            .then(function(createdGroup) {
+              troupe.group = createdGroup;
+              fixture[group] = createdGroup;
+            });
+        }
+      });
+    });
   }
 
   function createTroupes(fixture) {
-    var promises = Object.keys(expected).map(function(key) {
+    return Promise.map(Object.keys(expected), function(key) {
 
       if(key.match(/^troupe/)) {
         var expectedTroupe = expected[key];
@@ -396,42 +506,10 @@ function createExpectedFixtures(expected, done) {
 
       return null;
     });
-
-    return Promise.all(promises).then(function() { return fixture; });
-  }
-
-
-  function createInvites(fixture) {
-    var promises = Object.keys(expected).map(function(key) {
-
-        if(key.match(/^invite/)) {
-          var expectedInvite = expected[key];
-
-          expectedInvite.fromUserId = fixture[expectedInvite.fromUser]._id;
-          expectedInvite.userId = expectedInvite.user && fixture[expectedInvite.user]._id;
-          expectedInvite.troupeId = expectedInvite.troupe && fixture[expectedInvite.troupe]._id;
-
-          if(expectedInvite.email === true) {
-            expectedInvite.email =  generateEmail();
-          }
-
-          if(expectedInvite.code === true) {
-            expectedInvite.code =  "confirm" + Math.random();
-          }
-          return createInvite(key, expectedInvite)
-            .then(function(invite) {
-              fixture[key] = invite;
-            });
-        }
-
-        return null;
-      });
-    return Promise.all(promises)
-      .thenReturn(fixture);
   }
 
   function createMessages(fixture) {
-    var promises = Object.keys(expected).map(function(key) {
+    return Promise.map(Object.keys(expected), function(key) {
       if(key.match(/^message/)) {
         var expectedMessage = expected[key];
 
@@ -446,16 +524,16 @@ function createExpectedFixtures(expected, done) {
 
       return null;
     });
-
-    return Promise.all(promises).then(function() { return fixture; });
   }
 
-  return createUsers(createBaseFixture())
-    .then(createIdentities)
-    .then(createTroupes)
-    .then(createInvites)
-    .then(createMessages)
-    .nodeify(done);
+  return Promise.try(createBaseFixture)
+    .tap(deleteDocuments)
+    .tap(createUsers)
+    .tap(createIdentities)
+    .tap(createGroups)
+    .tap(createTroupes)
+    .tap(createMessages)
+    .asCallback(done);
 }
 
 function fixtureLoader(fixture, expected) {
@@ -474,10 +552,31 @@ function fixtureLoader(fixture, expected) {
    };
 }
 
+fixtureLoader.setup = function(expected) {
+  var fixture = {};
+
+  before(fixtureLoader(fixture, expected));
+  after(function() {
+    if (fixture.cleanup) {
+      fixture.cleanup();
+    }
+  });
+
+  return fixture;
+};
+
 fixtureLoader.use = function(expected) {
   return createExpectedFixtures(expected);
 };
 
 fixtureLoader.generateEmail = generateEmail;
+fixtureLoader.generateGithubId = generateGithubId;
+
+fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN = '***REMOVED***';
+fixtureLoader.GITTER_INTEGRATION_USERNAME = 'gitter-integration-tests';
+fixtureLoader.GITTER_INTEGRATION_USER_ID = '19433197';
+fixtureLoader.GITTER_INTEGRATION_ORG = 'gitter-integration-tests-organisation';
+fixtureLoader.GITTER_INTEGRATION_ORG_ID = '19433202';
+fixtureLoader.GITTER_INTEGRATION_REPO = 'public-repo-1';
 
 module.exports = fixtureLoader;

@@ -2,7 +2,6 @@
 
 var assert = require('assert');
 var Promise = require('bluebird');
-var proxyquireNoCallThru = require("proxyquire").noCallThru();
 var fixtureLoader = require('../../../../test/integration/test-fixtures');
 var LegacyPolicyEvaluator = require('../../lib/policies/legacy-policy-evaluator');
 

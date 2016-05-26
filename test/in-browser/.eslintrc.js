@@ -4,7 +4,11 @@ module.exports = {
         "browser": true,
         "mocha": true
     },
-    rules: {
+    "plugins": [
+      "mocha"
+    ],
+    "rules": {
+      "mocha/no-exclusive-tests": "error",
       "strict": ["warn", "safe"],
       "max-nested-callbacks": ["error", 10],
       "node/no-unpublished-require": "off",

@@ -1,13 +1,13 @@
 'use strict';
 
 var Marionette = require('backbone.marionette');
-var TagModel   = require('../../../collections/tag-collection.js').TagModel;
+var TagModel = require('../../../collections/tag-collection.js').TagModel;
 
 var tagInputTemplate = require('./tmpl/tagInputTemplate.hbs');
 
-var ENTER_KEY_CODE     = 13;
+var ENTER_KEY_CODE = 13;
 var BACKSPACE_KEY_CODE = 8;
-var DELETE_KEY_CODE    = 46;
+var DELETE_KEY_CODE = 46;
 
 var TagInputView = Marionette.ItemView.extend({
 
@@ -94,7 +94,7 @@ var TagInputView = Marionette.ItemView.extend({
   },
 
   removeLastTag: function() {
-    var val =  this.$el.find('input').val();
+    var val = this.$el.find('input').val();
     if (val === '') this.collection.pop();
     this.triggerMethod('tag:removed');
   },

@@ -1,11 +1,11 @@
 "use strict";
 
-var env           = require('gitter-web-env');
+var env = require('gitter-web-env');
 var errorReporter = env.errorReporter;
-var stats         = env.stats;
-var Processor     = require('gitter-markdown-processor');
-var shutdown      = require('shutdown');
-var Promise       = require('bluebird');
+var stats = env.stats;
+var Processor = require('gitter-markdown-processor');
+var shutdown = require('shutdown');
+var Promise = require('bluebird');
 
 // processor starts its own process, so lazy load it
 var processor;

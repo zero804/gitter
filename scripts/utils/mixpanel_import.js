@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 "use strict";
 
-var env         = require('gitter-web-env');
-var winston     = env.logger;
-var nconf       = env.config;
+var env = require('gitter-web-env');
+var winston = env.logger;
+var nconf = env.config;
 var persistence = require('gitter-web-persistence');
-var shutdown    = require('shutdown');
+var shutdown = require('shutdown');
 
 
 function getAllUsers(callback) {
@@ -19,9 +19,9 @@ getAllUsers(function(err, users) {
 
   if (nconf.get("stats:mixpanel")) {
 
-    var Mixpanel  = require('mixpanel');
-    var token     = nconf.get("stats:mixpanel:token");
-    var mixpanel  = Mixpanel.init(token);
+    var Mixpanel = require('mixpanel');
+    var token = nconf.get("stats:mixpanel:token");
+    var mixpanel = Mixpanel.init(token);
 
     winston.verbose("[mixpanel] Importing users: ", users.length);
 

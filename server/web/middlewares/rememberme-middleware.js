@@ -1,19 +1,20 @@
 "use strict";
 
-var env             = require('gitter-web-env');
-var logger          = env.logger;
-var nconf           = env.config;
-var stats           = env.stats;
+var env = require('gitter-web-env');
+var logger = env.logger;
+var nconf = env.config;
+var stats = env.stats;
 
-var _               = require('lodash');
-var uuid            = require('node-uuid');
-var sechash         = require('sechash');
-var userService     = require('../../services/user-service');
+var _ = require('lodash');
+var uuid = require('node-uuid');
+var sechash = require('sechash');
+var userService = require('../../services/user-service');
 var useragentTagger = require('../../utils/user-agent-tagger');
-var debug           = require('debug')('gitter:rememberme-middleware');
-var userScopes      = require('gitter-web-identity/lib/user-scopes');
-var passportLogin   = require('../passport-login');
-var Promise         = require('bluebird');
+var debug = require('debug')('gitter:infra:rememberme-middleware');
+var userScopes = require('gitter-web-identity/lib/user-scopes');
+var passportLogin = require('../passport-login');
+var Promise = require('bluebird');
+
 var cookieName = nconf.get('web:cookiePrefix') + 'auth';
 
 var redisClient = env.redis.getClient();

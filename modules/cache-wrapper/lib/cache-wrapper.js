@@ -1,11 +1,11 @@
 'use strict';
 
-var env         = require('gitter-web-env');
-var config      = env.config;
-var _           = require('lodash');
+var env = require('gitter-web-env');
+var config = env.config;
+var _ = require('lodash');
 var SnappyCache = require('snappy-cache');
-var Promise     = require('bluebird');
-var assert      = require('assert');
+var Promise = require('bluebird');
+var assert = require('assert');
 
 var redisClient;
 function getRedisCachingClient() {

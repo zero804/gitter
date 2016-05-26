@@ -71,7 +71,7 @@ describe('github-members', function() {
         return Promise.resolve(true);
       };
 
-      var githubMembers =  proxyquireNoCallThru('../lib/github-members', {
+      var githubMembers = proxyquireNoCallThru('../lib/github-members', {
         './github-org-service': FakeOrgService,
         './github-me-service': FakeMeService
       });

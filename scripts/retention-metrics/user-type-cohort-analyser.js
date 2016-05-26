@@ -20,7 +20,7 @@ UserRoomsRetentionAnalyser.prototype.categoriseUsers = function(allCohortUsers, 
   Troupe.aggregate([
     { $match: {'users.userId': { $in: userIds } } },
     { $project: { githubType: 1, security: 1, users: 1, _id: 0} },
-    { $unwind: '$users'  },
+    { $unwind: '$users' },
     { $project: { githubType: 1, security: 1, userId: "$users.userId" } },
     { $match: { userId: { $in: userIds } } },
     { $group: { _id: "$userId", roomTypes: { $push: { githubType: "$githubType", security: "$security" } } }}

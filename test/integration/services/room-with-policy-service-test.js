@@ -5,7 +5,7 @@ var assert = require('assert');
 var fixtureLoader = require('../test-fixtures');
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
-
+var persistence = require('gitter-web-persistence');
 var RoomWithPolicyService = testRequire('./services/room-with-policy-service');
 
 describe('room-with-policy-service', function() {
@@ -37,13 +37,16 @@ describe('room-with-policy-service', function() {
       },
       userBan: { },
       userBanAdmin: {},
-
+      troupeForDeletion: {}
     }));
 
     after(function() { fixture.cleanup(); });
 
   var isAdminPolicy = {
     canAdmin: function() {
+      return Promise.resolve(true);
+    },
+    canJoin: function(){
       return Promise.resolve(true);
     }
   };
@@ -209,6 +212,44 @@ describe('room-with-policy-service', function() {
           assert.equal(err.status, 403);
         });
 
+    });
+
+  });
+
+  describe('welcome message', function(){
+   it('should allow you to create a welcome message', function(){
+    var welcomeMessage = 'this is a test';
+    var r = new RoomWithPolicyService(fixture.troupe1, fixture.user1, isAdminPolicy);
+    return r.updateRoomWelcomeMessage({ welcomeMessage: welcomeMessage })
+      .then(function(){
+        return r.getRoomWelcomeMessage();
+      })
+      .then(function(result){
+        assert(result.text);
+        assert(result.html);
+        assert.equal(result.text, welcomeMessage);
+      });
+    });
+  });
+
+  describe('delete room', function() {
+    it('should allow an admin to delete a room', function() {
+      var r = new RoomWithPolicyService(fixture.troupeForDeletion, fixture.user1, isAdminPolicy);
+      return r.deleteRoom()
+        .then(function() {
+          return persistence.Troupe.findById(fixture.troupeForDeletion._id)
+            .then(function(troupe) {
+              assert(!troupe);
+            });
+        });
+    });
+
+    it('should not allow a non-admin to delete a room', function() {
+      var r = new RoomWithPolicyService(fixture.troupeForDeletion, fixture.user1, notAdminPolicy);
+      return r.deleteRoom()
+        .catch(StatusError, function(err) {
+          assert.equal(err.status, 403);
+        });
     });
 
   });

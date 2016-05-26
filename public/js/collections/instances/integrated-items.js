@@ -1,15 +1,15 @@
 "use strict";
 
-var userModels        = require('../users');
-var eventModels       = require('../events');
-var appEvents         = require('utils/appevents');
-var errorHandle       = require('utils/live-collection-error-handle');
+var userModels = require('../users');
+var eventModels = require('../events');
+var appEvents = require('utils/appevents');
+var errorHandle = require('utils/live-collection-error-handle');
 
 // TODO: find a better home for this....
 require('components/realtime-troupe-listener');
 
-var rosterCollection        = new userModels.RosterCollection(null, { listen: true });
-var eventCollection         = new eventModels.EventCollection(null,  { listen: true, snapshot: true });
+var rosterCollection = new userModels.RosterCollection(null, { listen: true });
+var eventCollection = new eventModels.EventCollection(null, { listen: true, snapshot: true });
 
 rosterCollection.on('error', errorHandle.bind(null, 'roster-collection'));
 eventCollection.on('error', errorHandle.bind(null, 'events-collection'));

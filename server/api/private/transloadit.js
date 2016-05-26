@@ -1,19 +1,19 @@
 "use strict";
 
-var env           = require('gitter-web-env');
-var stats         = env.stats;
-var logger        = env.logger;
-var nconf         = env.config;
+var env = require('gitter-web-env');
+var stats = env.stats;
+var logger = env.logger;
+var nconf = env.config;
 
-var userService   = require('../../services/user-service');
+var userService = require('../../services/user-service');
 var troupeService = require('../../services/troupe-service');
-var chatService   = require('../../services/chat-service');
-var Promise       = require('bluebird');
-var StatusError   = require('statuserror');
+var chatService = require('../../services/chat-service');
+var Promise = require('bluebird');
+var StatusError = require('statuserror');
 var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
 
-var redis         = require('../../utils/redis');
-var redisClient   = redis.getClient();
+var redis = require('../../utils/redis');
+var redisClient = redis.getClient();
 
 function fixUrl(url) {
   return url.replace(nconf.get('transloadit:bucket') + '.s3.amazonaws.com', nconf.get('transloadit:cname'));

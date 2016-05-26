@@ -4,7 +4,7 @@ var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
 var heatmapService = require('../../services/chat-heatmap-service');
 var moment = require('moment');
 var StatusError = require('statuserror');
-var debug = require('debug')('gitter:chat-heapmap-route');
+var debug = require('debug')('gitter:app:chat-heapmap-route');
 
 module.exports = function(req, res, next) {
   var roomId = req.params.roomId;

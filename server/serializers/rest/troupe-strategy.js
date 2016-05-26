@@ -1,12 +1,12 @@
 /* eslint complexity: ["error", 17] */
 "use strict";
 
-var logger                = require('gitter-web-env').logger;
-var debug                 = require('debug')('gitter:serializer:troupe');
-var getVersion            = require('../get-model-version');
-var UserIdStrategy        = require('./user-id-strategy');
-var mongoUtils            = require('gitter-web-persistence-utils/lib/mongo-utils');
-var Promise               = require('bluebird');
+var logger = require('gitter-web-env').logger;
+var debug = require('debug')('gitter:infra:serializer:troupe');
+var getVersion = require('../get-model-version');
+var UserIdStrategy = require('./user-id-strategy');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var Promise = require('bluebird');
 
 var AllUnreadItemCountStrategy = require('./troupes/all-unread-item-count-strategy');
 var FavouriteTroupesForUserStrategy = require('./troupes/favourite-troupes-for-user-strategy');

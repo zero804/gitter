@@ -1,10 +1,10 @@
 "use strict";
 
-var Promise        = require('bluebird');
-var appEvents      = require('gitter-web-appevents');
+var Promise = require('bluebird');
+var appEvents = require('gitter-web-appevents');
 var restSerializer = require("../../serializers/rest-serializer");
-var troupeService  = require('../troupe-service');
-var debug          = require('debug')('gitter:live-collection-room-members');
+var troupeService = require('../troupe-service');
+var debug = require('debug')('gitter:app:live-collection-room-members');
 
 function notifyGroupRoomOfAddedUsers(room, userIds) {
   /* No point in notifing large rooms */

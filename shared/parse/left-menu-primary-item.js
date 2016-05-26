@@ -1,11 +1,11 @@
 /* eslint complexity: ["error", 14] */
 'use strict';
 
-var _                       = require('underscore');
-var urlJoin                 = require('url-join');
+var _ = require('underscore');
+var urlJoin = require('url-join');
 var resolveRoomAvatarSrcSet = require('../avatars/resolve-room-avatar-srcset');
-var roomNameShortener       = require('../room-name-shortener');
-var parseRoomItemName       = require('../get-org-menu-state-name-from-troupe-name');
+var roomNameShortener = require('../room-name-shortener');
+var parseRoomItemName = require('../get-org-menu-state-name-from-troupe-name');
 
 var clientEnv = require('gitter-client-env');
 
@@ -45,8 +45,8 @@ module.exports = function parseContentToTemplateData(data, state) {
     });
   }
 
-  var hasMentions  = !!data.mentions && data.mentions;
-  var unreadItems  = !hasMentions && data.unreadItems;
+  var hasMentions = !!data.mentions && data.mentions;
+  var unreadItems = !hasMentions && data.unreadItems;
 
   // Make sure we are lurking and we only have activity so we don't override mentions or unread indicators
   var lurkActivity = !!data.activity && (!hasMentions && !unreadItems);

@@ -1,9 +1,9 @@
 'use strict';
 
-var Backbone           = require('backbone');
-var _                  = require('underscore');
+var Backbone = require('backbone');
+var _ = require('underscore');
 var FilteredCollection = require('backbone-filtered-collection');
-var localStorageSync   = require('../utils/local-storage-sync');
+var localStorageSync = require('../utils/local-storage-sync');
 
 var Model = Backbone.Model.extend({
   defaults: { name: null, avatarUrl: null, isRecentSearch: true },
@@ -51,7 +51,7 @@ var RecentSearchesCollection = Backbone.Collection.extend({
 
 var FilteredRecentSearches = function(attrs, options) {
   this.collection = new RecentSearchesCollection(null);
-  attrs  = _.extend({}, attrs, { collection: this.collection });
+  attrs = _.extend({}, attrs, { collection: this.collection });
   FilteredCollection.call(this, attrs, options);
 };
 

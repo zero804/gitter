@@ -1,7 +1,7 @@
 'use strict';
 
-var path          = require('path');
-var _             = require('underscore');
+var path = require('path');
+var _ = require('underscore');
 var webpackConfig = require('./webpack.config');
 
 module.exports = function(config) {

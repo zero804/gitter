@@ -40,7 +40,7 @@ function ensureGitHubUser(options) {
   return userService.findOrCreateUserForGithubId(options);
 }
 
-describe('restful', function() {
+describe('restful #slow', function() {
   var fixture = {};
   before(fixtureLoader(fixture, {
     // user1 is a google (non-github) user
@@ -59,6 +59,11 @@ describe('restful', function() {
       id: 2,
       username: generateGithubUsername()
     },
+    group1: { },
+    troupe1: {
+      group: 'group1',
+      users: ['user1']
+    }
   }));
 
   after(function() {
@@ -137,4 +142,21 @@ describe('restful', function() {
   it('serializes orgs', function() {
     return restful.serializeOrgsForUserId(fixture.user1.id);
   });
+
+
+  describe('serializeGroupsForUserId', function() {
+
+    it('should do what it says on the tin', function() {
+      return restful.serializeGroupsForUserId(fixture.user1.id)
+        .then(function(result) {
+          assert.deepEqual(result, [{
+            id: fixture.group1.id,
+            name: fixture.group1.name,
+            uri: fixture.group1.uri
+          }]);
+        });
+    });
+
+  });
+
 });

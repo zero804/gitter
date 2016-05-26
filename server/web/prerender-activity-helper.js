@@ -1,16 +1,16 @@
 "use strict";
 
-var _                  = require('underscore');
-var compileTemplate    = require('./compile-web-template');
+var _ = require('underscore');
+var compileTemplate = require('./compile-web-template');
 var activityDecorators = require('gitter-web-shared/activity/activity-decorators');
-var prerenderWrapper   = require('./prerender-wrapper');
-var timeFormat         = require('gitter-web-shared/time/time-format');
+var prerenderWrapper = require('./prerender-wrapper');
+var timeFormat = require('gitter-web-shared/time/time-format');
 
 function compile(template) {
   return compileTemplate('/js/views/righttoolbar/tmpl/' + template + '.hbs');
 }
 
-var compositeTemplate   = compile('activity-composite');
+var compositeTemplate = compile('activity-composite');
 var prerenderedTemplate = compile('activity-item-prerendered');
 
 var serviceTemplates = {
