@@ -6,15 +6,17 @@ var ModalView = require('./modal');
 var apiClient = require('components/apiClient');
 var roomSettingsTemplate = require('./tmpl/room-settings-view.hbs');
 var Promise = require('bluebird');
+var toggleClass = require('utils/toggle-class');
 
 var View = Marionette.ItemView.extend({
   template: roomSettingsTemplate,
 
   ui: {
     githubOnly: '#github-only',
+    welcomeMessageContainer: '#welcome-message-container',
     welcomeMessage: '#room-welcome-message',
+    welcomeMessagePreview: '#preview-welcome-message',
     errorMessage: '#error-message',
-    welcomeMessagePreview: '#preview-welcome-message'
   },
 
   events:   {
@@ -67,6 +69,8 @@ var View = Marionette.ItemView.extend({
 
   previewWelcomeMessage: function (e){
     e.preventDefault();
+    this.ui.welcomeMessagePreview.text('Close');
+    toggleClass(this.ui.welcomeMessageContainer[0], 'preview', true);
   },
 
   formSubmit: function() {
