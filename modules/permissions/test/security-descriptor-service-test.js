@@ -3,7 +3,7 @@
 var assert = require('assert');
 var fixtureLoader = require('../../../test/integration/test-fixtures');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
-var securityDesciptorService = require('../lib/security-descriptor-service');
+var securityDescriptorService = require('../lib/security-descriptor-service');
 var permissionCombinations = require('./permission-combinations');
 
 describe('security-descriptor-service', function() {
@@ -12,9 +12,9 @@ describe('security-descriptor-service', function() {
     permissionCombinations.forEach(function(descriptor, index) {
       it('should insert and read combination #' + index, function() {
         var roomId = mongoUtils.getNewObjectIdString();
-        return securityDesciptorService.insertForRoom(roomId, descriptor)
+        return securityDescriptorService.insertForRoom(roomId, descriptor)
           .then(function() {
-            return securityDesciptorService.getForRoomUser(roomId, null);
+            return securityDescriptorService.getForRoomUser(roomId, null);
           })
           .then(function(result) {
             assert.strictEqual(result.type, descriptor.type);
@@ -47,9 +47,9 @@ describe('security-descriptor-service', function() {
     after(function() { fixture.cleanup(); });
 
     it('should rename links', function() {
-      return securityDesciptorService.updateLinksForRepo('gitterHQ/gitter', 'gitterHQ/test')
+      return securityDescriptorService.updateLinksForRepo('gitterHQ/gitter', 'gitterHQ/test')
         .then(function() {
-          return securityDesciptorService.getForRoomUser(fixture.troupe1._id, null);
+          return securityDescriptorService.getForRoomUser(fixture.troupe1._id, null);
         })
         .then(function(descriptor) {
           assert.deepEqual(descriptor, {

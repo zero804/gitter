@@ -71,10 +71,10 @@ module.exports = {
       return next();
     });
 
-    var SecurityDesciptor = mongooseConnection.model('SecurityDesciptor', SecurityDescriptorSchema);
+    var SecurityDescriptor = mongooseConnection.model('SecurityDescriptor', SecurityDescriptorSchema);
 
     // Create a partial index for troupe security descriptors
-    SecurityDesciptor.collection.createIndex({
+    SecurityDescriptor.collection.createIndex({
         troupeId: 1
       } , {
         background: true,
@@ -87,7 +87,7 @@ module.exports = {
         if (err) throw err;
       });
 
-    SecurityDesciptor.collection.createIndex({
+    SecurityDescriptor.collection.createIndex({
         groupId: 1
       } , {
         background: true,
@@ -100,7 +100,7 @@ module.exports = {
         if (err) throw err;
       });
 
-    SecurityDesciptor.collection.createIndex({
+    SecurityDescriptor.collection.createIndex({
         type: 1,
         linkPath: 1
       } , {
@@ -113,7 +113,7 @@ module.exports = {
         if (err) throw err;
       });
 
-    SecurityDesciptor.collection.createIndex({
+    SecurityDescriptor.collection.createIndex({
         type: 1,
         externalId: 1
       } , {
@@ -127,7 +127,7 @@ module.exports = {
       });
 
     return {
-      model: SecurityDesciptor,
+      model: SecurityDescriptor,
       schema: SecurityDescriptorSchema
     };
   }
