@@ -1,7 +1,6 @@
 "use strict";
 
 var Marionette = require('backbone.marionette');
-var Backbone = require('backbone');
 var loadingFilteredCollection = require('collections/loading-filtered-collection');
 var template = require('./tmpl/repoSelectView.hbs');
 var itemTemplate = require('./tmpl/repoItemView.hbs');

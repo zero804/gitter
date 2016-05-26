@@ -30,7 +30,7 @@ onMongoConnect(function() {
               }
           }
         } } ])
-        .exec(function(err, results) {
+        .exec(function() {
           done();
         });
     },
