@@ -252,6 +252,9 @@ RoomWithPolicyService.prototype.getRoomWelcomeMessage = secureMethod([allowJoin]
   return roomMetaService.findMetaByTroupeId(this.room.id, 'welcomeMessage');
 });
 
+/**
+ * Update the welcome message for a room
+ */
 RoomWithPolicyService.prototype.updateRoomWelcomeMessage = secureMethod([allowAdmin], function(welcomeMessage){
   if (!welcomeMessage) throw new StatusError(400);
 
