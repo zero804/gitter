@@ -1,7 +1,7 @@
 "use strict";
 
 var assert = require('assert');
-var fixtureLoader = require('../../../test/integration/test-fixtures');
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var securityDescriptorService = require('../lib/security-descriptor-service');
 var permissionCombinations = require('./permission-combinations');

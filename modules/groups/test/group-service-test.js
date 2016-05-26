@@ -2,7 +2,7 @@
 
 var groupService = require('../lib/group-service');
 var assert = require('assert');
-var fixtureLoader = require('../../../test/integration/test-fixtures');
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
 
 describe('group-service', function() {

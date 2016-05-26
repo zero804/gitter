@@ -3,7 +3,7 @@
 var testRequire = require('../test-require');
 var restful = testRequire('./services/restful');
 var userService = testRequire('./services/user-service');
-var fixtureLoader = require('../test-fixtures');
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assert = require('assert');
 
 var counter = 0;
