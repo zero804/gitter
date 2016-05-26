@@ -255,7 +255,8 @@ onready(function() {
       'settings': 'settings',
       'tags': 'editTags',
       'autojoin': 'autojoin',
-      'notification-defaults': 'notificationDefaults'
+      'notification-defaults': 'notificationDefaults',
+      'welcome-message': 'showWelcomeMessage'
     },
 
     autojoin: function() {
@@ -374,7 +375,14 @@ onready(function() {
         }));
 
       });
-    }
+    },
+
+    showWelcomeMessage: function (){
+      require.ensure(['./views/modals/welcome-message'], function(require){
+        var WelcomeMessageView = require('./views/modals/welcome-message');
+        appView.dialogRegion.show(new WelcomeMessageView.Modal());
+      });
+    },
 
   });
 
