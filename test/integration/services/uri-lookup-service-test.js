@@ -9,7 +9,7 @@ var assert = require('assert');
 var uriLookupService = testRequire("./services/uri-lookup-service");
 var promiseUtils = testRequire("./utils/promise-utils");
 
-var fixtureLoader = require('../test-fixtures');
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var fixture = {};
 
 
