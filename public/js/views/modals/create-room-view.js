@@ -130,7 +130,7 @@ var View = Marionette.LayoutView.extend({
 
       case 'repo':
       case 'org':
-        if(permissions !== 'public' && permissions !== 'private' && permissions != 'inherited') {
+        if(permissions !== 'public' && permissions !== 'private' && permissions !== 'inherited') {
           self.showValidationMessage('Please select the permissions for the room');
           // TODO: better error reporting!
           return;
@@ -156,8 +156,6 @@ var View = Marionette.LayoutView.extend({
         appEvents.trigger('navigation', data.url , 'chat#add', data.uri);
       })
       .catch(function(err) {
-
-
         var status = err.status;
         var message = 'Unable to create channel.';
 

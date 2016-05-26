@@ -2,6 +2,7 @@
 
 var roomService = require("../../../services/room-service");
 var restSerializer = require("../../../serializers/rest-serializer");
+var StatusError = require('statuserror');
 
 function serialize(items, req) {
   var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user && req.user.id });
@@ -33,9 +34,9 @@ module.exports = {
       .then(function(customRoom) {
         return serializeObject(customRoom, req);
       })
-      .catch(function(err) {
-        if(err.clientDetail && err.responseStatusCode) {
-          res.status(err.responseStatusCode);
+      .catch(StatusError, function(err) {
+        if(err.clientDetail) {
+          res.status(err.status);
           return err.clientDetail;
         }
 

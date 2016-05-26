@@ -26,7 +26,7 @@ mongoDebug.install(mongoose.mongo, {
 
 connection.on('error', function(err) {
   winston.info("MongoDB connection error", { exception: err });
-  errorReporter(err, { connection_error:true }, { module: 'persistence' });
+  errorReporter(err, { connection_error: true }, { module: 'persistence' });
 });
 
 function createExports(schemas) {
@@ -51,6 +51,7 @@ module.exports = createExports({
   Identity: require('./schemas/identity-schema'),
   UserTroupeLastAccess: require('./schemas/user-troupe-last-access-schema'),
   UserTroupeFavourites: require('./schemas/user-troupe-favourites-schema'),
+  Group: require('./schemas/group-schema'),
   Troupe: require('./schemas/troupe-schema'),
   TroupeMeta: require('./schemas/troupe-meta-schema'),
   TroupeUser: require('./schemas/troupe-user-schema'),
