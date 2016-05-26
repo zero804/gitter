@@ -5,12 +5,12 @@
  *  TODO TEST VIEW FILTERING FOR DIFFERENT MODEL STATES
  * */
 
-var $                     = require('jquery');
-var assert                = require('assert');
-var sinon                 = require('sinon');
-var Backbone              = require('backbone');
+var $ = require('jquery');
+var assert = require('assert');
+var sinon = require('sinon');
+var Backbone = require('backbone');
 var PrimaryCollectionView = require('public/js/views/menu/room/primary-collection/primary-collection-view');
-var context               = require('utils/context');
+var context = require('utils/context');
 
 describe.skip('PrimaryCollectionView', function() {
 
@@ -26,14 +26,14 @@ describe.skip('PrimaryCollectionView', function() {
     model = new Backbone.Model({ state: 'all', panelOpenState: true, activeOrgName: 'gitterHQ' });
     collection = new Backbone.Collection([
       { name:  '1', id: 1, favourite: 1, uri: '1/1', url: '1/1' },
-      { name:  '2', id: 2, uri: '2/2', url: '2/2'   },
+      { name:  '2', id: 2, uri: '2/2', url: '2/2' },
       { name:  '3', id: 3, uri: '3/3', url: '3/3' },
       { name:  '4', id: 4, uri: '4/4', url: '4/4' },
     ]);
     sinon.stub(collection.models[1], 'save');
 
-    dndCtrl                 = new Backbone.View();
-    dndCtrl.pushContainer   = function() {};
+    dndCtrl = new Backbone.View();
+    dndCtrl.pushContainer = function() {};
     dndCtrl.removeContainer = function() {};
 
     primaryCollectionView = new PrimaryCollectionView({
@@ -246,19 +246,19 @@ describe('PrimaryCollectionView2', function(){
 
   beforeEach(function() {
     context.troupe().set('id', 1);
-    el            = document.createElement('div');
-    model         = new Backbone.Model();
+    el = document.createElement('div');
+    model = new Backbone.Model();
     roomMenuModel = new Backbone.Model({ state: 'all', panelOpenState: true, activeOrgName: 'gitterHQ' });
-    collection    = new Backbone.Collection([
+    collection = new Backbone.Collection([
       { name:  '1', id: 1, favourite: 1, uri: '1/1', url: '1/1' },
-      { name:  '2', id: 2, uri: '2/2', url: '2/2'   },
+      { name:  '2', id: 2, uri: '2/2', url: '2/2' },
       { name:  '3', id: 3, uri: '3/3', url: '3/3' },
       { name:  '4', id: 4, uri: '4/4', url: '4/4' },
     ]);
     sinon.stub(collection.models[1], 'save');
 
-    dndCtrl                 = new Backbone.View();
-    dndCtrl.pushContainer   = function() {};
+    dndCtrl = new Backbone.View();
+    dndCtrl.pushContainer = function() {};
     dndCtrl.removeContainer = function() {};
 
     primaryCollectionView = new PrimaryCollectionView({

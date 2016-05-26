@@ -15,7 +15,7 @@ router.use('/orgs', authMiddleware);
 var userResources = resourceRoute('api-user', require('./user'));
 var roomsResources = resourceRoute('api-rooms', require('./rooms'));
 var usersResources = resourceRoute('api-rooms', require('./users'));
-var orgResources   = resourceRoute('api-orgs', require('./orgs'));
+var orgResources = resourceRoute('api-orgs', require('./orgs'));
 
 router.use('/user', userResources);
 router.use('/rooms', roomsResources);

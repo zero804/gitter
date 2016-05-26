@@ -49,7 +49,7 @@ module.exports = (function() {
   }
 
   function eyeballsOff(synchronous) {
-    if(eyesOnState)  {
+    if(eyesOnState) {
       stopInactivityPoller();
 
       debug('Eyeballs off');
@@ -64,7 +64,7 @@ module.exports = (function() {
     lastUserInteraction = Date.now();
     inactivity = false;
 
-    if(!eyesOnState)  {
+    if(!eyesOnState) {
       startInactivityPoller();
 
       debug('Eyeballs on');
@@ -166,10 +166,10 @@ module.exports = (function() {
 
   var debouncedInteractionTracking = _.debounce(updateLastUserInteraction, 500);
 
-  document.addEventListener("keydown",    debouncedInteractionTracking, false);
-  document.addEventListener("mousemove",  debouncedInteractionTracking, false);
+  document.addEventListener("keydown", debouncedInteractionTracking, false);
+  document.addEventListener("mousemove", debouncedInteractionTracking, false);
   document.addEventListener("touchstart", debouncedInteractionTracking, false);
-  window.addEventListener("scroll",       debouncedInteractionTracking, false);
+  window.addEventListener("scroll", debouncedInteractionTracking, false);
 
 
   startInactivityPoller();

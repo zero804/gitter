@@ -1,6 +1,6 @@
 "use strict";
 
-var roomService     = require("../../../services/room-service");
+var roomService = require("../../../services/room-service");
 var restSerializer = require("../../../serializers/rest-serializer");
 var loadTroupeFromParam = require('./load-troupe-param');
 var RoomWithPolicyService = require('../../../services/room-with-policy-service');

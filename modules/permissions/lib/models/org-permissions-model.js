@@ -1,10 +1,10 @@
 "use strict";
 
-var env              = require('gitter-web-env');
-var logger           = env.logger;
+var env = require('gitter-web-env');
+var logger = env.logger;
 var GitHubOrgService = require('gitter-web-github').GitHubOrgService;
-var userIsInRoom     = require('../user-in-room');
-var Promise          = require('bluebird');
+var userIsInRoom = require('../user-in-room');
+var Promise = require('bluebird');
 
 /**
  * ORG permissions model

@@ -1,11 +1,11 @@
 "use strict";
 
-var env           = require('gitter-web-env');
-var winston       = env.logger;
+var env = require('gitter-web-env');
+var winston = env.logger;
 var errorReporter = env.errorReporter;
-var mongoose      = require('gitter-web-mongoose-bluebird');
-var debug         = require('debug')('gitter:infra:persistence-service');
-var mongoDebug    = require('node-mongodb-debug-log');
+var mongoose = require('gitter-web-mongoose-bluebird');
+var debug = require('debug')('gitter:infra:persistence-service');
+var mongoDebug = require('node-mongodb-debug-log');
 
 // Install inc and dec number fields in mongoose
 require('mongoose-number')(mongoose);

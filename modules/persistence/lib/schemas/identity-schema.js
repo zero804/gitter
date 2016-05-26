@@ -1,8 +1,8 @@
 'use strict';
 
-var mongoose       = require('gitter-web-mongoose-bluebird');
-var Schema         = mongoose.Schema;
-var ObjectId       = Schema.ObjectId;
+var mongoose = require('gitter-web-mongoose-bluebird');
+var Schema = mongoose.Schema;
+var ObjectId = Schema.ObjectId;
 
 module.exports = {
   install: function(mongooseConnection) {

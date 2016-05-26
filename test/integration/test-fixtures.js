@@ -1,11 +1,11 @@
 "use strict";
 
 var testRequire = require('./test-require');
-var Promise     = require('bluebird');
+var Promise = require('bluebird');
 var persistence = require('gitter-web-persistence');
 var roomMembershipFlags = testRequire("./services/room-membership-flags");
-var debug       = require('debug')('gitter:tests:test-fixtures');
-var counter     = 0;
+var debug = require('debug')('gitter:tests:test-fixtures');
+var counter = 0;
 
 var seed = Date.now();
 
@@ -127,8 +127,8 @@ function createExpectedFixtures(expected, done) {
       githubId:         possibleGenerate('githubId', generateGithubId),
       githubToken:      possibleGenerate('githubToken', generateGithubToken),
       username:         possibleGenerate('username', generateUsername),
-      state:            f.state      || undefined,
-      staff:            f.staff      || false
+      state:            f.state || undefined,
+      staff:            f.staff || false
     });
   }
 
@@ -254,7 +254,7 @@ function createExpectedFixtures(expected, done) {
       email:        f.email,
       code:         f.code,
       troupeId:     f.troupeId,
-      status:       f.status    || 'UNUSED'
+      status:       f.status || 'UNUSED'
     });
 
   }
@@ -413,11 +413,11 @@ function createExpectedFixtures(expected, done) {
           expectedInvite.troupeId = expectedInvite.troupe && fixture[expectedInvite.troupe]._id;
 
           if(expectedInvite.email === true) {
-            expectedInvite.email =  generateEmail();
+            expectedInvite.email = generateEmail();
           }
 
           if(expectedInvite.code === true) {
-            expectedInvite.code =  "confirm" + Math.random();
+            expectedInvite.code = "confirm" + Math.random();
           }
           return createInvite(key, expectedInvite)
             .then(function(invite) {

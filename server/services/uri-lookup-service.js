@@ -7,9 +7,9 @@
  */
 
 var persistence = require('gitter-web-persistence');
-var Promise     = require('bluebird');
-var mongoUtils  = require('gitter-web-persistence-utils/lib/mongo-utils');
-var debug       = require('debug')('gitter:app:uri-lookup-service');
+var Promise = require('bluebird');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var debug = require('debug')('gitter:app:uri-lookup-service');
 
 
 /**

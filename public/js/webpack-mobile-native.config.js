@@ -1,9 +1,9 @@
 "use strict";
 
-var path                     = require("path");
-var _                        = require('lodash');
-var mainWebpackConfig        = require('./webpack.config');
-var DedupePlugin             = require('webpack/lib/optimize/DedupePlugin');
+var path = require("path");
+var _ = require('lodash');
+var mainWebpackConfig = require('./webpack.config');
+var DedupePlugin = require('webpack/lib/optimize/DedupePlugin');
 
 var mobileConfig = _.extend({}, mainWebpackConfig);
 

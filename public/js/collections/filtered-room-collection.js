@@ -3,8 +3,8 @@
 var Backbone = require('backbone');
 
 //Filters
-var one2oneFilter  = require('gitter-web-shared/filters/left-menu-primary-one2one');
-var orgFilter      = require('gitter-web-shared/filters/left-menu-primary-org');
+var one2oneFilter = require('gitter-web-shared/filters/left-menu-primary-one2one');
+var orgFilter = require('gitter-web-shared/filters/left-menu-primary-org');
 var sortAndFilters = require('gitter-realtime-client/lib/sorts-filters').model;
 
 var FilteredRoomCollection = Backbone.Collection.extend({

@@ -74,16 +74,14 @@ function resetNotificationsForUserTroupe(userId, troupeId, callback) {
 // Returns falsey value or notification period number
 function canLockForNotification(userId, troupeId, startTime, maxLockValue) {
   debug("canLockForNotification: userId=%s, troupeId=%s, startTime=%s, maxLockValue=%s", userId, troupeId, startTime, maxLockValue);
-  return redisClient.notifyLockUserTroupe(
-    /* keys */   'nl:' + userId + ':' + troupeId, 'nls:' + userId + ':' + troupeId,
+  return redisClient.notifyLockUserTroupe('nl:' + userId + ':' + troupeId, 'nls:' + userId + ':' + troupeId,
     /* values */ startTime, minimumUserAlertIntervalS, maxLockValue);
 }
 
 // Returns falsey value or start-of-notification-period as unix timestamp
 function canUnlockForNotification(userId, troupeId, notificationNumber) {
   debug("canUnlockForNotification: userId=%s, troupeId=%s, notificationNumber=%s", userId, troupeId, notificationNumber);
-  return redisClient.notifyUnlockUserTroupe(
-    /* keys */   'nl:' + userId + ':' + troupeId, 'nls:' + userId + ':' + troupeId,
+  return redisClient.notifyUnlockUserTroupe('nl:' + userId + ':' + troupeId, 'nls:' + userId + ':' + troupeId,
     /* values */ notificationNumber)
   .then(function(result) {
     return result ? parseInt(result, 10) : 0;

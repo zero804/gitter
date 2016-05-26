@@ -1,21 +1,21 @@
 'use strict';
 
-var _                 = require('underscore');
-var $                 = require('jquery');
-var Marionette        = require('backbone.marionette');
-var cocktail          = require('cocktail');
-var fastdom           = require('fastdom');
-var context           = require('utils/context');
-var DNDCtrl           = require('components/menu/room/dnd-controller');
-var localStore        = require('components/local-store');
-var toggleClass       = require('utils/toggle-class');
+var _ = require('underscore');
+var $ = require('jquery');
+var Marionette = require('backbone.marionette');
+var cocktail = require('cocktail');
+var fastdom = require('fastdom');
+var context = require('utils/context');
+var DNDCtrl = require('components/menu/room/dnd-controller');
+var localStore = require('components/local-store');
+var toggleClass = require('utils/toggle-class');
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 var KeyboardEventMixin = require('views/keyboard-events-mixin');
 
-var RoomMenuModel      = require('../../../../models/room-menu-model');
-var MiniBarView        = require('../minibar/minibar-view');
-var PanelView          = require('../panel/panel-view');
-var MinibarCollection  = require('../minibar/minibar-collection');
+var RoomMenuModel = require('../../../../models/room-menu-model');
+var MiniBarView = require('../minibar/minibar-view');
+var PanelView = require('../panel/panel-view');
+var MinibarCollection = require('../minibar/minibar-collection');
 var KeyboardControllerView = require('../keyboard-controller/keyboard-controller-view');
 var KeyboardControllerModel = require('../keyboard-controller/keyboard-controller-model');
 
@@ -76,7 +76,7 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
       throw new Error('A valid event bus needs to be passed to a new instance of RoomMenuLayout');
     }
 
-    this.bus   = attrs.bus;
+    this.bus = attrs.bus;
 
     //Room Collection
     if (!attrs || !attrs.roomCollection) {
@@ -84,11 +84,11 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
     }
 
 
-    this.roomCollection          = attrs.roomCollection;
+    this.roomCollection = attrs.roomCollection;
 
     //TODO TEST THIS & FIGURE OUT IF THEY ARE REQUIRED FOR MOBILE?
     //JP 28/1/16
-    this.orgCollection           = attrs.orgCollection;
+    this.orgCollection = attrs.orgCollection;
     this.suggestedRoomCollection = attrs.suggestedRoomCollection;
 
     var orgsSnapshot = context.getSnapshot('orgs') || [];
@@ -116,8 +116,8 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
 
     window.addEventListener('resize', this._initNano.bind(this));
     this.listenTo(this.dndCtrl, 'dnd:start-drag', this.onDragStart.bind(this));
-    this.listenTo(this.dndCtrl, 'dnd:end-drag',   this.onDragEnd.bind(this));
-    this.listenTo(this.bus,     'panel:render',   this.onPanelRender, this);
+    this.listenTo(this.dndCtrl, 'dnd:end-drag', this.onDragEnd.bind(this));
+    this.listenTo(this.bus, 'panel:render', this.onPanelRender, this);
 
     //this.$el.find('#searc-results').show();
 
@@ -198,7 +198,7 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
 
       //because of the margins nanoScroller will never show the scroller
       //so here is some custom logic to work around it
-      var minibarItems       = this.minibar.currentView.collection.length;
+      var minibarItems = this.minibar.currentView.collection.length;
       var minibarItemsHeight = (minibarItems * MINIBAR_ITEM_HEIGHT);
       fastdom.measure(function() {
         var minibarContainerHeight = this.ui.minibarList.height();
