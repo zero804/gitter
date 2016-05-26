@@ -8,7 +8,7 @@ var EVENTS = ['change', 'keydown', 'click', 'cut', 'paste'];
 function Drafty(el, uniqueId) {
   this.el = el;
   if(!uniqueId) {
-    uniqueId =  window.location.pathname.split('/').splice(1).join('_');
+    uniqueId = window.location.pathname.split('/').splice(1).join('_');
   }
 
   this.uniqueId = uniqueId;

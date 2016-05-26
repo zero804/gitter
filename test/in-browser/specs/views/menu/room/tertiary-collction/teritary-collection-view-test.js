@@ -1,8 +1,8 @@
 /*global describe:true, it:true, beforeEach:true */
 'use strict';
 
-var assert                 = require('assert');
-var Backbone               = require('backbone');
+var assert = require('assert');
+var Backbone = require('backbone');
 var TertiaryCollectionView = require('public/js/views/menu/room/tertiary-collection/tertiary-collection-view');
 
 describe('TertiaryCollectionView', function() {
@@ -14,11 +14,11 @@ describe('TertiaryCollectionView', function() {
   var collection;
 
   beforeEach(function() {
-    el            = document.createElement('div');
-    model         = new Backbone.Model({ active: true });
+    el = document.createElement('div');
+    model = new Backbone.Model({ active: true });
     roomMenuModel = new Backbone.Model();
-    collection    = new Backbone.Collection(null);
-    view          = new TertiaryCollectionView({
+    collection = new Backbone.Collection(null);
+    view = new TertiaryCollectionView({
       el:            el,
       roomMenuModel: roomMenuModel,
       collection:    collection,

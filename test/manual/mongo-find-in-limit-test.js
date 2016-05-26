@@ -1,6 +1,6 @@
 'use strict';
 
-var speedy      = require("speedy");
+var speedy = require("speedy");
 var persistence = require('gitter-web-persistence');
 
 

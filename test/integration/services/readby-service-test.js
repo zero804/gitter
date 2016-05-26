@@ -1,10 +1,10 @@
 "use strict";
 
-var testRequire        = require('../test-require');
-var readyByService     = testRequire('./services/readby-service');
+var testRequire = require('../test-require');
+var readyByService = testRequire('./services/readby-service');
 var persistenceService = require('gitter-web-persistence');
-var collections        = testRequire('./utils/collections');
-var fixtureLoader      = require('../test-fixtures');
+var collections = testRequire('./utils/collections');
+var fixtureLoader = require('../test-fixtures');
 
 var assert = require("assert");
 

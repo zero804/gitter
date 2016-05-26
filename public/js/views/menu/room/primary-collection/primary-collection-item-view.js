@@ -1,13 +1,13 @@
 'use strict';
 
-var Backbone          = require('backbone');
-var _                 = require('underscore');
-var itemTemplate      = require('./primary-collection-item-view.hbs');
-var apiClient         = require('components/apiClient');
-var context           = require('utils/context');
-var appEvents         = require('utils/appevents');
-var parseForTemplate  = require('gitter-web-shared/parse/left-menu-primary-item');
-var toggleClass       = require('utils/toggle-class');
+var Backbone = require('backbone');
+var _ = require('underscore');
+var itemTemplate = require('./primary-collection-item-view.hbs');
+var apiClient = require('components/apiClient');
+var context = require('utils/context');
+var appEvents = require('utils/appevents');
+var parseForTemplate = require('gitter-web-shared/parse/left-menu-primary-item');
+var toggleClass = require('utils/toggle-class');
 var parseRoomItemName = require('gitter-web-shared/get-org-menu-state-name-from-troupe-name');
 var roomNameShortener = require('gitter-web-shared/room-name-shortener');
 
@@ -164,7 +164,7 @@ module.exports = BaseCollectionItemView.extend({
   },
 
   onMenuChangeState: function () {
-    var name    = (this.model.get('name') || this.model.get('uri') || this.model.get('username'));
+    var name = (this.model.get('name') || this.model.get('uri') || this.model.get('username'));
     var content = (this.roomMenuModel.get('state') === 'org') ?
       parseRoomItemName(name) :
       roomNameShortener(name);

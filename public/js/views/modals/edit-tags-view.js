@@ -1,14 +1,14 @@
 'use strict';
 
-var Backbone         = require('backbone');
-var Marionette       = require('backbone.marionette');
-var ModalView        = require('./modal');
-var TagInputView     = require('views/app/tags/tagInputView');
-var TagListView      = require('views/app/tags/tagListView');
-var TagErrorView     = require('views/app/tags/tagErrorView');
-var TagModel         = require('collections/tag-collection').TagModel;
-var TagCollection    = require('collections/tag-collection').TagCollection;
-var apiClient        = require('components/apiClient');
+var Backbone = require('backbone');
+var Marionette = require('backbone.marionette');
+var ModalView = require('./modal');
+var TagInputView = require('views/app/tags/tagInputView');
+var TagListView = require('views/app/tags/tagListView');
+var TagErrorView = require('views/app/tags/tagErrorView');
+var TagModel = require('collections/tag-collection').TagModel;
+var TagCollection = require('collections/tag-collection').TagCollection;
+var apiClient = require('components/apiClient');
 var editTagsTemplate = require('./tmpl/edit-tags-view.hbs');
 
 require('views/behaviors/isomorphic');
@@ -18,7 +18,7 @@ var View = Marionette.LayoutView.extend({
 
   behaviors: {
     Isomorphic: {
-      tagList:  { el: '#tag-list',  init: 'initTagList' },
+      tagList:  { el: '#tag-list', init: 'initTagList' },
       tagInput: { el: '#tag-input', init: 'initTagListEdit' },
       tagError: { el: '#tag-error', init: 'initTagError'},
     },
