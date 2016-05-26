@@ -72,10 +72,12 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
   onDragEnd: function (el) {
     this.mirror = null;
     window.removeEventListener('mouseup', this.onMouseUp);
-    this.trigger('dnd:end-drag');
     if(el) {
       el.classList.remove('hidden');
+      el.classList.remove('will-hideaway');
     }
+    
+    this.trigger('dnd:end-drag');
   },
 
   onMouseUp: function () {
@@ -91,7 +93,7 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
       mirror  = document.querySelector('.gu-mirror');
       transit = document.querySelector('.gu-transit');
       if (mirror) { mirror.classList.add('hidden'); }
-      if(transit) { transit.classList.remove('hidden'); }
+      if(transit) { transit.classList.remove('will-hideaway'); }
     }
 
     //If we hover over the primary collection show the drag mirror
@@ -99,7 +101,7 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
       mirror  = document.querySelector('.gu-mirror');
       transit = document.querySelector('.gu-transit');
       if (mirror) { mirror.classList.remove('hidden'); }
-      if(transit) { transit.classList.add('hidden'); }
+      if(transit) { transit.classList.add('will-hideaway'); }
     }
   },
 
