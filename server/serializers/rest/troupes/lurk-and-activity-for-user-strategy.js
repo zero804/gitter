@@ -1,8 +1,8 @@
 "use strict";
 
-var unreadItemService     = require('../../../services/unread-items');
+var unreadItemService = require('../../../services/unread-items');
 var roomMembershipService = require('../../../services/room-membership-service');
-var _                     = require("lodash");
+var _ = require("lodash");
 
 function LurkAndActivityForUserStrategy(options) {
   this.currentUserId = options.currentUserId;

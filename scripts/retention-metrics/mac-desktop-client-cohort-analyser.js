@@ -31,7 +31,7 @@ MacDesktopAnalyser.prototype.categoriseUsers = function(allCohortUsers, callback
       var usersWithMacLogin = _(results).transform(function(result, token) { result[token.userId] = 1; }, {}).value();
       return _(userIds)
         .transform(function(result, userId) {
-          result[userId] = usersWithMacLogin[userId]  == 1 ? "MacDesktop" : "NoMacDesktop";
+          result[userId] = usersWithMacLogin[userId] == 1 ? "MacDesktop" : "NoMacDesktop";
         }, {})
         .value();
     })

@@ -1,6 +1,6 @@
 "use strict";
 
-var assert  = require('assert');
+var assert = require('assert');
 
 describe('push-notification-filter', function() {
   var pushNotificationFilter;
@@ -190,7 +190,7 @@ describe('push-notification-filter', function() {
 
       .spread(function(ttl1, exists) {
         assert(ttl1 > 0);
-        assert(ttl1 <  t1); // Check that the expiry on the key has not been reset.
+        assert(ttl1 < t1); // Check that the expiry on the key has not been reset.
 
         assert.strictEqual(exists, 0);
 

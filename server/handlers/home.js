@@ -1,13 +1,13 @@
 "use strict";
 
-var express            = require('express');
-var urlJoin            = require('url-join');
-var ensureLoggedIn     = require('../web/middlewares/ensure-logged-in');
-var appMiddleware      = require('./app/middleware');
+var express = require('express');
+var urlJoin = require('url-join');
+var ensureLoggedIn = require('../web/middlewares/ensure-logged-in');
+var appMiddleware = require('./app/middleware');
 var timezoneMiddleware = require('../web/middlewares/timezone');
-var appRender          = require('./app/render');
-var identifyRoute      = require('gitter-web-env').middlewares.identifyRoute;
-var featureToggles     = require('../web/middlewares/feature-toggles');
+var appRender = require('./app/render');
+var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
+var featureToggles = require('../web/middlewares/feature-toggles');
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 

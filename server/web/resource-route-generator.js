@@ -1,9 +1,9 @@
 'use strict';
 
-var express       = require('express');
-var StatusError   = require('statuserror');
+var express = require('express');
+var StatusError = require('statuserror');
 var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
-var Promise       = require('bluebird');
+var Promise = require('bluebird');
 
 module.exports = function resourceRoute(routeIdentifier, resource) {
   var router = express.Router({ caseSensitive: true, mergeParams: true });
@@ -54,14 +54,14 @@ module.exports = function resourceRoute(routeIdentifier, resource) {
       });
   }
 
-  mount('get',    '/',                       'index');
-  mount('get',    '/new',                    'new');
-  mount('post',   '/',                       'create');
-  mount('get',    '/:' + idParam,            'show');
-  mount('get',    '/:' + idParam + '/edit',  'edit');
-  mount('put',    '/:' + idParam,            'update');
-  mount('patch',  '/:' + idParam,            'patch');
-  mount('delete', '/:' + idParam,            'destroy');
+  mount('get', '/', 'index');
+  mount('get', '/new', 'new');
+  mount('post', '/', 'create');
+  mount('get', '/:' + idParam, 'show');
+  mount('get', '/:' + idParam + '/edit', 'edit');
+  mount('put', '/:' + idParam, 'update');
+  mount('patch', '/:' + idParam, 'patch');
+  mount('delete', '/:' + idParam, 'destroy');
 
   if (resource.subresources) {
     Object.keys(resource.subresources).forEach(function(subresourceName) {

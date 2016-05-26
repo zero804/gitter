@@ -2,20 +2,20 @@
 
 //TODO This has basically turned into a controller, refactor it JP 2/2/16
 
-var Backbone                       = require('backbone');
-var _                              = require('underscore');
-var ProxyCollection                = require('backbone-proxy-collection');
-var RecentSearchesCollection       = require('../collections/recent-searches');
-var SuggestedOrgCollection         = require('../collections/org-suggested-rooms');
-var apiClient                      = require('components/apiClient');
-var FilteredRoomCollection         = require('../collections/filtered-room-collection.js');
+var Backbone = require('backbone');
+var _ = require('underscore');
+var ProxyCollection = require('backbone-proxy-collection');
+var RecentSearchesCollection = require('../collections/recent-searches');
+var SuggestedOrgCollection = require('../collections/org-suggested-rooms');
+var apiClient = require('components/apiClient');
+var FilteredRoomCollection = require('../collections/filtered-room-collection.js');
 var SuggestedRoomsByRoomCollection = require('../collections/left-menu-suggested-by-room');
-var UserSuggestions                = require('../collections/user-suggested-rooms');
-var SearchRoomPeopleCollection     = require('../collections/left-menu-search-rooms-and-people');
-var SearchChatMessages             = require('../collections/search-chat-messages');
-var perfTiming                     = require('components/perf-timing');
-var context                        = require('utils/context');
-var defaultCollectionFilter        = require('gitter-web-shared/filters/left-menu-primary-default');
+var UserSuggestions = require('../collections/user-suggested-rooms');
+var SearchRoomPeopleCollection = require('../collections/left-menu-search-rooms-and-people');
+var SearchChatMessages = require('../collections/search-chat-messages');
+var perfTiming = require('components/perf-timing');
+var context = require('utils/context');
+var defaultCollectionFilter = require('gitter-web-shared/filters/left-menu-primary-default');
 
 var states = [
   'all',
@@ -64,7 +64,7 @@ module.exports = Backbone.Model.extend({
     this.searchInterval = SEARCH_DEBOUNCE_INTERVAL;
 
     //assign internal collections
-    this._roomCollection          = attrs.roomCollection;
+    this._roomCollection = attrs.roomCollection;
     delete attrs.roomCollection;
 
     this._troupeModel = attrs.troupeModel;
@@ -81,11 +81,11 @@ module.exports = Backbone.Model.extend({
     delete attrs.userModel;
 
     //expose the public collection
-    this.searchTerms              = new RecentSearchesCollection(null);
-    this.searchRoomAndPeople      = new SearchRoomPeopleCollection(null, { roomMenuModel: this, roomCollection: this._roomCollection });
-    this.searchChatMessages       = new SearchChatMessages(null, { roomMenuModel: this, roomModel: this._troupeModel });
-    this.suggestedOrgs            = new SuggestedOrgCollection({ contextModel: this, roomCollection: this._roomCollection });
-    this.userSuggestions          = new UserSuggestions(null, { contextModel: context.user() });
+    this.searchTerms = new RecentSearchesCollection(null);
+    this.searchRoomAndPeople = new SearchRoomPeopleCollection(null, { roomMenuModel: this, roomCollection: this._roomCollection });
+    this.searchChatMessages = new SearchChatMessages(null, { roomMenuModel: this, roomModel: this._troupeModel });
+    this.suggestedOrgs = new SuggestedOrgCollection({ contextModel: this, roomCollection: this._roomCollection });
+    this.userSuggestions = new UserSuggestions(null, { contextModel: context.user() });
     this._suggestedRoomCollection = new SuggestedRoomsByRoomCollection({
       roomMenuModel:           this,
       troupeModel:             this._troupeModel,
@@ -94,16 +94,16 @@ module.exports = Backbone.Model.extend({
     });
 
     var models = this._roomCollection.filter(defaultCollectionFilter);
-    this.activeRoomCollection   = new FilteredRoomCollection(models, {
+    this.activeRoomCollection = new FilteredRoomCollection(models, {
       roomModel:  this,
       collection: this._roomCollection,
     });
 
 
 
-    this.primaryCollection   = new ProxyCollection({ collection: this.activeRoomCollection });
+    this.primaryCollection = new ProxyCollection({ collection: this.activeRoomCollection });
     this.secondaryCollection = new ProxyCollection({ collection: this.searchTerms });
-    this.tertiaryCollection  = new ProxyCollection({ collection: this._orgCollection });
+    this.tertiaryCollection = new ProxyCollection({ collection: this._orgCollection });
 
     this.listenTo(this.primaryCollection, 'snapshot', this.onPrimaryCollectionSnapshot, this);
     this.snapshotTimeout = setTimeout(function(){
@@ -248,7 +248,7 @@ module.exports = Backbone.Model.extend({
   },
 
   onRoomChange: function (){
-    var activeModel      = this._getModel('active', true);
+    var activeModel = this._getModel('active', true);
     var newlyActiveModel = this._getModel('id', context.troupe().get('id'));
 
     if(activeModel) { activeModel.set('active', false); }

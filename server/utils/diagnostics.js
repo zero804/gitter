@@ -1,11 +1,11 @@
 "use strict";
 
-var env     = require('gitter-web-env');
+var env = require('gitter-web-env');
 var winston = env.logger;
-var nconf   = env.config;
-var path    = require('path');
-var util    = require('util');
-var os      = require('os');
+var nconf = env.config;
+var path = require('path');
+var util = require('util');
+var os = require('os');
 
 if (nconf.get('newrelic:enabled')) require('newrelic');
 

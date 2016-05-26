@@ -1,18 +1,18 @@
 "use strict";
 
-var env               = require('gitter-web-env');
-var logger            = env.logger;
-var stats             = env.stats;
+var env = require('gitter-web-env');
+var logger = env.logger;
+var stats = env.stats;
 
-var presenceService   = require('gitter-web-presence');
-var restful           = require('../../services/restful');
-var restSerializer    = require("../../serializers/rest-serializer");
-var mongoUtils        = require('gitter-web-persistence-utils/lib/mongo-utils');
-var StatusError       = require('statuserror');
-var bayeuxExtension   = require('./extension');
-var Promise           = require('bluebird');
-var policyFactory     = require('gitter-web-permissions/lib/legacy-policy-factory');
-var debug             = require('debug')('gitter:app:bayeux-authorisor');
+var presenceService = require('gitter-web-presence');
+var restful = require('../../services/restful');
+var restSerializer = require("../../serializers/rest-serializer");
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var StatusError = require('statuserror');
+var bayeuxExtension = require('./extension');
+var Promise = require('bluebird');
+var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
+var debug = require('debug')('gitter:app:bayeux-authorisor');
 var recentRoomService = require('../../services/recent-room-service');
 
 var survivalMode = !!process.env.SURVIVAL_MODE || false;

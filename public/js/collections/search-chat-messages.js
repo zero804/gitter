@@ -2,10 +2,10 @@
 
 //TODO This is too specialised, abstract jp 2/2/16
 
-var Backbone               = require('backbone');
-var _                      = require('underscore');
+var Backbone = require('backbone');
+var _ = require('underscore');
 var BaseResolverCollection = require('./base-resolver-collection.js');
-var context                = require('utils/context');
+var context = require('utils/context');
 
 var ContextModel = Backbone.Model.extend({
   defaults: {
@@ -15,7 +15,7 @@ var ContextModel = Backbone.Model.extend({
   },
   initialize: function(attrs, options) { //jshint unused: true
     this.roomMenuModel = options.roomMenuModel;
-    this.roomModel     = options.roomModel;
+    this.roomModel = options.roomModel;
     this.listenTo(this.roomMenuModel, 'change:searchTerm change:state', this.onModelUpdate, this);
     this.listenTo(this.roomModel, 'change:id', this.onModelUpdate, this);
 

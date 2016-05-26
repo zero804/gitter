@@ -2,28 +2,28 @@
 
 "use strict";
 
-var env                  = require('gitter-web-env');
-var stats                = env.stats;
-var config               = env.config;
-var errorReporter        = env.errorReporter;
-var logger               = env.logger;
+var env = require('gitter-web-env');
+var stats = env.stats;
+var config = env.config;
+var errorReporter = env.errorReporter;
+var logger = env.logger;
 
-var ChatMessage          = require('gitter-web-persistence').ChatMessage;
-var collections          = require("../utils/collections");
-var userService          = require("./user-service");
-var processChat          = require('../utils/markdown-processor');
-var Promise              = require('bluebird');
-var StatusError          = require('statuserror');
-var _                    = require('underscore');
-var mongooseUtils        = require('gitter-web-persistence-utils/lib/mongoose-utils');
-var cacheWrapper         = require('gitter-web-cache-wrapper');
-var groupResolver        = require('./group-resolver');
-var chatSearchService    = require('./chat-search-service');
-var unreadItemService    = require('./unread-items');
+var ChatMessage = require('gitter-web-persistence').ChatMessage;
+var collections = require("../utils/collections");
+var userService = require("./user-service");
+var processChat = require('../utils/markdown-processor');
+var Promise = require('bluebird');
+var StatusError = require('statuserror');
+var _ = require('underscore');
+var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
+var cacheWrapper = require('gitter-web-cache-wrapper');
+var groupResolver = require('./group-resolver');
+var chatSearchService = require('./chat-search-service');
+var unreadItemService = require('./unread-items');
 var markdownMajorVersion = require('gitter-markdown-processor').version.split('.')[0];
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
-var recentRoomService    = require("./recent-room-service");
-var mongoUtils           = require('gitter-web-persistence-utils/lib/mongo-utils');
+var recentRoomService = require("./recent-room-service");
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 var useHints = true;
 
@@ -231,16 +231,16 @@ exports.updateChatMessage = function(troupe, chatMessage, user, newText, callbac
       return Promise.all([parsedMessage, resolveMentions(troupe, user, parsedMessage)]);
     })
     .spread(function(parsedMessage, mentions) {
-      chatMessage.html      = parsedMessage.html;
-      chatMessage.editedAt  = new Date();
-      chatMessage.lang      = parsedMessage.lang;
+      chatMessage.html = parsedMessage.html;
+      chatMessage.editedAt = new Date();
+      chatMessage.lang = parsedMessage.lang;
 
       // Metadata
-      chatMessage.urls      = parsedMessage.urls;
-      var originalMentions  = chatMessage.mentions;
-      chatMessage.mentions  = mentions;
-      chatMessage.issues    = parsedMessage.issues;
-      chatMessage._md       = parsedMessage.markdownProcessingFailed ?
+      chatMessage.urls = parsedMessage.urls;
+      var originalMentions = chatMessage.mentions;
+      chatMessage.mentions = mentions;
+      chatMessage.issues = parsedMessage.issues;
+      chatMessage._md = parsedMessage.markdownProcessingFailed ?
                                 -CURRENT_META_DATA_VERSION : CURRENT_META_DATA_VERSION;
 
       return chatMessage.save()

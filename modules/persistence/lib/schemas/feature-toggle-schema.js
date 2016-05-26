@@ -1,7 +1,7 @@
 "use strict";
 
-var mongoose      = require('gitter-web-mongoose-bluebird');
-var Schema        = mongoose.Schema;
+var mongoose = require('gitter-web-mongoose-bluebird');
+var Schema = mongoose.Schema;
 
 var FeatureToggle = new Schema({
   name: String,

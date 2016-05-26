@@ -1,11 +1,11 @@
 "use strict";
 
 
-var testRequire   = require('../test-require');
+var testRequire = require('../test-require');
 var fixtureLoader = require('../test-fixtures');
-var assert        = require("assert");
-var mongoUtils    = require('gitter-web-persistence-utils/lib/mongo-utils');
-var fixture       = {};
+var assert = require("assert");
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var fixture = {};
 
 describe('troupe-service', function() {
 

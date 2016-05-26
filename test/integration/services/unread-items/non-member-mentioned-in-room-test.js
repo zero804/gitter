@@ -1,11 +1,11 @@
 "use strict";
 
-var testRequire       = require('./../../test-require');
-var fixtureLoader     = require('../../test-fixtures');
-var assert            = testRequire("assert");
-var chatService       = testRequire("./services/chat-service");
+var testRequire = require('./../../test-require');
+var fixtureLoader = require('../../test-fixtures');
+var assert = testRequire("assert");
+var chatService = testRequire("./services/chat-service");
 var unreadItemService = testRequire("./services/unread-items");
-var appEvents         = testRequire("gitter-web-appevents");
+var appEvents = testRequire("gitter-web-appevents");
 
 describe("unread item end-to-end integration tests #slow", function() {
   var fixture = {};

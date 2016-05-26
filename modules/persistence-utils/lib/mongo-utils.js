@@ -1,7 +1,7 @@
 "use strict";
 
 var ObjectID = require('mongodb').ObjectID;
-var _        = require('lodash');
+var _ = require('lodash');
 
 function objectIDsEqual(a, b) {
   if (a === b) return true;

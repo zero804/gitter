@@ -1,19 +1,19 @@
 /* eslint complexity: ["error", 19] */
 "use strict";
 
-var env                      = require('gitter-web-env');
-var winston                  = env.logger;
-var troupeService            = require("../../services/troupe-service");
-var identityService          = require("gitter-web-identity");
-var presenceService          = require("gitter-web-presence");
-var Promise                  = require('bluebird');
-var collections              = require("../../utils/collections");
+var env = require('gitter-web-env');
+var winston = env.logger;
+var troupeService = require("../../services/troupe-service");
+var identityService = require("gitter-web-identity");
+var presenceService = require("gitter-web-presence");
+var Promise = require('bluebird');
+var collections = require("../../utils/collections");
 var GithubContributorService = require('gitter-web-github').GitHubContributorService;
-var getVersion               = require('../get-model-version');
-var billingService           = require('../../services/billing-service');
-var leanUserDao              = require('../../services/daos/user-dao').full;
-var resolveUserAvatarUrl     = require('gitter-web-shared/avatars/resolve-user-avatar-url');
-var userScopes               = require('gitter-web-identity/lib/user-scopes');
+var getVersion = require('../get-model-version');
+var billingService = require('../../services/billing-service');
+var leanUserDao = require('../../services/daos/user-dao').full;
+var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-url');
+var userScopes = require('gitter-web-identity/lib/user-scopes');
 
 function UserPremiumStatusStrategy() {
   var usersWithPlans;
