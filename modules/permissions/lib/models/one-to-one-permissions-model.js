@@ -39,7 +39,7 @@ module.exports = function oneToOnePermissionsModel(user, right, uri, security) {
       return Promise.resolve(false);
 
     default:
-      throw 'Unknown right ' + right;
+      throw new StatusError(400, 'Unknown right ' + right);
   }
 
 };

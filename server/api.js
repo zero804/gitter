@@ -30,11 +30,15 @@ require('./workers').listen();
 
 app.use('/', require('./api/'));
 
-onMongoConnect(function() {
-  serverStats('api', server);
+if (!process.env.DISABLE_API_LISTEN) {
+  onMongoConnect(function() {
+    serverStats('api', server);
 
-  var port = nconf.get("PORT");
-  server.listen(port, undefined, nconf.get("web:backlog"), function() {
-    winston.info("Listening on " + port);
+    var port = nconf.get("PORT");
+    server.listen(port, undefined, nconf.get("web:backlog"), function() {
+      winston.info("Listening on " + port);
+    });
   });
-});
+}
+
+module.exports = server;
