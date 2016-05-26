@@ -28,10 +28,11 @@ function idStrategyGenerator(name, FullObjectStrategy, loaderFunction) {
     });
 
     this.map = function(id) {
+      if (!objectHash) return undefined;
       var fullObject = objectHash[id];
 
       if(!fullObject) {
-        return null;
+        return undefined;
       }
 
       return strategy.map(fullObject);

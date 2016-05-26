@@ -48,7 +48,8 @@ module.exports = {
     var strategy = new restSerializer.TroupeIdStrategy({
       currentUserId: req.user && req.user.id,
       includeTags: true,
-      includeProviders: true
+      includeProviders: true,
+      includeGroups: true
     });
 
     return restSerializer.serializeObject(req.params.troupeId, strategy);
