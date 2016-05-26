@@ -255,10 +255,10 @@ RoomWithPolicyService.prototype.getRoomWelcomeMessage = secureMethod([allowJoin]
 /**
  * Update the welcome message for a room
  */
-RoomWithPolicyService.prototype.updateRoomWelcomeMessage = secureMethod([allowAdmin], function(welcomeMessage){
-  if (!welcomeMessage) throw new StatusError(400);
+RoomWithPolicyService.prototype.updateRoomWelcomeMessage = secureMethod([allowAdmin], function(data){
+  if (!data || !data.welcomeMessage) throw new StatusError(400);
 
-  return processMarkdown(welcomeMessage)
+  return processMarkdown(data.welcomeMessage)
     .bind(this)
     .then(function(welcomeMessage){
       return roomMetaService.upsertMetaKey(this.room.id, 'welcomeMessage', welcomeMessage)
