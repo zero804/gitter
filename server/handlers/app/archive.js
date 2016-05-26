@@ -15,7 +15,7 @@ var timezoneMiddleware      = require('../../web/middlewares/timezone');
 var resolveRoomAvatarUrl    = require('gitter-web-shared/avatars/resolve-room-avatar-url');
 var dateTZtoUTC             = require('gitter-web-shared/time/date-timezone-to-utc');
 var beforeTodayAnyTimezone  = require('gitter-web-shared/time/before-today-any-timezone');
-var debug                   = require('debug')('gitter:app-archive');
+var debug                   = require('debug')('gitter:app:app-archive');
 var _                       = require('underscore');
 var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 var StatusError             = require('statuserror');
@@ -194,8 +194,9 @@ exports.chatArchive = [
   function(req, res, next) {
     var user = req.user;
     var troupe = req.uriContext.troupe;
+    var policy = req.uriContext.policy;
 
-    return validateRoomForReadOnlyAccess(user, troupe)
+    return validateRoomForReadOnlyAccess(user, policy)
       .then(function() {
         var troupeId = troupe.id;
 

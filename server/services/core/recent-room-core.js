@@ -4,7 +4,7 @@ var Promise                 = require('bluebird');
 var lazy                    = require('lazy.js');
 var persistence             = require('gitter-web-persistence');
 var _                       = require('underscore');
-var debug                   = require('debug')('gitter:recent-room-core');
+var debug                   = require('debug')('gitter:app:recent-room-core');
 
 exports.updateFavourite                                = updateFavourite;
 exports.clearFavourite                                 = clearFavourite;

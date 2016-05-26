@@ -4,7 +4,7 @@ var env               = require('gitter-web-env');
 var stats             = env.stats;
 var nconf             = env.config;
 var statsd            = env.createStatsClient({ prefix: nconf.get('stats:statsd:prefix')});
-var debug             = require('debug')('gitter:faye-logging');
+var debug             = require('debug')('gitter:infra:faye-logging');
 
 function getClientIp(req) {
   if(!req) return;
