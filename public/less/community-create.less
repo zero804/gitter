@@ -275,7 +275,7 @@
 
   background-color: transparent;
   border: 0;
-  border-bottom: @border-width solid @ruby;
+  border-bottom: @border-width solid @jaffa;
   box-shadow: none;
   border-radius: 0;
 
@@ -283,6 +283,8 @@
   font-size: @font-size;
   line-height: 1;
   font-weight: 300;
+
+  transition: border-color .2s ease;
 
   &:hover,
   &:focus {
@@ -294,9 +296,31 @@
     box-shadow: none;
   }
 
+
+  // Reset forms.less :(
+  &:focus:required:invalid {
+    color: @base-text-color;
+    border-bottom-color: @ruby;
+    box-shadow: none;
+  }
+
+  &:required {
+    border-bottom-color: @jaffa;
+  }
+  &:valid {
+    border-bottom-color: @caribbean;
+  }
+  &:invalid {
+    border-bottom-color: @ruby;
+  }
+  &:not(:required) {
+    border-bottom-color: @jaffa;
+  }
+
   &:placeholder {
     color: @subdued-text-color;
   }
+
 }
 
 .secondary-bare-input() {
