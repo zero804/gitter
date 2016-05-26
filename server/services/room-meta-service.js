@@ -13,6 +13,7 @@ function findMetaByTroupeId(troupeId, metaKey) {
   return persistence.TroupeMeta.findOne({ troupeId: troupeId }).select(metaKey)
     .exec()
     .then(function(result){
+      result = (result || {});
       return result[metaKey];
     });
 }
