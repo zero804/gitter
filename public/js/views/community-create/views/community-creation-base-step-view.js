@@ -30,7 +30,7 @@ module.exports = Marionette.LayoutView.extend({
   onValidChange: function() {
     var isValid = this.model.get('valid');
     toggleClass(this.ui.nextStep[0], 'disabled', !isValid);
-    this.ui.nextStep[0][isValid ? 'removeAttribute' : 'setAttribute']('disabled', 'disabled');
+    //this.ui.nextStep[0][isValid ? 'removeAttribute' : 'setAttribute']('disabled', 'disabled');
   },
 
   onRender: function() {

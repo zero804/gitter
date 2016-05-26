@@ -25,6 +25,21 @@ var updateElementValueAndMaintatinSelection = function(el, newValue) {
   }
 };
 
+// Consider all constraints except a customError because we use
+// this to add a custom message on what to do to satisfy
+var isFormElementInvalid = function(el, useCustomError) {
+  return el.validity.badInput ||
+    (useCustomError ? el.validity.customError : false) ||
+    el.validity.patternMismatch ||
+    el.validity.rangeOverflow ||
+    el.validity.rangeUnderflow ||
+    el.validity.stepMismatch ||
+    el.validity.tooLong ||
+    el.validity.typeMismatch ||
+    //el.validity.valid ||
+    el.validity.valueMissing;
+};
+
 
 module.exports = CommunityCreateBaseStepView.extend({
   template: template,
@@ -48,6 +63,7 @@ module.exports = CommunityCreateBaseStepView.extend({
   },
 
   ui: _.extend({}, CommunityCreateBaseStepView.prototype.ui, {
+    mainForm: '.js-community-create-main-view-form',
     communityNameInput: '.primary-community-name-input',
     communitySlugInput: '.community-creation-slug-input',
     githubProjectLink: '.js-community-create-from-github-project-link',
@@ -65,7 +81,8 @@ module.exports = CommunityCreateBaseStepView.extend({
   }),
 
   events: _.extend({}, CommunityCreateBaseStepView.prototype.events, {
-    'click @ui.nextStep': 'onStepNext',
+    'submit @ui.mainForm': 'onStepNext',
+    'click @ui.nextStep': 'validateStep',
     'input @ui.communityNameInput': 'onCommunityNameInputChange',
     'input @ui.communitySlugInput': 'onCommunitSlugInputChange',
     'click @ui.githubProjectLink': 'onGitHubProjectLinkActivated',
@@ -103,6 +120,7 @@ module.exports = CommunityCreateBaseStepView.extend({
   validateStep: function() {
     var hasCommunityName = this.communityCreateModel.get('communityName').length;
     var hasCommunitySlug = this.communityCreateModel.get('communitySlug').length;
+
     this.model.set({
       valid: hasCommunityName && hasCommunitySlug
     });
@@ -165,6 +183,8 @@ module.exports = CommunityCreateBaseStepView.extend({
       isUsingCustomSlug: true,
       communitySlug: newSlug
     });
+
+    this.ui.communitySlugInput[0].setCustomValidity(isFormElementInvalid(this.ui.communitySlugInput[0]) ? 'Slug can only contain lowercase a-z and dashes -' : '');
   },
 
   /* * /

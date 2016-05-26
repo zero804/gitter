@@ -1,4 +1,4 @@
-<div class="community-create-step-content-area">
+<form class="community-create-step-content-area js-community-create-main-view-form">
   <h1 class="primary-community-heading h1">
     Think big,<br />
     start small, grow fast
@@ -6,13 +6,17 @@
 
   <input
     class="primary-community-name-input"
-    placeholder="your community name" />
+    placeholder="your community name"
+    pattern=".+"
+    required />
 
   <div class="community-creation-slug-input-wrapper">
     <span class="community-creation-slug-input-prefix">gitter.im/</span>
     <input
       class="community-creation-slug-input"
-      placeholder="your-community-domain" />
+      placeholder="your-community-domain"
+      pattern="[a-z\-]+"
+      required />
   </div>
 
   {{#if hasGitHubProvider}}
@@ -68,9 +72,9 @@
   <section class="community-create-progression-button-wrapper">
     <div></div>
 
-    <button class="community-create-next-button button-caribbean js-community-create-step-next">
+    <button type="submit" class="community-create-next-button button-caribbean js-community-create-step-next">
       Next
     </button>
   </section>
 
-</div>
+</form>
