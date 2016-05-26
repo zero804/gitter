@@ -100,7 +100,7 @@ router.get('/user-avatar/:username',
   identifyRoute('api-private-user-avatar'),
   require('./user-avatar'));
 
-router.get('/avatars/gravatar/:email',
+router.get('/avatars/gravatar/e/:email',
   identifyRoute('api-private-gravatar'),
   require('./gravatar'));
 
