@@ -3,12 +3,20 @@
     <p>Oops, something went wrong. Try refreshing the page and re-opening the room settings</p>
   </div>
   <form class="room-settings">
+
     <label class="welcome-message-label"
            id="room-welcome-message-label"
            for="room-welcome-message">
       Welcome message
     </label>
+
     <textarea class="welcome-message" placeholder="Checking for an existing welcome message ..." id="room-welcome-message"></textarea>
+
+    <button id="preview-welcome-message"
+            class="secondary-button-caribbean">
+      Preview
+    </button>
+
     <p class="github-only-container">
       <input type="checkbox"
              class="github-only"
@@ -17,5 +25,6 @@
              value="checked">
       <label for="github-only">Only GitHub users are allowed to join this room.</label>
     </p>
+
   </form>
 </div>
