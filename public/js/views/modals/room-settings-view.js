@@ -10,14 +10,16 @@ var Promise = require('bluebird');
 var View = Marionette.ItemView.extend({
   template: roomSettingsTemplate,
 
-  events:   {
-    'click #close-settings': 'destroySettings',
-  },
-
   ui: {
     githubOnly: '#github-only',
     welcomeMessage: '#room-welcome-message',
     errorMessage: '#error-message',
+    welcomeMessagePreview: '#preview-welcome-message'
+  },
+
+  events:   {
+    'click #close-settings': 'destroySettings',
+    'click @ui.welcomeMessagePreview': 'previewWelcomeMessage'
   },
 
   initialize: function() {
@@ -61,6 +63,10 @@ var View = Marionette.ItemView.extend({
 
   onRender: function() {
     this.update();
+  },
+
+  previewWelcomeMessage: function (e){
+    e.preventDefault();
   },
 
   formSubmit: function() {
