@@ -1,14 +1,14 @@
 "use strict";
 
-var $             = require('jquery');
-var Marionette    = require('backbone.marionette');
-var context       = require('utils/context');
-var clientEnv     = require('gitter-client-env');
-var apiClient     = require('components/apiClient');
-var social        = require('utils/social');
-var ModalView     = require('./modal');
-var cdn           = require('utils/cdn');
-var template      = require('./tmpl/share-view.hbs');
+var $ = require('jquery');
+var Marionette = require('backbone.marionette');
+var context = require('utils/context');
+var clientEnv = require('gitter-client-env');
+var apiClient = require('components/apiClient');
+var social = require('utils/social');
+var ModalView = require('./modal');
+var cdn = require('utils/cdn');
+var template = require('./tmpl/share-view.hbs');
 var ZeroClipboard = require('zeroclipboard');
 
 require('gitter-styleguide/css/components/buttons.css');

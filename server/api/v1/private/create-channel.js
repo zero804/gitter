@@ -4,6 +4,7 @@ var roomService = require('../../../services/room-service');
 var restSerializer = require("../../../serializers/rest-serializer");
 var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
 var RoomWithPolicyService = require('../../../services/room-with-policy-service');
+var StatusError = require('statuserror');
 
 /**
  * TODO: this endpoint will go once we break way from
@@ -32,11 +33,13 @@ module.exports = function(req, res, next) {
     .then(function(serialized) {
       res.send(serialized);
     })
-    .catch(function(err) {
-      if(err.clientDetail && err.responseStatusCode) {
-        res.status(err.responseStatusCode).send(err.clientDetail);
-      } else {
-        next(err);
+    .catch(StatusError, function(err) {
+      if(err.clientDetail) {
+        res.status(err.status).send(err.clientDetail);
+        return;
       }
-    });
+
+      throw err;
+    })
+    .catch(next);
 };

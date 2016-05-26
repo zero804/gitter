@@ -1,9 +1,9 @@
 "use strict";
 
-var assert      = require('assert');
+var assert = require('assert');
 var testRequire = require('../../test-require');
-var isToday     = testRequire('../shared/time/is-today');
-var moment      = require('moment');
+var isToday = testRequire('../shared/time/is-today');
+var moment = require('moment');
 
 var TEST_CASES = [
   { time: '2015-06-17T00:00:00-08:00', now: '2015-06-17T00:00:00Z', expected: false },

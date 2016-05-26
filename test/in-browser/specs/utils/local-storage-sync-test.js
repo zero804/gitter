@@ -1,8 +1,8 @@
 /*global describe:true, it:true, beforeEach:true */
 'use strict';
 
-var assert           = require('assert');
-var Backbone         = require('backbone');
+var assert = require('assert');
+var Backbone = require('backbone');
 var localStorageSync = require('public/js/utils/local-storage-sync');
 
 describe('LocalStorageSync', function() {

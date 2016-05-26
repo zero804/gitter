@@ -26,7 +26,7 @@ UserRoomsRetentionAnalyser.prototype.categoriseUsers = function(allCohortUsers, 
 
       result.push({
         'd.userId': { $in: userIds },
-        t: { $gte: start,  $lt: endOfClassificationPeriod }
+        t: { $gte: start, $lt: endOfClassificationPeriod }
       });
 
     }, [])

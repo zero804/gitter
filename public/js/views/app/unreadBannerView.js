@@ -33,8 +33,8 @@ var TopBannerView = Marionette.ItemView.extend({
 
   modelEvents: function() {
     var events = {};
-    events['change:unread' + this.position]      = 'updateVisibility';
-    events['change:hasUnread' + this.position]   = 'updateVisibility';
+    events['change:unread' + this.position] = 'updateVisibility';
+    events['change:hasUnread' + this.position] = 'updateVisibility';
     events['change:hasMentions' + this.position] = 'updateVisibility';
 
     return events;
@@ -71,10 +71,10 @@ var TopBannerView = Marionette.ItemView.extend({
     var mentionsCount = this.getMentionsCount();
 
     if (!unreadCount && !mentionsCount) return 'Go to bottom';
-    if (mentionsCount === 1)            return '1 mention';
-    if (mentionsCount > 1)              return mentionsCount + '  mentions';
-    if (unreadCount === 1)              return '1 unread';
-    if (unreadCount > 99)               return '99+ unread';
+    if (mentionsCount === 1) return '1 mention';
+    if (mentionsCount > 1) return mentionsCount + '  mentions';
+    if (unreadCount === 1) return '1 unread';
+    if (unreadCount > 99) return '99+ unread';
     return unreadCount + ' unread';
   },
 

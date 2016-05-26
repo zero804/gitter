@@ -1,7 +1,7 @@
 'use strict';
 
 var env = require('gitter-web-env');
-var stats  = env.stats;
+var stats = env.stats;
 
 var Promise = require('bluebird');
 var github = require('gitter-web-github');

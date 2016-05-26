@@ -29,7 +29,7 @@ makeBenchmark({
     processor = new Processor();
     var i = 0;
     (function warmup() {
-      if (++i > 100)  {
+      if (++i > 100) {
 
         return done();
       }

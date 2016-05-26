@@ -1,14 +1,14 @@
 "use strict";
-var Backbone              = require('backbone');
-var Marionette            = require('backbone.marionette');
-var context               = require('utils/context');
-var itemCollections       = require('collections/instances/integrated-items');
-var PeopleCollectionView  = require('views/people/peopleCollectionView');
-var RepoInfoView          = require('./repoInfo');
+var Backbone = require('backbone');
+var Marionette = require('backbone.marionette');
+var context = require('utils/context');
+var itemCollections = require('collections/instances/integrated-items');
+var PeopleCollectionView = require('views/people/peopleCollectionView');
+var RepoInfoView = require('./repoInfo');
 var ActivityCompositeView = require('./activityCompositeView');
 
-var SearchView            = require('views/search/searchView');
-var SearchInputView       = require('views/search/search-input-view');
+var SearchView = require('views/search/searchView');
+var SearchInputView = require('views/search/search-input-view');
 
 require('views/behaviors/isomorphic');
 

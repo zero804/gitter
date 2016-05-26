@@ -1,9 +1,9 @@
 "use strict";
 
 var Marionette = require('backbone.marionette');
-var ModalView  = require('./modal');
-var template   = require('./tmpl/choose-room-view.hbs');
-var context    = require('../../utils/context');
+var ModalView = require('./modal');
+var template = require('./tmpl/choose-room-view.hbs');
+var context = require('../../utils/context');
 
 
 var View = Marionette.ItemView.extend({

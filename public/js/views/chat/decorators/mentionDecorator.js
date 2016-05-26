@@ -9,7 +9,7 @@ module.exports = (function() {
 
   function highlightMention(chatItemView) {
     var mentions = chatItemView.model.get('mentions');
-    var user  = context.user();
+    var user = context.user();
 
     if(!mentions || !user) return;
     var username = context.user().get('username');
@@ -17,7 +17,7 @@ module.exports = (function() {
     if(!username) return;
 
     if(mentions.some(function(mention) {
-      return mention.userId ===  context.getUserId();
+      return mention.userId === context.getUserId();
     })) {
       chatItemView.$el.find('.trpChatBox').addClass('mention');
     }
