@@ -38,7 +38,7 @@ userService.findByUsername(opts.username)
     var troupeHash = collections.indexById(troupes);
     sockets.forEach(function(socket) {
       if (troupeHash[socket.troupeId]) {
-        socket.troupe =  troupeHash[socket.troupeId].uri;
+        socket.troupe = troupeHash[socket.troupeId].uri;
       }
       // this is all the same anyway
       delete socket.userId;

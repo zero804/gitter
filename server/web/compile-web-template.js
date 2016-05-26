@@ -4,7 +4,7 @@ var path = require('path');
 var fs = require('fs');
 var handlebars = require('handlebars');
 var hbsInstance = handlebars.create();
-var resolveStatic  = require('./resolve-static');
+var resolveStatic = require('./resolve-static');
 
 /* Horrible circular-dep hack */
 setImmediate(function() {

@@ -1,9 +1,9 @@
 "use strict";
 
 var persistence = require('gitter-web-persistence');
-var mongoUtils  = require('gitter-web-persistence-utils/lib/mongo-utils');
-var env         = require('gitter-web-env');
-var config      = env.config;
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var env = require('gitter-web-env');
+var config = env.config;
 
 
 function isEarlyAdopter(roomUri) {

@@ -1,18 +1,18 @@
 "use strict";
 
-var context           = require('utils/context');
-var Marionette        = require('backbone.marionette');
-var modalRegion       = require('components/modal-region');
+var context = require('utils/context');
+var Marionette = require('backbone.marionette');
+var modalRegion = require('components/modal-region');
 var ChatContainerView = require('views/chat/chatContainerView');
 
 //var RoomMenuLayout    = require('../menu/room/layout/room-menu-layout');
 //var appEvents         = require('utils/appevents');
 
 /* Decorators */
-var emojiDecorator  = require('views/chat/decorators/emojiDecorator');
+var emojiDecorator = require('views/chat/decorators/emojiDecorator');
 var mobileDecorator = require('views/chat/decorators/mobileDecorator');
-var ChatInputView   = require('views/chat/chatInputView');
-var JoinRoomView    = require('views/chat/join-room-view');
+var ChatInputView = require('views/chat/chatInputView');
+var JoinRoomView = require('views/chat/join-room-view');
 
 var $ = require('jquery');
 
@@ -104,7 +104,7 @@ module.exports = Marionette.LayoutView.extend({
     //  collection: this.options.chatCollection,
     //}));
     if (this.model.get('roomMember')) {
-      return  new ChatInputView(optionsForRegion({
+      return new ChatInputView(optionsForRegion({
         model: context.troupe(),
         collection: this.options.chatCollection
       }, {rerender: true}));

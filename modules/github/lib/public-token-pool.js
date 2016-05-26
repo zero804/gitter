@@ -1,7 +1,7 @@
 'use strict';
 
-var url   = require('url');
-var env   = require('gitter-web-env');
+var url = require('url');
+var env = require('gitter-web-env');
 var nconf = env.config;
 var stats = env.stats;
 

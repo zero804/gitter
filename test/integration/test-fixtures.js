@@ -4,9 +4,10 @@ var testRequire = require('./test-require');
 var Promise = require('bluebird');
 var persistence = require('gitter-web-persistence');
 var roomMembershipFlags = testRequire("./services/room-membership-flags");
-var debug = require('debug')('gitter:test-fixtures');
 var util = require('util');
 var uuid = require('node-uuid');
+var debug = require('debug')('gitter:tests:test-fixtures');
+
 var counter = 0;
 
 var seed = Date.now();
@@ -505,7 +506,6 @@ function createExpectedFixtures(expected, done) {
 
       return null;
     });
-
   }
 
   function createMessages(fixture) {

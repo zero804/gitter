@@ -132,7 +132,7 @@ module.exports = (function() {
       var img = e.currentTarget;
       var options = this.options || {};
       var avatarSize = options.avatarSize || 's';
-      var imgSize =  avatarSize == 'm' ? AVATAR_SIZE_MEDIUM : AVATAR_SIZE_SMALL;
+      var imgSize = avatarSize == 'm' ? AVATAR_SIZE_MEDIUM : AVATAR_SIZE_SMALL;
 
       var user = this.model && this.model.toJSON();
       var avatarSrcSet = resolveUserAvatarSrcSet(user, imgSize);
@@ -160,7 +160,7 @@ module.exports = (function() {
     }
 
     var avatarSize = options.avatarSize || 's';
-    var imgSize =  avatarSize == 'm' ? AVATAR_SIZE_MEDIUM : AVATAR_SIZE_SMALL;
+    var imgSize = avatarSize == 'm' ? AVATAR_SIZE_MEDIUM : AVATAR_SIZE_SMALL;
 
     var currentUserId = context.getUserId();
     var avatarSrcSet = resolveUserAvatarSrcSet(user, imgSize);

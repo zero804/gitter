@@ -16,6 +16,8 @@ var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var roomMembershipService = require('./room-membership-service');
 var roomService = require('./room-service');
 var assert = require('assert');
+var roomMetaService = require('./room-meta-service');
+var processMarkdown = require('../utils/markdown-processor');
 
 var MAX_RAW_TAGS_LENGTH = 200;
 
@@ -168,7 +170,7 @@ RoomWithPolicyService.prototype.banUserFromRoom = secureMethod([allowStaff, allo
 
           return Promise.all([
               room.save(),
-              roomMembershipService.removeRoomMember(room._id, bannedUser._id)
+              roomMembershipService.removeRoomMember(room._id, bannedUser._id, room.groupId)
             ])
             .return(ban);
         })
@@ -244,6 +246,27 @@ RoomWithPolicyService.prototype.joinRoom = secureMethod([allowJoin], function(op
 });
 
 /**
+ *  GET room meta/welcome-message
+ */
+RoomWithPolicyService.prototype.getRoomWelcomeMessage = secureMethod([allowJoin], function(){
+  return roomMetaService.findMetaByTroupeId(this.room.id, 'welcomeMessage');
+});
+
+/**
+ * Update the welcome message for a room
+ */
+RoomWithPolicyService.prototype.updateRoomWelcomeMessage = secureMethod([allowAdmin], function(data){
+  if (!data || !data.welcomeMessage) throw new StatusError(400);
+
+  return processMarkdown(data.welcomeMessage)
+    .bind(this)
+    .then(function(welcomeMessage){
+      return roomMetaService.upsertMetaKey(this.room.id, 'welcomeMessage', welcomeMessage)
+        .return({ welcomeMessage: welcomeMessage });
+    });
+});
+
+/*
  * Delete a room
  */
  RoomWithPolicyService.prototype.deleteRoom = secureMethod([allowAdmin], function() {

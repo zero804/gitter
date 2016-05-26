@@ -1,9 +1,9 @@
 "use strict";
 
-var RepoService         = require('gitter-web-github').GitHubRepoService;
-var GitHubIssueService  = require('gitter-web-github').GitHubIssueService;
-var processChat         = require('../../../utils/markdown-processor');
-var StatusError         = require('statuserror');
+var RepoService = require('gitter-web-github').GitHubRepoService;
+var GitHubIssueService = require('gitter-web-github').GitHubIssueService;
+var processChat = require('../../../utils/markdown-processor');
+var StatusError = require('statuserror');
 var loadTroupeFromParam = require('./load-troupe-param');
 
 function getEightSuggestedIssues(issues) {

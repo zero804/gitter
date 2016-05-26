@@ -1,8 +1,8 @@
 "use strict";
 
-var express        = require('express');
+var express = require('express');
 var ensureLoggedIn = require('../web/middlewares/ensure-logged-in');
-var identifyRoute  = require('gitter-web-env').middlewares.identifyRoute;
+var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 

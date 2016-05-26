@@ -1,10 +1,10 @@
 "use strict";
 
-var env         = require('gitter-web-env');
-var winston     = env.logger;
-var GithubRepo  = require('gitter-web-github').GitHubRepoService;
+var env = require('gitter-web-env');
+var winston = env.logger;
+var GithubRepo = require('gitter-web-github').GitHubRepoService;
 var persistence = require('gitter-web-persistence');
-var Promise     = require('bluebird');
+var Promise = require('bluebird');
 
 function applyFilters(array, filters) {
   // Filter out what needs filtering out
@@ -21,7 +21,7 @@ function getReposForUser(user, options) {
   if(!options) options = {};
   var adminAccessOnly = 'adminAccessOnly' in options ? options.adminAccessOnly : false;
 
-  var ghRepo  = new GithubRepo(user);
+  var ghRepo = new GithubRepo(user);
 
   return ghRepo.getAllReposForAuthUser()
     .then(function(userRepos) {
@@ -55,7 +55,7 @@ function createRegExpsForQuery(queryText) {
 function findPublicReposWithRoom(user, query, options) {
   if(!options) options = {};
 
-  var ghRepo  = new GithubRepo(user);
+  var ghRepo = new GithubRepo(user);
 
   var filters = createRegExpsForQuery(query);
   if(!filters.length) return Promise.resolve([]);

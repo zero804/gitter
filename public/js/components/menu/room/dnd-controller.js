@@ -1,8 +1,8 @@
 'use strict';
 
 var Backbone = require('backbone');
-var dragula  = require('dragula');
-var _        = require('underscore');
+var dragula = require('dragula');
+var _ = require('underscore');
 
 var DNDCtrl = function(attrs) {
 
@@ -18,17 +18,17 @@ var DNDCtrl = function(attrs) {
     deadzone: 10
   });
 
-  this.drag.on('drag',    this.onDragStart.bind(this));
+  this.drag.on('drag', this.onDragStart.bind(this));
   this.drag.on('dragend', this.onDragEnd.bind(this));
-  this.drag.on('remove',  this.onDragEnd.bind(this));
-  this.drag.on('drop',    this.onItemDropped.bind(this));
-  this.drag.on('over',    this.onContainerHover.bind(this));
+  this.drag.on('remove', this.onDragEnd.bind(this));
+  this.drag.on('drop', this.onItemDropped.bind(this));
+  this.drag.on('over', this.onContainerHover.bind(this));
 };
 
 DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
 
   shouldItemMove: function (el) {
-    return (el.tagName  !== 'A' &&
+    return (el.tagName !== 'A' &&
             !el.classList.contains('search-message-empty-container') &&
             el.id !== 'empty-view');
   },
@@ -90,7 +90,7 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
 
     //If we hover over the favourite collection hide the drag mirror
     if (container.classList.contains('collection-list--favourite')) {
-      mirror  = document.querySelector('.gu-mirror');
+      mirror = document.querySelector('.gu-mirror');
       transit = document.querySelector('.gu-transit');
       if (mirror) { mirror.classList.add('hidden'); }
       if(transit) { transit.classList.remove('will-hideaway'); }
@@ -98,7 +98,7 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
 
     //If we hover over the primary collection show the drag mirror
     else if (container.classList.contains('collection-list--primary')) {
-      mirror  = document.querySelector('.gu-mirror');
+      mirror = document.querySelector('.gu-mirror');
       transit = document.querySelector('.gu-transit');
       if (mirror) { mirror.classList.remove('hidden'); }
       if(transit) { transit.classList.add('will-hideaway'); }

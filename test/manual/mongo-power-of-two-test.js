@@ -1,8 +1,8 @@
 'use strict';
 
-var speedy      = require("speedy");
-var mongoose    = require('gitter-web-mongoose-bluebird');
-var onMongoConnect    = require('../../server/utils/on-mongo-connect');
+var speedy = require("speedy");
+var mongoose = require('gitter-web-mongoose-bluebird');
+var onMongoConnect = require('../../server/utils/on-mongo-connect');
 var async = require('async');
 
 // speedy.samples(10);

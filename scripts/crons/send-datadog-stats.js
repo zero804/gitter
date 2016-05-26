@@ -3,9 +3,9 @@
 "use strict";
 
 var persistence = require('gitter-web-persistence');
-var config      = require('gitter-web-env');
-var stats       = config.stats;
-var Promise     = require('bluebird');
+var config = require('gitter-web-env');
+var stats = config.stats;
+var Promise = require('bluebird');
 
 Promise.all([
   persistence.User.count().exec(),
