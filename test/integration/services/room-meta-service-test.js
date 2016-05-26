@@ -1,30 +1,55 @@
 "use strict";
 
-var testRequire   = require('../test-require');
+var testRequire = require('../test-require');
 var fixtureLoader = require('../test-fixtures');
-var assert        = require("assert");
+var assert = require('assert');
+var Promise = require('bluebird');
 
 describe('room-meta-service #slow', function(){
-  var fixture = {};
   var roomMetaService;
-  var welcomeMessage = 'this is a test';
 
-  before(fixtureLoader(fixture, {
-    troupe: {}
-  }));
+  var fixture = fixtureLoader.setup({
+    troupe1: {},
+    troupe2: {},
+    troupe3: {}
+  });
 
-
-  it('should upsert and retrieve a record', function(){
+  before(function() {
     roomMetaService = testRequire('./services/room-meta-service');
-    return roomMetaService.upsertMetaKey(fixture.troupe.id, 'welcomeMessage', welcomeMessage)
-      .then(function(){
-        return roomMetaService.findMetaByTroupeId(fixture.troupe.id, 'welcomeMessage');
+  })
+
+  it('should handle missing metadata', function() {
+    return roomMetaService.findMetaByTroupeId(fixture.troupe2._id, 'welcomeMessage')
+      .then(function(result) {
+        assert.equal(result, null);
+      });
+
+  });
+
+  it('should upsert and retrieve a record', function() {
+    var welcomeMessage = {
+      text: 'blah',
+      html: 'bob'
+    };
+
+    return roomMetaService.upsertMetaKey(fixture.troupe1.id, 'welcomeMessage', welcomeMessage)
+      .then(function() {
+        return roomMetaService.findMetaByTroupeId(fixture.troupe1.id, 'welcomeMessage');
       })
-      .then(function(res){
-        assert(!!res);
-        //apparently this returns a model ...
-        assert.equal(res.toJSON(), welcomeMessage);
+      .then(function(result) {
+        assert.deepEqual(result, welcomeMessage);
+        // Make sure one meta doesnt override the other, which was happening before
+        return roomMetaService.findMetaByTroupeId(fixture.troupe2.id, 'welcomeMessage');
+      })
+      .then(function(result) {
+        assert.equal(result, null);
       });
   });
+
+  it('should be able to insert two records', function() {
+    return Promise.join(
+      roomMetaService.upsertMetaKey(fixture.troupe1.id, 'welcomeMessage', { text: 'a' }),
+      roomMetaService.upsertMetaKey(fixture.troupe1.id, 'welcomeMessage', { text: 'b' }));
+  })
 
 });
