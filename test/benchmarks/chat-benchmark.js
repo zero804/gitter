@@ -1,7 +1,7 @@
 'use strict';
 
 var makeBenchmark = require('../make-benchmark');
-var fixtureLoader = require('../integration/test-fixtures');
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var chatService = require('../../server/services/chat-service');
 var roomMembershipFlags = require("../../server/services/room-membership-flags");
 

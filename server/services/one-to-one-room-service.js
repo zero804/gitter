@@ -60,6 +60,7 @@ function upsertNewOneToOneRoom(userId1, userId2) {
     oneToOne: true,
     status: 'ACTIVE',
     githubType: 'ONETOONE',
+    groupId: null, // One-to-ones are never in a group
     oneToOneUsers: [{
       _id: new ObjectID(),
       userId: userId1
