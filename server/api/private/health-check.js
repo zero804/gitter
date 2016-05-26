@@ -1,8 +1,8 @@
 "use strict";
 
-var env        = require('gitter-web-env');
-var nconf      = env.config;
-var os         = require("os");
+var env = require('gitter-web-env');
+var nconf = env.config;
+var os = require("os");
 var appVersion = require('gitter-app-version');
 
 module.exports = function(req, res) {

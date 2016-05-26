@@ -1,15 +1,15 @@
 "use strict";
 
-var env               = require('gitter-web-env');
-var nconf             = env.config;
-var winston           = env.logger;
-var statsd            = env.createStatsClient({ prefix: nconf.get('stats:statsd:prefix')});
-var appEvents         = require('gitter-web-appevents');
-var bayeux            = require('../web/bayeux');
-var ent               = require('ent');
-var presenceService   = require("gitter-web-presence");
-var restSerializer    = require('../serializers/rest-serializer');
-var debug             = require('debug')('gitter:app:bayeux-events-bridge');
+var env = require('gitter-web-env');
+var nconf = env.config;
+var winston = env.logger;
+var statsd = env.createStatsClient({ prefix: nconf.get('stats:statsd:prefix')});
+var appEvents = require('gitter-web-appevents');
+var bayeux = require('../web/bayeux');
+var ent = require('ent');
+var presenceService = require("gitter-web-presence");
+var restSerializer = require('../serializers/rest-serializer');
+var debug = require('debug')('gitter:app:bayeux-events-bridge');
 
 var useDeprecatedChannels = nconf.get('ws:useDeprecatedChannels');
 

@@ -1,8 +1,8 @@
 /*global describe:true, it:true, beforeEach:true */
 'use strict';
 
-var assert          = require('assert');
-var Backbone        = require('backbone');
+var assert = require('assert');
+var Backbone = require('backbone');
 var PanelFooterView = require('public/js/views/menu/room/footer/footer-view');
 
 describe('PanelFooterView', function() {

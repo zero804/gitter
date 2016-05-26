@@ -1,12 +1,12 @@
 'use strict';
 
-var suggestedOrgsFromRoomList  = require('gitter-web-shared/orgs/suggested-orgs-from-room-list');
+var suggestedOrgsFromRoomList = require('gitter-web-shared/orgs/suggested-orgs-from-room-list');
 var generateLeftMenuState = require('gitter-web-shared/parse/left-menu-state');
 
 module.exports = function getSnapshotsForPageContext(req, troupeContext, rooms) {
   // Generate the org list for the minibar, this is derived from the room list
-  var currentRoom    = (req.troupe || {});
-  var currentRoomId  = currentRoom.id;
+  var currentRoom = (req.troupe || {});
+  var currentRoomId = currentRoom.id;
   var minibarOrgList = suggestedOrgsFromRoomList(rooms, req.uriContext.uri, currentRoomId, currentRoom);
 
   // `?preserveLeftMenuState=true/false` or a session variable

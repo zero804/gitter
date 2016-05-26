@@ -1,11 +1,11 @@
 "use strict";
 
-var GitHubMeService  = require('gitter-web-github').GitHubMeService;
+var GitHubMeService = require('gitter-web-github').GitHubMeService;
 var GitHubOrgService = require('gitter-web-github').GitHubOrgService;
-var restSerializer   = require("../../serializers/rest-serializer");
-var userService      = require('../../services/user-service');
-var StatusError      = require('statuserror');
-var Promise          = require('bluebird');
+var restSerializer = require("../../serializers/rest-serializer");
+var userService = require('../../services/user-service');
+var StatusError = require('statuserror');
+var Promise = require('bluebird');
 
 function listOrgMembers(user, uri) {
   var ghMe = new GitHubMeService(user);

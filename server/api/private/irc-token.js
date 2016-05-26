@@ -1,10 +1,10 @@
 "use strict";
 
-var oauthService    = require('../../services/oauth-service');
-var restSerializer  = require('../../serializers/rest-serializer');
-var Promise         = require('bluebird');
+var oauthService = require('../../services/oauth-service');
+var restSerializer = require('../../serializers/rest-serializer');
+var Promise = require('bluebird');
 
-module.exports =  function(req, res, next) {
+module.exports = function(req, res, next) {
   var strategy = new restSerializer.UserStrategy();
 
   return Promise.join(

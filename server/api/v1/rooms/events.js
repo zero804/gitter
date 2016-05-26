@@ -1,6 +1,6 @@
 "use strict";
 
-var eventService   = require("../../../services/event-service");
+var eventService = require("../../../services/event-service");
 var restSerializer = require("../../../serializers/rest-serializer");
 
 module.exports = {

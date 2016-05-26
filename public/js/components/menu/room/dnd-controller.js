@@ -1,8 +1,8 @@
 'use strict';
 
 var Backbone = require('backbone');
-var dragula  = require('dragula');
-var _        = require('underscore');
+var dragula = require('dragula');
+var _ = require('underscore');
 
 var distance = function(pt1, pt2) {
   var dist2 = Math.pow(pt1.x - pt2.x, 2) + Math.pow(pt1.y - pt2.y, 2);
@@ -31,22 +31,22 @@ var DNDCtrl = function(attrs) {
     moves:   this.shouldItemMove.bind(this),
   });
 
-  this.drag.on('drag',    this.onDragStart.bind(this));
+  this.drag.on('drag', this.onDragStart.bind(this));
   this.drag.on('dragend', this.onDragEnd.bind(this));
-  this.drag.on('remove',  this.onDragEnd.bind(this));
-  this.drag.on('drop',    this.onItemDropped.bind(this));
-  this.drag.on('cancel',  this.onDragCancel.bind(this));
-  this.drag.on('over',    this.onContainerHover.bind(this));
+  this.drag.on('remove', this.onDragEnd.bind(this));
+  this.drag.on('drop', this.onItemDropped.bind(this));
+  this.drag.on('cancel', this.onDragCancel.bind(this));
+  this.drag.on('over', this.onContainerHover.bind(this));
 
   // Can't space separate multiple events with dragulas `contra/emitter` :(
-  this.drag.on('drop',   this.onDragDoneDeadzoneActivate.bind(this));
+  this.drag.on('drop', this.onDragDoneDeadzoneActivate.bind(this));
   this.drag.on('cancel', this.onDragDoneDeadzoneActivate.bind(this));
 };
 
 DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
 
   shouldItemMove: function (el) {
-    return (el.tagName  !== 'A' &&
+    return (el.tagName !== 'A' &&
             !el.classList.contains('search-message-empty-container') &&
             el.id !== 'empty-view');
   },
@@ -145,7 +145,7 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
 
     //If we hover over the favourite collection hide the drag mirror
     if (container.classList.contains('collection-list--favourite')) {
-      mirror  = document.querySelector('.gu-mirror');
+      mirror = document.querySelector('.gu-mirror');
       transit = document.querySelector('.gu-transit');
       if (mirror) { mirror.classList.add('hidden'); }
       if(transit) { transit.classList.remove('will-hideaway'); }
@@ -153,7 +153,7 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
 
     //If we hover over the primary collection show the drag mirror
     else if (container.classList.contains('collection-list--primary')) {
-      mirror  = document.querySelector('.gu-mirror');
+      mirror = document.querySelector('.gu-mirror');
       transit = document.querySelector('.gu-transit');
       if (mirror) { mirror.classList.remove('hidden'); }
       if(transit) { transit.classList.add('will-hideaway'); }

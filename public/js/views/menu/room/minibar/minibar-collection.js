@@ -1,7 +1,7 @@
 'use strict';
 
 var Backbone = require('backbone');
-var context  = require('utils/context');
+var context = require('utils/context');
 //just use shared/
 var getSuggestedOrgsFromRoomList = require('gitter-web-shared/orgs/suggested-orgs-from-room-list');
 

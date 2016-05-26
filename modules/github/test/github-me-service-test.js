@@ -1,7 +1,7 @@
 /*global describe:true, it:true */
 "use strict";
 
-var assert          = require("assert");
+var assert = require("assert");
 var GithubMeService = require('..').GitHubMeService;
 
 var FAKE_USER = { username: 'gittertestbot', githubToken: '***REMOVED***'};

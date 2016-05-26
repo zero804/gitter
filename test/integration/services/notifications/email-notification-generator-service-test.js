@@ -3,9 +3,9 @@
 "use strict";
 
 var testRequire = require('../../test-require');
-var assert      = require("assert");
-var mockito     = require('jsmockito').JsMockito;
-var Promise     = require('bluebird');
+var assert = require("assert");
+var mockito = require('jsmockito').JsMockito;
+var Promise = require('bluebird');
 
 var userSettingsService = testRequire('./services/user-settings-service');
 var fixtureLoader = require('../../test-fixtures');

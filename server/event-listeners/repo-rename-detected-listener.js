@@ -1,11 +1,11 @@
 "use strict";
 
-var env           = require('gitter-web-env');
-var logger        = env.logger;
-var config        = env.config;
+var env = require('gitter-web-env');
+var logger = env.logger;
+var config = env.config;
 var errorReporter = env.errorReporter;
 
-var appEvents   = require('gitter-web-appevents');
+var appEvents = require('gitter-web-appevents');
 var roomService = require('../services/room-service');
 
 var installed = false;

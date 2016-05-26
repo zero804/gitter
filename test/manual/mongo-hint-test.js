@@ -1,6 +1,6 @@
 'use strict';
 
-var speedy      = require("speedy");
+var speedy = require("speedy");
 var chatService = require('../../server/services/chat-service');
 
 // speedy.samples(10);

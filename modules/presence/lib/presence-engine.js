@@ -94,8 +94,7 @@ function disassociateSocketAndDeactivateUserAndTroupe(socketId, userId, callback
 
   return lookupTroupeIdForSocket(socketId)
     .then(function(troupeId) {
-      return redisClient.presenceDisassociate(
-        /* keys */   keySocketUser(socketId), ACTIVE_USERS_KEY, MOBILE_USERS_KEY, ACTIVE_SOCKETS_KEY,
+      return redisClient.presenceDisassociate(keySocketUser(socketId), ACTIVE_USERS_KEY, MOBILE_USERS_KEY, ACTIVE_SOCKETS_KEY,
                      keyUserLock(userId), troupeId ? keyTroupeUsers(troupeId) : null,
                      keyUserSockets(userId),
         /* values */ userId, socketId)
@@ -160,11 +159,10 @@ function userSocketConnected(userId, socketId, connectionType, clientType, realt
   var isMobileConnection = connectionType == 'mobile';
 
   if(!userId) {
-    return redisClient.presenceAssociateAnon(
-      /* keys */   keySocketUser(socketId), ACTIVE_SOCKETS_KEY, keyUserSockets('anon'),
+    return redisClient.presenceAssociateAnon(keySocketUser(socketId), ACTIVE_SOCKETS_KEY, keyUserSockets('anon'),
       /* values */ socketId, Date.now(), isMobileConnection ? 1 : 0, clientType, realtimeLibrary, troupeId || null, oauthClientId, uniqueClientId)
       .spread(function(lockSuccess, saddResult) {
-        if(!lockSuccess)  {
+        if(!lockSuccess) {
           debug('associateSocketAndActivateUser rejected. Socket already exists.', socketId, userId);
           throw new StatusError(409, 'Conflict');
         }
@@ -177,11 +175,10 @@ function userSocketConnected(userId, socketId, connectionType, clientType, realt
       .nodeify(callback);
   }
 
-  return redisClient.presenceAssociate(
-    /* keys */   keySocketUser(socketId), ACTIVE_USERS_KEY, MOBILE_USERS_KEY, ACTIVE_SOCKETS_KEY, keyUserLock(userId), keyUserSockets(userId),
+  return redisClient.presenceAssociate(keySocketUser(socketId), ACTIVE_USERS_KEY, MOBILE_USERS_KEY, ACTIVE_SOCKETS_KEY, keyUserLock(userId), keyUserSockets(userId),
     /* values */ userId, socketId, Date.now(), isMobileConnection ? 1 : 0, clientType, realtimeLibrary, troupeId || null, oauthClientId, uniqueClientId)
     .spread(function(lockSuccess, userSocketCountString, saddResult) {
-      if(!lockSuccess)  {
+      if(!lockSuccess) {
         debug('presence: associateSocketAndActivateUser rejected. Socket already exists.', socketId, userId);
         throw new StatusError(409, 'socket already exists');
       }
@@ -227,8 +224,7 @@ function socketReassociated(socketId, userId, troupeId, eyeballsOn) {
         // No change... process eyeballs and be done
       }
 
-      return redisClient.presenceReassociate(
-        /* keys */   keySocketUser(socketId),
+      return redisClient.presenceReassociate(keySocketUser(socketId),
                      keyUserLock(userId),
                      troupeId ? keyTroupeUsers(troupeId) : null,
                      previousTroupeId ? keyTroupeUsers(previousTroupeId) : null,
@@ -238,7 +234,7 @@ function socketReassociated(socketId, userId, troupeId, eyeballsOn) {
                      previousTroupeId || null,
                      userId ? eyeballsOn : false) // Only non-anonymous users can be eyeballs on
         .spread(function(success, newTroupeUserCount, previousTroupeUserCount) {
-          if(!success)  {
+          if(!success) {
             throw new StatusError(500, 'Socket reassociation failed.');
           }
 
@@ -307,8 +303,7 @@ function eyeBallsOnTroupe(userId, socketId, troupeId, callback) {
   if(!socketId) return Promise.reject(new StatusError(400, 'socketId expected')).nodeify(callback);
   if(!troupeId) return Promise.reject(new StatusError(400, 'troupeId expected')).nodeify(callback);
 
-  return redisClient.presenceEyeballsOn(
-      /* keys */   keySocketUser(socketId), keyTroupeUsers(troupeId), keyUserLock(userId),
+  return redisClient.presenceEyeballsOn(keySocketUser(socketId), keyTroupeUsers(troupeId), keyUserLock(userId),
       /* values */ userId)
     .spread(function(eyeballLock, userScoreString) {
       if(!eyeballLock) {
@@ -332,8 +327,7 @@ function eyeBallsOffTroupe(userId, socketId, troupeId, callback) {
   if(!socketId) return Promise.reject(new StatusError(400, 'socketId expected')).nodeify(callback);
   if(!troupeId) return Promise.reject(new StatusError(400, 'troupeId expected')).nodeify(callback);
 
-  return redisClient.presenceEyeballsOff(
-      /* keys */   keySocketUser(socketId), keyTroupeUsers(troupeId), keyUserLock(userId),
+  return redisClient.presenceEyeballsOff(keySocketUser(socketId), keyTroupeUsers(troupeId), keyUserLock(userId),
       /* values */ userId)
     .spread(function(eyeballLock, userInTroupeCountString, totalUsersInTroupe) {
       if(!eyeballLock) {
@@ -895,7 +889,7 @@ function validateUsersSubset(userIds, callback) {
 
           return multi.exec()
             .then(checkMultiErrors)
-            .then(function(replies)  {
+            .then(function(replies) {
               if(!replies) {
                 var err = new StatusError(419, 'Transaction rolled back');
                 err.rollback = true;
@@ -944,31 +938,31 @@ function validateUsers(callback) {
 
   // Connections and disconnections
 presenceService.userSocketConnected = userSocketConnected;
-presenceService.socketDisconnected =  socketDisconnected;
+presenceService.socketDisconnected = socketDisconnected;
 presenceService.socketDisconnectionRequested = socketDisconnectionRequested;
 presenceService.socketReassociated = socketReassociated;
 
 // Query Status
-presenceService.lookupUserIdForSocket =  lookupUserIdForSocket;
+presenceService.lookupUserIdForSocket = lookupUserIdForSocket;
 presenceService.socketExists = socketExists;
-presenceService.findOnlineUsersForTroupe =  findOnlineUsersForTroupe;
-presenceService.categorizeUsersByOnlineStatus =  categorizeUsersByOnlineStatus;
+presenceService.findOnlineUsersForTroupe = findOnlineUsersForTroupe;
+presenceService.categorizeUsersByOnlineStatus = categorizeUsersByOnlineStatus;
 presenceService.listOnlineUsers = listOnlineUsers;
 presenceService.listActiveSockets = listActiveSockets;
 presenceService.getSocket = getSocket;
 presenceService.getSockets = getSockets;
-presenceService.listMobileUsers =  listMobileUsers;
-presenceService.listOnlineUsersForTroupes =  listOnlineUsersForTroupes;
+presenceService.listMobileUsers = listMobileUsers;
+presenceService.listOnlineUsersForTroupes = listOnlineUsersForTroupes;
 presenceService.categorizeUserTroupesByOnlineStatus = categorizeUserTroupesByOnlineStatus;
 presenceService.findAllSocketsForUserInTroupe = findAllSocketsForUserInTroupe;
 presenceService.listAllSocketsForUser = listAllSocketsForUser;
 presenceService.isUserConnectedWithClientType = isUserConnectedWithClientType;
 
 // Eyeball
-presenceService.clientEyeballSignal =  clientEyeballSignal;
+presenceService.clientEyeballSignal = clientEyeballSignal;
 
   // GC
-presenceService.collectGarbage =  collectGarbage;
+presenceService.collectGarbage = collectGarbage;
 presenceService.validateUsers = validateUsers;
 
 // -------------------------------------------------------------------

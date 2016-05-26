@@ -1,7 +1,7 @@
 "use strict";
 
 var apiClient = require('components/apiClient');
-var debug     = require('debug-proxy')('app:ping');
+var debug = require('debug-proxy')('app:ping');
 
 var PING_POLL = 10 * 60 * 1000;
 

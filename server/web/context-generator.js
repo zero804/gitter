@@ -1,15 +1,15 @@
 "use strict";
 
-var restSerializer   = require("../serializers/rest-serializer");
-var presenceService  = require("gitter-web-presence");
-var useragent        = require("useragent");
-var userService      = require('../services/user-service');
+var restSerializer = require("../serializers/rest-serializer");
+var presenceService = require("gitter-web-presence");
+var useragent = require("useragent");
+var userService = require('../services/user-service');
 var userSettingsService = require('../services/user-settings-service');
-var isNative         = require('../../public/js/utils/is-native');
+var isNative = require('../../public/js/utils/is-native');
 
-var assert           = require("assert");
-var Promise          = require('bluebird');
-var _                = require('underscore');
+var assert = require("assert");
+var Promise = require('bluebird');
+var _ = require('underscore');
 
 /**
  * Returns the promise of a mini-context
@@ -52,7 +52,7 @@ exports.generateSocketContext = function(userId, troupeId) {
     .spread(function(serializedUser, serializedTroupe) {
       return {
         user: serializedUser || undefined,
-        troupe: serializedTroupe  || undefined
+        troupe: serializedTroupe || undefined
       };
     });
 };

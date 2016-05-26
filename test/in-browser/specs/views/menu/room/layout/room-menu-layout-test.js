@@ -1,11 +1,11 @@
 /*global describe:true, it:true, beforeEach:true, afterEach: true */
 'use strict';
 
-var $                  = require('jquery');
-var assert             = require('assert');
-var Backbone           = require('backbone');
-var MenuLayout         = require('public/js/views/menu/room/layout/room-menu-layout');
-var RoomMenuModel      = require('public/js/models/room-menu-model');
+var $ = require('jquery');
+var assert = require('assert');
+var Backbone = require('backbone');
+var MenuLayout = require('public/js/views/menu/room/layout/room-menu-layout');
+var RoomMenuModel = require('public/js/models/room-menu-model');
 var MockRoomCollection = require('fixtures/helpers/room-collection');
 
 describe('MenuLayout', function() {

@@ -1,12 +1,12 @@
 "use strict";
 
 var PushNotificationDevice = require('gitter-web-persistence').PushNotificationDevice;
-var crypto                 = require('crypto');
-var Promise                = require('bluebird');
-var mongoUtils             = require('gitter-web-persistence-utils/lib/mongo-utils');
-var debug                  = require('debug')('gitter:app:push-notification-service');
-var uniqueIds              = require('mongodb-unique-ids');
-var _                      = require('lodash');
+var crypto = require('crypto');
+var Promise = require('bluebird');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var debug = require('debug')('gitter:app:push-notification-service');
+var uniqueIds = require('mongodb-unique-ids');
+var _ = require('lodash');
 
 function buffersEqual(a,b) {
   if (!Buffer.isBuffer(a)) return undefined;

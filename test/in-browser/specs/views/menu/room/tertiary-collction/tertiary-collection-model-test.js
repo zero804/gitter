@@ -1,8 +1,8 @@
 /*global describe:true, it:true, beforeEach:true */
 'use strict';
 
-var assert                  = require('assert');
-var Backbone                = require('backbone');
+var assert = require('assert');
+var Backbone = require('backbone');
 var TertiaryCollectionModel = require('../../../../../../../public/js/views/menu/room/tertiary-collection/tertiary-collection-model');
 
 describe.skip('TeritaryCollectionModel', function(){
