@@ -177,6 +177,8 @@ function ensureGroupForGitHubRoomCreation(user, options) {
 }
 
 function findRoomsIdForGroup(groupId, userId) {
+  assert(groupId, 'groupId is required');
+
   // for now only public rooms plus the ones the user is in already
   return Troupe.distinct('_id', { groupId: groupId, security: 'PUBLIC' })
     .lean()

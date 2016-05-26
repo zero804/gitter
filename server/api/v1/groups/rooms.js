@@ -6,7 +6,7 @@ module.exports = {
   id: 'groupRoom',
 
   index: function(req) {
-    var groupId = req.params.group._id;
+    var groupId = req.group._id;
     var user = req.user;
     var userId = user && user._id;
 
