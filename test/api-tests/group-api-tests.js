@@ -9,6 +9,8 @@ var assert = require('assert');
 describe('group-api', function() {
   this.timeout(10000);
 
+  var communityUri = 'I-heart-cats-Test-LOL';
+
   var app, request;
 
   before(function() {
@@ -19,7 +21,8 @@ describe('group-api', function() {
   var fixture = fixtureLoader.setup({
     deleteDocuments: {
       User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }],
-      Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() }],
+      Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
+              { lcUri: communityUri.toLowerCase() } ],
     },
     user1: {
       githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
@@ -49,10 +52,23 @@ describe('group-api', function() {
       .expect(200)
   });
 
-  it('POST /v1/groups', function() {
+  it('POST /v1/groups (new style community)', function() {
     return request(app)
       .post('/v1/groups')
-      .send({ uri: fixtureLoader.GITTER_INTEGRATION_ORG, name: 'Test' })
+      .send({ uri: communityUri, name: 'Test' })
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+  });
+
+  it('POST /v1/groups (github org based)', function() {
+    return request(app)
+      .post('/v1/groups')
+      .send({
+        uri: fixtureLoader.GITTER_INTEGRATION_ORG,
+        name: 'Test',
+        type: 'GH_ORG',
+        linkPath: fixtureLoader.GITTER_INTEGRATION_ORG
+      })
       .set('x-access-token', fixture.user1.accessToken)
       .expect(200)
   });
