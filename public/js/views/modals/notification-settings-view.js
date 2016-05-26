@@ -1,12 +1,12 @@
 "use strict";
 
-var Marionette        = require('backbone.marionette');
-var _                 = require('underscore');
-var apiClient         = require('components/apiClient');
-var ModalView         = require('./modal');
-var template          = require('./tmpl/notification-settings-view.hbs');
+var Marionette = require('backbone.marionette');
+var _ = require('underscore');
+var apiClient = require('components/apiClient');
+var ModalView = require('./modal');
+var template = require('./tmpl/notification-settings-view.hbs');
 var userNotifications = require('components/user-notifications');
-var FeaturesView      = require('./notification-features-collection-view');
+var FeaturesView = require('./notification-features-collection-view');
 
 var OPTIONS = {
   all: 'All: Notify me for all messages',
@@ -64,7 +64,7 @@ var View = Marionette.LayoutView.extend({
         return {
           selectValue: 'all',
           nonStandard: nonStandard,
-          description: nonStandard ?  defaultDescription : null
+          description: nonStandard ? defaultDescription : null
         };
 
       case 'announcement':
@@ -74,7 +74,7 @@ var View = Marionette.LayoutView.extend({
         return {
           selectValue: 'announcement',
           nonStandard: nonStandard,
-          description: nonStandard ?  defaultDescription : null
+          description: nonStandard ? defaultDescription : null
         };
 
       case 'mute':
@@ -83,7 +83,7 @@ var View = Marionette.LayoutView.extend({
         return {
           selectValue: 'mute',
           nonStandard: nonStandard,
-          description: nonStandard ?  defaultDescription : null
+          description: nonStandard ? defaultDescription : null
         };
 
       default:

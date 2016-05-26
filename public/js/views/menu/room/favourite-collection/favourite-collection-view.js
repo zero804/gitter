@@ -1,10 +1,10 @@
 'use strict';
 
-var Backbone              = require('backbone');
-var Marionette            = require('backbone.marionette');
+var Backbone = require('backbone');
+var Marionette = require('backbone.marionette');
 var PrimaryCollectionView = require('../primary-collection/primary-collection-view');
-var BaseCollectionView    = require('../base-collection/base-collection-view');
-var ItemView              = require('./favourite-collection-item-view');
+var BaseCollectionView = require('../base-collection/base-collection-view');
+var ItemView = require('./favourite-collection-item-view');
 
 var FavouriteCollection = PrimaryCollectionView.extend({
 
@@ -51,11 +51,11 @@ var FavouriteCollection = PrimaryCollectionView.extend({
 
   onFavouritesSorted: function(targetID, siblingID, position) {
 
-    var target  = this.roomCollection.get(targetID);
+    var target = this.roomCollection.get(targetID);
     var sibling = this.roomCollection.get(siblingID);
-    var index   = !!sibling ? sibling.get('favourite') : (this.getHighestFavourite() + 1);
-    var max     = this.roomCollection.max('favourite');
-    var min     = this.roomCollection.min('favourite');
+    var index = !!sibling ? sibling.get('favourite') : (this.getHighestFavourite() + 1);
+    var max = this.roomCollection.max('favourite');
+    var min = this.roomCollection.min('favourite');
 
     //If we have a sibling and that sibling has the highest favourite value
     //then we have dropped the item in the second to last position
@@ -86,11 +86,11 @@ var FavouriteCollection = PrimaryCollectionView.extend({
   //TODO The filter should be reused within the view filter method?
   onFavouriteAdded: function(id) {
     var newFavModel = this.roomCollection.get(id);
-    var max         = this.roomCollection.max('favourite');
-    var favIndex    = !!max.get ? (max.get('favourite') + 1) : true;
+    var max = this.roomCollection.max('favourite');
+    var favIndex = !!max.get ? (max.get('favourite') + 1) : true;
     newFavModel.save({ favourite: favIndex }, { patch: true });
   },
 
 });
 
-module.exports =  FavouriteCollection;
+module.exports = FavouriteCollection;

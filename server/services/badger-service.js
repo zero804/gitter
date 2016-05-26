@@ -1,23 +1,23 @@
 "use strict";
 
-var env             = require('gitter-web-env');
-var logger          = env.logger;
-var stats           = env.stats;
-var conf            = env.config;
-var format          = require('util').format;
-var github          = require('octonode');
-var _               = require('underscore');
-var Promise         = require('bluebird');
-var troupeTemplate  = require('../utils/troupe-template');
+var env = require('gitter-web-env');
+var logger = env.logger;
+var stats = env.stats;
+var conf = env.config;
+var format = require('util').format;
+var github = require('octonode');
+var _ = require('underscore');
+var Promise = require('bluebird');
+var troupeTemplate = require('../utils/troupe-template');
 var templatePromise = troupeTemplate.compile('github-pull-request-body');
 
-var StatusError     = require('statuserror');
-var badger          = require('readme-badger');
-var path            = require('path');
+var StatusError = require('statuserror');
+var badger = require('readme-badger');
+var path = require('path');
 
 function insertBadge(repo, content, fileExt, user) {
   var imageUrl = conf.get('web:badgeBaseUrl') + '/' + repo + '.svg';
-  var linkUrl =  conf.get('web:basepath') + '/' + repo + '?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge';
+  var linkUrl = conf.get('web:basepath') + '/' + repo + '?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge';
   var altText = 'Join the chat at ' + conf.get('web:basepath') + '/' + repo;
 
   if(!badger.hasImageSupport(fileExt)) {
@@ -315,7 +315,7 @@ function getBadgeMarkdown(repo, content) {
   var contentLink = content ? '&utm_content=' + content : '';
 
   var imageUrl = conf.get('web:badgeBaseUrl') + '/' + repo + '.svg';
-  var linkUrl =  conf.get('web:basepath') + '/' + repo + '?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge' + contentLink;
+  var linkUrl = conf.get('web:basepath') + '/' + repo + '?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge' + contentLink;
   return '\n[![Gitter](' + imageUrl + ')](' + linkUrl + ')';
 }
 

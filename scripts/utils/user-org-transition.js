@@ -12,7 +12,7 @@ var userService = require('../../server/services/user-service');
 var persistence = require('gitter-web-persistence');
 var uriLookupService = require('../../server/services/uri-lookup-service');
 var validateUri = require('gitter-web-github').GitHubUriValidator;
-var permissionsModel   = require('gitter-web-permissions/lib/permissions-model');
+var permissionsModel = require('gitter-web-permissions/lib/permissions-model');
 
 var opts = require('yargs')
   .option('username', {

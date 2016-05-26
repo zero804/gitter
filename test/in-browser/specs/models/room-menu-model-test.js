@@ -1,11 +1,11 @@
 /*global describe:true, it:true, beforeEach:true */
 'use strict';
 
-var assert             = require('assert');
-var Backbone           = require('backbone');
-var ProxyCollection    = require('backbone-proxy-collection');
+var assert = require('assert');
+var Backbone = require('backbone');
+var ProxyCollection = require('backbone-proxy-collection');
 var MockRoomCollection = require('fixtures/helpers/room-collection');
-var RoomMenuModel      = require('public/js/models/room-menu-model');
+var RoomMenuModel = require('public/js/models/room-menu-model');
 
 //TODO write tests for local storage save() && fetch();
 describe('RoomMenuModel', function() {

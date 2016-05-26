@@ -1,14 +1,14 @@
 "use strict";
 
-var restful             = require('../../../services/restful');
-var roomService         = require('../../../services/room-service');
+var restful = require('../../../services/restful');
+var roomService = require('../../../services/room-service');
 var emailAddressService = require('../../../services/email-address-service');
-var userService         = require("../../../services/user-service");
-var restSerializer      = require("../../../serializers/rest-serializer");
-var mongoUtils          = require('gitter-web-persistence-utils/lib/mongo-utils');
-var troupeService       = require("../../../services/troupe-service");
-var StatusError         = require('statuserror');
-var Promise             = require('bluebird');
+var userService = require("../../../services/user-service");
+var restSerializer = require("../../../serializers/rest-serializer");
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var troupeService = require("../../../services/troupe-service");
+var StatusError = require('statuserror');
+var Promise = require('bluebird');
 var loadTroupeFromParam = require('./load-troupe-param');
 
 function maskEmail(email) {

@@ -1,8 +1,8 @@
 'use strict';
 
-var Backbone                = require('backbone');
-var BaseResolverCollection  = require('./base-resolver-collection.js');
-var SyncMixin               = require('./sync-mixin.js');
+var Backbone = require('backbone');
+var BaseResolverCollection = require('./base-resolver-collection.js');
+var SyncMixin = require('./sync-mixin.js');
 
 
 var Model = Backbone.Model.extend({

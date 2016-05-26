@@ -152,11 +152,15 @@ gulp.task('validate-config', function() {
 });
 
 gulp.task('validate-eslint', function() {
+  mkdirp.sync('output/eslint/');
   return gulp.src(['**/*.js','!node_modules/**','!public/repo/**'])
     .pipe(eslint({
       quiet: argv.quiet
     }))
-    .pipe(eslint.format())
+    .pipe(eslint.format('unix'))
+    .pipe(eslint.format('checkstyle', function(checkstyleData) {
+      fs.writeFileSync('output/eslint/checkstyle.xml', checkstyleData);
+    }))
     .pipe(eslint.failAfterError());
 });
 

@@ -56,7 +56,7 @@ describe('gh-repo-policy-delegate', function() {
   }
 
   before(function() {
-    GhRepoPolicyDelegate =  proxyquireNoCallThru('../../lib/policies/gh-repo-policy-delegate', {
+    GhRepoPolicyDelegate = proxyquireNoCallThru('../../lib/policies/gh-repo-policy-delegate', {
       'gitter-web-github': {
         GitHubRepoService: StubGitHubRepoService
       }

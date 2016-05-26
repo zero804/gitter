@@ -1,10 +1,10 @@
 /*global describe:true, it:true, beforeEach:true */
 'use strict';
 
-var assert      = require('assert');
-var Backbone    = require('backbone');
+var assert = require('assert');
+var Backbone = require('backbone');
 var MiniBarView = require('public/js/views/menu/room/minibar/minibar-view');
-var appEvents   = require('utils/appevents');
+var appEvents = require('utils/appevents');
 
 describe.skip('MinibarView', function() {
 

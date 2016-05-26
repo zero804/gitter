@@ -33,7 +33,7 @@ describe('gh-org-policy-delegate', function() {
   }
 
   before(function() {
-    GhOrgPolicyDelegate =  proxyquireNoCallThru('../../lib/policies/gh-org-policy-delegate', {
+    GhOrgPolicyDelegate = proxyquireNoCallThru('../../lib/policies/gh-org-policy-delegate', {
       'gitter-web-github': {
         GitHubOrgService: StubGitHubOrgService
       }

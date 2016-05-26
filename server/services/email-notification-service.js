@@ -1,18 +1,18 @@
 "use strict";
 
-var env                 = require('gitter-web-env');
-var config              = env.config;
-var logger              = env.logger;
-var mailerService       = require("./mailer-service");
-var crypto              = require('crypto');
-var passphrase          = config.get('email:unsubscribeNotificationsSecret');
+var env = require('gitter-web-env');
+var config = env.config;
+var logger = env.logger;
+var mailerService = require("./mailer-service");
+var crypto = require('crypto');
+var passphrase = config.get('email:unsubscribeNotificationsSecret');
 var userSettingsService = require('./user-settings-service');
 var emailAddressService = require('./email-address-service');
-var roomNameTrimmer     = require('../../public/js/utils/room-name-trimmer');
-var mongoUtils          = require('gitter-web-persistence-utils/lib/mongo-utils');
-var moment              = require('moment');
-var Promise             = require('bluebird');
-var i18nFactory         = require('../utils/i18n-factory');
+var roomNameTrimmer = require('../../public/js/utils/room-name-trimmer');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var moment = require('moment');
+var Promise = require('bluebird');
+var i18nFactory = require('../utils/i18n-factory');
 
 /*
  * Return a nice sane
@@ -61,9 +61,9 @@ function calculateSubjectForUnreadEmail(i18n, troupesWithUnreadCounts) {
 function sendInvite(fromUser, toUser, room, email, template, eventName) {
   if (!email) return;
 
-  var senderName    = (fromUser.displayName || fromUser.username);
+  var senderName = (fromUser.displayName || fromUser.username);
   var recipientName = (toUser.displayName || toUser.username).split(' ')[0];
-  var date          = moment(mongoUtils.getTimestampFromObjectId(toUser._id)).format('Do MMMM YYYY');
+  var date = moment(mongoUtils.getTimestampFromObjectId(toUser._id)).format('Do MMMM YYYY');
 
   return mailerService.sendEmail({
     templateFile:   template,
@@ -89,8 +89,8 @@ module.exports = {
 
   sendUnreadItemsNotification: Promise.method(function(user, troupesWithUnreadCounts) {
     var plaintext = user.id + ',' + 'unread_notifications';
-    var cipher    = crypto.createCipher('aes256', passphrase);
-    var hash      = cipher.update(plaintext, 'utf8', 'hex') + cipher.final('hex');
+    var cipher = crypto.createCipher('aes256', passphrase);
+    var hash = cipher.update(plaintext, 'utf8', 'hex') + cipher.final('hex');
 
     if (user.state) {
       logger.info('Skipping email notification for ' + user.username + ', not active state.');
@@ -159,14 +159,14 @@ module.exports = {
   }),
 
   sendInvitation: Promise.method(function(fromUser, toUser, room) {
-    return emailAddressService(toUser, { preferInvitedEmail: true,  attemptDiscovery: true })
+    return emailAddressService(toUser, { preferInvitedEmail: true, attemptDiscovery: true })
       .then(function(email) {
         return sendInvite(fromUser, toUser, room, email, 'invitation', 'invitation_sent');
       });
   }),
 
   sendInvitationReminder: Promise.method(function(fromUser, toUser, room) {
-    return emailAddressService(toUser, { preferInvitedEmail: true,  attemptDiscovery: true })
+    return emailAddressService(toUser, { preferInvitedEmail: true, attemptDiscovery: true })
     .then(function(email) {
       return sendInvite(fromUser, toUser, room, email, 'invitation-reminder', 'invitation_reminder_sent');
     });
@@ -184,8 +184,8 @@ module.exports = {
    */
   createdRoomNotification: Promise.method(function (user, room) {
     var plaintext = user.id + ',' + 'created_room';
-    var cipher    = crypto.createCipher('aes256', passphrase);
-    var hash      = cipher.update(plaintext, 'utf8', 'hex') + cipher.final('hex');
+    var cipher = crypto.createCipher('aes256', passphrase);
+    var hash = cipher.update(plaintext, 'utf8', 'hex') + cipher.final('hex');
     var emailBasePath = config.get("email:emailBasePath");
     var unsubscribeUrl = emailBasePath + '/settings/unsubscribe/' + hash;
 
@@ -235,11 +235,11 @@ module.exports = {
   }),
 
   addedToRoomNotification: Promise.method(function(fromUser, toUser, room) {
-    var plaintext       = toUser.id + ',' + 'unread_notifications';
-    var cipher          = crypto.createCipher('aes256', passphrase);
-    var hash            = cipher.update(plaintext, 'utf8', 'hex') + cipher.final('hex');
-    var emailBasePath   = config.get("email:emailBasePath");
-    var unsubscribeUrl  = emailBasePath + '/settings/unsubscribe/' + hash;
+    var plaintext = toUser.id + ',' + 'unread_notifications';
+    var cipher = crypto.createCipher('aes256', passphrase);
+    var hash = cipher.update(plaintext, 'utf8', 'hex') + cipher.final('hex');
+    var emailBasePath = config.get("email:emailBasePath");
+    var unsubscribeUrl = emailBasePath + '/settings/unsubscribe/' + hash;
 
     var senderName = (fromUser.displayName || fromUser.username).split(' ')[0];
     var recipientName = (toUser.displayName || toUser.username).split(' ')[0];

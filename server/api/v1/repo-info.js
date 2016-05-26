@@ -3,7 +3,7 @@
 var RepoService = require('gitter-web-github').GitHubRepoService;
 var StatusError = require('statuserror');
 
-module.exports =  function(req, res, next) {
+module.exports = function(req, res, next) {
   var repoName = req.query.repo ? String(req.query.repo) : null;
   
   if (!repoName) return next(new StatusError(400, 'repo parameter required'));

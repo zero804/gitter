@@ -1,17 +1,17 @@
 "use strict";
 
 
-var env                     = require('gitter-web-env');
-var logger                  = env.logger;
-var stats                   = env.stats;
-var Promise                 = require('bluebird');
+var env = require('gitter-web-env');
+var logger = env.logger;
+var stats = env.stats;
+var Promise = require('bluebird');
 var GithubIssueStateService = require('gitter-web-github').GitHubIssueStateService;
-var StatusError             = require('statuserror');
+var StatusError = require('statuserror');
 
 var EXPIRES_SECONDS = 180;
 var EXPIRES_MILLISECONDS = 180 * 1000;
 
-module.exports =  function(req, res, next) {
+module.exports = function(req, res, next) {
   var issue = req.query.q;
 
   return Promise.try(function() {

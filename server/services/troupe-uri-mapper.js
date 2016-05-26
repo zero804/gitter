@@ -1,10 +1,10 @@
 "use strict";
 
-var persistence           = require('gitter-web-persistence');
-var userService           = require("./user-service");
-var collections           = require("../utils/collections");
-var mongoUtils            = require('gitter-web-persistence-utils/lib/mongo-utils');
-var Promise               = require('bluebird');
+var persistence = require('gitter-web-persistence');
+var userService = require("./user-service");
+var collections = require("../utils/collections");
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var Promise = require('bluebird');
 var roomMembershipService = require('./room-membership-service');
 
 /**

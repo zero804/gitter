@@ -1,7 +1,7 @@
 "use strict";
 
 var mongoose = require('gitter-web-mongoose-bluebird');
-var Schema   = mongoose.Schema;
+var Schema = mongoose.Schema;
 var ObjectId = Schema.ObjectId;
 var installVersionIncMiddleware = require('../install-version-inc-middleware');
 
@@ -85,7 +85,7 @@ UserSchema.methods.getAllEmails = function() {
 };
 
 UserSchema.methods.getHomeUrl = function() {
-  return '/' +  this.username;
+  return '/' + this.username;
 };
 
 UserSchema.methods.hasUsername = function() {

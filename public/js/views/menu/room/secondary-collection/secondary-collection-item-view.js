@@ -1,12 +1,12 @@
 'use strict';
 
-var _                       = require('underscore');
-var urlJoin                 = require('url-join');
-var roomNameShortener       = require('gitter-web-shared/room-name-shortener');
-var BaseCollectionItemView  = require('../base-collection/base-collection-item-view');
+var _ = require('underscore');
+var urlJoin = require('url-join');
+var roomNameShortener = require('gitter-web-shared/room-name-shortener');
+var BaseCollectionItemView = require('../base-collection/base-collection-item-view');
 var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
-var parseForTemplate        = require('gitter-web-shared/parse/left-menu-primary-item');
-var parseRoomItemName       = require('gitter-web-shared/get-org-menu-state-name-from-troupe-name');
+var parseForTemplate = require('gitter-web-shared/parse/left-menu-primary-item');
+var parseRoomItemName = require('gitter-web-shared/get-org-menu-state-name-from-troupe-name');
 
 module.exports = BaseCollectionItemView.extend({
 
@@ -33,7 +33,7 @@ module.exports = BaseCollectionItemView.extend({
   },
 
   onMenuChangeState: function () {
-    var name    = (this.model.get('name') || this.model.get('uri') || this.model.get('username'));
+    var name = (this.model.get('name') || this.model.get('uri') || this.model.get('username'));
     var content = (this.roomMenuModel.get('state') === 'org') ?
       parseRoomItemName(name) :
       roomNameShortener(name);

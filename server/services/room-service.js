@@ -45,6 +45,7 @@ var uriResolver = require('./uri-resolver');
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 var userScopes = require('gitter-web-identity/lib/user-scopes');
 var groupService = require('gitter-web-groups/lib/group-service');
+
 var splitsvilleEnabled = nconf.get("project-splitsville:enabled");
 
 /**
