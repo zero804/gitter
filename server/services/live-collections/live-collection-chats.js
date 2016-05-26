@@ -1,7 +1,7 @@
 "use strict";
 
-var _              = require('lodash');
-var appEvents      = require('gitter-web-appevents');
+var _ = require('lodash');
+var appEvents = require('gitter-web-appevents');
 var restSerializer = require("../../serializers/rest-serializer");
 
 function serializeChatToRoom(operation, chat) {

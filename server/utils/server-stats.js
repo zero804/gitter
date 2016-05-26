@@ -1,8 +1,8 @@
 "use strict";
 
-var env      = require('gitter-web-env');
-var logger   = env.logger;
-var stats    = env.stats;
+var env = require('gitter-web-env');
+var logger = env.logger;
+var stats = env.stats;
 var shutdown = require('shutdown');
 
 module.exports = function(prefix, server) {

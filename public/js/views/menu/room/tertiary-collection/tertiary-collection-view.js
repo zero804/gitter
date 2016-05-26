@@ -1,15 +1,15 @@
 'use strict';
 
-var _                       = require('underscore');
-var urlJoin                 = require('url-join');
-var Marionette              = require('backbone.marionette');
-var toggleClass             = require('utils/toggle-class');
+var _ = require('underscore');
+var urlJoin = require('url-join');
+var Marionette = require('backbone.marionette');
+var toggleClass = require('utils/toggle-class');
 var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
-var roomNameShortener       = require('gitter-web-shared/room-name-shortener');
-var BaseCollectionView      = require('../base-collection/base-collection-view');
-var BaseCollectionItemView  = require('../base-collection/base-collection-item-view');
-var EmptySearchView         = require('./tertiary-collection-item-search-empty-view');
-var parseForTemplate        = require('gitter-web-shared/parse/left-menu-primary-item');
+var roomNameShortener = require('gitter-web-shared/room-name-shortener');
+var BaseCollectionView = require('../base-collection/base-collection-view');
+var BaseCollectionItemView = require('../base-collection/base-collection-item-view');
+var EmptySearchView = require('./tertiary-collection-item-search-empty-view');
+var parseForTemplate = require('gitter-web-shared/parse/left-menu-primary-item');
 
 var proto = BaseCollectionView.prototype;
 
@@ -31,7 +31,7 @@ var ItemView = BaseCollectionItemView.extend({
   }
 });
 
-module.exports =  BaseCollectionView.extend({
+module.exports = BaseCollectionView.extend({
   childView:          ItemView,
   className:          'tertiary-collection',
 
@@ -40,9 +40,9 @@ module.exports =  BaseCollectionView.extend({
   }),
 
   initialize: function(attrs) {
-    this.roomMenuModel       = attrs.roomMenuModel;
-    this.roomCollection      = attrs.roomCollection;
-    this.primaryCollection   = attrs.primaryCollection;
+    this.roomMenuModel = attrs.roomMenuModel;
+    this.roomCollection = attrs.roomCollection;
+    this.primaryCollection = attrs.primaryCollection;
     this.secondaryCollection = attrs.secondaryCollection;
 
     this.listenTo(this.collection, 'filter-complete sync', this.render, this);
@@ -64,7 +64,7 @@ module.exports =  BaseCollectionView.extend({
       case 'search':
         return (index <= 5);
       default:
-        return  !this.primaryCollection.get(model.get('id')) &&
+        return !this.primaryCollection.get(model.get('id')) &&
                 !this.secondaryCollection.get(model.get('id'));
     }
   },

@@ -23,11 +23,11 @@ var Behavior = Marionette.Behavior.extend({
     this.listenTo(this.view, 'render', this.decorateIfVisible);
 
     // Debounced actions for improved performance
-    this.lazyDecorator      = _.debounce(this.decorateIfVisible.bind(this), 500);
+    this.lazyDecorator = _.debounce(this.decorateIfVisible.bind(this), 500);
     this.lazyDecoratorQueue = rafUtils.debounce(this.decorateQueue, this);
 
-    this.lazyTracker        = _.debounce(this.trackViewport.bind(this), 500);
-    this.lazyPointerEvents  = _.debounce(this.enablePointerEvents.bind(this), 250);
+    this.lazyTracker = _.debounce(this.trackViewport.bind(this), 500);
+    this.lazyPointerEvents = _.debounce(this.enablePointerEvents.bind(this), 250);
 
     this.scrollHandler = this.smoothScroll.bind(this);
     addPassiveScrollListener(this.scrollElement, this.scrollHandler);

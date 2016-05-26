@@ -1,8 +1,8 @@
 'use strict';
 
-var env       = require('gitter-web-env');
+var env = require('gitter-web-env');
 var redisLock = require("redis-lock")(env.redis.getClient());
-var Promise   = require('bluebird');
+var Promise = require('bluebird');
 
 module.exports = function lock(key, promiseFn) {
   return new Promise(function(resolve, reject) {

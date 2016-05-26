@@ -1,10 +1,10 @@
 'use strict';
 
-var Marionette                      = require('backbone.marionette');
-var cocktail                        = require('cocktail');
-var toggleClass                     = require('utils/toggle-class');
-var KeyboardEventMixin              = require('views/keyboard-events-mixin');
-var template                        = require('./base-collection-item-view.hbs');
+var Marionette = require('backbone.marionette');
+var cocktail = require('cocktail');
+var toggleClass = require('utils/toggle-class');
+var KeyboardEventMixin = require('views/keyboard-events-mixin');
+var template = require('./base-collection-item-view.hbs');
 var updateUnreadIndicatorClassState = require('../../../../components/menu/update-unread-indicator-class-state');
 
 var BaseCollectionItemView = Marionette.ItemView.extend({
@@ -38,7 +38,7 @@ var BaseCollectionItemView = Marionette.ItemView.extend({
 
   constructor: function(attrs) {
     this.roomMenuModel = attrs.roomMenuModel;
-    this.index         = attrs.index;
+    this.index = attrs.index;
 
     Marionette.ItemView.prototype.constructor.apply(this, arguments);
   },
@@ -63,7 +63,7 @@ var BaseCollectionItemView = Marionette.ItemView.extend({
 
   getRoomUrl: function() {
     var name = this.getRoomName();
-    var url  = (name[0] !== '/') ?  '/' + name : name;
+    var url = (name[0] !== '/') ? '/' + name : name;
 
     return url;
   },

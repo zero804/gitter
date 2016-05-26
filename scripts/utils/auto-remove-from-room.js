@@ -52,7 +52,7 @@ function handleRoom(troupe) {
       var userIds = candidates.map(function(c) { return c.userId; });
       return [candidates, userService.findByIds(userIds)];
     })
-    .spread(function(candidates, users)  {
+    .spread(function(candidates, users) {
       console.log('>>>>>>>>>>> ROOM ', troupe.uri, '> ', candidates.length, 'candidates');
       var usersHash = collections.indexById(users);
 

@@ -1,9 +1,9 @@
 "use strict";
 
 var GithubRepoService = require('./github-repo-service');
-var GithubMeService   = require('./github-me-service');
-var GithubOrgService  = require('./github-org-service');
-var Promise           = require('bluebird');
+var GithubMeService = require('./github-me-service');
+var GithubOrgService = require('./github-org-service');
+var Promise = require('bluebird');
 
 function getRepoMembers(uri, instigatingUser) {
   var repo = new GithubRepoService(instigatingUser);

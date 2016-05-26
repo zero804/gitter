@@ -1,9 +1,9 @@
 "use strict";
 
-var env               = require('gitter-web-env');
-var logger            = env.logger;
-var config            = env.config;
-var stats             = env.stats;
+var env = require('gitter-web-env');
+var logger = env.logger;
+var config = env.config;
+var stats = env.stats;
 
 var superClientPassword = config.get('ws:superClientPassword');
 

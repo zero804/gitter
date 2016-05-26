@@ -1,13 +1,13 @@
 'use strict';
 
-var env    = require('gitter-web-env');
+var env = require('gitter-web-env');
 var logger = env.logger;
-var conf   = env.config;
+var conf = env.config;
 
 /* Uses the no-persist redis */
-var redisClient        = env.redis.createClient(process.env.REDIS_NOPERSIST_CONNECTION_STRING || conf.get("redis_nopersist"));
-var STANDARD_TTL       = 10 * 60;     /* 10 minutes */
-var ANONYMOUS_TTL      = conf.get('web:sessionTTL') + 60; /* One minute more than the session age */
+var redisClient = env.redis.createClient(process.env.REDIS_NOPERSIST_CONNECTION_STRING || conf.get("redis_nopersist"));
+var STANDARD_TTL = 10 * 60;     /* 10 minutes */
+var ANONYMOUS_TTL = conf.get('web:sessionTTL') + 60; /* One minute more than the session age */
 
 var tokenLookupCachePrefix = "token:c:";
 var tokenValidationCachePrefix = "token:t:";
@@ -67,7 +67,7 @@ module.exports = {
 
       if (!result) return callback();
 
-      var userId  = result[0];
+      var userId = result[0];
       var clientId = result[1];
 
       // Anonymous tokens don't have this

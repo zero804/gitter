@@ -1,6 +1,7 @@
 'use strict';
 
-var RESERVED_RE = new RegExp('^\\/(' + require('./vanity-keywords').join('|') + ')\\b');
+var reservedNameSpaces = require('gitter-web-validators/lib/reserved-namespaces');
+var RESERVED_RE = new RegExp('^\\/(' + reservedNameSpaces.join('|') + ')\\b');
 
 module.exports = function (name) {
   if (!name) return false;

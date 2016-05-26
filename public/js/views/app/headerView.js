@@ -1,20 +1,20 @@
 /* eslint complexity: ["error", 16] */
 'use strict';
-var _                        = require('underscore');
-var context                  = require('utils/context');
-var clientEnv                = require('gitter-client-env');
-var apiClient                = require('components/apiClient');
-var Marionette               = require('backbone.marionette');
-var Backbone                 = require('backbone');
-var cocktail                 = require('cocktail');
-var autolink                 = require('autolink');
-var userNotifications        = require('components/user-notifications');
-var Dropdown                 = require('views/controls/dropdown');
-var appEvents                = require('utils/appevents');
-var KeyboardEventMixin       = require('views/keyboard-events-mixin');
-var headerViewTemplate       = require('./tmpl/headerViewTemplate.hbs');
+var _ = require('underscore');
+var context = require('utils/context');
+var clientEnv = require('gitter-client-env');
+var apiClient = require('components/apiClient');
+var Marionette = require('backbone.marionette');
+var Backbone = require('backbone');
+var cocktail = require('cocktail');
+var autolink = require('autolink');
+var userNotifications = require('components/user-notifications');
+var Dropdown = require('views/controls/dropdown');
+var appEvents = require('utils/appevents');
+var KeyboardEventMixin = require('views/keyboard-events-mixin');
+var headerViewTemplate = require('./tmpl/headerViewTemplate.hbs');
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
-var resolveRoomAvatarSrcSet  = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
+var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 var toggleClass = require('utils/toggle-class');
 
 require('views/behaviors/tooltip');

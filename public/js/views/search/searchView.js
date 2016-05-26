@@ -292,7 +292,7 @@ module.exports = (function() {
         .map(function (room) {
           room.exists = true;
           room.priority = room.githubType.match(/^ORG$/) ? 0 : 1;
-          room.boost    = room.githubType.match(/^ORG$/) ? 1 : 0;
+          room.boost = room.githubType.match(/^ORG$/) ? 1 : 0;
           return room;
         });
     },
