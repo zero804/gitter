@@ -49,7 +49,7 @@ describe('room-meta-service #slow', function(){
   it('should be able to insert two records', function() {
     return Promise.join(
       roomMetaService.upsertMetaKey(fixture.troupe1.id, 'welcomeMessage', { text: 'a' }),
-      roomMetaService.upsertMetaKey(fixture.troupe1.id, 'welcomeMessage', { text: 'b' }));
+      roomMetaService.upsertMetaKey(fixture.troupe2.id, 'welcomeMessage', { text: 'b' }));
   })
 
 });
