@@ -4,9 +4,13 @@ module.exports = {
         "node": true,
         "mocha": true
     },
+    "plugins": [
+      "mocha"
+    ],
     "rules": {
-        "max-nested-callbacks": ["error", 10],
-        "node/no-unpublished-require": "off",
-        "node/no-missing-require": "off"
+      "mocha/no-exclusive-tests": "error",
+      "max-nested-callbacks": ["error", 10],
+      "node/no-unpublished-require": "off",
+      "node/no-missing-require": "off"
     }
 };

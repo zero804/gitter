@@ -252,16 +252,26 @@ RoomWithPolicyService.prototype.getRoomWelcomeMessage = secureMethod([allowJoin]
   return roomMetaService.findMetaByTroupeId(this.room.id, 'welcomeMessage');
 });
 
-RoomWithPolicyService.prototype.updateRoomWelcomeMessage = secureMethod([allowAdmin], function(options){
-  assert(options.welcomeMessage);
-  return processMarkdown(options.welcomeMessage)
+/**
+ * Update the welcome message for a room
+ */
+RoomWithPolicyService.prototype.updateRoomWelcomeMessage = secureMethod([allowAdmin], function(data){
+  if (!data || !data.welcomeMessage) throw new StatusError(400);
+
+  return processMarkdown(data.welcomeMessage)
+    .bind(this)
     .then(function(welcomeMessage){
-      return roomMetaService.upsertMetaKey(this.room.id, 'welcomeMessage', welcomeMessage);
-    }.bind(this))
-    .then(function(res){
-      res = (res || {});
-      return { welcomeMessage: (res.welcomeMessage || {}) };
+      return roomMetaService.upsertMetaKey(this.room.id, 'welcomeMessage', welcomeMessage)
+        .return({ welcomeMessage: welcomeMessage });
     });
 });
+
+/*
+ * Delete a room
+ */
+ RoomWithPolicyService.prototype.deleteRoom = secureMethod([allowAdmin], function() {
+   logger.warn('User deleting room ', { roomId: this.room._id, username: this.user.username, userId: this.user._id });
+   return roomService.deleteRoom(this.room);
+ });
 
 module.exports = RoomWithPolicyService;
