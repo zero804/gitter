@@ -3,7 +3,7 @@
 var GitHubOrgService  = require('./github-org-service');
 var GitHubRepoService = require('./github-repo-service');
 var Promise           = require('bluebird');
-var debug             = require('debug')('gitter:github-uri-validator');
+var debug             = require('debug')('gitter:app:github:github-uri-validator');
 
 function validateOrgUri(user, uri) {
   debug("validateOrgUri: %s", uri);

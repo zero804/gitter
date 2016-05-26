@@ -6,7 +6,7 @@ var logger             = env.logger;
 var uriLookupService   = require("./uri-lookup-service");
 var userService        = require('./user-service');
 var troupeService      = require('./troupe-service');
-var debug              = require('debug')('gitter:uri-resolver');
+var debug              = require('debug')('gitter:app:uri-resolver');
 var StatusError        = require('statuserror');
 
 /**

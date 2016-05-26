@@ -6,7 +6,7 @@ var winston = env.logger;
 
 var events = require('events');
 var StatusError = require('statuserror');
-var debug = require('debug')('gitter:presence-engine');
+var debug = require('debug')('gitter:app:presence-engine');
 var presenceService = new events.EventEmitter();
 var uniqueIds = require('mongodb-unique-ids');
 var fs = require('fs');

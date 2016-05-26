@@ -5,7 +5,7 @@ var restful = require("../../../services/restful");
 var restSerializer = require("../../../serializers/rest-serializer");
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
-var loadTroupeFromParam  = require('./load-troupe-param');
+var loadTroupeFromParam = require('./load-troupe-param');
 var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
 var RoomWithPolicyService = require('../../../services/room-with-policy-service');
 
@@ -63,24 +63,25 @@ module.exports = {
 
     if (!roomUri) throw new StatusError(400);
 
-    return roomService.findOrCreateRoom(req.user, roomUri, { ignoreCase: true, addBadge: addBadge })
-      .then(function (room) {
-        if (!room || !room.troupe) throw new StatusError(403, 'Permission denied');
-
-        var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, includeRolesForTroupe: room.troupe });
-
-        return restSerializer.serializeObject(room.troupe, strategy)
-        .then(function(serialized) {
-
-          serialized.extra = {
-            access: room.access,
-            didCreate: room.didCreate,
-            hookCreationFailedDueToMissingScope: room.hookCreationFailedDueToMissingScope
-          };
-
-          return serialized;
+    return roomService.createRoomByUri(req.user, roomUri, { ignoreCase: true, addBadge: addBadge })
+      .then(function (createResult) {
+        var strategy = new restSerializer.TroupeStrategy({
+          currentUserId: req.user.id,
+          currentUser: req.user,
+          includeRolesForTroupe: createResult.troupe
         });
-    });
+
+        return [createResult, restSerializer.serializeObject(createResult.troupe, strategy)];
+      })
+      .spread(function(createResult, serialized) {
+        serialized.extra = {
+          didCreate: createResult.didCreate,
+          hookCreationFailedDueToMissingScope: createResult.hookCreationFailedDueToMissingScope
+        };
+
+        return serialized;
+      });
+
   },
 
   update: function(req) {
@@ -130,12 +131,8 @@ module.exports = {
       .then(function(troupe) {
         if (troupe.oneToOne || !troupe.uri) throw new StatusError(400, 'cannot delete one to one rooms');
 
-        return [troupe, req.userRoomPolicy.isAdmin()];
-      })
-      .spread(function(troupe, isAdmin) {
-        if (!isAdmin) throw new StatusError(403, 'admin permissions required');
-
-        return roomService.deleteRoom(troupe);
+        var roomWithPolicyService = new RoomWithPolicyService(troupe, req.user, req.userRoomPolicy);
+        return roomWithPolicyService.deleteRoom();
       })
       .then(function() {
         return { success: true };
