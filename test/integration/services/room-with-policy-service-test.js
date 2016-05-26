@@ -216,7 +216,7 @@ describe('room-with-policy-service', function() {
 
   });
 
-  describe.only('welcome message', function(){
+  describe('welcome message', function(){
    it('should allow you to create a welcome message', function(){
     var welcomeMessage = 'this is a test';
     var r = new RoomWithPolicyService(fixture.troupe1, fixture.user1, isAdminPolicy);
