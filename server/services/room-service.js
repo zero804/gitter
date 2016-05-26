@@ -7,10 +7,11 @@ var stats = env.stats;
 var errorReporter = env.errorReporter;
 
 var appEvents = require('gitter-web-appevents');
+var assert = require('assert');
 var Promise = require('bluebird');
 var request = require('request');
 var _ = require('lodash');
-var xregexp = require('xregexp').XRegExp;
+var validateRoomName = require('gitter-web-validators/lib/validate-room-name');
 var persistence = require('gitter-web-persistence');
 var uriLookupService = require("./uri-lookup-service");
 var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
@@ -43,6 +44,7 @@ var badgerEnabled = nconf.get('autoPullRequest:enabled');
 var uriResolver = require('./uri-resolver');
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 var userScopes = require('gitter-web-identity/lib/user-scopes');
+var groupService = require('gitter-web-groups/lib/group-service');
 
 var splitsvilleEnabled = nconf.get("project-splitsville:enabled");
 
@@ -166,6 +168,45 @@ function doPostGitHubRoomCreationTasks(troupe, user, githubType, security, optio
 
 }
 
+function getOwnerFromRepoFullName(repoName) {
+  assert(repoName, 'repoName required');
+  var owner = repoName.split('/')[0];
+  return owner;
+}
+
+/**
+ * During communities API migration phase, finds or creates a group for the
+ * given uri.
+ */
+function ensureGroupForGitHubRoom(user, githubType, uri) {
+  var options;
+  switch (githubType) {
+    case 'REPO':
+      options = {
+        uri: getOwnerFromRepoFullName(uri),
+        obtainAccessFromGitHubRepo: uri
+      }
+      break;
+
+    case 'ORG':
+      options = {
+        uri: uri
+      }
+      break;
+
+    default:
+      throw new StatusError(400, 'Cannot create a group for ' + githubType);
+  }
+
+  return groupService.migration.ensureGroupForGitHubRoomCreation(user, options);
+}
+
+function doPostRoomCreationMigrationSteps(troupe) {
+  // create security permissions
+  var descriptor = legacyMigration.generatePermissionsForRoom(troupe, null, null);
+  return securityDescriptorService.insertForRoom(troupe._id, descriptor);
+}
+
 /**
  * Assuming that oneToOne uris have been handled already,
  * Figure out what this troupe is for
@@ -186,6 +227,20 @@ function createRoomForGitHubUri(user, uri, options) {
       if (!githubInfo) throw new StatusError(404);
 
       var githubType = githubInfo.type;
+
+      switch (githubType) {
+        case 'ORG':
+        case 'REPO':
+          break;
+
+        case 'USER':
+          // We got back a user. Since we've managed to get this far,
+          // it means that the user is on GitHub but not gitter, so
+          // we'll 404
+          // In future, it might be worth bring up a page.
+          throw new StatusError(404);
+      }
+
       var officialUri = githubInfo.uri;
       var lcUri = officialUri.toLowerCase();
       var security = githubInfo.security || null;
@@ -199,7 +254,7 @@ function createRoomForGitHubUri(user, uri, options) {
         officialUri.toLowerCase() === uri.toLowerCase()) {
 
         debug('Redirecting client from %s to official uri %s', uri, officialUri);
-        throw extendStatusError(301, { path:  '/' + officialUri });
+        throw extendStatusError(301, { path: '/' + officialUri });
       }
 
       /* Room does not yet exist */
@@ -218,16 +273,22 @@ function createRoomForGitHubUri(user, uri, options) {
 
           // If the user is not allowed to create this room, go no further
           if(!access) throw new StatusError(403);
-
+          return ensureGroupForGitHubRoom(user, githubType, officialUri);
+        })
+        .then(function(group) {
           // TODO: this will change when uris break away
           var queryTerm = githubId ?
                 { githubId: githubId, githubType: githubType } :
                 { lcUri: lcUri, githubType: githubType };
 
+          // TODO: remove this when lcOwner goes away
+          var lcOwner = lcUri.split('/')[0];
+
           return mongooseUtils.upsert(persistence.Troupe, queryTerm, {
               $setOnInsert: {
                 lcUri: lcUri,
-                lcOwner: lcUri.split('/')[0],
+                lcOwner: lcOwner, // This will go
+                groupId: group._id,
                 uri: officialUri,
                 githubType: githubType,
                 githubId: githubId,
@@ -239,7 +300,7 @@ function createRoomForGitHubUri(user, uri, options) {
             });
         })
         .tap(function(upsertResult) {
-          /* Next stage - create security permissions */
+          /* Next stage - post creation migration */
           var troupe = this.troupe = upsertResult[0];
           var updateExisting = this.updateExisting = upsertResult[1];
 
@@ -247,14 +308,13 @@ function createRoomForGitHubUri(user, uri, options) {
 
           if (updateExisting) return;
 
-          var descriptor = legacyMigration.generatePermissionsForRoom(troupe, null, null);
-          return securityDescriptorService.insertForRoom(troupe._id, descriptor);
+          return doPostRoomCreationMigrationSteps(troupe);
         })
         .tap(function() {
+          /* Next stage - possible rename */
           var troupe = this.troupe;
           var updateExisting = this.updateExisting;
 
-          /* Next stage - possible rename */
           // New room? Skip this step
           if (!updateExisting) return;
 
@@ -565,14 +625,12 @@ function findUsersChannelRoom(user, childTroupeId, callback) {
 }
 
 function assertValidName(name) {
-  var matcher = xregexp('^[\\p{L}\\d][\\p{L}\\d\\-\\_]*$');
-  if(!matcher.test(name)) {
-    throw {
-      responseStatusCode: 400,
-      clientDetail: {
-        illegalName: true
-      }
+  if (!validateRoomName(name)) {
+    var err = new StatusError(400);
+    err.clientDetail = {
+      illegalName: true
     };
+    throw err;
   }
 }
 
@@ -594,7 +652,7 @@ var ensureNoRepoNameClash = Promise.method(function (user, uri) {
 
   if(parts.length < 2) {
     /* The classic "this should never happen" gag */
-    throw "Bad channel uri";
+    throw new StatusError(400, "Bad channel uri");
   }
 
   if(parts.length === 2) {
@@ -653,14 +711,30 @@ function createRoomChannel(parentTroupe, user, options) {
       validate.fail('Invalid security option: ' + security);
   }
 
-  return createChannel(user, null, {
-    uri: uri,
-    security: options.security,
-    githubType: githubType,
-  });
+  return Promise.try(function() {
+      if (parentTroupe.groupId) return parentTroupe.groupId;
+
+      // The parent troupe does not have a groupId, but it should
+      // so, create the group add the parent to the group and
+      // the user the same groupId in the creation of this room
+      return groupService.migration.ensureGroupForRoom(parentTroupe, user)
+        .then(function(group) {
+          return group && group._id;
+        });
+    })
+    .then(function(groupId) {
+      return createChannel(user, null, {
+        uri: uri,
+        security: options.security,
+        githubType: githubType,
+        groupId: groupId
+      });
+    })
 }
 
-
+/**
+ * Create a channel under a user
+ */
 function createUserChannel(user, options) {
   validate.expect(user, 'user is expected');
   validate.expect(options, 'options is expected');
@@ -687,20 +761,30 @@ function createUserChannel(user, options) {
       validate.fail('Invalid security option: ' + security);
   }
 
-  var uri = user.username + '/' + name;
-  return createChannel(user, null, {
-    uri: uri,
-    security: options.security,
-    githubType: 'USER_CHANNEL',
-  });
+  return groupService.migration.ensureGroupForUser(user)
+    .then(function(group) {
+      var groupId = group && group._id;
+      var uri = user.username + '/' + name;
+
+      return createChannel(user, null, {
+        uri: uri,
+        security: options.security,
+        githubType: 'USER_CHANNEL',
+        groupId: groupId
+      });
+    })
 }
 
+/**
+ * @private
+ */
 function createChannel(user, parentRoom, options) {
   var uri = options.uri;
   var githubType = options.githubType;
   var lcUri = uri.toLowerCase();
   var lcOwner = lcUri.split('/')[0];
   var security = options.security;
+  var groupId = options.groupId;
 
   // TODO: Add group support in here....
   return ensureNoRepoNameClash(user, uri)
@@ -717,6 +801,7 @@ function createChannel(user, parentRoom, options) {
           $setOnInsert: {
             lcUri: lcUri,
             lcOwner: lcOwner,
+            groupId: groupId,
             uri: uri,
             security: security,
             parentId: parentRoom ? parentRoom._id : undefined,
@@ -734,8 +819,7 @@ function createChannel(user, parentRoom, options) {
           return newRoom;
         })
         .tap(function(newRoom) {
-          var descriptor = legacyMigration.generatePermissionsForRoom(newRoom, null, user);
-
+          var descriptor = legacyMigration.generatePermissionsForRoom(newRoom, parentRoom, user);
           return securityDescriptorService.insertForRoom(newRoom._id, descriptor);
         })
         .tap(function(newRoom) {

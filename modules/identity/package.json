@@ -9,5 +9,8 @@
   "scripts": {
     "test": "mocha test/"
   },
+  "devDependencies": {
+    "gitter-web-test-utils": "file:../test-utils"
+  },
   "private": true
 }
