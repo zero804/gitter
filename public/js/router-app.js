@@ -2,26 +2,26 @@
 'use strict';
 require('utils/initial-setup');
 
-var $                                 = require('jquery');
-var appEvents                         = require('utils/appevents');
-var context                           = require('utils/context');
-var clientEnv                         = require('gitter-client-env');
-var Backbone                          = require('backbone');
-var AppLayout                         = require('views/layouts/app-layout');
-var LoadingView                       = require('views/app/loading-view');
-var troupeCollections                 = require('collections/instances/troupes');
-var repoModels                        = require('collections/repos');
-var ReposCollection                   = repoModels.ReposCollection;
-var TitlebarUpdater                   = require('components/titlebar');
-var realtime                          = require('components/realtime');
-var onready                           = require('./utils/onready');
-var urlParser                         = require('utils/url-parser');
-var RAF                               = require('utils/raf');
-var RoomCollectionTracker             = require('components/room-collection-tracker');
-var SPARoomSwitcher                   = require('components/spa-room-switcher');
-var debug                             = require('debug-proxy')('app:router-app');
-var linkHandler                       = require('./components/link-handler');
-var roomListGenerator                 = require('./components/chat-cache/room-list-generator');
+var $ = require('jquery');
+var appEvents = require('utils/appevents');
+var context = require('utils/context');
+var clientEnv = require('gitter-client-env');
+var Backbone = require('backbone');
+var AppLayout = require('views/layouts/app-layout');
+var LoadingView = require('views/app/loading-view');
+var troupeCollections = require('collections/instances/troupes');
+var repoModels = require('collections/repos');
+var ReposCollection = repoModels.ReposCollection;
+var TitlebarUpdater = require('components/titlebar');
+var realtime = require('components/realtime');
+var onready = require('./utils/onready');
+var urlParser = require('utils/url-parser');
+var RAF = require('utils/raf');
+var RoomCollectionTracker = require('components/room-collection-tracker');
+var SPARoomSwitcher = require('components/spa-room-switcher');
+var debug = require('debug-proxy')('app:router-app');
+var linkHandler = require('./components/link-handler');
+var roomListGenerator = require('./components/chat-cache/room-list-generator');
 
 require('components/statsc');
 require('views/widgets/preload');
@@ -191,7 +191,7 @@ onready(function() {
 
   appEvents.on('navigation', function(url, type, title) {
     debug('navigation: %s', url);
-    var parsed   = urlParser.parse(url);
+    var parsed = urlParser.parse(url);
     var frameUrl = parsed.pathname + '/~' + type + parsed.search;
 
     if (parsed.pathname === window.location.pathname) {
@@ -426,9 +426,9 @@ onready(function() {
           // org as the correct parent for the newly created room
           // we have to check if the org exists in the users room list otherwise
           // they probably don't have permission to create a child room of that type
-          var roomMenuModel                     = appLayout.getRoomMenuModel();
-          var currentLeftMenuState              = roomMenuModel.get('state');
-          var currentlySelectedOrg              = roomMenuModel.get('selectedOrgName');
+          var roomMenuModel = appLayout.getRoomMenuModel();
+          var currentLeftMenuState = roomMenuModel.get('state');
+          var currentlySelectedOrg = roomMenuModel.get('selectedOrgName');
           var hasPermissionToCreateOrgChildRoom = !!troupeCollections.troupes.findWhere({ uri: currentlySelectedOrg }) || context.getUser().username === currentlySelectedOrg;
 
           if(currentLeftMenuState === 'org' && hasPermissionToCreateOrgChildRoom) {

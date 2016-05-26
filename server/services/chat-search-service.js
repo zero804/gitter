@@ -1,13 +1,13 @@
 "use strict";
 
-var env                    = require('gitter-web-env');
-var stats                  = env.stats;
+var env = require('gitter-web-env');
+var stats = env.stats;
 
-var Promise                = require('bluebird');
-var _                      = require('underscore');
-var languageDetector       = require('../utils/language-detector');
+var Promise = require('bluebird');
+var _ = require('underscore');
+var languageDetector = require('../utils/language-detector');
 var languageAnalyzerMapper = require('../utils/language-analyzer-mapper');
-var client                 = require('../utils/elasticsearch-client');
+var client = require('../utils/elasticsearch-client');
 
 
 /* Magic way of figuring out the matching terms so that we can highlight */

@@ -1,14 +1,14 @@
 "use strict";
 
-var $                 = require('jquery');
-var _                 = require('underscore');
-var Marionette        = require('backbone.marionette');
+var $ = require('jquery');
+var _ = require('underscore');
+var Marionette = require('backbone.marionette');
 var troupeCollections = require('collections/instances/troupes');
-var ModalView         = require('./modal');
-var apiClient         = require('components/apiClient');
-var ParentSelectView  = require('views/createRoom/parentSelectView');
-var template          = require('./tmpl/create-room-view.hbs');
-var appEvents         = require('utils/appevents');
+var ModalView = require('./modal');
+var apiClient = require('components/apiClient');
+var ParentSelectView = require('views/createRoom/parentSelectView');
+var template = require('./tmpl/create-room-view.hbs');
+var appEvents = require('utils/appevents');
 
 var View = Marionette.LayoutView.extend({
   template: template,

@@ -1,11 +1,11 @@
 "use strict";
 
-var Marionette        = require('backbone.marionette');
-var _                 = require('underscore');
-var apiClient         = require('components/apiClient');
-var ModalView         = require('./modal');
-var template          = require('./tmpl/notification-defaults.hbs');
-var FeaturesView      = require('./notification-features-collection-view');
+var Marionette = require('backbone.marionette');
+var _ = require('underscore');
+var apiClient = require('components/apiClient');
+var ModalView = require('./modal');
+var template = require('./tmpl/notification-defaults.hbs');
+var FeaturesView = require('./notification-features-collection-view');
 
 var View = Marionette.LayoutView.extend({
   template: template,

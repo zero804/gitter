@@ -1,9 +1,9 @@
 'use strict';
 
 var parseLinks = require('parse-links');
-var url        = require('url');
-var lazy       = require('lazy.js');
-var Promise    = require('bluebird');
+var url = require('url');
+var lazy = require('lazy.js');
+var Promise = require('bluebird');
 
 function updatePerPage(options) {
   if(options.method !== 'GET' && options.method !== undefined) return;

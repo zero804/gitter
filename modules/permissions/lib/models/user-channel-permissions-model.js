@@ -1,7 +1,7 @@
 /* eslint complexity: ["error", 16] */
 "use strict";
 
-var Promise      = require('bluebird');
+var Promise = require('bluebird');
 var userIsInRoom = require('../user-in-room');
 
 var ALLOWED_USER_CHANNEL_SECURITY_VALUES = {

@@ -1,8 +1,8 @@
 /*global describe:true, it:true, beforeEach:true */
 'use strict';
 
-var assert                         = require('assert');
-var Backbone                       = require('backbone');
+var assert = require('assert');
+var Backbone = require('backbone');
 var SuggestedRoomsByRoomCollection = require('public/js/collections/room-suggested-rooms');
 
 describe('SuggestedRoomsByRoomCollection()', function() {
@@ -10,7 +10,7 @@ describe('SuggestedRoomsByRoomCollection()', function() {
   var suggestedCollection;
   var model;
   beforeEach(function() {
-    model =  new Backbone.Model({ roomId: 'test' });
+    model = new Backbone.Model({ roomId: 'test' });
     suggestedCollection = new SuggestedRoomsByRoomCollection(null, {
       contextModel: model,
     });

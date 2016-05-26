@@ -1,7 +1,7 @@
 'use strict';
 
 var BackendMuxer = require('gitter-web-backend-muxer');
-var Promise      = require('bluebird');
+var Promise = require('bluebird');
 
 var env = require('gitter-web-env');
 var config = env.config;

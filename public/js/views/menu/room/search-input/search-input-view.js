@@ -1,12 +1,12 @@
 //TODO TEST THIS JP 10/2/16
 'use strict';
 
-var Marionette         = require('backbone.marionette');
-var _                  = require('underscore');
-var cocktail           = require('cocktail');
+var Marionette = require('backbone.marionette');
+var _ = require('underscore');
+var cocktail = require('cocktail');
 var KeyboardEventMixin = require('views/keyboard-events-mixin');
-var template           = require('./search-input-view.hbs');
-var toggleClass        = require('utils/toggle-class');
+var template = require('./search-input-view.hbs');
+var toggleClass = require('utils/toggle-class');
 
 var SearchInputView = Marionette.ItemView.extend({
 

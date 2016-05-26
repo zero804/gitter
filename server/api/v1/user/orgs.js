@@ -1,6 +1,6 @@
 "use strict";
 
-var restful     = require('../../../services/restful');
+var restful = require('../../../services/restful');
 var StatusError = require('statuserror');
 
 module.exports = {

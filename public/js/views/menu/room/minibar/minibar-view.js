@@ -1,14 +1,14 @@
 'use strict';
 
-var _             = require('underscore');
-var Marionette    = require('backbone.marionette');
-var fastdom       = require('fastdom');
-var ItemView      = require('./minibar-item-view');
+var _ = require('underscore');
+var Marionette = require('backbone.marionette');
+var fastdom = require('fastdom');
+var ItemView = require('./minibar-item-view');
 var CloseItemView = require('./minibar-close-item-view');
 var CommunityCreateItemView = require('./minibar-community-create-item-view');
 var FavouriteView = require('./minibar-favourite-item-view');
-var PeopleView    = require('./minibar-people-item-view.js');
-var domIndexById  = require('../../../../utils/dom-index-by-id');
+var PeopleView = require('./minibar-people-item-view.js');
+var domIndexById = require('../../../../utils/dom-index-by-id');
 
 //TODO TEST ALL THE THINGS JP 2/2/16
 var MinibarView = Marionette.CollectionView.extend({
@@ -67,13 +67,13 @@ var MinibarView = Marionette.CollectionView.extend({
   },
 
   initialize: function(attrs) {
-    this.bus            = attrs.bus;
-    this.dndCtrl        = attrs.dndCtrl;
-    this.model          = attrs.model;
+    this.bus = attrs.bus;
+    this.dndCtrl = attrs.dndCtrl;
+    this.model = attrs.model;
     this.roomCollection = attrs.roomCollection;
     this.keyboardControllerView = attrs.keyboardControllerView;
 
-    this.shouldRender   = false;
+    this.shouldRender = false;
 
     this.listenTo(this.roomCollection, 'add remove', this.render, this);
     this.listenTo(this.collection, 'snapshot', this.onCollectionSnapshot, this);

@@ -3,16 +3,16 @@
 var env = require('gitter-web-env');
 var logger = env.logger;
 
-var passport               = require('passport');
+var passport = require('passport');
 var ClientPasswordStrategy = require('passport-oauth2-client-password').Strategy;
-var BearerStrategy         = require('gitter-passport-http-bearer').Strategy;
-var userService            = require('../services/user-service');
-var oauthService           = require('../services/oauth-service');
-var githubUserStrategy     = require('./strategies/github-user');
-var githubUpgradeStrategy  = require('./strategies/github-upgrade');
-var googleStrategy         = require('./strategies/google');
-var twitterStrategy        = require('./strategies/twitter');
-var linkedinStrategy        = require('./strategies/linkedin');
+var BearerStrategy = require('gitter-passport-http-bearer').Strategy;
+var userService = require('../services/user-service');
+var oauthService = require('../services/oauth-service');
+var githubUserStrategy = require('./strategies/github-user');
+var githubUpgradeStrategy = require('./strategies/github-upgrade');
+var googleStrategy = require('./strategies/google');
+var twitterStrategy = require('./strategies/twitter');
+var linkedinStrategy = require('./strategies/linkedin');
 
 
 function installApi() {

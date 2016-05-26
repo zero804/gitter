@@ -1,10 +1,10 @@
 "use strict";
 
-var $             = require('jquery');
-var _             = require('underscore');
-var Marionette    = require('backbone.marionette');
+var $ = require('jquery');
+var _ = require('underscore');
+var Marionette = require('backbone.marionette');
 var modalTemplate = require('./tmpl/modal.hbs');
-var isCompact     = require('utils/detect-compact');
+var isCompact = require('utils/detect-compact');
 
 require('../../template/helpers/all');
 require('gitter-styleguide/css/components/modals.css');

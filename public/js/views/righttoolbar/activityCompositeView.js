@@ -108,10 +108,10 @@ module.exports = (function() {
 
     serializeData: function() {
       try {
-        var meta    = this.model.get('meta');
+        var meta = this.model.get('meta');
         var payload = this.model.get('payload');
-        var sent    = this.model.get('sent');
-        var html    = this.model.get('html');
+        var sent = this.model.get('sent');
+        var html = this.model.get('html');
         var sentFormatted = timeFormat(sent, { compact: true });
 
         var core = {
@@ -203,7 +203,7 @@ module.exports = (function() {
       // so that they get to
       var viewReloading = this.collection.length === 0 && this.collection.loading;
       this.$el.toggleClass('loading', viewReloading);
-      var headerVisible =  !context.inOneToOneTroupeContext() && !!(context.isTroupeAdmin() || this.collection.length);
+      var headerVisible = !context.inOneToOneTroupeContext() && !!(context.isTroupeAdmin() || this.collection.length);
       this.ui.header.toggle(headerVisible);
     },
 

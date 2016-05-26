@@ -1,13 +1,13 @@
 /* eslint complexity: ["error", 13] */
 'use strict';
 
-var _                       = require('underscore');
+var _ = require('underscore');
 var resolveRoomAvatarSrcSet = require('../avatars/resolve-room-avatar-srcset.js');
-var getOrgNameFromUri       = require('../get-org-name-from-uri');
-var defaultFilter           = require('../filters/left-menu-primary-default');
-var defaultFavouriteFilter  = require('../filters/left-menu-primary-favourite');
-var defaultOneToOneFilter   = require('../filters/left-menu-primary-one2one');
-var favouriteOneToOneFilter   = require('../filters/left-menu-primary-favourite-one2one');
+var getOrgNameFromUri = require('../get-org-name-from-uri');
+var defaultFilter = require('../filters/left-menu-primary-default');
+var defaultFavouriteFilter = require('../filters/left-menu-primary-favourite');
+var defaultOneToOneFilter = require('../filters/left-menu-primary-one2one');
+var favouriteOneToOneFilter = require('../filters/left-menu-primary-favourite-one2one');
 
 module.exports = function suggestedOrgsFromRoomList(roomList, uri, currentRoomId, currentRoom) {
   var orgList = roomList.reduce(function(memo, room) {
@@ -21,7 +21,7 @@ module.exports = function suggestedOrgsFromRoomList(roomList, uri, currentRoomId
 
     //clean the prepending / from the url
     room.url = (room.url || '');
-    var url  = room.url.substring(1);
+    var url = room.url.substring(1);
 
     //get the first part of the url ie gitterHQ/gitter === gitterHQ
     var orgName = url.split('/')[0];
@@ -32,8 +32,8 @@ module.exports = function suggestedOrgsFromRoomList(roomList, uri, currentRoomId
       var index = memo.indexOf(existingEntry);
       // Aggregate the counts in each org bucket from each room
       memo[index].unreadItems = ((existingEntry.unreadItems || 0) + (room.unreadItems || 0));
-      memo[index].mentions    = ((existingEntry.mentions || 0) + (room.mentions || 0));
-      memo[index].activity    = ((existingEntry.activity || 0) + (room.activity || 0));
+      memo[index].mentions = ((existingEntry.mentions || 0) + (room.mentions || 0));
+      memo[index].activity = ((existingEntry.activity || 0) + (room.activity || 0));
       return memo;
     }
 
@@ -43,7 +43,7 @@ module.exports = function suggestedOrgsFromRoomList(roomList, uri, currentRoomId
 
   //If we are viewing a room owned by an org which the user is not yet a member of
   //we shunt the new org to the top of the minibar list JP 8/3/16
-  var currentOrg     = getOrgNameFromUri(uri);
+  var currentOrg = getOrgNameFromUri(uri);
   var roomIsOneToOne = (!!currentRoom && !!currentRoom.get) ?
     currentRoom.get('oneToOne') :
     !!currentRoom && currentRoom.oneToOne;
@@ -61,7 +61,7 @@ module.exports = function suggestedOrgsFromRoomList(roomList, uri, currentRoomId
 //Return a formatted minibar-item
 function getOrgItem(name, room, isViewingTemporaryOrg) {
 
-  room                  = (room || {});
+  room = (room || {});
   isViewingTemporaryOrg = (isViewingTemporaryOrg || false);
 
   return {

@@ -1,14 +1,14 @@
 "use strict";
-var _               = require('underscore');
-var context         = require('utils/context');
-var realtime        = require('./realtime');
-var apiClient       = require('./apiClient');
-var debug           = require('debug-proxy')('app:unread-items-client');
-var Backbone        = require('backbone');
-var appEvents       = require('utils/appevents');
+var _ = require('underscore');
+var context = require('utils/context');
+var realtime = require('./realtime');
+var apiClient = require('./apiClient');
+var debug = require('debug-proxy')('app:unread-items-client');
+var Backbone = require('backbone');
+var appEvents = require('utils/appevents');
 var UnreadItemStore = require('./unread-items-client-store');
-var log             = require('utils/log');
-var raf             = require('utils/raf')
+var log = require('utils/log');
+var raf = require('utils/raf')
 var addPassiveScrollListener = require('utils/passive-scroll-listener');
 
 module.exports = (function() {
@@ -524,7 +524,7 @@ module.exports = (function() {
       var bottomBound = topBound + scrollElement.clientHeight;
       if (bottomBound >= scrollElement.scrollHeight - 10) {
         /* At the bottom? */
-        bottomBound =  Number.POSITIVE_INFINITY;
+        bottomBound = Number.POSITIVE_INFINITY;
       }
 
       var modelsInRange = this.findModelsInViewport(topBound, bottomBound);
@@ -547,7 +547,7 @@ module.exports = (function() {
         if (itemId < firstItemId) {
           above++;
           if (!oldestUnreadItemId) oldestUnreadItemId = itemId;
-          if (store._items[itemId])  {
+          if (store._items[itemId]) {
             mentionsAbove++;
             oldestMentionId = itemId;
           }
@@ -611,7 +611,7 @@ module.exports = (function() {
     store.on('change:status', function(itemId, mention) {
       debug('CollectionSync: change:status: %s mention=%s', itemId);
 
-      collection.patch(itemId, { unread: true,  mentioned: mention });
+      collection.patch(itemId, { unread: true, mentioned: mention });
     });
 
     store.on('add', function(itemId, mention) {

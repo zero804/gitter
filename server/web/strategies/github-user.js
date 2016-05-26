@@ -52,16 +52,16 @@ function updateUser(req, accessToken, user, githubUserProfile) {
     });
   }
 
-  user.username         = githubUserProfile.login;
-  user.displayName      = githubUserProfile.name || githubUserProfile.login;
+  user.username = githubUserProfile.login;
+  user.displayName = githubUserProfile.name || githubUserProfile.login;
   user.gravatarImageUrl = githubUserProfile.avatar_url;
-  user.githubId         = githubUserProfile.id;
-  var gravatarVersion   = extractGravatarVersion(githubUserProfile.avatar_url);
+  user.githubId = githubUserProfile.id;
+  var gravatarVersion = extractGravatarVersion(githubUserProfile.avatar_url);
   if (gravatarVersion) {
     user.gravatarVersion = extractGravatarVersion(githubUserProfile.avatar_url);
   }
-  user.githubUserToken  = accessToken;
-  user.state            = undefined;
+  user.githubUserToken = accessToken;
+  user.state = undefined;
 
   return user.save()
     .then(function() {

@@ -1,11 +1,11 @@
 "use strict";
 
-var Backbone   = require('backbone');
+var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
-var apiClient  = require('components/apiClient');
-var appEvents  = require('utils/appevents');
-var ModalView  = require('./modal');
-var template   = require('./tmpl/confirm-repo-room.hbs');
+var apiClient = require('components/apiClient');
+var appEvents = require('utils/appevents');
+var ModalView = require('./modal');
+var template = require('./tmpl/confirm-repo-room.hbs');
 
 var View = Marionette.ItemView.extend({
   template: template,
@@ -67,12 +67,12 @@ var Modal = ModalView.extend({
     this.view = new View(options);
   },
   menuItems: [
-    { action: "cancel", text: "Cancel", pull: 'left',  className: "modal--default__footer__btn--neutral"},
+    { action: "cancel", text: "Cancel", pull: 'left', className: "modal--default__footer__btn--neutral"},
     { action: "create", text: "Create", pull: 'right', className: "modal--default__footer__btn" },
   ]
 });
 
-module.exports =  {
+module.exports = {
   View: View,
   Modal: Modal
 };
