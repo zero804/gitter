@@ -194,6 +194,7 @@
     "fuzzysearch": "^1.0.3",
     "gitter-handlebars-loader": "^1.2.0",
     "gitter-styleguide": "^1.6.4",
+    "gitter-web-test-utils": "file:modules/test-utils",
     "gulp": "^3.8.11",
     "gulp-codacy": "^1.0.0",
     "gulp-coveralls": "^0.1.4",

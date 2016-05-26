@@ -2,7 +2,7 @@
 
 var testRequire = require('../../test-require');
 var assertUtils = require('../../assert-utils');
-var fixtureLoader = require('../../test-fixtures');
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var serialize = testRequire('./serializers/serialize');
 var ChatStrategy = testRequire('./serializers/rest/chat-strategy');
 var ChatIdStrategy = testRequire('./serializers/rest/chat-id-strategy');

@@ -2,7 +2,7 @@
 
 
 var testRequire = require('../test-require');
-var fixtureLoader = require('../test-fixtures');
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assert = require("assert");
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var fixture = {};
