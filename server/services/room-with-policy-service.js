@@ -252,6 +252,9 @@ RoomWithPolicyService.prototype.getRoomWelcomeMessage = secureMethod([allowJoin]
   return roomMetaService.findMetaByTroupeId(this.room.id, 'welcomeMessage');
 });
 
+/**
+ * Update the welcome message for a room
+ */
 RoomWithPolicyService.prototype.updateRoomWelcomeMessage = secureMethod([allowAdmin], function(welcomeMessage){
   if (!welcomeMessage) throw new StatusError(400);
 
@@ -262,5 +265,13 @@ RoomWithPolicyService.prototype.updateRoomWelcomeMessage = secureMethod([allowAd
         .return({ welcomeMessage: welcomeMessage });
     });
 });
+
+/*
+ * Delete a room
+ */
+ RoomWithPolicyService.prototype.deleteRoom = secureMethod([allowAdmin], function() {
+   logger.warn('User deleting room ', { roomId: this.room._id, username: this.user.username, userId: this.user._id });
+   return roomService.deleteRoom(this.room);
+ });
 
 module.exports = RoomWithPolicyService;
