@@ -1,14 +1,14 @@
 'use strict';
 
-var Marionette          = require('backbone.marionette');
-var Backbone            = require('backbone');
-var context             = require('utils/context');
-var social              = require('utils/social');
-var apiClient           = require('components/apiClient');
-var template            = require('./tmpl/collaboratorsView.hbs');
-var itemTemplate        = require('./tmpl/collaboratorsItemView.hbs');
-var emptyViewTemplate   = require('./tmpl/collaboratorsEmptyView.hbs');
-var appEvents           = require('utils/appevents');
+var Marionette = require('backbone.marionette');
+var Backbone = require('backbone');
+var context = require('utils/context');
+var social = require('utils/social');
+var apiClient = require('components/apiClient');
+var template = require('./tmpl/collaboratorsView.hbs');
+var itemTemplate = require('./tmpl/collaboratorsItemView.hbs');
+var emptyViewTemplate = require('./tmpl/collaboratorsEmptyView.hbs');
+var appEvents = require('utils/appevents');
 var collaboratorsModels = require('collections/collaborators');
 var resolveUserAvatarSrcSet = require('gitter-web-shared/avatars/resolve-user-avatar-srcset');
 
@@ -255,7 +255,7 @@ module.exports = (function() {
     //Check if we should fetch data
     shouldFetch: function() {
       var roomModel = context.troupe();
-      var roomType  = roomModel.get('githubType');
+      var roomType = roomModel.get('githubType');
       var userCount = roomModel.get('userCount');
 
       //don't fetch for one-to-one rooms

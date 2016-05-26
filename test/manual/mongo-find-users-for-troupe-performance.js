@@ -1,8 +1,8 @@
 'use strict';
 
-var speedy      = require("speedy");
+var speedy = require("speedy");
 var troupeService = require('../../server/services/troupe-service');
-var onMongoConnect    = require('../../server/utils/on-mongo-connect');
+var onMongoConnect = require('../../server/utils/on-mongo-connect');
 
 // var troupeId = "54e4bffbf551ca5918c16c29";
 var troupeId = "54d244f1c53660e29b9f91d9";

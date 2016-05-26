@@ -18,7 +18,7 @@ function garbageCollection() {
       if (!value) return;
 
       var pair = value.split('-');
-      var lockDate =  parseInt(pair[0], 10);
+      var lockDate = parseInt(pair[0], 10);
 
       if (lockDate && (now - lockDate > TIMEOUT)) {
         localStore.remove(key);

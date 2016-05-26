@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 'use strict';
 
-var env         = require('gitter-web-env');
-var config      = env.config;
+var env = require('gitter-web-env');
+var config = env.config;
 var redisClient = env.ioredis.createClient(null, { keyPrefix: 'github:stats:' });
-var stats       = env.stats;
-var Tentacles   = require('tentacles');
-var Promise     = require('bluebird');
+var stats = env.stats;
+var Tentacles = require('tentacles');
+var Promise = require('bluebird');
 var shutdown = require('shutdown');
 
 var clientId = config.get('github:anonymous_app:client_id');

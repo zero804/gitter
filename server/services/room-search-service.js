@@ -1,8 +1,8 @@
 "use strict";
 
-var Promise       = require('bluebird');
-var client        = require('../utils/elasticsearch-client');
-var _             = require('underscore');
+var Promise = require('bluebird');
+var client = require('../utils/elasticsearch-client');
+var _ = require('underscore');
 
 exports.searchRooms = function(queryText, userId, privateRoomIds, options) {
   options = _.defaults(options, { limit: 5 });

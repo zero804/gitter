@@ -25,7 +25,7 @@ module.exports = (function() {
 
     }, shortDebounceValue);
 
-    var slowDebounce =  _.debounce(fastDebounce, longDebounceValue);
+    var slowDebounce = _.debounce(fastDebounce, longDebounceValue);
 
     var change = function(e) {
       var currentValue = e.target.value;

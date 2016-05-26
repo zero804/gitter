@@ -1,10 +1,10 @@
 "use strict";
 
-var env           = require('gitter-web-env');
-var logger        = env.logger;
-var config        = env.config;
+var env = require('gitter-web-env');
+var logger = env.logger;
+var config = env.config;
 var elasticsearch = require('elasticsearch');
-var debug         = require('debug')('gitter:infra:elasticsearch');
+var debug = require('debug')('gitter:infra:elasticsearch');
 
 function ElasticSearchLoggingAdapter(/*config*/) {
 }

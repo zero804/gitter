@@ -1,17 +1,17 @@
 "use strict";
 
-var env             = require('gitter-web-env');
-var logger          = env.logger;
-var nconf           = env.config;
-var stats           = env.stats;
+var env = require('gitter-web-env');
+var logger = env.logger;
+var nconf = env.config;
+var stats = env.stats;
 
-var _               = require('lodash');
-var uuid            = require('node-uuid');
-var sechash         = require('sechash');
-var userService     = require('../../services/user-service');
+var _ = require('lodash');
+var uuid = require('node-uuid');
+var sechash = require('sechash');
+var userService = require('../../services/user-service');
 var useragentTagger = require('../../utils/user-agent-tagger');
-var debug           = require('debug')('gitter:infra:rememberme-middleware');
-var userScopes      = require('gitter-web-identity/lib/user-scopes');
+var debug = require('debug')('gitter:infra:rememberme-middleware');
+var userScopes = require('gitter-web-identity/lib/user-scopes');
 
 var cookieName = nconf.get('web:cookiePrefix') + 'auth';
 
@@ -167,7 +167,7 @@ module.exports = {
       if(err || !userId) return fail(err);
 
       userService.findById(userId, function(err, user) {
-        if(err)  return fail(err);
+        if(err) return fail(err);
         if(!user) return fail();
 
         /* No token, no touch */
@@ -177,7 +177,7 @@ module.exports = {
 
         req.login(user, function(err) {
           if(err) {
-            logger.info("rememberme: Passport login failed", { exception: err  });
+            logger.info("rememberme: Passport login failed", { exception: err });
             return fail(err);
           }
 

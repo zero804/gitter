@@ -23,7 +23,7 @@ function triggerMouseoverForHover(el) {
       evt = new MouseEvent("mouseover");
     } catch(e) {
       /* Internet Explorer, good times */
-      evt =  document.createEvent('MouseEvents');
+      evt = document.createEvent('MouseEvents');
       evt.initMouseEvent("mouseover", true, true, window, 0, 0, 0, 80, 20, false, false, false, false, 0, null);
     }
     el.dispatchEvent(evt);

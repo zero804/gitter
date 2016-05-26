@@ -1,10 +1,9 @@
 'use strict';
 
-var _  = require('underscore');
+var _ = require('underscore');
 var toggleClass = require('utils/toggle-class');
 var closeTemplate = require('./minibar-close-item-view.hbs');
 var ItemView = require('./minibar-item-view.js');
-
 
 var defaults = {
   pinStateClass: 'is-menu-pinned',
@@ -99,7 +98,7 @@ module.exports = ItemView.extend({
   },
 
   updatePinnedState: function() {
-    var isPinned  = !!this.roomModel.get('roomMenuIsPinned');
+    var isPinned = !!this.roomModel.get('roomMenuIsPinned');
     //var openState = this.roomModel.get('panelOpenState');
 
     toggleClass(this.ui.toggleIcon[0], this.iconOpts.pinStateClass, isPinned);
@@ -137,7 +136,7 @@ module.exports = ItemView.extend({
   },
 
   deflectArms: function() {
-    var isPinned  = !!this.roomModel.get('roomMenuIsPinned');
+    var isPinned = !!this.roomModel.get('roomMenuIsPinned');
     var isHovered = this.iconHover;
 
     var legDeflectAnimationOptions = this.getLegDeflectAnimationOptions();

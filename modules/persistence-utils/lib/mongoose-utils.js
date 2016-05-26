@@ -1,7 +1,7 @@
 "use strict";
 
-var Promise     = require('bluebird');
-var mongoUtils  = require('./mongo-utils');
+var Promise = require('bluebird');
+var mongoUtils = require('./mongo-utils');
 var uniqueIds = require('mongodb-unique-ids');
 
 function idsIn(ids) {

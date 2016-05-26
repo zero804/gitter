@@ -1,12 +1,12 @@
 'use strict';
 
-var favouriteFilter         = require('../filters/left-menu-primary-favourite');
+var favouriteFilter = require('../filters/left-menu-primary-favourite');
 var favouriteOneToOneFilter = require('../filters/left-menu-primary-favourite-one2one');
-var orgFavouriteFilter      = require('../filters/left-menu-primary-favourite-org');
+var orgFavouriteFilter = require('../filters/left-menu-primary-favourite-org');
 
-var favouriteSort           = require('../sorting/left-menu-primary-favourite');
+var favouriteSort = require('../sorting/left-menu-primary-favourite');
 
-var parseToTemplateItem     = require('../parse/left-menu-primary-item');
+var parseToTemplateItem = require('../parse/left-menu-primary-item');
 
 module.exports = function generateLemMenuFavouriteRoomsList(state, rooms, selectedOrgName) {
 

@@ -24,7 +24,7 @@ var View = Marionette.ItemView.extend({
     this.listenTo(this, 'menuItemClicked', this.menuItemClicked, this);
     apiClient.room.get('/meta/welcome-message').then(function(welcomeMessage){
       welcomeMessage = (welcomeMessage || { text: '', html: '' });
-      if(!!welcomeMessage.text.length) { return  this.initWithMessage(welcomeMessage); }
+      if(!!welcomeMessage.text.length) { return this.initWithMessage(welcomeMessage); }
       return this.initEmptyTextArea();
     }.bind(this));
   },
@@ -64,7 +64,7 @@ var View = Marionette.ItemView.extend({
   },
 
   formSubmit: function() {
-    var providers             = (this.ui.githubOnly.is(':checked')) ? ['github'] : [];
+    var providers = (this.ui.githubOnly.is(':checked')) ? ['github'] : [];
     var welcomeMessageContent = this.ui.welcomeMessage.val();
 
     Promise.all([

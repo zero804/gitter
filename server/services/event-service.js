@@ -1,10 +1,10 @@
 "use strict";
 
-var persistence   = require('gitter-web-persistence');
-var processChat   = require('../utils/markdown-processor');
-var ObjectID      = require('mongodb').ObjectID;
-var Promise       = require('bluebird');
-var StatusError   = require('statuserror');
+var persistence = require('gitter-web-persistence');
+var processChat = require('../utils/markdown-processor');
+var ObjectID = require('mongodb').ObjectID;
+var Promise = require('bluebird');
+var StatusError = require('statuserror');
 
 exports.newEventToTroupe = function(troupe, user, text, meta, payload, callback) {
   text = text ? "" + text : "";
@@ -20,11 +20,11 @@ exports.newEventToTroupe = function(troupe, user, text, meta, payload, callback)
 
       event.fromUserId = user ? user.id : null;
       event.toTroupeId = troupe.id;
-      event.sent       = new Date();
-      event.text       = text;
-      event.html       = parsed.html;
-      event.meta       = meta;
-      event.payload    = payload;
+      event.sent = new Date();
+      event.text = text;
+      event.html = parsed.html;
+      event.meta = meta;
+      event.payload = payload;
 
       return event.save();
     })
