@@ -46,14 +46,14 @@ function run() {
 function handleRoom(troupe) {
   return (opts.dryRun ?
             autoRemovalService.findRemovalCandidates(troupe.id, { minTimeInDays: minTimeInDays }) :
-            autoRemovalService.autoRemoveInactiveUsers(troupe.id, { minTimeInDays: minTimeInDays })
+            autoRemovalService.autoRemoveInactiveUsers(troupe.id, troupe.groupId, { minTimeInDays: minTimeInDays })
             )
     .then(function(candidates) {
       var userIds = candidates.map(function(c) { return c.userId; });
       return [candidates, userService.findByIds(userIds)];
     })
-    .spread(function(candidates, users)  {
-      console.log('>>>>>>>>>>> ROOM ', troupe.uri, '> ', candidates.length, 'candidates');
+    .spread(function(candidates, users) {
+      console.log('>>>>>>>>>>> ROOM ', troupe.uri, '> ', candidates.length, 'candidates'); // eslint-disable-line
       var usersHash = collections.indexById(users);
 
       candidates.forEach(function(c) {

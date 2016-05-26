@@ -258,7 +258,7 @@ function renderMainFrame(req, res, next, frame) {
           return !!f;
         })
         .map(function(room) {
-          room.selected = room.id == selectedRoomId;
+          room.selected = mongoUtils.objectIDsEqual(room.id, selectedRoomId);
           room.name = roomNameTrimmer(room.name);
           return room;
         });
