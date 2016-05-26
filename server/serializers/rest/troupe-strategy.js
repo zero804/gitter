@@ -1,4 +1,4 @@
-/* eslint complexity: ["error", 14] */
+/* eslint complexity: ["error", 15] */
 "use strict";
 
 var debug = require('debug')('gitter:infra:serializer:troupe');
@@ -16,6 +16,7 @@ var RoomMembershipStrategy = require('./troupes/room-membership-strategy');
 var TagsStrategy = require('./troupes/tags-strategy');
 var TroupeOwnerIsOrgStrategy = require('./troupes/troupe-owner-is-org-strategy');
 var TroupePermissionsStrategy = require('./troupes/troupe-permissions-strategy');
+var GroupIdStrategy = require('./group-id-strategy');
 
 /**
  * Given the currentUser and a sequence of troupes
@@ -37,12 +38,6 @@ function oneToOneOtherUserSequence(currentUserId, troupes) {
     });
 }
 
-function mapIdsSequence(troupes) {
-  return troupes.map(function(troupe) {
-    return troupe._id;
-  });
-}
-
 function TroupeStrategy(options) {
   if (!options) options = {};
 
@@ -58,11 +53,14 @@ function TroupeStrategy(options) {
   var permissionsStrategy;
   var ownerIsOrgStrategy;
   var roomMembershipStrategy;
+  var groupIdStrategy;
 
   this.preload = function(items) { // eslint-disable-line max-statements
     if (items.isEmpty()) return;
 
-    var troupeIds = mapIdsSequence(items);
+    var troupeIds = items.map(function(troupe) {
+      return troupe._id;
+    });
 
     var strategies = [];
 
@@ -119,6 +117,18 @@ function TroupeStrategy(options) {
     if (options.includeTags) {
       tagsStrategy = new TagsStrategy(options);
       strategies.push(tagsStrategy.preload(items));
+    }
+
+    if (options.includeGroups) {
+      groupIdStrategy = new GroupIdStrategy(options);
+      var groupIds = items.map(function(troupe) {
+          return troupe.groupId;
+        })
+        .filter(function(f) {
+          return !!f;
+        });
+
+      strategies.push(groupIdStrategy.preload(groupIds));
     }
 
     return Promise.all(strategies)
@@ -214,8 +224,9 @@ function TroupeStrategy(options) {
       tags: tagsStrategy ? tagsStrategy.map(item) : undefined,
       providers: providers,
       permissions: permissionsStrategy ? permissionsStrategy.map(item) : undefined,
-      ownerIsOrg: ownerIsOrgStrategy ? ownerIsOrgStrategy.map(item) : undefined,
+      ownerIsOrg: ownerIsOrgStrategy ? ownerIsOrgStrategy.map(item) : undefined, // TODO: remove this once groups are in place
       roomMember: roomMembershipStrategy ? roomMembershipStrategy.map(item.id) : undefined,
+      group: groupIdStrategy && item.groupId ? groupIdStrategy.map(item.groupId) : undefined,
       v: getVersion(item)
     };
   };
