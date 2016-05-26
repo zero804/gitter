@@ -1,11 +1,11 @@
 "use strict";
 
-var fs          = require('fs');
-var handlebars  = require('handlebars');
+var fs = require('fs');
+var handlebars = require('handlebars');
 var i18nFactory = require('./i18n-factory');
-var _           = require('underscore');
-var hbsHelpers  = require('../web/hbs-helpers');
-var Promise     = require('bluebird');
+var _ = require('underscore');
+var hbsHelpers = require('../web/hbs-helpers');
+var Promise = require('bluebird');
 
 // TODO: add caching!
 handlebars.registerHelper('cdn', hbsHelpers.cdn);

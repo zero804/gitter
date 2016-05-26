@@ -1,9 +1,9 @@
 "use strict";
 
-var env    = require('gitter-web-env');
-var stats  = env.stats;
+var env = require('gitter-web-env');
+var stats = env.stats;
 var logger = env.logger;
-var debug  = require('debug')('gitter:infra:enforce-csrf-middleware');
+var debug = require('debug')('gitter:infra:enforce-csrf-middleware');
 
 var escapeRegExp = require('../../utils/escape-regexp');
 

@@ -1,14 +1,14 @@
 "use strict";
 
-var env           = require('gitter-web-env');
-var stats         = env.stats;
-var winston       = env.logger;
+var env = require('gitter-web-env');
+var stats = env.stats;
+var winston = env.logger;
 
-var crypto        = require('crypto');
-var eventService  = require('../../services/event-service');
+var crypto = require('crypto');
+var eventService = require('../../services/event-service');
 var troupeService = require('../../services/troupe-service');
 var checkRepoPrivacy = require('../../services/check-repo-privacy');
-var StatusError   = require('statuserror');
+var StatusError = require('statuserror');
 
 // TODO: this is just horrible
 var passphrase = 'wyElt0ian8waunt8';
@@ -48,7 +48,7 @@ module.exports = function(req, res, next) {
   }
 
   var message = req.body.message;
-  var meta    = req.body.meta;
+  var meta = req.body.meta;
   var payload = req.body.payload;
 
   if(meta) {

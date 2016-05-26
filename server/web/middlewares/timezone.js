@@ -1,10 +1,10 @@
 "use strict";
 
-var env           = require('gitter-web-env');
-var logger        = env.logger;
+var env = require('gitter-web-env');
+var logger = env.logger;
 var errorReporter = env.errorReporter;
-var userService   = require('../../services/user-service');
-var debug         = require('debug')('gitter:infra:timezone-middleware');
+var userService = require('../../services/user-service');
+var debug = require('debug')('gitter:infra:timezone-middleware');
 
 function parseOffset(value) {
   if (value.length !== 5) return;
@@ -66,7 +66,7 @@ module.exports = function(req, res, next) {
       }
 
       /* Has the user presented us with new timezone information? If so, update */
-      if (userTz.offset !== parsed.offset || userTz.abbr !== parsed.abbr ||  userTz.iana !== parsed.iana) {
+      if (userTz.offset !== parsed.offset || userTz.abbr !== parsed.abbr || userTz.iana !== parsed.iana) {
         updateUserTzInfo(req.user, parsed);
       }
 

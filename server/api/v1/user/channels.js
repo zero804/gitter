@@ -1,6 +1,6 @@
 "use strict";
 
-var roomService    = require("../../../services/room-service");
+var roomService = require("../../../services/room-service");
 var restSerializer = require("../../../serializers/rest-serializer");
 
 function serialize(items, req) {

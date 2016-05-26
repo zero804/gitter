@@ -1,11 +1,11 @@
 "use strict";
 
-var testRequire   = require('../test-require');
+var testRequire = require('../test-require');
 var fixtureLoader = require('../test-fixtures');
-var assert        = require("assert");
-var Promise       = require('bluebird');
-var sinon         = require('sinon');
-var fixture       = {};
+var assert = require("assert");
+var Promise = require('bluebird');
+var sinon = require('sinon');
+var fixture = {};
 var roomMembershipFlags = testRequire('./services/room-membership-flags');
 
 

@@ -1,8 +1,8 @@
 'use strict';
 
-var assert          = require('assert');
-var $               = require('jquery');
-var Backbone        = require('backbone');
+var assert = require('assert');
+var $ = require('jquery');
+var Backbone = require('backbone');
 var PanelHeaderView = require('public/js/views/menu/room/header/header-view');
 
 describe('PanelHeaderView', function() {
@@ -12,7 +12,7 @@ describe('PanelHeaderView', function() {
   var el;
 
   beforeEach(function() {
-    model           = new Backbone.Model({
+    model = new Backbone.Model({
       state:                'all',
       profileMenuOpenState: false,
       panelOpenState:       true,
@@ -21,7 +21,7 @@ describe('PanelHeaderView', function() {
     model.primaryCollection = [];
 
     model.userModel = new Backbone.Model();
-    el              = document.createElement('div');
+    el = document.createElement('div');
     panelHeaderView = new PanelHeaderView({ el: el, model: model });
     panelHeaderView.render();
   });

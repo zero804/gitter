@@ -1,17 +1,17 @@
 "use strict";
 
-var persistence          = require('gitter-web-persistence');
-var TroupeUser           = persistence.TroupeUser;
-var Troupe               = persistence.Troupe;
-var mongoUtils           = require('gitter-web-persistence-utils/lib/mongo-utils');
-var Promise              = require('bluebird');
-var EventEmitter         = require('events').EventEmitter;
-var assert               = require('assert');
-var debug                = require('debug')('gitter:app:room-membership-service');
-var recentRoomCore       = require('./core/recent-room-core');
+var persistence = require('gitter-web-persistence');
+var TroupeUser = persistence.TroupeUser;
+var Troupe = persistence.Troupe;
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var Promise = require('bluebird');
+var EventEmitter = require('events').EventEmitter;
+var assert = require('assert');
+var debug = require('debug')('gitter:app:room-membership-service');
+var recentRoomCore = require('./core/recent-room-core');
 var roomMembershipEvents = new EventEmitter();
-var _                    = require('lodash');
-var roomMembershipFlags  = require('./room-membership-flags');
+var _ = require('lodash');
+var roomMembershipFlags = require('./room-membership-flags');
 
 /**
  * Returns the rooms the user is in
@@ -434,7 +434,7 @@ var findMembershipModeForUsersInRoom = Promise.method(function(troupeId, userIds
   return TroupeUser.find({
       troupeId: troupeId,
       userId: { $in: mongoUtils.asObjectIDs(userIds) }
-    },  {
+    }, {
       userId: 1,
       flags: 1,
       _id: 0
@@ -521,13 +521,13 @@ function queryForToggles(flagToggles) {
     }
   }
 
-  addToggle('notify'      , roomMembershipFlags.FLAG_POS_NOTIFY_MENTION);
-  addToggle('activity'    , roomMembershipFlags.FLAG_POS_NOTIFY_ACTIVITY);
-  addToggle('mention'     , roomMembershipFlags.FLAG_POS_NOTIFY_MENTION);
+  addToggle('notify' , roomMembershipFlags.FLAG_POS_NOTIFY_MENTION);
+  addToggle('activity' , roomMembershipFlags.FLAG_POS_NOTIFY_ACTIVITY);
+  addToggle('mention' , roomMembershipFlags.FLAG_POS_NOTIFY_MENTION);
   addToggle('announcement', roomMembershipFlags.FLAG_POS_NOTIFY_ANNOUNCEMENT);
-  addToggle('default'     , roomMembershipFlags.FLAG_POS_NOTIFY_DEFAULT);
-  addToggle('desktop'     , roomMembershipFlags.FLAG_POS_NOTIFY_DESKTOP);
-  addToggle('mobile'      , roomMembershipFlags.FLAG_POS_NOTIFY_MOBILE);
+  addToggle('default' , roomMembershipFlags.FLAG_POS_NOTIFY_DEFAULT);
+  addToggle('desktop' , roomMembershipFlags.FLAG_POS_NOTIFY_DESKTOP);
+  addToggle('mobile' , roomMembershipFlags.FLAG_POS_NOTIFY_MOBILE);
 
   var allRequired = flagToggles.all === true;
 
@@ -619,28 +619,28 @@ function updateRoomMembershipFlagsForUser(userId, newFlags, overrideAll) {
 }
 
 /* Exports */
-exports.findRoomIdsForUser          = findRoomIdsForUser;
-exports.findRoomIdsForUserWithLurk  = findRoomIdsForUserWithLurk;
+exports.findRoomIdsForUser = findRoomIdsForUser;
+exports.findRoomIdsForUserWithLurk = findRoomIdsForUserWithLurk;
 exports.findLurkingRoomIdsForUserId = findLurkingRoomIdsForUserId;
-exports.checkRoomMembership         = checkRoomMembership;
-exports.findUserMembershipInRooms   = findUserMembershipInRooms;
+exports.checkRoomMembership = checkRoomMembership;
+exports.findUserMembershipInRooms = findUserMembershipInRooms;
 exports.findMembershipForUsersInRoom = findMembershipForUsersInRoom;
 
-exports.findMembersForRoom          = findMembersForRoom;
-exports.countMembersInRoom          = countMembersInRoom;
-exports.findMembersForRoomWithLurk  = findMembersForRoomWithLurk;
-exports.addRoomMember               = addRoomMember;
-exports.removeRoomMember            = removeRoomMember;
-exports.removeRoomMembers           = removeRoomMembers;
-exports.findAllMembersForRooms      = findAllMembersForRooms;
-exports.findMembersForRoomMulti     = findMembersForRoomMulti;
+exports.findMembersForRoom = findMembersForRoom;
+exports.countMembersInRoom = countMembersInRoom;
+exports.findMembersForRoomWithLurk = findMembersForRoomWithLurk;
+exports.addRoomMember = addRoomMember;
+exports.removeRoomMember = removeRoomMember;
+exports.removeRoomMembers = removeRoomMembers;
+exports.findAllMembersForRooms = findAllMembersForRooms;
+exports.findMembersForRoomMulti = findMembersForRoomMulti;
 
-exports.getMemberLurkStatus         = getMemberLurkStatus;
+exports.getMemberLurkStatus = getMemberLurkStatus;
 
-exports.getMembershipMode           = getMembershipMode;
-exports.getMembershipDetails        = getMembershipDetails;
-exports.setMembershipFlags          = setMembershipFlags;
-exports.setMembershipMode           = setMembershipMode;
+exports.getMembershipMode = getMembershipMode;
+exports.getMembershipDetails = getMembershipDetails;
+exports.setMembershipFlags = setMembershipFlags;
+exports.setMembershipMode = setMembershipMode;
 exports.setMembershipModeForUsersInRoom = setMembershipModeForUsersInRoom;
 exports.findMembershipModeForUsersInRoom = findMembershipModeForUsersInRoom;
 exports.findMembersForRoomForNotify = findMembersForRoomForNotify;
@@ -648,4 +648,4 @@ exports.findMembersForRoomWithFlags = findMembersForRoomWithFlags;
 exports.updateRoomMembershipFlagsForUser = updateRoomMembershipFlagsForUser;
 
 /* Event emitter */
-exports.events                      = roomMembershipEvents;
+exports.events = roomMembershipEvents;

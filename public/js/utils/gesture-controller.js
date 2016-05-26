@@ -1,7 +1,7 @@
 'use strict';
 
 var appEvents = require('./appevents');
-var Hammer    = require('hammerjs');
+var Hammer = require('hammerjs');
 var hammer;
 
 function tapHandle(e) {

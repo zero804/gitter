@@ -1,7 +1,7 @@
 'use strict';
 
-var _         = require('underscore');
-var Backbone  = require('backbone');
+var _ = require('underscore');
+var Backbone = require('backbone');
 var urlParser = require('../utils/url-parser');
 
 function SpaRoomSwitcher(troupesCollection, baseUrl, locationDelegate, windowLocationDelegate) {
@@ -88,7 +88,7 @@ _.extend(SpaRoomSwitcher.prototype, Backbone.Events, {
 
 function getOrgRoomUrl(pathname) {
   pathname = pathname.replace('~iframe', '');
-  return pathname +  (/\/$/.test(pathname) ? '~iframe' :  '/~iframe');
+  return pathname + (/\/$/.test(pathname) ? '~iframe' : '/~iframe');
 }
 
 module.exports = SpaRoomSwitcher;

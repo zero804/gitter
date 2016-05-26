@@ -1,10 +1,10 @@
 "use strict";
 
-var persistence           = require('gitter-web-persistence');
-var assert                = require("assert");
-var mongoUtils            = require('gitter-web-persistence-utils/lib/mongo-utils');
-var Promise               = require('bluebird');
-var mongooseUtils         = require('gitter-web-persistence-utils/lib/mongoose-utils');
+var persistence = require('gitter-web-persistence');
+var assert = require("assert");
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var Promise = require('bluebird');
+var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var roomMembershipService = require('./room-membership-service');
 
 function findByUri(uri, callback) {

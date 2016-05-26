@@ -1,6 +1,6 @@
 "use strict";
 
-var assert          = require("assert");
+var assert = require("assert");
 var githubUriValidator = require('..').GitHubUriValidator;
 
 var FAKE_USER = { username: 'gittertestbot', githubToken: '***REMOVED***'};

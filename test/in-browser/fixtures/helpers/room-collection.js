@@ -7,7 +7,7 @@ module.exports = Backbone.Collection.extend({
 
   model: Backbone.Model.extend({
     url: function(){
-      return  ' ';
+      return ' ';
     }
   }),
   initialize: function() {

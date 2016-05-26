@@ -1,15 +1,15 @@
 "use strict";
 
-var Marionette             = require('backbone.marionette');
-var Backbone               = require('backbone');
-var _                      = require('underscore');
-var ModalView              = require('./modal');
-var itemTemplate           = require('./tmpl/people-modal-result.hbs');
-var apiClient              = require('components/apiClient');
-var template               = require('./tmpl/people-modal.hbs');
-var SyncMixin              = require('collections/sync-mixin');
+var Marionette = require('backbone.marionette');
+var Backbone = require('backbone');
+var _ = require('underscore');
+var ModalView = require('./modal');
+var itemTemplate = require('./tmpl/people-modal-result.hbs');
+var apiClient = require('components/apiClient');
+var template = require('./tmpl/people-modal.hbs');
+var SyncMixin = require('collections/sync-mixin');
 var InfiniteScrollBehavior = require('views/behaviors/infinite-scroll');
-var context                = require('utils/context');
+var context = require('utils/context');
 
 require('views/behaviors/widgets');
 

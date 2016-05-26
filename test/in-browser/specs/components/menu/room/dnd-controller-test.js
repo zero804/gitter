@@ -1,9 +1,9 @@
 /*global describe:true, it:true, beforeEach:true */
 'use strict';
 
-var assert   = require('assert');
+var assert = require('assert');
 var Backbone = require('backbone');
-var DNDCtrl  = require('public/js/components/menu/room/dnd-controller');
+var DNDCtrl = require('public/js/components/menu/room/dnd-controller');
 
 describe('DNDCtrl', function(){
 

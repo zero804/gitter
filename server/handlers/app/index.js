@@ -1,14 +1,14 @@
 "use strict";
 
-var express            = require('express');
-var appRender          = require('./render');
-var appMiddleware      = require('./middleware');
-var recentRoomService  = require('../../services/recent-room-service');
-var isPhone            = require('../../web/is-phone');
+var express = require('express');
+var appRender = require('./render');
+var appMiddleware = require('./middleware');
+var recentRoomService = require('../../services/recent-room-service');
+var isPhone = require('../../web/is-phone');
 var timezoneMiddleware = require('../../web/middlewares/timezone');
-var featureToggles     = require('../../web/middlewares/feature-toggles');
-var archive            = require('./archive');
-var identifyRoute      = require('gitter-web-env').middlewares.identifyRoute;
+var featureToggles = require('../../web/middlewares/feature-toggles');
+var archive = require('./archive');
+var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
 
 function saveRoom(req) {
   var userId = req.user && req.user.id;
@@ -34,7 +34,7 @@ var mainFrameMiddlewarePipeline = [
       if(!req.user) {
         if (req.uriContext.accessDenied) {
           //return appRender.renderOrgPage(req, res, next);
-          return res.redirect('/orgs/' + req.uriContext.uri +  '/rooms/~iframe');
+          return res.redirect('/orgs/' + req.uriContext.uri + '/rooms/~iframe');
         }
         appRender.renderMobileNotLoggedInChat(req, res, next);
         return;
@@ -65,7 +65,7 @@ var chatMiddlewarePipeline = [
   function (req, res, next) {
     if (req.uriContext.accessDenied) {
       //return appRender.renderOrgPage(req, res, next);
-      return res.redirect('/orgs/' + req.uriContext.uri +  '/rooms/~iframe');
+      return res.redirect('/orgs/' + req.uriContext.uri + '/rooms/~iframe');
     }
 
     if(!req.uriContext.troupe) return next(404);

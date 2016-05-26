@@ -1,11 +1,11 @@
 'use strict';
 
-var _                      = require('underscore');
+var _ = require('underscore');
 var FilteredRoomCollection = require('./filtered-room-collection');
 
-var sortAndFilters         = require('gitter-realtime-client/lib/sorts-filters').model;
+var sortAndFilters = require('gitter-realtime-client/lib/sorts-filters').model;
 var one2oneFavouriteFilter = require('gitter-web-shared/filters/left-menu-primary-favourite-one2one');
-var orgFavouriteFilter     = require('gitter-web-shared/filters/left-menu-primary-favourite-org');
+var orgFavouriteFilter = require('gitter-web-shared/filters/left-menu-primary-favourite-org');
 
 var FilteredFavouriteCollection = function() {
   FilteredRoomCollection.apply(this, arguments);

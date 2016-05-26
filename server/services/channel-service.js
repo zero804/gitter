@@ -1,7 +1,7 @@
 "use strict";
 
-var persistence           = require('gitter-web-persistence');
-var Promise               = require('bluebird');
+var persistence = require('gitter-web-persistence');
+var Promise = require('bluebird');
 var roomMembershipService = require('./room-membership-service');
 
 function createRegExpsForQuery(queryText) {

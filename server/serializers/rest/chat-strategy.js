@@ -1,14 +1,14 @@
 "use strict";
 
-var env                   = require('gitter-web-env');
-var logger                = env.logger;
-var _                     = require('lodash');
-var unreadItemService     = require("../../services/unread-items");
+var env = require('gitter-web-env');
+var logger = env.logger;
+var _ = require('lodash');
+var unreadItemService = require("../../services/unread-items");
 var collapsedChatsService = require('../../services/collapsed-chats-service');
-var getVersion            = require('../get-model-version');
-var UserIdStrategy        = require('./user-id-strategy');
-var mongoUtils            = require('gitter-web-persistence-utils/lib/mongo-utils');
-var Promise               = require('bluebird');
+var getVersion = require('../get-model-version');
+var UserIdStrategy = require('./user-id-strategy');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var Promise = require('bluebird');
 
 function formatDate(d) {
   return d ? d.toISOString() : null;
@@ -60,7 +60,7 @@ CollapsedItemStrategy.prototype = {
   name: 'CollapsedItemStrategy'
 };
 
-function ChatStrategy(options)  {
+function ChatStrategy(options) {
   if (!options) options = {};
 
   // useLookups will be set to true if there are any lookups that this strategy
