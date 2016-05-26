@@ -11,9 +11,9 @@ var BatchStream = require('batch-stream');
 var _ = require('lodash');
 var Promise = require('bluebird');
 
-var mongoose      = require('gitter-web-mongoose-bluebird');
-var Schema        = mongoose.Schema;
-var ObjectId      = Schema.ObjectId;
+var mongoose = require('gitter-web-mongoose-bluebird');
+var Schema = mongoose.Schema;
+var ObjectId = Schema.ObjectId;
 
 var connection = mongoose.connection;
 

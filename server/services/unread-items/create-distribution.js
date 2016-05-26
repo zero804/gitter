@@ -1,13 +1,13 @@
 'use strict';
 
-var env                   = require('gitter-web-env');
-var errorReporter         = env.errorReporter;
-var _                     = require('lodash');
-var Promise               = require('bluebird');
-var Distribution          = require('./distribution');
+var env = require('gitter-web-env');
+var errorReporter = env.errorReporter;
+var _ = require('lodash');
+var Promise = require('bluebird');
+var Distribution = require('./distribution');
 var roomMembershipService = require('../room-membership-service');
-var categoriseUserInRoom  = require("../categorise-users-in-room");
-var policyFactory         = require('gitter-web-permissions/lib/legacy-policy-factory');
+var categoriseUserInRoom = require("../categorise-users-in-room");
+var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
 
 /**
  * Given an array of non-member userIds in a room,

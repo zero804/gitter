@@ -1,8 +1,9 @@
 /* eslint complexity: ["error", 16] */
 "use strict";
 
-var Promise      = require('bluebird');
+var Promise = require('bluebird');
 var userIsInRoom = require('../user-in-room');
+var StatusError = require('statuserror');
 
 var ALLOWED_USER_CHANNEL_SECURITY_VALUES = {
   PRIVATE: 1,
@@ -41,7 +42,7 @@ module.exports = Promise.method(function userChannelPermissionsModel(user, right
 
         /* No inherited security for user channels */
         default:
-          throw 'Unknown security: ' + security;
+          throw new StatusError(400, 'Unknown security: ' + security);
       }
       /* break; */
 
@@ -75,7 +76,7 @@ module.exports = Promise.method(function userChannelPermissionsModel(user, right
       return userUri === user.username;
 
     default:
-      throw 'Unknown right ' + right;
+      throw new StatusError(400, 'Unknown right ' + right);
   }
 
 });

@@ -4,7 +4,7 @@
 
 var testRequire = require('../test-require');
 var assert = require('assert');
-var fixtureLoader = require('../test-fixtures');
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
 var troupeUriMapper = testRequire("./services/troupe-uri-mapper");
 

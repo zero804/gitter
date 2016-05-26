@@ -2,8 +2,7 @@
 
 var assert = require('assert');
 var Promise = require('bluebird');
-var proxyquireNoCallThru = require("proxyquire").noCallThru();
-var fixtureLoader = require('../../../../test/integration/test-fixtures');
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var LegacyPolicyEvaluator = require('../../lib/policies/legacy-policy-evaluator');
 
 describe('legacy-policy-evaluator', function() {

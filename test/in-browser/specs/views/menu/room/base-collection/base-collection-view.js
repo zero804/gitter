@@ -1,9 +1,9 @@
 /*global describe:true, it:true, beforeEach:true, afterEach:true */
 'use strict';
 
-var assert             = require('assert');
-var sinon              = require('sinon');
-var Backbone           = require('backbone');
+var assert = require('assert');
+var sinon = require('sinon');
+var Backbone = require('backbone');
 var BaseCollectionView = require('public/js/views/menu/room/base-collection/base-collection-view');
 
 describe('BaseCollectionView', function(){
@@ -13,9 +13,9 @@ describe('BaseCollectionView', function(){
   var roomMenuModel;
   var model;
   beforeEach(function(){
-    collection     = new Backbone.Collection();
-    roomMenuModel  = new Backbone.Model({ state: ''});
-    model          = new Backbone.Model();
+    collection = new Backbone.Collection();
+    roomMenuModel = new Backbone.Model({ state: ''});
+    model = new Backbone.Model();
     collectionView = new BaseCollectionView({
       bus:           Backbone.Events,
       collection:    collection,

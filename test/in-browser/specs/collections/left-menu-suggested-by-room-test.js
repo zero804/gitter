@@ -1,9 +1,9 @@
 /*global describe:true, it:true, beforeEach:true */
 'use strict';
 
-var assert              = require('assert');
-var sinon               = require('sinon');
-var Backbone            = require('backbone');
+var assert = require('assert');
+var sinon = require('sinon');
+var Backbone = require('backbone');
 var LeftMenuSuggestions = require('../../../../public/js/collections/left-menu-suggested-by-room');
 
 describe('LeftMenuSuggestions()', function() {
@@ -13,9 +13,9 @@ describe('LeftMenuSuggestions()', function() {
   var troupeModel;
 
   beforeEach(function() {
-    model       = new Backbone.Model({ state: '' });
+    model = new Backbone.Model({ state: '' });
     troupeModel = new Backbone.Model({ id: 1 });
-    collection  = new LeftMenuSuggestions(null, {
+    collection = new LeftMenuSuggestions(null, {
       roomMenuModel: model,
       troupeModel:   troupeModel,
     });

@@ -1,11 +1,11 @@
 "use strict";
 
-var env           = require('gitter-web-env');
-var winston       = env.logger;
+var env = require('gitter-web-env');
+var winston = env.logger;
 var errorReporter = env.errorReporter;
-var mongoose      = require('gitter-web-mongoose-bluebird');
-var debug         = require('debug')('gitter:infra:persistence-service');
-var mongoDebug    = require('node-mongodb-debug-log');
+var mongoose = require('gitter-web-mongoose-bluebird');
+var debug = require('debug')('gitter:infra:persistence-service');
+var mongoDebug = require('node-mongodb-debug-log');
 
 // Install inc and dec number fields in mongoose
 require('mongoose-number')(mongoose);
@@ -26,7 +26,7 @@ mongoDebug.install(mongoose.mongo, {
 
 connection.on('error', function(err) {
   winston.info("MongoDB connection error", { exception: err });
-  errorReporter(err, { connection_error:true }, { module: 'persistence' });
+  errorReporter(err, { connection_error: true }, { module: 'persistence' });
 });
 
 function createExports(schemas) {
@@ -51,7 +51,9 @@ module.exports = createExports({
   Identity: require('./schemas/identity-schema'),
   UserTroupeLastAccess: require('./schemas/user-troupe-last-access-schema'),
   UserTroupeFavourites: require('./schemas/user-troupe-favourites-schema'),
+  Group: require('./schemas/group-schema'),
   Troupe: require('./schemas/troupe-schema'),
+  TroupeMeta: require('./schemas/troupe-meta-schema'),
   TroupeUser: require('./schemas/troupe-user-schema'),
   UserSettings: require('./schemas/user-settings-schema'),
   ChatMessage: require('./schemas/chat-message-schema'),

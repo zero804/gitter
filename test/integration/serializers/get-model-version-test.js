@@ -2,7 +2,7 @@
 
 var persistence = require('gitter-web-persistence');
 var assert = require("assert");
-var fixtureLoader = require('../test-fixtures');
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var testRequire = require('../test-require');
 var getModelVersion = testRequire('./serializers/get-model-version');
 

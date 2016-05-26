@@ -1,7 +1,7 @@
 'use strict';
 
-var assert                  = require('assert');
-var Backbone                = require('backbone');
+var assert = require('assert');
+var Backbone = require('backbone');
 var SecondaryCollectionView = require('public/js/views/menu/room/secondary-collection/secondary-collection-view.js');
 
 describe('SecondaryCollectionView', function() {
@@ -14,11 +14,11 @@ describe('SecondaryCollectionView', function() {
   var primaryCollection;
 
   beforeEach(function() {
-    roomMenuModel           = new Backbone.Model({ state: 'all' });
-    collection              = new Backbone.Collection(null);
-    el                      = document.createElement('div');
-    model                   = new Backbone.Model({ active: true });
-    primaryCollection       = new Backbone.Collection();
+    roomMenuModel = new Backbone.Model({ state: 'all' });
+    collection = new Backbone.Collection(null);
+    el = document.createElement('div');
+    model = new Backbone.Model({ active: true });
+    primaryCollection = new Backbone.Collection();
     secondaryCollectionView = new SecondaryCollectionView({
       el:                el,
       model:             model,

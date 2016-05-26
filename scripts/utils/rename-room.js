@@ -4,7 +4,7 @@
 
 var shutdown = require('shutdown');
 var persistence = require('gitter-web-persistence');
-var uriLookupService   = require("../../server/services/uri-lookup-service");
+var uriLookupService = require("../../server/services/uri-lookup-service");
 
 var readline = require('readline');
 var Promise = require('bluebird');

@@ -1,13 +1,13 @@
 'use strict';
 
-var Backbone               = require('backbone');
-var _                      = require('underscore');
-var context                = require('utils/context');
+var Backbone = require('backbone');
+var _ = require('underscore');
+var context = require('utils/context');
 var SearchPeopleCollection = require('./search-people');
-var SearchRoomCollection   = require('./search-rooms');
-var SearchRepoCollection   = require('./search-repos');
-var FilteredCollection     = require('backbone-filtered-collection');
-var fuzzysearch            = require('fuzzysearch');
+var SearchRoomCollection = require('./search-rooms');
+var SearchRepoCollection = require('./search-repos');
+var FilteredCollection = require('backbone-filtered-collection');
+var fuzzysearch = require('fuzzysearch');
 
 function roomFilter(roomMenuModel, room) {
   return roomMenuModel.get('searchTerm') && fuzzysearch(roomMenuModel.get('searchTerm'), room.get('name'));
@@ -41,13 +41,13 @@ module.exports = Backbone.Collection.extend({
       throw new Error('A valid instance of a roomCollection should be passed to a new LeftMenuSearchRoomsAndPeopleCollection');
     }
 
-    this.roomMenuModel          = attrs.roomMenuModel;
-    this.roomCollection         = attrs.roomCollection;
+    this.roomMenuModel = attrs.roomMenuModel;
+    this.roomCollection = attrs.roomCollection;
 
     this.searchPeopleCollection = new SearchPeopleCollection(null, { contextModel: this.roomMenuModel });
-    this.searchRoomCollection   = new SearchRoomCollection(null, { contextModel: this.roomMenuModel });
-    this.searchRepoCollection   = new SearchRepoCollection(null, { contextModel: context.user() });
-    this.searchCurrentRooms     = new FilteredCollection({ collection: this.roomCollection });
+    this.searchRoomCollection = new SearchRoomCollection(null, { contextModel: this.roomMenuModel });
+    this.searchRepoCollection = new SearchRepoCollection(null, { contextModel: context.user() });
+    this.searchCurrentRooms = new FilteredCollection({ collection: this.roomCollection });
     this.searchCurrentRooms.setFilter(_.partial(roomFilter, this.roomMenuModel));
 
     this.listenTo(this.roomMenuModel, 'change:searchTerm', this.onSearchUpdate, this);
@@ -72,13 +72,13 @@ module.exports = Backbone.Collection.extend({
 
   onCollectionChange: function () {
     var currentRooms = (this.searchCurrentRooms.toJSON() || []);
-    var repos        = (this.searchRepoCollection.toJSON() || []);
-    var rooms        = (this.searchRoomCollection.toJSON() || []);
-    var people       = (this.searchPeopleCollection.toJSON() || []);
+    var repos = (this.searchRepoCollection.toJSON() || []);
+    var rooms = (this.searchRoomCollection.toJSON() || []);
+    var people = (this.searchPeopleCollection.toJSON() || []);
 
     //format our results
     var results = currentRooms.concat(repos).concat(rooms).concat(people);
-    results     = uniqByUrl(results).map(function(model){
+    results = uniqByUrl(results).map(function(model){
       model.isHidden = false;
       return model;
     });
