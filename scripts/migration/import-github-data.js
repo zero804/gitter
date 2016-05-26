@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
+/* eslint-disable */ /* messy messy @lerouxb */
+
 var path = require('path');
 var yargs = require('yargs');
 var fs = require('fs');
@@ -95,4 +97,3 @@ onMongoConnect()
         shutdown.shutdownGracefully();
       })
   });
-

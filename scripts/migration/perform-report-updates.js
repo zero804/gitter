@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 'use strict';
 
+/* eslint-disable */ /* messy messy @lerouxb */
+
 var fs = require('fs');
 var _ = require('lodash');
 var Promise = require('bluebird');
 var shutdown = require('shutdown');
-var persistence = require('gitter-web-persistence');
-var through2 = require('through2');
 var onMongoConnect = require('../../server/utils/on-mongo-connect');
 var userService = require('../../server/services/user-service');
 var troupeService = require('../../server/services/troupe-service');

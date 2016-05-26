@@ -1,9 +1,9 @@
 "use strict";
 
-var GitHubUserService  = require('./github-user-service');
+var GitHubUserService = require('./github-user-service');
 var GitHubRepoService = require('./github-repo-service');
-var Promise           = require('bluebird');
-var debug             = require('debug')('gitter:app:github:github-uri-validator');
+var Promise = require('bluebird');
+var debug = require('debug')('gitter:app:github:github-uri-validator');
 
 function validateUserOrOrgUri(user, uri) {
   debug("validateUserOrOrgUri: %s", uri);

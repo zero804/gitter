@@ -23,7 +23,6 @@ function findForQueryAndUser(query, userId) {
 
   if (userId) {
     var elemMatch = { $elemMatch: { $eq: userId } };
-    projection.oneToOneUsers = { $elemMatch: { userId: userId } };
     // projection.bans = elemMatch; TODO ADD BANS
     projection.extraMembers = elemMatch;
     projection.extraAdmins = elemMatch;

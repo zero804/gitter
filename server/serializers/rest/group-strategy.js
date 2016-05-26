@@ -2,7 +2,7 @@
 
 var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
 
-function GroupStrategy(/*options*/)  {
+function GroupStrategy(/*options*/) {
 }
 
 GroupStrategy.prototype = {
