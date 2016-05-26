@@ -99,10 +99,10 @@ module.exports = CommunityCreateBaseStepView.extend({
   setSelectedGitHubProjectCommunityState: function() {
     if(this.model.get('isOrgAreaActive')) {
       var selectedOrgId = this.model.get('selectedOrgId');
-      var selectedOrgName = this.model.get('selectedOrgName');
+      var selectedOrgName = this.model.get('selectedOrgName') || '';
       this.communityCreateModel.set({
-        communityName: selectedOrgName || '',
-        communitySlug: slugify(selectedOrgName || ''),
+        communityName: selectedOrgName,
+        communitySlug: slugify(selectedOrgName.toLowerCase()),
         isUsingCustomSlug: false,
         githubOrgId: selectedOrgId,
         githubRepoId: null
@@ -113,7 +113,7 @@ module.exports = CommunityCreateBaseStepView.extend({
       var selectedRepoName = getRoomNameFromTroupeName(this.model.get('selectedRepoName') || '');
       this.communityCreateModel.set({
         communityName: selectedRepoName,
-        communitySlug: slugify(selectedRepoName),
+        communitySlug: slugify(selectedRepoName.toLowerCase()),
         isUsingCustomSlug: false,
         githubOrgId: null,
         githubRepoId: selectedRepoId
