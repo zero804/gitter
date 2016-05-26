@@ -10,12 +10,19 @@
       Welcome message
     </label>
 
-    <textarea class="welcome-message" placeholder="Checking for an existing welcome message ..." id="room-welcome-message"></textarea>
+    <div id="welcome-message-container"  class="welcome-message-container">
+      <textarea class="welcome-message" placeholder="Checking for an existing welcome message ..." id="room-welcome-message"></textarea>
+      <div class="preview-container loading" id="welcome-message-container">
+        Loading ...
+      </div>
+    </div>
 
-    <button id="preview-welcome-message"
-            class="secondary-button-caribbean">
-      Preview
-    </button>
+    <div class="welcome-message-controls">
+      <button id="preview-welcome-message"
+              class="secondary-button-caribbean preview-welcome-message">
+        Preview
+      </button>
+    </div>
 
     <p class="github-only-container">
       <input type="checkbox"
