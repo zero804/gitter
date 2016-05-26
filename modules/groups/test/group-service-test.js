@@ -9,11 +9,14 @@ describe('group-service', function() {
 
   describe('integration tests #slow', function() {
 
+    var communityUri = 'I-heart-cats-Test-LOL';
+
     describe('createGroup', function() {
       var fixture = fixtureLoader.setup({
         deleteDocuments: {
           User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }],
-          Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() }],
+          Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
+                  { lcUri: communityUri.toLowerCase() } ],
         },
         user1: {
           githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
@@ -21,10 +24,15 @@ describe('group-service', function() {
         }
       });
 
-      it('should create a group', function() {
+      it('should create a group for a GitHub org', function() {
         var groupUri = fixtureLoader.GITTER_INTEGRATION_ORG;
         var user = fixture.user1;
-        return groupService.createGroup(user, { name: 'Bob', uri: groupUri })
+        return groupService.createGroup(user, {
+            type: 'GH_ORG',
+            name: 'Bob',
+            uri: groupUri,
+            linkPath: groupUri
+          })
           .then(function(group) {
             assert.strictEqual(group.name, 'Bob');
             assert.strictEqual(group.uri, groupUri);
@@ -39,6 +47,30 @@ describe('group-service', function() {
               members: 'PUBLIC',
               public: true,
               type: 'GH_ORG'
+            })
+          })
+      });
+
+      it('should create a group for a new style community', function() {
+        var user = fixture.user1;
+        return groupService.createGroup(user, {
+            name: 'Bob',
+            uri: communityUri
+          })
+          .then(function(group) {
+            assert.strictEqual(group.name, 'Bob');
+            assert.strictEqual(group.uri, communityUri);
+            assert.strictEqual(group.lcUri, communityUri.toLowerCase());
+            return securityDescriptorService.getForGroupUser(group._id, null);
+          })
+          .then(function(securityDescriptor) {
+            assert.deepEqual(securityDescriptor, {
+              type: null,
+              admins: 'MANUAL',
+              public: true,
+              members: 'PUBLIC',
+              externalId: null,
+              linkPath: null
             })
           })
       });
