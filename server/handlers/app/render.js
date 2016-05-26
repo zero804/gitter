@@ -1,42 +1,42 @@
 "use strict";
 
-var env                                     = require('gitter-web-env');
-var winston                                 = env.logger;
-var nconf                                   = env.config;
-var errorReporter                           = env.errorReporter;
-var Promise                                 = require('bluebird');
-var contextGenerator                        = require('../../web/context-generator');
-var restful                                 = require('../../services/restful');
-var userService                             = require('../../services/user-service');
-var chatService                             = require('../../services/chat-service');
-var appVersion                              = require('gitter-app-version');
-var social                                  = require('../social-metadata');
-var restSerializer                          = require("../../serializers/rest-serializer");
-var burstCalculator                         = require('../../utils/burst-calculator');
-var userSort                                = require('../../../public/js/utils/user-sort');
-var roomSort                                = require('gitter-realtime-client/lib/sorts-filters').pojo; /* <-- Don't use the default export
+var env = require('gitter-web-env');
+var winston = env.logger;
+var nconf = env.config;
+var errorReporter = env.errorReporter;
+var Promise = require('bluebird');
+var contextGenerator = require('../../web/context-generator');
+var restful = require('../../services/restful');
+var userService = require('../../services/user-service');
+var chatService = require('../../services/chat-service');
+var appVersion = require('gitter-app-version');
+var social = require('../social-metadata');
+var restSerializer = require("../../serializers/rest-serializer");
+var burstCalculator = require('../../utils/burst-calculator');
+var userSort = require('../../../public/js/utils/user-sort');
+var roomSort = require('gitter-realtime-client/lib/sorts-filters').pojo; /* <-- Don't use the default export
                                                                                           will bring in tons of client-side
                                                                                           libraries that we don't need */
-var roomNameTrimmer                         = require('../../../public/js/utils/room-name-trimmer');
-var isolateBurst                            = require('gitter-web-shared/burst/isolate-burst-array');
-var unreadItemService                       = require('../../services/unread-items');
-var mongoUtils                              = require('gitter-web-persistence-utils/lib/mongo-utils');
-var url                                     = require('url');
-var cdn                                     = require("../../web/cdn");
-var roomMembershipService                   = require('../../services/room-membership-service');
-var troupeService                           = require('../../services/troupe-service');
-var useragent                               = require('useragent');
-var _                                       = require('lodash');
-var GitHubOrgService                        = require('gitter-web-github').GitHubOrgService;
-var orgPermissionModel                      = require('gitter-web-permissions/lib/models/org-permissions-model');
-var userSettingsService                     = require('../../services/user-settings-service');
-var resolveUserAvatarUrl                    = require('gitter-web-shared/avatars/resolve-user-avatar-url');
-var resolveRoomAvatarSrcSet                 = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
-var getOrgNameFromTroupeName                = require('gitter-web-shared/get-org-name-from-troupe-name');
-var parseRoomsIntoLeftMenuRoomList          = require('gitter-web-shared/rooms/left-menu-room-list.js');
-var generateLeftMenuSnapshot                = require('../snapshots/left-menu-snapshot');
+var roomNameTrimmer = require('../../../public/js/utils/room-name-trimmer');
+var isolateBurst = require('gitter-web-shared/burst/isolate-burst-array');
+var unreadItemService = require('../../services/unread-items');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var url = require('url');
+var cdn = require("../../web/cdn");
+var roomMembershipService = require('../../services/room-membership-service');
+var troupeService = require('../../services/troupe-service');
+var useragent = require('useragent');
+var _ = require('lodash');
+var GitHubOrgService = require('gitter-web-github').GitHubOrgService;
+var orgPermissionModel = require('gitter-web-permissions/lib/models/org-permissions-model');
+var userSettingsService = require('../../services/user-settings-service');
+var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-url');
+var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
+var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
+var parseRoomsIntoLeftMenuRoomList = require('gitter-web-shared/rooms/left-menu-room-list.js');
+var generateLeftMenuSnapshot = require('../snapshots/left-menu-snapshot');
 var parseRoomsIntoLeftMenuFavouriteRoomList = require('gitter-web-shared/rooms/left-menu-room-favourite-list');
-var generateRoomCardContext                 = require('gitter-web-shared/templates/partials/room-card-context-generator');
+var generateRoomCardContext = require('gitter-web-shared/templates/partials/room-card-context-generator');
 
 /* How many chats to send back */
 var INITIAL_CHAT_COUNT = 50;
@@ -225,13 +225,13 @@ function renderMainFrame(req, res, next, frame) {
       }
 
       var socialMetadata = permalinkChat ?
-        social.getMetadataForChatPermalink({ room: req.troupe, chat: permalinkChat  }) :
-        social.getMetadata({ room: req.troupe  });
+        social.getMetadataForChatPermalink({ room: req.troupe, chat: permalinkChat }) :
+        social.getMetadata({ room: req.troupe });
 
       //TODO Pass this to MINIBAR?? JP 17/2/16
-      var hasNewLeftMenu            = !req.isPhone && req.fflip && req.fflip.has('left-menu');
-      var snapshots                 = troupeContext.snapshots = generateLeftMenuSnapshot(req, troupeContext, rooms);
-      var leftMenuRoomList          = parseRoomsIntoLeftMenuRoomList(snapshots.leftMenu.state, snapshots.rooms, snapshots.leftMenu.selectedOrgName);
+      var hasNewLeftMenu = !req.isPhone && req.fflip && req.fflip.has('left-menu');
+      var snapshots = troupeContext.snapshots = generateLeftMenuSnapshot(req, troupeContext, rooms);
+      var leftMenuRoomList = parseRoomsIntoLeftMenuRoomList(snapshots.leftMenu.state, snapshots.rooms, snapshots.leftMenu.selectedOrgName);
       var leftMenuFavouriteRoomList = parseRoomsIntoLeftMenuFavouriteRoomList(snapshots.leftMenu.state, snapshots.rooms, snapshots.leftMenu.selectedOrgName);
 
       var previousLeftMenuState = troupeContext.leftRoomMenuState;
@@ -258,7 +258,7 @@ function renderMainFrame(req, res, next, frame) {
           return !!f;
         })
         .map(function(room) {
-          room.selected = room.id == selectedRoomId;
+          room.selected = mongoUtils.objectIDsEqual(room.id, selectedRoomId);
           room.name = roomNameTrimmer(room.name);
           return room;
         });
@@ -370,7 +370,7 @@ function renderChat(req, res, options, next) {
 
         //add ownerIsOrg to the troupe model
         troupeContext.troupe.ownerIsOrg = ownerIsOrg;
-        var orgName     = getOrgNameFromTroupeName(troupeContext.troupe.name);
+        var orgName = getOrgNameFromTroupeName(troupeContext.troupe.name);
         var orgPageHref = '/orgs/' + orgName + '/rooms/';
 
         var renderOptions = _.extend({
@@ -390,7 +390,7 @@ function renderChat(req, res, options, next) {
             dnsPrefetch: dnsPrefetch,
             isPrivate: isPrivate,
             activityEvents: activityEvents,
-            users: users  && users.sort(userSort),
+            users: users && users.sort(userSort),
             userCount: troupe.userCount,
             hasHiddenMembers: troupe.userCount > 25,
             integrationsUrl: integrationsUrl,

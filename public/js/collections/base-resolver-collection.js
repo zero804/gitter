@@ -1,8 +1,8 @@
 'use strict';
 
-var Backbone            = require('backbone');
+var Backbone = require('backbone');
 var backboneUrlResolver = require('backbone-url-resolver');
-var SyncMixin           = require('./sync-mixin');
+var SyncMixin = require('./sync-mixin');
 
 module.exports = Backbone.Collection.extend({
 
@@ -12,8 +12,8 @@ module.exports = Backbone.Collection.extend({
     }
 
     this.contextModel = (this.contextModel || attrs.contextModel);
-    this.template     = (this.template || attrs.template);
-    this.urlModel     = backboneUrlResolver(this.template, this.contextModel);
+    this.template = (this.template || attrs.template);
+    this.urlModel = backboneUrlResolver(this.template, this.contextModel);
   },
 
   url: function() {

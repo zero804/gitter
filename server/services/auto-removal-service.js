@@ -1,12 +1,12 @@
 "use strict";
 
-var env                       = require('gitter-web-env');
-var stats                     = env.stats;
-var logger                    = env.logger;
-var recentRoomCore            = require('./core/recent-room-core');
-var unreadItemService         = require('./unread-items');
-var Promise                   = require('bluebird');
-var roomMembershipService     = require('./room-membership-service');
+var env = require('gitter-web-env');
+var stats = env.stats;
+var logger = env.logger;
+var recentRoomCore = require('./core/recent-room-core');
+var unreadItemService = require('./unread-items');
+var Promise = require('bluebird');
+var roomMembershipService = require('./room-membership-service');
 
 /**
  * Returns a list of users who could be lurked
@@ -48,11 +48,11 @@ function findRemovalCandidates(roomId, options) {
 }
 exports.findRemovalCandidates = findRemovalCandidates;
 
-function bulkRemoveUsersFromRoom(roomId, userIds) {
+function bulkRemoveUsersFromRoom(roomId, groupId, userIds) {
 
   if (!userIds.length) return Promise.resolve();
   logger.info('Removing ' + userIds.length + ' users from ' + roomId);
-  return roomMembershipService.removeRoomMembers(roomId, userIds)
+  return roomMembershipService.removeRoomMembers(roomId, userIds, groupId)
     .then(function() {
       logger.info('Marking items as read');
       return Promise.map(userIds, function(userId) {
@@ -75,7 +75,7 @@ exports.bulkRemoveUsersFromRoom = bulkRemoveUsersFromRoom;
 /**
  * Auto remove users in a room
  */
-function autoRemoveInactiveUsers(roomId, options) {
+function autoRemoveInactiveUsers(roomId, groupId, options) {
   return findRemovalCandidates(roomId, options)
     .then(function(candidates) {
       if (!candidates.length) return [];
@@ -85,7 +85,7 @@ function autoRemoveInactiveUsers(roomId, options) {
           return candidate.userId;
         });
 
-      return bulkRemoveUsersFromRoom(roomId, usersToLurk)
+      return bulkRemoveUsersFromRoom(roomId, groupId, usersToLurk)
         .thenReturn(candidates);
     });
 }

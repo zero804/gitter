@@ -1,15 +1,15 @@
 "use strict";
 
-var chatModels            = require('../chat');
-var context               = require('utils/context');
-var unreadItemsClient     = require('components/unread-items-client');
-var errorHandle           = require('utils/live-collection-error-handle');
-var ProxyCollection       = require('backbone-proxy-collection');
-var Pool                  = require('../../components/chat-cache/pool');
-var appEvents             = require('../../utils/appevents');
-var Promise               = require('bluebird');
+var chatModels = require('../chat');
+var context = require('utils/context');
+var unreadItemsClient = require('components/unread-items-client');
+var errorHandle = require('utils/live-collection-error-handle');
+var ProxyCollection = require('backbone-proxy-collection');
+var Pool = require('../../components/chat-cache/pool');
+var appEvents = require('../../utils/appevents');
+var Promise = require('bluebird');
 var selectCacheCandidates = require('../../components/chat-cache/select-cache-candidates');
-var frameUtils            = require('../../utils/frame-utils');
+var frameUtils = require('../../utils/frame-utils');
 
 function invokeChatPreload(pool, rooms) {
   var cacheRooms = selectCacheCandidates(pool.size, rooms);

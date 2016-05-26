@@ -1,8 +1,8 @@
 /*global describe:true, it:true, beforeEach:true, afterEach:true */
 'use strict';
 
-var assert                 = require('assert');
-var Backbone               = require('backbone');
+var assert = require('assert');
+var Backbone = require('backbone');
 var BaseResolverCollection = require('public/js/collections/base-resolver-collection');
 
 describe('BaseResolverCollection', function() {

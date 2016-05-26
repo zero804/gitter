@@ -1,8 +1,8 @@
 "use strict";
 
 var assert = require('assert');
-var testRequire     = require('../../test-require');
-var isolateBurst    = testRequire('../shared/burst/isolate-burst-array');
+var testRequire = require('../../test-require');
+var isolateBurst = testRequire('../shared/burst/isolate-burst-array');
 
 describe('isolate-burst-array', function() {
   function id(collection) {

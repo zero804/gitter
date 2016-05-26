@@ -27,7 +27,7 @@ describe('collaborators-service #slow', function() {
   });
 
   it('should return collaborators for a PRIVATE REPO', function() {
-    return getCollaboratorForRoom({ security: 'PRIVATE',  githubType: 'REPO', uri: 'troupe/gitter-webapp' }, FAKE_USER)
+    return getCollaboratorForRoom({ security: 'PRIVATE', githubType: 'REPO', uri: 'troupe/gitter-webapp' }, FAKE_USER)
       .then(function(collaborators) {
         assert(!collaborators.some(function(f) {
           return f.login === 'waltfy';
@@ -45,7 +45,7 @@ describe('collaborators-service #slow', function() {
   });
 
   it('should return collaborators for a unknown REPO', function() {
-    return getCollaboratorForRoom({ security: 'PUBLIC',  githubType: 'REPO', uri: 'troupe/xyz' }, FAKE_USER)
+    return getCollaboratorForRoom({ security: 'PUBLIC', githubType: 'REPO', uri: 'troupe/xyz' }, FAKE_USER)
       .then(function(collaborators) {
         assert(Array.isArray(collaborators));
         assert(collaborators.length > 0);

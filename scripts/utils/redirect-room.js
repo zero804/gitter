@@ -3,7 +3,7 @@
 "use strict";
 
 var shutdown = require('shutdown');
-var uriLookupService   = require('../../server/services/uri-lookup-service');
+var uriLookupService = require('../../server/services/uri-lookup-service');
 var roomService = require('../../server/services/room-service');
 var troupeService = require('../../server/services/troupe-service');
 

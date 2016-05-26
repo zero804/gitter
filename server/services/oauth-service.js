@@ -1,14 +1,14 @@
 "use strict";
 
 var WEB_INTERNAL_CLIENT_KEY = 'web-internal';
-var env    = require('gitter-web-env');
-var nconf  = env.config;
+var env = require('gitter-web-env');
+var nconf = env.config;
 var logger = env.logger;
 
-var persistenceService   = require('gitter-web-persistence');
-var Promise              = require('bluebird');
-var userService          = require('./user-service');
-var tokenProvider        = require('./tokens/');
+var persistenceService = require('gitter-web-persistence');
+var Promise = require('bluebird');
+var userService = require('./user-service');
+var tokenProvider = require('./tokens/');
 var MongooseCachedLookup = require('../utils/mongoose-cached-lookup');
 
 var ircClientId;

@@ -1,8 +1,8 @@
 "use strict";
 
-var assert      = require('assert');
+var assert = require('assert');
 var testRequire = require('../../test-require');
-var dateTzToUTC  = testRequire('../shared/time/date-timezone-to-utc');
+var dateTzToUTC = testRequire('../shared/time/date-timezone-to-utc');
 
 var TEST_CASES = [
   { year: 2015, month: 1, day: 1, utcOffset: -60, expected: '2014-12-31T23:00:00.000Z' },

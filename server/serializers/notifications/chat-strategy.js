@@ -2,7 +2,7 @@
 
 var UserIdStrategy = require('./user-id-strategy');
 
-function ChatStrategy(options)  {
+function ChatStrategy(options) {
   if(!options) options = {};
 
   var userStategy = new UserIdStrategy(options);

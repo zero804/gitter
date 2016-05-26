@@ -4,12 +4,12 @@
  * Bridges events from the membership service up to the live-collections
  */
 
-var env                   = require('gitter-web-env');
-var stats                 = env.stats;
-var errorReporter         = env.errorReporter;
+var env = require('gitter-web-env');
+var stats = env.stats;
+var errorReporter = env.errorReporter;
 var roomMembershipService = require('../services/room-membership-service');
-var liveCollections       = require('../services/live-collections');
-var unreadItemService     = require('../services/unread-items');
+var liveCollections = require('../services/live-collections');
+var unreadItemService = require('../services/unread-items');
 
 function onMembersAdded(troupeId, userIds) {
   liveCollections.roomMembers.emit('added', troupeId, userIds);
@@ -40,6 +40,14 @@ function onMembersLurkChange(troupeId, userIds, lurk) {
   return null;
 }
 
+function onGroupMembersAdded(groupId, userIds) {
+  liveCollections.groupMembers.emit('added', groupId, userIds);
+}
+
+function onGroupMembersRemoved(groupId, userIds) {
+  liveCollections.groupMembers.emit('removed', groupId, userIds);
+}
+
 var installed = false;
 exports.install = function() {
   if (installed) return;
@@ -47,11 +55,15 @@ exports.install = function() {
 
   var events = roomMembershipService.events;
 
+  // Room Member changes
   events.on("members.added", onMembersAdded);
-
   events.on("members.removed", onMembersRemoved);
-
   events.on("members.lurk.change", onMembersLurkChange);
+
+  // Group Member Changes
+  events.on("group.members.added", onGroupMembersAdded);
+  events.on("group.members.removed", onGroupMembersRemoved);
+
 };
 
 exports.testOnly = {

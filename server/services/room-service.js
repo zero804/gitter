@@ -45,6 +45,7 @@ var uriResolver = require('./uri-resolver');
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 var userScopes = require('gitter-web-identity/lib/user-scopes');
 var groupService = require('gitter-web-groups/lib/group-service');
+
 var splitsvilleEnabled = nconf.get("project-splitsville:enabled");
 
 /**
@@ -377,9 +378,9 @@ function createRoomForGitHubUri(user, uri, options) {
 function ensureAccessControl(user, troupe, access) {
   if(access) {
     var flags = userDefaultFlagsService.getDefaultFlagsForUser(user);
-    return roomMembershipService.addRoomMember(troupe._id, user._id, flags);
+    return roomMembershipService.addRoomMember(troupe._id, user._id, flags, troupe.groupId);
   } else {
-    return roomMembershipService.removeRoomMember(troupe._id, user._id);
+    return roomMembershipService.removeRoomMember(troupe._id, user._id, troupe.groupId);
   }
 }
 
@@ -966,7 +967,7 @@ function addUserToRoom(room, instigatingUser, usernameToAdd) {
       return recentRoomService.saveLastVisitedTroupeforUserId(addedUser._id, room._id, { skipFayeUpdate: true })
         .then(function() {
           var flags = userDefaultFlagsService.getDefaultFlagsForUser(addedUser);
-          return roomMembershipService.addRoomMember(room._id, addedUser._id, flags);
+          return roomMembershipService.addRoomMember(room._id, addedUser._id, flags, room.groupId);
         })
         .then(function(wasAdded) {
           if (!wasAdded) return addedUser;
@@ -1016,7 +1017,7 @@ function addUserToRoom(room, instigatingUser, usernameToAdd) {
 //             })
 //             .then(function() {
 //               if (!removalUserIds.length) return;
-//               return roomMembershipService.removeRoomMembers(room._id, removalUserIds);
+//               return roomMembershipService.removeRoomMembers(room._id, removalUserIds, GROUPID);
 //             });
 //           });
 //     });
@@ -1074,13 +1075,21 @@ function removeUserFromRoom(room, user) {
   // if (!requestingUser) throw new StatusError(401, 'Not authenticated');
   if (room.oneToOne || room.githubType === 'ONETOONE') throw new StatusError(400, 'This room does not support removing.');
 
-  return roomMembershipService.removeRoomMember(room._id, user._id)
+  return roomMembershipService.removeRoomMember(room._id, user._id, room.groupId)
     .then(function() {
       // Remove favorites, unread items and last access times
       return recentRoomService.removeRecentRoomForUser(user._id, room._id);
     });
 }
 
+function removeRoomMemberById(roomId, userId) {
+  return persistence.TroupeUser.findById(roomId, { _id: 0, groupId: 1 })
+    .exec()
+    .then(function(room) {
+      var groupId = room && room.groupId;
+      return roomMembershipService.removeRoomMember(roomId, userId, groupId);
+    });
+}
 /**
  * Hides a room for a user.
  */
@@ -1097,11 +1106,16 @@ function hideRoomFromUser(roomId, userId) {
       }
 
       if (userLurkStatus) {
-        return roomMembershipService.removeRoomMember(roomId, userId);
+        return removeRoomMemberById(roomId, userId);
       }
 
       // TODO: in future get rid of this but this collection is used by the native clients
-      appEvents.dataChange2('/user/' + userId + '/rooms', 'patch', { id: roomId, favourite: null, lastAccessTime: null, mentions: 0, unreadItems: 0 }, 'room');
+      appEvents.dataChange2('/user/' + userId + '/rooms', 'patch', {
+        id: roomId,
+        favourite: null,
+        lastAccessTime: null,
+        mentions: 0,
+        unreadItems: 0 }, 'room');
     });
 }
 
@@ -1280,6 +1294,7 @@ module.exports = {
   /* DISABLED revalidatePermissionsForUsers: revalidatePermissionsForUsers, */
   ensureRepoRoomSecurity: ensureRepoRoomSecurity,
   removeUserFromRoom: Promise.method(removeUserFromRoom),
+  removeRoomMemberById: removeRoomMemberById,
   hideRoomFromUser: hideRoomFromUser,
 
   findBanByUsername: findBanByUsername,

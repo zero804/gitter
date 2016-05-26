@@ -1,8 +1,8 @@
 "use strict";
 
-var _         = require('underscore');
-var safeJson  = require('../utils/safe-json');
-var util      = require('util');
+var _ = require('underscore');
+var safeJson = require('../utils/safe-json');
+var util = require('util');
 var clientEnv = require('gitter-client-env');
 var cdn = require('./cdn');
 
@@ -84,7 +84,7 @@ exports.pad = function(options) {
   while (content.length < width) {
     if (directionRight) {
       content+=" ";
-    } else  {
+    } else {
       content=" " + content;
     }
   }

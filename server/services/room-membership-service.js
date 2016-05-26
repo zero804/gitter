@@ -1,17 +1,18 @@
 "use strict";
 
-var persistence          = require('gitter-web-persistence');
-var TroupeUser           = persistence.TroupeUser;
-var Troupe               = persistence.Troupe;
-var mongoUtils           = require('gitter-web-persistence-utils/lib/mongo-utils');
-var Promise              = require('bluebird');
-var EventEmitter         = require('events').EventEmitter;
-var assert               = require('assert');
-var debug                = require('debug')('gitter:app:room-membership-service');
-var recentRoomCore       = require('./core/recent-room-core');
+var persistence = require('gitter-web-persistence');
+var TroupeUser = persistence.TroupeUser;
+var Troupe = persistence.Troupe;
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var Promise = require('bluebird');
+var EventEmitter = require('events').EventEmitter;
+var assert = require('assert');
+var debug = require('debug')('gitter:app:room-membership-service');
+var recentRoomCore = require('./core/recent-room-core');
 var roomMembershipEvents = new EventEmitter();
-var _                    = require('lodash');
-var roomMembershipFlags  = require('./room-membership-flags');
+var _ = require('lodash');
+var roomMembershipFlags = require('./room-membership-flags');
+var groupMembershipDeltaService = require('gitter-web-groups/lib/group-membership-delta-service');
 
 /**
  * Returns the rooms the user is in
@@ -162,30 +163,42 @@ function findMembersForRoomWithLurk(troupeId) {
  * user was added, false if they were already in the
  * room
  */
-function addRoomMember(troupeId, userId, flags) {
+function addRoomMember(troupeId, userId, flags, groupId) {
   debug('Adding member %s to room %s', userId, troupeId);
 
   assert(troupeId, 'Expected troupeId parameter');
   assert(userId, 'Expected userId parameter');
   assert(flags, 'Expected flags parameter');
 
-  return TroupeUser.findOneAndUpdate({
-      troupeId: troupeId,
-      userId: userId
-    }, {
-      $setOnInsert: {
-        troupeId: troupeId,
-        userId: userId,
-        flags: flags
-      }
-    }, { upsert: true, new: false })
-    .exec()
+  return (groupId ? groupMembershipDeltaService.isUserInGroup(userId, groupId) : Promise.resolve(null))
+    .bind({
+      alreadyInGroup: null
+    })
+    .then(function(alreadyInGroup) {
+      this.alreadyInGroup = alreadyInGroup;
+
+      return TroupeUser.findOneAndUpdate({
+          troupeId: troupeId,
+          userId: userId
+        }, {
+          $setOnInsert: {
+            troupeId: troupeId,
+            userId: userId,
+            flags: flags
+          }
+        }, { upsert: true, new: false })
+        .exec();
+    })
     .then(function(previous) {
       var added = !previous;
 
       if (!added) {
         debug('Member %s is already in room %s', userId, troupeId);
         return false;
+      }
+
+      if (groupId && !this.alreadyInGroup) {
+        roomMembershipEvents.emit("group.members.added", groupId, [userId]);
       }
 
       // Set the last access time for the user to now if the user
@@ -206,21 +219,33 @@ function addRoomMember(troupeId, userId, flags) {
  * true if the user was deleted, false if they
  * were not in the room
  */
-function removeRoomMember(troupeId, userId) {
+function removeRoomMember(troupeId, userId, groupId) {
   debug('Removing member %s from room %s', userId, troupeId);
 
   assert(troupeId);
   assert(userId);
 
-  return TroupeUser.findOneAndRemove({
-      troupeId: troupeId,
-      userId: userId
+  return (groupId ? groupMembershipDeltaService.isUserInGroup(userId, groupId, troupeId) : Promise.resolve(false))
+    .bind({
+      hasOtherMembershipsInGroup: null
     })
-    .exec()
+    .then(function(hasOtherMembershipsInGroup) {
+      this.hasOtherMembershipsInGroup = hasOtherMembershipsInGroup;
+
+      return TroupeUser.findOneAndRemove({
+          troupeId: troupeId,
+          userId: userId
+        })
+        .exec();
+    })
     .then(function(existing) {
       var removed = !!existing;
 
       if (!removed) return false;
+
+      if (groupId && !this.hasOtherMembershipsInGroup) {
+        roomMembershipEvents.emit("group.members.removed", groupId, [userId]);
+      }
 
       roomMembershipEvents.emit("members.removed", troupeId, [userId]);
       return incrementTroupeUserCount(troupeId, -1)
@@ -231,7 +256,7 @@ function removeRoomMember(troupeId, userId) {
 /**
  * Remove users from a room
  */
-function removeRoomMembers(troupeId, userIds) {
+function removeRoomMembers(troupeId, userIds, groupId) {
   debug('Removing %s members from room %s', userIds.length, troupeId);
 
   assert(troupeId);
@@ -241,18 +266,38 @@ function removeRoomMembers(troupeId, userIds) {
     assert(userId);
   });
 
-  return TroupeUser.remove({
-      troupeId: troupeId,
-      userId: { $in: mongoUtils.asObjectIDs(userIds) }
+  return (groupId ? groupMembershipDeltaService.checkUsersInGroup(groupId, userIds, troupeId) : Promise.resolve({ }))
+    .bind({
+      groupMembership: null
     })
-    .exec()
+    .then(function(groupMembership) {
+      this.groupMembership = groupMembership;
+
+      return TroupeUser.remove({
+          troupeId: troupeId,
+          userId: { $in: mongoUtils.asObjectIDs(userIds) }
+        })
+        .exec();
+    })
     .then(function() {
       // Unfortunately we have no way of knowing which of the users
       // were actually removed and which were already out of the collection
       // as we have no transactions.
       //
+      // So we assume that ALL the users were actually removed
       roomMembershipEvents.emit("members.removed", troupeId, userIds);
 
+      if (groupId) {
+        var groupMembership = this.groupMembership;
+
+        var usersNoLongerInGroup = _.filter(userIds, function(userId) {
+          return !groupMembership[userId];
+        });
+
+        if (usersNoLongerInGroup.length) {
+          roomMembershipEvents.emit("group.members.removed", groupId, usersNoLongerInGroup);
+        }
+      }
       return resetTroupeUserCount(troupeId);
     });
 }
@@ -288,10 +333,10 @@ function findMembersForRoomMulti(troupeIds) {
         var troupeId = troupeUser.troupeId;
         var userId = troupeUser.userId;
 
-        if (!memo[troupeId]) {
-          memo[troupeId] = [userId];
-        } else {
+        if (memo[troupeId]) {
           memo[troupeId].push(userId);
+        } else {
+          memo[troupeId] = [userId];
         }
 
         return memo;
@@ -434,7 +479,7 @@ var findMembershipModeForUsersInRoom = Promise.method(function(troupeId, userIds
   return TroupeUser.find({
       troupeId: troupeId,
       userId: { $in: mongoUtils.asObjectIDs(userIds) }
-    },  {
+    }, {
       userId: 1,
       flags: 1,
       _id: 0
@@ -521,13 +566,13 @@ function queryForToggles(flagToggles) {
     }
   }
 
-  addToggle('notify'      , roomMembershipFlags.FLAG_POS_NOTIFY_MENTION);
-  addToggle('activity'    , roomMembershipFlags.FLAG_POS_NOTIFY_ACTIVITY);
-  addToggle('mention'     , roomMembershipFlags.FLAG_POS_NOTIFY_MENTION);
+  addToggle('notify', roomMembershipFlags.FLAG_POS_NOTIFY_MENTION);
+  addToggle('activity', roomMembershipFlags.FLAG_POS_NOTIFY_ACTIVITY);
+  addToggle('mention', roomMembershipFlags.FLAG_POS_NOTIFY_MENTION);
   addToggle('announcement', roomMembershipFlags.FLAG_POS_NOTIFY_ANNOUNCEMENT);
-  addToggle('default'     , roomMembershipFlags.FLAG_POS_NOTIFY_DEFAULT);
-  addToggle('desktop'     , roomMembershipFlags.FLAG_POS_NOTIFY_DESKTOP);
-  addToggle('mobile'      , roomMembershipFlags.FLAG_POS_NOTIFY_MOBILE);
+  addToggle('default', roomMembershipFlags.FLAG_POS_NOTIFY_DEFAULT);
+  addToggle('desktop', roomMembershipFlags.FLAG_POS_NOTIFY_DESKTOP);
+  addToggle('mobile', roomMembershipFlags.FLAG_POS_NOTIFY_MOBILE);
 
   var allRequired = flagToggles.all === true;
 
@@ -619,28 +664,28 @@ function updateRoomMembershipFlagsForUser(userId, newFlags, overrideAll) {
 }
 
 /* Exports */
-exports.findRoomIdsForUser          = findRoomIdsForUser;
-exports.findRoomIdsForUserWithLurk  = findRoomIdsForUserWithLurk;
+exports.findRoomIdsForUser = findRoomIdsForUser;
+exports.findRoomIdsForUserWithLurk = findRoomIdsForUserWithLurk;
 exports.findLurkingRoomIdsForUserId = findLurkingRoomIdsForUserId;
-exports.checkRoomMembership         = checkRoomMembership;
-exports.findUserMembershipInRooms   = findUserMembershipInRooms;
+exports.checkRoomMembership = checkRoomMembership;
+exports.findUserMembershipInRooms = findUserMembershipInRooms;
 exports.findMembershipForUsersInRoom = findMembershipForUsersInRoom;
 
-exports.findMembersForRoom          = findMembersForRoom;
-exports.countMembersInRoom          = countMembersInRoom;
-exports.findMembersForRoomWithLurk  = findMembersForRoomWithLurk;
-exports.addRoomMember               = addRoomMember;
-exports.removeRoomMember            = removeRoomMember;
-exports.removeRoomMembers           = removeRoomMembers;
-exports.findAllMembersForRooms      = findAllMembersForRooms;
-exports.findMembersForRoomMulti     = findMembersForRoomMulti;
+exports.findMembersForRoom = findMembersForRoom;
+exports.countMembersInRoom = countMembersInRoom;
+exports.findMembersForRoomWithLurk = findMembersForRoomWithLurk;
+exports.addRoomMember = addRoomMember;
+exports.removeRoomMember = removeRoomMember;
+exports.removeRoomMembers = removeRoomMembers;
+exports.findAllMembersForRooms = findAllMembersForRooms;
+exports.findMembersForRoomMulti = findMembersForRoomMulti;
 
-exports.getMemberLurkStatus         = getMemberLurkStatus;
+exports.getMemberLurkStatus = getMemberLurkStatus;
 
-exports.getMembershipMode           = getMembershipMode;
-exports.getMembershipDetails        = getMembershipDetails;
-exports.setMembershipFlags          = setMembershipFlags;
-exports.setMembershipMode           = setMembershipMode;
+exports.getMembershipMode = getMembershipMode;
+exports.getMembershipDetails = getMembershipDetails;
+exports.setMembershipFlags = setMembershipFlags;
+exports.setMembershipMode = setMembershipMode;
 exports.setMembershipModeForUsersInRoom = setMembershipModeForUsersInRoom;
 exports.findMembershipModeForUsersInRoom = findMembershipModeForUsersInRoom;
 exports.findMembersForRoomForNotify = findMembersForRoomForNotify;
@@ -648,4 +693,4 @@ exports.findMembersForRoomWithFlags = findMembersForRoomWithFlags;
 exports.updateRoomMembershipFlagsForUser = updateRoomMembershipFlagsForUser;
 
 /* Event emitter */
-exports.events                      = roomMembershipEvents;
+exports.events = roomMembershipEvents;
