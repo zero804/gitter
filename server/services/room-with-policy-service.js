@@ -168,7 +168,7 @@ RoomWithPolicyService.prototype.banUserFromRoom = secureMethod([allowStaff, allo
 
           return Promise.all([
               room.save(),
-              roomMembershipService.removeRoomMember(room._id, bannedUser._id)
+              roomMembershipService.removeRoomMember(room._id, bannedUser._id, room.groupId)
             ])
             .return(ban);
         })

@@ -1,12 +1,11 @@
-/* eslint complexity: ["error", 17] */
+/* eslint complexity: ["error", 14] */
 "use strict";
 
-var logger                = require('gitter-web-env').logger;
-var debug                 = require('debug')('gitter:infra:serializer:troupe');
-var getVersion            = require('../get-model-version');
-var UserIdStrategy        = require('./user-id-strategy');
-var mongoUtils            = require('gitter-web-persistence-utils/lib/mongo-utils');
-var Promise               = require('bluebird');
+var debug = require('debug')('gitter:infra:serializer:troupe');
+var getVersion = require('../get-model-version');
+var UserIdStrategy = require('./user-id-strategy');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var Promise = require('bluebird');
 
 var AllUnreadItemCountStrategy = require('./troupes/all-unread-item-count-strategy');
 var FavouriteTroupesForUserStrategy = require('./troupes/favourite-troupes-for-user-strategy');
@@ -138,43 +137,50 @@ function TroupeStrategy(options) {
     }
   }
 
-  var shownWarning = false;
+  function resolveOneToOneOtherUser(item) {
+    if (!currentUserId) {
+      debug('TroupeStrategy initiated without currentUserId, but generating oneToOne troupes. This can be a problem!');
+      return null;
+    }
+
+    var otherUser = mapOtherUser(item.oneToOneUsers);
+
+    if (!otherUser) {
+      debug("Troupe %s appears to contain bad users", item._id);
+      return null;
+    }
+
+    return otherUser;
+  }
+
+  function resolveProviders(item) {
+    // mongoose is upgrading old undefineds to [] on load and we don't want to
+    // send through that no providers are allowed in that case
+
+    if (options.includeProviders && item.providers && item.providers.length) {
+      return item.providers;
+    } else {
+      return undefined;
+    }
+  }
 
   this.map = function(item) {
-    var troupeName, troupeUrl, otherUser, isPro;
+    var isPro = proOrgStrategy.map(item);
 
-    isPro = proOrgStrategy.map(item);
-
+    var troupeName, troupeUrl;
     if (item.oneToOne) {
-      if (currentUserId) {
-        otherUser = mapOtherUser(item.oneToOneUsers);
-      } else {
-        if (shownWarning) {
-          otherUser = null;
-        } else {
-          logger.warn('TroupeStrategy initiated without currentUserId, but generating oneToOne troupes. This can be a problem!');
-          shownWarning = true;
-        }
-      }
-
+      var otherUser = resolveOneToOneOtherUser(item);
       if (otherUser) {
         troupeName = otherUser.displayName;
         troupeUrl = "/" + otherUser.username;
-      } else {
-        debug("Troupe %s appears to contain bad users", item._id);
-        // This should technically never happen......
-        return undefined;
       }
     } else {
-        troupeName = item.uri;
-        troupeUrl = "/" + item.uri;
+      troupeName = item.uri;
+      troupeUrl = "/" + item.uri;
     }
 
     var unreadCounts = unreadItemStrategy && unreadItemStrategy.map(item.id);
-
-    // mongoose is upgrading old undefineds to [] on load and we don't want to
-    // send through that no providers are allowed in that case
-    var providers = (options.includeProviders && item.providers && item.providers.length) ? item.providers : undefined;
+    var providers = resolveProviders(item);
 
     var isLurking;
     var hasActivity;

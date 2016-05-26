@@ -25,6 +25,10 @@ function findById(groupId) {
     .exec();
 }
 
+function findByIds(ids) {
+  return mongooseUtils.findByIds(Group, ids);
+}
+
 /**
  * Find a group given a URI
  */
@@ -291,6 +295,7 @@ function ensureGroupForUser(user) {
 module.exports = {
   findByUri: Promise.method(findByUri),
   findById: Promise.method(findById),
+  findByIds: findByIds,
   createGroup: Promise.method(createGroup),
   findRoomsIdForGroup: Promise.method(findRoomsIdForGroup),
   migration: {
