@@ -95,9 +95,9 @@ function disassociateSocketAndDeactivateUserAndTroupe(socketId, userId, callback
   return lookupTroupeIdForSocket(socketId)
     .then(function(troupeId) {
       return redisClient.presenceDisassociate(
-        /* keys */   keySocketUser(socketId), ACTIVE_USERS_KEY, MOBILE_USERS_KEY, ACTIVE_SOCKETS_KEY,
-                     keyUserLock(userId), troupeId ? keyTroupeUsers(troupeId) : null,
-                     keyUserSockets(userId),
+        /* keys */ keySocketUser(socketId), ACTIVE_USERS_KEY, MOBILE_USERS_KEY, ACTIVE_SOCKETS_KEY,
+          keyUserLock(userId), troupeId ? keyTroupeUsers(troupeId) : null,
+          keyUserSockets(userId),
         /* values */ userId, socketId)
         .spread(function(deleteSuccess, userSocketCountString, sremResult, userInTroupeCountString, totalUsersInTroupe) {
           if(!deleteSuccess) {
@@ -109,7 +109,7 @@ function disassociateSocketAndDeactivateUserAndTroupe(socketId, userId, callback
 
           var userInTroupeCount = parseInt(userInTroupeCountString, 10);  // If the user was already eboff, this will be -1
 
-          if(sremResult != 1) {
+          if(sremResult !== 1 && sremResult !== "1") {
             winston.warn("presence: Socket has already been removed from active sockets. Something fishy is happening.");
           }
 
@@ -157,19 +157,19 @@ function sendAppEventsForUserEyeballsOffTroupe(userInTroupeCount, totalUsersInTr
 function userSocketConnected(userId, socketId, connectionType, clientType, realtimeLibrary, troupeId, oauthClientId, uniqueClientId, eyeballState, callback) {
   if(!socketId) return Promise.reject(new StatusError(400, 'socketId expected')).nodeify(callback);
 
-  var isMobileConnection = connectionType == 'mobile';
+  var isMobileConnection = connectionType === 'mobile';
 
   if(!userId) {
     return redisClient.presenceAssociateAnon(
-      /* keys */   keySocketUser(socketId), ACTIVE_SOCKETS_KEY, keyUserSockets('anon'),
+      /* keys */ keySocketUser(socketId), ACTIVE_SOCKETS_KEY, keyUserSockets('anon'),
       /* values */ socketId, Date.now(), isMobileConnection ? 1 : 0, clientType, realtimeLibrary, troupeId || null, oauthClientId, uniqueClientId)
       .spread(function(lockSuccess, saddResult) {
-        if(!lockSuccess)  {
+        if(!lockSuccess) {
           debug('associateSocketAndActivateUser rejected. Socket already exists.', socketId, userId);
           throw new StatusError(409, 'Conflict');
         }
 
-        if(saddResult != 1) {
+        if(saddResult !== 1 && saddResult !== "1") {
           winston.warn("presence: Socket has already been added to active sockets. Something fishy is happening.");
         }
         return 0;
@@ -178,17 +178,17 @@ function userSocketConnected(userId, socketId, connectionType, clientType, realt
   }
 
   return redisClient.presenceAssociate(
-    /* keys */   keySocketUser(socketId), ACTIVE_USERS_KEY, MOBILE_USERS_KEY, ACTIVE_SOCKETS_KEY, keyUserLock(userId), keyUserSockets(userId),
+    /* keys */ keySocketUser(socketId), ACTIVE_USERS_KEY, MOBILE_USERS_KEY, ACTIVE_SOCKETS_KEY, keyUserLock(userId), keyUserSockets(userId),
     /* values */ userId, socketId, Date.now(), isMobileConnection ? 1 : 0, clientType, realtimeLibrary, troupeId || null, oauthClientId, uniqueClientId)
     .spread(function(lockSuccess, userSocketCountString, saddResult) {
-      if(!lockSuccess)  {
+      if(!lockSuccess) {
         debug('presence: associateSocketAndActivateUser rejected. Socket already exists.', socketId, userId);
         throw new StatusError(409, 'socket already exists');
       }
 
       var userSocketCount = parseInt(userSocketCountString, 10);
 
-      if(saddResult != 1) {
+      if(saddResult !== 1 && saddResult !== "1") {
         winston.warn("presence: Socket has already been added to active sockets. Something fishy is happening.");
       }
 
@@ -228,17 +228,17 @@ function socketReassociated(socketId, userId, troupeId, eyeballsOn) {
       }
 
       return redisClient.presenceReassociate(
-        /* keys */   keySocketUser(socketId),
-                     keyUserLock(userId),
-                     troupeId ? keyTroupeUsers(troupeId) : null,
-                     previousTroupeId ? keyTroupeUsers(previousTroupeId) : null,
+        /* keys */ keySocketUser(socketId),
+                   keyUserLock(userId),
+                   troupeId ? keyTroupeUsers(troupeId) : null,
+                   previousTroupeId ? keyTroupeUsers(previousTroupeId) : null,
         /* values */ userId,
                      socketId,
                      troupeId || null,
                      previousTroupeId || null,
                      userId ? eyeballsOn : false) // Only non-anonymous users can be eyeballs on
         .spread(function(success, newTroupeUserCount, previousTroupeUserCount) {
-          if(!success)  {
+          if(!success) {
             throw new StatusError(500, 'Socket reassociation failed.');
           }
 
@@ -308,7 +308,7 @@ function eyeBallsOnTroupe(userId, socketId, troupeId, callback) {
   if(!troupeId) return Promise.reject(new StatusError(400, 'troupeId expected')).nodeify(callback);
 
   return redisClient.presenceEyeballsOn(
-      /* keys */   keySocketUser(socketId), keyTroupeUsers(troupeId), keyUserLock(userId),
+      /* keys */ keySocketUser(socketId), keyTroupeUsers(troupeId), keyUserLock(userId),
       /* values */ userId)
     .spread(function(eyeballLock, userScoreString) {
       if(!eyeballLock) {
@@ -317,7 +317,7 @@ function eyeBallsOnTroupe(userId, socketId, troupeId, callback) {
       }
 
       var userScore = parseInt(userScoreString, 10);                   // Score for user is returned as a string
-      if(userScore == 1) {
+      if(userScore === 1) {
         presenceService.emit('presenceChange', userId, troupeId, true);
       }
 
@@ -333,7 +333,7 @@ function eyeBallsOffTroupe(userId, socketId, troupeId, callback) {
   if(!troupeId) return Promise.reject(new StatusError(400, 'troupeId expected')).nodeify(callback);
 
   return redisClient.presenceEyeballsOff(
-      /* keys */   keySocketUser(socketId), keyTroupeUsers(troupeId), keyUserLock(userId),
+      /* keys */ keySocketUser(socketId), keyTroupeUsers(troupeId), keyUserLock(userId),
       /* values */ userId)
     .spread(function(eyeballLock, userInTroupeCountString, totalUsersInTroupe) {
       if(!eyeballLock) {
@@ -452,7 +452,7 @@ function categorizeUserTroupesByOnlineStatus(userTroupes, callback) {
         var onlineForTroupe = troupeOnlineUsers[troupeId];
         if(onlineForTroupe.indexOf(userId) >= 0) {
           inTroupe.push(userTroupe);
-        } else if(statii[userId] == 'online') {
+        } else if(statii[userId] === 'online') {
           online.push(userTroupe);
         } else {
           offline.push(userTroupe);
@@ -808,10 +808,10 @@ function validateUsersSubset(userIds, callback) {
           if(troupeId) {
             troupeIdsHash[troupeId] = true;
             if(socket.eyeballs) {
-              if(!troupeCounts[userId]) {
-                troupeCounts[userId] = { troupeId: 1 };
-              } else {
+              if (troupeCounts[userId]) {
                 troupeCounts[userId][troupeId] = troupeCounts[userId][troupeId] ? troupeCounts[userId][troupeId] + 1 : 1;
+              } else {
+                troupeCounts[userId] = { troupeId: 1 };
               }
             }
           }
@@ -895,7 +895,7 @@ function validateUsersSubset(userIds, callback) {
 
           return multi.exec()
             .then(checkMultiErrors)
-            .then(function(replies)  {
+            .then(function(replies) {
               if(!replies) {
                 var err = new StatusError(419, 'Transaction rolled back');
                 err.rollback = true;
@@ -944,31 +944,31 @@ function validateUsers(callback) {
 
   // Connections and disconnections
 presenceService.userSocketConnected = userSocketConnected;
-presenceService.socketDisconnected =  socketDisconnected;
+presenceService.socketDisconnected = socketDisconnected;
 presenceService.socketDisconnectionRequested = socketDisconnectionRequested;
 presenceService.socketReassociated = socketReassociated;
 
 // Query Status
-presenceService.lookupUserIdForSocket =  lookupUserIdForSocket;
+presenceService.lookupUserIdForSocket = lookupUserIdForSocket;
 presenceService.socketExists = socketExists;
-presenceService.findOnlineUsersForTroupe =  findOnlineUsersForTroupe;
-presenceService.categorizeUsersByOnlineStatus =  categorizeUsersByOnlineStatus;
+presenceService.findOnlineUsersForTroupe = findOnlineUsersForTroupe;
+presenceService.categorizeUsersByOnlineStatus = categorizeUsersByOnlineStatus;
 presenceService.listOnlineUsers = listOnlineUsers;
 presenceService.listActiveSockets = listActiveSockets;
 presenceService.getSocket = getSocket;
 presenceService.getSockets = getSockets;
-presenceService.listMobileUsers =  listMobileUsers;
-presenceService.listOnlineUsersForTroupes =  listOnlineUsersForTroupes;
+presenceService.listMobileUsers = listMobileUsers;
+presenceService.listOnlineUsersForTroupes = listOnlineUsersForTroupes;
 presenceService.categorizeUserTroupesByOnlineStatus = categorizeUserTroupesByOnlineStatus;
 presenceService.findAllSocketsForUserInTroupe = findAllSocketsForUserInTroupe;
 presenceService.listAllSocketsForUser = listAllSocketsForUser;
 presenceService.isUserConnectedWithClientType = isUserConnectedWithClientType;
 
 // Eyeball
-presenceService.clientEyeballSignal =  clientEyeballSignal;
+presenceService.clientEyeballSignal = clientEyeballSignal;
 
   // GC
-presenceService.collectGarbage =  collectGarbage;
+presenceService.collectGarbage = collectGarbage;
 presenceService.validateUsers = validateUsers;
 
 // -------------------------------------------------------------------

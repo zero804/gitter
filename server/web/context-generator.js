@@ -5,6 +5,7 @@ var presenceService  = require("gitter-web-presence");
 var useragent        = require("useragent");
 var userService      = require('../services/user-service');
 var userSettingsService = require('../services/user-settings-service');
+var roomMetaService = require('../services/room-meta-service');
 var isNative         = require('../../public/js/utils/is-native');
 
 var assert           = require("assert");
@@ -31,7 +32,7 @@ exports.generateNonChatContext = function(req) {
         troupe:               serializedTroupe,
         suggestedRoomsHidden: suggestedRoomsHidden,
         desktopNotifications: desktopNotifications,
-        leftRoomMenuState:    leftRoomMenuState
+        leftRoomMenuState:    leftRoomMenuState,
       });
     });
 };
@@ -67,15 +68,19 @@ exports.generateTroupeContext = function(req, extras) {
   return Promise.all([
     user ? serializeUser(user) : null,
     troupe ? serializeTroupe(troupe, user) : undefined,
-    determineDesktopNotifications(user, req)
+    determineDesktopNotifications(user, req),
+    troupe && troupe._id ? roomMetaService.findMetaByTroupeId(troupe._id, 'welcomeMessage') : false,
   ])
-  .spread(function(serializedUser, serializedTroupe, desktopNotifications) {
+  .spread(function(serializedUser, serializedTroupe, desktopNotifications, welcomeMessage) {
+
+    welcomeMessage = (welcomeMessage || { text: '' });
 
     return createTroupeContext(req, {
       user: serializedUser,
       troupe: serializedTroupe,
       desktopNotifications: desktopNotifications,
-      extras: extras
+      extras: extras,
+      roomHasWelcomeMessage: !!welcomeMessage.text && !!welcomeMessage.text.length,
     });
   });
 };
@@ -180,6 +185,7 @@ function createTroupeContext(req, options) {
     permissions: options.permissions,
     locale: req.i18n.locales[req.i18n.locale],
     features: features,
-    leftRoomMenuState: options.leftRoomMenuState
+    leftRoomMenuState: options.leftRoomMenuState,
+    roomHasWelcomeMessage: options.roomHasWelcomeMessage
   }, extras);
 }
