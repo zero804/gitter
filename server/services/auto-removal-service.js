@@ -1,12 +1,12 @@
 "use strict";
 
-var env                       = require('gitter-web-env');
-var stats                     = env.stats;
-var logger                    = env.logger;
-var recentRoomCore            = require('./core/recent-room-core');
-var unreadItemService         = require('./unread-items');
-var Promise                   = require('bluebird');
-var roomMembershipService     = require('./room-membership-service');
+var env = require('gitter-web-env');
+var stats = env.stats;
+var logger = env.logger;
+var recentRoomCore = require('./core/recent-room-core');
+var unreadItemService = require('./unread-items');
+var Promise = require('bluebird');
+var roomMembershipService = require('./room-membership-service');
 
 /**
  * Returns a list of users who could be lurked

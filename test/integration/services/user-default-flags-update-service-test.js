@@ -3,7 +3,7 @@
 var testRequire = require('../test-require');
 var assert = require('assert');
 var Promise = require('bluebird');
-var fixtureLoader = require('../test-fixtures');
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
 describe('user-default-flags-update-service', function() {
 

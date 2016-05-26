@@ -4,7 +4,11 @@ module.exports = {
         "browser": true,
         "mocha": true
     },
+    "plugins": [
+      "mocha"
+    ],
     "rules": {
+      "mocha/no-exclusive-tests": "error",
       "strict": ["warn", "safe"],
     }
 };

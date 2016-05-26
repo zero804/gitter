@@ -3,13 +3,13 @@
 require('./utils/diagnostics');
 
 /* Configure winston before all else! */
-var env     = require('gitter-web-env');
+var env = require('gitter-web-env');
 var winston = env.logger;
-var nconf   = env.config;
+var nconf = env.config;
 winston.info('Starting server/web.js');
 
-var express  = require('express');
-var http     = require('http');
+var express = require('express');
+var http = require('http');
 var serverStats = require('./utils/server-stats');
 var onMongoConnect = require('./utils/on-mongo-connect');
 

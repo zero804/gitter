@@ -1,15 +1,15 @@
 'use strict';
 
-var roomSort           = require('gitter-realtime-client').sortsFilters.model;
-var troupeModels       = require('../troupes');
-var orgModels          = require('../orgs');
-var unreadItemsClient  = require('components/unread-items-frame-client');
-var appEvents          = require('utils/appevents');
-var Sorted             = require('backbone-sorted-collection');
-var errorHandle        = require('utils/live-collection-error-handle');
-var context            = require('utils/context');
-var moment             = require('moment');
-var _                  = require('underscore');
+var roomSort = require('gitter-realtime-client').sortsFilters.model;
+var troupeModels = require('../troupes');
+var orgModels = require('../orgs');
+var unreadItemsClient = require('components/unread-items-frame-client');
+var appEvents = require('utils/appevents');
+var Sorted = require('backbone-sorted-collection');
+var errorHandle = require('utils/live-collection-error-handle');
+var context = require('utils/context');
+var moment = require('moment');
+var _ = require('underscore');
 var FilteredCollection = require('backbone-filtered-collection');
 
 

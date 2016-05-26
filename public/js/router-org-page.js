@@ -1,11 +1,11 @@
 "use strict";
 
-var onReady     = require('./utils/onready');
-var Backbone    = require('backbone');
-var appEvents   = require('utils/appevents');
+var onReady = require('./utils/onready');
+var Backbone = require('backbone');
+var appEvents = require('utils/appevents');
 var modalRegion = require('components/modal-region');
-var _           = require('underscore');
-var clientEnv   = require('gitter-client-env');
+var _ = require('underscore');
+var clientEnv = require('gitter-client-env');
 
 require('gitter-styleguide/css/components/buttons.css');
 require('gitter-styleguide/css/components/headings.css');

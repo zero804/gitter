@@ -1,11 +1,11 @@
 "use strict";
 
-var Promise     = require('bluebird');
-var redis       = require("../utils/redis");
+var Promise = require('bluebird');
+var redis = require("../utils/redis");
 var redisClient = redis.getClient();
-var Scripto     = require('gitter-redis-scripto');
+var Scripto = require('gitter-redis-scripto');
 
-var scriptManager    = new Scripto(redisClient);
+var scriptManager = new Scripto(redisClient);
 scriptManager.loadFromDir(__dirname + '/../../redis-lua/collapsed');
 
 var runScript = Promise.promisify(scriptManager.run, { context: scriptManager });

@@ -1,10 +1,10 @@
 'use strict';
 
-var defaultFilter   = require('../filters/left-menu-primary-default');
-var one2oneFilter   = require('../filters/left-menu-primary-one2one');
-var orgFilter       = require('../filters/left-menu-primary-org');
+var defaultFilter = require('../filters/left-menu-primary-default');
+var one2oneFilter = require('../filters/left-menu-primary-one2one');
+var orgFilter = require('../filters/left-menu-primary-org');
 
-var defaultSort   = require('../sorting/left-menu-primary-default');
+var defaultSort = require('../sorting/left-menu-primary-default');
 
 var parseToTemplateItem = require('../parse/left-menu-primary-item');
 

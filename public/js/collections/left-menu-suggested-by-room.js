@@ -1,10 +1,10 @@
 'use strict';
 
-var Backbone                       = require('backbone');
-var _                              = require('underscore');
-var FilteredCollection             = require('backbone-filtered-collection');
+var Backbone = require('backbone');
+var _ = require('underscore');
+var FilteredCollection = require('backbone-filtered-collection');
 var SuggestedRoomsByRoomCollection = require('./room-suggested-rooms.js');
-var SyncMixin                      = require('./sync-mixin');
+var SyncMixin = require('./sync-mixin');
 
 var SuggestionsContextModel = Backbone.Model.extend({});
 
@@ -47,7 +47,7 @@ var SuggestedCollection = SuggestedRoomsByRoomCollection.extend({
     //check the menu state
     var currentMenuState = this.roomMenuModel.get('state');
     if(currentMenuState !== 'all' &&
-       currentMenuState !== 'favourite'  &&
+       currentMenuState !== 'favourite' &&
        currentMenuState !== 'org') { return }
 
     //check the current state of the room
@@ -69,11 +69,11 @@ var SuggestedCollection = SuggestedRoomsByRoomCollection.extend({
 });
 
 var FilteredSuggestedCollection = function(attrs, options){
-    this.collection             = new SuggestedCollection(null, attrs);
-    this.roomCollection         = attrs.roomCollection;
+    this.collection = new SuggestedCollection(null, attrs);
+    this.roomCollection = attrs.roomCollection;
     this.suggestedOrgCollection = attrs.suggestedOrgsCollection;
-    this.collectionFilter       = this.collectionFilter.bind(this);
-    attrs                       = _.extend({}, attrs, { collection: this.collection });
+    this.collectionFilter = this.collectionFilter.bind(this);
+    attrs = _.extend({}, attrs, { collection: this.collection });
 
     this.listenTo(this.roomCollection, 'update', this.onCollectionSync, this);
     FilteredCollection.call(this, attrs, options);

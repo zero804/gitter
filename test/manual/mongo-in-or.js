@@ -1,6 +1,6 @@
 'use strict';
 
-var speedy      = require("speedy");
+var speedy = require("speedy");
 var persistence = require('gitter-web-persistence');
 
 var userIds = ["54e4b1e56d46b9ea027e6e38", "54e4b1e56d46b9ea027e6e37"];

@@ -1,6 +1,6 @@
 'use strict';
 
-var env   = require('gitter-web-env');
+var env = require('gitter-web-env');
 var nconf = env.config;
 
 var superClientPassword = nconf.get('ws:superClientPassword');

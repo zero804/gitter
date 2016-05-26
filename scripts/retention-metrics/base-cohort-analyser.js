@@ -83,7 +83,7 @@ BaseRetentionAnalyser.prototype.rollupUsageIntoWeeks = function(input) {
 
   var weekly = _(input)
     .transform(function(result, userIds, timestamp) {
-      var cohortDate  = cohortUtils.getStartOfWeek(moment(parseInt(timestamp, 10)));
+      var cohortDate = cohortUtils.getStartOfWeek(moment(parseInt(timestamp, 10)));
 
       timestamp = cohortDate.valueOf();
 

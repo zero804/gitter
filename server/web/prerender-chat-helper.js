@@ -6,7 +6,7 @@
  */
 
 var compileTemplate = require('./compile-web-template');
-var _               = require('lodash');
+var _ = require('lodash');
 
 var chatWrapper = compileTemplate.compileString('<div class="chat-item model-id-{{id}} {{burstClass}} {{unreadClass}} {{deletedClass}}">{{{inner}}}</div>');
 

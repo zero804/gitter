@@ -1,9 +1,9 @@
 "use strict";
 
 var express = require('express');
-var appMiddleware      = require('./app/middleware');
-var appRender          = require('./app/render');
-var featureToggles     = require('../web/middlewares/feature-toggles');
+var appMiddleware = require('./app/middleware');
+var appRender = require('./app/render');
+var featureToggles = require('../web/middlewares/feature-toggles');
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 

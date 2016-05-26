@@ -79,7 +79,7 @@ module.exports = function makeBenchmark(options) {
     benchmarks.add(target);
   });
 
-  suite.on('complete', function(event) {
+  suite.on('complete', function() {
     function doAfter(callback) {
       if (!options.after) return callback();
 

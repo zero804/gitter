@@ -1,9 +1,9 @@
 'use strict';
 
-var _                     = require('lodash');
-var Promise               = require('bluebird');
-var appEvents             = require('gitter-web-appevents');
-var restSerializer        = require("../../serializers/rest-serializer");
+var _ = require('lodash');
+var Promise = require('bluebird');
+var appEvents = require('gitter-web-appevents');
+var restSerializer = require("../../serializers/rest-serializer");
 var roomMembershipService = require('../room-membership-service');
 
 function getRoomDistribution(userId) {

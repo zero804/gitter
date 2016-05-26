@@ -1,13 +1,13 @@
 'use strict';
 
-var env                = require('gitter-web-env');
-var logger             = env.logger;
+var env = require('gitter-web-env');
+var logger = env.logger;
 
-var uriLookupService   = require("./uri-lookup-service");
-var userService        = require('./user-service');
-var troupeService      = require('./troupe-service');
-var debug              = require('debug')('gitter:app:uri-resolver');
-var StatusError        = require('statuserror');
+var uriLookupService = require("./uri-lookup-service");
+var userService = require('./user-service');
+var troupeService = require('./troupe-service');
+var debug = require('debug')('gitter:app:uri-resolver');
+var StatusError = require('statuserror');
 
 /**
  * Returns [user, troupe, roomMember] where either user XOR troupe and access is set
