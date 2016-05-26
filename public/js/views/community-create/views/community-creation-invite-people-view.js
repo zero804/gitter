@@ -3,8 +3,6 @@
 var _ = require('underscore');
 var Backbone = require('backbone');
 var ProxyCollection = require('backbone-proxy-collection');
-var Marionette = require('backbone.marionette');
-var toggleClass = require('utils/toggle-class');
 
 var template = require('./community-creation-invite-people-view.hbs');
 var CommunityCreateBaseStepView = require('./community-creation-base-step-view');

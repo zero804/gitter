@@ -1,8 +1,6 @@
 'use strict';
 
 var _ = require('underscore');
-var Marionette = require('backbone.marionette');
-var urlJoin = require('url-join');
 var toggleClass = require('utils/toggle-class');
 var context = require('utils/context');
 var slugify = require('slug');

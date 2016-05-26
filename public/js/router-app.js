@@ -487,7 +487,7 @@ onready(function() {
       });
     },
 
-    createCommunity: function(uri) {
+    createCommunity: function(/* uri */) {
       appEvents.trigger('community-create-view:toggle', true);
     },
   });

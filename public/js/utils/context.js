@@ -276,6 +276,10 @@ module.exports = (function() {
     return snapshot;
   };
 
+  context.roomHasWelcomeMessage = function(){
+    return ctx.roomHasWelcomeMessage;
+  };
+
   return context;
 
 })();
