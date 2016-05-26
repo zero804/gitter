@@ -17,12 +17,14 @@ var View = Marionette.ItemView.extend({
     welcomeMessage: '#room-welcome-message',
     welcomeMessagePreviewButton: '#preview-welcome-message',
     welcomeMessagePreviewContainer: '#welcome-message-preview-container',
+    editWelcomeMessageButton: '#close-welcome-message-preview',
     errorMessage: '#error-message',
   },
 
   events:   {
     'click #close-settings': 'destroySettings',
-    'click @ui.welcomeMessagePreviewButton': 'previewWelcomeMessage'
+    'click @ui.welcomeMessagePreviewButton': 'previewWelcomeMessage',
+    'click @ui.editWelcomeMessageButton': 'editWelcomeMessage',
   },
 
   initialize: function() {
@@ -70,11 +72,17 @@ var View = Marionette.ItemView.extend({
 
   previewWelcomeMessage: function (e){
     e.preventDefault();
-    this.ui.welcomeMessagePreviewButton.text('Close');
-    toggleClass(this.ui.welcomeMessageContainer[0], 'preview', true);
+    toggleClass(this.el, 'preview', true);
     this.fetchRenderedHTML().then(function(html){
       this.injectContentIntoPreview(html);
     }.bind(this));
+  },
+
+  editWelcomeMessage: function (e){
+    e.preventDefault();
+    this.ui.welcomeMessagePreviewContainer.html('Loading ...');
+    toggleClass(this.ui.welcomeMessagePreviewContainer[0], 'loading', true);
+    toggleClass(this.el, 'preview', false);
   },
 
   fetchRenderedHTML: function (){

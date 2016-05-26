@@ -70,4 +70,17 @@ input.github-only {
 
 .preview-welcome-message {
   padding: .8em 1rem;
+
+  .preview & {
+    display: none;
+  }
+}
+
+.close-welcome-message-preview {
+  display: none;
+  padding: .8em 1rem;
+
+  .preview & {
+    display: inline-block;
+  }
 }
