@@ -57,14 +57,14 @@ describe('group-api', function() {
       .expect(200)
   });
 
-  it.skip('GET /v1/groups/:groupId/rooms', function() {
+  it('GET /v1/groups/:groupId/rooms', function() {
     return request(app)
       .get('/v1/groups/' + fixture.group1.id + '/rooms')
       .set('x-access-token', fixture.user1.accessToken)
       .expect(200)
       .then(function(result) {
         var rooms = result.body;
-        
+
         assert(rooms.some(function(r) {
           return r.id === fixture.troupe1.id;
         }));
