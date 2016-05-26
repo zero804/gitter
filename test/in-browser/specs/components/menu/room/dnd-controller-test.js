@@ -68,7 +68,7 @@ describe('DNDCtrl', function(){
   });
 
   it('should trigger a different event with the wrong target', function(done){
-     dndCtrl.on('room-menu:sort-favourite', function(id){
+     dndCtrl.on('room-menu:sort-favourite', function() {
       assert.ok(true);
       done();
     });
