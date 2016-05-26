@@ -15,13 +15,14 @@ var View = Marionette.ItemView.extend({
     githubOnly: '#github-only',
     welcomeMessageContainer: '#welcome-message-container',
     welcomeMessage: '#room-welcome-message',
-    welcomeMessagePreview: '#preview-welcome-message',
+    welcomeMessagePreviewButton: '#preview-welcome-message',
+    welcomeMessagePreviewContainer: '#welcome-message-preview-container',
     errorMessage: '#error-message',
   },
 
   events:   {
     'click #close-settings': 'destroySettings',
-    'click @ui.welcomeMessagePreview': 'previewWelcomeMessage'
+    'click @ui.welcomeMessagePreviewButton': 'previewWelcomeMessage'
   },
 
   initialize: function() {
@@ -69,13 +70,26 @@ var View = Marionette.ItemView.extend({
 
   previewWelcomeMessage: function (e){
     e.preventDefault();
-    this.ui.welcomeMessagePreview.text('Close');
+    this.ui.welcomeMessagePreviewButton.text('Close');
     toggleClass(this.ui.welcomeMessageContainer[0], 'preview', true);
+    this.fetchRenderedHTML().then(function(html){
+      this.injectContentIntoPreview(html);
+    }.bind(this));
+  },
+
+  fetchRenderedHTML: function (){
+    var welcomeMessageContent = this.getWelcomeMessageContent();
+    return apiClient.post('/private/markdown-preview', { text: this.getWelcomeMessageContent() })
+      .catch(this.showError.bind(this));
+  },
+
+  getWelcomeMessageContent: function (){
+    return this.ui.welcomeMessage.val();
   },
 
   formSubmit: function() {
     var providers             = (this.ui.githubOnly.is(':checked')) ? ['github'] : [];
-    var welcomeMessageContent = this.ui.welcomeMessage.val();
+    var welcomeMessageContent = this.getWelcomeMessageContent();
 
     Promise.all([
       apiClient.room.put('', { providers: providers }),
@@ -85,10 +99,18 @@ var View = Marionette.ItemView.extend({
       context.setTroupe(updatedTroupe);
       this.destroySettings();
     }.bind(this))
-    .catch(function(){
-      this.ui.errorMessage[0].classList.remove('hidden');
-    }.bind(this));
-  }
+    .catch(this.showError.bind(this));
+  },
+
+  showError: function (){
+    this.ui.errorMessage[0].classList.remove('hidden');
+  },
+
+  injectContentIntoPreview: function (html){
+    this.ui.welcomeMessagePreviewContainer.html(html);
+    toggleClass(this.ui.welcomeMessagePreviewContainer[0], 'loading', false);
+  },
+
 });
 
 var Modal = ModalView.extend({
