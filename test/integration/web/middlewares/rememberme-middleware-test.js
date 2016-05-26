@@ -1,17 +1,21 @@
-/*global describe:true, it:true, before:false, after:false */
 'use strict';
 
 var testRequire = require('../../test-require');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assert = require('assert');
+var ObjectID = require('mongodb').ObjectID;
 
 var fixture = {};
 
 var rememberMeMiddleware = testRequire('./web/middlewares/rememberme-middleware');
 
-describe('rememberme-middleware', function() {
+describe('rememberme-middleware #slow', function() {
   before(fixtureLoader(fixture, {
-    user1: { }
+    user1: { },
+    userNoTokens: {
+      username: 'remembermetest' + Date.now(),
+      githubToken: null
+    }
   }));
 
   after(function() {
@@ -20,20 +24,17 @@ describe('rememberme-middleware', function() {
 
   it('should generate a token for a user', function() {
     return rememberMeMiddleware.testOnly.generateAuthToken(fixture.user1.id)
-      .spread(function(key, token) {
-        assert(key);
-        assert(token);
+      .then(function(cookieValue) {
+        assert(cookieValue);
       });
   });
 
-
   it('should validate a token for a user', function() {
     return rememberMeMiddleware.testOnly.generateAuthToken(fixture.user1.id)
-      .spread(function(key, token) {
-        assert(key);
-        assert(token);
+      .then(function(cookieValue) {
+        assert(cookieValue);
 
-        return rememberMeMiddleware.testOnly.validateAuthToken(key + ":" + token);
+        return rememberMeMiddleware.testOnly.validateAuthToken(cookieValue);
       })
       .then(function(userId) {
         assert.strictEqual(userId, fixture.user1.id);
@@ -44,22 +45,21 @@ describe('rememberme-middleware', function() {
     rememberMeMiddleware.testOnly.setTokenGracePeriodMillis(100);
 
     return rememberMeMiddleware.testOnly.generateAuthToken(fixture.user1.id)
-      .spread(function(key, token) {
-        assert(key);
-        assert(token);
+      .then(function(cookieValue) {
+        assert(cookieValue);
 
-        return rememberMeMiddleware.testOnly.validateAuthToken(key + ":" + token)
+        return rememberMeMiddleware.testOnly.validateAuthToken(cookieValue)
           .then(function(userId) {
             assert.strictEqual(userId, fixture.user1.id);
 
-            return rememberMeMiddleware.testOnly.validateAuthToken(key + ":" + token);
+            return rememberMeMiddleware.testOnly.validateAuthToken(cookieValue);
           })
           .then(function(userId) {
             assert.strictEqual(userId, fixture.user1.id);
           })
           .delay(110) /* Wait for the token to expire */
           .then(function() {
-            return rememberMeMiddleware.testOnly.validateAuthToken(key + ":" + token);
+            return rememberMeMiddleware.testOnly.validateAuthToken(cookieValue);
           })
           .then(function(userId) {
             assert(!userId);
@@ -72,18 +72,17 @@ describe('rememberme-middleware', function() {
     rememberMeMiddleware.testOnly.setTokenGracePeriodMillis(100);
 
     return rememberMeMiddleware.testOnly.generateAuthToken(fixture.user1.id)
-      .spread(function(key, token) {
-        assert(key);
-        assert(token);
+      .then(function(cookieValue) {
+        assert(cookieValue);
 
-        return rememberMeMiddleware.testOnly.validateAuthToken(key + ":" + token)
+        return rememberMeMiddleware.testOnly.validateAuthToken(cookieValue)
           .then(function(userId) {
             assert.strictEqual(userId, fixture.user1.id);
 
-            return rememberMeMiddleware.testOnly.deleteAuthToken(key + ":" + token);
+            return rememberMeMiddleware.testOnly.deleteAuthToken(cookieValue);
           })
           .then(function() {
-            return rememberMeMiddleware.testOnly.validateAuthToken(key + ":" + token);
+            return rememberMeMiddleware.testOnly.validateAuthToken(cookieValue);
           })
           .then(function(userId) {
             assert(!userId);
@@ -96,6 +95,52 @@ describe('rememberme-middleware', function() {
       .then(function(userId) {
         assert(!userId);
       });
-  })
+  });
+
+  describe('processRememberMeToken', function() {
+    it('should cope with a missing user', function() {
+      return rememberMeMiddleware.testOnly.generateAuthToken(new ObjectID())
+        .then(function(cookieValue) {
+          return rememberMeMiddleware.testOnly.processRememberMeToken(cookieValue);
+        })
+        .then(function(loginInfo) {
+          assert(!loginInfo);
+        })
+    });
+
+    it('should cope with a user without tokens', function() {
+      return rememberMeMiddleware.testOnly.generateAuthToken(fixture.userNoTokens.id)
+        .then(function(cookieValue) {
+          return rememberMeMiddleware.testOnly.processRememberMeToken(cookieValue);
+        })
+        .then(function(loginInfo) {
+          assert(!loginInfo);
+        })
+    });
+
+    it('should authenticate with genuine tokens', function() {
+      return rememberMeMiddleware.testOnly.generateAuthToken(fixture.user1.id)
+        .then(function(cookieValue) {
+          return rememberMeMiddleware.testOnly.processRememberMeToken(cookieValue);
+        })
+        .then(function(loginInfo) {
+          assert.strictEqual(loginInfo.user.id, fixture.user1.id);
+          assert(loginInfo.newCookieValue);
+          return rememberMeMiddleware.testOnly.processRememberMeToken(loginInfo.newCookieValue);
+        })
+        .then(function(loginInfo) {
+          assert.strictEqual(loginInfo.user.id, fixture.user1.id);
+          assert(loginInfo.newCookieValue);
+        });
+    });
+
+    it('should reject bad cookies', function() {
+      return rememberMeMiddleware.testOnly.processRememberMeToken("123123123:asdasasdasdadasd")
+        .then(function(loginInfo) {
+          assert(!loginInfo);
+        });
+    });
+
+  });
 
 });
