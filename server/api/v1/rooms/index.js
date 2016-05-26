@@ -168,7 +168,8 @@ module.exports = {
     'chatMessages': require('./chat-messages'),
     'collaborators': require('./collaborators'),
     'suggestedRooms': require('./suggested-rooms'),
-    'events': require('./events')
+    'events': require('./events'),
+    'meta': require('./meta')
   }
 
 };

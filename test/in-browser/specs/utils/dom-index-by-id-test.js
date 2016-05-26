@@ -1,10 +1,9 @@
-/*global describe:true, it:true, beforeEach:true, afterEach:true */
 'use strict';
 
 var assert = require('assert');
 var domIndexerById = require('public/js/utils/dom-index-by-id');
 
-describe.only('DomIndexerById', function(){
+describe('DomIndexerById', function(){
 
   var el;
   var el1;

@@ -1,7 +1,6 @@
 'use strict';
 
 var Backbone = require('backbone');
-var moment = require('moment');
 
 module.exports = Backbone.Collection.extend({
 
