@@ -3,26 +3,34 @@
 var assert = require('assert');
 var persistence = require('gitter-web-persistence');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
-var processMarkdown = require('../utils/markdown-processor');
-
 
 function findMetaByTroupeId(troupeId, metaKey) {
   assert(mongoUtils.isLikeObjectId(troupeId));
   assert(metaKey);
   troupeId = mongoUtils.asObjectID(troupeId);
-  return persistence.TroupeMeta.findOne({ troupeId: troupeId }).select(metaKey)
+
+  var select = { _id: 0 };
+  select[metaKey] = 1;
+
+  return persistence.TroupeMeta.findOne({ troupeId: troupeId }, select)
+    .select(metaKey)
+    .lean()
     .exec()
-    .then(function(result){
+    .then(function(result) {
+      if (!result) return null;
       return result[metaKey];
     });
 }
 
 function upsertMetaKey(troupeId, metaKey, value) {
-  assert(mongoUtils.isLikeObjectId(troupeId));
+  assert(troupeId && mongoUtils.isLikeObjectId(troupeId));
+
   troupeId = mongoUtils.asObjectID(troupeId);
-  var query = { $set: {}};
+  var query = { $set: { } };
   query.$set[metaKey] = value;
-  return persistence.TroupeMeta.findOneAndUpdate({ troupeId: troupeId }, query, { upsert: true }).exec();
+
+  return persistence.TroupeMeta.findOneAndUpdate({ troupeId: troupeId }, query, { upsert: true })
+    .exec();
 }
 
 module.exports = {

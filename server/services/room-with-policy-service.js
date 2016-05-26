@@ -252,15 +252,14 @@ RoomWithPolicyService.prototype.getRoomWelcomeMessage = secureMethod([allowJoin]
   return roomMetaService.findMetaByTroupeId(this.room.id, 'welcomeMessage');
 });
 
-RoomWithPolicyService.prototype.updateRoomWelcomeMessage = secureMethod([allowAdmin], function(options){
-  assert(options.welcomeMessage);
-  return processMarkdown(options.welcomeMessage)
+RoomWithPolicyService.prototype.updateRoomWelcomeMessage = secureMethod([allowAdmin], function(welcomeMessage){
+  if (!welcomeMessage) throw new StatusError(400);
+
+  return processMarkdown(welcomeMessage)
+    .bind(this)
     .then(function(welcomeMessage){
-      return roomMetaService.upsertMetaKey(this.room.id, 'welcomeMessage', welcomeMessage);
-    }.bind(this))
-    .then(function(res){
-      res = (res || {});
-      return { welcomeMessage: (res.welcomeMessage || {}) };
+      return roomMetaService.upsertMetaKey(this.room.id, 'welcomeMessage', welcomeMessage)
+        .return({ welcomeMessage: welcomeMessage });
     });
 });
 
