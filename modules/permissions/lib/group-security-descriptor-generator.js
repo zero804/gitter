@@ -15,11 +15,11 @@ function usernameMatchesUri(user, linkPath) {
 }
 
 function generateUserSecurityDescriptor(user, options) {
-  var githubId = options.githubId;
-  var uri = options.uri;
+  var externalId = options.externalId;
+  var linkPath = options.linkPath;
 
   var extraAdmins;
-  if (!user || usernameMatchesUri(user, uri)) {
+  if (!user || usernameMatchesUri(user, linkPath)) {
     extraAdmins = [];
   } else {
     extraAdmins = [user._id];
@@ -30,40 +30,40 @@ function generateUserSecurityDescriptor(user, options) {
     members: 'PUBLIC',
     admins: 'GH_USER_SAME',
     public: true,
-    linkPath: uri,
-    externalId: githubId,
+    linkPath: linkPath,
+    externalId: externalId,
     extraAdmins: extraAdmins
   };
 }
 
 function generateOrgSecurityDescriptor(user, options) {
-  var githubId = options.githubId;
-  var uri = options.uri;
+  var externalId = options.externalId;
+  var linkPath = options.linkPath;
 
   return {
     type: 'GH_ORG',
     members: 'PUBLIC',
     admins: 'GH_ORG_MEMBER',
     public: true,
-    linkPath: uri,
-    externalId: githubId
+    linkPath: linkPath,
+    externalId: externalId
   };
 }
 
 function generateRepoSecurityDescriptor(user, options) {
-  var githubId = options.githubId;
-  var uri = options.uri;
+  var externalId = options.externalId;
+  var linkPath = options.linkPath;
   var security = options.security;
 
-  switch(security) {
+  switch (security) {
     case 'PUBLIC':
       return {
         type: 'GH_REPO',
         members: 'PUBLIC',
         admins: 'GH_REPO_PUSH',
         public: true,
-        linkPath: uri,
-        externalId: githubId
+        linkPath: linkPath,
+        externalId: externalId
       };
 
     case 'PRIVATE':
@@ -72,8 +72,8 @@ function generateRepoSecurityDescriptor(user, options) {
         members: 'GH_REPO_ACCESS',
         admins: 'GH_REPO_PUSH',
         public: false,
-        linkPath: uri,
-        externalId: githubId
+        linkPath: linkPath,
+        externalId: externalId
       };
 
     default:
@@ -83,16 +83,16 @@ function generateRepoSecurityDescriptor(user, options) {
 
 
 function generate(user, options) {
-  assert(options.uri, 'uri required');
+  assert(options.linkPath, 'linkPath required');
 
-  switch(options.type) {
-    case 'USER':
+  switch (options.type) {
+    case 'GH_USER':
       return generateUserSecurityDescriptor(user, options);
 
-    case 'REPO':
+    case 'GH_REPO':
       return generateRepoSecurityDescriptor(user, options);
 
-    case 'ORG':
+    case 'GH_ORG':
       return generateOrgSecurityDescriptor(user, options);
 
     default:
@@ -100,6 +100,18 @@ function generate(user, options) {
   }
 }
 
+function getDefaultGroupSecurityDescriptor(creatorUserId) {
+  return {
+    type: null,
+    admins: 'MANUAL',
+    public: true,
+    members: 'PUBLIC',
+    extraMembers: [],
+    extraAdmins: [creatorUserId]
+  }
+}
+
 module.exports = {
-  generate: generate
+  generate: generate,
+  getDefaultGroupSecurityDescriptor: getDefaultGroupSecurityDescriptor
 }

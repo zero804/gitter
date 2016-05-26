@@ -197,9 +197,9 @@ function migrate(batch, enc, callback) {
           // Insert group security descriptors for the owning org or user.
           // (this will only insert if it is missing)
           var securityDescriptor = groupSecurityDescriptorGenerator.generate(gitterUser, {
-            uri: info.owner.uri, // mixed case OK?
-            type: info.type.toUpperCase(), // ORG or USER
-            githubId: info.owner.githubId,
+            type: 'GH_'+info.type.toUpperCase(), // ORG or USER
+            linkPath: info.owner.uri, // mixed case OK?
+            externalId: info.owner.githubId,
           });
 
           promises.push(securityDescriptorService.insertForGroup(groupId, securityDescriptor));

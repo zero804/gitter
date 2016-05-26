@@ -10,7 +10,7 @@ var validateGroupUri = require('gitter-web-validators/lib/validate-group-uri');
 var StatusError = require('statuserror');
 var legacyPolicyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
-var validateUri = require('gitter-web-github').GitHubUriValidator;
+var validateGitHubUri = require('gitter-web-github').GitHubUriValidator;
 var debug = require('debug')('gitter:groups:group-service');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var groupSecurityDescriptorGenerator = require('gitter-web-permissions/lib/group-security-descriptor-generator');
@@ -43,7 +43,8 @@ function upsertGroup(user, options) {
   var uri = options.uri;
   var name = options.name || uri;
   var lcUri = uri.toLowerCase();
-  var githubId = options.githubId || null;
+  var linkPath = options.linkPath;
+  var externalId = options.externalId || null;
 
   return mongooseUtils.upsert(Group, { lcUri: lcUri }, {
       $setOnInsert: {
@@ -60,23 +61,71 @@ function upsertGroup(user, options) {
 
       debug('Inserting a security descriptor for a new group');
 
-      var securityDescriptor = groupSecurityDescriptorGenerator.generate(user, {
-          uri: uri,
-          type: type,
-          githubId: githubId,
-        });
+      var securityDescriptor;
+      if (type) {
+        securityDescriptor = groupSecurityDescriptorGenerator.generate(user, {
+            type: type,
+            linkPath: linkPath,
+            externalId: externalId,
+          });
+      } else {
+        securityDescriptor = groupSecurityDescriptorGenerator.getDefaultGroupSecurityDescriptor(user._id);
+      }
 
       return securityDescriptorService.insertForGroup(group._id, securityDescriptor)
         .return(group);
     });
 }
 
-function createGroup(user, options) {
+function ensureGitHubAccessAndFetchGroupInfo(user, options) {
   var name = options.name;
   var uri = options.uri;
+  var type = options.type;
+
+  var linkPath = options.linkPath;
+  assert(linkPath, 'linkPath required');
+
+  return validateGitHubUri(user, linkPath)
+    .then(function(githubInfo) {
+      debug("GitHub information for %s is %j", linkPath, githubInfo);
+
+      if (!githubInfo) throw new StatusError(404);
+
+      if (type === 'GH_ORG' && githubInfo.type !== 'ORG') {
+        throw new StatusError(400, 'linkPath is not an org: ' + linkPath);
+      }
+      if (type === 'GH_USER' && githubInfo.type !== 'USER') {
+        throw new StatusError(400, 'linkPath is not a user: ' + linkPath);
+      }
+
+      // for migration cases below
+      if (type === 'GH_GUESS') {
+        type = 'GH_'+githubInfo.type;
+      }
+
+      return canAdminPotentialGitHubGroup(user, githubInfo, options.obtainAccessFromGitHubRepo)
+        .then(function(isAdmin) {
+          if (!isAdmin) throw new StatusError(403, 'Not an administrator of this org');
+          return {
+            type: type,
+            name: name,
+            uri: uri,
+            linkPath: linkPath,
+            externalId: githubInfo.githubId || null
+          }
+        });
+    });
+}
+
+function ensureAccessAndFetchGroupInfo(user, options) {
+  options = options || {};
+
+  var name = options.name;
+  var uri = options.uri;
+  var type = options.type || null;
   assert(user, 'user required');
   assert(name, 'name required');
-  assert(uri, 'name required');
+  assert(uri, 'uri required');
 
   if (!validateGroupName(name)) {
     throw new StatusError(400, 'Invalid group name');
@@ -86,35 +135,33 @@ function createGroup(user, options) {
     throw new StatusError(400, 'Invalid group uri: ' + uri);
   }
 
-  // TODO: validateUri is validate GITHUB uri..
+  return findByUri(uri)
+    .then(function(group) {
+      if (group) {
+        throw new StatusError(400, 'Group uri already taken: ' + uri);
+      }
 
-  /* From here on we're going to be doing a create */
-  return validateUri(user, uri)
-    .bind({
-      githubInfo: null,
+      switch (type) {
+        case 'GH_ORG':
+        case 'GH_USER':
+        case 'GH_GUESS': // for migration calls to createGroup, see below
+          return ensureGitHubAccessAndFetchGroupInfo(user, options);
+        case null:
+          return {
+            type: null,
+            name: name,
+            uri: uri
+          }
+        default:
+          throw new StatusError(400, 'type is not known: ' + type);
+      }
     })
-    .then(function(githubInfo) {
-      debug("GitHub information for %s is %j", uri, githubInfo);
+}
 
-      if (!githubInfo) throw new StatusError(404);
-      this.githubInfo = githubInfo;
-
-      return canAdminPotentialGitHubGroup(user, githubInfo, options.obtainAccessFromGitHubRepo);
-    })
-    .then(function(isAdmin) {
-      if (!isAdmin) throw new StatusError(403, 'Not an administrator of this org');
-
-      var githubInfo = this.githubInfo;
-      var type = githubInfo.type;
-      var uri = githubInfo.uri;
-      var githubId = githubInfo.githubId || null;
-
-      return upsertGroup(user, {
-        type: type,
-        name: name,
-        uri: uri,
-        githubId: githubId
-      });
+function createGroup(user, options) {
+  return ensureAccessAndFetchGroupInfo(user, options)
+    .then(function(groupInfo) {
+      return upsertGroup(user, groupInfo);
     });
 }
 
@@ -169,8 +216,10 @@ function ensureGroupForGitHubRoomCreation(user, options) {
 
       debug('No existing group. Will create');
       return createGroup(user, {
-        uri: uri,
+        type: 'GH_GUESS', // how do we know if it is a GH_ORG or GH_USER? or GH_REPO?
         name: name,
+        uri: uri,
+        linkPath: uri.split('/')[0], // does this make sense? or rather uri?
         obtainAccessFromGitHubRepo: options.obtainAccessFromGitHubRepo
       });
     });
@@ -253,8 +302,10 @@ function ensureGroupForRoom(room, user) {
       if (group) return group;
 
       return createGroup(user, {
-        uri: groupUri,
+        type: 'GH_GUESS', // could be a GH_ORG or GH_USER
         name: groupUri,
+        uri: groupUri,
+        linkPath: groupUri,
         obtainAccessFromGitHubRepo: obtainAccessFromGitHubRepo
       });
     })
@@ -282,8 +333,10 @@ function ensureGroupForUser(user) {
       if (group) return group;
 
       return createGroup(user, {
+        type: 'GH_USER',
         name: groupUri,
-        uri: groupUri
+        uri: groupUri,
+        linkPath: groupUri
       });
     });
   }
