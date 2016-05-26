@@ -13,7 +13,9 @@ function findGroupsForUser(userId) {
   return TroupeUser.aggregate([
       { $match: { userId: userId } },
       { $project: { troupeId: 1 } },
-      { $lookup: {
+      {
+        /* Join the troupes onto TroupeUser */
+        $lookup: {
           from: 'troupes',
           localField: 'troupeId',
           foreignField: '_id',
@@ -22,8 +24,10 @@ function findGroupsForUser(userId) {
       }, {
         $unwind: '$troupe'
       }, {
+        /* Get the unique set of groups that the user is in */
         $group: { _id: '$troupe.groupId' }
       }, {
+        /* Join the group documents using the unique set of groupIds for the user */
         $lookup: {
           from: 'groups',
           localField: '_id',

@@ -32,10 +32,10 @@ module.exports = {
     //
     var TroupeSchema = new Schema({
       groupId: { type: ObjectId, required: false},
-      topic: { type: String, 'default':'' },
+      topic: { type: String, default: '' },
       uri: { type: String },
       tags: [String],
-      lcUri: { type: String, 'default': function() { return this.uri ? this.uri.toLowerCase() : null; }  },
+      lcUri: { type: String, 'default': function() { return this.uri ? this.uri.toLowerCase() : null; } },
       githubType: { type: String, 'enum': ['REPO', 'ORG', 'ONETOONE', 'REPO_CHANNEL', 'ORG_CHANNEL', 'USER_CHANNEL'], required: true },
       lcOwner: { type: String, 'default': function() { return this.uri ? this.uri.split('/')[0].toLowerCase() : null; } },
       status: { type: String, "enum": ['ACTIVE', 'DELETED'], "default": 'ACTIVE'},  // DEPRECATED. TODO: remove this
@@ -79,7 +79,7 @@ module.exports = {
     installVersionIncMiddleware(TroupeSchema);
 
     TroupeSchema.pre('save', function (next) {
-      this.lcUri =  this.uri ? this.uri.toLowerCase() : undefined;
+      this.lcUri = this.uri ? this.uri.toLowerCase() : undefined;
       next();
       // Put this somewhere when it finds a better home
       // if (this.security !== 'PUBLIC') return next();
