@@ -1,11 +1,11 @@
 "use strict";
 
-var env                         = require('gitter-web-env');
-var stats                       = env.stats;
-var recentRoomCore              = require('./core/recent-room-core');
-var unreadItemService           = require('./unread-items');
-var Promise                     = require('bluebird');
-var roomMembershipService       = require('./room-membership-service');
+var env = require('gitter-web-env');
+var stats = env.stats;
+var recentRoomCore = require('./core/recent-room-core');
+var unreadItemService = require('./unread-items');
+var Promise = require('bluebird');
+var roomMembershipService = require('./room-membership-service');
 
 /* CODEDEBT: https://github.com/troupe/gitter-webapp/issues/991 */
 

@@ -1,15 +1,15 @@
 "use strict";
 
-var env                   = require('gitter-web-env');
-var redisClient           = env.redis.getClient();
-var errorReporter         = env.errorReporter;
+var env = require('gitter-web-env');
+var redisClient = env.redis.getClient();
+var errorReporter = env.errorReporter;
 
-var persistence           = require('gitter-web-persistence');
-var dolph                 = require('dolph');
-var Promise               = require('bluebird');
-var roomPermissionsModel  = require('./room-permissions-model');
-var mongoUtils            = require('gitter-web-persistence-utils/lib/mongo-utils');
-var appEvents             = require('gitter-web-appevents');
+var persistence = require('gitter-web-persistence');
+var dolph = require('dolph');
+var Promise = require('bluebird');
+var roomPermissionsModel = require('./room-permissions-model');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var appEvents = require('gitter-web-appevents');
 
 var rateLimiter = dolph.rateLimiter({
   prefix: 'ac:',

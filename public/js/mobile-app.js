@@ -1,15 +1,15 @@
 "use strict";
 
-var context               = require('utils/context');
-var $                     = require('jquery');
-var appEvents             = require('utils/appevents');
-var chatModels            = require('collections/chat');
-var Backbone              = require('backbone');
-var onready               = require('./utils/onready');
-var MobileLayout          = require('views/layouts/mobile');
+var context = require('utils/context');
+var $ = require('jquery');
+var appEvents = require('utils/appevents');
+var chatModels = require('collections/chat');
+var Backbone = require('backbone');
+var onready = require('./utils/onready');
+var MobileLayout = require('views/layouts/mobile');
 var RoomCollectionTracker = require('components/room-collection-tracker');
-var troupeCollections     = require('collections/instances/troupes');
-var unreadItemsClient     = require('components/unread-items-client');
+var troupeCollections = require('collections/instances/troupes');
+var unreadItemsClient = require('components/unread-items-client');
 
 //Remove when left menu is in place
 var FastClick = require('fastclick');

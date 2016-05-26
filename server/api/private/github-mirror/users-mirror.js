@@ -1,6 +1,6 @@
 "use strict";
 
-var Mirror      = require('gitter-web-github').GitHubMirrorService('user');
+var Mirror = require('gitter-web-github').GitHubMirrorService('user');
 var userService = require('../../../services/user-service');
 var StatusError = require('statuserror');
 

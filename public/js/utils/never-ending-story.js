@@ -1,8 +1,8 @@
 "use strict";
 
-var _        = require('underscore');
+var _ = require('underscore');
 var Backbone = require('backbone');
-var debug    = require('debug-proxy')('app:nes');
+var debug = require('debug-proxy')('app:nes');
 var isMobile = require('utils/is-mobile');
 
 

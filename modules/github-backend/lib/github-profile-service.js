@@ -32,7 +32,7 @@ module.exports = function gitHubProfileService(gitHubUser, options) {
       // db for those values
       if (options.includeCore) {
         profile.username = body.login;
-        profile.displayName =  body.name;
+        profile.displayName = body.name;
       }
 
       //standard

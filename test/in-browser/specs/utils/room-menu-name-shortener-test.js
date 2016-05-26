@@ -1,7 +1,7 @@
 /*global describe:true, it:true, beforeEach:true */
 'use strict';
 
-var assert            = require('assert');
+var assert = require('assert');
 var roomNameShortener = require('../../../../shared/room-name-shortener');
 
 describe('roomNameShortener()', function() {

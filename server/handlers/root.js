@@ -1,14 +1,14 @@
 "use strict";
 
-var env           = require('gitter-web-env');
-var nconf         = env.config;
+var env = require('gitter-web-env');
+var nconf = env.config;
 var identifyRoute = env.middlewares.identifyRoute;
 var featureToggles = require('../web/middlewares/feature-toggles');
-var express       = require('express');
-var loginUtils    = require('../web/login-utils');
-var social        = require('./social-metadata');
-var langs         = require('langs');
-var router        = express.Router({ caseSensitive: true, mergeParams: true });
+var express = require('express');
+var loginUtils = require('../web/login-utils');
+var social = require('./social-metadata');
+var langs = require('langs');
+var router = express.Router({ caseSensitive: true, mergeParams: true });
 
 router.get(nconf.get('web:homeurl'),
   identifyRoute('homepage'),

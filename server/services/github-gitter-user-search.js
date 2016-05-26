@@ -1,10 +1,10 @@
 "use strict";
 
-var env                    = require('gitter-web-env');
-var logger                 = env.logger;
-var userSearchService      = require("./user-search-service");
-var userService            = require("./user-service");
-var githubSearchService    = require('gitter-web-github').GitHubFastSearch;
+var env = require('gitter-web-env');
+var logger = env.logger;
+var userSearchService = require("./user-search-service");
+var userService = require("./user-service");
+var githubSearchService = require('gitter-web-github').GitHubFastSearch;
 var extractGravatarVersion = require('../utils/extract-gravatar-version');
 
 var Promise = require('bluebird');

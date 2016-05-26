@@ -11,13 +11,13 @@ var userSettingsService = require('./user-settings-service');
 var userScopes = require('gitter-web-identity/lib/user-scopes');
 var graphSuggestions = require('gitter-web-suggestions');
 var cacheWrapper = require('gitter-web-cache-wrapper');
-var debug = require('debug')('gitter:suggestions');
+var debug = require('debug')('gitter:app:suggestions');
 var logger = require('gitter-web-env').logger;
 
 // the old github recommenders that find repos, to be filtered to rooms
-var ownedRepos = require('./recommendations/owned-repos');
+// var ownedRepos = require('./recommendations/owned-repos');
 var starredRepos = require('./recommendations/starred-repos');
-var watchedRepos = require('./recommendations/watched-repos');
+// var watchedRepos = require('./recommendations/watched-repos');
 
 var NUM_SUGGESTIONS = 12;
 var MAX_SUGGESTIONS_PER_ORG = 2;

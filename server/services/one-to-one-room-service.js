@@ -1,22 +1,22 @@
 "use strict";
 
-var env                       = require('gitter-web-env');
-var stats                     = env.stats;
-var userService               = require('./user-service');
-var persistence               = require('gitter-web-persistence');
-var userDefaultFlagsService   = require('./user-default-flags-service');
-var Troupe                    = persistence.Troupe;
-var assert                    = require("assert");
-var mongoUtils                = require('gitter-web-persistence-utils/lib/mongo-utils');
-var Promise                   = require('bluebird');
-var ObjectID                  = require('mongodb').ObjectID;
-var mongooseUtils             = require('gitter-web-persistence-utils/lib/mongoose-utils');
-var StatusError               = require('statuserror');
-var roomMembershipService     = require('./room-membership-service');
+var env = require('gitter-web-env');
+var stats = env.stats;
+var userService = require('./user-service');
+var persistence = require('gitter-web-persistence');
+var userDefaultFlagsService = require('./user-default-flags-service');
+var Troupe = persistence.Troupe;
+var assert = require("assert");
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var Promise = require('bluebird');
+var ObjectID = require('mongodb').ObjectID;
+var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
+var StatusError = require('statuserror');
+var roomMembershipService = require('./room-membership-service');
 var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
-var legacyMigration           = require('gitter-web-permissions/lib/legacy-migration');
-var policyFactory             = require('gitter-web-permissions/lib/legacy-policy-factory');
-var debug                     = require('debug')('gitter:one-to-one-room-service');
+var legacyMigration = require('gitter-web-permissions/lib/legacy-migration');
+var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
+var debug = require('debug')('gitter:app:one-to-one-room-service');
 
 function getOneToOneRoomQuery(userId1, userId2) {
   // Need to use $elemMatch due to a regression in Mongo 2.6, see https://jira.mongodb.org/browse/SERVER-13843
@@ -60,6 +60,7 @@ function upsertNewOneToOneRoom(userId1, userId2) {
     oneToOne: true,
     status: 'ACTIVE',
     githubType: 'ONETOONE',
+    groupId: null, // One-to-ones are never in a group
     oneToOneUsers: [{
       _id: new ObjectID(),
       userId: userId1

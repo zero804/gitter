@@ -1,6 +1,6 @@
 'use strict';
 
-var log       = require('utils/log');
+var log = require('utils/log');
 var appEvents = require('utils/appevents');
 
 module.exports = function(collectionName, collection, error) {

@@ -1,8 +1,8 @@
 "use strict";
 
-var env        = require('gitter-web-env');
-var config     = env.config;
-var _          = require('lodash');
+var env = require('gitter-web-env');
+var config = env.config;
+var _ = require('lodash');
 var userScopes = require('gitter-web-identity/lib/user-scopes');
 
 function linkStack(stack) {
@@ -63,7 +63,7 @@ module.exports = function(err, req, res, next) { // eslint-disable-line no-unuse
     _.extend(extraTemplateValues, {
       room: room,
       org: org,
-      billingUrl: config.get('web:billingBaseUrl')  + '/bill/' + err.uri,
+      billingUrl: config.get('web:billingBaseUrl') + '/bill/' + err.uri,
     });
   }
 

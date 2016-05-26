@@ -1,8 +1,8 @@
 "use strict";
 
-var Marionette      = require('backbone.marionette');
+var Marionette = require('backbone.marionette');
 var behaviourLookup = require('./lookup');
-var appEvents       = require('../../utils/appevents');
+var appEvents = require('../../utils/appevents');
 
 var Behavior = Marionette.Behavior.extend({
   initialize: function() {

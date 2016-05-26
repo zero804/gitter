@@ -1,23 +1,23 @@
 "use strict";
 
-var env                       = require('gitter-web-env');
-var logger                    = env.logger;
-var config                    = env.config;
-var stats                     = env.stats;
+var env = require('gitter-web-env');
+var logger = env.logger;
+var config = env.config;
+var stats = env.stats;
 
-var _                            = require("underscore");
-var troupeService                = require("../troupe-service");
-var userService                  = require("../user-service");
-var unreadItemService            = require("../unread-items");
-var serializer                   = require('../../serializers/notification-serializer');
-var moment                       = require('moment');
-var Promise                      = require('bluebird');
-var collections                  = require('../../utils/collections');
-var mongoUtils                   = require('gitter-web-persistence-utils/lib/mongo-utils');
-var emailNotificationService     = require('../email-notification-service');
-var userSettingsService          = require('../user-settings-service');
-var debug                        = require('debug')('gitter:email-notification-generator-service');
-var userScopes                   = require('gitter-web-identity/lib/user-scopes');
+var _ = require("underscore");
+var troupeService = require("../troupe-service");
+var userService = require("../user-service");
+var unreadItemService = require("../unread-items");
+var serializer = require('../../serializers/notification-serializer');
+var moment = require('moment');
+var Promise = require('bluebird');
+var collections = require('../../utils/collections');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var emailNotificationService = require('../email-notification-service');
+var userSettingsService = require('../user-settings-service');
+var debug = require('debug')('gitter:app:email-notification-generator-service');
+var userScopes = require('gitter-web-identity/lib/user-scopes');
 
 var filterTestValues = config.get('notifications:filterTestValues');
 
