@@ -263,4 +263,12 @@ RoomWithPolicyService.prototype.updateRoomWelcomeMessage = secureMethod([allowAd
     });
 });
 
+/*
+ * Delete a room
+ */
+ RoomWithPolicyService.prototype.deleteRoom = secureMethod([allowAdmin], function() {
+   logger.warn('User deleting room ', { roomId: this.room._id, username: this.user.username, userId: this.user._id });
+   return roomService.deleteRoom(this.room);
+ });
+
 module.exports = RoomWithPolicyService;
