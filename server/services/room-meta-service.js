@@ -20,9 +20,9 @@ function findMetaByTroupeId(troupeId, metaKey) {
 function upsertMetaKey(troupeId, metaKey, value) {
   assert(mongoUtils.isLikeObjectId(troupeId));
   troupeId = mongoUtils.asObjectID(troupeId);
-    var query = { $set: {}};
-    query.$set[metaKey] = value;
-    return persistence.TroupeMeta.findOneAndUpdate({ troupeId: troupeId }, query, { upsert: true }).exec();
+  var query = { $set: {}};
+  query.$set[metaKey] = value;
+  return persistence.TroupeMeta.findOneAndUpdate({ troupeId: troupeId }, query, { upsert: true }).exec();
 }
 
 module.exports = {
