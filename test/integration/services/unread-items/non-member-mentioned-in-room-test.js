@@ -1,7 +1,7 @@
 "use strict";
 
 var testRequire = require('./../../test-require');
-var fixtureLoader = require('../../test-fixtures');
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assert = testRequire("assert");
 var chatService = testRequire("./services/chat-service");
 var unreadItemService = testRequire("./services/unread-items");

@@ -1,7 +1,7 @@
 'use strict';
 
 var testRequire = require('../../test-require');
-var fixtureLoader = require('../../test-fixtures');
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assertUtils = require('../../assert-utils')
 var serialize = testRequire('./serializers/serialize');
 var UserStrategy = testRequire('./serializers/rest/user-strategy');

@@ -1,16 +1,16 @@
 "use strict";
 
-var testRequire = require('./test-require');
 var Promise = require('bluebird');
 var persistence = require('gitter-web-persistence');
-var roomMembershipFlags = testRequire("./services/room-membership-flags");
 var util = require('util');
 var uuid = require('node-uuid');
 var debug = require('debug')('gitter:tests:test-fixtures');
-
 var counter = 0;
 
 var seed = Date.now();
+
+// This corresponds with require("/services/room-membership-flags").MODES.all
+var DEFAULT_ROOM_MEMBERSHIP_FLAGS = 109;
 
 function generateEmail() {
   return 'testuser' + (++counter) + seed + '@troupetest.local';
@@ -187,7 +187,7 @@ function createExpectedFixtures(expected, done) {
           flags = membership.flags;
           lurk = membership.lurk;
         } else {
-          flags = roomMembershipFlags.MODES.all;
+          flags = DEFAULT_ROOM_MEMBERSHIP_FLAGS;
           lurk = false;
         }
 
