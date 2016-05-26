@@ -80,7 +80,7 @@ module.exports = function(searchQuery, user, options, callback) {
 
     var merged = gitterUsers.concat(githubUsers);
     var noSelfMentions = merged.filter(function(user) {
-      return user.username != excludedUsername;
+      return user.username !== excludedUsername;
     });
     var deduplicated = _.uniq(noSelfMentions, false, function(user) {
       return user.username;
