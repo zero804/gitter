@@ -3,6 +3,7 @@
 var express = require('express');
 var appRender = require('./render');
 var renderChat = require('./render/chat');
+var renderUserNotSignedUp = require('./render/user-not-signed-up');
 var appMiddleware = require('./middleware');
 var recentRoomService = require('../../services/recent-room-service');
 var isPhone = require('../../web/is-phone');
@@ -51,7 +52,7 @@ var mainFrameMiddlewarePipeline = [
   },
   function (err, req, res, next) {
     if (err && err.userNotSignedUp && !isPhone(req.headers['user-agent'])) {
-      appRender.renderUserNotSignedUpMainFrame(req, res, next, 'chat');
+      renderUserNotSignedUp.renderUserNotSignedUpMainFrame(req, res, next, 'chat');
       return;
     }
     return next(err);
@@ -85,7 +86,7 @@ var chatMiddlewarePipeline = [
   },
   function (err, req, res, next) {
     if (err && err.userNotSignedUp) {
-      appRender.renderUserNotSignedUp(req, res, next);
+      renderUserNotSignedUp.renderUserNotSignedUp(req, res, next);
       return;
     }
     return next(err);

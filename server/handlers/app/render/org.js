@@ -13,8 +13,6 @@ var orgPermissionModel = require('gitter-web-permissions/lib/models/org-permissi
 var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 var generateRoomCardContext = require('gitter-web-shared/templates/partials/room-card-context-generator');
 
-/* How many chats to send back */
-
 function renderOrgPage(req, res, next, options) {
   var orgUri = options.orgUri;
   var findChildRoomOptions = {};
