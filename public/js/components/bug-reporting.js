@@ -1,12 +1,12 @@
 "use strict";
 
-var context   = require('../utils/context');
+var context = require('../utils/context');
 var clientEnv = require('gitter-client-env');
 var appEvents = require('../utils/appevents');
-var Raven     = require('raven-js');
-var log       = require('../utils/log');
+var Raven = require('raven-js');
+var log = require('../utils/log');
 
-var ravenUrl  = clientEnv['ravenUrl'];
+var ravenUrl = clientEnv['ravenUrl'];
 
 // See https://github.com/troupe/gitter-webapp/issues/1056
 // TODO: renable unhandled rejections

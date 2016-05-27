@@ -1,15 +1,15 @@
 /*jshint trailing: false, unused: true, node: true */
 "use strict";
 
-var os            = require("os");
-var appVersion    = require('gitter-app-version');
-var mongoose      = require('mongoose');
-var env           = require('gitter-web-env');
-var logger        = env.logger;
-var config        = env.config;
-var redis         = env.redis;
+var os = require("os");
+var appVersion = require('gitter-app-version');
+var mongoose = require('mongoose');
+var env = require('gitter-web-env');
+var logger = env.logger;
+var config = env.config;
+var redis = env.redis;
 var errorReporter = env.errorReporter;
-var StatusError   = require('statuserror');
+var StatusError = require('statuserror');
 
 module.exports = [
   function(req, res, next) {

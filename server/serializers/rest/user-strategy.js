@@ -1,19 +1,19 @@
 /* eslint complexity: ["error", 19] */
 "use strict";
 
-var env                      = require('gitter-web-env');
-var winston                  = env.logger;
-var troupeService            = require("../../services/troupe-service");
-var identityService          = require("gitter-web-identity");
-var presenceService          = require("gitter-web-presence");
-var Promise                  = require('bluebird');
-var collections              = require("../../utils/collections");
+var env = require('gitter-web-env');
+var winston = env.logger;
+var troupeService = require("../../services/troupe-service");
+var identityService = require("gitter-web-identity");
+var presenceService = require("gitter-web-presence");
+var Promise = require('bluebird');
+var collections = require("../../utils/collections");
 var GithubContributorService = require('gitter-web-github').GitHubContributorService;
-var getVersion               = require('../get-model-version');
-var billingService           = require('../../services/billing-service');
-var leanUserDao              = require('../../services/daos/user-dao').full;
-var resolveUserAvatarUrl     = require('gitter-web-shared/avatars/resolve-user-avatar-url');
-var userScopes               = require('gitter-web-identity/lib/user-scopes');
+var getVersion = require('../get-model-version');
+var billingService = require('../../services/billing-service');
+var leanUserDao = require('../../services/daos/user-dao').full;
+var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-url');
+var userScopes = require('gitter-web-identity/lib/user-scopes');
 
 function UserPremiumStatusStrategy() {
   var usersWithPlans;
@@ -199,6 +199,10 @@ function UserStrategy(options) {
     return Promise.all(strategies);
   };
 
+  function displayNameForUser(user) {
+    return options.exposeRawDisplayName ? user.displayName : user.displayName || user.username
+  }
+
   this.map = function(user) {
     if (!user) return null;
     var scopes;
@@ -238,9 +242,8 @@ function UserStrategy(options) {
       id: user.id,
       status: options.includeEmail ? user.status : undefined,
       username: user.username,
-      displayName: options.exposeRawDisplayName ? user.displayName : user.getDisplayName(),
-      fallbackDisplayName: options.exposeRawDisplayName && user.getDisplayName(),
-      url: user.getHomeUrl(),
+      displayName: displayNameForUser(user),
+      url: '/' + user.username,
       avatarUrlSmall: resolveUserAvatarUrl(user, 60),
       avatarUrlMedium: resolveUserAvatarUrl(user, 128),
       scopes: scopes,

@@ -1,15 +1,15 @@
 "use strict";
-var Marionette             = require('backbone.marionette');
-var ModalView              = require('views/modals/modal');
-var Backbone               = require('backbone');
-var context                = require('utils/context');
-var clientEnv              = require('gitter-client-env');
-var apiClient              = require('components/apiClient');
-var template               = require('./tmpl/addPeople.hbs');
+var Marionette = require('backbone.marionette');
+var ModalView = require('views/modals/modal');
+var Backbone = require('backbone');
+var context = require('utils/context');
+var clientEnv = require('gitter-client-env');
+var apiClient = require('components/apiClient');
+var template = require('./tmpl/addPeople.hbs');
 var userSearchItemTemplate = require('./tmpl/userSearchItem.hbs');
-var itemTemplate           = require('./tmpl/addPeopleItemView.hbs');
-var Typeahead              = require('views/controls/typeahead');
-var userSearchModels       = require('collections/user-search');
+var itemTemplate = require('./tmpl/addPeopleItemView.hbs');
+var Typeahead = require('views/controls/typeahead');
+var userSearchModels = require('collections/user-search');
 require('views/behaviors/widgets');
 
 
@@ -230,7 +230,7 @@ if(context.troupe().get('security') !== 'PRIVATE') {
   modalButtons.push({ action: "share", pull: 'right', text: "Share this room", className: "modal--default__footer__link"});
 }
 
-module.exports =  ModalView.extend({
+module.exports = ModalView.extend({
   disableAutoFocus: true,
   initialize: function(options) {
     options = options || {};

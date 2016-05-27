@@ -1,7 +1,7 @@
 'use strict';
 
-var speedy      = require("speedy");
-var mongoUtils    = require('gitter-web-persistence-utils/lib/mongo-utils');
+var speedy = require("speedy");
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var _ = require('underscore');
 
 var sets = {

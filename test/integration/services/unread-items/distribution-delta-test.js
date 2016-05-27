@@ -1,9 +1,9 @@
 'use strict';
 
-var testRequire  = require('../../test-require');
-var mongoUtils   = require('gitter-web-persistence-utils/lib/mongo-utils');
-var assert       = require('assert');
-var Promise      = require('bluebird');
+var testRequire = require('../../test-require');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var assert = require('assert');
+var Promise = require('bluebird');
 var Distribution = testRequire('./services/unread-items/distribution');
 var roomMembershipFlags = testRequire('./services/room-membership-flags');
 var MODES = roomMembershipFlags.MODES;

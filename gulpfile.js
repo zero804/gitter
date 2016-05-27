@@ -81,6 +81,9 @@ var cssWatchGlob = 'public/**/*.less';
 
 /* Don't do clean in gulp, use make */
 var RUN_TESTS_IN_PARALLEL = false;
+if (process.env.PARALLEL_TESTS) {
+  RUN_TESTS_IN_PARALLEL = true;
+}
 
 var testModules = {
 };
@@ -94,6 +97,11 @@ modulesWithTest.forEach(function(testDir) {
     includeInFast: false
   }
 });
+
+testModules['api-tests'] = {
+  files: ['./test/api-tests/**/*.js'],
+  includeInFast: false
+};
 
 testModules.integration = {
   files: ['./test/integration/**/*.js', './test/public-js/**/*.js'],
@@ -144,11 +152,15 @@ gulp.task('validate-config', function() {
 });
 
 gulp.task('validate-eslint', function() {
+  mkdirp.sync('output/eslint/');
   return gulp.src(['**/*.js','!node_modules/**','!public/repo/**'])
     .pipe(eslint({
       quiet: argv.quiet
     }))
-    .pipe(eslint.format())
+    .pipe(eslint.format('unix'))
+    .pipe(eslint.format('checkstyle', function(checkstyleData) {
+      fs.writeFileSync('output/eslint/checkstyle.xml', checkstyleData);
+    }))
     .pipe(eslint.failAfterError());
 });
 

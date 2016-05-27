@@ -1,8 +1,8 @@
 'use strict';
 
-var speedy      = require("speedy");
+var speedy = require("speedy");
 var troupeService = require('../../server/services/troupe-service');
-var onMongoConnect    = require('../../server/utils/on-mongo-connect');
+var onMongoConnect = require('../../server/utils/on-mongo-connect');
 
 onMongoConnect(function() {
   speedy.run({

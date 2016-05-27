@@ -1,12 +1,12 @@
 "use strict";
 
-var Marionette   = require('backbone.marionette');
-var context      = require('utils/context');
-var template     = require('./tmpl/parentSelectView.hbs');
+var Marionette = require('backbone.marionette');
+var context = require('utils/context');
+var template = require('./tmpl/parentSelectView.hbs');
 var itemTemplate = require('./tmpl/parentItemView.hbs');
-var Typeahead    = require('views/controls/typeahead');
-var Backbone     = require('backbone');
-var cdn          = require('../../utils/cdn');
+var Typeahead = require('views/controls/typeahead');
+var Backbone = require('backbone');
+var cdn = require('../../utils/cdn');
 
 module.exports = (function() {
 
@@ -132,7 +132,7 @@ module.exports = (function() {
         this.typeahead.hide();
       }
 
-      if  (m.get('type') === 'repo') {
+      if (m.get('type') === 'repo') {
         this.ui.avatar.css("background-image", "url(" + cdn('images/icon-repo.png') + ")");
       } else {
         this.ui.avatar.css("background-image", "url(" + m.get('avatarUrl') + ")");

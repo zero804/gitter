@@ -1,24 +1,37 @@
 "use strict";
 
-var GitHubOrgService  = require('./github-org-service');
+var GitHubUserService = require('./github-user-service');
 var GitHubRepoService = require('./github-repo-service');
-var Promise           = require('bluebird');
-var debug             = require('debug')('gitter:app:github:github-uri-validator');
+var Promise = require('bluebird');
+var debug = require('debug')('gitter:app:github:github-uri-validator');
 
-function validateOrgUri(user, uri) {
-  debug("validateOrgUri: %s", uri);
-  var orgService = new GitHubOrgService(user);
-  return orgService.getOrg(uri)
-    .then(function(org) {
-      if(!org) return;
+function validateUserOrOrgUri(user, uri) {
+  debug("validateUserOrOrgUri: %s", uri);
+  var userService = new GitHubUserService(user);
+  return userService.getUser(uri)
+    .then(function(user) {
+      if(!user) return null;
 
-      return {
-        type: 'ORG',
-        uri: org.login,
-        description: org.name,
-        githubId: parseInt(org.id, 10) || undefined
-      };
+      switch (user.type) {
+        case 'Organization':
+          return {
+            type: 'ORG',
+            uri: user.login,
+            description: user.name,
+            githubId: parseInt(user.id, 10) || undefined
+          };
 
+        case 'User':
+          return {
+            type: 'USER',
+            uri: user.login,
+            description: user.name,
+            githubId: parseInt(user.id, 10) || undefined
+          };
+
+        default:
+          return null;
+      }
     });
 }
 
@@ -54,8 +67,7 @@ module.exports = Promise.method(function validateUri(user, uri) {
      *  already know if its a registered user and won't be
      *  in this code
      **/
-    return validateOrgUri(user, uri);
-
+    return validateUserOrOrgUri(user, uri);
   }
 
   if(parts.length === 2) {

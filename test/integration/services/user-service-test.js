@@ -1,10 +1,10 @@
 /*global describe:true, it:true, before:true, after:true */
 "use strict";
 
-var testRequire   = require('./../test-require');
-var fixtureLoader = require('../test-fixtures');
-var assert        = testRequire("assert");
-var Promise       = require('bluebird');
+var testRequire = require('./../test-require');
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
+var assert = testRequire("assert");
+var Promise = require('bluebird');
 
 
 var fixture2 = {};

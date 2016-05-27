@@ -2,7 +2,7 @@
 
 var assert = require('assert');
 var RoomContextDelegate = require('../../lib/policies/room-context-delegate');
-var fixtureLoader = require('../../../../test/integration/test-fixtures');
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
 describe('room-context-delegate', function() {
 
