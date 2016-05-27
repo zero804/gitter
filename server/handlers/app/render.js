@@ -21,10 +21,8 @@ var isolateBurst = require('gitter-web-shared/burst/isolate-burst-array');
 var unreadItemService = require('../../services/unread-items');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var url = require('url');
-var cdn = require("../../web/cdn");
 var roomMembershipService = require('../../services/room-membership-service');
 var troupeService = require('../../services/troupe-service');
-var useragent = require('useragent');
 var _ = require('lodash');
 var GitHubOrgService = require('gitter-web-github').GitHubOrgService;
 var orgPermissionModel = require('gitter-web-permissions/lib/models/org-permissions-model');
@@ -36,97 +34,10 @@ var parseRoomsIntoLeftMenuRoomList = require('gitter-web-shared/rooms/left-menu-
 var generateLeftMenuSnapshot = require('../snapshots/left-menu-snapshot');
 var parseRoomsIntoLeftMenuFavouriteRoomList = require('gitter-web-shared/rooms/left-menu-room-favourite-list');
 var generateRoomCardContext = require('gitter-web-shared/templates/partials/room-card-context-generator');
-
+var getSubResources = require('./render/sub-resources');
 /* How many chats to send back */
 var INITIAL_CHAT_COUNT = 50;
 var ROSTER_SIZE = 25;
-
-var WELCOME_MESSAGES = [
-  'Code for people',
-  'Talk about it',
-  "Let's try something new",
-  'Computers are pretty cool',
-  "Don't build Skynet",
-  'Make the world better',
-  'Computers need people',
-  'Everyone secretly loves robots',
-  'Initial commit',
-  'Hello World',
-  'From everywhere, with love',
-  '200 OK',
-  'UDP like you just dont care',
-  'Lovely code for lovely people',
-  "Don't drop your computer",
-  'Learn, Teach, Repeat. Always Repeat.',
-  'Help out on the projects you love',
-  "HTTP 418: I'm a teapot",
-  'Hey there, nice to see you',
-  'Welcome home'
-];
-
-function cdnSubResources(resources, jsRoot) {
-  var resourceList = ['vendor'];
-  if (resources) {
-    resourceList = resourceList.concat(resources);
-  }
-
-  return resourceList.map(function(f) {
-      return cdn(jsRoot + '/' + f + '.js');
-    })
-    .concat(cdn('fonts/sourcesans/SourceSansPro-Regular.otf.woff'));
-}
-
-var SUBRESOURCE_MAPPINGS = {
-  'router-app': ['router-app', 'router-chat'],
-  'mobile-nli-app': ['mobile-nli-app', 'router-nli-chat'],
-  'mobile-userhome': ['mobile-userhome'],
-  'userhome': ['userhome'],
-  'router-chat': ['router-chat'],
-  'router-nli-chat': ['router-nli-chat'],
-  'mobile-app': ['mobile-app']
-};
-
-var CACHED_SUBRESOURCES = Object.keys(SUBRESOURCE_MAPPINGS).reduce(function(memo, key) {
-  memo[key] = cdnSubResources(SUBRESOURCE_MAPPINGS[key], 'js');
-  return memo;
-}, {});
-
-function getSubResources(entryPoint, jsRoot) {
-  if (!jsRoot) {
-    return CACHED_SUBRESOURCES[entryPoint];
-  }
-
-  return cdnSubResources(SUBRESOURCE_MAPPINGS[entryPoint], jsRoot);
-}
-
-function renderHomePage(req, res, next) {
-  contextGenerator.generateNonChatContext(req)
-    .then(function (troupeContext) {
-      var page = req.isPhone ? 'mobile/mobile-userhome' : 'userhome-template';
-
-      var osName = useragent.parse(req.headers['user-agent']).os.family.toLowerCase();
-
-      var isLinux = osName.indexOf('linux') >= 0;
-      var isOsx = osName.indexOf('mac') >= 0;
-      var isWindows = osName.indexOf('windows') >= 0;
-
-      // show everything if we cant confirm the os
-      var showOsxApp = !isLinux && !isWindows;
-      var showWindowsApp = !isLinux && !isOsx;
-      var showLinuxApp = !isOsx && !isWindows;
-
-      res.render(page, {
-        welcomeMessage: WELCOME_MESSAGES[Math.floor(Math.random() * WELCOME_MESSAGES.length)],
-        showOsxApp: showOsxApp,
-        showWindowsApp: showWindowsApp,
-        showLinuxApp: showLinuxApp,
-        troupeContext: troupeContext,
-        isNativeDesktopApp: troupeContext.isNativeDesktopApp,
-        billingBaseUrl: nconf.get('web:billingBaseUrl')
-      });
-    })
-    .catch(next);
-}
 
 function getPermalinkChatForRoom(troupe, chatId) {
   if (!troupe || troupe.security !== 'PUBLIC') return Promise.resolve();
@@ -395,19 +306,6 @@ function renderChatPage(req, res, next) {
   }, next);
 }
 
-function renderMobileUserHome(req, res, next) {
-  contextGenerator.generateNonChatContext(req)
-  .then(function(troupeContext) {
-    res.render('mobile/mobile-userhome', {
-      troupeName: req.uriContext.uri,
-      troupeContext: troupeContext,
-      agent: req.headers['user-agent'],
-      user: req.user
-    });
-  })
-  .catch(next);
-}
-
 function renderMobileChat(req, res, next) {
   return renderChat(req, res, {
     template: 'mobile/mobile-chat',
@@ -421,16 +319,6 @@ function renderMobileNativeEmbeddedChat(req, res) {
     isMobile: true,
     troupeContext: {}
   });
-}
-
-function renderMobileNativeUserhome(req, res) {
-  contextGenerator.generateNonChatContext(req)
-    .then(function(troupeContext) {
-      res.render('mobile/native-userhome-app', {
-        bootScriptName: 'mobile-native-userhome',
-        troupeContext: troupeContext
-      });
-    });
 }
 
 function renderMobileNotLoggedInChat(req, res, next) {
@@ -673,19 +561,16 @@ function renderUserNotSignedUpMainFrame(req, res, next, frame) {
 }
 
 module.exports = exports = {
-  renderHomePage: renderHomePage,
   renderChatPage: renderChatPage,
   renderMainFrame: renderMainFrame,
   renderOrgPage: renderOrgPage,
   renderMobileChat: renderMobileChat,
-  renderMobileUserHome: renderMobileUserHome,
   renderEmbeddedChat: renderEmbeddedChat,
   renderNotLoggedInEmbeddedChat: renderNotLoggedInEmbeddedChat,
   renderChatCard: renderChatCard,
   renderMobileNotLoggedInChat: renderMobileNotLoggedInChat,
   renderNotLoggedInChatPage: renderNotLoggedInChatPage,
   renderMobileNativeEmbeddedChat: renderMobileNativeEmbeddedChat,
-  renderMobileNativeUserhome: renderMobileNativeUserhome,
   renderUserNotSignedUp: renderUserNotSignedUp,
   renderUserNotSignedUpMainFrame: renderUserNotSignedUpMainFrame
 };
