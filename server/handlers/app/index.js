@@ -2,6 +2,7 @@
 
 var express = require('express');
 var appRender = require('./render');
+var renderChat = require('./render/chat');
 var appMiddleware = require('./middleware');
 var recentRoomService = require('../../services/recent-room-service');
 var isPhone = require('../../web/is-phone');
@@ -36,12 +37,12 @@ var mainFrameMiddlewarePipeline = [
           //return appRender.renderOrgPage(req, res, next);
           return res.redirect('/orgs/' + req.uriContext.uri + '/rooms/~iframe');
         }
-        appRender.renderMobileNotLoggedInChat(req, res, next);
+        renderChat.renderMobileNotLoggedInChat(req, res, next);
         return;
       }
 
       saveRoom(req);
-      appRender.renderMobileChat(req, res, next);
+      renderChat.renderMobileChat(req, res, next);
 
     } else {
       appRender.renderMainFrame(req, res, next, 'chat');
@@ -72,13 +73,13 @@ var chatMiddlewarePipeline = [
 
     if(req.user) {
       saveRoom(req);
-      appRender.renderChatPage(req, res, next);
+      renderChat.renderChatPage(req, res, next);
     } else {
       // We're doing this so we correctly redirect a logged out
       // user to the right chat post login
       var url = req.originalUrl;
       req.session.returnTo = url.replace(/\/~\w+(\?.*)?$/,"");
-      appRender.renderNotLoggedInChatPage(req, res, next);
+      renderChat.renderNotLoggedInChatPage(req, res, next);
     }
 
   },
@@ -101,9 +102,9 @@ var embedMiddlewarePipeline = [
     if(!req.uriContext.troupe) return next(404);
 
     if (req.user) {
-      appRender.renderEmbeddedChat(req, res, next);
+      renderChat.renderEmbeddedChat(req, res, next);
     } else {
-      appRender.renderNotLoggedInEmbeddedChat(req, res, next);
+      renderChat.renderNotLoggedInEmbeddedChat(req, res, next);
     }
   }
 ];
@@ -116,7 +117,7 @@ var cardMiddlewarePipeline = [
     if(!req.uriContext.troupe) return next(404);
     if(req.uriContext.troupe.security !== 'PUBLIC') return next(403);
     if(!req.query.at) return next(400);
-    appRender.renderChatCard(req, res, next);
+    renderChat.renderChatCard(req, res, next);
   }
 ];
 
