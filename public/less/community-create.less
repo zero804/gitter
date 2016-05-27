@@ -28,19 +28,21 @@
 @org-item-height: @org-item-avatar-size;
 @org-item-spacing: 2rem;
 
-@org-area-total-height: (@number-org-items-per-column * @org-item-height) + (@number-org-items-per-column * @org-item-spacing);
-
 @number-repo-items-per-column: 5;
 @repo-item-avatar-size: 2rem;
 @repo-item-height: @repo-item-avatar-size;
+
+@org-area-padding: @repo-item-avatar-size;
+@org-area-total-height: (@number-org-items-per-column * @org-item-height) + (@number-org-items-per-column * @org-item-spacing);
+
 @repo-item-spacing: (@org-area-total-height - (@number-repo-items-per-column * @repo-item-height)) / @number-repo-items-per-column;
 
 
 @number-invite-user-items-per-column: 2;
 @invite-user-item-avatar-size: 3.6rem;
 @invite-user-item-height: @invite-user-item-avatar-size;
-@invite-user-item-spacing: 1.6rem;
-@invite-user-area-total-height: @org-area-total-height - (@org-item-height + @org-item-spacing);
+@invite-user-item-spacing: 2rem;
+@invite-user-area-total-height: @org-area-total-height - (@invite-user-item-height + @invite-user-item-spacing);
 
 
 @people-list-item-spacing: .4rem;
@@ -236,6 +238,9 @@
   @media (max-width: 600px) {
     width: 95%;
   }
+
+  // Sometimes the wrapper can be a form, forms.less reset :(
+  margin: 0;
 }
 
 @keyframes community-create-step-move-in-animation {
@@ -330,6 +335,7 @@
 
 
 .primary-community-heading {
+  max-width: 600px;
   min-height: 2em;
 
   color: #ffffff;
@@ -482,12 +488,13 @@
 
 
 .community-create-associated-project-section {
-  height: @org-area-total-height + @invited-area-total-height + @invited-area-spacing-top;
-  padding-top: @org-item-height + @org-item-spacing;
+  height: (@org-area-total-height + @org-area-padding) + @invited-area-total-height + @invited-area-spacing-top;
+  padding-top: @org-item-height;
 }
 
 .community-create-associated-project-copy {
   display: none;
+  margin: 0;
 
   color: @subdued-text-color;
 
@@ -605,7 +612,7 @@
 
 .community-create-github-project-list-wrapper {
   overflow: auto;
-  height: @org-area-total-height;
+  height: 100%;
 
   &::-webkit-scrollbar-thumb {
     background-color: rgba(255, 255, 255, .2);
@@ -674,7 +681,17 @@
 
 
 .community-create-org-list-root {
-  margin-top: @secondary-input-height + @secondary-input-spacing-top + @secondary-input-spacing-bottom;
+  height: @org-area-total-height + @org-area-padding;
+  margin-top: @secondary-input-spacing-top;
+  //margin-top: @secondary-input-height + @secondary-input-spacing-top + @secondary-input-spacing-bottom;
+  padding: (@org-area-padding - (@org-item-spacing / 2)) @org-area-padding;
+
+  background-color: rgba(0, 0, 0, .2);
+
+  // Marrionette extra region div
+  & > div {
+    height: 100%;
+  }
 }
 
 .community-create-org-list {
@@ -694,6 +711,8 @@
   height: @org-item-avatar-size;
   vertical-align: middle;
   margin-right: 1.6rem;
+
+  background-color: #ffffff;
 }
 
 
@@ -701,6 +720,17 @@
   .secondary-bare-input();
   margin-top: @secondary-input-spacing-top;
   margin-bottom: @secondary-input-spacing-bottom;
+}
+
+.community-create-repo-list-root {
+  height: @org-area-total-height + @org-area-padding;
+  padding: (@org-area-padding - (@repo-item-spacing / 2)) @org-area-padding;
+  background-color: rgba(0, 0, 0, .2);
+
+  // Marrionette extra region div
+  & > div {
+    height: 100%;
+  }
 }
 
 .community-create-repo-list {
@@ -720,16 +750,25 @@
   height: @repo-item-avatar-size;
   vertical-align: middle;
   margin-right: .3rem;
+
+  background-color: #ffffff;
 }
 
-.community-create-org-missing-note,
-.community-create-repo-missing-note {
-  height: @invited-area-total-height;
+
+.community-create-org-missing-note {
+  // @secondary-input-spacing-top is already used on top of org list
+  @secondary-input-leftover-height: @secondary-input-height + @secondary-input-spacing-bottom;
+  height: @invited-area-total-height + @secondary-input-leftover-height;
   margin-top: @invited-area-spacing-top;
   margin-bottom: 0;
 }
 
 
+.community-create-repo-missing-note {
+  min-height: @invited-area-total-height;
+  margin-top: @invited-area-spacing-top;
+  margin-bottom: 0;
+}
 
 .community-invite-people-name-input {
   .primary-community-name-input();
@@ -838,12 +877,23 @@
 }
 
 .community-create-invite-user-result-list-root {
-  margin-top: @secondary-input-height + @secondary-input-spacing-top + @secondary-input-spacing-bottom;
+  height: @invite-user-area-total-height + @org-area-padding;
+
+  margin-top: @secondary-input-spacing-top;
+  //margin-top: @secondary-input-height + @secondary-input-spacing-top + @secondary-input-spacing-bottom;
+  padding: (@org-area-padding - (@invite-user-item-spacing / 2)) @org-area-padding;
+
+  background-color: rgba(0, 0, 0, .2);
+
+  // Marrionette extra region div
+  & > div {
+    height: 100%;
+  }
 }
 
 .community-create-invite-user-result-list-wrapper {
   overflow: auto;
-  height: @invite-user-area-total-height;
+  height: 100%;
 }
 
 .community-create-invite-user-result-list {
@@ -887,13 +937,16 @@
   width: @invite-user-item-avatar-size;
   height: @invite-user-item-avatar-size;
   margin-right: 1rem;
+
+  background-color: #ffffff;
 }
 
 
 
 
 .community-create-invite-list-root {
-  min-height: @people-list-item-height;
+  // @secondary-input-spacing-top is already used on the invite user result list
+  min-height: @people-list-item-height + (@secondary-input-height + @secondary-input-spacing-bottom);
   margin-top: @invite-user-item-spacing;
 }
 
@@ -930,6 +983,8 @@
 .community-create-people-list-item-avatar {
   width: @invite-user-item-avatar-size;
   height: @invite-user-item-avatar-size;
+
+  background-color: #ffffff;
 }
 
 .community-create-people-list-item-overlay {
@@ -975,24 +1030,23 @@
 }
 
 
-
+@overview-extra-space-section-offset: 2rem;
+.community-create-overview-info-area {
+  height: @overview-extra-space-section-offset + @primary-input-height + @primary-input-spacing-bottom + @secondary-input-height + @secondary-input-spacing-top + @secondary-input-spacing-bottom;
+  margin-top: @primary-input-spacing-top;
+}
 
 .community-create-overview-invite-area {
-  height: @org-area-total-height + @invited-area-total-height + @invited-area-spacing-top;
+  height: -@overview-extra-space-section-offset + (@org-area-total-height + @org-area-padding) + @invited-area-total-height + @invited-area-spacing-top;
   padding-top: 3rem;
   border-top: 2px solid rgba(255,255,255,.2);
 }
 
-.community-create-overview-info-area {
-  height: @primary-input-height + @primary-input-spacing-bottom + @secondary-input-height + @secondary-input-spacing-top + @secondary-input-spacing-bottom;
-  margin-top: 3rem;
-}
-
 .community-create-overview-community-name {
-  margin-bottom: 1.2rem;
+  margin-bottom: 1.8rem;
 
-  font-size: 2.3rem;
-  font-weight: bold;
+  font-weight: 300;
+  line-height: 1;
 }
 
 .community-create-overview-url-heading {
@@ -1000,11 +1054,12 @@
 
   color: fade(@base-text-color, 60%);
   font-size: 1.8rem;
-  font-weight: normal;
+  font-weight: 300;
 }
 
 .community-create-overview-github-link {
   .community-create-general-link();
+  font-weight: 300;
 }
 
 .community-create-overview-invite-list-heading {

@@ -86,8 +86,8 @@ module.exports = CommunityCreateBaseStepView.extend({
     'input @ui.communitySlugInput': 'onCommunitSlugInputChange',
     'click @ui.githubProjectLink': 'onGitHubProjectLinkActivated',
 
-    'click @ui.advancedOptionsButton': 'onAdvancedOptionsToggle',
-    'click @ui.subRoomSubmitButton': 'onSubRoomSubmit'
+    //'click @ui.advancedOptionsButton': 'onAdvancedOptionsToggle',
+    //'click @ui.subRoomSubmitButton': 'onSubRoomSubmit'
   }),
 
   modelEvents: _.extend({}, CommunityCreateBaseStepView.prototype.modelEvents, {
@@ -125,13 +125,15 @@ module.exports = CommunityCreateBaseStepView.extend({
     });
   },
 
-  onStepNext: function() {
+  onStepNext: function(e) {
     this.validateStep();
     var isValid = this.model.get('valid');
 
     if(isValid) {
       this.communityCreateModel.set('stepState', this.communityCreateModel.STEP_CONSTANT_MAP.invite);
     }
+
+    e.preventDefault();
   },
 
   onGitHubProjectLinkActivated: function(e) {

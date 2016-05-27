@@ -139,7 +139,7 @@ module.exports = CommunityCreateBaseStepView.extend({
     this.communityCreateModel.get('peopleToInvite').remove(person);
   },
 
-  onEmailSubmit: function() {
+  onEmailSubmit: function(e) {
     var newEmailAddress = this.ui.emailInput[0].value;
 
     if(newEmailAddress.length) {
@@ -150,6 +150,8 @@ module.exports = CommunityCreateBaseStepView.extend({
 
     // Clear the input
     this.ui.emailInput[0].value = '';
+
+    e.preventDefault();
   },
 
   onEmailRemoved: function(email) {
