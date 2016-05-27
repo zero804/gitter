@@ -313,7 +313,10 @@
     "task-watch": "gulp watch",
     "browser-build-tests": "webpack --config ./test/in-browser/webpack.config.js",
     "browser-run-test": "cd ./test/in-browser/fixtures && devtool -chq runner.js",
-    "browser-test": "npm run browser-build-tests && npm run browser-run-test"
+    "browser-test": "npm run browser-build-tests && npm run browser-run-test",
+    "browser-watch-build-tests": "webpack -w --config ./test/in-browser/webpack.config.js",
+    "browser-watch-run-tests": "cd ./test/in-browser/fixtures && devtool -w -c -h runner.js",
+    "browser-watch-test": "npm run browser-watch-build-tests & npm run browser-watch-run-tests"
   },
   "git": {
     "scripts": {
