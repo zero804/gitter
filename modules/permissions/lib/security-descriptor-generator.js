@@ -39,15 +39,33 @@ function generateUserSecurityDescriptor(user, options) {
 function generateOrgSecurityDescriptor(user, options) {
   var githubId = options.githubId;
   var uri = options.uri;
+  var security = options.security;
 
-  return {
-    type: 'GH_ORG',
-    members: 'PUBLIC',
-    admins: 'GH_ORG_MEMBER',
-    public: true,
-    linkPath: uri,
-    externalId: githubId
-  };
+  switch(security || null) {
+    case 'PUBLIC':
+    case null:
+      return {
+        type: 'GH_ORG',
+        members: 'PUBLIC',
+        admins: 'GH_ORG_MEMBER',
+        public: true,
+        linkPath: uri,
+        externalId: githubId
+      };
+
+    case 'PRIVATE':
+      return {
+        type: 'GH_ORG',
+        members: 'GH_ORG_MEMBER',
+        admins: 'GH_ORG_MEMBER',
+        public: false,
+        linkPath: uri,
+        externalId: githubId
+      };
+
+  }
+
+
 }
 
 function generateRepoSecurityDescriptor(user, options) {
