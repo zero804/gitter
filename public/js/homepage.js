@@ -17,7 +17,7 @@ require('utils/tracking');
 
 var active = [];
 
-var featuredRooms  = [
+var featuredRooms = [
   { uri: 'marionettejs/backbone.marionette',
     name: 'Marionette',
     language: 'JavaScript',
@@ -173,7 +173,7 @@ function initEmbedPanel() {
 }
 
 function initAppsPanelScrollListener() {
-  var $panel =  $('#apps-panel');
+  var $panel = $('#apps-panel');
   var $window = $(window);
 
   $window.on('scroll', function(e) {

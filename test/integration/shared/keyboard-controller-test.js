@@ -55,11 +55,11 @@ var activeCollectionFixtureData3 = [
   { name: 'zxc3-3' }
 ];
 
-var activeCollectionFixtureData4 = [
-  { name: 'lor4-1' },
-  { name: 'ips4-2' },
-  { name: 'dol4-3' }
-];
+// var activeCollectionFixtureData4 = [
+//   { name: 'lor4-1' },
+//   { name: 'ips4-2' },
+//   { name: 'dol4-3' }
+// ];
 
 
 var ActiveModel = Backbone.Model.extend({

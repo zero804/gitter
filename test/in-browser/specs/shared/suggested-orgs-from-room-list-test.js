@@ -1,8 +1,8 @@
 /*global describe:true, it:true, beforeEach:true */
 'use strict';
 
-var assert                    = require('assert');
-var _                         = require('underscore');
+var assert = require('assert');
+var _ = require('underscore');
 var suggestedOrgsFromRoomList = require('../../../../shared/orgs/suggested-orgs-from-room-list');
 
 describe('suggestedOrgsFromRoomList', function() {

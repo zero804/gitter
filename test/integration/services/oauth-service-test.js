@@ -8,7 +8,7 @@ var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var oauthService = testRequire("./services/oauth-service");
 var Promise = require('bluebird');
 
-var fixtureLoader = require('../test-fixtures');
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var fixture = {};
 
 describe('oauth-service', function() {

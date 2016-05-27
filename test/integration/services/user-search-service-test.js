@@ -2,7 +2,7 @@
 "use strict";
 
 var testRequire = require('./../test-require');
-var fixtureLoader = require('../test-fixtures');
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var fixture = {};
 
 var userSearchService = testRequire('./services/user-search-service');
@@ -77,8 +77,8 @@ describe("User Search Service", function() {
         assert(searchResults.results.length >= 2, "Expect some users");
 
         assert(searchResults.results.filter(function(f) { return f.displayName === fixture.user1.displayName; }).length === 0, "Expect test user 1 not to be returned");
-        assert(searchResults.results.filter(function(f) { return f.displayName === fixture.user2.displayName; }).length == 1, "Expect test user 2");
-        assert(searchResults.results.filter(function(f) { return f.displayName === fixture.user3.displayName; }).length == 1, "Expect test user 3");
+        assert(searchResults.results.filter(function(f) { return f.displayName === fixture.user2.displayName; }).length === 1, "Expect test user 2");
+        assert(searchResults.results.filter(function(f) { return f.displayName === fixture.user3.displayName; }).length === 1, "Expect test user 3");
 
         return done();
       });

@@ -1,6 +1,6 @@
 "use strict";
 
-var useragent   = require('useragent');
+var useragent = require('useragent');
 
 module.exports = function(req, res, next) {
   var agent = useragent.parse(req.headers['user-agent']);

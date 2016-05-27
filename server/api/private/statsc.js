@@ -1,8 +1,8 @@
 "use strict";
 
-var env            = require('gitter-web-env');
-var stats          = env.stats;
-var logger         = env.logger;
+var env = require('gitter-web-env');
+var stats = env.stats;
+var logger = env.logger;
 
 function parse(incoming) {
   if (!incoming) return;
@@ -62,7 +62,7 @@ function handleStats(incomingStats) {
   });
 }
 
-module.exports =  function(req, res) {
+module.exports = function(req, res) {
   var stats = req.body;
 
   try {

@@ -1,20 +1,20 @@
 "use strict";
 
-var troupeService  = require('../../services/troupe-service');
-var userService    = require('../../services/user-service');
-var emailService   = require('../../services/email-notification-service');
-var env            = require('gitter-web-env');
-var Promise        = require('bluebird');
-var StatusError    = require('statuserror');
+var troupeService = require('../../services/troupe-service');
+var userService = require('../../services/user-service');
+var emailService = require('../../services/email-notification-service');
+var env = require('gitter-web-env');
+var Promise = require('bluebird');
+var StatusError = require('statuserror');
 var emailValidator = require('email-validator');
-var stats          = env.stats;
+var stats = env.stats;
 
-module.exports =  function (req, res, next) {
+module.exports = function (req, res, next) {
 
   var userId = req.body.userId || req.body.userid; // Why no capital I?
   var username = req.body.username;
   var roomId = req.body.roomId || req.body.roomid; // Why no capital I?
-  var email  = req.body.email;
+  var email = req.body.email;
 
   userId = userId ? String(userId) : null;
   username = username ? String(username) : null;

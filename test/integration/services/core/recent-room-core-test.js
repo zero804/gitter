@@ -1,10 +1,10 @@
 "use strict";
 
-var testRequire   = require('../../test-require');
-var assert        = require('assert');
-var Promise       = require('bluebird');
-var fixtureLoader = require('../../test-fixtures');
-var ObjectID      = require('mongodb').ObjectID;
+var testRequire = require('../../test-require');
+var assert = require('assert');
+var Promise = require('bluebird');
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
+var ObjectID = require('mongodb').ObjectID;
 var recentRoomCore = testRequire("./services/core/recent-room-core");
 
 describe('recent-room-core', function() {

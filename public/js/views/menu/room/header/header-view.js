@@ -1,8 +1,8 @@
 'use strict';
 
-var Marionette  = require('backbone.marionette');
-var template    = require('./header-view.hbs');
-var fastdom     = require('fastdom');
+var Marionette = require('backbone.marionette');
+var template = require('./header-view.hbs');
+var fastdom = require('fastdom');
 var toggleClass = require('utils/toggle-class');
 var cocktail = require('cocktail');
 var KeyboardEventMixin = require('views/keyboard-events-mixin');

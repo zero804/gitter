@@ -1,8 +1,8 @@
 "use strict";
 
-var Promise         = require('bluebird');
+var Promise = require('bluebird');
 var userHasSignedUp = require('../user-has-signed-up');
-var StatusError     = require('statuserror');
+var StatusError = require('statuserror');
 
 function ensureUserHasSignedUp(uri) {
   return userHasSignedUp(uri)
@@ -39,7 +39,7 @@ module.exports = function oneToOnePermissionsModel(user, right, uri, security) {
       return Promise.resolve(false);
 
     default:
-      throw 'Unknown right ' + right;
+      throw new StatusError(400, 'Unknown right ' + right);
   }
 
 };

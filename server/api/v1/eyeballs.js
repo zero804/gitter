@@ -7,7 +7,7 @@ var stats = env.stats;
 var presenceService = require('gitter-web-presence');
 var bayeux = require('../../web/bayeux');
 
-module.exports =  function(req, res, next) {
+module.exports = function(req, res, next) {
   var socketId = req.body.socketId;
   var on = parseInt(req.body.on, 10);
 

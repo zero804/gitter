@@ -1,11 +1,11 @@
 "use strict";
 
-var env            = require('gitter-web-env');
-var mailer         = env.mailer;
+var env = require('gitter-web-env');
+var mailer = env.mailer;
 
 var troupeTemplate = require('../utils/troupe-template');
-var Promise        = require('bluebird');
-var cdn            = require('../web/cdn');
+var Promise = require('bluebird');
+var cdn = require('../web/cdn');
 
 
 var CACHED = { };

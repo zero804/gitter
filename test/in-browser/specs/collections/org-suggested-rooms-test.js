@@ -1,9 +1,9 @@
 /*global describe:true, it:true, beforeEach:true */
 'use strict';
 
-var assert                 = require('assert');
-var sinon                  = require('sinon');
-var Backbone               = require('backbone');
+var assert = require('assert');
+var sinon = require('sinon');
+var Backbone = require('backbone');
 var SuggestedOrgCollection = require('public/js/collections/org-suggested-rooms');
 
 describe('SuggestedOrgCollection()', function() {
@@ -12,8 +12,8 @@ describe('SuggestedOrgCollection()', function() {
   var suggestedOrgCollection;
 
   beforeEach(function() {
-    model                        = new Backbone.Model({ selectedOrgName: 'test', id: 1});
-    suggestedOrgCollection       = new SuggestedOrgCollection([], { contextModel: model });
+    model = new Backbone.Model({ selectedOrgName: 'test', id: 1});
+    suggestedOrgCollection = new SuggestedOrgCollection([], { contextModel: model });
     suggestedOrgCollection.fetch = sinon.spy();
   });
 

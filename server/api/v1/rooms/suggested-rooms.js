@@ -12,7 +12,7 @@ module.exports = {
   id: 'resourceTroupeSuggestedRoom',
 
   index: function(req) {
-    var userId  = req.user._id;
+    var userId = req.user._id;
     return loadTroupeFromParam(req)
       .then(function(troupe) {
         return Promise.join(

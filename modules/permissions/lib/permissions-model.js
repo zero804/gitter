@@ -1,18 +1,18 @@
 "use strict";
 
-var env                  = require('gitter-web-env');
-var winston              = env.logger;
-var Promise              = require('bluebird');
+var env = require('gitter-web-env');
+var winston = env.logger;
+var Promise = require('bluebird');
 var userIsBannedFromRoom = require('./user-banned-from-room');
 
-var repoPermissionsModel        = require('./models/repo-permissions-model');
-var orgPermissionsModel         = require('./models/org-permissions-model');
-var oneToOnePermissionsModel    = require('./models/one-to-one-permissions-model');
-var orgChannelPermissionsModel  = require('./models/org-channel-permissions-model');
+var repoPermissionsModel = require('./models/repo-permissions-model');
+var orgPermissionsModel = require('./models/org-permissions-model');
+var oneToOnePermissionsModel = require('./models/one-to-one-permissions-model');
+var orgChannelPermissionsModel = require('./models/org-channel-permissions-model');
 var repoChannelPermissionsModel = require('./models/repo-channel-permissions-model');
 var userChannelPermissionsModel = require('./models/user-channel-permissions-model');
-var debug                       = require('debug')('gitter:app:permissions-model');
-var appEvents                   = require('gitter-web-appevents');
+var debug = require('debug')('gitter:app:permissions-model');
+var appEvents = require('gitter-web-appevents');
 
 function checkBan(user, uri) {
   if(!user) return Promise.resolve(false);
@@ -34,7 +34,7 @@ var ALL_RIGHTS = {
  */
 function permissionsModel(user, right, uri, roomType, security) {
   function log(x) {
-    debug("Permission: user=%s, uri=%s, roomType=%s, granted=%s, right=%s",  user && user.username, uri, roomType, x, right);
+    debug("Permission: user=%s, uri=%s, roomType=%s, granted=%s, right=%s", user && user.username, uri, roomType, x, right);
     return x;
   }
 

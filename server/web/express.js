@@ -1,17 +1,17 @@
 "use strict";
 
-var env            = require('gitter-web-env');
-var config         = env.config;
+var env = require('gitter-web-env');
+var config = env.config;
 
-var passport       = require('passport');
-var expressHbs     = require('express-hbs');
-var rememberMe     = require('./middlewares/rememberme-middleware');
-var resolveStatic  = require('./resolve-static');
-var bodyParser     = require('body-parser');
-var cookieParser   = require('cookie-parser');
+var passport = require('passport');
+var expressHbs = require('express-hbs');
+var rememberMe = require('./middlewares/rememberme-middleware');
+var resolveStatic = require('./resolve-static');
+var bodyParser = require('body-parser');
+var cookieParser = require('cookie-parser');
 var methodOverride = require('method-override');
-var session        = require('express-session');
-var devMode        = config.get('dev-mode');
+var session = require('express-session');
+var devMode = config.get('dev-mode');
 
 // Naughty naughty naught, install some extra methods on the express prototype
 require('./http');

@@ -1,9 +1,9 @@
 "use strict";
 
-var Marionette       = require('backbone.marionette');
-var appEvents        = require('../../utils/appevents');
-var platformKeys     = require('utils/platform-keys');
-var ModalView        = require('./modal');
+var Marionette = require('backbone.marionette');
+var appEvents = require('../../utils/appevents');
+var platformKeys = require('utils/platform-keys');
+var ModalView = require('./modal');
 var markdownTemplate = require('./tmpl/markdown-view.hbs');
 
 var View = Marionette.ItemView.extend({
@@ -27,7 +27,7 @@ var View = Marionette.ItemView.extend({
   }
 });
 
-module.exports =  ModalView.extend({
+module.exports = ModalView.extend({
     initialize: function(options) {
       options.title = "Markdown Help";
       ModalView.prototype.initialize.apply(this, arguments);

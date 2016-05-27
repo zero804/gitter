@@ -1,9 +1,9 @@
 'use strict';
 
-var Promise                       = require('bluebird');
-var StatusError                   = require('statuserror');
-var userSettingsService           = require('./user-settings-service');
-var userDefaultFlagsService       = require('./user-default-flags-service');
+var Promise = require('bluebird');
+var StatusError = require('statuserror');
+var userSettingsService = require('./user-settings-service');
+var userDefaultFlagsService = require('./user-default-flags-service');
 var userDefaultFlagsUpdateService = require('./user-default-flags-update-service');
 
 function standardHandler(settingsKey) {

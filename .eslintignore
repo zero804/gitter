@@ -8,3 +8,4 @@ test/in-browser/fixtures/coverage/**
 test/end-to-end/yslow/**
 public/js/utils/base64.js
 config/mongo-docker/*
+test/in-browser/fixtures/build/*
