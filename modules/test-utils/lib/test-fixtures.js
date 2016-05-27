@@ -525,7 +525,7 @@ fixtureLoader.setup = function(expected) {
 
   return fixture;
 };
-
+fixtureLoader.createExpectedFixtures = createExpectedFixtures;
 fixtureLoader.generateEmail = generateEmail;
 fixtureLoader.generateGithubId = generateGithubId;
 
