@@ -3,25 +3,25 @@
 var express = require('express');
 var appMiddleware = require('./app/middleware');
 var appRender = require('./app/render');
+var renderOrg = require('./app/render/org');
 var featureToggles = require('../web/middlewares/feature-toggles');
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
-function renderOrgPage(req, res, next) {
+function handleOrgPage(req, res, next) {
   req.uriContext = {
     uri: req.params.orgName
   };
 
-  appRender.renderOrgPage(req, res, next);
+  renderOrg.renderOrgPage(req, res, next);
 }
 
-
-function renderOrgPageInFrame(req, res, next) {
+function handleOrgPageInFrame(req, res, next) {
   req.uriContext = {
     uri: 'orgs/' + req.params.orgName + '/rooms'
   };
 
-  if (req.isPhone) return renderOrgPage(req, res, next);
+  if (req.isPhone) return handleOrgPage(req, res, next);
 
   appRender.renderMainFrame(req, res, next, 'iframe');
 }
@@ -29,11 +29,11 @@ function renderOrgPageInFrame(req, res, next) {
 router.get('/:orgName/rooms',
            featureToggles,
            appMiddleware.isPhoneMiddleware,
-           renderOrgPageInFrame);
+           handleOrgPageInFrame);
 
 router.get('/:orgName/rooms/~iframe',
-           featureToggles,
-           appMiddleware.isPhoneMiddleware,
-           renderOrgPage);
+  featureToggles,
+  appMiddleware.isPhoneMiddleware,
+  handleOrgPage);
 
 module.exports = router;

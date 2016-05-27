@@ -10,6 +10,7 @@ var timezoneMiddleware = require('../../web/middlewares/timezone');
 var featureToggles = require('../../web/middlewares/feature-toggles');
 var archive = require('./archive');
 var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
+var StatusError = require('statuserror');
 
 function saveRoom(req) {
   var userId = req.user && req.user.id;
@@ -34,9 +35,9 @@ var mainFrameMiddlewarePipeline = [
     if(req.isPhone) {
       if(!req.user) {
         if (req.uriContext.accessDenied) {
-          //return appRender.renderOrgPage(req, res, next);
           return res.redirect('/orgs/' + req.uriContext.uri + '/rooms/~iframe');
         }
+
         renderChat.renderMobileNotLoggedInChat(req, res, next);
         return;
       }
@@ -65,11 +66,10 @@ var chatMiddlewarePipeline = [
   timezoneMiddleware,
   function (req, res, next) {
     if (req.uriContext.accessDenied) {
-      //return appRender.renderOrgPage(req, res, next);
       return res.redirect('/orgs/' + req.uriContext.uri + '/rooms/~iframe');
     }
 
-    if(!req.uriContext.troupe) return next(404);
+    if(!req.uriContext.troupe) return next(new StatusError(404));
 
     if(req.user) {
       saveRoom(req);
@@ -99,7 +99,7 @@ var embedMiddlewarePipeline = [
   appMiddleware.isPhoneMiddleware,
   timezoneMiddleware,
   function (req, res, next) {
-    if(!req.uriContext.troupe) return next(404);
+    if(!req.uriContext.troupe) return next(new StatusError(404));
 
     if (req.user) {
       renderChat.renderEmbeddedChat(req, res, next);
@@ -114,9 +114,9 @@ var cardMiddlewarePipeline = [
   appMiddleware.uriContextResolverMiddleware({ create: false }),
   timezoneMiddleware,
   function (req, res, next) {
-    if(!req.uriContext.troupe) return next(404);
-    if(req.uriContext.troupe.security !== 'PUBLIC') return next(403);
-    if(!req.query.at) return next(400);
+    if(!req.uriContext.troupe) return next(new StatusError(404));
+    if(req.uriContext.troupe.security !== 'PUBLIC') return next(new StatusError(403));
+    if(!req.query.at) return next(new StatusError(400));
     renderChat.renderChatCard(req, res, next);
   }
 ];
@@ -157,7 +157,7 @@ var router = express.Router({ caseSensitive: true, mergeParams: true });
   router.post(path,
     appMiddleware.uriContextResolverMiddleware({ create: true }),
     function(req, res, next) {
-      if(!req.uriContext.troupe || !req.uriContext.ownUrl) return next(404);
+      if(!req.uriContext.troupe || !req.uriContext.ownUrl) return next(new StatusError(404));
 
       // GET after POST
       res.redirect(req.uri);
