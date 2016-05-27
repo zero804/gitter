@@ -7,7 +7,7 @@ var assert = require('assert');
  * This could do with a better name
  */
 function GroupWithPolicyService(group, user, policy) {
-  assert(group, 'Room required');
+  assert(group, 'Group required');
   assert(policy, 'Policy required');
   this.group = group;
   this.user = user;
