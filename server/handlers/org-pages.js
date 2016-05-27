@@ -2,7 +2,7 @@
 
 var express = require('express');
 var appMiddleware = require('./app/middleware');
-var appRender = require('./app/render');
+var appRenderMainFrame = require('./app/render/main-frame');
 var renderOrg = require('./app/render/org');
 var featureToggles = require('../web/middlewares/feature-toggles');
 
@@ -17,7 +17,7 @@ function handleOrgPage(req, res, next) {
 function handleOrgPageInFrame(req, res, next) {
   if (req.isPhone) return handleOrgPage(req, res, next);
 
-  appRender.renderMainFrame(req, res, next, 'iframe');
+  appRenderMainFrame.renderMainFrame(req, res, next, 'iframe');
 }
 
 router.get('/:orgName/rooms',
