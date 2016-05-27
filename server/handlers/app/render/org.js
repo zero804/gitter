@@ -15,25 +15,25 @@ var generateRoomCardContext = require('gitter-web-shared/templates/partials/room
 
 /* How many chats to send back */
 
-function renderOrgPage(req, res, next) {
-  var org = req.uriContext && req.uriContext.uri;
-  var opts = {};
+function renderOrgPage(req, res, next, options) {
+  var orgUri = options.orgUri;
+  var findChildRoomOptions = {};
 
   var ROOMS_PER_PAGE = 15;
 
   // Show only public rooms to not logged in users
-  if (!req.user) opts.security = 'PUBLIC';
+  if (!req.user) findChildRoomOptions.security = 'PUBLIC';
 
   var ghOrgService = new GitHubOrgService(req.user);
 
   return Promise.all([
-    ghOrgService.getOrg(org).catch(function() { return {login: org}; }),
-    troupeService.findChildRoomsForOrg(org, opts),
+    ghOrgService.getOrg(orgUri).catch(function() { return null; }),
+    troupeService.findChildRoomsForOrg(orgUri, findChildRoomOptions),
     contextGenerator.generateNonChatContext(req),
-    orgPermissionModel(req.user, 'admin', org),
-    orgPermissionModel(req.user, 'join', org)
+    orgPermissionModel(req.user, 'admin', orgUri),
+    orgPermissionModel(req.user, 'join', orgUri)
   ])
-  .spread(function (ghOrg,rooms, troupeContext, isOrgAdmin, isOrgMember) {
+  .spread(function(ghOrg, rooms, troupeContext, isOrgAdmin, isOrgMember) {
     var isStaff = !!(troupeContext.user || {}).staff;
 
     // Filter out PRIVATE rooms
@@ -98,11 +98,11 @@ function renderOrgPage(req, res, next) {
       // This is used to track pageViews in mixpanel
       troupeContext.isCommunityPage = true;
 
-      var orgUri = nconf.get('web:basepath') + "/orgs/" + org + "/rooms";
+      var fullUri = nconf.get('web:basepath') + "/orgs/" + orgUri + "/rooms";
       var text = encodeURIComponent('Explore our chat community on Gitter:');
       var url = 'https://twitter.com/share?' +
         'text=' + text +
-        '&url=' + orgUri +
+        '&url=' + fullUri +
         '&related=gitchat' +
         '&via=gitchat';
 
@@ -113,7 +113,7 @@ function renderOrgPage(req, res, next) {
         roomCount: roomCount,
         orgUserCount: orgUserCount,
         org: ghOrg || {
-          login: org
+          login: orgUri
         },
         rooms: rooms,
         troupeContext: troupeContext,
