@@ -2,7 +2,7 @@
 
 var testRequire = require('../test-require');
 var assert = require('assert');
-var fixtureLoader = require('../test-fixtures');
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
 var persistence = require('gitter-web-persistence');
