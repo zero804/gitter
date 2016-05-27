@@ -9,7 +9,7 @@ var assert = require('assert');
 describe('group-api', function() {
   this.timeout(10000);
 
-  var communityUri = 'I-heart-cats-Test-LOL';
+  var communityUri = '_I-heart-cats-Test-LOL';
 
   var app, request;
 
@@ -66,8 +66,10 @@ describe('group-api', function() {
       .send({
         uri: fixtureLoader.GITTER_INTEGRATION_ORG,
         name: 'Test',
-        type: 'GH_ORG',
-        linkPath: fixtureLoader.GITTER_INTEGRATION_ORG
+        security: {
+          type: 'GH_ORG',
+          linkPath: fixtureLoader.GITTER_INTEGRATION_ORG
+        }
       })
       .set('x-access-token', fixture.user1.accessToken)
       .expect(200)
