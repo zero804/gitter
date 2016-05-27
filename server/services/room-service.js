@@ -16,7 +16,6 @@ var persistence = require('gitter-web-persistence');
 var uriLookupService = require("./uri-lookup-service");
 var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
 var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
-var legacyMigration = require('gitter-web-permissions/lib/legacy-migration');
 var canUserBeInvitedToJoinRoom = require('gitter-web-permissions/lib/invited-permissions-service');
 var userService = require('./user-service');
 var troupeService = require('./troupe-service');
@@ -45,6 +44,8 @@ var uriResolver = require('./uri-resolver');
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 var userScopes = require('gitter-web-identity/lib/user-scopes');
 var groupService = require('gitter-web-groups/lib/group-service');
+var securityDescriptorGenerator = require('gitter-web-permissions/lib/security-descriptor-generator');
+var legacyMigration = require('gitter-web-permissions/lib/legacy-migration');
 
 var splitsvilleEnabled = nconf.get("project-splitsville:enabled");
 
@@ -201,12 +202,6 @@ function ensureGroupForGitHubRoom(user, githubType, uri) {
   return groupService.migration.ensureGroupForGitHubRoomCreation(user, options);
 }
 
-function doPostRoomCreationMigrationSteps(troupe) {
-  // create security permissions
-  var descriptor = legacyMigration.generatePermissionsForRoom(troupe, null, null);
-  return securityDescriptorService.insertForRoom(troupe._id, descriptor);
-}
-
 /**
  * Assuming that oneToOne uris have been handled already,
  * Figure out what this troupe is for
@@ -284,6 +279,13 @@ function createRoomForGitHubUri(user, uri, options) {
           // TODO: remove this when lcOwner goes away
           var lcOwner = lcUri.split('/')[0];
 
+          var sd = securityDescriptorGenerator.generate(user, {
+              uri: officialUri,
+              type: githubType,
+              githubId: githubId,
+              security: githubType === 'ORG' ? 'PRIVATE' : security
+            });
+
           return mongooseUtils.upsert(persistence.Troupe, queryTerm, {
               $setOnInsert: {
                 lcUri: lcUri,
@@ -296,6 +298,7 @@ function createRoomForGitHubUri(user, uri, options) {
                 security: security,
                 dateLastSecurityCheck: new Date(),
                 userCount: 0,
+                sd: sd
               }
             });
         })
@@ -306,15 +309,7 @@ function createRoomForGitHubUri(user, uri, options) {
 
           debug('Upsert found an existing room? %s', updateExisting);
 
-          if (updateExisting) return;
-
-          return doPostRoomCreationMigrationSteps(troupe);
-        })
-        .tap(function() {
           /* Next stage - possible rename */
-          var troupe = this.troupe;
-          var updateExisting = this.updateExisting;
-
           // New room? Skip this step
           if (!updateExisting) return;
 
@@ -795,6 +790,12 @@ function createChannel(user, parentRoom, options) {
     .then(function(clash) {
       if(clash) throw new StatusError(409, 'There is already a channel at ' + uri);
 
+      var sd = legacyMigration.generateForNewChannel(user, parentRoom, {
+        githubType: githubType,
+        security: security,
+        uri: uri
+      });
+
       return mongooseUtils.upsert(persistence.Troupe,
         { lcUri: lcUri, githubType: githubType },
         {
@@ -807,7 +808,8 @@ function createChannel(user, parentRoom, options) {
             parentId: parentRoom ? parentRoom._id : undefined,
             ownerUserId: parentRoom ? undefined: user._id,
             githubType: githubType,
-            userCount: 0
+            userCount: 0,
+            sd: sd
           }
         })
         .spread(function(newRoom, updatedExisting) {
@@ -817,10 +819,6 @@ function createChannel(user, parentRoom, options) {
           }
 
           return newRoom;
-        })
-        .tap(function(newRoom) {
-          var descriptor = legacyMigration.generatePermissionsForRoom(newRoom, parentRoom, user);
-          return securityDescriptorService.insertForRoom(newRoom._id, descriptor);
         })
         .tap(function(newRoom) {
           if (!user) return;
