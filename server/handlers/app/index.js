@@ -1,7 +1,7 @@
 "use strict";
 
 var express = require('express');
-var appRender = require('./render');
+var renderMainFrame = require('./render/main-frame');
 var renderChat = require('./render/chat');
 var renderUserNotSignedUp = require('./render/user-not-signed-up');
 var appMiddleware = require('./middleware');
@@ -47,12 +47,12 @@ var mainFrameMiddlewarePipeline = [
       renderChat.renderMobileChat(req, res, next);
 
     } else {
-      appRender.renderMainFrame(req, res, next, 'chat');
+      renderMainFrame.renderMainFrame(req, res, next, 'chat');
     }
   },
   function (err, req, res, next) {
     if (err && err.userNotSignedUp && !isPhone(req.headers['user-agent'])) {
-      renderUserNotSignedUp.renderUserNotSignedUpMainFrame(req, res, next, 'chat');
+      renderUserNotSignedUp.renderUserNotSignedUpMainFrame(req, res, next);
       return;
     }
     return next(err);

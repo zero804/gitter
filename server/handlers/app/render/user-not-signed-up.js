@@ -2,8 +2,8 @@
 
 var env = require('gitter-web-env');
 var nconf = env.config;
-var contextGenerator = require('../../../web/context-generator');
 var userService = require('../../../services/user-service');
+var renderMainFrame = require('./main-frame');
 
 /**
  * renderUserNotSignedUp() renders a set template for a 1:1 chat, with an invited user.
@@ -24,30 +24,11 @@ function renderUserNotSignedUp(req, res, next) {
     .catch(next);
 }
 
-function renderUserNotSignedUpMainFrame(req, res, next, frame) {
-  contextGenerator.generateNonChatContext(req)
-    .then(function(troupeContext) {
-      var chatAppLocation = '/' + req.params.roomPart1 + '/~' + frame + '#initial';
-
-      var template, bootScriptName;
-      if(req.user) {
-        template = 'app-template';
-        bootScriptName = 'router-app';
-      } else {
-        template = 'app-nli-template';
-        bootScriptName = 'router-nli-app';
-      }
-
-      res.render(template, {
-        bootScriptName: bootScriptName,
-        cssFileName: "styles/" + bootScriptName + ".css",
-        troupeName: req.params.roomPart1,
-        troupeContext: troupeContext,
-        chatAppLocation: chatAppLocation,
-        agent: req.headers['user-agent']
-      });
-    })
-    .catch(next);
+function renderUserNotSignedUpMainFrame(req, res, next) {
+  req.uriContext = {
+    uri: req.params.roomPart1
+  }
+  return renderMainFrame.renderMainFrame(req, res, next, 'chat');
 }
 
 module.exports = exports = {
