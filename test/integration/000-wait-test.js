@@ -7,6 +7,8 @@ var env = testRequire('gitter-web-env');
 var Promise = require('bluebird');
 var onMongoConnect = testRequire('./utils/on-mongo-connect');
 
+process.traceDeprecation = true;
+
 describe('start', function() {
   this.timeout(30000);
 

@@ -1,7 +1,7 @@
 'use strict';
 
 var Backbone = require('backbone');
-var _        = require('underscore');
+var _ = require('underscore');
 var ItemView = require('./minibar-item-view');
 
 var NotificationModel = Backbone.Model.extend({
@@ -39,12 +39,12 @@ module.exports = ItemView.extend({
 
   initialize: function(attrs) {
     this.roomCollection = attrs.roomCollection;
-    this.notifications  = new NotificationModel(null, { roomCollection: this.roomCollection });
+    this.notifications = new NotificationModel(null, { roomCollection: this.roomCollection });
     this.listenTo(this.notifications, 'change', this.render, this);
   },
 
   serializeData: function (){
-    return  _.extend({}, ItemView.prototype.serializeData.apply(this, arguments), this.notifications.toJSON());
+    return _.extend({}, ItemView.prototype.serializeData.apply(this, arguments), this.notifications.toJSON());
   },
 
   onDestroy: function (){

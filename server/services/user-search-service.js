@@ -1,11 +1,11 @@
 "use strict";
 
-var persistence   = require('gitter-web-persistence');
-var Promise       = require('bluebird');
-var client        = require('../utils/elasticsearch-client');
-var collections   = require('../utils/collections');
-var _             = require('underscore');
-var userService   = require('./user-service');
+var persistence = require('gitter-web-persistence');
+var Promise = require('bluebird');
+var client = require('../utils/elasticsearch-client');
+var collections = require('../utils/collections');
+var _ = require('underscore');
+var userService = require('./user-service');
 var roomMembershipService = require('./room-membership-service');
 
 var LARGE_ROOM_SIZE_THRESHOLD = 200;
@@ -47,7 +47,7 @@ function executeSearch(q, options) {
 // TODO: Replace this with full-text search
 function getSearchConjunction(res) {
   var displayNameSearch = { displayName: { $in: res } } ;
-  var usernameSearch    = { username:    { $in: res } } ;
+  var usernameSearch = { username:    { $in: res } } ;
 
   return [displayNameSearch, usernameSearch];
 }

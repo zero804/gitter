@@ -1,11 +1,11 @@
 "use strict";
 
-var dolph       = require('dolph');
-var redis       = require("../../utils/redis");
+var dolph = require('dolph');
+var redis = require("../../utils/redis");
 var redisClient = redis.getClient();
 
-var env         = require('gitter-web-env');
-var config      = env.config;
+var env = require('gitter-web-env');
+var config = env.config;
 
 module.exports = dolph({
   prefix: 'rate:',

@@ -1,15 +1,15 @@
 "use strict";
-var Marionette  = require('backbone.marionette');
+var Marionette = require('backbone.marionette');
 var modalRegion = require('components/modal-region');
-var appEvents   = require('utils/appevents');
+var appEvents = require('utils/appevents');
 
 //OLD LEFT MENU
 var TroupeMenu = require('views/menu/old/troupeMenu');
-var context    = require('utils/context');
-var isMobile   = require('utils/is-mobile');
+var context = require('utils/context');
+var isMobile = require('utils/is-mobile');
 
 //NEW LEFT MENU
-var RoomMenuLayout    = require('../menu/room/layout/room-menu-layout');
+var RoomMenuLayout = require('../menu/room/layout/room-menu-layout');
 
 var CommunityCreateModel = require('../community-create/community-create-model');
 var CommunityCreateView = require('../community-create/community-create-view');
@@ -50,7 +50,7 @@ module.exports = (function () {
     },
 
     initNewMenuRegion: function (optionsForRegion){
-      this.menuRegion =  new RoomMenuLayout(optionsForRegion({
+      this.menuRegion = new RoomMenuLayout(optionsForRegion({
         bus:                     appEvents,
         roomCollection:          this.roomCollection,
         orgCollection:           this.orgCollection
@@ -64,9 +64,9 @@ module.exports = (function () {
 
     initialize: function (options) {
       this.roomCollection = options.roomCollection;
-      this.orgCollection  = options.orgCollection;
+      this.orgCollection = options.orgCollection;
       this.repoCollection = options.repoCollection
-      this.dialogRegion   = modalRegion;
+      this.dialogRegion = modalRegion;
 
       this.communityCreateModel = new CommunityCreateModel();
       this.hasRenderedCommunityCreateView = false;

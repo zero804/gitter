@@ -1,9 +1,9 @@
 "use strict";
 
-var dolph       = require('dolph');
-var env         = require('gitter-web-env');
-var stats       = env.stats;
-var redisClient =  env.redis.getClient();
+var dolph = require('dolph');
+var env = require('gitter-web-env');
+var stats = env.stats;
+var redisClient = env.redis.getClient();
 
 var rateLimiter = dolph.rateLimiter({
   prefix: 'cu:',

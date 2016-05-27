@@ -9,7 +9,7 @@ var badCredentialsCheck = require('./bad-credentials-check');
 var request = require('./request-wrapper');
 
 function repoTokenFirst(user) {
-  return user && (user.githubToken || user.githubUserToken)  || '';
+  return user && (user.githubToken || user.githubUserToken) || '';
 }
 
 function userTokenFirst(user) {

@@ -1,21 +1,21 @@
 'use strict';
 require('utils/initial-setup');
 
-var Backbone               = require('backbone');
-var context                = require('utils/context');
-var clientEnv              = require('gitter-client-env');
-var liveContext            = require('components/live-context');
-var appEvents              = require('utils/appevents');
-var debug                  = require('debug-proxy')('app:router-chat');
+var Backbone = require('backbone');
+var context = require('utils/context');
+var clientEnv = require('gitter-client-env');
+var liveContext = require('components/live-context');
+var appEvents = require('utils/appevents');
+var debug = require('debug-proxy')('app:router-chat');
 var ChatToolbarInputLayout = require('views/layouts/chat-toolbar-input');
-var DropTargetView         = require('views/app/dropTargetView');
-var onready                = require('./utils/onready');
-var apiClient              = require('components/apiClient');
-var perfTiming             = require('./components/perf-timing');
-var frameUtils             = require('./utils/frame-utils');
-var itemCollections        = require('collections/instances/integrated-items');
-var chatCollection         = require('collections/instances/chats-cached');
-var fullTimeFormat         = require('gitter-web-shared/time/full-time-format');
+var DropTargetView = require('views/app/dropTargetView');
+var onready = require('./utils/onready');
+var apiClient = require('components/apiClient');
+var perfTiming = require('./components/perf-timing');
+var frameUtils = require('./utils/frame-utils');
+var itemCollections = require('collections/instances/integrated-items');
+var chatCollection = require('collections/instances/chats-cached');
+var fullTimeFormat = require('gitter-web-shared/time/full-time-format');
 
 /* Set the timezone cookie */
 require('components/timezone-cookie');

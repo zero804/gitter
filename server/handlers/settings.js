@@ -1,28 +1,28 @@
 "use strict";
 
-var env                          = require('gitter-web-env');
-var logger                       = env.logger;
-var stats                        = env.stats;
-var config                       = env.config;
-var express                      = require('express');
-var ensureLoggedIn               = require('../web/middlewares/ensure-logged-in');
-var crypto                       = require('crypto');
-var userSettingsService          = require('../services/user-settings-service');
-var passphrase                   = config.get('email:unsubscribeNotificationsSecret');
-var request                      = require('request');
+var env = require('gitter-web-env');
+var logger = env.logger;
+var stats = env.stats;
+var config = env.config;
+var express = require('express');
+var ensureLoggedIn = require('../web/middlewares/ensure-logged-in');
+var crypto = require('crypto');
+var userSettingsService = require('../services/user-settings-service');
+var passphrase = config.get('email:unsubscribeNotificationsSecret');
+var request = require('request');
 var uriContextResolverMiddleware = require('./app/middleware').uriContextResolverMiddleware;
-var jwt                          = require('jwt-simple');
-var cdn                          = require('../web/cdn');
-var services                     = require('gitter-services');
-var identifyRoute                = env.middlewares.identifyRoute;
-var debug                        = require('debug')('gitter:app:settings-route');
-var StatusError                  = require('statuserror');
-var userScopes                   = require('gitter-web-identity/lib/user-scopes');
+var jwt = require('jwt-simple');
+var cdn = require('../web/cdn');
+var services = require('gitter-services');
+var identifyRoute = env.middlewares.identifyRoute;
+var debug = require('debug')('gitter:app:settings-route');
+var StatusError = require('statuserror');
+var userScopes = require('gitter-web-identity/lib/user-scopes');
 
 var supportedServices = [
-  { id: 'github',    name: 'GitHub'},
+  { id: 'github', name: 'GitHub'},
   { id: 'bitbucket', name: 'BitBucket'},
-  { id: 'trello',    name: 'Trello'},
+  { id: 'trello', name: 'Trello'},
 ];
 
 var openServices = Object.keys(services).map(function(id) {
@@ -142,7 +142,7 @@ var router = express.Router({ caseSensitive: true, mergeParams: true });
     // Shitty method override because the integrations page
     // doesn't use javascript and relies on forms aka, the web as of 1996.
     var _method = req.body && req.body._method ? '' + req.body._method : '';
-    if (req.method === 'POST' &&  _method.toLowerCase() === 'delete') {
+    if (req.method === 'POST' && _method.toLowerCase() === 'delete') {
       req.method = 'DELETE';
     }
     next();
@@ -175,15 +175,15 @@ router.get('/unsubscribe/:hash',
   function (req, res, next) {
     var plaintext;
     try {
-      var decipher  = crypto.createDecipher('aes256', passphrase);
-      plaintext     = decipher.update(req.params.hash, 'hex', 'utf8') + decipher.final('utf8');
+      var decipher = crypto.createDecipher('aes256', passphrase);
+      plaintext = decipher.update(req.params.hash, 'hex', 'utf8') + decipher.final('utf8');
     } catch(err) {
       return next(new StatusError(400, 'Invalid hash'));
     }
 
-    var parts             = plaintext.split(',');
-    var userId            = parts[0];
-    var notificationType  = parts[1];
+    var parts = plaintext.split(',');
+    var userId = parts[0];
+    var notificationType = parts[1];
 
     debug("User %s opted-out from ", userId, notificationType);
     stats.event('unsubscribed_unread_notifications', { userId: userId });

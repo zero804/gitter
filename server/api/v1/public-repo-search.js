@@ -1,9 +1,9 @@
 "use strict";
 
 var repoService = require('../../services/repo-service');
-var restSerializer   = require("../../serializers/rest-serializer");
+var restSerializer = require("../../serializers/rest-serializer");
 
-module.exports =  function(req, res, next) {
+module.exports = function(req, res, next) {
   var limit = req.query.limit ? parseInt(req.query.limit, 10) : undefined;
 
   repoService.findPublicReposWithRoom(req.user, req.query.q, {limit: limit})

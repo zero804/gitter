@@ -1,11 +1,11 @@
 'use strict';
 
-var _                      = require('underscore');
-var Marionette             = require('backbone.marionette');
-var cocktail               = require('cocktail');
-var KeyboardEventMixin     = require('views/keyboard-events-mixin');
-var sanitizeDir            = require('./sanitize-direction');
-var findNextActiveItem     = require('./find-next-active-item');
+var _ = require('underscore');
+var Marionette = require('backbone.marionette');
+var cocktail = require('cocktail');
+var KeyboardEventMixin = require('views/keyboard-events-mixin');
+var sanitizeDir = require('./sanitize-direction');
+var findNextActiveItem = require('./find-next-active-item');
 var findNextNavigableModel = require('./find-next-navigable-model');
 
 var navigableCollectionItemActiveCb = findNextNavigableModel.navigableCollectionItemActiveCb;

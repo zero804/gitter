@@ -1,9 +1,9 @@
 "use strict";
 
 var roomContextService = require('../../services/room-context-service');
-var isPhone     = require('../../web/is-phone');
-var url         = require('url');
-var debug       = require('debug')('gitter:app:app-middleware');
+var isPhone = require('../../web/is-phone');
+var url = require('url');
+var debug = require('debug')('gitter:app:app-middleware');
 var StatusError = require('statuserror');
 
 function normaliseUrl(params) {

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 
-var express  = require('express');
+var express = require('express');
 var app = express();
 var http = require('http');
 var os = require('os');
@@ -9,7 +9,7 @@ var membershipStream = require('./membership-stream');
 var roomStream = require('./room-stream');
 var userStream = require('./user-stream');
 var cypher = require("cypher-promise");
-var env   = require('gitter-web-env');
+var env = require('gitter-web-env');
 var neo4jClient = cypher(env.config.get('neo4j:endpoint'));
 
 
@@ -124,7 +124,7 @@ function getIPV4Address(ifaceList) {
     var iface = ifaceList[j];
 
     // skip over internal (i.e. 127.0.0.1) and non-ipv4 addresses
-    if (iface.family === 'IPv4' &&  !iface.internal) {
+    if (iface.family === 'IPv4' && !iface.internal) {
       return iface.address;
     }
   }

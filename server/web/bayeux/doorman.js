@@ -1,8 +1,8 @@
 'use strict';
 
-var bayeuxExtension   = require('./extension');
-var StatusError       = require('statuserror');
-var presenceService   = require('gitter-web-presence');
+var bayeuxExtension = require('./extension');
+var StatusError = require('statuserror');
+var presenceService = require('gitter-web-presence');
 
 module.exports = function(server) {
   return bayeuxExtension({

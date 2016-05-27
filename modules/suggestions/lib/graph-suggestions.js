@@ -1,6 +1,6 @@
 'use strict';
 
-var env   = require('gitter-web-env');
+var env = require('gitter-web-env');
 var stats = env.stats;
 var cypher = require("cypher-promise");
 var neo4jClient = cypher(env.config.get('neo4j:endpoint'));
