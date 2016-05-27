@@ -113,7 +113,6 @@ var View = Marionette.ItemView.extend({
   },
 
   showError: function (err){
-    console.log(err);
     this.ui.errorMessage[0].classList.remove('hidden');
   },
 
