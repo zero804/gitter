@@ -15,6 +15,8 @@ var once = times(1);
 var persistence = require('gitter-web-persistence');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var roomMembershipService = testRequire('./services/room-membership-service');
+var securityDescriptorValidator = require('gitter-web-permissions/lib/security-descriptor-validator');
+
 testRequire("./services/room-service");
 
 // to work around proxyquire caching bugs...
@@ -133,6 +135,7 @@ describe('room-service', function() {
       var groupId = new ObjectID();
       var uriResolver = mockito.mockFunction();
       var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
+
       var roomService = testRequire.withProxies("./services/room-service", {
         './uri-resolver': uriResolver,
         'gitter-web-groups/lib/group-service': {
@@ -183,6 +186,7 @@ describe('room-service', function() {
           return securityDescriptorService.getForRoomUser(uriContext.troupe._id, fixture.user1._id);
         })
         .then(function(securityDescriptor) {
+          securityDescriptorValidator(securityDescriptor);
           assert.deepEqual(securityDescriptor, {
             admins: "GH_ORG_MEMBER",
             externalId: this.uriContext.troupe.githubId,
@@ -209,6 +213,8 @@ describe('room-service', function() {
           return securityDescriptorService.getForRoomUser(uriContext.troupe._id, fixture.user1._id);
         })
         .then(function(securityDescriptor) {
+          securityDescriptorValidator(securityDescriptor);
+
           assert.deepEqual(securityDescriptor, {
             extraAdmins: [],
             extraMembers: [],
@@ -265,6 +271,8 @@ describe('room-service', function() {
           return securityDescriptorService.getForRoomUser(uriContext.troupe._id, fixture.user1._id);
         })
         .then(function(securityDescriptor) {
+          securityDescriptorValidator(securityDescriptor);
+
           assert.deepEqual(securityDescriptor, {
             admins: "GH_REPO_PUSH",
             externalId: this.uriContext.troupe.githubId,
@@ -396,6 +404,8 @@ describe('room-service', function() {
           return securityDescriptorService.getForRoomUser(uriContext.troupe._id, fixture.user1._id);
         })
         .then(function(securityDescriptor) {
+          securityDescriptorValidator(securityDescriptor);
+
           assert.deepEqual(securityDescriptor, {
             admins: "GH_REPO_PUSH",
             externalId: this.uriContext.troupe.githubId,
@@ -810,6 +820,8 @@ describe('room-service', function() {
             return securityDescriptorService.getForRoomUser(this.room._id, fixture.user1._id);
           })
           .then(function(securityDescriptor) {
+            securityDescriptorValidator(securityDescriptor);
+
             assert.deepEqual(securityDescriptor, {
               admins: "GH_ORG_MEMBER",
               externalId: fixture.troupeOrg1.githubId,
@@ -867,6 +879,8 @@ describe('room-service', function() {
             return securityDescriptorService.getForRoomUser(this.room._id, fixture.user1._id);
           })
           .then(function(securityDescriptor) {
+            securityDescriptorValidator(securityDescriptor);
+
             assert.deepEqual(securityDescriptor, {
               admins: "GH_ORG_MEMBER",
               externalId: fixture.troupeOrg1.githubId,
@@ -915,6 +929,8 @@ describe('room-service', function() {
             return securityDescriptorService.getForRoomUser(this.room._id, fixture.user1._id);
           })
           .then(function(securityDescriptor) {
+            securityDescriptorValidator(securityDescriptor);
+
             assert.deepEqual(securityDescriptor, {
               admins: "GH_ORG_MEMBER",
               externalId: fixture.troupeOrg1.githubId,
@@ -963,6 +979,8 @@ describe('room-service', function() {
             return securityDescriptorService.getForRoomUser(this.room._id, fixture.user1._id);
           })
           .then(function(securityDescriptor) {
+            securityDescriptorValidator(securityDescriptor);
+
             assert.deepEqual(securityDescriptor, {
               admins: "GH_ORG_MEMBER",
               externalId: fixture.troupeEmptyOrg.githubId,
@@ -1013,6 +1031,8 @@ describe('room-service', function() {
             return securityDescriptorService.getForRoomUser(this.room._id, fixture.user1._id);
           })
           .then(function(securityDescriptor) {
+            securityDescriptorValidator(securityDescriptor);
+
             assert.deepEqual(securityDescriptor, {
               admins: "GH_REPO_PUSH",
               externalId: fixture.troupeRepo.githubId,
@@ -1060,6 +1080,8 @@ describe('room-service', function() {
             return securityDescriptorService.getForRoomUser(this.room._id, fixture.user1._id);
           })
           .then(function(securityDescriptor) {
+            securityDescriptorValidator(securityDescriptor);
+
             assert.deepEqual(securityDescriptor, {
               admins: "GH_REPO_PUSH",
               externalId: fixture.troupeRepo.githubId,
@@ -1108,6 +1130,8 @@ describe('room-service', function() {
             return securityDescriptorService.getForRoomUser(this.room._id, fixture.user1._id);
           })
           .then(function(securityDescriptor) {
+            securityDescriptorValidator(securityDescriptor);
+
             assert.deepEqual(securityDescriptor, {
               admins: "GH_REPO_PUSH",
               externalId:  fixture.troupeRepo.githubId,
@@ -1155,6 +1179,8 @@ describe('room-service', function() {
             return securityDescriptorService.getForRoomUser(this.room._id, fixture.user1._id);
           })
           .then(function(securityDescriptor) {
+            securityDescriptorValidator(securityDescriptor);
+
             assert.strictEqual(securityDescriptor.extraAdmins.length, 1);
             assert.strictEqual(String(securityDescriptor.extraAdmins[0]), fixture.user1.id);
 
@@ -1200,6 +1226,8 @@ describe('room-service', function() {
             return securityDescriptorService.getForRoomUser(this.room._id, fixture.user1._id);
           })
           .then(function(securityDescriptor) {
+            securityDescriptorValidator(securityDescriptor);
+
             assert.strictEqual(securityDescriptor.extraAdmins.length, 1);
             assert.strictEqual(String(securityDescriptor.extraAdmins[0]), fixture.user1.id);
 
@@ -1246,6 +1274,8 @@ describe('room-service', function() {
             return securityDescriptorService.getForRoomUser(this.room._id, fixture.user1._id);
           })
           .then(function(securityDescriptor) {
+            securityDescriptorValidator(securityDescriptor);
+
             assert.strictEqual(securityDescriptor.extraAdmins.length, 1);
             assert.strictEqual(String(securityDescriptor.extraAdmins[0]), fixture.user1.id);
 
