@@ -2,7 +2,6 @@
 
 var processMarkdown = require('../../utils/markdown-processor');
 var StatusError = require('statuserror');
-var _ = require('lodash');
 
 function markdownPreview(req, res, next) {
   if(!req.user) { return next(new StatusError(401)); }
