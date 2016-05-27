@@ -3,12 +3,12 @@
 "use strict";
 
 var testRequire = require('../../test-require');
-var assert      = require("assert");
-var mockito     = require('jsmockito').JsMockito;
-var Promise     = require('bluebird');
+var assert = require("assert");
+var mockito = require('jsmockito').JsMockito;
+var Promise = require('bluebird');
 
 var userSettingsService = testRequire('./services/user-settings-service');
-var fixtureLoader = require('../../test-fixtures');
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var underlyingUnreadItemService = testRequire('./services/unread-items');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var roomMembershipService = testRequire("./services/room-membership-service");

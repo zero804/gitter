@@ -86,7 +86,7 @@ var ChatToolbarInputLayout = ChatToolbarLayout.extend({
 
   initInputRegion: function(optionsForRegion) {
     if (this.model.get('roomMember')) {
-      return  new ChatInputView(optionsForRegion({
+      return new ChatInputView(optionsForRegion({
         model: context.troupe(),
         collection: this.options.chatCollection
       }, { rerender: true }));

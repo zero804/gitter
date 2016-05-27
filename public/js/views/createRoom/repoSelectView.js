@@ -1,17 +1,16 @@
 "use strict";
 
-var Marionette                = require('backbone.marionette');
-var Backbone                  = require('backbone');
+var Marionette = require('backbone.marionette');
 var loadingFilteredCollection = require('collections/loading-filtered-collection');
-var template                  = require('./tmpl/repoSelectView.hbs');
-var itemTemplate              = require('./tmpl/repoItemView.hbs');
-var emptyTemplate             = require('./tmpl/repoEmptyView.hbs');
-var repoModels                = require('collections/repos');
-var cocktail                  = require('cocktail');
-var SelectableMixin           = require('views/controls/selectable-mixin');
-var LoadingCollectionMixin    = require('views/loading-mixin');
-var liveSearch                = require('views/controls/live-search');
-var dataset                   = require('utils/dataset-shim');
+var template = require('./tmpl/repoSelectView.hbs');
+var itemTemplate = require('./tmpl/repoItemView.hbs');
+var emptyTemplate = require('./tmpl/repoEmptyView.hbs');
+var repoModels = require('collections/repos');
+var cocktail = require('cocktail');
+var SelectableMixin = require('views/controls/selectable-mixin');
+var LoadingCollectionMixin = require('views/loading-mixin');
+var liveSearch = require('views/controls/live-search');
+var dataset = require('utils/dataset-shim');
 
 var FilteredCollection = require('backbone-filtered-collection');
 
@@ -50,7 +49,7 @@ var View = Marionette.CompositeView.extend({
 
 cocktail.mixin(View, LoadingCollectionMixin, SelectableMixin);
 
-var createCollection = function()  {
+var createCollection = function() {
   var underlying = new repoModels.ReposCollection();
   underlying.fetch();
 

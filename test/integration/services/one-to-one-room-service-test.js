@@ -1,11 +1,11 @@
 "use strict";
 
-var testRequire   = require('../test-require');
-var fixtureLoader = require('../test-fixtures');
-var Promise       = require('bluebird');
-var _             = require('underscore');
-var assert        = require("assert");
-var StatusError   = require('statuserror');
+var testRequire = require('../test-require');
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
+var Promise = require('bluebird');
+var _ = require('underscore');
+var assert = require("assert");
+var StatusError = require('statuserror');
 
 function findUserIdPredicate(userId) {
   return function(x) {
@@ -15,7 +15,7 @@ function findUserIdPredicate(userId) {
 describe('one-to-one-room-service', function() {
 
   describe('#slow', function() {
-    var fixture       = {};
+    var fixture = {};
     var oneToOneRoomService = testRequire('./services/one-to-one-room-service');
     var roomMembershipService = testRequire('./services/room-membership-service');
 
@@ -145,7 +145,7 @@ describe('one-to-one-room-service', function() {
   });
 
   describe('https://github.com/troupe/gitter-webapp/issues/1227 #slow', function() {
-    var fixture       = {};
+    var fixture = {};
     var oneToOneRoomService = testRequire('./services/one-to-one-room-service');
     var roomMembershipService = testRequire('./services/room-membership-service');
 

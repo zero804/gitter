@@ -1,9 +1,9 @@
 /*global describe:true, it:true, beforeEach:true, afterEach:true */
 'use strict';
 
-var assert             = require('assert');
-var Backbone           = require('backbone');
-var sinon              = require('sinon');
+var assert = require('assert');
+var Backbone = require('backbone');
+var sinon = require('sinon');
 var SearchChatMessages = require('public/js/collections/search-chat-messages');
 
 describe('SearchChatMessages', function() {
@@ -13,9 +13,9 @@ describe('SearchChatMessages', function() {
   var collection;
 
   beforeEach(function() {
-    model            = new Backbone.Model({ state: 'all' });
-    room             = new Backbone.Model({ id: 1 });
-    collection       = new SearchChatMessages(null, { roomMenuModel: model, roomModel: room });
+    model = new Backbone.Model({ state: 'all' });
+    room = new Backbone.Model({ id: 1 });
+    collection = new SearchChatMessages(null, { roomMenuModel: model, roomModel: room });
     collection.fetch = sinon.spy();
   });
 

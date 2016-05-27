@@ -1,7 +1,7 @@
 'use strict';
 
-var async  = require('async');
-var env    = require('gitter-web-env');
+var async = require('async');
+var env = require('gitter-web-env');
 var logger = env.logger;
 
 /**

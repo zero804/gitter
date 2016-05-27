@@ -1,11 +1,11 @@
 'use strict';
 
-var Marionette   = require('backbone.marionette');
-var Backbone     = require('backbone');
+var Marionette = require('backbone.marionette');
+var Backbone = require('backbone');
 var itemTemplate = require('./profile-menu-item-view.hbs');
-var fastdom      = require('fastdom');
-var toggleClass  = require('utils/toggle-class');
-var logout       = require('utils/logout');
+var fastdom = require('fastdom');
+var toggleClass = require('utils/toggle-class');
+var logout = require('utils/logout');
 
 var profileCollection = new Backbone.Collection([
   { name: 'Home', stub: '/home' },

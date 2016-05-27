@@ -1,10 +1,10 @@
 "use strict";
 
-var env                    = require('gitter-web-env');
-var logger                 = env.logger;
-var userSearchService      = require("./user-search-service");
-var userService            = require("./user-service");
-var githubSearchService    = require('gitter-web-github').GitHubFastSearch;
+var env = require('gitter-web-env');
+var logger = env.logger;
+var userSearchService = require("./user-search-service");
+var userService = require("./user-service");
+var githubSearchService = require('gitter-web-github').GitHubFastSearch;
 var extractGravatarVersion = require('../utils/extract-gravatar-version');
 
 var Promise = require('bluebird');
@@ -25,8 +25,6 @@ function searchGithubUsers(query, user, callback) {
           username: user.login,
           gravatarImageUrl: user.avatar_url,
           gravatarVersion: extractGravatarVersion(user.avatar_url),
-          getDisplayName: function() {}, // Remove, deprecated
-          getHomeUrl: function() {}  // Remove, deprecated
         };
       });
 
@@ -82,7 +80,7 @@ module.exports = function(searchQuery, user, options, callback) {
 
     var merged = gitterUsers.concat(githubUsers);
     var noSelfMentions = merged.filter(function(user) {
-      return user.username != excludedUsername;
+      return user.username !== excludedUsername;
     });
     var deduplicated = _.uniq(noSelfMentions, false, function(user) {
       return user.username;

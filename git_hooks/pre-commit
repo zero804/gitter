@@ -11,4 +11,5 @@ if [ "$branch" = "refs/heads/master" ]; then
 fi
 
 gulp="$repo_dir/node_modules/.bin/gulp"
-${gulp} validate && ${gulp} fasttest
+eslint --cache --quiet --format unix $repo_dir
+${gulp} validate-config fasttest

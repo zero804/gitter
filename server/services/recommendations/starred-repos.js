@@ -3,7 +3,7 @@
 var GithubRepo = require('gitter-web-github').GitHubRepoService;
 
 module.exports = function starredRepos(user) {
-  var ghRepo  = new GithubRepo(user);
+  var ghRepo = new GithubRepo(user);
 
   return ghRepo.getRecentlyStarredRepos()
     .then(function(starredRepos) {

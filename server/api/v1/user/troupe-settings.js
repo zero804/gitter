@@ -1,9 +1,9 @@
 "use strict";
 
-var Promise                   = require('bluebird');
-var StatusError               = require('statuserror');
-var roomMembershipService     = require('../../../services/room-membership-service');
-var userDefaultFlagsService   = require('../../../services/user-default-flags-service');
+var Promise = require('bluebird');
+var StatusError = require('statuserror');
+var roomMembershipService = require('../../../services/room-membership-service');
+var userDefaultFlagsService = require('../../../services/user-default-flags-service');
 var userRoomModeUpdateService = require('../../../services/user-room-mode-update-service');
 
 function generateResponse(userId, troupeId) {

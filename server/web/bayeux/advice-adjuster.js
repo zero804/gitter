@@ -1,7 +1,7 @@
 'use strict';
 
-var env     = require('gitter-web-env');
-var config  = env.config;
+var env = require('gitter-web-env');
+var config = env.config;
 
 module.exports = {
   outgoing: function(message, req, callback) {

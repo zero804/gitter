@@ -1,14 +1,14 @@
 "use strict";
 
-var $                 = require('jquery');
-var _                 = require('underscore');
-var Marionette        = require('backbone.marionette');
+var $ = require('jquery');
+var _ = require('underscore');
+var Marionette = require('backbone.marionette');
 var troupeCollections = require('collections/instances/troupes');
-var ModalView         = require('./modal');
-var apiClient         = require('components/apiClient');
-var ParentSelectView  = require('views/createRoom/parentSelectView');
-var template          = require('./tmpl/create-room-view.hbs');
-var appEvents         = require('utils/appevents');
+var ModalView = require('./modal');
+var apiClient = require('components/apiClient');
+var ParentSelectView = require('views/createRoom/parentSelectView');
+var template = require('./tmpl/create-room-view.hbs');
+var appEvents = require('utils/appevents');
 
 var View = Marionette.LayoutView.extend({
   template: template,
@@ -130,7 +130,7 @@ var View = Marionette.LayoutView.extend({
 
       case 'repo':
       case 'org':
-        if(permissions !== 'public' && permissions !== 'private' && permissions != 'inherited') {
+        if(permissions !== 'public' && permissions !== 'private' && permissions !== 'inherited') {
           self.showValidationMessage('Please select the permissions for the room');
           // TODO: better error reporting!
           return;
@@ -156,8 +156,6 @@ var View = Marionette.LayoutView.extend({
         appEvents.trigger('navigation', data.url , 'chat#add', data.uri);
       })
       .catch(function(err) {
-
-
         var status = err.status;
         var message = 'Unable to create channel.';
 
