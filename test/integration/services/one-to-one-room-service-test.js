@@ -1,7 +1,7 @@
 "use strict";
 
 var testRequire = require('../test-require');
-var fixtureLoader = require('../test-fixtures');
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var Promise = require('bluebird');
 var _ = require('underscore');
 var assert = require("assert");

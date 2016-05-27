@@ -3,7 +3,7 @@
 process.env.DISABLE_API_LISTEN = '1';
 
 var Promise = require('bluebird');
-var fixtureLoader = require('../integration/test-fixtures');
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
 describe('group-api', function() {
   var app, request;

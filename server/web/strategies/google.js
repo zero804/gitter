@@ -3,11 +3,11 @@
 var env = require('gitter-web-env');
 var config = env.config;
 
-var Promise = require('bluebird');
 var GoogleStrategy = require('passport-google-oauth2').Strategy;
 var userService = require('../../services/user-service');
 var trackSignupOrLogin = require('../../utils/track-signup-or-login');
 var updateUserLocale = require('../../utils/update-user-locale');
+var passportLogin = require('../passport-login');
 
 function googleOauth2Callback(req, accessToken, refreshToken, params, profile, done) {
   var avatar = profile.photos[0].value; // is this always set?
@@ -37,14 +37,9 @@ function googleOauth2Callback(req, accessToken, refreshToken, params, profile, d
       trackSignupOrLogin(req, user, isNewUser, 'google');
       updateUserLocale(req, user);
 
-      return Promise.fromCallback(function(callback) {
-        req.logIn(user, callback);
-      });
+      return passportLogin(req, user);
     })
-    .then(function() {
-      done(null, user);
-    })
-    .catch(done);
+    .asCallback(done);
 }
 
 var googleStrategy = new GoogleStrategy({

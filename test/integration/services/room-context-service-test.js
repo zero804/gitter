@@ -5,7 +5,7 @@ var assert = require('assert');
 var mockito = require('jsmockito').JsMockito;
 var Promise = require('bluebird');
 
-var fixtureLoader = require('../test-fixtures');
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var fixture = {};
 
 describe('room-context-service', function() {
