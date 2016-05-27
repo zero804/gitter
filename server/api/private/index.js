@@ -100,4 +100,8 @@ router.get('/user-avatar/:username',
   identifyRoute('api-private-user-avatar'),
   require('./user-avatar'));
 
+router.post('/markdown-preview',
+  identifyRoute('api-private-markdown-preview'),
+  require('./markdown-preview'));
+
 module.exports = router;

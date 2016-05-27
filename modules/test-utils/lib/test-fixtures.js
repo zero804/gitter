@@ -2,7 +2,6 @@
 
 var Promise = require('bluebird');
 var persistence = require('gitter-web-persistence');
-var util = require('util');
 var uuid = require('node-uuid');
 var debug = require('debug')('gitter:tests:test-fixtures');
 var counter = 0;
@@ -75,42 +74,8 @@ function createBaseFixture() {
   };
 }
 
-function createLegacyFixtures(done) {
-  return createExpectedFixtures({
-    user1: {
-    },
-    user2: {
-    },
-    user3: {
-    },
-    userNoTroupes: {
-    },
-    troupe1: {
-      users: ['user1', 'user2']
-    },
-    troupe2: {
-    },
-    troupe3: {
-      /* This troupe should not include test user 2 */
-      //uri: 'testtroupe3',
-      users: ['user1', 'user3']
-    }
-  }, done);
-}
-
-function load(expected, done) {
-  if(expected) {
-    // DO THINGS THE NEW SCHOOL WAY
-    return createExpectedFixtures(expected, done);
-  } else {
-
-    // Deliberately log the message for every invocation
-    return util.deprecate(createLegacyFixtures, 'Legacy fixtures are deprecated')(done);
-  }
-}
-
-
-function createExpectedFixtures(expected, done) {
+function createExpectedFixtures(expected) {
+  if (!expected) throw new Error('Please provide a fixture')
   function createUser(fixtureName, f) {
 
     debug('Creating %s', fixtureName);
@@ -204,6 +169,29 @@ function createExpectedFixtures(expected, done) {
       });
   }
 
+  function generateSecurityDescriptorForTroupeFixture(f) {
+    var securityDescriptor = f.securityDescriptor || {};
+
+    var securityDescriptorType;
+    if (securityDescriptor.type) {
+      securityDescriptorType = securityDescriptor.type;
+    } else {
+      securityDescriptorType = f.oneToOne ? 'ONE_TO_ONE' : null;
+    }
+
+    return {
+      // Permissions stuff
+      type: securityDescriptorType,
+      members: securityDescriptor.members || 'PUBLIC',
+      admins: securityDescriptor.admins || 'MANUAL',
+      public: 'public' in securityDescriptor ? securityDescriptor.public : !f.oneToOne,
+      linkPath: securityDescriptor.linkPath,
+      externalId: securityDescriptor.externalId,
+      extraMembers: securityDescriptor.extraMembers,
+      extraAdmins: securityDescriptor.extraAdmins
+    };
+  }
+
   function createTroupe(fixtureName, f) {
     var oneToOneUsers;
 
@@ -243,36 +231,13 @@ function createExpectedFixtures(expected, done) {
       providers: f.providers,
     };
 
+    doc.sd = generateSecurityDescriptorForTroupeFixture(f);
+
     debug('Creating troupe %s with %j', fixtureName, doc);
     return persistence.Troupe.create(doc)
       .tap(function(troupe) {
         if (!f.userIds || !f.userIds.length) return;
         return bulkInsertTroupeUsers(troupe._id, f.userIds, f.membershipStrategy);
-      })
-      .tap(function(troupe) {
-
-        var securityDescriptor = f.securityDescriptor || {};
-
-        var type;
-        if (securityDescriptor.type) {
-          type = securityDescriptor.type;
-        } else {
-          type = f.oneToOne ? 'ONE_TO_ONE' : null;
-        }
-
-        return persistence.SecurityDescriptor.create({
-          troupeId: troupe._id,
-
-          // Permissions stuff
-          type: type,
-          members: securityDescriptor.members || 'PUBLIC',
-          admins: securityDescriptor.admins || 'MANUAL',
-          public: 'public' in securityDescriptor ? securityDescriptor.public : !f.oneToOne,
-          linkPath: securityDescriptor.linkPath,
-          externalId: securityDescriptor.externalId,
-          extraMembers: securityDescriptor.extraMembers,
-          extraAdmins: securityDescriptor.extraAdmins
-        });
       });
   }
 
@@ -289,34 +254,30 @@ function createExpectedFixtures(expected, done) {
 
     debug('Creating group %s with %j', fixtureName, doc);
 
-    return persistence.Group.create(doc)
-    .tap(function(group) {
-      var securityDescriptor = f.securityDescriptor || {};
+    var securityDescriptor = f.securityDescriptor || {};
 
-      var type;
-      if (securityDescriptor.type) {
-        type = securityDescriptor.type;
-      } else {
-        type = null;
-      }
+    var securityDescriptorType;
+    if (securityDescriptor.type) {
+      securityDescriptorType = securityDescriptor.type;
+    } else {
+      securityDescriptorType = null;
+    }
 
-      var securityDoc = {
-        groupId: group._id,
+    var securityDoc = {
+      // Permissions stuff
+      type: securityDescriptorType,
+      members: securityDescriptor.members || 'PUBLIC',
+      admins: securityDescriptor.admins || 'MANUAL',
+      public: 'public' in securityDescriptor ? securityDescriptor.public : true,
+      linkPath: securityDescriptor.linkPath,
+      externalId: securityDescriptor.externalId,
+      extraMembers: securityDescriptor.extraMembers,
+      extraAdmins: securityDescriptor.extraAdmins
+    };
 
-        // Permissions stuff
-        type: type,
-        members: securityDescriptor.members || 'PUBLIC',
-        admins: securityDescriptor.admins || 'MANUAL',
-        public: 'public' in securityDescriptor ? securityDescriptor.public : true,
-        linkPath: securityDescriptor.linkPath,
-        externalId: securityDescriptor.externalId,
-        extraMembers: securityDescriptor.extraMembers,
-        extraAdmins: securityDescriptor.extraAdmins
-      };
+    doc.sd = securityDoc;
 
-      debug('Creating security descriptor for group %s with %j', fixtureName, securityDoc);
-      return persistence.SecurityDescriptor.create(securityDoc);
-    });
+    return persistence.Group.create(doc);
   }
 
   function createMessage(fixtureName, f) {
@@ -532,23 +493,19 @@ function createExpectedFixtures(expected, done) {
     .tap(createIdentities)
     .tap(createGroups)
     .tap(createTroupes)
-    .tap(createMessages)
-    .asCallback(done);
+    .tap(createMessages);
 }
 
 function fixtureLoader(fixture, expected) {
   debug("Creating fixtures %j", expected);
   return function(done) {
-     load(expected, function(err, data) {
-       if(err) return done(err);
-
-       Object.keys(data).forEach(function(key) {
-        fixture[key] = data[key];
-       });
-
-       done();
-     });
-
+    return createExpectedFixtures(expected)
+      .then(function(data) {
+         Object.keys(data).forEach(function(key) {
+          fixture[key] = data[key];
+         });
+       })
+       .asCallback(done);
    };
 }
 
@@ -564,11 +521,7 @@ fixtureLoader.setup = function(expected) {
 
   return fixture;
 };
-
-fixtureLoader.use = function(expected) {
-  return createExpectedFixtures(expected);
-};
-
+fixtureLoader.createExpectedFixtures = createExpectedFixtures;
 fixtureLoader.generateEmail = generateEmail;
 fixtureLoader.generateGithubId = generateGithubId;
 
