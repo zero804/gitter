@@ -29,11 +29,13 @@ var View = Marionette.ItemView.extend({
 
   initialize: function() {
     this.listenTo(this, 'menuItemClicked', this.menuItemClicked, this);
-    apiClient.room.get('/meta/welcome-message').then(function(welcomeMessage){
+    apiClient.room.get('/meta/welcome-message')
+    .then(function(welcomeMessage){
       welcomeMessage = (welcomeMessage || { text: '', html: '' });
       if(!!welcomeMessage.text.length) { return this.initWithMessage(welcomeMessage); }
       return this.initEmptyTextArea();
-    }.bind(this));
+    }.bind(this))
+    .catch(this.showError.bind(this));
   },
 
   destroySettings: function () {
@@ -87,7 +89,7 @@ var View = Marionette.ItemView.extend({
 
   fetchRenderedHTML: function (){
     var welcomeMessageContent = this.getWelcomeMessageContent();
-    return apiClient.post('/private/markdown-preview', { text: this.getWelcomeMessageContent() })
+    return apiClient.post('/private/markdown-preview', { text: this.getWelcomeMessageContent() }, { dataType: 'text'})
       .catch(this.showError.bind(this));
   },
 
@@ -110,7 +112,8 @@ var View = Marionette.ItemView.extend({
     .catch(this.showError.bind(this));
   },
 
-  showError: function (){
+  showError: function (err){
+    console.log(err);
     this.ui.errorMessage[0].classList.remove('hidden');
   },
 
