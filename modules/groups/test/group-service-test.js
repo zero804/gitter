@@ -9,7 +9,7 @@ describe('group-service', function() {
 
   describe('integration tests #slow', function() {
 
-    var communityUri = 'I-heart-cats-Test-LOL';
+    var communityUri = '_I-heart-cats-Test-LOL';
 
     describe('createGroup', function() {
       var fixture = fixtureLoader.setup({
@@ -101,6 +101,19 @@ describe('group-service', function() {
               linkPath: null
             })
           })
+      });
+
+      it('should throw an error if you try and create a new style community not prefixed with a promise', function() {
+        var user = fixture.user1;
+        return groupService.createGroup(user, {
+            name: 'This Should Fail',
+            uri: 'i-love-cats'
+          })
+          .then(function fulfilled(result) {
+            throw new Error('Promise was unexpectedly fulfilled. Result: ' + result);
+          }, function rejected(error) {
+            assert.strictEqual(error.status, 400);
+          });
       });
     });
 

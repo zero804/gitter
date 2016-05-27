@@ -73,6 +73,9 @@ function upsertGroup(user, options) {
             externalId: externalId,
           });
       } else {
+        if (uri[0] !== '_') {
+          throw new StatusError(400, 'Non-GitHub community URIs MUST be prefixed by an underscore for now.');
+        }
         securityDescriptor = groupSecurityDescriptorGenerator.getDefaultGroupSecurityDescriptor(user._id);
       }
 
