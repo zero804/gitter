@@ -6,8 +6,7 @@ var _ = require('lodash');
 
 function markdownPreview(req, res, next) {
   if(!req.user) { return next(new StatusError(401)); }
-  var data = _.clone(req.body);
-  return processMarkdown(data.text)
+  return processMarkdown(req.body.text)
     .then(function(parsed){
       res.json(200, parsed.html);
     })
