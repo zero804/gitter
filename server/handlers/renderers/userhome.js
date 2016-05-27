@@ -2,7 +2,7 @@
 
 var env = require('gitter-web-env');
 var nconf = env.config;
-var contextGenerator = require('../../../web/context-generator');
+var contextGenerator = require('../../web/context-generator');
 var useragent = require('useragent');
 
 var WELCOME_MESSAGES = [

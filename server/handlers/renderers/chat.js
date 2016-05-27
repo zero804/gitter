@@ -3,18 +3,18 @@
 var env = require('gitter-web-env');
 var nconf = env.config;
 var Promise = require('bluebird');
-var contextGenerator = require('../../../web/context-generator');
-var restful = require('../../../services/restful');
-var burstCalculator = require('../../../utils/burst-calculator');
-var userSort = require('../../../../public/js/utils/user-sort');
+var contextGenerator = require('../../web/context-generator');
+var restful = require('../../services/restful');
+var burstCalculator = require('../../utils/burst-calculator');
+var userSort = require('../../../public/js/utils/user-sort');
 var isolateBurst = require('gitter-web-shared/burst/isolate-burst-array');
-var unreadItemService = require('../../../services/unread-items');
-var roomMembershipService = require('../../../services/room-membership-service');
+var unreadItemService = require('../../services/unread-items');
+var roomMembershipService = require('../../services/room-membership-service');
 var _ = require('lodash');
 var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 var getSubResources = require('./sub-resources');
-var fixMongoIdQueryParam = require('../../../web/fix-mongo-id-query-param');
+var fixMongoIdQueryParam = require('../../web/fix-mongo-id-query-param');
 
 /* How many chats to send back */
 var INITIAL_CHAT_COUNT = 50;
