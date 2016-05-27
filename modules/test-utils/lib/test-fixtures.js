@@ -2,7 +2,6 @@
 
 var Promise = require('bluebird');
 var persistence = require('gitter-web-persistence');
-var util = require('util');
 var uuid = require('node-uuid');
 var debug = require('debug')('gitter:tests:test-fixtures');
 var counter = 0;
@@ -75,42 +74,8 @@ function createBaseFixture() {
   };
 }
 
-function createLegacyFixtures(done) {
-  return createExpectedFixtures({
-    user1: {
-    },
-    user2: {
-    },
-    user3: {
-    },
-    userNoTroupes: {
-    },
-    troupe1: {
-      users: ['user1', 'user2']
-    },
-    troupe2: {
-    },
-    troupe3: {
-      /* This troupe should not include test user 2 */
-      //uri: 'testtroupe3',
-      users: ['user1', 'user3']
-    }
-  }, done);
-}
-
-function load(expected, done) {
-  if(expected) {
-    // DO THINGS THE NEW SCHOOL WAY
-    return createExpectedFixtures(expected, done);
-  } else {
-
-    // Deliberately log the message for every invocation
-    return util.deprecate(createLegacyFixtures, 'Legacy fixtures are deprecated')(done);
-  }
-}
-
-
-function createExpectedFixtures(expected, done) {
+function createExpectedFixtures(expected) {
+  if (!expected) throw new Error('Please provide a fixture')
   function createUser(fixtureName, f) {
 
     debug('Creating %s', fixtureName);
@@ -532,23 +497,19 @@ function createExpectedFixtures(expected, done) {
     .tap(createIdentities)
     .tap(createGroups)
     .tap(createTroupes)
-    .tap(createMessages)
-    .asCallback(done);
+    .tap(createMessages);
 }
 
 function fixtureLoader(fixture, expected) {
   debug("Creating fixtures %j", expected);
   return function(done) {
-     load(expected, function(err, data) {
-       if(err) return done(err);
-
-       Object.keys(data).forEach(function(key) {
-        fixture[key] = data[key];
-       });
-
-       done();
-     });
-
+    return createExpectedFixtures(expected)
+      .then(function(data) {
+         Object.keys(data).forEach(function(key) {
+          fixture[key] = data[key];
+         });
+       })
+       .asCallback(done);
    };
 }
 
@@ -563,10 +524,6 @@ fixtureLoader.setup = function(expected) {
   });
 
   return fixture;
-};
-
-fixtureLoader.use = function(expected) {
-  return createExpectedFixtures(expected);
 };
 
 fixtureLoader.generateEmail = generateEmail;

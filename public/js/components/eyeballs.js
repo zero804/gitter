@@ -1,4 +1,5 @@
 "use strict";
+
 var context = require('utils/context');
 var apiClient = require('components/apiClient');
 var localStore = require('./local-store');
@@ -38,12 +39,12 @@ module.exports = (function() {
         global: false
       })
       .catch(function(err) {
-        if(err.status !== 400) {
-          debug('An error occurred while communicating eyeballs');
-        } else {
+        if(err.status === 400) {
           // The connection is gone...
           debug('Eyeballs returned 400. Realtime connection may be dead.');
-          appEvents.trigger('eyeballsInvalid', clientId);
+          appEvents.trigger('eyeballsInvalid', clientId)
+        } else {
+          debug('An error occurred while communicating eyeballs');
         }
       });
   }
