@@ -186,6 +186,8 @@ describe('room-service', function() {
           assert.deepEqual(securityDescriptor, {
             admins: "GH_ORG_MEMBER",
             externalId: this.uriContext.troupe.githubId,
+            extraAdmins: [],
+            extraMembers: [],
             linkPath: "gitterTest",
             members: "GH_ORG_MEMBER",
             public: false,
@@ -210,10 +212,8 @@ describe('room-service', function() {
         })
         .then(function(securityDescriptor) {
           assert.deepEqual(securityDescriptor, {
-            admins: null,
-            externalId: null,
-            linkPath: null,
-            members: null,
+            extraAdmins: [],
+            extraMembers: [],
             public: false,
             type: "ONE_TO_ONE"
           });
@@ -269,6 +269,8 @@ describe('room-service', function() {
         .then(function(securityDescriptor) {
           assert.deepEqual(securityDescriptor, {
             admins: "GH_REPO_PUSH",
+            extraAdmins: [],
+            extraMembers: [],
             externalId: this.uriContext.troupe.githubId,
             linkPath: 'gitterHQ/cloaked-avenger',
             members: "GH_REPO_ACCESS",
@@ -400,6 +402,8 @@ describe('room-service', function() {
         .then(function(securityDescriptor) {
           assert.deepEqual(securityDescriptor, {
             admins: "GH_REPO_PUSH",
+            extraAdmins: [],
+            extraMembers: [],
             externalId: this.uriContext.troupe.githubId,
             linkPath: 'gitterHQ/sandbox',
             members: "GH_REPO_ACCESS",
@@ -814,6 +818,8 @@ describe('room-service', function() {
           .then(function(securityDescriptor) {
             assert.deepEqual(securityDescriptor, {
               admins: "GH_ORG_MEMBER",
+              extraAdmins: [],
+              extraMembers: [],
               externalId: fixture.troupeOrg1.githubId,
               linkPath: fixture.troupeOrg1.uri,
               members: "INVITE",
@@ -871,6 +877,8 @@ describe('room-service', function() {
           .then(function(securityDescriptor) {
             assert.deepEqual(securityDescriptor, {
               admins: "GH_ORG_MEMBER",
+              extraAdmins: [],
+              extraMembers: [],
               externalId: fixture.troupeOrg1.githubId,
               linkPath: fixture.troupeOrg1.uri,
               members: "PUBLIC",
@@ -919,6 +927,8 @@ describe('room-service', function() {
           .then(function(securityDescriptor) {
             assert.deepEqual(securityDescriptor, {
               admins: "GH_ORG_MEMBER",
+              extraAdmins: [],
+              extraMembers: [],
               externalId: fixture.troupeOrg1.githubId,
               linkPath: fixture.troupeOrg1.uri,
               members: "GH_ORG_MEMBER",
@@ -967,6 +977,8 @@ describe('room-service', function() {
           .then(function(securityDescriptor) {
             assert.deepEqual(securityDescriptor, {
               admins: "GH_ORG_MEMBER",
+              extraAdmins: [],
+              extraMembers: [],
               externalId: fixture.troupeEmptyOrg.githubId,
               linkPath: fixture.troupeEmptyOrg.uri,
               members: "GH_ORG_MEMBER",
@@ -1017,6 +1029,8 @@ describe('room-service', function() {
           .then(function(securityDescriptor) {
             assert.deepEqual(securityDescriptor, {
               admins: "GH_REPO_PUSH",
+              extraAdmins: [],
+              extraMembers: [],
               externalId: fixture.troupeRepo.githubId,
               linkPath: fixture.troupeRepo.uri,
               members: "INVITE",
@@ -1064,6 +1078,8 @@ describe('room-service', function() {
           .then(function(securityDescriptor) {
             assert.deepEqual(securityDescriptor, {
               admins: "GH_REPO_PUSH",
+              extraAdmins: [],
+              extraMembers: [],
               externalId: fixture.troupeRepo.githubId,
               linkPath: fixture.troupeRepo.uri,
               members: "PUBLIC",
@@ -1112,6 +1128,8 @@ describe('room-service', function() {
           .then(function(securityDescriptor) {
             assert.deepEqual(securityDescriptor, {
               admins: "GH_REPO_PUSH",
+              extraAdmins: [],
+              extraMembers: [],
               externalId:  fixture.troupeRepo.githubId,
               linkPath: fixture.troupeRepo.uri,
               members: "GH_REPO_ACCESS",
@@ -1162,9 +1180,8 @@ describe('room-service', function() {
 
             delete securityDescriptor.extraAdmins;
             assert.deepEqual(securityDescriptor, {
+              extraMembers: [],
               admins: "MANUAL",
-              externalId: null,
-              linkPath: null,
               members: "INVITE",
               public: false,
               type: null
@@ -1210,8 +1227,7 @@ describe('room-service', function() {
             delete securityDescriptor.extraAdmins;
             assert.deepEqual(securityDescriptor, {
               admins: "MANUAL",
-              externalId: null,
-              linkPath: null,
+              extraMembers: [],
               members: "INVITE",
               public: false,
               type: null
@@ -1258,8 +1274,7 @@ describe('room-service', function() {
             delete securityDescriptor.extraAdmins;
             assert.deepEqual(securityDescriptor, {
               admins: "MANUAL",
-              externalId: null,
-              linkPath: null,
+              extraMembers: [],
               members: "PUBLIC",
               public: true,
               type: null
