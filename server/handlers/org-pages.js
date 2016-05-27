@@ -9,18 +9,12 @@ var featureToggles = require('../web/middlewares/feature-toggles');
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
 function handleOrgPage(req, res, next) {
-  req.uriContext = {
-    uri: req.params.orgName
-  };
-
-  renderOrg.renderOrgPage(req, res, next);
+  renderOrg.renderOrgPage(req, res, next, {
+    orgUri: req.params.orgName
+  });
 }
 
 function handleOrgPageInFrame(req, res, next) {
-  req.uriContext = {
-    uri: 'orgs/' + req.params.orgName + '/rooms'
-  };
-
   if (req.isPhone) return handleOrgPage(req, res, next);
 
   appRender.renderMainFrame(req, res, next, 'iframe');
