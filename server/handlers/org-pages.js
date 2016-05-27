@@ -2,8 +2,8 @@
 
 var express = require('express');
 var appMiddleware = require('./app/middleware');
-var appRenderMainFrame = require('./app/render/main-frame');
-var renderOrg = require('./app/render/org');
+var mainFrameRenderer = require('./renderers/main-frame');
+var renderOrg = require('./renderers/org');
 var featureToggles = require('../web/middlewares/feature-toggles');
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
@@ -17,13 +17,13 @@ function handleOrgPage(req, res, next) {
 function handleOrgPageInFrame(req, res, next) {
   if (req.isPhone) return handleOrgPage(req, res, next);
 
-  appRenderMainFrame.renderMainFrame(req, res, next, 'iframe');
+  mainFrameRenderer.renderMainFrame(req, res, next, 'iframe');
 }
 
 router.get('/:orgName/rooms',
-           featureToggles,
-           appMiddleware.isPhoneMiddleware,
-           handleOrgPageInFrame);
+  featureToggles,
+  appMiddleware.isPhoneMiddleware,
+  handleOrgPageInFrame);
 
 router.get('/:orgName/rooms/~iframe',
   featureToggles,

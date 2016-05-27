@@ -4,24 +4,24 @@ var env = require('gitter-web-env');
 var winston = env.logger;
 var errorReporter = env.errorReporter;
 var Promise = require('bluebird');
-var contextGenerator = require('../../../web/context-generator');
-var restful = require('../../../services/restful');
+var contextGenerator = require('../../web/context-generator');
+var restful = require('../../services/restful');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var url = require('url');
 var _ = require('lodash');
-var chatService = require('../../../services/chat-service');
-var social = require('../../social-metadata');
-var restSerializer = require("../../../serializers/rest-serializer");
+var chatService = require('../../services/chat-service');
+var social = require('../social-metadata');
+var restSerializer = require("../../serializers/rest-serializer");
 var roomSort = require('gitter-realtime-client/lib/sorts-filters').pojo; /* <-- Don't use the default export
                                                                                           will bring in tons of client-side
                                                                                           libraries that we don't need */
-var roomNameTrimmer = require('../../../../public/js/utils/room-name-trimmer');
-var userSettingsService = require('../../../services/user-settings-service');
+var roomNameTrimmer = require('../../../public/js/utils/room-name-trimmer');
+var userSettingsService = require('../../services/user-settings-service');
 var parseRoomsIntoLeftMenuRoomList = require('gitter-web-shared/rooms/left-menu-room-list.js');
-var generateLeftMenuSnapshot = require('../../snapshots/left-menu-snapshot');
+var generateLeftMenuSnapshot = require('../snapshots/left-menu-snapshot');
 var parseRoomsIntoLeftMenuFavouriteRoomList = require('gitter-web-shared/rooms/left-menu-room-favourite-list');
 var getSubResources = require('./sub-resources');
-var fixMongoIdQueryParam = require('../../../web/fix-mongo-id-query-param');
+var fixMongoIdQueryParam = require('../../web/fix-mongo-id-query-param');
 
 /* How many chats to send back */
 

@@ -2,7 +2,7 @@
 
 var env = require('gitter-web-env');
 var nconf = env.config;
-var userService = require('../../../services/user-service');
+var userService = require('../../services/user-service');
 var renderMainFrame = require('./main-frame');
 
 /**

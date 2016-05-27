@@ -1,9 +1,9 @@
 "use strict";
 
 var express = require('express');
-var renderMainFrame = require('./render/main-frame');
-var renderChat = require('./render/chat');
-var renderUserNotSignedUp = require('./render/user-not-signed-up');
+var mainFrameRenderer = require('../renderers/main-frame');
+var chatRenderer = require('../renderers/chat');
+var userNotSignedUpRenderer = require('../renderers/user-not-signed-up');
 var appMiddleware = require('./middleware');
 var recentRoomService = require('../../services/recent-room-service');
 var isPhone = require('../../web/is-phone');
@@ -39,20 +39,20 @@ var mainFrameMiddlewarePipeline = [
           return res.redirect('/orgs/' + req.uriContext.uri + '/rooms/~iframe');
         }
 
-        renderChat.renderMobileNotLoggedInChat(req, res, next);
+        chatRenderer.renderMobileNotLoggedInChat(req, res, next);
         return;
       }
 
       saveRoom(req);
-      renderChat.renderMobileChat(req, res, next);
+      chatRenderer.renderMobileChat(req, res, next);
 
     } else {
-      renderMainFrame.renderMainFrame(req, res, next, 'chat');
+      mainFrameRenderer.renderMainFrame(req, res, next, 'chat');
     }
   },
   function (err, req, res, next) {
     if (err && err.userNotSignedUp && !isPhone(req.headers['user-agent'])) {
-      renderUserNotSignedUp.renderUserNotSignedUpMainFrame(req, res, next);
+      userNotSignedUpRenderer.renderUserNotSignedUpMainFrame(req, res, next);
       return;
     }
     return next(err);
@@ -74,19 +74,19 @@ var chatMiddlewarePipeline = [
 
     if(req.user) {
       saveRoom(req);
-      renderChat.renderChatPage(req, res, next);
+      chatRenderer.renderChatPage(req, res, next);
     } else {
       // We're doing this so we correctly redirect a logged out
       // user to the right chat post login
       var url = req.originalUrl;
       req.session.returnTo = url.replace(/\/~\w+(\?.*)?$/,"");
-      renderChat.renderNotLoggedInChatPage(req, res, next);
+      chatRenderer.renderNotLoggedInChatPage(req, res, next);
     }
 
   },
   function (err, req, res, next) {
     if (err && err.userNotSignedUp) {
-      renderUserNotSignedUp.renderUserNotSignedUp(req, res, next);
+      userNotSignedUpRenderer.renderUserNotSignedUp(req, res, next);
       return;
     }
     return next(err);
@@ -103,9 +103,9 @@ var embedMiddlewarePipeline = [
     if(!req.uriContext.troupe) return next(new StatusError(404));
 
     if (req.user) {
-      renderChat.renderEmbeddedChat(req, res, next);
+      chatRenderer.renderEmbeddedChat(req, res, next);
     } else {
-      renderChat.renderNotLoggedInEmbeddedChat(req, res, next);
+      chatRenderer.renderNotLoggedInEmbeddedChat(req, res, next);
     }
   }
 ];
@@ -118,7 +118,7 @@ var cardMiddlewarePipeline = [
     if(!req.uriContext.troupe) return next(new StatusError(404));
     if(req.uriContext.troupe.security !== 'PUBLIC') return next(new StatusError(403));
     if(!req.query.at) return next(new StatusError(400));
-    renderChat.renderChatCard(req, res, next);
+    chatRenderer.renderChatCard(req, res, next);
   }
 ];
 
