@@ -165,6 +165,7 @@ function ensureAccessAndFetchGroupInfo(user, options) {
 function createGroup(user, options) {
   return ensureAccessAndFetchGroupInfo(user, options)
     .then(function(groupInfo) {
+      debug("Upserting %j", groupInfo);
       return upsertGroup(user, groupInfo);
     });
 }
