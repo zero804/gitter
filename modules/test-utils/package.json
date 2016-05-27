@@ -1,0 +1,19 @@
+{
+  "name": "gitter-web-test-utils",
+  "version": "1.0.0",
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha test/"
+  },
+  "private": true,
+  "dependencies": {
+    "bluebird": "^3.4.0",
+    "debug": "^2.2.0",
+    "gitter-web-persistence": "file:../persistence",
+    "node-uuid": "^1.4.0"
+  }
+}

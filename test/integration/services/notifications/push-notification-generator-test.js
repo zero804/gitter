@@ -6,7 +6,7 @@ var testRequire = require('../../test-require');
 var Promise = require('bluebird');
 var mockito = require('jsmockito').JsMockito;
 var assert = require('assert');
-var fixtureLoader = require('../../test-fixtures');
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
 var times = mockito.Verifiers.times;
 var once = times(1);
