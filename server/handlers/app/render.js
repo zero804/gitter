@@ -9,7 +9,6 @@ var contextGenerator = require('../../web/context-generator');
 var restful = require('../../services/restful');
 var userService = require('../../services/user-service');
 var chatService = require('../../services/chat-service');
-var appVersion = require('gitter-app-version');
 var social = require('../social-metadata');
 var restSerializer = require("../../serializers/rest-serializer");
 var burstCalculator = require('../../utils/burst-calculator');
@@ -98,32 +97,6 @@ function getSubResources(entryPoint, jsRoot) {
   }
 
   return cdnSubResources(SUBRESOURCE_MAPPINGS[entryPoint], jsRoot);
-}
-
-
-var stagingText, stagingLink;
-var dnsPrefetch = (nconf.get('cdn:hosts') || []).concat([
-  nconf.get('ws:hostname')
-]);
-
-/* App tag */
-var staging = nconf.get('STAGING');
-switch(nconf.get('NODE_ENV')) {
-  case 'prod':
-    if(staging) {
-      stagingText = 'NEXT';
-      stagingLink = 'http://next.gitter.im';
-    }
-    break;
-  case 'beta':
-    var branch = appVersion.getBranch();
-    stagingText = branch ? branch.split('/').pop() : 'BETA';
-    stagingLink = appVersion.getGithubLink();
-    break;
-  case 'dev':
-    stagingText = 'DEV';
-    stagingLink = 'https://github.com/troupe/gitter-webapp/tree/develop';
-    break;
 }
 
 function renderHomePage(req, res, next) {
@@ -272,9 +245,6 @@ function renderMainFrame(req, res, next, frame) {
         roomMenuIsPinned:       snapshots.leftMenu.roomMenuIsPinned,
         chatAppLocation:        chatAppLocation,
         agent:                  req.headers['user-agent'],
-        stagingText:            stagingText,
-        stagingLink:            stagingLink,
-        dnsPrefetch:            dnsPrefetch,
         subresources:           getSubResources(bootScriptName),
         showFooterButtons:      true,
         showUnreadTab:          true,
@@ -387,7 +357,6 @@ function renderChat(req, res, options, next) {
             classNames: classNames.join(' '),
             agent: req.headers['user-agent'],
             subresources: getSubResources(script),
-            dnsPrefetch: dnsPrefetch,
             isPrivate: isPrivate,
             activityEvents: activityEvents,
             users: users && users.sort(userSort),
@@ -433,8 +402,7 @@ function renderMobileUserHome(req, res, next) {
       troupeName: req.uriContext.uri,
       troupeContext: troupeContext,
       agent: req.headers['user-agent'],
-      user: req.user,
-      dnsPrefetch: dnsPrefetch
+      user: req.user
     });
   })
   .catch(next);
@@ -650,7 +618,7 @@ function renderChatCard(req, res, next) {
     filterChats: function(chats) {
       // Only show the burst
       // TODO: move this somewhere useful
-      var permalinkedChat = _.find(chats, function(chat) { return chat.id == aroundId; });
+      var permalinkedChat = _.find(chats, function(chat) { return chat.id === aroundId; });
       if (!permalinkedChat) return [];
 
       var burstChats = isolateBurst(chats, permalinkedChat);
@@ -698,9 +666,7 @@ function renderUserNotSignedUpMainFrame(req, res, next, frame) {
         troupeName: req.params.roomPart1,
         troupeContext: troupeContext,
         chatAppLocation: chatAppLocation,
-        agent: req.headers['user-agent'],
-        stagingText: stagingText,
-        stagingLink: stagingLink,
+        agent: req.headers['user-agent']
       });
     })
     .catch(next);
