@@ -2,6 +2,7 @@
 
 var groupService = require('../lib/group-service');
 var assert = require('assert');
+var StatusError = require('statuserror');
 var fixtureLoader = require('../../../test/integration/test-fixtures');
 var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
 
@@ -109,9 +110,10 @@ describe('group-service', function() {
             name: 'This Should Fail',
             uri: 'i-love-cats'
           })
-          .then(function fulfilled(result) {
-            throw new Error('Promise was unexpectedly fulfilled. Result: ' + result);
-          }, function rejected(error) {
+          .then(function() {
+            assert.ok(false, 'expected error')
+          })
+          .catch(StatusError, function(error) {
             assert.strictEqual(error.status, 400);
           });
       });
