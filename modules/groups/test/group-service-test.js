@@ -16,7 +16,8 @@ describe('group-service', function() {
         deleteDocuments: {
           User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }],
           Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
-                  { lcUri: communityUri.toLowerCase() } ],
+                  { lcUri: communityUri.toLowerCase() },
+                  { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() }],
         },
         user1: {
           githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
@@ -47,6 +48,33 @@ describe('group-service', function() {
               members: 'PUBLIC',
               public: true,
               type: 'GH_ORG'
+            })
+          })
+      });
+
+      it('should create a group for an unknown GitHub owner', function() {
+        var groupUri = fixtureLoader.GITTER_INTEGRATION_USERNAME;
+        var user = fixture.user1;
+        return groupService.createGroup(user, {
+            type: 'GH_GUESS',
+            name: 'Bob',
+            uri: groupUri,
+            linkPath: groupUri
+          })
+          .then(function(group) {
+            assert.strictEqual(group.name, 'Bob');
+            assert.strictEqual(group.uri, groupUri);
+            assert.strictEqual(group.lcUri, groupUri.toLowerCase());
+            return securityDescriptorService.getForGroupUser(group._id, null);
+          })
+          .then(function(securityDescriptor) {
+            assert.deepEqual(securityDescriptor, {
+              admins: 'GH_USER_SAME',
+              externalId: fixtureLoader.GITTER_INTEGRATION_USER_ID,
+              linkPath: fixtureLoader.GITTER_INTEGRATION_USERNAME,
+              members: 'PUBLIC',
+              public: true,
+              type: 'GH_USER'
             })
           })
       });
