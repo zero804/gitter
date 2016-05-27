@@ -13,7 +13,7 @@ function UserStrategy(options) {
     return {
       id: user.id,
       username: user.username,
-      displayName: user.getDisplayName(),
+      displayName: user.displayName || user.username,
       avatarUrlSmall: resolveUserAvatarUrl(user, 60),
       avatarUrlMedium: resolveUserAvatarUrl(user, 128)
     };

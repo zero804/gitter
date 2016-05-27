@@ -3,11 +3,11 @@
 var env = require('gitter-web-env');
 var config = env.config;
 
-var Promise = require('bluebird');
 var TwitterStrategy = require('passport-twitter');
 var userService = require('../../services/user-service');
 var trackSignupOrLogin = require('../../utils/track-signup-or-login');
 var updateUserLocale = require('../../utils/update-user-locale');
+var passportLogin = require('../passport-login');
 
 //function twitterOauthCallback(req, accessToken, refreshToken, params, profile, done) {
 function twitterOauthCallback(req, token, tokenSecret, profile, done) {
@@ -29,22 +29,16 @@ function twitterOauthCallback(req, token, tokenSecret, profile, done) {
     accessTokenSecret: tokenSecret,
     avatar: avatar
   };
-  var user;
+
   return userService.findOrCreateUserForProvider(twitterUser, twitterIdentity)
-    .spread(function(_user, isNewUser) {
-      user = _user;
+    .spread(function(user, isNewUser) {
 
       trackSignupOrLogin(req, user, isNewUser, 'twitter');
       updateUserLocale(req, user);
 
-      return Promise.fromCallback(function(callback) {
-        req.logIn(user, callback);
-      });
+      return passportLogin(req, user);
     })
-    .then(function() {
-      done(null, user);
-    })
-    .catch(done);
+    .asCallback(done);
 }
 
 var twitterStrategy = new TwitterStrategy({
