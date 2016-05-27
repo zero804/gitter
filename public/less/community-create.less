@@ -23,12 +23,12 @@
 @secondary-input-spacing-bottom: 2rem;
 
 
-@number-org-items-per-column: 3;
+@number-org-items-per-column: 2;
 @org-item-avatar-size: 3.6rem;
 @org-item-height: @org-item-avatar-size;
 @org-item-spacing: 2rem;
 
-@number-repo-items-per-column: 5;
+@number-repo-items-per-column: 3;
 @repo-item-avatar-size: 2rem;
 @repo-item-height: @repo-item-avatar-size;
 
@@ -42,7 +42,7 @@
 @invite-user-item-avatar-size: 3.6rem;
 @invite-user-item-height: @invite-user-item-avatar-size;
 @invite-user-item-spacing: 2rem;
-@invite-user-area-total-height: @org-area-total-height - (@invite-user-item-height + @invite-user-item-spacing);
+@invite-user-area-total-height: @org-area-total-height;
 
 
 @people-list-item-spacing: .4rem;
@@ -775,28 +775,17 @@
   .primary-community-name-input();
 }
 
-.community-invite-people-email-section {
+.community-invite-people-email-input-wrapper {
+  display: flex;
+  // reset forms.less :(
+  margin: 0;
   margin-top: @invite-user-item-spacing;
 }
 
-.community-invite-people-email-input-wrapper {
-  display: flex;
-}
-
 .community-invite-people-email-input {
+  .secondary-bare-input();
   flex: 6;
-  height: @invite-user-item-height;
-  margin: 0;
-  padding: 0 2rem;
-
-  background-color: rgba(0, 0, 0, .3);
-  border: 0;
-
-  color: @base-text-color;
-
-  &:placeholder {
-    color: @subdued-text-color;
-  }
+  margin-bottom: 0;
 }
 
 .community-invite-people-email-submit-button {
@@ -947,7 +936,7 @@
 
 .community-create-invite-list-root {
   // @secondary-input-spacing-top is already used on the invite user result list
-  min-height: @people-list-item-height + (@secondary-input-height + @secondary-input-spacing-bottom);
+  min-height: @people-list-item-height;
   margin-top: @invite-user-item-spacing;
 }
 
