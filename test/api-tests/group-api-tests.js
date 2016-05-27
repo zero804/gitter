@@ -13,8 +13,7 @@ describe('group-api', function() {
     app = require('../../server/api');
   });
 
-  var fixture = {};
-  before(fixtureLoader(fixture, {
+  var fixture = fixtureLoader.setup({
     deleteDocuments: {
       User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }],
       Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() }],
@@ -26,10 +25,6 @@ describe('group-api', function() {
     },
     group1: {},
     troupe1: {}
-  }));
-
-  after(function() {
-    return fixture.cleanup();
   });
 
   it('GET /', function() {
