@@ -2,8 +2,15 @@
 
 var context = require('utils/context');
 var Marionette = require('backbone.marionette');
+var $ = require('jquery');
+
+var appEvents = require('utils/appevents');
 var modalRegion = require('components/modal-region');
 var ChatContainerView = require('views/chat/chatContainerView');
+var TroupeMenu = require('views/menu/old/troupeMenu');
+
+var CommunityCreateModel = require('../community-create/community-create-model');
+var CommunityCreateView = require('../community-create/community-create-view');
 
 //var RoomMenuLayout    = require('../menu/room/layout/room-menu-layout');
 //var appEvents         = require('utils/appevents');
@@ -14,12 +21,8 @@ var mobileDecorator = require('views/chat/decorators/mobileDecorator');
 var ChatInputView = require('views/chat/chatInputView');
 var JoinRoomView = require('views/chat/join-room-view');
 
-var $ = require('jquery');
-
-
-var TroupeMenu = require('views/menu/old/troupeMenu');
-
 require('views/behaviors/isomorphic');
+
 
 module.exports = Marionette.LayoutView.extend({
   template: false,
@@ -71,6 +74,13 @@ module.exports = Marionette.LayoutView.extend({
     this.chatCollection = options.chatCollection;
     this.dialogRegion = modalRegion;
     this.roomCollection = options.roomCollection;
+    this.orgCollection = options.orgCollection;
+    this.repoCollection = options.repoCollection;
+
+    this.communityCreateModel = new CommunityCreateModel();
+    this.hasRenderedCommunityCreateView = false;
+
+    this.listenTo(appEvents, 'community-create-view:toggle', this.onCommunityCreateToggle, this);
   },
 
   onRender: function() {
@@ -114,6 +124,18 @@ module.exports = Marionette.LayoutView.extend({
 
   },
 
+  initCommunityCreateRegion: function() {
+    this.repoCollection.fetch();
+
+    this.communityCreateView = new CommunityCreateView({
+      el: '.community-create-app-root',
+      model: this.communityCreateModel,
+      orgCollection: this.orgCollection,
+      repoCollection: this.repoCollection
+    });
+    return this.communityCreateView;
+  },
+
   hideTroupes: function() {
     this.makeAppFullScreen();
     //TODO Remove jp 24-11-15
@@ -129,6 +151,17 @@ module.exports = Marionette.LayoutView.extend({
     this.makeAppFullScreen();
     this.ui.mainPage.toggleClass('partiallyOffScreen');
     e.stopPropagation();
+  },
+
+
+  onCommunityCreateToggle: function(active) {
+    if(!this.hasRenderedCommunityCreateView) {
+      var communityCreateView = this.initCommunityCreateRegion();
+      communityCreateView.render();
+    }
+    this.communityCreateModel.set('active', active);
+
+    this.hasRenderedCommunityCreateView = true;
   }
 
 });

@@ -65,7 +65,7 @@ module.exports = (function () {
     initialize: function (options) {
       this.roomCollection = options.roomCollection;
       this.orgCollection = options.orgCollection;
-      this.repoCollection = options.repoCollection
+      this.repoCollection = options.repoCollection;
       this.dialogRegion = modalRegion;
 
       this.communityCreateModel = new CommunityCreateModel();
