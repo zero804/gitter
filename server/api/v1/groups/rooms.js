@@ -1,5 +1,6 @@
 'use strict';
 
+var StatusError = require('statuserror');
 var restful = require('../../../services/restful')
 var GroupWithPolicyService = require('../../../services/group-with-policy-service');
 
@@ -28,7 +29,7 @@ module.exports = {
 
     var uri = String(req.body.uri);
     var topic = String(req.body.topic);
-    var roomInfo = { uri: uri, topic: topic };
+    var createOptions = { uri: uri, topic: topic };
     if (req.body.security) {
       createOptions.public = req.body.security.public;
 
@@ -38,6 +39,6 @@ module.exports = {
     }
 
     var groupWithPolicyService = new GroupWithPolicyService(req.group, req.user, req.userGroupPolicy);
-    return groupWithPolicyService.createRoom(roomInfo);
+    return groupWithPolicyService.createRoom(createOptions);
   }
 };
