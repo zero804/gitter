@@ -27,9 +27,9 @@ module.exports = {
       throw new StatusError(404);
     }
 
-    var uri = String(req.body.uri);
+    var name = String(req.body.name);
     var topic = String(req.body.topic);
-    var createOptions = { uri: uri, topic: topic };
+    var createOptions = { name: name, topic: topic };
     if (req.body.security) {
       createOptions.public = req.body.security.public;
 
