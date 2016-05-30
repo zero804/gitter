@@ -47,7 +47,7 @@ function executeSearch(q, options) {
 // TODO: Replace this with full-text search
 function getSearchConjunction(res) {
   var displayNameSearch = { displayName: { $in: res } } ;
-  var usernameSearch = { username:    { $in: res } } ;
+  var usernameSearch = { username: { $in: res } } ;
 
   return [displayNameSearch, usernameSearch];
 }
@@ -95,7 +95,7 @@ function performQuery(queryText, options) {
         }
       },
       sort: [
-        { _score: { order : "desc"} }
+        { _score: { order: "desc"} }
       ],
     }
   };
@@ -145,7 +145,7 @@ function elasticsearchUserTypeahead(queryText, options) {
       fields: ["_id"],
       query: query,
       sort: [
-        { _score: { order : "desc"} }
+        { _score: { order: "desc"} }
       ],
     }
   };

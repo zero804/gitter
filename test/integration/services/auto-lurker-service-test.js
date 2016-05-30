@@ -4,7 +4,7 @@
 
 var testRequire = require('../test-require');
 var assert = require('assert');
-var fixtureLoader = require('../test-fixtures');
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
 var autoLurkerService = testRequire("./services/auto-lurker-service");
 var recentRoomService = testRequire("./services/recent-room-service");

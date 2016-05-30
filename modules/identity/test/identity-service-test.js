@@ -1,7 +1,7 @@
 'use strict';
 
 var identityService = require('../lib/identity-service');
-var fixtureLoader = require('../../../test/integration/test-fixtures');
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assert = require('assert');
 
 describe('identityService', function() {

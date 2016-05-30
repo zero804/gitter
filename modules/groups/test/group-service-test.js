@@ -3,7 +3,7 @@
 var groupService = require('../lib/group-service');
 var assert = require('assert');
 var StatusError = require('statuserror');
-var fixtureLoader = require('../../../test/integration/test-fixtures');
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
 
 describe('group-service', function() {
@@ -97,9 +97,7 @@ describe('group-service', function() {
               type: null,
               admins: 'MANUAL',
               public: true,
-              members: 'PUBLIC',
-              externalId: null,
-              linkPath: null
+              members: 'PUBLIC'
             })
           })
       });
@@ -180,7 +178,7 @@ describe('group-service', function() {
         .then(function(securityDescriptor) {
           assert.strictEqual(securityDescriptor.admins, 'GH_USER_SAME');
           assert.strictEqual(securityDescriptor.externalId, fixtureLoader.GITTER_INTEGRATION_USER_ID);
-          assert(!securityDescriptor.extraAdmins);
+          assert.deepEqual(securityDescriptor.extraAdmins, []);
           assert.equal(securityDescriptor.public, true);
           assert.equal(securityDescriptor.members, 'PUBLIC');
           assert.equal(securityDescriptor.linkPath, fixtureLoader.GITTER_INTEGRATION_USERNAME);
