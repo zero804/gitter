@@ -36,10 +36,6 @@ module.exports = {
       // for GitHub and future group types that are backed by other services
       createOptions.type = req.body.security.type;
       createOptions.linkPath = req.body.security.linkPath;
-    } else {
-      if (uri && uri[0] !== '_') {
-        throw new StatusError(400, 'Non-GitHub community URIs MUST be prefixed by an underscore for now.');
-      }
     }
     return groupService.createGroup(user, createOptions);
   },
