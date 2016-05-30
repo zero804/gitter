@@ -8,13 +8,10 @@ var assert = require('assert');
 var validateGroupName = require('gitter-web-validators/lib/validate-group-name');
 var validateGroupUri = require('gitter-web-validators/lib/validate-group-uri');
 var StatusError = require('statuserror');
-var legacyPolicyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
-var validateGitHubUri = require('gitter-web-github').GitHubUriValidator;
 var debug = require('debug')('gitter:groups:group-service');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var securityDescriptorGenerator = require('gitter-web-permissions/lib/security-descriptor-generator');
-var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
 
 /**
  * Find a group given an id
@@ -42,27 +39,11 @@ function findByUri(uri) {
 /**
  *
  */
-function upsertGroup(user, options) {
-  var type = options.type;
-  var uri = options.uri;
-  var name = options.name || uri;
+function upsertGroup(user, groupInfo, securityDescriptor) {
+  var type = groupInfo.type || null;
+  var uri = groupInfo.uri;
+  var name = groupInfo.name || uri;
   var lcUri = uri.toLowerCase();
-  var linkPath = options.linkPath;
-  var externalId = options.externalId || null;
-
-  var securityDescriptor;
-  if (type) {
-    securityDescriptor = securityDescriptorGenerator.generate(user, {
-        type: type,
-        linkPath: linkPath,
-        externalId: externalId,
-      });
-  } else {
-    if (uri[0] !== '_') {
-      throw new StatusError(400, 'Non-GitHub community URIs MUST be prefixed by an underscore for now.');
-    }
-    securityDescriptor = securityDescriptorGenerator.getDefaultGroupSecurityDescriptor(user._id);
-  }
 
   return mongooseUtils.upsert(Group, { lcUri: lcUri }, {
       $setOnInsert: {
@@ -72,66 +53,17 @@ function upsertGroup(user, options) {
         sd: securityDescriptor
       }
     })
-    .spread(function(group, updateExisting) {
-      debug('Upsert found existing group? %s', updateExisting);
-
-      /** Add a security descriptor */
-      if (updateExisting) return group;
-
-      debug('Inserting a security descriptor for a new group');
-
-
-      return securityDescriptorService.insertForGroup(group._id, securityDescriptor)
-        .return(group);
+    .spread(function(group /*, updateExisting */) {
+      return group;
     });
 }
 
-function ensureGitHubAccessAndFetchGroupInfo(user, options) {
-  var name = options.name;
-  var uri = options.uri;
-  var type = options.type;
-
-  var linkPath = options.linkPath;
-  assert(linkPath, 'linkPath required');
-
-  return validateGitHubUri(user, linkPath)
-    .then(function(githubInfo) {
-      debug("GitHub information for %s is %j", linkPath, githubInfo);
-
-      if (!githubInfo) throw new StatusError(404);
-
-      if (type === 'GH_ORG' && githubInfo.type !== 'ORG') {
-        throw new StatusError(400, 'linkPath is not an org: ' + linkPath);
-      }
-      if (type === 'GH_USER' && githubInfo.type !== 'USER') {
-        throw new StatusError(400, 'linkPath is not a user: ' + linkPath);
-      }
-
-      // for migration cases below
-      if (type === 'GH_GUESS') {
-        type = 'GH_'+githubInfo.type;
-      }
-
-      return canAdminPotentialGitHubGroup(user, githubInfo, options.obtainAccessFromGitHubRepo)
-        .then(function(isAdmin) {
-          if (!isAdmin) throw new StatusError(403, 'Not an administrator of this org');
-          return {
-            type: type,
-            name: name,
-            uri: uri,
-            linkPath: linkPath,
-            externalId: githubInfo.githubId || null
-          }
-        });
-    });
-}
 
 function ensureAccessAndFetchGroupInfo(user, options) {
   options = options || {};
 
   var name = options.name;
   var uri = options.uri;
-  var type = options.type || null;
   assert(user, 'user required');
   assert(name, 'name required');
   assert(uri, 'uri required');
@@ -150,44 +82,26 @@ function ensureAccessAndFetchGroupInfo(user, options) {
         throw new StatusError(400, 'Group uri already taken: ' + uri);
       }
 
-      switch (type) {
-        case 'GH_ORG':
-        case 'GH_USER':
-        case 'GH_GUESS': // for migration calls to createGroup, see below
-          return ensureGitHubAccessAndFetchGroupInfo(user, options);
-        case null:
-          return {
-            type: null,
+      return securityDescriptorGenerator.ensureAccessAndFetchDescriptor(user, options)
+        .then(function(securityDescriptor) {
+          return [{
             name: name,
             uri: uri
-          }
-        default:
-          throw new StatusError(400, 'type is not known: ' + type);
-      }
+          }, securityDescriptor];
+        });
     })
 }
 
+
 function createGroup(user, options) {
   return ensureAccessAndFetchGroupInfo(user, options)
-    .then(function(groupInfo) {
+    .spread(function(groupInfo, securityDescriptor) {
       debug("Upserting %j", groupInfo);
-      return upsertGroup(user, groupInfo);
+      return upsertGroup(user, groupInfo, securityDescriptor);
     });
 }
 
-/**
- * @private
- */
-function canAdminPotentialGitHubGroup(user, githubInfo, obtainAccessFromGitHubRepo) {
-  var type = githubInfo.type;
-  var uri = githubInfo.uri;
-  var githubId = githubInfo.id;
 
-  return legacyPolicyFactory.createGroupPolicyForGithubObject(user, type, uri, githubId, obtainAccessFromGitHubRepo)
-    .then(function(policy) {
-      return policy.canAdmin();
-    });
-}
 
 /**
  * @private
