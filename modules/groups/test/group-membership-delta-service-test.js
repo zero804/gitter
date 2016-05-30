@@ -2,7 +2,7 @@
 
 var groupMembershipDeltaService = require('../lib/group-membership-delta-service');
 var assert = require('assert');
-var fixtureLoader = require('../../../test/integration/test-fixtures');
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
 describe('group-membership-delta-service', function() {
 

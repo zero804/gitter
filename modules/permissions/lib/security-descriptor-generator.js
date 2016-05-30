@@ -39,15 +39,30 @@ function generateUserSecurityDescriptor(user, options) {
 function generateOrgSecurityDescriptor(user, options) {
   var externalId = options.externalId;
   var linkPath = options.linkPath;
+  var security = options.security;
 
-  return {
-    type: 'GH_ORG',
-    members: 'PUBLIC',
-    admins: 'GH_ORG_MEMBER',
-    public: true,
-    linkPath: linkPath,
-    externalId: externalId
-  };
+  switch(security || null) {
+    case 'PUBLIC':
+    case null:
+      return {
+        type: 'GH_ORG',
+        members: 'PUBLIC',
+        admins: 'GH_ORG_MEMBER',
+        public: true,
+        linkPath: linkPath,
+        externalId: externalId
+      };
+
+    case 'PRIVATE':
+      return {
+        type: 'GH_ORG',
+        members: 'GH_ORG_MEMBER',
+        admins: 'GH_ORG_MEMBER',
+        public: false,
+        linkPath: linkPath,
+        externalId: externalId
+      };
+  }
 }
 
 function generateRepoSecurityDescriptor(user, options) {
@@ -86,12 +101,15 @@ function generate(user, options) {
   assert(options.linkPath, 'linkPath required');
 
   switch (options.type) {
+    case 'USER':
     case 'GH_USER':
       return generateUserSecurityDescriptor(user, options);
 
+    case 'REPO':
     case 'GH_REPO':
       return generateRepoSecurityDescriptor(user, options);
 
+    case 'ORG':
     case 'GH_ORG':
       return generateOrgSecurityDescriptor(user, options);
 

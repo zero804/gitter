@@ -8,7 +8,7 @@ var Promise = require('bluebird');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var onMongoConnect = require('../../server/utils/on-mongo-connect');
 var userService = require('../../server/services/user-service');
-var groupSecurityDescriptorGenerator = require('gitter-web-permissions/lib/group-security-descriptor-generator');
+var securityDescriptorGenerator = require('gitter-web-permissions/lib/security-descriptor-generator');
 var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
 
 
@@ -196,7 +196,7 @@ function migrate(batch, enc, callback) {
 
           // Insert group security descriptors for the owning org or user.
           // (this will only insert if it is missing)
-          var securityDescriptor = groupSecurityDescriptorGenerator.generate(gitterUser, {
+          var securityDescriptor = securityDescriptorGenerator.generate(gitterUser, {
             type: 'GH_'+info.type.toUpperCase(), // ORG or USER
             linkPath: info.owner.uri, // mixed case OK?
             externalId: info.owner.githubId,

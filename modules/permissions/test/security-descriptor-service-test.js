@@ -1,28 +1,36 @@
 "use strict";
 
 var assert = require('assert');
-var fixtureLoader = require('../../../test/integration/test-fixtures');
-var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
-var securityDesciptorService = require('../lib/security-descriptor-service');
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
+var securityDescriptorService = require('../lib/security-descriptor-service');
 var permissionCombinations = require('./permission-combinations');
+var persistence = require('gitter-web-persistence');
 
 describe('security-descriptor-service', function() {
   describe('integration tests #slow', function() {
 
     permissionCombinations.forEach(function(descriptor, index) {
       it('should insert and read combination #' + index, function() {
-        var roomId = mongoUtils.getNewObjectIdString();
-        return securityDesciptorService.insertForRoom(roomId, descriptor)
-          .then(function() {
-            return securityDesciptorService.getForRoomUser(roomId, null);
+
+        return persistence.Troupe.create({
+            githubType: 'REPO'
           })
-          .then(function(result) {
-            assert.strictEqual(result.type, descriptor.type);
-            assert.strictEqual(result.members, descriptor.members);
-            assert.strictEqual(result.admins, descriptor.admins);
-            assert.strictEqual(result.linkPath, descriptor.linkPath);
-            assert.strictEqual(result.externalId, descriptor.externalId);
-          });
+          .tap(function(troupe) {
+            return securityDescriptorService.insertForRoom(troupe._id, descriptor)
+              .then(function() {
+                return securityDescriptorService.getForRoomUser(troupe._id, null);
+              })
+              .then(function(result) {
+                assert.strictEqual(result.type, descriptor.type);
+                assert.strictEqual(result.members, descriptor.members);
+                assert.strictEqual(result.admins, descriptor.admins);
+                assert.strictEqual(result.linkPath, descriptor.linkPath);
+                assert.strictEqual(result.externalId, descriptor.externalId);
+              })
+              .finally(function() {
+                return troupe.remove();
+              })
+          })
       });
     });
 
@@ -47,9 +55,9 @@ describe('security-descriptor-service', function() {
     after(function() { fixture.cleanup(); });
 
     it('should rename links', function() {
-      return securityDesciptorService.updateLinksForRepo('gitterHQ/gitter', 'gitterHQ/test')
+      return securityDescriptorService.updateLinksForRepo('gitterHQ/gitter', 'gitterHQ/test')
         .then(function() {
-          return securityDesciptorService.getForRoomUser(fixture.troupe1._id, null);
+          return securityDescriptorService.getForRoomUser(fixture.troupe1._id, null);
         })
         .then(function(descriptor) {
           assert.deepEqual(descriptor, {

@@ -3,11 +3,11 @@
 var env = require('gitter-web-env');
 var config = env.config;
 
-var Promise = require('bluebird');
 var LinkedInStrategy = require('passport-linkedin-oauth2').Strategy;
 var userService = require('../../services/user-service');
 var trackSignupOrLogin = require('../../utils/track-signup-or-login');
 var updateUserLocale = require('../../utils/update-user-locale');
+var passportLogin = require('../passport-login');
 
 function linkedinOauth2Callback(req, accessToken, refreshToken, profile, done) {
   var avatar = profile.photos[0].value; // is this always set?
@@ -29,22 +29,15 @@ function linkedinOauth2Callback(req, accessToken, refreshToken, profile, done) {
     refreshToken: refreshToken,
     avatar: avatar
   };
-  var user;
-  return userService.findOrCreateUserForProvider(linkedinUser, linkedinIdentity)
-    .spread(function(_user, isNewUser) {
-      user = _user;
 
+  return userService.findOrCreateUserForProvider(linkedinUser, linkedinIdentity)
+    .spread(function(user, isNewUser) {
       trackSignupOrLogin(req, user, isNewUser, 'linkedin');
       updateUserLocale(req, user);
 
-      return Promise.fromCallback(function(callback) {
-        req.logIn(user, callback);
-      });
+      return passportLogin(req, user);
     })
-    .then(function() {
-      done(null, user);
-    })
-    .catch(done);
+    .asCallback(done);
 }
 
 var linkedInStrategy = new LinkedInStrategy({

@@ -100,6 +100,10 @@ modulesWithTest.forEach(function(testDir) {
 
 testModules['api-tests'] = {
   files: ['./test/api-tests/**/*.js'],
+  options: {
+    // These tests load the entire app, so mocha will sometimes timeout before it even runs the tests
+    timeout: 30000
+  },
   includeInFast: false
 };
 
@@ -118,7 +122,7 @@ function makeTestTasks(taskName, generator, isFast) {
     }
 
     gulp.task(taskName + '-' + moduleName, function() {
-      return generator(moduleName, definition.files);
+      return generator(moduleName, definition.files, definition.options || {});
     });
   });
 
@@ -166,7 +170,7 @@ gulp.task('validate-eslint', function() {
 
 gulp.task('validate', ['validate-config', 'validate-eslint']);
 
-makeTestTasks('test-mocha', function(name, files) {
+makeTestTasks('test-mocha', function(name, files, options) {
   mkdirp.sync('output/test-reports/');
   mkdirp.sync('output/coverage-reports/' + name);
 
@@ -174,7 +178,7 @@ makeTestTasks('test-mocha', function(name, files) {
 
   var mochaOpts = {
     reporter: 'mocha-multi',
-    timeout: 10000,
+    timeout: options.timeout || 10000,
     istanbul: {
       dir: 'output/coverage-reports/' + name
     },
@@ -195,14 +199,14 @@ makeTestTasks('test-mocha', function(name, files) {
     .pipe(mocha(mochaOpts));
 });
 
-makeTestTasks('test-docker', function(name, files) {
+makeTestTasks('test-docker', function(name, files, options) {
   mkdirp.sync('output/test-reports/');
   mkdirp.sync('output/coverage-reports/' + name);
   gutil.log('Writing XUnit output', 'output/test-reports/' + name + '.xml');
   return gulp.src(files, { read: false })
     .pipe(mocha({
       reporter: 'mocha-multi',
-      timeout: 10000,
+      timeout: options.timeout || 10000,
       istanbul: {
         dir: 'output/coverage-reports/' + name
       },
@@ -262,12 +266,11 @@ gulp.task('submit-coveralls', ['test-mocha'/*, 'test-redis-lua'*/], function(cal
 
 gulp.task('test', ['test-mocha'/*, 'test-redis-lua'*/, 'submit-coveralls', 'submit-codacy']);
 
-makeTestTasks('localtest', function(name, files) {
-
+makeTestTasks('localtest', function(name, files, options) {
   return gulp.src(files, { read: false })
     .pipe(mocha({
       reporter: 'spec',
-      timeout: 10000,
+      timeout: options.timeout || 10000,
       bail: !!process.env.BAIL,
       env: {
         SKIP_BADGER_TESTS: 1,
@@ -294,14 +297,14 @@ gulp.task('clean:coverage', function (cb) {
   ], cb);
 });
 
-makeTestTasks('localtest-coverage', function(name, files) {
+makeTestTasks('localtest-coverage', function(name, files, options) {
   mkdirp.sync('output/test-reports/');
   mkdirp.sync('output/coverage-reports/' + name);
 
   return gulp.src(files, { read: false })
     .pipe(mocha({
       reporter: 'spec',
-      timeout: 10000,
+      timeout: options.timeout || 10000,
       istanbul: {
         dir: 'output/coverage-reports/' + name
       },
@@ -314,7 +317,7 @@ makeTestTasks('localtest-coverage', function(name, files) {
     }));
 });
 
-makeTestTasks('fasttest', function(name, files) {
+makeTestTasks('fasttest', function(name, files, options) {
   return gulp.src(files, { read: false })
     .pipe(mocha({
       reporter: 'spec',

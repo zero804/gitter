@@ -13,7 +13,7 @@ var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var validateGitHubUri = require('gitter-web-github').GitHubUriValidator;
 var debug = require('debug')('gitter:groups:group-service');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
-var groupSecurityDescriptorGenerator = require('gitter-web-permissions/lib/group-security-descriptor-generator');
+var securityDescriptorGenerator = require('gitter-web-permissions/lib/security-descriptor-generator');
 var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
 
 /**
@@ -50,11 +50,26 @@ function upsertGroup(user, options) {
   var linkPath = options.linkPath;
   var externalId = options.externalId || null;
 
+  var securityDescriptor;
+  if (type) {
+    securityDescriptor = securityDescriptorGenerator.generate(user, {
+        type: type,
+        linkPath: linkPath,
+        externalId: externalId,
+      });
+  } else {
+    if (uri[0] !== '_') {
+      throw new StatusError(400, 'Non-GitHub community URIs MUST be prefixed by an underscore for now.');
+    }
+    securityDescriptor = securityDescriptorGenerator.getDefaultGroupSecurityDescriptor(user._id);
+  }
+
   return mongooseUtils.upsert(Group, { lcUri: lcUri }, {
       $setOnInsert: {
         name: name,
         uri: uri,
-        lcUri: lcUri
+        lcUri: lcUri,
+        sd: securityDescriptor
       }
     })
     .spread(function(group, updateExisting) {
@@ -65,19 +80,6 @@ function upsertGroup(user, options) {
 
       debug('Inserting a security descriptor for a new group');
 
-      var securityDescriptor;
-      if (type) {
-        securityDescriptor = groupSecurityDescriptorGenerator.generate(user, {
-            type: type,
-            linkPath: linkPath,
-            externalId: externalId,
-          });
-      } else {
-        if (uri[0] !== '_') {
-          throw new StatusError(400, 'Non-GitHub community URIs MUST be prefixed by an underscore for now.');
-        }
-        securityDescriptor = groupSecurityDescriptorGenerator.getDefaultGroupSecurityDescriptor(user._id);
-      }
 
       return securityDescriptorService.insertForGroup(group._id, securityDescriptor)
         .return(group);

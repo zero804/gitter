@@ -194,11 +194,11 @@ function validateOneToOneDescriptor(descriptor) {
     throw new StatusError(403, 'Invalid externalId attribute');
   }
 
-  if (descriptor.extraMembers) {
+  if (descriptor.extraMembers && descriptor.extraMembers.length) {
     throw new StatusError(403, 'Invalid extraMembers attribute');
   }
 
-  if (descriptor.extraAdmins) {
+  if (descriptor.extraAdmins && descriptor.extraAdmins.length) {
     throw new StatusError(403, 'Invalid extraAdmins attribute');
   }
 

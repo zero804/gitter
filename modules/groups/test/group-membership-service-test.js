@@ -2,7 +2,7 @@
 
 var groupMembershipService = require('../lib/group-membership-service');
 var assert = require('assert');
-var fixtureLoader = require('../../../test/integration/test-fixtures');
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 describe('group-membership-service', function() {
