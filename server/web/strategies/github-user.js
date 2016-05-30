@@ -6,7 +6,6 @@ var errorReporter = env.errorReporter;
 var stats = env.stats;
 var logger = env.logger;
 
-var Promise = require('bluebird');
 var moment = require('moment');
 var GitHubStrategy = require('gitter-passport-github').Strategy;
 var TokenStateProvider = require('gitter-passport-oauth2').TokenStateProvider;
@@ -20,6 +19,7 @@ var trackUserLogin = require('../../utils/track-user-login');
 var updateUserLocale = require('../../utils/update-user-locale');
 var debug = require('debug')('gitter:infra:passport');
 var obfuscateToken = require('gitter-web-github').obfuscateToken;
+var passportLogin = require('../passport-login');
 
 // Move this out once we use it multiple times. We're only interested in
 // account age for github users at this stage.
@@ -69,14 +69,10 @@ function updateUser(req, accessToken, user, githubUserProfile) {
 
       updateUserLocale(req, user);
 
-      return Promise.fromCallback(function(callback) {
-        req.logIn(user, callback);
-      });
-    })
-    .then(function() {
       // Remove the old token for this user
       req.accessToken = null;
-      return user;
+
+      return passportLogin(req, user);
     });
 }
 
@@ -93,10 +89,8 @@ function addUser(req, accessToken, githubUserProfile) {
 
   debug('About to create GitHub user %j', githubUser);
 
-  var user;
   return userService.findOrCreateUserForGithubId(githubUser)
-    .then(function(_user) {
-      user = _user;
+    .then(function(user) {
 
       debug('Created GitHub user %j', user.toObject());
 
@@ -120,12 +114,7 @@ function addUser(req, accessToken, githubUserProfile) {
         }
       });
 
-      return Promise.fromCallback(function(callback) {
-        req.logIn(user, callback);
-      });
-    })
-    .then(function() {
-      return user;
+      return passportLogin(req, user);
     });
 }
 
@@ -164,9 +153,6 @@ function githubUserCallback(req, accessToken, refreshToken, params, _profile, do
         return addUser(req, accessToken, githubUserProfile);
       }
     })
-    .then(function(user) {
-      done(null, user);
-    })
     .catch(function(err) {
       errorReporter(err, { oauth: "failed" }, { module: 'passport' });
       stats.event("oauth_profile.error");
@@ -174,8 +160,9 @@ function githubUserCallback(req, accessToken, refreshToken, params, _profile, do
         exception: err,
         accessToken: loggableToken
       });
-      return done(err);
-    });
+      throw err;
+    })
+    .asCallback(done);
 }
 
 var githubUserStrategy = new GitHubStrategy({

@@ -1,8 +1,5 @@
 "use strict";
 
-var env = require('gitter-web-env');
-var logger = env.logger;
-
 var passport = require('passport');
 var ClientPasswordStrategy = require('passport-oauth2-client-password').Strategy;
 var BearerStrategy = require('gitter-passport-http-bearer').Strategy;
@@ -13,7 +10,6 @@ var githubUpgradeStrategy = require('./strategies/github-upgrade');
 var googleStrategy = require('./strategies/google');
 var twitterStrategy = require('./strategies/twitter');
 var linkedinStrategy = require('./strategies/linkedin');
-
 
 function installApi() {
   /**
@@ -31,49 +27,34 @@ function installApi() {
       return oauthService.validateAccessTokenAndClient(accessToken)
         .then(function(tokenInfo) {
           // Token not found
-          if(!tokenInfo) return done();
+          if(!tokenInfo) return;
 
           var user = tokenInfo.user;
           var client = tokenInfo.client;
 
-          if (!client) return done();
+          if (!client) return;
 
           if (!user) {
             /* This will be converted to null in auth-api.js */
             user = { _anonymous: true };
           }
-          // Not yet needed var accessToken = tokenInfo.accessToken;
-          done(null, user, { client: client, accessToken: accessToken });
+
+          return [user, { client: client, accessToken: accessToken }];
         })
-        .catch(done);
+        .asCallback(done, { spread: true });
     }
   ));
 }
 
-
-
 function install() {
   passport.serializeUser(function(user, done) {
-    done(null, user.id);
+    var serializedId = user.id || user._id && user._id.toHexString();
+    done(null, serializedId);
   });
 
   passport.deserializeUser(function deserializeUserCallback(id, done) {
-    userService.findById(id, function findUserByIdCallback(err, user) {
-      if(err) {
-        logger.error('Unable to deserialize user ' + err, { exception: err });
-        return done(err);
-      }
-
-      if(!user) {
-        logger.error('Unable to deserialize user ' + id + '. Not found.');
-        /* For some reason passport wants a null here */
-        return done(null, null);
-      }
-
-      /* Todo: consider using a seperate object for the security user */
-      return done(null, user);
-    });
-
+    return userService.findById(id)
+      .asCallback(done);
   });
 
 
@@ -92,17 +73,16 @@ function install() {
    * the specification, in practice it is quite common.
    */
 
-  passport.use(new ClientPasswordStrategy(
-    function(clientKey, clientSecret, done) {
-      oauthService.findClientByClientKey(clientKey, function(err, client) {
-        if (err) { return done(err); }
-        if (!client) { return done(null, false); }
-        if (client.clientSecret != clientSecret) { return done(null, false); }
+  passport.use(new ClientPasswordStrategy(function(clientKey, clientSecret, done) {
+    return oauthService.findClientByClientKey(clientKey)
+      .then(function(client) {
+        if (!client) return false;
+        if (client.clientSecret !== clientSecret) return false;
 
-        return done(null, client);
-      });
-    }
-  ));
+        return client;
+      })
+      .asCallback(done);
+  }));
 
   /* Install the API OAuth strategy too */
   installApi();

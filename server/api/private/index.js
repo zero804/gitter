@@ -104,4 +104,9 @@ router.get('/avatars/gravatar/e/:email',
   identifyRoute('api-private-gravatar'),
   require('./gravatar'));
 
+router.post('/markdown-preview',
+  identifyRoute('api-private-markdown-preview'),
+  require('./markdown-preview'));
+
+
 module.exports = router;
