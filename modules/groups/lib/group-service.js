@@ -94,6 +94,10 @@ function ensureAccessAndFetchGroupInfo(user, options) {
 
 
 function createGroup(user, options) {
+  if (!options.type && options.uri && options.uri[0] !== '_') {
+    throw new StatusError(400, 'Non-GitHub community URIs MUST be prefixed by an underscore for now.');
+  }
+
   return ensureAccessAndFetchGroupInfo(user, options)
     .spread(function(groupInfo, securityDescriptor) {
       debug("Upserting %j", groupInfo);
