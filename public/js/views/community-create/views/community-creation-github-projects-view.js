@@ -173,9 +173,9 @@ module.exports = CommunityCreateBaseStepView.extend({
       selectedOrgName: selectedOrgName
     });
 
+    this.setSelectedGitHubProjectCommunityState();
     // Clicking a org moves you onto the next step and fills in the data
     if(activeModel) {
-      this.setSelectedGitHubProjectCommunityState();
       this.onStepNext();
     }
   },
@@ -191,9 +191,9 @@ module.exports = CommunityCreateBaseStepView.extend({
       selectedRepoName: selectedRepoName
     });
 
+    this.setSelectedGitHubProjectCommunityState();
     // Clicking a repo moves you onto the next step and fills in the data
     if(activeModel) {
-      this.setSelectedGitHubProjectCommunityState();
       this.onStepNext();
     }
   },
