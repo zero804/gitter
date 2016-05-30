@@ -1,7 +1,11 @@
 'use strict';
 
+var Promise = require('bluebird');
 var StatusError = require('statuserror');
 var assert = require('assert');
+var validateGitHubUri = require('gitter-web-github').GitHubUriValidator;
+var legacyPolicyFactory = require('./legacy-policy-factory');
+var debug = require('debug')('gitter:app:security-descriptor-generator');
 
 
 function usernameMatchesUri(user, linkPath) {
@@ -118,18 +122,93 @@ function generate(user, options) {
   }
 }
 
-function getDefaultGroupSecurityDescriptor(creatorUserId) {
+function getDefaultSecurityDescriptor(creatorUserId, isPublic) {
+  var members = (isPublic) ? 'PUBLIC' : 'PRIVATE';
   return {
     type: null,
     admins: 'MANUAL',
-    public: true,
-    members: 'PUBLIC',
+    public: isPublic,
+    members: members,
     extraMembers: [],
     extraAdmins: [creatorUserId]
   }
 }
 
+/**
+ * @private
+ */
+function canAdminPotentialGitHubGroup(user, githubInfo, obtainAccessFromGitHubRepo) {
+  var type = githubInfo.type;
+  var uri = githubInfo.uri;
+  var githubId = githubInfo.id;
+
+  return legacyPolicyFactory.createGroupPolicyForGithubObject(user, type, uri, githubId, obtainAccessFromGitHubRepo)
+    .then(function(policy) {
+      return policy.canAdmin();
+    });
+}
+
+function ensureGitHubAccessAndFetchDescriptor(user, options) {
+  var type = options.type;
+  var linkPath = options.linkPath;
+  var isPublic = options.public || true;
+  var obtainAccessFromGitHubRepo = options.obtainAccessFromGitHubRepo || null;
+
+  assert(type, "type required");
+  assert(linkPath, "linkPath required");
+
+  return validateGitHubUri(user, linkPath)
+    .then(function(githubInfo) {
+      debug("GitHub information for %s is %j", linkPath, githubInfo);
+
+      if (!githubInfo) throw new StatusError(404);
+
+      if (type === 'GH_ORG' && githubInfo.type !== 'ORG') {
+        throw new StatusError(400, 'linkPath is not an org: ' + linkPath);
+      }
+      if (type === 'GH_USER' && githubInfo.type !== 'USER') {
+        throw new StatusError(400, 'linkPath is not a user: ' + linkPath);
+      }
+
+      // for migration cases below
+      if (type === 'GH_GUESS') {
+        type = 'GH_'+githubInfo.type;
+      }
+
+      return canAdminPotentialGitHubGroup(user, githubInfo, obtainAccessFromGitHubRepo)
+        .then(function(isAdmin) {
+          if (!isAdmin) throw new StatusError(403, 'Not an administrator of this org');
+          return generate(user, {
+              type: type,
+              linkPath: linkPath,
+              externalId: githubInfo.githubId,
+              public: isPublic // TODO: how do we validate this?
+            });
+        });
+    });
+}
+
+var ensureAccessAndFetchDescriptor = Promise.method(function(user, options) {
+  var type = options.type || null;
+  var isPublic = options.public || true;
+  // options can also contain linkPath, public, obtainAccessFromGitHubRepo
+
+  switch (type) {
+    case 'GH_ORG':
+    case 'GH_USER':
+    case 'GH_GUESS': // for migration calls to createGroup, see below
+      return ensureGitHubAccessAndFetchDescriptor(user, options);
+
+    case null:
+      return getDefaultSecurityDescriptor(user._id, isPublic);
+
+    default:
+      throw new StatusError(400, 'type is not known: ' + type);
+  }
+});
+
 module.exports = {
   generate: generate,
-  getDefaultGroupSecurityDescriptor: getDefaultGroupSecurityDescriptor
+  getDefaultSecurityDescriptor: getDefaultSecurityDescriptor,
+  ensureAccessAndFetchDescriptor: ensureAccessAndFetchDescriptor
 }

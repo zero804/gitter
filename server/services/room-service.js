@@ -1276,6 +1276,89 @@ function deleteRoom(troupe) {
     });
 }
 
+// This is the new way to add any type of room to a group and should replace
+// all the types of room creation except one-to-ones
+// TODO: what about joining a room in a group?
+function upsertGroupRoom(user, group, roomInfo, securityDescriptor, options) {
+  var options = options || {}; // options.tracking
+  var type = roomInfo.type || null;
+  var uri = roomInfo.uri;
+  var topic = roomInfo.topic || null;
+  var lcUri = uri.toLowerCase();
+
+  // convert back to the old github-tied vars here
+  var security = securityDescriptor.security || null;
+  var githubId = securityDescriptor.externalId || null;
+  var githubType;
+  var roomType;
+  switch (type) {
+    case 'GH_ORG':
+      githubType = 'ORG';
+      roomType = 'github-room';
+      break
+
+    case 'GH_REPO':
+      githubType = 'REPO';
+      roomType = 'github-room';
+      break
+
+    case null:
+      githubType = 'NONE';
+      roomType = 'group-room'; // or channel?
+      break;
+
+    default:
+      throw new StatusError(400, 'type is not known: ' + type);
+  }
+
+  return mongooseUtils.upsert(persistence.Troupe, { lcUri: lcUri }, {
+      $setOnInsert: {
+        groupId: group._id,
+        topic: topic,
+        uri: uri,
+        lcUri: lcUri,
+        userCount: 0,
+        sd: securityDescriptor,
+
+        // TODO: Remove this soon. Here for backwards compatibility for now.
+        lcOwner: lcUri.split('/')[0],
+        githubType: githubType,
+        githubId: githubId,
+        security: security,
+
+        // NOTE: assuming there can't be parentId and ownerUserId anymore?
+      }
+    })
+    .spread(function(room, updateExisting) {
+      if (updatedExisting) {
+        /* Somehow someone beat us to it */
+        throw new StatusError(409);
+      }
+      return room;
+    })
+    .tap(function(room) {
+      var flags = userDefaultFlagsService.getDefaultFlagsForUser(user);
+      return roomMembershipService.addRoomMember(room._id, user._id, flags);
+    })
+    .tap(function(room) {
+      // Send the created room notification
+      emailNotificationService.createdRoomNotification(user, room) // send an email to the room's owner
+        .catch(function(err) {
+          logger.error('Unable to send create room notification: ' + err, { exception: err });
+        });
+
+      // NOTE: does options.tracking still make sense?
+      sendJoinStats(user, room, options.tracking);
+
+      stats.event("create_room", {
+        userId: user._id,
+        roomType: roomType
+      });
+
+      return uriLookupService.reserveUriForTroupeId(room._id, uri);
+    });
+}
+
 module.exports = {
   applyAutoHooksForRepoRoom: applyAutoHooksForRepoRoom,
   findAllRoomsIdsForUserIncludingMentions: findAllRoomsIdsForUserIncludingMentions,
