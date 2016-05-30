@@ -23,6 +23,7 @@ describe('group-api', function() {
       User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }],
       Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
               { lcUri: communityUri.toLowerCase() } ],
+      Troupe: [ {lcUri: fixtureLoader.GITTER_INTEGRATION_REPO.toLowerCase()}]
     },
     user1: {
       githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
@@ -97,6 +98,21 @@ describe('group-api', function() {
 
         assert.strictEqual(result.body.length, 1);
       })
+  });
+
+  it.skip('POST /v1/groups/:groupId/rooms', function() {
+    return request(app)
+      .post('/v1/groups/' + fixture.group1.id + '/rooms')
+      .send({
+        name: 'test',
+        topic: 'all about testing',
+        security: {
+          type: 'GH_REPO',
+          linkPath: fixtureLoader.GITTER_INTEGRATION_REPO
+        }
+      })
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200);
   });
 
 
