@@ -23,16 +23,20 @@
 @secondary-input-spacing-bottom: 2rem;
 
 
-@number-org-items-per-column: 2;
+@number-github-projects-per-row: 3;
+
+@number-org-items-per-column: 3;
 @org-item-avatar-size: 3.6rem;
 @org-item-height: @org-item-avatar-size;
 @org-item-spacing: 2rem;
 
-@number-repo-items-per-column: 3;
+@number-repo-items-per-column: 5;
 @repo-item-avatar-size: 2rem;
 @repo-item-height: @repo-item-avatar-size;
 
-@org-area-padding: @repo-item-avatar-size;
+@org-area-padding: 2rem;
+// 2rem but need px so we can avoid calc
+@org-area-inner-width: (@step-content-area-max-width - (2 * 20px)); /*@org-area-padding*/
 @org-area-total-height: (@number-org-items-per-column * @org-item-height) + (@number-org-items-per-column * @org-item-spacing);
 
 @repo-item-spacing: (@org-area-total-height - (@number-repo-items-per-column * @repo-item-height)) / @number-repo-items-per-column;
@@ -616,6 +620,9 @@
 
 .community-create-github-project-list-wrapper {
   overflow: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   height: 100%;
 
   &::-webkit-scrollbar-thumb {
@@ -637,6 +644,17 @@
   list-style: none;
 }
 
+.loop-github-projects-list-item-max-width(@num-columns) when (@num-columns > 1) {
+  // next iteration
+  .loop-github-projects-list-item-max-width(@num-columns - 1);
+
+  // Only when we can fit the appropriate number of items in (see flex-basis)
+  @breakpoint-width: ((@org-area-inner-width / @num-columns) * (@num-columns - 1));
+  @media (min-width: @breakpoint-width) {
+    max-width: 100% / @num-columns;
+  }
+}
+
 .community-create-github-project-list-item(@item-spacing) {
   @border-width: 2px;
   @vertical-padding-calc-value: (@item-spacing / 2) ~"-" @border-width;
@@ -644,12 +662,14 @@
   overflow: hidden;
   flex-grow: 1;
   // This will ensure we can have at max 2 items
-  flex-basis: (@step-content-area-max-width / 3) + 1;
+  flex-basis: (@org-area-inner-width / (@number-github-projects-per-row + 1)) + 1;
   display: block;
-  border: @border-width solid transparent;
+  .loop-github-projects-list-item-max-width(@number-github-projects-per-row);
 
   margin-top: calc(@vertical-padding-calc-value);
   margin-bottom: calc(@vertical-padding-calc-value);
+
+  border: @border-width solid transparent;
 
   transition: border-color .2s ease;
 
