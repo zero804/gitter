@@ -1280,13 +1280,13 @@ function deleteRoom(troupe) {
 // all the types of room creation except one-to-ones
 // TODO: what about joining a room in a group?
 function upsertGroupRoom(user, group, roomInfo, securityDescriptor, options) {
-  var options = options || {}; // options.tracking
-  var type = roomInfo.type || null;
+  options = options || {}; // options.tracking
   var uri = roomInfo.uri;
   var topic = roomInfo.topic || null;
   var lcUri = uri.toLowerCase();
 
   // convert back to the old github-tied vars here
+  var type = securityDescriptor.type || null;
   var security = securityDescriptor.security || null;
   var githubId = securityDescriptor.externalId || null;
   var githubType;
@@ -1329,7 +1329,7 @@ function upsertGroupRoom(user, group, roomInfo, securityDescriptor, options) {
         // NOTE: assuming there can't be parentId and ownerUserId anymore?
       }
     })
-    .spread(function(room, updateExisting) {
+    .spread(function(room, updatedExisting) {
       if (updatedExisting) {
         /* Somehow someone beat us to it */
         throw new StatusError(409);

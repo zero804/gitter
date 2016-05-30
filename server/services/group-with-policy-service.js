@@ -1,8 +1,13 @@
 'use strict';
 
-var secureMethod = require('../utils/secure-method');
 var assert = require('assert');
+var StatusError = require('statuserror');
 var securityDescriptorGenerator = require('gitter-web-permissions/lib/security-descriptor-generator');
+var Troupe = require('gitter-web-persistence').Troupe;
+var debug = require('debug')('gitter:app:group-with-policy-service');
+var roomService = require('./room-service');
+var secureMethod = require('../utils/secure-method');
+var validateRoomName = require('gitter-web-validators/lib/validate-room-name');
 
 /**
  * This could do with a better name
@@ -19,33 +24,39 @@ function allowAdmin() {
   return this.policy.canAdmin();
 }
 
+function findByUri(uri) {
+  assert(uri, 'uri required');
+  return Troupe.findOne({ lcUri: uri.toLowerCase() })
+    .lean()
+    .exec();
+}
 
 function ensureAccessAndFetchRoomInfo(user, group, options) {
   options = options || {};
 
-  var uri = options.uri;
-  assert(uri, 'uri required');
+  var topic = options.topic || null;
+  var name = options.name;
 
-  uri = group.uri + '/' + uri;
+  assert(name, 'name required');
 
-  var topic = options.topic; // null or ''?
+  if (!validateRoomName(name)) {
+    throw new StatusError(400, 'Invalid room name: ' + name);
+  }
+
+  var uri = group.uri + '/' + name;
 
   // TODO: validate topic
 
-  if (!validateRoomUri(uri)) {
-    throw new StatusError(400, 'Invalid room uri: ' + uri);
-  }
-
-  return troupeService.findByUri(uri)
+  return findByUri(uri)
     .then(function(room) {
       if (room) {
         throw new StatusError(400, 'Room uri already taken: ' + uri);
       }
 
-      return securityDescriptorService.ensureAccessAndFetchDescriptor(user, options)
+      return securityDescriptorGenerator.ensureAccessAndFetchDescriptor(user, options)
         .then(function(securityDescriptor) {
           return [{
-            name: name,
+            topic: topic,
             uri: uri
           }, securityDescriptor];
         });
@@ -57,7 +68,9 @@ function ensureAccessAndFetchRoomInfo(user, group, options) {
  * Allow admins to create a new room
  * @return {Promise} Promise of room
  */
-GroupWithPolicyService.prototype.createRoom = secureMethod([allowAdmin], function(roomInfo) {
+GroupWithPolicyService.prototype.createRoom = secureMethod([allowAdmin], function(options) {
+  var user = this.policy.user;
+  var group = this.policy.group;
   return ensureAccessAndFetchRoomInfo(user, group, options)
     .spread(function(roomInfo, securityDescriptor) {
       debug("Upserting %j", roomInfo);
