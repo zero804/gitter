@@ -102,7 +102,7 @@ describe('group-service', function() {
           })
       });
 
-      it('should throw an error if you try and create a new style community not prefixed with a promise', function() {
+      it('should throw an error if you try and create a new style community not prefixed with an underscore', function() {
         var user = fixture.user1;
         return groupService.createGroup(user, {
             name: 'This Should Fail',
