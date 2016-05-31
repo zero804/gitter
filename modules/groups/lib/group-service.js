@@ -40,7 +40,6 @@ function findByUri(uri) {
  *
  */
 function upsertGroup(user, groupInfo, securityDescriptor) {
-  var type = groupInfo.type || null;
   var uri = groupInfo.uri;
   var name = groupInfo.name || uri;
   var lcUri = uri.toLowerCase();

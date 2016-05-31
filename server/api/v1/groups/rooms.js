@@ -16,8 +16,6 @@ module.exports = {
   },
 
   create: function(req) {
-    var user = req.user;
-
     if (!req.user) {
       throw new StatusError(401);
     }
