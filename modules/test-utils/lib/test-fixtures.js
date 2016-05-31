@@ -252,7 +252,6 @@ function createExpectedFixtures(expected) {
       lcUri: uri.toLowerCase()
     };
 
-    debug('Creating group %s with %j', fixtureName, doc);
 
     var securityDescriptor = f.securityDescriptor || {};
 
@@ -271,11 +270,15 @@ function createExpectedFixtures(expected) {
       public: 'public' in securityDescriptor ? securityDescriptor.public : true,
       linkPath: securityDescriptor.linkPath,
       externalId: securityDescriptor.externalId,
-      extraMembers: securityDescriptor.extraMembers,
-      extraAdmins: securityDescriptor.extraAdmins
+      extraMembers: undefined,
+      extraAdmins: undefined
     };
 
     doc.sd = securityDoc;
+
+    debug('Creating group %s with %j', fixtureName, doc);
+
+    debug(doc);
 
     return persistence.Group.create(doc);
   }
@@ -409,6 +412,16 @@ function createExpectedFixtures(expected) {
         return createGroup(key, expected[key])
           .then(function(createdGroup) {
             fixture[key] = createdGroup;
+
+            // add specified extra admins
+            var f = expected[key];
+            var extraAdmins = f.securityDescriptor && f.securityDescriptor.extraAdmins;
+            if (extraAdmins) {
+              fixture[key].sd.extraAdmins = extraAdmins.map(function(user) {
+                return fixture[user]._id;
+              });
+              return fixture[key].save();
+            }
           });
       }
     })
@@ -531,5 +544,6 @@ fixtureLoader.GITTER_INTEGRATION_USER_ID = '19433197';
 fixtureLoader.GITTER_INTEGRATION_ORG = 'gitter-integration-tests-organisation';
 fixtureLoader.GITTER_INTEGRATION_ORG_ID = '19433202';
 fixtureLoader.GITTER_INTEGRATION_REPO = 'public-repo-1';
+fixtureLoader.GITTER_INTEGRATION_COMMUNITY = '_I-heart-cats-Test-LOL';
 
 module.exports = fixtureLoader;

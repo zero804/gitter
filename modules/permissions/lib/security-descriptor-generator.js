@@ -166,6 +166,9 @@ function ensureGitHubAccessAndFetchDescriptor(user, options) {
       if (type === 'GH_ORG' && githubInfo.type !== 'ORG') {
         throw new StatusError(400, 'linkPath is not an org: ' + linkPath);
       }
+      if (type === 'GH_REPO' && githubInfo.type !== 'REPO') {
+        throw new StatusError(400, 'linkPath is not a repo: ' + linkPath);
+      }
       if (type === 'GH_USER' && githubInfo.type !== 'USER') {
         throw new StatusError(400, 'linkPath is not a user: ' + linkPath);
       }
@@ -175,6 +178,7 @@ function ensureGitHubAccessAndFetchDescriptor(user, options) {
         type = 'GH_'+githubInfo.type;
       }
 
+      // TODO: should this do something else when adding rooms to existing groups? what?
       return canAdminPotentialGitHubGroup(user, githubInfo, obtainAccessFromGitHubRepo)
         .then(function(isAdmin) {
           if (!isAdmin) throw new StatusError(403, 'Not an administrator of this org');
@@ -195,6 +199,7 @@ var ensureAccessAndFetchDescriptor = Promise.method(function(user, options) {
 
   switch (type) {
     case 'GH_ORG':
+    case 'GH_REPO':
     case 'GH_USER':
     case 'GH_GUESS': // for migration calls to createGroup, see below
       return ensureGitHubAccessAndFetchDescriptor(user, options);

@@ -9,8 +9,6 @@ var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 describe('group-api', function() {
   this.timeout(10000);
 
-  var communityUri = '_I-heart-cats-Test-LOL';
-
   var app, request;
 
   before(function() {
@@ -22,7 +20,7 @@ describe('group-api', function() {
     deleteDocuments: {
       User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }],
       Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
-              { lcUri: communityUri.toLowerCase() } ],
+              { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() } ],
       Troupe: [ {lcUri: fixtureLoader.GITTER_INTEGRATION_REPO.toLowerCase()}]
     },
     user1: {
@@ -31,6 +29,9 @@ describe('group-api', function() {
       accessToken: 'web-internal'
     },
     group1: {
+      securityDescriptor: {
+        extraAdmins: ['user1']
+      }
     },
     troupe1: {
       security: 'PUBLIC',
@@ -56,7 +57,7 @@ describe('group-api', function() {
   it('POST /v1/groups (new style community)', function() {
     return request(app)
       .post('/v1/groups')
-      .send({ uri: communityUri, name: 'Test' })
+      .send({ uri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY, name: 'Test' })
       .set('x-access-token', fixture.user1.accessToken)
       .expect(200)
   });
@@ -108,12 +109,10 @@ describe('group-api', function() {
         topic: 'all about testing',
         security: {
           type: 'GH_REPO',
-          linkPath: fixtureLoader.GITTER_INTEGRATION_REPO
+          linkPath: fixtureLoader.GITTER_INTEGRATION_USERNAME + '/' + fixtureLoader.GITTER_INTEGRATION_REPO
         }
       })
       .set('x-access-token', fixture.user1.accessToken)
       .expect(200);
   });
-
-
-})
+});
