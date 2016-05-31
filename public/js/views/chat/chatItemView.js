@@ -631,7 +631,6 @@ module.exports = (function() {
 
     showReadBy: function(e) {
       if(this.popover) return;
-      e.preventDefault();
 
       var popover = new ReadByPopover({
         model: this.model,
@@ -646,11 +645,12 @@ module.exports = (function() {
 
       popover.show();
       ReadByPopover.singleton(this, popover);
+
+      e.preventDefault();
+      e.stopPropagation();
     },
 
     showActions: function(e) {
-      e.preventDefault();
-
       // Don't show if it's already open.
       if(this.popover) return;
 
@@ -672,6 +672,9 @@ module.exports = (function() {
 
       actions.show();
       ReadByPopover.singleton(this, actions);
+
+      e.preventDefault();
+      e.stopPropagation();
     },
 
     mentionUser: function () {
@@ -689,6 +692,7 @@ module.exports = (function() {
       appEvents.trigger('permalink.requested', 'chat', this.model, { appendInput: !!e.altKey });
 
       e.preventDefault();
+      e.stopPropagation();
     },
 
     highlight: function() {
