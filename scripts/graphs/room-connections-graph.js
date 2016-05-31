@@ -7,7 +7,7 @@ var Promise = require('bluebird');
 var persistenceService = require('gitter-web-persistence');
 var mongoose = require('gitter-web-mongoose-bluebird');
 
-var Schema   = mongoose.Schema;
+var Schema = mongoose.Schema;
 var ObjectId = Schema.ObjectId;
 
 var AggrSchema = new Schema({
@@ -61,7 +61,7 @@ function makeGraph(topRooms) {
       })
       .on('error', reject)
       .on('end', function() {
-        fs.writeFileSync('room-connections-' + new Date().toISOString().replace(/:/g, '_') + '.dot',  g.to_dot());
+        fs.writeFileSync('room-connections-' + new Date().toISOString().replace(/:/g, '_') + '.dot', g.to_dot());
         resolve();
       });
   });

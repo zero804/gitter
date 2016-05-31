@@ -7,7 +7,7 @@ module.exports = (function() {
   var hosts = clientEnv['cdns'];
   var hostLength = hosts && hosts.length;
   var assetTag = clientEnv['assetTag'];
-  var cdnPrefix =  assetTag ? "/_s/" + assetTag : '';
+  var cdnPrefix = assetTag ? "/_s/" + assetTag : '';
 
   function cdnNativeApp(url) {
     // nicest way of supporting embedded mobile chat

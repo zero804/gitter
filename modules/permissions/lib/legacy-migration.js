@@ -2,7 +2,7 @@
 
 var StatusError = require('statuserror');
 var securityDescriptorValidator = require('./security-descriptor-validator');
-var debug = require('debug')('gitter:permissions:legacy-migration');
+var debug = require('debug')('gitter:app:permissions:legacy-migration');
 
 /**
  * This module helps migrating from the old world of permissions
@@ -267,7 +267,9 @@ function generatePermissionsForRoom(room, parentRoom, ownerUser) {
  * Creates and validates the generated descriptor
  */
 function generatePermissionsForRoomAndValidate(room, parentRoom, ownerUser) {
+  debug('Will generate permissions for room=%j, parentRoom=%j, ownerUser=%j', room, parentRoom, ownerUser)
   var descriptor = generatePermissionsForRoom(room, parentRoom, ownerUser);
+  debug('Generated security descriptor: %j', descriptor);
   securityDescriptorValidator(descriptor);
   return descriptor;
 }

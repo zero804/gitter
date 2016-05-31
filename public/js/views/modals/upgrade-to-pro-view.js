@@ -1,10 +1,10 @@
 "use strict";
 
-var context    = require('utils/context');
-var clientEnv  = require('gitter-client-env');
+var context = require('utils/context');
+var clientEnv = require('gitter-client-env');
 var Marionette = require('backbone.marionette');
-var template   = require('./tmpl/upgrade-to-pro-view.hbs');
-var ModalView  = require('./modal');
+var template = require('./tmpl/upgrade-to-pro-view.hbs');
+var ModalView = require('./modal');
 
 
 
@@ -44,7 +44,7 @@ var View = Marionette.ItemView.extend({
   },
 });
 
-module.exports =  ModalView.extend({
+module.exports = ModalView.extend({
     initialize: function(options) {
       options.title = "Upgrade to Pro";
       ModalView.prototype.initialize.apply(this, arguments);

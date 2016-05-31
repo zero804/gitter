@@ -1,15 +1,15 @@
 "use strict";
-var Backbone   = require('backbone');
-var qs         = require('./qs');
-var _          = require('underscore');
+var Backbone = require('backbone');
+var qs = require('./qs');
+var _ = require('underscore');
 var localStore = require('../components/local-store');
-var Promise    = require('bluebird');
-var clientEnv  = require('gitter-client-env');
+var Promise = require('bluebird');
+var clientEnv = require('gitter-client-env');
 
 module.exports = (function() {
 
-  var ctx         = window.troupeContext || {};
-  var snapshots   = ctx.snapshots || {};
+  var ctx = window.troupeContext || {};
+  var snapshots = ctx.snapshots || {};
 
   function getTroupeModel() {
     var troupeModel;
@@ -274,6 +274,10 @@ module.exports = (function() {
     delete snapshots[key];
 
     return snapshot;
+  };
+
+  context.roomHasWelcomeMessage = function(){
+    return ctx.roomHasWelcomeMessage;
   };
 
   return context;

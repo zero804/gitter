@@ -1,9 +1,9 @@
 "use strict";
-var _         = require('underscore');
-var utils     = require('../utils/utils');
-var context   = require('../utils/context');
+var _ = require('underscore');
+var utils = require('../utils/utils');
+var context = require('../utils/context');
 var appEvents = require('utils/appevents');
-var debug     = require('debug-proxy')('app:infinite-mixin');
+var debug = require('debug-proxy')('app:infinite-mixin');
 
 module.exports = (function() {
 
@@ -219,7 +219,7 @@ module.exports = (function() {
 
     /* Ensure that an item is loaded, and call the callback once it is */
     ensureLoaded: function(id, callback, context) {
-      function done(err, item)  {
+      function done(err, item) {
         if (callback) {
           callback.call(context, err, item);
         }

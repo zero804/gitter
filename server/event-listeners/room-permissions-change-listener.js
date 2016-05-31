@@ -1,6 +1,6 @@
 "use strict";
 
-var appEvents   = require('gitter-web-appevents');
+var appEvents = require('gitter-web-appevents');
 var roomService = require('../services/room-service');
 
 var installed = false;

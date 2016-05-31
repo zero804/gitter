@@ -1,13 +1,13 @@
 "use strict";
 
-var pushNotificationFilter       = require("gitter-web-push-notification-filter");
-var pushNotificationGateway      = require("../../gateways/push-notification-gateway");
-var serializer                   = require("../../serializers/notification-serializer");
+var pushNotificationFilter = require("gitter-web-push-notification-filter");
+var pushNotificationGateway = require("../../gateways/push-notification-gateway");
+var serializer = require("../../serializers/notification-serializer");
 var notificationMessageGenerator = require('./notification-message-generator');
-var unreadItemService            = require('../unread-items');
-var debug                        = require('debug')('gitter:push-notification-generator');
-var Promise                      = require('bluebird');
-var _                            = require('lodash');
+var unreadItemService = require('../unread-items');
+var debug = require('debug')('gitter:app:push-notification-generator');
+var Promise = require('bluebird');
+var _ = require('lodash');
 
 var MAX_MESSAGES_FOR_NOTIFICATION = 3;
 

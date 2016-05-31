@@ -1,13 +1,13 @@
 "use strict";
 
-var Promise                     = require('bluebird');
-var appEvents                   = require('gitter-web-appevents');
-var resolveUserAvatarUrl        = require('gitter-web-shared/avatars/resolve-user-avatar-url');
-var troupeDao                   = require('../daos/troupe-dao').lean;
-var userDao                     = require('../daos/user-dao').lean;
-var chatService                 = require('../chat-service');
-var _                           = require('lodash');
-var debug                       = require('debug')('gitter:online-notification-generator');
+var Promise = require('bluebird');
+var appEvents = require('gitter-web-appevents');
+var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-url');
+var troupeDao = require('../daos/troupe-dao').lean;
+var userDao = require('../daos/user-dao').lean;
+var chatService = require('../chat-service');
+var _ = require('lodash');
+var debug = require('debug')('gitter:app:online-notification-generator');
 
 function generateChatMessageNotification(troupeId, chatId) {
   return Promise.all([

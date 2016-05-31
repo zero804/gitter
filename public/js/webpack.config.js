@@ -1,7 +1,7 @@
 "use strict";
 
-var path                     = require("path");
-var CommonsChunkPlugin       = require("webpack/lib/optimize/CommonsChunkPlugin");
+var path = require("path");
+var CommonsChunkPlugin = require("webpack/lib/optimize/CommonsChunkPlugin");
 var ContextReplacementPlugin = require("webpack/lib/ContextReplacementPlugin");
 
 var getPostcssStack = require('gitter-styleguide/postcss-stack');

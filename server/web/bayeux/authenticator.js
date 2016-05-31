@@ -1,22 +1,22 @@
 'use strict';
 
-var env           = require('gitter-web-env');
-var nconf         = env.config;
-var logger        = env.logger;
+var env = require('gitter-web-env');
+var nconf = env.config;
+var logger = env.logger;
 var errorReporter = env.errorReporter;
-var statsd        = env.createStatsClient({ prefix: nconf.get('stats:statsd:prefix')});
+var statsd = env.createStatsClient({ prefix: nconf.get('stats:statsd:prefix')});
 
-var oauth             = require('../../services/oauth-service');
-var mongoUtils        = require('gitter-web-persistence-utils/lib/mongo-utils');
-var presenceService   = require('gitter-web-presence');
+var oauth = require('../../services/oauth-service');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var presenceService = require('gitter-web-presence');
 var recentRoomService = require('../../services/recent-room-service');
-var contextGenerator  = require('../context-generator');
-var StatusError       = require('statuserror');
-var bayeuxExtension   = require('./extension');
-var clientUsageStats  = require('../../utils/client-usage-stats');
-var appVersion        = require('gitter-app-version');
-var useragent         = require('useragent');
-var debug             = require('debug')('gitter:bayeux-authenticator');
+var contextGenerator = require('../context-generator');
+var StatusError = require('statuserror');
+var bayeuxExtension = require('./extension');
+var clientUsageStats = require('../../utils/client-usage-stats');
+var appVersion = require('gitter-app-version');
+var useragent = require('useragent');
+var debug = require('debug')('gitter:app:bayeux-authenticator');
 
 function getConnectionType(incoming) {
   if(!incoming) return 'online';

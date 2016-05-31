@@ -1,8 +1,8 @@
 'use strict';
 
-var Marionette  = require('backbone.marionette');
-var template    = require('./footer-view.hbs');
-var fastdom     = require('fastdom');
+var Marionette = require('backbone.marionette');
+var template = require('./footer-view.hbs');
+var fastdom = require('fastdom');
 var toggleClass = require('utils/toggle-class');
 
 require('gitter-styleguide/css/components/buttons.css');

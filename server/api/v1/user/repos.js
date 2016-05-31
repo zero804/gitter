@@ -1,9 +1,9 @@
 "use strict";
 
-var restSerializer   = require("../../../serializers/rest-serializer");
-var repoService      = require("../../../services/repo-service");
+var restSerializer = require("../../../serializers/rest-serializer");
+var repoService = require("../../../services/repo-service");
 var createTextFilter = require('text-filter');
-var StatusError      = require('statuserror');
+var StatusError = require('statuserror');
 
 function indexQuery(req) {
   var limit = parseInt(req.query.limit, 10) || 0;

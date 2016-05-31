@@ -1,0 +1,26 @@
+{
+  "name": "gitter-web-groups",
+  "version": "1.0.0",
+  "main": "lib/group-service.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha test/"
+  },
+  "private": true,
+  "dependencies": {
+    "bluebird": "^3.3.5",
+    "debug": "^2.2.0",
+    "gitter-web-github": "file:../github",
+    "gitter-web-permissions": "file:../permissions",
+    "gitter-web-persistence": "file:../persistence",
+    "gitter-web-persistence-utils": "file:../persistence-utils",
+    "gitter-web-validators": "file:../validators",
+    "statuserror": "^0.1.3"
+  },
+  "devDependencies": {
+    "gitter-web-test-utils": "file:../test-utils"
+  }
+}

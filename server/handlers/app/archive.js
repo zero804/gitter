@@ -1,24 +1,24 @@
 "use strict";
 
-var env                     = require('gitter-web-env');
-var identifyRoute           = env.middlewares.identifyRoute;
+var env = require('gitter-web-env');
+var identifyRoute = env.middlewares.identifyRoute;
 
-var moment                  = require('moment');
-var appMiddleware           = require('./middleware');
-var chatService             = require('../../services/chat-service');
-var heatmapService          = require('../../services/chat-heatmap-service');
-var restSerializer          = require('../../serializers/rest-serializer');
-var contextGenerator        = require('../../web/context-generator');
-var Promise                 = require('bluebird');
-var burstCalculator         = require('../../utils/burst-calculator');
-var timezoneMiddleware      = require('../../web/middlewares/timezone');
-var resolveRoomAvatarUrl    = require('gitter-web-shared/avatars/resolve-room-avatar-url');
-var dateTZtoUTC             = require('gitter-web-shared/time/date-timezone-to-utc');
-var beforeTodayAnyTimezone  = require('gitter-web-shared/time/before-today-any-timezone');
-var debug                   = require('debug')('gitter:app-archive');
-var _                       = require('underscore');
+var moment = require('moment');
+var appMiddleware = require('./middleware');
+var chatService = require('../../services/chat-service');
+var heatmapService = require('../../services/chat-heatmap-service');
+var restSerializer = require('../../serializers/rest-serializer');
+var contextGenerator = require('../../web/context-generator');
+var Promise = require('bluebird');
+var burstCalculator = require('../../utils/burst-calculator');
+var timezoneMiddleware = require('../../web/middlewares/timezone');
+var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
+var dateTZtoUTC = require('gitter-web-shared/time/date-timezone-to-utc');
+var beforeTodayAnyTimezone = require('gitter-web-shared/time/before-today-any-timezone');
+var debug = require('debug')('gitter:app:app-archive');
+var _ = require('underscore');
 var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
-var StatusError             = require('statuserror');
+var StatusError = require('statuserror');
 
 var ONE_DAY_SECONDS = 60 * 60 * 24; // 1 day
 var ONE_DAY_MILLISECONDS = ONE_DAY_SECONDS * 1000;

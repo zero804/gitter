@@ -135,7 +135,7 @@ describe('unread-item-service', function() {
         troupeId2 = mongoUtils.getNewObjectIdString() + "";
         troupeId3 = mongoUtils.getNewObjectIdString() + "";
         troupeId4 = mongoUtils.getNewObjectIdString() + "";
-        userId1   = mongoUtils.getNewObjectIdString() + "";
+        userId1 = mongoUtils.getNewObjectIdString() + "";
 
         recentRoomCore = mockito.mock(testRequire('./services/core/recent-room-core'));
         engine = mockito.mock(testRequire('./services/unread-items/engine'));
@@ -294,7 +294,7 @@ describe('unread-item-service', function() {
 
             mockito.verify(appEvents, never()).troupeUnreadCountsChange(hasMember('userId', fromUserId));
             mockito.verify(appEvents).troupeUnreadCountsChange(deep({userId: userId1, troupeId: troupeId, total: 1, mentions: undefined }));
-            mockito.verify(appEvents).troupeUnreadCountsChange(deep({userId: userId2, troupeId: troupeId, total: 1, mentions: undefined  }));
+            mockito.verify(appEvents).troupeUnreadCountsChange(deep({userId: userId2, troupeId: troupeId, total: 1, mentions: undefined }));
           });
       });
 
@@ -356,7 +356,7 @@ describe('unread-item-service', function() {
 
             mockito.verify(appEvents, never()).troupeUnreadCountsChange(hasMember('userId', fromUserId));
             mockito.verify(appEvents).troupeUnreadCountsChange(deep({userId: userId1, troupeId: troupeId, total: 1, mentions: 1 }));
-            mockito.verify(appEvents).troupeUnreadCountsChange(deep({userId: userId2, troupeId: troupeId, total: 1  }));
+            mockito.verify(appEvents).troupeUnreadCountsChange(deep({userId: userId2, troupeId: troupeId, total: 1 }));
           });
       });
 
@@ -399,7 +399,7 @@ describe('unread-item-service', function() {
 
             mockito.verify(appEvents, never()).troupeUnreadCountsChange(hasMember('userId', fromUserId));
             mockito.verify(appEvents).troupeUnreadCountsChange(deep({userId: userId1, troupeId: troupeId, total: 1, mentions: 1 }));
-            mockito.verify(appEvents).troupeUnreadCountsChange(deep({userId: userId2, troupeId: troupeId, total: 1, mentions: 1  }));
+            mockito.verify(appEvents).troupeUnreadCountsChange(deep({userId: userId2, troupeId: troupeId, total: 1, mentions: 1 }));
           });
       });
 

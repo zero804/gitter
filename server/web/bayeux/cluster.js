@@ -1,18 +1,18 @@
 "use strict";
 
-var env               = require('gitter-web-env');
-var logger            = env.logger;
-var nconf             = env.config;
-var stats             = env.stats;
+var env = require('gitter-web-env');
+var logger = env.logger;
+var nconf = env.config;
+var stats = env.stats;
 
-var faye              = require('gitter-faye');
-var fayeRedis         = require('gitter-faye-redis');
-var deflate           = require('permessage-deflate');
-var presenceService   = require('gitter-web-presence');
-var shutdown          = require('shutdown');
-var zlib              = require('zlib');
-var debug             = require('debug')('gitter:bayeux');
-var Promise           = require('bluebird');
+var faye = require('gitter-faye');
+var fayeRedis = require('gitter-faye-redis');
+var deflate = require('permessage-deflate');
+var presenceService = require('gitter-web-presence');
+var shutdown = require('shutdown');
+var zlib = require('zlib');
+var debug = require('debug')('gitter:infra:bayeux');
+var Promise = require('bluebird');
 
 
 /* Disabled after the outage 8 April 2015 XXX investigate further */
@@ -103,7 +103,7 @@ function makeServer(options) {
     // where the socket is residing
     presenceService.socketDisconnected(clientId, function(err) {
       if(err && err.status !== 404) {
-        logger.error("bayeux: Error while attempting disconnection of socket " + clientId + ": " + err,  { exception: err });
+        logger.error("bayeux: Error while attempting disconnection of socket " + clientId + ": " + err, { exception: err });
       }
     });
   });
@@ -118,10 +118,10 @@ function makeServer(options) {
   server._server._makeResponse = function(message) {
     var response = {};
 
-    if (message.id)       response.id       = message.id;
+    if (message.id) response.id = message.id;
     if (message.clientId) response.clientId = message.clientId;
-    if (message.channel)  response.channel  = message.channel;
-    if (message.error)    response.error    = message.error;
+    if (message.channel) response.channel = message.channel;
+    if (message.error) response.error = message.error;
 
     // Our improvement: information for extensions
     if (message._private) response._private = message._private;
@@ -192,7 +192,7 @@ function BayeuxCluster(lightweight) {
     lightweight: lightweight
   });
 
-  var serverLegacy = this.serverLegacy  = makeServer({
+  var serverLegacy = this.serverLegacy = makeServer({
     endpoint: '/faye',
     redisClient: env.redis.createClient(),
     redisSubscribeClient: env.redis.createClient(),
