@@ -130,6 +130,10 @@ module.exports = CommunityCreateBaseStepView.extend({
     this.setAreaActive('isOrgAreaActive');
   },
   onReposAreaToggle: function() {
+    if(this.repoCollection.length === 0) {
+      this.repoCollection.fetch();
+    }
+
     this.setAreaActive('isRepoAreaActive');
   },
 
