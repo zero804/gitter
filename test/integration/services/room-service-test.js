@@ -1645,6 +1645,43 @@ describe('room-service', function() {
           return persistence.Troupe.remove({ uri: 'gitterTest' }).exec();
         });
     });
+
+    it('should be idempotent', function() {
+      var groupId = new ObjectID();
+      var roomService = testRequire.withProxies("./services/room-service", {
+        'gitter-web-groups/lib/group-service': {
+          migration: {
+            ensureGroupForGitHubRoomCreation: function(pUser, options) {
+              assert.strictEqual(pUser, fixture.user1);
+              assert.deepEqual(options, {
+                uri: "gitterTest"
+              });
+              return Promise.resolve({ _id: groupId });
+            }
+          }
+        },
+        'gitter-web-permissions/lib/legacy-policy-factory': {
+          createPolicyForGithubObject: function(user, uri, githubType, security) {
+            assert.strictEqual(user.username, fixture.user1.username);
+            assert.strictEqual(uri, 'gitterTest');
+            assert.strictEqual(githubType, 'ORG');
+            assert.strictEqual(security, null);
+            return Promise.resolve({
+              canAdmin: function() {
+                return Promise.resolve(true);
+              }
+            });
+          }
+        }
+      });
+
+      return Promise.join(
+        roomService.createRoomForGitHubUri(fixture.user1, 'gitterTest'),
+        roomService.createRoomForGitHubUri(fixture.user1, 'gitterTest'),
+        function(r1, r2) {
+          assert(mongoUtils.objectIDsEqual(r1.troupe._id, r2.troupe._id));
+        });
+    });
   });
 
   describe('renames #slow', function() {
