@@ -29,7 +29,8 @@ module.exports = {
     var topic = String(req.body.topic);
     var createOptions = { name: name, topic: topic };
     if (req.body.security) {
-      createOptions.public = req.body.security.public;
+      // PUBLIC, PRIVATE or INHERIT
+      createOptions.security = req.body.security.security;
 
       // for GitHub and future rom types that are backed by other services
       createOptions.type = req.body.security.type;
