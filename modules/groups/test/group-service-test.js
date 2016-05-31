@@ -10,14 +10,12 @@ describe('group-service', function() {
 
   describe('integration tests #slow', function() {
 
-    var communityUri = '_I-heart-cats-Test-LOL';
-
     describe('createGroup', function() {
       var fixture = fixtureLoader.setup({
         deleteDocuments: {
           User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }],
           Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
-                  { lcUri: communityUri.toLowerCase() },
+                  { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() },
                   { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() }],
         },
         user1: {
@@ -84,12 +82,12 @@ describe('group-service', function() {
         var user = fixture.user1;
         return groupService.createGroup(user, {
             name: 'Bob',
-            uri: communityUri
+            uri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY
           })
           .then(function(group) {
             assert.strictEqual(group.name, 'Bob');
-            assert.strictEqual(group.uri, communityUri);
-            assert.strictEqual(group.lcUri, communityUri.toLowerCase());
+            assert.strictEqual(group.uri, fixtureLoader.GITTER_INTEGRATION_COMMUNITY);
+            assert.strictEqual(group.lcUri, fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase());
             return securityDescriptorService.getForGroupUser(group._id, null);
           })
           .then(function(securityDescriptor) {

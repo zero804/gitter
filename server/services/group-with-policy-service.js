@@ -69,8 +69,8 @@ function ensureAccessAndFetchRoomInfo(user, group, options) {
  * @return {Promise} Promise of room
  */
 GroupWithPolicyService.prototype.createRoom = secureMethod([allowAdmin], function(options) {
-  var user = this.policy.user;
-  var group = this.policy.group;
+  var user = this.user;
+  var group = this.group;
   return ensureAccessAndFetchRoomInfo(user, group, options)
     .spread(function(roomInfo, securityDescriptor) {
       debug("Upserting %j", roomInfo);
