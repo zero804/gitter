@@ -101,13 +101,14 @@ describe('group-api', function() {
       })
   });
 
-  it.skip('POST /v1/groups/:groupId/rooms', function() {
+  it('POST /v1/groups/:groupId/rooms', function() {
     return request(app)
       .post('/v1/groups/' + fixture.group1.id + '/rooms')
       .send({
         name: 'test',
         topic: 'all about testing',
         security: {
+          security: 'INHERIT',
           type: 'GH_REPO',
           linkPath: fixtureLoader.GITTER_INTEGRATION_USERNAME + '/' + fixtureLoader.GITTER_INTEGRATION_REPO
         }

@@ -122,8 +122,9 @@ function generate(user, options) {
   }
 }
 
-function getDefaultSecurityDescriptor(creatorUserId, isPublic) {
-  var members = (isPublic) ? 'PUBLIC' : 'PRIVATE';
+function getDefaultSecurityDescriptor(creatorUserId, security) {
+  var members = (security === 'PUBLIC') ? 'PUBLIC' : 'INVITE' ;
+  var isPublic = security === 'PUBLIC';
   return {
     type: null,
     admins: 'MANUAL',
@@ -148,10 +149,21 @@ function canAdminPotentialGitHubGroup(user, githubInfo, obtainAccessFromGitHubRe
     });
 }
 
+function canAdminGitHubRepo(user, githubInfo, security) {
+  var type = githubInfo.type;
+  var uri = githubInfo.uri;
+  var githubId = githubInfo.githubId;
+
+  return legacyPolicyFactory.createPolicyForGithubObject(user, uri, type, security)
+    .then(function(policy) {
+      return policy.canAdmin();
+    });
+}
+
 function ensureGitHubAccessAndFetchDescriptor(user, options) {
   var type = options.type;
   var linkPath = options.linkPath;
-  var isPublic = options.public || true;
+  var security = options.security || 'PUBLIC';
   var obtainAccessFromGitHubRepo = options.obtainAccessFromGitHubRepo || null;
 
   assert(type, "type required");
@@ -160,6 +172,11 @@ function ensureGitHubAccessAndFetchDescriptor(user, options) {
   return validateGitHubUri(user, linkPath)
     .then(function(githubInfo) {
       debug("GitHub information for %s is %j", linkPath, githubInfo);
+
+      // is this correct?
+      if (security === 'INHERIT') {
+        security = githubInfo.security;
+      }
 
       if (!githubInfo) throw new StatusError(404);
 
@@ -178,15 +195,22 @@ function ensureGitHubAccessAndFetchDescriptor(user, options) {
         type = 'GH_'+githubInfo.type;
       }
 
-      // TODO: should this do something else when adding rooms to existing groups? what?
-      return canAdminPotentialGitHubGroup(user, githubInfo, obtainAccessFromGitHubRepo)
+      var policyPromise;
+      if (type == 'GH_REPO') {
+        // a room based on a repo
+        policyPromise = canAdminGitHubRepo(user, githubInfo, security); // or null?
+      } else {
+        // org or user based group
+        policyPromise = canAdminPotentialGitHubGroup(user, githubInfo, obtainAccessFromGitHubRepo);
+      }
+      return policyPromise
         .then(function(isAdmin) {
           if (!isAdmin) throw new StatusError(403, 'Not an administrator of this org');
           return generate(user, {
               type: type,
               linkPath: linkPath,
               externalId: githubInfo.githubId,
-              public: isPublic // TODO: how do we validate this?
+              security: security
             });
         });
     });
@@ -194,8 +218,8 @@ function ensureGitHubAccessAndFetchDescriptor(user, options) {
 
 var ensureAccessAndFetchDescriptor = Promise.method(function(user, options) {
   var type = options.type || null;
-  var isPublic = options.public || true;
-  // options can also contain linkPath, public, obtainAccessFromGitHubRepo
+  var security = options.security || 'PUBLIC'; // groups default to public
+  // options can also contain linkPath, obtainAccessFromGitHubRepo
 
   switch (type) {
     case 'GH_ORG':
@@ -208,7 +232,7 @@ var ensureAccessAndFetchDescriptor = Promise.method(function(user, options) {
       return ensureGitHubAccessAndFetchDescriptor(user, options);
 
     case null:
-      return getDefaultSecurityDescriptor(user._id, isPublic);
+      return getDefaultSecurityDescriptor(user._id, security);
 
     default:
       throw new StatusError(400, 'type is not known: ' + type);

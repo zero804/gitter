@@ -35,8 +35,9 @@ function ensureAccessAndFetchRoomInfo(user, group, options) {
   options = options || {};
 
   var topic = options.topic || null;
-  var name = options.name;
+  // TODO: validate topic
 
+  var name = options.name;
   assert(name, 'name required');
 
   if (!validateRoomName(name)) {
@@ -45,7 +46,8 @@ function ensureAccessAndFetchRoomInfo(user, group, options) {
 
   var uri = group.uri + '/' + name;
 
-  // TODO: validate topic
+  var security = options.security;
+  assert(security, 'security required');
 
   return findByUri(uri)
     .then(function(room) {
