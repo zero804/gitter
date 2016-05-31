@@ -22,16 +22,6 @@ describe('LeftMenuSuggestions()', function() {
     collection.fetch = sinon.spy();
   });
 
-  it('should throw an error if no roomModel is passed', function(done) {
-    try {
-      new LeftMenuSuggestions(null, {});
-    }
-    catch (e) {
-      assert.equal(e.message,
-                   'A valid instance of a RoomMenuModel must be passed to a new instance of LeftMenuSuggestionsCollection');
-      done();
-    }
-  });
 
   it('should attach the room menu model', function() {
     assert(collection.roomMenuModel);

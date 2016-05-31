@@ -16,8 +16,12 @@ var Model = Backbone.Model.extend({
 
 var SuggestedCollection = SuggestedRoomsByRoomCollection.extend({
   model: Model,
-  
+
   initialize: function(models, attrs, options) {
+
+    console.log('-----------------------');
+    console.log(attrs);
+    console.log('-----------------------');
 
     if (!attrs || !attrs.roomMenuModel) {
       throw new Error('A valid instance of a RoomMenuModel must be passed to a new instance of LeftMenuSuggestionsCollection');
