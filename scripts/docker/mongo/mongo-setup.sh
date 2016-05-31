@@ -35,3 +35,9 @@ while [[ "$(mongoeval 'rs.isMaster().ismaster')" != "true" ]]; do
 done
 
 SKIP_BACKUP=yes ${SCRIPT_DIR}/../../upgrade-data.sh "${ANNOUNCE_MONGO1_HOST}:27017" gitter
+
+if [[ -n "${DISABLE_TABLE_SCAN}" ]]; then
+  mongo --host "${ANNOUNCE_MONGO1_HOST}" --port 27017 --quiet --eval 'db.getSiblingDB("admin").runCommand( { setParameter: 1, notablescan: 1 } )'
+  mongo --host "${ANNOUNCE_MONGO2_HOST}" --port 27018 --quiet --eval 'db.getSiblingDB("admin").runCommand( { setParameter: 1, notablescan: 1 } )'
+  mongo --host "${ANNOUNCE_MONGO3_HOST}" --port 27019 --quiet --eval 'db.getSiblingDB("admin").runCommand( { setParameter: 1, notablescan: 1 } )'
+fi
