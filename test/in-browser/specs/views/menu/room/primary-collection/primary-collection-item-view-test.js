@@ -1,12 +1,12 @@
 /*global describe:true, it:true, beforeEach:true */
 'use strict';
 
-var assert                    = require('assert');
-var Backbone                  = require('backbone');
+var assert = require('assert');
+var Backbone = require('backbone');
 var PrimaryCollectionItemView = require('public/js/views/menu/room/primary-collection/primary-collection-item-view');
-var apiClient                 = require('components/apiClient');
-var appEvents                 = require('utils/appevents');
-var context                   = require('utils/context');
+var apiClient = require('components/apiClient');
+var appEvents = require('utils/appevents');
+var context = require('utils/context');
 
 describe.skip('PrimaryCollectionItemView()', function() {
 
@@ -15,7 +15,7 @@ describe.skip('PrimaryCollectionItemView()', function() {
 
   beforeEach(function() {
     el = document.createElement('div');
-    itemView = new  PrimaryCollectionItemView({
+    itemView = new PrimaryCollectionItemView({
       index: 1,
       model: new Backbone.Model({
         name: 'gitterHQ',

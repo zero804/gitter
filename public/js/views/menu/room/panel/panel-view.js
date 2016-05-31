@@ -1,23 +1,23 @@
 'use strict';
 
-var _                               = require('underscore');
-var Marionette                      = require('backbone.marionette');
-var fastdom                         = require('fastdom');
-var toggleClass                     = require('utils/toggle-class');
-var PanelHeaderView                 = require('../header/header-view');
-var PanelFooterView                 = require('../footer/footer-view');
-var FavouriteCollectionView         = require('../favourite-collection/favourite-collection-view');
-var FavouriteCollectionModel        = require('../favourite-collection/favourite-collection-model');
-var PrimaryCollectionView           = require('../primary-collection/primary-collection-view');
-var PrimaryCollectionModel          = require('../primary-collection/primary-collection-model');
-var SecondaryCollectionView         = require('../secondary-collection/secondary-collection-view');
-var SecondaryCollectionModel        = require('../secondary-collection/secondary-collection-model');
-var TertiaryCollectionView          = require('../tertiary-collection/tertiary-collection-view');
-var TertiaryCollectionModel         = require('../tertiary-collection/tertiary-collection-model');
-var ProfileMenuView                 = require('../profile/profile-menu-view');
+var _ = require('underscore');
+var Marionette = require('backbone.marionette');
+var fastdom = require('fastdom');
+var toggleClass = require('utils/toggle-class');
+var PanelHeaderView = require('../header/header-view');
+var PanelFooterView = require('../footer/footer-view');
+var FavouriteCollectionView = require('../favourite-collection/favourite-collection-view');
+var FavouriteCollectionModel = require('../favourite-collection/favourite-collection-model');
+var PrimaryCollectionView = require('../primary-collection/primary-collection-view');
+var PrimaryCollectionModel = require('../primary-collection/primary-collection-model');
+var SecondaryCollectionView = require('../secondary-collection/secondary-collection-view');
+var SecondaryCollectionModel = require('../secondary-collection/secondary-collection-model');
+var TertiaryCollectionView = require('../tertiary-collection/tertiary-collection-view');
+var TertiaryCollectionModel = require('../tertiary-collection/tertiary-collection-model');
+var ProfileMenuView = require('../profile/profile-menu-view');
 var FilteredFavouriteRoomCollection = require('../../../../collections/filtered-favourite-room-collection.js');
-var SearchInputView                 = require('views/menu/room/search-input/search-input-view');
-var favouriteCollectionFilter       = require('gitter-web-shared/filters/left-menu-primary-favourite');
+var SearchInputView = require('views/menu/room/search-input/search-input-view');
+var favouriteCollectionFilter = require('gitter-web-shared/filters/left-menu-primary-favourite');
 
 require('views/behaviors/isomorphic');
 
@@ -126,7 +126,7 @@ var PanelView = Marionette.LayoutView.extend({
   },
 
   initialize: function(attrs) {
-    this.bus     = attrs.bus;
+    this.bus = attrs.bus;
     this.dndCtrl = attrs.dndCtrl;
     this.keyboardControllerView = attrs.keyboardControllerView;
 
@@ -169,17 +169,17 @@ var PanelView = Marionette.LayoutView.extend({
       }, {
         collection: this.model.primaryCollection,
         getActive: function() {
-          return  this.primaryCollectionModel.get('active');
+          return this.primaryCollectionModel.get('active');
         }.bind(this)
       }, {
         collection: this.model.secondaryCollection,
         getActive: function() {
-          return  this.secondaryCollectionModel.get('active');
+          return this.secondaryCollectionModel.get('active');
         }.bind(this)
       }, {
         collection: this.model.tertiaryCollection,
         getActive: function() {
-          return  this.tertiaryCollectionModel.get('active');
+          return this.tertiaryCollectionModel.get('active');
         }.bind(this)
       }
     ]);

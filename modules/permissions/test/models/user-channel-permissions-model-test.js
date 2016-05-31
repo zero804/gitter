@@ -1,8 +1,8 @@
 "use strict";
 
 var proxyquireNoCallThru = require("proxyquire").noCallThru();
-var assert        = require('assert');
-var Promise       = require('bluebird');
+var assert = require('assert');
+var Promise = require('bluebird');
 var testGenerator = require('../../../../test/integration/test-generator');
 
 var mockito = require('jsmockito').JsMockito;

@@ -2,13 +2,33 @@
 "use strict";
 
 var testRequire = require('./../test-require');
-var fixtureLoader = require('../test-fixtures');
-var fixture = {};
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
 var userSearchService = testRequire('./services/user-search-service');
 var assert = require('assert');
 
 describe("User Search Service", function() {
+
+  var fixture = fixtureLoader.setup({
+    user1: {
+    },
+    user2: {
+    },
+    user3: {
+    },
+    userNoTroupes: {
+    },
+    troupe1: {
+      users: ['user1', 'user2']
+    },
+    troupe2: {
+    },
+    troupe3: {
+      /* This troupe should not include test user 2 */
+      //uri: 'testtroupe3',
+      users: ['user1', 'user3']
+    }
+  });
 
   describe("#createRegExpsForQuery", function() {
     it("should create a single regexp for a single word search", function() {
@@ -31,7 +51,6 @@ describe("User Search Service", function() {
           assert(res.length === 2, 'Expected a single regular expression');
           assert.strictEqual(res[0].toString(), "/\\bfrodo/i", 'Expected the search');
           assert.strictEqual(res[1].toString(), "/\\bbaggins/i", 'Expected the search');
-
         });
 
 
@@ -77,8 +96,8 @@ describe("User Search Service", function() {
         assert(searchResults.results.length >= 2, "Expect some users");
 
         assert(searchResults.results.filter(function(f) { return f.displayName === fixture.user1.displayName; }).length === 0, "Expect test user 1 not to be returned");
-        assert(searchResults.results.filter(function(f) { return f.displayName === fixture.user2.displayName; }).length == 1, "Expect test user 2");
-        assert(searchResults.results.filter(function(f) { return f.displayName === fixture.user3.displayName; }).length == 1, "Expect test user 3");
+        assert(searchResults.results.filter(function(f) { return f.displayName === fixture.user2.displayName; }).length === 1, "Expect test user 2");
+        assert(searchResults.results.filter(function(f) { return f.displayName === fixture.user3.displayName; }).length === 1, "Expect test user 3");
 
         return done();
       });
@@ -93,7 +112,7 @@ describe("User Search Service", function() {
         if(err) return done(err);
 
         assert(searchResults.results.length >= 1, "Expect one user: got " + searchResults.results.join(', '));
-        assert(searchResults.results.filter(function(f) { return f.displayName === fixture.user2.displayName; }).length == 1, "Expect test user 2");
+        assert(searchResults.results.filter(function(f) { return f.displayName === fixture.user2.displayName; }).length === 1, "Expect test user 2");
 
         return done();
       });
@@ -129,7 +148,5 @@ describe("User Search Service", function() {
   });
 
 
-  before(fixtureLoader(fixture));
-  after(function() { fixture.cleanup(); });
 
 });

@@ -36,11 +36,11 @@ var FIXTURES = [{
       security: 'PUBLIC'
     },
     tests: [
-      { right: 'create',  expectedResult: false },
-      { right: 'join',    expectedResult: false },
-      { right: 'admin',   expectedResult: false },
+      { right: 'create', expectedResult: false },
+      { right: 'join', expectedResult: false },
+      { right: 'admin', expectedResult: false },
       { right: 'adduser', expectedResult: false },
-      { right: 'view',    expectedResult: true  } // Unauthenticated users can view public repos
+      { right: 'view', expectedResult: true } // Unauthenticated users can view public repos
     ]
   },{
     name: 'in private repos',
@@ -84,11 +84,11 @@ var FIXTURES = [{
           repo: { },
         },
         tests: [
-          { right: 'create',  expectedResult: false },
-          { right: 'join',    expectedResult: true  },
-          { right: 'admin',   expectedResult: false },
-          { right: 'adduser', expectedResult: true  },
-          { right: 'view',    expectedResult: true  }
+          { right: 'create', expectedResult: false },
+          { right: 'join', expectedResult: true },
+          { right: 'admin', expectedResult: false },
+          { right: 'adduser', expectedResult: true },
+          { right: 'view', expectedResult: true }
         ]
       }, {
         name: 'with no access',
@@ -96,11 +96,11 @@ var FIXTURES = [{
           repo: null
         },
         tests: [
-          { right: 'create',  expectedResult: false },
-          { right: 'join',    expectedResult: false },
-          { right: 'admin',   expectedResult: false },
+          { right: 'create', expectedResult: false },
+          { right: 'join', expectedResult: false },
+          { right: 'admin', expectedResult: false },
           { right: 'adduser', expectedResult: false },
-          { right: 'view',    expectedResult: true  } // Edge case: we know the room is public, allow access
+          { right: 'view', expectedResult: true } // Edge case: we know the room is public, allow access
         ]
       }]
     },
@@ -116,24 +116,24 @@ var FIXTURES = [{
           expectedResult: true // Users with push access have full rights
         },
         tests: [
-          { right: 'create',  expectedResult: true },
-          { right: 'join',    expectedResult: true },
-          { right: 'admin',   expectedResult: true },
+          { right: 'create', expectedResult: true },
+          { right: 'join', expectedResult: true },
+          { right: 'admin', expectedResult: true },
           { right: 'adduser', expectedResult: true },
-          { right: 'view',    expectedResult: true }
+          { right: 'view', expectedResult: true }
         ]
       }, {
         name: 'with no permissions',
         meta: {
-          repo: { private: true, owner: { login: USERNAME, type: 'User' }  },
+          repo: { private: true, owner: { login: USERNAME, type: 'User' } },
           expectedResult: false
         },
         tests: [
-          { right: 'create',  expectedResult: false },
-          { right: 'join',    expectedResult: true },
-          { right: 'admin',   expectedResult: false },
+          { right: 'create', expectedResult: false },
+          { right: 'join', expectedResult: true },
+          { right: 'admin', expectedResult: false },
           { right: 'adduser', expectedResult: true },
-          { right: 'view',    expectedResult: true }
+          { right: 'view', expectedResult: true }
         ]
       }]
     }]

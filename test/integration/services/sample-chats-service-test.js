@@ -1,7 +1,7 @@
 "use strict";
 
-var testRequire   = require('../test-require');
-var assert        = require('assert');
+var testRequire = require('../test-require');
+var assert = require('assert');
 var sampleChatsService = testRequire("./services/sample-chats-service");
 
 describe('sample-chats-service', function() {

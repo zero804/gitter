@@ -9,7 +9,7 @@ module.exports = (function() {
    * args       Object - object in which the "search for headers" happens
    * returns    String - the final (but optional) headers string
    */
-  var processHeaders =  function (args) {
+  var processHeaders = function (args) {
     /* mailto protocol optional headers */
     return ['subject', 'body', 'CC', 'BCC']
       .map(function (header) { return header + '=' + (args[header] || ''); }) // composes the string as `key=value`

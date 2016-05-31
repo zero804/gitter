@@ -1,6 +1,6 @@
 "use strict";
 
-var $        = require('jquery');
+var $ = require('jquery');
 var template = require('./tmpl/notification.hbs');
 
 require('./notify');

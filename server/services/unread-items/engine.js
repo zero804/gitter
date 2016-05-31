@@ -1,18 +1,18 @@
 "use strict";
 
-var env           = require('gitter-web-env');
-var stats         = env.stats;
-var winston       = env.logger;
-var redis         = require("../../utils/redis");
-var mongoUtils    = require('gitter-web-persistence-utils/lib/mongo-utils');
-var Scripto       = require('gitter-redis-scripto');
-var assert        = require('assert');
-var _             = require('lodash');
-var Promise       = require('bluebird');
-var lazy          = require('lazy.js');
-var moment        = require('moment');
-var debug         = require('debug')('gitter:unread-items:engine');
-var redisClient   = redis.getClient();
+var env = require('gitter-web-env');
+var stats = env.stats;
+var winston = env.logger;
+var redis = require("../../utils/redis");
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var Scripto = require('gitter-redis-scripto');
+var assert = require('assert');
+var _ = require('lodash');
+var Promise = require('bluebird');
+var lazy = require('lazy.js');
+var moment = require('moment');
+var debug = require('debug')('gitter:app:unread-items:engine');
+var redisClient = redis.getClient();
 var scriptManager = new Scripto(redisClient);
 
 scriptManager.loadFromDir(__dirname + '/redis-lua');
@@ -21,11 +21,11 @@ var EMAIL_NOTIFICATION_HASH_KEY = "unread:email_notify";
 var runScript = Promise.promisify(scriptManager.run, { context: scriptManager });
 
 var redisClient_smembers = Promise.promisify(redisClient.smembers, { context: redisClient });
-var redisClient_set      = Promise.promisify(redisClient.set, { context: redisClient });
-var redisClient_mget     = Promise.promisify(redisClient.mget, { context: redisClient });
-var redisClient_hscan    = Promise.promisify(redisClient.hscan, { context: redisClient });
-var redisClient_del      = Promise.promisify(redisClient.del, { context: redisClient });
-var redisClient_zrange   = Promise.promisify(redisClient.zrange, { context: redisClient });
+var redisClient_set = Promise.promisify(redisClient.set, { context: redisClient });
+var redisClient_mget = Promise.promisify(redisClient.mget, { context: redisClient });
+var redisClient_hscan = Promise.promisify(redisClient.hscan, { context: redisClient });
+var redisClient_del = Promise.promisify(redisClient.del, { context: redisClient });
+var redisClient_zrange = Promise.promisify(redisClient.zrange, { context: redisClient });
 
 var UNREAD_BATCH_SIZE = 100;
 var MAXIMUM_USERS_PER_UNREAD_NOTIFICATION_BATCH = 1000*3;
@@ -83,11 +83,11 @@ function newItemWithMentions(troupeId, itemId, userWithMentions) {
 
           // Using _.map as its much faster than native in a tight loop like this
           return _.map(batchUserIds, function(userId, index) {
-            var userWithMention     = usersWithMentions[index];
-            var troupeUnreadCount   = result[index * 2];
-            var flag                = result[(index * 2) + 1];
-            var badgeUpdate         = !!(flag & 1);
-            var upgradedKey          = flag & 2;
+            var userWithMention = usersWithMentions[index];
+            var troupeUnreadCount = result[index * 2];
+            var flag = result[(index * 2) + 1];
+            var badgeUpdate = !!(flag & 1);
+            var upgradedKey = flag & 2;
 
             var userResult = {
               userId: userId,
@@ -165,11 +165,11 @@ function removeItem(troupeId, itemId, userIds) {
 
       // Results come back as three items per key in sequence
       for(var i = 0; result.length > 0; i++) {
-        var troupeUnreadCount   = result.shift();
-        var mentionCount        = result.shift();
-        var flag                = result.shift();
-        var badgeUpdate         = !!(flag & 1);
-        var userId              = userIds[i];
+        var troupeUnreadCount = result.shift();
+        var mentionCount = result.shift();
+        var flag = result.shift();
+        var badgeUpdate = !!(flag & 1);
+        var userId = userIds[i];
 
         results.push({
           userId: userId,
@@ -233,10 +233,10 @@ function markItemsRead(userId, troupeId, ids) {
 
   return runScript('unread-mark-items-read', keys, values)
     .then(function(result) {
-      var troupeUnreadCount   = result[0];
-      var mentionCount        = result[1];
-      var flag                = result[2];
-      var badgeUpdate         = !!(flag & 1);
+      var troupeUnreadCount = result[0];
+      var mentionCount = result[1];
+      var flag = result[2];
+      var badgeUpdate = !!(flag & 1);
 
       return {
         unreadCount: troupeUnreadCount >= 0 ? troupeUnreadCount : undefined,

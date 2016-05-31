@@ -1,14 +1,14 @@
 'use strict';
 
-var appEvents           = require('utils/appevents');
-var cdn                 = require('../utils/cdn');
-var WindowNotification  = window.Notification;
+var appEvents = require('utils/appevents');
+var cdn = require('../utils/cdn');
+var WindowNotification = window.Notification;
 var webkitNotifications = window.webkitNotifications;
-var urlParser           = require('../utils/url-parser');
-var linkHandler         = require('./link-handler');
-var onReady             = require('../utils/onready');
-var webNotifications    = require('./web-notifications');
-var sessionMutex        = require('../utils/session-mutex');
+var urlParser = require('../utils/url-parser');
+var linkHandler = require('./link-handler');
+var onReady = require('../utils/onready');
+var webNotifications = require('./web-notifications');
+var sessionMutex = require('../utils/session-mutex');
 
 /**
  * Returns "granted", "denied", "default" or undefined

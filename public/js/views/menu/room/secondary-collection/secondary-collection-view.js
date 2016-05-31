@@ -1,13 +1,13 @@
 'use strict';
 
-var Marionette         = require('backbone.marionette');
-var _                  = require('underscore');
-var urlJoin            = require('url-join');
+var Marionette = require('backbone.marionette');
+var _ = require('underscore');
+var urlJoin = require('url-join');
 var extendCallbackHash = require('utils/marionette-extend-callback-hash');
-var ItemView           = require('./secondary-collection-item-view');
-var SearchItemView     = require('./secondary-collection-item-search-view');
+var ItemView = require('./secondary-collection-item-view');
+var SearchItemView = require('./secondary-collection-item-search-view');
 var BaseCollectionView = require('../base-collection/base-collection-view');
-var EmptySearchView    = require('./secondary-collection-item-search-empty-view');
+var EmptySearchView = require('./secondary-collection-item-search-empty-view');
 
 var clientEnv = require('gitter-client-env');
 
@@ -64,13 +64,13 @@ module.exports = BaseCollectionView.extend({
     BaseCollectionView.prototype.initialize.apply(this, arguments);
 
     this.primaryCollection = attrs.primaryCollection;
-    this.userModel         = attrs.userModel;
-    this.troupeModel       = attrs.troupeModel;
-    this.roomCollection    = attrs.roomCollection;
+    this.userModel = attrs.userModel;
+    this.troupeModel = attrs.troupeModel;
+    this.roomCollection = attrs.roomCollection;
 
     this.listenTo(this.roomMenuModel, 'change:searchTerm', this.setActive, this);
-    this.listenTo(this.roomMenuModel, 'change:state:post',  this.toggleShowMore, this);
-    this.listenTo(this.collection, 'reset',  this.toggleShowMore, this);
+    this.listenTo(this.roomMenuModel, 'change:state:post', this.toggleShowMore, this);
+    this.listenTo(this.collection, 'reset', this.toggleShowMore, this);
   },
 
   toggleShowMore: function () {
@@ -114,9 +114,9 @@ module.exports = BaseCollectionView.extend({
   },
 
   redirectToPermalink: function(view) {
-    var roomId    = this.troupeModel.get('id');
-    var model     = this.roomCollection.get(roomId);
-    var roomUri   = model.get('uri') || model.get('url');
+    var roomId = this.troupeModel.get('id');
+    var model = this.roomCollection.get(roomId);
+    var roomUri = model.get('uri') || model.get('url');
     var permalink = urlJoin(clientEnv.basePath, roomUri, '?at=' + view.model.get('id'));
 
     var name = this.troupeModel.name;

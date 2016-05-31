@@ -1,6 +1,6 @@
 'use strict';
 
-var Promise            = require('bluebird');
+var Promise = require('bluebird');
 var createDistribution = require('./create-distribution');
 
 function toString(f) {

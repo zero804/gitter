@@ -1,8 +1,8 @@
 "use strict";
 
-var Marionette        = require('backbone.marionette');
-var Backbone          = require('backbone');
-var _                 = require('underscore');
+var Marionette = require('backbone.marionette');
+var Backbone = require('backbone');
+var _ = require('underscore');
 
 var View = Marionette.CollectionView.extend({
   tagName: 'ul',

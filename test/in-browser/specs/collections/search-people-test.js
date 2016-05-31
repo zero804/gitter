@@ -1,8 +1,8 @@
 /*global describe:true, it:true, beforeEach:true, afterEach:true */
 'use strict';
 
-var assert                 = require('assert');
-var Backbone               = require('backbone');
+var assert = require('assert');
+var Backbone = require('backbone');
 var SearchPeopleCollection = require('public/js/collections/search-people');
 
 describe('SearchPeopleCollection', function() {

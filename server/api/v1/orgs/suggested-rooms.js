@@ -9,7 +9,7 @@ var collections = require('../../../utils/collections');
 
 module.exports = {
   index: function(req) {
-    var userId  = req.user._id;
+    var userId = req.user._id;
     var orgName = req.params.orgName.toLowerCase();
     return Promise.join(
         troupeService.findChildRoomsForOrg(orgName, {security: 'PUBLIC'}),

@@ -3,6 +3,7 @@
 var StatusError = require('statuserror');
 var assert = require('assert');
 
+/* eslint-disable no-multi-spaces */
 /* Note, these can not change! */
 /* -----8<---- */
 var FLAG_POS_NOTIFY_UNREAD       = 0; // Track unread counts
@@ -63,6 +64,8 @@ var MODES = {
   mute: BITMASK_NOTIFY_ACTIVITY |
         BITMASK_NOTIFY_MENTION,
 };
+
+/* eslint-enable no-multi-spaces */
 
 /* Alias modes */
 MODES.mention = MODES.announcement;

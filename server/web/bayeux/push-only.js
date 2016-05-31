@@ -1,7 +1,7 @@
 'use strict';
 
-var bayeuxExtension   = require('./extension');
-var StatusError       = require('statuserror');
+var bayeuxExtension = require('./extension');
+var StatusError = require('statuserror');
 
 module.exports = bayeuxExtension({
   name: 'pushOnly',

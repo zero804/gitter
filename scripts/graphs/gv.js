@@ -25,7 +25,7 @@ persistenceService.Troupe.find({}, 'oneToOne users.userId githubType security ur
             g.addNode("" + userId1, { shape: "point", color: COLOR1 });
             g.addNode("" + userId2, { shape: "point", color: COLOR1 });
 
-            g.addEdge("" + userId1, "" + userId2, { color: COLOR1,  arrowhead: "none"  });
+            g.addEdge("" + userId1, "" + userId2, { color: COLOR1, arrowhead: "none" });
             // g.addEdge("" + userId2, "" + userId1);
           }
         }
@@ -47,13 +47,13 @@ persistenceService.Troupe.find({}, 'oneToOne users.userId githubType security ur
         room.users.forEach(function(roomUser) {
           if(roomUser.userId) {
             g.addNode("" + roomUser.userId, { shape: "point", color: COLOR1 });
-            g.addEdge("" + roomUser.userId, "" + room.id, { color: color,  arrowhead: "none" });
+            g.addEdge("" + roomUser.userId, "" + room.id, { color: color, arrowhead: "none" });
           }
         });
       }
     });
 
-    fs.writeFileSync('prod2.dot',  g.to_dot());
+    fs.writeFileSync('prod2.dot', g.to_dot());
     // g.output( "png", "test01.png" );
     process.exit(0);
   })

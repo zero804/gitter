@@ -1,20 +1,20 @@
 "use strict";
 
-var Promise            = require('bluebird');
-var troupeUriMapper    = require('./troupe-uri-mapper');
-var mongoUtils         = require('gitter-web-persistence-utils/lib/mongo-utils');
-var persistence        = require('gitter-web-persistence');
-var assert             = require('assert');
-var appEvents          = require('gitter-web-appevents');
-var moment             = require('moment');
+var Promise = require('bluebird');
+var troupeUriMapper = require('./troupe-uri-mapper');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var persistence = require('gitter-web-persistence');
+var assert = require('assert');
+var appEvents = require('gitter-web-appevents');
+var moment = require('moment');
 var unreadItemsService = require('./unread-items');
-var recentRoomCore     = require('./core/recent-room-core');
-var debug              = require('debug')('gitter:recent-room-service');
+var recentRoomCore = require('./core/recent-room-core');
+var debug = require('debug')('gitter:app:recent-room-service');
 
-exports.removeRecentRoomForUser                        = removeRecentRoomForUser;
-exports.saveLastVisitedTroupeforUserId                 = saveLastVisitedTroupeforUserId;
-exports.findInitialRoomUrlForUser                      = findInitialRoomUrlForUser;
-exports.updateFavourite                                = updateFavourite;
+exports.removeRecentRoomForUser = removeRecentRoomForUser;
+exports.saveLastVisitedTroupeforUserId = saveLastVisitedTroupeforUserId;
+exports.findInitialRoomUrlForUser = findInitialRoomUrlForUser;
+exports.updateFavourite = updateFavourite;
 
 /**
  * Called when the user removes a room from the left hand menu.

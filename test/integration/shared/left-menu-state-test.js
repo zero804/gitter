@@ -30,7 +30,7 @@ describe('left-menu state', function() {
   it('Resolves `/org` as its\' respective org state', function() {
     var leftMenuState = generateLeftMenuState({}, 'gitterHQ', orgListFixture);
 
-    assert.deepEqual(leftMenuState,  {
+    assert.deepEqual(leftMenuState, {
       roomMenuIsPinned: true,
       state: 'org',
       selectedOrgName: 'gitterHQ',
@@ -41,7 +41,7 @@ describe('left-menu state', function() {
   it('Resolves `/org/room` as its\' respective org state', function() {
     var leftMenuState = generateLeftMenuState({}, 'gitterHQ/gitter', orgListFixture);
 
-    assert.deepEqual(leftMenuState,  {
+    assert.deepEqual(leftMenuState, {
       roomMenuIsPinned: true,
       state: 'org',
       selectedOrgName: 'gitterHQ',
@@ -52,7 +52,7 @@ describe('left-menu state', function() {
   it('Resolves `/home` as the "search" state', function() {
     var leftMenuState = generateLeftMenuState({}, 'home', orgListFixture);
 
-    assert.deepEqual(leftMenuState,  {
+    assert.deepEqual(leftMenuState, {
       roomMenuIsPinned: true,
       state: 'search',
       selectedOrgName: 'home',
@@ -63,7 +63,7 @@ describe('left-menu state', function() {
   it('Org directory resolves to respective org state', function() {
     var leftMenuState = generateLeftMenuState({}, 'orgs/temp-foo/rooms', orgListWithTempFixture);
 
-    assert.deepEqual(leftMenuState,  {
+    assert.deepEqual(leftMenuState, {
       roomMenuIsPinned: true,
       state: 'org',
       selectedOrgName: 'temp-foo',
@@ -82,7 +82,7 @@ describe('left-menu state', function() {
       previousUnloadTime: new Date().getTime()
     });
 
-    assert.deepEqual(leftMenuState,  {
+    assert.deepEqual(leftMenuState, {
       roomMenuIsPinned: true,
       state: 'org',
       selectedOrgName: 'gitterHQ',
@@ -101,7 +101,7 @@ describe('left-menu state', function() {
       previousUnloadTime: new Date().getTime() - (5 * 60 * 1000)
     });
 
-    assert.deepEqual(leftMenuState,  {
+    assert.deepEqual(leftMenuState, {
       roomMenuIsPinned: true,
       state: 'org',
       selectedOrgName: 'w3c',
@@ -121,7 +121,7 @@ describe('left-menu state', function() {
       previousUnloadTime: new Date().getTime()
     });
 
-    assert.deepEqual(leftMenuState,  {
+    assert.deepEqual(leftMenuState, {
       roomMenuIsPinned: true,
       state: 'org',
       selectedOrgName: 'w3c',
@@ -140,7 +140,7 @@ describe('left-menu state', function() {
       previousUnloadTime: new Date().getTime() - (5 * 60 * 1000)
     });
 
-    assert.deepEqual(leftMenuState,  {
+    assert.deepEqual(leftMenuState, {
       roomMenuIsPinned: true,
       state: 'org',
       selectedOrgName: 'gitterHQ',
@@ -159,7 +159,7 @@ describe('left-menu state', function() {
       previousUnloadTime: new Date().getTime()
     });
 
-    assert.deepEqual(leftMenuState,  {
+    assert.deepEqual(leftMenuState, {
       roomMenuIsPinned: true,
       state: 'org',
       selectedOrgName: 'gitterHQ',
@@ -181,7 +181,7 @@ describe('left-menu state', function() {
       previousUnloadTime: new Date().getTime()
     });
 
-    assert.deepEqual(leftMenuState,  {
+    assert.deepEqual(leftMenuState, {
       roomMenuIsPinned: true,
       state: 'org',
       selectedOrgName: 'gitterHQ',
@@ -195,7 +195,7 @@ describe('left-menu state', function() {
       isOneToOne: true
     });
 
-    assert.deepEqual(leftMenuState,  {
+    assert.deepEqual(leftMenuState, {
       roomMenuIsPinned: true,
       state: 'people',
       selectedOrgName: 'some-person',

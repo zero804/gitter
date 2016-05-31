@@ -8,8 +8,8 @@ var winston = env.logger;
 
 winston.info('Starting server/web.js');
 
-var express  = require('express');
-var http     = require('http');
+var express = require('express');
+var http = require('http');
 var cors = require('cors');
 var app = express();
 

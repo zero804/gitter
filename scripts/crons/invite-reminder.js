@@ -17,7 +17,7 @@ var DAY = 1000 * 60 * 60 * 24;
 
 // if something goes terribly wrong use this
 function die(err) {
-  logger.error('Catastrophic error: ' + err,  { exception: err });
+  logger.error('Catastrophic error: ' + err, { exception: err });
   process.exit(1);
 }
 

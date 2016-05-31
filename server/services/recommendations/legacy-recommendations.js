@@ -2,13 +2,13 @@
 
 /* This should go once A/B testing has proven that the new method is better */
 
-var persistence           = require('gitter-web-persistence');
-var Promise               = require('bluebird');
-var _                     = require('underscore');
-var collections           = require('../../utils/collections');
-var recommendations       = require('./index');
+var persistence = require('gitter-web-persistence');
+var Promise = require('bluebird');
+var _ = require('underscore');
+var collections = require('../../utils/collections');
+var recommendations = require('./index');
 var roomMembershipService = require('../room-membership-service');
-var debug                 = require('debug')('gitter:legacy-recommendations');
+var debug = require('debug')('gitter:app:recommendations:legacy-recommendations');
 
 var MAX_RECOMMENDATIONS = 20;
 

@@ -1,10 +1,8 @@
 'use strict';
 
 var _ = require('underscore');
-var Marionette = require('backbone.marionette');
 var urlJoin = require('url-join');
 var clientEnv = require('gitter-client-env');
-var toggleClass = require('utils/toggle-class');
 
 var template = require('./community-creation-invite-people-view.hbs');
 var CommunityCreateBaseStepView = require('./community-creation-base-step-view');

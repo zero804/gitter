@@ -1,10 +1,10 @@
 "use strict";
-var $                    = require('jquery');
-var appEvents            = require('utils/appevents');
-var Backbone             = require('backbone');
-var confirmRepoRoomView  = require('views/modals/confirm-repo-room-view.js');
-var modalRegion          = require('components/modal-region');
-var onready              = require('./utils/onready');
+var $ = require('jquery');
+var appEvents = require('utils/appevents');
+var Backbone = require('backbone');
+var confirmRepoRoomView = require('views/modals/confirm-repo-room-view.js');
+var modalRegion = require('components/modal-region');
+var onready = require('./utils/onready');
 var MobileUserhomeLayout = require('views/layouts/mobile-userhome');
 
 //Left Menu Additions
