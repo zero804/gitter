@@ -1382,6 +1382,7 @@ module.exports = {
   searchRooms: searchRooms,
   renameRepo: renameRepo,
   deleteRoom: deleteRoom,
+  upsertGroupRoom: upsertGroupRoom,
   testOnly: {
     updateUserDateAdded: updateUserDateAdded
 }
