@@ -140,7 +140,7 @@ function getDefaultSecurityDescriptor(creatorUserId, isPublic) {
 function canAdminPotentialGitHubGroup(user, githubInfo, obtainAccessFromGitHubRepo) {
   var type = githubInfo.type;
   var uri = githubInfo.uri;
-  var githubId = githubInfo.id;
+  var githubId = githubInfo.githubId;
 
   return legacyPolicyFactory.createGroupPolicyForGithubObject(user, type, uri, githubId, obtainAccessFromGitHubRepo)
     .then(function(policy) {
@@ -202,6 +202,9 @@ var ensureAccessAndFetchDescriptor = Promise.method(function(user, options) {
     case 'GH_REPO':
     case 'GH_USER':
     case 'GH_GUESS': // for migration calls to createGroup, see below
+      if (type === 'GH_REPO') {
+        options.obtainAccessFromGitHubRepo = options.linkPath;
+      }
       return ensureGitHubAccessAndFetchDescriptor(user, options);
 
     case null:
