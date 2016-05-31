@@ -286,6 +286,8 @@ function createRoomForGitHubUri(user, uri, options) {
               security: githubType === 'ORG' ? 'PRIVATE' : security
             });
 
+          debug('Attempting to upsert room using query: %j', queryTerm);
+
           return mongooseUtils.upsert(persistence.Troupe, queryTerm, {
               $setOnInsert: {
                 lcUri: lcUri,
