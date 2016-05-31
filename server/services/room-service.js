@@ -258,7 +258,8 @@ function createRoomForGitHubUri(user, uri, options) {
       return policyFactory.createPolicyForGithubObject(user, officialUri, githubType, null)
         .bind({
           troupe: null,
-          updateExisting: null
+          updateExisting: null,
+          groupId: null
         })
         .then(function(policy) {
           return policy.canAdmin();
@@ -272,12 +273,18 @@ function createRoomForGitHubUri(user, uri, options) {
         })
         .then(function(group) {
           // TODO: this will change when uris break away
-          var queryTerm = githubId ?
-                { githubId: githubId, githubType: githubType } :
-                { lcUri: lcUri, githubType: githubType };
+          var queryTerm;
+
+          if (githubId) {
+            queryTerm = { $or: [{ githubId: githubId }, { lcUri: lcUri }], githubType: githubType };
+          } else {
+            queryTerm = { lcUri: lcUri, githubType: githubType };
+          }
 
           // TODO: remove this when lcOwner goes away
           var lcOwner = lcUri.split('/')[0];
+
+          var groupId = this.groupId = group._id;
 
           var sd = securityDescriptorGenerator.generate(user, {
               uri: officialUri,
@@ -292,7 +299,7 @@ function createRoomForGitHubUri(user, uri, options) {
               $setOnInsert: {
                 lcUri: lcUri,
                 lcOwner: lcOwner, // This will go
-                groupId: group._id,
+                groupId: groupId,
                 uri: officialUri,
                 githubType: githubType,
                 githubId: githubId,
@@ -308,12 +315,45 @@ function createRoomForGitHubUri(user, uri, options) {
           /* Next stage - post creation migration */
           var troupe = this.troupe = upsertResult[0];
           var updateExisting = this.updateExisting = upsertResult[1];
+          var groupId = this.groupId;
 
           debug('Upsert found an existing room? %s', updateExisting);
 
           /* Next stage - possible rename */
           // New room? Skip this step
           if (!updateExisting) return;
+
+          var updateRequired = false;
+          var set = {};
+
+          if (troupe.githubId !== githubId) {
+            updateRequired = true;
+            set.githubId = githubId;
+          }
+
+          if (!troupe.groupId) {
+            updateRequired = true;
+            set.groupId = groupId;
+          }
+
+          if (!updateRequired) return;
+
+          debug('Updating existing room with values %j', set);
+
+          return persistence.Troupe.findOneAndUpdate({ _id: troupe._id }, { $set: set })
+            .exec()
+            .bind(this)
+            .then(function(troupe) {
+              this.troupe = troupe;
+            })
+        })
+        .tap(function() {
+          var troupe = this.troupe;
+          var updateExisting = this.updateExisting;
+
+          if (!updateExisting) return;
+
+          // Rename URLS if required
 
           // Existing room and name hasn't changed? Skip
           if (troupe.uri === officialUri) return;
