@@ -545,5 +545,6 @@ fixtureLoader.GITTER_INTEGRATION_ORG = 'gitter-integration-tests-organisation';
 fixtureLoader.GITTER_INTEGRATION_ORG_ID = '19433202';
 fixtureLoader.GITTER_INTEGRATION_REPO = 'public-repo-1';
 fixtureLoader.GITTER_INTEGRATION_COMMUNITY = '_I-heart-cats-Test-LOL';
+fixtureLoader.GITTER_INTEGRATION_ROOM = 'all-about-kitty-litter';
 
 module.exports = fixtureLoader;

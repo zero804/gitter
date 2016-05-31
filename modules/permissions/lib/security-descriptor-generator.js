@@ -201,6 +201,7 @@ function ensureGitHubAccessAndFetchDescriptor(user, options) {
         policyPromise = canAdminGitHubRepo(user, githubInfo, security); // or null?
       } else {
         // org or user based group
+        // TODO: or could you have a room like that too?
         policyPromise = canAdminPotentialGitHubGroup(user, githubInfo, obtainAccessFromGitHubRepo);
       }
       return policyPromise
