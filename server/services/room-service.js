@@ -1351,7 +1351,6 @@ function upsertGroupRoom(user, group, roomInfo, securityDescriptor, options) {
           logger.error('Unable to send create room notification: ' + err, { exception: err });
         });
 
-      // NOTE: does options.tracking still make sense?
       sendJoinStats(user, room, options.tracking);
 
       stats.event("create_room", {
