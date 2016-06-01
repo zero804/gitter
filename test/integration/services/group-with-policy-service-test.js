@@ -18,7 +18,7 @@ var isAdminPolicy = {
   }
 };
 
-describe('group-with-policy-service', function() {
+describe('group-with-policy-service #slow', function() {
   var fixture = {};
   var groupWithPolicyService;
 
