@@ -29,7 +29,9 @@ var CommunityCreateModel = Backbone.Model.extend({
     }]),
     /* */
 
+    // user models
     peopleToInvite: new Backbone.Collection(),
+    // { emailAddress }
     emailsToInvite: new Backbone.Collection()
   },
 

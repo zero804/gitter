@@ -820,74 +820,6 @@
   text-align: right;
 }
 
-.community-create-invite-email-list-root {
-  min-height: @invited-email-item-font-size;
-  margin-top: @invited-area-spacing-top;
-}
-
-.community-create-email-list {
-  margin-left: 0;
-  margin-bottom: 0;
-  padding-left: 0;
-  list-style: none;
-
-  font-size: @invited-email-item-font-size;
-  line-height: 1;
-}
-
-.community-create-email-list-item {
-  display: inline-block;
-  height: @invited-email-item-height;
-}
-
-.community-create-email-list-item-comma-separated {
-  .community-create-email-list-item();
-
-  &:not(:last-child) {
-    &:after {
-      content: ',';
-      margin-right: 1ch;
-    }
-  }
-}
-
-.community-create-email-list-item-link {
-  display: inline-block;
-  color: @base-text-color;
-
-  & > .community-create-email-list-item-remove-button {
-    opacity: 0;
-  }
-  &:hover,
-  &:focus {
-    text-decoration: none;
-
-    & > .community-create-email-list-item-remove-button {
-      opacity: 1;
-    }
-  }
-}
-
-.community-create-email-list-item-remove-button {
-  padding-top: 0;
-  padding-left: .25em;
-  padding-bottom: 0;
-  padding-right: .4em;
-
-  background-color: transparent;
-  border: 0;
-
-  color: @base-text-color;
-  line-height: 1;
-
-  transition: opacity .2s ease;
-
-
-  &:hover,
-  &:focus {
-    opacity: 1;
-  }
-}
 
 .community-create-invite-user-result-list-root {
   height: @invite-user-area-total-height + @org-area-padding;
@@ -1082,14 +1014,6 @@
 .community-create-overview-invite-list-root {
   min-height: @people-list-item-height;
   margin-top: @invite-user-item-spacing;
-}
-
-.community-create-overview-invite-email-area {
-  margin-top: 2rem;
-}
-
-.community-create-overview-invite-email-list-root {
-  display: inline-block;
 }
 
 .community-create-overview-sub-room-heading {

@@ -3,12 +3,12 @@
 var _ = require('underscore');
 var urlJoin = require('url-join');
 var toggleClass = require('utils/toggle-class');
+var VirtualMultipleCollection = require('../virtual-multiple-collection');
 
 var template = require('./community-creation-overview-view.hbs');
 var CommunityCreateBaseStepView = require('./community-creation-base-step-view');
 var CommunityCreationSubRoomListView = require('./community-creation-sub-room-list-view');
 var CommunityCreationPeopleListView = require('./community-creation-people-list-view');
-var CommunityCreationEmailListView = require('./community-creation-email-list-view');
 
 require('gitter-styleguide/css/components/headings.css');
 require('gitter-styleguide/css/components/buttons.css');
@@ -24,8 +24,7 @@ module.exports = CommunityCreateBaseStepView.extend({
   behaviors: {
     Isomorphic: {
       //subRoomListView: { el: '.community-create-sub-room-list-root', init: 'initSubRoomListView' },
-      inviteListView: { el: '.community-create-overview-invite-list-root', init: 'initInviteListView' },
-      inviteEmailListView: { el: '.community-create-overview-invite-email-list-root', init: 'initInviteEmailListView' },
+      inviteListView: { el: '.community-create-overview-invite-list-root', init: 'initInviteListView' }
     },
   },
 
@@ -39,18 +38,10 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   initInviteListView: function(optionsForRegion) {
     this.inviteListView = new CommunityCreationPeopleListView(optionsForRegion({
-      collection: this.communityCreateModel.get('peopleToInvite')
+      collection: this.inviteCollection
     }));
     return this.inviteListView;
   },
-
-  initInviteEmailListView: function(optionsForRegion) {
-    this.inviteEmailListView = new CommunityCreationEmailListView(optionsForRegion({
-      collection: this.communityCreateModel.get('emailsToInvite')
-    }));
-    return this.inviteEmailListView;
-  },
-
 
   ui: _.extend({}, CommunityCreateBaseStepView.prototype.ui, {
     communityNameHeading: '.community-create-overview-community-name',
@@ -69,6 +60,13 @@ module.exports = CommunityCreateBaseStepView.extend({
 
     this.orgCollection = options.orgCollection;
     this.repoCollection = options.repoCollection;
+
+    this.inviteCollection = new VirtualMultipleCollection([], {
+      backingCollections: [
+        this.communityCreateModel.get('peopleToInvite'),
+        this.communityCreateModel.get('emailsToInvite')
+      ]
+    });
 
     this.listenTo(this.communityCreateModel, 'change:communityName change:communitySlug change:githubOrgId', this.onCommunityDataChange, this);
   },

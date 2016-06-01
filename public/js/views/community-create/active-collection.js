@@ -23,7 +23,7 @@ var ActiveCollection = Backbone.Collection.extend({
     this.listenTo(this.backingCollection, 'sync', this.onCollectionSync, this);
     this.listenTo(this.backingCollection, 'snapshot', this.onCollectionSnapshot, this);
     this.listenTo(this.backingCollection, 'remove', this.onItemRemoved, this);
-    this.listenTo(this.backingCollection, 'add', this.onItemAdded, this)
+    this.listenTo(this.backingCollection, 'add', this.onItemAdded, this);
 
     this.addModels(models);
   },
@@ -32,10 +32,10 @@ var ActiveCollection = Backbone.Collection.extend({
     return this.backingCollection.fetch.apply(this.backingCollection, arguments);
   },
 
-  onItemAdded: function (model){
+  onItemAdded: function(model) {
     this.add(new ActiveItemModel(model.toJSON()));
   },
-  onItemRemoved: function (model){
+  onItemRemoved: function(model) {
     this.remove(model);
   },
 
