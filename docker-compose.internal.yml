@@ -37,17 +37,17 @@ mongo1:
   links:
     - mongo2
     - mongo3
-  entrypoint: [ "/usr/bin/mongod", "--replSet", "troupeSet", "--journal", "--smallfiles", "--storageEngine=wiredTiger", "--oplogSize=20", "--port=27017" ]
+  entrypoint: [ "/usr/bin/mongod", "--replSet", "troupeSet", "--journal", "--smallfiles", "--storageEngine=wiredTiger", "--oplogSize=20", "--port=27017"]
 
 mongo2:
   image: mongo:3.2
   restart: always
-  entrypoint: [ "/usr/bin/mongod", "--replSet", "troupeSet", "--journal", "--smallfiles", "--storageEngine=wiredTiger", "--oplogSize=20", "--port=27018" ]
+  entrypoint: [ "/usr/bin/mongod", "--replSet", "troupeSet", "--journal", "--smallfiles", "--storageEngine=wiredTiger", "--oplogSize=20", "--port=27018"]
 
 mongo3:
   image: mongo:3.2
   restart: always
-  entrypoint: [ "/usr/bin/mongod", "--replSet", "troupeSet", "--journal", "--smallfiles", "--storageEngine=wiredTiger", "--oplogSize=20", "--port=27019" ]
+  entrypoint: [ "/usr/bin/mongod", "--replSet", "troupeSet", "--journal", "--smallfiles", "--storageEngine=wiredTiger", "--oplogSize=20", "--port=27019"]
 
 mongosetup:
   image: mongo:3.2
@@ -62,6 +62,7 @@ mongosetup:
     ANNOUNCE_MONGO1_HOST: ""
     ANNOUNCE_MONGO2_HOST: ""
     ANNOUNCE_MONGO3_HOST: ""
+    DISABLE_TABLE_SCAN: 1
   working_dir: /src
   entrypoint: [ "/src/scripts/docker/mongo/mongo-setup.sh" ]
 
