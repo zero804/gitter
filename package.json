@@ -115,7 +115,7 @@
     "passport-oauth2-client-password": "^0.1.2",
     "passport-twitter": "^1.0.3",
     "permessage-deflate": "^0.1.2",
-    "qs": "^6.1.0",
+    "qs": "file:modules/qs",
     "readme-badger": "^0.1.2",
     "redis-lock": "0.0.8",
     "request": "~2.40.0",

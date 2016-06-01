@@ -1,7 +1,7 @@
 /*eslint-env browser */
 
 'use strict';
-var qs = require('qs').parse(window.location.search);
+var qs = require('qs');
 
 var env = window.gitterClientEnv || {};
 // Allow env through the querystring
