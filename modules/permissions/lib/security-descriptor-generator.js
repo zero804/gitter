@@ -172,7 +172,6 @@ function canAdminPotentialGitHubGroup(user, githubInfo, obtainAccessFromGitHubRe
 function canAdminGitHubRepo(user, githubInfo, security) {
   var type = githubInfo.type;
   var uri = githubInfo.uri;
-  var githubId = githubInfo.githubId;
 
   return legacyPolicyFactory.createPolicyForGithubObject(user, uri, type, security)
     .then(function(policy) {
@@ -216,7 +215,7 @@ function ensureGitHubAccessAndFetchDescriptor(user, options) {
       }
 
       var policyPromise;
-      if (type == 'GH_REPO') {
+      if (type === 'GH_REPO') {
         // a room based on a repo
         policyPromise = canAdminGitHubRepo(user, githubInfo, security); // or null?
       } else {

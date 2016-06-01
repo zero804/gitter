@@ -5,7 +5,6 @@ var assert = require('assert');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
-var persistence = require('gitter-web-persistence');
 var GroupWithPolicyService = testRequire('./services/group-with-policy-service');
 var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
 
