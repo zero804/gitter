@@ -44,6 +44,11 @@ module.exports = {
       createOptions.security = 'PUBLIC';
     }
 
+    // keep tracking info around for sendStats
+    if (typeof req.body.source === 'string') {
+      createOptions.tracking = { source: req.body.source };
+    }
+
     var groupWithPolicyService = new GroupWithPolicyService(req.group, req.user, req.userGroupPolicy);
     return groupWithPolicyService.createRoom(createOptions);
   }
