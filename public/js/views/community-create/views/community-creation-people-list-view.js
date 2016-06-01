@@ -41,7 +41,17 @@ var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
   serializeData: function() {
     var data = this.model.toJSON();
     data.absoluteUri = urlJoin(clientEnv.basePath, this.model.get('username'));
-    data.avatarSrcset = resolveRoomAvatarSrcSet({ uri: data.username }, AVATAR_SIZE);
+    if(data.username) {
+      data.avatarSrcset = resolveRoomAvatarSrcSet({ uri: data.username }, AVATAR_SIZE);
+    }
+    else if(data.emailAddress) {
+      var avatarUrl = 'https://avatars-beta.gitter.im/gravatar/e/' + data.emailAddress;
+      data.avatarSrcset = {
+        src: avatarUrl + '?size=' + AVATAR_SIZE,
+        size: AVATAR_SIZE,
+        srcset: avatarUrl + '?size=' + (2 * AVATAR_SIZE) + ' 2x',
+      };
+    }
 
     return data;
   },

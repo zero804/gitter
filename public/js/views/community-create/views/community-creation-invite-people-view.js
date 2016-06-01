@@ -3,12 +3,12 @@
 var _ = require('underscore');
 var Backbone = require('backbone');
 var ProxyCollection = require('backbone-proxy-collection');
+var VirtualMultipleCollection = require('../virtual-multiple-collection');
 
 var template = require('./community-creation-invite-people-view.hbs');
 var CommunityCreateBaseStepView = require('./community-creation-base-step-view');
 var CommunityCreationPeopleListView = require('./community-creation-people-list-view');
 var UserResultListView = require('./community-create-invite-user-result-list-view');
-var CommunityCreationEmailListView = require('./community-creation-email-list-view');
 
 var userSearchModels = require('collections/user-search');
 var collaboratorsModels = require('collections/collaborators');
@@ -29,8 +29,7 @@ module.exports = CommunityCreateBaseStepView.extend({
   behaviors: {
     Isomorphic: {
       userResultListView: { el: '.community-create-invite-user-result-list-root', init: 'initUserResultListView' },
-      inviteListView: { el: '.community-create-invite-list-root', init: 'initInviteListView' },
-      inviteEmailListView: { el: '.community-create-invite-email-list-root', init: 'initInviteEmailListView' },
+      inviteListView: { el: '.community-create-invite-list-root', init: 'initInviteListView' }
     },
   },
 
@@ -39,30 +38,18 @@ module.exports = CommunityCreateBaseStepView.extend({
       collection: this.userResultCollection
     }));
     this.listenTo(this.userResultListView, 'user:activated', this.onPersonSelected, this);
-    //this.listenTo(this.inviteListView, 'user:cleared', this.onPersonRemoved, this);
     return this.userResultListView;
   },
 
   initInviteListView: function(optionsForRegion) {
     this.inviteListView = new CommunityCreationPeopleListView(optionsForRegion({
-      collection: this.communityCreateModel.get('peopleToInvite'),
+      collection: this.inviteCollection,//this.communityCreateModel.get('peopleToInvite'),
       model: new Backbone.Model({
         canRemove: true
       })
     }));
     this.listenTo(this.inviteListView, 'person:remove', this.onPersonRemoved, this);
     return this.inviteListView;
-  },
-
-  initInviteEmailListView: function(optionsForRegion) {
-    this.inviteEmailListView = new CommunityCreationEmailListView(optionsForRegion({
-      collection: this.communityCreateModel.get('emailsToInvite'),
-      model: new Backbone.Model({
-        canRemove: true
-      })
-    }));
-    this.listenTo(this.inviteEmailListView, 'email:remove', this.onEmailRemoved, this);
-    return this.inviteEmailListView;
   },
 
   ui: _.extend({}, CommunityCreateBaseStepView.prototype.ui, {
@@ -89,6 +76,13 @@ module.exports = CommunityCreateBaseStepView.extend({
 
     this.userResultCollection = new ProxyCollection({
       collection: this.userSuggestionCollection
+    });
+
+    this.inviteCollection = new VirtualMultipleCollection([], {
+      backingCollections: [
+        this.communityCreateModel.get('peopleToInvite'),
+        this.communityCreateModel.get('emailsToInvite')
+      ]
     });
 
     this.throttledFetchUsers = _.throttle(this.fetchUsers, 300);
@@ -137,6 +131,7 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   onPersonRemoved: function(person) {
     this.communityCreateModel.get('peopleToInvite').remove(person);
+    this.communityCreateModel.get('emailsToInvite').remove(person);
   },
 
   onEmailSubmit: function(e) {
@@ -144,7 +139,7 @@ module.exports = CommunityCreateBaseStepView.extend({
 
     if(newEmailAddress.length) {
       this.communityCreateModel.get('emailsToInvite').add({
-        address: newEmailAddress
+        emailAddress: newEmailAddress
       });
     }
 
@@ -153,8 +148,4 @@ module.exports = CommunityCreateBaseStepView.extend({
 
     e.preventDefault();
   },
-
-  onEmailRemoved: function(email) {
-    this.communityCreateModel.get('emailsToInvite').remove(email);
-  }
 });
