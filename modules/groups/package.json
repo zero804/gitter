@@ -18,6 +18,7 @@
     "gitter-web-persistence": "file:../persistence",
     "gitter-web-persistence-utils": "file:../persistence-utils",
     "gitter-web-validators": "file:../validators",
+    "lazy.js": "^0.4.2",
     "lodash": "^3.2.0",
     "statuserror": "^0.1.3"
   },

@@ -163,7 +163,7 @@ describe('restful #slow', function() {
       group1: {},
       user1: { },
       troupe1: { group: 'group1', users: ['user1'] },
-      troupe2: { group: 'group1' },
+      troupe2: { group: 'group1', security: 'PRIVATE' },
     });
 
     it('should serializer the rooms for a group', function() {
