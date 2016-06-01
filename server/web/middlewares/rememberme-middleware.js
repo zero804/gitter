@@ -9,7 +9,7 @@ var _ = require('lodash');
 var uuid = require('node-uuid');
 var sechash = require('sechash');
 var userService = require('../../services/user-service');
-var useragentTagger = require('../../utils/user-agent-tagger');
+var useragentTagger = require('../user-agent-tagger');
 var debug = require('debug')('gitter:infra:rememberme-middleware');
 var userScopes = require('gitter-web-identity/lib/user-scopes');
 var passportLogin = require('../passport-login');
@@ -223,7 +223,7 @@ module.exports = {
         req.accessToken = null;
 
         // Tracking
-        var properties = useragentTagger(req.headers['user-agent']);
+        var properties = useragentTagger(req);
         stats.userUpdate(user, properties);
 
         stats.event("rememberme_accepted");

@@ -1,13 +1,12 @@
 "use strict";
 
-var parser = require('useragent');
-
-var isPhone = function(userAgentString) {
-  var agent = parser.parse(userAgentString);
+var isPhone = function(req) {
+  var agent = req.getParsedUserAgent();
   var device = agent.device;
 
   if(device && device.family === 'iPad') return false;
 
+  var userAgentString = req.headers['user-agent'];
   return userAgentString && userAgentString.toLowerCase().indexOf('mobile') >= 0;
 };
 

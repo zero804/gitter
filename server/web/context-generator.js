@@ -2,7 +2,6 @@
 
 var restSerializer = require("../serializers/rest-serializer");
 var presenceService = require("gitter-web-presence");
-var useragent = require("useragent");
 var userService = require('../services/user-service');
 var userSettingsService = require('../services/user-settings-service');
 var roomMetaService = require('../services/room-meta-service');
@@ -92,7 +91,7 @@ exports.generateTroupeContext = function(req, extras) {
 function determineDesktopNotifications(user, req) {
   if(!user) return true;
 
-  var agent = useragent.parse(req.headers['user-agent']);
+  var agent = req.getParsedUserAgent();
   var os = agent.os.family;
   var clientType;
 
