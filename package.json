@@ -191,6 +191,7 @@
     "fastdom": "^1.0.1",
     "faye": "^1.1.2",
     "file-loader": "^0.8.1",
+    "fontfaceobserver": "^1.7.1",
     "fuzzysearch": "^1.0.3",
     "gitter-handlebars-loader": "^1.2.0",
     "gitter-styleguide": "^1.6.4",
