@@ -37,8 +37,8 @@ describe('group-api', function() {
       group: 'group1'
     },
     troupe3: {
-      /* Security is undefined */
-      group: 'group1'
+      group: 'group1',
+      security: 'PRIVATE'
     }
   });
 

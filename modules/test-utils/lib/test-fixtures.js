@@ -179,12 +179,50 @@ function createExpectedFixtures(expected) {
       securityDescriptorType = f.oneToOne ? 'ONE_TO_ONE' : null;
     }
 
+    var isPublic;
+    var members;
+    var admins;
+
+    if ('public' in securityDescriptor) {
+      isPublic = securityDescriptor.public;
+    } else {
+      if (f.oneToOne) {
+        isPublic = false;
+      } else {
+        if (f.security === 'PRIVATE') {
+          isPublic = false;
+        } else {
+          isPublic = true;
+        }
+      }
+    }
+
+    if ('members' in securityDescriptor) {
+      members = securityDescriptor.members;
+    } else {
+      if (f.oneToOne) {
+        members = null;
+      } else {
+        if (f.security === 'PRIVATE') {
+          members = 'INVITE';
+        } else {
+          members = 'PUBLIC';
+        }
+      }
+    }
+
+    if ('admins' in securityDescriptor) {
+      admins = securityDescriptor.admins;
+    } else {
+      admins = 'MANUAL';
+    }
+
     return {
       // Permissions stuff
       type: securityDescriptorType,
-      members: securityDescriptor.members || 'PUBLIC',
-      admins: securityDescriptor.admins || 'MANUAL',
-      public: 'public' in securityDescriptor ? securityDescriptor.public : !f.oneToOne,
+      members: members,
+      admins: admins,
+      public: isPublic,
       linkPath: securityDescriptor.linkPath,
       externalId: securityDescriptor.externalId,
       extraMembers: securityDescriptor.extraMembers,

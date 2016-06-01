@@ -1,6 +1,7 @@
 'use strict';
 
 var Promise = require('bluebird');
+var _ = require('lodash');
 var Group = require('gitter-web-persistence').Group;
 var Troupe = require('gitter-web-persistence').Troupe;
 var TroupeUser = require('gitter-web-persistence').TroupeUser;
@@ -14,6 +15,9 @@ var validateUri = require('gitter-web-github').GitHubUriValidator;
 var debug = require('debug')('gitter:groups:group-service');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var securityDescriptorGenerator = require('gitter-web-permissions/lib/security-descriptor-generator');
+var lazy = require('lazy.js');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+
 
 /**
  * Find a group given an id
@@ -172,32 +176,106 @@ function ensureGroupForGitHubRoomCreation(user, options) {
     });
 }
 
+function filterPrivateRoomsForUser(groupId, userId, troupeIds) {
+  return TroupeUser.distinct('troupeId', { userId: userId, troupeId: { $in: troupeIds } })
+    .exec()
+    .then(function(troupeIds) {
+      // TODO: add extraMember and extraAdmin rooms
+      return troupeIds;
+    })
+}
+
+/**
+ * Returns true if a userId can be found in an array of objectIds
+
+ * @private
+ */
+function isInExtraArray(userId, arrayOfUserIds) {
+  if (!arrayOfUserIds || !arrayOfUserIds.length) return false;
+
+  return _.some(arrayOfUserIds, function(item) {
+    return mongoUtils.objectIDsEqual(item, userId);
+  });
+}
+
 function findRoomsIdForGroup(groupId, userId) {
   assert(groupId, 'groupId is required');
 
-  // for now only public rooms plus the ones the user is in already
-  return Troupe.distinct('_id', { groupId: groupId, security: 'PUBLIC' })
-    .lean()
-    .exec()
-    .then(function(results) {
-      if (!userId) return results;
+  var query, select;
+  if (userId) {
+    query = { groupId: groupId };
+    select = {
+      _id: 1,
+      'sd.public': 1,
+      'sd.extraMembers': 1,
+      'sd.extraAdmins': 1,
+    };
+  } else {
+    query = { groupId: groupId, 'sd.public': true };
+    select = {
+      _id: 1,
+      'sd.public': 1,
+    };
+  }
 
-      return TroupeUser.distinct("troupeId", { 'userId': userId })
-        .exec()
-        .then(function(roomIds) {
-          // merge them in
+  return Troupe.find(query, select)
+    .then(function(troupes) {
+      if (!troupes.length) return [];
 
-          var roomIdMap = results.reduce(function(memo, room) {
-            memo[room._id] = true;
-            return memo;
-          }, {});
+      var troupeSeq = lazy(troupes);
 
-          var filtered = roomIds.filter(function(roomId) {
-            return !roomIdMap[roomId];
-          });
-
-          return results.concat(filtered);
+      var publicRooms = troupeSeq.filter(function(troupe) {
+          return troupe.sd && troupe.sd.public;
+        })
+        .map(function(f) {
+          return f._id;
         });
+
+      if (!userId) {
+        return publicRooms.toArray();
+      }
+
+      var privateRoomSeq = troupeSeq.filter(function(troupe) {
+        return troupe.sd && !troupe.sd.public;
+      });
+
+      if (privateRoomSeq.isEmpty()) {
+        return publicRooms.toArray();
+      }
+
+      var explicitAccessPrivateRooms = privateRoomSeq.filter(function(troupe) {
+          if (isInExtraArray(userId, troupe.extraMembers)) return true;
+          if (isInExtraArray(userId, troupe.extraAdmins)) return true;
+
+          return false;
+        })
+        .map(function(f) {
+          return f._id;
+        });
+
+      var memberAccessPrivateRooms = privateRoomSeq.filter(function(troupe) {
+          if (isInExtraArray(userId, troupe.extraMembers)) return false;
+          if (isInExtraArray(userId, troupe.extraAdmins)) return false;
+
+          return true;
+        })
+        .map(function(f) {
+          return f._id;
+        });
+
+      var privatePlusExplicit = publicRooms.concat(explicitAccessPrivateRooms);
+
+      if (memberAccessPrivateRooms.isEmpty()) {
+        return privatePlusExplicit.toArray();
+      }
+
+      return filterPrivateRoomsForUser(groupId, userId, memberAccessPrivateRooms.toArray())
+        .then(function(accessiblePrivateRooms) {
+          return privatePlusExplicit.concat(lazy(accessiblePrivateRooms)).toArray();
+        });
+
+      // Resolve membership in private rooms
+
     });
 }
 
