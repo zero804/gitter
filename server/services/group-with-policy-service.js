@@ -8,6 +8,7 @@ var debug = require('debug')('gitter:app:group-with-policy-service');
 var roomService = require('./room-service');
 var secureMethod = require('../utils/secure-method');
 var validateRoomName = require('gitter-web-validators/lib/validate-room-name');
+var validateRoomSecurity = require('gitter-web-validators/lib/validate-room-security');
 
 /**
  * This could do with a better name
@@ -34,6 +35,15 @@ function findByUri(uri) {
 function ensureAccessAndFetchRoomInfo(user, group, options) {
   options = options || {};
 
+  var type = options.type || null;
+
+  var security = options.security;
+  assert(security, 'security required');
+
+  if (!validateRoomSecurity(type, security)) {
+    throw new StatusError(400, 'Invalid room security for ' + type +': '+ security);
+  }
+
   var topic = options.topic || null;
   // TODO: validate topic
 
@@ -46,8 +56,6 @@ function ensureAccessAndFetchRoomInfo(user, group, options) {
 
   var uri = group.uri + '/' + name;
 
-  var security = options.security;
-  assert(security, 'security required');
 
   return findByUri(uri)
     .then(function(room) {
@@ -73,11 +81,18 @@ function ensureAccessAndFetchRoomInfo(user, group, options) {
 GroupWithPolicyService.prototype.createRoom = secureMethod([allowAdmin], function(options) {
   var user = this.user;
   var group = this.group;
+
   return ensureAccessAndFetchRoomInfo(user, group, options)
     .spread(function(roomInfo, securityDescriptor) {
       debug("Upserting %j", roomInfo);
-      // NOTE: options.tracking?
-      return roomService.upsertGroupRoom(user, group, roomInfo, securityDescriptor);
+      // NOTE: what about options.tracking?
+
+      // We have to send security along for now because we have to keep filling
+      // it in for backwards compatibility and there's no way to figure out if
+      // it should be INHERITED from a securityDescriptor.
+      return roomService.upsertGroupRoom(user, group, roomInfo, securityDescriptor, {
+        security: options.security
+      });
     });
 });
 

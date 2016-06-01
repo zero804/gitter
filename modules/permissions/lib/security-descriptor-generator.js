@@ -66,6 +66,9 @@ function generateOrgSecurityDescriptor(user, options) {
         linkPath: linkPath,
         externalId: externalId
       };
+
+    default:
+      throw new StatusError(500, 'Unknown security type: ' + security);
   }
 }
 
@@ -123,8 +126,25 @@ function generate(user, options) {
 }
 
 function getDefaultSecurityDescriptor(creatorUserId, security) {
-  var members = (security === 'PUBLIC') ? 'PUBLIC' : 'INVITE' ;
-  var isPublic = security === 'PUBLIC';
+  var members;
+  var isPublic;
+
+  switch (security || null) {
+    case null:
+    case 'PUBLIC':
+      members = 'PUBLIC';
+      isPublic = true;
+      break;
+
+    case 'PRIVATE':
+      members = 'INVITE';
+      isPublic = false;
+      break;
+
+    default:
+      throw new StatusError(500, 'Unknown security type: ' + security);
+  }
+
   return {
     type: null,
     admins: 'MANUAL',
@@ -174,8 +194,8 @@ function ensureGitHubAccessAndFetchDescriptor(user, options) {
       debug("GitHub information for %s is %j", linkPath, githubInfo);
 
       // is this correct?
-      if (security === 'INHERIT') {
-        security = githubInfo.security;
+      if (security === 'INHERITED') {
+        security = 'PRIVATE';
       }
 
       if (!githubInfo) throw new StatusError(404);
@@ -219,7 +239,7 @@ function ensureGitHubAccessAndFetchDescriptor(user, options) {
 
 var ensureAccessAndFetchDescriptor = Promise.method(function(user, options) {
   var type = options.type || null;
-  var security = options.security || 'PUBLIC'; // groups default to public
+  var security = options.security;
   // options can also contain linkPath, obtainAccessFromGitHubRepo
 
   switch (type) {

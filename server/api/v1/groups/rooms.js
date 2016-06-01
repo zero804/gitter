@@ -1,5 +1,6 @@
 'use strict';
 
+var assert = require('assert');
 var StatusError = require('statuserror');
 var restful = require('../../../services/restful')
 var GroupWithPolicyService = require('../../../services/group-with-policy-service');
@@ -29,12 +30,18 @@ module.exports = {
     var topic = String(req.body.topic);
     var createOptions = { name: name, topic: topic };
     if (req.body.security) {
-      // PUBLIC, PRIVATE or INHERIT
+      // PUBLIC, PRIVATE or INHERITED
       createOptions.security = req.body.security.security;
+      assert(createOptions.security, 'security required');
 
-      // for GitHub and future rom types that are backed by other services
       createOptions.type = req.body.security.type;
-      createOptions.linkPath = req.body.security.linkPath;
+      if (createOptions.type) {
+        // for GitHub and future room types that are backed by other services
+        createOptions.linkPath = req.body.security.linkPath;
+        assert(createOptions.linkPath, 'linkPath required');
+      }
+    } else {
+      createOptions.security = 'PUBLIC';
     }
 
     var groupWithPolicyService = new GroupWithPolicyService(req.group, req.user, req.userGroupPolicy);

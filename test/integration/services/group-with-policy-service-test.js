@@ -22,14 +22,16 @@ describe('group-with-policy-service', function() {
   var fixture = {};
   var groupWithPolicyService;
 
+  var linkPath = fixtureLoader.GITTER_INTEGRATION_USERNAME + '/' + fixtureLoader.GITTER_INTEGRATION_REPO;
+
   beforeEach(function() {
     return fixtureLoader(fixture, {
         deleteDocuments: {
           User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }],
           Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
                   { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() } ],
-          Troupe: [ { lcUri: fixtureLoader.GITTER_INTEGRATION_REPO.toLowerCase() },
-                    { lcUri: fixtureLoader.GITTER_INTEGRATION_ROOM.toLowerCase()}]
+          Troupe: [ { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() + '/' + fixtureLoader.GITTER_INTEGRATION_REPO.toLowerCase() },
+                    { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() + '/' + fixtureLoader.GITTER_INTEGRATION_ROOM.toLowerCase() }]
         },
         user1: {
           githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
@@ -65,6 +67,12 @@ describe('group-with-policy-service', function() {
         assert.equal(room.topic, topic);
         assert.equal(room.groupId, fixture.group1.id);
 
+        // test backwards compatibility
+        assert.equal(room.lcOwner, fixture.group1.lcUri);
+        assert.equal(room.githubType, 'NONE');
+        assert.equal(room.githubId, undefined);
+        assert.equal(room.security, 'PUBLIC');
+
         return securityDescriptorService.getForRoomUser(room._id, null);
       })
       .then(function(securityDescriptor) {
@@ -86,6 +94,7 @@ describe('group-with-policy-service', function() {
         security: 'PRIVATE'
       })
       .then(function(room) {
+        assert.equal(room.security, 'PRIVATE');
         return securityDescriptorService.getForRoomUser(room._id, null);
       })
       .then(function(securityDescriptor) {
@@ -98,9 +107,95 @@ describe('group-with-policy-service', function() {
       });
   });
 
-  it('should throw an error when trying to create a normal room with security: INHERIT');
+  it('should throw an error when trying to create a normal room with security: INHERIT', function() {
+    return groupWithPolicyService.createRoom({
+        type: null,
+        name: fixtureLoader.GITTER_INTEGRATION_ROOM,
+        security: 'INHERITED'
+      })
+      .then(function() {
+        assert.ok(false, 'expected error')
+      })
+      .catch(StatusError, function(error) {
+        assert.strictEqual(error.status, 400);
+      });
+  });
 
-  it('should create a repo room (public)');
-  it('should create a repo room (private)');
-  it('should create a repo room (inherit)');
+  it('should create a repo room (inherit)', function() {
+    return groupWithPolicyService.createRoom({
+        type: 'GH_REPO',
+        name: fixtureLoader.GITTER_INTEGRATION_REPO,
+        security: 'INHERITED',
+        linkPath: linkPath
+      })
+      .then(function(room) {
+        assert.equal(room.githubType, 'REPO');
+        assert.equal(room.githubId, fixtureLoader.GITTER_INTEGRATION_REPO_ID);
+        assert.equal(room.security, 'INHERITED');
+
+        return securityDescriptorService.getForRoomUser(room._id, null);
+      })
+      .then(function(securityDescriptor) {
+        assert.deepEqual(securityDescriptor, {
+          type: 'GH_REPO',
+          members: 'GH_REPO_ACCESS',
+          admins: 'GH_REPO_PUSH',
+          public: false,
+          linkPath: linkPath,
+          externalId: fixtureLoader.GITTER_INTEGRATION_REPO_ID
+        });
+      });
+  });
+
+  it('should create a repo room (public)', function() {
+    return groupWithPolicyService.createRoom({
+        type: 'GH_REPO',
+        name: fixtureLoader.GITTER_INTEGRATION_REPO,
+        security: 'PUBLIC',
+        linkPath: linkPath
+      })
+      .then(function(room) {
+        assert.equal(room.security, 'PUBLIC');
+
+        return securityDescriptorService.getForRoomUser(room._id, null);
+      })
+      .then(function(securityDescriptor) {
+        assert.deepEqual(securityDescriptor, {
+          type: 'GH_REPO',
+          members: 'PUBLIC',
+          admins: 'GH_REPO_PUSH',
+          public: true,
+          linkPath: linkPath,
+          externalId: fixtureLoader.GITTER_INTEGRATION_REPO_ID
+        });
+      });
+
+  });
+
+  it('should create a repo room (private)', function() {
+    return groupWithPolicyService.createRoom({
+        type: 'GH_REPO',
+        name: fixtureLoader.GITTER_INTEGRATION_REPO,
+        security: 'PRIVATE',
+        linkPath: linkPath
+      })
+      .then(function(room) {
+        assert.equal(room.security, 'PRIVATE');
+
+        return securityDescriptorService.getForRoomUser(room._id, null);
+      })
+      .then(function(securityDescriptor) {
+        assert.deepEqual(securityDescriptor, {
+          type: 'GH_REPO',
+          members: 'GH_REPO_ACCESS',
+          admins: 'GH_REPO_PUSH',
+          public: false,
+          linkPath: linkPath,
+          externalId: fixtureLoader.GITTER_INTEGRATION_REPO_ID
+        });
+      });
+  });
+
+  // TODO: what about an org channel?
+  // TODO: what about if someone tries to pass in a gh user as linkPath?
 });

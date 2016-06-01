@@ -1287,8 +1287,11 @@ function upsertGroupRoom(user, group, roomInfo, securityDescriptor, options) {
 
   // convert back to the old github-tied vars here
   var type = securityDescriptor.type || null;
-  var security = securityDescriptor.security || null;
   var githubId = securityDescriptor.externalId || null;
+  var security = options.security; // blegh
+
+  assert(security, 'security required');
+
   var githubType;
   var roomType;
   switch (type) {
@@ -1310,6 +1313,7 @@ function upsertGroupRoom(user, group, roomInfo, securityDescriptor, options) {
     default:
       throw new StatusError(400, 'type is not known: ' + type);
   }
+
 
   return mongooseUtils.upsert(persistence.Troupe, { lcUri: lcUri }, {
       $setOnInsert: {

@@ -63,6 +63,7 @@ function ensureAccessAndFetchGroupInfo(user, options) {
 
   var name = options.name;
   var uri = options.uri;
+  var security = options.security || 'PUBLIC';
   assert(user, 'user required');
   assert(name, 'name required');
   assert(uri, 'uri required');
@@ -73,6 +74,11 @@ function ensureAccessAndFetchGroupInfo(user, options) {
 
   if (!validateGroupUri(uri)) {
     throw new StatusError(400, 'Invalid group uri: ' + uri);
+  }
+
+  // we only support public groups for now
+  if (security !== 'PUBLIC') {
+    throw new StatusError(400, 'Invalid group security: ' + security);
   }
 
   return findByUri(uri)

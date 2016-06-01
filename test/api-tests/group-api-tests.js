@@ -108,7 +108,7 @@ describe('group-api', function() {
         name: 'test',
         topic: 'all about testing',
         security: {
-          security: 'INHERIT',
+          security: 'INHERITED',
           type: 'GH_REPO',
           linkPath: fixtureLoader.GITTER_INTEGRATION_USERNAME + '/' + fixtureLoader.GITTER_INTEGRATION_REPO
         }
