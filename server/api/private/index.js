@@ -107,5 +107,8 @@ router.post('/markdown-preview',
   identifyRoute('api-private-markdown-preview'),
   require('./markdown-preview'));
 
+  router.get('/inviteUserSuggestions',
+    identifyRoute('api-private-invite-user-suggestions'),
+    require('./invite-user-suggestions'));
 
 module.exports = router;
