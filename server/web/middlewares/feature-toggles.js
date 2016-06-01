@@ -3,7 +3,6 @@
 var fflip = require('fflip');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var persistence = require('gitter-web-persistence');
-var useragent = require('useragent');
 
 /**
  * List of criteria functions to be used by feature toggles
@@ -28,7 +27,7 @@ var Criteria = {
   disableBrowser: function(userDetails, browsers) {
     if (!browsers) return undefined;
 
-    var agent = useragent.parse(userDetails.userAgent);
+    var agent = userDetails.req.getParsedUserAgent();
 
     var disabledVersion = browsers[agent.family];
     if (!disabledVersion) return undefined;
@@ -102,7 +101,7 @@ module.exports = [
     // Only logged in users get features
     if (!req.user) return next();
 
-    req.fflip.setForUser({ user: req.user, userAgent: req.headers['user-agent'] });
+    req.fflip.setForUser({ user: req.user, req: req });
     next();
   }
 ];

@@ -70,7 +70,7 @@ function uriContextResolverMiddleware(options) {
 }
 
 function isPhoneMiddleware(req, res, next) {
-  req.isPhone = isPhone(req.headers['user-agent']);
+  req.isPhone = isPhone(req);
   next();
 }
 

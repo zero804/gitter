@@ -25,7 +25,6 @@ var url = require('url');
 var cdn = require("../../web/cdn");
 var roomMembershipService = require('../../services/room-membership-service');
 var troupeService = require('../../services/troupe-service');
-var useragent = require('useragent');
 var _ = require('lodash');
 var GitHubOrgService = require('gitter-web-github').GitHubOrgService;
 var orgPermissionModel = require('gitter-web-permissions/lib/models/org-permissions-model');
@@ -131,7 +130,7 @@ function renderHomePage(req, res, next) {
     .then(function (troupeContext) {
       var page = req.isPhone ? 'mobile/mobile-userhome' : 'userhome-template';
 
-      var osName = useragent.parse(req.headers['user-agent']).os.family.toLowerCase();
+      var osName = req.getParsedUserAgent().os.family.toLowerCase();
 
       var isLinux = osName.indexOf('linux') >= 0;
       var isOsx = osName.indexOf('mac') >= 0;

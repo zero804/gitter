@@ -48,7 +48,7 @@ var mainFrameMiddlewarePipeline = [
     }
   },
   function (err, req, res, next) {
-    if (err && err.userNotSignedUp && !isPhone(req.headers['user-agent'])) {
+    if (err && err.userNotSignedUp && !isPhone(req)) {
       appRender.renderUserNotSignedUpMainFrame(req, res, next, 'chat');
       return;
     }

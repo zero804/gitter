@@ -1,8 +1,7 @@
 "use strict";
 
-var useragent = require('useragent');
-var isPhone = require('../web/is-phone');
-var _ = require('underscore');
+var isPhone = require('./is-phone');
+var _ = require('lodash');
 
 // prior to 1.2.1, the ios app would incorrectly send its build number instead of the version nubmer
 var mobileBuildVersionMapping = {
@@ -16,11 +15,11 @@ function isNativeApp(userAgentString) {
   return (userAgentString.indexOf('Gitter') >= 0);
 }
 
-function getType(userAgentString) {
-  return (isPhone(userAgentString) || userAgentString.indexOf('Mobile') >= 0) ? 'mobile' : 'desktop';
+function getType(req, userAgentString) {
+  return (isPhone(req) || userAgentString.indexOf('Mobile') >= 0) ? 'mobile' : 'desktop';
 }
 
-function getGitterAppMetadata(userAgentString) {
+function getGitterAppMetadata(req, userAgentString) {
   // e.g GitterBeta/1.2.0
   var extension = userAgentString.substring(userAgentString.indexOf('Gitter')).split(' ')[0];
 
@@ -29,7 +28,7 @@ function getGitterAppMetadata(userAgentString) {
   var family = parts[0];
   var version = parts[1];
 
-  if(getType(userAgentString) === 'mobile') {
+  if(getType(req, userAgentString) === 'mobile') {
     version = mobileBuildVersionMapping[version] || version;
   }
 
@@ -70,17 +69,19 @@ function createVersionString(obj) {
   return version;
 }
 
-module.exports = function(userAgentString) {
+module.exports = function(req) {
+  var userAgentString = req.headers['user-agent'];
+
   // no useragentstring? no tags for you.
   if(!userAgentString) return {};
 
-  var userAgentObj = useragent.parse(userAgentString).toJSON();
+  var userAgentObj = req.getParsedUserAgent().toJSON();
 
   if(isNativeApp(userAgentString)) {
-    var appMetadata = getGitterAppMetadata(userAgentString);
+    var appMetadata = getGitterAppMetadata(req, userAgentString);
     userAgentObj = _.extend({}, userAgentObj, appMetadata);
   }
-  userAgentObj.type = getType(userAgentString);
+  userAgentObj.type = getType(req, userAgentString);
 
   return tagify(userAgentObj);
 };
