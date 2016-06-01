@@ -1,6 +1,7 @@
 "use strict";
 
 var isPhone = require('./is-phone');
+var isNative = require('./is-native');
 var _ = require('lodash');
 
 // prior to 1.2.1, the ios app would incorrectly send its build number instead of the version nubmer
@@ -10,10 +11,6 @@ var mobileBuildVersionMapping = {
   '595': '1.1.0',
   '587': '1.0.0'
 };
-
-function isNativeApp(userAgentString) {
-  return (userAgentString.indexOf('Gitter') >= 0);
-}
 
 function getType(req, userAgentString) {
   return (isPhone(req) || userAgentString.indexOf('Mobile') >= 0) ? 'mobile' : 'desktop';
@@ -77,7 +74,7 @@ module.exports = function(req) {
 
   var userAgentObj = req.getParsedUserAgent().toJSON();
 
-  if(isNativeApp(userAgentString)) {
+  if(isNative(req)) {
     var appMetadata = getGitterAppMetadata(req, userAgentString);
     userAgentObj = _.extend({}, userAgentObj, appMetadata);
   }

@@ -1,6 +1,6 @@
 "use strict";
 
-var isPhone = function(req) {
+function isPhone(req) {
   var agent = req.getParsedUserAgent();
   var device = agent.device;
 
@@ -8,6 +8,6 @@ var isPhone = function(req) {
 
   var userAgentString = req.headers['user-agent'];
   return userAgentString && userAgentString.toLowerCase().indexOf('mobile') >= 0;
-};
+}
 
 module.exports = isPhone;
