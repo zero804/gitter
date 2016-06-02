@@ -1,7 +1,6 @@
 'use strict';
 
 var _ = require('underscore');
-var urlJoin = require('url-join');
 var toggleClass = require('utils/toggle-class');
 var VirtualMultipleCollection = require('../virtual-multiple-collection');
 

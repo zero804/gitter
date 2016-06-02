@@ -27,10 +27,6 @@ var InviteUserResultListItemView = Marionette.ItemView.extend({
     'change:active': 'onActiveChange'
   },
 
-  initialize: function(options) {
-
-  },
-
   serializeData: function() {
     var data = _.extend({}, this.model.toJSON());
     data.absoluteUri = urlJoin(clientEnv.basePath, this.model.get('username'));
