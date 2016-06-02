@@ -37,6 +37,7 @@ GitHubRepoService.prototype.isCollaborator = function(repo, username) {
  *
  */
  GitHubRepoService.prototype.getCollaborators = function(repo, options) {
+ options = options || {};
   return tentacles.repoCollaborator.list(repo, {
     accessToken: this.accessToken,
     firstPageOnly: options.firstPageOnly
@@ -47,6 +48,7 @@ GitHubRepoService.prototype.isCollaborator = function(repo, username) {
  *
  */
 GitHubRepoService.prototype.getCommits = function(repo, options) {
+  options = options || {};
   return tentacles.repoCommit.list(repo, {
     accessToken: this.accessToken,
     firstPageOnly: options.firstPageOnly
@@ -57,7 +59,8 @@ GitHubRepoService.prototype.getCommits = function(repo, options) {
 /**
  *  Returns repo stargazers
  */
- GitHubRepoService.prototype.getStargazers = function(repo, options) {
+GitHubRepoService.prototype.getStargazers = function(repo, options) {
+  options = options || {};
   return tentacles.starring.listForRepo(repo, {
     accessToken: this.accessToken,
     firstPageOnly: options.firstPageOnly
@@ -99,9 +102,10 @@ GitHubRepoService.prototype.getAllReposForAuthUser = function() {
 
 /** TODO: deprecated */
 GitHubRepoService.prototype.getReposForUser = function(username, options) {
+  options = options || {};
   return tentacles.repo.listForUser(username, {
-    firstPageOnly: options && options.firstPageOnly,
-    accessToken: this.accessToken
+  accessToken: this.accessToken,
+    firstPageOnly: options && options.firstPageOnly
   });
 };
 

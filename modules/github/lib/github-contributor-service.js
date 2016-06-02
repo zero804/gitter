@@ -11,6 +11,7 @@ function GitHubContributorService(user) {
 
 /** Returns an array of usernames of all contributors to a repo */
 GitHubContributorService.prototype.getContributors = function(repo, options) {
+  options = options || {};
   return tentacles.repo.listContributors(repo, {
     accessToken: this.accessToken,
     firstPageOnly: options.firstPageOnly
