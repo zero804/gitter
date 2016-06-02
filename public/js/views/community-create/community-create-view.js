@@ -1,7 +1,9 @@
 'use strict';
 
 var Marionette = require('backbone.marionette');
+var cocktail = require('cocktail');
 var toggleClass = require('utils/toggle-class');
+var KeyboardEventMixin = require('views/keyboard-events-mixin');
 
 require('views/behaviors/isomorphic');
 
@@ -19,7 +21,7 @@ var CommunityCreationOverviewView = require('./views/community-creation-overview
 
 
 
-module.exports = Marionette.LayoutView.extend({
+var CommunityCreateView = Marionette.LayoutView.extend({
   template: template,
 
   attributes: {
@@ -78,7 +80,11 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   events: {
-    'click @ui.close': 'onViewCloseClicked'
+    'click @ui.close': 'closeView'
+  },
+
+  keyboardEvents: {
+    'document.escape': 'closeView'
   },
 
   modelEvents: {
@@ -131,7 +137,12 @@ module.exports = Marionette.LayoutView.extend({
     toggleClass(this.$el[0], 'active', this.model.get('active'));
   },
 
-  onViewCloseClicked: function() {
+  closeView: function() {
     this.model.set('active', false);
   }
 });
+
+
+cocktail.mixin(CommunityCreateView, KeyboardEventMixin);
+
+module.exports = CommunityCreateView;
