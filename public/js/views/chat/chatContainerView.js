@@ -2,6 +2,7 @@
 
 var Marionette = require('backbone.marionette');
 var hasScrollBars = require('utils/scrollbar-detect');
+var appEvents = require('utils/appevents');
 var ChatCollectionView = require('views/chat/chatCollectionView');
 var ChatConnectionIndicatorView = require('views/chat/chatConnectivityIndicatorView');
 var context = require('utils/context');
@@ -45,9 +46,20 @@ module.exports = Marionette.LayoutView.extend({
     primaryScroll: '.primary-scroll',
   },
 
+  events: {
+    'click': 'onClick',
+  },
+
   onRender: function() {
     if (hasScrollBars()) {
       this.ui.primaryScroll.addClass("scroller");
+    }
+  },
+
+  onClick: function(e) {
+    var hasTextSelected = window.getSelection().toString().length > 0;
+    if(!hasTextSelected && e.target.tagName.toLowerCase() !== 'textarea') {
+      appEvents.trigger('focus.request.chat');
     }
   }
 });

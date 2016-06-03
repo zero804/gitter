@@ -106,7 +106,7 @@ describe('group-service', function() {
         .then(function(securityDescriptor) {
           assert.strictEqual(securityDescriptor.admins, 'GH_USER_SAME');
           assert.strictEqual(securityDescriptor.externalId, fixtureLoader.GITTER_INTEGRATION_USER_ID);
-          assert(!securityDescriptor.extraAdmins);
+          assert.deepEqual(securityDescriptor.extraAdmins, []);
           assert.equal(securityDescriptor.public, true);
           assert.equal(securityDescriptor.members, 'PUBLIC');
           assert.equal(securityDescriptor.linkPath, fixtureLoader.GITTER_INTEGRATION_USERNAME);
