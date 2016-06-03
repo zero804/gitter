@@ -13,7 +13,6 @@ var View = Marionette.ItemView.extend({
 
   ui: {
     githubOnly: '#github-only',
-    welcomeMessageContainer: '#welcome-message-container',
     welcomeMessage: '#room-welcome-message',
     welcomeMessagePreviewButton: '#preview-welcome-message',
     welcomeMessagePreviewContainer: '#welcome-message-preview-container',
