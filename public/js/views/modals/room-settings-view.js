@@ -78,7 +78,8 @@ var View = Marionette.ItemView.extend({
     //hide the text area
     this.ui.welcomeMessage[0].classList.add('hidden');
     this.fetchRenderedHTML().then(function(html){
-      this.injectContentIntoPreview(html);
+      this.ui.welcomeMessagePreviewContainer.html(html);
+      toggleClass(this.ui.welcomeMessagePreviewContainer[0], 'loading', false);
     }.bind(this));
   },
 
@@ -122,11 +123,6 @@ var View = Marionette.ItemView.extend({
   showError: function (err){
     this.ui.errorMessage[0].classList.remove('hidden');
     this.ui.welcomeMessage.attr('disabled', true);
-  },
-
-  injectContentIntoPreview: function (html){
-    this.ui.welcomeMessagePreviewContainer.html(html);
-    toggleClass(this.ui.welcomeMessagePreviewContainer[0], 'loading', false);
   },
 
 });
