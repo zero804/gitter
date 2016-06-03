@@ -113,7 +113,7 @@ describe('group-with-policy-service #slow', function() {
       });
   });
 
-  it('should create a repo room (inherit)', function() {
+  it('should create a repo room (inherited)', function() {
     return groupWithPolicyService.createRoom({
         type: 'GH_REPO',
         name: fixtureLoader.GITTER_INTEGRATION_REPO,
@@ -126,9 +126,9 @@ describe('group-with-policy-service #slow', function() {
       .then(function(securityDescriptor) {
         assert.deepEqual(securityDescriptor, {
           type: 'GH_REPO',
-          members: 'GH_REPO_ACCESS',
+          members: 'PUBLIC',
           admins: 'GH_REPO_PUSH',
-          public: false,
+          public: true,
           linkPath: linkPath,
           externalId: fixtureLoader.GITTER_INTEGRATION_REPO_ID
         });

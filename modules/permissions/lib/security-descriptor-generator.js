@@ -192,9 +192,8 @@ function ensureGitHubAccessAndFetchDescriptor(user, options) {
     .then(function(githubInfo) {
       debug("GitHub information for %s is %j", linkPath, githubInfo);
 
-      // is this correct?
       if (security === 'INHERITED') {
-        security = 'PRIVATE';
+        security = githubInfo.security;
       }
 
       if (!githubInfo) throw new StatusError(404);
