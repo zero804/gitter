@@ -1278,7 +1278,6 @@ function deleteRoom(troupe) {
 
 // This is the new way to add any type of room to a group and should replace
 // all the types of room creation except one-to-ones
-// TODO: what about joining a room in a group?
 function upsertGroupRoom(user, group, roomInfo, securityDescriptor, options) {
   options = options || {}; // options.tracking
   var uri = roomInfo.uri;
@@ -1288,9 +1287,6 @@ function upsertGroupRoom(user, group, roomInfo, securityDescriptor, options) {
   // convert back to the old github-tied vars here
   var type = securityDescriptor.type || null;
   var githubId = securityDescriptor.externalId || null;
-  var security = options.security; // blegh
-
-  assert(security, 'security required');
 
   var githubType;
   var roomType;
@@ -1323,14 +1319,6 @@ function upsertGroupRoom(user, group, roomInfo, securityDescriptor, options) {
         lcUri: lcUri,
         userCount: 0,
         sd: securityDescriptor,
-
-        // TODO: Remove this soon. Here for backwards compatibility for now.
-        lcOwner: lcUri.split('/')[0],
-        githubType: githubType,
-        githubId: githubId,
-        security: security,
-
-        // NOTE: assuming there can't be parentId and ownerUserId anymore?
       }
     })
     .spread(function(room, updatedExisting) {
