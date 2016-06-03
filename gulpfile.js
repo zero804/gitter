@@ -551,7 +551,6 @@ gulp.task('build-assets', ['copy-asset-files', 'css', 'webpack', 'uglify']);
  */
 function restoreOriginalFileTimestamps() {
   return through.obj(function(file, enc, done) {
-    console.log(file.path, file.stat.atime);
     utimes(file.path, file.stat.atime, file.stat.mtime, done);
   });
 
