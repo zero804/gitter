@@ -105,16 +105,12 @@ function generate(user, options) {
 
   switch (options.type) {
     // TODO: case null: getDefaultSecurityDescriptor
-    // TODO: drop USER, REPO and ORG
-    case 'USER':
     case 'GH_USER':
       return generateUserSecurityDescriptor(user, options);
 
-    case 'REPO':
     case 'GH_REPO':
       return generateRepoSecurityDescriptor(user, options);
 
-    case 'ORG':
     case 'GH_ORG':
       return generateOrgSecurityDescriptor(user, options);
 

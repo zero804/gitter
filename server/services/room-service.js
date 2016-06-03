@@ -281,7 +281,7 @@ function createRoomForGitHubUri(user, uri, options) {
 
           var sd = securityDescriptorGenerator.generate(user, {
               linkPath: officialUri,
-              type: githubType,
+              type: 'GH_'+githubType, // GH_USER, GH_ORG or GH_REPO
               externalId: githubId,
               security: githubType === 'ORG' ? 'PRIVATE' : security
             });
