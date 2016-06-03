@@ -88,7 +88,6 @@ var View = Marionette.ItemView.extend({
   },
 
   fetchRenderedHTML: function (){
-    var welcomeMessageContent = this.getWelcomeMessageContent();
     return apiClient.post('/private/markdown-preview', { text: this.getWelcomeMessageContent() }, { dataType: 'text'})
       .catch(this.showError.bind(this));
   },
