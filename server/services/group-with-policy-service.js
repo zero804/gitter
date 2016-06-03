@@ -2,7 +2,7 @@
 
 var assert = require('assert');
 var StatusError = require('statuserror');
-var securityDescriptorGenerator = require('gitter-web-permissions/lib/security-descriptor-generator');
+var ensureAccessAndFetchDescriptor = require('gitter-web-permissions/lib/ensure-access-and-fetch-descriptor');
 var Troupe = require('gitter-web-persistence').Troupe;
 var debug = require('debug')('gitter:app:group-with-policy-service');
 var roomService = require('./room-service');
@@ -63,7 +63,7 @@ function ensureAccessAndFetchRoomInfo(user, group, options) {
         throw new StatusError(400, 'Room uri already taken: ' + uri);
       }
 
-      return securityDescriptorGenerator.ensureAccessAndFetchDescriptor(user, options)
+      return ensureAccessAndFetchDescriptor(user, options)
         .then(function(securityDescriptor) {
           return [{
             topic: topic,
