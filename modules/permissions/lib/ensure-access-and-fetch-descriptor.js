@@ -89,8 +89,7 @@ function ensureGitHubAccessAndFetchDescriptor(user, options) {
 
 var ensureAccessAndFetchDescriptor = function(user, options) {
   var type = options.type || null;
-  var security = options.security;
-  // options can also contain linkPath, obtainAccessFromGitHubRepo
+  // options can also contain security, linkPath, obtainAccessFromGitHubRepo
 
   switch (type) {
     case 'GH_ORG':
@@ -103,8 +102,7 @@ var ensureAccessAndFetchDescriptor = function(user, options) {
       return ensureGitHubAccessAndFetchDescriptor(user, options);
 
     case null:
-      // TODO: roll this function into generate() and then call that
-      return securityDescriptorGenerator.getDefaultSecurityDescriptor(user._id, security);
+      return securityDescriptorGenerator.generate(user, options);
 
     default:
       throw new StatusError(400, 'type is not known: ' + type);

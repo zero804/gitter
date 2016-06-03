@@ -101,10 +101,16 @@ function generateRepoSecurityDescriptor(user, options) {
 
 
 function generate(user, options) {
-  assert(options.linkPath, 'linkPath required');
+  options.type = options.type || null;
+
+  if (options.type) {
+    assert(options.linkPath, 'linkPath required');
+  }
 
   switch (options.type) {
-    // TODO: case null: getDefaultSecurityDescriptor
+    case null:
+      return generateDefaultSecurityDescriptor(user, options);
+
     case 'GH_USER':
       return generateUserSecurityDescriptor(user, options);
 
@@ -119,11 +125,11 @@ function generate(user, options) {
   }
 }
 
-function getDefaultSecurityDescriptor(creatorUserId, security) {
+function generateDefaultSecurityDescriptor(user, options) {
   var members;
   var isPublic;
 
-  switch (security || null) {
+  switch (options.security || null) {
     case null:
     case 'PUBLIC':
       members = 'PUBLIC';
@@ -136,7 +142,7 @@ function getDefaultSecurityDescriptor(creatorUserId, security) {
       break;
 
     default:
-      throw new StatusError(500, 'Unknown security type: ' + security);
+      throw new StatusError(500, 'Unknown security type: ' + options.security);
   }
 
   return {
@@ -145,11 +151,10 @@ function getDefaultSecurityDescriptor(creatorUserId, security) {
     public: isPublic,
     members: members,
     extraMembers: [],
-    extraAdmins: [creatorUserId]
+    extraAdmins: [user._id]
   }
 }
 
 module.exports = {
-  generate: generate,
-  getDefaultSecurityDescriptor: getDefaultSecurityDescriptor
+  generate: generate
 }
