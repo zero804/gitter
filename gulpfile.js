@@ -551,6 +551,7 @@ gulp.task('build-assets', ['copy-asset-files', 'css', 'webpack', 'uglify']);
  */
 function restoreOriginalFileTimestamps() {
   return through.obj(function(file, enc, done) {
+    console.log(file.path, file.stat.atime);
     utimes(file.path, file.stat.atime, file.stat.mtime, done);
   });
 
@@ -564,7 +565,7 @@ gulp.task('compress-assets', ['build-assets'], function() {
 });
 
 gulp.task('tar-assets', ['build-assets', 'compress-assets'], function () {
-    return gulp.src(['output/assets/**', '!**/*.map'])
+    return gulp.src(['output/assets/**', '!**/*.map'], { stat: true })
       .pipe(tar('assets.tar'))
       .pipe(gzip({ append: true, gzipOptions: { level: 9 } }))
       .pipe(gulp.dest('output'));
