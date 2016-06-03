@@ -202,6 +202,7 @@ function fixBadLinksOnId(value) {
 }
 
 function renderMainFrame(req, res, next, frame) {
+
   var user = req.user;
   var userId = user && user.id;
   var aroundId = fixBadLinksOnId(req.query.at);
@@ -265,6 +266,10 @@ function renderMainFrame(req, res, next, frame) {
       //TODO Remove this when favourite tab is removed for realz JP 8/4/16
       if(snapshots.leftMenu.state === 'favourite') { leftMenuRoomList = []; }
 
+      //Work out font state
+      var fonts = getFonts();
+      var hasCachedFonts = (req.cookies.webfontsLoaded || '') === 'true';
+
       // pre-processing rooms
       // Bad mutation ... BAD MUTATION
       rooms = rooms
@@ -291,7 +296,8 @@ function renderMainFrame(req, res, next, frame) {
         stagingLink:            stagingLink,
         dnsPrefetch:            dnsPrefetch,
         subresources:           getSubResources(bootScriptName),
-        fonts:                  getFonts(),
+        hasCachedFonts:         hasCachedFonts,
+        fonts:                  fonts,
         showFooterButtons:      true,
         showUnreadTab:          true,
         menuHeaderExpanded:     false,
@@ -389,6 +395,10 @@ function renderChat(req, res, options, next) {
         var orgName = getOrgNameFromTroupeName(troupeContext.troupe.name);
         var orgPageHref = '/orgs/' + orgName + '/rooms/';
 
+        //Work out font state
+        var fonts = getFonts();
+        var hasCachedFonts = (req.cookies.webfontsLoaded || '') === 'true';
+
         var renderOptions = _.extend({
             isRepo: troupe.githubType === 'REPO',
             bootScriptName: script,
@@ -403,7 +413,8 @@ function renderChat(req, res, options, next) {
             classNames: classNames.join(' '),
             agent: req.headers['user-agent'],
             subresources: getSubResources(script),
-            fonts: getFonts(),
+            hasCachedFonts: hasCachedFonts,
+            fonts: fonts,
             dnsPrefetch: dnsPrefetch,
             isPrivate: isPrivate,
             activityEvents: activityEvents,
